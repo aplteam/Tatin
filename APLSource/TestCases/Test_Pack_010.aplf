@@ -1,0 +1,38 @@
+ r←Test_Pack_010(stopFlag batchFlag);⎕TRAP;src2;src3
+ ;dir;src;dist;body;cfg;zipfile;ns;list;expected
+⍝ Packaage the has a folder as "files" property.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir src dist
+ F.MkDir src2←src,'/TheSource'
+ F.MkDir src3←src,'/Assets'
+
+ body←'r←Hello' 'r←''World'''
+ (⊂body)F.NPUT src2,'/Hello.aplf'
+ (⊂'/myFirst.dll')F.NPUT src3,'/myFirst.dll'
+ (⊂'/mySecond.dll')F.NPUT src3,'/mySecond.dll'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'0.1.0'
+ cfg.source←'TheSource/'
+ cfg.files←'Assets/'
+ cfg P.WritePackageConfigFile src
+
+ zipfile←P.Pack src dist
+ →T.GoToTidyUp 0≥≢zipfile
+ list←∆GetFileListFromZipArchive zipfile
+ expected←F.NormalizePath'Assets/myFirst.dll' 'Assets/mySecond.dll' 'TheSource\Hello.aplf' 'apl-package.json'
+ →T.GoToTidyUp~expected ∆LazyMatch list
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

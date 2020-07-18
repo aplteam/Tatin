@@ -1,0 +1,47 @@
+ r←Test_Load_071(stopFlag batchFlag);⎕TRAP
+ ;dir;src;zip;body;cfg;zipfile;refs;tno;qdmx
+⍝ Pack a package with a file asset and then load it twice while the file asset is tied exclusively
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ (⊂'My DLL')F.NPUT src,'/file.dll'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg.source←'Constants.apln'
+ cfg.files←'file.dll'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src zip
+
+ refs←P.LoadPackage zipfile #.TEMP
+ Assert 3=#.TEMP.Constants.⎕NC'PI'
+ →T.GoToTidyUp 3.14≠#.TEMP.Constants.PI
+ →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.∆URI
+ →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.∆HOME
+ →T.GoToTidyUp 1≠≢refs
+
+ tno←(#.TEMP.Constants.##.∆HOME,'/file.dll')⎕NTIE 0 0
+
+ :Trap 98
+     {}P.LoadPackage zipfile #.TEMP
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Does already exist:'{⍺≢(≢⍺)↑⍵}qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ {}{0::⍬ ⋄ ⎕NUNTIE tno}⍬
+ Assert 0=⊃F.RmDir #.TEMP.Constants.##.∆HOME
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

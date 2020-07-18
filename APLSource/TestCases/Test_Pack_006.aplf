@@ -1,0 +1,33 @@
+ r←Test_Pack_006(stopFlag batchFlag);⎕TRAP
+ ;dir;src;dist;cfg;zipfile;ns;list;expected
+⍝ Pack one code file together with several files on "file"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir(src,'/source')dist
+
+ ('foo1←{1}')F.NPUT src,'/source/foo1.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_B'
+ cfg.version←'0.1.0'
+ (F.ExpandPath src,'/README.md')⎕NCOPY F.ExpandPath'README.md'
+ (F.ExpandPath src,'/Managing_packages_with_Tatin.md')⎕NCOPY F.ExpandPath'docs/Managing_packages_with_Tatin.md'
+ cfg.files←'README.md' 'Managing_packages_with_Tatin.md'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src dist
+ →T.GoToTidyUp 0≥≢zipfile
+ list←∆GetFileListFromZipArchive zipfile
+ expected←'apl-package.json' 'source/foo1.apln' 'README.md' 'Managing_packages_with_Tatin.md'
+ →T.GoToTidyUp~expected ∆LazyMatch list
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

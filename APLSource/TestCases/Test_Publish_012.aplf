@@ -1,0 +1,40 @@
+ r←Test_Publish_012(stopFlag batchFlag);⎕TRAP
+ ;dir;src;dist;body;cfg;reg;list;list2
+⍝ Publish a really simple package (single source file, no dependencies, no assets) via 'file://....'
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src dist reg)←(⊂dir,'/'),¨'src' 'dist' 'reg'
+ F.MkDir src dist reg
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_A'
+ cfg.version←'1.0.0'
+ cfg.source←'Test.apln'
+ cfg P.WritePackageConfigFile src
+
+ P.PublishPackage src reg
+
+ →T.GoToTidyUp 1≠≢list←F.ListDirs reg
+ →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list
+ →T.GoToTidyUp 2≠≢list2←F.ListFiles(1⊃list),'/'
+ →T.GoToTidyUp 0=+/'/Example-Package_A-1.0.0.zip'∘{⍺≢(-≢⍺)↑⍵}¨list2
+ →T.GoToTidyUp 1≠≢(Reg.Index.GetRegistryIndex reg)+.=⎕UCS 10
+ →T.GoToTidyUp 1≠reg Reg.Index.FindFullPackageID'Example-Package_A-1.0.0'
+ →T.GoToTidyUp 1≠≢reg Reg.Index.FindPartPackageID'Example-Package_A'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

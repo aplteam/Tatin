@@ -1,0 +1,53 @@
+ r←Test_Misc_002(stopFlag batchFlag);⎕TRAP
+ ;dir;noOfBytes;deps
+⍝ Create a dependency file, add and remove dependencies from it and finally delete it.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir ⍬
+ F.MkDir dir
+
+ P._UserSettings.AddRegistry'[Dyalog]https://packages.dyalog.com/'
+ P._UserSettings.AddRegistry'[MyCompany]https://packages.my-company.com'
+
+ dir D.Add'[tatin]/aplteam-APLTreeUtils-5.0.0'
+ deps←1 D.Get dir
+ →T.GoToTidyUp deps≢,⊂((P._UserSettings.GetRegistry'[tatin]').uri),'aplteam-APLTreeUtils-5.0.0'
+ dir D.Add'[DYALOG]dyalog-Conga-3.2.0'
+ deps←1 D.Get dir
+ →T.GoToTidyUp deps≢((P._UserSettings.GetRegistry¨'[tatin]' '[dyalog]').uri),¨'aplteam-APLTreeUtils-5.0.0' 'dyalog-Conga-3.2.0'
+ dir D.Add'[tatin]aplteam-FilesAndDirs-3.4.9' ';[Foo]C:/Temp/MyGroup-MyPkg-0.1.0' '[tatin]aplteam-APLTreeUtils-4.9.0'
+ deps←1 D.Get dir
+ →T.GoToTidyUp 4≠≢deps
+ (⊂'[tatin]aplteam-OS-2.3.0')F.NPUT(dir,'/',D.DEP_NAME)2                          ⍝ Make sure that the file contains an alias
+ deps←1 D.Get dir
+ →T.GoToTidyUp 5≠≢deps
+ →T.GoToTidyUp~∧/'https'{⍺∘≡¨(≢⍺)↑¨⍵}deps
+ deps←D.Get dir
+ →T.GoToTidyUp 5≠≢deps
+ (⊂'R@[tatin]carlisle-Rumba-2.3.0')F.NPUT(dir,'/',D.DEP_NAME)2                    ⍝ Make sure that the file contains an alias
+ deps←1 D.Get dir
+ →T.GoToTidyUp 6≠≢deps
+ →T.GoToTidyUp~∧/∨/¨'https'∘⍷¨deps
+ (⊂'R@http://tatin.aplteam.com/aplteam-Rumba-2.3.0')F.NPUT(dir,'/',D.DEP_NAME)2   ⍝ Make sure that the file contains an alias
+ deps←1 D.Get dir
+ →T.GoToTidyUp 7≠≢deps
+ →T.GoToTidyUp~∧/{≢'https*://'⎕S 0⊣⍵}¨deps
+
+ F.MkDir dir,'/MyFolder'
+ dir D.Add dir,'/MyFolder/example-packageName-1.2.3'
+ deps←D.Get dir
+ →T.GoToTidyUp 8≠≢deps
+
+ dir D.Add dir,'/MyFolder/example-packageName-1.2.3.zip'
+ deps←D.Get dir
+ →T.GoToTidyUp 9≠≢deps
+
+ r←T._OK
+
+∆TidyUp:
+ Assert P._UserSettings.RemoveRegistry'[Dyalog]'
+ Assert P._UserSettings.RemoveRegistry'[MyCompany]'
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

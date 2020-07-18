@@ -1,0 +1,13 @@
+ r←Test_Server_051(stopFlag batchFlag);⎕TRAP
+ ;list
+⍝ List all versions for a given package in a given Registry for a specific {group}-{name}-{major.minor}
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←P.ListVersions'https://localhost/aplteam-APLProcess-0.2'
+ →T.PassesIf(,⊂'aplteam-APLProcess-0.2')≡∪{⍵↓⍨{-⍵⍳'.'}⌽⍵}¨list
+ list←P.ListVersions'https://localhost/aplteam-APLProcess-1.0'
+ →T.PassesIf(,⊂'aplteam-APLProcess-1.0')≡∪{⍵↓⍨{-⍵⍳'.'}⌽⍵}¨list
+
+ r←T._OK
+⍝Done

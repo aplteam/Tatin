@@ -1,0 +1,60 @@
+ Times;dir;list;ai;list2
+ ⍝ Kai Thomas Max Jaeger
+ dir←'C:\Users\kai\AppData\Local\Temp\Registry_10000_Strong\'
+
+ ⎕←'--- First series always queries the file system for a list'
+⍝ List of all config files for all packages
+ ai←⎕AI[2]
+ list←⊃#.FilesAndDirs.Dir dir
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for listing all packages'
+
+ ai←⎕AI[2]
+ list←{⊃,/1↓⎕NPARTS ⍵}¨⊃#.FilesAndDirs.Dir dir
+ list←({≢'^aplt[^-]*-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for listing packages belonging to a particular group'
+
+ ai←⎕AI[2]
+ list←{⊃,/1↓⎕NPARTS ⍵}¨⊃#.FilesAndDirs.Dir dir
+ list←({≢'^[^-]+-Tester2-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for listing particular packages belonging to any group'
+
+ ai←⎕AI[2]
+ list←{⊃,/1↓⎕NPARTS ⍵}¨⊃#.FilesAndDirs.Dir dir
+ list←({≢'^aplteam-Tester2*-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for listing particular packages belonging to a particualar group'
+
+ ai←⎕AI[2]
+ list←{⊃,/1↓⎕NPARTS ⍵}¨⊃#.FilesAndDirs.Dir dir
+ list←({≢'^[^-]+-W[^-]*-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for all packages that start with a "W" in "name"'
+
+ ⎕←'--- Second series uses a prepared list of all packages ("index")'
+
+ list←{⊃,/1↓⎕NPARTS ⍵}¨⊃#.FilesAndDirs.Dir dir
+
+ ai←⎕AI[2]
+ list2←({≢'^aplt[^-]*-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for listing packages belonging to a particular group'
+
+ ai←⎕AI[2]
+ list2←({≢'^[^-]+-Tester2-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for listing particular packages belonging to any group'
+
+ ai←⎕AI[2]
+ list2←({≢'^aplteam-Tester2*-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for listing particular packages belonging to a particualar group'
+
+ ai←⎕AI[2]
+ list2←({≢'^[^-]+-W[^-]*-'⎕S 0⊣⍵}¨list)/list
+ ai←(⌊0.5+(⎕AI[2]-ai)÷10)÷100
+ ⎕←(⍕ai),' seconds for all packages that start with a "W" in "name"'
+
+⍝D

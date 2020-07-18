@@ -1,0 +1,38 @@
+ r←Test_Load_056(stopFlag batchFlag);⎕TRAP;reg1;reg2;reg3
+ ;dir;src;body;cfg;list;index;expected;zipped;src2;refs
+⍝ Publish a package, then load it from any Registry by specifying a full package ID
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg1 reg2 reg3)←(⊂dir,'/'),¨'src' 'reg1' 'reg2' 'reg3'
+ F.MkDir src2←src,'/Math/Source'
+ F.MkDir reg1 reg2 reg3
+
+ P.Reg.CreateRegistry¨reg1 reg2 reg3
+ P._UserSettings.AddRegistry'[lOcal2]',reg1
+ P._UserSettings.AddRegistry'[MycoMpany]',reg2
+ P._UserSettings.AddRegistry'[PriVate]',reg3
+
+ body←':Class Math' '∇r←x Times y' ':Access Public Shared' 'r←x×y' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/Math.aplc'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'MyDepartment' 'Math' '1.0.0'
+ cfg.source←'Math.aplc'
+ cfg P.WritePackageConfigFile src2
+ P.PublishPackage src2 reg2
+
+ refs←P.LoadPackage'MyDepartment-Math-1.0.0'#.TEMP
+ →T.GoToTidyUp 12≠3 #.TEMP.Math.Times 4
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[Local2]'
+ Assert P._UserSettings.RemoveRegistry'[MYCOMPANy]'
+ Assert P._UserSettings.RemoveRegistry'[private]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

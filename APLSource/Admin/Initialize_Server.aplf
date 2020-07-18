@@ -1,0 +1,12 @@
+ Initialize_Server
+⍝ Copies dependencies, fixes the work dir and establishes references for the Tatin Server.
+⍝ It does not prepare for tests; for that call #.Tatin.TestCasesServer.Prepare
+ :If 'CLEAR WS'≡⎕WSID
+     {}##.FilesAndDirs.Cd ##.AcreConfig.ProjectFolder
+ :Else
+     ##.FilesAndDirs.PolishCurrentDir
+ :EndIf
+ 'RumbaLean' 'Plodder'##.⎕CY'Assets/RunTime/Plodder/Plodder.dws'
+ ##.Server.CreateAllRefs
+ ⎕←'*** Done'
+⍝Done

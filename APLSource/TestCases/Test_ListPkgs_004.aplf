@@ -1,0 +1,12 @@
+ r←Test_ListPkgs_004(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ List all packages for group "aplteam"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←Reg.ListPackages ∆GetServerRegistryFolder,'aplteam'
+
+ noOf←+/{∨/¨(F.CurrentSep,'aplteam-')∘⍷¨⍵}∪{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\'
+ →T.PassesIf noOf≡≢∪{⊃{⍺,'-',⍵}/¯1↓'-'A.Split ⍵}¨list
+
+ r←T._OK
+⍝Done

@@ -1,0 +1,14 @@
+ r←Test_Server_001(stopFlag batchFlag);⎕TRAP
+ ;c;q;res
+⍝ URL is not a package ID but also does not specify the REST interface version;  therefore it's not a valid request.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ c←P.NewClient'https://localhost'
+ q←R.NewRequest 0
+ q.URI←'/does_not_exist'
+ res←c R.SendAndReceive q
+ →T.PassesIf 404≡res.StatusCode
+
+ r←T._OK
+⍝Done

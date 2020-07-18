@@ -1,0 +1,33 @@
+ r←Test_UserCommands_003(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;res3;res4;res5
+⍝ Exercise ]Titan.ListVersions
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg res1)←∆UCMD'ListVersions [local]aplteam-DoesNotExist'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0=≢res1
+
+ (rc msg res1)←∆UCMD'ListVersions [local]aplteam-APLProcess'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res1
+
+ (rc msg res2)←∆UCMD'ListVersions [local]aplteam-APLProcess-0'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res2
+
+ (rc msg res3)←∆UCMD'ListVersions [local]aplteam-APLProcess-0.2'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res3
+
+ (rc msg res4)←∆UCMD'ListVersions [local]aplteam-APLProcess-0.3'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res4
+
+ (rc msg res5)←∆UCMD'ListVersions [local]aplteam-APLProcess-1'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res5
+
+ →T.PassesIf(≢res1)=+/≢¨res3 res4 res5
+
+ r←T._OK
+⍝Done

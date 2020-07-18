@@ -1,0 +1,13 @@
+ Prune←{
+⍝ Make sure that for every {packageName}-{majorNo} only the best version survives.
+     TREE←⍵
+     0=≢TREE.Data:TREE.Data
+     minorPatch←{⍵/⍨⌽2>+\'.'=⌽⍵}¨TREE.{Data[;∆packageID]}⍬
+     TREE.Data←TREE.Data[⍒minorPatch;]                                  ⍝ Firstly, sort by by minor-patch
+     major←{{⍵↑⍨¯1+⍵⍳'.'}⍵↓⍨⍵⍳'-'}¨TREE.{Data[;∆packageID]}⍬
+     ind←⍋major
+     TREE.Data←TREE.Data[ind;]                                          ⍝ Secondly, sort by major
+     major←major[ind]
+     TREE.Data←TREE.Data[{⊃⍵}⌸major⊣TREE.Data;]                         ⍝ First one only
+     TREE.Data[⍋TREE.{Data[;∆level]}⍬;]                                 ⍝ Final sort order by level
+ }

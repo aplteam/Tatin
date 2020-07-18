@@ -1,0 +1,22 @@
+ r←Test_ClientConfig_003(stopFlag batchFlag);⎕TRAP;reg;ns;expected
+⍝ Exercise DefineRegistry's "Get" function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ reg←⎕NEW P.DefineRegistry(,⊂'[boo]http://localhost')
+ reg.api_key←'Firlefanz'
+ reg.port←61250
+ reg.alias←'foo'
+ reg.priority←400
+ ns←reg.Get ⍬
+ →T.PassesIf reg.varsList ∆LazyMatch' '~¨⍨↓ns.⎕NL⍳16
+
+ expected←'foo' 'Firlefanz' 61250 'http://localhost/' 400
+ →T.PassesIf expected ∆LazyMatch reg.Get¨reg.varsList
+
+ →T.PassesIf{98::1 ⋄ 0⊣reg.Get ⍵}1                  ⍝ Wrong data type
+ →T.PassesIf{98::1 ⋄ 0⊣reg.Get ⍵}⊂'foo'             ⍝ Wrong depth
+ →T.PassesIf{98::1 ⋄ 0⊣reg.Get ⍵}'DoesNotExist'
+
+ r←T._OK
+⍝Done

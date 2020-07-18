@@ -1,0 +1,18 @@
+ r←Test_Server_303(stopFlag batchFlag);⎕TRAP;dir;refs
+⍝ Load particular package without specifying a Registry and a patch number.
+⍝ Should find the best patch number on the test server.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+
+ refs←P.LoadPackage'aplteam-APLProcess-0.2'#.TEMP
+ →T.GoToTidyUp 0≡≢refs
+ →T.GoToTidyUp'0.2.12'≢{⍵/⍨3>+\'.'=⍵}2⊃#.TEMP.APLProcess.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

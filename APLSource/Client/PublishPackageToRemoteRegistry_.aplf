@@ -1,0 +1,26 @@
+ {filename}←PublishPackageToRemoteRegistry_(filename url);uri;client;request;response;msg;packageID
+⍝ This sends the file "manually". See also PublishPackageToRemoteRegistry__.
+ (uri packageID)←Reg.SeparateUriAndPackageID url
+ :If 0=≢packageID
+ :OrIf (,'/')≡,packageID
+     packageID,←2⊃⎕NPARTS filename
+ :EndIf
+
+ client←NewClient uri
+
+ request←R.NewRequest 0
+ request.URI←packageID
+ request.Method←'PUT'
+ request.Content←Reg.Base64 Reg.ReadNativeFile filename
+ request.Headers,←⊂'api-key'((_UserSettings.GetRegistry uri).api_key)
+
+ response←client R.SendAndReceive request
+ :If response.StatusCode≢200
+     :If 0<≢response.Content
+         msg←response.Content
+     :Else
+         msg←'HTTP status code: ',⍕response.StatusCode
+     :EndIf
+     msg Assert 0
+ :EndIf
+ ⍝Done

@@ -1,0 +1,13 @@
+ r←Test_ClientConfig_001(stopFlag batchFlag);⎕TRAP;reg;uri
+⍝ Check the default values after initializing the DefineRegistry class
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ uri←'tatin.mycompany.com'
+ reg←⎕NEW P.DefineRegistry(,⊂'http://',uri)
+ →T.PassesIf≢reg.uri≡uri
+ →T.PassesIf 0=≢⊃,/reg.(alias api_key)
+ →T.PassesIf 0≡reg.port
+
+ r←T._OK
+⍝Done

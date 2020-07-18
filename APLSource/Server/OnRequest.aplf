@@ -1,0 +1,15 @@
+ response←OnRequest request
+⍝ Main handler for requests. Requests are first split by HTTP verb.
+ :If 0=G.INI.Get'Trap:General'
+     ⎕SHADOW'⎕TRAP'
+     ⎕TRAP←0 'S'
+ :EndIf
+ :Select request.Method
+ :Case 'GET'
+     response←Handle_GET request
+ :Case 'PUT'
+     response←Handle_PUT request
+ :Else
+     response←ReturnNOT_IMPLEMENTED request
+ :EndSelect
+⍝Done

@@ -1,0 +1,9 @@
+ {r}←∆RecompileIndexOnServer;response;client;request
+⍝ Works only with localhost and when the server runs in test mode.
+ r←⍬
+ client←P.NewClient'https://localhost'
+ request←R.NewRequest 0
+ request.URI←'/v1/RecompileIndex'
+ response←client R.SendAndReceive request
+ Assert response.StatusCode≡200
+⍝Done

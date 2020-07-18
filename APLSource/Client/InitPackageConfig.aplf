@@ -1,0 +1,23 @@
+ InitPackageConfig←{
+⍝ Initialise a package config namespace
+⍝ ⍵ might be empty; then it is ignored.
+⍝ ⍵ might be a namespace; then the content is copied into the config namespace after
+⍝ it got populated with defaults.
+     cfg←#.⎕NS''
+     cfg.alias←''
+     cfg.api←''
+     cfg.description←''     ⍝ max 120 chars
+     cfg.date←3 A.FormatDateTime ⎕TS
+     cfg.files←''
+     cfg.group←''
+     cfg.name←''
+     cfg.source←''
+     cfg.tags←''            ⍝ ";" separated list of tags
+     cfg.project_url←''     ⍝ The project's home
+     cfg.version←'0.1.0'
+     0=≢⍵:cfg
+     varsList←' '~¨⍨↓cfg.⎕NL 2
+     cfg←cfg.⎕NS ⍵
+     'Invalid properties in config namespace'Assert∧/(' '~¨⍨↓cfg.⎕NL 2)∊varsList,⊂'uri':
+     cfg
+ }

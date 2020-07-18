@@ -1,0 +1,32 @@
+ MakeServer;msg;F;targetPath
+ ⎕←(⎕PW-1)⍴'-'
+ msg←''
+ msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
+ msg,←⊂'run a Tatin server, re-arrange stuff, set ⎕LX and finally save the workspace together'
+ msg,←⊂'with everything that is needed by the server in Dist/Server'
+ ⎕←⍪msg
+ ⎕←''
+ F←##.FilesAndDirs
+ :If 1 YesOrNo'Would you like to continue?'
+     {}⎕SE.acre.CloseProject''('all' 1)
+     #.Tatin.⎕EX¨'Client' 'Todo' 'TestCases' 'Simu'
+     ⎕EX¨'Initialize_Client' 'RunTestServer' 'CreateAllRefs_Client'
+     ⎕LX←'#.Tatin.Server.Run 1'
+     F.MkDir'Dist'
+     targetPath←'Dist/Server'
+     F.RmDir targetPath
+     ⎕DL 0.1
+     Assert F.MkDir targetPath
+     ⎕DL 0.1
+     ⎕WSID←targetPath,'/Server'
+     0 ⎕SAVE ⎕WSID
+     F.RmDir targetPath,'/Assets/'
+     ⎕DL 0.1
+     F.MkDir targetPath,'/Assets/'
+     ⎕DL 0.1
+     Assert F.IsDir targetPath,'/Assets/'
+     {(2⊃⍵)Assert 1⊃⍵}'./Assets/'F.CopyTree targetPath,'/Assets'
+     ('./server.ini.RemoveMe')F.CopyTo targetPath,'/server.ini'
+     ⎕←'Note that the INI file need editing!'
+     ⎕←'*** Done'
+ :EndIf

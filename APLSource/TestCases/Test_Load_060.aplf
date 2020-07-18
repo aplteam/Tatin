@@ -1,0 +1,17 @@
+ r←Test_Load_060(stopFlag batchFlag);⎕TRAP;refs
+⍝ Try to load a particular package without specifying a registry
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ refs←P.LoadPackage'aplteam-APLProcess-0.2.7'#.TEMP
+ →T.GoToTidyUp 0=≢refs
+ →T.GoToTidyUp'0.2.7'{⍺≢(≢⍺)↑⍵}2⊃#.TEMP.APLProcess.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

@@ -1,0 +1,44 @@
+ r←Test_Misc_003(stopFlag batchFlag);⎕TRAP
+ ;dir;cfg;cfgFilename;cfg2
+⍝ Exercise the `InitialisePackage` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'MyPackage'
+ cfg.version←'0.1.0'
+ cfg P.WritePackageConfigFile dir
+ cfgFilename←dir,'/',P.CFG_NAME
+
+ :Trap 98
+     P.InitialisePackage dir
+     →T.GoToTidyUp 1
+ :Else
+     →T.GoToTidyUp 0=∨/'already exists'⍷1⊃⎕DM
+ :EndTrap
+
+ F.DeleteFile cfgFilename
+ P.InitialisePackage dir
+ →T.GoToTidyUp 0=F.Exists cfgFilename
+ →T.GoToTidyUp 0=F.Exists dir,'/',cfg.source
+
+ F.DeleteFile cfgFilename
+ cfg.group←'aplteam'
+ cfg.name←'MyPackage'
+ cfg.version←'1.2.0'
+ cfg.source←'APLSource/'
+ cfg P.InitialisePackage dir
+ cfg2←P.ReadPackageConfigFile dir
+ →T.GoToTidyUp 0=F.Exists cfgFilename
+ →T.GoToTidyUp 0=F.Exists dir,'/',cfg.source
+ →T.GoToTidyUp cfg2.(group name version)≢'aplteam' 'MyPackage' '1.2.0'
+ →T.GoToTidyUp cfg2.source≢'APLSource/'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Done

@@ -1,0 +1,42 @@
+ paths←InstallPackage(identifier_ targetFolder);buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID
+⍝ Install package `identifier` in `targetFolder`.\\
+⍝ `identifier` must be one of:
+⍝ * an HTTP request for a package
+⍝ * a ZIP file holding a package
+⍝ * a folder holding a package (like file://C:\Temp\group-name-version\\)
+⍝ * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch}')
+⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
+⍝ You may omit either minor+patch or even major+minor+patch in order to load the "best" verion but you _must_ specify a Registry then.
+⍝ `←` Paths to all packages loaded with the first one being the "main" package, meaning that all the others are dependencies.
+ '"targetFolder" is invalid'Assert F.IsDir⍕targetFolder
+ paths←⍬
+ identifier←ReplaceRegistryAlias identifier_
+ ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
+ identifier←CheckVersion identifier
+ 'Package not found'Assert 0<≢identifier
+ :If ~'/'∊identifier
+ :AndIf '.zip'≢⎕C ¯4↑identifier
+     packageID←GetPackageIDFromFilename identifier
+     identifier←(EstablishRegistry packageID),packageID
+ :EndIf
+ :If 0<≢buildList←GetDependecyTree identifier
+     :For level packageID2 url :In ↓buildList
+         installFolder←targetFolder,'/',packageID2
+         :If level=1
+         :AndIf F.Exists installFolder
+             ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
+             ('Installation folder is not empty :"',installFolder,'"')Assert 0=≢⊃F.Dir installFolder,'/'
+         :EndIf
+         :If 0=F.IsDir installFolder
+             tempDir←InstallPackage_ packageID2 url
+             installFolder ⎕NMOVE tempDir
+             paths,←⊂installFolder
+             F.RmDir tempDir
+         :EndIf
+         :If 1=level
+             targetFolder Dependencies.Add packageID2
+         :EndIf
+     :EndFor
+     SaveBuildList buildList targetFolder
+ :EndIf
+ ⍝Done

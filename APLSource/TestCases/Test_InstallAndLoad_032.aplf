@@ -1,0 +1,61 @@
+ r←Test_InstallAndLoad_032(stopFlag batchFlag);⎕TRAP
+ ;dir;src;body;cfg;installFolder;list;src2;src3;reg
+⍝ A package that depend on another package that has several functions within a namespace
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ src2←src,'/Example-Constants-0.1.0/'
+ src3←src,'/Example-MyMath-0.2.0/'
+ F.MkDir reg
+ F.MkDir src2 src3,¨⊂'/APLSource'
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.14' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/APLSource/Constants.aplc'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg.source←'APLSource'
+ cfg P.WritePackageConfigFile src2
+ P.PublishPackage src2 reg
+
+ body←⊂':Namespace MyMath'
+ body,←'∇r←x Times y' 'r←##.Constants.PI× x×y' '∇'
+ body,←'∇r←Total x' 'r←+/x' '∇'
+ body,←'∇r←x Power y' 'r←x*y' '∇'
+ body,←⊂':EndNamespace'
+ (⊂body)F.NPUT src3,'/APLSource/Math.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'MyMath' '0.2.0'
+ ⍝ cfg.source←''    ⍝ Does not need setting: there is just one folder
+ cfg P.WritePackageConfigFile src3
+ src3 P.Dependencies.Add'[local2]Example-Constants-0.1.0'
+ P.PublishPackage src3 reg
+
+ installFolder←GetTempDir'/Tatin_AppPackages'
+ list←P.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
+ →T.GoToTidyUp 2≠≢list
+
+ →T.GoToTidyUp 2≠≢F.ListDirs installFolder
+ →T.GoToTidyUp 2≠≢F.ListFiles installFolder
+ →T.GoToTidyUp(,⊂'Example-MyMath-0.2.0')≢P.Dependencies.Get installFolder
+
+ {}P.LoadDependencies installFolder #.TEMP
+ →T.GoToTidyUp(3.14×3×4)≠3 #.TEMP.MyMath.Times 4
+ →T.GoToTidyUp 7≠#.TEMP.MyMath.Total 3 4
+ →T.GoToTidyUp 81≠3 #.TEMP.MyMath.Power 4
+ →T.GoToTidyUp 1≠≢#.TEMP.⎕NL⍳16
+ →T.GoToTidyUp 2≠≢#._packages.⎕NL⍳16
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

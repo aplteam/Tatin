@@ -1,0 +1,21 @@
+ html←{accept}∆GetHtmlFromServer uri;client;request;res;path;host
+⍝ Connects to server and returns the HTML, if any.
+⍝ In case the server does not return status code 200 an error is thrown. That's because "accept" (⍺)
+⍝ defaults to 200. You may change this according to your needs.
+ accept←{0<⎕NC ⍵:⍎⍵ ⋄ 200}'accept'  ⍝ 200 (OK) is default
+ :If '/'∊uri
+     (host path)←uri{(⍵↑⍺)(⍵↓⍺)}¯1+uri⍳'/'
+ :Else
+     host←uri
+     path←'/'
+ :EndIf
+ client←R.NewClient 0
+ client.Host←host
+ request←R.NewRequest 0
+ request.URI←path
+ request.Headers,←⊂'Accept' 'text/html'
+ request.Headers,←⊂'User-Agent' 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+ res←client R.SendAndReceive request
+ Assert accept∊res.StatusCode
+ html←¯4↓res.Content
+⍝Done

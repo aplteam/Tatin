@@ -1,0 +1,274 @@
+:Class RideClient
+⍝ ## What
+⍝ The APL Ride Client implements the RIDE protocol in APL and makes it easy to launch a separate APL process and control it with simple commands.\\
+⍝ ## Why
+⍝ Remote controlling an APL process via RIDE allows for mocking user interaction with the APL interpreter, such as:\\
+⍝ * executing expressions in the session
+⍝ * creating and changing items using the editor
+⍝ * tracing, skipping lines, resuming execution
+⍝ * anything else allowed for in the RIDE protocol\\
+⍝ This makes it an ideal framework for writing scripted tests to validate the behaviour of the interpreter or development tools.\\
+⍝ After having been instanciated you need the call the `Start` method in order to make it firing up an instance of Dyalog APL.\\
+⍝ Needs the class `APLProcess` as a sibling.\\
+⍝ Note that SSH is not supported yet.\\
+⍝ See <https://github.com/theaplroom/apl-ride-client>
+
+    ⎕IO←0
+    ⎕ML←1
+
+    ∇ r←Version
+      :Access Public Shared
+      r←'Client' '0.6.2.6' '2020-03-23'
+    ∇
+
+    ∇ History
+      :Access Public Shared
+    ⍝ * 0.6.0 by Kai
+    ⍝   * File extension is now .aplc rather than .dyalog
+    ⍝ * 0.5.0 by Kai
+    ⍝   * APLProcess is now a dependency
+    ⍝   * Method `Start` now returns the ID of the process created.
+    ⍝ * 0.4.0 by Kai
+    ⍝   * Test cases formalized
+    ⍝ * 0.3.0 by Kai
+    ⍝   * ]ADOCable documentation added.
+    ⍝ * 0.2.0 by kai
+    ⍝   * `Start` now takes a parameters space or an empty vector as right argument.
+    ⍝   * Function `Edit` renamed: `EditAndFix`.
+    ⍝   * Methods `Version` and `History` added.
+    ⍝   * Some documentation added.
+    ⍝   * Bug fixes:
+    ⍝     * `Close` crashed in case it was called early (no process started yet).
+    ⍝ * 0.1.0 by Gil
+    ⍝   * First draft
+    ∇
+
+    :Field Public Instance Proc←⍬
+    :Field Public Instance Host←''
+    :Field Public Instance Port
+    :Field Public Instance Messages←⍬
+    :Field Private Instance Name←''
+    :Field Private Instance HandshakeDone←0
+    :Field Private Instance P
+
+    :Field Private Shared MAGIC←82 73 68 69
+    :Field Private Shared PORT←4602
+
+    ∇ r←GetPort
+      :Access Private Shared
+      r←PORT←PORT+1
+    ∇
+
+    ∇ make;r;version
+      :Access Public Instance
+      :Implements Constructor
+      version←⊃(//)⎕VFI{⍵/⍨2>+\'.'=⍵}1⊃'#'⎕WG'APLVersion'
+      'This class requires at least version 16.0 of Dyalog APL'⎕SIGNAL 11/⍨16>version
+      P←(⊃⊃⎕CLASS ⎕THIS).##
+      :If 0=P.⎕NC'DRC'
+          'DRC'P.⎕CY'conga'
+      :EndIf
+      r←P.DRC.Init''
+      Port←GetPort
+    ∇
+
+    ∇ unmake;r
+      :Access Private Instance
+      :Implements Destructor
+      Close
+    ∇
+
+    ∇ Close;r
+      :Access Public Instance
+      :If ~(⊂Proc)∊''⍬
+          :If ~Proc.HasExited
+              r←SendMessage'["Exit",{"code":0}]'
+              ⎕DL 0.5
+              r←P.DRC.Close Name
+          :AndIf ~Proc.HasExited
+              ⎕←'killing'
+              r←Proc.Kill Proc.GetPID
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {pid}←Start parms;ride;rc;more;msg
+      :Access Public Instance
+      ⍝ `parms` is optional and might be an empty vector (= defaults take place).\\
+      ⍝ It is typically provided as a namespace created by `APLProcess.CreateParms`.
+      :If (⊂parms)∊''⍬
+          parms←P.APLProcess.CreateParms
+      :EndIf
+      parms.RideInit←'SERVE:',Host,':',⍕Port
+      Proc←⎕NEW P.APLProcess parms
+      pid←Proc.GetPID
+      Messages←⍬
+      ⎕DL 0.5
+      (rc msg more)←3↑(P.DRC.Clt''Host Port'raw'),'' ''
+      :If 0≠rc
+          (msg,'; rc=',(⍕rc),{0=≢⍵:⍵ ⋄ '; ',⍵}more)⎕SIGNAL 11
+      :EndIf
+      Name←msg
+      HandshakeDone←0
+      SendMessage¨'SupportedProtocols=2' 'UsingProtocol=2' '["Identify",{"identity":1}]'
+      MessageHandler&⍬
+    ∇
+
+    :Section ScriptHelpers
+
+    ∇ {r}←EditAndFix(name body);m1;m2;m3;ns;z;rc
+      :Access Public Instance
+      ⍝ Open an edit window with `name` and populate it with `body` and then fix it.\\
+      ⍝ Any prompt by the editor whether the object should be fixed will be answered.
+      z←Execute')ED ',name
+      (rc m1)←WaitFor'OpenWindow'
+      Assert(¯1≠rc)∧⍬≢m1
+     
+      ns←⎕NS''
+      ns.win←m1.token
+      ns.text←body
+      ns.stop←⍬
+      z←SendMessage'SaveChanges'ns
+      (rc z)←WaitFor'TaskDialog' 1000
+      :If rc=0
+          ns←⎕NS''
+          ns.token←z.token
+          ns.index←100
+          SendMessage'ReplyTaskDialog'ns
+      :EndIf
+     
+      (rc m2)←WaitFor'ReplySaveChanges'
+      Assert(¯1≠rc)∧⍬≢m2
+      Assert m2.err=0
+     
+      ns←⎕NS''
+      ns.win←m1.token
+      z←SendMessage'CloseWindow'ns
+      (rc m3)←WaitFor'CloseWindow'
+      Assert(¯1≠rc)∧⍬≢m3
+      Assert m3.win≡m1.token
+      r←0
+      ⍝
+    ∇
+
+    ∇ {r}←Execute arg;m;trc;txt
+      :Access Public Instance
+      txt trc←2↑(⊆arg),0
+      m←⎕NS''
+      m.text←txt,⎕UCS 10
+      m.trace←trc⌷'false' 'true'
+      r←SendMessage'Execute'm
+    ∇
+
+    ∇ r←ExecuteAndFetchResult arg;m;trc;txt
+      :Access Public Instance
+      txt trc←2↑(⊆arg),0
+      m←⎕NS''
+      m.text←txt,⎕UCS 10
+      m.trace←trc⌷'false' 'true'
+      {}SendMessage'Execute'm
+      r←WaitForSessionOutput 1000
+    ∇
+
+    ∇ {(rc m)}←WaitFor arg;e;en;i;t
+      :Access Public Instance
+      (e t)←2↑(⊆arg),10000
+      rc m←¯1 ⍬
+      :Repeat
+          i←(en←⊃¨Messages)⍳⊂e
+          :If i<≢en
+              m←i 1⊃Messages
+              rc←0
+              Messages↓⍨←i+1
+          :Else
+              t-←1000×⎕DL 0.5⌊t÷1000
+          :EndIf
+      :Until (t≤0)∨(rc=0)
+      :If (rc≠¯1)∧⍬≡m
+          .⍝             rc←¯1
+      :EndIf
+    ∇
+
+    ∇ {r}←WaitForPromptType arg;done;m;timeout;type;start;rc;rem
+      :Access Public Instance
+      type timeout←2↑arg,(≢arg)↓1 10000
+      r←¯1 ⍬
+      done←0
+      start←2⊃⎕AI
+      rem←timeout
+      :Repeat
+          rc m←WaitFor'SetPromptType'rem
+          :If rc=0
+              done←m.type=type
+          :EndIf
+          rem←timeout-(2⊃⎕AI)-start
+      :Until (rem<0)∨done
+      :If done
+          r←0 m
+      :EndIf
+    ∇
+
+    ∇ {r}←WaitForSessionOutput timeout;e;en;i;m;rc
+      :Access Public Instance
+      r←''
+      :Repeat
+          (rc m)←WaitFor'AppendSessionOutput'timeout
+          :If rc=0
+              timeout←0
+              r,←m.result
+          :EndIf
+      :Until rc=¯1
+      r←(⎕UCS 10){¯1↓1↓¨⍵⊂⍨⍺=⍵}(⎕UCS 10),r
+    ∇
+
+    :EndSection
+
+    ∇ {r}←MessageHandler b;dat;done;evt;msgs;nm;ok;pmsgs;rc
+      done←0
+      :Repeat
+          r←P.DRC.Wait Name
+          (rc nm evt dat)←4↑r
+          evt←(rc=100)⊃evt'Timeout'
+          :Select evt
+          :Case 'BlockLast'
+              r←P.DRC.Close Name
+          :Case 'Timeout'
+     
+          :Case 'Block'
+              b,←dat
+              b msgs←ParseMessage b
+              pmsgs←⎕JSON⍣HandshakeDone¨msgs
+              Messages,←pmsgs
+              :If ~HandshakeDone
+              :AndIf 2≤≢Messages
+                  ok←∧/'SupportedProtocols=2' 'UsingProtocol=2'∊2↑Messages
+                  HandshakeDone←ok
+                  Messages↓⍨←2
+                  done←~ok
+              :EndIf
+          :Else
+              done←1
+          :EndSelect
+      :Until done
+    ∇
+
+      ParseMessage←{
+          ⍺←⍬
+          0=l←256⊥4↑⍵:⍵ ⍺
+          l>≢⍵:⍵ ⍺
+          MAGIC≢4↑4↓⍵:∘∘∘ ⍝ RIDE magic number
+          json←8↓l↑⍵
+          msgs←⍺,⊂'UTF-8'⎕UCS json
+          msgs ∇ l↓⍵
+      }
+
+    ∇ {r}←SendMessage m;array;d;p
+      array←~(1=≢⍴m)∧(0=10|⎕DR m)
+      p←'UTF-8'⎕UCS ⎕JSON⍣array⊢m
+      d←{⍵-256×128<⍵}(4/256)⊤8+≢p
+      r←P.DRC.Send Name(d,MAGIC,p)
+    ∇
+
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),11}
+
+:EndClass

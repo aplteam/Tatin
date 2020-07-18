@@ -1,0 +1,17 @@
+ r←Test_ClientConfig_020(stopFlag batchFlag);⎕TRAP;reg;ns;reg2;expected
+⍝ Use the namespace returned by the "Get" method as template for creating a new instance of DefineRegistry
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ reg←⎕NEW P.DefineRegistry(,⊂'http://foo.com')
+ reg.api_key←'firlefanz'
+ reg.port←61250
+ reg.alias←'foo'
+ reg.priority←500
+ ns←reg.Get ⍬
+ reg2←⎕NEW P.DefineRegistry(,ns)
+ expected←'http://foo.com/' 'foo' 61250 'firlefanz' 500
+ →T.PassesIf expected ∆LazyMatch reg{⍺⍎⍵}¨P.DefineRegistry.varsList
+
+ r←T._OK
+⍝Done

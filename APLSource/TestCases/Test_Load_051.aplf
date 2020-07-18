@@ -1,0 +1,45 @@
+ r←Test_Load_051(stopFlag batchFlag);⎕TRAP
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
+⍝ Publish 2 packages consisting of single fn with the 2. depending on first and having an alias, then load from specific Registry
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ F.MkDir src2←src,'/package_A'
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ body←':Namespace Package_A' 'Times←{' '×/⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src2,'/Package_A.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Package_A' '1.0.0'
+ cfg.source←'Package_A.apln'
+ cfg P.WritePackageConfigFile src2
+ P.PublishPackage src2 reg
+
+ F.MkDir src3←src,'/package_B'
+ body←'r←Times y' 'r←Package_A.Times y'
+ (⊂body)F.NPUT src3,'/Times.aplf'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Package_B' '1.0.0'
+ cfg.source←'Times.aplf'
+ cfg.alias←'Times'
+ cfg P.WritePackageConfigFile src3
+ src3 P.Dependencies.Add'[local2]Example-Package_A-1.0.0'
+ P.PublishPackage src3 reg
+
+ refs←P.LoadPackage(reg,'/Example-Package_B-1.0.0')#.TEMP
+ →T.GoToTidyUp 12≠#.TEMP.Times 3 4
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

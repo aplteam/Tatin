@@ -1,0 +1,22 @@
+ r←Test_ClientConfig_105(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg;res
+⍝ Remove the one and only Registry
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+
+ settings←⎕NEW P.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp 0≠≢settings.registries
+
+ reg←⎕NEW P.DefineRegistry(,⊂'https://pakkman.aplwiki.com')
+ settings.AddRegistry reg
+ →T.GoToTidyUp 1≠≢settings.registries
+
+ →T.GoToTidyUp 1≠res←settings.RemoveRegistry'https://pakkman.aplwiki.com'
+ →T.GoToTidyUp 0≠res←settings.RemoveRegistry'https://pakkman.aplwiki.com'
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir

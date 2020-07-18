@@ -1,0 +1,35 @@
+ {rc}←PublishPackageToRemoteRegistry_2(filename uri);filepath;host;request;client;response;m;h;rp;t;buff;headers
+⍝ Send file using Conga 3.0 native send file utility.
+⍝ Process uses C worker thread and should not be blocking.
+⍝
+⍝ --------------- ⍝TODO⍝ -----------------------------------------------------------------
+⍝ This function is currently not used because I could not get this to work.
+⍝ I believe that this is a Conga problem.
+⍝ When this function works it can replace PublishPackageToRemoteRegistry_
+⍝ Whether this function is goinng to be deleted or renamed, check the setting of Tester2's
+⍝ `watchIgnore` property in the Client's `TestCases.Prepare` functions.
+ uri←'^https*://'⎕R''⊣uri
+ (host uri)←{⍵{(⍵↑⍺)(⍵↓⍺)}¯1+⍵⍳'/'}uri
+
+ client←NewClient host
+
+ request←R.NewRequest 0
+ request.URI←uri
+ request.Method←'PUT'
+
+ {}client R.Connect 0
+ m←R.NewMessage client
+ m.Request←request
+ m.RequestTime←R.QTSToSeconds R.QTS ⍝ Or after send?
+ client.Messages,←m
+ headers←0 2⍴''
+ headers⍪←'Connection' 'Close'
+ headers⍪←'Content-Length'(⍕2 ⎕NINFO filename)
+ headers⍪←'Accept-Encoding' 'identity'
+ headers⍪←'Accept' '*.*'
+ headers⍪←'Host'host
+ buff←R.DRC.Send client.Name('POST'uri client.Version headers(''filename))
+ client.LastSendTime←R.QTS
+ Assert 0=1⊃buff    ⍝ This creates a LENGTH ERROR - why?!
+ ∘∘∘
+ ⍝Done

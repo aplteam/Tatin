@@ -1,0 +1,46 @@
+ r←Test_Publish_031(stopFlag batchFlag);⎕TRAP
+ ;dir;src;body;cfg;reg;list;expected;zipped;list2
+⍝ Publish a simple package with two non-source files
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ (⊂'First DLL')F.NPUT src,'/myFirst.dll'
+ (⊂'Second DLL')F.NPUT src,'/mySecond.dll'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_A'
+ cfg.version←'1.0.0'
+ cfg.source←'Test.apln'
+ cfg.files←'myFirst.dll' 'mySecond.dll'
+ cfg P.WritePackageConfigFile src
+
+ P.PublishPackage src reg
+
+ →T.GoToTidyUp 1≠≢list←F.ListDirs reg
+ →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list
+ →T.GoToTidyUp 2≠≢list2←F.ListFiles(1⊃list),'/'
+ →T.GoToTidyUp 0=+/'/Example-Package_A-1.0.0.zip'∘{⍺≢(-≢⍺)↑⍵}¨list2
+ →T.GoToTidyUp 1≠≢(Reg.Index.GetRegistryIndex reg)+.=⎕UCS 10
+ →T.GoToTidyUp 1≠reg Reg.Index.FindFullPackageID'Example-Package_A-1.0.0'
+ →T.GoToTidyUp 1≠≢reg Reg.Index.FindPartPackageID'Example-Package_A'
+ expected←'apl-package.json' 'Test.apln' 'myFirst.dll' 'mySecond.dll'
+ zipped←Reg.DotNetZip.ListZipContents list2 ∆GetByExtension'.ZIP'
+ →T.GoToTidyUp~expected ∆LazyMatch zipped
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

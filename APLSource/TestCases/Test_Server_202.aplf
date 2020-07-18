@@ -1,0 +1,15 @@
+ r←Test_Server_202(stopFlag batchFlag);⎕TRAP;qdmx
+⍝ Ask for best version of an invalid package ID
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :Trap 98
+     P.GetBestVersionNumber'IamInvalid' 'https://localhost'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'Invalid package ID'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

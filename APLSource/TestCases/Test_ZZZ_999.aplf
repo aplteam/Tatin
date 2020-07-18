@@ -1,0 +1,26 @@
+ R←Test_ZZZ_999(stopFlag batchFlag);v;n;d;xml;rf;f1;f2;⎕TRAP
+⍝ Check the "Version" function.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ rf←#.Tatin.Admin
+
+⍝ First we check whether "Version" returns a valid result:
+ (n v d)←rf.Version
+ d←{⍵/⍨3>+\'-'=⍵}d      ⍝ Remove trailing stuff like "-beta"
+ v←{⍵/⍨3>+\'.'=⍵}v      ⍝ Remove build ID
+ f1←~5≤⍴v
+ f1∨←2≠'.'+.=v
+ f1∨←~∧/⎕D∊⍨v~'.'
+
+ f1∨←10≠⍴d
+ f1∨←d[4 7+⎕IO]∨.≠'-'
+ f1∨←~∧/⎕D∊⍨d~'-'
+
+ :If f1
+     ⎕←'Result of the "Version" function is invalid.'
+ :EndIf
+
+ →T.FailsIf f1
+
+ R←T._OK

@@ -1,0 +1,13 @@
+ r←Test_Server_405(stopFlag batchFlag);⎕TRAP;result
+⍝ Ask for the file Assets/img/packkman.png
+⍝ Supposed to deliver the best one
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ result←∆GetHtmlFromServer'localhost/Assets/img/tatin.png'
+ →T.PassesIf'PNG'≡3↑1↓result
+
+ r←T._OK
+
+∆TidyUp:
+⍝Done

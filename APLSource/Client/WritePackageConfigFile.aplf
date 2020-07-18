@@ -1,0 +1,18 @@
+ WritePackageConfigFile←{
+     cfg←⍺
+     path←⊃1 ⎕NPARTS ⍵,'/'
+     cfg_file←path,CFG_NAME
+     cfg←ValidatePackageFiles cfg
+     cfg←ValidateTags cfg
+     cfg.tags←⎕C cfg.tags
+     cfg2←InitPackageConfig cfg
+     'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg2.name:
+     'Invalid alias name'Assert(⎕NS''){0=≢⍵:1 ⋄ 0=⍺.⎕NC ⍵}cfg2.alias:
+     tmp←cfg_file,'.tmp'
+     0::⎕EN(⊃⎕DM)⍬⊣F.DeleteFile tmp
+     _←cfg2.⎕EX'∆List'
+     _←(⊆Reg.JSON cfg2)F.NPUT tmp 1
+     del←F.DeleteFile cfg_file
+     _←cfg_file ⎕NMOVE tmp
+     1:shy←cfg2
+ }

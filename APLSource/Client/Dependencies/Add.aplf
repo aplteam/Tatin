@@ -1,0 +1,18 @@
+ Add←{
+ ⍝ Add ⍵ (one or more dependencies) to depedency file in ⍺ (path).
+ ⍝ ⍵ might be simple (=single dependency) or nested.\\
+ ⍝ Comments start with a ";".\\
+ ⍝ If there is no such file yet it is created.
+     path←⍺
+     deps←,⊆⍵
+     filename←path,'/',DEP_NAME
+     _←Create⍣(0=##.F.Exists filename)⊣path
+     b←##.Reg.IsValidPackageID_Complete¨{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}¨deps
+     b{('Not valid package IDs: ',⊃,/{⍺,',',⍵}/(~⍺)/deps)##.Assert 0}⍣(0∊b)⊣0:
+     sofar←Get path
+     tempFile←(⊃,/2↑⎕NPARTS filename),'.tmp'
+     _←((∪sofar,deps)'ASCII')##.F.NPUT tempFile
+     _←##.F.DeleteFile filename
+     _←filename ⎕NMOVE tempFile
+     1:shy←0
+ }

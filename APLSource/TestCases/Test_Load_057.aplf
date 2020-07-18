@@ -1,0 +1,66 @@
+ r←Test_Load_057(stopFlag batchFlag);⎕TRAP;src0
+ ;dir;body;cfg;list;index;expected;zipped;src2;refs;reg1;reg2;reg3;src1;src3
+⍝ Publish several versions of a package to different Registries, then load all of them by package ID
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src0 src1 src2 src3)←(⊂dir,'/'),¨'src0' 'src1' 'src2' 'src3'
+ (reg1 reg2 reg3)←(⊂dir,'/'),¨'reg1' 'reg2' 'reg3'
+ src0←src0,'/Math/Source'
+ (src1 src2 src3)←{⍵,'/Math/Source'}¨src1 src2 src3
+ F.MkDir src0 src1 src2 src3
+ F.MkDir reg1 reg2 reg3
+
+ P.Reg.CreateRegistry¨reg1 reg2 reg3
+ P._UserSettings.AddRegistry'[MyCompany]',reg1
+ P._UserSettings.AddRegistry'[Private]',reg2
+ P._UserSettings.AddRegistry'[local2]',reg3
+
+ body←':Namespace Foo' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src0,'/Foo.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'MyDepartment' 'Foo' '1.0.0'
+ cfg.source←'Foo.apln'
+ cfg P.WritePackageConfigFile src0
+ P.PublishPackage src0 reg1
+
+ body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''1.0.0''' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src1,'/Math.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'MyDepartment' 'Math' '1.0.0'
+ cfg.source←'Math.apln'
+ cfg P.WritePackageConfigFile src1
+ P.PublishPackage src1 reg2
+
+ body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''3.0.0''' '∇' ':EndNamespace'
+ (⊂body)F.NPUT(src2,'/Math.apln')
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'MyDepartment' 'Math' '3.0.0'
+ cfg.source←'Math.apln'
+ cfg P.WritePackageConfigFile src2
+ P.PublishPackage src2 reg1
+
+ body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''2.0.0''' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src3,'/Math.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'MyDepartment' 'Math' '2.0.0'
+ cfg.source←'Math.apln'
+ cfg P.WritePackageConfigFile src3
+ P.PublishPackage src3 reg3
+
+ refs←P.LoadPackage'MyDepartment-Math-2.0.0'#.TEMP
+ →T.GoToTidyUp 12≠3 #.TEMP.Math.Times 4
+ →T.GoToTidyUp'2.0.0'≢#.TEMP.Math.Version
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ Assert P._UserSettings.RemoveRegistry'[MYCOMPANy]'
+ Assert P._UserSettings.RemoveRegistry'[Private]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

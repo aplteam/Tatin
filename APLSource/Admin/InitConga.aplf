@@ -1,0 +1,25 @@
+ {r}←InitConga dummy;flag;counter;drc
+⍝ The loop is required because every now and then this error is thrown:
+⍝ 1043  ERR_ALREADY_INITIALIZED  DLL probably loaded more than once
+⍝ It seems that executing it again is enough to get over the hurdle
+⍝TODO⍝ To be discussed with Bjoern
+ r←⍬
+ flag←counter←0
+ :Repeat
+     :Trap 999
+         :If '#'≡⊃⊃1↓⎕XSI
+             drc←((GetMyUCMDsFolder''),'/Tatin/Assets/Runtime/Conga/')##.RumbaLean.Conga.Init'tatin'
+             ##.RumbaLean.Conga.X509Cert.LDRC←drc
+         :Else
+             drc←((GetMyUCMDsFolder''),'/Tatin/Assets/Runtime/Conga/')⎕SE._Tatin.RumbaLean.Conga.Init'tatin'
+             ⎕SE._Tatin.RumbaLean.Conga.X509Cert.LDRC←drc
+         :EndIf
+         flag←1
+     :Else
+         :If 10=counter←counter+1
+             ∘∘∘   ⍝ Something is very wrong here: cannot initialize Conga!
+         :Else
+             ⎕DL 0.1
+         :EndIf
+     :EndTrap
+ :Until flag

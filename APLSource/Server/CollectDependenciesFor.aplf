@@ -1,0 +1,34 @@
+ r←{level}CollectDependenciesFor filename;folder;isHttp;filenames;topLevel;list
+⍝ `filename` is a file `Registry.DependenciesFilename`
+⍝ The file may or may not exist.
+⍝ If it does it contains either packageIDs (implying that those packages are part of the
+⍝ current Registry) or an http address, meaning that those packages are managed by a server.
+⍝ ← is a list of dependencies recursively determined by visiting what's hosted elsewhere.
+ :If topLevel←0=⎕NC'DATA'
+     ⎕SHADOW'DATA'
+     DATA←⎕NS''
+     DATA.TREE←⍬
+     DATA.LEVEL←⍬
+     level←1
+ :EndIf
+ :If F.IsFile F.NormalizePath filename
+ :AndIf 0<≢list←⊃F.NGET filename 1
+     :If 0<≢list←list~DATA.TREE
+         DATA.TREE←∪DATA.TREE,list
+         DATA.LEVEL←(≢DATA.TREE)⍴DATA.LEVEL,(≢DATA.TREE)⍴level
+         :If 0∊isHttp←Reg.IsHTTP¨list
+             folder←Reg.RemoveOneLevel 1⊃⎕NPARTS filename
+             filenames←(⊂folder,'/'),¨((~isHttp)/list),¨⊂'/',Reg.DependenciesFilename
+         :AndIf 0<≢filenames←(F.IsFile filenames)/filenames
+             filenames←F.NormalizePath filenames
+             (level+1)CollectDependenciesFor¨filenames
+         :EndIf
+         :If ∨/isHttp
+             DATA.TREE←∪DATA.TREE,list
+             DATA.LEVEL←(≢DATA.TREE)⍴DATA.LEVEL,(≢DATA.TREE)⍴level+1
+         :EndIf
+     :EndIf
+ :EndIf
+ :If topLevel
+     r←DATA
+ :EndIf

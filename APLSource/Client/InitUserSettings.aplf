@@ -1,0 +1,26 @@
+ {ref}←{deleteFlag}InitUserSettings folder;ns
+⍝ Estalishes `_UserSettings` by instantiating the `UserSettings` class.\\
+⍝ `folder` is where the config file lives / is going to be created. If this is empty the Windows
+⍝ Registry or the Dyalog config file (other operating systems than Windows) are checked.
+⍝ If no definition is found it falls back to the default defined by the `GetUserHomeFolder` function.\\
+⍝ ← is a reference pointing to the instance.\\
+⍝ Note that all functions that require user settings rely on `_UserSettings` to exist;
+⍝ if it doesn't a VALUE ERROR will be generated with defaults.\\
+⍝ A newly created user config file will always carry a URL pointing to the Tatin server
+⍝ with the default [tatin].\\
+⍝ ⍺ is optional and defaults to 0; if it is 1 then any already existing config file is
+⍝ first deleted and then created from scratch.
+ deleteFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'deleteFlag'
+ :If F.IsFile folder
+     folder←1⊃⎕NPARTS folder
+ :EndIf
+ {}F.DeleteFile⍣deleteFlag⊣folder,'/',UserSettings.cfg_name
+ :If ~F.IsDir folder
+     Assert F.MkDir folder
+ :EndIf
+ ref←_UserSettings←⎕NEW UserSettings(,⊂folder)
+ :If 0=≢ListRegistries''
+     ns←⎕NEW DefineRegistry(,⊂'[tatin]https://pakkman.aplwiki.com')
+     _UserSettings.AddRegistry ns
+ :EndIf
+⍝Done

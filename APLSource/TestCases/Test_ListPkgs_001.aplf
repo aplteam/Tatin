@@ -1,0 +1,13 @@
+ r←Test_ListPkgs_001(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ List all packages
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←P.ListPackages'[local]'
+
+ noOf←≢∪{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\'
+ →T.PassesIf 0<noOf
+ →T.PassesIf noOf≡≢∪{⊃{⍺,'-',⍵}/¯1↓'-'A.Split ⍵}¨list
+
+ r←T._OK
+⍝Done

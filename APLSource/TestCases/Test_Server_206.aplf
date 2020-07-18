@@ -1,0 +1,15 @@
+ r←Test_Server_206(stopFlag batchFlag);⎕TRAP;result;reg
+⍝ Try to establish which Registry a particular package is found first (first wins)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ reg←P._UserSettings.GetRegistry'[local]'
+ P._UserSettings.RemoveRegistry'[local]'
+ result←P.EstablishRegistry'aplteam-APLProcess-0.2.12'
+ →T.PassesIf result≡'https://localhost/'
+
+ r←T._OK
+
+∆TidyUp:
+ P._UserSettings.AddRegistry ⎕NEW P.DefineRegistry(,⊂reg)
+⍝Done

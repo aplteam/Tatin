@@ -1,0 +1,17 @@
+ response←request GetDetails packageID;data;html;filename;url
+ :If Reg.IsValidPackageID_WithoutVersionNo packageID
+     filename←(⊃¯1↑1⊃F.Dir G.RegistryPath,packageID,'*'),'/',Reg.CFG_Name
+     :If 0<≢data←1⊃F.NGET filename 1
+         :If IsJsonRequest request.Headers
+             response←request ReturnJSON Reg.JSON data
+         :Else
+             url←{(⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET ⍵).project_url}filename
+             html←PrepareHtmlPageForPackageDetails packageID data url
+             response←request ReturnHTML html
+         :EndIf
+     :Else
+         response←request R.Respond 404 1
+     :EndIf
+ :Else
+     response←request R.Respond 404 1
+ :EndIf

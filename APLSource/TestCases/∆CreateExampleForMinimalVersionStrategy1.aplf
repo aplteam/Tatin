@@ -1,0 +1,206 @@
+ {r}←∆CreateExampleForMinimalVersionStrategy1;body;cfg
+⍝ This function establishes the first example of https://research.swtch.com/vgo-mvs
+ r←⍬
+
+⍝ A
+ :If ~(⊂'minimalversion-A')∊P.ListPackages ∆BuildReg
+     body←':Namespace Test' 'Main←{' 'A-1.0.0' '}' ':EndNamespace'
+     (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+     cfg←P.InitPackageConfig ⍬
+     cfg.group←'minimalversion'
+     cfg.name←'A'
+     cfg.version←'1.0.0'
+     cfg.source←'Main.apln'
+     cfg P.WritePackageConfigFile ∆BuildSrc
+     ∆BuildSrc P.Dependencies.Add'minimalversion-B-1.1.2'
+     ∆BuildSrc P.Dependencies.Add'minimalversion-C-1.1.2'
+     P.PublishPackage ∆BuildSrc ∆BuildReg
+     Assert 0=1⊃F.RmDir ∆BuildSrc
+     Assert F.MkDir ∆BuildSrc
+ :EndIf
+
+⍝ B
+ body←':Namespace Test' 'Main←{' 'B-1.1.1' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'B'
+ cfg.version←'1.1.1'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-D-1.1.1'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'B-1.1.2' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'B'
+ cfg.version←'1.1.2'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-D-1.1.3'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+⍝ C
+ body←':Namespace Test' 'Main←{' 'C-1.1.1' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'C'
+ cfg.version←'1.1.1'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'C-1.1.2' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'C'
+ cfg.version←'1.1.2'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-D-1.1.4'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'C-1.1.3' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'C'
+ cfg.version←'1.1.3'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-F-1.1.1'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+⍝ D
+ body←':Namespace Test' 'Main←{' 'D-1.1.1' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'D'
+ cfg.version←'1.1.1'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-E-1.1.1'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'D-1.1.2' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'D'
+ cfg.version←'1.1.2'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-D-1.1.1'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'D-1.1.3' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'D'
+ cfg.version←'1.1.3'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-E-1.1.2'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'D-1.1.4' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'D'
+ cfg.version←'1.1.4'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-E-1.1.2'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+⍝ F
+ body←':Namespace Test' 'Main←{' 'F-1.1.1' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'F'
+ cfg.version←'1.1.1'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-G-1.1.1'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+⍝ G
+ body←':Namespace Test' 'Main←{' 'G-1.1.1' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'G'
+ cfg.version←'1.1.1'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc P.Dependencies.Add'minimalversion-F-1.1.1'
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+⍝ E
+ body←':Namespace Test' 'Main←{' 'E-1.1.1' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'E'
+ cfg.version←'1.1.1'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'E-1.1.2' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'E'
+ cfg.version←'1.1.2'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'E-1.1.3' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'E'
+ cfg.version←'1.1.3'
+ cfg.source←'Main.apln'
+ cfg P.WritePackageConfigFile ∆BuildSrc
+ P.PublishPackage ∆BuildSrc ∆BuildReg
+
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+
+⍝Done

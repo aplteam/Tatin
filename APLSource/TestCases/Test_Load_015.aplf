@@ -1,0 +1,27 @@
+ r←Test_Load_015(stopFlag batchFlag);⎕TRAP
+ ;dir;reg;qdmx
+⍝ Try to load a package with an undefined alias
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ reg←dir,'/reg'
+ F.MkDir reg
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]file://',reg
+
+ :Trap 98
+     P.LoadPackage'[DoesNotExist]Example-MyPackage-0.1.0'#.TEMP
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Unknown alias'{⍺≢(≢⍺)↑⍵}qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+⍝Done

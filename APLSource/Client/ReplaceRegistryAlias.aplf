@@ -1,0 +1,24 @@
+ ReplaceRegistryAlias←{
+ ⍝ Replaces any string `[foo]` by its definition from the Client's config file
+ ⍝ If ⍵ is an alias which cannot be found in the user settings then an error is thrown.
+ ⍝ ⍵ might be nested (more than one string): the function calls itself then recursively.
+ ⍝ Note that the result may start with <http[s]://" but not with "file://"
+     ⍺←_UserSettings
+     cfg←⍺
+     txt←⍵
+     2=≡txt:∇¨txt
+     (at txt)←{'@'∊⍵:⍵{(⍵↑⍺)(⍵↓⍺)}⍵⍳'@' ⋄ ''⍵}txt
+     ('['≠1⍴txt)∨~']'∊txt:txt   ⍝ Because `txt` might be a RegEx after the path/alias!
+     txt~←' '
+     (offset end)←txt⍳'[]'
+     txt←1↓(offset-1)⌽txt
+     alias←A.Lowercase ¯1↓' '~⍨(end-offset)↑txt
+     txt←(end-offset)↓txt
+     0=≢cfg.registries:''
+     ~(⊂alias)∊⎕C cfg.registries.alias:''
+     replaceBy←(1⍳⍨(⎕C cfg.registries.alias)≡¨⊂alias)⊃cfg.registries.uri
+     txt↓⍨←(⊃txt)∊'/\'
+     f←~(¯1↑replaceBy)∊'/\'
+     sep←f/'/'
+     at,(-offset-1)⌽replaceBy,sep,txt
+ }

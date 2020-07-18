@@ -1,0 +1,21 @@
+ r←Test_PkgCfg_002(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2
+⍝ Check whether the "tags" property is converted into lowercase and comma into ;
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ dir←GetTempDir ⍬
+ F.MkDir dir
+
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'0.1.0'
+ cfg.source←'TheSource/'
+ cfg.tags←'APLTeam;FOO,goo'
+ cfg2←cfg P.WritePackageConfigFile dir
+ →T.PassesIf cfg2.tags≡'aplteam;foo;goo'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Done

@@ -1,0 +1,24 @@
+ r←Test_UserCommands_009(stopFlag batchFlag);⎕TRAP;rc;msg;res;filename;folder
+⍝ Exercise ]Tatin.PackageDependencies
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg res)←∆UCMD'PackageDependencies ',∆GetServerRegistryFolder,'aplteam-FilesAndDirs-3.2.3'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res
+ res←(⎕UCS 10)(≠⊆⊢)res
+ →T.PassesIf∧/'aplteam-'∘{⍺≡(≢⍺)↑⍵}¨res
+
+ :If batchFlag
+     →0,r←T._OK
+ :EndIf
+ {}⍞,0/⎕←'This test needs YOU in order to close an edit window without making changes; press <enter> to continue'
+
+ folder←∆GetServerRegistryFolder,'aplteam-FilesAndDirs-3.2.3'
+ filename←folder,'/',P.Dependencies.DEP_NAME
+ (rc msg res)←∆UCMD'PackageDependencies ',folder,' -edit'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢⊃F.NGET filename
+
+ r←T._OK
+⍝Done

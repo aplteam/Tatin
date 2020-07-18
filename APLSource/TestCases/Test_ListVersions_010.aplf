@@ -1,0 +1,10 @@
+ r←Test_ListVersions_010(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ List all versions of one particular package that does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←P.ListVersions'[local]DoesNot-Exit'
+ →T.PassesIf 0≡≢list
+
+ r←T._OK
+⍝Done

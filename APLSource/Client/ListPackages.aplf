@@ -1,0 +1,17 @@
+ list←{group}ListPackages y;client;request;res;uri
+⍝ `y` might be tha path to a Registry or a Registry alias (embraced by []).\\
+⍝ By default all packages saved in that Registry are returned.\\
+⍝ Optionally a left argument can be specified that is treated as a group name:
+⍝ only packages belonging to that group are then returned.
+ group←⎕C{0<⎕NC ⍵:⍎⍵ ⋄ ''}'group'
+ uri←ReplaceRegistryAlias y
+ 'No (valid) Registry specified?!'Assert 0<≢uri
+ :If Reg.IsHTTP uri
+     list←ListPackages_ uri
+ :Else
+     list←Reg.ListPackages uri
+ :EndIf
+ :If 0<≢group
+     list←(group∘≡¨⎕C{⍵↑⍨¯1+⍵⍳'-'}¨list)/list
+ :EndIf
+⍝Done

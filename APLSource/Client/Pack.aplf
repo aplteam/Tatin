@@ -1,0 +1,22 @@
+ zipFilename←Pack(projectPath targetPath);cfg;fileList;zipObj
+ ⍝ projectPath → folder to create package from\\
+ ⍝ targetPath  → folder to put package in\\
+ ⍝ ←             path to package file created
+ targetPath←RemoveFileProtocol targetPath
+ projectPath←⊃1 ⎕NPARTS projectPath,'/'
+ targetPath←⊃1 ⎕NPARTS targetPath,'/'
+ cfg←ReadPackageConfigFile projectPath                                         ⍝ Check projectPath has config
+ ValidateConfig cfg
+ zipFilename←F.ExpandPath targetPath,(GetPackageFilenameFromCfg cfg),'.zip'
+ zipObj←⎕NEW DotNetZip(,⊂zipFilename)
+ 'No source code?!'Assert 0<≢fileList←projectPath GetAllFiles cfg
+ projectPath zipObj.Add fileList
+ projectPath zipObj.Add CFG_NAME
+ :If 0<≢cfg.files
+     projectPath zipObj.Add cfg.files
+ :EndIf
+ :If F.Exists projectPath,Dependencies.DEP_NAME
+     projectPath zipObj.Add Dependencies.DEP_NAME
+ :EndIf
+ zipObj.Dispose
+⍝Done

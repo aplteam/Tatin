@@ -1,0 +1,41 @@
+ r←Test_Pack_011(stopFlag batchFlag);⎕TRAP;src2;src3
+ ;dir;src;dist;body;cfg;zipfile;ns;list;expected
+⍝ Packaage the has a folder and a file as "files" property.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir src dist
+ F.MkDir src2←src,'/TheSource'
+ F.MkDir src3←src,'/Assets/DLLs'
+
+ body←'r←Hello' 'r←''World'''
+ (⊂body)F.NPUT src2,'/Hello.aplf'
+ body←'r←Hello2' 'r←''World2'''
+ (⊂body)F.NPUT src2,'/Hello2.aplf'
+ (⊂'/myFirst.dll')F.NPUT src3,'/myFirst.dll'
+ (⊂'/mySecond.dll')F.NPUT src3,'/mySecond.dll'
+ (⊂'/The ReadMe')F.NPUT src,'/Readme.md'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'0.1.0'
+ cfg.source←'TheSource/'
+ cfg.files←'Assets/' 'Readme.md'
+ cfg P.WritePackageConfigFile src
+
+ zipfile←P.Pack src dist
+ →T.GoToTidyUp 0≥≢zipfile
+ list←∆GetFileListFromZipArchive zipfile
+ expected←{(1+≢⍵)↓¨{⍵/⍨F.IsFile ⍵}⊃('recursive' 1)F.Dir ⍵,'/'}src
+ →T.GoToTidyUp~expected ∆LazyMatch list
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

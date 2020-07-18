@@ -1,0 +1,75 @@
+ r←Test_InstallAndLoad_010(stopFlag batchFlag);⎕TRAP
+ ;dir;src;body;cfg;zipfile;installFolder;list;src2;src3;src4;src5;reg
+⍝ Two packages that depend on the same package but different versions; all are classes
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ src2←src,'/Example-Constants-0.1.0/'
+ src3←src,'/Example-Constants-0.2.0/'
+ src4←src,'/Example-MyClass_AAA-1.0.0/'
+ src5←src,'/Example-MyClass_BBB-1.1.0/'
+ F.MkDir reg
+ F.MkDir src2 src3 src4 src5,¨⊂'/APLSource'
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.14' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/APLSource/Constants.aplc'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg.source←'APLSource'
+ cfg P.WritePackageConfigFile src2
+ P.PublishPackage src2 reg
+
+ body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.1415926' '∇' ':EndClass'
+ (⊂body)F.NPUT src3,'/APLSource/Constants.aplc'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.2.0'
+ cfg.source←'APLSource'
+ cfg P.WritePackageConfigFile src3
+ P.PublishPackage src3 reg
+
+ body←':Class MyClass_AAA' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
+ (⊂body)F.NPUT src4,'/APLSource/MyClass_AAA.aplc'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'MyClass_AAA' '1.0.0'
+ cfg.source←'APLSource'
+ cfg P.WritePackageConfigFile src4
+ src4 P.Dependencies.Add'[local2]Example-Constants-0.1.0'
+ P.PublishPackage src4 reg
+
+ body←':Class MyClass_BBB' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
+ (⊂body)F.NPUT src5,'/APLSource/MyClass_BBB.aplc'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'MyClass_BBB' '1.0.0'
+ cfg.source←'APLSource'
+ cfg P.WritePackageConfigFile src5
+ src5 P.Dependencies.Add'[local2]Example-Constants-0.2.0'
+ P.PublishPackage src5 reg
+
+ installFolder←GetTempDir'/Tatin_AppPackages'
+ list←P.InstallPackage('[local2]Example-MyClass_AAA-1.0.0')installFolder
+ →T.GoToTidyUp 2≠≢list
+ list←P.InstallPackage('[local2]Example-MyClass_BBB-1.0.0')installFolder
+ →T.GoToTidyUp 2≠≢list
+
+ →T.GoToTidyUp 4≠≢F.ListDirs installFolder
+ →T.GoToTidyUp 2≠≢F.ListFiles installFolder
+ →T.GoToTidyUp'Example-MyClass_AAA-1.0.0' 'Example-MyClass_BBB-1.0.0'≢P.Dependencies.Get installFolder
+
+ {}P.LoadDependencies installFolder #.TEMP
+ →T.GoToTidyUp 3.14≠#.TEMP.MyClass_AAA.GetPI
+ →T.GoToTidyUp 3.1415926≠#.TEMP.MyClass_BBB.GetPI
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

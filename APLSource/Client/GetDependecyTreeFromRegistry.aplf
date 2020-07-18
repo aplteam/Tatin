@@ -1,0 +1,21 @@
+ {r}←level GetDependecyTreeFromRegistry path;deps;filename;dep;identifier;requiredBy
+⍝ Reads the dependency file of `path` and processes those
+⍝ Requires semi-global ∆TREE
+ r←⍬
+ filename←path,'/',Reg.DependenciesFilename
+ :If F.IsFile filename
+ :AndIf 0<≢deps←1⊃F.NGET filename 1
+     :For dep :In deps
+         :If ∧/'[]'∊dep
+             identifier←ReplaceRegistryAlias dep
+         :Else
+             identifier←(Reg.RemoveOneLevel path),'/',dep
+         :EndIf
+         :If (⊂GetPackageIDFromFilename identifier)∊GetPackageIDFromFilename¨∆TREE.{Data[;∆packageID]}⍬ ⍝ Avoid circular references
+             :Continue
+         :EndIf
+         requiredBy←GetPackageIDFromFilename path
+         {}GetDependecyTree(level+1)('file://',RemoveFileProtocol identifier)
+     :EndFor
+ :EndIf
+⍝Done

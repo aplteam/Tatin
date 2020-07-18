@@ -1,0 +1,23 @@
+ r←Test_UserCommands_006(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;res3;res4;res5;res;tempDir;packageFolder
+⍝ Exercise ]Titan.Pack and ]Titan.Publish
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ packageFolder←∆GetServerRegistryFolder,'../../Source/OS'
+ (rc msg res)←∆UCMD'Pack "',packageFolder,'" "',tempDir,'"'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ res←⊃F.Dir tempDir,'/'
+ →T.GoToTidyUp 1≠≢res
+ →T.GoToTidyUp'.zip'≢⎕C ¯4↑⊃res
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempDir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

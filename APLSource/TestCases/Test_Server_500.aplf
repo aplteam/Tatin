@@ -1,0 +1,45 @@
+ r←Test_Server_500(stopFlag batchFlag);⎕TRAP;packageID;serverPath;qdmx;reg;oldCredentials
+ ;zip;cfg;body;clientCfg;dir;src;res
+⍝ Try to publish a package with an invalid API key
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'zip'
+ F.MkDir src zip
+ serverPath←∆GetServerPath
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_A'
+ cfg.version←'0.1.0'
+ cfg.source←'Test.apln'
+ cfg P.WritePackageConfigFile src
+
+ packageID←'Example-Package_A-0.1.0'
+
+ reg←P._UserSettings.GetRegistry'https://localhost'
+ oldCredentials←reg.api_key
+ reg.api_key←'Firlefanz'
+ P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂reg)
+ :Trap 0
+     P.PublishPackage src('https://localhost/',packageID)
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Unauthorized request'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ reg.api_key←oldCredentials
+ P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂reg)
+ Assert 0=⊃F.RmDir dir
+ Assert 0=⊃F.RmDir serverPath,'/',packageID
+ F.DeleteFile(739⌶0),'/',packageID,'.zip'
+ ∆RecompileIndexOnServer
+⍝Done

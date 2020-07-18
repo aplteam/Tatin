@@ -1,0 +1,35 @@
+ r←GetBestVersionNumber path;id;pattern;list
+⍝ Establishes the best version number for ⍵
+⍝ '{group}-{name}-3.0.0' ← GetBestVersionNumber '{group}-{name}'
+⍝ '{group}-{name}-2.1.0' ← GetBestVersionNumber '{group}-{name}-2'
+⍝ '{group}-{name}-1.2.1' ← GetBestVersionNumber '{group}-{name}-1'
+⍝ '{group}-{name}-1.1.9' ← GetBestVersionNumber '{group}-{name}-1.1'
+⍝ Returns an empty vector in case nothing fits
+ r←''
+ id←(≢RemovePackageID path)↓path
+ :If IsValidPackageID_Complete id
+     :If F.IsDir path
+         r←path
+     :EndIf
+ :Else
+     :Select ⊃'-'+.=id
+     :Case 1
+         pattern←path,'*'
+     :Case 2
+         pattern←path,'.*'
+     :EndSelect
+     list←⊃F.Dir pattern
+     :If 0<≢list
+         list←list[SortIndexForPackageIDs list]
+         r←⊃¯1↑list
+         r←{⍵↑⍨-'-'⍳⍨⌽⍵}r
+         :If IsValidPackageID_WithoutPatchNo id
+             r←({⍵/⍨2>+\'-'=⍵}path),r
+         :ElseIf IsValidPackageID_WithMajorNo id
+             r←({⍵/⍨2>+\'-'=⍵}path),r
+         :Else
+             r←((-≢id)↓path),({⍵/⍨2>+\'-'=⍵}id),r
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

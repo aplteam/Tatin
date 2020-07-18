@@ -1,0 +1,49 @@
+ r←Test_Misc_004(stopFlag batchFlag);⎕TRAP
+⍝ Exercise the `IsValidPackageID*` functions
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+⍝ ------------- IsValidPackageID_Complete
+ →T.PassesIf Reg.IsValidPackageID_Complete'group-name-1.0.0'
+ →T.PassesIf Reg.IsValidPackageID_Complete'Group-Name-1.0.0'
+ →T.PassesIf Reg.IsValidPackageID_Complete'Group-Na_me-1.0.0'
+ →T.PassesIf Reg.IsValidPackageID_Complete'Group-Name2-1.0.0'
+ →T.PassesIf Reg.IsValidPackageID_Complete'Group-Name2-1.0.0-beta'
+ →T.PassesIf Reg.IsValidPackageID_Complete'Group-Name2-1.0.0-beta-3'
+ →T.PassesIf Reg.IsValidPackageID_Complete'Group-Name2-1.0.0-beta.1'
+
+ →T.FailsIf Reg.IsValidPackageID_Complete'_Group-Name-1.0.0'
+ →T.FailsIf Reg.IsValidPackageID_Complete'Group-_Name-1.0.0'
+ →T.FailsIf Reg.IsValidPackageID_Complete'Group--Name-1.0.0'
+ →T.FailsIf Reg.IsValidPackageID_Complete'GroupName-1.0.0'
+ →T.FailsIf Reg.IsValidPackageID_Complete'Group-Name-1-0-0'
+ →T.FailsIf Reg.IsValidPackageID_Complete'A Group-Name-1.0.0'
+ →T.FailsIf Reg.IsValidPackageID_Complete'Group-Name-1.0.0 A'
+ →T.FailsIf Reg.IsValidPackageID_Complete'GroupName-1.0.0∆'
+
+⍝ ------------- IsValidPackageID_WithoutVersionNo
+
+ →T.PassesIf Reg.IsValidPackageID_WithoutVersionNo'group-name'
+ →T.PassesIf Reg.IsValidPackageID_WithoutVersionNo'Group-Name'
+ →T.PassesIf Reg.IsValidPackageID_WithoutVersionNo'Group-Na_me'
+ →T.PassesIf Reg.IsValidPackageID_WithoutVersionNo'Group-Name2'
+
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'_Group-Name'
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'Group-_Name'
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'Group--Name'
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'GroupName'
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'A GroupName'
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'Group-Name A'
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'Group-Name2-1'
+ →T.FailsIf Reg.IsValidPackageID_WithoutVersionNo'Group-Name2-1.2.3'
+
+ ⍝ ------------- IsValidPackageID_WithMajorNo
+
+ →T.PassesIf Reg.IsValidPackageID_WithMajorNo'group-name-1'
+ →T.PassesIf Reg.IsValidPackageID_WithMajorNo'Group-Name-23'
+
+ →T.FailsIf Reg.IsValidPackageID_WithMajorNo'Group-Name'
+ →T.FailsIf Reg.IsValidPackageID_WithMajorNo'Group-Name-1.2.3'
+
+ r←T._OK
+⍝Done

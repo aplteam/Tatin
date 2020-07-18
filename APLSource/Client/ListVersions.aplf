@@ -1,0 +1,10 @@
+ list←ListVersions y;client;request;res;uri
+⍝ `y` must specify a package but without version number.
+⍝ Returns list with all versions found for that particular package.
+ uri←ReplaceRegistryAlias y
+ :If Reg.IsHTTP uri
+     list←ListVersions_ uri
+ :Else
+     list←Reg.ListVersions uri
+ :EndIf
+⍝Done

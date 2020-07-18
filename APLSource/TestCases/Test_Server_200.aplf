@@ -1,0 +1,11 @@
+ r←Test_Server_200(stopFlag batchFlag);⎕TRAP;packageID;tree
+⍝ Request a build list for a package with no dependencies
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ packageID←'example-Zoo-3.0.0'
+ tree←P.GetDependecyTree'https://localhost/',packageID
+ →T.PassesIf 1 'example-Zoo-3.0.0' 'https://localhost/example-Zoo-3.0.0'≡,tree
+
+ r←T._OK
+⍝Done

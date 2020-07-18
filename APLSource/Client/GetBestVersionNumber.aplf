@@ -1,0 +1,21 @@
+ r←GetBestVersionNumber(packageID url);client;request;res;f
+ :If f←Reg.IsValidPackageID_Complete packageID
+ :OrIf f←Reg.IsValidPackageID_WithMajorNo packageID
+ :OrIf f←Reg.IsValidPackageID_WithoutPatchNo packageID
+ :OrIf f←Reg.IsValidPackageID_WithoutVersionNo packageID
+ :EndIf
+ 'Invalid package ID'Assert f
+ :If Reg.IsHTTP url
+     client←NewClient url
+     :If ':'∊RemoveHttpProtocol url
+         client.Port←⊃⊃(//)⎕VFI{⍵↓⍨⍵⍳':'}RemoveHttpProtocol url
+     :EndIf
+     request←R.NewRequest 0
+     request.URI←'/v1/packages/best_version/',packageID
+     request.Headers,←⊂'Accept' 'application/json'
+     res←client R.SendAndReceive request
+     res.Content Assert 200≡res.StatusCode
+     r←url,((~(¯1↑url)∊'/\')/'/'),(⎕JSON⍠('Dialect' 'JSON5')⊣res.Content).BestVersion
+ :Else
+     r←Reg.GetBestVersionNumber url,packageID
+ :EndIf

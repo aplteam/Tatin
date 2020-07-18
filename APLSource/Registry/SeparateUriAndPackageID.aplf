@@ -1,0 +1,6 @@
+ SeparateUriAndPackageID←{
+     protocol←{⍵↑⍨1↑'^file://' '^https?://'⎕S 1⍠('Greedy' 0)⊣⍵}⍵
+     buff←(≢protocol)↓⍵
+     ~'/'∊buff:(protocol,buff)''
+     protocol'',¨{⍵{(⍵↓⍺)(⍵↑⍺)}1+-{⍵⍳'/'}⌽⍵}buff
+ }

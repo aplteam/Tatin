@@ -1,0 +1,11 @@
+ r←Test_ListPkgs_601(stopFlag batchFlag);⎕TRAP;list
+⍝ List all groups
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←Reg.ListGroups ∆GetServerRegistryFolder
+ →T.PassesIf 0<≢list
+ →T.PassesIf(⊂'aplteam')∊list
+
+ r←T._OK
+⍝Done

@@ -1,0 +1,16 @@
+ Get←{
+ ⍝ Returns all dependencies without any comment lines.
+ ⍝ By default aliases are not replaced (⍺ defaults to 0).
+ ⍝ If you want any Registry alias to be replaced specify 1 as left argument.
+ ⍝ Note that if there is no dependency file then '' is returned.
+     ⍺←0
+     replaceAliasFlag←⍺
+     path←⍵
+     filename←path,'/',DEP_NAME
+     0=##.F.Exists filename:''
+     deps←1⊃##.F.NGET filename 1
+     bool←';'≠⊃¨deps
+     deps←bool/deps             ⍝ Get rid of comments
+     deps←##.ReplaceRegistryAlias⍣replaceAliasFlag⊢deps
+     deps
+ }

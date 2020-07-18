@@ -1,0 +1,27 @@
+ r←Test_PkgCfg_001(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2;qdmx
+⍝ Check whether the "tags" is checked for invalid characters
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ dir←GetTempDir ⍬
+ F.MkDir dir
+
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'0.1.0'
+ cfg.source←'TheSource/'
+ cfg.tags←'APLTeam;FOO!goo'
+
+ :Trap 98
+     cfg2←cfg P.WritePackageConfigFile dir
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'"tags" contains invalid characters'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Done

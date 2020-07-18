@@ -1,0 +1,45 @@
+home                = '<INIFILE>/'
+
+[CONFIG]
+AppName             = 'PlodderForTatin'
+DisplayRequests     = 0                     ; 1 makes Rumba display every request in a ⎕ED windows. For debugging only of course.
+Folder              = '{home}ServerData'    ; Logs, crash files etc.
+LogHTTPToSession    = 0                     ; Naturally only useful in development
+MaxNoOfThreads      = 1000
+Port                = 443
+Secure              = 1
+Registry            = '{home}Registry/'
+Base                = 'localhost'
+Title               = 'Tatin'               ; Window title (Browser)
+Caption             = 'Tatin Registry'      ; <h1> of HTML pages
+TestFlag            = 0                     ; If 1 a couple of commands are available as REST requests
+HTDOCS              = '{home}'              ; Where static files live (CSS, IMGs...)
+
+[LOGFILE]
+LogHTTP             = 1                     ; HTTP requests should always be logged
+LogConga            = 0
+LogRumba            = 0
+
+[WINDOWSEVENTLOG]
+write               = ¯1                   ; ¯1 = Write Start/Stop/Error events to Windows Event Log in Runtime;   1: write   ; 0=never
+
+[CERTIFICATES]                              ; The following settings are ignored in case CONFIG.Secure is 0
+PublicCertFile      = '{home}Assets/RunTime/Certificates/myserver-cert.pem'
+PrivateKeyFile      = '{home}Assets/RunTime/Certificates/myserver-key.pem'
+CertType            = 'DER'
+
+[EVENTS]                        ; These are events send by Rumba to quit ⎕DQ or to broadcasts events ("Pause" and "Continue" when running as a Windows Service)
+QuitEvent           = 9876
+PauseEvent          = 9877
+ContinueEvent       = 9878
+
+[TRAP]
+General             = ¯1        ; ¯1: Error trapping in RunTime but not otherwise;   1: Trap;   0: do not trap.   General means "above" Rumba
+Rumba               = 1         ; This has an effect only in development. Rumba traps all errors in RunTime in any case.
+
+[APP]                                                  ; Change the following settings according to your needs:
+Context             = '#.Tatin.Server'                 ; Where in the workspace does the application live?  (Ideally outside Plodder)
+OnStart             = 'OnStart'                        ; Once called when the server starts
+;OnHeader           = 'OnHeader'                       ; Especially useful for handling "Expect" with value "100-continue"
+OnRequest           = 'OnRequest'                      ; Called in the event of a request. Setting this is mandatory
+OnCongaTimeout      = 'OnHouseKeeping'                 ; Do any housekeeping here

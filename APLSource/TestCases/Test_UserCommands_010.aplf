@@ -1,0 +1,31 @@
+ r←Test_UserCommands_010(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;res3;res4;res5;tempDir;res
+⍝ Exercise ]Tatin.UserSettings
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If 1
+     →0,r←T._Inactive
+ :EndIf
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+
+ (rc msg res)←∆UCMD'UserSettings '
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ ∘∘∘ ⍝TODO⍝
+
+ :If batchFlag
+     →0,r←T._OK
+ :EndIf
+ ⎕←'This test needs YOU: one the ⎕ED windows appears make an insignificant change by adding a'
+ {}⍞,0/⎕←'white space, and then close the edit window; press <enter> to continue.'
+
+ (rc msg res)←∆UCMD'UserSettings -editAArg._1'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ ∘∘∘ ⍝TODO⍝
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempDir
+⍝Done

@@ -1,0 +1,38 @@
+ {r}←CreateTestRegistry registryName;packages;package;i;noOf
+ ;targetDir;filename;packageID;root;F;path;A;packageID2;zipFilename;list2;cfg;P;Reg
+⍝ Takes the name of a Registry which must live in ]GetAcreProjectPath
+⍝ Copies all packages found in that registry over to a - newly created or overwritten - folder
+⍝ "Tatin_Registry' by increasing the minor version number of each package with a random number from 1-20.
+ r←⍬
+ F←##.Core.F ⋄ A←##.Core.A
+ P←#.Tatin.Core ⋄ Reg←#.Tatin_Registry.Core
+ root←⎕SE.UCMD'GetAcreProjectPath'   ⍝ Sorry, runs on Kai's machine only
+ ('Registry "',registryName,'" does not exist in ',root)⎕SIGNAL 11/⍨0=⎕NEXISTS root,'/',registryName,'/'
+ packages←⊃('recursive' 1)('depth' 1)F.Dir root,'/',registryName,'/'
+ targetDir←(739⌶0),'/Registry'
+ F.RmDir targetDir
+ F.MkDir targetDir
+ :For package :In packages
+     path←{⍵,'\','\'A.Last ⍵}package
+     filename←path,'.zip'
+     packageID←2⊃⎕NPARTS filename
+     ⎕←noOf←?19
+     :For i :In 0,⍳noOf
+         packageID2←i IncreasePatchNo packageID
+         F.MkDir targetDir,'/',packageID2
+         zipFilename←targetDir,'/',packageID2,'/',packageID2,'.zip'
+         zipFilename ⎕NCOPY filename
+         zipFilename Reg.DotNetZip.UnzipTo targetDir,'/',packageID2,'/'
+         F.MkDir targetDir,'/',packageID2,'/data'
+         list2←⊃('recursive' 1)F.Dir targetDir,'/',packageID2,'/'
+         list2←(~({⊃,/1↓⎕NPARTS ⍵}¨list2)∊##.Registry.DependenciesFilename'apl-package.json' 'data')/list2
+         list2←('.zip'∘≢¨¯4↑¨list2)/list2
+         list2 F.MoveTo targetDir,'/',packageID2,'/data/'
+         cfg←P.ReadPackageConfigFile targetDir,'/',packageID2
+         cfg.version←3⊃'-'(≠⊆⊢)packageID2
+         cfg P.WritePackageConfigFile targetDir,'/',packageID2
+     :EndFor
+ :EndFor
+
+ ⎕←'*** Done'
+⍝Done

@@ -1,0 +1,19 @@
+ r←Test_LoadBest_003(stopFlag batchFlag);⎕TRAP;qdmx
+ ;refs
+⍝ Load best version of a package from a given Registry by specifying {group}-{name} that does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ :Trap 0
+     refs←P.LoadPackage'[local]DoesNot-Exist'#.TEMP
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'Package not found'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

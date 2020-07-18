@@ -1,0 +1,28 @@
+ {zipFilename}←PublishPackage(source registry);uri;path;cfg
+⍝ Publish a package.\\
+⍝ 1. Checks for uniqueness of the given package/version combination.
+⍝ 2. Creates a dependency file for the package.
+⍝ 3. Creates a zip file for the package in a Temp folder
+⍝ 4. Moves the zip file into the Registry
+⍝ 5. Updates the Registry index
+⍝ Note that if ⍵ points already to a ZIP file it is **moved** into the Registry.\\
+⍝ `⍵` must be a two-item vector:
+⍝ 1. `source` → folder to create package from
+⍝ 2. `registry` → registry to publish package to (alias or uri)
+⍝ ← is '' in case `source` is a ZIP file but the name of the ZIP file created along the way.
+ zipFilename←''
+ uri←F.EnforceSlash ReplaceRegistryAlias registry
+ 'Unknown Registry'Assert(⊂EnforceTrailingSlash RemovePackageID uri)∊_UserSettings.registries.uri
+ source←RemoveFileProtocol source  ⍝ Precaution
+ path←PackIfFolder source
+ :If '.zip'≢⎕C ¯4↑source
+     zipFilename←path
+ :EndIf
+ :If Reg.IsHTTP uri
+     PublishPackageToRemoteRegistry_ path uri
+ :Else
+     'Invalid URI specified'Assert'.zip'≡¯4↑path
+     cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_NAME}source
+     cfg Reg.PublishPackage path uri
+ :EndIf
+⍝Done

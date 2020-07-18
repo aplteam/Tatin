@@ -1,0 +1,25 @@
+ response←request ReturnFiles filename;⎕TRAP
+ response←R.NewResponse request
+ :Select ⎕C 3⊃⎕NPARTS filename
+ :Case '.css'
+     response.ContentType←'text/css'
+ :Case '.ico'
+     response.ContentType←'image/x-icon'
+ :Case '.png'
+     response.ContentType←'image/png'
+ :Case '.gif'
+     response.ContentType←'image/gif'
+ :Else
+     response.ContentType←'text/html'
+ :EndSelect
+ response.FilePath←F.ExpandPath,filename
+ :If F.IsFile response.FilePath
+     response.StatusCode←200
+     response.IsFile←1
+     response.Headers,←⊂'X-Robots-Tag' 'noindex'
+     response.Headers,←⊂'Cache-Control' 'public'   ⍝ Allow caching
+ :Else
+     response←request R.Respond 404
+     response.Content←'File not found'
+ :EndIf
+ ⍝Done

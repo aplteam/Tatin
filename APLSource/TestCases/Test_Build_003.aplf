@@ -1,0 +1,23 @@
+ r←Test_Build_003(stopFlag batchFlag);⎕TRAP;path;tree;expected;qdmx
+⍝ ...
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←∆BuildReg,'minimalversion-A-1.0.0'
+ tree←P.GetDependecyTree'file://',path
+ P.SaveBuildList tree path
+ ⎕DL 1
+ path P.Dependencies.Add'tatin-APLTreeUtils-6.0.1'      ⍝ Modify it
+
+ :Trap 98
+     P.LoadDependencies path'#.TEMP'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Invalid entry:'{⍺≢(≢⍺)↑⍵}qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+⍝Done

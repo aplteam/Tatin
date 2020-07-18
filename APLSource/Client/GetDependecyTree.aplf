@@ -1,0 +1,56 @@
+ tree←GetDependecyTree x;initialCall;identifier;level;requiredBy;buildList;path;tempPath;filename;flag1;flag2
+⍝ Takes `identifier` (`x`) and returns the dependencies as a matrix.
+⍝ `identifier` must be one of:
+⍝ * an HTTP request
+⍝ * a folder holding a package (like file://C:\Temp\group-name-major.minor.patch\\)
+⍝ * a path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
+⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in Client's config file.\\
+⍝ Returns a dependey tree as a matrix:
+⍝ * [;1] reflects the depth of the dependency with 1 for the root (`identifier`)
+⍝ * [;2] PackageID of what required that dependency
+⍝ * [;3] Full package ID
+⍝ * [;4] The full URL (either a local path (without protocol) or http(s)://...)\\
+⍝ This function requires the version number to be fully specified.
+ :If initialCall←80=⎕DR x
+     level←1
+     identifier←x
+     ⎕SHADOW'∆TREE' ⍝ Semiglobal: ∆TREE is visible by GetDependecyTree when called recursively but not outside
+     ∆TREE←CreateTree ⎕NS''
+ :Else
+     (level identifier)←x
+ :EndIf
+ identifier←ReplaceRegistryAlias identifier
+ :If Reg.IsHTTP identifier
+     path←{⍵↓⍨⍵⍳'/'}RemoveHttpProtocol identifier
+     ∆TREE.Data⍪←level path identifier
+     level GetDependecyTreeViaHTTP identifier
+ :Else
+     flag1←Reg.IsValidPackageID_Complete GetPackageIDFromFilename identifier
+     flag2←Reg.IsValidPackageID_WithoutVersionNo GetPackageIDFromFilename identifier
+     'Not a valid package ID'Assert flag1∨flag2
+     ∆TREE.Data⍪←level(GetPackageIDFromFilename identifier)identifier
+     :If '.zip'≡⎕C ¯4↑identifier
+         filename←RemoveFileProtocol identifier
+         tempPath←Reg.GetTempDir,'/',GetPackageIDFromFilename filename
+         F.RmDir tempPath
+         ⎕DL 0.1
+         F.MkDir tempPath
+         ⎕DL 0.1
+         filename DotNetZip.UnzipTo tempPath
+         (level+1)GetDependecyTreeFromRegistry tempPath
+         F.RmDir tempPath
+     :Else
+         identifier←RemoveFileProtocol identifier
+         (level+1)GetDependecyTreeFromRegistry identifier
+     :EndIf
+ :EndIf
+ :If initialCall
+     :If 0<≢buildList←LoadBuildList identifier
+     :AndIf 0<≢buildList←(0<≢¨buildList[;2])⌿buildList
+         ∆TREE.Data⍪←(~buildList[;∆TREE.∆packageID]∊∆TREE.{Data[;∆packageID]}⍬)⌿buildList
+     :EndIf
+     tree←Prune ∆TREE
+ :Else
+     tree←0 4⍴⍬
+ :EndIf
+⍝Done

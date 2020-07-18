@@ -1,0 +1,9 @@
+ response←GetGroupList path;data;html
+ data←Reg.ListGroups path
+ :If IsJsonRequest request.Headers
+     response←request ReturnJSON Reg.JSON data
+ :Else
+     html←PrepareHtmlPageForGroupList data
+     response←request ReturnHTML html
+ :EndIf
+⍝Done

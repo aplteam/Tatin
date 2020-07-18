@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Schema for apl-project.json files",
+    "type": "object",
+    "properties": {
+        "alias": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "description": "Name used in the APL workspace for the reference. Defaults to the name of the pckage."
+        },
+        "api" : {
+            "type": "string",
+            "description": "Application programming interface. Name of a function or a class or a namespace."
+        },        
+        "description" : {
+            "type": "string",
+            "description": "Describes the purpose of the package in max 120 characters."
+        },        
+       "files": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Array of file and folder names to be included in package (default is include all)."
+        },        
+        "group": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "description": "Name of group that the package belongs to."
+        },     
+        "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "description": "Name of the package."
+        },
+        "source": {
+            "type": "string",
+            "description": "Path to file or folder containing the source code (defaults to 'source')."
+        },
+        "version": {
+            "type": "string",
+            "pattern": "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$",
+            "description": "Version number following semantic versioning."
+        }
+    },
+    "required": ["group", "name", "version", "shortdescription"],
+    "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    }
+}

@@ -1,0 +1,33 @@
+ r←Test_Pack_004(stopFlag batchFlag);⎕TRAP
+ ;dir;src;dist;cfg;zipfile;ns;list;expected
+⍝ Pack multiple files spreaded over several levels into special source folder
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir(src,'/APLSource/SubDir')dist
+
+ ('foo1←{1}')F.NPUT src,'/APLSource/foo1.apln'
+ ('foo2←{2}')F.NPUT src,'/APLSource/SubDir/foo2.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_B'
+ cfg.version←'0.1.0'
+ cfg.source←'APLSource'
+ cfg P.WritePackageConfigFile src
+
+ zipfile←P.Pack src dist
+ →T.GoToTidyUp 0≥≢zipfile
+ list←∆GetFileListFromZipArchive zipfile
+ expected←'apl-package.json' 'APLSource/foo1.apln' 'APLSource/SubDir/foo2.apln'
+ →T.GoToTidyUp~expected ∆LazyMatch list
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

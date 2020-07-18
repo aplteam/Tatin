@@ -1,0 +1,21 @@
+ r←Test_ClientConfig_108(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns
+⍝ Exercise AddRegistry and RemoveRegistry with a character vector defining alias+URL, delete by alias
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name               ⍝ Precaution
+
+ settings←⎕NEW P.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp 0≠≢settings.registries
+ settings.AddRegistry'[foo]https://localhost'
+ →T.GoToTidyUp 1≠≢settings.registries
+
+ →T.GoToTidyUp 1≠settings.RemoveRegistry'[foo]'     ⍝ Delete by alias
+ →T.GoToTidyUp 0≠≢settings.registries
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir
+⍝Done

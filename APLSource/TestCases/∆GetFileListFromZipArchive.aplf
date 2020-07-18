@@ -1,0 +1,9 @@
+ list←∆GetFileListFromZipArchive zipfile;tempDir
+ ⍝ Unzip ⍵ into ⍺
+ tempDir←F.GetTempSubDir'Tatin'
+ zipfile ##.DotNetZip.UnzipTo tempDir,'/'
+ list←⊃('recursive' 1)F.Dir tempDir,'/*'
+ list←(F.IsFile list)/list
+ list←(1+≢tempDir)↓¨list
+ Assert 0=⊃F.RmDir tempDir
+ ⍝Done

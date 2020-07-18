@@ -1,0 +1,17 @@
+ r←path FindPartPackageID packageName;index;bool;list
+⍝ `path` must point to a Tatin Registry
+⍝ `packageName` is the `{group}-{name}` part of a package ID
+⍝ Returns either matrix with zero rows or a matrix with full package IDs in the first
+⍝ column and the Registry path in the second column.
+⍝ If the file that is expected to hold the index is not found it is created (empty).
+⍝ See also `FindFullPackageID`
+ r←0 2⍴⍬
+ :If 0=##.F.Exists path,'/',GetIndexFilename
+     Create path
+ :EndIf
+ index←(⎕UCS 10)(≠⊆⊢)1⊃'ASCII'##.F.NGET path,'/',GetIndexFilename
+ :If 0<+/bool←((1+≢packageName)↑¨index)≡¨⊂packageName,'-'
+     list←bool/index
+     r←↑(⊂¨list),¨⊂⊂path
+ :EndIf
+⍝Done

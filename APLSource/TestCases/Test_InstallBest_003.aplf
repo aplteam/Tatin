@@ -1,0 +1,21 @@
+ r←Test_InstallBest_003(stopFlag batchFlag);⎕TRAP;qdmx;dir
+⍝ Attempt to install a "best" version of a package from a given Registry that does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir ⍬
+
+ :Trap 0
+     {}P.InstallPackage'[local]DoesNot-Exist'dir
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'Package not found'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX P.GetTatinRootSpace'#'
+ F.RmDir dir
+⍝Done

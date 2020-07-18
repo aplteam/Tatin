@@ -1,0 +1,40 @@
+ r←Test_Server_102(stopFlag batchFlag);⎕TRAP;zipFilename
+ ;packageID;serverPath;qdmx;zip;cfg;body;clientCfg;dir;src;res
+⍝ Publish a package with two asset files
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'zip'
+ F.MkDir src zip
+ F.MkDir src,'/Assets'
+ serverPath←∆GetServerPath
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ (⊂'First.dll')F.NPUT src,'/Assets/First.dll'
+ (⊂'Second.dll')F.NPUT src,'/Assets/Second.dll'
+ cfg←P.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_A'
+ cfg.version←'0.1.0'
+ cfg.source←'Test.apln'
+ cfg.files←'Assets/First.dll' 'Assets/Second.dll'
+ cfg P.WritePackageConfigFile src
+
+ packageID←'Example-Package_A-0.1.0'
+ zipFilename←P.PublishPackage src('https://localhost/',packageID)
+
+ →T.GoToTidyUp 0=F.IsDir serverPath,,'/',packageID,'/data\Assets'
+ →T.GoToTidyUp 2≠≢1⊃F.Dir serverPath,'/',packageID,'/data\Assets\'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ ⎕DL 0.2
+ Assert 0=⊃F.RmDir serverPath,'/',packageID  ⍝ Error? Try →⎕LC
+ F.DeleteFile zipFilename
+ ∆RecompileIndexOnServer
+⍝Done

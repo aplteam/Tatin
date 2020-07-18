@@ -1,0 +1,38 @@
+ r←Test_ClientConfig_103(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg2;reg1;ns
+⍝ Exercise AddRegistry, ReplaceRegistry and RemoveRegistry on a config file with 0 to 2 registries
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+
+ settings←⎕NEW P.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp 0≠≢settings.registries
+ reg1←⎕NEW P.DefineRegistry(,⊂'https://pakkman.aplwiki.com')
+ settings.AddRegistry reg1
+ →T.GoToTidyUp 1≠≢settings.registries
+ reg2←⎕NEW P.DefineRegistry(,⊂'https://localhost')
+ settings.AddRegistry reg2
+ →T.GoToTidyUp 2≠≢settings.registries
+ reg2.alias←'foo'
+ reg2.api_key←'Firlefanz'
+ ns←reg2.Get ⍬
+ settings.ReplaceRegistry reg2
+ ⎕EX'settings'
+ settings←⎕NEW P.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp 2≠≢settings.registries
+ →T.GoToTidyUp(settings.GetRegistry'[foo]')≢settings.GetRegistry'https://localhost'
+ →T.GoToTidyUp 1≠settings.RemoveRegistry'https://localhost'
+ →T.GoToTidyUp 0≠settings.RemoveRegistry'https://localhost'
+ →T.GoToTidyUp 1≠≢settings.registries
+ settings.AddRegistry reg2
+ →T.GoToTidyUp 2≠≢settings.registries
+ →T.GoToTidyUp 1≠settings.Exist'[foo]'
+ →T.GoToTidyUp 1≠settings.RemoveRegistry'[foo]'
+ →T.GoToTidyUp 0≠settings.Exist'[foo]'
+ →T.GoToTidyUp 1≠≢settings.registries
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir

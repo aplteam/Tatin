@@ -1,0 +1,18 @@
+ r←Test_Server_010(stopFlag batchFlag);⎕TRAP;installFolder;paths;listOfPackages
+ ;filename;q
+⍝ Install a package from the server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ installFolder←GetTempDir'/Installed Packages'
+ paths←P.InstallPackage'https://localhost/aplteam-FilesAndDirs-3.2.2'installFolder
+
+ filename←installFolder,'/',Reg.DependenciesFilename
+ listOfPackages←F.ListDirs installFolder
+ →T.GoToTidyUp~paths ∆LazyMatch listOfPackages
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir F.ExpandPath installFolder,'/..'
+⍝Done

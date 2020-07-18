@@ -1,0 +1,19 @@
+ tempDir←InstallPackage_(packageID url);zipFilename
+⍝ This function fetches a package and unzips it into a temp folder.
+⍝ It is called by both `InstallPackage` and `LoadPackage`.
+ :If Reg.IsHTTP url
+     zipFilename←GetPackageViaHTTP url
+ :Else
+     :If '.zip'≡¯4↑url
+         zipFilename←RemoveFileProtocol RemoveFileProtocol url
+     :Else
+         zipFilename←RemoveFileProtocol(RemoveFileProtocol url),'/',packageID,'.zip'
+     :EndIf
+ :EndIf
+ tempDir←Reg.GetTempDir,'/',packageID,'_',GetMD5 zipFilename
+ F.RmDir tempDir
+ 'Does already exist:'Assert 0=F.IsDir tempDir
+ F.MkDir tempDir
+ zipFilename DotNetZip.UnzipTo tempDir
+ tempDir Add2Config'uri'(RemoveFileProtocol url)
+⍝Done

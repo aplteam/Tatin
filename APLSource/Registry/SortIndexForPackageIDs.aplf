@@ -1,0 +1,7 @@
+ SortIndexForPackageIDs←{
+⍝ ⍵ is either a list of package IDs or a list of version numbers
+⍝ This needs some gymnastics in order to make sure that
+⍝ G-N-9.0.0 comes before G-N-10.0.0
+     '-'∊⊃⍵:⍋{⊃,/¯4↑¨'.'A.Split 3⊃'-'A.Split ⍵}¨⍵
+     ⍋{⊃,/¯4↑¨'.'A.Split ⍵}¨⍵
+ }

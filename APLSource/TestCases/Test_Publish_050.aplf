@@ -1,0 +1,41 @@
+ r←Test_Publish_050(stopFlag batchFlag);⎕TRAP;installFolder;qdmx
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src;src3;refs
+⍝ Publish a package with an invalid dependency
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ body←':Namespace A' 'foo←{' '##.Times ⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/A.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'A' '1.0.0'
+ cfg.source←'A.apln'
+ cfg P.WritePackageConfigFile src
+ src P.Dependencies.Add'[local2]DoesNot-Exist-1.0.0'     ⍝ Invalid dependency
+
+ P.PublishPackage src reg                               ⍝ You might want to install a package with a not yet published dependency
+
+ installFolder←GetTempDir'/Tatin_AppPackages'
+ :Trap 98
+     refs←P.InstallPackage('[local2]/Example-A-1.0.0')installFolder
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~'File does not exist'∆LazyMatch qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert 0=⊃F.RmDir installFolder
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

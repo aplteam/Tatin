@@ -1,0 +1,38 @@
+ r←Test_UserCommands_004(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;rc;msg
+⍝ Exercise ]Titan.LoadPackage
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ (rc msg res)←∆UCMD'LoadPackage aplteam-APLProcess-0.2.9 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.2.9'≢∆RemovePatchFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res)←∆UCMD'LoadPackage aplteam-APLProcess-0.2 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.2.12'≢∆RemovePatchFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res)←∆UCMD'LoadPackage aplteam-APLProcess-0 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.3.0'≢∆RemovePatchFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res)←∆UCMD'LoadPackage aplteam-APLProcess #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'1.0.0'≢∆RemovePatchFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res)←∆UCMD'LoadPackage [local]aplteam-APLProcess #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'1.0.0'≢∆RemovePatchFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

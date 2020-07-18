@@ -1,0 +1,51 @@
+ r←Test_Load_013(stopFlag batchFlag);⎕TRAP
+ ;dir;src;body;cfg;zipfile;refs;path;reg
+⍝ Publish several versions of a package to a registry and then load it without version number (best one)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.0' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg.source←'Constants.apln'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src src
+ P.PublishPackage zipfile'[local2]'
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.1' '∇' ':EndNamespace'
+ (⊂body)F.NPUT(src,'/Constants.apln')1
+ cfg.(group name version)←'Example' 'Constants' '0.2.0'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src src
+ P.PublishPackage zipfile'[local2]'
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT(src,'/Constants.apln')1
+ cfg.(group name version)←'Example' 'Constants' '1.0.0'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src src
+ P.PublishPackage zipfile'[local2]'
+
+ path←dir,'/reg/',⊃{⍺,'-',⍵}/cfg.(group name)
+ refs←P.LoadPackage path #.TEMP
+
+ →T.GoToTidyUp'Example_Constants_1_0_0'≢⊃' '~⍨¨↓#._packages.⎕NL 9
+ →T.GoToTidyUp 1≠≢refs
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

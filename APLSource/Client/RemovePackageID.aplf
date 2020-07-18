@@ -1,0 +1,17 @@
+ RemovePackageID←{
+  ⍝ ⍵ maybe a URL like http(s)://.../{group}-{name}-{version}
+  ⍝ ← is ⍵ without the packageID
+  ⍝ Examples:
+  ⍝ 'https://tatin.com/' ← RemovePackageID 'https://tatin.com/aplteam-OS-1.0.0'
+  ⍝ 'file:///tmp/foo/'     ← RemovePackageID 'file:///tmp/foo/aplteam-OS-1.0.0'
+  ⍝ 'tmp/foo/'             ← RemovePackageID 'tmp/foo/aplteam-OS-1.0.0'
+  ⍝ 'tmp/foo/'             ← RemovePackageID 'tmp/foo/'
+  ⍝ 'tmp/'                 ← RemovePackageID 'tmp/foo'    !!
+     (¯1↑⍵)∊'/\':⍵
+     Reg.IsValidPackageID_Complete ⍵:''
+     Reg.IsValidPackageID_WithMajorNo ⍵:''
+     Reg.IsValidPackageID_WithoutPatchNo ⍵:''
+     last←'/\'A.Last ⍵
+     ~Reg.IsValidPackageID_Complete last:⍵
+     (-≢last)↓⍵
+ }

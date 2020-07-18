@@ -1,0 +1,22 @@
+ tree←{level}LoadBuildList path;filename;ns
+⍝ Reads the build list from file
+⍝ Default for `level` is 0 (all)
+⍝ If level is 1 then only entries with the level 1 are returned (level 1 is the top level)
+⍝ If level is 2 then only entries with the level greater than 2 are returned
+⍝ Note that for the time being level 1 indicates a top-level package while any level >1
+⍝ indicates a dependency.
+ level←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'level'
+ 'Invalid left argument'Assert level∊0 1 2
+ filename←path,'/',Reg.BuildListFilename
+ :If F.IsFile filename
+     ns←0 ⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET filename
+     tree←⍉↑ns.{⍎¨⍵}'depth' 'packageID' 'url'
+     :If level=1
+         tree←(tree[;1]=1)⌿tree
+     :ElseIf level=2
+         tree←(tree[;1]>1)⌿tree
+     :EndIf
+ :Else
+     tree←0 3⍴⍬
+ :EndIf
+⍝Done

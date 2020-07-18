@@ -1,0 +1,56 @@
+ r←Test_Load_014(stopFlag batchFlag);⎕TRAP
+ ;dir;src;reg;prjPath;zipfile;path;refs
+⍝ Publish two classes and one namespace script. The classes :Include the NS script.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ prjPath←'TestData/Source'      ⍝ Already populated; current directory must be where Tatin Client lives
+
+ P.Reg.CreateRegistry reg
+ P._UserSettings.AddRegistry'[local2]',reg
+
+ zipfile←P.Pack(prjPath,'/APLTree')src
+ src ⎕NCOPY prjPath,'/APLTree/apl-package.json'
+ P.PublishPackage zipfile'[local2]'
+
+ Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
+ zipfile←P.Pack(prjPath,'/F-D')src
+ src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/F-D/apl-package.json'
+ P.PublishPackage zipfile'[local2]'
+
+ Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
+ zipfile←P.Pack(prjPath,'/OS')src
+ src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/OS/apl-package.json'
+ P.PublishPackage zipfile'[local2]'
+
+ Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
+ path←dir,'/reg/aplteam-APLTreeUtils-6.0.0'
+ refs←P.LoadPackage path #.TEMP
+ →T.GoToTidyUp 0=≢⎕SRC #.TEMP.APLTreeUtils
+ →T.GoToTidyUp 1≠≢refs
+ →T.GoToTidyUp #.TEMP.APLTreeUtils≢(1⊃refs)⍎'APLTreeUtils'
+
+ path←dir,'/reg/aplteam-FilesAndDirs-3.0.0'
+ refs←P.LoadPackage path #.TEMP
+ →T.GoToTidyUp 0=≢⎕SRC #.TEMP.FilesAndDirs
+ →T.GoToTidyUp 1≠≢refs
+ →T.GoToTidyUp #.TEMP.FilesAndDirs≢(1⊃refs)⍎'FilesAndDirs'
+
+ path←dir,'/reg/aplteam-OS-2.0.0'
+ refs←P.LoadPackage path #.TEMP
+ →T.GoToTidyUp 0=≢⎕SRC #.TEMP.OS
+ →T.GoToTidyUp 1≠≢refs
+ →T.GoToTidyUp #.TEMP.OS≢(1⊃refs)⍎'OS'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

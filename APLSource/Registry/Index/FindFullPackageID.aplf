@@ -1,0 +1,12 @@
+ ind←path FindFullPackageID packageName;index;bool
+⍝ `path` must point to a Tatin Registry
+⍝ `packageName` is simple string `{group}-{name}-{version}`
+⍝ Returns the index of that package in the index or 0 if not found.
+⍝ If the file that is expected to hold the index is not found it is created (empty).
+⍝ See all `FindPartPackageID
+ ind←0
+ index←1⊃'ASCII'##.F.NGET path,'/',GetIndexFilename
+ :If 0<+/bool←(packageName,⎕UCS 10)⍷index
+     ind←1+(index↑⍨bool⍳1)+.=⎕UCS 10
+ :EndIf
+⍝Done

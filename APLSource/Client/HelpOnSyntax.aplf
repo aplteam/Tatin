@@ -1,0 +1,17 @@
+ r←HelpOnSyntax name;body;header;b
+ 'Neither function nor operator'Assert(⎕NC name)∊3 4
+ body←A.dlb A.dtb ⎕NR name
+ header←1⊃body
+ body←1↓body                            ⍝ Remover header
+ body←(~∧\';'=⊃¨body)/body              ⍝ Remove all local vars definition
+ b←∧\(⊃¨body)∊':⍝ '
+ body←2↓¨(b\';'≠⊃¨b/body)/body          ⍝ Remove empty and decleration lines within comment lines
+ header←(¯1+⌊/header⍳';⍝')↑header
+ r←⊂name{⍵↑'--- Help on ',⍺,' ',⍵⍴'-'}⎕PW-1
+ body←'\\\\$'⎕R''⊣body
+ :If 3.1=⎕NC⊂name
+     r,←⊂'∇',header
+ :EndIf
+ r,←'  '∘,¨body
+ r←↑r
+⍝Done

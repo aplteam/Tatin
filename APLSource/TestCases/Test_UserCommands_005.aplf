@@ -1,0 +1,23 @@
+ r←Test_UserCommands_005(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;res3;res4;res5;tempDir;res
+⍝ Exercise ]Titan.InstallPackage and ]Titan.LoadInstalled
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ (rc msg res)←∆UCMD'InstallPackage [local]aplteam-APLProcess-0.2 ',tempDir
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+
+ (rc msg res)←∆UCMD'LoadInstalled ',tempDir,' #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.2.12'≢∆RemovePatchFromVersion 2⊃#.TEMP.APLProcess.Version
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempDir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

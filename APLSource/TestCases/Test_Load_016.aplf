@@ -1,0 +1,34 @@
+ r←Test_Load_016(stopFlag batchFlag);⎕TRAP
+ ;dir;src;zip;body;cfg;zipfile;qdmx
+⍝ Pack a package into a ZIP file and then load it. There are several files but no cfg.source so an error needs to be thrown.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ body←'Times←{×/⍵}'
+ (⊂'body')F.NPUT src,'/Times.aplf'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg P.WritePackageConfigFile src
+
+ :Trap 98
+     zipfile←P.Pack src zip
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~'"cfg.source" is undefined and cannot be established'∆LazyMatch qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

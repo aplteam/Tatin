@@ -1,0 +1,24 @@
+ r←Test_Server_302(stopFlag batchFlag);⎕TRAP;dir;paths;was;localReg
+⍝ Install particular package without specifying a Registry. Should find it on the test server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+
+ localReg←P._UserSettings.GetRegistry'[local]'
+ was←localReg.priority
+ localReg.priority←1  ⍝ Make sure it goes to the end of the food chain
+ P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂localReg)
+ localReg.priority←was
+
+ paths←P.InstallPackage'aplteam-APLProcess-0.2.4'dir
+ →T.PassesIf 1<≢paths
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+ P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂localReg)
+⍝Done

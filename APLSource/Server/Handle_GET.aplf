@@ -1,0 +1,24 @@
+ response←Handle_GET request;html;packageID;fullPath;path;versionNo
+ :If (,'/')≡request.Path
+     response←CreateHomePage request
+ :Else
+     fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
+     :If ∨/∨/¨StaticFiles⍷¨⊂fullPath                            ⍝ Static stuff
+         response←request ReturnFiles G.HTDOCS,fullPath
+     :Else
+         path←Reg.RemovePackageID fullPath
+         packageID←(≢path)↓fullPath
+         :If 0=≢path
+             :If Reg.IsValidPackageID_Complete packageID
+                 response←request FetchPackage packageID        ⍝ It is a fully qualified packageID
+             :Else
+                 response←request R.Respond 404                 ⍝ Neither a valid package ID nor a proper REST request
+             :EndIf
+         :ElseIf request IsREST_v1 fullPath
+             response←request HandleREST_Version1 fullPath
+         :Else
+             response←request R.Respond 404                     ⍝ Neither a valid package ID nor a proper REST request
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

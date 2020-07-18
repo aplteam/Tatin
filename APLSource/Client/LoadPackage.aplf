@@ -1,0 +1,61 @@
+ refs←LoadPackage(identifier_ targetSpace);saveIn2
+ ;buildList;url;level;packageID;tempDir;saveIn;cfg;msg;ref;tempDirs;reset;identifier
+⍝ Load package `identifier` dynamically into the workspace,\\
+⍝ `identifier` must be one of:
+⍝ * an HTTP request for a package
+⍝ * a ZIP file holding a package
+⍝ * a folder holding a package (like file://C:/Temp/group-name-version)
+⍝ * a path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg{packageID}')
+⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in Client's config file.\\
+⍝ `targetSpace` must be a reference or a fully qualified name of an ordinary namespace, meaning the name must start
+⍝ with either `#.` or `⎕SE.`.\\
+⍝ `targetSpace` might already exist but if it doesn't it will be created. If it exists but is not an ordinary
+⍝ namespace an error is thrown.\\
+⍝ `←` Vector with all references that were loaded, including depencies.\\
+⍝ Loads the package into `#._packages.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
+⍝ Loads all dependencies, if any, as well.\\
+⍝ Leaves no trails in the file system unless a package relies on file assets in which case those are loaded into a
+⍝ temporary directory.\\
+⍝ Returns references to all packages loaded into Tatin's package namespace.
+ 'Not a valid package ID'Assert GetPackageIDFromFilename identifier_
+ refs←reset←tempDirs←⍬
+ identifier←ReplaceRegistryAlias identifier_
+ ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
+ :If ~'/'∊identifier
+     identifier←(EstablishRegistry identifier),identifier
+ :EndIf
+ targetSpace←⍕targetSpace
+ '"targetSpace" must start with either "#" or "⎕SE"'Assert(1 ⎕C{⍵↑⍨¯1+⍵⍳'.'}targetSpace)∊'#' '⎕SE'
+ saveIn←GetTatinRootSpace targetSpace
+ :If 0=⎕NC targetSpace
+     targetSpace(⍎{⍵↑⍨¯1+⍵⍳'.'}saveIn).⎕NS''
+ :Else
+     '"targetSpace" is not a namespace'Assert 9=⎕NC targetSpace
+     '"targetSpace" must not be a scripted namespace'Assert{16::1 ⋄ 0⊣⎕SRC ⍵}⍎targetSpace
+ :EndIf
+ identifier←CheckVersion identifier
+ 'Package not found'Assert 0<≢identifier
+ buildList←GetDependecyTree identifier
+ :For level packageID url :In ↓buildList
+     tempDir←InstallPackage_ packageID url
+     cfg←ReadPackageConfigFile tempDir
+     packageID←1 GetPackageIDFromFilename url
+     saveIn2←saveIn,'.',packageID
+     msg←⎕SE.Link.Import saveIn2(tempDir,'/',cfg.source)
+     'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
+     ref←⍎saveIn2
+     ref.∆URI←cfg.uri
+     ref.∆HOME←tempDir
+     :If 0=≢cfg.files
+         tempDirs,←⊂tempDir
+         reset,←⍎saveIn2
+     :EndIf
+     refs,←ref
+     cfg LinkTargetToPackage saveIn2 targetSpace
+ :EndFor
+ LinkDependencies refs
+ :If 0<≢tempDirs
+     F.RmDir tempDirs
+     reset.∆HOME←⊂''  ⍝ Those have been deleted because they don't have
+ :EndIf
+⍝Done

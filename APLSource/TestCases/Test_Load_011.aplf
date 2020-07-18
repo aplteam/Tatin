@@ -1,0 +1,49 @@
+ r←Test_Load_011(stopFlag batchFlag);⎕TRAP
+ ;dir;src;reg1;reg2;body;cfg;zipfile;refs
+⍝ Publish simple package to the second registry and then load it from there using just a package ID.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg1 reg2)←(⊂dir,'/'),¨'src' 'reg1' 'reg2'
+ F.MkDir src reg1 reg2
+
+ P.Reg.CreateRegistry reg1
+ P._UserSettings.AddRegistry'[Private]',reg1
+ P.Reg.CreateRegistry reg2
+ P._UserSettings.AddRegistry'[local2]',reg2
+
+ body←':Namespace Test' '∇r←Hello' 'r←''Word''' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Test' '1.0.0'
+ cfg.source←'Test.apln'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src src
+ P.PublishPackage zipfile'[local2]'
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '1.0.0'
+ cfg.source←'Constants.apln'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src src
+ P.PublishPackage zipfile'[local2]'
+
+ refs←P.LoadPackage'Example-Constants-1.0.0'#.TEMP
+
+ →T.GoToTidyUp'Example_Constants_1_0_0'≢⊃' '~⍨¨↓#._packages.⎕NL 9
+ →T.GoToTidyUp 2≠≢F.ListDirs reg2
+ →T.GoToTidyUp 1≠≢refs
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert P._UserSettings.RemoveRegistry'[Private]'
+ Assert P._UserSettings.RemoveRegistry'[Local2]'
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

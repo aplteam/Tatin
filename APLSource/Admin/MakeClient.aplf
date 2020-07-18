@@ -1,0 +1,73 @@
+ MakeClient;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list
+ F←##.FilesAndDirs
+ ⎕←(⎕PW-1)⍴'-'
+ msg←''
+ msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
+ msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
+ msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
+ msg,←⊂''
+ msg,←⊂'From that WS the Tatin client is eventually copied into ⎕SE by the associated user command:'
+ msg,←⊂'  ]Tatin.Load'
+ msg,←⊂'It also checks whether the user command should be copied to the MyCMDs folder or vice versa.'
+ ⎕←⍪msg
+ ⎕←''
+ :If 1 YesOrNo'Would you like to continue?'
+     {}⎕SE.acre.CloseProject''('all' 1)
+     Assert'#._Tatin'≡⎕SE.acre.OpenProject #.Tatin.AcreConfig.ProjectFolder'#._Tatin'
+     {}⎕SE.acre.CloseProject''('all' 1)
+     #._Tatin.⎕EX¨'Server' 'Todo' 'TestCases' 'Simu'
+     #._Tatin.Admin.⎕EX¨'Initialize_Server' 'RunTestServer' 'CreateAllRefs_Server'
+     #._Tatin.Admin.Initialize_Client
+     ⎕LX←''
+     F.MkDir'Dist'
+     targetPath←'Dist/Client'
+     F.RmDir targetPath
+     ⎕DL 0.1
+     F.MkDir targetPath
+     ⎕DL 0.1
+     ⎕WSID←targetPath,'/Client'
+     #.⎕EX¨(' '~¨⍨↓#.⎕NL⍳16)~⊂'_Tatin'
+     0 ⎕SAVE ⎕WSID
+     (rc more)←'Tatin.dyalog'F.CopyTo targetPath,'/'
+     more Assert 0=⊃rc
+     (success more list)←('./Assets/Runtime/Conga/')F.CopyTree targetPath,'/Assets/Runtime/Conga/'
+     more Assert success
+     reg←⎕NEW #._Tatin.Client.DefineRegistry(,⊂'[tatin]https://pakkman.aplwiki.com')
+     reg.api_key←'f272c8cf-eb99-62b8-f297-60be1a266676'
+     _userSettings←⎕NEW #._Tatin.Client.UserSettings(,⊂targetPath,'/')
+     _userSettings.AddRegistry reg
+     myucmds←#._Tatin.Admin.GetMyUCMDsFolder''
+     :If 1 YesOrNo'Would you like to copy the Tatin client to ',myucmds
+         F.RmDir myucmds,'/Tatin'
+         F.MkDir myucmds,'/Tatin'
+         (rc more)←(⎕WSID,'.dws')F.CopyTo myucmds,'/Tatin/'
+         more Assert 0=rc
+         :If 0=F.Exists myucmds,'/tatin.dyalog'
+             (rc more)←(targetPath,'/tatin.dyalog')F.CopyTo myucmds,'/'
+             more Assert 0=rc
+         :Else
+             ts1←' -:,./'~⍨##.APLTreeUtils.FormatDateTime⊃⊃('type' 3)F.Dir myucmds,'/tatin.dyalog'
+             ts2←' -:,./'~⍨##.APLTreeUtils.FormatDateTime⊃⊃('type' 3)F.Dir'./tatin.dyalog'
+             :If ts1≢ts2
+                 :Select ⍋ts1 ts2
+                 :Case 1 2
+                     (rc more)←'./tatin.dyalog'F.CopyTo myucmds,'/'
+                 :Case 2 1
+                     (rc more)←(myucmds,'/tatin.dyalog')F.CopyTo'./'
+                 :EndSelect
+                 more Assert 0=rc
+             :EndIf
+         :EndIf
+         (success more list)←(targetPath,'/Assets/')F.CopyTree myucmds,'/Tatin/Assets/'
+         more Assert success ⍝ Might fail because the Conga DLLs are in use
+     :EndIf
+     :If 0=F.IsFile path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
+     :OrIf 0 YesOrNo'Overwrite "',path,'" ?'
+         (rc more)←_userSettings.path2config F.CopyTo path
+         more Assert 0=rc
+     :EndIf
+     ⎕←'Note that the user config file might need editing:'
+     ⎕←path
+     ⎕←''
+     ⎕←'*** Done'
+ :EndIf

@@ -1,0 +1,17 @@
+ r←Test_ClientConfig_111(stopFlag batchFlag);⎕TRAP;settings;tempDir
+⍝ Instantiate the "UserSettings" class with two arguments
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+
+ settings←⎕NEW P.UserSettings(tempDir'MySource')
+ →T.GoToTidyUp≢/F.ExpandPath¨settings.path2config(tempDir,'/',settings.cfg_name)
+ →T.GoToTidyUp'MySource'≢settings.source
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir
+⍝Done

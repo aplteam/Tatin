@@ -1,0 +1,9 @@
+ PutRegistryIndex←{
+     (tmp tgt)←(⊂⍵,'/',2⊃⎕NPARTS GetIndexFilename),¨'.tmp' '.txt'
+     data←⍺
+     data,←((⎕UCS 10)≠¯1↑data)/⎕UCS 10
+     _←(⊂data)##.F.NPUT tmp
+     _←##.F.DeleteFile tgt
+     _←tgt ⎕NMOVE tmp
+     1:shy←0
+ }

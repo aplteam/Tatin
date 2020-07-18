@@ -1,0 +1,11 @@
+ RemoveOneLevel←{
+⍝  'C:\Temp' ←→     RemoveOneLevel 'C:\Temp\Foo'
+⍝  'C:\Temp' ←→     RemoveOneLevel 'C:\Temp\Foo\'
+⍝  'AA.BB'   ←→ '.' RemoveOneLevel 'AA.BB.CC'
+     ⍺←'/\'
+     sep←⍺
+     path←⍵
+     path←(-sep∊⍨¯1↑path)↓path
+     0=+/path∊sep:path
+     path↓⍨-⌊/sep⍳⍨⌽path
+ }

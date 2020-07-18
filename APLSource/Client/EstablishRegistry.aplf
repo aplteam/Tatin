@@ -1,0 +1,38 @@
+ reg←{userSettings}EstablishRegistry packageID;registries;uri;alias;list
+⍝ The purpose of this function is to establish the registry a package can be found in.
+⍝ Useful in case the user specified just a package ID.
+⍝ Note that `packageID` might be a full ({group}-{name}-{version}) or a partial one ({group}-{name} or {group}-{name}-{major}).
+⍝ The function scans all registries according to the user settings and stops as soon as it finds one.
+⍝ In case of no hit anywhere `reg` is empty.
+ reg←''
+ :If '.zip'≢⎕C ¯4↑packageID
+     userSettings←{0<⎕NC ⍵:⍎⍵ ⋄ _UserSettings}'userSettings'
+     registries←userSettings.registries
+     'No Registries defined in the Client config file'Assert 1≤≢registries
+     :For uri alias :In registries.(uri alias)
+         :If Reg.IsHTTP uri
+             :Trap 345  ⍝ Because the server might be down, or have disappeared, whatever...
+                 :If 0=≢list←ListPackages_ uri,packageID
+                     :Continue
+                 :Else
+                     reg←uri
+                     :Leave
+                 :EndIf
+             :EndTrap
+         :ElseIf Reg.IsValidPackageID_Complete packageID,'*'
+             :If F.IsDir(RemoveFileProtocol uri),'/',packageID
+                 reg←uri
+                 :Leave
+             :EndIf
+         :ElseIf Reg.IsValidPackageID_WithoutVersionNo packageID,'*'
+             :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/',packageID,'-*'
+                 reg←uri
+                 :Leave
+             :EndIf
+         :ElseIf 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/',packageID,'*'
+             reg←uri
+             :Leave
+         :EndIf
+     :EndFor
+ :EndIf
+⍝Done

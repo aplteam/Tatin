@@ -1,0 +1,35 @@
+ r←Test_ClientConfig_102(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg;ns
+⍝ Exercise AddRegistry, ReplaceRegistry and RemoveRegistry on a config file with 0 registries
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+
+ settings←⎕NEW P.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp 0≠≢settings.registries
+ reg←⎕NEW P.DefineRegistry(,⊂'https://localhost')
+ settings.AddRegistry reg
+ →T.GoToTidyUp 1≠≢settings.registries
+ reg.alias←'foo'
+ reg.api_key←'Firlefanz'
+ ns←reg.Get ⍬
+ settings.ReplaceRegistry reg
+ ⎕EX'settings'
+ settings←⎕NEW P.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp 1≠≢settings.registries
+ →T.GoToTidyUp(settings.GetRegistry'[foo]')≢settings.GetRegistry'https://localhost/'
+ →T.GoToTidyUp 1≠settings.RemoveRegistry'https://localhost'
+ →T.GoToTidyUp 0≠settings.RemoveRegistry'https://localhost'
+ →T.GoToTidyUp 0≠≢settings.registries
+ settings.AddRegistry reg
+ →T.GoToTidyUp 1≠≢settings.registries
+ →T.GoToTidyUp 1≠settings.RemoveRegistry'[foo]'
+ →T.GoToTidyUp 0≠settings.RemoveRegistry'[foo]'
+ →T.GoToTidyUp 0≠≢settings.registries
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir
+⍝Done

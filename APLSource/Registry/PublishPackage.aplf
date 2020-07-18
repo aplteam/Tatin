@@ -1,0 +1,21 @@
+ PublishPackage←{
+⍝ ⍺ is the Client config
+⍝ ⍵ is:
+⍝   * path to a zip file
+⍝   * path to a registry
+     cfg←⍺
+     (zipFilename registry)←⍵
+     ind←Index.GetRegistryIndex registry
+     pgId←cfg.group,'-',cfg.name,'-',cfg.version
+     ∨/(pgId,⎕UCS 10)⍷ind:'Version conflict, package versions must be unique'Assert 0
+     tgt←registry,'/',pgId
+     _←F.MkDir tgt,'/data'
+     _←(tgt,'/',pgId,'.zip')⎕NMOVE zipFilename
+     _←(ind,pgId)Index.PutRegistryIndex registry
+     _←(tgt,'/',pgId,'.zip')DotNetZip.UnzipTo(tgt,'/data')
+     _←tgt ⎕NMOVE tgt,'/data/apl-package.json'
+     dependenciesFilename←tgt,'/data/',DependenciesFilename
+     0=F.Exists dependenciesFilename:shy←0
+     _←tgt ⎕NMOVE dependenciesFilename
+     1:shy←0
+ }

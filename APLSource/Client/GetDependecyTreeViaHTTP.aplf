@@ -1,0 +1,29 @@
+ level GetDependecyTreeViaHTTP url;uri;packageID;client;request;res;port;isNotHttp;b;tree;requiredBy
+⍝ Fetch the dependency tree via HTTP. Once a package is retrieved via the http protocol
+⍝ we know that all dependecies must be fetched via the http protocol as well.\\
+⍝ Requires semi-global ∆TREE
+ (uri packageID)←Reg.SplitAtLast url
+ client←NewClient uri
+ :If ':'∊RemoveHttpProtocol uri
+     client.Port←⊃⊃(//)⎕VFI{⍵↓⍨⍵⍳':'}RemoveHttpProtocol uri
+ :EndIf
+ request←R.NewRequest 0
+ request.URI←'/v1/packages/dependencies/',packageID
+ request.Headers,←⊂'Accept' 'application/json'
+ res←client R.SendAndReceive request
+ Assert 200≡res.StatusCode
+ :If 0<≢res.Content
+ :AndIf 0<≢tree←{⍵.(LEVEL,[1.5]TREE)}⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
+     tree[;1]+←level
+ :AndIf 0<≢tree←(~tree[;2]∊∆TREE.{Data[;∆packageID]}⍬)⌿tree
+ ⍝ Now dependencies on any server may point to another server or they won't mention a protocol at all,
+ ⍝ but in that case they are on the very same server as to original package, so we inject the original url.
+     isNotHttp←0=Reg.IsHTTP¨tree[;2]
+     (isNotHttp⌿tree[;2])←(({⍵/⍨3>+\⍵='/'}url),'/')∘,¨isNotHttp⌿tree[;2]
+     requiredBy←packageID
+     ∆TREE.Data⍪←↑{⍵[1],(⊂{⍵↓⍨⍵⍳'/'}RemoveHttpProtocol 2⊃⍵),⍵[2]}¨↓tree
+     :If ∨/~isNotHttp
+         (level+1)GetDependecyTreeViaHTTP¨(~isNotHttp)/tree[;2]
+     :EndIf
+ :EndIf
+⍝Done

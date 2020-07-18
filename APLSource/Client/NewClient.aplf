@@ -1,0 +1,9 @@
+ c←NewClient uri;reg
+ c←R.NewClient 0
+ reg←_UserSettings.GetRegistry uri
+ c.Secure←∨/'https://'⍷reg.uri
+ :If 0=c.Port←reg.port
+     c.Port←(c.Secure+1)⊃80 443
+ :EndIf
+ c.Host←'/'~⍨RemoveHttpProtocol uri
+⍝Done

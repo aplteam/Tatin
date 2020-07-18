@@ -1,0 +1,17 @@
+ Base64←{
+⍝    A←⎕A,(⎕UCS(⍳26)+⎕UCS'a'),⎕D,'+/'                      ⍝ alphabet
+     ⎕IO←0
+     A←'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+     ⍺←~∧/⍵∊A,'='
+     ed←{⊃⍵{⍺{2⊥⍉((⌈(⍴⍵)÷⍺),⍺){⍺⍴(×/⍺)↑⍵}⍵},⍉(⍵⍴2)⊤⍺⍺}/⍺}  ⍝ encode decode
+     ⍺:{⍵,'='⍴⍨4|-⍴⍵}(⊂6 8 ed ⎕UCS ⍵)⌷A                    ⍝ encode strict /
+     ⍝⍺:(⊂6 8 ed ⎕UCS ⍵)⌷A                                  ⍝ encode lax    x
+     ⍝1:⎕UCS{x↓8 6 ed A⍳⍵,'='↑⍨x←-4|-⍴⍵}⍵∩A                 ⍝ decode lax    /
+     1:⎕UCS{(-+/'='=¯3↑⍵)↓8 6 ed A⍳⍵}⍵∩A,'='               ⍝ decode strict x
+⍝ base64 encoding
+⍝ ⍺ 1=encode; 0=decode
+⍝ ⍵ byte string: 256∧.>⎕ucs ⍵
+⍝ ← ⍺=1: longer (4:3) string in A-Z,a-z,0-9,+/= only
+⍝   ⍺=0: original string whence ⍵ was encoded
+⍝   whitespace in (⍵) is ignored on decode
+ }

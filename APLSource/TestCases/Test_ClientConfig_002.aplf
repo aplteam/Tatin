@@ -1,0 +1,21 @@
+ r←Test_ClientConfig_002(stopFlag batchFlag);⎕TRAP;reg
+⍝ Check invalid assignments for the DefineRegistry class
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ →T.PassesIf{98::1 ⋄ 0⊣⎕NEW P.DefineRegistry(,⊂⍵)}⊂'Wrong depth'
+ →T.PassesIf{98::1 ⋄ 0⊣⎕NEW P.DefineRegistry(,⊂⍵)}⊂1 2 3
+ reg←⎕NEW P.DefineRegistry(,⊂'https://foo.com')
+ →T.PassesIf{2::1 ⋄ 0⊣reg.uri←⍵}'johndoe.org'
+ →T.PassesIf{98::1 ⋄ 0⊣reg.alias←⍵}⊂'Wrong depth'
+ →T.PassesIf{98::1 ⋄ 0⊣reg.alias←⍵}⊂1                   ⍝ Wrong data type
+ →T.PassesIf{98::1 ⋄ 0⊣reg.api_key←⍵}⊂'foo'             ⍝ Wrong depth
+ →T.PassesIf{98::1 ⋄ 0⊣reg.api_key←⍵}⊂1                 ⍝ Wrong data type
+ →T.PassesIf{98::1 ⋄ 0⊣reg.port←⍵}⊂,1                   ⍝ Wrong dapth
+ →T.PassesIf{98::1 ⋄ 0⊣reg.port←⍵}1 2                   ⍝ Wrong length
+ →T.PassesIf{98::1 ⋄ 0⊣reg.port←⍵}¯1                    ⍝ Wrong value
+ →T.PassesIf{98::1 ⋄ 0⊣reg.port←⍵}70000                 ⍝ Wrong value
+ →T.PassesIf{98::1 ⋄ 0⊣reg.port←⍵}⊂'foo'                ⍝ Wrong data type
+
+ r←T._OK
+⍝Done

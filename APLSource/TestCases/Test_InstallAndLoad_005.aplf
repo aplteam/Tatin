@@ -1,0 +1,17 @@
+ r←Test_InstallAndLoad_005(stopFlag batchFlag);⎕TRAP
+ ;refs;dir
+⍝ Install a package without specifying a Registry
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+ #.⎕EX P.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+
+ refs←P.InstallPackage'aplteam-APLProcess-0.2.9'dir
+ →T.GoToTidyUp 0=≢refs
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+⍝Done

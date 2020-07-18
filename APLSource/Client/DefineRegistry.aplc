@@ -1,0 +1,140 @@
+:Class DefineRegistry
+⍝ By instantiating this class you get a representation of a Registry that can be added to the user settings.\\
+⍝ The main purpose of this class is to check the data provided for describing a Registry like "uri", "alias" etc.\\
+⍝ A list of all variables is available as a shared field: `varsList`.
+⍝ An instance can be transformed into an ordinay namespace by calling the `Get` method with an empty right argument.
+⍝ Usually a new instance is created by providing a URI. However, an new instance call also be creating from the
+⍝ ordinay namespace that is returned by the `Get` function.
+
+    :Field public Shared ReadOnly varsList←'uri' 'alias' 'port' 'api_key' 'priority' ⍝ List of all variables in an instance
+
+⍝ --------------- Constructors
+
+    ∇ make1(y);ns
+    ⍝ `y` must be one of:
+    ⍝ * A text vector representing a uri
+    ⍝ * A text vector representing an alias and a uri (syntax: [alias]domain.com)
+    ⍝ * A namespace holding all the necessary variables. This is typically created by a call to the `Get` function.
+      :Implements Constructor
+      :Access Public
+      :If 326=⎕DR y
+      :AndIf 0=≡y
+          ns←y
+          'Invalid variables'Assert∧/varsList{(⍺∊⍵)∧(⍵∊⍺)}' '~¨⍨↓ns.⎕NL 2
+          uri_←ns.uri
+          '"uri": invalid depth'Assert 1=≡uri_
+          '"uri": invalid data type'Assert' '=1↑0⍴uri_
+          ((uri_='\')/uri_)←'/'
+          ⍎¨ns.{'_',⍵,'←',{0=1↑0⍴⍵:⍕⍵ ⋄ '''',⍵,''''}⍎⍵}¨varsList
+      :Else
+          :If ∧/'[]'∊y
+              (alias uri_)←{⍵{('[]'~⍨⍵↑⍺)(⍵↓⍺)}⍵⍳']'}y
+          :Else
+              uri_←y
+              _alias←''
+          :EndIf
+          '"uri": invalid depth'Assert 1=≡uri_
+          '"uri": invalid data type'Assert' '=1↑0⍴uri_
+          ((uri_='\')/uri_)←'/'
+          uri_,←('/'≠¯1↑uri_)/'/'
+          _alias←⎕C _alias
+          _uri←uri_
+          _api_key←''
+          _port←0
+          _priority←0
+      :EndIf
+    ∇
+
+⍝ ---------- Properties
+
+    :Property uri
+    ⍝ The URI of the given Tatin Registry. May be "localhost" for the current machine.
+    :Access Public Instance
+        ∇ r←get
+          r←_uri
+        ∇
+    :EndProperty
+
+    :Property alias
+    ⍝ The alias one may use to specify the given Registry
+    :Access Public Instance
+        ∇ r←get
+          r←_alias
+        ∇
+        ∇ set value;buff
+          buff←,value.NewValue
+          '"alias": invalid depth'Assert 1=≡buff
+          '"alias": invalid data type'Assert' '=1↑0⍴buff
+          _alias←buff
+        ∇
+    :EndProperty
+
+    :Property port
+    ⍝ Defaults to 0 which means that the protocol rules: 443 in case of https, 80 for http.
+    ⍝ This can by any integer between 1 and 65535 althoug it is wise to not use anything between 1 and 999 because
+    ⍝ many of those are reserved for partiuclar applications.
+    :Access Public Instance
+        ∇ r←get
+          r←_port
+        ∇
+        ∇ set value;buff
+          buff←value.NewValue
+          '"port": invalid depth'Assert 0=≡buff
+          '"port": invalid data type'Assert 0=1↑0⍴buff
+          '"port": invalid value'Assert(buff>0)∧(buff<65535)
+          _port←buff
+        ∇
+    :EndProperty
+
+    :Property api_key
+    ⍝ A Registry might require authentication generally and certainly for publishing. This can be achieved by
+    ⍝ providing an API key. Note that an API key needs the same care and security measures as a password.
+    :Access Public Instance
+        ∇ r←get
+          r←_api_key
+        ∇
+        ∇ set value;buff
+          buff←value.NewValue
+          '"api_key": invalid depth'Assert 1=≡buff
+          '"api_key": invalid value'Assert' '=1↑0⍴buff
+          _api_key←buff
+        ∇
+    :EndProperty
+
+    :Property priority
+    ⍝ The `priority` is used to determine the order of the registries when scanning for a particular package.\\
+    ⍝ It must be an integer greater then zero. If it is zero than the 0 is replaced by the lowest number of any
+    ⍝ defined Registry minus 1. Highest number comes first.
+    :Access Public Instance
+        ∇ r←get
+          r←_priority
+        ∇
+        ∇ set value;buff
+          buff←value.NewValue
+          '"priority": invalid depth'Assert 0=≡buff
+          '"priority": invalid length'Assert 1=≢buff
+          '"priority": invalid data type (not integer)'Assert 0=1↑0⍴buff
+          '"priority": invalid value'Assert buff>0
+          _priority←buff
+        ∇
+    :EndProperty
+
+    ∇ r←Get key;list;bool
+    ⍝ Returns the data as a namespace. "data" is defined as all variables list in the `varsList` field.
+      :Access Public Instance
+      r←#.⎕NS''
+      :If (⊂key)∊''⍬
+          r.(uri alias port api_key priority)←_uri _alias _port _api_key _priority
+      :Else
+          'Invalid right argument (depth)'Assert 1=≡key
+          'Invalid right argument (data type)'Assert' '=1↑0⍴key
+          'Unknwon'Assert(⊂key)∊varsList
+          r←⍎'_',varsList{⍺⊃⍨⍺⍳⊂⍵}key
+      :EndIf
+    ∇
+
+⍝ ------------ Private stuff
+
+    Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 98 ⋄ shy←0}
+
+:EndClass

@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Schema for apl-dependency-tree.json files",
+    "type": "object",    
+        "dependencies": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "group": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+                        "description": "Name of group that the package belongs to."
+                    },
+                    "name": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+                        "description": "Name of the package."
+                    },
+                    "version": {
+                        "type": "string",
+                        "pattern": "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$",
+                        "description": "Version number following semantic versioning."
+                    },
+                    "alias": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+                        "description": "Name used to reference this dependency (default is the package name)."
+                    }
+                },
+                "required": ["group", "name", "version"]
+            }
+        }
+    },
+}

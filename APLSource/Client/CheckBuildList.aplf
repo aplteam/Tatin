@@ -1,0 +1,11 @@
+ {r}←CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b
+⍝ Checks the last modification data of both the build list and the dependency file.
+⍝ If the dependency file modified later and one or more packaged are missing re-installation is required.
+ ts1←1 ⎕DT⊃('type' 3)F.Dir filename1←folder,'/',Reg.BuildListFilename
+ ts2←1 ⎕DT⊃('type' 3)F.Dir filename2←folder,'/',Reg.DependenciesFilename
+ :If r←ts2>ts1
+     tree←⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET filename1
+     deps←1⊃F.NGET filename2 1
+     ('Invalid entry: ',(⊃{⍺,',',⍵}/b/deps),'; re-install!')Assert∧/b←deps∊tree.packageID
+ :EndIf
+⍝Done

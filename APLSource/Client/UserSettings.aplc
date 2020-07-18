@@ -1,0 +1,242 @@
+:Class UserSettings
+⍝ By instanciating this class you get a representation of user settings required by Tatin.\\
+⍝ In case no path pointing to a folder hosting a config file is provided to `⎕NEW` the file is created
+⍝ in the default location (user's home folder) which depends on your operating system.\\
+⍝ Optionally you may specify such a folder with `⎕NEW` that hosts the configuration file.\\
+⍝ Note that if the file does not yet exist it will be created with defaults.\\
+⍝ You may also define `source` which is used as the default for `source` in a package config file.\\
+⍝ After having created an instance you can add a Registry definition (read: an instance of the
+⍝ `DefineRegistry` class) to the user settings with `AddRegistry`, and you may also call `ReplaceRegistry`
+⍝ and `RemoveRegistry`.\\
+⍝ Whenevever one of these functions is called the user settings are updated and written to its file.
+⍝ The full name of the file as available via the field `path2config`.\\
+⍝ You can convert a particular Registry into an ordinary namespace by calling the `GetRegsitry` function.
+
+    :Field Public Shared ReadOnly cfg_name←'tatin-client.json'  ⍝ Name of the user config file is fixed
+
+    ∇ make0
+      :Implements Constructor
+      :Access Public
+      Init1 ⍬
+      _registries←⍬
+      _path2config←home.GetUserHomeFolder ⍬     ⍝ By default it's the user's home folder on all platforms
+      :If F.IsFile _path2config
+          (_registries _source)←Read _path2config
+      :Else
+          _registries←⍬
+          Write _path2config
+      :EndIf
+    ∇
+
+    ∇ make1(path2config_);reg
+      :Implements Constructor
+      :Access Public
+      Init1 ⍬
+      :If 0=##.F.IsDir path2config_
+          ⍝ In case the user passed the fully qualifed name rather than just the folder:
+          path2config_←⊃⎕NPARTS path2config_
+      :EndIf
+      'Is not a directory?!'Assert ##.F.IsDir path2config_
+      _path2config←path2config_
+      :If F.IsFile path2config
+          Read _path2config
+      :Else
+          _registries←⍬
+          Write _path2config
+      :EndIf
+    ∇
+
+    ∇ make2(path2config_ source_);reg
+      :Implements Constructor
+      :Access Public
+      Init1 ⍬
+      'Is not a directory?!'Assert ##.F.IsDir path2config_
+      _path2config←path2config_
+      _source←source_
+      :If F.IsFile path2config
+          Read _path2config
+      :Else
+          _registries←⍬
+          Write _path2config
+      :EndIf
+    ∇
+
+    ∇ Init1 dummy
+    ⍝ Early initialisation
+      home←(⊃⊃⎕CLASS ⎕THIS).##
+      F←home.F ⋄ A←home.A
+      _source←''
+    ∇
+
+    :Property source
+    ⍝ Defines the default for the "source" property of any package.\\
+    ⍝ Setting this might be useful in case you use most of the time the same source folder, so it makes
+    ⍝ sense to pre-populate a packages "source" property with a default defined here.
+    :Access Public Instance
+        ∇ r←get
+          r←_source
+        ∇
+        ∇ set value;buff
+          buff←value.NewValue
+          '"source" is invalid (depth)'Assert 1=≡buff
+          '"source" is invalid (data type)'Assert' '=1↑0⍴buff
+          _source←buff
+        ∇
+    :EndProperty
+
+    :Property path2config
+    :Access Public Instance
+        ∇ r←get
+          r←_path2config,'/',cfg_name
+        ∇
+    :EndProperty
+
+    :Property registries
+    :Access Public Instance
+        ∇ r←get
+          :If 0=≢_registries
+              r←_registries
+          :Else
+              r←_registries[⍒_registries.priority]
+          :EndIf
+        ∇
+    :EndProperty
+
+    ∇ {r}←AddRegistry y;registry;name;alias;buff
+   ⍝ Adds the definition of a Registry (as a namespace) to the user settings.\\
+   ⍝ If that Registry is already defined an error is thrown.\\
+   ⍝ `⍵` must be one of:
+   ⍝ * An instance of the "Registry" class.
+   ⍝ * A text vector with a name or an alias+name in the format `[alias]name`\\
+   ⍝   In this case `AddRegistry` creates an instance on the fly. Of course thies means that this is
+   ⍝   only suitable in case specifying just the name and optionally the alias is sufficient.
+   ⍝ * A namespace that can be used to instanciate the `DefineRegistry` class.\\
+   ⍝ `←` is always `⍬` (shy).
+      :Access Public Instance
+      r←⍬
+      'Invalid depth'Assert(≡registries)∊0 1
+      :If 80=⎕DR y
+          :If ∧/'[]'∊y
+              (alias name)←{⍵{('[]'~⍨⍵↑⍺)(⍵↓⍺)}⍵⍳']'}y
+              alias←⎕C alias
+          :Else
+              name←y
+              alias←''
+          :EndIf
+          ((name='\')/name)←'/'
+          registry←⎕NEW home.DefineRegistry(,⊂name)
+          registry.alias←⎕C alias
+      :Else
+          registry←y
+      :EndIf
+      '⍵ is not instance if the "DefineRegistry" class'Assert∨/'[DefineRegistry]'⍷⍕registry
+      :If 0<≢_registries
+          'This URI is already defined'Assert~(⊂registry.uri)∊_registries.uri
+          :If 0<≢registry.alias
+              'This alias is already used for a different uri'Assert~(⊂registry.alias)∊_registries.alias
+          :EndIf
+      :EndIf
+      buff←registry.Get ⍬
+      :If 0=buff.priority
+          :If 0=≢_registries
+              buff.priority←100
+          :Else
+              buff.priority←(⌊/_registries.priority)-10
+          :EndIf
+      :EndIf
+      _registries,←buff
+      Write ⍬
+    ∇
+
+    ∇ {r}←ReplaceRegistry registry;ind
+   ⍝ Replaces the definition of a Registry in the user settings.\\
+   ⍝ If that Registry does not already exist an error is thrown.\\
+   ⍝ Note that this function requires a URI since an alias is subject to change.\\
+   ⍝ `⍵` must be an instance of the "Registry" class.\\
+   ⍝ `←` is always `⍬` (shy).
+      :Access Public Instance
+      r←⍬
+      '⍵ is not instance if the "DefineRegistry" class'Assert∨/'[DefineRegistry]'⍷⍕registry
+      :If 0=≢_registries
+      :OrIf ~(⊂registry.uri)∊_registries.uri
+          'There is no such registry yet'Assert 0
+      :EndIf
+      ind←_registries.uri⍳⊂registry.uri
+      _registries[ind]←registry.Get ⍬
+      Write ⍬
+    ∇
+
+    ∇ flag←Exist uriOrAlias
+    ⍝ Checks whether `uriOrAlias` is defined as a Registry in the user settings.
+      :Access Public Instance
+      flag←∨/EqualsAliasOrName uriOrAlias
+    ∇
+
+    ∇ {r}←RemoveRegistry uriOrAlias;bool
+    ⍝ Removes a Registry from the user settings.\\
+    ⍝ `⍵` can be either a name or an alias.\\
+    ⍝ `←` is 1 in case something was removed and 0 otherwise.
+      :Access Public Instance
+      :If 0=≢_registries
+          r←0
+      :Else
+          :If 0=≢_registries
+              r←0
+          :Else
+              :If ∨/~bool←~EqualsAliasOrName uriOrAlias
+                  _registries←bool/_registries
+                  Write ⍬
+              :EndIf
+              r←∨/~bool
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←GetRegistry uriOrAlias;bool
+    ⍝ Returns a Registry (as a namespace) or `⍬` in case the requested registry does not exist.
+    ⍝ `⍵` can be either a name or an alias.\\
+      :Access Public Instance
+      'No Registry defined in the user settings'Assert 0<≢_registries
+      :If 0=+/bool←EqualsAliasOrName uriOrAlias
+          'uri/alias not found in user settings'Assert∨/bool
+      :EndIf
+      r←(bool⍳1)⊃_registries
+    ∇
+
+⍝ ------------------- Privates stuff
+
+    Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 98 ⋄ shy←0}
+
+    ∇ bool←EqualsAliasOrName uriOrAlias
+    ⍝ Returns a vector of booleans.\\
+    ⍝ Interprets `⍵` as an alias in case is carries `[]` and as an URI otherwise.
+      uriOrAlias←⎕THIS home.ReplaceRegistryAlias uriOrAlias
+      uriOrAlias←F.EnforceSlash uriOrAlias
+      uriOrAlias,←('/'≠¯1↑uriOrAlias)/'/'
+      bool←(⊂uriOrAlias)≡¨_registries.uri
+    ∇
+
+    ∇ {r}←Write dummy;ns;tmp;del
+      r←⍬
+      ns←⎕NS''
+      ns.registries←_registries
+      ns.source←_source
+      tmp←'tmp'F.GetTempFilename2 cfg_name
+      {}(⊂home.Reg.JSON ns)F.NPUT tmp 1
+      {}F.DeleteFile path2config
+      {}path2config ⎕NMOVE tmp
+    ∇
+
+    ∇ {r}←Read dummy;ns
+    ⍝ Reads the Client's config file
+      r←⍬
+      ns←⎕NS ⎕JSON⍠('Dialect' 'JSON5')⊣⊃##.F.NGET path2config
+      :If 0<≢ns.registries
+          _registries←ns.registries[⍋ns.registries.priority]
+      :Else
+          _registries←0 2⍴''
+      :EndIf
+      _source←ns.source
+    ∇
+
+:EndClass

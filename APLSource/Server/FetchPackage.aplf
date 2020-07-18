@@ -1,0 +1,14 @@
+ response←request FetchPackage packageID
+ :If Reg.IsValidPackageID_Complete packageID
+     :If F.IsDir G.RegistryPath,'/',packageID
+         response←R.NewResponse request
+         response.IsFile←1
+         response.FilePath←F.ExpandPath G.RegistryPath,'/',packageID,'/',packageID,'.zip'
+         response.ContentType←'application/zip'
+     :Else
+         response←Return404 request
+     :EndIf
+ :Else
+     response←Return404 request
+ :EndIf
+⍝Done

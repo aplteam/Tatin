@@ -1,0 +1,8 @@
+ filename←{filename}GetPackageViaHTTP URL;uri;response;packageID
+⍝ Requests a package via HTTP
+ filename←{0=⎕NC ⍵:'zip'F.GetTempFilename2'' ⋄ ⍎⍵}'filename'
+ (uri packageID)←Reg.SeparateUriAndPackageID URL
+ response←uri GetPackageViaHTTP_ packageID
+ ('Server reported an error, status code is ',⍕response.StatusCode)Assert 200≡response.StatusCode
+ response.Content Reg.WriteNativeFile filename
+⍝Done

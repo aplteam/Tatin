@@ -1,0 +1,13 @@
+ html←PrepareHtmlPageForPackageDetails(ID json url)
+ html←HtmlHeader''
+ html,←⊂'<h2>Latest details of package "',ID,'"</h2>'
+ html,←⊂'<pre><json>',1⊃json
+ html,←1↓json
+ html,←⊂'</json></pre>'
+ :If 0<≢url
+     html,←⊂{'<p>The project lives on <a href="',⍵,'" title="',⍵,'">',⍵,'</a></p>'}url
+ :EndIf
+ html,←⊆GetFooter
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+⍝Done

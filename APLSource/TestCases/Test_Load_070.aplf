@@ -1,0 +1,37 @@
+ r←Test_Load_070(stopFlag batchFlag);⎕TRAP
+ ;dir;src;zip;body;cfg;zipfile;refs
+⍝ Pack a package with a file asset and then load it
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ (⊂'My DLL')F.NPUT src,'/file.dll'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg.source←'Constants.apln'
+ cfg.files←'file.dll'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src zip
+
+ refs←P.LoadPackage('file://',zipfile)#.TEMP
+ Assert 3=#.TEMP.Constants.⎕NC'PI'
+ →T.GoToTidyUp 3.14≠#.TEMP.Constants.PI
+ →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.∆URI
+ →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.∆HOME
+ →T.GoToTidyUp 1≠≢refs
+ →T.GoToTidyUp~(⊂'file.dll')∊⊃¨,/¨1↓¨⎕NPARTS¨⊃0 ⎕NINFO⍠('Wildcard' 1)⊣(refs[1].∆HOME),'/*'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX P.GetTatinRootSpace'#'
+ Assert 0=⊃F.RmDir refs[1].∆HOME
+⍝Done

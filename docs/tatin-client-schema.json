@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Schema for pakkman-client.json files",
+    "type": "object",
+    "properties": {
+        "registries": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "uri": {
+                        "type": "string",
+                        "pattern": "^(?:https?|file):\\/\\/[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:\\/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$",
+                        "description": "URI for registry."
+                    },
+                    "alias": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+                        "description": "Name used to reference this registry."
+                    }
+                    "port": {
+                        "type": "integer",
+                        "pattern": "^[0-9]{3,5}",
+                        "description": "Port number to be used."
+                    }
+                    "api_key": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9{}](){32,38}$",
+                        "description": "API key used for authentication."
+                    }
+                },
+                "required": ["uri", "alias", "port"]
+            }
+        }
+    },
+    "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    }
+}

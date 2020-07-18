@@ -1,0 +1,17 @@
+ GetPackageIDFromFilename←{
+ ⍝ ⍵ is a filename or a URI, possibly fully qualified.
+ ⍝ ← is the package ID
+ ⍝ By default ⍺ is 0, meaning the package ID is returned unchanged.
+ ⍝ If ⍺ is 1 the package ID is massaged so that it is an APL compatible name, meaning that all
+ ⍝ characters that are not ASCII or are not allowed in an APL name are replaced by an underscore character.
+ ⍝ Example:
+ ⍝ 'Example_Package-A.1.0.0' ←   GetPackageID 'file://C:/Temp/Example-Package_A-1.0.0.zip'
+ ⍝ 'Example_Package_A_1_0_0' ← 1 GetPackageID 'file://C:/Temp/Example-Package_A-1.0.0.zip'
+     ⍺←0
+     convert←⍺
+     fn←A.(dlb dtb)⍵
+     '.zip'≡⎕C ¯4↑fn:convert ∇{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¯4↓fn
+     ∨/'/\'∊fn:convert ∇{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}fn
+     ~convert:fn
+     '_'@(⍸~⍵∊⎕D,⎕A,'abcdefghijklmnopqrstuvwxyz_',⎕UCS 10)⊣fn
+ }

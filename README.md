@@ -26,7 +26,7 @@ You may also keep a local Registry on your own machine, for example for developm
 
 ## Contributing to the code 
 
-There is a separate folder "For developers" available in the `docs/` folder.
+There is a separate document "ForDevelopers.html" available in the `docs/` folder.
 
 -----
 

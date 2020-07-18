@@ -18,9 +18,9 @@ The Tatin wiki contains exhaustive documentation for how to use the Tatin Client
 
 Once you've installed the Tatin client you have access to <https://tatin.dev>, the principle Tatin server.
 
-However, you might find it useful to run your own Tatin server. For example, all packages used within a company could be served by a Tatin Server.
+However, you might find it useful to run your own Tatin server. For example, all packages used within a company could be served by a Tatin Server within your company LAN.
 
-You may also keep a local Registry on yoiur own machine, for example for development work. 
+You may also keep a local Registry on your own machine, for example for development work. 
 
 
 

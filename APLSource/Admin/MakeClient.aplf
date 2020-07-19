@@ -1,14 +1,17 @@
- MakeClient;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list
+ MakeClient;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list;zipFilename;zipContent;fileList
  F←##.FilesAndDirs
  ⎕←(⎕PW-1)⍴'-'
  msg←''
  msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
  msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
  msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
+ msg,←⊂'Eventually all that''s required is zipped into a file <Tatin-Client-{major}.{Minor}.{Patch}.zip'
+ msg,←⊂'That file is created within the Dist/ folder.'
  msg,←⊂''
- msg,←⊂'From that WS the Tatin client is eventually copied into ⎕SE by the associated user command:'
- msg,←⊂'  ]Tatin.Load'
- msg,←⊂'It also checks whether the user command should be copied to the MyCMDs folder or vice versa.'
+ msg,←⊂'From that WS the Tatin client willbe copied into ⎕SE once a Tatin user command is invoked.'
+ msg,←⊂''
+ msg,←⊂'It also checks whether the user command should be copied to the MyCMDs folder or vice versa,'
+ msg,←⊂'depending on where the last change was made.'
  ⎕←⍪msg
  ⎕←''
  :If 1 YesOrNo'Would you like to continue?'
@@ -25,18 +28,21 @@
      ⎕DL 0.1
      F.MkDir targetPath
      ⎕DL 0.1
-     ⎕WSID←targetPath,'/Client'
+     ⎕WSID←targetPath,'/Tatin/Client'
+     Assert F.MkDir targetPath,'/Tatin'
      #.⎕EX¨(' '~¨⍨↓#.⎕NL⍳16)~⊂'_Tatin'
      0 ⎕SAVE ⎕WSID
      (rc more)←'Tatin.dyalog'F.CopyTo targetPath,'/'
      more Assert 0=⊃rc
-     (success more list)←('./Assets/Runtime/Conga/')F.CopyTree targetPath,'/Assets/Runtime/Conga/'
+     (success more list)←('./Assets/Runtime/Conga/')F.CopyTree targetPath,'/Tatin/Assets/Runtime/Conga/'
      more Assert success
      reg←⎕NEW #._Tatin.Client.DefineRegistry(,⊂'[tatin]https://pakkman.aplwiki.com')
      reg.api_key←'f272c8cf-eb99-62b8-f297-60be1a266676'
-     _userSettings←⎕NEW #._Tatin.Client.UserSettings(,⊂targetPath,'/')
+     _userSettings←⎕NEW #._Tatin.Client.UserSettings(,⊂targetPath,'/Tatin/')
      _userSettings.AddRegistry reg
-     myucmds←#._Tatin.Admin.GetMyUCMDsFolder''
+     myucmds←#._Tatin.Client.GetMyUCMDsFolder''
+     (rc more)←'Setup.dyalog.RemoveMe'F.CopyTo targetPath,'/'
+     more Assert 0=rc
      :If 1 YesOrNo'Would you like to copy the Tatin client to ',myucmds
          F.RmDir myucmds,'/Tatin'
          F.MkDir myucmds,'/Tatin'
@@ -58,7 +64,7 @@
                  more Assert 0=rc
              :EndIf
          :EndIf
-         (success more list)←(targetPath,'/Assets/')F.CopyTree myucmds,'/Tatin/Assets/'
+         (success more list)←('./Assets/Runtime/Conga/')F.CopyTree myucmds,'/Tatin/Assets/'
          more Assert success ⍝ Might fail because the Conga DLLs are in use
      :EndIf
      :If 0=F.IsFile path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
@@ -66,8 +72,12 @@
          (rc more)←_userSettings.path2config F.CopyTo path
          more Assert 0=rc
      :EndIf
-     ⎕←'Note that the user config file might need editing:'
-     ⎕←path
-     ⎕←''
+     zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),'-beta-1.0'),'.zip'
+     F.DeleteFile zipFilename
+     ⎕DL 0.1
+     targetPath ##.DotNetZip.ZipFolder zipFilename    ⍝TODO⍝ Should preserve the directory structure but does not!
+     fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'
+     zipContent←##.DotNetZip.ListZipContents zipFilename
+     'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
      ⎕←'*** Done'
  :EndIf

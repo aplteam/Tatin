@@ -1,8 +1,6 @@
 ﻿:Namespace Tatin
-⍝ User Command for managing packages.
-⍝ In the long run this script will manage all the client user commands for Tatin,
-⍝ but for the time being there is just a few:  ]Tatin.Load
-⍝ 0.5.0 - 2020-07-16
+⍝ The ]Tatin user commands for managing packages.
+⍝ 0.6.0 - 2020-07-19
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -85,6 +83,12 @@
       c.Name←'Publish'
       c.Desc←'Publish a package (ZIP file) to a particular Registry'
       c.Parse←'2 -quiet'
+      r,←c
+     
+      c←⎕NS ⍬
+      c.Name←'Version'
+      c.Desc←'Prints name, version number and version date of the client to the session'
+      c.Parse←''
       r,←c
      
       r.Group←⊂NM
@@ -261,7 +265,7 @@
           :OrIf 0 ∆YesOrNo msg
               PK.F.DeleteFile filename
           :EndIf
-      :ElseIf Arg.edit
+      :Else
           :If 0=PK.F.IsDir path
               :If Arg.quiet
               :OrIf ∆YesOrNo'The directory does not exist yet. Would you like to create it?'
@@ -278,24 +282,25 @@
               ns.source←PK._UserSettings.source
               newFlag←1
           :EndIf
-          origData←PK.Reg.JSON ns
-          (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData
-          :If success
-              :If 0<≢∊newData
-              :AndIf newFlag∨newData≢origData
-                  ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
-                  ns.tags←⎕C ns.tags
-                  :Trap 98
-                      ns PK.WritePackageConfigFile path
-                  :Else
-                      qdmx←⎕DMX
-                      ⎕←qdmx.EM
-                  :EndTrap
+          :If Arg.edit∨newFlag
+              origData←PK.Reg.JSON ns
+              (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData
+              :If success
+                  :If 0<≢∊newData
+                  :AndIf newFlag∨newData≢origData
+                      ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
+                      ns.tags←⎕C ns.tags
+                      :Trap 98
+                          ns PK.WritePackageConfigFile path
+                      :Else
+                          qdmx←⎕DMX
+                          ⎕←qdmx.EM
+                      :EndTrap
+                  :EndIf
               :EndIf
+          :Else
+              r←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
           :EndIf
-      :Else
-          'File not found'Assert PK.F.IsFile filename
-          r←⍪⊃PK.F.NGET filename 1
       :EndIf
     ∇
 
@@ -489,8 +494,9 @@
           r,←⊂'Requires two arguments:'
           r,←⊂'A) First argument'
           r,←(3⍴' ')∘,¨HelpOnPackageID'LoadPackage'
+                    r,←⊂''
           r,←⊂'B) Second argument'
-          r,←⊂'   The second argument must be the name of a namespace the packges are loaded into.'
+          r,←⊂'   Must be the name of a namespace the package will be loaded into.'
       :Case ⎕C'InstallPackage'
           r,←⊂']',NM,'.InstallPackage [alias]package-id  /path/to/folder -load='
           r,←⊂''
@@ -573,6 +579,10 @@
           r,←⊂''
           r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question usually asked before'
           r,←⊂'a package is actually published is probably only useful with test cases.'
+      :Case ⎕C'Version'
+          r,←⊂']',NM,'.Version'
+          r,←⊂''
+          r,←⊂'Prints name, version number and version date of the client to the session.'
       :Else
           r←'Unknown command: ',Cmd
       :EndSelect
@@ -591,7 +601,7 @@
       r,←⊂'  ]tatin.',fns,' aplteam-APLTreeUtils ',add
       r,←⊂'  ]tatin.',fns,' [tatin]aplteam-APLTreeUtils-2.0.0 ',add
       r,←⊂'  ]tatin.',fns,' [tatin]/aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]tatin.',fns,' /tatin/MyRegistry/aplteam-APLTreeUtils-2.0.0/ ',add
+      r,←⊂'  ]tatin.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils-2.0.0/ ',add
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

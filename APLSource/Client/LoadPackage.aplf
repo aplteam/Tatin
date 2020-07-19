@@ -1,4 +1,4 @@
- refs←LoadPackage(identifier_ targetSpace);saveIn2
+ r←LoadPackage(identifier_ targetSpace);saveIn2;refs
  ;buildList;url;level;packageID;tempDir;saveIn;cfg;msg;ref;tempDirs;reset;identifier
 ⍝ Load package `identifier` dynamically into the workspace,\\
 ⍝ `identifier` must be one of:
@@ -12,11 +12,12 @@
 ⍝ `targetSpace` might already exist but if it doesn't it will be created. If it exists but is not an ordinary
 ⍝ namespace an error is thrown.\\
 ⍝ `←` Vector with all references that were loaded, including depencies.\\
-⍝ Loads the package into `#._packages.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
+⍝ Loads the package into `#._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
 ⍝ Loads all dependencies, if any, as well.\\
 ⍝ Leaves no trails in the file system unless a package relies on file assets in which case those are loaded into a
 ⍝ temporary directory.\\
-⍝ Returns references to all packages loaded into Tatin's package namespace.
+⍝ Returns fully qualified names of the references created in the target namespace.
+ r←⍬
  'Not a valid package ID'Assert GetPackageIDFromFilename identifier_
  refs←reset←tempDirs←⍬
  identifier←ReplaceRegistryAlias identifier_
@@ -51,7 +52,7 @@
          reset,←⍎saveIn2
      :EndIf
      refs,←ref
-     cfg LinkTargetToPackage saveIn2 targetSpace
+     r,←⊂cfg LinkTargetToPackage saveIn2 targetSpace
  :EndFor
  LinkDependencies refs
  :If 0<≢tempDirs

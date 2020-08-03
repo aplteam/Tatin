@@ -1,6 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.
-⍝ 0.6.0 - 2020-07-19
+⍝ * 0.6.1 - 2020-07-28
+⍝   * Shows only under 18.0 and better now.
+⍝ * 0.6.0 - 2020-07-19
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -11,87 +13,91 @@
 
     ∇ r←List;c
       r←⍬
+     
+      :If IfAtLeastVersion 18
    ⍝ Name, group, short description and parsing rules
      
-      c←⎕NS ⍬
-      c.Name←'LoadTatin'
-      c.Desc←'Loads the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
-      c.Parse←'1s -force'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'LoadTatin'
+          c.Desc←'Loads the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
+          c.Parse←'1s -force'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'ListRegistries'
-      c.Desc←'Lists all registries defined in the user settings'
-      c.Parse←'0 -raw'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'ListRegistries'
+          c.Desc←'Lists all registries defined in the user settings'
+          c.Parse←'0 -raw'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'ListPackages'
-      c.Desc←'Lists all packages in the Registry specified in the argument'
-      c.Parse←'1 -raw -group='
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'ListPackages'
+          c.Desc←'Lists all packages in the Registry specified in the argument'
+          c.Parse←'1 -raw -group='
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'LoadPackage'
-      c.Desc←'Load the package specified in the argument and all dependencies into the WS'
-      c.Parse←'2'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'LoadPackage'
+          c.Desc←'Load the package specified in the argument and all dependencies into the WS'
+          c.Parse←'2'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'ListVersions'
-      c.Desc←'Lists all versions of the specified package'
-      c.Parse←'1'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'ListVersions'
+          c.Desc←'Lists all versions of the specified package'
+          c.Parse←'1'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'InstallPackage'
-      c.Desc←'Install a package and all its dependencies into a given folder'
-      c.Parse←'2 -quiet'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'InstallPackage'
+          c.Desc←'Install a package and all its dependencies into a given folder'
+          c.Parse←'2 -quiet'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'LoadInstalled'
-      c.Desc←'Takes a folder with installed packages and loads all of them'
-      c.Parse←'2'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'LoadInstalled'
+          c.Desc←'Takes a folder with installed packages and loads all of them'
+          c.Parse←'2'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'UserSettings'
-      c.Desc←'By default the user settings and the filenanme are printed to ⎕SE as JSON'
-      c.Parse←'1s -edit -raw -quiet -permanent'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'UserSettings'
+          c.Desc←'By default the user settings and the filenanme are printed to ⎕SE as JSON'
+          c.Parse←'1s -edit -raw -quiet -permanent'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'PackageConfig'
-      c.Desc←'Create and/or edit a package config file for a specific folder'
-      c.Parse←'1 -delete -edit -quiet'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'PackageConfig'
+          c.Desc←'Create and/or edit a package config file for a specific folder'
+          c.Parse←'1 -delete -edit -quiet'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'PackageDependencies'
-      c.Desc←'Create and/or edit a package dependency file for a specific folder'
-      c.Parse←'1 -delete -edit -quiet'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'PackageDependencies'
+          c.Desc←'Create and/or edit a package dependency file for a specific folder'
+          c.Parse←'1 -delete -edit -quiet'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'Pack'
-      c.Desc←'Packs (zips) all required files found in ⍵[1] into the folder ⍵[2]'
-      c.Parse←'2'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'Pack'
+          c.Desc←'Packs (zips) all required files found in ⍵[1] into the folder ⍵[2]'
+          c.Parse←'2'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'Publish'
-      c.Desc←'Publish a package (ZIP file) to a particular Registry'
-      c.Parse←'2 -quiet'
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'Publish'
+          c.Desc←'Publish a package (ZIP file) to a particular Registry'
+          c.Parse←'2 -quiet'
+          r,←c
      
-      c←⎕NS ⍬
-      c.Name←'Version'
-      c.Desc←'Prints name, version number and version date of the client to the session'
-      c.Parse←''
-      r,←c
+          c←⎕NS ⍬
+          c.Name←'Version'
+          c.Desc←'Prints name, version number and version date of the client to the session'
+          c.Parse←''
+          r,←c
      
-      r.Group←⊂NM
+          r.Group←⊂NM
+     
+      :EndIf
      
     ∇
 
@@ -494,9 +500,9 @@
           r,←⊂'Requires two arguments:'
           r,←⊂'A) First argument'
           r,←(3⍴' ')∘,¨HelpOnPackageID'LoadPackage'
-                    r,←⊂''
           r,←⊂'B) Second argument'
-          r,←⊂'   Must be the name of a namespace the package will be loaded into.'
+          r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
+          r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
           r,←⊂']',NM,'.InstallPackage [alias]package-id  /path/to/folder -load='
           r,←⊂''
@@ -698,5 +704,6 @@
     IsScripted←{0::1 ⋄0⊣⎕src ⍵}
     ED←{⎕ED⍠('EditName' 'Disallow')⊣⍵}
     IsValidJSON←{0::0 ⋄ 1⊣PK.Reg.JSON ⍵}
+    IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}
 
 :EndNamespace

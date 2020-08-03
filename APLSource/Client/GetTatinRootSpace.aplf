@@ -1,18 +1,16 @@
- r←GetTatinRootSpace targetSpace;root
-⍝ `targetSpace` is where the link to a package it going to be created,
-⍝ That rules whether we return `#` or `⎕SE` as the root.
+ path←GetTatinRootSpace targetSpace
+⍝ `targetSpace` is where the link to a package it going to be created: `#` or `⎕SE`.\\
+⍝ That rules whether we return `#._tatin` or `⎕SE._tatin`.
 ⍝ As a side effect the function makes sure that the space exists.
  targetSpace←⍕targetSpace
  :If '#'=1⍴targetSpace
-     r←'#._tatin'
-     root←#
+     path←'#._tatin'
  :ElseIf '⎕SE'≡1 ⎕C 3⍴targetSpace
-     r←'⎕SE._tatin'
-     root←⎕SE
+     path←'⎕SE._tatin'
  :Else
      'Invalid right argument'⎕SIGNAL 11
  :EndIf
- :If 0=⎕NC r
-     r ⎕NS''
+ :If 0=⎕NC path
+     path ⎕NS''
  :EndIf
 ⍝Done

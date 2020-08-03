@@ -5,18 +5,18 @@
 ⍝ * an HTTP request for a package
 ⍝ * a ZIP file holding a package
 ⍝ * a folder holding a package (like file://C:/Temp/group-name-version)
-⍝ * a path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg{packageID}')
+⍝ * a path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in Client's config file.\\
-⍝ `targetSpace` must be a reference or a fully qualified name of an ordinary namespace, meaning the name must start
-⍝ with either `#.` or `⎕SE.`.\\
+⍝   The first hit wins.\\
+⍝ `targetSpace` must be a reference or a fully qualified name of an ordinary namespace, meaning the name must
+⍝ start with either `#.` or `⎕SE.`.\\
 ⍝ `targetSpace` might already exist but if it doesn't it will be created. If it exists but is not an ordinary
 ⍝ namespace an error is thrown.\\
-⍝ `←` Vector with all references that were loaded, including depencies.\\
-⍝ Loads the package into `#._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
-⍝ Loads all dependencies, if any, as well.\\
-⍝ Leaves no trails in the file system unless a package relies on file assets in which case those are loaded into a
-⍝ temporary directory.\\
-⍝ Returns fully qualified names of the references created in the target namespace.
+⍝ Loads the package into `[#|⎕SE]._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
+⍝ Loads all dependencies, if any, as well into [#|⎕SE]._tatin but _not_ into `targetSpace`.\\
+⍝ Leaves no trails in the file system unless a package relies on file assets in which case those are loaded
+⍝ into a temporary directory.\\
+⍝ Returns the fully qualified name of the reference created in `targetSpace` for the loaded package.
  r←⍬
  'Not a valid package ID'Assert GetPackageIDFromFilename identifier_
  refs←reset←tempDirs←⍬

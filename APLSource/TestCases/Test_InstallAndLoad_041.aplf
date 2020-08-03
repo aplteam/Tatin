@@ -1,0 +1,31 @@
+ r←Test_InstallAndLoad_041(stopFlag batchFlag);⎕TRAP;dir;installFolder;src;zip;body;cfg;zipfile
+ ;src4;list1;list2;refs
+⍝ Install and load simple package with crazy name into ⎕SE.
+⍝ We do this because we cannot temper with ⎕SE._tatin!
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ ⎕SE.⎕SHADOW'TEMP' ⋄ 'TEMP'⎕SE.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir''
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace CrazyName___' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/CrazyName___.apln'
+ cfg←P.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'CrazyName___' '0.1.0'
+ cfg.source←'CrazyName___.apln'
+ cfg P.WritePackageConfigFile src
+ zipfile←P.Pack src zip
+ installFolder←GetTempDir'/MyAppPackages'
+ {}P.InstallPackage('file://',zipfile)installFolder
+
+ {}P.LoadDependencies installFolder ⎕SE.TEMP
+ →T.GoToTidyUp ⎕SE.TEMP.CrazyName___.PI≢3.14
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ ⎕SE._tatin.⎕EX'Example_CrazyName____0_1_0'
+⍝Done

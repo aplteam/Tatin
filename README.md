@@ -20,7 +20,7 @@ Once you've installed the Tatin client you have access to <https://tatin.dev>, t
 
 However, you might find it useful to run your own Tatin server. For example, all packages used within a company could be served by a Tatin Server within your company LAN.
 
-You may also keep a local Registry on your own machine, for example for development work. From a consumer's perspective there is no difference between consuming a package that is consumed from a Tatin Server or a local Registry.
+You may also keep a local Registry on your own machine, for example for development work. From a consumer's perspective there is no difference between consuming a package that is coming from a Tatin Server or from a local Registry.
 
 
 

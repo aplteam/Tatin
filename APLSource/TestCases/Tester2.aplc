@@ -25,14 +25,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(Last⍕⎕THIS)'2.3.0.67' '2020-07-11'
+      r←(Last⍕⎕THIS)'2.4.0.70' '2020-08-01'
     ∇
 
     ∇ History
       :Access Public shared
-      ⍝ * 2.3.0 ⋄ 2020-06-29
-      ⍝   * Code coverage feature added: see the `codeCoverage` property. Needs the `CodeCoverage` class for this.
-      ⍝   * `RunThese` now allows to suppress a group by putting a `~` ("without") in front of its name.
+      ⍝ * 2.4.0 ⋄ 2020-08-01
+      ⍝   * Stops on "Initial" and "Cleanup" introduced
       ⍝\\
       ⍝ For a full history (including older versions) see <https://github.com/aplteam/Tester2/releases>
     ∇
@@ -269,7 +268,9 @@
       :Access Public Instance
       ⎕IO←1 ⋄ ⎕ML←3
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1
+      'Invalid left argument '⎕SIGNAL 11/⍨1≠≡,stopFlag
+      'Invalid left argument '⎕SIGNAL 11/⍨1≠≢stopFlag
+      'Invalid left argument '⎕SIGNAL 11/⍨83≠⎕DR stopFlag
       'Invalid right argument '⎕SIGNAL 11/⍨~(⊂debugFlag)∊0 1
       _parms←CreateParms ⍬
       _parms.debugFlag←debugFlag
@@ -353,7 +354,11 @@
    ⍝ 3. `batchFlag`: a 1 would mean that the test should quit itself if for example it
    ⍝     needs a human being in front of the monitor. Such test cases are supposed to
    ⍝     do nothing but return a `_NoBatchTest` when this flag is on.
-   ⍝ 4. `stopFlag`: Is treated as "stop just before the next test case is going to be executed".
+   ⍝ 4. `stopFlag`: Is treated as "stop just before the next test case is going to be executed" when 1.\\
+   ⍝     Since version 2.4 this accepts an integer that can be the sum of:
+   ⍝     * 1=stop in testcases
+   ⍝     * 2=stop in all `Initial` functions
+   ⍝     * 4=stop in all `Cleanup` functions
    ⍝ 5. `testCaseNos`: the test cases to be executed (IDs or group or a mixture of both)
    ⍝ 6. `guiFlag`: is 0 when no GUI is required an 1 otherwise.
       :Access Public Instance
@@ -367,7 +372,7 @@
       r.⎕FX'r←List' 'r←⊃{⍵(⍎⍵)}¨'' ''~¨⍨↓⎕NL 2'
     ∇
 
-    ∇ {r}←Run__ ps;rc;log;⎕TRAP;rc2;filename;tno
+    ∇ {r}←Run__ ps;rc;log;⎕TRAP;rc2;filename;tno;buff
         ⍝ Run all test cases to be found in `_ref`.\\
         ⍝ The right argument is a parameter space, typically created by calling `CreateParms ⍬`.\\
         ⍝ The shy explicit result is a two-element vector:
@@ -377,8 +382,8 @@
         ⍝ 2. Nested vector with the log information
       :Access Public Instance
       ⎕TRAP←(QuitEvent'C' '→∆GetOutOfHere')(PassEvent'C'('⎕SIGNAL ',⍕PassEvent))((0 1000)'N')
-      _ref.Stop←ps.stopFlag         ⍝ "Stop" is honored by "FailsIf" & "PassesIf"
-      _INI←⍬                        ⍝ Flatten any leftovers
+      _ref.Stop←ps.stopFlag    ⍝ "Stop" is honored by "FailsIf" & "PassesIf"
+      _INI←⍬                   ⍝ Flatten any leftovers
       ps.(log errCounter failedCounter totalCounter)←'' 0 0 0
       ps.guiFlag∧←'Win'≡GetOperatingSystem ⍬  ⍝ Windows only, if at all
       :If ps.guiFlag
@@ -420,7 +425,9 @@
       ps.returnCodes←⍬
       ps.processedGroups←''
       ShowLog(,'--- Tests started at ',FormatDateTime ⎕TS),' on ',(⍕_ref),' ---'
-      ps.stopFlag∨←¯1∊×ps.testCaseNos
+      buff←⌽(8⍴2)⊤ps.stopFlag
+      buff[1]∨←¯1∊×ps.testCaseNos
+      ps.stopFlag←2⊥⌽buff
       ProcessTestCases _ref ps
      ∆GetOutOfHere:
       :If ps.guiFlag
@@ -518,18 +525,23 @@
       r←1
       report←'Looking for a function "Initial": '
       :If 3=ref.⎕NC'Initial'
+          :If 2⊃⌽(8⍴2)⊤ps.stopFlag
+              (∪(⎕STOP 1⊃⎕SI),∆stop1,∆stop2,∆stop3,∆stop4)⎕STOP 1⊃⎕SI
+          :Else
+              ((⎕STOP 1⊃⎕SI)~,∆stop1,∆stop2,∆stop3,∆stop4)⎕STOP 1⊃⎕SI
+          :EndIf
           :Select ↑(⎕IO+1)⊃1 ref.⎕AT'Initial'
           :Case 0
               :If 0=↑↑ref.⎕AT'Initial'
-                  ref.Initial
+     ∆stop1:      ref.Initial
               :Else
-                  r←ref.Initial
+     ∆stop2:      r←ref.Initial
               :EndIf
           :Case 1
               :If 0=↑↑ref.⎕AT'Initial'
-                  ref.Initial ps
+     ∆stop3:      ref.Initial ps
               :Else
-                  r←ref.Initial ps
+     ∆stop4:      r←ref.Initial ps
               :EndIf
           :Else
               11 ⎕SIGNAL⍨'The "Initial" function in ',(⍕ref),' has an invalid signature: it''s neither monadic nor niladic'
@@ -625,7 +637,7 @@
           :EndIf
           ps.ref2Gui.∆n.Form.on9998←0
           ps.ref2Gui.∆n.StartBtn.Active←0
-          ps.stopFlag←ps.ref2Gui.∆n.StopFlag.State
+          ps.stopFlag←↑{⍵≡(≢⍵)↑1:0 ⋄ ⍵/0 1 2 4 3 5 7 6}ps.ref2Gui.∆n.StopFlag.SelItems
           ps.trapFlag←ps.ref2Gui.∆n.TrapErrors.State
           {2 ⎕NQ ps.ref2Gui.∆n.Grid'SetColSize'⍵ ¯3}¨¯1↓3↓⍳2⊃⍴ps.ref2Gui.∆n.Grid.Values
       :EndIf
@@ -646,12 +658,17 @@
                   ps.processedGroups,←⊂currentGroup
                   :If 3=ref.⎕NC'Initial_',currentGroup
                       at←1⊃ref.⎕AT'Initial_',currentGroup
-                      :If (2⊃at)∊1 ¯2           ⍝ Accepts a right argument (monadic=1, ambivalent=¯2)?
-                          result←ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Initial_',currentGroup
-                      :ElseIf |1⊃at
-                          result←ps ref.{6::1 ⋄ ⍎⍵}'Initial_',currentGroup
+                      :If 2⊃⌽(8⍴2)⊤ps.stopFlag
+                          (∪(⎕STOP 1⊃⎕SI),∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
                       :Else
-                          ref⍎'Initial_',currentGroup
+                          ((⎕STOP 1⊃⎕SI)~,∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
+                      :EndIf
+                      :If (2⊃at)∊1 ¯2           ⍝ Accepts a right argument (monadic=1, ambivalent=¯2)?
+     ∆stop1:              result←ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Initial_',currentGroup
+                      :ElseIf |1⊃at
+     ∆stop2:              result←ps ref.{6::1 ⋄ ⍎⍵}'Initial_',currentGroup
+                      :Else
+     ∆stop3:              ref⍎'Initial_',currentGroup
                           result←1
                       :EndIf
                       :If ~1↑result∊⍬ 1
@@ -720,18 +737,23 @@
           :If i=≢ps.list                                                ⍝ Last one?
           :OrIf currentGroup{0=≢⍺:0 ⋄ ⍺≢GetGroupName(i+1)⊃⍵}ps.list     ⍝ Group change?!
               :If 3=ref.⎕NC'Cleanup_',currentGroup
+                  :If 3⊃⌽(8⍴2)⊤ps.stopFlag
+                      (∪(⎕STOP 1⊃⎕SI),∆stop10,∆stop11)⎕STOP 1⊃⎕SI
+                  :Else
+                      ((⎕STOP 1⊃⎕SI)~,∆stop10,∆stop11)⎕STOP 1⊃⎕SI
+                  :EndIf
                   at←1⊃ref.⎕AT'Cleanup_',currentGroup
                   :If (2⊃at)∊1 ¯2 ⍝ Accepts a right argument (1=monadic, ¯2=ambivalent)?
-                      ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Cleanup_',currentGroup
+     ∆stop10:         ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Cleanup_',currentGroup
                   :Else
-                      ref.⍎'Cleanup_',currentGroup
+     ∆stop11:         ref.⍎'Cleanup_',currentGroup
                   :EndIf
               :EndIf
           :EndIf
           {}⎕WA  ⍝ Enforce a memory compaction in order to get rid of any rubbish.
           :If ps.guiFlag
           :AndIf 0=ps.ref2Gui.∆n.∆Closed
-              ps.stopFlag←ps.ref2Gui.∆n.StopFlag.State
+              ps.stopFlag←↑{⍵≡(≢⍵)↑1:0 ⋄ ⍵/0 1 2 4 3 5 7 6}ps.ref2Gui.∆n.StopFlag.SelItems
               ps.trapFlag←ps.ref2Gui.∆n.TrapErrors.State
               ProcessGuiEvents ps.ref2Gui.∆n
           :AndIf ps.ref2Gui.∆n.∆Closed
@@ -746,7 +768,7 @@
 
     ∇ HandleStops(fns ps StopHere testNo fnsName)
       :If 0<ps.stopFlag
-      :AndIf testNo≥ps.stopFlag
+      :AndIf 1⊃⌽(8⍴2)⊤↑ps.stopFlag
           (∪(⎕STOP fns),StopHere)⎕STOP fns
           ⎕←'About to execute <',(⍕_ref),'.',fnsName,'> ...'
       :Else
@@ -803,11 +825,16 @@
       r←⍬
       report←'Looking for a function "Cleanup": '
       :If 3=ref.⎕NC'Cleanup'
+          :If 3⊃⌽(8⍴2)⊤ps.stopFlag
+              (∆stop1 ∆stop2)⎕STOP 1⊃⎕SI
+          :Else
+              ((⎕STOP 1⊃⎕SI)~∆stop1 ∆stop2)⎕STOP 1⊃⎕SI
+          :EndIf
           :If 0=1 2⊃ref.⎕AT'Cleanup'
-              ref.Cleanup
+     ∆stop1:  ref.Cleanup
               report,←'found and executed'
           :Else
-              ref.Cleanup ps
+     ∆stop2:  ref.Cleanup ps
           :EndIf
       :Else
           report,←'not found'
@@ -898,7 +925,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←ps CreateGui dummy;∆;n;width;scrollbarSize
+    ∇ {r}←ps CreateGui dummy;∆;n;width;scrollbarSize;items;bool
       n←⎕NS''
       ∆←''
       ∆,←⊂'Caption'('Test cases in ',⍕{↑⍵~⊂↑⍵}⎕NSI)
@@ -958,14 +985,21 @@
       n.Debug←n.Form.⎕NEW'Button'∆
      
       ∆←''
-      ∆,←⊂'Style' 'Check'
       ∆,←⊂'Posn'(5,20+2⊃+⌿⊃n.Debug.(Posn Size))
-      ∆,←⊂'Caption' 'Stop &before executing'
+      items←(⊂'No stop'),'Stop on '∘,¨'tests' '"Initial"' '"Cleanup"' 'tests+"Initial"' 'tests+"Cleanup"' 'test+"Initial"+"Cleanup"' '"Initial"+"Cleanup"'
+      items,¨←'' ' (1)' ' (2)' ' (4)' ' (3)' ' (5)' ' (7)' ' (6)'
+      ∆,←⊂'Items'items
+      bool←(≢items)⍴0
+      :If 0=+/(8⍴2)⊤ps.stopFlag
+          bool[1]←1
+      :Else
+          bool[1+1 2 4 3 5 7 6⍳ps.stopFlag]←1
+      :EndIf
+      ∆,←⊂'SelItems'bool
       ∆,←⊂'Attach'(4⍴'Top' 'Left')
-      ∆,←⊂'State'ps.stopFlag
       ∆,←⊂'TipObj'n.MyTipObj
-      ∆,←⊂'Tip'('Stop just before any test gets executed.' 'Allows tracing any test case from top to bottom.')
-      n.StopFlag←n.Form.⎕NEW'Button'∆
+      ∆,←⊂'Tip'('Stop just before any test or any "Initial" or' 'any "Cleanup" functions gets executed.' 'Allows tracing those functions.')
+      n.StopFlag←n.Form.⎕NEW'Combo'∆
      
       ∆←''
       ∆,←⊂'Posn'((8+1⊃+⌿⊃n.StopFlag.(Posn Size))0)
@@ -1117,7 +1151,7 @@
       r←⍬
       :If ~y                        ⍝ Passes test, so →PassesIf x just continues
           :If 2=_ref.⎕NC'stopFlag'  ⍝ Stop not defined, continue with test suite
-          :AndIf ~_ref.stopFlag     ⍝ Do not stop, continue with test suite
+          :AndIf ~_ref.stopFlag     ⍝ Do not stop, continue with test suite   ⍝TODO⍝
               r←0
           :Else
               ⎕SIGNAL 999           ⍝ Otherwise stop for investigation
@@ -1535,7 +1569,7 @@
           ps←⍵
           ps.trapFlag←ps.ref2Gui.∆n.TrapErrors.State
           ps.debugFlag←ps.ref2Gui.∆n.Debug.State
-          ps.stopFlag←ps.ref2Gui.∆n.StopFlag.State
+          ps.stopFlag←+/ps.ref2Gui.∆n.StopFlag.SelItems/0 1 2 4 3 5 7 6
           ps
       }
 

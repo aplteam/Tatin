@@ -23,10 +23,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '0.8.0.31' '2020-07-04'
+      r←'DotNetZip' '0.8.1.34' '2020-08-07'
     ∇
 
     ∇ History
+    ⍝ * 0.8.1 from 2020-08-07
+    ⍝   * Workaround implemented for bug with ⎕USING that caused a nonsense VALUE ERROR. (Mantis 18404)\\
+    ⍝     The bugs makes an appearance when the class is instanciated in ⎕SE, then a )CLEAR command is issued
+    ⍝     and then again instantiated: you get a VALUE ERROR on a .NET function that is there, at least a bit.
     ⍝ * 0.8.0 from 2020-07-04
     ⍝   * `Add` is now effectively doing a "Replace" in case the file(s) in question are already part of
     ⍝     the ZIP. The `Update` method has been removed.
@@ -187,7 +191,15 @@
     ⍝ `targetFolder` must not yet exist.
       :Access Public Shared
       r←Initialize ⍬
-      System.IO.Compression.ZipFile.ExtractToDirectory zipfile targetFolder
+      :Trap 6
+          System.IO.Compression.ZipFile.ExtractToDirectory zipfile targetFolder
+      :Else
+          ⍝ Workaround for bug Mantis 18404 from 2020-08
+          ⍝ The VALUE ERROR is not really a VALUE ERROR. This appears to happen only when `DotNetZip` is instanciated
+          ⍝ within `⎕SE`, the )CLEAR is issed and then again `DotNetZip` instanciated within `⎕SE`.
+          ⎕EX'System'
+          System.IO.Compression.ZipFile.ExtractToDirectory zipfile targetFolder
+      :EndTrap
     ⍝Done
     ∇
 

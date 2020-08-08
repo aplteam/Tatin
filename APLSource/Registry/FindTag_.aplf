@@ -1,0 +1,14 @@
+ (fuzzy bool)←FindTag_(tagList search);tagList_;hits;max
+ fuzzy←¯1
+ bool←0
+ :If 0<+/bool←search∘≡¨tagList
+     fuzzy←0
+ :ElseIf 0<+/bool←∨/search⍷↑tagList
+     fuzzy←1
+ :Else
+     tagList_←{↓{⍵}⌺2⊣⍵}¨tagList
+     max←⌈/hits←+/¨tagList_∊¨⊂{↓⍵}⌺2⊣search
+     bool←hits=max
+     fuzzy←2
+ :EndIf
+⍝Done

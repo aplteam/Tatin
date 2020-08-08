@@ -5,7 +5,12 @@
  r←T._Failed
 
  html←∆GetHtmlFromServer'localhost/v1/packages/details/aplteam-APLTreeUtils'
- →T.PassesIf∨/'<h2>Latest details of package "aplteam-APLTreeUtils"</h2>'⍷html
+ →T.PassesIf∨/'<h2>Details of "best" package for &lt;aplteam-APLTreeUtils&gt;</h2>'⍷html
+ →T.PassesIf∨/'version: "7.0.0"'⍷html
+
+ html←∆GetHtmlFromServer'localhost/v1/packages/details/aplteam-APLTreeUtils-6'
+ →T.PassesIf∨/'<h2>Details of "best" package for &lt;aplteam-APLTreeUtils&gt; of major version 6</h2>'⍷html
+ →T.PassesIf∨/'version: "6.0.11"'⍷html
 
  r←T._OK
 

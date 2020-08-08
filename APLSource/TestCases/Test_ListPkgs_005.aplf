@@ -1,0 +1,13 @@
+ r←Test_ListPkgs_005(stopFlag batchFlag);⎕TRAP;fuzzy;list1;list2;list3;list4;path
+⍝ List all packages with tags "llinukx" and "trabbing"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←∆GetServerRegistryFolder
+ (fuzzy list1)←Reg.FindTag path('linnuks' 'trabbing')
+ →T.PassesIf 2=fuzzy
+ →T.PassesIf 1=≢list1
+ →T.PassesIf∧/∨/'-HandleError-'⍷↑list1
+
+ r←T._OK
+⍝Done

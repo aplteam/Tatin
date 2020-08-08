@@ -1,17 +1,39 @@
- response←request GetDetails packageID;data;html;filename;url
- :If Reg.IsValidPackageID_WithoutVersionNo packageID
-     filename←(⊃¯1↑1⊃F.Dir G.RegistryPath,packageID,'*'),'/',Reg.CFG_Name
+ response←request GetDetails packageID;data;html;filename;url;version;filenames
+⍝ If no version is specified then the "best" version is determined and its details are returned.
+⍝ If just a major number is provided the details of the best version of that major number are returned.
+⍝ If a full package ID is provided the details for that precise version are returned.
+⍝ Otherwise  a 404 is returned.
+ :If Reg.IsValidPackageID_Complete packageID
+     filename←G.RegistryPath,packageID,'/',Reg.CFG_Name
+     version←'full'
+ :ElseIf Reg.IsValidPackageID_WithMajorNo packageID
+     filenames←⊃F.Dir G.RegistryPath,packageID,'*'
+     filename←({⍵⊃⍨¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     version←'major'
+ :ElseIf Reg.IsValidPackageID_WithoutPatchNo packageID
+     filenames←⊃F.Dir(G.RegistryPath,packageID,'*')
+     filename←({⍵⊃⍨¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     version←'major+minor'
+ :ElseIf Reg.IsValidPackageID_WithoutVersionNo packageID
+     filenames←⊃F.Dir G.RegistryPath,packageID,'*'
+     filename←({⍵⊃⍨¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     version←'none'
+ :Else
+     response←request R.Respond 404 1
+     :Return
+ :EndIf
+ :If 0=F.IsFile filename
+     response←request R.Respond 404 1
+ :Else
      :If 0<≢data←1⊃F.NGET filename 1
          :If IsJsonRequest request.Headers
              response←request ReturnJSON Reg.JSON data
          :Else
              url←{(⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET ⍵).project_url}filename
-             html←PrepareHtmlPageForPackageDetails packageID data url
+             html←PrepareHtmlPageForPackageDetails packageID data url version
              response←request ReturnHTML html
          :EndIf
      :Else
          response←request R.Respond 404 1
      :EndIf
- :Else
-     response←request R.Respond 404 1
  :EndIf

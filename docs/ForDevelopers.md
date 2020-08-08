@@ -1,6 +1,6 @@
 # Tatin for developers
 
-If you want to contribute to the [Tatin project on GitHub](https://github.com/aplteam/Tatin) or make adjustments to Titan for an in-house project, this document will help you.
+If you want to contribute to the [Tatin project on GitHub](https://github.com/aplteam/Tatin) or make adjustments to Tatin for an in-house project, this document will help you.
 
 
 ## Tatin is managed by acre

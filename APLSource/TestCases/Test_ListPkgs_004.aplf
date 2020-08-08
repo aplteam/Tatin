@@ -1,12 +1,30 @@
- r←Test_ListPkgs_004(stopFlag batchFlag);⎕TRAP;list;noOf
-⍝ List all packages for group "aplteam"
+ r←Test_ListPkgs_004(stopFlag batchFlag);⎕TRAP;fuzzy;list1;list2;list3;list4
+⍝ List all packages with a tag "zip-tools"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- list←Reg.ListPackages ∆GetServerRegistryFolder,'aplteam'
+ (fuzzy list1)←Reg.FindTag ∆GetServerRegistryFolder'zip-tools'
+ →T.PassesIf 0=fuzzy
+ →T.PassesIf 2=≢list1
+ →T.PassesIf∧/∨/¨∨/¨'-SevenZip-' '-DotNetZip-'⍷¨⊂↑list1
 
- noOf←+/{∨/¨(F.CurrentSep,'aplteam-')∘⍷¨⍵}∪{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\'
- →T.PassesIf noOf≡≢∪{⊃{⍺,'-',⍵}/¯1↓'-'A.Split ⍵}¨list
+ (fuzzy list1)←Reg.FindTag ∆GetServerRegistryFolder'zip-tool'
+ →T.PassesIf 1=fuzzy
+ →T.PassesIf 2=≢list1
+ →T.PassesIf∧/∨/¨∨/¨'-SevenZip-' '-DotNetZip-'⍷¨⊂↑list1
+
+ (fuzzy list2)←Reg.FindTag ∆GetServerRegistryFolder'zip'
+ →T.PassesIf 1=fuzzy
+ →T.PassesIf 2=≢list2
+ →T.PassesIf∧/∨/¨∨/¨'-SevenZip-' '-DotNetZip-'⍷¨⊂↑list2
+
+ (fuzzy list3)←Reg.FindTag ∆GetServerRegistryFolder'winndows'
+ →T.PassesIf 2=fuzzy
+ →T.PassesIf 24=≢list3
+
+ (fuzzy list4)←Reg.FindTag ∆GetServerRegistryFolder'linus'
+ →T.PassesIf 2=fuzzy
+ →T.PassesIf 16=≢list4
 
  r←T._OK
 ⍝Done

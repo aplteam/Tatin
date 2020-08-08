@@ -1,9 +1,9 @@
- {ref}←CompileIndex path;packageList;index;cfgFiles;descs
+ {ref}←CompileIndex path;packageList;index;cfgFiles;descs;tags
 ⍝ (Re)-builds the index for the registry pointed to by `path`.
 ⍝ Writes the index to several files:
 ⍝ * {path}/tatin_index.txt contains a simple string with all package folder names
 ⍝ * {path}/tatin_descriptions.json contains a simple string with all package descriptions\\
-⍝ More stuff might be added later, like tags.
+⍝ More stuff might be added later.
 ⍝ Returns a reference to a namspace that holds veriables with these pieces of information.
  ref←⎕NS''
  :If 0<≢packageList←F.ListDirs path
@@ -13,12 +13,15 @@
      (⊂index)F.NPUT(path,'/',Index.GetIndexFilename)1
      cfgFiles←packageList,¨⊂'/apl-package.json'
      cfgFiles←(F.IsFile cfgFiles)/cfgFiles              ⍝ Should only happen in case tracing through test cases
-     descs←{(ReadConfigFile ⍵).description}¨cfgFiles
+     (descs tags)←↓⍉↑{(ReadConfigFile ⍵).(description tags)}¨cfgFiles
      descs←⊃,/descs,¨⎕UCS 13
      ref.descriptions←descs
-     (⊂descs)F.NPUT(path,'/Tatin_descriptions.json')1
+     (⊂descs)F.NPUT(path,'/tatin_descriptions.json')1
+     tags←↑⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨';'(≠⊆⊢)⍵}¨tags
+     (⊂tags)F.NPUT(path,'/tatin_tags.txt')1
  :Else
      (⊂'')F.NPUT(path,'/',Index.GetIndexFilename)1
-     (⊂'')F.NPUT(path,'/Tatin_descriptions.json')1
+     (⊂'')F.NPUT(path,'/tatin_descriptions.json')1
+     (⊂'')F.NPUT(path,'/tatin_tags')1
  :EndIf
 ⍝Done

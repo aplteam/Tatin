@@ -1,6 +1,19 @@
- html←PrepareHtmlPageForPackageDetails(ID json url)
+ html←PrepareHtmlPageForPackageDetails(ID json url version);ID_;major;majorMinor
  html←HtmlHeader''
- html,←⊂'<h2>Latest details of package "',ID,'"</h2>'
+ :Select version
+ :Case 'full'
+     html,←⊂'<h2>Details of &lt;',ID,'&gt;</h2>'
+ :Case 'major'
+     (ID_ major)←{⍵{(⍵↓⍺)((1+⍵)↑⍺)}-'-'⍳⍨⌽⍵}ID
+     html,←⊂'<h2>Details of "best" package for &lt;',ID_,'&gt; of major version ',(,major),'</h2>'
+ :Case 'major+minor'
+     (ID_ majorMinor)←{⍵{(⍵↓⍺)((1+⍵)↑⍺)}-'-'⍳⍨⌽⍵}ID
+     html,←⊂'<h2>Details of "best" patch for &lt;',ID_,'&gt; for version ',(,majorMinor),'</h2>'
+ :Case 'none'
+     html,←⊂'<h2>Details of "best" package for &lt;',ID,'&gt;</h2>'
+ :Else
+     ∘∘∘ ⍝ Huuh?>!
+ :EndSelect
  html,←⊂'<pre><json>',1⊃json
  html,←1↓json
  html,←⊂'</json></pre>'

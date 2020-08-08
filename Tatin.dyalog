@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.
+⍝ * 0.6.2 - 2020-08-04
+⍝   * `UserSettings` replaces API-keys by stars when printing to the session
+⍝   * Internal change: "TC" is now "TC" (Tatin Client)
 ⍝ * 0.6.1 - 2020-07-28
 ⍝   * Shows only under 18.0 and better now.
 ⍝ * 0.6.0 - 2020-07-19
@@ -32,7 +35,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'Lists all packages in the Registry specified in the argument'
-          c.Parse←'1 -raw -group='
+          c.Parse←'1 -raw -group= -tag='
           r,←c
      
           c←⎕NS ⍬
@@ -110,7 +113,7 @@
           Input.force LoadTatin(1+0<≢Input._1)⊃''Input._1
           r←''
       :Else
-          PK←⎕SE._Tatin.Client
+          TC←⎕SE._Tatin.Client
           r←⍎Cmd,' Input'
       :EndIf
     ∇
@@ -121,9 +124,9 @@
       LoadTatin_ forceLoad
       home←⍎'Tatin'⎕SE.⎕NS''
       :If 0=≢path2Config
-          path2Config←PK.FindUserSettings ⎕AN
+          path2Config←TC.FindUserSettings ⎕AN
       :EndIf
-      'Create!'PK.F.CheckPath path2Config
+      'Create!'TC.F.CheckPath path2Config
       path2Config ⎕SE._Tatin.Admin.InstallClient home
      ⍝Done
     ∇
@@ -137,7 +140,7 @@
           ⎕SE.⎕EX¨'_Tatin' 'Tatin'
           '_Tatin'⎕SE.⎕CY filename
       :EndIf
-      PK←⎕SE._Tatin.Client
+      TC←⎕SE._Tatin.Client
     ∇
 
     ∇ r←ListPackages Arg;registry
@@ -145,9 +148,9 @@
       registry,←(~(¯1↑registry)∊'/\')/'/'
       registry←EnforceSlash registry
       :If 0≡Arg.group
-          r←⍪PK.ListPackages registry
+          r←⍪TC.ListPackages registry
       :Else
-          r←⍪Arg.group PK.ListPackages registry
+          r←⍪Arg.group TC.ListPackages registry
       :EndIf
       :If 0=Arg.raw
           :If 0=≢r
@@ -162,8 +165,8 @@
     ∇ r←LoadInstalled Arg;installFolder;f1;f2;targetSpace;saveIn
       installFolder←Arg._1
       targetSpace←Arg._2
-      f1←PK.F.IsDir installFolder
-      f2←(PK.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
+      f1←TC.F.IsDir installFolder
+      f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
       '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
       '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert~(⊂⎕C targetSpace)∊'#' '⎕se'
       '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
@@ -173,29 +176,29 @@
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
-      r←PK.LoadDependencies installFolder targetSpace
+      r←TC.LoadDependencies installFolder targetSpace
     ∇
 
     ∇ r←Pack Arg;filename;sourcePath;targetPath;zipFilename
       (sourcePath targetPath)←Arg.(_1 _2)
-      'Source path (⍵[1]) is not a directory'Assert PK.F.IsDir sourcePath
-      filename←sourcePath,'/',PK.CFG_NAME
-      ('Could not find a file "',PK.CFG_NAME,'" in ',sourcePath)Assert PK.F.IsFile filename
+      'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
+      filename←sourcePath,'/',TC.CFG_NAME
+      ('Could not find a file "',TC.CFG_NAME,'" in ',sourcePath)Assert TC.F.IsFile filename
       :If ~(1↑targetPath)∊'./\'
       :AndIf (1↑1↓targetPath)≠':'
           targetPath←sourcePath,'/',targetPath
       :EndIf
-      'Target path (⍵[2]) is not a directory'Assert PK.F.IsDir targetPath
-      zipFilename←PK.Pack sourcePath targetPath
+      'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
+      zipFilename←TC.Pack sourcePath targetPath
       r←'Created: ',zipFilename
     ∇
 
     ∇ r←Publish Arg;zipFilename;url;url_;qdmx;statusCode;list
       r←''
       (zipFilename url)←Arg.(_1 _2)
-      :If PK.F.IsDir zipFilename
-      :AndIf 0<≢list←⊃PK.F.Dir zipFilename,'/*.zip'
-          list←({PK.Reg.IsValidPackageID_Complete⊃,/1↓⎕NPARTS ⍵}¨list)/list
+      :If TC.F.IsDir zipFilename
+      :AndIf 0<≢list←⊃TC.F.Dir zipFilename,'/*.zip'
+          list←({TC.Reg.IsValidPackageID_Complete⊃,/1↓⎕NPARTS ⍵}¨list)/list
       :AndIf 1=≢list
           :If Arg.quiet
           :OrIf 1 ∆YesOrNo'Publish ',((1+≢zipFilename)↓⊃list),' ?'
@@ -204,12 +207,12 @@
               :Return
           :EndIf
       :EndIf
-      'Could not find the ZIP file'Assert PK.F.IsFile zipFilename
+      'Could not find the ZIP file'Assert TC.F.IsFile zipFilename
       ('"',zipFilename,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑zipFilename
-      url_←PK.ReplaceRegistryAlias url
+      url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_
       :Trap 98
-          PK.PublishPackage zipFilename url_
+          TC.PublishPackage zipFilename url_
           r←'Package published on ',url_
       :Else
           qdmx←⎕DMX
@@ -234,7 +237,7 @@
     ∇
 
     ∇ r←ListRegistries Arg
-      r←PK.ListRegistries''
+      r←TC.ListRegistries''
       :If 0=Arg.raw
           r(AddHeader)←'Path' 'Alias'
       :EndIf
@@ -242,7 +245,7 @@
 
     ∇ r←ListVersions Arg
       :Trap 98
-          r←⍪PK.ListVersions Arg._1
+          r←⍪TC.ListVersions Arg._1
       :Else
           r←'Not found: ',Arg._1
       :EndTrap
@@ -257,55 +260,64 @@
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
-      r←⍪PK.LoadPackage identifier targetSpace
+      r←⍪TC.LoadPackage identifier targetSpace
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what
       r←⍬
-      path←Arg._1
-      filename←path,'/',PK.CFG_NAME
-      :If Arg.delete
-          'File not found'Assert PK.F.IsFile filename
-          msg←'Sure you want to delete "',filename,'" ?'
-          :If Arg.quiet
-          :OrIf 0 ∆YesOrNo msg
-              PK.F.DeleteFile filename
-          :EndIf
+      what←Arg._1
+      :If ∧/'[]'∊what
+          what←TC.ReplaceRegistryAlias what
+      :EndIf
+      :If TC.Reg.IsHTTP what
+          ∘∘∘ ⍝TODO⍝
+          'v1/packages/details/'{(1⊃⍵),⍺,(2⊃⍵)}TC.Reg.SeparateUriAndPackageID what
       :Else
-          :If 0=PK.F.IsDir path
+          path←Arg._1
+          filename←path,'/',TC.CFG_NAME
+          :If Arg.delete
+              'File not found'Assert TC.F.IsFile filename
+              msg←'Sure you want to delete "',filename,'" ?'
               :If Arg.quiet
-              :OrIf ∆YesOrNo'The directory does not exist yet. Would you like to create it?'
-                  'Could not create the directory'Assert PK.F.MkDir path
-              :Else
-                  :Return  ⍝ Give up
+              :OrIf 0 ∆YesOrNo msg
+                  TC.F.DeleteFile filename
               :EndIf
-          :EndIf
-          :If PK.F.IsFile filename
-              ns←PK.ReadPackageConfigFile path
-              newFlag←0
           :Else
-              ns←PK.InitPackageConfig ⍬
-              ns.source←PK._UserSettings.source
-              newFlag←1
-          :EndIf
-          :If Arg.edit∨newFlag
-              origData←PK.Reg.JSON ns
-              (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData
-              :If success
-                  :If 0<≢∊newData
-                  :AndIf newFlag∨newData≢origData
-                      ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
-                      ns.tags←⎕C ns.tags
-                      :Trap 98
-                          ns PK.WritePackageConfigFile path
-                      :Else
-                          qdmx←⎕DMX
-                          ⎕←qdmx.EM
-                      :EndTrap
+              :If 0=TC.F.IsDir path
+                  :If Arg.quiet
+                  :OrIf ∆YesOrNo'The directory does not exist yet. Would you like to create it?'
+                      'Could not create the directory'Assert TC.F.MkDir path
+                  :Else
+                      :Return  ⍝ Give up
                   :EndIf
               :EndIf
-          :Else
-              r←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+              :If TC.F.IsFile filename
+                  ns←TC.ReadPackageConfigFile path
+                  newFlag←0
+              :Else
+                  ns←TC.InitPackageConfig ⍬
+                  ns.source←TC._UserSettings.source
+                  newFlag←1
+              :EndIf
+              :If Arg.edit∨newFlag
+                  origData←TC.Reg.JSON ns
+                  (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData
+                  :If success
+                      :If 0<≢∊newData
+                      :AndIf newFlag∨newData≢origData
+                          ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
+                          ns.tags←⎕C ns.tags
+                          :Trap 98
+                              ns TC.WritePackageConfigFile path
+                          :Else
+                              qdmx←⎕DMX
+                              ⎕←qdmx.EM
+                          :EndTrap
+                      :EndIf
+                  :EndIf
+              :Else
+                  r←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+              :EndIf
           :EndIf
       :EndIf
     ∇
@@ -315,17 +327,17 @@
       path←Arg._1
       filename←path,'/apl-dependencies.txt'
       :If Arg.delete
-          'File not found'Assert PK.F.IsFile filename
+          'File not found'Assert TC.F.IsFile filename
           msg←'Sure you want to delete the package dependency file in "',filename,'" ?'
           :If Arg.quiet
           :OrIf 0 ∆YesOrNo msg
-              PK.F.DeleteFile filename
+              TC.F.DeleteFile filename
           :EndIf
       :ElseIf Arg.edit
-          'Path does not exist'Assert PK.F.IsDir path
+          'Path does not exist'Assert TC.F.IsDir path
           temp←⎕NS'EditText'
-          :If PK.F.IsFile filename
-              origData←1⊃PK.F.NGET filename 1
+          :If TC.F.IsFile filename
+              origData←1⊃TC.F.NGET filename 1
               newFlag←0
           :Else
               origData←,⊂''
@@ -334,23 +346,23 @@
           (success newData)←(CheckDependencies EditText)'PackageDependencies'origData
           :If 0<≢∊newData
           :AndIf newFlag∨newData≢origData
-              (⊂newData)PK.F.NPUT filename 1
+              (⊂newData)TC.F.NPUT filename 1
           :EndIf
       :Else
-          'File not found'Assert PK.F.IsFile filename
-          r←⊃PK.F.NGET filename
+          'File not found'Assert TC.F.IsFile filename
+          r←⊃TC.F.NGET filename
       :EndIf
     ∇
 
     ∇ r←InstallPackage Arg;identifier;installFolder
       (identifier installFolder)←Arg.(_1 _2)
-      :If ~PK.F.IsDir installFolder
+      :If ~TC.F.IsDir installFolder
           :If Arg.quiet
           :AndIf 1 ∆YesOrNo'The install folder does not yet exist; create?'
-              'Create!'PK.F.CheckPath installFolder
+              'Create!'TC.F.CheckPath installFolder
           :EndIf
       :EndIf
-      r←⍪PK.InstallPackage identifier installFolder
+      r←⍪TC.InstallPackage identifier installFolder
     ∇
 
     ∇ r←UserSettings Arg;filename;temp;origData;flag;msg;success;newData;editFlag;path
@@ -358,18 +370,18 @@
       editFlag←0
       :If ' '=1↑0⍴Arg._1
           path←Arg._1
-          'No such folder exists'Assert PK.F.IsDir path
-          filename←PK.F.ExpandPath path{⍺,((~(¯1↑⍺)∊'/\')/'/'),⍵}PK.UserSettings.cfg_name
+          'No such folder exists'Assert TC.F.IsDir path
+          filename←TC.F.ExpandPath path{⍺,((~(¯1↑⍺)∊'/\')/'/'),⍵}TC.UserSettings.cfg_name
           :If ~⎕NEXISTS filename
               :If Arg.quiet
               :OrIf 1 ∆YesOrNo'No such config file exists yet. Create and edit?'
-                  PK.InitUserSettings path
-                  ∘∘∘ ⍝TODO⍝                  PK.In ⎕NPUT filename
+                  TC.InitUserSettings path
+                  ∘∘∘ ⍝TODO⍝                  TC.In ⎕NPUT filename
                   editFlag←1
               :EndIf
           :EndIf
       :Else
-          filename←PK._UserSettings.path2config
+          filename←TC.F.NormalizePath TC._UserSettings.path2config
       :EndIf
       origData←1⊃⎕NGET filename
       :If Arg.edit
@@ -380,7 +392,7 @@
               :OrIf 1 ∆YesOrNo'Do you want to save/use your changes?'
                   (⊂newData)⎕NPUT filename 1
                   path←1⊃⎕NPARTS filename
-                  PK._UserSettings←PK.⎕NEW PK.UserSettings(,⊂path)
+                  TC._UserSettings←TC.⎕NEW TC.UserSettings(,⊂path)
                   r←'User settings saved in ',path,' and also established in the WS'
               :EndIf
           :EndIf
@@ -392,6 +404,7 @@
               :EndIf
           :EndIf
       :Else
+          origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace the API key by Aserisks
           r←⍪(⊂'User settings in <',filename,'> :'),(⎕UCS 10)(≠⊆⊢)origData
       :EndIf
     ∇
@@ -444,7 +457,7 @@
           :If origData≢temp.⍎name
               txt←⊆temp.⍎name
               txt←(0<≢¨txt)/txt
-              txt{PK.A.(dlb dtb)⍵}¨txt
+              txt{TC.A.(dlb dtb)⍵}¨txt
           :AndIf 0<≢(∊txt)~' '
               :If 0<≢msg←CheckFns txt
                   ⎕←msg
@@ -457,12 +470,12 @@
       :Until flag
     ∇
 
-    ∇ r←level Help Cmd;PK
+    ∇ r←level Help Cmd;TC
       r←''
       :If 0=⎕SE.⎕NC'_Tatin'
           ⎕SE.UCMD'Tatin.LoadTatin'
       :EndIf
-      PK←⎕SE._Tatin.Client
+      TC←⎕SE._Tatin.Client
       :Select ⎕C Cmd
       :Case ⎕C'LoadTatin'
           r,←⊂']',NM,'.LoadTatin'
@@ -490,8 +503,11 @@
           r,←⊂'* Aliases are case insensitive, paths only under Windows.'
           r,←⊂'* It does not matter whether you specify / or \ in a path, or whether it has or has'
           r,←⊂'  not a trailing separator: Tatin is taking care of that.'
-          r,←⊂'* By default all packages are listed. You can restrict the output to all packages'
-          r,←⊂'  belonging to a particular group by setting to -group={groupname}'
+          r,←⊂'* By default all packages are listed. You can restrict the output in two ways:'
+          r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
+          r,←⊂'  * -tag=zip will restrict the output to packages that carry the given tag.'
+          r,←⊂'    If you need to specify more than on tag enclose them by quotes and separate'
+          r,←⊂'    them either by spaces or commas.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
           r,←⊂']',NM,'.LoadPackage [alias]package-id  #.NS'
@@ -546,7 +562,7 @@
       :Case ⎕C'PackageConfig'
           r,←⊂']',NM,'.PackageConfig'
           r,←⊂''
-          r,←⊂'Takes a path to a folder and returns the contents of the file "',PK.CFG_NAME,'".'
+          r,←⊂'Takes a path to a folder and returns the contents of the file "',TC.CFG_NAME,'".'
           r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
           r,←⊂'exist it is created.'
           r,←⊂''
@@ -570,7 +586,7 @@
           r,←⊂''
           r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
           r,←⊂''
-          r,←⊂'Requires ⍵[1] to have a file "',PK.CFG_NAME,'" defining the package.'
+          r,←⊂'Requires ⍵[1] to have a file "',TC.CFG_NAME,'" defining the package.'
           r,←⊂''
           r,←⊂'Note that if ⍵[2] does not start with "." or "/" it is relative to ⍵[1], Therefore, if you'
           r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
@@ -665,9 +681,9 @@
     ∇ errMsg←CheckDependencies txt;f1;f2;f3;f
     ⍝ Every single line must have at least a group name and a package name
     ⍝ but optionally also major.minor.patch
-      f1←PK.Reg.IsValidPackageID_Complete¨txt
-      f2←PK.Reg.IsValidPackageID_WithMajorNo¨txt
-      f3←PK.Reg.IsValidPackageID_WithoutVersionNo¨txt
+      f1←TC.Reg.IsValidPackageID_Complete¨txt
+      f2←TC.Reg.IsValidPackageID_WithMajorNo¨txt
+      f3←TC.Reg.IsValidPackageID_WithoutVersionNo¨txt
       errMsg←''
       :If ∨/~f←f1+f2+f3
           :If 1=+/~f
@@ -683,13 +699,13 @@
       r←''
       ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
       :Trap 98
-          cfg2←PK.InitPackageConfig ns
-          'name'PK.ValidateName ns.name
-          'group'PK.ValidateName ns.group
-          {}'api'PK.ValidateName⍣(0<≢ns.api)⊣ns.api
-          PK.ValidateVersion ns.version
-          ns←PK.ValidateTags ns
-          {}{{'source'PK.ValidateName ⍵}⍣(0<≢⍵)⊣⍵}ns.source~'/\'
+          cfg2←TC.InitPackageConfig ns
+          'name'TC.ValidateName ns.name
+          'group'TC.ValidateName ns.group
+          {}'api'TC.ValidateName⍣(0<≢ns.api)⊣ns.api
+          TC.ValidateVersion ns.version
+          ns←TC.ValidateTags ns
+          {}{{'source'TC.ValidateName ⍵}⍣(0<≢⍵)⊣⍵}ns.source~'/\'
           :If '.'∊ns.source
               '"source" carries an invalid extension'Assert(⊂3⊃⎕NPARTS ns.source)∊SupportedExtensions
           :EndIf
@@ -703,7 +719,7 @@
     EnforceSlash←{'/'@(⍸'\'=⍵)⊣⍵}
     IsScripted←{0::1 ⋄0⊣⎕src ⍵}
     ED←{⎕ED⍠('EditName' 'Disallow')⊣⍵}
-    IsValidJSON←{0::0 ⋄ 1⊣PK.Reg.JSON ⍵}
+    IsValidJSON←{0::0 ⋄ 1⊣TC.Reg.JSON ⍵}
     IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}
 
 :EndNamespace

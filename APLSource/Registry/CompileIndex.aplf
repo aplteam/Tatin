@@ -1,4 +1,4 @@
- {ref}←CompileIndex path;packageList;index;cfgFiles;descs;tags
+ {ref}←CompileIndex path;packageList;index;cfgFiles;descs;tags;buff;ind
 ⍝ (Re)-builds the index for the registry pointed to by `path`.
 ⍝ Writes the index to several files:
 ⍝ * {path}/tatin_index.txt contains a simple string with all package folder names
@@ -13,7 +13,14 @@
      (⊂index)F.NPUT(path,'/',Index.GetIndexFilename)1
      cfgFiles←packageList,¨⊂'/apl-package.json'
      cfgFiles←(F.IsFile cfgFiles)/cfgFiles              ⍝ Should only happen in case tracing through test cases
-     (descs tags)←↓⍉↑{(ReadConfigFile ⍵).(description tags)}¨cfgFiles
+     buff←{(ReadConfigFile ⍵)}¨cfgFiles
+     :If 0<≢ind←⍸{0=⊃⍵.⎕NC'description'}¨buff
+         buff[ind].description←⊂''
+     :EndIf
+     :If 0<≢ind←⍸{0=⊃⍵.⎕NC'tags'}¨buff
+         buff[ind].tags←⊂''
+     :EndIf
+     (descs tags)←↓⍉↑buff.(description tags)
      descs←⊃,/descs,¨⎕UCS 13
      ref.descriptions←descs
      (⊂descs)F.NPUT(path,'/tatin_descriptions.json')1

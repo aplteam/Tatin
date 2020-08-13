@@ -23,10 +23,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '0.8.1.34' '2020-08-07'
+      r←'DotNetZip' '0.8.2.36' '2020-08-12'
     ∇
 
     ∇ History
+    ⍝ * 0.8.2 from 2020-08-12
+    ⍝   * `⎕NEW` replaced by a function `QuadNEW` which tries again for a while. Required because sometimes .NET 
+    ⍝     generates and error "being used by another process" byanother process though that was caused by DotNetZip. 
     ⍝ * 0.8.1 from 2020-08-07
     ⍝   * Workaround implemented for bug with ⎕USING that caused a nonsense VALUE ERROR. (Mantis 18404)\\
     ⍝     The bugs makes an appearance when the class is instanciated in ⎕SE, then a )CLEAR command is issued
@@ -82,15 +85,15 @@
       :If F.Exists zipFilename
       :AndIf 0=overwriteFlag
           stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
-          _zip←⎕NEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Update)
+          _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Update)
       :Else
           F.DeleteFile zipFilename
           stream←System.IO.File.Open(zipFilename System.IO.FileMode.CreateNew)
-          _zip←⎕NEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Create)
+          _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Create)
           _zip.Dispose
           ⍝ `List` is not available in "Create" mode, so we re-open it
           stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
-          _zip←⎕NEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Update)
+          _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Update)
       :EndIf
       _zip.⎕DF'[archive:',zipFilename,']'
       _filename←zipFilename
@@ -217,11 +220,30 @@
     ∇ r←ListZipContents zipfile;myZip
       :Access Public Shared
     ⍝ Helper that instantiates the `DotNetZip` class just for the purpose of unzipping a zip file.
-      myZip←⎕NEW ⎕THIS(zipfile 0)
+      myZip←QuadNEW ⎕THIS(zipfile 0)
       r←myZip.List
     ∇
 
 ⍝ ------------------------ Private stuff -------------------
+
+    ∇ r←QuadNEW arg;success;counter;qdmx
+    ⍝ Attempts to be successful several times in case of "being used by another process" errors.
+      success←counter←0
+      :Repeat
+          :Trap 90
+              r←⎕NEW arg
+              success←1
+          :Else
+              qdmx←⎕DMX
+              :If ∨/'because it is being used by another process'⍷⍕⎕EXCEPTION
+                  counter+←1
+                  ⎕DL 0.2×counter
+              :Else
+                  qdmx.EM ⎕SIGNAL qdmx.EN
+              :EndIf
+          :EndTrap
+      :Until success∨10<counter
+    ∇
 
     ∇ {r}←Initialize dummy;notwindows;netcoreset
       r←⍬

@@ -1,0 +1,8 @@
+ Establish←{
+     type←##.Client.⎕NC⊂⍵
+     header←{⍵↑⍨¯1+⌊/⍵⍳'⍝;'}⊃##.Client.⎕NR ⍵
+     header←type{⍺=3.2:'r←{x}',(⍵↑⍨¯1+⍵⍳'←'),' y' ⋄ ⍵}header
+     body←⊂'←'⎕R('←',(⍕##.Client),'.')⊢header
+     Assert' '=1↑0⍴ref.⎕FX(⊂header),body:
+     1:shy←0
+ }

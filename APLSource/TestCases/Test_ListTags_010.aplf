@@ -1,0 +1,13 @@
+ r←Test_ListTags_010(stopFlag batchFlag);⎕TRAP;list;parms
+⍝ List all tags stemming from projects that share the tag "does-not-exist": none!
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.tags←'does-not-exist'
+ list←parms P.ListTags'[local]'
+
+ →T.PassesIf 0=≢list
+
+ r←T._OK
+⍝Done

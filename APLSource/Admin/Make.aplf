@@ -1,0 +1,43 @@
+ Make type;P;parms;P_;list
+⍝ This function will start two APL sessions in succession in order to open the Tatin project and then execute
+⍝ first `MakeClient` (important because that bumps the version number) and then, in the second session, `MakeServer`.
+⍝ It cannot be done in one go, and it cannot be done in batch mode from the current session.
+⍝ `type` specifies how to deal with the version number; it takes the following actions dependening on `type`:
+⍝ * If `type` ←→ 0 no further action is taken
+⍝ * If `type` ←→ 1 the "patch" number is bumped
+⍝ * If `type` ←→ 2 the "minor" number is bumped
+⍝ * If `type` ←→ 3 the "major" number is bumped\\
+⍝ Note that the build ID is **always** bumped.
+ 'Invalid right argument; must be one of: 0 1 2 3'⎕SIGNAL 11/⍨~(⊂type)∊0 1 2 3
+
+ list←⊃##.FilesAndDirs.Dir'Dist/*.zip'
+ list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
+ list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server'⍷¨⊂⍵}¨list)/list
+ ##.FilesAndDirs.DeleteFile list
+
+ P←##.APLProcess
+
+ parms←P.CreateParms
+ parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" lx="#.Make_.Run ',(⍕type),'"'
+ :If 0
+     parms.CommandLineArgs,←' -x'
+ :EndIf
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
+ P_←⎕NEW P parms
+ {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+
+ {}⎕SE.acre.Refresh'#.Tatin'   ⍝ Because of the updated Tatin.Registry.Version function
+
+ parms←P.CreateParms
+ parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" lx="#.Make_.Run ¯1"'
+ :If 0
+     parms.CommandLineArgs,←' -x'
+ :EndIf
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
+ P_←⎕NEW P parms
+ {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+
+ ⎕←'*** Done'
+⍝Done

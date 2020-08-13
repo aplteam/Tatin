@@ -25,11 +25,14 @@
 
     ∇ r←Version
       :Access Public shared
-      r←(Last⍕⎕THIS)'2.4.0.70' '2020-08-01'
+      r←(Last⍕⎕THIS)'2.4.1.71' '2020-08-13'
     ∇
 
     ∇ History
-      :Access Public shared
+      :Access Public shared 
+      ⍝ * 2.4.1 ⋄ 2020-08-13
+      ⍝   * While `Run` accepted integers as `stopFlag`, `RunThese` and `RunBatchTests` incorrectly insisted on 
+      ⍝     a Boolean (pre 2.4.0 condition).
       ⍝ * 2.4.0 ⋄ 2020-08-01
       ⍝   * Stops on "Initial" and "Cleanup" introduced
       ⍝\\
@@ -262,9 +265,13 @@
 
 
     ∇ {(rc log)}←{stopFlag}Run debugFlag;⎕IO;⎕ML
-    ⍝ Runs _all_ test cases, by default with error trapping. The right boolean right argument decides
-    ⍝ whether with (0) or without (1) error trapping. In addition you can specify a 1 as the (optional)
-    ⍝ left argument which will make `Run` stop just before any test case is about to be executed.
+    ⍝ Runs _all_ test cases, by default with error trapping.\\
+    ⍝ The Boolean right argument decides whether with (0) or without (1) error trapping.\\
+    ⍝ In addition you may specify an optional left argument which will make `Run` stop in certain circumstances:
+    ⍝ * 1=stop just before any test case is about to be executed
+    ⍝ * 2=stop in all `Initial*` functions
+    ⍝ * 4=stop in all `Cleanup*` functions\\
+    ⍝ You may also specidy a sum of them, like 3, 5, 6 or 7
       :Access Public Instance
       ⎕IO←1 ⋄ ⎕ML←3
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
@@ -305,14 +312,18 @@
     ⍝ * A two-item vector with:
     ⍝   * A text string identifying one or more groups (with the wildcard syntax, **not** by specifying more than one).
     ⍝   * An integer vector identifying test cases within that group.\\
-    ⍝ By specifying an (optional) 1 as left argument `RunThese` would stop right before executing any test case.\\
+    ⍝ In addition you may specify an optional left argument which will make `RunThese` stop in certain circumstances:
+    ⍝ * 1=stop just before any test case is about to be executed
+    ⍝ * 2=stop in all `Initial*` functions
+    ⍝ * 4=stop in all `Cleanup*` functions\\
+    ⍝ You may also specidy a sum of them, like 3, 5, 6 or 7
     ⍝ The result:
     ⍝ 1. A return code. 0 means all test cases passed successfully.
     ⍝ 2. A vector of text vectors with the log. The log contains detailed information about what was carried out.
       :Access Public Instance
       ⎕IO←1 ⋄ ⎕ML←3
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1
+      'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1 2 4 3 5 6 7
       _parms←CreateParms ⍬
       _parms.testCaseNos←these
       _parms.debugFlag←1
@@ -324,21 +335,24 @@
     ∇ {(rc log)}←{stopFlag}RunBatchTests debugFlag;⎕ML;⎕IO
     ⍝ Runs all test cases but tells the test functions that this is a batch run meaning that test cases in need
     ⍝ for any human being for interaction should not execute the test case and return `_NoBatchTest` instead.\\
-    ⍝ By default any errors are trapped. The boolean right argument decides whether with (0) or without (1)
-    ⍝ error trapping. In addition you can specify a 1 as the (optional) left argument which will make `Run` stop
-    ⍝ just before any test case is about to be executed.\\
+    ⍝ By default any errors are trapped. 
+    ⍝ In addition you can specify an optional left argument which will make `RunBatchTests` stop in certain circumstances:
+    ⍝ * 1=stop just before any test case is about to be executed
+    ⍝ * 2=stop in all `Initial*` functions
+    ⍝ * 4=stop in all `Cleanup*` functions\\
+    ⍝ You may also specidy a sum of them, like 3, 5, 6 or 7
     ⍝ This function does not trap errors in case `debugFlag` is 1.\\
     ⍝ Returns 0 for okay or a 1 as `rc` in case one or more test cases are broken or failed.\\
       :Access Public Instance
       ⎕IO←1 ⋄ ⎕ML←3
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1
+      'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1 2 4 3 5 6 7
       'Invalid right argument '⎕SIGNAL 11/⍨~(⊂debugFlag)∊0 1
       _parms←CreateParms ⍬
       _parms.debugFlag←debugFlag
       _parms.stopFlag←stopFlag
       _parms.batchFlag←1
-      _parms.trapFlag←~stopFlag
+      _parms.trapFlag←0=stopFlag
       _parms.testCaseNos←⍬
       (rc log)←Run__ _parms
     ∇
@@ -355,10 +369,10 @@
    ⍝     needs a human being in front of the monitor. Such test cases are supposed to
    ⍝     do nothing but return a `_NoBatchTest` when this flag is on.
    ⍝ 4. `stopFlag`: Is treated as "stop just before the next test case is going to be executed" when 1.\\
-   ⍝     Since version 2.4 this accepts an integer that can be the sum of:
-   ⍝     * 1=stop in testcases
-   ⍝     * 2=stop in all `Initial` functions
-   ⍝     * 4=stop in all `Cleanup` functions
+   ⍝     Since version 2.4 this accepts also an integer that can be the sum of:
+   ⍝     * 1=stop just before any test case is executed
+   ⍝     * 2=stop in all `Initial*` functions
+   ⍝     * 4=stop in all `Cleanup*` functions
    ⍝ 5. `testCaseNos`: the test cases to be executed (IDs or group or a mixture of both)
    ⍝ 6. `guiFlag`: is 0 when no GUI is required an 1 otherwise.
       :Access Public Instance

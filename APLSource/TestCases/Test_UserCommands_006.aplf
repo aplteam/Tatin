@@ -1,5 +1,5 @@
- r←Test_UserCommands_006(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;res3;res4;res5;res;tempDir;packageFolder
-⍝ Exercise ]Titan.Pack and ]Titan.Publish
+ r←Test_UserCommands_006(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;packageFolder;zipfile;res;more;cfg;version
+⍝ Exercise ]Tatin.Pack and ]Tatin.Publish
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -8,16 +8,28 @@
  #.⎕EX P.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
 
- packageFolder←∆GetServerRegistryFolder,'../../Source/OS'
- (rc msg res)←∆UCMD'Pack "',packageFolder,'" "',tempDir,'"'
+ packageFolder←F.ExpandPath ∆GetServerRegistryFolder,'../../Source/OS'
+ (rc msg zipfile)←∆UCMD'Pack "',packageFolder,'" "',tempDir,'"'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
  res←⊃F.Dir tempDir,'/'
- →T.GoToTidyUp 1≠≢res
- →T.GoToTidyUp'.zip'≢⎕C ¯4↑⊃res
+ →T.GoToTidyUp 0=≢zipfile
+ →T.GoToTidyUp'.zip'≢⎕C ¯4↑zipfile
+
+ (rc more)←(⊃⊃F.Dir packageFolder,'/*.json')F.CopyTo tempDir,'/'
+ Assert 0=rc
+
+ cfg←0 ⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET(⊃⊃F.Dir packageFolder,'/',P.CFG_NAME)0
+ version←⊃{⍺,'-',⍵}/cfg.(group name version)
+ F.RmDir ∆GetServerRegistryFolder,version
+ #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
+
+ (rc msg res)←∆UCMD'Publish "',zipfile,'" [local]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir tempDir
  #.⎕EX P.GetTatinRootSpace'#'
+ #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
 ⍝Done

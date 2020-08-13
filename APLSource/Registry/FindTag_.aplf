@@ -1,4 +1,8 @@
- (fuzzy bool)←FindTag_(tagList search);tagList_;hits;max
+ (fuzzy bool)←{minPercentage}FindTag_(tagList search);tagList_;hits;search_;b;percentage
+⍝ Tries to find `search` (one to many tags) in `tagList`.
+⍝ Uses a fuzzy approach in case nothing fits with ∊ and ⍷.
+⍝ Returns (¯1 '') in case nothing fits
+ minPercentage←{0<⎕NC ⍵:⍎⍵ ⋄ 50}'minPercentage'
  fuzzy←¯1
  bool←0
  :If 0<+/bool←search∘≡¨tagList
@@ -7,8 +11,12 @@
      fuzzy←1
  :Else
      tagList_←{↓{⍵}⌺2⊣⍵}¨tagList
-     max←⌈/hits←+/¨tagList_∊¨⊂{↓⍵}⌺2⊣search
-     bool←hits=max
-     fuzzy←2
+     search_←{↓⍵}⌺2⊣search
+     b←tagList_∊¨⊂search_
+     hits←+/¨(b/¨tagList_){2</⍺⍳⍵}¨⊂search_
+     percentage←⌊0.5+100×hits÷≢¨tagList
+     :If 0<+/bool←percentage≥minPercentage
+         fuzzy←2
+     :EndIf
  :EndIf
 ⍝Done

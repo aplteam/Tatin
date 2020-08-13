@@ -1,5 +1,9 @@
 # Tatin - a Package Manager for Dyalog APL
 
+Tatin is a community project. It is available as Open Source under the (pretty relaxed) MIT license.
+
+A Tarte Tatin is a nice way to package APpLe's.
+
 ## Overview
 
 Tatin consists of three modules:
@@ -12,7 +16,7 @@ Client as well as Server run under Windows, Linux and Mac-OS.
 
 Tatin requires Dyalog APL 18.0 Unicode or better.
 
-The Tatin wiki contains exhaustive documentation for how to use the Tatin Client and how to get a Tatin Server up and running.
+The Tatin wiki contains documentation for how to use the Tatin Client and how to get a Tatin Server up and running.
 
 ## Usage
 
@@ -26,8 +30,8 @@ You may also keep a local Registry on your own machine, for example for developm
 
 ## Contributing to the code 
 
-There is a separate document "ForDevelopers.html" available in the `docs/` folder.
+There are several documents (like "TatinForContributor.html") available in the `docs/` folder that discuss specific topics associated with using the Tatin client or running a Tatin Server.
 
 -----
 
-Latest revision 2020-07-18
+Latest revision 2020-08-08

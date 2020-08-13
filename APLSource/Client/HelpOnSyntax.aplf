@@ -1,5 +1,8 @@
- r←HelpOnSyntax name;body;header;b
+ r←{raw}HelpOnSyntax name;body;header;b
+⍝ Takes the name of an API function and returns its header and all "leading" comments.
+⍝ In case the (optional) left argument is 1 no beautifying takes place. Useful for tests.
  'Neither function nor operator'Assert(⎕NC name)∊3 4
+ raw←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'raw'
  body←A.dlb A.dtb ⎕NR name
  header←1⊃body
  body←1↓body                            ⍝ Remover header
@@ -7,11 +10,16 @@
  b←∧\(⊃¨body)∊':⍝ '
  body←2↓¨(b\';'≠⊃¨b/body)/body          ⍝ Remove empty and decleration lines within comment lines
  header←(¯1+⌊/header⍳';⍝')↑header
- r←⊂name{⍵↑'--- Help on ',⍺,' ',⍵⍴'-'}⎕PW-1
+ r←''
+ :If 0=raw
+     r,←⊂name{⍵↑'--- Help on ',⍺,' ',⍵⍴'-'}⎕PW-1
+ :EndIf
  body←'\\\\$'⎕R''⊣body
  :If 3.1=⎕NC⊂name
      r,←⊂'∇',header
  :EndIf
- r,←'  '∘,¨body
+ :If 0<≢∊body
+     r,←'  '∘,¨body
+ :EndIf
  r←↑r
 ⍝Done

@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.
+⍝ * 0.7.0 - 2020-08-09
+⍝   * ListPackages now honours the -group and the -tags options
 ⍝ * 0.6.2 - 2020-08-04
 ⍝   * `UserSettings` replaces API-keys by stars when printing to the session
 ⍝   * Internal change: "TC" is now "TC" (Tatin Client)
@@ -35,7 +37,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'Lists all packages in the Registry specified in the argument'
-          c.Parse←'1 -raw -group= -tag='
+          c.Parse←'1 -raw -group= -tags='
           r,←c
      
           c←⎕NS ⍬
@@ -57,7 +59,7 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'LoadInstalled'
+          c.Name←'LoadDependencies'
           c.Desc←'Takes a folder with installed packages and loads all of them'
           c.Parse←'2'
           r,←c
@@ -98,6 +100,12 @@
           c.Parse←''
           r,←c
      
+          c←⎕NS ⍬
+          c.Name←'ListTags'
+          c.Desc←'Lists all tags used in all packages/'
+          c.Parse←'1s -tags='
+          r,←c
+     
           r.Group←⊂NM
      
       :EndIf
@@ -127,7 +135,7 @@
           path2Config←TC.FindUserSettings ⎕AN
       :EndIf
       'Create!'TC.F.CheckPath path2Config
-      path2Config ⎕SE._Tatin.Admin.InstallClient home
+      path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE home
      ⍝Done
     ∇
 
@@ -143,15 +151,18 @@
       TC←⎕SE._Tatin.Client
     ∇
 
-    ∇ r←ListPackages Arg;registry
+    ∇ r←ListPackages Arg;registry;parms
       registry←Arg._1
       registry,←(~(¯1↑registry)∊'/\')/'/'
       registry←EnforceSlash registry
-      :If 0≡Arg.group
-          r←⍪TC.ListPackages registry
-      :Else
-          r←⍪Arg.group TC.ListPackages registry
+      parms←⎕NS''
+      :If 0≢Arg.group
+          parms.group←Arg.group
       :EndIf
+      :If 0≢Arg.tags
+          parms.tags←Arg.tags
+      :EndIf
+      r←⍪parms TC.ListPackages registry
       :If 0=Arg.raw
           :If 0=≢r
               r←'No packages found'
@@ -162,7 +173,7 @@
       :EndIf
     ∇
 
-    ∇ r←LoadInstalled Arg;installFolder;f1;f2;targetSpace;saveIn
+    ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn
       installFolder←Arg._1
       targetSpace←Arg._2
       f1←TC.F.IsDir installFolder
@@ -179,7 +190,7 @@
       r←TC.LoadDependencies installFolder targetSpace
     ∇
 
-    ∇ r←Pack Arg;filename;sourcePath;targetPath;zipFilename
+    ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath
       (sourcePath targetPath)←Arg.(_1 _2)
       'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
       filename←sourcePath,'/',TC.CFG_NAME
@@ -190,7 +201,6 @@
       :EndIf
       'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
       zipFilename←TC.Pack sourcePath targetPath
-      r←'Created: ',zipFilename
     ∇
 
     ∇ r←Publish Arg;zipFilename;url;url_;qdmx;statusCode;list
@@ -229,7 +239,7 @@
                   qdmx.EM ⎕SIGNAL qdmx.EN
               :EndSelect
           :Else
-              :If 0=≢r←qdmx.EN
+              :If 0<≢r←qdmx.EM
                   qdmx.EM ⎕SIGNAL qdmx.EN
               :EndIf
           :EndIf
@@ -239,8 +249,18 @@
     ∇ r←ListRegistries Arg
       r←TC.ListRegistries''
       :If 0=Arg.raw
-          r(AddHeader)←'Path' 'Alias'
+          r(AddHeader)←'URL' 'Alias'
       :EndIf
+    ∇
+
+    ∇ r←ListTags Arg;parms
+      parms←⎕NS''
+      parms.tags←''
+      :If 0≢Arg.tags
+      :AndIf 0<≢Arg.tags
+          parms.tags←Arg.tags
+      :EndIf
+      r←parms TC.ListTags Arg._1
     ∇
 
     ∇ r←ListVersions Arg
@@ -496,7 +516,7 @@
           r,←⊂'Lists the paths and alias of all Registries defined in the user settings.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw table.'
       :Case ⎕C'ListPackages'
-          r,←⊂']',NM,'.ListPackages [path|alias] -raw -group='
+          r,←⊂']',NM,'.ListPackages [path|alias] -raw -group= -tags='
           r,←⊂''
           r,←⊂'Lists all groups defined in the Registry specified as an argument.'
           r,←⊂'* If you specify an alias it MUST be embraced by square brackets as in [MyAlias]'
@@ -505,9 +525,8 @@
           r,←⊂'  not a trailing separator: Tatin is taking care of that.'
           r,←⊂'* By default all packages are listed. You can restrict the output in two ways:'
           r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
-          r,←⊂'  * -tag=zip will restrict the output to packages that carry the given tag.'
-          r,←⊂'    If you need to specify more than on tag enclose them by quotes and separate'
-          r,←⊂'    them either by spaces or commas.'
+          r,←⊂'  * -tags=zip will restrict the output to packages that carry the given tags.'
+          r,←⊂'    If you need to specify more than one tag the enclose then separate them by commas.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
           r,←⊂']',NM,'.LoadPackage [alias]package-id  #.NS'
@@ -534,8 +553,8 @@
           r,←⊂''
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
           r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
-      :Case ⎕C'LoadInstalled'
-          r,←⊂']',NM,'.LoadInstalled [alias]package-id  #.NS'
+      :Case ⎕C'LoadDependencies'
+          r,←⊂']',NM,'.LoadDependencies [alias]package-id  #.NS'
           r,←⊂''
           r,←⊂'Takes two arguments:'
           r,←⊂'[1] A folder into which one or more packages have been installed.'
@@ -605,6 +624,10 @@
           r,←⊂']',NM,'.Version'
           r,←⊂''
           r,←⊂'Prints name, version number and version date of the client to the session.'
+      :Case ⎕C'ListTags'
+          r,←⊂']',NM,'.Version'
+          r,←⊂''
+          r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
       :Else
           r←'Unknown command: ',Cmd
       :EndSelect

@@ -3,16 +3,11 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- :If 1
-     →0,r←T._Inactive
- :EndIf
-
  tempDir←GetTempDir''
  F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
 
  (rc msg res)←∆UCMD'UserSettings '
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- ∘∘∘ ⍝TODO⍝
 
  :If batchFlag
      →0,r←T._OK
@@ -20,9 +15,8 @@
  ⎕←'This test needs YOU: one the ⎕ED windows appears make an insignificant change by adding a'
  {}⍞,0/⎕←'white space, and then close the edit window; press <enter> to continue.'
 
- (rc msg res)←∆UCMD'UserSettings -editAArg._1'
+ (rc msg res)←∆UCMD'UserSettings -edit'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- ∘∘∘ ⍝TODO⍝
 
  r←T._OK
 

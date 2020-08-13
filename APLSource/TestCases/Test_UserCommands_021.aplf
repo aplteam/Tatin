@@ -1,0 +1,19 @@
+ r←Test_UserCommands_021(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;dir
+⍝ Exercise ]Tatin.ListPackages with -raw flag
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+
+ (rc msg res1)←∆UCMD'ListPackages [local] -raw'
+ →T.GoToTidyUp~0<≢res1
+ →T.GoToTidyUp~2=⍴⍴res1
+
+ (rc msg res2)←∆UCMD'ListPackages ',(dir,''),' -raw'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp~0=≢res2
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir

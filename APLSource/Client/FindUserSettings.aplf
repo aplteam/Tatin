@@ -1,11 +1,12 @@
- r←FindUserSettings name;filename;path
+ r←FindUserSettings name;filename;path;F
 ⍝ Returns the folder where the user settings live.\\
 ⍝ If a file .tatin can be found which is not empty then it's supposed to be a single-line text file holding the path
 ⍝ of a folder that holds a Tatin config file.
-⍝ If such a file does not exist or is empty the folder defaults to what is returned bu the function `GetUserHomeFolder`.
+⍝ If such a file does not exist or is empty the folder defaults to what is returned by the function `GetUserHomeFolder`.
 ⍝ See also `SaveUserSettingsFolder`.
  path←GetUserHomeFolder''
  filename←path,'.tatin'
+ F←##.FilesAndDirs
  :If F.IsFile filename
      r←(1⊃F.NGET filename)~⎕TC
  :AndIf 0<≢r

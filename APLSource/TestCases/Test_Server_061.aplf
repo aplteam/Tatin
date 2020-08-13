@@ -1,0 +1,13 @@
+ r←Test_Server_061(stopFlag batchFlag);⎕TRAP;parms;list
+⍝ List all tags
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.tags←'mac-os'
+ list←parms P.ListTags'https://localhost'
+ →T.PassesIf 0<≢list
+ →T.PassesIf 2=≡list
+
+ r←T._OK
+⍝Done

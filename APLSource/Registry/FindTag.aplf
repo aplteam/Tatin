@@ -1,13 +1,12 @@
- (fuzzy list)←FindTag(path tags);tagList;allPackages;bool;ind;bool_;fuzzy_
+ (fuzzy list)←{reduceFlag}FindTag(path tags allPackages);tagList;bool;ind;bool_;fuzzy_
 ⍝ `path` is path to Registry.\\
 ⍝ `tags` is one ore more tags: either a simple text vector or a vector of text vectors. Multiple tags result in an AND search.\\
 ⍝ In a first attempt we try to find exact matches for the tags given. If successful we return the full package IDs with a hit and 0 for `fuzzy`.\\
 ⍝ If not successful we try again by using ⍷. If that is successful we return the full package IDs with a hit and 1 for `fuzzy`.\\
 ⍝ If still not successful we try again with a fuzzy search. If that is successful we return the full package IDs with a hit and 2 for `fuzzy`.\\
-⍝ If still not successful we return (¯1 '')
-⍝ ⍝TODO⍝ We handle all tags the same; shouldn't we search independently for each tag? Downsize is that the "fuzzy" thing has not much meaning then,
-⍝ because when searching for three different tags the first one can be a full match, the second can be found somewhere and the third one a fuzzy hit.
-⍝ What's that supposed to mean?
+⍝ If still not successful we return (¯1 '').\\
+⍝ `reduceFlag` defaults to 0. If it is one the minor version number and the patch numbers are removed and doubles dropped from the result.
+ reduceFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'reduceFlag'
  fuzzy←¯1
  list←''
  tags←⎕C¨⊆tags
@@ -15,10 +14,13 @@
  (fuzzy_ bool_)←↓⍉↑tagList[;2]∘{FindTag_ ⍺ ⍵}¨,tags
  bool←tagList[;1]∊⊃∩/bool_⌿¨⊂tagList[;1]
  :If ∨/bool
-     allPackages←0 ListPackages path
      ind←∪⊃¨bool⌿tagList[;1]
      list←allPackages[ind]
-     list←∪RemoveMinorAndPatch¨list
+     list←∪list
      fuzzy←⌈/fuzzy_
+ :EndIf
+ :If reduceFlag
+ :AndIf 0<≢list
+     list←∪RemoveMinorAndPatch¨list        ⍝ Get rid of minor and patch number but preserve major one
  :EndIf
 ⍝Done

@@ -1,4 +1,4 @@
- response←request HandleREST_Version1 path_;packageID;json;path;data;html
+ response←request HandleREST_Version1 path_;packageID;json;path;data;html;regFolder
 ⍝ Handles all commands defined in version 1 of the REST interface
  path_↓⍨←-'/'=¯1↑path_
  :If 1='/'+.=path_
@@ -23,7 +23,10 @@
      :Case 'v1/packages/best_version'
          response←request GetBestVersionNumber packageID
      :Case 'v1/groups'
-         response←GetGroupList'expand'F.NormalizePath G.RegistryPath
+         regFolder←'expand'F.NormalizePath G.RegistryPath
+         response←GetGroupList regFolder
+     :Case 'v1/tags'
+         response←GetTagList request
      :Else
          ⍝ Something new?
          response←request R.Respond 400 1 ⍝ Not a valid REST version 1 request

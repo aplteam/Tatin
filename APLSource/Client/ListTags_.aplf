@@ -1,0 +1,20 @@
+ list←{parms}ListTags_ uri;client;request;res;host;packageID
+ :If 0=⎕NC'parms'
+     parms←⎕NS''
+     parms.tags←''
+ :EndIf
+ (host packageID)←Reg.SeparateUriAndPackageID uri
+ client←NewClient host
+ request←R.NewRequest 0
+ request.URI←'/v1/tags/',{⍵↓⍨'/'=1⍴⍵}packageID
+ :If 0<≢parms.tags
+     request.URI,←'?'
+     :If 0<≢⊃,/parms.tags
+         request.URI,←'tags=',parms.tags
+     :EndIf
+ :EndIf
+ request.Headers,←⊂'Accept' 'application/json'
+ res←client R.SendAndReceive request
+ ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
+ list←{(,0)≡⍴⍵:'' ⋄ ⎕JSON⍠('Dialect' 'JSON5')⊣⍵}⊣res.Content
+⍝Done

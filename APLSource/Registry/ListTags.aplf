@@ -1,0 +1,18 @@
+ list←ListTags(uri parms);registryPath;tagList;search;bool;fuzzy;bool_;IDs;search_
+⍝ Returns either a list with all tagList or, in case `parms.tagList` is not empty,
+⍝ all tagList of all packages that carry the tagList specified in `parms`.
+ 'No registry specified'Assert 0<≢uri
+ registryPath←F.ExpandPath uri
+ tagList←GetTags registryPath
+ :If 0<≢parms.tags
+     search←','(≠⊆⊢)parms.tags
+     (fuzzy bool)←↓⍉↑tagList[;2]∘{FindTag_ ⍺ ⍵}¨,search
+     IDs←⊃∩/bool⌿¨⊂tagList[;1]
+     search_←⊃∩/bool⌿¨⊂tagList[;2]
+     bool_←tagList[;1]∊IDs
+     tagList←bool_⌿tagList
+     tagList←(~tagList[;2]∊search_)⌿tagList
+ :EndIf
+ list←∪tagList[;2]
+ list←list[⍋list]
+⍝Done

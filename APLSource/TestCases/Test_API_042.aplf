@@ -1,0 +1,11 @@
+ r←Test_API_042(stopFlag batchFlag);⎕TRAP;res1
+⍝ Exercise ⎕SE.Tatin.GetDependecyTree
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res1←⎕SE.Tatin.GetDependecyTree ∆GetServerRegistryFolder,'aplteam-MarkAPL-9.1.13'
+ →T.PassesIf 0<≢res1
+ →T.PassesIf 2=⍴⍴res1
+
+ r←T._OK
+⍝Done

@@ -1,0 +1,22 @@
+ r←Test_API_020(stopFlag batchFlag);⎕TRAP;res2;dir;res1;res3
+⍝ Exercise ⎕SE.Tatin.ListPackages; simple case
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+
+ res1←⎕SE.Tatin.ListPackages'[local]'
+ →T.GoToTidyUp 2≠≡res1
+ →T.GoToTidyUp 0=≢res1
+
+ res2←⎕SE.Tatin.ListPackages ∆GetServerRegistryFolder
+ →T.GoToTidyUp 2≠≡res1
+ →T.GoToTidyUp 0=≢res1
+
+ res3←⎕SE.Tatin.ListPackages(dir,'/')
+ →T.GoToTidyUp 0≠≢res3
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir

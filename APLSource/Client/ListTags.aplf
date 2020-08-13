@@ -1,0 +1,24 @@
+ list←{parms}ListTags y;client;request;res;uri;parms
+⍝ `y` might be tha path to a Registry or a Registry alias (embraced by []).\\
+⍝ By default all tags of all packages are returned.\\
+⍝ Optionally ⍺ can be specified. Must be namespace that might contain a variable "tags" which
+⍝ may specify one or more tags (simple comma-separated text vector). If that is the case only
+⍝ the tags shared by the packages that carries that specified tag(s).
+ :If 0=⎕NC'parms'
+     parms←⎕NS''
+     parms.tags←''
+ :Else
+     :If 0=parms.⎕NC'tags'
+         parms.tags←''
+     :EndIf
+ :EndIf
+ 'Invalid left argument: only "tags" is permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊,⊂'tags'
+ parms.tags←⎕C parms.tags
+ uri←ReplaceRegistryAlias y
+ 'No (valid) Registry specified?!'Assert 0<≢uri
+ :If Reg.IsHTTP uri
+     list←parms ListTags_ uri
+ :Else
+     list←Reg.ListTags uri parms
+ :EndIf
+⍝Done

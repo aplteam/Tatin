@@ -1,20 +1,35 @@
- MakeClient;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list;zipFilename;zipContent;fileList
+ {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list;zipFilename;zipContent;fileList
+⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
+⍝ process whit ⍵←1. In case of a problem an error is thrown whit ⍵←0 and ⎕⎕off 123 in case ⍵←1.\\
+⍝ `type` specifies what part of the version number should be bumped. 0 means only the build ID, which is always bumped.\\
+⍝ 1 means "patch" shall be bumped, 2 for "minor" amnd 3 for major. Other values result in an error or ⎕OFF 123 respectively.\\
+⍝ Note that as part of an automated process this function should be called *before* `MakeServer` because it bumps the
+⍝ version number while `MakeServer` does not.
+ r←⍬
  F←##.FilesAndDirs
- ⎕←(⎕PW-1)⍴'-'
- msg←''
- msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
- msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
- msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
- msg,←⊂'Eventually all that''s required is zipped into a file <Tatin-Client-{major}.{Minor}.{Patch}.zip'
- msg,←⊂'That file is created within the Dist/ folder.'
- msg,←⊂''
- msg,←⊂'From that WS the Tatin client willbe copied into ⎕SE once a Tatin user command is invoked.'
- msg,←⊂''
- msg,←⊂'It also checks whether the user command should be copied to the MyCMDs folder or vice versa,'
- msg,←⊂'depending on where the last change was made.'
- ⎕←⍪msg
- ⎕←''
- :If 1 YesOrNo'Would you like to continue?'
+ type←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'type'
+ :If batchFlag
+     ⎕SHADOW'Assert'
+     Assert←{(,1)≡,⍵:r←1 ⋄ ⎕OFF 123}
+ :Else
+     ⎕←(⎕PW-1)⍴'-'
+     msg←''
+     msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
+     msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
+     msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
+     msg,←⊂'The Tatin client will be copied From that the WS into ⎕SE once a Tatin user command is invoked.'
+     msg,←⊂''
+     msg,←⊂'It also checks whether the user command should be copied to the MyCMDs folder or vice versa,'
+     msg,←⊂'depending on where the last change was made.'
+     msg,←⊂''
+     msg,←⊂'Eventually all that''s required is zipped into a file <Tatin-Client-{major}.{Minor}.{Patch}.zip'
+     msg,←⊂'That file is created within the Dist/ folder.'
+     ⎕←⍪msg
+     ⎕←''
+ :EndIf
+ :If batchFlag
+ :OrIf 1 YesOrNo'Would you like to continue?'
+     batchFlag UpdateVersionNumber type
      {}⎕SE.acre.CloseProject''('all' 1)
      Assert'#._Tatin'≡⎕SE.acre.OpenProject #.Tatin.AcreConfig.ProjectFolder'#._Tatin'
      {}⎕SE.acre.CloseProject''('all' 1)
@@ -67,17 +82,23 @@
          (success more list)←('./Assets/Runtime/Conga/')F.CopyTree myucmds,'/Tatin/Assets/'
          more Assert success ⍝ Might fail because the Conga DLLs are in use
      :EndIf
-     :If 0=F.IsFile path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
+     path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
+     :If 0=F.IsFile path
      :OrIf 0 YesOrNo'Overwrite "',path,'" ?'
          (rc more)←_userSettings.path2config F.CopyTo path
          more Assert 0=rc
      :EndIf
-     zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),'-beta-1.0'),'.zip'
+     zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),''),'.zip'
      F.DeleteFile zipFilename
      ⎕DL 0.1
-     targetPath ##.DotNetZip.ZipFolder zipFilename    ⍝TODO⍝ Should preserve the directory structure but does not!
+     targetPath ##.DotNetZip.ZipFolder zipFilename
      fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'
+     ⎕DL 1
      zipContent←##.DotNetZip.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
-     ⎕←'*** Done'
+     :If batchFlag
+         ⎕OFF
+     :Else
+         ⎕←'*** Done;  note that the Tatin acre projects has been closed'
+     :EndIf
  :EndIf

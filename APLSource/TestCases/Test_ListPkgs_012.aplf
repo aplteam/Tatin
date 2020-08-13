@@ -1,9 +1,11 @@
- r←Test_ListPkgs_012(stopFlag batchFlag);⎕TRAP;list
+ r←Test_ListPkgs_012(stopFlag batchFlag);⎕TRAP;list;parms
 ⍝ List all packages for a Registry using an alias
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- list←'aplteam'P.ListPackages'[local]'
+ parms←⎕NS''
+ parms.group←'aplteam'
+ list←parms P.ListPackages'[local]'
  →T.PassesIf∧/'aplteam-'{⍺∘≡¨(≢⍺)↑¨⍵}list
 
  r←T._OK

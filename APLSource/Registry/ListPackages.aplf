@@ -1,5 +1,5 @@
- list←{reduceFlag}ListPackages uri;packageID;registryPath
-⍝ Returns for each package found just {group}-{name}-{version} or {group}-{name}-{major} dependening on ⍺.\\
+ list←{reduceFlag}ListPackages(uri parms);packageID;registryPath;fuzzy;tags
+⍝ Returns for each package found, either as {group}-{name}-{version} or just {group}-{name}-{major} dependening on ⍺.\\
 ⍝ In case the packageID is not part of the uri, all packages are returned.\\
 ⍝ By default `reduceFlag` is 1, meaning that the minor and patch numbers are removed and then all
 ⍝ duplicates are removed before the list is returnd.\\
@@ -13,6 +13,15 @@
  list←{⊃,/1↓⎕NPARTS ⍵}¨list                     ⍝ Remove path: we only need the package IDs
  :If 0<≢packageID~'*'
      list←((packageID)∘{⍺≡(≢⍺)↑⍵}¨list)/list
+ :EndIf
+ :If 2=parms.⎕NC'tags'
+ :AndIf 0<≢parms.tags
+     tags←','(≠⊆⊢)⎕C parms.tags
+     (fuzzy list)←reduceFlag FindTag registryPath tags list
+ :EndIf
+ :If 2=parms.⎕NC'group'
+ :AndIf 0<≢parms.group
+     list←(parms.group∘≡¨GetGroupFromPackageID¨list)/list
  :EndIf
  :If 0<≢list
      :If reduceFlag

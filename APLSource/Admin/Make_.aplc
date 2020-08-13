@@ -1,0 +1,56 @@
+:Class Make_
+⍝ This class is only ever used when Tatin's `Admin.Make` function is called.\\
+⍝ It's purpose is to call either `#.Tatin.Admin.MakeClient` or `#.Tatin.Admin.MakeSever`
+⍝ (depending on the right argument of the `Run` function) after a new instance of Dyalog
+⍝ was fired up by the `Admin.Make` function.
+
+    ∇ Run type;home;targetFolder
+    ⍝ Calls either the `#.Tatin.Admin.MakeClient` or the `#.Tatin.Admin.MakeSever` function depending
+    ⍝ on the right argument `type`.
+    ⍝ * ¯1 = call `#.Tatin.Admin.MakeSever`
+    ⍝ * Otherwise call `#.Tatin.Admin.MakeClient` and pass `type` as left argument.\\
+    ⍝ In the end `type` defines if and how version number is bumped by `#.Tatin.Admin.MakeClient`.
+    ⍝ The build ID is always bumped.
+      :Access Public Shared
+      home←1⊃1 ⎕NPARTS''
+      :If type∊0 1 2 3
+          targetFolder←home,'/Dist/Client'
+          3(⎕NDELETE Attempt)targetFolder
+          3(⎕MKDIR Attempt)targetFolder
+          Assert'#.Tatin'≡⎕SE.acre.OpenProject home'#.Tatin'
+          type #.Tatin.Admin.MakeClient 1
+      :ElseIf ¯1≡type
+          targetFolder←home,'/Dist/Server'
+          3(⎕NDELETE Attempt)targetFolder
+          3(⎕MKDIR Attempt)targetFolder
+          Assert'#.Tatin'≡⎕SE.acre.OpenProject home'#.Tatin'
+          #.Tatin.Admin.MakeServer 1
+      :Else
+          ∘∘∘ ⍝ Huuh?!
+      :EndIf
+     
+    ∇
+
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),11}
+
+    ∇ {r}←{x}(f Attempt)y;success;counter
+    ⍝ Uses this in case a function of fails on the first attempt.
+    ⍝ ⎕NDELETE and ⎕MKDIR are candidates
+      r←⍬
+      counter←success←0
+      :Repeat
+          :Trap 19
+              :If 0<⎕NC'x'
+                  x f y
+              :Else
+                  f y
+              :EndIf
+              success←1
+          :Else
+              ⎕DL 0.2
+              counter+←1
+          :EndTrap
+      :Until success∨10<counter
+    ∇
+
+:EndClass

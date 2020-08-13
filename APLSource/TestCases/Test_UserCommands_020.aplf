@@ -1,0 +1,20 @@
+ r←Test_UserCommands_020(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;dir
+⍝ Exercise ]Tatin.ListPackages; simple case
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+
+ (rc msg res1)←∆UCMD'ListPackages [local]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp~(2=⍴⍴res1)∧0<≢res1
+ →T.GoToTidyUp~3=2⊃⍴res1
+
+ (rc msg res2)←∆UCMD'ListPackages ',(dir,'')
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp~res2≡'No packages found'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir

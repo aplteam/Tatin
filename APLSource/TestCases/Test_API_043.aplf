@@ -1,0 +1,20 @@
+ r←Test_API_043(stopFlag batchFlag);⎕TRAP;res1;dir;list;json
+⍝ Exercises ⎕SE.Tatin.InitialisePackage and ⎕SE.Tatin.ReadPackageConfigFile
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+
+ res1←⎕SE.Tatin.InitialisePackage dir
+ →T.GoToTidyUp 0≠≢res1
+ list←⊃F.Dir dir,'/'
+ →T.GoToTidyUp 1≠≢list
+ →T.GoToTidyUp'apl=package.json'{⍺≡(-≢⍺)↑⍵}⊃list
+
+ json←⎕SE.Tatin.ReadPackageConfigFile dir
+ →T.GoToTidyUp 0=≢json.⎕NL 2
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir

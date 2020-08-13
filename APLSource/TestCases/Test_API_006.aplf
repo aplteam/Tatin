@@ -1,0 +1,36 @@
+ r←Test_API_006(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;tempDir;packageFolder;cfg;version;rc;more;zipfile
+⍝ Exercise ⎕SE.Tatin.Pack and ⎕SE.Tatin.PublishPackage
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ packageFolder←∆GetServerRegistryFolder,'../../Source/OS'
+ res←⎕SE.Tatin.Pack packageFolder tempDir
+ res←⊃F.Dir tempDir,'/'
+ →T.GoToTidyUp 1≠≢res
+ zipfile←⊃res
+ →T.GoToTidyUp'.zip'≢⎕C ¯4↑zipfile
+
+ (rc more)←(⊃⊃F.Dir packageFolder,'/*.json')F.CopyTo tempDir,'/'
+ Assert 0=rc
+
+ cfg←0 ⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET(⊃⊃F.Dir packageFolder,'/',P.CFG_NAME)0
+ version←⊃{⍺,'-',⍵}/cfg.(group name version)
+ F.RmDir ∆GetServerRegistryFolder,version
+ #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
+
+ res←⎕SE.Tatin.PublishPackage zipfile'[local]'
+ →T.GoToTidyUp 0≠≢res
+ →T.GoToTidyUp~F.IsDir ∆GetServerRegistryFolder,version
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempDir
+ #.⎕EX P.GetTatinRootSpace'#'
+ #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
+⍝Done

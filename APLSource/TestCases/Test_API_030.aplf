@@ -1,0 +1,15 @@
+ r←Test_API_030(stopFlag batchFlag);⎕TRAP;res1;dir
+⍝ Exercise ⎕SE.Tatin.ListTags
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+
+ res1←⎕SE.Tatin.ListTags'[local]'
+ →T.GoToTidyUp~0<≢res1
+ →T.GoToTidyUp~1=⍴⍴res1
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir

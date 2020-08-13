@@ -1,0 +1,31 @@
+ {r}←{pathToUserSettings}EstablishClientInQuadSE dummy;C;Establish;ref
+⍝ This function is called in order to establish the Tatin Client in ⎕SE._Tatin and to establish
+⍝ the API within ⎕SE.Tatin.
+⍝ By default the UserSettings class is instantiated with the default path as argument.
+⍝ Instead a left argument might be provided: that must be the folder that hosts the user settings.
+ r←⍬
+ pathToUserSettings←{0<⎕NC ⍵:⍎⍵ ⋄ C.GetUserHomeFolder ⍬}'pathToUserSettings'
+ CreateAllRefs_Client
+ ⎕SE.⎕EX'Tatin'
+ ref←⍎'Tatin'⎕SE.⎕NS''
+ Establish←{⎕SE.Tatin.⍎⍵,'←{⍺←⊢ ⋄ ⍺ ⎕SE._Tatin.Client.',⍵,' ⍵}'}
+ Establish'GetDependecyTree'
+ Establish'InitialisePackage'
+ Establish'InstallPackage'
+ Establish'ListPackages'
+ Establish'ListTags'
+ Establish'LoadDependencies'
+ Establish'LoadPackage'
+ Establish'Pack'
+ Establish'PublishPackage'
+ Establish'ReadPackageConfigFile'
+ Establish'ListRegistries'
+ Establish'ListVersions'
+ Establish'HelpOnSyntax'
+ ⎕SE.Tatin.⎕FX↑'r←Version' '⍝ Returns "name", "version" and "date"' 'r←⎕SE._Tatin.Registry.Version'
+ ref.DefineRegistry←##.Client.DefineRegistry
+ ref.UserSettings←##.Client.UserSettings
+ C←##.Client
+ C.InitUserSettings pathToUserSettings
+ InitConga ⍬
+⍝Done

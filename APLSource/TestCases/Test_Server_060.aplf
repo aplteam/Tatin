@@ -1,0 +1,11 @@
+ r←Test_Server_060(stopFlag batchFlag);⎕TRAP;list
+⍝ List all tags
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←P.ListTags'https://localhost'
+ →T.PassesIf 0<≢list
+ →T.PassesIf 2=≡list
+
+ r←T._OK
+⍝Done

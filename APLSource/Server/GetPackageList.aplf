@@ -1,12 +1,19 @@
- response←request GetPackageList packageID;data;html;noOfVersions;IDs
+ response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms
 ⍝ Respond to a request for some or all packages, HTML or JSON
  :If IsJsonRequest request.Headers
-     data←Reg.ListPackages G.RegistryPath,'/',packageID
+     parms←⎕NS''
+     :If (⊂'group')∊request.QueryParameters[;1]
+         parms.group←{2⊃⍵[⍵[;1]⍳⊂'group';]}request.QueryParameters
+     :EndIf
+     :If (⊂'tags')∊request.QueryParameters[;1]
+         parms.tags←{2⊃⍵[⍵[;1]⍳⊂'tags';]}request.QueryParameters
+     :EndIf
+     data←Reg.ListPackages(G.RegistryPath,'/',packageID)parms
      response←request ReturnJSON Reg.JSON data
  :Else
      ⍝ Because it's a request from a Browser for the time
      ⍝ being we know that *all* packages are requested.
-     data←0 Reg.ListPackages G.RegistryPath
+     data←0 Reg.ListPackages G.RegistryPath(⎕NS'')
      noOfVersions←{≢⍵}⌸2⊃¨'-'A.Split¨data
      IDs←Reg.LatestVersions data
      :If 0<≢data←⍪Reg.RemoveVersionNumber¨IDs

@@ -1,17 +1,20 @@
- {r}←InitConga dummy;flag;counter;drc
+ {r}←InitConga path;flag;counter;drc
 ⍝ The loop is required because every now and then this error is thrown:
 ⍝ 1043  ERR_ALREADY_INITIALIZED  DLL probably loaded more than once
 ⍝ It seems that executing it again is enough to get over the hurdle
 ⍝TODO⍝ To be discussed with Bjoern
  r←⍬
+ :If 0=≢path
+     path←(##.Client.GetMyUCMDsFolder''),'/Tatin/Assets/Runtime/Conga/'
+ :EndIf
  flag←counter←0
  :Repeat
      :Trap 999
          :If '#'≡⊃⊃1↓⎕XSI
-             drc←((##.Client.GetMyUCMDsFolder''),'/Tatin/Assets/Runtime/Conga/')##.RumbaLean.Conga.Init'tatin'
+             drc←path ##.RumbaLean.Conga.Init'tatin'
              ##.RumbaLean.Conga.X509Cert.LDRC←drc
          :Else
-             drc←((##.Client.GetMyUCMDsFolder''),'/Tatin/Assets/Runtime/Conga/')⎕SE._Tatin.RumbaLean.Conga.Init'tatin'
+             drc←path ⎕SE._Tatin.RumbaLean.Conga.Init'tatin'
              ⎕SE._Tatin.RumbaLean.Conga.X509Cert.LDRC←drc
          :EndIf
          flag←1

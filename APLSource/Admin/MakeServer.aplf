@@ -1,13 +1,23 @@
- MakeServer;msg;F;targetPath
- ⎕←(⎕PW-1)⍴'-'
- msg←''
- msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
- msg,←⊂'run a Tatin server, re-arrange stuff, set ⎕LX and finally save the workspace together'
- msg,←⊂'with everything that is needed by the server in Dist/Server'
- ⎕←⍪msg
- ⎕←''
+ {r}←MakeServer batchFlag;msg;F;targetPath;zipFilename;fileList;zipContent
+ r←⍬
+ :If batchFlag
+     ⎕SHADOW'Assert'
+     Assert←{(,1)≡,⍵:r←1 ⋄ ⎕OFF 123}
+ :Else
+     ⎕←(⎕PW-1)⍴'-'
+     msg←''
+     msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
+     msg,←⊂'run a Tatin server, re-arrange stuff, set ⎕LX and finally save the workspace together'
+     msg,←⊂'with everything that is needed by the server in Dist/Server.dws'
+     msg,←⊂''
+     msg,←⊂'Eventually all that''s required is zipped into a file <Tatin-Server-{major}.{Minor}.{Patch}.zip'
+     msg,←⊂'That file is created within the Dist/ folder.'
+     ⎕←⍪msg
+     ⎕←''
+ :EndIf
  F←##.FilesAndDirs
- :If 1 YesOrNo'Would you like to continue?'
+ :If batchFlag
+ :OrIf 1 YesOrNo'Would you like to continue?'
      {}⎕SE.acre.CloseProject''('all' 1)
      #.Tatin.⎕EX¨'Client' 'Todo' 'TestCases' 'Simu'
      ⎕EX¨'Initialize_Client' 'RunTestServer' 'CreateAllRefs_Client'
@@ -27,6 +37,15 @@
      Assert F.IsDir targetPath,'/Assets/'
      {(2⊃⍵)Assert 1⊃⍵}'./Assets/'F.CopyTree targetPath,'/Assets'
      ('./server.ini.RemoveMe')F.CopyTo targetPath,'/server.ini'
-     ⎕←'Note that the INI file need editing!'
-     ⎕←'*** Done'
+     zipFilename←'Dist/Tatin-Server-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Server.Version),''),'.zip'
+     F.DeleteFile zipFilename
+     targetPath ##.DotNetZip.ZipFolder zipFilename
+     fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'
+     zipContent←##.DotNetZip.ListZipContents zipFilename
+     'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
+     :If batchFlag
+         ⎕OFF
+     :Else
+         ⎕←'*** Done;  note that the Tatin acre projects has been closed'
+     :EndIf
  :EndIf

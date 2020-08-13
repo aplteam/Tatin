@@ -434,6 +434,7 @@ Available parameters:
 | `per_page` | number | Max number of items returned in result set (default 100). |
 | `page` | number | Current page of the collection (default 1). |
 | `group` | string | Pattern that is matched against group names. |
+| `tags` | string | One or more tags, separated by comma. |
 | `name` | string | Pattern that is matched against package names. |
 
 

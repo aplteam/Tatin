@@ -56,7 +56,7 @@ It's advantage over other solutions is that it works on all major platforms: Win
 
 This package depends on .NET or .NET Core and on the class `FilesAndDirs` which in turn depends on the namespace script `ALPTreeUtils` but it does not depend on any files, therefore it is an example for a simple version of a package.
 
-These are the only files you would get if you fetch this package with the Pakkmen client:
+These are the only files you would get if you fetch this package with the Tatin client:
 
 ```
 apl-package.json

@@ -1,9 +1,9 @@
- ReadPackageConfigFile←{
-     cfg_file←⍵,'/',CFG_NAME
-     'Config file missing'Assert F.Exists cfg_file:
-     cfg←InitPackageConfig''
-     ⍝ load in actual
-     buff←⊃F.NGET cfg_file
-     _←'cfg'⎕NS ⎕JSON⍠('Dialect' 'JSON5')⊣buff
-     cfg
- }
+ cfg←ReadPackageConfigFile path;cfg_file;cfg;buff
+⍝ Takes path to a package and returns the config file for that package.
+ cfg_file←path,'/',CFG_NAME
+ 'Config file missing'Assert F.Exists cfg_file
+ cfg←InitPackageConfig''
+ ⍝ load in actual
+ buff←⊃F.NGET cfg_file
+ {}'cfg'⎕NS ⎕JSON⍠('Dialect' 'JSON5')⊣buff
+⍝Done

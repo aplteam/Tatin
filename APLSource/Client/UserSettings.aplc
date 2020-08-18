@@ -14,14 +14,25 @@
 
     :Field Public Shared ReadOnly cfg_name←'tatin-client.json'  ⍝ Name of the user config file is fixed
 
-    ∇ make0
+    ∇ make0;permanentFile
       :Implements Constructor
       :Access Public
       Init1 ⍬
       _registries←⍬
-      _path2config←home.GetUserHomeFolder ⍬     ⍝ By default it's the user's home folder on all platforms
-      :If F.IsFile _path2config
-          (_registries _source)←Read _path2config
+      permanentFile←home.GetUserHomeFolder'.tatin'
+      :If F.IsFile permanentFile
+      :AndIf 0<≢_path2config←(∊1⊃F.NGET permanentFile)~⎕TC
+          :If F.IsFile _path2config,'/',cfg_name
+              _permanent←1
+          :Else
+              F.DeleteFile permanentFile
+              _path2config←home.GetUserHomeFolder ⍬     ⍝ By default it's the user's home folder on all platforms
+          :EndIf
+      :Else
+          _path2config←home.GetUserHomeFolder ⍬     ⍝ By default it's the user's home folder on all platforms
+      :EndIf
+      :If F.IsFile _path2config,'/',cfg_name
+          Read _path2config
       :Else
           _registries←⍬
           Write _path2config
@@ -32,11 +43,11 @@
       :Implements Constructor
       :Access Public
       Init1 ⍬
-      :If 0=##.F.IsDir path2config_
           ⍝ In case the user passed the fully qualifed name rather than just the folder:
-          path2config_←⊃⎕NPARTS path2config_
+      :If cfg_name{⍺≡(-≢⍺)↑⍵}path2config_
+          path2config_←(-≢cfg_name)↓path2config_
       :EndIf
-      'Is not a directory?!'Assert ##.F.IsDir path2config_
+      'Is not a directory?!'Assert F.IsDir path2config_
       _path2config←path2config_
       :If F.IsFile path2config
           Read _path2config
@@ -46,18 +57,22 @@
       :EndIf
     ∇
 
-    ∇ make2(path2config_ source_);reg
+    ∇ make2(path2config_ permanent_);reg;settingsFile
       :Implements Constructor
       :Access Public
       Init1 ⍬
-      'Is not a directory?!'Assert ##.F.IsDir path2config_
+      'Is not a directory?!'Assert F.IsDir path2config_
       _path2config←path2config_
-      _source←source_
+      _permanent←permanent_
       :If F.IsFile path2config
           Read _path2config
       :Else
           _registries←⍬
           Write _path2config
+          :If permanent_
+              settingsFile←home.GetUserHomeFolder'.tatin'
+              (⊂_path2config)F.NPUT settingsFile 1
+          :EndIf
       :EndIf
     ∇
 
@@ -65,6 +80,7 @@
     ⍝ Early initialisation
       home←(⊃⊃⎕CLASS ⎕THIS).##
       F←home.F ⋄ A←home.A
+      _permanent←0
       _source←''
     ∇
 
@@ -203,6 +219,23 @@
       r←(bool⍳1)⊃_registries
     ∇
 
+    ∇ r←Delete flag;filename;buff
+    ⍝ Call this in order to delete the currently instanciated user settings file.\\
+    ⍝ If that file was "permanent" it is deleted from the file defining that as well.
+    ⍝ Returns 1 in case the file was successfully deleted otherwise (Blocked by another process, already deleted...)
+      :Access Public Instance
+      r←0
+      :If flag
+          filename←_path2config,'/',cfg_name
+      :AndIf F.IsFile filename
+          r←F.DeleteFile filename
+          :If _permanent
+              (⊂'')F.NPUT(home.GetUserHomeFolder'.tatin')1
+          :EndIf
+          _permanent←0
+      :EndIf
+    ∇
+
 ⍝ ------------------- Privates stuff
 
     Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 98 ⋄ shy←0}
@@ -230,7 +263,7 @@
     ∇ {r}←Read dummy;ns
     ⍝ Reads the Client's config file
       r←⍬
-      ns←⎕NS ⎕JSON⍠('Dialect' 'JSON5')⊣⊃##.F.NGET path2config
+      ns←⎕NS ⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET path2config
       :If 0<≢ns.registries
           _registries←ns.registries[⍋ns.registries.priority]
       :Else

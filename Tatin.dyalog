@@ -1,5 +1,9 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.
+⍝ * 0.8.1 - 2020-08-15
+⍝   * ]tatin.version fixed.
+⍝ * 0.8.0 - 2020-08-15
+⍝   * ]tatin.UserSettings simplified.
 ⍝ * 0.7.0 - 2020-08-09
 ⍝   * ListPackages now honours the -group and the -tags options
 ⍝ * 0.6.2 - 2020-08-04
@@ -66,13 +70,13 @@
      
           c←⎕NS ⍬
           c.Name←'UserSettings'
-          c.Desc←'By default the user settings and the filenanme are printed to ⎕SE as JSON'
-          c.Parse←'1s -edit -raw -quiet -permanent'
+          c.Desc←'The user settings and the fully qualified filenanme are printed to ⎕SE as JSON'
+          c.Parse←''
           r,←c
      
           c←⎕NS ⍬
           c.Name←'PackageConfig'
-          c.Desc←'Create and/or edit a package config file for a specific folder'
+          c.Desc←'Retrieve (HTTP) or create and/or edit a package config file for a specific package'
           c.Parse←'1 -delete -edit -quiet'
           r,←c
      
@@ -137,6 +141,10 @@
       'Create!'TC.F.CheckPath path2Config
       path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE home
      ⍝Done
+    ∇
+
+    ∇ r←Version
+      r←TC.Reg.Version
     ∇
 
     ∇ {r}←LoadTatin_ forceLoad;filename
@@ -260,7 +268,7 @@
       :AndIf 0<≢Arg.tags
           parms.tags←Arg.tags
       :EndIf
-      r←parms TC.ListTags Arg._1
+      r←⍪parms TC.ListTags Arg._1
     ∇
 
     ∇ r←ListVersions Arg
@@ -283,15 +291,14 @@
       r←⍪TC.LoadPackage identifier targetSpace
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri
       r←⍬
       what←Arg._1
       :If ∧/'[]'∊what
           what←TC.ReplaceRegistryAlias what
       :EndIf
       :If TC.Reg.IsHTTP what
-          ∘∘∘ ⍝TODO⍝
-          'v1/packages/details/'{(1⊃⍵),⍺,(2⊃⍵)}TC.Reg.SeparateUriAndPackageID what
+          r←TC.ReadPackageConfigFile_ what
       :Else
           path←Arg._1
           filename←path,'/',TC.CFG_NAME
@@ -316,7 +323,7 @@
                   newFlag←0
               :Else
                   ns←TC.InitPackageConfig ⍬
-                  ns.source←TC._UserSettings.source
+                  ns.source←TC.MyUserSettings.source
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
@@ -336,7 +343,7 @@
                       :EndIf
                   :EndIf
               :Else
-                  r←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+                  r←⍪⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
               :EndIf
           :EndIf
       :EndIf
@@ -385,48 +392,13 @@
       r←⍪TC.InstallPackage identifier installFolder
     ∇
 
-    ∇ r←UserSettings Arg;filename;temp;origData;flag;msg;success;newData;editFlag;path
+    ∇ r←UserSettings dummy;origData;filename
       r←''
-      editFlag←0
-      :If ' '=1↑0⍴Arg._1
-          path←Arg._1
-          'No such folder exists'Assert TC.F.IsDir path
-          filename←TC.F.ExpandPath path{⍺,((~(¯1↑⍺)∊'/\')/'/'),⍵}TC.UserSettings.cfg_name
-          :If ~⎕NEXISTS filename
-              :If Arg.quiet
-              :OrIf 1 ∆YesOrNo'No such config file exists yet. Create and edit?'
-                  TC.InitUserSettings path
-                  ∘∘∘ ⍝TODO⍝                  TC.In ⎕NPUT filename
-                  editFlag←1
-              :EndIf
-          :EndIf
-      :Else
-          filename←TC.F.NormalizePath TC._UserSettings.path2config
-      :EndIf
+      filename←TC.F.NormalizePath TC.MyUserSettings.path2config
+      ('User setting file "',filename,'" does not exist?!')Assert ⎕NEXISTS filename
       origData←1⊃⎕NGET filename
-      :If Arg.edit
-      :OrIf editFlag
-          (success newData)←({''}EditJson)'UserSettings'origData
-          :If success
-              :If Arg.quiet
-              :OrIf 1 ∆YesOrNo'Do you want to save/use your changes?'
-                  (⊂newData)⎕NPUT filename 1
-                  path←1⊃⎕NPARTS filename
-                  TC._UserSettings←TC.⎕NEW TC.UserSettings(,⊂path)
-                  r←'User settings saved in ',path,' and also established in the WS'
-              :EndIf
-          :EndIf
-          :If Arg.permanent
-              :If 'Win'≡3↑⊃# ⎕WG'APLVersion '
-                  RegWrite RegKey path
-              :Else
-                  ∘∘∘ ⍝TODO⍝
-              :EndIf
-          :EndIf
-      :Else
-          origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace the API key by Aserisks
-          r←⍪(⊂'User settings in <',filename,'> :'),(⎕UCS 10)(≠⊆⊢)origData
-      :EndIf
+      origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace the API key by Aserisks
+      r←⍪(⊂'User settings in <',filename,'> :'),(⎕UCS 10)(≠⊆⊢)origData
     ∇
 
     ∇ (success newData)←(CheckFns EditJson)(name origData);temp;msg;flag;json
@@ -560,32 +532,26 @@
           r,←⊂'[1] A folder into which one or more packages have been installed.'
           r,←⊂'[2] A namespace into which the packages are going to be loaded.'
       :Case ⎕C'UserSettings'
-          r,←⊂']',NM,'.UserSettings -edit'
+          r,←⊂']',NM,'.UserSettings'
           r,←⊂''
-          r,←⊂'By default the user settings are printed to the session in JSON format.'
-          r,←⊂'If no config file exists yet it is created with default settings.'
+          r,←⊂'Prints the user settings to the session in JSON format.'
           r,←⊂''
-          r,←⊂'By specifying the -edit flag the JSON is put into ⎕ED.'
-          r,←⊂'Once the edit window is closed the JSON is checked for being syntactically'
-          r,←⊂'correct and then written back to disk, and used in the active WS as well.'
-          r,←⊂''
-          r,←⊂'Without specifying a folder this command acts on the config file in the default location,'
-          r,←⊂'which is the (platform dependent) user''s home folder. You may change this by specifying'
-          r,←⊂'a folder as optional argument. By default this is a temporary change, meaning that the'
-          r,←⊂'specified config is only used in the current session but forgotten afterwards. You can'
-          r,←⊂'make Tatin use the config file in the given folder permanently by specifying -permanent'
-          r,←⊂'which is ignored in case no argument is provided.'
-          r,←⊂''
-          r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is usually asked in'
-          r,←⊂'case there is no config file yet in the given folder; probably only useful with tests.'
+          r,←⊂'Note that the user command does not give you the means to change the user settings,'
+          r,←⊂'or to move it elsewhere. If you want to do anything more than just printing the settings'
+          r,←⊂'to the session then you are advised to used the API. Note that there is a dedicated'
+          r,←⊂'document for how to use the API, and what for.'
       :Case ⎕C'PackageConfig'
           r,←⊂']',NM,'.PackageConfig'
           r,←⊂''
-          r,←⊂'Takes a path to a folder and returns the contents of the file "',TC.CFG_NAME,'".'
-          r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
-          r,←⊂'exist it is created.'
+          r,←⊂'The argument may be a http request or a path'
+          r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
+          r,←⊂'  Specifying any of the options is ignored.'
+          r,←⊂'* In case of a path the contents of the file "',TC.CFG_NAME,'" is returned.'
+          r,←⊂'  In case the file does not exist yet it is created.'
+          r,←⊂'  You may edit the file by specifying the -edit flag.'
+          r,←⊂'  In case you want to delete the file: specify the -delete flag.'
           r,←⊂''
-          r,←⊂'In case you want to delete the file specify the -delete flag.'
+          r,←⊂'In case of success a text vector with NLs in it is returned, otherwise an empty vector.'
       :Case ⎕C'PackageDependencies'
           r,←⊂']',NM,'.PackageDependencies'
           r,←⊂''

@@ -3,13 +3,13 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- reg←P._UserSettings.GetRegistry'[local]'
- P._UserSettings.RemoveRegistry'[local]'
- result←P.EstablishRegistry'aplteam-APLProcess-0.2.12'
+ reg←TC.MyUserSettings.GetRegistry'[local]'
+ TC.MyUserSettings.RemoveRegistry'[local]'
+ result←TC.EstablishRegistry'aplteam-APLProcess-0.2.12'
  →T.PassesIf result≡'https://localhost/'
 
  r←T._OK
 
 ∆TidyUp:
- P._UserSettings.AddRegistry ⎕NEW P.DefineRegistry(,⊂reg)
+ TC.MyUserSettings.AddRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
 ⍝Done

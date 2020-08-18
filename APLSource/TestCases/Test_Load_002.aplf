@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
@@ -12,14 +12,14 @@
 
  body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
  (⊂body)F.NPUT src,'/Constants.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'Constants.apln'
  cfg.alias←'Foo'
- cfg P.WritePackageConfigFile src
- zipfile←P.Pack src zip
+ cfg TC.WritePackageConfigFile src
+ zipfile←TC.Pack src zip
 
- refs←P.LoadPackage('file://',zipfile)#.TEMP
+ refs←TC.LoadPackage('file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Foo.⎕NC'PI'
  →T.PassesIf 3.14=#.TEMP.Foo.PI
  →T.PassesIf 0<≢#.TEMP.Foo.##.∆URI
@@ -30,5 +30,5 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

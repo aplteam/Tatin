@@ -1,0 +1,35 @@
+ response←request ReadPackageConfigFile_ path_;packageID;json;path;data;html;regFolder
+⍝ Handles all commands defined in version 1 of the REST interface
+ path_↓⍨←-'/'=¯1↑path_
+ :If 1='/'+.=path_
+     path←path_
+     packageID←''
+ :Else
+     (path packageID)←Reg.SeparateUriAndPackageID path_
+     path↓⍨←-'/'=¯1↑path
+ :EndIf
+ :If (⊂path)∊'v1/GetServerPath' 'v1/RecompileIndex' 'v1/Stop' 'v1/shutdown' 'v1/crash'
+     response←request ProcessTestCommands path
+ :Else
+     :Select path
+     :Case 'v1/packages'
+         response←request GetPackageList packageID
+     :Case 'v1/packages/versions'
+         response←request GetVersionList packageID
+     :Case 'v1/packages/details'
+         response←request GetDetails packageID
+     :Case 'v1/packages/dependencies'
+         response←request GetDependencies packageID
+     :Case 'v1/packages/best_version'
+         response←request GetBestVersionNumber packageID
+     :Case 'v1/groups'
+         regFolder←'expand'F.NormalizePath G.RegistryPath
+         response←GetGroupList regFolder
+     :Case 'v1/tags'
+         response←GetTagList request
+     :Else
+         ⍝ Something new?
+         response←request R.Respond 400 1 ⍝ Not a valid REST version 1 request
+     :EndSelect
+ :EndIf
+⍝Done

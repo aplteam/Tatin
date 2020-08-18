@@ -25,20 +25,19 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="What-Registries-are-available">What Registries are available</h2>
 </a>
 </div>
-<p>After a fresh installation you might wonder what Registries at your disposal.</p>
+<p>After a fresh installation you might wonder what Registries are at your disposal.</p>
 <pre><code>      ]tatin.ListRegistries
  URL                 Alias
  ----                -----
  https://tatin.dev/  tatin</code></pre>
-<p>At this point Tatin only knows about the principal Tatin server. If you wish to host and publish packages locally (in all likelyhood your own ones), then you must <a href="#Adding-Registries" class="bookmark_link">add that local Registry to the config file</a>.</p>
+<p>At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelyhood your own ones), then you must change the user settings.</p>
+<p>All these topics are discussed in a separate document: “TatinUserSettings.html”. Here we try to keep things simple.</p>
 <div class="h_tag">
 <a href="#Consuming-packages" id="Consuming-packages" class="autoheader_anchor">
 <h2 data-id="Consuming-packages">Consuming packages</h2>
 </a>
 </div>
-<p>Let's assume you need a ZIP tool (zipper) that is platform independent.</p>
-<p>This has been a problem for a long time, because many zippers are available on one or two platforms, but none has been available on all three major platforms (Windows, Linux, Mac OS) for a long time.</p>
-<p>In our first example we are going to try to find an appropriate package and give it a try.</p>
+<p>Let's assume you need a tool in order to convert <a href="https://en.wikipedia.org/wiki/Markdown" class="external_link" title="The Wikipedia on Markdown">Markdown</a> into HTML.</p>
 <div class="h_tag">
 <a href="#Listing-packages" id="Listing-packages" class="autoheader_anchor">
 <h3 data-id="Listing-packages">Listing packages</h3>
@@ -53,10 +52,11 @@ Group    Package Name     Major
  aplteam  OS               2
 ...</code></pre>
 <p>The square brackets around “tatin” declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like <code>https://localhost/my_tatin_server</code>.</p>
-<p>Note that the list comprehends not only group names and package names but also the major version numbers of each package. This is because in principle these two packages:</p>
+<p>Note that the list comprehends not only group names and package names but also the major version numbers of each package. This is because in principle these packages:</p>
 <pre><code>aplteam-misc-1.0.0
-aplteam-misc-1.1.0</code></pre>
-<p>are different versions of the same package while these:</p>
+aplteam-misc-1.1.0
+aplteam-misc-1.1.1</code></pre>
+<p>are all different versions of the <em>same</em> package while these:</p>
 <pre><code>aplteam-misc-1.0.0
 aplteam-misc-2.0.0
 </code></pre>
@@ -66,72 +66,91 @@ aplteam-That-1.0.0</code></pre>
 <div class="leanpub_A">
 <h3>Semantic Versioning and Minimal Version Strategy.</h3>
 <p>This is because Tatin is based on the concepts of <em>Semantic Versioning</em> and <em>Minimal Version Strategy</em>.</p>
-<p>These concepts are discussed in a separate document with the name “Tatin_Update_Strategy”.</p>
+<p>These concepts are discussed in a separate document with the name “TatinsUpdateStrategy”.</p>
 </div>
 
-<p>This user command will return a list with all packages available on that server. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to shrink the list.</p>
+<p><code>]tatin.ListPackages</code> will return a list with <em>all</em> packages available on that server. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.</p>
 <ul>
-<li>If you know the group name you may specify <code>-group=whatever</code>; then only packages of that group are listed.</li>
+<li>If you happen to know the group name you may specify <code>-group=whatever</code>; then only packages of that group are listed.</li>
 <li>Every package is tagged with keywords. You may specify one or more tags, for example <code>-tag=linux,date</code>.</li>
 </ul>
 <div class="leanpub_A">
 <h3>Searching for tags</h3>
-<p>Note that the search for a tag follows this recipe:</p>
+<p>Note that the search for a tag follows this strategy:</p>
 <ol start="1">
-<li>First Tatin try to find 100% matches</li>
-<li>If that does not yield results, it tries to find the search string somewhere in tags</li>
+<li>First Tatin tries to find 100% matches</li>
+<li>If that does not yield results, it tries to find the search string <em>somewhere</em> in tags (<code>⍷</code>)</li>
 <li>If that does not yield a result then a fuzzy search is performed</li>
 </ol>
-<p>The fizzy search would find “windows” when you enter “winndows” and “linux” when you enter “linuks”. It heas limits but in practice it works quite well unless the tags are very short: typing “AY” when you meant “AI” would not work.</p>
-<p>Note that entering more than a single tag would meand that only packages that carry <em>all of them</em> would qualify.</p>
+<p>The fizzy search would find “windows” when you enter “winndows” and “linux” when you enter “linuks”. It has limits but in practice it works quite well unless the tags are very short: typing “AY” when you meant “AI” would not work.</p>
+<p>Notes:</p>
+<ul>
+<li>The strategy outlined above is applied on each tag independently</li>
+<li>Entering more than a single tag would mean that only packages that carry <em>all of them</em> would qualify</li>
+</ul>
 </div>
 
-<p>In our case we look for a zip tool that runs on all platforms. For that we execute this user command:</p>
-<pre><code>      ]Tatin.Listtags [tatin] -tags=mack-os,zip
- linux  mac-os  windows  zip-tools</code></pre>
-<p>That's good: there must be at least one package that carries the tags “mac-os” and “zip” but <em>also</em> the tags “windows” and “linux”, so there will be a zipping tools that is running on all major platforms.</p>
-<p>Note that although we misspelled “mac-os” as “mack-os” it was stil identified correctly. Similarly, “zip” was enough for finding “zip-tools”. That's because the algorithm uses three different approaches</p>
-<ol start="1">
-<li>First it tries to find 100%-matches</li>
-<li>If that does not yield a result it tried to find the specified tag with <code>⍷</code> <em>somewhere</em>.</li>
-<li>If that does not yield a result either then a fuzzy search is performed.</li>
-</ol>
-<p>In the next step we ask for all packages</p>
+<p>In our case we look for something that runs on all platforms. For that we execute this user command:</p>
+<pre><code>            ]Tatin.Listtags [tatin] -tags=mack-os,markd
+ apltree
+ converter
+ linux
+ mac-os
+ markdown
+ windows</code></pre>
+<p>That's good: there must be at least one package that carries the tags “mac-os” and “markdown” but <em>also</em> the tags “windows” and “linux”, so there will be a package available that runs on all major platforms.</p>
+<p>Note that although we misspelled “mac-os” as “mack-os” it was still identified correctly. Similarly, “markd” was enough for finding “markdown”.</p>
+<p>We are now ready to identify that package:</p>
+<pre><code>           ]tatin.ListPackages [tatin] -tags=mac-os,markdown
+ Group    Package Name  Major
+ -----    ------------  -----
+ aplteam  MarkAPL       9
+</code></pre>
+<p>Note that because packages which share the same group and name but have different major version numbers are considered to be different packages the major version number is part of the list.</p>
+<p>The last question is: how many versions of that package are available:</p>
+<pre><code>       ]tatin.ListVersions [tatin]aplteam-MarkAPL
+ aplteam-MarkAPL-9.1.1</code></pre>
+<p>We could have specified the major number as well:</p>
+<pre><code>       ]tatin.ListVersions [tatin]aplteam-MarkAPL-9
+ aplteam-MarkAPL-9.1.1</code></pre>
+<p>We could also have specified the minor number:</p>
+<pre><code>       ]tatin.ListVersions [tatin]aplteam-MarkAPL-9.1
+ aplteam-MarkAPL-9.1.1</code></pre>
 <div class="h_tag">
 <a href="#Give-it-a-try" id="Give-it-a-try" class="autoheader_anchor">
 <h3 data-id="Give-it-a-try">Give it a try</h3>
 </a>
 </div>
-<p>Let's assume that you are not certain whether you really want to use <code>DotNetZip</code>, you just want to check it out.</p>
-<p>That can be achieved with the <code>LoadPackage</code> user command. That loads the package into the workspace and leaves to trail in the file system.</p>
-<div class="leanpub_A">
-<h3>File dependencies (assets)</h3>
-<p>Although in most cases this will be true there are exceptions:</p>
-<p>In case the package has file dependencies, like DLLs, than those DLLs will be saved in a specific package-dependent directory within the temp directory of your operating system.</p>
-</div>
-
-<p>…………..</p>
-<hr>
-<div class="h_tag">
-<a href="#Adding-Registries" id="Adding-Registries" class="autoheader_anchor">
-<h3 data-id="Adding-Registries">Adding Registries</h3>
-</a>
-</div>
-<p>You can check the your current settings with the <code>UserSettings</code> command:</p>
-<pre><code>      ]tatin.UserSettings
- User settings in &lt;C:\Users\{username}\AppData\Local\Tatin\tatin-client.json&gt; :
- {
-   registries: [
-     {
-       alias: "tatin",
-       api_key: "***",
-       port: 0,
-       priority: 100,
-       uri: "https://tatin.dev/",
-     },
-   ],
-   source: "",
- }
+<p>Let's assume that you are not certain whether you really want to use <code>MarkAPL</code>, you just want to check it out.</p>
+<p>That can be achieved with the <code>LoadPackage</code> user command. That loads the package into the workspace and leaves to trail in the file system if that can be avoided.</p>
+<p>In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system.</p>
+<p>Let's load the <code>MarkAPL</code> package into the workspace:</p>
+<pre><code>      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-9.1.1
 </code></pre>
+<pre><code>      #.MyTests.⎕nl ⍳16
+MarkAPL
+      #._tatin.⎕nl ⍳16
+aplteam_APLTreeUtils_6_0_0
+aplteam_FilesAndDirs_3_2_1
+aplteam_IniFiles_4_0_0
+aplteam_MarkAPL_9_1_9
+aplteam_OS_2_0_0
+aplteam_Tester2_2_2_2
+aplteam_WinSys_4_0_0</code></pre>
+<p>Note that these are ….</p>
+<pre><code>      #._tatin.aplteam_MarkAPL_9_1_9.⎕nl ⍳16
+APLTreeUtils
+FilesAndDirs
+MarkAPL
+OS
+Tester2
+WinSys
+∆HOME
+∆URI
+      #._tatin.aplteam_MarkAPL_9_1_9.∆HOME
+C:/Users/.../AppData/Local/Temp/Foo//aplteam-MarkAPL-9.1.9
+      #._tatin.aplteam_MarkAPL_9_1_9.∆URI
+https://tatin.dev/aplteam-MarkAPL-9.1.9</code></pre>
+<p>…………..</p>
 </body>
 </html>

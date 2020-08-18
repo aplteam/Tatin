@@ -1,0 +1,18 @@
+ html←PrepareHtmlPageForTagList list
+ html←HtmlHeader''
+ html,←⊂'<h2>List of all tags</h2>'
+ html,←⊂'<table>'
+ html,←⊂'<thead>'
+ html,←⊂'<tr class="my-first-th">'
+ html,←⊂'<th style="align: left">Tag</th>'
+ html,←⊂'</thead>'
+ html,←⊂'<tbody>'
+ :If 0<≢list
+     html,←{'<tr><td>',⍵,'</td></tr>'}¨list
+ :EndIf
+ html,←⊂'</tbody>'
+ html,←⊂'</table>'
+ html,←⊆GetFooter
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+ ⍝Done

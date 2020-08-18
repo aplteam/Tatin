@@ -4,12 +4,12 @@
  r←T._Failed
 
  tempDir←GetTempDir''
- F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
- settings←⎕NEW P.UserSettings(,⊂tempDir)
+ settings←⎕NEW TC.UserSettings(,⊂tempDir)
  →T.GoToTidyUp 0≠≢settings.registries
 
- reg1←⎕NEW P.DefineRegistry(,⊂'https://localhost')
+ reg1←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
  reg1.alias←'foo'
  reg1.api_key←'Firlefanz'
 
@@ -21,7 +21,7 @@
      →T.GoToTidyUp'There is no such registry yet'≢qdmx.EM
  :EndTrap
 
- reg2←⎕NEW P.DefineRegistry(,⊂'https://tatin.dev')
+ reg2←⎕NEW TC.DefineRegistry(,⊂'https://tatin.dev')
  settings.AddRegistry reg2
  →T.GoToTidyUp 1≠≢settings.registries
 

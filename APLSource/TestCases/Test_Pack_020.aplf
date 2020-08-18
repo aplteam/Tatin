@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
  (src dist)←(⊂dir,'/'),¨'src' 'dist'
  src,←'/v0.1.0'
@@ -12,15 +12,15 @@
 
  body←'r←Hello' 'r←''World'''
  (⊂body)F.NPUT src,'/Hello.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Hello'
  cfg.version←'0.1.0'
  cfg.source←'Firlefanz.aplf'
- cfg P.WritePackageConfigFile src
+ cfg TC.WritePackageConfigFile src
 
  :Trap 98
-     zipfile←P.Pack src dist
+     zipfile←TC.Pack src dist
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
@@ -31,5 +31,5 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

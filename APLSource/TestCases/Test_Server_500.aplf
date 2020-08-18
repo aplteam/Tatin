@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'zip'
  F.MkDir src zip
@@ -12,21 +12,21 @@
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_A'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
- cfg P.WritePackageConfigFile src
+ cfg TC.WritePackageConfigFile src
 
  packageID←'Example-Package_A-0.1.0'
 
- reg←P._UserSettings.GetRegistry'https://localhost'
+ reg←TC.MyUserSettings.GetRegistry'https://localhost'
  oldCredentials←reg.api_key
  reg.api_key←'Firlefanz'
- P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂reg)
+ TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
  :Trap 0
-     P.PublishPackage src('https://localhost/',packageID)
+     TC.PublishPackage src('https://localhost/',packageID)
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
@@ -37,7 +37,7 @@
 
 ∆TidyUp:
  reg.api_key←oldCredentials
- P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂reg)
+ TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
  Assert 0=⊃F.RmDir dir
  Assert 0=⊃F.RmDir serverPath,'/',packageID
  F.DeleteFile(739⌶0),'/',packageID,'.zip'

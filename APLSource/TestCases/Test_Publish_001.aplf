@@ -4,28 +4,28 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
  (src reg zip)←(⊂dir,'/'),¨'src' 'reg' 'zip'
  F.MkDir src reg zip
 
- P.Reg.CreateRegistry reg
+ TC.Reg.CreateRegistry reg
 
- P._UserSettings.AddRegistry'[local2]',reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_A'
  cfg.version←'1.0.0'
  cfg.source←'Test.apln'
- cfg P.WritePackageConfigFile src
+ cfg TC.WritePackageConfigFile src
 
- zipfile←P.Pack src zip
- zip ⎕NCOPY src,'/',P.CFG_NAME
+ zipfile←TC.Pack src zip
+ zip ⎕NCOPY src,'/',TC.CFG_NAME
 
- P.PublishPackage zipfile'[local2]'
+ TC.PublishPackage zipfile'[local2]'
 
  →T.GoToTidyUp 1≠≢list←F.ListDirs reg
  →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list
@@ -38,7 +38,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert P._UserSettings.RemoveRegistry'[local2]'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

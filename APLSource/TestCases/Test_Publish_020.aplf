@@ -4,27 +4,27 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
  (src dist reg)←(⊂dir,'/'),¨'src' 'dist' 'reg'
  F.MkDir src dist reg
  F.MkDir src,'/source'
 
- P.Reg.CreateRegistry reg
+ TC.Reg.CreateRegistry reg
 
- P._UserSettings.AddRegistry'[local2]',reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/source/Test.apln'
  body←'R←Hello' 'r←''World'''
  (⊂body)F.NPUT src,'/source/Hello.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_A'
  cfg.version←'1.0.0'
- cfg P.WritePackageConfigFile src
+ cfg TC.WritePackageConfigFile src
 
- P.PublishPackage src'[local2]'
+ TC.PublishPackage src'[local2]'
 
  →T.GoToTidyUp 1≠≢list←F.ListDirs reg
  →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list
@@ -34,13 +34,13 @@
  →T.GoToTidyUp 1≠reg Reg.Index.FindFullPackageID'Example-Package_A-1.0.0'
  →T.GoToTidyUp 1≠≢reg Reg.Index.FindPartPackageID'Example-Package_A'
  zipped←Reg.DotNetZip.ListZipContents list2 ∆GetByExtension'.ZIP'
- expected←P.CFG_NAME'source/Test.apln' 'source/Hello.aplf'
+ expected←TC.CFG_NAME'source/Test.apln' 'source/Hello.aplf'
  →T.GoToTidyUp~expected ∆LazyMatch zipped
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert P._UserSettings.RemoveRegistry'[local2]'
- #.⎕EX P.GetTatinRootSpace'#'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

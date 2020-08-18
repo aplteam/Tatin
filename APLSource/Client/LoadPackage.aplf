@@ -16,8 +16,8 @@
 ⍝ Loads all dependencies, if any, as well into [#|⎕SE]._tatin but _not_ into `targetSpace`.\\
 ⍝ Leaves no trails in the file system unless a package relies on file assets in which case those are loaded
 ⍝ into a temporary directory.\\
-⍝ Returns the fully qualified name of the reference created in `targetSpace` for the loaded package.
- r←⍬
+⍝ Returns the name of whatever was established in `targetSpace`.
+ r←''
  'Not a valid package ID'Assert GetPackageIDFromFilename identifier_
  refs←reset←tempDirs←⍬
  identifier←ReplaceRegistryAlias identifier_
@@ -52,11 +52,13 @@
          reset,←⍎saveIn2
      :EndIf
      refs,←ref
-     r,←⊂cfg LinkTargetToPackage saveIn2 targetSpace
+     :If level=1
+         r←,⊂cfg LinkTargetToPackage saveIn2 targetSpace
+     :EndIf
  :EndFor
  LinkDependencies refs
  :If 0<≢tempDirs
      F.RmDir tempDirs
-     reset.∆HOME←⊂''  ⍝ Those have been deleted because they don't have
+     reset.∆HOME←⊂''  ⍝ Those have been deleted because they don't have files
  :EndIf
 ⍝Done

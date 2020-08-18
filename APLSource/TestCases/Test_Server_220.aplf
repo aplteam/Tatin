@@ -1,0 +1,11 @@
+ r←Test_Server_220(stopFlag batchFlag);⎕TRAP;result;reg;res
+⍝ Request a package config file
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←TC.ReadPackageConfigFile'https://localhost/aplteam-OS-2.0.0'
+ →T.PassesIf 0<≢res
+ →T.PassesIf'{}'≡∊res[1,≢res]
+
+ r←T._OK
+⍝Done

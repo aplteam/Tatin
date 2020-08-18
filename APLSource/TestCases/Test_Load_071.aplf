@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
@@ -13,14 +13,14 @@
  body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
  (⊂body)F.NPUT src,'/Constants.apln'
  (⊂'My DLL')F.NPUT src,'/file.dll'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'Constants.apln'
  cfg.files←'file.dll'
- cfg P.WritePackageConfigFile src
- zipfile←P.Pack src zip
+ cfg TC.WritePackageConfigFile src
+ zipfile←TC.Pack src zip
 
- refs←P.LoadPackage zipfile #.TEMP
+ refs←TC.LoadPackage zipfile #.TEMP
  Assert 3=#.TEMP.Constants.⎕NC'PI'
  →T.GoToTidyUp 3.14≠#.TEMP.Constants.PI
  →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.∆URI
@@ -30,7 +30,7 @@
  tno←(#.TEMP.Constants.##.∆HOME,'/file.dll')⎕NTIE 0 0
 
  :Trap 98
-     {}P.LoadPackage zipfile #.TEMP
+     {}TC.LoadPackage zipfile #.TEMP
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
@@ -43,5 +43,5 @@
  {}{0::⍬ ⋄ ⎕NUNTIE tno}⍬
  Assert 0=⊃F.RmDir #.TEMP.Constants.##.∆HOME
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

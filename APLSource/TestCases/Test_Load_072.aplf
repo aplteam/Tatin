@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
@@ -12,15 +12,15 @@
 
  body←'∇Hello' '⎕←''Hello world''' '∇'
  (⊂body)F.NPUT src,'/hello.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Hello' '0.1.0'
  cfg.source←'Hello.aplf'
  cfg.api←'Hello'
- cfg P.WritePackageConfigFile src
- zipfile←P.Pack src zip
+ cfg TC.WritePackageConfigFile src
+ zipfile←TC.Pack src zip
 
  :Trap 98
-     {}P.LoadPackage('file://',zipfile)#.TEMP
+     {}TC.LoadPackage('file://',zipfile)#.TEMP
      →T.FailsIf 1
  :Else
      qdmx←⎕DMX

@@ -1,8 +1,8 @@
- {refs}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;allRefs
+ {refs}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level
 ⍝ Takes a folder with a build list, typically the result of installing packages.
 ⍝ Loads all packages according to that list and injects required references into `targetSpace`.
 ⍝ Returns a vector with references to **all** loaded packages, including dependencies.
- refs←allRefs←⍬
+ refs←⍬
  'Target spave does not exist'Assert 9.1=⎕NC⊂⍕targetSpace
  CheckBuildList installFolder
  :If 0<≢tree←LoadBuildList installFolder
@@ -19,15 +19,12 @@
              ref←⍎saveIn
              ref.∆URI←cfg.uri
              ref.∆HOME←path
-             allRefs,←ref
-             :If 1=level
-                 refs,←ref
-             :EndIf
+             refs,←ref
          :EndIf
          :If 1=level
              cfg LinkTargetToPackage saveIn targetSpace
          :EndIf
      :EndFor
-     LinkDependencies allRefs
+     LinkDependencies refs
  :EndIf
 ⍝Done

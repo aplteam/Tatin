@@ -4,8 +4,8 @@
  r←T._Failed
 
  tempDir←GetTempDir''
- F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
- #.⎕EX P.GetTatinRootSpace'#'
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
 
  packageFolder←F.ExpandPath ∆GetServerRegistryFolder,'../../Source/OS'
@@ -18,7 +18,7 @@
  (rc more)←(⊃⊃F.Dir packageFolder,'/*.json')F.CopyTo tempDir,'/'
  Assert 0=rc
 
- cfg←0 ⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET(⊃⊃F.Dir packageFolder,'/',P.CFG_NAME)0
+ cfg←0 ⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET(⊃⊃F.Dir packageFolder,'/',TC.CFG_NAME)0
  version←⊃{⍺,'-',⍵}/cfg.(group name version)
  F.RmDir ∆GetServerRegistryFolder,version
  #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
@@ -30,6 +30,6 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir tempDir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
 ⍝Done

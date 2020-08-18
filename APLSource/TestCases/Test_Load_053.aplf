@@ -5,54 +5,54 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
 
  F.MkDir src2←src,'/package_A'
- P.Reg.CreateRegistry reg
- P._UserSettings.AddRegistry'[local2]',reg
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←':Namespace A' 'foo←{' '##.B.FB2 ⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src2,'/A.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'A' '1.0.0'
  cfg.source←'A.apln'
- cfg P.WritePackageConfigFile src2
- src2 P.Dependencies.Add'[local2]Example-B-1.0.0'
- P.PublishPackage src2 reg
+ cfg TC.WritePackageConfigFile src2
+ src2 TC.Dependencies.Add'[local2]Example-B-1.0.0'
+ TC.PublishPackage src2 reg
 
  F.MkDir src3←src,'/B'
  body←':Namespace B' 'FB1←{' '1+⍵' '}' 'FB2←{' '⍵+##.C.FC2 2' '}' ':EndNamespace'
  (⊂body)F.NPUT src3,'/B.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'B' '1.0.0'
  cfg.source←'B.apln'
  cfg.api←'B'
- cfg P.WritePackageConfigFile src3
- src3 P.Dependencies.Add'[local2]Example-C-1.0.0'
- P.PublishPackage src3 reg
+ cfg TC.WritePackageConfigFile src3
+ src3 TC.Dependencies.Add'[local2]Example-C-1.0.0'
+ TC.PublishPackage src3 reg
 
  F.MkDir src3←src,'/C'
  body←':Namespace C' 'FC1←{' '⍵+3' '}' 'FC2←{' '4+##.B.FB1 ⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src3,'/C.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'C' '1.0.0'
  cfg.source←'C.apln'
  cfg.api←'C'
- cfg P.WritePackageConfigFile src3
- src3 P.Dependencies.Add'[local2]Example-B-1.0.0'
- P.PublishPackage src3 reg
+ cfg TC.WritePackageConfigFile src3
+ src3 TC.Dependencies.Add'[local2]Example-B-1.0.0'
+ TC.PublishPackage src3 reg
 
- refs←P.LoadPackage(reg,'/Example-A-1.0.0')#.TEMP
+ refs←TC.LoadPackage(reg,'/Example-A-1.0.0')#.TEMP
  →T.GoToTidyUp 37≠#.TEMP.A.foo 30
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert P._UserSettings.RemoveRegistry'[local2]'
- #.⎕EX P.GetTatinRootSpace'#'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

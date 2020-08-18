@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
@@ -13,25 +13,25 @@
  F.MkDir src3←src,'/MyBaseClass/'
  {F.MkDir ⍵,'/source'}¨src2 src3
 
- P.Reg.CreateRegistry reg
- P._UserSettings.AddRegistry'[local2]',reg
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←':Class MyClass:MyBaseClass' '∇r←Math arg' ':Access Public Shared' 'r←×/arg' '∇' ':EndClass'
  (⊂body)F.NPUT src2,'/source/MyClass.aplc'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'MyCompany' 'MyClass' '1.0.0'
- cfg P.WritePackageConfigFile src2
- src2 P.Dependencies.Add'[local2]MyCompany-MyBaseClass-1.0.0'
- P.PublishPackage src2 reg
+ cfg TC.WritePackageConfigFile src2
+ src2 TC.Dependencies.Add'[local2]MyCompany-MyBaseClass-1.0.0'
+ TC.PublishPackage src2 reg
 
  body←':Class MyBaseClass' '∇r←Copyright' ':Access Public Shared' 'r←''Copyright This and that 2020''' '∇' ':EndClass'
  (⊂body)F.NPUT src3,'/source/MyBaseClass.aplc'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'MyCompany' 'MyBaseClass' '1.0.0'
- cfg P.WritePackageConfigFile src3
- P.PublishPackage src3 reg
+ cfg TC.WritePackageConfigFile src3
+ TC.PublishPackage src3 reg
 
- refs←P.LoadPackage(reg,'/MyCompany-MyClass-1.0.0')#.TEMP
+ refs←TC.LoadPackage(reg,'/MyCompany-MyClass-1.0.0')#.TEMP
  →T.GoToTidyUp 12≠#.TEMP.MyClass.Math 3 4
  →T.GoToTidyUp'Copyright This and that 2020'≢#.TEMP.MyClass.Copyright
 
@@ -39,6 +39,6 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert P._UserSettings.RemoveRegistry'[local2]'
- #.⎕EX P.GetTatinRootSpace'#'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

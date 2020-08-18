@@ -1,6 +1,7 @@
  {r}←cfg LinkTargetToPackage(source target);alias;name;ref;from;buff
 ⍝ Establishes references in the target space pointing to the loaded package.\\
-⍝ Returns the fully qualified names of what was established in the target space
+⍝ Returns the fully qualified names of what was established in the target space.
+⍝ Note that this can be a namespace or a function etc.
  alias←cfg.alias{0=≢⍺:⍵ ⋄ ⍺}cfg.name
  name←cfg.name
  ref←⍎source
@@ -23,5 +24,5 @@
      0 Assert⍨'Cannot establish API in ',source
  :EndIf
  target⍎alias,'←',source,'.',from
- r←targetSpace,'.',alias
+ r←target,'.',alias
 ⍝Done

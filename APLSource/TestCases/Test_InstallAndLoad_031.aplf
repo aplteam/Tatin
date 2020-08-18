@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
@@ -13,16 +13,16 @@
  F.MkDir reg
  F.MkDir src2 src3,¨⊂'/APLSource'
 
- P.Reg.CreateRegistry reg
- P._UserSettings.AddRegistry'[local2]',reg
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.14' '∇' ':EndClass'
  (⊂body)F.NPUT src2,'/APLSource/Constants.aplc'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
- cfg P.WritePackageConfigFile src2
- P.PublishPackage src2 reg
+ cfg TC.WritePackageConfigFile src2
+ TC.PublishPackage src2 reg
 
  body←'r←x Times y' 'r←Constants.PI× x×y'
  (⊂body)F.NPUT src3,'/APLSource/Times.aplf'
@@ -30,23 +30,23 @@
  (⊂body)F.NPUT src3,'/APLSource/Total.aplf'
  body←'r←x Power y' 'r←x*y'
  (⊂body)F.NPUT src3,'/APLSource/Power.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyMath' '0.2.0'
  ⍝ cfg.source←''    ⍝ Does not need setting: there is just one folder
  cfg.api←'Times'    ⍝ Meaning that the other functions are invisible
- cfg P.WritePackageConfigFile src3
- src3 P.Dependencies.Add'[local2]Example-Constants-0.1.0'
- P.PublishPackage src3 reg
+ cfg TC.WritePackageConfigFile src3
+ src3 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
+ TC.PublishPackage src3 reg
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list←P.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
+ list←TC.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
  →T.GoToTidyUp 2≠≢list
 
  →T.GoToTidyUp 2≠≢F.ListDirs installFolder
  →T.GoToTidyUp 2≠≢F.ListFiles installFolder
- →T.GoToTidyUp(,⊂'Example-MyMath-0.2.0')≢P.Dependencies.Get installFolder
+ →T.GoToTidyUp(,⊂'Example-MyMath-0.2.0')≢TC.Dependencies.Get installFolder
 
- {}P.LoadDependencies installFolder #.TEMP
+ {}TC.LoadDependencies installFolder #.TEMP
  →T.GoToTidyUp(3.14×3×4)≠3 #.TEMP.MyMath 4
  →T.GoToTidyUp 1≠≢#.TEMP.⎕NL⍳16
 
@@ -54,6 +54,6 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert P._UserSettings.RemoveRegistry'[local2]'
- #.⎕EX P.GetTatinRootSpace'#'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

@@ -1,0 +1,12 @@
+ list←ReadPackageConfigFile_ uri;host;packageID;client;request;res
+ (host packageID)←Reg.SeparateUriAndPackageID uri
+ packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
+ client←NewClient host
+ request←R.NewRequest 0
+ request.URI←'v1/packages/details/',{⍵↓⍨'/'=1⍴⍵}packageID
+ request.Headers,←⊂'Accept' 'application/json'
+ res←client R.SendAndReceive request
+ ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
+ list←{(,0)≡⍴⍵:'' ⋄ ⎕JSON⍠('Dialect' 'JSON5')⊣⍵}⊣res.Content
+ list←1↓⊃,/(⎕UCS 10),¨list
+⍝Done

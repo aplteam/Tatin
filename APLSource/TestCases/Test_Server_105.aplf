@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'zip'
  F.MkDir src zip
@@ -12,18 +12,18 @@
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_A'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
- cfg P.WritePackageConfigFile src
+ cfg TC.WritePackageConfigFile src
 
  packageID←'Example-Package_A-0.1.0'
- zipFilename←P.PublishPackage src('https://localhost/',packageID)
+ zipFilename←TC.PublishPackage src('https://localhost/',packageID)
 
  :Trap 98
-     P.PublishPackage src('https://localhost/',packageID)
+     TC.PublishPackage src('https://localhost/',packageID)
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

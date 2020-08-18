@@ -4,14 +4,14 @@
  r←T._Failed
 
  tempDir←GetTempDir''
- F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
- settings←⎕NEW P.UserSettings(,⊂tempDir)
+ settings←⎕NEW TC.UserSettings(,⊂tempDir)
  →T.GoToTidyUp 0≠≢settings.registries
- reg1←⎕NEW P.DefineRegistry(,⊂'https://tatin.dev')
+ reg1←⎕NEW TC.DefineRegistry(,⊂'https://tatin.dev')
  settings.AddRegistry reg1
  →T.GoToTidyUp 1≠≢settings.registries
- reg2←⎕NEW P.DefineRegistry(,⊂'https://localhost')
+ reg2←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
  settings.AddRegistry reg2
  →T.GoToTidyUp 2≠≢settings.registries
  reg2.alias←'foo'
@@ -19,7 +19,7 @@
  ns←reg2.Get ⍬
  settings.ReplaceRegistry reg2
  ⎕EX'settings'
- settings←⎕NEW P.UserSettings(,⊂tempDir)
+ settings←⎕NEW TC.UserSettings(,⊂tempDir)
  →T.GoToTidyUp 2≠≢settings.registries
  →T.GoToTidyUp(settings.GetRegistry'[foo]')≢settings.GetRegistry'https://localhost'
  →T.GoToTidyUp 1≠settings.RemoveRegistry'https://localhost'

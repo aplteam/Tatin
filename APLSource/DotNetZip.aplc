@@ -3,17 +3,17 @@
 ⍝ This class offers three shared methods:
 ⍝ * `ZipFolder`
 ⍝ * `UnzipTo`
-⍝ * `ListZipContents`
+⍝ * `ListZipContents`\\
 ⍝ For more advanced features the class can also be instantiated.\\
-⍝ With `⎕NEW` either a new zip file is created or an existing one is opened,
-⍝ depending on the arguments passed onto the constructor. By default any existing zip file is overwritten.\\
+⍝ With `⎕NEW` either a new zip file is created or an existing one is opened depending on the
+⍝ arguments passed onto the constructor. By default any existing zip file is overwritten.\\
 ⍝ You can then use these instance methods:
 ⍝ * `Add`
 ⍝ * `Delete`
 ⍝ * `List`
 ⍝ * `Dispose`\\
 ⍝ Once instanciated the read-only property `filename` carries the name of the ZIP file.\\
-⍝ This class requires the class `FilesAndDirs` and the namespace script `APLTreeUtils`.\\
+⍝ This class requires the class `FilesAndDirs`.\\
 ⍝ Kai Jaeger - APL Team Ltd.\\
 ⍝ Homepage: <https://github.com/aplteam/DotNetZip/>
 
@@ -23,13 +23,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '0.8.2.36' '2020-08-12'
+      r←'DotNetZip' '0.8.2.37' '2020-08-14'
     ∇
 
     ∇ History
     ⍝ * 0.8.2 from 2020-08-12
-    ⍝   * `⎕NEW` replaced by a function `QuadNEW` which tries again for a while. Required because sometimes .NET 
-    ⍝     generates and error "being used by another process" byanother process though that was caused by DotNetZip. 
+    ⍝   * `⎕NEW` replaced by a function `QuadNEW` which tries again for a while with increasing dealys. 
+    ⍝     This is required because sometimes .NET generates and error "being used by another process" 
+    ⍝     though that was caused by `DotNetZip` itself.
     ⍝ * 0.8.1 from 2020-08-07
     ⍝   * Workaround implemented for bug with ⎕USING that caused a nonsense VALUE ERROR. (Mantis 18404)\\
     ⍝     The bugs makes an appearance when the class is instanciated in ⎕SE, then a )CLEAR command is issued
@@ -227,7 +228,9 @@
 ⍝ ------------------------ Private stuff -------------------
 
     ∇ r←QuadNEW arg;success;counter;qdmx
-    ⍝ Attempts to be successful several times in case of "being used by another process" errors.
+    ⍝ Attempts to be successful several times in case of "being used by another process" errors with 
+    ⍝ increasingly long delays. This often occured when `DotNetZip` itself had just dealt with the zip file,
+    ⍝ and it almost always goes away after some tries.
       success←counter←0
       :Repeat
           :Trap 90
@@ -243,6 +246,9 @@
               :EndIf
           :EndTrap
       :Until success∨10<counter
+      :If 10<counter
+          ('⎕NEW failed ',(⍕counter),' times')⎕SIGNAL 11
+      :EndIf
     ∇
 
     ∇ {r}←Initialize dummy;notwindows;netcoreset

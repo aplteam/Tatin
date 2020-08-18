@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
  (src dist)←(⊂dir,'/'),¨'src' 'dist'
  src,←'/v0.1.0'
@@ -16,15 +16,15 @@
  (⊂body)F.NPUT src2,'/Hello.aplf'
  (⊂'/myFirst.dll')F.NPUT src3,'/myFirst.dll'
  (⊂'/mySecond.dll')F.NPUT src3,'/mySecond.dll'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Hello'
  cfg.version←'0.1.0'
  cfg.source←'TheSource/'
  cfg.files←'Assets/'
- cfg P.WritePackageConfigFile src
+ cfg TC.WritePackageConfigFile src
 
- zipfile←P.Pack src dist
+ zipfile←TC.Pack src dist
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←F.NormalizePath'Assets/myFirst.dll' 'Assets/mySecond.dll' 'TheSource\Hello.aplf' 'apl-package.json'
@@ -34,5 +34,5 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

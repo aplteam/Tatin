@@ -4,54 +4,54 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
  F.MkDir src2←src,'/package_A'
 
- P.Reg.CreateRegistry reg
- P._UserSettings.AddRegistry'[local2]',reg
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←':Namespace A' 'foo←{' '##.Times ⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src2,'/A.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'A' '1.0.0'
  cfg.source←'A.apln'
- cfg P.WritePackageConfigFile src2
- src2 P.Dependencies.Add'[local2]Example-C-1.0.0'
- P.PublishPackage src2 reg
+ cfg TC.WritePackageConfigFile src2
+ src2 TC.Dependencies.Add'[local2]Example-C-1.0.0'
+ TC.PublishPackage src2 reg
 
  F.MkDir src3←src,'/B'
  body←'r←Call arg' 'r←A.foo arg'
  (⊂body)F.NPUT src3,'/Call.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'B' '1.0.0'
  cfg.source←'Call.aplf'
  cfg.alias←'Call'
- cfg P.WritePackageConfigFile src3
- src3 P.Dependencies.Add'[local2]Example-A-1.0.0'
- P.PublishPackage src3 reg
+ cfg TC.WritePackageConfigFile src3
+ src3 TC.Dependencies.Add'[local2]Example-A-1.0.0'
+ TC.PublishPackage src3 reg
 
  F.MkDir src3←src,'/C'
  body←'r←Times v' 'r←×/v'
  (⊂body)F.NPUT src3,'/Times.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'C' '1.0.0'
  cfg.source←'Times.aplf'
  cfg.api←'Times'
  cfg.alias←'Times'
- cfg P.WritePackageConfigFile src3
- P.PublishPackage src3 reg
+ cfg TC.WritePackageConfigFile src3
+ TC.PublishPackage src3 reg
 
- refs←P.LoadPackage(reg,'/Example-B-1.0.0')#.TEMP
+ refs←TC.LoadPackage(reg,'/Example-B-1.0.0')#.TEMP
  →T.GoToTidyUp 12≠#.TEMP.Call 3 4
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert P._UserSettings.RemoveRegistry'[local2]'
- #.⎕EX P.GetTatinRootSpace'#'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

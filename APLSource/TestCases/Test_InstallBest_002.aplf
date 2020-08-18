@@ -8,15 +8,15 @@
  'TEMP'#.⎕NS''
  dir←GetTempDir ⍬
 
- refs←P.InstallPackage'[local]aplteam-APLProcess'dir
+ refs←TC.InstallPackage'[local]aplteam-APLProcess'dir
  →T.PassesIf 0<≢refs
- refs2←P.LoadDependencies dir #.TEMP
+ refs2←TC.LoadDependencies dir #.TEMP
 
  →T.PassesIf'1.0.0'≡∆GetMajorMinorPatch 2⊃#.TEMP.APLProcess.Version
 
  r←T._OK
 
 ∆TidyUp:
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  F.RmDir dir
 ⍝Done

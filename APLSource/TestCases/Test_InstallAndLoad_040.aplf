@@ -4,17 +4,17 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir''
  F.MkDir installFolder←dir,'/Tatin_AppPackages'
 
- list1←P.InstallPackage(∆GetServerRegistryFolder,'aplteam-APLProcess')installFolder ⍝ No version number at all
+ list1←TC.InstallPackage(∆GetServerRegistryFolder,'aplteam-APLProcess')installFolder ⍝ No version number at all
  →T.GoToTidyUp 0=≢list1
- list2←P.InstallPackage(∆GetServerRegistryFolder,'aplteam-CompareSimple-3.0.2')installFolder
+ list2←TC.InstallPackage(∆GetServerRegistryFolder,'aplteam-CompareSimple-3.0.2')installFolder
  →T.GoToTidyUp 0=≢list2
 
- refs←P.LoadDependencies installFolder'#.TEMP'
+ refs←TC.LoadDependencies installFolder'#.TEMP'
  →T.GoToTidyUp 0=≢refs
 
  →T.GoToTidyUp~'1.0.0'∆LazyMatch 2⊃#.TEMP.APLProcess.Version
@@ -24,5 +24,5 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

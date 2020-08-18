@@ -3,15 +3,15 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- reg←⎕NEW P.DefineRegistry(,⊂'http://foo.com')
+ reg←⎕NEW TC.DefineRegistry(,⊂'http://foo.com')
  reg.api_key←'firlefanz'
  reg.port←61250
  reg.alias←'foo'
  reg.priority←500
  ns←reg.Get ⍬
- reg2←⎕NEW P.DefineRegistry(,ns)
+ reg2←⎕NEW TC.DefineRegistry(,ns)
  expected←'http://foo.com/' 'foo' 61250 'firlefanz' 500
- →T.PassesIf expected ∆LazyMatch reg{⍺⍎⍵}¨P.DefineRegistry.varsList
+ →T.PassesIf expected ∆LazyMatch reg{⍺⍎⍵}¨TC.DefineRegistry.varsList
 
  r←T._OK
 ⍝Done

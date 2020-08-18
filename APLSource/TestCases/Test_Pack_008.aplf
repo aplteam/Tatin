@@ -4,36 +4,36 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
  (src dist)←(⊂dir,'/'),¨'src' 'dist'
  src,←'/v0.1.0'
  F.MkDir(src,'/APLSource')dist(src,'/docs')
 
  ('foo1←{1}')F.NPUT src,'/APLSource/foo1.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_B'
  cfg.version←'0.1.0'
  cfg.source←'APLSource'
- cfg P.WritePackageConfigFile src
+ cfg TC.WritePackageConfigFile src
 
- P._UserSettings.AddRegistry'[Dyalog]https://packages.dyalog.com'
- P._UserSettings.AddRegistry'[MyCompany]https://packages.my-company.com'
+ TC.MyUserSettings.AddRegistry'[Dyalog]https://packages.dyalog.com'
+ TC.MyUserSettings.AddRegistry'[MyCompany]https://packages.my-company.com'
 
  src D.Add'[tatin]aplteam-APLTreeUtils-1.0.0'
 
- zipfile←P.Pack src dist
+ zipfile←TC.Pack src dist
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
- expected←'apl-package.json' 'APLSource/foo1.apln'P.Reg.DependenciesFilename
+ expected←'apl-package.json' 'APLSource/foo1.apln'TC.Reg.DependenciesFilename
  →T.GoToTidyUp~expected ∆LazyMatch list
 
  r←T._OK
 
 ∆TidyUp:
- Assert P._UserSettings.RemoveRegistry'[dyalog]'
- Assert P._UserSettings.RemoveRegistry'[myCompany]'
+ Assert TC.MyUserSettings.RemoveRegistry'[dyalog]'
+ Assert TC.MyUserSettings.RemoveRegistry'[myCompany]'
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

@@ -5,7 +5,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
@@ -17,14 +17,14 @@
  body←':Class: Calc:Constants' '∇r←Times v' 'r←×/v' '∇' ':EndClass'
  (⊂body)F.NPUT src2,'/Calc.aplc'
  (⊂'# Foo' 'Some paragraph')F.NPUT src,'/ReadMe.md'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
- cfg P.WritePackageConfigFile src
- zipfile←P.Pack src zip
+ cfg TC.WritePackageConfigFile src
+ zipfile←TC.Pack src zip
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list←P.InstallPackage('file://',zipfile)installFolder
+ list←TC.InstallPackage('file://',zipfile)installFolder
 
  →T.GoToTidyUp 1≠≢list
  →T.GoToTidyUp 3≠≢⊃F.Dir installFolder,'/*'
@@ -32,7 +32,7 @@
  F.DeleteFile src,'/ReadMe.md'   ⍝ Compromise the installation
 
  :Trap 98
-     {}P.InstallPackage('file://',zipfile)installFolder
+     {}TC.InstallPackage('file://',zipfile)installFolder
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
@@ -43,5 +43,5 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

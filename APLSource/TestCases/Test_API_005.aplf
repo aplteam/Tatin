@@ -1,11 +1,11 @@
- r←Test_API_005(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;tempDir;res
+ r←Test_API_005(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;tempDir;res;expected
 ⍝ Exercise ⎕SE.Tatin.InstallPackage and ⎕SE.Tatin.LoadDependencies
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  tempDir←GetTempDir''
- F.DeleteFile tempDir,'/',P.UserSettings.cfg_name                           ⍝ Precaution
- #.⎕EX P.GetTatinRootSpace'#'
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
 
@@ -13,11 +13,12 @@
  →T.GoToTidyUp 2≠≢res
 
  res←⎕SE.Tatin.LoadDependencies tempDir'#.TEMP'
- →T.GoToTidyUp(,⊂'#._tatin.aplteam_APLProcess_0_2_12')≢⍕¨res
+ expected←'#._tatin.aplteam_APLProcess_0_2_12' '#._tatin.aplteam_APLTreeUtils_6_0_0'
+ →T.GoToTidyUp expected≢⍕¨res
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir tempDir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

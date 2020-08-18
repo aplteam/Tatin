@@ -8,11 +8,11 @@
  dir←GetTempDir ⍬
  reg←dir,'/reg'
  F.MkDir reg
- P.Reg.CreateRegistry reg
- P._UserSettings.AddRegistry'[local2]file://',reg
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]file://',reg
 
  :Trap 98
-     P.LoadPackage'[DoesNotExist]Example-MyPackage-0.1.0'#.TEMP
+     TC.LoadPackage'[DoesNotExist]Example-MyPackage-0.1.0'#.TEMP
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
@@ -23,5 +23,5 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert P._UserSettings.RemoveRegistry'[local2]'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
 ⍝Done

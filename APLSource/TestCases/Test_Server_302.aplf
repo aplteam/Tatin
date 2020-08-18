@@ -3,22 +3,22 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
 
- localReg←P._UserSettings.GetRegistry'[local]'
+ localReg←TC.MyUserSettings.GetRegistry'[local]'
  was←localReg.priority
  localReg.priority←1  ⍝ Make sure it goes to the end of the food chain
- P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂localReg)
+ TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂localReg)
  localReg.priority←was
 
- paths←P.InstallPackage'aplteam-APLProcess-0.2.4'dir
+ paths←TC.InstallPackage'aplteam-APLProcess-0.2.4'dir
  →T.PassesIf 1<≢paths
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
- P._UserSettings.ReplaceRegistry ⎕NEW P.DefineRegistry(,⊂localReg)
+ #.⎕EX TC.GetTatinRootSpace'#'
+ TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂localReg)
 ⍝Done

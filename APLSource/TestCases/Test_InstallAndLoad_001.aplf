@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
@@ -12,26 +12,26 @@
 
  body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
  (⊂body)F.NPUT src,'/Constants.apln'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'Constants.apln'
- cfg P.WritePackageConfigFile src
- zipfile←P.Pack src zip
+ cfg TC.WritePackageConfigFile src
+ zipfile←TC.Pack src zip
 
  installFolder←GetTempDir'/MyAppPackages'
- list←P.InstallPackage('file://',zipfile)installFolder
+ list←TC.InstallPackage('file://',zipfile)installFolder
 
  →T.GoToTidyUp 1≠≢list
- expected←,⊂P.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
+ expected←,⊂TC.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
  →T.GoToTidyUp~expected ∆LazyMatch(1+≢installFolder)↓¨F.ListDirs installFolder
- →T.GoToTidyUp~F.Exists installFolder,'/',P.Reg.DependenciesFilename
+ →T.GoToTidyUp~F.Exists installFolder,'/',TC.Reg.DependenciesFilename
 
- {}P.LoadDependencies installFolder #.TEMP
+ {}TC.LoadDependencies installFolder #.TEMP
  →T.GoToTidyUp #.TEMP.Constants.PI≢3.14
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

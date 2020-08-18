@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- #.⎕EX P.GetTatinRootSpace'#'
+ #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  dir←GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
@@ -14,16 +14,16 @@
  F.MkDir reg
  F.MkDir src2 src3 src4,¨⊂'/APLSource'
 
- P.Reg.CreateRegistry reg
- P._UserSettings.AddRegistry'[local2]',reg
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.14' '∇' ':EndClass'
  (⊂body)F.NPUT src2,'/APLSource/Constants.aplc'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
- cfg P.WritePackageConfigFile src2
- P.PublishPackage src2 reg
+ cfg TC.WritePackageConfigFile src2
+ TC.PublishPackage src2 reg
 
  body←⊂':Namespace MyMath'
  body,←'∇r←x Times y' 'r←##.Constants.PI × x × y' '∇'
@@ -31,11 +31,11 @@
  body,←'∇r←x Power y' 'r←x*y' '∇'
  body,←⊂':EndNamespace'
  (⊂body)F.NPUT src3,'/APLSource/Power.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyMath' '0.2.0'
- cfg P.WritePackageConfigFile src3
- src3 P.Dependencies.Add'[local2]Example-Constants-0.1.0'
- P.PublishPackage src3 reg
+ cfg TC.WritePackageConfigFile src3
+ src3 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
+ TC.PublishPackage src3 reg
 
  body←⊂':Namespace MyTests'
  body,←'∇r←x Test1 y' 'r←##.Constants.PI × x × y' '∇'
@@ -43,22 +43,22 @@
  body,←'∇r←x Test3 y' 'r←x*y' '∇'
  body,←⊂':EndNamespace'
  (⊂body)F.NPUT src4,'/APLSource/Test3.aplf'
- cfg←P.InitPackageConfig ⍬
+ cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyTests' '0.3.0'
- cfg P.WritePackageConfigFile src4
- src4 P.Dependencies.Add'[local2]Example-Constants-0.1.0'
- P.PublishPackage src4 reg
+ cfg TC.WritePackageConfigFile src4
+ src4 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
+ TC.PublishPackage src4 reg
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list1←P.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
+ list1←TC.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
  →T.GoToTidyUp 2≠≢list1
- list2←P.InstallPackage('[local2]Example-MyTests-0.3.0')installFolder
+ list2←TC.InstallPackage('[local2]Example-MyTests-0.3.0')installFolder
  →T.GoToTidyUp 1≠≢list2
 
  →T.GoToTidyUp 3≠+/F.IsDir⊃F.Dir installFolder,'/*'
- →T.GoToTidyUp 2≠≢P.Dependencies.Get installFolder
+ →T.GoToTidyUp 2≠≢TC.Dependencies.Get installFolder
 
- {}P.LoadDependencies installFolder #.TEMP
+ {}TC.LoadDependencies installFolder #.TEMP
  →T.GoToTidyUp 2≠≢#.TEMP.⎕NL⍳16
  →T.GoToTidyUp(3.14×3×4)≠3 #.TEMP.MyMath.Times 4
  →T.GoToTidyUp 7≠#.TEMP.MyMath.Total 3 4
@@ -70,6 +70,6 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert P._UserSettings.RemoveRegistry'[local2]'
- #.⎕EX P.GetTatinRootSpace'#'
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

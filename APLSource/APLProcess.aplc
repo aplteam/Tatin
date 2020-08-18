@@ -21,11 +21,13 @@
     ∇ r←Version
     ⍝ See also `History`
       :Access Public Shared
-      r←'APLProcess' '0.2.0.6' '2020-03-23'
+      r←'APLProcess' '0.2.1.7' '2020-08-14'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 0.2.1 from 2020-08-14
+    ⍝   * `Kill` now kills `Proc.ID` (self so to speak) in case ⍵ is empty.
     ⍝ * 0.2.0 from 2020-03-23
     ⍝   * File extension changed from .DYALOG to .APLC
     ⍝ * 0.1.2 from 2020-01-30
@@ -251,9 +253,12 @@
     ∇ {r}←Kill pid;proc;qdmx
       :Access Public Instance
     ⍝ Attempts to stop the process with processID pid.\\
-    ⍝ `r` is 0 in case the process could not be stopped, including when it is not running anyway.,
-    ⍝ otherwise it is 1.
+    ⍝ In case `pid` is empty it becomes `Proc.Id` (self so to speak)
+    ⍝ `r` is 0 in case the process could not be stopped, including when it is not running anyway  otherwise it is 1.\\
       r←0
+      :If 0=≢pid
+            pid←Proc.Id
+      :EndIf
       :If IsWin
           ⎕USING←'System,system.dll'
           :Trap 90

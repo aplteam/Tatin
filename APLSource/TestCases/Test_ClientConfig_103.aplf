@@ -1,5 +1,5 @@
  r←Test_ClientConfig_103(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg2;reg1;ns
-⍝ Exercise AddRegistry, ReplaceRegistry and RemoveRegistry on a config file with 0 to 2 registries
+⍝ Exercise AddRegistry, ListRegistries, ReplaceRegistry and RemoveRegistry on a config file with 1 to 2 registries
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -7,9 +7,6 @@
  F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- →T.GoToTidyUp 0≠≢settings.registries
- reg1←⎕NEW TC.DefineRegistry(,⊂'https://tatin.dev')
- settings.AddRegistry reg1
  →T.GoToTidyUp 1≠≢settings.registries
  reg2←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
  settings.AddRegistry reg2
@@ -23,8 +20,6 @@
  →T.GoToTidyUp 2≠≢settings.registries
  →T.GoToTidyUp(settings.GetRegistry'[foo]')≢settings.GetRegistry'https://localhost'
  →T.GoToTidyUp 1≠settings.RemoveRegistry'https://localhost'
- →T.GoToTidyUp 0≠settings.RemoveRegistry'https://localhost'
- →T.GoToTidyUp 1≠≢settings.registries
  settings.AddRegistry reg2
  →T.GoToTidyUp 2≠≢settings.registries
  →T.GoToTidyUp 1≠settings.Exist'[foo]'

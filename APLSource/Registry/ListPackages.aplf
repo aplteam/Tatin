@@ -11,6 +11,7 @@
  registryPath←F.ExpandPath registryPath
  list←F.ListDirs registryPath ⍝ All package IDs
  list←{⊃,/1↓⎕NPARTS ⍵}¨list                     ⍝ Remove path: we only need the package IDs
+ list←(IsValidPackageID_Complete¨list)/list
  :If 0<≢packageID~'*'
      list←((packageID)∘{⍺≡(≢⍺)↑⍵}¨list)/list
  :EndIf

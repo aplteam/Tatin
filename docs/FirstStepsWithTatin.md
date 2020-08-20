@@ -24,7 +24,7 @@ After a fresh installation you might wonder what Registries are at your disposal
 
 At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelyhood your own ones), then you must change the user settings. 
 
-All these topics are discussed in a separate document: "TatinUserSettings.html". Here we try to keep things simple.
+All these topics --- and others --- are discussed in a separate document: "TatinUserSettings.html". Here we try to keep things simple.
 
 
 ## Consuming packages
@@ -47,7 +47,14 @@ Group    Package Name     Major
 
 The square brackets around "tatin" declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like `https://localhost/my_tatin_server`.
 
-Note that the list comprehends not only group names and package names but also the major version numbers of each package. This is because in principle these packages:
+A> ### Local and remote Registries
+A>
+A> The Tatin client can access packes that are managed by a Tatin Server but also Registries that are locally available. 
+A> In order to address a local Registry you would just provide the path to it. The folder _must_ contain a file ffoo.xyz in order to qualify as a Registry.
+A>
+A> Of course
+
+Note that the list comprehends not only group names and package names but also the major version number of each package. This is because in principle these packages:
 
 ```
 aplteam-misc-1.0.0
@@ -55,7 +62,7 @@ aplteam-misc-1.1.0
 aplteam-misc-1.1.1
 ```
 
-are all different versions of the _same_ package while these:
+These are all different versions of the _same_ package while these:
 
 ```
 aplteam-misc-1.0.0
@@ -76,7 +83,7 @@ A> This is because Tatin is based on the concepts of _Semantic Versioning_ and _
 A>
 A> These concepts are discussed in a separate document with the name "TatinsUpdateStrategy".
 
-`]tatin.ListPackages` will return a list with _all_ packages available on that server. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.
+`]tatin.ListPackages` will return a list with _all_ packages available in the given Registry. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.
 
 * If you happen to know the group name you may specify `-group=whatever`; then only packages of that group are listed.
 * Every package is tagged with keywords. You may specify one or more tags, for example `-tag=linux,date`.
@@ -88,11 +95,12 @@ A> 1. First Tatin tries to find 100% matches
 A> 1. If that does not yield results, it tries to find the search string _somewhere_ in tags (`⍷`)
 A> 1. If that does not yield a result then a fuzzy search is performed
 A> 
-A> The fizzy search would find "windows" when you enter "winndows" and "linux" when you enter "linuks". It has limits but in practice it works quite well unless the tags are very short: typing "AY" when you meant "AI" would not work.
+A> The fuzzy search would find "windows" when you enter "winndows" and "linux" when you enter "linuks". It has limits but in practice it works quite well unless the tags are very short: typing "AY" when you meant "AI" would not work.
 A>
 A> Notes:
 A> * The strategy outlined above is applied on each tag independently
 A> * Entering more than a single tag would mean that only packages that carry _all of them_ would qualify
+A> * Searching for tags is an action that is carried out by a Tatin Server. That means that specifying `-tags=` makes sense only in HTTP requests: only then is there a server on the other side that can process the reuqest.
 
 In our case we look for something that runs on all platforms. For that we execute this user command:
 

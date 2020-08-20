@@ -1,7 +1,8 @@
 :Class UserSettings
-⍝ By instanciating this class you get a representation of user settings required by Tatin.\\
-⍝ In case no path pointing to a folder hosting a config file is provided to `⎕NEW` the file is created
+⍝ By instanciating this class you get a representation of a user settings file required by Tatin.\\
+⍝ In case no path pointing to a folder hosting such a file is provided to `⎕NEW`, the file is created
 ⍝ in the default location (user's home folder) which depends on your operating system.\\
+⍝ You may call ⎕SE.Tatin.GetUserHomeFolder ''
 ⍝ Optionally you may specify such a folder with `⎕NEW` that hosts the configuration file.\\
 ⍝ Note that if the file does not yet exist it will be created with defaults.\\
 ⍝ You may also define `source` which is used as the default for `source` in a package config file.\\
@@ -10,7 +11,7 @@
 ⍝ and `RemoveRegistry`.\\
 ⍝ Whenevever one of these functions is called the user settings are updated and written to its file.
 ⍝ The full name of the file as available via the field `path2config`.\\
-⍝ You can convert a particular Registry into an ordinary namespace by calling the `GetRegsitry` function.
+⍝ You can convert a particular Registry into an ordinary namespace by calling the `GetRegistry` method.
 
     :Field Public Shared ReadOnly cfg_name←'tatin-client.json'  ⍝ Name of the user config file is fixed
 
@@ -39,7 +40,7 @@
       :EndIf
     ∇
 
-    ∇ make1(path2config_);reg
+    ∇ make1(path2config_);reg;buff
       :Implements Constructor
       :Access Public
       Init1 ⍬
@@ -53,6 +54,11 @@
           Read _path2config
       :Else
           _registries←⍬
+          buff←⎕NS''
+          buff.alias←'tatin'
+          buff.uri←'https://tatin.dev'
+          reg←⎕NEW home.DefineRegistry(,⊂buff)
+          AddRegistry reg
           Write _path2config
       :EndIf
     ∇
@@ -63,16 +69,12 @@
       Init1 ⍬
       'Is not a directory?!'Assert F.IsDir path2config_
       _path2config←path2config_
-      _permanent←permanent_
+      permanent←permanent_
       :If F.IsFile path2config
           Read _path2config
       :Else
           _registries←⍬
           Write _path2config
-          :If permanent_
-              settingsFile←home.GetUserHomeFolder'.tatin'
-              (⊂_path2config)F.NPUT settingsFile 1
-          :EndIf
       :EndIf
     ∇
 
@@ -100,6 +102,31 @@
         ∇
     :EndProperty
 
+    :Property permanent
+    ⍝ Flag that defines whether the current user setting file should be used permanently.\\
+    ⍝ If the file is situated in the default location then there is no need to worry about this property
+    ⍝ except when you want to go back to that default file from another one.\\
+    ⍝ Note that when this is 1 due to an earlier setting or because a 1 was passed as second argument
+    ⍝ to a constructor, then the file `.tatin` will be deleted.
+    :Access Public Instance
+        ∇ r←get
+          r←_permanent
+        ∇
+        ∇ set value;buff;settingsFile
+          buff←value.NewValue
+          '"permanent" is invalid'Assert(⊂buff)∊0 1
+          :If buff              ⍝ Is now 1...
+          :AndIf ~_permanent    ⍝ ... but was 0
+              settingsFile←home.GetUserHomeFolder'.tatin'
+              (⊂_path2config)F.NPUT settingsFile 1
+          :Else
+              ⎕NDELETE home.GetUserHomeFolder'.tatin'
+          :EndIf
+          _permanent←buff
+        ∇
+    :EndProperty
+
+
     :Property path2config
     :Access Public Instance
         ∇ r←get
@@ -118,13 +145,13 @@
         ∇
     :EndProperty
 
-    ∇ {r}←AddRegistry y;registry;name;alias;buff
+    ∇ {r}←AddRegistry y;registry;name;alias;buff;reg
    ⍝ Adds the definition of a Registry (as a namespace) to the user settings.\\
    ⍝ If that Registry is already defined an error is thrown.\\
    ⍝ `⍵` must be one of:
    ⍝ * An instance of the "Registry" class.
    ⍝ * A text vector with a name or an alias+name in the format `[alias]name`\\
-   ⍝   In this case `AddRegistry` creates an instance on the fly. Of course thies means that this is
+   ⍝   In this case `AddRegistry` creates an instance on the fly. Of course this means that this is
    ⍝   only suitable in case specifying just the name and optionally the alias is sufficient.
    ⍝ * A namespace that can be used to instanciate the `DefineRegistry` class.\\
    ⍝ `←` is always `⍬` (shy).
@@ -142,29 +169,51 @@
           ((name='\')/name)←'/'
           registry←⎕NEW home.DefineRegistry(,⊂name)
           registry.alias←⎕C alias
-      :Else
+      :ElseIf ∨/'[DefineRegistry]'⍷⍕y
           registry←y
+      :Else
+          registry←⎕NEW home.DefineRegistry(,⊂y)
       :EndIf
-      '⍵ is not instance if the "DefineRegistry" class'Assert∨/'[DefineRegistry]'⍷⍕registry
       :If 0<≢_registries
           'This URI is already defined'Assert~(⊂registry.uri)∊_registries.uri
-          :If 0<≢registry.alias
+          :If 0<registry.⎕NC'alias'
+          :AndIf 0<≢registry.alias
               'This alias is already used for a different uri'Assert~(⊂registry.alias)∊_registries.alias
           :EndIf
       :EndIf
-      buff←registry.Get ⍬
-      :If 0=buff.priority
+      :If ∨/'[DefineRegistry]'⍷⍕registry
+          buff←registry.Get ⍬
+      :Else
+          buff←registry
+      :EndIf
+      :If 0=buff.⎕NC'priority'
+      :OrIf 0=buff.priority
           :If 0=≢_registries
               buff.priority←100
           :Else
               buff.priority←(⌊/_registries.priority)-10
           :EndIf
       :EndIf
+      buff.uri,←('/'≠¯1↑buff.uri)/'/'
       _registries,←buff
       Write ⍬
     ∇
 
-    ∇ {r}←ReplaceRegistry registry;ind
+    ∇ r←{rawFlag}ListRegistries dummy
+    ⍝ List all data of all regsitries.\\
+    ⍝ With `rawflag` being 0 (the default) the result is beautified.
+      :Access Public Instance
+      rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
+      '⍵ must be a Boolean'Assert(⊂rawFlag)∊0 1
+      r←↑registries.(alias uri port priority api_key)
+      :If ~rawFlag
+          r←((,[0.5]'Alias' 'URI' 'Port' 'Priority' 'API-key'),[1]' ')⍪r
+          r[2;]←(⌈⌿≢¨r)⍴¨'-'
+      :EndIf
+    ⍝Done
+    ∇
+
+    ∇ {r}←ReplaceRegistry registry;ind;reg
    ⍝ Replaces the definition of a Registry in the user settings.\\
    ⍝ If that Registry does not already exist an error is thrown.\\
    ⍝ Note that this function requires a URI since an alias is subject to change.\\
@@ -172,13 +221,17 @@
    ⍝ `←` is always `⍬` (shy).
       :Access Public Instance
       r←⍬
-      '⍵ is not instance if the "DefineRegistry" class'Assert∨/'[DefineRegistry]'⍷⍕registry
       :If 0=≢_registries
       :OrIf ~(⊂registry.uri)∊_registries.uri
           'There is no such registry yet'Assert 0
       :EndIf
       ind←_registries.uri⍳⊂registry.uri
-      _registries[ind]←registry.Get ⍬
+      :If ∨/'[DefineRegistry]'⍷⍕registry
+          _registries[ind]←registry.Get ⍬
+      :Else
+          reg←⎕NEW home.DefineRegistry(,⊂registry)
+          _registries[ind]←reg.Get ⍬
+      :EndIf
       Write ⍬
     ∇
 
@@ -196,6 +249,7 @@
       :If 0=≢_registries
           r←0
       :Else
+          'You MUST NOT delete the very last registry!'Assert 1<≢_registries
           :If 0=≢_registries
               r←0
           :Else

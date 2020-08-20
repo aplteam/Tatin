@@ -14,31 +14,35 @@
     ⍝ `y` must be one of:
     ⍝ * A text vector representing a uri
     ⍝ * A text vector representing an alias and a uri (syntax: [alias]domain.com)
-    ⍝ * A namespace holding all the necessary variables. This is typically created by a call to the `Get` function.
+    ⍝ * A namespace holding at least `uri`. This is typically created by a call to the `Get` function, but
+    ⍝   it could have been created "manually".
       :Implements Constructor
       :Access Public
       :If 326=⎕DR y
       :AndIf 0=≡y
           ns←y
-          'Invalid variables'Assert∧/varsList{(⍺∊⍵)∧(⍵∊⍺)}' '~¨⍨↓ns.⎕NL 2
-          uri_←ns.uri
-          '"uri": invalid depth'Assert 1=≡uri_
-          '"uri": invalid data type'Assert' '=1↑0⍴uri_
-          ((uri_='\')/uri_)←'/'
+          ns.port←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'port'
+          ns.priority←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'priority'
+          ns.api_key←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'api_key'
+          ns.alias←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'alias'
+          'Invalid variables'Assert∧/(' '~¨⍨↓ns.⎕NL 2)∊varsList
+          _uri←ns.uri
+          '"uri": invalid depth'Assert 1=≡_uri
+          '"uri": invalid data type'Assert' '=1↑0⍴_uri
+          ((_uri='\')/_uri)←'/'
           ⍎¨ns.{'_',⍵,'←',{0=1↑0⍴⍵:⍕⍵ ⋄ '''',⍵,''''}⍎⍵}¨varsList
       :Else
           :If ∧/'[]'∊y
-              (alias uri_)←{⍵{('[]'~⍨⍵↑⍺)(⍵↓⍺)}⍵⍳']'}y
+              (_alias _uri)←{⍵{('[]'~⍨⍵↑⍺)(⍵↓⍺)}⍵⍳']'}y
           :Else
-              uri_←y
+              _uri←y
               _alias←''
           :EndIf
-          '"uri": invalid depth'Assert 1=≡uri_
-          '"uri": invalid data type'Assert' '=1↑0⍴uri_
-          ((uri_='\')/uri_)←'/'
-          uri_,←('/'≠¯1↑uri_)/'/'
+          '"uri": invalid depth'Assert 1=≡_uri
+          '"uri": invalid data type'Assert' '=1↑0⍴_uri
+          ((_uri='\')/_uri)←'/'
+          _uri,←('/'≠¯1↑_uri)/'/'
           _alias←⎕C _alias
-          _uri←uri_
           _api_key←''
           _port←0
           _priority←0
@@ -103,8 +107,9 @@
 
     :Property priority
     ⍝ The `priority` is used to determine the order of the registries when scanning for a particular package.\\
-    ⍝ It must be an integer greater then zero. If it is zero than the 0 is replaced by the lowest number of any
-    ⍝ defined Registry minus 1. Highest number comes first.
+    ⍝ It must be an integer greater then 0. If it is 0 than it is replaced by the lowest number of any
+    ⍝ defined Registry minus 10 when the registry is added to the user settings class by calling the `AddRegistry`
+    ⍝ method. The highest number is scanned first and so on.
     :Access Public Instance
         ∇ r←get
           r←_priority
@@ -120,7 +125,8 @@
     :EndProperty
 
     ∇ r←Get key;list;bool
-    ⍝ Returns the data as a namespace. "data" is defined as the variables listed by the `varsList` field.
+    ⍝ Returns the data as a namespace. "data" is defined as the variables listed by the `varsList` field in case `key`
+    ⍝ is empty. Otherwise `key` must be a valid variable name.
       :Access Public Instance
       r←#.⎕NS''
       :If (⊂key)∊''⍬

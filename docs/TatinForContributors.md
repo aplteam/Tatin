@@ -2,7 +2,7 @@
 
 If you want to contribute to the [Tatin project on GitHub](https://github.com/aplteam/Tatin) or make adjustments to Tatin for an in-house project, this document will help you.
 
-Tatin is a community project under the MIT license, so everybody is welcome to contribute to the code.
+Tatin is a community project under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody, it is rather a community project.
 
 This is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for "contribute to a github project".
 
@@ -10,6 +10,7 @@ This is not an introduction into how to contribute to a project that is hosted o
 ## Tatin is managed by acre
 
 Note that Tatin is managed by the [acre project management tool](https://github.com/the-carlisle-group/Acre-Desktop).
+If you are not familiar with acre you are advised to spend an hour or so playing with it before using it for serious work.
 
 Though it is possible making changes to Tatin or adding code without acre, it is much easier to use acre.
 
@@ -18,7 +19,7 @@ Though it is possible making changes to Tatin or adding code without acre, it is
 
 In order to work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic). 
 
-You need one of: Windows, Linux, Mac-OS. The Pi is not supported but that restriction might be lifted with a later version. AIX will never be supported.
+You need one of: Windows, Linux, Mac-OS. The Pi is not supported but that restriction might be lifted with a later version. AIX will not be supported.
 
 
 ## How to work on Tatin
@@ -36,7 +37,7 @@ Note that there is no need to save a workspace or anything: every function, oper
 
 ## Prepare either the Client or the Server
 
-If you want to use the Tatin client module execute the function
+If you want to tun any Tatin client code execute the function
 
 ```
 #.Tatin.Admin.Initialize_Client
@@ -127,11 +128,11 @@ Now you are ready to execute the test suite.
 
 ## Do your thing
 
-Now that you have a working version of acre on your machine you can start contributing.
+Now that you have a working version of Tatin on your machine you can start contributing.
 
 If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it: that might well be your first valuable contribution.
 
-Whether you improved just documentation or fixed a bug or added a feature, at the of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is the APL Team Ltd, but this might (and eventually will) change in the future of course.
+Whether you improved just documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is APL Team Ltd, but this might (and eventually will) change in the future of course.
 
 
 ## How to create new versions
@@ -140,17 +141,17 @@ Usually your job is done once you've created a Pull Request (PR). However, here 
 
 In order to create new versions of either the Client or the Server the following steps need to be executed:
 
-1. Change the `#.Tatin.Registry.Version` function; there is a `#.Tatin.Client.Version` as well as a `#.Tatin.Server.Version` function as well, but they both call `#.Tatin.Registry.Version` anyway.
+1. Change the `#.Tatin.Registry.Version` function; there is a `#.Tatin.Client.Version` as well as a `#.Tatin.Server.Version` function, but they both just call `#.Tatin.Registry.Version` anyway.
 
-1. Run either the `#.Tatin.Admin.MakeClient` or the `#.Tatin.Admin.MakeServer` function, but not both in the same workspace.
+1. Run `#.Tatin.Admin.Make`
 
-   These functions put everything together needed to run either the Client or the Server. Eventually it is all copied into a ZIP file. The ZIP file will be saved in the `Dist/` folder and can be published as a release to GitHub.
+   This function will first fire up a session and put together a Client. Along the process it might well ask some quesitons.
+
+   It will then fire up a second session and put together a Server.
+
+   Along the process any existing `.zip` files in the `Dist/` folder will be deleted, and new ones with the current version number will be created. These `.zip` files is what should be released on GitHub as a new release.
 
 Notes:
 
-* Both `Make` function close all open acre projects, so any changes you would make after calling them are _not managed by acre_!
-
-* In case you need to create both Client and Server you need to restart with a fresh instance of Dyalog after having called the first `Make` function.
-
 | Created:       | 2020-08-11
-| Latest update: | 2020-08-11
+| Latest update: | 2020-08-19

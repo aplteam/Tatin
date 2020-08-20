@@ -1,5 +1,5 @@
- r←Test_ClientConfig_105(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg;res
-⍝ Remove the one and only Registry
+ r←Test_ClientConfig_105(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg1;reg2;qdmx
+⍝ Exercise ReplaceRegistry on a registry that does not exist
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -7,14 +7,19 @@
  F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- →T.GoToTidyUp 0≠≢settings.registries
-
- reg←⎕NEW TC.DefineRegistry(,⊂'https://tatin.dev')
- settings.AddRegistry reg
  →T.GoToTidyUp 1≠≢settings.registries
 
- →T.GoToTidyUp 1≠res←settings.RemoveRegistry'https://tatin.dev'
- →T.GoToTidyUp 0≠res←settings.RemoveRegistry'https://tatin.dev'
+ reg1←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
+ reg1.alias←'foo'
+ reg1.api_key←'Firlefanz'
+
+ :Trap 98
+     settings.ReplaceRegistry reg1
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'There is no such registry yet'≢qdmx.EM
+ :EndTrap
 
  r←T._OK
 

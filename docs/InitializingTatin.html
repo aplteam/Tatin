@@ -14,116 +14,33 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </head>
 <body>
 <div class="h_tag">
-<a href="#Tatin-for-contributors" id="Tatin-for-contributors" class="autoheader_anchor">
-<h1 data-id="Tatin-for-contributors">Tatin for contributors</h1>
+<a href="#Initializing-Tatin" id="Initializing-Tatin" class="autoheader_anchor">
+<h1 data-id="Initializing-Tatin">Initializing Tatin</h1>
 </a>
 </div>
-<p>If you want to contribute to the <a href="https://github.com/aplteam/Tatin" class="external_link">Tatin project on GitHub</a> or make adjustments to Tatin for an in-house project, this document will help you.</p>
-<p>Tatin is a community project under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody, it is rather a community project.</p>
-<p>This is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for “contribute to a github project”.</p>
 <div class="h_tag">
-<a href="#Tatin-is-managed-by-acre" id="Tatin-is-managed-by-acre" class="autoheader_anchor">
-<h2 data-id="Tatin-is-managed-by-acre">Tatin is managed by acre</h2>
+<a href="#Overview" id="Overview" class="autoheader_anchor">
+<h2 data-id="Overview">Overview</h2>
 </a>
 </div>
-<p>Note that Tatin is managed by the <a href="https://github.com/the-carlisle-group/Acre-Desktop" class="external_link">acre project management tool</a>. If you are not familiar with acre you are advised to spend an hour or so playing with it before using it for serious work.</p>
-<p>Though it is possible making changes to Tatin or adding code without acre, it is much easier to use acre.</p>
+<p>Note that you need to worry about this only if you use version 18.0: with version 19.0 or later Tatin will be available in <code>⎕SE</code> after a standard installation anyway.</p>
+<p>Otherwise there are two different scenarios:</p>
+<ul>
+<li>You may establish Tatin in <code>⎕SE</code> via a script <code>setup.dyalog</code> in your <code>MyUCMDs\</code> folder.
+<ul>
+<li>If that script does not yet exist you may create it and add a Tatin-specific line to it.</li>
+<li>If there is already such a script you may add a Tatin-specific line to it.</li>
+</ul>
+<p><code>setup.dyalog</code> is executed at a very early stage when Dyalog APL is instanciated. As a result Tatin is already loaded into <code>⎕SE</code> when you gain control over the session.</p>
+<p>The disadvantage of this approach is that Tatin will always be loaded, no matter whether you need it or not.</p></li>
+<li>Instead you may force Tatin's initialization by executing any Tatin user command: it will realize that Tatin as such has not been established in <code>⎕SE</code> yet, and do that for you.
+<p>The disadvantage of this approach is that the Tatin API is only available after having executed any Tatin user command.</p></li>
+</ul>
 <div class="h_tag">
-<a href="#Requirements" id="Requirements" class="autoheader_anchor">
-<h2 data-id="Requirements">Requirements</h2>
+<a href="#On-setupdyalog" id="On-setupdyalog" class="autoheader_anchor">
+<h2 data-id="On-setupdyalog">On <code>setup.dyalog</code></h2>
 </a>
 </div>
-<p>In order to work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic).</p>
-<p>You need one of: Windows, Linux, Mac-OS. The Pi is not supported but that restriction might be lifted with a later version. AIX will not be supported.</p>
-<div class="h_tag">
-<a href="#How-to-work-on-Tatin" id="How-to-work-on-Tatin" class="autoheader_anchor">
-<h2 data-id="How-to-work-on-Tatin">How to work on Tatin</h2>
-</a>
-</div>
-<p>After downloading Tatin from GitHub and saving it somewhere, say in <code>C:\Tatin</code>, you issue the command</p>
-<pre><code>]acre.OpenProject C:\Tatin #.Tatin</code></pre>
-<p>and you are ready to go.</p>
-<p>Note that there is no need to save a workspace or anything: every function, operator, class, interface or namespace script changed in <code>#.Tatin</code> will be automatically saved to disk by acre.</p>
-<div class="h_tag">
-<a href="#Prepare-either-the-Client-or-the-Server" id="Prepare-either-the-Client-or-the-Server" class="autoheader_anchor">
-<h2 data-id="Prepare-either-the-Client-or-the-Server">Prepare either the Client or the Server</h2>
-</a>
-</div>
-<p>If you want to tun any Tatin client code execute the function</p>
-<pre><code>#.Tatin.Admin.Initialize_Client</code></pre>
-<p>If you want to run the Tatin Server execute the function</p>
-<pre><code>#.Tatin.Admin.Initialize_Server</code></pre>
-<p>You are advised not to run the Client and the Server in the same workspace.</p>
-<div class="h_tag">
-<a href="#Execute-the-test-cases" id="Execute-the-test-cases" class="autoheader_anchor">
-<h2 data-id="Execute-the-test-cases">Execute the test cases</h2>
-</a>
-</div>
-<p>By default port 443 is used for the test cases. You may change the INI files for both server and client if that does not work for you.</p>
-<p>In order to execute the full test suite you need to start a Tatin Server first. For that execute the following steps:</p>
-<ol start="1">
-<li>Instantiate Dyalog Unicode 18.0 or later</li>
-<li>Execute this:
-<pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
-<li>Execute this:
-<pre><code>#.Tatin.Admin.Initialize_Server</code></pre>
-<p>This changes the current directory, loads required dependencies and establishes all required references.</p></li>
-<li>Execute this:
-<pre><code>#.Tatin.TestCasesServer.Prepare</code></pre>
-<p>This instantiates the <code>Tester2</code> class under the name <code>T</code>.</p></li>
-<li>Execute this:
-<pre><code>#.Tatin.TestCasesServer.T.Run 1</code></pre>
-<p>This will start a Tatin server.</p></li>
-</ol>
-<p>Now you are ready to execute the test suite.</p>
-<ol start="1">
-<li>Instantiate Dyalog Unicode 18.0 or later</li>
-<li>Execute this:
-<pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
-<li>Execute this:
-<pre><code>#.Tatin.Admin.Initialize_Client</code></pre>
-<p>This changes the current directory, loads required dependencies and establishes all required references.</p></li>
-<li>Execute this:
-<pre><code>#.Tatin.TestCases.Prepare</code></pre>
-<p>This instantiates the <code>Tester2</code> class under the name <code>T</code>.</p></li>
-<li>Execute this:
-<pre><code>#.Tatin.TestCases.T.Run 1</code></pre>
-<p>This will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
-</ol>
-<div class="h_tag">
-<a href="#Do-your-thing" id="Do-your-thing" class="autoheader_anchor">
-<h2 data-id="Do-your-thing">Do your thing</h2>
-</a>
-</div>
-<p>Now that you have a working version of Tatin on your machine you can start contributing.</p>
-<p>If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it: that might well be your first valuable contribution.</p>
-<p>Whether you improved just documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is APL Team Ltd, but this might (and eventually will) change in the future of course.</p>
-<div class="h_tag">
-<a href="#How-to-create-new-versions" id="How-to-create-new-versions" class="autoheader_anchor">
-<h2 data-id="How-to-create-new-versions">How to create new versions</h2>
-</a>
-</div>
-<p>Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.</p>
-<p>In order to create new versions of either the Client or the Server the following steps need to be executed:</p>
-<ol start="1">
-<li>Change the <code>#.Tatin.Registry.Version</code> function; there is a <code>#.Tatin.Client.Version</code> as well as a <code>#.Tatin.Server.Version</code> function, but they both just call <code>#.Tatin.Registry.Version</code> anyway.</li>
-<li>Run <code>#.Tatin.Admin.Make</code>
-<p>This function will first fire up a session and put together a Client. Along the process it might well ask some quesitons.</p>
-<p>It will then fire up a second session and put together a Server.</p>
-<p>Along the process any existing <code>.zip</code> files in the <code>Dist/</code> folder will be deleted, and new ones with the current version number will be created. These <code>.zip</code> files is what should be released on GitHub as a new release.</p></li>
-</ol>
-<p>Notes:</p>
-<table>
-<tbody>
-<tr>
-<td>Created:</td>
-<td>2020-08-11</td>
-</tr>
-<tr>
-<td>Latest update:</td>
-<td>2020-08-19</td>
-</tr>
-</tbody>
-</table>
+<p>⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹</p>
 </body>
 </html>

@@ -1,0 +1,12 @@
+ r←Test_ClientConfig_004(stopFlag batchFlag);⎕TRAP;res
+⍝ List all registries while we have only one
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←⎕SE.Tatin.MyUserSettings.ListRegistries ⍬
+ →T.PassesIf 4 5≡⍴res
+ res←1 ⎕SE.Tatin.MyUserSettings.ListRegistries ⍬
+ →T.PassesIf 2 5≡⍴res
+
+ r←T._OK
+⍝Done

@@ -5,7 +5,7 @@
 ⍝ Under Windows typically:\\
 ⍝ `C:\Users\{⎕AN}\AppData\Local\Tatin'     ←→ GetUserHomeFolder ''
 ⍝ `C:\Users\{⎕AN}\AppData\Local\Tatin\foo' ←→ GetUserHomeFolder 'foo'
-⍝ On non-Windows platoforms:\\
+⍝ On non-Windows platforms:\\
 ⍝ '/home/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''
 ⍝ '/home/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'
 ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
@@ -15,14 +15,14 @@
      (w l)←'WL'∊''⍴p
      d←'/Tatin'
      (h lad)←2 ⎕NQ'.' 'GetEnvironment'('HOME' 'LOCALAPPDATA')
-     w:lad,d,add            ⍝ windows
+     w:F.ExpandPath lad,d,add           ⍝ windows
 
      as←'/Library/Application Support'  ⍝ special mac folder
-     l∧0≠≢h:h,d,add         ⍝ linux
-     0≠≢h:h,as,d,add        ⍝ mac
+     l∧0≠≢h:F.ExpandPath h,d,add        ⍝ linux
+     0≠≢h:F.ExpandPathh,as,d,add        ⍝ mac
 
      u←⊃~∘∊⍨2 ⎕NQ'.' 'GetEnvironment'('LOGNAME' 'USER' 'LNAME' 'USERNAME')
-     0=≢u:d                 ⍝ ? what if no user found  ⍝TODO⍝
-     l:'/home/',u,d,add     ⍝ linux
-     '/Users/',u,as,d,add   ⍝ mac
+     0=≢u:d                             ⍝ ? what if no user found  ⍝TODO⍝
+     l:'/home/',u,d,add                 ⍝ linux
+     '/Users/',u,as,d,add               ⍝ mac
  }

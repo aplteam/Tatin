@@ -1,5 +1,5 @@
- r←Test_ClientConfig_104(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg1;reg2;qdmx
-⍝ Exercise ReplaceRegistry on a registry that does not exist
+ r←Test_ClientConfig_104(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns;list
+⍝ Exercise both AddRegistry and ReplaceRegistry with ⎕NS''
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -7,33 +7,27 @@
  F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- →T.GoToTidyUp 0≠≢settings.registries
-
- reg1←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
- reg1.alias←'foo'
- reg1.api_key←'Firlefanz'
-
- :Trap 98
-     settings.ReplaceRegistry reg1
-     →T.FailsIf 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'There is no such registry yet'≢qdmx.EM
- :EndTrap
-
- reg2←⎕NEW TC.DefineRegistry(,⊂'https://tatin.dev')
- settings.AddRegistry reg2
  →T.GoToTidyUp 1≠≢settings.registries
+ ns←⎕NS''
+ ns.uri←'https://localhost'
 
- :Trap 98
-     settings.ReplaceRegistry reg1
-     →T.FailsIf 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'There is no such registry yet'≢qdmx.EM
- :EndTrap
+ settings.AddRegistry ns
+ list←1 settings.ListRegistries ⍬
+ →T.PassesIf 2=≢list
+ →T.PassesIf list[;1]∆LazyMatch'tatin' ''
+
+ ns←⎕NS''
+ ns.uri←'https://localhost/'
+ ns.priority←999
+ ns.api_key←'xxx'
+ ns.alias←'foo'
+ settings.ReplaceRegistry ns
+ list←1 settings.ListRegistries ⍬
+ →T.PassesIf 2=≢list
+ →T.PassesIf list[;1]∆LazyMatch'tatin' 'foo'
+
 
  r←T._OK
 
 ∆TidyUp:
- F.RmDir tempDir
+ Assert 0=⊃F.RmDir tempDir

@@ -1,9 +1,24 @@
- ListRegistries←{
-⍝ List all registries defined in the Client's config file.
+ {r}←{rawFlag}ListRegistries type
+⍝ List all registries defined in the Client's config file.\\
 ⍝ Returns a matrix with two columns:
 ⍝ * [;1] URL
 ⍝ * [;2] Alias\\
-⍝ The right argument is ignored
-     0=≢MyUserSettings.registries:0 2⍴''
-     ↑(MyUserSettings.registries).(uri alias)
- }
+⍝ "type" must be either 0 or 1 or empty:\\
+⍝ * 1 means all data is listed
+⍝ * Everything else mease just the alias and the uri are listed\\
+⍝ "rawFlag" defaults to 0 and must be Boolean. If it is 1 then no beautifying takes place.
+ r←(0,(2+3×1≡type))⍴''
+ rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
+ '"rawFlag" (⍺) must be a Boolean'Assert(⊂rawFlag)∊0 1
+ '"type" (⍵) must be a Boolean or empty'Assert(⊂type)∊0 1 ''⍬
+ :If 0<≢MyUserSettings.registries
+     :If 1≡type
+         r←↑MyUserSettings.registries.(alias uri port priority api_key)
+     :Else
+         r←↑(MyUserSettings.registries).(uri alias)
+     :EndIf
+     :If ~rawFlag
+         r←((,[0.5]'Alias' 'URI',(1≡type)/'Port' 'Priority' 'API-key'),[1]' ')⍪r
+         r[2;]←(⌈⌿≢¨r)⍴¨'-'
+     :EndIf
+ :EndIf

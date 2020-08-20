@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.
+⍝ * 0.8.2 - 2020-08-18
+⍝   * `ListPackages` throws an error in case the -tags keyword was set but it is not an HTTP request
 ⍝ * 0.8.1 - 2020-08-15
 ⍝   * ]tatin.version fixed.
 ⍝ * 0.8.0 - 2020-08-15
@@ -15,7 +17,7 @@
 
     ⎕IO←1 ⋄ ⎕ML←1
 
-    NM←'Tatin'
+    NM←'tatin'
     RS←'#._tatin' ⍝ target root space for packages
     SupportedExtensions←'.aplc' '.apln' '.apli' '.aplf' '.aplo' '.apla' '.charlist' '.charmat' '.charstring' '.dyalog'
     RegKey←'HKCU\Software\Tatin\ConfigPath'
@@ -168,6 +170,7 @@
           parms.group←Arg.group
       :EndIf
       :If 0≢Arg.tags
+          '-tags keyword is only supported in HTTP requests'Assert TC.Reg.IsHTTP Arg._1
           parms.tags←Arg.tags
       :EndIf
       r←⍪parms TC.ListPackages registry

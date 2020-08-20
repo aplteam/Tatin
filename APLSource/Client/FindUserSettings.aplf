@@ -10,7 +10,8 @@
  :If F.IsFile path,'/.tatin'
      buff←⊃F.NGET path,'/.tatin'
  :AndIf 0<≢buff~⎕TC
-     filename←path
+     filename←(buff~⎕TC),'/',UserSettings.cfg_name
+     ('.tatin points to ',(buff~⎕TC),' but there is no file ',UserSettings.cfg_name,'?!')Assert F.IsFile filename
      :If 0=≢⊃F.NGET filename
          ('File "',filename,'" does not point to a folder')Assert F.IsDir filename
      :EndIf

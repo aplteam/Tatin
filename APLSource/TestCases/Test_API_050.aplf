@@ -1,4 +1,4 @@
- r←Test_API_050(stopFlag batchFlag);⎕TRAP;dir;US;myReg1;myReg2
+ r←Test_API_050(stopFlag batchFlag);⎕TRAP;dir;US;myReg1
 ⍝ Exercise ⎕SE.Tatin.UserSettings and ⎕SE.Tatin.DefineRegistry: create a temporay user config file
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -12,13 +12,8 @@
  →T.GoToTidyUp'https://MyCompany.com/'≢myReg1.uri
  US.AddRegistry myReg1
 
- myReg2←⎕NEW ⎕SE.Tatin.DefineRegistry(,⊂'[tatin]https://tatin.dev/')
- →T.GoToTidyUp'tatin'≢myReg2.alias
- →T.GoToTidyUp'https://tatin.dev/'≢myReg2.uri
- US.AddRegistry myReg2
-
- →T.GoToTidyUp'my' 'tatin'≢US.registries.alias
- →T.GoToTidyUp'https://MyCompany.com/' 'https://tatin.dev/'≢US.registries.uri
+ →T.GoToTidyUp~'my' 'tatin'∆LazyMatch US.registries.alias
+ →T.GoToTidyUp~'https://MyCompany.com/' 'https://tatin.dev/'∆LazyMatch US.registries.uri
 
  r←T._OK
 

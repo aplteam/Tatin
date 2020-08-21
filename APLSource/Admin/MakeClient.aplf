@@ -1,4 +1,4 @@
- {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list;zipFilename;zipContent;fileList
+ {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list;zipFilename;zipContent;fileList;b
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
 ⍝ process whit ⍵←1. In case of a problem an error is thrown whit ⍵←0 and ⎕⎕off 123 in case ⍵←1.\\
 ⍝ `type` specifies what part of the version number should be bumped. 0 means only the build ID, which is always bumped.\\
@@ -78,7 +78,10 @@
              :EndIf
          :EndIf
          (success more list)←('./Assets/Runtime/Conga/')F.CopyTree myucmds,'/Tatin/Assets/Runtime/Conga/'
-         more Assert success ⍝ Might fail because the Conga DLLs are in use
+         :If 0=success
+         :AndIf 0∊b←(0=≢¨list[;3])∨∨/¨'The process cannot access the file'∘⍷¨list[;3]
+             ('Problems with ',⊃{⍺,',',⍵}/⊃{⍺,⍵}/¨1↓¨⎕NPARTS¨(~b)/list[;1])Assert 0 ⍝ Might fail because the Conga DLLs are in use
+         :EndIf
      :EndIf
      path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
      :If 0=F.IsFile path

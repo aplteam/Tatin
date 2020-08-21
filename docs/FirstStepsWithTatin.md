@@ -50,9 +50,9 @@ The square brackets around "tatin" declare that string to be an alias. Without t
 A> ### Local and remote Registries
 A>
 A> The Tatin client can access packes that are managed by a Tatin Server but also Registries that are locally available. 
-A> In order to address a local Registry you would just provide the path to it. The folder _must_ contain a file ffoo.xyz in order to qualify as a Registry.
+A> In order to address a local Registry you would just provide the path to it.
 A>
-A> Of course
+A> Of course features like listing only packages that carry a specific tag are only available when a Registry is managed by a Tatin server.
 
 Note that the list comprehends not only group names and package names but also the major version number of each package. This is because in principle these packages:
 
@@ -62,7 +62,7 @@ aplteam-misc-1.1.0
 aplteam-misc-1.1.1
 ```
 
-These are all different versions of the _same_ package while these:
+...are all different versions of the _same_ package while these:
 
 ```
 aplteam-misc-1.0.0
@@ -70,7 +70,7 @@ aplteam-misc-2.0.0
 
 ```
 
-are considered to be as diffent as these:
+...are considered to be as diffent as these:
 
 ```
 aplteam-This-1.0.0
@@ -92,17 +92,17 @@ A> ### Searching for tags
 A>
 A> Note that the search for a tag follows this strategy:
 A> 1. First Tatin tries to find 100% matches
-A> 1. If that does not yield results, it tries to find the search string _somewhere_ in tags (`⍷`)
+A> 1. If that does not yield results, it tries to find the search string _somewhere_ in the tags (`⍷`)
 A> 1. If that does not yield a result then a fuzzy search is performed
 A> 
 A> The fuzzy search would find "windows" when you enter "winndows" and "linux" when you enter "linuks". It has limits but in practice it works quite well unless the tags are very short: typing "AY" when you meant "AI" would not work.
 A>
 A> Notes:
-A> * The strategy outlined above is applied on each tag independently
-A> * Entering more than a single tag would mean that only packages that carry _all of them_ would qualify
-A> * Searching for tags is an action that is carried out by a Tatin Server. That means that specifying `-tags=` makes sense only in HTTP requests: only then is there a server on the other side that can process the reuqest.
+A> * The strategy outlined above is applied on each tag independently.
+A> * Entering more than a single tag would mean that only packages that carry _all of them_ would qualify.
+A> * Searching for tags is an action that is carried out by a Tatin Server. That means that specifying `-tags=` makes sense only in HTTP requests: only then is there a server on the other side that can process the request.
 
-In our case we look for something that runs on all platforms. For that we execute this user command:
+In our case we look for something that runs on all platforms. The user command `ListTags` takes one or more tags and returns a list of tags that were also found in the packages that carried the specified tags:
 
 ```
             ]Tatin.Listtags [tatin] -tags=mack-os,markd
@@ -118,7 +118,7 @@ That's good: there must be at least one package that carries the tags "mac-os" a
 
 Note that although we misspelled "mac-os" as "mack-os" it was still identified correctly. Similarly, "markd" was enough for finding "markdown". 
 
-We are now ready to identify that package:
+We are now ready to identify that package by executing `ListPackages` with the `-tags` option:
 
 ```
            ]tatin.ListPackages [tatin] -tags=mac-os,markdown
@@ -128,7 +128,7 @@ We are now ready to identify that package:
 
 ```
 
-Note that because packages which share the same group and name but have different major version numbers are considered to be different packages the major version number is part of the list.
+Note that because packages which share the same group and name but have different major version numbers are considered to be different packages, the major version number is part of the list.
 
 
 The last question is: how many versions of that package are available:
@@ -138,7 +138,7 @@ The last question is: how many versions of that package are available:
  aplteam-MarkAPL-9.1.1  
 ```
 
-We could have specified the major number as well:
+We could have specified the major number as well though it does not make a differenc here because there's just one anyway:
 
 ```
        ]tatin.ListVersions [tatin]aplteam-MarkAPL-9
@@ -159,7 +159,7 @@ Let's assume that you are not certain whether you really want to use `MarkAPL`, 
 
 That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves to trail in the file system if that can be avoided.
 
-In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system. 
+In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there is a footprint left in the file system.
 
 Let's load the `MarkAPL` package into the workspace:
 

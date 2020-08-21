@@ -1,4 +1,4 @@
- {r}←{pathToUserSettings}EstablishClientInQuadSE dummy;C;Establish;ref
+ {r}←{pathToUserSettings}EstablishClientInQuadSE dummy;C;Establish;ref;reg
 ⍝ This function is called in order to establish the Tatin Client in ⎕SE._Tatin and to establish
 ⍝ the API within ⎕SE.Tatin.
 ⍝ By default the UserSettings class is instantiated with the default path as argument.
@@ -29,5 +29,14 @@
  C←##.Client
  C.InitUserSettings pathToUserSettings
  ⎕SE.Tatin.MyUserSettings←C.MyUserSettings
+
+⍝TODO⍝ --- this is a temporary measure until we have a proper authentication system in place ---
+ reg←⎕SE.Tatin.MyUserSettings.GetRegistry'[tatin]'
+ :If 0=≢reg.api_key
+     reg.api_key←'f272c8cf-eb99-62b8-f297-60be1a266676'
+     ⎕SE.Tatin.MyUserSettings.ReplaceRegistry reg
+ :EndIf
+⍝TODO⍝ --- End ---
+
  InitConga ⍬
 ⍝Done

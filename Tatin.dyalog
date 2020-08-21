@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.
+⍝ * 0.9.0 - 2020-08-20
+⍝   * ListRegistry now accepts flags -all
 ⍝ * 0.8.2 - 2020-08-18
 ⍝   * `ListPackages` throws an error in case the -tags keyword was set but it is not an HTTP request
 ⍝ * 0.8.1 - 2020-08-15
@@ -37,7 +39,7 @@
           c←⎕NS ⍬
           c.Name←'ListRegistries'
           c.Desc←'Lists all registries defined in the user settings'
-          c.Parse←'0 -raw'
+          c.Parse←'0 -raw -all'
           r,←c
      
           c←⎕NS ⍬
@@ -257,11 +259,15 @@
       :EndTrap
     ∇
 
-    ∇ r←ListRegistries Arg
-      r←TC.ListRegistries''
-      :If 0=Arg.raw
-          r(AddHeader)←'URL' 'Alias'
+    ∇ r←ListRegistries Arg;type;rawFlag
+      type←rawFlag←0
+      :If 0≢Arg.Switch'raw'
+          rawFlag←Arg.Switch'raw'
       :EndIf
+      :If 0≢Arg.Switch'all'
+          type←Arg.Switch'all'
+      :EndIf
+      r←rawFlag TC.ListRegistries type
     ∇
 
     ∇ r←ListTags Arg;parms
@@ -473,7 +479,6 @@
       TC←⎕SE._Tatin.Client
       :Select ⎕C Cmd
       :Case ⎕C'LoadTatin'
-          r,←⊂']',NM,'.LoadTatin'
           r,←⊂''
           r,←⊂'This loads the Tatin client into ⎕SE and initializes it if it''s not already there.'
           r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
@@ -486,12 +491,11 @@
           r,←⊂''
           r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
       :Case ⎕C'ListRegistries'
-          r,←⊂']',NM,'.ListRegistries'
           r,←⊂''
           r,←⊂'Lists the paths and alias of all Registries defined in the user settings.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw table.'
+          r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all data.'
       :Case ⎕C'ListPackages'
-          r,←⊂']',NM,'.ListPackages [path|alias] -raw -group= -tags='
           r,←⊂''
           r,←⊂'Lists all groups defined in the Registry specified as an argument.'
           r,←⊂'* If you specify an alias it MUST be embraced by square brackets as in [MyAlias]'
@@ -504,7 +508,6 @@
           r,←⊂'    If you need to specify more than one tag the enclose then separate them by commas.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
-          r,←⊂']',NM,'.LoadPackage [alias]package-id  #.NS'
           r,←⊂''
           r,←⊂'Load the specified package and all its dependencies into the workspace'
           r,←⊂'Requires two arguments:'
@@ -514,7 +517,6 @@
           r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
           r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
-          r,←⊂']',NM,'.InstallPackage [alias]package-id  /path/to/folder -load='
           r,←⊂''
           r,←⊂'Installs the given package and all its dependencies into the given folder which'
           r,←⊂'must exist.'
@@ -529,13 +531,11 @@
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
           r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
       :Case ⎕C'LoadDependencies'
-          r,←⊂']',NM,'.LoadDependencies [alias]package-id  #.NS'
           r,←⊂''
           r,←⊂'Takes two arguments:'
           r,←⊂'[1] A folder into which one or more packages have been installed.'
           r,←⊂'[2] A namespace into which the packages are going to be loaded.'
       :Case ⎕C'UserSettings'
-          r,←⊂']',NM,'.UserSettings'
           r,←⊂''
           r,←⊂'Prints the user settings to the session in JSON format.'
           r,←⊂''
@@ -544,7 +544,6 @@
           r,←⊂'to the session then you are advised to used the API. Note that there is a dedicated'
           r,←⊂'document for how to use the API, and what for.'
       :Case ⎕C'PackageConfig'
-          r,←⊂']',NM,'.PackageConfig'
           r,←⊂''
           r,←⊂'The argument may be a http request or a path'
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
@@ -556,7 +555,6 @@
           r,←⊂''
           r,←⊂'In case of success a text vector with NLs in it is returned, otherwise an empty vector.'
       :Case ⎕C'PackageDependencies'
-          r,←⊂']',NM,'.PackageDependencies'
           r,←⊂''
           r,←⊂'Takes a path to a folder and returns the contents of the file "apl-dependencies.txt".'
           r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
@@ -570,7 +568,6 @@
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is usually asked'
           r,←⊂'in conjunction with the -delete flag is probably only useful with test cases.'
       :Case ⎕C'Pack'
-          r,←⊂']',NM,'.Pack'
           r,←⊂''
           r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
           r,←⊂''
@@ -579,7 +576,6 @@
           r,←⊂'Note that if ⍵[2] does not start with "." or "/" it is relative to ⍵[1], Therefore, if you'
           r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
       :Case ⎕C'Publish'
-          r,←⊂']',NM,'.Publish'
           r,←⊂''
           r,←⊂'Publish a ZIP file (typically created with ]Tatin.Zip) to a particular Registry Server.'
           r,←⊂''
@@ -590,11 +586,9 @@
           r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question usually asked before'
           r,←⊂'a package is actually published is probably only useful with test cases.'
       :Case ⎕C'Version'
-          r,←⊂']',NM,'.Version'
           r,←⊂''
           r,←⊂'Prints name, version number and version date of the client to the session.'
       :Case ⎕C'ListTags'
-          r,←⊂']',NM,'.Version'
           r,←⊂''
           r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
       :Else

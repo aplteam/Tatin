@@ -54,19 +54,19 @@ Group    Package Name     Major
 <p>The square brackets around “tatin” declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like <code>https://localhost/my_tatin_server</code>.</p>
 <div class="leanpub_A">
 <h3>Local and remote Registries</h3>
-<p>The Tatin client can access packes that are managed by a Tatin Server but also Registries that are locally available. In order to address a local Registry you would just provide the path to it. The folder <em>must</em> contain a file ffoo.xyz in order to qualify as a Registry.</p>
-<p>Of course</p>
+<p>The Tatin client can access packes that are managed by a Tatin Server but also Registries that are locally available. In order to address a local Registry you would just provide the path to it.</p>
+<p>Of course features like listing only packages that carry a specific tag are only available when a Registry is managed by a Tatin server.</p>
 </div>
 
 <p>Note that the list comprehends not only group names and package names but also the major version number of each package. This is because in principle these packages:</p>
 <pre><code>aplteam-misc-1.0.0
 aplteam-misc-1.1.0
 aplteam-misc-1.1.1</code></pre>
-<p>These are all different versions of the <em>same</em> package while these:</p>
+<p>…are all different versions of the <em>same</em> package while these:</p>
 <pre><code>aplteam-misc-1.0.0
 aplteam-misc-2.0.0
 </code></pre>
-<p>are considered to be as diffent as these:</p>
+<p>…are considered to be as diffent as these:</p>
 <pre><code>aplteam-This-1.0.0
 aplteam-That-1.0.0</code></pre>
 <div class="leanpub_A">
@@ -85,19 +85,19 @@ aplteam-That-1.0.0</code></pre>
 <p>Note that the search for a tag follows this strategy:</p>
 <ol start="1">
 <li>First Tatin tries to find 100% matches</li>
-<li>If that does not yield results, it tries to find the search string <em>somewhere</em> in tags (<code>⍷</code>)</li>
+<li>If that does not yield results, it tries to find the search string <em>somewhere</em> in the tags (<code>⍷</code>)</li>
 <li>If that does not yield a result then a fuzzy search is performed</li>
 </ol>
 <p>The fuzzy search would find “windows” when you enter “winndows” and “linux” when you enter “linuks”. It has limits but in practice it works quite well unless the tags are very short: typing “AY” when you meant “AI” would not work.</p>
 <p>Notes:</p>
 <ul>
-<li>The strategy outlined above is applied on each tag independently</li>
-<li>Entering more than a single tag would mean that only packages that carry <em>all of them</em> would qualify</li>
-<li>Searching for tags is an action that is carried out by a Tatin Server. That means that specifying <code>-tags=</code> makes sense only in HTTP requests: only then is there a server on the other side that can process the reuqest.</li>
+<li>The strategy outlined above is applied on each tag independently.</li>
+<li>Entering more than a single tag would mean that only packages that carry <em>all of them</em> would qualify.</li>
+<li>Searching for tags is an action that is carried out by a Tatin Server. That means that specifying <code>-tags=</code> makes sense only in HTTP requests: only then is there a server on the other side that can process the request.</li>
 </ul>
 </div>
 
-<p>In our case we look for something that runs on all platforms. For that we execute this user command:</p>
+<p>In our case we look for something that runs on all platforms. The user command <code>ListTags</code> takes one or more tags and returns a list of tags that were also found in the packages that carried the specified tags:</p>
 <pre><code>            ]Tatin.Listtags [tatin] -tags=mack-os,markd
  apltree
  converter
@@ -107,17 +107,17 @@ aplteam-That-1.0.0</code></pre>
  windows</code></pre>
 <p>That's good: there must be at least one package that carries the tags “mac-os” and “markdown” but <em>also</em> the tags “windows” and “linux”, so there will be a package available that runs on all major platforms.</p>
 <p>Note that although we misspelled “mac-os” as “mack-os” it was still identified correctly. Similarly, “markd” was enough for finding “markdown”.</p>
-<p>We are now ready to identify that package:</p>
+<p>We are now ready to identify that package by executing <code>ListPackages</code> with the <code>-tags</code> option:</p>
 <pre><code>           ]tatin.ListPackages [tatin] -tags=mac-os,markdown
  Group    Package Name  Major
  -----    ------------  -----
  aplteam  MarkAPL       9
 </code></pre>
-<p>Note that because packages which share the same group and name but have different major version numbers are considered to be different packages the major version number is part of the list.</p>
+<p>Note that because packages which share the same group and name but have different major version numbers are considered to be different packages, the major version number is part of the list.</p>
 <p>The last question is: how many versions of that package are available:</p>
 <pre><code>       ]tatin.ListVersions [tatin]aplteam-MarkAPL
  aplteam-MarkAPL-9.1.1</code></pre>
-<p>We could have specified the major number as well:</p>
+<p>We could have specified the major number as well though it does not make a differenc here because there's just one anyway:</p>
 <pre><code>       ]tatin.ListVersions [tatin]aplteam-MarkAPL-9
  aplteam-MarkAPL-9.1.1</code></pre>
 <p>We could also have specified the minor number:</p>
@@ -130,7 +130,7 @@ aplteam-That-1.0.0</code></pre>
 </div>
 <p>Let's assume that you are not certain whether you really want to use <code>MarkAPL</code>, you just want to check it out.</p>
 <p>That can be achieved with the <code>LoadPackage</code> user command. That loads the package into the workspace and leaves to trail in the file system if that can be avoided.</p>
-<p>In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system.</p>
+<p>In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there is a footprint left in the file system.</p>
 <p>Let's load the <code>MarkAPL</code> package into the workspace:</p>
 <pre><code>      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-9.1.1
 </code></pre>

@@ -1,4 +1,4 @@
- {r}←{rawFlag}ListRegistries type
+ r←{rawFlag}ListRegistries type
 ⍝ List all registries defined in the Client's config file.\\
 ⍝ Returns a matrix with two columns:
 ⍝ * [;1] URL
@@ -14,6 +14,7 @@
  :If 0<≢MyUserSettings.registries
      :If 1≡type
          r←↑MyUserSettings.registries.(alias uri port priority api_key)
+         r[;5]←{0=≢⍵:⍵ ⋄ '***'}¨r[;5]       ⍝ Replace any non-empty API key by asterisks
      :Else
          r←↑(MyUserSettings.registries).(uri alias)
      :EndIf

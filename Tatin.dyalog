@@ -172,7 +172,6 @@
           parms.group←Arg.group
       :EndIf
       :If 0≢Arg.tags
-          '-tags keyword is only supported in HTTP requests'Assert TC.Reg.IsHTTP Arg._1
           parms.tags←Arg.tags
       :EndIf
       r←⍪parms TC.ListPackages registry

@@ -1,12 +1,18 @@
- response←request GetVersionList packageID;data;html
- :If 0<≢data←Reg.ListVersions G.RegistryPath,packageID
-     :If IsJsonRequest request.Headers
-         response←request ReturnJSON Reg.JSON data
+ response←request GetVersionList packageID;data;html;qdmx
+ :Trap 98
+     :If 0<≢data←Reg.ListVersions G.RegistryPath,packageID
+         :If IsJsonRequest request.Headers
+             response←request ReturnJSON Reg.JSON data
+         :Else
+             html←PrepareHtmlPageForVersionList data
+             response←request ReturnHTML html
+         :EndIf
      :Else
-         html←PrepareHtmlPageForVersionList data
-         response←request ReturnHTML html
+         response←request R.Respond 404 1
      :EndIf
  :Else
-     response←request R.Respond 404 1
- :EndIf
+     qdmx←⎕DMX
+     response←request R.Respond 400 0
+     response.Content←qdmx.EM
+ :EndTrap
 ⍝Done

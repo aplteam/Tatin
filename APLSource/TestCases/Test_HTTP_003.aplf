@@ -1,0 +1,10 @@
+ r←Test_HTTP_003(stopFlag batchFlag);⎕TRAP;res
+⍝ List tags on the principal Tatin server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←TC.ListTags'https://tatin.dev/'
+ →T.PassesIf 0<≢res
+
+ r←T._OK
+⍝Done

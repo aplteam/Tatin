@@ -1,7 +1,7 @@
- tempDir←InstallPackage_(packageID url);zipFilename
+ tempDir←InstallPackage_(packageID url);zipFilename;isHTTP
 ⍝ This function fetches a package and unzips it into a temp folder.
 ⍝ It is called by both `InstallPackage` and `LoadPackage`.
- :If Reg.IsHTTP url
+ :If isHTTP←Reg.IsHTTP url
      zipFilename←GetPackageViaHTTP url
  :Else
      :If '.zip'≡¯4↑url
@@ -16,4 +16,7 @@
  F.MkDir tempDir
  zipFilename DotNetZip.UnzipTo tempDir
  tempDir Add2Config'uri'(RemoveFileProtocol url)
+ :If isHTTP
+     F.DeleteFile zipFilename   ⍝ Then it is a temporay zipfile
+ :EndIf
 ⍝Done

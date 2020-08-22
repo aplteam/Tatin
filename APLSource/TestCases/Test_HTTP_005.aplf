@@ -1,0 +1,13 @@
+ r←Test_HTTP_005(stopFlag batchFlag);⎕TRAP;res
+⍝ Download a particular package from the principal Tatin server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ res←TC.LoadPackage'https://tatin.dev/aplteam-HandleError-3.0.0'#.TEMP
+ →T.PassesIf 0<≢res
+
+ r←T._OK
+⍝Done

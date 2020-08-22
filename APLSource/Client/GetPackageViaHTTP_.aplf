@@ -3,12 +3,12 @@
 ⍝ `host` defaults to "https://localhost"
 ⍝ Port number is defined by the client settings
 ⍝ * a package ID
- host←{0<⎕NC ⍵:⍎⍵ ⋄ 'https://localhost'}'host'
+ host←{0<⎕NC ⍵:⍎⍵ ⋄ 'https://localhost/'}'host'
  c←NewClient host
  :If ':'∊RemoveHttpProtocol host
      c.Port←⊃(//)⎕VFI{⍵↓⍨⍵⍳':'}host
  :EndIf
  q←R.NewRequest 0
- q.URI←packageID
+ q.URI←'/',packageID
  response←c R.SendAndReceive q
 ⍝Done

@@ -1,0 +1,11 @@
+ r←Test_HTTP_002(stopFlag batchFlag);⎕TRAP;res
+⍝ Get dependency tree for a packae managed by the principal Tatin server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←TC.GetDependecyTree'https://tatin.dev/aplteam-HandleError-3.0.0'
+ →T.PassesIf 0<≢res
+ →T.PassesIf 1+.=res[;1]
+
+ r←T._OK
+⍝Done

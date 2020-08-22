@@ -1,0 +1,10 @@
+ r←Test_HTTP_004(stopFlag batchFlag);⎕TRAP;res
+⍝ List version of a particular package mangaged by the principal Tatin server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←TC.ListVersions'https://tatin.dev/aplteam-HandleError'
+ →T.PassesIf 0<≢res
+
+ r←T._OK
+⍝Done

@@ -22,7 +22,11 @@ Documentation is available via the `docs/` folder but also as part of a release,
 
 Once you've installed the Tatin client you have access to <https://tatin.dev>, the principal Tatin server.
 
-However, you might find it useful to run your own Tatin server. For example, all packages used within a company could be served by a Tatin Server within your company LAN.
+The document `FirstStepsWithTatin.html` in the docs/ folder will get you started.
+
+## Tatin Server 
+
+You might find it useful to run your own Tatin server. For example, all packages used within a company could be served by a Tatin Server within your company LAN.
 
 You may also keep a local Registry on your own machine, for example for development work. From a consumer's perspective there is no difference between consuming a package that is coming from a Tatin Server or from a local Registry.
 
@@ -30,7 +34,7 @@ You may also keep a local Registry on your own machine, for example for developm
 
 ## Contributing to the code 
 
-There are several documents (like "TatinForContributor.html") available in the `docs/` folder that discuss specific topics associated with Tatin in any way.
+There is a document "TatinForContributor.html" available in the `docs/` folder that discusses how one can contribute to the documentation or the code or both/
 
 -----
 

@@ -36,6 +36,10 @@ You may also keep a local Registry on your own machine, for example for developm
 
 There is a document "TatinForContributor.html" available in the `docs/` folder that discusses how one can contribute to the documentation or the code or both/
 
+## Documentation
+
+There are plenty of documents available in the docs/ folder but also as part of a release. The document `_ReadMe.html` gives an overview about what each document is focussed on.
+
 -----
 
-Latest revision 2020-08-15
+Latest revision 2020-23

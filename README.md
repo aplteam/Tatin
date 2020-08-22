@@ -14,9 +14,9 @@ Tatin consists of three modules:
 
 Client as well as Server run under Windows, Linux and Mac-OS.
 
-Tatin requires Dyalog APL 18.0 Unicode or better.
+Tatin requires Dyalog APL 18.0 Unicode or better. It will be part of 19.0 Dyalog APL installatio.
 
-The Tatin wiki contains documentation for how to use the Tatin Client and how to get a Tatin Server up and running.
+Documentation is available via the `docs/` folder but also as part of a release, in particular the documents `InstallingTheTatinClient.html` and `InstallingTheTatinServer.html`.
 
 ## Usage
 

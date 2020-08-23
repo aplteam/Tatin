@@ -12,17 +12,23 @@ Tatin consists of three modules:
 * `Server` - the Server
 * `Registry` - all code that is shared between the client and the server.
 
-Client as well as Server run under Windows, Linux and Mac-OS.
+Client as well as Server may run under Windows, Linux and Mac-OS.
 
-Tatin requires Dyalog APL 18.0 Unicode or better. It will be part of 19.0 Dyalog APL installatio.
+Tatin requires Dyalog APL 18.0 Unicode or better. It will be part of 19.0.
 
-Documentation is available via the `docs/` folder but also as part of a release, in particular the documents `InstallingTheTatinClient.html` and `InstallingTheTatinServer.html`.
+## Installing and updating the Tatin Client
+
+The document `InstallingTheTatinClient.html` in the `docs/` folder discusses how to install the Tatin client.
 
 ## Usage
 
 Once you've installed the Tatin client you have access to <https://tatin.dev>, the principal Tatin server.
 
-The document `FirstStepsWithTatin.html` in the docs/ folder will get you started.
+The document `FirstStepsWithTatin.html` in the `docs/` folder will get you started.
+
+## Documentation
+
+There are plenty of documents available in the `docs/` folder, discussing different aspects of Tatin. The document `_ReadMe.html` gives an overview about what each of the document is about.
 
 ## Tatin Server 
 
@@ -30,15 +36,11 @@ You might find it useful to run your own Tatin server. For example, all packages
 
 You may also keep a local Registry on your own machine, for example for development work. From a consumer's perspective there is no difference between consuming a package that is coming from a Tatin Server or from a local Registry.
 
-
+The document `InstallingTheTatinServer.html` in the `docs/` folder discusses how to install the Tatin client.
 
 ## Contributing to the code 
 
-There is a document "TatinForContributor.html" available in the `docs/` folder that discusses how one can contribute to the documentation or the code or both/
-
-## Documentation
-
-There are plenty of documents available in the docs/ folder but also as part of a release. The document `_ReadMe.html` gives an overview about what each document is focussed on.
+There is a document "TatinForContributor.html" available in the `docs/` folder that discusses how one can contribute to the documentation or the code or both.
 
 -----
 

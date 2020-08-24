@@ -29,13 +29,13 @@ The name of the file is `tatin-client.json`.
 
 ### May I edit it?
 
-If you are famailiar with [JSON5](https://json5.org/) your are free to edit that file with any editor, but keep in mind that you are in charge for making sure that the contents of the file is valid JSON5. If it's not, Tatin will crash.
+Of course you are free to edit that file with any editor. However, if you are not familiar with [JSON5](https://json5.org/) then keep in mind that you are in charge for making sure that the contents of the file is valid JSON5: if it's not, Tatin will crash.
 
 Changing the contents of that file by other means --- discussed next --- is much saver as it would check your input and also make  sure that the contents of the file is always valid (syntactically correct).
 
 ### What does Tatin do with the file?
 
-When Tatin is initialized (that is discussed in detail in the document "InitializingTatin") in creates an instance of the `UserSettings` class with the name `MyUserSettings`. The constructor gets the fully qualfied name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.
+When Tatin is initialized (that is discussed in detail in the document "InitializingTatin") in creates an instance of the `UserSettings` class with the name `MyUserSettings`. The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.
 
 
 ### Summary
@@ -102,7 +102,7 @@ Notes:
 
 #### Adding the Registry
 
-Adding a registry is achived by calling the `AddRegistry` method and providing an instance of the `DefineRegistry` class as argument:
+Adding a registry is achieved by calling the `AddRegistry` method and providing an instance of the `DefineRegistry` class as argument:
 
 
 ```
@@ -117,7 +117,7 @@ Now we would expect two Registries:
  myc    https://tatin.mycompany.com/   90
 ```
 
-Note that the priority is not 0 anymore but 90: Any 0 is replaced by the lowest number yet minus 10. `priority` is used to dertermine the sequence in which the Registries are scanned in case the user asks for a specific package without specifying any registry at all.
+Note that the priority is not 0 anymore but 90: Any 0 is replaced by the lowest number yet minus 10. `priority` is used to determine the sequence in which the Registries are scanned in case the user asks for a specific package without specifying any registry at all.
 
 
 
@@ -129,7 +129,7 @@ There might be scenarios when the default location for the user config file is n
 
 * If you have a roaming profile, and you use different computers but expect the same environment no matter which PC you are actually using.
 
-* You computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
+* Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 
    You could still use the default location, but because that location is user specific, every user would have its own user settings file, which is something you might or might not want to avoid.
 

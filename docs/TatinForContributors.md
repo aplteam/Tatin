@@ -145,7 +145,7 @@ In order to create new versions of either the Client or the Server the following
 
 1. Run `#.Tatin.Admin.Make`
 
-   This function will first fire up a session and put together a Client. Along the process it might well ask some quesitons.
+   This function will first fire up a session and put together a Client. Along the process it might well ask some questions.
 
    It will then fire up a second session and put together a Server.
 

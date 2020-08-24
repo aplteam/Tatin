@@ -2,7 +2,31 @@
 [parm]:leanpubExtensions = 1
 
 
-# First steps with the Tatin client
+# First steps with the Tatin Client
+
+## Basics
+
+### What exactly is a package?
+
+A package may consist of as little as a single source file and as much as a nested folder structure with many text files. Those text files may contain a function, an operator, a class, an interface or a namespace.
+
+Note that there is no clear-cut line between an application and a package: one man's package may well be somebody else's application.
+
+Note also that it does not make too much sense to publish a package that consists of just a single function. That's a route several programming languages have chosen, and it did not work out well. There is the famous story about the `ToLowercase` function written in JavaScript which can be consumed as a package. It's currently on version 4.1, and we are looking forward to version 5.0  ;)
+
+### Assets
+
+A package may come with all sorts of assets (CSS files, BAT files, icons, images, config files, documentation, DLLs...) which can be accessed via a folder that is defined in the package configuration file.
+
+The finer details of package configuration are discussed in the document "PackageConfiguration.html".
+
+### Why do we need packages?
+
+Packages are these days available in probably 99% of all programming languages. They allow the consumption of code that others have written to solve a particular task, without any problem; even name clashes can easily be avoided.
+
+But packages also allow you to update to a newer (and therefore hopefully better) version in an easy and straightforward manner.
+
+## Where we start from
 
 We assume that you have the Tatin client installed and ready for use. That means that this command gives you a list with all Tatin user commands available to you:
 

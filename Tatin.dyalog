@@ -1,7 +1,7 @@
 ﻿:Namespace Tatin
-⍝ The ]Tatin user commands for managing packages.
+⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.9.0 - 2020-08-20
-⍝   * ListRegistry now accepts flags -all
+⍝   * ListRegistry now accepts a flag -all
 ⍝ * 0.8.2 - 2020-08-18
 ⍝   * `ListPackages` throws an error in case the -tags keyword was set but it is not an HTTP request
 ⍝ * 0.8.1 - 2020-08-15

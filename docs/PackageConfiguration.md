@@ -31,23 +31,48 @@ This is an example:
 
 By default a package is established in the target space under its own name. However, for ease of use but also in order to avoid possible name clashes, an alias can be defined. If not empty the package must be addressed by the alias rather than its own name.
 
-## api
-
-Defines the API of the package. In the example the package consists of a single class named `DotNetZip`, therefore the class name is identical with the API. Similarly, if the package consists of a single function --- not that this is recommended! --- the name of the function is the API. And finally with a single class the interface is just the name of the class.
+### api
 
 Things are different with namespaces, and with collections of namespaces and/or classes: In that case the names of some of the functions (for namespaces) or some of the classes might become the API.
 
+Defines the API of the package. In the example the package consists of a single class named `DotNetZip`, therefore the class name is identical with the API. Similarly, if the package consists of a single function --- not that this is recommended! --- the name of the function is the API.
+
+A> ### Defining an API with namespaces
+A> Classes have a build-in mechanism for hiding details (all the private stuff) and offering a public interface (API): all the public stuff. Namespaces lack this.
+A>
+A> Thanks to references you can still easily simulate this. Given a namespace `Foo` one common technique is to put all the functions, variables, operators and sub-namespaces into a namespace `Foo.core`.
+A> 
+A> You can then create the public interface by assigning references in `Foo`. If there is just one function (`Run`) and just one variable (`DATA`) that should be public then this would do:
+A> ```
+A> #.Foo.Run←#.Foo.core.Run
+A> #.Foo.Data←#.Foo.core.DATA
+A> ```
+A>
+A> That would not work with niladic functions, but purists would argue that you should not have niladic functions at all: by definition a function takes an argument, manipulates it and returns it. A niladic "function" might return something, but it  cannot take something, so calling it a function is questionable.
+
+### assets
+
+This can be one of:
+
+* A simple text vector representing a single filename
+* A simple text vector representing a the name of a folder
+* A vector of text vectors representing files or folders or a mixture of both
+
+The path must be relative to the package since the file or the folder are part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`" or with "`./`". If it does anyway an error is thrown.
+
+There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative. 
+
+Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.
+
 ### date
 
-The date of the package. This is not the publishing date.
+The date of the package. This is not necessarily the publishing date.
 
 ### description
 
 A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.
 
-### files
-
-...
+This information is typically used when a human accesses a Tatin Server with a Browser.
 
 ### group
 

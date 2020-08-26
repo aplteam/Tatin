@@ -51,29 +51,48 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>By default a package is established in the target space under its own name. However, for ease of use but also in order to avoid possible name clashes, an alias can be defined. If not empty the package must be addressed by the alias rather than its own name.</p>
 <div class="h_tag">
 <a href="#api" id="api" class="autoheader_anchor">
-<h2 data-id="api">api</h2>
+<h3 data-id="api">api</h3>
 </a>
 </div>
-<p>Defines the API of the package. In the example the package consists of a single class named <code>DotNetZip</code>, therefore the class name is identical with the API. Similarly, if the package consists of a single function — not that this is recommended! — the name of the function is the API. And finally with a single class the interface is just the name of the class.</p>
 <p>Things are different with namespaces, and with collections of namespaces and/or classes: In that case the names of some of the functions (for namespaces) or some of the classes might become the API.</p>
+<p>Defines the API of the package. In the example the package consists of a single class named <code>DotNetZip</code>, therefore the class name is identical with the API. Similarly, if the package consists of a single function — not that this is recommended! — the name of the function is the API.</p>
+<div class="leanpub_A">
+<h3>Defining an API with namespaces</h3>
+<p>Classes have a build-in mechanism for hiding details (all the private stuff) and offering a public interface (API): all the public stuff. Namespaces lack this.</p>
+<p>Thanks to references you can still easily simulate this. Given a namespace <code>Foo</code> one common technique is to put all the functions, variables, operators and sub-namespaces into a namespace <code>Foo.core</code>.</p>
+<p>You can then create the public interface by assigning references in <code>Foo</code>. If there is just one function (<code>Run</code>) and just one variable (<code>DATA</code>) that should be public then this would do:</p>
+<pre><code>#.Foo.Run←#.Foo.core.Run
+#.Foo.Data←#.Foo.core.DATA</code></pre>
+<p>That would not work with niladic functions, but purists would argue that you should not have niladic functions at all: by definition a function takes an argument, manipulates it and returns it. A niladic “function” might return something, but it cannot take something, so calling it a function is questionable.</p>
+</div>
+
+<div class="h_tag">
+<a href="#assets" id="assets" class="autoheader_anchor">
+<h3 data-id="assets">assets</h3>
+</a>
+</div>
+<p>This can be one of:</p>
+<ul>
+<li>A simple text vector representing a single filename</li>
+<li>A simple text vector representing a the name of a folder</li>
+<li>A vector of text vectors representing files or folders or a mixture of both</li>
+</ul>
+<p>The path must be relative to the package since the file or the folder are part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>” or with “<code>./</code>”. If it does anyway an error is thrown.</p>
+<p>There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative.</p>
+<p>Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.</p>
 <div class="h_tag">
 <a href="#date" id="date" class="autoheader_anchor">
 <h3 data-id="date">date</h3>
 </a>
 </div>
-<p>The date of the package. This is not the publishing date.</p>
+<p>The date of the package. This is not necessarily the publishing date.</p>
 <div class="h_tag">
 <a href="#description" id="description" class="autoheader_anchor">
 <h3 data-id="description">description</h3>
 </a>
 </div>
 <p>A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.</p>
-<div class="h_tag">
-<a href="#files" id="files" class="autoheader_anchor">
-<h3 data-id="files">files</h3>
-</a>
-</div>
-<p>…</p>
+<p>This information is typically used when a human accesses a Tatin Server with a Browser.</p>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
 <h3 data-id="group">group</h3>

@@ -354,7 +354,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>The client uses the <code>Pack</code> method to create a zip file that contains all the files needed to publish a package to a Registry.</p>
 <p><code>Pack</code> takes a path to a project folder and a target folder. It inspects the project folder and validates that it contains all files required. Then the <a href="#Package-config-file" class="bookmark_link">package config file</a> and the optional <a href="#Dependency-file" class="bookmark_link">Dependency file</a> are checked to ensure they are well formed. If all is fine, it proceeds to add the required files to a zip archive.</p>
 <p>Everything the <code>source</code> parameter within the package config file is pointing to is added to the archive. When this parameter is empty the Client Config setting for “source” is checked. If that is not empty then it is taken. If that is empty, too, then the home folder of the package is investigated: if that carries exactly one sub folder then it is assumed that this folder carries the source code. If there are mutiple folders, or a single folder does not carry any files with APL source code extensions, then an error is thrown.</p>
-<p>The optional <code>files</code> property is a whitelist of files and/or folders that should also be added to the resulting package. This allows adding files to the package that are not source files. The items included in the whitelist will keep their relational structure, e.g. <code>docs/help.md</code> will not only include the help.md file but place it into a docs folder within the package.</p>
+<p>The optional <code>assets</code> property is a whitelist of files and/or folders that should also be added to the resulting package. This allows adding files to the package that are not source files. The items included in the whitelist will keep their relational structure, e.g. <code>docs/help.md</code> will not only include the help.md file but place it into a docs folder within the package.</p>
+<p>Assets must be specified relative to the package source. There is one exception: in case an absolute path is specified but that path is identical to the source path then it's just removed.</p>
 <p>The resulting zip file will be named <code>{group}-{name}-{version}.zip</code> and placed in <code>target_path</code>.</p>
 <div class="h_tag">
 <a href="#The-PublishPackage-method" id="The-PublishPackage-method" class="autoheader_anchor">
@@ -1143,7 +1144,7 @@ aplteam-Conga-3.2.1</code></pre>
 <p>Example:</p>
 <pre class="json"><code>{
   "decription": "Date and Time related stuff",
-  "files": [
+  "assets": [
      "license.txt",
      "README.md"
   ],

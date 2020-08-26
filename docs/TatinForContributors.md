@@ -1,4 +1,8 @@
-# Tatin for contributors
+[parm]:leanpubExtensions = 1
+[parm]:title             = 'Tatin for Contributors'
+
+
+# Tatin for Contributors
 
 If you want to contribute to the [Tatin project on GitHub](https://github.com/aplteam/Tatin) or make adjustments to Tatin for an in-house project, this document will help you.
 
@@ -53,6 +57,14 @@ You are advised not to run the Client and the Server in the same workspace.
 
 
 ## Execute the test cases
+
+It is recommended to start a fresh APL session and then load Tatin into the CLEAR WS before running the test cases.
+
+A> ### Creating a new version
+A>
+A> Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
+A>
+A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed than naturally you want the new version available in `⎕SE` for execution, but that is only possible if you create a new version first.
 
 By default port 443 is used for the test cases. You may change the INI files for both server and client if that does not work for you.
 

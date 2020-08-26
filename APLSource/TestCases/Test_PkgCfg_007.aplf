@@ -1,0 +1,36 @@
+ r←Test_PkgCfg_007(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2;qdmx
+ ;dir;src;zip;body;cfg;refs;assets
+⍝ Pack a package with an assets that does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ assets←src,'/assets'
+ F.MkDir src zip
+ F.MkDir assets
+
+ body←':Namespace Foo' '∇r←Plus arg' 'r←=/arg' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Foo.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Foo' '0.1.0'
+ cfg.source←'Foo.apln'
+ cfg.api←'Foo'
+ cfg.assets←assets,'/first.dll'
+
+ :Trap 98
+     cfg TC.WritePackageConfigFile src
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'This asset does not exist: assets/first.dll'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

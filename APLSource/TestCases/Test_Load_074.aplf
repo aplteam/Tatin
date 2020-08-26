@@ -1,0 +1,42 @@
+ r←Test_Load_074(stopFlag batchFlag);⎕TRAP
+ ;dir;src;zip;assets;body;cfg;zipfile;refs;res
+⍝ Pack a package with several files and folders as assets
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ assets←src,'/assets'
+ F.MkDir src zip
+ F.MkDir assets
+
+ (⊂'first')F.NPUT src,'/first.dll'
+ (⊂'second')F.NPUT assets,'/second.dll'
+ (⊂'third')F.NPUT assets,'/third.dll'
+
+ body←'∇r←GetAssetList dummy' 'r←⊃⎕NINFO⍠(''Wildcard'' 1)⊢##.∆HOME,''/assets/*''' 'r,←⎕NINFO ⊢##.∆HOME,''/first.dll''' '∇'
+ body←,¨(⊂':Namespace Foo'),body,(⊂':EndNamespace')
+ (⊂body)F.NPUT src,'/Foo.apln'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Foo' '0.1.0'
+ cfg.source←'Foo.apln'
+ cfg.api←'Foo'
+ cfg.assets←'first.dll'assets
+ cfg TC.WritePackageConfigFile src
+ zipfile←TC.Pack src zip
+
+ refs←TC.LoadPackage('file://',zipfile)#.TEMP
+ →T.GoToTidyUp 3≠#.TEMP.Foo.⎕NC'GetAssetList'
+ res←#.TEMP.Foo.GetAssetList ⍬
+ →T.GoToTidyUp 3≠≢res
+ →T.GoToTidyUp~∧/res∘{∨/∨/¨⍵∘⍷¨⍺}¨'first.dll' 'second.dll' 'third.dll'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -172,7 +172,9 @@ The client uses the `Pack` method to create a zip file that contains all the fil
 
 Everything the `source` parameter within the package config file is pointing to is added to the archive. When this parameter is empty the Client Config setting for "source" is checked. If that is not empty then it is taken. If that is empty, too, then the home folder of the package is investigated: if that carries exactly one sub folder then it is assumed that this folder carries the source code. If there are mutiple folders, or a single folder does not carry any files with APL source code extensions, then an error is thrown.
 
-The optional `files` property is a whitelist of files and/or folders that should also be added to the resulting package. This allows adding files to the package that are not source files. The items included in the whitelist will keep their relational structure, e.g. `docs/help.md` will not only include the help.md file but place it into a docs folder within the package.
+The optional `assets` property is a whitelist of files and/or folders that should also be added to the resulting package. This allows adding files to the package that are not source files. The items included in the whitelist will keep their relational structure, e.g. `docs/help.md` will not only include the help.md file but place it into a docs folder within the package.
+
+Assets must be specified relative to the package source. There is one exception: in case an absolute path is specified but that path is identical to the source path then it's just removed.
 
 The resulting zip file will be named `{group}-{name}-{version}.zip` and placed in `target_path`.
 
@@ -671,7 +673,7 @@ Example:
 ```json
 {
   "decription": "Date and Time related stuff",
-  "files": [
+  "assets": [
      "license.txt",
      "README.md"
   ],

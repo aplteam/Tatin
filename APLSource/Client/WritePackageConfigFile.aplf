@@ -5,6 +5,9 @@
      cfg←ValidatePackageFiles cfg
      cfg←ValidateTags cfg
      cfg.tags←⎕C cfg.tags
+     cfg←path PolishAssetsPaths cfg
+     _←{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}cfg.assets
+     _←path CheckAssetsExist cfg.assets
      cfg2←InitPackageConfig cfg
      'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg2.name:
      'Invalid alias name'Assert(⎕NS''){0=≢⍵:1 ⋄ 0=⍺.⎕NC ⍵}cfg2.alias:

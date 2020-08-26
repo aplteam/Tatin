@@ -1,0 +1,9 @@
+ PolishAssetsPaths←{
+     cfg←⍵
+     pkgPath←F.EnforceSlash ⍺
+     0=≢cfg.assets:cfg
+     cfg.assets←pkgPath∘{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}¨F.EnforceSlash¨cfg.assets
+     0=+/b←F.IsDir¨cfg.assets:cfg
+     (b/cfg.assets)←(b/cfg.assets),¨'/'
+     cfg
+ }

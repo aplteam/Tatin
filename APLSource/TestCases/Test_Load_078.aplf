@@ -1,0 +1,32 @@
+ r←Test_Load_078(stopFlag batchFlag);⎕TRAP
+ ;dir;src;zip;body;cfg;zipfile;refs;res
+⍝ Pack and load a package  that consists of a single function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←'Plus←{' '+/⍵' '}'   ⍝ Span over several lines to make it traceable
+ (⊂body)F.NPUT src,'/Plus.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Plus' '0.1.0'
+ cfg.source←'Plus.aplf'
+ cfg.api←'Plus'
+ cfg TC.WritePackageConfigFile src
+ zipfile←TC.Pack src zip
+
+ refs←TC.LoadPackage('file://',zipfile)#.TEMP
+ →T.GoToTidyUp 3≠#.TEMP.⎕NC'Plus'
+ res←#.TEMP.Plus 3 4
+ →T.GoToTidyUp 7≢res
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

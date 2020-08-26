@@ -1,0 +1,31 @@
+ r←Test_PkgCfg_003(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2
+ ;dir;src;zip;cfg;zipfile;refs;assets
+⍝ Create package config file with an absolutely addressed asset file but within the package (corrected automatically)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ assets←src,'/assets'
+ F.MkDir src zip
+ F.MkDir assets
+
+ (⊂'first')F.NPUT assets,'/first.dll'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Foo' '0.1.0'
+ cfg.source←'Foo.apln'
+ cfg.api←'Foo'
+ cfg.assets←assets
+
+ cfg TC.WritePackageConfigFile src
+ →T.GoToTidyUp(,⊂'assets/')≢cfg.assets
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

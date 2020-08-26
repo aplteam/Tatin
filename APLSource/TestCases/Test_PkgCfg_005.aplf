@@ -1,0 +1,35 @@
+ r←Test_PkgCfg_005(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2
+ ;dir;src;zip;cfg;refs
+⍝ Create a package config file with an asset file and asset folder of which the folder is addressed incorrectly
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ (⊂'first')F.NPUT dir,'/first.dll'
+ (⊂'second')F.NPUT src,'/second.dll'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Foo' '0.1.0'
+ cfg.source←'Foo.apln'
+ cfg.api←'Foo'
+ cfg.assets←dir(src,'/second.dll')
+
+ :Trap 98
+     cfg TC.WritePackageConfigFile src
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'"assets" must be addressed by relativ path(s)'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

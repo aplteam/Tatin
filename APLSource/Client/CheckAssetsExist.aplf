@@ -1,0 +1,6 @@
+ CheckAssetsExist←{
+     list←⍺∘{(':'∊⍵)∨('./'≡2⍴⍵)∨((1⍴⍵)∊'/\'):⍵ ⋄ ⍺,⍵}¨⍵
+     ∧/b←F.Exists¨list:shy←⍬
+     msg←((1+1<+/~b)⊃'This asset does' 'These assets do'),' not exist: ',⊃{⍺,',',⍵}/(~b)/⍵
+     msg Assert 0
+ }

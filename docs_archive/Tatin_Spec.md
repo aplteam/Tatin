@@ -207,7 +207,7 @@ Packages retrieved from a Registry can either be saved in a folder, typically in
 
 Both methods require an `identifier` (see below) in order to identify a package in a Registry.
 
-Packages are loaded either into `#._packages` or `⎕SE._packages`. 
+Packages are loaded either into `#._tatin` or `⎕SE._tatin`. 
 
 Sub-namespaces are compiled from `{groupname}-{packagename}-{version}`. Any characters that are not permitted in APL names are replaced by an underscore character (`_`)
 
@@ -234,9 +234,9 @@ However, usually the `identifier` carries also information that identifies a par
 
 ###### Registry scan
 
-If the `identifier` is a Package ID then it may be prefixed with a Registry alias. The alias is defined by surrounding it with square brackets. If this is done then only that Registry is queried for the package in question. If the package cannot be found in the given Registry an error is thrown.
+If the `identifier` is a Package ID then it may be prefixed with a URL or a Registry alias. An alias is defined by surrounding it with square brackets. If this is done then only that Registry is queried for the package in question. If the package cannot be found in the given Registry an error is thrown.
 
-If no Registry is specified, only a Package ID, then all Registries defined in the Client's config file are queried for the package in the order that is specified by the `priority` property: the Registry with the highest number is scanned first. Once the package with the geiven package ID is found the scanning stops.
+If no Registry is specified, only a Package ID, then all Registries defined in the Client's config file are queried for the package in the order that is specified by the `priority` property: the Registry with the highest number is scanned first. Once the package with the given package ID is found the scanning stops.
 
 Examples:
 
@@ -259,9 +259,11 @@ Syntax: `⍬ ← InstallPackage (identifier target_folder)`
 | ------ |
 | `⍬`    |
 
-The purpose of this method is to retrieve the package (and all its dependencies), unzip it and then copy it to the `target_folder`. Then the fully qualified package URI is added to the [Dependency file](#) in the `target_folder` (if the file is missing it is created). Finally a file "apl-buildlist.json` is created or added to that defines all the top-level packages and their dependencies.
+The purpose of this method is to retrieve the package (and all its dependencies), unzip it and then copy it to the `target_folder`. Then the fully qualified package URI is added to the [Dependency file](#) in the `target_folder` (if the file is missing it is created).
 
-This is all done in the file system only. 
+Finally the dependency tree is added to the file `apl-buildlist.json` or, if it does not exist yet, it is created. This file contains all the top-level packages and their dependencies.
+
+This is all done in the file system.
 
 Use the `LoadDependencies` method to read the [Dependency file](#) and load the installed packages into the active workspace.
 

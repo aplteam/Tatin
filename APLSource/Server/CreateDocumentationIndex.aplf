@@ -1,0 +1,43 @@
+ response←CreateDocumentationIndex request;html;path
+⍝
+ html←HtmlHeader''
+ html,←⊂'<h2>Documentation Center</h2>'
+ html,←AddSpecialMessage ⍬
+ path←F.ExpandPath(⊃G.INI.Get'CONFIG:HTDOCS'),'Assets/docs/'
+
+ html,←⊂'<h3>The Client</h3>'
+ html,←⊂'<ul>'
+ html,←⊂'<li><a href="Assets/docs/InstallingAndUpdatingTheTatinClient.html" title="InstallingAndUpdatingTheTatinClient.html">Installing and updating the Tatin Client</a> (draft)'
+ html,←⊂'<li><a href="Assets/docs/FirstStepsWithTatin.html" title="FirstStepsWithTatin.html">First Steps with Tatin</a> (work in progress)'
+ html,←⊂'<li><a href="Assets/docs/PublishingPackages.html" title="PublishingPackages.html">Publishing Packages</a> (stub)'
+ html,←⊂'</ul>'
+ html,←⊂'<h3>The Server</h3>'
+ html,←⊂'<ul>'
+ html,←⊂'<li><a href="Assets/docs/InstallingTheTatinServer.html" title="InstallingTheTatinServer.html">Installing the Tatin Server</a> (draft)'
+ html,←⊂'<li><a href="Assets/docs/ServerMaintenance.html" title="ServerMaintenance.html">Maintaining a Tatin Server</a> (stub)'
+ html,←⊂'</li>'
+ html,←⊂'</ul>'
+ html,←⊂'<h3>General information</h3>'
+ html,←⊂'<ul>'
+ html,←⊂'<li><a href="Assets/docs/TatinsLoadAndUpdateStrategy.html" title="TatinsLoadAndUpdateStrategy.html">Tatins Load and Update Strategy</a> (draft)'
+ html,←⊂'<p>Explains _semantic versioning_ and how Tatin deals with update conflicts.</p></li>'
+ html,←⊂'<li><a href="Assets/docs/TatinUserSettings.html" title="TatinUserSettings.html">Tatin User Settings</a> (draft)'
+ html,←⊂'<p>Read this in case you...</p>'
+ html,←⊂'<ul>'
+ html,←⊂'<li>are unhappy with Tatin''s default location for the user settings file</li>'
+ html,←⊂'<li>need multiple user settings files</li>'
+ html,←⊂'<li>need one user settings file for multiple users</li>'
+ html,←⊂'</ul>'
+ html,←⊂'</ul>'
+ html,←⊂'<h3>Misc</h3>'
+ html,←⊂'<ul>'
+ html,←⊂'<li><a href="Assets/docs/TatinForContributors.html" title="TatinForContributors.html">Tatin for Contributors</a> (draft)'
+ html,←⊂'<p>You want to contribute to Tatin''s documentation and/or Tatin''s code? Read this first.</p></li>'
+ html,←⊂'<li><a href="Assets/docs/RunDyalogBehindApache.html" title="RunDyalogBehindApache.html">Run Dyalog behind Apache</a> (draft)</li>'
+ html,←⊂'</ul>'
+
+ html,←GetFooter
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+ response←request ReturnHTML html
+⍝Done

@@ -1,0 +1,32 @@
+ r←Test_PkgCfg_008(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2;qdmx
+ ;dir;src;zip;cfg;refs
+⍝ Pack a package with non-Tatin variables  that do not start with an underscore
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Foo' '0.1.0'
+ cfg.source←'Foo.apln'
+ cfg.api←'Foo'
+ cfg.myVars←'Foo'
+
+ :Trap 98
+     cfg TC.WritePackageConfigFile src
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Invalid properties in config namespace'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

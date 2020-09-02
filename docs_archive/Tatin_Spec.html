@@ -408,7 +408,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Packages retrieved from a Registry can either be saved in a folder, typically in order to become part of a project, or just brought into the workspace, typically to try them out. The former is achieved by the <code>InstallPackage</code> method while the latter is achieved by the <code>LoadPackage</code> method. Installed packages and their dependencies can be brought into the workspace with the <code>LoadDependencies</code> method.</p>
 <p>Both methods require an <code>identifier</code> (see below) in order to identify a package in a Registry.</p>
-<p>Packages are loaded either into <code>#._packages</code> or <code>⎕SE._packages</code>.</p>
+<p>Packages are loaded either into <code>#._tatin</code> or <code>⎕SE._tatin</code>.</p>
 <p>Sub-namespaces are compiled from <code>{groupname}-{packagename}-{version}</code>. Any characters that are not permitted in APL names are replaced by an underscore character (<code>_</code>)</p>
 <div class="h_tag">
 <a href="#The-identifier" id="The-identifier" class="autoheader_anchor">
@@ -433,8 +433,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h6 data-id="Registry-scan">1.6.1.4.1.1. Registry scan</h6>
 </a>
 </div>
-<p>If the <code>identifier</code> is a Package ID then it may be prefixed with a Registry alias. The alias is defined by surrounding it with square brackets. If this is done then only that Registry is queried for the package in question. If the package cannot be found in the given Registry an error is thrown.</p>
-<p>If no Registry is specified, only a Package ID, then all Registries defined in the Client's config file are queried for the package in the order that is specified by the <code>priority</code> property: the Registry with the highest number is scanned first. Once the package with the geiven package ID is found the scanning stops.</p>
+<p>If the <code>identifier</code> is a Package ID then it may be prefixed with a URL or a Registry alias. An alias is defined by surrounding it with square brackets. If this is done then only that Registry is queried for the package in question. If the package cannot be found in the given Registry an error is thrown.</p>
+<p>If no Registry is specified, only a Package ID, then all Registries defined in the Client's config file are queried for the package in the order that is specified by the <code>priority</code> property: the Registry with the highest number is scanned first. Once the package with the given package ID is found the scanning stops.</p>
 <p>Examples:</p>
 <pre><code>https://tatin.com/groupName-packageName-1.1.0-beta
 [DYALOG]toolgroup-Conga-3.2.1
@@ -478,8 +478,9 @@ aplteam-Conga-3.2.1</code></pre>
 </tr>
 </tbody>
 </table>
-<p>The purpose of this method is to retrieve the package (and all its dependencies), unzip it and then copy it to the <code>target_folder</code>. Then the fully qualified package URI is added to the <a href="#Dependency-file" class="bookmark_link">Dependency file</a> in the <code>target_folder</code> (if the file is missing it is created). Finally a file "apl-buildlist.json` is created or added to that defines all the top-level packages and their dependencies.</p>
-<p>This is all done in the file system only.</p>
+<p>The purpose of this method is to retrieve the package (and all its dependencies), unzip it and then copy it to the <code>target_folder</code>. Then the fully qualified package URI is added to the <a href="#Dependency-file" class="bookmark_link">Dependency file</a> in the <code>target_folder</code> (if the file is missing it is created).</p>
+<p>Finally the dependency tree is added to the file <code>apl-buildlist.json</code> or, if it does not exist yet, it is created. This file contains all the top-level packages and their dependencies.</p>
+<p>This is all done in the file system.</p>
 <p>Use the <code>LoadDependencies</code> method to read the <a href="#Dependency-file" class="bookmark_link">Dependency file</a> and load the installed packages into the active workspace.</p>
 <p>Note that in case different packages required the same package but with different version numbers then a certain strategy called the “minimal version strategy” is applied. This is quite a complex topic that is discussed in a separate document.</p>
 <p>For a detailed general discussion of this strategy see <a href="https://research.swtch.com/vgo" class="external_link">https://research.swtch.com/vgo</a>, in particular the “Minimal Version Selection” PDF.</p>

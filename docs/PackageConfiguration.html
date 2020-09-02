@@ -44,14 +44,44 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <div class="h_tag">
+<a href="#Introduction" id="Introduction" class="autoheader_anchor">
+<h3 data-id="Introduction">Introduction</h3>
+</a>
+</div>
+<p>In the workspace a simple namespace can be a used for package configuration. On file it is saved as JASON5.</p>
+<p>Tatin's API offers a function <code>Tatin.InitialisePackage</code> that can be used to create a package config file.</p>
+<p>It can be fed with an empty vector as right argument: then just defaults are established.</p>
+<p>Instead you may create a namespace and populate that namespace with Tatin package configuration variables which are discussed underneath.</p>
+<p>Example:</p>
+<pre><code>      parms←⎕NS''
+      parms.group←'aplteam'
+      parms.name←'Foo'
+      parms.version←'1.0.0'
+      Tatin.InitialisePackage parms</code></pre>
+<p>The user command aquivalent is <code>]tatin.packageconfig</code></p>
+<div class="h_tag">
+<a href="#User-defined-variables" id="User-defined-variables" class="autoheader_anchor">
+<h3 data-id="User-defined-variables">User defined variables</h3>
+</a>
+</div>
+<p>You may define your own variables in a package configuration file.</p>
+<p>However, since we might add Tatin-specific variables at a later stage there is a danger of name clashes. This is avoided by a simple rule:</p>
+<p>The names of user defined variables <em>must</em> start with an underscore.</p>
+<p>If you specify any variable with a name that Tatin does not know about and that does not start with an underscore, then error will be thrown.</p>
+<div class="h_tag">
+<a href="#Tatins-package-configuration-variables" id="Tatins-package-configuration-variables" class="autoheader_anchor">
+<h3 data-id="Tatins-package-configuration-variables">Tatin's package configuration variables</h3>
+</a>
+</div>
+<div class="h_tag">
 <a href="#alias" id="alias" class="autoheader_anchor">
-<h3 data-id="alias">alias</h3>
+<h4 data-id="alias">alias</h4>
 </a>
 </div>
 <p>By default a package is established in the target space under its own name. However, for ease of use but also in order to avoid possible name clashes, an alias can be defined. If not empty the package must be addressed by the alias rather than its own name.</p>
 <div class="h_tag">
 <a href="#api" id="api" class="autoheader_anchor">
-<h3 data-id="api">api</h3>
+<h4 data-id="api">api</h4>
 </a>
 </div>
 <p>Things are different with namespaces, and with collections of namespaces and/or classes: In that case the names of some of the functions (for namespaces) or some of the classes might become the API.</p>
@@ -68,7 +98,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 
 <div class="h_tag">
 <a href="#assets" id="assets" class="autoheader_anchor">
-<h3 data-id="assets">assets</h3>
+<h4 data-id="assets">assets</h4>
 </a>
 </div>
 <p>This can be one of:</p>
@@ -82,50 +112,50 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.</p>
 <div class="h_tag">
 <a href="#date" id="date" class="autoheader_anchor">
-<h3 data-id="date">date</h3>
+<h4 data-id="date">date</h4>
 </a>
 </div>
 <p>The date of the package. This is not necessarily the publishing date.</p>
 <div class="h_tag">
 <a href="#description" id="description" class="autoheader_anchor">
-<h3 data-id="description">description</h3>
+<h4 data-id="description">description</h4>
 </a>
 </div>
 <p>A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.</p>
 <p>This information is typically used when a human accesses a Tatin Server with a Browser.</p>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
-<h3 data-id="group">group</h3>
+<h4 data-id="group">group</h4>
 </a>
 </div>
 <p>The group part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <div class="h_tag">
 <a href="#name" id="name" class="autoheader_anchor">
-<h3 data-id="name">name</h3>
+<h4 data-id="name">name</h4>
 </a>
 </div>
 <p>The name part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <div class="h_tag">
 <a href="#project_url" id="project_url" class="autoheader_anchor">
-<h3 data-id="project_url">project_url</h3>
+<h4 data-id="project_url">project_url</h4>
 </a>
 </div>
 <p>The URL that points to something like GitHub. An example is <code>http://github.com/aplteam-MarkAPL-9.2.0</code>.</p>
 <div class="h_tag">
 <a href="#source" id="source" class="autoheader_anchor">
-<h3 data-id="source">source</h3>
+<h4 data-id="source">source</h4>
 </a>
 </div>
 <p>The name of a text file (that contains code) or a folder (that contains a collection of code files).</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
-<h3 data-id="tags">tags</h3>
+<h4 data-id="tags">tags</h4>
 </a>
 </div>
 <p>A simple text vector, possibly empty (though that is not recommended), that should contain semicolon-separated lists of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.</p>
 <div class="h_tag">
 <a href="#version" id="version" class="autoheader_anchor">
-<h3 data-id="version">version</h3>
+<h4 data-id="version">version</h4>
 </a>
 </div>
 <p>The version[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>

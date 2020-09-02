@@ -5,7 +5,7 @@
  r←⍬
  append←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'append'
  buildList[;3]←RemoveFileProtocol¨buildList[;3]
- filename←path,'/',Reg.BuildListFilename
+ filename←path,Reg.BuildListFilename{('/',⍺)/⍨⍺≢(-≢⍺)↑⍵}path
  :If F.IsFile filename
  :AndIf append
      ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET filename

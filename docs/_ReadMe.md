@@ -1,31 +1,41 @@
 [parm]:title             = 'Tatin ReadMe'
 
 
-# Tatin ReadMe
+### The Client
 
-This document gives an overview about the documentation Tatin comes with.
+* [Installing and updating the Tatin Client](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") (draft)
+
+* [First Steps with Tatin (work in progress)](./FirstStepsWithTatin.html "FirstStepsWithTatin.html") (draft)
+
+* [PublishingPackages](./PublishingPackages.html "PublishingPackages.html") (stub)
 
 
-## The Client
+### The Server
 
-* [Installing and updating the Tatin Client](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html")
+* [Installing the Tatin Server](./InstallingTheTatinServer.html "InstallingTheTatinServer.html") (draft)
 
-* [First Steps with Tatin](./FirstStepsWithTatin.html "FirstStepsWithTatin.html")
+* [Maintaining the Server](./ServerMaintenance.html "ServerMaintenance.html") (draft)
 
-## The Server
 
-* [Installing the Tatin Server](./InstallingTheTatinServer.html "InstallingTheTatinServer.html")
+### General information
 
-## General information
-
-* [Tatins Update Strategy](./TatinsUpdateStrategy.html "TatinsUpdateStrategy.html")
+* [Tatins Load and Update Strategy](./TatinsLoadAndUpdateStrategy.html "TatinsLoadAndUpdateStrategy.html") (draft)
 
   Explains _semantic versioning_ and how Tatin deals with update conflicts.
 
-* [Tatin User Settings](./TatinUserSettings.html "TatinUserSettings.html")
+* [Tatin User Settings](./TatinUserSettings.html "TatinUserSettings.html") (draft)
 
-  If you are unhappy with Tatin's default location for the user settings file or you want multiple user settings file, this explains it all.
+  Read this in case you...
+  
+  * are unhappy with Tatin's default location for the user settings file
+  * need multiple user settings files
+  * need one user settings file for multiple users
 
-* [Tatin for Contributors](./TatinForContributors.html "TatinForContributors.html")
 
-  You want to contribute to the documentation or the code? Read this first.
+### Misc
+
+* [Tatin for Contributors](./TatinForContributors.html "TatinForContributors.html") (draft)
+
+  You want to contribute to Tatin's documentation and/or Tatin's code? Read this first.
+
+* [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (work in progress)

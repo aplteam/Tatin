@@ -1,5 +1,5 @@
  r←Test_PkgCfg_007(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2;qdmx
- ;dir;src;zip;body;cfg;refs;assets
+ ;dir;src;zip;cfg;refs;assets
 ⍝ Pack a package with an assets that does not exist
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -12,8 +12,6 @@
  F.MkDir src zip
  F.MkDir assets
 
- body←':Namespace Foo' '∇r←Plus arg' 'r←=/arg' '∇' ':EndNamespace'
- (⊂body)F.NPUT src,'/Foo.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Foo' '0.1.0'
  cfg.source←'Foo.apln'

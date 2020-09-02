@@ -9,7 +9,7 @@
  'Invalid left argument'Assert level∊0 1 2
  filename←path,'/',Reg.BuildListFilename
  :If F.IsFile filename
-     ns←0 ⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET filename
+     ns←Reg.GetJsonFromFile filename
      tree←⍉↑ns.{⍎¨⍵}'depth' 'packageID' 'url'
      :If level=1
          tree←(tree[;1]=1)⌿tree

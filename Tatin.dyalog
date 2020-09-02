@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.10.0 - 2020-08-28
+⍝   * Method `UninstallPackage` added
 ⍝ * 0.9.0 - 2020-08-20
 ⍝   * ListRegistry now accepts a flag -all
 ⍝ * 0.8.2 - 2020-08-18
@@ -114,6 +116,12 @@
           c.Parse←'1s -tags='
           r,←c
      
+          c←⎕NS ⍬
+          c.Name←'UninstallPackage'
+          c.Desc←'Uninstalls a package and its dependencies'
+          c.Parse←'2'
+          r,←c
+     
           r.Group←⊂NM
      
       :EndIf
@@ -188,6 +196,7 @@
     ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn
       installFolder←Arg._1
       targetSpace←Arg._2
+      installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
       '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
@@ -256,6 +265,11 @@
               :EndIf
           :EndIf
       :EndTrap
+    ∇
+
+    ∇ r←UninstallPackage(path packageID)
+    ⍝
+      ∘∘∘ ⍝TODO⍝
     ∇
 
     ∇ r←ListRegistries Arg;type;rawFlag
@@ -553,6 +567,13 @@
           r,←⊂'  In case you want to delete the file: specify the -delete flag.'
           r,←⊂''
           r,←⊂'In case of success a text vector with NLs in it is returned, otherwise an empty vector.'
+      :Case ⎕C'UninstallPackage'
+          r,←⊂'Requires two arguments:'
+          r,←⊂'* Path to a folder with installed packages'
+          r,←⊂'* Name of the package to be un-installed. If {group} and {name} can identify the'
+          r,←⊂'  package uniquely then there is no need for {version}'
+          r,←⊂'This command uninstalles the given package and all its dependencies but only if those'
+          r,←⊂'are not required by any other packages.'
       :Case ⎕C'PackageDependencies'
           r,←⊂''
           r,←⊂'Takes a path to a folder and returns the contents of the file "apl-dependencies.txt".'

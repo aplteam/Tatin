@@ -22,8 +22,8 @@
  parms←P.CreateParms
  parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
  parms.CommandLineArgs,←'lx="#.Make_.Run ',(⍕type),'" '
- parms.CommandLineArgs,←'-exec_setup=0 '        ⍝ To avoid the Conga DLLs being loaded: we might need to overwrite them
- parms.CommandLineArgs,←'-stop_in_setup=1 '     ⍝ To avoid the Conga DLLs being loaded: we might need to overwrite them
+⍝ parms.CommandLineArgs,←'-exec_setup=0 '
+⍝ parms.CommandLineArgs,←'-stop_in_setup=1 '
  parms.CommandLineArgs,←noQLX/' -x'
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
@@ -31,6 +31,9 @@
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
 
  {}⎕SE.acre.Refresh'#.Tatin'                    ⍝ Because of the updated Tatin.Registry.Version function
+
+ CompileDocumentation ⍬
+ UpdateDocumentation ⍬
 
  parms←P.CreateParms
  parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" lx="#.Make_.Run ¯1"'
@@ -40,7 +43,7 @@
  P_←⎕NEW P parms
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
 
- CompileDocumentation ⍬
+ UpdateTestServerAssets ⍬
 
  ⎕←'*** Done'
 ⍝Done

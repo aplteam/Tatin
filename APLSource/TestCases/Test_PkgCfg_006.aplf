@@ -1,5 +1,5 @@
  r←Test_PkgCfg_006(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2;qdmx
- ;dir;src;zip;body;cfg;refs;assets
+ ;dir;src;zip;cfg;refs;assets
 ⍝ Pack a package with assets that are addressed incorrectly (absolute path outside the package)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -15,8 +15,6 @@
  (⊂'first')F.NPUT assets,'/first.dll'
  (⊂'second')F.NPUT assets,'/secnd.dll'
 
- body←':Namespace Foo' '∇r←GetAssetList' 'r←⊃⎕NINFO⍠(''Wildcard'' 1)⊢##.∆HOME,''/assets/*''' '∇' ':EndNamespace'
- (⊂body)F.NPUT src,'/Foo.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Foo' '0.1.0'
  cfg.source←'Foo.apln'

@@ -17,7 +17,9 @@
  :If ~'/'∊identifier
  :AndIf '.zip'≢⎕C ¯4↑identifier
      packageID←GetPackageIDFromFilename identifier
-     identifier←(EstablishRegistry packageID),packageID
+     :If ~∨/'/\:'∊identifier
+         identifier←(EstablishRegistry packageID),packageID
+     :EndIf
  :EndIf
  :If 0<≢buildList←GetDependecyTree identifier
      :For level packageID2 url :In ↓buildList

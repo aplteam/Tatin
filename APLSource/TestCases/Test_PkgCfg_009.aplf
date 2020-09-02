@@ -1,0 +1,27 @@
+ r←Test_PkgCfg_009(stopFlag batchFlag);⎕TRAP;dir;dist;cfg;cfg2
+ ;dir;src;zip;cfg;refs
+⍝ Pack a package with a valid non-Tatin variable (name start with `_`)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Foo' '0.1.0'
+ cfg.source←'Foo.apln'
+ cfg.api←'Foo'
+ cfg._myVars←'Foo'
+
+ cfg2←cfg TC.WritePackageConfigFile src
+ →T.GoToTidyUp'Foo'≢cfg2._myVars
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

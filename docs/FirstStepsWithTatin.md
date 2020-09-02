@@ -53,7 +53,7 @@ All these topics --- and others --- are discussed in a separate document: "Tatin
 
 ## Consuming packages
 
-Let's assume you need a tool in order to convert [Markdown](https://en.wikipedia.org/wiki/Markdown "The Wikipedia on Markdown") into HTML.
+Let's assume you need a tool in order to convert [Markdown](https://en.wikipedia.org/wiki/Markdown "Link to the Wikipedia") into HTML.
 
 ### Listing packages
 
@@ -123,7 +123,7 @@ A> The fuzzy search would find "windows" when you enter "winndows" and "linux" w
 A>
 A> Notes:
 A> * The strategy outlined above is applied on each tag independently.
-A> * Entering more than a single tag would mean that only packages that carry _all of them_ would qualify.
+A> * Searching for multiple tags would mean that only packages that carry _all of them_ would qualify.
 A> * Searching for tags is an action that is carried out by a Tatin Server. That means that specifying `-tags=` makes sense only in HTTP requests: only then is there a server on the other side that can process the request.
 
 In our case we look for something that runs on all platforms. The user command `ListTags` takes one or more tags and returns a list of tags that were also found in the packages that carried the specified tags:
@@ -184,6 +184,13 @@ Let's assume that you are not certain whether you really want to use `MarkAPL`, 
 That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves to trail in the file system if that can be avoided.
 
 In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there is a footprint left in the file system.
+
+Notes:
+
+* Loading a package has only one purpose: to investigate a package.
+
+* Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but with installing a package that is not necessarily the case. This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
+
 
 Let's load the `MarkAPL` package into the workspace:
 

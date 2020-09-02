@@ -1,0 +1,10 @@
+ {r}←UpdateTestServerAssets dummy;path;success;msg;list
+⍝ Update the Assets of the Test Server with what we've got in Dist/
+ r←⍬
+ path←'./TestData/Server/Assets/'
+ ##.FilesAndDirs.RmDir path
+ ⎕DL 0.2
+ ##.FilesAndDirs.MkDir path
+ (success msg list)←('./Dist/Server/Assets/')##.FilesAndDirs.CopyTree path
+ msg Assert success  ⍝ Crashes on Conga files? There is probably a server running, using the DLLs.
+⍝Done

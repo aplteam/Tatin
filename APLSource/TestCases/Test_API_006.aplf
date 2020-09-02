@@ -18,7 +18,7 @@
  (rc more)←(⊃⊃F.Dir packageFolder,'/*.json')F.CopyTo tempDir,'/'
  Assert 0=rc
 
- cfg←0 ⎕JSON⍠('Dialect' 'JSON5')⊣1⊃F.NGET(⊃⊃F.Dir packageFolder,'/',TC.CFG_NAME)0
+ cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_NAME)0
  version←⊃{⍺,'-',⍵}/cfg.(group name version)
  F.RmDir ∆GetServerRegistryFolder,version
  #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder

@@ -107,7 +107,7 @@
  cfg.version←'1.1.2'
  cfg.source←'Main.apln'
  cfg TC.WritePackageConfigFile ∆BuildSrc
- ∆BuildSrc TC.Dependencies.Add'minimalversion-D-1.1.1'
+ ∆BuildSrc TC.Dependencies.Add'minimalversion-E-1.1.1'
  TC.PublishPackage ∆BuildSrc ∆BuildReg
  Assert 0=1⊃F.RmDir ∆BuildSrc
  Assert F.MkDir ∆BuildSrc
@@ -131,6 +131,32 @@
  cfg.group←'minimalversion'
  cfg.name←'D'
  cfg.version←'1.1.4'
+ cfg.source←'Main.apln'
+ cfg TC.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc TC.Dependencies.Add'minimalversion-E-1.1.2'
+ TC.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'D-1.2.0' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'D'
+ cfg.version←'1.2.0'
+ cfg.source←'Main.apln'
+ cfg TC.WritePackageConfigFile ∆BuildSrc
+ ∆BuildSrc TC.Dependencies.Add'minimalversion-E-1.1.2'
+ TC.PublishPackage ∆BuildSrc ∆BuildReg
+ Assert 0=1⊃F.RmDir ∆BuildSrc
+ Assert F.MkDir ∆BuildSrc
+
+ body←':Namespace Test' 'Main←{' 'D-2.0.0' '}' ':EndNamespace'
+ (⊂body)F.NPUT ∆BuildSrc,'/Main.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'minimalversion'
+ cfg.name←'D'
+ cfg.version←'2.0.0'
  cfg.source←'Main.apln'
  cfg TC.WritePackageConfigFile ∆BuildSrc
  ∆BuildSrc TC.Dependencies.Add'minimalversion-E-1.1.2'

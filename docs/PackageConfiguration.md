@@ -27,11 +27,47 @@ This is an example:
 ```
 ## Details
 
-### alias
+### Introduction
+
+In the workspace a simple namespace can be a used for package configuration. On file it is saved as JASON5.
+
+Tatin's API offers a function `Tatin.InitialisePackage` that can be used to create a package config file.
+
+It can be fed with an empty vector as right argument: then just defaults are established.
+
+Instead you may create a namespace and populate that namespace with Tatin package configuration variables which are discussed underneath.
+
+Example:
+
+```
+      parms←⎕NS''
+      parms.group←'aplteam'
+      parms.name←'Foo'
+      parms.version←'1.0.0'
+      Tatin.InitialisePackage parms 
+```
+
+The user command aquivalent is `]tatin.packageconfig`
+
+
+### User defined variables
+
+You may define your own variables in a package configuration file.
+
+However, since we might add Tatin-specific variables at a later stage there is a danger of name clashes. This is avoided by a simple rule:
+
+The names of user defined variables _must_ start with an underscore.
+
+If you specify any variable with a name that Tatin does not know about and that does not start with an underscore, then error will be thrown.
+
+
+### Tatin's package configuration variables
+
+#### alias
 
 By default a package is established in the target space under its own name. However, for ease of use but also in order to avoid possible name clashes, an alias can be defined. If not empty the package must be addressed by the alias rather than its own name.
 
-### api
+#### api
 
 Things are different with namespaces, and with collections of namespaces and/or classes: In that case the names of some of the functions (for namespaces) or some of the classes might become the API.
 
@@ -50,7 +86,7 @@ A> ```
 A>
 A> That would not work with niladic functions, but purists would argue that you should not have niladic functions at all: by definition a function takes an argument, manipulates it and returns it. A niladic "function" might return something, but it  cannot take something, so calling it a function is questionable.
 
-### assets
+#### assets
 
 This can be one of:
 
@@ -64,37 +100,37 @@ There is one exception: when an absolute path is specified but it's partly ident
 
 Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.
 
-### date
+#### date
 
 The date of the package. This is not necessarily the publishing date.
 
-### description
+#### description
 
 A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.
 
 This information is typically used when a human accesses a Tatin Server with a Browser.
 
-### group
+#### group
 
 The group part of the package ID[^id]
 
-### name
+#### name
 
 The name part of the package ID[^id]
 
-### project_url
+#### project_url
 
 The URL that points to something like GitHub. An example is `http://github.com/aplteam-MarkAPL-9.2.0`.
 
-### source
+#### source
 
 The name of a text file (that contains code) or a folder (that contains a collection of code files).
 
-### tags
+#### tags
 
 A simple text vector, possibly empty (though that is not recommended), that should contain semicolon-separated lists of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.
 
-### version
+#### version
 
 The version[^version] part of the package ID[^id]
 

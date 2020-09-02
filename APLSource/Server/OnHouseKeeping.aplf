@@ -8,7 +8,7 @@
      :If ##.APLTreeUtils.IsDevelopment
          {}⎕NQ'#'QuitDQ
      :Else
-         {}#.Plodder.Shutdown G.INI                     ⍝ Will ⎕OFF in runtime
+         {}#.Plodder.Shutdown G.INI                                 ⍝ Will ⎕OFF in runtime
      :EndIf
  :ElseIf 0<⎕NC'∆STARTED'
  :AndIf 'CLEAR WS'≢⎕WSID
@@ -17,5 +17,8 @@
              ⎕LOAD ⎕WSID
          :EndIf
      :EndIf
+ :EndIf
+ :If G.INI.Changed                                                  ⍝ In case the INI file got changed...
+     ##.Plodder.G(##.Plodder.ProcessIniFile)←G.INI.IniFilename      ⍝ ... we initialize from scratch
  :EndIf
 ⍝Done

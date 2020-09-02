@@ -1,0 +1,7 @@
+ AddSpecialMessage←{
+⍝ Useful for adding a general message to ALL HTML pages right after the <h1> in case the INI file says so.
+     0=≢msg←⊆⊃G.INI.Get'MSG:Text':''
+     css←⊃G.INI.Get'MSG:CSS'
+     style←{0=≢⍵:⍵ ⋄ 'style="',⍵,'"'}css
+     style∘{'<div ',⍺,'><p>',⍵,'</p></div>'}¨msg
+ }

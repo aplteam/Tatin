@@ -1,4 +1,4 @@
- {r}←MakeServer batchFlag;msg;F;targetPath;zipFilename;fileList;zipContent
+ {r}←MakeServer batchFlag;F;targetPath;zipFilename;fileList;zipContent;list;msg;success
  r←⍬
  :If batchFlag
      ⎕SHADOW'Assert'
@@ -22,6 +22,7 @@
      #.Tatin.⎕EX¨'Client' 'Todo' 'TestCases' 'Simu'
      ⎕EX¨'Initialize_Client' 'RunTestServer' 'CreateAllRefs_Client'
      ⎕LX←'#.Tatin.Server.Run 1'
+
      F.MkDir'Dist'
      targetPath←'Dist/Server'
      F.RmDir targetPath
@@ -35,14 +36,17 @@
      F.MkDir targetPath,'/Assets/'
      ⎕DL 0.1
      Assert F.IsDir targetPath,'/Assets/'
-     {(2⊃⍵)Assert 1⊃⍵}'./Assets/'F.CopyTree targetPath,'/Assets'
+     (success msg list)←'./Assets/'F.CopyTree targetPath,'/Assets'
+     msg Assert success
      ('./server.ini.RemoveMe')F.CopyTo targetPath,'/server.ini'
+
      zipFilename←'Dist/Tatin-Server-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Server.Version),''),'.zip'
      F.DeleteFile zipFilename
      targetPath ##.DotNetZip.ZipFolder zipFilename
      fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'
      zipContent←##.DotNetZip.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
+
      :If batchFlag
          ⎕OFF
      :Else

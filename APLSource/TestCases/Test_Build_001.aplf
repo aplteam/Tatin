@@ -1,7 +1,18 @@
- r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx
+ r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir
 ⍝ Save build list on disk. Exercises `GetDependecyTree`, `SaveBuildList` and `LoadBuildList`.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
+
+ ∆BuildDir←'Build_Tests'GetTempDir''
+ ∆BuildSrc←∆BuildDir,'/src/'
+ ∆BuildReg←∆BuildDir,'/reg/'
+ Assert F.MkDir ∆BuildSrc
+ Assert F.MkDir ∆BuildReg
+ Reg.CreateRegistry ∆BuildReg
+ dir←'ConfigFile'GetTempDir''
+ 1 TC.InitUserSettings dir
+ TC.MyUserSettings.AddRegistry'[Build]',∆BuildReg
+ ∆CreateExampleForMinimalVersionStrategy1
 
  path←∆BuildReg,'minimalversion-A-1.0.0'
 
@@ -27,7 +38,7 @@
  expected←'minimalversion-'∘,¨expected
  →T.GoToTidyUp~∧/(tree[;2]~⊂'minimalversion-C-1.1.2')∊tree2[;2] ⍝ Because C-1.1.2 is neither requested nor needed
 
- ⍝ We compromise here: rather rebuilding everything in a second test case we use what we have right now
+ ⍝ We compromise here: rather rebuilding everything in a second and third test case we use what we have right now
  ⎕DL 0.2
  path TC.Dependencies.Add'DoesNotExist-APLTreeUtils-6.0.1'       ⍝ Modify it: that does not exist
 
@@ -44,4 +55,8 @@
  r←T._OK
 
 ∆TidyUp:
- F.DeleteFile path,'/',TC.Reg.BuildListFilename
+ Assert F.DeleteFile path,'/',TC.Reg.BuildListFilename
+ F.RmDir ∆BuildDir
+ ⎕EX'∆BuildDir'
+ ∆CreateDefaultUserSettings
+⍝Done

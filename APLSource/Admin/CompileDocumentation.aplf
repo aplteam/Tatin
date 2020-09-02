@@ -1,23 +1,22 @@
- {r}←CompileDocumentation dummy;F;list;myZip;zipFilename;targetFolder;this;parms;html;ns
+ {r}←CompileDocumentation dummy;F;targetFolder;htmlFiles;markdownFiles;markdownFile;parms;html;ns;zipFilename;myZip
 ⍝ Convert all markdown files in the docs/ folder to HTML and then zip the HTML files into TatinDocumentation.zip
  F←##.FilesAndDirs
- targetFolder←'Dist/'
- list←⊃F.Dir'docs/*.html'
- F.DeleteFile¨list
- list←⊃F.Dir'docs/*.md'
- :For this :In list
+ targetFolder←'./Dist/'
+ htmlFiles←⊃F.Dir'./docs/*.html'
+ F.DeleteFile¨htmlFiles
+ markdownFiles←⊃F.Dir'./docs/*.md'
+ :For markdownFile :In markdownFiles
      parms←##.MarkAPL.CreateParms
-     parms.inputFilename←this
-     parms.outputFilename←'docs/',(2⊃⎕NPARTS this),'.html'
+     parms.inputFilename←markdownFile
+     parms.outputFilename←'docs/',(2⊃⎕NPARTS markdownFile),'.html'
      parms.homeFolder←'Assets/MarkAPL'
      parms.verbose←0
      (html ns)←parms ##.MarkAPL.Markdown2HTML''
      'The markdown-to-HTML conversion run into problems'Assert 0=≢ns.report
  :EndFor
- list←{⊃{⍺,⍵}/1↓⎕NPARTS ⍵}¨⊃F.Dir'docs/*.html'
+ htmlFiles←{⊃{⍺,⍵}/1↓⎕NPARTS ⍵}¨⊃F.Dir'docs/*.html'
  zipFilename←targetFolder,'Tatin-Documentation-',({⍵/⍨3>+\'.'=⍵}2⊃##.Registry.Version),'.zip'
  F.DeleteFile zipFilename
  myZip←⎕NEW ##.DotNetZip(,⊂zipFilename)
- (F.PWD,'/docs')∘{⍺ myZip.Add ⍵}¨list
- ⎕EX'myZip'
+ (F.PWD,'/docs')∘{⍺ myZip.Add ⍵}¨htmlFiles
 ⍝Done

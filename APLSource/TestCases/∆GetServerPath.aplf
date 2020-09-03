@@ -8,4 +8,10 @@
  response←c R.SendAndReceive q
  Assert response.StatusCode≡200
  path←response.Content
+ :If ∧/':\'∊path
+ :AndIf 'W'≠⊃⊃# ⎕WG'APLVersion'
+ ⍝ If the Server runs under Windows but the Client not then we assume that
+ ⍝ the Client runs in WSL, which allows us to manipulate the path accordingly:
+     path←F.EnforceSlash{'/mnt/',⊃{(⎕C ⍺),⍵}/':'(≠⊆⊢)⍵}path
+ :EndIf
 ⍝Done

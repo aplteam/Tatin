@@ -369,13 +369,15 @@ Load using alias "A51":
 
 Note that loading packages is recursive, and transitive dependencies will therefore be loaded in the same way with references established on each level, thereby creating a tree of dependencies.
 
-Two constants are created in each package space:
+These constants are created in each package space:
 
 * `∆HOME_DIR` specifies the path to the package folder on disk. 
 
    This can be referenced by the package code when accessing package resources.
 
 * `∆URI` carries the name of the Registry or the name of the file/folder the package was originally retrieved from.
+
+* `∆CONFIG` carries the package's configuration as readable JSON.
 
 ### Client Settings
 

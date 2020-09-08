@@ -138,3 +138,14 @@ The version[^version] part of the package ID[^id]
 [^version]: A version is built from the major number, the minor number and the version number, and possibly a build number (which is not recorded in the package configuration file). 
 
   Examples for valid version numbers are `1.2.3` and `18.0.0.30165`
+
+### Access after loading a package
+
+Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON under the name `∆CONFIG` together with `∆URI` and `∆HOME`.
+
+Note that `∆HOME` will be empty in case two conditions are met:
+
+* The package was brought intot the workspace with `LoadPackage` (as opposed to `LoadDependencies`)
+* The package does not have any assets
+
+All of them are niladic functions because that's how we emulate constants in APL.

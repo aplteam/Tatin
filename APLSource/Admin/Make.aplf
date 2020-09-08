@@ -22,17 +22,22 @@
  parms←P.CreateParms
  parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
  parms.CommandLineArgs,←'lx="#.Make_.Run ',(⍕type),'" '
-⍝ parms.CommandLineArgs,←'-exec_setup=0 '
-⍝ parms.CommandLineArgs,←'-stop_in_setup=1 '
+ :If 0  ⍝ Only for analyzing problems:
+     parms.CommandLineArgs,←'-exec_setup=0 '
+     parms.CommandLineArgs,←'-stop_in_setup=1 '
+ :EndIf
  parms.CommandLineArgs,←noQLX/' -x'
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  P_←⎕NEW P parms
+ ⎕←'   Process started for "making" the Tatin Client...'
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
-
+ 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  {}⎕SE.acre.Refresh'#.Tatin'                    ⍝ Because of the updated Tatin.Registry.Version function
 
+ ⎕←'   Now compiling HTML from the markdown files (documentation)...'
  CompileDocumentation ⍬
+ ⎕←'   Copy the documentation to the test server...'
  UpdateDocumentation ⍬
 
  parms←P.CreateParms
@@ -41,7 +46,9 @@
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  P_←⎕NEW P parms
+ ⎕←'   Process started for "making" the Tatin Server...'
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+ 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
 
  UpdateTestServerAssets ⍬
 

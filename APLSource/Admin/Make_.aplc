@@ -9,11 +9,12 @@
     ⍝ on the right argument `type`.
     ⍝ * ¯1 = call `#.Tatin.Admin.MakeSever`
     ⍝ * Otherwise call `#.Tatin.Admin.MakeClient` and pass `type` as left argument.\\
-    ⍝ In the end `type` defines if and how version number is bumped by `#.Tatin.Admin.MakeClient`.
-    ⍝ The build ID is always bumped.
+    ⍝ In the end `type` defines if and how the version number is bumped by `#.Tatin.Admin.MakeClient`.
+    ⍝ The build ID is always bumpe (`type←→0`).\\
+    ⍝ `type←→1` bumps the patch number, `type←→2` bumps the minor number and `type←→3` bumps the major number.
       :Access Public Shared
       home←1⊃1 ⎕NPARTS''
-
+     
       :If type∊0 1 2 3
           targetFolder←home,'/Dist/Client'
           3(⎕NDELETE Attempt)targetFolder
@@ -32,12 +33,13 @@
       :EndIf
      
     ∇
-
-    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),11}
+    
+    ⍝ In case an assert is not fulfilled we ⎕OFF with an error code in runtime and crash otherwise:
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ##.APLTreeUtils.IsDevelopment:⍺ ⎕SIGNAL 11 ⋄ errCode←123 ⋄ ⎕OFF errCode}
 
     ∇ {r}←{x}(f Attempt)y;success;counter
-    ⍝ Uses this in case a function of fails on the first attempt.
-    ⍝ ⎕NDELETE and ⎕MKDIR are candidates
+    ⍝ Uses this in case a function might fail on the first attempt. `⎕NDELETE` and `⎕MKDIR` are candidates.\\
+    ⍝ We try up to 10 times with an increasingly longer delay between 0.01 and 0.55 seconds.
       r←⍬
       counter←success←0
       :Repeat
@@ -49,10 +51,11 @@
               :EndIf
               success←1
           :Else
-              ⎕DL 0.2
+              ⎕DL 0.05×counter
               counter+←1
           :EndTrap
       :Until success∨10<counter
     ∇
 
 :EndClass
+

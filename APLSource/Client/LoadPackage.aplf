@@ -45,8 +45,7 @@
      msg←⎕SE.Link.Import saveIn2(tempDir,'/',cfg.source)
      'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
      ref←⍎saveIn2
-     ref.∆URI←cfg.uri
-     ref.∆HOME←tempDir  ⍝ We might delete this at a later stage if the packages does not have any asset files
+     EstablishConstants ref cfg tempDir
      :If 0=≢cfg.assets
          tempDirs,←⊂tempDir
          reset,←⍎saveIn2
@@ -59,6 +58,6 @@
  LinkDependencies refs
  :If 0<≢tempDirs
      F.RmDir tempDirs
-     reset.∆HOME←⊂''  ⍝ Those have been deleted because they don't have files
+     {⍵.⎕FX'r←∆HOME' 'r←'''''}¨reset  ⍝ For those that do not have any assets
  :EndIf
 ⍝Done

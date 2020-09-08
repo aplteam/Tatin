@@ -29,9 +29,9 @@
     ∇
 
     ∇ History
-      :Access Public shared 
+      :Access Public shared
       ⍝ * 2.4.1 ⋄ 2020-08-13
-      ⍝   * While `Run` accepted integers as `stopFlag`, `RunThese` and `RunBatchTests` incorrectly insisted on 
+      ⍝   * While `Run` accepted integers as `stopFlag`, `RunThese` and `RunBatchTests` incorrectly insisted on
       ⍝     a Boolean (pre 2.4.0 condition).
       ⍝ * 2.4.0 ⋄ 2020-08-01
       ⍝   * Stops on "Initial" and "Cleanup" introduced
@@ -335,7 +335,7 @@
     ∇ {(rc log)}←{stopFlag}RunBatchTests debugFlag;⎕ML;⎕IO
     ⍝ Runs all test cases but tells the test functions that this is a batch run meaning that test cases in need
     ⍝ for any human being for interaction should not execute the test case and return `_NoBatchTest` instead.\\
-    ⍝ By default any errors are trapped. 
+    ⍝ By default any errors are trapped.
     ⍝ In addition you can specify an optional left argument which will make `RunBatchTests` stop in certain circumstances:
     ⍝ * 1=stop just before any test case is about to be executed
     ⍝ * 2=stop in all `Initial*` functions
@@ -589,8 +589,13 @@
               negate←'~'=1↑ps.group
               ps.group←negate↓ps.group
               :If negate
-                  buff←'Test_'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}ps.group
-                  ps.list←(~({⍵/⍨2>+\⍵='_'}¨ps.list)≡¨⊂'Test_',ps.group)/ps.list
+                  :If ','∊ps.group
+                      ps.group←','(≠⊆⊢)ps.group
+                      ps.list/⍨←⊃∧/ps.list∘{~({⍵/⍨2>+\⍵='_'}¨⍺)≡¨⊂'Test_',⍵}¨ps.group
+                  :Else
+                      buff←'Test_'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}ps.group
+                      ps.list←(~({⍵/⍨2>+\⍵='_'}¨ps.list)≡¨⊂'Test_',ps.group)/ps.list
+                  :EndIf
               :Else
                   ps.group←'Test_'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}ps.group
                   :If 3=ref.⎕NC'Test_'{((⍺≢(≢⍺)↑⍵)/⍺),⍵}ps.group

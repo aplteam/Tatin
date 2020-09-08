@@ -105,7 +105,7 @@ A> ### Semantic Versioning and Minimal Version Strategy.
 A> 
 A> This is because Tatin is based on the concepts of _Semantic Versioning_ and _Minimal Version Strategy_.
 A>
-A> These concepts are discussed in a separate document with the name "TatinsUpdateStrategy".
+A> These concepts are discussed in a separate document with the name "TatinsLoadAndUpdateStrategy".
 
 `]tatin.ListPackages` will return a list with _all_ packages available in the given Registry. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.
 

@@ -1,23 +1,24 @@
- {r}←LinkDependencies refs;ref;deps;depNames;root;destinations;bool;depName;destination;cfgs
+ {r}←LinkDependencies refs;ref;deps;depNames;root;destinations;bool;depName;destination;cfgs;cfg
 ⍝ Takes a list of refs, typically returned by `LoadPackage`, and establishes any required references
 ⍝ to dependencies within those refs.
 ⍝ `api` rules, but if it's empty then `name` is taken instead.
-⍝ ∆HOME is preferred but might well be empty in case a package was loaded rather than installed.
  r←⍬
  root←{GetTatinRootSpace 1⊃⍵}⍣(0<≢refs)⊣refs
  :For ref :In refs
      :If 0<≢deps←Dependencies.Get⊃{0=≢⍺:⍵ ⋄ ⍺}/ref.(∆HOME ∆URI)
          deps←ReplaceRegistryAlias¨deps
          destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨GetPackageIDFromFilename¨deps
-         cfgs←ReadPackageConfigFile¨destinations⍎¨⊂'∆HOME'
-         :If 1=≢cfgs.source
-         :AndIf (3⊃¨⎕NPARTS cfgs.source)∊'.aplf' 'aplo'
-             depNames←⊂2⊃⎕NPARTS⊃cfgs.source
-         :Else
-             depNames←{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}¨GetPackageIDFromFilename¨deps
-         :EndIf
-         depNames{0=≢⍵.api:⍺ ⋄ ⍵.api}¨←cfgs
-         depNames ref.{⍎'⎕THIS.',⍺,'←',⍵}¨destinations,¨'.',¨depNames
+         cfgs←Reg.JSON¨destinations⍎¨⊂'∆CONFIG'
+         :For cfg :In cfgs
+             :If 0<≢cfg.source
+             :AndIf (⊂3⊃⎕NPARTS cfg.source)∊'.aplf' 'aplo'
+                 depNames←⊂2⊃⎕NPARTS cfg.source
+             :Else
+                 depNames←{⍵↑⍨¯1+⍵⍳'-'}∘{⍵↓⍨⍵⍳'-'}¨GetPackageIDFromFilename¨deps
+             :EndIf
+             depNames{0=≢⍵.api:⍺ ⋄ ⍵.api}¨←cfgs
+             depNames ref.{⍎'⎕THIS.',⍺,'←',⍵}¨destinations,¨'.',¨depNames
+         :EndFor
      :EndIf
  :EndFor
 ⍝Done

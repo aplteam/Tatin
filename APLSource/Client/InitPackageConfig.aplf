@@ -18,6 +18,9 @@
      0=≢⍵:cfg
      varsList←' '~¨⍨↓cfg.⎕NL 2
      cfg←cfg.⎕NS ⍵
-     'Invalid properties in config namespace'Assert∧/((' '~¨⍨↓cfg.⎕NL 2)~' '~¨⍨↓'_'cfg.⎕NL 2)∊varsList,⊂'uri':
-     cfg
+     list←(' '~¨⍨↓cfg.⎕NL 2)~' '~¨⍨↓'_'cfg.⎕NL 2
+     bool←list∊varsList,⊂'uri'
+     ∧/bool:cfg
+     msg←'Invalid propert',((1+1<+/~bool)⊃'y' 'ies'),' in config namespace: ',⊃{⍺,',',⍵}/(~bool)/list
+     msg Assert 0
  }

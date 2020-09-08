@@ -25,6 +25,8 @@
      :Else
          version,←'.',⍕build
      :EndIf
+     'Missing dots in version number'Assert 3=version+.='.'
+     'Some bits in the version number are empty when they must not'Assert 0∧.<≢¨'.'(≠⊆⊢)version
      :If 0≠type
          (major minor patch buildID)←{⊃(//)⎕VFI ⍵}¨'.'(≠⊆⊢)version
          :Select ⊃type

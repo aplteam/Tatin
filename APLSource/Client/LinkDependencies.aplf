@@ -7,7 +7,8 @@
  :For ref :In refs
      :If 0<≢deps←Dependencies.Get⊃{0=≢⍺:⍵ ⋄ ⍺}/ref.(∆HOME ∆URI)
          deps←ReplaceRegistryAlias¨deps
-         destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨GetPackageIDFromFilename¨deps
+         destinations←GetPackageIDFromFilename¨deps
+         destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨destinations
          cfgs←Reg.JSON¨destinations⍎¨⊂'∆CONFIG'
          :For cfg :In cfgs
              :If 0<≢cfg.source

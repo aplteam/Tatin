@@ -1,10 +1,12 @@
- {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;more;rc;ts1;ts2;path;reg;_userSettings;success;list;zipFilename;zipContent;fileList;b
+ {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
-⍝ process whit ⍵←1. In case of a problem an error is thrown whit ⍵←0 and ⎕⎕off 123 in case ⍵←1.\\
-⍝ `type` specifies what part of the version number should be bumped. 0 means only the build ID, which is always bumped.\\
-⍝ 1 means "patch" shall be bumped, 2 for "minor" amnd 3 for major. Other values result in an error or ⎕OFF 123 respectively.\\
+⍝ process with ⍵←1.\\
+⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
+⍝ `type` specifies what part of the version number should be bumped. 0 (the default) means only the build ID, which is always bumped anyway.\\
+⍝ 1 means "patch" shall be bumped, 2 for "minor" amnd 3 for "major". Other values result in an error or ⎕OFF 123 respectively.\\
 ⍝ Note that as part of an automated process this function should be called *before* `MakeServer` because it bumps the
 ⍝ version number while `MakeServer` does not.
+⍝ Version 1.0.0 from 2020-12-02
  r←⍬
  F←##.FilesAndDirs
  type←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'type'
@@ -14,7 +16,7 @@
      msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
      msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
      msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
-     msg,←⊂'The Tatin client will be copied From that the WS into ⎕SE once a Tatin user command is invoked.'
+     msg,←⊂'The Tatin client will be copied from that WS into ⎕SE once a Tatin user command is invoked.'
      msg,←⊂''
      msg,←⊂'It also checks whether the user command should be copied to the MyCMDs folder or vice versa,'
      msg,←⊂'depending on where the last change was made.'
@@ -45,52 +47,43 @@
      Assert F.MkDir targetPath,'/Tatin'
      #.⎕EX¨(' '~¨⍨↓#.⎕NL⍳16)~⊂'_Tatin'
      0 ⎕SAVE ⎕WSID
-     (rc more)←'Tatin.dyalog'F.CopyTo targetPath,'/'
-     more Assert 0=⊃rc
-     (success more list)←('./Assets/Runtime/Conga/')F.CopyTree targetPath,'/Tatin/Assets/Runtime/Conga/'
-     more Assert success
+     (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'Tatin.dyalog'
+     'Create!'F.CheckPath targetPath,'/Tatin/Assets'
+     (targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/Runtime/'
      _userSettings←⎕NEW #._Tatin.Client.UserSettings(,⊂targetPath,'/Tatin/')
      reg←_userSettings.GetRegistry'[tatin]'
      reg.api_key←'f272c8cf-eb99-62b8-f297-60be1a266676'
      _userSettings.ReplaceRegistry reg
-     (rc more)←'setup.dyalog.RemoveMe'F.CopyTo targetPath,'/'
-     more Assert 0=rc
+     (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'setup.dyalog.RemoveMe'
      myucmds←#._Tatin.Client.GetMyUCMDsFolder''
      :If 1 YesOrNo'Would you like to copy the Tatin client to ',myucmds
          F.RmDir myucmds,'/Tatin'
          F.MkDir myucmds,'/Tatin'
-         (rc more)←(⎕WSID,'.dws')F.CopyTo myucmds,'/Tatin/'
-         more Assert 0=rc
+         (myucmds,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣⎕WSID,'.dws'
          :If 0=F.Exists myucmds,'/tatin.dyalog'
-             (rc more)←(targetPath,'/tatin.dyalog')F.CopyTo myucmds,'/'
-             more Assert 0=rc
+             (myucmds,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣targetPath,'/tatin.dyalog'
          :Else
-             ts1←' -:,./'~⍨##.APLTreeUtils.FormatDateTime⊃⊃('type' 3)F.Dir myucmds,'/tatin.dyalog'
-             ts2←' -:,./'~⍨##.APLTreeUtils.FormatDateTime⊃⊃('type' 3)F.Dir'./tatin.dyalog'
+             ts1←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir myucmds,'/tatin.dyalog'
+             ts2←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir'./tatin.dyalog'
              :If ts1≢ts2
                  :Select ⍋ts1 ts2
                  :Case 1 2
-                     (rc more)←'./tatin.dyalog'F.CopyTo myucmds,'/'
+                     (myucmds,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./tatin.dyalog'
                  :Case 2 1
-                     (rc more)←(myucmds,'/tatin.dyalog')F.CopyTo'./'
+                     './'⎕NCOPY⍠('IfExists' 'Replace')⊣myucmds,'/tatin.dyalog'
                  :EndSelect
-                 more Assert 0=rc
              :EndIf
          :EndIf
-         (success more list)←('./Assets/Runtime/Conga/')F.CopyTree myucmds,'/Tatin/Assets/Runtime/Conga/'
-         :If 0=success
-         :AndIf 0∊b←(0=≢¨list[;3])∨∨/¨'The process cannot access the file'∘⍷¨list[;3]
-             ('Problems with ',⊃{⍺,',',⍵}/⊃{⍺,⍵}/¨1↓¨⎕NPARTS¨(~b)/list[;1])Assert 0 ⍝ Might fail because the Conga DLLs are in use
-         :EndIf
+         dlls←F.ListFiles'./CongaDlls/*'
+         (⊂F.NormalizePath myucmds,'\Tatin\Assets\RunTime\Conga'){19::shy←⍬ ⋄ ⍺ ⎕NCOPY⍠('IfExists' 'Replace')⊣⍵}¨dlls
      :EndIf
      path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
      :If 0=F.IsFile path
      :OrIf 0 YesOrNo'Overwrite "',path,'" ?'
-         (rc more)←_userSettings.path2config F.CopyTo path
-         more Assert 0=rc
+         path ⎕NCOPY⍠('IfExists' 'Replace')⊣_userSettings.path2config
      :EndIf
+     F.DeleteFile¨F.Dir'Dist/Tatin-Client-*.zip'
      zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),''),'.zip'
-     F.DeleteFile zipFilename
      ⎕DL 0.1
      targetPath ##.DotNetZip.ZipFolder zipFilename
      fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'

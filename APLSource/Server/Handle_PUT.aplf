@@ -1,13 +1,14 @@
  response←Handle_PUT request;filename;path;path2
+ request.URI←('/'=1⍴request.URI)↓request.URI
  :If AcceptCredential'api-key'GetFromHeaders request.Headers   ⍝TODO⍝ Simulation: later we need to check whether the API key is valid for that group
      :If Reg.IsValidPackageID_Complete request.URI
          response←SavePackage request
      :Else
-         response←request R.Respond 400  ⍝ 400 ←→ Bad Request
+         response←request Respond 400  ⍝ 400 ←→ Bad Request
          response.Content←'Neither valid package ID nor proper REST request'
      :EndIf
  :Else
-     response←request R.Respond 401      ⍝ 401 ←→ Unauthorized
+     response←request Respond 401      ⍝ 401 ←→ Unauthorized
      response.Content←'Unauthorized request'
  :EndIf
 ⍝Done

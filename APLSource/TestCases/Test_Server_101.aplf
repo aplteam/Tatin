@@ -1,4 +1,4 @@
- r←Test_Server_101(stopFlag batchFlag);⎕TRAP;zipFilename
+ r←Test_Server_101(stopFlag batchFlag);⎕TRAP;zipFilename;msg;rc
  ;packageID;serverPath;index1;index2;zip;cfg;body;clientCfg;dir;src;res
 ⍝ Publish a package with dependencies to the server.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,8 @@
 
  packageID←'Example-Package_A-0.1.0'
  index1←1⊃F.NGET(serverPath,'/',Reg.Index.GetIndexFilename)1
- zipFilename←TC.PublishPackage src('https://localhost/',packageID)
+ (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
+ Assert 200=rc
  index2←1⊃F.NGET(serverPath,'/',Reg.Index.GetIndexFilename)1
 
  →T.GoToTidyUp(1+≢index1)≠≢index2

@@ -6,21 +6,20 @@
 ⍝ Kai Jaeger - APL Team Ltd.\\
 ⍝ Homepage: <https://github.com/aplteam/OS>
 
-    :Include APLTreeUtils
 
-    ⎕IO←0 ⋄ ⎕ML←3
+    ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public shared
-      r←'OS' '2.0.1.20' '2020-06-04'
+      r←'OS' '3.0.0.43' '2020-09-18'
     ∇
 
     ∇ History
       :Access Public shared
-      ⍝ * 2.0.1 from 2020-06-04
-      ⍝   * ShellExecute could fail under Windows
-      ⍝ * 2.0.0 from 2020-03-22
-      ⍝   * BREAKING CHANGE: file extension is now .aplc rather than .dyalog
+      ⍝ * 3.0.0 from 2020-09-07
+      ⍝   * Does not :Include APLTreeUtils anymore (but requires the class APLTreeUtils2)
+      ⍝   * Uses ⎕ML←1 and  ⎕IO←1 internally
+      ⍝   * Needs at least Dyalog 18.0
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/OS/releases>
     ∇
@@ -35,14 +34,14 @@
       result←more←''
       rc←0
       :Trap 11
-          cmd←dtb cmd
+          cmd←##.APLTreeUtils2.DTB cmd
           :If '&'=¯1↑cmd
               cmd←(¯1↓cmd),' </dev/null 1>/dev/null 2>/dev/null &'
               {}⎕SH cmd
           :Else
               cmd,←' 2>&1; echo "CMDEXIT=$?"; exit 0'
               buff←⎕SH cmd
-              rc←{6::⍬ ⋄ ⍎⍵}(≢'CMDEXIT=')↓↑¯1↑buff
+              rc←{2 6::⍬ ⋄ ⍎⍵}(≢'CMDEXIT=')↓⊃¯1↑buff
               :If 0≡rc
                   result←¯1↓buff
               :Else
@@ -83,7 +82,7 @@
       ⍝ 1. A Boolean flag, 1 indicating success.
       ⍝ 2. The return code of the Windows API function `ShellOpen`. Is 42 in case of success.
       ⍝ 3. An empty text string in case of success. In case of failure this may provide additional information.
-      'Runs under Windows only'⎕SIGNAL 11/⍨'Win'≢GetOperatingSystem ⍬
+      'Runs under Windows only'⎕SIGNAL 11/⍨'Win'≢##.APLTreeUtils2.GetOperatingSystem ⍬
       success←0 ⋄ more←'' ⋄ rc←0
       :If (⎕DR x)∊80 82
           :If 0≠2|'"'+.=x
@@ -99,7 +98,7 @@
       :ElseIf 326=⎕DR x
       :AndIf 9=⎕NC'x'
           parms←x
-          parms.verb←Uppercase parms.verb
+          parms.verb←##.APLTreeUtils2.Uppercase parms.verb
           :If 0≠2|'"'+.=parms.lpParms
               more←'Odd nunmber of doubles quotes in "lpParms" detected'
               :Return
@@ -159,12 +158,12 @@
     ⍝ * `success` is a Boolean with 1 indicating success.
     ⍝ * `rc` is a return code. 42 stands for "okay".
       :Access Public Shared
-      'Runs under Windows only'⎕SIGNAL 11/⍨'Win'≢GetOperatingSystem ⍬
+      'Runs under Windows only'⎕SIGNAL 11/⍨'Win'≢##.APLTreeUtils2.GetOperatingSystem ⍬
       tempFilename←GetTempFilename
       batFilename←(¯3↓tempFilename),'BAT'
       cmd,←' >',tempFilename
       ⎕NDELETE tempFilename
-      WriteUtf8File batFilename cmd
+      (⊂cmd)⎕NPUT batFilename
       adminFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'adminFlag'
       parms←CreateParms_WinExecute
       parms.file←batFilename
@@ -174,21 +173,22 @@
           i←flag←0
           :Repeat
               i+←1
-              ⎕DL 0.01
+              ⎕DL 0.1
               :If IsFile tempFilename
-                  result←ReadUtf8File tempFilename
+                  result←⊃⎕NGET tempFilename
                   flag←(100<i)∨0<≢result
               :EndIf
           :Until flag
       :Else
           result←more
       :EndIf
+      ⎕DL 0.1
       {}{19 22::⍬ ⋄ ⎕NDELETE ⍵}¨batFilename tempFilename
     ∇
 
     ∇ r←GetSharedLib
       :Access Public Shared
-      :Select GetOperatingSystem ⍬
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
       :Case 'Lin'
           r←GetLibcName ⍬
       :Case 'Mac'
@@ -203,7 +203,7 @@
     ⍝ In case of an error a 0 is returned.\\
     ⍝ See also [`KillPID`](#).
       :Access Public Shared
-      :Select GetOperatingSystem ⍬
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
       :Case 'Win'
           :Trap 11
               '∆GetCurrentProcessId'⎕NA'I KERNEL32|GetCurrentProcessId'
@@ -223,19 +223,19 @@
       :EndSelect
     ∇
 
-    ∇ r←KillPID pid;∆KillPID;PROCESS_TERMINATE;False;OpenProcess;TerminateProcess;h;∆OpenProcess;∆CloseHandle;∆TerminateProcess;thisPID
+    ∇ r←KillPID pid;False;OpenProcess;PROCESS_TERMINATE;TerminateProcess;h;thisPID;∆CloseHandle;∆OpenProcess;∆TerminateProcess
     ⍝ Kill one or more processes identified by their process ID.\\
     ⍝ See also [`GetPID`](#).
       :Access Public Shared
       r←0
-      :Select GetOperatingSystem ⍬
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
       :Case 'Win'
           '∆OpenProcess'⎕NA'U4 KERNEL32.C32|OpenProcess I4 I2 I4'
-          PROCESS_TERMINATE←↑83 323 ⎕DR 1
-          False←↑83 323 ⎕DR 0
+          PROCESS_TERMINATE←⊃83 323 ⎕DR 1
+          False←⊃83 323 ⎕DR 0
           '∆CloseHandle'⎕NA'U KERNEL32.C32|CloseHandle I4'
           :Repeat
-              thisPID←↑pid
+              thisPID←⊃pid
               'Invalid PID: not an integer'⎕SIGNAL 11/⍨0≠1↑0⍴thisPID
               :If 0≠h←∆OpenProcess PROCESS_TERMINATE False thisPID   ⍝ Get handle to the process
                   '∆TerminateProcess'⎕NA'KERNEL32.C32|TerminateProcess P I4'
@@ -245,11 +245,8 @@
               {}∆CloseHandle h
           :Until 0=≢pid←1↓pid
       :CaseList 'Lin' 'Mac'
-          '∆KillPID'⎕NA'I4 ',GetSharedLib,'| kill I4 I4'
           :Repeat
-              :Trap 11
-                  r←∆KillPID 2↑↑pid
-              :EndTrap
+              ⎕SH'kill -9 ',⍕pid
           :Until 0=≢pid←1↓pid
       :Else
           . ⍝ Huuh?!
@@ -259,9 +256,9 @@
 ⍝ Private stuff
 
       GetLibcName←{   ⍝ Linux: extract real name of libc that is actually used
-          pid←↑⎕SH'echo $PPID'
+          pid←⊃⎕SH'echo $PPID'
           libs←⎕SH'ldd /proc/',pid,'/exe'
-          ↑('^[[:space:]]*libc\.so\b.*=>[[:space:]]*([^[:space:]]*)'⎕S'\1')libs
+          ⊃('^[[:space:]]*libc\.so\b.*=>[[:space:]]*([^[:space:]]*)'⎕S'\1')libs
       }
 
     GetAPL_Width←{z←⍵ ⋄ 2×⍬⍴⎕SIZE'z'}
@@ -291,10 +288,10 @@
     ∇ path←GetTempPath;∆GetTempPath
     ⍝ Copied from FilesAndDirs in 2019-10 in an attempt to make OS independent.
     ⍝ Replace this by the `739 ⌶ 0` function once 17.0 becomes the latest supported version.
-      :Select GetOperatingSystem ⍬
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
       :Case 'Win'
           '∆GetTempPath'⎕NA'I4 KERNEL32.C32|GetTempPath* I4 >T[]'
-          path←↑↑/∆GetTempPath 1024 1024
+          path←⊃↑/∆GetTempPath 1024 1024
           :If 0=≢path
               11 ⎕SIGNAL⍨'Problem getting Windows temp path!; rc=',⍕GetLastError
           :EndIf
@@ -309,7 +306,7 @@
 
     ∇ r←GetLastError;∆GetLastError
     ⍝ Copied from FilesAndDirs in 2019-10 in an attempt to make OS independent.
-      :Select GetOperatingSystem ⍬
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
       :Case 'Win'
           '∆GetLastError'⎕NA'I4 kernel32.C32|GetLastError'
           r←∆GetLastError

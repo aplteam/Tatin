@@ -22,7 +22,7 @@
              list←(≢home)↓¨⊃('recursive' 1)F.Dir home,cfg.source
          :EndIf
      :EndIf
-     cfg WritePackageConfigFile home
+     cfg WritePackageConfigFile home   ⍝ Because we might have established what is the source
  :Else
      :If F.IsFile home,cfg.source
          list←⊆cfg.source
@@ -32,5 +32,5 @@
          list←(≢home)↓¨⊃('recursive' 1)F.Dir home,cfg.source,'/'
      :EndIf
  :EndIf
- list/⍨←F.IsFile projectPath∘,¨list
+ list/⍨←F.IsFile home∘,¨list
 ⍝Done

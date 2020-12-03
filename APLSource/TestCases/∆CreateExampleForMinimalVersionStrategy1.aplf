@@ -1,4 +1,4 @@
- {r}←∆CreateExampleForMinimalVersionStrategy1;body;cfg
+ {r}←∆CreateExampleForMinimalVersionStrategy1;body;cfg;rc;msg;zipFilename
 ⍝ This function establishes the first example of https://research.swtch.com/vgo-mvs
  r←⍬
 
@@ -14,7 +14,8 @@
      cfg TC.WritePackageConfigFile ∆BuildSrc
      ∆BuildSrc TC.Dependencies.Add'minimalversion-B-1.1.2'
      ∆BuildSrc TC.Dependencies.Add'minimalversion-C-1.1.2'
-     TC.PublishPackage ∆BuildSrc ∆BuildReg
+     (rc msg zipFilename)←TC.PublishPackage ∆BuildSrc ∆BuildReg
+     Assert 200=rc
      Assert 0=1⊃F.RmDir ∆BuildSrc
      Assert F.MkDir ∆BuildSrc
  :EndIf

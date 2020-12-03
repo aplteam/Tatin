@@ -20,11 +20,11 @@
      filename←({⍵⊃⍨¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
      version←'none'
  :Else
-     response←request R.Respond 404 1
+     response←request Respond 404 1
      :Return
  :EndIf
  :If 0=F.IsFile filename
-     response←request R.Respond 404 1
+     response←request Respond 404 1
  :Else
      :If 0<≢data←1⊃F.NGET filename 1
          :If IsJsonRequest request.Headers
@@ -35,6 +35,6 @@
              response←request ReturnHTML html
          :EndIf
      :Else
-         response←request R.Respond 404 1
+         response←request Respond 404 1
      :EndIf
  :EndIf

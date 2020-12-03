@@ -1,0 +1,8 @@
+ {rc}←flag RemoveDataFolder path;en;more
+⍝ Attempts to remove the `data\` folder from `path` in case `flag` is 1.\\
+⍝ Note that this is the only step in the process of publishing a package that might fail without all actions already carried out as part
+⍝ being rolled back. In other works, if removing the `data\` folder fails that is ignored.
+ rc←0
+ :If flag
+     (rc en more)←F.RmDir path,'/data'
+ :EndIf

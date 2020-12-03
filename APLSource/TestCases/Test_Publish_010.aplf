@@ -1,4 +1,4 @@
- r←Test_Publish_010(stopFlag batchFlag);⎕TRAP;expected;zipped
+ r←Test_Publish_010(stopFlag batchFlag);⎕TRAP;expected;zipped;rc;zipFilename;msg
  ;dir;src;dist;body;cfg;reg;list;list2
 ⍝ Publish a really simple package (single source file, no dependencies, no assets) via an alias.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,8 @@
  cfg.source←'Test.apln'
  cfg TC.WritePackageConfigFile src
 
- TC.PublishPackage src'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage src'[local2]'
+ Assert 200=rc
 
  →T.GoToTidyUp 1≠≢list←F.ListDirs reg
  →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list

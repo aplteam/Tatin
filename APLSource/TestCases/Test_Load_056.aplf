@@ -1,4 +1,4 @@
- r←Test_Load_056(stopFlag batchFlag);⎕TRAP;reg1;reg2;reg3
+ r←Test_Load_056(stopFlag batchFlag);⎕TRAP;reg1;reg2;reg3;rc;msg;zipFilename
  ;dir;src;body;cfg;list;index;expected;zipped;src2;refs
 ⍝ Publish a package, then load it from any Registry by specifying a full package ID
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,8 @@
  cfg.(group name version)←'MyDepartment' 'Math' '1.0.0'
  cfg.source←'Math.aplc'
  cfg TC.WritePackageConfigFile src2
- TC.PublishPackage src2 reg2
+ (rc msg zipFilename)←TC.PublishPackage src2 reg2
+ Assert 200=rc
 
  refs←TC.LoadPackage'MyDepartment-Math-1.0.0'#.TEMP
  →T.GoToTidyUp 12≠3 #.TEMP.Math.Times 4

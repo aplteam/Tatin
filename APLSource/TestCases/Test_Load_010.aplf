@@ -1,4 +1,4 @@
- r←Test_Load_010(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_010(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;reg1;reg2;body;cfg;zipfile;refs
 ⍝ Publish simple package to the second registry and then load it from there using the alias.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,8 @@
  cfg.source←'Test.apln'
  cfg TC.WritePackageConfigFile src
  zipfile←TC.Pack src src
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
  (⊂body)F.NPUT src,'/Constants.apln'
@@ -31,7 +32,8 @@
  cfg.source←'Constants.apln'
  cfg TC.WritePackageConfigFile src
  zipfile←TC.Pack src src
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  refs←TC.LoadPackage('[local2]Example-Constants-1.0.0')'#.TEMP'
 

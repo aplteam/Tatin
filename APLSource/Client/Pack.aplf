@@ -8,6 +8,7 @@
  cfg←ReadPackageConfigFile projectPath                                         ⍝ Check projectPath has config
  ValidateConfig cfg
  zipFilename←F.ExpandPath targetPath,(GetPackageFilenameFromCfg cfg),'.zip'
+ F.DeleteFile zipFilename
  zipObj←⎕NEW DotNetZip(,⊂zipFilename)
  'No source code?!'Assert 0<≢fileList←projectPath GetAllFiles cfg
  projectPath zipObj.Add fileList

@@ -1,21 +1,46 @@
- PublishPackage←{
-⍝ ⍺ is the Client config
-⍝ ⍵ is:
-⍝   * path to a zip file
-⍝   * path to a registry
-     cfg←⍺
-     (zipFilename registry)←⍵
-     ind←Index.GetRegistryIndex registry
-     pgId←cfg.group,'-',cfg.name,'-',cfg.version
-     ∨/(pgId,⎕UCS 10)⍷ind:'Version conflict, package versions must be unique'Assert 0
-     tgt←registry,'/',pgId
-     _←F.MkDir tgt,'/data'
-     _←(tgt,'/',pgId,'.zip')⎕NMOVE zipFilename
-     _←(ind,pgId)Index.PutRegistryIndex registry
-     _←(tgt,'/',pgId,'.zip')DotNetZip.UnzipTo(tgt,'/data')
-     _←tgt ⎕NMOVE tgt,'/data/apl-package.json'
-     dependenciesFilename←tgt,'/data/',DependenciesFilename
-     0=F.Exists dependenciesFilename:shy←0
-     _←tgt ⎕NMOVE dependenciesFilename
-     1:shy←0
- }
+ {(statusCode errMsg)}←clientConfig PublishPackage(zipFilename registry);regIndex;packageID;packageDir;dependenciesFilename;errMsg;HttpCodes
+⍝ Tries to publish a package locally.\\
+⍝ * If the package already exists `errmsg` carries an appropriate message and the error is logged. No further action is taken.
+⍝ * If any action along the line fails (like creating the package directory, copying the ZIP file, copying the dependeny file, if any)
+⍝   then the error is logged and all actions carried out so far are rolled back.
+⍝ No matter whether this functions was called by a Tatin server or not, it returns HTTP HttpCodes:
+⍝ * In case of success 200
+⍝ * In case the package is already published 400 (Bad request)
+⍝ * In case something else went wrong 500 (Internal Server error)
+⍝ In case the function is called by a Tatin server, `errMsg` should be returned as content; that's why we do not just use `Assert`
+ HttpCodes←⎕NS'' ⋄ HttpCodes.OK←200 ⋄ HttpCodes.InternalServerError←500 ⋄ HttpCodes.BadRequest←400
+ statusCode←HttpCodes.OK ⋄ errMsg←''
+ regIndex←Index.GetRegistryIndex registry
+ packageID←clientConfig.group,'-',clientConfig.name,'-',clientConfig.version
+ packageDir←registry,('/'/⍨~'/\'∊⍨¯1↑registry),packageID
+ :If ∨/(packageID,LF)⍷regIndex
+     errMsg←'Package already exists (version conflict)'
+     statusCode←HttpCodes.BadRequest
+     LogAndRollbackPublishPackage errMsg
+ :ElseIf 0=F.MkDir packageDir,'/data'
+     statusCode←HttpCodes.InternalServerError
+     errMsg←'Could not create directory for ',packageID
+ :ElseIf 0<≢(packageDir,'/',packageID,'.zip')(⎕NCOPY Exec)zipFilename
+     HttpCodes.InternalServerError
+     errMsg←'Publishing packaged failed'
+     packageDir LogAndRollbackPublishPackage errMsg
+ :Else
+     (regIndex,packageID)Index.PutRegistryIndex registry
+     (packageDir,'/',packageID,'.zip')DotNetZip.UnzipTo(packageDir,'/data')
+     :If 0<≢packageDir(⎕NMOVE Exec)packageDir,'/data/apl-package.json'
+         HttpCodes.InternalServerError
+         errMsg←'Publishing packaged failed'
+         packageDir LogAndRollbackPublishPackage errMsg
+     :Else
+         dependenciesFilename←packageDir,'/data/',DependenciesFilename
+         :If F.Exists dependenciesFilename
+         :AndIf 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
+             HttpCodes.InternalServerError
+             errMsg←'Publishing packaged failed'
+             packageDir LogAndRollbackPublishPackage errMsg
+         :Else
+             0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

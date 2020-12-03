@@ -1,4 +1,4 @@
- r←Test_Load_053(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_053(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish three packages two of wich depend on each other (circle), then load from specific Registry.
 ⍝ "A" depends on "B" which depends on "C" while "C" depends on "B".
@@ -22,7 +22,8 @@
  cfg.source←'A.apln'
  cfg TC.WritePackageConfigFile src2
  src2 TC.Dependencies.Add'[local2]Example-B-1.0.0'
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ Assert 200=rc
 
  F.MkDir src3←src,'/B'
  body←':Namespace B' 'FB1←{' '1+⍵' '}' 'FB2←{' '⍵+##.C.FC2 2' '}' ':EndNamespace'
@@ -33,7 +34,8 @@
  cfg.api←'B'
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-C-1.0.0'
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  F.MkDir src3←src,'/C'
  body←':Namespace C' 'FC1←{' '⍵+3' '}' 'FC2←{' '4+##.B.FB1 ⍵' '}' ':EndNamespace'
@@ -44,7 +46,8 @@
  cfg.api←'C'
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-B-1.0.0'
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/Example-A-1.0.0')#.TEMP
  →T.GoToTidyUp 37≠#.TEMP.A.foo 30

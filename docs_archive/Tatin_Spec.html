@@ -42,7 +42,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><a href="#The-InitialisePackage-method">1.6.1.1. The “InitialisePackage” method</a></li>
 <li><a href="#The-Pack-method">1.6.1.2. The “Pack” method</a></li>
-<li><a href="#The-PublishPackage-method">1.6.1.3. The “PublishPackage” method</a></li>
+<li><a href="#The-Publish-method">1.6.1.3. The “Publish” method</a></li>
 <li><a href="#Retrieving-packages">1.6.1.4. Retrieving packages</a>
 <ul>
 <li><a href="#The-identifier">1.6.1.4.1. The “identifier”</a>
@@ -77,7 +77,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#create_index">1.8.1.2. The <code>Index.Create</code> method</a></li>
 <li><a href="#Reg_ListPackages">1.8.1.3. The <code>ListPackages</code> method</a></li>
 <li><a href="#Reg_ListPackageVersions">1.8.1.4. The <code>ListPackageVersions</code> method</a></li>
-<li><a href="#registry_publish_package">1.8.1.5. The <code>PublishPackage</code> method</a></li>
+<li><a href="#registry_publish_package">1.8.1.5. The <code>Publish</code> method</a></li>
 <li><a href="#GetPackage">1.8.1.6. The <code>GetPackage</code> method</a></li>
 <li><a href="#Withdrawing-a-package">1.8.1.7. Withdrawing a package (Delete)</a></li>
 <li><a href="#Updating-a-package">1.8.1.8. Updating a package</a></li>
@@ -96,11 +96,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><a href="#Overview-1">1.9.2.1. Overview</a></li>
 <li><a href="#Example-for-a-Registry">1.9.2.2. Example for a Registry</a></li>
+<li><a href="#CPU-versus-disk-space">1.9.2.3. CPU versus disk space</a></li>
 </ul></li>
-</ul></li>
-<li><a href="#CPU-versus-disk-space">1.10. CPU versus disk space</a>
-<ul>
-<li><a href="#Authentication">1.10.1. Authentication</a>
+<li><a href="#Authentication">1.9.3. Authentication</a>
 </li></ul></li>
 </li></ul></li>
 </ul>
@@ -168,7 +166,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>aplteam-APLTreeUtils-1.0.0</code></li>
 <li><code>aplteam-APLTreeUtils-2.0.0</code></li>
 </ul>
-<p>That means they are considered to be as different as <code>aplteam-Foo-1.0.0</code> and <code>aplteam-Goo-1.0.0</code>.</p>
+<p>That means they are considered to be as different as <code>aplteam-This-1.0.0</code> and <code>aplteam-That-1.0.0</code>.</p>
 <div class="h_tag">
 <a href="#Registry" id="Registry" class="autoheader_anchor">
 <h3 data-id="Registry">1.2.4. Registry</h3>
@@ -358,11 +356,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Assets must be specified relative to the package source. There is one exception: in case an absolute path is specified but that path is identical to the source path then it's just removed.</p>
 <p>The resulting zip file will be named <code>{group}-{name}-{version}.zip</code> and placed in <code>target_path</code>.</p>
 <div class="h_tag">
-<a href="#The-PublishPackage-method" id="The-PublishPackage-method" class="autoheader_anchor">
-<h4 data-id="The-PublishPackage-method">1.6.1.3. The “PublishPackage” method</h4>
+<a href="#The-Publish-method" id="The-Publish-method" class="autoheader_anchor">
+<h4 data-id="The-Publish-method">1.6.1.3. The “Publish” method</h4>
 </a>
 </div>
-<p>Syntax: <code>{⍬} ← {registry} PublishPackage (package)</code></p>
+<p>Syntax: <code>{⍬} ← {registry} Publish (package)</code></p>
 <p>Publish <code>package</code> to <code>registry</code>.</p>
 <table>
 <thead>
@@ -399,7 +397,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </table>
 <ul>
 <li>If <code>package</code> is a ZIP file then that file was typically created by the <code>Pack</code> method.</li>
-<li>If it points to a folder then it is assumed that this is a project folder. In that case <code>PublishPackage</code> calls the method <code>Pack</code> itself, producing the required ZIP file in a temp folder, which is then published to the given Registry.</li>
+<li>If it points to a folder then it is assumed that this is a project folder. In that case <code>Publish</code> calls the method <code>Pack</code> itself, producing the required ZIP file in a temp folder, which is then published to the given Registry.</li>
 </ul>
 <div class="h_tag">
 <a href="#Retrieving-packages" id="Retrieving-packages" class="autoheader_anchor">
@@ -994,10 +992,10 @@ aplteam-Conga-3.2.1</code></pre>
 <p>Lists all versions of the given package. If no package with the given <code>group</code> and <code>name</code> can be found then <code>⍬</code> is returned.</p>
 <div class="h_tag">
 <a href="#registry_publish_package" id="registry_publish_package" class="autoheader_anchor">
-<h4 data-id="registry_publish_package">1.8.1.5. The <code>PublishPackage</code> method</h4>
+<h4 data-id="registry_publish_package">1.8.1.5. The <code>Publish</code> method</h4>
 </a>
 </div>
-<p>Syntax: <code>rc ← PublishPackage (packageZip)</code></p>
+<p>Syntax: <code>rc ← Publish (packageZip)</code></p>
 <p>Add a package to the Registry.</p>
 <table>
 <thead>
@@ -1189,7 +1187,7 @@ R@https://packages.carlisle-group.com/carlisle/Rumba/3.2.0</code></pre>
 </div>
 <p>Data is stored in the file system: there is no database involved.</p>
 <p>When a Registry is managed by a Server a file <code>tatin_index.json</code> will be created. The file will be re-created whenever the Server is started.</p>
-<p>Meta data regarding packages might be stored at a later stage in sub folders following certain naming conventions.</p>
+<p>Meta data regarding packages might be stored at a later stage following certain naming conventions.</p>
 <div class="h_tag">
 <a href="#Example-for-a-Registry" id="Example-for-a-Registry" class="autoheader_anchor">
 <h4 data-id="Example-for-a-Registry">1.9.2.2. Example for a Registry</h4>
@@ -1199,7 +1197,6 @@ R@https://packages.carlisle-group.com/carlisle/Rumba/3.2.0</code></pre>
 <pre><code>/Foo/
   Group1-Pack_1-1.0.0/
     apl-package.json
-    apl-dependencies.txt
     Group1-Pack_1-1.0.0.zip
   Group1-Pack_1-2.0.0/
     apl-package.json
@@ -1225,20 +1222,26 @@ R@https://packages.carlisle-group.com/carlisle/Rumba/3.2.0</code></pre>
     apl-package.json
     apl-dependencies.txt
     Group2-Pack_c-1.0.0.zip</code></pre>
-<p>Note that packages in different groups may share the same name.</p>
+<p>Notes:</p>
+<ul>
+<li>Packages in different groups may share the same name</li>
+<li>Only when a package has dependencies is there a file <code>apl-depedencies.txt</code></li>
+</ul>
 <p>A Registry might live on a different machine; then the client must access any packages within that Registry via the HTTP protocol and the server's REST interface.</p>
 <p>A Registry might live locally. In that case it can also be addressed via the file protocol. If no Tatin server is running on the local machine then this is the only way to access the Registry, though one could access a single zipped file comprising a package by passing a full path.</p>
 <p>In such a case the last part of the path will be converted into a package ID automatically.</p>
 <div class="h_tag">
 <a href="#CPU-versus-disk-space" id="CPU-versus-disk-space" class="autoheader_anchor">
-<h2 data-id="CPU-versus-disk-space">1.10. CPU versus disk space</h2>
+<h4 data-id="CPU-versus-disk-space">1.9.2.3. CPU versus disk space</h4>
 </a>
 </div>
-<p>It is not clear whether packages should be saved as ZIP files <em><strong>and</strong></em> unzipped as well. The ZIP files are required for delivery. Keeping the package unzipped might speed up some search operations. Those will certainly be needed at a later stage, for example searching for particular code snippets or comments etc. However, the package configuration file and the dependency file are always available unzipped.</p>
-<p>For the time being the packages are stored unzipped in a sub-folder <code>data\</code>. This can be switched off, and all the <code>data\</code> folders deleted, without causing trouble.</p>
+<p>It is not clear whether packages should be saved as ZIP files <em><strong>and</strong></em> unzipped as well. The ZIP files are required for delivery in any case.</p>
+<p>Keeping the package unzipped might speed up some search operations. Those will certainly be needed at a later stage, for example searching for particular code snippets or comments etc. However, the package configuration file and the dependency file are always available unzipped.</p>
+<p>For the time being the packages are stored unzipped in a sub-folder <code>data\</code>. The package config file and the dependency file (if any) are then copied from the <code>data\</code> folder to parent folder.</p>
+<p>If we don't want to keep the <code>data\</code> folder then it should be removed as the very last step. The code is already there but commented.</p>
 <div class="h_tag">
 <a href="#Authentication" id="Authentication" class="autoheader_anchor">
-<h3 data-id="Authentication">1.10.1. Authentication</h3>
+<h3 data-id="Authentication">1.9.3. Authentication</h3>
 </a>
 </div>
 <p>Bearer authentication is used when accessing protected resources. API keys can be generated by authenticated users with specific access permissions.</p>

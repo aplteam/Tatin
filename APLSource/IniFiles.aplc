@@ -11,22 +11,25 @@
 ⍝
 ⍝ Homepage: http://aplwiki.com/IniFiles
 
-    ⎕IO←1 ⋄ ⎕ML←3
-    :Include APLTreeUtils
+    ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public Shared
-      r←(Last⍕⎕THIS)'3.2.3.5' '2019-12-01'
+      r←'IniFiles' '5.0.1.12' '2020-11-29'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 3.2.3
-      ⍝   * The `List` function injected into the namespace that is created by the `Convert` method does 
-      ⍝     not depend on APLTreeUtils any more at all.
-      ⍝ * 3.2.2
-      ⍝   * `Put` crashed when called on a non-existing section.
-      ⍝   * `Help` provided out-of-date information regarding ]ADOC
+      ⍝ * 5.0.1
+      ⍝   * Internal change: `Uppercase` and Lowercase` replaced by calles to `⎕C`.
+      ⍝   * ...
+      ⍝ * 5.0.0
+      ⍝   * BREAKING CHANGES:
+      ⍝     * Does not now requires the class `APLTreeUtils2`
+      ⍝     * Requires at least Dyalog 18.0
+      ⍝   * `IniFiles` does not :Include APLTreeUtils anymore
+      ⍝   * Bug fix: in case a value was added with `Put` the `Changed` property was not set to 1.
+      ⍝   * Internally now `⎕ML←1` is used.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/IniFiles/releases>
     ∇
@@ -34,10 +37,10 @@
     ∇ r←GetSections
     ⍝ Returns a vector of strings with sections names.
       :Access Public Instance
-      r←Uppercase 1↓¨_Sections
+      r←1 ⎕C 1↓¨_Sections
     ∇
 
-    ∇ r←GetIniFiles filename;p;fn;ext;fn2;fn1;f1;f2;assume
+    ∇ r←GetIniFiles filename;p;fn;ext;fn2;fn1;f1;f2;assume;A
       :Access Public Shared
     ⍝ Returns a list of INI files.\\
     ⍝ Let's assume that "foo.ini" ←→ filename. Let's also assume that the current computer's name is "JohnDoe".
@@ -49,8 +52,9 @@
     ⍝ `'foo.ini' 'foo_johndoe,ini' ← #.IniFiles.GetIniFiles`\\
     ⍝ If there is no file foo_johndoe.ini however then the result is:\\
     ⍝ `'foo.ini' ← #.IniFiles.GetIniFiles`
-      (p fn)←{('\'∊⍵):SplitPath ⍵ ⋄ ''⍵}filename
-      (fn ext)←{('.'∊⍵):'.'SplitPath ⍵ ⋄ (⍵,'.')'ini'}fn
+      A←(⊃⊃⎕CLASS ⎕THIS).##.⍎'APLTreeUtils2'
+      (p fn)←{('\'∊⍵):A.SplitPath ⍵ ⋄ ''⍵}filename
+      (fn ext)←{('.'∊⍵):'.'A.SplitPath ⍵ ⋄ (⍵,'.')'ini'}fn
       f1←⎕NEXISTS fn1←p,fn,ext
       f2←⎕NEXISTS fn2←p,(¯1↓fn),'_',GetComputerName,'.',ext
       ⍎('Could not find ',fn1)Signal 6/⍨f1=0
@@ -62,22 +66,22 @@
       lnos←⍳⍴data                               ⍝ Create Line Numbers
       il←bool⌿data                              ⍝ Create it (Import List)
       ilRemarks←bool/allRemarks                 ⍝ Remarks belonging to !Import
-      ⍎'!Import statement must not have a remark'Signal 911/⍨0∨.<↑∘⍴¨ilRemarks
+      ⍎'!Import statement must not have a remark'Signal 911/⍨0∨.<≢¨ilRemarks
       data←(~bool)/data                         ⍝ Remove the "!Import" lines from "data" numbers
       lnos←bool/lnos                            ⍝ Remove the "!Import" lines from the line numbers
       allRemarks←(~bool)/allRemarks             ⍝ Remove the "!Import" lines from "allRemarks"
-      il←(+/∧\' '=⊃il)↓¨il                      ⍝ Drop any leading blanks
-      il←Lowercase¨(il⍳¨' ')↓¨il                ⍝ Drop method name, leaving the filenames
-      refToIniFile←↑1⊃⎕CLASS ⎕THIS              ⍝ Ref to itself
+      il←(+/∧\' '=↑il)↓¨il                      ⍝ Drop any leading blanks
+      il←⎕C¨(il⍳¨' ')↓¨il                       ⍝ Drop method name, leaving the filenames
+      refToIniFile←⊃1⊃⎕CLASS ⎕THIS              ⍝ Ref to itself
       r←0 3⍴⊂''
       :For this :In il
           :If (~':'∊this)∧~(1⍴this)∊'/\'        ⍝ Does not start with / and has no drive letter?
-              fullName←(↑1 ⎕NPARTS''),'\',this  ⍝ Then make it absolute
+              fullName←(⊃1 ⎕NPARTS''),'\',this  ⍝ Then make it absolute
           :Else
               fullName←this                     ⍝ Is already absolute
           :EndIf
-          fullName←↑,/1 ⎕NPARTS fullName
-          'Tries to import itself'⎕SIGNAL 11/⍨(⊂Lowercase fullName)∊Lowercase _IniFilename
+          fullName←⊃,/1 ⎕NPARTS fullName
+          'Tries to import itself'⎕SIGNAL 11/⍨(⊂⎕C fullName)∊⎕C _IniFilename
           temp←(⎕NEW refToIniFile(fullName _debugFlag)).Convert ⎕NS''  ⍝ Create an instance
           buff←temp.List''
           buff[;3]←DoubleCurlies¨buff[;3]
@@ -89,7 +93,7 @@
     :Property IniFilename
     :Access Public
         ∇ r←get
-          r←{0∊⍴⍵:1⊃⍵ ⋄ ⊃{⍺,';',⍵}/⍵}_IniFilename
+          r←{0∊⍴⍵:1⊃⍵ ⋄ ↑{⍺,';',⍵}/⍵}_IniFilename
         ∇
     :EndProperty
 
@@ -115,8 +119,7 @@
     :EndProperty
 
     :Property EstablishedAt
-    ⍝ Stores date and time as float (date.time) when the instance was established.
-    ⍝
+    ⍝ Stores date and time as float (date.time) when the instance was established.\\
     ⍝ Usefult if you want to find out whether the INI file was changed since it was instanciated.
     ⍝ See `HasInifileChanged`
     :Access Public
@@ -127,9 +130,9 @@
 
 
     :Property Changed
-    ⍝ Read-only property that tells you that the data from the INI file was changed later on by assignment.
-    ⍝
+    ⍝ Read-only property that tells you that the data from the INI file was changed later on by assignment.\\
     ⍝ Note that those changes will persist only if the `Save` method is invoked at some point.
+    ⍝ See also `HasInifileChanged`
     :Access Public
         ∇ r←get
           r←_changed
@@ -139,30 +142,30 @@
     :Property keyed default data
     ⍝ This property allows external access to the INI data via indexing.
         ∇ set val;where;EndHold;keys;section;key;data;where2;i;buffer;buffer2;ref;name;line;KEY;TOC;toc;this;new;newItem;comments;SECTION
-          keys←{2=≡⍵:⍵ ⋄ ↑⍵}val.Indexers
-          'Length Error'⎕SIGNAL(≠/↑∘⍴¨,¨keys(,val.NewValue))/11
+          keys←{2=|≡⍵:⍵ ⋄ ⊃⍵}val.Indexers
+          'Length Error'⎕SIGNAL(≠/≢¨keys(,val.NewValue))/11
           keys←{~':'∊⍵:⍵ ⋄ ⍵{((⍵-1)↑⍺)(⍵↓⍺)}⍵⍳':'}¨keys
           :For i :In ⍳⍴,keys
               buffer←i⊃,keys
               'Use "Section:key" syntax'⎕SIGNAL 11/⍨2≠⍴buffer
               (section key)←buffer
-              SECTION←Uppercase section←'_',section
+              SECTION←1 ⎕C section←'_',section
               :If (⍴_Sections)<where←_SECTIONS⍳⊂SECTION
-                       ⍝ Event the section is new!
-                  (Uppercase section)⎕NS''
+                  ⍝ Event the section is new!
+                  (1 ⎕C section)⎕NS''
                   _Sections,←⊂section
-                  {⍵._Data←0 5⍴'' ⋄ ⍵.generalRemarks←''}⍎Uppercase section
+                  {⍵._Data←0 5⍴'' ⋄ ⍵.generalRemarks←''}⍎1 ⎕C section
                   _changed←1
                   where←⍴_Sections
               :EndIf
               data←{⍵._Data}ref←⍎where⊃_SECTIONS
-              KEY←Uppercase key
+              KEY←1 ⎕C key
               (toc TOC)←↓⍉data[;1 5]
               :If (1⊃⍴data)≥where2←TOC⍳⊂KEY
               ⍝ It is an update!
                   buffer←i⊃,val.NewValue
-                  'Invalid depth'⎕SIGNAL 11/⍨~0 1 2∊⍨≡buffer
-                  :If 2=≡buffer
+                  'Invalid depth'⎕SIGNAL 11/⍨~0 1 2∊⍨|≡buffer
+                  :If 2=|≡buffer
                       new←''
                       :For this :In buffer
                           :If IsChar this
@@ -175,13 +178,13 @@
                       :EndFor
                       _changed∨←data[where2;2]≢1⊃¨new
                       :If (1+⍴new)≠⍴4⊃data[where2;] ⍝ Add one for initialiation (nested!)
-                      :AndIf ~0∊⍴4⊃data[where2;]
+                      :AndIf 0≠≢4⊃data[where2;]
                           ⍝ The length has changed, so the comments do not any longer fit!
                           comments←(1,(2⊃data[where2;])∊(1⊃¨new))/4⊃data[where2;]
                           comments←(1,(1⊃¨new)∊2⊃data[where2;])\comments
                           data[where2;4]←⊂comments
                       :EndIf
-                      data[where2;2 3]←↓⍉⊃new
+                      data[where2;2 3]←↓⍉↑new
                   :Else
                       :If '{'∊buffer
                           data[where2;2]←⊂ReplaceCurlies TOC buffer
@@ -194,8 +197,8 @@
               :Else
               ⍝ key is new in this section
                   buffer←i⊃,val.NewValue
-                  'Invalid depth'⎕SIGNAL 11/⍨~0 1 2∊⍨≡buffer
-                  :If 2=≡buffer
+                  'Invalid depth'⎕SIGNAL 11/⍨~0 1 2∊⍨|≡buffer
+                  :If 2=|≡buffer
                       new←''
                       :For this :In buffer
                           :If IsChar this
@@ -207,11 +210,11 @@
                           new,←⊂newItem
                       :EndFor
                       _changed←1
-                      data⍪←((⊂key),(↓⍉⊃new),⊂''),⊂''
+                      data⍪←((⊂key),(↓⍉↑new),⊂''),⊂''
                   :Else
                       :If 2=+/'{}'∊buffer
                           name←{{⍵↑⍨¯1+'}'⍳⍨⍵}⍵↓⍨⍵⍳'{'}buffer
-                          :If (1⊃⍴ref._Data)<line←ref._Data[;5]⍳⊂Uppercase name
+                          :If (1⊃⍴ref._Data)<line←ref._Data[;5]⍳⊂1 ⎕C name
                               6 ⎕SIGNAL⍨'Unknown: "',name,'"'
                           :EndIf
                           buffer2←(line⊃ref._Data[;2]){a←¯1+⍵⍳'{' ⋄ w←a⌽⍵ ⋄ (-a)⌽⍺,⍵↓⍨⍵⍳'}'}buffer
@@ -233,24 +236,24 @@
         ∇
 
         ∇ r←get arg;keys;bool;where;this;KEYS;THIS;i;noOf
-          'Invalid argument'⎕SIGNAL 11/⍨0 1∊⍨≡keys←↑arg.Indexers
+          'Invalid argument'⎕SIGNAL 11/⍨0 1∊⍨≡keys←⊃arg.Indexers
           :If 0∊⍴keys←{~':'∊⍵:⍵ ⋄ ⍵{((⍵-1)↑⍺)(⍵↓⍺)}⍵⍳':'}¨keys
               r←''
           :Else
               'Invalid key'⎕SIGNAL 11/⍨0=⍴∊keys
-              KEYS←Uppercase¨keys
-              :If 0∊bool←('_',¨1⊃¨KEYS)∊Uppercase _Sections
-                  11 ⎕SIGNAL⍨'Unknown section: ',⊃{⍺,',',⍵}/∪(~bool)/1⊃¨keys
+              KEYS←1 ⎕C¨keys
+              :If 0∊bool←('_',¨1⊃¨KEYS)∊1 ⎕C _Sections
+                  11 ⎕SIGNAL⍨'Unknown section: ',↑{⍺,',',⍵}/∪(~bool)/1⊃¨keys
               :EndIf
               r←''
               :For i :In ⍳⍴,keys
                   THIS←i⊃,KEYS
                   this←i⊃,keys
-                  :If 0∊⍴2⊃this
-                      r,←⊂{({⍵⌿⍨0<↑∘⍴¨⍵[;1]}⍵._Data)[;2]}⍎'_',1⊃THIS
+                  :If 0=≢2⊃this
+                      r,←⊂{({⍵⌿⍨0<≢¨⍵[;1]}⍵._Data)[;2]}⍎'_',1⊃THIS
                   :Else
                       noOf←{1⊃⍴⍵._Data}⍎'_',1⊃THIS
-                      :If noOf<where←(2⊃THIS){(⍵._Data[;5])⍳⊂Uppercase ⍺}⍎'_',1⊃THIS
+                      :If noOf<where←(2⊃THIS){(⍵._Data[;5])⍳⊂1 ⎕C ⍺}⍎'_',1⊃THIS
                           :If 0=⎕NC'_default'
                               6 ⎕SIGNAL⍨'Unknown: ',2⊃this
                           :Else
@@ -262,8 +265,8 @@
                   :EndIf
               :EndFor
               :If ⍬≡⍴keys
-                  :If 1=≡r
-                      r←↑r
+                  :If 1=|≡r
+                      r←⊃r
                   :Else
                       r←r[1]
                   :EndIf
@@ -310,19 +313,20 @@
     ∇
 
     ∇ Init dummy
-      ⎕ML←3 ⋄ ⎕IO←1
+      ⎕ML←1 ⋄ ⎕IO←1
       _import←0
       _debugFlag←0
       _EN←⍬
       _EstablishedAt←Timestamp2Float ⎕TS
+      A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
     ∇
 
-    ∇ Create IniFilename;data;allRemarks;import;dm;en;invalid;⎕TRAP;sec
+    ∇ Create IniFilename;data;allRemarks;import;dm;en;invalid;⎕TRAP;sec;sep
      ⍝ Called by the official constructors
       _changed←_oldStyleFlag←0
       _Sections←''
       ⎕TRAP←(1+_debugFlag)⊃((0 'C' '_EN←⎕en ⋄ (⎕IO⊃⎕DM)⎕signal 911'))((0 1000)'S')
-      :If ~0∊⍴_IniFilename←IniFilename
+      :If 0≠≢_IniFilename←IniFilename
           _IniFilename←CheckExtension¨_IniFilename
           (data _oldStyleFlag allRemarks)←EvaluateINIs _IniFilename
           import←''
@@ -338,45 +342,46 @@
           :Else
               ⍎911 Signal⍨1⊃⎕DM
           :EndTrap
-          data←{(0∊⍴⍵):⍵ ⋄ ↑,/SortSection¨⍵}SplitSections data
-          :If ~0∊⍴import
+          data←{(0=≢⍵):⍵ ⋄ ⊃,/SortSection¨⍵}SplitSections data
+          :If 0≠≢import
               (data allRemarks)←MergeImport import data allRemarks
           :EndIf
-          :If ~0∊⍴data
-              (data allRemarks)←(⊂+\'['=↑¨data)⊂¨data allRemarks
-              :If ∨/invalid←(' '∊¨~∘'[]'∘↑¨data)∨¯1=↑∘⎕NC¨~∘'[ ]'∘↑¨data
-                  ⍎11 Signal⍨'Invalid section name(s): ',↑{⍺,', ',⍵}/invalid/↑¨data
+          :If 0≠≢data
+              sep←+\'['=⊃¨data
+              (data allRemarks)←sep∘{⎕ML←3 ⋄ ⍺⊂⍵}¨data allRemarks
+              :If ∨/invalid←(' '∊¨~∘'[]'∘⊃¨data)∨¯1=⊃∘⎕NC¨~∘'[ ]'∘⊃¨data
+                  ⍎11 Signal⍨'Invalid section name(s): ',⊃{⍺,', ',⍵}/invalid/⊃¨data
               :EndIf
-          :AndIf ~0∊⍴_Sections←'_',¨∪~∘'[ ]'∘↑¨data
-              ⎕NS∘''¨sec←Uppercase _Sections
+          :AndIf 0≠≢_Sections←'_',¨∪~∘'[ ]'∘⊃¨data
+              ⎕NS∘''¨sec←1 ⎕C _Sections
               (⍎¨sec)._Data←⊂0 5⍴''
               ProcessSections data allRemarks
           :EndIf
       :EndIf
-      ⎕DF(⍕⎕THIS),' on <',({0∊⍴⍵:⍵ ⋄ ⊃{⍺,';',⍵}/⍵}_IniFilename),'>'
+      ⎕DF(⍕⎕THIS),' on <',({0∊⍴⍵:⍵ ⋄ ↑{⍺,';',⍵}/⍵}_IniFilename),'>'
     ∇
 
     ∇ ProcessSections(data allRemarks);thisSection;sectionRemarks;this;ref;buffer;TOC;toc
-      :For thisSection sectionRemarks :In ↓⍉⊃data allRemarks
+      :For thisSection sectionRemarks :In ↓⍉↑data allRemarks
           this←'_','[ ]'~⍨1⊃thisSection
-          ref←⍎Uppercase this
+          ref←⍎1 ⎕C this
           ref.generalRemarks←⊂{⍵↓⍨+/∧\' '=⍵}1⊃sectionRemarks
           buffer←{i←⍵⍳'=' ⋄ ((i-1)↑⍵)(i↓⍵)}¨1↓thisSection
           :If OldStyleFlag
-          :AndIf ∨/(0<↑∘⍴¨∊¨buffer)∧¯1=↑∘⎕NC¨(↑¨buffer)~¨' '
-              ⍎11 Signal⍨'Check value names: ',⊃{⍺,',',⍵}/{(↑¨⍵)/⍨(0<↑∘⍴¨∊¨⍵)∧¯1=↑∘⎕NC¨↑¨⍵}buffer
+          :AndIf ∨/(0<≢¨∊¨buffer)∧¯1=⊃∘⎕NC¨(⊃¨buffer)~¨' '
+              ⍎11 Signal⍨'Check value names: ',↑{⍺,',',⍵}/{(⊃¨⍵)/⍨(0<≢¨∊¨⍵)∧¯1=⊃∘⎕NC¨⊃¨⍵}buffer
           :EndIf
-          :If ∨/' '∊¨dlb dtb','~¨⍨↑¨buffer
-              ⍎11 Signal⍨'Invalid value name(s): ',↑{⍺,', ',⍵}/{⍵/⍨' '∊¨⍵}↑¨buffer
+          :If ∨/' '∊¨A.DLB A.DTB','~¨⍨⊃¨buffer
+              ⍎11 Signal⍨'Invalid value name(s): ',⊃{⍺,', ',⍵}/{⍵/⍨' '∊¨⍵}⊃¨buffer
           :EndIf
           toc←' '~¨⍨1⊃¨buffer
-          TOC←Uppercase toc
+          TOC←1 ⎕C toc
           buffer←2⊃¨{2↑⍵,'' ''}¨buffer
           EstablishValuesInSection(TOC toc buffer)
-          :If 0∊⍴ref._Data
+          :If 0=≢ref._Data
               ref.Remarks←''
           :Else
-              ref.Remarks←sectionRemarks~⊃,/{2=≡⍵:⍵ ⋄ ⊂⍵}¨ref._Data[;4]
+              ref.Remarks←sectionRemarks~↑,/{2=|≡⍵:⍵ ⋄ ⊂⍵}¨ref._Data[;4]  ⍝ ⊃ ←→ ↑ ?!
           :EndIf
       :EndFor
     ∇
@@ -420,10 +425,10 @@
                   :EndIf
               :EndIf
               where←ref._Data[;5]⍳⊂NAME~','
-              :If where>1⊃⍴ref._Data
+              :If where>≢ref._Data
                   ref._Data⍪←name value2 value remark NAME
               :ElseIf ','∊name
-                  :If 0∊⍴2⊃ref._Data[where;] ⍝ Is it the first time?
+                  :If 0=≢2⊃ref._Data[where;] ⍝ Is it the first time?
                       ref._Data[where;4]←⊂¨ref._Data[where;4]
                       ref._Data[where;3]←⊂''
                   :EndIf
@@ -452,7 +457,7 @@
       ⍎'Left argument must be either empty or "flat"'Signal 11/⍨~(0∊⍴type)∨'flat'≡type
       data←Get ⍬ ⍬
       :If 'flat'≡type
-          :If ~0∊⍴data←(0<↑∘⍴¨data[;2])⌿data                ⍝ Isolate pure data
+          :If 0≠≢data←(0<≢¨data[;2])⌿data                   ⍝ Isolate pure data
               (theseNames theseValues)←↓⍉data[;2 3]         ⍝ All the names and values
               theseNames r.{⍎⍺,'←⍵'}¨theseValues            ⍝ Assign the values to the names
           :EndIf
@@ -461,13 +466,13 @@
           allValues←data[;3]
           :For thisSection :In data[;1]~⊂''                 ⍝ Loop over sections
               s←data[;1]⍳⊂thisSection                       ⍝ Where does the section start?
-              :If 0<noOf←{+/∧\0=↑¨⍴¨⍵}s↓data[;1]            ⍝ How many entries has the section?
+              :If 0<noOf←{+/∧\0=≢¨⍵}s↓data[;1]              ⍝ How many entries has the section?
                   rf←⍎'r.',thisSection,'←⎕NS'''''           ⍝ Create a namespace name after the section
                   rf.⎕DF thisSection                        ⍝ Set the display format
                   theseNames←noOf↑s↓data[;2]                ⍝ All the names and ...
                   theseValues←noOf↑s↓allValues              ⍝ ... values of this section
-                  :If ¯1∊↑∘⎕NC¨theseNames
-                      ⍎11 Signal⍨'Invalid value name(s): ',{↑{⍺,', ',⍵}/⍵/⍨¯1=↑∘⎕NC¨⍵}theseNames
+                  :If ¯1∊⊃∘⎕NC¨theseNames
+                      ⍎11 Signal⍨'Invalid value name(s): ',{⊃{⍺,', ',⍵}/⍵/⍨¯1=⊃∘⎕NC¨⍵}theseNames
                   :EndIf
                   theseNames rf.{⍎⍺,'←⍵'}¨theseValues       ⍝ Assign values to names inside that namespace
               :EndIf
@@ -475,11 +480,11 @@
           code←''
           code,←⊂' r←List section;toc;section_U;ind'
           code,←⊂'⍝ If "section" is empty or "*", all sections are returned'
-          code,←⊂' ⎕IO←1 ⋄ ⎕ML←3'
+          code,←⊂' ⎕IO←1 ⋄ ⎕ML←1'
           code,←⊂' r←'''''
           code,←⊂' :If (0∊⍴section)∨(,''*'')≡,section'
           code,←⊂'     :If ~0∊⍴⎕NL-9'
-          code,←⊂'         r←⊃⍪/{⍵,⍵.{{⎕IO←0 ⋄ ⎕ML←3 ⋄ ⍵,[0.5]⍎¨⍵}⎕NL-2}⍵}¨⍎¨⎕NL-9'
+          code,←⊂'         r←↑⍪/{⍵,⍵.{{⎕IO←0 ⋄ ⎕ML←3 ⋄ ⍵,[0.5]⍎¨⍵}⎕NL-2}⍵}¨⍎¨⎕NL-9'
           code,←⊂'     :EndIf'
           code,←⊂' :Else'
           code,←⊂'     ''Invalid right argument''⎕SIGNAL 11/⍨~(≡section)∊0 1'
@@ -506,7 +511,7 @@
       :If ⍬≡section
           section←''
       :EndIf
-      SECTION←Uppercase section
+      SECTION←1 ⎕C section
       :If ((⊂section)∊''⍬)∧(⊂key)∊''⍬
           r←0 3⍴''
           :For thisSection :In _SECTIONS
@@ -520,8 +525,8 @@
               ⍎6 Signal⍨'Unknown: "',(⍕∊section),'"'
           :EndIf
       :Else
-          :If 0∊⍴section
-              r←↑⍪/{⍵{(⊂⍺),⍵._Data}⍎⍵}¨_Sections
+          :If 0=≢section
+              r←⊃⍪/{⍵{(⊂⍺),⍵._Data}⍎⍵}¨_Sections
           :Else
               row←_SECTIONS⍳⊂SECTION
               :If (1⊃⍴_Sections)<row
@@ -530,15 +535,15 @@
           :EndIf
           this←row⊃_Sections
           ref←⍎row⊃_SECTIONS
-          :If 0∊⍴key
+          :If 0=≢key
               r←ref._Data
           :Else
               key←{0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}key
-              subRow←ref._Data[;5]⍳Uppercase key
-              :If ∨/bool←(↑⍴ref._Data)<subRow
+              subRow←ref._Data[;5]⍳1 ⎕C key
+              :If ∨/bool←(⊃⍴ref._Data)<subRow
                   :If 0=⎕NC'default'
                       :If 0=⎕NC'Default'
-                          ⍎6 Signal⍨'Value Error: "',(⊃{⍺,',',⍵}/bool/key),'"'
+                          ⍎6 Signal⍨'Value Error: "',(↑{⍺,',',⍵}/bool/key),'"'
                       :Else
                           :Trap 6
                               r←(ref._Data[;2],⊂Default)[subRow]
@@ -557,9 +562,9 @@
       :If 2=⍴⍴r
           :Select 2⊃⍴r
           :Case 2
-              r⌿⍨←0<↑∘⍴¨r[;1]
+              r⌿⍨←0<≢¨r[;1]
           :Case 3
-              r⌿⍨←0∨.≠⍨↑∘⍴¨r
+              r⌿⍨←0∨.≠⍨≢¨r
           :EndSelect
       :EndIf
     ∇
@@ -615,14 +620,9 @@
           (section key)←name
       :EndIf
       section←'_',section
-      (SECTION KEY)←Uppercase(section key)
+      (SECTION KEY)←1 ⎕C(section key)
       :If (⊂SECTION)∊_SECTIONS
           where←_SECTIONS⍳⊂SECTION
- ⍝TODO⍝       :Else
- ⍝TODO⍝           _Sections,←⊂section
- ⍝TODO⍝           where←⍴_Sections
- ⍝TODO⍝       :EndIf
- ⍝TODO⍝       :elseIf 9=⎕NC where⊃_SECTIONS
           ref←⍎SECTION
       :Else
           ⍎6 Signal⍨'Unkown section; (consider executing "AddSection")'
@@ -631,7 +631,7 @@
       :If (⎕DR data)∊11 83 645
           buffer←data(⍕data)
       :Else
-          :If 2=≡data
+          :If 2=|≡data
               buffer←({ReplaceCurlies KEYS ⍵}¨data)({'''',⍵,''''}¨,data)
           :Else
               buffer←(ReplaceCurlies KEYS data)('''',data,'''')
@@ -644,7 +644,8 @@
           :EndIf
           ref._Data[where;2 3]←buffer
       :Else
-          ref._Data⍪←(⊂key),buffer,(⊂''),⊂Uppercase key
+          ref._Data⍪←(⊂key),buffer,(⊂''),⊂1 ⎕C key
+          _changed←1
       :EndIf
     ∇
 
@@ -679,9 +680,9 @@
       r←0
       :If 0 1∊⍨≡name
           ⍎'Invalid right argument'Signal 11/⍨1≠':'+.=name
-          (section key)←' '~¨⍨2↑Uppercase{⍵⊂⍨':'≠⍵}name
+          (section key)←' '~¨⍨2↑1 ⎕C':'(≠⊆⊢)name
           section←'_',section
-          :If 0∊⍴key
+          :If 0=≢key
               :If 9=⎕NC section
                   ⎕EX section
                   _Sections←(_SECTIONS≢¨⊂section)/_Sections
@@ -689,7 +690,7 @@
               :EndIf
           :Else
               ⍝key←{⍵∧.=' ':'' ⋄ ⍵}key
-              (section key)←Uppercase{⍵⊂⍨':'≠⍵}name
+              (section key)←1 ⎕C':'(≠⊆⊢)name
               section←'_',section
               :If (⊂section)∊_SECTIONS
                   TOC←{⍵._Data[;5]}ref←⍎section
@@ -700,14 +701,14 @@
           :EndIf
       :Else
           :If 0 1∊⍨≡2⊃name
-              :If 2=≡name
+              :If 2=|≡name
               :AndIf ~':'∊1⊃,name
                   r←Delete⊃{⍺,':',⍵}/name
               :Else
                   r←Delete¨name
               :EndIf
           :Else
-              :If 3=≡name
+              :If 3=|≡name
               :AndIf 1 2≡≡¨name
                   r←Delete¨(⊂name[1]),¨⊂¨2⊃name
               :Else
@@ -752,10 +753,10 @@
     ⍝ Exist ('section:key1' 'otherSection:key2' 'thirdSection:')
     ⍝ ~~~
       :If 0 1∊⍨≡name
-          (section key)←' '~¨⍨Uppercase 2↑{⍵⊂⍨':'≠⍵}name
+          (section key)←' '~¨⍨1 ⎕C 2↑':'(≠⊆⊢)name
           section←'_',section
           :If 0∊⍴key
-              r←↑9=⎕NC section
+              r←⊃9=⎕NC section
           :Else
               key←{⍵∧.=' ':'' ⋄ ⍵}key
               :If 0∊⍴key
@@ -771,8 +772,8 @@
           :If ∧/':'∊¨name
               r←Exist¨name
           :Else
-              :If 3=≡name
-                  ⍎'Mixed syntax not eligible'Signal 11/⍨(∨/':'∊¨name)∧(∨/2=≡¨name)
+              :If 3=|≡name
+                  ⍎'Mixed syntax not eligible'Signal 11/⍨(∨/':'∊¨name)∧(∨/2=|≡¨name)
                   r←Exist¨name
               :Else
                   r←Exist⊃{⍺,':',⍵}/name
@@ -786,7 +787,7 @@
  ⍝
  ⍝ Return a 1 if a section was added. A 0 is rerturned in case the section already exists.
       :Access Public
-      NAME←Uppercase name←'_',name
+      NAME←1 ⎕C name←'_',name
       ⍎'Section name must be a valid APL name'Signal 11/⍨¯1=⎕NC NAME
       :If r←0=⎕NC NAME
           NAME ⎕NS''
@@ -798,9 +799,10 @@
     ∇
 
     ∇ boolean←HasInifileChanged;ts
-   ⍝ Returns a 1 in case the (any) ini file has changed since the instance was created.
+   ⍝ Returns a 1 in case the (any) ini file has changed since the instance was created.\\
+   ⍝ See also the `Changed` property.
       :Access Public Instance
-      ts←{⊃3 ⎕NINFO ⍵}¨_IniFilename
+      ts←{↑3 ⎕NINFO ⍵}¨_IniFilename
       boolean←_EstablishedAt∨.<Timestamp2Float¨ts
     ∇
 
@@ -824,8 +826,8 @@
       :OrIf 0∊⍴locals
           data←''
       :Else
-          bool←∧\0=↑∘⍴¨locals[;1]
-          data←'; '∘,¨{⍵↓¨⍨+/∧\' '=⊃⍵}⊃¨bool⌿locals[;4]
+          bool←∧\0=≢¨locals[;1]
+          data←'; '∘,¨{⍵↓⍨+/∧\' '=⍵}¨bool⌿locals[;4]
           :For thisKey thisData origValue thisRemark thisKEY :In ↓(~bool)⌿locals
               buffer←(thisKey{0∊⍴⍺:⍺ ⋄ ⍺,⍵}'='),{0=1↑0⍴⍵:⍕⍵ ⋄ '''',(DoubleQuotes ⍵),''''}thisData
               :If ~0∊⍴thisRemark
@@ -840,7 +842,7 @@
       :EndIf
       :For thisSection :In _Sections
           thisSection←1↓thisSection
-          THISSECTION←Uppercase thisSection
+          THISSECTION←1 ⎕C thisSection
           ref←⍎'_',THISSECTION
           :If 0=⎕NC'ref.generalRemarks'  ⍝ might not exist if the original filename was empty
               data,←⊂'[',THISSECTION,']'
@@ -871,9 +873,9 @@
               :EndIf
           :EndFor
       :EndFor
-      bool←(';'≠↑¨1⍴¨data)∧(⎕UCS 9)∊¨data
+      bool←(';'≠⊃¨1⍴¨data)∧(⎕UCS 9)∊¨data
       where←bool\{⍵⍳(⎕UCS 9)}¨bool/data
-      buffer←(⎕UCS 9)⍴¨⍨{⍵-⍨⌈/1+⍵}⌊4÷⍨↑∘⍴¨(where-1)↑¨data
+      buffer←(⎕UCS 9)⍴¨⍨{⍵-⍨⌈/1+⍵}⌊4÷⍨≢¨(where-1)↑¨data
       :For i :In ⍳⍴,data
           :If i⊃bool
               this←i⊃data
@@ -882,7 +884,7 @@
               (i⊃data)←this
           :EndIf
       :EndFor
-      WriteUtf8File(1⊃_IniFilename)data
+      (⊂data)⎕NPUT(1⊃_IniFilename)1
     ∇
 
     ∇ {r}←DeleteDefault
@@ -895,7 +897,7 @@
 
     ∇ r←Help;this
       :Access Public shared
-      this←↑¯1↑'.'Split⍕⎕THIS
+      this←⊃¯1↑'.'##.APLTreeUtils2.Split⍕⎕THIS
       r←''
       r,←⊂'To provide a list of methods and properties use'
       r,←⊂'  ]ADOC -summary ',⍕this
@@ -905,7 +907,7 @@
       r,←⊂'  ]ADOC ',⍕this
       r,←⊂'A fully-fledged documentation is available at:'
       r,←⊂'http://aplwiki.com/IniFiles'
-      r←⊃r
+      r←↑r
     ∇
 
       fixkeys←{0 1∊⍨≡⍵:,⊂⍵
@@ -920,7 +922,7 @@
     ∇
 
     ∇ r←_SECTIONS
-      r←Uppercase _Sections
+      r←1 ⎕C _Sections
     ∇
 
     ∇ value←ReplaceCurlies(toc value);bool;val2;where;name;names;noOf
@@ -929,14 +931,14 @@
       value←ExchangeDoubleCourlies value'}'(⎕UCS 1)
       :If ∧/'{}'∊value
           bool←{{⍵∨≠\⍵}⍵∊'{}'}value
-          names←Uppercase bool/value
-          names←'}'~⍨¨'{'Split names
-          names←(0<↑∘⍴¨names)/names
+          names←1 ⎕C bool/value
+          names←'}'~⍨¨'{'A.Split names
+          names←(0<≢¨names)/names
           :For name :In names
               :Trap 0
                   where←toc⍳⊂name
                   :If (⍴toc)∨.<where
-                      where←(Uppercase locals[;1])⍳⊂name
+                      where←(1 ⎕C locals[;1])⍳⊂name
                       ⍎('Invalid references found in INI file, check "',name,'"')Signal 6/⍨where∨.>1⊃⍴locals
                       val2←DoubleQuotes⊃locals[where;2]
                   :Else
@@ -962,12 +964,12 @@
     ⍝ Extract any "local" variabels.
     ⍝ Locals are defined as those assigned above the first section
       locals←0 5⍴''                                     ⍝ Initialize the main result
-      :If '['∊↑¨data
-          :If 0<where←¯1+'['⍳⍨↑¨data                    ⍝ Where starts the first section
+      :If '['∊⊃¨data
+          :If 0<where←¯1+'['⍳⍨⊃¨data                    ⍝ Where starts the first section
               data2←where↑data                          ⍝ Take eveything above the first section
-              data2←(+/∧\' '=⊃data2)↓¨data2             ⍝ Drop any leading blanks
-              data2/⍨←'!Import'{((⍴⍺)↑[2]⊃⍵)∨.≠⍺}data2  ⍝ Remove all "!Import" directives
-              data2←'='Split¨data2                      ⍝ Split remaining items at "=" (assignment)
+              data2←(+/∧\' '=↑data2)↓¨data2             ⍝ Drop any leading blanks
+              data2/⍨←'!Import'{((⍴⍺)↑[2]↑⍵)∨.≠⍺}data2  ⍝ Remove all "!Import" directives
+              data2←'='A.Split¨data2     ⍝ Split remaining items at "=" (assignment)
               toc←' '~¨⍨1⊃¨data2                        ⍝ First part = names
               data2←2⊃¨{2↑⍵,'' ''}¨data2                ⍝ Second part = data
               allRemarks2←where↑allRemarks              ⍝
@@ -979,7 +981,7 @@
                       locals⍪←'' '' ''remark''
                   :Else
                       :If ∧/'{}'∊value
-                          value2←⍎ReplaceCurlies((Uppercase toc)value)
+                          value2←⍎ReplaceCurlies((1 ⎕C toc)value)
                       :Else
                           :If _oldStyleFlag
                               value2←value
@@ -988,7 +990,7 @@
                               value2←⍎value
                           :EndIf
                       :EndIf
-                      itemNo←locals[;5]⍳⊂NAME←Uppercase name~','
+                      itemNo←locals[;5]⍳⊂NAME←1 ⎕C name~','
                       :If itemNo>1⊃⍴locals
                           locals⍪←name value2 value remark NAME
                       :ElseIf ','∊name
@@ -998,29 +1000,10 @@
                       :EndIf
                   :EndIf
               :EndFor
-              locals[;4]←{2=≡⍵:⊃,/⍵ ⋄ ⍵}¨locals[;4]
+              locals[;4]←{2=|≡⍵:↑,/⍵ ⋄ ⍵}¨locals[;4]
               data←where↓data
               allRemarks←where↓allRemarks
           :EndIf
-      :EndIf
-    ∇
-
-    ∇ r←name Process value;depth;buff;thisVal;i
-    ⍝ Assign values to names
-      depth←≡value
-      :If depth∊0 1             ⍝ It's simple
-          r←value
-      :Else                     ⍝ It's nested!
-          buff←''
-          :For i :In ⍳⍴,value
-              thisVal←i⊃value
-              :If 0=1↑0⍴thisVal
-                  buff,←',(⊂',(⍕thisVal),')'
-              :Else
-                  buff,←',(⊂''',(DoubleQuotes thisVal),''')'
-              :EndIf
-          :EndFor
-          r←⍎buff
       :EndIf
     ∇
 
@@ -1034,37 +1017,37 @@
      ⍝
      ⍝ Side effect: sets global /_oldStyleFlag
       (oldStyleFlag DM EN)←¯1 '' 0      ⍝ ¯1: not decided yet. As soon it is something else the case is settled
-      bool←0<↑∘⍴¨dlb data
+      bool←0<≢¨A.DLB data
       lnos←bool/⍳⍴data                  ⍝ Create line numbers
       data←bool/data                    ⍝ Drop empty lines
-      bool←';'≠↑¨data                   ⍝ Pure comment lines
+      bool←';'≠⊃¨data                   ⍝ Pure comment lines
       (data lnos)←bool∘/¨data lnos      ⍝ Get rid of all comment lines from data & lnos
-      :If ∨/b←'!'=↑¨data
-      :AndIf ∨/b←b\'!IMPORT'∘{⍺≡Uppercase(⍴⍺)↑⍵}¨b/data
+      :If ∨/b←'!'=⊃¨data
+      :AndIf ∨/b←b\'!IMPORT'∘{⍺≡1 ⎕C(⍴⍺)↑⍵}¨b/data
           oldStyleFlag←0                ⍝ Now we know it's not an old-style file.
           (data lnos)←(⊂~b)/¨data lnos
       :EndIf
       :If ¯1=oldStyleFlag
-      :AndIf ~0∊⍴(¯1+(↑¨data)⍳'[')↑data ⍝ Local variables?!
+      :AndIf ~0∊⍴(¯1+(⊃¨data)⍳'[')↑data ⍝ Local variables?!
           oldStyleFlag←0                ⍝ Now we know it's not an old-style file.
-          bool←~∧\'['≠↑¨data            ⍝ Where does the real stuff starts (first section)?
+          bool←~∧\'['≠⊃¨data            ⍝ Where does the real stuff starts (first section)?
           (data lnos)←bool∘/¨data lnos  ⍝ Remove the local variables
       :EndIf
-      bool←'['≠↑¨data                   ⍝ Which are not sections?
+      bool←'['≠⊃¨data                   ⍝ Which are not sections?
       (data lnos)←bool∘/¨data lnos      ⍝ Get rid of them
       :If ∨/b←~'='∊¨{⍵↑⍨¯1+⍵⍳''''}data
-          DM←'Check line',((1≠+/b)/'s'),' ',(↑{⍺,',',⍵}/⍕¨b/lnos),' of ',filename
+          DM←'Check line',((1≠+/b)/'s'),' ',(⊃{⍺,',',⍵}/⍕¨b/lnos),' of ',filename
           EN←11
           :Return
       :EndIf
-      vals←dlb{⍵↓⍨⍵⍳'='}¨data           ⍝ Remove the assigment as such.
-      swq←''''=↑¨vals                   ⍝ Start With Quote
-      ewq←''''=↑¨¯1⌽¨vals               ⍝ Ends with quotes
+      vals←A.DLB{⍵↓⍨⍵⍳'='}¨data           ⍝ Remove the assigment as such.
+      swq←''''=⊃¨vals                   ⍝ Start With Quote
+      ewq←''''=⊃¨¯1⌽¨vals               ⍝ Ends with quotes
       in←{∧/{⍵↑⍨1⌈⍴⍵}1⊃⎕VFI ⍵}¨vals     ⍝ "Is Numeric" flag
-      emptyFlag←0=↑∘⍴¨vals              ⍝ Empty is allowed only in old-style
+      emptyFlag←0=⊃∘⍴¨vals              ⍝ Empty is allowed only in old-style
       :If ¯1=oldStyleFlag
           :If 2=⍴∪(~in)/swq+ewq
-              DM←filename,' is inconsistent - neither old-style nor new-style; check line(s) ',⍕Where bool\in⍱swq∧ewq
+              DM←filename,' is inconsistent - neither old-style nor new-style; check line(s) ',⍕⍸bool\in⍱swq∧ewq
               EN←11
               :Return
           :Else
@@ -1076,13 +1059,13 @@
       :EndIf
       :If oldStyleFlag
           :If ∨/b←~(swq+ewq)∊0 2
-              DM←filename,' is invalid: ',↑,/{⍺,',',⍵}/b/data~¨'''' ⋄ EN←11
+              DM←filename,' is invalid: ',⊃,/{⍺,',',⍵}/b/data~¨'''' ⋄ EN←11
           :EndIf
       :Else
           :If ∨/b←(~in)∧2≠swq+ewq
-              DM←filename,' is inconsistent: ',↑,/{⍺,',',⍵}/b/data ⋄ EN←11
+              DM←filename,' is inconsistent: ',⊃,/{⍺,',',⍵}/b/data ⋄ EN←11
           :ElseIf ∨/emptyFlag
-              DM←filename,' is inconsistent: ',↑,/{⍺,',',⍵}/emptyFlag/data ⋄ EN←11
+              DM←filename,' is inconsistent: ',⊃,/{⍺,',',⍵}/emptyFlag/data ⋄ EN←11
           :EndIf
       :EndIf
     ∇
@@ -1090,7 +1073,7 @@
       RemoveInBetweenBlanks←{
       ⍝ Remove all "in-between" blanks from names.
           s←⍵
-          (0=↑∘⍴s):s                            ⍝ Empty? Ignore!
+          (0=≢s):s                            ⍝ Empty? Ignore!
           ((1↑s)∊';!['):s
           (~'='∊⍵):⍵
           where←⍵⍳'='
@@ -1101,8 +1084,8 @@
       }
 
     ∇ (data remarks)←MergeImport(import data remarks);value;section;secName;secList;ind;name
-      data←{(+\'['=↑¨⍵)⊂⍵}data
-      secList←↑¨data
+      data←{(+\'['=⊃¨⍵)⊂⍵}data
+      secList←⊃¨data
       :For section name value :In ↓import
           secName←'[',(⍕section),']'
           :If (⍴secList)<ind←secList⍳⊂secName
@@ -1111,14 +1094,14 @@
               remarks,←⊂''
           :EndIf
           ind←secList⍳⊂secName
-          :If 2=≡value
+          :If 2=|≡value
               (ind⊃data),←⊂name,'='''''
               (ind⊃data),←(⊂name,',='),¨Pack¨value
           :Else
               (ind⊃data),←⊂name,'=',Pack value
           :EndIf
       :EndFor
-      data←↑,/SortSection¨data
+      data←⊃,/SortSection¨data
       remarks←(⍴data)↑remarks,(⍴data)⍴⊂''
     ∇
 
@@ -1132,7 +1115,7 @@
           (⍵[1]),{⍵[⍋'{'∊¨⍵]}1↓⍵
       }
 
-    SplitSections←{(+\'['=↑¨⍵)⊂⍵}
+    SplitSections←{(+\'['=⊃¨⍵)⊂⍵}
 
     ∇ r←ExchangeDoubleCourlies(r what new);b;ind
     ⍝ Typical:
@@ -1140,7 +1123,7 @@
     ⍝ data ← RestoreCurlies ExchangeDoubleCourlies data '}' (⎕UCS 1)
     ⍝ '{abc}' ←→ RestoreCurlies data
       :While ∨/b←(2⍴what)⍷r
-          ind←↑Where b
+          ind←⊃⍸b
           r←(-ind-1)⌽new,2↓(ind-1)⌽r
       :EndWhile
     ∇
@@ -1157,20 +1140,20 @@
     ∇ (data oldStyleFlag remarks)←EvaluateINIs filenames;dm;en;this;buffer;buffer2;bool;flag;remarks2
       data←'' ⋄ oldStyleFlag←⍬ ⋄ remarks←''
       :For this :In filenames
-          :If 0∊⍴buffer←ReadUtf8File this
+          :If 0=≢buffer←⊃⎕NGET this 1
               :Return
           :EndIf
-          buffer←(,∘⊂⍣(↑1=≡buffer))buffer
+          buffer←(,∘⊂⍣(⊃1=|≡buffer))buffer
           buffer←{(0=+/b←(⎕UCS 9)=w←⍵):w ⋄ (b/w)←' ' ⋄ w}¨buffer    ⍝ Transform TAB into blanks
           buffer~¨←⎕UCS 10                                          ⍝ Remove any LF characters
           buffer←{0 1∊⍨≡⍵:⊂⍵ ⋄ ⍵}buffer
          ⍝buffer←{(0<∊⍴∘,¨⍵)⌿⍵}buffer  ⍝ No: in order to report line numbers we can't do this
-          buffer2←⊃,buffer
+          buffer2←↑,buffer
           bool←{a∨≠\a←⍵=''''}buffer2
           ((,bool)/,buffer2)←' '
           remarks2←(';'⍳⍨¨⊂[2]buffer2)↓¨buffer
           buffer←(¯1+';'⍳⍨¨⊂[2]buffer2)↑¨buffer
-          buffer←RemoveInBetweenBlanks¨dlb dtb buffer
+          buffer←RemoveInBetweenBlanks¨A.DLB A.DTB buffer
           (flag dm en)←CheckValues buffer this
           ⍎dm Signal en
           data,←buffer
@@ -1180,13 +1163,9 @@
       oldStyleFlag←∨/oldStyleFlag
     ∇
 
-    ∇ r←GetRefToUtils
-      r←⍎⎕IO⊃'.'Split dlb⍕⎕IO⊃⎕CLASS ⎕THIS
-    ∇
-
     ∇ CallCreate IniFilename
       :If 0 1∊⍨≡IniFilename
-      :AndIf ~0∊⍴IniFilename
+      :AndIf 0≠≢IniFilename
           IniFilename←,⊂IniFilename
       :EndIf
       :Trap (~_debugFlag)/911
@@ -1215,17 +1194,12 @@
       r←{1E¯9×0 100 100 100 100 100 1000⊥7↑⍵}ts
     ∇
 
-    ∇ r←Float2Timestamp float
-    ⍝ yyyy mm dd hh mm ss←Float2Timestamp yyyymmdd.hhmmss
-      r←⌊0 100 100 100 100 100 1000⊤float×10*9
-    ∇
-
       DoubleCurlies←{
           (~'{'∊r←⍵):r
           (('{'=r)/r)←⊂'{{'
-          r←↑,/r
+          r←⊃,/r
           (('}'=r)/r)←⊂'}}'
-          ↑,/r
+          ⊃,/r
       }
 
 :EndClass

@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.10.1 - 2020-11-06
+⍝   * Typos in help fixed
+⍝   * Help page for `ListVersions` added
 ⍝ * 0.10.0 - 2020-08-28
 ⍝   * Method `UninstallPackage` added
 ⍝ * 0.9.0 - 2020-08-20
@@ -232,7 +235,7 @@
           list←({TC.Reg.IsValidPackageID_Complete⊃,/1↓⎕NPARTS ⍵}¨list)/list
       :AndIf 1=≢list
           :If Arg.quiet
-          :OrIf 1 ∆YesOrNo'Publish ',((1+≢zipFilename)↓⊃list),' ?'
+          :OrIf 1 ∆YesOrNo'Publish ',({~∨/'/\'∊⍵:⍵   ⋄ ⍵↑⍨-¯1+⌊/(⌽⍵)⍳'/\'}1⊃list),' ?'
               zipFilename←⊃list
           :Else
               :Return
@@ -499,7 +502,7 @@
           r,←⊂'By default the user config file is expected in the user''s home folder, and it will be'
           r,←⊂'created there if it does not already exists.'
           r,←⊂'Instead you may specify a different folder. Note that this is NOT a permanent change;'
-          r,←⊂'if you want the change to be permanent specify it via the ]Tatin.UserSettings command'
+          r,←⊂'if you want the change to be permanent specify it via the ]TATIN.UserSettings command'
           r,←⊂'with a -permanent flag.'
           r,←⊂''
           r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
@@ -518,7 +521,7 @@
           r,←⊂'* By default all packages are listed. You can restrict the output in two ways:'
           r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
           r,←⊂'  * -tags=zip will restrict the output to packages that carry the given tags.'
-          r,←⊂'    If you need to specify more than one tag the enclose then separate them by commas.'
+          r,←⊂'    If you need to specify multiple tags then separate them by commas.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
           r,←⊂''
@@ -558,9 +561,9 @@
           r,←⊂'document for how to use the API, and what for.'
       :Case ⎕C'PackageConfig'
           r,←⊂''
-          r,←⊂'The argument may be a http request or a path'
+          r,←⊂'The argument may be an HTTP request or a path.'
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
-          r,←⊂'  Specifying any of the options is ignored.'
+          r,←⊂'  Specifying any of the options has no effect.'
           r,←⊂'* In case of a path the contents of the file "',TC.CFG_NAME,'" is returned.'
           r,←⊂'  In case the file does not exist yet it is created.'
           r,←⊂'  You may edit the file by specifying the -edit flag.'
@@ -581,12 +584,12 @@
           r,←⊂'exist it is created.'
           r,←⊂''
           r,←⊂'After the edit the changes are checked for being complete and syntactically correct'
-          r,←⊂'JSON, and they are then saved to the given folder.'
+          r,←⊂'JSON, and if they are then they are saved to the given folder.'
           r,←⊂''
           r,←⊂'In case you want to delete the file specify the -delete flag.'
           r,←⊂''
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is usually asked'
-          r,←⊂'in conjunction with the -delete flag is probably only useful with test cases.'
+          r,←⊂'in conjunction with the -delete flag; this is probably only useful with test cases.'
       :Case ⎕C'Pack'
           r,←⊂''
           r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
@@ -597,14 +600,20 @@
           r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
       :Case ⎕C'Publish'
           r,←⊂''
-          r,←⊂'Publish a ZIP file (typically created with ]Tatin.Zip) to a particular Registry Server.'
+          r,←⊂'Publish a ZIP file (typically created with ]TATIN.Pack) to a particular Registry Server.'
           r,←⊂''
           r,←⊂'Requires two arguments:'
-          r,←⊂'* Path to a ZIP file that contains a package'
+          r,←⊂'* Path to the ZIP file that contains the package to be published'
           r,←⊂'* URL or alias of a Registry Server'
+          r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
+                    r,←⊂'to the Tatin rules'
           r,←⊂''
           r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question usually asked before'
           r,←⊂'a package is actually published is probably only useful with test cases.'
+      :Case ⎕C'ListVersions'
+          r,←⊂''
+          r,←⊂'List all versions of the given package. You must specify the package as in'
+          r,←⊂'[registry]{group}-{package}'
       :Case ⎕C'Version'
           r,←⊂''
           r,←⊂'Prints name, version number and version date of the client to the session.'
@@ -623,13 +632,13 @@
       r,←⊂'  In that case all Registries are scanned for that package ID; the first one wins.'
       r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID'
       r,←⊂'  Valid examples are:'
-      r,←⊂'  ]tatin.',fns,' aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]tatin.',fns,' aplteam-APLTreeUtils-2.0 ',add
-      r,←⊂'  ]tatin.',fns,' aplteam-APLTreeUtils-2 ',add
-      r,←⊂'  ]tatin.',fns,' aplteam-APLTreeUtils ',add
-      r,←⊂'  ]tatin.',fns,' [tatin]aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]tatin.',fns,' [tatin]/aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]tatin.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils-2.0.0/ ',add
+      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0.0 ',add
+      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0 ',add
+      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2 ',add
+      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2.0.0 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils-2.0.0 ',add
+      r,←⊂'  ]TATIN.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils-2.0.0/ ',add
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

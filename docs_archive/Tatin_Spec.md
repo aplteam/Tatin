@@ -60,7 +60,7 @@ However, note that due to [SimVer](http://simver.org/ "Link to a definition of w
 * `aplteam-APLTreeUtils-1.0.0`
 * `aplteam-APLTreeUtils-2.0.0`
 
-That means they are considered to be as different as `aplteam-Foo-1.0.0` and `aplteam-Goo-1.0.0`.
+That means they are considered to be as different as `aplteam-This-1.0.0` and `aplteam-That-1.0.0`.
 
 ### Registry
 
@@ -179,9 +179,9 @@ Assets must be specified relative to the package source. There is one exception:
 The resulting zip file will be named `{group}-{name}-{version}.zip` and placed in `target_path`.
 
 
-#### The "PublishPackage" method
+#### The "Publish" method
 
-Syntax: `{⍬} ← {registry} PublishPackage (package)`
+Syntax: `{⍬} ← {registry} Publish (package)`
 
 Publish `package` to `registry`.
 
@@ -198,7 +198,7 @@ Publish `package` to `registry`.
 
 * If `package` is a ZIP file then that file was typically created by the `Pack` method.
 
-* If it points to a folder then it is assumed that this is a project folder. In that case `PublishPackage` calls the method `Pack` itself, producing the required ZIP file in a temp folder, which is then published to the given Registry.
+* If it points to a folder then it is assumed that this is a project folder. In that case `Publish` calls the method `Pack` itself, producing the required ZIP file in a temp folder, which is then published to the given Registry.
 
 
 #### Retrieving packages
@@ -568,9 +568,9 @@ Syntax: `packages ← ListPackageVersions (package)`
 Lists all versions of the given package. If no package with the given `group` and `name` can be found then `⍬` is returned.
 
 
-#### The `PublishPackage` method {#registry_publish_package}
+#### The `Publish` method {#registry_publish_package}
 
-Syntax: `rc ← PublishPackage (packageZip)`
+Syntax: `rc ← Publish (packageZip)`
 
 Add a package to the Registry.
 
@@ -725,7 +725,7 @@ Data is stored in the file system: there is no database involved.
 
 When a Registry is managed by a Server a file `tatin_index.json` will be created. The file will be re-created whenever the Server is started.
 
-Meta data regarding packages might be stored at a later stage in sub folders following certain naming conventions.
+Meta data regarding packages might be stored at a later stage following certain naming conventions.
 
 
 #### Example for a Registry
@@ -736,7 +736,6 @@ If the name of the folder holding a Registry is `Foo` then this is how the conte
 /Foo/
   Group1-Pack_1-1.0.0/
     apl-package.json
-    apl-dependencies.txt
     Group1-Pack_1-1.0.0.zip
   Group1-Pack_1-2.0.0/    
     apl-package.json
@@ -764,7 +763,10 @@ If the name of the folder holding a Registry is `Foo` then this is how the conte
     Group2-Pack_c-1.0.0.zip
 ```
 
-Note that packages in different groups may share the same name.
+Notes:
+
+* Packages in different groups may share the same name
+* Only when a package has dependencies is there a file `apl-depedencies.txt`
 
 A Registry might live on a different machine; then the client must access any packages within that Registry via the HTTP protocol and the server's REST interface.
 
@@ -773,11 +775,16 @@ A Registry might live locally. In that case it can also be addressed via the fil
 In such a case the last part of the path will be converted into a package ID automatically.
 
 
-## CPU versus disk space
+#### CPU versus disk space
 
-It is not clear whether packages should be saved as ZIP files _**and**_ unzipped as well. The ZIP files are required for delivery. Keeping the package unzipped might speed up some search operations. Those will certainly be needed at a later stage, for example searching for particular code snippets or comments etc. However, the package configuration file and the dependency file are always available unzipped.
+It is not clear whether packages should be saved as ZIP files _**and**_ unzipped as well. The ZIP files are required for delivery in any case. 
 
-For the time being the packages are stored unzipped in a sub-folder `data\`. This can be switched off, and all the `data\` folders deleted, without causing trouble. 
+Keeping the package unzipped might speed up some search operations. Those will certainly be needed at a later stage, for example searching for particular code snippets or comments etc. 
+However, the package configuration file and the dependency file are always available unzipped.
+
+For the time being the packages are stored unzipped in a sub-folder `data\`. The package config file and the dependency file (if any) are then copied from the `data\` folder to parent folder.
+
+If we don't want to keep the `data\` folder then it should be removed as the very last step. The code is already there but commented.
 
 ### Authentication
 

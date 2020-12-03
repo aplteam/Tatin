@@ -1,4 +1,4 @@
- r←Test_Load_052(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_052(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish three packages (consisting of functions) with dependencies, then load from specific Registry.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -21,7 +21,8 @@
  cfg.source←'A.apln'
  cfg TC.WritePackageConfigFile src2
  src2 TC.Dependencies.Add'[local2]Example-C-1.0.0'
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ Assert 200=rc
 
  F.MkDir src3←src,'/B'
  body←'r←Call arg' 'r←A.foo arg'
@@ -32,7 +33,8 @@
  cfg.alias←'Call'
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-A-1.0.0'
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  F.MkDir src3←src,'/C'
  body←'r←Times v' 'r←×/v'
@@ -43,7 +45,8 @@
  cfg.api←'Times'
  cfg.alias←'Times'
  cfg TC.WritePackageConfigFile src3
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/Example-B-1.0.0')#.TEMP
  →T.GoToTidyUp 12≠#.TEMP.Call 3 4

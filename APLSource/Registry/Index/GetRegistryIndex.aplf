@@ -1,4 +1,12 @@
- GetRegistryIndex←{
-     ('Not a Tatin Registry: ',⍵)##.Assert ##.F.Exists ⍵,'/',GetIndexFilename:
-     ⊃##.F.NGET ⍵,'/',GetIndexFilename
- }
+ r←GetRegistryIndex path;filename;list
+⍝ In a managed Tatin Registry there must be a file "tatin_index.txt".
+⍝ In a local un-managed Registry there is none.
+ filename←path,'/',GetIndexFilename
+ :If 0<##.F.IsFile filename
+     r←⊃##.F.NGET filename
+ :ElseIf 'Client'≡{⍵↑⍨{1+-⍵⍳'.'}⌽⍵}{⍵⊃⍨+/∧\∨/¨'Tatin.'∘⍷¨⍵}⎕NSI
+     r←''
+ :Else
+     'Not found'⎕SIGNAL 98
+ :EndIf
+⍝Done

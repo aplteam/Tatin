@@ -1,4 +1,4 @@
- r←Test_Load_013(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_013(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;body;cfg;zipfile;refs;path;reg
 ⍝ Publish several versions of a package to a registry and then load it without version number (best one)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -20,21 +20,24 @@
  cfg.source←'Constants.apln'
  cfg TC.WritePackageConfigFile src
  zipfile←TC.Pack src src
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  body←':Namespace Constants' '∇r←PI' 'r←3.1' '∇' ':EndNamespace'
  (⊂body)F.NPUT(src,'/Constants.apln')1
  cfg.(group name version)←'Example' 'Constants' '0.2.0'
  cfg TC.WritePackageConfigFile src
  zipfile←TC.Pack src src
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
  (⊂body)F.NPUT(src,'/Constants.apln')1
  cfg.(group name version)←'Example' 'Constants' '1.0.0'
  cfg TC.WritePackageConfigFile src
  zipfile←TC.Pack src src
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  path←dir,'/reg/',⊃{⍺,'-',⍵}/cfg.(group name)
  refs←TC.LoadPackage path #.TEMP

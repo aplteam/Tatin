@@ -1,4 +1,4 @@
- tree←GetDependecyTree x;initialCall;identifier;level;requiredBy;buildList;path;tempPath;filename;flag1;flag2
+ tree←GetDependecyTree x;initialCall;identifier;level;requiredBy;buildList;path;tempPath;filename;flag1;flag2;packageID
 ⍝ Takes `identifier` (`x`) and returns the dependencies as a matrix.
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request
@@ -25,13 +25,14 @@
      ∆TREE.Data⍪←level path identifier
      level GetDependecyTreeViaHTTP identifier
  :Else
-     flag1←Reg.IsValidPackageID_Complete GetPackageIDFromFilename identifier
-     flag2←Reg.IsValidPackageID_WithoutVersionNo GetPackageIDFromFilename identifier
+     packageID←GetPackageIDFromFilename identifier
+     flag1←Reg.IsValidPackageID_Complete packageID
+     flag2←Reg.IsValidPackageID_WithoutVersionNo packageID
      'Not a valid package ID'Assert flag1∨flag2
-     ∆TREE.Data⍪←level(GetPackageIDFromFilename identifier)identifier
+     ∆TREE.Data⍪←level packageID identifier
      :If '.zip'≡⎕C ¯4↑identifier
          filename←RemoveFileProtocol identifier
-         tempPath←Reg.GetTempDir,'/',GetPackageIDFromFilename filename
+         tempPath←Reg.GetTempDir,'/',packageID
          F.RmDir tempPath
          ⎕DL 0.1
          F.MkDir tempPath

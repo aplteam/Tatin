@@ -1,4 +1,4 @@
- r←Test_Load_055(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_055(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish two packages (consisting of classes) with a dependency, then load from specific Registry.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,14 +22,16 @@
  cfg.(group name version)←'MyCompany' 'MyClass' '1.0.0'
  cfg TC.WritePackageConfigFile src2
  src2 TC.Dependencies.Add'[local2]MyCompany-MyBaseClass-1.0.0'
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ Assert 200=rc
 
  body←':Class MyBaseClass' '∇r←Copyright' ':Access Public Shared' 'r←''Copyright This and that 2020''' '∇' ':EndClass'
  (⊂body)F.NPUT src3,'/source/MyBaseClass.aplc'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'MyCompany' 'MyBaseClass' '1.0.0'
  cfg TC.WritePackageConfigFile src3
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/MyCompany-MyClass-1.0.0')#.TEMP
  →T.GoToTidyUp 12≠#.TEMP.MyClass.Math 3 4

@@ -1,4 +1,4 @@
- r←Test_Publish_030(stopFlag batchFlag);⎕TRAP
+ r←Test_Publish_030(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;dist;body;cfg;reg;list;expected;zipped;list2
 ⍝ Publish a simple package with a single non-source file
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -23,7 +23,8 @@
  cfg.assets←'my.dll'
  cfg TC.WritePackageConfigFile src
 
- TC.PublishPackage src reg
+ (rc msg zipFilename)←TC.PublishPackage src reg
+ Assert 200=rc
 
  →T.GoToTidyUp 1≠≢list←F.ListDirs reg
  →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list

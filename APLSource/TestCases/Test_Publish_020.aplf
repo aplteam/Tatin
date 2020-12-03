@@ -1,4 +1,4 @@
- r←Test_Publish_020(stopFlag batchFlag);⎕TRAP
+ r←Test_Publish_020(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;dist;body;cfg;reg;list;zipped;expected;list2
 ⍝ Publish a package with two source files in default folder ("source")
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -24,7 +24,8 @@
  cfg.version←'1.0.0'
  cfg TC.WritePackageConfigFile src
 
- TC.PublishPackage src'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage src'[local2]'
+ Assert 200=rc
 
  →T.GoToTidyUp 1≠≢list←F.ListDirs reg
  →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list
@@ -35,7 +36,7 @@
  →T.GoToTidyUp 1≠≢reg Reg.Index.FindPartPackageID'Example-Package_A'
  zipped←Reg.DotNetZip.ListZipContents list2 ∆GetByExtension'.ZIP'
  expected←TC.CFG_NAME'source/Test.apln' 'source/Hello.aplf'
- →T.GoToTidyUp~expected ∆LazyMatch zipped
+ →T.GoToTidyUp~expected ∆LazyMatchPaths zipped
 
  r←T._OK
 

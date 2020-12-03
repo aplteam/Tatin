@@ -5,20 +5,20 @@
      :Case ⎕C'v1/GetServerPath'
          response←ReturnRegistryPath request
      :Case ⎕C'v1/RecompileIndex'
-         Reg.CompileIndex G.RegistryPath
-         response←request R.Respond 200
-     :Case 'v1/Stop'
+         Reg.Index.Compile G.RegistryPath
+         response←request Respond 200
+     :Case ⎕C'v1/Stop'
          1 ⎕STOP'#.Tatin.Server.OnRequest'
-         response←request R.Respond 200
-     :Case 'v1/Shutdown'
+         response←request Respond 200
+     :Case ⎕C'v1/Shutdown'
          ⎕TRAP←0 'S'
-         response←request R.Respond 200
+         response←request Respond 200
          ∆SHUTDOWN←1
      :Case 'v1/Srash'
          ∘∘∘                                ⍝ Deliberate crash for testing error trapping
      :Else
-         response←request R.Respond 404 1   ⍝ Unknown (new?!)
+         response←request Respond 404 1   ⍝ Unknown (new?!)
      :EndSelect
  :Else
-     response←request R.Respond 401 1       ⍝ Not a valid REST version 1 request
+     response←request Respond 401 1       ⍝ Not a valid REST version 1 request
  :EndIf

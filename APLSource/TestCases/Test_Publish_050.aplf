@@ -1,4 +1,4 @@
- r←Test_Publish_050(stopFlag batchFlag);⎕TRAP;installFolder;qdmx
+ r←Test_Publish_050(stopFlag batchFlag);⎕TRAP;installFolder;qdmx;rc;msg;zipFilename
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src;src3;refs
 ⍝ Publish a package with an invalid dependency
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -20,7 +20,8 @@
  cfg TC.WritePackageConfigFile src
  src TC.Dependencies.Add'[local2]DoesNot-Exist-1.0.0'     ⍝ Invalid dependency
 
- TC.PublishPackage src reg                               ⍝ You might want to install a package with a not yet published dependency
+ (rc msg zipFilename)←TC.PublishPackage src reg          ⍝ You might want to install a package with a not yet published dependency
+ Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
  :Trap 98

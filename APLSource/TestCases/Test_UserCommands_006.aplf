@@ -15,13 +15,12 @@
  →T.GoToTidyUp 0=≢zipfile
  →T.GoToTidyUp'.zip'≢⎕C ¯4↑zipfile
 
- (rc more)←(⊃⊃F.Dir packageFolder,'/*.json')F.CopyTo tempDir,'/'
- Assert 0=rc
+ (tempDir,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣⊃⊃F.Dir packageFolder,'/*.json'
 
  cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_NAME)0
  version←⊃{⍺,'-',⍵}/cfg.(group name version)
  F.RmDir ∆GetServerRegistryFolder,version
- #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
+ #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
 
  (rc msg res)←∆UCMD'Publish "',zipfile,'" [local]'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
@@ -31,5 +30,5 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir tempDir
  #.⎕EX TC.GetTatinRootSpace'#'
- #.Tatin.Registry.CompileIndex ∆GetServerRegistryFolder
+ #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
 ⍝Done

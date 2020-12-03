@@ -4,14 +4,14 @@
 ⍝ `flag` is just an insurance against accidental calls
  r←⍬
  :If 'kai'≡⎕AN
-     (A F)←##.(APLTreeUtils FilesAndDirs) ⋄ P←##.Client ⋄ Reg←#.Tatin.Registry
+     (A F)←##.(APLTreeUtils2 FilesAndDirs) ⋄ P←##.Client ⋄ Reg←#.Tatin.Registry
      :If flag
          root←⎕SE.UCMD'GetAcreProjectPath'
          sourceFolder←root,'_Source/'
          targetFolder←root,registryName,'/'
          homeFolder←root,'APLTree/'
          'The target folder does already exist'⎕SIGNAL 11/⍨F.IsDir targetFolder
-         list←{((A.Lowercase 3⊃∘⎕NPARTS¨⍵)∊'.aplc' '.apln')/⍵}F.ListFiles sourceFolder
+         list←{((⎕C 3⊃∘⎕NPARTS¨⍵)∊'.aplc' '.apln')/⍵}F.ListFiles sourceFolder
          list←list{⍺/⍨~({2⊃⎕NPARTS ⍵}¨⍺)∊⍵}'HTML' 'Tester' 'XML_File' 'GitHubAPIv3'  ⍝ Remove unwanted
          :For fullPath :In list
              ConvertAPLTreeToPackages_ fullPath homeFolder targetFolder

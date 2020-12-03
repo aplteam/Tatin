@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_045(stopFlag batchFlag);⎕TRAP;src4;list1;list2
+ r←Test_InstallAndLoad_045(stopFlag batchFlag);⎕TRAP;src4;list1;list2;rc;msg;zipFilename
  ;dir;src;body;cfg;installFolder;src2;src3;reg
 ⍝ Install a package that depends on two packages which consist of a class and a function
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -24,7 +24,8 @@
  cfg.source←'APLSource'
  cfg.api←'Constants'
  cfg TC.WritePackageConfigFile src2
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ Assert 200=rc
 
  body←'r←x Times y' 'r←x×y'
  (⊂body)F.NPUT src3,'/APLSource/Times.aplf'
@@ -32,7 +33,8 @@
  cfg.(group name version)←'Example' 'Mixed2' '0.2.0'
  cfg.api←'Times'
  cfg TC.WritePackageConfigFile src3
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  body←⊂':Namespace MyTests'
  body,←'∇r←Test1 y' 'r←##.Constants.PI ##.Times y' '∇'
@@ -44,7 +46,8 @@
  cfg TC.WritePackageConfigFile src4
  src4 TC.Dependencies.Add'[local2]Example-Mixed1-0.1.0'
  src4 TC.Dependencies.Add'[local2]Example-Mixed2-0.2.0'
- TC.PublishPackage src4 reg
+ (rc msg zipFilename)←TC.PublishPackage src4 reg
+ Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
  list1←TC.InstallPackage('[local2]Example-Mixed3-0.3.0')installFolder

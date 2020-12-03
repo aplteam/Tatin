@@ -138,7 +138,7 @@ In our case we look for something that runs on all platforms. The user command `
  windows   
 ```
 
-That's good: there must be at least one package that carries the tags "mac-os" and "markdown" but _also_ the tags "windows" and "linux", so there will be a package available that runs on all major platforms.
+That's good: there must be at least one package that carries the tags "mac-os" and "markdown" but _also_ the tags "windows" and "linux" because those are both listed, so there will be a package available that runs on all major platforms.
 
 Note that although we misspelled "mac-os" as "mack-os" it was still identified correctly. Similarly, "markd" was enough for finding "markdown". 
 
@@ -181,9 +181,9 @@ We could also have specified the minor number:
 
 Let's assume that you are not certain whether you really want to use `MarkAPL`, you just want to check it out. 
 
-That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves to trail in the file system if that can be avoided.
+That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves no trail in the file system if that can be avoided.
 
-In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there is a footprint left in the file system.
+A> In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there is a footprint left in the file system.
 
 Notes:
 
@@ -195,14 +195,30 @@ Notes:
 Let's load the `MarkAPL` package into the workspace:
 
 ```
-      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-9.1.1
-
+      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-9.1.1 #.MyTests
 ```
 
+The namespace `#.MyTests` may or may not exist. If it does not Tatin will create it.
+
+When you try to execute the following statements on your own machine then you will probably see different version numbers.
+
+Tatin created named "MarkAPL" in the target namespace `#.MyTests`:
 
 ```
       #.MyTests.⎕nl ⍳16
 MarkAPL
+```
+
+That link points to the namespace that holds the package as such, which is loaded into `_tatin`. The name of the namespace carries the version number:
+
+```
+      #.MyTests.MarkAPL
+#._tatin.aplteam_MarkAPL_9_1_9 
+```
+
+`_tatin` also contains all the dependencies "MarkAPL" relies on:
+
+```
       #._tatin.⎕nl ⍳16
 aplteam_APLTreeUtils_6_0_0
 aplteam_FilesAndDirs_3_2_1
@@ -212,26 +228,6 @@ aplteam_OS_2_0_0
 aplteam_Tester2_2_2_2     
 aplteam_WinSys_4_0_0  
 ```
-
-Note that these are ....
-
-```
-      #._tatin.aplteam_MarkAPL_9_1_9.⎕nl ⍳16
-APLTreeUtils
-FilesAndDirs
-MarkAPL     
-OS          
-Tester2     
-WinSys      
-∆HOME       
-∆URI        
-      #._tatin.aplteam_MarkAPL_9_1_9.∆HOME
-C:/Users/.../AppData/Local/Temp/Foo//aplteam-MarkAPL-9.1.9
-      #._tatin.aplteam_MarkAPL_9_1_9.∆URI
-https://tatin.dev/aplteam-MarkAPL-9.1.9
-```
-..............
-
 
 [^dotnetcore]: More information on .NET Core is available at <<br>>
 <https://en.wikipedia.org/wiki/.NET_Core>

@@ -1,4 +1,10 @@
  {r}←MakeServer batchFlag;F;targetPath;zipFilename;fileList;zipContent;list;msg;success
+⍝ Creates a new server.\\
+⍝ Call this after `MakeClient` has been called; see there for details.
+⍝ It can be called from a developer's session (⍵←0) or as part of an automated "Make" process with ⍵←1.\\
+⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
+⍝ Version 1.0.1 from 2020-12-03
+⍝ 1.0.1: Assets\Assets corrected
  r←⍬
  :If batchFlag
      ⎕SHADOW'Assert'
@@ -22,7 +28,6 @@
      #.Tatin.⎕EX¨'Client' 'Todo' 'TestCases' 'Simu'
      ⎕EX¨'Initialize_Client' 'RunTestServer' 'CreateAllRefs_Client'
      ⎕LX←'#.Tatin.Server.Run 1'
-
      F.MkDir'Dist'
      targetPath←'Dist/Server'
      F.RmDir targetPath
@@ -36,17 +41,14 @@
      F.MkDir targetPath,'/Assets/'
      ⎕DL 0.1
      Assert F.IsDir targetPath,'/Assets/'
-     (success msg list)←'./Assets/'F.CopyTree targetPath,'/Assets'
-     msg Assert success
-     ('./server.ini.RemoveMe')F.CopyTo targetPath,'/server.ini'
-
+     targetPath ⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/'
+     (targetPath,'/server.ini')⎕NCOPY⍠('IfExists' 'Replace')⊣'./server.ini.RemoveMe'
+     F.DeleteFile¨F.Dir'Dist/Tatin-Server-*.zip'
      zipFilename←'Dist/Tatin-Server-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Server.Version),''),'.zip'
-     F.DeleteFile zipFilename
      targetPath ##.DotNetZip.ZipFolder zipFilename
      fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'
      zipContent←##.DotNetZip.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
-
      :If batchFlag
          ⎕OFF
      :Else

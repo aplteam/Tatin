@@ -10,10 +10,10 @@
 ⍝ You can then use these instance methods:
 ⍝ * `Add`
 ⍝ * `Delete`
+⍝ * `ExtractTo`
 ⍝ * `List`
 ⍝ * `Dispose`\\
-⍝ Once instanciated the read-only property `filename` carries the name of the ZIP file.\\
-⍝ This class requires the class `FilesAndDirs`.\\
+⍝ Once instantiated the read-only property `filename` carries the name of the ZIP file.\\
 ⍝ Kai Jaeger - APL Team Ltd.\\
 ⍝ Homepage: <https://github.com/aplteam/DotNetZip/>
 
@@ -23,30 +23,12 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '0.8.2.37' '2020-08-14'
+      r←'DotNetZip' '1.0.0.48' '2020-09-21'
     ∇
 
     ∇ History
-    ⍝ * 0.8.2 from 2020-08-12
-    ⍝   * `⎕NEW` replaced by a function `QuadNEW` which tries again for a while with increasing dealys. 
-    ⍝     This is required because sometimes .NET generates and error "being used by another process" 
-    ⍝     though that was caused by `DotNetZip` itself.
-    ⍝ * 0.8.1 from 2020-08-07
-    ⍝   * Workaround implemented for bug with ⎕USING that caused a nonsense VALUE ERROR. (Mantis 18404)\\
-    ⍝     The bugs makes an appearance when the class is instanciated in ⎕SE, then a )CLEAR command is issued
-    ⍝     and then again instantiated: you get a VALUE ERROR on a .NET function that is there, at least a bit.
-    ⍝ * 0.8.0 from 2020-07-04
-    ⍝   * `Add` is now effectively doing a "Replace" in case the file(s) in question are already part of
-    ⍝     the ZIP. The `Update` method has been removed.
-    ⍝ * 0.7.0 from 2020-07-03
-    ⍝   * The default for "overwriteFlag" when only a zip filename was passed was 1. Should be 0.
-    ⍝ * 0.6.0 from 2020-05-24
-    ⍝   * `Add` now accepts and processes folders as well as files
-    ⍝   * Documentation improved
-    ⍝ * 0.5.1 from 2020-05-12
-    ⍝   * Minor bug fix in `ZipFolder`
-    ⍝ * 0.5.0 from 2020-05-09
-    ⍝   * First version published on GitHub as beta
+    ⍝ * 1.0.0 from 2020-09-21
+    ⍝   * First official release. Requires Dyalog 18.0 and is delivered as a Tatin package
     ∇
 
     :Property  filename
@@ -83,6 +65,7 @@
       CheckMinVersion ⍬
       Initialize ⍬
       zipFilename←AddExtension F.ExpandPath zipFilename
+      QEX_System
       :If F.Exists zipFilename
       :AndIf 0=overwriteFlag
           stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
@@ -146,6 +129,43 @@
       :EndIf
     ∇
 
+    ∇ r←names ExtractTo folder;name;entry;writer;buff;zip;stream;rc;i;targetFilename;list;sep
+    ⍝ `names` is the name of one or more zipped objects (files or directories).
+    ⍝ Those will be extracted into `folder\`.\\
+    ⍝ `names` may be simple (single object) or nested (vector of objects).\\         
+    ⍝ There must be no file or folder of the given name in the target folder, otherwise an error is thrown.\\
+    ⍝ `r` is a vector of Booleans with the same lengths as `names, carrying 1 for success and 0  otherwise,
+    ⍝ However, if `names` is or contains the name of a folder the lenght of `r` may be smaller than the
+    ⍝ number of files and folders extracted. Note that in such a case will result in a 0 in case a single
+    ⍝ file or folder cannot be extracted.\\
+    ⍝ A typical reason for a failure is that a given file or folder does not exist in the ZIP file.
+      :Access Public Instance
+      names←,⊆names
+      r←(≢names)⍴0
+      :For i :In ⍳≢names
+          name←F.NormalizePath i⊃names
+          :If ⎕NULL≢entry←_zip.GetEntry⊂name
+              targetFilename←F.NormalizePath folder,'/',name
+              :Trap 90
+                  'Create!'F.CheckPath 1⊃⎕NPARTS targetFilename
+                  QEX_System
+                  System.IO.Compression.ZipFileExtensions.ExtractToFile(entry targetFilename)
+                  r[i]←1
+              :Else
+                  ⎕EXCEPTION.Message ⎕SIGNAL 11
+              :EndTrap
+          :Else
+              :If 0<≢list←List
+              :AndIf 0<≢≢∪(1⊃¨⎕NPARTS list)~⊂''
+                  sep←('\'∊∊list)⌽'/\'
+                  name←(sep[1]@(⍸name=sep[2]))name
+              :AndIf 0<≢list←(((1+≢name)↑[2]↑list)∧.=name,sep[1])/list
+                  r[i]←⊃∨/list ExtractTo¨⊂folder
+              :EndIf
+          :EndIf
+      :EndFor
+    ∇
+
     ∇ r←List;collection
     ⍝ Lists the contents of the ZIP file
       :Access Public Instance
@@ -195,13 +215,14 @@
     ⍝ `targetFolder` must not yet exist.
       :Access Public Shared
       r←Initialize ⍬
+      QEX_System
       :Trap 6
           System.IO.Compression.ZipFile.ExtractToDirectory zipfile targetFolder
       :Else
           ⍝ Workaround for bug Mantis 18404 from 2020-08
           ⍝ The VALUE ERROR is not really a VALUE ERROR. This appears to happen only when `DotNetZip` is instanciated
-          ⍝ within `⎕SE`, the )CLEAR is issued and then again `DotNetZip` instanciated within `⎕SE`.
-          ⎕EX'System'    ⍝ Strangely that helps
+          ⍝ within `⎕SE`, the )CLEAR is issed and then again `DotNetZip` instanciated within `⎕SE`.
+          ⎕EX'System'
           System.IO.Compression.ZipFile.ExtractToDirectory zipfile targetFolder
       :EndTrap
     ⍝Done
@@ -214,6 +235,7 @@
       Initialize ⍬
       targetFile←F.ExpandPath AddExtension targetFile
       sourceFolder←F.ExpandPath sourceFolder
+      QEX_System
       System.IO.Compression.ZipFile.CreateFromDirectory sourceFolder targetFile
     ⍝Done
     ∇
@@ -228,7 +250,7 @@
 ⍝ ------------------------ Private stuff -------------------
 
     ∇ r←QuadNEW arg;success;counter;qdmx
-    ⍝ Attempts to be successful several times in case of "being used by another process" errors with 
+    ⍝ Attempts to be successful several times in case of "being used by another process" errors with
     ⍝ increasingly long delays. This often occured when `DotNetZip` itself had just dealt with the zip file,
     ⍝ and it almost always goes away after some tries.
       success←counter←0
@@ -246,9 +268,7 @@
               :EndIf
           :EndTrap
       :Until success∨10<counter
-      :If 10<counter
-          ('⎕NEW failed ',(⍕counter),' times')⎕SIGNAL 11
-      :EndIf
+      ('⎕NEW failed ',(⍕counter),' times')⎕SIGNAL 11/⍨10<counter
     ∇
 
     ∇ {r}←Initialize dummy;notwindows;netcoreset
@@ -259,8 +279,8 @@
           notwindows←'Win'≢3↑⊃# ⎕WG'APLVersion'
           netcoreset←(,'1')≡2 ⎕NQ'.' 'GetEnvironment' 'DYALOG_NETCORE'
           :If notwindows∨netcoreset                      ⍝ Under Windows, switch selects .NET version
-              ⎕USING←',System.IO.Compression.ZipFile' ',System.IO.Compression' ',System.IO.FileSystem' ⍝ .NET Core bridge: Lookup by name
-⍝             ⎕USING←',System.IO.Compression.ZipFile'    ⍝ .NET Core bridge: Lookup by name
+              ⍝ .NET Core bridge: Lookup by name:
+              ⎕USING←',System.IO.Compression.ZipFile' ',System.IO.Compression' ',System.IO.FileSystem'
           :Else
               ⎕USING←',System.IO.Compression.DLL' ',System.IO.Compression.FileSystem.DLL'
           :EndIf
@@ -270,6 +290,7 @@
 
     ∇ {r}←parent Add_ toBeZipped
       Delete toBeZipped
+      QEX_System
       r←System.IO.Compression.ZipFileExtensions.CreateEntryFromFile _zip(parent,toBeZipped)toBeZipped
     ∇
 
@@ -287,8 +308,15 @@
       }
 
       CheckMinVersion←{
-          IfAtLeastVersion 16:shy←1
-          'This class requires at least version 16.0 of Dyalog APL'⎕SIGNAL 11
+          IfAtLeastVersion 17:shy←1
+          'This class requires at least version 17.0 of Dyalog APL'⎕SIGNAL 11
       }
+
+    ∇ QEX_System
+      ⍝ Workaround for bug Mantis 18404 from 2020-08
+      ⍝ The VALUE ERROR is not really a VALUE ERROR. This appears to happen only when `DotNetZip` is instanciated
+      ⍝ within `⎕SE`, the )CLEAR is issed and then again `DotNetZip` instanciated within `⎕SE`.
+      ⎕EX'System'
+    ∇
 
 :EndClass

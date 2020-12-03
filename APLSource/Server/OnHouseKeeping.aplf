@@ -1,17 +1,16 @@
  {r}←OnHouseKeeping msg
 ⍝ Used for two purposes:
-⍝ * Check ∆SHUTDOWN; if this is 1 sgut the server down
+⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
  r←0
  :If ∆SHUTDOWN
      {}⎕EX'∆SHUTDOWN'
-     :If ##.APLTreeUtils.IsDevelopment
+     :If ##.APLTreeUtils2.IsDevelopment
          {}⎕NQ'#'QuitDQ
      :Else
          {}#.Plodder.Shutdown G.INI                                 ⍝ Will ⎕OFF in runtime
      :EndIf
  :ElseIf 0<⎕NC'∆STARTED'
- :AndIf 'CLEAR WS'≢⎕WSID
      :If ∆STARTED<1 ⎕DT⊃('type' 3)F.Dir'Server.dws'
          :If ⊃G.INI.Get'Config:ReloadWS'
              ⎕LOAD ⎕WSID

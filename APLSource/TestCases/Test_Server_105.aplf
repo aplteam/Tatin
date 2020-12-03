@@ -1,4 +1,4 @@
- r←Test_Server_105(stopFlag batchFlag);⎕TRAP;zipFilename
+ r←Test_Server_105(stopFlag batchFlag);⎕TRAP;zipFilename;rc;msg
  ;packageID;serverPath;qdmx;zip;cfg;body;clientCfg;dir;src;res
 ⍝ Publish a package twice - the second time must result in an error
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -20,7 +20,8 @@
  cfg TC.WritePackageConfigFile src
 
  packageID←'Example-Package_A-0.1.0'
- zipFilename←TC.PublishPackage src('https://localhost/',packageID)
+ (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
+ Assert 200=rc
 
  :Trap 98
      TC.PublishPackage src('https://localhost/',packageID)

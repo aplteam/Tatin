@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_031(stopFlag batchFlag);⎕TRAP
+ r←Test_InstallAndLoad_031(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;body;cfg;installFolder;list;src2;src3;reg
 ⍝ A package that depend on another package that has several functions and therefore uses "api"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,8 @@
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src2
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ Assert 200=rc
 
  body←'r←x Times y' 'r←Constants.PI× x×y'
  (⊂body)F.NPUT src3,'/APLSource/Times.aplf'
@@ -36,7 +37,8 @@
  cfg.api←'Times'    ⍝ Meaning that the other functions are invisible
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
  list←TC.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder

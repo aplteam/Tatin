@@ -6,7 +6,7 @@
 
 If you want to contribute to the [Tatin project on GitHub](https://github.com/aplteam/Tatin) or make adjustments to Tatin for an in-house project, this document will help you.
 
-Tatin is a community project under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody, it is rather a community project.
+Tatin is published under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody, it is rather a community project.
 
 This is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for "contribute to a github project".
 

@@ -1,4 +1,4 @@
- r←Test_Load_014(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_014(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;reg;prjPath;zipfile;path;refs
 ⍝ Publish two classes and one namespace script. The classes :Include the NS script.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -16,17 +16,20 @@
 
  zipfile←TC.Pack(prjPath,'/APLTree')src
  src ⎕NCOPY prjPath,'/APLTree/apl-package.json'
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
  zipfile←TC.Pack(prjPath,'/F-D')src
  src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/F-D/apl-package.json'
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
  zipfile←TC.Pack(prjPath,'/OS')src
  src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/OS/apl-package.json'
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
  path←dir,'/reg/aplteam-APLTreeUtils-6.0.0'

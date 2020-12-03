@@ -1,4 +1,4 @@
- r←Test_Load_012(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_012(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;reg1;reg2;body;cfg;zipfile;refs;path
 ⍝ Publish simple package to the second registry and then load it from there using the folder name.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,8 @@
  cfg.source←'Constants.apln'
  cfg TC.WritePackageConfigFile src
  zipfile←TC.Pack src src
- TC.PublishPackage zipfile'[local2]'
+ (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
+ Assert 200=rc
 
  path←dir,'/reg2/',⊃{⍺,'-',⍵}/cfg.(group name version)
  refs←TC.LoadPackage('file://',path)#.TEMP

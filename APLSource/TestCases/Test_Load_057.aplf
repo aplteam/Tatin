@@ -1,4 +1,4 @@
- r←Test_Load_057(stopFlag batchFlag);⎕TRAP;src0
+ r←Test_Load_057(stopFlag batchFlag);⎕TRAP;src0;rc;msg;zipFilename
  ;dir;body;cfg;list;index;expected;zipped;src2;refs;reg1;reg2;reg3;src1;src3
 ⍝ Publish several versions of a package to different Registries, then load all of them by package ID
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -25,7 +25,8 @@
  cfg.(group name version)←'MyDepartment' 'Foo' '1.0.0'
  cfg.source←'Foo.apln'
  cfg TC.WritePackageConfigFile src0
- TC.PublishPackage src0 reg1
+ (rc msg zipFilename)←TC.PublishPackage src0 reg1
+ Assert 200=rc
 
  body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''1.0.0''' '∇' ':EndNamespace'
  (⊂body)F.NPUT src1,'/Math.apln'
@@ -33,7 +34,8 @@
  cfg.(group name version)←'MyDepartment' 'Math' '1.0.0'
  cfg.source←'Math.apln'
  cfg TC.WritePackageConfigFile src1
- TC.PublishPackage src1 reg2
+ (rc msg zipFilename)←TC.PublishPackage src1 reg2
+ Assert 200=rc
 
  body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''3.0.0''' '∇' ':EndNamespace'
  (⊂body)F.NPUT(src2,'/Math.apln')
@@ -41,7 +43,8 @@
  cfg.(group name version)←'MyDepartment' 'Math' '3.0.0'
  cfg.source←'Math.apln'
  cfg TC.WritePackageConfigFile src2
- TC.PublishPackage src2 reg1
+ (rc msg zipFilename)←TC.PublishPackage src2 reg1
+ Assert 200=rc
 
  body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''2.0.0''' '∇' ':EndNamespace'
  (⊂body)F.NPUT src3,'/Math.apln'
@@ -49,7 +52,8 @@
  cfg.(group name version)←'MyDepartment' 'Math' '2.0.0'
  cfg.source←'Math.apln'
  cfg TC.WritePackageConfigFile src3
- TC.PublishPackage src3 reg3
+ (rc msg zipFilename)←TC.PublishPackage src3 reg3
+ Assert 200=rc
 
  refs←TC.LoadPackage'MyDepartment-Math-2.0.0'#.TEMP
  →T.GoToTidyUp 12≠3 #.TEMP.Math.Times 4

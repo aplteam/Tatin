@@ -9,12 +9,13 @@
  (registryPath packageID)←SeparateUriAndPackageID uri
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  registryPath←F.ExpandPath registryPath
- list←F.ListDirs registryPath ⍝ All package IDs
- list←{⊃,/1↓⎕NPARTS ⍵}¨list                     ⍝ Remove path: we only need the package IDs
+ list←F.ListDirs registryPath                           ⍝ All package IDs
+ list←{⊃,/1↓⎕NPARTS ⍵}¨list                             ⍝ Remove path: we only need the package IDs
  list←(IsValidPackageID_Complete¨list)/list
  :If 0<≢packageID~'*'
      list←((packageID)∘{⍺≡(≢⍺)↑⍵}¨list)/list
  :EndIf
+ list←list[⍋list]                                       ⍝ Ensure proper sorting
  :If 2=parms.⎕NC'tags'
  :AndIf 0<≢parms.tags
      tags←','(≠⊆⊢)⎕C parms.tags
@@ -26,7 +27,7 @@
  :EndIf
  :If 0<≢list
      :If reduceFlag
-         list←∪RemoveMinorAndPatch¨list                    ⍝ Get rid of minor and patch number but preserve major one
+         list←∪RemoveMinorAndPatch¨list                 ⍝ Get rid of minor and patch number but preserve major one
      :EndIf
  :EndIf
 ⍝Done

@@ -4,7 +4,7 @@
 
 # Tatin's Load and Update Strategy
 
-Tatin is based on the concept of [semantic versioning (SemVer)](<https://semver.org "Link to the document that introduced SemVer">), so before we go into any details we first need to understand SemVer. 
+Tatin is based on the concept of [semantic versioning (SemVer)](https://semver.org "Link to the document that introduced SemVer"), so before we go into any details we first need to understand SemVer. 
 
 If you are familiar with SemVer then please skip this and carry on with "The Strategy Problem".
 

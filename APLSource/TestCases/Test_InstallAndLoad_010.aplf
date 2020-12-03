@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_010(stopFlag batchFlag);⎕TRAP
+ r←Test_InstallAndLoad_010(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;body;cfg;zipfile;installFolder;list;src2;src3;src4;src5;reg
 ⍝ Two packages that depend on the same package but different versions; all are classes
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -24,7 +24,8 @@
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src2
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ Assert 200=rc
 
  body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.1415926' '∇' ':EndClass'
  (⊂body)F.NPUT src3,'/APLSource/Constants.aplc'
@@ -32,7 +33,8 @@
  cfg.(group name version)←'Example' 'Constants' '0.2.0'
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src3
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  body←':Class MyClass_AAA' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
  (⊂body)F.NPUT src4,'/APLSource/MyClass_AAA.aplc'
@@ -41,7 +43,8 @@
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src4
  src4 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
- TC.PublishPackage src4 reg
+ (rc msg zipFilename)←TC.PublishPackage src4 reg
+ Assert 200=rc
 
  body←':Class MyClass_BBB' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
  (⊂body)F.NPUT src5,'/APLSource/MyClass_BBB.aplc'
@@ -50,7 +53,8 @@
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src5
  src5 TC.Dependencies.Add'[local2]Example-Constants-0.2.0'
- TC.PublishPackage src5 reg
+ (rc msg zipFilename)←TC.PublishPackage src5 reg
+ Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
  list←TC.InstallPackage('[local2]Example-MyClass_AAA-1.0.0')installFolder

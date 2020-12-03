@@ -1,4 +1,4 @@
- r←Test_Load_051(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_051(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish 2 packages consisting of single fn with 2. depending on 1. & having an alias, then load from specific Registry
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -20,7 +20,8 @@
  cfg.(group name version)←'Example' 'Package_A' '1.0.0'
  cfg.source←'Package_A.apln'
  cfg TC.WritePackageConfigFile src2
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ Assert 200=rc
 
  F.MkDir src3←src,'/package_B'
  body←'r←Times y' 'r←Package_A.Times y'
@@ -31,7 +32,8 @@
  cfg.alias←'Times'
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-Package_A-1.0.0'
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/Example-Package_B-1.0.0')#.TEMP
  →T.GoToTidyUp 12≠#.TEMP.Times 3 4

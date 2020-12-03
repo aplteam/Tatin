@@ -1,4 +1,4 @@
- {zipFilename}←PublishPackage(source registry);uri;path;cfg
+ {(statusCode errMsg zipFilename)}←PublishPackage(source registry);uri;path;cfg;errMsg;statusCode
 ⍝ Publish a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
 ⍝ 2. Creates a dependency file for the package.
@@ -9,20 +9,20 @@
 ⍝ `⍵` must be a two-item vector:
 ⍝ 1. `source` → folder to create package from
 ⍝ 2. `registry` → registry to publish package to (alias or uri)
-⍝ ← is '' in case `source` is a ZIP file but the name of the ZIP file created along the way.
- zipFilename←''
+⍝ ## The explicit result
+⍝ * `statusCode` is an HTTP no matter whether it is an HTTP call or not.
+⍝ * `errMsg` is empty if `statusCode` is 200 but can be transferred back to the server as content otherwise.
+⍝ * `zipFilename` is empty in case `source` is a ZIP file but the name of the ZIP file created along the way otherwise.
+ statusCode←200 ⋄ errMsg←''
  uri←F.EnforceSlash ReplaceRegistryAlias registry
  'Unknown Registry'Assert(⊂EnforceTrailingSlash RemovePackageID uri)∊MyUserSettings.registries.uri
  source←RemoveFileProtocol source  ⍝ Precaution
- path←PackIfFolder source
- :If '.zip'≢⎕C ¯4↑source
-     zipFilename←path
- :EndIf
+ zipFilename←PackIfFolder source
+ 'Invalid URI specified: not a zip file'Assert'.zip'≡⎕C ¯4↑zipFilename
  :If Reg.IsHTTP uri
-     PublishPackageToRemoteRegistry_ path uri
+     PublishPackageToRemoteRegistry_ zipFilename uri
  :Else
-     'Invalid URI specified'Assert'.zip'≡¯4↑path
      cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_NAME}source
-     cfg Reg.PublishPackage path uri
+     (statusCode errMsg)←cfg Reg.PublishPackage zipFilename uri
  :EndIf
 ⍝Done

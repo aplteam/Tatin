@@ -1,14 +1,17 @@
- r←Test_Server_001(stopFlag batchFlag);⎕TRAP
+ r←Test_Server_001(stopFlag batchFlag);⎕TRAP;ind;version;serverVersion
  ;c;q;res
-⍝ URL is not a package ID but also does not specify the REST interface version;  therefore it's not a valid request.
+⍝ Check whethert the Tatin server carries the same version number as the client
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  c←TC.NewClient'https://localhost'
  q←R.NewRequest 0
- q.URI←'/does_not_exist'
+ q.URI←'/'
  res←c R.SendAndReceive q
- →T.PassesIf 404≡res.StatusCode
+ →T.PassesIf(≢res.Headers)≥ind←(⊃¨res.Headers)⍳⊂'x-tatin'
+ version←2⊃Reg.Version
+ serverVersion←ind 2⊃res.Headers
+ →T.PassesIf version≡serverVersion
 
  r←T._OK
 ⍝Done

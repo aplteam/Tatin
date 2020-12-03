@@ -1,11 +1,11 @@
- response←SavePackage request;path;filename;path2;packageID;tempFolder;target;rc;more
+ response←SavePackage request;path;filename;path2;packageID;tempFolder;target
 ⍝ `packageID` is a valid package ID
 ⍝ `bytes` is a stream of bytes originating from a ZIP file being sent base-64 encoded by the client
 ⍝ This function saves the data in the appropriate folder which of course must not exist.
  packageID←request.URI
  target←G.RegistryPath,'/',packageID
  :If F.IsDir target
-     response←request R.Respond 400
+     response←request Respond 400
      response.Content←'The package has already been published'
  :Else
      tempFolder←(739⌶0),'/',packageID
@@ -15,15 +15,12 @@
      (Reg.Base64 request.Content)Reg.WriteNativeFile filename
      path←tempFolder,'/data/'
      filename DotNetZip.UnzipTo path
-     (rc more)←(path,'\apl-package.json')F.MoveTo tempFolder,'/'
-     more Reg.Assert 0=rc
+     (F.NormalizePath tempFolder,'/')⎕NMOVE F.NormalizePath path,'\apl-package.json'
      :If F.IsFile path,Reg.DependenciesFilename
-         (rc more)←(path,Reg.DependenciesFilename)F.MoveTo tempFolder,'/'
-         more Reg.Assert 0=rc
+         (F.NormalizePath tempFolder,'/')⎕NMOVE F.NormalizePath path,Reg.DependenciesFilename
      :EndIf
-     (rc more)←tempFolder F.MoveTo target
-     more Reg.Assert 0=rc
-     Reg.CompileIndex G.RegistryPath
-     response←request R.Respond 200
+     (F.NormalizePath target)⎕NMOVE F.NormalizePath tempFolder
+     Reg.Index.Compile G.RegistryPath
+     response←request Respond 200
  :EndIf
 ⍝Done

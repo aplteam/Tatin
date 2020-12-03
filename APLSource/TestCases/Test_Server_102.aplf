@@ -1,4 +1,4 @@
- r←Test_Server_102(stopFlag batchFlag);⎕TRAP;zipFilename
+ r←Test_Server_102(stopFlag batchFlag);⎕TRAP;zipFilename;rc;msg
  ;packageID;serverPath;qdmx;zip;cfg;body;clientCfg;dir;src;res
 ⍝ Publish a package with two asset files
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -24,7 +24,9 @@
  cfg TC.WritePackageConfigFile src
 
  packageID←'Example-Package_A-0.1.0'
- zipFilename←TC.PublishPackage src('https://localhost/',packageID)
+ (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
+ Assert 200=rc
+
 
  →T.GoToTidyUp 0=F.IsDir serverPath,,'/',packageID,'/data\Assets'
  →T.GoToTidyUp 2≠≢1⊃F.Dir serverPath,'/',packageID,'/data\Assets\'

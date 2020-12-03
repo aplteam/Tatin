@@ -1,0 +1,13 @@
+ r←x(fns Exec)y;qdmx
+⍝ Operator useful for trapping all errors and returning either '' for success and an error message
+⍝ otherwise. This is typically useful for functions like ⎕NCOPY, ⎕MOVE and the like.\\
+⍝ You *must not* use this operator if thhe operand function returns a value since this is ignored.
+⍝ Also, the operand function must be dyadic.\\
+⍝ You should not use this for executing user-defined functions since *all* errors are trapped.
+ r←''
+ :Trap 0
+     {}x fns y
+ :Else
+     qdmx←⎕DMX
+     r←qdmx.EM
+ :EndTrap

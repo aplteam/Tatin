@@ -13,8 +13,14 @@ Base                = 'localhost'           ; The domain name without the protoc
 Title               = 'Tatin'               ; Window title (Browser)
 Caption             = 'Tatin Registry'      ; <h1> of HTML pages
 TestFlag            = 0                     ; If 1 a couple of commands are available as REST requests
-ReloadWS            = 0                     ; Reload the server WS in case a better version is detected on disk
+ReloadWS            = 1                     ; Reload the server WS in case a better version is detected on disk
 HTDOCS              = '{home}'              ; Defines where the static files live (CSS, IMGs...)
+
+
+[HTMLBACKGROUND]
+image               = ''                    ; Set this to tatin.png for a test server
+color:              = '#FFFFF0'             ; Set this to #FFFFF0 for a production server
+
 
 [MSG]				; Use this to put a general msg (maintanence etc.) on _every_ page. Ignored when "Text" is empty. Might be nested.
 Text                = ''
@@ -29,19 +35,23 @@ LogRumba            = 0
 [WINDOWSEVENTLOG]
 write               = ¯1                   ; ¯1 = Write Start/Stop/Error events to Windows Event Log in Runtime;   1: write   ; 0=never
 
+
 [CERTIFICATES]                              ; The following settings are ignored in case CONFIG.Secure is 0
 PublicCertFile      = '{home}Assets/RunTime/Certificates/myserver-cert.pem'
 PrivateKeyFile      = '{home}Assets/RunTime/Certificates/myserver-key.pem'
 CertType            = 'DER'
+
 
 [EVENTS]                        ; These are events send by Rumba to quit ⎕DQ or to broadcasts events ("Pause" and "Continue" when running as a Windows Service)
 QuitEvent           = 9876
 PauseEvent          = 9877
 ContinueEvent       = 9878
 
+
 [TRAP]
 General             = ¯1        ; ¯1: Error trapping in RunTime but not otherwise;   1: Trap;   0: do not trap.   General means "above" Rumba
 Rumba               = 1         ; This has an effect only in development. Rumba traps all errors in RunTime in any case.
+
 
 [APP]                                                  ; Change the following settings according to your needs:
 Context             = '#.Tatin.Server'                 ; Where in the workspace does the application live?  (Ideally outside Plodder)

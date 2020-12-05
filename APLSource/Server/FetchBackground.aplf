@@ -1,0 +1,17 @@
+ r←FetchBackground ini;backgroundColor;backgroundImage
+⍝ The INI file section [HTMLBACKGROUND] rules how the background should like this.\\
+⍝ * For production servers we expect "colour" to be set and used for the <body> tag.
+⍝ * For a production server we expect "image" to be set and used for the <body> tag.
+ r←'<style>' 'body {'
+ :If ini.Exist'HTMLBACKGROUND:color'
+     backgroundColor←⊃ini.Get'HTMLBACKGROUND:color'
+ :AndIf 0<≢backgroundColor
+     r,←⊂'background-color: ',backgroundColor,');'
+ :EndIf
+ :If ini.Exist'HTMLBACKGROUND:image'
+     backgroundImage←⊃ini.Get'HTMLBACKGROUND:image'
+ :AndIf 0<≢backgroundImage
+     r,←⊂'background-image: url("/Assets/img/',backgroundImage,'");'
+ :EndIf
+ r,←'}' '</style>'
+⍝Done

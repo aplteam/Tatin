@@ -9,7 +9,7 @@
  client←NewClient uri
 
  request←R.NewRequest 0
- request.URI←packageID
+ request.URI←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
  request.Method←'PUT'
  request.Content←Reg.Base64 Reg.ReadNativeFile filename
  request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)

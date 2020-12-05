@@ -1,6 +1,6 @@
  html←HtmlHeader dummy;base;caption;title
-⍝ Strictly speaking this does not only return a header: it's also returning the DOC type,
-⍝ and an opening html and body tag and some more stuff.
+⍝ Strictly speaking this does not only return a header: it's also returning the DOC type and
+⍝ an opening html and the opening body tag and some more stuff shared by all Tatin HTML pages.
  base←'https://',(⊃G.INI.Get'Config:Base'),'/'
  html←''
  html,←⊂'<!DOCTYPE html>'
@@ -16,11 +16,11 @@
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="print">'
  html,←⊂'<base href="',base,'">'
  html,←⊂'<link rel="icon" type="image/x-icon" href="/Assets/img/favicon.ico" />'
+ html,←FetchBackground G.INI
  html,←⊂'</head>'
- html,←⊂'<body>'
  html,←⊂'<div id="my-logo">'
  caption←⊃G.INI.Get'Config:Caption'
- html,←⊂'<a href="/"><img id="logo" src="Assets/img/tatin.png" title="Link to ',title,' main page" alt="Link to ',title,' main page"></a>'
+ html,←⊂'<a href="/"><img id="logo" src="Assets/img/tatin.png" title="Link to ',title,' main page" alt="Link to ',title,' main page"></a>'
  html,←⊂'<h1>',caption,'</h1>'
  html,←⊂'</div>'
  ⍝Done

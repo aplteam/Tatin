@@ -1,0 +1,15 @@
+ r←Test_Server_005(stopFlag batchFlag);⎕TRAP
+ ;c;q;res
+⍝ Requests index.html. Mut led to the home page being displayed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ c←R.NewClient 0
+ c.Host←'localhost'
+ q←R.NewRequest 0
+ q.URI←'/index.html'
+ res←c R.SendAndReceive q
+ →T.PassesIf∨/'<title>Tatin Tests</title>'⍷res.Content
+
+ r←T._OK
+⍝Done

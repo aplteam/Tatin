@@ -5,7 +5,7 @@
  (registryPath packageID)←SplitAtLast uri
  'Is not a folder'Assert F.IsDir registryPath
  registryPath←F.ExpandPath registryPath
- packageID,←('*'≠¯1↑packageID)/'*'
+ packageID,←('*'≠¯1↑packageID)/'-*'
  list←F.ListDirs registryPath,'/',packageID
  list←((~'/\'∊⍨¯1↑registryPath)+≢registryPath)↓¨list            ⍝ All package IDs
  list←list[SortIndexForPackageIDs list]

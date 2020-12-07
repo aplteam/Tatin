@@ -5,8 +5,8 @@
      html,←specialMsg
  :EndIf
  html2←⊃F.NGET(StaticFolder,'docs/_ReadMe.html')1
- html2↓⍨←¯1+html2⍳⊂'<h2 data-id="Documentation-Center">Documentation Center</h2>'
- html2←'href="./'⎕R('href="',StaticFolder,'docs/')⊣html2
+ html2←'<h2'{⍵↓⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html2               ⍝ Ignore everything to the first <h2> tag
+ html2[html2⍳⊂'</a>']←⊂''                           ⍝ Flatten first closing </a>
  html,←html2
  html←'</body'{⍵↑⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html
  html,←GetFooter

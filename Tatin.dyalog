@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.11.0 - 2020-12-09
+⍝   * `ListPackages` now allows call without an argument. A list of registries is presented then for user selection.
 ⍝ * 0.10.1 - 2020-11-06
 ⍝   * Typos in help fixed
 ⍝   * Help page for `ListVersions` added
@@ -50,7 +52,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'Lists all packages in the Registry specified in the argument'
-          c.Parse←'1 -raw -group= -tags='
+          c.Parse←'1s -raw -group= -tags='
           r,←c
      
           c←⎕NS ⍬
@@ -175,8 +177,12 @@
     ∇
 
     ∇ r←ListPackages Arg;registry;parms
-      registry←Arg._1
-      registry,←(~(¯1↑registry)∊'/\')/'/'
+      r←''
+      :If 0≡registry←Arg._1
+          →(⍬≡registry←SelectRegistry 0)/0
+      :Else
+          registry,←(~(¯1↑registry)∊'/\')/'/'
+      :EndIf
       registry←EnforceSlash registry
       parms←⎕NS''
       :If 0≢Arg.group
@@ -192,6 +198,7 @@
           :Else
               r←↑,'-'(≠⊆⊢)¨r
               r(AddHeader)←'Group' 'Package Name' 'Major'
+              r←(⍉⍪('Packages from ',registry)'' '')⍪r
           :EndIf
       :EndIf
     ∇
@@ -235,7 +242,7 @@
           list←({TC.Reg.IsValidPackageID_Complete⊃,/1↓⎕NPARTS ⍵}¨list)/list
       :AndIf 1=≢list
           :If Arg.quiet
-          :OrIf 1 ∆YesOrNo'Publish ',({~∨/'/\'∊⍵:⍵   ⋄ ⍵↑⍨-¯1+⌊/(⌽⍵)⍳'/\'}1⊃list),' ?'
+          :OrIf 1 ∆YesOrNo'Publish ',({~∨/'/\'∊⍵:⍵ ⋄ ⍵↑⍨-¯1+⌊/(⌽⍵)⍳'/\'}1⊃list),' ?'
               zipFilename←⊃list
           :Else
               :Return
@@ -296,11 +303,17 @@
       r←⍪parms TC.ListTags Arg._1
     ∇
 
-    ∇ r←ListVersions Arg
+    ∇ r←ListVersions Arg;qdmx
+      ⎕SIGNAL 0
       :Trap 98
           r←⍪TC.ListVersions Arg._1
       :Else
-          r←'Not found: ',Arg._1
+          qdmx←⎕DMX
+          :If 0=≢qdmx.EM
+              r←'Not found: ',Arg._1
+          :Else
+              r←qdmx.EM
+          :EndIf
       :EndTrap
     ∇
 
@@ -513,7 +526,8 @@
           r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all data.'
       :Case ⎕C'ListPackages'
           r,←⊂''
-          r,←⊂'Lists all groups defined in the Registry specified as an argument.'
+          r,←⊂'Lists all groups defined in the Registry specified as an argument. If no Registry was'
+          r,←⊂'specified then a list witg all Registries is presented to the user.'
           r,←⊂'* If you specify an alias it MUST be embraced by square brackets as in [MyAlias]'
           r,←⊂'* Aliases are case insensitive, paths only under Windows.'
           r,←⊂'* It does not matter whether you specify / or \ in a path, or whether it has or has'
@@ -606,7 +620,7 @@
           r,←⊂'* Path to the ZIP file that contains the package to be published'
           r,←⊂'* URL or alias of a Registry Server'
           r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
-                    r,←⊂'to the Tatin rules'
+          r,←⊂'to the Tatin rules'
           r,←⊂''
           r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question usually asked before'
           r,←⊂'a package is actually published is probably only useful with test cases.'
@@ -736,5 +750,72 @@
     ED←{⎕ED⍠('EditName' 'Disallow')⊣⍵}
     IsValidJSON←{0::0 ⋄ 1⊣TC.Reg.JSON ⍵}
     IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}
+
+    ∇ index←{x}Select options;flag;answer;question;value;bool;⎕ML;⎕IO;manyFlag;mustFlag;caption
+    ⍝ Presents `options` as a numbered list and allows the user to select either exactly one or multiple ones.\\
+    ⍝ One is the default.\\
+    ⍝ The optional left argument allows you to specify more options:
+    ⍝ * `manyFlag` defaults to 0 (meaning just one item might be selected) or 1, in which case multiple items can be specified.
+    ⍝ * `mustFlag` forces the user to select at least one  option.
+    ⍝ * `caption` is shown above the options.
+    ⍝ `options` must not have more than 999 items.
+    ⍝ If the user aborts by entering nothing or a "q" (for "quit") `index will be `⍬`.
+      x←{0<⎕NC ⍵:⊆⍎⍵ ⋄ ''}'x'
+      (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
+      ⎕IO←1 ⋄ ⎕ML←1
+      manyFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'manyFlag'
+      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 11/⍨2≠≡options
+      'Right argument has more than 999 items'⎕SIGNAL 11/⍨999<≢options
+      flag←0
+      :Repeat
+          ⎕←{⍵↑'--- ',caption,((0≠≢caption)/' '),⍵⍴'-'}⎕PW-1
+          ⎕←⍪{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳⍴⍵),¨⍵}options
+          ⎕←''
+          question←'Select one ',(manyFlag/'or more '),'item',((manyFlag)/'s'),' '
+          question,←((manyFlag∨~mustFlag)/'('),((~mustFlag)/'q=quit'),((manyFlag∧~mustFlag)/', '),(manyFlag/'a=all'),((manyFlag∨~mustFlag)/')'),' :'
+          :If 0<≢answer←⍞,0/⍞←question
+              answer←(⍴question)↓answer
+              :If 1=≢answer
+              :AndIf answer∊'Qq',manyFlag/'Aa'
+                  :If answer∊'Qq'
+                      :If 0=mustFlag
+                          index←⍬
+                          flag←1
+                      :EndIf
+                  :Else
+                      index←⍳≢options
+                      flag←1
+                  :EndIf
+              :Else
+                  (bool value)←⎕VFI answer
+                  :If ∧/bool
+                  :AndIf manyFlag∨1=+/bool
+                      value←bool/value
+                  :AndIf ∧/value∊⍳⍴options
+                      index←value
+                      flag←0≠≢index
+                  :EndIf
+              :EndIf
+          :EndIf
+      :Until flag
+      index←{1<≢⍵:⍵ ⋄ ⊃⍵}⍣(⍬≢index)⊣index
+    ∇
+
+    ∇ r←GetListOfRegistriesForSelection type
+      r←1 TC.ListRegistries type
+      r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
+    ∇
+
+    ∇ registry←SelectRegistry type;row;list
+      :If 1=≢list←GetListOfRegistriesForSelection type
+          registry←1⊃list[1;]
+      :Else
+          :If ⍬≡row←'Select Tatin Registry'Select↓⎕FMT⌽list
+              registry←⍬
+          :Else
+              registry←1⊃list[row;]
+          :EndIf
+      :EndIf
+    ∇
 
 :EndNamespace

@@ -1,0 +1,11 @@
+ r←ListMajorVersions packageID;registryPath;packageID;group;name;version;regEx;pattern;list2;list;noOfVersions
+⍝ Takes a package ID without version number and returns all major versions (package IDs without minor and patch number)
+ r←0 2⍴'' ''
+ :If 0<≢list2←F.ListDirs G.RegistryPath,'/',packageID,'-*'
+     list2←'/\'∘A.Last¨list2
+     list2←Reg.RemoveMinorAndPatch¨list2
+     list←⌽∪list2
+     noOfVersions←⌽{≢⍵}⌸3⊃¨'-'A.Split¨list2
+     r←list,[1.5]noOfVersions
+ :EndIf
+⍝Done

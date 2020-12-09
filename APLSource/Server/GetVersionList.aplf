@@ -1,14 +1,18 @@
  response←request GetVersionList packageID;data;html;qdmx
  :Trap 98
-     :If 0<≢data←Reg.ListVersions G.RegistryPath,packageID
-         :If IsJsonRequest request.Headers
+     :If IsJsonRequest request.Headers
+         :If 0<≢data←Reg.ListVersions G.RegistryPath,packageID
              response←request ReturnJSON Reg.JSON data
          :Else
-             html←PrepareHtmlPageForVersionList data
-             response←request ReturnHTML html
+             response←request Respond 404 1
          :EndIf
      :Else
-         response←request Respond 404 1
+         :If 0<≢data←Reg.ListVersions G.RegistryPath,Reg.RemoveMinorAndPatch packageID
+             html←PrepareHtmlPageForVersionList packageID data
+             response←request ReturnHTML html
+         :Else
+             response←request Respond 404 1
+         :EndIf
      :EndIf
  :Else
      qdmx←⎕DMX

@@ -1,19 +1,19 @@
- html←packageIDs PrepareHtmlPageForPackageList mat;col1;col2;col3;buff
+ html←packageIDs PrepareHtmlPageForPackageList mat;col1;col2;col3;col4
  html←HtmlHeader''
  html,←⊂'<h2>List of all packages</h2>'
  html,←AddSpecialMessage ⍬
  html,←⊂'<table>'
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←{'<th style="align: left">',⍵,'</th>'}¨'Package name' 'Description' 'Total'
- buff←packageIDs{'<a href="v1/packages/details/',⍺,'" title="Latest details of this package">',⍵,'</a>'}¨mat[;1]
+ html,←{'<th style="align: left">',⍵,'</th>'}¨'Package name' 'Description' 'Major<br>versions' 'Link to<br>project'
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
  :If 0<≢mat
-     col1←{'<td><code>',⍵,'</code></td>'}¨buff
+     col1←{'<td><code>',({'<a href="v1/packages/major_versions/',⍵,'" title="List major versions">',⍵,'</a>'}⍵),'</code></td>'}¨mat[;1]
      col2←{'<td>',⍵,'</td>'}¨mat[;2]
-     col3←packageIDs{'<td><a href="v1/packages/versions/',⍺,'">',(⍕⍵),' version',((1<⍵)/'s'),'</a></td>'}¨mat[;4]
-     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3
+     col3←{'<td align="right">',⍵,'</td>'}¨mat[;4]
+     col4←{'<td>',⍵,'</td>'}¨mat[;1]{0=≢⍵:'- ' ⋄ '<a href="',⍵,'" title="Opens ',⍵,' in a new tab" target="_blank">',(MassageProjectURL ⍵),'</a>'}¨mat[;3]
+     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3 col4
      html,←⊂'</tr>'
  :EndIf
  html,←⊂'</tbody>'

@@ -14,6 +14,9 @@
      :Select path
      :Case 'v1/packages'
          response←request GetPackageList packageID
+     :Case 'v1/packages/major_versions'
+         regFolder←'expand'F.NormalizePath G.RegistryPath
+         response←request GetMajorVersionList packageID regFolder
      :Case 'v1/packages/versions'
          response←request GetVersionList packageID
      :Case 'v1/packages/details'

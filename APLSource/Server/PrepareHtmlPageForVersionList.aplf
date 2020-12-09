@@ -1,10 +1,16 @@
- html←PrepareHtmlPageForVersionList data
+ html←PrepareHtmlPageForVersionList(packageID data);links
+ data←⌽data
  html←HtmlHeader''
- html,←⊂'<h2>List of all versions</h2>'
+ html,←⊂'<h2>All versions of "',packageID,'"</h2>'
  html,←AddSpecialMessage ⍬
  html,←⊂'<table>'
+ html,←⊂'<thead>'
+ html,←⊂'<tr class="my-first-th">'
+ html,←{'<th>',⍵,'</th>'}¨⊂'All versions'
+ html,←⊂'</thead>'
  html,←⊂'<tbody>'
- html,←data{'<tr><td>',(⍕⍵),'.</td><td><code>',⍺,'</code></td></tr>'}¨⍳≢data
+ links←{'<a href="v1/packages/details/',⍵,'" title="Link to the package configuration">',⍵,'</a>'}¨data
+ html,←{'<tr><td><code>',⍵,'</code></td></tr>'}¨links
  html,←⊂'</tr>'
  html,←⊂'</tbody>'
  html,←⊂'</table>'

@@ -1,0 +1,18 @@
+ response←request GetMajorVersionList(packageID folder);data;html;qdmx
+ :Trap 98
+     :If 0<≢data←ListMajorVersions packageID
+         :If IsJsonRequest request.Headers
+             response←request ReturnJSON Reg.JSON data
+         :Else
+             html←PrepareHtmlPageForMajorVersionList packageID data
+             response←request ReturnHTML html
+         :EndIf
+     :Else
+         response←request Respond 404 1
+     :EndIf
+ :Else
+     qdmx←⎕DMX
+     response←request Respond 400 0
+     response.Content←qdmx.EM
+ :EndTrap
+⍝Done

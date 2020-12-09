@@ -1,4 +1,4 @@
- response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms
+ response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;data2;list;description;uniqueIDs
 ⍝ Respond to a request for some or all packages, HTML or JSON
  :If IsJsonRequest request.Headers
      parms←⎕NS''
@@ -14,13 +14,15 @@
      ⍝ Because it's a request from a Browser for the time
      ⍝ being we know that *all* packages are requested.
      data←0 Reg.ListPackages G.RegistryPath(⎕NS'')
-     noOfVersions←{≢⍵}⌸2⊃¨'-'A.Split¨data
-     IDs←Reg.LatestVersions data
-     :If 0<≢data←⍪Reg.RemoveVersionNumber¨IDs
-         data,←↑FetchDescriptionAndPackageProjectUrl¨IDs
-         data,←noOfVersions
+     data2←∪Reg.RemoveMinorAndPatch¨data
+     :If 2='-'+.=⊃data2
+         noOfVersions←{≢⍵}⌸data2
+     :Else
+         noOfVersions←{≢⍵}⌸2⊃¨'-'A.Split¨data2
      :EndIf
-     IDs←1⊃¨'-'Reg.SplitAtLast¨IDs
-     html←IDs PrepareHtmlPageForPackageList data
+     uniqueIDs←data[(¯1+1↓∪data2⍳data2),≢data2]
+     description←↑FetchDescriptionAndPackageProjectUrl¨uniqueIDs
+     data←(∪data2),description,⍕¨noOfVersions
+     html←uniqueIDs PrepareHtmlPageForPackageList data
      response←request ReturnHTML html
  :EndIf

@@ -1,12 +1,20 @@
- response←CreateDocumentationIndex request;html;specialMsg;html2
+ response←CreateDocumentationIndex request;html;specialMsg;html2;h2;offset;length;sf;options
 ⍝
  html←HtmlHeader''
- :If 0<≢specialMsg←AddSpecialMessage ⍬
-     html,←specialMsg
- :EndIf
  html2←⊃F.NGET(StaticFolder,'docs/_ReadMe.html')1
- html2←'<h2'{⍵↓⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html2               ⍝ Ignore everything to the first <h2> tag
- html2[html2⍳⊂'</a>']←⊂''                           ⍝ Flatten first closing </a>
+ h2←{row←1⍳⍨∨/¨'<h2 '∘⍷¨⍵ ⋄ row⊃⍵}html2
+ offset←¯1+{1⍳⍨∨/¨'<div class="h_tag">'∘⍷¨⍵}html2
+ length←{1⍳⍨∨/¨'</div>'∘⍷¨⍵}offset↓html2
+ html2←(length+offset)↓html2
+ html2←1↓⊃,/(⎕UCS 13),¨(⊂h2),(AddSpecialMessage ⍬),html2
+ sf←'<div[^>]*>\r<a[^>]*>\r(<h3[^>]*>[^<]*<\/h3>)\r</a>\r</div>'  ⍝ sf = search for
+ options←('Greedy' 0)('Mode' 'D')('DotAll' 1)
+ html2←sf ⎕R'\1'⍠options⊣html2
+ sf←'(<a href="./)'
+ html2←sf ⎕R'\1Assets/docs/'⍠options⊣html2
+ sf←'( title=")([^"]*)"'
+ html2←sf ⎕R'\1Opens \2 in a new Tab" target=_blank'⍠options⊣html2
+ html2←(⎕UCS 13)A.Split html2
  html,←html2
  html←'</body'{⍵↑⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html
  html,←GetFooter

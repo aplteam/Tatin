@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.12.0 - 2020-12-15
+⍝   * New option -noaggr aded to ListPackages
 ⍝ * 0.11.0 - 2020-12-09
 ⍝   * `ListPackages` now allows call without an argument. A list of registries is presented then for user selection.
 ⍝ * 0.10.1 - 2020-11-06
@@ -52,7 +54,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'Lists all packages in the Registry specified in the argument'
-          c.Parse←'1s -raw -group= -tags='
+          c.Parse←'1s -raw -group= -tags= -noaggr'
           r,←c
      
           c←⎕NS ⍬
@@ -176,7 +178,7 @@
       TC←⎕SE._Tatin.Client
     ∇
 
-    ∇ r←ListPackages Arg;registry;parms
+    ∇ r←ListPackages Arg;registry;parms;caption;width
       r←''
       :If 0≡registry←Arg._1
           →(⍬≡registry←SelectRegistry 0)/0
@@ -191,14 +193,19 @@
       :If 0≢Arg.tags
           parms.tags←Arg.tags
       :EndIf
+      :If 0≢Arg.noaggr
+          parms.aggregate←~Arg.noaggr
+      :EndIf
       r←⍪parms TC.ListPackages registry
       :If 0=Arg.raw
           :If 0=≢r
               r←'No packages found'
           :Else
-              r←↑,'-'(≠⊆⊢)¨r
-              r(AddHeader)←'Group' 'Package Name' 'Major'
-              r←(⍉⍪('Packages from ',registry)'' '')⍪r
+              r(AddHeader)←'Group & Name' '≢ major versions'
+              r←⎕FMT r
+              caption←' *** Packages from ',registry
+              width←(2⊃⍴r)⌈≢caption
+              r←(width↑caption),[1]width↑[2]r
           :EndIf
       :EndIf
     ∇
@@ -210,7 +217,7 @@
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
       '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
-      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert~(⊂⎕C targetSpace)∊'#' '⎕se'
+      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert '.'∊targetSpace
       '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
       :If 0=saveIn.⎕NC'targetSpace'
@@ -319,6 +326,7 @@
 
     ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn
       (identifier targetSpace)←Arg.(_1 _2)
+      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert'.'∊targetSpace
       '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert~(⊂⎕C targetSpace)∊'#' '⎕se'
       '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
@@ -536,6 +544,7 @@
           r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
           r,←⊂'  * -tags=zip will restrict the output to packages that carry the given tags.'
           r,←⊂'    If you need to specify multiple tags then separate them by commas.'
+          r,←⊂'* By default the output is aggregated. Specify -noaggr if you want the full list.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
           r,←⊂''
@@ -645,13 +654,15 @@
       r,←⊂'* The argument might just be a package ID: {group}-{name}-{major.minor.patch}'
       r,←⊂'  In that case all Registries are scanned for that package ID; the first one wins.'
       r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID'
-      r,←⊂'  Valid examples are:'
+      r,←⊂'* You may specify an incomplete package ID (in terms of patch, minor and/or major'
+      r,←⊂'  number) but just MSUT specify a Registry then.'
+      r,←⊂'Valid examples are:'
       r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0 ',add
-      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2 ',add
-      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2.0.0 ',add
       r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils-2.0.0 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2.0.0 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2.0 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils ',add
       r,←⊂'  ]TATIN.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils-2.0.0/ ',add
     ∇
 

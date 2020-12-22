@@ -1,0 +1,14 @@
+ r←Test_ListPkgs_033(stopFlag batchFlag);⎕TRAP;mat
+⍝ List all versions of package "aplteam-APLProcess-0"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ mat←TC.ListPackages'[local]aplteam-APLProcess-0'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 0<≢mat
+ →T.PassesIf 0<⊃mat[1;2]
+ →T.PassesIf∧/'aplteam-APLProcess-0'{⍺∘≡¨(≢⍺)↑¨⍵}mat[;1]
+
+ r←T._OK
+⍝Done

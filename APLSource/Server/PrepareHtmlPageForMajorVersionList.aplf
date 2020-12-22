@@ -1,15 +1,14 @@
- html←PrepareHtmlPageForMajorVersionList(packageID data);mvn
+ html←PrepareHtmlPageForMajorVersionList(packageID data)
  html←HtmlHeader''
  html,←⊂'<h2>Major versions of "',packageID,'"</h2>'
  html,←AddSpecialMessage ⍬
  html,←⊂'<table>'
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←{'<th>',⍵,'</th>'}¨'Package name' 'No. of<br>versions'
+ html,←{'<th>',⍵,'</th>'}¨'Package name' 'Major' 'No. of versions'
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
- mvn←{⊃'-'A.Last Reg.RemoveMinorAndPatch ⍵}¨data[;1]   ⍝ mvn = Major version numbers
- html,←mvn{'<tr><td><a href="/v1/packages/versions/',packageID,'-',⍺,'" title="List of versions"><code>',(1⊃⍵),'</code></a></td><td align="right">',(⍕2⊃⍵),'</td></tr>'}¨↓data
+ html,←{'<tr><td><a href="/v1/packages/versions/',(1⊃⍵),'-',(2⊃⍵),'" title="List of versions"><code>',(1⊃⍵),'</code></a></td><td>',(2⊃⍵),'</td><td align="right">',(⍕3⊃⍵),'</td></tr>'}¨↓data
  html,←⊂'</tbody>'
  html,←⊂'</table>'
  html,←⊆GetFooter

@@ -8,15 +8,15 @@
  :For markdownFile :In markdownFiles
      parms←##.MarkAPL.CreateParms
      parms.inputFilename←markdownFile
-     parms.outputFilename←'docs/',(2⊃⎕NPARTS markdownFile),'.html'
+     parms.outputFilename←'html/',(2⊃⎕NPARTS markdownFile),'.html'
      parms.homeFolder←'Assets/MarkAPL'
      parms.verbose←0
      (html ns)←parms ##.MarkAPL.Markdown2HTML''
      'The markdown-to-HTML conversion run into problems'Assert 0=≢ns.report
  :EndFor
- htmlFiles←{⊃{⍺,⍵}/1↓⎕NPARTS ⍵}¨⊃F.Dir'docs/*.html'
+ htmlFiles←{⊃{⍺,⍵}/1↓⎕NPARTS ⍵}¨⊃F.Dir'html/*.html'
  zipFilename←targetFolder,'Tatin-Documentation-',({⍵/⍨3>+\'.'=⍵}2⊃##.Registry.Version),'.zip'
  F.DeleteFile zipFilename
  myZip←⎕NEW ##.DotNetZip(,⊂zipFilename)
- (F.PWD,'/docs')∘{⍺ myZip.Add ⍵}¨htmlFiles
+ (F.PWD,'/html')∘{⍺ myZip.Add ⍵}¨htmlFiles
 ⍝Done

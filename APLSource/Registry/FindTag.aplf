@@ -1,12 +1,12 @@
- (fuzzy list)←{reduceFlag}FindTag(path tags allPackages);tagList;bool;ind;bool_;fuzzy_
-⍝ `path` is path to Registry.\\
+ (fuzzy list)←{aggregate}FindTag(path tags allPackages);tagList;bool;ind;bool_;fuzzy_
+⍝ `path` is a path to a Registry.\\
 ⍝ `tags` is one ore more tags: either a simple text vector or a vector of text vectors. Multiple tags result in an AND search.\\
 ⍝ In a first attempt we try to find exact matches for the tags given. If successful we return the full package IDs with a hit and 0 for `fuzzy`.\\
 ⍝ If not successful we try again by using ⍷. If that is successful we return the full package IDs with a hit and 1 for `fuzzy`.\\
 ⍝ If still not successful we try again with a fuzzy search. If that is successful we return the full package IDs with a hit and 2 for `fuzzy`.\\
 ⍝ If still not successful we return (¯1 '').\\
-⍝ `reduceFlag` defaults to 0. If it is one the minor version number and the patch numbers are removed and doubles dropped from the result.
- reduceFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'reduceFlag'
+⍝ `aggregate` defaults to 0. If it is 1 the minor version number and the patch numbers are removed and doubles dropped from the result.
+ aggregate←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'aggregate'
  fuzzy←¯1
  list←''
  tags←⎕C¨⊆tags
@@ -19,7 +19,7 @@
      list←∪list
      fuzzy←⌈/fuzzy_
  :EndIf
- :If reduceFlag
+ :If aggregate
  :AndIf 0<≢list
      list←∪RemoveMinorAndPatch¨list        ⍝ Get rid of minor and patch number but preserve major one
  :EndIf

@@ -1,0 +1,12 @@
+ r←Test_ListPkgs_011(stopFlag batchFlag);⎕TRAP;mat
+⍝ List all packages of group "doesnotexist"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ mat←TC.ListPackages'[local]doesnotexist'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 0≡≢mat
+
+ r←T._OK
+⍝Done

@@ -1,15 +1,14 @@
- {r}←UpdateDocumentation dummy;msg;list;targetPath;sourcePath;targetPaths;rc
+ {r}←UpdateDocumentation dummy;list;targetPath;sourcePath;targetPaths
 ⍝ Update the Documentation in Assets/docs/ as well as the Test Server with what we've got in Dist/
  r←⍬
  targetPaths←'./Assets/docs/' './Dist/Server/Assets/docs/'
- sourcePath←'./docs/'
+ sourcePath←'./html/'
 
  :For targetPath :In targetPaths
      ##.FilesAndDirs.RmDir targetPath
      ⎕DL 0.2
      ##.FilesAndDirs.MkDir targetPath
      list←##.FilesAndDirs.Dir sourcePath,'*.html'
-     (rc msg)←⊃targetPath∘{⍵ ##.FilesAndDirs.CopyTo ⍺}¨list
-     msg Assert rc∧.=0
+     targetPath∘⎕NCOPY¨list
  :EndFor
 ⍝Done

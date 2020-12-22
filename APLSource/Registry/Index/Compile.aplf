@@ -24,11 +24,11 @@
      descs←⊃,/descs,¨⎕UCS 13
      ref.descriptions←descs
      (⊂descs)##.F.NPUT(path,'/tatin_descriptions.json')1
-     tags←⊃,/⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨{⍵⊆⍨~⍵∊';,'}⍵}¨tags
+     tags←##.TAB{(1⊃⍵),⍺,(2⊃⍵)}¨⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨{⍵⊆⍨~⍵∊';,'}⍵}¨tags
      (⊂tags)##.F.NPUT(path,'/tatin_tags.txt')1
  :Else
      (⊂'')##.F.NPUT(path,'/',GetIndexFilename)1
      (⊂'')##.F.NPUT(path,'/tatin_descriptions.json')1
-     (⊂'')##.F.NPUT(path,'/tatin_tags')1
+     (⊂'')##.F.NPUT(path,'/tatin_tags.txt')1
  :EndIf
 ⍝Done

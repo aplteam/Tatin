@@ -1,4 +1,4 @@
- list←home GetAllFiles cfg;list;subList;default
+ list←home GetAllFiles cfg;list;subList;default;extension
 ⍝ ⍵ Is an object presenting a package's config file
 ⍝ ⍺ Is the folder that hosts the package
 ⍝ ← Is a list of all cfg.source files
@@ -6,16 +6,21 @@
 ⍝ 1. If the client's config file has a default source folder defined it is taken if it exists.
 ⍝ 2. If there is just one folder then it is assumed that this folder contains all source code files.\\
 ⍝ As a side effect this function writes back the config file in case "source" could be established.
+ extension←'.aplf' '.aplo' '.aplc' '.apln' '.dyalog'
  :If 0=≢cfg.source
      :If 0<≢default←MyUserSettings.source
      :AndIf F.IsDir home,default
          list←(≢home)↓¨⊃F.Dir home,default,'/'
-         ('No source code files found in ',home,default)Assert∧/(3⊃∘⎕NPARTS¨list)∊'.aplf' '.aplo' '.aplc' '.apln' '.dyalog'
+         ('No source code files found in ',home,default)Assert∧/(3⊃∘⎕NPARTS¨list)∊extension
          cfg.source←default
      :Else
          list←(≢home)↓¨⊃F.Dir home,'/'
          subList←list~Reg.CFG_Name Reg.DependenciesFilename
-         :If 1≠≢subList←(F.IsDir home∘,¨subList)/subList
+         subList←(({3⊃⎕NPARTS ⍵}¨subList)≢¨⊂'.zip')/subList
+         :If 1=≢subList
+         :AndIf (⊂3⊃⎕NPARTS⊃subList)∊extension
+             list←subList
+         :ElseIf 1≠≢subList←(F.IsDir home∘,¨subList)/subList
              '"cfg.source" is undefined and cannot be established'Assert 1=≢subList
          :Else
              cfg.source←(⊃subList),'/'

@@ -1,11 +1,13 @@
- r←Test_ListTags_006(stopFlag batchFlag);⎕TRAP;fuzzy;list1;list2;list3;list4;path;allPackages
+ r←Test_ListTags_006(stopFlag batchFlag);⎕TRAP;fuzzy;list1;list2;list3;list4;path;allPackages;parms
 ⍝ List all packages with tags "llinukx" and "err-trappinck"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  path←∆GetServerRegistryFolder
- allPackages←0 Reg.ListPackages path(⎕NS'')
- (fuzzy list1)←1 Reg.FindTag path('linnuks' 'err-trappinck')allPackages
+ parms←⎕NS''
+ parms.aggregate←0
+ allPackages←Reg.ListPackages path parms
+ (fuzzy list1)←1 Reg.FindTag path('linnuks' 'err-trappinck')(allPackages[;1])
  →T.PassesIf 2=fuzzy
  →T.PassesIf 1=≢list1
  →T.PassesIf∧/∨/'-HandleError-'⍷↑list1

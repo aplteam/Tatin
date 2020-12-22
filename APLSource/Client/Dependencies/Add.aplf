@@ -2,9 +2,13 @@
  ⍝ Add ⍵ (one or more dependencies) to dependency file in ⍺ (path).
  ⍝ ⍵ might be simple (=single dependency) or nested.\\
  ⍝ Comments start with a ";".\\
- ⍝ If there is no such file yet it is created.
+ ⍝ If there is no such file yet it is created.\\
+ ⍝ Note that although ⍵ might contain an alias (like `[tatin]`), this will be replaced
+ ⍝ by what the alias stands for.
      path←⍺
      deps←,⊆⍵
+     deps←##.ReplaceRegistryAlias¨deps
+     deps←{{##.AddFileProtocol ⍵}⍣((';'≠⊃⍵)∧~##.Reg.IsValidPackageID_Complete ⍵)⊣⍵}¨deps
      filename←path,'/',DEP_NAME
      _←Create⍣(0=##.F.Exists filename)⊣path
      b←##.Reg.IsValidPackageID_Complete¨{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}¨deps

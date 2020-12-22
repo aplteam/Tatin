@@ -16,14 +16,20 @@ This is not an introduction into how to contribute to a project that is hosted o
 Note that Tatin is managed by the [acre project management tool](https://github.com/the-carlisle-group/Acre-Desktop).
 If you are not familiar with acre you are advised to spend an hour or so playing with it before using it for serious work.
 
-Though it is possible making changes to Tatin or adding code without acre, it is much easier to use acre.
+Though it is possible making changes to Tatin or adding code without acre, using acre makes this much easier.
 
 
 ## Requirements
 
 In order to work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic). 
 
-You need one of: Windows, Linux, Mac-OS. The Pi is not supported but that restriction might be lifted with a later version. AIX will not be supported.
+You need one of: 
+
+* Windows
+* Linux
+* Mac-OS. 
+
+The Pi is not supported but that restriction might be lifted with a later version. AIX will not be supported.
 
 
 ## How to work on Tatin
@@ -64,7 +70,7 @@ A> ### Creating a new version
 A>
 A> Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
 A>
-A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed than naturally you want the new version available in `⎕SE` for execution, but that is only possible if you create a new version first.
+A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed then naturally you want the new version available in `⎕SE` for execution, but that is only possible if you create a new version first.
 
 By default port 443 is used for the test cases. You may change the INI files for both server and client if that does not work for you.
 
@@ -81,20 +87,12 @@ In order to execute the full test suite you need to start a Tatin Server first. 
 3. Execute this:
 
    ```
-   #.Tatin.Admin.Initialize_Server
-   ```
-
-   This changes the current directory, loads required dependencies and establishes all required references.
-
-4. Execute this:
-
-   ```
    #.Tatin.TestCasesServer.Prepare
    ```
 
-   This instantiates the `Tester2` class under the name `T`.
+   This changes the current directory, loads required dependencies and establishes all required references and then instantiates the `Tester2` class under the name `T`.
 
-5. Execute this:
+4. Execute this:
 
    ```
    #.Tatin.TestCasesServer.T.Run 1
@@ -116,20 +114,12 @@ Now you are ready to execute the test suite.
 3. Execute this:
 
    ```
-   #.Tatin.Admin.Initialize_Client
-   ```
-
-   This changes the current directory, loads required dependencies and establishes all required references.
-
-4. Execute this:
-
-   ```
    #.Tatin.TestCases.Prepare
    ```
 
-   This instantiates the `Tester2` class under the name `T`.
+   This changes the current directory, loads required dependencies and establishes all required references and finally instantiates the `Tester2` class under the name `T`.
 
-5. Execute this:
+4. Execute this:
 
    ```
    #.Tatin.TestCases.T.Run 1
@@ -144,26 +134,46 @@ Now that you have a working version of Tatin on your machine you can start contr
 
 If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it: that might well be your first valuable contribution.
 
-Whether you improved just documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is APL Team Ltd, but this might (and eventually will) change in the future of course.
+Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is APL Team Ltd, but this might (and eventually will) change in the future of course.
 
 
 ## How to create new versions
 
 Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.
 
-In order to create new versions of either the Client or the Server the following steps need to be executed:
+In order to create new versions of the Client and the Server all you need to to is to execute:
 
-1. Change the `#.Tatin.Registry.Version` function; there is a `#.Tatin.Client.Version` as well as a `#.Tatin.Server.Version` function, but they both just call `#.Tatin.Registry.Version` anyway.
+```
+{noQLXFlag} #.Tatin.Admin.Make {type}
+```
 
-1. Run `#.Tatin.Admin.Make`
+* `{noQLXFlag}` is an optional Boolean that defaults to 0. It makes sense to set this to 1 only for debugging piurposes.
 
-   This function will first fire up a session and put together a Client. Along the process it might well ask some questions.
+* `{type}` must be an integer in the range of 0, 1, 2 or 3.
 
-   It will then fire up a second session and put together a Server.
+   0 means that the version number is not changed apart from the build ID which is always bumped. 
 
-   Along the process any existing `.zip` files in the `Dist/` folder will be deleted, and new ones with the current version number will be created. These `.zip` files is what should be released on GitHub as a new release.
+   If `type←1` then the patch number is bumped. If `type←2` the minor version is bumped and the patch number is set to 0. If `type←3` the major version is bumped and the minor as well as the patch number are set to 0.
 
-Notes:
+
+The `Make` function performs the following steps:
+
+1. It runs `Tatin.Admin.MakeClient`
+
+1. It compiles the documentation (markdown) to HTML files and copies them around
+
+1. It runs `#.Tatin.Admin.MakeServer`
+
+Along the process any existing `.zip` files in the `Dist/` folder will be deleted, and new ones with the current version number will be created. These `.zip` files are to be released on GitHub.
+
+There will be three zip files:
+
+```
+Tatin-Client-{major}.{minor}.{patch}.zip
+Tatin-Documentation-{major}.{minor}.{patch}.zip
+Tatin-Server-{major}.{minor}.{patch}.zip
+```
+
 
 | Created:       | 2020-08-11
-| Latest update: | 2020-08-19
+| Latest update: | 2020-12-12

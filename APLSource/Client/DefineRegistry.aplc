@@ -23,7 +23,7 @@
           ns←y
           ns.port←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'port'
           ns.priority←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'priority'
-          ns.api_key←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'api_key'
+          ns.api_key←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'api_key'    
           ns.alias←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'alias'
           'Invalid variables'Assert∧/(' '~¨⍨↓ns.⎕NL 2)∊varsList
           _uri←ns.uri
@@ -85,7 +85,7 @@
           buff←value.NewValue
           '"port": invalid depth'Assert 0=≡buff
           '"port": invalid data type'Assert 0=1↑0⍴buff
-          '"port": invalid value'Assert(buff>0)∧(buff<65535)
+          '"port": invalid value'Assert(buff≥0)∧(buff<65535)
           _port←buff
         ∇
     :EndProperty
@@ -119,7 +119,7 @@
           '"priority": invalid depth'Assert 0=≡buff
           '"priority": invalid length'Assert 1=≢buff
           '"priority": invalid data type (not integer)'Assert 0=1↑0⍴buff
-          '"priority": invalid value'Assert buff>0
+          '"priority": invalid value'Assert buff≥0
           _priority←buff
         ∇
     :EndProperty

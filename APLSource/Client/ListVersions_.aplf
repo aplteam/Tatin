@@ -6,6 +6,6 @@
  request.URI←'/v1/packages/versions/',packageID
  request.Headers,←⊂'Accept' 'application/json'
  res←client R.SendAndReceive request
- ('Server signalled error ',⍕res.StatusCode)Assert 200=res.StatusCode
+ ('Server signalled error ',(⍕res.StatusCode),' on ',uri)Assert 200=res.StatusCode
  list←⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
 ⍝Done

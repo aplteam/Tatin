@@ -1,4 +1,8 @@
- ∆CreateDefaultUserSettings;dir
+ ∆CreateDefaultUserSettings;dir;buff;parms
  1 TC.InitUserSettings ∆GetConfigPathForTests
- TC.MyUserSettings.AddRegistry'[local]./TestData/Server/Registry'
+ buff←⎕NEW TC.DefineRegistry(,⊂'[local]./TestData/Server/Registry')
+ parms←buff.Get ⍬
+ parms.api_key←'test-api-key'
+ buff←⎕NEW TC.DefineRegistry(,⊂parms)
+ TC.MyUserSettings.AddRegistry buff
 ⍝Done

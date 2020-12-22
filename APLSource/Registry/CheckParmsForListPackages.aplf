@@ -1,0 +1,20 @@
+ parms←CheckParmsForListPackages parms
+⍝ Makes sure that `parms` will be a namespace that carries the required parameters.
+⍝ If `parms` is `⍬` or '' it is replace with `⎕NS''` and then populated properly.
+⍝ `parms` is also checked for containing other stuff (not permitted) and coverts
+⍝ `group` and `tags` to lowercase.
+ :If (⊂parms)∊''⍬
+     parms←⎕NS''
+ :EndIf
+ :If 0=parms.⎕NC'group'
+     parms.group←''
+ :EndIf
+ :If 0=parms.⎕NC'tags'
+     parms.tags←''
+ :EndIf
+ :If 0=parms.⎕NC'aggregate'
+     parms.aggregate←1
+ :EndIf
+ 'Invalid left argument: only "group", "tags" and "aggregate" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊'group' 'tags' 'aggregate'
+ parms.(group tags)←⎕C¨parms.(group tags)
+⍝Done

@@ -1,12 +1,14 @@
- r←Test_ListPkgs_012(stopFlag batchFlag);⎕TRAP;list;parms
-⍝ List all packages for a Registry using an alias
+ r←Test_ListPkgs_012(stopFlag batchFlag);⎕TRAP;mat;parms
+⍝ List all packages of group "doesnotexist" with `aggregate←0`
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- parms←⎕NS''
- parms.group←'aplteam'
- list←parms TC.ListPackages'[local]'
- →T.PassesIf∧/'aplteam-'{⍺∘≡¨(≢⍺)↑¨⍵}list
+ parms←TC.Reg.CheckParmsForListPackages ⍬
+ parms.aggregate←0
+ mat←parms TC.ListPackages'[local]doesnotexist'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 0≡≢mat
 
  r←T._OK
 ⍝Done

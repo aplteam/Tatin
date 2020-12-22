@@ -1,27 +1,33 @@
- list←{parms}ListPackages y;client;request;res;uri;parms
-⍝ `y` might be tha path to a Registry or a Registry alias (embraced by []).\\
-⍝ By default all packages saved in that Registry are returned.\\
-⍝ Optionally ⍺ can be specified. Must be namespace that might contain the variables "group" and/or "tags"
-⍝   * "group" may specify the group
-⍝   * "tags" may specify one or more tags (simple comma-separated text vector)
- :If 0=⎕NC'parms'
-     parms←⎕NS''
-     parms.(group tags)←⊂''
- :Else
-     :If 0=parms.⎕NC'group'
-         parms.group←''
-     :EndIf
-     :If 0=parms.⎕NC'tags'
-         parms.tags←''
-     :EndIf
- :EndIf
- 'Invalid left argument: only "group" and "tags" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊'group' 'tags'
- parms.(group tags)←⎕C¨parms.(group tags)
+ mat←{parms}ListPackages y;client;request;res;uri;parms
+⍝ `uri` is at least a path to a Registry but might also specify (part of) a package ID.\\
+⍝ By default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.\\
+⍝ `r` is a matrix with two columns.\\
+⍝ `[;2]` carries the number of major versions.\\
+⍝ Optionally `parms` can be specified. This must be a namespace that must contain the variables `group`, `tags` and `aggregate.\\
+⍝ * `group` may specify the group
+⍝ * `tags` may specify one or more tags (simple comma-separated text vector)
+⍝ * `aggregate` is a Boolean that defaults to 1\\
+⍝ These options are available:\\
+⍝ * `uri` is empty and `aggregate` is 0:\\
+⍝   All packages are returned; the second column carries `⍬`\\
+⍝ * `uri` is empty and `aggregate` is 1 (the default):\\
+⍝   All packages are returned with the number of major versions in `[;2]`\\
+⍝ * `uri` specifies {group}-{name} and `aggregate` is 0\\
+⍝   All versions of that package are returned\\
+⍝ * `uri` specifies {group}-{name} and `aggregate` is 1\\
+⍝   All major versions of that package are returned\\
+⍝   `[;2]` caries the number of versions of each major version\\
+⍝ * `uri` specifies {group}-{name}-{major}; n this case `aggregate` is ignored\\
+⍝   All versions (minor and patch) of that package are returned\\
+⍝ * `uri` specifies {group}-{name}-{major}-{minor}; in this case `aggregate` is ignored\\
+⍝   All patch versions of that package are returned\\
+ parms←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕NS''}'parms'
+ parms←Reg.CheckParmsForListPackages parms
  uri←ReplaceRegistryAlias y
  'No (valid) Registry specified?!'Assert 0<≢uri
  :If Reg.IsHTTP uri
-     list←parms ListPackages_ uri
+     mat←parms ListPackages_ uri
  :Else
-     list←Reg.ListPackages uri parms
+     mat←Reg.ListPackages uri parms
  :EndIf
 ⍝Done

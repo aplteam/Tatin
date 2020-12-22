@@ -2,24 +2,33 @@
  :If 0=⎕NC'parms'
      parms←⎕NS''
      parms.(group tags)←⊂''
+     parms.aggregate←1
  :EndIf
  (host packageID)←Reg.SeparateUriAndPackageID uri
+ 'Not a valid URI'Assert('/'+.=host)∊2 3
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  client←NewClient host
  request←R.NewRequest 0
  request.URI←'/v1/packages/',{⍵↓⍨'/'=1⍴⍵}packageID
- :If 0<≢⊃,/parms.(group tags)
+ :If 0<≢⊃,/parms.(group tags aggregate)
      request.URI,←'?'
      :If 0<≢⊃,/parms.group
-         request.URI,←'group=',parms.group
-         request.URI,←(0<≢⊃,/parms.tags)/'&'
+         request.URI,←'group=',parms.group,'&'
      :EndIf
      :If 0<≢⊃,/parms.tags
-         request.URI,←'tags=',parms.tags
+         request.URI,←'tags=',parms.tags,'&'
+     :EndIf
+     :If 0<parms.⎕NC'aggregate'
+         request.URI,←'aggregate=',(⍕parms.aggregate),'&'
      :EndIf
  :EndIf
+ request.URI←(-'&'=¯1↑request.URI)↓request.URI
  request.Headers,←⊂'Accept' 'application/json'
  res←client R.SendAndReceive request
- ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
- list←{(,0)≡⍴⍵:'' ⋄ ⎕JSON⍠('Dialect' 'JSON5')⊣⍵}⊣res.Content
+ :If 404≡res.StatusCode
+     list←0 2⍴''⍬
+ :Else
+     ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
+     list←Reg.APLfromJSON res.Content
+ :EndIf
 ⍝Done

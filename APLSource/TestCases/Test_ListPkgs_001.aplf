@@ -1,13 +1,17 @@
- r←Test_ListPkgs_001(stopFlag batchFlag);⎕TRAP;list;noOf
-⍝ List all packages
+ r←Test_ListPkgs_001(stopFlag batchFlag);⎕TRAP;mat;noOf;buff;last
+⍝ List all packages with defaults (aggregate=1)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- list←TC.ListPackages'[local]'
-
- noOf←≢∪{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\'
- →T.PassesIf 0<noOf
- →T.PassesIf noOf≡≢∪{⊃{⍺,'-',⍵}/¯1↓'-'A.Split ⍵}¨list
+ mat←TC.ListPackages'[local]'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ buff←F.ListDirs ∆GetServerRegistryFolder,'\'
+ last←'-'A.Last¨buff
+ buff←(-≢¨last)↓¨buff
+ noOf←≢∪buff
+ Assert 0<noOf
+ →T.PassesIf noOf≡≢mat
 
  r←T._OK
 ⍝Done

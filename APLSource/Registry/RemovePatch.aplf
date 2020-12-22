@@ -1,0 +1,8 @@
+ RemovePatch←{
+⍝ Takes a packageID and removes the patch number:
+⍝ 'aplteam-APLTreeUtils-6.0' ← RemoveMinorPatch 'aplteam-APLTreeUtils-6.0.1'
+⍝ 'aplteam-foo-0.1'          ← RemoveMinorPatch 'aplteam-foo-0.1.2-beta3'
+     2>'-'+.=⍵:⍵
+     (group name version)←'-'(≠⊆⊢)⍵
+     group,'-',name,'-',{⍵/⍨2>+\'.'=⍵}version
+ }

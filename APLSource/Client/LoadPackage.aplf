@@ -42,8 +42,10 @@
      cfg←ReadPackageConfigFile tempDir
      packageID←1 GetPackageIDFromFilename url
      saveIn2←saveIn,'.',packageID
-     msg←⎕SE.Link.Import saveIn2(tempDir,'/',cfg.source)
-     'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
+     :If 0=⎕NC saveIn2
+         msg←⎕SE.Link.Import saveIn2(tempDir,'/',{(-(¯1↑⍵)∊'/\')↓⍵}cfg.source)
+         'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
+     :EndIf
      ref←⍎saveIn2
      EstablishConstants ref cfg tempDir
      :If 0=≢cfg.assets

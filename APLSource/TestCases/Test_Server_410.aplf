@@ -1,0 +1,12 @@
+ r←Test_Server_410(stopFlag batchFlag);⎕TRAP;html
+⍝ Ask for a list of all major versions of a specific package; pretends to be a browser
+⍝ Supposed to deliver the best one
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←∆GetHtmlFromServer'localhost/v1/packages/major_versions/aplteam-APLProcess'
+ →T.PassesIf∨/'<h2>Major versions of "aplteam-APLProcess"</h2>'⍷html
+ →T.PassesIf 2=+/'<tr>'⍷html
+
+ r←T._OK
+⍝Done

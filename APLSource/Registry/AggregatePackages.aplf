@@ -1,0 +1,13 @@
+ r←{removeVersionNo}AggregatePackages list;list2;list3;list4;noOfVersions
+ removeVersionNo←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'removeVersionNo'
+ list2←RemoveMinorAndPatch¨list
+ list3←∪list2
+ :If removeVersionNo
+     list4←RemoveVersionNumber¨list3
+ :Else
+     list4←list3
+ :EndIf
+ noOfVersions←{≢⍵}⌸list4
+ list4←∪list4
+ r←list4,[1.5],noOfVersions
+⍝Done

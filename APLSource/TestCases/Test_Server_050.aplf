@@ -6,8 +6,9 @@
 
  list←TC.ListPackages'https://localhost'
  →T.PassesIf 0<≢list
- →T.PassesIf∧/Reg.IsValidPackageID_WithMajorNo¨list
- →T.PassesIf(list+.=¨'-')∧.=2
+ →T.PassesIf 2=⍴⍴list
+ →T.PassesIf∧/Reg.IsValidPackageID_WithoutVersionNo¨(list[;1])
+ →T.PassesIf(list[;1]+.=¨'-')∧.=1
 
  r←T._OK
 ⍝Done

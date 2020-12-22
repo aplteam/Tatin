@@ -8,20 +8,21 @@
 ⍝   * Stack
 ⍝   * System vars like `⎕WSID`, `⎕IO`, `⎕ML`, `⎕TNUMS`, `⎕WA`
 ⍝   * Current directory
-⍝   * Command line\\
+⍝   * Command line
+⍝   * and more\\
 ⍝ * Create a namespace `crash` and populate it with variables providing all
 ⍝   sorts of information potentially important for analyzing the error.
 ⍝   The namespace `crash` is saved in a component file. By default all variables
 ⍝   visible at the time of the crash are saved in a sub namespace of `crash` called
 ⍝   `Vars`.\\
-⍝   In case of a threaded application this and the HTML page might all you get
-⍝   for analysing the problem.\\
-⍝ * Attempt to save an error workspace. Since no workspace can be saved when threads
-⍝   are running `HandleError` will kill all running threads but the main thraeds. That
+⍝   In case of a threaded application this and the HTML page might be all you get
+⍝   for analyzing the problem.\\
+⍝ * Attempts to save an error workspace. Since no workspace can be saved when threads
+⍝   are running `HandleError` will kill all running threads but the main thraed. That
 ⍝   means that even in a multi-threaded application you might still get a saved workspace
 ⍝   for analyzing purposes if the error happened to occur in the main thread.\\
 ⍝ ## Parameters
-⍝ All parameters can be changed by setting variables in the namespace
+⍝ All parameters can be changed by setting variables in a namespace
 ⍝ returned by `CreateParms` which can be passed as right argument to the main
 ⍝ function `Process`. For defaults just pass an empty vector to `Process`.\\
 ⍝ ## Custom stuff
@@ -44,34 +45,30 @@
 ⍝   The `customFns` shall not return a result. If it does it must be of type "shy";
 ⍝   the result will be ignored.\\
 ⍝ Although both function names may use dotted syntax that would not help in case
-⍝ they live in an instance of a class. For such case use `logFunctionParent`
+⍝ they live in an instance of a class. For such a case use `logFunctionParent`
 ⍝ and `customFnsParent` respectively in order to define the parent of the functions.\\
 ⍝ ## Windows Event Log
 ⍝ `HandleError` will attempt to write to the Windows Event Log when `windowsEventSource`
-⍝ is not empty. For that to work .NET is needed (that shouldn't be a problem these days)
-⍝ and the Dyalog bridge DLLs are requiered. That means you need to take action, it would
-⍝ not work out of the box in a runtime application, though it would work in development.\\
+⍝ is not empty. For that to work .NET is required and the Dyalog bridge DLLs are requiered.
+⍝ That means it would not work out of the box in a runtime application without you taking action, 
+⍝ though it would of course work in development.\\
 ⍝ ## How tos
 ⍝ * At an early stage (we don't know yet where to save stuff etc) specify an
 ⍝   empty vector as right argument to `SetTrap`.
 ⍝ * As soon as you can create a parameter space by calling `CreateParms`,
 ⍝   specify the details in it, typically by `#.⎕SHADOW`ing the name of that
-⍝   parameter space in the root within your `⎕LX` function and then assiging
+⍝   parameter space in the root within your `⎕LX` function and then assigning
 ⍝   it to something like `#.MyParms`.\\
 ⍝   `Process` is then able to see this from everywhere when you specify\\
 ⍝   `⎕TRAP←0 'E' '#.HandleError.Process' '#.MyParms'`\\
 ⍝ ## Notes
-⍝ * The attempt to save an error WS will fail if there are any open acre projects. acre is
-⍝   designed to make any saved workspace superfluous anyway but if you do not share this
-⍝   opinion then use your own function (see the `customFns` parameter) to close all open
-⍝   acre projects.
 ⍝ * Prior to version 2.2.0 `HandleError` saved crash files in a folder `Errors`
 ⍝   that was created as a sibling of either the workspace or the stabnd-alone
 ⍝   EXE. While this policy still holds true under Linux and Mac OS, under Windows
 ⍝   a folder with the name of either the EXE or the WS is created
 ⍝   within %LOCALAPPDATA%, with a sub-folder "Errors" inside it.\\
-⍝   This is because under Windows the application is unlikely to have the right to write to
-⍝   the directory the EXE is coming from.\\
+⍝   This is because under Windows the application is unlikely to have the right to
+⍝   write to the directory the EXE is coming from.\\
 ⍝ Kai Jaeger ⋄ APL Team Ltd\\
 ⍝ Homepage: <https://github.com/aplteam/HandleError>
 
@@ -79,7 +76,7 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'HandleError' '4.0.0.35' '2020-09-21'
+      r←'HandleError' '4.0.0.37' '2020-12-20'
     ∇
 
     ∇ History
@@ -87,18 +84,24 @@
       ⍝ * 4.0.0
       ⍝   * BREAKING CHANGES:
       ⍝     * Requires at least Dyalog 18.0
-      ⍝     * Requires the class `APLTreeUtils1
+      ⍝     * Requires the class `APLTreeUtils2`
       ⍝   * Does not `:Include APLTreeUtils` anymore
+      ⍝   * Bug fixes: 
+      ⍝     * Empty `⎕WSID` (stand-alone-EXE!) can cause havoc (#1)
+      ⍝     * `Process` does not return the name of the error workspace because the function either
+      ⍝       executed `⎕OFF` or '→`. The name is now assigned to `∆ERROR_WS` in the parameter space.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/HandleError/releases>
     ∇
 
-    ∇ {filename}←{signal}Process parms;crash;TRAP;⎕IO;⎕ML;⎕TRAP
+    ∇ {r}←{signal}Process parms;crash;TRAP;⎕IO;⎕ML;⎕TRAP;filename
       :Access Public Shared
-    ⍝ Returns the name of the error workspace saved by `Process` as shy result.\\
-    ⍝ `⎕OFF`s in runtime or if `enforceOff` is 1 but not otherwise.\\
+    ⍝ `⎕OFF`s in runtime or if `enforceOff` is 1 but executes `→` otherwise.\\
+    ⍝ In case you need the name of the error WS you must specify a parameter space. `HandleError` will
+    ⍝ inject a variable `∆ERROR_WS` into the parameter space.\\
     ⍝ All actions are performed under error trapping, so it should never fail.\\
     ⍝ "signal": if specified this overwrites `parms.signal`; this is for test cases only.
+      r←⍬
       ⎕IO←1 ⋄ ⎕ML←1
       TRAP←⎕TRAP                                    ⍝ Remember old setting (for reporting)
       ⎕TRAP←(0 1000)'C' '→∆End'                     ⍝ Make sure that it does not crash itself
@@ -115,10 +118,12 @@
       CheckErrorFolder parms
       crash←CreateCrash parms TRAP
       filename←CreateFilename parms.errorFolder
+      parms.∆ERROR_WS←filename
       parms.crashFilename←filename
       0 ⎕TKILL ⎕TNUMS~⎕TID   ⍝ Try to kill all threads but itself and the main thread
       WriteToLogFile parms
       WriteHtmlFile parms crash filename
+      ⎕DL 0.2
       crash←SaveErrorWorkspace filename parms crash
       SaveCrash filename crash parms
       WriteToWindowsEvents parms
@@ -401,6 +406,7 @@
           ⎕WSID←wsid       ⍝ Potentially important (for example when running test cases)
           ⎕LX←lx
       :EndIf
+     ∆End:
     ∇
 
     ∇ crash←CreateCrash(parms Trap)
@@ -469,11 +475,14 @@
       :EndFor
     ∇
 
-    ∇ {r}←CheckErrorFolder parms;buff
+    ∇ {r}←CheckErrorFolder parms;buff;wsid
       r←⍬
       :If 0=≢parms.errorFolder
-          :If 0=≢buff←2⊃⎕NPARTS ⎕WSID
-              buff←2⊃⎕NPARTS'"'~⍨{⍵↑⍨¯1+⍵⍳' '}2 ⎕NQ'#' 'GetCommandLine' ⍝ Probably a stand-alone EXE
+          :If 0=≢wsid←⎕WSID
+              ⎕WSID←'Error-WS'
+          :EndIf
+          :If 0=≢buff←2⊃⎕NPARTS wsid
+              buff←2⊃⎕NPARTS{'"'∊⍵:1↓⍵/⍨1=+\'"'=⍵ ⋄ ⍵↑⍨¯1+⍵⍳' '}2 ⎕NQ'#' 'GetCommandLine' ⍝ Probably a stand-alone EXE
           :EndIf
           :If 'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
               parms.errorFolder←(⊃⎕CMD'ECHO %LOCALAPPDATA%'),'/',buff,'\Errors'
@@ -488,7 +497,7 @@
       :If 0=⎕NEXISTS parms.errorFolder
       :AndIf parms.checkErrorFolder
           :If 'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
-              ⎕CMD'MkDir "',parms.errorFolder,'"'
+              ##.FilesAndDirs.MkDir parms.errorFolder
           :Else
               ⎕SH'mkdir -p "',parms.errorFolder,'"'
           :EndIf

@@ -1,0 +1,14 @@
+ r←Test_ListPkgs_013(stopFlag batchFlag);⎕TRAP;mat
+⍝ List all packages of group "aplteam"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ mat←TC.ListPackages'[local]aplteam'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 0<≢mat
+ →T.PassesIf∧/'aplteam-'{⍺∘≡¨(≢⍺)↑¨⍵}mat[;1]
+ →T.PassesIf 2≤≢∪mat[;2]
+
+ r←T._OK
+⍝Done

@@ -1,32 +1,32 @@
 :Class APLProcess
 ⍝ Start (and eventually dispose of) an APL Process.\\
-⍝ By default the version of Dyalog APL a new process is going to be
-⍝ created from defines which version of APL will be started, be it
-⍝ development or runtime.\\
-⍝ Of course you can change that by first creating a parameter space
-⍝ by calling `CreateParms` and then making necessary adjustment,\\
-⍝ Instead of passing a parameter space to the constructor you can
-⍝ also pass a simple text vector, specifying a workspace and possibly
-⍝ other command line parameters like, say, MAXWS=32GB and the like.\\
-⍝ Note that this class is designed for test cases that require one or
-⍝ more additional instances of APL for some reason. For that reason
-⍝ it does not offer encryption for a RIDE.\\
-⍝ Note that the destructor of this class will attempt to kill the
-⍝ process that was started.
+⍝ By default the version of Dyalog APL a new process is going to be created from defines which version
+⍝ of APL will be started, be it development or runtime.\\
+⍝ You can change that by first creating a parameter space by calling `CreateParms`, then making the necessary
+⍝ adjustments, and finally passing that namespace as parameter to `⎕NEW` when instantiating `APLProcess`.\\
+⍝ Instead of passing a parameter space to the constructor you can also pass a simple text vector, specifying a
+⍝ workspace and possibly other command line parameters like, say, `MAXWS=32GB` and the like.\\
+⍝ Notes:
+⍝ * This class is designed for test cases that require one or more additional instances of APL for some reason.
+⍝   For that reason it does not offer encryption for a RIDE.\\
+⍝   This restriction might be lifted at a later stage depending on demand.
+⍝ * The destructor of this class will attempt to kill the process that was started.\\
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
     ⍝ See also `History`
       :Access Public Shared
-      r←'APLProcess' '0.3.0.11' '2020-11-28'
+      r←'APLProcess' '0.3.0.13' '2020-12-19'
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 0.3.0 from 2020-11-28
+    ⍝ * 0.3.0 from 2020-12-19
     ⍝   * Does not :Include APLTreeUtils anymore
-    ⍝   * ...
+    ⍝   * Property `Wait` introduced
+    ⍝   * Property name `Runtime` changed to `Runtime`
+    ⍝   * Documentation improved
     ⍝ * 0.2.1 from 2020-08-14
     ⍝   * `Kill` now kills `Proc.ID` (self so to speak) in case ⍵ is empty.
     ⍝ * 0.2.0 from 2020-03-23
@@ -39,16 +39,29 @@
     ⍝   * First version (Windows only)
     ∇
 
-    :Field Public Instance Args←''              ⍝ Why....
-    :Field Public Instance WorkspaceName←''     ⍝ ...is...
-    :Field Public Instance Exe←''               ⍝ ...this...
-    :Field Public Instance Proc←⎕NS ''          ⍝ ... not ADOCed?!
-    :Field Public Instance RunTime←0            ⍝ Boolean or name of runtime executable
-    :Field Public Instance IsWin                ⍝ This
-    :Field Public Instance IsMacOS              ⍝ That
-    ⍝ And more
+    :Field Public Instance Args←''              ⍝ Command line parameter (but not session_file!).
+    :Field Public Instance WorkspaceName←''     ⍝ Name of the workpsace to be loaded.
+    :Field Public Instance Exe←''               ⍝ The Dyalog EXE started by `APLProcess``.
+    :Field Public Instance Proc←⎕NS ''          ⍝ Instance of the .NET class `Diagnostics.Process`.
+    :Field Public Instance Runtime←0            ⍝ Boolean or name of runtime executable.
+    :Field Public Instance IsWin                ⍝ Bolean that is 1 only in case APLProcess runs under Windows.
+    :Field Public Instance IsMacOS              ⍝ Bolean that is 1 only in case APLProcess runs under Mac-OS.
 
-    :Field Public Shared WindowsStyleDefault←'Minimized'  ⍝ Only test cases should change this. As a consumer of this class use the Property "WindowsStyle"
+    :Field Public Shared WindowsStyleDefault←'Minimized'  ⍝ Only test cases should change this. As a consumer of this class use the Property `WindowsStyle`
+
+    _Wait←180
+
+    :Property Wait
+    :Access Public Instance
+    ⍝ How many second the destructor will wait for the process to shut down before using force
+        ∇ r←get
+          r←_Wait
+        ∇
+        ∇ set arg
+          'Invalid argument'⎕SIGNAL 11/⍨~(⎕DR arg.NewValue)∊83 163
+          _Wait←arg.NewValue
+        ∇
+    :EndProperty
 
     :Property IsUnix
     :Access Public Instance
@@ -64,18 +77,12 @@
         ∇
     :EndProperty
 
-    ∇ make
-      :Access public instance
-      :Implements constructor
-      make_common
-    ∇
-
     ∇ make1 y;commandline;parmSpace;rt;cmd;ws;windowStyle;buff
       :Access Public Instance
       :Implements Constructor
       ⍝ `y` becomes either `parmspace` (if it is a namespace) or `commandline` (if it is a text vector).
       ⍝ `parmSpace` is a parameter namespace, usually created by calling `CreateParms`; see there.
-      ⍝ `commandline` is a text vector the is passed on the command line, like workspace name, maxws= etc.
+      ⍝ `commandline` is a text vector that will be passed on the command line, like workspace name, `maxws=` etc.
       make_common
       :If 2=⎕NC'y'
       :AndIf (≡y)∊0 1
@@ -102,7 +109,7 @@
           parmSpace.CommandLineArgs←1↓⊃,/' ',¨buff
       :EndIf
       'Invalid window style'⎕SIGNAL 11/⍨~(⊂parmSpace.WindowsStyle)∊'Hidden' 'Maximized' 'Minimized' 'Normal'
-      (RIDE_INIT OUT_FILE WorkspaceName Args)←parmSpace.(RideInit LogFilename WorkspaceName CommandLineArgs)
+      (RIDE_INIT OUT_FILE WorkspaceName Args _Wait)←parmSpace.(RideInit LogFilename WorkspaceName CommandLineArgs Wait)
       PATH←SourcePath
       Start parmSpace
     ∇
@@ -115,19 +122,14 @@
       OS←(⊃⊃⎕CLASS ⎕THIS).##.OS
     ∇
 
-    ∇ Run
-      :Access Public Instance
-      Start(WorkspaceName Args RunTime)
-    ∇
-
     ∇ Start ps;psi;pid;cmd;host;port;keyfile;exe;z;output;args
       :If 0=≢ps.Exe
-          ps.Exe←(GetRunTimeName⍣ps.RunTime)GetCurrentExecutable ⍝ else, deduce it
+          ps.Exe←(GetRuntimeName⍣ps.Runtime)GetCurrentExecutable ⍝ else, deduce it
       :EndIf
       Exe←ps.Exe
       args←ps.CommandLineArgs
       args,←(0≠≢RIDE_INIT)/' RIDE_INIT="',RIDE_INIT,'" RIDE_SPAWNED=1 '
-      :If ~ps.RunTime
+      :If ~ps.Runtime
           :If (,0)≡,ps.SessionFile
               args,←' session_file="" '
           :ElseIf (,1)≡,ps.SessionFile
@@ -151,7 +153,7 @@
               args,←' LOG_FILE=/dev/null '  ⍝ ... no log file
           :EndIf
           :If 0<≢'-\bx\b'⎕S 0⍠('Mode' 'M')('Greedy' 0)⊣args
-              ∘∘∘ ⍝ How do we prevent ⎕LX from being executed in Ubuntu, and enforce a session?
+              ∘∘∘ ⍝ How do we prevent ⎕LX from being executed in Ubuntu?
               cmd←'{ ',args,' ',ps.Exe,' +s -q ',ps.WorkspaceName,' -c APLPPID=$PPID 2>&1 & } ; echo $!'
           :Else
               output←(1+×≢OUT_FILE)⊃'/dev/null'OUT_FILE
@@ -166,32 +168,39 @@
 
 
     ∇ Close;count;limit
+      :Access Public Instance
+      Close_
+    ∇
+
+    ∇ Close_;count;limit
       :Implements Destructor
-      WaitForKill&200 0.1 ⍝ Start a new thread to do the dirty work
+      WaitForKill&(5×Wait) 0.2 ⍝ Start a new thread to do the dirty work
     ∇
 
     ∇ r←CreateParms
       :Access Public Shared
     ⍝ Creates a parameter namespace that will be accepted by the constructor.
-    ⍝ | Name           | Description |
-    ⍝ |----------------|-------------|
-    ⍝ | CommandLineArg | By default empty. Optinal command line parameters passed to `Exe`. |
-    ⍝ | Exe            | Defaults to '' which means that the same EXE is executed the instance was created from. 1 means same version but the runtime. Can also be a fully qualified name of the exe to be executed. |
-    ⍝ | LogFilename    | By default empty, meaning that any output is thrown away. If this is specified it is expected to be the name of a file|
-    ⍝ | RideInit       | By default empty. Is passed as RIDE_INIT. |
-    ⍝ | RunTime        | Boolean that defaults to 0. Is ignored in case `Exe` is not empty.
-    ⍝ | SessionFile    | Defaults to 0 which means no session file is loaded. A 1 will load the default DSE file. May also be the fully qualified path to a DSE file. ||
-    ⍝ | WindowStyle    | Default to "Minimized". May be "Hidden" or "Maximized"or "Normal" instead. Case sensitive. |
-    ⍝ | WorkspaceName  | By default empty; the fully qualified name of the workspace to be loaded. |
+    ⍝ | Name             | Description |
+    ⍝ |------------------|-------------|
+    ⍝ | `CommandLineArg` | By default empty. Optional command line parameters passed to `Exe`. (Don't specify a session file here!)|
+    ⍝ | `Exe`            | Defaults to `''` which means that the same EXE is executed the instance was created from. Can also be a fully qualified name of the exe to be run.|
+    ⍝ | `LogFilename`    | By default empty, meaning that any output is thrown away. If this is specified it is expected to be the name of a file.|
+    ⍝ | `RideInit`       | By default empty. Is passed as `RIDE_INIT={RideInit}` and always accompanied by `RIDE_SPAWNED=1`.|
+    ⍝ | `Runtime`        | Boolean that defaults to 0. Is ignored in case `Exe` is not empty.|
+    ⍝ | `SessionFile`    | Defaults to 0 which means no session file is loaded. A 1 will load the default DSE file. May also be the fully qualified path to a DSE file.|
+    ⍝ | `Wait`           | How many seconds the destructor will wait for the process to shut down before using force.|
+    ⍝ | `WindowStyle`    | Defaults to "Minimized". May be "Hidden" or "Maximized"or "Normal" instead. Case sensitive.|
+    ⍝ | `WorkspaceName`  | By default empty; the fully qualified name of the workspace to be loaded.|
       r←⎕NS''
       r.CommandLineArgs←''
       r.Exe←''
       r.LogFilename←''
       r.RideInit←''
-      r.RunTime←0
+      r.Runtime←0
       r.SessionFile←0
       r.WindowsStyle←WindowsStyleDefault
       r.WorkspaceName←''
+      r.Wait←_Wait
       r.⎕FX'r←∆List;⎕IO' '⎕IO←⎕ML←1' 'r←{(⍵,[1.5]⎕nc¨⊂¨⍵),⍎¨⍵}(⊂''∆List'')~⍨⎕NL-2 9 3' ⍝ Vars, refs and niladic functions
     ∇
 
@@ -234,7 +243,7 @@
       :EndIf
     ∇
 
-    ∇ r←GetRunTimeName exe
+    ∇ r←GetRuntimeName exe
     ⍝ Assumes that:
     ⍝ Windows runtime ends in "rt.exe"
     ⍝ *NIX runtime ends in ".rt"
@@ -251,19 +260,21 @@
 
     ∇ r←HasExited
       :Access Public Instance
+      ⍝ Boolean that is 1 if and only if the process started by `APLProcess` has stopped running.
       r←Proc.HasExited
     ∇
 
     ∇ r←GetPID
       :Access Public Instance
+      ⍝ Get ID of the current process
       r←Proc.Id
     ∇
 
     ∇ {r}←Kill pid;proc;qdmx
       :Access Public Instance
-    ⍝ Attempts to stop the process with processID pid.\\
-    ⍝ In case `pid` is empty it becomes `Proc.Id` (self so to speak)
-    ⍝ `r` is 0 in case the process could not be stopped, including when it is not running anyway  otherwise it is 1.\\
+    ⍝ Attempts to stop the process with the ID `pid` (process id).\\
+    ⍝ In case `pid` is empty it becomes `Proc.Id` (self so to speak).\\
+    ⍝ `r` is 0 in case the process could not be stopped, including when it is not running anyway, otherwise it is 1.\\
       r←0
       :If 0=≢pid
           pid←Proc.Id

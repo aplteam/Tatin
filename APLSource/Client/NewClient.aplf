@@ -1,9 +1,23 @@
  c←NewClient uri;reg
  c←R.NewClient 0
- reg←MyUserSettings.GetRegistry uri
- c.Secure←∨/'https://'⍷reg.uri
- :If 0=c.Port←reg.port
-     c.Port←(c.Secure+1)⊃80 443
+ :Trap 98
+     reg←MyUserSettings.GetRegistry uri
+ :Else
+     reg←⍬
+ :EndTrap
+ :If ⍬≡reg
+     :If 'http://'{⍺≡(≢⍺)↑⍵}uri
+         c.Port←80
+     :ElseIf 'https://'{⍺≡(≢⍺)↑⍵}uri
+         c.Port←443
+     :Else
+         'Invalid URI'Assert 0
+     :EndIf
+ :Else
+     c.Secure←∨/'https://'⍷reg.uri
+     :If 0=c.Port←reg.port
+         c.Port←(c.Secure+1)⊃80 443
+     :EndIf
  :EndIf
  c.Host←'/'~⍨RemoveHttpProtocol uri
 ⍝Done

@@ -8,6 +8,8 @@
      :For dep :In deps
          :If ∧/'[]'∊dep
              identifier←ReplaceRegistryAlias dep
+         :ElseIf Reg.IsFILE dep
+             identifier←RemoveFileProtocol dep
          :Else
              identifier←(Reg.RemoveOneLevel path),'/',dep
          :EndIf

@@ -5,8 +5,10 @@
 ⍝ If the dependency file was modified after the build list was saved:
 ⍝ * If a principal package was removed from the dependency file the build list is re-created
 ⍝ * If any "other" packages are missing, re-installation is required and therefore an error thrown\\
- ts1←1 ⎕DT⊃('type' 3)F.Dir filename1←folder,'/',Reg.BuildListFilename
- ts2←1 ⎕DT⊃('type' 3)F.Dir filename2←folder,'/',Reg.DependenciesFilename
+ filename1←folder,'/',Reg.BuildListFilename
+ ts1←1 ⎕DT⊃('type' 3)F.Dir filename1
+ filename2←folder,'/',Reg.DependenciesFilename
+ ts2←1 ⎕DT⊃('type' 3)F.Dir filename2
  :If r←ts2>ts1
      tree←Reg.GetJsonFromFile filename1
      deps←1⊃F.NGET filename2 1

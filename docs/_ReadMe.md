@@ -33,7 +33,7 @@ This document gives you an overview over these HTML files: their purpose and who
 
 ### The Client
 
-* [Installing and updating the Tatin Client](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") (work in progress)
+* [Installing and updating the Tatin Client](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") (draft)
 
   Check whether autocomplete in the Dyalog session offers you something after entering `]TATIN` - if that's the case Tatin is already available, so no need for installing a new version.
 

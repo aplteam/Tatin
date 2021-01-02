@@ -4,7 +4,7 @@
 ⍝ * an HTTP request
 ⍝ * a folder holding a package (like file://C:\Temp\group-name-major.minor.patch\\)
 ⍝ * a path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
-⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in Client's config file.\\
+⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
 ⍝ Returns a dependey tree as a matrix:
 ⍝ * [;1] reflects the depth of the dependency with 1 for the root (`identifier`)
 ⍝ * [;2] PackageID of what required that dependency
@@ -38,7 +38,7 @@
          F.MkDir tempPath
          ⎕DL 0.1
          filename DotNetZip.UnzipTo tempPath
-         (level+1)GetDependecyTreeFromRegistry tempPath
+         (level+1)GetDependecyTreeFromRegistry Reg.RemoveOneLevel filename
          F.RmDir tempPath
      :Else
          identifier←RemoveFileProtocol identifier

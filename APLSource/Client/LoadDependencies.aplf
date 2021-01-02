@@ -3,7 +3,9 @@
 ⍝ Loads all packages according to that list and injects required references into `targetSpace`.
 ⍝ Returns a vector with references to **all** loaded packages, including dependencies.
  refs←⍬
- 'Target spave does not exist'Assert 9.1=⎕NC⊂⍕targetSpace
+ :If 0=⎕NC⊂⍕targetSpace
+     targetSpace ⎕NS''
+ :EndIf
  CheckBuildList installFolder
  :If 0<≢tree←LoadBuildList installFolder
      :For level packageID url :In ↓tree

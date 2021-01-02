@@ -1,0 +1,17 @@
+ r←Test_Load_081(stopFlag batchFlag);⎕TRAP;refs;html;ns;expected
+⍝ Load a package that has several dependencies (local & remote) into non-existing ⎕SE.TEMP.Foo
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'⎕SE'
+ ⎕SE.⎕SHADOW'TEMP' ⋄ 'TEMP'⎕SE.⎕NS''    ⍝ Used to load stuff into
+
+ refs←TC.LoadPackage'./TestData/Tatin/Registry/aplteam-MarkAPL-10.0.0' '⎕SE.TEMP.Foo'
+ →T.PassesIf'⎕SE.TEMP.Foo.MarkAPL'≡⍕∊refs
+ (html ns)←⎕SE.TEMP.Foo.MarkAPL.Markdown2HTML'A Para' '' '* This' '* That'
+ expected←'<p>A Para</p>' '<ul>' '<li>This</li>' '<li>That</li>' '</ul>'
+ →T.PassesIf expected≡html
+ →T.PassesIf 9=⎕SE._tatin.⎕NC'aplteam_HandleError_4_0_0'
+
+ r←T._OK
+⍝Done

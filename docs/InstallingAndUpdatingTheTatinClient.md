@@ -20,21 +20,24 @@ Instructions:
 
    The `MyUCMDs/` folder is created by the Dyalog APL installer. Where to find it depends on your operating system:
 
-   * Under Windows it is `(2 ⎕nq # 'GetEnvironment' 'USERPROFILE'),'\Documents\MyUCMDs\'`
+   * Under Windows it is 
+
+     `(2 ⎕nq # 'GetEnvironment' 'USERPROFILE'),'\Documents\MyUCMDs\'`
+
    * Otherwise it is `$home/MyUCMDs/`
 
 Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.
 
 As a side effect of executing any of the Tatin user commands the Tatin API will become available via `⎕SE.Tatin`. 
 
-If you want the Tatin API to be available right from the start: this is discussed under "[Initialisizing Tatin](#)".
+If you want the Tatin API to be available right from the start: this is discussed under "[Initializing Tatin](#)".
 
 Putting Tatin into this folder has the benefit that it will be available in all suitable versions of Dyalog APL installed on your machine. It has the drawback that this is a user-specific folder.
 
 Tatin requires version 18.0 Unicode or better, therefore the `]TATIN` user commands won't be listed in either earlier versions of Dyalog or in the Classic version.
 
 
-## Initialisizing Tatin
+## Initializing Tatin
 
 As already mentioned, Tatin comes with a self-initializing feature: once installed any suitable version of Dyalog will provide a list of the Tatin user commands once you enter:
 
@@ -70,8 +73,53 @@ A> This can be used for many things like making changes to the session, specifyi
 
 ### There is no script `setup.dyalog` yet
 
-... (work in progress)
+Create one that looks like this:
+
+```
+:Namespace SetItUp
+
+    ∇ {r}←Setup arg;⎕IO;⎕ML;dmx
+      r←⍬
+      ⎕IO←1 ⋄ ⎕ML←1
+      :Trap ⎕SE.SALTUtils.DEBUG↓0
+          AutoloadTatin ⍬
+      :Else
+          dmx←⎕DMX
+          ⎕←'Setup.dyalog has a problem and was not executed sucessfully:'
+          ⎕←↑'  '∘,¨dmx.DM
+      :EndTrap
+    ∇
+
+    ∇ {r}←AutoloadTatin dummy;wspath;path2Config
+      r←⍬
+      :If IfAtLeastVersion 18
+          ⎕SE.⎕EX¨'_Tatin' 'Tatin'
+          wspath←(GetMyUCMDsPath),'/Tatin/Client.dws'
+          '_Tatin'⎕SE.⎕CY wspath
+          path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
+          'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
+          'Tatin'⎕SE.⎕NS''
+          path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+      :EndIf
+    ∇
+
+      IfAtLeastVersion←{
+      ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
+      ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
+          ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
+      }
+
+    ∇ r←GetMyUCMDsPath
+      :If 'Win'≡3⍴1⊃# ⎕WG'APLVersion '
+          r←(⊃⎕SH'ECHO %USERPROFILE%'),'\Documents\MyUCMDs\'
+      :Else
+          r←(⊃⎕SH'echo $HOME'),'/MyUCMDs/'
+      :EndIf
+    ∇
+
+:EndNamespace
+```
 
 ### There is already a script `setup.dyalog`
 
-... (work in progress)
+Make sure that you copy the functions `IfAtLeastVersion`, `GetMyUCMDsPath` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.

@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.13.0 - 20210-01-2
+⍝   * Some minor improvements
 ⍝ * 0.12.0 - 2020-12-15
 ⍝   * New option -noaggr aded to ListPackages
 ⍝ * 0.11.0 - 2020-12-09
@@ -217,9 +219,10 @@
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
       '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
-      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert '.'∊targetSpace
+      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert'.'∊targetSpace
       '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
+      ({⍵↓⍨⍵⍳'.'}targetSpace) saveIn.⎕ns''
       :If 0=saveIn.⎕NC'targetSpace'
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
@@ -654,8 +657,8 @@
       r,←⊂'* The argument might just be a package ID: {group}-{name}-{major.minor.patch}'
       r,←⊂'  In that case all Registries are scanned for that package ID; the first one wins.'
       r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID'
-      r,←⊂'* You may specify an incomplete package ID (in terms of patch, minor and/or major'
-      r,←⊂'  number) but just MSUT specify a Registry then.'
+      r,←⊂'* You may specify an incomplete package ID (in terms of no patch number, or neither'
+      r,←⊂'  minor nor patch number) but then you MUST specify a Registry.'
       r,←⊂'Valid examples are:'
       r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0.0 ',add
       r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils-2.0.0 ',add

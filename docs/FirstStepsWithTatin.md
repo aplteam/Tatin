@@ -20,7 +20,7 @@ We assume that you have the Tatin client installed and ready for use. That means
 
 ## What Registries are available
 
-After a fresh installation you might wonder what Registries are available for you.
+After a fresh installation you might wonder what Registries are available to you.
 
 
 ```
@@ -55,7 +55,7 @@ The square brackets around "tatin" declare that string to be an alias. Without t
 
 A> ### Local and remote Registries
 A>
-A> The Tatin client can access packages that are managed by a Tatin Server but also Registries that are locally available. 
+A> The Tatin client can access packages that are managed by a Tatin Server, but also Registries that are locally available. 
 A> In order to address a local Registry you would just provide the path to it.
 A>
 A> Of course features like listing just the packages that carry a specific tag are only available when a Registry is managed by a Tatin server.
@@ -69,11 +69,11 @@ A> Of course features like listing just the packages that carry a specific tag a
 
 A> ### Searching for tags: the strategy
 A>
-A> 1. First Tatin tries to find 100% matches for each keyword
-A> 1. In case there is no match Tatin tries to find the search string _somewhere_ (`⍷`)
+A> 1. First Tatin tries to find a 100%-match
+A> 1. In case there is no match, Tatin tries to find it _somewhere_ (`⍷`)
 A> 1. In case there is still no match a fuzzy search is performed
 A> 
-A> The fuzzy search would find "windows" when you enter "winndows" and "linux" when you enter "linuks". It has limits but in practice it works quite well unless the tags are very short: typing "AY" when you meant "AI" would not work.
+A> The fuzzy search would find "windows" when you enter "winndows" and "linux" when you enter "linuks". It has limits, but in practice it works quite well unless the tags are very short: typing "AY" when you meant "AI" would not work.
 A>
 A> Notes:
 A> * The strategy outlined above is applied on each tag independently.
@@ -86,7 +86,7 @@ The user command `ListTags` takes one or more tags and returns a list of tags th
 
 
 ```
-            ]Tatin.Listtags [tatin] -tags=mack-os,markd
+            ]Tatin.ListTags [tatin] -tags=mack-os,markd
  apltree   
  converter 
  linux     
@@ -116,19 +116,21 @@ Note that because packages which share the same group and name but have differen
 
 ### Give it a try: `LoadPackage`
 
-Let's assume that you want to make sure that `MarkAPL` suits your needs, in other words: you just want to check it out. 
+Let's assume that you want to check whether `MarkAPL` suits your needs, in other words: you just want to check it out. 
 
 That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves no trail on the file system if that can be avoided.
 
 A> ### Leaving a trace on the file system
 A>
-A> In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there is a footprint left in the file system.
+A> In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there _is_ a footprint left in the file system.
 
 Notes:
 
 * Loading a package has only one purpose: to investigate it.
 
 * Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but with installing a package that is not necessarily the case. This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
+
+W> **The rest of the document is not ready yet**
 
 
 Let's load the `MarkAPL` package into the workspace:

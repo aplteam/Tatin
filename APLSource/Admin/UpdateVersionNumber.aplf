@@ -1,4 +1,4 @@
- {r}←{quietFlag}UpdateVersionNumber type;version;date;name;buff;build;major;minor;patch;buildID;wsPath
+ {r}←{quietFlag}UpdateVersionNumber type;version;date;name;buff;build;major;minor;patch;buildID;wsPath;body;newVersion
 ⍝ If either `quietFlag` is 1 or the user answer "yes" when prompted this function does the following:
 ⍝ 1. It updates the "date" part of the function ##.Registry.Version
 ⍝ 2. It bumps the build ID, or adds 1 as the build ID
@@ -41,7 +41,10 @@
          :EndSelect
          version←⊃{⍺,'.',⍵}/⍕¨major minor patch buildID
      :EndIf
-     Assert' '=1↑0⍴##.Registry.⎕FX'r←Version'('r←''',name,''' ''',version,''' ''',date,'''')
+     body←##.Registry.⎕NR'Version'
+     newVersion←'r←''',name,''' ''',version,''' ''',date,''''
+     body←'r←''[^$]+'⎕R newVersion⊣body
+     Assert' '=1↑0⍴##.Registry.⎕FX body
      wsPath←(⍕⎕THIS.##),'.Registry.Version'
      Assert 0<≢⎕SE.acre.SetChanged wsPath
  :EndIf

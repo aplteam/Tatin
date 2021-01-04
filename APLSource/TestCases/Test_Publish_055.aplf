@@ -1,0 +1,25 @@
+ r←Test_Publish_055(stopFlag batchFlag);⎕TRAP;dir;body;cfg;rc;msg;zipFilename;qdmx
+⍝ Attempt to publish a package we have no valid API key for
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+
+ body←':Namespace A' 'foo←{' '##.Times ⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT dir,'/A.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'DoesNot' 'Exist' '1.0.0'
+ cfg.source←'A.apln'
+ cfg TC.WritePackageConfigFile dir
+
+ :Trap 98
+     (rc msg zipFilename)←TC.PublishPackage dir'[tatin]'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'Unauthorized request'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

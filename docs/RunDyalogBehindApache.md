@@ -26,23 +26,4 @@ The `ProxyPass` directive is doing the magic.
 
 The `ProxyPassReverse` directive ensures that the `Location:` headers generated from the backend (your Dyalog application) are modified to point to the reverse proxy instead to itself.
 
-You can chose to proxy specific requests by defining the URI path that should be handled:
-
-```
-ProxyPass "/v1"  "http://www.example.com/"
-ProxyPassReverse "/v1"  "http://www.example.com/"
-```
-
-As a result all requests which start with the `/v1` path will be proxied, everything else will be handled locally.
-
-Note that you can also use Regular Expressions; for that "ProxyPassMatch" must be used, for example:
-
-```
-ProxyPassMatch "/v1/(.*)" "http://localhost:9090/v1/$1"
-```
-
-You may have several "ProxyPassMatch" statements. The first match wins. If a URL does not match any RegEx then Apache will try to serve the request locally, meaning "documentRoot" in the Apache config files takes over.
-
-
-
 For details see the ["Reverse Proxy Guide"](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html "Link to the Apache documentation") and [Apache Module mod_proxy](https://httpd.apache.org/docs/2.4/mod/mod_proxy.html "Link to the Apache documentation")

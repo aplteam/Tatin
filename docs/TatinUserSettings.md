@@ -35,7 +35,9 @@ Changing the contents of that file by other means --- discussed next --- is much
 
 ### What does Tatin do with the file?
 
-When Tatin is initialized (that is discussed in detail in the document "InitializingTatin") in creates an instance of the `UserSettings` class with the name `MyUserSettings`. The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.
+When Tatin is initialized (that is discussed in detail in the document "InitializingTatin") in creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`.
+
+The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.
 
 
 ### Summary
@@ -97,7 +99,7 @@ Notes:
 
 * `uri` and `alias` are already set by the constructor
 * `port` is 0 which means that it will fall back to 80 for `http://` and 443 for `https://`
-* `priority` may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first.
+* `priority` may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hits wins.
 * `api_key` must be set only when the Registry is managed by a Tatin server _and_ you want to publish packages.
 
 #### Adding the Registry
@@ -119,6 +121,12 @@ Now we would expect two Registries:
 
 Note that the priority is not 0 anymore but 90: Any 0 is replaced by the lowest number yet minus 10. `priority` is used to determine the sequence in which the Registries are scanned in case the user asks for a specific package without specifying any registry at all.
 
+
+#### Adding the Tatin Test Registry
+
+_Don't_ add it permanently!
+
+The simple reason is that under certain circumstances Tatin scans all Registries in order to find a package, and usually you don't want to include the Test Registry in such a scan.
 
 
 ## Putting the user config file elsewhere

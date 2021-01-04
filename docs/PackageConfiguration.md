@@ -126,6 +126,18 @@ The URL that points to something like GitHub. An example is `http://github.com/a
 
 The name of a text file (that contains code) or a folder (that contains a collection of code files).
 
+If it's a single file it might be anything with the extension `.aplf` (a function), `.aplo` (an operator), `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script).
+
+If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extension are misplaced and well be ignored entirely.
+
+If `source` is left empty Tatin will attempt to identify the source itself.
+
+* If there is any script file found with the aforementioned extension that file will become the source.
+
+* If there is no file with such an extension all folders are investigated except those mentioned as "assets". If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.
+
+* If Tatin cannot establish the source an error will be thrown.
+
 #### tags
 
 A simple text vector, possibly empty (though that is not recommended), that should contain semicolon-separated lists of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.

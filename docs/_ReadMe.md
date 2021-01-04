@@ -39,11 +39,15 @@ This document gives you an overview over these HTML files: their purpose and who
 
   However, you might still want to update Tatin.
 
-* [First Steps with Tatin](./FirstStepsWithTatin.html "FirstStepsWithTatin.html") (work in progress)
+* [First Steps with Tatin](./FirstStepsWithTatin.html "FirstStepsWithTatin.html") (draft)
 
   Read this before you consume your first package
 
-* [PublishingPackages](./PublishingPackages.html "PublishingPackages.html") (stub)
+* [PackageConfiguration](./PackageConfiguration.html "Regarding Package Configuration") (draft)
+
+  Read this for discussing the details of package configuration files.
+
+* [PublishingPackages](./PublishingPackages.html "PublishingPackages.html") (draft)
 
   Read this in case you want to publish Tatin packages.
 
@@ -61,6 +65,6 @@ This document gives you an overview over these HTML files: their purpose and who
 
   Read this in case you want to contribute to Tatin's documentation and/or Tatin's code.
 
-* [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (work in progress)
+* [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (draft)
 
   Read this if you want to run a Tatin server behind an Appache server.

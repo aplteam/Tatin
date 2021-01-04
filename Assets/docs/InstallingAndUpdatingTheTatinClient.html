@@ -36,18 +36,19 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Unzip it into the <code>MyUCMDs/</code> folder.
 <p>The <code>MyUCMDs/</code> folder is created by the Dyalog APL installer. Where to find it depends on your operating system:</p>
 <ul>
-<li>Under Windows it is <code>(2 ⎕nq # 'GetEnvironment' 'USERPROFILE'),'\Documents\MyUCMDs\'</code></li>
+<li>Under Windows it is
+<p><code>(2 ⎕nq # 'GetEnvironment' 'USERPROFILE'),'\Documents\MyUCMDs\'</code></p></li>
 <li>Otherwise it is <code>$home/MyUCMDs/</code></li>
 </ul></li>
 </ol>
 <p>Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.</p>
 <p>As a side effect of executing any of the Tatin user commands the Tatin API will become available via <code>⎕SE.Tatin</code>.</p>
-<p>If you want the Tatin API to be available right from the start: this is discussed under “<a href="#Initialisizing-Tatin" class="bookmark_link">Initialisizing Tatin</a>”.</p>
+<p>If you want the Tatin API to be available right from the start: this is discussed under “<a href="#Initializing-Tatin" class="bookmark_link">Initializing Tatin</a>”.</p>
 <p>Putting Tatin into this folder has the benefit that it will be available in all suitable versions of Dyalog APL installed on your machine. It has the drawback that this is a user-specific folder.</p>
 <p>Tatin requires version 18.0 Unicode or better, therefore the <code>]TATIN</code> user commands won't be listed in either earlier versions of Dyalog or in the Classic version.</p>
 <div class="h_tag">
-<a href="#Initialisizing-Tatin" id="Initialisizing-Tatin" class="autoheader_anchor">
-<h2 data-id="Initialisizing-Tatin">Initialisizing Tatin</h2>
+<a href="#Initializing-Tatin" id="Initializing-Tatin" class="autoheader_anchor">
+<h2 data-id="Initializing-Tatin">Initializing Tatin</h2>
 </a>
 </div>
 <p>As already mentioned, Tatin comes with a self-initializing feature: once installed any suitable version of Dyalog will provide a list of the Tatin user commands once you enter:</p>
@@ -82,12 +83,54 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="There-is-no-script-setupdyalog-yet">There is no script <code>setup.dyalog</code> yet</h3>
 </a>
 </div>
-<p>… (work in progress)</p>
+<p>Create one that looks like this:</p>
+<pre><code>:Namespace SetItUp
+
+    ∇ {r}←Setup arg;⎕IO;⎕ML;dmx
+      r←⍬
+      ⎕IO←1 ⋄ ⎕ML←1
+      :Trap ⎕SE.SALTUtils.DEBUG↓0
+          AutoloadTatin ⍬
+      :Else
+          dmx←⎕DMX
+          ⎕←'Setup.dyalog has a problem and was not executed sucessfully:'
+          ⎕←↑'  '∘,¨dmx.DM
+      :EndTrap
+    ∇
+
+    ∇ {r}←AutoloadTatin dummy;wspath;path2Config
+      r←⍬
+      :If IfAtLeastVersion 18
+          ⎕SE.⎕EX¨'_Tatin' 'Tatin'
+          wspath←(GetMyUCMDsPath),'/Tatin/Client.dws'
+          '_Tatin'⎕SE.⎕CY wspath
+          path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
+          'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
+          'Tatin'⎕SE.⎕NS''
+          path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+      :EndIf
+    ∇
+
+      IfAtLeastVersion←{
+      ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
+      ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
+          ⍵≤{⊃(//)⎕VFI ⍵/⍨2&gt;+\'.'=⍵}2⊃# ⎕WG'APLVersion'
+      }
+
+    ∇ r←GetMyUCMDsPath
+      :If 'Win'≡3⍴1⊃# ⎕WG'APLVersion '
+          r←(⊃⎕SH'ECHO %USERPROFILE%'),'\Documents\MyUCMDs\'
+      :Else
+          r←(⊃⎕SH'echo $HOME'),'/MyUCMDs/'
+      :EndIf
+    ∇
+
+:EndNamespace</code></pre>
 <div class="h_tag">
 <a href="#There-is-already-a-script-setupdyalog" id="There-is-already-a-script-setupdyalog" class="autoheader_anchor">
 <h3 data-id="There-is-already-a-script-setupdyalog">There is already a script <code>setup.dyalog</code></h3>
 </a>
 </div>
-<p>… (work in progress)</p>
+<p>Make sure that you copy the functions <code>IfAtLeastVersion</code>, <code>GetMyUCMDsPath</code> and <code>AutoLoadTatin</code> from above into your own <code>setup.dyalog</code> script and then make sure that <code>AutoLoadTatin</code> is called from your <code>Setup</code> function.</p>
 </body>
 </html>

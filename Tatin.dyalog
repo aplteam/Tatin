@@ -222,13 +222,14 @@
       '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert'.'∊targetSpace
       '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
-      ({⍵↓⍨⍵⍳'.'}targetSpace) saveIn.⎕ns''
+      ({⍵↓⍨⍵⍳'.'}targetSpace)saveIn.⎕NS''
       :If 0=saveIn.⎕NC'targetSpace'
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
       r←TC.LoadDependencies installFolder targetSpace
+      r←⍪r
     ∇
 
     ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath
@@ -433,7 +434,7 @@
     ∇ r←InstallPackage Arg;identifier;installFolder
       (identifier installFolder)←Arg.(_1 _2)
       :If ~TC.F.IsDir installFolder
-          :If Arg.quiet
+          :If 0=Arg.quiet
           :AndIf 1 ∆YesOrNo'The install folder does not yet exist; create?'
               'Create!'TC.F.CheckPath installFolder
           :EndIf
@@ -626,16 +627,20 @@
           r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
       :Case ⎕C'Publish'
           r,←⊂''
-          r,←⊂'Publish a ZIP file (typically created with ]TATIN.Pack) to a particular Registry Server.'
+          r,←⊂'Publish a package to a particular Registry Server.'
+          r,←⊂'Such a package can be one of:'
+          r,←⊂'* ZIP file (typically created by calling ]TATIN.Pack)'
+          r,←⊂'* Folder that contains everything that defines a package; in this case the required ZIP is'
+          r,←⊂'  created on the fly'
           r,←⊂''
           r,←⊂'Requires two arguments:'
-          r,←⊂'* Path to the ZIP file that contains the package to be published'
+          r,←⊂'* Path to the package or ZIP file to be published'
           r,←⊂'* URL or alias of a Registry Server'
-          r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
-          r,←⊂'to the Tatin rules'
           r,←⊂''
-          r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question usually asked before'
-          r,←⊂'a package is actually published is probably only useful with test cases.'
+          r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
+          r,←⊂'to the Tatin rules.'
+          r,←⊂''
+          r,←⊂'The -quiet flag suppresses the "Are you sure?" question (test cases).'
       :Case ⎕C'ListVersions'
           r,←⊂''
           r,←⊂'List all versions of the given package. You must specify the package as in'

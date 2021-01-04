@@ -18,6 +18,88 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h1 data-id="Publishing-Packages">Publishing Packages</h1>
 </a>
 </div>
-<p>Stub</p>
+<div class="h_tag">
+<a href="#Precondition-API-key" id="Precondition-API-key" class="autoheader_anchor">
+<h2 data-id="Precondition-API-key">Precondition: API key</h2>
+</a>
+</div>
+<p>Whether you want to publish to the principal Tatin server at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a> or your own Tatin Server or a Tatin Server that someone in your company runs, first you need an API key. “API key” is just a fancy expression for a password that is used by an application.</p>
+<p>API keys are only required for publishing, not for consuming packages.</p>
+<div class="h_tag">
+<a href="#The-Server" id="The-Server" class="autoheader_anchor">
+<h3 data-id="The-Server">The Server</h3>
+</a>
+</div>
+<div class="h_tag">
+<a href="#The-principal-Tatin-Server" id="The-principal-Tatin-Server" class="autoheader_anchor">
+<h4 data-id="The-principal-Tatin-Server">The principal Tatin Server</h4>
+</a>
+</div>
+<p>If you want to publish on <code>https://tatin.dev</code> you need to ask <a href="mailto:kai@aplteam.com" class="mailto_link">kai@aplteam.com</a> for an API key.</p>
+<div class="h_tag">
+<a href="#The-Tatin-Test-Server" id="The-Tatin-Test-Server" class="autoheader_anchor">
+<h4 data-id="The-Tatin-Test-Server">The Tatin Test Server</h4>
+</a>
+</div>
+<p>The Tatin test Server publishes its one and only API key on its website; it's “Tatin-Test-API-Key”. It allows you to publish anything you want, including an group name.</p>
+<p>However, be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later.</p>
+<div class="h_tag">
+<a href="#Running-your-own-Tatin-Server" id="Running-your-own-Tatin-Server" class="autoheader_anchor">
+<h4 data-id="Running-your-own-Tatin-Server">Running your own Tatin Server</h4>
+</a>
+</div>
+<p>If you run your own Tatin Server we suggest that you create a UUID and use that as an API key.</p>
+<p>In order for the API key to be accepted by the Tatin Server it must be added to the file <code>Credentials.txt</code> in the Registry's root directory. The file will most likely already exist but might be empty.</p>
+<p>Make sure that you specify it as either</p>
+<pre><code>groupname={api-key}</code></pre>
+<p>or</p>
+<pre><code>*={api-key}</code></pre>
+<p>In the first case somebody who provides that API key may publish packages only for the group “groupname”.</p>
+<p>In the second case it's a kind of master password: it allows the creation of packages with <em>any</em> group name.</p>
+<div class="h_tag">
+<a href="#The-Client" id="The-Client" class="autoheader_anchor">
+<h3 data-id="The-Client">The Client</h3>
+</a>
+</div>
+<p>On the client side the API key must go into the user configuration file: the file <code>tatin-client.json</code>.</p>
+<p>It already has an API key for every Server defined in the file but it's empty.</p>
+<div class="h_tag">
+<a href="#Publishing" id="Publishing" class="autoheader_anchor">
+<h2 data-id="Publishing">Publishing</h2>
+</a>
+</div>
+<div class="h_tag">
+<a href="#Preparing" id="Preparing" class="autoheader_anchor">
+<h3 data-id="Preparing">Preparing</h3>
+</a>
+</div>
+<div class="h_tag">
+<a href="#How-to-structure-a-package" id="How-to-structure-a-package" class="autoheader_anchor">
+<h4 data-id="How-to-structure-a-package">How to structure a package</h4>
+</a>
+</div>
+<p>A Tatin package requires all source code (functions, operators, classes, interfaces and namespace scripts) to be separated from other files (like CSS files, EXEs, DLLs etc.).</p>
+<p>Tatin calls the former “source” and the latter “assets”.</p>
+<p>What is what is defined in the package copnfiguration file which <em>must</em> exist to make something a Tatin package.</p>
+<div class="h_tag">
+<a href="#The-package-configuration-file" id="The-package-configuration-file" class="autoheader_anchor">
+<h4 data-id="The-package-configuration-file">The package configuration file</h4>
+</a>
+</div>
+<p>What is required and how to create and change a package configuration file is discussed in the document <a href="./PackageConfiguration.html" class="external_link">PackageConfiguration</a>,</p>
+<div class="h_tag">
+<a href="#The-dependency-file" id="The-dependency-file" class="autoheader_anchor">
+<h4 data-id="The-dependency-file">The dependency file</h4>
+</a>
+</div>
+<p>This file is only required when the package has dependencies.</p>
+<div class="h_tag">
+<a href="#Final-step" id="Final-step" class="autoheader_anchor">
+<h3 data-id="Final-step">Final step</h3>
+</a>
+</div>
+<p>Once the preparation is done the final step is easy:</p>
+<pre><code>]TATIN.Publish /path2package/group-name-1.2.3.zip [tatin]</code></pre>
+<p>This publishes the package <code>group-name-1.2.3</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
 </body>
 </html>

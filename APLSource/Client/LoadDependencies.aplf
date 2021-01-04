@@ -1,8 +1,9 @@
- {refs}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level
+ {r}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;refs
 ⍝ Takes a folder with a build list, typically the result of installing packages.
 ⍝ Loads all packages according to that list and injects required references into `targetSpace`.
-⍝ Returns a vector with references to **all** loaded packages, including dependencies.
- refs←⍬
+⍝ Returns a vector with references to the loaded packages (no dependencies).
+⍝ Might be empty if the package was already loaded, for example as a dependency.
+ r←refs←⍬
  :If 0=⎕NC⊂⍕targetSpace
      targetSpace ⎕NS''
  :EndIf
@@ -21,6 +22,9 @@
              ref←⍎saveIn
              EstablishConstants ref cfg path
              refs,←ref
+             :If 1=level
+                 r,←ref
+             :EndIf
          :EndIf
          :If 1=level
              cfg LinkTargetToPackage saveIn targetSpace

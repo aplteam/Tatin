@@ -31,13 +31,6 @@ ProxyPassReverse / http://localhost:8081/</code></pre>
 <p>In <code>/etc/apache2/sites-enabled</code> there should be just a link pointing to <code>/etc/apache2/sites-available</code>.</p>
 <p>The <code>ProxyPass</code> directive is doing the magic.</p>
 <p>The <code>ProxyPassReverse</code> directive ensures that the <code>Location:</code> headers generated from the backend (your Dyalog application) are modified to point to the reverse proxy instead to itself.</p>
-<p>You can chose to proxy specific requests by defining the URI path that should be handled:</p>
-<pre><code>ProxyPass "/v1"  "http://www.example.com/"
-ProxyPassReverse "/v1"  "http://www.example.com/"</code></pre>
-<p>As a result all requests which start with the <code>/v1</code> path will be proxied, everything else will be handled locally.</p>
-<p>Note that you can also use Regular Expressions; for that “ProxyPassMatch” must be used, for example:</p>
-<pre><code>ProxyPassMatch "/v1/(.*)" "http://localhost:9090/v1/$1"</code></pre>
-<p>You may have several “ProxyPassMatch” statements. The first match wins. If a URL does not match any RegEx then Apache will try to serve the request locally, meaning “documentRoot” in the Apache config files takes over.</p>
 <p>For details see the <a href="https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html" class="external_link" title="Link to the Apache documentation">“Reverse Proxy Guide”</a> and <a href="https://httpd.apache.org/docs/2.4/mod/mod_proxy.html" class="external_link" title="Link to the Apache documentation">Apache Module mod_proxy</a></p>
 </body>
 </html>

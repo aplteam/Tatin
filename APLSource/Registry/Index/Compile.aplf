@@ -1,34 +1,38 @@
  {ref}←Compile path;packageList;index;cfgFiles;descs;tags;buff;ind
 ⍝ (Re)-builds the index for the registry pointed to by `path`.
-⍝ Writes the index to several files:
+⍝ Writes several files:
 ⍝ * {path}/tatin_index.txt contains a simple string with all package folder names
-⍝ * {path}/tatin_descriptions.json contains a simple string with all package descriptions\\
+⍝ * {path}/tatin_descriptions.json contains a simple string with all package descriptions
+⍝ * {path}/tatin_tags.txt contains the tags for all packages
 ⍝ More stuff might be added later.
 ⍝ Returns a reference to a namspace that holds veriables with these pieces of information.
  ref←⎕NS''
- :If 0<≢packageList←##.F.ListDirs path
-     index←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¨packageList
-     index←⊃,/index,¨⎕UCS 13
-     ref.index←index
-     (⊂index)##.F.NPUT(path,'/',GetIndexFilename)1
-     cfgFiles←packageList,¨⊂'/apl-package.json'
-     cfgFiles←(##.F.IsFile cfgFiles)/cfgFiles              ⍝ Should only happen in case tracing through test cases
-     buff←{(##.ReadConfigFile ⍵)}¨cfgFiles
-     :If 0<≢ind←⍸{0=⊃⍵.⎕NC'description'}¨buff
-         buff[ind].description←⊂''
+ :Hold 'INDEX'
+     :If 0<≢packageList←##.F.ListDirs path
+         packageList←packageList[##.SortIndexForPackageIDs packageList]
+         index←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¨packageList
+         index←⊃,/index,¨⎕UCS 13
+         ref.index←index
+         (⊂index)##.F.NPUT(path,'/',GetIndexFilename)1
+         cfgFiles←packageList,¨⊂'/apl-package.json'
+         cfgFiles←(##.F.IsFile cfgFiles)/cfgFiles              ⍝ Should only happen in case tracing through test cases
+         buff←{(##.ReadConfigFile ⍵)}¨cfgFiles
+         :If 0<≢ind←⍸{0=⊃⍵.⎕NC'description'}¨buff
+             buff[ind].description←⊂''
+         :EndIf
+         :If 0<≢ind←⍸{0=⊃⍵.⎕NC'tags'}¨buff
+             buff[ind].tags←⊂''
+         :EndIf
+         (descs tags)←↓⍉↑buff.(description tags)
+         descs←⊃,/descs,¨⎕UCS 13
+         ref.descriptions←descs
+         (⊂descs)##.F.NPUT(path,'/tatin_descriptions.json')1
+         tags←##.TAB{(1⊃⍵),⍺,(2⊃⍵)}¨⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨{⍵⊆⍨~⍵∊';,'}⍵}¨tags
+         (⊂tags)##.F.NPUT(path,'/tatin_tags.txt')1
+     :Else
+         (⊂'')##.F.NPUT(path,'/',GetIndexFilename)1
+         (⊂'')##.F.NPUT(path,'/tatin_descriptions.json')1
+         (⊂'')##.F.NPUT(path,'/tatin_tags.txt')1
      :EndIf
-     :If 0<≢ind←⍸{0=⊃⍵.⎕NC'tags'}¨buff
-         buff[ind].tags←⊂''
-     :EndIf
-     (descs tags)←↓⍉↑buff.(description tags)
-     descs←⊃,/descs,¨⎕UCS 13
-     ref.descriptions←descs
-     (⊂descs)##.F.NPUT(path,'/tatin_descriptions.json')1
-     tags←##.TAB{(1⊃⍵),⍺,(2⊃⍵)}¨⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨{⍵⊆⍨~⍵∊';,'}⍵}¨tags
-     (⊂tags)##.F.NPUT(path,'/tatin_tags.txt')1
- :Else
-     (⊂'')##.F.NPUT(path,'/',GetIndexFilename)1
-     (⊂'')##.F.NPUT(path,'/tatin_descriptions.json')1
-     (⊂'')##.F.NPUT(path,'/tatin_tags.txt')1
- :EndIf
+ :EndHold
 ⍝Done

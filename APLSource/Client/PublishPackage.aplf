@@ -1,8 +1,8 @@
  {(statusCode errMsg zipFilename)}←PublishPackage(source registry);uri;path;cfg;errMsg;statusCode
 ⍝ Publish a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
-⍝ 2. Creates a dependency file for the package.
-⍝ 3. Creates a zip file for the package in a Temp folder
+⍝ 2. Creates a dependency file for the package if required
+⍝ 3. Creates a zip file for the package in a Temp folder if required
 ⍝ 4. Moves the zip file into the Registry
 ⍝ 5. Updates the Registry index
 ⍝ Note that if ⍵ points already to a ZIP file it is **moved** into the Registry.\\
@@ -24,5 +24,11 @@
  :Else
      cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_NAME}source
      (statusCode errMsg)←cfg Reg.PublishPackage zipFilename uri
+     :If 200≠statusCode
+     :AndIf '.zip'≢⎕C⊃¯1↑⎕NPARTS source
+         ⍝ Was created on the fly, so we clean up
+         F.DeleteFile zipFilename
+         zipFilename←''
+     :EndIf
  :EndIf
 ⍝Done

@@ -19,28 +19,30 @@
      LogAndRollbackPublishPackage errMsg
  :ElseIf 0=F.MkDir packageDir,'/data'
      statusCode←HttpCodes.InternalServerError
-     errMsg←'Could not create directory for ',packageID
+     errMsg←'Could not create data/ directory for ',packageID
  :ElseIf 0<≢(packageDir,'/',packageID,'.zip')(⎕NCOPY Exec)zipFilename
      HttpCodes.InternalServerError
-     errMsg←'Publishing packaged failed'
+     errMsg←'Publishing package failed :',packageID
      packageDir LogAndRollbackPublishPackage errMsg
  :Else
-     (regIndex,packageID)Index.PutRegistryIndex registry
      (packageDir,'/',packageID,'.zip')DotNetZip.UnzipTo(packageDir,'/data')
      :If 0<≢packageDir(⎕NMOVE Exec)packageDir,'/data/apl-package.json'
-         HttpCodes.InternalServerError
-         errMsg←'Publishing packaged failed'
+         statusCode←HttpCodes.InternalServerError
+         errMsg←'Publishing package failed: ',packageID
          packageDir LogAndRollbackPublishPackage errMsg
      :Else
          dependenciesFilename←packageDir,'/data/',DependenciesFilename
          :If F.Exists dependenciesFilename
          :AndIf 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
-             HttpCodes.InternalServerError
-             errMsg←'Publishing packaged failed'
+             statusCode←HttpCodes.InternalServerError
+             errMsg←'Publishing package failed: ',packageID
              packageDir LogAndRollbackPublishPackage errMsg
          :Else
              0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
          :EndIf
      :EndIf
+ :EndIf
+ :If 200=statusCode
+     Index.Compile registry
  :EndIf
 ⍝Done

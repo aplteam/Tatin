@@ -6,9 +6,9 @@
 
 Before you start reading this document you should have read the document [Introduction.html](./Introduction.html).
 
-Also, it does not hurt to know what [Semantic Versioning](./SemanticVersioning.html) is.
+Also, it is _essential_ to understand [Semantic Versioning](./SemanticVersioning.html).
 
-In this document additional information you might or might not be interested in at this stage is presented in gray boxes. You might well skip over them till later.
+In this document additional information that you might or might not be interested in at this stage is presented in gray boxes. You might well skip over them till later.
 
 ## Where we start from
 
@@ -32,7 +32,7 @@ After a fresh installation you might wonder what Registries are available to you
 
 At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelyhood your own ones), then you must change the user settings. 
 
-All these topics --- and others --- are discussed in a separate document: "TatinUserSettings.html". Here we try to keep things simple.
+All these topics --- and related ones --- are discussed in a separate document: "TatinUserSettings.html". Here we try to keep things simple.
 
 
 ## Looking around
@@ -45,9 +45,10 @@ You may list _all_ packages managed by Tatin's principal server with this comman
       ]tatin.ListPackages [tatin]
  Group & Name             ≢ Major versions
  -----------------------  ----------------
- aplteam-WindowsEventLog  2     
- aplteam-Logger           4     
- aplteam-OS               2  
+ aplteam-APLTreeUtils2                   1 
+ aplteam-CodeCoverage                    2 
+ aplteam-Compare                         1 
+ aplteam-CompareSimple                   3 
  ...
 ```
 
@@ -111,6 +112,8 @@ We are now ready to identify that package by executing `ListPackages` with the `
 
 Note that because packages which share the same group and name but have different major version numbers are considered to be different packages, the major version number is part of the list.
 
+I> If you wonder why that is then please read the document discussing [Semantic Versioning](./SemanticVersioning.html).
+
 
 ## Consuming packages
 
@@ -128,59 +131,154 @@ Notes:
 
 * Loading a package has only one purpose: to investigate it.
 
-* Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but with installing a package that is not necessarily the case. This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
+* Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case. 
 
-W> **The rest of the document is not ready yet**
+  This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
 
 
 Let's load the `MarkAPL` package into the workspace:
 
 ```
-      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-9.1.1 #.MyTests
+      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-10.0.0 #.MyTests
 ```
 
 The namespace `#.MyTests` may or may not exist. If it does not Tatin will create it.
 
 I> When you try to execute the following statements on your own machine then you will probably see different version numbers.
 
-Tatin created a reference named "MarkAPL" in the target namespace `#.MyTests`:
+Tatin created a reference named `MarkAPL` in the target namespace `#.MyTests`:
 
 ```
       #.MyTests.⎕nl ⍳16
 MarkAPL
 ```
 
-That reference points to the namespace that holds the package as such, which is loaded into `_tatin`. The name of the namespace carries the version number:
+That reference points to the namespace that holds the package as such, which is loaded into `_tatin`. 
+
+I> The name `_tatin` is hard-coded and _cannot_ be changed.
+
+The name of the namespace carries the version number:
 
 ```
       #.MyTests.MarkAPL
-#._tatin.aplteam_MarkAPL_9_1_9 
+#._tatin.aplteam_MarkAPL_10_0_0 
 ```
-
-`_tatin` also contains all the dependencies "MarkAPL" relies on:
+`_tatin` also contains all the dependencies `MarkAPL` relies on:
 
 ```
       #._tatin.⎕nl ⍳16
-aplteam_APLTreeUtils_6_0_0
-aplteam_FilesAndDirs_3_2_1
-aplteam_IniFiles_4_0_0    
-aplteam_MarkAPL_9_1_9     
-aplteam_OS_2_0_0          
-aplteam_Tester2_2_2_2     
-aplteam_WinSys_4_0_0  
+aplteam_APLTreeUtils2_1_1_0
+aplteam_FilesAndDirs_5_0_0
+aplteam_MarkAPL_10_0_0
+aplteam_OS_3_0_0          
 ```
-
-`==>` **Add `InstallPackage` and `Load_Dependencies` here** {style="font-size:xx-large;"}
 
 ### Installing packages
 
-...
+Let's assume you've checked on `MarkAPL`, and that it turns out to suit your needs. You decide to use it in your application `Foo` which happens to live in `/Path2Foo/` on disk and in `#.Foo` in the workspace. 
 
+Let's also assume that the code of your application lives in `Foo.Core`, and that you want to address `MarkAPL` with `##.MarkAPL` from any function within `Foo.Core`.
+
+For that you need to execute this:
+
+```
+      ]TATIN.InstallPackage [tatin]aplteam-MarkAPL /Path2Foo/Packages
+```
+
+Note that we did not specify any of the major, minor and patch number but the Registry by alias (`[tatin]`); that tells Tatin that we want to get the very latest version of `MarkAPL`.
+
+Let's check what's now in `/Path2Foo/Packages`
+
+```
+      ⍪⊃⎕NINFO ⍠ 1 ⊣ '/Path2Foo/Packages\*'
+ D:/Temp/ZZZ/apl-buildlist.json          
+ D:/Temp/ZZZ/apl-dependencies.txt        
+ D:/Temp/ZZZ/aplteam-APLTreeUtils2-1.1.0 
+ D:/Temp/ZZZ/aplteam-FilesAndDirs-5.0.0  
+ D:/Temp/ZZZ/aplteam-MarkAPL-10.0.0      
+ D:/Temp/ZZZ/aplteam-OS-3.0.0            
+```
+
+The build-list defines the relationship of the packages:
+
+```
+      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-buildlist.json'1
+ {                                                    
+   depth: [                                           
+     1,                                               
+     2,                                               
+     2,                                               
+     2,                                               
+   ],                                                 
+   packageID: [                                       
+     "aplteam-MarkAPL-10.0.0",                        
+     "aplteam-APLTreeUtils2-1.1.0",                   
+     "aplteam-FilesAndDirs-5.0.0",                    
+     "aplteam-OS-3.0.0",                              
+   ],                                                 
+   url: [                                             
+     "https://tatin.dev/aplteam-MarkAPL-10.0.0",      
+     "https://tatin.dev/aplteam-APLTreeUtils2-1.1.0", 
+     "https://tatin.dev/aplteam-FilesAndDirs-5.0.0",  
+     "https://tatin.dev/aplteam-OS-3.0.0",            
+   ],                                                 
+ }                                                    
+```
+
+The dependencies file specifies what packages your application depend on as of yet:
+
+```
+      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-dependencies.txt' 1
+ aplteam-MarkAPL-10.0.0 
+```
 
 ### Loading dependencies
 
-...
+Having the packages installed you may now load them into your application. 
 
+This is achieved by the `LoadDependencies` user command:
+
+```
+      ]TATIN.LoadDependencies /Path2Foo/Packages/ #.Foo
+ #.Foo.MarkAPL
+```
+
+The user command prints a list of all top-level packages to the session. In other words, it hides the dependencies. 
+
+As you might have guessed the folder specified as first argument must contain these two files:
+
+```
+apl-dependencies.txt
+apl-buildlist.json
+```
+
+If one or both are missing an error will be thrown.
+
+
+If you want the full list of all packages:
+
+```
+      #._tatin.⎕nl 9
+ aplteam_APLTreeUtils2_1_1_0
+ aplteam_FilesAndDirs_5_0_0 
+ aplteam_MarkAPL_10_0_0     
+ aplteam_OS_3_0_0   
+```
+
+A> ### `#._tatin` versus `⎕SE._tatin`
+A> 
+A> Note that whether you specify a namespace in `#` or in `⎕SE` as the target of a `LoadDependency` operation decides whether the packages are loaded into `#._tatin` or `⎕SE._tatin`.
+
+Let's check whether it worked:
+
+```
+      ⍪⊃#.Foo.MarkAPL.Markdown2HTML 'A pragraph' '' '* This' '* That'
+ <p>A pragraph</p> 
+ <ul>              
+ <li>This</li>     
+ <li>That</li>     
+ </ul>                  
+```
 
 [^dotnetcore]: More information on .NET Core is available at <<br>>
 <https://en.wikipedia.org/wiki/.NET_Core>

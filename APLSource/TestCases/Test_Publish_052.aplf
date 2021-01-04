@@ -1,0 +1,44 @@
+ r←Test_Publish_052(stopFlag batchFlag);⎕TRAP;qdmx;rc;msg;zipFilename;src1;src2
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src;src3
+⍝ Publish a package with a dependency were the specified version does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ (src1 src2)←src∘,¨'/A' '/Foo'
+ F.MkDir src1 src2 reg
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←':Namespace Foo' 'Times←{' '##.Times ⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src2,'/Foo.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Foo' '1.0.0'
+ cfg.source←'Foo.apln'
+ cfg TC.WritePackageConfigFile src2
+ (rc msg zipFilename)←TC.PublishPackage src2 reg             ⍝ You might want to install a package with a not yet published dependency
+ Assert 200=rc
+
+ body←':Namespace A' 'foo←{' '##.Times ⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src1,'/A.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'A' '1.0.0'
+ cfg.source←'A.apln'
+ cfg TC.WritePackageConfigFile src1
+ src1 TC.Dependencies.Add'[local2]Example-Foo-2.0.0'         ⍝ Only version 1.0.0 does exist!
+
+ (rc msg zipFilename)←TC.PublishPackage src1 reg             ⍝ You might want to install a package with a not yet published dependency
+ →T.GoToTidyUp rc≠200                                        ⍝ And that should work!
+ →T.GoToTidyUp 0=≢zipFilename
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.DeleteFile zipFilename
+⍝Done

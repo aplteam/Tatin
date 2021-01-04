@@ -33,6 +33,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><a href="#Create-an-instance-of-the-DefineRegistry-class">Create an instance of the <code>DefineRegistry</code> class.</a></li>
 <li><a href="#Adding-the-Registry">Adding the Registry</a></li>
+<li><a href="#Adding-the-Tatin-Test-Registry">Adding the Tatin Test Registry</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#Putting-the-user-config-file-elsewhere">Putting the user config file elsewhere</a>
@@ -84,7 +85,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="What-does-Tatin-do-with-the-file">What does Tatin do with the file?</h3>
 </a>
 </div>
-<p>When Tatin is initialized (that is discussed in detail in the document “InitializingTatin”) in creates an instance of the <code>UserSettings</code> class with the name <code>MyUserSettings</code>. The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.</p>
+<p>When Tatin is initialized (that is discussed in detail in the document “InitializingTatin”) in creates an instance of the <code>UserSettings</code> class with the name <code>MyUserSettings</code> which lives in <code>⎕se.Tatin</code>.</p>
+<p>The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.</p>
 <div class="h_tag">
 <a href="#Summary" id="Summary" class="autoheader_anchor">
 <h3 data-id="Summary">Summary</h3>
@@ -140,7 +142,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><code>uri</code> and <code>alias</code> are already set by the constructor</li>
 <li><code>port</code> is 0 which means that it will fall back to 80 for <code>http://</code> and 443 for <code>https://</code></li>
-<li><code>priority</code> may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first.</li>
+<li><code>priority</code> may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hits wins.</li>
 <li><code>api_key</code> must be set only when the Registry is managed by a Tatin server <em>and</em> you want to publish packages.</li>
 </ul>
 <div class="h_tag">
@@ -155,6 +157,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
  tatin  https://tatin.dev/            100
  myc    https://tatin.mycompany.com/   90</code></pre>
 <p>Note that the priority is not 0 anymore but 90: Any 0 is replaced by the lowest number yet minus 10. <code>priority</code> is used to determine the sequence in which the Registries are scanned in case the user asks for a specific package without specifying any registry at all.</p>
+<div class="h_tag">
+<a href="#Adding-the-Tatin-Test-Registry" id="Adding-the-Tatin-Test-Registry" class="autoheader_anchor">
+<h4 data-id="Adding-the-Tatin-Test-Registry">Adding the Tatin Test Registry</h4>
+</a>
+</div>
+<p><em>Don't</em> add it permanently!</p>
+<p>The simple reason is that under certain circumstances Tatin scans all Registries in order to find a package, and usually you don't want to include the Test Registry in such a scan.</p>
 <div class="h_tag">
 <a href="#Putting-the-user-config-file-elsewhere" id="Putting-the-user-config-file-elsewhere" class="autoheader_anchor">
 <h2 data-id="Putting-the-user-config-file-elsewhere">Putting the user config file elsewhere</h2>

@@ -1,6 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.13.0 - 20210-01-2
+⍝ * 0.13.1 - 2021-01-10
+⍝   * LoadPackage's help page improved.
+⍝ * 0.13.0 - 2021-01-02
 ⍝   * Some minor improvements
 ⍝ * 0.12.0 - 2020-12-15
 ⍝   * New option -noaggr aded to ListPackages
@@ -555,7 +557,7 @@
           r,←⊂'Load the specified package and all its dependencies into the workspace'
           r,←⊂'Requires two arguments:'
           r,←⊂'A) First argument'
-          r,←(3⍴' ')∘,¨HelpOnPackageID'LoadPackage'
+          r,←(3⍴' ')∘,¨'#.TargetSpace'HelpOnPackageID'LoadPackage'
           r,←⊂'B) Second argument'
           r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
           r,←⊂'Returns fully qualified name of the package established in the target space'
@@ -629,12 +631,12 @@
           r,←⊂''
           r,←⊂'Publish a package to a particular Registry Server.'
           r,←⊂'Such a package can be one of:'
-          r,←⊂'* ZIP file (typically created by calling ]TATIN.Pack)'
+          r,←⊂'* ZIP file, typically created by calling ]TATIN.Pack'
           r,←⊂'* Folder that contains everything that defines a package; in this case the required ZIP is'
-          r,←⊂'  created on the fly'
+          r,←⊂'  created by "Publish"'
           r,←⊂''
           r,←⊂'Requires two arguments:'
-          r,←⊂'* Path to the package or ZIP file to be published'
+          r,←⊂'* Path to ZIP file or package folder'
           r,←⊂'* URL or alias of a Registry Server'
           r,←⊂''
           r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
@@ -660,18 +662,18 @@
       add←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'add'
       r←''
       r,←⊂'* The argument might just be a package ID: {group}-{name}-{major.minor.patch}'
-      r,←⊂'  In that case all Registries are scanned for that package ID; the first one wins.'
+      r,←⊂'  In that case ALL Registries are scanned for that package ID; the first one wins.'
       r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID'
       r,←⊂'* You may specify an incomplete package ID (in terms of no patch number, or neither'
       r,←⊂'  minor nor patch number) but then you MUST specify a Registry.'
       r,←⊂'Valid examples are:'
       r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils-2 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils ',add
-      r,←⊂'  ]TATIN.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils-2.0.0/ ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils2-1.0.0 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0.0 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1 ',add
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2 ',add
+      r,←⊂'  ]TATIN.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils2-1.0.0/ ',add
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

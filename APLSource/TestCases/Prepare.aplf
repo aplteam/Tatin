@@ -1,15 +1,27 @@
- Prepare
+ Prepare;testFilename;ask;answer;ignore
  'This WS appears to be prepared for functioning as a Tatin Server'⎕SIGNAL 11/⍨0<##.Client.⎕NC''
  :If 0=##.Client.⎕NC'MyUserSettings'
      #.Tatin.Admin.Initialize_Client
  :EndIf
  T←⎕NEW ##.Tester2 ⎕THIS
+ testFilename←##.Admin.GetCoverageFile
+ :If ⎕NEXISTS testFilename
+     ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
+     answer←⊃ask'Coverage file already exists'
+     :If 2≡answer
+         1 ⎕NDELETE testFilename
+     :EndIf
+ :EndIf
  T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Client,#.Tatin.Registry,#.Tatin.Server')
- T.codeCoverage.ignore←'#.Tatin.Client.InitUserSettings,#.Tatin.Registry.Create_UUID,#.Tatin.Client.GetUserHomeFolder'
- T.codeCoverage.ignore,←',#.Tatin.Client.PublishPackageToRemoteRegistry_2,#.Tatin.Client.CreateAllRefs_Client,#.Tatin.Client.GetMyUCMDsFolder'
- T.codeCoverage.filename←##.Admin.GetCoverageFile
-
- 1 ⎕NDELETE T.codeCoverage.filename
+ T.codeCoverage.filename←testFilename
+ ignore←''
+ ignore,←⊂'#.Tatin.Client.InitUserSettings'
+ ignore,←⊂'#.Tatin.Registry.Create_UUID'
+ ignore,←⊂'#.Tatin.Client.GetUserHomeFolder'
+ ignore,←⊂'#.Tatin.Client.PublishPackageToRemoteRegistry_2'
+ ignore,←⊂'#.Tatin.Client.CreateAllRefs_Client'
+ ignore,←⊂'#.Tatin.Client.GetMyUCMDsFolder'
+ T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
  A←##.APLTreeUtils2
  F←##.FilesAndDirs
  TC←##.Client

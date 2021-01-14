@@ -1,4 +1,4 @@
- {r}←MakeServer batchFlag;F;targetPath;zipFilename;fileList;zipContent;list;msg;success
+ {r}←MakeServer batchFlag;F;targetPath;zipFilename;list;msg;success
 ⍝ Creates a new server.\\
 ⍝ Call this after `MakeClient` has been called; see there for details.
 ⍝ It can be called from a developer's session (⍵←0) or as part of an automated "Make" process with ⍵←1.\\
@@ -46,12 +46,9 @@
      F.DeleteFile¨F.Dir'Dist/Tatin-Server-*.zip'
      zipFilename←'Dist/Tatin-Server-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Server.Version),''),'.zip'
      targetPath ##.DotNetZip.ZipFolder zipFilename
-     fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'
-     zipContent←##.DotNetZip.ListZipContents zipFilename
-     'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
      :If batchFlag
          ⎕OFF
      :Else
-         ⎕←'*** Done;  note that the Tatin acre projects has been closed'
+         ⎕←'*** Done;  note that the Tatin acre project has been closed'
      :EndIf
  :EndIf

@@ -23,10 +23,17 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '1.0.0.48' '2020-09-21'
+      r←'DotNetZip' '1.0.1.52' '2021-01-14'
     ∇
 
     ∇ History
+    ⍝ * 1.0.1 from 2021-01-10
+    ⍝   * Paths are written to a ZIP file with / rather than \, no matter what the platform is.
+    ⍝     Only then can we be sure that it will work on Linux and Mac-OS due to bugs in many
+    ⍝     versions of .NET and .NET Core.\\
+    ⍝     `ZipFolder` does not call the corresponding .NET method in order to overcome the \ bug.
+    ⍝   * The `Add` function now checks the existence of any file. Sometimes non-existent files
+    ⍝     did not cause the .NET call to crash.
     ⍝ * 1.0.0 from 2020-09-21
     ⍝   * First official release. Requires Dyalog 18.0 and is delivered as a Tatin package
     ∇
@@ -68,11 +75,19 @@
       QEX_System
       :If F.Exists zipFilename
       :AndIf 0=overwriteFlag
-          stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
+          :Trap 90
+              stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
+          :Else
+              99 ⎕SIGNAL⍨{⍵↓⍨1+⍵⍳':'}{⍵↑⍨¯1+⌊/⍵⍳⎕UCS 10 13}∊⍕⎕EXCEPTION
+          :EndTrap
           _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Update)
       :Else
           F.DeleteFile zipFilename
-          stream←System.IO.File.Open(zipFilename System.IO.FileMode.CreateNew)
+          :Trap 90
+              stream←System.IO.File.Open(zipFilename System.IO.FileMode.CreateNew)
+          :Else
+              99 ⎕SIGNAL⍨{⍵↓⍨1+⍵⍳':'}{⍵↑⍨¯1+⌊/⍵⍳⎕UCS 10 13}∊⍕⎕EXCEPTION
+          :EndTrap
           _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Create)
           _zip.Dispose
           ⍝ `List` is not available in "Create" mode, so we re-open it
@@ -105,9 +120,10 @@
       :Access Public Instance
       r←⍬
       parent←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'parent'
-      parent←F.NormalizePath{0=≢⍵:⍵ ⋄ ⍵,(~'/\'∊⍨¯1↑⍵)/F.CurrentSep}parent
+      parent←F.EnforceSlash{0=≢⍵:⍵ ⋄ ⍵,(~'/\'∊⍨¯1↑⍵)/F.CurrentSep}parent
       :If (≡toBeZipped)∊0 1
-          toBeZipped←F.NormalizePath{⍵↓⍨'/\'∊⍨1⍴⍵}toBeZipped
+          toBeZipped←{⍵↓⍨'/\'∊⍨1⍴⍵}toBeZipped
+          toBeZipped←F.EnforceSlash toBeZipped
           :If F.IsDir parent,toBeZipped
               :If 0<≢list←⊃('recursive' 1)F.Dir parent,toBeZipped,'/*'
               :AndIf 0<≢list←(F.IsFile list)/list
@@ -118,7 +134,8 @@
               parent Add_ toBeZipped
           :EndIf
       :Else
-          toBeZipped←F.NormalizePath∘{⍵↓⍨'/\'∊⍨1⍴⍵}¨toBeZipped
+          toBeZipped←{⍵↓⍨'/\'∊⍨1⍴⍵}¨toBeZipped
+          toBeZipped←F.EnforceSlash¨toBeZipped
           isDir←F.IsDir parent∘,¨toBeZipped
           :If ∨/~isDir
               parent∘Add_¨(~isDir)/toBeZipped
@@ -143,7 +160,7 @@
       names←,⊆names
       r←(≢names)⍴0
       :For i :In ⍳≢names
-          name←F.NormalizePath i⊃names
+          name←F.EnforceSlash i⊃names
           :If ⎕NULL≢entry←_zip.GetEntry⊂name
               targetFilename←F.NormalizePath folder,'/',name
               :Trap 90
@@ -178,8 +195,7 @@
     ⍝ Returns `⍬` (shy).
       :Access Public Instance
       r←⍬
-      filenames←⊆F.NormalizePath filenames
-      :If 0<+/bool←(⍕¨⌷_zip.Entries)∊filenames
+      :If 0<+/bool←(⍕¨⌷_zip.Entries)∊⊆filenames
           toBeDeleted←bool/⌷_zip.Entries
           toBeDeleted.Delete
       :EndIf
@@ -228,10 +244,30 @@
     ⍝Done
     ∇
 
-    ∇ {targetFile}←sourceFolder ZipFolder targetFile
+    ∇ {zipFilename}←sourceFolder ZipFolder zipFilename;fileList;myZip;F;∆INIT;b
+    ⍝ Takes a folder and zips it. `zipFilename` must not exist.\\
+    ⍝ Returns the fully expanded name of `zipFilename`.\\
+    ⍝ This is a workaround thats gets around the \-problem on Linux and Mac-OS.
+    ⍝ The "real" solution is named `ZipFolder_` and can be brought back once Microsoft fixes the probem.
+      :Access Public Shared
+      ∆INIT←0
+      Initialize ⍬
+      sourceFolder,←((0<≢sourceFolder)∧~'/\'∊⍨¯1↑sourceFolder)/'/'
+      fileList←'recursive'F.ListFiles sourceFolder
+      fileList←(≢sourceFolder)↓¨fileList
+      :If ~∧/b←⎕NEXISTS sourceFolder∘,¨fileList
+          ('',⊃{⍺,',',⍵}/(~b)/fileList)Assert 0
+      :Else
+          myZip←⎕NEW ⎕THIS(,⊂zipFilename)
+          sourceFolder∘myZip.Add¨fileList
+          zipFilename←myZip.filename
+      :EndIf
+    ∇
+
+    ∇ {targetFile}←sourceFolder ZipFolder_ targetFile
     ⍝ Takes a folder and zips it. `target` must not exist.\\
     ⍝ Returns the fully expanded name of the `targetFile`.
-      :Access Public Shared
+    ⍝  :Access Public Shared
       Initialize ⍬
       targetFile←F.ExpandPath AddExtension targetFile
       sourceFolder←F.ExpandPath sourceFolder
@@ -289,7 +325,8 @@
     ∇
 
     ∇ {r}←parent Add_ toBeZipped
-      Delete toBeZipped
+      ('Files does not exist: ',parent,toBeZipped)Assert ⎕NEXISTS parent,toBeZipped
+      Delete toBeZipped      ⍝ Remove from ZIP file, simulating "overwrite"
       QEX_System
       r←System.IO.Compression.ZipFileExtensions.CreateEntryFromFile _zip(parent,toBeZipped)toBeZipped
     ∇
@@ -312,11 +349,11 @@
           'This class requires at least version 17.0 of Dyalog APL'⎕SIGNAL 11
       }
 
-    ∇ QEX_System
+    ∇ {r}←QEX_System
       ⍝ Workaround for bug Mantis 18404 from 2020-08
       ⍝ The VALUE ERROR is not really a VALUE ERROR. This appears to happen only when `DotNetZip` is instanciated
-      ⍝ within `⎕SE`, the )CLEAR is issed and then again `DotNetZip` instanciated within `⎕SE`.
-      ⎕EX'System'
+      ⍝ within `⎕SE`, then )CLEAR is issued and then again `DotNetZip` instanciated within `⎕SE`.
+      r←⎕EX'System'
     ∇
 
 :EndClass

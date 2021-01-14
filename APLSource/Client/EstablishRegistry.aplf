@@ -1,10 +1,10 @@
- reg←{userSettings}EstablishRegistry packageID;registries;uri;alias;list
+ reg←{userSettings}EstablishRegistry packageID;registries;uri;alias;list;msg;CR
 ⍝ The purpose of this function is to establish the registry a package can be found in.
 ⍝ Useful in case the user specified just a package ID.
 ⍝ Note that `packageID` might be a full ({group}-{name}-{version}) or a partial one ({group}-{name} or {group}-{name}-{major}).
 ⍝ The function scans all registries according to the user settings and stops as soon as it finds one.\\
-⍝ In case of no hit anywhere `reg` is empty.
- reg←''
+⍝ In case of no hit anywhere an error is thrown.
+ reg←registries←''
  :If '.zip'≢⎕C ¯4↑packageID
  :AndIf ~∨/'/\:'∊packageID
      userSettings←{0<⎕NC ⍵:⍎⍵ ⋄ MyUserSettings}'userSettings'
@@ -35,5 +35,11 @@
              :Leave
          :EndIf
      :EndFor
+     :If 0=≢reg
+         CR←⎕UCS 13
+         msg←'Package:',CR,'  ',packageID,CR,'not found in any of these Registries:'
+         msg,←⊃,/(⊂CR,'  '),¨{0<≢2⊃⍵:'[',(2⊃⍵),']' ⋄ 1⊃⍵}¨registries.(uri alias)
+         msg Assert 0
+     :EndIf
  :EndIf
 ⍝Done

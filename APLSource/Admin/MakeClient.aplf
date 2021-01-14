@@ -1,4 +1,4 @@
- {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls
+ {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls;myZip
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
 ⍝ process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
@@ -84,14 +84,18 @@
      F.DeleteFile¨F.Dir'Dist/Tatin-Client-*.zip'
      zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),''),'.zip'
      ⎕DL 0.1
-     targetPath ##.DotNetZip.ZipFolder zipFilename
-     fileList←(1+≢targetPath)↓¨'recursive'F.ListFiles targetPath,'\'
+     fileList←'recursive'F.ListFiles targetPath,'\'
+     fileList←F.EnforceSlash¨(1+≢targetPath)↓¨fileList
+     myZip←⎕NEW ##.DotNetZip(,⊂zipFilename)
+     targetPath myZip.Add fileList
+    ⍝targetPath ##.DotNetZip.ZipFolder zipFilename   ⍝ This causes potentially trouble on Linux and Mac OS because of the \
      ⎕DL 1
+     myZip.Dispose
      zipContent←##.DotNetZip.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
      :If batchFlag
          ⎕OFF
      :Else
-         ⎕←'*** Done;  note that the Tatin acre projects has been closed'
+         ⎕←'*** Done;  note that the Tatin acre project has been closed'
      :EndIf
  :EndIf

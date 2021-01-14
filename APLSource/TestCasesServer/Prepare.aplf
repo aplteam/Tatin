@@ -1,12 +1,26 @@
- Prepare
+ Prepare;ignore;testFilename;ask;answer
 ⍝ Use this run the test server as a test cases, in particular for a test coverage report
  'This WS appears to be prepared for functioning as a Tatin Client'⎕SIGNAL 11/⍨0<##.Client.⎕NC'MyUserSettings'
  :If 0=##.⎕NC'Plodder'
      #.Tatin.Admin.Initialize_Server
  :EndIf
  T←⎕NEW ##.Tester2 ⎕THIS
+ testFilename←##.Admin.GetCoverageFile
+ :If ⎕NEXISTS testFilename
+     ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
+     answer←⊃ask'Coverage file already exists'
+     :If 2≡answer
+         1 ⎕NDELETE testFilename
+     :EndIf
+ :EndIf
  T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Registry,#.Tatin.Server')
- T.codeCoverage.ignore←'#.Tatin.Server.CopyDependencies,#.Tatin.Server.GetPackageConfigFilename,#.Tatin.Registry.Create_UUID'
- T.codeCoverage.ignore,←',#.Tatin.Server.PROJECT_HOME,#.Tatin.Server.QuitDQ,#.Tatin.Server.Run'
- T.codeCoverage.filename←##.Admin.GetCoverageFile
+ T.codeCoverage.filename←testFilename
+ ignore←''
+ ignore,←⊂'#.Tatin.Server.CopyDependencies'
+ ignore,←⊂'#.Tatin.Server.GetPackageConfigFilename'
+ ignore,←⊂'#.Tatin.Registry.Create_UUID'
+ ignore,←⊂'#.Tatin.Server.PROJECT_HOME'
+ ignore,←⊂'#.Tatin.Server.QuitDQ'
+ ignore,←⊂'#.Tatin.Server.Run'
+ T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
 ⍝Done

@@ -2,11 +2,11 @@
 ⍝ Strictly speaking this does not only return a header: it's also returning the DOC type and
 ⍝ an opening html and the opening body tag and some more stuff shared by all Tatin HTML pages.
  base←'https://',(⊃G.INI.Get'Config:Base')
- port←⊃G.INI.Get'Config:Port'
- :If ~port∊80 443
-     base,←':',⍕port
+ port←0
+ :If G.INI.Exist'Config:BaseTagPort'
+     port←G.INI.Get'Config:BaseTagPort'
  :EndIf
- base,←'/'
+ base,←(0≠port)/':',⍕port
  html←''
  html,←⊂'<!DOCTYPE html>'
  html,←⊂'<html lang="en">'

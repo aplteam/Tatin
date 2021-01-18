@@ -10,10 +10,6 @@ Tatin is based on the concept of Semantic Versioning (SemVer), so before we go i
 
 The version number of a Tatin package must follow the rules for Semantic Versioning: it always has the format `{major}.{minor}.{patch}`. 
 
-A> Semantic versionin came into being via this website:
-A>
-A> [https://semver.org/](https://semver.org/ {target="_blank"})
-
 After `{patch}` there might be more information available, separated from the patch number by either a dot or a hyphen, but this is just for convenience; Tatin would simply ignore any additional pieces of information.
 
 Valid examples for a version number are therefore:
@@ -97,3 +93,7 @@ Before the introduction of the rules of Semantic Versioning everybody assigned v
 With the rules of Semantic Versioning in place, if everybody involved acts accordingly and sensibly, updating should be much safer. 
 
 However, things can get pretty complicated even with Semantic Versioning; see the [TatinsLoadAndUpdateStrategy](TatinsLoadAndUpdateStrategy.html "Link to the HTML document").
+
+Semantic versioning came into being via this website:
+
+[https://semver.org/](https://semver.org/ {target="_blank"})

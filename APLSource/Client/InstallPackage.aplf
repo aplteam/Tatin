@@ -1,4 +1,4 @@
- paths←InstallPackage(identifier_ targetFolder);buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID
+ paths←InstallPackage(identifier_ targetFolder);buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request for a package
@@ -21,13 +21,17 @@
          identifier←(EstablishRegistry packageID),packageID
      :EndIf
  :EndIf
+ :If '.zip'≡⎕C ¯4↑identifier
+ :AndIf Reg.IsHTTP identifier
+     'ZIP files cannot be installed via HTTP'Assert 0
+ :EndIf
+ alias←{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}identifier_   ⍝ Not supported yet
  :If 0<≢buildList←GetDependecyTree identifier
      :For level packageID2 url :In ↓buildList
-         installFolder←targetFolder,'/',packageID2
+         installFolder←(Reg.AddSlash targetFolder),packageID2
          :If level=1
          :AndIf F.Exists installFolder
              ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
-             ('Installation folder is not empty :"',installFolder,'"')Assert 0=≢⊃F.Dir installFolder,'/'
          :EndIf
          :If 0=F.IsDir installFolder
              tempDir←InstallPackage_ packageID2 url

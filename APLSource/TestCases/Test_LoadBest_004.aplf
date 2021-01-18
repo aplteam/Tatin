@@ -1,0 +1,18 @@
+ r←Test_LoadBest_004(stopFlag batchFlag);⎕TRAP;names
+⍝ Load best version of a package from a given Registry by specifying {group}-{name} but there is also WinRegSimple (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ names←TC.LoadPackage'[local]aplteam-WinReg'#.TEMP
+ →T.GoToTidyUp 0=≢names
+ →T.GoToTidyUp'#.TEMP.WinReg'≢∊names
+ →T.GoToTidyUp'4.0.0'≢∆GetMajorMinorPatch 2⊃#.TEMP.WinReg.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

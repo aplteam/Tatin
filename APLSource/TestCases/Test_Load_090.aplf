@@ -1,0 +1,15 @@
+ r←Test_Load_090(stopFlag batchFlag);⎕TRAP;html;ns;expected;qdmx
+⍝ Load a package as a ZIP file from Github
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :Trap 98
+     TC.LoadPackage'https://github.com/aplteam/DotNetZip/releases/download/v1.0.0/aplteam-DotNetZip-1.0.0.zip' '⎕SE.TEMP.Foo'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'ZIP files cannot be loaded via HTTP'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

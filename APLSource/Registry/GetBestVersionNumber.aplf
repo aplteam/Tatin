@@ -19,6 +19,9 @@
          pattern←path,'.*'
      :EndSelect
      list←⊃F.Dir pattern
+     :If 1='-'+.=id
+         list←('-'=(1+≢id)⊃¨F.CurrentSep A.Last¨list)/list
+     :EndIf
      :If 0<≢list
          list←list[SortIndexForPackageIDs list]
          r←⊃¯1↑list

@@ -1,4 +1,4 @@
- r←LoadPackage(identifier_ targetSpace);saveIn2;refs
+ r←LoadPackage(identifier_ targetSpace);saveIn2;refs;zipFilename
  ;buildList;url;level;packageID;tempDir;saveIn;cfg;msg;ref;tempDirs;reset;identifier
 ⍝ Load package `identifier` dynamically into the workspace,\\
 ⍝ `identifier` must be one of:
@@ -33,6 +33,10 @@
  :Else
      '"targetSpace" is not a namespace'Assert 9=⎕NC targetSpace
      '"targetSpace" must not be a scripted namespace'Assert{16::1 ⋄ 0⊣⎕SRC ⍵}⍎targetSpace
+ :EndIf
+ :If '.zip'≡⎕C ¯4↑identifier
+ :AndIf Reg.IsHTTP identifier_
+     'ZIP files cannot be loaded via HTTP'Assert 0
  :EndIf
  identifier←CheckVersion identifier
  'Package not found'Assert 0<≢identifier

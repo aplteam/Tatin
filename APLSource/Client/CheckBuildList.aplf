@@ -1,5 +1,5 @@
- {r}←CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b;newTree;deps2;ind
-⍝ Checks the last modification data of both the build list and the dependency file.\\
+ {r}←CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b;newTree;deps2;ind;deps_
+⍝ Checks the last modification date of both the build list and the dependency file.\\
 ⍝ We distinguesh here between level-1 packages and packages that the level-1 packages rely on. The level-1 packages
 ⍝ are called principal packages. The remaining packages are called "other" packages.\\
 ⍝ If the dependency file was modified after the build list was saved:
@@ -12,8 +12,10 @@
  :If r←ts2>ts1
      tree←Reg.GetJsonFromFile filename1
      deps←1⊃F.NGET filename2 1
-     ('Invalid entry: ',(⊃{⍺,',',⍵}/b/deps),'; re-install!')Assert∧/b←deps∊tree.packageID   ⍝ Check consistency
-     :If 0<≢newTree←⊃⍪/GetDependecyTree¨(⊂folder,'/'),¨deps                                 ⍝ There might be no depen
+     deps_←({'@'∊⍵:⍵↓⍨⍵⍳'@' ⋄ ⍵}¨deps)                                      ⍝ However, we don't support alaise (yet)
+     b←deps_∊tree.packageID
+     ('Invalid entry: ',(⊃{⍺,',',⍵}/b/deps_),'; re-install!')Assert∧/b      ⍝ Check consistency
+     :If 0<≢newTree←⊃⍪/GetDependecyTree¨(⊂folder,'/'),¨deps                 ⍝ There might be no depen
      :AndIf 0<≢deps2←(1<newTree[;1])⌿newTree
          deps2←Reg.GetBestVersionNumber¨Reg.RemoveVersionNumber¨deps2[;3]
          ind←⍸newTree[;1]>1

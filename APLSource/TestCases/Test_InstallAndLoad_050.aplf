@@ -1,0 +1,22 @@
+ r←Test_InstallAndLoad_050(stopFlag batchFlag);⎕TRAP;regPath;target;paths1;paths2;json
+⍝ Install two packages of wich one is also a dependency of the other
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''        ⍝ Where we install into
+ target←GetTempDir ⍬
+ regPath←'TestData/Tatin/Registry/'     ⍝ Where we install porjects from
+
+ paths2←TC.InstallPackage(regPath,'aplteam-OS-3.0.0\aplteam-OS-3.0.0.zip')target
+ paths1←TC.InstallPackage(regPath,'aplteam-FilesAndDirs-4.0.0\aplteam-FilesAndDirs-4.0.0.zip')target
+
+ json←∆JSON⊃F.NGET target,'/',Reg.BuildListFilename
+ →T.GoToTidyUp json.depth≢1 1 3
+ →T.GoToTidyUp json.packageID≢'aplteam-OS-3.0.0' 'aplteam-FilesAndDirs-4.0.0' 'aplteam-APLTreeUtils2-1.1.0'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir target
+⍝Done

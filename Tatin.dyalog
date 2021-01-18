@@ -556,10 +556,15 @@
           r,←⊂''
           r,←⊂'Load the specified package and all its dependencies into the workspace'
           r,←⊂'Requires two arguments:'
+          r,←⊂''
           r,←⊂'A) First argument'
-          r,←(3⍴' ')∘,¨'#.TargetSpace'HelpOnPackageID'LoadPackage'
+          r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
+          r,←⊂''
           r,←⊂'B) Second argument'
           r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
+          r,←⊂''
+          r,←'#.MyPkgs'ExamplesForLoadAndInstall'LoadPackage'
+          r,←⊂''
           r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
           r,←⊂''
@@ -567,11 +572,13 @@
           r,←⊂'must exist.'
           r,←⊂''
           r,←⊂'A) First argument'
-          r,←(3⍴' ')∘,¨' /pkgs/installed'HelpOnPackageID'InstallPackage'
+          r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
           r,←⊂''
           r,←⊂'B) Second argument'
           r,←⊂'   The second argument must be the path to a folder into which the packages are'
           r,←⊂'   going to be be installed'
+          r,←⊂''
+          r,←'#.MyPkgs'ExamplesForLoadAndInstall'InstallPackage'
           r,←⊂''
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
           r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
@@ -658,22 +665,25 @@
       :EndSelect
     ∇
 
-    ∇ r←{add}HelpOnPackageID fns
-      add←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'add'
+    ∇ r←HelpOnPackageID dummy
       r←''
-      r,←⊂'* The argument might just be a package ID: {group}-{name}-{major.minor.patch}'
-      r,←⊂'  In that case ALL Registries are scanned for that package ID; the first one wins.'
-      r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID'
-      r,←⊂'* You may specify an incomplete package ID (in terms of no patch number, or neither'
-      r,←⊂'  minor nor patch number) but then you MUST specify a Registry.'
+      r,←⊂'* A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
+      r,←⊂'  If a full package ID is specified ALL Registries are scanned; the first one wins.'
+      r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID.'
+      r,←⊂'* You may also specify an incomplete package ID (in terms of no patch number, or'
+      r,←⊂'  neither minor nor patch number), but then you MUST specify a Registry (path or alias).'
+    ∇
+
+    ∇ r←append ExamplesForLoadAndInstall fns
+      r←''
       r,←⊂'Valid examples are:'
-      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils2-1.0.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1 ',add
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2 ',add
-      r,←⊂'  ]TATIN.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils2-1.0.0/ ',add
+      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0.0 ',append
+      r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils2-1.0.0 ',append
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0.0 ',append
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0 ',append
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1 ',append
+      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2 ',append
+      r,←⊂'  ]TATIN.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils2-1.0.0/ ',append
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

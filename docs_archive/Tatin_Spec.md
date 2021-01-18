@@ -80,7 +80,9 @@ Note that such an alias is _not_ case sensitive.
 
 #### Package alias
 
-One can assign an [alias to a package dependency](#Dependency file). This potentially simplifies addressing a package dependency in the source code.
+~~One can assign an [alias to a package dependency](#Dependency file). This potentially simplifies addressing a package dependency in the source code.~~
+
+Not implemented. The fact that there are already two different aliases available and that top-level dependencies might be loaded into different namespaces, and with different aliases, might cause confusion rather than being useful.
 
 ## The Modules
 

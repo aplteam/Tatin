@@ -1,4 +1,4 @@
- {r}←{append}SaveBuildList(buildList path);filename;ns;bool
+ {r}←{append}SaveBuildList(buildList path);filename;ns;bool;b;mat
 ⍝ Takes a dependency tree (`buildlist`) and (by default) appends it to `path`.\\
 ⍝ The optional left arguemtn `append` defaults to 1, meaning that `buildlist` is
 ⍝ appended to an already existing build list. If set to 0 any existing file is replaced.
@@ -21,5 +21,11 @@
  ns.depth,←buildList[;1]
  ns.packageID,←buildList[;2]
  ns.url,←buildList[;3]
+ ns.url←{'/'@(⍸'\'=⍵)⊢⍵}¨ns.url
+ mat←⍉↑ns.(depth packageID url)
+ mat←mat[⍋mat[;1];]
+ b←(mat[;2]⍳mat[;2])=⍳≢mat
+ mat←b⌿mat
+ ns.(depth packageID url)←↓⍉mat
  (⊂Reg.JSON ns)F.NPUT filename 1
 ⍝Done

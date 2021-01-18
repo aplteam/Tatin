@@ -1,5 +1,4 @@
- r←Test_LoadBest_001(stopFlag batchFlag);⎕TRAP
- ;refs
+ r←Test_LoadBest_001(stopFlag batchFlag);⎕TRAP;names
 ⍝ Load best version of a package from a given Registry by specifying {group}-{name}-{major}
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -7,9 +6,10 @@
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
 
- refs←TC.LoadPackage'[local]aplteam-APLProcess-0'#.TEMP
- →T.PassesIf 0<≢refs
- →T.PassesIf'0.3.0'≡∆GetMajorMinorPatch 2⊃#.TEMP.APLProcess.Version
+ names←TC.LoadPackage'[local]aplteam-APLProcess-0'#.TEMP
+ →T.GoToTidyUp'#.TEMP.APLProcess'≢∊names
+ →T.GoToTidyUp 1≠≢names
+ →T.GoToTidyUp'0.3.0'≢∆GetMajorMinorPatch 2⊃#.TEMP.APLProcess.Version
 
  r←T._OK
 

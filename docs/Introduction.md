@@ -63,6 +63,4 @@ Finally you publish your package to a Tatin server.
 
 ## Now what?!
 
-We suggest that you make yourself familiar with the concept of [Semantic Versioning](https://semver.org/ "External link, opened in a new Tab" {target="_blank"}), 
-
-and how exactly it is implemented in Tatin by reading the document [Tatin's load- and update strategy](./TatinsLoadAndUpdateStrategy.html "Opens the document TatinsLoadAndUpdateStrategy.html").
+We suggest that you make yourself familiar with the concept of [Semantic Versioning](https://semver.org/ "External link, opened in a new Tab" {target="_blank"}), and how exactly it is implemented in Tatin by reading the document [Tatin's load- and update strategy](./TatinsLoadAndUpdateStrategy.html "Opens the document TatinsLoadAndUpdateStrategy.html").

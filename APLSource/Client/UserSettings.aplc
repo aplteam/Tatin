@@ -2,15 +2,15 @@
 ⍝ By instanciating this class you get a representation of a user settings file required by Tatin.\\
 ⍝ In case no path pointing to a folder hosting such a file is provided to `⎕NEW`, the file is created
 ⍝ in the default location (user's home folder) which depends on your operating system.\\
-⍝ You may call ⎕SE.Tatin.GetUserHomeFolder ''
+⍝ You may call `⎕SE.Tatin.GetUserHomeFolder ''` in order to find out the location.
 ⍝ Optionally you may specify such a folder with `⎕NEW` that hosts the configuration file.\\
 ⍝ Note that if the file does not yet exist it will be created with defaults.\\
-⍝ You may also define `source` which is used as the default for `source` in a package config file.\\
+⍝ You may also define `source` which will be used as default for `source` in a package config file.\\
 ⍝ After having created an instance you can add a Registry definition (read: an instance of the
 ⍝ `DefineRegistry` class) to the user settings with `AddRegistry`, and you may also call `ReplaceRegistry`
 ⍝ and `RemoveRegistry`.\\
 ⍝ Whenevever one of these functions is called the user settings are updated and written to its file.
-⍝ The full name of the file as available via the field `path2config`.\\
+⍝ The full name of the file is available via the field `path2config`.\\
 ⍝ You can convert a particular Registry into an ordinary namespace by calling the `GetRegistry` method.
 
     :Field Public Shared ReadOnly cfg_name←'tatin-client.json'  ⍝ Name of the user config file is fixed
@@ -22,17 +22,17 @@
       _registries←⍬
       permanentFile←home.GetUserHomeFolder'.tatin'
       :If F.IsFile permanentFile
-      :AndIf 0<≢_path2config←(∊1⊃F.NGET permanentFile)~⎕TC
-          :If F.IsFile _path2config,'/',cfg_name
+      :AndIf 0<≢_path2config←AddSlash(∊1⊃F.NGET permanentFile)~⎕TC
+          :If F.IsFile _path2config,cfg_name
               _permanent←1
           :Else
               F.DeleteFile permanentFile
-              _path2config←home.GetUserHomeFolder ⍬     ⍝ By default it's the user's home folder on all platforms
+              _path2config←AddSlash home.GetUserHomeFolder ⍬  ⍝ By default it's the user's home folder on all platforms
           :EndIf
       :Else
-          _path2config←home.GetUserHomeFolder ⍬     ⍝ By default it's the user's home folder on all platforms
+          _path2config←AddSlash home.GetUserHomeFolder ⍬      ⍝ By default it's the user's home folder on all platforms
       :EndIf
-      :If F.IsFile _path2config,'/',cfg_name
+      :If F.IsFile _path2config,cfg_name
           Read _path2config
       :Else
           _registries←⍬
@@ -49,9 +49,9 @@
           path2config_←(-≢cfg_name)↓path2config_
       :EndIf
       'Is not a directory?!'Assert F.IsDir path2config_
-      _path2config←path2config_
+      _path2config←AddSlash path2config_
       :If F.IsFile path2config
-          Read _path2config
+          Read path2config
       :Else
           _registries←⍬
           buff←⎕NS''
@@ -59,7 +59,7 @@
           buff.uri←'https://tatin.dev'
           reg←⎕NEW home.DefineRegistry(,⊂buff)
           AddRegistry reg
-          Write _path2config
+          Write path2config
       :EndIf
     ∇
 
@@ -68,13 +68,13 @@
       :Access Public
       Init1 ⍬
       'Is not a directory?!'Assert F.IsDir path2config_
-      _path2config←path2config_
+      _path2config←AddSlash path2config_
       permanent←permanent_
       :If F.IsFile path2config
-          Read _path2config
+          Read path2config
       :Else
           _registries←⍬
-          Write _path2config
+          Write path2config
       :EndIf
     ∇
 
@@ -130,7 +130,15 @@
     :Property path2config
     :Access Public Instance
         ∇ r←get
-          r←_path2config,(cfg_name{⍵≢(-≢⍺)↑⍵}_path2config)/'/',cfg_name
+          r←_path2config,cfg_name
+        ∇
+    :EndProperty
+
+    :Property fileTimestamp
+    ⍝ Returns the file timestamp. Used to detect changes maed in one way or another.
+    :Access Public Instance
+        ∇ r←get
+          r←_fileTimestamp
         ∇
     :EndProperty
 
@@ -194,7 +202,7 @@
               buff.priority←(⌊/_registries.priority)-10
           :EndIf
       :EndIf
-      buff.uri,←('/'≠¯1↑buff.uri)/'/'
+      buff.uri←AddSlash buff.uri
       _registries,←buff
       Write ⍬
     ∇
@@ -280,7 +288,7 @@
       :Access Public Instance
       r←0
       :If flag
-          filename←_path2config,'/',cfg_name
+          filename←_path2config,cfg_name
       :AndIf F.IsFile filename
           r←F.DeleteFile filename
           :If _permanent
@@ -290,7 +298,7 @@
       :EndIf
     ∇
 
-⍝ ------------------- Privates stuff
+⍝ ------------------- Private stuff
 
     Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 98 ⋄ shy←0}
 
@@ -312,6 +320,7 @@
       {}(⊂home.Reg.JSON ns)F.NPUT tmp 1
       {}F.DeleteFile path2config
       {}path2config ⎕NMOVE tmp
+      _fileTimestamp←GetFileTimestamp _path2config
     ∇
 
     ∇ {r}←Read dummy;ns
@@ -324,6 +333,20 @@
           _registries←0 2⍴''
       :EndIf
       _source←ns.source
+      _fileTimestamp←GetFileTimestamp _path2config
     ∇
+
+    ∇ r←GetFileTimestamp filename
+      r←3 ⎕NINFO filename
+    ∇
+
+    ∇ {r}←CheckForUpdate dummy
+      :If r←_fileTimestamp≢GetFileTimestamp _path2config
+      :AndIf
+          Read _path2config
+      :EndIf
+    ∇
+    
+     AddSlash←{⍵,(~(¯1↑⍵)∊'/\')/'/'}
 
 :EndClass

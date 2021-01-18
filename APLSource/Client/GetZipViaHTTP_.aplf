@@ -1,0 +1,19 @@
+ (statusCode zippedData)←GetZipViaHTTP_ url;r;q;c;host;path;domain;newUrl;response
+⍝ Requests a ZIP file via HTTP(S) and returns the zipped data
+ zippedData←''
+ domain←GetDomainNameFromURL url
+ (host path)←domain{l←(≢⍺)+1⍳⍨⍺⍷⍵ ⋄ (l↑⍵)(l↓⍵)}url
+ c←NewClient host
+ q←R.NewRequest 0
+ q.URI←'/',path
+ response←c R.SendAndReceive q
+ :If 200=response.StatusCode
+     zippedData←response.Content
+     statusCode←200
+ :ElseIf response.StatusCode∊301 302
+     newUrl←{2⊃⍵[⍵[;1]⍳⊂'location';]}↑response.Headers
+     (statusCode zippedData)←GetZipViaHTTP_ newUrl
+ :Else
+     statusCode←response.StatusCode
+ :EndIf
+⍝Done

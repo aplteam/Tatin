@@ -1,28 +1,28 @@
- {r}←cfg LinkTargetToPackage(source target);alias;name;ref;from;buff
+ {r}←cfg LinkTargetToPackage(saveIn target);alias;name;ref;api;buff
 ⍝ Establishes references in the target space pointing to the loaded package.\\
 ⍝ Returns the fully qualified names of what was established in the target space.
 ⍝ Note that this can be a namespace or a function etc.
  alias←cfg.alias{0=≢⍺:⍵ ⋄ ⍺}cfg.name
  name←cfg.name
- ref←⍎source
+ ref←⍎saveIn
  :If 0<≢cfg.api
-     from←cfg.api
+     api←cfg.api
  :Else
      buff←⎕NPARTS cfg.source
      :If buff[3]∊'.aplf' '.aplo'
-         from←2⊃buff
+         api←2⊃buff
      :Else
-         from←cfg.name
+         api←cfg.name
      :EndIf
  :EndIf
- :If (ref.⎕NC from)∊3 4
+ :If (ref.⎕NC api)∊3 4
      ⍝ If it is a function it must not be niladic!
-     ('Cannot load package "',source,'": entry point is niladic function ')Assert 0≠1 2⊃ref.⎕AT from
+     ('Cannot load package "',saveIn,'": entry point is niladic function ')Assert 0≠1 2⊃ref.⎕AT api
  :EndIf
- :If 0=⎕NC source,'.',from
- :AndIf 0=|⎕NC⊂source,'.',from
-     0 Assert⍨'Cannot establish API in ',source
+ :If 0=⎕NC saveIn,'.',api
+ :AndIf 0=|⎕NC⊂saveIn,'.',api
+     0 Assert⍨'Cannot establish API for <',api,'>; does not exist'
  :EndIf
- target⍎alias,'←',source,'.',from
+ target⍎alias,'←',saveIn,'.',api
  r←target,'.',alias
 ⍝Done

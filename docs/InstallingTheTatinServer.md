@@ -6,11 +6,20 @@
 
 ## Introduction
 
-While the Tatin Client is coming with version 19.0 and later, the Tatin Server always needs to be installed in case you want to use it.
+While the Tatin Client is coming with version 18.1 and later, the Tatin Server always needs to be installed in case you want to use it.
 
 After downloading it from <https://github.com/aplteam/Tatin/releases> you need to unzip it into a folder where the Tatin Server is supposed to live.
 
+
+## Configuration: the INI File
+
 First you need to amend the file `server.ini`.
+
+A> ### Plodder
+A>
+A> Tatin uses Plodder (<https://github.com/aplteam/Plodder>) as HTTP server. 
+A>
+A> The INI file is originally a Plodder INI file with some additional settings used on the application level.
 
 Note that this is an old-school INI file. Well, almost: it comes with a number of features that are unusual for INI files. We just mention the most important ones here; for details see <https://github.com/aplteam/IniFiles>.
 
@@ -23,40 +32,85 @@ A> On top of the INI file, before any `[SECTION]` is defined, the local variable
 A>
 A> Further down the local variable is referenced as `{home}`; that simply means that `{home}` will be replaced by `<INIFILE>` once the INI file is instantiated. 
 A>
-A> What happens to the string `<INIFILE>` later is a Tatin convention, not a feature of the INI file: when the Tatin Server loads the INI file it will replace `<INIFILE>` by the fully qualified folder that INI file was loaded from.
 
-## Settings to pay attention to
+### `<INIFILE>` {#INIFILE}
+
+When the Tatin Server loads the INI file it will replace the string `<INIFILE>` by the fully qualified directory the INI file was loaded from.
+
+### Settings to pay attention to
 
 The INI file is well documented, so we won't discuss the meaning of the different sections and settings. Most of the settings don't need changing, so we will just draw your attention to those you are likely to change:
 
-* `Registry`
+* `[CONFIG]AppName`
 
-This defines the path to where the Registry lives that is managed by the Tatin Server.
+   This defines the name used by Tatin for logging to the Windows Event Log. 
 
-* `Base`
+   The parameter has no meaning on non-Windows platforms, and is ignored in case `[LOGGING]WindowsEventLog` is 0 rather than 1.
 
-Replace this by your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
+* `[CONFIG]Registry`
 
-* `Title`
+   This defines the path to where the Registry lives that is managed by the Tatin Server.
 
-When you use a Browser for accessing a Tatin server then `Title` defines what we will see as the tab title in the browser.
+* `[CONFIG]Base`
 
-* `Caption`
+   Replace this by your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
 
-This defines what all the HTML pages will display as `<h1>`.
+   Never add a port number; see `[CONFIG]BaseTagPort` for this.
+
+* `[CONFIG]BaseTagPort`
+
+   Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://). 
+
+   In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set `BaseTagPort` to 9999. This makes Tatin inject that port number into the HTML "base" tag, so that for example links in the Tatin documentation would continue to work.
+
+   However, when your Tatin Server runs "behind", say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
+
+   See also `[CONFIG]Base`.
+
+
+* `[CONFIG]Title`
+
+   When you use a Browser for accessing a Tatin server then `Title` defines what will become the tab title in the browser.
+
+* `[CONFIG]Caption`
+
+   This defines what all the HTML pages will display as `<h1>`.
+
+* `[CONFIG]ReloadWS`
+
+   If this is 1 Tatin will check whether the workspace `Server.dws` was changed since it was loaded. If it was Tatin will load it.
 
 * The section `[CERTIFICATES]` 
 
   A certificate is required in case you want to use https, a must on the Internet these days.
 You probably want to use your own one.
 
-  For more details on certificates see the next topic
+  For more details on certificates see "On Certificates"
   
 
 * `[WINDOWEVENTLOG]write`
 
-  If you run the Tatin Server as a Windows Service set this to 1. It won't cause harm in case it is 1 but does _not_ run as a Windows Service.
+   This parameter is ignored on non-Windows platforms.  
 
+   If you run the Tatin Server as a Windows Service set this to 1. It won't cause harm in case it is 1 but does _not_ run as a Windows Service.
+
+## On Logging
+
+There are two different levels available for logging:
+
+* Low-level logging with `LogHTTP`, `LogConga` and `LogRumba`. These are useful for debugging. 
+
+  The log file these pieces of information go into is situated in the Rumba/ sub folder.
+
+* High level logging with `Log` and `LogFolder`. 
+
+  Note that IP addresses are _not_ logged at this level.
+
+  * `Log` is a flag that indicates whether Tatin should log at all. In production it should always be 1.
+
+  * `LogFolder` must specify the path the Log file lives in. 
+
+    The name of the log file looks like `Tatin_{YYYYMMDD}.log`.
 
 ## On Certificates
 
@@ -66,12 +120,32 @@ Such a server is able to deal with attacks and has also all sorts of security me
 
 There is a separate document available that discusses how to do this: RunDyalogBehindApache.html
 
-In case you hide the Tatin Server behind, say, an Apache server, there might be no need to use encryption (https) except avoiding security warnings from browser, in case users access the Tatin Server also with a browser.
+In case you hide the Tatin Server behind, say, an Apache server, on the same machine there might be no need to use encryption (https).
+
+## The `[MSG]` section
+
+This section can be useful in case you want to inject a message into every HTML page delivered by Tatin.
+
+A typical application is the announcement of down time due to maintanance.
+
+In case `Text` is not empty it is injected as `<div><p>{text}</p>?</div>`. If CSS is not empty it is injected into the `<div>`.
+
+## The `[APP]` section {#the_app_section}
+
+This section tells Plodder where to find the application-specific logic (Tatin).
+
+* `Context`
+
+   This defines the namespace all Tatin-specific handlers live in.
+
+* The `On*` handlers
+
+  These are the Tatin-specific entry points. You might want to add something to `OnHouseKeeping`, or add a handler `OnHeader`, but that is pretty unsual.
 
 
 ## How to start the Tatin server
 
-After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog 18.0 Unicode or better with ample memory, and load the workspace.
+After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace.
 
 Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.
 

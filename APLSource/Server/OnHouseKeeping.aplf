@@ -3,6 +3,7 @@
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
  r←0
+ Log'Number of threads: ',⍕≢⎕TNUMS
  :If ∆SHUTDOWN
      {}⎕EX'∆SHUTDOWN'
      :If ##.APLTreeUtils2.IsDevelopment
@@ -13,11 +14,14 @@
  :ElseIf 0<⎕NC'∆STARTED'
      :If ∆STARTED<1 ⎕DT⊃('type' 3)F.Dir'Server.dws'
          :If ⊃G.INI.Get'Config:ReloadWS'
+             0 #.Tatin.Server.G.INI.Put'Config:MaxNoOfThreads'      ⍝ Prevent anybody from connecting
+             {1=≢⎕TNUMS:shy←0 ⋄ _←⎕DL ⍵ ⋄ ∇ ⍵}0.5                   ⍝ Wait until threads peter out
              ⎕LOAD ⎕WSID
          :EndIf
      :EndIf
  :EndIf
- :If G.INI.Changed                                                  ⍝ In case the INI file got changed...
+ :If G.INI.EstablishedAt<Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
      ##.Plodder.G(##.Plodder.ProcessIniFile)←G.INI.IniFilename      ⍝ ... we initialize from scratch
+     Log'INI file processed because it was changed'
  :EndIf
 ⍝Done

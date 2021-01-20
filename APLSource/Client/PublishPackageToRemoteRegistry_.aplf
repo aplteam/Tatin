@@ -16,11 +16,19 @@
 
  response←client R.SendAndReceive request
  :If response.StatusCode≢200
-     :If 0<≢response.Content
-         msg←response.Content
+     :If 405≡response.StatusCode
+         :If ∨/'http://'⍷url
+             'http:// is not supported'Assert 0
+         :Else
+             'https:// is not supported'Assert 0
+         :EndIf
      :Else
-         msg←'HTTP status code: ',⍕response.StatusCode
+         :If 0<≢response.Content
+             msg←response.Content
+         :Else
+             msg←'HTTP status code: ',⍕response.StatusCode
+         :EndIf
+         msg Assert 0
      :EndIf
-     msg Assert 0
  :EndIf
  ⍝Done

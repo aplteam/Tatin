@@ -1,4 +1,4 @@
- response←OnRequest request
+ response←OnRequest request;logMsg
 ⍝ Main handler for requests. Requests are first split by HTTP verb.
  :If 0=G.INI.Get'Trap:General'
      ⎕SHADOW'⎕TRAP'
@@ -12,4 +12,9 @@
  :Else
      response←ReturnNOT_IMPLEMENTED request
  :EndSelect
+ logMsg←request.Method,' ',(⍕response.StatusCode),' ',request.URI
+ :If 200≠response.StatusCode
+     logMsg,←'; ',response.Content
+ :EndIf
+ Log logMsg
 ⍝Done

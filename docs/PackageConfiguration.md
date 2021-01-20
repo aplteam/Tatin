@@ -29,7 +29,7 @@ This is an example:
 
 ### Introduction
 
-In the workspace a simple namespace can be a used for package configuration. On file it is saved as JASON5.
+In the workspace a simple namespace can be a used for package configuration. On file it is saved as JSON5.
 
 Tatin's API offers a function `Tatin.InitialisePackage` that can be used to create a package config file.
 
@@ -58,7 +58,7 @@ However, since we might add Tatin-specific variables at a later stage there is a
 
 The names of user defined variables _must_ start with an underscore.
 
-If you specify any variable with a name that Tatin does not know about and that does not start with an underscore, then error will be thrown.
+If you specify any variable with a name that Tatin does not know about and that does not start with an underscore an error will be thrown.
 
 
 ### Tatin's package configuration variables
@@ -128,11 +128,11 @@ The name of a text file (that contains code) or a folder (that contains a collec
 
 If it's a single file it might be anything with the extension `.aplf` (a function), `.aplo` (an operator), `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script).
 
-If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extension are misplaced and well be ignored entirely.
+If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extension are misplaced and will be ignored entirely.
 
 If `source` is left empty Tatin will attempt to identify the source itself.
 
-* If there is any script file found with the aforementioned extension that file will become the source.
+* If there is a single script file found with one of the aforementioned extensions that file will become the source.
 
 * If there is no file with such an extension all folders are investigated except those mentioned as "assets". If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.
 

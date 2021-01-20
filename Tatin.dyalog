@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.13.2 - 2021-01-19
+⍝   * `UnInstall` was visible when it shouldn't have been
 ⍝ * 0.13.1 - 2021-01-10
 ⍝   * LoadPackage's help page improved.
 ⍝ * 0.13.0 - 2021-01-02
@@ -127,11 +129,13 @@
           c.Parse←'1s -tags='
           r,←c
      
-          c←⎕NS ⍬
-          c.Name←'UninstallPackage'
-          c.Desc←'Uninstalls a package and its dependencies'
-          c.Parse←'2'
-          r,←c
+          :If 0 ⍝ Not decided yet whether we allow that at all, or what for
+              c←⎕NS ⍬
+              c.Name←'UninstallPackage'
+              c.Desc←'Uninstalls a package and its dependencies'
+              c.Parse←'2'
+              r,←c
+          :EndIf
      
           r.Group←⊂NM
      
@@ -283,8 +287,10 @@
                   qdmx.EM ⎕SIGNAL qdmx.EN
               :EndSelect
           :Else
-              :If 0<≢r←qdmx.EM
-                  qdmx.EM ⎕SIGNAL qdmx.EN
+              :If ∨/'<title>'⍷qdmx.EM
+                  r←GetTitleFromHtml qdmx.EM
+              :ElseIf 0<≢r←qdmx.EM
+                  r←qdmx.EM
               :EndIf
           :EndIf
       :EndTrap
@@ -847,6 +853,15 @@
               registry←1⊃list[row;]
           :EndIf
       :EndIf
+    ∇
+
+    ∇ r←GetTitleFromHtml html;offset
+      offset←⊃'<title[^>]*>([^<]+)'⎕S 0⍠('Greedy' 0)('IC' 1)('Mode' 'M')⊣html
+      r←offset↓html
+      r↓⍨←r⍳'>'
+      r↑⍨←¯1+r⍳'>'
+      r↑⍨←¯1+r⍳'<'
+      ⍝Done
     ∇
 
 :EndNamespace

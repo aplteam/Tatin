@@ -1,3 +1,5 @@
+; Note that configuration details are discussed in the document InstallingTheTatinServer.html
+
 home                = '<INIFILE>/'
 
 [CONFIG]
@@ -7,6 +9,7 @@ Folder              = '{home}ServerData'    ; Logs, crash files etc.
 LogHTTPToSession    = 0                     ; Naturally only useful in development
 MaxNoOfThreads      = 1000
 Port                = 443                   ; This is usually 443 in case of "Secure=1" and 80 otherwise
+BaseTagPort         = 0                     ; 0 means: do not inject a port number into the HTML meta base tag. If it is non-zero that port IS injected.
 Secure              = 1                     ; 1 for https and 0 for http
 Registry            = '{home}Registry/'     ; Where does the data (the Registry) live?
 Base                = 'localhost'           ; The domain name without the protocol; port number is added by Tatin in case a non-standard port is used
@@ -27,13 +30,18 @@ Text                = ''
 CSS                 = 'font-size: large; font-weight: bold; border: 2px solid silver; padding: 5px 15px; margin: 15px 0; background-color: chocolate;'
 
 
-[LOGFILE]
-LogHTTP             = 1                     ; HTTP requests should always be logged
+[LOGGING]
+; Application level (standard log file)
+Log                 = 1
+LogFolder           = '{home}Logs/'         ; Where does the app log file live?
+
+; The following entries make Rumba log stuff; useful for debugging but not for production 
+LogHTTP             = 0
 LogConga            = 0
 LogRumba            = 0
 
-[WINDOWSEVENTLOG]
-write               = ¯1                   ; ¯1 = Write Start/Stop/Error events to Windows Event Log in Runtime;   1: write   ; 0=never
+; The following entry makes Tatin log to the Windows Event Log
+WindowsEventLog     = ¯1                    ; ¯1 = Write Start/Stop/Error events to Windows Event Log in Runtime;   1: write   ; 0=never
 
 
 [CERTIFICATES]                              ; The following settings are ignored in case CONFIG.Secure is 0

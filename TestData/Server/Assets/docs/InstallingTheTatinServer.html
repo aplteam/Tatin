@@ -23,9 +23,20 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Introduction">Introduction</h2>
 </a>
 </div>
-<p>While the Tatin Client is coming with version 19.0 and later, the Tatin Server always needs to be installed in case you want to use it.</p>
+<p>While the Tatin Client is coming with version 18.1 and later, the Tatin Server always needs to be installed in case you want to use it.</p>
 <p>After downloading it from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a> you need to unzip it into a folder where the Tatin Server is supposed to live.</p>
+<div class="h_tag">
+<a href="#Configuration-the-INI-File" id="Configuration-the-INI-File" class="autoheader_anchor">
+<h2 data-id="Configuration-the-INI-File">Configuration: the INI File</h2>
+</a>
+</div>
 <p>First you need to amend the file <code>server.ini</code>.</p>
+<div class="leanpub_A">
+<h3>Plodder</h3>
+<p>Tatin uses Plodder (<a href="https://github.com/aplteam/Plodder" class="external_link">https://github.com/aplteam/Plodder</a>) as HTTP server.</p>
+<p>The INI file is originally a Plodder INI file with some additional settings used on the application level.</p>
+</div>
+
 <p>Note that this is an old-school INI file. Well, almost: it comes with a number of features that are unusual for INI files. We just mention the most important ones here; for details see <a href="https://github.com/aplteam/IniFiles" class="external_link">https://github.com/aplteam/IniFiles</a>.</p>
 <ul>
 <li>There are data types: text needs to go between 'quotes', everything else is considered a number</li>
@@ -35,39 +46,67 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3>What is a local variable?</h3>
 <p>On top of the INI file, before any <code>[SECTION]</code> is defined, the local variable <code>home</code> is defined. It carries the value <code>&lt;INIFILE&gt;</code>.</p>
 <p>Further down the local variable is referenced as <code>{home}</code>; that simply means that <code>{home}</code> will be replaced by <code>&lt;INIFILE&gt;</code> once the INI file is instantiated.</p>
-<p>What happens to the string <code>&lt;INIFILE&gt;</code> later is a Tatin convention, not a feature of the INI file: when the Tatin Server loads the INI file it will replace <code>&lt;INIFILE&gt;</code> by the fully qualified folder that INI file was loaded from.</p>
 </div>
 
 <div class="h_tag">
+<a href="#INIFILE" id="INIFILE" class="autoheader_anchor">
+<h3 data-id="INIFILE"><code>&lt;INIFILE&gt;</code></h3>
+</a>
+</div>
+<p>When the Tatin Server loads the INI file it will replace the string <code>&lt;INIFILE&gt;</code> by the fully qualified directory the INI file was loaded from.</p>
+<div class="h_tag">
 <a href="#Settings-to-pay-attention-to" id="Settings-to-pay-attention-to" class="autoheader_anchor">
-<h2 data-id="Settings-to-pay-attention-to">Settings to pay attention to</h2>
+<h3 data-id="Settings-to-pay-attention-to">Settings to pay attention to</h3>
 </a>
 </div>
 <p>The INI file is well documented, so we won't discuss the meaning of the different sections and settings. Most of the settings don't need changing, so we will just draw your attention to those you are likely to change:</p>
 <ul>
-<li><code>Registry</code></li>
-</ul>
-<p>This defines the path to where the Registry lives that is managed by the Tatin Server.</p>
-<ul>
-<li><code>Base</code></li>
-</ul>
+<li><code>[CONFIG]AppName</code>
+<p>This defines the name used by Tatin for logging to the Windows Event Log.</p>
+<p>The parameter has no meaning on non-Windows platforms, and is ignored in case <code>[LOGGING]WindowsEventLog</code> is 0 rather than 1.</p></li>
+<li><code>[CONFIG]Registry</code>
+<p>This defines the path to where the Registry lives that is managed by the Tatin Server.</p></li>
+<li><code>[CONFIG]Base</code>
 <p>Replace this by your domain name, or “localhost” in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.</p>
-<ul>
-<li><code>Title</code></li>
+<p>Never add a port number; see <code>[CONFIG]BaseTagPort</code> for this.</p></li>
+<li><code>[CONFIG]BaseTagPort</code>
+<p>Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://).</p>
+<p>In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set <code>BaseTagPort</code> to 9999. This makes Tatin inject that port number into the HTML “base” tag, so that for example links in the Tatin documentation would continue to work.</p>
+<p>However, when your Tatin Server runs “behind”, say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case you would leave <code>BaseTagPort</code> alone, except when the Apache Server itself listens to a non-standard port: then <code>BaseTagPort</code> needs to be <em>that</em> port.</p>
+<p>See also <code>[CONFIG]Base</code>.</p></li>
 </ul>
-<p>When you use a Browser for accessing a Tatin server then <code>Title</code> defines what we will see as the tab title in the browser.</p>
 <ul>
-<li><code>Caption</code></li>
-</ul>
-<p>This defines what all the HTML pages will display as <code>&lt;h1&gt;</code>.</p>
-<ul>
+<li><code>[CONFIG]Title</code>
+<p>When you use a Browser for accessing a Tatin server then <code>Title</code> defines what will become the tab title in the browser.</p></li>
+<li><code>[CONFIG]Caption</code>
+<p>This defines what all the HTML pages will display as <code>&lt;h1&gt;</code>.</p></li>
+<li><code>[CONFIG]ReloadWS</code>
+<p>If this is 1 Tatin will check whether the workspace <code>Server.dws</code> was changed since it was loaded. If it was Tatin will load it.</p></li>
 <li>The section <code>[CERTIFICATES]</code>
 <p>A certificate is required in case you want to use https, a must on the Internet these days. You probably want to use your own one.</p>
-<p>For more details on certificates see the next topic</p></li>
+<p>For more details on certificates see “On Certificates”</p></li>
 </ul>
 <ul>
 <li><code>[WINDOWEVENTLOG]write</code>
+<p>This parameter is ignored on non-Windows platforms.</p>
 <p>If you run the Tatin Server as a Windows Service set this to 1. It won't cause harm in case it is 1 but does <em>not</em> run as a Windows Service.</p></li>
+</ul>
+<div class="h_tag">
+<a href="#On-Logging" id="On-Logging" class="autoheader_anchor">
+<h2 data-id="On-Logging">On Logging</h2>
+</a>
+</div>
+<p>There are two different levels available for logging:</p>
+<ul>
+<li>Low-level logging with <code>LogHTTP</code>, <code>LogConga</code> and <code>LogRumba</code>. These are useful for debugging.
+<p>The log file these pieces of information go into is situated in the Rumba/ sub folder.</p></li>
+<li>High level logging with <code>Log</code> and <code>LogFolder</code>.
+<p>Note that IP addresses are <em>not</em> logged at this level.</p>
+<ul>
+<li><code>Log</code> is a flag that indicates whether Tatin should log at all. In production it should always be 1.</li>
+<li><code>LogFolder</code> must specify the path the Log file lives in.
+<p>The name of the log file looks like <code>Tatin_{YYYYMMDD}.log</code>.</p></li>
+</ul></li>
 </ul>
 <div class="h_tag">
 <a href="#On-Certificates" id="On-Certificates" class="autoheader_anchor">
@@ -77,13 +116,33 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that in case you want your Tatin server to serve requests from the Internet — as opposed to an Intranet — it is strongly recommended to hide the Tatin Server behind an industrial-strength HTTP server like Apache.</p>
 <p>Such a server is able to deal with attacks and has also all sorts of security measures build into it, so it's much safer to run Tatin behind it.</p>
 <p>There is a separate document available that discusses how to do this: RunDyalogBehindApache.html</p>
-<p>In case you hide the Tatin Server behind, say, an Apache server, there might be no need to use encryption (https) except avoiding security warnings from browser, in case users access the Tatin Server also with a browser.</p>
+<p>In case you hide the Tatin Server behind, say, an Apache server, on the same machine there might be no need to use encryption (https).</p>
+<div class="h_tag">
+<a href="#The--section" id="The--section" class="autoheader_anchor">
+<h2 data-id="The--section">The <code>[MSG]</code> section</h2>
+</a>
+</div>
+<p>This section can be useful in case you want to inject a message into every HTML page delivered by Tatin.</p>
+<p>A typical application is the announcement of down time due to maintanance.</p>
+<p>In case <code>Text</code> is not empty it is injected as <code>&lt;div&gt;&lt;p&gt;{text}&lt;/p&gt;?&lt;/div&gt;</code>. If CSS is not empty it is injected into the <code>&lt;div&gt;</code>.</p>
+<div class="h_tag">
+<a href="#the_app_section" id="the_app_section" class="autoheader_anchor">
+<h2 data-id="the_app_section">The <code>[APP]</code> section</h2>
+</a>
+</div>
+<p>This section tells Plodder where to find the application-specific logic (Tatin).</p>
+<ul>
+<li><code>Context</code>
+<p>This defines the namespace all Tatin-specific handlers live in.</p></li>
+<li>The <code>On*</code> handlers
+<p>These are the Tatin-specific entry points. You might want to add something to <code>OnHouseKeeping</code>, or add a handler <code>OnHeader</code>, but that is pretty unsual.</p></li>
+</ul>
 <div class="h_tag">
 <a href="#How-to-start-the-Tatin-server" id="How-to-start-the-Tatin-server" class="autoheader_anchor">
 <h2 data-id="How-to-start-the-Tatin-server">How to start the Tatin server</h2>
 </a>
 </div>
-<p>After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog 18.0 Unicode or better with ample memory, and load the workspace.</p>
+<p>After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace.</p>
 <p>Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.</p>
 <p>In such an event you are most likely interested in the server being restarted automatically.</p>
 <div class="h_tag">

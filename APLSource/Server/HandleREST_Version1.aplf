@@ -1,4 +1,4 @@
- response←request HandleREST_Version1 path_;packageID;json;path;data;html;regFolder
+ response←request HandleREST_Version1 path_;packageID;json;path;data;html;regFolder;specialCommands
 ⍝ Handles all commands defined in version 1 of the REST interface
  path_↓⍨←-'/'=¯1↑path_
  :If 1='/'+.=path_
@@ -8,29 +8,31 @@
      (path packageID)←Reg.SeparateUriAndPackageID path_
      path↓⍨←-'/'=¯1↑path
  :EndIf
- :If (⊂path)∊'v1/GetServerPath' 'v1/RecompileIndex' 'v1/Stop' 'v1/shutdown' 'v1/crash'
-     response←request ProcessTestCommands path
+ path←⎕C path
+ specialCommands←'get-server-path' 'recompile-index' 'stop' 'shutdown' 'crash' 'list-commands'
+ :If (⊂path)∊(⊂'v1/'),¨specialCommands
+     response←request ProcessTestCommands(⎕C path)specialCommands
  :Else
      :Select path
-     :Case 'v1/packages'
+     :Case GetVersion_REST'packages'
          response←request GetPackageList packageID
-     :Case 'v1/packages/major_versions'
+     :Case GetVersion_REST'packages/major_versions'
          regFolder←'expand'F.NormalizePath G.RegistryPath
          response←request GetMajorVersionList packageID regFolder
-     :Case 'v1/packages/versions'
+     :Case GetVersion_REST'packages/versions'
          response←request GetVersionList packageID
-     :Case 'v1/packages/details'
+     :Case GetVersion_REST'packages/details'
          response←request GetDetails packageID
-     :Case 'v1/packages/dependencies'
+     :Case GetVersion_REST'packages/dependencies'
          response←request GetDependencies packageID
-     :Case 'v1/packages/best_version'
+     :Case GetVersion_REST'packages/best_version'
          response←request GetBestVersionNumber packageID
-     :Case 'v1/groups'
+     :Case GetVersion_REST'groups'
          regFolder←'expand'F.NormalizePath G.RegistryPath
          response←GetGroupList regFolder
-     :Case 'v1/tags'
+     :Case GetVersion_REST'tags'
          response←GetTagList request
-     :Case 'v1/documentation'
+     :Case GetVersion_REST'documentation'
          response←CreateDocumentationIndex request
      :Else
          ⍝ Something new?

@@ -22,14 +22,17 @@
      iniFile←{0<⎕NC ⍵:⍎⍵ ⋄ './server.ini'}'iniFile'
      iniFile←P.PolishInifilePath iniFile
      P.G(P.ProcessIniFile)←iniFile
+     P.G←OpenLogFiles P.G
      P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
      P.G←##.Server.ProcessCredentials P.G
      parms←P.CreateServerParms P.G
      parms←P.CheckServerParms parms
+     parms←CheckServerParms parms
      ##.G←P.OpenWindowsEventLog P.G
      P.WindowsEventLog'Starting'
      P.EstablishHandlersForRumbaEvents P.G
      r←parms P.R.Start P.F.ExpandPath'Assets/RunTime/Conga'
      P.DQ'.'
+     Shutdown G
  :EndIf
 ⍝Done

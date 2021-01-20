@@ -1,0 +1,13 @@
+ OpenLogFiles←{
+     G←⍵
+     0=G.INI.Get'Logging:Log':0
+     folder←⊃G.INI.Get'Logging:LogFolder'
+     0=≢folder:'Logging is active but no Log folder specified'Assert 0
+     parms←##.Logger.CreateParms
+     parms.encoding←'UTF8'
+     parms.path←folder
+     parms.path←F.ExpandPath parms.path
+     parms.filenamePrefix←'Tatin'
+     G.MyLogger←⎕NEW ##.Logger(,⊂parms)
+     G
+ }

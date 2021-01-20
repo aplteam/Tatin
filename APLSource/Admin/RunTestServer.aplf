@@ -19,6 +19,7 @@
  iniFile←{0<⎕NC ⍵:⍎⍵ ⋄ './TestData/Server/server.ini'}'iniFile'
  iniFile←P.PolishInifilePath iniFile
  P.G(P.ProcessIniFile)←iniFile
+ P.G←OpenLogFiles P.G
  P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
  P.G←##.Server.ProcessCredentials P.G
  :If (⊂testFlag)∊0 1
@@ -33,4 +34,5 @@
  r←parms P.R.Start P.F.ExpandPath P.GetAssetPath,'RunTime/Conga'
  EndlessLoop ⍬
  ##.Server.∆SHUTDOWN←0
+ ##.Server.Shutdown P.G
 ⍝Done

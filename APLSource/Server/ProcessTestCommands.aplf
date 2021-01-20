@@ -1,21 +1,24 @@
- response←request ProcessTestCommands path;⎕TRAP
+ response←request ProcessTestCommands(path specialCommands);⎕TRAP;version
 ⍝ This function must only be called when G.TestFlag is true
  :If G.TestFlag
      :Select ⎕C path
-     :Case ⎕C'v1/GetServerPath'
+     :Case GetVersion_REST'get-server-path'
          response←ReturnRegistryPath request
-     :Case ⎕C'v1/RecompileIndex'
+     :Case GetVersion_REST'recompile-index'
          Reg.Index.Compile G.RegistryPath
          response←request Respond 200
-     :Case ⎕C'v1/Stop'
+     :Case GetVersion_REST'stop'
          1 ⎕STOP'#.Tatin.Server.OnRequest'
          response←request Respond 200
-     :Case ⎕C'v1/Shutdown'
+     :Case GetVersion_REST'shutdown'
          ⎕TRAP←0 'S'
          response←request Respond 200
          ∆SHUTDOWN←1
-     :Case 'v1/Srash'
-         ∘∘∘                                ⍝ Deliberate crash for testing error trapping
+     :Case GetVersion_REST'list-commands'
+         response←request Respond 200
+         response.Content←⊃{⍺,',',⍵}/specialCommands
+     :Case GetVersion_REST'crash'
+         ∘∘∘                              ⍝ Deliberate crash for testing error trapping
      :Else
          response←request Respond 404 1   ⍝ Unknown (new?!)
      :EndSelect

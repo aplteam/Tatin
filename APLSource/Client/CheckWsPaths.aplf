@@ -1,0 +1,13 @@
+ CheckWsPaths←{
+⍝ Makes sure that the version is tranformed when it turned out that the WS has "only" a better
+⍝ version to offer. We don't have that information at hand anymore, the building file might
+⍝ be confused by dependencies that are also top-level packages, and other obstacles.
+     path←⍕⍵
+     0<⎕NC path:⍵
+     (parent packageID)←{⍵{(⍵↓⍺)(1↓⍵↑⍺)}-(⌽⍵)⍳'.'}path
+     list←' '~⍨¨↓(⍎parent).⎕NL 9
+     removeVersionNo←{⍵/⍨2>+\'_'=⍵}
+     ind←((removeVersionNo¨list),¨' ')⍳⊂(removeVersionNo packageID),' '
+     instead←ind⊃list
+     ⍕parent⍎instead
+ }

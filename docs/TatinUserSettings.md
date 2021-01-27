@@ -99,7 +99,7 @@ Notes:
 
 * `uri` and `alias` are already set by the constructor
 * `port` is 0 which means that it will fall back to 80 for `http://` and 443 for `https://`
-* `priority` may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hits wins.
+* `priority` may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.
 * `api_key` must be set only when the Registry is managed by a Tatin server _and_ you want to publish packages.
 
 #### Adding the Registry

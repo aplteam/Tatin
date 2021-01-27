@@ -15,8 +15,10 @@
      :If 1≡type
          r←↑MyUserSettings.registries.(alias uri port priority api_key)
          r[;5]←{0=≢⍵:⍵ ⋄ '***'}¨r[;5]       ⍝ Replace any non-empty API key by asterisks
+         r←r[⍒r[;4];]
      :Else
-         r←↑(MyUserSettings.registries).(uri alias)
+         r←↑(MyUserSettings.registries).(uri alias priority)
+         r←r[⍒r[;3];1 2]
      :EndIf
      :If ~rawFlag
          r←((,[0.5]'Alias' 'URI',(1≡type)/'Port' 'Priority' 'API-key'),[1]' ')⍪r

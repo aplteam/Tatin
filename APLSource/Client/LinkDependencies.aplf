@@ -5,10 +5,12 @@
  r←⍬
  root←{GetTatinRootSpace 1⊃⍵}⍣(0<≢refs)⊣refs
  :For ref :In refs
+     ref←CheckWsPaths ref
      :If 0<≢deps←Dependencies.Get⊃{0=≢⍺:⍵ ⋄ ⍺}/ref.(∆HOME ∆URI)
          deps←ReplaceRegistryAlias¨deps
          destinations←GetPackageIDFromFilename¨deps
          destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨destinations
+         destinations←CheckWsPaths¨destinations
          cfgs←Reg.JSON¨destinations⍎¨⊂'∆CONFIG'
          :For cfg :In cfgs
              :If 0<≢cfg.source

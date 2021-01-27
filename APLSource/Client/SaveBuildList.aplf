@@ -1,4 +1,4 @@
- {r}←{append}SaveBuildList(buildList path);filename;ns;bool;b;mat
+ {r}←{append}SaveBuildList(buildList path);filename;ns;bool;b;mat;b1;b2;new;old;b3;ind;groupNameMajor;topLevel
 ⍝ Takes a dependency tree (`buildlist`) and (by default) appends it to `path`.\\
 ⍝ The optional left arguemtn `append` defaults to 1, meaning that `buildlist` is
 ⍝ appended to an already existing build list. If set to 0 any existing file is replaced.
@@ -9,8 +9,9 @@
  :If F.IsFile filename
  :AndIf append
      ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET filename
-     bool←~ns.packageID∊buildList[;3]
-     ns.(depth packageID url)←bool∘/¨ns.(depth packageID url)
+     :If ∨/bool←~buildList[;2]∊ns.packageID
+         buildList←bool⌿buildList  ⍝ Remove what we already have
+     :EndIf
  :Else
      ns←⎕NS''
      ns.(depth packageID url)←⊂''
@@ -18,14 +19,29 @@
  :If ~append
      F.DeleteFile path
  :EndIf
+
+ b1←1=buildList[;1]
+ b2←1=ns.depth
+ new←Reg.RemoveMinorAndPatch¨b1/buildList[;2]
+ old←Reg.RemoveMinorAndPatch¨b2/ns.packageID
+ :If ∨/b3←old∊new
+     ⍝ A top-level package has been installed, so the old version needs to be removed
+     ind←((~b3)/⍸b2),⍸~b2
+     ns.(depth packageID url)←(⊂⊂ind)⌷¨ns.(depth packageID url)
+ :EndIf
+
  ns.depth,←buildList[;1]
  ns.packageID,←buildList[;2]
  ns.url,←buildList[;3]
  ns.url←{'/'@(⍸'\'=⍵)⊢⍵}¨ns.url
  mat←⍉↑ns.(depth packageID url)
- mat←mat[⍋mat[;1];]
- b←(mat[;2]⍳mat[;2])=⍳≢mat
+
+ (topLevel mat)←{b←1=⍵[;1] ⋄ (b⌿⍵)((~b)⌿⍵)}mat
+ mat←⊖mat[Reg.SortIndexForPackageIDs mat[;2];]
+ groupNameMajor←Reg.RemoveMinorAndPatch¨mat[;2]
+ b←(groupNameMajor⍳groupNameMajor)=⍳≢mat
  mat←b⌿mat
+ mat←topLevel⍪mat
  ns.(depth packageID url)←↓⍉mat
  (⊂Reg.JSON ns)F.NPUT filename 1
 ⍝Done

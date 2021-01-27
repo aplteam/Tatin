@@ -18,7 +18,7 @@ We can take several different approaches here:
 
 * We could load both versions and make `Foo` use version 1.1.1 and `Goo` use version 1.2.0
 * We could load the better version (1.2) and make `Zoo` and `Goo` both use that version 
-* We could check the server, find that there is a better version available (1.3.0) and use that one
+* We could check the server, find that there is an even better version available (1.3.0) and use that one
 
   (More generally, always check for the best version and use that one)
 
@@ -37,13 +37,13 @@ This can happen in case the author of a package has released a new version of a 
 
 Attractive as an automated update mechanism might be, you want a build to be _reproducible_.
 
-That does not necessarily mean that you always need to update all packages in your application "by hand", there are smarter ways to do this, and we will discuss this later.
+Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are better packages available: check the user command `]TATIN.CheckForBetterVersions`.
 
 So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages `Foo` and `Goo`.
 
 Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses _the best version_, which might or might not be the best one available. In our example that would be 1.2.0, while 1.3.0 is ignored.
 
-This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs "Link to the paper defining it"). It guarantees that when you re-build, you will get exactly the same result.
+This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs "Link to the paper defining it"). It guarantees that when you re-build, you will get exactly the same result, but it will grab the best version mentioned.
 
 
 ## Loading Dependencies
@@ -92,7 +92,7 @@ A>
 A> ```
 A> ]TATIN.Loadpackage [MyTatin]/mygroup-Goo #.MyPkgs
 A> ```
-A> Note that neither the major nor the minor nor the patch number have been specified.
+A> Note that in this case not even the major number have been specified.
 
 You wanted `Foo` and `Goo` to be loaded into `#.MyPkgs`, and that's exactly what Tatin did. But where are the dependencies?
 
@@ -142,7 +142,7 @@ Let's check the contents of the `/myPkgs/apl-buildlist.json` file:
 
 ```
       #.q←⎕JSON⍠('Dialect' 'JSON5')⊢⊃⎕NGET'/myPkgs/apl-buildlist.json'
-      ⍉↑#.q.(depth packageID url)
+      ⍉↑#.q.(depth packageID)
 1 mygroup-Foo-1.0.0
 2 mygroup-Zoo-1.1.1
 1 mygroup-Goo-2.1.0
@@ -157,7 +157,7 @@ The build list comprises not only the two principal packages but also all depend
 
 Though installing is roughly the same as loading except that the packages end up in the file system rather than the workspace, loading the installed packages allows Tatin to optimize what's actually loaded, and in this respect it is different.
 
-Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which is either created or possibly extended by the installation process. 
+Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which is either created or possibly extended by an installation. 
 
 It also requires a namespace as second argument: that's where the references pointing to the principal packages are going to be created. This is similar to `LoadPackage`.
 
@@ -174,7 +174,7 @@ This is what `LoadDependencies` will do:
   is fine then the build list is created from scratch,
 3. Finally it will prune the build list and bring in the remaining packages.
 
-Note that the pruning is in charge for removing the package `Zoo` 1.1.1. That means that rather than loading `Zoo` twice _only the best version_ will be loaded: both `Foo` and `Goo` will use `Zoo` version 1.2.0. 
+Note that the pruning is in charge for removing the package `Zoo` 1.1.1. That means that rather than loading `Zoo` twice _only the best **installed** version_ will be loaded: both `Foo` and `Goo` will use `Zoo` version 1.2.0. 
 
 
 ## Special case

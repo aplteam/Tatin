@@ -1,0 +1,18 @@
+ r←Test_CheckVersions_004(stopFlag batchFlag);⎕TRAP;dir;versions;result
+⍝ Run CheckVersions on a package that has a better major version.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/Packages/Install-template/*'
+
+ versions←1 TC.CheckForBetterVersion dir
+ →T.PassesIf 1=≢versions
+ →T.GoToTidyUp'aplteam-MarkAPL-10.0.0'≢TC.GetPackageIDFromFilename 1⊃versions
+
+ r←T._OK
+
+
+∆TidyUp:
+ F.RmDir dir
+⍝Done

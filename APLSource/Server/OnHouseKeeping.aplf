@@ -1,27 +1,22 @@
- {r}←OnHouseKeeping msg
+ {r}←OnHouseKeeping msg;savedAt
 ⍝ Used for two purposes:
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
  r←0
- Log'Number of threads: ',⍕≢⎕TNUMS
+ ReportNumberOfThreads G.INI
  :If ∆SHUTDOWN
      {}⎕EX'∆SHUTDOWN'
      :If ##.APLTreeUtils2.IsDevelopment
          {}⎕NQ'#'QuitDQ
      :Else
-         {}#.Plodder.Shutdown G.INI                                 ⍝ Will ⎕OFF in runtime
+         {}#.Plodder.Shutdown G.INI                             ⍝ Will ⎕OFF in runtime
      :EndIf
  :ElseIf 0<⎕NC'∆STARTED'
-     :If ∆STARTED<1 ⎕DT⊃('type' 3)F.Dir'Server.dws'
-         :If ⊃G.INI.Get'Config:ReloadWS'
-             0 #.Tatin.Server.G.INI.Put'Config:MaxNoOfThreads'      ⍝ Prevent anybody from connecting
-             {1=≢⎕TNUMS:shy←0 ⋄ _←⎕DL ⍵ ⋄ ∇ ⍵}0.5                   ⍝ Wait until threads peter out
-             ⎕LOAD ⎕WSID
-         :EndIf
-     :EndIf
+     ReloadThisWorkspace G.INI
  :EndIf
- :If G.INI.EstablishedAt<Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
-     ##.Plodder.G(##.Plodder.ProcessIniFile)←G.INI.IniFilename      ⍝ ... we initialize from scratch
-     Log'INI file processed because it was changed'
+ savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
+ :If G.INI.EstablishedAt<savedAt
+     ##.Plodder.G(##.Plodder.ProcessIniFile)←G.INI.IniFilename  ⍝ ... we initialize from scratch
+     Log'INI file processed because it was changed on disk'
  :EndIf
 ⍝Done

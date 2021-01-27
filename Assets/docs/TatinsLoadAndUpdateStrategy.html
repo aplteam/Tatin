@@ -31,7 +31,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li>We could load both versions and make <code>Foo</code> use version 1.1.1 and <code>Goo</code> use version 1.2.0</li>
 <li>We could load the better version (1.2) and make <code>Zoo</code> and <code>Goo</code> both use that version</li>
-<li>We could check the server, find that there is a better version available (1.3.0) and use that one
+<li>We could check the server, find that there is an even better version available (1.3.0) and use that one
 <p>(More generally, always check for the best version and use that one)</p></li>
 </ul>
 <p>All these options are actually used by different package managers in the wild, so there is no consensus on what's best.</p>
@@ -45,10 +45,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ol>
 <p>This can happen in case the author of a package has released a new version of a package you depend on in one way or another.</p>
 <p>Attractive as an automated update mechanism might be, you want a build to be <em>reproducible</em>.</p>
-<p>That does not necessarily mean that you always need to update all packages in your application “by hand”, there are smarter ways to do this, and we will discuss this later.</p>
+<p>Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are better packages available: check the user command <code>]TATIN.CheckForBetterVersions</code>.</p>
 <p>So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages <code>Foo</code> and <code>Goo</code>.</p>
 <p>Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses <em>the best version</em>, which might or might not be the best one available. In our example that would be 1.2.0, while 1.3.0 is ignored.</p>
-<p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get exactly the same result.</p>
+<p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get exactly the same result, but it will grab the best version mentioned.</p>
 <div class="h_tag">
 <a href="#Loading-Dependencies" id="Loading-Dependencies" class="autoheader_anchor">
 <h2 data-id="Loading-Dependencies">Loading Dependencies</h2>
@@ -81,7 +81,7 @@ Goo</code></pre>
 <p>Note that neither the minor nor the patch number have been specified.</p>
 <p>Assuming that version 2.1.0 of <code>Goo</code> is the very best version available at all, and that's the version you want to use, then this would have been sufficient:</p>
 <pre><code>]TATIN.Loadpackage [MyTatin]/mygroup-Goo #.MyPkgs</code></pre>
-<p>Note that neither the major nor the minor nor the patch number have been specified.</p>
+<p>Note that in this case not even the major number have been specified.</p>
 </div>
 
 <p>You wanted <code>Foo</code> and <code>Goo</code> to be loaded into <code>#.MyPkgs</code>, and that's exactly what Tatin did. But where are the dependencies?</p>
@@ -118,7 +118,7 @@ mygroup-Goo-2.1.0</code></pre>
 <p>Note that these are the principal packages that we've installed.</p>
 <p>Let's check the contents of the <code>/myPkgs/apl-buildlist.json</code> file:</p>
 <pre><code>      #.q←⎕JSON⍠('Dialect' 'JSON5')⊢⊃⎕NGET'/myPkgs/apl-buildlist.json'
-      ⍉↑#.q.(depth packageID url)
+      ⍉↑#.q.(depth packageID)
 1 mygroup-Foo-1.0.0
 2 mygroup-Zoo-1.1.1
 1 mygroup-Goo-2.1.0
@@ -131,7 +131,7 @@ mygroup-Goo-2.1.0</code></pre>
 </a>
 </div>
 <p>Though installing is roughly the same as loading except that the packages end up in the file system rather than the workspace, loading the installed packages allows Tatin to optimize what's actually loaded, and in this respect it is different.</p>
-<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which is either created or possibly extended by the installation process.</p>
+<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which is either created or possibly extended by an installation.</p>
 <p>It also requires a namespace as second argument: that's where the references pointing to the principal packages are going to be created. This is similar to <code>LoadPackage</code>.</p>
 <pre><code>      ]TATIN.LoadDependencies /myPkgs/ #.Temp</code></pre>
 <p>This is what <code>LoadDependencies</code> will do:</p>
@@ -141,7 +141,7 @@ mygroup-Goo-2.1.0</code></pre>
 <p>If that is the case, the build list will be checked for consistency with <code>apl-dependencies.txt</code>; if that   is fine then the build list is created from scratch,</p></li>
 <li>Finally it will prune the build list and bring in the remaining packages.</li>
 </ol>
-<p>Note that the pruning is in charge for removing the package <code>Zoo</code> 1.1.1. That means that rather than loading <code>Zoo</code> twice <em>only the best version</em> will be loaded: both <code>Foo</code> and <code>Goo</code> will use <code>Zoo</code> version 1.2.0.</p>
+<p>Note that the pruning is in charge for removing the package <code>Zoo</code> 1.1.1. That means that rather than loading <code>Zoo</code> twice <em>only the best <strong>installed</strong> version</em> will be loaded: both <code>Foo</code> and <code>Goo</code> will use <code>Zoo</code> version 1.2.0.</p>
 <div class="h_tag">
 <a href="#Special-case" id="Special-case" class="autoheader_anchor">
 <h2 data-id="Special-case">Special case</h2>

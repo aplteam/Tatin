@@ -1,0 +1,23 @@
+ r←all CheckForBetterVersion_ fullPaths;fullPath;packageID;url;fullPath2
+⍝ Takes a vector of fully qualified package paths (http or local) & checks for better versions.
+⍝ `r` is a vector with fully qualified paths of any better versions, so possibly empty.
+⍝ If `all` is 0 only minor and patch number are considered. If `all` is 1 better "major"
+⍝ versions are considered as well. This is used only in the user command since Tatin considers
+⍝ packages with different major numbers to be different packages.
+ r←⍬
+ 'Invalid left argument'Assert 1=≢all
+ 'Invalid left argument'Assert all∊0 1
+ :For fullPath :In fullPaths
+     PrintToSession'Checking <',fullPath,'>...'
+     packageID←GetPackageIDFromFilename fullPath
+     url←(-≢packageID)↓fullPath
+     :If all
+         fullPath2←GetBestVersionNumber(Reg.RemoveVersionNumber packageID)url
+     :Else
+         fullPath2←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID)url
+     :EndIf
+     :If packageID≢GetPackageIDFromFilename fullPath2
+         r,←⊂fullPath2
+     :EndIf
+ :EndFor
+ ⍝Done

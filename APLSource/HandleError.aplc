@@ -1,7 +1,7 @@
 :Class HandleError
-⍝ This class offers the method `Process` which is useful to handle application
-⍝ errors on a general level. `Process` in turn is triggered via `⎕TRAP`; use
-⍝ the method `SetTrap` in order to set `⎕TRAP` properly.\\
+⍝ This class offers the method `Process`, which is useful to handle application
+⍝ errors on a general (or application) level. `Process` in turn is triggered via `⎕TRAP`;
+⍝ use the method `HandleError.SetTrap` in order to set `⎕TRAP` properly.\\
 ⍝ ## Goals
 ⍝ * Create an HTML page with essential information regarding the error, for example:
 ⍝   * Error message
@@ -18,57 +18,54 @@
 ⍝   In case of a threaded application this and the HTML page might be all you get
 ⍝   for analyzing the problem.\\
 ⍝ * Attempts to save an error workspace. Since no workspace can be saved when threads
-⍝   are running `HandleError` will kill all running threads but the main thraed. That
-⍝   means that even in a multi-threaded application you might still get a saved workspace
-⍝   for analyzing purposes if the error happened to occur in the main thread.\\
+⍝   are running, `HandleError` will kill all running threads but the main thread just before
+⍝   attempting to save the workspace. That means that even in a multi-threaded application 
+⍝   you _might_ still get a saved workspace for analyzing purposes if the error happened to 
+⍝   occur in the main thread.\\
 ⍝ ## Parameters
-⍝ All parameters can be changed by setting variables in a namespace
-⍝ returned by `CreateParms` which can be passed as right argument to the main
-⍝ function `Process`. For defaults just pass an empty vector to `Process`.\\
+⍝ All parameters can be changed by setting variables in a namespace returned by `CreateParms`,
+⍝ which can then be passed as right argument to the main function `Process`. 
+⍝ For defaults just pass an empty vector to `Process`.\\
 ⍝ ## Custom stuff
 ⍝ You can make `Process` execute your own code by specifying a custom log function
 ⍝ and / or a custom function for other purposes:
-⍝ * `logFunction` is supposed to be the name of a monadic function that
-⍝   returns a shy result. That function must be able to deal with a simple
-⍝   string as well as vectors of strings. As the name suggests it will be called by
-⍝   `Process` when something needs to be logged.
+⍝ * `logFunction` is supposed to be the name of a monadic function that returns a shy result.
+⍝   That function must be able to deal with a simple character vector as well as vectors of 
+⍝   character vectors. As the name suggests it will be called by `Process` when something needs 
+⍝   to be logged.
 ⍝ * `customFns` can be used to do anything you like. A typical application for this
 ⍝   is sending an email to notify certain people about the crash.\\
 ⍝   The `customFns` must accept  a right argument. This is the parameter namespace
 ⍝   which holds all the parameters plus three additional variables:
-⍝   * `LastError` hold `⎕DM` at the moment of the crash.
-⍝   * `LastErrorNumber` holds `⎕EN` at the moment of the crash.
 ⍝   * `crashFilename` holds the name used for the crash files (HTML file, workspace,
-⍝     DCF file) but without `.extension`.\\
-⍝   This is necessary because something might go wrong inside `HandleError` and, as a
-⍝   side effect, overwrite both `⎕DM` and `⎕EN`.\\
-⍝   The `customFns` shall not return a result. If it does it must be of type "shy";
-⍝   the result will be ignored.\\
+⍝     DCF file) but without `.extension`.
+⍝   * `LastError` holds `⎕DMX.DM` at the moment of the crash.
+⍝   * `LastErrorNumber` holds `⎕DMX.EN` at the moment of the crash.\\
+⍝   The last two steps are necessary because something might go wrong inside `HandleError` and,
+⍝   though trapped, as a side effect overwrite both `⎕DMX.DM` and `⎕DMX.EN`.\\
+⍝   The `customFns` shall not return a result. If it does it must be "shy" and will be ignored.\\
 ⍝ Although both function names may use dotted syntax that would not help in case
-⍝ they live in an instance of a class. For such a case use `logFunctionParent`
+⍝ they live in an instance of a class. In such a case use `logFunctionParent`
 ⍝ and `customFnsParent` respectively in order to define the parent of the functions.\\
 ⍝ ## Windows Event Log
 ⍝ `HandleError` will attempt to write to the Windows Event Log when `windowsEventSource`
-⍝ is not empty. For that to work .NET is required and the Dyalog bridge DLLs are requiered.
+⍝ is not empty. For that to work both .NET and the Dyalog bridge DLLs are required.
 ⍝ That means it would not work out of the box in a runtime application without you taking action, 
 ⍝ though it would of course work in development.\\
 ⍝ ## How tos
 ⍝ * At an early stage (we don't know yet where to save stuff etc) specify an
 ⍝   empty vector as right argument to `SetTrap`.
-⍝ * As soon as you can create a parameter space by calling `CreateParms`,
-⍝   specify the details in it, typically by `#.⎕SHADOW`ing the name of that
-⍝   parameter space in the root within your `⎕LX` function and then assigning
-⍝   it to something like `#.MyParms`.\\
-⍝   `Process` is then able to see this from everywhere when you specify\\
-⍝   `⎕TRAP←0 'E' '#.HandleError.Process' '#.MyParms'`\\
+⍝ * As soon as you can create a parameter space by calling `CreateParms`, assign it to something 
+⍝   like `#.MyParms`, make amendments and finally execute `#.⎕SHADOW 'MyParms'` from within your 
+⍝   `⎕LX` function. That way `Process` will be able to see `MyParms` from everywhere no matter what.\\
 ⍝ ## Notes
 ⍝ * Prior to version 2.2.0 `HandleError` saved crash files in a folder `Errors`
-⍝   that was created as a sibling of either the workspace or the stabnd-alone
+⍝   that was created as a sibling of either the workspace or the stand-alone
 ⍝   EXE. While this policy still holds true under Linux and Mac OS, under Windows
 ⍝   a folder with the name of either the EXE or the WS is created
 ⍝   within %LOCALAPPDATA%, with a sub-folder "Errors" inside it.\\
 ⍝   This is because under Windows the application is unlikely to have the right to
-⍝   write to the directory the EXE is coming from.\\
+⍝   write to the directory the EXE was loaded from.\\
 ⍝ Kai Jaeger ⋄ APL Team Ltd\\
 ⍝ Homepage: <https://github.com/aplteam/HandleError>
 
@@ -76,11 +73,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'HandleError' '4.0.0.37' '2020-12-20'
+      r←'HandleError' '4.0.1.46' '2021-01-21'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 4.0.1
+      ⍝   * Documentation improved
       ⍝ * 4.0.0
       ⍝   * BREAKING CHANGES:
       ⍝     * Requires at least Dyalog 18.0
@@ -97,10 +96,10 @@
     ∇ {r}←{signal}Process parms;crash;TRAP;⎕IO;⎕ML;⎕TRAP;filename
       :Access Public Shared
     ⍝ `⎕OFF`s in runtime or if `enforceOff` is 1 but executes `→` otherwise.\\
-    ⍝ In case you need the name of the error WS you must specify a parameter space. `HandleError` will
+    ⍝ In case you need to save the name of the error WS you must specify a parameter space. `HandleError` will
     ⍝ inject a variable `∆ERROR_WS` into the parameter space.\\
-    ⍝ All actions are performed under error trapping, so it should never fail.\\
-    ⍝ "signal": if specified this overwrites `parms.signal`; this is for test cases only.
+    ⍝ All actions `Process` will execute are performed under error trapping, so it should never fail.\\
+    ⍝ `signal`: if specified this overwrites `parms.signal`; this is for test cases only.
       r←⍬
       ⎕IO←1 ⋄ ⎕ML←1
       TRAP←⎕TRAP                                    ⍝ Remember old setting (for reporting)
@@ -178,30 +177,30 @@
     ⍝ Returns a namespace with default values for the `HandleError` method
     ⍝ | Parameter    | Description|
     ⍝ | - | - |
-    ⍝ | `checkErrorFolder` | Boolean that defaults to 1. If this is 1 and the folder `errorFolder` is pointing to does<<br>>**not** exist it will be created. Needs `FilsAndDirs`! |
-    ⍝ | `createHTML` | Boolean that defaults to 1. A 0 suppresses the creation of the HTML file.|
-    ⍝ | `customFns`  | Fully qualified name of a monadic function to be executed by `Process`.<<br>>Useful to send an email, for example. See also `customFnsParent`.|
-    ⍝ | `customFnsParent` | No default. May be a reference pointing to the parent of the `customFns`.<<br>>Needed only in case that the parent is a class instance since `logFunction` may use dottet syntax.|
-    ⍝ | `enforceOff` | 1: `⎕OFF` no matter whether is's a runtime EXE or not. Mainly for test cases.|
+    ⍝ | `checkErrorFolder` | Boolean that defaults to 1. If this is 1 and the folder `errorFolder` does **not** exist<<br>>it will be created. |
+    ⍝ | `createHTML` | Boolean that defaults to 1. A 0 means that no HTML file will be created.|
+    ⍝ | `customFns`  | Fully qualified name of a monadic function to be executed by `Process`. Useful to send an email, for example. See also `customFnsParent`.|
+    ⍝ | `customFnsParent` | No default. May be a reference pointing to the parent of the `customFns`. Needed only in case the parent is a class instance since `logFunction` may use dottet syntax.|
+    ⍝ | `enforceOff` | Boolean that defaults to 0. With a 1 you can force `HandleError` to `⎕OFF` no matter whether it's a runtime EXE or not. Overwrites `off`. Mainly for test cases.|
     ⍝ | `errorFolder`| Folder that keeps the component file (`crash`), the HTML page and the error WS. See below for rules.|
     ⍝ | `logFunction`| Name of the logging function to be used. See also `logFnsParent`.|
-    ⍝ | `logFnsParent` | No default. May be a reference pointing to the parent of `logFunction`.<<br>>Needed only in case that the parent is a class instance since `logFunction` may use dottet syntax.|
-    ⍝ | `off`        | By default this function executes `⎕OFF` with `returnCode` when in Runtime. A 0 suppresses this.|
+    ⍝ | `logFnsParent` | No default. May be a reference pointing to the parent of `logFunction`. Needed only in case the parent is a class instance since `logFunction` may use dottet syntax.|
+    ⍝ | `off`        | Boolean that defaults to 1 which makes `HandleError` execute `⎕OFF` with `returnCode` only in Runtime. A 0 suppresses this, executing `→` instead. See also `enforceOff`|
     ⍝ | `returnCode` | The return code passed on to `⎕OFF`.|
     ⍝ | `saveCrash`  | Boolean that defaults to 1.<<br>>A 0 suppresses the creation of `crash` & a component file in which `crash` is saved.|
     ⍝ | `saveErrorWS`| Boolean that defaults to 1.<<br>>A 0 suppresses the creation of a crash workspace. There is no point in attempting<<br>>to save a WS in a multi-threaded application for example.|
     ⍝ | `saveVars`   | Boolean that defaults to 1.<<br>>Is ignored when `saveCrash` is 0. If 1 all visible variables are saved in a<<br>>sub namespace `Vars` within `crash`.|
-    ⍝ | `signal`     | When `off` is 0 and `signal` is not 0 then `signal` is signalled by `Process`.<<br>>This can be used for a restart attempt.|
+    ⍝ | `signal`     | When `off` is 0 and `signal` is not 0 then `signal` is `⎕SIGNAL`led by `Process`.<<br>>This can be used for a restart attempt.|
     ⍝ | `trapInternalErrors` | By default all internal errors are trapped:<<br>>`Process` should never crash an application.|
     ⍝ | `trapSaveWSID`       | Boolean that defaults to 1. Makes sure that the `⎕SAVE` statement is guarded.<<br>>Useful to trace through it without a problem in versions prior to 14.1.|
     ⍝ | `windowsEventSource` | Name of the Windows Event Log to write to. Ignored when empty.|
     ⍝ | `addToMsg`           | Will be added to the log file as well as the Windows Event Log messages.<<br>>Mainly for test cases.|\\
-    ⍝ Since version 2.2.0 `errorFolder` defaults to an empty vector. Assuming that the WS or the stand-alone EXE have the name "Foo" the the following rules hold true:
+    ⍝ Since version 2.2.0 `errorFolder` defaults to an empty vector. Assuming that the WS or the stand-alone EXE have the name "Foo" the following rules hold true:
     ⍝ * If `errorFolder` is empty then it defaults to "%LOCALAPPDATA%/Foo/Errors" under Windows and "Errors/" in the current
     ⍝   directory otherwise.
     ⍝ * If `errorFolder` is "Errors/" then this folder will be expected in the current directory.
     ⍝ * If `errorFolder` is an absolute path it is assumed that the last part is the folder that shall hold the crash files.\\
-    ⍝ In all three instances if the folder in question does not exist but `checkErrorFolder` is 1 then it will be created.
+    ⍝ In all three instances if the folder in question does not exist but `checkErrorFolder` is 1 the folder will be created.
       :Access Public Shared
       ⎕IO←0 ⋄ ⎕ML←3
       r←⎕NS''

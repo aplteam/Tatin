@@ -14,6 +14,8 @@
  {}b{('Not valid package IDs: ',⊃,/{⍺,',',⍵}/(~⍺)/deps)##.Assert 0}⍣(0∊b)⊣0
  sofar←Get path
  tempFile←(⊃,/2↑⎕NPARTS filename),'.tmp'
+ sofar←∪sofar
+ sofar←(~(##.Reg.RemoveMinorAndPatch¨sofar)∊##.Reg.RemoveMinorAndPatch¨deps)/sofar
  ((∪sofar,deps)'ASCII')##.F.NPUT tempFile
  ##.F.DeleteFile filename
  filename ⎕NMOVE tempFile

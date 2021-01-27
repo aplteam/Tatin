@@ -1,0 +1,7 @@
+ r←IsRunningAsUserCommand;list
+⍝ Used to establish whether we run as a user command.
+⍝ Important because some function then print important stuff to the session.
+⍝ In the API we don't want that.
+ list←⎕NSI
+ list←(+/∧\∨/¨'⎕SE._Tatin.'∘⍷¨list)↓list
+ r←'⎕SE.SALTUtils.'{⍺≡(≢⍺)↑⍵}⊃list

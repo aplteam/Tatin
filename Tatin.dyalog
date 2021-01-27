@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.14.0 - 2021-01-22
+⍝   * User commands ]TATIN.Init and ]TATIN.CheckForBetterVersion added.
 ⍝ * 0.13.2 - 2021-01-19
 ⍝   * `UnInstall` was visible when it shouldn't have been
 ⍝ * 0.13.1 - 2021-01-10
@@ -129,6 +131,18 @@
           c.Parse←'1s -tags='
           r,←c
      
+          c←⎕NS ⍬
+          c.Name←'Init'
+          c.Desc←'Re-establish the user settings'
+          c.Parse←''
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'CheckForBetterVersion'
+          c.Desc←'Check whether there are better versions available'
+          c.Parse←'1 -major'
+          r,←c
+     
           :If 0 ⍝ Not decided yet whether we allow that at all, or what for
               c←⎕NS ⍬
               c.Name←'UninstallPackage'
@@ -238,6 +252,41 @@
       r←⍪r
     ∇
 
+    ∇ r←CheckForBetterVersion Arg;path;majorFlag;question;this
+      path←Arg._1
+      majorFlag←Arg.major
+      :If majorFlag
+          r←majorFlag TC.CheckForBetterVersion path
+      :Else
+          r←TC.CheckForBetterVersion path
+          r←(0<≢¨r)/r
+     
+          :If 0  ⍝TODO⍝  May be one day we support this, may be not
+              :If 0<≢r
+                  :If 1=≢r
+                      question←'There is a better version:',⎕UCS 13
+                      question,←'  ',(∊r),⎕UCS 13
+                      question,←'Would you like to install this better version?'
+                  :Else
+                      question←'There are better versions:',⎕UCS 13
+                      question,←∊'  '∘,¨r,¨⎕UCS 13
+                      question,←'Would you like to install ALL these better versions?'
+                      :If 1 ∆YesOrNo question
+                          ∘∘∘
+                      :ElseIf 1 ∆YesOrNo'Would you like to installe SOME of these better versions?'
+                          :For this :In r
+                              ∘∘∘
+                          :EndFor
+                      :EndIf
+                  :EndIf
+              :AndIf 1 ∆YesOrNo question
+                  ∘∘∘
+              :EndIf
+          :EndIf
+     
+      :EndIf
+    ∇
+
     ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath
       (sourcePath targetPath)←Arg.(_1 _2)
       'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
@@ -310,6 +359,10 @@
           type←Arg.Switch'all'
       :EndIf
       r←rawFlag TC.ListRegistries type
+    ∇
+
+    ∇ {r}←Init ignored
+      r←TC.Init''
     ∇
 
     ∇ r←ListTags Arg;parms
@@ -541,9 +594,10 @@
           r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
       :Case ⎕C'ListRegistries'
           r,←⊂''
-          r,←⊂'Lists the paths and alias of all Registries defined in the user settings.'
-          r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw table.'
-          r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all data.'
+          r,←⊂'Lists the paths and alias of all Registries defined in the user settings. The result'
+          r,←⊂'is ordered by priority: the first one is scanned first etc.'
+          r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
+          r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all columns'
       :Case ⎕C'ListPackages'
           r,←⊂''
           r,←⊂'Lists all groups defined in the Registry specified as an argument. If no Registry was'
@@ -569,13 +623,21 @@
           r,←⊂'B) Second argument'
           r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
           r,←⊂''
+          r,←⊂'Valid examples are:'
+          r,←⊂'  ]TATIN.LoadPackage aplteam-APLTreeUtils-2.0.0 #.MyPkgs'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]/aplteam-APLTreeUtils2-1.0.0 #.MyPkgs'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1.0.0 #.MyPkgs'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1.0 #.MyPkgs'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1 #.MyPkgs'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2 #.MyPkgs'
+          r,←⊂'  ]TATIN.LoadPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #.MyPkgs'
+          r,←⊂''
           r,←'#.MyPkgs'ExamplesForLoadAndInstall'LoadPackage'
           r,←⊂''
           r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
           r,←⊂''
-          r,←⊂'Installs the given package and all its dependencies into the given folder which'
-          r,←⊂'must exist.'
+          r,←⊂'Installs the given package and all its dependencies into the given folder.'
           r,←⊂''
           r,←⊂'A) First argument'
           r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
@@ -584,7 +646,14 @@
           r,←⊂'   The second argument must be the path to a folder into which the packages are'
           r,←⊂'   going to be be installed'
           r,←⊂''
-          r,←'#.MyPkgs'ExamplesForLoadAndInstall'InstallPackage'
+          r,←⊂'Valid examples are:'
+          r,←⊂'  ]TATIN.InstallPackage aplteam-APLTreeUtils-2.0.0 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage [tatin]/aplteam-APLTreeUtils2-1.0.0 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2-1.0.0 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2-1.0 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2-1 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
           r,←⊂''
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
           r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
@@ -601,6 +670,8 @@
           r,←⊂'or to move it elsewhere. If you want to do anything more than just printing the settings'
           r,←⊂'to the session then you are advised to used the API. Note that there is a dedicated'
           r,←⊂'document for how to use the API, and what for.'
+          r,←⊂''
+          r,←⊂'In case the user command settings got changed you can re-establish them by calling ]Tatin.Init'
       :Case ⎕C'PackageConfig'
           r,←⊂''
           r,←⊂'The argument may be an HTTP request or a path.'
@@ -666,6 +737,24 @@
       :Case ⎕C'ListTags'
           r,←⊂''
           r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
+      :Case ⎕C'Init'
+          r,←⊂''
+          r,←⊂'Re-establishes the user settings in ⎕SE. Call this in case the user settings got changed on file'
+          r,←⊂'and you want to incorporate the changes in the current session.'
+      :Case ⎕C'CheckForBetterVersion'
+          r,←⊂''
+          r,←⊂'Takes the path to a folder with installed packages as argument.'
+          r,←⊂'Checks alle top-level packages in that folder for better versions.'
+          r,←⊂'By default better MAJOR versions are ignored but see -major.'
+          r,←⊂''
+⍝          r,←⊂'If there are better versions the user will be asked whether she wants to install them.'
+⍝          r,←⊂'If she confirms she can decide whether all better packages should be updated in one go,'
+⍝          r,←⊂'or whether the packages will be installed on a one-by-one bases.'
+⍝          r,←⊂''
+          r,←⊂'The default behaviour can be changed by specifying the flag -major.'
+          r,←⊂'Then only better major versions are reported.'
+⍝          r,←⊂'However, there is no semi-automated update procedure in place when -major is specified:'
+⍝          r,←⊂'better version are just reported.'
       :Else
           r←'Unknown command: ',Cmd
       :EndSelect
@@ -678,18 +767,6 @@
       r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID.'
       r,←⊂'* You may also specify an incomplete package ID (in terms of no patch number, or'
       r,←⊂'  neither minor nor patch number), but then you MUST specify a Registry (path or alias).'
-    ∇
-
-    ∇ r←append ExamplesForLoadAndInstall fns
-      r←''
-      r,←⊂'Valid examples are:'
-      r,←⊂'  ]TATIN.',fns,' aplteam-APLTreeUtils-2.0.0 ',append
-      r,←⊂'  ]TATIN.',fns,' [tatin]/aplteam-APLTreeUtils2-1.0.0 ',append
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0.0 ',append
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1.0 ',append
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2-1 ',append
-      r,←⊂'  ]TATIN.',fns,' [tatin]aplteam-APLTreeUtils2 ',append
-      r,←⊂'  ]TATIN.',fns,' /path/to/MyRegistry/aplteam-APLTreeUtils2-1.0.0/ ',append
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

@@ -1,0 +1,10 @@
+ {r}←{flag}PrintToSession msg
+⍝ Prints `msg` to the session if `flag` is `. `flag` defaults to `IsRunningAsUserCommand`
+ flag←{0=⎕NC ⍵:IsRunningAsUserCommand ⋄ ⍎⍵}'flag'
+ :If 0<⎕NC'∆PrintToSession'
+     flag←(,1)≡,∆PrintToSession
+ :EndIf
+ :If flag
+     ⎕←msg
+ :EndIf
+ ⍝Done

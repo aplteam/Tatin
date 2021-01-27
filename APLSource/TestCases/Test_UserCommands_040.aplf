@@ -1,0 +1,13 @@
+ r←Test_UserCommands_040(stopFlag batchFlag);⎕TRAP;res;msg;rc;path
+⍝ Exercise ]Tatin.CheckForBetterVersion with the -major flag
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←'./TestData/Packages/Update-Check-Single'
+ (rc msg res)←∆UCMD'CheckForBetterVersion ',path,' -major'
+ →T.PassesIf 0=rc
+ →T.PassesIf 0=≢msg
+ →T.PassesIf 1=≢res
+ →T.PassesIf∨/'aplteam-MarkAPL-10.0.0'⍷∊res
+
+ r←T._OK

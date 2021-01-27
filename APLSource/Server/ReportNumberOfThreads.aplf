@@ -1,0 +1,13 @@
+ {r}←{threshold}ReportNumberOfThreads INI;maxNoOfThreads
+⍝ If the number of threads is not limited to a very small number (`threshold`, which defaults to 20)
+⍝ anyway and there is less than 20% between the threshold and the number of threads currently
+⍝ running, then we report our findings to the log file.
+⍝ Return 1 when it wrote something to the log and 0 otherwise
+ r←0
+ threshold←{0<⎕NC ⍵:⍎⍵ ⋄ 20}'threshold'
+ maxNoOfThreads←INI.Get'Config:MaxNoOfThreads'
+ :If threshold>maxNoOfThreads÷20   ⍝ Less than 20%?!
+ :AndIf 100<maxNoOfThreads          ⍝ Not limited to a very small number for any reason?
+     Log'Number of threads: ',(⍕≢⎕TNUMS),'; ⎕WA=',(⍕⌊⎕WA÷1000000),'MB'
+     r←0
+ :EndIf

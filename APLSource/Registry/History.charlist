@@ -1,3 +1,12 @@
+* 0.19.0
+  * New function `CheckForBetterVersion` now reports on whether there are better versions of any top-level package.
+  * `Install` and `Load` now report to the session from which Registry they will fetch the package in case the
+     the user did not specify a particular Registry.
+  * `ListRegistries` now orders the data by priority.
+  * The new user command ]TATIN.Init as well as the new API function Tatin.Init allow a user to re-establish the 
+    latest version of the user settings in a running Dyalog session.
+  * The version of Dyalog APL used to run the Server is now shown in the HTML footer.
+  * Reporting threads in `OnHouseKeeping` improved.
 * 0.18.0
   * Tatin now logs actions on application level in addition to communication level (optional).
   * "ReloadWorkspace" now makes sure that all threads are processed before `⎕LOAD` is executed, and
@@ -8,30 +17,5 @@
   * Message improved in case the API of a package cannt be established (Client)
   * Documentation improved: Server installation
   * INI file was processed over and over again. Should only be processed when changed on disk after instantiation. 
-* 0.17.3
-  * A Tatin Server running behind any web server like Apache should now set `BaseTagPort` to enforce
-    the correct port used for the HTML base tag.
-* 0.17.2
-  * Bug fixes:
-    * When a package is installed that is also a dependency of another package Tatin did not
-      deal with this properly.
-    * `GetBestVersionNumber` returned an incorrect result in case ones searches for, say, "WinReg"
-      and there are two different packages "WinReg" and "WinRegSimple".
 
-* 0.17.1
-  * When Tatin was not loaded upfront into ⎕SE, Conga was not initialized correctly.
-  * The meta-base tag was wrong in case the Server port was non-standard (neither 80 nor 443).
-  * User-command help for `LoadPackage` was wrong.
-  * Error message improved in case a package ID without a version number is not found in any registry.
-* 0.17.0
-  * Documentation is complete now; proofreading is still required
-  * `Client.ListPackages` returns a vector with major packages but no dependencies
-  * `]TATIN.ListPackages returns a matrix with major packages but no dependencies
-  * Bug fixes
-    * Under Linux listing packages with -tags= could be wrong due to the fact that
-      file and folder lists are not sorted under Linus.
-    * Identifying a source when "assets" was not empty sometimes failed
-    * A local package with local dependencies could neither be installed nor loaded
-    * Loading a package into ⎕SE did not work
-    * When a valid name is passed as "Load into" but it does not exist yet it should 
-      create the namespace rather than producing an error
+

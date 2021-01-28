@@ -2,10 +2,10 @@
 ⍝ Checks whether the current workspace was modified since the WS was loaded. If that is the case and
 ⍝ the INI entry "ReloadWS" is 1 then we issue a ⎕LOAD
  r←⍬
- :If ∆STARTED<1 ⎕DT⊃('type' 3)F.Dir'Server.dws'
+ :If ∆STARTED<1 ⎕DT⊃('type' 3)F.Dir'.\Dist\Server\Server.dws'
      :If ⊃INI.Get'Config:ReloadWS'
          0 INI.Put'Config:MaxNoOfThreads'       ⍝ Prevent anybody from connecting
-         {1=≢⎕TNUMS:shy←0 ⋄ _←⎕DL ⍵ ⋄ ∇ ⍵}0.5   ⍝ Wait until the threads peter out
+         ⎕DL 5+10×2<≢⎕TNUMS                     ⍝ Gives it at least 5 seconds and 15 if busy
          ⎕LOAD ⎕WSID
      :EndIf
  :EndIf

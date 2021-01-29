@@ -1,13 +1,9 @@
  {r}←Check_DYALOG_NETCORE dummy;value
-⍝ Under Linux and Mac-OS the environment variable DYALOG_NETCORE must be defined and carry the value 1
+⍝ Under Linux and Mac-OS the environment variable DYALOG_NETCORE must either be undefined or carry the value 1
  r←⍬
  :If 'Win'≢A.GetOperatingSystem ⍬
-     :If 0=≢value←2 ⎕NQ'.' 'GetEnvironment' 'DYALOG_NETCORE'
-         'Env vars DYALOG_NETCORE is undefined: .NET Core cannot be used but is required'⎕SIGNAL 11
-     :Else
-         value←,⊃(//)⎕VFI value
-         :If value≢,1
-             'Env vars DYALOG_NETCORE is not 1: .NET Core cannot be used but is required'⎕SIGNAL 11
-         :EndIf
-     :EndIf
+ :AndIf 0<≢value←2 ⎕NQ'.' 'GetEnvironment' 'DYALOG_NETCORE'
+     value←,⊃(//)⎕VFI value
+ :AndIf value≢,1
+     'Env vars DYALOG_NETCORE is not 1: .NET Core cannot be used but is required'⎕SIGNAL 11
  :EndIf

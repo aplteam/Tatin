@@ -7,12 +7,13 @@
  rf←#.Tatin
 
  buff←rf T.FindSpecialString'⍝CHECK⍝'
- buff←(buff[;0]≢¨⎕XSI[0])⌿buff ⍝ remove caller
+ buff←(buff[;0]≢¨⎕XSI[0])⌿buff                  ⍝ remove caller
  :If 0≠≢buff
      report,←↓(⊂' ⍝CHECK⍝ found:'),(⊂'   '),¨buff
  :EndIf
  buff←rf T.FindSpecialString'⍝TODO⍝'
- buff←(buff[;0]≢¨⎕XSI[0])⌿buff ⍝ remove caller
+ buff←(buff[;0]≢¨⎕XSI[0])⌿buff                  ⍝ remove caller
+ buff←({9≠⎕NC ⍵:1 ⋄ ⍵≡⍕⍎⍵}¨buff[;0])⌿buff       ⍝ Remove references
  :If 0≠≢buff
      report,←↓(⊂' ⍝TODO⍝ found:'),(⊂'   '),¨buff
  :EndIf

@@ -49,13 +49,13 @@ The INI file is well documented, so we won't discuss the meaning of the differen
 
 * `[CONFIG]Registry`
 
-   This defines the path to where the Registry lives that is managed by the Tatin Server.
+   This defines the path where the Registry lives that is managed by the Tatin Server.
 
 * `[CONFIG]Base`
 
    Replace this by your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
 
-   Never add a port number; see `[CONFIG]BaseTagPort` for this.
+   Never add a port number to `Base`; see `[CONFIG]BaseTagPort` for this.
 
 * `[CONFIG]BaseTagPort`
 
@@ -78,7 +78,9 @@ The INI file is well documented, so we won't discuss the meaning of the differen
 
 * `[CONFIG]ReloadWS`
 
-   If this is 1 Tatin will check whether the workspace `Server.dws` was changed since it was loaded. If it was Tatin will load it.
+   If this is 1 Tatin will check whether the workspace `Server.dws` was changed since it was loaded. If it was Tatin will load it, meaning that it will kind of restart itself.
+
+   Whether this is a good idea in production is debatable, but it can be very helpful when making changes to the Tatin Server itself.
 
 * The section `[CERTIFICATES]` 
 
@@ -86,13 +88,7 @@ The INI file is well documented, so we won't discuss the meaning of the differen
 You probably want to use your own one.
 
   For more details on certificates see "On Certificates"
-  
-
-* `[WINDOWEVENTLOG]write`
-
-   This parameter is ignored on non-Windows platforms.  
-
-   If you run the Tatin Server as a Windows Service set this to 1. It won't cause harm in case it is 1 but does _not_ run as a Windows Service.
+ 
 
 ## On Logging
 
@@ -112,6 +108,12 @@ There are two different levels available for logging:
 
     The name of the log file looks like `Tatin_{YYYYMMDD}.log`.
 
+* `WindowsEventLog`
+
+   This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.
+
+   If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and any errors are then reported to the Windows Event Log.
+
 ## On Certificates
 
 Note that in case you want your Tatin server to serve requests from the Internet --- as opposed to an Intranet --- it is strongly recommended to hide the Tatin Server behind an industrial-strength HTTP server like Apache.
@@ -128,7 +130,7 @@ This section can be useful in case you want to inject a message into every HTML 
 
 A typical application is the announcement of down time due to maintanance.
 
-In case `Text` is not empty it is injected as `<div><p>{text}</p>?</div>`. If CSS is not empty it is injected into the `<div>`.
+In case `Text` is not empty it is injected as `<div><p>{text}</p>?</div>`. If `CSS` is not empty it is injected into the `<div>` as `style="..."`.
 
 ## The `[APP]` section {#the_app_section}
 
@@ -147,7 +149,7 @@ This section tells Plodder where to find the application-specific logic (Tatin).
 
 After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace.
 
-Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.
+Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but would not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.
 
 In such an event you are most likely interested in the server being restarted automatically.
 
@@ -170,15 +172,8 @@ For testing and debugging you might want to change these settings:
 
 * `[CONFIG]DisplayRequests`
 * `LogHTTPToSession`
-* `TestFlag`; in case this is 1 a Tatin Server supports additional commands:
-
-   * `GetServerPath`
-   * `RecompileIndex`
-   * `Stop`
-   * `Shutdown`
-   * `Crash`
-
-* `ReloadWS`   
+* `TestFlag`; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute 'list-commands'. Naturally this makes sense only under program control, not from a browser.
+* `ReloadWS`
 * The settings in the `[LOGFILE]` section
 
 

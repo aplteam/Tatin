@@ -65,10 +65,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>This defines the name used by Tatin for logging to the Windows Event Log.</p>
 <p>The parameter has no meaning on non-Windows platforms, and is ignored in case <code>[LOGGING]WindowsEventLog</code> is 0 rather than 1.</p></li>
 <li><code>[CONFIG]Registry</code>
-<p>This defines the path to where the Registry lives that is managed by the Tatin Server.</p></li>
+<p>This defines the path where the Registry lives that is managed by the Tatin Server.</p></li>
 <li><code>[CONFIG]Base</code>
 <p>Replace this by your domain name, or “localhost” in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.</p>
-<p>Never add a port number; see <code>[CONFIG]BaseTagPort</code> for this.</p></li>
+<p>Never add a port number to <code>Base</code>; see <code>[CONFIG]BaseTagPort</code> for this.</p></li>
 <li><code>[CONFIG]BaseTagPort</code>
 <p>Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://).</p>
 <p>In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set <code>BaseTagPort</code> to 9999. This makes Tatin inject that port number into the HTML “base” tag, so that for example links in the Tatin documentation would continue to work.</p>
@@ -81,15 +81,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>[CONFIG]Caption</code>
 <p>This defines what all the HTML pages will display as <code>&lt;h1&gt;</code>.</p></li>
 <li><code>[CONFIG]ReloadWS</code>
-<p>If this is 1 Tatin will check whether the workspace <code>Server.dws</code> was changed since it was loaded. If it was Tatin will load it.</p></li>
+<p>If this is 1 Tatin will check whether the workspace <code>Server.dws</code> was changed since it was loaded. If it was Tatin will load it, meaning that it will kind of restart itself.</p>
+<p>Whether this is a good idea in production is debatable, but it can be very helpful when making changes to the Tatin Server itself.</p></li>
 <li>The section <code>[CERTIFICATES]</code>
 <p>A certificate is required in case you want to use https, a must on the Internet these days. You probably want to use your own one.</p>
 <p>For more details on certificates see “On Certificates”</p></li>
-</ul>
-<ul>
-<li><code>[WINDOWEVENTLOG]write</code>
-<p>This parameter is ignored on non-Windows platforms.</p>
-<p>If you run the Tatin Server as a Windows Service set this to 1. It won't cause harm in case it is 1 but does <em>not</em> run as a Windows Service.</p></li>
 </ul>
 <div class="h_tag">
 <a href="#On-Logging" id="On-Logging" class="autoheader_anchor">
@@ -107,6 +103,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>LogFolder</code> must specify the path the Log file lives in.
 <p>The name of the log file looks like <code>Tatin_{YYYYMMDD}.log</code>.</p></li>
 </ul></li>
+<li><code>WindowsEventLog</code>
+<p>This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.</p>
+<p>If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and any errors are then reported to the Windows Event Log.</p></li>
 </ul>
 <div class="h_tag">
 <a href="#On-Certificates" id="On-Certificates" class="autoheader_anchor">
@@ -124,7 +123,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>This section can be useful in case you want to inject a message into every HTML page delivered by Tatin.</p>
 <p>A typical application is the announcement of down time due to maintanance.</p>
-<p>In case <code>Text</code> is not empty it is injected as <code>&lt;div&gt;&lt;p&gt;{text}&lt;/p&gt;?&lt;/div&gt;</code>. If CSS is not empty it is injected into the <code>&lt;div&gt;</code>.</p>
+<p>In case <code>Text</code> is not empty it is injected as <code>&lt;div&gt;&lt;p&gt;{text}&lt;/p&gt;?&lt;/div&gt;</code>. If <code>CSS</code> is not empty it is injected into the <code>&lt;div&gt;</code> as <code>style="..."</code>.</p>
 <div class="h_tag">
 <a href="#the_app_section" id="the_app_section" class="autoheader_anchor">
 <h2 data-id="the_app_section">The <code>[APP]</code> section</h2>
@@ -143,7 +142,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace.</p>
-<p>Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.</p>
+<p>Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but would not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.</p>
 <p>In such an event you are most likely interested in the server being restarted automatically.</p>
 <div class="h_tag">
 <a href="#Windows" id="Windows" class="autoheader_anchor">
@@ -167,14 +166,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><code>[CONFIG]DisplayRequests</code></li>
 <li><code>LogHTTPToSession</code></li>
-<li><code>TestFlag</code>; in case this is 1 a Tatin Server supports additional commands:
-<ul>
-<li><code>GetServerPath</code></li>
-<li><code>RecompileIndex</code></li>
-<li><code>Stop</code></li>
-<li><code>Shutdown</code></li>
-<li><code>Crash</code></li>
-</ul></li>
+<li><code>TestFlag</code>; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute 'list-commands'. Naturally this makes sense only under program control, not from a browser.</li>
 <li><code>ReloadWS</code></li>
 <li>The settings in the <code>[LOGFILE]</code> section</li>
 </ul>

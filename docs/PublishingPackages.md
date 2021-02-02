@@ -21,7 +21,7 @@ If you want to publish on `https://tatin.dev` you need to ask [kai@aplteam.com](
 
 #### The Tatin Test Server
 
-The Tatin test Server publishes its one and only API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including an group name.
+The Tatin test Server publishes its one and only API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name.
 
 However, be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later.
 
@@ -48,6 +48,27 @@ In the first case somebody who provides that API key may publish packages only f
 
 In the second case it's a kind of master password: it allows the creation of packages with _any_ group name.
 
+| **The API-key-related features described next are going to be implemented in version 0.20.0** |
+
+The two scenarios can be mixed:
+
+```
+group1='abc'
+group2='xyz'
+*='other'
+```
+
+This means that one can only publish packages with the groupname "group1" with the API key "abc", packages with the groupname "group2" with the API key "xyz", and anything else with the API key "other".
+
+Note that `*=` means that no API key is required. That's the same as having not credentials file, but it can be useful together with other group names:
+
+```
+group1='abc'
+group2='xyz'
+*=
+```
+
+This is interpreted as _require API keys for the groups "group1" and "group2" but allow anything else without an API key_.
 
 ### The Client
 
@@ -84,10 +105,18 @@ Note that in case you specify a dependency that does not (yet?!) exists on the R
 
 ### Final step
 
-Once the preparation is done the final step is easy:
+Once the preparation is done the final step is easy. You may specify the folder hosting the package:
+
+```
+]TATIN.Publish /path2package [tatin]
+```
+
+The folder may or may not carry a trailing `/`.
+
+You can also create a ZIP file with the `]TATIN.Pack` command and specify that ZIP file:
 
 ```
 ]TATIN.Publish /path2package/group-name-1.2.3.zip [tatin]
 ```
 
-This publishes the package `group-name-1.2.3` to the principal Tatin Server represented by the alias `[tatin]`.
+Both calls would attempt to publish the package `group-name-1.2.3` to the principal Tatin Server represented by the alias `[tatin]`.

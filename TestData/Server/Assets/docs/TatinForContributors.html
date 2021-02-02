@@ -79,11 +79,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Execute this:
 <pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
 <li>Execute this:
-<pre><code>#.Tatin.TestCasesServer.Prepare</code></pre>
-<p>This changes the current directory, loads required dependencies and establishes all required references and then instantiates the <code>Tester2</code> class under the name <code>T</code>.</p></li>
-<li>Execute this:
-<pre><code>#.Tatin.TestCasesServer.T.Run 1</code></pre>
-<p>This will start a Tatin server.</p></li>
+<pre><code>#.Tatin.TestCasesServer.RunTests</code></pre>
+<p>This function changes the current directory, establishes all required references and then instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>Run</code> function from an instance of the <code>Tester2</code> class; this will start a Tatin server.</p></li>
 </ol>
 <p>Now you are ready to execute the test suite.</p>
 <ol start="1">
@@ -91,11 +88,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Execute this:
 <pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
 <li>Execute this:
-<pre><code>#.Tatin.TestCases.Prepare</code></pre>
-<p>This changes the current directory, loads required dependencies and establishes all required references and finally instantiates the <code>Tester2</code> class under the name <code>T</code>.</p></li>
-<li>Execute this:
-<pre><code>#.Tatin.TestCases.T.Run 1</code></pre>
-<p>This will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
+<pre><code>#.Tatin.TestCases.RunTests</code></pre>
+<p>This changes the current directory, establishes all required references, instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>Run</code> function from an instance of the <code>Tester2</code> class; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
 </ol>
 <div class="h_tag">
 <a href="#Do-your-thing" id="Do-your-thing" class="autoheader_anchor">
@@ -111,7 +105,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.</p>
-<p>In order to create new versions of the Client and the Server all you need to to is to execute:</p>
+<p>In order to create new versions of the Client and the Server all you need to do is to execute:</p>
 <pre><code>{noQLXFlag} #.Tatin.Admin.Make {type}</code></pre>
 <ul>
 <li><code>{noQLXFlag}</code> is an optional Boolean that defaults to 0. It makes sense to set this to 1 only for debugging piurposes.</li>
@@ -125,7 +119,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>It compiles the documentation (markdown) to HTML files and copies them around</li>
 <li>It runs <code>#.Tatin.Admin.MakeServer</code></li>
 </ol>
-<p>Along the process any existing <code>.zip</code> files in the <code>Dist/</code> folder will be deleted, and new ones with the current version number will be created. These <code>.zip</code> files are to be released on GitHub.</p>
+<p>In the process the <code>Dist/</code> folder will be recreated from scratch. The <code>.zip</code> files in <code>Dist/</code> are to be released on GitHub.</p>
 <p>There will be three zip files:</p>
 <pre><code>Tatin-Client-{major}.{minor}.{patch}.zip
 Tatin-Documentation-{major}.{minor}.{patch}.zip
@@ -138,7 +132,7 @@ Tatin-Server-{major}.{minor}.{patch}.zip</code></pre>
 </tr>
 <tr>
 <td>Latest update:</td>
-<td>2020-12-12</td>
+<td>2021-01-02</td>
 </tr>
 </tbody>
 </table>

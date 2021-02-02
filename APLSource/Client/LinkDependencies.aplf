@@ -4,24 +4,27 @@
 ⍝ `api` rules, but if it's empty then `name` is taken instead.
  r←⍬
  root←{GetTatinRootSpace 1⊃⍵}⍣(0<≢refs)⊣refs
- :For ref :In refs
-     ref←CheckWsPaths ref
-     :If 0<≢deps←Dependencies.Get⊃{0=≢⍺:⍵ ⋄ ⍺}/ref.(∆HOME ∆URI)
-         deps←ReplaceRegistryAlias¨deps
-         destinations←GetPackageIDFromFilename¨deps
-         destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨destinations
-         destinations←CheckWsPaths¨destinations
-         cfgs←Reg.JSON¨destinations⍎¨⊂'∆CONFIG'
-         :For cfg :In cfgs
-             :If 0<≢cfg.source
-             :AndIf (⊂3⊃⎕NPARTS cfg.source)∊'.aplf' 'aplo'
-                 depNames←⊂2⊃⎕NPARTS cfg.source
-             :Else
-                 depNames←{⍵↑⍨¯1+⍵⍳'-'}∘{⍵↓⍨⍵⍳'-'}¨GetPackageIDFromFilename¨deps
-             :EndIf
-             depNames{0=≢⍵.api:⍺ ⋄ ⍵.api}¨←cfgs
-             depNames ref.{⍎'⎕THIS.',⍺,'←',⍵}¨destinations,¨'.',¨depNames
-         :EndFor
-     :EndIf
- :EndFor
+ :If 0<≢refs
+     PrintToSession'  Establish references to dependencies...'
+     :For ref :In refs
+         ref←CheckWsPaths ref
+         :If 0<≢deps←Dependencies.Get⊃{0=≢⍺:⍵ ⋄ ⍺}/ref.(∆HOME ∆URI)
+             deps←ReplaceRegistryAlias¨deps
+             destinations←GetPackageIDFromFilename¨deps
+             destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨destinations
+             destinations←CheckWsPaths¨destinations
+             cfgs←Reg.JSON¨destinations⍎¨⊂'∆CONFIG'
+             :For cfg :In cfgs
+                 :If 0<≢cfg.source
+                 :AndIf (⊂3⊃⎕NPARTS cfg.source)∊'.aplf' 'aplo'
+                     depNames←⊂2⊃⎕NPARTS cfg.source
+                 :Else
+                     depNames←{⍵↑⍨¯1+⍵⍳'-'}∘{⍵↓⍨⍵⍳'-'}¨GetPackageIDFromFilename¨deps
+                 :EndIf
+                 depNames{0=≢⍵.api:⍺ ⋄ ⍵.api}¨←cfgs
+                 depNames ref.{⍎'⎕THIS.',⍺,'←',⍵}¨destinations,¨'.',¨depNames
+             :EndFor
+         :EndIf
+     :EndFor
+ :EndIf
 ⍝Done

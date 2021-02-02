@@ -43,6 +43,7 @@
  'Package not found'Assert 0<≢identifier
  buildList←GetDependecyTree identifier
  :For level packageID url :In ↓buildList
+     PrintToSession'  Fetching ',packageID,' from ',url,'...'
      tempDir←InstallPackage_ packageID url
      cfg←ReadPackageConfigFile tempDir
      packageID←1 GetPackageIDFromFilename url
@@ -59,6 +60,7 @@
      :EndIf
      refs,←ref
      :If level=1
+         PrintToSession'  Establish reference in ',targetSpace,' for ',saveIn2,'...'
          r←,⊂cfg LinkTargetToPackage saveIn2 targetSpace
      :EndIf
  :EndFor

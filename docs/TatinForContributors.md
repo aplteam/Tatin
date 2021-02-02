@@ -87,18 +87,10 @@ In order to execute the full test suite you need to start a Tatin Server first. 
 3. Execute this:
 
    ```
-   #.Tatin.TestCasesServer.Prepare
+   #.Tatin.TestCasesServer.RunTests
    ```
 
-   This changes the current directory, loads required dependencies and establishes all required references and then instantiates the `Tester2` class under the name `T`.
-
-4. Execute this:
-
-   ```
-   #.Tatin.TestCasesServer.T.Run 1
-   ``` 
-
-   This will start a Tatin server.
+   This function changes the current directory, establishes all required references and then instantiates the `Tester2` class under the name `T` before finally calling the `Run` function from an instance of the `Tester2` class; this will start a Tatin server.
 
 
 Now you are ready to execute the test suite.
@@ -114,18 +106,10 @@ Now you are ready to execute the test suite.
 3. Execute this:
 
    ```
-   #.Tatin.TestCases.Prepare
+   #.Tatin.TestCases.RunTests
    ```
 
-   This changes the current directory, loads required dependencies and establishes all required references and finally instantiates the `Tester2` class under the name `T`.
-
-4. Execute this:
-
-   ```
-   #.Tatin.TestCases.T.Run 1
-   ``` 
-
-   This will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <https://tatin.dev>
+   This changes the current directory, establishes all required references, instantiates the `Tester2` class under the name `T` before finally calling the `Run` function from an instance of the `Tester2` class; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <https://tatin.dev>
 
 
 ## Do your thing
@@ -141,7 +125,7 @@ Whether you improved the documentation or fixed a bug or added a feature, at the
 
 Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.
 
-In order to create new versions of the Client and the Server all you need to to is to execute:
+In order to create new versions of the Client and the Server all you need to do is to execute:
 
 ```
 {noQLXFlag} #.Tatin.Admin.Make {type}
@@ -164,7 +148,7 @@ The `Make` function performs the following steps:
 
 1. It runs `#.Tatin.Admin.MakeServer`
 
-Along the process any existing `.zip` files in the `Dist/` folder will be deleted, and new ones with the current version number will be created. These `.zip` files are to be released on GitHub.
+In the process the `Dist/` folder will be recreated from scratch. The `.zip` files in `Dist/` are to be released on GitHub.
 
 There will be three zip files:
 
@@ -176,4 +160,4 @@ Tatin-Server-{major}.{minor}.{patch}.zip
 
 
 | Created:       | 2020-08-11
-| Latest update: | 2020-12-12
+| Latest update: | 2021-01-02

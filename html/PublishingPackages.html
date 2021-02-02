@@ -41,7 +41,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="The-Tatin-Test-Server">The Tatin Test Server</h4>
 </a>
 </div>
-<p>The Tatin test Server publishes its one and only API key on its website; it's “Tatin-Test-API-Key”. It allows you to publish anything you want, including an group name.</p>
+<p>The Tatin test Server publishes its one and only API key on its website; it's “Tatin-Test-API-Key”. It allows you to publish anything you want, including any group name.</p>
 <p>However, be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later.</p>
 <div class="h_tag">
 <a href="#Running-your-own-Tatin-Server" id="Running-your-own-Tatin-Server" class="autoheader_anchor">
@@ -56,6 +56,23 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>*={api-key}</code></pre>
 <p>In the first case somebody who provides that API key may publish packages only for the group “groupname”.</p>
 <p>In the second case it's a kind of master password: it allows the creation of packages with <em>any</em> group name.</p>
+<table>
+<tbody>
+<tr>
+<td><strong>The API-key-related features described next are going to be implemented in version 0.20.0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The two scenarios can be mixed:</p>
+<pre><code>group1='abc'
+group2='xyz'
+*='other'</code></pre>
+<p>This means that one can only publish packages with the groupname “group1” with the API key “abc”, packages with the groupname “group2” with the API key “xyz”, and anything else with the API key “other”.</p>
+<p>Note that <code>*=</code> means that no API key is required. That's the same as having not credentials file, but it can be useful together with other group names:</p>
+<pre><code>group1='abc'
+group2='xyz'
+*=</code></pre>
+<p>This is interpreted as <em>require API keys for the groups “group1” and “group2” but allow anything else without an API key</em>.</p>
 <div class="h_tag">
 <a href="#The-Client" id="The-Client" class="autoheader_anchor">
 <h3 data-id="The-Client">The Client</h3>
@@ -99,8 +116,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Final-step">Final step</h3>
 </a>
 </div>
-<p>Once the preparation is done the final step is easy:</p>
+<p>Once the preparation is done the final step is easy. You may specify the folder hosting the package:</p>
+<pre><code>]TATIN.Publish /path2package [tatin]</code></pre>
+<p>The folder may or may not carry a trailing <code>/</code>.</p>
+<p>You can also create a ZIP file with the <code>]TATIN.Pack</code> command and specify that ZIP file:</p>
 <pre><code>]TATIN.Publish /path2package/group-name-1.2.3.zip [tatin]</code></pre>
-<p>This publishes the package <code>group-name-1.2.3</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
+<p>Both calls would attempt to publish the package <code>group-name-1.2.3</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
 </body>
 </html>

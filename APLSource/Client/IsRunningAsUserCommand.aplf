@@ -1,7 +1,7 @@
  r←IsRunningAsUserCommand;list
 ⍝ Used to establish whether we run as a user command.
-⍝ Important because some function then print important stuff to the session.
+⍝ Important because some functions then print stuff to the session.
 ⍝ In the API we don't want that.
- list←⎕NSI
- list←(+/∧\∨/¨'⎕SE._Tatin.'∘⍷¨list)↓list
- r←'⎕SE.SALTUtils.'{⍺≡(≢⍺)↑⍵}⊃list
+ list←(4=⊃∘⎕NC¨⎕XSI)/⎕SI                ⍝ We are looking for operator...
+ r←(⊂'__ExecAsTatinUserCommand')∊list   ⍝ ... by the name "__ExecAsTatinUserCommand"
+⍝Done

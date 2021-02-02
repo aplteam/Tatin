@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.15.0 - 2021-02-01
+⍝   * `Publish` now accepts a folder that contains a Tatin package
+⍝   * Help for ListRegistries polished
 ⍝ * 0.14.0 - 2021-01-22
 ⍝   * User commands ]TATIN.Init and ]TATIN.CheckForBetterVersion added.
 ⍝ * 0.13.2 - 2021-01-19
@@ -167,8 +170,16 @@
           r←''
       :Else
           TC←⎕SE._Tatin.Client
-          r←⍎Cmd,' Input'
+          r←((⍎Cmd)__ExecAsTatinUserCommand)Input
       :EndIf
+    ∇
+
+
+    ∇ r←(fns __ExecAsTatinUserCommand)arg
+    ⍝ Fancy name that we can work out whether a Tatin function was called via the User Command framework.
+    ⍝ That makes a difference regarding messages printed to the session.
+      r←fns arg
+    ⍝Done
     ∇
 
     ∇ {r}←{forceLoad}LoadTatin path2Config;buff;home;settings
@@ -300,27 +311,23 @@
       zipFilename←TC.Pack sourcePath targetPath
     ∇
 
-    ∇ r←Publish Arg;zipFilename;url;url_;qdmx;statusCode;list
+    ∇ r←Publish Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename
       r←''
-      (zipFilename url)←Arg.(_1 _2)
-      :If TC.F.IsDir zipFilename
-      :AndIf 0<≢list←⊃TC.F.Dir zipFilename,'/*.zip'
-          list←({TC.Reg.IsValidPackageID_Complete⊃,/1↓⎕NPARTS ⍵}¨list)/list
-      :AndIf 1=≢list
-          :If Arg.quiet
-          :OrIf 1 ∆YesOrNo'Publish ',({~∨/'/\'∊⍵:⍵ ⋄ ⍵↑⍨-¯1+⌊/(⌽⍵)⍳'/\'}1⊃list),' ?'
-              zipFilename←⊃list
-          :Else
-              :Return
-          :EndIf
-      :EndIf
-      'Could not find the ZIP file'Assert TC.F.IsFile zipFilename
-      ('"',zipFilename,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑zipFilename
+      (source url)←Arg.(_1 _2)
       url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_
+      :If TC.F.IsDir source
+          ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_NAME
+      :Else
+          ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
+      :EndIf
       :Trap 98
-          TC.PublishPackage zipFilename url_
-          r←'Package published on ',url_
+          (rc msg zipFilename)←TC.PublishPackage source url_
+          :If 200≡rc
+              r←'Package published on ',url_
+          :Else
+              r←msg,'; RC=',⍕rc
+          :EndIf
       :Else
           qdmx←⎕DMX
           :If 'HTTP status code:'{⍺≡(≢⍺)↑⍵}qdmx.EM
@@ -594,8 +601,9 @@
           r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
       :Case ⎕C'ListRegistries'
           r,←⊂''
-          r,←⊂'Lists the paths and alias of all Registries defined in the user settings. The result'
-          r,←⊂'is ordered by priority: the first one is scanned first etc.'
+          r,←⊂'Lists URI, alias and priority of all Registries defined in the user settings.'
+          r,←⊂'The result is ordered by priority: the first one is scanned first etc.'
+          r,←⊂''
           r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
           r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all columns'
       :Case ⎕C'ListPackages'

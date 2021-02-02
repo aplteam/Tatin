@@ -3,5 +3,5 @@
  list←F.ListDirs registryPath                           ⍝ All folder name
  list←{⊃,/1↓⎕NPARTS ⍵}¨list                             ⍝ Remove path: we only need the package IDs
  list←(IsValidPackageID_Complete¨list)/list             ⍝ Remove everything that is not a valid package ID
- list←list[⍋list]                                       ⍝ Only under Windows is the list sorted
+ list←list[SortIndexForPackageIDs list]                 ⍝ Only under Windows is the list sorted
 ⍝Done

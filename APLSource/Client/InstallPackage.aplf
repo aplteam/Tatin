@@ -14,6 +14,7 @@
  ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
  identifier←CheckVersion identifier
  'Package not found'Assert 0<≢identifier
+ PrintToSession'  Attempting to install ',identifier,'...'
  :If ~'/'∊identifier
  :AndIf '.zip'≢⎕C ¯4↑identifier
      packageID←GetPackageIDFromFilename identifier
@@ -27,8 +28,11 @@
      'ZIP files cannot be installed via HTTP'Assert 0
  :EndIf
  alias←{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}identifier_   ⍝ Not supported yet
+ PrintToSession'  Establish dependencies...'
  :If 0<≢buildList←GetDependecyTree identifier
+     PrintToSession'  ',(⍕≢buildList),' dependencies identified'
      :For level packageID2 url :In ↓buildList
+         PrintToSession'  Fetching ',packageID2,' from ',(RemovePackageID url),'...'
          installFolder←(Reg.AddSlash targetFolder),packageID2
          :If level=1
          :AndIf F.Exists installFolder
@@ -41,9 +45,11 @@
              F.RmDir tempDir
          :EndIf
          :If 1=level
+             PrintToSession'  Add ',packageID2,' to dependency file...'
              targetFolder Dependencies.Add packageID2
          :EndIf
      :EndFor
+     PrintToSession'  Saving build list... '
      SaveBuildList buildList targetFolder
  :EndIf
 ⍝Done

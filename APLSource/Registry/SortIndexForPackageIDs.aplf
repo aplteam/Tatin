@@ -2,6 +2,7 @@
 ⍝ ⍵ is either a list of package IDs or a list of version numbers
 ⍝ This needs some gymnastics in order to make sure that
 ⍝ {group}-{name}-9.0.0 comes before [group}-{name}-10.0.0
-     '-'∊⊃⍵:⍋{buff[1 2],{⊃,/¯4↑¨'.'A.Split ⍵}3⊃buff←'-'A.Split ⍵}¨⍵
-     ⍋{⊃,/¯4↑¨'.'A.Split ⍵}¨⍵
+     ∧/~'.'∊¨⍵:⍋⎕C ⍵
+     '-'∊⊃⍵:⍋⎕C{buff[1 2],{⊃,/¯4↑¨'.'A.Split ⍵}3⊃buff←'-'A.Split ⍵}¨⍵
+     ⍋⎕C{⊃,/¯4↑¨'.'A.Split ⍵}¨⍵
  }

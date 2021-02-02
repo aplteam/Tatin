@@ -29,7 +29,7 @@ The name of the file is `tatin-client.json`.
 
 ### May I edit it?
 
-Of course you are free to edit that file with any editor. However, if you are not familiar with [JSON5](https://json5.org/) then keep in mind that you are in charge for making sure that the contents of the file is valid JSON5: if it's not, Tatin will crash.
+Of course you are free to edit that file with any editor. However, keep in mind that you are in charge for making sure that the contents of the file is valid JSON5[^JSON5]: if it's not, Tatin will crash.
 
 Changing the contents of that file by other means --- discussed next --- is much saver as it would check your input and also make  sure that the contents of the file is always valid (syntactically correct).
 
@@ -38,6 +38,16 @@ Changing the contents of that file by other means --- discussed next --- is much
 When Tatin is initialized (that is discussed in detail in the document "InitializingTatin") in creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`.
 
 The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.
+
+### Syncing file and workspace
+
+If you change the file and have an APL session up and running then your change does not have an impact on the APL session. Also, if you have two APL session running, and you make changes in one session the other would not know about those changes.
+
+However, you can force Tatin to bring the session in line with what is saved in the configuration file by executing:
+
+```
+      ]TATIN.Init
+```
 
 
 ### Summary
@@ -191,3 +201,5 @@ You could also specify the permanent flag already when instantiating the class `
 Note the 1 at the end: this defines `permanent`. This tells the `UserSettings` class that from now on this user settings file shall be used whenever a new instance of Dyalog is started.
 
 Note that this also allows easy switching between several user settings files by simply adjusting the contents of the `.tatin` file.
+
+[^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site")  rather than JSON

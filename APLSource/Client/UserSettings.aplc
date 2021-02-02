@@ -327,6 +327,7 @@
     ⍝ Reads the Client's config file
       r←⍬
       ns←⎕NS home.Reg.GetJsonFromFile path2config
+      ns.registries.uri←{f←'\\'≡2⍴⍵ ⋄ AddSlash (f/'\\'),##.F.EnforceSlash(2×f)↓⍵}¨ns.registries.uri
       :If 0<≢ns.registries
           _registries←ns.registries[⍋ns.registries.priority]
       :Else
@@ -346,7 +347,7 @@
           Read _path2config
       :EndIf
     ∇
-    
-     AddSlash←{⍵,(~(¯1↑⍵)∊'/\')/'/'}
+
+    AddSlash←{⍵,(~(¯1↑⍵)∊'/\')/'/'}
 
 :EndClass

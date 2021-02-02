@@ -22,11 +22,13 @@
  :If Reg.IsHTTP uri
      PublishPackageToRemoteRegistry_ zipFilename uri
  :Else
+     PrintToSession'  Read config file for ',source,'...'
      cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_NAME}source
+     PrintToSession'  Attempting to publish ',source,'...'
      (statusCode errMsg)←cfg Reg.PublishPackage zipFilename uri
      :If 200≠statusCode
      :AndIf '.zip'≢⎕C⊃¯1↑⎕NPARTS source
-         ⍝ Was created on the fly, so we clean up
+         PrintToSession'  Cleaning up temp file...'
          F.DeleteFile zipFilename
          zipFilename←''
      :EndIf

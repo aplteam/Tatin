@@ -25,6 +25,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Whats-the-name-of-that-file">What's the name of that file?</a></li>
 <li><a href="#May-I-edit-it">May I edit it?</a></li>
 <li><a href="#What-does-Tatin-do-with-the-file">What does Tatin do with the file?</a></li>
+<li><a href="#Syncing-file-and-workspace">Syncing file and workspace</a></li>
 <li><a href="#Summary">Summary</a></li>
 </ul></li>
 <li><a href="#Adding-and-removing-Registries">Adding and removing Registries</a>
@@ -78,7 +79,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="May-I-edit-it">May I edit it?</h3>
 </a>
 </div>
-<p>Of course you are free to edit that file with any editor. However, if you are not familiar with <a href="https://json5.org/" class="external_link">JSON5</a> then keep in mind that you are in charge for making sure that the contents of the file is valid JSON5: if it's not, Tatin will crash.</p>
+<p>Of course you are free to edit that file with any editor. However, keep in mind that you are in charge for making sure that the contents of the file is valid JSON5[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]: if it's not, Tatin will crash.</p>
 <p>Changing the contents of that file by other means — discussed next — is much saver as it would check your input and also make sure that the contents of the file is always valid (syntactically correct).</p>
 <div class="h_tag">
 <a href="#What-does-Tatin-do-with-the-file" id="What-does-Tatin-do-with-the-file" class="autoheader_anchor">
@@ -87,6 +88,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>When Tatin is initialized (that is discussed in detail in the document “InitializingTatin”) in creates an instance of the <code>UserSettings</code> class with the name <code>MyUserSettings</code> which lives in <code>⎕se.Tatin</code>.</p>
 <p>The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.</p>
+<div class="h_tag">
+<a href="#Syncing-file-and-workspace" id="Syncing-file-and-workspace" class="autoheader_anchor">
+<h3 data-id="Syncing-file-and-workspace">Syncing file and workspace</h3>
+</a>
+</div>
+<p>If you change the file and have an APL session up and running then your change does not have an impact on the APL session. Also, if you have two APL session running, and you make changes in one session the other would not know about those changes.</p>
+<p>However, you can force Tatin to bring the session in line with what is saved in the configuration file by executing:</p>
+<pre><code>      ]TATIN.Init</code></pre>
 <div class="h_tag">
 <a href="#Summary" id="Summary" class="autoheader_anchor">
 <h3 data-id="Summary">Summary</h3>
@@ -213,5 +222,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       ⎕SE.Tatin.MyUserSttings←⎕new ⎕se.Tatin.UserSettings path  1</code></pre>
 <p>Note the 1 at the end: this defines <code>permanent</code>. This tells the <code>UserSettings</code> class that from now on this user settings file shall be used whenever a new instance of Dyalog is started.</p>
 <p>Note that this also allows easy switching between several user settings files by simply adjusting the contents of the <code>.tatin</code> file.</p>
+<div id="footnotes_div">
+<hr>
+<p><strong>Footnotes</strong></p>
+<ol>
+<li id="fnref1"><p>Tatin uses <a href="https://json5.org/" class="external_link" title="Link to the JSON5 web site">JSON5</a> rather than JSON</p><a href="#fnref1" class="footnote_anchor"></a>
+</ol>
+</div>
 </body>
 </html>

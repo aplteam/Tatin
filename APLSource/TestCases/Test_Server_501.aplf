@@ -1,6 +1,6 @@
- r←Test_Server_500(stopFlag batchFlag);⎕TRAP;packageID;serverPath;qdmx;reg;oldCredentials
+ r←Test_Server_501(stopFlag batchFlag);⎕TRAP;packageID;serverPath;qdmx;reg;oldCredentials
  ;zip;cfg;body;clientCfg;dir;src;res
-⍝ Try to publish a package with an invalid API key
+⍝ Publish a package with a group name that requires a specific API key but use the generic one
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -13,18 +13,16 @@
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
  cfg←TC.InitPackageConfig ⍬
- cfg.group←'Example'
+ cfg.group←'protected'
  cfg.name←'Package_A'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
  cfg TC.WritePackageConfigFile src
 
- packageID←'Example-Package_A-0.1.0'
-
+ packageID←'protected-Package_A-0.1.0'
  reg←TC.MyUserSettings.GetRegistry'https://localhost'
  oldCredentials←reg.api_key
- reg.api_key←'Firlefanz'
- TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
+ reg.api_key←'test-api-key'        ⍝ This should NOT fit this particular group (though any other)
  :Trap 0
      TC.PublishPackage src('https://localhost/',packageID)
      →T.GoToTidyUp 1
@@ -40,5 +38,6 @@
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
  Assert 0=⊃F.RmDir dir
  Assert 0=⊃F.RmDir serverPath,'/',packageID
+ F.DeleteFile(739⌶0),'/',packageID,'.zip'
  ∆RecompileIndexOnServer
 ⍝Done

@@ -1,6 +1,6 @@
- r←Test_Server_500(stopFlag batchFlag);⎕TRAP;packageID;serverPath;qdmx;reg;oldCredentials
+ r←Test_Server_502(stopFlag batchFlag);⎕TRAP;packageID;serverPath;reg;oldCredentials;rc;msg;zipFilename
  ;zip;cfg;body;clientCfg;dir;src;res
-⍝ Try to publish a package with an invalid API key
+⍝ Publish a package with a group name that requires a specific API key, and provide it
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -13,25 +13,22 @@
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
  cfg←TC.InitPackageConfig ⍬
- cfg.group←'Example'
+ cfg.group←'protected'
  cfg.name←'Package_A'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
- cfg TC.WritePackageConfigFile src
 
- packageID←'Example-Package_A-0.1.0'
+ cfg TC.WritePackageConfigFile src
 
  reg←TC.MyUserSettings.GetRegistry'https://localhost'
  oldCredentials←reg.api_key
- reg.api_key←'Firlefanz'
+ reg.api_key←'ByAPI-Key'        ⍝ This should fit for this particular group
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
- :Trap 0
-     TC.PublishPackage src('https://localhost/',packageID)
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'Unauthorized request'≢qdmx.EM
- :EndTrap
+
+ packageID←'protected-Package_A-0.1.0'
+ (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
+ →T.GoToTidyUp 200≠rc
+ →T.GoToTidyUp 0≠≢msg
 
  r←T._OK
 
@@ -40,5 +37,6 @@
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
  Assert 0=⊃F.RmDir dir
  Assert 0=⊃F.RmDir serverPath,'/',packageID
+ F.DeleteFile(739⌶0),'/',packageID,'.zip'
  ∆RecompileIndexOnServer
 ⍝Done

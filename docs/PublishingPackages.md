@@ -48,8 +48,6 @@ In the first case somebody who provides that API key may publish packages only f
 
 In the second case it's a kind of master password: it allows the creation of packages with _any_ group name.
 
-| **The API-key-related features described next are going to be implemented in version 0.20.0** |
-
 The two scenarios can be mixed:
 
 ```

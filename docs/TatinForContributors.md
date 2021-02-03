@@ -111,6 +111,14 @@ Now you are ready to execute the test suite.
 
    This changes the current directory, establishes all required references, instantiates the `Tester2` class under the name `T` before finally calling the `Run` function from an instance of the `Tester2` class; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <https://tatin.dev>
 
+A> ### On test cases
+A>
+A> The procedure outlined in this document discuss just how to run test tests in case you expect them to succeed. The test framework offers much more than that: it is flexible and powerful; for details refer to <https://github.com/aplteam/Tester2>
+A>
+A> If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the `RunTests` functions.
+A>
+A> In particular the `Prepare` function, which is called by the `RunTests` functions, is important: it instantiates the `Tester2` class as `T`, and that's the starting point for whatever your are trying to achieve.
+
 
 ## Do your thing
 

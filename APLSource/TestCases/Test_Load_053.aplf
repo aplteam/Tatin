@@ -1,4 +1,4 @@
- r←Test_Load_053(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_Load_053(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish three packages two of wich depend on each other (circle), then load from specific Registry.
 ⍝ "A" depends on "B" which depends on "C" while "C" depends on "B".
@@ -10,6 +10,7 @@
  dir←GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
+ toBeDeleted←''
 
  F.MkDir src2←src,'/package_A'
  TC.Reg.CreateRegistry reg
@@ -23,6 +24,7 @@
  cfg TC.WritePackageConfigFile src2
  src2 TC.Dependencies.Add'[local2]Example-B-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  F.MkDir src3←src,'/B'
@@ -35,6 +37,7 @@
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-C-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  F.MkDir src3←src,'/C'
@@ -47,6 +50,7 @@
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-B-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/Example-A-1.0.0')#.TEMP
@@ -57,5 +61,6 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

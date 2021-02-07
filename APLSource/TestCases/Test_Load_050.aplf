@@ -1,4 +1,4 @@
- r←Test_Load_050(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_050(stopFlag batchFlag);⎕TRAP;toBeDeleted;rc;msg;zipFilename
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish two packages consisting of a single function with the second depending on the first, then load from a Registry.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -10,6 +10,7 @@
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
  F.MkDir src2←src,'/Package_A'
+ toBeDeleted←''
 
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
@@ -21,7 +22,8 @@
  cfg.source←'Package_A.apln'
  cfg TC.WritePackageConfigFile src2
  src2 TC.Dependencies.Add'[local2]Example-Package_B-1.0.0'
- TC.PublishPackage src2 reg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
 
  F.MkDir src3←src,'/Package_B'
  body←'r←Times y' 'r←×/ y'
@@ -30,7 +32,8 @@
  cfg.(group name version)←'Example' 'Package_B' '1.0.0'
  cfg.source←'Times.aplf'
  cfg TC.WritePackageConfigFile src3
- TC.PublishPackage src3 reg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
 
  refs←TC.LoadPackage(reg,'/Example-Package_A-1.0.0')#.TEMP
  →T.GoToTidyUp 12≠#.TEMP.Package_A.Times 3 4
@@ -40,5 +43,6 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

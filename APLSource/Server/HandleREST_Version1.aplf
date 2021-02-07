@@ -14,6 +14,8 @@
      response←request ProcessTestCommands(⎕C path)specialCommands
  :Else
      :Select path
+     :Case GetVersion_REST'all_packages'
+         response←request GetFullPackageList packageID
      :Case GetVersion_REST'packages'
          response←request GetPackageList packageID
      :Case GetVersion_REST'packages/major_versions'
@@ -34,6 +36,8 @@
          response←GetTagList request
      :Case GetVersion_REST'documentation'
          response←CreateDocumentationIndex request
+     :Case GetVersion_REST'version'
+         response←GetServerVersion request
      :Else
          ⍝ Something new?
          response←request Respond 400 1 ⍝ Not a valid REST version 1 request

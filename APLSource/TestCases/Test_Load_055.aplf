@@ -1,4 +1,4 @@
- r←Test_Load_055(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_Load_055(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish two packages (consisting of classes) with a dependency, then load from specific Registry.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -12,6 +12,7 @@
  F.MkDir src2←src,'/MyClass/'
  F.MkDir src3←src,'/MyBaseClass/'
  {F.MkDir ⍵,'/source'}¨src2 src3
+ toBeDeleted←''
 
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
@@ -23,6 +24,7 @@
  cfg TC.WritePackageConfigFile src2
  src2 TC.Dependencies.Add'[local2]MyCompany-MyBaseClass-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Class MyBaseClass' '∇r←Copyright' ':Access Public Shared' 'r←''Copyright This and that 2020''' '∇' ':EndClass'
@@ -31,6 +33,7 @@
  cfg.(group name version)←'MyCompany' 'MyBaseClass' '1.0.0'
  cfg TC.WritePackageConfigFile src3
  (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/MyCompany-MyClass-1.0.0')#.TEMP
@@ -42,5 +45,6 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

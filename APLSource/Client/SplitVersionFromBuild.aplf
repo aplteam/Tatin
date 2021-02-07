@@ -1,0 +1,18 @@
+ (version2 patch)←SplitVersionFromBuild version;bool;ind
+⍝ ('1.2.3' '')         ← SplitVersionFromBuild '1.2.3'
+⍝ ('1.2.3-beta-1' '')  ← SplitVersionFromBuild '1.2.3-beta-1'
+⍝ ('1.2.3' '34')       ← SplitVersionFromBuild '1.2.3.34'
+⍝ ('1.2.3' '34')       ← SplitVersionFromBuild '1.2.3+34'
+⍝ ('1.2.3-beta1' '34') ← SplitVersionFromBuild '1.2.3-beta1+34'
+ :If 0∊bool←3>+\'.'=version
+     version2←bool/version
+     patch←(-¯1++/∧\⌽~bool)↑version
+ :ElseIf '+'∊version
+     ind←version⍳'+'
+     patch←ind↓version
+     version2←(ind-1)↑version
+ :Else
+     version2←version
+     patch←''
+ :EndIf
+⍝Done

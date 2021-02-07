@@ -25,20 +25,36 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>The version number of a Tatin package must follow the rules for Semantic Versioning: it always has the format <code>{major}.{minor}.{patch}</code>.</p>
-<p>After <code>{patch}</code> there might be more information available, separated from the patch number by either a dot or a hyphen, but this is just for convenience; Tatin would simply ignore any additional pieces of information.</p>
+<p>After <code>{patch}</code> there might be more information available, separated from the patch number by a hyphen.</p>
 <p>Valid examples for a version number are therefore:</p>
 <pre><code>0.1.0
 1.0.0
 12.23.199
-2.3.4.1456
 1.2.3-beta-1</code></pre>
-<p>The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped.</p>
+<p>These pieces of information fully participate when Tatin needs to establish package prevalence:</p>
+<p><code>1.2.3</code> is “better” than <code>1.2.2</code> but also “better” as <code>1.2.3-beta1</code> of course.</p>
+<p>Information after the hyphen is restricted to ASCII characters and digits until a dot (<code>.</code>)or a plus (<code>+</code>) is detected.</p>
+<div class="h_tag">
+<a href="#Build-numbers" id="Build-numbers" class="autoheader_anchor">
+<h3 data-id="Build-numbers">Build numbers</h3>
+</a>
+</div>
+<p>After {majow}-{minor}-{patch} you may add the optional build number. Build numbers <em>do not</em> participate in establishing prevalence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.</p>
+<p>A build number, when specified, needs to be separated by a <code>+</code> (recommended) or a <code>.</code> (deprecated). A build number may consist of digits and obly digits.</p>
+<p>Note that when there are more than three dots in the version number, then the first two dots are part of establishing major, minor and patch number while the last dot defines what is considered the build number.</p>
+<pre><code>2.3.4.1456    ⍝ deprecated
+2.3.4+1456    ⍝ recommended
+1.2.3-beta-1      (becomes 1.2.3-beta-1 as a Tatin package)
+1.2.3-beta-1.123  (becomes 1.2.3-beta-1 as a Tatin package; deprecated)
+1.2.3-beta-1+123  (becomes 1.2.3-beta-1 as a Tatin package; recommended)</code></pre>
+<p>Therefore <code>1.2.3.4</code> is valid, with 4 being the build number. <code>1.2.3-beta-1.4</code> is valid, with 4 being the build number. <code>1.2.3-beta-1</code> is valid, no build number. <code>1.2.3-beta-1.abc</code> is <em>invalid</em>.</p>
+<p>The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing preferences: build numbers are always ignored.</p>
 <div class="h_tag">
 <a href="#Terminology-and-versioning-Rules" id="Terminology-and-versioning-Rules" class="autoheader_anchor">
 <h2 data-id="Terminology-and-versioning-Rules">Terminology and versioning Rules</h2>
 </a>
 </div>
-<p>Given <code>1.2.3.4</code>:</p>
+<p>Given <code>1.2.3+4</code>:</p>
 <ul>
 <li><code>1</code> is the <em>major version number</em></li>
 <li><code>2</code> is the <em>minor version number</em></li>

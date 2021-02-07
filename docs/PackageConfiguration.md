@@ -69,32 +69,56 @@ By default a package is established in the target space under its own name. Howe
 
 #### api
 
-Things are different with namespaces, and with collections of namespaces and/or classes: In that case the names of some of the functions (for namespaces) or some of the classes might become the API.
+There are two different scenarios:
 
-Defines the API of the package. In the example the package consists of a single class named `DotNetZip`, therefore the class name is identical with the API. Similarly, if the package consists of a single function --- not that this is recommended! --- the name of the function is the API.
+* The package consists of a single function or a single operator or a single class or a single namespace, be it scripted or not
 
-A> ### Defining an API with namespaces
-A> Classes have a build-in mechanism for hiding details (all the private stuff) and offering a public interface (API): all the public stuff. Namespaces lack this.
-A>
-A> Thanks to references you can still easily simulate this. Given a namespace `Foo` one common technique is to put all the functions, variables, operators and sub-namespaces into a namespace `Foo.core`.
-A> 
-A> You can then create the public interface by assigning references in `Foo`. If there is just one function (`Run`) and just one variable (`DATA`) that should be public then this would do:
-A> ```
-A> #.Foo.Run←#.Foo.core.Run
-A> #.Foo.Data←#.Foo.core.DATA
-A> ```
-A>
-A> That would not work with niladic functions, but purists would argue that you should not have niladic functions at all: by definition a function takes an argument, manipulates it and returns it. A niladic "function" might return something, but it  cannot take something, so calling it a function is questionable.
+* The package consists of several functions, operators, classes or namespaces
+
+In the former case what is the api of the package is obvious, and there is no need to even specify it: Tatin will recognize that the name of that single function or single operator or single class or single namespace must be the API of the package, and act accordingly.
+
+If it's a single function (not that this is recommended!) and the name of the package is `Foo`, then calling the function is identical with the package name.
+
+In the latter case it is not obvious at all what the API should be, and the user must specify it.
+
+Also, while a single namespace is by default the API, the user might want to expose only a subset of functions/operators from that namespace, and in that case the user must specify "api" as well.
+
+Namespaces are special: imagine a situation when you have a single namespace that contains, say, a hundred functions of which only one should be exposed. If that function is called `Run` then of course the api needs to become `api←'Run'`.
+
+If the name of the package is `Foo` and it is loaded into `#.MyPkgs` then calling the function requires:
+
+```
+#.MyPkgs.Foo.Run
+```
+
+If you want to expose two functions, `CreateParameterSpace` and `Run`, then the api needs to be specified as:
+
+```
+api←`CreateParameterSpace,Run`
+```
+
+Calling the two functions would look similar to this:
+
+```
+parms←#.MyPkgs.Foo.CreateParameterSpace ⍬
+#.MyPkgs.Foo.Run parms
+```
+
+Notes: 
+
+* If specified "api" must be either a single name or a list of comma-separated names. Names must be relative, never absolute, therefore they must never start with `#` or `⎕`.
+
+* Niladic functions _cannot_ become part of an API. Tatin will create references in the target namespace, and onme cannot create a reference for a niladic function.
 
 #### assets
 
-This can be one of:
+This must be a simple text vector that is one of:
 
-* A simple text vector representing a single filename
-* A simple text vector representing a the name of a folder
-* A vector of text vectors representing files or folders or a mixture of both
+* A single filename
+* A single folder name
+* A simple text vector representing a mixture of file names and folder names separated by `,`.
 
-The path must be relative to the package since the file or the folder are part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`" or with "`./`". If it does anyway an error is thrown.
+The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`" or with "`./`". If it does anyway an error is thrown.
 
 There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative. 
 
@@ -134,22 +158,23 @@ If `source` is left empty Tatin will attempt to identify the source itself.
 
 * If there is a single script file found with one of the aforementioned extensions that file will become the source.
 
-* If there is no file with such an extension all folders are investigated except those mentioned as "assets". If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.
+* If there is no file with such an extension, all folders are investigated except those mentioned as "assets". If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.
 
-* If Tatin cannot establish the source an error will be thrown.
+* If Tatin cannot establish the source an error will be thrown, and the user _must_ specify "source".
 
 #### tags
 
-A simple text vector, possibly empty (though that is not recommended), that should contain semicolon-separated lists of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.
+A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.
 
 #### version
 
 The version[^version] part of the package ID[^id]
 
-[^id]: A package ID consists of `{group}-{name}-{major.{minor}.{patch}`
-[^version]: A version is built from the major number, the minor number and the version number, and possibly a build number (which is not recorded in the package configuration file). 
+Examples for valid version numbers are `1.2.3`, `1.2.3-beta1`, `1.2.3-beta1.30164` and `18.0.0.30165`
 
-  Examples for valid version numbers are `1.2.3` and `18.0.0.30165`
+An optional build number is ignored by Tatin.
+
+For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
 ### Access after loading a package
 
@@ -161,3 +186,6 @@ Note that `∆HOME` will be empty in case two conditions are met:
 * The package does not have any assets
 
 All of them are niladic functions because that's how we emulate constants in APL.
+
+[^id]: A package ID consists of `{group}-{name}-{major.{minor}.{patch}`
+[^version]: A version is built from the major number, the minor number and the version number, 

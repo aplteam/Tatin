@@ -1,7 +1,8 @@
  ValidatePackageFiles←{
      ⍺←''
      cfg←⍵
-     0<cfg.⎕NC'assets':cfg⊣cfg.assets←,⊆⍣(0<≢∊cfg.assets)⊣cfg.assets
-     cfg.assets←''
+     0=cfg.⎕NC'assets':cfg⊣cfg.assets←''
+     1=≡cfg.assets:cfg
+     cfg.assets←⊃{⍺,',',⍵}/cfg.assets
      cfg
  }

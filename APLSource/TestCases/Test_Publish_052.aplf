@@ -1,4 +1,4 @@
- r←Test_Publish_052(stopFlag batchFlag);⎕TRAP;qdmx;rc;msg;zipFilename;src1;src2
+ r←Test_Publish_052(stopFlag batchFlag);⎕TRAP;qdmx;rc;msg;zipFilename;src1;src2;toBeDeleted
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src;src3
 ⍝ Publish a package with a dependency were the specified version does not exist
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -9,6 +9,7 @@
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  (src1 src2)←src∘,¨'/A' '/Foo'
  F.MkDir src1 src2 reg
+ toBeDeleted←''
 
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
@@ -20,6 +21,7 @@
  cfg.source←'Foo.apln'
  cfg TC.WritePackageConfigFile src2
  (rc msg zipFilename)←TC.PublishPackage src2 reg             ⍝ You might want to install a package with a not yet published dependency
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Namespace A' 'foo←{' '##.Times ⍵' '}' ':EndNamespace'
@@ -31,6 +33,7 @@
  src1 TC.Dependencies.Add'[local2]Example-Foo-2.0.0'         ⍝ Only version 1.0.0 does exist!
 
  (rc msg zipFilename)←TC.PublishPackage src1 reg             ⍝ You might want to install a package with a not yet published dependency
+ toBeDeleted,←⊂zipFilename
  →T.GoToTidyUp rc≠200                                        ⍝ And that should work!
  →T.GoToTidyUp 0=≢zipFilename
 
@@ -40,5 +43,5 @@
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
  #.⎕EX TC.GetTatinRootSpace'#'
- F.DeleteFile zipFilename
+ F.DeleteFile toBeDeleted
 ⍝Done

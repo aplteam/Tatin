@@ -10,7 +10,7 @@ Tatin is based on the concept of Semantic Versioning (SemVer), so before we go i
 
 The version number of a Tatin package must follow the rules for Semantic Versioning: it always has the format `{major}.{minor}.{patch}`. 
 
-After `{patch}` there might be more information available, separated from the patch number by either a dot or a hyphen, but this is just for convenience; Tatin would simply ignore any additional pieces of information.
+After `{patch}` there might be more information available, separated from the patch number by a hyphen.
 
 Valid examples for a version number are therefore:
 
@@ -18,15 +18,38 @@ Valid examples for a version number are therefore:
 0.1.0
 1.0.0
 12.23.199
-2.3.4.1456
-1.2.3-beta-1
+1.2.3-beta-1     
 ```
 
-The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped.
+These pieces of information fully participate when Tatin needs to establish package prevalence:
+
+`1.2.3` is "better" than  `1.2.2` but also "better" as `1.2.3-beta1` of course.
+
+Information after the hyphen is restricted to ASCII characters and digits until a dot (`.`)or a plus (`+`) is detected. 
+
+### Build numbers
+
+After {majow}-{minor}-{patch} you may add the optional build number. Build numbers _do not_ participate in establishing prevalence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.
+
+A build number, when specified, needs to be separated by a `+` (recommended) or a `.` (deprecated). A build number may consist of digits and obly digits.
+
+Note that when there are more than three dots in the version number, then the first two dots are part of establishing major, minor and patch number while the last dot defines what is considered the build number.
+
+```
+2.3.4.1456    ⍝ deprecated
+2.3.4+1456    ⍝ recommended
+1.2.3-beta-1      (becomes 1.2.3-beta-1 as a Tatin package)
+1.2.3-beta-1.123  (becomes 1.2.3-beta-1 as a Tatin package; deprecated)
+1.2.3-beta-1+123  (becomes 1.2.3-beta-1 as a Tatin package; recommended)
+```
+
+Therefore `1.2.3.4` is valid, with 4 being the build number. `1.2.3-beta-1.4` is valid, with 4 being the build number. `1.2.3-beta-1` is valid, no build number. `1.2.3-beta-1.abc` is _invalid_.
+
+The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing preferences: build numbers are always ignored.
 
 ## Terminology and versioning Rules
 
-Given `1.2.3.4`:
+Given `1.2.3+4`:
 
 * `1` is the _major version number_
 * `2` is the _minor version number_

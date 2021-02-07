@@ -16,27 +16,27 @@
  :If ∨/(packageID,LF)⍷regIndex
      errMsg←'Package already exists (version conflict)'
      statusCode←HttpCodes.BadRequest
-     LogAndRollbackPublishPackage errMsg
+     errMsg Assert 0=≢errMsg
  :ElseIf 0=F.MkDir packageDir,'/data'
      statusCode←HttpCodes.InternalServerError
      errMsg←'Could not create data/ directory for ',packageID
  :ElseIf 0<≢(packageDir,'/',packageID,'.zip')(⎕NCOPY Exec)zipFilename
      HttpCodes.InternalServerError
      errMsg←'Publishing package failed :',packageID
-     packageDir LogAndRollbackPublishPackage errMsg
+     packageDir RollbackPublishPackage errMsg
  :Else
      (packageDir,'/',packageID,'.zip')DotNetZip.UnzipTo(packageDir,'/data')
      :If 0<≢packageDir(⎕NMOVE Exec)packageDir,'/data/apl-package.json'
          statusCode←HttpCodes.InternalServerError
          errMsg←'Publishing package failed: ',packageID
-         packageDir LogAndRollbackPublishPackage errMsg
+         packageDir RollbackPublishPackage errMsg
      :Else
          dependenciesFilename←packageDir,'/data/',DependenciesFilename
          :If F.Exists dependenciesFilename
          :AndIf 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
              statusCode←HttpCodes.InternalServerError
              errMsg←'Publishing package failed: ',packageID
-             packageDir LogAndRollbackPublishPackage errMsg
+             packageDir RollbackPublishPackage errMsg
          :Else
              0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
          :EndIf

@@ -18,7 +18,7 @@
  projectPath zipObj.Add fileList
  projectPath zipObj.Add CFG_NAME
  :If 0<≢cfg.assets
-     projectPath zipObj.Add cfg.assets
+     {projectPath zipObj.Add ⍵}¨','(≠⊆⊢)cfg.assets
  :EndIf
  :If F.Exists projectPath,Dependencies.DEP_NAME
      tempFilename←F.GetTempFilename2''
@@ -31,7 +31,7 @@
      (⊂deps)F.NPUT tempFilename 1
      (⊃⎕NPARTS tempFilename)zipObj.Add Dependencies.DEP_NAME
      ⎕DL 0.2
-     F.RmDir tempFilename
+     F.RmDir 1⊃⎕NPARTS tempFilename
  :EndIf
  zipObj.Dispose
 ⍝Done

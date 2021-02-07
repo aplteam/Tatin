@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.16.0 - 2021-02-05
+⍝   * ]TATIN.Version enhanced
 ⍝ * 0.15.0 - 2021-02-01
 ⍝   * `Publish` now accepts a folder that contains a Tatin package
 ⍝   * Help for ListRegistries polished
@@ -125,7 +127,7 @@
           c←⎕NS ⍬
           c.Name←'Version'
           c.Desc←'Prints name, version number and version date of the client to the session'
-          c.Parse←''
+          c.Parse←'1s'
           r,←c
      
           c←⎕NS ⍬
@@ -195,8 +197,13 @@
      ⍝Done
     ∇
 
-    ∇ r←Version
-      r←TC.Reg.Version
+    ∇ r←Version Arg;⎕TRAP
+      ⎕TRAP←0 'S'
+      :If 0≡Arg._1
+          r←TC.Reg.Version
+      :Else
+          r←TC.GetServerVersion Arg._1
+      :EndIf
     ∇
 
     ∇ {r}←LoadTatin_ forceLoad;filename
@@ -742,6 +749,7 @@
       :Case ⎕C'Version'
           r,←⊂''
           r,←⊂'Prints name, version number and version date of the client to the session.'
+          r,←⊂'Specify a URL if you are after the version number of a Tatin server.'
       :Case ⎕C'ListTags'
           r,←⊂''
           r,←⊂'List all unique tags used in all packages, sorted alphabetically.'

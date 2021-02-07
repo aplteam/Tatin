@@ -15,11 +15,14 @@
 
  :Trap 98
      (rc msg zipFilename)←TC.PublishPackage dir'[tatin]'
-     →T.FailsIf 1
+     →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.PassesIf'Unauthorized request'≡qdmx.EM
+     →T.GoToTidyUp'Unauthorized request'≢qdmx.EM
  :EndTrap
 
  r←T._OK
+
+∆TidyUp:
+ F.DeleteFile(739⌶0),'/',(⊃{⍺,'-',⍵}/cfg.(group name version)),'.zip'
 ⍝Done

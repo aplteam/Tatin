@@ -1,4 +1,4 @@
- r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir
+ r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir;zipFiles
 ⍝ Save build list on disk. Exercises `GetDependecyTree`, `SaveBuildList` and `LoadBuildList`.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -12,7 +12,7 @@
  dir←'ConfigFile'GetTempDir''
  1 TC.InitUserSettings dir
  TC.MyUserSettings.AddRegistry'[Build]',∆BuildReg
- ∆CreateExampleForMinimalVersionStrategy1
+ zipFiles←∆CreateExampleForMinimalVersionStrategy1
 
  path←∆BuildReg,'minimalversion-A-1.0.0'
 
@@ -59,4 +59,5 @@
  F.RmDir ∆BuildDir
  ⎕EX'∆BuildDir'
  ∆CreateDefaultUserSettings
+ F.DeleteFile zipFiles
 ⍝Done

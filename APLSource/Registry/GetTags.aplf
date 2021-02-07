@@ -2,11 +2,7 @@
  filename←path,'/tatin_tags.txt'
  'Tag file not found'Assert F.IsFile filename
  :If 0<≢r←⊃F.NGET filename 1
-     :If TAB∊1⊃r        ⍝ New format?!
-         r←↑TAB{⍺(≠⊆⊢)⍵}¨r
-     :Else              ⍝ Old Format; remove not later than when version 1.0.0 is released  ⍝TODO⍝
-         r←∪r{⍺⍴⍨2,⍨⍵÷2}⍴r
-     :EndIf
+     r←↑TAB{⍺(≠⊆⊢)⍵}¨r
      r[;2]←⎕C r[;2]
      r←r[⍋r;]
      r[;1]←{⊃⊃(//)⎕VFI ⍵}¨r[;1]

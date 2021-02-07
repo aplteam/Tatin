@@ -1,9 +1,17 @@
- r←Test_UserCommands_032(stopFlag batchFlag);⎕TRAP;res
+ r←Test_UserCommands_032(stopFlag batchFlag);⎕TRAP;res;rc;msg
 ⍝ Exercise ]Tatin.Version
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- res←∆UCMD'version'
- →T.PassesIf 0<≢res
+ (rc msg res)←∆UCMD'version'
+ →T.PassesIf 0=rc
+ →T.PassesIf 0=≢msg
+ →T.PassesIf 3=≢res
+
+ (rc msg res)←res←∆UCMD'version [tatin]'
+⍝ (rc msg res)←∆UCMD'version https://localhost'
+ →T.PassesIf 0=rc
+ →T.PassesIf 0=≢msg
+ →T.PassesIf 3=≢res
 
  r←T._OK

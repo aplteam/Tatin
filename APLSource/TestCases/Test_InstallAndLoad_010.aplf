@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_010(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_InstallAndLoad_010(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
  ;dir;src;body;cfg;zipfile;installFolder;list;src2;src3;src4;src5;reg
 ⍝ Two packages that depend on the same package but different versions; all are classes
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -14,6 +14,7 @@
  src5←src,'/Example-MyClass_BBB-1.1.0/'
  F.MkDir reg
  F.MkDir src2 src3 src4 src5,¨⊂'/APLSource'
+ toBeDeleted←''
 
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
@@ -25,6 +26,7 @@
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src2
  (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.1415926' '∇' ':EndClass'
@@ -34,6 +36,7 @@
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src3
  (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Class MyClass_AAA' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
@@ -44,6 +47,7 @@
  cfg TC.WritePackageConfigFile src4
  src4 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src4 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Class MyClass_BBB' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
@@ -54,6 +58,7 @@
  cfg TC.WritePackageConfigFile src5
  src5 TC.Dependencies.Add'[local2]Example-Constants-0.2.0'
  (rc msg zipFilename)←TC.PublishPackage src5 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
@@ -75,5 +80,6 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

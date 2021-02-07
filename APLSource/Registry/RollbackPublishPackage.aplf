@@ -1,0 +1,13 @@
+ {r}←packageDir RollbackPublishPackage msg;rc;en;more
+⍝ Rolls back any attempt to publish a package locally.
+⍝ This is decided by `msg`: if it is empty, no action is taken at all.\\
+⍝ `packageDir` (together with any content) will be removed.
+⍝ If that fails for any reason an error is thrown.\\
+⍝ Returns always `⍬`
+ r←⍬
+ :If 0<≢msg
+ :AndIf 2=⎕NC'packageDir'
+     (rc en more)←F.RmDir packageDir
+     'Removing package folder after failed publishing attempt failed'Assert 0=rc
+ :EndIf
+⍝Done

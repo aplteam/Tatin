@@ -1,28 +1,41 @@
- {r}←cfg LinkTargetToPackage(saveIn target);alias;name;ref;api;buff
+ {r}←cfg LinkTargetToPackage(saveIn target);alias;name;ref;api;buff;b;api;apis;parent
 ⍝ Establishes references in the target space pointing to the loaded package.\\
 ⍝ Returns the fully qualified names of what was established in the target space.
 ⍝ Note that this can be a namespace or a function etc.
+ r←⍬
  alias←cfg.alias{0=≢⍺:⍵ ⋄ ⍺}cfg.name
  name←cfg.name
  ref←⍎saveIn
  :If 0<≢cfg.api
-     api←cfg.api
+     apis←','(≠⊆⊢)cfg.api
  :Else
      buff←⎕NPARTS cfg.source
-     :If buff[3]∊'.aplf' '.aplo'
-         api←2⊃buff
+     :If buff[3]∊'.aplf' '.aplo' '.aplc' '.apln'
+         apis←buff[2]
      :Else
-         api←cfg.name
+         apis←⊂cfg.name
      :EndIf
  :EndIf
- :If (ref.⎕NC api)∊3 4
-     ⍝ If it is a function it must not be niladic!
-     ('Cannot load package "',saveIn,'": entry point is niladic function ')Assert 0≠1 2⊃ref.⎕AT api
+ :If ∨/b←3=⊃¨ref.⎕NC¨apis
+     ⍝ If there are functions they must not be niladic!
+     {('Cannot load package "',saveIn,'": entry point is niladic function ')Assert 0≠1 2⊃ref.⎕AT ⍵}¨b/apis
  :EndIf
- :If 0=⎕NC saveIn,'.',api
- :AndIf 0=|⎕NC⊂saveIn,'.',api
-     0 Assert⍨'Cannot establish API for <',api,'>; does not exist'
+ :If 1=≢apis
+     target⍎alias,'←',saveIn,'.',⊃apis
+     r,←target,'.',alias
+ :Else
+     alias target.⎕NS''
+     :For api :In apis
+         :If 0=⎕NC saveIn,'.',api
+         :AndIf 0=|⎕NC⊂saveIn,'.',api
+             0 Assert⍨'Cannot establish reference for <',api,'>; does not exist'
+         :EndIf
+         :If '.'∊api
+             parent←(-1+≢'.'A.Last api)↓api
+         :AndIf 0=target.⎕NC parent
+             (alias,'.',parent)target.⎕NS''
+         :EndIf
+         target⍎alias,'.',api,'←',saveIn,'.',api
+     :EndFor
  :EndIf
- target⍎alias,'←',saveIn,'.',api
- r←target,'.',alias
 ⍝Done

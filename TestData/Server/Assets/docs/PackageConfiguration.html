@@ -84,30 +84,40 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="api">api</h4>
 </a>
 </div>
-<p>Things are different with namespaces, and with collections of namespaces and/or classes: In that case the names of some of the functions (for namespaces) or some of the classes might become the API.</p>
-<p>Defines the API of the package. In the example the package consists of a single class named <code>DotNetZip</code>, therefore the class name is identical with the API. Similarly, if the package consists of a single function — not that this is recommended! — the name of the function is the API.</p>
-<div class="leanpub_A">
-<h3>Defining an API with namespaces</h3>
-<p>Classes have a build-in mechanism for hiding details (all the private stuff) and offering a public interface (API): all the public stuff. Namespaces lack this.</p>
-<p>Thanks to references you can still easily simulate this. Given a namespace <code>Foo</code> one common technique is to put all the functions, variables, operators and sub-namespaces into a namespace <code>Foo.core</code>.</p>
-<p>You can then create the public interface by assigning references in <code>Foo</code>. If there is just one function (<code>Run</code>) and just one variable (<code>DATA</code>) that should be public then this would do:</p>
-<pre><code>#.Foo.Run←#.Foo.core.Run
-#.Foo.Data←#.Foo.core.DATA</code></pre>
-<p>That would not work with niladic functions, but purists would argue that you should not have niladic functions at all: by definition a function takes an argument, manipulates it and returns it. A niladic “function” might return something, but it cannot take something, so calling it a function is questionable.</p>
-</div>
-
+<p>There are two different scenarios:</p>
+<ul>
+<li>The package consists of a single function or a single operator or a single class or a single namespace, be it scripted or not</li>
+<li>The package consists of several functions, operators, classes or namespaces</li>
+</ul>
+<p>In the former case what is the api of the package is obvious, and there is no need to even specify it: Tatin will recognize that the name of that single function or single operator or single class or single namespace must be the API of the package, and act accordingly.</p>
+<p>If it's a single function (not that this is recommended!) and the name of the package is <code>Foo</code>, then calling the function is identical with the package name.</p>
+<p>In the latter case it is not obvious at all what the API should be, and the user must specify it.</p>
+<p>Also, while a single namespace is by default the API, the user might want to expose only a subset of functions/operators from that namespace, and in that case the user must specify “api” as well.</p>
+<p>Namespaces are special: imagine a situation when you have a single namespace that contains, say, a hundred functions of which only one should be exposed. If that function is called <code>Run</code> then of course the api needs to become <code>api←'Run'</code>.</p>
+<p>If the name of the package is <code>Foo</code> and it is loaded into <code>#.MyPkgs</code> then calling the function requires:</p>
+<pre><code>#.MyPkgs.Foo.Run</code></pre>
+<p>If you want to expose two functions, <code>CreateParameterSpace</code> and <code>Run</code>, then the api needs to be specified as:</p>
+<pre><code>api←`CreateParameterSpace,Run`</code></pre>
+<p>Calling the two functions would look similar to this:</p>
+<pre><code>parms←#.MyPkgs.Foo.CreateParameterSpace ⍬
+#.MyPkgs.Foo.Run parms</code></pre>
+<p>Notes:</p>
+<ul>
+<li>If specified “api” must be either a single name or a list of comma-separated names. Names must be relative, never absolute, therefore they must never start with <code>#</code> or <code>⎕</code>.</li>
+<li>Niladic functions <em>cannot</em> become part of an API. Tatin will create references in the target namespace, and onme cannot create a reference for a niladic function.</li>
+</ul>
 <div class="h_tag">
 <a href="#assets" id="assets" class="autoheader_anchor">
 <h4 data-id="assets">assets</h4>
 </a>
 </div>
-<p>This can be one of:</p>
+<p>This must be a simple text vector that is one of:</p>
 <ul>
-<li>A simple text vector representing a single filename</li>
-<li>A simple text vector representing a the name of a folder</li>
-<li>A vector of text vectors representing files or folders or a mixture of both</li>
+<li>A single filename</li>
+<li>A single folder name</li>
+<li>A simple text vector representing a mixture of file names and folder names separated by <code>,</code>.</li>
 </ul>
-<p>The path must be relative to the package since the file or the folder are part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>” or with “<code>./</code>”. If it does anyway an error is thrown.</p>
+<p>The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>” or with “<code>./</code>”. If it does anyway an error is thrown.</p>
 <p>There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative.</p>
 <p>Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.</p>
 <div class="h_tag">
@@ -152,21 +162,24 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If <code>source</code> is left empty Tatin will attempt to identify the source itself.</p>
 <ul>
 <li>If there is a single script file found with one of the aforementioned extensions that file will become the source.</li>
-<li>If there is no file with such an extension all folders are investigated except those mentioned as “assets”. If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.</li>
-<li>If Tatin cannot establish the source an error will be thrown.</li>
+<li>If there is no file with such an extension, all folders are investigated except those mentioned as “assets”. If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.</li>
+<li>If Tatin cannot establish the source an error will be thrown, and the user <em>must</em> specify “source”.</li>
 </ul>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
 <h4 data-id="tags">tags</h4>
 </a>
 </div>
-<p>A simple text vector, possibly empty (though that is not recommended), that should contain semicolon-separated lists of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.</p>
+<p>A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.</p>
 <div class="h_tag">
 <a href="#version" id="version" class="autoheader_anchor">
 <h4 data-id="version">version</h4>
 </a>
 </div>
 <p>The version[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
+<p>Examples for valid version numbers are <code>1.2.3</code>, <code>1.2.3-beta1</code>, <code>1.2.3-beta1.30164</code> and <code>18.0.0.30165</code></p>
+<p>An optional build number is ignored by Tatin.</p>
+<p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
 <a href="#Access-after-loading-a-package" id="Access-after-loading-a-package" class="autoheader_anchor">
 <h3 data-id="Access-after-loading-a-package">Access after loading a package</h3>
@@ -184,7 +197,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p><strong>Footnotes</strong></p>
 <ol>
 <li id="fnref1"><p>A package ID consists of <code>{group}-{name}-{major.{minor}.{patch}</code></p><a href="#fnref1" class="footnote_anchor"></a>
-<li id="fnref2"><p>A version is built from the major number, the minor number and the version number, and possibly a build number (which is not recorded in the package configuration file).</p><p>Examples for valid version numbers are <code>1.2.3</code> and <code>18.0.0.30165</code></p><a href="#fnref2" class="footnote_anchor"></a>
+<li id="fnref2"><p>A version is built from the major number, the minor number and the version number,</p><a href="#fnref2" class="footnote_anchor"></a>
 </ol>
 </div>
 </body>

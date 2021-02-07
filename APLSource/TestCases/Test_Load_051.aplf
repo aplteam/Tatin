@@ -1,4 +1,4 @@
- r←Test_Load_051(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_Load_051(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish 2 packages consisting of single fn with 2. depending on 1. & having an alias, then load from specific Registry
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -10,6 +10,7 @@
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
  F.MkDir src2←src,'/package_A'
+ toBeDeleted←''
 
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
@@ -21,6 +22,7 @@
  cfg.source←'Package_A.apln'
  cfg TC.WritePackageConfigFile src2
  (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  F.MkDir src3←src,'/package_B'
@@ -33,6 +35,7 @@
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-Package_A-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/Example-Package_B-1.0.0')#.TEMP
@@ -43,5 +46,6 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

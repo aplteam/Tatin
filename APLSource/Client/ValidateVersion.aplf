@@ -1,6 +1,8 @@
- ValidateVersion←{
-     '"version" is not a string'Assert 0 2∊⍨10|⎕DR ⍵:                                   ⍝ Must be char
-     '"version" is invalid'Assert 2≤'.'+.=⍵:                                            ⍝ At least two dots
-     '"version" is invalid'Assert 0≠≢'^\d+\.\d+\.\d+(?:-\w+)?$'⎕S 0⊢(+/3>+\⍵='.')↑⍵:    ⍝ Must be {no}.{no}.{no} but everything after a third dot is ignored
-     1:shy←0
- }
+ {r}←ValidateVersion version;bool;version2;ind;patch
+ r←⍬
+ '"version" is not a string'Assert 0 2∊⍨10|⎕DR version                      ⍝ Must be char
+ '"version" is invalid'Assert 2≤'.'+.=version                               ⍝ At least two dots
+ (version2 patch)←SplitVersionFromBuild version
+ 'Build number must be nothing but digits'Assert∧/patch∊⎕D
+ '"version" is invalid'Assert 0≠≢'^\d+\.\d\.\d[\d\-a-zA-Z]*$'⎕S 0⊢version2  ⍝ Must be {no}.{no}.{patch}
+ ⍝Done

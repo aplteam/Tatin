@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_031(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_InstallAndLoad_031(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
  ;dir;src;body;cfg;installFolder;list;src2;src3;reg
 ⍝ A package that depend on another package that has several functions and therefore uses "api"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -12,6 +12,7 @@
  src3←src,'/Example-MyMath-0.2.0/'
  F.MkDir reg
  F.MkDir src2 src3,¨⊂'/APLSource'
+ toBeDeleted←''
 
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
@@ -23,6 +24,7 @@
  cfg.source←'APLSource'
  cfg TC.WritePackageConfigFile src2
  (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←'r←x Times y' 'r←Constants.PI× x×y'
@@ -38,6 +40,7 @@
  cfg TC.WritePackageConfigFile src3
  src3 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
@@ -57,5 +60,6 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

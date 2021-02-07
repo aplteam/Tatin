@@ -7,11 +7,14 @@
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''    ⍝ Used to load stuff into
 
  refs←TC.LoadPackage'./TestData/Tatin/Registry/aplteam-MarkAPL-10.0.0' '#.TEMP.Foo'
- →T.PassesIf'#.TEMP.Foo.MarkAPL'≡⍕∊refs
+ →T.GoToTidyUp'#.TEMP.Foo.MarkAPL'≢⍕∊refs
  (html ns)←#.TEMP.Foo.MarkAPL.Markdown2HTML'A Para' '' '* This' '* That'
  expected←'<p>A Para</p>' '<ul>' '<li>This</li>' '<li>That</li>' '</ul>'
- →T.PassesIf expected≡html
- →T.PassesIf 9=#._tatin.⎕NC'aplteam_HandleError_4_0_0'
+ →T.GoToTidyUp expected≢html
+ →T.GoToTidyUp 9≠#._tatin.⎕NC'aplteam_HandleError_4_0_0'
 
  r←T._OK
+
+∆TidyUp:
+ ∆DeleteTempFolder refs
 ⍝Done

@@ -41,6 +41,7 @@
  :EndIf
  identifier←CheckVersion identifier
  'Package not found'Assert 0<≢identifier
+ PrintToSession'  Establish dependency tree...'
  buildList←GetDependecyTree identifier
  :For level packageID url :In ↓buildList
      PrintToSession'  Fetching ',packageID,' from ',url,'...'
@@ -60,7 +61,7 @@
      :EndIf
      refs,←ref
      :If level=1
-         PrintToSession'  Establish reference in ',targetSpace,' for ',saveIn2,'...'
+         PrintToSession'  Establish API in ',targetSpace,' for ',saveIn2,'...'
          r←,⊂cfg LinkTargetToPackage saveIn2 targetSpace
      :EndIf
  :EndFor

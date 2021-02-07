@@ -1,0 +1,53 @@
+ r←Test_Pkg_API_002(stopFlag batchFlag);⎕TRAP;installFolder;noOf;rc;msg;zipFilename;src_
+ ;dir;src;cfg;reg;list;index;expected;zipped;refs
+⍝ Publish and load a package with an ordinary namespace and two functions as API
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''    ⍝ Used to create stuff
+ #.⎕SHADOW'TEMP2' ⋄ 'TEMP2'#.⎕NS''  ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ src_←src,'/APLSource'
+ F.MkDir src_ reg
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ #.TEMP.⎕FX'r←fns1 arg' 'r←1+arg'
+ #.TEMP.⎕FX'r←fns2 arg' 'r←2+arg'
+ #.TEMP.⎕FX'r←fns3 arg' 'r←3+arg'
+ #.TEMP.⎕FX'r←fns4 arg' 'r←4+arg'
+ #.TEMP.⎕FX'r←(fns op1) arg' 'r←fns 10+arg'
+ #.TEMP.⎕FX'r←(fns op2) arg' 'r←fns 20+arg'
+ #.TEMP.⎕FX'r←Run dummy' 'r←(fns1 100)+(fns2 100)'
+ #.TEMP.⎕FX'r←RunAlso dummy' 'r←(fns3 100)+(fns4 100)'
+ ∆ExportNamespace #.TEMP src_
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'A' '1.0.0'
+ cfg.api←'Run,RunAlso'
+ cfg TC.WritePackageConfigFile src
+ (rc msg zipFilename)←TC.PublishPackage src reg
+ Assert 200=rc
+
+ installFolder←GetTempDir'/Tatin_AppPackages'
+ refs←TC.InstallPackage('[local2]Example-A-1.0.0')installFolder
+ noOf←≢TC.LoadDependencies installFolder #.TEMP2
+
+ →T.GoToTidyUp 1≠noOf
+ →T.GoToTidyUp 9≠#.TEMP2.⎕NC'A'
+ →T.GoToTidyUp 3≠#.TEMP2.⎕NC'A.Run'
+ →T.GoToTidyUp 3≠#.TEMP2.⎕NC'A.RunAlso'
+ →T.GoToTidyUp 203≠#.TEMP2.A.Run 10
+ →T.GoToTidyUp 207≠#.TEMP2.A.RunAlso 10
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile zipFilename
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

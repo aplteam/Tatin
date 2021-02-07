@@ -1,0 +1,32 @@
+ {r}←ReplaceSemicolonByCommainTagOfAllPackages pathToRegistry;list;Reg;F;pathToPackage;ns;json;cfgFilename;zipFilename;myZip;A;i;noOf;flag
+⍝ With version 0.20.1 tags are separated by comma, not by semicolon anymore.
+⍝ Althpough we keep supporting ; for now, we exchange it to comma.
+⍝ This function is useful for converting all packages already saved in a Registry (path)
+ r←⍬
+ F←##.FilesAndDirs ⋄ Reg←##.Registry ⋄ A←##.APLTreeUtils2
+ :If 0<≢list←F.ListDirs pathToRegistry
+     i←1
+     noOf←≢list
+     :Repeat
+         ⎕←(⍕i),' of ',⍕noOf
+         pathToPackage←i⊃list
+         cfgFilename←pathToPackage,'/',Reg.CFG_Name
+         ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET cfgFilename
+         :If flag←0=ns.⎕NC'tags'
+             ns.tags←''
+             (⊂json)F.NPUT cfgFilename 1
+         :ElseIf flag←';'∊ns.tags
+             ((ns.tags=';')/ns.tags)←','
+             json←Reg.JSON ns
+             (⊂json)F.NPUT cfgFilename 1
+         :EndIf
+         :If flag
+             zipFilename←pathToPackage,'/',({⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}pathToPackage),'.zip'
+             myZip←⎕NEW ##.DotNetZip(zipFilename 0)
+             pathToPackage myZip.Add Reg.CFG_Name
+             myZip.Dispose
+             ⎕←'  Changed!'
+         :EndIf
+     :Until noOf<i←i+1
+ :EndIf
+⍝Done

@@ -1,4 +1,4 @@
- r←Test_Load_057(stopFlag batchFlag);⎕TRAP;src0;rc;msg;zipFilename
+ r←Test_Load_057(stopFlag batchFlag);⎕TRAP;src0;rc;msg;zipFilename;toBeDeleted
  ;dir;body;cfg;list;index;expected;zipped;src2;refs;reg1;reg2;reg3;src1;src3
 ⍝ Publish several versions of a package to different Registries, then load all of them by package ID
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -13,6 +13,7 @@
  (src1 src2 src3)←{⍵,'/Math/Source'}¨src1 src2 src3
  F.MkDir src0 src1 src2 src3
  F.MkDir reg1 reg2 reg3
+ toBeDeleted←''
 
  TC.Reg.CreateRegistry¨reg1 reg2 reg3
  TC.MyUserSettings.AddRegistry'[MyCompany]',reg1
@@ -26,6 +27,7 @@
  cfg.source←'Foo.apln'
  cfg TC.WritePackageConfigFile src0
  (rc msg zipFilename)←TC.PublishPackage src0 reg1
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''1.0.0''' '∇' ':EndNamespace'
@@ -35,6 +37,7 @@
  cfg.source←'Math.apln'
  cfg TC.WritePackageConfigFile src1
  (rc msg zipFilename)←TC.PublishPackage src1 reg2
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''3.0.0''' '∇' ':EndNamespace'
@@ -44,6 +47,7 @@
  cfg.source←'Math.apln'
  cfg TC.WritePackageConfigFile src2
  (rc msg zipFilename)←TC.PublishPackage src2 reg1
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  body←':Namespace Math' '∇r←x Times y' 'r←x×y' '∇' '∇r←Version' 'r←''2.0.0''' '∇' ':EndNamespace'
@@ -53,6 +57,7 @@
  cfg.source←'Math.apln'
  cfg TC.WritePackageConfigFile src3
  (rc msg zipFilename)←TC.PublishPackage src3 reg3
+ toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  refs←TC.LoadPackage'MyDepartment-Math-2.0.0'#.TEMP
@@ -66,5 +71,6 @@
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
  Assert TC.MyUserSettings.RemoveRegistry'[MYCOMPANy]'
  Assert TC.MyUserSettings.RemoveRegistry'[Private]'
+ F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

@@ -1,0 +1,11 @@
+ response←GetServerVersion request;parms;data;html
+⍝ Respond to a request for some or all tags, HTML or JSON
+ :If IsJsonRequest request.Headers
+     parms←⎕NS''
+     data←Reg.Version
+     response←request ReturnJSON Reg.JSON data
+ :Else
+     data←⊂'<p>',(⊃{⍺,' from ',⍵}/1↓Reg.Version),'</p>'
+     html←PrepareHtmlPageForServerVersionNo data
+     response←request ReturnHTML html
+ :EndIf

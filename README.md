@@ -4,7 +4,7 @@ Tatin is a community project. It is available as Open Source under the (pretty r
 
 A Tarte Tatin is a nice way to package APpLe's.
 
-The documentation is available on [Tatin's principal server](https://tatin.dev/v1/documentation "Link to documentation").
+The documentation is available on [Tatin's principal server](https://tatin.dev/v1/documentation "Link to https://tatin.dev/v1/documentation").
 
 ## Overview
 

@@ -21,7 +21,7 @@ If you want to publish on `https://tatin.dev` you need to ask [kai@aplteam.com](
 
 #### The Tatin Test Server
 
-The Tatin test Server publishes its one and only API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name.
+The Tatin test Server publishes an API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name.
 
 However, be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later.
 
@@ -72,7 +72,7 @@ This is interpreted as _require API keys for the groups "group1" and "group2" bu
 
 On the client side the API key must go into the user configuration file: the file `tatin-client.json`.
 
-It already has an API key for every Server defined in the file but it's empty.
+It already has an API key for every Server defined in the file, but it's empty.
 
 
 ## Publishing
@@ -86,7 +86,7 @@ A Tatin package requires all source code (functions, operators, classes, interfa
 
 Tatin calls the former "source" and the latter "assets". 
 
-What is what is defined in the package copnfiguration file which _must_ exist to make something a Tatin package.
+What is what is defined in the package configuration file which _must_ exist to make something a Tatin package.
 
 
 #### The package configuration file
@@ -98,7 +98,7 @@ What is required and how to create and change a package configuration file is di
 
 This file is only required when the package has dependencies.
 
-Note that in case you specify a dependency that does not (yet?!) exists on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual dependencies. Insisting on dependencies already being published would not work out well then.
+Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual dependencies. Insisting on dependencies already being published would not work out well then.
 
 
 ### Final step

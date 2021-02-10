@@ -1,0 +1,20 @@
+ r←Test_Load_062(stopFlag batchFlag);⎕TRAP;refs;parms
+⍝ Load a package from a ZIP file that has dependencies; for those the Registry must be determined
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ refs←TC.LoadPackage'./TestData/aplteam-Laguntza-5.0.0.zip'#.TEMP
+ →T.GoToTidyUp 0=≢refs  ⍝ Has assets
+ →T.GoToTidyUp~F.IsDir refs
+ parms←#.TEMP.Laguntza.CreateParms''
+ →T.GoToTidyUp 2≠⍴⍴parms.∆List
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir refs
+⍝Done

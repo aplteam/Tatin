@@ -23,7 +23,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Introduction">Introduction</h2>
 </a>
 </div>
-<p>While the Tatin Client is coming with version 18.1 and later, the Tatin Server always needs to be installed in case you want to use it.</p>
+<p>While the Tatin Client is coming with version 18.1 and later automatically, the Tatin Server always needs to be installed in case you want to use it.</p>
 <p>After downloading it from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a> you need to unzip it into a folder where the Tatin Server is supposed to live.</p>
 <div class="h_tag">
 <a href="#Configuration-the-INI-File" id="Configuration-the-INI-File" class="autoheader_anchor">
@@ -86,6 +86,25 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>The section <code>[CERTIFICATES]</code>
 <p>A certificate is required in case you want to use https, a must on the Internet these days. You probably want to use your own one.</p>
 <p>For more details on certificates see “On Certificates”</p></li>
+<li><code>[CONFIG]DeletePackages</code>
+<p>This setting defines whether a user might delete a package. The setting may become one of these:</p>
+<table>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td>Deleting packages is not allowed</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Deleting packages is allowed</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Only beta versions may be deleted (major version number is 0)</td>
+</tr>
+</tbody>
+</table>
+<p>The principal Tatin server only allows deleting beta versions. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.</p></li>
 </ul>
 <div class="h_tag">
 <a href="#On-Logging" id="On-Logging" class="autoheader_anchor">
@@ -149,10 +168,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Windows">Windows</h3>
 </a>
 </div>
-<p>Under Windows you are advised to run the Tatin Server as a Windows Service. Such a service can be configured so that it is restarted automatically in case of a failure.</p>
+<p>Under Windows you might run the Tatin Server as a Windows Service. Such a service can be configured so that it is restarted automatically in case of a failure.</p>
+<p>Alternatively it could run as a Windows Docker Container.</p>
 <div class="h_tag">
-<a href="#Linux-and-Mac-OS" id="Linux-and-Mac-OS" class="autoheader_anchor">
-<h3 data-id="Linux-and-Mac-OS">Linux and Mac OS</h3>
+<a href="#Linux" id="Linux" class="autoheader_anchor">
+<h3 data-id="Linux">Linux</h3>
 </a>
 </div>
 <p>Under these operating systems you are advised to run the Tatin Server in a Docker image.</p>

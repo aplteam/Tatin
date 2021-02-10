@@ -7,7 +7,7 @@
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''    ⍝ Used to load stuff into
 
  refs←TC.LoadPackage'./TestData/Tatin/Registry/aplteam-MarkAPL-10.0.0' '#.TEMP.Foo'
- →T.GoToTidyUp'#.TEMP.Foo.MarkAPL'≢⍕∊refs
+ →T.GoToTidyUp 0=≢refs
  (html ns)←#.TEMP.Foo.MarkAPL.Markdown2HTML'A Para' '' '* This' '* That'
  expected←'<p>A Para</p>' '<ul>' '<li>This</li>' '<li>That</li>' '</ul>'
  →T.GoToTidyUp expected≢html
@@ -16,5 +16,5 @@
  r←T._OK
 
 ∆TidyUp:
- ∆DeleteTempFolder refs
+ Assert 0=⊃F.RmDir refs
 ⍝Done

@@ -53,7 +53,7 @@ If you're a consumer, you'll use the Tatin client to load, explore, and possibly
 Note that although you can access the Tatin server with a browser, it's real goal is the communication of the `]TATIN` user commands with one or more Tatin servers.
 
 
-### Authors / publishers
+### Authors (publishers)
  
 You'll develop Tatin packages using whatever tools you're familiar with.  These could be GitHub, GitLab or any of their competitors, or local files on your PC.
 
@@ -61,6 +61,14 @@ When you're ready to create a release of your package, you'll give the release a
 
 Finally you publish your package to a Tatin server.
 
+Of course you should publish your first package on the test server https://test.tatin.dev rather than on https://tatin.dev.
+
 ## Now what?!
 
-We suggest that you make yourself familiar with the concept of [Semantic Versioning](https://semver.org/ "External link, opened in a new Tab" {target="_blank"}), and how exactly it is implemented in Tatin by reading the document [Tatin's load- and update strategy](./TatinsLoadAndUpdateStrategy.html "Opens the document TatinsLoadAndUpdateStrategy.html").
+Now is the time to read [First Steps with Tatin](./FirstStepsWithTatin.html "FirstStepsWithTatin.html") (draft)
+
+
+A> ### Minimal version strategy
+A>
+A> We suggest that you make yourself familiar with the concept of [Semantic Versioning](https://semver.org/ "External link, opened in a new Tab" {target="_blank"}) at one stage or another, and how exactly it is implemented in Tatin by reading the document [Tatin's load- and update strategy](./TatinsLoadAndUpdateStrategy.html "Opens the document TatinsLoadAndUpdateStrategy.html").
+

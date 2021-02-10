@@ -19,7 +19,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Before you start reading this document you should have read the document <a href="./Introduction.html" class="external_link">Introduction.html</a>.</p>
-<p>Also, it is <em>essential</em> to understand <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a>.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>Note that you should have at least an idea of what <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a> is all about.</p>
+</div>
+</div>
+
 <p>In this document additional information that you might or might not be interested in at this stage is presented in gray boxes. You might well skip over them till later.</p>
 <div class="h_tag">
 <a href="#Where-we-start-from" id="Where-we-start-from" class="autoheader_anchor">
@@ -62,7 +68,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>The square brackets around “tatin” declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like <code>https://localhost/my_tatin_server</code>.</p>
 <div class="leanpub_A">
 <h3>Local and remote Registries</h3>
-<p>The Tatin client can access packages that are managed by a Tatin Server, but also Registries that are locally available. In order to address a local Registry you would just provide the path to it.</p>
+<p>The Tatin client can access packages that are managed by a Tatin Server, but also Registries that are locally available (read: not managed by a server). In order to address a local Registry you would just provide the path to it.</p>
 <p>Of course features like listing just the packages that carry a specific tag are only available when a Registry is managed by a Tatin server.</p>
 </div>
 
@@ -128,10 +134,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Let's assume that you want to check whether <code>MarkAPL</code> suits your needs, in other words: you just want to check it out.</p>
-<p>That can be achieved with the <code>LoadPackage</code> user command. That loads the package into the workspace and leaves no trail on the file system if that can be avoided.</p>
+<p>That can be achieved with the <code>LoadPackage</code> user command. That loads the package into the workspace and leaves no trail in the file system if that can be avoided.</p>
 <div class="leanpub_A">
 <h3>Leaving a trace on the file system</h3>
-<p>In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there <em>is</em> a footprint left in the file system.</p>
+<p>In case the package has file dependencies, like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there <em>is</em> a footprint left on the file system.</p>
 </div>
 
 <p>Notes:</p>
@@ -140,9 +146,25 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case.
 <p>This is discussed in the paper <code>TatinsLoadAndUpdateStrategy.html</code></p></li>
 </ul>
-<p>Let's load the <code>MarkAPL</code> package into the workspace:</p>
-<pre><code>      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-10.0.0 #.MyTests</code></pre>
-<p>The namespace <code>#.MyTests</code> may or may not exist. If it does not Tatin will create it.</p>
+<p>Let's load the <code>MarkAPL</code> package into the workspace; for that we need to specify a URL and a target namespace:</p>
+<pre><code>      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-10.0.0 #
+  Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
+  Establish dependencies...
+  4 dependencies identified
+  Fetching https://tatin.dev/aplteam-MarkAPL-10.0.0...
+  Unzipping C:\Users\kai\AppData\Local\Temp\kai_746270.zip...
+  Add aplteam-MarkAPL-10.0.0 to dependency file...
+  Fetching https://tatin.dev/aplteam-APLTreeUtils2-1.1.0...
+  ...</code></pre>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>In case the package or any of its dependencies comes with assets the path to a directory in the temp directory of your OS is printed to the session by <code>]tatin.LoacdPacke</code>.</p>
+<p>This is because this folder cannot be deleted by Tatin. If no package has any assets then nothing is printed to the session, indicating that no footprint is left behind.</p>
+</div>
+</div>
+
+<p>In case the target namespace is something like <code>#.MyTests</code> it may or may not exist. If it does not Tatin will create it.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
@@ -150,10 +172,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 </div>
 
-<p>Tatin created a reference named <code>MarkAPL</code> in the target namespace <code>#.MyTests</code>:</p>
-<pre><code>      #.MyTests.⎕nl ⍳16
-MarkAPL</code></pre>
-<p>That reference points to the namespace that holds the package as such, which is loaded into <code>_tatin</code>.</p>
+<p>Tatin created a reference named <code>MarkAPL</code> in the target namespace <code>#</code>:</p>
+<pre><code>      #.⎕nl ⍳16
+MarkAPL
+_tatin</code></pre>
+<p>That reference points to the namespace that holds the package as such, which is loaded into <code>_tatin</code>: this is the namespace Tatin uses to manage packages.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
@@ -162,7 +185,7 @@ MarkAPL</code></pre>
 </div>
 
 <p>The name of the namespace carries the version number:</p>
-<pre><code>      #.MyTests.MarkAPL
+<pre><code>      #.MarkAPL
 #._tatin.aplteam_MarkAPL_10_0_0</code></pre>
 <p><code>_tatin</code> also contains all the dependencies <code>MarkAPL</code> relies on:</p>
 <pre><code>      #._tatin.⎕nl ⍳16
@@ -182,12 +205,12 @@ aplteam_OS_3_0_0</code></pre>
 <p>Note that we did not specify any of the major, minor and patch number but the Registry by alias (<code>[tatin]</code>); that tells Tatin that we want to get the very latest version of <code>MarkAPL</code>.</p>
 <p>Let's check what's now in <code>/Path2Foo/Packages</code></p>
 <pre><code>      ⍪⊃⎕NINFO ⍠ 1 ⊣ '/Path2Foo/Packages\*'
- D:/Temp/ZZZ/apl-buildlist.json
- D:/Temp/ZZZ/apl-dependencies.txt
- D:/Temp/ZZZ/aplteam-APLTreeUtils2-1.1.0
- D:/Temp/ZZZ/aplteam-FilesAndDirs-5.0.0
- D:/Temp/ZZZ/aplteam-MarkAPL-10.0.0
- D:/Temp/ZZZ/aplteam-OS-3.0.0</code></pre>
+ /Path2Foo/Packages/apl-buildlist.json
+ /Path2Foo/Packages/apl-dependencies.txt
+ /Path2Foo/Packages/aplteam-APLTreeUtils2-1.1.0
+ /Path2Foo/Packages/aplteam-FilesAndDirs-5.0.0
+ /Path2Foo/Packages/aplteam-MarkAPL-10.0.0
+ /Path2Foo/Packages/aplteam-OS-3.0.0</code></pre>
 <p>The build-list defines the relationship of the packages:</p>
 <pre><code>      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-buildlist.json'1
  {
@@ -210,7 +233,7 @@ aplteam_OS_3_0_0</code></pre>
      "https://tatin.dev/aplteam-OS-3.0.0",
    ],
  }</code></pre>
-<p>The dependencies file specifies what packages your application depend on as of yet:</p>
+<p>The dependencies file specifies what packages <em>your application</em> depends on as of yet:</p>
 <pre><code>      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-dependencies.txt' 1
  aplteam-MarkAPL-10.0.0</code></pre>
 <div class="h_tag">
@@ -218,8 +241,7 @@ aplteam_OS_3_0_0</code></pre>
 <h3 data-id="Loading-dependencies">Loading dependencies</h3>
 </a>
 </div>
-<p>Having the packages installed you may now load them into your application.</p>
-<p>This is achieved by the <code>LoadDependencies</code> user command:</p>
+<p>Having the packages installed you may now load them into your application. This is achieved by the <code>LoadDependencies</code> user command:</p>
 <pre><code>      ]TATIN.LoadDependencies /Path2Foo/Packages/ #.Foo
  #.Foo.MarkAPL</code></pre>
 <p>The user command prints a list of all top-level packages to the session. In other words, it hides the dependencies.</p>

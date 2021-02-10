@@ -6,7 +6,7 @@
 
 ## Introduction
 
-While the Tatin Client is coming with version 18.1 and later, the Tatin Server always needs to be installed in case you want to use it.
+While the Tatin Client is coming with version 18.1 and later automatically, the Tatin Server always needs to be installed in case you want to use it.
 
 After downloading it from <https://github.com/aplteam/Tatin/releases> you need to unzip it into a folder where the Tatin Server is supposed to live.
 
@@ -88,6 +88,16 @@ The INI file is well documented, so we won't discuss the meaning of the differen
 You probably want to use your own one.
 
   For more details on certificates see "On Certificates"
+
+* `[CONFIG]DeletePackages`
+
+  This setting defines whether a user might delete a package. The setting may become one of these:
+
+  | 0 | Deleting packages is not allowed
+  | 1 | Deleting packages is allowed
+  | 2 | Only beta versions may be deleted (major version number is 0)
+
+  The principal Tatin server only allows deleting beta versions. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.
  
 
 ## On Logging
@@ -156,10 +166,12 @@ In such an event you are most likely interested in the server being restarted au
 
 ### Windows 
 
-Under Windows you are advised to run the Tatin Server as a Windows Service. Such a service can be configured so that it is restarted automatically in case of a failure.
+Under Windows you might run the Tatin Server as a Windows Service. Such a service can be configured so that it is restarted automatically in case of a failure.
+
+Alternatively it could run as a Windows Docker Container.
 
 
-### Linux and Mac OS
+### Linux
 
 Under these operating systems you are advised to run the Tatin Server in a Docker image. 
 

@@ -1,10 +1,11 @@
  {r}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;refs
 ⍝ Takes a folder with a build list, typically the result of installing packages.
 ⍝ Loads all packages according to that list and injects required references into `targetSpace`.
-⍝ Returns a vector with references to the loaded packages (no dependencies).
+⍝ Returns a vector with references to the loaded packages (no dependencies, top-level only).
 ⍝ Might be empty if the package was already loaded, for example as a dependency.
  r←refs←⍬
- :If 0=⎕NC⊂⍕targetSpace
+ targetSpace←⍕targetSpace
+ :If 0=⎕NC targetSpace
      targetSpace ⎕NS''
  :EndIf
  CheckBuildList installFolder
@@ -17,6 +18,7 @@
          packageID←1 GetPackageIDFromFilename path
          saveIn,←'.',packageID
          :If 0=⎕NC saveIn   ⍝ Might already exist
+             EstablishSystemVars saveIn cfg
              msg←Reg.ImportWithLink saveIn(path,'/',cfg.source)
              'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
              ref←⍎saveIn

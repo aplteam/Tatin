@@ -1,5 +1,10 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.17.0 - 2021-02-10
+⍝   * User command ]TATIN.DeletePackage added
+⍝   * User command ]TATIN.Documentation added
+⍝   * Flag -edit added to ]TATIN.UserSettings
+⍝   * Bug fix: ]TATIN.UserSettings accepted flags but ignored them
 ⍝ * 0.16.0 - 2021-02-05
 ⍝   * ]TATIN.Version enhanced
 ⍝ * 0.15.0 - 2021-02-01
@@ -97,7 +102,7 @@
           c←⎕NS ⍬
           c.Name←'UserSettings'
           c.Desc←'The user settings and the fully qualified filenanme are printed to ⎕SE as JSON'
-          c.Parse←''
+          c.Parse←'0 -edit -apikey'
           r,←c
      
           c←⎕NS ⍬
@@ -148,6 +153,20 @@
           c.Parse←'1 -major'
           r,←c
      
+          c←⎕NS ⍬
+          c.Name←'Documentation'
+          c.Desc←'Loads the documentation center into the default browser'
+          c.Parse←''
+          r,←c
+     
+          :If 0 ⍝  ⍝TODO⍝ Not implemeted yet though the help is ready
+              c←⎕NS ⍬
+              c.Name←'DeletePackage'
+              c.Desc←'Delete a package from a Tatin Registry'
+              c.Parse←'2'
+              r,←c
+          :EndIf
+     
           :If 0 ⍝ Not decided yet whether we allow that at all, or what for
               c←⎕NS ⍬
               c.Name←'UninstallPackage'
@@ -180,7 +199,9 @@
     ∇ r←(fns __ExecAsTatinUserCommand)arg
     ⍝ Fancy name that we can work out whether a Tatin function was called via the User Command framework.
     ⍝ That makes a difference regarding messages printed to the session.
-      r←fns arg
+     
+      r←fns arg   ⍝ <===
+     
     ⍝Done
     ∇
 
@@ -257,12 +278,12 @@
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
       '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
-      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert'.'∊targetSpace
-      '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
+      :If (,'#')≢,targetSpace
+          '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
+      :EndIf
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
       ({⍵↓⍨⍵⍳'.'}targetSpace)saveIn.⎕NS''
       :If 0=saveIn.⎕NC'targetSpace'
-          '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
@@ -303,6 +324,10 @@
           :EndIf
      
       :EndIf
+    ∇
+
+    ∇ r←DeletePackage Arg
+      r←'Sorry, not implemented yet'
     ∇
 
     ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath
@@ -403,17 +428,23 @@
       :EndTrap
     ∇
 
+    ∇ r←Documentation Arg
+      r←0 0⍴⍬
+      {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage'https://tatin.dev/v1/documentation'   ⍝TODO⍝
+    ∇
+
     ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn
       (identifier targetSpace)←Arg.(_1 _2)
-      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert'.'∊targetSpace
-      '"targetSpace" must specify a fully qualified sub-namespace in # or ⎕SE'Assert~(⊂⎕C targetSpace)∊'#' '⎕se'
-      '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
+      :If ~(⊂1 ⎕C targetSpace)∊'#' '⎕SE'
+          '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
+      :EndIf
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
-      :If 0=saveIn.⎕NC'targetSpace'
+      :If ~(⊂1 ⎕C targetSpace)∊,¨'#' '⎕SE'
+      :AndIf 0=saveIn.⎕NC'targetSpace'
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
-      r←⍪TC.LoadPackage identifier targetSpace
+      r←TC.LoadPackage identifier targetSpace
     ∇
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri
@@ -517,13 +548,28 @@
       r←⍪TC.InstallPackage identifier installFolder
     ∇
 
-    ∇ r←UserSettings dummy;origData;filename
+    ∇ r←UserSettings Arg;origData;filename;ns;new
       r←''
       filename←TC.F.NormalizePath TC.MyUserSettings.path2config
       ('User setting file "',filename,'" does not exist?!')Assert ⎕NEXISTS filename
       origData←1⊃⎕NGET filename
-      origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace the API key by Aserisks
-      r←⍪(⊂'User settings in <',filename,'> :'),(⎕UCS 10)(≠⊆⊢)origData
+      :If Arg.edit
+          :If 0=≢new←EditJSON origData
+              ⎕←'Cancelled without a change'
+          :Else
+              :If 1 ∆YesOrNo'Do you want to save your changes to disk?'
+                  (⊂new)⎕NPUT filename 1
+              :AndIf 1 ∆YesOrNo'Saved! Woul you like to refresh the user settings in the WS?'
+                  TC.Init ⍬
+                  ⎕←'User settings in WS updated'
+              :EndIf
+          :EndIf
+      :Else
+          :If ~Arg.apikey
+              origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace API key by Asterisks
+          :EndIf
+          r←⍪(⊂'User settings in <',filename,'> :'),(⎕UCS 10)(≠⊆⊢)origData
+      :EndIf
     ∇
 
     ∇ (success newData)←(CheckFns EditJson)(name origData);temp;msg;flag;json
@@ -595,7 +641,6 @@
       TC←⎕SE._Tatin.Client
       :Select ⎕C Cmd
       :Case ⎕C'LoadTatin'
-          r,←⊂''
           r,←⊂'This loads the Tatin client into ⎕SE and initializes it if it''s not already there.'
           r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
           r,←⊂''
@@ -607,14 +652,12 @@
           r,←⊂''
           r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
       :Case ⎕C'ListRegistries'
-          r,←⊂''
           r,←⊂'Lists URI, alias and priority of all Registries defined in the user settings.'
           r,←⊂'The result is ordered by priority: the first one is scanned first etc.'
           r,←⊂''
           r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
           r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all columns'
       :Case ⎕C'ListPackages'
-          r,←⊂''
           r,←⊂'Lists all groups defined in the Registry specified as an argument. If no Registry was'
           r,←⊂'specified then a list witg all Registries is presented to the user.'
           r,←⊂'* If you specify an alias it MUST be embraced by square brackets as in [MyAlias]'
@@ -628,7 +671,6 @@
           r,←⊂'* By default the output is aggregated. Specify -noaggr if you want the full list.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
-          r,←⊂''
           r,←⊂'Load the specified package and all its dependencies into the workspace'
           r,←⊂'Requires two arguments:'
           r,←⊂''
@@ -647,11 +689,8 @@
           r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2 #.MyPkgs'
           r,←⊂'  ]TATIN.LoadPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #.MyPkgs'
           r,←⊂''
-          r,←'#.MyPkgs'ExamplesForLoadAndInstall'LoadPackage'
-          r,←⊂''
           r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
-          r,←⊂''
           r,←⊂'Installs the given package and all its dependencies into the given folder.'
           r,←⊂''
           r,←⊂'A) First argument'
@@ -673,29 +712,31 @@
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
           r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
       :Case ⎕C'LoadDependencies'
-          r,←⊂''
           r,←⊂'Takes two arguments:'
           r,←⊂'[1] A folder into which one or more packages have been installed.'
           r,←⊂'[2] A namespace into which the packages are going to be loaded.'
       :Case ⎕C'UserSettings'
-          r,←⊂''
           r,←⊂'Prints the user settings to the session in JSON format.'
+          r,←⊂'By default the API key is replaced by asterisks; specify -apikey to overwrite this.'
           r,←⊂''
-          r,←⊂'Note that the user command does not give you the means to change the user settings,'
-          r,←⊂'or to move it elsewhere. If you want to do anything more than just printing the settings'
-          r,←⊂'to the session then you are advised to used the API. Note that there is a dedicated'
-          r,←⊂'document for how to use the API, and what for.'
+          r,←⊂'If you want to do anything more than just printing the settings to the session then'
+          r,←⊂'you are advised to used the API. Note that there is a dedicated document for how to'
+          r,←⊂'use the API, and what for.'
           r,←⊂''
-          r,←⊂'In case the user command settings got changed you can re-establish them by calling ]Tatin.Init'
+          r,←⊂'If you want to change the settings anyway you can add -edit in order to get the data'
+          r,←⊂'into the editor and make changes. In this case the API key will always show.'
+          r,←⊂'If you did change the data, you will first be prompted for saving the changes on disk'
+          r,←⊂'and then for executing ]TATIN.Init in order to refresh the user settings in the WS.'
       :Case ⎕C'PackageConfig'
-          r,←⊂''
           r,←⊂'The argument may be an HTTP request or a path.'
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
           r,←⊂'  Specifying any of the options has no effect.'
-          r,←⊂'* In case of a path the contents of the file "',TC.CFG_NAME,'" is returned.'
+          r,←⊂'* In case of a path it must point to a folder that contains a Tatin package.'
+          r,←⊂'  The contents of the file "',TC.CFG_NAME,'" in thet folder is returned.'
           r,←⊂'  In case the file does not exist yet it is created.'
-          r,←⊂'  You may edit the file by specifying the -edit flag.'
-          r,←⊂'  In case you want to delete the file: specify the -delete flag.'
+          r,←⊂''
+          r,←⊂'You may edit the file by specifying the -edit flag.'
+          r,←⊂'In case you want to delete the file: specify the -delete flag.'
           r,←⊂''
           r,←⊂'In case of success a text vector with NLs in it is returned, otherwise an empty vector.'
       :Case ⎕C'UninstallPackage'
@@ -706,7 +747,6 @@
           r,←⊂'This command uninstalles the given package and all its dependencies but only if those'
           r,←⊂'are not required by any other packages.'
       :Case ⎕C'PackageDependencies'
-          r,←⊂''
           r,←⊂'Takes a path to a folder and returns the contents of the file "apl-dependencies.txt".'
           r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
           r,←⊂'exist it is created.'
@@ -719,7 +759,6 @@
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is usually asked'
           r,←⊂'in conjunction with the -delete flag; this is probably only useful with test cases.'
       :Case ⎕C'Pack'
-          r,←⊂''
           r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
           r,←⊂''
           r,←⊂'Requires ⍵[1] to have a file "',TC.CFG_NAME,'" defining the package.'
@@ -727,7 +766,6 @@
           r,←⊂'Note that if ⍵[2] does not start with "." or "/" it is relative to ⍵[1], Therefore, if you'
           r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
       :Case ⎕C'Publish'
-          r,←⊂''
           r,←⊂'Publish a package to a particular Registry Server.'
           r,←⊂'Such a package can be one of:'
           r,←⊂'* ZIP file, typically created by calling ]TATIN.Pack'
@@ -743,34 +781,39 @@
           r,←⊂''
           r,←⊂'The -quiet flag suppresses the "Are you sure?" question (test cases).'
       :Case ⎕C'ListVersions'
-          r,←⊂''
           r,←⊂'List all versions of the given package. You must specify the package as in'
           r,←⊂'[registry]{group}-{package}'
       :Case ⎕C'Version'
-          r,←⊂''
           r,←⊂'Prints name, version number and version date of the client to the session.'
           r,←⊂'Specify a URL if you are after the version number of a Tatin server.'
       :Case ⎕C'ListTags'
-          r,←⊂''
           r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
       :Case ⎕C'Init'
-          r,←⊂''
           r,←⊂'Re-establishes the user settings in ⎕SE. Call this in case the user settings got changed on file'
           r,←⊂'and you want to incorporate the changes in the current session.'
       :Case ⎕C'CheckForBetterVersion'
-          r,←⊂''
           r,←⊂'Takes the path to a folder with installed packages as argument.'
           r,←⊂'Checks alle top-level packages in that folder for better versions.'
-          r,←⊂'By default better MAJOR versions are ignored but see -major.'
+          r,←⊂'By default better MAJOR versions are ignored, but check on -major.'
           r,←⊂''
-⍝          r,←⊂'If there are better versions the user will be asked whether she wants to install them.'
-⍝          r,←⊂'If she confirms she can decide whether all better packages should be updated in one go,'
-⍝          r,←⊂'or whether the packages will be installed on a one-by-one bases.'
-⍝          r,←⊂''
           r,←⊂'The default behaviour can be changed by specifying the flag -major.'
           r,←⊂'Then only better major versions are reported.'
-⍝          r,←⊂'However, there is no semi-automated update procedure in place when -major is specified:'
-⍝          r,←⊂'better version are just reported.'
+      :Case ⎕C'DeletePackage'
+          r,←⊂'Requires two arguments:'
+          r,←⊂'* Either a directory hosting a Tatin Registry or a URL of a Tatin-managed Registry.'
+          r,←⊂'* A fully or partly qualified package ID'
+          r,←⊂''
+          r,←⊂'You must specify:'
+          r,←⊂' * {group}-{name}-{major}-*          ; All with that major no.'
+          r,←⊂' * {group}-{name}-{major}-{minor}-*  ; All with that major & minor no.'
+          r,←⊂' * {group}-{name}-{major}-{patch}    ; Exactly that package'
+          r,←⊂''
+          r,←⊂'The operation will succeed only if...'
+          r,←⊂'* the package exists'
+          r,←⊂'* the server is configured so that packages can be deleted'
+          r,←⊂'* a valid API key is produced'
+      :Case ⎕C'Documentation'
+          r,←⊂'Puts https://tatin.dev/v1/documentation into the default browser'
       :Else
           r←'Unknown command: ',Cmd
       :EndSelect
@@ -956,5 +999,31 @@
       r↑⍨←¯1+r⍳'<'
       ⍝Done
     ∇
+
+    ∇ r←EditJSON data;ns;flag
+      flag←0
+      ns←#.⎕NS''
+      ns.UserSettings←data
+      :Repeat
+          ns.⎕ED'UserSettings'
+          :If 0=≢ns.UserSettings
+              r←⍬
+              flag←1
+          :Else
+              :If {0::1 ⋄ 0⊣JSON ⍵}ns.UserSettings
+                  :If ~1 ∆YesOrNo'The JSON is invalid; would you like to edit it again? ("N"=drop out without change)'
+                      r←''
+                      flag←1
+                  :EndIf
+              :Else
+                  r←ns.UserSettings
+                  flag←1
+              :EndIf
+          :EndIf
+      :Until flag
+    ⍝Done
+    ∇
+
+    JSON←{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}
 
 :EndNamespace

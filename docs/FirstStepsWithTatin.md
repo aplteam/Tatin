@@ -6,7 +6,7 @@
 
 Before you start reading this document you should have read the document [Introduction.html](./Introduction.html).
 
-Also, it is _essential_ to understand [Semantic Versioning](./SemanticVersioning.html).
+I> Note that you should have at least an idea of what [Semantic Versioning](./SemanticVersioning.html) is all about.
 
 In this document additional information that you might or might not be interested in at this stage is presented in gray boxes. You might well skip over them till later.
 
@@ -56,7 +56,7 @@ The square brackets around "tatin" declare that string to be an alias. Without t
 
 A> ### Local and remote Registries
 A>
-A> The Tatin client can access packages that are managed by a Tatin Server, but also Registries that are locally available. 
+A> The Tatin client can access packages that are managed by a Tatin Server, but also Registries that are locally available (read: not managed by a server). 
 A> In order to address a local Registry you would just provide the path to it.
 A>
 A> Of course features like listing just the packages that carry a specific tag are only available when a Registry is managed by a Tatin server.
@@ -121,11 +121,11 @@ I> If you wonder why that is then please read the document discussing [Semantic 
 
 Let's assume that you want to check whether `MarkAPL` suits your needs, in other words: you just want to check it out. 
 
-That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves no trail on the file system if that can be avoided.
+That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves no trail in the file system if that can be avoided.
 
 A> ### Leaving a trace on the file system
 A>
-A> In case the package has file dependencies, like DLLs, images, CSS files and what not, than those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there _is_ a footprint left in the file system.
+A> In case the package has file dependencies, like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there _is_ a footprint left on the file system.
 
 Notes:
 
@@ -136,31 +136,44 @@ Notes:
   This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
 
 
-Let's load the `MarkAPL` package into the workspace:
+Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and a target namespace:
 
 ```
-      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-10.0.0 #.MyTests
+      ]tatin.LoadPackage [tatin]aplteam-MarkAPL-10.0.0 #
+  Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
+  Establish dependencies...
+  4 dependencies identified
+  Fetching https://tatin.dev/aplteam-MarkAPL-10.0.0...
+  Unzipping C:\Users\kai\AppData\Local\Temp\kai_746270.zip...
+  Add aplteam-MarkAPL-10.0.0 to dependency file...
+  Fetching https://tatin.dev/aplteam-APLTreeUtils2-1.1.0...
+  ...
 ```
 
-The namespace `#.MyTests` may or may not exist. If it does not Tatin will create it.
+I> In case the package or any of its dependencies comes with assets the path to a directory in the temp directory of your OS is printed to the session by `]tatin.LoacdPacke`.
+I>
+I> This is because this folder cannot be deleted by Tatin. If no package has any assets then nothing is printed to the session, indicating that no footprint is left behind.
+
+In case the target namespace is something like `#.MyTests` it may or may not exist. If it does not Tatin will create it.
 
 I> When you try to execute the following statements on your own machine then you will probably see different version numbers.
 
-Tatin created a reference named `MarkAPL` in the target namespace `#.MyTests`:
+Tatin created a reference named `MarkAPL` in the target namespace `#`:
 
 ```
-      #.MyTests.⎕nl ⍳16
+      #.⎕nl ⍳16
 MarkAPL
+_tatin 
 ```
 
-That reference points to the namespace that holds the package as such, which is loaded into `_tatin`. 
+That reference points to the namespace that holds the package as such, which is loaded into `_tatin`: this is the namespace Tatin uses to manage packages.
 
 I> The name `_tatin` is hard-coded and _cannot_ be changed.
 
 The name of the namespace carries the version number:
 
 ```
-      #.MyTests.MarkAPL
+      #.MarkAPL
 #._tatin.aplteam_MarkAPL_10_0_0 
 ```
 `_tatin` also contains all the dependencies `MarkAPL` relies on:
@@ -191,12 +204,12 @@ Let's check what's now in `/Path2Foo/Packages`
 
 ```
       ⍪⊃⎕NINFO ⍠ 1 ⊣ '/Path2Foo/Packages\*'
- D:/Temp/ZZZ/apl-buildlist.json          
- D:/Temp/ZZZ/apl-dependencies.txt        
- D:/Temp/ZZZ/aplteam-APLTreeUtils2-1.1.0 
- D:/Temp/ZZZ/aplteam-FilesAndDirs-5.0.0  
- D:/Temp/ZZZ/aplteam-MarkAPL-10.0.0      
- D:/Temp/ZZZ/aplteam-OS-3.0.0            
+ /Path2Foo/Packages/apl-buildlist.json          
+ /Path2Foo/Packages/apl-dependencies.txt        
+ /Path2Foo/Packages/aplteam-APLTreeUtils2-1.1.0 
+ /Path2Foo/Packages/aplteam-FilesAndDirs-5.0.0  
+ /Path2Foo/Packages/aplteam-MarkAPL-10.0.0      
+ /Path2Foo/Packages/aplteam-OS-3.0.0            
 ```
 
 The build-list defines the relationship of the packages:
@@ -225,7 +238,7 @@ The build-list defines the relationship of the packages:
  }                                                    
 ```
 
-The dependencies file specifies what packages your application depend on as of yet:
+The dependencies file specifies what packages _your application_ depends on as of yet:
 
 ```
       ⍪⊃⎕NGET '/Path2Foo/Packages/apl-dependencies.txt' 1
@@ -234,9 +247,7 @@ The dependencies file specifies what packages your application depend on as of y
 
 ### Loading dependencies
 
-Having the packages installed you may now load them into your application. 
-
-This is achieved by the `LoadDependencies` user command:
+Having the packages installed you may now load them into your application. This is achieved by the `LoadDependencies` user command:
 
 ```
       ]TATIN.LoadDependencies /Path2Foo/Packages/ #.Foo

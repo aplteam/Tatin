@@ -1,4 +1,4 @@
- {r}←cfg LinkTargetToPackage(saveIn target);alias;name;ref;api;buff;b;api;apis;parent
+ {r}←cfg LinkTargetToPackage(saveIn target);alias;name;ref;api;buff;b;api;apis;parent;refToTarget
 ⍝ Establishes references in the target space pointing to the loaded package.\\
 ⍝ Returns the fully qualified names of what was established in the target space.
 ⍝ Note that this can be a namespace or a function etc.
@@ -24,7 +24,8 @@
      target⍎alias,'←',saveIn,'.',⊃apis
      r,←target,'.',alias
  :Else
-     alias target.⎕NS''
+     refToTarget←⍎target
+     alias refToTarget.⎕NS''
      :For api :In apis
          :If 0=⎕NC saveIn,'.',api
          :AndIf 0=|⎕NC⊂saveIn,'.',api
@@ -32,8 +33,8 @@
          :EndIf
          :If '.'∊api
              parent←(-1+≢'.'A.Last api)↓api
-         :AndIf 0=target.⎕NC parent
-             (alias,'.',parent)target.⎕NS''
+         :AndIf 0=refToTarget.⎕NC parent
+             (alias,'.',parent)refToTarget.⎕NS''
          :EndIf
          target⍎alias,'.',api,'←',saveIn,'.',api
      :EndFor

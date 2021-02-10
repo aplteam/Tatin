@@ -6,7 +6,7 @@
 
 ## Overview 
 
-Every package has a configuration file: that's one of the things that actually make it a package. It defines all there needs to be defined in order to consume the package, and to announce its existence to the world.
+Every package has a configuration file: that's one of the things that actually make it a package. It defines all that is required in order to consume the package, and to announce its existence to the world.
 
 This is an example:
 
@@ -23,15 +23,17 @@ This is an example:
   source: "DotNetZip.aplc",
   tags: "zip-tools;windows;mac-os;linux",
   version: "0.5.4",
+  io: 1,
+  ml: 1,
+  wx: 1,
 }
 ```
+
 ## Details
 
 ### Introduction
 
-In the workspace a simple namespace can be a used for package configuration. On file it is saved as JSON5.
-
-Tatin's API offers a function `Tatin.InitialisePackage` that can be used to create a package config file.
+In the workspace a simple namespace can be a used for package configuration. On file it is saved as JSON5. Tatin's API offers a function `Tatin.InitialisePackage` that can be used to create a package config file.
 
 It can be fed with an empty vector as right argument: then just defaults are established.
 
@@ -54,7 +56,7 @@ The user command aquivalent is `]tatin.packageconfig`
 
 You may define your own variables in a package configuration file.
 
-However, since we might add Tatin-specific variables at a later stage there is a danger of name clashes. This is avoided by a simple rule:
+However, since more Tatin-specific variables might be add at a later stage there is a danger of name clashes. This is avoided by a simple rule:
 
 The names of user defined variables _must_ start with an underscore.
 
@@ -83,9 +85,7 @@ In the latter case it is not obvious at all what the API should be, and the user
 
 Also, while a single namespace is by default the API, the user might want to expose only a subset of functions/operators from that namespace, and in that case the user must specify "api" as well.
 
-Namespaces are special: imagine a situation when you have a single namespace that contains, say, a hundred functions of which only one should be exposed. If that function is called `Run` then of course the api needs to become `api←'Run'`.
-
-If the name of the package is `Foo` and it is loaded into `#.MyPkgs` then calling the function requires:
+For example, if the name of the package is `Foo` and it is loaded into `#.MyPkgs` and you set "api" to `Run` then calling the function requires:
 
 ```
 #.MyPkgs.Foo.Run
@@ -108,15 +108,15 @@ Notes:
 
 * If specified "api" must be either a single name or a list of comma-separated names. Names must be relative, never absolute, therefore they must never start with `#` or `⎕`.
 
-* Niladic functions _cannot_ become part of an API. Tatin will create references in the target namespace, and onme cannot create a reference for a niladic function.
+* Niladic functions _cannot_ become part of an API. Tatin will create references in the target namespace, and one cannot create a reference for a niladic function.
 
 #### assets
 
-This must be a simple text vector that is one of:
+This must be a simple text vector that can represent:
 
 * A single filename
 * A single folder name
-* A simple text vector representing a mixture of file names and folder names separated by `,`.
+* A simple text vector representing a mixture of file names and folder names separated by commas.
 
 The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`" or with "`./`". If it does anyway an error is thrown.
 
@@ -144,7 +144,9 @@ The name part of the package ID[^id]
 
 #### project_url
 
-The URL that points to something like GitHub. An example is `http://github.com/aplteam-MarkAPL-9.2.0`.
+A URL that points to something like GitHub. 
+
+An example is `https://github.com/aplteam-MarkAPL-9.2.0`
 
 #### source
 
@@ -152,7 +154,7 @@ The name of a text file (that contains code) or a folder (that contains a collec
 
 If it's a single file it might be anything with the extension `.aplf` (a function), `.aplo` (an operator), `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script).
 
-If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extension are misplaced and will be ignored entirely.
+If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.
 
 If `source` is left empty Tatin will attempt to identify the source itself.
 
@@ -176,13 +178,20 @@ An optional build number is ignored by Tatin.
 
 For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
+#### System vars: `⎕IO`, `⎕ML`, `⎕WX`
+
+By default the config namespace carries the values of the three Dyalog parameters `default_io`, `default_ml` and `default_wx` for the three system variables `⎕IO`, `⎕ML` and `⎕WX`. 
+
+Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependency` function. This is important because that makes any sub-namespace created later on inherit those values.
+
+
 ### Access after loading a package
 
 Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON under the name `∆CONFIG` together with `∆URI` and `∆HOME`.
 
 Note that `∆HOME` will be empty in case two conditions are met:
 
-* The package was brought intot the workspace with `LoadPackage` (as opposed to `LoadDependencies`)
+* The package was brought into the workspace with `LoadPackage` (as opposed to `LoadDependencies`)
 * The package does not have any assets
 
 All of them are niladic functions because that's how we emulate constants in APL.

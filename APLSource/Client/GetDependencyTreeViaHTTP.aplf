@@ -1,4 +1,4 @@
- level GetDependecyTreeViaHTTP url;uri;packageID;client;request;res;port;isNotHttp;b;tree;requiredBy
+ level GetDependencyTreeViaHTTP url;uri;packageID;client;request;res;port;isNotHttp;b;tree;requiredBy
 ⍝ Fetch the dependency tree via HTTP. Once a package is retrieved via the http protocol
 ⍝ we know that all dependecies must be fetched via the http protocol as well.\\
 ⍝ Requires semi-global ∆TREE
@@ -23,7 +23,7 @@
      requiredBy←packageID
      ∆TREE.Data⍪←↑{⍵[1],(⊂{⍵↓⍨⍵⍳'/'}RemoveHttpProtocol 2⊃⍵),⍵[2]}¨↓tree
      :If ∨/~isNotHttp
-         (level+1)GetDependecyTreeViaHTTP¨(~isNotHttp)/tree[;2]
+         (level+1)GetDependencyTreeViaHTTP¨(~isNotHttp)/tree[;2]
      :EndIf
  :EndIf
 ⍝Done

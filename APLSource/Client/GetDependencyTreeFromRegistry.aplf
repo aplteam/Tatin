@@ -1,4 +1,4 @@
- {r}←level GetDependecyTreeFromRegistry path;deps;filename;dep;identifier;requiredBy
+ {r}←level GetDependencyTreeFromRegistry path;deps;filename;dep;identifier;requiredBy
 ⍝ Reads the dependency file of `path` and processes them.\\
 ⍝ Requires semi-global ∆TREE
  r←⍬
@@ -16,12 +16,12 @@
          :If (⊂GetPackageIDFromFilename identifier)∊GetPackageIDFromFilename¨∆TREE.{Data[;∆packageID]}⍬ ⍝ Avoid circular references
              :Continue
          :EndIf
-         :If 0=⎕NEXISTS dep
+         :If ~Reg.IsHTTP identifier
+         :AndIf 0=⎕NEXISTS identifier
              identifier←(EstablishRegistry dep),dep
          :EndIf
-         PrintToSession'  Dependency ',identifier,' identified...'
          requiredBy←GetPackageIDFromFilename path
-         {}GetDependecyTree(level+1)(RemoveFileProtocol identifier)
+         {}GetDependencyTree(level+1)(RemoveFileProtocol identifier)
      :EndFor
  :EndIf
 ⍝Done

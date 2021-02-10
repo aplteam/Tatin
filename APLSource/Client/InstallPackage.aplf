@@ -7,7 +7,7 @@
 ⍝ * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch}')
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
 ⍝ You may omit either minor+patch or even major+minor+patch in order to install the "best" verion but you _must_ specify a Registry then.
-⍝ `←` paths to all packages installed with the first one being the "main" package, meaning that all the others are dependencies.
+⍝ `←` paths to all packages installed with the first one being the "main" package, meaning that all the others (if any) are dependencies.
  '"targetFolder" is invalid'Assert F.IsDir⍕targetFolder
  paths←''
  identifier←ReplaceRegistryAlias identifier_
@@ -27,12 +27,11 @@
  :AndIf Reg.IsHTTP identifier
      'ZIP files cannot be installed via HTTP'Assert 0
  :EndIf
- alias←{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}identifier_   ⍝ Not supported yet
+ alias←{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}identifier_   ⍝ Not supported (yet?!)
  PrintToSession'  Establish dependencies...'
- :If 0<≢buildList←GetDependecyTree identifier
+ :If 0<≢buildList←GetDependencyTree identifier
      PrintToSession'  ',(⍕≢buildList),' dependencies identified'
      :For level packageID2 url :In ↓buildList
-         PrintToSession'  Fetching ',packageID2,' from ',(RemovePackageID url),'...'
          installFolder←(Reg.AddSlash targetFolder),packageID2
          :If level=1
          :AndIf F.Exists installFolder

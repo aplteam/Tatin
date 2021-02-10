@@ -1,4 +1,4 @@
- r←Test_Load_061(stopFlag batchFlag);⎕TRAP;refs;bestVersion;versions
+ r←Test_Load_061(stopFlag batchFlag);⎕TRAP;refs;qdmx
 ⍝ Try to load a particular package without specifying a registry and without a patch number
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -6,11 +6,13 @@
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
 
- refs←TC.LoadPackage'aplteam-APLProcess-0.2'#.TEMP
- →T.GoToTidyUp 0=≢refs
- versions←{⊃,/1↓⎕NPARTS ⍵}¨⊃F.Dir ∆GetServerRegistryFolder,'aplteam-APLProcess-0.2*'
- bestVersion←{⍵↑⍨{1+-⍵⍳'-'}⌽⍵}⊃¯1↑{⍵[Reg.SortIndexForPackageIDs ⍵]}versions
- →T.GoToTidyUp bestVersion{⍺≢(≢⍺)↑⍵}2⊃#.TEMP.APLProcess.Version
+ :Trap 98
+     refs←TC.LoadPackage'aplteam-APLProcess-0.2'#.TEMP
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~∨/'You must specify a Registry for this package ID:'⍷qdmx.EM
+ :EndTrap
 
  r←T._OK
 

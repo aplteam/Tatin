@@ -23,7 +23,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Overview">Overview</h2>
 </a>
 </div>
-<p>Every package has a configuration file: that's one of the things that actually make it a package. It defines all there needs to be defined in order to consume the package, and to announce its existence to the world.</p>
+<p>Every package has a configuration file: that's one of the things that actually make it a package. It defines all that is required in order to consume the package, and to announce its existence to the world.</p>
 <p>This is an example:</p>
 <pre><code>{
   alias: "",
@@ -37,6 +37,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
   source: "DotNetZip.aplc",
   tags: "zip-tools;windows;mac-os;linux",
   version: "0.5.4",
+  io: 1,
+  ml: 1,
+  wx: 1,
 }</code></pre>
 <div class="h_tag">
 <a href="#Details" id="Details" class="autoheader_anchor">
@@ -48,8 +51,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Introduction">Introduction</h3>
 </a>
 </div>
-<p>In the workspace a simple namespace can be a used for package configuration. On file it is saved as JSON5.</p>
-<p>Tatin's API offers a function <code>Tatin.InitialisePackage</code> that can be used to create a package config file.</p>
+<p>In the workspace a simple namespace can be a used for package configuration. On file it is saved as JSON5. Tatin's API offers a function <code>Tatin.InitialisePackage</code> that can be used to create a package config file.</p>
 <p>It can be fed with an empty vector as right argument: then just defaults are established.</p>
 <p>Instead you may create a namespace and populate that namespace with Tatin package configuration variables which are discussed underneath.</p>
 <p>Example:</p>
@@ -65,7 +67,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>You may define your own variables in a package configuration file.</p>
-<p>However, since we might add Tatin-specific variables at a later stage there is a danger of name clashes. This is avoided by a simple rule:</p>
+<p>However, since more Tatin-specific variables might be add at a later stage there is a danger of name clashes. This is avoided by a simple rule:</p>
 <p>The names of user defined variables <em>must</em> start with an underscore.</p>
 <p>If you specify any variable with a name that Tatin does not know about and that does not start with an underscore an error will be thrown.</p>
 <div class="h_tag">
@@ -93,8 +95,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If it's a single function (not that this is recommended!) and the name of the package is <code>Foo</code>, then calling the function is identical with the package name.</p>
 <p>In the latter case it is not obvious at all what the API should be, and the user must specify it.</p>
 <p>Also, while a single namespace is by default the API, the user might want to expose only a subset of functions/operators from that namespace, and in that case the user must specify “api” as well.</p>
-<p>Namespaces are special: imagine a situation when you have a single namespace that contains, say, a hundred functions of which only one should be exposed. If that function is called <code>Run</code> then of course the api needs to become <code>api←'Run'</code>.</p>
-<p>If the name of the package is <code>Foo</code> and it is loaded into <code>#.MyPkgs</code> then calling the function requires:</p>
+<p>For example, if the name of the package is <code>Foo</code> and it is loaded into <code>#.MyPkgs</code> and you set “api” to <code>Run</code> then calling the function requires:</p>
 <pre><code>#.MyPkgs.Foo.Run</code></pre>
 <p>If you want to expose two functions, <code>CreateParameterSpace</code> and <code>Run</code>, then the api needs to be specified as:</p>
 <pre><code>api←`CreateParameterSpace,Run`</code></pre>
@@ -104,18 +105,18 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Notes:</p>
 <ul>
 <li>If specified “api” must be either a single name or a list of comma-separated names. Names must be relative, never absolute, therefore they must never start with <code>#</code> or <code>⎕</code>.</li>
-<li>Niladic functions <em>cannot</em> become part of an API. Tatin will create references in the target namespace, and onme cannot create a reference for a niladic function.</li>
+<li>Niladic functions <em>cannot</em> become part of an API. Tatin will create references in the target namespace, and one cannot create a reference for a niladic function.</li>
 </ul>
 <div class="h_tag">
 <a href="#assets" id="assets" class="autoheader_anchor">
 <h4 data-id="assets">assets</h4>
 </a>
 </div>
-<p>This must be a simple text vector that is one of:</p>
+<p>This must be a simple text vector that can represent:</p>
 <ul>
 <li>A single filename</li>
 <li>A single folder name</li>
-<li>A simple text vector representing a mixture of file names and folder names separated by <code>,</code>.</li>
+<li>A simple text vector representing a mixture of file names and folder names separated by commas.</li>
 </ul>
 <p>The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>” or with “<code>./</code>”. If it does anyway an error is thrown.</p>
 <p>There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative.</p>
@@ -150,7 +151,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="project_url">project_url</h4>
 </a>
 </div>
-<p>The URL that points to something like GitHub. An example is <code>http://github.com/aplteam-MarkAPL-9.2.0</code>.</p>
+<p>A URL that points to something like GitHub.</p>
+<p>An example is <code>https://github.com/aplteam-MarkAPL-9.2.0</code></p>
 <div class="h_tag">
 <a href="#source" id="source" class="autoheader_anchor">
 <h4 data-id="source">source</h4>
@@ -158,7 +160,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>The name of a text file (that contains code) or a folder (that contains a collection of code files).</p>
 <p>If it's a single file it might be anything with the extension <code>.aplf</code> (a function), <code>.aplo</code> (an operator), <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script) or <code>.apli</code> (an interface script).</p>
-<p>If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extension are misplaced and will be ignored entirely.</p>
+<p>If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.</p>
 <p>If <code>source</code> is left empty Tatin will attempt to identify the source itself.</p>
 <ul>
 <li>If there is a single script file found with one of the aforementioned extensions that file will become the source.</li>
@@ -181,6 +183,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>An optional build number is ignored by Tatin.</p>
 <p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
+<a href="#System-vars-IO-ML-WX" id="System-vars-IO-ML-WX" class="autoheader_anchor">
+<h4 data-id="System-vars-IO-ML-WX">System vars: <code>⎕IO</code>, <code>⎕ML</code>, <code>⎕WX</code></h4>
+</a>
+</div>
+<p>By default the config namespace carries the values of the three Dyalog parameters <code>default_io</code>, <code>default_ml</code> and <code>default_wx</code> for the three system variables <code>⎕IO</code>, <code>⎕ML</code> and <code>⎕WX</code>.</p>
+<p>Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the <code>LoadPackage</code> or the <code>LoadDependency</code> function. This is important because that makes any sub-namespace created later on inherit those values.</p>
+<div class="h_tag">
 <a href="#Access-after-loading-a-package" id="Access-after-loading-a-package" class="autoheader_anchor">
 <h3 data-id="Access-after-loading-a-package">Access after loading a package</h3>
 </a>
@@ -188,7 +197,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Whether you load a package with <code>LoadPackage</code> or <code>LoadDependencies</code>, the contents of the configuration file is available as readable JSON under the name <code>∆CONFIG</code> together with <code>∆URI</code> and <code>∆HOME</code>.</p>
 <p>Note that <code>∆HOME</code> will be empty in case two conditions are met:</p>
 <ul>
-<li>The package was brought intot the workspace with <code>LoadPackage</code> (as opposed to <code>LoadDependencies</code>)</li>
+<li>The package was brought into the workspace with <code>LoadPackage</code> (as opposed to <code>LoadDependencies</code>)</li>
 <li>The package does not have any assets</li>
 </ul>
 <p>All of them are niladic functions because that's how we emulate constants in APL.</p>

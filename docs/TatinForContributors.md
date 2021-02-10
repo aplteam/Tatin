@@ -70,7 +70,7 @@ A> ### Creating a new version
 A>
 A> Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
 A>
-A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed then naturally you want the new version available in `⎕SE` for execution, but that is only possible if you create a new version first.
+A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed then naturally you want the new version to be available in `⎕SE` for execution, but that is only possible if you create a new version first.
 
 By default port 443 is used for the test cases. You may change the INI files for both server and client if that does not work for you.
 
@@ -113,9 +113,9 @@ Now you are ready to execute the test suite.
 
 A> ### On test cases
 A>
-A> The procedure outlined in this document discuss just how to run test tests in case you expect them to succeed. The test framework offers much more than that: it is flexible and powerful; for details refer to <https://github.com/aplteam/Tester2>
+A> The procedure outlined in this document discusses just how to run tests in case you expect them to succeed. The test framework offers much more than that: it is flexible and powerful; for details refer to <https://github.com/aplteam/Tester2>
 A>
-A> If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the `RunTests` functions.
+A> If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the two functions `#.Tatin.TestCases.RunTests` and `#.Tatin.TestCasesServer.RunTests`.
 A>
 A> In particular the `Prepare` function, which is called by the `RunTests` functions, is important: it instantiates the `Tester2` class as `T`, and that's the starting point for whatever your are trying to achieve.
 
@@ -139,13 +139,14 @@ In order to create new versions of the Client and the Server all you need to do 
 {noQLXFlag} #.Tatin.Admin.Make {type}
 ```
 
-* `{noQLXFlag}` is an optional Boolean that defaults to 0. It makes sense to set this to 1 only for debugging piurposes.
+* `{noQLXFlag}` is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.
 
 * `{type}` must be an integer in the range of 0, 1, 2 or 3.
 
-   0 means that the version number is not changed apart from the build ID which is always bumped. 
-
-   If `type←1` then the patch number is bumped. If `type←2` the minor version is bumped and the patch number is set to 0. If `type←3` the major version is bumped and the minor as well as the patch number are set to 0.
+   | 0 | The version number is not changed apart from the build ID which is always bumped
+   | 1 | The patch number is bumped. 
+   | 2 | The minor version is bumped; the patch number is set to 0
+   | 3 | The major version is bumped; minor and patch number are set to 0
 
 
 The `Make` function performs the following steps:
@@ -168,4 +169,4 @@ Tatin-Server-{major}.{minor}.{patch}.zip
 
 
 | Created:       | 2020-08-11
-| Latest update: | 2021-01-02
+| Latest update: | 2021-01-10

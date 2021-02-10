@@ -69,7 +69,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub_A">
 <h3>Creating a new version</h3>
 <p>Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version <em>before</em> you execute the test cases.</p>
-<p>The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed then naturally you want the new version available in <code>⎕SE</code> for execution, but that is only possible if you create a new version first.</p>
+<p>The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed then naturally you want the new version to be available in <code>⎕SE</code> for execution, but that is only possible if you create a new version first.</p>
 </div>
 
 <p>By default port 443 is used for the test cases. You may change the INI files for both server and client if that does not work for you.</p>
@@ -93,8 +93,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ol>
 <div class="leanpub_A">
 <h3>On test cases</h3>
-<p>The procedure outlined in this document discuss just how to run test tests in case you expect them to succeed. The test framework offers much more than that: it is flexible and powerful; for details refer to <a href="https://github.com/aplteam/Tester2" class="external_link">https://github.com/aplteam/Tester2</a></p>
-<p>If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the <code>RunTests</code> functions.</p>
+<p>The procedure outlined in this document discusses just how to run tests in case you expect them to succeed. The test framework offers much more than that: it is flexible and powerful; for details refer to <a href="https://github.com/aplteam/Tester2" class="external_link">https://github.com/aplteam/Tester2</a></p>
+<p>If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the two functions <code>#.Tatin.TestCases.RunTests</code> and <code>#.Tatin.TestCasesServer.RunTests</code>.</p>
 <p>In particular the <code>Prepare</code> function, which is called by the <code>RunTests</code> functions, is important: it instantiates the <code>Tester2</code> class as <code>T</code>, and that's the starting point for whatever your are trying to achieve.</p>
 </div>
 
@@ -115,10 +115,28 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>In order to create new versions of the Client and the Server all you need to do is to execute:</p>
 <pre><code>{noQLXFlag} #.Tatin.Admin.Make {type}</code></pre>
 <ul>
-<li><code>{noQLXFlag}</code> is an optional Boolean that defaults to 0. It makes sense to set this to 1 only for debugging piurposes.</li>
+<li><code>{noQLXFlag}</code> is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.</li>
 <li><code>{type}</code> must be an integer in the range of 0, 1, 2 or 3.
-<p>0 means that the version number is not changed apart from the build ID which is always bumped.</p>
-<p>If <code>type←1</code> then the patch number is bumped. If <code>type←2</code> the minor version is bumped and the patch number is set to 0. If <code>type←3</code> the major version is bumped and the minor as well as the patch number are set to 0.</p></li>
+<table>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td>The version number is not changed apart from the build ID which is always bumped</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td>The patch number is bumped.</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>The minor version is bumped; the patch number is set to 0</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>The major version is bumped; minor and patch number are set to 0</td>
+</tr>
+</tbody>
+</table></li>
 </ul>
 <p>The <code>Make</code> function performs the following steps:</p>
 <ol start="1">
@@ -139,7 +157,7 @@ Tatin-Server-{major}.{minor}.{patch}.zip</code></pre>
 </tr>
 <tr>
 <td>Latest update:</td>
-<td>2021-01-02</td>
+<td>2021-01-10</td>
 </tr>
 </tbody>
 </table>

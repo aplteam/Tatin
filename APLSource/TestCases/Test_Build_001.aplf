@@ -1,5 +1,5 @@
  r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir;zipFiles
-⍝ Save build list on disk. Exercises `GetDependecyTree`, `SaveBuildList` and `LoadBuildList`.
+⍝ Save build list on disk. Exercises `GetDependencyTree`, `SaveBuildList` and `LoadBuildList`.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -16,7 +16,7 @@
 
  path←∆BuildReg,'minimalversion-A-1.0.0'
 
- tree←TC.GetDependecyTree'file://',path
+ tree←TC.GetDependencyTree'file://',path
  expected←'A-1.0.0' 'B-1.1.2' 'C-1.1.2' 'D-1.1.4' 'E-1.1.2'  ⍝ But not 'D-1.1.3'!
  expected←'minimalversion-'∘,¨expected
  →T.PassesIf expected ∆LazyMatch tree[;2]
@@ -33,7 +33,7 @@
  ⍝ However, we DO NOT fall back to D-1.1.3, we stick with D-1.1.4 althoug strictly speaking that
  ⍝ version is not requested any longer by any of the packages, but we stick with the "best" we have.
 
- tree2←TC.GetDependecyTree'file://',path
+ tree2←TC.GetDependencyTree'file://',path
  expected←'A-1.0.0' 'B-1.1.2' 'C-1.1.3' 'D-1.1.4' 'E-1.1.2' 'F-1.1.1' 'G-1.1.1' ⍝ Still D-1.1.4, NOT D-1.1.3!
  expected←'minimalversion-'∘,¨expected
  →T.GoToTidyUp~∧/(tree[;2]~⊂'minimalversion-C-1.1.2')∊tree2[;2] ⍝ Because C-1.1.2 is neither requested nor needed

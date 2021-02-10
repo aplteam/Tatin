@@ -56,7 +56,7 @@ This document gives you an overview over these HTML files: their purpose and who
 
 * [Installing the Tatin Server](./InstallingTheTatinServer.html "InstallingTheTatinServer.html") (draft)
 
-* [Maintaining the Server](./ServerMaintenance.html "ServerMaintenance.html") (draft)
+* [Maintaining the Server](./ServerMaintenance.html "ServerMaintenance.html") (stub)
 
 
 ### Misc

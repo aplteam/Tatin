@@ -1,73 +1,33 @@
- r←LoadPackage(identifier_ targetSpace);saveIn2;refs;zipFilename
- ;buildList;url;level;packageID;tempDir;saveIn;cfg;msg;ref;tempDirs;reset;identifier
+ r←LoadPackage(identifier targetSpace);paths;tempFolder;loaded
 ⍝ Load package `identifier` dynamically into the workspace,\\
 ⍝ `identifier` must be one of:
-⍝ * an HTTP request for a package
-⍝ * a ZIP file holding a package
-⍝ * a folder holding a package (like file://C:/Temp/group-name-version)
-⍝ * a path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
-⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in Client's config file.\\
+⍝ * An HTTP request for a package
+⍝ * A ZIP file holding a package
+⍝ * A folder holding a package (like file://C:/Temp/group-name-version)
+⍝ * A path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
+⍝ * A package ID; Tatin will then attempt to find that package in one of the Registries defined in the
+⍝   Client's config file.
 ⍝   The first hit wins.\\
 ⍝ `targetSpace` must be a reference or a fully qualified name of an ordinary namespace, meaning the name must
 ⍝ start with either `#.` or `⎕SE.`.\\
-⍝ `targetSpace` might already exist but if it doesn't it will be created. If it exists but is not an ordinary
+⍝ `targetSpace` might already exist, but if it doesn't it will be created. If it exists but is not an ordinary
 ⍝ namespace an error is thrown.\\
 ⍝ Loads the package into `[#|⎕SE]._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
 ⍝ Loads all dependencies, if any, as well into [#|⎕SE]._tatin but _not_ into `targetSpace`.\\
-⍝ Leaves no trails in the file system unless a package relies on file assets in which case those are loaded
-⍝ into a temporary directory.\\
-⍝ Returns the name of whatever was established in `targetSpace`.
+⍝ Leaves no trails in the file system unless a package (or one of its dependencies) relies on file assets in
+⍝ which case the temporary directory (which is created in any case) will not be deleted.\\
+⍝ Returns the name of the temp folder in case it could not be deleted (because of assets) and '' otherwise.
  r←''
- 'Not a valid package ID'Assert GetPackageIDFromFilename identifier_
- refs←reset←tempDirs←⍬
- identifier←ReplaceRegistryAlias identifier_
- ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
- :If ~'/'∊identifier
-     identifier←(EstablishRegistry identifier),identifier
-     PrintToSession⊃{'Loading <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
- :EndIf
  targetSpace←⍕targetSpace
- '"targetSpace" must start with either "#" or "⎕SE"'Assert(⊂1 ⎕C{⍵↑⍨¯1+⍵⍳'.'}targetSpace)∊,¨'#' '⎕SE'
- saveIn←GetTatinRootSpace targetSpace
- :If 0=⎕NC targetSpace
-     targetSpace(⍎{⍵↑⍨¯1+⍵⍳'.'}saveIn).⎕NS''
- :Else
-     '"targetSpace" is not a namespace'Assert 9=⎕NC targetSpace
-     '"targetSpace" must not be a scripted namespace'Assert{16::1 ⋄ 0⊣⎕SRC ⍵}⍎targetSpace
- :EndIf
- :If '.zip'≡⎕C ¯4↑identifier
- :AndIf Reg.IsHTTP identifier_
-     'ZIP files cannot be loaded via HTTP'Assert 0
- :EndIf
- identifier←CheckVersion identifier
- 'Package not found'Assert 0<≢identifier
- PrintToSession'  Establish dependency tree...'
- buildList←GetDependecyTree identifier
- :For level packageID url :In ↓buildList
-     PrintToSession'  Fetching ',packageID,' from ',url,'...'
-     tempDir←InstallPackage_ packageID url
-     cfg←ReadPackageConfigFile tempDir
-     packageID←1 GetPackageIDFromFilename url
-     saveIn2←saveIn,'.',packageID
-     :If 0=⎕NC saveIn2
-         msg←Reg.ImportWithLink saveIn2(tempDir,'/',cfg.source)
-         'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
+ tempFolder←F.GetTempSubDir''
+ paths←InstallPackage identifier tempFolder
+ loaded←LoadDependencies tempFolder targetSpace
+ :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_NAME).assets}¨F.ListDirs tempFolder
+     F.RmDir tempFolder
+     :If 0<≢loaded
+         {⍵.⎕FX'r←∆HOME' 'r←⍬'}¨loaded
      :EndIf
-     ref←⍎saveIn2
-     EstablishConstants ref cfg tempDir
-     :If 0=≢cfg.assets
-         tempDirs,←⊂tempDir
-         reset,←⍎saveIn2
-     :EndIf
-     refs,←ref
-     :If level=1
-         PrintToSession'  Establish API in ',targetSpace,' for ',saveIn2,'...'
-         r←,⊂cfg LinkTargetToPackage saveIn2 targetSpace
-     :EndIf
- :EndFor
- LinkDependencies refs
- :If 0<≢tempDirs
-     F.RmDir tempDirs
-     {⍵.⎕FX'r←∆HOME' 'r←'''''}¨reset  ⍝ For those that do not have any assets
+ :ElseIf 0<≢loaded
+     r←tempFolder
  :EndIf
 ⍝Done

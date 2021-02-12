@@ -1,0 +1,16 @@
+ r←Test_Load_063(stopFlag batchFlag);⎕TRAP;refs
+⍝ Try to load a particular package by specifying just group and name (no Registry, no version)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ refs←TC.LoadPackage'aplteam-APLProcess'#.TEMP
+ →T.GoToTidyUp'#._tatin.aplteam_APLProcess_1_0_0.APLProcess'≢⍕#.TEMP.APLProcess
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -1,12 +1,18 @@
- response←request GetBestVersionNumber packageID;bestVersion;ns
+ response←request GetBestVersionNumber packageID;bestVersion;ns;group
 ⍝ `path` is fully qualified. The packageID part might have just a major version no. or no version numer at all
+ :If Reg.IsValidPackageName packageID
+     :If 0<≢group←EstablishGroup packageID
+         packageID←group,packageID
+     :Else
+         response←'Package not found'Return404 request
+     :EndIf
+ :EndIf
  bestVersion←(≢G.RegistryPath)↓Reg.GetBestVersionNumber G.RegistryPath,packageID
  :If 0<≢bestVersion
      ns←⎕NS''
      ns.BestVersion←bestVersion
      response←request ReturnJSON Reg.JSON ns
  :Else
-     response←request Respond 404 0
-     response.Content←'Package not found'
+     response←'Package not found'Return404 request
  :EndIf
 ⍝Done

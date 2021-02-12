@@ -1,0 +1,16 @@
+ r←Test_Load_064(stopFlag batchFlag);⎕TRAP;refs
+⍝ Try to load a particular package by specifying just the name (no Registry, no group, no version)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ refs←TC.LoadPackage'APLTreeUtils'#.TEMP
+ →T.GoToTidyUp'#._tatin.aplteam_APLTreeUtils_7_0_0.APLTreeUtils'≢⍕#.TEMP.APLTreeUtils
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

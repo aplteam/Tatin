@@ -7,8 +7,11 @@
      'Invalid: "format"'Assert 1=≢format
      'Invalid: "format"'Assert format∊'DM'
      :If ⍬≢⍴data
-     :AndIf 2≠⍴⍴data
+     :AndIf (2≠⍴⍴data)∧2≠≡data
          buff←{'\\'⎕R'\\\\'⍠('Greedy' 0)⊣⍵}⍣(⍬≢⍴data)⊣data      ⍝ Backslash is the JSON escape character!
+         buff←(⎕UCS 10)(≠⊆⊢)buff
+         buff←(';'≠⊃¨buff)/buff
+         buff←1↓⊃,/(⎕UCS 10),¨buff
      :Else
          buff←data
      :EndIf

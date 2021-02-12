@@ -1,4 +1,4 @@
- r←GetBestVersionNumber path;id;pattern;list
+ r←GetBestVersionNumber path;id;pattern;list;buff
 ⍝ Establishes the best version number for ⍵
 ⍝ '{group}-{name}-3.0.0' ← GetBestVersionNumber '{group}-{name}'
 ⍝ '{group}-{name}-2.1.0' ← GetBestVersionNumber '{group}-{name}-2'
@@ -12,6 +12,15 @@
          r←path
      :EndIf
  :Else
+     :If IsValidPackageName id
+         ⍝ We first need to establish the group:
+         path←{⍵↓⍨-≢'/\'A.Last ⍵}path
+         :If 0=≢buff←⊃F.ListDirs path,'*-',id
+             :Return
+         :EndIf
+         id←({⍵↑⍨⍵⍳'-'}{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}buff),id
+         path,←id
+     :EndIf
      :Select ⊃'-'+.=id
      :Case 1
          pattern←path,'*'

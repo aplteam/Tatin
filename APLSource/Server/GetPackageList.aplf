@@ -1,5 +1,18 @@
- response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;uniqueIDs;list;list2;list3;descriptionAndProjecturl;list5;mat
+ response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;uniqueIDs;list;list2;list3;descriptionAndProjecturl;list5;mat;group
 ⍝ Respond to a request for some or all packages, HTML or JSON
+ :If Reg.IsValidPackageName packageID
+     :If 0<≢group←EstablishGroup packageID
+         packageID←group,packageID
+     :Else
+         :If IsJsonRequest request.Headers
+             response←'Package not found'Return404 request
+         :Else
+             html←'<p>Not found</p>'
+             response←request ReturnHTML html
+         :EndIf
+         :Return
+     :EndIf
+ :EndIf
  parms←Reg.CheckParmsForListPackages ⍬
  :If (⊂'group')∊request.QueryParameters[;1]
      parms.group←{2⊃⍵[⍵[;1]⍳⊂'group';]}request.QueryParameters

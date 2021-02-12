@@ -1,8 +1,12 @@
- r←Test_Server_502(stopFlag batchFlag);⎕TRAP;packageID;serverPath;reg;oldCredentials;rc;msg;zipFilename
- ;zip;cfg;body;clientCfg;dir;src;res
-⍝ Publish a package with a group name that requires a specific API key, and provide it
+ r←Test_Server_502(stopFlag batchFlag);⎕TRAP;dir;src;zip;serverPath;body;cfg;reg;oldCredentials;packageID
+⍝ Publish a package and then delete it
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
+
+ :If 1
+     r←T._NotImplemented
+     :Return
+ :EndIf
 
  #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
@@ -19,6 +23,8 @@
  cfg.source←'Test.apln'
 
  cfg TC.WritePackageConfigFile src
+
+ ∘∘∘  ⍝TODO⍝
 
  reg←TC.MyUserSettings.GetRegistry'https://localhost'
  oldCredentials←reg.api_key

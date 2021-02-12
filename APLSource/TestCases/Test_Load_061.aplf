@@ -1,4 +1,4 @@
- r←Test_Load_061(stopFlag batchFlag);⎕TRAP;refs;qdmx
+ r←Test_Load_061(stopFlag batchFlag);⎕TRAP;refs
 ⍝ Try to load a particular package without specifying a registry and without a patch number
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -6,13 +6,8 @@
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
 
- :Trap 98
-     refs←TC.LoadPackage'aplteam-APLProcess-0.2'#.TEMP
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp~∨/'You must specify a Registry for this package ID:'⍷qdmx.EM
- :EndTrap
+ refs←TC.LoadPackage'aplteam-APLProcess-0.2'#.TEMP
+ →T.GoToTidyUp'#._tatin.aplteam_APLProcess_0_2_12.APLProcess'≢⍕#.TEMP.APLProcess
 
  r←T._OK
 

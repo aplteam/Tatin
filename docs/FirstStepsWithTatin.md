@@ -200,6 +200,8 @@ For that you need to execute this:
 
 Note that we did not specify any of the major, minor and patch number but the Registry by alias (`[tatin]`); that tells Tatin that we want to get the very latest version of `MarkAPL`.
 
+If you do not even specify the Regsitry then Tatin would scan all Registry; the first hit wins. Only then would it establish the best version on that server.
+
 Let's check what's now in `/Path2Foo/Packages`
 
 ```

@@ -1,4 +1,4 @@
- reg←{userSettings}EstablishRegistry packageID;registries;uri;alias;list;msg;CR
+ reg←{userSettings}EstablishRegistry packageID;registries;uri;alias;list;msg;CR;i
 ⍝ The purpose of this function is to establish the registry a package can be found in.
 ⍝ Useful in case the user specified just a package ID.
 ⍝ Note that `packageID` might be a full ({group}-{name}-{version}) or a partial one ({group}-{name} or {group}-{name}-{major}).
@@ -10,31 +10,35 @@
      userSettings←{0<⎕NC ⍵:⍎⍵ ⋄ MyUserSettings}'userSettings'
      registries←userSettings.registries
      'No Registries defined in the Client config file'Assert 1≤≢registries
-     :For uri alias :In registries.(uri alias)
+     i←0
+     :Repeat
+         i+←1
+         (uri alias)←i⊃registries.(uri alias)
          :If Reg.IsHTTP uri
              :Trap 98  ⍝ Because the server might be down, or have disappeared, whatever...
+              ⍝TODO⍝ Invent a particular command for this for better performance and less data exchange
                  :If 0=≢list←ListPackages_ uri,packageID
                      :Continue
                  :Else
                      reg←uri
-                     :Leave
                  :EndIf
              :EndTrap
-         :ElseIf Reg.IsValidPackageID_Complete packageID,'*'
+         :ElseIf Reg.IsValidPackageID_Complete packageID
              :If F.IsDir(RemoveFileProtocol uri),'/',packageID
                  reg←uri
-                 :Leave
              :EndIf
-         :ElseIf Reg.IsValidPackageID_WithoutVersionNo packageID,'*'
-             :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/',packageID,'-*'
+         :ElseIf Reg.IsValidPackageName packageID
+             :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/*-',packageID,'*'
+                 list←∪{⍵↑⍨¯1+⍵⍳'-'}¨GetPackageIDFromFilename¨list
+                 ('Package name found in ',(⍕≢list),' groups')Assert 1=≢list
                  reg←uri
-                 :Leave
              :EndIf
-         :ElseIf 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/',packageID,'*'
-             reg←uri
-             :Leave
+         :Else
+             :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/',packageID,'*'
+                 reg←uri
+             :EndIf
          :EndIf
-     :EndFor
+     :Until (i=≢registries)∨0<≢reg
      :If 0=≢reg
          CR←⎕UCS 13
          msg←'Package:',CR,'  ',packageID,CR,'not found in any of these Registries:'

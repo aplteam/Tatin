@@ -404,14 +404,19 @@
       r←TC.Init''
     ∇
 
-    ∇ r←ListTags Arg;parms
+    ∇ r←ListTags Arg;parms;registry
       parms←⎕NS''
       parms.tags←''
+      :If 0≡registry←Arg._1
+          →(⍬≡registry←SelectRegistry 0)/0
+      :Else
+          registry,←(~(¯1↑registry)∊'/\')/'/'
+      :EndIf
       :If 0≢Arg.tags
       :AndIf 0<≢Arg.tags
           parms.tags←Arg.tags
       :EndIf
-      r←⍪parms TC.ListTags Arg._1
+      r←⍪parms TC.ListTags registry
     ∇
 
     ∇ r←ListVersions Arg;qdmx
@@ -435,7 +440,7 @@
 
     ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn
       (identifier targetSpace)←Arg.(_1 _2)
-      :If ~(⊂1 ⎕C targetSpace)∊'#' '⎕SE'
+      :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
           '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       :EndIf
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
@@ -548,7 +553,7 @@
       r←⍪TC.InstallPackage identifier installFolder
     ∇
 
-    ∇ r←UserSettings Arg;origData;filename;ns;new
+    ∇ r←UserSettings Arg;origData;filename;ns;new;buff
       r←''
       filename←TC.F.NormalizePath TC.MyUserSettings.path2config
       ('User setting file "',filename,'" does not exist?!')Assert ⎕NEXISTS filename
@@ -557,7 +562,8 @@
           :If 0=≢new←EditJSON origData
               ⎕←'Cancelled without a change'
           :Else
-              :If 1 ∆YesOrNo'Do you want to save your changes to disk?'
+              :If new≢origData
+              :AndIf 1 ∆YesOrNo'Do you want to save your changes to disk?'
                   (⊂new)⎕NPUT filename 1
               :AndIf 1 ∆YesOrNo'Saved! Woul you like to refresh the user settings in the WS?'
                   TC.Init ⍬
@@ -568,7 +574,9 @@
           :If ~Arg.apikey
               origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace API key by Asterisks
           :EndIf
-          r←⍪(⊂'User settings in <',filename,'> :'),(⎕UCS 10)(≠⊆⊢)origData
+          buff←(⎕UCS 10)(≠⊆⊢)origData
+          buff←(';'≠⊃¨buff)⌿buff
+          r←⍪(⊂'User settings in <',filename,'> :'),buff
       :EndIf
     ∇
 
@@ -656,38 +664,42 @@
           r,←⊂'The result is ordered by priority: the first one is scanned first etc.'
           r,←⊂''
           r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
-          r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all columns'
+          r,←⊂'* By default only "alias", "uri" and "priority" are listed; specify -all for all'
+          r,←⊂'  columns but be aware that this means the API key will become visible.'
       :Case ⎕C'ListPackages'
-          r,←⊂'Lists all groups defined in the Registry specified as an argument. If no Registry was'
-          r,←⊂'specified then a list witg all Registries is presented to the user.'
-          r,←⊂'* If you specify an alias it MUST be embraced by square brackets as in [MyAlias]'
-          r,←⊂'* Aliases are case insensitive, paths only under Windows.'
-          r,←⊂'* It does not matter whether you specify / or \ in a path, or whether it has or has'
-          r,←⊂'  not a trailing separator: Tatin is taking care of that.'
-          r,←⊂'* By default all packages are listed. You can restrict the output in two ways:'
-          r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
-          r,←⊂'  * -tags=zip will restrict the output to packages that carry the given tags.'
-          r,←⊂'    If you need to specify multiple tags then separate them by commas.'
+          r,←⊂'Lists all packages in the Registry specified as an argument. If no Registry was specified'
+          r,←⊂'then the user will be prompted for the Registry, eccept when there is just one anyway.'
+          r,←⊂''
+          r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has'
+          r,←⊂'not a trailing separator: Tatin is taking care of that.'
+          r,←⊂''
+          r,←⊂'By default all packages are listed. You can restrict the output in two ways:'
+          r,←⊂' * -group={groupname} will restrict the list the packages with the given group name.'
+          r,←⊂' * -tags=foo,goo will restrict the output to packages that carry the tags "foo" & "goo".'
+          r,←⊂''
           r,←⊂'* By default the output is aggregated. Specify -noaggr if you want the full list.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
           r,←⊂'Load the specified package and all its dependencies into the workspace'
           r,←⊂'Requires two arguments:'
           r,←⊂''
-          r,←⊂'A) First argument'
+          r,←⊂'A) First argument: a package identifier'
           r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
           r,←⊂''
-          r,←⊂'B) Second argument'
-          r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
+          r,←⊂'B) Second argument: target namespace'
+          r,←⊂'   Must be the fully qualified name of a namespace the package will be loaded into.'
+          r,←⊂'   May be # or ⎕SE or a sub-namespace of any level'
           r,←⊂''
           r,←⊂'Valid examples are:'
-          r,←⊂'  ]TATIN.LoadPackage aplteam-APLTreeUtils-2.0.0 #.MyPkgs'
-          r,←⊂'  ]TATIN.LoadPackage [tatin]/aplteam-APLTreeUtils2-1.0.0 #.MyPkgs'
-          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1.0.0 #.MyPkgs'
-          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1.0 #.MyPkgs'
-          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1 #.MyPkgs'
-          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2 #.MyPkgs'
-          r,←⊂'  ]TATIN.LoadPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #.MyPkgs'
+          r,←⊂'  ]TATIN.LoadPackage aplteam-APLTreeUtils-2.0.0 #'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]/aplteam-APLTreeUtils2-1.0.0 #'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1.0.0 #'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1.0 #'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1 #'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.LoadPackage APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.LoadPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #'
           r,←⊂''
           r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
@@ -707,6 +719,8 @@
           r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2-1.0 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2-1 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage [tatin]APLTreeUtils2 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
           r,←⊂''
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
@@ -720,7 +734,7 @@
           r,←⊂'By default the API key is replaced by asterisks; specify -apikey to overwrite this.'
           r,←⊂''
           r,←⊂'If you want to do anything more than just printing the settings to the session then'
-          r,←⊂'you are advised to used the API. Note that there is a dedicated document for how to'
+          r,←⊂'you are advised to use the API. Note that there is a dedicated document for how to'
           r,←⊂'use the API, and what for.'
           r,←⊂''
           r,←⊂'If you want to change the settings anyway you can add -edit in order to get the data'
@@ -788,6 +802,12 @@
           r,←⊂'Specify a URL if you are after the version number of a Tatin server.'
       :Case ⎕C'ListTags'
           r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
+          r,←⊂''
+          r,←⊂'If no Registry is specified as argument the user will be prompted unless there is only one'
+          r,←⊂'Registry anyway.'
+          r,←⊂''
+          r,←⊂'You can specify one or more tags like -tags=foo,goo'
+          r,←⊂'In that case all tags are listed from packages that carry both "foo" & "goo".'
       :Case ⎕C'Init'
           r,←⊂'Re-establishes the user settings in ⎕SE. Call this in case the user settings got changed on file'
           r,←⊂'and you want to incorporate the changes in the current session.'
@@ -822,10 +842,12 @@
     ∇ r←HelpOnPackageID dummy
       r←''
       r,←⊂'* A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
-      r,←⊂'  If a full package ID is specified ALL Registries are scanned; the first one wins.'
-      r,←⊂'* Alternatively one can specify a full path or an alias in front of the package ID.'
-      r,←⊂'* You may also specify an incomplete package ID (in terms of no patch number, or'
-      r,←⊂'  neither minor nor patch number), but then you MUST specify a Registry (path or alias).'
+      r,←⊂'  If just a full package ID is specified ALL Registries are scanned; the first one wins.'
+      r,←⊂'* Alternatively specify a full path or a URL or an alias in front of the package ID.'
+      r,←⊂'* You may also specify an incomplete package ID in terms of no patch number, or'
+      r,←⊂'  neither minor nor patch number, or no version information at all'
+      r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
+      r,←⊂'  in two ore more different groups but will success otherwise.'
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2
@@ -1010,7 +1032,7 @@
               r←⍬
               flag←1
           :Else
-              :If {0::1 ⋄ 0⊣JSON ⍵}ns.UserSettings
+              :If {0::1 ⋄ 0⊣JSON ⍵}{b←';'≠⊃¨d←(⎕UCS 10)(≠⊆⊢)⍵ ⋄ 1↓⊃,/(⎕UCS 10),¨b/d}ns.UserSettings
                   :If ~1 ∆YesOrNo'The JSON is invalid; would you like to edit it again? ("N"=drop out without change)'
                       r←''
                       flag←1

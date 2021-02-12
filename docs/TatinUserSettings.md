@@ -16,7 +16,7 @@ When you start using Tatin for the very first time with 18.0 (when Tatin is not 
 
 ### The default file
 
-That default file will only have one Tatin Registry defined in it: the principal Tatin server, available under the address `https://tatin.dev/`. It has an alias `tatin` assigned to it, so you can address it as `[tatin]` with all user commands that require a Registry as parameter.
+That default file will only have one Tatin Registry defined in it: the principal Tatin server, available via the URL `https://tatin.dev/`. It has an alias `tatin` assigned to it, so you can address it as `[tatin]` with all user commands that require a Registry as parameter.
 
 ### Where does it live?
 
@@ -31,17 +31,23 @@ The name of the file is `tatin-client.json`.
 
 Of course you are free to edit that file with any editor. However, keep in mind that you are in charge for making sure that the contents of the file is valid JSON5[^JSON5]: if it's not, Tatin will crash.
 
-Changing the contents of that file by other means --- discussed next --- is much saver as it would check your input and also make  sure that the contents of the file is always valid (syntactically correct).
+If you are familiar with JSON5 syntax and want to edit the file it is recommended to use
+
+```
+]TATIN.Usersettings -edit
+```
+
+This will allow you to edit the file but it will check the syntax afterwards in order to make sure that nothing invalid goes ever into the file.
 
 ### What does Tatin do with the file?
 
-When Tatin is initialized (that is discussed in detail in the document "InitializingTatin") in creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`.
+When Tatin is initialized it creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`.
 
 The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.
 
 ### Syncing file and workspace
 
-If you change the file and have an APL session up and running then your change does not have an impact on the APL session. Also, if you have two APL session running, and you make changes in one session the other would not know about those changes.
+If you change the file and have an APL session up and running then your change does not have an impact on the APL session. 
 
 However, you can force Tatin to bring the session in line with what is saved in the configuration file by executing:
 
@@ -79,9 +85,15 @@ Let's add a made-up registry.
 
 #### Create an instance of the `DefineRegistry` class.
 
-Let's assume that you work for a company "MyCompany", and that this company entertains a Tatin Server under the address https://tatin.mycompany.com.
+Let's assume that you work for a company "MyCompany", and that this company entertains a Tatin Server with the URL https://tatin.mycompany.com.
 
-In order to add that Registry to the user settings file you must first instantiate the `DefineRegistry` class. You may specify the URL and the alias in different ways, execute `]adoc ⎕se.Tatin.DefineRegistry` for details on that class.
+In order to add that Registry to the user settings file you must first instantiate the `DefineRegistry` class. You may specify the URL and the alias in different ways, execute 
+
+```
+]adoc ⎕se.Tatin.DefineRegistry
+``` 
+
+for details on that class.
 
 We will pass a simple text vector that specifies the alias (between `[]`) and the URI:
 
@@ -105,7 +117,7 @@ We will pass a simple text vector that specifies the alias (between `[]`) and th
       ]box off
 ```
 
-Notes:
+#### Settings in der file
 
 * `uri` and `alias` are already set by the constructor
 * `port` is 0 which means that it will fall back to 80 for `http://` and 443 for `https://`
@@ -114,7 +126,7 @@ Notes:
 
 #### Adding the Registry
 
-Adding a registry is achieved by calling the `AddRegistry` method and providing an instance of the `DefineRegistry` class as argument:
+Adding a registry is achieved by calling the `AddRegistry` method, and providing an instance of the `DefineRegistry` class as argument:
 
 
 ```
@@ -129,7 +141,9 @@ Now we would expect two Registries:
  myc    https://tatin.mycompany.com/   90
 ```
 
-Note that the priority is not 0 anymore but 90: Any 0 is replaced by the lowest number yet minus 10. `priority` is used to determine the sequence in which the Registries are scanned in case the user asks for a specific package without specifying any registry at all.
+The priority is not 0 anymore but 90: any 0 is replaced by the lowest number yet minus 10.
+
+Note that so far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the change permanent. That means that other sessions won't be affected.
 
 
 #### Adding the Tatin Test Registry
@@ -149,7 +163,7 @@ There might be scenarios when the default location for the user config file is n
 
 * Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 
-   You could still use the default location, but because that location is user specific, every user would have its own user settings file, which is something you might or might not want to avoid.
+   You could still use the default location, but because that location is user specific, every user would require its own user settings file, which is something you might or might not want to avoid.
 
 In any of the aforementioned cases you need more freedom than what is provided by default.
 
@@ -170,7 +184,7 @@ For that you must create a user settings file in a specific location. In order t
 Notes:
 
 * We use the same name as before (`MyUserSettings`) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class `UserSettings` with that name.
-* There are two ways to list the registries: the first one provides just the alias and the uri while the second one provides _all_ data.
+* There are two ways to list the registries: the first one provides just the alias, the uri and the priority while the second one provides _all_ data (API key!).
 * When you fire up a new session of Dyalog APL right  now, it would still look for the user settings file in its standard location.
 
 ### Make the switch permanent

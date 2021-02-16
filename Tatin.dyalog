@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.17.1 - 2021-02-18
+⍝   * Some changes to the ]TATIN.PackageConfig command
+⍝   * Documentation polished
 ⍝ * 0.17.0 - 2021-02-10
 ⍝   * User command ]TATIN.DeletePackage added
 ⍝   * User command ]TATIN.Documentation added
@@ -476,13 +479,19 @@
                   :OrIf ∆YesOrNo'The directory does not exist yet. Would you like to create it?'
                       'Could not create the directory'Assert TC.F.MkDir path
                   :Else
-                      :Return  ⍝ Give up
+                      ⎕←'Cancelled'
+                      :Return ⍝ Give up
                   :EndIf
               :EndIf
               :If TC.F.IsFile filename
                   ns←TC.ReadPackageConfigFile path
                   newFlag←0
               :Else
+                  :If ~Arg.quiet
+                  :AndIf 0=1 ∆YesOrNo'There is no file ',TC.CFG_NAME,' yet; would you like to create it?'
+                      ⎕←'Cancelled'
+                      :Return
+                  :EndIf
                   ns←TC.InitPackageConfig ⍬
                   ns.source←TC.MyUserSettings.source
                   newFlag←1
@@ -504,7 +513,7 @@
                       :EndIf
                   :EndIf
               :Else
-                  r←⍪⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+                  r←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
               :EndIf
           :EndIf
       :EndIf
@@ -746,8 +755,8 @@
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
           r,←⊂'  Specifying any of the options has no effect.'
           r,←⊂'* In case of a path it must point to a folder that contains a Tatin package.'
-          r,←⊂'  The contents of the file "',TC.CFG_NAME,'" in thet folder is returned.'
-          r,←⊂'  In case the file does not exist yet it is created.'
+          r,←⊂'  The contents of the file "',TC.CFG_NAME,'" in that folder is returned.'
+          r,←⊂'  In case the file does not exist yet it will be created.'
           r,←⊂''
           r,←⊂'You may edit the file by specifying the -edit flag.'
           r,←⊂'In case you want to delete the file: specify the -delete flag.'

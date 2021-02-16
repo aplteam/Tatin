@@ -126,7 +126,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="date">date</h4>
 </a>
 </div>
-<p>The date of the package. This is not necessarily the publishing date.</p>
+<p>The date of the package in the format <code>YYYY-MM-DD</code>. This is not necessarily the publishing date.</p>
+<p>This date is only used for display; see also <a href="#publishedAt" class="bookmark_link"><code>publishedAt</code></a>.</p>
 <div class="h_tag">
 <a href="#description" id="description" class="autoheader_anchor">
 <h4 data-id="description">description</h4>
@@ -167,6 +168,22 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>If there is no file with such an extension, all folders are investigated except those mentioned as “assets”. If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.</li>
 <li>If Tatin cannot establish the source an error will be thrown, and the user <em>must</em> specify “source”.</li>
 </ul>
+<div class="h_tag">
+<a href="#publishedAt" id="publishedAt" class="autoheader_anchor">
+<h4 data-id="publishedAt">publishedAt</h4>
+</a>
+</div>
+<p>This is read-only: when the package is saved as part of publishing it, a timestamp (<code>⎕TS</code>) is injected in the format <code>yyyymmdd.hhmmss</code>.</p>
+<p>Note that this date might play an important role in determining the precedence of versions. This is because although it's obvious which version is better when you look at these two packages:</p>
+<pre><code>group-name-1.0.0
+group-name-1.1.0</code></pre>
+<p>it is less obvious when you look at these:</p>
+<pre><code>group-name-1.0.0-alpha
+group-name-1.1.0-beta</code></pre>
+<p>and it cannot be determined at all with these packages:</p>
+<pre><code>group-name-1.0.0-TryFeature1
+group-name-1.1.0-AttemptedFixFor234</code></pre>
+<p>Since packages, once published, cannot be altered, it is save to assume that the publishing date determines the correct order, but only in such cases. As long as the version consists of just digits and dots <code>publishedAt</code> is ignored.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
 <h4 data-id="tags">tags</h4>

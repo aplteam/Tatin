@@ -126,7 +126,10 @@ Note that when the package configuration file is written to disk the existence o
 
 #### date
 
-The date of the package. This is not necessarily the publishing date.
+The date of the package in the format `YYYY-MM-DD`. This is not necessarily the publishing date. 
+
+This date is only used for display; see also [`publishedAt`](#).
+
 
 #### description
 
@@ -163,6 +166,34 @@ If `source` is left empty Tatin will attempt to identify the source itself.
 * If there is no file with such an extension, all folders are investigated except those mentioned as "assets". If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.
 
 * If Tatin cannot establish the source an error will be thrown, and the user _must_ specify "source".
+
+#### publishedAt
+
+This is read-only: when the package is saved as part of publishing it, a timestamp (`⎕TS`) is injected in the format `yyyymmdd.hhmmss`.
+
+Note that this date might play an important role in determining the precedence of versions. This is because although it's obvious which version is better when you look at these two packages:
+
+```
+group-name-1.0.0
+group-name-1.1.0
+```
+
+it is less obvious when you look at these:
+
+```
+group-name-1.0.0-alpha
+group-name-1.1.0-beta
+```
+
+and it cannot be determined at all with these packages:
+
+```
+group-name-1.0.0-TryFeature1
+group-name-1.1.0-AttemptedFixFor234
+```
+
+Since packages, once published, cannot be altered, it is save to assume that the publishing date determines the correct order, but only in such cases. As long as the version consists of just digits and dots `publishedAt` is ignored.
+
 
 #### tags
 

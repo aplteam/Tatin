@@ -1,4 +1,4 @@
- response←SavePackage request;path;filename;path2;packageID;tempFolder;target
+ response←SavePackage request;path;filename;path2;packageID;tempFolder;target;pkgFilename
 ⍝ `packageID` is a valid package ID
 ⍝ `bytes` is a stream of bytes originating from a ZIP file being sent base-64 encoded by the client
 ⍝ This function saves the data in the appropriate folder which of course must not exist.
@@ -15,7 +15,9 @@
      (Reg.Base64 request.Content)Reg.WriteNativeFile filename
      path←tempFolder,'/data/'
      filename DotNetZip.UnzipTo path
-     (F.NormalizePath tempFolder,'/')⎕NMOVE F.NormalizePath path,'\apl-package.json'
+     pkgFilename←F.NormalizePath path,'\apl-package.json'
+     SetPublishingDate pkgFilename
+     (F.NormalizePath tempFolder,'/')⎕NMOVE pkgFilename
      :If F.IsFile path,Reg.DependenciesFilename
          (F.NormalizePath tempFolder,'/')⎕NMOVE F.NormalizePath path,Reg.DependenciesFilename
      :EndIf

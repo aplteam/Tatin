@@ -1,5 +1,6 @@
  ValidateName←{
      ('"',⍺,'" is not a string')Assert 0 2∊⍨10|⎕DR ⍵:
+     ','∊⍵:⍺(∇{(⍺,':',⍵)⍺⍺ ⍵})¨','(≠⊆⊢)⍵
      ('"',⍺,'" is not a valid APL name')Assert 0=(⎕NS'').⎕NC ⍵:
      ('"',⍺,'" is not pure ASCII')Assert~∨/127<⎕UCS ⍵:
      1:shy←0

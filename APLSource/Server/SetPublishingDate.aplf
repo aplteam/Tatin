@@ -1,0 +1,10 @@
+ {r}←{TS}SetPublishingDate filename;json;TS2
+⍝ Injects the publishing date into the config file as a float (`1 ⎕DT ⊂⎕TS`)
+⍝ You may specify a TS as left argument (mainly test cases)
+ r←⍬
+ TS←{0=⎕NC ⍵:⎕TS ⋄ ⍎⍵}'TS'
+ TS2←60 ⎕DT⊂TS
+ json←Reg.JSON⊃F.NGET filename
+ json.publishedAt←TS2
+ (⊂Reg.JSON json)F.NPUT filename 1
+⍝Done

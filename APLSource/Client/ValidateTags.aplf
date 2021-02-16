@@ -3,7 +3,10 @@
      tags←cfg.tags
      tags←⎕C tags
      tags←','@(⍸';'=tags)⊣tags
-     '"tags" contains invalid characters'Assert∧/b←tags∊(⎕C ⎕A),⎕D,' -∆⍙,':
-     cfg.tags←tags
-     cfg
+     b←tags∊(⎕C ⎕A),⎕D,' -∆⍙,'
+     ∧/b:cfg⊣cfg.tags←tags
+     b←~b
+     plural←(1<+/b)/'s'
+     msg←'"tag',plural,'" contains ',((1=+/b)/'an '),'invalid character',plural,': ',(b/tags)
+     msg Assert 0:
  }

@@ -14,8 +14,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </head>
 <body>
 <div class="h_tag">
-<a href="#Installing-and-Updating-Tatin" id="Installing-and-Updating-Tatin" class="autoheader_anchor">
-<h1 data-id="Installing-and-Updating-Tatin">Installing and Updating Tatin</h1>
+<a href="#Installing-and-Updating-the-Tatin-Cleint" id="Installing-and-Updating-the-Tatin-Cleint" class="autoheader_anchor">
+<h1 data-id="Installing-and-Updating-the-Tatin-Cleint">Installing and Updating the Tatin Cleint</h1>
 </a>
 </div>
 <div class="h_tag">
@@ -24,7 +24,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Note that you need to worry about this only if you use version 18.0: with later versions Tatin will be available in <code>⎕SE</code> after a standard installation anyway.</p>
-<p>However, installing and updating is, as far as the Tatin client is concerned, <em>the same thing</em>, because updating the Tatin client basically means removing the old version and installing the new one.</p>
+<p>However, installing and updating is, as far as the Tatin client is concerned, <em>the same thing</em>, because updating the Tatin client basically means removing the old version and installing a new one.</p>
 <div class="h_tag">
 <a href="#How-to-install-the-Tatin-Client" id="How-to-install-the-Tatin-Client" class="autoheader_anchor">
 <h2 data-id="How-to-install-the-Tatin-Client">How to install the Tatin Client</h2>
@@ -33,19 +33,26 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Instructions:</p>
 <ol start="1">
 <li>Download the latest release of the Tatin client from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a></li>
-<li>Unzip it into the <code>MyUCMDs/</code> folder.
-<p>The <code>MyUCMDs/</code> folder is created by the Dyalog APL installer. Where to find it depends on your operating system:</p>
+<li>Unzip it <em>into</em> the <code>MyUCMDs/</code> folder.</li>
+</ol>
+<p>Where to find the <code>MyUCMDs/</code> folder depends on your operating system:</p>
 <ul>
 <li>Under Windows it is
 <p><code>(2 ⎕nq # 'GetEnvironment' 'USERPROFILE'),'\Documents\MyUCMDs\'</code></p></li>
-<li>Otherwise it is <code>$home/MyUCMDs/</code></li>
-</ul></li>
-</ol>
+<li>On non-Windows platforms it is <code>$HOME/MyUCMDs/</code></li>
+</ul>
+<p>Note that this folder is created by the Dyalog APL installer under Windows but <em>not</em> under Linux and Mac-OS, so you need to create the folder yourself on non-Windows platform.</p>
 <p>Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.</p>
 <p>As a side effect of executing any of the Tatin user commands the Tatin API will become available via <code>⎕SE.Tatin</code>.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
 <p>If you want the Tatin API to be available right from the start: this is discussed under “<a href="#Initializing-Tatin" class="bookmark_link">Initializing Tatin</a>”.</p>
+</div>
+</div>
+
 <p>Putting Tatin into this folder has the benefit that it will be available in all suitable versions of Dyalog APL installed on your machine. It has the drawback that this is a user-specific folder.</p>
-<p>Tatin requires version 18.0 Unicode or better, therefore the <code>]TATIN</code> user commands won't be listed in either earlier versions of Dyalog or in the Classic version.</p>
+<p>Tatin requires version 18.0 Unicode or better, therefore the <code>]TATIN</code> user commands won't be listed in either earlier versions of Dyalog or in any Classic version.</p>
 <div class="h_tag">
 <a href="#Initializing-Tatin" id="Initializing-Tatin" class="autoheader_anchor">
 <h2 data-id="Initializing-Tatin">Initializing Tatin</h2>
@@ -54,28 +61,38 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>As already mentioned, Tatin comes with a self-initializing feature: once installed any suitable version of Dyalog will provide a list of the Tatin user commands once you enter:</p>
 <pre><code>      ]tatin -?</code></pre>
 <p>The script <code>Tatin.dyalog</code> is the interface between the Dyalog user command framework and the Tatin API:</p>
-<ul>
-<li>When any of the Tatin user commands is executed it will check whether the API is already loaded (<code>⎕NC '⎕SE.Tatin'</code>)</li>
-<li>If that's not the case it will…
+<p>When any of the Tatin user commands is executed it will check whether the API is already loaded (<code>0&lt;⎕NC '⎕SE.Tatin'</code>)</p>
+<p>If that's not the case it will…</p>
 <ol start="1">
 <li>copy the code into <code>⎕SE._Tatin</code></li>
 <li>create a namespace <code>⎕SE.Tatin</code></li>
-<li>establish references in <code>⎕SE.Tatin</code> pointing to functions in <code>⎕SE._Tatin</code>.</li>
-</ol></li>
-</ul>
+<li>establish references in <code>⎕SE.Tatin</code> pointing to the public functions in <code>⎕SE._Tatin</code>.</li>
+</ol>
 <div class="h_tag">
 <a href="#On-setupdyalog" id="On-setupdyalog" class="autoheader_anchor">
 <h2 data-id="On-setupdyalog">On <code>setup.dyalog</code></h2>
 </a>
 </div>
-<p>Now you might want the Tatin API to be around right from the start, so that you can invoke any of the Tatin API functions without first executing any of the Tatin user commands. For example, you might want to have an automated build process available right from the start.</p>
-<p>If you are not interested in this, skip the rest of this document.</p>
+<p>Now you might want the Tatin API to be around right from the start, so that you can invoke any of the Tatin API functions without first executing any of the Tatin user commands.</p>
+<p>What is the application for this? Well, you might want to have an automated build process available right from the start, for example.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>If you are not interested in this, skip the rest of this document</p>
+</div>
+</div>
+
 <p>The way to achieve that goal requires the introduction or modification of a file <code>setup.dyalog</code> in your <code>MyUCMDs\</code> folder.</p>
 <div class="leanpub_A">
 <h3>How does <code>setup.dyalog</code> work?</h3>
 <p>The magic behind this is that whenever an instance of Dyalog is fired up it checks whether such a script exists. If that is the case it checks whether there is a function <code>Setup</code>.</p>
 <p>If that is the case it is expected to be a monadic function which will be executed automatically as part of the instantiating process of Dyalog APL.</p>
-<p>This can be used for many things like making changes to the session, specifying function keys or loading stuff into <code>⎕SE</code>.</p>
+<p>This can be used for many things like…</p>
+<ul>
+<li>making changes to the session</li>
+<li>specifying function keys</li>
+<li>loading stuff into <code>⎕SE</code></li>
+</ul>
 </div>
 
 <div class="h_tag">
@@ -93,7 +110,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
           AutoloadTatin ⍬
       :Else
           dmx←⎕DMX
-          ⎕←'Setup.dyalog has a problem and was not executed sucessfully:'
+          ⎕←'Setup.dyalog has a problem and was not executed successfully:'
           ⎕←↑'  '∘,¨dmx.DM
       :EndTrap
     ∇

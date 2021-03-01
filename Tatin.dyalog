@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
+
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.17.2 - 2021-02-17
+⍝   * Minor improvements in user command help
 ⍝ * 0.17.1 - 2021-02-18
 ⍝   * Some changes to the ]TATIN.PackageConfig command
 ⍝   * Documentation polished
@@ -80,7 +83,7 @@
      
           c←⎕NS ⍬
           c.Name←'LoadPackage'
-          c.Desc←'Load the package specified in the argument and all dependencies into the WS'
+          c.Desc←'Load the package specified in the argument and all dependencies into the WS or ⎕SE'
           c.Parse←'2'
           r,←c
      
@@ -140,7 +143,7 @@
      
           c←⎕NS ⍬
           c.Name←'ListTags'
-          c.Desc←'Lists all tags used in all packages/'
+          c.Desc←'Lists all tags used in all packages'
           c.Parse←'1s -tags='
           r,←c
      
@@ -152,7 +155,7 @@
      
           c←⎕NS ⍬
           c.Name←'CheckForBetterVersion'
-          c.Desc←'Check whether there are better versions available'
+          c.Desc←'Check whether there are better versions of a package available'
           c.Parse←'1 -major'
           r,←c
      
@@ -194,6 +197,9 @@
           r←''
       :Else
           TC←⎕SE._Tatin.Client
+          :If 0=⎕SE._Tatin.RumbaLean.⎕NC'DRC'
+              ⎕SE._Tatin.Admin.InitConga ⍬
+          :EndIf
           r←((⍎Cmd)__ExecAsTatinUserCommand)Input
       :EndIf
     ∇
@@ -221,9 +227,22 @@
      ⍝Done
     ∇
 
-    ∇ r←Version Arg;⎕TRAP
+    ∇ r←Version Arg;⎕TRAP;registries;registry;alias
       ⎕TRAP←0 'S'
-      :If 0≡Arg._1
+      :If (,'*')≡,Arg._1
+          r←⊂(⊂'{Client}'),TC.Reg.Version
+          registries←1 TC.ListRegistries 0
+          :For registry alias :In ↓registries[;1 2]
+              :If 0≠≢'http[s]://'⎕S 0⊣registry  ⍝ Not local?
+                  :Trap 0
+                      r,←⊂(⊂registry),TC.GetServerVersion registry
+                  :Else
+                      r,←⊂registry'' '*** Could not be accessed'
+                  :EndTrap
+              :EndIf
+          :EndFor
+          r←(↑r)[;1 3 4]
+      :ElseIf 0≡Arg._1
           r←TC.Reg.Version
       :Else
           r←TC.GetServerVersion Arg._1
@@ -342,6 +361,10 @@
       :AndIf (1↑1↓targetPath)≠':'
           targetPath←sourcePath,'/',targetPath
       :EndIf
+      :If 0=⎕NEXISTS targetPath
+      :AndIf 1 ∆YesOrNo'Target directory does not exist yet; create it?'
+          TC.F.MkDir targetPath
+      :EndIf
       'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
       zipFilename←TC.Pack sourcePath targetPath
     ∇
@@ -408,6 +431,7 @@
     ∇
 
     ∇ r←ListTags Arg;parms;registry
+      r←''
       parms←⎕NS''
       parms.tags←''
       :If 0≡registry←Arg._1
@@ -455,7 +479,7 @@
       r←TC.LoadPackage identifier targetSpace
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list
       r←⍬
       what←Arg._1
       :If ∧/'[]'∊what
@@ -493,19 +517,17 @@
                       :Return
                   :EndIf
                   ns←TC.InitPackageConfig ⍬
-                  ns.source←TC.MyUserSettings.source
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
                   origData←TC.Reg.JSON ns
-                  (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData
+                  (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData path
                   :If success
                       :If 0<≢∊newData
                       :AndIf newFlag∨newData≢origData
                           ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
-                          ns.tags←⎕C ns.tags
                           :Trap 98
-                              ns TC.WritePackageConfigFile path
+                              TC.WritePackageConfigFile path ns
                           :Else
                               qdmx←⎕DMX
                               ⎕←qdmx.EM
@@ -574,9 +596,9 @@
               :If new≢origData
               :AndIf 1 ∆YesOrNo'Do you want to save your changes to disk?'
                   (⊂new)⎕NPUT filename 1
-              :AndIf 1 ∆YesOrNo'Saved! Woul you like to refresh the user settings in the WS?'
+              :AndIf 1 ∆YesOrNo'Saved! Would you like to refresh the user settings in ⎕SE?'
                   TC.Init ⍬
-                  ⎕←'User settings in WS updated'
+                  ⎕←'User settings in ⎕SE updated'
               :EndIf
           :EndIf
       :Else
@@ -589,7 +611,7 @@
       :EndIf
     ∇
 
-    ∇ (success newData)←(CheckFns EditJson)(name origData);temp;msg;flag;json
+    ∇ (success newData)←(CheckFns EditJson)(name origData path);temp;msg;flag;json
     ⍝ Operator that allows the user to edit `origData` which is supposed to be JSON.\\
     ⍝ After editing it the function checks whether it is still valid JSON.
     ⍝ The user must either fix any problems or make sure that the JSON is empty,
@@ -608,11 +630,14 @@
               :If ~success←IsValidJSON json
                   msg←'This is not valid JSON; do you want to fix the problem? N=abandon changes'
                   flag←~∆YesOrNo msg
-              :ElseIf 0<≢msg←CheckFns json
-                  flag←~1 ∆YesOrNo msg,'; want to try fixing the problem (n=abandon changes) ?'
               :Else
-                  flag←1
-                  newData←json
+                  (msg json)←CheckFns json path
+                  :If 0<≢msg
+                      flag←~1 ∆YesOrNo msg,'; want to try fixing the problem (n=abandon changes) ?'
+                  :Else
+                      flag←1
+                      newData←json
+                  :EndIf
               :EndIf
           :Else
               flag←1
@@ -708,7 +733,8 @@
           r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage [tatin]APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage APLTreeUtils2 #'
-          r,←⊂'  ]TATIN.LoadPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #'
+          r,←⊂'  ]TATIN.LoadPackage A@APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.LoadPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #'
           r,←⊂''
           r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
@@ -730,7 +756,8 @@
           r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage [tatin]APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage APLTreeUtils2 /pathTo/folder'
-          r,←⊂'  ]TATIN.InstallPackage /pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
+          r,←⊂'  ]TATIN.InstallPackage A@APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.InstallPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
           r,←⊂''
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
           r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
@@ -749,7 +776,7 @@
           r,←⊂'If you want to change the settings anyway you can add -edit in order to get the data'
           r,←⊂'into the editor and make changes. In this case the API key will always show.'
           r,←⊂'If you did change the data, you will first be prompted for saving the changes on disk'
-          r,←⊂'and then for executing ]TATIN.Init in order to refresh the user settings in the WS.'
+          r,←⊂'and then for executing ]TATIN.Init in order to refresh the user settings in the ⎕SE.'
       :Case ⎕C'PackageConfig'
           r,←⊂'The argument may be an HTTP request or a path.'
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
@@ -808,7 +835,9 @@
           r,←⊂'[registry]{group}-{package}'
       :Case ⎕C'Version'
           r,←⊂'Prints name, version number and version date of the client to the session.'
-          r,←⊂'Specify a URL if you are after the version number of a Tatin server.'
+          r,←⊂''
+          r,←⊂'* Specify a URL or n alias if you are after the version number of a Tatin server'
+          r,←⊂'* Specify * if you are after the version numbers of all Tatin servers'
       :Case ⎕C'ListTags'
           r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
           r,←⊂''
@@ -857,6 +886,8 @@
       r,←⊂'  neither minor nor patch number, or no version information at all'
       r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
       r,←⊂'  in two ore more different groups but will success otherwise.'
+      r,←⊂'* You may specify an alias for the package by putting it to the front and separate it'
+      r,←⊂'  with an @ from the package ID'
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2
@@ -927,9 +958,9 @@
       :EndIf
     ∇
 
-    ∇ r←CheckPackageConfigFile json;cfg2;ns;extensions
+    ∇ (msg json)←CheckPackageConfigFile(json path);cfg2;ns;extensions;⎕TRAP;list
     ⍝ Returns an empty vector if everything is okay and an error message otherwise
-      r←''
+      msg←''
       ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
       :Trap 98
           cfg2←TC.InitPackageConfig ns
@@ -938,12 +969,28 @@
           {}'api'TC.ValidateName⍣(0<≢ns.api)⊣ns.api
           TC.ValidateVersion ns.version
           ns←TC.ValidateTags ns
+          ns←TC.ValidateDescription ns
+          :If 0=≢ns.source
+              list←(1+≢path)↓¨⊃TC.F.Dir path,'\'
+              list~←⊂TC.CFG_NAME
+              :If 1=≢list
+              :AndIf ((⊂3⊃⎕NPARTS⊃list)∊'.apln' '.aplc')∨TC.F.IsDir path,⊃list
+                  ns.source←⊃list
+              :Else
+                  msg←'Invalid: "source"'
+                  :Return
+              :EndIf
+          :EndIf
+          :If 0=≢ns.api
+              ns.api←⊃,/2↑⎕NPARTS ns.source
+          :EndIf
           {}{{'source'TC.ValidateName ⍵}⍣(0<≢⍵)⊣⍵}ns.source~'/\'
           :If '.'∊ns.source
               '"source" carries an invalid extension'Assert(⊂3⊃⎕NPARTS ns.source)∊SupportedExtensions
           :EndIf
+          json←TC.Reg.JSON ns
       :Else
-          r←⎕DMX.EM
+          msg←⎕DMX.EM
       :EndTrap
     ∇
 

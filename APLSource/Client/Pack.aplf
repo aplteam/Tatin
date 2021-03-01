@@ -4,7 +4,12 @@
  ⍝ ←             path to package file created
  targetPath←RemoveFileProtocol targetPath
  projectPath←⊃1 ⎕NPARTS projectPath,'/'
- targetPath←⊃1 ⎕NPARTS targetPath,'/'
+ :If ~(1↑targetPath)∊'./\'
+ :AndIf (1↑1↓targetPath)≠':'
+     targetPath←Reg.AddSlash(Reg.AddSlash projectPath),targetPath
+ :Else
+     targetPath←⊃1 ⎕NPARTS Reg.AddSlash targetPath
+ :EndIf
  cfg←ReadPackageConfigFile projectPath                                         ⍝ Check projectPath has config
  ValidateConfig cfg
  zipFilename←F.ExpandPath targetPath,(GetPackageFilenameFromCfg cfg),'.zip'
@@ -14,7 +19,8 @@
      F.DeleteFile zipFilename
  :EndIf
  zipObj←⎕NEW DotNetZip(,⊂zipFilename)
- 'No source code?!'Assert 0<≢fileList←projectPath GetAllFiles cfg
+ fileList←projectPath GetAllFiles cfg
+ 'No source code?!'Assert 0<≢fileList
  projectPath zipObj.Add fileList
  projectPath zipObj.Add CFG_NAME
  :If 0<≢cfg.assets

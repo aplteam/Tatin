@@ -3,8 +3,8 @@
 ⍝ Works on all platforms but returns different results.\\
 ⍝ `⍵`, if not empty, is added to the resulting path.\\
 ⍝ Under Windows typically:\\
-⍝ `C:\Users\{⎕AN}\AppData\Local\Tatin'     ←→ GetUserHomeFolder ''
-⍝ `C:\Users\{⎕AN}\AppData\Local\Tatin\foo' ←→ GetUserHomeFolder 'foo'
+⍝ `C:\Users\%USERPROFILE%\AppData\Roaming\Tatin'     ←→ GetUserHomeFolder ''
+⍝ `C:\Users\%USERPROFILE%\AppData\Roaming\Tatin\foo' ←→ GetUserHomeFolder 'foo'
 ⍝ On non-Windows platforms:\\
 ⍝ '/home/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''
 ⍝ '/home/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'
@@ -14,7 +14,7 @@
      (p v)←2↑⍺
      (w l)←'WL'∊''⍴p
      d←'/Tatin'
-     (h lad)←2 ⎕NQ'.' 'GetEnvironment'('HOME' 'LOCALAPPDATA')
+     (h lad)←2 ⎕NQ'.' 'GetEnvironment'('HOME' 'APPDATA')
      w:F.ExpandPath lad,d,add           ⍝ windows
 
      as←'/Library/Application Support'  ⍝ special mac folder

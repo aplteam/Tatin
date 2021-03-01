@@ -17,17 +17,18 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'Constants.apln'
+ cfg.api←'Constants'
  cfg.assets←'file.dll'
- cfg TC.WritePackageConfigFile src
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src zip
 
  refs←TC.LoadPackage('file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Constants.⎕NC'PI'
  →T.GoToTidyUp 3.14≠#.TEMP.Constants.PI
- →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.∆URI
- →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.∆HOME
+ →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.##.∆URI
+ →T.GoToTidyUp 0≥≢#.TEMP.Constants.##.##.∆HOME
  →T.GoToTidyUp 0=≢refs
- →T.GoToTidyUp~(⊂'file.dll')∊⊃¨,/¨1↓¨⎕NPARTS¨⊃0 ⎕NINFO⍠('Wildcard' 1)⊣#.TEMP.Constants.##.∆HOME,'/*'
+ →T.GoToTidyUp~(⊂'file.dll')∊⊃¨,/¨1↓¨⎕NPARTS¨⊃0 ⎕NINFO⍠('Wildcard' 1)⊣#.TEMP.Constants.##.##.∆HOME,'/*'
 
  r←T._OK
 
@@ -35,5 +36,5 @@
  Assert 0=⊃F.RmDir dir
  Assert 0=⊃F.RmDir refs
  #.⎕EX TC.GetTatinRootSpace'#'
- Assert 0=⊃F.RmDir #.TEMP.Constants.##.∆HOME
+ Assert 0=⊃F.RmDir #.TEMP.Constants.##.##.∆HOME
 ⍝Done

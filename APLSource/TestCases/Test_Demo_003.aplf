@@ -1,0 +1,47 @@
+ r←Test_Demo_003(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
+⍝ Publish a package with a three classes, no API
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ F.MkDir src2←src,'/APLSource'
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←':Class MyClass1' '∇r←x Plus y' ':Access Public Shared' 'r←x+y' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/Arithmetic1.aplc'
+ body←':Class MyClass2' '∇r←x Times y' ':Access Public Shared' 'r←x×y' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/Arithmetic2.aplc'
+ body←':Class MyClass3' '∇r←x Power y' ':Access Public Shared' 'r←x*y' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/Arithmetic3.aplc'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Arithmetic' '1.0.0'
+ cfg.source←'APLSource'
+⍝ cfg.api←'MyClass1'
+ TC.WritePackageConfigFile src cfg
+ (rc msg zipFilename)←TC.PublishPackage src reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ refs←TC.LoadPackage(reg,'/Example-Arithmetic-1.0.0')#.TEMP
+ →T.GoToTidyUp 0 0 3≢≢¨#.TEMP.Arithmetic.⎕NL¨3 4 9
+ →T.GoToTidyUp 7≠3 #.TEMP.Arithmetic.MyClass1.Plus 4
+ →T.GoToTidyUp 12≠3 #.TEMP.Arithmetic.MyClass2.Times 4
+ →T.GoToTidyUp 81≠3 #.TEMP.Arithmetic.MyClass3.Power 4
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

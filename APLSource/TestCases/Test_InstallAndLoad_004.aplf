@@ -15,52 +15,50 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- body←':Namespace A' 'foo←{' '##.Times ⍵' '}' ':EndNamespace'
+ body←':Namespace A' '  Times_←{' '    ##.Arithmetic.Times ⍵' '  }' ':EndNamespace'
  (⊂body)F.NPUT src2,'/A.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'A' '1.0.0'
  cfg.source←'A.apln'
- cfg TC.WritePackageConfigFile src2
- src2 TC.Dependencies.Add'[local2]Example-C-1.0.0'
+ cfg.api←'A'
+ TC.WritePackageConfigFile src2 cfg
+ src2 TC.Dependencies.Add'[local2]Example-Arithmetic-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  F.MkDir src3←src,'/B'
- body←'r←Call arg' 'r←A.foo arg'
+ body←'r←Call arg' '  r←A.Times_ arg'
  (⊂body)F.NPUT src3,'/Call.aplf'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'B' '1.0.0'
  cfg.source←'Call.aplf'
- cfg.alias←'Call'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'[local2]Example-A-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- F.MkDir src3←src,'/C'
- body←'r←Times v' 'r←×/v'
+ F.MkDir src3←src,'/Arithmetic'
+ body←' r←Times v' '  r←×/v'
  (⊂body)F.NPUT src3,'/Times.aplf'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'C' '1.0.0'
+ cfg.(group name version)←'Example' 'Arithmetic' '1.0.0'
  cfg.source←'Times.aplf'
- cfg.api←'Times'
- cfg.alias←'Times'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
  refs←TC.InstallPackage('[local2]Example-B-1.0.0')installFolder
- expected←'Example-A-1.0.0' 'Example-B-1.0.0' 'Example-C-1.0.0'
+ expected←'Example-A-1.0.0' 'Example-B-1.0.0' 'Example-Arithmetic-1.0.0'
  →T.GoToTidyUp~expected ∆LazyMatch TC.GetPackageIDFromFilename¨F.ListDirs installFolder,'/*'
  →T.GoToTidyUp~F.IsFile installFolder,'/',TC.Reg.DependenciesFilename
 
  noOf←≢TC.LoadDependencies installFolder #.TEMP
  →T.GoToTidyUp 1≠noOf
- →T.GoToTidyUp 12≢#.TEMP.Call 3 4
+ →T.GoToTidyUp 12≢#.TEMP.B.Call 3 4
 
  r←T._OK
 

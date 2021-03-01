@@ -8,7 +8,7 @@
 
 Whether you want to publish to the principal Tatin server at <https://tatin.dev> or your own Tatin Server or a Tatin Server that someone in your company runs, first you need an API key. "API key" is just a fancy expression for a password that is used by an application.
 
-API keys are only required for publishing, not for consuming packages.
+API keys are only required for publishing and possibly deleting packages, but not for consuming them.
 
 
 ### The Server
@@ -21,9 +21,13 @@ If you want to publish on `https://tatin.dev` you need to ask [kai@aplteam.com](
 
 #### The Tatin Test Server
 
-The Tatin test Server publishes an API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name.
+The Tatin Test Server publishes an API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name.
 
-However, be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later.
+Notes:
+
+* Be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later
+* You cannot publish anything with the groups "aplteam" or "dyalog"
+
 
 
 #### Running your own Tatin Server 
@@ -86,7 +90,7 @@ A Tatin package requires all source code (functions, operators, classes, interfa
 
 Tatin calls the former "source" and the latter "assets". 
 
-What is what is defined in the package configuration file which _must_ exist to make something a Tatin package.
+What is what is defined in the package configuration file which _must_ exist to make a folder a Tatin package.
 
 
 #### The package configuration file

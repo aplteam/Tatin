@@ -44,7 +44,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
  URL                 Alias
  ----                -----
  https://tatin.dev/  tatin</code></pre>
-<p>At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelyhood your own ones), then you must change the user settings.</p>
+<p>At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelihood your own ones), then you must change the user settings.</p>
 <p>All these topics — and related ones — are discussed in a separate document: “TatinUserSettings.html”. Here we try to keep things simple.</p>
 <div class="h_tag">
 <a href="#Looking-around" id="Looking-around" class="autoheader_anchor">
@@ -98,7 +98,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 </div>
 
-<p>Let's assume you need a tool in order to convert <a href="https://en.wikipedia.org/wiki/Markdown" class="external_link" title="Link to the Wikipedia">Markdown</a> into HTML, and that the package should run on all platforms.</p>
+<p>Let's assume you need a tool for converting <a href="https://en.wikipedia.org/wiki/Markdown" class="external_link" title="Link to the Wikipedia">Markdown</a> into HTML, and that the package should run on all platforms.</p>
 <p>The user command <code>ListTags</code> takes one or more tags and returns a list of tags that were also found in the packages that carried the specified tags:</p>
 <pre><code>            ]Tatin.ListTags [tatin] -tags=mack-os,markd
  apltree
@@ -108,7 +108,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
  markdown
  windows</code></pre>
 <p>Good news: there must be at least one package that carries the tags “mac-os” and “markdown” but <em>also</em> the tags “windows” and “linux” because those are both listed, so there will be a package available that runs on all major platforms.</p>
-<p>Note that although we misspelled “mac-os” as “mack-os” it was still identified correctly. Similarly, “markd” was enough for finding “markdown”.</p>
+<p>Note that although we misspelled “mac-os” as “mack-os” it was still identified correctly. Similarly, “markd” was enough to find “markdown”.</p>
 <p>We are now ready to identify that package by executing <code>ListPackages</code> with the <code>-tags</code> option:</p>
 <pre><code>           ]tatin.ListPackages [tatin] -tags=mac-os,markdown
  Group &amp; Name     ≢ major versions
@@ -119,7 +119,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
-<p>If you wonder why that is then please read the document discussing <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a>.</p>
+<p>If you wonder why that is, then please read the document discussing <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a>.</p>
 </div>
 </div>
 
@@ -134,7 +134,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Let's assume that you want to check whether <code>MarkAPL</code> suits your needs, in other words: you just want to check it out.</p>
-<p>That can be achieved with the <code>LoadPackage</code> user command. That loads the package into the workspace and leaves no trail in the file system if that can be avoided.</p>
+<p>That can be achieved with the <code>LoadPackage</code> user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided.</p>
 <div class="leanpub_A">
 <h3>Leaving a trace on the file system</h3>
 <p>In case the package has file dependencies, like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there <em>is</em> a footprint left on the file system.</p>
@@ -142,7 +142,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 
 <p>Notes:</p>
 <ul>
-<li>Loading a package has only one purpose: to investigate it.</li>
+<li>Loading a package in this way has only one purpose: to investigate it.</li>
 <li>Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case.
 <p>This is discussed in the paper <code>TatinsLoadAndUpdateStrategy.html</code></p></li>
 </ul>
@@ -159,12 +159,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
-<p>In case the package or any of its dependencies comes with assets the path to a directory in the temp directory of your OS is printed to the session by <code>]tatin.LoacdPacke</code>.</p>
+<p>In case the package or any of its dependencies comes with assets, the path to a directory in the temp directory of your OS is printed to the session by <code>]tatin.LoadPackage</code>.</p>
 <p>This is because this folder cannot be deleted by Tatin. If no package has any assets then nothing is printed to the session, indicating that no footprint is left behind.</p>
 </div>
 </div>
 
-<p>In case the target namespace is something like <code>#.MyTests</code> it may or may not exist. If it does not Tatin will create it.</p>
+<p>In case the target namespace is something like <code>#.MyTests</code> it may or may not exist. If it does not, Tatin will create it.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
@@ -187,23 +187,32 @@ _tatin</code></pre>
 <p>The name of the namespace carries the version number:</p>
 <pre><code>      #.MarkAPL
 #._tatin.aplteam_MarkAPL_10_0_0</code></pre>
-<p><code>_tatin</code> also contains all the dependencies <code>MarkAPL</code> relies on:</p>
+<p><code>_tatin</code> also contains all the packages <code>MarkAPL</code> depends on:</p>
 <pre><code>      #._tatin.⎕nl ⍳16
 aplteam_APLTreeUtils2_1_1_0
 aplteam_FilesAndDirs_5_0_0
 aplteam_MarkAPL_10_0_0
 aplteam_OS_3_0_0</code></pre>
 <div class="h_tag">
-<a href="#Installing-packages" id="Installing-packages" class="autoheader_anchor">
-<h3 data-id="Installing-packages">Installing packages</h3>
+<a href="#Adding-packages-to-an-application" id="Adding-packages-to-an-application" class="autoheader_anchor">
+<h3 data-id="Adding-packages-to-an-application">Adding packages to an application</h3>
 </a>
 </div>
 <p>Let's assume you've checked on <code>MarkAPL</code>, and that it turns out to suit your needs. You decide to use it in your application <code>Foo</code> which happens to live in <code>/Path2Foo/</code> on disk and in <code>#.Foo</code> in the workspace.</p>
 <p>Let's also assume that the code of your application lives in <code>Foo.Core</code>, and that you want to address <code>MarkAPL</code> with <code>##.MarkAPL</code> from any function within <code>Foo.Core</code>.</p>
-<p>For that you need to execute this:</p>
+<p>For that you need to execute two steps:</p>
+<ol start="1">
+<li>Install the required packages (and implicitly all packages they depend on)</li>
+<li>Load all these packages</li>
+</ol>
+<div class="h_tag">
+<a href="#Step-1--installing" id="Step-1--installing" class="autoheader_anchor">
+<h4 data-id="Step-1--installing">Step 1 : installing</h4>
+</a>
+</div>
 <pre><code>      ]TATIN.InstallPackage [tatin]aplteam-MarkAPL /Path2Foo/Packages</code></pre>
-<p>Note that we did not specify any of the major, minor and patch number but the Registry by alias (<code>[tatin]</code>); that tells Tatin that we want to get the very latest version of <code>MarkAPL</code>.</p>
-<p>If you do not even specify the Regsitry then Tatin would scan all Registry; the first hit wins. Only then would it establish the best version on that server.</p>
+<p>Note that we did not specify any of the major, minor and patch number but the Registry by alias (<code>[tatin]</code>); that tells Tatin that we want to get the very latest version of <code>MarkAPL</code> from the principal Tatin server.</p>
+<p>If you do not even specify the Registry then Tatin would scan all Registry; the first hit wins. Only then would it establish the best version on that server.</p>
 <p>Let's check what's now in <code>/Path2Foo/Packages</code></p>
 <pre><code>      ⍪⊃⎕NINFO ⍠ 1 ⊣ '/Path2Foo/Packages\*'
  /Path2Foo/Packages/apl-buildlist.json
@@ -238,8 +247,8 @@ aplteam_OS_3_0_0</code></pre>
 <pre><code>      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-dependencies.txt' 1
  aplteam-MarkAPL-10.0.0</code></pre>
 <div class="h_tag">
-<a href="#Loading-dependencies" id="Loading-dependencies" class="autoheader_anchor">
-<h3 data-id="Loading-dependencies">Loading dependencies</h3>
+<a href="#Step-2--loading" id="Step-2--loading" class="autoheader_anchor">
+<h4 data-id="Step-2--loading">Step 2 : loading</h4>
 </a>
 </div>
 <p>Having the packages installed you may now load them into your application. This is achieved by the <code>LoadDependencies</code> user command:</p>
@@ -258,12 +267,12 @@ apl-buildlist.json</code></pre>
  aplteam_OS_3_0_0</code></pre>
 <div class="leanpub_A">
 <h3><code>#._tatin</code> versus <code>⎕SE._tatin</code></h3>
-<p>Note that whether you specify a namespace in <code>#</code> or in <code>⎕SE</code> as the target of a <code>LoadDependency</code> operation decides whether the packages are loaded into <code>#._tatin</code> or <code>⎕SE._tatin</code>.</p>
+<p>Note that whether you specify a namespace in <code>#</code> or in <code>⎕SE</code> as the target of a <code>LoadDependencies</code> operation decides whether the packages are loaded into <code>#._tatin</code> or <code>⎕SE._tatin</code>.</p>
 </div>
 
 <p>Let's check whether it worked:</p>
-<pre><code>      ⍪⊃#.Foo.MarkAPL.Markdown2HTML 'A pragraph' '' '* This' '* That'
- &lt;p&gt;A pragraph&lt;/p&gt;
+<pre><code>      ⍪⊃#.Foo.MarkAPL.Markdown2HTML 'A paragraph' '' '* This' '* That'
+ &lt;p&gt;A paragraph&lt;/p&gt;
  &lt;ul&gt;
  &lt;li&gt;This&lt;/li&gt;
  &lt;li&gt;That&lt;/li&gt;

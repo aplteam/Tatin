@@ -22,7 +22,7 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
- cfg TC.WritePackageConfigFile src2
+ TC.WritePackageConfigFile src2 cfg
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
@@ -35,9 +35,8 @@
  (⊂body)F.NPUT src3,'/APLSource/Power.aplf'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyMath' '0.2.0'
- ⍝ cfg.source←''    ⍝ Does not need setting: there is just one folder
- cfg.api←'Times'    ⍝ Meaning that the other functions are invisible
- cfg TC.WritePackageConfigFile src3
+ cfg.source←'APLSource'
+ TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
@@ -52,7 +51,7 @@
  →T.GoToTidyUp(,⊂'Example-MyMath-0.2.0')≢TC.Dependencies.Get installFolder
 
  {}TC.LoadDependencies installFolder #.TEMP
- →T.GoToTidyUp(3.14×3×4)≠3 #.TEMP.MyMath 4
+ →T.GoToTidyUp(3.14×3×4)≠3 #.TEMP.MyMath.Times 4
  →T.GoToTidyUp 1≠≢#.TEMP.⎕NL⍳16
 
  r←T._OK

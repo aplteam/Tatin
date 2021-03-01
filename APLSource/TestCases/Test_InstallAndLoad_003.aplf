@@ -16,10 +16,10 @@
  body←':Class Calc:MyConstants' '∇r←Times v' ':Access Public Shared' 'r←PI××/v' '∇' ':EndClass'
  (⊂body)F.NPUT src2,'/Calc.aplc'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'MyConstants' '0.1.0'
+ cfg.(group name version)←'Example' 'MyStuff' '0.1.0'
  cfg.source←'APLSource'
- cfg.api←'Calc.Times'
- cfg TC.WritePackageConfigFile src
+⍝ cfg.api←'Calc.Times'
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src zip
 
  installFolder←GetTempDir'/Tatin_AppPackages'
@@ -30,7 +30,8 @@
  →T.GoToTidyUp~F.Exists installFolder,'/',TC.Reg.DependenciesFilename
 
  {}TC.LoadDependencies installFolder #.TEMP
- →T.GoToTidyUp(12×3.14)≠#.TEMP.MyConstants 3 4
+ →T.GoToTidyUp(12×3.14)≠#.TEMP.MyStuff.Calc.Times 3 4
+ →T.GoToTidyUp 3.14≠#.TEMP.MyStuff.MyConstants.PI
 
  r←T._OK
 

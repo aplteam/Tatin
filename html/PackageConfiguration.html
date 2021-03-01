@@ -23,10 +23,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Overview">Overview</h2>
 </a>
 </div>
-<p>Every package has a configuration file: that's one of the things that actually make it a package. It defines all that is required in order to consume the package, and to announce its existence to the world.</p>
+<p>Every package has a configuration file: that's one of the things that make it a package. It defines all that is required in order to consume the package, and to announce its existence to the world.</p>
 <p>This is an example:</p>
 <pre><code>{
-  alias: "",
   api: "DotNetZip",
   date: "2020-05-16",
   description: "Zipping and unzipping with.NET Core on all major platforms",
@@ -60,15 +59,21 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       parms.name←'Foo'
       parms.version←'1.0.0'
       Tatin.InitialisePackage parms</code></pre>
-<p>The user command aquivalent is <code>]tatin.packageconfig</code></p>
+<p>The user command equivalent is <code>]tatin.PackageConfig</code></p>
 <div class="h_tag">
 <a href="#User-defined-variables" id="User-defined-variables" class="autoheader_anchor">
 <h3 data-id="User-defined-variables">User defined variables</h3>
 </a>
 </div>
 <p>You may define your own variables in a package configuration file.</p>
-<p>However, since more Tatin-specific variables might be add at a later stage there is a danger of name clashes. This is avoided by a simple rule:</p>
-<p>The names of user defined variables <em>must</em> start with an underscore.</p>
+<p>However, since more Tatin-specific variables might be added at a later stage there is a danger of name clashes. This is avoided by a simple rule:</p>
+<table>
+<tbody>
+<tr>
+<td><strong>The names of user defined variables <em>must</em> start with an underscore</strong></td>
+</tr>
+</tbody>
+</table>
 <p>If you specify any variable with a name that Tatin does not know about and that does not start with an underscore an error will be thrown.</p>
 <div class="h_tag">
 <a href="#Tatins-package-configuration-variables" id="Tatins-package-configuration-variables" class="autoheader_anchor">
@@ -76,37 +81,79 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <div class="h_tag">
-<a href="#alias" id="alias" class="autoheader_anchor">
-<h4 data-id="alias">alias</h4>
-</a>
-</div>
-<p>By default a package is established in the target space under its own name. However, for ease of use but also in order to avoid possible name clashes, an alias can be defined. If not empty the package must be addressed by the alias rather than its own name.</p>
-<div class="h_tag">
 <a href="#api" id="api" class="autoheader_anchor">
 <h4 data-id="api">api</h4>
 </a>
 </div>
-<p>There are two different scenarios:</p>
+<p>“api”, when specified, must be a single name. It must be relative, never absolute; therefore it must never start with <code>#</code> or <code>⎕</code>. It must point to either a class or a namespace.</p>
+<p>There are several scenarios:</p>
+<ol start="1">
+<li>The package consists of a single class or a single namespace, be it scripted or not</li>
+<li>The package consists of a single function or operator</li>
+<li>The package consists of several objects: a mixture of functions, operators, classes and / or namespaces. All objects are public.</li>
+</ol>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>Note that you <em>cannot</em> specify the name of a function or an operator as the API in any of these cases.</p>
+<p>This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is not possible for niladic functions and operators.</p>
+</div>
+</div>
+
+<div class="h_tag">
+<a href="#Single-namespace" id="Single-namespace" class="autoheader_anchor">
+<h5 data-id="Single-namespace">Single namespace</h5>
+</a>
+</div>
 <ul>
-<li>The package consists of a single function or a single operator or a single class or a single namespace, be it scripted or not</li>
-<li>The package consists of several functions, operators, classes or namespaces</li>
+<li>If you don't specify <code>api</code> then the name of the namespace is the API.</li>
+<li>If you do specify <code>api</code> then it must be the name of the namespace. In that case the contents of the namespace becomes the API.</li>
 </ul>
-<p>In the former case what is the api of the package is obvious, and there is no need to even specify it: Tatin will recognize that the name of that single function or single operator or single class or single namespace must be the API of the package, and act accordingly.</p>
-<p>If it's a single function (not that this is recommended!) and the name of the package is <code>Foo</code>, then calling the function is identical with the package name.</p>
-<p>In the latter case it is not obvious at all what the API should be, and the user must specify it.</p>
-<p>Also, while a single namespace is by default the API, the user might want to expose only a subset of functions/operators from that namespace, and in that case the user must specify “api” as well.</p>
-<p>For example, if the name of the package is <code>Foo</code> and it is loaded into <code>#.MyPkgs</code> and you set “api” to <code>Run</code> then calling the function requires:</p>
-<pre><code>#.MyPkgs.Foo.Run</code></pre>
-<p>If you want to expose two functions, <code>CreateParameterSpace</code> and <code>Run</code>, then the api needs to be specified as:</p>
-<pre><code>api←`CreateParameterSpace,Run`</code></pre>
-<p>Calling the two functions would look similar to this:</p>
-<pre><code>parms←#.MyPkgs.Foo.CreateParameterSpace ⍬
-#.MyPkgs.Foo.Run parms</code></pre>
-<p>Notes:</p>
+<div class="h_tag">
+<a href="#Single-class" id="Single-class" class="autoheader_anchor">
+<h5 data-id="Single-class">Single class</h5>
+</a>
+</div>
 <ul>
-<li>If specified “api” must be either a single name or a list of comma-separated names. Names must be relative, never absolute, therefore they must never start with <code>#</code> or <code>⎕</code>.</li>
-<li>Niladic functions <em>cannot</em> become part of an API. Tatin will create references in the target namespace, and one cannot create a reference for a niladic function.</li>
+<li>If you don't specify <code>api</code> then the name of the class is the API.</li>
+<li>If you do specify <code>api</code> then it must be the name of the class. In that case everything in the class with <code>:Access Public Shared</code> becomes the API.</li>
 </ul>
+<div class="h_tag">
+<a href="#Single-function-or-operator" id="Single-function-or-operator" class="autoheader_anchor">
+<h5 data-id="Single-function-or-operator">Single function or operator</h5>
+</a>
+</div>
+<p>If the name of the package is <code>Foo</code>, and the name of the function is <code>MyFns</code>, then it is called as <code>Foo.MyFns</code>. The function may be niladic, monadic, ambivalent or dyadic.</p>
+<p>The same holds true for an operator.</p>
+<p>In this particular case <code>api</code> <em>must not</em> be defined (remain empty).</p>
+<div class="h_tag">
+<a href="#Mixture-of-several-APL-objects" id="Mixture-of-several-APL-objects" class="autoheader_anchor">
+<h5 data-id="Mixture-of-several-APL-objects">Mixture of several APL objects</h5>
+</a>
+</div>
+<ul>
+<li>If <code>api</code> is not set all top-level objects of the package become the API: functions, operators, namespaces, classes , interfaces</li>
+<li>If <code>api</code> is set it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what <code>api</code> is pointing to become the API.</li>
+</ul>
+<div class="h_tag">
+<a href="#Example-restricting-whats-public" id="Example-restricting-whats-public" class="autoheader_anchor">
+<h5 data-id="Example-restricting-whats-public">Example: restricting what's “public”</h5>
+</a>
+</div>
+<p>The user might want to expose only a subset of functions/operators of a namespace (classes have a public interface anyway), and in that case the user must not only specify <code>api</code>, but also structure her code accordingly.</p>
+<p>If the name of the package is <code>Foo</code>, and it is loaded into <code>#</code>, and you want to expose only the functions <code>Run</code> and <code>CreateParmSpace</code>, then the recommended way of doing this is to create a sub-namespace with the name (say) <code>API</code> and populate it with two functions:</p>
+<ul>
+<li><code>Run</code> (which is calling <code>##.Run</code>)</li>
+<li><code>CreateParmSpace</code> (which is calling <code>##.CreateParmSpace</code>)</li>
+</ul>
+<p>Finally you need to assign <code>api←'API'</code> in the package config file.</p>
+<p>Calling the function <code>Run</code> would then require:</p>
+<pre><code>      #.Foo.Run</code></pre>
+<p>To the outside world only two functions are visible:</p>
+<pre><code>      #.Foo.⎕nl ⍳16
+#.Foo.Run
+#.Foo.CreateParmSpace</code></pre>
+<p>Similarly, if your package <code>Foo</code> consist of the two namespaces <code>Boo</code> and <code>Goo</code>, and <code>Run</code> and <code>CreateParmSpace</code> live in <code>Boo</code>, then you could also have a sub-namespace <code>Boo.API</code> that hosts <code>Run</code> and <code>CreateParmSpace</code>, and <code>api</code> would be <code>Boo.API</code>, while calls are still <code>Foo.Run</code> and <code>Foo.CreateParmSpace</code>.</p>
 <div class="h_tag">
 <a href="#assets" id="assets" class="autoheader_anchor">
 <h4 data-id="assets">assets</h4>
@@ -118,7 +165,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>A single folder name</li>
 <li>A simple text vector representing a mixture of file names and folder names separated by commas.</li>
 </ul>
-<p>The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>” or with “<code>./</code>”. If it does anyway an error is thrown.</p>
+<p>The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>”. If it does anyway an error is thrown.</p>
 <p>There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative.</p>
 <p>Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.</p>
 <div class="h_tag">
@@ -126,8 +173,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="date">date</h4>
 </a>
 </div>
-<p>The date of the package in the format <code>YYYY-MM-DD</code>. This is not necessarily the publishing date.</p>
-<p>This date is only used for display; see also <a href="#publishedAt" class="bookmark_link"><code>publishedAt</code></a>.</p>
+<p>The user is not expected to set this: it will be set by the <code>Publish</code> method. This is a timestamp (<code>⎕TS</code>) in the format <code>yyyymmdd.hhmmss</code>.</p>
+<p>Apart from being shown on the web page when listing packages this date might play an important role in determining the precedence of versions. This is because although it's obvious which version is “better” when you look at these two packages:</p>
+<pre><code>group-name-1.0.0
+group-name-1.1.0</code></pre>
+<p>it is less obvious when you look at these:</p>
+<pre><code>group-name-1.0.0-alpha
+group-name-1.1.0-beta</code></pre>
+<p>and it cannot be determined at all with these packages:</p>
+<pre><code>group-name-1.0.0-TryFeature1
+group-name-1.1.0-FixFor234</code></pre>
+<p>Since packages, once published, cannot be altered, it is safe to assume that the publishing date determines the correct order, but only in such cases. However, as long as the version consists of just digits and dots, <code>date</code> is ignored.</p>
 <div class="h_tag">
 <a href="#description" id="description" class="autoheader_anchor">
 <h4 data-id="description">description</h4>
@@ -135,6 +191,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.</p>
 <p>This information is typically used when a human accesses a Tatin Server with a Browser.</p>
+<p><code>description</code> must not be empty.</p>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
 <h4 data-id="group">group</h4>
@@ -159,45 +216,24 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="source">source</h4>
 </a>
 </div>
-<p>The name of a text file (that contains code) or a folder (that contains a collection of code files).</p>
-<p>If it's a single file it might be anything with the extension <code>.aplf</code> (a function), <code>.aplo</code> (an operator), <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script) or <code>.apli</code> (an interface script).</p>
-<p>If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.</p>
-<p>If <code>source</code> is left empty Tatin will attempt to identify the source itself.</p>
-<ul>
-<li>If there is a single script file found with one of the aforementioned extensions that file will become the source.</li>
-<li>If there is no file with such an extension, all folders are investigated except those mentioned as “assets”. If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.</li>
-<li>If Tatin cannot establish the source an error will be thrown, and the user <em>must</em> specify “source”.</li>
-</ul>
-<div class="h_tag">
-<a href="#publishedAt" id="publishedAt" class="autoheader_anchor">
-<h4 data-id="publishedAt">publishedAt</h4>
-</a>
-</div>
-<p>This is read-only: when the package is saved as part of publishing it, a timestamp (<code>⎕TS</code>) is injected in the format <code>yyyymmdd.hhmmss</code>.</p>
-<p>Note that this date might play an important role in determining the precedence of versions. This is because although it's obvious which version is better when you look at these two packages:</p>
-<pre><code>group-name-1.0.0
-group-name-1.1.0</code></pre>
-<p>it is less obvious when you look at these:</p>
-<pre><code>group-name-1.0.0-alpha
-group-name-1.1.0-beta</code></pre>
-<p>and it cannot be determined at all with these packages:</p>
-<pre><code>group-name-1.0.0-TryFeature1
-group-name-1.1.0-AttemptedFixFor234</code></pre>
-<p>Since packages, once published, cannot be altered, it is save to assume that the publishing date determines the correct order, but only in such cases. As long as the version consists of just digits and dots <code>publishedAt</code> is ignored.</p>
+<p>The name of a text file that contains code or a folder that contains a collection of code files. <code>source</code> <em>must not</em> be empty.</p>
+<p>If it's a single file it might be anything with the extension <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script) or <code>.apli</code> (an interface script).</p>
+<p>If it's a folder it might contain any number and mixture of the aforementioned files plus <code>.aplf</code> (functions) and <code>.aplo</code> (operators). Any files with other extensions are misplaced and will be ignored.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
 <h4 data-id="tags">tags</h4>
 </a>
 </div>
 <p>A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.</p>
+<p><code>tags</code> must not be empty if you wish to publish a package.</p>
 <div class="h_tag">
 <a href="#version" id="version" class="autoheader_anchor">
 <h4 data-id="version">version</h4>
 </a>
 </div>
 <p>The version[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
-<p>Examples for valid version numbers are <code>1.2.3</code>, <code>1.2.3-beta1</code>, <code>1.2.3-beta1.30164</code> and <code>18.0.0.30165</code></p>
-<p>An optional build number is ignored by Tatin.</p>
+<p>Examples for valid version numbers are <code>1.2.3</code>, <code>1.2.3-beta1</code>, <code>1.2.3-beta1+30164</code> and <code>18.0.0+30165</code></p>
+<p>The optional build number is ignored by Tatin.</p>
 <p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
 <a href="#System-vars-IO-ML-WX" id="System-vars-IO-ML-WX" class="autoheader_anchor">
@@ -205,13 +241,13 @@ group-name-1.1.0-AttemptedFixFor234</code></pre>
 </a>
 </div>
 <p>By default the config namespace carries the values of the three Dyalog parameters <code>default_io</code>, <code>default_ml</code> and <code>default_wx</code> for the three system variables <code>⎕IO</code>, <code>⎕ML</code> and <code>⎕WX</code>.</p>
-<p>Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the <code>LoadPackage</code> or the <code>LoadDependency</code> function. This is important because that makes any sub-namespace created later on inherit those values.</p>
+<p>Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the <code>LoadPackage</code> or the <code>LoadDependencies</code> function. This is important because that makes any sub-namespace created later on inherit those values.</p>
 <div class="h_tag">
 <a href="#Access-after-loading-a-package" id="Access-after-loading-a-package" class="autoheader_anchor">
 <h3 data-id="Access-after-loading-a-package">Access after loading a package</h3>
 </a>
 </div>
-<p>Whether you load a package with <code>LoadPackage</code> or <code>LoadDependencies</code>, the contents of the configuration file is available as readable JSON under the name <code>∆CONFIG</code> together with <code>∆URI</code> and <code>∆HOME</code>.</p>
+<p>Whether you load a package with <code>LoadPackage</code> or <code>LoadDependencies</code>, the contents of the configuration file is available as readable JSON under the name <code>∆CONFIG</code> together with <code>∆ID</code>, <code>∆URI</code> and <code>∆HOME</code>.</p>
 <p>Note that <code>∆HOME</code> will be empty in case two conditions are met:</p>
 <ul>
 <li>The package was brought into the workspace with <code>LoadPackage</code> (as opposed to <code>LoadDependencies</code>)</li>
@@ -223,7 +259,7 @@ group-name-1.1.0-AttemptedFixFor234</code></pre>
 <p><strong>Footnotes</strong></p>
 <ol>
 <li id="fnref1"><p>A package ID consists of <code>{group}-{name}-{major.{minor}.{patch}</code></p><a href="#fnref1" class="footnote_anchor"></a>
-<li id="fnref2"><p>A version is built from the major number, the minor number and the version number,</p><a href="#fnref2" class="footnote_anchor"></a>
+<li id="fnref2"><p>A version is built from the major number, the minor number and the version number, optionally followed by a build number</p><a href="#fnref2" class="footnote_anchor"></a>
 </ol>
 </div>
 </body>

@@ -1,42 +1,44 @@
 :Class UserSettings
 ⍝ By instanciating this class you get a representation of a user settings file required by Tatin.\\
-⍝ In case no path pointing to a folder hosting such a file is provided to `⎕NEW`, the file is created
-⍝ in the default location (user's home folder) which depends on your operating system.\\
-⍝ You may call `⎕SE.Tatin.GetUserHomeFolder ''` in order to find out the location.
+⍝ In case no path pointing to a folder hosting such a file is provided to `⎕NEW`, the file is search for
+⍝ (and created if it does not yet exist) in the default location (user's home folder) which depends
+⍝ on your operating system.\\
+⍝ You may call `⎕SE.Tatin.GetUserHomeFolder ''` in order to find out the location.\\
 ⍝ Optionally you may specify such a folder with `⎕NEW` that hosts the configuration file.\\
-⍝ Note that if the file does not yet exist it will be created with defaults.\\
-⍝ You may also define `source` which will be used as default for `source` in a package config file.\\
+⍝ Again, if the file does not yet exist it will be created with defaults.\\
 ⍝ After having created an instance you can add a Registry definition (read: an instance of the
 ⍝ `DefineRegistry` class) to the user settings with `AddRegistry`, and you may also call `ReplaceRegistry`
 ⍝ and `RemoveRegistry`.\\
-⍝ Whenevever one of these functions is called the user settings are updated and written to its file.
+⍝ However, all changes are strictly workspace-only. If youy want your changes to be written to file you
+⍝ must call the niladic `Save` method.\\
+⍝ If you have passed a path to where the user settings file should be created, and you want this file
+⍝ to become the default user settings file whenever Dyalog APL is fired up, then you make call the
+⍝ `MakeDefaultFile` instance method. This creates (or overwrites) a file '.tatin` that points to that folder.
+⍝ written to file when the `permanent` flag was specified as 1 when the class was instantiated.
 ⍝ The full name of the file is available via the field `path2config`.\\
-⍝ You can convert a particular Registry into an ordinary namespace by calling the `GetRegistry` method.
+⍝ You may convert a particular Registry into an ordinary namespace by calling the `GetRegistry` method.
 
     :Field Public Shared ReadOnly cfg_name←'tatin-client.json'  ⍝ Name of the user config file is fixed
 
-    ∇ make0;permanentFile
+    ∇ make0;configFile;buff
       :Implements Constructor
       :Access Public
       Init1 ⍬
       _registries←⍬
-      permanentFile←home.GetUserHomeFolder'.tatin'
-      :If F.IsFile permanentFile
-      :AndIf 0<≢_path2config←AddSlash(∊1⊃F.NGET permanentFile)~⎕TC
-          :If F.IsFile _path2config,cfg_name
-              _permanent←1
-          :Else
-              F.DeleteFile permanentFile
-              _path2config←AddSlash home.GetUserHomeFolder ⍬  ⍝ By default it's the user's home folder on all platforms
-          :EndIf
+      configFile←home.GetUserHomeFolder'.tatin'
+      :If F.IsFile configFile                               ⍝ Has the user...
+          buff←(∊1⊃F.NGET configFile)~⎕TC
+      :AndIf 0<≢buff                                        ⍝ ... specified her own location for the user settings file?
+          _path2config←AddSlash buff                        ⍝ Then we accept that
       :Else
-          _path2config←AddSlash home.GetUserHomeFolder ⍬      ⍝ By default it's the user's home folder on all platforms
+          _path2config←AddSlash home.GetUserHomeFolder ⍬    ⍝ By default it's the user's home folder on all platforms
       :EndIf
-      :If F.IsFile _path2config,cfg_name
-          Read _path2config
+      :If F.IsFile _path2config,cfg_name                    ⍝ If it exists...
+          Read _path2config                                 ⍝ we raed it
       :Else
-          _registries←⍬
-          Write _path2config
+          _registries←⍬                                     ⍝ otherwise we create it with default values
+          AddPrincipalServer ⍬
+          Save 1
       :EndIf
     ∇
 
@@ -44,7 +46,7 @@
       :Implements Constructor
       :Access Public
       Init1 ⍬
-          ⍝ In case the user passed the fully qualifed name rather than just the folder:
+       ⍝ In case the user passed the fully qualifed name rather than just the folder:
       :If cfg_name{⍺≡(-≢⍺)↑⍵}path2config_
           path2config_←(-≢cfg_name)↓path2config_
       :EndIf
@@ -54,27 +56,8 @@
           Read path2config
       :Else
           _registries←⍬
-          buff←⎕NS''
-          buff.alias←'tatin'
-          buff.uri←'https://tatin.dev'
-          reg←⎕NEW home.DefineRegistry(,⊂buff)
-          AddRegistry reg
-          Write path2config
-      :EndIf
-    ∇
-
-    ∇ make2(path2config_ permanent_);reg;settingsFile
-      :Implements Constructor
-      :Access Public
-      Init1 ⍬
-      'Is not a directory?!'Assert F.IsDir path2config_
-      _path2config←AddSlash path2config_
-      permanent←permanent_
-      :If F.IsFile path2config
-          Read path2config
-      :Else
-          _registries←⍬
-          Write path2config
+          AddPrincipalServer ⍬
+          Save 1
       :EndIf
     ∇
 
@@ -104,28 +87,13 @@
 
     :Property permanent
     ⍝ Flag that defines whether the current user setting file should be used permanently.\\
-    ⍝ If the file is situated in the default location then there is no need to worry about this property
-    ⍝ except when you want to go back to that default file from another one.\\
-    ⍝ Note that when this is 1 due to an earlier setting or because a 1 was passed as second argument
-    ⍝ to a constructor, then the file `.tatin` will be deleted.
+    ⍝ Ineed to be defined when instantiated (read-only).
+    ⍝ You may at any time call `Save` however.
     :Access Public Instance
         ∇ r←get
           r←_permanent
         ∇
-        ∇ set value;buff;settingsFile
-          buff←value.NewValue
-          '"permanent" is invalid'Assert(⊂buff)∊0 1
-          :If buff              ⍝ Is now 1...
-          :AndIf ~_permanent    ⍝ ... but was 0
-              settingsFile←home.GetUserHomeFolder'.tatin'
-              (⊂_path2config)F.NPUT settingsFile 1
-          :Else
-              ⎕NDELETE home.GetUserHomeFolder'.tatin'
-          :EndIf
-          _permanent←buff
-        ∇
     :EndProperty
-
 
     :Property path2config
     :Access Public Instance
@@ -204,16 +172,20 @@
       :EndIf
       buff.uri←AddSlash buff.uri
       _registries,←buff
-      Write ⍬
+      Save 1
     ∇
 
-    ∇ r←{rawFlag}ListRegistries dummy
+    ∇ r←{rawFlag}ListRegistries showApiKey
     ⍝ List all data of all regsitries.\\
+    ⍝ `showApiKey` must be a flag. If it 1 then the API key is shown, otherwise it is replace by "***"
     ⍝ With `rawflag` being 0 (the default) the result is beautified.
       :Access Public Instance
       rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
       '⍵ must be a Boolean'Assert(⊂rawFlag)∊0 1
       r←↑registries.(alias uri port priority api_key)
+      :If (,1)≢,showApiKey
+          r[;5]←⊂'***'          ⍝ Replace API key by Asterisks
+      :EndIf
       :If ~rawFlag
           r←((,[0.5]'Alias' 'URI' 'Port' 'Priority' 'API-key'),[1]' ')⍪r
           r[2;]←(⌈⌿≢¨r)⍴¨'-'
@@ -240,7 +212,7 @@
           reg←⎕NEW home.DefineRegistry(,⊂registry)
           _registries[ind]←reg.Get ⍬
       :EndIf
-      Write ⍬
+      Save 1
     ∇
 
     ∇ flag←Exist uriOrAlias
@@ -263,7 +235,7 @@
           :Else
               :If ∨/~bool←~EqualsAliasOrName uriOrAlias
                   _registries←bool/_registries
-                  Write ⍬
+                  Save 1
               :EndIf
               r←∨/~bool
           :EndIf
@@ -298,6 +270,34 @@
       :EndIf
     ∇
 
+    ∇ {r}←Save flag;ns;tmp;del
+      :Access Public Instance
+      r←⍬
+      :If flag
+          ns←⎕NS''
+          ns.registries←_registries
+          ns.source←_source
+          tmp←'tmp'F.GetTempFilename2 cfg_name
+          {}(⊂home.Reg.JSON ns)F.NPUT tmp 1
+          {}F.DeleteFile path2config
+          {}path2config ⎕NMOVE tmp
+          _fileTimestamp←GetFileTimestamp _path2config
+      :EndIf
+    ∇
+
+    ∇ {r}←MakeDefaultFile flag;defaultFolder
+      :Access Public Instance
+      ⍝ Checks whether the current file is in a non-standard location. If that it the case it will create or overwrite
+      ⍝ any file `.tatin` in the default folder, and add the path to the current user settings file to it.
+      r←0
+      :If flag
+          defaultFolder←AddSlash home.GetUserHomeFolder''
+      :AndIf ≢/F.NormalizePath _path2config defaultFolder  ⍝ Not in default folder?!
+          (⊂_path2config)F.NPUT(defaultFolder,'.tatin')1
+          r←1
+      :EndIf
+    ∇
+
 ⍝ ------------------- Private stuff
 
     Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 98 ⋄ shy←0}
@@ -311,23 +311,11 @@
       bool←(⊂uriOrAlias)≡¨_registries.uri
     ∇
 
-    ∇ {r}←Write dummy;ns;tmp;del
-      r←⍬
-      ns←⎕NS''
-      ns.registries←_registries
-      ns.source←_source
-      tmp←'tmp'F.GetTempFilename2 cfg_name
-      {}(⊂home.Reg.JSON ns)F.NPUT tmp 1
-      {}F.DeleteFile path2config
-      {}path2config ⎕NMOVE tmp
-      _fileTimestamp←GetFileTimestamp _path2config
-    ∇
-
     ∇ {r}←Read dummy;ns
     ⍝ Reads the Client's config file
       r←⍬
       ns←⎕NS home.Reg.GetJsonFromFile path2config
-      ns.registries.uri←{f←'\\'≡2⍴⍵ ⋄ AddSlash (f/'\\'),##.F.EnforceSlash(2×f)↓⍵}¨ns.registries.uri
+      ns.registries.uri←{f←'\\'≡2⍴⍵ ⋄ AddSlash(f/'\\'),##.F.EnforceSlash(2×f)↓⍵}¨ns.registries.uri
       :If 0<≢ns.registries
           _registries←ns.registries[⍋ns.registries.priority]
       :Else
@@ -349,5 +337,14 @@
     ∇
 
     AddSlash←{⍵,(~(¯1↑⍵)∊'/\')/'/'}
+
+    ∇ {r}←AddPrincipalServer dummy;buff;reg
+      r←⍬
+      buff←⎕NS''
+      buff.alias←'tatin'
+      buff.uri←'https://tatin.dev'
+      reg←⎕NEW home.DefineRegistry(,⊂buff)
+      AddRegistry reg
+    ∇
 
 :EndClass

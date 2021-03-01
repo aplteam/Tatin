@@ -1,6 +1,6 @@
  r←Test_Load_050(stopFlag batchFlag);⎕TRAP;toBeDeleted;rc;msg;zipFilename
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
-⍝ Publish two packages consisting of a single function with the second depending on the first, then load from a Registry.
+⍝ Publish two packages consisting of a single function with the second depending on the first, then load them.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -15,23 +15,23 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- body←':Namespace Package_A' 'Times←{' '##.Times ⍵' '}' ':EndNamespace'
+ body←'Times←{' '  Package_B.Times ⍵' '}'
  (⊂body)F.NPUT src2,'/Package_A.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Package_A' '1.0.0'
  cfg.source←'Package_A.apln'
- cfg TC.WritePackageConfigFile src2
+ TC.WritePackageConfigFile src2 cfg
  src2 TC.Dependencies.Add'[local2]Example-Package_B-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
 
  F.MkDir src3←src,'/Package_B'
- body←'r←Times y' 'r←×/ y'
+ body←'r←Times y' '  r←×/ y'
  (⊂body)F.NPUT src3,'/Times.aplf'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Package_B' '1.0.0'
  cfg.source←'Times.aplf'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
 

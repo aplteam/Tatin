@@ -22,6 +22,7 @@ That default file will only have one Tatin Registry defined in it: the principal
 
 This default file will be created in the user's home folder; the API function  `⎕SE.Tatin.GetUserHomeFolder''` does return that folder.
 
+
 ### What's the name of that file?
 
 The name of the file is `tatin-client.json`.
@@ -37,23 +38,42 @@ If you are familiar with JSON5 syntax and want to edit the file it is recommende
 ]TATIN.Usersettings -edit
 ```
 
-This will allow you to edit the file but it will check the syntax afterwards in order to make sure that nothing invalid goes ever into the file.
+This will allow you to edit the file, but Tatin will check the file afterwards in order to make sure that nothing invalid goes ever into the file.
 
-### What does Tatin do with the file?
+### What does Tatin do at start-up time?
 
-When Tatin is initialized it creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`.
+When Tatin is initialized[^init] it creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`.
 
-The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.
+If the constructor does not get a fully qualified name of the user settings file as an argument then it performs two steps:
+
+1. It looks for a file `.tatin` in that folder.
+
+   If the file exists and is not empty then it is expected to point to a user settings file, and Tatin will go for that file.
+
+   We will discuss soon under which circumstances such a file might spring into existence.
+
+2. In case there is no file `.tatin` in that folder, or the file is empty, Tatin will look for a user settings file in the default folder.
+
+   * If that file exists then Tatin will instantiate it
+
+   * If the file does not exist then it will be created with default settings
+
 
 ### Syncing file and workspace
 
-If you change the file and have an APL session up and running then your change does not have an impact on the APL session. 
+#### Changes made to the file
 
-However, you can force Tatin to bring the session in line with what is saved in the configuration file by executing:
+If you change the file that Tatin has instantiated by editing it, and have an APL session up and running, then your change does not have an impact on the APL session. 
+
+However, you can force Tatin to bring the session in line with the file by executing:
 
 ```
       ]TATIN.Init
 ```
+
+#### Changes made in the workspace
+
+If you manipulate the instance in the workspace, then the changes won't be written to file. You need to call the monadic `Save` method (with a `1` as right argument) to make your changes permanent.
 
 
 ### Summary
@@ -73,10 +93,10 @@ We are now going to add a registry, list all registries and then delete that reg
 Let's list all registries currently defined:
 
 ```
-      ⎕se.Tatin.MyUserSettings.ListRegistries ⍬
+      ⎕se.Tatin.MyUserSettings.ListRegistries 0
  Alias  URI                 Port  Priority  API-key 
  -----  ------------------  ----  --------  ------- 
- tatin  https://tatin.dev/     0       100     
+ tatin  https://tatin.dev/     0       100  ***
 ```
 
 This is because originally Tatin only knows about the principal Tatin server.
@@ -119,10 +139,10 @@ We will pass a simple text vector that specifies the alias (between `[]`) and th
 
 #### Settings in der file
 
-* `uri` and `alias` are already set by the constructor
-* `port` is 0 which means that it will fall back to 80 for `http://` and 443 for `https://`
+* `uri` and `alias` are already set by the constructor.
+* `port` is 0 which means that it will fall back to 80 for `http://` and 443 for `https://`.
 * `priority` may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.
-* `api_key` must be set only when the Registry is managed by a Tatin server _and_ you want to publish packages.
+* `api_key` must be set only when the Registry is managed by a Tatin server _and_ you want to publish packages, or delete packages if that is permitted by that Tatin server.
 
 #### Adding the Registry
 
@@ -146,11 +166,9 @@ The priority is not 0 anymore but 90: any 0 is replaced by the lowest number yet
 Note that so far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the change permanent. That means that other sessions won't be affected.
 
 
-#### Adding the Tatin Test Registry
-
-_Don't_ add it permanently!
-
-The simple reason is that under certain circumstances Tatin scans all Registries in order to find a package, and usually you don't want to include the Test Registry in such a scan.
+W> _Don't_ add the Tatin Test Registry permanently to the user settings file
+W>
+W> The simple reason is that under certain circumstances Tatin scans all Registries in order to find a package, and usually you don't want to include the Test Registry in such a scan.
 
 
 ## Putting the user config file elsewhere
@@ -159,61 +177,44 @@ There might be scenarios when the default location for the user config file is n
 
 * If you cannot save the Tatin user settings file in its default location due to, say,  company constraints, then of course it need to go elsewhere.
 
-* If you have a roaming profile, and you use different computers but expect the same environment no matter which PC you are actually using.
-
 * Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 
-   You could still use the default location, but because that location is user specific, every user would require its own user settings file, which is something you might or might not want to avoid.
+   You could still use the default location, but because that location is user specific, every user would require her own user settings file, which is something you might or might not want to avoid.
 
-In any of the aforementioned cases you need more freedom than what is provided by default.
+In the aforementioned cases as well as other scenarios you need more freedom than what is provided by default.
 
 For that you must create a user settings file in a specific location. In order to achieve that we re-instantiate the class `UserConfig`, and we provide a path to the folder where the file should live:
 
 ```
-      ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path/to/user_config_file/')
-      ⍴⎕←⎕se.Tatin.ListRegistries ⍬
- https://tatin.dev  tatin 
-1 2
-      ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries⍬
+      ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path2/user_config_file/')
+      ⍴⎕←1 ⎕se.Tatin.ListRegistries 0
+ https://tatin.dev  tatin   100
+1 3
+      ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
  Alias  URI                 Port  Priority  API-key 
  -----  ------------------  ----  --------  ------- 
- tatin  https://tatin.dev/     0       100          
+ tatin  https://tatin.dev/     0       100  ***      
 3 5
 ```
 
 Notes:
 
 * We use the same name as before (`MyUserSettings`) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class `UserSettings` with that name.
-* There are two ways to list the registries: the first one provides just the alias, the uri and the priority while the second one provides _all_ data (API key!).
+* Note that the API key is replaced by asterisks unless you specify a `1` as right argument to `ListRegistries`,
 * When you fire up a new session of Dyalog APL right  now, it would still look for the user settings file in its standard location.
 
 ### Make the switch permanent
 
-In order to make the switch permanent you need to set the `permanent` flag to 1:
+In order to make the user settings file we have created and manipulated in the workspace the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
+
+You can do this yourself, but you can also ask the instance for doing the job for you:
 
 ```
-      ⎕SE.Tatin.MyUserSttings.permanent←1
+      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile
 ```
 
-From now on this user settings file will be used.
+From now on the file `MyUserSettings.path2config` is pointing to will be used to determine the user settings.
 
-A> ### How is a user settings file made permanent?
-A>
-A> When in need for a user settings file, Tatin checks its own home folder --- which is returned by `⎕SE.Tatin.GetUserHomeFolder''` --- and looks for a file `.tatin`. If that file does not exist or is empty, it carries on with the default.
-A>
-A> If it does exist it is expected to contain a path pointing to a folder that hosts a user settings file.
-A>
-A> This implies that you can go back to the default by deleting the `.tatin` file, or by removing its contents.
+[^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site")  rather than JSON.
 
-You could also specify the permanent flag already when instantiating the class `UserSettings`:
-
-```
-      path←'/path/to/user_config_file/'
-      ⎕SE.Tatin.MyUserSttings←⎕new ⎕se.Tatin.UserSettings path  1
-```
-
-Note the 1 at the end: this defines `permanent`. This tells the `UserSettings` class that from now on this user settings file shall be used whenever a new instance of Dyalog is started.
-
-Note that this also allows easy switching between several user settings files by simply adjusting the contents of the `.tatin` file.
-
-[^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site")  rather than JSON
+[^init]: Tatin will be initialized either explicitly by the `startup.dyalog` script or as a side effect when the first Tatin user command is issued. See [Installing and updating the Tatin Client](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.

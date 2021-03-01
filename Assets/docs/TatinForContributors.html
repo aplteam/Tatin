@@ -80,7 +80,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
 <li>Execute this:
 <pre><code>#.Tatin.TestCasesServer.RunTests</code></pre>
-<p>This function changes the current directory, establishes all required references and then instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>Run</code> function from an instance of the <code>Tester2</code> class; this will start a Tatin server.</p></li>
+<p>This function changes the current directory, establishes all required references and then instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will start a Tatin server.</p></li>
 </ol>
 <p>Now you are ready to execute the test suite.</p>
 <ol start="1">
@@ -89,13 +89,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
 <li>Execute this:
 <pre><code>#.Tatin.TestCases.RunTests</code></pre>
-<p>This changes the current directory, establishes all required references, instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>Run</code> function from an instance of the <code>Tester2</code> class; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
+<p>This changes the current directory, establishes all required references, instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
 </ol>
 <div class="leanpub_A">
 <h3>On test cases</h3>
 <p>The procedure outlined in this document discusses just how to run tests in case you expect them to succeed. The test framework offers much more than that: it is flexible and powerful; for details refer to <a href="https://github.com/aplteam/Tester2" class="external_link">https://github.com/aplteam/Tester2</a></p>
 <p>If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the two functions <code>#.Tatin.TestCases.RunTests</code> and <code>#.Tatin.TestCasesServer.RunTests</code>.</p>
-<p>In particular the <code>Prepare</code> function, which is called by the <code>RunTests</code> functions, is important: it instantiates the <code>Tester2</code> class as <code>T</code>, and that's the starting point for whatever your are trying to achieve.</p>
+<p>In particular the <code>Prepare</code> function, which is called by the <code>RunTests</code> functions, is important: it instantiates the <code>Tester2</code> class as <code>T</code>, and that's the starting point for whatever you are trying to achieve.</p>
 </div>
 
 <div class="h_tag">
@@ -104,7 +104,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Now that you have a working version of Tatin on your machine you can start contributing.</p>
-<p>If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it: that might well be your first valuable contribution.</p>
+<p>If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it; that might well be your first valuable contribution.</p>
 <p>Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is APL Team Ltd, but this might (and eventually will) change in the future of course.</p>
 <div class="h_tag">
 <a href="#How-to-create-new-versions" id="How-to-create-new-versions" class="autoheader_anchor">
@@ -115,8 +115,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>In order to create new versions of the Client and the Server all you need to do is to execute:</p>
 <pre><code>{noQLXFlag} #.Tatin.Admin.Make {type}</code></pre>
 <ul>
-<li><code>{noQLXFlag}</code> is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.</li>
-<li><code>{type}</code> must be an integer in the range of 0, 1, 2 or 3.
+<li><code>noQLXFlag</code> is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.</li>
+<li><code>type</code> must be an integer in the range of 0, 1, 2 or 3.
 <table>
 <tbody>
 <tr>
@@ -125,7 +125,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tr>
 <tr>
 <td style="text-align: right;">1</td>
-<td>The patch number is bumped.</td>
+<td>The patch number is bumped</td>
 </tr>
 <tr>
 <td style="text-align: right;">2</td>
@@ -138,6 +138,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tbody>
 </table></li>
 </ul>
+<p>Note that the <code>Make</code> function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. <code>noQLXFlag</code>, if 1, prevents the interpreter from running the code straight away.</p>
+<div class="leanpub_A">
+<h3>The <code>load</code> and <code>lx</code> command line parameters</h3>
+<p>Despite its name <code>noQLXFlag</code> is not associated with <code>⎕LX</code>: for this to work the command line parameters <code>load</code> and <code>lx</code> are invoked, and <code>-x</code> is added in case <code>noQLXFlag</code> is 1, preventing the interpreter from excuting the expression noted as <code>lx.</code></p>
+<p>These were introduced in 18.0.</p>
+</div>
+
 <p>The <code>Make</code> function performs the following steps:</p>
 <ol start="1">
 <li>It runs <code>Tatin.Admin.MakeClient</code></li>
@@ -149,17 +156,5 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>Tatin-Client-{major}.{minor}.{patch}.zip
 Tatin-Documentation-{major}.{minor}.{patch}.zip
 Tatin-Server-{major}.{minor}.{patch}.zip</code></pre>
-<table>
-<tbody>
-<tr>
-<td>Created:</td>
-<td>2020-08-11</td>
-</tr>
-<tr>
-<td>Latest update:</td>
-<td>2021-01-10</td>
-</tr>
-</tbody>
-</table>
 </body>
 </html>

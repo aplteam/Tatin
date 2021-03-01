@@ -18,7 +18,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h1 data-id="Tatins-Load-and-Update-Strategy">Tatin's Load and Update Strategy</h1>
 </a>
 </div>
-<p>Before you read this document you have to have a good understanding of what Semantic Versioning is. If that's the case then carry on reading, otherwise please read <a href="./SemanticVersioning.html" class="external_link">SemanticVersioning</a> first.</p>
+<p>Before you read this document, you have to have a good understanding of what Semantic Versioning is. If that's the case then carry-on reading, otherwise please read <a href="./SemanticVersioning.html" class="external_link">SemanticVersioning</a> first.</p>
 <div class="h_tag">
 <a href="#The-Strategy-Problem" id="The-Strategy-Problem" class="autoheader_anchor">
 <h2 data-id="The-Strategy-Problem">The Strategy Problem</h2>
@@ -32,7 +32,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>We could load both versions and make <code>Foo</code> use version 1.1.1 and <code>Goo</code> use version 1.2.0</li>
 <li>We could load the better version (1.2) and make <code>Zoo</code> and <code>Goo</code> both use that version</li>
 <li>We could check the server, find that there is an even better version available (1.3.0) and use that one
-<p>(More generally, always check for the best version and use that one)</p></li>
+<p>(More generally, always check for the latest version and use that one)</p></li>
 </ul>
 <p>All these options are actually used by different package managers in the wild, so there is no consensus on what's best.</p>
 <p>To many programmers the last option seems particularly appealing because you are always up-to-date, you always get the latest fixes when you build your application. Great!</p>
@@ -67,21 +67,21 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>For simplicity we will assume that the packages are all hosted by a Tatin server known under the alias name <code>MyTatin</code></p>
 <p>While <code>Foo</code> relies on <code>Zoo</code> 1.1.1, <code>Goo</code> needs <code>Zoo</code> 1.2.0 — what is Tatin doing about this?</p>
 <p>It depends on what you are doing. Let's first load <code>Zoo</code> and <code>Goo</code> into the workspace, the usual approach to inspect a package:</p>
-<pre><code>      ]TATIN.Loadpackage [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
+<pre><code>      ]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
 #.MyPkgs.Foo
-      ]TATIN.Loadpackage [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
+      ]TATIN.LoadPackage [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
 #.MyPkgs.Goo
       #.MyPkgs.⎕nl ⍳16
 Foo
 Goo</code></pre>
 <div class="leanpub_A">
 <h3>Getting the best version</h3>
-<p>Assuming that version 1.0.0 of <code>Foo</code> is the best version available with the major number 1, then this would have been sufficient:</p>
-<pre><code>]TATIN.Loadpackage [MyTatin]/mygroup-Foo-1 #.MyPkgs</code></pre>
+<p>Assuming that version 1.3.0 of <code>Foo</code> is the best version available with the major number 1, then this would have been sufficient:</p>
+<pre><code>]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1 #.MyPkgs</code></pre>
 <p>Note that neither the minor nor the patch number have been specified.</p>
 <p>Assuming that version 2.1.0 of <code>Goo</code> is the very best version available at all, and that's the version you want to use, then this would have been sufficient:</p>
-<pre><code>]TATIN.Loadpackage [MyTatin]/mygroup-Goo #.MyPkgs</code></pre>
-<p>Note that in this case not even the major number have been specified.</p>
+<pre><code>]TATIN.LoadPackage [MyTatin]/mygroup-Goo #.MyPkgs</code></pre>
+<p>Note that in this case not even the major number has been specified.</p>
 </div>
 
 <p>You wanted <code>Foo</code> and <code>Goo</code> to be loaded into <code>#.MyPkgs</code>, and that's exactly what Tatin did. But where are the dependencies?</p>
@@ -100,9 +100,9 @@ mygroup_Zoo_1_2_0</code></pre>
 <p>To make packages a part of an application (say), they first need to be installed. In the following examples we will install two packages, <code>Foo</code> and <code>Goo</code>. Both require <code>Zoo</code>, so <code>Zoo</code> will be installed as a side effect.</p>
 <pre><code>      ⎕NEXISTS /myPkgs
 0
-      ]TATIN.Installpackage [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
+      ]TATIN.InstallPackage [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
 /myPkgs/mygroup-Foo-1.0.0
-      ]TATIN.Installpackage [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
+      ]TATIN.InstallPackage [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
 /myPkgs/mygroup-Goo-2.1.0
       ⍪⊃⎕NINFO ⍠ 1⊢'/myPkgs/*'
 /myPkgs/apl-buildlist.json
@@ -131,7 +131,7 @@ mygroup-Goo-2.1.0</code></pre>
 </a>
 </div>
 <p>Though installing is roughly the same as loading except that the packages end up in the file system rather than the workspace, loading the installed packages allows Tatin to optimize what's actually loaded, and in this respect it is different.</p>
-<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which is either created or possibly extended by an installation.</p>
+<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which was created when you installed your first package, and which will be extended when you install more packages.</p>
 <p>It also requires a namespace as second argument: that's where the references pointing to the principal packages are going to be created. This is similar to <code>LoadPackage</code>.</p>
 <pre><code>      ]TATIN.LoadDependencies /myPkgs/ #.Temp</code></pre>
 <p>This is what <code>LoadDependencies</code> will do:</p>
@@ -170,92 +170,38 @@ mygroup-Goo-2.1.0</code></pre>
 </code></pre>
 <p>Tatin would check whether the file <code>apl-dependencies.txt</code> was changed after <code>apl-buildlist.json</code> was created by Tatin.</p>
 <p>In this case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly an insurance against people manually changing <code>apl-dependencies.txt</code> and making mistakes.</p>
-<p>Since the health check passes the build-list would be re-created. As a result <code>Goo</code> would disappear from the build list, and therefore a future <code>]TATIN.LoadDependencies</code> command would not load it any more.</p>
+<p>Since the health check passes, the build-list would be re-created. As a result <code>Goo</code> would disappear from the build list, and therefore a future <code>]TATIN.LoadDependencies</code> command would not load it any more.</p>
 <p>However, note this: although <code>Foo</code> only required <code>Zoo</code> 1.1.1, Tatin would <em>not</em> go back to that version, because version 1.2.0 of <code>Zoo</code> is already installed. It would therefore keep loading version 1.2.0 although at this point in time this version is not referenced at all.</p>
-<div class="h_tag">
-<a href="#Need-to-overwrite-a-package-dependency" id="Need-to-overwrite-a-package-dependency" class="autoheader_anchor">
-<h3 data-id="Need-to-overwrite-a-package-dependency">Need to overwrite a package dependency</h3>
-</a>
-</div>
-<p>Imagine you've installed a principal packages <code>Foo</code>, and as a result you also got two dependency packages, <code>Goo</code> and <code>Zoo</code>:</p>
-<p>Foo -&gt; Goo -&gt; Zoo</p>
-<p>You find that sometimes <code>Zoo</code> crashes because of a bug.</p>
-<p>Two different scenarios both cause a problem here:</p>
-<ul>
-<li>You check the project's web site and find that the guy in charge has already fixed the problem in <code>Zoo</code>, but <code>Goo</code> has not been updated and still refers to the buggy version of <code>Zoo</code>.</li>
-<li>You find that the version you already have is still the best, and the author does not respond to emails or even Pull Requests at the moment, and you are under time pressure, but it's easy to fix the problem yourself, so you put a fixed copy into a local Registry.
-<p>(Assuming that you have defined your Registry chain so that local versions of packages take precedence)</p></li>
-</ul>
-<p>The first step is obviously to install that fixed version, but that is not enough, because neither <code>apl-dependencies.txt</code> nor <code>apl-buildlist.json</code> would refer to that version, therefore it would not be loaded.</p>
-<p>Since the build-list is compiled dynamically, the solution here is to add <code>Zoo</code> to the file <code>apl-dependencies.txt</code>.</p>
-<div class="leanpub_A">
-<h3>Second problem</h3>
-<p>There is a second problem with this:</p>
-<p>In the scenario outlined in that Go-paper on semantic versioning you end up using D-1.1.4 although this version is not mentioned anywhere as a dependency, it's just part of the build list.</p>
-<p>But we agreed that the build list should be re-compiled from scratch in case somebody has changed the dependency file <em>after</em> the build list file was created. In that case we would currently fall back on D-1.1.3 although we don't want that.</p>
-<p>This also means that manually changing the build list is not an option in any case.</p>
-</div>
-
-<div class="leanpub">
-<img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
-<div>
-<p>Above</p>
-<p>The above needs attention <em>and</em> examples on <code>https://test.tatin.dev</code></p>
-</div>
-</div>
-
 <div class="h_tag">
 <a href="#Checking-and-updating" id="Checking-and-updating" class="autoheader_anchor">
 <h2 data-id="Checking-and-updating">Checking and updating</h2>
 </a>
 </div>
-<p><strong><em>Note that this hat not been implemented yet and is open to discussion</em></strong></p>
-<div class="h_tag">
-<a href="#Checking" id="Checking" class="autoheader_anchor">
-<h3 data-id="Checking">Checking</h3>
-</a>
-</div>
 <p>Let's assume you want to check whether there are better versions of the principal packages of your application.</p>
 <p>There is a user command available that can help you with that:</p>
-<pre><code>      ]TATIN.CheckVersions ./</code></pre>
+<pre><code>      ]TATIN.CheckForBetterVersion ./</code></pre>
 <p>It requires a path to a folder that holds a file <code>apl-dependencies.txt</code> and a file <code>apl-buildlist.json</code>.</p>
-<p>This user command would check whether there are any better versions available and report its findings to the session.</p>
-<p>In case there is a better version in terms of minor and/or patch number but also a better major version then it would report both.</p>
-<p>It is then up to you to take action, or to use the user command <code>]TATIN.Update</code>.</p>
-<p>You may also restrict the output of the command to a specific package, say <code>mygroup-Foo</code>; in that case just specify the package as an additional parameter:</p>
-<pre><code>      ]TATIN.CheckVersions /myPkgs/ mygroup-Foo</code></pre>
-<p>You may specify more than one package:</p>
-<pre><code>      ]TATIN.CheckVersions /myPkgs/ mygroup-Foo mygroup-Goo</code></pre>
+<p>This user command would check whether there are any better top-level versions available and report its findings to the session.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p><code>CheckForBetterVersion</code> does not bother to look out for dependencies because we load exact versions anyway.</p>
+</div>
+</div>
+
+<p>Note that a top-level package carries a 1 as <code>depth</code> in the <code>apl-buildlist.json</code> file.</p>
+<p>As usual Tatin would consider packages with different major numbers different, so by default you will get only a list of packages that have the same group-name, package-name and major version number then your top-level packages.</p>
+<p>It is then up to you to take action: you may or may not install a better package that is available.</p>
+<div class="leanpub_A">
+<h3>Better major versions</h3>
+<p>When you specify the <code>-major</code> flag of the <code>CheckForBetterVersion</code> user command then the user command will only report better major versions.</p>
+</div>
+
 <div class="h_tag">
-<a href="#Updating" id="Updating" class="autoheader_anchor">
-<h3 data-id="Updating">Updating</h3>
+<a href="#Downgrading" id="Downgrading" class="autoheader_anchor">
+<h2 data-id="Downgrading">Downgrading</h2>
 </a>
 </div>
-<div class="h_tag">
-<a href="#Updating-_all_-principal-packages" id="Updating-_all_-principal-packages" class="autoheader_anchor">
-<h4 data-id="Updating-_all_-principal-packages">Updating <em>all</em> principal packages</h4>
-</a>
-</div>
-<p>After having executed <code>]TATIN.CheckVersions</code> you might want to update all principal packages of your application. This can be achieved by executing:</p>
-<pre><code>      ]TATIN.Update ./ *</code></pre>
-<p>This will update <em>all</em> principal packages.</p>
-<p>Of course dependencies will be updated implicitly if one of the principal packages requires a better version.</p>
-<div class="h_tag">
-<a href="#Updating-a-specific-principal-package" id="Updating-a-specific-principal-package" class="autoheader_anchor">
-<h4 data-id="Updating-a-specific-principal-package">Updating a specific principal package</h4>
-</a>
-</div>
-<p>Lets assume your application uses the package <code>mygroup-Foo-1.0.0</code>, and that the versions 1.0.0, 1.1.0, 1.2.0 and 2.0.0 are all available from a Tatin server.</p>
-<p>After having executed <code>]TATIN.CheckVersions</code> you might want to update <code>mygroup-Foo</code>.</p>
-<p>This can be achieved by executing:</p>
-<pre><code>      ]TATIN.Update /myPkgs/ mygroup-Foo</code></pre>
-<p>This will update <code>mygroup-Foo-1.0.0</code> to <code>mygroup-Foo-1.2.0</code> <em>but not</em> to version <code>mygroup-Foo-2.0.0</code>. This is because <code>mygroup-Foo-2.0.0</code> is considered to be a completely different package.</p>
-<div class="h_tag">
-<a href="#Updating-to-a-specific-version" id="Updating-to-a-specific-version" class="autoheader_anchor">
-<h4 data-id="Updating-to-a-specific-version">Updating to a specific version</h4>
-</a>
-</div>
-<p>There might be a reason why you want to update <code>mygroup-Foo-1.0.0</code> but not to version <code>mygroup-Foo-1.2.0</code> but to version <code>mygroup-Foo-1.1.0</code>. However, this is <em>not</em> supported by <code>]TATIN.Update</code>; you need to edit the file <code>apl-dependendies.txt</code> in order to achieve that.</p>
-<p>The same is true in case you want to update to a new major version, <code>mygroup-Foo-2.0.0</code> in our example.</p>
+<p>There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known for being okay. Tatin does not offer help here, you need to do this yourself.</p>
 </body>
 </html>

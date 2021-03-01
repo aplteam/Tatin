@@ -14,7 +14,7 @@
      request←R.NewRequest 0
      request.URI←'/v1/packages/best_version/',packageID
      request.Headers,←⊂'Accept' 'application/json'
-     res←client R.SendAndReceive request
+     res←client SendAndReceive request
      res.Content Assert 200≡res.StatusCode
      r←url,((~(¯1↑url)∊'/\')/'/'),(⎕JSON⍠('Dialect' 'JSON5')⊣res.Content).BestVersion
  :Else

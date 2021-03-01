@@ -1,25 +1,37 @@
- WritePackageConfigFile←{
-     cfg←⍺
-     path←⊃1 ⎕NPARTS ⍵,'/'
-     cfg_file←path,CFG_NAME
-     _←ValidateVersion cfg.version
-     cfg←ValidatePackageFiles cfg
-     cfg←ValidateAPI cfg
-     cfg←ValidateTags cfg
-     cfg.tags←⎕C cfg.tags
-     assets←{','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
+ {r}←{initializeFlag}WritePackageConfigFile(path cfg);qdmx;cfg_file;assets;cfg2;tmp
+⍝ Write package config file to disk.
+⍝ By default "source" is checked for being not empty.
+⍝ This can be changed by apssing a 1 as ⍺.
+ initializeFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'initializeFlag'
+ :If 0=initializeFlag
+     '"source" must not be empty'Assert 0<≢cfg.source
+ :EndIf
+ '"source" must be simple'Assert 1=|≡cfg.source
+ '"source" must be character'Assert' '=1↑0⍴cfg.source
+ path←⊃1 ⎕NPARTS path,'/'
+ cfg_file←path,CFG_NAME
+ {}ValidateVersion cfg.version
+ cfg←ValidatePackageFiles cfg
+ cfg←ValidateTags cfg
+ cfg←ValidateAPI cfg
+ :If 0<≢assets←{0=≢⍵:⍵ ⋄ ','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
      assets←path∘PolishAssetsPaths¨assets
-     _←{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}assets
-     _←path∘CheckAssetsExist¨assets
+     {}{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}assets
+     {}path∘CheckAssetsExist¨assets
      cfg.assets←⊃{⍺,',',⍵}/assets
-     cfg2←InitPackageConfig cfg
-     'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg2.name:
-     'Invalid alias name'Assert(⎕NS''){0=≢⍵:1 ⋄ 0=⍺.⎕NC ⍵}cfg2.alias:
-     tmp←cfg_file,'.tmp'
-     0::⎕EN(⊃⎕DM)⍬⊣F.DeleteFile tmp
-     _←cfg2.⎕EX'∆List'
-     _←(⊆Reg.JSON cfg2)F.NPUT tmp 1
-     del←F.DeleteFile cfg_file
-     _←cfg_file ⎕NMOVE tmp
-     1:shy←cfg2
- }
+ :EndIf
+ cfg2←InitPackageConfig cfg
+ 'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg2.name
+ tmp←cfg_file,'.tmp'
+ :Trap 0
+     {}cfg2.⎕EX'∆List'
+     {}(⊆Reg.JSON cfg2)F.NPUT tmp 1
+     {}F.DeleteFile cfg_file
+     ⎕DL 0.01
+     {}cfg_file ⎕NMOVE tmp
+     r←cfg2
+ :Else
+     qdmx←⎕DMX
+     qdmx.DM ⎕SIGNAL qdmx.EM
+ :EndTrap
+⍝Done

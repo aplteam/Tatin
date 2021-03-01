@@ -1,0 +1,50 @@
+ r←Test_Demo_043(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted;qdmx
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
+⍝ Publish a package with two functions but with an API picking one of them (invalid)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ F.MkDir src2←src,'/Arithmetic'
+ F.MkDir src2,'/APLSource'
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←'r←x Plus y' 'r←x+y'
+ (⊂body)F.NPUT src2,'/APLSource/Plus.aplf'
+
+ body←'r←x Times y' 'r←x×y'
+ (⊂body)F.NPUT src2,'/APLSource/Times.aplf'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Arithmetic' '1.0.0'
+ cfg.source←'APLSource'
+ cfg.api←'Times'
+ TC.WritePackageConfigFile src2 cfg
+
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ :Trap 98
+     {}TC.LoadPackage(reg,'/Example-Arithmetic-1.0.0')#.TEMP
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~∨/'Is neither class nor namespace:'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

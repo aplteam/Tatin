@@ -6,7 +6,7 @@
 
 The Tatin documentation consists of a collection of HTML files.
 
-This document gives you an overview over these HTML files: their purpose and who should (or may) read them, and which ones you can savely ignore depending on your skills and goal(s).
+This document gives you an overview over these HTML files: their purpose and who should (or may) read them, and which ones you can safely ignore depending on your skills and goal(s).
 
 
 ### General information
@@ -19,9 +19,7 @@ This document gives you an overview over these HTML files: their purpose and who
 
   Read this if you don't know what Semantic Versioning is; an understanding is essential for using Tatin.
 
-* [Tatins Load and Update Strategy](./TatinsLoadAndUpdateStrategy.html "TatinsLoadAndUpdateStrategy.html") (draft)
-
-  You might get away without reading this for quite a while, but when one day you need to understand what Tatin does when there is conflict between dependencies, this is it.
+* [Tatin's Load and Update Strategy](./TatinsLoadAndUpdateStrategy.html "TatinsLoadAndUpdateStrategy.html") (draft)
 
 * [Tatin User Settings](./TatinUserSettings.html "TatinUserSettings.html") (draft)
 
@@ -29,7 +27,7 @@ This document gives you an overview over these HTML files: their purpose and who
   
   * You are unhappy with Tatin's default location for the user settings file
   * You need multiple user settings files
-  * You need one user settings file for multiple users
+  * You need different user settings files for multiple users
 
 ### The Client
 
@@ -43,11 +41,11 @@ This document gives you an overview over these HTML files: their purpose and who
 
   Read this before you consume your first package
 
-* [PackageConfiguration](./PackageConfiguration.html "Regarding Package Configuration") (draft)
+* [Package Configuration](./PackageConfiguration.html "Regarding Package Configuration") (draft)
 
   Read this for discussing the details of package configuration files.
 
-* [PublishingPackages](./PublishingPackages.html "PublishingPackages.html") (draft)
+* [Publishing Packages](./PublishingPackages.html "PublishingPackages.html") (draft)
 
   Read this in case you want to publish Tatin packages.
 
@@ -63,8 +61,8 @@ This document gives you an overview over these HTML files: their purpose and who
 
 * [Tatin for Contributors](./TatinForContributors.html "TatinForContributors.html") (draft)
 
-  Read this in case you want to contribute to Tatin's documentation and/or Tatin's code.
+  Read this in case you want to contribute to the Tatin project on GitHub
 
 * [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (draft)
 
-  Read this if you want to run a Tatin server behind an Appache server.
+  Read this if you want to run a Tatin server behind an Apache server.

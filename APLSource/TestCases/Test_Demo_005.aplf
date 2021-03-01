@@ -1,0 +1,56 @@
+ r←Test_Demo_005(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
+⍝ Publish a package with all sorts of stuff and an API that has just one function: `Run`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ src2←src,'/APLSource'
+ F.MkDir src3←src2,'/API'
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←':Class MyClass1' '∇r←x Plus y' ':Access Public Shared' 'r←x+y' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/Arithmetic1.aplc'
+ body←':Class MyClass2' '∇r←x Times y' ':Access Public Shared' 'r←x×y' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/Arithmetic2.aplc'
+ body←':Class MyClass3' '∇r←x Power y' ':Access Public Shared' 'r←x*y' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/Arithmetic3.aplc'
+ body←':Namespace MyNS' '∇r←Hello' 'r←''World''' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src2,'/MyNS.apln'
+ body←'∇r←Hello1' 'r←''Universe''' '∇'
+ (⊂body)F.NPUT src2,'/Hello1.aplf'
+ body←'∇r←Hello2' 'r←''Galaxy''' '∇'
+ (⊂body)F.NPUT src2,'/Hello2.aplf'
+ body←'∇r←Run' '  r←''Hello '',##.Hello2' '∇'
+ (⊂body)F.NPUT src3,'/Run.aplf'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'MyProject' '1.0.0'
+ cfg.source←'APLSource'
+ cfg.api←'API'
+ TC.WritePackageConfigFile src cfg
+ (rc msg zipFilename)←TC.PublishPackage src reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ refs←TC.LoadPackage(reg,'/Example-MyProject-1.0.0')#.TEMP
+ →T.GoToTidyUp 1≠≢#.TEMP.MyProject.⎕NL⍳16
+ →T.GoToTidyUp 1≠≢#.TEMP.MyProject.⎕NL-⍳16
+ →T.GoToTidyUp 1≠≢#.TEMP.MyProject.⎕NL 3
+ →T.GoToTidyUp'Hello Galaxy'≢#.TEMP.MyProject.Run
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -18,7 +18,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h1 data-id="Tatin-and-Semantic-Versioning">Tatin and Semantic Versioning</h1>
 </a>
 </div>
-<p>Tatin is based on the concept of Semantic Versioning (SemVer), so before we go into any details we first need to understand SemVer.</p>
+<p>Tatin is based on the concept of Semantic Versioning (SemVer), so before we go into any details, we first need to understand SemVer.</p>
 <div class="h_tag">
 <a href="#Format" id="Format" class="autoheader_anchor">
 <h2 data-id="Format">Format</h2>
@@ -33,14 +33,22 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 1.2.3-beta-1</code></pre>
 <p>These pieces of information fully participate when Tatin needs to establish package prevalence:</p>
 <p><code>1.2.3</code> is “better” than <code>1.2.2</code> but also “better” as <code>1.2.3-beta1</code> of course.</p>
-<p>Information after the hyphen is restricted to ASCII characters and digits until a dot (<code>.</code>)or a plus (<code>+</code>) is detected.</p>
+<p>Information after the hyphen is restricted to ASCII characters and digits until a space or a plus (<code>+</code>) is detected.</p>
+<p>The plus (<code>+</code>) is used to separate an (optional) build number from the other parts of a version number.</p>
 <div class="h_tag">
 <a href="#Build-numbers" id="Build-numbers" class="autoheader_anchor">
 <h3 data-id="Build-numbers">Build numbers</h3>
 </a>
 </div>
-<p>After {majow}-{minor}-{patch} you may add the optional build number. Build numbers <em>do not</em> participate in establishing prevalence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.</p>
-<p>A build number, when specified, needs to be separated by a <code>+</code> (recommended) or a <code>.</code> (deprecated). A build number may consist of digits and obly digits.</p>
+<p>After {major}-{minor}-{patch} you may add the optional build number. Build numbers <em>do not</em> participate in establishing prevalence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build-numbers - they are the same as far as Tatin is concerned.</p>
+</div>
+</div>
+
+<p>A build number, when specified, needs to be separated by a <code>+</code> (recommended) or a <code>.</code> (deprecated). A build number may consist of digits and only digits.</p>
 <p>Note that when there are more than three dots in the version number, then the first two dots are part of establishing major, minor and patch number while the last dot defines what is considered the build number.</p>
 <pre><code>2.3.4.1456    ⍝ deprecated
 2.3.4+1456    ⍝ recommended
@@ -66,14 +74,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="The-Build-number">The Build number</h3>
 </a>
 </div>
-<p>The build number is bumped whenever the package is built again, not matter what. It is never reset. The build number is optional and is ignored by Tatin.</p>
+<p>The build number is optional and is ignored by Tatin. However, if a package has a build-number then it is bumped whenever the package is built again, not matter what. It is never reset.</p>
 <div class="h_tag">
 <a href="#The-Patch-Number" id="The-Patch-Number" class="autoheader_anchor">
 <h3 data-id="The-Patch-Number">The Patch Number</h3>
 </a>
 </div>
 <p>The patch number is bumped only when a change <em>does not affect compatibility</em>.</p>
-<p>A typical example is a bug fix: imagine that a function in a package crashes because an edge coniditon was not handled. When you fix that problem then you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.</p>
+<p>A typical example is a bug fix: imagine that a function in a package crashes because an edge condition was not handled. When you fix that problem then you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.</p>
 <p>However, in real life things get messy pretty quickly: the consumer of a package might mistake a bug as a feature if it does not crash but does something it shouldn't, and take advantage of the bug. Imagine that a new version of the package comes with a fix for just that bug…</p>
 <p>If chances are high that a consumer might rely on the bug then you should actually bump the Major number rather than the Patch number - see there. Bugs that are very old are excellent candidates for that.</p>
 <div class="h_tag">

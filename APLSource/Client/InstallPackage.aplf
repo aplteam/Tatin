@@ -1,4 +1,5 @@
- paths←InstallPackage(identifier_ targetFolder);buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
+ paths←InstallPackage(identifier_ targetFolder);buildList;level;requestedBy;packageID2;url;installFolder;tempDir
+ ;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request for a package
@@ -10,6 +11,7 @@
 ⍝ `←` paths to all packages installed with the first one being the "main" package, meaning that all the others (if any) are dependencies.
  '"targetFolder" is invalid'Assert F.IsDir⍕targetFolder
  paths←''
+ alias←{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}identifier_
  identifier←ReplaceRegistryAlias identifier_
  ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
  identifier←CheckVersion identifier
@@ -27,7 +29,6 @@
  :AndIf Reg.IsHTTP identifier
      'ZIP files cannot be installed via HTTP'Assert 0
  :EndIf
- alias←{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}identifier_   ⍝ Not supported (yet?!)
  PrintToSession'  Establish dependencies...'
  :If 0<≢buildList←GetDependencyTree identifier
      PrintToSession'  ',(⍕≢buildList),' dependencies identified'
@@ -49,6 +50,6 @@
          :EndIf
      :EndFor
      PrintToSession'  Saving build list... '
-     SaveBuildList buildList targetFolder
+     SaveBuildList buildList targetFolder alias
  :EndIf
 ⍝Done

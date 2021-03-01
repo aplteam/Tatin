@@ -24,8 +24,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Where-does-it-live">Where does it live?</a></li>
 <li><a href="#Whats-the-name-of-that-file">What's the name of that file?</a></li>
 <li><a href="#May-I-edit-it">May I edit it?</a></li>
-<li><a href="#What-does-Tatin-do-with-the-file">What does Tatin do with the file?</a></li>
-<li><a href="#Syncing-file-and-workspace">Syncing file and workspace</a></li>
+<li><a href="#What-does-Tatin-do-at-start-up-time">What does Tatin do at start-up time?</a></li>
+<li><a href="#Syncing-file-and-workspace">Syncing file and workspace</a>
+<ul>
+<li><a href="#Changes-made-to-the-file">Changes made to the file</a></li>
+<li><a href="#Changes-made-in-the-workspace">Changes made in the workspace</a></li>
+</ul></li>
 <li><a href="#Summary">Summary</a></li>
 </ul></li>
 <li><a href="#Adding-and-removing-Registries">Adding and removing Registries</a>
@@ -35,7 +39,6 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Create-an-instance-of-the-DefineRegistry-class">Create an instance of the <code>DefineRegistry</code> class.</a></li>
 <li><a href="#Settings-in-der-file">Settings in der file</a></li>
 <li><a href="#Adding-the-Registry">Adding the Registry</a></li>
-<li><a href="#Adding-the-Tatin-Test-Registry">Adding the Tatin Test Registry</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#Putting-the-user-config-file-elsewhere">Putting the user config file elsewhere</a>
@@ -83,22 +86,43 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Of course you are free to edit that file with any editor. However, keep in mind that you are in charge for making sure that the contents of the file is valid JSON5[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]: if it's not, Tatin will crash.</p>
 <p>If you are familiar with JSON5 syntax and want to edit the file it is recommended to use</p>
 <pre><code>]TATIN.Usersettings -edit</code></pre>
-<p>This will allow you to edit the file but it will check the syntax afterwards in order to make sure that nothing invalid goes ever into the file.</p>
+<p>This will allow you to edit the file, but Tatin will check the file afterwards in order to make sure that nothing invalid goes ever into the file.</p>
 <div class="h_tag">
-<a href="#What-does-Tatin-do-with-the-file" id="What-does-Tatin-do-with-the-file" class="autoheader_anchor">
-<h3 data-id="What-does-Tatin-do-with-the-file">What does Tatin do with the file?</h3>
+<a href="#What-does-Tatin-do-at-start-up-time" id="What-does-Tatin-do-at-start-up-time" class="autoheader_anchor">
+<h3 data-id="What-does-Tatin-do-at-start-up-time">What does Tatin do at start-up time?</h3>
 </a>
 </div>
-<p>When Tatin is initialized it creates an instance of the <code>UserSettings</code> class with the name <code>MyUserSettings</code> which lives in <code>⎕se.Tatin</code>.</p>
-<p>The constructor gets the fully qualified name of the user config file as an argument and is therefore able to represent that file. If it does not exist yet it is created.</p>
+<p>When Tatin is initialized[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] it creates an instance of the <code>UserSettings</code> class with the name <code>MyUserSettings</code> which lives in <code>⎕se.Tatin</code>.</p>
+<p>If the constructor does not get a fully qualified name of the user settings file as an argument then it performs two steps:</p>
+<ol start="1">
+<li>It looks for a file <code>.tatin</code> in that folder.
+<p>If the file exists and is not empty then it is expected to point to a user settings file, and Tatin will go for that file.</p>
+<p>We will discuss soon under which circumstances such a file might spring into existence.</p></li>
+<li>In case there is no file <code>.tatin</code> in that folder, or the file is empty, Tatin will look for a user settings file in the default folder.
+<ul>
+<li>If that file exists then Tatin will instantiate it</li>
+<li>If the file does not exist then it will be created with default settings</li>
+</ul></li>
+</ol>
 <div class="h_tag">
 <a href="#Syncing-file-and-workspace" id="Syncing-file-and-workspace" class="autoheader_anchor">
 <h3 data-id="Syncing-file-and-workspace">Syncing file and workspace</h3>
 </a>
 </div>
-<p>If you change the file and have an APL session up and running then your change does not have an impact on the APL session.</p>
-<p>However, you can force Tatin to bring the session in line with what is saved in the configuration file by executing:</p>
+<div class="h_tag">
+<a href="#Changes-made-to-the-file" id="Changes-made-to-the-file" class="autoheader_anchor">
+<h4 data-id="Changes-made-to-the-file">Changes made to the file</h4>
+</a>
+</div>
+<p>If you change the file that Tatin has instantiated by editing it, and have an APL session up and running, then your change does not have an impact on the APL session.</p>
+<p>However, you can force Tatin to bring the session in line with the file by executing:</p>
 <pre><code>      ]TATIN.Init</code></pre>
+<div class="h_tag">
+<a href="#Changes-made-in-the-workspace" id="Changes-made-in-the-workspace" class="autoheader_anchor">
+<h4 data-id="Changes-made-in-the-workspace">Changes made in the workspace</h4>
+</a>
+</div>
+<p>If you manipulate the instance in the workspace, then the changes won't be written to file. You need to call the monadic <code>Save</code> method (with a <code>1</code> as right argument) to make your changes permanent.</p>
 <div class="h_tag">
 <a href="#Summary" id="Summary" class="autoheader_anchor">
 <h3 data-id="Summary">Summary</h3>
@@ -119,10 +143,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Let's list all registries currently defined:</p>
-<pre><code>      ⎕se.Tatin.MyUserSettings.ListRegistries ⍬
+<pre><code>      ⎕se.Tatin.MyUserSettings.ListRegistries 0
  Alias  URI                 Port  Priority  API-key
  -----  ------------------  ----  --------  -------
- tatin  https://tatin.dev/     0       100</code></pre>
+ tatin  https://tatin.dev/     0       100  ***</code></pre>
 <p>This is because originally Tatin only knows about the principal Tatin server.</p>
 <p>Let's add a made-up registry.</p>
 <div class="h_tag">
@@ -158,10 +182,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <ul>
-<li><code>uri</code> and <code>alias</code> are already set by the constructor</li>
-<li><code>port</code> is 0 which means that it will fall back to 80 for <code>http://</code> and 443 for <code>https://</code></li>
+<li><code>uri</code> and <code>alias</code> are already set by the constructor.</li>
+<li><code>port</code> is 0 which means that it will fall back to 80 for <code>http://</code> and 443 for <code>https://</code>.</li>
 <li><code>priority</code> may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.</li>
-<li><code>api_key</code> must be set only when the Registry is managed by a Tatin server <em>and</em> you want to publish packages.</li>
+<li><code>api_key</code> must be set only when the Registry is managed by a Tatin server <em>and</em> you want to publish packages, or delete packages if that is permitted by that Tatin server.</li>
 </ul>
 <div class="h_tag">
 <a href="#Adding-the-Registry" id="Adding-the-Registry" class="autoheader_anchor">
@@ -176,13 +200,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
  myc    https://tatin.mycompany.com/   90</code></pre>
 <p>The priority is not 0 anymore but 90: any 0 is replaced by the lowest number yet minus 10.</p>
 <p>Note that so far we have changed the user settings in the workspace, <em>not</em> on file. This allows you to experiment with certain settings without making the change permanent. That means that other sessions won't be affected.</p>
-<div class="h_tag">
-<a href="#Adding-the-Tatin-Test-Registry" id="Adding-the-Tatin-Test-Registry" class="autoheader_anchor">
-<h4 data-id="Adding-the-Tatin-Test-Registry">Adding the Tatin Test Registry</h4>
-</a>
-</div>
-<p><em>Don't</em> add it permanently!</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
+<div>
+<p><em>Don't</em> add the Tatin Test Registry permanently to the user settings file</p>
 <p>The simple reason is that under certain circumstances Tatin scans all Registries in order to find a package, and usually you don't want to include the Test Registry in such a scan.</p>
+</div>
+</div>
+
 <div class="h_tag">
 <a href="#Putting-the-user-config-file-elsewhere" id="Putting-the-user-config-file-elsewhere" class="autoheader_anchor">
 <h2 data-id="Putting-the-user-config-file-elsewhere">Putting the user config file elsewhere</h2>
@@ -191,25 +216,24 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>There might be scenarios when the default location for the user config file is not suitable for you.</p>
 <ul>
 <li>If you cannot save the Tatin user settings file in its default location due to, say,  company constraints, then of course it need to go elsewhere.</li>
-<li>If you have a roaming profile, and you use different computers but expect the same environment no matter which PC you are actually using.</li>
 <li>Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
-<p>You could still use the default location, but because that location is user specific, every user would require its own user settings file, which is something you might or might not want to avoid.</p></li>
+<p>You could still use the default location, but because that location is user specific, every user would require her own user settings file, which is something you might or might not want to avoid.</p></li>
 </ul>
-<p>In any of the aforementioned cases you need more freedom than what is provided by default.</p>
+<p>In the aforementioned cases as well as other scenarios you need more freedom than what is provided by default.</p>
 <p>For that you must create a user settings file in a specific location. In order to achieve that we re-instantiate the class <code>UserConfig</code>, and we provide a path to the folder where the file should live:</p>
-<pre><code>      ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path/to/user_config_file/')
-      ⍴⎕←⎕se.Tatin.ListRegistries ⍬
- https://tatin.dev  tatin
-1 2
-      ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries⍬
+<pre><code>      ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path2/user_config_file/')
+      ⍴⎕←1 ⎕se.Tatin.ListRegistries 0
+ https://tatin.dev  tatin   100
+1 3
+      ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
  Alias  URI                 Port  Priority  API-key
  -----  ------------------  ----  --------  -------
- tatin  https://tatin.dev/     0       100
+ tatin  https://tatin.dev/     0       100  ***
 3 5</code></pre>
 <p>Notes:</p>
 <ul>
 <li>We use the same name as before (<code>MyUserSettings</code>) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class <code>UserSettings</code> with that name.</li>
-<li>There are two ways to list the registries: the first one provides just the alias, the uri and the priority while the second one provides <em>all</em> data (API key!).</li>
+<li>Note that the API key is replaced by asterisks unless you specify a <code>1</code> as right argument to <code>ListRegistries</code>,</li>
 <li>When you fire up a new session of Dyalog APL right  now, it would still look for the user settings file in its standard location.</li>
 </ul>
 <div class="h_tag">
@@ -217,26 +241,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Make-the-switch-permanent">Make the switch permanent</h3>
 </a>
 </div>
-<p>In order to make the switch permanent you need to set the <code>permanent</code> flag to 1:</p>
-<pre><code>      ⎕SE.Tatin.MyUserSttings.permanent←1</code></pre>
-<p>From now on this user settings file will be used.</p>
-<div class="leanpub_A">
-<h3>How is a user settings file made permanent?</h3>
-<p>When in need for a user settings file, Tatin checks its own home folder — which is returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code> — and looks for a file <code>.tatin</code>. If that file does not exist or is empty, it carries on with the default.</p>
-<p>If it does exist it is expected to contain a path pointing to a folder that hosts a user settings file.</p>
-<p>This implies that you can go back to the default by deleting the <code>.tatin</code> file, or by removing its contents.</p>
-</div>
-
-<p>You could also specify the permanent flag already when instantiating the class <code>UserSettings</code>:</p>
-<pre><code>      path←'/path/to/user_config_file/'
-      ⎕SE.Tatin.MyUserSttings←⎕new ⎕se.Tatin.UserSettings path  1</code></pre>
-<p>Note the 1 at the end: this defines <code>permanent</code>. This tells the <code>UserSettings</code> class that from now on this user settings file shall be used whenever a new instance of Dyalog is started.</p>
-<p>Note that this also allows easy switching between several user settings files by simply adjusting the contents of the <code>.tatin</code> file.</p>
+<p>In order to make the user settings file we have created and manipulated in the workspace the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file <code>.tatin</code> in the default folder (that's the one returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code>) contains a path pointing to that folder.</p>
+<p>You can do this yourself, but you can also ask the instance for doing the job for you:</p>
+<pre><code>      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile</code></pre>
+<p>From now on the file <code>MyUserSettings.path2config</code> is pointing to will be used to determine the user settings.</p>
 <div id="footnotes_div">
 <hr>
 <p><strong>Footnotes</strong></p>
 <ol>
-<li id="fnref1"><p>Tatin uses <a href="https://json5.org/" class="external_link" title="Link to the JSON5 web site">JSON5</a> rather than JSON</p><a href="#fnref1" class="footnote_anchor"></a>
+<li id="fnref1"><p>Tatin uses <a href="https://json5.org/" class="external_link" title="Link to the JSON5 web site">JSON5</a> rather than JSON.</p><a href="#fnref1" class="footnote_anchor"></a>
+<li id="fnref2"><p>Tatin will be initialized either explicitly by the <code>startup.dyalog</code> script or as a side effect when the first Tatin user command is issued. See <a href="./InstallingAndUpdatingTheTatinClient.html" class="external_link" title="InstallingAndUpdatingTheTatinClient.html">Installing and updating the Tatin Client</a> for details.</p><a href="#fnref2" class="footnote_anchor"></a>
 </ol>
 </div>
 </body>

@@ -16,45 +16,45 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- body←':Namespace A' 'foo←{' '##.B.FB2 ⍵' '}' ':EndNamespace'
+ body←':Namespace A' 'foo←{' '  ##.B.FB2 ⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src2,'/A.apln'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'A' '1.0.0'
+ cfg.(group name version)←'Example' 'A_' '1.0.0'
  cfg.source←'A.apln'
- cfg TC.WritePackageConfigFile src2
+ TC.WritePackageConfigFile src2 cfg
  src2 TC.Dependencies.Add'[local2]Example-B-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  F.MkDir src3←src,'/B'
- body←':Namespace B' 'FB1←{' '1+⍵' '}' 'FB2←{' '⍵+##.C.FC2 2' '}' ':EndNamespace'
+ body←':Namespace B' 'FB1←{' '1+⍵' '}' 'FB2←{' '  ⍵+##.C.FC2 2' '}' ':EndNamespace'
  (⊂body)F.NPUT src3,'/B.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'B' '1.0.0'
  cfg.source←'B.apln'
  cfg.api←'B'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'[local2]Example-C-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  F.MkDir src3←src,'/C'
- body←':Namespace C' 'FC1←{' '⍵+3' '}' 'FC2←{' '4+##.B.FB1 ⍵' '}' ':EndNamespace'
+ body←':Namespace C' 'FC1←{' '⍵+3' '}' 'FC2←{' '  4+##.B.FB1 ⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src3,'/C.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'C' '1.0.0'
  cfg.source←'C.apln'
  cfg.api←'C'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'[local2]Example-B-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- refs←TC.LoadPackage(reg,'/Example-A-1.0.0')#.TEMP
- →T.GoToTidyUp 37≠#.TEMP.A.foo 30
+ refs←TC.LoadPackage(reg,'/Example-A_-1.0.0')#.TEMP
+ →T.GoToTidyUp 37≠#.TEMP.A_.A.foo 30
 
  r←T._OK
 

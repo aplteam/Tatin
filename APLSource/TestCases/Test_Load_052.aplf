@@ -1,6 +1,6 @@
  r←Test_Load_052(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
-⍝ Publish three packages (consisting of functions) with dependencies, then load from specific Registry.
+⍝ Publish three packages (two consisting of functions, one of a namespace) with dependencies, then load them
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -15,45 +15,43 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- body←':Namespace A' 'foo←{' '##.Times ⍵' '}' ':EndNamespace'
+ body←':Namespace A' 'foo←{' '  ##.Times.Times ⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src2,'/A.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'A' '1.0.0'
  cfg.source←'A.apln'
- cfg TC.WritePackageConfigFile src2
- src2 TC.Dependencies.Add'[local2]Example-C-1.0.0'
+ cfg.api←'A.foo'
+ TC.WritePackageConfigFile src2 cfg
+ src2 TC.Dependencies.Add'[local2]Example-Times-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  F.MkDir src3←src,'/B'
- body←'r←Call arg' 'r←A.foo arg'
+ body←'r←Call arg' '  r←A arg'
  (⊂body)F.NPUT src3,'/Call.aplf'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'B' '1.0.0'
  cfg.source←'Call.aplf'
- cfg.alias←'Call'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'[local2]Example-A-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- F.MkDir src3←src,'/C'
- body←'r←Times v' 'r←×/v'
+ F.MkDir src3←src,'/Times'
+ body←'r←Times v' '  r←×/v'
  (⊂body)F.NPUT src3,'/Times.aplf'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'C' '1.0.0'
+ cfg.(group name version)←'Example' 'Times' '1.0.0'
  cfg.source←'Times.aplf'
- cfg.api←'Times'
- cfg.alias←'Times'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  refs←TC.LoadPackage(reg,'/Example-B-1.0.0')#.TEMP
- →T.GoToTidyUp 12≠#.TEMP.Call 3 4
+ →T.GoToTidyUp 12≠#.TEMP.B.Call 3 4
 
  r←T._OK
 

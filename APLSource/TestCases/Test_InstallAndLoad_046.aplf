@@ -1,0 +1,75 @@
+ r←Test_InstallAndLoad_046(stopFlag batchFlag);⎕TRAP;src4;list1;list2;rc;msg;zipFilename;toBeDeleted
+ ;dir;src;body;cfg;installFolder;src2;src3;reg
+⍝ Install a package that depends on two packages which consist of a class and a function, with APIs
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ src2←src,'/Example-Constants-0.1.0/'
+ src3←src,'/Example-UtilFns-0.2.0/'
+ src4←src,'/Example-MyTests-0.3.0/'
+ F.MkDir reg
+ F.MkDir src2 src3 src4,¨⊂'/APLSource'
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←':Class Constants' '∇r←PI' ':Access Public Shared' 'r←3.14' '∇' ':EndClass'
+ (⊂body)F.NPUT src2,'/APLSource/Constants.aplc'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg.source←'APLSource'
+ cfg.api←'Constants'
+ TC.WritePackageConfigFile src2 cfg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ body←'r←x Times y' 'r←x×y'
+ (⊂body)F.NPUT src3,'/APLSource/Times.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'UtilFns' '0.2.0'
+ cfg.source←'APLSource'
+ cfg.api←'Times'
+ TC.WritePackageConfigFile src3 cfg
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ body←⊂':Namespace MyTests'
+ body,←'∇r←Test1 y' 'r←##.Constants.PI ##.UtilFns y' '∇'
+ body,←⊂':EndNamespace'
+ (⊂body)F.NPUT src4,'/APLSource/MyTests.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'MyTests' '0.3.0'
+ cfg.source←'APLSource'
+ cfg.api←'MyTests'
+ TC.WritePackageConfigFile src4 cfg
+ src4 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
+ src4 TC.Dependencies.Add'[local2]Example-UtilFns-0.2.0'
+ (rc msg zipFilename)←TC.PublishPackage src4 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ installFolder←GetTempDir'/Tatin_AppPackages'
+ list1←TC.InstallPackage('[local2]Example-MyTests-0.3.0')installFolder
+ →T.GoToTidyUp 3≠≢list1
+
+ →T.GoToTidyUp 3≠+/F.IsDir⊃F.Dir installFolder,'/*'
+ →T.GoToTidyUp 1≠≢TC.Dependencies.Get installFolder
+ {}TC.LoadDependencies installFolder #.TEMP
+
+ →T.GoToTidyUp(3.14×3)≢#.TEMP.MyTests.Test1 3
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

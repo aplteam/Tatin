@@ -1,7 +1,9 @@
- {r}←{append}SaveBuildList(buildList path);filename;ns;bool;b;mat;b1;b2;new;old;b3;ind;groupNameMajor;topLevel
+ {r}←{append}SaveBuildList(buildList path alias);filename;ns;bool;b;mat;b1;b2;new;old;b3;ind;groupNameMajor;topLevel
 ⍝ Takes a dependency tree (`buildlist`) and (by default) appends it to `path`.\\
 ⍝ The optional left arguemtn `append` defaults to 1, meaning that `buildlist` is
 ⍝ appended to an already existing build list. If set to 0 any existing file is replaced.
+⍝ If `alias` is empty it has no effect. If it is not empty it as assigned to the one-and-only
+⍝ top-level package in `buildList`.
  r←⍬
  append←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'append'
  buildList[;3]←RemoveFileProtocol¨buildList[;3]
@@ -43,5 +45,9 @@
  mat←b⌿mat
  mat←topLevel⍪mat
  ns.(depth packageID url)←↓⍉mat
+ :If 0<≢alias
+     Assert 1=+/b←1=ns.depth
+     ns.packageID[b⍳1]←⊂alias,'@',⊃ns.packageID[b⍳1]
+ :EndIf
  (⊂Reg.JSON ns)F.NPUT filename 1
 ⍝Done

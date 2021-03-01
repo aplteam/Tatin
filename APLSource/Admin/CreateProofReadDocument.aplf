@@ -1,0 +1,26 @@
+ r←CreateProofReadDocument dummy;M;parms;F;list;file;md;html;ns;buff
+⍝ This creates an HTML document from all the Markdown files in the docs/ folder for proof-reading the documentation.
+⍝ The file will be created in the temp folder and is returned as result
+ r←''
+ M←##.MarkAPL ⋄ F←##.FilesAndDirs
+ parms←M.CreateParms
+ parms.leanpubExtensions←1
+ parms.outputFilename←F.GetTempFilename2'tatin-proofread'
+ parms.cssURL←'./Assets/CSS/'
+ parms.createFullHtmlPage←0
+ parms.numberHeaders←1
+ parms.bookmarkLink←0
+ html←''
+ :If 0<≢list←F.ListFiles'docs/*.md'
+     :For file :In list
+         md←⊃F.NGET file 1
+         md←(~∧\'[parm]:'∘{⍺∘≡¨(≢⍺)↑¨⍵}md)/md
+         (buff ns)←parms M.Markdown2HTML md
+         file{~⍵:shy←⍬ ⋄ ⎕←⍺,' has a problem!' ⋄.}0<≢ns.report
+         html,←buff
+     :EndFor
+     html←parms M.MakeHTML_Doc html
+     (⊂html)F.NPUT parms.outputFilename 1
+     r←parms.outputFilename
+ :EndIf
+⍝Done

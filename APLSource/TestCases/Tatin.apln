@@ -1,7 +1,7 @@
 :Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.10.0 - 2020-08-28
-⍝   * Method `UninstallPackage` added
+⍝ * 0.9.1 - 2021-02-28
+⍝   * Several minor improvements
 ⍝ * 0.9.0 - 2020-08-20
 ⍝   * ListRegistry now accepts a flag -all
 ⍝ * 0.8.2 - 2020-08-18
@@ -116,11 +116,11 @@
           c.Parse←'1s -tags='
           r,←c
      
-          c←⎕NS ⍬
-          c.Name←'UninstallPackage'
-          c.Description←'Uninstalls a package and its dependencies'
-          c.Parse←'2'
-          r,←c
+⍝          c←⎕NS ⍬
+⍝          c.Name←'UninstallPackage'
+⍝          c.Description←'Uninstalls a package and its dependencies'
+⍝          c.Parse←'2'
+⍝          r,←c
      
           r.Group←⊂NM
      
@@ -268,8 +268,7 @@
     ∇
 
     ∇ r←UninstallPackage(path packageID)
-    ⍝ We are probably never going to allow this!
-      ∘∘∘ ⍝TODO⍝
+      ∘∘∘ ⍝TODO⍝  Not implemented yet
     ∇
 
     ∇ r←ListRegistries Arg;type;rawFlag
@@ -511,14 +510,15 @@
       :Case ⎕C'ListPackages'
           r,←⊂''
           r,←⊂'Lists all groups defined in the Registry specified as an argument.'
-          r,←⊂'* If you specify an alias it MUST be embraced by square brackets as in [MyAlias]'
+          r,←⊂'* If you specify the Registry by an alias it MUST be embraced by square brackets as in'
+          r,←⊂'  [MyAlias]'
           r,←⊂'* Aliases are case insensitive, paths only under Windows.'
           r,←⊂'* It does not matter whether you specify / or \ in a path, or whether it has or has'
           r,←⊂'  not a trailing separator: Tatin is taking care of that.'
           r,←⊂'* By default all packages are listed. You can restrict the output in two ways:'
           r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
           r,←⊂'  * -tags=zip will restrict the output to packages that carry the given tags.'
-          r,←⊂'    If you need to specify more than one tag the enclose then separate them by commas.'
+          r,←⊂'    If you need to specify more than one tag then separate them by commas.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
           r,←⊂''
@@ -571,8 +571,8 @@
           r,←⊂'Requires two arguments:'
           r,←⊂'* Path to a folder with installed packages'
           r,←⊂'* Name of the package to be un-installed. If {group} and {name} can identify the'
-          r,←⊂'  package uniquely then there is no need for {version}'
-          r,←⊂'This command uninstalles the given package and all its dependencies but only if those'
+          r,←⊂'  package uniquely then there is no need for {version}. If it cannot an error is thrown.'
+          r,←⊂'This command uninstalls the given package and all its dependencies but only if those'
           r,←⊂'are not required by any other packages.'
       :Case ⎕C'PackageDependencies'
           r,←⊂''
@@ -729,4 +729,3 @@
     IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}
 
 :EndNamespace
-

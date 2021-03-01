@@ -1,0 +1,38 @@
+ r←Test_InstallAndLoad_006(stopFlag batchFlag);⎕TRAP
+ ;dir;src;zip;body;cfg;zipfile;installFolder;list;expected
+⍝ Pack a package with a single file into a ZIP file, install and load it with an alias.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '0.1.0'
+ cfg.source←'Constants.apln'
+ cfg.api←'Constants'
+ TC.WritePackageConfigFile src cfg
+ zipfile←TC.Pack src zip
+
+ installFolder←GetTempDir'/MyAppPackages'
+ list←TC.InstallPackage('X@file://',zipfile)installFolder
+
+ →T.GoToTidyUp 1≠≢list
+ expected←,⊂TC.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
+ →T.GoToTidyUp~expected ∆LazyMatch(1+≢installFolder)↓¨F.ListDirs installFolder
+ →T.GoToTidyUp~F.Exists installFolder,'/',TC.Reg.DependenciesFilename
+
+ {}TC.LoadDependencies installFolder #.TEMP
+ →T.GoToTidyUp #.TEMP.X.PI≢3.14
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

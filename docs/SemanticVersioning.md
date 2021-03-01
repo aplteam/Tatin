@@ -4,7 +4,7 @@
 
 # Tatin and Semantic Versioning
 
-Tatin is based on the concept of Semantic Versioning (SemVer), so before we go into any details we first need to understand SemVer. 
+Tatin is based on the concept of Semantic Versioning (SemVer), so before we go into any details, we first need to understand SemVer. 
 
 ## Format
 
@@ -25,13 +25,17 @@ These pieces of information fully participate when Tatin needs to establish pack
 
 `1.2.3` is "better" than  `1.2.2` but also "better" as `1.2.3-beta1` of course.
 
-Information after the hyphen is restricted to ASCII characters and digits until a dot (`.`)or a plus (`+`) is detected. 
+Information after the hyphen is restricted to ASCII characters and digits until a space or a plus (`+`) is detected. 
+
+The plus (`+`) is used to separate an (optional) build number from the other parts of a version number.
 
 ### Build numbers
 
-After {majow}-{minor}-{patch} you may add the optional build number. Build numbers _do not_ participate in establishing prevalence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.
+After {major}-{minor}-{patch} you may add the optional build number. Build numbers _do not_ participate in establishing prevalence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.
 
-A build number, when specified, needs to be separated by a `+` (recommended) or a `.` (deprecated). A build number may consist of digits and obly digits.
+I> That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build-numbers - they are the same as far as Tatin is concerned.
+
+A build number, when specified, needs to be separated by a `+` (recommended) or a `.` (deprecated). A build number may consist of digits and only digits.
 
 Note that when there are more than three dots in the version number, then the first two dots are part of establishing major, minor and patch number while the last dot defines what is considered the build number.
 
@@ -58,13 +62,13 @@ Given `1.2.3+4`:
 
 ### The Build number
 
-The build number is bumped whenever the package is built again, not matter what. It is never reset. The build number is optional and is ignored by Tatin.
+The build number is optional and is ignored by Tatin. However, if a package has a build-number then it is bumped whenever the package is built again, not matter what. It is never reset. 
 
 ### The Patch Number
 
 The patch number is bumped only when a change _does not affect compatibility_. 
 
-A typical example is a bug fix: imagine that a function in a package crashes because an edge coniditon was not handled. When you fix that problem then you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.
+A typical example is a bug fix: imagine that a function in a package crashes because an edge condition was not handled. When you fix that problem then you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.
 
 However, in real life things get messy pretty quickly: the consumer of a package might mistake a bug as a feature if it does not crash but does something it shouldn't, and take advantage of the bug. Imagine that a new version of the package comes with a fix for just that bug...
 

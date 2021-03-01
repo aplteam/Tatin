@@ -1,0 +1,14 @@
+ r←CollectZipFiles path;F;folders;folder;filename;allZipFiles
+ r←⍬
+ F←##.##.FilesAndDirs
+ folders←F.ListDirs path,'/'
+ :For folder :In folders
+     filename←folder,'/*.zip'
+     allZipFiles←⊃F.Dir filename
+     :If 1=≢allZipFiles
+         r,←allZipFiles
+     :Else
+         ∘∘∘  ⍝ Huuh?!
+     :EndIf
+ :EndFor
+⍝Done

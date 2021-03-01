@@ -10,7 +10,8 @@
  Assert F.MkDir ∆BuildReg
  Reg.CreateRegistry ∆BuildReg
  dir←'ConfigFile'GetTempDir''
- 1 TC.InitUserSettings dir
+ F.DeleteFile dir,'/',TC.UserSettings.cfg_name
+ TC.InitUserSettings dir
  TC.MyUserSettings.AddRegistry'[Build]',∆BuildReg
  zipFiles←∆CreateExampleForMinimalVersionStrategy1
 
@@ -21,7 +22,7 @@
  expected←'minimalversion-'∘,¨expected
  →T.PassesIf expected ∆LazyMatch tree[;2]
 
- TC.SaveBuildList tree path
+ TC.SaveBuildList tree path''
  tree2←TC.LoadBuildList path
  →T.PassesIf∧/tree2[;2]∊tree[;2]
 
@@ -40,7 +41,7 @@
 
  ⍝ We compromise here: rather rebuilding everything in a second and third test case we use what we have right now
  ⎕DL 0.2
- path TC.Dependencies.Add'DoesNotExist-APLTreeUtils-6.0.1'       ⍝ Modify it: that does not exist
+ path TC.Dependencies.Add'DoesNotExist-APLTreeUtils-6.0.1'      ⍝ Modify it: that does not exist
 
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''

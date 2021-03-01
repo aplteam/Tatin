@@ -2,41 +2,16 @@
 ⍝ ⍵ Is an object presenting a package's config file
 ⍝ ⍺ Is the folder that hosts the package
 ⍝ ← Is a list of all cfg.source files
-⍝ Note that if cfg.source is empty the function tries to work out what the cfg.source might be:
-⍝ 1. If the client's config file has a default source folder defined it is taken if it exists.
-⍝ 2. If there is just one folder then it is assumed that this folder contains all source code files.\\
-⍝ As a side effect this function writes back the config file in case "source" could be established.
- extension←'.aplf' '.aplo' '.aplc' '.apln' '.dyalog'
- :If 0=≢cfg.source
-     :If 0<≢default←MyUserSettings.source
-     :AndIf F.IsDir home,default
-         list←(≢home)↓¨⊃F.Dir home,default,'/'
-         ('No source code files found in ',home,default)Assert∧/(3⊃∘⎕NPARTS¨list)∊extension
-         cfg.source←default
-     :Else
-         list←(≢home)↓¨⊃F.Dir home,'/'
-         list~←{⍵↓⍨¯1×'/'=¯1↑⍵}¨{','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
-         subList←list~Reg.CFG_Name Reg.DependenciesFilename
-         subList←(({3⊃⎕NPARTS ⍵}¨subList)≢¨⊂'.zip')/subList
-         :If 1=≢subList
-         :AndIf (⊂3⊃⎕NPARTS⊃subList)∊extension
-             list←subList
-         :ElseIf 1≠≢subList←(F.IsDir home∘,¨subList)/subList
-             '"cfg.source" is undefined and cannot be established'Assert 1=≢subList
-         :Else
-             cfg.source←(⊃subList),'/'
-             list←(≢home)↓¨⊃('recursive' 1)F.Dir home,cfg.source
-         :EndIf
-     :EndIf
-     cfg WritePackageConfigFile home   ⍝ Because we might have established what is the source
+ :If F.IsFile home,cfg.source
+     list←home∘,¨⊆cfg.source
  :Else
-     :If F.IsFile home,cfg.source
-         list←⊆cfg.source
-     :Else
-         ('"',cfg.source,'" is neither file nor folder')Assert F.IsDir home,cfg.source
-         home,←(~(¯1↑home)∊'\/')/'/'
-         list←(≢home)↓¨⊃('recursive' 1)F.Dir home,cfg.source,'/'
-     :EndIf
+     home,←(~(¯1↑home)∊'\/')/'/'
+     ('"',cfg.source,'" is neither file nor folder')Assert F.IsDir home,cfg.source
+     list←⊃('recursive' 1)F.Dir home,cfg.source,'/'
  :EndIf
- list/⍨←F.IsFile home∘,¨list
+ list/⍨←F.IsFile list
+ list←(≢home)↓¨list
+ list~←Reg.DependenciesFilename CFG_NAME
+ extension←'.aplf' '.aplo' '.aplc' '.apln' '.dyalog'
+ list/⍨←(3⊃∘⎕NPARTS¨list)∊extension
 ⍝Done

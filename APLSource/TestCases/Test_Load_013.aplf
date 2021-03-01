@@ -18,7 +18,7 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'Constants.apln'
- cfg TC.WritePackageConfigFile src
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src src
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
@@ -26,7 +26,7 @@
  body←':Namespace Constants' '∇r←PI' 'r←3.1' '∇' ':EndNamespace'
  (⊂body)F.NPUT(src,'/Constants.apln')1
  cfg.(group name version)←'Example' 'Constants' '0.2.0'
- cfg TC.WritePackageConfigFile src
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src src
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
@@ -34,7 +34,7 @@
  body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
  (⊂body)F.NPUT(src,'/Constants.apln')1
  cfg.(group name version)←'Example' 'Constants' '1.0.0'
- cfg TC.WritePackageConfigFile src
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src src
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc

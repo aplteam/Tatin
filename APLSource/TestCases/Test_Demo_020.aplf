@@ -1,0 +1,44 @@
+ r←Test_Demo_020(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted;src2_
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
+⍝ Publish a package with a non-scripted namespace with two fns & one op, no dependencies, no API
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ F.MkDir src2←src,'/package_A'
+ F.MkDir src2_←src2,'/APLSource/Sub_NS'
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←'Times←{' '⍺←1' '×/⍺,⍵' '}'
+ (⊂body)F.NPUT src2_,'/Times.aplf'
+ body←'r←(fns MyOp) array' 'r←fns array'
+ (⊂body)F.NPUT src2_,'/MyOp.aplo'
+ body←'r←NiladicFn' '  r←1'
+ (⊂body)F.NPUT src2_,'/../Niladic.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'NS' '1.0.0'
+ cfg.source←'APLSource'
+ TC.WritePackageConfigFile src2 cfg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ refs←TC.LoadPackage(reg,'/Example-NS-1.0.0')#.TEMP
+ →T.GoToTidyUp 1≠#.TEMP.NS.NiladicFn
+ →T.GoToTidyUp 24≠(#.TEMP.NS.Sub_NS.Times #.TEMP.NS.Sub_NS.MyOp)1 2 3 4
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

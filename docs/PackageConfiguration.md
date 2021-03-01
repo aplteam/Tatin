@@ -6,13 +6,12 @@
 
 ## Overview 
 
-Every package has a configuration file: that's one of the things that actually make it a package. It defines all that is required in order to consume the package, and to announce its existence to the world.
+Every package has a configuration file: that's one of the things that make it a package. It defines all that is required in order to consume the package, and to announce its existence to the world.
 
 This is an example:
 
 ```
 {
-  alias: "",
   api: "DotNetZip",
   date: "2020-05-16",
   description: "Zipping and unzipping with.NET Core on all major platforms",
@@ -49,66 +48,95 @@ Example:
       Tatin.InitialisePackage parms 
 ```
 
-The user command aquivalent is `]tatin.packageconfig`
+The user command equivalent is `]tatin.PackageConfig`
 
 
 ### User defined variables
 
 You may define your own variables in a package configuration file.
 
-However, since more Tatin-specific variables might be add at a later stage there is a danger of name clashes. This is avoided by a simple rule:
+However, since more Tatin-specific variables might be added at a later stage there is a danger of name clashes. This is avoided by a simple rule:
 
-The names of user defined variables _must_ start with an underscore.
+| **The names of user defined variables _must_ start with an underscore** |
 
 If you specify any variable with a name that Tatin does not know about and that does not start with an underscore an error will be thrown.
 
 
 ### Tatin's package configuration variables
 
-#### alias
-
-By default a package is established in the target space under its own name. However, for ease of use but also in order to avoid possible name clashes, an alias can be defined. If not empty the package must be addressed by the alias rather than its own name.
-
 #### api
 
-There are two different scenarios:
+"api", when specified,  must be a single name. It must be relative, never absolute; therefore it must never start with `#` or `⎕`. It must point to either a class or a namespace.
 
-* The package consists of a single function or a single operator or a single class or a single namespace, be it scripted or not
+There are several scenarios:
 
-* The package consists of several functions, operators, classes or namespaces
+1. The package consists of a single class or a single namespace, be it scripted or not
 
-In the former case what is the api of the package is obvious, and there is no need to even specify it: Tatin will recognize that the name of that single function or single operator or single class or single namespace must be the API of the package, and act accordingly.
+1. The package consists of a single function or operator
 
-If it's a single function (not that this is recommended!) and the name of the package is `Foo`, then calling the function is identical with the package name.
+1. The package consists of several objects: a mixture of functions, operators, classes and / or namespaces. All objects are public.
 
-In the latter case it is not obvious at all what the API should be, and the user must specify it.
+I> Note that you _cannot_ specify the name of a function or an operator as the API in any of these cases.
+I> 
+I> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is not possible for niladic functions and operators.
 
-Also, while a single namespace is by default the API, the user might want to expose only a subset of functions/operators from that namespace, and in that case the user must specify "api" as well.
 
-For example, if the name of the package is `Foo` and it is loaded into `#.MyPkgs` and you set "api" to `Run` then calling the function requires:
+##### Single namespace
+
+* If you don't specify `api` then the name of the namespace is the API. 
+
+* If you do specify `api` then it must be the name of the namespace. In that case the contents of the namespace becomes the API.
+
+
+##### Single class
+
+* If you don't specify `api` then the name of the class is the API. 
+
+* If you do specify `api` then it must be the name of the class. In that case everything in the class with `:Access Public Shared` becomes the API.
+
+
+##### Single function or operator
+
+If the name of the package is `Foo`, and the name of the function is `MyFns`, then it is called as `Foo.MyFns`. The function may be niladic, monadic, ambivalent or dyadic.
+
+The same holds true for an operator.
+
+In this particular case `api` _must not_ be defined (remain empty).
+
+
+##### Mixture of several APL objects
+
+* If `api` is not set all top-level objects of the package become the API: functions, operators, namespaces, classes , interfaces
+* If `api` is set it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what `api` is pointing to become the API.
+
+
+##### Example: restricting what's "public"
+
+The user might want to expose only a subset of functions/operators of a namespace (classes have a public interface anyway), and in that case the user must not only specify `api`, but also structure her code accordingly.
+
+If the name of the package is `Foo`, and it is loaded into `#`, and you want to expose only the functions `Run` and `CreateParmSpace`, then the recommended way of doing this is to create a sub-namespace with the name (say) `API` and populate it with two functions:
+
+* `Run` (which is calling `##.Run`)
+* `CreateParmSpace` (which is calling `##.CreateParmSpace`)
+
+Finally you need to assign `api←'API'` in the package config file.
+
+Calling the function `Run` would then require:
 
 ```
-#.MyPkgs.Foo.Run
+      #.Foo.Run
 ```
 
-If you want to expose two functions, `CreateParameterSpace` and `Run`, then the api needs to be specified as:
+To the outside world only two functions are visible:
 
 ```
-api←`CreateParameterSpace,Run`
+      #.Foo.⎕nl ⍳16
+#.Foo.Run
+#.Foo.CreateParmSpace
 ```
 
-Calling the two functions would look similar to this:
+Similarly, if your package `Foo` consist of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `Foo.Run` and `Foo.CreateParmSpace`.
 
-```
-parms←#.MyPkgs.Foo.CreateParameterSpace ⍬
-#.MyPkgs.Foo.Run parms
-```
-
-Notes: 
-
-* If specified "api" must be either a single name or a list of comma-separated names. Names must be relative, never absolute, therefore they must never start with `#` or `⎕`.
-
-* Niladic functions _cannot_ become part of an API. Tatin will create references in the target namespace, and one cannot create a reference for a niladic function.
 
 #### assets
 
@@ -118,7 +146,7 @@ This must be a simple text vector that can represent:
 * A single folder name
 * A simple text vector representing a mixture of file names and folder names separated by commas.
 
-The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`" or with "`./`". If it does anyway an error is thrown.
+The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
 
 There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative. 
 
@@ -126,52 +154,9 @@ Note that when the package configuration file is written to disk the existence o
 
 #### date
 
-The date of the package in the format `YYYY-MM-DD`. This is not necessarily the publishing date. 
+The user is not expected to set this: it will be set by the `Publish` method. This is a timestamp (`⎕TS`) in the format `yyyymmdd.hhmmss`. 
 
-This date is only used for display; see also [`publishedAt`](#).
-
-
-#### description
-
-A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.
-
-This information is typically used when a human accesses a Tatin Server with a Browser.
-
-#### group
-
-The group part of the package ID[^id]
-
-#### name
-
-The name part of the package ID[^id]
-
-#### project_url
-
-A URL that points to something like GitHub. 
-
-An example is `https://github.com/aplteam-MarkAPL-9.2.0`
-
-#### source
-
-The name of a text file (that contains code) or a folder (that contains a collection of code files).
-
-If it's a single file it might be anything with the extension `.aplf` (a function), `.aplo` (an operator), `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script).
-
-If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.
-
-If `source` is left empty Tatin will attempt to identify the source itself.
-
-* If there is a single script file found with one of the aforementioned extensions that file will become the source.
-
-* If there is no file with such an extension, all folders are investigated except those mentioned as "assets". If there is just one folder left that carries one or more files with the aforementioned extensions then that folder will become the source.
-
-* If Tatin cannot establish the source an error will be thrown, and the user _must_ specify "source".
-
-#### publishedAt
-
-This is read-only: when the package is saved as part of publishing it, a timestamp (`⎕TS`) is injected in the format `yyyymmdd.hhmmss`.
-
-Note that this date might play an important role in determining the precedence of versions. This is because although it's obvious which version is better when you look at these two packages:
+Apart from being shown on the web page when listing packages this date might play an important role in determining the precedence of versions. This is because although it's obvious which version is "better" when you look at these two packages:
 
 ```
 group-name-1.0.0
@@ -189,23 +174,56 @@ and it cannot be determined at all with these packages:
 
 ```
 group-name-1.0.0-TryFeature1
-group-name-1.1.0-AttemptedFixFor234
+group-name-1.1.0-FixFor234
 ```
 
-Since packages, once published, cannot be altered, it is save to assume that the publishing date determines the correct order, but only in such cases. As long as the version consists of just digits and dots `publishedAt` is ignored.
+Since packages, once published, cannot be altered, it is safe to assume that the publishing date determines the correct order, but only in such cases. However, as long as the version consists of just digits and dots, `date` is ignored.
+
+
+#### description
+
+A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.
+
+This information is typically used when a human accesses a Tatin Server with a Browser.
+
+`description` must not be empty.
+
+#### group
+
+The group part of the package ID[^id]
+
+#### name
+
+The name part of the package ID[^id]
+
+#### project_url
+
+A URL that points to something like GitHub. 
+
+An example is `https://github.com/aplteam-MarkAPL-9.2.0`
+
+#### source
+
+The name of a text file that contains code or a folder that contains a collection of code files. `source` _must not_ be empty.
+
+If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script).
+
+If it's a folder it might contain any number and mixture of the aforementioned files plus `.aplf` (functions) and `.aplo` (operators). Any files with other extensions are misplaced and will be ignored.
 
 
 #### tags
 
 A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.
 
+`tags` must not be empty if you wish to publish a package.
+
 #### version
 
 The version[^version] part of the package ID[^id]
 
-Examples for valid version numbers are `1.2.3`, `1.2.3-beta1`, `1.2.3-beta1.30164` and `18.0.0.30165`
+Examples for valid version numbers are `1.2.3`, `1.2.3-beta1`, `1.2.3-beta1+30164` and `18.0.0+30165`
 
-An optional build number is ignored by Tatin.
+The optional build number is ignored by Tatin.
 
 For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
@@ -213,12 +231,12 @@ For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "S
 
 By default the config namespace carries the values of the three Dyalog parameters `default_io`, `default_ml` and `default_wx` for the three system variables `⎕IO`, `⎕ML` and `⎕WX`. 
 
-Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependency` function. This is important because that makes any sub-namespace created later on inherit those values.
+Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependencies` function. This is important because that makes any sub-namespace created later on inherit those values.
 
 
 ### Access after loading a package
 
-Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON under the name `∆CONFIG` together with `∆URI` and `∆HOME`.
+Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON under the name `∆CONFIG` together with `∆ID`, `∆URI` and `∆HOME`.
 
 Note that `∆HOME` will be empty in case two conditions are met:
 
@@ -228,4 +246,4 @@ Note that `∆HOME` will be empty in case two conditions are met:
 All of them are niladic functions because that's how we emulate constants in APL.
 
 [^id]: A package ID consists of `{group}-{name}-{major.{minor}.{patch}`
-[^version]: A version is built from the major number, the minor number and the version number, 
+[^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number

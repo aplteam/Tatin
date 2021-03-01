@@ -70,7 +70,7 @@ A local Registry can be created anywhere on the filesystem where the user has re
 
 ### Alias
 
-The term "alias" is used for two different things in this document:
+The term "alias" is used for different things in this document:
 
 #### Registry alias
 
@@ -78,11 +78,10 @@ In the [client's config file](#Client Settings) (which can also be referred to a
 
 Note that such an alias is _not_ case sensitive.
 
-#### Package alias
+#### Dependency alias
 
-~~One can assign an [alias to a package dependency](#Dependency file). This potentially simplifies addressing a package dependency in the source code.~~
+One can assign an [alias to a package dependency](#Dependency file). This potentially simplifies addressing a package dependency in the source code.
 
-Not implemented. The fact that there are already two different aliases available and that top-level dependencies might be loaded into different namespaces, and with different aliases, might cause confusion rather than being useful.
 
 ## The Modules
 

@@ -1,6 +1,6 @@
  r←Test_Load_002(stopFlag batchFlag);⎕TRAP
  ;dir;src;zip;body;cfg;zipfile;refs
-⍝ Pack a package with an alias into a ZIP file and then load it.
+⍝ Pack a package into a ZIP file and then load itbut specify an alias
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -15,15 +15,15 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'Constants.apln'
- cfg.alias←'Foo'
- cfg TC.WritePackageConfigFile src
+ cfg.api←'Constants'
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src zip
 
- refs←TC.LoadPackage('file://',zipfile)#.TEMP
+ refs←TC.LoadPackage('Foo@file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Foo.⎕NC'PI'
  →T.PassesIf 3.14=#.TEMP.Foo.PI
- →T.PassesIf 0<≢#.TEMP.Foo.##.∆URI
- →T.PassesIf 0=≢#.TEMP.Foo.##.∆HOME
+ →T.PassesIf 0<≢#.TEMP.Foo.##.##.∆URI
+ →T.PassesIf 0=≢#.TEMP.Foo.##.##.∆HOME
  →T.PassesIf 0=≢refs
 
  r←T._OK

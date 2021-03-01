@@ -80,7 +80,7 @@ The INI file is well documented, so we won't discuss the meaning of the differen
 
    If this is 1 Tatin will check whether the workspace `Server.dws` was changed since it was loaded. If it was Tatin will load it, meaning that it will kind of restart itself.
 
-   Whether this is a good idea in production is debatable, but it can be very helpful when making changes to the Tatin Server itself.
+   Whether this is a good idea in production is debatable, but it can be helpful in development.
 
 * The section `[CERTIFICATES]` 
 
@@ -106,7 +106,7 @@ There are two different levels available for logging:
 
 * Low-level logging with `LogHTTP`, `LogConga` and `LogRumba`. These are useful for debugging. 
 
-  The log file these pieces of information go into is situated in the Rumba/ sub folder.
+  The log file these pieces of information go into is situated in the `Rumba/` sub folder.
 
 * High level logging with `Log` and `LogFolder`. 
 
@@ -128,9 +128,9 @@ There are two different levels available for logging:
 
 Note that in case you want your Tatin server to serve requests from the Internet --- as opposed to an Intranet --- it is strongly recommended to hide the Tatin Server behind an industrial-strength HTTP server like Apache.
 
-Such a server is able to deal with attacks and has also all sorts of security measures build into it, so it's much safer to run Tatin behind it.
+Such a server is able to deal with attacks and has also all sorts of security measures built into it, so it's much safer to run Tatin behind it.
 
-There is a separate document available that discusses how to do this: RunDyalogBehindApache.html
+There is a separate document available that discusses how to do this: [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html").
 
 In case you hide the Tatin Server behind, say, an Apache server, on the same machine there might be no need to use encryption (https).
 
@@ -138,7 +138,7 @@ In case you hide the Tatin Server behind, say, an Apache server, on the same mac
 
 This section can be useful in case you want to inject a message into every HTML page delivered by Tatin.
 
-A typical application is the announcement of down time due to maintanance.
+A typical application is the announcement of down time due to maintenance.
 
 In case `Text` is not empty it is injected as `<div><p>{text}</p>?</div>`. If `CSS` is not empty it is injected into the `<div>` as `style="..."`.
 
@@ -152,7 +152,7 @@ This section tells Plodder where to find the application-specific logic (Tatin).
 
 * The `On*` handlers
 
-  These are the Tatin-specific entry points. You might want to add something to `OnHouseKeeping`, or add a handler `OnHeader`, but that is pretty unsual.
+  These are the Tatin-specific entry points. You might want to add something to `OnHouseKeeping`, or add a handler `OnHeader`, but that is pretty unusual.
 
 
 ## How to start the Tatin server

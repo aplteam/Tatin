@@ -1,0 +1,53 @@
+ r←Test_Demo_042(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3
+⍝ Publish a package with a single function, no API
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ F.MkDir src2←src,'/Arithmetic'
+ F.MkDir src2,'/APLSource'
+ F.MkDir src3←src,'/UseCase'
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←'r←x Plus y' 'r←x+y'
+ (⊂body)F.NPUT src2,'/APLSource/Plus.aplf'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Arithmetic' '1.0.0'
+ cfg.source←'APLSource'
+ TC.WritePackageConfigFile src2 cfg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+ {}TC.LoadPackage(reg,'/Example-Arithmetic-1.0.0')#.TEMP
+ →T.GoToTidyUp 7≠3 #.TEMP.Arithmetic.Plus 4
+
+ body←'r←x Call y' 'r←x Arithmetic.Plus y'
+ (⊂body)F.NPUT src3,'/Call.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Calls' '1.0.0'
+ cfg.source←'Call.aplf'
+ TC.WritePackageConfigFile src3 cfg
+ src3 TC.Dependencies.Add'[local2]Example-Arithmetic-1.0.0'
+ (rc msg zipFilename)←TC.PublishPackage src3 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+ {}TC.LoadPackage(reg,'/Example-Calls-1.0.0')#.TEMP
+ →T.GoToTidyUp 7≠3 #.TEMP.Calls.Call 4
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

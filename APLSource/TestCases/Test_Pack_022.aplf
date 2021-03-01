@@ -1,6 +1,6 @@
- r←Test_Pack_002(stopFlag batchFlag);⎕TRAP
- ;dir;src;dist;cfg;zipfile;ns;list;expected
-⍝ Pack multiple files with default "source"
+ r←Test_Pack_022(stopFlag batchFlag);⎕TRAP;buff
+ ;dir;src;dist;cfg
+⍝ Check whether "alias" is ignored when specified as a package parameter  ⍝TODO⍝ To be deleted one day
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -11,18 +11,15 @@
  F.MkDir(src,'/source')dist
 
  ('foo1←{1}')F.NPUT src,'/source/foo1.apln'
- ('foo2←{2}')F.NPUT src,'/source/foo2.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_B'
  cfg.version←'0.1.0'
- cfg TC.WritePackageConfigFile src
+ cfg.alias←'ShouldBeIgnored'
+ cfg.source←'source'
+ TC.WritePackageConfigFile src cfg
 
- zipfile←TC.Pack src dist
- →T.GoToTidyUp 0≥≢zipfile
- list←∆GetFileListFromZipArchive zipfile
- expected←'apl-package.json' 'source/foo1.apln' 'source/foo2.apln'
- →T.GoToTidyUp~expected ∆LazyMatchPaths list
+ buff←TC.Pack src dist
 
  r←T._OK
 

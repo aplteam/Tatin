@@ -1,0 +1,26 @@
+ {r}←CheckWouldBePackage path;cfg;extension;sourceCodeFiles;isDir;isFnOrOpr;fullPath
+⍝ Checks whether there is a config file in path ⍵, and whether the API, if specified at all, points to a namespace or class.
+ r←0
+ 'Could not find a package config file'Assert F.Exists path,'/',CFG_NAME
+ cfg←ReadPackageConfigFile path
+ path←Reg.AddSlash path
+ :If 0<≢cfg.api
+     extension←3⊃⎕NPARTS cfg.source
+     '"api" must not point to a function or an operator'Assert~(⊂extension)∊'.aplf' '.aplo'
+     fullPath←path,cfg.source
+     :If ≢/,¨cfg.api(2⊃⎕NPARTS cfg.source)
+         isDir←F.IsDir fullPath
+         isFnOrOpr←(⊂3⊃⎕NPARTS cfg.source)∊'.apln' '.aplc'
+         :If 0=isDir+isFnOrOpr
+             ('Is not a directory: ',fullPath)Assert isDir
+             'API is neither a class nor a namespace'Assert isFnOrOpr
+         :EndIf
+         :If isFnOrOpr
+             ('Is not a source file: ',fullPath)Assert F.IsFile fullPath
+         :Else
+             sourceCodeFiles←⊃F.Dir Reg.AddSlash fullPath
+             ('Directory is empty: ',fullPath)Assert 0<≢sourceCodeFiles
+         :EndIf
+     :EndIf
+ :EndIf
+ ⍝Done

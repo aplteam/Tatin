@@ -1,0 +1,43 @@
+ r←Test_Demo_001(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
+ ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
+⍝ Publish a package with a single class, no API
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ F.MkDir src2←src,'/Arithmetic'
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←''
+ body,←'∇r←x Plus y' ':Access Public Shared' 'r←x+y' '∇'
+ body,←'∇r←x Times y' ':Access Public Shared' 'r←x×y' '∇'
+ body←(⊂':Class MyClass'),body,(⊂':EndClass')
+ (⊂body)F.NPUT src2,'/Arithmetic.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Arithmetic' '1.0.0'
+ cfg.source←'Arithmetic.apln'
+⍝ cfg.api←'MyClass'
+ TC.WritePackageConfigFile src2 cfg
+ (rc msg zipFilename)←TC.PublishPackage src2 reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ refs←TC.LoadPackage(reg,'/Example-Arithmetic-1.0.0')#.TEMP
+ →T.GoToTidyUp 7≠3 #.TEMP.Arithmetic.MyClass.Plus 4
+ →T.GoToTidyUp 12≠3 #.TEMP.Arithmetic.MyClass.Times 4
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

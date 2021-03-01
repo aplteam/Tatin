@@ -1,6 +1,6 @@
  r←Test_Load_051(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
-⍝ Publish 2 packages consisting of single fn with 2. depending on 1. & having an alias, then load from specific Registry
+⍝ Publish 2 packages consisting of single fn with the second depending on the first.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -15,31 +15,31 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- body←':Namespace Package_A' 'Times←{' '×/⍵' '}' ':EndNamespace'
+ body←':Namespace Functions' 'Times←{' '×/⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src2,'/Package_A.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Package_A' '1.0.0'
  cfg.source←'Package_A.apln'
- cfg TC.WritePackageConfigFile src2
+ cfg.api←'Functions'
+ TC.WritePackageConfigFile src2 cfg
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- F.MkDir src3←src,'/package_B'
- body←'r←Times y' 'r←Package_A.Times y'
+ F.MkDir src3←src,'/Times'
+ body←'r←Times y' '  r←Package_A.Times y'
  (⊂body)F.NPUT src3,'/Times.aplf'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'Package_B' '1.0.0'
+ cfg.(group name version)←'Example' 'Times_' '1.0.0'
  cfg.source←'Times.aplf'
- cfg.alias←'Times'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'[local2]Example-Package_A-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- refs←TC.LoadPackage(reg,'/Example-Package_B-1.0.0')#.TEMP
- →T.GoToTidyUp 12≠#.TEMP.Times 3 4
+ refs←TC.LoadPackage(reg,'/Example-Times_-1.0.0')#.TEMP
+ →T.GoToTidyUp 12≠#.TEMP.Times_.Times 3 4
 
  r←T._OK
 

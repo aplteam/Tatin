@@ -30,7 +30,7 @@ After a fresh installation you might wonder what Registries are available to you
  https://tatin.dev/  tatin 
 ```
 
-At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelyhood your own ones), then you must change the user settings. 
+At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelihood your own ones), then you must change the user settings. 
 
 All these topics --- and related ones --- are discussed in a separate document: "TatinUserSettings.html". Here we try to keep things simple.
 
@@ -81,7 +81,7 @@ A> * The strategy outlined above is applied on each tag independently.
 A> * Searching for multiple tags would mean that only packages that have a hit for _all of them_ would qualify.
 A> * Searching for tags is an action that is carried out by a Tatin Server. That means that specifying `-tags=` makes sense only in HTTP requests: only then is there a server on the other side that can process the request.
 
-Let's assume you need a tool in order to convert [Markdown](https://en.wikipedia.org/wiki/Markdown "Link to the Wikipedia") into HTML, and that the package should run on all platforms.
+Let's assume you need a tool for converting [Markdown](https://en.wikipedia.org/wiki/Markdown "Link to the Wikipedia") into HTML, and that the package should run on all platforms.
 
 The user command `ListTags` takes one or more tags and returns a list of tags that were also found in the packages that carried the specified tags:
 
@@ -98,7 +98,7 @@ The user command `ListTags` takes one or more tags and returns a list of tags th
 
 Good news: there must be at least one package that carries the tags "mac-os" and "markdown" but _also_ the tags "windows" and "linux" because those are both listed, so there will be a package available that runs on all major platforms.
 
-Note that although we misspelled "mac-os" as "mack-os" it was still identified correctly. Similarly, "markd" was enough for finding "markdown". 
+Note that although we misspelled "mac-os" as "mack-os" it was still identified correctly. Similarly, "markd" was enough to find "markdown". 
 
 We are now ready to identify that package by executing `ListPackages` with the `-tags` option:
 
@@ -112,7 +112,7 @@ We are now ready to identify that package by executing `ListPackages` with the `
 
 Note that because packages which share the same group and name but have different major version numbers are considered to be different packages, the major version number is part of the list.
 
-I> If you wonder why that is then please read the document discussing [Semantic Versioning](./SemanticVersioning.html).
+I> If you wonder why that is, then please read the document discussing [Semantic Versioning](./SemanticVersioning.html).
 
 
 ## Consuming packages
@@ -121,7 +121,7 @@ I> If you wonder why that is then please read the document discussing [Semantic 
 
 Let's assume that you want to check whether `MarkAPL` suits your needs, in other words: you just want to check it out. 
 
-That can be achieved with the `LoadPackage` user command. That loads the package into the workspace and leaves no trail in the file system if that can be avoided.
+That can be achieved with the `LoadPackage` user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided.
 
 A> ### Leaving a trace on the file system
 A>
@@ -129,7 +129,7 @@ A> In case the package has file dependencies, like DLLs, images, CSS files and w
 
 Notes:
 
-* Loading a package has only one purpose: to investigate it.
+* Loading a package in this way has only one purpose: to investigate it.
 
 * Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case. 
 
@@ -150,11 +150,11 @@ Let's load the `MarkAPL` package into the workspace; for that we need to specify
   ...
 ```
 
-I> In case the package or any of its dependencies comes with assets the path to a directory in the temp directory of your OS is printed to the session by `]tatin.LoacdPacke`.
+I> In case the package or any of its dependencies comes with assets, the path to a directory in the temp directory of your OS is printed to the session by `]tatin.LoadPackage`.
 I>
 I> This is because this folder cannot be deleted by Tatin. If no package has any assets then nothing is printed to the session, indicating that no footprint is left behind.
 
-In case the target namespace is something like `#.MyTests` it may or may not exist. If it does not Tatin will create it.
+In case the target namespace is something like `#.MyTests` it may or may not exist. If it does not, Tatin will create it.
 
 I> When you try to execute the following statements on your own machine then you will probably see different version numbers.
 
@@ -176,7 +176,7 @@ The name of the namespace carries the version number:
       #.MarkAPL
 #._tatin.aplteam_MarkAPL_10_0_0 
 ```
-`_tatin` also contains all the dependencies `MarkAPL` relies on:
+`_tatin` also contains all the packages `MarkAPL` depends on:
 
 ```
       #._tatin.⎕nl ⍳16
@@ -186,21 +186,26 @@ aplteam_MarkAPL_10_0_0
 aplteam_OS_3_0_0          
 ```
 
-### Installing packages
+### Adding packages to an application
 
 Let's assume you've checked on `MarkAPL`, and that it turns out to suit your needs. You decide to use it in your application `Foo` which happens to live in `/Path2Foo/` on disk and in `#.Foo` in the workspace. 
 
 Let's also assume that the code of your application lives in `Foo.Core`, and that you want to address `MarkAPL` with `##.MarkAPL` from any function within `Foo.Core`.
 
-For that you need to execute this:
+For that you need to execute two steps:
+
+1. Install the required packages (and implicitly all packages they depend on)
+2. Load all these packages
+
+#### Step 1 : installing
 
 ```
       ]TATIN.InstallPackage [tatin]aplteam-MarkAPL /Path2Foo/Packages
 ```
 
-Note that we did not specify any of the major, minor and patch number but the Registry by alias (`[tatin]`); that tells Tatin that we want to get the very latest version of `MarkAPL`.
+Note that we did not specify any of the major, minor and patch number but the Registry by alias (`[tatin]`); that tells Tatin that we want to get the very latest version of `MarkAPL` from the principal Tatin server.
 
-If you do not even specify the Regsitry then Tatin would scan all Registry; the first hit wins. Only then would it establish the best version on that server.
+If you do not even specify the Registry then Tatin would scan all Registry; the first hit wins. Only then would it establish the best version on that server.
 
 Let's check what's now in `/Path2Foo/Packages`
 
@@ -247,7 +252,7 @@ The dependencies file specifies what packages _your application_ depends on as o
  aplteam-MarkAPL-10.0.0 
 ```
 
-### Loading dependencies
+#### Step 2 : loading
 
 Having the packages installed you may now load them into your application. This is achieved by the `LoadDependencies` user command:
 
@@ -280,13 +285,13 @@ If you want the full list of all packages:
 
 A> ### `#._tatin` versus `⎕SE._tatin`
 A> 
-A> Note that whether you specify a namespace in `#` or in `⎕SE` as the target of a `LoadDependency` operation decides whether the packages are loaded into `#._tatin` or `⎕SE._tatin`.
+A> Note that whether you specify a namespace in `#` or in `⎕SE` as the target of a `LoadDependencies` operation decides whether the packages are loaded into `#._tatin` or `⎕SE._tatin`.
 
 Let's check whether it worked:
 
 ```
-      ⍪⊃#.Foo.MarkAPL.Markdown2HTML 'A pragraph' '' '* This' '* That'
- <p>A pragraph</p> 
+      ⍪⊃#.Foo.MarkAPL.Markdown2HTML 'A paragraph' '' '* This' '* That'
+ <p>A paragraph</p> 
  <ul>              
  <li>This</li>     
  <li>That</li>     

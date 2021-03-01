@@ -1,6 +1,6 @@
  r←Test_Load_010(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;reg1;reg2;body;cfg;zipfile;refs
-⍝ Publish simple package to the second registry and then load it from there using the alias.
+⍝ Publish simple package to the second registry and then load it from there
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -20,7 +20,7 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Test' '1.0.0'
  cfg.source←'Test.apln'
- cfg TC.WritePackageConfigFile src
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src src
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
@@ -30,7 +30,7 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '1.0.0'
  cfg.source←'Constants.apln'
- cfg TC.WritePackageConfigFile src
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src src
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc

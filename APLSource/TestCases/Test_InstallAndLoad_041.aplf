@@ -15,7 +15,8 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'CrazyName___' '0.1.0'
  cfg.source←'CrazyName___.apln'
- cfg TC.WritePackageConfigFile src
+ cfg.api←'CrazyName___'
+ TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src zip
  installFolder←GetTempDir'/MyAppPackages'
  {}TC.InstallPackage('file://',zipfile)installFolder

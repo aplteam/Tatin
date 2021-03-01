@@ -1,4 +1,4 @@
- {ref}←{deleteFlag}InitUserSettings folder;ns
+ {ref}←InitUserSettings folder;ns
 ⍝ Establishes `MyUserSettings` by instantiating the `UserSettings` class.\\
 ⍝ `folder` is where the config file lives or is going to be created. If this is empty the
 ⍝ Tatin config file `.tatin` is checked. If no definition is found (that file does not
@@ -8,13 +8,9 @@
 ⍝ if it doesn't a VALUE ERROR will be generated.\\
 ⍝ A user config file created by this function will always carry a URL pointing to the Tatin
 ⍝ server with the default [tatin].\\
-⍝ ⍺ is optional and defaults to 0; if it is 1 then any already existing config file is
-⍝ first deleted and then created from scratch.
- deleteFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'deleteFlag'
  :If F.IsFile folder
      folder←1⊃⎕NPARTS folder
  :EndIf
- {}F.DeleteFile⍣deleteFlag⊣folder,'/',UserSettings.cfg_name
  :If ~F.IsDir folder
      Assert F.MkDir folder
  :EndIf

@@ -1,4 +1,4 @@
- {r}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;refs
+ {r}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;refs;alias
 ⍝ Takes a folder with a build list, typically the result of installing packages.
 ⍝ Loads all packages according to that list and injects required references into `targetSpace`.
 ⍝ Returns a vector with references to the loaded packages (no dependencies, top-level only).
@@ -11,6 +11,7 @@
  CheckBuildList installFolder
  :If 0<≢tree←LoadBuildList installFolder
      :For level packageID url :In ↓tree
+         (alias packageID)←{~'@'∊⍵:''⍵ ⋄ '@'(≠⊆⊢)⍵}packageID
          path←installFolder,'/',packageID
          ('Cannot find package "',path,'"')Assert F.Exists path
          saveIn←GetTatinRootSpace targetSpace
@@ -19,7 +20,7 @@
          saveIn,←'.',packageID
          :If 0=⎕NC saveIn   ⍝ Might already exist
              EstablishSystemVars saveIn cfg
-             msg←Reg.ImportWithLink saveIn(path,'/',cfg.source)
+             msg←Reg.ImportWithLink(saveIn,'.code')(path,'/',cfg.source)
              'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
              ref←⍎saveIn
              EstablishConstants ref cfg path
@@ -29,7 +30,7 @@
              :EndIf
          :EndIf
          :If 1=level
-             cfg LinkTargetToPackage saveIn targetSpace
+             LinkTargetToPackage cfg saveIn targetSpace alias
          :EndIf
      :EndFor
      LinkDependencies refs

@@ -14,7 +14,7 @@
      :EndIf
  :EndIf
  request.Headers,←⊂'Accept' 'application/json'
- res←client R.SendAndReceive request
+ res←client SendAndReceive request
  ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
  list←{(,0)≡⍴⍵:'' ⋄ ⎕JSON⍠('Dialect' 'JSON5')⊣⍵}⊣res.Content
 ⍝Done

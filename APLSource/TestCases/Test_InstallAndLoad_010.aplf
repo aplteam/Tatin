@@ -10,8 +10,8 @@
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  src2←src,'/Example-Constants-0.1.0/'
  src3←src,'/Example-Constants-0.2.0/'
- src4←src,'/Example-MyClass_AAA-1.0.0/'
- src5←src,'/Example-MyClass_BBB-1.1.0/'
+ src4←src,'/Example-MyPiUtils1-1.0.0/'
+ src5←src,'/Example-MyPiUtils2-1.1.0/'
  F.MkDir reg
  F.MkDir src2 src3 src4 src5,¨⊂'/APLSource'
  toBeDeleted←''
@@ -24,7 +24,7 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
- cfg TC.WritePackageConfigFile src2
+ TC.WritePackageConfigFile src2 cfg
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
@@ -34,46 +34,48 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.2.0'
  cfg.source←'APLSource'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- body←':Class MyClass_AAA' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
- (⊂body)F.NPUT src4,'/APLSource/MyClass_AAA.aplc'
+ body←':Class MyPiUtils1' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
+ (⊂body)F.NPUT src4,'/APLSource/MyPiUtils1.aplc'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'MyClass_AAA' '1.0.0'
+ cfg.(group name version)←'Example' 'MyPiUtils1' '1.0.0'
  cfg.source←'APLSource'
- cfg TC.WritePackageConfigFile src4
+ cfg.api←'MyPiUtils1'
+ TC.WritePackageConfigFile src4 cfg
  src4 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src4 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- body←':Class MyClass_BBB' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
- (⊂body)F.NPUT src5,'/APLSource/MyClass_BBB.aplc'
+ body←':Class MyPiUtils2' '∇r←GetPI' ':Access Public Shared' 'r←##.Constants.PI' '∇' ':EndClass'
+ (⊂body)F.NPUT src5,'/APLSource/MyPiUtils2.aplc'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'MyClass_BBB' '1.0.0'
+ cfg.(group name version)←'Example' 'MyPiUtils2' '1.0.0'
  cfg.source←'APLSource'
- cfg TC.WritePackageConfigFile src5
+ cfg.api←'MyPiUtils2'
+ TC.WritePackageConfigFile src5 cfg
  src5 TC.Dependencies.Add'[local2]Example-Constants-0.2.0'
  (rc msg zipFilename)←TC.PublishPackage src5 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list←TC.InstallPackage('[local2]Example-MyClass_AAA-1.0.0')installFolder
+ list←TC.InstallPackage('[local2]Example-MyPiUtils1-1.0.0')installFolder
  →T.GoToTidyUp 2≠≢list
- list←TC.InstallPackage('[local2]Example-MyClass_BBB-1.0.0')installFolder
+ list←TC.InstallPackage('[local2]Example-MyPiUtils2-1.0.0')installFolder
  →T.GoToTidyUp 2≠≢list
 
  →T.GoToTidyUp 4≠≢F.ListDirs installFolder
  →T.GoToTidyUp 2≠≢F.ListFiles installFolder
- →T.GoToTidyUp'Example-MyClass_AAA-1.0.0' 'Example-MyClass_BBB-1.0.0'≢TC.Dependencies.Get installFolder
+ →T.GoToTidyUp'Example-MyPiUtils1-1.0.0' 'Example-MyPiUtils2-1.0.0'≢TC.Dependencies.Get installFolder
 
  {}TC.LoadDependencies installFolder #.TEMP
- →T.GoToTidyUp 3.1415926≠#.TEMP.MyClass_AAA.GetPI   ⍝ Because the "better" version...
- →T.GoToTidyUp 3.1415926≠#.TEMP.MyClass_BBB.GetPI   ⍝ ... is used in both cases!
+ →T.GoToTidyUp 3.1415926≠#.TEMP.MyPiUtils1.GetPI   ⍝ Because the "better" version...
+ →T.GoToTidyUp 3.1415926≠#.TEMP.MyPiUtils2.GetPI   ⍝ ... is used in both cases!
 
  r←T._OK
 

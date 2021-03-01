@@ -14,7 +14,7 @@
  request.Content←Reg.Base64 Reg.ReadNativeFile filename
  request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)
 
- response←client R.SendAndReceive request
+ response←client SendAndReceive request
  :If response.StatusCode≢200
      :If 405≡response.StatusCode
          :If ∨/'http://'⍷url

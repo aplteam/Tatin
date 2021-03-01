@@ -4,7 +4,7 @@
 
 # Tatin's Load and Update Strategy
 
-Before you read this document you have to have a good understanding of what Semantic Versioning is. If that's the case then carry on reading, otherwise please read [SemanticVersioning](./SemanticVersioning.html) first.
+Before you read this document, you have to have a good understanding of what Semantic Versioning is. If that's the case then carry-on reading, otherwise please read [SemanticVersioning](./SemanticVersioning.html) first.
 
 ## The Strategy Problem
 
@@ -20,7 +20,7 @@ We can take several different approaches here:
 * We could load the better version (1.2) and make `Zoo` and `Goo` both use that version 
 * We could check the server, find that there is an even better version available (1.3.0) and use that one
 
-  (More generally, always check for the best version and use that one)
+  (More generally, always check for the latest version and use that one)
 
 All these options are actually used by different package managers in the wild, so there is no consensus on what's best.
 
@@ -69,9 +69,9 @@ While `Foo` relies on `Zoo` 1.1.1, `Goo` needs `Zoo` 1.2.0 --- what is Tatin doi
 It depends on what you are doing. Let's first load `Zoo` and `Goo` into the workspace, the usual approach to inspect a package:
 
 ```
-      ]TATIN.Loadpackage [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
+      ]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
 #.MyPkgs.Foo
-      ]TATIN.Loadpackage [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
+      ]TATIN.LoadPackage [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
 #.MyPkgs.Goo
       #.MyPkgs.⎕nl ⍳16
 Foo
@@ -80,9 +80,9 @@ Goo
 
 A> ### Getting the best version
 A>
-A> Assuming that version 1.0.0 of `Foo` is the best version available with the major number 1, then this would have been sufficient:
+A> Assuming that version 1.3.0 of `Foo` is the best version available with the major number 1, then this would have been sufficient:
 A> ```
-A> ]TATIN.Loadpackage [MyTatin]/mygroup-Foo-1 #.MyPkgs
+A> ]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1 #.MyPkgs
 A> ```
 A> Note that neither the minor nor the patch number have been specified.
 A>
@@ -90,9 +90,9 @@ A> Assuming that version 2.1.0 of `Goo` is the very best version available at al
 A> then this would have been sufficient:
 A>
 A> ```
-A> ]TATIN.Loadpackage [MyTatin]/mygroup-Goo #.MyPkgs
+A> ]TATIN.LoadPackage [MyTatin]/mygroup-Goo #.MyPkgs
 A> ```
-A> Note that in this case not even the major number have been specified.
+A> Note that in this case not even the major number has been specified.
 
 You wanted `Foo` and `Goo` to be loaded into `#.MyPkgs`, and that's exactly what Tatin did. But where are the dependencies?
 
@@ -115,9 +115,9 @@ To make packages a part of an application (say), they first need to be installed
 ```
       ⎕NEXISTS /myPkgs
 0
-      ]TATIN.Installpackage [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
+      ]TATIN.InstallPackage [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
 /myPkgs/mygroup-Foo-1.0.0
-      ]TATIN.Installpackage [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
+      ]TATIN.InstallPackage [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
 /myPkgs/mygroup-Goo-2.1.0
       ⍪⊃⎕NINFO ⍠ 1⊢'/myPkgs/*'
 /myPkgs/apl-buildlist.json  
@@ -157,7 +157,7 @@ The build list comprises not only the two principal packages but also all depend
 
 Though installing is roughly the same as loading except that the packages end up in the file system rather than the workspace, loading the installed packages allows Tatin to optimize what's actually loaded, and in this respect it is different.
 
-Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which is either created or possibly extended by an installation. 
+Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which was created when you installed your first package, and which will be extended when you install more packages.
 
 It also requires a namespace as second argument: that's where the references pointing to the principal packages are going to be created. This is similar to `LoadPackage`.
 
@@ -213,113 +213,38 @@ Tatin would check whether the file `apl-dependencies.txt` was changed after `apl
 
 In this case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly an insurance against people manually changing `apl-dependencies.txt` and making mistakes.
   
-Since the health check passes the build-list would be re-created. As a result `Goo` would disappear from the build list, and therefore a future `]TATIN.LoadDependencies` command would not load it any more.
+Since the health check passes, the build-list would be re-created. As a result `Goo` would disappear from the build list, and therefore a future `]TATIN.LoadDependencies` command would not load it any more.
 
 However, note this: although `Foo` only required `Zoo` 1.1.1, Tatin would _not_ go back to that version, because version 1.2.0 of `Zoo` is already installed. It would therefore keep loading version 1.2.0 although at this point in time this version is not referenced at all.
 
-### Need to overwrite a package dependency 
-
-Imagine you've installed a principal packages `Foo`, and as a result you also got two dependency packages, `Goo` and  `Zoo`:
-
-Foo -> Goo -> Zoo
-
-You find that sometimes `Zoo` crashes because of a bug.
-
-Two different scenarios both cause a problem here:
-
-* You check the project's web site and find that the guy in charge has already fixed the problem in `Zoo`, but `Goo` has not been updated and still refers to the buggy version of `Zoo`.
-
-* You find that the version you already have is still the best, and the author does not respond to emails or even Pull Requests at the moment, and you are under time pressure, but it's easy to fix the problem yourself, so you put a fixed copy into a local Registry.
-
-  (Assuming that you have defined your Registry chain so that local versions of packages take precedence)
-
-The first step is obviously to install that fixed version, but that is not enough, because neither `apl-dependencies.txt` nor `apl-buildlist.json` would refer to that version, therefore it would not be loaded.
-
-Since the build-list is compiled dynamically, the solution here is to add `Zoo` to the file `apl-dependencies.txt`.
-
-A> ### Second problem
-A>
-A> There is a second problem with this:
-A>
-A> In the scenario outlined in that Go-paper on semantic versioning you end up using D-1.1.4 although this version is not mentioned anywhere as a dependency, it's just part of the build list.
-A>
-A> But we agreed that the build list should be re-compiled from scratch in case somebody has changed the dependency file _after_ the build list file was created. In that case we would currently fall back on D-1.1.3 although we don't want that.
-A>
-A> This also means that manually changing the build list is not an option in any case.
-
-
-W> Above
-W>
-W> The above needs attention _and_ examples on `https://test.tatin.dev`
-
 
 ## Checking and updating
-
-**_Note that this hat not been implemented yet and is open to discussion_**
-
-
-### Checking 
 
 Let's assume you want to check whether there are better versions of the principal packages of your application.
 
 There is a user command available that can help you with that:
 
 ```
-      ]TATIN.CheckVersions ./
+      ]TATIN.CheckForBetterVersion ./
 ```
 
 It requires a path to a folder that holds a file `apl-dependencies.txt`  and a file `apl-buildlist.json`. 
 
-This user command would check whether there are any better versions available and report its findings to the session.
+This user command would check whether there are any better top-level versions available and report its findings to the session.
 
-In case there is a better version in terms of minor and/or patch number but also a better major version then it would report both.
+I> `CheckForBetterVersion` does not bother to look out for dependencies because we load exact versions anyway.
 
-It is then up to you to take action, or to use the user command `]TATIN.Update`.
+Note that a top-level package carries a 1 as `depth` in the `apl-buildlist.json` file.
 
-You may also restrict the output of the command to a specific package, say `mygroup-Foo`; in that case just specify the package as an additional parameter:
+As usual Tatin would consider packages with different major numbers different, so by default you will get only a list of packages that have the same group-name, package-name and major version number then your top-level packages.
 
-```
-      ]TATIN.CheckVersions /myPkgs/ mygroup-Foo
-```
+It is then up to you to take action: you may or may not install a better package that is available.
 
-You may specify more than one package:
-
-```
-      ]TATIN.CheckVersions /myPkgs/ mygroup-Foo mygroup-Goo
-```
+A> ### Better major versions
+A> When you specify the `-major` flag of the `CheckForBetterVersion` user command then the user command will only report better major versions.
 
 
-### Updating 
+## Downgrading
 
-#### Updating _all_ principal packages
+There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known for being okay. Tatin does not offer help here, you need to do this yourself.
 
-After having executed `]TATIN.CheckVersions` you might want to update all principal packages of your application. This can be achieved by executing:
-
-```
-      ]TATIN.Update ./ *
-```
-
-This will update _all_ principal packages. 
-
-Of course dependencies will be updated implicitly if one of the principal packages requires a better version.
-
-#### Updating a specific principal package
-
-Lets assume your application uses the package `mygroup-Foo-1.0.0`, and that the versions 1.0.0, 1.1.0, 1.2.0 and 2.0.0 are all available from a Tatin server.
-
-After having executed `]TATIN.CheckVersions` you might want to update `mygroup-Foo`.
-
-This can be achieved by executing:
-
-```
-      ]TATIN.Update /myPkgs/ mygroup-Foo
-```
-
-This will update `mygroup-Foo-1.0.0` to `mygroup-Foo-1.2.0` _but not_ to version `mygroup-Foo-2.0.0`. This is because `mygroup-Foo-2.0.0` is considered to be a completely different package.
-
-
-#### Updating to a specific version
-
-There might be a reason why you want to update `mygroup-Foo-1.0.0` but not to version `mygroup-Foo-1.2.0`  but to version `mygroup-Foo-1.1.0`. However, this is _not_ supported by `]TATIN.Update`; you need to edit the file `apl-dependendies.txt` in order to achieve that.
-
-The same is true in case you want to update to a new major version, `mygroup-Foo-2.0.0` in our example.

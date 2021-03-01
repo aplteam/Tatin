@@ -21,7 +21,9 @@
  (⊂body)F.NPUT src2,'/source/MyClass.aplc'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'MyCompany' 'MyClass' '1.0.0'
- cfg TC.WritePackageConfigFile src2
+ cfg.source←'source'
+ cfg.api←'MyClass'
+ TC.WritePackageConfigFile src2 cfg
  src2 TC.Dependencies.Add'[local2]MyCompany-MyBaseClass-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
@@ -30,8 +32,9 @@
  body←':Class MyBaseClass' '∇r←Copyright' ':Access Public Shared' 'r←''Copyright This and that 2020''' '∇' ':EndClass'
  (⊂body)F.NPUT src3,'/source/MyBaseClass.aplc'
  cfg←TC.InitPackageConfig ⍬
+ cfg.source←'source'
  cfg.(group name version)←'MyCompany' 'MyBaseClass' '1.0.0'
- cfg TC.WritePackageConfigFile src3
+ TC.WritePackageConfigFile src3 cfg
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc

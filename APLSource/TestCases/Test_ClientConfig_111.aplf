@@ -1,15 +1,16 @@
  r←Test_ClientConfig_111(stopFlag batchFlag);⎕TRAP;settings;tempDir;buff;reg;myRegDef
-⍝ Instantiate the "UserSettings" class with a path and permanent←1, add registry and then delete it.
+⍝ Instantiate the "UserSettings" class with a path, add registry, Save, call MakeDefaultFile and then re-instantiate
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  tempDir←GetTempDir''
  F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name   ⍝ Precaution
 
- settings←⎕NEW TC.UserSettings(tempDir 1)
+ settings←⎕NEW TC.UserSettings(,⊂tempDir)
  →T.GoToTidyUp≢/F.ExpandPath¨settings.path2config(tempDir,'/',settings.cfg_name)
+ settings.MakeDefaultFile 1
 
- buff←⊃F.NGET TC.GetUserHomeFolder'.tatin'           ⍝ Must now exist and...
+ buff←⊃F.NGET TC.GetUserHomeFolder'.tatin'          ⍝ Must now exist and...
  →T.GoToTidyUp tempDir{⍺≢(≢⍺)↑⍵}buff                ⍝ ... have the correct contents
 
  myRegDef←'[my]http://tatin.dev/'
@@ -22,9 +23,9 @@
 
  →T.GoToTidyUp 1≠settings.Delete 1
  →T.GoToTidyUp 0≠settings.Delete 1                  ⍝ Second time cannot be successful
+ settings.Save 1
 
  →T.GoToTidyUp F.IsFile⊃{⍺,'/',⍵}/settings.(path2config cfg_name)
- →T.GoToTidyUp 0≠≢⊃F.NGET(TC.GetUserHomeFolder'.tatin')
 
  r←T._OK
 

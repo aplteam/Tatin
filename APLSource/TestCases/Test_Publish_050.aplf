@@ -17,8 +17,8 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'A' '1.0.0'
  cfg.source←'A.apln'
- cfg TC.WritePackageConfigFile src
- src TC.Dependencies.Add'[local2]DoesNot-Exist-1.0.0'     ⍝ Invalid dependency
+ TC.WritePackageConfigFile src cfg
+ src TC.Dependencies.Add'[local2]DoesNot-Exist-1.0.0'    ⍝ Invalid dependency
 
  (rc msg zipFilename)←TC.PublishPackage src reg          ⍝ You might want to install a package with a not yet published dependency
  Assert 200=rc
@@ -29,7 +29,7 @@
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.GoToTidyUp~'File does not exist'∆LazyMatch qdmx.EM
+     →T.GoToTidyUp 1≠≢'File <[^>]+> does not exist'⎕S 0⊣qdmx.EM
  :EndTrap
 
  r←T._OK

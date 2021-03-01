@@ -23,7 +23,7 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Constants' '0.1.0'
  cfg.source←'APLSource'
- cfg TC.WritePackageConfigFile src2
+ TC.WritePackageConfigFile src2 cfg
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
@@ -33,10 +33,12 @@
  body,←'∇r←Total x' 'r←+/x' '∇'
  body,←'∇r←x Power y' 'r←x*y' '∇'
  body,←⊂':EndNamespace'
- (⊂body)F.NPUT src3,'/APLSource/Power.apln'
+ (⊂body)F.NPUT src3,'/APLSource/MyMath.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyMath' '0.2.0'
- cfg TC.WritePackageConfigFile src3
+ cfg.source←'APLSource'
+ cfg.api←'MyMath'
+ TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
@@ -47,10 +49,12 @@
  body,←'∇r←Test2 x' 'r←+/x' '∇'
  body,←'∇r←x Test3 y' 'r←x*y' '∇'
  body,←⊂':EndNamespace'
- (⊂body)F.NPUT src4,'/APLSource/Test3.apln'
+ (⊂body)F.NPUT src4,'/APLSource/MyTests.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyTests' '0.3.0'
- cfg TC.WritePackageConfigFile src4
+ cfg.source←'APLSource'
+ cfg.api←'MyTests'
+ TC.WritePackageConfigFile src4 cfg
  src4 TC.Dependencies.Add'[local2]Example-Constants-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src4 reg
  toBeDeleted,←⊂zipFilename

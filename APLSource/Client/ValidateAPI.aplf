@@ -1,9 +1,9 @@
  ValidateAPI←{
      api←,⍵.api
      0=≢api:⍵
-     apis←','(≠⊆⊢)api
-     f1←0≠⊃∘(⎕NS'').⎕NC¨apis            ⍝ Valid names?
-     f2←∨/¨apis∊¨⊂'⎕#'                 ⍝ No absolute refs?
-     '"api" is invalid'Assert 0=f1+f2:
+     '"api" is invalid (nested)'Assert 1=≡api:
+     '"api" is invalid (name)'Assert 0=(⎕NS'').⎕NC api:
+     '"api" is invalid (path)'Assert~∨/api∊'⎕#':
+     ⍝ Unfortunately we cannot check the API for existence at this point
      ⍵
  }

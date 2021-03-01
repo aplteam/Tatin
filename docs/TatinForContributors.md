@@ -90,7 +90,7 @@ In order to execute the full test suite you need to start a Tatin Server first. 
    #.Tatin.TestCasesServer.RunTests
    ```
 
-   This function changes the current directory, establishes all required references and then instantiates the `Tester2` class under the name `T` before finally calling the `Run` function from an instance of the `Tester2` class; this will start a Tatin server.
+   This function changes the current directory, establishes all required references and then instantiates the `Tester2` class under the name `T` before finally calling the `T.Run` function; this will start a Tatin server.
 
 
 Now you are ready to execute the test suite.
@@ -109,7 +109,7 @@ Now you are ready to execute the test suite.
    #.Tatin.TestCases.RunTests
    ```
 
-   This changes the current directory, establishes all required references, instantiates the `Tester2` class under the name `T` before finally calling the `Run` function from an instance of the `Tester2` class; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <https://tatin.dev>
+   This changes the current directory, establishes all required references, instantiates the `Tester2` class under the name `T` before finally calling the `T.Run` function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <https://tatin.dev>
 
 A> ### On test cases
 A>
@@ -117,14 +117,14 @@ A> The procedure outlined in this document discusses just how to run tests in ca
 A>
 A> If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the two functions `#.Tatin.TestCases.RunTests` and `#.Tatin.TestCasesServer.RunTests`.
 A>
-A> In particular the `Prepare` function, which is called by the `RunTests` functions, is important: it instantiates the `Tester2` class as `T`, and that's the starting point for whatever your are trying to achieve.
+A> In particular the `Prepare` function, which is called by the `RunTests` functions, is important: it instantiates the `Tester2` class as `T`, and that's the starting point for whatever you are trying to achieve.
 
 
 ## Do your thing
 
 Now that you have a working version of Tatin on your machine you can start contributing.
 
-If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it: that might well be your first valuable contribution.
+If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it; that might well be your first valuable contribution.
 
 Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is APL Team Ltd, but this might (and eventually will) change in the future of course.
 
@@ -139,15 +139,21 @@ In order to create new versions of the Client and the Server all you need to do 
 {noQLXFlag} #.Tatin.Admin.Make {type}
 ```
 
-* `{noQLXFlag}` is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.
+* `noQLXFlag` is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.
 
-* `{type}` must be an integer in the range of 0, 1, 2 or 3.
+* `type` must be an integer in the range of 0, 1, 2 or 3.
 
    | 0 | The version number is not changed apart from the build ID which is always bumped
-   | 1 | The patch number is bumped. 
+   | 1 | The patch number is bumped
    | 2 | The minor version is bumped; the patch number is set to 0
    | 3 | The major version is bumped; minor and patch number are set to 0
 
+Note that the `Make` function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. `noQLXFlag`, if 1,  prevents the interpreter from running the code straight away. 
+
+A> ### The `load` and `lx` command line parameters
+A> Despite its name `noQLXFlag` is not associated with `⎕LX`: for this to work the command line parameters `load` and `lx` are invoked, and `-x` is added in case `noQLXFlag` is 1, preventing the interpreter from excuting the expression noted as `lx.` 
+A>
+A> These were introduced in 18.0.
 
 The `Make` function performs the following steps:
 
@@ -166,7 +172,3 @@ Tatin-Client-{major}.{minor}.{patch}.zip
 Tatin-Documentation-{major}.{minor}.{patch}.zip
 Tatin-Server-{major}.{minor}.{patch}.zip
 ```
-
-
-| Created:       | 2020-08-11
-| Latest update: | 2021-01-10

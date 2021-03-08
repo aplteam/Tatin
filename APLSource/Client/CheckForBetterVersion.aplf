@@ -1,14 +1,15 @@
- version←{all}CheckForBetterVersion path;buildFilename;buildList;topLevel
+ version←{majorVersions}CheckForBetterVersion path;buildFilename;topLevel;buildList
 ⍝ Checks whether there are better versions available for what's specified by `path`.\\
+⍝ Requires to find a Tatin build list in `path`, otherwise it throws an error.\\
 ⍝ By default only minor and patch number are part of the check. By specifying 1 as left argument
 ⍝ you may change this default behaviour and include any better major versions.
 ⍝ This is used only in the user command since Tatin considers packages with different major
 ⍝ numbers to be different packages, and for good reasons.
- all←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'all'
+ majorVersions←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'majorVersions'
  path←Reg.AddSlash path
  buildFilename←path,Reg.BuildListFilename
- ('No Tatin build file found in ',path)Assert F.IsFile buildFilename
+ ('No file "',Reg.BuildListFilename,'" found in ',path)Assert F.IsFile buildFilename
  buildList←Reg.JSON⊃F.NGET buildFilename
- topLevel←buildList.depth=1
- version←all CheckForBetterVersion_ topLevel/buildList.url
+ topLevel←1=buildList.depth
+ version←majorVersions CheckForBetterVersion_ topLevel/buildList.url
  ⍝Done

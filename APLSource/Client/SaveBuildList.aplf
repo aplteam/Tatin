@@ -1,13 +1,15 @@
- {r}←{append}SaveBuildList(buildList path alias);filename;ns;bool;b;mat;b1;b2;new;old;b3;ind;groupNameMajor;topLevel
-⍝ Takes a dependency tree (`buildlist`) and (by default) appends it to `path`.\\
-⍝ The optional left arguemtn `append` defaults to 1, meaning that `buildlist` is
-⍝ appended to an already existing build list. If set to 0 any existing file is replaced.
-⍝ If `alias` is empty it has no effect. If it is not empty it as assigned to the one-and-only
-⍝ top-level package in `buildList`.
- r←⍬
+ {buildList}←{append}SaveBuildList(buildList path alias);filename;ns;bool;b;b1;b2;new;old;b3;ind;groupNameMajor;topLevel;mat
+⍝ Takes a dependency tree (`buildlist`) and saved it into `path`.\\
+⍝ The optional left argument `append` defaults to 1, meaning that `buildlist` is
+⍝ appended to an already existing build list. If set to 0 an existing build list is replaced.
+⍝ If `alias` is empty it has no effect. If it is not empty then the build list must carry exactly
+⍝ one top-level package, and "alias" is assigned to that package.  ⍝TODO⍝ Check!
  append←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'append'
  buildList[;3]←RemoveFileProtocol¨buildList[;3]
  filename←path,Reg.BuildListFilename{('/',⍺)/⍨⍺≢(-≢⍺)↑⍵}path
+ :If 0<≢alias
+     buildList[1;2]←⊂alias,2⊃buildList[1;]
+ :EndIf
  :If F.IsFile filename
  :AndIf append
      ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET filename
@@ -18,26 +20,20 @@
      ns←⎕NS''
      ns.(depth packageID url)←⊂''
  :EndIf
- :If ~append
-     F.DeleteFile path
- :EndIf
-
  b1←1=buildList[;1]
  b2←1=ns.depth
  new←Reg.RemoveMinorAndPatch¨b1/buildList[;2]
  old←Reg.RemoveMinorAndPatch¨b2/ns.packageID
  :If ∨/b3←old∊new
-     ⍝ A top-level package has been installed, so the old version needs to be removed
+     ⍝ A better top-level package has been installed, so the old version of that package needs to be removed
      ind←((~b3)/⍸b2),⍸~b2
      ns.(depth packageID url)←(⊂⊂ind)⌷¨ns.(depth packageID url)
  :EndIf
-
  ns.depth,←buildList[;1]
  ns.packageID,←buildList[;2]
  ns.url,←buildList[;3]
  ns.url←{'/'@(⍸'\'=⍵)⊢⍵}¨ns.url
  mat←⍉↑ns.(depth packageID url)
-
  (topLevel mat)←{b←1=⍵[;1] ⋄ (b⌿⍵)((~b)⌿⍵)}mat
  mat←⊖mat[Reg.SortIndexForPackageIDs mat[;2];]
  groupNameMajor←Reg.RemoveMinorAndPatch¨mat[;2]
@@ -45,9 +41,5 @@
  mat←b⌿mat
  mat←topLevel⍪mat
  ns.(depth packageID url)←↓⍉mat
- :If 0<≢alias
-     Assert 1=+/b←1=ns.depth
-     ns.packageID[b⍳1]←⊂alias,'@',⊃ns.packageID[b⍳1]
- :EndIf
  (⊂Reg.JSON ns)F.NPUT filename 1
 ⍝Done

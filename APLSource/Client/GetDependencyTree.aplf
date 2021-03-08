@@ -1,4 +1,4 @@
- tree←GetDependencyTree x;initialCall;identifier;level;requiredBy;buildList;path;tempPath;filename;flag1;flag2;packageID
+ tree←{append}GetDependencyTree x;initialCall;identifier;level;requiredBy;buildList;path;tempPath;filename;flag1;flag2;packageID;alias
 ⍝ Takes `identifier` (`x`) and returns the dependencies as a matrix.
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request
@@ -10,7 +10,9 @@
 ⍝ * [;2] PackageID of what required that dependency
 ⍝ * [;3] Full package ID
 ⍝ * [;4] The full URL (either a local path (without protocol) or http(s)://...)\\
-⍝ This function requires the version number to be fully specified.
+⍝ This function requires the version number to be fully specified.\\
+⍝ By default the ciontents of a build list on file is added. You can prevent that by passing a 0 as ⍺.
+ append←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'append'
  :If initialCall←80=⎕DR x
      level←1
      identifier←x
@@ -25,12 +27,20 @@
      ∆TREE.Data⍪←level path identifier
      level GetDependencyTreeViaHTTP identifier
  :Else
-     packageID←GetPackageIDFromFilename identifier
-     flag1←Reg.IsValidPackageID_Complete packageID
-     flag2←Reg.IsValidPackageID_WithoutVersionNo packageID
-     'Not a valid package ID'Assert flag1∨flag2
+     (alias identifier)←SplitAtAlias identifier
+     :If F.IsDir identifier
+         packageID←'/\'{⊃¯1↑⍵⊆⍨~⍵∊⍺}identifier
+         :If ~Reg.IsValidPackageID_Complete packageID
+             packageID←''
+         :EndIf
+     :Else
+         packageID←GetPackageIDFromFilename identifier
+         flag1←Reg.IsValidPackageID_Complete packageID
+         flag2←Reg.IsValidPackageID_WithoutVersionNo packageID
+         'Not a valid package ID'Assert flag1∨flag2
+     :EndIf
      PrintToSession'  Dependency ',identifier,' identified...'
-     ∆TREE.Data⍪←level packageID identifier
+     ∆TREE.Data⍪←level(alias,packageID)identifier
      :If '.zip'≡⎕C ¯4↑identifier
          filename←RemoveFileProtocol identifier
          tempPath←Reg.GetTempDir,'/',packageID
@@ -43,12 +53,13 @@
          F.RmDir tempPath
      :Else
          identifier←RemoveFileProtocol identifier
-         level GetDependencyTreeFromRegistry identifier
+         level GetDependencyTreeFromRegistry alias,identifier
      :EndIf
  :EndIf
  :If initialCall
-     :If 0<≢buildList←LoadBuildList identifier
-     :AndIf 0<≢buildList←(0<≢¨buildList[;2])⌿buildList
+     :If append
+     :AndIf 0<≢buildList←LoadBuildList identifier
+     :AndIf 0<≢buildList←(0<≢¨buildList[;∆TREE.∆packageID])⌿buildList
          ∆TREE.Data⍪←(~buildList[;∆TREE.∆packageID]∊∆TREE.{Data[;∆packageID]}⍬)⌿buildList
      :EndIf
      tree←Prune ∆TREE

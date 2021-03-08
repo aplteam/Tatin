@@ -1,7 +1,9 @@
  {r}←{initializeFlag}WritePackageConfigFile(path cfg);qdmx;cfg_file;assets;cfg2;tmp
 ⍝ Write package config file to disk.
-⍝ By default "source" is checked for being not empty.
-⍝ This can be changed by apssing a 1 as ⍺.
+⍝ By default several properties are checked and an error is thrown in case something is not quite right,
+⍝ This can be changed by passing a 1 as ⍺. In this case two checks are NOT perfortmed:
+⍝ * "source" might be empty
+⍝ * "assets" is ignored, and therefore might not exist
  initializeFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'initializeFlag'
  :If 0=initializeFlag
      '"source" must not be empty'Assert 0<≢cfg.source
@@ -14,11 +16,13 @@
  cfg←ValidatePackageFiles cfg
  cfg←ValidateTags cfg
  cfg←ValidateAPI cfg
- :If 0<≢assets←{0=≢⍵:⍵ ⋄ ','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
-     assets←path∘PolishAssetsPaths¨assets
-     {}{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}assets
-     {}path∘CheckAssetsExist¨assets
-     cfg.assets←⊃{⍺,',',⍵}/assets
+ :If 0=initializeFlag
+     :If 0<≢assets←{0=≢⍵:⍵ ⋄ ','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
+         assets←path∘PolishAssetsPaths¨assets
+         {}{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}assets
+         {}path∘CheckAssetsExist¨assets
+         cfg.assets←⊃{⍺,',',⍵}/assets
+     :EndIf
  :EndIf
  cfg2←InitPackageConfig cfg
  'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg2.name

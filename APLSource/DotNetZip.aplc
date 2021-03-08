@@ -23,10 +23,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '1.0.1.52' '2021-01-14'
+      r←'DotNetZip' '1.0.2+58' '2021-03-01'
     ∇
 
     ∇ History
+    ⍝ * 1.0.2 from 2021-03-01
+    ⍝   * Problem with backslash as separated fixed
+    ⍝   * Package config corrected
     ⍝ * 1.0.1 from 2021-01-10
     ⍝   * Paths are written to a ZIP file with / rather than \, no matter what the platform is.
     ⍝     Only then can we be sure that it will work on Linux and Mac-OS due to bugs in many
@@ -128,6 +131,7 @@
               :If 0<≢list←⊃('recursive' 1)F.Dir parent,toBeZipped,'/*'
               :AndIf 0<≢list←(F.IsFile list)/list
                   list←(≢parent)↓¨list
+                  list←F.EnforceSlash¨list
                   parent∘Add_¨list
               :EndIf
           :Else

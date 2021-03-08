@@ -1,0 +1,19 @@
+ {r}←PublishAllAPLTreeMembers flag;projects;F;zipFiles;zipFile;T;errMsg;statusCode;target;i
+ r←⍬
+ F←⎕SE.FilesAndDirs
+ target←'[tatin]'
+ :If flag
+     projects←F.ListDirs'C:\T\Projects\APLTree\'
+     projects←({'_'≠⊃2⊃⎕NPARTS ⍵}¨projects)/projects
+     ⎕ED'projects'
+     →(0=≢projects~⊂'')/0
+     zipFiles←⊃∘F.ListFiles¨projects,¨⊂'\Dist\*.zip'
+     T←⎕SE.Tatin
+     i←0
+     :For zipFile :In zipFiles
+         ⎕←'Publishing ',zipFile,' on',target,' ',(⍕i←i+1),' of ',⍕≢zipFiles
+         (statusCode errMsg)←2↑T.PublishPackage zipFile target
+         {⍵:.}200≠statusCode
+     :EndFor
+     ⎕←'*** Done'
+ :EndIf

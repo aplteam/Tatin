@@ -1,27 +1,30 @@
- {r}←level GetDependencyTreeFromRegistry path;deps;filename;dep;identifier;requiredBy
+ {r}←level GetDependencyTreeFromRegistry path;deps;filename;dep;identifier;dep2;alias
 ⍝ Reads the dependency file of `path` and processes them.\\
 ⍝ Requires semi-global ∆TREE
  r←⍬
- filename←path,'/',Reg.DependenciesFilename
+ path←Reg.AddSlash path
+ filename←path,Reg.DependenciesFilename
  :If F.IsFile filename
  :AndIf 0<≢deps←1⊃F.NGET filename 1
      :For dep :In deps
-         :If ∧/'[]'∊dep
-             identifier←ReplaceRegistryAlias dep
-         :ElseIf Reg.IsFILE dep
-             identifier←RemoveFileProtocol dep
+         (alias dep2)←SplitAtAlias dep
+         :If ∧/'[]'∊dep2
+             identifier←ReplaceRegistryAlias dep2
+         :ElseIf Reg.IsFILE dep2
+             identifier←RemoveFileProtocol dep2
+         :ElseIf F.IsDir path,dep2
+             identifier←path,dep2
          :Else
-             identifier←(Reg.RemoveOneLevel path),'/',dep
+             identifier←(Reg.RemoveOneLevel path),'/',dep2
          :EndIf
-         :If (⊂GetPackageIDFromFilename identifier)∊GetPackageIDFromFilename¨∆TREE.{Data[;∆packageID]}⍬ ⍝ Avoid circular references
+         :If (⊂alias,GetPackageIDFromFilename identifier)∊GetPackageIDFromFilename¨∆TREE.{Data[;∆packageID]}⍬ ⍝ Avoid circular references
              :Continue
          :EndIf
          :If ~Reg.IsHTTP identifier
          :AndIf 0=⎕NEXISTS identifier
              identifier←(EstablishRegistry dep),dep
          :EndIf
-         requiredBy←GetPackageIDFromFilename path
-         {}GetDependencyTree(level+1)(RemoveFileProtocol identifier)
+         {}GetDependencyTree(level+1)(alias,RemoveFileProtocol(identifier))
      :EndFor
  :EndIf
 ⍝Done

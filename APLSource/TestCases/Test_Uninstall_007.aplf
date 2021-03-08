@@ -1,0 +1,23 @@
+ r←Test_Uninstall_007(stopFlag batchFlag);⎕TRAP;qdmx;dir;dir2
+⍝ Uninstall a package by {group}-{name} that does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ dir ⎕NCOPY'TestData/UnInstall/'
+ dir2←dir,'/UnInstall'
+
+ :Trap 98
+     {}TC.UnInstallPackage dir2'Does-NotExist'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Could not find package'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

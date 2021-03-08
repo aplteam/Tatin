@@ -1,11 +1,13 @@
  Initial_ClientConfig;dir;filename
- dir←'ConfigFile'GetTempDir''
- F.DeleteFile dir,'/',TC.UserSettings.cfg_name
- TC.InitUserSettings dir                            ⍝ That reflects to the temp config file
- filename←TC.GetUserHomeFolder'/.tatin'
- :If TC.F.IsFile filename
-     ∆PermanentTatinConfigPath←1⊃TC.F.NGET filename ⍝ For restoring the original contents
- :Else
-     ∆PermanentTatinConfigPath←''                   ⍝ Nothing to restore
- :EndIf
-⍝Done
+ ⍝dir←'ConfigFile'GetTempDir''
+⍝ F.DeleteFile dir,'/',TC.UserSettings.cfg_name
+⍝ TC.InitUserSettings dir                            ⍝ That reflects to the temp config file
+⍝ filename←TC.GetUserHomeFolder'/.tatin'
+⍝ :If TC.F.IsFile filename
+⍝     ∆PermanentTatinConfigPath←1⊃TC.F.NGET filename ⍝ For restoring the original contents
+⍝ :Else
+ ∆PermanentTatinConfigPath←''                   ⍝ Nothing to restore
+⍝ :EndIf
+⍝⍝Done
+ ⎕SE._Tatin.Client.MyUserSettings←TC.MyUserSettings
+ ⎕SE.Tatin.MyUserSettings←⎕SE._Tatin.Client.MyUserSettings

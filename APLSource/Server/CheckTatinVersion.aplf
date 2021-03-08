@@ -1,0 +1,18 @@
+ msg←CheckTatinVersion request;minimum;minor;major;clientVersion;clientMajor;clientMinor
+⍝ Checks whether the Tatin version used on the client matched the minimum version defined in the IN
+⍝ (if any) and rejects the request as 400 (bad request).
+⍝ The INI entry might or might not exist but is it does it must be a number with one of:
+⍝ * a major number (integer)
+⍝ * major.minor number (real)
+ msg←''
+ :If 0<≢clientVersion←request R.GetHeaderValue'x-tatin'
+ :AndIf 0≠clientVersion←⊃⊃(//)⎕VFI{⍵/⍨2>+\'.'=⍵}clientVersion
+     (clientMajor clientMinor)←0 1⊤clientVersion
+ :AndIf G.INI.Exist'Config:MinimumTatinVersion'
+ :AndIf 0≠minimum←⊃0 G.INI.Get'Config:MinimumTatinVersion'
+     (major minor)←0 1⊤minimum
+     :If clientMajor≠major
+     :OrIf clientMinor<minor
+         msg←'Request came from invalid version of Tatin. Minimum version required is ',⍕minimum
+     :EndIf
+ :EndIf

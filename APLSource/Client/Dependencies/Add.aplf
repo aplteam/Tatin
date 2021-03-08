@@ -5,11 +5,18 @@
  ⍝ If there is no such file yet it is created.\\
  ⍝ Note that although ⍵ might contain an  (like `[tatin]`), this will be replaced by what the alias stands for.
  r←0
- deps←##.ReplaceRegistryAlias¨⊆deps
- deps←{{##.AddFileProtocol ⍵}⍣((';'≠⊃⍵)∧~##.Reg.IsValidPackageID_Complete ⍵)⊣⍵}¨deps
+ deps←⊆deps
+ :If ∨/b←'@'∊¨deps
+     {'Invalid dependency'##.Assert 1='@'+.=⍵:}¨b/deps
+ :EndIf
+ :If ∨/b←'['∊¨deps
+     {'Invalid dependency'##.Assert 1='['+.=⍵:}¨b/deps
+ :EndIf
+ 'Invalid dependency'##.Assert{∧/'@['∊⍵:</⍵⍳'[@' ⋄ ⍵}¨deps
+ deps←##.ReplaceRegistryAlias¨deps
  filename←path,'/',DEP_NAME
  {}Create⍣(0=##.F.Exists filename)⊣path
- b←##.Reg.IsValidPackageID_Complete¨{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}¨deps
+ b←##.Reg.IsValidPackageID_Complete¨{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}¨2⊃∘##.SplitAtAlias¨deps
  {}b{('Not valid package IDs: ',⊃,/{⍺,',',⍵}/(~⍺)/deps)##.Assert 0}⍣(0∊b)⊣0
  sofar←Get path
  tempFile←(⊃,/2↑⎕NPARTS filename),'.tmp'

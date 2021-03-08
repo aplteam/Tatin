@@ -1,0 +1,36 @@
+ (r msg)←UnInstallPackage(folder packageID);pkgDepFilename;topDependencies;buildList;installedPkgs;toBeRemoved;rc;bool;oldBuildList
+⍝ If `folder` carries a dependency file then this function attempts to un-install the package
+⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
+⍝ required by other packagases.\\
+⍝ To keep things simple Tatin performs the following steps:
+⍝ 1. It checks whether `packageID` is a member of the dependency file: only those can be un-installed.\\
+⍝ 2. It removes `packagedID` from the dependency file and writes it back to disk.
+⍝ 3. It re-compiles the build list based on the new dependecy file.
+⍝ 4. It removes all packages that are not mentioned in the build list.
+⍝ For the last two steps only group name and package name are used for the check. That way we might
+⍝ delete to little, but never too much.\\
+⍝ Returns a list with the fully qualifed names of all packages removed by the un-install operation.\\
+⍝ Note that removing the directories hosting the packages might fail for all sorts of reasons even
+⍝ although the package and any dependencies were already successfully removed from the dependency file.
+ msg←''
+ '"folder" is invalid'Assert F.IsDir folder
+ folder←Reg.AddSlash folder
+ pkgDepFilename←folder,Reg.DependenciesFilename
+ 'The folder has no dependeny file'Assert F.IsFile pkgDepFilename
+ topDependencies←(1⊃F.NGET pkgDepFilename 1)~⊂''
+ packageID←IdentifyInstalledPackageID topDependencies packageID
+ 'Could not find the package in the dependency file'Assert 0≠≢packageID
+ (⊂topDependencies~⊂packageID)F.NPUT pkgDepFilename 1
+ oldBuildList←LoadBuildList folder
+ buildList←1 CompileBuildList folder
+ installedPkgs←(≢folder)↓¨F.ListDirs folder
+ toBeRemoved←(~installedPkgs∊(RemoveAlias¨buildList[;2]))/installedPkgs
+ :If 0<≢toBeRemoved
+     r←toBeRemoved
+     toBeRemoved←folder∘,¨toBeRemoved
+     rc←⊃∘F.RmDir¨toBeRemoved
+     :If ∨/bool←0≠rc
+         msg←'Removing package folder failed for ',⊃{⍺,', ',⍵}/bool/(≢folder)↓¨toBeRemoved
+     :EndIf
+ :EndIf
+⍝Done

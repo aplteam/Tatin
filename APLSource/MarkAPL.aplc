@@ -59,28 +59,22 @@
     ∇ r←Version
       :Access Public Shared
       ⍝ See `History`
-      r←'MarkAPL' '10.0.0.160' '2020-11-13'
+      r←'MarkAPL' '10.0.2+211' '2021-03-02'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 10.0.2
+      ⍝   * Package config corrected
+      ⍝ * 10.0.1
+      ⍝   * `CreateParms` did not reflect the now flat folder structure of "files/" making `MakeHTML_Doc` fail
+      ⍝     to find the default CSS files.
       ⍝ * 10.0.0
-      ⍝   * Verion 18.0 is required by `MarkAPL`
-      ⍝   * `MarkAPL` now requires the class `APLTreeUtils2` rather than the namespace script `APLTreeUtils`.
-      ⍝ * 9.2.0
-      ⍝   * `MarkAPL` may now be a Tatin package. It means that it will find its home folder
-      ⍝     automatically via Tatin's `∆HOME` property.
-      ⍝ * 9.1.1
-      ⍝   * Ill-formed markdown wrongly interpreted as a table could crash MarkAPL
-      ⍝   * Ill-formed markdown wrongly interpreted as a code block could crash MarkAPL
-      ⍝ * 9.1.0
-      ⍝   * Both sets of CSS files improved regarding tables and lists for both screen and print.
-      ⍝   * The warning regarding an ill-formed TOC is now more specific about the level at fault.
-      ⍝   * Bug fixes:
-      ⍝     * Default alignment for text columns in tables was "center" but should have been "left".
-      ⍝     * Column header with aligned to the right in case all cells start with a digit.
-      ⍝ * 9.0.0
-      ⍝   * BREAKING CHANGE: File extension is now .aplc rather than .dyalog
+      ⍝   * BREAKING CHANGES:
+      ⍝     * Dyalog 18.0 is required by `MarkAPL`
+      ⍝     * `MarkAPL` now requires the class `APLTreeUtils2` rather than the namespace script `APLTreeUtils`.
+      ⍝     * The structure of files (HTML, CSS and markdown) has changed due to MarkAPL being now a Tatin package.\\
+      ⍝       This might require you to change your own application as well!
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/MarkAPL/releases>
     ∇
@@ -356,7 +350,7 @@
       :EndIf
       parms←EstablishDefaultHomeFolder parms
       :If ⎕NULL≡parms.cssURL
-          parms.cssURL←'file:///',parms.homeFolder
+          parms.cssURL←'file:///',##.FilesAndDirs.NormalizePath parms.homeFolder
       :EndIf
       ((parms.cssURL='\')/parms.cssURL)←'/'
       ((parms.leanpubIconsUrl='\')/parms.leanpubIconsUrl)←'/'
@@ -421,9 +415,8 @@
       r←⍎y
     ∇
 
-    ∇ {ns}←{parms}Reference recompileFlag;filename
-    ⍝ Displays the file MarkAPL.html with your default browser.
-    ⍝
+    ∇ {ns}←{parms}Reference recompileFlag;filename;folder
+    ⍝ Displays the file MarkAPL.html with your default browser.\\
     ⍝ `recompileFlag`:
     ⍝ - A zero shows the file as it stands.
     ⍝ - A 1 lets MarkAPL recompile it from MarkAPL.md first.
@@ -431,26 +424,47 @@
       :Access Public Shared
       parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHelpParms}'parms'
       parms←EstablishDefaultHomeFolder parms
-      ns←CompileHelp(parms.homeFolder,'\MarkAPL.html')recompileFlag parms
+      :If 0<##.⎕NC'∆HOME'
+      :AndIf 0<≢##.∆HOME
+          folder←##.∆HOME,'/Files/'
+          ns←CompileHelp(folder,'MarkAPL.html')recompileFlag parms
+      :Else
+          ns←CompileHelp(parms.homeFolder,'/Docs/MarkAPL.html')recompileFlag parms
+      :EndIf
       :If ¯1≠×recompileFlag  ⍝ This syntax is used only by the `Make` workspace and test cases, therefore it is not documented.
       :AndIf parms.viewInBrowser
-          ns ShowHtml'MarkAPL'
+          ns ShowHtml parms.outputFilename
       :EndIf
+     
     ∇
 
-    ∇ {ns}←{parms}Help recompileFlag
-    ⍝ Displays the file MarkAPL_CheatSheet.html with your default browser.
-    ⍝
+    ∇ {ns}←{parms}Help recompileFlag;folder
+    ⍝ Displays the file MarkAPL_CheatSheet.html with your default browser.\\
     ⍝ `recompileFlag`:
     ⍝ - A zero shows the file as it stands.
     ⍝ - A 1 lets MarkAPL recompile it from MarkAPL_CheatSheet.md first.
     ⍝ Returns either `⍬` or the `ns` namespace created by `Init` and modified by `Process`.
       :Access Public Shared
       parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHelpParms}'parms'
-      ns←CompileHelp'Docs\MarkAPL_CheatSheet.html'recompileFlag parms
+      :If ⎕NULL≡parms.homeFolder
+          :If 0=##.FilesAndDirs.IsDir folder←##.FilesAndDirs.PWD,'/Files'
+              folder←##.FilesAndDirs.PWD
+          :EndIf
+      :Else
+          folder←parms.homeFolder
+      :EndIf
+      :If 0<##.⎕NC'∆HOME'
+      :AndIf 0<≢##.∆HOME
+          folder←##.∆HOME,'/Files/'
+          ns←CompileHelp(folder,'MarkAPL_CheatSheet.html')recompileFlag parms
+      :ElseIf recompileFlag
+          ns←CompileHelp(folder,'/Docs/MarkAPL_CheatSheet.md')recompileFlag parms
+      :Else
+          ns←CompileHelp(folder,'/HTML/MarkAPL_CheatSheet.html')recompileFlag parms
+      :EndIf
       :If ¯1≠×recompileFlag  ⍝ This syntax is used only by the `Make` workspace and test cases, therefore it is not documented.
       :AndIf parms.viewInBrowser
-          ns ShowHtml'MarkAPL_CheatSheet'
+          ns ShowHtml parms.outputFilename
       :EndIf
     ∇
 
@@ -1048,25 +1062,6 @@
           ns.noOf←1
           ns←Drop ns
           flag←1
-      :EndIf
-    ∇
-
-    ∇ flag←ProcessATX_HeaderLink ns;row;sa;header
-      ⍝ This should only happen when an HTML document that was created by MarkAPL is converted back into Markdown.
-      ⍝ We try to limit the damage here but we don't create a link, and such headers are going into a TOC.
-      flag←0
-      row←⊃ns.markdown
-      sa←GetSpecialAttributes ¯1↓A.DTB row
-      :If ∨/' class="autoheader_anchor" '⍷' ',sa,' '
-          header←{⍵↑⍨¯1+⍵⍳']'}↑{⍵↓⍨⍵⍳'['}row
-          sa←'class="autoheader_anchor"'⎕R''⊣sa
-          sa←A.DMB'id=".*"'⎕R''⊣sa
-          header←A.DLB A.DTB header,sa
-          (1⊃ns.markdown)←header
-          (1⊃ns.markdownLC)←⎕C header
-          (1⊃ns.leadingChars)←(16⌊≢header)↑header
-          (1⊃ns.withoutBlanks)←' '~⍨1⊃ns.withoutBlanks
-          flag←ProcessATX_Header ns
       :EndIf
     ∇
 
@@ -3081,20 +3076,23 @@
     ∇
 
     ∇ (noOf para)←CollectItemPara bl;options;buff
-       ⍝ Collects as many lines from `bl` as belong to what's a paragraph.
-       ⍝ bl:    All the lines a list may be compiled from.
-       ⍝ indentation:   Number of blanks defining the indentation. May be zero.
-       ⍝ ←:     [1]=Number of lines in bl the para is made of; [2]=the para as such
-       ⍝ Note: this function must be called only when at least ⊃bl is a para indeed.
+    ⍝ Collects as many lines from `bl` as belong to what's a paragraph.
+    ⍝ bl:    All the lines a list may be compiled from.
+    ⍝ indentation:   Number of blanks defining the indentation. May be zero.
+    ⍝ ←:     [1]=Number of lines in bl the para is made of; [2]=the para as such
+    ⍝ Note: this function must be called only when at least ⊃bl is a para indeed.
       :If 1=noOf←+/∧\0≠≢¨bl
           para←⊃bl
       :Else
           noOf←1++/∧\0=IsHtmlList¨1↓noOf↑bl
           options←('Mode' 'M')('EOL' 'CR')('DotAll' 1)
-          :If 0≠≢buff←{⍵↑⍨⊃'[~`]{3,}\s{0,}'⎕S 0⍠options⊣⍵}1↓⊃,/(⎕UCS 13),¨A.DLB¨noOf↑bl
-              noOf←⊃((⎕UCS 13)+.={⍵↑⍨⊃'[~`]{3,}\s{0,}'⎕S 0⍠options⊣⍵}1↓⊃,/(⎕UCS 13),¨A.DLB¨noOf↑bl),noOf
-              noOf-←0=≢' '~⍨noOf⊃bl
-          :EndIf
+     
+⍝TODO⍝ ------------------ OBSOLETE?! --------------------------------------------------------------------
+⍝          :If 0≠≢buff←{⍵↑⍨⊃'[~`]{3,}\s{0,}'⎕S 0⍠options⊣⍵}1↓⊃,/(⎕UCS 13),¨A.DLB noOf↑bl
+⍝              noOf←⊃((⎕UCS 13)+.={⍵↑⍨⊃'[~`]{3,}\s{0,}'⎕S 0⍠options⊣⍵}1↓⊃,/(⎕UCS 13),¨A.DLB noOf↑bl),noOf
+⍝              noOf-←0=≢' '~⍨noOf⊃bl
+⍝          :EndIf
+⍝ --------------------------------------------------------------------------------------------------------
           para←A.DLB⊃,/' ',¨noOf↑bl
       :EndIf
     ∇
@@ -3216,18 +3214,12 @@
           f2←2=##.⎕NC'∆HOME'
           f1∧f2:p⊣p.homeFolder←##.∆HOME ⍝ It's a Tatin package!
           p.homeFolder←GetCurrentDir
-          f←∨/##.FilesAndDirs.Exists¨p.homeFolder∘,¨'/MarkAPL.html' '/MarkAPL_CheatSheet.html'
+          f←∨/##.FilesAndDirs.Exists¨p.homeFolder∘,¨'/Docs/MarkAPL.html' '/Docs/MarkAPL_CheatSheet.html'
           f:p
           p.homeFolder←GetCurrentDir,'/Files'
-          f←∨/##.FilesAndDirs.Exists¨p.homeFolder∘,¨'/MarkAPL.html' '/MarkAPL_CheatSheet.html'
+          f←∨/##.FilesAndDirs.Exists¨p.homeFolder∘,¨'/Docs/MarkAPL.html' '/Docs/MarkAPL_CheatSheet.html'
           f:p
-          home←(⊃¯1↑'.'A.SplitPath this){6::(⊃⎕RSI)⍎⍺ ⋄ ⍎⍵}¯1↓⊃'.'A.SplitPath this
-          f←9≠home.⎕NC this,'.SALT_Data'
-          f:p⊣p.homeFolder←GetCurrentDir,'/'
-          sourceFolder←⊃A.SplitPath home.⍎'MarkAPL.SALT_Data.SourceFile'
-          f←∨/##.FilesAndDirs.Exists¨sourceFolder∘,¨'/MarkAPL.html' '/MarkAPL_CheatSheet.html'
-          f:p⊣p.homeFolder←sourceFolder
-          p.homeFolder←CorrectSlash sourceFolder,'/Files/'
+          p.homeFolder←GetCurrentDir,'/'
           p
       }
 
@@ -3263,9 +3255,13 @@
       :If ⎕NULL≡parms.cssURL
           parms.cssURL←parms.homeFolder
       :EndIf
-      fn←CorrectSlash parms.homeFolder,'/',filename
+      :If (':'∊filename)∨'/'=1⍴filename
+          fn←CorrectSlash filename
+      :Else
+          fn←CorrectSlash ##.FilesAndDirs.PWD,'/',filename
+      :EndIf
       :If 0=≢parms.inputFilename
-      :AndIf 0=##.FilesAndDirs.IsFile parms.inputFilename←(¯4↓fn),'md'
+      :AndIf 0=##.FilesAndDirs.IsFile parms.inputFilename←(⊃,/2↑⎕NPARTS fn),(1+recompileFlag)⊃'.html' '.md'
           ('Could not find "',parms.inputFilename,'"')⎕SIGNAL 6
       :EndIf
       :If 0=≢parms.outputFilename
@@ -3483,24 +3479,6 @@
           (b1/b2)←0
           b2←Between b2
           bool←b1∨b2
-          :Return
-     
-          fences←'~`'
-          first←>/⌊/¨⍸¨b1 b2,¨1     ⍝ 0=~, 1=`
-          :If 0<+/b1
-              b1←b1\(fences[first+1])CheckForCodeBlocks b1/md
-          :EndIf
-          :If 0<+/b2
-              b2←b2\(fences[first+1])CheckForCodeBlocks b2/md
-          :EndIf
-          :If 0∨.≠2|(+/b1)(+/b2)        ⍝ If ~ or ` have on odd number of opening/closing then special treatment is needed
-              :If first
-                  (¯1↑b1)←1
-              :Else
-                  (¯1↑b2)←1
-              :EndIf
-          :EndIf
-          bool←Between b1∨b2
       :EndIf
     ∇
 
@@ -3580,19 +3558,19 @@
       }
 
     ∇ {r}←ns ShowHtml name;filename
-      :If 9=⎕SE.⎕NC'acre'
-      :AndIf (⊂'MarkAPL')∊{⍵↓⍨⍵⍳'.'}¨⍕¨{⍵[;1]}⎕SE.acre.Projects ⍬
-          filename←##.FilesAndDirs.EnforceSlash ##.FilesAndDirs.PWD,'/Dist/files/',name,'.html'
+      :If '/'≠1⍴name
+      :AndIf ~':'∊name
+          filename←##.FilesAndDirs.EnforceSlash parms.homeFolder,'/Docs/',name,'.html'
       :Else
-          filename←##.FilesAndDirs.EnforceSlash parms.homeFolder,'/files/',name,'.html'
+          filename←name
       :EndIf
       :If ⍬≢ns
-          GoToWebPage'file:///',filename
+          A.GoToWebPage'file:///',filename
       :Else
           :If ##.FilesAndDirs.IsFile filename
-              GoToWebPage'file:///',filename
+              A.GoToWebPage'file:///',filename
           :Else
-              ('Could not find "',name,'"; consider calling this function with a 1 as ⍵')⎕SIGNAL 6
+              6 ⎕SIGNAL⍨'File not found: "',name,'"'
           :EndIf
       :EndIf
     ∇

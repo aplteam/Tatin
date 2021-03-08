@@ -1,27 +1,30 @@
- {r}←CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b;newTree;deps2;ind;deps_
+ {r}←{force}CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b;newTree;deps2;ind;deps_
 ⍝ Checks the last modification date of both the build list and the dependency file.\\
-⍝ We distinguesh here between level-1 packages and packages that the level-1 packages rely on. The level-1 packages
-⍝ are called principal packages. The remaining packages are called "other" packages.\\
+⍝ We distinguish here between level-1 packages and other packages (=dependencies).
+⍝ The level-1 packages are called top-level packages.
 ⍝ If the dependency file was modified after the build list was saved:
-⍝ * If a principal package was removed from the dependency file the build list is re-created
-⍝ * If any "other" packages are missing, re-installation is required and therefore an error thrown\\
- filename1←folder,'/',Reg.BuildListFilename
- ts1←1 ⎕DT⊃('type' 3)F.Dir filename1
- filename2←folder,'/',Reg.DependenciesFilename
- ts2←1 ⎕DT⊃('type' 3)F.Dir filename2
- :If r←ts2>ts1
-     tree←Reg.GetJsonFromFile filename1
-     deps←1⊃F.NGET filename2 1
-     deps_←({'@'∊⍵:⍵↓⍨⍵⍳'@' ⋄ ⍵}¨deps)                                      ⍝ However, we don't support alaise (yet)
-     b←deps_∊tree.packageID
-     ('Invalid entry: ',(⊃{⍺,',',⍵}/b/deps_),'; re-install!')Assert∧/b      ⍝ Check consistency
-     :If 0<≢newTree←⊃⍪/GetDependencyTree¨(⊂folder,'/'),¨deps                 ⍝ There might be no depen
-     :AndIf 0<≢deps2←(1<newTree[;1])⌿newTree
-         deps2←Reg.GetBestVersionNumber¨Reg.RemoveVersionNumber¨deps2[;3]
-         ind←⍸newTree[;1]>1
-         newTree[ind;2]←GetPackageIDFromFilename¨deps2
-         newTree[ind;3]←deps2
-         0 SaveBuildList newTree filename1
+⍝ * If a top-level package was removed from the dependency file the build list is re-created
+⍝ * If a dependency package is missing, re-installation is required and therefore an error thrown\\
+ force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}' force'
+ folder←Reg.AddSlash folder
+ filename2←folder,Reg.DependenciesFilename
+ filename1←folder,Reg.BuildListFilename
+ :If ~force
+     ts1←1 ⎕DT⊃('type' 3)F.Dir filename1
+     ts2←1 ⎕DT⊃('type' 3)F.Dir filename2
+ :EndIf
+ :If force
+ :OrIf r←ts2>ts1
+     :If F.IsFile filename1
+         tree←Reg.GetJsonFromFile filename1
+         tree←⍉↑tree.(depth packageID url)
+         deps←(1⊃F.NGET filename2 1)~⊂''
+         deps_←RemoveAlias¨deps
+         b←deps_∊RemoveAlias¨tree[;2]                       ⍝ Check consistency
+         :If ∨/~b
+             ('Invalid entry: ',(⊃{⍺,', ',⍵}/(~b)/deps_),'; re-install!')Assert 0
+         :EndIf
      :EndIf
+     0 CompileBuildList folder
  :EndIf
 ⍝Done

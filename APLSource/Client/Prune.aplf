@@ -8,6 +8,6 @@
      ind←⍋major
      TREE.Data←TREE.Data[ind;]                                          ⍝ Secondly, sort by major
      major←major[ind]
-     TREE.Data←TREE.Data[{⊃⍵}⌸major⊣TREE.Data;]                         ⍝ First one only
+     TREE.Data←TREE.Data[{⊃⍵}⌸((⊃∘SplitAtAlias¨TREE.Data[;2]),¨major)⊣TREE.Data;]  ⍝ First one only, but honor alias!
      TREE.Data[⍋TREE.{Data[;∆level]}⍬;]                                 ⍝ Final sort order by level
  }

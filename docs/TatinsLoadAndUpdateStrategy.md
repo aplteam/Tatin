@@ -185,42 +185,30 @@ Let's assume that you don't need `Goo` anymore.
 
 Generally we advise to _not_ delete stuff manually from the folder that holds all packages of an application. 
 
-If you want to get rid of one then it is recommended to use the method 
+If you want to get rid of a package then you are strongly advised to use the method 
 
-`]TATIN.UninstallPackage` 
+`]TATIN.UnInstallPackage` 
 
-instead. That will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but _only_ if those packages are not requested by other packages as well.
+I> The API equivalent is `⎕SE.Tatin.UnInstallPackage`
+
+This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but _only_ if those packages are not requested by other packages as well.
 
 Clearly there is a danger that you remove too much when you attempt to do this manually.
 
-However, if you want to remove just a principal package, not dependencies, for example because you _know_ it does not have any, or because you _know_ that all its dependencies are also required by other packages anyway, then you might do it manually, though we still don't recommend it.
+### Adding a package
 
-For the purpose of discussing what Tatin would do, we assume here that you perform the following two actions:
+If you want to add a package which has no dependencies you might feel tempted to just add it to the file "apl-dependencies.txt" and copy the package over.
 
-* You remove the line regarding `Goo` from the `apl-dependencies.txt` file
-* You remove `mygroup-Goo-2.1.0` from the package folder (strictly speaking the following is true even when you omit this step)
+That would indeed not cause a problem because when the `LoadDependencies` command is issued the next time, Tatin would check whether the file `apl-dependencies.txt` was changed after `apl-buildlist.json` was created by Tatin.
 
-Note that at this point the file `apl-buildlist.json` would still carry information regarding `Goo.`
-
-Imagine you would now issue this command:
-
-```
-      ]TATIN.LoadDependencies /myPkgs/ #.Temp
-
-```
-
-Tatin would check whether the file `apl-dependencies.txt` was changed after `apl-buildlist.json` was created by Tatin.
-
-In this case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly an insurance against people manually changing `apl-dependencies.txt` and making mistakes.
+In our case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly an insurance against people manually changing `apl-dependencies.txt` and making mistakes.
   
-Since the health check passes, the build-list would be re-created. As a result `Goo` would disappear from the build list, and therefore a future `]TATIN.LoadDependencies` command would not load it any more.
-
-However, note this: although `Foo` only required `Zoo` 1.1.1, Tatin would _not_ go back to that version, because version 1.2.0 of `Zoo` is already installed. It would therefore keep loading version 1.2.0 although at this point in time this version is not referenced at all.
+When the health checks pass, the build-list would be re-created..
 
 
 ## Checking and updating
 
-Let's assume you want to check whether there are better versions of the principal packages of your application.
+Let's assume you want to check whether there are "better" versions of the principal packages of your application.
 
 There is a user command available that can help you with that:
 
@@ -230,17 +218,17 @@ There is a user command available that can help you with that:
 
 It requires a path to a folder that holds a file `apl-dependencies.txt`  and a file `apl-buildlist.json`. 
 
-This user command would check whether there are any better top-level versions available and report its findings to the session.
+This user command would check whether there are any "better" top-level versions available and report its findings to the session.
 
 I> `CheckForBetterVersion` does not bother to look out for dependencies because we load exact versions anyway.
 
 Note that a top-level package carries a 1 as `depth` in the `apl-buildlist.json` file.
 
-As usual Tatin would consider packages with different major numbers different, so by default you will get only a list of packages that have the same group-name, package-name and major version number then your top-level packages.
+As usual Tatin would consider packages with different major numbers different, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your top-level packages.
 
-It is then up to you to take action: you may or may not install a better package that is available.
+It is then up to you to take action: you may or may not install a "better" package that is available.
 
-A> ### Better major versions
+A> ### "Better" major versions
 A> When you specify the `-major` flag of the `CheckForBetterVersion` user command then the user command will only report better major versions.
 
 

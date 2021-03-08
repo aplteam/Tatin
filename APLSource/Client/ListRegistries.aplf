@@ -1,4 +1,4 @@
- r←{rawFlag}ListRegistries type
+ r←{rawFlag}ListRegistries type;data
 ⍝ List all registries defined in the Client's config file.\\
 ⍝ Returns a matrix with two columns:
 ⍝ * [;1] Alias
@@ -12,12 +12,12 @@
  rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
  '"rawFlag" (⍺) must be a Boolean'Assert(⊂rawFlag)∊0 1
  '"type" (⍵) must be a Boolean or empty'Assert(⊂type)∊0 1 ''⍬
- :If 0<≢MyUserSettings.registries
+ :If 0<≢data←MyUserSettings.registries
      :If 1≡type
-         r←↑MyUserSettings.registries.(alias uri port priority api_key)
+         r←↑data.(alias uri port priority api_key)
          r←r[⍒r[;4];]
      :Else
-         r←↑(MyUserSettings.registries).(uri alias priority)
+         r←↑data.(uri alias priority)
          r←r[⍒r[;3];]
      :EndIf
      :If ~rawFlag

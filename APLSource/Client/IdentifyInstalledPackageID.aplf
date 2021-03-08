@@ -1,0 +1,32 @@
+ ID←IdentifyInstalledPackageID(list ID_);noOf;list2;Case;bool
+⍝ ID might be one of:
+⍝ * Fully qualified package ID
+⍝ * group-name
+⍝ * Just "name"
+⍝ Returns either empty (not found) or the full package ID including group, name and version number.
+⍝ If `ID_` is ambiguous an error is thrown.\\
+⍝ `ID` might be one of:
+⍝ * a package name ('APLTreeUtils2')
+⍝ * Group name and package name ('aplteam-APLTreeUtils2')
+⍝ * A fully qualified package ID ('aplteam-APLTreeUtils2-1.2.3')
+ :If '@'∊ID_        ⍝ Is it an alias?
+     'Invalid alias'Assert 0<≢ID_~'@'
+     bool←(⊂ID_~'@')≡¨{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}¨list
+ :Else
+     noOf←'-'+.=ID_
+     'Invalid package identifier'Assert noOf∊0 1 2
+     :Select noOf
+     :Case 0
+         list2←{2⊃'-'(≠⊆⊢)⍵}¨RemoveAlias¨list
+         bool←list2≡¨⊂ID_
+     :Case 1
+         list2←{⊃{⍺,'-',⍵}/2↑'-'(≠⊆⊢)⍵}¨RemoveAlias¨list
+         bool←list2≡¨⊂ID_
+     :Case 2
+         bool←(RemoveAlias¨list)≡¨⊂ID_
+     :EndSelect
+ :EndIf
+ 'Could not find package'Assert 0<+/bool
+ 'Ambiguous package name'Assert 1=+/bool
+ ID←(⍸bool)⊃list
+⍝Done

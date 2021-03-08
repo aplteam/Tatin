@@ -154,34 +154,36 @@ mygroup-Goo-2.1.0</code></pre>
 </div>
 <p>Let's assume that you don't need <code>Goo</code> anymore.</p>
 <p>Generally we advise to <em>not</em> delete stuff manually from the folder that holds all packages of an application.</p>
-<p>If you want to get rid of one then it is recommended to use the method</p>
-<p><code>]TATIN.UninstallPackage</code></p>
-<p>instead. That will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but <em>only</em> if those packages are not requested by other packages as well.</p>
+<p>If you want to get rid of a package then you are strongly advised to use the method</p>
+<p><code>]TATIN.UnInstallPackage</code></p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>The API equivalent is <code>⎕SE.Tatin.UnInstallPackage</code></p>
+</div>
+</div>
+
+<p>This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but <em>only</em> if those packages are not requested by other packages as well.</p>
 <p>Clearly there is a danger that you remove too much when you attempt to do this manually.</p>
-<p>However, if you want to remove just a principal package, not dependencies, for example because you <em>know</em> it does not have any, or because you <em>know</em> that all its dependencies are also required by other packages anyway, then you might do it manually, though we still don't recommend it.</p>
-<p>For the purpose of discussing what Tatin would do, we assume here that you perform the following two actions:</p>
-<ul>
-<li>You remove the line regarding <code>Goo</code> from the <code>apl-dependencies.txt</code> file</li>
-<li>You remove <code>mygroup-Goo-2.1.0</code> from the package folder (strictly speaking the following is true even when you omit this step)</li>
-</ul>
-<p>Note that at this point the file <code>apl-buildlist.json</code> would still carry information regarding <code>Goo.</code></p>
-<p>Imagine you would now issue this command:</p>
-<pre><code>      ]TATIN.LoadDependencies /myPkgs/ #.Temp
-</code></pre>
-<p>Tatin would check whether the file <code>apl-dependencies.txt</code> was changed after <code>apl-buildlist.json</code> was created by Tatin.</p>
-<p>In this case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly an insurance against people manually changing <code>apl-dependencies.txt</code> and making mistakes.</p>
-<p>Since the health check passes, the build-list would be re-created. As a result <code>Goo</code> would disappear from the build list, and therefore a future <code>]TATIN.LoadDependencies</code> command would not load it any more.</p>
-<p>However, note this: although <code>Foo</code> only required <code>Zoo</code> 1.1.1, Tatin would <em>not</em> go back to that version, because version 1.2.0 of <code>Zoo</code> is already installed. It would therefore keep loading version 1.2.0 although at this point in time this version is not referenced at all.</p>
+<div class="h_tag">
+<a href="#Adding-a-package" id="Adding-a-package" class="autoheader_anchor">
+<h3 data-id="Adding-a-package">Adding a package</h3>
+</a>
+</div>
+<p>If you want to add a package which has no dependencies you might feel tempted to just add it to the file “apl-dependencies.txt” and copy the package over.</p>
+<p>That would indeed not cause a problem because when the <code>LoadDependencies</code> command is issued the next time, Tatin would check whether the file <code>apl-dependencies.txt</code> was changed after <code>apl-buildlist.json</code> was created by Tatin.</p>
+<p>In our case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly an insurance against people manually changing <code>apl-dependencies.txt</code> and making mistakes.</p>
+<p>When the health checks pass, the build-list would be re-created..</p>
 <div class="h_tag">
 <a href="#Checking-and-updating" id="Checking-and-updating" class="autoheader_anchor">
 <h2 data-id="Checking-and-updating">Checking and updating</h2>
 </a>
 </div>
-<p>Let's assume you want to check whether there are better versions of the principal packages of your application.</p>
+<p>Let's assume you want to check whether there are “better” versions of the principal packages of your application.</p>
 <p>There is a user command available that can help you with that:</p>
 <pre><code>      ]TATIN.CheckForBetterVersion ./</code></pre>
 <p>It requires a path to a folder that holds a file <code>apl-dependencies.txt</code> and a file <code>apl-buildlist.json</code>.</p>
-<p>This user command would check whether there are any better top-level versions available and report its findings to the session.</p>
+<p>This user command would check whether there are any “better” top-level versions available and report its findings to the session.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
@@ -190,10 +192,10 @@ mygroup-Goo-2.1.0</code></pre>
 </div>
 
 <p>Note that a top-level package carries a 1 as <code>depth</code> in the <code>apl-buildlist.json</code> file.</p>
-<p>As usual Tatin would consider packages with different major numbers different, so by default you will get only a list of packages that have the same group-name, package-name and major version number then your top-level packages.</p>
-<p>It is then up to you to take action: you may or may not install a better package that is available.</p>
+<p>As usual Tatin would consider packages with different major numbers different, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your top-level packages.</p>
+<p>It is then up to you to take action: you may or may not install a “better” package that is available.</p>
 <div class="leanpub_A">
-<h3>Better major versions</h3>
+<h3>“Better” major versions</h3>
 <p>When you specify the <code>-major</code> flag of the <code>CheckForBetterVersion</code> user command then the user command will only report better major versions.</p>
 </div>
 

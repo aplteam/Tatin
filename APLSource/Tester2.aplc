@@ -1,8 +1,7 @@
 :Class Tester2
 ⍝ This class provides a test framework for APL applications.
 ⍝ ## Warning
-⍝ This is **not** an introduction into how the test framework works, and
-⍝ how you should organize your test cases and how to actually use `Tester2`.
+⍝ This is **not** an introduction into how the test framework works, and how you should organize your test cases.
 ⍝ This is, after all, a technical documentation.\\
 ⍝ More information for the _user_ of `Tester2` is available on
 ⍝ [`Tester2`'s home page on GitHub ](https://github.com/aplteam/Tester2).\\
@@ -12,7 +11,7 @@
 ⍝ `Tester2` tries to find two INI files: "Testcases.INI" and "Testcases_{computername}.INI". If it finds one or
 ⍝ both of them it will merge and flatten them and assign them to the `INI` property of `Tester2` instance.
 ⍝ ## Dependencies
-⍝ `Tester2` requires the classes `APLTreeUtils2` and `CodeCoverage`, but the latter only in case you want code 
+⍝ `Tester2` requires the classes `APLTreeUtils2` and `CodeCoverage`, but the latter only in case you want code
 ⍝ coverage to be checked; for that you need to set the `codeCoverage` property.
 ⍝ ## Misc
 ⍝ This class is part of the APLTree Open Source project.\\
@@ -23,11 +22,20 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.0.1.86' '2020-11-28'
+      r←'Tester2' '3.1.1+91' '2021-03-01'
     ∇
 
     ∇ History
-      :Access Public shared
+      :Access Public shared 
+      ⍝ * 3.1.1 ⋄ 2021-03-01
+      ⍝   * Package config corrected
+      ⍝ * 3.1.0 ⋄ 2021-01-31
+      ⍝   * `RenameTestFnsTo` enhanced
+      ⍝   * Bug fix in `GetTestTemplate`
+      ⍝   * Internal changes:
+      ⍝     * Referencing APLTreeUtils2 changed
+      ⍝     * Call to APLTreeUtils2.Uppercase|Lowercase replaced by calls to ⎕C
+      ⍝   * Documentation improved
       ⍝ * 3.0.1 ⋄ 2020-11-28
       ⍝   * `GetRefToAPLTreeUtils` removed
       ⍝   * Bug fix: invalid calls to `dtb` removed by calls to `A.DTB`.
@@ -299,7 +307,7 @@
     ⍝ The left argument is useful only for defining defaults on the GUI.\\
     ⍝ See also `Run` which does vasically the same but without a GUI.\\
       :Access Public Instance
-      :If 'Win'≡##.##.APLTreeUtils2.GetOperatingSystem''
+      :If 'Win'≡A.GetOperatingSystem''
           _parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateParms ⍬}'parms'
           CloseGUI
           _parms.testCaseNos←these
@@ -366,15 +374,16 @@
     ⍝⍝⍝ Private stuff
 
     ∇ r←CreateParms dummy
-   ⍝ Creates parameter space (to be consumed by `Run__`) and populates it with defaults.\\
+   ⍝ Creates a parameter space to be consumed by `Run__` and therefore by any of the `Run*` functions
+   ⍝ that do call `Run__`. The namespace is populated with defaults.\\
    ⍝ 1. `trapFlag`: controls error trapping:
-   ⍝    1 = failing test cases are reported, then the next one is executed.
-   ⍝    0 = program halts in case of an error - use this for investigation.
+   ⍝    * 1 = failing test cases are reported, then the next one is executed.
+   ⍝    * 0 = program halts in case of an error - use this for investigation.
    ⍝ 2. `debugFlag`: if it is 1 failing tests stop for investigation (stop on error).
    ⍝ 3. `batchFlag`: a 1 would mean that the test should quit itself if for example it
    ⍝     needs a human being in front of the monitor. Such test cases are supposed to
-   ⍝     do nothing but return a `_NoBatchTest` when this flag is on.
-   ⍝ 4. `stopFlag`: Is treated as "stop just before the next test case is going to be executed" when 1.\\
+   ⍝     do nothing but return `_NoBatchTest` when this flag is on.
+   ⍝ 4. `stopFlag`: is treated as "stop just before the next test case is going to be executed" when 1.\\
    ⍝     Since version 2.4 this accepts also an integer that can be the sum of:
    ⍝     * 1=stop just before any test case is executed
    ⍝     * 2=stop in all `Initial*` functions
@@ -898,7 +907,7 @@
 
     ∇ rc←ExecuteTestFunction(ref ps testNo fnsName);buff
       :If 0=ps.batchFlag
-      :AndIf 0=+/'⎕TRAP'⍷A.Uppercase{⍵↑⍨⍵⍳'⍝'}{⊃,/⍵↑⍨1++/∧\';'=1↓⊃¨A.DLB ⍵}ref.⎕NR fnsName
+      :AndIf 0=+/'⎕TRAP'⍷1 ⎕C{⍵↑⍨⍵⍳'⍝'}{⊃,/⍵↑⍨1++/∧\';'=1↓⊃¨A.DLB ⍵}ref.⎕NR fnsName
           ShowLog'  *** WARNING: ⎕TRAP is not localized in ',(⍕ref),'.',fnsName
       :EndIf
       :If 0<≢_codeCoverage
@@ -1205,7 +1214,7 @@
       r←⍬
       :If ~y                        ⍝ Passes test, so →PassesIf x just continues
           :If 2=_ref.⎕NC'stopFlag'  ⍝ Stop not defined, continue with test suite
-          :AndIf ~_ref.stopFlag     ⍝ Do not stop, continue with test suite   ⍝TODO⍝
+          :AndIf ~_ref.stopFlag     ⍝ Do not stop, continue with test suite
               r←0
           :Else
               ⎕SIGNAL 999           ⍝ Otherwise stop for investigation
@@ -1266,13 +1275,13 @@
               numbers←x
               view←0
           :Else
-              view←'view'≡A.Lowercase x
+              view←'view'≡⎕C x
               numbers←⍬
           :EndIf
       :Else
           ''⎕SIGNAL 11/⍨2≠≢x
           (view numbers)←(0=1↑0⍴1⊃x)⌽x
-          view←'view'≡A.Lowercase view
+          view←'view'≡⎕C view
       :EndIf
       r2←↓'Test_'{⍵⌿⍨((≢⍺)↑[2]⍵)∧.=⍺}'T'_ref.⎕NL 3
       :If 0≠≢groupName
@@ -1292,7 +1301,7 @@
           buff←_ref GetFirstCommentLine¨r2
           buff←A.DLB buff
           r2←r2,[1.5]buff
-          r2←r2[⍋↑A.Lowercase r2[;1];]
+          r2←r2[⍋↑⎕C r2[;1];]
           longestName←⌈/≢¨r2[;1]
           :If 0<≢r2
           :AndIf ⎕PW<longestName+3+⌈/≢¨r2[;2]
@@ -1316,7 +1325,7 @@
       r←' '~¨⍨↓'Test_'{⍵⌿⍨((≢⍺)↑[2]⍵)∧.=⍺}'T'_ref.⎕NL 3
       :If 0≠≢r←(2≤'_'+.=⍉↑r)⌿r
       :AndIf 0≠≢r←{⍺,≢⍵}⌸{⊃{⍺,'_',⍵}/¯1↓'_'A.Split ⍵}¨r
-          r←r[⍋A.Lowercase↑r[;1];]
+          r←r[⍋⎕C↑r[;1];]
       :EndIf
     ∇
 
@@ -1375,19 +1384,37 @@
       :EndIf
     ∇
 
-    ∇ {r}←oldName RenameTestFnsTo newName;body;rc;header;comment;res;name;right;left;delFilanme;list;this;no;buff;val
-         ⍝ Renames a test function or a group of tests and tells acre.\\
-         ⍝ Neither `oldName` nor `newName` may contain a dot.
-         ⍝ `r ← ⍬`
+    ∇ {r}←oldName RenameTestFnsTo newName;body;rc;header;comment;res;name;right;left;delFilanme;list;this;no;buff;val;f1;f2
+     ⍝ Renames a test function or a group of test functions and tells acre.\\
+     ⍝ `oldName` and `newName` **must not** contain a dot.\\
+     ⍝ Examples:
+     ⍝ ```
+     ⍝ 'Test_999' ← 'Test_001' T.RenameTestFnsTo 'Test_999'
+     ⍝ 'Test_BBB_002' ← 'Test_001' T.RenameTestFnsTo 'Test_BBB_002'
+     ⍝ 'Test_CCC_003' ← 'Test_BBB_002' T.RenameTestFnsTo 'Test_CCC_003'
+     ⍝ 'Test_YYY*' ← 'AAA; T.RenameTestFnsTo 'YYY'
+     ⍝ 'Test_YYY*' ← 'Test_AAA; T.RenameTestFnsTo 'Test_YYY'
+     ⍝ 'Test_VVV*' ← '' T.RenameTestFnsTo 'Test_VVV'  ⍝ all NOT belonging to a group are renamed
+     ⍝ ```
+     ⍝ `r ← ⍬`
       :Access Public Instance
       r←⍬
       (oldName newName)←oldName newName~¨' '
       'Names must not contain dots'⎕SIGNAL 11/⍨↑∨/'.'∊¨oldName newName
       :If ~'.'∊oldName
       :AndIf ~'.'∊newName
-      :AndIf 0<≢buff←ListGroups
-      :AndIf (⊂oldName)∊(≢'Test_')↓¨{⍵[;1]}buff     ⍝ Group name?
-          list←{⍵[;1]}ListTestFunctions oldName
+          :If 0=≢buff←ListGroups
+              f1←0
+              f2←0=≢Remove∆Test_ oldName
+          :Else
+              f1←(⊂Remove∆Test_ oldName)∊(≢'Test_')↓¨{⍵[;1]}buff     ⍝ Group name?
+              f2←0=≢Remove∆Test_ oldName
+          :EndIf
+      :AndIf f1∨f2
+          list←{⍵[;1]}ListTestFunctions Remove∆Test_ oldName
+          :If f2
+              list←((⊃∘Remove∆Test_¨list)∊⎕D)/list
+          :EndIf
           :For this :In list
               no←{⍵↑⍨-¯1+(⌽⍵)⍳'_'}this
               :If 0<_ref.⎕NC'Test_',newName,'_',no  ⍝ Already occupied
@@ -1448,43 +1475,12 @@
       :If ' '≠1↑0⍴rc←_ref.⎕FX↑body
           . ⍝ something went wrong
       :EndIf
-      :If (0=#.⎕NC'acre')∧0=⎕SE.⎕NC'acre'
-          ⎕←'acre not found in ⎕SE'
-          _ref.⎕EX oldName
-      :Else
-          (oldName newName)←{(⍕_ref),'.',⍵}¨oldName newName
-          :If 3=⎕SE.acre.⎕NC'Version'   ⍝ acre 6 or better?
-              delFilanme←((-≢'.change')↓⊃⎕SE.acre.Changefile newName),'.delete'
-              :Trap 22
-                  :If 0=≢rc←⎕SE.acre.SetChanged newName
-                      ⎕←'acre was told about the introduction of a new test fns but it was not interested.'
-                  :EndIf
-              :Else
-                  →∆Go  ⍝ Not an acre project
-              :EndTrap
-              :If 0=≢rc←⎕SE.acre.Erase oldName
-                  ⎕←'acre was told about the deletion of a test fns but it was not interested.'
-              :EndIf
-              :If ⎕NEXISTS delFilanme
-                  ⎕NDELETE delFilanme
-              :EndIf
-          :ElseIf 3=⎕SE.acre.⎕NC'run'   ⍝ acre 4 or better?
-              delFilanme←((-≢'.change')↓'changefile'⎕SE.acre.run newName),'.delete'
-              :If ⎕NEXISTS delFilanme
-                  ⎕NDELETE delFilanme
-              :EndIf
-              :If 0=≢rc←⎕SE.acre.SetChanged newName
-                  ⎕←'acre was told about the introduction of a new test fns but it was not interested.'
-              :EndIf
-              :If 0=≢rc←⎕SE.acre.Erase oldName
-                  ⎕←'acre was told about the deletion of a test fns but it was not interested.'
-              :EndIf
-          :EndIf
+      NotifyAcreAndDeleteOldVersion oldName newName
+     
      ∆Go:
-          _ref.⎕EX oldName
-          :If (⊃⎕SI)≢⊃1↓⎕SI
-              ⎕←'***Done'
-          :EndIf
+      _ref.⎕EX oldName
+      :If (⊃⎕SI)≢⊃1↓⎕SI
+          ⎕←'***Done'
       :EndIf
     ∇
 
@@ -1496,7 +1492,7 @@
       r←⍬
       groupName←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'groupName'
       'Invalid right argumet: must be an integer between 1 and 999'⎕SIGNAL 11/⍨~(⊂no)∊(⍳999)
-      'Invalid left argumet: must be a char vector'⎕SIGNAL 11/⍨~((≡groupName)∊0 1)∧' '≡↑0⍴groupName
+      'Invalid left argumet: must be a char vector'⎕SIGNAL 11/⍨~((≡groupName)∊0 1)∧' '≡⊃0⍴groupName
       body←A.DTB↓180⌶'Test_000'
       :If 0=≢groupName
           newName←'Test_',(¯3↑'000',⍕no)
@@ -1665,6 +1661,33 @@
       :AndIf '⍝'∊body
           n.Grid.Values[row;4]←⊂(1↓constant),':',{⍵↓⍨⍵⍳'⍝'}body
           2 ⎕NQ n.Grid'SetColSize' 4 ¯3
+      :EndIf
+    ∇
+
+    Remove∆Test_←{'Test_'{l←≢⍺ ⋄ 0=l×←⍺≡l↑⍵:⍵ ⋄ l↓⍵}⍵}
+
+    ∇ {r}←NotifyAcreAndDeleteOldVersion(oldName newName);delFilanme;rc
+      r←⍬
+      :If 0=⎕SE.⎕NC'acre'
+          _ref.⎕EX oldName
+      :Else
+          (oldName newName)←{(⍕_ref),'.',⍵}¨oldName newName
+          :If 3=⎕SE.acre.⎕NC'Version'   
+              delFilanme←((-≢'.change')↓⊃⎕SE.acre.Changefile newName),'.delete'
+              :Trap 22
+                  :If 0=≢rc←⎕SE.acre.SetChanged newName
+                      ⎕←'acre was told about the introduction of a new test fns but it was not interested.'
+                  :EndIf
+              :Else
+                  :Return ⍝ Not an acre project
+              :EndTrap
+              :If 0=≢rc←⎕SE.acre.Erase oldName
+                  ⎕←'acre was told about the deletion of a test fns but it was not interested.'
+              :EndIf
+              :If ⎕NEXISTS delFilanme
+                  ⎕NDELETE delFilanme
+              :EndIf
+          :EndIf
       :EndIf
     ∇
 

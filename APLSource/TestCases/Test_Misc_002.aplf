@@ -1,4 +1,4 @@
- r←Test_Misc_002(stopFlag batchFlag);⎕TRAP
+ r←Test_Misc_002(stopFlag batchFlag);⎕TRAP;qdmx
  ;dir;noOfBytes;deps
 ⍝ Create a dependency file, add and remove dependencies from it and finally delete it.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -19,17 +19,26 @@
  dir D.Add'[tatin]aplteam-FilesAndDirs-3.4.9' ';[Foo]C:/Temp/MyGroup-MyPkg-0.1.0' '[tatin]aplteam-APLTreeUtils-4.9.0'
  deps←1 D.Get dir
  →T.GoToTidyUp 4≠≢deps
- (⊂'[tatin]aplteam-OS-2.3.0')F.NPUT(dir,'/',D.DEP_NAME)2                          ⍝ Make sure that the file contains an alias
+ (⊂'[tatin]aplteam-OS-2.3.0')F.NPUT(dir,'/',D.DEP_NAME)2          ⍝ Make sure that the file contains an alias
  deps←1 D.Get dir
  →T.GoToTidyUp 5≠≢deps
  →T.GoToTidyUp~∧/'https'{⍺∘≡¨(≢⍺)↑¨⍵}deps
  deps←D.Get dir
  →T.GoToTidyUp 5≠≢deps
- (⊂'R@[tatin]carlisle-Rumba-2.3.0')F.NPUT(dir,'/',D.DEP_NAME)2                    ⍝ Make sure that the file contains an alias
+ dir D.Add'[tatin]R@carlisle-Rumba-2.3.0'                         ⍝ Make sure that the file contains an alias together with Registry alias
  deps←1 D.Get dir
  →T.GoToTidyUp 6≠≢deps
  →T.GoToTidyUp~∧/∨/¨'https'∘⍷¨deps
- (⊂'R@http://tatin.aplteam.com/aplteam-Rumba-2.3.0')F.NPUT(dir,'/',D.DEP_NAME)2   ⍝ Make sure that the file contains an alias
+
+ :Trap 98
+     dir D.Add'R@[tatin]carlisle-Rumba-2.3.0'                     ⍝ Invalid alias
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Invalid dependency'≢qdmx.EM
+ :EndTrap
+
+ dir D.Add'http://tatin.aplteam.com/R@carlisle-Rumba2-1.0.0'      ⍝ Make sure that the file contains an alias but no Registry alias
  deps←1 D.Get dir
  →T.GoToTidyUp 7≠≢deps
  →T.GoToTidyUp~∧/{≢'https*://'⎕S 0⊣⍵}¨deps

@@ -1,6 +1,8 @@
 ﻿:Namespace Tatin
 
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.18.0 - 2021-03-01
+⍝   * PackageConfig now looks into the current directory if no argument was specified
 ⍝ * 0.17.2 - 2021-02-17
 ⍝   * Minor improvements in user command help
 ⍝ * 0.17.1 - 2021-02-18
@@ -114,7 +116,7 @@
           c←⎕NS ⍬
           c.Name←'PackageConfig'
           c.Desc←'Retrieve (HTTP) or create and/or edit a package config file for a specific package'
-          c.Parse←'1 -delete -edit -quiet'
+          c.Parse←'1s -delete -edit -quiet'
           r,←c
      
           c←⎕NS ⍬
@@ -131,7 +133,7 @@
      
           c←⎕NS ⍬
           c.Name←'Publish'
-          c.Desc←'Publish a package (ZIP file) to a particular Registry'
+          c.Desc←'Publish a package (package folder or ZIP file) to a particular Registry'
           c.Parse←'2 -quiet'
           r,←c
      
@@ -173,13 +175,11 @@
               r,←c
           :EndIf
      
-          :If 0 ⍝ Not decided yet whether we allow that at all, or what for
-              c←⎕NS ⍬
-              c.Name←'UninstallPackage'
-              c.Desc←'Uninstalls a package and its dependencies'
-              c.Parse←'2'
-              r,←c
-          :EndIf
+          c←⎕NS ⍬
+          c.Name←'UninstallPackage'
+          c.Desc←'Uninstalls a package and its dependencies'
+          c.Parse←'2'
+          r,←c
      
           r.Group←⊂NM
      
@@ -314,14 +314,14 @@
     ∇
 
     ∇ r←CheckForBetterVersion Arg;path;majorFlag;question;this
+      r←''
       path←Arg._1
       majorFlag←Arg.major
       :If majorFlag
-          r←majorFlag TC.CheckForBetterVersion path
+          r←⍪majorFlag TC.CheckForBetterVersion path
       :Else
           r←TC.CheckForBetterVersion path
-          r←(0<≢¨r)/r
-     
+          r←⍪(0<≢¨r)/r
           :If 0  ⍝TODO⍝  May be one day we support this, may be not
               :If 0<≢r
                   :If 1=≢r
@@ -344,7 +344,6 @@
                   ∘∘∘
               :EndIf
           :EndIf
-     
       :EndIf
     ∇
 
@@ -372,6 +371,10 @@
     ∇ r←Publish Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename
       r←''
       (source url)←Arg.(_1 _2)
+      :If (,'?')≡,url
+      :AndIf 0=≢url←SelectRegistry 0
+          :Return
+      :EndIf
       url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_
       :If TC.F.IsDir source
@@ -410,9 +413,10 @@
       :EndTrap
     ∇
 
-    ∇ r←UninstallPackage(path packageID)
-    ⍝
-      ∘∘∘ ⍝TODO⍝
+    ∇ r←UninstallPackage Arg;path;packageID
+    ⍝ Attempt to un-installe the top-level package `packageID` from the folder `path`
+      (path packageID)←Arg.(_1 _2)
+      r←1⊃TC.UnInstallPackage path packageID
     ∇
 
     ∇ r←ListRegistries Arg;type;rawFlag
@@ -453,9 +457,9 @@
       :Else
           qdmx←⎕DMX
           :If 0=≢qdmx.EM
-              r←'Not found: ',Arg._1
+              ('Not found: ',Arg._1)⎕SIGNAL 11
           :Else
-              r←qdmx.EM
+              qdmx.EM ⎕SIGNAL 11
           :EndIf
       :EndTrap
     ∇
@@ -479,16 +483,17 @@
       r←TC.LoadPackage identifier targetSpace
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data
       r←⍬
-      what←Arg._1
-      :If ∧/'[]'∊what
+      :If (,0)≡,what←Arg._1
+          what←TC.F.PWD
+      :ElseIf ∧/'[]'∊what
           what←TC.ReplaceRegistryAlias what
       :EndIf
       :If TC.Reg.IsHTTP what
           r←TC.ReadPackageConfigFile_ what
       :Else
-          path←Arg._1
+          path←what
           filename←path,'/',TC.CFG_NAME
           :If Arg.delete
               'File not found'Assert TC.F.IsFile filename
@@ -520,20 +525,31 @@
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
-                  origData←TC.Reg.JSON ns
-                  (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData path
-                  :If success
-                      :If 0<≢∊newData
-                      :AndIf newFlag∨newData≢origData
-                          ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
-                          :Trap 98
-                              TC.WritePackageConfigFile path ns
-                          :Else
-                              qdmx←⎕DMX
-                              ⎕←qdmx.EM
-                          :EndTrap
+                  data←origData←TC.Reg.JSON ns
+                  :Repeat
+                      (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'data path
+                      flag←1
+                      :If success
+                          :If 0<≢∊newData
+                          :AndIf newFlag∨newData≢origData
+                              ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
+                              :Trap 98
+                                  1 TC.WritePackageConfigFile path ns
+                              :Else
+                                  qdmx←⎕DMX
+                                  ⎕←qdmx.EM
+                                  :If 0=1 ∆YesOrNo'Would you like to try to fix the problem in the editor? (n=abandon changes)'
+                                      ⎕←'Cancelled, no change'
+                                  :Else
+                                      flag←0
+                                      data←newData
+                                  :EndIf
+                              :EndTrap
+                          :EndIf
+                      :Else
+                          ⎕←'No change'
                       :EndIf
-                  :EndIf
+                  :Until flag
               :Else
                   r←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
               :EndIf
@@ -732,6 +748,7 @@
           r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2-1 #'
           r,←⊂'  ]TATIN.LoadPackage [tatin]aplteam-APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage [tatin]APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.LoadPackage [tatin]A@APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage A@APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #'
@@ -755,6 +772,7 @@
           r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2-1 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage [tatin]aplteam-APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage [tatin]APLTreeUtils2 /pathTo/folder'
+          r,←⊂'  ]TATIN.InstallPackage [tatin]A@APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage A@APLTreeUtils2 #'
           r,←⊂'  ]TATIN.InstallPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
@@ -778,12 +796,15 @@
           r,←⊂'If you did change the data, you will first be prompted for saving the changes on disk'
           r,←⊂'and then for executing ]TATIN.Init in order to refresh the user settings in the ⎕SE.'
       :Case ⎕C'PackageConfig'
-          r,←⊂'The argument may be an HTTP request or a path.'
+          r,←⊂'The argument, if specified, may be an HTTP request or a path.'
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
           r,←⊂'  Specifying any of the options has no effect.'
           r,←⊂'* In case of a path it must point to a folder that contains a Tatin package.'
           r,←⊂'  The contents of the file "',TC.CFG_NAME,'" in that folder is returned.'
           r,←⊂'  In case the file does not exist yet it will be created.'
+          r,←⊂''
+          r,←⊂'In case no argument is specified the command tries to find a package config file in'
+          r,←⊂'the current directory.'
           r,←⊂''
           r,←⊂'You may edit the file by specifying the -edit flag.'
           r,←⊂'In case you want to delete the file: specify the -delete flag.'
@@ -792,10 +813,14 @@
       :Case ⎕C'UninstallPackage'
           r,←⊂'Requires two arguments:'
           r,←⊂'* Path to a folder with installed packages'
-          r,←⊂'* Name of the package to be un-installed. If {group} and {name} can identify the'
-          r,←⊂'  package uniquely then there is no need for {version}'
-          r,←⊂'This command uninstalles the given package and all its dependencies but only if those'
-          r,←⊂'are not required by any other packages.'
+          r,←⊂'* A package identifier; can be one of:'
+          r,←⊂'  * Name of the package to be un-installed. If {group} and {name} can identify the'
+          r,←⊂'    package uniquely then there is no need to specify {version}. Even just {name}'
+          r,←⊂'    might suffice.'
+          r,←⊂'  * An alias. Post- or prefix with a "@" in order to be recognized as an alias.'
+          r,←⊂''
+          r,←⊂'This command un-installs the given package and all its dependencies but only if those'
+          r,←⊂'are neither top-level packages nor required by any other package.'
       :Case ⎕C'PackageDependencies'
           r,←⊂'Takes a path to a folder and returns the contents of the file "apl-dependencies.txt".'
           r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
@@ -824,7 +849,7 @@
           r,←⊂''
           r,←⊂'Requires two arguments:'
           r,←⊂'* Path to ZIP file or package folder'
-          r,←⊂'* URL or alias of a Registry Server'
+          r,←⊂'* URL or alias of a Registry Server or a "?"'
           r,←⊂''
           r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
           r,←⊂'to the Tatin rules.'
@@ -850,12 +875,15 @@
           r,←⊂'Re-establishes the user settings in ⎕SE. Call this in case the user settings got changed on file'
           r,←⊂'and you want to incorporate the changes in the current session.'
       :Case ⎕C'CheckForBetterVersion'
-          r,←⊂'Takes the path to a folder with installed packages as argument.'
-          r,←⊂'Checks alle top-level packages in that folder for better versions.'
-          r,←⊂'By default better MAJOR versions are ignored, but check on -major.'
+          r,←⊂'Takes the path to a folder with a file "apl-buildlist.json" as argument.'
+          r,←⊂'Checks the packages specified in that file for "better" versions.'
+          r,←⊂''
+          r,←⊂'Returns all "better" versions. If no "better" version was found nothing will be returned.'
+          r,←⊂''
+          r,←⊂'By default "better" MAJOR versions are ignored, but check on -major.'
           r,←⊂''
           r,←⊂'The default behaviour can be changed by specifying the flag -major.'
-          r,←⊂'Then only better major versions are reported.'
+          r,←⊂'Then only "better" major versions are reported.'
       :Case ⎕C'DeletePackage'
           r,←⊂'Requires two arguments:'
           r,←⊂'* Either a directory hosting a Tatin Registry or a URL of a Tatin-managed Registry.'

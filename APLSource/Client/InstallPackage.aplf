@@ -11,7 +11,7 @@
 ⍝ `←` paths to all packages installed with the first one being the "main" package, meaning that all the others (if any) are dependencies.
  '"targetFolder" is invalid'Assert F.IsDir⍕targetFolder
  paths←''
- alias←{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}identifier_
+ (alias identifier_)←SplitAtAlias identifier_
  identifier←ReplaceRegistryAlias identifier_
  ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
  identifier←CheckVersion identifier
@@ -32,6 +32,7 @@
  PrintToSession'  Establish dependencies...'
  :If 0<≢buildList←GetDependencyTree identifier
      PrintToSession'  ',(⍕≢buildList),' dependencies identified'
+     CheckAlias targetFolder alias
      :For level packageID2 url :In ↓buildList
          installFolder←(Reg.AddSlash targetFolder),packageID2
          :If level=1
@@ -46,7 +47,7 @@
          :EndIf
          :If 1=level
              PrintToSession'  Add ',packageID2,' to dependency file...'
-             targetFolder Dependencies.Add packageID2
+             targetFolder Dependencies.Add alias,packageID2
          :EndIf
      :EndFor
      PrintToSession'  Saving build list... '

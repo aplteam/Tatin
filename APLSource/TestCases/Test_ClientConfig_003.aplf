@@ -9,7 +9,7 @@
  reg.alias←'foo'
  reg.priority←400
  ns←reg.Get ⍬
- →T.PassesIf reg.varsList ∆LazyMatch' '~¨⍨↓ns.⎕NL⍳16
+ →T.PassesIf∧/(' '~¨⍨↓ns.⎕NL⍳16)∊reg.varsList
 
  expected←'foo' 'Firlefanz' 61250 'http://localhost/' 400
  →T.PassesIf expected ∆LazyMatch reg.Get¨reg.varsList

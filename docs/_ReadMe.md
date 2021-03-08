@@ -11,7 +11,7 @@ This document gives you an overview over these HTML files: their purpose and who
 
 ### General information
 
-* [Introduction](./Introduction.html) (draft)
+* [Introduction](./Introduction.html "Introduction.html") (draft)
 
   A must-read for _everybody_.
 

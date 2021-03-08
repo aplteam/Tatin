@@ -41,63 +41,75 @@ When the Tatin Server loads the INI file it will replace the string `<INIFILE>` 
 
 The INI file is well documented, so we won't discuss the meaning of the different sections and settings. Most of the settings don't need changing, so we will just draw your attention to those you are likely to change:
 
-* `[CONFIG]AppName`
 
-   This defines the name used by Tatin for logging to the Windows Event Log. 
+#### `[CONFIG]AppName`
 
-   The parameter has no meaning on non-Windows platforms, and is ignored in case `[LOGGING]WindowsEventLog` is 0 rather than 1.
+This defines the name used by Tatin for logging to the Windows Event Log. 
 
-* `[CONFIG]Registry`
-
-   This defines the path where the Registry lives that is managed by the Tatin Server.
-
-* `[CONFIG]Base`
-
-   Replace this by your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
-
-   Never add a port number to `Base`; see `[CONFIG]BaseTagPort` for this.
-
-* `[CONFIG]BaseTagPort`
-
-   Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://). 
-
-   In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set `BaseTagPort` to 9999. This makes Tatin inject that port number into the HTML "base" tag, so that for example links in the Tatin documentation would continue to work.
-
-   However, when your Tatin Server runs "behind", say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
-
-   See also `[CONFIG]Base`.
+The parameter has no meaning on non-Windows platforms, and is ignored in case `[LOGGING]WindowsEventLog` is 0 rather than 1.
 
 
-* `[CONFIG]Title`
+#### `[CONFIG]Registry`
 
-   When you use a Browser for accessing a Tatin server then `Title` defines what will become the tab title in the browser.
+This defines the path where the Registry lives that is managed by the Tatin Server.
 
-* `[CONFIG]Caption`
+#### `[CONFIG]Base`
 
-   This defines what all the HTML pages will display as `<h1>`.
+Replace this by your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
 
-* `[CONFIG]ReloadWS`
+Never add a port number to `Base`; see `[CONFIG]BaseTagPort` for this.
 
-   If this is 1 Tatin will check whether the workspace `Server.dws` was changed since it was loaded. If it was Tatin will load it, meaning that it will kind of restart itself.
 
-   Whether this is a good idea in production is debatable, but it can be helpful in development.
+#### `[CONFIG]BaseTagPort`
 
-* The section `[CERTIFICATES]` 
+Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://). 
 
-  A certificate is required in case you want to use https, a must on the Internet these days.
+In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set `BaseTagPort` to 9999. This makes Tatin inject that port number into the HTML "base" tag, so that for example links in the Tatin documentation would continue to work.
+
+However, when your Tatin Server runs "behind", say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
+
+See also `[CONFIG]Base`.
+
+
+#### `[CONFIG]Title`
+
+When you use a Browser for accessing a Tatin server then `Title` defines what will become the tab title in the browser.
+
+
+#### `[CONFIG]Caption`
+
+This defines what all the HTML pages will display as `<h1>`.
+
+
+#### `[CONFIG]ReloadWS`
+
+If this is 1 Tatin will check whether the workspace `Server.dws` was changed since it was loaded. If it was Tatin will load it, meaning that it will kind of restart itself.
+
+Whether this is a good idea in production is debatable, but it can be helpful in development.
+
+
+#### `[CONFIG]DeletePackages`
+
+This setting defines whether a user might delete a package. The setting may become one of these:
+
+| 0 | Deleting packages is not allowed
+| 1 | Deleting packages is allowed
+| 2 | Only beta versions may be deleted (major version number is 0)
+
+The principal Tatin server only allows deleting beta versions. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.
+
+
+#### `[CONFIG]Secure`
+
+Flag that defines whether certificates (https) are used nor not (http).
+
+
+#### The section `[CERTIFICATES]` 
+
+A certificate is required in case you want to use https, a must on the Internet these days.
 You probably want to use your own one.
 
-  For more details on certificates see "On Certificates"
-
-* `[CONFIG]DeletePackages`
-
-  This setting defines whether a user might delete a package. The setting may become one of these:
-
-  | 0 | Deleting packages is not allowed
-  | 1 | Deleting packages is allowed
-  | 2 | Only beta versions may be deleted (major version number is 0)
-
-  The principal Tatin server only allows deleting beta versions. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.
+For more details on certificates see "On Certificates"
  
 
 ## On Logging

@@ -1,20 +1,21 @@
 :Class UserSettings
 ⍝ By instanciating this class you get a representation of a user settings file required by Tatin.\\
-⍝ In case no path pointing to a folder hosting such a file is provided to `⎕NEW`, the file is search for
-⍝ (and created if it does not yet exist) in the default location (user's home folder) which depends
-⍝ on your operating system.\\
-⍝ You may call `⎕SE.Tatin.GetUserHomeFolder ''` in order to find out the location.\\
-⍝ Optionally you may specify such a folder with `⎕NEW` that hosts the configuration file.\\
+⍝ In case no path pointing to a folder hosting such a file is provided to `⎕NEW`, the file is searched
+⍝ for (and created if it does not yet exist) in the default location (user's home folder) which
+⍝ depends on your operating system.\\
+⍝ You may call `⎕SE.Tatin.GetUserHomeFolder ''` in order to find out that location.\\
+⍝ Optionally you may specify a folder hosting the configuration file as an argument to `⎕NEW`.\\
 ⍝ Again, if the file does not yet exist it will be created with defaults.\\
 ⍝ After having created an instance you can add a Registry definition (read: an instance of the
-⍝ `DefineRegistry` class) to the user settings with `AddRegistry`, and you may also call `ReplaceRegistry`
-⍝ and `RemoveRegistry`.\\
-⍝ However, all changes are strictly workspace-only. If youy want your changes to be written to file you
-⍝ must call the niladic `Save` method.\\
-⍝ If you have passed a path to where the user settings file should be created, and you want this file
-⍝ to become the default user settings file whenever Dyalog APL is fired up, then you make call the
-⍝ `MakeDefaultFile` instance method. This creates (or overwrites) a file '.tatin` that points to that folder.
-⍝ written to file when the `permanent` flag was specified as 1 when the class was instantiated.
+⍝ `DefineRegistry` class) to the user settings with `AddRegistry`, and you may also call
+⍝ `ReplaceRegistry` and `RemoveRegistry`.\\
+⍝ Note that all changes are strictly workspace-only. If you want your changes to be written to file
+⍝ you must call the `Save` method with a 1 as right argument. The only exception is that when the
+⍝ file does not yet exist, it is created and written to disk with default.\\
+⍝ If you have passed a path to where the user settings file should be created to `⎕NEW`, and you want
+⍝ this file to become the default user settings file whenever Dyalog APL is fired up, then make a call
+⍝ to the `MakeDefaultFile` instance method. This creates (or overwrites) a file '.tatin` that points
+⍝ to that folder.\\
 ⍝ The full name of the file is available via the field `path2config`.\\
 ⍝ You may convert a particular Registry into an ordinary namespace by calling the `GetRegistry` method.
 
@@ -36,7 +37,7 @@
       :If F.IsFile _path2config,cfg_name                    ⍝ If it exists...
           Read _path2config                                 ⍝ we raed it
       :Else
-          _registries←⍬                                     ⍝ otherwise we create it with default values
+          _registries←⍬                                     ⍝ otherwise we create it with default values...
           AddPrincipalServer ⍬
           Save 1
       :EndIf
@@ -65,7 +66,6 @@
     ⍝ Early initialisation
       home←(⊃⊃⎕CLASS ⎕THIS).##
       F←home.F ⋄ A←home.A
-      _permanent←0
       _source←''
     ∇
 
@@ -82,16 +82,6 @@
           '"source" is invalid (depth)'Assert 1=≡buff
           '"source" is invalid (data type)'Assert' '=1↑0⍴buff
           _source←buff
-        ∇
-    :EndProperty
-
-    :Property permanent
-    ⍝ Flag that defines whether the current user setting file should be used permanently.\\
-    ⍝ Ineed to be defined when instantiated (read-only).
-    ⍝ You may at any time call `Save` however.
-    :Access Public Instance
-        ∇ r←get
-          r←_permanent
         ∇
     :EndProperty
 
@@ -133,7 +123,6 @@
    ⍝ `←` is always `⍬` (shy).
       :Access Public Instance
       r←⍬
-      'Invalid depth'Assert(≡registries)∊0 1
       :If 80=⎕DR y
           :If ∧/'[]'∊y
               (alias name)←{⍵{('[]'~⍨⍵↑⍺)(⍵↓⍺)}⍵⍳']'}y
@@ -172,7 +161,6 @@
       :EndIf
       buff.uri←AddSlash buff.uri
       _registries,←buff
-      Save 1
     ∇
 
     ∇ r←{rawFlag}ListRegistries showApiKey
@@ -212,7 +200,6 @@
           reg←⎕NEW home.DefineRegistry(,⊂registry)
           _registries[ind]←reg.Get ⍬
       :EndIf
-      Save 1
     ∇
 
     ∇ flag←Exist uriOrAlias
@@ -235,7 +222,6 @@
           :Else
               :If ∨/~bool←~EqualsAliasOrName uriOrAlias
                   _registries←bool/_registries
-                  Save 1
               :EndIf
               r←∨/~bool
           :EndIf
@@ -255,7 +241,6 @@
 
     ∇ r←Delete flag;filename;buff
     ⍝ Call this in order to delete the currently instanciated user settings file.\\
-    ⍝ If that file was "permanent" it is deleted from the file defining that as well.
     ⍝ Returns 1 in case the file was successfully deleted otherwise (Blocked by another process, already deleted...)
       :Access Public Instance
       r←0
@@ -263,10 +248,7 @@
           filename←_path2config,cfg_name
       :AndIf F.IsFile filename
           r←F.DeleteFile filename
-          :If _permanent
-              (⊂'')F.NPUT(home.GetUserHomeFolder'.tatin')1
-          :EndIf
-          _permanent←0
+          (⊂'')F.NPUT(home.GetUserHomeFolder'.tatin')1
       :EndIf
     ∇
 

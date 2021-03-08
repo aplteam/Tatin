@@ -1,0 +1,10 @@
+ r←Test_Server_411(stopFlag batchFlag);⎕TRAP;html
+⍝ Ask for version information
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←∆GetHtmlFromServer'localhost/v1/version-information'
+ →T.PassesIf∨/'minimum version required on the client side'⍷html
+
+ r←T._OK
+⍝Done

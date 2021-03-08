@@ -13,7 +13,6 @@ This is an example:
 ```
 {
   api: "DotNetZip",
-  date: "2020-05-16",
   description: "Zipping and unzipping with.NET Core on all major platforms",
   files: "",
   group: "aplteam",
@@ -152,33 +151,6 @@ There is one exception: when an absolute path is specified but it's partly ident
 
 Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.
 
-#### date
-
-The user is not expected to set this: it will be set by the `Publish` method. This is a timestamp (`⎕TS`) in the format `yyyymmdd.hhmmss`. 
-
-Apart from being shown on the web page when listing packages this date might play an important role in determining the precedence of versions. This is because although it's obvious which version is "better" when you look at these two packages:
-
-```
-group-name-1.0.0
-group-name-1.1.0
-```
-
-it is less obvious when you look at these:
-
-```
-group-name-1.0.0-alpha
-group-name-1.1.0-beta
-```
-
-and it cannot be determined at all with these packages:
-
-```
-group-name-1.0.0-TryFeature1
-group-name-1.1.0-FixFor234
-```
-
-Since packages, once published, cannot be altered, it is safe to assume that the publishing date determines the correct order, but only in such cases. However, as long as the version consists of just digits and dots, `date` is ignored.
-
 
 #### description
 
@@ -233,6 +205,40 @@ By default the config namespace carries the values of the three Dyalog parameter
 
 Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependencies` function. This is important because that makes any sub-namespace created later on inherit those values.
 
+
+#### Injected values
+
+##### date
+
+The user must not specify "date", but when published the server will inject it as a timestamp (`⎕TS`) in the format `yyyymmdd.hhmmss`. 
+
+This date might play an important role in determining the precedence of versions. This is because although it's obvious which version is "better" when you look at these two packages:
+
+```
+group-name-1.0.0
+group-name-1.1.0
+```
+
+it is less obvious when you look at these:
+
+```
+group-name-1.0.0-alpha
+group-name-1.1.0-beta
+```
+
+and it cannot be determined at all with these packages:
+
+```
+group-name-1.0.0-TryFeature1
+group-name-1.1.0-FixFor234
+```
+
+Since packages, once published, cannot be altered, it is safe to assume that the publishing date determines the correct order. However, as long as the version consists of just digits and dots, and possibly a build number, `date` does not play a role in determining precedence.
+
+
+##### url
+
+WHen a package is loaded or installed from a Tatin Server, "url" is injected, and points back to that server.
 
 ### Access after loading a package
 

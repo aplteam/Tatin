@@ -22,11 +22,14 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.1.1+91' '2021-03-01'
+      r←'Tester2' '3.1.2+93' '2021-03-08'
     ∇
 
     ∇ History
       :Access Public shared 
+      ⍝ * 3.1.2 ⋄ 2021-03-08
+      ⍝   * Bug fix: in case a test suite was quit by sending `QuitEvent`, a generic `Cleanup` function was executed
+      ⍝     but on group-specific one, if there is any due.
       ⍝ * 3.1.1 ⋄ 2021-03-01
       ⍝   * Package config corrected
       ⍝ * 3.1.0 ⋄ 2021-01-31
@@ -685,7 +688,7 @@
       :EndIf
     ∇
 
-    ∇ ProcessTestCases(ref ps);i;testFns;testNo;rc;msg;length;cw;max;desc;comment;marker;length2;at;result;cases;currentGroup;noOf
+    ∇ ProcessTestCases(ref ps);cw;max;noOf;length2;length;i;testFns;currentGroup;testNo;continueFlag;rc;comment;desc;marker
       cw←≢max←⍕noOf←≢ps.list
       length←2+⌈/≢¨ps.list
       length2←length+≢'(',max,'/',max,')  '
@@ -716,37 +719,9 @@
                   ps.ref2Gui.∆n.Info.Text←'PAUSING'
                   {0=⍵.ref2Gui.∆n.PauseBtn.State:shy←1 ⋄ _←⎕DL 0.3 ⋄ ∇ ⍵}ps
               :EndIf
-              :If 0<≢currentGroup
-              :AndIf currentGroup≢⊃⌽ps.processedGroups
-                  ps.processedGroups,←⊂currentGroup
-                  :If 3=ref.⎕NC'Initial_',currentGroup
-                      at←1⊃ref.⎕AT'Initial_',currentGroup
-                      :If 2⊃⌽(8⍴2)⊤ps.stopFlag
-                          (∪(⎕STOP 1⊃⎕SI),∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
-                      :Else
-                          ((⎕STOP 1⊃⎕SI)~,∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
-                      :EndIf
-                      :If (2⊃at)∊1 ¯2           ⍝ Accepts a right argument (monadic=1, ambivalent=¯2)?
-     ∆stop1:              result←ps ref.{⍎⍵,' ⍺'}'Initial_',currentGroup
-                      :ElseIf |1⊃at
-     ∆stop2:              result←ps ref.{⍎⍵}'Initial_',currentGroup
-                      :Else
-     ∆stop3:              ref⍎'Initial_',currentGroup
-                          result←1
-                      :EndIf
-                      :If ~1↑result∊⍬ 1
-                          ShowLog'Function "Initial_',currentGroup,'" found and executed but did not return a 1'
-                          noOf←+/∨/('_',currentGroup,'_')⍷↑(i-1)↓ps.list
-                          ShowLog'Therefore ',(⍕noOf),' member',((1<noOf)/'s'),' of the group "',currentGroup,'" will not be executed'
-                          :If ps.guiFlag
-                              ps.ref2Gui.∆n.Grid.Values[(i-1)+⍳noOf;4]←⊂'Prevented by Initial_',currentGroup
-                          :EndIf
-                          i+←noOf-1
-                          :Continue
-                      :Else
-                          ShowLog'Function "Initial_',currentGroup,'" found and successfully executed'
-                      :EndIf
-                  :EndIf
+              (continueFlag i noOf)←HandleInitialize(ref ps currentGroup i noOf)
+              :If continueFlag
+                  :Continue
               :EndIf
               rc←ExecuteTestFunction ref ps testNo testFns
               :If ' '=1↑0⍴rc   ⍝ Custom message?
@@ -784,6 +759,7 @@
                   :EndIf
               :EndIf
           :Case QuitEvent
+              HandleCleanup ref ps currentGroup i 
               ⎕SIGNAL QuitEvent
           :Else
               ps.errCounter+←1
@@ -797,22 +773,7 @@
                   ps.ref2Gui.∆n.Grid.Values[i;4]←⊂'{Broken}'
               :EndIf
           :EndTrap
-          :If i=≢ps.list                                                ⍝ Last one?
-          :OrIf currentGroup{0=≢⍺:0 ⋄ ⍺≢GetGroupName(i+1)⊃⍵}ps.list     ⍝ Group change?!
-              :If 3=ref.⎕NC'Cleanup_',currentGroup
-                  :If 3⊃⌽(8⍴2)⊤ps.stopFlag
-                      (∪(⎕STOP 1⊃⎕SI),∆stop10,∆stop11)⎕STOP 1⊃⎕SI
-                  :Else
-                      ((⎕STOP 1⊃⎕SI)~,∆stop10,∆stop11)⎕STOP 1⊃⎕SI
-                  :EndIf
-                  at←1⊃ref.⎕AT'Cleanup_',currentGroup
-                  :If (2⊃at)∊1 ¯2 ⍝ Accepts a right argument (1=monadic, ¯2=ambivalent)?
-     ∆stop10:         ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Cleanup_',currentGroup
-                  :Else
-     ∆stop11:         ref.⍎'Cleanup_',currentGroup
-                  :EndIf
-              :EndIf
-          :EndIf
+           HandleCleanup ref ps currentGroup i 
           {}⎕WA  ⍝ Enforce a memory compaction in order to get rid of any rubbish.
           :If ps.guiFlag
           :AndIf 0=ps.ref2Gui.∆n.∆Closed
@@ -1672,7 +1633,7 @@
           _ref.⎕EX oldName
       :Else
           (oldName newName)←{(⍕_ref),'.',⍵}¨oldName newName
-          :If 3=⎕SE.acre.⎕NC'Version'   
+          :If 3=⎕SE.acre.⎕NC'Version'
               delFilanme←((-≢'.change')↓⊃⎕SE.acre.Changefile newName),'.delete'
               :Trap 22
                   :If 0=≢rc←⎕SE.acre.SetChanged newName
@@ -1686,6 +1647,63 @@
               :EndIf
               :If ⎕NEXISTS delFilanme
                   ⎕NDELETE delFilanme
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {(continueFlag i noOf)}←{force}HandleInitialize(ref ps currentGroup i noOf);at;result
+      force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
+      continueFlag←0
+      :If 0<≢currentGroup
+      :AndIf force∨currentGroup≢⊃⌽ps.processedGroups
+          ps.processedGroups,←⊂currentGroup
+          :If 3=ref.⎕NC'Initial_',currentGroup
+              at←1⊃ref.⎕AT'Initial_',currentGroup
+              :If 2⊃⌽(8⍴2)⊤ps.stopFlag
+                  (∪(⎕STOP 1⊃⎕SI),∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
+              :Else
+                  ((⎕STOP 1⊃⎕SI)~,∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
+              :EndIf
+              :If (2⊃at)∊1 ¯2           ⍝ Accepts a right argument (monadic=1, ambivalent=¯2)?
+     ∆stop1:      result←ps ref.{⍎⍵,' ⍺'}'Initial_',currentGroup
+              :ElseIf |1⊃at
+     ∆stop2:      result←ps ref.{⍎⍵}'Initial_',currentGroup
+              :Else
+     ∆stop3:      ref⍎'Initial_',currentGroup
+                  result←1
+              :EndIf
+              :If ~1↑result∊⍬ 1
+                  ShowLog'Function "Initial_',currentGroup,'" found and executed but did not return a 1'
+                  noOf←+/∨/('_',currentGroup,'_')⍷↑(i-1)↓ps.list
+                  ShowLog'Therefore ',(⍕noOf),' member',((1<noOf)/'s'),' of the group "',currentGroup,'" will not be executed'
+                  :If ps.guiFlag
+                      ps.ref2Gui.∆n.Grid.Values[(i-1)+⍳noOf;4]←⊂'Prevented by Initial_',currentGroup
+                  :EndIf
+                  i+←noOf-1
+                  continueFlag←1
+              :Else
+                  ShowLog'Function "Initial_',currentGroup,'" found and successfully executed'
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {r}←HandleCleanup(ref ps currentGroup i);at
+      r←0
+      :If i=≢ps.list                                                ⍝ Last one?
+      :OrIf currentGroup{0=≢⍺:0 ⋄ ⍺≢GetGroupName(i+1)⊃⍵}ps.list     ⍝ Group change?!
+          :If 3=ref.⎕NC'Cleanup_',currentGroup
+              :If 3⊃⌽(8⍴2)⊤ps.stopFlag
+                  (∪(⎕STOP 1⊃⎕SI),∆stop10,∆stop11)⎕STOP 1⊃⎕SI
+              :Else
+                  ((⎕STOP 1⊃⎕SI)~,∆stop10,∆stop11)⎕STOP 1⊃⎕SI
+              :EndIf
+              at←1⊃ref.⎕AT'Cleanup_',currentGroup
+              :If (2⊃at)∊1 ¯2 ⍝ Accepts a right argument (1=monadic, ¯2=ambivalent)?
+     ∆stop10:     ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Cleanup_',currentGroup
+              :Else
+     ∆stop11:     ref.⍎'Cleanup_',currentGroup
               :EndIf
           :EndIf
       :EndIf

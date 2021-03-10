@@ -1,12 +1,13 @@
- {filename}←PublishPackageToRemoteRegistry_(filename url);uri;client;request;response;msg;packageID
+ {filename}←PublishPackageToRemoteRegistry_(filename uri);client;request;response;msg;packageID;uri_
 ⍝ This sends the file "manually". See also PublishPackageToRemoteRegistry__.
- (uri packageID)←Reg.SeparateUriAndPackageID url
+ (uri packageID)←Reg.SeparateUriAndPackageID uri
+ uri_←ReplaceRegistryAlias uri
  :If 0=≢packageID
  :OrIf (,'/')≡,packageID
      packageID,←2⊃⎕NPARTS filename
  :EndIf
 
- client←NewClient uri
+ client←NewClient uri_
 
  request←R.NewRequest 0
  request.URI←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
@@ -17,7 +18,7 @@
  response←client SendAndReceive request
  :If response.StatusCode≢200
      :If 405≡response.StatusCode
-         :If ∨/'http://'⍷url
+         :If ∨/'http://'⍷uri
              'http:// is not supported'Assert 0
          :Else
              'https:// is not supported'Assert 0

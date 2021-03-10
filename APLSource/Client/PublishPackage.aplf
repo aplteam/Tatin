@@ -20,7 +20,7 @@
  zipFilename←PackIfFolder source
  'Invalid URI specified: not a zip file'Assert'.zip'≡⎕C ¯4↑zipFilename
  :If Reg.IsHTTP uri
-     PublishPackageToRemoteRegistry_ zipFilename uri
+     PublishPackageToRemoteRegistry_ zipFilename registry
  :Else
      PrintToSession'  Read config file for ',source,'...'
      cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_NAME}source

@@ -1,6 +1,7 @@
 ﻿:Namespace Tatin
-
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.18.1 - 2021-03-10
+⍝   * Bug fix for publishing a package
 ⍝ * 0.18.0 - 2021-03-01
 ⍝   * PackageConfig now looks into the current directory if no argument was specified
 ⍝ * 0.17.2 - 2021-02-17
@@ -383,7 +384,7 @@
           ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
       :EndIf
       :Trap 98
-          (rc msg zipFilename)←TC.PublishPackage source url_
+          (rc msg zipFilename)←TC.PublishPackage source url
           :If 200≡rc
               r←'Package published on ',url_
           :Else

@@ -1,0 +1,40 @@
+ r←Test_Server_103(stopFlag batchFlag);⎕TRAP;dir;src;zip;unzip;serverPath;body;cfg;packageID;rc;msg;zipFilename;ts
+⍝ Publish a package with dependencies to the server, then load it and check "date" in the config. Was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ dir←GetTempDir ⍬
+ (src zip unzip)←(⊂dir,'/'),¨'src' 'zip' 'unzip'
+ F.MkDir src zip unzip
+ serverPath←∆GetServerPath
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_A'
+ cfg.version←'0.1.0'
+ cfg.source←'Test.apln'
+ TC.WritePackageConfigFile src cfg
+
+ packageID←'Example-Package_A-0.1.0'
+ (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
+ Assert 200=rc
+
+ {}TC.InstallPackage('https://localhost/',packageID)unzip
+ ts←{⍵.date}TC.Reg.GetJsonFromFile unzip,'/',packageID,'/apl-package.json'
+ →T.GoToTidyUp 645≠⎕DR ts
+ →T.GoToTidyUp(⌊ts)≠60 ⎕DT⊂3↑⎕TS
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ ⎕DL 0.1
+ Assert 0=⊃F.RmDir serverPath,'/',packageID  ⍝ Error? Try →⎕LC
+ F.DeleteFile zipFilename
+ ∆RecompileIndexOnServer
+⍝Done

@@ -1,0 +1,23 @@
+ CorrectDateInAllRegistryPackages flag;path;folders;folder;cfg;json;zipFilename;myZip;date;time
+ :If flag
+     path←'C:\T\Projects\Dyalog\Tatin\TestData\Server\Registry\'
+     folders←#.F.ListDirs path
+     date←20200101
+     time←1
+     :For folder :In folders
+         cfg←⎕JSON⍠('Dialect' 'JSON5')⊣⊃#.F.NGET folder,'/apl-package.json'
+         cfg.date←date+time÷1000000
+         json←##.##.Registry.JSON cfg
+         (⊂json)#.F.NPUT(folder,'/apl-package.json')1
+         :If 60<time←time+1
+             time←1
+             date+←1
+         :EndIf
+         zipFilename←(2⊃#.A.SplitPath folder),'.zip'
+         myZip←⎕NEW #.Z(,⊂folder,'/',zipFilename)
+         folder myZip.Add'apl-package.json'
+         myZip.Dispose
+     :EndFor
+     ⎕←'***'
+ :EndIf
+⍝Done

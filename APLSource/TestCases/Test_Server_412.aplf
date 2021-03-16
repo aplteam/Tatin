@@ -1,0 +1,12 @@
+ r←Test_Server_412(stopFlag batchFlag);⎕TRAP;html
+⍝ Ask for the documentation home page; pretends to be a Browser
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←∆GetHtmlFromServer'localhost/v1/documentation'
+ →T.PassesIf 1=≢'<h2[^>]*>Documentation Center</h2>'⎕S 0⍠('Greedy' 0)⊣html
+
+ r←T._OK
+
+∆TidyUp:
+⍝Done

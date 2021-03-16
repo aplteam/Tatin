@@ -1,0 +1,13 @@
+ r←Test_Misc_009(stopFlag batchFlag);⎕TRAP;result
+⍝ Exercise the "GetServerVersion" function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ result←TC.GetServerVersion'[tatin]'
+
+ →T.PassesIf 0<≢result
+ →T.PassesIf'Tatin'≡1⊃result
+ →T.PassesIf 3=≢result
+
+ r←T._OK
+⍝Done

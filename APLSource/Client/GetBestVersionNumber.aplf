@@ -1,4 +1,5 @@
- r←GetBestVersionNumber(packageID url);client;request;res;f
+ r←{includeBetas}GetBestVersionNumber(packageID url);client;request;res;f
+ includeBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'includeBetas'
  :If f←Reg.IsValidPackageID_Complete packageID
  :OrIf f←Reg.IsValidPackageID_WithMajorNo packageID
  :OrIf f←Reg.IsValidPackageID_WithoutPatchNo packageID
@@ -14,9 +15,10 @@
      request←R.NewRequest 0
      request.URI←'/v1/packages/best_version/',packageID
      request.Headers,←⊂'Accept' 'application/json'
+     request.Headers,←⊂'include-betas'('NY'[1+includeBetas])
      res←client SendAndReceive request
      res.Content Assert 200≡res.StatusCode
      r←url,((~(¯1↑url)∊'/\')/'/'),(⎕JSON⍠('Dialect' 'JSON5')⊣res.Content).BestVersion
  :Else
-     r←Reg.GetBestVersionNumber url,packageID
+     r←includeBetas Reg.GetBestVersionNumber url,packageID
  :EndIf

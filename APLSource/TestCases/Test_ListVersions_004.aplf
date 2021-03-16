@@ -1,0 +1,12 @@
+ r←Test_ListVersions_004(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ List all versions of one particular package that has beta by specifying just {group}-{name}-{major.minor}
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←TC.ListVersions'[local]example-versions-1.0'
+ noOf←≢{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\example-versions-1.0*'
+ →T.PassesIf 0<noOf
+ →T.PassesIf noOf≡≢list
+
+ r←T._OK
+⍝Done

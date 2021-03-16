@@ -1,0 +1,13 @@
+ packageIDs←{path}InjectPublishingDate packageIDs;i;packageID;json
+⍝ This is usd the replace the "-beta-1" part in "1.2.3-beta-1" by 10000000-the publishing date.
+⍝ Useful for sorting purposes.
+ path←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'path'
+ :For i :In ⍳≢packageIDs
+     packageID←i⊃packageIDs
+     :If NotJustDigits{⍵↓⍨1++/2>+\'-'=⍵}{∨/'/\'∊⍵:⊃,/1↓⎕NPARTS ⍵ ⋄ ⍵}packageID
+         json←GetJsonFromFile(AddSlash path),packageID,'/',CFG_Name
+         (i⊃packageIDs)←({⍵/⍨3>+\⍵='-'}packageID),'-',⍕json.date
+     :Else
+         (i⊃packageIDs)←({⍵/⍨3>+\⍵='-'}packageID),'-99999999'
+     :EndIf
+ :EndFor

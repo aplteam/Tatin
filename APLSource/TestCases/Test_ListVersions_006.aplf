@@ -1,0 +1,14 @@
+ r←Test_ListVersions_006(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ List all versions of one particular package that has beta by specifying just {group}-{name}
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←TC.ListVersions'[local]example-versions'
+ →T.PassesIf</list∘{1⍳⍨∨/¨⍵∘⍷¨⍺}¨'1.0.1-This-fix' '1.0.1-That-fix'  ⍝ Because the publishing date...
+ →T.PassesIf</list∘{1⍳⍨∨/¨⍵∘⍷¨⍺}¨'1.0.12-zzz' '1.0.12-That-fix'    ⍝ dictates this sort order
+ noOf←≢{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\example-versions-*'
+ →T.PassesIf 0<noOf
+ →T.PassesIf noOf≡≢list
+
+ r←T._OK
+⍝Done

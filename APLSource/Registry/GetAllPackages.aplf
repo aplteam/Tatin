@@ -1,7 +1,8 @@
- list←GetAllPackages registryPath
+ list←GetAllPackages registryPath;list2
 ⍝ Resturn names of all folders in `registryPath` that are valid package IDs
  list←F.ListDirs registryPath                           ⍝ All folder name
  list←{⊃,/1↓⎕NPARTS ⍵}¨list                             ⍝ Remove path: we only need the package IDs
  list←(IsValidPackageID_Complete¨list)/list             ⍝ Remove everything that is not a valid package ID
- list←list[SortIndexForPackageIDs list]                 ⍝ Only under Windows is the list sorted
+ list2←registryPath InjectPublishingDate list           ⍝ Add publishing date where required
+ list←list[SortIndexForPackageIDs list2]                ⍝ Only under Windows is the list guaranteed to be sorted
 ⍝Done

@@ -1,0 +1,21 @@
+ r←Test_InstallBest_100(stopFlag batchFlag);⎕TRAP;qdmx;dir
+⍝ Attempt to install a latest version of a package from a given Registry that does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir ⍬
+
+ :Trap 0
+     {}TC.InstallPackage'[local]DoesNot-Exist'dir
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'Not found: DoesNot-Exist'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir dir
+⍝Done

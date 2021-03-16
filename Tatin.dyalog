@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.19.0 - 2021-03-16
+⍝   * User command `CheckForBetterVersion` renamed to `CheckForLaterVersion`
+⍝   * Couple of minor changes
 ⍝ * 0.18.1 - 2021-03-10
 ⍝   * Bug fix for publishing a package
 ⍝ * 0.18.0 - 2021-03-01
@@ -157,7 +160,7 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'CheckForBetterVersion'
+          c.Name←'CheckForLaterVersion'
           c.Desc←'Check whether there are better versions of a package available'
           c.Parse←'1 -major'
           r,←c
@@ -255,7 +258,7 @@
       filename←(1⊃⎕NPARTS ##.SourceFile),'Tatin/Client.dws'
       :If 0∊⊃∘⎕SE.⎕NC¨'Tatin' '_Tatin'
       :OrIf forceLoad
-          ('Workspace not found: ',filename)⎕SIGNAL 11/⍨0=⎕NEXISTS filename
+          ('Workspace not found: ',filename)⎕SIGNAL 98/⍨0=⎕NEXISTS filename
           ⎕SE.⎕EX¨'_Tatin' 'Tatin'
           '_Tatin'⎕SE.⎕CY filename
       :EndIf
@@ -314,14 +317,14 @@
       r←⍪r
     ∇
 
-    ∇ r←CheckForBetterVersion Arg;path;majorFlag;question;this
+    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this
       r←''
       path←Arg._1
       majorFlag←Arg.major
       :If majorFlag
-          r←⍪majorFlag TC.CheckForBetterVersion path
+          r←⍪majorFlag TC.CheckForLaterVersion path
       :Else
-          r←TC.CheckForBetterVersion path
+          r←TC.CheckForLaterVersion path
           r←⍪(0<≢¨r)/r
           :If 0  ⍝TODO⍝  May be one day we support this, may be not
               :If 0<≢r
@@ -402,7 +405,7 @@
               :Case 500
                   r←'The server ',url_,' reported an internal error'
               :Else
-                  qdmx.EM ⎕SIGNAL qdmx.EN
+                  qdmx.EM ⎕SIGNAL 98
               :EndSelect
           :Else
               :If ∨/'<title>'⍷qdmx.EM
@@ -458,9 +461,9 @@
       :Else
           qdmx←⎕DMX
           :If 0=≢qdmx.EM
-              ('Not found: ',Arg._1)⎕SIGNAL 11
+              ('Not found: ',Arg._1)⎕SIGNAL 98
           :Else
-              qdmx.EM ⎕SIGNAL 11
+              qdmx.EM ⎕SIGNAL 98
           :EndIf
       :EndTrap
     ∇
@@ -724,7 +727,7 @@
           r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has'
           r,←⊂'not a trailing separator: Tatin is taking care of that.'
           r,←⊂''
-          r,←⊂'By default all packages are listed. You can restrict the output in two ways:'
+          r,←⊂'By default all packages are listed. You can influence the output in two ways:'
           r,←⊂' * -group={groupname} will restrict the list the packages with the given group name.'
           r,←⊂' * -tags=foo,goo will restrict the output to packages that carry the tags "foo" & "goo".'
           r,←⊂''
@@ -775,7 +778,7 @@
           r,←⊂'  ]TATIN.InstallPackage [tatin]APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage [tatin]A@APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage APLTreeUtils2 /pathTo/folder'
-          r,←⊂'  ]TATIN.InstallPackage A@APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.InstallPackage A@APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
           r,←⊂''
           r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
@@ -875,7 +878,7 @@
       :Case ⎕C'Init'
           r,←⊂'Re-establishes the user settings in ⎕SE. Call this in case the user settings got changed on file'
           r,←⊂'and you want to incorporate the changes in the current session.'
-      :Case ⎕C'CheckForBetterVersion'
+      :Case ⎕C'CheckForLaterVersion'
           r,←⊂'Takes the path to a folder with a file "apl-buildlist.json" as argument.'
           r,←⊂'Checks the packages specified in that file for "better" versions.'
           r,←⊂''
@@ -929,9 +932,9 @@
       default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
       isOkay←0
       :If ~0∊⍴default
-          'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠⍴,default
+          'Left argument must be a scalar'⎕SIGNAL 98/⍨1≠⍴,default
       :AndIf ~default∊0 1
-          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 11
+          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 98
       :EndIf
       :If 0=≢default
           add←' (y/n) '
@@ -1023,7 +1026,7 @@
       :EndTrap
     ∇
 
-    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),11}
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),98}
     AddHeader←{0=≢⍺:⍺ ⋄(⍵,[0.5]'-'⍴¨⍨≢¨⍵)⍪⍺}
     EnforceSlash←{'/'@(⍸'\'=⍵)⊣⍵}
     IsScripted←{0::1 ⋄0⊣⎕src ⍵}
@@ -1044,8 +1047,8 @@
       (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
       ⎕IO←1 ⋄ ⎕ML←1
       manyFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'manyFlag'
-      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 11/⍨2≠≡options
-      'Right argument has more than 999 items'⎕SIGNAL 11/⍨999<≢options
+      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 98/⍨2≠≡options
+      'Right argument has more than 999 items'⎕SIGNAL 98/⍨999<≢options
       flag←0
       :Repeat
           ⎕←{⍵↑'--- ',caption,((0≠≢caption)/' '),⍵⍴'-'}⎕PW-1

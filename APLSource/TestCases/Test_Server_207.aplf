@@ -1,0 +1,11 @@
+ r←Test_Server_207(stopFlag batchFlag);⎕TRAP;result;best;expected
+⍝ Ask for best version of a package ID with major number without minor and patch number; includes betas
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ result←1 TC.GetBestVersionNumber'example-versions-1' 'https://localhost'
+ expected←'https://localhost/example-versions-1.0.12-That-fix'
+ →T.PassesIf expected≡result            ⍝ Because it was published later than 1.0.12-zzz
+
+ r←T._OK
+⍝Done

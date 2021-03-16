@@ -1,9 +1,0 @@
- filename←GetZipViaHttp URL;domain;packageID;zippedData;statusCode
-⍝ Requests a ZIP file (assuming that it contains a package) via HTTP
- packageID←GetPackageIDFromFilename URL
- domain←GetDomainNameFromURL URL
- filename←F.GetTempPath,packageID,'.zip'
- (statusCode zippedData)←GetZipViaHTTP_ URL
- ('Attempt to retrieve ',URL,' has failed, RC=',⍕statusCode)Assert 200≡statusCode
- zippedData Reg.WriteNativeFile filename
-⍝Done

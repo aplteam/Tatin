@@ -1,0 +1,26 @@
+ r←Test_InstallBest_005(stopFlag batchFlag);⎕TRAP;dir;refs;expected;refs2
+⍝ Install & load best version from given Registry with {group}-{name}-{major-{minor}-{patch}, betas to be ignored.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ dir←GetTempDir ⍬
+
+ refs←TC.InstallPackage'[local]example-versions-1.0.1'dir
+ →T.GoToTidyUp 1≠≢refs
+
+ refs2←TC.LoadDependencies dir #.TEMP
+ →T.GoToTidyUp 1≠≢refs2
+
+ expected←'MyCode' '1.0.1' '2020-01-06'
+ →T.GoToTidyUp expected≢#.TEMP.versions.Version
+ expected←'example_versions_1_0_1'
+ →T.GoToTidyUp expected≢3⊃'.'(≠⊆⊢)⍕#.TEMP.versions
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir dir
+⍝Done

@@ -1,13 +1,14 @@
- r←GetBestVersionNumber path;id;pattern;list;buff
+ r←includeBetas GetBestVersionNumber path;id;pattern;list;buff;list2;level
 ⍝ Establishes the best version number for ⍵
 ⍝ '{group}-{name}-3.0.0' ← GetBestVersionNumber '{group}-{name}'
 ⍝ '{group}-{name}-2.1.0' ← GetBestVersionNumber '{group}-{name}-2'
 ⍝ '{group}-{name}-1.2.1' ← GetBestVersionNumber '{group}-{name}-1'
 ⍝ '{group}-{name}-1.1.9' ← GetBestVersionNumber '{group}-{name}-1.1'
 ⍝ Returns an empty vector in case nothing fits
+ includeBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'includeBetas'
  r←''
  id←(≢RemovePackageID path)↓path
- :If IsValidPackageID_Complete id
+ :If (~includeBetas)∧IsValidPackageID_Complete id
      :If F.IsDir path
          r←path
      :EndIf
@@ -21,26 +22,29 @@
          id←({⍵↑⍨⍵⍳'-'}{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}buff),id
          path,←id
      :EndIf
-     :Select ⊃'-'+.=id
-     :Case 1
+     level←⊃'-'+.=id
+     :If level∊1 2
          pattern←path,'*'
-     :Case 2
-         pattern←path,'.*'
-     :EndSelect
-     list←⊃F.Dir pattern
-     :If 1='-'+.=id
-         list←('-'=(1+≢id)⊃¨F.CurrentSep A.Last¨list)/list
      :EndIf
-     :If 0<≢list
-         list←list[SortIndexForPackageIDs list]
+     :If 0<≢list←⊃F.Dir pattern
+         :If 1=level
+             list←('-'=(1+≢id)⊃¨F.CurrentSep A.Last¨list)/list
+         :EndIf
+         :If 0<≢list
+             :If ~includeBetas
+                 list←({3>⌈/+\'-'=⍵}¨'/\'∘A.Last¨list)/list   ⍝ Remove any betas versions
+             :EndIf
+             list2←InjectPublishingDate list              ⍝ Add publishing date where required
+             list←list[SortIndexForPackageIDs list2]
+         :EndIf
          r←⊃¯1↑list
-         r←{⍵↑⍨-'-'⍳⍨⌽⍵}r
+         r←{1↓⍵/⍨2≤+\'-'=⍵}⊃,/1↓⎕NPARTS r
          :If IsValidPackageID_WithoutPatchNo id
-             r←({⍵/⍨2>+\'-'=⍵}path),r
+             r←({⍵/⍨2>+\'-'=⍵}path),'-',r
          :ElseIf IsValidPackageID_WithMajorNo id
-             r←({⍵/⍨2>+\'-'=⍵}path),r
+             r←({⍵/⍨2>+\'-'=⍵}path),'-',r
          :Else
-             r←((-≢id)↓path),({⍵/⍨2>+\'-'=⍵}id),r
+             r←((-≢id)↓path),({⍵/⍨2>+\'-'=⍵}id),'-',r
          :EndIf
      :EndIf
  :EndIf

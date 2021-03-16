@@ -1,4 +1,4 @@
- list←ListVersions uri;registryPath;packageID;group;name;version;regEx;pattern
+ list←ListVersions uri;registryPath;packageID;group;name;version;regEx;pattern;list2
 ⍝ Takes a package ID without minor and patch number (but possibly with major) and returns all versions saved for that package ID
  'Invalid package ID'Assert 1 2∊⍨('\/'A.Last uri)+.='-'
  'Invalid package ID'Assert 0 1∊⍨('\/'A.Last uri)+.='.'
@@ -6,7 +6,9 @@
  'Is not a folder'Assert F.IsDir registryPath
  registryPath←F.ExpandPath registryPath
  packageID,←{'*'=¯1↑⍵:'' ⋄ 2='-'+.=⍵:'.*' ⋄ '-*'}packageID
- list←F.ListDirs registryPath,'/',packageID
- list←((~'/\'∊⍨¯1↑registryPath)+≢registryPath)↓¨list            ⍝ All package IDs
- list←list[SortIndexForPackageIDs list]
+ :If 0<≢list←F.ListDirs registryPath,'/',packageID
+     list←((~'/\'∊⍨¯1↑registryPath)+≢registryPath)↓¨list            ⍝ All package IDs
+     list2←registryPath InjectPublishingDate list
+     list←list[SortIndexForPackageIDs list2]
+ :EndIf
 ⍝Done

@@ -1,0 +1,26 @@
+ r←Test_InstallBest_008(stopFlag batchFlag);⎕TRAP;dir;refs;expected;refs2
+⍝ Install & load a specific version ith {group}-{name}-{major-{minor}-{patch} that is an existing beta
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ dir←GetTempDir ⍬
+
+ refs←TC.InstallPackage'[local]example-versions-1.0.12-zzz'dir
+ →T.GoToTidyUp 1≠≢refs
+
+ refs2←TC.LoadDependencies dir #.TEMP
+ →T.GoToTidyUp 1≠≢refs2
+
+ expected←'MyCode' '1.0.12-zzz' '2020-01-05'
+ →T.GoToTidyUp expected≢#.TEMP.versions.Version
+ expected←'example_versions_1_0_12_zzz'
+ →T.GoToTidyUp expected≢3⊃'.'(≠⊆⊢)⍕#.TEMP.versions
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir dir
+⍝Done

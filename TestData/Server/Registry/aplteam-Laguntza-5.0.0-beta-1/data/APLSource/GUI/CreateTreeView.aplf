@@ -1,0 +1,25 @@
+ CreateTreeView←{
+     ∆Ref←⍵
+     (n p)←∆Ref.(n p)
+     ∆←⊂'TreeView'
+     ∆,←⊂'Coord' 'Prop'
+     ∆,←⊂'Posn'(0 0)
+     ∆,←⊂'Size'(100 100)
+     ∆,←⊂'Event' 9999(FullPathToHandler'##.OnUpdate')∆Ref
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     n.treeFont←⎕NEW'Font'(↓('PName' 'Weight' 'Size'),[0.5]n.font.(PName Weight Size))
+     ∆,←⊂'Font'n.treeFont
+     n.tree←⍎'tv'n.contents_sf.⎕WC ∆
+     n.tree.onKeyPress←(FullPathToHandler'##.OnKeyPressInTreeView')∆Ref
+     n.tree.onItemUp←(FullPathToHandler'##.OnItemUpInTreeView')∆Ref
+     n.tree.onContextMenu←(FullPathToHandler'##.OnContextMenu')∆Ref
+     n.tree.onExpanding←(FullPathToHandler'##.OnExpandingInTreeView')∆Ref
+     n.tree.onRetracting←(FullPathToHandler'##.OnRetractingInTreeView')∆Ref
+     n.tree.onMouseWheel←'OnMouseWheelInTreeView'
+     n.tree.on9998←(FullPathToHandler'OnDelayedUpdate')n.tree
+     n.tree.on9997←(FullPathToHandler'On9997InTreeView')
+     n.tree.on9993←(FullPathToHandler'On9993EmphasizeSearchTerm')∆Ref
+     1=⍵.p.userMode:⍬
+     ⍬
+⍝ Creates the treeview and expands the very first entry
+ }

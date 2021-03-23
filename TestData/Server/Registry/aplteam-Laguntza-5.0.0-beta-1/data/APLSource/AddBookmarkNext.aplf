@@ -1,0 +1,17 @@
+ AddBookmarkNext←{
+     in←⍵
+     0=in:⍬                                         ⍝ Nothing to do: get out
+     0=≢in:⍬                                        ⍝ Nothing to do: get out
+     ∆Ref←⍺
+     id←∆Ref.d.tree[in;I.(Parent TopicName)]        ⍝ Parent+Name as id
+     ∆Ref.d.bookmark,←⊂id                           ⍝ Remember it
+     name←'i',⍕1++/'i'=↑¨∆Ref.n.bookmarkMenu.⎕WN''
+     title←I.Title⊃∆Ref.d.tree[↑in;]                ⍝ Title of the topic
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Caption'title
+     rf←⍎name ∆Ref.n.bookmarkMenu.⎕WC ∆
+     rf.id←id                                       ⍝ For identification (delete etc)
+     rf.onSelect←'OnMenuCmd' 'bookmark'
+     ∆Ref CheckBookmarkButton in
+⍝ Called when entries need to be created in the "Bookmarks" menu.
+ }

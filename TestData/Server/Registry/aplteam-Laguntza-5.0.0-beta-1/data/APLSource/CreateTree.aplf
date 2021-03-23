@@ -1,0 +1,12 @@
+ CreateTree←{
+ ⍝ Builds up the tree, saves it in its designated file and returns the tree as result.
+     p←⍵
+     tree←⊃BuildHelpTree p.source
+     tree,←⍳≢tree                       ⍝ The row numbers
+     tree←tree[;0 1 2 3 5 6]            ⍝ Drop active flag: at this stage all rows are active
+     0=≢tree:'The source namespace is empty!'⎕SIGNAL 11
+     fullNames←↑¨{(⍕⍺),'.',⍵}/¨↓tree[;I.(Parent TopicName)] ⍝ Here I.Parent is still a ref!
+     fullNames←{3=↑⎕NC ⍵:⍵ ⋄ ⍵,⍵{⍵/⍨3=⎕NC ⍺,⍵}'.∆DefaultPage'}¨fullNames  ⍝ Add ∆DefaultPage if appropriate
+     tree,←9=∊⎕NC¨(⍕¨tree[;I.Parent]),¨'.',¨tree[;I.TopicName]  ⍝ Is is a node?
+     tree
+ }

@@ -1,0 +1,19 @@
+ {in}←{ev}Display(∆Ref pattern);tab;st;_;in;n;p
+⍝ Designed to be called when the Help Viewer is already established.
+⍝ ∆Ref.p.visible defines the visibility of the form.
+⍝ However, with a 1 as left argument the caller of "Display" can
+⍝ force the GUI to become visible anyway.
+⍝ Returns the item number.
+ ev←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'ev'              ⍝ 1:enforce visibility, even if p.visibile is 0; ¯1: very first call
+ (n p)←∆Ref.(n p)
+ pattern←PolishPagePattern pattern
+ in←∆Ref GetItemNumberFromPattern pattern
+ n.infoSB.BCol←0                      ⍝ Reset status bar color
+ :If ((,¯1)≢,in)∧0≠≢in
+     in{⍵=⍺:0 ⋄ ⍺}←≢∆Ref.d.tree
+     {}∆Ref SelectItemInTreeView in
+     _←⎕NQ n.tree 9999                ⍝ Enforce screen update
+     ⎕NQ n.tree'Flush'                ⍝ DO NOT call this with a 1 as left argument: won't work!
+ :EndIf
+ {}∆Ref SetVisible ev{⍺≡1:⍺ ⋄ ⍵}p.visible
+ {}RemoveEggTimer ∆Ref

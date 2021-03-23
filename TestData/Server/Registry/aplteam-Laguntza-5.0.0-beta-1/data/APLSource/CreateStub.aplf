@@ -1,0 +1,54 @@
+ {r}←{parms}CreateStub name;ref;ref2;parms;parent;msg;cmd
+⍝ Creates a new help system as a starting point. It comes with two pages ("Overview" and "Copyright")
+⍝ and a sub folder "Sub" that has another two pages, "Foo" and "Goo".\\
+⍝ `name` must be the name of the new help system. If it is a relative path (like `Foo`) the help
+⍝ system is created in `#`. If it is a full path (like `#.Here.Foo`) a help system `Foo`
+⍝ will be created in `#.Here` which must already exist.\\
+⍝ You can specify a parameter space, typically created by calling `Laguntza.CreateParms ''`, as
+⍝ optional left argument.
+⍝ `r` is a pointer to the newly created help system.
+⍝ In case something is wrong with the argument(s) `CreateStub` throws an error.
+ parms←{0<⎕NC ⍵:⍎⍵ ⋄ ⍬}'parms'
+ :If 0≠≢parms
+     'Invalid container namespace'⎕SIGNAL 11/⍨326≠⎕DR parms
+ :EndIf
+ parms←CreateParms parms
+ :If '.'∊name
+     (parent name)←{⍵{(⍺↓⍨-1+≢⍵)(⍺↑⍨-≢⍵)}'.'A.Last ⍵}name
+ :ElseIf 0=≢parms.source
+     parent←((⍕⎕THIS),'.')∘{↑⍵↓⍨+/∧\⍺∘≡¨(≢⍺)↑¨⍵}⎕NSI
+ :Else
+     parent←⍕parms.source
+ :EndIf
+ {}{⍵ #.⎕NS''}⍣(↑0=⎕NC parent)⊣parent
+ 'Invalid container namespace'⎕SIGNAL 11/⍨(9≠⎕NC parent)∧(,'#')≢,parent
+ parent←⍎parent
+ :Trap 0
+     ⎕SIGNAL/{0=⍵:''⍬ ⋄ ¯1=⍵:'Invalid name' 11 ⋄ 'Name is already taken' 11}parent.⎕NC name
+ :Else
+     'Invalid name'⎕SIGNAL 11
+ :EndTrap
+ ref←⍎name parent.⎕NS''
+ parms.helpCaption←name
+ parms.source←parent⍎name
+ parms.expand←'All'
+ :If CheckOnEditFixForSaltHandler ⍬
+     :If 0=≢parms.saltFolder
+         :If 'Laguntza & SALT'YesOrNo'Do you want <',name,'> to be managed by SALT?'
+             parms.saltFolder←DefineSaltHomeFolder name
+         :EndIf
+     :EndIf
+ :EndIf
+ ref2←⍎'Sub'ref.⎕NS''
+ ref.Overview←'[DATA]:index=''How to start ⋄ Get going ⋄ First steps''' '' '# Overview' '' 'This is the "Overview" page'
+ ref.Copyright←'[DATA]:index=''Copyright''' '' '# Copyright' '' '(c) Copyright 2021 xyz'
+ ref2.Foo←'[DATA]:index=''This is about Foo''' '# Foo' '' 'This is the "Foo" page' '' 'Go to →[Overview]'
+ ref2.Goo←'[DATA]:index=''This is about Goo''' '# Goo' '' 'This is the "Goo" page' '' 'Go to →[Overview]'
+ r←1 New parms
+ :If 0≠≢parms.saltFolder
+ :AndIf CheckOnEditFixForSaltHandler ⍬
+     cmd←'"',(parms.saltFolder~'"'),'" -patterns=',name,' -loadfn -makedir -noprompt -clear'
+     SaveHelpSystemWithSalt parms ref
+ :EndIf
+ r.n.∆Ref TellAcreAboutChange ref
+⍝Done

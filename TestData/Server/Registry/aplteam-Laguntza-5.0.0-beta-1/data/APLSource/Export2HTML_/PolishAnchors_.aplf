@@ -1,0 +1,13 @@
+ PolishAnchors_←{
+⍝ Checks whether the src=" part of an image definition is an absolute path name.
+⍝ If yes: leave it alone.
+⍝ If no: add as many "../" as defined by `level`.
+     level←⍺
+     html←⍵
+     src←{⍵↑⍨⍵⍳'"'}'src="'{(≢⍺)↓⍵↓⍨(⍺⍷⍵)⍳1}html
+     f1←'/'=1⍴src
+     f2←'\\'≡2⍴src
+     f3←':'∊src
+     f1∨f2∨f3:html
+     'src="'⎕R('&',↑,/level⍴⊂'../')⊣html
+ }

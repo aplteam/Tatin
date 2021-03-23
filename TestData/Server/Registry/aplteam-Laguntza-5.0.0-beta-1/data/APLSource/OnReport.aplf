@@ -1,0 +1,14 @@
+ OnReport←{
+⍝ Investigates which "Report" command the user has actually issued
+⍝ and calls the appropriate function.
+     ref←⍎0⊃⍵                               ⍝ Ref to the menu command
+     cmd←{⍵↑⍨-'.'⍳⍨⌽⍵}0⊃⍵                   ⍝ The selected "Print" command
+     all←'CurrentItem' 'UserGuide' 'ObjectModelRef' 'Object' 'FunctionRef' 'Full'
+     b←cmd∘≡¨all                            ⍝ Which one is it?
+     _←ShowEggTimer ∆Ref
+     ref.Active←0
+     _←⍎'Report',((b⍳1)⊃all),' ⍬'           ⍝ Execute the work horse
+     _←RemoveEggTimer ∆Ref
+     ref.Active←1
+     0
+ }

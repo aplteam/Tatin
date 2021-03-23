@@ -1,0 +1,13 @@
+ {r}←Reset;list;l2;this
+⍝ Deletes all Forms in HelpForms and unties all files connected to those forms
+ r←⍬
+ :If 9=⎕NC'HelpForms'
+     :If 0≠≢list←HelpForms.(⎕NL-9)
+     :AndIf 0≠≢list←(HelpForms.{'Form'≡⍵ ⎕WG'Type'}¨list)/list
+         list←HelpForms.⍎¨list
+         FilesAndDirs.DeleteFile list.∆tempFilename
+         {6::⍬ ⋄ ⎕FUNTIE ⍵.n.∆Ref.f.tieNo}¨list
+         {}{0::⍬ ⋄ ⍬⊣⍵.Close}¨list
+     :EndIf
+     {}HelpForms.(⎕EX ⎕NL-9)
+ :EndIf

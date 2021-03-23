@@ -1,0 +1,54 @@
+ CreateEditMenu←{
+     ∆Ref←⍵
+     tab←⎕UCS 9
+     eh←FullPathToHandler'##.OnMenuCmd'  ⍝ Event handler
+     ∆Ref.n.editMenu←⍎'edit'∆Ref.n.menubar.⎕WC'Menu' '&Edit'
+     tx←'Collapse all branches in the tree'
+     ∆Ref.n.collapse←⍎'collapse'∆Ref.n.editMenu.⎕WC'MenuItem'('Collapse all',tab,'Ctrl+Shift+"-"')('Event' 'Select'eh)('Hint'tx)('Accelerator'(109 3))('HintObj'∆Ref.n.infoSB)
+     tx←'Expand all branches in the tree'
+     ∆Ref.n.expand←⍎'expand'∆Ref.n.editMenu.⎕WC'MenuItem'('Expand all',tab,'Ctrl+Shift+"+"')('Event' 'Select'eh)('Hint'tx)('Accelerator'(107 3))('HintObj'∆Ref.n.infoSB)
+
+    ⍝ _←'f.mb.edit.s1'⍵.⎕WC'Separator'
+    ⍝ ↓↓↓ Unfortunately, "Find" won't work with the IE ActiveC control.
+    ⍝ _←'f.mb.edit.find'⍵.⎕WC'MenuItem'('Caption'('Find',tab,'Ctrl+F'))('Event' 'Select' (FullPathToHandler'##.OnFind'))
+
+     ∆Ref.p.userMode:⍬
+
+     ∆Ref.n.editMenuSep1←⍎'sep1'∆Ref.n.editMenu.⎕WC'Separator'
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Go to row number...',tab,'Ctrl+Shift+R'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Hint' 'Aks for a row number and then show that row'
+     ∆,←⊂'HintObj'∆Ref.n.infoSB
+     ∆,←⊂'Accelerator'(82 3)
+     ∆Ref.n.gotoRow←⍎'gotoRow'∆Ref.n.editMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Go to next emphasized topic',tab,'Ctrl+Shift+G'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Hint' 'Use this to go through all emphazised topics'
+     ∆,←⊂'HintObj'∆Ref.n.infoSB
+     ∆,←⊂'Accelerator'(71 3)
+     ∆Ref.n.nextBold←⍎'nextBold'∆Ref.n.editMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Reset any emphasized topics'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Hint' 'Undo any emphasizing done by one of the reports'
+     ∆,←⊂'HintObj'∆Ref.n.infoSB
+     ∆Ref.n.undo←⍎'unbold'∆Ref.n.editMenu.⎕WC ∆
+
+     ∆Ref.n.editMenuSep2←⍎'sep2'∆Ref.n.editMenu.⎕WC'Separator'
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Edit (or inject) ∆TopicProperties',tab,'Ctrl+T'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Accelerator'(84 2)
+     ∆,←⊂'Hint' 'Edit an existing or inject a new ∆TopicProperties function'
+     ∆,←⊂'HintObj'∆Ref.n.infoSB
+     ∆Ref.n.handleTopicProperties←⍎'handleTopicProperties'∆Ref.n.editMenu.⎕WC ∆
+
+     ⍬
+     ⍝ Create the "Edit" menu
+ }

@@ -139,6 +139,8 @@ Similarly, if your package `Foo` consist of the two namespaces `Boo` and `Goo`, 
 
 #### assets
 
+This defines the files the source code relies on in one way or another, like CSS files, JavaScript files, images and what not.
+
 This must be a simple text vector that can represent:
 
 * A single filename
@@ -151,6 +153,23 @@ There is one exception: when an absolute path is specified but it's partly ident
 
 Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.
 
+##### Accessing assets from an instance
+
+In case you need to access assets from an instance of a package you have two choices:
+
+1. Create a shared method like this:
+
+   ```
+   r←GetAssetFolder
+   r←##.##.∆HOME
+   ```
+
+   You can then call this shared method from within an instance method.
+
+2. Use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
+
+   Therefore the expression `(⊃⊃⎕CLASS ⎕THIS).##.##.∆HOME` returns what's on `∆HOME`.
+
 
 #### description
 
@@ -158,11 +177,13 @@ A short description of what the package is supposed to do, or what kind of probl
 
 This information is typically used when a human accesses a Tatin Server with a Browser.
 
-`description` must not be empty.
+`description` _must not_ be empty.
 
 #### group
 
 The group part of the package ID[^id]
+
+A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.
 
 #### name
 
@@ -174,11 +195,15 @@ A URL that points to something like GitHub.
 
 An example is `https://github.com/aplteam-MarkAPL-9.2.0`
 
+It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.
+
 #### source
+
+This defines the source code files that are going to be part of the package.
 
 The name of a text file that contains code or a folder that contains a collection of code files. `source` _must not_ be empty.
 
-If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script).
+If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script) or `.aplf` (a function) or `.aplo` (an operator).
 
 If it's a folder it might contain any number and mixture of the aforementioned files plus `.aplf` (functions) and `.aplo` (operators). Any files with other extensions are misplaced and will be ignored.
 
@@ -195,7 +220,7 @@ The version[^version] part of the package ID[^id]
 
 Examples for valid version numbers are `1.2.3`, `1.2.3-beta1`, `1.2.3-beta1+30164` and `18.0.0+30165`
 
-The optional build number is ignored by Tatin.
+The optional build number, separated by the `+` sign, is ignored by Tatin.
 
 For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
@@ -238,7 +263,7 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 ##### url
 
-WHen a package is loaded or installed from a Tatin Server, "url" is injected, and points back to that server.
+When a package is loaded or installed from a Tatin Server, "url" is injected, and points back to that server.
 
 ### Access after loading a package
 

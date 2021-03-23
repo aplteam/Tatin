@@ -1,0 +1,15 @@
+ CheckBookmarkButton←{
+     ∆Ref←⍺
+     in←⍵
+     n←∆Ref.n
+     flag←~(⊂∆Ref.d.tree[in;I.(Parent TopicName)])∊∆Ref.d.bookmark ⍝ Not already bookmarked?
+     n.bookmarkBtn.Active←flag      ⍝ The Bookmark button
+     n.addBookmark.Active←flag      ⍝ Handle the "Add bookmark" menu item
+     flag←~flag                     ⍝ Already bookmarked?
+     n.delBookmark.Active←flag      ⍝ Handle the "Del bookmark" menu item
+     flag←AreThereNoBookmarksYet ∆Ref  ⍝ Is there are any bookmark at all?
+     n.delAllBookmarks.Active←flag  ⍝ Handle the "Del all bookmarks" menu item
+     ⍬
+⍝ Makes the "Bookmark" toolbutton as well as the "Bookmark" menu item(s)
+⍝ active/inactive depending on the circumstances
+ }

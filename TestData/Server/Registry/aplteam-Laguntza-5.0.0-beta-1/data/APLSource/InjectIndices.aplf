@@ -1,0 +1,21 @@
+ InjectIndices←{
+⍝ ⍵ are the indices of a single page. These are injected into the already existing indices
+⍝ while old ones are removed.
+⍝ This function is typically called after a page update.
+     ∆Ref←⍺
+     (indices in mat)←⍵
+     (entries rows fullMat)←⎕FREAD ∆Ref.f.(tieNo ∆index)
+     mat≡(rows=↑in)⌿fullMat:⍬                           ⍝ No change, so nothing needs to be done
+     b←rows≠↑in
+     (entries rows fullMat)←b∘⌿¨entries rows fullMat    ⍝ Remove the old ones, if any
+     entries,←indices
+     rows,←in
+     fullMat⍪←mat
+     fullMat[;0]←FillRowsInIndicesMatrix fullMat[;0]
+     ind←⍋⊃fullMat[;0]
+     entries←entries[ind]
+     rows←rows[ind]
+     fullMat←fullMat[ind;]
+     fullMat←{m←⍵ ⋄ 0=≢ind←⍸{(⍵⍳⍵)≠⍳≢⍵}m[;0]:m ⋄ m[ind;0]←' ' ⋄ m}fullMat
+     ⍬⊣(entries rows fullMat)⎕FREPLACE ∆Ref.f.(tieNo ∆index)
+ }

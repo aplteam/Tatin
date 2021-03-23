@@ -1,0 +1,13 @@
+ AddSavedBookmarksToMenu←{
+     ∆Ref←⍺
+     ins←⍵                                  ⍝ Item number(s)
+     (0=≢ins):⍬                             ⍝ No Bookmarks: done!
+     _←'sep1'∆Ref.n.bookmarkMenu.⎕WC'Separator'
+     first←0⊃,ins
+     _←∆Ref AddBookmarkFirst first
+     (1=≢ins):⍬                             ⍝ Just one: done!
+     _←∆Ref AddBookmarkNext¨1↓ins           ⍝ All remaining ones
+     ⍬
+⍝ Called at an early stage, after any Bookmarks have been read from the Registry
+⍝ ⍵ are (valid! checked by caller) item numbers pointing into the tree.
+ }

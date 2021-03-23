@@ -1,0 +1,22 @@
+ {r}←∆Ref AddToTopicProperties(name parent);result;ind;body;title;cin;ci;cmd
+⍝ Adds "name" to ∆TopicProperties if that exists in `parent` at all.
+ r←⍬
+ :If r←3=⎕NC(⍕parent),'.∆TopicProperties'
+     result←⍎(⍕parent),'.∆TopicProperties ⍬'
+     ci←GetCurrentItem ∆Ref.n       ⍝ current item (new page "name" goes AFTER that)
+     cin←ci⊃∆Ref.n.tree.Items       ⍝ current item name
+     ind←1+GetTopicIndexFromCaption cin result
+     title←HTML.GetTitle⍎(⍕parent),'.',name
+     title←(name≡{0=+/b←' '=w←⍵:w ⋄ (b/w)←'_' ⋄ w}title)⊃title''
+     title~←'`'
+     result←(ind↑result)⍪(name title 1 0)⍪ind↓result
+     body←⍪GetTopicPropertyTemplate ⍬
+     body⍪←⍪ReformatTopicPropertyResult result
+     parent.⎕FX,body
+     :If CheckOnEditFixForSaltHandler ⍬
+         cmd←(⍕parent),'.∆TopicProperties ',(GetSaltPath parent),'∆TopicProperties.dyalog -noprompt'
+         {}⎕SE.SALT.Save cmd
+     :Else
+         ∆Ref TellAcreAboutChange(⍕parent),'.∆TopicProperties'
+     :EndIf
+ :EndIf

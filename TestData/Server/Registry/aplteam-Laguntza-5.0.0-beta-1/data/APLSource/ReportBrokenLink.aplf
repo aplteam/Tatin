@@ -1,0 +1,10 @@
+ ReportBrokenLink←{
+     (X row)←⍺
+     link←⍵
+     ((link='*')/link)←'★'
+     r←{' INVALID LINK: ',⍵,' '}{⍵,('['∊⍵)/']'}1↓link
+     X.∆Ref.p.userMode:r
+     _←X.∆Ref ReportBrokenLink_ link row
+     ⎕THIS.X.linkReport,←⊂'broken'
+     r
+ }

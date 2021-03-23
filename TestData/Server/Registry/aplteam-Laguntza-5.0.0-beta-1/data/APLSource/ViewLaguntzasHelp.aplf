@@ -1,0 +1,32 @@
+ {ref}←ViewLaguntzasHelp dummy;⎕ML;⎕IO;expand;filename;msg;debug;tieNo;parms;ps
+⍝ Puts Laguntza's own help on display
+ ⎕ML←3 ⋄ ⎕IO←0
+ filename←##.∆HOME,'/',File.GetHelpFileName
+ expand←'None'
+ :If ~File.DoesFileExist filename
+     msg←'Could not find:'filename
+     msg,←'' 'The programm cannot continue.'
+         ⍝ --- Debug information
+     :If debug←0
+         msg,←⊂'folder name: ',folderName
+         msg,←⊂'Command line: ',⎕C 2 ⎕NQ'#' 'GetCommandLine'
+         msg,←⊂'Current directory: ',#.FilesAndDirs.PWD
+     :EndIf
+     'Laguntza'Show msg
+ :Else
+     tieNo←filename ⎕FSTIE 0
+     parms←⎕FREAD tieNo 6
+     ⎕FUNTIE tieNo
+     ps←⎕NS''
+     parms[parms[;0]⍳⊂'userMode';1]←1 ⍝ This function always runs in user mode
+     :If 0≠≢parms
+         ps.{⍎(0⊃⍵),'←1⊃⍵'}¨↓parms
+     :EndIf
+     ps.folderName←##.∆HOME
+     :If File.DoesFileExist'help.ico'
+         ps.helpIcon←'file:///',(↑⎕CMD'cd'),'\help.ico'
+     :EndIf
+     ps.visible←1
+     ps.page←GetPageName ⍬
+     ref←New ps
+ :EndIf

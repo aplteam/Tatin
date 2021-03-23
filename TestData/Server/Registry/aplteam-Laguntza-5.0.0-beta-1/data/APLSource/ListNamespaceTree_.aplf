@@ -1,0 +1,15 @@
+ ListNamespaceTree_←{
+⍝ Returns a list of all namespaces in ⍵, including ⍵ itself.
+⍝ Does NOT return unnamed namespaces or GUI instances.
+⍝ Does not fall for circle references.
+     ⍺←¯1
+     ref←⍵
+     container←{(¯1≡⍵):{⍵.buf←'' ⋄ ⍵}⎕NS'' ⋄ ⍵}⍺
+     list←ref{⍺.(⍎⍕'⍺',⌽⎕NL-9.1)}⍬      ⍝ Ordinary & unnamed namespaces (NS)
+     list/⍨←{'['∊⍵:0 ⋄ 0::0 ⋄ (⊂⍵ ⎕WG'Type')∊'Root' 'Namespace' 'Session'}∘⍕¨list
+     list~←container.buf
+     container.buf,←list
+     (0=≢list):container.buf
+     _←container ∇¨list
+     container.buf
+ }

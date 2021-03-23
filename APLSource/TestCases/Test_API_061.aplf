@@ -1,0 +1,17 @@
+ r←Test_API_061(stopFlag batchFlag);⎕TRAP;res1
+⍝ Exercise ⎕SE.Tatin.LoadPackage
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ res1←⎕SE.Tatin.LoadPackage'aplteam-APLProcess-0.2.9' '#.TEMP'
+ →T.GoToTidyUp'0.2.9'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir res1
+⍝Done

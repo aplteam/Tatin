@@ -1,0 +1,8 @@
+ {r}←{refToParent}EditFnsByQED name
+⍝ Allows "edit-through" in version 14.1 and later.
+ refToParent←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕THIS}'refToParent'
+ :If 14.1≤↑(//)⎕VFI{⍵/⍨2>+\'.'=⍵}1⊃'#'⎕WG'APLVersion'
+     r←(refToParent.⎕ED⍠('EditName' 'Allow'))name
+ :Else
+     r←refToParent.⎕ED name
+ :EndIf

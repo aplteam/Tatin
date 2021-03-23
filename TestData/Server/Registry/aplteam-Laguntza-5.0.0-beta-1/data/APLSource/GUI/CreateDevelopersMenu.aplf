@@ -1,0 +1,52 @@
+ CreateDevelopersMenu←{
+     ∆Ref←⍵
+     n←∆Ref.n
+
+     ∆Ref.p.userMode:⍬⊣n.developersMenu←⍬ ⍝ Get out if it's a RunTime
+
+     tab←⎕UCS 9
+     eh←FullPathToHandler'##.OnMenuCmd'    ⍝ Event handler
+     n.developersMenu←⍎'dev'n.menubar.⎕WC'Menu' '&Developers'('Align' 'Right')
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Compile Help',(⎕UCS 9),'Shift+F5'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Accelerator'(116 1)
+     ∆,←⊂'Hint' 'All help files are re-created from scratch; then the GUI is updated'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.compileHelp←⍎'compile'n.developersMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Show topic in browser'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Hint' 'Puts the current topic in your default browser; useful for HTML/CSS checking'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.showHtmlFile←⍎'showHtmlFile'n.developersMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Show the HTML'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Hint' 'Shows the HTML of the WebBrowser ActiveX control '
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.showHtml←⍎'showHtml'n.developersMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Create proofread document'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Hint' 'Creates an HTML document with all the help pages useful for opening with a word processor'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.proofRead←⍎'proofRead'n.developersMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Browse internal data'
+     ∆,←⊂'Event' 'Select'eh
+     ∆,←⊂'Hint' 'Puts the internal data driving the GUI into a []ED window'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.browseTree←⍎'browseTree'n.developersMenu.⎕WC ∆
+
+     n.developersMenuSep1←⍎'s1'n.developersMenu.⎕WC'Separator'
+
+     eh CreateReportSubMenu ∆Ref
+⍝ Create the "developer" menu (only in non-user mode)
+⍝ Offers utilities useful for developers
+ }

@@ -1,0 +1,14 @@
+ {r}←{testFlag}InjectNewNode ∆Ref;row;parentName;parent;name;type
+ r←⍬
+ testFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'testFlag'
+ row←GetCurrentItem ∆Ref.n
+ parentName←⍕parent←∆Ref GetParentOf row
+ :If 0≠≢name←testFlag GetNameForNewNode parent
+     :If ∆Ref.d.tree[row;I.IsNode]
+         type←testFlag AskForNodeType ∆Ref
+     :Else
+         type←⊂'sibling'
+     :EndIf
+ :AndIf type∊'sibling' 'child'
+     testFlag InjectNewNode_ ∆Ref name parent type row
+ :EndIf

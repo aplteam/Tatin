@@ -1,0 +1,24 @@
+ {r}←∆Ref ShowTopic id;bool
+⍝ [0] Makes the form visible.\\
+⍝ [1] Converts "id" into a row number pointing into `∆Ref.d.tree`. "id" can be one of:\\
+⍝ * A simple name. However, if this identifies more than on page only the first one is displayed.
+⍝ * A full path like `#.MyDoc.Ref.AllFns.MyFns`.
+⍝ * An integer. This is treated then as a `TopicID`. This is the recommended way.
+⍝   (See method `FindTopic` for an easy way to find a `TopicID`).
+⍝
+⍝
+⍝ [2] Makes sure that this row is displayed.\\
+⍝ Returns a 0 in case "id" could not be identified ("Page not found" is displayed then)
+⍝ or a 1 in case it could.
+ r←0
+ :If '.'∊id
+     bool←((-≢id)↑¨GetParentAndTopicNameAsText ∆Ref.d.tree)≡¨⊂id
+ :Else
+     bool←∆Ref.d.tree[;I.TopicName]≡¨⊂id
+ :EndIf
+ :If 0=+/bool
+     {}(⍕id)ShowPageNotFound ∆Ref
+ :Else
+     Display ∆Ref(bool⍳1)       ⍝ Show the first hit
+ :EndIf
+ ∆Ref.Visible←1

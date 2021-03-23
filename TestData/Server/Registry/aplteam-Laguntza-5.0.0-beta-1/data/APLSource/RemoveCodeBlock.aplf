@@ -1,0 +1,7 @@
+ RemoveCodeBlock←{
+⍝ ⍵ is a vector of text vectors representing a help page (markdown).
+⍝ Strictly speaking the RegEx is not correct: it allows more than 3 leading spaces. However,
+⍝ this is a necessity here because the code block(s) might be part of a list, and we don't
+⍝ have the means to check this properly here. For every-day usage that should not matter.
+     '(^\s{0,}~{3,}).*?(?1)'⎕R''⍠('Mode' 'M')('DotAll' 1)⊣⍵
+ }

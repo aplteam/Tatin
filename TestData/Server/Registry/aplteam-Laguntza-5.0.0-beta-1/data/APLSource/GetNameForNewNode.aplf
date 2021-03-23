@@ -1,0 +1,29 @@
+ r←testFlag GetNameForNewNode parent;flag;list;name;key;default;caption
+ flag←0
+ :If testFlag
+     :If 0=≢list←'N'parent.⎕NL 9
+         r←'Node_01'
+     :Else
+         r←'Node_',¯2↑'0',⍕1+↑↑{(//)⎕VFI ⍵↓⍨1+⍵⍳'_'},¯1↑'Test_'{⍵⌿⍨((≢⍺)↑[1]⍵)∧.=⍺}list
+     :EndIf
+ :Else
+     default←''
+     :Repeat
+         caption←'Insert node > ',⍕parent
+         (key r)←caption AskString.Run ∆Ref'Specify a node name (must be a valid APL name; blanks become "_"):'default
+         :If 'Cancel'≡key
+             r←''
+             :Return
+         :EndIf
+         :Select ↑parent.⎕NC r
+         :Case ¯1
+             Show'Sorry:'('   <',r,'>')'is not a valid APL name.' '' 'Please try again.'
+             default←r
+         :Case 0
+             flag←1
+         :Else
+             Show'Sorry:'('   <',r,'>')'is already taken.' '' 'Please try again.'
+             default←r
+         :EndSelect
+     :Until flag
+ :EndIf

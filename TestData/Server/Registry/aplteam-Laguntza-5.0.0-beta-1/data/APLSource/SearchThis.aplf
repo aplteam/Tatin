@@ -1,0 +1,17 @@
+ SearchThis←{
+     ∆Ref←⍺
+     0=1↑0⍴⍵:⍵      ⍝ Numeric?! That is already an item nunber then
+     '#.'≡2↑⍵:⍵     ⍝ Already fully qualified
+     sa←1           ⍝ 1: Ignore container in search
+     sa,←⊂⍵         ⍝ 2: Search string
+     sa,←0          ⍝ 3: full text search
+     sa,←1          ⍝ 4: 1=search Reference
+     sa,←1          ⍝ 5: 1=search User's Guide
+     sa,←0          ⍝ 6: 1=search Misc
+     sa,←1          ⍝ 7: unique flag ("drop doubles")
+     sa,←0          ⍝ 8: fuzzy search flag (find anywhere)
+     sa,←0          ⍝ 9: lower case flag
+     (line name type)←∆Ref Search.Search sa     ⍝ Perform the search
+     line
+⍝ Search for ⍵ and return the line number (hit) or ⍬ for "no hit"
+ }

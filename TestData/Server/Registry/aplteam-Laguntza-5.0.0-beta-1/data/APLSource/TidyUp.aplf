@@ -1,0 +1,8 @@
+ TidyUp←{
+⍝ Checks whether anything inside Help
+     (0=⎕NC'HelpForms'):⍬                 ⍝ Nothing there to worry
+     (0=≢l←HelpForms.⎕NL-9):⍬             ⍝ It's empty - done
+     l←HelpForms.⍎¨l                      ⍝ It's empty - done
+     (0=+/b←~{0::0 ⋄ 'Form'≡⍵.Type}¨l):⍬  ⍝ All of them are forms - done
+     ⍬⊣⎕EX¨⍕¨b/l
+ }

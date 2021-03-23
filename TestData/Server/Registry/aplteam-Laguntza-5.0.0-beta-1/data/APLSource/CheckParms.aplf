@@ -1,0 +1,12 @@
+ CheckParms←{
+     ps←⍵
+     0=≢ps.helpCaption:'"helpCaption" not found'⎕SIGNAL 6
+     ps.trapErrors←(ps.trapErrors≡¯1)⊃ps.(trapErrors userMode)
+     ps.expand{(0=≢⍺):'Level1' ⋄ ⍺}←⍬
+     ps.reportToSession{⍺≡¯1:⍵ ⋄ ⍺}←~ps.isRuntime
+     (,¯1)≢,ps.folderName:ps
+     rf←⍎'FO'⎕WC⊢FO←'OLECLIENT' 'Scripting.FileSystemObject'
+     ps.folderName←(2 ⎕NQ'#' 'GetEnvironment' 'Temp'),'\',{⍵↑⍨⍵⍳'.'}rf.GetTempName
+     ps
+⍝ Checks and possibly modifies a number of items in the parameter space
+ }

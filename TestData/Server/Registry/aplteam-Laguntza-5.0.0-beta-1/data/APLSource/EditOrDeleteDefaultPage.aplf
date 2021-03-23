@@ -1,0 +1,61 @@
+ {r}←∆Ref EditOrDeleteDefaultPage parentName;n2;∆;res
+⍝ Returns 0 for "Cancel", 1 for "Edit" and 2 for "Delete".
+ r←0
+ n2←⎕NS''
+ ∆←⊂'Caption' 'Laguntza - Defaultpage'
+ ∆,←⊂'Coord' 'Pixel'
+ ∆,←⊂'Posn'(50+∆Ref.n.form.Posn)
+ ∆,←⊂'Size'(230 230)
+ ∆,←⊂'SysMenu' 0
+ ∆,←⊂'MaxButton' 0
+ ∆,←⊂'MinButton' 0
+ ∆,←⊂'Sizeable' 0
+ n2.Form←⎕NEW'Form'∆
+
+ ∆←⊂'Caption' 'What would you like to do?'
+ ∆,←⊂'Posn'(15 10)
+ n2.Label1←n2.Form.⎕NEW'Label'∆
+
+ ∆←⊂'Posn'((5+↑+⌿⊃n2.Label1.(Posn Size)),10)
+ ∆,←⊂'Size'(80 120)
+⍝ ∆,←⊂'Caption' ' Options '
+ n2.Group←n2.Form.⎕NEW'Group'∆
+
+ ∆←⊂'Caption' '&Edit'
+ ∆,←⊂'Posn'(20 10)
+ ∆,←⊂'Style' 'Radio'
+ ∆,←⊂'State' 1
+ n2.Edit←n2.Group.⎕NEW'Button'∆
+
+ ∆←⊂'Caption' '&Delete'
+ ∆,←⊂'Posn'((5+↑+⌿⊃n2.Edit.(Posn Size)),10)
+ ∆,←⊂'Style' 'Radio'
+ n2.Delete←n2.Group.⎕NEW'Button'∆
+
+ ∆←⊂'Caption'('the default page in:')
+ ∆,←⊂'Posn'((10+↑+⌿⊃n2.Group.(Posn Size))10)
+ n2.Label2←n2.Form.⎕NEW'Label'∆
+
+ ∆←⊂'Caption'('<',((1+≢⍕∆Ref.p.source)↓parentName),'>')
+ ∆,←⊂'Posn'((2+↑+⌿⊃n2.Label2.(Posn Size))10)
+ n2.Label3←n2.Form.⎕NEW'Label'∆
+
+ ∆←⊂'Caption' 'OK'
+ ∆,←⊂'Default' 1
+ ∆,←⊂'Size'(⍬ 100)
+ n2.OK←n2.Form.⎕NEW'Button'∆
+ n2.OK.Posn←(↑n2.Form.Size-14+n2.OK.Size),10
+ n2.OK.Size[0]+←6
+
+ ∆←⊂'Caption' 'Cancel'
+ ∆,←⊂'Cancel' 1
+ ∆,←⊂'Size'((n2.OK.Size[0]),100)
+ n2.Cancel←n2.Form.⎕NEW'Button'∆
+ n2.Cancel.Posn←(n2.OK.Posn[0]),10+1↓+⌿⊃n2.OK.(Posn Size)
+ n2.(OK Cancel).onSelect←1
+
+ ⎕NQ n2.Edit'GotFocus' ⋄ res←⎕DQ n2.Form
+ :If n2.Cancel≢↑res
+     r←↑n2.(Edit Delete).State/1 2
+ :EndIf
+⍝Done

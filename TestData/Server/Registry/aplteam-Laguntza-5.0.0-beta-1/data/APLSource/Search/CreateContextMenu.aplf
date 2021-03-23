@@ -1,0 +1,33 @@
+ CreateContextMenu←{
+     tab←⎕UCS 9
+     ∆Ref←⍵
+
+     in←{⍵.lines⌷⍨⍵.SelItems⍳1}∆Ref.n.reportList    ⍝ Item number
+     hc←0<in ##.NoOfChildren ∆Ref.d.tree[;##.I.Depth]  ⍝ Has it children?
+
+     n←⎕NS''
+     n.menu←⎕NEW⊂'Menu'
+     bm←∆Ref ##.IsBookmarkable in                   ⍝ Gets 1 if item may be bookmarked
+     tx←'Bookmark this item',tab,'Ctrl+D'
+     n.bookmark←n.menu.⎕NEW'MenuItem'(('Caption'tx)('Active'bm))
+
+     ('MenuItem'⎕WN n.menu).onSelect←1
+     ∆Ref.p.userMode:n in
+
+     n.sep2←n.menu.⎕NEW⊂'Separator'
+
+     tx←'Edit help page',tab,'Ctrl+Enter'
+     n.edit←n.menu.⎕NEW'MenuItem'(⊂'Caption'tx)
+
+     tx←'Manage ∆TopicProperties'
+     n.manageTopicProp←n.menu.⎕NEW'MenuItem'(,⊂('Caption'tx))
+
+     flag←∆Ref.d.tree[in;##.I.IsNode]
+     title←##.I.Title⊃∆Ref.d.tree[in;]
+
+     tx←'Copy full path of "',title,'"'
+     n.copyFullPath←n.menu.⎕NEW'MenuItem'(⊂('Caption'tx))
+
+     ('MenuItem'⎕WN n.menu).onSelect←1
+     n in
+ }

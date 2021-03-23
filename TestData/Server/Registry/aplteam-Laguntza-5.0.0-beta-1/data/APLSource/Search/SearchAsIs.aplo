@@ -1,0 +1,24 @@
+ {r}←∆Ref(lc SearchAsIs)ss;list;allPages;bool;lines;ss2
+⍝ Performs a "search as is". That means that the contents of "Search for" is not treated as a word or list
+⍝ of words but is treated "as is". It also means that we cannot use the list of pre-compiled words.
+⍝ Therefore every single help page must be examined; that makes this type of search slow.
+⍝ `lc` is a function that does lowercase or not depending on the parameters the user has specified.
+ r←⍬ ⍬                                                      ⍝ Means: nothing found
+ ∆Ref{6:: ⋄ ⍺.n.infoSB.Visible←⍵}0
+ (list allPages)←##.CollectHelpPages ∆Ref
+ allPages{0=≢⍵:⍵ ⋄ ↑,/⍵}¨←allPages
+ :If 0≠≢list
+     allPages←lc allPages
+     allPages←ConvertHtmlEntities allPages
+     ss2←lc ss
+     lines←⍸{∨/ss2∘⍷⍵}¨allPages
+     list←list[lines]
+     :If 0≠≢lines
+         list←(1+≢⍕∆Ref.p.source)↓¨list
+         list←{l←⍵ ⋄ (('.'=l)/l)←'/' ⋄ l}¨list
+         r←lines list
+     :EndIf
+ :EndIf
+
+ {}∆Ref ##.SetInfoText''
+ ∆Ref{6:: ⋄ ⍺.n.infoSB.Visible←⍵}1

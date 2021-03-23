@@ -1,0 +1,30 @@
+ CreateForm←{
+     ∆Ref←⍵
+     ∆←⊂'Form'
+     ∆,←⊂'Caption'∆Ref.p.helpCaption
+     ∆,←⊂'Coord' 'Pixel'
+     ∆,←⊂'Posn'∆Ref.p.posn
+     ∆,←⊂'Visible'∆Ref.p.visible
+     ∆,←⊂'Event' 'Close'(FullPathToHandler'##.OnClose')
+     ∆,←⊂'HintObj' 'f.sb.info'
+     ∆,←⊂'KeepOnClose' 0
+     ∆Ref.n.form←⍎∆Ref.⎕WC ∆
+     ∆Ref.n.form.Size←∆Ref.p.size
+     ∆Ref.n.form.IconObj←##.Icons.HandleIcon ∆Ref
+     ∆Ref.n.tipField←⍎'tipfield'∆Ref.n.form.⎕WC'TipField'
+     ∆Ref.n.tipField←⍎'tipfield'∆Ref.n.form.⎕WC'TipField'
+     ∆Ref.n.form.TipObj←∆Ref.n.tipField
+     ∆Ref.n.font←⍎'font'∆Ref.n.form.⎕WC'Font' 'Verdana' 14
+     ∆Ref.n.indexFont←⍎'font'∆Ref.n.form.⎕WC'Font' 'Courier New' 16
+     ∆Ref.n.form.FontObj←∆Ref.n.font
+     ∆Ref.n.form.∆FontSizes←GetFontSizesOf ∆Ref.n.font
+     ∆Ref.n.form.onConfigure←(FullPathToHandler'OnConfigure')(200 360)
+     ∆Ref.n.form.onKeyPress←(FullPathToHandler'OnKeyPressInForm')
+     ∆Ref.n.form.CursorObj←1    ⍝ We cannot use "##.ShowEggTimer" yet
+     ∆Ref.on9996←1              ⍝ Use to quit ⎕DQ, in particular in the test cases
+     ⍬
+ ⍝ Create the Form and process "posn" and "size" parameters.
+ ⍝ "Size" can be numeric but also '75% or ('75%','30%') for example.
+ ⍝ Size and Posn passed as parms when calling the main function overule
+ ⍝ defaults which are overuled by Windows Registry.
+ }

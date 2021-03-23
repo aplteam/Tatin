@@ -1,0 +1,11 @@
+ GoForward←{
+     ∆Ref←⍵
+     (n d)←∆Ref.(n d)
+     d.history←¯1⌽d.history         ⍝ Last gets first
+     ci←0⊃d.history                 ⍝ Current item is...
+     _←∆Ref SetItem ci              ⍝ Make this one the first one
+     _←SelectTreeView ∆Ref          ⍝ Force the TreeView to be THE tab
+     _←⎕NQ n.tree 9999              ⍝ Enforce update
+     0                              ⍝ Suppress the default handling for "Backspace"
+⍝ Uses (and manipulates) the _Data.lastItem for jumping back one page per call
+ }

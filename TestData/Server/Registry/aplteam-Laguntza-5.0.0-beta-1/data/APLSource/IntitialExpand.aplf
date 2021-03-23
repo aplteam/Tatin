@@ -1,0 +1,17 @@
+ {r}←IntitialExpand ∆Ref;these;A;_
+⍝ Expand the appropriate branches; honors ∆Ref.p.expand
+ r←⍬
+ A←∆Ref.d.A
+ :Select ⎕C ∆Ref.p.expand
+ :Case 'none'
+     :Return
+ :Case 'level1'
+     these←⍸∆Ref.d.tree[;I.Depth]=0
+ :Case 'all'
+     these←⍸2{⍺<⍵}/∆Ref.d.tree[;I.Depth]
+ :Else
+     .                                      ⍝ Huuh?!
+ :EndSelect
+ _←{1 ⎕NQ ∆Ref.n.tree'Expanding'⍵}¨these    ⍝ Expand them
+ {}∆Ref SelectItemInTreeView 0              ⍝ Force focus back to first one
+⍝Done

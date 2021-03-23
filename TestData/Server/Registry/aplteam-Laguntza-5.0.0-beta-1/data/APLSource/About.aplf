@@ -1,0 +1,12 @@
+ r←About ∆Ref;msg
+ r←{
+     ∆Ref←⍵
+     parms←⎕FREAD ∆Ref.f.tieNo ∆Ref.f.∆parms
+     txt←{(0 1∊⍨|≡⍵):,⊂,⍵ ⋄ ⍵}∆Ref.p.helpAbout
+     flag←~(0=≢,∆Ref.p.helpVersion)∧0=≢∆Ref.p.helpVersionDate
+     txt,←flag/''('Version ',∆Ref.p.helpVersion,' from ',∆Ref.p.helpVersionDate)
+     txt,←''('Location: ',∆Ref.p.folderName)
+     caption←∆Ref.p.helpCaption
+     caption Show txt
+ }∆Ref
+ ⍝ Called from the menu (About..."); Tells current version

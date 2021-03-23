@@ -1,0 +1,11 @@
+ Replace←{
+     (w h)←⍵        ⍝ Where (hits) and HTML
+     (ss st et)←⍺   ⍝ Search string; start tag; end tag
+     h←(↑w)⌽h       ⍝ Bring to front
+     was←(≢ss)↑h    ⍝ Because case might be an issue we save the original
+     h←(≢ss)↓h      ⍝ Drop it
+     h,←st,was,et   ⍝ Add to the end
+     0=≢w←1↓w:h     ⍝ This one is done, and there might be nonbe left
+     (↑w)-←(≢ss)    ⍝ Because we have dropped the search string from h
+     ⍺ ∇ w h        ⍝ Next one
+ }

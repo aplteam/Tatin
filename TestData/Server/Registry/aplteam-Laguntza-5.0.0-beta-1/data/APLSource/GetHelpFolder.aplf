@@ -1,0 +1,15 @@
+ helpFolder←GetHelpFolder dummy;cla;searchFor;cl;cf
+⍝ Checks the command line for "helpfolder" but returns a default folder otherwise.
+ cla←⎕C 2 ⎕NQ'#' 'GetCommandLineArgs'
+ cla←{⍵↓⍨¨'-'=↑¨⍵}cla   ⍝ Drop leading hyphens
+ searchFor←'helpfolder='
+ :If 0=≢helpFolder←↑1↑{⍵/⍨0<≢¨⍵}searchFor∘{0=⍺≡(≢⍺)↑⍵:'' ⋄ (≢⍺)↓⍵}¨cla
+     cl←A.DLB 2 ⎕NQ'#' 'GetCommandLine'         ⍝ Command line
+     cf←↑⎕NPARTS{⍵↓⍨'"'=↑⍵}{⍵/⍨2>+\'"'=⍵}cl     ⍝ called from
+     helpFolder←cf ⍝ ,'Files'
+ :Else
+⍝     helpFolder,←'\Files'
+ :EndIf
+ helpFolder,←(~(¯1↑helpFolder)∊'/\')/'\'
+ helpFolder←{0=+/b←'\\'⍷⍵:⍵ ⋄ ∇(~b)/⍵}helpFolder
+⍝Done

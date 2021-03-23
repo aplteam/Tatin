@@ -1,0 +1,17 @@
+ CollapseAll←{
+     ∆Ref←⍺
+     n←∆Ref.n
+     fu←⍵                                       ⍝ Force update
+     no←≢n.tree.SelItems                        ⍝ No of items
+     states←n.tree.GetItemState¨⍳no             ⍝ Get all states
+     states←⌽⍉(32⍴2)⊤states                     ⍝ convert to Booleans
+     states[;5 6]←0                             ⍝ Collapse all branches
+     states←{2⊥⍉⌽⍵}states                       ⍝ Convert to Int
+     _←states{n.tree.SetItemState ⍵ ⍺}¨⍳no      ⍝ Reset all states
+     _←∆Ref SetItem 0                           ⍝ Select very first item
+     _←{⍵:⎕NQ n.tree 9999 ⋄ ⍬}fu                ⍝ Force update
+     _←⎕NQ n.tree'GotFocus'                     ⍝ Force focus to TreeView
+     0
+ ⍝ Called from the menu to collapse literally everything
+ ⍝ ⍵ is boolean: 0 (default) = don't force update; 1 = force update
+ }

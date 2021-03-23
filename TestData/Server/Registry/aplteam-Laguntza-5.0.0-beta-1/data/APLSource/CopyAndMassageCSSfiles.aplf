@@ -1,0 +1,16 @@
+ {r}←CopyAndMassageCSSfiles ∆Ref;home;target;css;filename
+ r←⍬
+ home←FilesAndDirs.ExpandPath ##.∆HOME,'\CSS'
+ target←FilesAndDirs.ExpandPath ∆Ref.p.folderName,'\CSS'
+
+ filename←'screen.css'
+ css←0⊃FilesAndDirs.NGET home,'/',filename
+ css←'<<max-width>>'⎕R ∆Ref.p.maxWidth⍠('Greedy' 0)⊣css
+ css←'<<font-size>>'⎕R ∆Ref.p.screenFontSize⍠('Greedy' 0)⊣css
+ css FilesAndDirs.NPUT(target,'/',filename)1
+
+ filename←'print.css'
+ css←0⊃FilesAndDirs.NGET home,'/',filename
+ css←'<<font-size>>'⎕R ∆Ref.p.printFontSize⍠('Greedy' 0)⊣css
+ css FilesAndDirs.NPUT(target,'/',filename)1
+⍝Done

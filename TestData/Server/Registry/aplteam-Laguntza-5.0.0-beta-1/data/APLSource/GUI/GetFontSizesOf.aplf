@@ -1,0 +1,9 @@
+ GetFontSizesOf←{
+     font←⍵
+     size←font.Size                                 ⍝ Save default
+     smallest←10                                    ⍝ Define...
+     largest←32                                     ⍝ ... boundaries
+     sizes←font{⍵/⍨⍺{⍺.Size←⍵ ⋄ ⍵=⍺.Size}¨⍵}9↓⍳36   ⍝ Try everything between (and including) smalltest and largest
+     font.Size←size                                 ⍝ Restore default
+     sizes
+ }

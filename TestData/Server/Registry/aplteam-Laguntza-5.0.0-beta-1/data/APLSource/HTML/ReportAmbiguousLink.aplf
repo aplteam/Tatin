@@ -1,0 +1,10 @@
+ ReportAmbiguousLink←{
+⍝ ⍵ is the link
+     ∆Ref←⍺
+     link←⍵               ⍝ Link text and item numbers
+     r←'<span class="invalidlink">(AMBIGUOUS LINK: ',({⍵,('['∊⍵)/']'}⍕1↓link),')</span>'
+     ∆Ref.p.userMode:r
+     _←∆Ref ReportAmbiguousLink_ link
+     ⎕THIS.X.linkReport,←⊂'ambiguous'
+     r
+ }

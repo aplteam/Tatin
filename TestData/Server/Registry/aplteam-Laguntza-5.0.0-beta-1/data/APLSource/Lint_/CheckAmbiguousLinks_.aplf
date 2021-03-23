@@ -1,0 +1,18 @@
+ CheckAmbiguousLinks_←{
+⍝ Returns vector with line number (tree), full help function name
+⍝ and the link causing the problem.
+     fine←0 1⍴' '
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     in←⍵
+     n←↑∆Ref ##.GetVarsName in
+     0=≢n:0 1⍴''                                ⍝ It's a node: nothing to check
+     0=≢body←∆Ref GetHelpBody n:fine            ⍝ The part of the page that might carry links
+     links←∆Ref IsolateLinks body               ⍝ Get just the links
+     0=≢links:fine                              ⍝ No links found?! Done!
+     type←∆Ref LookUpComplexLink¨(⊂¨links),¨in
+     (0=+/b←~type∊¯1 1):fine
+     r←((⍕in),' ',n)∘{⍺,': ',⍵}¨({⍵↑⍨⍵⍳']'}¨b/links)
+     r,¨←b/(1<type)⊃¨⊂'' ' (ambiguous)'
+     ∪r
+ }

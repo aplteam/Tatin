@@ -1,5 +1,9 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.20.0 - 2021-03-20
+⍝   * `Pack` polished
+⍝   * Bug fixes:
+⍝     * `api` was mishandled when editing a JSON package config file.
 ⍝ * 0.19.0 - 2021-03-16
 ⍝   * User command `CheckForBetterVersion` renamed to `CheckForLaterVersion`
 ⍝   * Couple of minor changes
@@ -90,7 +94,7 @@
           c←⎕NS ⍬
           c.Name←'LoadPackage'
           c.Desc←'Load the package specified in the argument and all dependencies into the WS or ⎕SE'
-          c.Parse←'2'
+          c.Parse←'2 -nobetas'
           r,←c
      
           c←⎕NS ⍬
@@ -102,7 +106,7 @@
           c←⎕NS ⍬
           c.Name←'InstallPackage'
           c.Desc←'Install a package and all its dependencies into a given folder'
-          c.Parse←'2 -quiet'
+          c.Parse←'2 -nobetas -quiet'
           r,←c
      
           c←⎕NS ⍬
@@ -132,7 +136,7 @@
           c←⎕NS ⍬
           c.Name←'Pack'
           c.Desc←'Packs (zips) all required files found in ⍵[1] into the folder ⍵[2]'
-          c.Parse←'2'
+          c.Parse←'2s'
           r,←c
      
           c←⎕NS ⍬
@@ -197,7 +201,7 @@
           flag←LoadTatin''
       :EndIf
       :If 'loadtatin'≡⎕C Cmd
-          Input.force LoadTatin(1+0<≢Input._1)⊃''Input._1
+          Input.force LoadTatin(1+(0≡Input._1)∨0=≢Input._1)⊃Input._1''
           r←''
       :Else
           TC←⎕SE._Tatin.Client
@@ -355,14 +359,35 @@
       r←'Sorry, not implemented yet'
     ∇
 
-    ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath
+    ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath;prompt;msg
       (sourcePath targetPath)←Arg.(_1 _2)
+      prompt←0
+      :If 0≡sourcePath
+      :OrIf 0=≢sourcePath
+          sourcePath←TC.F.PWD
+          prompt∨←1
+      :EndIf
+      :If 0≡targetPath
+      :OrIf 0=≢targetPath
+          targetPath←sourcePath
+          prompt∨←1
+      :EndIf
       'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
       filename←sourcePath,'/',TC.CFG_NAME
       ('Could not find a file "',TC.CFG_NAME,'" in ',sourcePath)Assert TC.F.IsFile filename
       :If ~(1↑targetPath)∊'./\'
       :AndIf (1↑1↓targetPath)≠':'
           targetPath←sourcePath,'/',targetPath
+      :EndIf
+      :If prompt
+          msg←'Sure that you want to pack ',sourcePath,' into '
+          :If sourcePath≡targetPath
+              msg,←' the same directory?'
+          :Else
+              msg,←targetPath,'?'
+          :EndIf
+      :AndIf 0=1 ∆YesOrNo msg
+          :Return
       :EndIf
       :If 0=⎕NEXISTS targetPath
       :AndIf 1 ∆YesOrNo'Target directory does not exist yet; create it?'
@@ -484,7 +509,7 @@
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
-      r←TC.LoadPackage identifier targetSpace
+      r←Arg.nobetas TC.LoadPackage identifier targetSpace
     ∇
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data
@@ -842,8 +867,9 @@
           r,←⊂''
           r,←⊂'Requires ⍵[1] to have a file "',TC.CFG_NAME,'" defining the package.'
           r,←⊂''
-          r,←⊂'Note that if ⍵[2] does not start with "." or "/" it is relative to ⍵[1], Therefore, if you'
-          r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
+          r,←⊂'If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
+          r,←⊂'If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
+          r,←⊂'Note that if ⍵[2] is relative then it is relative to ⍵[1].'
       :Case ⎕C'Publish'
           r,←⊂'Publish a package to a particular Registry Server.'
           r,←⊂'Such a package can be one of:'
@@ -912,14 +938,24 @@
     ∇ r←HelpOnPackageID dummy
       r←''
       r,←⊂'* A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
-      r,←⊂'  If just a full package ID is specified ALL Registries are scanned; the first one wins.'
-      r,←⊂'* Alternatively specify a full path or a URL or an alias in front of the package ID.'
+      r,←⊂'  If just a full package ID is specified and nothing else then ALL Registries'
+      r,←⊂'  are scanned; the first one wins.'
+      r,←⊂''
+      r,←⊂'* Alternatively specify a full path or a URL in front of the package ID.'
+      r,←⊂''
       r,←⊂'* You may also specify an incomplete package ID in terms of no patch number, or'
-      r,←⊂'  neither minor nor patch number, or no version information at all'
+      r,←⊂'  neither minor nor patch number, or no version information at all, and leave it'
+      r,←⊂'  it to Tatin to establish the latest version itself.'
+      r,←⊂''
+      r,←⊂'  Tatin would consider beta version then, but you can force Tatin to ignores betas'
+      r,←⊂'  by specifying the -nobetas flag which is in all other scenarios ignored.'
+      r,←⊂''
       r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
-      r,←⊂'  in two ore more different groups but will success otherwise.'
-      r,←⊂'* You may specify an alias for the package by putting it to the front and separate it'
-      r,←⊂'  with an @ from the package ID'
+      r,←⊂'  in two ore more different groups but will succeed otherwise.'
+      r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
+      r,←⊂''
+      r,←⊂'* You may specify an alias for the package by putting it to the front and separate'
+      r,←⊂'  it with an @ from the package ID'
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2
@@ -1012,9 +1048,6 @@
                   msg←'Invalid: "source"'
                   :Return
               :EndIf
-          :EndIf
-          :If 0=≢ns.api
-              ns.api←⊃,/2↑⎕NPARTS ns.source
           :EndIf
           {}{{'source'TC.ValidateName ⍵}⍣(0<≢⍵)⊣⍵}ns.source~'/\'
           :If '.'∊ns.source

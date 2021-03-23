@@ -1,0 +1,17 @@
+ CreateBookmarkMenu←{
+     ∆Ref←⍵
+     tab←⎕UCS 9
+     eh←FullPathToHandler'##.OnMenuCmd'
+     ∆Ref.n.bookmarkMenu←⍎'bookmark'∆Ref.n.menubar.⎕WC'Menu' '&Bookmarks'
+     cp←'Add bookmark',tab,'Ctrl+D'
+     ∆Ref.n.addBookmark←⍎'add'∆Ref.n.bookmarkMenu.⎕WC'MenuItem'cp('Active' 0)('Event' 'Select'eh)
+     cp←'Delete bookmark'
+     ∆Ref.n.delBookmark←⍎'del'∆Ref.n.bookmarkMenu.⎕WC'MenuItem'cp('Active' 0)('Event' 'Select'eh)
+     cp←'Delete all bookmarks'
+     ∆Ref.n.delAllBookmarks←⍎'delAll'∆Ref.n.bookmarkMenu.⎕WC'MenuItem'cp('Active' 0)('Event' 'Select'eh)
+     0=≢bm←∆Ref.d.bookmark:⍬            ⍝ No bookmarks?
+     ∆Ref.d.bookmark←⍬                  ⍝ Because they are re-saved on this by the next line!
+     _←∆Ref ##.Bookmark¨bm              ⍝ Bookmark them
+     ⍬
+⍝ Create the "Bookmarks" menu
+ }

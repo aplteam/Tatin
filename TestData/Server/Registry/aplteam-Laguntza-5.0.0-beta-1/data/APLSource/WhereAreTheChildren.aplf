@@ -1,0 +1,11 @@
+ WhereAreTheChildren←{
+⍝ Returns a vector of booleans indicating the direct children of ⍵[0] (no grand-children).
+⍝ ⍵ is a vector of integers, typically "Depth" of a TreeView.
+⍝ ⍺ is the (optional) item number in ⍵ and defaults to 0.
+     ⍺←0
+     in←⍺
+     int←in↓⍵                       ⍝ Depth
+     (0=≢int):⍬
+     bool←{0,∧\int[0]<1↓⍵}int
+     in+1+⍸(1+↑int)=bool/int
+ }

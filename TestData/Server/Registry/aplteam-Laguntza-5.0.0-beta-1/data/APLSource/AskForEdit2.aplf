@@ -1,0 +1,17 @@
+ r←AskForEdit2(varsName result ticks);msg
+⍝ Asks the user whether she wants to fix the problem.
+⍝ Print some information regarding the lines causing the problem.
+⍝ r is 1 in case the user made an effort to fix the problem , otherwise 0.
+ ⎕←{⍵↑'--- Attention ',⍵⍴'-'}⎕PW-1
+ ⎕←'The help page (variable) "',varsName,' has a problem!'
+ :If 1∊ticks
+     ⎕←'  Odd numbers of ticks (`) in ',(+/ticks),' item(s)'
+ :EndIf
+ ⎕←'Problems:'
+ ⎕←⍪'  '∘,¨{(70⌊≢⍵)↑⍵}¨∊¨ticks/RemoveCodeBlock result
+ msg←''
+ msg,←⊂'Would you like to edit the vars in order to fix the problem? (n=problem is ignored)'
+ msg,←⊂'Note that you can have an odd number of back-ticks, for example a single 1 with ````!'
+ :If r←YesOrNoInSession msg
+     EditByQED varsName
+ :EndIf

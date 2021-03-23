@@ -1,0 +1,12 @@
+ GetBreadcrumb←{
+     f←⍺
+     row←⍵
+     rows←{¯1+(≢⍵)-⍵⍳⍳↑⍵}⌽(1+row)↑f.tree[;0]
+     parents←{↑{⍺,'/',⍵}/⍵}⍣(0≠≢rows)⊣f.tree[rows;2]
+     breadcrumb←parents,((0≠≢parents)/'/'),,row⊃f.tree[;2]
+     ~'/'∊breadcrumb:''
+     urls←{(⊂⍵)↑¨⍨1+⍳≢⍵}f.tree[rows;1]
+     buff←urls{((↑{⍺,'/',⍵}/⍺),'/index.html')⍵}¨f.tree[rows;1]
+     (0⊃¨buff)←(,/((row⊃f.tree[;6])+≢buff)⍴⊂'../'),¨0⊃¨buff
+     ↑{⍺,' / ',⍵}/{'<a href="',(0⊃⍵),'">',(1⊃⍵),'</a>'}¨buff
+ }

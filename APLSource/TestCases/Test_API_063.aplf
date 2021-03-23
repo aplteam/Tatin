@@ -1,0 +1,22 @@
+ r←Test_API_063(stopFlag batchFlag);⎕TRAP;res1;qdmx
+⍝ Exercise ⎕SE.Tatin.LoadPackage on a package that has just betas but with "noBetas"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ :Trap 0
+     res1←1 ⎕SE.Tatin.LoadPackage'[local]Laguntza' '#.TEMP'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Not found: Laguntza'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :Trap 0 ⋄ F.RmDir res1 ⋄ :EndTrap
+⍝Done

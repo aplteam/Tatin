@@ -1,0 +1,11 @@
+ GetProperSize←{
+     (¯1≡⍵):⍺           ⍝ Argument of "Run" is defaulting? Take Windows Registry (defaults to (⍬ ⍬) anyway)
+     (0=1↑0⍴∊⍵):⍵       ⍝ Argument is numeric? Take it!
+     (~'%'∊∊⍵):⍎⍵       ⍝ No percent sign? Make it numeric
+     v←{0 1∊⍨≡⍵:2⍴⍎⍵~'%' ⋄ ⍎¨⍵~¨'%'}⍵   ⍝ Handle %
+     (y x)←GetScreenSize ⍬              ⍝ Get screen size
+     ⌊x y×v÷100                         ⍝ Calc pixels
+⍝ Take the right "Size", either from "outside" (=arg of "Run") or
+⍝ from Windows registry or defaults. If argument it can be text with "%",
+⍝ for example:  "36%"
+ }

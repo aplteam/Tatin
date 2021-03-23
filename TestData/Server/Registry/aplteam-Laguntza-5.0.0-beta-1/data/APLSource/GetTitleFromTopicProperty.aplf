@@ -1,0 +1,10 @@
+ GetTitleFromTopicProperty←{
+⍝ Returns "title" if it is not empty but "name" otherwise.
+     (parent name)←⍵
+     result←parent.⍎'∆TopicProperties ⍬'
+     ((name=' ')/name)←'_'
+     ~(⊂name)∊result[;0]:. ⍝ Something  went terribly wrong
+     ind←result[;0]⍳⊂name
+     0=≢title←1⊃result[ind;]:0⊃result[ind;]
+     title
+ }

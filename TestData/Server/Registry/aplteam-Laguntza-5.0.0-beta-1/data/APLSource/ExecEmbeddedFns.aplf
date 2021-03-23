@@ -1,0 +1,45 @@
+ r←ExecEmbeddedFns(md name);mask;i;start;length;fnsCall;result;calledFrom;noOf;fns;p2;p1;ind;arg
+⍝ Mask code and then search for function calls.
+⍝ `md` is Markdown.
+⍝ `name` is the fully qualified name of the variable representing the help page.
+⍝ These are between `⍎⍎` and `⍎⍎`
+ r←1↓↑,/(⎕UCS 13),¨md
+ mask←GetMaskForCode r
+ ind←'[^⍎]⍎⍎⍎[^⍎]'⎕S 0⍠('EOL' 'CR')('Mode' 'M')⊣' ',(mask\mask/r),' '
+ :If 0=≢ind
+     r←md
+ :Else
+     ind←⊖0 3+[1]((⌊(≢ind)÷2),2)⍴ind
+     ind[;1]-←ind[;0]
+     :For start length :In ↓ind
+         r←start⌽r
+         fnsCall←3↓¯3↓length↑r
+         calledFrom←¯1↓↑'.'A.SplitPath name
+         noOf←+/∧\fnsCall∊'#.'
+         calledFrom←⍎calledFrom,((0<noOf)/'.'),¯1↓noOf↑fnsCall
+         fnsCall←noOf↓fnsCall
+         :If '.'∊fnsCall
+             (p1 p2)←'.'A.SplitPath fnsCall
+             calledFrom←⍎(⍕calledFrom),'.',¯1↓{⍵↓⍨3×'⍎⍎⍎'≡3↑⍵}p1~⎕UCS 13
+             fnsCall←p2
+         :EndIf
+         :If 0≠≢arg←{⍵↓⍨⌊/⍵⍳' ''[({'}fnsCall
+             fnsCall←(-≢arg)↓fnsCall
+         :EndIf
+         :If 3=calledFrom.⎕NC fnsCall
+             fns←calledFrom⍎fnsCall
+             :If 0=≢arg
+                 result←fns name
+             :Else
+                 result←arg fns name
+             :EndIf
+             :If 2=≡result
+                 result←1↓↑,/(⎕UCS 13),¨result
+             :EndIf
+         :Else
+             result←'INVALID FUNCTION CALL: ',fnsCall
+         :EndIf
+         r←(-start)⌽result,length↓r
+     :EndFor
+     r←(⎕UCS 13)A.Split r
+ :EndIf

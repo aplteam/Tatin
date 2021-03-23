@@ -1,0 +1,10 @@
+ CreateHelpForm←{
+⍝ Creates a new namespace which later will become a help form
+     ps←⍵
+     _←{9=⎕NC ⍵:⍬ ⋄ 'HelpForms'⎕THIS.⎕NS''}'HelpForms'
+     0=≢l←HelpForms.⎕NL-9:⍎'FORM_00'HelpForms.⎕NS''
+     lr←HelpForms.⍎¨ln←HelpForms.⎕NL-9                  ⍝ List of names and refs
+     ⍬≢ref←CheckForAlreadyOpen ps lr:ref                ⍝ Check weather this one is already open
+     nextNo←↑(⍳99)~⍎¨¯2↑¨ln                             ⍝ Next available free number is...
+     ⍎('FORM_',¯2↑'00',⍕nextNo)HelpForms.⎕NS''
+ }

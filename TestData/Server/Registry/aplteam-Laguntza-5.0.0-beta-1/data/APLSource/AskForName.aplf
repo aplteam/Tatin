@@ -1,0 +1,54 @@
+ r←{name}AskForName ∆Ref;∆;n;res
+ name←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'name'
+ n←⎕NS''
+ ∆←''
+ ∆,←⊂'Caption' 'New help page'
+ ∆,←⊂'Posn'(∆Ref.n.form.Posn+20 20)
+ ∆,←⊂'Icon'∆Ref.n.form.IconObj
+ ∆,←⊂'Coord' 'Pixel'
+ ∆,←⊂'Size'(150 600)
+ ∆,←⊂'MaxButton' 0
+ ∆,←⊂'MinButton' 0
+ ∆,←⊂'Sizeable' 0
+ ∆,←⊂'Event'(9999 1)
+ ∆,←⊂'IconObj'∆Ref.n.form.IconObj
+ ∆,←⊂'FontObj'∆Ref.n.form.FontObj
+ n.∆form←⎕NEW'Form'∆
+ n.∆form.n←n
+
+ ∆←''
+ ∆,←⊂'Posn'(15 15)
+ ∆,←⊂'Caption' 'Name of the new help page (must be a valid APL name; blanks become "_"):'
+ n.Label←n.∆form.⎕NEW'Label'∆
+
+ ∆←''
+ ∆,←⊂'Posn'((10+↑+⌿⊃n.Label.(Posn Size)),15)
+ ∆,←⊂'Size'(⍬ 370)
+ ∆,←⊂'Text'name
+ n.Name←n.∆form.⎕NEW'Edit'∆
+ n.Name.Size[0]+←5
+
+ ∆←''
+ ∆,←⊂'Caption' '&OK'
+ ∆,←⊂'Size'(⍬ 100)
+ ∆,←⊂'Default' 1
+ n.OK←n.∆form.⎕NEW'Button'∆
+ n.OK.Size[0]←⌊1.15×n.OK.Size[0]
+ n.OK.Posn←(n.∆form.Size[0]-n.OK.Size[0]+10),15
+ n.OK.onSelect←'OnSelectOkInAskForName'
+
+ ∆←''
+ ∆,←⊂'Caption' '&Cancel'
+ ∆,←⊂'Size'(⍬ 100)
+ ∆,←⊂'Cancel' 1
+ ∆,←⊂'Event'('Select' 1)
+ n.Cancel←n.∆form.⎕NEW'Button'∆
+ n.Cancel.Size[0]←⌊1.15×n.Cancel.Size[0]
+ n.Cancel.Posn←(n.∆form.Size[0]-n.OK.Size[0]+10),15+1⊃+⌿⊃n.OK.(Posn Size)
+
+ n.∆result←''
+
+ ⎕NQ n.Name'GotFocus' ⋄ res←⎕DQ n.∆form
+ r←n.∆result
+ n.∆form.⎕EX'n'
+⍝Done

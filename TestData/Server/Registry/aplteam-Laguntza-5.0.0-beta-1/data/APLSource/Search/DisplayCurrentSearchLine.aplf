@@ -1,0 +1,14 @@
+ DisplayCurrentSearchLine←{
+     ∆Ref←⍵
+     ref←∆Ref.n.reportList              ⍝ Create reference
+     lineNo←ref.SelItems⍳1              ⍝ Which line?
+     ((≢ref.SelItems)=lineNo):0         ⍝ Nothing selected?
+     0=ref.⎕NC'lines':⍬                 ⍝ That's true in case no (successful) search was performed yet.
+     itemNo←lineNo⌷ref.lines            ⍝ Translate line no into item no (saved in "Data")
+     in←##.Display ∆Ref itemNo          ⍝ Display it
+     _←∆Ref ##.SelectItemInTreeView in
+     in
+⍝ 1. Displays the help page of the currently selected item in the "Search" list.
+⍝ 2. Make sure that the search term is highlighted,
+⍝ 3. Select the item in the trees of both, "Search" and "Content" for the sake of sync.
+ }

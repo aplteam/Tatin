@@ -1,0 +1,13 @@
+ path←GetSaltPath parent;name;home
+ name←A.Last⍕∆Ref.∆parms.source
+ path←name,'/',(1+≢⍕∆Ref.∆parms.source)↓⍕parent
+ :If 0≠≢∆Ref.∆parms.saltFolder
+     path←((-≢name)↓∆Ref.∆parms.saltFolder),path
+ :EndIf
+ (('.'=path)/path)←'/'
+ :If ~':'∊path
+     home←(-1+≢name)↓{⍵[0;]↑⍨+/∧\∧⌿⍵=[1]⍵[0;]}⊃(∨/¨('.',name,'.')∘⍷¨#.SALT_Var_Data.VD[;0])⌿#.SALT_Var_Data.VD[;1]
+     path←home,path
+ :EndIf
+ path←'expand'FilesAndDirs.NormalizePath path
+⍝Done

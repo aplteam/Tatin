@@ -1,0 +1,109 @@
+ CreateSearch←{
+     ∆Ref←⍵
+     um←∆Ref.p.userMode         ⍝ is 1 if running in user mode
+     n←∆Ref.n
+     ref←n.search_sf
+
+     ∆←⊂'Label'
+     ∆,←⊂'Caption' 'Search for:'
+     ∆,←⊂'Posn'(5 10)
+     ∆,←⊂'Attach'(4⍴'Top' 'Left')
+     rf2←⍎'l'ref.⎕WC ∆
+
+     ∆←⊂'Combo'
+     ∆,←⊂'Items'∆Ref.d.searchString
+     ∆,←⊂'Style' 'DropEdit'
+     ∆,←⊂'Posn'((0⊃AddPosnAndSizeFor rf2),5)
+     ∆,←⊂'Size'(⍬(ref.Size[1]-60))
+     ∆,←⊂'SelItems'({0∊⍵:⍬ ⋄ ⍵↑1}≢∆Ref.d.searchString)
+     ∆,←⊂'Event' 'KeyPress'(FullPathToHandler'##.Search.OnKeyPressInCombo')
+     ∆,←⊂'Event' 9999(FullPathToHandler'##.Search.On9999')
+     ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+     n.searchString←⍎'e'ref.⎕WC ∆
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' ' &Go '
+     ∆,←⊂'Posn'((n.searchString.Posn[0]),ref.Size[1]-45)
+     ∆,←⊂'Size'(22 40)
+     ∆,←⊂'Active'(0≠≢,∆Ref.d.searchString)
+     ∆,←⊂'Event' 'Select'(FullPathToHandler'##.Search.OnSearch')
+     ∆,←⊂'Attach'(4⍴'Top' 'Right')
+     n.searchBtn←⍎'search'ref.⎕WC ∆
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' 'Ignore case'
+     ∆,←⊂'Style' 'Check'
+     ∆,←⊂'State' 1
+     ∆,←⊂'Posn'((10+0⊃AddPosnAndSizeFor n.searchBtn),5)
+     ∆,←⊂'Attach'(4⍴'Top' 'Left')
+     ∆,←⊂'Tip' 'If this is ticked, "A" and "a" are considered the same'
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     n.ignoreCaseFlag←⍎'c'ref.⎕WC ∆
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' 'Whole word(s) only'
+     ∆,←⊂'Style' 'Check'
+     ∆,←⊂'Posn'((0⊃AddPosnAndSizeFor n.ignoreCaseFlag),5)
+     ∆,←⊂'Attach'(4⍴'Top' 'Left')
+     ∆,←⊂'Tip'('Interprets "Search for" as a word - or a list of words - and tries to find them')
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'State' 1
+     n.matchWholeWord←⍎'mhw'ref.⎕WC ∆
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' 'Search as entered'
+     ∆,←⊂'Style' 'Check'
+     ∆,←⊂'Posn'((0⊃AddPosnAndSizeFor n.matchWholeWord),5)
+     ∆,←⊂'Attach'(4⍴'Top' 'Left')
+     ∆,←⊂'Tip'('Tries to find the contents of "Search for" as it was entered.' 'This can take some time in case the number of help pages is large!')
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'State' 0
+     n.searchAsIs←⍎'mhw'ref.⎕WC ∆
+     n.searchAsIs.onSelect←'OnSearchAsIs'
+
+     ∆←⊂'Group'
+     ∆,←⊂'Caption' 'Search'
+     ∆,←⊂'Posn'((5+0⊃AddPosnAndSizeFor n.searchBtn),165)
+     ∆,←⊂'Size'(70 120)
+     ∆,←⊂'Attach'(4⍴'Top' 'Left')
+     n.searchParms←⍎'R1'ref.⎕WC ∆
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' '&Full-text'
+     ∆,←⊂'Style' 'Radio'
+     ∆,←⊂'Posn'(20 5)
+     ∆,←⊂'Attach'(4⍴'Top' 'Left')
+     ∆,←⊂'Tip'('"Whole words": all paragraphs are scanned but code is ignored' '"Search as entered": everything is searched')
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'State' 0
+     n.fullTextSearchFlag←⍎'R1'n.searchParms.⎕WC ∆
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' 'Tree titles &only'
+     ∆,←⊂'Style' 'Radio'
+     ∆,←⊂'Posn'(45 5)
+     ∆,←⊂'Attach'(4⍴'Top' 'Left')
+     ∆,←⊂'Tip' 'Scans just the topic titles as shown in the tree'
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'State' 1
+     n.titleOnlySearchFlag←⍎'R2'n.searchParms.⎕WC ∆
+
+     ∆←⊂'ListView'
+     ∆,←⊂'Posn'((10+0⊃AddPosnAndSizeFor n.searchParms)5)
+     ∆,←⊂'Size'(10⌈ref.Size-(15+↑AddPosnAndSizeFor n.searchParms)10)
+     ∆,←⊂'View' 'Report'
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     ∆,←⊂'ColTitles'('Topic' 'Location')
+     ∆,←⊂'FullRowSelect' 1
+     ∆,←⊂'Event' 'ItemUp'(FullPathToHandler'##.Search.OnHitSelected')
+     ∆,←⊂'Event' 9999(FullPathToHandler'##.Search.OnHitSelected')
+     ∆,←⊂'Event' 'KeyPress'(FullPathToHandler'##.Search.OnKeyPress')∆Ref
+     ∆,←⊂'Event' 'ColumnClick'(FullPathToHandler'##.Search.OnColClick')
+     ∆,←⊂'Event' 'ContextMenu'(FullPathToHandler'##.Search.OnContextMenu')
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     n.reportList←⍎'list'ref.⎕WC ∆
+     _←n.reportList ⎕WS'Event' 9998(FullPathToHandler'##.GUI.OnDelayedUpdate')n.reportList
+     0=∆Ref.p.userMode:⍬
+     ⍬
+⍝ Creates the tab for the "Find" dialog
+ }

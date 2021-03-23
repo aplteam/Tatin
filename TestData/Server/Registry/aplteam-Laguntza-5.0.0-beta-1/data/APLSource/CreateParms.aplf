@@ -1,0 +1,44 @@
+ CreateParms←{
+ ⍝ If `⍵` is empty: create a namespace and populate it with default parameters
+ ⍝ Otherwise `⍵` must be a parameter space. Missing parameters are added before `⍵` is returned as result.
+     ⍺←{'CLEAR WS'≡⍵:FilesAndDirs.PWD ⋄ 0⊃⎕NPARTS ⍵}⎕WSID
+     p←⎕NS''
+     p.homeFolder←⍺
+     p.cssPrintFilename←''          ⍝ Name of the CSS file to be used for printing
+     p.cssScreenFilename←''         ⍝ Name of the CSS file to be used for the screen
+     p.folderName←¯1                ⍝ MUST be specified.
+     p.helpAbout←'Laguntza' 'Written by Kai Jaeger'
+     p.helpCaption←'Laguntza'       ⍝ General caption used in all GUI controls.
+     p.helpIcon←''                  ⍝ Filename of an ICO file or ref pointing to an ICO object. Empty results in default icon.
+     p.helpVersion←1⊃Version
+     p.helpVersionDate←2⊃Version
+     p.expand←'Level1'              ⍝ May be one of: "All", "Level1" or "None.
+     p.isRuntime←IsRunTime ⍬
+     p.language←'en'                ⍝ Used to set the language in `<html lang="`.
+     p.maxWidth←'900px'             ⍝ If you don't want to restrict the width set this to ⍬.
+     p.noClose←0                    ⍝ 1=Don't close the Help, leave files tied etc, just set Visible←0. You must call "CloseHelp" eventually.
+     p.notifyAcre←1                 ⍝ Shall acre be notified. Normally only test cases will set this to 0.
+     p.page←0                       ⍝ The page to be shown at start time; Can be a row number, minimal or full link.
+     p.posn←⍬ ⍬                     ⍝ Default position (might be overwritten from outside).
+     p.printFontSize←'9pt'          ⍝ Defines the basic font size for printing. Everything else refers to this by either "em" or in percentage.
+     p.regPath←''                   ⍝ Path to Windows Registry. Becomes "Software\APLTree\Laguntza\",helpCaption if empty. 0 disables mechanism.
+     p.reportToSession←¯1           ⍝ 1=report problems (like broken links etc) to the session. Defaults to `isRuntime`.
+     p.saltFolder←''                ⍝ If not empty then all vars & ∆TopicProperties are saved in files within that folder.
+     p.screenFontSize←'16px'        ⍝ Defines the basic font size for the screen. Everything else refers to this by either "em" or in percentage.
+     p.size←⍬ ⍬                     ⍝ Default size (might be overwritten from outside).
+     p.source←''                    ⍝ Ref to the NS that contains the Help system. Needed for compilation & development only.
+     p.splitterPosn←⍬ ⍬             ⍝ May be overwritten by user and/or Windows Registry.
+     p.statusbarAlarmColor←255 160 160 ⍝ Used to make the message in the status bar more prominent.
+     p.testMode←0                   ⍝ Suppress dialogs telling the user about problems etc.
+     p.trapErrors←¯1                ⍝ Becomes userMode if not set.
+     p.userMode←p.isRuntime         ⍝ Default depends on APL's exe type.
+     p.visible←1                    ⍝ By default the GUI is visible.
+     ' '≠1↑0⍴p.⎕FX⊃'r←∆List' 'r←⍉{⍵,[-0.5]⍎¨⍵}(⎕NL-2 9)':.
+     0=≢⍵:p
+     326≠⎕DR ⍵:p
+     p2←⍵
+     ' '≠1↑0⍴p2.⎕FX⊃'r←∆List' 'r←⍉{⍵,[-0.5]⍎¨⍵}(⎕NL-2 9)':.
+     0=≢list←(' '~¨⍨↓p.⎕NL 2 9)~p2.⎕NL-2 9:p2
+     _←p p2.{⍎⍵,'←⍺⍎⍵'}¨list
+     p2
+ }

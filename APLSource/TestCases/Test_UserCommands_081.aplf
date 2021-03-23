@@ -1,0 +1,38 @@
+ r←Test_UserCommands_081(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;rc;msg
+⍝ Exercise ]Tatin.LoadPackage
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ (rc msg res1)←∆UCMD'LoadPackage [local]aplteam-APLProcess-0.2.9 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg    ⍝ Error?! 1043 Conga?!  just do →⎕lc-1
+ →T.GoToTidyUp'0.2.9'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res2)←∆UCMD'LoadPackage [local]aplteam-APLProcess-0.2 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.2.12'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res3)←∆UCMD'LoadPackage [local]aplteam-APLProcess-0 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.3.0'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res4)←∆UCMD'LoadPackage [local]aplteam-APLProcess #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'1.0.0'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ #.⎕EX'TEMP'
+
+ (rc msg res5)←∆UCMD'LoadPackage [local]aplteam-APLProcess #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'1.0.0'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir¨res1 res2 res3 res4 res5
+⍝Done

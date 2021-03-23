@@ -1,0 +1,8 @@
+ QualifyParent←{
+     (tree containerName)←⍵
+     locs←⍕¨tree[;##.I.Parent]          ⍝ Get the location of each
+     locs←(1+≢⍕containerName)↓¨locs     ⍝ Remove container name
+     locs←{'#',('.'/⍨0<≢⍵),⍵}¨locs      ⍝ Add "#." (or "#" as "root"
+     tree[;##.I.Parent]←locs
+     tree
+ }

@@ -1,0 +1,15 @@
+ GetParentAndTopicNameAsRef←{
+     ∆Ref←⍺
+     1≠≢in←⍵:'Invalid right argument: not a single item number'⎕SIGNAL 11
+     tree←∆Ref.d.tree[↑in;]
+     parent←I.Parent⊃tree           ⍝ Get a ref to the parent
+     f←0≠≢I.TopicName⊃tree          ⍝ Not a node?
+     f:parent(I.TopicName⊃tree)     ⍝ Return pointer to the help page
+     parent((3.2=parent.⎕NC'∆DefaultPage')⊃'' '∆DefaultPage')
+⍝ ⍵ is an item number
+⍝ Returns one of:
+⍝ Ref to parent and name of help function.
+⍝ Name of the help function is ∆DefaultPage if and only if there is
+⍝ such a page. If there is not help page (node without ∆DefaultPage)
+⍝ Then the second element is empty.
+ }

@@ -1,0 +1,39 @@
+ OnSearch←{
+     ∆Ref←##.Get∆Ref 0⊃⍵
+     n←∆Ref.n
+     _←##.ShowEggTimer ∆Ref
+     _←∆Ref ##.SetInfoText'Performing search...'
+     _←ResetList ∆Ref
+     ref←n.search_sf
+     _←EnforceDelay 0.2
+     sa←1                                   ⍝ 1: Ignore container in search
+     buff←⍕n.searchString.Text
+     sa,←⊂⍕##.A.DMB⍣(~n.searchAsIs.State)⊣buff   ⍝ 2: Search string
+     sa,←n.fullTextSearchFlag.State         ⍝ 3: full text search
+     sa,←n.ignoreCaseFlag.State             ⍝ 4: lower case flag
+     sa,←n.matchWholeWord.State             ⍝ 5: Match whole words only
+     sa,←n.searchAsIs.State                 ⍝ 6: Search "as is"
+     ∆Ref.s.searchString←n.searchString.Text
+     ∆Ref.s.ignoreCase←n.ignoreCaseFlag.State
+     ∆Ref.s.matchWholeWord←n.matchWholeWord.State
+     ∆Ref.s.fullTextSearchFlag←n.fullTextSearchFlag.State
+     ∆Ref.s.searchAsIs←n.searchAsIs.State
+     (lines names)←∆Ref Search sa           ⍝ Perform the search
+     _←##.RemoveEggTimer ∆Ref
+     (0=≢lines):0⊣HandleNotFound ∆Ref       ⍝ Nothing found?
+     _←∆Ref AddTextToItems(⊂n.searchString.Text)∊n.searchString.Items
+     _←∆Ref ##.SaveSearchString n.searchString.Text
+     _←∆Ref ##.SetInfoText'"',(0⊃∆Ref.d.searchString),'" was found ',(⍕≢lines),' time',(1<≢lines)/'s'
+     ref.list.Items←∆Ref.d.tree[lines;##.I.Title]   ⍝ Display the titles ...
+     ref.list.ReportInfo←⍪PolishLocation¨names      ⍝ ... and the location
+     _←ref{⍺.list.SetColSize ⍵ ¯3}¨0 1      ⍝ Ensure proper column width
+     ref.list.lines←lines                   ⍝ Save for callbacks
+     _←0 SetState⍨∆Ref(1,1↓∆Ref GetState 0) ⍝ Set appropriate state as well
+     (0⊃ref.list.SelItems)←1                ⍝ Select first item
+     _←ref.list.ItemDown 1                  ⍝ Fire...
+     _←ref.list.ItemUp 1                    ⍝ ...event
+     _←⎕NQ ref.list'GotFocus'               ⍝ Force focus to the list
+     _←⎕NQ ref.list 9999 ¯1                 ⍝ Force update
+     0
+⍝ Performs the actual search and shows what needs to be shown
+ }

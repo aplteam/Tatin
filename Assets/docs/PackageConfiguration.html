@@ -158,6 +158,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="assets">assets</h4>
 </a>
 </div>
+<p>This defines the files the source code relies on in one way or another, like CSS files, JavaScript files, images and what not.</p>
 <p>This must be a simple text vector that can represent:</p>
 <ul>
 <li>A single filename</li>
@@ -168,19 +169,34 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative.</p>
 <p>Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.</p>
 <div class="h_tag">
+<a href="#Accessing-assets-from-an-instance" id="Accessing-assets-from-an-instance" class="autoheader_anchor">
+<h5 data-id="Accessing-assets-from-an-instance">Accessing assets from an instance</h5>
+</a>
+</div>
+<p>In case you need to access assets from an instance of a package you have two choices:</p>
+<ol start="1">
+<li>Create a shared method like this:
+<pre><code>r←GetAssetFolder
+r←##.##.∆HOME</code></pre>
+<p>You can then call this shared method from within an instance method.</p></li>
+<li>Use the expression <code>⊃⊃⎕CLASS ⎕THIS</code> in order to find out where the class script actually lives.
+<p>Therefore the expression <code>(⊃⊃⎕CLASS ⎕THIS).##.##.∆HOME</code> returns what's on <code>∆HOME</code>.</p></li>
+</ol>
+<div class="h_tag">
 <a href="#description" id="description" class="autoheader_anchor">
 <h4 data-id="description">description</h4>
 </a>
 </div>
 <p>A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.</p>
 <p>This information is typically used when a human accesses a Tatin Server with a Browser.</p>
-<p><code>description</code> must not be empty.</p>
+<p><code>description</code> <em>must not</em> be empty.</p>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
 <h4 data-id="group">group</h4>
 </a>
 </div>
 <p>The group part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
+<p>A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.</p>
 <div class="h_tag">
 <a href="#name" id="name" class="autoheader_anchor">
 <h4 data-id="name">name</h4>
@@ -194,13 +210,15 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>A URL that points to something like GitHub.</p>
 <p>An example is <code>https://github.com/aplteam-MarkAPL-9.2.0</code></p>
+<p>It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.</p>
 <div class="h_tag">
 <a href="#source" id="source" class="autoheader_anchor">
 <h4 data-id="source">source</h4>
 </a>
 </div>
+<p>This defines the source code files that are going to be part of the package.</p>
 <p>The name of a text file that contains code or a folder that contains a collection of code files. <code>source</code> <em>must not</em> be empty.</p>
-<p>If it's a single file it might be anything with the extension <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script) or <code>.apli</code> (an interface script).</p>
+<p>If it's a single file it might be anything with the extension <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script) or <code>.apli</code> (an interface script) or <code>.aplf</code> (a function) or <code>.aplo</code> (an operator).</p>
 <p>If it's a folder it might contain any number and mixture of the aforementioned files plus <code>.aplf</code> (functions) and <code>.aplo</code> (operators). Any files with other extensions are misplaced and will be ignored.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
@@ -216,7 +234,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>The version[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <p>Examples for valid version numbers are <code>1.2.3</code>, <code>1.2.3-beta1</code>, <code>1.2.3-beta1+30164</code> and <code>18.0.0+30165</code></p>
-<p>The optional build number is ignored by Tatin.</p>
+<p>The optional build number, separated by the <code>+</code> sign, is ignored by Tatin.</p>
 <p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
 <a href="#System-vars-IO-ML-WX" id="System-vars-IO-ML-WX" class="autoheader_anchor">
@@ -251,7 +269,7 @@ group-name-1.1.0-FixFor234</code></pre>
 <h5 data-id="url">url</h5>
 </a>
 </div>
-<p>WHen a package is loaded or installed from a Tatin Server, “url” is injected, and points back to that server.</p>
+<p>When a package is loaded or installed from a Tatin Server, “url” is injected, and points back to that server.</p>
 <div class="h_tag">
 <a href="#Access-after-loading-a-package" id="Access-after-loading-a-package" class="autoheader_anchor">
 <h3 data-id="Access-after-loading-a-package">Access after loading a package</h3>

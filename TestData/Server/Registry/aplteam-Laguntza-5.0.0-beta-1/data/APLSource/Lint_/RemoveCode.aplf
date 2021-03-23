@@ -1,0 +1,7 @@
+ RemoveCode←{
+     md←⍵
+     bool←'`'=md
+     0≠2|+/bool:md⊣⎕←⍺,' contains odd number of in-line code markers (back-ticks)'
+     md←'`.*?`'⎕R''⊣md                                                      ⍝ Remove inline code
+     '(^\s{0,3}~{3,}.*?)(?1)'⎕R''⍠('Mode' 'M')('DotAll' 1)('EOL' 'CR')⊣md   ⍝ Remove fenced blocks
+ }

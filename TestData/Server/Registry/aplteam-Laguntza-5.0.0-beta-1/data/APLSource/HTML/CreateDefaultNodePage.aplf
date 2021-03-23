@@ -1,0 +1,16 @@
+ CreateDefaultNodePage←{
+⍝ In case content ("html") is empty AND "row" a node we create
+⍝ a page that carries links to the children if there are any.
+⍝ There MUST be childen by definition if it's a node.
+⍝ Otherwise we just return `html`.
+     ∆Ref←⍺
+     (row html)←⍵                                   ⍝ Item number, content
+     0=≢row:html                                    ⍝ If "row" is empy we are done
+     0≠≢html:html                                   ⍝ If "html" is not empy we are done
+     ind←row ##.WhereAreTheChildren ∆Ref.d.tree[;##.I.Depth] ⍝ Where are the children?
+     (0∊noc←≢ind):html                              ⍝ How many are there? (0=ready)
+     names←∆Ref.d.tree[ind;##.I.Title]              ⍝ Names of children
+     lks←ind{'<a class="link" href="#',(⍕⍺),'">',⍵,'</a>'}¨names ⍝ wrap row HTML
+     header←⊂'<h1>',(↑∆Ref.d.tree[row;##.I.Title]),'</h1>'
+     header,(⊂'<ul class="defaultpagelist">'),({'<li>',⍵}¨lks),⊂'</ul>'
+ }

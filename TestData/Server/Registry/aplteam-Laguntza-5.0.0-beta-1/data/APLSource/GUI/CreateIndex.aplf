@@ -1,0 +1,35 @@
+ CreateIndex←{
+     ∆Ref←⍵
+     n←∆Ref.n
+
+     ∆←⊂'Label'
+     ∆,←⊂'Caption' '&Type in the keyword to find:     ' ⍝ Don't delete the blanks! Field gets too small otherwise for unknown reasons
+     ∆,←⊂'Posn'(5 6)
+     ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+     n.indexKeyword_label←⍎'L_IndexKeyword'n.index_sf.⎕WC ∆
+
+     ∆←⊂'Edit'
+     ∆,←⊂'Posn'((1+0⊃AddPosnAndSizeFor n.indexKeyword_label),3)
+     ∆,←⊂'Size'(⍬(n.index_sf.Size[1]-6))
+     ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+     n.indexKeyword←⍎'IndexKeyword'n.index_sf.⎕WC ∆
+     n.indexKeyword.onKeyPress←'OnKeyPressInIndexKeyword'∆Ref
+     n.indexKeyword.on9999←'On9999InIndexKeyword'∆Ref
+
+     ∆←⊂'ListView'
+     ∆,←⊂'Posn'((16+0⊃AddPosnAndSizeFor n.indexKeyword),3)
+     ∆,←⊂'Size'(n.index_sf.Size-(21+0⊃AddPosnAndSizeFor n.indexKeyword),6)
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     ∆,←⊂'FullRowSelect' 1
+     ∆,←⊂'View' 'Report'
+     ∆,←⊂'ColTitles'('Keyword' 'Page title' 'Location')
+     ∆,←⊂'Font'∆Ref.n.indexFont
+     n.indexList←⍎'list'n.index_sf.⎕WC ∆
+     n.indexList.onItemUp←FullPathToHandler'##.Index.OnHitSelectedIndex'
+     n.indexList.on9999←FullPathToHandler'##.Index.OnHitSelectedIndex'
+     n.indexList.onKeyPress←FullPathToHandler'##.Index.OnKeyPressInIndex'∆Ref
+     n.indexList.onContextMenu←FullPathToHandler'##.Index.OnContextMenu'
+     n.indexList.on9998←(FullPathToHandler'OnDelayedUpdate')n.indexList
+     0=∆Ref.p.userMode:⍬
+     ⍬
+ }

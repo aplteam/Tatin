@@ -1,0 +1,12 @@
+ TellAboutMissingDefaultPage←{
+     ∆Ref←⍺
+     (in name)←⍵
+     p←↑GetParentAndTopicNameAsText ∆Ref.d.tree[,in;]
+     2=⎕NC p,'.∆DefaultPage':0
+     msg←⊂'There is no default page defined for '
+     msg,←⊂'   ',p
+     msg,←''('Would you like to create one?')
+     0=∆Ref.p.helpCaption YesOrNo msg:1
+     _←∆Ref EditDefaultPage p
+     1
+ }

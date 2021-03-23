@@ -1,5 +1,5 @@
- paths←InstallPackage(identifier_ targetFolder);buildList;level;requestedBy;packageID2;url;installFolder;tempDir
- ;zipFilename;id;identifier;packageID;alias
+ paths←{noBetas}InstallPackage(identifier_ targetFolder)
+ ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request for a package
@@ -9,13 +9,15 @@
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
 ⍝ You may omit either minor+patch or even major+minor+patch in order to install the latest version.
 ⍝ When the best version is to be determined then by default any beta versions are ignored. You can overwrite this by specifying a 1 as ⍺.
+⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
 ⍝ `←` paths to all packages installed with the first one being the "main" package, meaning that all the others (if any) are dependencies.
+ noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
  '"targetFolder" is invalid'Assert F.IsDir⍕targetFolder
  paths←''
  (alias identifier_)←SplitAtAlias identifier_
  identifier←ReplaceRegistryAlias identifier_
  ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
- identifier←CheckVersion identifier
+ identifier←noBetas CheckVersion identifier
  'Package not found'Assert 0<≢identifier
  PrintToSession'  Attempting to install ',identifier,'...'
  :If ~'/'∊identifier

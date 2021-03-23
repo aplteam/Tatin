@@ -1,0 +1,12 @@
+ RemoveCode←{
+     md←A.DLB ⍵
+     0=+/b←(↑¨md)∊'~`':md
+     md2←(b/md)~¨' '
+     b2←↑¨1=⍴¨∪¨md2
+     b2∧←3≤↑¨⍴¨md2
+     md←(~{⍵∨≠\⍵}b\b2)/md
+     md←∊' ',¨md
+     0=≢hits←'`.*?`'⎕S 0 1⊣md:md
+     md[∊{(↑⍵)+⍳1↓⍵}¨hits]←' '
+     md
+ }

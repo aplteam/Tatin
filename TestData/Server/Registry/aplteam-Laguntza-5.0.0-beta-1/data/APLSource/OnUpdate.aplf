@@ -1,0 +1,41 @@
+ {r}←∆Ref OnUpdate msg;rf;arg;gf;fs;tf;obj;ev;in;⎕TRAP;html
+⍝ Basically create appropriate format and display it
+ r←1
+ rf←∆Ref.n.form
+ ⎕TRAP←∆Ref.p.userMode⊃(994 'C' '→∆Error')(994 'C' '→0')
+ :If 0<∆Ref.f.⎕NC'tieNo'
+ :AndIf ~∆Ref.f.tieNo∊⎕FNUMS
+     :Return        ⍝ Timing issue: does not exist anymore.
+ :EndIf
+ :If {11::1 ⋄ 'Namespace'≡rf.Type}⍬            ⍝ The user might just have closed the GUI (Alt+F4...)
+     Cleanup ⍬
+ :Else
+     (obj ev)←2↑msg,(≢msg)↓'' ''
+     :If 0=≢in←GetCurrentItem ∆Ref.n
+         r←0
+     :Else
+         {}∆Ref AddToHistory in                ⍝ Add the first item to the history
+         {}∆Ref CheckBookmarkButton in         ⍝ Make the "Bookmark" button active/inactive
+         {}∆Ref ParentInStatusbar in           ⍝ Display parent path if appropriate
+         {}DisplayParentelInfo ∆Ref in         ⍝ Display number of children (if any)
+         ∆Ref.n.tree.SelItems[in]←1            ⍝ Select the current item
+         html←∆Ref File.GetHtmlFromFile in
+         html←HTML.WrapInHtml ∆Ref 2 html in
+         tf←0                                  ⍝ Test flag - this is not a test
+         fs←2                                  ⍝ Font size; may be one of 1,2,3
+         arg←fs html in tf                     ⍝ Compile argument
+         ∆Ref ViewHTML arg                   ⍝ Display output in proper format
+     :EndIf
+ :EndIf
+ ⎕DL 0.0005 ⋄ 1 ⎕NQ ∆Ref.n.tree'GotFocus'      ⍝ This solves the focus problem!!
+ :Return
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+∆Error:
+ :If 0=∆Ref.p.userMode
+     ⎕←(⎕PW-1)⍴'-'
+     ⎕←'Error in "',(↑{⍺,'.',⍵}/∆Ref.d.tree[in;I.(Parent TopicName)]),'" (row=',(⍕I.Row⊃∆Ref.d.tree[in;]),'); ',⎕DMX.EM
+     ⎕←'Deliberate stop; continue with →⎕LC; do NOT try →1 !'
+     ⎕←'If you want to edit the faulty help page execute this: (updates the help files as well!)'
+     ⎕←'∆Ref Edit ',(⍕in),' ''',(∆Ref GetHelpVarsName in),''''
+     . ⍝ Deliberate stop; read above and then continue with →0 (do NOT try →1).
+ :EndIf

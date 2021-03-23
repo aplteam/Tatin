@@ -1,0 +1,22 @@
+ On9999InIndexKeyword←{
+ ⍝ This is triggered by a timer in order to react with a small delay to user input.
+     rf←0⊃⍵
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     ri←∆Ref.n.indexList                        ⍝ Ref to indexKeyword
+     _←ri.⎕EX'IndexUpdateTimer'
+     (0=≢tx←⎕C ∆Ref.n.indexKeyword.Text):0
+     items←0⊃⎕FREAD ∆Ref.f.(tieNo ∆index)
+     ri.SelItems←(no←≢ri.Items)⍴0
+     bool←(⊃(≢tx)↑¨items)∧.=tx
+     (0=noOf←+/bool):(∆Ref.n.browser.Size←0 0){1}##.ResetStatusbar ∆Ref
+     in←(bool⍳1)⊃1⊃⎕FREAD ∆Ref.f.(tieNo ∆index)
+     ri.SelItems[bool⍳1]←1
+     _←∆Ref ##.SelectItemInTreeView in
+     _←##.ResetStatusbar ∆Ref
+     _←∆Ref ##.SetInfoText(⍕noOf),' index ',((1=noOf)⊃'entries' 'entry'),' match the keyword'
+     ∆←⊂'Timer'
+     ∆,←⊂'Interval' 250
+     ∆,←⊂'Event' 'Timer'(FullPathToHandler'OnIndexTimer')ri
+     1⊣'IndexUpdateTimer'ri.⎕WC ∆
+ }

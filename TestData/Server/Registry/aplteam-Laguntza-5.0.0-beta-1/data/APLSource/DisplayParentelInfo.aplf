@@ -1,0 +1,16 @@
+ DisplayParentelInfo←{
+     (∆Ref in)←⍵
+     n←∆Ref.n
+     d←in⌽∆Ref.d.tree[;I.Depth]     ⍝ Depth information
+     nsa←+/∧\d[0]≤⌽(-in)↑d          ⍝ No of siblings "above"
+     d←(-nsa)⌽d                     ⍝ Embrace siblings "above"
+     d←(1++/∧\(1↓d)≥d[0])↑d         ⍝ Cut back to this "family"
+     ns←¯1+d[0]+.=d                 ⍝ No of siblings "undernath" (-1 because of itself)
+     d←nsa⌽d                        ⍝ Make d[0] current line
+     d←(1+(1↓d)⍳d[0])↑d             ⍝ Cut back to this branch
+     nc←(d[0]+1)+.=(1+(1↓d)⍳d[0])↑d ⍝ No of children
+     tx←(⍕nc),((0=nc)∨1<nc)⊃' child, ' ' children, '
+     tx,←(⍕ns),' sibling',(1<ns)/'s'
+     ≢n.relSB.Text←tx
+⍝ Display information about siblings & children, but only if tree is visible
+ }

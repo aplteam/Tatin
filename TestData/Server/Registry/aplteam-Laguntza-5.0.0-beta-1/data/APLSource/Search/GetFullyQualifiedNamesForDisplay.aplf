@@ -1,0 +1,10 @@
+ GetFullyQualifiedNamesForDisplay←{
+⍝ Create partially qualified names for display purposes, meaning that dots are replaced by slashes.
+     ∆Ref←⍺
+     rows←⍵
+     pqn←⍕¨∆Ref∘##.GetParentOf¨rows
+     pqn←(1+≢⍕↑∆Ref.d.tree[;##.I.Parent])↓¨pqn
+     pqn←pqn{0=≢⍺:⍵ ⋄ ⍺,'/',⍵}¨∆Ref.d.tree[rows;##.I.TopicName]
+     0=≢pqn:''
+     {0=+/b←'.'=d←⍵:d ⋄ (b/d)←'/' ⋄ d}¨pqn  ⍝ Replace . by /
+ }

@@ -1,0 +1,25 @@
+ {html}←∆Ref ViewHTML(s html in tf);⎕TRAP
+⍝ Right argument: size, code, item no, test flag
+ :If 0=IsNotOnSearchTab ∆Ref         ⍝ We emphasize hits only when focus is on the search TAB
+     html(EmphasizeHitsInHTML)←∆Ref
+ :EndIf
+∆CarryOn:
+ :If ~tf
+     ⎕TRAP←((∆Ref.p.trapErrors)/⊂(995 'C' '→0,≢r←''''')),⊂(0 'S')
+ :EndIf
+ :If (,1)≢,tf                        ⍝ Test flag on? Get out!
+
+     ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+     ⍝ We don't do the (memory based) approach anymore because ⍝
+     ⍝ a) Ctrl+F (Find) on a page does not work then           ⍝
+     ⍝ b) The engine is IE11 or worse, NOT Edge!               ⍝
+     ⍝      ∆Ref.n.browser.Document.close                      ⍝
+     ⍝      ∆Ref.n.browser.Document.write⊂1↓↑,/(⎕UCS 13),¨html ⍝
+     ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+
+     (⊂html)FilesAndDirs.NPUT ∆Ref.∆tempFilename 1
+     ∆Ref.n.browser.Navigate⊂'file://',∆Ref.∆tempFilename
+
+ :EndIf
+⍝ Prepare HTML, write to file and make IE display that file.
+⍝ 1=test flag (tf) : do only create the HTML; 0=operate normally.

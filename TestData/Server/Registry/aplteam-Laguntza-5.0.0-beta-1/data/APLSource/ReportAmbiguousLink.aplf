@@ -1,0 +1,11 @@
+ ReportAmbiguousLink←{
+⍝ ⍵ is the link
+     (∆Ref row)←⍺
+     link←⍵               ⍝ Link text and item numbers
+     ((link='*')/link)←'★'
+     r←{' AMBIGUOUS LINK: ',⍵,' '}{⍵,('['∊⍵)/']'}1↓link
+     X.∆Ref.p.userMode:r
+     _←X.∆Ref ReportAmbiguousLink_ link row
+     ⎕THIS.X.linkReport,←⊂'ambiguous'
+     r
+ }

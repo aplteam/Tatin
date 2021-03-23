@@ -1,0 +1,45 @@
+ {r}←testFlag InjectNewPageStub_(∆Ref in parent);body;lastLine;newBody;okFlag;TEMP;name;testlist;path;cmd
+⍝ Returns 1 in case the help was re-compiled, otherwise 0.
+ r←0
+ ⎕SE.⎕SHADOW'TEMP'
+ 'TEMP'⎕SE.⎕NS''
+ okFlag←0
+ :If testFlag
+     name←'Test_'
+     testlist←' '~¨⍨↓'T'parent.⎕NL 2
+     testlist←'Test_'{⍵/⍨⍺∘≡¨(≢⍺)↑¨⍵}testlist
+     :If 0=≢testlist
+         name,←'01'
+     :Else
+         name,←¯2↑'00',⍕1+⍎¯2↑↑¯1↑testlist
+     :EndIf
+ :Else
+     name←AskForName ∆Ref
+ :EndIf
+ →(0=≢name)/0
+ name←' '⎕R'_'⊣name
+ ⍎'⎕SE.TEMP.',(⍕name),'←testFlag CreateStubTopic (⍕parent) name'
+ :Repeat
+     :If 0=testFlag
+     :AndIf 0=⎕SE.TEMP EditByQED name
+         :Return        ⍝ User has not entered anything
+     :EndIf
+     :If 0=≢∊⍎'⎕SE.TEMP.',name
+         :Return
+     :Else
+         okFlag←1
+     :EndIf
+     ⍎(⍕parent),'.',name,'←⎕SE.TEMP.',name
+ :Until okFlag
+ :If CheckOnEditFixForSaltHandler ⍬
+     path←GetSaltPath parent
+     cmd←'SALT.Save ',(⍕parent),'.',name,' ''',path,'\',name,'.dyalog'' -makedir -noprompt'
+     {}⎕SE.UCMD cmd
+ :Else
+     ∆Ref TellAcreAboutChange(⍕parent),'.',name
+ :EndIf
+ ∆Ref AddToTopicProperties name parent
+ {}Compile ∆Ref
+ r←1
+ ∆Ref ShowTopic(⍕parent),'.',name
+⍝Done

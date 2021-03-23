@@ -1,0 +1,14 @@
+ LookUpComplexLink←{
+⍝ Returns the number of rows in the tree that fulfill the link
+⍝ or ¯1 for an external link.
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     (link in)←⍵
+     link←{⍵↑⍨⍵⍳']'}link
+     0=≢link:''
+     (link2 alt)←{'|'∊⍵:'|'A.Split ⍵ ⋄ ⍵''}link
+     link2←{⍵↑⍨⌊/⍵⍳'|] '}link2
+     f←∨/'https://' 'http://'{⍺∊⍨⎕C(≢¨⍺)↑¨⊂⍵}link2
+     f:¯1
+     ≢in ##.FindTopic ∆Ref link2
+ }

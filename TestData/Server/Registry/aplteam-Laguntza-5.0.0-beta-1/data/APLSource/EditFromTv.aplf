@@ -1,0 +1,33 @@
+ {r}←∆Ref EditFromTv in;changeFlag;parentName;varsName;fullName
+⍝ Let user (developers only) edit item number ⍵.
+⍝ Enforces a screen and file update.
+ r←⍬
+ changeFlag←0
+ :If 0≠≢in←∆Ref.n{0=≢⍵:GetCurrentItem ⍺ ⋄ ⍵}in      ⍝ If "in" is empty we look it up.
+     {}ResetStatusbar ∆Ref
+     :If 0=≢varsName←∆Ref GetHelpVarsName in
+         varsName←'∆DefaultPage'
+     :EndIf
+     :If ∆Ref.d.tree[in;I.IsNode]
+         :If ∆Ref TellAboutMissingDefaultPage in varsName
+             :Return
+         :Else
+             :Select ↑∆Ref EditOrDeleteDefaultPage ¯1↓↑'.'A.SplitPath varsName
+             :Case 0                                ⍝ Cancel
+                 :Return
+             :Case 1
+                 parentName←GetParentAndTopicNameAsText ∆Ref.d.tree[in;]
+                 fullName←parentName,'.',varsName
+                 changeFlag←∆Ref Edit in fullName   ⍝ Let user edit and get out if nothing got changed
+             :Case 2
+                 parentName←GetParentAndTopicNameAsText ∆Ref.d.tree[in;]
+                 ∆Ref DeleteDefaultPage varsName parentName
+             :EndSelect
+         :EndIf
+     :Else
+         changeFlag←∆Ref Edit in varsName    ⍝ Let user edit and get out if nothing got changed
+     :EndIf
+     :If changeFlag
+         1 ⎕NQ ∆Ref.n.tree 9999                     ⍝ Enforce screen update
+     :EndIf
+ :EndIf

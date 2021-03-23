@@ -1,0 +1,15 @@
+ {r}←testFlag InjectNewNode_(∆Ref name parent type row);row2;parent2
+ 'Invalid: "type"'⎕SIGNAL 11/⍨~type∊'sibling' 'child'
+ :If 'child'≡↑type
+     parent←parent.⍎↑∆Ref.d.tree[row;I.TopicName]
+ :EndIf
+ name parent.⎕NS''              ⍝ This injects the node. Lexical order applies
+ {}∆Ref AddToTopicProperties name parent
+ {}Compile ∆Ref
+ row2←∆Ref GetItemNumberFromPattern(⍕parent),'.',name
+ :If 0≠≢row2
+     {}∆Ref SelectItemInTreeView row2
+     {}ProcessEvents ∆Ref.n.form
+ :EndIf
+ {}'into'InjectNewPageStub ∆Ref row2 testFlag
+⍝Done

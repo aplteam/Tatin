@@ -1,0 +1,13 @@
+ EditFromSearch←{
+     ∆Ref←⍺
+     in←⍵
+     in←∆Ref.n{0=≢⍵:GetCurrentItem ⍺ ⋄ ⍵}in ⍝ If "in" is empty we look it up.
+     (0=≢in):⍬                              ⍝ item in question; empty: no item selected
+     name←∆Ref GetHelpVarsName in
+     0=∆Ref Edit in name:0                  ⍝ Let user edit and get out if nothing got changed
+     _←1 ⎕NQ ∆Ref.n.reportList 9999         ⍝ Enforce screen update
+     0
+ ⍝ Let user (developers only) edit item number ⍵
+ ⍝ By default this fns also enforces a screen update and moves
+ ⍝ the focus to the hit list
+ }

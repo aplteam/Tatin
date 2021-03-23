@@ -1,0 +1,16 @@
+ FindIn←{
+⍝ Returns indices for everything in tx that is marked up by "markup"
+⍝ "markup" is typically "*" or "_"
+⍝ Example:
+⍝ '*' FindIn  'This is *bold*'
+⍝ '*' FindIn  'This is * not bold *'
+     markup←⍺
+     tx←⍵
+     tx2←' ',(MaskAplCharsAndLinks tx),' '
+     (((markup,markup)⍷tx2)/tx2)←' '
+     tx2[,({⍵/⍳≢⍵}('\',markup)⍷tx2)∘.+⍳2]←' '
+     tx2[1+{⍵/⍳≢⍵}(' ',markup,' ')⍷tx2]←' '
+     ~markup∊tx2:⍬
+     i←¯1+{⍵/⍳≢⍵}tx2=markup
+     (2×⌊0.5×≢i)↑i                  ⍝ Make sure we have open/close pairs
+ }

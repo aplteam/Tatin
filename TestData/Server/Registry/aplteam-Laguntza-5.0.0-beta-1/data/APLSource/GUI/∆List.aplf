@@ -1,0 +1,16 @@
+ ∆List←{
+    ⍝ List all controls with their ⍵ and caption (if any)
+    ⍝ ⍵ is "type"
+    ⍝ If "type" is empty, all controls are listed.
+    ⍝ if "type" is not empty then only controls are listed of that "type".
+    ⍝ "type" can be either a simple string or a vector of strings.
+     vars←⎕NL-2
+     refs←⎕NL-9
+     r←⊃{6 2::'-' '' ⋄ rf←⍎⍵ ⋄ (⊂⍵),(⊂rf.Type),(⊂{0::'' ⋄ ⍵.Caption}rf)}¨refs
+     r{(0=≢⍵):⍺ ⋄ ⍺,[0](⍪⍵),((≢⍵),2)⍴'Vars' ''}←vars
+     (0=≢⍵):r
+     types←{0 1∊⍨≡⍵:,⊂,⍵ ⋄ ⍵}⍵
+     bool←(r[;1]≢¨⊂'Vars')\({0::'' ⋄ ⍵.Type}∘⍎¨refs)∊types
+     r←bool⌿r
+     r
+ }

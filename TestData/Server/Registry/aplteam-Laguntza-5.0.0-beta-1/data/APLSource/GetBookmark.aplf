@@ -1,0 +1,10 @@
+ GetBookmark←{
+     ∆Ref←⍺
+     id←{⍵.id}∆Ref.n.bookmarkMenu.⍎⍵
+     in←1⍳⍨↑∧/id{⍺∘≡¨⍵}¨↓⍉∆Ref.d.tree[;I.(Parent TopicName)]
+     _←Display ∆Ref in                  ⍝ Display it
+     _←SelectTreeView ∆Ref              ⍝ Force TreeView to be THE tab
+     0
+ ⍝ Called by selecting an item from the "Bookmarked" menu, if there is any.
+ ⍝ Forces also the TreeView to be the current tab if it is not.
+ }

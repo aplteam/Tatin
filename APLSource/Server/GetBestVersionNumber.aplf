@@ -1,18 +1,21 @@
- response←request GetBestVersionNumber packageID;bestVersion;ns;group;includeBetas
+ response←request GetBestVersionNumber packageID;bestVersion;ns;group;noBetas
 ⍝ `path` is fully qualified. The packageID part might have just a major version no. or no version numer at all
  :If Reg.IsValidPackageName packageID
      :If 0<≢group←EstablishGroup packageID
          packageID←group,packageID
      :Else
          response←'Package not found'Return404 request
+         :If 200≠response.StatusCode
+             :Return
+         :EndIf
      :EndIf
  :EndIf
- :If 0=≢includeBetas←request R.GetHeaderValue'include-betas'
-     includeBetas←0
+ :If 0=≢noBetas←request R.GetHeaderValue'include-betas'
+     noBetas←0
  :Else
-     includeBetas←includeBetas∊'yY'
+     noBetas←~noBetas∊'yY'
  :EndIf
- bestVersion←(≢G.RegistryPath)↓includeBetas Reg.GetBestVersionNumber G.RegistryPath,packageID
+ bestVersion←(≢G.RegistryPath)↓noBetas Reg.GetBestVersionNumber G.RegistryPath,packageID
  :If 0<≢bestVersion
      ns←⎕NS''
      ns.BestVersion←bestVersion

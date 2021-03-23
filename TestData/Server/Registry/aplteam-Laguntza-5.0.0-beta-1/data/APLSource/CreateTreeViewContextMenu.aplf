@@ -1,0 +1,62 @@
+ CreateTreeViewContextMenu←{
+     ∆Ref←⍵
+     n←⎕NS''
+     tree←∆Ref.n.tree                        ⍝ Create reference to GUI tree object
+     tab←⎕UCS 9
+     in←tree.SelItems{(≢⍺)=l←⍺⍳1:⍬ ⋄ l}1     ⍝ Currently selected item
+     hc←0<in NoOfChildren ∆Ref.d.tree[;I.Depth]  ⍝ Has it children?
+     n.menu←⎕NEW⊂'Menu'
+     n.collaps←n.menu.⎕NEW'MenuItem'(('Caption' 'Collapse incl. children')('Active'hc))
+     n.expand←n.menu.⎕NEW'MenuItem'(('Caption' 'Expand incl. children')('Active'hc))
+     bm←∆Ref IsBookmarkable in               ⍝ Gets 1 if item may be bookmarked
+     tx←'Bookmark this item',tab,'Ctrl+D'
+     n.bookmark←n.menu.⎕NEW'MenuItem'(('Caption'tx)('Active'bm))
+     n.sep05←n.menu.⎕NEW⊂'Separator'
+     tx←'Increase font size',tab,'Mouse wheel ↑'
+     n.increaseFontSize←n.menu.⎕NEW'MenuItem'(⊂('Caption'tx))
+     tx←'Decrease font size',tab,'Mouse wheel ↓'
+     n.decreaseFontSize←n.menu.⎕NEW'MenuItem'(⊂('Caption'tx))
+     tx←'Reset font size'
+     n.resetFontSize←n.menu.⎕NEW'MenuItem'(⊂('Caption'tx))
+     ('MenuItem'⎕WN n.menu).onSelect←1
+     ∆Ref.p.userMode:n                       ⍝ Running in user mode? Done!
+
+     n.sep10←n.menu.⎕NEW⊂'Separator'
+
+     tx←∆Ref GetContextMenuCaptionForHelpPageEdit in
+     n.editHelp←n.menu.⎕NEW'MenuItem'(⊂'Caption'tx)
+
+     tx←'Copy short name to clipboard'
+     n.copyShortName←n.menu.⎕NEW'MenuItem'(,⊂'Caption'tx)
+
+     tx←'Copy full name to clipboard'
+     n.copyFullName←n.menu.⎕NEW'MenuItem'(,⊂'Caption'tx)
+
+     tx←'Print full name to []SE'
+     n.printFullName←n.menu.⎕NEW'MenuItem'(,⊂'Caption'tx)
+
+     n.sep15←n.menu.⎕NEW⊂'Separator'
+
+     tx←'Inject new help page (stub)'
+     n.injectPage←n.menu.⎕NEW'MenuItem'(⊂('Caption'tx))
+
+     tx←'Inject new node'
+     n.injectNode←n.menu.⎕NEW'MenuItem'(⊂('Caption'tx))
+
+     n.renameHelp←n.menu.⎕NEW'MenuItem'(('Caption' 'Rename help page...')('Active'((0=∆Ref.d.tree[in;I.IsNode])∧0≠≢↑∆Ref GetVarsName in)))
+     tx←∆Ref GetContextMenuCaptionForDeleteItemFromTreeView in
+     n.deleteHelp←n.menu.⎕NEW'MenuItem'(,⊂('Caption'tx))
+
+     tx←'Manage ∆TopicProperties'
+     n.editTopicProperties←n.menu.⎕NEW'MenuItem'(⊂('Caption'tx))
+
+     n.sep20←n.menu.⎕NEW⊂'Separator'
+
+     tx←'Check for broken links'
+     n.brokenLinks←n.menu.⎕NEW'MenuItem'(,⊂('Caption'tx))
+     tx←'Check for ambiguous links'
+     n.ambiguousLinks←n.menu.⎕NEW'MenuItem'(,⊂('Caption'tx))
+     ('MenuItem'⎕WN n.menu).onSelect←1
+
+     n
+ }

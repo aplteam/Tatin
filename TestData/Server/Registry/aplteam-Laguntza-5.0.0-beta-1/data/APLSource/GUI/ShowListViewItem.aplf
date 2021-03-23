@@ -1,0 +1,9 @@
+ ShowListViewItem←{
+⍝ ref points to a ListView
+⍝ in is item number to ensure is visible
+     (ref in)←⍵
+     _←'sendmsg'⎕NA'I4 USER32|SendMessage* P U4 P P'
+     hndl←ref ⎕WG'Handle'
+     LVM_ENSUREVISIBLE←4115
+     ⍬⊣sendmsg hndl LVM_ENSUREVISIBLE in 1
+ }

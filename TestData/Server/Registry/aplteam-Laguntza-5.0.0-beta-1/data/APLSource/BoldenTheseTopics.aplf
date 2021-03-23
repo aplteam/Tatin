@@ -1,0 +1,16 @@
+ BoldenTheseTopics←{
+     ∆Ref←⍺
+     rows←⍵
+     st←∆Ref GetStates 1                    ⍝ Get status for all topics
+     st[;4]←0                               ⍝ First reset ALL
+     st[rows;4]←1                           ⍝ Set the "Bold" flag for the missed ones.
+     ∆Ref.n.tree.Visible←0
+     _←∆Ref SetStates st                    ⍝ Write status back
+     ∆Ref.n.tree.Visible←1
+     plural←1<≢rows
+     _←∆Ref SelectItemInTreeView(0⊃,rows)
+     _←1 ⎕NQ ∆Ref.n.tree 9999               ⍝ Enforce screen update
+     ∆Ref.n.infoSB.Text←(⍕≢rows),' page',(plural/'s'),' emphasized'
+     ⍬
+⍝ Emphasizes all rows given in ⍵ (row numbers for d.tree)
+ }

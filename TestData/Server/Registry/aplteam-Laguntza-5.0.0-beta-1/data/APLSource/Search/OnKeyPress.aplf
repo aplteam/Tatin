@@ -1,0 +1,17 @@
+ OnKeyPress←{
+     ref←⍎0⊃⍵                       ⍝ Reference to the list
+     ∆Ref←⍺
+     0=≢ref.SelItems:0              ⍝ Yes, this HAS hapanned
+     0=+/ref.SelItems:0             ⍝ Yes, this HAS hapanned
+     flag←2↑3↓⍵≡68 2                ⍝ Was Ctrl+D pressed?
+     in←{⍵.lines⌷⍨⍵.SelItems⍳1}ref  ⍝ Item number
+     bm←∆Ref ##.IsBookmarkable in   ⍝ Is current "bookmarkable"?
+     _←##.Bookmark(flag∧bm)/in      ⍝ Then bookmark this item
+     f←∆Ref.p.userMode∨13 2≢2↑4↓⍵   ⍝ Either user mode or not Ctrl+Enter
+     f:{_←⎕NQ ⍵ 9998 ⋄ 1}0⊃⍵        ⍝ Create timer for update
+     in←{⍵.lines⌷⍨⍵.SelItems⍳1}ref  ⍝ Item number
+     _←##.EditFromSearch in         ⍝ Let this fns edit
+     _←⎕NQ ref'GotFocus'            ⍝ Force focus back to the list (because of ⎕ED)
+     0                              ⍝ Suppress keystroke
+⍝ Processes Ctrl+D, Ctrl+Enter and others
+ }

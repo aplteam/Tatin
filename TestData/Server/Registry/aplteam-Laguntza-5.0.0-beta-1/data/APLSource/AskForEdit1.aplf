@@ -1,0 +1,21 @@
+ r←AskForEdit1(fnsName result length depth ticks);bool
+⍝ Asks the user whether she wants to fix the problem.
+⍝ Print some information regarding the lines causing the problem.
+⍝ r is 1 in case the user made an effort to fix the problem , otherwise 0.
+ ⎕←{⍵↑'--- Attention ',⍵⍴'-'}⎕PW-1
+ ⎕←'The function "',fnsName,' has a problem!'
+ :If 1∊ticks
+     ⎕←'  Odd numbers of ticks (`) in ',(+/ticks),' item(s)'
+ :EndIf
+ :If 2∨.≠length
+     ⎕←'  Length of ',(2+.≠length),' item(s) is invalid'
+ :EndIf
+ :If ∨/~depth∊3 4
+     ⎕←'  Depth of ',(+/~depth∊3 4),' item(s) is invalid'
+ :EndIf
+ bool←(ticks)∨(2≠length)∨(~depth∊3 4)
+ ⎕←'Problems:'
+ ⎕←⍪'  '∘,¨{(70⌊≢⍵)↑⍵}¨∊¨bool/result
+ :If r←YesOrNoInSession'Would you like to edit the function in order to fix the problem? (n=problem is ignored)'
+     EditByQED fnsName
+ :EndIf

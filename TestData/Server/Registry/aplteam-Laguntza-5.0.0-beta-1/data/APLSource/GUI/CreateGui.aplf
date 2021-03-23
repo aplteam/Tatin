@@ -1,0 +1,21 @@
+ CreateGui←{
+     ∆Ref←⍵
+     ∆Ref.n←⎕NS'∆List'
+     _←CreateForm ∆Ref
+     _←CreateHiddenButtons ∆Ref
+     _←CreateToolbar ∆Ref
+     _←CreateStatusbar ∆Ref
+     _←CreateMenus ∆Ref
+     _←CreateTabs ∆Ref
+     _←CreateTreeView ∆Ref
+     _←CreateSearch ∆Ref
+     _←CreateIndex ∆Ref
+     _←CreateBrowser ∆Ref
+     _←##.ShowEggTimer ∆Ref             ⍝ Now the objects exist
+     ∆Ref.n.∆Ref←∆Ref
+     _←EstablishTabSelectHandler ∆Ref   ⍝ Make sure that tab changes are handled
+     ∆Ref.d.currentTabIs←∆Ref.n.tree    ⍝ Used to overcome the focus problem; see OnTitleChangeInWebBrowser
+     (0=∆Ref.p.visible):⍬
+     ⍬⊣2 ⎕NQ ∆Ref.n.tree'Flush'
+⍝ Creates the main GUI
+ }

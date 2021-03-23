@@ -1,0 +1,16 @@
+ DisplayCurrentTopicInBrowser←{
+     ∆Ref←⍵
+     A←∆Ref.d.A
+     (0=≢in←GetCurrentItem ∆Ref.n):0            ⍝ Which item (if any)?
+     body←∆Ref File.GetHtmlFromFile in
+     0=≢body:⍬⊣Show'This is a node without a default page'
+     fs←2                                       ⍝ Font size; may be one of 1,2,3
+     html←HTML.WrapInHtml(∆Ref fs body in)      ⍝ Create the self-contained HTML page
+     f←GetTempFilename''
+     f←(¯4↓f),'.html'
+     _←(⊂html)FilesAndDirs.NPUT f
+     _←A.GoToWebPage'file:///',f
+     ⍬
+⍝ Takes the currently selected topic, writes it into a tmep file and then
+⍝ starts the defult browser on that file.
+ }

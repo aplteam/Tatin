@@ -1,0 +1,25 @@
+ BuildDocFromAllPages←{
+     ⍺←0
+     ∆Ref←⍵
+     ∆Ref.∆ReportToSession←⍺                    ⍝ 1 = don't report problems with links to the session
+     A←∆Ref.d.A
+     _←ShowEggTimer ∆Ref
+     ∆Ref.n.PB←ProgressbarCreate ∆Ref
+     _←⎕DL 0.5                                  ⍝ Otherwise the status bar never becomes visible
+     fs←2                                       ⍝ Font size
+     l←∆Ref GetVarsName ∆Ref.d.tree[;I.Row]     ⍝ List of help pages
+     doc←GetAllHtmlFromFile ∆Ref
+     doc←l{(1↑⍵),(⊂'<p class="fns_name">',⍺,'</p>'),1↓⍵}¨doc
+     doc,¨←⊂⊂'<hr/>'
+     doc←⊃,/doc
+     cssFlag←1
+     doc←(HTML.MakeCssForDoc HTML.HtmlTopCode fs'Help Pages'cssFlag),doc
+     tf←GetTempFilename'html'
+     _←(⊂doc)FilesAndDirs.NPUT tf 1
+     _←∆Ref SetInfoText''
+     _←∆Ref.n.PB.Close
+     _←RemoveEggTimer ∆Ref
+     tf
+⍝ Creates HTML code representing a complete document by default.
+⍝ Returns the name of the (temp) file with the HTML.
+ }

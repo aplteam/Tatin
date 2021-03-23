@@ -1,0 +1,44 @@
+ {∆Ref}←{enforceCompile}New ps;projectName;A
+⍝ Creates a new instance of a help system.
+⍝ Parameter space "ps" is needed. Function `CreateParms` creates one with defaults.\\
+⍝ Example:\\
+⍝ ~~~
+⍝ ps←Laguntza.CreateParms ⍬
+⍝ ps.folderName←'C:\MyHelp'
+⍝ ps.source←#.MyHelp
+⍝ Markdown2.New ps
+⍝ ~~~
+ ⎕ML←3 ⋄ ⎕IO←0
+ A←APLTreeUtils2
+ 'Right argument must be a parameter space'⎕SIGNAL 11/⍨9.1≢⎕NC⊂'ps'
+ ps←CreateParms ps
+ ps←CheckParms ps
+ enforceCompile←HandleEnforceCompile ps{0<⎕NC ⍵:⍎⍵ ⋄ CheckCompileFiles ⍺}'enforceCompile'
+ ps.folderName←(-(¯1↑ps.folderName)∊'\/')↓ps.folderName
+ 'Invalid parameter: "foldername"'⎕SIGNAL 11/⍨(,ps.folderName)≡,¯1
+ {}TidyUp ⍬
+ ∆Ref←CreateHelpForm ps
+ ∆Ref.A←A   ⍝ Establish a reference to APLTreeUtils2 for performance
+ ∆Ref.∆NamespaceTree←ListNamespaceTree⍎{⍵↑⍨⍵⍳'.'}(⎕IO)⊃{⍵/⍨0<⍬∘⍴¨⍴¨⍵}⎕XSI
+ ∆Ref.∆parms←ps
+ ∆Ref.∆tempFilename←GetTempFilename'html'
+ {}CreateData ∆Ref
+ ∆Ref.p←ps
+ {}ps ReadGuiParmsFromRegistry ∆Ref
+ {}GUI.CreateGui ∆Ref
+ :If enforceCompile
+     {}CompileHelpFile ∆Ref
+ :Else
+     'f'∆Ref.⎕NS''
+     ∆Ref←File.EstablishFileIndexVars ∆Ref
+     ∆Ref.f.filename←File.GetHelpFileName
+ :EndIf
+ {}GUI.PopulateToolbar ∆Ref
+ ∆Ref.d.tree←File.OpenFilesAndGetTree ∆Ref
+ {}ps ReadBookMarksFromRegistry ∆Ref
+ {}PopulateGUI ∆Ref
+ {}¯1 Display ∆Ref ∆Ref.p.page
+ ∆Ref.n.browser_sf.Active←1
+ :If ∆Ref.p.visible
+     2 ⎕NQ ∆Ref.n.tree'GotFocus'
+ :EndIf

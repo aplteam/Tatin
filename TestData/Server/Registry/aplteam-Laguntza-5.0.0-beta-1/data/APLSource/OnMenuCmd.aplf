@@ -1,0 +1,35 @@
+ OnMenuCmd←{
+     ∆Ref←Get∆Ref 0⊃⍵
+     n←∆Ref.n
+     _←ResetStatusbar ∆Ref
+     name←{⍵↑⍨-'.'⍳⍨⌽⍵}⍕0⊃⍵         ⍝ Select the pure name
+   ⍝ Handle all the different menu commands:
+     ('showHtmlFile'≡name):DisplayCurrentTopicInBrowser ∆Ref
+     ('showHtml'≡name):ShowHtmlOfCurrentTopic ∆Ref
+     ('quit'≡name):CloseGui ∆Ref
+     ('about'≡name):About ∆Ref
+     ('add'≡name):∆Ref Bookmark GetCurrentItem ∆Ref.n
+     ('del'≡name):∆Ref DelBookmark GetCurrentItem ∆Ref.n
+     ('delAll'≡name):DelAllBookmarks ∆Ref
+     ('collapse'≡name):∆Ref CollapseAll 1
+     ('expand'≡name):∆Ref ExpandAll 1
+     ('devHelp'≡name):ShowDevelopersHelp ⍬
+     ('crash'≡name):f.mb.dev.crash.Checked←~f.mb.dev.crash.Checked
+     ('proofRead'≡name):GUI.OnBuildDocFromAllPages ∆Ref
+     ('compile'≡name):Compile ∆Ref
+     ('reportBrokenLinks'≡name):⍬⊣Lint_.ReportBrokenLinks ∆Ref
+     ('reportAmbiguousLinks'≡name):⍬⊣Lint_.ReportAmbiguousLinks ∆Ref
+     ('reportTopicProperties'≡name):⍬⊣Lint_.ReportTopicProperties ∆Ref
+     ('unbold'≡name):UnboldAll ∆Ref
+     ('browseTree'≡name):BrowseTree ∆Ref
+     ('nextBold'≡name):GoToNextBoldTopic ∆Ref
+     ('helpHelp'≡name):HelpOnHelp&∆Ref
+     ('gotoRow'≡name):GoToRow ∆Ref
+     ('reportMissingIndexes'≡name):ReportMissingIndexEntries ∆Ref
+     ('handleTopicProperties'≡name):HandleTopicProperties ∆Ref
+     ('export'≡name):Export2HTML ∆Ref
+     (('i'=1⍴name)∧∧/(1↓name)∊⎕D):∆Ref GetBookmark name
+   ⍝ What passed through is probably something very new?!
+     . ⍝ Huuh?!
+⍝ General callback for all "Select" events on any menu items in the main form
+ }

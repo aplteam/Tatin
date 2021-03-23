@@ -1,0 +1,7 @@
+ page←GetPageName dummy;cla;searchFor;cl;cf
+⍝ Checks the command line for page and returns its settings or an empty vector otherwise
+ cla←2 ⎕NQ'#' 'GetCommandLineArgs'
+ cla←cla~¨'-'
+ searchFor←'page='
+ page←↑1↑{⍵/⍨0<≢¨⍵}searchFor∘{0=⍺≡(≢⍺)↑⎕C ⍵:'' ⋄ (≢⍺)↓⍵}¨cla
+⍝Done

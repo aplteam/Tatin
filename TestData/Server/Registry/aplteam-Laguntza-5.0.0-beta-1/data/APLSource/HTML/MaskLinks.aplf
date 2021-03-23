@@ -1,0 +1,22 @@
+ r←{sep}MaskLinks tx;b1;b2;tx2;b3;count
+ sep←{0=⎕NC ⍵:']' ⋄ ⍎⍵}'sep'                ⍝ By default the full link is masked. Can be '|' instead when the link text should survive
+ :If 1≠≢sep
+ :OrIf ~sep∊'|]'
+     'Invalid left argument'⎕SIGNAL 11
+ :Else
+     b1←'→['⍷r←tx                           ⍝ The links
+     :If 0<+/b1                             ⍝ No links? Done!
+         tx2←b1{⎕ML←1 ⋄ ⍺⊂⍵}r               ⍝ Split up where the link(s) start
+         b2←∊<\¨tx2=sep                     ⍝ Split and look for the fist `sep` - that's the end of the link
+         :If sep='|'
+             b3←∊<\¨tx2=']'                 ⍝ When the link text is supposed to surive the closing `]` must be wiped out
+         :EndIf
+         count←(≢b2)++/∧\~b1                ⍝ How many chars until the first link?
+         b2←(-count)↑b2                     ⍝ Fill up
+         r[{⍵/⍳≢⍵}{⍵∨≠\⍵}b1∨b2]←' '         ⍝ Mask the links
+         :If sep='|'
+             b3←(-count)↑b3                 ⍝ Fill up
+             (b3/r)←' '                     ⍝ The closing `]` of any links becomes a blank
+         :EndIf
+     :EndIf
+ :EndIf

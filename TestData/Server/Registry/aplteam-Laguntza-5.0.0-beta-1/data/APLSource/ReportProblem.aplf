@@ -1,0 +1,12 @@
+ ReportProblem←{
+     ∆Ref←⍺
+     (ps tree)←⍵
+     ps.userMode:⍬
+     (~0∊nc←{↑(4⊃⍵).⎕NC 1⊃⍵}¨↓tree):⍬
+     0=∆Ref.p.reportToSession:⍬
+     ⎕←(⎕PW-1)⍴'--- Problems (∆TopicProperties?!) - these do not exist: ',⎕PW⍴'-'
+     ⎕←⍪{(⍕4⊃⍵),'.',1⊃⍵}¨↓(nc=0)⌿tree
+     ⍬
+⍝ Reports any problems with items (probably ∆TopicProperties!
+⍝ to the session but only in user mode.
+ }

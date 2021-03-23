@@ -1,0 +1,15 @@
+ ReportBrokenLinks←{
+     ∆Ref←⍵
+     A←∆Ref.d.A
+     ⍺←¯1
+     buf←⍺ CheckBrokenLinks ∆Ref
+     _←##.UnboldAll ∆Ref
+     (0=≢buf):⍬⊣⎕←'No broken links found'
+     ⎕←(⎕PW-1)⍴'-'
+     ⎕←buf
+     0=∆Ref.p.helpCaption ##.YesOrNo'Would you like to emphasize all pages with broken links?':⍬
+     buf←1↓,buf
+     rows←⍎¨buf{⍵↑⍨⍵⍳' '}¨A.DLB buf                 ⍝ Isolate line numbers (tree)
+     _←∆Ref ##.BoldenTheseTopics rows
+     ⍬
+ }

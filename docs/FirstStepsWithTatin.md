@@ -125,7 +125,7 @@ That can be achieved with the `LoadPackage` user command. It loads the package i
 
 A> ### Leaving a trace on the file system
 A>
-A> In case the package has file dependencies, like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there _is_ a footprint left on the file system.
+A> In case the package has file dependencies (assets), like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there _is_ a footprint left on the file system.
 
 Notes:
 
@@ -150,11 +150,11 @@ Let's load the `MarkAPL` package into the workspace; for that we need to specify
   ...
 ```
 
-I> In case the package or any of its dependencies comes with assets, the path to a directory in the temp directory of your OS is printed to the session by `]tatin.LoadPackage`.
+In case the target namespace is something like `#.MyTests` it may or may not exist. If it does not, Tatin will create it.
+
+I> If the package or any of its dependencies depend on assets the path to a directory in the temp directory of your OS is printed to the session by `]tatin.LoadPackage`.
 I>
 I> This is because this folder cannot be deleted by Tatin. If no package has any assets then nothing is printed to the session, indicating that no footprint is left behind.
-
-In case the target namespace is something like `#.MyTests` it may or may not exist. If it does not, Tatin will create it.
 
 I> When you try to execute the following statements on your own machine then you will probably see different version numbers.
 
@@ -203,9 +203,11 @@ For that you need to execute two steps:
       ]TATIN.InstallPackage [tatin]aplteam-MarkAPL /Path2Foo/Packages
 ```
 
-Note that we did not specify any of the major, minor and patch number but the Registry by alias (`[tatin]`); that tells Tatin that we want to get the very latest version of `MarkAPL` from the principal Tatin server.
+Note that we did not specify any of the major, minor and patch numbers but the Registry by alias (`[tatin]`); that tells Tatin that we want to get the very latest version of `MarkAPL` from the principal Tatin server.
 
 If you do not even specify the Registry then Tatin would scan all Registry; the first hit wins. Only then would it establish the best version on that server.
+
+You may even omit the group name, although this would fail in case the name ("MarkAPL") is used by multiple groups.
 
 Let's check what's now in `/Path2Foo/Packages`
 

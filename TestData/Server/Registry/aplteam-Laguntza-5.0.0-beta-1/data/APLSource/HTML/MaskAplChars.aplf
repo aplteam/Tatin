@@ -1,0 +1,8 @@
+ MaskAplChars←{
+⍝ Masks everything between backticks.
+⍝ 'This                 code →[Link]' ← MaskAplCharsAndLinks 'This `is Inline APL` code →[Link]'
+     tx←⍵
+     0=+/b←'`'=tx:tx                    ⍝
+     tx[{⍵/⍳≢⍵}{⍵∨≠\⍵}b]←' '           ⍝ Mask the APL
+     tx
+ }

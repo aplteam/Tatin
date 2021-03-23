@@ -1,0 +1,16 @@
+ Collapse←{
+     ∆Ref←⍺
+     n←∆Ref.n
+     itemNo←⍵
+     state←⌽(32⍴2)⊤n.tree.GetItemState itemNo           ⍝ Get states
+     isParent←</(∆Ref.d.tree[;I.Depth],¯1)[itemNo+0 1]  ⍝ Is it a parent?
+     (isParent∧5⊃state):0,0/n.tree.Retracting itemNo    ⍝ Is expanded? Collapse!
+     (0=itemNo):0                                       ⍝ It's the very first item? Get out!
+     node←{⍵-{1⍳⍨(0⊃⍵)>⍵}⌽∆Ref.d.tree[1+⍳⍵;I.Depth]}itemNo⍝ Calc next parent...
+     _←n.tree.Retracting node                           ⍝ ... and collapse that one
+     _←∆Ref SetItem node                                ⍝ Select the parent
+     _←⎕NQ n.tree 9999                                  ⍝ Enforce an update
+     0
+ ⍝ Called to collapse a branch. If "-" is pressed on something
+ ⍝ that is not a node the parent node is collapsed.
+ }

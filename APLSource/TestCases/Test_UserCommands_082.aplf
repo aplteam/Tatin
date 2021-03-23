@@ -1,0 +1,18 @@
+ r←Test_UserCommands_082(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;rc;msg
+⍝ Exercise ]Tatin.LoadPackage on a beta package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ (rc msg res)←∆UCMD'LoadPackage [local]Laguntza #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg    ⍝ Error?! 1043 Conga?!  just do →⎕lc-1
+ →T.GoToTidyUp'5.0.0-beta-1'≢∆RemoveBuildFromVersion 2⊃#._tatin.aplteam_Laguntza_5_0_0_beta_1.code.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir res
+⍝Done

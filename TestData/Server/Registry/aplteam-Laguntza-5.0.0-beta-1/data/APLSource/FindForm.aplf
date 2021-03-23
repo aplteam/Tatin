@@ -1,0 +1,12 @@
+ FindForm←{
+⍝ ⍵ is a ref to a child of a Form
+⍝ Finds the Form and returns its ref
+⍝ Occasionally this crashes with a DOMAIN ERROR because it's too fast.
+⍝ In such cases it calls itself recursively with a delay but controls
+⍝ the number of attempts via the left argument.
+     ⍺←¯1
+     11::(⍺+1)∇{_←⎕DL 0.2 ⋄ ⍵}⍵
+     ⍺=2:. ⍝ Avoid endless loop. Has never ocurred in real life
+     (⍵.Type≡'Form'):⍵
+     ∇ ⍵.##
+ }

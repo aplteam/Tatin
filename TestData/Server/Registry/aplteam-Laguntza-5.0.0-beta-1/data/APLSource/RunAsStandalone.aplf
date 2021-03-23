@@ -1,0 +1,55 @@
+ {r}←RunAsStandalone;ps;ref;⎕ML;⎕IO;cd;msg;filename;rc;folderName;expand;tieNo;⎕TRAP;parms;debug;isDev
+⍝ This function runs under ViewHelp.exe.
+ ⎕ML←3 ⋄ ⎕IO←0
+ r←⍬
+ AllowContinueWS ⍬
+ :If 0
+     ⎕TRAP←0 'S'
+     AllowRide 4613
+ :Else
+     ⎕TRAP←(0 'E' '#.Laguntza.HandleError')
+ :EndIf
+ :If 0=isDev←A.IsDevelopment
+     folderName←GetHelpFolder ⍬
+     expand←'None'
+     filename←folderName,File.GetHelpFileName
+     :If ~File.DoesFileExist filename
+         msg←'Could not find:'filename
+         msg,←'' 'The programm cannot continue.'
+         ⍝ --- Debug information
+         :If debug←0
+             msg,←⊂'folder name: ',folderName
+             msg,←⊂'Command line: ',⎕C 2 ⎕NQ'#' 'GetCommandLine'
+             msg,←⊂'Current directory: ',#.FilesAndDirs.PWD
+         :EndIf
+         'Laguntza'Show msg
+         :If isDev
+             ∘∘∘
+         :Else
+             ⎕OFF
+         :EndIf
+     :EndIf
+     tieNo←filename ⎕FSTIE 0
+     parms←⎕FREAD tieNo 6
+     ⎕FUNTIE tieNo
+     ps←⎕NS''
+     parms[parms[;0]⍳⊂'userMode';1]←1 ⍝ This function always runs in user mode
+     :If 0≠≢parms
+         ps.{⍎(0⊃⍵),'←1⊃⍵'}¨↓parms
+     :EndIf
+     ps.folderName←folderName
+     :If File.DoesFileExist'help.ico'
+         ps.helpIcon←'file:///',(↑⎕CMD'cd'),'\help.ico'
+     :EndIf
+     ps.visible←1
+     ps.page←GetPageName ⍬
+     ref←New ps
+     ⎕DQ ref
+     :If isDev
+         ∘∘∘
+     :Else
+         ⎕OFF
+     :EndIf
+ :Else
+     ⎕←'*** Runs under Runtime ViewHelp.exe only!'
+ :EndIf

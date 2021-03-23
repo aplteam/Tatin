@@ -1,0 +1,44 @@
+ r←Test_Misc_010(stopFlag batchFlag);⎕TRAP;dir;src;reg;body;cfg;rc;msg;zipFilename;refs;toBeDeleted;instance
+⍝ Acess assets via ∆HOME from the instance of a class
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+ toBeDeleted←''
+
+ TC.Reg.CreateRegistry reg
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←''
+ body,←'∇r←PI' ':Access Public Instance' 'home←(⊃⊃⎕CLASS ⎕THIS).##.##.∆HOME' 'filename←home,''/pi.txt''' 'r←⊃(//)⎕VFI(⊃⎕NGET filename)~⎕TC' '∇'
+ body,←'∇r←AssetFolder' ':Access Public Shared' 'r←##.##.∆HOME' '∇'
+ body←(⊂':Class MyClass'),body,(⊂':EndClass')
+ (⊂body)F.NPUT src,'/AssetAccess.aplc'
+ (⊂,⊂'3.14')F.NPUT src,'/pi.txt'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'AssetAccess' '1.0.0'
+ cfg.source←'AssetAccess.aplc'
+ cfg.assets←'pi.txt'
+ TC.WritePackageConfigFile src cfg
+ (rc msg zipFilename)←TC.PublishPackage src reg
+ toBeDeleted,←⊂zipFilename
+ Assert 200=rc
+
+ refs←TC.LoadPackage(reg,'/Example-AssetAccess-1.0.0')#.TEMP
+ →T.GoToTidyUp 0=≢refs
+ instance←⎕NEW #.TEMP.AssetAccess.MyClass
+ →T.GoToTidyUp 3.14≠instance.PI
+ →T.GoToTidyUp'Example-AssetAccess-1.0.0'≢⊃,/1↓⎕NPARTS #.TEMP.AssetAccess.MyClass.AssetFolder
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ F.DeleteFile toBeDeleted
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -1,0 +1,23 @@
+ r←{depth}CollectChildren NS;list;list1;list2;list3
+⍝ Takes a ref pointing to a namespace as right argument.
+⍝ Tries to find ∆TopicProperties and executes it if it exists.
+⍝ If it cannot find ∆TopicProperties it compiles a table with default values.
+⍝ It also checks whether there is a function ∆DefaultPage. If that's the
+⍝ case then this function will represent the NS as such instead of the
+⍝ page otherwise one is created on the fly carrying just links.
+⍝ ⍺ is, when specified, the level in the tree view. It defaults to 0.
+ depth←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'depth'
+ r←''
+ :If 0<NS.⎕NC'∆TopicProperties'
+     r←(NS CheckItemTitle DropUnwanted depth{(0=≢⍺):⍵ ⋄ ⍺,⍵}NS.⍎'∆TopicProperties ⍬'),NS
+ :Else
+     list1←' '~¨⍨↓NS.⎕NL 2
+     list1←list1[Alpha⍋⊃list1]
+     :If 0<≢list2←' '~¨⍨↓NS.⎕NL 9.1
+     :AndIf 0<≢list2←(NS{((⍕⍺),'.',⍵)≡ShowDisplayFormat ⍺.⍎⍵}¨list2)/list2  ⍝ Remove all refs)
+         list2←list2[Alpha⍋⊃list2]
+     :EndIf
+     list←list1,list2
+     list←(~(↑¨list)∊¨⊂'∆_')⌿list
+     r←(depth{(0=≢⍺):⍵ ⋄ ⍺,⍵}⊃{(⊂⍵),(⊂PolishName ⍵),1 0}¨list),NS   ⍝ name, caption, active, dev only, ref
+ :EndIf

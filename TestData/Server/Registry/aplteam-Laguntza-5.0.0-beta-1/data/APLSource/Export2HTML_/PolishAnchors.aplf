@@ -1,0 +1,25 @@
+ html←x PolishAnchors html;bool;noOf;top;anchors;rows;urls;type;level;f;buff
+⍝ The html (⍵) is from Laguntza, meaning that all internal links look
+⍝ like `<a href="#001"` - they need to point to real HTML pages now, so we
+⍝ have to change them all.\\
+⍝ Also, all images need to be polished as well
+ (f level)←x
+ :If 0<noOf←+/bool←'<a href="#'⍷html
+     top←(bool⍳1)↑html
+     anchors←1↓(~bool)⊂html
+     rows←{⍎⍵↑⍨⍵⍳'"'}¨(≢'a href="#')↓¨anchors
+     anchors←{⍵/⍨2≤+\'"'=⍵}¨anchors
+     urls←f∘GetRelativeUrlForRow¨rows
+     urls←(,/(level)⍴⊂'../'),¨urls
+     type←f.tree[rows;6]
+     (type/urls)←(type/urls),¨⊂'/index.html'
+     type←~type
+     (type/urls)←(type/urls),¨⊂'.html'
+     html←top,↑,/(⊂'<a href="'),¨urls,¨anchors
+ :EndIf
+ :If 0<noOf←+/bool←'<img src="'⍷html
+     top←(bool⍳1)↑html
+     buff←1↓(~bool)⊂html
+     buff←'<',¨(1+level)PolishAnchors_¨buff
+     html←top,↑,/buff
+ :EndIf

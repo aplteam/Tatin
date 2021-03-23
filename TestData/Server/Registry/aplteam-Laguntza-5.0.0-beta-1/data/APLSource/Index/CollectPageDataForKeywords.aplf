@@ -1,0 +1,8 @@
+ CollectPageDataForKeywords←{
+⍝ Collects page name, location (parent) and row numbers in tree for all indices in a matrix.
+     (tags tree)←⍵
+     dat←tags{(⊂¨⍺),¨⍵}¨⊂¨tree[;##.I.Title]
+     tree2←(↑,/tags),↑⍪/⊃¨(≢¨tags)⍴¨⊂¨↓tree[;##.I.(Title Parent Row)]
+     tree2⌿⍨←''∘≢¨tree2[;0]         ⍝ Drop empty ones (caused by ⋄⋄)
+     tree2[⍋⊃tree2[;0];]            ⍝ Sort by indices
+ }

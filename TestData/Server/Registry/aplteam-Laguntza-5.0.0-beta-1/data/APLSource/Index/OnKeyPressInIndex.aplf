@@ -1,0 +1,12 @@
+ OnKeyPressInIndex←{
+     ∆Ref←⍺
+     ref←0⊃⍵
+     f←∆Ref.p.userMode∨{16::1 ⋄ 13 2≢2↑4↓⍵}⍵   ⍝ Either user mode or not Ctrl+Enter
+     f:{_←⎕NQ ⍵ 9998 ⋄ 1}ref        ⍝ Create timer for update
+     rn←##.GetCurrentItem ∆Ref.n    ⍝ Which row?
+     in←rn⌷1⊃##._Data.index         ⍝ Item number
+     (¯1≡in):1                      ⍝ Is a container - get out
+     _←##.EditFromIndex in          ⍝ Let this fns edit
+     0                              ⍝ Suppress keystroke
+⍝ Creates a timer which in turn cares about an update
+ }

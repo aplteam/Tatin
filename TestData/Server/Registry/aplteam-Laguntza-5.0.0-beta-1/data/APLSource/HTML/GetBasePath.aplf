@@ -1,0 +1,13 @@
+ GetBasePath←{
+ ⍝ ⍵ is <head>
+ ⍝ Looks for a meta key with the name "basepath".
+ ⍝ NOTE: format must match EXACTLY!
+ ⍝ Returns just content or empty vector.
+ ⍝ Usually we need the path for finding images etc. after the
+ ⍝ help system was copied elsewhere.
+     head←⍵
+     searchFor←'<meta name="basepath" content="'
+     b←searchFor∘{⍺≡(≢⍺)↑⍵}¨head
+     0=+/b:''
+     {⍵↑⍨⍵⍳'"'}(≢searchFor)↓(b⍳1)⊃head
+ }

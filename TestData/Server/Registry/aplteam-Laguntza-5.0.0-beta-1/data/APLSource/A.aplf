@@ -1,0 +1,13 @@
+ r←A
+⍝ Returns a ref pointing to APLTreeUtils.
+⍝ Used only in case a function in ⎕THIS is called
+⍝ that is NOT one of the Run* functions: they all establish
+⍝ a reference "A" which is localized in that Run*-function.
+⍝ When ∆Ref is visible from this function then it uses
+⍝ ∆Ref.A; that will be much faster than searching for
+⍝ APLTreeUtils whenever `A` is referred to.
+ :If 9=⎕NC'∆Ref'
+     r←∆Ref.A
+ :Else
+     r←APLTreeUtils2
+ :EndIf

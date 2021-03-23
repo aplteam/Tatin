@@ -1,0 +1,19 @@
+ Compile←{
+⍝ Recompile Help file, for example after an edit or insert or delete operation, or when
+⍝ the developer called "Compile..." from the "Developer" menu.
+     ∆Ref←⍵
+     _←∆Ref.⎕EX'∆NamespaceTree'
+     ∆Ref.∆NamespaceTree←ListNamespaceTree ⍬
+     in←GetCurrentItem ∆Ref.n
+     _←∆Ref SetInfoText'Compiling the help, please wait...'
+     _←∆Ref SetInfoBCol ∆Ref.p.statusbarAlarmColor
+     _←{0=∆Ref.⎕NC'n':⍬ ⋄ ∆Ref.n.infoSB.BCol←⍵}∆Ref.p.statusbarAlarmColor
+     _←ShowEggTimer ∆Ref
+     _←∆Ref SetVisibleForTreeAndIndexTab 0
+     _←CompileHelpFile ∆Ref
+     ∆Ref.d.tree←File.OpenFilesAndGetTree ∆Ref
+     _←PopulateGUI ∆Ref
+     _←¯1 Display ∆Ref in
+     _←∆Ref SetVisibleForTreeAndIndexTab 1
+     ⍬⊣∆Ref SetInfoText''
+ }

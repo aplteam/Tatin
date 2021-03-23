@@ -1,0 +1,15 @@
+ ReportAmbiguousLinks←{
+     ∆Ref←⍵
+     A←∆Ref.d.A
+     ⍺←¯1
+     buf←⍺ CheckAmbiguousLinks ∆Ref
+     _←##.UnboldAll ∆Ref
+     (0=≢buf):⍬⊣⎕←'No ambiguous links found'
+     ⎕←(⎕PW-1)⍴'-'
+     ⎕←buf
+     0=∆Ref ##.YesOrNo'Would you like to emphasize all pages with ambiguous links?':⍬
+     buf←1↓,buf
+     rows←⍎¨buf{⍵↑⍨⍵⍳' '}¨A.DLB buf                     ⍝ Isolate row numbers
+     _←∆Ref ##.BoldenTheseTopics rows
+     ⍬
+ }

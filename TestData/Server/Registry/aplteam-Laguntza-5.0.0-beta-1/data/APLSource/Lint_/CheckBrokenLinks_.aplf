@@ -1,0 +1,17 @@
+ CheckBrokenLinks_←{
+⍝ Returns vector with line number (tree), full page name & link causing the problem.
+     fine←0 1⍴' '
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     in←⍵
+     n←↑∆Ref ##.GetVarsName in
+     0=≢n:0 1⍴''                        ⍝ It's a node with a default page: nothing to check
+     body←∆Ref GetHelpBody n
+     0=≢body:fine                       ⍝ The part of the page that might carry links
+     body←n RemoveCode body
+     links←∆Ref IsolateLinks body       ⍝ Get just the links
+     0=≢links:fine                      ⍝ No links found?! Done!
+     type←∆Ref LookUpComplexLink¨(⊂¨links),¨in
+     (0=+/b←type=0):fine
+     ∪((⍕in),' ',n)∘{⍺,': ',⍵}¨({⍵↑⍨⍵⍳']'}¨b/links)
+ }

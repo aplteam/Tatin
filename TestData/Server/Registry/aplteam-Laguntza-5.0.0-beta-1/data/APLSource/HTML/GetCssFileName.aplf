@@ -1,0 +1,7 @@
+ GetCssFileName←{
+     (∆Ref type)←⍵
+     {('\\'≡2⍴⍵)∨':'∊⍵}∆Ref.p.folderName:EnforceSlash'file:///',∆Ref.p.folderName,'/CSS/',type,'.css'
+     rf←⍎'FO'⎕WC⊢FO←'OLECLIENT' 'Scripting.FileSystemObject'
+     r←'file:///',rf.GetAbsolutePathName⊂∆Ref.p.folderName,'/CSS/',type,'.css'
+     EnforceSlash r
+ }

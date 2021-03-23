@@ -1,0 +1,10 @@
+ ExecHelpParms←{
+⍝ Takes a ref and tries to execute ∆TopicProperties.
+⍝ If it cannot find ∆TopicProperties it returns a table with default values.
+⍝ ⍺ is, when specified, the level in the tree view. It defaults to 0.
+     ⍺←0
+     (0<⍵.⎕NC'∆TopicProperties'):(⍵ CheckItemTitle DropUnwanted ⍺{(0=≢⍺):⍵ ⋄ ⍺,⍵}⍵.⍎'∆TopicProperties ⍬'),⍵
+     l←⍵.⎕NL-3.2 9.1
+     l←(~(↑¨l)∊¨⊂'∆_')⌿l
+     (⍺{(0=≢⍺):⍵ ⋄ ⍺,⍵}⊃{(⊂⍵),(⊂PolishName ⍵),1 0}¨l),⍵   ⍝ name, caption, active, dev only, ref
+ }

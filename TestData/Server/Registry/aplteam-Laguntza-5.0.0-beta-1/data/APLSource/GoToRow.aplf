@@ -1,0 +1,50 @@
+ {r}←GoToRow ∆Ref;∆;rf;edit;ok;cancel;res;info;n
+ r←⍬
+ n←⎕NS''
+ ∆←⊂'Form'
+ ∆,←⊂'Posn'(50+∆Ref.Posn)
+ ∆,←⊂'Size'(160 300)
+ ∆,←⊂'Caption' 'Laguntza - go to row number'
+ ∆,←⊂'Coord' 'Pixel'
+ ∆,←('MaxButton' 0)('MinButton' 0)('SysMenu' 0)('Sizeable' 0)
+ n.Form←⍎'Form'⎕WC ∆
+ n.Form.on9999←1
+
+ ∆←⊂'Label'
+ ∆,←⊂'Posn'(15 5)
+ ∆,←⊂'Caption'('Enter row number (',(⍕⌊/∆Ref.d.tree[;I.Row]),'-',(⍕⌈/∆Ref.d.tree[;I.Row]),'):')
+ n.Label←⍎'Label'n.Form.⎕WC ∆
+
+ ∆←⊂'Edit'
+ ∆,←⊂'Posn'((5+0⊃+⌿⊃n.Label.(Posn Size)),5)
+ ∆,←⊂'FieldType' 'Numeric'
+ ∆,←⊂'Text' '99999'
+ n.Value←⍎'Value'n.Form.⎕WC ∆
+ n.Value.Text←''
+
+ ∆←⊂'Button'
+ ∆,←⊂'Caption' 'OK'
+ ∆,←⊂'Default' 1
+ ∆,←⊂'Posn'((30+0⊃+⌿⊃n.Value.(Posn Size)),5)
+ ∆,←⊂'Size'(⍬ 110)
+ n.OK←⍎'OK'n.Form.⎕WC ∆
+
+ ∆←⊂'Button'
+ ∆,←⊂'Caption' 'Cancel'
+ ∆,←⊂'Cancel' 1
+ ∆,←⊂'Posn'(n.OK.Posn[0],120)
+ ∆,←⊂'Size'(⍬ 110)
+ n.Cancel←⍎'Cancel'n.Form.⎕WC ∆
+ n.Cancel.onSelect←1
+
+ n.SB←⍎'SB'n.Form.⎕WC'Statusbar'
+ n.Info←⍎'Info'n.SB.⎕WC'StatusField'('Size'(⍬(n.Form.Size[1]-10)))
+ n.∆Ref←∆Ref
+ n.OK.onSelect←'OnOkInGotoRow'n
+ ⎕NQ n.Value'GotFocus' ⋄ res←⎕DQ n.Form
+ :If 0≠≢res
+ :AndIf n.Cancel≢0⊃res
+     Display ∆Ref n.Value.Value
+ :EndIf
+ {0:: ⋄ ⍵.Close}n.Form
+⍝Done

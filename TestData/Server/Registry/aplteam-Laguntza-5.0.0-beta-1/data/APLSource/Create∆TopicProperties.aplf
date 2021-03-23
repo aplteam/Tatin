@@ -1,0 +1,20 @@
+ b←Create∆TopicProperties target;l;b;quote;titles;isVars
+⍝ Returns a body for the standard ∆TopicProperties function expected to exist in every
+⍝ tree node of a help system. Pre-populates the body with whatever is already found
+⍝ in "target" with defaults active←1, caption←'' and developmentOnly←0.
+⍝ Note that the absence of this function in a node does not harm the help system:
+⍝ it will carry on with default values.
+⍝ You can (re-)create a function ∆TopicProperties in any node from its context menu.
+ l←' '~¨⍨↓target.⎕NL 9 2                ⍝ All namespaces and variables
+ l←('∆'≠↑¨l)/l                          ⍝ Drop all starting with "∆" (∆DefaultPage!)
+ b←GetTopicPropertyTemplate ⍬
+ quote←{'''',⍵,''''}
+ titles←(≢l)⍴⊂quote''
+ :If ∨/isVars←2.1=target.⎕NC¨⊂¨l
+     (isVars/titles)←{t←HTML.GetTitle target.⍎⍵ ⋄ 0=≢t:⍵ ⋄ quote t}¨isVars/l
+ :EndIf
+ ((titles≡¨quote¨l)/titles)←⊂''''''                     ⍝ Titles becomes empty when identical with name
+ b,←⍕¨'r⍪←'∘,¨↓⍉⊃(quote¨l)(titles)(⍕¨1⍴⍨≢l)(⍕¨0⍴⍨≢l)
+ b,←⊂,'r'
+ b,←⊂,'}'
+⍝Done

@@ -1,0 +1,21 @@
+ {r}←∆Ref TellAcreAboutChange y;res;name;list;bool
+⍝ `y` is either a name of a single funtion/operator/variable or a ref pointing to a namespace.
+⍝ If it is a namespace acre's `SetChanged` method is called with the parameter -recursive in order
+⍝ to make sure that acre is told about all functions/operators/variables in `y` and any sub-namespaces.
+⍝ Returns 0 in case acre was not interested (or not supposed to be told anyway) and 1 otherwise.
+ r←0
+ :If ∆Ref.p.notifyAcre
+     'acre is not present in ⎕SE'⎕SIGNAL 11/⍨9≠⎕SE.⎕NC'acre'
+     name←⍕y
+     :If 9=⎕NC name
+         res←⎕SE.acre.SetChanged name('recursive' 1)
+     :Else
+         res←⎕SE.acre.SetChanged name
+     :EndIf
+     r←0<≢res
+     :If ∆Ref.p.reportToSession
+     :AndIf 0=≢res
+         ⎕←'*** acre was told that ',name,((9=⎕NC name)/'.*'),' got changed but wasn''t interested.'
+     :EndIf
+ :EndIf
+⍝Done

@@ -1,0 +1,15 @@
+ Inject∆TopicProperties_←{
+     r←''
+     (ref recursiveFlag)←⍵
+     f←0≠≢' '~¨⍨↓ref.⎕NL 2                     ⍝ Are there any variables?
+     l←{0=≢l←⍵.⎕NL-9:l ⋄ (~(↑¨l)∊'_∆')/l}ref    ⍝ Collect sub-namespaces
+     f∨←0≠≢l
+     f∧←0=ref.⎕NC'∆TopicProperties'
+     r←ref{⍵:⍺⊣⍺.⎕FX Create∆TopicProperties ⍺ ⋄ ''}f
+     _←ref{⍵:TellAcreRegardingNew∆TopicProperty ⍺ ⋄ ⍬}0≠≢r
+     _←ref{⍵:TellSALT_RegardingNew∆TopicProperty ⍺ ⋄ ⍬}0≠≢r
+     0=recursiveFlag:r
+     0=≢l:r
+     l←ref.⍎¨l
+     r,∊∇¨l,¨recursiveFlag
+ }

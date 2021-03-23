@@ -1,0 +1,13 @@
+ mask←GetMaskForCode md;ind
+⍝ Returns a mask that hides codes (everything between "~~~" or back-ticks.
+ mask←(≢md)⍴0
+ :If 0≠≢ind←'^\s{0,3}[~`]{3,}\s{0,}$'⎕S 0 1⍠('Mode' 'M')('DotAll' 1)('EOL' 'CR')⊣md
+     'Odd number of code fences'⎕SIGNAL 11/⍨0≠2|≢ind
+     mask[↑¨ind]←1
+     mask←{⍵∨≠\⍵}mask
+     mask[∊{(↑⍵)+⍳1⊃⍵}¨ind]←1
+ :EndIf
+ :If 0≠≢ind←'`.*?`'⎕S 0 1⍠('Mode' 'M')('DotAll' 1)('EOL' 'CR')⊣md
+     mask[∊{(↑⍵)+⍳1⊃⍵}¨ind]←1
+ :EndIf
+ mask←~mask

@@ -1,0 +1,13 @@
+ ParentInStatusbar←{
+     ∆Ref←⍺                                         ⍝ Can be the item number
+     in←⍵
+     n←∆Ref.n
+     1=∆Ref.p.userMode:⍬⊣n.pathSB.Text←''           ⍝ Set the text
+     tx←⍕∆Ref GetParentOf in                        ⍝ Get parent(s) of item
+     tx←(1+≢⍕↑∆Ref.d.tree[0;I.Parent])↓tx
+     tx,←((0≠≢tx)/'.'),I.TopicName⊃∆Ref.d.tree[in;] ⍝ Topic name
+     tx←in{0=≢⍺:⍵ ⋄ ⍵,'  [',(⍕⍺),';]'}tx            ⍝ Add item number
+     n.pathSB.Text←tx                               ⍝ Set the enhanced text
+     ⍬
+⍝ Display parent(s) in status bar, but only if the tree is visible
+ }

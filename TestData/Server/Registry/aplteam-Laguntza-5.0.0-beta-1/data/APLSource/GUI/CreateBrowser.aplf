@@ -1,0 +1,17 @@
+ CreateBrowser←{
+     ∆Ref←⍵
+     n←∆Ref.n
+     A←∆Ref.d.A
+     ∆←⊂'SubForm'
+     ∆,←⊂'Coord' 'Prop'
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     ∆,←⊂'Active' 0
+     n.browser_sf←⍎'sf'∆Ref.n.form.⎕WC ∆
+     _←CreateActiveXContainer ∆Ref
+     _←CreateSplitter ∆Ref
+     _←2 ⎕NQ n.splitter'EndSplit',0 260,n.splitter.Size     ⍝ Move it
+     ∆Ref.n.splitter.Posn[1]⌈←∆Ref.p.splitterPosn[1]
+     ⍬
+ ⍝ Creates a control which displays the real help.
+ ⍝ With ∆Ref.p.format←'TEXT' an "Edit" control can be forced as a replacement.
+ }

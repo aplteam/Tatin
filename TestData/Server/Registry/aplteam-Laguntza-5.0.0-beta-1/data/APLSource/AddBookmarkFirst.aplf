@@ -1,0 +1,20 @@
+ AddBookmarkFirst←{
+     ∆Ref←⍺
+     in←⍵                                      ⍝ Item number
+     0=in:⍬                                    ⍝ Nothing to add: get out
+     id←∆Ref.d.tree[in;I.(Parent TopicName)]   ⍝ Parent and name as id
+     ∆Ref.d.bookmark,←⊂id
+     title←2⊃∆Ref.d.tree[↑in;]                 ⍝ Get the title (used as caption)
+     name←'i1'                                 ⍝ Name for the menu item
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Caption'title
+     ∆,←⊂'Event' 'Select' 'OnMenuCmd' 'bookmark'
+     rf←⍎name ∆Ref.n.bookmarkMenu.⎕WC ∆        ⍝ add to "Bookmarks" menu
+     rf.id←id                                  ⍝ For identification (delete etc)
+     rf.onSelect←'OnMenuCmd' 'bookmark'
+     ∆Ref CheckBookmarkButton in
+⍝ Called when the very first entry to the "Bookmarks" menu needs to be created
+⍝ ⍵: Vector of length 2:
+⍝    [0] Topic name
+⍝    [2] Item number
+ }

@@ -1,0 +1,7 @@
+ GetRelativeUrlForRow←{
+     f←⍺
+     row←⍵
+     rows←{¯1+(≢⍵)-⍵⍳⍳↑⍵}⌽(1+row)↑f.tree[;0]
+     parents←{↑{⍺,'/',⍵}/⍵}⍣(0≠≢rows)⊣f.tree[rows;1]
+     parents,((0≠≢parents)/'/'),((~row⊃f.tree[;6])/'_'),row⊃f.tree[;1]
+ }

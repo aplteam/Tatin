@@ -1,0 +1,23 @@
+ {r}←CollectData ∆Ref;p;tree;markdown;Words;words;X;html;indices
+⍝ See also UpdateFileData
+ r←⍬
+ p←∆Ref.p
+ tree←CreateTree p
+ ∆Ref.d.tree←tree
+ {}∆Ref ReportProblem p tree
+ markdown←∆Ref GetMarkdownVarsContent¨↓tree[;I.(TopicName Parent)]
+ (Words words)←{0=≢⍵:'' '' ⋄ ↓⍉⍵}⊃GetWordsFromMarkdown¨markdown
+ X←HTML.CreateParameterSpace ∆Ref
+ markdown←X ProcessLinks(⍳≢markdown)markdown
+ html←∆Ref Markdown2HTML markdown
+ {}∆Ref SaveAllHtml html
+ indices←GetIndicesFromMarkdown¨markdown
+ indices←Index.GetIndices indices ∆Ref ∆Ref.d.tree
+ tree[;I.Parent]←⍕¨tree[;I.Parent] ⍝ MUST be text when written to a component file: see Dyalog bug <01157>
+ {}tree ⎕FREPLACE ∆Ref.f.(tieNo ∆tree)
+ {}words ⎕FREPLACE ∆Ref.f.(tieNo ∆words)
+ {}Words ⎕FREPLACE ∆Ref.f.(tieNo ∆Words)
+ {}indices ⎕FREPLACE ∆Ref.f.(tieNo ∆index)
+ {}∆Ref.p.helpCaption ⎕FREPLACE ∆Ref.f.(tieNo ∆caption)
+ SaveHelpParms ∆Ref
+⍝Done

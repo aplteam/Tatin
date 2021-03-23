@@ -1,0 +1,68 @@
+ type←testFlag AskForNodeType ∆Ref;∆;n;res
+ :If testFlag
+     type←⊂'sibling'
+ :Else
+     type←⊂''
+     n←⎕NS''
+     ∆←''
+     ∆,←⊂'Caption' 'Node type'
+     ∆,←⊂'Posn'(45+∆Ref.n.form.Posn)
+     ∆,←⊂'Icon'∆Ref.n.form.IconObj
+     ∆,←⊂'Coord' 'Pixel'
+     ∆,←⊂'Size'(250 300)
+     ∆,←⊂'MaxButton' 0
+     ∆,←⊂'MinButton' 0
+     ∆,←⊂'Sizeable' 0
+     n.∆form←⎕NEW'Form'∆
+     n.∆form.n←n
+
+     ∆←''
+     ∆,←⊂'Posn'(15 15)
+     ∆,←⊂'Caption' 'What shall the new node be?'
+     n.question←n.∆form.⎕NEW'Label'∆
+
+     ∆←''
+     ∆,←⊂'Posn'((15+↑+⌿⊃n.question.(Posn Size)),15)
+     ∆,←⊂'Caption' ' Options '
+     ∆,←⊂'Size'(100 140)
+     n.Group←n.∆form.⎕NEW'Group'∆
+
+     ∆←''
+     ∆,←⊂'Caption' '&Sibling'
+     ∆,←⊂'Posn'(25 15)
+     ∆,←⊂'Style' 'Radio'
+     ∆,←⊂'State' 1
+     n.Sibling←n.Group.⎕NEW'Button'∆
+
+     ∆←''
+     ∆,←⊂'Caption' '&Child'
+     ∆,←⊂'Posn'((10+↑+⌿⊃n.Sibling.(Posn Size))15)
+     ∆,←⊂'Style' 'Radio'
+     ∆,←⊂'State' 0
+     n.Child←n.Group.⎕NEW'Button'∆
+     n.∆Types←n.(Sibling Child)
+
+     ∆←''
+     ∆,←⊂'Caption' 'OK'
+     ∆,←⊂'Size'(⍬ 110)
+     ∆,←⊂'Default' 1
+     ∆,←⊂'Event'('Select' 1)
+     n.OK←n.∆form.⎕NEW'Button'∆
+     n.OK.Posn←(n.∆form.Size[0]-n.OK.Size[0]+15),15
+
+     ∆←''
+     ∆,←⊂'Caption' 'Cancel'
+     ∆,←⊂'Size'(⍬ 110)
+     ∆,←⊂'Cancel' 1
+     ∆,←⊂'Event'('Select' 1)
+     n.Cancel←n.∆form.⎕NEW'Button'∆
+     n.Cancel.Posn←(n.OK.Posn[0]),n.OK.Size[1]+2×15
+     n.∆Buttons←n.(OK Cancel)
+     n.∆Buttons.onSelect←1
+
+     ⎕NQ n.Sibling'GotFocus' ⋄ res←n.∆form.Wait
+     n.∆form.⎕EX'n'
+     :If n.OK≡↑res
+         type←n.∆Types.State/'sibling' 'child'
+     :EndIf
+ :EndIf

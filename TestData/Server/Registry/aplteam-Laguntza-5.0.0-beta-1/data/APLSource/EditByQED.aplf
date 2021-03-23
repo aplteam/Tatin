@@ -1,0 +1,47 @@
+ {r}←{refToParent}EditByQED name;body;noOf;flag;msg;old
+⍝ Allows "edit-through" in version 14.1 and later.
+⍝ Returns 1 if the user has entered something, otherwise 0 if name points to a vars.
+⍝ Returns the result of ⎕FX if name points to a function (∆TopicProperties)
+ refToParent←name{0<⎕NC ⍵:⍎⍵ ⋄ ⍎↑{⍺,'.',⍵}/¯1↓'.'A.Split ⍺}'refToParent'
+ flag←0
+ :If 2=refToParent.⎕NC name
+     refToParent.⍎name,'←,¨',name
+     old←refToParent⍎name
+ :EndIf
+ :Repeat
+     {}(refToParent.⎕ED⍠('EditName' 'Allow'))name
+     :If 3=refToParent.⎕NC name
+         body←⎕CR name
+         r←refToParent.⎕FX body
+         :Return
+     :Else
+         body←refToParent.⍎name
+     :EndIf
+     :If r←0≠≢(∊body)~' '
+         :If 1=2|≢'^\s{0,}~{3,} {0,}$'⎕S 0⍠('Mode' 'L')⊣body,⊂'~~~ 1'  ⍝ Odd number of code block fences?!
+             msg←'There is an odd number of code block fences; please fix.'
+         :Else
+         ⍝ The following line checks for any level-1 headers.
+             noOf←+/(⊂,'#')≡¨{⍵↑⍨⍵⍳' '}¨A.DLB RemoveCodeBlock body
+             :Select noOf
+             :Case 0
+                 msg←'Please make sure that you have a header of level one.'
+             :Case 1
+                 flag←1
+             :Else
+                 msg←'Please make sure that you have just one header of level one; you have '
+                 msg,←(⍕noOf),' right now.'
+             :EndSelect
+         :EndIf
+         :If 0=flag
+             ('Problem with ',name)ShowError msg
+         :EndIf
+     :Else
+         msg←'You have deleted the contents of the page entirely - are you sure about this?'
+         :If ∆Ref.p.helpCaption YesOrNo msg
+             flag←1
+         :Else
+             ⍎(⍕refToParent),'.',name,'←old'
+         :EndIf
+     :EndIf
+ :Until flag

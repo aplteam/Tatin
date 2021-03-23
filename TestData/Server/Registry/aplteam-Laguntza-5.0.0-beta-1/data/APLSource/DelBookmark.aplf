@@ -1,0 +1,13 @@
+ DelBookmark←{
+     (0=≢⍵):⍬
+     ∆Ref←⍺
+     all←{⍵.id}¨{⍵.⍎¨{⍵/⍨'i'=↑¨⍵}'MenuItem'⍵.⎕WN''}∆Ref.n.bookmarkMenu
+     no←1+all⍳⊂id←∆Ref.d.tree[⍵;I.(Parent TopicName)]
+     _←∆Ref.n.bookmarkMenu.⎕EX'i',⍕no       ⍝ Delete the menu item
+     ∆Ref.d.bookmark~←⊂id                   ⍝ Remove from "memory"
+     _←∆Ref CheckBookmarkButton ⍵
+     1=AreThereNoBookmarksYet ∆Ref:⍬        ⍝ When there are bookmarks then we are done
+     DelBookmarkSeparator ∆Ref
+⍝ Delete one particular bookmark
+⍝ First line is always the most recent one.
+ }

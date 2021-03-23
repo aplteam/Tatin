@@ -1,0 +1,12 @@
+ CopyFullLinkToClipboard←{
+     ⍺←0                            ⍝ 1 = suppress user conformation
+     ∆Ref←⍵
+     row←GetCurrentItem ∆Ref.n
+     ~row<≢∆Ref.d.tree:⍬           ⍝ Sometimes something strange happens
+     name←2⊃∆Ref.d.tree[row;]
+     f←name{∆Ref.p.helpCaption YesOrNo'Copy short name of "',⍺,'" to clipboard?'}⍣(~⍺)⊣1
+     link←↑{(⍕⍺),'.',⍵}/∆Ref.d.tree[row;4 1]
+     ~f:⍬
+     ∆Ref CopyToClipboard link
+     ⍬
+ }

@@ -1,0 +1,16 @@
+ {r}←sourcePath HandleImageFolder_ targetPath;list;file;tno1;tno2;subFolder
+ r←⍬
+ :If ⎕NEXISTS sourcePath
+ :AndIf 0≠≢list←0 1 ⎕NINFO⍠('Wildcard' 1)⊣sourcePath,'/*'
+     :For file :In (2=1⊃list)/0⊃list   ⍝ Copy all files
+         tno1←file ⎕NTIE 0 64
+         tno2←(targetPath,'/',↑{⍺,⍵}/¯2↑⎕NPARTS file)⎕NCREATE 0
+         (⎕NREAD tno1 11 ¯1 0)⎕NAPPEND tno2
+         ⎕NUNTIE tno1 tno2
+     :EndFor
+     :For file :In (1=1⊃list)/0⊃list   ⍝ Handle sub directories
+         subFolder←1⊃⎕NPARTS file
+         1 ⎕MKDIR targetPath,'/',subFolder
+         (sourcePath,'/',subFolder)HandleImageFolder_ targetPath,'/',subFolder
+     :EndFor
+ :EndIf

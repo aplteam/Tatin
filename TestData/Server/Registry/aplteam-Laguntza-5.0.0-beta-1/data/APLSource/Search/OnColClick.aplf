@@ -1,0 +1,20 @@
+ OnColClick←{
+     ∆Ref←##.Get∆Ref 0⊃⍵
+     ref←∆Ref.n.reportList              ⍝ Create reference
+     col←2⊃⍵                            ⍝ The col we are dealing with
+     d←⊃,/ref.(Items ReportInfo)        ⍝ all data
+     0=≢d:⍬
+     s←⊃d[;col] ⍝ The col to be sorted
+     si←##.Alpha{si←⍺⍋⍵ ⋄ ⍵≢⍵[si;]:si ⋄ ⍺⍒⍵}s ⍝ Build sort index
+     ref.Items←ref.Items[si]            ⍝ Sort items
+     ref.ReportInfo←ref.ReportInfo[si;] ⍝ Sort other data
+     ref.lines←ref.lines[si]            ⍝ Sort the history
+     ref.SelItems[]←0                   ⍝ Deselect everything
+     ref.SelItems[0]←1                  ⍝ Select first line
+     _←⎕NQ ref'GotFocus'                ⍝ Force focus to the list
+     _←⎕NQ ref'ItemDown' 0 1 0          ⍝ Jump on the very first item
+     ⎕NQ ref'KeyPress' 'DC'             ⍝ "Press" Cursor down
+⍝ Sort the rows according to the column the user did click at
+⍝ Second click: sort the other way round
+⍝ Handle focus and current line as well
+ }

@@ -1,0 +1,20 @@
+ MakeRelativePathAbsoluteForIMG←{
+⍝ If the Markdown (⍵) contains the definition of an image and the SRC starts with `./` (or `.\`)
+⍝ then this is considered a relative path, and it is converted into an absolute path
+⍝ by adding `homePath` to it.
+     homePath←⍺
+     md←⍵
+     0=+/'!['⍷∊md:md                                ⍝ Yes, that makes it faster!
+     replaceBy←homePath
+     ((replaceBy='\')/replaceBy)←'/'
+     replaceBy←(-'/'=¯1↑replaceBy)↓replaceBy
+     replaceBy←'\1\2',replaceBy,'/\3'
+⍝     replaceBy←'\1',replaceBy,'/\2'
+     cb←'^\s{0,3}([~|`]){3,}(.*?)\1{3,}\s{0,}$'    ⍝ Code block
+     iac←'`.*?`'                                    ⍝ Inline APL code
+     path←'(!\[.*?]\()(file:\/\/)?\.[\\|//](.*?\))'
+⍝     path←'(!\[.*?]\()\.[\\|/](.*?\))'
+     options←('Mode' 'M')('DotAll' 1)
+     r←iac cb path ⎕R'&' '&'replaceBy⍠options⊣md
+     r
+ }

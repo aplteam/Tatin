@@ -1,0 +1,22 @@
+ CreateHomePage←{
+     ∆Ref←⍺
+     (f path)←⍵
+     level←0
+     mainTocPage←1
+     mainIndexPage←0
+     tag←##.HTML.Tag
+     toc←GetTOC f
+     body←''
+     body,←⊂'<body>'
+     body,←InjectMainMenu level mainTocPage mainIndexPage
+     body,←⊂'<h1 id="h1toc">',f.caption,'<br />Table Of Contents</h1>'
+     body,←⊂'<div id="toc">'
+     body,←toc
+     body,←⊂'</div>'
+     body,←⊂'</body>'
+     head←∆Ref GetHead f.caption path level
+     html←head,body,⊂'</html>'
+     filename←path,'/index.html'
+     r←(⊂html)⎕NPUT filename 1
+     1:r←0
+ }

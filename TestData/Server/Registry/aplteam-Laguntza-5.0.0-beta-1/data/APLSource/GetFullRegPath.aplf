@@ -1,0 +1,11 @@
+ GetFullRegPath←{
+⍝ Returns path to the Windows Registry or empty vector
+     ∆Ref←⍵
+     0≡∆Ref.p.regPath:''                                   ⍝ Disabled?
+     ('\'=¯1↑∆Ref.p.regPath):'Invalid: regPath'⎕SIGNAL 11  ⍝ Check
+     f1←0≠≢∆Ref.p.regPath                                  ⍝ Not empty?
+     f1:{⍵,('\'≠¯1↑⍵)/'\'}∆Ref.p.regPath                   ⍝ Then we are fine
+     f2←0≠≢∆Ref.p.helpCaption                              ⍝ Not empty?
+     f2:'Software\APLTree\Laguntza\',∆Ref.p.helpCaption,'\'    ⍝ Establish a sensible default
+     ''                                                    ⍝ Okay, there is nothing we can do then
+ }

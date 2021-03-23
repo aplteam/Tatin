@@ -1,0 +1,24 @@
+ {r}←∆Ref UpdateFileData in;name;ref;markdown;Words;words;X;html;allWords;indices
+⍝ See also CollectData
+⍝ "ref" points to a Help namespace
+⍝ "name" is the name of a help function. May even be ∆DefaultPage.
+⍝ Does NOT update the ∆parms component because the user cannot change any
+⍝ parameter by simply editing a help page.
+ r←⍬
+ (ref name)←∆Ref GetParentAndTopicNameAsRef in
+ markdown←∆Ref GetMarkdownVarsContent name ref
+ (Words words)←GetWordsFromMarkdown markdown
+ X←HTML.CreateParameterSpace ∆Ref
+ markdown←X in ProcessLinks_ markdown
+ html←∆Ref in Markdown2HTML_ markdown
+ {}html ⎕FREPLACE ∆Ref.f.tieNo,in+1+10
+ allWords←⎕FREAD ∆Ref.f.(tieNo ∆words)
+ (in⊃allWords)←words
+ {}allWords ⎕FREPLACE ∆Ref.f.(tieNo ∆words)
+ allWords←⎕FREAD ∆Ref.f.(tieNo ∆Words)
+ (in⊃allWords)←Words
+ {}allWords ⎕FREPLACE ∆Ref.f.(tieNo ∆Words)
+ indices←∆Ref GetIndicesFromVarsContent ∆Ref.d.tree[in;I.(TopicName Parent)]
+ indices←Index.GetIndices(⊂indices)∆Ref(∆Ref.d.tree[,in;])
+ {}∆Ref InjectIndices indices
+⍝Done

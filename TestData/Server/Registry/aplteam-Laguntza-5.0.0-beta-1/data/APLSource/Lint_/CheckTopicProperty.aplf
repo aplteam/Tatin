@@ -1,0 +1,19 @@
+ {r}←∆Ref CheckTopicProperty p;res;mentioned;vars;nodes;b;vars2
+ r←''
+ res←p.⍎'∆TopicProperties ⍬'        ⍝ Get the result
+ mentioned←res[;0]                  ⍝
+ vars←' '~¨⍨↓p.⎕NL 2                ⍝ All variables that exist in that NS (=help pages)
+ nodes←' '~¨⍨↓p.⎕NL 9               ⍝ All variables that exist in that NS (=help pages)
+ :If ∨/b←0=mentioned∊vars,nodes
+     r,←'  Mentioned in ∆TopicProperties but not found: '∘,¨b/mentioned
+ :EndIf
+ :If ∨/b←~vars∊mentioned
+ :AndIf 0≠≢vars2←(b/vars)~⊂'∆DefaultPage'
+     r,←'  Existing help page that is not mentionend in ∆TopicProperties: '∘,¨vars2
+ :EndIf
+ :If ∨/b←~nodes∊mentioned
+     r,←'  Existing node that is not mentionend in ∆TopicProperties: '∘,¨b/nodes
+ :EndIf
+ :If 0≠≢r
+     r←(⊂'--- Findings in ',⍕p),r
+ :EndIf

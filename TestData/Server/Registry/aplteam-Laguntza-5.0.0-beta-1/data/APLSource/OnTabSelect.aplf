@@ -1,0 +1,12 @@
+ OnTabSelect←{
+     this←⍎0⊃⍵
+     ∆Ref←Get∆Ref this
+     n←∆Ref.n
+     _←ResetStatusbar ∆Ref
+     t←(n.tabBtns⍳this)⊃n.tabs
+     _←⎕NQ t'GotFocus'                              ⍝ Force focus to that child
+     n.searchBtn.Default←n.search≡this              ⍝ Circumvention of bug <00718>
+     ∆Ref.d.currentTabIs←this
+     t≡n.search_sf:1⊣⎕NQ n.searchString'GotFocus'   ⍝ Special handling for "Search"
+⍝ When the tab is changed, the status bar is reset
+ }

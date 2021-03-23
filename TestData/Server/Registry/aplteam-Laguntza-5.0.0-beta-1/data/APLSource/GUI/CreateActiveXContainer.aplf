@@ -1,0 +1,20 @@
+ CreateActiveXContainer←{
+     ∆Ref←⍵
+     n←∆Ref.n
+     _←CreateActiveX ∆Ref
+     ∆←⊂'WEBBROWSER'
+     ∆,←⊂'Coord' 'Prop'
+     ∆,←⊂'Size' 0 0             ⍝ Without this trick the browser area would not show an egg timer
+     ∆,←⊂'Posn' 0 0
+     ∆,←⊂'QueueEvents' 1
+     ∆,←⊂'Silent' 1
+     n.browser←⍎'wb'n.browser_sf.⎕WC ∆
+     n.browser.onTitleChange←'OnTitleChangeInWebBrowser'
+     n.browser.on9991←'On9991'
+     _←n.browser.⎕WS'Event' 'BeforeNavigate2'(FullPathToHandler'OnBeforeNavigate')
+     _←{6::⍬ ⋄ _←n.browser.Navigate⊂⍵}'about:blank'
+     _←{6::⍬ ⋄ _←n.browser.Document.Close}⍬
+     ⍬
+ ⍝ Creates the object that is the Internet Explorer ActiveX control and
+ ⍝ adds a container for that control to the subform on the right pane of the GUI.
+ }

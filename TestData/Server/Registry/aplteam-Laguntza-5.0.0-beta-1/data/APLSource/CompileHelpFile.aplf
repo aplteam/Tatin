@@ -1,0 +1,22 @@
+ {∆Ref}←CompileHelpFile y;A;ps
+⍝ Compiles the help file needed for actually showing the Help pages.
+⍝ This can be called without an instance of the Help in question. In that
+⍝ case y will be a command space providing all information needed. Otherwise
+⍝ y is a ref pointing to an instance of Laguntza.\\
+⍝ The explicit result should be used by test cases only.
+⍝ Note that this function shadows the global `∆Ref` deliberately. This is a
+⍝ necesary measure to ensure a full recompile
+ A←APLTreeUtils2
+ :If 'Namespace'≡y ⎕WG'Type'      ⍝ Is it a parameter space?
+     ∆Ref←CreateHelpForm ps←CheckParms y
+     ∆Ref.p←ps
+     CreateData ∆Ref
+ :Else
+     ∆Ref←y
+ :EndIf
+ File.DealWithFiles ∆Ref
+ CollectData ∆Ref               ⍝ Gather all the data needed for the tree
+ File.CloseFile ∆Ref
+ CopyImages ∆Ref
+ CopyAndMassageCSSfiles ∆Ref
+⍝Done

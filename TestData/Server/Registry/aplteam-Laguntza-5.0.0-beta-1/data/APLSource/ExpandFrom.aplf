@@ -1,0 +1,18 @@
+ ExpandFrom←{
+     ∆Ref←⍺
+     n←∆Ref.n
+     in←⍵                                   ⍝ Item number
+     ind←in,in WhereAreTheChildren ∆Ref.d.tree[;I.Depth]  ⍝ Which ones?
+     states←n.tree.GetItemState¨ind         ⍝ Get all states
+     states←⌽⍉(32⍴2)⊤states                 ⍝ convert to Booleans
+     states[;5]←1                           ⍝ Expand all branches
+     states←{2⊥⍉⌽⍵}states                   ⍝ Convert to Int
+     n.tree.Visible←0                       ⍝ Make invisible
+     _←states{n.tree.SetItemState ⍵ ⍺}¨ind  ⍝ Reset all states
+     n.tree.SelItems[in]←1                  ⍝ re-select original one
+     _←n.tree.ShowItem in                   ⍝ Force it back, just in case
+     n.tree.Visible←1                       ⍝ Bring it back
+     _←⎕NQ n.tree'GotFocus'                 ⍝ Force focus back to TreeView
+     0
+ ⍝ Expand only ⍵ and all it's children
+ }

@@ -1,0 +1,14 @@
+ MarkUpIndexPage←{
+     ∆Ref←⍺
+     (title anchors folder breadcrumb level)←⍵
+     tag←##.HTML.Tag
+     body←''
+     body,←⊂'<body>'
+     body,←breadcrumb InjectMainMenu(level+1)0 0
+     body,←⊂'h1'tag title
+     body,←⊂'<ul class="defaultpagelist">'
+     body,←'li'∘tag¨anchors
+     body,←⊂'</ul>'
+     body,←⊂'</body>'
+     (⊂'<html>'),body,⊂'</html>'
+ }

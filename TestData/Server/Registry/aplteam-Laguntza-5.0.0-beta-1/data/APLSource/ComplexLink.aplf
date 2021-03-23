@@ -1,0 +1,40 @@
+ r←ComplexLink(X tx st row);l;lt;ct;mw;ll;lk;in;url;add
+⍝ Processes complex links like:
+⍝ "→[*Name]"
+⍝ "→[*.Name]"
+⍝ "→[↑*.Name]"
+⍝ "→[Name]"
+⍝ "→[PathLevel3.Name]"
+⍝ "→[##.##.PathLevel3.Name]"
+⍝ "→[#.Full.Path.Name]"
+⍝ "→[Object.ThisMethod | alternative link text]"
+⍝ tx: What's going to become the Help
+⍝ st: For performance reasons tx might have been rotated. (-st)⌽ brings it back into shape.
+ l←⌊/tx⍳']|'                                                ⍝ Length of "magic" word
+ lt←{⍵↑⍨⍵⍳']'}tx                                            ⍝ Cut this link into lt
+ add←0
+ :If '→[http://'⎕C{⍺≡⍺⍺(≢⍺)↑⍵}tx
+ :OrIf '→[https://'⎕C{⍺≡⍺⍺(≢⍺)↑⍵}tx
+     url←{⍵↑⍨⍵⍳'|'}2↓lt
+     lt←A.DMB{'|'∊⍵:⍵↓⍨1+⍵⍳'|' ⋄ ⍵}2↓lt
+     lk←'[',lt,'](',url,')'                                 ⍝ wrap in HTML
+ :Else
+     :If 0=≢in←(row FindTopic X.∆Ref({⍵↑⍨⌊/⍵⍳'|] '}2↓lt))[;0]
+         lk←X row ReportBrokenLink l↑tx
+     :ElseIf 1<≢in
+         lk←row ReportAmbiguousLink l↑tx
+     :Else
+         lt←PolishLinkText lt
+         lt,←(0=≢lt)/I.Title⊃X.∆Ref.d.tree[↑in;]            ⍝ No link title? Fetch topic title!
+         :If '``'≡((1+tx⍳']')⊃tx),¯1↑tx                     ⍝ Is it marked up as code?
+             st-←1
+             tx←¯1↓tx
+             lk←'[`',lt,'`](#',(⍕in),')'                    ⍝ Convert to a Markdown bookmark link that is marked up as code
+             add←1
+         :Else
+             lk←'[',lt,'](#',(⍕in),')'                      ⍝ Convert to a Markdown bookmark link
+         :EndIf
+     :EndIf
+ :EndIf
+ r←(-st)⌽lk,((1+add)+tx⍳']')↓tx                             ⍝ Insert link, rotate back
+⍝Done

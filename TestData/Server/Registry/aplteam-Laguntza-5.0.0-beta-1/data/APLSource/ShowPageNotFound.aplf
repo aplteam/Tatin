@@ -1,0 +1,10 @@
+ ShowPageNotFound←{
+     ∆Ref←⍵
+     ⍺←''             ⍝ Can be the topic identifier that did not work
+     A←∆Ref.d.A
+     html←HTML.WrapInHtml ∆Ref 2(PageNotFound ⍬)0
+     _←{0::⍬ ⋄ ⍬⊣⍵.n.browser.Document.close}∆Ref
+     _←∆Ref{0::⍬ ⋄ ⍬⊣⍺.n.browser.Document.write⊂∊⍵}html
+     ⍬
+⍝ Display a "Page not found" page in the right pane
+ }

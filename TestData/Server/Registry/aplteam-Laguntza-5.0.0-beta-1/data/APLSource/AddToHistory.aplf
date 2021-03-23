@@ -1,0 +1,13 @@
+ AddToHistory←{
+     ∆Ref←⍺
+     (n d)←∆Ref.(n d)
+     in←↑⍵                                  ⍝ Fist item number
+     d.history,⍨←(in≠0⊃d.history)/in        ⍝ Append item no in front if not already there (back!)
+     n.backBtn.Active←1<d.history⍳¯1        ⍝ Make "Back" active/inactive
+     n.forwardBtn.Active←¯1≠¯1↑d.history    ⍝ Make "Forward" active/inactive
+     ⍬
+⍝ The "history" vars contains the number of all pages
+⍝ It's very first entry is ¯1 which is used to determine the
+⍝ "end" of the queue. Important for working out when "Back" or
+⍝ "Forward" can't work anymore.
+ }

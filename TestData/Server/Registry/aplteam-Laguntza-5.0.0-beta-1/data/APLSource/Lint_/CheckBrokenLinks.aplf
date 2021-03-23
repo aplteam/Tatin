@@ -1,0 +1,21 @@
+ CheckBrokenLinks←{
+     ⍺←¯1
+     ∆Ref←⍵
+     _←##.ShowEggTimer ∆Ref
+     ∆Ref.n.infoSB.Text←'Looking for broken links, please wait...'
+     ∆Ref.n.infoSB.BCol←∆Ref.p.statusbarAlarmColor
+     rows←⍺{¯1≡⍺:⍵ ⋄ ⍵[⍺]}∆Ref.d.tree[;##.I.Row]
+     r←∆Ref∘CheckBrokenLinks_¨rows
+     r⌿⍨←~0=≢¨r                        ⍝ Remove empty ones: they are okay
+     _←##.ResetStatusbar ∆Ref
+     _←##.RemoveEggTimer ∆Ref
+     0=≢r:0 1⍴''
+     r←↑,/r
+     ⍪(⊂'*** ',(⍴r),'broken links in ',(⍕⍴∪{⍵↑⍨⍵⍳':'}¨r),' topics'),' ',¨r
+⍝ Checks all pages (⍺ ←→ ¯1) or page(s) specified by ⍺ if ⍺ is not ¯1.
+⍝ In that case ⍺ is treated as a vector of row numbers pointing into d.tree.
+⍝ Returns a report that can be displayed  or analzyed by a test case.
+⍝ First line of the report is the header which starts with "*".
+⍝ Remaining lines start with a blank.
+⍝ Result is always a matrix with one column and zero to many rows.
+ }

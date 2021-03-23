@@ -1,0 +1,10 @@
+ GoToNextBoldTopic←{
+     ∆Ref←⍵
+     in←GetCurrentItem ∆Ref.n
+     tv←∆Ref.n.tree                             ⍝ Ref to TreeView
+     st←∆Ref GetStates 1                        ⍝ Get status for all topics
+     boldFlags←(1+in)↓st[;4]
+     0=+/boldFlags:⍬⊣Show'No more emphasized topics after the current one'
+     next←1+in+boldFlags⍳1                      ⍝ Next bold one
+     Display ∆Ref next
+ }

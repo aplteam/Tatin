@@ -1,0 +1,6 @@
+ r←default RegRead path;wsh
+⍝ Tries to read "path" from the HKCU branch in the Windows Registry.
+⍝ If it cannot be found "default" is returned.
+ 'wsh'⎕WC'OLEClient' 'WScript.Shell'
+ path←'HKCU\',path
+ r←default(wsh.RegRead{11::⍺ ⋄ ⍺⍺⊂⍵})path

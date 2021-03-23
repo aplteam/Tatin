@@ -1,0 +1,63 @@
+ (key string)←{caption}Run(∆Ref question default);∆;n;size;res
+ caption←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'caption'
+ n←⎕NS''
+ size←150 600
+
+ ∆←''
+ ∆,←⊂'Caption'caption
+ ∆,←⊂'Posn'(∆Ref.n.form.Posn+20 20)
+ ∆,←⊂'Size'size
+ ∆,←⊂'Coord' 'Pixel'
+ ∆,←⊂'MaxButton' 0
+ ∆,←⊂'IconObj'∆Ref.n.form.IconObj
+ ∆,←⊂'FontObj'∆Ref.n.form.FontObj
+
+ n.form←⎕NEW'Form'∆
+ n.form.onConfigure←'OnConfigure'size
+ n.aplFont←n.form.⎕NEW'Font'(('PName' 'APL385 Unicode')('Size' 18)('Fixed' 1))
+
+ ∆←''
+ ∆,←⊂'Posn'(10 10)
+ ∆,←⊂'Caption'question
+ ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Left')
+ n.question←n.form.⎕NEW'Label'∆
+
+ ∆←''
+ ∆,←⊂'Text'default
+ ∆,←⊂'Size'(⍬(n.form.Size[1]-20))
+ ∆,←⊂'Posn'((10+0⊃+⌿⊃n.question.(Posn Size)),10)
+ ∆,←⊂'Attach'('Top' 'Left' 'Top' 'Right')
+ ∆,←⊂'FontObj'n.aplFont
+ n.input←n.form.⎕NEW'Edit'∆
+ n.input.Size[0]-←5
+
+ ∆←''
+ ∆,←⊂'Size'(⍬ 100)
+ ∆,←⊂'Default' 1
+ ∆,←⊂'Caption' 'OK'
+ ∆,←⊂'Attach'('Bottom' 'Left' 'Bottom' 'Left')
+ n.ok←n.form.⎕NEW'Button'∆
+ n.ok.Posn←(n.form.Size[0]-n.ok.Size[0]+10),10
+
+ ∆←''
+ ∆,←⊂'Size'(⍬ 100)
+ ∆,←⊂'Cancel' 1
+ ∆,←⊂'Caption' 'Cancel'
+ ∆,←⊂'Attach'('Bottom' 'Left' 'Bottom' 'Left')
+ n.cancel←n.form.⎕NEW'Button'∆
+ n.cancel.Posn←(n.ok.Posn[0]),10+1⊃+⌿⊃n.ok.(Posn Size)
+
+ n.cancel.onSelect←1
+ n.ok.onSelect←'OnCheckNameOfNewNode'
+ n.input.SelText←1,1+≢default
+ n.form.n←n
+ ⎕NQ n.input'GotFocus' ⋄ res←⎕DQ n.form
+
+ key←(n.cancel≡↑res)⊃'OK' 'Cancel'
+ :If key≡'OK'
+     string←n.∆result
+ :Else
+     string←''
+     {}2 ⎕NQ n.form'Close'
+ :EndIf
+⍝Done

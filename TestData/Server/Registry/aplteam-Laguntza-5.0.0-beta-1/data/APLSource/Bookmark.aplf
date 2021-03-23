@@ -1,0 +1,13 @@
+ Bookmark←{
+     (0=≢⍵):⍬
+     ∆Ref←⍺
+     (n d)←∆Ref.(n d)
+     (∧/⍵∊d.bookmark):⍬                             ⍝ Already bookmarked: done
+     ~⍵∊∆Ref.d.tree[;I.Row]:⍬                       ⍝ Yes, this should not happen but it happens anyway
+     f←AreThereNoBookmarksYet ∆Ref                  ⍝ Bookmark menu has just standard entries yet?
+     _←n.bookmarkMenu{~⍵:'s1'⍺.⎕WC'Separator' ⋄ ⍬}f ⍝ Create a separator once
+     0=≢∆Ref.d.bookmark:∆Ref AddBookmarkFirst ⍵     ⍝ Is it the very first?
+     ∆Ref AddBookmarkNext ⍵
+     ⍝ Add a menu item to the "Bookmarks" menu. ⍵ Is the "itemNo"
+     ⍝ First line is always the most recent one.
+ }

@@ -1,0 +1,12 @@
+ ProcessEvents←{
+⍝ ⍺ is a delay which default to ... seconds.
+⍝ ⍵ is a control
+     ⍺←0.5                                      ⍝ Default delay
+     delay←⍺                                    ⍝ The delay executed before "Wait" is stopped
+     rf←⍵                                       ⍝ Ref
+     rf←{'Form'≢⍵.Type:∇ ⍵.## ⋄ ⍵}rf            ⍝ If it's not a form take parent until it IS a form
+   ⍝ ↓↓ Trapping the VALUE ERROR is needed: it sometimes fails for unkown reasons...
+     _←delay{6::⍬ ⋄ _←⎕DL ⍺ ⋄ ⎕NQ ⍵ 9996}&rf    ⍝ Make sure that the "Wait" call is ended after ⍺ delay
+     _←rf.Wait                                  ⍝ Enqueue
+     ⍬
+ }

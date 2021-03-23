@@ -1,0 +1,30 @@
+ {r}←OnContextMenu msg;rf;∆Ref;tab;in;hc;bm;tx;cm;um;arg;res;sel
+⍝ Offers a context menu on the "Search" hit list
+ r←0
+ ∆Ref←##.Get∆Ref rf←0⊃msg
+ tab←⎕UCS 9
+ in←(rf.SelItems⍳1)⊃1⊃⎕FREAD ∆Ref.f.(tieNo ∆index)
+ →(¯1≡in)/0                             ⍝ Is a "container" - nothing to do
+ hc←0<in ##.NoOfChildren ∆Ref.d.tree[;##.I.Depth]  ⍝ Has it children?
+ 'cm'⎕WC'Menu'
+ bm←∆Ref ##.IsBookmarkable in           ⍝ Gets 1 if item may be bookmarked
+ tx←'Bookmark this item',tab,'Ctrl+D'
+ 'cm.bookmark'⎕WC'MenuItem'tx('Active'bm)
+ cm.{⍵ ⎕WS'Event' 'Select' 1}¨'MenuItem'cm.⎕WN''
+ um←∆Ref.p.userMode
+ {}{⍵:⍬ ⋄ 'cm.s2'⎕WC'Separator'}um
+ arg←'MenuItem' 'Edit "Help" function'('Event' 'Select' 1)
+ {}arg{⍵:⍬ ⋄ 'cm.edit'⎕WC ⍺}um
+ res←⎕DQ'cm'                            ⍝ Hand over to user
+ {}{0::⍬ ⋄ ⍬⊣⍵.Close}cm
+ :If 0≠≢res                             ⍝ Not cancelled?!
+     sel←{⍵↓⍨1+⍵⍳'.'}0⊃res              ⍝ Which menu item got selected?
+     :Select sel
+     :Case 'edit'                       ⍝ Let user edit a help function
+         {}∆Ref ##.EditFromIndex in
+     :Case 'bookmark'
+         {}∆Ref ##.Bookmark in
+     :Else
+         .                              ⍝ Huuh?!
+     :EndSelect
+ :EndIf

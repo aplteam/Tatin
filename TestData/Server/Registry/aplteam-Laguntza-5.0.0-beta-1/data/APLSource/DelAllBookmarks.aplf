@@ -1,0 +1,12 @@
+ DelAllBookmarks←{
+     ∆Ref←⍵
+     n←∆Ref.n
+     l←{⍵.⍎¨{⍵/⍨'i'=↑¨⍵}'MenuItem'⍵.⎕WN''}∆Ref.n.bookmarkMenu  ⍝ Refs to all bookmark menu item
+     _←{⍵.Close ⍵}¨l
+     n.bookmarkBtn.Active←1         ⍝ The Bookmark button
+     n.addBookmark.Active←1         ⍝ Handle the "Add bookmark" menu item
+     n.delBookmark.Active←0         ⍝ Handle the "Del bookmark" menu item
+     n.delAllBookmarks.Active←0     ⍝ Handle the "Del all bookmarks" menu item
+     ∆Ref.d.bookmark←''
+     DelBookmarkSeparator ∆Ref
+ }

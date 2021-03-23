@@ -1,0 +1,20 @@
+ ReadGuiParmsFromRegistry←{
+     ps←⍺
+     ∆Ref←⍵
+     0=≢rp←GetFullRegPath ∆Ref:⍬
+
+     data←↑(//)⎕VFI'¯1 ¯1'RegRead rp,'Posn'
+     f←(¯1 ¯1≢data)∧(⍬ ⍬≡ps.posn)
+     _←data{⍵:⍬⊣ps.posn←⍺ ⋄ ⍬}f
+
+     data←↑(//)⎕VFI'¯1 ¯1'RegRead rp,'Size'
+     f←(¯1 ¯1≢data)∧(⍬ ⍬≡ps.size)
+     _←data{⍵:⍬⊣ps.size←⍺ ⋄ ⍬}f
+
+     data←↑(//)⎕VFI'¯1 ¯1'RegRead rp,'SplitterPosn'
+     f←(¯1 ¯1≢data)∧(⍬ ⍬≡ps.splitterPosn)
+     _←data{⍵:⍬⊣ps.splitterPosn←⍺ ⋄ ⍬}f
+
+     ⍬
+ ⍝ Attempts to read Posn and Size of the GUI from the Registry
+ }

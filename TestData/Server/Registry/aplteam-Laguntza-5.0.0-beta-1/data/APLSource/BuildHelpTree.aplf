@@ -1,0 +1,11 @@
+ BuildHelpTree←{
+⍝ Returns the (properly sorted) tree for all active help nodes.
+     ⍺←0                                        ⍝ Level
+     0=≢r←↓⍺ CollectChildren ⍵:r
+     (0=≢l←(5⊃¨r){⍵/⍨⍺{9=↑⍺.⎕NC ⍵}¨⍵}1⊃¨r):r
+     b←9=↑∘⍵.⎕NC¨1⊃¨r
+     rl←⍵.⍎¨l                                   ⍝ References
+     buf←(⍺+1)∇¨rl                              ⍝ Recursive call
+     (b/r)←(⊂¨b/r),¨buf                         ⍝ Preserve proper sort order
+     ⊃,/r{(⊂⍣⍵)⍺}¨~b
+ }

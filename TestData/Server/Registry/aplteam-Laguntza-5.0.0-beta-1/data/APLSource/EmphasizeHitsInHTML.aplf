@@ -1,0 +1,23 @@
+ EmphasizeHitsInHTML←{
+     ∆Ref←⍵
+     html←⍺
+     0=≢ss←∆Ref.s.searchString:html         ⍝ Search string
+     fw←∆Ref.s.matchWholeWord               ⍝ Full word
+     ic←↑∆Ref.s.ignoreCase                  ⍝ Ignore case
+     (lf nl)←⎕UCS 10 13                     ⍝ Line feed and new line as separators
+     html2←html←lf,↑,/nl,¨html              ⍝ Add leading lf and make simple
+     mask←{{⍵∨≠\⍵}⍵∊'<>'}html               ⍝ Mask for the HTML as such
+     (mask/html2)←' '                       ⍝ Wipe out HTML
+     html2←⎕C⍣ic⊣html2                      ⍝ Conditional lowercase
+     ss←⎕C⍣ic⊣ss                            ⍝ Conditional lowercase
+     html2←SeparateWords html2              ⍝ Replace anything that separates words by blanks
+     ss2←fw{⍺:' ',⍵,' ' ⋄ ⍵}ss              ⍝ If "Full word" add blanks
+     bool←ss2⍷html2                         ⍝ Booleans indicating the hits
+     0=+/bool:nl{⍵⊂⍨⍺≠⍵}html                ⍝ No hits? Done!
+     ind←fw+{⍵/⍳≢⍵}bool                     ⍝ Where are the hits
+     ind-←0,¯1↓ind
+     html←(ss'<span class="emphasize">' '</span>')ReplaceSearchStringByEmphasizeSpan ind html ⍝ Workhorse
+     html({1↓⍺⌽⍨⍺⍳⍵})←lf                    ⍝ Restore order
+     nl{⍵⊂⍨⍺≠⍵}html                         ⍝ Split at newline
+⍝ Emphesizes the search term in the HTML (⍺)
+ }

@@ -1,0 +1,28 @@
+ r←∆Ref GetMarkdownVarsContent_(ref name);varsName;result;ticks
+⍝ Returns the contents of a vars (Markdown).
+⍝ If that fails then there is no help page and '' is returned.
+ r←''
+ :If 2.1=ref.⎕NC⊂name
+     varsName←(⍕ref),'.',name
+ :ElseIf 2=ref.⎕NC name,'.∆DefaultPage'
+     varsName←(⍕ref),'.',name,'.∆DefaultPage'
+ :Else
+     :Return
+ :EndIf
+ result←⍎varsName
+ result←ExecEmbeddedFns result varsName
+⍝ ⍎(∨/'FlipDB'⍷∊result)/'.'
+ ticks←0≠2|+/¨'`'=RemoveCodeBlock result
+ :If 1∊ticks
+     :If ∆Ref.p.userMode
+        ⍝ Returning two empty vectors is the best we can do in user mode.
+     :Else
+         :If AskForEdit2 varsName result ticks
+             →1
+         :Else
+             :Return
+         :EndIf
+     :EndIf
+ :Else
+     r←result
+ :EndIf

@@ -1,0 +1,19 @@
+ GetWordsFromMarkdown←{
+⍝ ⍵ is Markdown.
+⍝ Returns a two-item vector
+⍝ [1] All words unchanged
+⍝ [2] All words lowercased
+     markdown←⍵
+     0=≢markdown:'' ''
+     Words←RemoveFunctinCalls RemoveCode RemoveData markdown
+     Words←'|'HTML.MaskLinks¨Words
+     Words←SeparateWords∊' ',Words
+     Words⌿⍨←~∧/¨Words∊¨⊂⎕D,'.,'
+     Words←∪' 'A.Split A.DMB Words
+     Words/⍨←1<≢¨Words             ⍝ We don't want one-letter words
+     0=≢Words:'' ''
+     words←∪⎕C Words
+     Words←CR,CR,⍨∊↑{⍺,CR,⍵}/Words
+     words←CR,CR,⍨∊↑{⍺,CR,⍵}/words
+     Words words
+ }

@@ -1,0 +1,11 @@
+ InjectMainMenu←{
+     ⍺←''
+     breadcrumb←⍺
+     (level mainTocPage mainIndexPage)←⍵
+     buff←↑,/level⍴⊂'../'
+     a1←'<li><a ',(mainTocPage/'id="a_mainmenu_toc" '),'href="',buff,'index.html">TOC</a></li>'
+     a2←'<li><a ',(mainIndexPage/'id="a_mainmenu_index" '),'href="',buff,'TheIndex.html">Index</a></li>'
+     html←(0≠≢breadcrumb)/'<p id="p_breadcrumb">'breadcrumb'</p>'
+     html,←'<ul id="mainmenu">'a1 a2'</ul>'
+     html
+ }

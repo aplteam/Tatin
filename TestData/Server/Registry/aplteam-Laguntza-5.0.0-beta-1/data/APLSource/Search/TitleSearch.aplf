@@ -1,0 +1,14 @@
+ TitleSearch←{
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     (ss lf mhw sai)←⍵                      ⍝ Search string, ignore case, match whole words only, search as is
+     lc←lf∘{⍺:⎕C ⍵ ⋄ ⍵}                     ⍝ Make fns that translates to lowercase according to "lowercase flag"
+     n←lc⊃∆Ref.d.tree[;##.I.Title]          ⍝ All names to search in
+     (((⎕UCS 160)=,n)/,n)←' '               ⍝ Replace unbreakable blanks by normal ones
+     n{~⍵:⍺ ⋄ {(⊂'')~⍨' 'A.Split A.DMB ⍵}¨↓⍺}←mhw ⍝ Convert titles into vector of words if mhw
+     bool←∆Ref Find(n(lc ss)mhw)            ⍝ Search with "Lowercase"
+     ls←∪⍸bool                              ⍝ Calc lines
+     (0=≢ls):⍬ ⍬                            ⍝ Nothing found?
+     pqn←∆Ref GetFullyQualifiedNamesForDisplay ls
+     ls pqn                                 ⍝ Build result
+ }

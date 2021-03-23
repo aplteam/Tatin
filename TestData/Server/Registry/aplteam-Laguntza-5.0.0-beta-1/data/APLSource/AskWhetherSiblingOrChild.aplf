@@ -1,0 +1,59 @@
+ {r}←∆Ref AskWhetherSiblingOrChild name;n2;∆;res;caption
+⍝ User wishes to insert a help topic but it is not clear whether she wants it
+⍝ to be inserted as a sibling or into "name".
+⍝ Resturns 1 for "sibling" and 0 for "child".
+ r←⍬
+ n2←⎕NS''
+ ∆←⊂'Caption' 'Laguntza - Insert Help Topic'
+ ∆,←⊂'Coord' 'Pixel'
+ ∆,←⊂'Posn'(50+∆Ref.n.form.Posn)
+ ∆,←⊂'Size'(250 430)
+ ∆,←⊂'SysMenu' 0
+ ∆,←⊂'MaxButton' 0
+ ∆,←⊂'MinButton' 0
+ ∆,←⊂'Sizeable' 0
+ n2.Form←⎕NEW'Form'∆
+
+ ∆←⊂'Caption' 'Would you like to insert a help topic...'
+ ∆,←⊂'Posn'(15 10)
+ n2.Label1←n2.Form.⎕NEW'Label'∆
+
+ ∆←⊂'Posn'((15+↑+⌿⊃n2.Label1.(Posn Size)),10)
+ ∆,←⊂'Size'(90 250)
+ n2.Group←n2.Form.⎕NEW'Group'∆
+
+ caption←(0<(⍎name).##.⎕NC'∆TopicProperties')⊃'&as a sibling of' '&after'
+ ∆←⊂'Caption'caption
+ ∆,←⊂'Posn'(15 10)
+ ∆,←⊂'Style' 'Radio'
+ ∆,←⊂'State' 0
+ n2.Sibling←n2.Group.⎕NEW'Button'∆
+
+ ∆←⊂'Caption' '&into'
+ ∆,←⊂'Posn'((5+↑+⌿⊃n2.Sibling.(Posn Size)),10)
+ ∆,←⊂'Style' 'Radio'
+ ∆,←⊂'State' 1
+ n2.Into←n2.Group.⎕NEW'Button'∆
+
+ ∆←⊂'Caption'(((1+≢⍕∆Ref.p.source)↓name),' ?')
+ ∆,←⊂'Posn'((10+↑+⌿⊃n2.Group.(Posn Size))10)
+ n2.Label2←n2.Form.⎕NEW'Label'∆
+
+ ∆←⊂'Caption' 'OK'
+ ∆,←⊂'Default' 1
+ ∆,←⊂'Size'(⍬ 120)
+ n2.OK←n2.Form.⎕NEW'Button'∆
+ n2.OK.Posn←(↑n2.Form.Size-10+n2.OK.Size),10
+
+ ∆←⊂'Caption' 'Cancel'
+ ∆,←⊂'Cancel' 1
+ ∆,←⊂'Size'(⍬ 120)
+ n2.Cancel←n2.Form.⎕NEW'Button'∆
+ n2.Cancel.Posn←(↑n2.Form.Size-10+n2.OK.Size),10+1↓+⌿⊃n2.OK.(Posn Size)
+ n2.(OK Cancel).onSelect←1
+
+ ⎕NQ n2.Into'GotFocus' ⋄ res←⎕DQ n2.Form
+ :If n2.Cancel≢↑res
+     r←↑n2.(Sibling Into).State/'sibling' 'into'
+ :EndIf
+⍝Done

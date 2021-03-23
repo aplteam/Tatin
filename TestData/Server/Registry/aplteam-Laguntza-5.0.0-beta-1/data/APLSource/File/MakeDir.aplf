@@ -1,0 +1,15 @@
+ {r}←MakeDir dir;rf;levels;bool;FO;path
+ ⍝ Creates a folder. Returns an IFolder object or ⍬
+ r←⍬
+ rf←⍎'FO'⎕WC⊢FO←'OLECLIENT' 'Scripting.FileSystemObject'
+ ((dir='/')/dir)←'\'
+ dir←{∧/bool←~'\\'⍷⍵:⍵ ⋄ ∇ bool/⍵}dir  ⍝ Remove one of any "\\"
+ levels←∪{⍺,'\',⍵}\'\'##.A.Split dir
+ bool←rf{((,':')≡,1↓⍵):1 ⋄ ((2='\'+.=⍵)∧'\\'≡2↑⍵):1 ⋄ (⍺.FolderExists⊂⍵):1 ⋄ 0}¨levels
+ :If ~∧/bool
+     :For path :In (~bool)/levels
+         :If ~rf.FolderExists⊂path
+             rf.CreateFolder⊂path~'"'
+         :EndIf
+     :EndFor
+ :EndIf

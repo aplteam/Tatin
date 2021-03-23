@@ -1,0 +1,12 @@
+ CreateStatusbar←{
+     ∆Ref←⍵
+     n←∆Ref.n
+     n.SB←⍎'sb'⍵.⎕WC'Statusbar'('Coord' 'Pixel')('Attach'('Bottom' 'Left' 'Bottom' 'Right'))
+     size←⍵.sb.Size
+     n.infoSB←⍎'info'n.SB.⎕WC'Statusfield'('Size'(⍬(0⌈size[1]-480)))('Attach'('Top' 'Left' 'Bottom' 'Right'))
+     n.relSB←⍎'rel'n.SB.⎕WC'Statusfield'('Size'(⍬ 130))('Attach'('Top' 'Right' 'Bottom' 'Right'))
+     n.pathSB←⍎'path'n.SB.⎕WC'Statusfield'('Size'(⍬ 330))('Attach'('Top' 'Right' 'Bottom' 'Right'))
+     n.SB.onContextMenu←'OnStatusbarContextMenu'
+     ⍬
+⍝ Creates the statusbar and its fields
+ }

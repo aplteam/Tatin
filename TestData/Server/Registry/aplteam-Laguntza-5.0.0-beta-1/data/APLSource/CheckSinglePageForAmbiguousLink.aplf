@@ -1,0 +1,10 @@
+ CheckSinglePageForAmbiguousLink←{
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     in←⍵
+     buf←∆Ref Lint_.CheckAmbiguousLinks_ in
+     (0=≢buf):Show'No ambiguous links found'
+     ⎕←(⎕PW-1)⍴'--- Ambiguous links found in ',(I.TopicName⊃∆Ref.d.tree[in;]),' ',(A.FormatDateTime ⎕TS),⎕PW⍴'-'
+     ⎕←⍪buf
+     ⍬
+ }

@@ -1,0 +1,24 @@
+ {r}←ReportMissingIndexEntries ∆Ref;list;this;body;counter
+ r←''
+ list←GetParentAndTopicNameAsText ∆Ref.d.tree
+ :If ∆Ref.p.reportToSession
+     ⎕←(⎕PW-1)↑'--- Help topics without any index entries',(⎕PW-1)⍴'-'
+ :EndIf
+ counter←0
+ :For this :In list
+     :If 2=⎕NC this
+         body←⍎this
+         :If 0=∨/∨/¨'[DATA]:index'∘⍷¨##.Laguntza.body
+             ⎕←'⍝ ',this
+             r,←⊂this
+             counter+←1
+         :EndIf
+     :EndIf
+ :EndFor
+ :If 0=counter
+     r←'All help pages carry index entries'
+ :EndIf
+ :If ∆Ref.p.reportToSession
+     ⎕←{2=≡⍵:⍪r ⋄ r}r
+ :EndIf
+⍝Done

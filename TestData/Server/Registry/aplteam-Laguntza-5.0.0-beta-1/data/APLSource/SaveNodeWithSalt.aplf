@@ -1,0 +1,25 @@
+ {r}←{firstFlag}SaveNodeWithSalt(node folder);vars;varsList;subnode;subnodeList;path;cmd
+⍝ `node` is supposed to be the node of a help system.
+⍝ `folder` is the folder the node is saved in.
+⍝ Saves all variables and a function `∆TopicProperties` if there is one.
+⍝ It then checks whether there are sub namespaces. If so it calls itself
+⍝ on those namespaces.
+⍝ Don't specify a left argument: it's used to recognize recursive calls.
+ r←⍬
+ firstFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'firstFlag'
+ :If firstFlag
+     path←folder,'\'
+ :Else
+     path←↑,/1 ⎕NPARTS folder,'\',({⍵↑⍨-'.'⍳⍨⌽⍵}⍕node),'\'
+ :EndIf
+ :For vars :In varsList←' '~¨⍨↓node.⎕NL 2
+     cmd←(⍕node),'.',vars,' ',path,vars,'.dyalog -makedir -noprompt'
+     {}⎕SE.SALT.Save cmd
+ :EndFor
+ :If 3=node.⎕NC'∆TopicProperties'
+     cmd←(⍕node),'.∆TopicProperties ',path,'∆TopicProperties.dyalog -noprompt'
+     {}⎕SE.SALT.Save cmd
+ :EndIf
+ :For subnode :In subnodeList←' '~¨⍨↓node.⎕NL 9
+     0 SaveNodeWithSalt(node⍎subnode)path
+ :EndFor

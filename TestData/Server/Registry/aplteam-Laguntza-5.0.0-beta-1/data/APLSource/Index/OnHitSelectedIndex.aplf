@@ -1,0 +1,13 @@
+ OnHitSelectedIndex←{
+     ref←0⊃⍵                            ⍝ Create reference
+     ∆Ref←##.Get∆Ref ref
+     ∆Ref.n.indexKeyword.Text←''        ⍝ Reset the search field
+     ln←ref.SelItems⍳1                  ⍝ Which line number?
+     (ln=≢ref.SelItems):0               ⍝ Nothing selected?
+     in←∆Ref GetIndexNumber ln          ⍝ Translate ln into item no
+     _←∆Ref ##.SelectItemInTreeView in
+     (¯1≢in):0 ##.Display ∆Ref in       ⍝ Not a branch: display it!
+     ∆Ref.n.browser.Size←0 0            ⍝ Nothing to display
+     ∆Ref.n.tree.SelItems←(≢∆Ref.n.tree.Items)⍴0
+⍝ Display the appropriate help page
+ }

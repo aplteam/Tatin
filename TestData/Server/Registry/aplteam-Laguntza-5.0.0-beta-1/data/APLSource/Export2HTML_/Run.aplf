@@ -1,0 +1,26 @@
+ {r}←Run(∆Ref folder);f;path;body;row;name;html;filename;level;breadcrumb
+ f←⎕NS''                                ⍝ Holds all file data
+ f.(tree Words words index caption)←⎕FREAD ∆Ref.f.tieNo(1 2 3 4 5)
+ folder←##.HTML.EnforceSlash folder
+ HandleJavaScriptAndCSS folder
+ ∆Ref HandleImageFolder folder
+ ⎕MKDIR folder,'/HTML'
+ ∆Ref CreateHomePage f folder
+ ∆Ref CreateIndexPage f folder
+ :For row :In ⍳¯10+-/⌽2↑⎕FSIZE ∆Ref.f.tieNo
+     path←f GetRelativeUrlForRow row
+     body←⎕FREAD ∆Ref.f.tieNo,11+row
+     {}1 ⎕MKDIR⍣(f.tree[row;6])⊣folder,'/HTML/',path
+     level←+/f.tree[row;0 6]
+     :If 0=≢body
+         ∆Ref CreateDefaultIndexPage f row folder path level
+     :Else
+         filename←folder,'HTML/',f GetRelativePageNameForRow row
+         body←(⊂f level)PolishAnchors¨body
+         breadcrumb←f GetBreadcrumb row
+         body←(breadcrumb InjectMainMenu(level+1)0 0),body
+         html←∆Ref MakeFullPageFrom body path level
+         (⊂html)⎕NPUT filename
+     :EndIf
+ :EndFor
+ 'Export as HTML'##.Show'Help system exported to:'folder

@@ -1,0 +1,9 @@
+ PolishImageLinks←{
+ ⍝ Since all images are defined relative to the current dir we must now
+ ⍝ change this by inserting the basePath. We CANNOT use the HTML "base"
+ ⍝ thingy because that would destroy all #-links!
+     (head body)←⍵
+     0=+/'<img'⍷∊body:body
+     basePath←GetBasePath head
+     '<img src="'⎕R('&',basePath)⍠('Mode' 'D')⊣body
+ }

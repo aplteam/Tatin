@@ -1,0 +1,21 @@
+ Markdown2HTML_←{
+     (∆Ref row)←⍺
+     md←⍵
+     0=≢md:md
+     M←MarkAPL
+     parms←M.CreateParms
+     parms.checkLinks←0
+     parms.verbose←0
+     parms.bookmarkLink←0
+     parms.markdownStrict←1
+     parms.syntaxSugar←0
+     parms.projectPathFolder←∆Ref.p.folderName,'\'
+     ns←M.Init parms md
+     ns←M.Process ns
+     0=≢ns.report:ns.html
+     flag←{0=⎕NC ⍵:0 ⋄ ~⍎⍵}'∆Ref.∆ReportToSession':Is reporting to ⎕SE is switched off(test cases etc)?
+     flag:ns.html
+     ⎕←'*** Problem',((1<≢ns.report)/'s'),' in ',GetParentAndTopicNameAsText ∆Ref.d.tree[row;]
+     ⎕←⍪ns.report
+     ns.html
+ }

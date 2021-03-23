@@ -1,0 +1,15 @@
+ GetHelpVarsName←{
+     ∆Ref←⍺
+     in←⍵
+     (¯1=in):''
+     (name parent nodeFlag)←∆Ref.d.tree[in;I.(TopicName Parent IsNode)]
+     2.1=⎕NC⊂(⍕parent),'.',name:(⍕parent),'.',name      ⍝ Does this one exist?
+     0=nodeFlag:''                                      ⍝ If it's not a node we are done
+     ref2←⍎(⍕parent),'.',name
+     name←'∆DefaultPage'
+     2.1≠ref2.⎕NC⊂name:''                               ⍝ Is there a ∆DefaultPage?
+     (⍕ref2),'.',name
+⍝ Takes a row number and tries to find a (help) variable or, if that
+⍝ does not exist, a function called ∆DefaultPage.
+⍝ Returns just the name or ''.
+ }

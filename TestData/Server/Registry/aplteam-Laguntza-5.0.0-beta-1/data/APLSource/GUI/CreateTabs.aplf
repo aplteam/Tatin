@@ -1,0 +1,45 @@
+ CreateTabs←{
+     ∆Ref←⍵
+     n←∆Ref.n
+
+     ∆←⊂'TabControl'
+     ∆,←⊂'Size'((⍵.Size[0]-70),300)
+     ∆,←⊂'Posn'(0 0)
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Left')
+     n.tabControl←⍎'reg'n.form.⎕WC ∆
+
+     ∆←⊂'TabButton'
+     ∆,←⊂'Caption' 'Contents'
+     n.tabBtns←n.contents←⍎'tv'n.tabControl.⎕WC ∆
+
+     ∆←⊂'Subform'
+     ∆,←⊂'TabObj'n.contents
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     ∆,←⊂'EdgeStyle' 'Dialog'
+     n.tabs←n.contents_sf←⍎'sf_tv'n.tabControl.⎕WC ∆
+
+     ∆←⊂'TabButton'
+     ∆,←⊂'Caption' 'Search'
+     n.tabBtns,←n.search←⍎'search'n.tabControl.⎕WC ∆
+
+     ∆←⊂'Subform'
+     ∆,←⊂'TabObj'n.search
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     ∆,←⊂'EdgeStyle' 'Dialog'
+     n.tabs,←n.search_sf←⍎'sf_search'n.tabControl.⎕WC ∆
+
+     ∆←⊂'TabButton'
+     ∆,←⊂'Caption' 'Index'
+     n.tabBtns,←n.index←⍎'index'n.tabControl.⎕WC ∆
+
+     ∆←⊂'Subform'
+     ∆,←⊂'TabObj'n.index
+     ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
+     ∆,←⊂'EdgeStyle' 'Dialog'
+     n.tabs,←n.index_sf←⍎'sf_index'n.tabControl.⎕WC ∆
+
+     n.OrigSize←n.tabControl.Size ⍝ Remember size (Visibility can be toggled!)
+     ⎕NQ n.contents'Select'
+     ⍬
+⍝ Creates the tabs for the tree, search and index
+ }

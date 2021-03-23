@@ -1,0 +1,45 @@
+ CreateHiddenButtons←{
+⍝ The button are used for establishiung accelerator keys only.
+     ∆Ref←⍵
+
+     ∆←''
+     ∆,←⊂'Caption' 'Edit help function'
+     ∆,←⊂'Accelerator'(13 2)
+     ∆,←⊂'Posn'(¯5 ¯5)
+     ∆,←⊂'Size'(1 1)
+     ∆Ref.n.editHelpFnsBtn←∆Ref.n.form.⎕NEW'Button'∆
+     ∆Ref.n.editHelpFnsBtn.onSelect←'OnEditFromMainMenu'
+
+
+⍝ We need three buttons for Ctrl+0 because the numeric Keypad generates different codes and NumLock makes also a difference:
+     ∆←''
+     ∆,←⊂'Caption' 'Restore default font size for TreeView'
+     ∆,←⊂'Accelerator'(96 2)
+     ∆,←⊂'Posn'(¯5 ¯7)
+     ∆,←⊂'Size'(1 1)
+     ∆Ref.n.restoreDefaultFontSizeForTV1←∆Ref.n.form.⎕NEW'Button'(∆,⊂'Accelerator'(48 2))
+     ∆Ref.n.restoreDefaultFontSizeForTV1.onSelect←'OnRestoreDefaultFontSizeForTV'∆Ref
+     ∆Ref.n.restoreDefaultFontSizeForTV2←∆Ref.n.form.⎕NEW'Button'(∆,⊂'Accelerator'(45 2))
+     ∆Ref.n.restoreDefaultFontSizeForTV2.onSelect←'OnRestoreDefaultFontSizeForTV'∆Ref
+     ∆Ref.n.restoreDefaultFontSizeForTV3←∆Ref.n.form.⎕NEW'Button'(∆,⊂'Accelerator'(96 2))
+     ∆Ref.n.restoreDefaultFontSizeForTV3.onSelect←'OnRestoreDefaultFontSizeForTV'∆Ref
+
+⍝ We need two buttons for Ctrl++ and Ctrl+- because the numeric Keypad generates different codes:
+     ∆,←⊂'Caption' 'Increase font size for TreeView'
+     ∆,←⊂'Posn'(¯5 ¯9)
+     ∆,←⊂'Size'(1 1)
+     ∆Ref.n.IncreaseFontSizeForTV1←∆Ref.n.form.⎕NEW'Button'(∆,⊂'Accelerator'(107 2))
+     ∆Ref.n.IncreaseFontSizeForTV1.onSelect←'OnIncreaseDefaultFontSizeForTV'∆Ref
+     ∆Ref.n.IncreaseFontSizeForTV2←∆Ref.n.form.⎕NEW'Button'(∆,⊂'Accelerator'(187 3))
+     ∆Ref.n.IncreaseFontSizeForTV2.onSelect←'OnIncreaseDefaultFontSizeForTV'∆Ref
+
+     ∆,←⊂'Caption' 'Decrease font size for TreeView'
+     ∆,←⊂'Posn'(¯5 ¯11)
+     ∆,←⊂'Size'(1 1)
+     ∆Ref.n.DecreaseFontSizeForTV1←∆Ref.n.form.⎕NEW'Button'(∆,⊂'Accelerator'(109 2))
+     ∆Ref.n.DecreaseFontSizeForTV1.onSelect←'OnDecreaseDefaultFontSizeForTV'∆Ref
+     ∆Ref.n.DecreaseFontSizeForTV2←∆Ref.n.form.⎕NEW'Button'(∆,⊂'Accelerator'(189 2))
+     ∆Ref.n.DecreaseFontSizeForTV2.onSelect←'OnDecreaseDefaultFontSizeForTV'∆Ref
+
+     ⍬
+ }

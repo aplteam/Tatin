@@ -1,0 +1,25 @@
+ {r}←{sibling}InjectNewPageStub(∆Ref in testFlag);parent;sibling;row
+⍝ `in` is not neccessarily identical with n.tree.SelItems⍳1: in case it is new it's +1.
+⍝ Returns 1 in case the help was re-compiled, otherwise 0.
+ r←0
+ row←∆Ref.d.tree[↑in;]
+ :If row[I.IsNode]
+     :If 0=⎕NC'sibling'
+         :If 0=≢sibling←∆Ref AskWhetherSiblingOrChild GetParentAndTopicNameAsText row
+             :Return                ⍝ Cancelled!
+         :Else
+             :If sibling≡'into'
+                 parent←⍎↑{(⍕⍺),'.',⍵}/row[I.(Parent TopicName)]
+             :Else
+                 parent←I.Parent⊃row
+             :EndIf
+         :EndIf
+     :Else
+         parent←⍎↑{(⍕⍺),'.',⍵}/row[I.(Parent TopicName)]
+     :EndIf
+ :Else
+     parent←∆Ref GetParentOf in
+ :EndIf
+ r←testFlag InjectNewPageStub_ ∆Ref in parent
+ testFlag TellHowToArrangeNodes ∆Ref
+⍝Done

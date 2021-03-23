@@ -1,0 +1,19 @@
+ OnKeyPressInTreeView←{
+     ∆Ref←⍺
+     ⍵[2]∊'UC' 'DC':1⊣⎕NQ ∆Ref.n.tree 9998(1⍳⍨(0⊃⍵).SelItems) ⍝ Special: ↑ and ↓
+     key←2⊃⍵                                        ⍝ Which key was pressed?
+     (0=≢in←GetCurrentItem ∆Ref.n):⍬                ⍝ Which item (in) is selected? (get out if none)
+     (80 2≡⍵[4 5]):PrintCurrentPage ∆Ref
+     ('+'≡key):∆Ref Expand in                       ⍝ Expand current node
+     ('-'≡key):∆Ref Collapse in                     ⍝ Collapse current node
+     ('DB'≡key):GoBack ∆Ref                         ⍝ Backspace is "Go back"
+     (70 2≡⍵[4 5]):GoToSearchTab ∆Ref               ⍝ Ctrl+F pressed? Go to "Search" tab
+     ((⊂⍵[4 5])∊(96 2)(45 2)):∆Ref ChangeTreeViewFontSize 0  ⍝ Restore default font size (Ctrl+0)
+     flag←⍵[4 5]≡68 2                               ⍝ Was Ctrl+D pressed?
+     bm←∆Ref IsBookmarkable in                      ⍝ Is current topic "bookmarkable"?
+     _←∆Ref Bookmark(flag∧bm)/in                    ⍝ Then bookmark this item
+     _←∆Ref{⍵:ProcessF12 ⍺ ⋄ ⍬}⍵[4 5]≡123 0         ⍝ Was F12 pressed? (Edit ∆LinkID)
+     _←⎕NQ ∆Ref.n.tree 9998(GetCurrentItem ∆Ref.n)  ⍝ Must remain last line: forces an update
+     ~flag
+⍝ Handles various keys in the TreeView
+ }

@@ -1,0 +1,18 @@
+ {r}←∆Ref EditDefaultPage parent;body;lastLine;newBody;flag;okFlag;TEMP
+ r←⍬
+ ⎕SE.⎕SHADOW'TEMP'
+ 'TEMP'⎕SE.⎕NS''
+ ⎕SE.TEMP.buffer←CreateStubDefaultPage parent
+ okFlag←0
+ :Repeat
+     ⎕SE.TEMP EditByQED'buffer'
+     :If 0=≢' '~⍨∊⎕SE.TEMP.buffer
+         :Return
+     :EndIf
+     ⍎parent,'.∆DefaultPage←⎕SE.TEMP.buffer'
+     okFlag←1
+ :Until okFlag
+ ∆Ref TellAcreAboutChange parent,'.∆DefaultPage'
+ {}Compile ∆Ref
+ ∆Ref ShowTopic parent
+⍝Done

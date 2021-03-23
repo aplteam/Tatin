@@ -1,0 +1,20 @@
+ {r}←OnBeforeNavigate msg;self;url;∆Ref;topic;in;no
+⍝ Handler for "BeforeNavigate" events in the WebBrowser ActiveX control.
+ r←1
+ (self url)←msg[0 3]
+ self←⍎self
+ ∆Ref←##.Get∆Ref self
+ :If ∨/{≢'\bhttp[s]*://'⎕S 0⊣⍵}url
+     self.Stop      ⍝ Returning just a 0 as result is not enough!
+     r←0
+     {}##.A.GoToWebPage url
+ :ElseIf 'file://'{⍺≡(≢⍺)↑⍵}url
+     topic←{⍵↓⍨⍵⍳'#'}{⍵↑⍨-'.'⍳⍨⌽⍵}url
+     :If ∧/(1↓topic)∊⎕D
+         in←↑(//)⎕VFI 1↓topic
+     :Else
+         no←(⎕C ∆Ref.d.tree[;##.I.TopicName])⍳⊂1↓topic
+         in←∆Ref.d.tree[no;##.I.Row]
+     :EndIf
+     {}##.Display ∆Ref in              ⍝ Display a certain topic
+ :EndIf

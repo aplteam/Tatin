@@ -1,0 +1,13 @@
+ ReadBookMarksFromRegistry←{
+     ∆Ref←⍵
+     A←∆Ref.d.A
+     0=≢rp←GetFullRegPath ∆Ref:⍬
+     (0=≢savedBookmarks←''RegRead rp,'bookmarks'):⍬
+     (0=≢savedBookmarks←∪';'A.Split savedBookmarks):⍬
+     savedBookmarks←{⍵[Alpha⍋⊃A.Last¨⍵]}savedBookmarks
+     rows←(GetParentAndTopicNameAsText ∆Ref.d.tree)⍳savedBookmarks
+     rows←(rows<≢∆Ref.d.tree)/rows     ⍝ In development a bookmarked page might have been deleted
+     _←∆Ref AddSavedBookmarksToMenu rows
+     ⍬
+ ⍝ Attempts to read any bookmarks from the Windows Registry
+ }

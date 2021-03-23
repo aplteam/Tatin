@@ -1,0 +1,10 @@
+ OnKeyPressInCombo←{
+     (obj input)←⍵[0 2]
+     0 2∊⍨≢input:1⊣EnforceCheckOfSearchStringLength obj
+     ∆Ref←##.Get∆Ref obj
+     f←∆Ref.n.searchAsIs.State∨(~∆Ref.n.matchWholeWord.State)∨input∊' ',##.AllowedChars ⍬
+     f:1⊣EnforceCheckOfSearchStringLength obj ⍝ Okay?
+     ∆Ref.n.searchAsIs.State:1                  ⍝ "Search as is"? Then we allow any input!
+     _←∆Ref TellInvalidCharInSearchCombo input  ⍝ Tell user
+     0                                          ⍝ Suppress invalid input
+ }

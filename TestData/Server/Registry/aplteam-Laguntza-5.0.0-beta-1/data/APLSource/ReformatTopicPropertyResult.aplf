@@ -1,0 +1,8 @@
+ ReformatTopicPropertyResult←{
+⍝ Takes a result delivered from ∆TopicProperties function and returns a vector of vectors
+⍝ ready to be part of a new ∆TopicProperties function (for ⎕FX that is).
+     result←⍵
+     result[;1]←{''''⎕R''''''⊣⍵}¨result[;1]
+     buf←'r⍪←'∘,¨⍕¨↓⍉⊃{('''',¨(0⊃⍵),¨'''')('''',¨(1⊃⍵),¨'''')(⍕¨2⊃⍵)(⍕¨3⊃⍵)}↓[0]result
+     buf,'r' '}'
+ }

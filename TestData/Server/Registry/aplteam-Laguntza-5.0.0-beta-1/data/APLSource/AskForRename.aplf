@@ -1,0 +1,19 @@
+ newName←∆Ref AskForRename(parent pageName);flag;nc;msg
+ flag←0
+ newName←''
+ :Repeat
+     newName←pageName AskForName ∆Ref
+     →(0=≢newName)/0
+     newName←' '⎕R'_'⊣newName
+     :If pageName≡newName
+         msg←'You have not changed the name!?'
+         'Rename problem'Show msg
+     :Else
+         nc←parent.⎕NC newName
+         :If ~flag←0=nc
+             msg←'Sorry, this name:'('< ',newName,' >')'is already taken.'
+             'Rename problem'Show msg
+         :EndIf
+     :EndIf
+ :Until flag
+⍝Done

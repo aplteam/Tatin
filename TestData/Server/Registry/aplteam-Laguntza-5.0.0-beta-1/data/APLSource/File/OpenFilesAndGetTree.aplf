@@ -1,0 +1,14 @@
+ OpenFilesAndGetTree←{
+     ∆Ref←⍵
+     _←CloseFile ∆Ref
+     f←∆Ref.p.folderName,'\',∆Ref.f.filename
+     ∆Ref.f.tieNo←f ⎕FSTIE 0
+     tree←⎕FREAD ∆Ref.f.(tieNo ∆tree)
+
+   ⍝ ↓↓↓ Was written as text in order to overcome Dyalog bug <01157>
+     tree[;##.I.Parent]←{9≠⎕NC ⍵:⍵ ⋄ ⍎⍵}¨tree[;##.I.Parent]
+   ⍝ ↑↑↑ However, the refs are NOT needed for the stand-alone EXE!
+
+     tree
+⍝ Opens all files and reads (and returns) the tree from its file.
+ }

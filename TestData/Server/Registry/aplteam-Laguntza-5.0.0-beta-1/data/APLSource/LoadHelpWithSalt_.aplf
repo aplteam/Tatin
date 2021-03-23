@@ -1,0 +1,12 @@
+ r←LoadHelpWithSalt_(folder node);file;list;cmd;dir;name
+ r←⍬
+ node ⎕NS''
+ :For file :In list←FilesAndDirs.ListFiles folder,'\*.dyalog'
+     cmd←file,' -target=',node
+     {}⎕SE.SALT.Load cmd
+ :EndFor
+ :For dir :In list←FilesAndDirs.ListDirs folder
+     name←1⊃1 ⎕NPARTS dir
+     {}LoadHelpWithSalt_ dir(node,'.',name)
+ :EndFor
+⍝Done

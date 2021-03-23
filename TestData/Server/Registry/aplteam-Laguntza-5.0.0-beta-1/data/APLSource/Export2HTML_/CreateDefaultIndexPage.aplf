@@ -1,0 +1,22 @@
+ CreateDefaultIndexPage←{
+     (f row folder path level)←⍵
+     ∆Ref←⍺
+     bool←(1+f.tree[row;0])=row↓f.tree[;0]
+     noOf←1+((1+row)↓f.tree[;0])⍳f.tree[row;0]
+     (noOf↓bool)←0
+     type←f.tree[bool/row↓⍳≢f.tree;6]
+     urls←f.tree[bool/row↓⍳≢f.tree;1]
+     (type/urls),←⊂'/index.html'
+     type←~type
+     (type/urls)←(type/urls),¨⊂'.html'
+     (type/urls)←'_',¨type/urls
+     anchors←(bool/row↓f.tree[;2]){'<a class="link" href="',⍵,'">',⍺,'</a>'}¨urls
+     title←2⊃f.tree[row;]
+     head←∆Ref GetHead title folder(level+1)
+     breadcrumb←f GetBreadcrumb row
+     body←∆Ref MarkUpIndexPage title anchors folder breadcrumb level
+     html←head,body
+     filename←folder,'HTML/',path,'/index.html'
+     r←(⊂html)⎕NPUT filename 1
+     1:r←0
+ }

@@ -1,0 +1,15 @@
+ CollapseFrom←{
+     ∆Ref←⍺
+     n←∆Ref.n
+     t←∆Ref.d.tree
+     in←⍵
+     ind←in,in WhereAreTheChildren ∆Ref.d.tree[;I.Depth]  ⍝ Which ones?
+     states←n.tree.GetItemState¨ind             ⍝ Get all states
+     states←⌽⍉(32⍴2)⊤states                     ⍝ convert to Booleans
+     states[;5 6]←0                             ⍝ Collapse all branches
+     states←{2⊥⍉⌽⍵}states                       ⍝ Convert to Int
+     _←states{n.tree.SetItemState ⍵ ⍺}¨ind      ⍝ Reset all states
+     n.tree.SelItems[in]←1                  ⍝ re-select original one
+     0
+⍝ Collapse only ⍵ and all it's it's children
+ }

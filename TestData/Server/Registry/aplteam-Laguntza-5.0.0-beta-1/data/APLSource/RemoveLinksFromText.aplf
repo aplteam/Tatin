@@ -1,0 +1,12 @@
+ RemoveLinksFromText←{
+⍝ Takes a text vector and removes all links from it.
+⍝ If an alternative link text is found it is preserved.
+⍝ "_" become " "
+     t←⍵
+     (0=≢t):t
+     (0=+/b←'→['⍷t):t            ⍝ No links: done
+     (b t)←(st←b⍳1)⌽¨b t         ⍝ Turn around
+     t←b{⎕ML←1 ⋄ ⍺⊂⍵}t           ⍝ Split at start of links
+     t←RemoveComplexLink¨t
+     (-st)⌽↑,/t                  ⍝ Simplify and turn back
+ }

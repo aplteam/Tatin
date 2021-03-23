@@ -1,0 +1,80 @@
+ r←{row}FindTopic(∆Ref pattern);ind;A;id2;list;in;buf;t2;bool;lu;cl;nr;parent;path;path1;path2;bool2;id;tree
+⍝ Accepts a string in different flavours.
+⍝ The left argument is only needed for a relative link: it then
+⍝ is the row number from which the link was initiated.
+⍝ - `text`
+⍝   Returns the rows of all topics where name ≡ pattern.
+⍝   If the name cannot be found it looks for the Title.
+⍝ - `*text`
+⍝   Text may or may not contain a dot.
+⍝   "pattern" is compared with all {parent}.{name} from the right.
+⍝ - `↑*text`
+⍝   Same as `*text` but returns just the first hit.
+⍝ - `#.l1.l2.l3.text`
+⍝   Full path
+⍝ - `f3.text` and `##.f2.text` and `##.##.f2.text` and ...
+⍝   Relative links. "row" is needed here.
+ A←∆Ref.d.A
+ pattern←(-'.∆DefaultPage'{(≢⍺)×⍺≡(-≢⍺)↑⍵}pattern)↓pattern
+ tree←∆Ref.d.tree
+ :If '*'=↑pattern~'↑'
+     buf←GetParentAndTopicNameAsText tree
+     in←pattern{(0=≢⍵):⍵ ⋄ (↑⍣(↑'↑'∊⍺))⍵}⍸(⊃(-¯1+≢pattern~'↑')↑¨buf)∧.=1↓pattern~'↑'
+ :ElseIf '#.'≡2↑pattern
+     buf←GetParentAndTopicNameAsText tree
+     in←⍸buf≡¨⊂pattern
+ :ElseIf '#'∊pattern
+     'Missing left argument'⎕SIGNAL 11/⍨0=⎕NC'row'
+     'Invalid left argument'⎕SIGNAL 11/⍨~row∊tree[;I.Row]
+     (path1 path2)←'.'A.SplitPath pattern   ⍝ "path2" might point to a function or a namespace
+     id←⍕I.Parent⊃tree[row;]
+     id,←(∆Ref.d.tree[row;I.IsNode])/'.',I.TopicName⊃tree[row;]
+     id,←¯1⌽path1
+     :If ⍬≡parent←{6::⍬ ⋄ ⍎⍵}id
+         in←⍬
+     :Else
+         :If 2=parent.⎕NC path2
+             in←tree[⍸(GetParentAndTopicNameAsText tree)≡¨⊂(⍕parent),'.',path2;I.Row]
+         :Else
+             :If 0=+/bool←(tree[;I.Parent])≡¨⊂parent
+             :OrIf 0=+/bool2←path2∘≡¨bool⌿tree[;I.TopicName]
+                 in←⍬
+             :Else
+                 in←bool2/bool/tree[;I.Row]
+             :EndIf
+         :EndIf
+     :EndIf
+ :Else                       ⍝ Search just the same level
+     'Left argument is missing'⎕SIGNAL 6/⍨0=⎕NC'row'
+     :If I.IsNode⊃tree[row;]
+         bool←((1+row)⍴0),∧\{⍵[0]<1↓⍵}row↓{⍵[;I.Depth]}tree
+         t2←bool⌿tree
+     :Else
+         cl←row⊃tree[;I.Depth]
+         bool←(⌽∧\cl≤⌽row↑tree[;I.Depth]),∧\cl≤row↓tree[;I.Depth]
+         t2←bool⌿tree
+         bool←t2[;I.Depth]=cl+'.'+.=pattern
+         t2←bool⌿t2
+     :EndIf
+     :If '.'∊pattern
+         id←⍕I.Parent⊃tree[row;]
+         id,←(I.IsNode⊃tree[row;])/'.',I.TopicName⊃tree[row;]
+         id,←'.',pattern
+         :If 0=+/bool←(GetParentAndTopicNameAsText t2)≡¨⊂id
+             in←⍬
+         :Else
+             in←bool⌿t2[;I.Row]
+         :EndIf
+     :Else
+         :If 0<+/bool←t2[;I.TopicName]≡¨⊂pattern
+             in←bool/t2[;I.Row]
+         :ElseIf 0<+/bool←(0=tree[;I.Depth])∧tree[;I.TopicName]≡¨⊂pattern
+             in←bool/tree[;I.Row]
+         :Else
+             in←⍬
+         :EndIf
+     :EndIf
+ :EndIf
+ :If 0≠≢r←∆Ref.d.tree[,in;I.(Row Parent TopicName)]
+     r[;1]←⍕¨r[;1]
+ :EndIf

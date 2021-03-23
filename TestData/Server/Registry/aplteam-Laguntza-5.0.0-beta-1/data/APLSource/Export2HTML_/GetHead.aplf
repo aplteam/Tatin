@@ -1,0 +1,21 @@
+ GetHead←{
+ ⍝ Creates top part of the HTML code needed for the "head" part of the HTML page:
+ ⍝ Doc declaration, html, title and meta tags.
+     (title path level)←⍵
+     ∆Ref←⍺
+     head←''
+     head,←⊂'<!DOCTYPE html>'
+     head,←⊂'<html lang="',∆Ref.p.language,'">'
+     head,←⊂'<head>'
+   ⍝ ↓↓↓ https://blogs.msdn.microsoft.com/askie/2009/03/23/understanding-compatibility-modes-in-internet-explorer-8/
+     head,←⊂'<meta http-equiv="X-UA-Compatible" content="IE=edge" />' ⍝ This must be the FIRST entry after <head> according to some sources!
+     head,←⊂'<title>',title,'</title>'
+     href←##.HTML.EnforceSlash ∆Ref.p.folderName
+     href,←'/'/⍨'/'≠¯1↑href
+     head,←⊂'<meta charset="UTF-8">'
+     fn←(↑,/(level)⍴⊂'../'),'Assets/screen.css'
+     head,←⊂'<link rel="stylesheet" type="text/css" href="',fn,'" media="screen">'
+     fn←(↑,/(level)⍴⊂'../'),'Assets/print.css'
+     head,←⊂'<link rel="stylesheet" type="text/css" href="',fn,'" media="print">'
+     head,⊂'</head>'
+ }

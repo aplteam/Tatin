@@ -1,0 +1,8 @@
+ GetTitle←{
+⍝ ⍵ is a help page.
+⍝ ← is the title of the help page (First "# ...")
+     hits←{('^\s{0,3}# .*[^\n]')⎕S 0 1⍠('Mode' 'L')⊣⍵}¨⍕¨⍵
+     bool←≢¨hits
+     0=+/bool:''
+     2↓##.A.DLB(bool⍳1)⊃⍵
+ }

@@ -1,0 +1,21 @@
+ CreateIndexPage←{
+     ∆Ref←⍺
+     (f path)←⍵
+     level←0
+     mainTocPage←0
+     mainIndexPage←1
+     tag←##.HTML.Tag
+     body←''
+     body,←⊂'<body>'
+     body,←InjectMainMenu level mainTocPage mainIndexPage
+     body,←⊂'<h1 id="h1index">',f.caption,'<br />Index</h1>'
+     body,←⊂'<div id="index">'
+     body,←GetIndex f
+     body,←⊂'</div>'
+     body,←⊂'</body>'
+     head←∆Ref GetHead f.caption path level
+     html←head,body,⊂'</html>'
+     filename←path,'/TheIndex.html'
+     r←(⊂html)⎕NPUT filename 1
+     1:r←0
+ }

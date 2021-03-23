@@ -1,0 +1,36 @@
+ {r}←{testFlag}EditTopicProperties(∆Ref row rf);oldResult;newResult;success;rc;bool;msg
+ ⍝ `testFlag` is 1 only when it's running under a test case.
+ r←0
+ testFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'testFlag'
+ :If ~testFlag
+     oldResult←rf.⍎'∆TopicProperties ⍬'
+     success←0
+     :Repeat
+         :If 0=1↑0↑rc←EditByQED(⍕rf),'.∆TopicProperties'
+             . ⍝ Something went wrong - please investigate
+         :EndIf
+         :Trap 0
+             newResult←rf.⍎'∆TopicProperties ⍬'
+         :Else
+             msg←'∆TopicProperties did not execute - please correct it'
+             'Topic properties'ShowError msg
+             :Continue
+         :EndTrap
+         :If oldResult≡newResult
+             :Return
+         :EndIf
+         bool←0<rf.⎕NC newResult[;0]
+         :If 0=success←∧/bool
+             msg←'Note that '
+             :If 1=+/~bool
+                 msg,←'this object does not exist when it must:'
+             :Else
+                 msg,←'these objects do not exist when they must:'
+             :EndIf
+             msg←(⊂msg),{2≠≡⍵:⊂⍵ ⋄ ⍵}↑{⍺,',',⍵}/(~bool)/newResult[;0]
+             'Topic properties'ShowError msg
+         :EndIf
+     :Until success
+     {}Compile ∆Ref
+     r←1
+ :EndIf

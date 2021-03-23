@@ -1,0 +1,17 @@
+ HandleTopicProperties←{
+⍝ `testFlag` is 1 only when it's running under a test case.
+     ⍺←0
+     testFlag←⍺
+     (∆Ref in)←2↑⍵,⊂⍬
+     in←{GetCurrentItem ∆Ref.n}⍣(⍬≡in)⊣in
+     rf←I.Parent⊃∆Ref.d.tree[in;]
+     3=rf.⎕NC'∆TopicProperties':testFlag ManageTopicProperties ∆Ref in rf
+     msg←⊂'There is no function ∆TopicProperties in ',(⍕rf),' yet.'
+     msg,←⊂'Would you like to introduce it?'
+     f←ask←msg∘{∆Ref.p.helpCaption YesOrNo ⍺}⍣(↑0=testFlag)⊣1
+     0=f:⍬
+     res←I
+     _←Inject∆TopicProperties rf
+     0=≢res:⍬
+     testFlag EditTopicProperties ∆Ref in rf
+ }

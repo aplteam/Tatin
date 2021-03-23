@@ -1,0 +1,21 @@
+ HtmlTopCode←{
+     (size title cssFlag)←⍵,(≢⍵)↓2 '' 1
+     body←''
+     body,←⊂'<!DOCTYPE html>'
+     body,←⊂'<html>'
+     body,←⊂'<head>'
+
+     ⍝ ↓↓↓ https://blogs.msdn.microsoft.com/askie/2009/03/23/understanding-compatibility-modes-in-internet-explorer-8/
+     body,←⊂'<meta http-equiv="X-UA-Compatible" content="IE=edge" />'
+
+     body,←⊂'<title>',title,'</title>'
+     body,←⊂'<meta charset="UTF-8">'
+     body,←⊂'<style type="text/css" media="screen">'
+     body,←⍺⍺{0=⍵:'' ⋄ ⍺⍺ size}cssFlag  ⍝ Insert CSS code; makes page self-contained
+     body,←⊂'</style>'
+     body,←⊂'</head>'
+     body,←⊂'<body>'
+     body
+ ⍝ Creates the HTML code needed for the top part of the HTML page:
+ ⍝ Doc declaration, head and start of body-tag
+ }

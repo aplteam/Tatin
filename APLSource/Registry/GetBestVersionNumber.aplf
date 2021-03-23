@@ -1,14 +1,14 @@
- r←includeBetas GetBestVersionNumber path;id;pattern;list;buff;list2;level
+ r←{noBetas}GetBestVersionNumber path;id;pattern;list;buff;list2;level
 ⍝ Establishes the best version number for ⍵
 ⍝ '{group}-{name}-3.0.0' ← GetBestVersionNumber '{group}-{name}'
 ⍝ '{group}-{name}-2.1.0' ← GetBestVersionNumber '{group}-{name}-2'
 ⍝ '{group}-{name}-1.2.1' ← GetBestVersionNumber '{group}-{name}-1'
 ⍝ '{group}-{name}-1.1.9' ← GetBestVersionNumber '{group}-{name}-1.1'
 ⍝ Returns an empty vector in case nothing fits
- includeBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'includeBetas'
+ noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas '
  r←''
  id←(≢RemovePackageID path)↓path
- :If (~includeBetas)∧IsValidPackageID_Complete id
+ :If noBetas∧IsValidPackageID_Complete id
      :If F.IsDir path
          r←path
      :EndIf
@@ -31,10 +31,11 @@
              list←('-'=(1+≢id)⊃¨F.CurrentSep A.Last¨list)/list
          :EndIf
          :If 0<≢list
-             :If ~includeBetas
-                 list←({3>⌈/+\'-'=⍵}¨'/\'∘A.Last¨list)/list   ⍝ Remove any betas versions
+             :If noBetas
+             :AndIf 0=≢list←({3>⌈/+\'-'=⍵}¨'/\'∘A.Last¨list)/list     ⍝ Remove all beta versions
+                 :Return
              :EndIf
-             list2←InjectPublishingDate list              ⍝ Add publishing date where required
+             list2←InjectPublishingDate list                    ⍝ Add publishing date where required
              list←list[SortIndexForPackageIDs list2]
          :EndIf
          r←⊃¯1↑list

@@ -1,0 +1,7 @@
+ GetTitleFromBody←{
+⍝ ⍵ is a help page body (vector of text vectors). Might be empty or not contain a <h1> tag at all.
+⍝ Returns either the contents of <h1> or ''.
+     0=≢⍵:⍵
+     0=≢buf←'<h1>.*</h1>'⎕S'&'⍠('Mode' 'D')⊣⍵:''
+     {⍵↑⍨⍵⍳'<'}{⍵↓⍨1+⍵⍳'>'}↑buf
+ }

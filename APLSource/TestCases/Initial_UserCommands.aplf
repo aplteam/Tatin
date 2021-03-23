@@ -1,9 +1,11 @@
- Initial_UserCommands;rc;msg;buff;tempDir
+ Initial_UserCommands;rc;msg;buff;tempDir;reg
  tempDir←∆GetConfigPathForTests
  rc←∆UCMD'Loadtatin ',tempDir
  Assert 0=rc
  Assert 0<⎕SE.⎕NC'_Tatin'
  Assert 0<⎕SE.⎕NC'Tatin'
  ∆CreateDefaultUserSettings
+ reg←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
+ TC.MyUserSettings.AddRegistry reg
  ⎕SE._Tatin.Client.MyUserSettings←TC.MyUserSettings
 ⍝Done

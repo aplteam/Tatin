@@ -1,0 +1,12 @@
+ ManageTopicProperties←{
+⍝ `testFlag` is 1 only when it's running under a test case.
+     testFlag←⍺
+     (∆Ref in rf)←⍵
+     testFlag:⍬
+     parentName←GetParentAndTopicNameAsText ∆Ref.d.tree[in;]
+     type←∆Ref EditOrDeleteTopicPropertiesPage parentName
+     0=type:⍬
+     2=type:∆Ref DeleteTopicProperty rf
+     _←EditTopicProperties ∆Ref in rf
+     ⍬
+ }

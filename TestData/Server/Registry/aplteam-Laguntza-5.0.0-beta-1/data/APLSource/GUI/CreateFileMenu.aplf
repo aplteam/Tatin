@@ -1,0 +1,12 @@
+ CreateFileMenu←{
+     ∆Ref←⍵
+     tab←⎕UCS 9
+     ∆Ref.n.fileMenu←⍎'file'∆Ref.n.menubar.⎕WC'Menu' '&File'
+     ∆Ref.n.export←⍎'export'∆Ref.n.fileMenu.⎕WC'MenuItem' 'Export as HTML...'
+     ∆Ref.n.export.onSelect←FullPathToHandler'##.OnMenuCmd'
+     ∆Ref.n.fileMenuSep1←⍎'sep1'∆Ref.n.fileMenu.⎕WC'Separator'
+     tx←'Exit help',tab,'Ctrl+W'
+     ∆Ref.n.quitApp←⍎'quit'∆Ref.n.fileMenu.⎕WC'MenuItem'(tx)('Accelerator'(87 2))
+     ∆Ref.n.quitApp.onSelect←FullPathToHandler'##.OnMenuCmd'
+     ⍬
+ }

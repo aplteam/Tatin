@@ -1,0 +1,14 @@
+ filename←GetTempFilename extension;path;no;start;filename;fno;flag
+⍝ Returns a temp filename in the temp directory.
+⍝ If ⍵ is not empty, it's taken as extension.
+ path←(2 ⎕NQ'#' 'GetEnvironment' 'temp'),'\'
+ start←no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
+ :Repeat
+     filename←path,(⎕AN,'_',⍕no),{0=≢⍵:'.tmp' ⋄ ((~'.'∊⍵)/'.'),⍵}extension
+     fno←0
+     :Trap 22
+         ⎕NUNTIE fno←filename ⎕NCREATE 0
+         flag←1
+     :EndTrap
+     no+←10
+ :Until (fno≠0)∨no>start+1000×10  ⍝ max 1000 tries - this will always suuceed.

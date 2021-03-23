@@ -1,0 +1,10 @@
+ CheckSinglePageForBrokenLink←{
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     in←⍵
+     buf←∆Ref Lint_.CheckBrokenLinks_ in
+     (0=≢buf):Show'No broken links found'
+     ⎕←(⎕PW-1)⍴'--- Broken links found in ',(I.TopicName⊃∆Ref.d.tree[in;]),' ',(A.FormatDateTime ⎕TS),⎕PW⍴'-'
+     ⎕←⍪buf
+     ⍬
+ }

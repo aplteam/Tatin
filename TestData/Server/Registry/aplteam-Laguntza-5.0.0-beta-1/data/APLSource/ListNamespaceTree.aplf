@@ -1,0 +1,19 @@
+ r←{x}ListNamespaceTree ref
+⍝ Returns a list of all namespaces in ⍵, including ⍵ itself.
+⍝ Does NOT return unnamed namespaces or GUI instances.
+⍝ Does not fall for circle references.
+⍝ Uses global ∆Ref.∆NamespaceTree if available.
+ :If 0=≢ref
+     ref←⍎{⍵↑⍨⍵⍳'.'}(⎕IO)⊃{⍵/⍨0<⍬∘⍴¨⍴¨⍵}1↓⎕XSI
+ :EndIf
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ¯1}'x'
+ :If 9=⎕NC'∆Ref'
+ :AndIf 0<∆Ref.⎕NC'∆NamespaceTree'
+     :If ref∊# ⎕SE
+         r←∆Ref.∆NamespaceTree
+     :Else
+         r←∆Ref.∆NamespaceTree{⍺/⍨((1+≢⍵)↑[1]⊃(⍕¨⍺),¨'.')∧.=⍵,'.'}⍕ref
+     :EndIf
+ :Else
+     r←x ListNamespaceTree_ ref
+ :EndIf

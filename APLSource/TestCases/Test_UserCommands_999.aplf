@@ -1,0 +1,11 @@
+ r←Test_UserCommands_999(stopFlag batchFlag);⎕TRAP;res;msg;rc
+⍝ Exercise ]Tatin.Init
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg res)←∆UCMD'Init'
+ →T.PassesIf 0=rc
+ →T.PassesIf 0=≢msg
+ →T.PassesIf 0<≢res
+
+ r←T._OK

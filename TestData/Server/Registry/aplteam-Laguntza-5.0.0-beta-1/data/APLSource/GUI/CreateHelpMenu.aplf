@@ -1,0 +1,14 @@
+ {r}←CreateHelpMenu ∆Ref;tx;flag
+ r←⍬
+ ∆Ref.n.HelpMenu←⍎'help'∆Ref.n.menubar.⎕WC'Menu' '&Help'
+ tx←'Provides information about this program'
+ flag←{82 80 160∊⍨⎕DR ⍵:1 ⋄ (,0)≢,⍵}∆Ref.p.helpAbout
+ :If flag
+     ∆Ref.n.about←flag/⍎'about'∆Ref.n.HelpMenu.⎕WC'MenuItem' 'About...'('Event' 'Select'(FullPathToHandler'##.OnMenuCmd'))('Hint'tx)
+ :EndIf
+ :If ~∆Ref.p.userMode
+     :If flag
+         ∆Ref.n.helpSep1←flag/⍎'sep1'∆Ref.n.HelpMenu.⎕WC'Separator'
+     :EndIf
+     ∆Ref.n.helpHelp←⍎'helpHelp'∆Ref.n.HelpMenu.⎕WC'MenuItem' 'Help on Laguntza'('Event' 'Select'(FullPathToHandler'##.OnMenuCmd'))('Hint'tx)
+ :EndIf

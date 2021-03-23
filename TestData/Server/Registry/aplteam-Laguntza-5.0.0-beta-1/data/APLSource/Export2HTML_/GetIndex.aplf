@@ -1,0 +1,21 @@
+ GetIndex←{
+     f←⍵
+     index←2⊃f.index
+     ∆chapterName←1+∆pageName←1+∆keywords←0
+     rows←1⊃f.index
+     pageUrls←f GetRelativePageNameForRow¨rows
+     pageUrls←(⊂'HTML/'),¨pageUrls
+     pageAnchors←index[;∆keywords]{'<a href="',⍵,'">',⍺,'</a>'}¨pageUrls
+     tag←##.HTML.Tag
+     bool←0<≢¨index[;∆chapterName]
+     chapterUrls←(↑¨¯2↓¨⎕NPARTS¨bool/pageUrls),¨⊂'index.html'
+     chapterAnchors←bool\chapterUrls{'<a href="',⍺,'">',⍵,'</a>'}¨bool/index[;∆pageName]
+     col1←'td'∘tag¨index[;∆pageName]
+     col2←'td'∘tag¨pageAnchors
+     col3←'td'∘tag¨chapterAnchors
+     table←'<table id="table_index">' '<thead>' '<tr>' '<th>Key word</th>' '<th>Page name</th>' '<th>Chapter</th>' '</tr>'
+     table,←'</thead>' '<tbody>'
+     table,←{↑,/⍵}¨'tr'∘tag¨(⊂¨col1),¨(⊂¨col2),¨⊂¨col3
+     table,←'</tbody>' '</table>'
+     table
+ }

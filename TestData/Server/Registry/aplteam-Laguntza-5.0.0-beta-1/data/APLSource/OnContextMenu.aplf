@@ -1,0 +1,30 @@
+ OnContextMenu←{
+     ∆Ref←⍺
+     n←CreateTreeViewContextMenu ∆Ref
+     res←⎕DQ n.menu                         ⍝ Hand over to user
+     (0=≢res):0                             ⍝ cancelled?!
+     sel←0⊃res
+     in←GetCurrentItem ∆Ref.n
+     (n.collaps≡sel):∆Ref CollapseFrom in   ⍝ Collapse this branch
+     (n.expand≡sel):∆Ref ExpandFrom in      ⍝ Expand this branch
+     (n.bookmark≡sel):∆Ref Bookmark in      ⍝ Bookmark current item
+     (n.increaseFontSize≡sel):∆Ref ChangeTreeViewFontSize 1
+     (n.decreaseFontSize≡sel):∆Ref ChangeTreeViewFontSize ¯1
+     (n.resetFontSize≡sel):∆Ref ChangeTreeViewFontSize 0
+     ∆Ref.p.userMode:0
+ ⍝⍝⍝ All what follows is for developers only
+     (n.editHelp≡sel):∆Ref EditFromTv in
+     (n.copyShortName≡sel):1 CopyLinkToClipboard ∆Ref
+     (n.copyFullName≡sel):1 CopyFullLinkToClipboard ∆Ref
+     (n.printFullName≡sel):PrintFullNameToQSE ∆Ref
+     (n.editTopicProperties≡sel):HandleTopicProperties ∆Ref
+     (n.injectPage≡sel):InjectNewPageStub ∆Ref in 0
+     (n.injectNode≡sel):InjectNewNode ∆Ref
+     (n.brokenLinks≡sel):∆Ref CheckSinglePageForBrokenLink in
+     (n.ambiguousLinks≡sel):∆Ref CheckSinglePageForAmbiguousLink in
+     (n.renameHelp≡sel):RenameHelpTopic ∆Ref in
+     (n.deleteHelp≡sel):DeleteTopicOrNode ∆Ref
+     (n.copyFullPath≡sel):∆Ref CopyFullPath2Clipboard in
+     0
+⍝ Offers a context menu on the TreeView
+ }

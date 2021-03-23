@@ -1,0 +1,11 @@
+ parms←LoadHelpWithSalt parms;parent
+⍝ `folder` is the folder that hosts a help system.\\
+⍝ The last part of `folder` defines the help system.
+⍝ For example: `D:\This\That\MyHelp` results in a help system `#.MyHelp`.\\
+⍝ However, if `parms.source` is, say, `#.Container.MyHelp` then that
+⍝ defines the namespace the help system is loaded into.
+ 'parms.source MUST be specified'⎕SIGNAL 11/⍨0=≢parms.source
+ 'parms.saltFolder MUST be specified'⎕SIGNAL 11/⍨0=≢parms.saltFolder
+ parent←⍎APLTreeUtils2.Last{⍵↓⍨¯1+-≢⍺⍺ ⍵}⍕parms.source
+ {}LoadHelpWithSalt_ parms.saltFolder(⍕parms.source)
+⍝Done

@@ -1,0 +1,53 @@
+ PopulateToolbar←{
+⍝ Populate the Toolbar with buttons for the three commands:
+⍝ "Fordward", "Next", "Bookmark".
+⍝ Also: creates a check box "Show navigation".
+     ∆Ref←⍵
+     ∆Ref.n.Back1←⍎'Back1'∆Ref.n.form.⎕WC'Bitmap'('File'(##.##.∆HOME,'\Images\Back_Active.bmp'))('Size'(32 32))
+     ∆Ref.n.Back3←⍎'Back3'∆Ref.n.form.⎕WC'Bitmap'('File'(##.##.∆HOME,'\Images\Back_Inactive.bmp'))('Size'(32 32))
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' 'Back'
+     ∆,←⊂'Event' 'Select'(FullPathToHandler'##.OnToolbarBtn')
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'Tip' 'Go back to previous topic (Alt+CursorLeft)'
+     ∆,←⊂'Active' 0
+     ∆,←⊂'BtnPix'∆Ref.n.(Back1 Back1 Back3)
+     ∆,←⊂'Accelerator'(37 4)
+     ⍵.n.backBtn←⍎'tb.back'⍵.⎕WC ∆
+     ⍵.tb.back.Posn[1]+←15
+
+     ∆Ref.n.Next1←⍎'Next1'∆Ref.n.form.⎕WC'Bitmap'('File'(##.##.∆HOME,'\Images\Next_Active.bmp'))('Size'(32 32))
+     ∆Ref.n.Next3←⍎'Next3'∆Ref.n.form.⎕WC'Bitmap'('File'(##.##.∆HOME,'\Images\Next_Inactive.bmp'))('Size'(32 32))
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' '&Forward'
+     ∆,←⊂'Event' 'Select'(FullPathToHandler'##.OnToolbarBtn')
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'Tip' 'Go forward one topic  (Alt+CursorRight)'
+     ∆,←⊂'Active' 0
+     ∆,←⊂'Accelerator'(39 4)
+     ∆,←⊂'BtnPix'∆Ref.n.(Next1 Next1 Next3)
+     ⍵.n.forwardBtn←⍎'tb.forward'⍵.⎕WC ∆
+     ⍵.tb.forward.Posn[1]+←15
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' '&Bookmark'
+     ∆,←⊂'Event' 'Select'(FullPathToHandler'##.OnToolbarBtn')
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'Tip' 'Bookmark the current page'
+     ⍵.n.bookmarkBtn←⍎'tb.bookmark'⍵.⎕WC ∆
+     ⍵.tb.bookmark.Posn[1]+←10
+
+     ∆←⊂'Button'
+     ∆,←⊂'Caption' 'Show &navigation'
+     ∆,←⊂'Event' 'Select'(FullPathToHandler'##.OnToolbarBtn')
+     ∆,←⊂'Style' 'Check'
+     ∆,←⊂'State' 1
+     ∆,←⊂'TipObj'∆Ref.n.tipField
+     ∆,←⊂'Tip' 'Toggles the visibility of the navigation bar'
+     ⍵.n.showNavigation←⍎'tb.showNavigation'⍵.⎕WC ∆
+     ⍵.tb.showNavigation.Posn[1]+←10
+
+     ⍬
+ }

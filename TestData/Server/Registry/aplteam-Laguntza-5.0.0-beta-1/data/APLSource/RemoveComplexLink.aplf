@@ -1,0 +1,10 @@
+ RemoveComplexLink←{
+ ⍝ ⍵ is simple text. Beginning of ⍵ is expected to be a link.
+ ⍝ Pure sub-function of RemoveLinksFromText
+     (0=≢t←⍵):t
+     w←t⍳']'
+     lt←w↑t
+     ('|'∊⍵):(A.(DLB DTB){⍵↑⍨⍵⍳']'}t↓⍨1+t⍳'|'),(w+1)↓t
+     ('.'∊lt):(PolishName A.(DLB DTB){⌽⍵↑⍨⍵⍳'.'}⌽lt),(w+1)↓t
+     (PolishName{⍵↓⍨'*'=↑⍵}{⍵↓⍨'↑'=↑⍵}2↓lt),(w+1)↓t
+ }

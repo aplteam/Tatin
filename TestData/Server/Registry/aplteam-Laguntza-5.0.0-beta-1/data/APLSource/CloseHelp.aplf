@@ -1,0 +1,35 @@
+ {r}←CloseHelp ∆Ref;f;list;refs;A;rp;⎕TRAP;ids;SM_CYMENU;mbh;posn;size
+⍝ Normally this needs a ref pointing to a Help instance but if this is an
+⍝ empty vector instead then ALL instances of Laguntza will be closed.\\
+⍝ Returns 0 for succecss and `⎕en` otherwise.
+ r←0
+ ⎕DL 0.2
+ ⎕TRAP←(0 'E' '→0,≢r←⎕EN')
+ :If ⍬≢A←{0::⍬ ⋄ ⍵.d.A}∆Ref
+     File.CloseFile ∆Ref
+     FilesAndDirs.DeleteFile ∆Ref.∆tempFilename
+ :AndIf {0::0 ⋄ 'Form'≡⍵.Type}∆Ref
+     :If (0=≢rp←GetFullRegPath ∆Ref)                ⍝ There is no RegKey specified: close the form, done.
+         FilesAndDirs.DeleteFile ∆Ref.∆tempFilename
+         ∆Ref.n.form.Close
+     :Else
+         ids←↑¨{⍺,'.',⍵}/¨∆Ref.d.bookmark           ⍝ Names of the bookmarks
+         ids←1↓∊';',¨ids                            ⍝ Prepare them
+         {}ids RegWrite rp,'Bookmarks'              ⍝ Save them in the Registry
+         :If (WindowStateNormal≠∆Ref.State)         ⍝ Maximzed or minimized: we are done
+             {}∆Ref.n.form.Close
+         :Else
+             SM_CYMENU←15                           ⍝ Menu bar height
+             mbh←GUI.GetSystemMetrics SM_CYMENU
+             posn←∆Ref.n.form.Posn                  ⍝ Save Posn of the help window
+             posn[0]-←mbh
+             {}(⍕posn)RegWrite rp,'Posn'
+             size←∆Ref.n.form.Size                  ⍝ Save Size of the help
+             {}(⍕size)RegWrite rp,'Size'
+             {}(⍕∆Ref.n.splitter.Posn)RegWrite rp,'SplitterPosn' ⍝ Save posn of the splitter
+             FilesAndDirs.DeleteFile ∆Ref.∆tempFilename
+             {}∆Ref.n.form.Close
+             ⎕EX⍕∆Ref
+         :EndIf
+     :EndIf
+ :EndIf

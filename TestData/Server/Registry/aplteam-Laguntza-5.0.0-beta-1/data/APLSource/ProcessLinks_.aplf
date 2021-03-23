@@ -1,0 +1,27 @@
+ md←X_row ProcessLinks_ md;b;X;row;maskCode;b2;ind;this;flag
+⍝ Process all links in vtv "md" (Markdown).
+ (X row)←X_row
+ flag←0
+ :If 0≠≢md
+     maskCode←{0=+/b←'`'=⍵:1 ⋄ ~{⍵∨≠\⍵}b}¨md
+ :AndIf 0<+/b←~{⍵∨≠\⍵}{∨/∨/¨'~~~' '```'⍷¨⊂⍵}¨maskCode/¨md
+ :AndIf 0<+/b←b∧∨/¨'→['∘⍷¨md
+     :If 1∊b2←~']'∊¨b/md                            ⍝ Missing the closing "]"?!
+         ind←b2/⍸b                                 ⍝ In case there is no closing ] it's not a link!
+         :For this :In ind
+             :If this<≢1↓md
+                 :If ']'∊((this+1)⊃maskCode)/(this+1)⊃md
+                     md[this+0 1]←(∊md[this+0 1])''     ⍝ For those we catenate the two lines before we proceed.
+                     flag←1
+                 :EndIf
+             :Else
+                 :Continue
+             :EndIf
+         :EndFor
+     :Else
+         flag←1
+     :EndIf
+     :If flag
+         (b/md)←(X row)∘{⍺ ProcessLinks__⍣≡⊣⍵}¨b/md
+     :EndIf
+ :EndIf

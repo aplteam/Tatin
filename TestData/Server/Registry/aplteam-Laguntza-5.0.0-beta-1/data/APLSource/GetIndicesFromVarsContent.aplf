@@ -1,0 +1,9 @@
+ GetIndicesFromVarsContent←{
+⍝ ⍵ is a row from ∆Ref.d.tree. Checks whether it's a variable.
+     ∆Ref←⍺
+     (name parent)←⍵
+     ref←{326≢⎕DR parent:⍎⍵ ⋄ ⍵}parent
+     markdown←∆Ref GetMarkdownVarsContent_ ref name
+     0=≢markdown:markdown'' '' ''
+     GetIndicesFromMarkdown markdown
+ }

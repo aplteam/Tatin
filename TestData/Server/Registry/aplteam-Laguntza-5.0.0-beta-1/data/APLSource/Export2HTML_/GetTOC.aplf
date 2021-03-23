@@ -1,0 +1,20 @@
+ toc←{attr}GetTOC f;lastLevel;name;caption;isContainer;level;parent;row;url;attr
+ toc←⊂'<div id="toc">'
+ lastLevel←¯1
+ :For row :In ⍳≢f.tree
+     (level name caption isContainer)←f.tree[row;0 1 2 6]
+     :If lastLevel<level
+         toc,←⊂'<ul>'
+     :ElseIf lastLevel>level
+         toc,←(lastLevel-level)⍴⊂'</ul>'
+     :EndIf
+     :If isContainer
+         url←'HTML/',f GetRelativeUrlForRow row
+         toc,←⊂'<li><a href="',url,'/index.html">',caption,'</a>'
+     :Else
+         url←'HTML/',f GetRelativeUrlForRow row
+         toc,←⊂'<li><a href="',url,'.html">',caption,'</a>'
+     :EndIf
+     lastLevel←level
+ :EndFor
+ toc,←⊂'</div>'

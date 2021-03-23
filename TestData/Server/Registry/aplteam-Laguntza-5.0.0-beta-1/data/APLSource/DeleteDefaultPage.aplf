@@ -1,0 +1,18 @@
+ {r}←∆Ref DeleteDefaultPage(name parentName);result;fnsName
+ r←⍬
+ fnsName←parentName,'.',name
+ :If ∆Ref.p.notifyAcre
+     :If 9=⎕SE.⎕NC'acre'
+         result←⎕SE.UCMD'acre.Erase ',fnsName
+     :ElseIf 9=#.⎕NC'acre'
+         result←#.acre.Erase fnsName
+         :If ∆Ref.p.reportToSession∧0=≢result
+             ⎕←'*** acre was told that "',fnsName,'" was deleted but wasn''t interested'
+         :EndIf
+     :Else
+         result←'No acre anywhere'
+     :EndIf
+ :EndIf
+ ⎕EX name
+ {}Compile ∆Ref
+ ∆Ref ShowTopic parentName

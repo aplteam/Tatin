@@ -1,0 +1,13 @@
+ r←testFlag CreateStubTopic(parent name);header;list
+ :If testFlag
+     :If 0=≢list←'T'(⍎parent).⎕NL 2
+         name←'Test_01'
+     :Else
+         name←'Test_',¯2↑'0',⍕1+↑↑{(//)⎕VFI ⍵↓⍨1+⍵⍳'_'},¯1↑'Test_'{⍵⌿⍨((≢⍺)↑[1]⍵)∧.=⍺}list
+     :EndIf
+     header←'# ',name
+ :Else
+     ((name='_')/name)←' '
+     header←'# ',name
+ :EndIf
+ r←'[DATA]:index=''''' ''header'' 'Your new help page...'

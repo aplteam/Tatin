@@ -1,0 +1,11 @@
+ IsolateLinks←{
+     body←⍵
+     ∆Ref←⍺
+     0=+/b←'→['⍷body:''
+     body←b{⎕ML←0 ⋄ ⍺⊂⍵}body                ⍝ Split it so that every item starts with a link
+     body←2↓¨body                           ⍝ Drop "→["
+     ((0=≢¨body)/body)←'?'
+     body
+⍝ Takes what would become the Help and returns just the links.
+⍝ Returns a vector of vectors with links. Might be empty.
+ }

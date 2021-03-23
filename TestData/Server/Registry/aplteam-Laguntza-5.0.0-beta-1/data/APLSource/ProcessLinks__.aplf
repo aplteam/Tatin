@@ -1,0 +1,14 @@
+ ProcessLinks__←{
+     (X row)←⍺
+     tx←⍵
+     b←'→['⍷tx                     ⍝ Where are the links?
+     0=+/b:tx
+     st←b⍳1                        ⍝ Starting point
+     tx←st⌽tx,' '                  ⍝ Bring to front
+     tx←ComplexLink X tx st row    ⍝ Process complex links
+     tx
+⍝ Process any links in tx. By default ⍵ is wrapped into a <p> of the "body" class.
+⍝ You can change this. For example, for table cells:
+⍝    ∆Ref '' ''∘ProcessLinks¨allTableCells
+⍝ This makes sure that there is no additional markup within cells.
+ }

@@ -1,0 +1,22 @@
+ {r}←Export2HTML ∆Ref;folder
+⍝ Called from the "File" menu. Used to export the current help system
+⍝ as an independent HTML web site.\\
+⍝ `index.html` is the  entry page. Any sub namespaces in `ref` will become
+⍝ sub folders in `folder`. They all will have a page `index.html` as well.\\
+⍝ This functions creates a mixture of HTML files and folders that act as
+⍝ a simplified representation of the help system in pure HTML. It lacks
+⍝ any other functionality than links: no search feature in particular.\\
+⍝ However, with a proper index it might still be useful.\\
+⍝ The reason for having this is that it's the only way to make the help
+⍝ system available under Linux.
+ :If 0≠≢folder←GetFolder ⍬
+ :AndIf 1=1 ⎕NINFO folder
+     :If 0=≢↑0 ⎕NINFO⍠('Follow' 1)('Wildcard' 1)⊣folder,'*'
+         ShowEggTimer ∆Ref
+         Export2HTML_.Run ∆Ref folder
+         RemoveEggTimer ∆Ref
+     :Else
+         'Export folder'Show'Folder is not empty'
+         :Return
+     :EndIf
+ :EndIf

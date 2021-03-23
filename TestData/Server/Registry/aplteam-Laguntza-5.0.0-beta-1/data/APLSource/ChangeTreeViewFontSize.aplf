@@ -1,0 +1,11 @@
+ ChangeTreeViewFontSize←{
+     ∆Ref←⍺
+     direction←⍵  ⍝ 1=increase, ¯1=decrease, 0=reset
+     ~(⊂direction)∊0 1 ¯1:'Direction is invalid'⎕SIGNAL 11
+     direction=0:∆Ref.n.treeFont.Size←∆Ref.n.font.Size
+     ind←∆Ref.∆FontSizes⍳∆Ref.n.treeFont.Size       ⍝ Where are we now
+     new←ind+direction
+     new∊0,≢∆Ref.∆FontSizes:0                       ⍝ Max/min is reached
+     ∆Ref.n.treeFont.Size←new⊃∆Ref.∆FontSizes       ⍝ Assign new value
+     1:r←0
+ }

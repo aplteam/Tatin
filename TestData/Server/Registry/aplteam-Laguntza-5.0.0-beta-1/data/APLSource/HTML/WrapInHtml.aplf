@@ -1,0 +1,12 @@
+ WrapInHtml←{
+⍝ Creates HTML code representing a complete document by default.
+     (∆Ref fs body in)←⍵            ⍝ ∆Ref, Font size (1∨2∨3), help, item number
+     title←GetTitleFromBody body
+     html←HtmlTopCode1 ∆Ref fs title
+     html,←HtmlTopCode2 ⍬
+     body←∆Ref CreateDefaultNodePage in body
+     body←PolishImageLinks html body
+     html,←body
+     html,←HtmlBottomCode ⍬
+     html
+ }

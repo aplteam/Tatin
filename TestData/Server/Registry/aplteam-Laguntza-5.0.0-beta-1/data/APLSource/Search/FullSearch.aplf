@@ -1,0 +1,21 @@
+ FullSearch←{
+     ∆Ref←⍺
+     A←∆Ref.d.A
+     (ss lf mhw sai)←⍵                          ⍝ Search String, lower case flag, match whole words only, search "as is"
+     lc←lf∘{⍺:0(819⌶)⍵ ⋄ ⍵}                     ⍝ Make fns that translates (or not) to lowercase according to "lowercase flag"
+     sai:∆Ref(lc SearchAsIs)ss
+     ss←' 'A.Split ss                           ⍝ Split
+     ss←mhw{⍺:CR,⍵,CR ⋄ ⍵}¨ss                   ⍝ Add CR if mhw
+     words←∆Ref ReadWords lf                    ⍝ Get all words from file
+     ss2←lc ss
+     bool←∧/¨ss2∘{∨/¨⍺⍷¨⊂⍵}¨words               ⍝ Perform the search
+     ls←⍸bool                                   ⍝ Lines with hits
+     (0=≢ls):⍬ ⍬                                ⍝ Nothing found?
+     fqn←∆Ref GetFullyQualifiedNamesForDisplay ls
+     ls fqn
+⍝ Performs a full text search on all help pages.
+⍝ Result is either (⍬ ⍬) if nothing could be found or:
+⍝ A two-item vector. Each such item contains:
+⍝ [0] Row number pointing into ∆Ref.d.t.
+⍝ [1] Fully qualified name for display purposes.
+ }

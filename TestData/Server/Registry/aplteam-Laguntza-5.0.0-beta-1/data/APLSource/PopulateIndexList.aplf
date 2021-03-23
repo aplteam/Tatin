@@ -1,0 +1,10 @@
+ PopulateIndexList←{
+     ∆Ref←⍵
+     0=≢buf←2⊃⎕FREAD ∆Ref.f.(tieNo ∆index):⍬
+     ∆Ref.n.indexList.Visible←0
+     ∆Ref.n.indexList.Items←buf[;0]
+     ∆Ref.n.indexList.ReportInfo←1↓[1]buf
+     _←∆Ref.n.indexList{⎕NQ ⍺'SetColSize'⍵ ¯3}¨⍳1⊃⍴buf
+     ∆Ref.n.indexList.Visible←1
+     ⍬
+ }

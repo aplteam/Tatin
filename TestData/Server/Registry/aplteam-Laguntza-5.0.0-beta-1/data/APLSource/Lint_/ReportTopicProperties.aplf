@@ -1,0 +1,23 @@
+ rep←ReportTopicProperties ∆Ref;an;at
+ rep←⍬
+⍝ an = all nodes. They may have a ∆TopicProperties function
+ :If 0≠≢an←##.ListNamespaceTree ∆Ref.p.source
+     at←(3=↑¨an.⎕NC⊂'∆TopicProperties')/an
+     :If ∆Ref.p.reportToSession
+         ⎕←(⎕PW-1)⍴'--- TopicProperties report ',⎕PW⍴'-'
+     :EndIf
+     :If 0=≢at
+         :If ∆Ref.p.reportToSession
+             ⎕←'No ∆TopicProperties found'
+         :EndIf
+     :Else
+         rep←↑,/∆Ref CheckTopicProperty¨at
+         :If ∆Ref.p.reportToSession
+             :If 0=≢rep
+                 ⎕←'All ∆TopicProperties functions are fine'
+             :Else
+                 ⎕←⍪rep
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf

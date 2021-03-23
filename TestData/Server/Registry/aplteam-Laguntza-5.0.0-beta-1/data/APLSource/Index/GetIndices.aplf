@@ -1,0 +1,17 @@
+ r←GetIndices(keywords ∆Ref tree);mat;li;mat2;disp;total;rows;tree
+⍝ Takes all keywords, extracts the indices from them and finally
+⍝ compiles the index table from that.
+⍝ Returns three items:
+⍝ [0]: The indices in lowercase letters (for searching purposes).
+⍝ [1]: The row numbers.
+⍝ [2]: Matrix with three columns for display only: index, title and location.
+ r←''⍬''
+ :If 0≠≢keywords
+     mat←CollectPageDataForKeywords keywords tree
+     mat[;2]←(1+≢⍕∆Ref.p.source)↓¨⍕¨mat[;2]  ⍝ Convert refs into reasonable captions
+     disp←mat[;0 1 2]                        ⍝ The display format
+     disp[⍸~{(⍵⍳⍵)=⍳≢⍵}disp[;0];0]←⊂''
+     rows←mat[;3]
+     li←⎕C mat[;0]                           ⍝ li = lower case indices; for search purposes
+     r←li rows disp                          ⍝ Compile li, row numbers in tree and display data
+ :EndIf

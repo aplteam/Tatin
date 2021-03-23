@@ -1,0 +1,40 @@
+ CreateReportSubMenu←{
+     ∆Ref←⍵
+     handler←⍺
+     n←∆Ref.n
+
+     ∆←⊂'Menu'
+     ∆,←⊂'Reports'
+     n.reportMenu←⍎'reports'n.developersMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Broken links'
+     ∆,←⊂'Event' 'Select'handler
+     ∆,←⊂'Hint' 'Report all broken links in all topics'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.reportBrokenLinks←⍎'reportBrokenLinks'n.reportMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Ambiguous links'
+     ∆,←⊂'Event' 'Select'handler
+     ∆,←⊂'Hint' 'Reports all ambiguous links in all topics'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.reportAmbiguousLinks←⍎'reportAmbiguousLinks'n.reportMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'TopicProperties'
+     ∆,←⊂'Event' 'Select'handler
+     ∆,←⊂'Hint' 'Reports whenever ∆TopicProperties does not return all the fns/NS found'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+     n.reportTopicProperties←⍎'reportTopicProperties'n.reportMenu.⎕WC ∆
+
+     ∆←⊂'MenuItem'
+     ∆,←⊂'Missing index entries'
+     ∆,←⊂'Event' 'Select'handler
+     ∆,←⊂'Hint' 'Reports all help topics that do not carry any index entries'
+     ∆,←⊂('HintObj'∆Ref.n.infoSB)
+
+     n.reportMissingIndexes←⍎'reportMissingIndexes'n.reportMenu.⎕WC ∆
+
+     ⍬
+ }

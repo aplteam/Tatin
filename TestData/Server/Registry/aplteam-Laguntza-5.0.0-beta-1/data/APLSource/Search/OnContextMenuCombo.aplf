@@ -1,0 +1,11 @@
+ OnContextMenuCombo←{
+     _←'mm'⎕WC'Menu'
+     tx←'Display help page',(⎕UCS 9),'Doubleclick'
+     _←'mm.display'⎕WC'MenuItem'tx
+     _←mm.{⍵ ⎕WS'Event' 'Select' 1}¨'MenuItem'mm.⎕WN''
+     (0=≢res←⎕DQ'mm'):⍬
+     cmd←0⊃res
+     (cmd≡'mm.display'):DisplayCurrentSearchLine ⍬
+     ⍬
+⍝ Offer a context menu on current item in find results
+ }

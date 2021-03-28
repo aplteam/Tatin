@@ -1,4 +1,4 @@
- response←request HandleREST_Version1 path_;packageID;json;path;data;html;regFolder;specialCommands
+ response←request Handle_REST_Version1 path_;packageID;json;path;data;html;regFolder
 ⍝ Handles all commands defined in version 1 of the REST interface
  path_↓⍨←-'/'=¯1↑path_
  :If 1='/'+.=path_
@@ -9,9 +9,8 @@
      path↓⍨←-'/'=¯1↑path
  :EndIf
  path←⎕C path
- specialCommands←'get-server-path' 'recompile-index' 'stop' 'shutdown' 'crash' 'list-commands'
- :If (⊂path)∊(⊂'v1/'),¨specialCommands
-     response←request ProcessTestCommands(⎕C path)specialCommands
+ :If (⊂path)∊(⊂'v1/'),¨GetSpecialCommands request.Method
+     response←request ProcessTestCommands(⎕C path)(GetSpecialCommands request.Method)
  :Else
      :Select path
      :Case GetVersion_REST'all_packages'
@@ -40,6 +39,8 @@
          response←GetServerVersion request
      :Case GetVersion_REST'version-information'
          response←GetVersionInformation request
+     :Case GetVersion_REST'delete-policy'
+         response←ReturnDeletePolicy request
      :Else
          ⍝ Something new?
          response←request Respond 400 1 ⍝ Not a valid REST version 1 request

@@ -32,11 +32,8 @@
  →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list
  →T.GoToTidyUp 2≠≢list2←F.ListFiles(1⊃list),'/'
  →T.GoToTidyUp 0=+/'/Example-Package_A-1.0.0.zip'∘{⍺≢(-≢⍺)↑⍵}¨list2
- →T.GoToTidyUp 1≠≢(Reg.Index.GetRegistryIndex reg)+.=⎕UCS 10
- →T.GoToTidyUp 1≠reg Reg.Index.FindFullPackageID'Example-Package_A-1.0.0'
- →T.GoToTidyUp 1≠≢reg Reg.Index.FindPartPackageID'Example-Package_A'
  zipped←Reg.DotNetZip.ListZipContents list2 ∆GetByExtension'.ZIP'
- expected←TC.CFG_NAME'source/Test.apln' 'source/Hello.aplf'
+ expected←TC.CFG_Name'source/Test.apln' 'source/Hello.aplf'
  →T.GoToTidyUp~expected ∆LazyMatchPaths zipped
 
  r←T._OK

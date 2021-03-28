@@ -1,0 +1,43 @@
+ r←Test_Server_504(stopFlag batchFlag);⎕TRAP;dir;src;zip;serverPath;body;cfg;packageID;rc;msg;oldPolicy;qdmx;zipFilename
+⍝ Publish a non-beta package and attempt to delete it when the server's delete policy is "betas only"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'zip'
+ F.MkDir src zip
+ serverPath←∆GetServerPath
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'test'
+ cfg.name←'Package_A'
+ cfg.version←'0.1.0'
+ cfg.source←'Test.apln'
+
+ TC.WritePackageConfigFile src cfg
+
+ packageID←'test-Package_A-0.1.0'
+ (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
+ →T.GoToTidyUp 200≠rc
+ →T.GoToTidyUp 0≠≢msg
+
+ oldPolicy←∆SetServerPolicy'JustBetas'
+ :Trap 98
+     (rc msg)←TC.DeletePackage'https://localhost/',packageID
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'This server allows only beta packages to be deleted'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ F.DeleteFile(739⌶0),'/',packageID,'.zip'
+ Assert 0=⊃F.RmDir serverPath,'/',packageID
+ ∆SetServerPolicy oldPolicy
+⍝Done

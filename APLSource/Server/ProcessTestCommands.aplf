@@ -10,13 +10,21 @@
      :Case GetVersion_REST'stop'
          1 ⎕STOP'#.Tatin.Server.OnRequest'
          response←request Respond 200
+     :Case GetVersion_REST'list-commands'
+         response←request Respond 200
+         response.Content←⊃{⍺,',',⍵}/specialCommands
+     :Case GetVersion_REST'set-delete-policy'
+         response←request Respond 200
+         response.Content←GetDeletePolicy
+         :If (⊂request.Content)∊'None' 'Any' 'JustBetas'
+             (0 1 2)['None' 'Any' 'JustBetas'⍳⊂request.Content]G.INI.Put'Config:DeletePackages'
+         :Else
+             response←request Respond 400 1
+         :EndIf
      :Case GetVersion_REST'shutdown'
          ⎕TRAP←0 'S'
          response←request Respond 200
          ∆SHUTDOWN←1
-     :Case GetVersion_REST'list-commands'
-         response←request Respond 200
-         response.Content←⊃{⍺,',',⍵}/specialCommands
      :Case GetVersion_REST'crash'
          ∘∘∘                              ⍝ Deliberate crash for testing error trapping
      :Else

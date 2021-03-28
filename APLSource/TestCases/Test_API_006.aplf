@@ -17,10 +17,9 @@
 
  (F.NormalizePath tempDir,'/')⎕NCOPY F.NormalizePath⊃⊃F.Dir packageFolder,'/*.json'
 
- cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_NAME)0
+ cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_Name)0
  version←⊃{⍺,'-',⍵}/cfg.(group name version)
  F.RmDir ∆GetServerRegistryFolder,version
- #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
 
  res←⎕SE.Tatin.PublishPackage zipfile'[local]'
  →T.GoToTidyUp 200≠1⊃res

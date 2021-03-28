@@ -20,10 +20,10 @@
  cfg.source←'Test.apln'
  TC.WritePackageConfigFile src cfg
 
- packageID←'Example-Package_A-0.1.0'
- (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
+ (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
  Assert 200=rc
 
+ packageID←'Example-Package_A-0.1.0'
  {}TC.InstallPackage('https://localhost/',packageID)unzip
  ts←{⍵.date}TC.Reg.GetJsonFromFile unzip,'/',packageID,'/apl-package.json'
  →T.GoToTidyUp 645≠⎕DR ts

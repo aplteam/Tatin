@@ -1,12 +1,7 @@
- r←Test_Server_502(stopFlag batchFlag);⎕TRAP;dir;src;zip;serverPath;body;cfg;reg;oldCredentials;packageID
-⍝ Publish a package and then delete it
+ r←Test_Server_502(stopFlag batchFlag);⎕TRAP;dir;src;zip;serverPath;body;cfg;reg;packageID;zipFilename;rc;msg
+⍝ Publish a package and then attempt to delete it with invalid API key
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
-
- :If 1
-     r←T._NotImplemented
-     :Return
- :EndIf
 
  #.⎕EX TC.GetTatinRootSpace'#'
  dir←GetTempDir ⍬
@@ -17,24 +12,24 @@
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
  cfg←TC.InitPackageConfig ⍬
- cfg.group←'protected'
+ cfg.group←'test'
  cfg.name←'Package_A'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
 
  TC.WritePackageConfigFile src cfg
-
- ∘∘∘  ⍝TODO⍝
+ packageID←'test-Package_A-0.1.0'
+ (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
+ Assert 200=rc
 
  reg←TC.MyUserSettings.GetRegistry'https://localhost'
- oldCredentials←reg.api_key
- reg.api_key←'ByAPI-Key'        ⍝ This should fit for this particular group
+ oldCredentials←reg.api_key     ⍝ We need to reset this later
+ reg.api_key←'Invalid'
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
 
- packageID←'protected-Package_A-0.1.0'
- (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
- →T.GoToTidyUp 200≠rc
- →T.GoToTidyUp 0≠≢msg
+ (rc msg)←TC.DeletePackage'https://localhost/',packageID
+ →T.GoToTidyUp rc≠401
+ →T.GoToTidyUp msg≢'Unauthorized request'
 
  r←T._OK
 

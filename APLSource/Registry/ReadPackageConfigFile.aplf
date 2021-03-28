@@ -1,0 +1,7 @@
+ cfg←ReadPackageConfigFile path;cfg_file;buff
+⍝ Takes path to a package and returns the config file for that package.
+ cfg_file←path,'/',CFG_Name
+ buff←⊃F.NGET cfg_file
+ (('\'=buff)/buff)←'/'
+ cfg←⎕JSON⍠('Dialect' 'JSON5')⊣buff
+⍝Done

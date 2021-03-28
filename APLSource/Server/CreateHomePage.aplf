@@ -1,4 +1,4 @@
- response←CreateHomePage request;html
+ response←CreateHomePage request;html;policy
  html←HtmlHeader''
  html,←⊂'<h2>Main page</h2>'
  html,←AddSpecialMessage ⍬
@@ -13,6 +13,15 @@
  html,←⊂'<li><a href="/v1/version-information">Version information regarding Tatin</a></li>'
  html,←⊂'</ol>'
  html,←⊂'</nav>'
+ :Select GetDeletePolicy
+ :Case 'Any'
+     policy←'This server operates a "delete any" policy: you may delete <b>any</b> package with fitting credentials.'
+ :Case 'None'
+     policy←'This server operates a "delete none" policy: once published, packages cannot be deleted.'
+ :Case 'JustBetas'
+     policy←'This server operates a "delete betas only" policy: you may delete <b>only</b> beta packages with fitting credentials.'
+ :EndSelect
+ html,←⊂'<p>',policy,'</p>'
  html,←GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

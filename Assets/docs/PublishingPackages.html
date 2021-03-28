@@ -69,7 +69,7 @@ group2='xyz'
 <pre><code>group1='abc'
 group2='xyz'
 *=</code></pre>
-<p>This is interpreted as <em>require API keys for the groups “group1” and “group2” but allow anything else without an API key</em>.</p>
+<p>This is interpreted as “require API keys for the groups ”group1“ and ”group2“ but allow anything else without an API key”.</p>
 <div class="h_tag">
 <a href="#The-Client" id="The-Client" class="autoheader_anchor">
 <h3 data-id="The-Client">The Client</h3>
@@ -114,10 +114,40 @@ group2='xyz'
 </a>
 </div>
 <p>Once the preparation is done the final step is easy. You may specify the folder hosting the package:</p>
-<pre><code>]TATIN.Publish /path2package [tatin]</code></pre>
+<pre><code>]TATIN.PublishPackage /path2package [tatin]</code></pre>
 <p>The folder may or may not carry a trailing <code>/</code>.</p>
-<p>You can also create a ZIP file with the <code>]TATIN.Pack</code> command and specify that ZIP file:</p>
-<pre><code>]TATIN.Publish /path2package/group-name-1.2.3.zip [tatin]</code></pre>
+<pre><code>]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]</code></pre>
 <p>Both calls would attempt to publish the package <code>group-name-1.2.3</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>You can also create a ZIP file with the <code>]TATIN.Pack</code> command and specify the ZIP file as argument.</p>
+</div>
+</div>
+
+<div class="h_tag">
+<a href="#Deleting-packages" id="Deleting-packages" class="autoheader_anchor">
+<h2 data-id="Deleting-packages">Deleting packages</h2>
+</a>
+</div>
+<p>Whether you can delete a package once it was published depends on the policy the server operates:</p>
+<ul>
+<li>“Any”: You may delete any package</li>
+<li>“JustBetas”: You may delete only beta versions</li>
+<li>“None”: You cannot delete a packages at all</li>
+</ul>
+<p>Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator — a <code>+</code> (recommended) or a <code>.</code> (deprecated) — qualifies as a beta version.</p>
+<p>Examples:</p>
+<pre><code>apltree-Foo-1.0.0                 ⍝ Not a beta
+apltree-Foo-1.0.0+123             ⍝ Not a beta
+apltree-Foo-1.0.0-alpha-1         ⍝ A beta
+apltree-Foo-1.0.0-alpha-1+123     ⍝ A beta</code></pre>
+<p>You can find out which policy the server operates in two ways:</p>
+<ul>
+<li>Execute this user command:
+<pre><code>  ]Tatin.GetDeletePolicy [tatin]
+None</code></pre></li>
+</ul>
+<p>Or visit the web site: <a href="https://tatin.dev" class="external_link">https://tatin.dev</a>: at the bottom of the home page the server mentions the “delete” policy it operates.</p>
 </body>
 </html>

@@ -1,4 +1,4 @@
- {(statusCode errMsg zipFilename)}←PublishPackage(source registry);uri;path;cfg;errMsg;statusCode
+ {(statusCode errMsg zipFilename)}←PublishPackage(source registry);uri;path;cfg;errMsg;statusCode;packageID
 ⍝ Publish a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
 ⍝ 2. Creates a dependency file for the package if required
@@ -15,6 +15,7 @@
 ⍝ * `zipFilename` is empty in case `source` is a ZIP file but the name of the ZIP file created along the way otherwise.
  statusCode←200 ⋄ errMsg←''
  uri←F.EnforceSlash ReplaceRegistryAlias registry
+ 'Not just a Registry'Assert uri≡RemovePackageID uri
  'Unknown Registry'Assert(⊂EnforceTrailingSlash RemovePackageID uri)∊MyUserSettings.registries.uri
  source←RemoveFileProtocol source  ⍝ Precaution
  zipFilename←PackIfFolder source
@@ -23,9 +24,10 @@
      PublishPackageToRemoteRegistry_ zipFilename registry
  :Else
      PrintToSession'  Read config file for ',source,'...'
-     cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_NAME}source
+     cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_Name}source
      PrintToSession'  Attempting to publish ',source,'...'
-     (statusCode errMsg)←cfg Reg.PublishPackage zipFilename uri
+     packageID←cfg.group,'-',cfg.name,'-',cfg.version
+     (statusCode errMsg)←Reg.PublishPackage zipFilename uri
      :If 200≠statusCode
      :AndIf '.zip'≢⎕C⊃¯1↑⎕NPARTS source
          PrintToSession'  Cleaning up temp file...'

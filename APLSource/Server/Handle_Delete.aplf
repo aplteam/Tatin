@@ -1,0 +1,16 @@
+ response←Handle_Delete request;groupName;apiKey
+ request.URI←('/'=1⍴request.URI)↓request.URI
+ groupName←{⍵↑⍨¯1+⍵⍳'-'}request.URI
+ apiKey←'api-key'GetFromHeaders request.Headers
+ :If G.Credentials AcceptCredential apiKey groupName
+     :If Reg.IsValidPackageID_Complete request.URI
+         response←DeletePackage request
+     :Else
+         response←request Respond 400  ⍝ 400 ←→ Bad Request
+         response.Content←'Neither valid package ID nor proper REST request'
+     :EndIf
+ :Else
+     response←request Respond 401      ⍝ 401 ←→ Unauthorized
+     response.Content←'Unauthorized request'
+ :EndIf
+⍝Done

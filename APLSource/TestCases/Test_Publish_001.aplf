@@ -23,7 +23,7 @@
  TC.WritePackageConfigFile src cfg
 
  zipfile←TC.Pack src zip
- zip ⎕NCOPY src,'/',TC.CFG_NAME
+ zip ⎕NCOPY src,'/',TC.CFG_Name
 
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
@@ -33,8 +33,6 @@
  →T.GoToTidyUp 2≠≢list2←F.ListFiles(1⊃list),'/'
  →T.GoToTidyUp 0=+/'/Example-Package_A-1.0.0.zip'∘{⍺≢(-≢⍺)↑⍵}¨list2
  →T.GoToTidyUp 1≠≢(Reg.Index.GetRegistryIndex reg)+.=⎕UCS 10
- →T.GoToTidyUp 1≠reg Reg.Index.FindFullPackageID'Example-Package_A-1.0.0'
- →T.GoToTidyUp 1≠≢reg Reg.Index.FindPartPackageID'Example-Package_A'
 
  r←T._OK
 

@@ -2,15 +2,21 @@
  ⍝ projectPath → folder to create package from\\
  ⍝ targetPath  → folder to put package in\\
  ⍝ ←             path to package file created
- targetPath←RemoveFileProtocol targetPath
+ (projectPath targetPath)←RemoveFileProtocol¨projectPath targetPath
+ :If 0=≢projectPath
+     projectPath←F.PWD,'/'
+ :EndIf
  projectPath←⊃1 ⎕NPARTS projectPath,'/'
+ :If 0=≢targetPath
+     targetPath←F.PWD,'/'
+ :EndIf
  :If ~(1↑targetPath)∊'./\'
  :AndIf (1↑1↓targetPath)≠':'
-     targetPath←Reg.AddSlash(Reg.AddSlash projectPath),targetPath
+     targetPath←Reg.AddSlash targetPath
  :Else
-     targetPath←⊃1 ⎕NPARTS Reg.AddSlash targetPath
+     targetPath←⊃1 ⎕NPARTS targetPath,'/'
  :EndIf
- cfg←ReadPackageConfigFile projectPath                                         ⍝ Check projectPath has config
+ cfg←ReadPackageConfigFile projectPath
  ValidateConfig cfg
  zipFilename←F.ExpandPath targetPath,(GetPackageFilenameFromCfg cfg),'.zip'
  :If 0=⎕NEXISTS targetPath
@@ -22,7 +28,7 @@
  fileList←projectPath GetAllFiles cfg
  'No source code?!'Assert 0<≢fileList
  projectPath zipObj.Add fileList
- projectPath zipObj.Add CFG_NAME
+ projectPath zipObj.Add CFG_Name
  :If 0<≢cfg.assets
      {projectPath zipObj.Add ⍵}¨','(≠⊆⊢)cfg.assets
  :EndIf

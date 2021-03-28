@@ -10,10 +10,12 @@
      response.Content←logMsg
  :Else
      :Select request.Method
-     :Case 'GET'
+     :CaseList 'GET' 'HEAD'
          response←Handle_GET request
      :Case 'PUT'
          response←Handle_PUT request
+     :Case 'DELETE'
+         response←Handle_Delete request
      :Else
          response←ReturnNOT_IMPLEMENTED request
      :EndSelect

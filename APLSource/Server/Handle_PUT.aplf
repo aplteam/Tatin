@@ -5,6 +5,8 @@
  :If G.Credentials AcceptCredential apiKey groupName
      :If Reg.IsValidPackageID_Complete request.URI
          response←SavePackage request
+     :ElseIf request IsREST_v1 request.URI
+         response←request Handle_REST_Version1 request.URI
      :Else
          response←request Respond 400  ⍝ 400 ←→ Bad Request
          response.Content←'Neither valid package ID nor proper REST request'

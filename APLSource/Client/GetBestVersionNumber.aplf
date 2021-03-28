@@ -18,7 +18,7 @@
      request.Headers,←⊂'include-betas'('NY'[1+~noBetas])
      res←client SendAndReceive request
      res.Content Assert 200≡res.StatusCode
-     r←url,((~(¯1↑url)∊'/\')/'/'),(⎕JSON⍠('Dialect' 'JSON5')⊣res.Content).BestVersion
+     r←url,'/',(Reg.APLfromJSON res.Content).BestVersion
  :Else
      r←noBetas Reg.GetBestVersionNumber url,packageID
  :EndIf

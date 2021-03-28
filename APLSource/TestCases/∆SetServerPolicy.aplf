@@ -1,0 +1,18 @@
+ {r}←{uri}∆SetServerPolicy new;client;request;res
+⍝ Tell the server the desired delete policiy and return the former setting.
+⍝ 0 = None
+⍝ 1 = Any
+⍝ 2 = JustBetas
+ Assert(⊂new)∊'Any' 'None' 'JustBetas'
+ uri←{0<⎕NC ⍵:⍎⍵ ⋄ 'https://localhost/'}'uri'
+ client←R.NewClient uri
+ request←R.NewRequest 0
+ request.URI←'/v1/set-delete-policy'
+ request.Method←'PUT'
+ request.Headers,←⊂'Accept' 'application/json'
+ request.Headers,←⊂'api-key'((TC.MyUserSettings.GetRegistry uri).api_key)
+ request.Content←new
+ res←client R.SendAndReceive request
+ Assert 200=res.StatusCode
+ r←res.Content
+⍝Done

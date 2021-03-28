@@ -11,24 +11,19 @@
  r←⍬
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
  'Invalid right argument; must be one of: 0 1 2 3'⎕SIGNAL 11/⍨~(⊂type)∊0 1 2 3
-
  list←⊃##.FilesAndDirs.Dir'Dist/*.zip'
  list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
  list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
  ##.FilesAndDirs.DeleteFile list
-
  P←##.APLProcess
-
  parms←P.CreateParms
  parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
- parms.CommandLineArgs,←'lx="#.Make_.Run ',(⍕type),'" '
+ parms.CommandLineArgs,←' lx="#.Make_.Run ',(⍕type),'"'
  :If 0  ⍝ Only for analyzing problems:
-     parms.CommandLineArgs,←'-exec_setup=0 '
-     parms.CommandLineArgs,←'-stop_in_setup=1 '
+     parms.CommandLineArgs,←' -exec_setup=0 '
+     parms.CommandLineArgs,←' -stop_in_setup=1 '
  :EndIf
- :If noQLX
-     parms.CommandLineArgs,←' -x'
- :EndIf
+ parms.CommandLineArgs,←noQLX/' -x'
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  P_←⎕NEW P parms
@@ -41,9 +36,13 @@
  CompileDocumentation ⍬
  ⎕←'   Copy the documentation to the test server...'
  UpdateDocumentation ⍬
-
  parms←P.CreateParms
- parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" lx="#.Make_.Run ¯1"'
+ parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc"'
+ parms.CommandLineArgs,←' lx="#.Make_.Run ¯1"'
+ :If 0  ⍝ Only for analyzing problems:
+     parms.CommandLineArgs,←' -exec_setup=0'
+     parms.CommandLineArgs,←' -stop_in_setup=1 '
+ :EndIf
  parms.CommandLineArgs,←noQLX/' -x'
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
@@ -51,8 +50,6 @@
  ⎕←'   Process started for "making" the Tatin Server...'
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
-
  UpdateTestServerAssets ⍬
-
  ⎕←'*** Done'
 ⍝Done

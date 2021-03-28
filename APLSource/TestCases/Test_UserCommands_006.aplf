@@ -17,12 +17,12 @@
 
  (tempDir,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣⊃⊃F.Dir packageFolder,'/*.json'
 
- cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_NAME)0
+ cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_Name)0
  version←⊃{⍺,'-',⍵}/cfg.(group name version)
  F.RmDir ∆GetServerRegistryFolder,version
  #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
 
- (rc msg res)←∆UCMD'Publish "',zipfile,'" [local]'
+ (rc msg res)←∆UCMD'PublishPackage "',zipfile,'" [local]'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
 
  r←T._OK

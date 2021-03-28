@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.21.0 - 2021-03-24
+⍝   * User command "DeletePackage" added
+⍝   * User command "GetDeletePolicy" added
 ⍝ * 0.20.0 - 2021-03-20
 ⍝   * `Pack` polished
 ⍝   * Bug fixes:
@@ -140,7 +143,7 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'Publish'
+          c.Name←'PublishPackage'
           c.Desc←'Publish a package (package folder or ZIP file) to a particular Registry'
           c.Parse←'2 -quiet'
           r,←c
@@ -175,13 +178,17 @@
           c.Parse←''
           r,←c
      
-          :If 0 ⍝  ⍝TODO⍝ Not implemeted yet though the help is ready
-              c←⎕NS ⍬
-              c.Name←'DeletePackage'
-              c.Desc←'Delete a package from a Tatin Registry'
-              c.Parse←'2'
-              r,←c
-          :EndIf
+          c←⎕NS ⍬
+          c.Name←'DeletePackage'
+          c.Desc←'Delete a package from a Tatin Registry'
+          c.Parse←'1'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'GetDeletePolicy'
+          c.Desc←'Asks the server about its "Delete" policy'
+          c.Parse←'1'
+          r,←c
      
           c←⎕NS ⍬
           c.Name←'UninstallPackage'
@@ -355,34 +362,45 @@
       :EndIf
     ∇
 
-    ∇ r←DeletePackage Arg
-      r←'Sorry, not implemented yet'
+    ∇ r←DeletePackage Arg;path
+      path←Arg._1
+      r←TC.DeletePackage path
+     ⍝Done
+    ∇
+
+    ∇ r←GetDeletePolicy Arg;uri
+      uri←Arg._1
+      r←TC.GetDeletePolicy uri
     ∇
 
     ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath;prompt;msg
       (sourcePath targetPath)←Arg.(_1 _2)
       prompt←0
       :If 0≡sourcePath
+      :OrIf (,'.')≡,sourcePath
       :OrIf 0=≢sourcePath
           sourcePath←TC.F.PWD
           prompt∨←1
       :EndIf
       :If 0≡targetPath
+      :OrIf (,'.')≡,targetPath
       :OrIf 0=≢targetPath
           targetPath←sourcePath
           prompt∨←1
       :EndIf
+      (sourcePath targetPath)←AddSlash¨sourcePath targetPath
       'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
-      filename←sourcePath,'/',TC.CFG_NAME
-      ('Could not find a file "',TC.CFG_NAME,'" in ',sourcePath)Assert TC.F.IsFile filename
-      :If ~(1↑targetPath)∊'./\'
+      filename←sourcePath,TC.CFG_Name
+      ('Could not find a file "',TC.CFG_Name,'" in ',sourcePath)Assert TC.F.IsFile filename
+      :If ~(1↑targetPath)∊'/\'
       :AndIf (1↑1↓targetPath)≠':'
-          targetPath←sourcePath,'/',targetPath
+          targetPath←sourcePath,targetPath
       :EndIf
+      (sourcePath targetPath)←{⊃1 ⎕NPARTS ⍵,'/'}¨sourcePath targetPath
       :If prompt
           msg←'Sure that you want to pack ',sourcePath,' into '
           :If sourcePath≡targetPath
-              msg,←' the same directory?'
+              msg,←'the same directory?'
           :Else
               msg,←targetPath,'?'
           :EndIf
@@ -397,7 +415,7 @@
       zipFilename←TC.Pack sourcePath targetPath
     ∇
 
-    ∇ r←Publish Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename
+    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename
       r←''
       (source url)←Arg.(_1 _2)
       :If (,'?')≡,url
@@ -407,7 +425,7 @@
       url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_
       :If TC.F.IsDir source
-          ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_NAME
+          ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_Name
       :Else
           ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
       :EndIf
@@ -523,7 +541,7 @@
           r←TC.ReadPackageConfigFile_ what
       :Else
           path←what
-          filename←path,'/',TC.CFG_NAME
+          filename←path,'/',TC.CFG_Name
           :If Arg.delete
               'File not found'Assert TC.F.IsFile filename
               msg←'Sure you want to delete "',filename,'" ?'
@@ -546,7 +564,7 @@
                   newFlag←0
               :Else
                   :If ~Arg.quiet
-                  :AndIf 0=1 ∆YesOrNo'There is no file ',TC.CFG_NAME,' yet; would you like to create it?'
+                  :AndIf 0=1 ∆YesOrNo'There is no file ',TC.CFG_Name,' yet; would you like to create it?'
                       ⎕←'Cancelled'
                       :Return
                   :EndIf
@@ -829,7 +847,7 @@
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
           r,←⊂'  Specifying any of the options has no effect.'
           r,←⊂'* In case of a path it must point to a folder that contains a Tatin package.'
-          r,←⊂'  The contents of the file "',TC.CFG_NAME,'" in that folder is returned.'
+          r,←⊂'  The contents of the file "',TC.CFG_Name,'" in that folder is returned.'
           r,←⊂'  In case the file does not exist yet it will be created.'
           r,←⊂''
           r,←⊂'In case no argument is specified the command tries to find a package config file in'
@@ -864,18 +882,16 @@
           r,←⊂'in conjunction with the -delete flag; this is probably only useful with test cases.'
       :Case ⎕C'Pack'
           r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
+          r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
           r,←⊂''
-          r,←⊂'Requires ⍵[1] to have a file "',TC.CFG_NAME,'" defining the package.'
-          r,←⊂''
-          r,←⊂'If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
-          r,←⊂'If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
-          r,←⊂'Note that if ⍵[2] is relative then it is relative to ⍵[1].'
-      :Case ⎕C'Publish'
+          r,←⊂'* If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
+          r,←⊂'* If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
+      :Case ⎕C'PublishPackage'
           r,←⊂'Publish a package to a particular Registry Server.'
           r,←⊂'Such a package can be one of:'
           r,←⊂'* ZIP file, typically created by calling ]TATIN.Pack'
           r,←⊂'* Folder that contains everything that defines a package; in this case the required ZIP is'
-          r,←⊂'  created by "Publish"'
+          r,←⊂'  created by "PublishPackage"'
           r,←⊂''
           r,←⊂'Requires two arguments:'
           r,←⊂'* Path to ZIP file or package folder'
@@ -915,19 +931,14 @@
           r,←⊂'The default behaviour can be changed by specifying the flag -major.'
           r,←⊂'Then only "better" major versions are reported.'
       :Case ⎕C'DeletePackage'
-          r,←⊂'Requires two arguments:'
-          r,←⊂'* Either a directory hosting a Tatin Registry or a URL of a Tatin-managed Registry.'
-          r,←⊂'* A fully or partly qualified package ID'
+          r,←⊂'Takes a path pointing to a package.'
+          r,←⊂'Examples:'
+          r,←⊂']Tatin.DeletePackage C:\MyTatinServer\Registry\aplteam-foo-1.0.0'
+          r,←⊂']Tatin.DeletePackage https:/test.tatin.dev/aplteam-foo-1.0.0'
+          r,←⊂']Tatin.DeletePackage [test-tatin]aplteam-foo-1.0.0'
           r,←⊂''
-          r,←⊂'You must specify:'
-          r,←⊂' * {group}-{name}-{major}-*          ; All with that major no.'
-          r,←⊂' * {group}-{name}-{major}-{minor}-*  ; All with that major & minor no.'
-          r,←⊂' * {group}-{name}-{major}-{patch}    ; Exactly that package'
-          r,←⊂''
-          r,←⊂'The operation will succeed only if...'
-          r,←⊂'* the package exists'
-          r,←⊂'* the server is configured so that packages can be deleted'
-          r,←⊂'* a valid API key is produced'
+          r,←⊂'Note that whether a package can be deleted or not depends on the delete policy of the given'
+          r,←⊂'server. A server may allow no deletion at all, or just beta versions or everything.'
       :Case ⎕C'Documentation'
           r,←⊂'Puts https://tatin.dev/v1/documentation into the default browser'
       :Else
@@ -1040,7 +1051,7 @@
           ns←TC.ValidateDescription ns
           :If 0=≢ns.source
               list←(1+≢path)↓¨⊃TC.F.Dir path,'\'
-              list~←⊂TC.CFG_NAME
+              list~←⊂TC.CFG_Name
               :If 1=≢list
               :AndIf ((⊂3⊃⎕NPARTS⊃list)∊'.apln' '.aplc')∨TC.F.IsDir path,⊃list
                   ns.source←⊃list
@@ -1126,7 +1137,7 @@
       :If 1=≢list←GetListOfRegistriesForSelection type
           registry←1⊃list[1;]
       :Else
-          :If ⍬≡row←'Select Tatin Registry'Select↓⎕FMT⌽list
+          :If ⍬≡row←'Select Tatin Registry'Select↓⎕FMT⌽list[;1 2]
               registry←⍬
           :Else
               registry←1⊃list[row;]
@@ -1168,5 +1179,7 @@
     ∇
 
     JSON←{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}
+
+    AddSlash←{0=≢⍵:⍵ ⋄ ⍵,(~(¯1↑⍵)∊'/\')/'/'}
 
 :EndNamespace

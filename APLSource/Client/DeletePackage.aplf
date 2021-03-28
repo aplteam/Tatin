@@ -1,0 +1,45 @@
+ (statusCode errMsg)←DeletePackage uri;uri_;packageID;statusCode;errMsg;client;request;response;en;msg;rc
+⍝ Delete a package.\\
+⍝ Whether deleting a package can be successful is determined by the INI setting [CONFIG]DeletePackages
+ statusCode←200 ⋄ errMsg←''
+ uri_←F.EnforceSlash ReplaceRegistryAlias uri
+ (uri_ packageID)←Reg.SeparateUriAndPackageID uri_
+ 'Unknown Registry'Assert(⊂EnforceTrailingSlash uri_)∊MyUserSettings.registries.uri
+ :If Reg.IsHTTP uri_
+     client←NewClient uri_
+     request←R.NewRequest 0
+     request.URI←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
+     request.Method←'DELETE'
+     request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri_).api_key)
+     response←client SendAndReceive request
+     :If response.StatusCode≢200
+         :If 405≡response.StatusCode
+             :If 0<≢response.Content
+                 response.Content Assert 0
+             :ElseIf ∨/'http://'⍷uri_
+                 'http:// is not supported'Assert 0
+             :Else
+                 'https:// is not supported'Assert 0
+             :EndIf
+         :Else
+             statusCode←response.StatusCode
+             :If 0<≢response.Content
+                 errMsg←response.Content
+             :Else
+                 errMsg←'HTTP status code: ',⍕response.StatusCode
+             :EndIf
+         :EndIf
+     :EndIf
+ :Else
+     :If F.IsDir uri_,packageID
+         (rc en msg)←F.RmDir uri_,packageID
+         :If 0≠rc
+             statusCode←400
+             errMsg←'Remove operation failed, RC=',(⍕rc),'; ',msg
+         :EndIf
+     :Else
+         statusCode←400
+         errMsg←'Not found'
+     :EndIf
+ :EndIf
+⍝Done

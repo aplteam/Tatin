@@ -1,0 +1,37 @@
+ r←Test_Server_600(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;msg;rc;dir;src;zip;serverPath;body;cfg;zipFilename
+⍝ Exercise ]Tatin.DeletePackage on a just-published package on the server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'zip'
+ F.MkDir src zip
+ serverPath←∆GetServerPath
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'test'
+ cfg.name←'Package_A'
+ cfg.version←'0.1.0'
+ cfg.source←'Test.apln'
+ TC.WritePackageConfigFile src cfg
+
+ (rc msg zipFilename)←TC.PublishPackage src'https://localhost'
+ →T.GoToTidyUp 200≠rc
+ →T.GoToTidyUp 0≠≢msg
+ →T.GoToTidyUp 0=F.IsDir serverPath,'/test-Package_A-0.1.0'
+
+ (rc msg res)←∆UCMD'DeletePackage [local]/test-Package_A-0.1.0'
+ →T.GoToTidyUp(rc≠0)∨(0<≢msg)∨200≠⊃res
+ →T.GoToTidyUp 1=F.IsDir serverPath,'/test-Package_A-0.1.0'
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.DeleteFile zipFilename
+ F.RmDir dir
+ F.RmDir serverPath,'/test-Package_A-0.1.0'
+⍝Done

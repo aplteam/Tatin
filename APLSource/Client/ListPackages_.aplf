@@ -28,7 +28,11 @@
  :If 404≡res.StatusCode
      list←0 2⍴''⍬
  :Else
-     ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
+     :If 0<≢res.Content
+         ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
+     :Else
+         res.Contewnt Assert 200=res.StatusCode
+     :EndIf
      list←Reg.APLfromJSON res.Content
  :EndIf
 ⍝Done

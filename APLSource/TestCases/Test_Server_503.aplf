@@ -1,0 +1,42 @@
+ r←Test_Server_503(stopFlag batchFlag);⎕TRAP;dir;src;zip;serverPath;body;cfg;packageID;rc;msg;list1;list2;oldPolicy;zipFilename
+⍝ Publish a package and then delete it
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'zip'
+ F.MkDir src zip
+ serverPath←∆GetServerPath
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'test'
+ cfg.name←'Package_A'
+ cfg.version←'0.1.0'
+ cfg.source←'Test.apln'
+
+ TC.WritePackageConfigFile src cfg
+
+ packageID←'test-Package_A-0.1.0'
+ (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
+ →T.GoToTidyUp 200≠rc
+ →T.GoToTidyUp 0≠≢msg
+
+ list1←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'https://localhost/'
+ oldPolicy←∆SetServerPolicy'Any'
+ (rc msg)←TC.DeletePackage'https://localhost/',packageID
+ Assert 200=rc
+ list2←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'https://localhost/'
+ →T.GoToTidyUp'test-Package_A-0.1.0'≢∊list1[;1]~list2[;1]
+
+ r←T._OK
+
+∆TidyUp:
+ ∆SetServerPolicy oldPolicy
+ Assert 0=⊃F.RmDir dir
+ Assert 0=⊃F.RmDir serverPath,'/',packageID
+ F.DeleteFile(739⌶0),'/',packageID,'.zip'
+ ∆RecompileIndexOnServer
+⍝Done

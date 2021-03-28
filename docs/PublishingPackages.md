@@ -70,7 +70,7 @@ group2='xyz'
 *=
 ```
 
-This is interpreted as _require API keys for the groups "group1" and "group2" but allow anything else without an API key_.
+This is interpreted as "require API keys for the groups "group1" and "group2" but allow anything else without an API key".
 
 ### The Client
 
@@ -110,15 +110,47 @@ Note that in case you specify a dependency that does not (yet?!) exist on the Re
 Once the preparation is done the final step is easy. You may specify the folder hosting the package:
 
 ```
-]TATIN.Publish /path2package [tatin]
+]TATIN.PublishPackage /path2package [tatin]
 ```
 
 The folder may or may not carry a trailing `/`.
 
-You can also create a ZIP file with the `]TATIN.Pack` command and specify that ZIP file:
 
 ```
-]TATIN.Publish /path2package/group-name-1.2.3.zip [tatin]
+]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]
 ```
 
 Both calls would attempt to publish the package `group-name-1.2.3` to the principal Tatin Server represented by the alias `[tatin]`.
+
+I> You can also create a ZIP file with the `]TATIN.Pack` command and specify the ZIP file as argument.
+
+
+## Deleting packages
+
+Whether you can delete a package once it was published depends on the policy the server operates:
+
+* "Any": You may delete any package
+* "JustBetas": You may delete only beta versions
+* "None": You cannot delete a packages at all
+
+Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator --- a `+` (recommended) or a `.` (deprecated) --- qualifies as a beta version.
+
+Examples:
+
+```
+apltree-Foo-1.0.0                 ⍝ Not a beta
+apltree-Foo-1.0.0+123             ⍝ Not a beta
+apltree-Foo-1.0.0-alpha-1         ⍝ A beta
+apltree-Foo-1.0.0-alpha-1+123     ⍝ A beta
+```
+
+You can find out which policy the server operates in two ways:
+
+* Execute this user command:
+
+  ```
+  ]Tatin.GetDeletePolicy [tatin]
+None
+  ```
+
+Or visit the web site: <https://tatin.dev>: at the bottom of the home page the server mentions the "delete" policy it operates.

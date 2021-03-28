@@ -24,13 +24,15 @@
  P.G←##.Server.ProcessCredentials P.G
  :If (⊂testFlag)∊0 1
      P.G.TestFlag←testFlag  ⍝ Overwrite INI setting
+ :Else
+     P.G.TestFlag←P.G.INI.Get'CONFIG:TestFlag'
  :EndIf
  parms←P.CreateServerParms P.G
  parms←P.CheckServerParms parms
  ##.G←P.OpenWindowsEventLog P.G
  P.WindowsEventLog'Starting'
  P.EstablishHandlersForRumbaEvents P.G
- F.MkDir parms.Folder←(739⌶0),'/Rumba-TestServer/Logs'
+ F.MkDir parms.Folder←(739⌶0),'/Tatin-TestServer-Logs'
  r←parms P.R.Start P.F.ExpandPath P.GetAssetPath,'RunTime/Conga'
  EndlessLoop ⍬
  ##.Server.∆SHUTDOWN←0

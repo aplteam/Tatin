@@ -1,9 +1,12 @@
- {r}←{userName}Init dummy;pathToUserSettings;ref
+ {r}←{userName}Init dummy;pathToUserSettings
 ⍝ Use this to re-establish the user settings via a user command.
  r←''
  userName←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'userName'
  pathToUserSettings←FindUserSettings userName
- ref←InitUserSettings pathToUserSettings
- MyUserSettings←ref
+ MyUserSettings←InitUserSettings pathToUserSettings
+ :If 9=##.##.⎕NC'Tatin'
+ :AndIf 9=##.##.Tatin.⎕NC'MyUserSettings'
+     ##.##.Tatin.MyUserSettings←MyUserSettings   ⍝TODO⍝ Why is this a necessity?!
+ :EndIf
  r←'User settings re-established in ⎕SE from ',pathToUserSettings
 ⍝Done

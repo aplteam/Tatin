@@ -1,0 +1,11 @@
+ r←Test_Server_601(stopFlag batchFlag);⎕TRAP;rc;msg;res
+⍝ Exercise ]Tatin.GetDeletePolicy on the server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg res)←∆UCMD'GetDeletePolicy https://localhost'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf'Any'≡res
+
+ r←T._OK
+⍝Done

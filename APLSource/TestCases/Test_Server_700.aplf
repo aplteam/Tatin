@@ -1,0 +1,16 @@
+ r←Test_Server_700(stopFlag batchFlag);⎕TRAP;c;q;res
+⍝ Exercise the HEAD method on index.html.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ c←R.NewClient 0
+ c.Host←'localhost'
+ q←R.NewRequest 0
+ q.URI←'/index.html'
+ q.Method←'HEAD'
+ res←c TC.SendAndReceive q
+ →T.PassesIf 0=≢res.Content
+ →T.PassesIf 0<res.ContentLength
+
+ r←T._OK
+⍝Done

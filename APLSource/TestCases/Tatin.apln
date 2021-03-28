@@ -212,16 +212,16 @@
     ∇
 
     ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath
-      (sourcePath targetPath)←Arg.(_1 _2)
-      'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
-      filename←sourcePath,'/',TC.CFG_NAME
-      ('Could not find a file "',TC.CFG_NAME,'" in ',sourcePath)Assert TC.F.IsFile filename
-      :If ~(1↑targetPath)∊'./\'
-      :AndIf (1↑1↓targetPath)≠':'
-          targetPath←sourcePath,'/',targetPath
-      :EndIf
-      'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
-      zipFilename←TC.Pack sourcePath targetPath
+     (sourcePath targetPath)←Arg.(_1 _2)
+     'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
+     filename←sourcePath,'/',TC.CFG_Name
+     ('Could not find a file "',TC.CFG_Name,'" in ',sourcePath)Assert TC.F.IsFile filename
+     :If ~(1↑targetPath)∊'./\'
+     :AndIf (1↑1↓targetPath)≠':'
+         targetPath←sourcePath,'/',targetPath
+     :EndIf
+     'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
+     zipFilename←TC.Pack sourcePath targetPath
     ∇
 
     ∇ r←Publish Arg;zipFilename;url;url_;qdmx;statusCode;list
@@ -313,61 +313,61 @@
     ∇
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri
-      r←⍬
-      what←Arg._1
-      :If ∧/'[]'∊what
-          what←TC.ReplaceRegistryAlias what
-      :EndIf
-      :If TC.Reg.IsHTTP what
-          r←TC.ReadPackageConfigFile_ what
-      :Else
-          path←Arg._1
-          filename←path,'/',TC.CFG_NAME
-          :If Arg.delete
-              'File not found'Assert TC.F.IsFile filename
-              msg←'Sure you want to delete "',filename,'" ?'
-              :If Arg.quiet
-              :OrIf 0 ∆YesOrNo msg
-                  TC.F.DeleteFile filename
-              :EndIf
-          :Else
-              :If 0=TC.F.IsDir path
-                  :If Arg.quiet
-                  :OrIf ∆YesOrNo'The directory does not exist yet. Would you like to create it?'
-                      'Could not create the directory'Assert TC.F.MkDir path
-                  :Else
-                      :Return  ⍝ Give up
-                  :EndIf
-              :EndIf
-              :If TC.F.IsFile filename
-                  ns←TC.ReadPackageConfigFile path
-                  newFlag←0
-              :Else
-                  ns←TC.InitPackageConfig ⍬
-                  ns.source←TC.MyUserSettings.source
-                  newFlag←1
-              :EndIf
-              :If Arg.edit∨newFlag
-                  origData←TC.Reg.JSON ns
-                  (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData
-                  :If success
-                      :If 0<≢∊newData
-                      :AndIf newFlag∨newData≢origData
-                          ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
-                          ns.tags←⎕C ns.tags
-                          :Trap 98
-                              ns TC.WritePackageConfigFile path
-                          :Else
-                              qdmx←⎕DMX
-                              ⎕←qdmx.EM
-                          :EndTrap
-                      :EndIf
-                  :EndIf
-              :Else
-                  r←⍪⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
-              :EndIf
-          :EndIf
-      :EndIf
+     r←⍬
+     what←Arg._1
+     :If ∧/'[]'∊what
+         what←TC.ReplaceRegistryAlias what
+     :EndIf
+     :If TC.Reg.IsHTTP what
+         r←TC.ReadPackageConfigFile_ what
+     :Else
+         path←Arg._1
+         filename←path,'/',TC.CFG_Name
+         :If Arg.delete
+             'File not found'Assert TC.F.IsFile filename
+             msg←'Sure you want to delete "',filename,'" ?'
+             :If Arg.quiet
+             :OrIf 0 ∆YesOrNo msg
+                 TC.F.DeleteFile filename
+             :EndIf
+         :Else
+             :If 0=TC.F.IsDir path
+                 :If Arg.quiet
+                 :OrIf ∆YesOrNo'The directory does not exist yet. Would you like to create it?'
+                     'Could not create the directory'Assert TC.F.MkDir path
+                 :Else
+                     :Return  ⍝ Give up
+                 :EndIf
+             :EndIf
+             :If TC.F.IsFile filename
+                 ns←TC.ReadPackageConfigFile path
+                 newFlag←0
+             :Else
+                 ns←TC.InitPackageConfig ⍬
+                 ns.source←TC.MyUserSettings.source
+                 newFlag←1
+             :EndIf
+             :If Arg.edit∨newFlag
+                 origData←TC.Reg.JSON ns
+                 (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'origData
+                 :If success
+                     :If 0<≢∊newData
+                     :AndIf newFlag∨newData≢origData
+                         ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
+                         ns.tags←⎕C ns.tags
+                         :Trap 98
+                             ns TC.WritePackageConfigFile path
+                         :Else
+                             qdmx←⎕DMX
+                             ⎕←qdmx.EM
+                         :EndTrap
+                     :EndIf
+                 :EndIf
+             :Else
+                 r←⍪⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+             :EndIf
+         :EndIf
+     :EndIf
     ∇
 
     ∇ r←PackageDependencies Arg;path;newFlag;origData;success;newData;msg;temp;filename
@@ -484,135 +484,135 @@
     ∇
 
     ∇ r←level Help Cmd;TC
-      r←''
-      :If 0=⎕SE.⎕NC'_Tatin'
-          ⎕SE.UCMD'Tatin.LoadTatin'
-      :EndIf
-      TC←⎕SE._Tatin.Client
-      :Select ⎕C Cmd
-      :Case ⎕C'LoadTatin'
-          r,←⊂''
-          r,←⊂'This loads the Tatin client into ⎕SE and initializes it if it''s not already there.'
-          r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
-          r,←⊂''
-          r,←⊂'By default the user config file is expected in the user''s home folder, and it will be'
-          r,←⊂'created there if it does not already exists.'
-          r,←⊂'Instead you may specify a different folder. Note that this is NOT a permanent change;'
-          r,←⊂'if you want the change to be permanent refer to the documentation.'
-          r,←⊂''
-          r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
-      :Case ⎕C'ListRegistries'
-          r,←⊂''
-          r,←⊂'Lists the paths and alias of all Registries defined in the user settings.'
-          r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw table.'
-          r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all data.'
-      :Case ⎕C'ListPackages'
-          r,←⊂''
-          r,←⊂'Lists all groups defined in the Registry specified as an argument.'
-          r,←⊂'* If you specify the Registry by an alias it MUST be embraced by square brackets as in'
-          r,←⊂'  [MyAlias]'
-          r,←⊂'* Aliases are case insensitive, paths only under Windows.'
-          r,←⊂'* It does not matter whether you specify / or \ in a path, or whether it has or has'
-          r,←⊂'  not a trailing separator: Tatin is taking care of that.'
-          r,←⊂'* By default all packages are listed. You can restrict the output in two ways:'
-          r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
-          r,←⊂'  * -tags=zip will restrict the output to packages that carry the given tags.'
-          r,←⊂'    If you need to specify more than one tag then separate them by commas.'
-          r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
-      :Case ⎕C'LoadPackage'
-          r,←⊂''
-          r,←⊂'Load the specified package and all its dependencies into the workspace'
-          r,←⊂'Requires two arguments:'
-          r,←⊂'A) First argument'
-          r,←(3⍴' ')∘,¨HelpOnPackageID'LoadPackage'
-          r,←⊂'B) Second argument'
-          r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
-          r,←⊂'Returns fully qualified name of the package established in the target space'
-      :Case ⎕C'InstallPackage'
-          r,←⊂''
-          r,←⊂'Installs the given package and all its dependencies into the given folder which'
-          r,←⊂'must exist.'
-          r,←⊂''
-          r,←⊂'A) First argument'
-          r,←(3⍴' ')∘,¨' /pkgs/installed'HelpOnPackageID'InstallPackage'
-          r,←⊂''
-          r,←⊂'B) Second argument'
-          r,←⊂'   The second argument must be the path to a folder into which the packages are'
-          r,←⊂'   going to be be installed'
-          r,←⊂''
-          r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
-          r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
-      :Case ⎕C'LoadDependencies'
-          r,←⊂''
-          r,←⊂'Takes two arguments:'
-          r,←⊂'[1] A folder into which one or more packages have been installed.'
-          r,←⊂'[2] A namespace into which the packages are going to be loaded.'
-      :Case ⎕C'UserSettings'
-          r,←⊂''
-          r,←⊂'Prints the user settings to the session in JSON format.'
-          r,←⊂''
-          r,←⊂'Note that the user command does not give you the means to change the user settings,'
-          r,←⊂'or to move it elsewhere. If you want to do anything more than just printing the settings'
-          r,←⊂'to the session then you are advised to used the API. Note that there is a dedicated'
-          r,←⊂'document for how to use the API, and what for.'
-      :Case ⎕C'PackageConfig'
-          r,←⊂''
-          r,←⊂'The argument may be a http request or a path'
-          r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
-          r,←⊂'  Specifying any of the options is ignored.'
-          r,←⊂'* In case of a path the contents of the file "',TC.CFG_NAME,'" is returned.'
-          r,←⊂'  In case the file does not exist yet it is created.'
-          r,←⊂'  You may edit the file by specifying the -edit flag.'
-          r,←⊂'  In case you want to delete the file: specify the -delete flag.'
-          r,←⊂''
-          r,←⊂'In case of success a text vector with NLs in it is returned, otherwise an empty vector.'
-      :Case ⎕C'UninstallPackage'
-          r,←⊂'Requires two arguments:'
-          r,←⊂'* Path to a folder with installed packages'
-          r,←⊂'* Name of the package to be un-installed. If {group} and {name} can identify the'
-          r,←⊂'  package uniquely then there is no need for {version}. If it cannot an error is thrown.'
-          r,←⊂'This command uninstalls the given package and all its dependencies but only if those'
-          r,←⊂'are not required by any other packages.'
-      :Case ⎕C'PackageDependencies'
-          r,←⊂''
-          r,←⊂'Takes a path to a folder and returns the contents of the file "apl-dependencies.txt".'
-          r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
-          r,←⊂'exist it is created.'
-          r,←⊂''
-          r,←⊂'After the edit the changes are checked for being complete and syntactically correct'
-          r,←⊂'JSON, and they are then saved to the given folder.'
-          r,←⊂''
-          r,←⊂'In case you want to delete the file specify the -delete flag.'
-          r,←⊂''
-          r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is usually asked'
-          r,←⊂'in conjunction with the -delete flag is probably only useful with test cases.'
-      :Case ⎕C'Pack'
-          r,←⊂''
-          r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
-          r,←⊂''
-          r,←⊂'Requires ⍵[1] to have a file "',TC.CFG_NAME,'" defining the package.'
-          r,←⊂''
-          r,←⊂'Note that if ⍵[2] does not start with "." or "/" it is relative to ⍵[1], Therefore, if you'
-          r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
-      :Case ⎕C'Publish'
-          r,←⊂''
-          r,←⊂'Publish a ZIP file (typically created with ]Tatin.Zip) to a particular Registry Server.'
-          r,←⊂''
-          r,←⊂'Requires two arguments:'
-          r,←⊂'* Path to a ZIP file that contains a package'
-          r,←⊂'* URL or alias of a Registry Server'
-          r,←⊂''
-          r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question usually asked before'
-          r,←⊂'a package is actually published is probably only useful with test cases.'
-      :Case ⎕C'Version'
-          r,←⊂''
-          r,←⊂'Prints name, version number and version date of the client to the session.'
-      :Case ⎕C'ListTags'
-          r,←⊂''
-          r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
-      :Else
-          r←'Unknown command: ',Cmd
-      :EndSelect
+     r←''
+     :If 0=⎕SE.⎕NC'_Tatin'
+         ⎕SE.UCMD'Tatin.LoadTatin'
+     :EndIf
+     TC←⎕SE._Tatin.Client
+     :Select ⎕C Cmd
+     :Case ⎕C'LoadTatin'
+         r,←⊂''
+         r,←⊂'This loads the Tatin client into ⎕SE and initializes it if it''s not already there.'
+         r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
+         r,←⊂''
+         r,←⊂'By default the user config file is expected in the user''s home folder, and it will be'
+         r,←⊂'created there if it does not already exists.'
+         r,←⊂'Instead you may specify a different folder. Note that this is NOT a permanent change;'
+         r,←⊂'if you want the change to be permanent refer to the documentation.'
+         r,←⊂''
+         r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
+     :Case ⎕C'ListRegistries'
+         r,←⊂''
+         r,←⊂'Lists the paths and alias of all Registries defined in the user settings.'
+         r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw table.'
+         r,←⊂'* By default only "alias" and "uri" are listed; specify -all for all data.'
+     :Case ⎕C'ListPackages'
+         r,←⊂''
+         r,←⊂'Lists all groups defined in the Registry specified as an argument.'
+         r,←⊂'* If you specify the Registry by an alias it MUST be embraced by square brackets as in'
+         r,←⊂'  [MyAlias]'
+         r,←⊂'* Aliases are case insensitive, paths only under Windows.'
+         r,←⊂'* It does not matter whether you specify / or \ in a path, or whether it has or has'
+         r,←⊂'  not a trailing separator: Tatin is taking care of that.'
+         r,←⊂'* By default all packages are listed. You can restrict the output in two ways:'
+         r,←⊂'  * -group={groupname} will restrict the list the packages with the given group name.'
+         r,←⊂'  * -tags=zip will restrict the output to packages that carry the given tags.'
+         r,←⊂'    If you need to specify more than one tag then separate them by commas.'
+         r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
+     :Case ⎕C'LoadPackage'
+         r,←⊂''
+         r,←⊂'Load the specified package and all its dependencies into the workspace'
+         r,←⊂'Requires two arguments:'
+         r,←⊂'A) First argument'
+         r,←(3⍴' ')∘,¨HelpOnPackageID'LoadPackage'
+         r,←⊂'B) Second argument'
+         r,←⊂'   Must be the name of a namespace the package will be loaded into (target space).'
+         r,←⊂'Returns fully qualified name of the package established in the target space'
+     :Case ⎕C'InstallPackage'
+         r,←⊂''
+         r,←⊂'Installs the given package and all its dependencies into the given folder which'
+         r,←⊂'must exist.'
+         r,←⊂''
+         r,←⊂'A) First argument'
+         r,←(3⍴' ')∘,¨' /pkgs/installed'HelpOnPackageID'InstallPackage'
+         r,←⊂''
+         r,←⊂'B) Second argument'
+         r,←⊂'   The second argument must be the path to a folder into which the packages are'
+         r,←⊂'   going to be be installed'
+         r,←⊂''
+         r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
+         r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
+     :Case ⎕C'LoadDependencies'
+         r,←⊂''
+         r,←⊂'Takes two arguments:'
+         r,←⊂'[1] A folder into which one or more packages have been installed.'
+         r,←⊂'[2] A namespace into which the packages are going to be loaded.'
+     :Case ⎕C'UserSettings'
+         r,←⊂''
+         r,←⊂'Prints the user settings to the session in JSON format.'
+         r,←⊂''
+         r,←⊂'Note that the user command does not give you the means to change the user settings,'
+         r,←⊂'or to move it elsewhere. If you want to do anything more than just printing the settings'
+         r,←⊂'to the session then you are advised to used the API. Note that there is a dedicated'
+         r,←⊂'document for how to use the API, and what for.'
+     :Case ⎕C'PackageConfig'
+         r,←⊂''
+         r,←⊂'The argument may be a http request or a path'
+         r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
+         r,←⊂'  Specifying any of the options is ignored.'
+         r,←⊂'* In case of a path the contents of the file "',TC.CFG_Name,'" is returned.'
+         r,←⊂'  In case the file does not exist yet it is created.'
+         r,←⊂'  You may edit the file by specifying the -edit flag.'
+         r,←⊂'  In case you want to delete the file: specify the -delete flag.'
+         r,←⊂''
+         r,←⊂'In case of success a text vector with NLs in it is returned, otherwise an empty vector.'
+     :Case ⎕C'UninstallPackage'
+         r,←⊂'Requires two arguments:'
+         r,←⊂'* Path to a folder with installed packages'
+         r,←⊂'* Name of the package to be un-installed. If {group} and {name} can identify the'
+         r,←⊂'  package uniquely then there is no need for {version}. If it cannot an error is thrown.'
+         r,←⊂'This command uninstalls the given package and all its dependencies but only if those'
+         r,←⊂'are not required by any other packages.'
+     :Case ⎕C'PackageDependencies'
+         r,←⊂''
+         r,←⊂'Takes a path to a folder and returns the contents of the file "apl-dependencies.txt".'
+         r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
+         r,←⊂'exist it is created.'
+         r,←⊂''
+         r,←⊂'After the edit the changes are checked for being complete and syntactically correct'
+         r,←⊂'JSON, and they are then saved to the given folder.'
+         r,←⊂''
+         r,←⊂'In case you want to delete the file specify the -delete flag.'
+         r,←⊂''
+         r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is usually asked'
+         r,←⊂'in conjunction with the -delete flag is probably only useful with test cases.'
+     :Case ⎕C'Pack'
+         r,←⊂''
+         r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
+         r,←⊂''
+         r,←⊂'Requires ⍵[1] to have a file "',TC.CFG_Name,'" defining the package.'
+         r,←⊂''
+         r,←⊂'Note that if ⍵[2] does not start with "." or "/" it is relative to ⍵[1], Therefore, if you'
+         r,←⊂'want to ZIP the package into a sub folder Dist/ inside ⍵[1] you just need to specify Dist/'
+     :Case ⎕C'Publish'
+         r,←⊂''
+         r,←⊂'Publish a ZIP file (typically created with ]Tatin.Zip) to a particular Registry Server.'
+         r,←⊂''
+         r,←⊂'Requires two arguments:'
+         r,←⊂'* Path to a ZIP file that contains a package'
+         r,←⊂'* URL or alias of a Registry Server'
+         r,←⊂''
+         r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question usually asked before'
+         r,←⊂'a package is actually published is probably only useful with test cases.'
+     :Case ⎕C'Version'
+         r,←⊂''
+         r,←⊂'Prints name, version number and version date of the client to the session.'
+     :Case ⎕C'ListTags'
+         r,←⊂''
+         r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
+     :Else
+         r←'Unknown command: ',Cmd
+     :EndSelect
     ∇
 
     ∇ r←{add}HelpOnPackageID fns
@@ -702,7 +702,7 @@
     ∇ r←CheckPackageConfigFile json;cfg2;ns;extensions
     ⍝ Returns an empty vector if everything is okay and an error message otherwise
       r←''
-      ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
+      ns←APLfromJSON json
       :Trap 98
           cfg2←TC.InitPackageConfig ns
           'name'TC.ValidateName ns.name

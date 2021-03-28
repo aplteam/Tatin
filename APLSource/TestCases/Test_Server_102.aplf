@@ -23,11 +23,10 @@
  cfg.assets←'Assets/First.dll' 'Assets/Second.dll'
  TC.WritePackageConfigFile src cfg
 
- packageID←'Example-Package_A-0.1.0'
- (rc msg zipFilename)←TC.PublishPackage src('https://localhost/',packageID)
+ (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
  Assert 200=rc
 
-
+ packageID←'Example-Package_A-0.1.0'
  →T.GoToTidyUp 0=F.IsDir serverPath,,'/',packageID,'/data\Assets'
  →T.GoToTidyUp 2≠≢1⊃F.Dir serverPath,'/',packageID,'/data\Assets\'
 

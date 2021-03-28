@@ -1,0 +1,29 @@
+ response←DeletePackage request;packageID;statusCode;errMsg;client;request;response;deletePolicy;regPath
+⍝ Delete a package.\\
+⍝ Whether deleting a package can be successful is determined by the INI setting [CONFIG]DeletePackages which is
+⍝ Returned by `GetDeletePolicy` as a text vector.
+ deletePolicy←GetDeletePolicy
+ packageID←request.URI
+ :If 'None'≡deletePolicy
+     response←request Respond 405
+     response.Content←'This server does not allow deleting packages'
+ :ElseIf ~Reg.IsValidPackageID_Complete packageID
+     response←request Respond 400
+     response.Content←'Invalid package ID'
+ :Else
+     :If 'JustBetas'≢deletePolicy
+     :OrIf Reg.IsBeta packageID
+         regPath←(Reg.AddSlash G.RegistryPath),packageID
+         :If Reg.DeletePackage regPath
+             response←request Respond 200
+             response.Content←'Package was deleted'
+             ##.Registry.Index.Compile G.RegistryPath
+         :Else
+
+         :EndIf
+     :Else
+         response←request Respond 405
+         response.Content←'This server allows only beta packages to be deleted'
+     :EndIf
+ :EndIf
+⍝Done

@@ -1,4 +1,4 @@
- (r msg)←UnInstallPackage(folder packageID);pkgDepFilename;topDependencies;buildList;installedPkgs;toBeRemoved;rc;bool;oldBuildList
+ (r msg)←UnInstallPackage(folder packageID);pkgDepFilename;topDependencies;buildList;installedPkgs;toBeRemoved;rc;bool;oldBuildList;packageID2
 ⍝ If `folder` carries a dependency file then this function attempts to un-install the package
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
 ⍝ required by other packagases.\\
@@ -12,25 +12,29 @@
 ⍝ Returns a list with the fully qualifed names of all packages removed by the un-install operation.\\
 ⍝ Note that removing the directories hosting the packages might fail for all sorts of reasons even
 ⍝ although the package and any dependencies were already successfully removed from the dependency file.
- msg←''
+ r←msg←''
  '"folder" is invalid'Assert F.IsDir folder
  folder←Reg.AddSlash folder
  pkgDepFilename←folder,Reg.DependenciesFilename
  'The folder has no dependeny file'Assert F.IsFile pkgDepFilename
  topDependencies←(1⊃F.NGET pkgDepFilename 1)~⊂''
- packageID←IdentifyInstalledPackageID topDependencies packageID
- 'Could not find the package in the dependency file'Assert 0≠≢packageID
- (⊂topDependencies~⊂packageID)F.NPUT pkgDepFilename 1
- oldBuildList←LoadBuildList folder
- buildList←1 CompileBuildList folder
- installedPkgs←(≢folder)↓¨F.ListDirs folder
- toBeRemoved←(~installedPkgs∊(RemoveAlias¨buildList[;2]))/installedPkgs
- :If 0<≢toBeRemoved
-     r←toBeRemoved
-     toBeRemoved←folder∘,¨toBeRemoved
-     rc←⊃∘F.RmDir¨toBeRemoved
-     :If ∨/bool←0≠rc
-         msg←'Removing package folder failed for ',⊃{⍺,', ',⍵}/bool/(≢folder)↓¨toBeRemoved
+ packageID2←IdentifyInstalledPackageID topDependencies packageID
+ :If 0=≢packageID2
+     'Package not found'Assert F.IsDir folder,packageID
+     F.RmDir folder,packageID
+ :Else
+     (⊂topDependencies~⊂packageID2)F.NPUT pkgDepFilename 1
+     oldBuildList←LoadBuildList folder
+     buildList←1 CompileBuildList folder
+     installedPkgs←(≢folder)↓¨F.ListDirs folder
+     toBeRemoved←(~installedPkgs∊(RemoveAlias¨buildList[;2]))/installedPkgs
+     :If 0<≢toBeRemoved
+         r←toBeRemoved
+         toBeRemoved←folder∘,¨toBeRemoved
+         rc←⊃∘F.RmDir¨toBeRemoved
+         :If ∨/bool←0≠rc
+             msg←'Removing package folder failed for ',⊃{⍺,', ',⍵}/bool/(≢folder)↓¨toBeRemoved
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

@@ -9,6 +9,7 @@
 ⍝ * a package name ('APLTreeUtils2')
 ⍝ * Group name and package name ('aplteam-APLTreeUtils2')
 ⍝ * A fully qualified package ID ('aplteam-APLTreeUtils2-1.2.3')
+⍝ In case ID_ was not found an empty vector is returned.
  :If '@'∊ID_        ⍝ Is it an alias?
      'Invalid alias'Assert 0<≢ID_~'@'
      bool←(⊂ID_~'@')≡¨{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ''}¨list
@@ -26,7 +27,10 @@
          bool←(RemoveAlias¨list)≡¨⊂ID_
      :EndSelect
  :EndIf
- 'Could not find package'Assert 0<+/bool
- 'Ambiguous package name'Assert 1=+/bool
- ID←(⍸bool)⊃list
+ 'Ambiguous package name'Assert 1≥+/bool
+ :If 0=+/bool
+     ID←''
+ :Else
+     ID←(⍸bool)⊃list
+ :EndIf
 ⍝Done

@@ -1,5 +1,5 @@
  {buildList}←{append}SaveBuildList(buildList path alias);filename;ns;bool;b;b1;b2;new;old;b3;ind;groupNameMajor;topLevel;mat
-⍝ Takes a dependency tree (`buildlist`) and saved it into `path`.\\
+⍝ Takes a dependency tree (`buildlist`) and saves it into `path`.\\
 ⍝ The optional left argument `append` defaults to 1, meaning that `buildlist` is
 ⍝ appended to an already existing build list. If set to 0 an existing build list is replaced.
 ⍝ If `alias` is empty it has no effect. If it is not empty then the build list must carry exactly
@@ -34,11 +34,12 @@
  ns.url,←buildList[;3]
  ns.url←{'/'@(⍸'\'=⍵)⊢⍵}¨ns.url
  mat←⍉↑ns.(depth packageID url)
- (topLevel mat)←{b←1=⍵[;1] ⋄ (b⌿⍵)((~b)⌿⍵)}mat
+⍝ (topLevel mat)←{b←1=⍵[;1] ⋄ (b⌿⍵)((~b)⌿⍵)}mat
  mat←⊖mat[Reg.SortIndexForPackageIDs mat[;2];]
  groupNameMajor←Reg.RemoveMinorAndPatch¨mat[;2]
  b←(groupNameMajor⍳groupNameMajor)=⍳≢mat
  mat←b⌿mat
+ (topLevel mat)←{b←1=⍵[;1] ⋄ (b⌿⍵)((~b)⌿⍵)}mat
  mat←topLevel⍪mat
  ns.(depth packageID url)←↓⍉mat
  (⊂Reg.JSON ns)F.NPUT filename 1

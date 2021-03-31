@@ -1,4 +1,4 @@
- r←majorVersions CheckForLaterVersion_ fullPaths;fullPath;packageID;url;fullPath2
+ r←majorVersions CheckForLaterVersion_ fullPaths;fullPath;packageID;url;fullPath2;buff;packageID2
 ⍝ Takes a vector of fully qualified package paths (http or local) & checks for later versions.
 ⍝ `r` is a vector with fully qualified paths of any better versions, so possibly empty.
 ⍝ If `majorVersions` is 0 only minor and patch number are considered. If `majorVersions` is 1
@@ -15,8 +15,16 @@
      :Else
          fullPath2←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID)url
      :EndIf
-     :If packageID≢GetPackageIDFromFilename fullPath2
-         r,←⊂fullPath2
+     :If 0<≢fullPath2
+         packageID2←GetPackageIDFromFilename fullPath2
+     :AndIf packageID≢packageID2
+         buff←packageID packageID2
+         :If '.zip'≡⎕C ¯4↑fullPath2
+             buff,←⊂fullPath2
+         :Else
+             buff,←⊂{⍵↓⍨-'//'≡¯2↑⍵}(-+≢2⊃buff)↓fullPath2
+         :EndIf
+         r,←⊂buff
      :EndIf
  :EndFor
 ⍝Done

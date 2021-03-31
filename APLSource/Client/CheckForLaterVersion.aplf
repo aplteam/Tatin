@@ -1,4 +1,9 @@
- version←{majorVersions}CheckForLaterVersion path;buildFilename;topLevel;buildList
+ version←{majorVersions}CheckForLaterVersion y;buildFilename;topLevel;buildList;path;childrenFlag
+⍝ `y` can be one of:
+⍝ * Simple character vector: the path to a folder with installed packages
+⍝ * A nested vector of lenght 2:
+⍝   1. A path
+⍝   2. A Boolean that defines whther children should be checked or not (the default).
 ⍝ Checks whether there are later versions available for what's specified by `path`.\\
 ⍝ Requires to find a Tatin build list in `path`, otherwise it throws an error.\\
 ⍝ By default only minor and patch number are part of the check. By specifying 1 as left argument
@@ -6,10 +11,21 @@
 ⍝ This is used only in the user command since Tatin considers packages with different major
 ⍝ numbers to be different packages, and for good reasons.
  majorVersions←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'majorVersions'
+ :If 326=⎕DR y
+     '⍵ must be either a simple character vector (path) or a nested vector: path and childrenFlag'Assert 2=≢y
+     (path childrenFlag)←2↑y
+ :Else
+     path←y
+     childrenFlag←0
+ :EndIf
  path←Reg.AddSlash path
  buildFilename←path,Reg.BuildListFilename
  ('No file "',Reg.BuildListFilename,'" found in ',path)Assert F.IsFile buildFilename
  buildList←Reg.JSON⊃F.NGET buildFilename
- topLevel←1=buildList.depth
+ :If childrenFlag
+     topLevel←1
+ :Else
+     topLevel←1=buildList.depth
+ :EndIf
  version←majorVersions CheckForLaterVersion_ topLevel/buildList.url
  ⍝Done

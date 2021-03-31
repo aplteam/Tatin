@@ -169,7 +169,7 @@
           c←⎕NS ⍬
           c.Name←'CheckForLaterVersion'
           c.Desc←'Check whether there are better versions of a package available'
-          c.Parse←'1 -major'
+          c.Parse←'1 -major -dependencies'
           r,←c
      
           c←⎕NS ⍬
@@ -328,14 +328,15 @@
       r←⍪r
     ∇
 
-    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this
+    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this;dependencies
       r←''
       path←Arg._1
       majorFlag←Arg.major
+      dependencies←0 Arg.Switch Arg.dependencies
       :If majorFlag
           r←⍪majorFlag TC.CheckForLaterVersion path
       :Else
-          r←TC.CheckForLaterVersion path
+          r←TC.CheckForLaterVersion path dependencies
           r←⍪(0<≢¨r)/r
           :If 0  ⍝TODO⍝  May be one day we support this, may be not
               :If 0<≢r

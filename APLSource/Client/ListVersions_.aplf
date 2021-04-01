@@ -6,6 +6,12 @@
  request.URI←'/v1/packages/versions/',packageID
  request.Headers,←⊂'Accept' 'application/json'
  res←client SendAndReceive request
- ('Server signalled error ',(⍕res.StatusCode),' on ',uri)Assert 200=res.StatusCode
+ :If 200≠res.StatusCode
+     :If 0<≢res.Content
+         ('Server: ',res.Content)Assert 0
+     :Else
+         ('Failed with status code ',⍕res.StatusCode)Assert 0
+     :EndIf
+ :EndIf
  list←⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
 ⍝Done

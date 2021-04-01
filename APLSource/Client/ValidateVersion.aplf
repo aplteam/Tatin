@@ -1,9 +1,9 @@
  {r}←ValidateVersion version;bool;version2;ind;patch
  r←⍬
- '"version" is not a string'Assert 0 2∊⍨10|⎕DR version                      ⍝ Must be char
- '"version" is invalid'Assert 2≤'.'+.=version                               ⍝ At least two dots
- '"version" is ill-formed'Assert 0='-'+.={⍵↑⍨¯1+⍵⍳'.'}version               ⍝ No hyphen before the first dot
+ '"version" is not a string'Assert 0 2∊⍨10|⎕DR version                          ⍝ Must be char
+ '"version" is invalid'Assert 2≤'.'+.=version                                   ⍝ At least two dots
+ '"version" is ill-formed'Assert 0='-'+.={⍵↑⍨¯1+⍵⍳'.'}version                   ⍝ No hyphen before the first dot
  (version2 patch)←Reg.SplitVersionFromBuild version
  'Build number must be nothing but digits'Assert∧/patch∊⎕D
- '"version" is invalid'Assert 0≠≢'^\d+\.\d\.\d[\d\-a-zA-Z]*$'⎕S 0⊢version2  ⍝ Must be {no}.{no}.{patch}
+ '"version" is invalid'Assert 0≠≢'^\d+\.\d+\.\d[_\d\-a-zA-Z]*$'⎕S 0⊢version2    ⍝ Must be {no}.{no}.{patch}
  ⍝Done

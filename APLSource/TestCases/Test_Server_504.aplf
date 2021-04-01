@@ -1,4 +1,4 @@
- r←Test_Server_504(stopFlag batchFlag);⎕TRAP;dir;src;zip;serverPath;body;cfg;packageID;rc;msg;oldPolicy;qdmx;zipFilename
+ r←Test_Server_504(stopFlag batchFlag);⎕TRAP;dir;src;zip;serverPath;body;cfg;packageID;rc;msg;oldPolicy;zipFilename
 ⍝ Publish a non-beta package and attempt to delete it when the server's delete policy is "betas only"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -25,13 +25,9 @@
  →T.GoToTidyUp 0≠≢msg
 
  oldPolicy←∆SetServerPolicy'JustBetas'
- :Trap 98
-     (rc msg)←TC.DeletePackage'https://localhost/',packageID
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'This server allows only beta packages to be deleted'≢qdmx.EM
- :EndTrap
+ (rc msg)←TC.DeletePackage'https://localhost/',packageID
+ →T.GoToTidyUp rc≠405
+ →T.GoToTidyUp'Server: This server allows only beta packages to be deleted'≢msg
 
  r←T._OK
 

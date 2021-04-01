@@ -7,6 +7,12 @@
  request.URI←'/v1/delete-policy'
  request.Headers,←⊂'Accept' 'text/html'
  res←client SendAndReceive request
- res.Content Assert res.StatusCode≡200
+ :If 200≠res.StatusCode
+     :If 0<≢res.Content
+         ('Server: ',res.Content)Assert 0
+     :Else
+         ('Failed with status code ',⍕res.StatusCode)Assert 0
+     :EndIf
+ :EndIf
  r←res.Content
 ⍝Done

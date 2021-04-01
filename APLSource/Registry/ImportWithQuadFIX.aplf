@@ -1,0 +1,31 @@
+ {r}←ImportWithQuadFIX(sourcePath target);ref;parent;name;list;sourceFiles;sourceDirs;bool;i;target2;extensions
+ r←⍬
+ :If 0=⎕NC target
+     (parent name)←¯1 0↓¨'.'A.SplitPath target
+     name(⍎parent).⎕NS''
+ :EndIf
+ ref←⍎⍕target
+ :If F.IsDir sourcePath
+     :If 0<≢sourceFiles←F.ListFiles sourcePath,'/'
+         extensions←⎕C¨3⊃∘⎕NPARTS¨sourceFiles
+         bool←~extensions∊'.txt' '.json' '.dws'
+     :AndIf 0<≢sourceFiles←bool/sourceFiles
+         extensions←bool/extensions
+         bool←(extensions∊'.aplc' '.apln' '.apli' '.aplf' '.aplo' '.dyalog' '.dws')
+         {⍵:.}0<+/~bool     ⍝TODO⍝  Variables!!
+     :AndIf 0<≢sourceFiles←bool/sourceFiles
+         ref.{2 ⎕FIX'file://',⍵}¨sourceFiles
+         {}{5178⌶⍵}¨sourceFiles
+     :EndIf
+     sourceDirs←F.ListDirs sourcePath,'/'
+     :If 0<≢sourceDirs
+         :For i :In ⍳≢sourceDirs
+             target2←target,'.',(1+≢sourcePath)↓i⊃sourceDirs
+             ImportWithQuadFIX(i⊃sourceDirs)target2
+         :EndFor
+     :EndIf
+ :Else
+     2 ref.⎕FIX'file://',sourcePath
+     {}5178⌶sourcePath
+ :EndIf
+⍝Done

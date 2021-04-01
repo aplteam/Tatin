@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.22.0 - 2021-04-01
+⍝   * ]GetDeletePolicy polished and help added
 ⍝ * 0.21.0 - 2021-03-24
 ⍝   * User command "DeletePackage" added
 ⍝   * User command "GetDeletePolicy" added
@@ -187,7 +189,7 @@
           c←⎕NS ⍬
           c.Name←'GetDeletePolicy'
           c.Desc←'Asks the server about its "Delete" policy'
-          c.Parse←'1'
+          c.Parse←'1s'
           r,←c
      
           c←⎕NS ⍬
@@ -371,6 +373,10 @@
 
     ∇ r←GetDeletePolicy Arg;uri
       uri←Arg._1
+      :If 0≡Arg._1
+          →(⍬≡uri←SelectRegistry 0)/0
+      :EndIf
+      'The "Delete" policy can only be requested from a Tatin server'Assert TC.Reg.IsHTTP uri
       r←TC.GetDeletePolicy uri
     ∇
 
@@ -940,6 +946,9 @@
           r,←⊂''
           r,←⊂'Note that whether a package can be deleted or not depends on the delete policy of the given'
           r,←⊂'server. A server may allow no deletion at all, or just beta versions or everything.'
+      :Case ⎕C'GetDeletePolicy'
+          r,←⊂'Requests which "Delete" policy is operated by a server.'
+          r,←⊂'If no server is specified the user will be prompted, unless there is just one server anyway.'
       :Case ⎕C'Documentation'
           r,←⊂'Puts https://tatin.dev/v1/documentation into the default browser'
       :Else

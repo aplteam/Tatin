@@ -25,7 +25,7 @@
  paths←noBetas InstallPackage identifier tempFolder
  loaded←LoadDependencies tempFolder targetSpace
  :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨F.ListDirs tempFolder
-     F.RmDir tempFolder
+ ⍝TODO⍝      F.RmDir tempFolder   ⍝ We cannot do this anmore because ⎕FIX goes crazy then on scrioted namespaces (bug <01841>)
      :If 0<≢loaded
          {⍵.⎕FX'r←∆HOME' 'r←⍬'}¨loaded
      :EndIf

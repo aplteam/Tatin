@@ -11,7 +11,13 @@
  request.URI←'/v1/packages/dependencies/',packageID
  request.Headers,←⊂'Accept' 'application/json'
  res←client SendAndReceive request
- Assert 200≡res.StatusCode
+ :If 200≠res.StatusCode
+     :If 0<≢res.Content
+         ('Server: ',res.Content)Assert 0
+     :Else
+         ('Failed with status code ',⍕res.StatusCode)Assert 0
+     :EndIf
+ :EndIf
  :If 0<≢res.Content
  :AndIf 0<≢tree←{⍵.(LEVEL,[1.5]TREE)}⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
      tree[;1]+←level

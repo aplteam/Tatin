@@ -1,0 +1,23 @@
+ r←Test_Misc_013(stopFlag batchFlag);⎕TRAP;exec
+⍝ Exercise `DeletePackage` locally
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.4'
+ →T.PassesIf 0=≢TC.ValidateVersion'100.3.4'
+ →T.PassesIf 0=≢TC.ValidateVersion'1.300.4'
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.400'
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.4-Beta1'
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.4-Beta1+123'
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.4-Beta1.123'  ⍝ Deprecated but still...
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.4-Beta-1+123'
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.4-Beta_1+123'
+ →T.PassesIf 0=≢TC.ValidateVersion'1.3.4-That-particular-fix+123'
+
+ exec←{0::1 ⋄ 0⊣TC.ValidateVersion ⍵}
+ →T.PassesIf exec'1.3'
+ →T.PassesIf exec'1.2.3.4.5'
+ →T.PassesIf exec'1.2.3-betaß'                      ⍝ Not ANSI
+
+ r←T._OK
+⍝Done

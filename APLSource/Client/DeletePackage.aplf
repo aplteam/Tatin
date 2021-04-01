@@ -13,20 +13,20 @@
      request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri_).api_key)
      response←client SendAndReceive request
      :If response.StatusCode≢200
-         :If 405≡response.StatusCode
+         statusCode←response.StatusCode
+         :If 405≡statusCode
              :If 0<≢response.Content
-                 response.Content Assert 0
+                 errMsg←'Server: ',response.Content
              :ElseIf ∨/'http://'⍷uri_
-                 'http:// is not supported'Assert 0
+                 errMsg←'http:// is not supported'
              :Else
-                 'https:// is not supported'Assert 0
+                 errMsg←'https:// is not supported'
              :EndIf
          :Else
-             statusCode←response.StatusCode
              :If 0<≢response.Content
-                 errMsg←response.Content
+                 errMsg←'Server: ',response.Content
              :Else
-                 errMsg←'HTTP status code: ',⍕response.StatusCode
+                 errMsg←'Failed with status code ',⍕response.StatusCode
              :EndIf
          :EndIf
      :EndIf

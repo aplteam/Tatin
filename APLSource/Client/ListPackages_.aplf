@@ -27,12 +27,13 @@
  res←client SendAndReceive request
  :If 404≡res.StatusCode
      list←0 2⍴''⍬
- :Else
+ :ElseIf 200≠res.StatusCode
      :If 0<≢res.Content
-         ('Requesting files failed with status code ',⍕res.StatusCode)Assert 200=res.StatusCode
+         ('Server: ',res.Content)Assert 0
      :Else
-         res.Contewnt Assert 200=res.StatusCode
+         ('Failed with status code ',⍕res.StatusCode)Assert 0
      :EndIf
+ :Else
      list←Reg.APLfromJSON res.Content
  :EndIf
 ⍝Done

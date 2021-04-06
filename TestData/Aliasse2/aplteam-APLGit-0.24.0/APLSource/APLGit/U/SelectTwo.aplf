@@ -1,0 +1,32 @@
+ index←{caption}SelectTwo options;flag;answer;question
+⍝ Presents `options` as a numbered list and allows the user to select exactly two of them, or to quit.\\
+⍝ See also `Select`.\\
+⍝ `options` must not have more than 999 items.aa
+⍝ If the user aborts `index` is `⍬`, otherwise it is a two-element integer vector.
+ caption←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'caption'
+ 'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 11/⍨2≠≡options
+ 'Right argument has more than 999 items'⎕SIGNAL 11/⍨999<≢options
+ flag←0
+ index←⍬
+ :Repeat
+     ⎕←(⎕PW-1)⍴'-'
+     :If 0<≢caption
+         ⎕←caption
+     :EndIf
+     ⎕←⍪{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳⍴⍵),¨⍵}options
+     ⎕←''
+     :If 0<≢answer←⍞,0/⍞←question←'Select two items (q=quit) : '
+         answer←(⍴question)↓answer
+         :If 1=≢answer
+         :AndIf answer∊'qQ'
+             :Return
+         :EndIf
+         :If 2=≢answer←∪' 'A.Split A.DMB answer
+         :AndIf 2=≢answer←{⊃⊃(//)⎕VFI ⍵}¨answer
+         :AndIf ∧/answer∊⍳≢options
+             index←answer
+             flag←1
+         :EndIf
+     :EndIf
+ :Until flag
+⍝Done

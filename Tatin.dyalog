@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.23.0 - 2021-04-02
+⍝   * ]LoadDependencies now has an overwrite flag
 ⍝ * 0.22.0 - 2021-04-01
 ⍝   * ]GetDeletePolicy polished and help added
 ⍝ * 0.21.0 - 2021-03-24
@@ -116,8 +118,8 @@
      
           c←⎕NS ⍬
           c.Name←'LoadDependencies'
-          c.Desc←'Takes a folder with installed packages and loads all of them'
-          c.Parse←'2'
+          c.Desc←'Takes a folder (⍵[1]) with installed packages and loads all of them into ⍵[2].'
+          c.Parse←'2 -overwrite'
           r,←c
      
           c←⎕NS ⍬
@@ -164,8 +166,8 @@
      
           c←⎕NS ⍬
           c.Name←'Init'
-          c.Desc←'Re-establish the user settings'
-          c.Parse←''
+          c.Desc←'(Re)-establish the user settings'
+          c.Parse←'1s'
           r,←c
      
           c←⎕NS ⍬
@@ -310,9 +312,10 @@
       :EndIf
     ∇
 
-    ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn
+    ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag
       installFolder←Arg._1
       targetSpace←Arg._2
+      overwriteFlag←Arg.overwrite
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
@@ -326,7 +329,7 @@
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
-      r←TC.LoadDependencies installFolder targetSpace
+      r←TC.LoadDependencies installFolder targetSpace overwriteFlag
       r←⍪r
     ∇
 
@@ -484,8 +487,12 @@
       r←rawFlag TC.ListRegistries type
     ∇
 
-    ∇ {r}←Init ignored
-      r←TC.Init''
+    ∇ {r}←Init Arg
+      :If 0≡Arg._1
+          r←TC.Init''
+      :Else
+          r←TC.Init Arg._1
+      :EndIf
     ∇
 
     ∇ r←ListTags Arg;parms;registry
@@ -647,7 +654,7 @@
       (identifier installFolder)←Arg.(_1 _2)
       :If ~TC.F.IsDir installFolder
           :If 0=Arg.quiet
-          :AndIf 1 ∆YesOrNo'The install folder does not yet exist; create?'
+          :AndIf 1 ∆YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
               'Create!'TC.F.CheckPath installFolder
           :EndIf
       :EndIf
@@ -837,6 +844,9 @@
           r,←⊂'Takes two arguments:'
           r,←⊂'[1] A folder into which one or more packages have been installed.'
           r,←⊂'[2] A namespace into which the packages are going to be loaded.'
+          r,←⊂''
+          r,←⊂'By default a package is not loaded if it already exists. You can enforce the load by'
+          r,←⊂'specifying the -overwrite flag.'
       :Case ⎕C'UserSettings'
           r,←⊂'Prints the user settings to the session in JSON format.'
           r,←⊂'By default the API key is replaced by asterisks; specify -apikey to overwrite this.'
@@ -927,6 +937,9 @@
       :Case ⎕C'Init'
           r,←⊂'Re-establishes the user settings in ⎕SE. Call this in case the user settings got changed on file'
           r,←⊂'and you want to incorporate the changes in the current session.'
+          r,←⊂''
+          r,←⊂'Without an argument Init prcesses the default user settings file.'
+          r,←⊂'Insetad you can specify a directory that contains a file tatin-client.json as argument.'
       :Case ⎕C'CheckForLaterVersion'
           r,←⊂'Takes the path to a folder with a file "apl-buildlist.json" as argument.'
           r,←⊂'Checks the packages specified in that file for "better" versions.'

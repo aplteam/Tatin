@@ -23,8 +23,9 @@
  :EndIf
  identifier←ReplaceRegistryAlias identifier
  :If Reg.IsHTTP identifier
+     (alias identifier)←SplitAtAlias identifier
      path←{⍵↓⍨⍵⍳'/'}RemoveHttpProtocol identifier
-     ∆TREE.Data⍪←level path identifier
+     ∆TREE.Data⍪←level(alias,path)identifier
      level GetDependencyTreeViaHTTP identifier
  :Else
      (alias identifier)←SplitAtAlias identifier

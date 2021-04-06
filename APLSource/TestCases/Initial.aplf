@@ -1,6 +1,18 @@
- Initial dummy;clientCfg;dir;cfg;registry
- ∆SaveUserSettingsinQSE←⎕SE._Tatin.Client.MyUserSettings
- ∆CreateDefaultUserSettings
- #.Tatin.Client.∆PrintToSession←0
- ⎕SE._Tatin.Client.∆PrintToSession←0
+ r←Initial parms;clientCfg;dir;cfg;registry;tempDir;rc;msg;res
+ #.⎕EX'_tatin'
+ :If 0=≢parms
+ :OrIf 0=parms.batchFlag
+     :If 1 ∆YesOrNo'Make sure the test server runs; carry on?'
+         tempDir←∆GetConfigPathForTests
+         ∆CongaFolder←'./Assets/RunTime/Conga'
+         {}1 R.InitConga ∆CongaFolder
+         {}TC.InitUserSettings'./TestData'
+         (rc msg res)←∆UCMD'Init ./TestData'
+         #.Tatin.Client.∆PrintToSession←0
+         ⎕SE._Tatin.Client.∆PrintToSession←0
+         r←1
+     :Else
+         r←0
+     :EndIf
+ :EndIf
 ⍝Done

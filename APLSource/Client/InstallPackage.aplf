@@ -1,4 +1,4 @@
- paths←{noBetas}InstallPackage(identifier_ targetFolder)
+ packages←{noBetas}InstallPackage(identifier_ targetFolder)
  ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be one of:
@@ -10,10 +10,9 @@
 ⍝ You may omit either minor+patch or even major+minor+patch in order to install the latest version.
 ⍝ When the best version is to be determined then by default any beta versions are ignored. You can overwrite this by specifying a 1 as ⍺.
 ⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
-⍝ `←` paths to all packages installed with the first one being the "main" package, meaning that all the others (if any) are dependencies.
+⍝ `←` Full names of all packages installed with the first one being the "main" package, meaning that all the others (if any) are dependencies.
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
  '"targetFolder" is invalid'Assert F.IsDir⍕targetFolder
- paths←''
  (alias identifier_)←SplitAtAlias identifier_
  identifier←ReplaceRegistryAlias identifier_
  ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
@@ -33,10 +32,11 @@
      'ZIP files cannot be installed via HTTP'Assert 0
  :EndIf
  PrintToSession'  Establish dependencies...'
- :If 0<≢buildList←GetDependencyTree identifier
+ :If 0<≢buildList←GetDependencyTree alias,identifier
      PrintToSession'  ',(⍕≢buildList),' dependencies identified'
      CheckAlias targetFolder alias
      :For level packageID2 url :In ↓buildList
+         (alias packageID2)←SplitAtAlias packageID2
          installFolder←(Reg.AddSlash targetFolder),packageID2
          :If level=1
          :AndIf F.Exists installFolder
@@ -45,7 +45,6 @@
          :If 0=F.IsDir installFolder
              tempDir←InstallPackage_ packageID2 url
              installFolder ⎕NMOVE tempDir
-             paths,←⊂installFolder
              F.RmDir tempDir
          :EndIf
          :If 1=level
@@ -54,6 +53,7 @@
          :EndIf
      :EndFor
      PrintToSession'  Saving build list... '
-     SaveBuildList buildList targetFolder alias
+     buildList←SaveBuildList buildList targetFolder
+     packages←buildList[;2]
  :EndIf
 ⍝Done

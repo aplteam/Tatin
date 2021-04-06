@@ -1,0 +1,34 @@
+ r←Test_LX_005(stopFlag batchFlag);⎕TRAP;dir;body;src;cfg;zipFilename
+⍝ A buggy `lx` was not fully executed but the error is trapped (kept silent)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ src←dir,'/ns/'
+ F.MkDir src
+
+ body←'r←PI' 'r←3.14'
+ (⊂body)F.NPUT src,'/PI.aplf'
+
+ body←'r←foo y' '⍝ something useful goes here' 'GLOBAL←''Hello world''' '∘∘∘'
+ (⊂body)F.NPUT src,'/foo.aplf'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'LX' '1.0.0'
+ cfg.lx←'foo'
+ cfg.source←'ns/'
+ TC.WritePackageConfigFile dir cfg
+ zipFilename←TC.Pack dir dir
+
+ {}TC.LoadPackage zipFilename #.TEMP
+ →T.GoToTidyUp 0≠#._tatin.Example_LX_1_0_0.⎕NC'∆LX'
+ →T.GoToTidyUp 2≠#._tatin.Example_LX_1_0_0.code.⎕NC'GLOBAL'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -1,0 +1,24 @@
+ {r}←{x}Rollback y;project;folder;currentBranch;buff;more;rc
+⍝ ...
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ r←⍬
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ project←EstablishProject x
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ folder←2⊃project
+ 'Uncommitted changes.'⎕SIGNAL 11/⍨IsDirty folder
+ ∘∘∘  ⍝TODO⍝  Not read yet!
+ currentBranch←CurrentBranch folder
+ :If currentBranch≢'master'
+     (rc more buff)←folder U.RunGitCommand2'fetch origin master:master'
+     U.Assert 0=rc
+ :Else
+     (rc more buff)←folder U.RunGitCommand2'fetch origin'
+     U.Assert 0=rc
+     ∆TestFlag U.Show?
+     (rc more buff)←folder U.RunGitCommand2'merge --ff-only origin/master'
+     U.Assert 0=rc
+     ∆TestFlag U.Show?
+ :EndIf
+ r←⍪r
+⍝Doe

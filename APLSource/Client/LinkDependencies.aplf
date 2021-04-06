@@ -1,4 +1,4 @@
- {r}←LinkDependencies refs;ref;deps;root;destinations;bool;depName;destination;cfgs;cfg;list
+ {r}←LinkDependencies refs;ref;deps;root;destinations;bool;depName;destination;cfgs;cfg;list;dep;aliasOrName
 ⍝ Takes a list of refs, typically returned by `LoadPackage`, and establishes any required references
 ⍝ to dependencies within those refs.
 ⍝ `api` rules, but if it's empty then `name` is taken instead.
@@ -11,19 +11,21 @@
          :If 0<≢deps←Dependencies.Get⊃{0=≢⍺:⍵ ⋄ ⍺}/ref.(∆HOME ∆URI)
              deps←ReplaceRegistryAlias¨deps
              destinations←GetPackageIDFromFilename¨deps
+             destinations←2⊃¨SplitAtAlias¨destinations
              destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨destinations
              destinations←CheckWsPaths¨destinations
              cfgs←Reg.JSON¨destinations⍎¨⊂'∆CONFIG'
              :For cfg destination dep :InEach cfgs destinations deps
                  depName←{⍵↑⍨¯1+⍵⍳'-'}{⍵↓⍨⍵⍳'-'}GetPackageIDFromFilename dep
+                 aliasOrName←depName{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ⍺}dep
                  :If 0=≢cfg.api
                      :If 1≠≢list←↓⍎destination,'.code.⎕nl 9'
-                         depName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code'
+                         aliasOrName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code'
                      :Else
-                         depName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code.',1⊃list
+                         aliasOrName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code.',1⊃list
                      :EndIf
                  :Else
-                     depName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code.',cfg.api
+                     aliasOrName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code.',cfg.api
                  :EndIf
              :EndFor
          :EndIf

@@ -1,0 +1,40 @@
+ {r}←{x}AddToGitHub gitHubUrl;project;folder;buff;userid;rc;more
+⍝ Use this to add a new local repo to GitHub. You need a URL from GitHub for this,
+⍝ so first add it there before calling this function.\\
+⍝ Alternatively specify an empty right argument: in that case the function works out
+⍝ the project name from the current directory and prompts you for the GitHub user ID.
+⍝ In case the URL is empty it is built like this:\\
+⍝ ```
+⍝ https://github.com/{User}/{RepoName}.git
+⍝ ```
+⍝ **Do not** add a README.md on GitHub while creating the project; this causes problems.
+⍝ You may add a license however.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ r←⍬
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ project←EstablishProject x
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ folder←2⊃project
+ 'There are uncommitted changes'⎕SIGNAL 11/⍨IsDirty folder
+ :If 0=≢gitHubUrl
+     :Repeat
+         userid←{(⍴⍵)↓⍞,0/⍞←⍵}'GitHub user name: '
+     :Until 0≠≢userid
+     gitHubUrl←'https://github.com/',userid,'/',(2⊃⎕NPARTS F.PWD),'.git'
+ :EndIf
+ (rc more buff)←folder U.RunGitCommand2'remote add origin ',gitHubUrl
+ U.Assert rc=0
+ r,←⊂buff
+ ∆TestFlag U.Show buff
+ (rc more buff)←folder U.RunGitCommand2'remote -v'
+ U.Assert rc=0
+ r,←⊂buff
+ ∆TestFlag U.Show buff
+ (rc more buff)←folder U.RunGitCommand2'push -u origin master'
+ :If 'Branch ''master'' set up to track remote branch ''master'' from ''origin''.'≢∊buff
+     U.Assert rc=0
+ :EndIf
+ r,←⊂buff
+ ∆TestFlag U.Show buff
+ r←⍪r
+⍝Done

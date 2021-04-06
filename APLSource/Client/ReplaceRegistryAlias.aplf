@@ -7,8 +7,8 @@
      cfg←⍺
      txt←⍵
      2=≡txt:∇¨txt
-     '['≠1⍴txt:txt
      (alias txt)←SplitAtAlias txt
+     '['≠1⍴txt:alias,txt
      txt~←' '
      (offset end)←txt⍳'[]'
      txt←1↓(offset-1)⌽txt
@@ -20,5 +20,5 @@
      txt↓⍨←(⊃txt)∊'/\'
      f←~(¯1↑replaceBy)∊'/\'
      sep←f/'/'
-     (-offset-1)⌽replaceBy,sep,alias,txt
+     (-offset-1)⌽alias,replaceBy,sep,txt
  }

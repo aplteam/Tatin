@@ -1,0 +1,29 @@
+ r←{noPrompt}Push y;project;folder;branchName;more;rc
+⍝ Pushes all committed changes to GitHub.\\
+⍝ Do **not** use this function for the very first commit of a newly created repository.
+⍝ The user will be prompted unless the (optional) left argument is 1.\\
+⍝ Note that `MergeWithMaster` will execute `Push` if the user wants to.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ r←''
+ noPrompt←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noPrompt'
+ :If 0=≢project←EstablishProject y
+     'Not an acre project'⎕SIGNAL 6
+ :Else
+     folder←2⊃project
+     'There are uncommited changes - you cannot Push!'⎕SIGNAL 11/⍨0≠≢StatusShort folder
+     branchName←CurrentBranch folder
+     :If 0=1 U.CheckForHistoryFolder folder
+         11 ⎕SIGNAL⍨folder,U.NameOfHistoryFolder,' exists, Push cannot continue'
+     :EndIf
+     :If 0=noPrompt
+     :AndIf 0=U.YesOrNo'You are on branch <',branchName,'> in ',folder,' - carry on with "Push"?'
+         ∆TestFlag U.Show'No action taken'
+         :Return
+     :EndIf
+     (rc more r)←folder U.RunGitCommand2'push origin ',branchName
+     :If 0=≢('^To https://github.com/')⎕S 0⊣more  ⍝ Strangely GitHub reports something starting with this on the error stream...
+         more U.Assert 0=rc
+     :EndIf
+     ∆TestFlag U.Show r
+ :EndIf
+⍝Done

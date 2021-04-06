@@ -97,7 +97,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ol start="1">
 <li>It looks for a file <code>.tatin</code> in that folder.
 <p>If the file exists and is not empty then it is expected to point to a user settings file, and Tatin will go for that file.</p>
-<p>We will discuss soon under which circumstances such a file might spring into existence.</p></li>
+<p>We will discuss soon under which circumstances such a file might be useful.</p></li>
 <li>In case there is no file <code>.tatin</code> in that folder, or the file is empty, Tatin will look for a user settings file in the default folder.
 <ul>
 <li>If that file exists then Tatin will instantiate it</li>
@@ -155,9 +155,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Let's assume that you work for a company “MyCompany”, and that this company entertains a Tatin Server with the URL https://tatin.mycompany.com.</p>
-<p>In order to add that Registry to the user settings file you must first instantiate the <code>DefineRegistry</code> class. You may specify the URL and the alias in different ways, execute</p>
+<p>In order to add that Registry to the user settings file you must first instantiate the <code>DefineRegistry</code> class. You may specify the URL and the alias in several ways; for details on the <code>DefineRegistry</code> class execute this:</p>
 <pre><code>]adoc ⎕se.Tatin.DefineRegistry</code></pre>
-<p>for details on that class.</p>
 <p>We will pass a simple text vector that specifies the alias (between <code>[]</code>) and the URI:</p>
 <pre><code>      #.myReg←⎕NEW ⎕SE.Tatin.DefineRegistry (,⊂'[myc]https://tatin.mycompany.com')
       #.myReg.varsList
@@ -215,7 +214,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>There might be scenarios when the default location for the user config file is not suitable for you.</p>
 <ul>
-<li>If you cannot save the Tatin user settings file in its default location due to, say,  company constraints, then of course it need to go elsewhere.</li>
+<li>If you cannot make frequent changes to the Tatin user settings file in its default location (because of red tape) due to, say,  company constraints, then of course it need to go elsewhere.</li>
 <li>Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 <p>You could still use the default location, but because that location is user specific, every user would require her own user settings file, which is something you might or might not want to avoid.</p></li>
 </ul>
@@ -241,7 +240,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Make-the-switch-permanent">Make the switch permanent</h3>
 </a>
 </div>
-<p>In order to make the user settings file we have created and manipulated in the workspace the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file <code>.tatin</code> in the default folder (that's the one returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code>) contains a path pointing to that folder.</p>
+<p>In order to make this user settings file the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file <code>.tatin</code> in the default folder (that's the one returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code>) contains a path pointing to that folder.</p>
 <p>You can do this yourself, but you can also ask the instance for doing the job for you:</p>
 <pre><code>      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile</code></pre>
 <p>From now on the file <code>MyUserSettings.path2config</code> is pointing to will be used to determine the user settings.</p>

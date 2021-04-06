@@ -1,0 +1,13 @@
+ {r}←ExecutePackageLX(installFolder targetSpace tree);packageID;url;alias;path;saveIn;cfg
+⍝ Checks for all packages in `tree` whether "lx" exists as a config parameter and is not empty.
+⍝ If that's the case it is supposed to be the name of a function that will be executed.
+ r←⍬
+ :For packageID url :In ↓tree[;2 3]
+     (alias packageID)←{~'@'∊⍵:''⍵ ⋄ '@'(≠⊆⊢)⍵}packageID
+     path←installFolder,'/',packageID
+     cfg←ReadPackageConfigFile path
+     saveIn←GetTatinRootSpace targetSpace
+     saveIn,←'.',1 GetPackageIDFromFilename path
+     ExecutePackageLX_ saveIn cfg installFolder
+ :EndFor
+⍝Done

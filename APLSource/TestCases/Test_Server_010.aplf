@@ -1,15 +1,16 @@
- r←Test_Server_010(stopFlag batchFlag);⎕TRAP;installFolder;paths;listOfPackages
+ r←Test_Server_010(stopFlag batchFlag);⎕TRAP;installFolder;listOfPackages;packageIDs;listOfPackages2
  ;filename;q
 ⍝ Install a package from the server
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  installFolder←GetTempDir'/Installed Packages'
- paths←TC.InstallPackage'https://localhost/aplteam-FilesAndDirs-3.2.2'installFolder
+ packageIDs←TC.InstallPackage'https://localhost/aplteam-FilesAndDirs-3.2.2'installFolder
 
  filename←installFolder,'/',Reg.DependenciesFilename
  listOfPackages←F.ListDirs installFolder
- →T.GoToTidyUp~paths ∆LazyMatchPaths listOfPackages
+ listOfPackages2←TC.GetPackageIDFromFilename¨listOfPackages
+ →T.GoToTidyUp~packageIDs ∆LazyMatchPaths listOfPackages2
 
  r←T._OK
 

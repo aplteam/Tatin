@@ -1,0 +1,40 @@
+ r←Test_LX_004(stopFlag batchFlag);⎕TRAP;dir;body;src;cfg;zipFilename;installFolder
+⍝ There should be a vars ∆LX because there is a monadic `lx` function, and it should be its right argument
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ src←dir,'/ns/'
+ F.MkDir src
+
+ body←'r←PI' 'r←3.14'
+ (⊂body)F.NPUT src,'/PI.aplf'
+
+ body←'r←foo y' '⍝ something useful goes here' 'GLOBAL←''Hello world''' 'r←y'
+ (⊂body)F.NPUT src,'/foo.aplf'
+
+ (⊂'Bla')F.NPUT dir,'/goo.txt'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'LX' '1.0.0'
+ cfg.lx←'foo'
+ cfg.assets←'goo.txt'
+ cfg.source←'ns/'
+ TC.WritePackageConfigFile dir cfg
+ zipFilename←TC.Pack dir dir
+
+ installFolder←TC.LoadPackage zipFilename #.TEMP
+ →T.GoToTidyUp 3.14≢#.TEMP.LX.PI
+ →T.GoToTidyUp 2≠#._tatin.Example_LX_1_0_0.⎕NC'∆LX'
+ →T.GoToTidyUp #._tatin.Example_LX_1_0_0.∆LX≢installFolder
+ →T.GoToTidyUp 2≠#._tatin.Example_LX_1_0_0.code.⎕NC'GLOBAL'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert 0=⊃F.RmDir installFolder
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

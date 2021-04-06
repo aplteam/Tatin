@@ -1,4 +1,4 @@
- Cleanup;F;folder
+ Cleanup;F;folder;configFolder;rc;msg;res
  ##.Client.⎕EX'∆PrintToSession'
  ##.Admin.⎕EX¨'∆DIRS' '∆FILES'
  ⎕SE._Tatin.Client.⎕EX'∆PrintToSession'
@@ -6,7 +6,11 @@
  folder←(739⌶0),'/TatinTests/'
  F.RmDir folder
  ⎕DL 0.2
- ⎕SE._Tatin.Client.MyUserSettings←∆SaveUserSettingsinQSE
- ⎕EX'∆SaveUserSettingsinQSE'
+ (rc msg res)←∆UCMD'Init '
+ Assert 0=rc
  Assert~F.IsDir folder
+ {}TC.InitUserSettings''
+ ⎕EX'∆CongaFolder'
+
+ ⎕EX'∆__UserSettings'
 ⍝Done

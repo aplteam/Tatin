@@ -1,0 +1,29 @@
+ r←{x}Log noOf;project;folder;buff;cmd;msg;rc
+⍝ Returns a matrix with four columns and zero to many rows:\\
+⍝ 1. Hash of the commit
+⍝ 2. User ID
+⍝ 3. Timestamp
+⍝ 4. Message\\
+⍝ With `noOf` you can limit the result to the last (youngest) `noOf` commits.
+⍝ If you want all commits specify a 0.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ See also `LogForBranch`, `LogShort` and `LogDetails`.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ 'Invalid right argument'⎕SIGNAL 11/⍨1≠≡,noOf
+ 'Invalid right argument'⎕SIGNAL 11/⍨~(⎕DR noOf)∊83 163 323
+ :If 0≠≢project←EstablishProject x
+     folder←2⊃project
+     :If 0=noOf
+         cmd←'log --pretty=format:"',U.GetLogFormat,'"'
+     :Else
+         cmd←'log -',(⍕|noOf),' --pretty=format:"',U.GetLogFormat,'"'
+     :EndIf
+     (rc msg buff)←folder U.RunGitCommand2 cmd
+     msg U.Assert 0=rc
+     :If 0=≢buff
+         r←0 4⍴''
+     :Else
+         r←↑U.FormatLog buff
+     :EndIf
+ :EndIf
+⍝Done

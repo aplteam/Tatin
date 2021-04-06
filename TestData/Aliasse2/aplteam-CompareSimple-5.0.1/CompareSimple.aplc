@@ -1,0 +1,860 @@
+:Class CompareSimple
+⍝ ## Overview
+⍝ ### Comparing
+⍝ `CompareSimple` offers a bunch of shared methods helpful to compare functions, operators and scripts.
+⍝ Sources of those objects may by in the current workspace or on file (SALT/script files).\\
+⍝ ### Comparing
+⍝ The actual comparison can be done by one of:
+⍝ * "Beyond Compare" (commercially available: <http://www.scootersoftware.com>)
+⍝ * "CompareIt!" (commercially available: <http://aplwiki.com/CompareIt>)\\
+⍝ In order to find the compare utility you must specify one or both of:
+⍝ * `pathToBeyondCompare`
+⍝ * `pathToCompareIt`\\
+⍝ If only one of them is set it is obvious which tool to use. If you set
+⍝ both you **must** also set "CompareTool" to either "BeyondCompare" or
+⍝ "CompareIt!", otherwise an error is thrown.\\
+⍝ Note that with version 2.4 the default tool is now "Beyond Compare" because
+⍝ "CompareIt!" is not under active development any more and has caused issues
+⍝ recently. It is therefore deprecated and will be removed in a future version.
+⍝ ## Features
+⍝ `CompareSimple` offers just methods to...
+⍝ * compare an APL object with a file.
+⍝ * compare two files.
+⍝ * create a DIFF report with CompareIt!.\\
+⍝ ## Compare versus CompareSimple
+⍝ `Compare` is a superset of `CompareSimple`.
+⍝ Compare offers much more features but is also much bigger and more
+⍝ complicated. If `CompareSimple` suits your needs, take it. If
+⍝ not then have a look at `Compare`.\\
+⍝ Author: Kai Jaeger ⋄ APL Team Ltd\\
+⍝ Homepage: <https://github.com/aplteam/CompareSimple>
+
+    ⎕IO←1 ⋄ ⎕ML←1
+
+    ∇ r←Version
+      :Access Public shared
+      r←'CompareSimple' '5.0.1+30' '2021-03-03'
+    ∇
+
+    ∇ History
+      :Access Public shared
+      ⍝ * 5.0.1
+      ⍝   * Package config corrected
+      ⍝ * 5.0.0
+      ⍝   * BREAKING CHANGES:
+      ⍝     * `refToUtils` removed. All dependencies are now expected to be siblings of the class.
+      ⍝     * `SetChanged` now returns 1 in case acre was interested and 0 otherwise.
+      ⍝   * Internal changes:
+      ⍝     * Does not handle ANSI files anymore
+      ⍝     * Couple of private functions deleted that are not used any longer
+      ⍝\\
+      ⍝ For information regarding older versions see <https://github.com/aplteam/CompareSimple/releases>
+    ∇
+
+    :Field Public Shared regPathToCompareIt←'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Compare It!_is1\InstallLocation' ⍝ Where to start "CompareIt!" from
+    :Field Public Shared regPathToBeyondCompare←'HKEY_LOCAL_MACHINE\SOFTWARE\Classes\BeyondCompare.SettingsPackage\shell\open\command'
+    :Field Public Shared regPath←'HKEY_CURRENT_USER\Software\APLTree\Compare\'
+
+    :Property compareTool
+    :Access Public Shared
+        ∇ r←get
+          r←{6::'' ⋄ ⍎⍵}'_compareTool'
+        ∇
+        ∇ set arg
+          ⎕SIGNAL 11/⍨~(⊂arg.NewValue)∊'CompareIt!' 'BeyondCompare' ''
+          _compareTool←arg.NewValue
+        ∇
+    :EndProperty
+
+    :Property pathToCompareIt
+    :Access Public Shared
+        ∇ r←get
+          r←{6::'' ⋄ ⍎⍵}'_pathToCompareIt'
+        ∇
+        ∇ set arg
+          _pathToCompareIt←arg.NewValue
+          ##.WinReg.PutString(regPath,'\PathToCompareIt!')_pathToCompareIt
+        ∇
+    :EndProperty
+
+    :Property pathToBeyondCompare
+    :Access Public Shared
+        ∇ r←get
+          r←{6::'' ⋄ ⍎⍵}'_pathToBeyondCompare'
+        ∇
+        ∇ set arg
+          _pathToBeyondCompare←arg.NewValue
+          ##.WinReg.PutString(regPath,'\PathToBeyondCompare')_pathToBeyondCompare
+        ∇
+    :EndProperty
+
+    ∇ filename←WriteAplObjToFile aplObjName;errMsg;body
+      :Access Public Shared
+    ⍝ `aplObjName` is written to a temp file. `aplObjName` may be one of:
+    ⍝ * Function name (trad or direct).
+    ⍝ * Operator name (trad or direct).
+    ⍝ * Script (class, interface, namespace) by name or by reference.
+      aplObjName←⍕aplObjName ⍝ just in case it is a ref
+      errMsg←'Right argument seems not to be one of: APL fns/opr/class/interface/scripted namespace'
+      errMsg ⎕SIGNAL 11/⍨~((2=⎕NC'body')∧0=⎕NC aplObjName)∨(⎕NC⊂aplObjName)∊3.1 3.2 3.3 4.1 4.2 9.4 9.5 9.1
+      errMsg ⎕SIGNAL 11/⍨~3 4 9∊⍨⎕NC⍕aplObjName
+      body←{9=⎕NC ⍵:⎕SRC⍎⍵ ⋄ ⎕NR ⍵}aplObjName
+      filename←WriteToFile⍕¨body  ⍝ The "⍕" is needed for idioms/assigned fns/opr
+    ∇
+
+    ∇ filename←WriteToFile text;errMsg
+      :Access Public Shared
+    ⍝ `text` is written to a temp file.
+    ⍝
+    ⍝ The name of the temp file is returned as the result and is build
+    ⍝ up from the current time, the current user and the extension ".txt".
+    ⍝ It's situated in the Windows temp dir.
+    ⍝
+    ⍝ Use this to write APL code to a file.
+      filename←##.FilesAndDirs.GetTempPath,(' '~⍨⍕⎕TS),(⍕?1000),'_',⎕AN,'.dyalog'
+      (⊂text)##.FilesAndDirs.NPUT filename 1
+    ∇
+
+    ∇ r←CreateParmsFor_These
+      :Access Public Shared
+      ⍝ Create a command space with the default settings of "These"
+      r←⎕NS''
+      r.readOnly1←0
+      r.readOnly2←0
+      r.alias1←''
+      r.alias2←''
+      r.reportFile←''
+      r.acreFlag←0
+      r.⎕FX'r←List;⎕IO' '⎕IO←⎕ML←0' 'r←{(⍵,[.5]⎕nc¨⊂¨⍵),⍎¨⍵}(⊂''List'')~⍨⎕NL-2 9 3' ⍝ Vars, refs and niladic functions
+    ∇
+
+    ∇ {changeFlag}←{parms}These y;ref1;ref2;b;l;ref1IsRef;ref2IsRef;ref2Is_FN;ref1Is_FN;temp_FN1;isSalt1;isSalt2;FN_1;fno1
+      ;range1;dates1;temp_FN2;FN_2;fno2;range2;dates2;file2;saveDel1;saveDel2;body;bodies;lineNo;res;rc;G;cmd;f;file1;buffer
+      :Access Public Shared
+          ⍝ Compare two "things" with each other.
+          ⍝
+          ⍝ * Syntax I.: `(ref1 [ref2])←y`
+          ⍝ * Syntax II.: `(name1 [name2])←y`
+          ⍝ * Syntax III.: `(name ["file://",filename])←y`
+          ⍝ * Syntax IV.: Just one name or one ref (`[2]` is then `SALT_Data`)
+          ⍝
+          ⍝ Note that any references must point to scripts. `These` cannot deal with
+          ⍝ ordinary namespaces (refs or names, it doesn't matter); see `Compare.Merge`
+          ⍝ for this.
+          ⍝
+          ⍝ ## Compares y[1] with y[2].
+          ⍝
+          ⍝ If `y[2]` is omitted, `y[1]` is compared with `y[1].(∆|SALT_Data).SourceFile`.
+          ⍝
+          ⍝ That means that in this special case `y[1]` **must** be a ref to
+          ⍝ a script, and that `∆` (or `SALT_Data`) **must** be available in `y[1]`,
+          ⍝ of course.
+          ⍝
+          ⍝ `y[1]` as well as `y[2]` can be any of:
+          ⍝
+          ⍝ * Reference to a script in the workspace.
+          ⍝ * Name of a function, operator or script in the workspace.
+          ⍝ * Name of a script file (\*.dyalog).
+          ⍝
+          ⍝ The left argument can be a command space with all sorts of parameters.
+          ⍝
+          ⍝ By default, any changes made in CompareIt! are taken into account.
+          ⍝
+          ⍝ By default, the names (APL ones or filenames) are used in CompareIt!
+          ⍝ as alias names but you can overwrite the, see next paragraph.
+          ⍝
+          ⍝ The following parameters can by specified from outside by passing a command space
+          ⍝ as a left argument:
+          ⍝
+          ⍝ `readOnly1`, `readOnly2`, `alias1`, `alias2`, `reportChanges`, `componentNo`
+          ⍝
+          ⍝ Example:
+          ⍝ ~~~
+          ⍝ parms←⎕ns ''
+          ⍝ parms.readOnly1←0
+          ⍝ parms.alias1←'foo'
+          ⍝ parms.alias2←'blah
+          ⍝
+          ⍝ parms #.Compare.These #.Compare
+          ⍝ ~~~
+          ⍝
+          ⍝ ## Explict Result
+          ⍝ If `y[1]` and/or `y[2]` are **not** read-only, any changes made by  the user
+          ⍝ are automatically taken into account, meaning that either the object in the
+          ⍝ workspace or the underlying file is updated by `These`. Now under some
+          ⍝ circumstances the caller might want to be notified about such changes, for
+          ⍝ examples if she has created the file itself. This is what the explicit result
+          ⍝ is reporting back: If nothing at all has changed, it's (0 0), if both got
+          ⍝ changed, it is (1 1).
+     
+      :If 1=≡y
+      :AndIf 2=+/⊃∨/' ⎕SE.' ' #.'⍷¨⊂' ',⍕y
+          (ref1 ref2)←y
+      :Else
+          y←,{0 1∊⍨≡⍵:⊂⍵ ⋄ y}y
+          (ref1 ref2)←2↑y,⊂''
+      :EndIf
+      G←CreateParmsFor_These
+      :If 9=⎕NC'parms'
+      :AndIf 0≠≢l←parms.⎕NL-2
+          :If ∨/b←~l∊G.⎕NL-2
+              11 ⎕SIGNAL⍨'Invalid left argument: ',{1↓∊','∘,¨⍵}b/l
+          :EndIf
+          'G'⎕NS(⊂'parms.'),¨parms.⎕NL-2
+      :EndIf
+      changeFlag←0 0
+     
+      (ref1 ref2)←{IsRef ⍵:⍵ ⋄ 9.5 9.4∊⍨|⎕NC⊂⍵:⍎⍵ ⋄ {⍵/⍨~(∧\' '=⍵)∨⌽∧\' '=⌽⍵}⍵}¨ref1 ref2
+      (ref1 ref2)←{⍬≡⍴⍵:⍵
+          (1⍴⍵)∊'#⎕':⍵
+          (':'∊⍵):⍵
+          ('\\'≡(2⌊⍴,⍵)↑⍵):⍵
+          0=≢⍵:⍵
+          (2⊃⎕NSI),'.',⍵}¨ref1 ref2
+      f←9 9=⊃∘⎕NC¨⍕¨ref1 ref2                   ⍝ If they are both name class 9 but...
+      f∧←IsNotScript¨ref1 ref2                  ⍝ ... not a script then they are ordinary namespaces...
+     
+      :If ∨/f
+          :If ∧/f
+              11 ⎕SIGNAL⍨'"These" cannot process ordinary namespaces; use `Compare.Merge` instead.'
+          :Else
+              11 ⎕SIGNAL⍨'"These" cannot process any ordinary namespace: ',(⍕⊃f/ref1 ref2),'; use `Compare.Merge` instead.'
+          :EndIf
+      :Else
+          :If 0=≢⍕ref2 ⍝ Special case: only y[1] was specified, so let's look for (∆|SALT_Data).SourceFile
+              :If 0=f[1] ⍝ Is it a script?
+                  :If 0<(|⎕NC(⍕ref1),'.SALT_Data.SourceFile')
+                      ref2←'file://',⍕(GetRefToSaltNS⍎⍕ref1).SourceFile
+                      readOnly2←1 ⍝ only this makes sense!
+                  :Else
+                      11 ⎕SIGNAL⍨'Nothing to compare with: "',(⍕ref1),'"'
+                  :EndIf
+              :Else
+                  'Invalid right argument'⎕SIGNAL 11
+              :EndIf
+          :EndIf
+     
+          (ref1IsRef ref2IsRef)←IsRef¨ref1 ref2
+          (ref1 ref2)←ref1IsRef ref2IsRef{⍺:GetRealHome ⍵ ⋄ ⍵}¨ref1 ref2
+          (ref1Is_FN ref2Is_FN)←IsFile¨ref1 ref2
+          temp_FN1←temp_FN2←⍬                                           ⍝ Temp filenames
+          isSalt1←{~(|⎕NC⊂⍵)∊9.1 9.4 9.5:0 ⋄ 1=0<|⎕NC ⍵,'.∆':1 ⋄ 0<|⎕NC ⍵,'.SALT_Data'}ref1
+          isSalt2←{~(|⎕NC⊂⍵)∊9.1 9.4 9.5:0 ⋄ 1=0<|⎕NC ⍵,'.∆':1 ⋄ 0<|⎕NC ⍵,'.SALT_Data'}ref2
+     
+          :If ref1Is_FN
+              FN_1←('file://'){⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⎕C ⍵}ref1
+          :Else
+              :If 0=≢temp_FN1 ⍝ then we are coming back again
+                  temp_FN1←WriteAplObjToFile ref1
+                  FN_1←''
+              :EndIf
+          :EndIf
+          :If ref2Is_FN
+              FN_2←('file://'){⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⎕C ⍵}ref2
+          :Else
+              FN_2←WriteAplObjToFile ref2
+              temp_FN2←''
+          :EndIf
+          file1←(1+0=≢temp_FN1)⊃temp_FN1 FN_1
+          file2←(1+0=≢temp_FN2)⊃temp_FN2 FN_2
+          :If isSalt1
+              saveDel1←{' '=1↑0⍴∊⍵:'''',⍵,'''' ⋄ ⍕⍵}{(⊂l~¨' '),⍺⍺¨⍵.⍎¨l←↓⍵.⎕NL 2}(GetRefToSaltNS⍎⍕ref1)
+          :EndIf
+          :If isSalt2
+              saveDel2←{' '=1↑0⍴∊⍵:'''',⍵,'''' ⋄ ⍕⍵}{(⊂l~¨' '),⍺⍺¨⍵.⍎¨l←↓⍵.⎕NL 2}(GetRefToSaltNS⍎⍕ref2)
+          :EndIf
+          G.alias1{0=≢⍺:⍵ ⋄ ⍺}←ref1
+          G.alias2{0=≢⍺:⍵ ⋄ ⍺}←ref2
+     
+          ('File not found: ',file1)⎕SIGNAL 11/⍨~##.FilesAndDirs.Exists file1
+          ('File not found: ',file2)⎕SIGNAL 11/⍨~##.FilesAndDirs.Exists file2
+          :Select WhichTool ⍬
+          :Case 'CompareIt!'
+              :If 0=≢G.reportFile
+                  cmd←''
+                  cmd,←⊂##.FilesAndDirs.NormalizePath file1
+                  cmd,←⊂##.FilesAndDirs.NormalizePath file2
+                  cmd,←⊂G.readOnly1∨(Is33 ref1)
+                  cmd,←⊂G.readOnly2∨(Is33 ref2)
+                  cmd,←⊂G.alias1
+                  cmd,←⊂G.alias2
+                  changeFlag←0≠≢¨bodies←RunCompareIt cmd
+              :Else
+                  cmd←''
+                  cmd,←⊂##.FilesAndDirs.NormalizePath file1
+                  cmd,←⊂##.FilesAndDirs.NormalizePath file2
+                  cmd,←⊂G.reportFile
+                  RunCompareItReport cmd
+              :EndIf
+          :Case 'BeyondCompare'
+              'Path to Beyond Compare is unknown'⎕SIGNAL 6/⍨0=≢pathToBeyondCompare
+              cmd←''
+              cmd,←⊂##.FilesAndDirs.NormalizePath file1
+              cmd,←⊂##.FilesAndDirs.NormalizePath file2
+              cmd,←⊂G.readOnly1∨(Is33 ref1)
+              cmd,←⊂G.readOnly2∨(Is33 ref2)
+              cmd,←ref1 ref2
+              :If 0=≢G.reportFile
+                  changeFlag←0≠≢¨bodies←RunBeyondCompare cmd
+              :Else
+                  changeFlag←0≠≢¨bodies←G.reportFile RunBeyondCompare cmd
+              :EndIf
+          :EndSelect
+     
+          :If ∨/changeFlag
+              :If 1⊃changeFlag
+                  body←1⊃bodies
+                  :If ref1Is_FN
+                      (⊂body)⎕⍎nput FN_1 1
+                  :Else
+                      :If (|⎕NC ref1)∊3 4
+                          lineNo←body{⍵.⎕FX ⍺}⍎{⍵↓⍨-'.'⍳⍨⌽⍵}ref1
+                          ⍎(' '≠1↑0⍴lineNo)/'. ⍝ ⎕FX has failed, check "lineNo"'
+                          :If G.acreFlag
+                              SetChanged ref1
+                          :EndIf
+                      :Else
+                          :Trap 0
+                              res←body{⍵.⎕FIX ⍺}⍎{⍵↓⍨-'.'⍳⍨⌽⍵}ref1
+                              :If (⍕res)≢ref1
+                                  . ⍝ Something is not quite right!
+                              :EndIf
+                              :If G.acreFlag
+                                  SetChanged ref1
+                              :EndIf
+                          :Else
+                              ShowMsg'Fixing your changes failed, please check'
+                              →∆EditAgain
+                          :EndTrap
+                          :If isSalt1
+                              :If 9=|⎕NC(⍕ref1),'.∆'
+                                  ⍎ref1,'.∆←⎕ns'''''
+                                  (⍎ref1).∆.{⍎¨(1⊃⍵),¨'←',¨1↓⍵}saveDel1
+                              :Else
+                                  ⍎ref1,'.SALT_Data←⎕ns'''''
+                                  (⍎ref1).SALT_Data.{⍎¨(1⊃⍵),¨'←',¨1↓⍵}saveDel1
+                              :EndIf
+                          :EndIf
+                      :EndIf
+                  :EndIf
+              :EndIf
+              :If 2⊃changeFlag
+                  body←2⊃bodies
+                  :If ref2Is_FN
+                      (⊂body)##.FilesAndDirs.NPUT FN_2 1
+                  :Else
+                      :If (|⎕NC ref2)∊3 4
+                          lineNo←body{⍵.⎕FX ⍺}⍎{⍵↓⍨-'.'⍳⍨⌽⍵}ref2
+                          ⍎(' '≠1↑0⍴lineNo)/'. ⍝ ⎕FX has failed, check "lineNo"'
+                          :If G.acreFlag
+                              SetChanged ref2
+                          :EndIf
+                      :Else
+                          res←body{⍵.⎕FIX ⍺}⍎{⍵↓⍨-'.'⍳⍨⌽⍵}ref2
+                          :If (⍕res)≢ref2
+                              . ⍝ Something is not quite right!
+                          :EndIf
+                          :If G.acreFlag
+                              SetChanged ref2
+                          :EndIf
+                      :EndIf
+                  :EndIf
+              :EndIf
+          :EndIf
+          {0=≢⍵:shy←0 ⋄ ##.FilesAndDirs.DeleteFile ⍵}¨temp_FN1 temp_FN2
+      :EndIf
+    ∇
+
+
+    ∇ bool←{x}Match y;body_x;fileNo;body_y;SaltNS
+      :Access Public Shared
+      ⍝ `x` and `y` might be:
+      ⍝ * a name of a fns/opr or a script, either from a namespace or a class.
+      ⍝ * a reference to a script.
+      ⍝ * a native file holding either a class or a namespace script.\\
+      ⍝ `bool ←→ 1` if `x` and `y` are equal. Note that before actually comparing the two
+      ⍝ of them, all leading and all trailing blanks are removed from the code.\\
+      ⍝ Note that filenames **must** start with `file://` if they do not contain
+      ⍝ one of these: `\` & `/` & `:`.\\
+      ⍝ Note that the left argument is optional. However, you can omit the left
+      ⍝ argument only when you specify a reference to a script as right argument.\\
+      ⍝ If it's omitted, the vars SALT_Data.SourceFilename is taken.
+      :If 0=|⎕NC'x'
+          'Right argument is not a reference'⎕SIGNAL 11/⍨⍬≢⍴y
+          'Right argument must be a ref to a class or an interface or a scripted namespace'⎕SIGNAL 11/⍨~(|⎕NC⊂⍕y)∊9.1 9.4 9.5
+          ('Could not find "(∆|Salt_Data).SourceFile" in ',⍕y)⎕SIGNAL 11/⍨~2∊(|y.⎕NC'∆.SourceFile'),(|y.⎕NC'SALT_Data.SourceFile')
+          SaltNS←⍎((⊃∘|y.⎕NC¨'∆' 'SALT_Data')⍳9)⊃'y.∆' 'y.SALT_Data'
+          ('"SourceFile" in ',(⍕SaltNS),' is empty')⎕SIGNAL 11/⍨0=≢x←'file://',SaltNS.SourceFile
+      :EndIf
+      :If 'file://'{⍺≡(⍴⍺)↑⍵}⎕C⍕x
+      :OrIf ∨/':/\'∊⍕x ⍝ these chars cannot be part of an APL name, so they indicate a file
+          x←'file://'{⍵↓⍨(⍴⍺)×⍺≡(⍴,⍺)↑⍵}⍕x
+          body_x←⊃##.FilesAndDirs.NGET x 1
+          body_x←RemoveLeadingAndTrailingBlanks body_x
+      :Else
+          body_x←⍬
+          :Trap 0
+              :If (|⎕NC⊂⍕x)∊9.1 9.4 9.5
+                  body_x←RemoveLeadingAndTrailingBlanks ⎕SRC⍎⍕x
+              :EndIf
+          :EndTrap
+          :If ⍬≡body_x
+              body_x←RemoveLeadingAndTrailingBlanks ⎕NR x ⍝ fns/opr?!
+          :EndIf
+      :EndIf
+      :If 'file://'{⍺≡(⍴⍺)↑⍵}⎕C⍕y
+      :OrIf ∨/':/\'∊⍕y ⍝ these chars cannot be part of an APL name, so they indicate a file
+          x←'file://'{⍵↓⍨(⍴⍺)×⍺≡(⍴,⍺)↑⍵}⍕x
+          body_y←⊃##.FilesAndDirs.NGET y 1
+          body_y←RemoveLeadingAndTrailingBlanks body_y
+      :Else
+          body_y←⍬
+          :Trap 0
+              :If (|⎕NC⊂⍕y)∊9.1 9.4 9.5
+                  body_y←RemoveLeadingAndTrailingBlanks ⎕SRC⍎⍕y
+              :EndIf
+          :EndTrap
+          :If ⍬≡body_y
+              body_y←RemoveLeadingAndTrailingBlanks ⎕NR y ⍝ fns/opr?!
+          :EndIf
+      :EndIf
+      bool←body_x≡body_y
+    ∇
+
+    ∇ {r}←{reportFile}RunCompareIt y;path;readonlyFlag;compNo;oldBodyLeft;newBody;ask;oldBodyRight;cmd;more;rc;ps
+      :Access Public Shared
+    ⍝ Runs CompareIt! against filename1 and filename2.
+    ⍝
+    ⍝ The right argument:
+    ⍝ 1. filename1
+    ⍝ 2. filename2
+    ⍝ 3. (optional) read-only flag 1 (default=1)
+    ⍝ 4. (optional) read-only flag 2 (default=0)
+    ⍝ 5. (optional) source1
+    ⍝ 6. (optional) source2
+    ⍝ 8. (optional) Wait flag.
+    ⍝
+    ⍝ Always returns a two-element-vector:
+    ⍝ * [1] contents of filename1 or empty
+    ⍝ * [2] contents of filename2 or empty
+    ⍝
+    ⍝ If the contents wasn't changed or read-only was 1 the
+    ⍝ corresponding item is empty.
+    ⍝
+    ⍝ -------------------
+    ⍝ The result can be used to establish any changes in the
+    ⍝ workspace if appropriate.
+      reportFile←{(0<⎕NC ⍵):⍎⍵ ⋄ ''}'reportFile'
+      r←'' ''
+      ps←⎕NS''
+      ps.(filename1 filename2 readonlyFlag1 readonlyFlag2 source1 source2 waitFlag)←7↑y,(⍴,y)↓'' '' 1 0 '' '' 1
+      :If 2=|≡ps.source2
+          (ps.source2 compNo)←ps.source2
+      :EndIf
+      'Filename(s) must not be empty!'⎕SIGNAL 11/⍨∨/0∊⊃∘⍴¨ps.filename1 ps.filename2
+      '"readonlyFlag1" is not a Boolean'⎕SIGNAL 11/⍨~∧/ps.readonlyFlag1∊0 1
+      '"readonlyFlag2" is not a Boolean'⎕SIGNAL 11/⍨~∧/ps.readonlyFlag2∊0 1
+      (ps.readonlyFlag1 ps.readonlyFlag2)←↑¨ps.readonlyFlag1,ps.readonlyFlag2
+      :If 0=≢ps.source1
+          ps.source1←ps.filename1
+      :EndIf
+      :If 0=≢ps.source2
+          ps.source2←ps.filename2
+      :EndIf
+      :If ~ps.readonlyFlag1
+          oldBodyLeft←ReadFile ps.filename1
+      :EndIf
+      :If ~ps.readonlyFlag2
+          oldBodyRight←ReadFile ps.filename2
+      :EndIf
+      ((ps.source1=' ')/ps.source1)←'_'
+      ((ps.source2=' ')/ps.source2)←'_'
+      :If 0=≢pathToCompareIt
+          {}FindCompareIt 0
+      :EndIf
+      cmd←pathToCompareIt,' '
+      cmd,←'"',(ps.filename1~'"'),'" /=',ps.source1,' '
+      cmd,←'"',(ps.filename2~'"'),'" /=',ps.source2
+      cmd,←' /N'
+      :If ~0=≢reportFile
+          cmd,←' /G:UW0 "',(reportFile~'¨'),'" '
+      :EndIf
+      :If ps.readonlyFlag1∧ps.readonlyFlag2
+          cmd,←' /R'
+      :Else
+          cmd,←(ps.readonlyFlag1/' /R1'),((ps.readonlyFlag2/' /R2 '))
+      :EndIf
+      (rc more)←ps.waitFlag Run cmd
+      ({0 1∊⍨≡⍵:⍵ ⋄ 1⊃⍵}more)⎕SIGNAL 11/⍨rc>99
+      :If ~ps.readonlyFlag1
+          :If oldBodyLeft≢newBody←ReadFile ps.filename1
+              r[1]←⊂newBody
+          :EndIf
+      :EndIf
+      :If ~ps.readonlyFlag2
+          :If oldBodyRight≢newBody←ReadFile ps.filename2
+              r[2]←⊂newBody
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {r}←{reportFile}RunBeyondCompare y;path;source2;source1;filename1;filename2;readonlyFlag;compNo;oldBodyLeft;newBody;ask;readonlyFlag2;readonlyFlag1;oldBodyRight;cmd;more;rc
+      :Access Public Shared
+    ⍝ Runs BeyondCompare against filename1 and filename2.
+    ⍝
+    ⍝ The right argument:
+    ⍝ 1. filename1
+    ⍝ 2. filename2
+    ⍝ 3. (optional) read-only flag 1 (default=1)
+    ⍝ 4. (optional) read-only flag 2 (default=0)
+    ⍝ 5. (optional) source1
+    ⍝ 6. (optional) source2
+    ⍝
+    ⍝ Always returns a two-element-vector:
+    ⍝ * [1] contents of filename1 or empty
+    ⍝ * [2] contents of filename2 or empty
+    ⍝
+    ⍝ If the contents wasn't changed or read-only was 1 the
+    ⍝ corresponding item is empty.
+    ⍝
+    ⍝ -------------------
+    ⍝ The result can be used to establish any changes in the
+    ⍝ workspace if appropriate.
+      r←'' ''
+      reportFile←{(0<⎕NC ⍵):⍎⍵ ⋄ ''}'reportFile'
+      (filename1 filename2 readonlyFlag1 readonlyFlag2 source1 source2)←6↑y,(⍴,y)↓'' '' 1 0 '' ''
+      :If 2=|≡source2
+          (source2 compNo)←source2
+      :EndIf
+      'Filename(s) must not be empty!'⎕SIGNAL 11/⍨∨/0∊⊃∘⍴¨filename1 filename2
+      '"readonlyFlag1" is not a Boolean'⎕SIGNAL 11/⍨~∧/readonlyFlag1∊0 1
+      '"readonlyFlag2" is not a Boolean'⎕SIGNAL 11/⍨~∧/readonlyFlag2∊0 1
+      (readonlyFlag1 readonlyFlag2)←↑¨readonlyFlag1,readonlyFlag2
+      :If 0=≢source1
+          source1←filename1
+      :EndIf
+      :If 0=≢source2
+          source2←filename2
+      :EndIf
+      :If ~readonlyFlag1
+          :If ##.FilesAndDirs.Exists filename1
+              oldBodyLeft←⊃##.FilesAndDirs.NGET filename1 1
+          :Else
+              oldBodyLeft←''
+          :EndIf
+      :EndIf
+      :If ~readonlyFlag2
+          :If ##.FilesAndDirs.Exists filename2
+              oldBodyRight←⊃##.FilesAndDirs.NGET filename2 1
+          :Else
+              oldBodyRight←''
+          :EndIf
+      :EndIf
+      cmd←'"',pathToBeyondCompare,'" '
+      cmd,←'"',(filename1~'"'),'" /title1="',(source1~'"'),'" '
+      cmd,←'"',(filename2~'"'),'" /title2="',(source2~'"'),'" '
+      cmd,←' /N'
+      cmd,←' /fv="Text Compare"'
+      cmd,←' /solo'
+      :If readonlyFlag1∧readonlyFlag2
+          cmd,←' /ro'
+      :Else
+          cmd,←(readonlyFlag1/' /ro1'),((readonlyFlag2/' /ro2 '))
+      :EndIf
+      :If ~0=≢reportFile
+          cmd,←' /automerge /silent /closescript /force /output-options=HTML /output-to="',(reportFile~'"'),'"'
+      :EndIf
+      (rc more)←1 Run cmd
+      ({0 1∊⍨≡⍵:⍵ ⋄ 1⊃⍵}more)⎕SIGNAL 11/⍨rc>99
+      :If ~readonlyFlag1
+          :If oldBodyLeft≢newBody←⊃##.FilesAndDirs.NGET filename1 1
+              r[1]←⊂newBody
+          :EndIf
+      :EndIf
+      :If ~readonlyFlag2
+          :If oldBodyRight≢newBody←⊃##.FilesAndDirs.NGET filename2 1
+              r[2]←⊂newBody
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ RunCompareItReport(filename1 filename2 reportFile);cmd;rc;more
+      :Access Public Shared
+    ⍝ Runs CompareIt! against filename1 and filename2.
+    ⍝
+    ⍝ The right argument:
+    ⍝ 1. filename1
+    ⍝ 2. filename2
+    ⍝ 3. The name of a file that takes a report.
+    ⍝
+      'Filename(s) must not be empty!'⎕SIGNAL 11/⍨∨/0∊⊃∘⍴¨filename1 filename2
+      {}FindCompareIt 1
+      cmd←pathToCompareIt,' '
+      cmd,←'"',(filename1~'"'),'" '
+      cmd,←'"',(filename2~'"'),'" '
+      cmd,←' /G:UW0 "',(reportFile~'¨'),'" '
+      cmd,←
+      cmd,←
+      (rc more)←1 Run cmd
+      more ⎕SIGNAL 11/⍨rc≠0
+      ⍝Done
+    ∇
+
+    ∇ {r}←FindCompareIt askUserFlag;parms;ourRegKey
+      :Access Public Shared
+      parms←''
+      parms,←⊂regPath,'\PathToCompareIt!'       ⍝ Our own Registry key (if any)
+      ourRegKey←'Computer\HKEY_CLASSES_ROOT\Applications\wincmp3.exe\shell\open\command' ⍝ The tool's Registry key (if any)
+      parms,←⊂ourRegKey
+      parms,←⊂pathToCompareIt                   ⍝ Path
+      parms,←⊂'Compare It!'                     ⍝ The default location
+      parms,←⊂'wincmp3.exe'                     ⍝ The EXEs name
+      parms,←⊂askUserFlag                       ⍝ Flag: shall be bother the user if we cannot work it out ourselves?
+      parms,←⊂'Select CompareIt!''s EXE:'       ⍝ Caption of the "File Select" dialog box
+      pathToCompareIt←r←FindCompareTool parms
+    ∇
+
+    ∇ {r}←FindBeyondCompare askUserFlag;parms;ourRegKey
+      :Access Public Shared
+      parms←''
+      parms,←⊂regPath,'\PathToBeyondCompare'    ⍝ Our own Registry key (if any)
+      ourRegKey←'HKEY_CURRENT_USER\Software\Scooter Software\Beyond Compare 4\ExePath' ⍝ The tool's Registry key (if any)
+      parms,←⊂ourRegKey
+      parms,←⊂pathToBeyondCompare               ⍝ Path
+      parms,←⊂'Beyond Compare 4'                ⍝ The default location
+      parms,←⊂'bcompare.exe'                    ⍝ The EXEs name
+      parms,←⊂askUserFlag                       ⍝ Flag: shall be bother the user if we cannot work it out ourselves?
+      parms,←⊂'Select BeyondCompare''s EXE:'    ⍝ Caption of the "File Select" dialog box
+      pathToBeyondCompare←r←FindCompareTool parms
+    ∇
+
+    ∇ {r}←FindCompareTool(ourRegKey vendorRegKey path defaultLocation exeName askUserFlag caption);rk;flag
+    ⍝ Tries to find out somehow where the compare tool is located.
+    ⍝ The function returns its findings as result.
+    ⍝ In case the function can't work it out AND the right argument is 1 then _
+    ⍝ the user is asked. This is always the case when `CompareSimple` itself calls _
+    ⍝ this functions but when you call it yourself you can prevent that from _
+    ⍝ happening - your choice
+    ⍝ When the functions fails to find the compare tool it throws an exception.
+      :If 0=≢path                                                   ⍝ Do we already know? (path is either pathToCompareIt or pathToBeyondCompare)
+      :OrIf 0=##.FilesAndDirs.Exists path                   ⍝ Or did we believe we know but we don't?!
+          path←##.WinReg.GetString ourRegKey                ⍝ Have we saved something ourselves?
+          :If 0={0∊≢⍵:0 ⋄ ##.FilesAndDirs.Exists ⍵}path
+              path←##.WinReg.GetString vendorRegKey         ⍝ The vendor might have saved the path in the Registry
+              :If 0=≢path                                           ⍝ No he didn't!
+              :OrIf 0=##.FilesAndDirs.Exists path           ⍝ Yes he did but the path is incorrect anyway
+                  path←(ExpandEnv'%ProgramFiles(x86)%'),'\',defaultLocation,'\',exeName ⍝ Standard location on a 64bit Windows
+                  :If ##.FilesAndDirs.Exists path           ⍝ Is it available there?!
+                      path←'"',(path~'"'),'"'                       ⍝ Prepare proper path
+                  :Else
+                      path←(ExpandEnv'%ProgramFiles%'),'\',defaultLocation,'\',exeName ⍝ Standard location on a 32bit Windows
+                      :If ##.FilesAndDirs.Exists path
+                          path←'"',(path~'"'),'"'                   ⍝ Prepare proper path
+                      :ElseIf askUserFlag
+                          path←SelectFile caption exeName           ⍝ We are running out of options - ask user
+                      :EndIf
+                  :EndIf
+                  flag←0=≢path                                      ⍝ The moron doesn't...
+                  flag∨←~##.FilesAndDirs.Exists path~'"'    ⍝ ...know either?!
+                  ('Cannot find ',exeName)⎕SIGNAL flag/6
+                  path←'"',(path~'"'),'"'                           ⍝ Prepare proper path
+              :EndIf
+          :EndIf
+      :EndIf
+      r←path
+    ∇
+
+    ∇ r←Exec statement
+      :Access Public Shared
+    ⍝ Useful to test non-public functions
+      r←⍎statement
+    ∇
+
+ ⍝⍝⍝⍝⍝ Private stuff
+
+    ∇ r←FormatTS ts
+      r←{
+          0=≢⍵:''
+          0=+/⍵:''
+          ,'ZI4,<->,ZI2,<->,ZI2,< >,ZI2,<:>,ZI2,<:>,ZI2'⎕FMT,[0.5]6↑⍵
+      }ts
+    ∇
+
+    ∇ {R}←{wait}Run cmd;∆WAIT;windowStyle;wsh;rc
+        ⍝ Starts an application
+        ⍝ By default, Run waits for the app to quit.
+      R←0 ''
+      wait←{0<|⎕NC ⍵:⍎⍵ ⋄ 1}'wait'
+      'Invalid left argument: must be a Boolean'⎕SIGNAL 11/⍨~wait∊0 1
+      windowStyle←8 ⍝ is WINDOWSTYLE.NORMAL
+      'wsh'⎕WC'OLEClient' 'WScript.Shell'
+      :Trap 0
+          rc←wsh.Run cmd windowStyle wait
+      :Else
+          R←1('.'⎕WG'LastError')
+          :Return
+      :EndTrap
+      R←rc''
+    ∇
+
+    ∇ flag←{caption}YesOrNo question;∆;ms
+      caption←{0<|⎕NC ⍵:'Compare: ',⍎⍵ ⋄ 'Compare'}'caption'
+      ∆←⊂'MsgBox'
+      ∆,←⊂caption
+      ∆,←⊂'Text'question
+      ∆,←⊂'Style' 'Query'
+      ∆,←⊂'Event'('MsgBtn1' 'MsgBtn2')1
+      'ms'⎕WC ∆
+      flag←'MsgBtn1'≡2⊃⎕DQ'ms'
+    ∇
+
+    ∇ {r}←{caption}ShowMsg question;∆;ms
+      r←⍬
+      caption←{0<|⎕NC ⍵:'Compare: ',⍎⍵ ⋄ 'Compare'}'caption'
+      ∆←⊂'MsgBox'
+      ∆,←⊂caption
+      ∆,←⊂'Text'question
+      ∆,←⊂'Style' 'Info'
+      ∆,←⊂'Event'('MsgBtn1')1
+      'ms'⎕WC ∆
+      {}⎕DQ'ms'
+    ∇
+
+      IsNotScript←{
+⍝ Takes a name (⍵) and returns a 1 in case it's not a script, otherwise 0
+⍝ The check is performed in ⍺ (ref to a namespace)
+          ⍺←#
+          (0=≢,⍵):1
+          (9≠|⍺.⎕NC⍕⍵):1
+          0::1
+          ¯1≡⍺:⎕SIGNAL 11
+          {0}⍺.⎕SRC ⍺.⍎⍕⍵
+      }
+
+      GetRefToSaltNS←{
+          9=|⎕NC(⍕⍵),'.∆':⍵⍎'∆'
+          9=|⎕NC(⍕⍵),'.SALT_Data':⍵⍎'SALT_Data'
+          ⍬
+      ⍝ Returns a ref to ⍵.∆ if that is a namespace or
+      ⍝ a ref to ⍵.SALT_Data if that is a namespace or
+      ⍝ an empty vector.
+      }
+
+    IsRef←{(0=≡⍵)∧⍵≢⍕⍵}                             ⍝ Used to identify references
+    IsFile←{(∨/':/\'∊⍵)∨'file://'{⍺≡(⍴⍺)↑⍵}⍵}       ⍝ Used to identify filename
+    ∇ r←RemoveLeadingAndTrailingBlanks r
+      :If 0 1∊⍨≡r
+          r/⍨←~(∧\' '=r)∧⌽∧\' '=⌽r
+      :Else
+          r←{⍵/⍨~(∧\' '=⍵)∨⌽∧\' '=⌽⍵}¨r
+      :EndIf
+    ∇
+
+    ∇ R←ExpandEnv Y;ExpandEnvironmentStrings;f;⎕IO
+    ⍝ If Y does not contain any "%", Y is passed untouched.
+    ⍝ In case Y is empty R is empty as well.
+    ⍝ Example:
+    ⍝ <pre>'C:\Windows\MyDir' ←→ #.WinSys.ExpandEnv '%WinDir%\MyDir'</pre>
+      ⎕IO←0
+      :If '%'∊R←Y
+          'ExpandEnvironmentStrings'⎕NA'I4 KERNEL32.C32|ExpandEnvironmentStrings',('*A'⊃⍨12>{⍎⍵↑⍨⍵⍳'.'}1⊃'.'⎕WG'APLVersion'),' <0T >0T I4'
+          f←80=⎕DR' '           ⍝ Unicode version? (used to double the buffer size)
+          R←1⊃ExpandEnvironmentStrings(Y(f×1024)(f×1024))
+      :EndIf
+    ∇
+
+    ∇ R←SelectFile(caption exeName);∆;res;flag;directory
+    ⍝ Let the user select a certain EXE for comparison
+      flag←0
+      directory←SelectProperStartDir ⍬
+      :Repeat
+          R←''
+          ∆←⊂'FileBox'
+          ∆,←⊂'Caption'caption
+          ∆,←⊂'FileMode' 'Read'
+          ∆,←⊂'Filters'(⊂'*.exe' 'Executables')
+          ∆,←⊂'Event'('FileBoxOk' 'FileBoxCancel')1
+          ∆,←⊂'Directory'directory
+          'ff'⎕WC ∆
+          res←⎕DQ ff
+          :If 'FileBoxOK'≡2⊃res
+              :If 0≠≢ff.File
+              :AndIf ≡/⎕C exeName ff.File
+                  R←3⊃res
+                  flag←1
+              :EndIf
+              directory←ff.Directory
+          :Else
+              flag←1
+          :EndIf
+      :Until flag
+    ∇
+
+      WhichTool←{
+          (0≠≢compareTool):compareTool              ⍝ That take precedence
+          (0≠≢pathToBeyondCompare):'BeyondCompare'  ⍝ The defaullt if we know where it is
+          (0≠≢pathToCompareIt):'CompareIt!'         ⍝ Fine as well if we know where it is
+          _←FindBeyondCompare 1
+          (0≠≢pathToBeyondCompare):'BeyondCompare'  ⍝ The defaullt if we know where it is
+          _←FindCompareIt 1
+          (0≠≢pathToCompareIt):'CompareIt!'         ⍝ Fine as well if we know where it is
+          'Comparison tool is undefined or location is unknown'⎕SIGNAL 6
+      }
+
+      SelectProperStartDir←{
+          (0≠≢b←2 ⎕NQ'.' 'GetEnvironment' 'ProgramFiles(x86)'):b
+          (0≠≢b←2 ⎕NQ'.' 'GetEnvironment' 'ProgramFiles'):b
+          ##.FilesAndDirs.PWD
+      }
+
+      GetRealHome←{
+          ⍵{(⍺.⎕DF ⍵)⊢⍕⍺}⍵.⎕DF ⎕NULL
+    ⍝ format ref - sans ⎕DF
+    ⍝ ⍵ ns-ref
+    ⍝ ← format of ns-ref - full path name
+    ⍝   ignoring ⎕DF by using it twice!
+    ⍝ Phil Last ⍝ 2008-03-13 23:14
+      }
+
+      Is33←{
+    ⍝ Returns 1 in case ⍵ is pointing to an idiom or assigned fns/opr (name class 3.3)
+    ⍝ ⍵ can be one of:
+    ⍝ #.MyNamespace.foo
+    ⍝ #.MyClass.foo
+    ⍝ file://c:temp.dyalog
+          ('file://'{⍺≡(⍴⍺)↑⍵}⎕C ⍵):0
+          3.3=⊃{(⍎⍺).⎕NC⊂⍵}/⍵{(⍵↓⍺)(1↓⍵↑⍺)}-(⌽⍵)⍳'.'
+      }
+
+    ∇ r←ReadFile filename;qdmx
+  ⍝ Reads filename, no matter whether it's a UTF-8 file or a UTF16LE file.
+  ⍝ Returns `''` in case the file does not eixst.
+      r←''
+      :If ##.FilesAndDirs.Exists filename
+          :Trap 11
+              r←⊃##.FilesAndDirs.NGET filename 1
+          :Else
+              :Trap 11 92
+                  r←↑'UTF16LE'##.FilesAndDirs.NGET filename 1
+              :Else
+                  qdmx←⎕DMX
+                  qdmx.EM ⎕SIGNAL qdmx.EN
+              :EndTrap
+          :EndTrap
+      :EndIf
+    ∇
+
+    ∇ {r}←SetChanged name;result
+    ⍝ Tells acre that `name` got changed. Returns 1 in case acre was interested and 0 otherwise.
+      r←0
+      :If r←0<⎕SE.⎕NC'acre'
+          result←⎕SE.UCMD'acre.SetChanged ',name
+          :If 0=≢result
+              ⎕←'Acre was told that "',name,'" got changed but wasn''t interested...'
+          :Else
+              r←1
+          :EndIf
+      :EndIf
+    ∇
+
+:EndClass

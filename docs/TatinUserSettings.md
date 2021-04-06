@@ -50,7 +50,7 @@ If the constructor does not get a fully qualified name of the user settings file
 
    If the file exists and is not empty then it is expected to point to a user settings file, and Tatin will go for that file.
 
-   We will discuss soon under which circumstances such a file might spring into existence.
+   We will discuss soon under which circumstances such a file might be useful.
 
 2. In case there is no file `.tatin` in that folder, or the file is empty, Tatin will look for a user settings file in the default folder.
 
@@ -107,13 +107,11 @@ Let's add a made-up registry.
 
 Let's assume that you work for a company "MyCompany", and that this company entertains a Tatin Server with the URL https://tatin.mycompany.com.
 
-In order to add that Registry to the user settings file you must first instantiate the `DefineRegistry` class. You may specify the URL and the alias in different ways, execute 
+In order to add that Registry to the user settings file you must first instantiate the `DefineRegistry` class. You may specify the URL and the alias in several ways; for details on the `DefineRegistry` class execute this:
 
 ```
 ]adoc ⎕se.Tatin.DefineRegistry
 ``` 
-
-for details on that class.
 
 We will pass a simple text vector that specifies the alias (between `[]`) and the URI:
 
@@ -175,7 +173,7 @@ W> The simple reason is that under certain circumstances Tatin scans all Registr
 
 There might be scenarios when the default location for the user config file is not suitable for you.
 
-* If you cannot save the Tatin user settings file in its default location due to, say,  company constraints, then of course it need to go elsewhere.
+* If you cannot make frequent changes to the Tatin user settings file in its default location (because of red tape) due to, say,  company constraints, then of course it need to go elsewhere.
 
 * Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 
@@ -205,7 +203,7 @@ Notes:
 
 ### Make the switch permanent
 
-In order to make the user settings file we have created and manipulated in the workspace the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
+In order to make this user settings file the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
 
 You can do this yourself, but you can also ask the instance for doing the job for you:
 

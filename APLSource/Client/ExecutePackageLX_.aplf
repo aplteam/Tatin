@@ -1,0 +1,20 @@
+ {r}←ExecutePackageLX_(name cfg homePath);ref;valence
+⍝ Checks whether "lx" exists as a config parameter and is not empty.
+⍝ If that's the case it is supposed to be the name of a function that will be executed.
+ r←⍬
+ :If 2=cfg.⎕NC'lx'
+ :AndIf 0<≢cfg.lx
+     ref←⍎name,'.code'
+     'Package LX is set but it is not a function'Assert 3=ref.⎕NC cfg.lx
+     :Trap 0
+         valence←1 2⊃ref.⎕AT cfg.lx
+         :If 0=valence      ⍝ Niladic fn
+             ref.##.∆LX←ref.{6::⍬ ⋄ ⍎⍵}cfg.lx
+         :ElseIf 1=valence  ⍝ Monadic fn
+             ref.##.∆LX←homePath ref.{6::⍬ ⋄ ⍎⍵}cfg.lx,' ''',homePath,''''
+         :Else
+             'lx is neither a niladic nor a monadic function'Assert 0
+         :EndIf
+     :EndTrap
+ :EndIf
+⍝Done

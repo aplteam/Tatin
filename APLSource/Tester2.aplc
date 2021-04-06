@@ -22,11 +22,16 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.1.2+93' '2021-03-08'
+      r←'Tester2' '3.1.3+98' '2021-04-02'
     ∇
 
     ∇ History
-      :Access Public shared 
+      :Access Public shared
+      ⍝ * 3.1.3 ⋄ 2021-04-02
+      ⍝   * Bug fixes
+      ⍝     * In case an `Initial` function returned a 0 this causes a VALUE ERROR later
+      ⍝     * When an `Initial` function returned a 0 no `Cleanup` function was executed, neither the general nor
+      ⍝       any group specific one.
       ⍝ * 3.1.2 ⋄ 2021-03-08
       ⍝   * Bug fix: in case a test suite was quit by sending `QuitEvent`, a generic `Cleanup` function was executed
       ⍝     but on group-specific one, if there is any due.
@@ -471,13 +476,13 @@
       _INI←⍬                    ⍝ Flatten any leftovers
       :If 0<ps.⎕NC'list'        ⍝ Then no test cases got executed, probably because `Initial` failed.
           (rc2 log)←ReportTestResults ps
-          :If rc≠2
+          :If rc2≠2
               rc←rc2
           :EndIf
           _ref.TestCasesExecutedAt←A.FormatDateTime ⎕TS
           ShowLog'Time of execution recorded on variable ',(⍕_ref),'.TestCasesExecutedAt as: ',_ref.TestCasesExecutedAt
       :EndIf
-      {}ExecuteCleanup⍣(0<≢ps.list)⊣_ref ps
+      {}ExecuteCleanup _ref ps
       :If 0<≢_codeCoverage
           :If 0=≢res←_codeCoverage.Finalyze 1
               ⎕←'Coverage report: nothing to report'
@@ -721,6 +726,7 @@
               :EndIf
               (continueFlag i noOf)←HandleInitialize(ref ps currentGroup i noOf)
               :If continueFlag
+                  HandleCleanup ref ps currentGroup i
                   :Continue
               :EndIf
               rc←ExecuteTestFunction ref ps testNo testFns
@@ -759,7 +765,7 @@
                   :EndIf
               :EndIf
           :Case QuitEvent
-              HandleCleanup ref ps currentGroup i 
+              HandleCleanup ref ps currentGroup i
               ⎕SIGNAL QuitEvent
           :Else
               ps.errCounter+←1
@@ -773,7 +779,7 @@
                   ps.ref2Gui.∆n.Grid.Values[i;4]←⊂'{Broken}'
               :EndIf
           :EndTrap
-           HandleCleanup ref ps currentGroup i 
+          HandleCleanup ref ps currentGroup i
           {}⎕WA  ⍝ Enforce a memory compaction in order to get rid of any rubbish.
           :If ps.guiFlag
           :AndIf 0=ps.ref2Gui.∆n.∆Closed

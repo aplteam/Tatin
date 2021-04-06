@@ -1,0 +1,35 @@
+ {r}←ImportWithQuadFIX_1(sourcePath target);ref;parent;name;list;sourceFiles;sourceDirs;bool;i;target2;extensions;refs;rc
+⍝ This works in principle but creates zombies from classes and scripted namespaces; see <01841> and <01843>
+ r←⍬
+ :If 0=⎕NC target
+     (parent name)←¯1 0↓¨'.'A.SplitPath target
+     name(⍎parent).⎕NS''
+ :EndIf
+ ref←⍎⍕target
+ sourcePath←##.FilesAndDirs.NormalizePath sourcePath
+ :If F.IsDir sourcePath
+     :If 0<≢sourceFiles←F.ListFiles sourcePath,'/'
+         extensions←⎕C¨3⊃∘⎕NPARTS¨sourceFiles
+         bool←~extensions∊'.txt' '.json' '.dws'
+     :AndIf 0<≢sourceFiles←bool/sourceFiles
+         extensions←bool/extensions
+         bool←(extensions∊'.aplc' '.apln' '.apli' '.aplf' '.aplo' '.dyalog' '.dws')
+         {⍵:.}0<+/~bool     ⍝TODO⍝  Variables!!
+     :AndIf 0<≢sourceFiles←bool/sourceFiles
+         refs←(⊂(⍕ref),'.'),¨ref.{⊃2 ⎕FIX'file://',⍵}¨sourceFiles
+         rc←{5178⌶⍵}¨refs
+         'Breaking the link between file and APL object failed'Assert∧/rc
+     :EndIf
+     sourceDirs←F.ListDirs sourcePath,'/'
+     :If 0<≢sourceDirs
+         :For i :In ⍳≢sourceDirs
+             target2←target,{0=≢⍵:⍵ ⋄ '.',⍵}({(≢⍵)+~(¯1↑⍵)∊'/\'}sourcePath)↓i⊃sourceDirs
+             ImportWithQuadFIX_1(i⊃sourceDirs)target2
+         :EndFor
+     :EndIf
+ :Else
+     refs←('.',⍨⍕ref),⊃2 ref.⎕FIX'file://',sourcePath
+     rc←{5178⌶⍵}refs
+     'Breaking the link between file and APL object failed'Assert rc
+ :EndIf
+⍝Done

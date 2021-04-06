@@ -1,0 +1,23 @@
+ r←Test_Server_011(stopFlag batchFlag);⎕TRAP;installFolder;paths;ref
+⍝ Load a package that depends on a package on the server, and use an alias for it
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ ref←⍎'TEMP'#.⎕NS''
+
+ installFolder←GetTempDir'/Installed Packages'
+ paths←TC.InstallPackage'./TestData/Aliasse/MyApp1/aplteam-MyApp1-1.0.0.zip'installFolder
+
+ {}TC.LoadDependencies installFolder #.TEMP
+ →T.GoToTidyUp 9.4≠#.TEMP.MyApp1.⎕NC⊂,'F'
+ →T.GoToTidyUp'World'≢#.TEMP.MyApp1.Hello 1
+ →T.GoToTidyUp'Galaxy'≢#.TEMP.MyApp1.Hello 2
+ →T.GoToTidyUp 0=≢⊃#.TEMP.MyApp1.Hello 3
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir GetTempDir''
+ #._tatin.⎕EX'aplteam_MyApp1_1_0_0'
+⍝Done

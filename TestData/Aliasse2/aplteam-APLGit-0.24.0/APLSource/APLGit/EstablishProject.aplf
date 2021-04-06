@@ -1,0 +1,81 @@
+ project←{noWarning}EstablishProject y;list;bool;folder;ind
+⍝ In case `y` is empty:
+⍝ * The global `##.∆DefaultDir` rules.
+⍝ * If `##.∆DefaultDir` does not exist or is itself empty then the result depends on whether there
+⍝   is at least one acre project open:
+⍝   * In case of a single open acre project its project path is taken
+⍝   * If there are several acre projects open then the user will be prompted for the correct one\\
+⍝ If `y` is not empty it must be either a "?" (see next para) or a fully qualified space name or
+⍝ a folder.\\
+⍝ If `y` is "?" the user is presented a list with all currently opened acre projects managed by Git.\\
+⍝ Returns the same format ]acre.Projects returns but as a vector, or an empty vector.\\
+⍝ Feel free to pass `⎕THIS` when you are inside an acre project you want the APLGit commands
+⍝ to be executed on: `EstablishProject` works out which project that will be.\\
+⍝ If `y` identifies a Git-managed folder that is not also acre-managed then items
+⍝ [1] and [3] will of course be empty. However, this will effect only very few commands (like
+⍝ `IsDirty`) since most commands are bound to be executed on an acre project.\\
+⍝ `noWarning` defaults to 0, meaning that in case of multiple open acre projects the user will be
+⍝ warned. Used in commands that prompt the user in any case like "push".
+ noWarning←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noWarning'
+ :If '?'≡y
+     project←U.SelectProject ⍬
+ :Else
+     project←''
+     :If 0=≢list←⎕SE.acre.Projects''
+         y←⍕y
+         :If '#'≠1⍴y
+             :If 0<≢y
+             :AndIf F.IsDir y
+                 project←''(F.EnforceSlash{⍵,(~(¯1↑⍵)∊'/\')/'/'}y)''
+             :EndIf
+         :EndIf
+     :Else
+         list[;2]←F.EnforceSlash¨list[;2]
+         :If 0=≢y
+             :If 0<⎕NC'∆DefaultDir'
+             :AndIf 0<≢∆DefaultDir
+                 folder←∆DefaultDir
+                 :If ~(⊂{⍵,(~(¯1↑⍵)∊'/')/'/'}U.EnforceSlashes ∆DefaultDir)∊{U.EnforceSlashes¨⍵[;2]}⎕SE.acre.Projects ⍬
+                     '∆DefaultDir does not define an open acre project?!'⎕SIGNAL 6
+                 :EndIf
+             :Else
+                 :If 1<≢list
+                 :AndIf 0=noWarning
+                     folder←F.PWD
+                     ⎕←''
+                     ⎕←'*** There is more than one project open.'
+                     ⎕←'    The default project is:'
+                     ⎕←'    ',folder
+                     :If 0=0 U.YesOrNo'Is that okay? (Answer "n" for a selection)'
+                         :If 0=≢ind←U.Select list[;1]
+                             project←''
+                             :Return
+                         :Else
+                             folder←2⊃list[ind;]
+                         :EndIf
+                     :EndIf
+                 :Else
+                     folder←2⊃list[1;]
+                 :EndIf
+             :EndIf
+             folder←U.WinLowercase F.EnforceSlash folder
+             folder,←(~(¯1↑folder)∊'/\')/'/'
+             project←,((U.WinLowercase list[;2])≡¨⊂folder)⌿list
+         :Else
+             y←⍕y
+             :If '#'=1⍴y
+                 :If (⊂y)∊list[;1]
+                     project←,(list[;1]≡¨⊂y)⌿list
+                 :Else
+                     project←,(list[;1]≡¨⊂{⍵/⍨2>+\'.'=⍵}y)⌿list
+                 :EndIf
+             :Else
+                 y,←(~(¯1↑y)∊'/\')/'/'
+                 :If 0=≢project←,((U.WinLowercase¨list[;2])≡¨⊂U.WinLowercase F.EnforceSlash y)⌿list
+                     project←''
+                 :EndIf
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

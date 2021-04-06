@@ -1,4 +1,4 @@
- r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir;zipFiles
+ r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir;zipFiles;∆BuildDir;∆BuildSrc;∆BuildReg
 ⍝ Save build list on disk. Exercises `GetDependencyTree`, `SaveBuildList` and `LoadBuildList`.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -22,7 +22,7 @@
  expected←'minimalversion-'∘,¨expected
  →T.PassesIf expected ∆LazyMatch tree[;2]
 
- TC.SaveBuildList tree path''
+ TC.SaveBuildList tree path
  tree2←TC.LoadBuildList path
  →T.PassesIf∧/tree2[;2]∊tree[;2]
 
@@ -54,8 +54,8 @@
  r←T._OK
 
 ∆TidyUp:
+ {}TC.InitUserSettings'./TestData'
  F.RmDir ∆BuildDir
  ⎕EX'∆BuildDir'
- ∆CreateDefaultUserSettings
  F.DeleteFile zipFiles
 ⍝Done

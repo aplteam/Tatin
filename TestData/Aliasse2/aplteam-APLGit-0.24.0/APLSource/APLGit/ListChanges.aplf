@@ -1,0 +1,18 @@
+ r←{date}ListChanges y;folder;cmd;project;rc;more;buff
+⍝ Executes the "diff" command in order to list all changes (including deleted files) in `y`.\\
+⍝ Returns a matrix with n rows and 1 column with all changed files.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+⍝ `date`, if specified, must be a Boolean. If it is 1 then the last-modified-date will be added as a second column.
+⍝ For deleted files the date will be empty.
+ date←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'date'
+ :If 0≠≢project←EstablishProject y
+     folder←2⊃project
+     cmd←'diff --name-only'
+     (rc more buff)←folder U.RunGitCommand2 cmd
+     U.Assert 0=rc
+     r←⍪buff
+     :If date
+         r←(,r),[1.5]{0=F.IsFile ⍵:'' ⋄ A.FormatDateTime⊃⊃('type' 3)F.Dir'expand'F.NormalizePath ⍵}¨↓r
+     :EndIf
+ :EndIf
+⍝Done

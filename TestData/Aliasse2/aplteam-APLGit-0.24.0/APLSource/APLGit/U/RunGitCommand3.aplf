@@ -1,0 +1,32 @@
+ (rc msg data)←{folder}RunGitCommand3 command;cmd;transform;tempFilename;buff;buff2;troubledLines
+⍝ `command` must be a Git command.\\
+⍝ * `rc` is 0 in case the command was executed successfully, otherwise 1.
+⍝ * `msg` is '' if `rc is 0 but may carry an error message otherwise.
+⍝ * `data` is the data returned by Git.
+⍝ This command is resilient when a Git command returns non-UTF8-data. Yes, we've seen this! Any
+⍝ such chars are removed. For a version that crashes instead see `RunGitCommand2`.\\
+⍝ Naturally whether a crash is preferable depends on the situation.
+⍝ Think of a precise comparison versus just showing some code.
+ rc←0
+ folder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'folder'
+ tempFilename←##.F.GetTempFilename2'APLGit'
+ cmd←'git -C "',folder,'" ',command,' 2>"',tempFilename,'"'    ⍝ Redirects errors to a temp file
+ transform←{'UTF-8'⎕UCS ⎕UCS ⍵}
+ buff←⎕CMD cmd
+ :Trap 11
+     data←transform¨buff
+ :Else
+     ⍝ Sometimes we get strange characters; we try to overcome this by ignoring those characters
+     data←{(⍳≢⍵){0::⍬ ⋄ transform ⍵}¨⍵}buff                                 ⍝ First we convert what can be converted
+     troubledLines←⍸data≡¨⊂⍬                                                ⍝ This items are the trouble makers
+     data[troubledLines]←{⊃,/{0::'' ⋄ transform ⍵}¨⍵}¨buff[troubledLines]   ⍝ For those we remove the invalid chars
+ :EndTrap
+ :If 0<≢msg←{22::'' ⋄ ⊃⎕NGET ⍵ 1}tempFilename
+     rc←1
+     :If 2=|≡msg
+     :AndIf 1=≢msg
+         msg←∊msg
+     :EndIf
+ :EndIf
+ ##.F.DeleteFile tempFilename
+⍝Done

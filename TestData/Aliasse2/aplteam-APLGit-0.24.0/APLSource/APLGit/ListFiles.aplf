@@ -1,0 +1,11 @@
+ r←{x}ListFiles commit;project;folder;rc;more
+⍝ List all files changed in (or with or by) the specified commit.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ 'Which project?!'⎕SIGNAL 6/⍨0=≢project←EstablishProject x
+ 'No commit (hash) specified?!'⎕SIGNAL 11/⍨0=≢commit
+ folder←2⊃project
+ (rc more r)←folder U.RunGitCommand2'show ',commit,' --name-only --pretty=oneline'
+ U.Assert 0=rc
+ r←1↓r
+⍝Done

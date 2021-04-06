@@ -15,6 +15,7 @@
 ⍝ * `zipFilename` is empty in case `source` is a ZIP file but the name of the ZIP file created along the way otherwise.
  statusCode←200 ⋄ errMsg←''
  uri←F.EnforceSlash ReplaceRegistryAlias registry
+ 'No URI provided'Assert 0<≢uri
  'Not just a Registry'Assert uri≡RemovePackageID uri
  'Unknown Registry'Assert(⊂EnforceTrailingSlash RemovePackageID uri)∊MyUserSettings.registries.uri
  source←RemoveFileProtocol source  ⍝ Precaution

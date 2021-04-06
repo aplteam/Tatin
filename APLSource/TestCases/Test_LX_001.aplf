@@ -1,0 +1,29 @@
+ r←Test_LX_001(stopFlag batchFlag);⎕TRAP;dir;body;src;cfg;zipFilename
+⍝ There should be no vars ∆LX if there is no `lx` function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ src←dir,'/ns/'
+ F.MkDir src
+
+ body←'r←PI' 'r←3.14'
+ (⊂body)F.NPUT src,'/PI.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'LX' '1.0.0'
+ cfg.source←'ns/'
+ TC.WritePackageConfigFile dir cfg
+ zipFilename←TC.Pack dir dir
+
+ {}TC.LoadPackage zipFilename #.TEMP
+ →T.GoToTidyUp 3.14≢#.TEMP.LX.PI
+ →T.GoToTidyUp 0≠#._tatin.Example_LX_1_0_0.⎕NC'∆LX'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

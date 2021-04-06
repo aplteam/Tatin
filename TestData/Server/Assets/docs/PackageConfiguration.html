@@ -84,7 +84,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="api">api</h4>
 </a>
 </div>
-<p>“api”, when specified, must be a single name. It must be relative, never absolute; therefore it must never start with <code>#</code> or <code>⎕</code>. It must point to either a class or a namespace.</p>
+<p>“api”, when snot empty, must be a single name. It must be relative, never absolute; therefore it must never start with <code>#</code> or <code>⎕</code>. It must point to either a class or a namespace <em>but neither a function nor an operator</em>.</p>
 <p>There are several scenarios:</p>
 <ol start="1">
 <li>The package consists of a single class or a single namespace, be it scripted or not</li>
@@ -94,14 +94,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
-<p>Note that you <em>cannot</em> specify the name of a function or an operator as the API in any of these cases.</p>
+<p>Note that you <em>must not</em> specify the name of a function or an operator as the API in any of these cases.</p>
 <p>This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is not possible for niladic functions and operators.</p>
 </div>
 </div>
 
 <div class="h_tag">
-<a href="#Single-namespace" id="Single-namespace" class="autoheader_anchor">
-<h5 data-id="Single-namespace">Single namespace</h5>
+<a href="#Package-consists-of-a-single-namespace" id="Package-consists-of-a-single-namespace" class="autoheader_anchor">
+<h5 data-id="Package-consists-of-a-single-namespace">Package consists of a single namespace</h5>
 </a>
 </div>
 <ul>
@@ -109,8 +109,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>If you do specify <code>api</code> then it must be the name of the namespace. In that case the contents of the namespace becomes the API.</li>
 </ul>
 <div class="h_tag">
-<a href="#Single-class" id="Single-class" class="autoheader_anchor">
-<h5 data-id="Single-class">Single class</h5>
+<a href="#Package-consists-of-a-single-class" id="Package-consists-of-a-single-class" class="autoheader_anchor">
+<h5 data-id="Package-consists-of-a-single-class">Package consists of a single class</h5>
 </a>
 </div>
 <ul>
@@ -131,7 +131,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <ul>
-<li>If <code>api</code> is not set all top-level objects of the package become the API: functions, operators, namespaces, classes , interfaces</li>
+<li>If <code>api</code> is not set all top-level objects of the package become the API: functions, operators, namespaces, classes , interfaces.</li>
 <li>If <code>api</code> is set it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what <code>api</code> is pointing to become the API.</li>
 </ul>
 <div class="h_tag">
@@ -145,7 +145,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>Run</code> (which is calling <code>##.Run</code>)</li>
 <li><code>CreateParmSpace</code> (which is calling <code>##.CreateParmSpace</code>)</li>
 </ul>
-<p>Finally you need to assign <code>api←'API'</code> in the package config file.</p>
+<p>Finally you need to specify <code>api: "API",</code> in the package config file.</p>
 <p>Calling the function <code>Run</code> would then require:</p>
 <pre><code>      #.Foo.Run</code></pre>
 <p>To the outside world only two functions are visible:</p>
@@ -198,6 +198,29 @@ r←##.##.∆HOME</code></pre>
 <p>The group part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <p>A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.</p>
 <div class="h_tag">
+<a href="#lx" id="lx" class="autoheader_anchor">
+<h4 data-id="lx">lx</h4>
+</a>
+</div>
+<table>
+<tbody>
+<tr>
+<td><strong>This was introduced as “experimental” in version 0.35</strong></td>
+</tr>
+</tbody>
+</table>
+<p>This is optional: it may or may not exist, and it might be empty if it does.</p>
+<p>In case it is not empty it must be the name of a niladic or monadic function that resides in the top level namespace of the package (<em>not</em> in what might be defined as API!) or a shared method of a class.</p>
+<p>This function will be executed bei either <code>LoadPackage</code> or <code>LoadDependencies</code> <em>after</em> all dependencies have been loaded and all refs got established.</p>
+<p>If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by <code>LoadPackage</code> and has no assets then the right argument will be empty.</p>
+<p>The function may or may not return a result. A result is assigned to <code>∆LX</code>. If there is no result <code>∆LX</code> is assigned an empty vector. Withou an <code>lx</code> function there won't be a variable <code>∆LX</code>.</p>
+<p>The <code>lx</code> function will be executed under error trapping, and any errors will be silently ignored. If you do not want this then you have two options:</p>
+<ul>
+<li>Make <code>⎕TRAP</code> a local variable in the <code>lx</code> function and assign <code>⎕TRAP←0 'S'</code> to it to make any problem popping up straight away</li>
+<li>Put <code>:TRAP ⋄ :EndTrap</code> around the code in the <code>lx</code> function and deal with any problem yourself</li>
+</ul>
+<p>Note that the existence of a variable <code>∆LX</code> indicates that there was an <code>lx</code> function successfully executed.</p>
+<div class="h_tag">
 <a href="#name" id="name" class="autoheader_anchor">
 <h4 data-id="name">name</h4>
 </a>
@@ -209,31 +232,35 @@ r←##.##.∆HOME</code></pre>
 </a>
 </div>
 <p>A URL that points to something like GitHub.</p>
-<p>An example is <code>https://github.com/aplteam-MarkAPL-9.2.0</code></p>
+<p>An example is <code>https://github.com/aplteam/MarkAPL</code></p>
 <p>It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.</p>
 <div class="h_tag">
 <a href="#source" id="source" class="autoheader_anchor">
 <h4 data-id="source">source</h4>
 </a>
 </div>
-<p>This defines the source code files that are going to be part of the package.</p>
-<p>The name of a text file that contains code or a folder that contains a collection of code files. <code>source</code> <em>must not</em> be empty.</p>
+<p>This defines the source code file(s) that are going to be part of the package.</p>
+<p>Must be either the name of a text file that contains code or a folder that contains a collection of code files. <code>source</code> <em>must not</em> be empty.</p>
 <p>If it's a single file it might be anything with the extension <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script) or <code>.apli</code> (an interface script) or <code>.aplf</code> (a function) or <code>.aplo</code> (an operator).</p>
-<p>If it's a folder it might contain any number and mixture of the aforementioned files plus <code>.aplf</code> (functions) and <code>.aplo</code> (operators). Any files with other extensions are misplaced and will be ignored.</p>
+<p>If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
 <h4 data-id="tags">tags</h4>
 </a>
 </div>
 <p>A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.</p>
-<p><code>tags</code> must not be empty if you wish to publish a package.</p>
+<p><code>tags</code> must not be empty if you wish to publish a package to a Tatin server.</p>
 <div class="h_tag">
 <a href="#version" id="version" class="autoheader_anchor">
 <h4 data-id="version">version</h4>
 </a>
 </div>
 <p>The version[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
-<p>Examples for valid version numbers are <code>1.2.3</code>, <code>1.2.3-beta1</code>, <code>1.2.3-beta1+30164</code> and <code>18.0.0+30165</code></p>
+<p>Examples for valid version numbers are:</p>
+<pre><code>1.2.3
+1.2.3-beta1
+1.2.3-beta1+30164
+18.0.0+30165</code></pre>
 <p>The optional build number, separated by the <code>+</code> sign, is ignored by Tatin.</p>
 <p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
@@ -253,7 +280,7 @@ r←##.##.∆HOME</code></pre>
 <h5 data-id="date">date</h5>
 </a>
 </div>
-<p>The user must not specify “date”, but when published the server will inject it as a timestamp (<code>⎕TS</code>) in the format <code>yyyymmdd.hhmmss</code>.</p>
+<p>The user must not specify “date”, but when published the server will inject it as a timestamp in the format <code>yyyymmdd.hhmmss</code>.</p>
 <p>This date might play an important role in determining the precedence of versions. This is because although it's obvious which version is “better” when you look at these two packages:</p>
 <pre><code>group-name-1.0.0
 group-name-1.1.0</code></pre>
@@ -269,7 +296,10 @@ group-name-1.1.0-FixFor234</code></pre>
 <h5 data-id="url">url</h5>
 </a>
 </div>
-<p>When a package is loaded or installed from a Tatin Server, “url” is injected, and points back to that server.</p>
+<ul>
+<li>When a package is loaded or installed from a Tatin Server, “url” is injected, and points back to that server.</li>
+<li>When a package is loaded or installed from a file, “url” is injected, and points to that file.</li>
+</ul>
 <div class="h_tag">
 <a href="#Access-after-loading-a-package" id="Access-after-loading-a-package" class="autoheader_anchor">
 <h3 data-id="Access-after-loading-a-package">Access after loading a package</h3>
@@ -282,6 +312,7 @@ group-name-1.1.0-FixFor234</code></pre>
 <li>The package does not have any assets</li>
 </ul>
 <p>All of them are niladic functions because that's how we emulate constants in APL.</p>
+<p>There <em>might</em> be a variable <code>∆LX</code> in case the package used the <a href="#lx" class="bookmark_link"><code>lx</code></a> mechanism for initializing itself.</p>
 <div id="footnotes_div">
 <hr>
 <p><strong>Footnotes</strong></p>

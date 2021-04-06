@@ -1,0 +1,8 @@
+ ValidateLX←{
+     0=cfg.⎕NC'lx':⍬                                    ⍝ Because it is optional
+     0=≢cfg.lx:⍬
+     '"lx" is not a string'Assert 0 2∊⍨10|⎕DR cfg.lx:   ⍝ Must be char
+     '"lx" must ne carry a dot'Assert~'.'∊cfg.lx:
+     '"lx" is not a valid APL name'Assert ¯1≠(⎕NS'').⎕NC cfg.lx:
+     ⍬
+ }

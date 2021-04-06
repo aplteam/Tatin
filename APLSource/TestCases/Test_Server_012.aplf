@@ -1,0 +1,28 @@
+ r←Test_Server_012(stopFlag batchFlag);⎕TRAP;paths;res;ref
+⍝ Load a package that depends on a package on the server, and use an alias for it (with overwrite flag)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ ref←⍎'TEMP'#.⎕NS''
+
+ res←TC.LoadDependencies'./TestData/Aliasse2'#.TEMP
+
+ →T.GoToTidyUp 9.4≠#._tatin.aplteam_APLGit_0_24_0.code.⎕NC⊂,'F'
+ #._tatin.aplteam_APLGit_0_24_0.code.I_WAS_HERE←⎕AN
+
+ res←TC.LoadDependencies'./TestData/Aliasse2'#.TEMP
+
+ →T.GoToTidyUp 9.4≠#._tatin.aplteam_APLGit_0_24_0.code.⎕NC⊂,'F'
+ →T.GoToTidyUp 0=#._tatin.aplteam_APLGit_0_24_0.code.⎕NC'I_WAS_HERE'
+
+ res←TC.LoadDependencies'./TestData/Aliasse2'#.TEMP 1
+
+ →T.GoToTidyUp 9.4≠#._tatin.aplteam_APLGit_0_24_0.code.⎕NC⊂,'F'
+ →T.GoToTidyUp 0≠#._tatin.aplteam_APLGit_0_24_0.code.⎕NC'I_WAS_HERE'
+
+ r←T._OK
+
+∆TidyUp:
+ #._tatin.⎕EX'aplteam_APLGit_0_24_0'
+⍝Done

@@ -1,8 +1,14 @@
- {r}←LoadDependencies(installFolder targetSpace);path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;refs;alias
-⍝ Takes a folder with a build list, typically the result of installing packages.
-⍝ Loads all packages according to that list and injects required references into `targetSpace`.
+ {r}←LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2
+⍝ Requires two arguments:
+⍝ * A folder with a build list (mandatory)
+⍝ * An installation folder (mandatory)
+⍝ You may specify an optional third argument: the `overwriteFlag` flag which defaults to 0.
+⍝ Use `overwriteFlag` in case all packages should be loaded even if they already exist in #|⎕SE._tatin\\
+⍝ Loads all packages and injects required references into `targetSpace`.
 ⍝ Returns a vector with references to the loaded packages (no dependencies, top-level only).
-⍝ Might be empty if the package was already loaded, for example as a dependency.
+ 'Length error on right argument'Assert(≢y)∊2 3
+ 'Invalid right argument'Assert 2=|≡y
+ (installFolder targetSpace overwriteFlag)←3↑y,0
  r←refs←⍬
  targetSpace←⍕targetSpace
  :If 0=⎕NC targetSpace
@@ -16,24 +22,31 @@
          ('Cannot find package "',path,'"')Assert F.Exists path
          saveIn←GetTatinRootSpace targetSpace
          cfg←ReadPackageConfigFile path
-         packageID←1 GetPackageIDFromFilename path
-         saveIn,←'.',packageID
+         packageID2←1 GetPackageIDFromFilename path
+         saveIn,←'.',packageID2
          :If 0=⎕NC saveIn   ⍝ Might already exist
+         :OrIf overwriteFlag
+             :If overwriteFlag
+                 {(⍎⍺).⎕EX ⍵}/¯1 0↓¨'.'A.SplitPath saveIn
+             :EndIf
              EstablishSystemVars saveIn cfg
-             Reg.ImportWithQuadFIX(path,'/',cfg.source)(saveIn,'.code')
+             Reg.ImportWithQuadFIX_2(path,'/',cfg.source)(saveIn,'.code')
              ⍝ Unreliable: #253    msg←Reg.ImportWithLink(saveIn,'.code')(path,'/',cfg.source)
              ⍝'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
              ref←⍎saveIn
              EstablishConstants ref cfg path
-             refs,←ref
-             :If 1=level
-                 r,←ref
-             :EndIf
+         :Else
+             ref←⍎saveIn
+         :EndIf
+         refs,←ref
+         :If 1=level
+             r,←ref
          :EndIf
          :If 1=level
              LinkTargetToPackage cfg saveIn targetSpace alias
          :EndIf
      :EndFor
      LinkDependencies refs
+     ExecutePackageLX installFolder targetSpace tree
  :EndIf
 ⍝Done

@@ -3,6 +3,7 @@
 ⍝ Whether deleting a package can be successful is determined by the INI setting [CONFIG]DeletePackages
  statusCode←200 ⋄ errMsg←''
  uri_←F.EnforceSlash ReplaceRegistryAlias uri
+ 'No URI provided'Assert 0<≢uri_
  (uri_ packageID)←Reg.SeparateUriAndPackageID uri_
  'Unknown Registry'Assert(⊂EnforceTrailingSlash uri_)∊MyUserSettings.registries.uri
  :If Reg.IsHTTP uri_

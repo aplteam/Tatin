@@ -1,0 +1,19 @@
+ {success}←{x}DeleteBranch branchName;folder;project;rc;more;allBranches
+⍝ Deletes branch `branchName`.\\
+⍝ Note that branch names are case insensitive.\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ Returns 1 (success) in case the specified branch was deleted and 0 otherwise.
+ success←0
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ project←EstablishProject x
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ folder←2⊃project
+ 'You must specify a branch name'⎕SIGNAL 6/⍨0=≢branchName
+ 'The current branch cannot be deleted'⎕SIGNAL 11/⍨branchName≡CurrentBranch folder
+ allBranches←(A.Lowercase ListBranches folder)~¨⊂'* '
+ :If (⊂A.Lowercase branchName)∊allBranches
+     (rc more r)←folder U.RunGitCommand2'branch -D ',branchName
+     more U.Assert 0=rc
+     success←1
+ :EndIf
+⍝Done

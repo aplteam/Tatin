@@ -1,14 +1,19 @@
- r←Test_ClientConfig_010(stopFlag batchFlag);⎕TRAP
+ r←Test_ClientConfig_010(stopFlag batchFlag);⎕TRAP;dir
 ⍝ Attempt to delete the one and only Registry; must result in an error
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
+ dir←'ConfigFile'GetTempDir''
+ F.DeleteFile dir,'/',TC.UserSettings.cfg_name
+ TC.InitUserSettings dir
+
  :Trap 0
      TC.MyUserSettings.RemoveRegistry'[tatin]'
-     →T.FailsIf 1
- :Else
-
+     →T.GoToTidyUp 1
  :EndTrap
 
  r←T._OK
+
+∆TidyUp:
+ {}TC.InitUserSettings'./TestData'
 ⍝Done

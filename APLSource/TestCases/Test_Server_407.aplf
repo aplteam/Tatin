@@ -1,15 +1,13 @@
- r←Test_Server_407(stopFlag batchFlag);⎕TRAP;result;client;request;res
+ r←Test_Server_407(stopFlag batchFlag);⎕TRAP;result;request;res
 ⍝ Try the HTTP "PATCH" verb: not implemented
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- client←R.NewClient 0
- client.Host←'localhost'
  request←R.NewRequest 0
  request.Method←'PATCH'
  request.URI←'/Foo'
  request.Headers,←⊂'Accept' 'application/json'
- res←client TC.SendAndReceive request
+ res←'localhost'TC.SendAndReceive request
  →T.PassesIf 501=res.StatusCode
 
  r←T._OK

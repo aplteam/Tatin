@@ -1,11 +1,10 @@
- list←ReadPackageConfigFile_ uri;host;packageID;client;request;res
+ list←ReadPackageConfigFile_ uri;host;packageID;request;res
  (host packageID)←Reg.SeparateUriAndPackageID uri
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
- client←NewClient host
  request←R.NewRequest 0
  request.URI←'v1/packages/details/',{⍵↓⍨'/'=1⍴⍵}packageID
  request.Headers,←⊂'Accept' 'application/json'
- res←client SendAndReceive request
+ res←host SendAndReceive request
  :If 200≠res.StatusCode
      :If 0<≢res.Content
          ('Server: ',res.Content)Assert 0

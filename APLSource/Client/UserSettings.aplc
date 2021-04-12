@@ -156,7 +156,11 @@
           :If 0=≢_registries
               buff.priority←100
           :Else
-              buff.priority←(⌊/_registries.priority)-10
+              :If 0≥buff.priority←(⌊/_registries.priority~0)-10
+              :AndIf 0≥buff.priority←⌈(⌊/_registries.priority~0)÷2
+              :AndIf 0≥buff.priority←⌈(⌊/_registries.priority~0)-1     
+                  ∘∘∘  ⍝TODO⍝ 
+              :EndIf
           :EndIf
       :EndIf
       buff.uri←AddSlash buff.uri

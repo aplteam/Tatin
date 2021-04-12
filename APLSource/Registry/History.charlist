@@ -1,3 +1,23 @@
+* 0.36.0 ⋄ 2021-04-11
+  * Breaking changes: 
+    * The strategy how to collect dependencies has been changed
+    * The Tatin "system variables" have been renamed. `∆HOME` is now `HOME` etc.
+      The full list of renamed ("system") variables is `HOME`, `CONFIG`, `LX`, `ID`, `URI`.
+  * Explicit result of `InstallPackage` changed.
+  * `raw` added to `]CheckForLatestVersion`
+  * Bug fixes:
+    * When a principal package depends on a package that is "better" then an already installed as a
+      dependency installed package then the better package did not win.
+    * When a package was loaded or installed from the first with the hightest priority then the servers were 
+      not questioned according to the priorities for the dependencies.
+    * The "Make" left the class `_Make` behind in both the Cleint and the Server workspace.
+    * The "nobetas" option was processed incorrectly by `InstallPackages`.
+    * HTML "base" was always "https" - must depend on INI entry [CONFIG]secure.
+    * Nothing but "*=" in the Credentials file was not interpreted as intended: everybody anything.
+    * `CheckForLatestVersion` did not process the `dependency` flag at all.
+    * `CheckForLatestVersion` crashed on ZIP files.
+    * `CheckVersion` and `EstablishRegistry` stumbled over defined Registries when the server did not respond.
+    * Port number was not processed correctly when non-standard
 * 0.35.0 ⋄ 2021-04-06
   * Experimental optional package config parameter "lx" added. 
   * -overwrite flag added the the ]LoadDependencies user command
@@ -66,7 +86,7 @@
 * 0.30.0 ⋄ 2021-02-28
   * BREAKING CHANGES: 
     * The code of a package is now loaded into a sub-namespace `code`. As a consequence package globals 
-      (like ∆HOME etc) must be addressed with `##.`
+      (like HOME etc) must be addressed with `##.`
     * The user must now specify `source` in a package config file, otherwise an error is thrown. 
     * The `UserSettings` class was re-designed
     * The user settings file was moved from \\Local to \\Roaming (Windows only)

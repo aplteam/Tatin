@@ -1,0 +1,20 @@
+ {registries}ScanRegistries packageIDs;request;res;bool;packageIDs_;urls
+⍝ Scans all registries provided via ⍺ for packageIDs. First hit wins.
+⍝ Adds data found to ∆TREE.Data
+ registries←{0=⎕NC ⍵:GetRegistriesForBuildList ⋄ ⍎⍵}'registries'
+ request←R.NewRequest 0
+ request.Headers,←⊂'Accept' 'application/json'
+
+ packageIDs←⊆packageIDs
+ :If 0<+/bool←∨/¨'://'∘⍷¨packageIDs           ⍝ Does any package know where it lives?
+     (urls packageIDs_)←↓⍉↑SplitUrlAndPackageID¨bool/packageIDs
+     {request ScanRegistries_1_ ⍵ packageIDs_}¨urls
+ :EndIf
+ :If 0<+/~bool
+ :AndIf 0<≢registries←∪⊆registries
+     request ScanRegistries_1 registries((~bool)/packageIDs)
+ :EndIf
+ :If 1<≢∆TREE.Data
+     request ScanRegistries_2 registries
+ :EndIf
+⍝Done

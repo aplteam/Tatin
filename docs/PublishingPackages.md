@@ -62,7 +62,7 @@ group2='xyz'
 
 This means that one can only publish packages with the groupname "group1" with the API key "abc", packages with the groupname "group2" with the API key "xyz", and anything else with the API key "other".
 
-Note that `*=` means that no API key is required. That's the same as having not credentials file, but it can be useful together with other group names:
+Note that `*=` means that no API key is required. That's the same as having no credentials file, but it can be useful together with other group names:
 
 ```
 group1='abc'

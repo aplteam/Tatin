@@ -1,4 +1,4 @@
- packages←{noBetas}InstallPackage(identifier_ targetFolder)
+ r←{noBetas}InstallPackage(identifier_ targetFolder);bool
  ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be one of:
@@ -8,10 +8,11 @@
 ⍝ * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch}')
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
 ⍝ You may omit either minor+patch or even major+minor+patch in order to install the latest version.
-⍝ When the best version is to be determined then by default any beta versions are ignored. You can overwrite this by specifying a 1 as ⍺.
+⍝ When the best version is to be determined then by default any beta versions are ignored. You can overwrite this by specifying a 0 as ⍺.
 ⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
-⍝ `←` Full names of all packages installed with the first one being the "main" package, meaning that all the others (if any) are dependencies.
- noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
+⍝ `←` Full name of `identifier_` finally loaded.
+ r←''
+ noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'noBetas'
  '"targetFolder" is invalid'Assert F.IsDir⍕targetFolder
  (alias identifier_)←SplitAtAlias identifier_
  identifier←ReplaceRegistryAlias identifier_
@@ -54,6 +55,10 @@
      :EndFor
      PrintToSession'  Saving build list... '
      buildList←SaveBuildList buildList targetFolder
-     packages←buildList[;2]
+     :If ∨/bool←∨/¨({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}identifier_)∘⍷¨buildList[;2]
+         r←2⊃buildList[bool⍳1;]
+     :Else
+         r←2⊃buildList[1;]
+     :EndIf
  :EndIf
 ⍝Done

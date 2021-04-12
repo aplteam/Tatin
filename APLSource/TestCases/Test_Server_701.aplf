@@ -1,4 +1,4 @@
- r←Test_Server_701(stopFlag batchFlag);⎕TRAP;c;q;res
+ r←Test_Server_701(stopFlag batchFlag);⎕TRAP;request;res
 ⍝ Exercise the HEAD method on a package
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -6,12 +6,10 @@
  r←T._NotImplemented
  :Return
 
- c←R.NewClient 0
- c.Host←'localhost'
- q←R.NewRequest 0
- q.URI←'aplteam-Compare-5.0.0'
- q.Method←'HEAD'
- res←c TC.SendAndReceive q
+ request←R.NewRequest 0
+ request.URI←'aplteam-Compare-5.0.0'
+ request.Method←'HEAD'
+ res←'localhost'TC.SendAndReceive request
  ∘∘∘
 
  r←T._OK

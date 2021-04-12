@@ -7,7 +7,6 @@
  (host packageID)←Reg.SeparateUriAndPackageID uri
  'Not a valid URI'Assert('/'+.=host)∊2 3
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
- client←NewClient host
  request←R.NewRequest 0
  request.URI←'/v1/packages/',{⍵↓⍨'/'=1⍴⍵}packageID
  :If 0<≢⊃,/parms.(group tags aggregate)
@@ -24,7 +23,7 @@
  :EndIf
  request.URI←(-'&'=¯1↑request.URI)↓request.URI
  request.Headers,←⊂'Accept' 'application/json'
- res←client SendAndReceive request
+ res←host SendAndReceive request
  :If 404≡res.StatusCode
      list←0 2⍴''⍬
  :ElseIf 200≠res.StatusCode

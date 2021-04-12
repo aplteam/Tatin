@@ -1,5 +1,5 @@
- r←Test_InstallAndLoad_001(stopFlag batchFlag);⎕TRAP
- ;dir;src;zip;body;cfg;zipfile;installFolder;list;expected
+ r←Test_InstallAndLoad_001(stopFlag batchFlag);⎕TRAP;res
+ ;dir;src;zip;body;cfg;zipfile;installFolder;expected
 ⍝ Pack a package with a single file into a ZIP file, install and load it.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -20,9 +20,9 @@
  zipfile←TC.Pack src zip
 
  installFolder←GetTempDir'/MyAppPackages'
- list←TC.InstallPackage('file://',zipfile)installFolder
+ res←TC.InstallPackage('file://',zipfile)installFolder
+ →T.GoToTidyUp res≢TC.GetPackageIDFromFilename zipfile
 
- →T.GoToTidyUp 1≠≢list
  expected←,⊂TC.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
  →T.GoToTidyUp~expected ∆LazyMatch(1+≢installFolder)↓¨F.ListDirs installFolder
  →T.GoToTidyUp~F.Exists installFolder,'/',TC.Reg.DependenciesFilename

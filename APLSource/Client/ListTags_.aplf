@@ -1,10 +1,9 @@
- list←{parms}ListTags_ uri;client;request;res;host;packageID
+ list←{parms}ListTags_ uri;request;res;host;packageID
  :If 0=⎕NC'parms'
      parms←⎕NS''
      parms.tags←''
  :EndIf
  (host packageID)←Reg.SeparateUriAndPackageID uri
- client←NewClient host
  request←R.NewRequest 0
  request.URI←'/v1/tags/',{⍵↓⍨'/'=1⍴⍵}packageID
  :If 0<≢parms.tags
@@ -14,7 +13,7 @@
      :EndIf
  :EndIf
  request.Headers,←⊂'Accept' 'application/json'
- res←client SendAndReceive request
+ res←host SendAndReceive request
  :If 200≠res.StatusCode
      :If 0<≢res.Content
          ('Server: ',res.Content)Assert 0

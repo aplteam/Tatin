@@ -1,8 +1,10 @@
  reg←{userSettings}EstablishRegistry packageID;registries;uri;alias;list;msg;CR;i
 ⍝ The purpose of this function is to establish the registry a package can be found in.
 ⍝ Useful in case the user specified just a package ID.
-⍝ Note that `packageID` might be a full ({group}-{name}-{version}) or a partial one ({group}-{name} or {group}-{name}-{major}).
-⍝ The function scans all registries according to the user settings and stops as soon as it finds one.\\
+⍝ Note that `packageID` might be a full ({group}-{name}-{version}) or a partial one
+⍝ ({group}-{name} or {group}-{name}-{major}).
+⍝ The function scans all registries according to the user settings and stops as soon
+⍝ as it finds a Registry that hosts the package in question.\\
 ⍝ In case of no hit anywhere an error is thrown.
  reg←registries←''
  :If '.zip'≢⎕C ¯4↑packageID
@@ -11,19 +13,20 @@
      userSettings←{0<⎕NC ⍵:⍎⍵ ⋄ MyUserSettings}'userSettings'
      registries←userSettings.registries
      'No Registries defined in the Client config file'Assert 1≤≢registries
+     registries←(0<registries.priority)/registries
+     'No Registries defined in the Client config file that can be scanned'Assert 1≤≢registries
      i←0
      :Repeat
          i+←1
          (uri alias)←i⊃registries.(uri alias)
          :If Reg.IsHTTP uri
-             :Trap 98  ⍝ Because the server might be down, or have disappeared, whatever...
-              ⍝TODO⍝ Invent a particular command for this for better performance and less data exchange
-                 :If 0=≢list←ListPackages_ uri,packageID
-                     :Continue
-                 :Else
-                     reg←uri
-                 :EndIf
-             :EndTrap
+             ⍝TODO⍝ Invent a particular command for this for better performance and less data exchange
+ ⍝TODO⍝  ⍝TODO⍝              ∘∘∘
+             :If 0=≢list←ListPackages_ uri,packageID
+                 :Continue
+             :Else
+                 reg←uri
+             :EndIf
          :ElseIf Reg.IsValidPackageID_Complete packageID
              :If F.IsDir(RemoveFileProtocol uri),'/',packageID
                  reg←uri

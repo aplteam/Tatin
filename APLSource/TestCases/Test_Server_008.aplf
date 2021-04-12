@@ -1,12 +1,11 @@
- r←Test_Server_008(stopFlag batchFlag);⎕TRAP;client;request;response
+ r←Test_Server_008(stopFlag batchFlag);⎕TRAP;request;response
 ⍝ Send a request that lacks the leading / after "GET " which is required by Apache etc.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- client←TC.R.NewClient'https://localhost'
  request←TC.R.NewRequest 0
  request.URI←'v1/list-packages'
- response←client TC.R.SendAndReceive request
+ response←'https://localhost'TC.SendAndReceive request
  →T.PassesIf response.StatusCode≡400
 
  r←T._OK

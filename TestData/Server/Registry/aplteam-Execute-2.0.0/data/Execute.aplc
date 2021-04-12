@@ -1,4 +1,4 @@
-:Class Execute		
+:Class Execute
 ⍝ This class allows you two different things:
 ⍝ * Start a process and catch its return code.
 ⍝ * Start an application and catch its standard output.\\
@@ -27,19 +27,25 @@
 ⍝ Author: Kai Jaeger ⋄ APL Team Ltd\\
 ⍝ Home page: <https://github.com/aplteam/Execute>
 
-    :Include APLTreeUtils
-
     okay←false←null←0 ⋄ true←1
 
     ∇ r←Version
       :Access Public shared
-      r←(Last⍕⎕THIS)'2.0.0.6' '2020-03-22'
+      r←'Execute' '2.0.0+16' '2021-01-01'
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 2.0.0
-    ⍝   * BREAKING CHANGE: file extension changed from .DYALOG to .APLC
+    ⍝ * 3.0.2 ⋄ 2020-03-02
+    ⍝   * Package config file corrected
+    ⍝ * 3.0.1 ⋄ 2020-09-21
+    ⍝   * The script delivered with 3.0.0 (and earlier versions as well) carried two <TAB> characters
+    ⍝     at the end of the first line, causing potentially trouble.
+    ⍝ * 3.0.0
+    ⍝   * BREAKING CHANGES:
+    ⍝     * Requires at least Dyalog 18.0
+    ⍝     * Requires the class `APLTreeUtils2`
+    ⍝   * Does not `:Include APLTreeUtils` anymore
     ⍝\\
     ⍝ For information regarding older versions see <https://github.com/aplteam/Execute/releases>
     ∇
@@ -424,7 +430,7 @@
     ∇
 
     ∇ cmd←EnforceBackslash cmd;ind;path
-      cmd←dlb dtb cmd
+      cmd←##.APLTreeUtils2.DLB ##.APLTreeUtils2.DTB cmd
       :If '"'=1⍴cmd
           ind←+/∧\2>+\'"'=cmd
           path←ind↑cmd

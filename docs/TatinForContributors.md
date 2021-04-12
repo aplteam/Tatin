@@ -47,7 +47,7 @@ Note that there is no need to save a workspace or anything: every function, oper
 
 ## Prepare either the Client or the Server
 
-If you want to tun any Tatin client code execute the function
+If you want to run any Tatin client code execute the function
 
 ```
 #.Tatin.Admin.Initialize_Client
@@ -59,7 +59,7 @@ If you want to run the Tatin Server execute the function
 #.Tatin.Admin.Initialize_Server
 ```
 
-You are advised not to run the Client and the Server in the same workspace.
+You are advised _not to run_ the Client and the Server in the same workspace.
 
 
 ## Execute the test cases

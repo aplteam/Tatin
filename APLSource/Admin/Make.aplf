@@ -1,4 +1,4 @@
- {r}←{noQLX}Make type;P;parms;P_;list
+ {r}←{noQLX}Make type;P;parms;P_;list;APL_Version
 ⍝ This function will start two APL sessions in succession in order to open the Tatin project and then execute
 ⍝ first `MakeClient` (important because that bumps the version number) and then, in the second session, `MakeServer`.
 ⍝ It cannot be done in one go, and it cannot be done in batch mode from the current session.
@@ -8,6 +8,9 @@
 ⍝ * If `type` ←→ 2 the "minor" number is bumped
 ⍝ * If `type` ←→ 3 the "major" number is bumped\\
 ⍝ Note that the build ID is **always** bumped.
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+ APL_Version←'C:\Program Files\Dyalog\Dyalog APL-64 18.0 Unicode\Dyalog.exe'
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
  r←⍬
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
  'Invalid right argument; must be one of: 0 1 2 3'⎕SIGNAL 11/⍨~(⊂type)∊0 1 2 3
@@ -17,6 +20,7 @@
  ##.FilesAndDirs.DeleteFile list
  P←##.APLProcess
  parms←P.CreateParms
+ parms.Exe←APL_Version
  parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
  parms.CommandLineArgs,←' lx="#.Make_.Run ',(⍕type),'"'
  :If 0  ⍝ Only for analyzing problems:
@@ -39,6 +43,7 @@
  parms←P.CreateParms
  parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc"'
  parms.CommandLineArgs,←' lx="#.Make_.Run ¯1"'
+ parms.Exe←APL_Version
  :If 0  ⍝ Only for analyzing problems:
      parms.CommandLineArgs,←' -exec_setup=0'
      parms.CommandLineArgs,←' -stop_in_setup=1 '

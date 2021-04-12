@@ -1,0 +1,13 @@
+ r←DetermineURI packageID
+⍝ Takes a packagesID which may or may not carry http[s]://
+⍝ Returns a matrix:
+⍝ [;1] URL
+⍝ [;2] Package ID
+⍝ The URL is determined by file:// or http[s]://
+⍝ Otherwise it is empty
+ :If Reg.IsHTTP packageID
+ :OrIf Reg.IsFILE packageID
+     r←⌽SplitUrlAndPackageID packageID
+ :Else
+     r←packageID''
+ :EndIf

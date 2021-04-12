@@ -94,12 +94,14 @@ Let's list all registries currently defined:
 
 ```
       ⎕se.Tatin.MyUserSettings.ListRegistries 0
- Alias  URI                 Port  Priority  API-key 
- -----  ------------------  ----  --------  ------- 
- tatin  https://tatin.dev/     0       100  ***
+URI                  Alias  Port  Priority
+------------------   -----  ----  --------
+https://tatin.dev/   tatin  0     100 
 ```
 
 This is because originally Tatin only knows about the principal Tatin server.
+
+Note that the API key is not listed when a zero is provided as right argument.
 
 Let's add a made-up registry.
 
@@ -139,7 +141,9 @@ We will pass a simple text vector that specifies the alias (between `[]`) and th
 
 * `uri` and `alias` are already set by the constructor.
 * `port` is 0 which means that it will fall back to 80 for `http://` and 443 for `https://`.
-* `priority` may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.
+* `priority` decides in which order Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.
+  
+  Note that a priority of `0` means that the registry will **not** participate in any scanning.
 * `api_key` must be set only when the Registry is managed by a Tatin server _and_ you want to publish packages, or delete packages if that is permitted by that Tatin server.
 
 #### Adding the Registry

@@ -1,9 +1,10 @@
- r←Test_Server_204(stopFlag batchFlag);⎕TRAP;qdmx;result;best
+ r←Test_Server_204(stopFlag batchFlag);⎕TRAP;qdmx;result;best;statusCode;errMsg
 ⍝ Ask for best version of a package ID with major and minor number but without a patch number
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- result←TC.GetBestVersionNumber'aplteam-APLProcess-0.2' 'https://localhost'
+ (statusCode errMsg result)←TC.GetBestVersionNumber'aplteam-APLProcess-0.2' 'https://localhost'
+ →T.PassesIf statusCode=200
  best←∆GetBestVersionFor'aplteam-APLProcess-0.2*'
  →T.PassesIf≡/{⍵↓⍨¨≢¨TC.RemovePackageID¨⍵}result best
 

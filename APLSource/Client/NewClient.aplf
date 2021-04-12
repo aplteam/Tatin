@@ -1,4 +1,5 @@
  c←NewClient uri;reg
+⍝ Create a Rumba client tailored for Tatin
  c←R.NewClient 0
  uri←(-'/'=¯1↑uri)↓uri
  :Trap 98
@@ -7,12 +8,14 @@
      reg←⍬
  :EndTrap
  :If ⍬≡reg
-     :If 'http://'{⍺≡(≢⍺)↑⍵}uri
-         c.Port←80
-     :ElseIf 'https://'{⍺≡(≢⍺)↑⍵}uri
-         c.Port←443
+     :If ':'∊RemoveHttpProtocol uri
+         c.Port←A.ToNum{⍵↓⍨⍵⍳':'}RemoveHttpProtocol uri
      :Else
-         'Invalid URI'Assert 0
+         :If 'http://'{⍺≡(≢⍺)↑⍵}uri
+             c.Port←80
+         :ElseIf 'https://'{⍺≡(≢⍺)↑⍵}uri
+             c.Port←443
+         :EndIf
      :EndIf
  :Else
      c.Secure←∨/'https://'⍷reg.uri
@@ -20,5 +23,6 @@
          c.Port←(c.Secure+1)⊃80 443
      :EndIf
  :EndIf
- c.Host←'/'~⍨RemoveHttpProtocol uri
+ c.Host←{⍵↑⍨¯1+⍵⍳':'}'/'~⍨RemoveHttpProtocol uri
+ c.ClientTimeout←10
 ⍝Done

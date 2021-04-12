@@ -16,7 +16,9 @@
      txt←(end-offset)↓txt
      0=≢cfg.registries:''
      ~(⊂regAlias)∊⎕C cfg.registries.alias:''
-     replaceBy←(1⍳⍨(⎕C cfg.registries.alias)≡¨⊂regAlias)⊃cfg.registries.uri
+     ind←1⍳⍨(⎕C cfg.registries.alias)≡¨⊂regAlias
+     replaceBy←ind⊃cfg.registries.uri
+     replaceBy{⍵∊0 80 443:⍺ ⋄ (⍺↓⍨¯1×'/'=¯1↑⍺),':',(⍕⍵),'/'}←ind⊃cfg.registries.port
      txt↓⍨←(⊃txt)∊'/\'
      f←~(¯1↑replaceBy)∊'/\'
      sep←f/'/'

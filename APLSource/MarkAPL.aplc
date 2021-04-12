@@ -424,9 +424,9 @@
       :Access Public Shared
       parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHelpParms}'parms'
       parms←EstablishDefaultHomeFolder parms
-      :If 0<##.⎕NC'∆HOME'
-      :AndIf 0<≢##.∆HOME
-          folder←##.∆HOME,'/Files/'
+      :If 0<##.⎕NC'HOME'
+      :AndIf 0<≢##.HOME
+          folder←##.HOME,'/Files/'
           ns←CompileHelp(folder,'MarkAPL.html')recompileFlag parms
       :Else
           ns←CompileHelp(parms.homeFolder,'/Docs/MarkAPL.html')recompileFlag parms
@@ -453,9 +453,9 @@
       :Else
           folder←parms.homeFolder
       :EndIf
-      :If 0<##.⎕NC'∆HOME'
-      :AndIf 0<≢##.∆HOME
-          folder←##.∆HOME,'/Files/'
+      :If 0<##.⎕NC'HOME'
+      :AndIf 0<≢##.HOME
+          folder←##.HOME,'/Files/'
           ns←CompileHelp(folder,'MarkAPL_CheatSheet.html')recompileFlag parms
       :ElseIf recompileFlag
           ns←CompileHelp(folder,'/Docs/MarkAPL_CheatSheet.md')recompileFlag parms
@@ -3211,8 +3211,8 @@
           ⎕NULL≢p.homeFolder:p
           this←⍕⎕THIS
           f1←∨/'MarkAPL'⍷A.Last⍕##.⎕THIS
-          f2←2=##.⎕NC'∆HOME'
-          f1∧f2:p⊣p.homeFolder←##.∆HOME ⍝ It's a Tatin package!
+          f2←2=##.⎕NC'HOME'
+          f1∧f2:p⊣p.homeFolder←##.HOME ⍝ It's a Tatin package!
           p.homeFolder←GetCurrentDir
           f←∨/##.FilesAndDirs.Exists¨p.homeFolder∘,¨'/Docs/MarkAPL.html' '/Docs/MarkAPL_CheatSheet.html'
           f:p

@@ -1,30 +1,39 @@
- r←majorVersions CheckForLaterVersion_ fullPaths;fullPath;packageID;url;fullPath2;buff;packageID2
+ r←majorVersions CheckForLaterVersion_ fullPaths;fullPath;packageID;url;fullPath2;buff;packageID2;errMsg;statusCode
 ⍝ Takes a vector of fully qualified package paths (http or local) & checks for later versions.
 ⍝ `r` is a vector with fully qualified paths of any better versions, so possibly empty.
 ⍝ If `majorVersions` is 0 only minor and patch number are considered. If `majorVersions` is 1
 ⍝ better "major" versions are considered. This is used only in the user command since
 ⍝ Tatin considers packages with different major numbers to be different packages.
+⍝ For every package three pieces of information are returned:
+⍝ 1. Original version
+⍝ 2. Best version found
+⍝ 3. URL
  r←⍬
  'Invalid left argument'Assert 1=≢majorVersions
  'Invalid left argument'Assert majorVersions∊0 1
  :For fullPath :In fullPaths
-     PrintToSession'Checking <',fullPath,'>...'
-     (url packageID)←SplitUrlAndPackageID fullPath
-     :If majorVersions
-         fullPath2←GetBestVersionNumber(Reg.RemoveVersionNumber packageID)url
-     :Else
-         fullPath2←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID)url
-     :EndIf
-     :If 0<≢fullPath2
-         packageID2←GetPackageIDFromFilename fullPath2
-     :AndIf packageID≢packageID2
-         buff←packageID packageID2
-         :If '.zip'≡⎕C ¯4↑fullPath2
-             buff,←⊂fullPath2
+     :If '.zip'≢⎕C 3⊃⎕NPARTS fullPath
+         PrintToSession'Checking <',fullPath,'>...'
+         (url packageID)←SplitUrlAndPackageID fullPath
+         :If majorVersions
+             (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID)url
          :Else
-             buff,←⊂{⍵↓⍨-'//'≡¯2↑⍵}(-+≢2⊃buff)↓fullPath2
+             (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID)url
          :EndIf
-         r,←⊂buff
+         :If 404=statusCode
+             :Continue
+         :Else
+             errMsg Assert 200=statusCode
+             :If 0<≢fullPath2
+                 packageID2←GetPackageIDFromFilename fullPath2
+             :AndIf packageID≢packageID2
+                 buff←packageID packageID2
+                 buff,←⊂{⍵↓⍨-'//'≡¯2↑⍵}(-+≢2⊃buff)↓fullPath2
+                 r,←⊂buff
+             :EndIf
+         :EndIf
+     :Else
+         PrintToSession'Ignored because it is a ZIP file: <',fullPath,'>...'
      :EndIf
  :EndFor
 ⍝Done

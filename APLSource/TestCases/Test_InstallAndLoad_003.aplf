@@ -1,5 +1,5 @@
- r←Test_InstallAndLoad_003(stopFlag batchFlag);⎕TRAP
- ;dir;src;zip;body;cfg;zipfile;installFolder;list;expected;src2
+ r←Test_InstallAndLoad_003(stopFlag batchFlag);⎕TRAP;res
+ ;dir;src;zip;body;cfg;zipfile;installFolder;expected;src2
 ⍝ Pack a package with multiple files (classes) into a ZIP file and then install it. One class depends on the other.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -23,8 +23,9 @@
  zipfile←TC.Pack src zip
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list←TC.InstallPackage('file://',zipfile)installFolder
- →T.GoToTidyUp 1≠≢list
+ res←TC.InstallPackage('file://',zipfile)installFolder
+ →T.GoToTidyUp res≢TC.GetPackageIDFromFilename zipfile
+
  expected←,⊂TC.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
  →T.GoToTidyUp~expected ∆LazyMatch(1+≢installFolder)↓¨F.ListDirs installFolder
  →T.GoToTidyUp~F.Exists installFolder,'/',TC.Reg.DependenciesFilename

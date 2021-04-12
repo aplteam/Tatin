@@ -25,9 +25,9 @@ After a fresh installation you might wonder what Registries are available to you
 
 ```
       ]tatin.ListRegistries
- URL                 Alias 
- ----                ----- 
- https://tatin.dev/  tatin 
+ URL                 Alias Port
+ ----                ----- ---- 
+ https://tatin.dev/  tatin 100
 ```
 
 At this point Tatin only knows about the principal Tatin server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelihood your own ones), then you must change the user settings. 

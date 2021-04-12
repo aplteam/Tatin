@@ -1,14 +1,10 @@
- response←{host}GetPackageViaHTTP_ packageID;r;q;c
+ response←{host}GetPackageViaHTTP_ packageID;r;request
 ⍝ Requests a package via HTTP(S)
 ⍝ `host` defaults to "https://localhost"
 ⍝ Port number is defined by the client settings
 ⍝ * a package ID
  host←{0<⎕NC ⍵:⍎⍵ ⋄ 'https://localhost/'}'host'
- c←NewClient host
- :If ':'∊RemoveHttpProtocol host
-     c.Port←⊃(//)⎕VFI{⍵↓⍨⍵⍳':'}host
- :EndIf
- q←R.NewRequest 0
- q.URI←'/',packageID
- response←c SendAndReceive q   ⍝ Errors handled by caller
+ request←R.NewRequest 0
+ request.URI←'/',packageID
+ response←host SendAndReceive request   ⍝ Errors handled by caller
 ⍝Done

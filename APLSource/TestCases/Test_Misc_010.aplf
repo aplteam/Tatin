@@ -1,5 +1,5 @@
  r←Test_Misc_010(stopFlag batchFlag);⎕TRAP;dir;src;reg;body;cfg;rc;msg;zipFilename;refs;toBeDeleted;instance
-⍝ Acess assets via ∆HOME from the instance of a class
+⍝ Acess assets via HOME from the instance of a class
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -14,8 +14,8 @@
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
  body←''
- body,←'∇r←PI' ':Access Public Instance' 'home←(⊃⊃⎕CLASS ⎕THIS).##.##.∆HOME' 'filename←home,''/pi.txt''' 'r←⊃(//)⎕VFI(⊃⎕NGET filename)~⎕TC' '∇'
- body,←'∇r←AssetFolder' ':Access Public Shared' 'r←##.##.∆HOME' '∇'
+ body,←'∇r←PI' ':Access Public Instance' 'home←(⊃⊃⎕CLASS ⎕THIS).##.##.HOME' 'filename←home,''/pi.txt''' 'r←⊃(//)⎕VFI(⊃⎕NGET filename)~⎕TC' '∇'
+ body,←'∇r←AssetFolder' ':Access Public Shared' 'r←##.##.HOME' '∇'
  body←(⊂':Class MyClass'),body,(⊂':EndClass')
  (⊂body)F.NPUT src,'/AssetAccess.aplc'
  (⊂,⊂'3.14')F.NPUT src,'/pi.txt'

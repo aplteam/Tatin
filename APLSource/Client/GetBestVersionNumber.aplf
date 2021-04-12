@@ -1,5 +1,6 @@
- r←{noBetas}GetBestVersionNumber(packageID url);client;request;res;f
- noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
+ (statusCode errMsg r)←{noBetas}GetBestVersionNumber(packageID url);request;res;f
+ statusCode←200 ⋄ errMsg←'' ⋄ r←''
+ noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'noBetas'
  :If f←Reg.IsValidPackageID_Complete packageID
  :OrIf f←Reg.IsValidPackageID_WithMajorNo packageID
  :OrIf f←Reg.IsValidPackageID_WithoutPatchNo packageID
@@ -8,23 +9,19 @@
  :EndIf
  'Invalid package ID'Assert f
  :If Reg.IsHTTP url
-     client←NewClient url
-     :If ':'∊RemoveHttpProtocol url
-         client.Port←⊃⊃(//)⎕VFI{⍵↓⍨⍵⍳':'}RemoveHttpProtocol url
-     :EndIf
      request←R.NewRequest 0
      request.URI←'/v1/packages/best_version/',packageID
      request.Headers,←⊂'Accept' 'application/json'
      request.Headers,←⊂'include-betas'('NY'[1+~noBetas])
-     res←client SendAndReceive request
+     res←url SendAndReceive request
      :If 200≠res.StatusCode
-         :If 0<≢res.Content
-             ('Server: ',res.Content)Assert 0
-         :Else
-             ('Failed with status code ',⍕res.StatusCode)Assert 0
-         :EndIf
+         statusCode←res.StatusCode
+         errMsg←res.Content
+     :Else
+         r←(Reg.AddSlash url),(Reg.APLfromJSON res.Content).BestVersion
      :EndIf
-     r←(Reg.AddSlash url),(Reg.APLfromJSON res.Content).BestVersion
  :Else
-     r←noBetas Reg.GetBestVersionNumber url,packageID
+     :If 0=≢r←noBetas Reg.GetBestVersionNumber url,packageID
+         statusCode←404
+     :EndIf
  :EndIf

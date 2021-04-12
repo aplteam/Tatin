@@ -1,12 +1,11 @@
- r←Test_Server_004(stopFlag batchFlag);⎕TRAP;c;q;res
+ r←Test_Server_004(stopFlag batchFlag);⎕TRAP;request;res
 ⍝ URL is neither a package ID nor a specific REST command: no version; therefore it's not a valid request.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- c←TC.NewClient'https://localhost'
- q←R.NewRequest 0
- q.URI←'/does_not_exist'
- res←c TC.SendAndReceive q
+ request←R.NewRequest 0
+ request.URI←'/does_not_exist'
+ res←'https://localhost'TC.SendAndReceive request
  →T.PassesIf 404≡res.StatusCode
 
  r←T._OK

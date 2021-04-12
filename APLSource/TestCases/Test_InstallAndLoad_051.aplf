@@ -1,0 +1,22 @@
+ r←Test_InstallAndLoad_051(stopFlag batchFlag);⎕TRAP;targetPath
+⍝ Install and load two packages of which the second brings in a better version of the first one as dependency (was a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''        ⍝ Where we install into
+
+ targetPath←GetTempDir ⍬
+
+ {}TC.InstallPackage'[localhost]aplteam-APLProcess-0.2.10'targetPath
+ {}TC.InstallPackage'[localhost]Example-Boo-1.0.0'targetPath
+
+ {}TC.LoadDependencies targetPath #.TEMP
+ →T.GoToTidyUp'0.3.0'≢{⍵/⍨3>+\'.'=⍵}2⊃#.TEMP.APLProcess.Version
+ →T.GoToTidyUp'0.3.0'≢{⍵/⍨3>+\'.'=⍵}2⊃#.TEMP.Boo.Version
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir targetPath
+⍝Done

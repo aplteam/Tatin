@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_045(stopFlag batchFlag);⎕TRAP;src4;list1;list2;rc;msg;zipFilename;toBeDeleted
+ r←Test_InstallAndLoad_045(stopFlag batchFlag);⎕TRAP;src4;list2;rc;msg;zipFilename;toBeDeleted;res1
  ;dir;src;body;cfg;installFolder;src2;src3;reg
 ⍝ Install a package that depends on two packages (first a class, second a function), no API
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -54,8 +54,8 @@
  Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list1←TC.InstallPackage('[local2]Example-MyTests-0.3.0')installFolder
- →T.GoToTidyUp 3≠≢list1
+ res1←TC.InstallPackage('[local2]Example-MyTests-0.3.0')installFolder
+ →T.GoToTidyUp'Example-MyTests-0.3.0'≢res1
 
  →T.GoToTidyUp 3≠+/F.IsDir⊃F.Dir installFolder,'/*'
  →T.GoToTidyUp 1≠≢TC.Dependencies.Get installFolder

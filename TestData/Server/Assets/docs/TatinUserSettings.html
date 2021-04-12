@@ -144,10 +144,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Let's list all registries currently defined:</p>
 <pre><code>      ⎕se.Tatin.MyUserSettings.ListRegistries 0
- Alias  URI                 Port  Priority  API-key
- -----  ------------------  ----  --------  -------
- tatin  https://tatin.dev/     0       100  ***</code></pre>
+URI                  Alias  Port  Priority
+------------------   -----  ----  --------
+https://tatin.dev/   tatin  0     100</code></pre>
 <p>This is because originally Tatin only knows about the principal Tatin server.</p>
+<p>Note that the API key is not listed when a zero is provided as right argument.</p>
 <p>Let's add a made-up registry.</p>
 <div class="h_tag">
 <a href="#Create-an-instance-of-the-DefineRegistry-class" id="Create-an-instance-of-the-DefineRegistry-class" class="autoheader_anchor">
@@ -183,7 +184,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><code>uri</code> and <code>alias</code> are already set by the constructor.</li>
 <li><code>port</code> is 0 which means that it will fall back to 80 for <code>http://</code> and 443 for <code>https://</code>.</li>
-<li><code>priority</code> may be useful for defining the sequence in which Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.</li>
+<li><code>priority</code> decides in which order Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.
+<p>Note that a priority of <code>0</code> means that the registry will <strong>not</strong> participate in any scanning.</p></li>
 <li><code>api_key</code> must be set only when the Registry is managed by a Tatin server <em>and</em> you want to publish packages, or delete packages if that is permitted by that Tatin server.</li>
 </ul>
 <div class="h_tag">

@@ -1,0 +1,10 @@
+ refs←ReinstallDependencies_(deps installFolder registry noBetas);i;pkg;ref
+ refs←⍬
+ :For i :In ⍳≢deps
+     pkg←i⊃deps
+     pkg←Reg.RemoveMinorAndPatch pkg
+     PrintToSession'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),'...'
+     ref←noBetas InstallPackage(registry,pkg)installFolder
+     PrintToSession'  Installed: ',ref,⎕UCS 13
+     refs,←⊂ref
+ :EndFor

@@ -1,14 +1,10 @@
  r←GetServerVersion uri;client;request;res
  uri←ReplaceRegistryAlias uri
  'No URI provided'Assert 0<≢uri
- client←NewClient uri
- :If ':'∊RemoveHttpProtocol uri
-     client.Port←⊃⊃(//)⎕VFI{⍵↓⍨⍵⍳':'}RemoveHttpProtocol uri
- :EndIf
  request←R.NewRequest 0
  request.URI←'/v1/version'
  request.Headers,←⊂'Accept' 'application/json'
- res←client SendAndReceive request
+ res←uri SendAndReceive request
  :If 200≠res.StatusCode
      :If 0<≢res.Content
          ('Server: ',res.Content)Assert 0

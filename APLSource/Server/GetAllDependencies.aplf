@@ -1,0 +1,13 @@
+ deps←known GetAllDependencies deps;list;deps2
+⍝ Fetches all dependencies recursively
+ :If 0<≢deps
+     list←G.RegistryPath∘,¨deps,¨⊂'/',Reg.DependenciesFilename
+ :AndIf 0<≢list←(F.IsFile list)/list
+ :AndIf 0<≢deps2←∪⊃,/{⊃F.NGET ⍵ 1}¨list
+ :AndIf 0<≢deps2←deps2~known
+ :AndIf 0<≢deps2←deps2~deps
+     deps,←deps2
+ :AndIf 0<≢deps2←deps GetAllDependencies deps2
+     deps←∪deps,deps2
+ :EndIf
+ ⍝Done

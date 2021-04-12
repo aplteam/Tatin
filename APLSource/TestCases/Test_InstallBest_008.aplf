@@ -1,4 +1,4 @@
- r←Test_InstallBest_008(stopFlag batchFlag);⎕TRAP;dir;refs;expected;refs2
+ r←Test_InstallBest_008(stopFlag batchFlag);⎕TRAP;dir;refs;expected;res
 ⍝ Install & load a specific version ith {group}-{name}-{major-{minor}-{patch} that is an existing beta
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -7,11 +7,11 @@
  'TEMP'#.⎕NS''
  dir←GetTempDir ⍬
 
- refs←TC.InstallPackage'[local]example-versions-1.0.12-zzz'dir
- →T.GoToTidyUp 1≠≢refs
+ res←TC.InstallPackage'[local]example-versions-1.0.12-zzz'dir
+ →T.GoToTidyUp res≢'example-versions-1.0.12-zzz'
 
- refs2←TC.LoadDependencies dir #.TEMP
- →T.GoToTidyUp 1≠≢refs2
+ res←TC.LoadDependencies dir #.TEMP
+ →T.GoToTidyUp 1≠≢res
 
  expected←'MyCode' '1.0.12-zzz' '2020-01-05'
  →T.GoToTidyUp expected≢#.TEMP.versions.Version

@@ -1,9 +1,10 @@
- r←Test_Server_205(stopFlag batchFlag);⎕TRAP;result
+ r←Test_Server_205(stopFlag batchFlag);⎕TRAP;result;statusCode;errMsg
 ⍝ Ask for best version of a complete package ID (does not make much sense but may confirm the existence)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- result←TC.GetBestVersionNumber'aplteam-APLProcess-0.2.11' 'https://localhost'
+ (statusCode errMsg result)←TC.GetBestVersionNumber'aplteam-APLProcess-0.2.11' 'https://localhost'
+ →T.PassesIf statusCode=200
  →T.PassesIf result≡'https://localhost/aplteam-APLProcess-0.2.11'
 
  r←T._OK

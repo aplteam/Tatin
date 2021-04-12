@@ -1,5 +1,5 @@
- r←Test_InstallAndLoad_030(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
- ;dir;src;body;cfg;zipfile;installFolder;list;src2;src3;src4;src5;reg
+ r←Test_InstallAndLoad_030(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted;res;GoToTidyUp
+ ;dir;src;body;cfg;zipfile;installFolder;src2;src3;src4;src5;reg
 ⍝ Two packages that depend on the same package but different versions; all are classes
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -64,10 +64,10 @@
  Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list←TC.InstallPackage('[local2]Example-MyClass_AAA-1.0.0')installFolder
- →T.GoToTidyUp 2≠≢list
- list←TC.InstallPackage('[local2]Example-MyClass_BBB-1.0.0')installFolder
- →T.GoToTidyUp 2≠≢list
+ res←TC.InstallPackage('[local2]Example-MyClass_AAA-1.0.0')installFolder
+ →T.GoToTidyUp res≢'Example-MyClass_AAA-1.0.0'
+ res←TC.InstallPackage('[local2]Example-MyClass_BBB-1.0.0')installFolder
+ →T.GoToTidyUp res≢'Example-MyClass_BBB-1.0.0'
 
  →T.GoToTidyUp 4≠≢F.ListDirs installFolder
  →T.GoToTidyUp 2≠≢F.ListFiles installFolder

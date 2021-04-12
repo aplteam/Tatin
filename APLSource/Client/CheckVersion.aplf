@@ -1,5 +1,5 @@
- identifier←{noBetas}CheckVersion identifier;packageID;path;CR;msg
- noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
+ identifier←{noBetas}CheckVersion identifier;packageID;path;CR;msg;statusCode;errMsg
+ noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'noBetas'
  packageID←GetPackageIDFromFilename identifier
  :If ~Reg.IsValidPackageID_Complete packageID
  :AndIf '.zip'≢⎕C ¯4↑identifier
@@ -7,9 +7,8 @@
          path←EstablishRegistry packageID
          ('Not found in any Registry: ',packageID)Assert 0<≢path
      :EndIf
-     identifier←noBetas GetBestVersionNumber packageID path
-     :If ~Reg.IsHTTP path
-         ('Not found: ',packageID)Assert 0<≢identifier
-         ('Not found: ',packageID)Assert F.IsDir identifier
-     :EndIf
+     (statusCode errMsg identifier)←noBetas GetBestVersionNumber packageID path
+     ('Not found: ',packageID)Assert 404≠statusCode
+     errMsg Assert 200=statusCode
  :EndIf
+⍝Done

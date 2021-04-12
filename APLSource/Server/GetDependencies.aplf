@@ -1,13 +1,12 @@
- response←request GetDependencies packageID;data;html;filename;list
+ response←request GetDependencies packageID;html;filename;list;content;dependencies
 ⍝ Collect dependencies if not http: those need to be dealt with by the caller since this is
 ⍝ the server module, so we don't have the means to query servers at this point.
  :If Reg.IsValidPackageID_Complete packageID
      filename←(⊃¯1↑1⊃F.Dir G.RegistryPath,packageID,'*'),'/',Reg.DependenciesFilename
      :If F.IsFile filename
-         data←CollectDependenciesFor filename
-     :AndIf 0<≢data
+     :AndIf 0<≢dependencies←⊃F.NGET filename 1
          :If IsJsonRequest request.Headers
-             response←request ReturnJSON Reg.JSON data
+             response←request ReturnJSON Reg.JSON dependencies
          :Else
              response←request Respond 401 1
          :EndIf

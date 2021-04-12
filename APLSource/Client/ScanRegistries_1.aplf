@@ -1,0 +1,11 @@
+ request ScanRegistries_1(registries packageIDs);i;registry;res;ns;data;buff;deps
+⍝ Part of creating a build list. Scans all registries for `packageIDs`
+ i←0
+ :Repeat
+     :If (≢registries)≥i←i+1
+         registry←i⊃registries
+         request ScanRegistries_1_ registry packageIDs
+         packageIDs~←∆TREE.{Data[;∆packageID]}⍬
+         packageIDs~←⊂'null'
+     :EndIf
+ :Until 0=≢packageIDs

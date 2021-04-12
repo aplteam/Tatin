@@ -1,0 +1,9 @@
+ response←request CheckForExistence packageIDs;ns;json
+⍝ Returns a Booleans for every packageID; 1 = hosted on this Registry
+ ns←⎕NS''
+ packageIDs←','A.Split packageIDs
+ ns.exist←F.IsDir G.RegistryPath∘,¨packageIDs
+ json←Reg.JSON ns
+ response←R.NewResponse request
+ response.Content←json
+ ⍝Done

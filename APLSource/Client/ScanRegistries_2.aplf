@@ -1,0 +1,19 @@
+ request ScanRegistries_2 registries;bool;i;registry;res;ns;bool2
+⍝ Part of creating a build list. Established the Server the package is hosted by.
+ i←1
+ :While 0<+/bool←0=≢¨∆TREE.Data[;∆TREE.∆url]
+     registry←i⊃registries
+     :If Reg.IsHTTP registry
+         request.URI←'/v1/packages/exist/',1↓∊',',¨bool/∆TREE.Data[;∆TREE.∆packageID]
+         res←registry SendAndReceive request
+         :If 200=res.StatusCode
+             ns←Reg.JSON res.Content
+             :If ∨/ns.exist
+                 ∆TREE.Data[⍸bool\ns.exist;∆TREE.∆url]←⊂registry
+             :EndIf
+         :EndIf
+     :Else
+         bool2←F.IsDir registry∘,¨bool/∆TREE.Data[;∆TREE.∆packageID]
+         ∆TREE.Data[⍸bool\bool2;∆TREE.∆url]←⊂registry
+     :EndIf
+ :Until (≢registries)<i←i+1

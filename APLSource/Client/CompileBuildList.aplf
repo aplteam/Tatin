@@ -16,7 +16,8 @@
 
  :If 0<≢newTree                                             ⍝ There might be no depen
  :AndIf 0<≢deps2←(1<newTree[;1])⌿newTree
-     deps2←1 Reg.GetBestVersionNumber¨Reg.RemoveVersionNumber¨deps2[;3]
+     deps2←1 Reg.GetBestVersionNumber∘Reg.RemoveVersionNumber¨deps2[;3]
+     Assert 0∧.<≢¨deps2
      ind←⍸newTree[;1]>1
      newTree[ind;2]←GetPackageIDFromFilename¨deps2
      newTree[ind;3]←deps2

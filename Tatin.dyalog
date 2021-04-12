@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.25.0 - 2021-04-07
+⍝   * ]ReinstallDependencies ikmplemented
+⍝   * -raw added to `CheckForLaterVersion`
 ⍝ * 0.23.0 - 2021-04-02
 ⍝   * ]LoadDependencies now has an overwrite flag
 ⍝ * 0.22.0 - 2021-04-01
@@ -173,7 +176,7 @@
           c←⎕NS ⍬
           c.Name←'CheckForLaterVersion'
           c.Desc←'Check whether there are better versions of a package available'
-          c.Parse←'1 -major -dependencies'
+          c.Parse←'1 -major -dependencies -raw'
           r,←c
      
           c←⎕NS ⍬
@@ -198,6 +201,12 @@
           c.Name←'UninstallPackage'
           c.Desc←'Uninstalls a package and its dependencies'
           c.Parse←'2'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'ReinstallDependencies'
+          c.Desc←'Install all packages again according to the dependency file'
+          c.Parse←'2s -betas'
           r,←c
      
           r.Group←⊂NM
@@ -333,16 +342,16 @@
       r←⍪r
     ∇
 
-    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this;dependencies
+    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this;dependencies;raw
       r←''
       path←Arg._1
-      majorFlag←Arg.major
-      dependencies←0 Arg.Switch Arg.dependencies
+      (majorFlag raw dependencies)←Arg.(major raw dependencies)
       :If majorFlag
-          r←⍪majorFlag TC.CheckForLaterVersion path
+          r←majorFlag TC.CheckForLaterVersion path dependencies
+          r←↑(0<≢¨r)/r
       :Else
           r←TC.CheckForLaterVersion path dependencies
-          r←⍪(0<≢¨r)/r
+          r←↑(0<≢¨r)/r
           :If 0  ⍝TODO⍝  May be one day we support this, may be not
               :If 0<≢r
                   :If 1=≢r
@@ -365,6 +374,30 @@
                   ∘∘∘
               :EndIf
           :EndIf
+      :EndIf
+      :If ~raw
+          r←'Installed' 'Best' 'URL'⍪' '⍪r
+          r[2;]←(⌈⌿≢¨r)⍴¨'-'
+      :EndIf
+    ∇
+
+    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;noBetas;deps
+      r←''
+      'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
+      :If 0≡Args._2
+          registry←''
+      :Else
+          registry←Args._2
+      :EndIf
+      noBetas←~Args.betas
+      installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
+      'Not a directory'Assert TC.F.IsDir installFolder
+      'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'
+      deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
+      'Dependency file is empty'Assert 0<≢deps
+      :If ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
+          r←noBetas TC.ReinstallDependencies installFolder registry
+          ⎕←'*** Done'
       :EndIf
     ∇
 
@@ -658,7 +691,7 @@
               'Create!'TC.F.CheckPath installFolder
           :EndIf
       :EndIf
-      r←⍪TC.InstallPackage identifier installFolder
+      r←TC.InstallPackage identifier installFolder
     ∇
 
     ∇ r←UserSettings Arg;origData;filename;ns;new;buff
@@ -771,12 +804,13 @@
           r,←⊂''
           r,←⊂'The -force flag allows you to enforce the load even if ⎕SE.Tatin already exists.'
       :Case ⎕C'ListRegistries'
-          r,←⊂'Lists URI, alias and priority of all Registries defined in the user settings.'
+          r,←⊂'Lists URI, alias, priority and port of all Registries defined in the user settings.'
           r,←⊂'The result is ordered by priority: the first one is scanned first etc.'
+          r,←⊂'Note that Registry with a priority of 0  will not participate in any scan of Registries.'
           r,←⊂''
           r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
-          r,←⊂'* By default only "alias", "uri" and "priority" are listed; specify -all for all'
-          r,←⊂'  columns but be aware that this means the API key will become visible.'
+          r,←⊂'* By default all data but the API key are listed. Specify -all if you want the API key'
+          r,←⊂'  columnsto be listed as well.'
       :Case ⎕C'ListPackages'
           r,←⊂'Lists all packages in the Registry specified as an argument. If no Registry was specified'
           r,←⊂'then the user will be prompted for the Registry, eccept when there is just one anyway.'
@@ -943,13 +977,15 @@
       :Case ⎕C'CheckForLaterVersion'
           r,←⊂'Takes the path to a folder with a file "apl-buildlist.json" as argument.'
           r,←⊂'Checks the packages specified in that file for "better" versions.'
+          r,←⊂'Packages installed from  ZIP files are ignored: Tatin does not know where to look.'
           r,←⊂''
-          r,←⊂'Returns all "better" versions. If no "better" version was found nothing will be returned.'
+          r,←⊂'Returns information only for packages a "better" version was found for.'
           r,←⊂''
           r,←⊂'By default "better" MAJOR versions are ignored, but check on -major.'
-          r,←⊂''
           r,←⊂'The default behaviour can be changed by specifying the flag -major.'
           r,←⊂'Then only "better" major versions are reported.'
+          r,←⊂''
+          r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
       :Case ⎕C'DeletePackage'
           r,←⊂'Takes a path pointing to a package.'
           r,←⊂'Examples:'
@@ -964,6 +1000,16 @@
           r,←⊂'If no server is specified the user will be prompted, unless there is just one server anyway.'
       :Case ⎕C'Documentation'
           r,←⊂'Puts https://tatin.dev/v1/documentation into the default browser'
+      :Case ⎕C'ReinstallDependencies'
+          r,←⊂''
+          r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt'
+          r,←⊂'All files and folders but the dependency file are removed from the folder and then the'
+          r,←⊂'packages are installed from scratch.'
+          r,←⊂''
+          r,←⊂'All defined Registries are scanned but one can specify a particular Registry as second'
+          r,←⊂'(optional) argument.'
+          r,←⊂''
+          r,←⊂'By default betas are not included but this can be changed by specifying the -betas flag.'
       :Else
           r←'Unknown command: ',Cmd
       :EndSelect

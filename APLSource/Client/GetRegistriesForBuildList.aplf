@@ -1,0 +1,6 @@
+ r←GetRegistriesForBuildList;buff
+⍝ Returns the URLs for all registries with a priority of greater than 0 (because we do not scan priority=0), ordered by priority
+ buff←1 ListRegistries''
+ buff←(buff[;4]>0)⌿buff
+ r←⊃¨{⍵∊0 80 443:⍺ ⋄ ({⍵↓⍨-'/'=¯1↑⍵}⍺),':',(⍕⍵),'/'}/¨↓buff[;1 3]
+⍝Done

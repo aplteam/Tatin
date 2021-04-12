@@ -1,4 +1,4 @@
- (statusCode errMsg)←DeletePackage uri;uri_;packageID;statusCode;errMsg;client;request;response;en;msg;rc
+ (statusCode errMsg)←DeletePackage uri;uri_;packageID;statusCode;errMsg;request;response;en;msg;rc
 ⍝ Delete a package.\\
 ⍝ Whether deleting a package can be successful is determined by the INI setting [CONFIG]DeletePackages
  statusCode←200 ⋄ errMsg←''
@@ -7,12 +7,11 @@
  (uri_ packageID)←Reg.SeparateUriAndPackageID uri_
  'Unknown Registry'Assert(⊂EnforceTrailingSlash uri_)∊MyUserSettings.registries.uri
  :If Reg.IsHTTP uri_
-     client←NewClient uri_
      request←R.NewRequest 0
      request.URI←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
      request.Method←'DELETE'
      request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri_).api_key)
-     response←client SendAndReceive request
+     response←uri_ SendAndReceive request
      :If response.StatusCode≢200
          statusCode←response.StatusCode
          :If 405≡statusCode

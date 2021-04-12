@@ -8,9 +8,12 @@
      path←⍵
      filename←path,'/',DEP_NAME
      0=##.F.Exists filename:''
-     deps←1⊃##.F.NGET filename 1
+     deps←⊃##.F.NGET filename 1
+     deps←deps~¨⊂⎕UCS 0 3           ⍝ Yes, we've seen "empty" files containig those charaters!
+     deps←(0<≢¨deps)/deps
+     0=≢deps:deps
      bool←';'≠⊃¨deps
-     deps←bool/deps             ⍝ Get rid of comments
+     deps←bool/deps                 ⍝ Get rid of comments
      deps←##.ReplaceRegistryAlias⍣replaceAliasFlag⊢deps
      deps
  }

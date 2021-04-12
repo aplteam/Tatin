@@ -1,0 +1,19 @@
+ r←Test_API_064(stopFlag batchFlag);⎕TRAP;res;noOfRefs
+⍝ Exercise ⎕SE.Tatin.LoadPackage on a package that is hosted in the test server but has dependencies elsewhere
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ res←1 ⎕SE.Tatin.LoadPackage'[local]example-joo' '#.TEMP'
+ →T.GoToTidyUp'MyCode' '1.0.0' '2020-01-02'≢#.TEMP.joo.Version
+ noOfRefs←≢(' '~⍨¨↓#._tatin.example_joo_1_0_0.code.⎕NL 9.1 9.4)~⊂'MyCode'
+ →T.GoToTidyUp noOfRefs≠≢⊃F.NGET(∆GetServerRegistryFolder,'example-joo-1.0.0/',TC.Reg.DependenciesFilename)1
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :Trap 0 ⋄ F.RmDir res ⋄ :EndTrap
+⍝Done

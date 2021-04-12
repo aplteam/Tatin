@@ -1,13 +1,12 @@
- r←Test_Server_006(stopFlag batchFlag);⎕TRAP;ind;version;serverVersion;c;q;res;expected
+ r←Test_Server_006(stopFlag batchFlag);⎕TRAP;ind;version;serverVersion;request;res;expected
 ⍝ Simulate a request from an outdated version of Tatin. Must result in a 400 (bad request)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- c←TC.NewClient'https://localhost'
- q←R.NewRequest 0
- q.URI←'/'
- q.Headers,←⊂'x-tatin' '0.1'
- r←c R.SendAndReceive q
+ request←R.NewRequest 0
+ request.URI←'/'
+ request.Headers,←⊂'x-tatin' '0.1'
+ r←'https://localhost'TC.SendAndReceive request
  →T.PassesIf r.StatusCode=400
  expected←'Request came from invalid version of Tatin. Minimum version required is '
  →T.PassesIf expected{⍺≡(≢⍺)↑⍵}r.Content

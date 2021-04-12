@@ -161,14 +161,14 @@ In case you need to access assets from an instance of a package you have two cho
 
    ```
    r←GetAssetFolder
-   r←##.##.∆HOME
+   r←##.##.HOME
    ```
 
    You can then call this shared method from within an instance method.
 
 2. Use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
 
-   Therefore the expression `(⊃⊃⎕CLASS ⎕THIS).##.##.∆HOME` returns what's on `∆HOME`.
+   Therefore the expression `(⊃⊃⎕CLASS ⎕THIS).##.##.HOME` returns what's on `HOME`.
 
 
 #### description
@@ -197,7 +197,7 @@ This function will be executed bei either `LoadPackage` or `LoadDependencies` _a
 
 If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackage` and has no assets then the right argument will be empty.
 
-The function may or may not return a result. A result is assigned to `∆LX`. If there is no result `∆LX` is assigned an empty vector. Withou an `lx` function there won't be a variable `∆LX`.
+The function may or may not return a result. A result is assigned to the [system variable](#SysVars) `LX`. If there is no result `LX` is assigned an empty vector. Without an `lx` function there won't be a variable `LX`.
 
 The `lx` function will be executed under error trapping, and any errors will be silently ignored. If you do not want this then you have two options:
 
@@ -205,7 +205,7 @@ The `lx` function will be executed under error trapping, and any errors will be 
 
 * Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with any problem yourself
 
-Note that the existence of a variable `∆LX` indicates that there was an `lx` function successfully executed.
+Note that the existence of a variable `LX` indicates that there was an `lx` function successfully executed.
 
 #### name
 
@@ -253,7 +253,7 @@ The optional build number, separated by the `+` sign, is ignored by Tatin.
 
 For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
-#### System vars: `⎕IO`, `⎕ML`, `⎕WX`
+#### System vars: `⎕IO`, `⎕ML`, `⎕WX` {#SysVars}
 
 By default the config namespace carries the values of the three Dyalog parameters `default_io`, `default_ml` and `default_wx` for the three system variables `⎕IO`, `⎕ML` and `⎕WX`. 
 
@@ -298,16 +298,16 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 ### Access after loading a package
 
-Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON under the name `∆CONFIG` together with `∆ID`, `∆URI` and `∆HOME`.
+Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON under the name `CONFIG` together with `ID`, `URI`, `LX` and `HOME`.
 
-Note that `∆HOME` will be empty in case two conditions are met:
+Note that `HOME` will be empty in case two conditions are met:
 
 * The package was brought into the workspace with `LoadPackage` (as opposed to `LoadDependencies`)
 * The package does not have any assets
 
 All of them are niladic functions because that's how we emulate constants in APL.
 
-There _might_ be a variable `∆LX` in case the package used the [`lx`](#) mechanism for initializing itself.
+There _might_ be a variable `LX` in case the package used the [`lx`](#) mechanism for initializing itself.
 
 [^id]: A package ID consists of `{group}-{name}-{major.{minor}.{patch}`
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number

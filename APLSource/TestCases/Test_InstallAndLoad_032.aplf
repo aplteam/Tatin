@@ -1,5 +1,5 @@
- r←Test_InstallAndLoad_032(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted
- ;dir;src;body;cfg;installFolder;list;src2;src3;reg
+ r←Test_InstallAndLoad_032(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted;res
+ ;dir;src;body;cfg;installFolder;src2;src3;reg
 ⍝ A package that depend on another package that has several functions within a namespace
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -44,8 +44,8 @@
  Assert 200=rc
 
  installFolder←GetTempDir'/Tatin_AppPackages'
- list←TC.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
- →T.GoToTidyUp 2≠≢list
+ res←TC.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
+ →T.GoToTidyUp res≢'Example-MyMath-0.2.0'
 
  →T.GoToTidyUp 2≠≢F.ListDirs installFolder
  →T.GoToTidyUp 2≠≢F.ListFiles installFolder

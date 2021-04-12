@@ -1,12 +1,11 @@
- r←Test_Server_001(stopFlag batchFlag);⎕TRAP;ind;version;serverVersion;c;q;res
+ r←Test_Server_001(stopFlag batchFlag);⎕TRAP;ind;version;serverVersion;request;res
 ⍝ Check whether the Tatin server carries the same version number as the client
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- c←TC.NewClient'https://localhost'
- q←R.NewRequest 0
- q.URI←'/'
- res←c TC.SendAndReceive q
+ request←R.NewRequest 0
+ request.URI←'/'
+ res←'https://localhost'TC.SendAndReceive request
  →T.PassesIf(≢res.Headers)≥ind←(⊃¨res.Headers)⍳⊂'x-tatin'
  version←2⊃Reg.Version
  serverVersion←ind 2⊃res.Headers

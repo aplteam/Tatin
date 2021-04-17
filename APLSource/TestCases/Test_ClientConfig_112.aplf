@@ -1,0 +1,29 @@
+ r←Test_ClientConfig_112(stopFlag batchFlag);⎕TRAP;settings;tempDir;reg;myRegDef1;myRegDef2
+⍝ Check whether the priorities are reset in case a new registry is added but the lowest priority is 1; standard order
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+
+ settings←⎕NEW TC.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp≢/F.ExpandPath¨settings.path2config(tempDir,'/',settings.cfg_name)
+
+ myRegDef1←'[test]http://test-tatin.dev/'
+ reg←⎕NEW TC.DefineRegistry(,⊂myRegDef1)
+ reg.priority←1
+ settings.AddRegistry reg
+
+ →T.GoToTidyUp'tatin' 'test'≢(1 settings.ListRegistries 0)[;1]
+
+ myRegDef2←'[my-tatin]http://tatin.dev/'
+ reg←⎕NEW TC.DefineRegistry(,⊂myRegDef2)
+ settings.AddRegistry reg
+
+ →T.GoToTidyUp'tatin' 'test' 'my-tatin'≢(1 settings.ListRegistries 0)[;1]
+ →T.GoToTidyUp 300 200 100≢settings.registries.priority
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir
+⍝Done

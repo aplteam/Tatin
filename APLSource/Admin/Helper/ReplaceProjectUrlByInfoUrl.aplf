@@ -1,0 +1,17 @@
+ ns←filename ReplaceProjectUrlByInfoUrl ns
+⍝ Renames "project_url" to "info_url" but also checks whether "date" is what we expect it to be
+ :If 0<ns.⎕NC'project_url'
+     ns.info_url←ns.project_url
+     ns.⎕EX'project_url'
+ :EndIf
+ :If 0<ns.⎕NC'date'
+     ##.Assert 2=ns.⎕NC'date'
+     :If 80=⎕DR ns.date
+         ns.date←##.A.ToNum ns.date
+     :EndIf
+     ##.Assert 645=⎕DR ns.date
+     ##.Assert'.'∊⍕ns.date
+ :Else
+     ⎕←'Has no "date": ',filename
+ :EndIf
+⍝Done

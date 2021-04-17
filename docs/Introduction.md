@@ -12,7 +12,11 @@ Tatin is a package manager for Dyalog APL that helps you use and manage packages
 
 A package should serve a particular task, for example convert markdown files into HTML. A package may be independent, but it may also depend on other packages. Tatin manages dependencies behind the scene.
 
-A package may consist of as little as a single source file and as much as a nested folder structure with many source files. Any of those files may contain a single function, a single operator, a single class, a single interface or a single namespace. A package may also come with assets.
+A package may consist of as little as a single source file and as much as a nested folder structure with many source files. Any of those files may contain a single function, a single operator, a single class, a single interface or a single namespace. 
+
+W> Dyalog supports several APL objects in a single text files. Tatin does _not_ support this.
+
+A package may also come with assets.
 
 A> ### Assets
 A>
@@ -21,7 +25,7 @@ A> A package may come with all sorts of assets (CSS files, BAT files, icons, ima
 
 ## Why do we need packages?
 
-These days packages are available in probably 99% of all programming languages. It allow the consumption of code that others have written to solve a particular task without any problem; even name clashes can easily be avoided, and you don't have to worry about dependencies.
+These days packages are available in probably 99% of all programming languages. It allows the consumption of code that others have written to solve a particular task without any problem; even name clashes can easily be avoided, and you don't have to worry about dependencies.
 
 Packages can be updated to a later (and therefore hopefully better) version in an easy and straightforward manner.
 
@@ -54,7 +58,7 @@ Note that although you can access a Tatin server with a browser, its real goal i
 
 ## Authors (publishers)
  
-You'll develop Tatin packages using whatever tools you're familiar with.  These could be GitHub, GitLab or any of their competitors, or local files on your PC.
+You may develop Tatin packages using whatever tools you're familiar with.  These could be GitHub, GitLab or any of their competitors, or local files on your PC.
 
 When you're ready to create a release of your package, you'll assign a group and specify a name and a version number, define dependencies (if any), and you may provide additional meta information like tags, a description and more. You may even add user-defined meta data.
 

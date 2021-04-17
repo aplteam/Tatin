@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackage(identifier_ targetFolder);bool
+ r←{noBetas}InstallPackage(identifier_ targetFolder);bool;principal
  ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be one of:
@@ -36,10 +36,10 @@
  :If 0<≢buildList←GetDependencyTree alias,identifier
      PrintToSession'  ',(⍕≢buildList),' dependencies identified'
      CheckAlias targetFolder alias
-     :For level packageID2 url :In ↓buildList
+     :For principal packageID2 url :In ↓buildList
          (alias packageID2)←SplitAtAlias packageID2
          installFolder←(Reg.AddSlash targetFolder),packageID2
-         :If level=1
+         :If principal
          :AndIf F.Exists installFolder
              ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
          :EndIf
@@ -48,7 +48,7 @@
              installFolder ⎕NMOVE tempDir
              F.RmDir tempDir
          :EndIf
-         :If 1=level
+         :If principal
              PrintToSession'  Add ',packageID2,' to dependency file...'
              targetFolder Dependencies.Add alias,packageID2
          :EndIf

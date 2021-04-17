@@ -1,4 +1,4 @@
- {r}←level GetDependencyTreeFromRegistry path;deps;filename;dep;identifier;dep2;alias
+ {r}←principal GetDependencyTreeFromRegistry path;deps;filename;dep;identifier;dep2;alias
 ⍝ Reads the dependency file of `path` and processes them.\\
 ⍝ Requires semi-global ∆TREE
  r←⍬
@@ -26,7 +26,7 @@
          :AndIf 0=⎕NEXISTS identifier
              identifier←(EstablishRegistry dep2),dep2
          :EndIf
-         {}GetDependencyTree(level+1)(alias,RemoveFileProtocol identifier)
+         {}GetDependencyTree principal(alias,RemoveFileProtocol identifier)
      :EndFor
  :EndIf
 ⍝Done

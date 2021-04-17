@@ -7,18 +7,18 @@
  filename←path,Reg.BuildListFilename{('/',⍺)/⍨⍺≢(-≢⍺)↑⍵}path
  :If F.IsFile filename
  :AndIf append
-     ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET filename
+     ns←Reg.JSON⊃F.NGET filename
  :Else
      ns←⎕NS''
-     ns.(depth packageID url)←⊂''
+     ns.(principal packageID url)←⊂''
  :EndIf
- ns.depth,←buildList[;1]
+ ns.principal,←buildList[;1]
  ns.packageID,←buildList[;2]
  ns.url,←buildList[;3]
  ns.url←{'/'@(⍸'\'=⍵)⊢⍵}¨ns.url
-⍝ mat←TakeBestVersion1 ns           ⍝ This seems to be not a correct implementation of minimum version selection
+⍝ mat←TakeBestVersion1 ns           ⍝ This seems to be an incorrect implementation of minimum version selection
  mat←TakeBestVersion2 ns
- ns.(depth packageID url)←↓⍉mat
+ ns.(principal packageID url)←↓⍉mat
  (⊂Reg.JSON ns)F.NPUT filename 1
  buildList←mat
 ⍝Done

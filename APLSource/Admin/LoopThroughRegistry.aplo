@@ -1,0 +1,24 @@
+ r←(fns LoopThroughRegistry)path;list;F;i;pattern;offset;length;buff;Z;myZip;folder;packages;package;filename;ns;zipFilename;A
+⍝ Takes a path to a local Registry. Processes all directories found in that folder and ...
+⍝ * Reads the file apl-package.json, convert the JSON5 to APL data and feeds it to `fns`
+⍝ * Replaces the file apl-package.json in that folder with the result of `fns`
+⍝ * Replaces apl-package.json inside the package zip file in that folder\\
+⍝ In other words, it's designed to polish all apl-package.json files in a Registry, zipped and unzipped
+ F←##.FilesAndDirs ⋄ Z←##.DotNetZip ⋄ A←##.APLTreeUtils2
+ packages←F.ListDirs path
+ :For i :In ⍳≢packages
+     package←i⊃packages
+     ⎕←(⍕i),'. of ',⍕≢packages
+     filename←package,'/apl-package.json'
+     ns←##.Registry.JSON⊃F.NGET filename
+     ns←filename fns ns
+     (⊂##.Registry.JSON ns)F.NPUT filename 1
+     zipFilename←{⍵,'/',(2⊃A.SplitPath ⍵),'.zip'}package
+     :If F.IsFile zipFilename
+         myZip←⎕NEW Z(,⊂zipFilename)
+         folder←⊃⎕NPARTS filename
+         folder myZip.Add'/apl-package.json'
+         myZip.Dispose
+     :EndIf
+ :EndFor
+⍝Done

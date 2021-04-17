@@ -1,0 +1,13 @@
+ {r}←EstablishTatinConstants(ref cfg folder);deps
+ r←⍬
+ ref.⎕FX'r←HOME'('r←''',folder,'''')   ⍝ We might change this at a later stage if the packages does not have any assets
+ ref.⎕FX'r←CONFIG'('r←''',(Reg.JSON cfg),'''')
+ ref.⎕FX'r←ID'('r←''',(⊃{⍺,'-',⍵}/cfg.(group name version)),'''')
+ ref.⎕FX'r←URI'('r←''',({0<⍵.⎕NC'uri':⍵⍎'uri' ⋄ ''}cfg),'''') ⍝ "uri" is set by server but not for local installations
+ :If F.IsFile folder,'\apl-dependencies.txt'
+     deps←⊃F.NGET(folder,'\apl-dependencies.txt')1
+     ref.⎕FX'r←DEPENDENCIES'('r←',(⊃{⍺,' ',⍵}/'''',¨(2⍴deps),¨''''),'')
+ :Else
+     ref.⎕FX'r←DEPENDENCIES' 'r←⍬'
+ :EndIf
+⍝Done

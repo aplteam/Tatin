@@ -25,10 +25,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Whats-the-name-of-that-file">What's the name of that file?</a></li>
 <li><a href="#May-I-edit-it">May I edit it?</a></li>
 <li><a href="#What-does-Tatin-do-at-start-up-time">What does Tatin do at start-up time?</a></li>
-<li><a href="#Syncing-file-and-workspace">Syncing file and workspace</a>
+<li><a href="#Synchronizing-file-and-workspace">Synchronizing file and workspace</a>
 <ul>
 <li><a href="#Changes-made-to-the-file">Changes made to the file</a></li>
 <li><a href="#Changes-made-in-the-workspace">Changes made in the workspace</a></li>
+<li><a href="#Comments">Comments</a></li>
 </ul></li>
 <li><a href="#Summary">Summary</a></li>
 </ul></li>
@@ -59,13 +60,20 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Tatin uses a file to remember all Tatin Registries you want to work with, and possibly other user-specific settings as well. We refer to this file as the user settings file.</p>
-<p>When you start using Tatin for the very first time with 18.0 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location.</p>
+<p>When you start using Tatin for the very first time with 18.0 or 18.1 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location.</p>
 <div class="h_tag">
 <a href="#The-default-file" id="The-default-file" class="autoheader_anchor">
 <h3 data-id="The-default-file">The default file</h3>
 </a>
 </div>
-<p>That default file will only have one Tatin Registry defined in it: the principal Tatin server, available via the URL <code>https://tatin.dev/</code>. It has an alias <code>tatin</code> assigned to it, so you can address it as <code>[tatin]</code> with all user commands that require a Registry as parameter.</p>
+<p>That default file will have two Tatin Registries defined in it:</p>
+<ul>
+<li>the principal Tatin server, available via the URL <code>https://tatin.dev/</code>.
+<p>It has an alias <code>tatin</code> assigned to it, so you can address it as <code>[tatin]</code> with all user commands that require a Registry as parameter.</p></li>
+<li>the Tatin Test server, available via the URL <code>https://test.tatin.dev/</code>.
+<p>It has an alias <code>test-tatin</code> assigned to it, so you can address it as <code>[test-tatin]</code> with all user commands that require a Registry as parameter.</p>
+<p>It has a priority of <code>0</code> assigned to it which means that it will <em>not</em> participate in Registry scans. Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is <code>0</code> or less.</p></li>
+</ul>
 <div class="h_tag">
 <a href="#Where-does-it-live" id="Where-does-it-live" class="autoheader_anchor">
 <h3 data-id="Where-does-it-live">Where does it live?</h3>
@@ -87,6 +95,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If you are familiar with JSON5 syntax and want to edit the file it is recommended to use</p>
 <pre><code>]TATIN.Usersettings -edit</code></pre>
 <p>This will allow you to edit the file, but Tatin will check the file afterwards in order to make sure that nothing invalid goes ever into the file.</p>
+<p>Note that Dyalog 18.1 and later recognise JASON5 and highlights any syntax errors which can be quite useful.</p>
 <div class="h_tag">
 <a href="#What-does-Tatin-do-at-start-up-time" id="What-does-Tatin-do-at-start-up-time" class="autoheader_anchor">
 <h3 data-id="What-does-Tatin-do-at-start-up-time">What does Tatin do at start-up time?</h3>
@@ -105,8 +114,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul></li>
 </ol>
 <div class="h_tag">
-<a href="#Syncing-file-and-workspace" id="Syncing-file-and-workspace" class="autoheader_anchor">
-<h3 data-id="Syncing-file-and-workspace">Syncing file and workspace</h3>
+<a href="#Synchronizing-file-and-workspace" id="Synchronizing-file-and-workspace" class="autoheader_anchor">
+<h3 data-id="Synchronizing-file-and-workspace">Synchronizing file and workspace</h3>
 </a>
 </div>
 <div class="h_tag">
@@ -123,6 +132,29 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>If you manipulate the instance in the workspace, then the changes won't be written to file. You need to call the monadic <code>Save</code> method (with a <code>1</code> as right argument) to make your changes permanent.</p>
+<div class="h_tag">
+<a href="#Comments" id="Comments" class="autoheader_anchor">
+<h4 data-id="Comments">Comments</h4>
+</a>
+</div>
+<p>Not that JSON5 allows two different types of comments:</p>
+<div class="h_tag">
+<a href="#Block-commenys" id="Block-commenys" class="autoheader_anchor">
+<h5 data-id="Block-commenys">Block commenys</h5>
+</a>
+</div>
+<p>Everything between <code>/*</code> and <code>*/</code> is recognized as a comment, like this:</p>
+<pre><code>/*
+  This is a comment that...
+  stretches over several lines
+*/.</code></pre>
+<div class="h_tag">
+<a href="#Line-comments" id="Line-comments" class="autoheader_anchor">
+<h5 data-id="Line-comments">Line comments</h5>
+</a>
+</div>
+<p>This is an example for a line that is recognized as a comment:</p>
+<pre><code>// This is a comment line</code></pre>
 <div class="h_tag">
 <a href="#Summary" id="Summary" class="autoheader_anchor">
 <h3 data-id="Summary">Summary</h3>
@@ -155,7 +187,7 @@ https://tatin.dev/   tatin  0     100</code></pre>
 <h4 data-id="Create-an-instance-of-the-DefineRegistry-class">Create an instance of the <code>DefineRegistry</code> class.</h4>
 </a>
 </div>
-<p>Let's assume that you work for a company “MyCompany”, and that this company entertains a Tatin Server with the URL https://tatin.mycompany.com.</p>
+<p>Let's assume that you work for a company “MyCompany”, and that this company entertains a Tatin Server with the URL <code>https://tatin.mycompany.com</code>.</p>
 <p>In order to add that Registry to the user settings file you must first instantiate the <code>DefineRegistry</code> class. You may specify the URL and the alias in several ways; for details on the <code>DefineRegistry</code> class execute this:</p>
 <pre><code>]adoc ⎕se.Tatin.DefineRegistry</code></pre>
 <p>We will pass a simple text vector that specifies the alias (between <code>[]</code>) and the URI:</p>
@@ -185,7 +217,7 @@ https://tatin.dev/   tatin  0     100</code></pre>
 <li><code>uri</code> and <code>alias</code> are already set by the constructor.</li>
 <li><code>port</code> is 0 which means that it will fall back to 80 for <code>http://</code> and 443 for <code>https://</code>.</li>
 <li><code>priority</code> decides in which order Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.
-<p>Note that a priority of <code>0</code> means that the registry will <strong>not</strong> participate in any scanning.</p></li>
+<p>Note that a priority of <code>0</code> or less means that the registry will <strong>not</strong> participate in a Registry scan.</p></li>
 <li><code>api_key</code> must be set only when the Registry is managed by a Tatin server <em>and</em> you want to publish packages, or delete packages if that is permitted by that Tatin server.</li>
 </ul>
 <div class="h_tag">
@@ -201,14 +233,6 @@ https://tatin.dev/   tatin  0     100</code></pre>
  myc    https://tatin.mycompany.com/   90</code></pre>
 <p>The priority is not 0 anymore but 90: any 0 is replaced by the lowest number yet minus 10.</p>
 <p>Note that so far we have changed the user settings in the workspace, <em>not</em> on file. This allows you to experiment with certain settings without making the change permanent. That means that other sessions won't be affected.</p>
-<div class="leanpub">
-<img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
-<div>
-<p><em>Don't</em> add the Tatin Test Registry permanently to the user settings file</p>
-<p>The simple reason is that under certain circumstances Tatin scans all Registries in order to find a package, and usually you don't want to include the Test Registry in such a scan.</p>
-</div>
-</div>
-
 <div class="h_tag">
 <a href="#Putting-the-user-config-file-elsewhere" id="Putting-the-user-config-file-elsewhere" class="autoheader_anchor">
 <h2 data-id="Putting-the-user-config-file-elsewhere">Putting the user config file elsewhere</h2>
@@ -216,7 +240,7 @@ https://tatin.dev/   tatin  0     100</code></pre>
 </div>
 <p>There might be scenarios when the default location for the user config file is not suitable for you.</p>
 <ul>
-<li>If you cannot make frequent changes to the Tatin user settings file in its default location (because of red tape) due to, say,  company constraints, then of course it need to go elsewhere.</li>
+<li>If you cannot make frequent changes to the Tatin user settings file in its default location due to, say,  company constraints, then of course it need to go elsewhere.</li>
 <li>Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 <p>You could still use the default location, but because that location is user specific, every user would require her own user settings file, which is something you might or might not want to avoid.</p></li>
 </ul>
@@ -234,7 +258,7 @@ https://tatin.dev/   tatin  0     100</code></pre>
 <p>Notes:</p>
 <ul>
 <li>We use the same name as before (<code>MyUserSettings</code>) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class <code>UserSettings</code> with that name.</li>
-<li>Note that the API key is replaced by asterisks unless you specify a <code>1</code> as right argument to <code>ListRegistries</code>,</li>
+<li>The API key is replaced by asterisks unless you specify a <code>1</code> as right argument to <code>ListRegistries</code>,</li>
 <li>When you fire up a new session of Dyalog APL right  now, it would still look for the user settings file in its standard location.</li>
 </ul>
 <div class="h_tag">

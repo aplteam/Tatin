@@ -1,3 +1,16 @@
+* 0.37.0 ⋄ 2021-04-15
+  * The package config variable "project_url" was renamed into "info_url".\\\\
+    Note that there is a (temporary) function `Helper.ReplaceProjectUrlByInfoUrl` available in #.Tatin.Admin 
+    that can be used to rename "project_url" into "info_url" in a package together with the operator 
+    `LoopThroughRegistry`.
+  * The internal variable "depth" (used in build trees and also the build-list.json files) was renamed into
+    "principal". 
+  * A Registry with a priority of 0 or lower let Tatin ignore that Registry when it scans Registries for
+    a particular package. However, the user can still interact as usual with such a Registry.
+  * When a new registry is added and there is no room anymore for a priority greater than 0, the priorities
+    of all existing Registries are redefined.                                                              
+  * Useful operator added to Tatin.Admin: `LoopThroughRegistry`
+  * The test that searches for "⍝TODO⍝" and "⍝CHECK⍝" does not find itself anymore but remains readable.
 * 0.36.0 ⋄ 2021-04-11
   * Breaking changes: 
     * The strategy how to collect dependencies has been changed
@@ -8,7 +21,7 @@
   * Bug fixes:
     * When a principal package depends on a package that is "better" then an already installed as a
       dependency installed package then the better package did not win.
-    * When a package was loaded or installed from the first with the hightest priority then the servers were 
+    * When a package was loaded or installed from the first with the highest priority then the servers were 
       not questioned according to the priorities for the dependencies.
     * The "Make" left the class `_Make` behind in both the Cleint and the Server workspace.
     * The "nobetas" option was processed incorrectly by `InstallPackages`.
@@ -183,6 +196,3 @@
   * Message improved in case the API of a package cannt be established (Client)
   * Documentation improved: Server installation
   * INI file was processed over and over again. Should only be processed when changed on disk after instantiation. 
-
-
-

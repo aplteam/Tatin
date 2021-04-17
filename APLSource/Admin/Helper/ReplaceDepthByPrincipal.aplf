@@ -1,0 +1,16 @@
+ ns←ReplaceDepthByPrincipal filename;file;list;json
+⍝ Renames "depth" to "principal" in buid lists and make sure that a 1 stays and eveything else becomes a 0.
+⍝ `fileList` must be a list with files apl-dependencies.txt
+ list←⊃⎕NGET filename 1
+ :For file :In list
+     :If 0<≢json←⊃⎕NGET file
+         ns←#.Tatin.Registry.JSON json
+         :If 0<ns.⎕NC'depth'
+             ns.principal←1=ns.depth
+             ns.⎕EX'depth'
+         :EndIf
+         json←#.Tatin.Registry.JSON ns
+         (⊂json)⎕NPUT file 1
+     :EndIf
+ :EndFor
+⍝Done

@@ -7,7 +7,7 @@
 
 ## Introduction
 
-Note that you need to worry about this only if you use version 18.0: with later versions Tatin will be available in `⎕SE` after a standard installation anyway.
+Note that you need to worry about this only if you use version 18.0 or 18.1: with later versions Tatin will be available in `⎕SE` after a standard installation anyway.
 
 However, installing and updating is, as far as the Tatin client is concerned, _the same thing_, because updating the Tatin client basically means removing the old version and installing a new one.
 

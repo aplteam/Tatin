@@ -2,7 +2,7 @@
 ⍝ Takes the best available version but does not allow dependenies to be "better" than a principal package
 ⍝ Considered a bug.
 ⍝ For a version that does not differantiate between principal packages and pure dependencies see TakeBestVersion2
- mat←⍉↑ns.(depth packageID url)
+ mat←⍉↑ns.(principal packageID url)
  (topLevel mat)←{b←1=⍵[;1] ⋄ (b⌿⍵)((~b)⌿⍵)}mat       ⍝ Separate level-1 packages (topLevel) from the rest
  mat←(~mat[;2]∊topLevel[;2])⌿mat                     ⍝ Those we have as top-level we can remove from mat
  mat←⊖mat[Reg.SortIndexForPackageIDs mat[;2];]       ⍝ Make sure latest ones are at the top

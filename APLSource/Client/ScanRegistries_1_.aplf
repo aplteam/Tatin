@@ -7,18 +7,18 @@
      :If 200=res.StatusCode
          ns←Reg.JSON res.Content
          :If 0<≢ns.data
-             ∆TREE.Data⍪←(2,[1.5]1⊃¨ns.data),⊂registry      ⍝ Those are hosted by "registry"
+             ∆TREE.Data⍪←(0,[1.5]1⊃¨ns.data),⊂registry      ⍝ Those are hosted by "registry"
              data←(⊃,/2⊃¨ns.data)~⊂'null'                   ⍝ Those are dependencies. They might carry http[s]://, or live on "registry", or elsewhere
          :AndIf 0<≢data                                     ⍝ There might well be no dependencies required
              buff←↑DetermineURI¨data                        ⍝ In case a depency knows where it lives  that's fine, and we handle that here
-             ∆TREE.Data⍪←2,buff
+             ∆TREE.Data⍪←0,buff
          :EndIf
      :EndIf
  :Else
      :If 0<≢packageIDs←(F.IsDir registry∘,¨packageIDs)/packageIDs
-         ∆TREE.Data⍪←(2,[1.5]packageIDs),registry∘,¨packageIDs
+         ∆TREE.Data⍪←(0,[1.5]packageIDs),registry∘,¨packageIDs
          deps←⊃,/Dependencies.Get¨registry∘,¨packageIDs
      :AndIf 0<≢deps
-         ∆TREE.Data⍪←(2,[1.5]deps),registry∘,¨deps          ⍝ Those are found in "registry"
+         ∆TREE.Data⍪←(0,[1.5]deps),registry∘,¨deps          ⍝ Those are found in "registry"
      :EndIf
  :EndIf

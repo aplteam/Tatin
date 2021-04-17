@@ -115,14 +115,13 @@ Once the preparation is done the final step is easy. You may specify the folder 
 
 The folder may or may not carry a trailing `/`.
 
+This would attempt to publish the package `group-name-1.2.3` to the principal Tatin Server represented by the alias `[tatin]`.
+
+You can also create a ZIP file with the `]TATIN.Pack` command and specify the ZIP file as argument:
 
 ```
 ]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]
 ```
-
-Both calls would attempt to publish the package `group-name-1.2.3` to the principal Tatin Server represented by the alias `[tatin]`.
-
-I> You can also create a ZIP file with the `]TATIN.Pack` command and specify the ZIP file as argument.
 
 
 ## Deleting packages
@@ -153,4 +152,33 @@ You can find out which policy the server operates in two ways:
 None
   ```
 
-Or visit the web site: <https://tatin.dev>: at the bottom of the home page the server mentions the "delete" policy it operates.
+Or visit its web site, for example <https://tatin.dev>: at the bottom of the home page the server mentions the "delete" policy it operates.
+
+## Developing strategies
+
+Let's imagine that you are supposed to develop Tatin packages for your employer, the company "XYZ".
+
+* You run a Tatin server on your local machine, known by the alias `[my]`.
+
+  This is just for you, nobody else. The purpose of this server is to publish packages to it at a very early stage.
+
+  It has the highest priority of all Registries, ensuring that in case a package lives on several Registries it is found on `[my]` first.
+
+* Your team runs a Tatin Server on the Intranet of your company. It carries the alias `[my-team]`.
+
+  This is used to publish beta versions that your team might want to use. This has the second-highest priority.
+
+* Your packages also have dependencies on packages published on Tatin's principal server, known as `[tatin]`.
+
+  Of the three Registries this one might have the lowest priority or the highest, depending on your goals.
+
+* You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when scanning Registries, but you could still mess around with it.
+
+You can now develop a package `Foo` and publish it on `[my]`, probably several times until it is stable.
+
+You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want `[my]` to be ignored altogether, make its priority negative.
+
+Your team can use your pacakage by referring to the team Registry.
+
+When all is good the beta is promoted to an official release and publish to the Tatin company server. At the same time the package would be deleted from the Team server.
+

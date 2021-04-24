@@ -1,11 +1,11 @@
- {r}←LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;level;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2
+ {r}←LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;principalFlag;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2
 ⍝ Requires two arguments:
 ⍝ * A folder with a build list (mandatory)
 ⍝ * An installation folder (mandatory)
 ⍝ You may specify an optional third argument: the `overwriteFlag` flag which defaults to 0.
 ⍝ Use `overwriteFlag` in case all packages should be loaded even if they already exist in #|⎕SE._tatin\\
 ⍝ Loads all packages and injects required references into `targetSpace`.
-⍝ Returns a vector with references to the loaded packages (no dependencies, top-level only).
+⍝ Returns a vector with references to the loaded packages (no dependencies, top-principalFlag only).
  'Length error on right argument'Assert(≢y)∊2 3
  'Invalid right argument'Assert 2=|≡y
  (installFolder targetSpace overwriteFlag)←3↑y,0
@@ -16,7 +16,7 @@
  :EndIf
  CheckBuildList installFolder
  :If 0<≢tree←LoadBuildList installFolder
-     :For level packageID url :In ↓tree
+     :For principalFlag packageID url :In ↓tree
          (alias packageID)←{~'@'∊⍵:''⍵ ⋄ '@'(≠⊆⊢)⍵}packageID
          path←installFolder,'/',packageID
          ('Cannot find package "',path,'"')Assert F.Exists path
@@ -39,10 +39,10 @@
              ref←⍎saveIn
          :EndIf
          refs,←ref
-         :If 1=level
+         :If 1=principalFlag
              r,←ref
          :EndIf
-         :If 1=level
+         :If 1=principalFlag
              LinkTargetToPackage cfg saveIn targetSpace alias
          :EndIf
      :EndFor

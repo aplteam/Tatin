@@ -204,9 +204,11 @@ MarkAPL
 
 ### Tatin Variables
 
-For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the APL equivalent of a constant.
+For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.
 
-Some of them always exist, some of them only under certain circumstances.
+Those variables are injected into a namespace `TatinVars` which in turn is injected into `code`.
+
+Some of them always exist, some of them only under certain circumstances. This is a list:
 
 
 #### `CONFIG`
@@ -231,9 +233,9 @@ The full package name. This will include a build ID if there is any.
 
 #### `LX`
 
-Character vector that holds the name of a function that will be executed after the package and all its dependencies have been established in the workspace. If the package does not have an `lx` parameter set in its config file `LX` will not exist.
+This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successully. `LX` holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.
 
-This can be used for initialising a package.
+Note that if there is no `lx` defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no `LX`.
 
 
 #### `URI`
@@ -243,10 +245,10 @@ Character vector that holds the address of a Tatin server or the full name of a 
 
 ### Assets
 
-`MarkAPL` comes with HTML and CSS files. Therefore `MarkAPL` must be able to find those assets. This can be achieved by referring to the Tatin variable `HOME` in `#._tatin.aplteam_MarkAPL_11_0_0`:
+`MarkAPL` comes with HTML and CSS files. Therefore `MarkAPL` must be able to find those assets. This can be achieved by referring to the Tatin variable `HOME` in `#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars`:
 
 ```
-      ⎕←path←#._tatin.aplteam_MarkAPL_11_0_0.HOME
+      ⎕←path←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.HOME
 C:\Users\...\Temp\username_155648451/aplteam-MarkAPL-11.0.0
       F←#._tatin.aplteam_MarkAPL_11_0_0.code.FilesAndDirs
       ⍪⊃F.Dir path,'\'
@@ -254,8 +256,8 @@ C:\Users\...\Temp\username_155648451/aplteam-MarkAPL-11.0.0
  C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\apl-package.json     
  C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\Files                
  C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\MarkAPL.aplc         
-      folder←{⍵.assets}⎕JSON⍠('Dialect' 'JSON5')⊣#._tatin.aplteam_MarkAPL_11_0_0.CONFIG
-      folder
+      cfg←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.CONFIG
+      ⎕←folder←{⍵.assets}⎕JSON⍠('Dialect' 'JSON5')⊣cfg
 Files/
       ⍪⊃F.Dir path,'\',folder
  C:\...\aplteam-MarkAPL-11.0.0\Files\BlackOnWhite_print.css       
@@ -381,3 +383,4 @@ Let's check whether it worked:
 [^dotnetcore]: More information on .NET Core is available at <<br>>
 <https://en.wikipedia.org/wiki/.NET_Core>
 
+		

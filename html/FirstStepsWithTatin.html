@@ -207,8 +207,9 @@ MarkAPL</code></pre>
 <h3 data-id="Tatin-Variables">Tatin Variables</h3>
 </a>
 </div>
-<p>For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the APL equivalent of a constant.</p>
-<p>Some of them always exist, some of them only under certain circumstances.</p>
+<p>For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.</p>
+<p>Those variables are injected into a namespace <code>TatinVars</code> which in turn is injected into <code>code</code>.</p>
+<p>Some of them always exist, some of them only under certain circumstances. This is a list:</p>
 <div class="h_tag">
 <a href="#CONFIG" id="CONFIG" class="autoheader_anchor">
 <h4 data-id="CONFIG"><code>CONFIG</code></h4>
@@ -238,8 +239,8 @@ MarkAPL</code></pre>
 <h4 data-id="LX"><code>LX</code></h4>
 </a>
 </div>
-<p>Character vector that holds the name of a function that will be executed after the package and all its dependencies have been established in the workspace. If the package does not have an <code>lx</code> parameter set in its config file <code>LX</code> will not exist.</p>
-<p>This can be used for initialising a package.</p>
+<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successully. <code>LX</code> holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.</p>
+<p>Note that if there is no <code>lx</code> defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no <code>LX</code>.</p>
 <div class="h_tag">
 <a href="#URI" id="URI" class="autoheader_anchor">
 <h4 data-id="URI"><code>URI</code></h4>
@@ -251,8 +252,8 @@ MarkAPL</code></pre>
 <h3 data-id="Assets">Assets</h3>
 </a>
 </div>
-<p><code>MarkAPL</code> comes with HTML and CSS files. Therefore <code>MarkAPL</code> must be able to find those assets. This can be achieved by referring to the Tatin variable <code>HOME</code> in <code>#._tatin.aplteam_MarkAPL_11_0_0</code>:</p>
-<pre><code>      ⎕←path←#._tatin.aplteam_MarkAPL_11_0_0.HOME
+<p><code>MarkAPL</code> comes with HTML and CSS files. Therefore <code>MarkAPL</code> must be able to find those assets. This can be achieved by referring to the Tatin variable <code>HOME</code> in <code>#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars</code>:</p>
+<pre><code>      ⎕←path←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.HOME
 C:\Users\...\Temp\username_155648451/aplteam-MarkAPL-11.0.0
       F←#._tatin.aplteam_MarkAPL_11_0_0.code.FilesAndDirs
       ⍪⊃F.Dir path,'\'
@@ -260,8 +261,8 @@ C:\Users\...\Temp\username_155648451/aplteam-MarkAPL-11.0.0
  C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\apl-package.json
  C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\Files
  C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\MarkAPL.aplc
-      folder←{⍵.assets}⎕JSON⍠('Dialect' 'JSON5')⊣#._tatin.aplteam_MarkAPL_11_0_0.CONFIG
-      folder
+      cfg←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.CONFIG
+      ⎕←folder←{⍵.assets}⎕JSON⍠('Dialect' 'JSON5')⊣cfg
 Files/
       ⍪⊃F.Dir path,'\',folder
  C:\...\aplteam-MarkAPL-11.0.0\Files\BlackOnWhite_print.css

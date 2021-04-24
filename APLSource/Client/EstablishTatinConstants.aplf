@@ -1,13 +1,14 @@
- {r}←EstablishTatinConstants(ref cfg folder);deps
+ {r}←EstablishTatinConstants(ref cfg folder);deps;ref2
  r←⍬
- ref.⎕FX'r←HOME'('r←''',folder,'''')   ⍝ We might change this at a later stage if the packages does not have any assets
- ref.⎕FX'r←CONFIG'('r←''',(Reg.JSON cfg),'''')
- ref.⎕FX'r←ID'('r←''',(⊃{⍺,'-',⍵}/cfg.(group name version)),'''')
- ref.⎕FX'r←URI'('r←''',({0<⍵.⎕NC'uri':⍵⍎'uri' ⋄ ''}cfg),'''') ⍝ "uri" is set by server but not for local installations
+ ref2←⍎'TatinVars'ref.code.⎕NS''
+ ref2.⎕FX'r←HOME'('r←''',folder,'''')   ⍝ We might change this at a later stage if the packages does not have any assets
+ ref2.⎕FX'r←CONFIG'('r←''',(Reg.JSON cfg),'''')
+ ref2.⎕FX'r←ID'('r←''',(⊃{⍺,'-',⍵}/cfg.(group name version)),'''')
+ ref2.⎕FX'r←URI'('r←''',({0<⍵.⎕NC'uri':⍵⍎'uri' ⋄ ''}cfg),'''') ⍝ "uri" is set by server but not for local installations
  :If F.IsFile folder,'\apl-dependencies.txt'
      deps←⊃F.NGET(folder,'\apl-dependencies.txt')1
-     ref.⎕FX'r←DEPENDENCIES'('r←',(⊃{⍺,' ',⍵}/'''',¨(2⍴deps),¨''''),'')
+     ref2.⎕FX'r←DEPENDENCIES'('r←',(⊃{⍺,' ',⍵}/'''',¨(2⍴deps),¨''''),'')
  :Else
-     ref.⎕FX'r←DEPENDENCIES' 'r←⍬'
+     ref2.⎕FX'r←DEPENDENCIES' 'r←⍬'
  :EndIf
 ⍝Done

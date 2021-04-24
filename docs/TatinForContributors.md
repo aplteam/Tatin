@@ -143,17 +143,20 @@ In order to create new versions of the Client and the Server all you need to do 
 
 * `type` must be an integer in the range of 0, 1, 2 or 3.
 
-   | 0 | The version number is not changed apart from the build ID which is always bumped
+   | 0 | The version number is not changed
    | 1 | The patch number is bumped
-   | 2 | The minor version is bumped; the patch number is set to 0
-   | 3 | The major version is bumped; minor and patch number are set to 0
+   | 2 | The minor version number is bumped; the patch number is set to 0
+   | 3 | The major version number is bumped; minor and patch number are set to 0
 
-Note that the `Make` function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. `noQLXFlag`, if 1,  prevents the interpreter from running the code straight away. 
+Notes:
+
+* The build ID is _always_ bumped
+* The `Make` function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. `noQLXFlag`, if 1,  prevents the interpreter from running the code straight away. 
 
 A> ### The `load` and `lx` command line parameters
 A> Despite its name `noQLXFlag` is not associated with `⎕LX`: for this to work the command line parameters `load` and `lx` are invoked, and `-x` is added in case `noQLXFlag` is 1, preventing the interpreter from excuting the expression noted as `lx.` 
 A>
-A> These were introduced in 18.0.
+A> If this looks unfamiliar to you: these were introduced in 18.0.
 
 The `Make` function performs the following steps:
 

@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.26.0 - 2021-04-19
+⍝   * Check added to `InstallPackage` regarding "installFolder"
 ⍝ * 0.25.0 - 2021-04-07
 ⍝   * ]ReinstallDependencies ikmplemented
 ⍝   * -raw added to `CheckForLaterVersion`
@@ -685,6 +687,7 @@
 
     ∇ r←InstallPackage Arg;identifier;installFolder
       (identifier installFolder)←Arg.(_1 _2)
+      'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
       :If ~TC.F.IsDir installFolder
           :If 0=Arg.quiet
           :AndIf 1 ∆YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'

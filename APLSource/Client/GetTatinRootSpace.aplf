@@ -1,16 +1,19 @@
- path←GetTatinRootSpace targetSpace
+ path←GetTatinRootSpace targetSpace;parent
 ⍝ `targetSpace` is where the link to a package it going to be created: `#` or `⎕SE`.\\
 ⍝ That rules whether we return `#._tatin` or `⎕SE._tatin`.
 ⍝ As a side effect the function makes sure that the space exists.
  targetSpace←⍕targetSpace
  :If '#'=1⍴targetSpace
-     path←'#._tatin'
+     parent←#
  :ElseIf '⎕SE'≡1 ⎕C 3⍴targetSpace
-     path←'⎕SE._tatin'
+     parent←⎕SE
  :Else
      'Invalid right argument'⎕SIGNAL 11
  :EndIf
- :If 0=⎕NC path
-     path ⎕NS''
+ :If 0=parent.⎕NC'_tatin'
+     ⍝ It is important to create the namespace _tatin in either # or ⎕SE to avoid a performance penalty
+     path←'_tatin'parent.⎕NS''
+ :Else
+     path←(⍕parent),'._tatin'
  :EndIf
 ⍝Done

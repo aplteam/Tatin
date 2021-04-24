@@ -63,15 +63,15 @@ If you specify any variable with a name that Tatin does not know about and that 
 
 ### Tatin's package configuration variables
 
-#### api
+#### `api`
 
-"api", when snot empty,  must be a single name. It must be relative, never absolute; therefore it must never start with `#` or `⎕`. It must point to either a class or a namespace _but neither a function nor an operator_.
+"api", when not empty,  must be a single name or a single class _but neither a function nor an operator_. It must be relative, never absolute; therefore it must never start with `#` or `⎕`.
 
 There are several scenarios:
 
-1. The package consists of a single class or a single namespace, be it scripted or not
+1. The package consists of a single class or a single namespace, be it scripted or not.
 
-1. The package consists of a single function or operator
+1. The package consists of a single function or operator.
 
 1. The package consists of several objects: a mixture of functions, operators, classes and / or namespaces. All objects are public.
 
@@ -105,22 +105,31 @@ In this particular case `api` _must not_ be defined (remain empty).
 
 ##### Mixture of several APL objects
 
-* If `api` is not set all top-level objects of the package become the API: functions, operators, namespaces, classes , interfaces.
-* If `api` is set it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what `api` is pointing to become the API.
+* If `api` is not set then all top-level objects of the package become the API: functions, operators, namespaces, classes , interfaces.
+* If `api` is set then it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what `api` is pointing to become the API.
 
 
 ##### Example: restricting what's "public"
 
 The user might want to expose only a subset of functions/operators of a namespace (classes have a public interface anyway), and in that case the user must not only specify `api`, but also structure her code accordingly.
 
-If the name of the package is `Foo`, and it is loaded into `#`, and you want to expose only the functions `Run` and `CreateParmSpace`, then the recommended way of doing this is to create a sub-namespace with the name (say) `API` and populate it with two functions:
+If the name of the package is `Foo`, and it is loaded into `#`, and you want to expose only the functions `Run` and `CreateParmSpace`, then the recommended way of doing this is to create a sub-namespace with the name (say) `MyAPI` and populate it with two functions:
 
-* `Run` (which is calling `##.Run`)
-* `CreateParmSpace` (which is calling `##.CreateParmSpace`)
+* `Run`:
 
-Finally you need to specify `api: "API",` in the package config file.
+  ```
+  Run←{⍺←⊢ ⋄ ⍺ ##.Run ⍵}
+  ```
 
-Calling the function `Run` would then require:
+* `CreateParmSpace`:
+
+  ```
+  CreateParmSpace←{##.CreateParmSpace ⍵}
+  ```
+
+Finally you need to specify `api: "MyAPI"` in the package config file.
+
+Calling the function `Run` (after loading the package) would then require:
 
 ```
       #.Foo.Run
@@ -137,7 +146,7 @@ To the outside world only two functions are visible:
 Similarly, if your package `Foo` consist of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `Foo.Run` and `Foo.CreateParmSpace`.
 
 
-#### assets
+#### `assets`
 
 This defines the files the source code relies on in one way or another, like CSS files, JavaScript files, images and what not.
 
@@ -161,17 +170,18 @@ In case you need to access assets from an instance of a package you have two cho
 
    ```
    r←GetAssetFolder
-   r←##.##.HOME
+   :Access Public Shared
+   r←##.TatinVars.HOME
    ```
 
    You can then call this shared method from within an instance method.
 
 2. Use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
 
-   Therefore the expression `(⊃⊃⎕CLASS ⎕THIS).##.##.HOME` returns what's on `HOME`.
+   Therefore the expression `(⊃⊃⎕CLASS ⎕THIS).##.TatinVars.HOME` returns the value of `HOME`.
 
 
-#### description
+#### `description`
 
 A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.
 
@@ -179,15 +189,13 @@ This information is typically used when a human accesses a Tatin Server with a B
 
 `description` _must not_ be empty.
 
-#### group
+#### `group`
 
 The group part of the package ID[^id]
 
 A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.
 
-#### lx
-
-|**This was introduced as "experimental" in version 0.35**|
+#### `lx`
 
 This is optional: it may or may not exist, and it might be empty if it does.
 
@@ -197,7 +205,7 @@ This function will be executed bei either `LoadPackage` or `LoadDependencies` _a
 
 If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackage` and has no assets then the right argument will be empty.
 
-The function may or may not return a result. A result is assigned to the [system variable](#SysVars) `LX`. If there is no result `LX` is assigned an empty vector. Without an `lx` function there won't be a variable `LX`.
+The function may or may not return a result. A result is assigned to the Tatin package variable `LX`. If there is no result `LX` becomes an empty vector. Without an `lx` function there won't be a variable `LX`.[^TatinVars]
 
 The `lx` function will be executed under error trapping, and any errors will be silently ignored. If you do not want this then you have two options:
 
@@ -207,11 +215,11 @@ The `lx` function will be executed under error trapping, and any errors will be 
 
 Note that the existence of a variable `LX` indicates that there was an `lx` function successfully executed.
 
-#### name
+#### `name`
 
 The name part of the package ID[^id]
 
-#### project_url
+#### `info_url`
 
 A URL that points to something like GitHub. 
 
@@ -219,7 +227,7 @@ An example is `https://github.com/aplteam/MarkAPL`
 
 It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.
 
-#### source
+#### `source`
 
 This defines the source code file(s) that are going to be part of the package.
 
@@ -230,13 +238,13 @@ If it's a single file it might be anything with the extension `.aplc` (a class s
 If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.
 
 
-#### tags
+#### `tags`
 
 A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.
 
 `tags` must not be empty if you wish to publish a package to a Tatin server.
 
-#### version
+#### `version`
 
 The version[^version] part of the package ID[^id]
 
@@ -253,11 +261,11 @@ The optional build number, separated by the `+` sign, is ignored by Tatin.
 
 For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
-#### System vars: `⎕IO`, `⎕ML`, `⎕WX` {#SysVars}
+#### APL System variables: `⎕IO`, `⎕ML`, `⎕WX` {#SysVars}
 
 By default the config namespace carries the values of the three Dyalog parameters `default_io`, `default_ml` and `default_wx` for the three system variables `⎕IO`, `⎕ML` and `⎕WX`. 
 
-Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependencies` function. This is important because that makes any sub-namespace created later on inherit those values.
+Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependencies` function _before_ any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.
 
 
 #### Injected values
@@ -298,7 +306,7 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 ### Access after loading a package
 
-Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON under the name `CONFIG` together with `ID`, `URI`, `LX` and `HOME`.
+Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
 
 Note that `HOME` will be empty in case two conditions are met:
 
@@ -310,4 +318,7 @@ All of them are niladic functions because that's how we emulate constants in APL
 There _might_ be a variable `LX` in case the package used the [`lx`](#) mechanism for initializing itself.
 
 [^id]: A package ID consists of `{group}-{name}-{major.{minor}.{patch}`
+
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
+
+[^TatinVars]: The Tatin package variables are discussed in detail the document `FirstStepsWithTatin.html`

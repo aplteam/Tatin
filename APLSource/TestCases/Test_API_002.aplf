@@ -1,0 +1,12 @@
+ r←Test_API_002(stopFlag batchFlag);⎕TRAP;res
+⍝ Exercise ⎕SE.Tatin.GetUserHomeFolder
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←⎕SE.Tatin.GetUserHomeFolder''
+ →T.PassesIf F.IsDir res
+ res←⎕SE.Tatin.GetUserHomeFolder'Foo'
+ →T.PassesIf'Foo'≡'/\'A.Last res
+
+ r←T._OK
+⍝Done

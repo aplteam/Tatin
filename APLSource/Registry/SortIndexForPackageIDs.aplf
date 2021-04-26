@@ -1,17 +1,19 @@
- ind←SortIndexForPackageIDs vec;buff
+ ind←SortIndexForPackageIDs data;ind1;ind2
 ⍝ ⍵ is either a list of package IDs or a list of version numbers.
 ⍝ This needs some gymnastics for two reasons:
 ⍝ * {group}-{name}-9.0.0 comes before {group}-{name}-10.0.0
-⍝ * {group}-{name}-9.0.0¯20101213.010203 comes before {group}-{name}-10.0.0¯20110114.010203
-⍝ * {group}-{name}-9.0.0¯20101213.010203 comes before {group}-{name}-10.0.0¯20110114.010203
+⍝ * {group}-{name}-9.0.0-20101213.010203 comes before {group}-{name}-10.0.0-20110114.010203
+⍝ * {group}-{name}-9.0.0-20101213.010203 comes before {group}-{name}-10.0.0-20110114.010203
  ind←⍬
- :If 0<≢vec
-     Assert 0=∧/~'.'∊¨vec
-     :If '-'∊⊃vec
-         buff←4↑¨'-'A.Split¨vec
-         ind←⍋⎕C{⍵[1 2],(⊂{⊃,/¯5↑¨'.'A.Split ⍵}3⊃⍵),⊂(4⊃⍵)}¨buff
+ :If 0<≢data
+     Assert 0=∧/~'.'∊¨data
+     :If 2=⍴⍴data
+         ind1←⍋|data[;2]
+         data←data[ind1;]
+         ind2←SeparateUriAndPackageID_ data[;1]
+         ind←ind1[ind2]
      :Else
-         ind←⍋⎕C{⊃,/¯4↑¨'.'A.Split ⍵}¨vec
+         ind←SeparateUriAndPackageID_ data
      :EndIf
  :EndIf
  ⍝Done

@@ -1,13 +1,17 @@
- response←request GetVersionList packageID;data;html;qdmx
+ response←request GetVersionList packageID;data;html;qdmx;dateFlag
+ :If dateFlag←0<≢request.QueryParameters
+ :AndIf dateFlag←(⊂'publishingdate')∊request.QueryParameters[;1]
+     dateFlag←⊃A.ToNum⊃request.QueryParameters[request.QueryParameters[;1]⍳⊂'publishingdate';2]
+ :EndIf
  :Trap 98
      :If IsJsonRequest request.Headers
-         :If 0<≢data←Reg.ListVersions G.RegistryPath,packageID
+         :If 0<≢data←dateFlag Reg.ListVersions G.RegistryPath,packageID
              response←request ReturnJSON Reg.JSON data
          :Else
              response←request Respond 404 1
          :EndIf
      :Else
-         :If 0<≢data←Reg.ListVersions G.RegistryPath,Reg.RemoveMinorAndPatch packageID
+         :If 0<≢data←dateFlag Reg.ListVersions G.RegistryPath,Reg.RemoveMinorAndPatch packageID
              html←PrepareHtmlPageForVersionList packageID data
              response←request ReturnHTML html
          :Else

@@ -7,15 +7,15 @@
  'TEMP'#.⎕NS''
  dir←GetTempDir ⍬
 
- res←TC.InstallPackage'[local]example-versions-1.0.1'dir
- →T.GoToTidyUp'example-versions-1.0.1'≢res
+ res←TC.InstallPackage'[local]example-versions-1.0.0'dir
+ →T.GoToTidyUp'example-versions-1.0.0'≢res
 
  res←TC.LoadDependencies dir #.TEMP
  →T.GoToTidyUp 1≠≢res
 
- expected←'MyCode' '1.0.1' '2020-01-06'
+ expected←'MyCode' '1.0.0' '2020-01-11'
  →T.GoToTidyUp expected≢#.TEMP.versions.Version
- expected←'example_versions_1_0_1'
+ expected←'example_versions_1_0_0'
  →T.GoToTidyUp expected≢3⊃'.'(≠⊆⊢)⍕#.TEMP.versions
 
  r←T._OK

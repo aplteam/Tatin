@@ -1,14 +1,22 @@
- list←ListVersions uri;registryPath;packageID;group;name;version;regEx;pattern;list2
-⍝ Takes a package ID without minor and patch number (but possibly with major) and returns all versions saved for that package ID
+ r←{dateFlag}ListVersions uri;registryPath;packageID;group;name;version;regEx;pattern;list2;ind;list
+⍝ Takes a package ID without minor and patch number (but possibly with major) and returns all versions saved for that package ID (vector)
+⍝ If `dateFlag` is specified and 1 (default is 0) then a matrix is returned with the publishing date in [;2]
  'Invalid package ID'Assert 1 2∊⍨('\/'A.Last uri)+.='-'
  'Invalid package ID'Assert 0 1∊⍨('\/'A.Last uri)+.='.'
+ dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
  (registryPath packageID)←SplitAtLast uri
  'Is not a folder'Assert F.IsDir registryPath
  registryPath←F.ExpandPath registryPath
  packageID,←{'*'=¯1↑⍵:'' ⋄ 2='-'+.=⍵:'.*' ⋄ '-*'}packageID
- :If 0<≢list←F.ListDirs registryPath,'/',packageID
-     list←((~'/\'∊⍨¯1↑registryPath)+≢registryPath)↓¨list            ⍝ All package IDs
-     list2←registryPath InjectPublishingDate list
-     list←list[SortIndexForPackageIDs list2]
+ list←F.ListDirs registryPath,'/',packageID
+ list←((~'/\'∊⍨¯1↑registryPath)+≢registryPath)↓¨list            ⍝ All package IDs
+ list2←registryPath InjectPublishingDate list
+ :If dateFlag
+     ind←SortIndexForPackageIDs list2
+     list←list[ind]
+     list2←list2[ind;]
+     r←list,|list2[;,2]
+ :Else
+     r←list[SortIndexForPackageIDs list2]
  :EndIf
 ⍝Done

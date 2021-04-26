@@ -3,8 +3,11 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
  :Trap 98
-     TC.LoadPackage'https://github.com/aplteam/DotNetZip/releases/download/v1.0.0/aplteam-DotNetZip-1.0.0.zip' '⎕SE.TEMP.Foo'
+     TC.LoadPackage'https://github.com/aplteam/DotNetZip/releases/download/v1.0.0/aplteam-DotNetZip-1.0.0.zip' '#.TEMP'
      →T.FailsIf 1
  :Else
      qdmx←⎕DMX

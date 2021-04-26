@@ -1,11 +1,14 @@
- list←ListVersions y;client;request;res;uri
-⍝ `y` must specify a package but without version number.
-⍝ Returns list with all versions found for that particular package.
+ list←{dateFlag}ListVersions y;client;request;res;uri
+⍝ `y` must specify a package but without version number.\\
+⍝ Returns list with all versions found for that particular package.\\
+⍝ By default the publishing date is not included but you my change this by passing a 1 as ⍺.
+⍝ If you do a matrix is returned
+ dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
  uri←ReplaceRegistryAlias y
  'No URI provided'Assert 0<≢uri
  :If Reg.IsHTTP uri
-     list←ListVersions_ uri
+     list←dateFlag ListVersions_ uri
  :Else
-     list←Reg.ListVersions uri
+     list←dateFlag Reg.ListVersions uri
  :EndIf
 ⍝Done

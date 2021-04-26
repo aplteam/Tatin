@@ -1,8 +1,12 @@
- list←ListVersions_ uri;request;res;host;packageID
+ list←{dateFlag}ListVersions_ uri;request;res;host;packageID
+ dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
  (host packageID)←Reg.SeparateUriAndPackageID uri
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  request←R.NewRequest 0
  request.URI←'/v1/packages/versions/',packageID
+ :If dateFlag
+     request.URI,←'?publishingdate=1'
+ :EndIf
  request.Headers,←⊂'Accept' 'application/json'
  res←host SendAndReceive request
  :If 200≠res.StatusCode
@@ -13,4 +17,5 @@
      :EndIf
  :EndIf
  list←⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
+ list←↑⍣dateFlag⊣list
 ⍝Done

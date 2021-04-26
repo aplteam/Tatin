@@ -1,10 +1,20 @@
- r←Test_API_003(stopFlag batchFlag);⎕TRAP;res1;res2
+ r←Test_API_003(stopFlag batchFlag);⎕TRAP;expected;res;GetVersion
 ⍝ Exercise ⎕SE.Tatin.ListVersions
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- res1←⎕SE.Tatin.ListVersions'[local]aplteam-APLProcess'
- →T.PassesIf 0<≢res1
+ GetVersion←{1↓⍵/⍨~2>+\'-'=⍵}
+
+ res←⎕SE.Tatin.ListVersions'[local]example-versions'
+ expected←'0.1.0' '1.0.0-beta-1' '1.0.0' '1.0.1-This-fix' '1.0.1-That-fix' '1.0.12-zzz' '1.0.12-That-fix'
+ →T.PassesIf expected≡GetVersion¨res
+
+ res←0 ⎕SE.Tatin.ListVersions'[local]example-versions'
+ →T.PassesIf expected≡GetVersion¨res
+
+ res←1 ⎕SE.Tatin.ListVersions'[local]example-versions'
+ →T.PassesIf expected≡GetVersion¨res[;1]
+ →T.PassesIf∧/∨⌿↑(2='-'+.=¨res[;1])(2≤/res[;2],99999999)
 
  r←T._OK
 ⍝Done

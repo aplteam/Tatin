@@ -1,0 +1,14 @@
+ r←Test_Load_091(stopFlag batchFlag);⎕TRAP;buff
+⍝ Try to load a package as a ZIP file via HTTP - not supported
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ buff←TC.LoadPackage'[tatin]A@APLTreeUtils2' '#.TEMP'
+ →T.PassesIf 0=≢buff
+ →T.PassesIf 3.14=#.TEMP.A.ToNum'3.14'
+
+ r←T._OK
+⍝Done

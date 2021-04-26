@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.27.0 - 2021-04-25
+⍝   * `ListVersion` extended
 ⍝ * 0.26.0 - 2021-04-19
 ⍝   * Check added to `InstallPackage` regarding "installFolder"
 ⍝ * 0.25.0 - 2021-04-07
@@ -112,7 +114,7 @@
           c←⎕NS ⍬
           c.Name←'ListVersions'
           c.Desc←'Lists all versions of the specified package'
-          c.Parse←'1'
+          c.Parse←'1 -date'
           r,←c
      
           c←⎕NS ⍬
@@ -208,7 +210,7 @@
           c←⎕NS ⍬
           c.Name←'ReinstallDependencies'
           c.Desc←'Install all packages again according to the dependency file'
-          c.Parse←'2s -betas'
+          c.Parse←'2s -nobetas'
           r,←c
      
           r.Group←⊂NM
@@ -391,7 +393,7 @@
       :Else
           registry←Args._2
       :EndIf
-      noBetas←~Args.betas
+      noBetas←0 Args.Switch'nobetas'
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       'Not a directory'Assert TC.F.IsDir installFolder
       'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'
@@ -464,11 +466,17 @@
       r←''
       (source url)←Arg.(_1 _2)
       :If (,'?')≡,url
-      :AndIf 0=≢url←SelectRegistry 0
-          :Return
+          :If 0=≢url←SelectRegistry 1
+              :Return
+          :EndIf
+      :EndIf
+      :If ~TC.Reg.IsHTTP url
+      :AndIf ~TC.Reg.IsFILE url
+          url←{∧/'[]'∊⍵:⍵ ⋄ '[',⍵,']'}url
       :EndIf
       url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_
+
       :If TC.F.IsDir source
           ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_Name
       :Else
@@ -546,10 +554,15 @@
       r←⍪parms TC.ListTags registry
     ∇
 
-    ∇ r←ListVersions Arg;qdmx
+    ∇ r←ListVersions Arg;qdmx;dateFlag
       ⎕SIGNAL 0
+      dateFlag←Arg.Switch'date'
       :Trap 98
-          r←⍪TC.ListVersions Arg._1
+          :If dateFlag
+              r←dateFlag TC.ListVersions Arg._1
+          :Else
+              r←⍪TC.ListVersions Arg._1
+          :EndIf
       :Else
           qdmx←⎕DMX
           :If 0=≢qdmx.EM
@@ -831,7 +844,7 @@
           r,←⊂'Load the specified package and all its dependencies into the workspace'
           r,←⊂'Requires two arguments:'
           r,←⊂''
-          r,←⊂'A) First argument: a package identifier'
+          r,←⊂'A) First argument:'
           r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
           r,←⊂''
           r,←⊂'B) Second argument: target namespace'
@@ -855,7 +868,7 @@
       :Case ⎕C'InstallPackage'
           r,←⊂'Installs the given package and all its dependencies into the given folder.'
           r,←⊂''
-          r,←⊂'A) First argument'
+          r,←⊂'A) First argument:'
           r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
           r,←⊂''
           r,←⊂'B) Second argument'
@@ -875,7 +888,7 @@
           r,←⊂'  ]TATIN.InstallPackage A@APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
           r,←⊂''
-          r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
+          r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question from being asked in'
           r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
       :Case ⎕C'LoadDependencies'
           r,←⊂'Takes two arguments:'
@@ -949,7 +962,7 @@
           r,←⊂''
           r,←⊂'Requires two arguments:'
           r,←⊂'* Path to ZIP file or package folder'
-          r,←⊂'* URL or alias of a Registry Server or a "?"'
+          r,←⊂'* URL or alias of a Registry Server or a "?"; you may or may not embrace it with []'
           r,←⊂''
           r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
           r,←⊂'to the Tatin rules.'
@@ -958,6 +971,10 @@
       :Case ⎕C'ListVersions'
           r,←⊂'List all versions of the given package. You must specify the package as in'
           r,←⊂'[registry]{group}-{package}'
+          r,←⊂''
+          r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem with'
+          r,←⊂'beta versions) then the publishing date is taken into account.'
+          r,←⊂'Specify the -date flag if you want the publishing date to be included.'
       :Case ⎕C'Version'
           r,←⊂'Prints name, version number and version date of the client to the session.'
           r,←⊂''
@@ -1012,7 +1029,12 @@
           r,←⊂'All defined Registries are scanned but one can specify a particular Registry as second'
           r,←⊂'(optional) argument.'
           r,←⊂''
-          r,←⊂'By default betas are not included but this can be changed by specifying the -betas flag.'
+          r,←⊂'Examples:'
+          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/'
+          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin]'
+          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ -betas'
+          r,←⊂''
+          r,←⊂'By default betas are included but this can be changed by specifying the -nobetas flag.'
       :Else
           r←'Unknown command: ',Cmd
       :EndSelect
@@ -1020,25 +1042,29 @@
 
     ∇ r←HelpOnPackageID dummy
       r←''
-      r,←⊂'* A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
-      r,←⊂'  If just a full package ID is specified and nothing else then ALL Registries'
-      r,←⊂'  are scanned; the first one wins.'
+      r,←⊂'You may specify an alias for the package in question by putting it to the front'
+      r,←⊂'and separate it with an @.'
       r,←⊂''
-      r,←⊂'* Alternatively specify a full path or a URL in front of the package ID.'
+      r,←⊂'Not that if neither a Registry nor a ZIP file is specified but just a package ID'
+      r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
+      r,←⊂'are scanned; the first hit wins.'
+      r,←⊂''
+      r,←⊂'Options:'
+      r,←⊂''
+      r,←⊂'* A full package ID'
+      r,←⊂''
+      r,←⊂'  A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
       r,←⊂''
       r,←⊂'* You may also specify an incomplete package ID in terms of no patch number, or'
       r,←⊂'  neither minor nor patch number, or no version information at all, and leave it'
       r,←⊂'  it to Tatin to establish the latest version itself.'
-      r,←⊂''
-      r,←⊂'  Tatin would consider beta version then, but you can force Tatin to ignores betas'
-      r,←⊂'  by specifying the -nobetas flag which is in all other scenarios ignored.'
+      r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
       r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
       r,←⊂'  in two ore more different groups but will succeed otherwise.'
       r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
-      r,←⊂'* You may specify an alias for the package by putting it to the front and separate'
-      r,←⊂'  it with an @ from the package ID'
+      r,←⊂'* A full path or a URL in front of the package ID.'
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

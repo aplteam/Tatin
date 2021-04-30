@@ -6,8 +6,6 @@
 ⍝ ← is a reference pointing to the instance.\\
 ⍝ Note that all functions that require user settings rely on `MyUserSettings` to exist;
 ⍝ if it doesn't a VALUE ERROR will be generated.\\
-⍝ A user config file created by this function will always carry a URL pointing to the Tatin
-⍝ server with the default [tatin].\\
  :If 0=≢folder
      folder←GetUserHomeFolder''
  :EndIf
@@ -18,12 +16,4 @@
      Assert F.MkDir folder
  :EndIf
  ref←MyUserSettings←⎕NEW UserSettings(,⊂folder)
- :If 0=≢1 ListRegistries''
-     ns←⎕NEW DefineRegistry(,⊂'[tatin]https://tatin.dev')
-     MyUserSettings.AddRegistry ns
-     ns←⎕NEW DefineRegistry(,⊂'[tatin]https://testtatin.dev')
-     ns.←
-     MyUserSettings.AddRegistry ns
-     MyUserSettings.Save 1
- :EndIf
 ⍝Done

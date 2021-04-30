@@ -1,0 +1,17 @@
+ r←Test_Load_083(stopFlag batchFlag);⎕TRAP;expected
+⍝ Load a package by specifying just group, name and major number; should NOT load a beta version
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''    ⍝ Used to load stuff into
+
+ {}1 TC.LoadPackage'[tatin-test]aplteam-versions-1' '#.TEMP'
+ expected←'MyCode' '1.0.0' '2020-01-11'
+ →T.GoToTidyUp expected≢#.TEMP.versions.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

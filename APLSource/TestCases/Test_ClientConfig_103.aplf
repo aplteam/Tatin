@@ -7,10 +7,10 @@
  F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- →T.GoToTidyUp 1≠≢settings.registries
+ →T.GoToTidyUp 2≠≢settings.registries
  reg2←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
  settings.AddRegistry reg2
- →T.GoToTidyUp 2≠≢settings.registries
+ →T.GoToTidyUp 3≠≢settings.registries
  reg2.alias←'foo'
  reg2.api_key←'Firlefanz'
  ns←reg2.Get ⍬
@@ -18,15 +18,15 @@
  settings.Save 1
  ⎕EX'settings'
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- →T.GoToTidyUp 2≠≢settings.registries
+ →T.GoToTidyUp 3≠≢settings.registries
  →T.GoToTidyUp(settings.GetRegistry'[foo]')≢settings.GetRegistry'https://localhost'
  →T.GoToTidyUp 1≠settings.RemoveRegistry'https://localhost'
  settings.AddRegistry reg2
- →T.GoToTidyUp 2≠≢settings.registries
+ →T.GoToTidyUp 3≠≢settings.registries
  →T.GoToTidyUp 1≠settings.Exist'[foo]'
  →T.GoToTidyUp 1≠settings.RemoveRegistry'[foo]'
  →T.GoToTidyUp 0≠settings.Exist'[foo]'
- →T.GoToTidyUp 1≠≢settings.registries
+ →T.GoToTidyUp 2≠≢settings.registries
 
  r←T._OK
 

@@ -12,6 +12,7 @@
  APL_Version←'C:\Program Files\Dyalog\Dyalog APL-64 18.0 Unicode\Dyalog.exe'
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
  r←⍬
+ 'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
  'Invalid right argument; must be one of: 0 1 2 3'⎕SIGNAL 11/⍨~(⊂type)∊0 1 2 3
  :If 0 YesOrNo'Would you like to update all Tatin packages?'
@@ -33,7 +34,9 @@
      parms.CommandLineArgs,←' -exec_setup=0 '
      parms.CommandLineArgs,←' -stop_in_setup=1 '
  :EndIf
- parms.CommandLineArgs,←noQLX/' -x'
+ :If noQLX
+     parms.CommandLineArgs,←' -x'
+ :EndIf
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  P_←⎕NEW P parms
@@ -54,7 +57,9 @@
      parms.CommandLineArgs,←' -exec_setup=0'
      parms.CommandLineArgs,←' -stop_in_setup=1 '
  :EndIf
- parms.CommandLineArgs,←noQLX/' -x'
+ :If noQLX
+     parms.CommandLineArgs,←' -x'
+ :EndIf
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  P_←⎕NEW P parms

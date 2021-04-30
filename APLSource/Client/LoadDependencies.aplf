@@ -12,7 +12,7 @@
  r←refs←⍬
  targetSpace←⍕targetSpace
  :If 0=⎕NC targetSpace
-     targetSpace ⎕NS''
+     targetSpace Reg.CreateNamespace ⎕THIS
  :EndIf
  CheckBuildList installFolder
  :If 0<≢tree←LoadBuildList installFolder
@@ -20,7 +20,7 @@
          (alias packageID)←{~'@'∊⍵:''⍵ ⋄ '@'(≠⊆⊢)⍵}packageID
          path←installFolder,'/',packageID
          ('Cannot find package "',path,'"')Assert F.Exists path
-         saveIn←GetTatinRootSpace targetSpace
+         saveIn←GetTatinRootSpace 3⍴targetSpace
          cfg←ReadPackageConfigFile path
          packageID2←1 GetPackageIDFromFilename path
          saveIn,←'.',packageID2

@@ -7,14 +7,14 @@
  F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- →T.GoToTidyUp 1≠≢settings.registries
+ →T.GoToTidyUp 2≠≢settings.registries
  ns←⎕NS''
  ns.uri←'https://localhost'
 
  settings.AddRegistry ns
  list←1 settings.ListRegistries ⍬
- →T.PassesIf 2=≢list
- →T.PassesIf list[;1]∆LazyMatch'tatin' ''
+ →T.PassesIf 3=≢list
+ →T.PassesIf list[;1]∆LazyMatch'tatin' 'tatin-test' ''
 
  ns←⎕NS''
  ns.uri←'https://localhost/'
@@ -23,8 +23,8 @@
  ns.alias←'foo'
  settings.ReplaceRegistry ns
  list←1 settings.ListRegistries ⍬
- →T.PassesIf 2=≢list
- →T.PassesIf list[;1]∆LazyMatch'tatin' 'foo'
+ →T.PassesIf 3=≢list
+ →T.PassesIf list[;1]≡'foo' 'tatin' 'tatin-test'
 
  r←T._OK
 

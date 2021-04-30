@@ -1,11 +1,10 @@
- {r}←ImportWithQuadFIX_1(sourcePath target);ref;parent;name;list;sourceFiles;sourceDirs;bool;i;target2;extensions;refs;rc
+ {r}←ImportWithQuadFIX_1(sourcePath target);ref;list;sourceFiles;sourceDirs;bool;i;target2;extensions;refs;rc
 ⍝ This works in principle but creates zombies from classes and scripted namespaces; see <01841> and <01843>
  r←⍬
  :If 0=⎕NC target
-     (parent name)←¯1 0↓¨'.'A.SplitPath target
-     name(⍎parent).⎕NS''
+     target CreateNamespace ⎕THIS
  :EndIf
- ref←⍎⍕target
+ ref←⍎target
  sourcePath←##.FilesAndDirs.NormalizePath sourcePath
  :If F.IsDir sourcePath
      :If 0<≢sourceFiles←F.ListFiles sourcePath,'/'

@@ -25,7 +25,6 @@
       :Implements Constructor
       :Access Public
       Init1 ⍬
-      _registries←⍬
       configFile←home.GetUserHomeFolder'.tatin'
       :If F.IsFile configFile                               ⍝ Has the user...
           buff←(∊1⊃F.NGET configFile)~⎕TC
@@ -35,10 +34,10 @@
           _path2config←AddSlash home.GetUserHomeFolder ⍬    ⍝ By default it's the user's home folder on all platforms
       :EndIf
       :If F.IsFile _path2config,cfg_name                    ⍝ If it exists...
-          Read _path2config                                 ⍝ we raed it
+          Read ⍬                                            ⍝ we read it
       :Else
-          _registries←⍬                                     ⍝ otherwise we create it with default values...
           AddPrincipalServer ⍬
+          AddTestServer ⍬
           Save 1
       :EndIf
     ∇
@@ -54,10 +53,10 @@
       'Is not a directory?!'Assert F.IsDir path2config_
       _path2config←AddSlash path2config_
       :If F.IsFile path2config
-          Read path2config
+          Read ⍬
       :Else
-          _registries←⍬
           AddPrincipalServer ⍬
+          AddTestServer ⍬
           Save 1
       :EndIf
     ∇
@@ -67,6 +66,7 @@
       home←(⊃⊃⎕CLASS ⎕THIS).##
       F←home.F ⋄ A←home.A
       _source←''
+      _registries←⍬
     ∇
 
     :Property source
@@ -311,23 +311,22 @@
       ns←⎕NS home.Reg.GetJsonFromFile path2config
       ns.registries.uri←{f←'\\'≡2⍴⍵ ⋄ AddSlash(f/'\\'),##.F.EnforceSlash(2×f)↓⍵}¨ns.registries.uri
       :If 0<≢ns.registries
-          _registries←ns.registries[⍋ns.registries.priority]
+          :If 1
+              _registries←ns.registries[⍋ns.registries.priority]
+          :Else
+              ⍝TODO⍝ 
+              ⍝ This avoids an orphaned reference lingering around but at the
+              ⍝ same time it leads to a ref  into # from ⎕SE for unknwon reasons.
+              _registries←⎕SE.⎕JSON⍣2 ns.registries[⍋ns.registries.priority]  ⍝ To avoids creating an orphaned ref once `ns` disappears (14888, <01851>)
+          :EndIf
       :Else
-          _registries←0 2⍴''
+          _registries←⍬
       :EndIf
-      _source←ns.source
       _fileTimestamp←GetFileTimestamp _path2config
     ∇
 
     ∇ r←GetFileTimestamp filename
       r←3 ⎕NINFO filename
-    ∇
-
-    ∇ {r}←CheckForUpdate dummy
-      :If r←_fileTimestamp≢GetFileTimestamp _path2config
-      :AndIf
-          Read _path2config
-      :EndIf
     ∇
 
     AddSlash←{⍵,(~(¯1↑⍵)∊'/\')/'/'}
@@ -337,6 +336,17 @@
       buff←⎕NS''
       buff.alias←'tatin'
       buff.uri←'https://tatin.dev'
+      reg←⎕NEW home.DefineRegistry(,⊂buff)
+      AddRegistry reg
+    ∇
+
+    ∇ {r}←AddTestServer dummy;buff;reg
+      r←⍬
+      buff←⎕NS''
+      buff.api_key←'Tatin-Test-API-Key'
+      buff.alias←'tatin-test'
+      buff.uri←'https://test.tatin.dev'
+      buff.priority←0
       reg←⎕NEW home.DefineRegistry(,⊂buff)
       AddRegistry reg
     ∇

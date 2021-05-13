@@ -1,0 +1,58 @@
+ r←Test_Misc_011(stopFlag batchFlag);⎕TRAP;credentials;S;res;expected
+⍝ Exercise the `GetCredentialReport` function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+ S←##.Server
+
+ credentials←0 2⍴''
+ res←S.GetCredentialReport↓⍉credentials
+ expected←,⊂'<p>Anybody can publish anything.</p>'
+ →T.PassesIf expected≡res
+
+ credentials←0 2⍴'' ''
+ credentials⍪←'group1' 'api-key-1'
+ credentials⍪←'group2' 'api-key-2'
+ res←S.GetCredentialReport↓⍉credentials
+ expected←,⊂'<p>All groups require a specific API key.</p>'
+ →T.PassesIf expected≡res
+
+ credentials⍪←'*' 'api-key-3'
+ res←S.GetCredentialReport↓⍉credentials
+ expected←'<p>These groups require a specific API key:</p>' '<ul>' '<li><code>group1</code></li>' '<li><code>group2</code></li>' '</ul>'
+ expected,←⊂'<p>All other groups require a generic API key.</p>'
+ →T.PassesIf expected≡res
+
+ credentials←1 2⍴'*' ''
+ res←S.GetCredentialReport↓⍉credentials
+ expected←,⊂'<p>Anybody can publish anything.</p>'
+ →T.PassesIf expected≡res
+
+ credentials←0 2⍴'' ''
+ credentials⍪←'group1' 'api-key-1'
+ credentials⍪←'group2' 'api-key-2'
+ credentials⍪←'group3' ''
+ res←S.GetCredentialReport↓⍉credentials
+ expected←'<p>These groups do <b>not</b> require an API key:</p>' '<ul>' '<li><code>group3</code></li>' '</ul>'
+ expected,←'<p>These groups require a specific API key:</p>' '<ul>' '<li><code>group1</code></li>' '<li><code>group2</code></li>' '</ul>'
+ →T.PassesIf expected≡res
+
+ credentials←0 2⍴'' ''
+ credentials⍪←'group1' 'api-key-1'
+ credentials⍪←'group2' 'api-key-2'
+ credentials⍪←'*' ''
+ res←S.GetCredentialReport↓⍉credentials
+ expected←'<p>These groups require a specific API key:</p>' '<ul>' '<li><code>group1</code></li>' '<li><code>group2</code></li>' '</ul>' '<p>Anybody can publish any other group.</p>'
+ →T.PassesIf expected≡res
+
+ credentials←0 2⍴'' ''
+ credentials⍪←'group1' 'api-key-1'
+ credentials⍪←'group2' 'api-key-2'
+ credentials⍪←'group3' ''
+ credentials⍪←'*' ''
+ res←S.GetCredentialReport↓⍉credentials
+ expected←'<p>These groups do <b>not</b> require an API key:</p>' '<ul>' '<li><code>group3</code></li>' '</ul>'
+ expected,←'<p>These groups require a specific API key:</p>' '<ul>' '<li><code>group1</code></li>' '<li><code>group2</code></li>' '</ul>' '<p>Anybody can publish any other group.</p>'
+ →T.PassesIf expected≡res
+
+ r←T._OK
+⍝Done

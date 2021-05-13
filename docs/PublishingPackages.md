@@ -19,7 +19,7 @@ API keys are only required for publishing and possibly deleting packages, but no
 If you want to publish on `https://tatin.dev` you need to ask [kai@aplteam.com](mailto:kai@aplteam.com) for an API key.
 
 
-#### The Tatin Test Server
+#### Credentials for the Tatin Test Server
 
 The Tatin Test Server publishes an API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name.
 
@@ -30,7 +30,7 @@ Notes:
 
 
 
-#### Running your own Tatin Server 
+#### Credentials for your own Tatin Server 
 
 If you run your own Tatin Server we suggest that you create a UUID and use that as an API key. 
 
@@ -39,7 +39,7 @@ In order for the API key to be accepted by the Tatin Server it must be added to 
 Make sure that you specify it as either
 
 ```
-groupname={api-key}
+group1={api-key}
 ```
 
 or
@@ -48,7 +48,7 @@ or
 *={api-key}
 ```
 
-In the first case somebody who provides that API key may publish packages only for the group "groupname".
+In the first case somebody who provides that API key may publish packages only for the group "group1".
 
 In the second case it's a kind of master password: it allows the creation of packages with _any_ group name.
 
@@ -62,7 +62,7 @@ group2='xyz'
 
 This means that one can only publish packages with the groupname "group1" with the API key "abc", packages with the groupname "group2" with the API key "xyz", and anything else with the API key "other".
 
-Note that `*=` means that no API key is required. That's the same as having no credentials file, but it can be useful together with other group names:
+Note that `*=` means that no API key is required. On its own it's the same as having no credentials file, but it can be useful together with other group names:
 
 ```
 group1='abc'
@@ -71,6 +71,21 @@ group2='xyz'
 ```
 
 This is interpreted as "require API keys for the groups "group1" and "group2" but allow anything else without an API key".
+
+Finally you can allow anybody to publish packages under a particular group name without providing an API key:
+
+```
+group1='abc'
+group2=
+group3=''
+*='other'
+```
+
+This means:
+
+* You must provide "abc" as an API key for the group "group1"
+* You may publish packages to the groups "group1" and "group2" without an API key 
+* For any group name but "group1", "group2" and "group3" you must specify "other" as API key
 
 ### The Client
 

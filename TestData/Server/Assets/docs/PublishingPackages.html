@@ -37,8 +37,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>If you want to publish on <code>https://tatin.dev</code> you need to ask <a href="mailto:kai@aplteam.com" class="mailto_link">kai@aplteam.com</a> for an API key.</p>
 <div class="h_tag">
-<a href="#The-Tatin-Test-Server" id="The-Tatin-Test-Server" class="autoheader_anchor">
-<h4 data-id="The-Tatin-Test-Server">The Tatin Test Server</h4>
+<a href="#Credentials-for-the-Tatin-Test-Server" id="Credentials-for-the-Tatin-Test-Server" class="autoheader_anchor">
+<h4 data-id="Credentials-for-the-Tatin-Test-Server">Credentials for the Tatin Test Server</h4>
 </a>
 </div>
 <p>The Tatin Test Server publishes an API key on its website; it's “Tatin-Test-API-Key”. It allows you to publish anything you want, including any group name.</p>
@@ -48,28 +48,39 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>You cannot publish anything with the groups “aplteam” or “dyalog”</li>
 </ul>
 <div class="h_tag">
-<a href="#Running-your-own-Tatin-Server" id="Running-your-own-Tatin-Server" class="autoheader_anchor">
-<h4 data-id="Running-your-own-Tatin-Server">Running your own Tatin Server</h4>
+<a href="#Credentials-for-your-own-Tatin-Server" id="Credentials-for-your-own-Tatin-Server" class="autoheader_anchor">
+<h4 data-id="Credentials-for-your-own-Tatin-Server">Credentials for your own Tatin Server</h4>
 </a>
 </div>
 <p>If you run your own Tatin Server we suggest that you create a UUID and use that as an API key.</p>
 <p>In order for the API key to be accepted by the Tatin Server it must be added to the file <code>Credentials.txt</code> in the Registry's root directory. The file will most likely already exist but might be empty.</p>
 <p>Make sure that you specify it as either</p>
-<pre><code>groupname={api-key}</code></pre>
+<pre><code>group1={api-key}</code></pre>
 <p>or</p>
 <pre><code>*={api-key}</code></pre>
-<p>In the first case somebody who provides that API key may publish packages only for the group “groupname”.</p>
+<p>In the first case somebody who provides that API key may publish packages only for the group “group1”.</p>
 <p>In the second case it's a kind of master password: it allows the creation of packages with <em>any</em> group name.</p>
 <p>The two scenarios can be mixed:</p>
 <pre><code>group1='abc'
 group2='xyz'
 *='other'</code></pre>
 <p>This means that one can only publish packages with the groupname “group1” with the API key “abc”, packages with the groupname “group2” with the API key “xyz”, and anything else with the API key “other”.</p>
-<p>Note that <code>*=</code> means that no API key is required. That's the same as having no credentials file, but it can be useful together with other group names:</p>
+<p>Note that <code>*=</code> means that no API key is required. On its own it's the same as having no credentials file, but it can be useful together with other group names:</p>
 <pre><code>group1='abc'
 group2='xyz'
 *=</code></pre>
 <p>This is interpreted as “require API keys for the groups ”group1“ and ”group2“ but allow anything else without an API key”.</p>
+<p>Finally you can allow anybody to publish packages under a particular group name without providing an API key:</p>
+<pre><code>group1='abc'
+group2=
+group3=''
+*='other'</code></pre>
+<p>This means:</p>
+<ul>
+<li>You must provide “abc” as an API key for the group “group1”</li>
+<li>You may publish packages to the groups “group1” and “group2” without an API key</li>
+<li>For any group name but “group1”, “group2” and “group3” you must specify “other” as API key</li>
+</ul>
 <div class="h_tag">
 <a href="#The-Client" id="The-Client" class="autoheader_anchor">
 <h3 data-id="The-Client">The Client</h3>

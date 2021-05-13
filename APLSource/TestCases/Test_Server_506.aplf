@@ -1,6 +1,6 @@
- r←Test_Server_501(stopFlag batchFlag);⎕TRAP;packageID;serverPath;qdmx;reg;oldCredentials
+ r←Test_Server_506(stopFlag batchFlag);⎕TRAP;packageID;serverPath;oldCredentials;reg
  ;zip;cfg;body;clientCfg;dir;src;res
-⍝ Publish a package with a group name that requires a specific API key but use the generic one
+⍝ Publish a package with a group name that requires no API key at all
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -13,23 +13,18 @@
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
  cfg←TC.InitPackageConfig ⍬
- cfg.group←'ProtectedGroup'
- cfg.name←'Package_A'
+ cfg.group←'NeedsNoAPIkey'
+ cfg.name←'Package_M'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
  TC.WritePackageConfigFile src cfg
 
- packageID←'ProtectedGroup-Package_A-0.1.0'
+ packageID←'NeedsNoAPIkey-Package_M-0.1.0'
  reg←TC.MyUserSettings.GetRegistry'https://localhost'
  oldCredentials←reg.api_key
- reg.api_key←'Test-API-Key'        ⍝ This should NOT fit this particular group (though any other)
- :Trap 98
-     TC.PublishPackage src'https://localhost/'
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'Server: Unauthorized request'≢qdmx.EM
- :EndTrap
+ reg.api_key←''                 ⍝ We do not provide an API key here!
+ res←TC.PublishPackage src'https://localhost/'
+ →T.GoToTidyUp 200≢1⊃res
 
  r←T._OK
 

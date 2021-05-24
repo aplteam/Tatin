@@ -1,0 +1,17 @@
+ r←Test_Misc_021(stopFlag batchFlag);⎕TRAP;dir;orig;buff;new
+⍝ Exercise `ReInstallDependencies
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir ⍬
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/dependencies/*'
+ orig←F.ListDirs dir,'/*'
+ buff←##.Client.ReInstallDependencies dir
+ new←F.ListDirs dir,'/*'
+ →T.PassesIf≡/∪¨{{⍵/⍨2>+\⍵='-'}⊃,/1↓⎕NPARTS ⍵}¨¨orig new
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir dir
+⍝Done

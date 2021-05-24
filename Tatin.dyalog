@@ -1,5 +1,9 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.28.0 - 2021-05-23
+⍝   * The ReInstallDependencies command got an option -dry
+⍝   * Help for user command s polished
+⍝   * Bug fix: VALUE RROR in ReinstallDependencies due to a typo
 ⍝ * 0.27.0 - 2021-04-25
 ⍝   * `ListVersion` extended
 ⍝ * 0.26.0 - 2021-04-19
@@ -210,7 +214,7 @@
           c←⎕NS ⍬
           c.Name←'ReinstallDependencies'
           c.Desc←'Install all packages again according to the dependency file'
-          c.Parse←'2s -nobetas'
+          c.Parse←'2s -nobetas -dry'
           r,←c
      
           r.Group←⊂NM
@@ -385,7 +389,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;noBetas;deps
+    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;noBetas;deps;dry;msg
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -393,15 +397,20 @@
       :Else
           registry←Args._2
       :EndIf
+      dry←0 Args.Switch'dry'
       noBetas←0 Args.Switch'nobetas'
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       'Not a directory'Assert TC.F.IsDir installFolder
       'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'
       deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
       'Dependency file is empty'Assert 0<≢deps
-      :If ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
-          r←noBetas TC.ReinstallDependencies installFolder registry
-          ⎕←'*** Done'
+      :If dry
+          r←noBetas TC.PretendReInstallDependencies installFolder registry
+      :Else
+          :If ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
+              r←noBetas TC.ReInstallDependencies installFolder registry
+              ⎕←'*** Done'
+          :EndIf
       :EndIf
     ∇
 
@@ -476,7 +485,7 @@
       :EndIf
       url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_
-
+     
       :If TC.F.IsDir source
           ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_Name
       :Else
@@ -873,7 +882,7 @@
           r,←⊂''
           r,←⊂'B) Second argument'
           r,←⊂'   The second argument must be the path to a folder into which the packages are'
-          r,←⊂'   going to be be installed'
+          r,←⊂'   going to be installed'
           r,←⊂''
           r,←⊂'Valid examples are:'
           r,←⊂'  ]TATIN.InstallPackage aplteam-APLTreeUtils-2.0.0 /pathTo/folder'
@@ -888,8 +897,7 @@
           r,←⊂'  ]TATIN.InstallPackage A@APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
           r,←⊂''
-          r,←⊂'Note that the -quiet flag that prevents the "Are you sure?" question from being asked in'
-          r,←⊂'case the install folder does not exist yet is probably only useful with test cases.'
+          r,←⊂'The -quiet flag comes handy with test cases.'
       :Case ⎕C'LoadDependencies'
           r,←⊂'Takes two arguments:'
           r,←⊂'[1] A folder into which one or more packages have been installed.'
@@ -1032,7 +1040,9 @@
           r,←⊂'Examples:'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin]'
-          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ -betas'
+          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas'
+          r,←⊂''
+          r,←⊂'-dry makes the user command report what it would do without actually doing anything at all.'
           r,←⊂''
           r,←⊂'By default betas are included but this can be changed by specifying the -nobetas flag.'
       :Else
@@ -1049,9 +1059,9 @@
       r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
       r,←⊂'are scanned; the first hit wins.'
       r,←⊂''
-      r,←⊂'Options:'
+      r,←⊂'It may be:'
       r,←⊂''
-      r,←⊂'* A full package ID'
+      r,←⊂'* A full package ID.'
       r,←⊂''
       r,←⊂'  A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
       r,←⊂''
@@ -1061,10 +1071,10 @@
       r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
       r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
-      r,←⊂'  in two ore more different groups but will succeed otherwise.'
+      r,←⊂'  in two or more different groups but will succeed otherwise.'
       r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
-      r,←⊂'* A full path or a URL in front of the package ID.'
+      r,←⊂'* Eiether a full path or a URL in front of the package ID.'
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

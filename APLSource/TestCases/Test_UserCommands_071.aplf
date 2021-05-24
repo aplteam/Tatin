@@ -1,0 +1,28 @@
+ r←Test_UserCommands_071(stopFlag batchFlag);⎕TRAP;dir;old;res;rc;msg;new
+⍝ Exercise ]Tatin.ReInstallDependencies
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If batchFlag
+     r←T._NoBatchTest
+     :Return
+ :EndIf
+
+ dir←GetTempDir''
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣'TestData/UnInstall/*'
+ ##.FilesAndDirs.RmDir dir,'/aplteam-EventCodes-3.0.0'  ⍝ Outdated, will therefore not be installed again
+ old←⊃##.FilesAndDirs.Dir dir,'/'
+ ##.FilesAndDirs.RmDir dir,'/aplteam-OS-3.0.1'
+ (rc msg res)←∆UCMD'ReInstallDependencies "',dir,'"'
+ →T.GoToTidyUp 0≠rc
+ →T.GoToTidyUp 0≠+/≢¨msg res
+
+ new←⊃##.FilesAndDirs.Dir dir,'/'
+ →T.GoToTidyUp{(≢⍵)≠1++/⍵}new∊old                       ⍝ That's because for Tester2 a better version will be installed
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

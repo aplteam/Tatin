@@ -1,10 +1,25 @@
- refs←ReInstallDependencies_(deps installFolder registry noBetas);i;pkg;ref
+ refs←{dry}ReInstallDependencies_(deps installFolder registry noBetas);i;pkg;ref;msg;alias;identifier
+⍝ Re-installs all packages according to the content of `deps`.\\
+⍝ In case `dry` is 1 it reports to the session what it _would_ do, without actually doing anything at all.\\
+ dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
  refs←⍬
  :For i :In ⍳≢deps
      pkg←i⊃deps
      pkg←Reg.RemoveMinorAndPatch pkg
-     PrintToSession'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),'...'
-     ref←noBetas InstallPackage(registry,pkg)installFolder
-     PrintToSession'  Installed: ',ref,⎕UCS 13
-     refs,←⊂ref
+     :If dry
+         (alias identifier)←SplitAtAlias pkg
+         identifier←ReplaceRegistryAlias identifier
+         ('Unknown',(∧/'[]'∊identifier)/' alias')Assert 0<≢identifier
+         identifier←noBetas CheckVersion identifier
+         'Package not found'Assert 0<≢identifier
+         msg←'Would fetch package ',(⍕i),' of ',(⍕≢deps),' (',identifier,')',((0<≢registry)/' from ',registry),'...'
+     :Else
+         msg←'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),'...'
+     :EndIf
+     PrintToSession msg
+     :If ~dry
+         ref←noBetas InstallPackage(registry,pkg)installFolder
+         PrintToSession'  Installed: ',ref,⎕UCS 13
+         refs,←⊂ref
+     :EndIf
  :EndFor

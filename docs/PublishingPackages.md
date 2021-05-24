@@ -34,7 +34,7 @@ Notes:
 
 If you run your own Tatin Server we suggest that you create a UUID and use that as an API key. 
 
-In order for the API key to be accepted by the Tatin Server it must be added to the file `Credentials.txt` in the Registry's root directory. The file will most likely already exist but might be empty.
+In order for an API key to be accepted by a Tatin Server it must be added to the file `Credentials.txt` in the Registry's root directory. The file might or might not exist, and it might be empty.
 
 Make sure that you specify it as either
 

@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.28.1 - 2021-05-24
+⍝   * User command now prints a reasonable text message to the session in case of success rather than am HTTP code
 ⍝ * 0.28.0 - 2021-05-23
 ⍝   * The ReInstallDependencies command got an option -dry
 ⍝   * Help for user command s polished
@@ -417,6 +419,9 @@
     ∇ r←DeletePackage Arg;path
       path←Arg._1
       r←TC.DeletePackage path
+      :If 200=⊃r
+          r←'Package was successfully deleted'
+      :EndIf
      ⍝Done
     ∇
 

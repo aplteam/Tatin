@@ -1,0 +1,68 @@
+ r←Test_Misc_014(stopFlag batchFlag);⎕TRAP;G;filename;res;expected
+⍝ Exercise `ProcessCredentials` locally
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ ##.Server.CreateAllRefs
+ G←⎕NS''
+ G.RegistryPath←##.FilesAndDirs.GetTempSubDir''
+ filename←G.RegistryPath,'/Credentials.txt'
+
+ G←##.Server.ProcessCredentials G
+ →T.GoToTidyUp 2≠≢G.Credentials
+ res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp'<p>Anybody can publish anything.</p>'≢∊res
+
+ (⊂'*=')##.FilesAndDirs.NPUT filename 1
+ G←##.Server.ProcessCredentials G
+ →T.GoToTidyUp 2≠≢G.Credentials
+ res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp'<p>Anybody can publish anything.</p>'≢∊res
+
+ (⊂'abc=xyz')##.FilesAndDirs.NPUT filename 1
+ G←##.Server.ProcessCredentials G
+ →T.GoToTidyUp 2≠≢G.Credentials
+ res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp'<p>All groups require a specific API key.</p>'≢∊res
+
+ (⊂'abc=xyz' 'ABC=XYZ')##.FilesAndDirs.NPUT filename 1
+ G←##.Server.ProcessCredentials G
+ →T.GoToTidyUp 2≠≢G.Credentials
+ res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp'<p>All groups require a specific API key.</p>'≢∊res
+
+ (⊂'abc=xyz' '*=')##.FilesAndDirs.NPUT filename 1
+ G←##.Server.ProcessCredentials G
+ →T.GoToTidyUp 2≠≢G.Credentials
+ res←##.Server.GetCredentialReport G.Credentials
+ expected←''
+ expected,←⊂'<p>These groups require a specific API key:</p>'
+ expected,←⊂'<ul>'
+ expected,←⊂'<li><code>abc</code></li>'
+ expected,←⊂'</ul>'
+ expected,←⊂'<p>Anybody can publish any other group.</p>'
+ →T.GoToTidyUp expected≢res
+
+ (⊂'abc=xyz' 'foo=' '*=other')##.FilesAndDirs.NPUT filename 1
+ G←##.Server.ProcessCredentials G
+ →T.GoToTidyUp 2≠≢G.Credentials
+ res←##.Server.GetCredentialReport G.Credentials
+ expected←''
+ expected,←⊂'<p>These groups do <b>not</b> require an API key:</p>'
+ expected,←⊂'<ul>'
+ expected,←⊂'<li><code>foo</code></li>'
+ expected,←⊂'</ul>'
+ expected,←⊂'<p>These groups require a specific API key:</p>'
+ expected,←⊂'<ul>'
+ expected,←⊂'<li><code>abc</code></li>'
+ expected,←⊂'</ul>'
+ expected,←⊂'<p>Anybody can publish any other group.</p>'
+ →T.GoToTidyUp expected≢res
+
+ r←T._OK
+
+∆TidyUp:
+ ##.FilesAndDirs.RmDir G.RegistryPath
+ ##.Server.Reg.⎕EX¨'A' 'F' 'OS' 'DotNetZip'
+ ##.Server.⎕EX¨'Reg' 'A' 'F' 'OS' 'DotNetZip'
+⍝Done

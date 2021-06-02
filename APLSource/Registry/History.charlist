@@ -1,7 +1,15 @@
-* 0.40.1 ⋄ 2021-05-??
+* 0.40.1 ⋄ 2021-06-03
+  * The server has a global variable ∆STARTED now.
+  * Tatin did allow loading packages into sub namespaces of `⎕SE` but not `⎕SE` into itself.
+    This restriction has been lifted.
   * Bug fixes:
     * `ProcessCredentials` did not handle correctly both a missing file and a file that contains nothing
       but `*=` (allow everything).
+    * A credential file that contained a trailing blank as in `*= ` let to "Unautorised request" no matter what
+    * Asking for a group list when no packages are yet published crashed a Tatin server
+    * The workspace hash was calculated too early. Mattered only if the current dir is not already correct at
+      that point.
+    * `CheckForLaterVersion` was buggy
 * 0.40.0 ⋄ 2021-05-23
   * The user command ]Tatin.ReInstallDependencies now has a flag -dry
   * User command help improved

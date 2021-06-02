@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.28.2 - 2021-05-31
+⍝   * Wording changed in CheckForLaterVersion's help
 ⍝ * 0.28.1 - 2021-05-24
 ⍝   * User command now prints a reasonable text message to the session in case of success rather than am HTTP code
 ⍝ * 0.28.0 - 2021-05-23
@@ -352,7 +354,7 @@
       r←⍪r
     ∇
 
-    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this;dependencies;raw
+    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this;dependencies;raw;b
       r←''
       path←Arg._1
       (majorFlag raw dependencies)←Arg.(major raw dependencies)
@@ -386,8 +388,12 @@
           :EndIf
       :EndIf
       :If ~raw
-          r←'Installed' 'Best' 'URL'⍪' '⍪r
+      :AndIf 0<≢r
+          r←'Installed' 'Best' 'URL' '?'⍪' '⍪r
           r[2;]←(⌈⌿≢¨r)⍴¨'-'
+          b←1≡¨r[;4]
+          r[⍸b;4]←'*'
+          r[2↓⍸~b;4]←⊂''     
       :EndIf
     ∇
 
@@ -1009,16 +1015,18 @@
           r,←⊂'Insetad you can specify a directory that contains a file tatin-client.json as argument.'
       :Case ⎕C'CheckForLaterVersion'
           r,←⊂'Takes the path to a folder with a file "apl-buildlist.json" as argument.'
-          r,←⊂'Checks the packages specified in that file for "better" versions.'
+          r,←⊂'Checks the packages specified in that file for later versions.'
           r,←⊂'Packages installed from  ZIP files are ignored: Tatin does not know where to look.'
           r,←⊂''
-          r,←⊂'Returns information only for packages a "better" version was found for.'
+          r,←⊂'Returns information only for packages a later version was found for.'
           r,←⊂''
-          r,←⊂'By default "better" MAJOR versions are ignored, but check on -major.'
-          r,←⊂'The default behaviour can be changed by specifying the flag -major.'
-          r,←⊂'Then only "better" major versions are reported.'
+          r,←⊂'-major:        by default later MAJOR versions are ignored, but this default behaviour can be changed '
+          r,←⊂'               by specifying the flag -major: then only later major versions are reported.'
           r,←⊂''
-          r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
+          r,←⊂'-dependencies: by default only principal packages are checked. You may include dependencies by'
+          r,←⊂'               specifying this flag.'
+          r,←⊂''
+          r,←⊂'-raw:          by default the output is beautified; specify -raw if you want just a raw table.'
       :Case ⎕C'DeletePackage'
           r,←⊂'Takes a path pointing to a package.'
           r,←⊂'Examples:'

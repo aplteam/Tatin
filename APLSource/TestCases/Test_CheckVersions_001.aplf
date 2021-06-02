@@ -1,10 +1,11 @@
  r←Test_CheckVersions_001(stopFlag batchFlag);⎕TRAP;version
-⍝ Run CheckVersions on an installed packages that is the best anyway
+⍝ Run CheckVersions on an installed package that is the best anyway
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  version←TC.CheckForLaterVersion'TestData\Packages\Local-No-Better'
- →T.PassesIf 0=≢version
+ →T.PassesIf 1=≢version
+ →T.PassesIf 0=1 4⊃version
 
  r←T._OK
 ⍝Done

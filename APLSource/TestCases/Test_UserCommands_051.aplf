@@ -1,13 +1,14 @@
- r←Test_UserCommands_051(stopFlag batchFlag);⎕TRAP;res;msg;rc;path
+ r←Test_UserCommands_051(stopFlag batchFlag);⎕TRAP;res;msg;rc;path;stop
 ⍝ Exercise ]Tatin.CheckForLaterVersion without the -major flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  path←'./TestData/Packages/Update-Check-Multiple'
- (rc msg res)←∆UCMD'CheckForLaterVersion ',path,' -raw'
+ stop←0
+ (rc msg res)←stop ∆UCMD'CheckForLaterVersion ',path,' -raw'
  →T.PassesIf 0=rc
  →T.PassesIf 0=≢msg
- →T.PassesIf 1=≢res
- →T.PassesIf∨/'aplteam-MarkAPL-9.1.13'⍷∊res
+ →T.PassesIf 1=≢(1≡¨res[;4])⌿r
+ →T.PassesIf(,⊂'aplteam-MarkAPL-9.1.13')≡(1≡¨res[;4])⌿res[;2]
 
  r←T._OK

@@ -8,7 +8,7 @@ Before you read this document, you have to have a good understanding of what Sem
 
 ## The Strategy Problem
 
-Let's imagine that you need two packages, `Foo` and `Goo`. Both rely on package `Zoo`, but while `Foo` requests 1.1.1 of `Zoo`, `Goo` insists on version 1.2.0. However, the best version of `Goo` available is actually 2.0.0, and even for major version 1 there is a better version available: 1.3.0.
+Let's imagine that you need two packages, `Foo` and `Goo`. Both rely on package `Zoo`, but while `Foo` requests 1.1.1 of `Zoo`, `Goo` insists on version 1.2.0. However, the best version of `Goo` available is actually 2.0.0, and even for major version 1 there is a later version available: 1.3.0.
 
 Now from what we've said so far it should be clear that version 2.0.0 is not an option at all because it is considered as a completely different package and therefore ignored.
 
@@ -17,8 +17,8 @@ Because of SemVer we know that `Goo` would crash on version 1.1.1 of `Zoo` in ca
 We can take several different approaches here:
 
 * We could load both versions and make `Foo` use version 1.1.1 and `Goo` use version 1.2.0
-* We could load the better version (1.2) and make `Zoo` and `Goo` both use that version 
-* We could check the server, find that there is an even better version available (1.3.0) and use that one
+* We could load the later version (1.2) and make `Zoo` and `Goo` both use that version 
+* We could check the server, find that there is an even later version available (1.3.0) and use that one
 
   (More generally, always check for the latest version and use that one)
 
@@ -37,13 +37,13 @@ This can happen in case the author of a package has released a new version of a 
 
 Attractive as an automated update mechanism might be, you want a build to be _reproducible_.
 
-Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are better packages available: check the user command `]TATIN.CheckForBetterVersions`.
+Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available: check the user command `]TATIN.CheckForLaterVersions`.
 
 So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages `Foo` and `Goo`.
 
-Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses _the best version_, which might or might not be the best one available. In our example that would be 1.2.0, while 1.3.0 is ignored.
+Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses _the latest version_, which might or might not be the latest one available. In our example that would be 1.2.0, while 1.3.0 is ignored.
 
-This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs "Link to the paper defining it"). It guarantees that when you re-build, you will get exactly the same result, but it will grab the best version mentioned.
+This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs "Link to the paper defining it"). It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest version _mentioned as a dependency_.
 
 
 ## Loading Dependencies
@@ -78,15 +78,15 @@ Foo
 Goo
 ```
 
-A> ### Getting the best version
+A> ### Getting the latest version
 A>
-A> Assuming that version 1.3.0 of `Foo` is the best version available with the major number 1, then this would have been sufficient:
+A> Assuming that version 1.3.0 of `Foo` is the latest version available with the major number 1, then this would have been sufficient:
 A> ```
 A> ]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1 #.MyPkgs
 A> ```
 A> Note that neither the minor nor the patch number have been specified.
 A>
-A> Assuming that version 2.1.0 of `Goo` is the very best version available at all, and that's the version you want to use,
+A> Assuming that version 2.1.0 of `Goo` is the very latest version available at all, and that's the version you want to use,
 A> then this would have been sufficient:
 A>
 A> ```
@@ -144,18 +144,18 @@ Let's check the contents of the `/myPkgs/apl-buildlist.json` file:
       #.q←⎕JSON⍠('Dialect' 'JSON5')⊢⊃⎕NGET'/myPkgs/apl-buildlist.json'
       ⍉↑#.q.(depth packageID)
 1 mygroup-Foo-1.0.0
-2 mygroup-Zoo-1.1.1
+0 mygroup-Zoo-1.1.1
 1 mygroup-Goo-2.1.0
-2 mygroup-Zoo-1.2.0
+0 mygroup-Zoo-1.2.0
 ```
 
-Note that the principal packages carry a 1 in the first column. Numbers higher than 1 indicate the level of dependency.
+Note that the principal packages carry a 1 in the first column whiles dependencies carry a 0.
 
 The build list comprises not only the two principal packages but also all dependencies.
 
 ## Loading the installed packages
 
-Though installing is roughly the same as loading except that the packages end up in the file system rather than the workspace, loading the installed packages allows Tatin to optimize what's actually loaded, and in this respect it is different.
+Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two different.
 
 Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which was created when you installed your first package, and which will be extended when you install more packages.
 
@@ -174,7 +174,7 @@ This is what `LoadDependencies` will do:
   is fine then the build list is created from scratch,
 3. Finally it will prune the build list and bring in the remaining packages.
 
-Note that the pruning is in charge for removing the package `Zoo` 1.1.1. That means that rather than loading `Zoo` twice _only the best **installed** version_ will be loaded: both `Foo` and `Goo` will use `Zoo` version 1.2.0. 
+Note that the pruning is in charge for removing the package `Zoo` 1.1.1. That means that rather than loading `Zoo` twice _only the latest **installed** version_ will be loaded: both `Foo` and `Goo` will use `Zoo` version 1.2.0. 
 
 
 ## Special case
@@ -208,28 +208,24 @@ When the health checks pass, the build-list would be re-created..
 
 ## Checking and updating
 
-Let's assume you want to check whether there are "better" versions of the principal packages of your application.
+Let's assume you want to check whether there are later versions of the packages of your application.
 
 There is a user command available that can help you with that:
 
 ```
-      ]TATIN.CheckForBetterVersion ./
+      ]TATIN.CheckForLaterVersion ./
 ```
 
 It requires a path to a folder that holds a file `apl-dependencies.txt`  and a file `apl-buildlist.json`. 
 
-This user command would check whether there are any "better" top-level versions available and report its findings to the session.
+This user command would check whether there are any later versions of the top-level packages available and report its findings to the session.
 
-I> `CheckForBetterVersion` does not bother to look out for dependencies because we load exact versions anyway.
+As usual Tatin would consider packages with different major numbers as different packages, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your top-level packages.
 
-Note that a top-level package carries a 1 as `depth` in the `apl-buildlist.json` file.
+It is then up to you to take action: you may or may not install a later package that is available.
 
-As usual Tatin would consider packages with different major numbers different, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your top-level packages.
-
-It is then up to you to take action: you may or may not install a "better" package that is available.
-
-A> ### "Better" major versions
-A> When you specify the `-major` flag of the `CheckForBetterVersion` user command then the user command will only report better major versions.
+A> ### Later major versions
+A> When you specify the `-major` flag of the `CheckForLaterVersion` user command then the user command will also report later major versions.
 
 
 ## Downgrading

@@ -2,12 +2,13 @@
 ⍝ Takes a vector of fully qualified package paths (http or local) & checks for later versions.
 ⍝ `r` is a vector with fully qualified paths of any better versions, so possibly empty.
 ⍝ If `majorVersions` is 0 only minor and patch number are considered. If `majorVersions` is 1
-⍝ better "major" versions are considered. This is used only in the user command since
+⍝ better "major" versions are considered as well. This is used only in the user command since
 ⍝ Tatin considers packages with different major numbers to be different packages.
-⍝ For every package three pieces of information are returned:
+⍝ For every package these pieces of information are returned:
 ⍝ 1. Original version
-⍝ 2. Best version found
+⍝ 2. Best version found  (or something like `<no response>` or `<not found>`)
 ⍝ 3. URL
+⍝ 4. "!" in case there is a later version
  r←⍬
  'Invalid left argument'Assert 1=≢majorVersions
  'Invalid left argument'Assert majorVersions∊0 1
@@ -15,20 +16,28 @@
      :If '.zip'≢⎕C 3⊃⎕NPARTS fullPath
          PrintToSession'Checking <',fullPath,'>...'
          (url packageID)←SplitUrlAndPackageID fullPath
-         :If majorVersions
-             (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID)url
-         :Else
-             (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID)url
+         :If ~Reg.IsHTTP url
+             url←Reg.RemovePackageID{⍵↓⍨-'/'=¯1↑⍵}url
          :EndIf
-         :If 404=statusCode
+         :Trap 345
+             :If majorVersions
+                 (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID)url
+             :Else
+                 (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID)url
+             :EndIf
+         :Else
+             r,←⊂packageID'<<< No response >>>'url''
              :Continue
+         :EndTrap
+         :If 404=statusCode
+             r,←⊂packageID'<<< Not found >>>'url''
          :Else
              errMsg Assert 200=statusCode
              :If 0<≢fullPath2
                  packageID2←GetPackageIDFromFilename fullPath2
-             :AndIf packageID≢packageID2
                  buff←packageID packageID2
                  buff,←⊂{⍵↓⍨-'//'≡¯2↑⍵}(-+≢2⊃buff)↓fullPath2
+                 buff,←packageID≢packageID2
                  r,←⊂buff
              :EndIf
          :EndIf

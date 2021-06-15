@@ -1,0 +1,52 @@
+﻿:Namespace Setup
+⍝ This script needs to go into either:
+⍝ %USERPROFILE%\Documents\MyUCMDs  (Windows)
+⍝ $HOME/MyUCMDs   (Linux, Mac-OS)
+
+
+    ∇ {r}←Setup arg;⎕IO;⎕ML;wspath;path2Config
+    ⍝ This function makes sure that Tatin is loaded into ⎕SE at startup time.
+      r←⍬
+      ⎕IO←1 ⋄ ⎕ML←1      
+      :If IfAtLeastVersion 18
+      :AndIf 80=⎕dr ' '  ⍝ Not in "Classic"
+          ⎕SE.⎕EX¨'_Tatin' 'Tatin'
+          wspath←(GetMyUCMDsFolder''),'/Tatin/Client.dws'
+          '_Tatin'⎕SE.⎕CY wspath
+          path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
+      :EndIf
+      'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
+      'Tatin'⎕SE.⎕NS''
+      path2Config ⎕SE._Tatin.Admin.InstallClient ⎕SE.Tatin
+    ∇
+
+    ∇ r←{OS}GetMyUCMDsFolder add
+    ⍝ Returns standard path for Dyalog's MyUCMDs\ folder
+    ⍝ Works on all platforms but returns different results.\\
+    ⍝ Under Windows typically:\\
+    ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\'  ←→ GetMyUCMDsFolder
+    ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
+      :If 0=⎕NC'OS'
+          OS←GetOperatingSystem''
+      :EndIf
+      add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
+      :If 'Win'≡OS
+          r←(2 ⎕NQ'.' 'GetEnvironment' 'USERPROFILE'),'\Documents\MyUCMDs',add
+      :Else
+          r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
+      :EndIf
+    ∇
+
+      GetOperatingSystem←{
+   ⍝ Returns one of: "Win", "Mac", "AIX", "Lin"
+          ⎕IO←1 ⋄ ⎕ML←1
+          3↑⊃'.'⎕WG'APLVersion'
+      }
+
+      IfAtLeastVersion←{
+    ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
+    ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
+          ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
+      }
+
+:EndNamespace

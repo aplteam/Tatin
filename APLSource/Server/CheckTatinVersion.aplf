@@ -8,11 +8,13 @@
  :If 0<≢clientVersion←request R.GetHeaderValue'x-tatin'
  :AndIf 0≠clientVersion←⊃⊃(//)⎕VFI{⍵/⍨2>+\'.'=⍵}clientVersion
      (clientMajor clientMinor)←0 1⊤clientVersion
+     clientMinor←A.ToNum 2↓⍕clientMinor
  :AndIf G.INI.Exist'Config:MinimumTatinVersion'
- :AndIf 0≠minimum←⊃0 G.INI.Get'Config:MinimumTatinVersion'
-     (major minor)←0 1⊤minimum
+     minimum←⍕⊃0 G.INI.Get'Config:MinimumTatinVersion'
+ :AndIf 0≠≢minimum
+     (major minor)←A.ToNum¨{⍵{(¯1↓⍵↑⍺)(⍵↓⍺)}⍵⍳'.'}minimum
      :If clientMajor≠major
      :OrIf clientMinor<minor
-         msg←'Request came from invalid version of Tatin. Minimum version required is ',⍕minimum
+         msg←'Request came from invalid version of Tatin. Minimum version required is ',minimum
      :EndIf
  :EndIf

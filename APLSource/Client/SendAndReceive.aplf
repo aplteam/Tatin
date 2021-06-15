@@ -1,6 +1,7 @@
- r←uri SendAndReceive request;client;uri_;port
+ r←uri SendAndReceive request;client;uri_;port;⎕TRAP;msg
  request.Headers,←⊂Reg.TatinVersionAsHttpHeader
  client←NewClient uri
- client.ClientTimeout←900
+ msg←'Did not respond: ',uri
+ ⎕TRAP←(345 'C'('SignalNoConnection ''',msg,''''))(0 'S')
  r←client R.SendAndReceive request
 ⍝Done

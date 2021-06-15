@@ -1,6 +1,7 @@
- request ScanRegistries_1_(registry packageIDs);res;ns;data;buff;deps
-⍝ Part of creating a build list. Scans all registries for `packageIDs`.
-⍝ `registry` is usuall an http[s]:// address but may alos be a (local) file.
+ {r}←request ScanRegistries_1_(registry packageIDs);res;ns;data;buff;deps
+⍝ Part of creating a build list.
+⍝ `registry` is usuall an http[s]:// address but may also be a (local) file.
+ r←0
  :If Reg.IsHTTP registry
      request.URI←'/v1/packages/dependencies/',1↓∊',',¨packageIDs
      res←registry SendAndReceive request

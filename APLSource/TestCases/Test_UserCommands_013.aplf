@@ -1,0 +1,11 @@
+ r←Test_UserCommands_013(stopFlag batchFlag);⎕TRAP;bool;msg;rc
+⍝ Exercise ]Tatin.Ping with an argument
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg bool)←∆UCMD'Ping [localhost]:5001'
+ Assert 0=rc
+ →T.PassesIf 1≡bool
+
+ r←T._OK
+⍝Done

@@ -1,0 +1,22 @@
+ r←Test_ScanRegistries_003(stopFlag batchFlag);⎕TRAP;path;ind;qdmx
+⍝ Enforce a Registry scan after defining a non-existing Registry in order to provoke a problem
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ TC.MyUserSettings.AddRegistry'[DoesNotExist]https://does-not-eixst.com'
+ ind←TC.MyUserSettings.registries.alias⍳⊂⎕C'DoesNotExist'
+ (ind⊃TC.MyUserSettings.registries).priority←1+⌈/TC.MyUserSettings.registries.priority
+
+ :Trap 345
+     path←TC.EstablishRegistry'[DosNotExist]aplteam-APLProcess'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Did not respond: https://does-not-eixst.com/'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ TC.MyUserSettings.RemoveRegistry'[DoesNotExist]'
+⍝Done

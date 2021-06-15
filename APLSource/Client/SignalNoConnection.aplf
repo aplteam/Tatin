@@ -1,0 +1,10 @@
+ SignalNoConnection msg;qdmx;EM
+⍝ Used to enable a Tatin-specific function to catch 346 and report `msg`, typically a server that does not respond.
+ qdmx←⎕DMX
+ EM←⎕C qdmx.EM~' '  ⍝ The Rumba message might carry more spaces than it should, so we have to do some gymnastic
+ :If 'handshakecertificateisfailing'{⍺≡(≢⍺)↑⍵}EM
+     msg ⎕SIGNAL 346
+ :Else
+     ⎕TRAP←0 'S'
+     qdmx.EM ⎕SIGNAL qdmx.EN
+ :EndIf

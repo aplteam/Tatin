@@ -1,0 +1,16 @@
+ r←Test_ScanRegistries_002(stopFlag batchFlag);⎕TRAP;path
+⍝ Search for a specific package without specifying a Registry in order to force Tatin to perform a scan
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←TC.EstablishRegistry'aplteam-APLProcess'
+ →T.PassesIf'./TestData/Server/Registry/'≡path
+
+ path←TC.EstablishRegistry'aplteam-APLProcess-0'
+ →T.PassesIf'./TestData/Server/Registry/'≡path
+
+ path←TC.EstablishRegistry'aplteam-APLProcess-0.3'
+ →T.PassesIf'./TestData/Server/Registry/'≡path
+
+ r←T._OK
+⍝Done

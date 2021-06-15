@@ -1,0 +1,19 @@
+ bool←Ping uri_;client;request;uri;buff;qdmx
+⍝ Establish whether the host is up and running with very little overhead.
+ :If ∧/'[]'∊uri_
+     uri←ReplaceRegistryAlias uri_
+ :Else
+     uri←uri_
+ :EndIf
+ bool←0
+ request←R.NewRequest 0
+ request.URI←'/ping'
+ client←NewClient uri
+ client.ClientTimeout←4
+ :Trap 345
+     buff←client R.SendAndReceive request
+     bool←1
+ :Else
+     ⍝ Just for debugging
+ :EndTrap
+⍝Done

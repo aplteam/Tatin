@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior:smooth" >
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title>Tatin: first steps</title>
+<style media="screen">
+html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}body{margin:0;}article,aside,footer,header,nav,section{display:block;}h1{font-size:2em;margin:0.67em 0;}figcaption,figure,main{display:block;}figure{margin:1em 40px;}hr{box-sizing:content-box;height:0;overflow:visible;}pre{font-family:monospace, monospace;font-size:1em;}a{background-color:transparent;-webkit-text-decoration-skip:objects;}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted;}b,strong{font-weight:inherit;}b,strong{font-weight:bolder;}code,kbd,samp{font-family:monospace, monospace;font-size:1em;}dfn{font-style:italic;}mark{background-color:#ff0;color:#000;}small{font-size:0.8em;}sub,sup{font-size:0.75em;line-height:0;position:relative;vertical-align:baseline;}sub{bottom:-0.25em;}sup{top:-0.5em;}audio,video{display:inline-block;}audio:not([controls]){display:none;height:0;}img{border-style:none;}svg:not(:root){overflow:hidden;}button,input,optgroup,select,textarea{font-family:sans-serif;font-size:1em;line-height:1.15;margin:0;}button,input{overflow:visible;}button,select{text-transform:none;}button,html [type="button"], [type="reset"],[type="submit"]{-webkit-appearance:button;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner{border-style:none;padding:0;}button:-moz-focusring,[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring{outline:1px dotted ButtonText;}fieldset{padding:0.35em 0.75em 0.625em;}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal;}progress{display:inline-block;vertical-align:baseline;}textarea{overflow:auto;}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0;}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto;}[type="search"]{-webkit-appearance:textfield;outline-offset:-2px;}[type="search"]::-webkit-search-cancel-button,[type="search"]::-webkit-search-decoration{-webkit-appearance:none;}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit;}details, menu{display:block;}summary{display:list-item;}canvas{display:inline-block;}template{display:none;}[hidden]{display:none;}body{margin:0;font-family:"Bookman Old Style", "Callisto MT", Bookman, "Goudy Old Style", Garamond, serif;background-color:#fdfdfd;font-size:18px;line-height:1.4;max-width:900px;padding:0.83em;color:#292929;word-wrap:break-word;overflow-wrap:break-word;}h1, h2, h3, h4, h5, h6{color:#404040;font-weight:800;padding-left:0;}h1, h2, h3, h4, h5, h6{font-family:"Century Gothic", Verdana, "Sans";}h1, h2, h3, h4, p{margin-bottom:0.88em;}h1{font-size:1.8em;margin:0.27em 0 1.11em 0;}h1 > code, h2 > code, h3 > code, h4 > code, h5 > code, h6 > code{font-size:1em;background-color:inherit;}h2{font-size:1.44em;margin:0.55em 0 0.55em 0;padding-top:0.55em;border-bottom:1px solid Silver;}h3{margin:0;margin-top:0.55em;font-size:1.22em;}nav h3{font-size:0.88em;margin-left:0.83em;margin-bottom:0.27em;}h4{font-size:1em;margin:0;margin-top:0.55em;}h5{font-size:0.94em;margin:0;margin-top:0.66em;padding:0;}h6{font-size:0.88em;margin:0;margin-top:0.66em;padding:0;}a{color:#0099ff;margin:0;padding:0;vertical-align:baseline;}a:visited{color:purple;}a.autoheader_anchor{text-decoration:none;}ul{list-style-type:disc;}ul, ol{padding:0;margin:0;}dd{padding-top:0.25em;}p.first_dd{padding-top:0.25em;}li > ul, ol{padding-bottom:0;}li{line-height:1.3;margin-left:1.38em;margin-bottom:0.55em;}ul > li{margin-left:2.5em;}ol > li{margin-left:2.5em;}li ul{margin-left:0.55em;}li ul{margin-left:0.27em;}li p{padding:1px 0 0 0;margin:0.55em 0 0.27em 0;line-height:1.3;}ul, ol{line-height:1.3;padding:0.33em 0 0 0;margin:0.5em;}p{line-height:1.2;padding:0.40em 0 0 0;margin:0;}pre{overflow:scroll;padding:0.55em 0.27em;margin:0.55em 0 0.55em 0 !important;background-color:#faebd7;color:#3e3e3e;border:1px Silver dashed;display:block;font-family:APLFont, monospace;font-weight:normal;white-space:pre-wrap;}pre > code{line-height:1.2;border:0;padding:0;margin:0;background-color:inherit;color:inherit;font-weight:inherit;white-space:pre-wrap;}td code{padding:0;}a code{padding:0;font-size:1em;}nav code{background-color:inherit;font-weight:400;color:inherit;}code{font-family:APLFont, monospace;color:Black;font-weight:800;line-height:1.2;font-size:0.88em;margin:0;color:#950000;padding:0 0.16em;}tbody tr:nth-child(even){background-color:#F0F0F0;}th{background-color:#E6E6E6;color:black;}th, td{padding:0.16em 0.55em;vertical-align:top;}table td + td{border-left:1px solid gray;}table th + th{border-left:1px solid gray;}table{border-color:Black;margin:1.5em 0;border:2px black;border-collapse:collapse;font-family:APLFont;font-size:0.88em;line-height:1.2;border:1px solid Gray;}li > table{margin:0.55em 0 0.55em 0;}tr{margin:1.11em;}th{font-weight:bold;}tfoot td{font-weight:bold;}blockquote{border-left:0.27em solid silver;padding-left:0.27em;margin:0.83em 0.27em 0.83em 0.55em;}blockquote ul li{margin-left:1.38em;}blockquote ol li{margin-left:1.38em;}li > blockquote{margin-left:0;}nav{background-color:#f5f5f5;border:1px solid Black;padding:0.55em;margin:0.55em;margin-right:0;box-shadow:0.27em 0.27em 0.27em Gray;overflow:hidden;clear:both;}nav#main_nav{position:fixed;top:0;right:0.55em;float:none;width:auto;}nav#main_nav_no_collapse li{font-size:0.77rem;}nav#main_nav_no_collapse li{line-height:1.5;}nav ul{list-style-type:none;margin:0 0 0.11em 0;padding:0;}nav a:visited{color:black;}nav ul li{margin-bottom:0.16em;}nav li p{margin:0;padding:0;line-height:1;margin:0;padding:0;}nav li{font-size:0.75rem;line-height:1.3;padding:0;margin-top:0;margin-bottom:0;margin-left:0.83em;}nav p{font-weight:bold;font-size:0.75rem;padding-top:0;}dl{margin-top:0.1em;margin-bottom:0.1em;}dt{margin-top:0.75em;margin-bottom:0.1em;font-weight:800;}label#hide_toc_label{font-size:0.8em;}.toc-container{position:relative;height:auto;}div.toc-container h1{font-size:0.88em;margin:0.27em 0 0.27em 0;}[type="checkbox"]{position:absolute;left:-9999px;}label{display:block;width:100%;height:1.1em;cursor:pointer;top:0;padding-left:1.1em;}label:before{content:'Table of contents \25BC';font-weight:bold;font-size:90%;padding-bottom:0;}[type="checkbox"] ~ div{display:none;}[type="checkbox"]:checked ~ div{display:block;margin-top:1.1em;}[type="checkbox"]:checked + label{top:100%;}[type="checkbox"]:checked + label:before{content:'Table of contents ▲';}div#footnotes_div p{line-height:1;padding-bottom:0;padding-top:0;}div#footnotes_div ol{padding-top:0;}@font-face{font-family:"APLFont";src:local("APL385 Unicode"), url("https://misc.aplteam.com/apl385.ttf") format("truetype");}.no_display{display:none;}.red{color:red;}.center{text-align:center;margin-left:auto;margin-right:auto;}.left{text-align:left;margin-right:0 auto;}.right{text-align:right;margin-left:0 auto;}img{margin-top:0.55em;margin-bottom:0.27em;}div.leanpub{padding:0.83em 0.55em 1.11em 0;margin:0.55em 0 0 0.27em;overflow:auto;}div.leanpub_A{border:1px solid black;background-color:#f1f1f1;padding:0.55em;margin:1.11em 0 0.83em 0;}div.leanpub h3, div.leanpub_A h3{font-size:1.2em;padding:0;margin:0;}div.leanpub h4, div.leanpub_A h4{font-size:1.1em;padding:0.27em 0 0 0;margin:0;}div.leanpub h5, div.leanpub h5{font-size:1.0em;padding:0.27em 0 0 0;margin:0;}div.leanpub_A h5, div.leanpub_A h5{font-size:1.0em;padding:0.27em 0 0 0;margin:0;}div.leanpub img{padding:0;margin:0 1.11em 0.27em 0;}div.leanpub_A > p:first-child{padding-top:0;margin-top:0;}div.leanpub img{float:left;padding:0;margin:0.55em 1.11em 0 0;clear:both;}div.leanpub tbody *{background-color:transparent;}div.leanpub p{padding:0.17em 0 0 0;margin:0;}span.leanpub_code{color:Red;}div.leanpub p{display:block;padding:0.44em 0 0 0;}div.leanpub > div{margin-left:2.27em;}.print_only{display:none;}
+</style>
+<style media="print">
+@page{margin:25mm 20mm 25mm 20mm;}body{font-family:"Bookman Old Style", "Callisto MT", Bookman,"Goudy Old Style", Garamond, serif;font-size:9pt;line-height:1.2;}h1{font-size:170%;}h2{font-size:110%;}h3{font-size:110%;}h4{font-size:105%;}h5{font-size:100%;}h6{font-size:95%;}h1{margin:0 0 20pt 0;}h2{margin:15pt 0 3pt 0;}h3{margin:10pt 0 0pt 0;}h4{margin:10pt 0 0pt 0;}h5{margin:9pt 0 0pt 0;}h6{margin:9pt 0 0pt 0;}h1, h2, h3, h4, h5, h6{color:black;font-family:"Century Gothic", Verdana, "Sans";page-break-after:avoid;}h1 > code, h2 > code, h3 > code, h4 > code, h5 > code, h6 > code{font-size:100%;}h2{border-bottom:1pt solid Silver;padding-bottom:2pt;}.h_tag{page-break-after:avoid;break-after:avoid;}abbr[title]{border-bottom:0;text-decoration:none;}a{color:black;margin:0;padding:0;vertical-align:baseline;text-decoration:none;font-style:italic;}a.autoheader_anchor{text-decoration:none;font-style:normal;page-break-after:avoid;break-after:avoid;}ul{list-style-type:square;}ul, ol{padding:0;margin:0;}li > ul, ol{padding-bottom:0;}li{line-height:1.3;margin-left:13pt;margin-bottom:5pt;}ul > li{margin-left:25pt;}ol > li{margin-left:25pt;}li ul{margin-left:5pt;}li ul{margin-left:3pt;}li p{padding:1pt 0 0 0;margin:5pt 0 3pt 0;line-height:1.3;}p, ul, ol{line-height:1.3;padding:4pt 0 0 0;margin:0;color:black;}ul, ol{margin-top:0.75em;}pre{padding:3pt;margin:5pt 0;white-space:pre-wrap;background-color:#FAFAFA;border:1pt Silver solid;display:block;font-family:APLFont, monospace;page-break-inside:avoid;}pre code{background-color:#FAFAFA;color:Black;padding:0;margin:0 0 -6pt 0;line-height:1.1;border:0;white-space:pre-wrap;}code{font-family:APLFont, monospace;line-height:1.2;font-size:9pt;padding:3pt 1pt 3pt 1pt;color:#950000;padding:3pt 4pt 3pt 4pt;}tbody th, tfoot tr{background-color:#e6e6e6;}tbody tr:nth-child(even){background-color:#fafafa;}th{background-color:#F0F0F0;}th, td{padding:1pt 5pt;border:1px solid #E3E3E3;vertical-align:top;}table td + td{border-left:1px solid gray;}table th + th{border-left:1px solid gray;}table code{font-style:normal;padding-left:0;padding-right:0;}table{margin:1.5em 0;font-family:APLFont;font-size:9pt;padding:0;border:1pt solid silver;border-collapse:collapse;}li > table{margin:10pt 0 10pt 0;}tr{margin:20pt;}th{font-weight:bold;}tfoot td{font-weight:bold;}blockquote{border-left:5pt solid silver;padding-left:5pt;margin:8pt 3pt 8pt 8pt;}nav{background-color:#f8f8f8;border:1pt solid Gray;width:auto;float:right;padding:5pt 5pt 5pt 0;margin:5pt 0 5pt 5pt;page-break-inside:avoid;break-inside:avoid;clear:both;overflow:hidden;}nav *{font-size:75%;}nav ul{list-style-type:none;margin:0 0 2pt 0;padding:0;}nav ul li{margin-bottom:0;}nav li p{margin:0;padding:0;line-height:1;margin:0;padding:0;}nav li{font-size:9pt;line-height:1;padding:0;margin-top:0;margin-bottom:0;margin-left:8pt;}dl{margin-top:0;margin-bottom:10pt;}dt{margin-top:10pt;margin-bottom:0;font-weight:800;page-break-inside:avoid;}dd{margin-top:2pt;}label#hide_toc_label{font-size:65%;}.toc-container{position:relative;height:auto;margin-top:2pt;background-color:inherit;}.toc-container h3{margin:0 0 2pt 7pt;}[type="checkbox"]{display:none;}label{display:block;width:100%;height:1.1em;top:0;padding-left:10pt;}label:before{content:'Table of contents';font-weight:bold;font-size:140%;padding-bottom:10pt;}a.external_link::before{content:" 🌎";}a.bookmark_link::before{content:" ➯";}a.mailto_link::before{content:" ✉"}nav a.bookmark_link{font-style:normal;}nav p{margin-left:10pt;font-weight:bold;font-size:9pt;}nav a{font-style:normal;}nav a.bookmark_link::before{content:"";}div#footnotes_div a::before{content:"";}div#footnotes_div a{font-style:normal;}div#footnotes_div{page-break-inside:avoid;}@font-face{font-family:"APLFont";src:local("APL385 Unicode"), url("https://misc.aplteam.com/apl385.ttf") format("truetype");}.no_print{display:none;}.red{color:red;}.center{text-align:center;margin:0 auto;}.left{text-align:left;margin-right:0 auto;}.right{text-align:right;margin-left:0 auto;}.avoid_page_break{page-break-inside:avoid;}.page_break_before{page-break-before:always;}div.leanpub{margin:10pt 0 10pt 8pt;page-break-inside:avoid;}div.leanpub_A{border:1pt solid black;background-color:#f9f9f9;padding:5pt;margin:10pt 0 10pt 0;page-break-inside:avoid;}div.leanpub h3, div.leanpub_A h3{font-size:1.2em;padding:3pt 0 0 0;margin:0;}div.leanpub h4, div.leanpub_A h4{font-size:1.1em;padding:3pt 0 0 0;margin:0;}div.leanpub h5, div.leanpub h5{font-size:1.0em;padding:3pt 0 0 0;margin:0;}div.leanpub_A h5, div.leanpub_A h5{font-size:1.0em;padding:3pt 0 0 0;margin:0;}div.leanpub img{padding:0;margin:0 10pt 2pt 0;}div.leanpub_A > p:first-child{padding-top:0;margin-top:0;}div.leanpub > div > h1:first-child{padding-top:5pt;}div.leanpub img{float:left;padding:0;margin:5pt 10pt 0 0;clear:both;}div.leanpub p{padding:3pt 0 0 0;margin:0;}span.leanpub_code{font-weight:bold;}div.leanpub p{display:block;padding:8pt 0 0 0;}div.leanpub > div{margin-left:35pt;}sup{font-size:0.75em;line-height:0;position:relative;vertical-align:baseline;top:-0.4em;}
+</style>
+
+</head>
+<body>
+<div class="h_tag">
+<a href="#First-steps-with-the-Tatin-Client" id="First-steps-with-the-Tatin-Client" class="autoheader_anchor">
+<h1 data-id="First-steps-with-the-Tatin-Client">First steps with the Tatin Client</h1>
+</a>
+</div>
+<p>Before you start reading this document you should have read the document <a href="./Introduction.html" class="external_link">Introduction.html</a>.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>Note that you should have at least an idea of what <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a> is all about.</p>
+</div>
+</div>
+
+<p>In this document additional information that you might or might not be interested in at this stage is presented in gray boxes. You might well skip over them till later.</p>
+<div class="h_tag">
+<a href="#Where-we-start-from" id="Where-we-start-from" class="autoheader_anchor">
+<h2 data-id="Where-we-start-from">Where we start from</h2>
+</a>
+</div>
+<p>We assume that you have the Tatin client installed and ready for use. That means that this command gives you a list with all Tatin user commands available to you:</p>
+<pre><code>      ]tatin -?</code></pre>
+<div class="h_tag">
+<a href="#What-Registries-are-available" id="What-Registries-are-available" class="autoheader_anchor">
+<h2 data-id="What-Registries-are-available">What Registries are available</h2>
+</a>
+</div>
+<p>After a fresh installation you might wonder what Registries are available to you.</p>
+<pre><code>      ]tatin.ListRegistries
+ URL                     Alias         Port    Priority
+ ----                    ----------    ----    --------
+ https://tatin.dev/      tatin            0         100
+ https://test.tatin.dev/ test-tatin       0           0</code></pre>
+<p>At this point Tatin only knows about the principal Tatin server and the Tatin test server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelihood your own ones), then you must change the user settings.</p>
+<p>All these topics — and related ones — are discussed in a separate document: “TatinUserSettings.html”. Here we try to keep things simple.</p>
+<div class="h_tag">
+<a href="#Looking-around" id="Looking-around" class="autoheader_anchor">
+<h2 data-id="Looking-around">Looking around</h2>
+</a>
+</div>
+<div class="h_tag">
+<a href="#Listing-packages" id="Listing-packages" class="autoheader_anchor">
+<h3 data-id="Listing-packages">Listing packages</h3>
+</a>
+</div>
+<p>You may list <em>all</em> packages managed by Tatin's principal server with this command:</p>
+<pre><code>      ]tatin.ListPackages [tatin]
+ Group &amp; Name             ≢ Major versions
+ -----------------------  ----------------
+ aplteam-APLTreeUtils2                   1
+ aplteam-CodeCoverage                    2
+ aplteam-Compare                         1
+ aplteam-CompareSimple                   3
+ ...</code></pre>
+<p>The square brackets around “tatin” declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like <code>https://localhost/my_tatin_server</code>.</p>
+<div class="leanpub_A">
+<h3>Local and remote Registries</h3>
+<p>The Tatin client can access packages that are managed by a Tatin Server, but also Registries that are locally available (read: not managed by a server). In order to address a local Registry you would just provide the path to it.</p>
+<p>Of course features like listing just the packages that carry a specific tag are only available when a Registry is managed by a Tatin server.</p>
+</div>
+
+<div class="h_tag">
+<a href="#Searching-by-tag" id="Searching-by-tag" class="autoheader_anchor">
+<h3 data-id="Searching-by-tag">Searching by tag(s)</h3>
+</a>
+</div>
+<p><code>]tatin.ListPackages</code> will return a list with <em>all</em> packages available in the given Registry, aggregated by major version number. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.</p>
+<ul>
+<li>If you happen to know the group name you may specify <code>-group=whatever</code>; then only packages of the group “whatever” are listed.</li>
+<li>Every package is tagged with keywords. You may specify one or more tags, for example <code>-tag=linux,date</code>.</li>
+</ul>
+<div class="leanpub_A">
+<h3>Searching for tags: the strategy</h3>
+<ol start="1">
+<li>First Tatin tries to find a 100%-match</li>
+<li>In case there is no match, Tatin tries to find it <em>somewhere</em> (<code>⍷</code>)</li>
+<li>In case there is still no match a fuzzy search is performed</li>
+</ol>
+<p>The fuzzy search would find “windows” when you enter “winndows” and “linux” when you enter “linuks”. It has limits, but in practice it works quite well unless the tags are very short: typing “AY” when you meant “AI” would not work.</p>
+<p>Notes:</p>
+<ul>
+<li>The strategy outlined above is applied on each tag independently.</li>
+<li>Searching for multiple tags would mean that only packages that have a hit for <em>all of them</em> would qualify.</li>
+<li>Searching for tags is an action that is carried out by a Tatin Server. That means that specifying <code>-tags=</code> makes sense only in HTTP requests: only then is there a server on the other side that can process the request.</li>
+</ul>
+</div>
+
+<p>Let's assume you need a tool for converting <a href="https://en.wikipedia.org/wiki/Markdown" class="external_link" title="Link to the Wikipedia">Markdown</a> into HTML, and that the package should run on all platforms.</p>
+<p>The user command <code>ListTags</code> takes one or more tags and returns a list of tags that were also found in the packages that carried the specified tags:</p>
+<pre><code>            ]Tatin.ListTags [tatin] -tags=mack-os,markd
+ apltree
+ converter
+ linux
+ mac-os
+ markdown
+ windows</code></pre>
+<p>Good news: there must be at least one package that carries the tags “mac-os” and “markdown” but <em>also</em> the tags “windows” and “linux” because those are both listed, so there will be a package available that runs on all major platforms.</p>
+<p>Note that although we misspelled “mac-os” as “mack-os” it was still identified correctly. Similarly, “markd” was enough to find “markdown”.</p>
+<p>We are now ready to identify that package by executing <code>ListPackages</code> with the <code>-tags</code> option:</p>
+<pre><code>           ]tatin.ListPackages [tatin] -tags=mac-os,markdown
+ Group &amp; Name     ≢ major versions
+ ---------------  ----------------
+ aplteam-MarkAPL                 1
+</code></pre>
+<p>Note that because packages which share the same group and name but have different major version numbers are considered different packages, the major version number is part of the list.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>If you wonder why that is, then please read the document discussing <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a>.</p>
+</div>
+</div>
+
+<div class="h_tag">
+<a href="#Consuming-packages" id="Consuming-packages" class="autoheader_anchor">
+<h2 data-id="Consuming-packages">Consuming packages</h2>
+</a>
+</div>
+<div class="h_tag">
+<a href="#Give-it-a-try-LoadPackage" id="Give-it-a-try-LoadPackage" class="autoheader_anchor">
+<h3 data-id="Give-it-a-try-LoadPackage">Give it a try: <code>LoadPackage</code></h3>
+</a>
+</div>
+<p>Let's assume that you want to check whether <code>MarkAPL</code> suits your needs, in other words: you just want to check it out.</p>
+<p>That can be achieved with the <code>LoadPackage</code> user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided.</p>
+<div class="leanpub_A">
+<h3>Leaving a trace on the file system</h3>
+<p>In case the package has file dependencies (assets), like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there <em>is</em> a footprint left on the file system.</p>
+</div>
+
+<p>Notes:</p>
+<ul>
+<li>Loading a package in this way has only one purpose: to investigate it.</li>
+<li>Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case.
+<p>This is discussed in the paper <code>TatinsLoadAndUpdateStrategy.html</code></p></li>
+</ul>
+<p>Let's load the <code>MarkAPL</code> package into the workspace; for that we need to specify a URL and a target namespace:</p>
+<pre><code>      ]tatin.LoadPackage [tatin]MarkAPL #
+  Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
+  Establish dependencies...
+  4 dependencies identified
+  Fetching https://tatin.dev/aplteam-MarkAPL-10.0.0...
+  Unzipping C:\Users\username\AppData\Local\Temp\...
+  Add aplteam-MarkAPL-10.0.0 to dependency file...
+  Fetching https://tatin.dev/aplteam-APLTreeUtils2-1.1.0...
+  ...
+C:\Users\username\AppData\Local\Temp\username_155648451</code></pre>
+<p>Here we have specified <code>#</code> as the target namespace. In case the target namespace is something like <code>#.MyTests</code> then it may or may not exist. If it does not, Tatin will create it.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>If the package or any of its dependencies depend on assets the path to a directory in the temp directory of your OS is printed to the session by <code>]tatin.LoadPackage</code>.</p>
+<p>This is because this folder cannot be deleted by Tatin. If none of the loaded packages has any assets then nothing is printed to the session, indicating that no footprint is left behind.</p>
+</div>
+</div>
+
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>When you try to execute the following statements on your own machine then you will probably see different version numbers.</p>
+</div>
+</div>
+
+<p>Tatin has created a reference named <code>MarkAPL</code> in the target namespace <code>#</code>:</p>
+<pre><code>      #.⎕nl ⍳16
+MarkAPL
+_tatin</code></pre>
+<p>That reference points to the namespace that holds the package as such, which is loaded into <code>_tatin</code>: this is the namespace Tatin uses to manage all the packages.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>The name <code>_tatin</code> is hard-coded and <em>cannot</em> be changed.</p>
+</div>
+</div>
+
+<p>The name of the namespace carries the version number:</p>
+<pre><code>      #.MarkAPL
+#._tatin.aplteam_MarkAPL_10_0_0</code></pre>
+<p><code>_tatin</code> also contains all the packages <code>MarkAPL</code> depends on:</p>
+<pre><code>      #._tatin.⎕nl ⍳16
+aplteam_APLTreeUtils2_1_1_0
+aplteam_FilesAndDirs_5_0_0
+aplteam_MarkAPL_10_0_0
+aplteam_OS_3_0_0</code></pre>
+<p>No matter whether the APL code of a package is a single function (or operator) or a bunch of functions and operators or a single namespace (ordinary or scripted) or a bunch of namespaces or a single class or a bunch of classes or a mixture of all these APL objects, they are going to live in a namespace <code>code</code>.</p>
+<p>But Tatin will also inject references pointing to the dependencies into <code>code</code>, therefore:</p>
+<pre><code>      #._tatin.aplteam_MarkAPL_11_0_0.code.⎕nl⍳16
+APLTreeUtils2
+FilesAndDirs
+MarkAPL</code></pre>
+<p><code>MarkAPL</code> is the package we asked for. It depends on two packages, <code>APLTreeUtils2</code> and <code>FilesAndDirs</code>. For those references are injected. <code>FilesAndDirs</code> depends on <code>OS</code> but because that is not required by <code>MarkAPL</code> no reference to it is injected into MarkAPL's <code>code</code>, instead you would find such a reference in <code>#._tatin.aplteam_FilesAndDirs_5_0_1.code</code>.</p>
+<div class="h_tag">
+<a href="#Tatin-Variables" id="Tatin-Variables" class="autoheader_anchor">
+<h3 data-id="Tatin-Variables">Tatin Variables</h3>
+</a>
+</div>
+<p>For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.</p>
+<p>Those variables are injected into a namespace <code>TatinVars</code> which in turn is injected into <code>code</code>.</p>
+<p>Some of them always exist, some of them only under certain circumstances. This is a list:</p>
+<div class="h_tag">
+<a href="#CONFIG" id="CONFIG" class="autoheader_anchor">
+<h4 data-id="CONFIG"><code>CONFIG</code></h4>
+</a>
+</div>
+<p>This is a simple character vector that stems from the file <code>apl-package.json</code> of the given package.</p>
+<div class="h_tag">
+<a href="#DEPENDENCIES" id="DEPENDENCIES" class="autoheader_anchor">
+<h4 data-id="DEPENDENCIES"><code>DEPENDENCIES</code></h4>
+</a>
+</div>
+<p>A vector of character vectors with the package IDs of the packages the package in question relies on.</p>
+<div class="h_tag">
+<a href="#HOME" id="HOME" class="autoheader_anchor">
+<h4 data-id="HOME"><code>HOME</code></h4>
+</a>
+</div>
+<p>Is either an empty vector or a character vector holding the path of a folder that carries assets; these are discussed next.</p>
+<div class="h_tag">
+<a href="#ID" id="ID" class="autoheader_anchor">
+<h4 data-id="ID"><code>ID</code></h4>
+</a>
+</div>
+<p>The full package name. This will include a build ID if there is any.</p>
+<div class="h_tag">
+<a href="#LX" id="LX" class="autoheader_anchor">
+<h4 data-id="LX"><code>LX</code></h4>
+</a>
+</div>
+<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successully. <code>LX</code> holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.</p>
+<p>Note that if there is no <code>lx</code> defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no <code>LX</code>.</p>
+<div class="h_tag">
+<a href="#URI" id="URI" class="autoheader_anchor">
+<h4 data-id="URI"><code>URI</code></h4>
+</a>
+</div>
+<p>Character vector that holds the address of a Tatin server or the full name of a ZIP file.</p>
+<div class="h_tag">
+<a href="#Assets" id="Assets" class="autoheader_anchor">
+<h3 data-id="Assets">Assets</h3>
+</a>
+</div>
+<p><code>MarkAPL</code> comes with HTML and CSS files. Therefore <code>MarkAPL</code> must be able to find those assets. This can be achieved by referring to the Tatin variable <code>HOME</code> in <code>#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars</code>:</p>
+<pre><code>      ⎕←path←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.HOME
+C:\Users\...\Temp\username_155648451/aplteam-MarkAPL-11.0.0
+      F←#._tatin.aplteam_MarkAPL_11_0_0.code.FilesAndDirs
+      ⍪⊃F.Dir path,'\'
+ C:\Users...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\apl-dependencies.txt
+ C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\apl-package.json
+ C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\Files
+ C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\MarkAPL.aplc
+      cfg←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.CONFIG
+      ⎕←folder←{⍵.assets}⎕JSON⍠('Dialect' 'JSON5')⊣cfg
+Files/
+      ⍪⊃F.Dir path,'\',folder
+ C:\...\aplteam-MarkAPL-11.0.0\Files\BlackOnWhite_print.css
+ C:\...\aplteam-MarkAPL-11.0.0\Files\BlackOnWhite_screen.css
+...</code></pre>
+<div class="h_tag">
+<a href="#Adding-packages-to-an-application" id="Adding-packages-to-an-application" class="autoheader_anchor">
+<h3 data-id="Adding-packages-to-an-application">Adding packages to an application</h3>
+</a>
+</div>
+<p>Let's assume you've checked on <code>MarkAPL</code>, and that it turns out to suit your needs. You decide to use it in your application <code>Foo</code> which happens to live in <code>/Path2Foo/</code> on disk and in <code>#.Foo</code> in the workspace.</p>
+<p>Let's also assume that the code of your application lives in <code>Foo.Core</code>, and that you want to address <code>MarkAPL</code> with <code>##.MarkAPL</code> from any function within <code>Foo.Core</code>.</p>
+<p>For that you need to execute two steps:</p>
+<ol start="1">
+<li>Install the required packages (and implicitly all dependencies)</li>
+<li>Load all these packages</li>
+</ol>
+<div class="h_tag">
+<a href="#Step-1--installing" id="Step-1--installing" class="autoheader_anchor">
+<h4 data-id="Step-1--installing">Step 1 : installing</h4>
+</a>
+</div>
+<pre><code>      ]TATIN.InstallPackage [tatin]aplteam-MarkAPL /Path2Foo/Packages</code></pre>
+<p>Note that we did not specify any of the major, minor and patch numbers but the Registry by alias (<code>[tatin]</code>); that tells Tatin that we want to get the very latest version of <code>MarkAPL</code> from the principal Tatin server.</p>
+<p>If you do not even specify the Registry then Tatin would scan all Registries <em>that have a priority greater than 0</em>; the first hit wins. Only then would it establish the best version on that server.</p>
+<div class="leanpub_A">
+<h3>Scanning Registries</h3>
+<p>The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages: you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. That way Tatin would find the package on your local machine.</p>
+<p>Later, when the package is ready, you could publish it to, say the principal Tatin server on <code>https://tatin.dev</code>, and delete it from your local Registry.</p>
+<p>The fact that Registries with a priority of <code>0</code> or less are ignored by Tatin when it comes to scanning Registries allows you to include a Registry like <code>https://test.tatin.dev</code> in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like <code>]tatin.ListPackages</code> etc on it.</p>
+</div>
+
+<p>You may even omit the group name, although this would fail in case the name (“MarkAPL”) is used by multiple groups.</p>
+<p>Let's check what's now in <code>/Path2Foo/Packages</code></p>
+<pre><code>      ⍪⊃⎕NINFO ⍠ 1 ⊣ '/Path2Foo/Packages\*'
+ /Path2Foo/Packages/apl-buildlist.json
+ /Path2Foo/Packages/apl-dependencies.txt
+ /Path2Foo/Packages/aplteam-APLTreeUtils2-1.1.0
+ /Path2Foo/Packages/aplteam-FilesAndDirs-5.0.0
+ /Path2Foo/Packages/aplteam-MarkAPL-10.0.0
+ /Path2Foo/Packages/aplteam-OS-3.0.0</code></pre>
+<p>The build-list defines the relationship of the packages:</p>
+<pre><code>      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-buildlist.json'1
+ {
+   principal: [
+     1,
+     0,
+     0,
+     0,
+   ],
+   packageID: [
+     "aplteam-MarkAPL-10.0.0",
+     "aplteam-APLTreeUtils2-1.1.0",
+     "aplteam-FilesAndDirs-5.0.0",
+     "aplteam-OS-3.0.0",
+   ],
+   url: [
+     "https://tatin.dev/",
+     "https://tatin.dev/",
+     "https://tatin.dev/",
+     "https://tatin.dev/",
+   ],
+ }</code></pre>
+<p>Notes:</p>
+<ul>
+<li><code>principal</code> is a flag that tells top-level packages (these are the ones you asked for) from dependencies.</li>
+<li><code>url</code> carries not the package name except when it is a ZIP file, because naturally the filename carries the package ID. However, including a ZIP file as a dependency as an exception anyway. The only reason why one might do this is testing a pre-release package.</li>
+</ul>
+<p>The dependencies file specifies what packages <em>your application</em> depends on as of yet:</p>
+<pre><code>      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-dependencies.txt' 1
+ aplteam-MarkAPL-10.0.0</code></pre>
+<div class="h_tag">
+<a href="#Step-2--loading" id="Step-2--loading" class="autoheader_anchor">
+<h4 data-id="Step-2--loading">Step 2 : loading</h4>
+</a>
+</div>
+<p>Having the packages installed you may now load them into your application. This is achieved by the <code>LoadDependencies</code> user command:</p>
+<pre><code>      ]TATIN.LoadDependencies /Path2Foo/Packages/ #.Foo</code></pre>
+<p>As you might have guessed the folder specified as first argument must contain these two files:</p>
+<pre><code>apl-dependencies.txt
+apl-buildlist.json</code></pre>
+<p>If one or both are missing an error will be thrown.</p>
+<div class="leanpub_A">
+<h3><code>#._tatin</code> versus <code>⎕SE._tatin</code></h3>
+<p>Note that whether you specify a namespace in <code>#</code> or in <code>⎕SE</code> as the target of a <code>LoadDependencies</code> operation decides whether the packages are loaded into <code>#._tatin</code> or <code>⎕SE._tatin</code>.</p>
+</div>
+
+<p>Let's check whether it worked:</p>
+<pre><code>      ⍪⊃#.Foo.MarkAPL.Markdown2HTML 'A paragraph' '' '* This' '* That'
+ &lt;p&gt;A paragraph&lt;/p&gt;
+ &lt;ul&gt;
+ &lt;li&gt;This&lt;/li&gt;
+ &lt;li&gt;That&lt;/li&gt;
+ &lt;/ul&gt;</code></pre>
+</body>
+</html>

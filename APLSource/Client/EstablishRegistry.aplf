@@ -2,7 +2,7 @@
 ⍝ The purpose of this function is to establish the registry a package can be found in.
 ⍝ Useful in case the user specified just a package ID.
 ⍝ Note that `packageID` might be a full ({group}-{name}-{version}) or a partial one
-⍝ ({group}-{name} or {group}-{name}-{major}).
+⍝ ({group}-{name} or {group}-{name}-{major}) or even just {name}.
 ⍝ The function scans all registries according to the user settings and stops as soon
 ⍝ as it finds a Registry that hosts the package in question.\\
 ⍝ In case of no hit anywhere an error is thrown.
@@ -20,6 +20,9 @@
          i+←1
          (uri alias)←i⊃registries.(uri alias)
          :If Reg.IsHTTP uri
+             :If 0=Ping uri
+                 345 ⎕SIGNAL⍨'Did not respond: ',uri
+             :EndIf
              :If 0=≢list←ListPackages_ uri,packageID
                  :Continue
              :Else

@@ -1,18 +1,23 @@
- request ScanRegistries_2 registries;bool;i;registry;res;ns;bool2;qdmx
+ request ScanRegistries_2 registries;bool;i;registry;res;ns;bool2;qdmx;dm
 ⍝ Part of creating a build list. Establish the Server the package is hosted on.
  i←1
  :While 0<+/bool←0=≢¨∆TREE.Data[;∆TREE.∆url]
      registry←i⊃registries
      :If Reg.IsHTTP registry
-         request.URI←'/v1/packages/exist/',1↓∊',',¨bool/∆TREE.Data[;∆TREE.∆packageID]
+         request.RequestTarget←'/v1/packages/exist/',1↓∊',',¨bool/∆TREE.Data[;∆TREE.∆packageID]
          :Trap 345
              res←registry SendAndReceive request
          :Else
              qdmx←⎕DMX
-             :If 'Handshakecertificateisfailing'≡' '~⍨1⊃qdmx.DM
-                 ⍝ Did not respond, therefore we carry on with the next registry but we tell the user
-                 ∘∘∘
-                 :Continue
+             dm←' '~⍨1⊃qdmx.DM
+             :If 'Handshakecertificateisfailing'≡dm
+             :OrIf 'Couldnotconnecttohostdataport'≡dm
+                 :If IsRunningAsUserCommand
+                     PrintToSession'*** Could not reach ',registry,', therefore it is ignored'
+                     :Continue
+                 :Else
+                     345 ⎕SIGNAL⍨'Could not reach ',registry  ⍝ When called via the API we stop
+                 :EndIf
              :Else
                  qdmx.EM ⎕SIGNAL qdmx.EN
              :EndIf

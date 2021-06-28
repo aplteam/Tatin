@@ -3,7 +3,7 @@
 ⍝ Whether deleting a package can be successful is determined by the INI setting [CONFIG]DeletePackages which is
 ⍝ Returned by `GetDeletePolicy` as a text vector.
  deletePolicy←GetDeletePolicy
- packageID←request.URI
+ packageID←request.RequestTarget
  :If 'None'≡deletePolicy
      response←request Respond 405
      response.Content←'This server does not allow deleting packages'

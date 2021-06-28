@@ -24,7 +24,6 @@
      iniFile←P.PolishInifilePath iniFile
      P.G(P.ProcessIniFile)←iniFile
      P.G.TestFlag←P.G.INI.Get'CONFIG:TestFlag'
-     P.G←OpenLogFiles P.G
      P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
      P.G←##.Server.ProcessCredentials P.G
      parms←P.CreateServerParms P.G
@@ -39,7 +38,9 @@
      #.ErrorParms.logFunction←'LogError'
      ⎕TRAP←##.HandleError.SetTrap'#.ErrorParms'
      P.EstablishHandlersForRumbaEvents P.G
-     r←parms P.R.Start P.F.ExpandPath'Assets/RunTime/Conga'
+
+     P.G.Server←r←parms P.R.Start P.F.ExpandPath'Assets/RunTime/Conga' ⍝ <== Work horse!
+
      P.DQ'.'
      Shutdown G
  :EndIf

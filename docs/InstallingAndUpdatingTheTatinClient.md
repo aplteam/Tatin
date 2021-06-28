@@ -48,9 +48,13 @@ As already mentioned, Tatin comes with a self-initializing feature: once install
       ]tatin -?
 ```
 
-The script `Tatin.dyalog` is the interface between the Dyalog user command framework and the Tatin API: 
+The script `Tatin.dyalog` is the interface between the Dyalog user command framework and the Tatin API.
 
-When any of the Tatin user commands is executed it will check whether the API is already loaded (`0<⎕NC '⎕SE.Tatin'`)
+When any of the Tatin user commands is executed it will check whether the API is already loaded with:
+
+```
+0<⎕NC '⎕SE.Tatin'
+```
 
 If that's not the case it will...
 

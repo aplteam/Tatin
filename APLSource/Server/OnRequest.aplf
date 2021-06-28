@@ -22,9 +22,9 @@
          :Else
              response←ReturnNOT_IMPLEMENTED request
          :EndSelect
-         logMsg←request.Method,' ',(⍕response.StatusCode),' ',request.URI
+         logMsg←request.Method,' ',(⍕response.StatusCode),' ',request.RequestTarget
          :If 200≠response.StatusCode
-             logMsg,←'; ',response.Content
+             logMsg,←(326≠⎕DR response.Content)/'; ',response.Content
          :EndIf
      :EndIf
      Log logMsg

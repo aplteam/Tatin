@@ -11,15 +11,13 @@
  F.PolishCurrentDir
  P.CheckForRide ⍬
  #.⎕SHADOW'ErrParms'
- P.LoadDependencies ⍬
- P.R←##.RumbaLean.Core
+ P.R←P.CopyRumba ⍬
  P.CreateRefs ##
  ##.Server.CreateAllRefs
  ##.RumbaLean.⎕EX'DRC'
  iniFile←{0<⎕NC ⍵:⍎⍵ ⋄ './TestData/Server/server.ini'}'iniFile'
  iniFile←P.PolishInifilePath iniFile
  P.G(P.ProcessIniFile)←iniFile
- P.G←##.Server.OpenLogFiles P.G
  P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
  P.G←##.Server.ProcessCredentials P.G
  :If (⊂testFlag)∊0 1
@@ -32,8 +30,12 @@
  ##.G←P.OpenWindowsEventLog P.G
  P.WindowsEventLog'Starting'
  P.EstablishHandlersForRumbaEvents P.G
- F.MkDir parms.Folder←(739⌶0),'/Tatin-TestServer-Logs'
- r←parms P.R.Start P.F.ExpandPath P.GetAssetPath,'RunTime/Conga'
+ parms.Folder←(739⌶0),'/Tatin-TestServer-Logs'
+ F.RmDir parms.Folder
+ F.MkDir parms.Folder
+
+ P.G.Server←r←parms P.R.Start P.F.ExpandPath P.GetAssetPath,'RunTime/Conga'  ⍝ <== Work horse!
+
  EndlessLoop ⍬
  ##.Server.∆SHUTDOWN←0
  ##.Server.Shutdown P.G

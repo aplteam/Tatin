@@ -1,9 +1,10 @@
- r←Test_UserCommands_014(stopFlag batchFlag);⎕TRAP;rc;msg;result
+ r←Test_UserCommands_014(stopFlag batchFlag);⎕TRAP;rc;msg;result;stop
 ⍝ Exercise ]Tatin.Ping with the -all flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (rc msg result)←∆UCMD'Ping -all'
+ stop←0
+ (rc msg result)←stop ∆UCMD'Ping -all'
  Assert 0=rc
  →T.PassesIf∧/result[;2]∊0 1
 

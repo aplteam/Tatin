@@ -1,16 +1,21 @@
  r←Test_Server_701(stopFlag batchFlag);⎕TRAP;request;res
 ⍝ Exercise the HEAD method on a package
+⍝ There must be no content but there must be a content length
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  r←T._NotImplemented
- :Return
+ :Return ⍝ Rumba is currently buggy on this
 
  request←R.NewRequest 0
- request.URI←'aplteam-Compare-5.0.0'
+ request.RequestTarget←'aplteam-Compare-5.0.0'
  request.Method←'HEAD'
- res←'localhost'TC.SendAndReceive request
- ∘∘∘
+ res←'localhost:5001'TC.SendAndReceive request
+
+ →T.PassesIf 200≡res.StatusCode
+ →T.PassesIf 0=≢res.Content
+ →T.PassesIf 0<res.ContentLength
+
 
  r←T._OK
 ⍝Done

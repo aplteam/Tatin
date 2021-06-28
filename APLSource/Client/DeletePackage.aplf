@@ -8,7 +8,7 @@
  'Unknown Registry'Assert(⊂EnforceTrailingSlash uri_)∊MyUserSettings.registries.uri
  :If Reg.IsHTTP uri_
      request←R.NewRequest 0
-     request.URI←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
+     request.RequestTarget←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
      request.Method←'DELETE'
      request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri_).api_key)
      response←uri_ SendAndReceive request

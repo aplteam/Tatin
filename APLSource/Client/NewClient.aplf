@@ -9,7 +9,7 @@
  :EndTrap
  :If ⍬≡reg
      :If ':'∊RemoveHttpProtocol uri
-         c.Port←A.ToNum{⍵↓⍨⍵⍳':'}RemoveHttpProtocol uri
+         c.Port←A.ToNum{⍵↑⍨¯1+⍵⍳'/'}{⍵↓⍨⍵⍳':'}RemoveHttpProtocol uri
      :Else
          :If 'http://'{⍺≡(≢⍺)↑⍵}uri
              c.Port←80
@@ -24,5 +24,4 @@
      :EndIf
  :EndIf
  c.Host←{⍵↑⍨¯1+⍵⍳':'}'/'~⍨RemoveHttpProtocol uri
- c.ClientTimeout←10
 ⍝Done

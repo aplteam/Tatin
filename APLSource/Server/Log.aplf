@@ -1,4 +1,9 @@
- {r}←Log msg
- r←⍬
- G.MyLogger.Log msg
+ {r}←{server}Log msg
+⍝ Uses Plodder's (and therefore ultimately Rumba's) `Log` function to log stuff.
+⍝ Expects the Global `G` to be around which holds an instance of the Rumba Servera as G.Server.
+⍝ If `G` is not avaiable (too early, for example) the server instance must be provided as ⍺.
+ server←{0<⎕NC ⍵:⍎⍵ ⋄ G.Server}'server'
+ :If 0≠server.LogFileTie
+     r←server ##.Plodder.Log msg
+ :EndIf
 ⍝Done

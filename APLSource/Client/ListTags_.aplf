@@ -5,11 +5,11 @@
  :EndIf
  (host packageID)←Reg.SeparateUriAndPackageID uri
  request←R.NewRequest 0
- request.URI←'/v1/tags/',{⍵↓⍨'/'=1⍴⍵}packageID
+ request.RequestTarget←'/v1/tags/',{⍵↓⍨'/'=1⍴⍵}packageID
  :If 0<≢parms.tags
-     request.URI,←'?'
+     request.RequestTarget,←'?'
      :If 0<≢⊃,/parms.tags
-         request.URI,←'tags=',parms.tags
+         request.RequestTarget,←'tags=',parms.tags
      :EndIf
  :EndIf
  request.Headers,←⊂'Accept' 'application/json'

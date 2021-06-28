@@ -9,7 +9,7 @@
      :If F.IsDir G.RegistryPath,packageID
          filename←G.RegistryPath,packageID,'/',Reg.DependenciesFilename
          :If F.IsFile filename
-             deps←⊃F.NGET filename 1
+         :AndIf 0<≢deps←⊃F.NGET filename 1
              deps←deps GetAllDependencies deps
          :Else
              deps←⊂'null'

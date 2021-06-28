@@ -3,9 +3,9 @@
  (host packageID)←Reg.SeparateUriAndPackageID uri
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  request←R.NewRequest 0
- request.URI←'/v1/packages/versions/',packageID
+ request.RequestTarget←'/v1/packages/versions/',packageID
  :If dateFlag
-     request.URI,←'?publishingdate=1'
+     request.RequestTarget,←'?publishingdate=1'
  :EndIf
  request.Headers,←⊂'Accept' 'application/json'
  res←host SendAndReceive request

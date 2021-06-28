@@ -2,7 +2,7 @@
  (host packageID)←Reg.SeparateUriAndPackageID uri
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  request←R.NewRequest 0
- request.URI←'v1/packages/details/',{⍵↓⍨'/'=1⍴⍵}packageID
+ request.RequestTarget←'v1/packages/details/',{⍵↓⍨'/'=1⍴⍵}packageID
  request.Headers,←⊂'Accept' 'application/json'
  res←host SendAndReceive request
  :If 200≠res.StatusCode

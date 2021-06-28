@@ -16,7 +16,7 @@
  'Directory does not host a file apl-dependencies.txt'Assert F.IsFile installFolder,'/apl-dependencies.txt'
  deps←⊃F.NGET(installFolder,'/apl-dependencies.txt')1
  'Dependency file is empty'Assert 0<≢deps
- F.DeleteFile installFolder∘,¨({'/',⊃,/1↓⎕NPARTS ⍵}¨F.ListFiles installFolder)~⊂'/apl-dependencies.txt'
+ F.DeleteFile installFolder∘,¨({'/',⊃,/1↓⎕NPARTS ⍵}¨F.ListFiles installFolder,'/')~⊂'/apl-dependencies.txt'
  F.RmDir F.ListDirs installFolder,'/'
  PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(noBetas/'out'),' any beta versions'
  refs←ReInstallDependencies_ deps installFolder registry noBetas

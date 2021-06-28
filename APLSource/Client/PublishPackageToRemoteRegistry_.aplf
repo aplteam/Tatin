@@ -7,7 +7,7 @@
      packageID,←2⊃⎕NPARTS filename
  :EndIf
  request←R.NewRequest 0
- request.URI←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
+ request.RequestTarget←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
  request.Method←'PUT'
  request.Content←Reg.Base64 Reg.ReadNativeFile filename
  request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)

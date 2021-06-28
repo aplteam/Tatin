@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.29.1 - 2021-06-24
+⍝   * `Ping` was buggy 
 ⍝ * 0.29.0 - 2021-06-14
 ⍝   * New user command `Ping` added
 ⍝ * 0.28.2 - 2021-05-31
@@ -189,7 +191,7 @@
      
           c←⎕NS ⍬
           c.Name←'CheckForLaterVersion'
-          c.Desc←'Check whether there are better versions of a package available'
+          c.Desc←'Check whether there are later versions of a package available'
           c.Parse←'1 -major -dependencies -raw'
           r,←c
      
@@ -220,7 +222,7 @@
           c←⎕NS ⍬
           c.Name←'ReinstallDependencies'
           c.Desc←'Install all packages again according to the dependency file'
-          c.Parse←'2s -nobetas -dry'
+          c.Parse←'2s -nobetas -dry -force'
           r,←c
      
           c←⎕NS ⍬
@@ -375,16 +377,16 @@
           :If 0  ⍝TODO⍝  May be one day we support this, may be not
               :If 0<≢r
                   :If 1=≢r
-                      question←'There is a better version:',⎕UCS 13
+                      question←'There is a later version:',⎕UCS 13
                       question,←'  ',(∊r),⎕UCS 13
-                      question,←'Would you like to install this better version?'
+                      question,←'Would you like to install this later version?'
                   :Else
-                      question←'There are better versions:',⎕UCS 13
+                      question←'There are later versions:',⎕UCS 13
                       question,←∊'  '∘,¨r,¨⎕UCS 13
-                      question,←'Would you like to install ALL these better versions?'
+                      question,←'Would you like to install ALL these later versions?'
                       :If 1 ∆YesOrNo question
                           ∘∘∘
-                      :ElseIf 1 ∆YesOrNo'Would you like to installe SOME of these better versions?'
+                      :ElseIf 1 ∆YesOrNo'Would you like to install SOME of these later versions?'
                           :For this :In r
                               ∘∘∘
                           :EndFor
@@ -405,7 +407,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;noBetas;deps;dry;msg
+    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;noBetas;deps;dry;msg;force
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -414,6 +416,7 @@
           registry←Args._2
       :EndIf
       dry←0 Args.Switch'dry'
+      force←0 Args.Switch'force'
       noBetas←0 Args.Switch'nobetas'
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       'Not a directory'Assert TC.F.IsDir installFolder
@@ -423,9 +426,12 @@
       :If dry
           r←noBetas TC.PretendReInstallDependencies installFolder registry
       :Else
-          :If ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
+          :If force
+          :OrIf ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
               r←noBetas TC.ReInstallDependencies installFolder registry
-              ⎕←'*** Done'
+              :If ~force
+                  ⎕←'*** Done'
+              :EndIf
           :EndIf
       :EndIf
     ∇
@@ -771,6 +777,7 @@
       :If Arg.all
           r←0 2⍴⍬
           :If 0<≢registries←GetListOfRegistriesForSelection 0
+          :AndIf 0<≢registries←(TC.Reg.IsHTTP¨registries[;1])⌿registries
               ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
               r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries[;1]
           :EndIf
@@ -1083,7 +1090,8 @@
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin]'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas'
           r,←⊂''
-          r,←⊂'-dry makes the user command report what it would do without actually doing anything at all.'
+          r,←⊂'-force prevent the command from asking the user, and does not report to the session either.'
+          r,←⊂'-dry   makes the user command report what it would do without actually doing anything at all.'
           r,←⊂''
           r,←⊂'By default betas are included but this can be changed by specifying the -nobetas flag.'
       :Case ⎕C'Ping'

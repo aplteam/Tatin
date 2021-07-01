@@ -1,7 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.29.1 - 2021-06-24
-⍝   * `Ping` was buggy 
+⍝   * `Ping` was buggy
 ⍝ * 0.29.0 - 2021-06-14
 ⍝   * New user command `Ping` added
 ⍝ * 0.28.2 - 2021-05-31
@@ -496,7 +496,7 @@
       zipFilename←TC.Pack sourcePath targetPath
     ∇
 
-    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename
+    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID
       r←''
       (source url)←Arg.(_1 _2)
       :If (,'?')≡,url
@@ -516,6 +516,8 @@
       :Else
           ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
       :EndIf
+      firstFlag←1
+     ∆Again:
       :Trap 98
           (rc msg zipFilename)←TC.PublishPackage source url
           :If 200≡rc
@@ -538,6 +540,20 @@
                   qdmx.EM ⎕SIGNAL 98
               :EndSelect
           :Else
+              :If firstFlag
+              :AndIf 'Server: The package has already been published'{⍺≡(≢⍺)↑⍵}qdmx.EM
+              :AndIf 'Any'≡⎕SE.Tatin.GetDeletePolicy url_
+                  packageID←2⊃⎕NPARTS source
+              :AndIf ∆YesOrNo packageID,' already published on ',url_,'; overwrite?'
+                  firstFlag←0
+                  (rc msg)←⎕SE.Tatin.DeletePackage url_,packageID
+                  :If 200=rc
+                      →∆Again
+                  :Else
+                      ⎕←'Delete attempt failed with status ',(⍕rc),'; publishing therefore not possible'
+                      :Return
+                  :EndIf
+              :EndIf
               :If ∨/'<title>'⍷qdmx.EM
                   r←GetTitleFromHtml qdmx.EM
               :ElseIf 0<≢r←qdmx.EM

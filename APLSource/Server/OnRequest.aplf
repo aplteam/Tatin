@@ -4,7 +4,8 @@
      response←request R.Respond 200
  :Else
      :If 0=G.INI.Get'Trap:General'
-     ⍝ Invalidate Rumba's top level error trapping
+     :AndIf ~request.Connection.Server.Trap
+         ⍝ Invalidate Rumba's top level error trapping
          ⎕SHADOW'⎕TRAP'
          ⎕TRAP←0 'S'
      :EndIf

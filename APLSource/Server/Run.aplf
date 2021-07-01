@@ -1,47 +1,14 @@
- {r}←{iniFile}Run flag;⎕TRAP;parms;more;A;F;G;R;S;P
-⍝ This function starts the server
+ {r}←{iniFile}Run flag;⎕TRAP;parms;more;A;F;G;R;S;P;testFlag;trapFlag
+⍝ This function starts the Tatin server
  ⎕TRAP←0 'S'
  r←⍬
  ⎕IO←1 ⋄ ⎕ML←1
  :If flag
-     A←##.APLTreeUtils2 ⋄ F←##.FilesAndDirs
-     ∆STARTED←60 ⎕DT⊂⎕TS
-     F.PolishCurrentDir
-     ∆WS_HASH←GetWorkspaceHash
-     CopyDependencies
-     R←##.RumbaLean ⋄ P←##.Plodder
-     P.EnableCONTINUE_workspaces ⍬
-     P.G←#.⎕NS''
-     P.G←P.EstablishPlatformVars P.G
-     CreateAllRefs
-     P.CheckForRide ⍬
-     Check_DYALOG_NETCORE ⍬
-     #.⎕SHADOW'ErrParms'
-     P.R←##.RumbaLean.Core
-     P.CreateRefs ##
-     ##.RumbaLean.⎕EX'DRC'
+     testFlag←0     ⍝ Might be overwritten by the INI file
+     trapFlag←1     ⍝ Might be overwritten by the INI file
      iniFile←{0<⎕NC ⍵:⍎⍵ ⋄ './server.ini'}'iniFile'
-     iniFile←P.PolishInifilePath iniFile
-     P.G(P.ProcessIniFile)←iniFile
-     P.G.TestFlag←P.G.INI.Get'CONFIG:TestFlag'
-     P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
-     P.G←##.Server.ProcessCredentials P.G
-     parms←P.CreateServerParms P.G
-     parms←P.CheckServerParms parms
-     parms←CheckServerParms parms
-     ##.G←P.OpenWindowsEventLog P.G
-     P.WindowsEventLog'Starting'
-     #.⎕SHADOW'ErrorParms'
-     'ErrorParms'#.⎕NS''
-     #.ErrorParms←##.HandleError.CreateParms
-     #.ErrorParms.logFnsParent←'#.Tatin.Server'
-     #.ErrorParms.logFunction←'LogError'
-     ⎕TRAP←##.HandleError.SetTrap'#.ErrorParms'
-     P.EstablishHandlersForRumbaEvents P.G
-
-     P.G.Server←r←parms P.R.Start P.F.ExpandPath'Assets/Runtime/Conga' ⍝ <== Work horse!
-
-     P.DQ'.'
-     Shutdown G
+     r←iniFile(##.Server.TatinAmendments ##.Plodder.Run)testFlag trapFlag
+     ∆SHUTDOWN←0
+     Shutdown ⍬
  :EndIf
 ⍝Done

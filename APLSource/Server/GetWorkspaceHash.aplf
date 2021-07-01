@@ -1,6 +1,10 @@
  r←GetWorkspaceHash;wsid
 ⍝ Used to identify changes made to the WS on file
- wsid←(1⊃1 ⎕NPARTS''),'/Server.dws'
- r←2 ⎕NQ #'GetBuildID'wsid
- 'Cannot calculate workspace hash'⎕SIGNAL 11/⍨r∧.='0'
+ :If 'CLEAR WS'≡⎕WSID
+     r←''  ⍝ WS was not loaded but created dynamically, as for the test cases
+ :Else
+     wsid←(1⊃1 ⎕NPARTS''),'/Server.dws'
+     r←2 ⎕NQ #'GetBuildID'wsid
+     'Cannot calculate workspace hash'⎕SIGNAL 11/⍨r∧.='0'
+ :EndIf
 ⍝Done

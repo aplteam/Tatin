@@ -3,7 +3,8 @@
 ⍝ Call this after `MakeClient` has been called; see there for details.
 ⍝ It can be called from a developer's session (⍵←0) or as part of an automated "Make" process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
-⍝ Version 1.0.1 from 2020-12-03
+⍝ Version 1.1.0 from 2021-07-01
+⍝ 1.1.0: RumbaLean and Plodder are now copied into the WS rather than being an asset.
 ⍝ 1.0.1: Assets\Assets corrected
  r←⍬
  :If batchFlag
@@ -37,6 +38,7 @@
      ⎕WSID←targetPath,'/Server'
      #.⎕EX'Make_'
      ⎕SE.⎕EX ⎕SE.⎕NL⍳16             ⍝ Attempt to avoid the "Reference in ⎕SE points to #"
+     'Plodder' 'RumbaLean'#.Tatin.⎕CY'./Assets/Runtime/Plodder/Plodder'
      0 ⎕SAVE ⎕WSID
      F.RmDir targetPath,'/Assets/'
      ⎕DL 0.1
@@ -45,6 +47,7 @@
      Assert F.IsDir targetPath,'/Assets/'
      targetPath ⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/'
      (targetPath,'/server.ini')⎕NCOPY⍠('IfExists' 'Replace')⊣'./server.ini.RemoveMe'
+     F.RmDir'Dist/Server/Assets/RunTime/Plodder'
      F.DeleteFile¨F.Dir'Dist/Tatin-Server-*.zip'
      zipFilename←'Dist/Tatin-Server-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Server.Version),''),'.zip'
      targetPath ##.DotNetZip.ZipFolder zipFilename

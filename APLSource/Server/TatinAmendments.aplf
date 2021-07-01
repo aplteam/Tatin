@@ -1,0 +1,13 @@
+ success←TatinAmendments G
+⍝ Called by Plodder's `Run` operator.
+⍝ In charge for making Tatin amendments.
+ ∆STARTED←60 ⎕DT⊂⎕TS
+ ∆WS_HASH←GetWorkspaceHash
+ CreateAllRefs
+ P←##.Plodder
+ Check_DYALOG_NETCORE ⍬
+ P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
+ P.LogFolder←P.G.INI.Get'LOGGING:Folder'
+ P.G←ProcessCredentials P.G
+ success←1
+⍝Done

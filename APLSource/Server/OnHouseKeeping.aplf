@@ -1,22 +1,26 @@
  {r}←OnHouseKeeping msg;savedAt
-⍝ Used for two purposes:
+⍝ Used for these purposes:
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
+⍝ * Check the INI file; if it has been changed re-instantiate the INI file
  r←0
  ReportNumberOfThreads G.INI
- :If ∆SHUTDOWN
-     {}⎕EX'∆SHUTDOWN'
-     :If ##.APLTreeUtils2.IsDevelopment
-         {}⎕NQ'#'QuitDQ
-     :Else
-         {}#.Plodder.Shutdown G.INI                             ⍝ Will ⎕OFF in runtime
+ :If 1=∆SHUTDOWN
+     ∆SHUTDOWN←¯1  ⍝ In case this function runs again before it comes to an end
+     {}⎕NQ'#'GetQuitDQEvent
+     P.WindowsEventLog'Shutting down'
+     P.G.Server Log'Tatin Server is shutting down'
+     :If ~A.IsDevelopment
+         {}P.Shutdown G.INI               ⍝ Will ⎕OFF in runtime
      :EndIf
- :ElseIf 0<⎕NC'∆WS_HASH'
-     ReloadThisWorkspace G.INI
- :EndIf
- savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
- :If G.INI.EstablishedAt<savedAt
-     ##.Plodder.G(##.Plodder.ProcessIniFile)←G.INI.IniFilename  ⍝ ... we initialize from scratch
-     Log'INI file processed because it was changed on disk'
+ :ElseIf ¯1≠∆SHUTDOWN
+     :If 0<⎕NC'∆WS_HASH'
+         ReloadThisWorkspaceIfChanged G.INI
+     :EndIf
+     savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
+     :If G.INI.EstablishedAt<savedAt
+         P.G(P.ProcessIniFile)←G.INI.IniFilename  ⍝ ... we initialize from scratch
+         Log'INI file re-instantiated because it was changed on disk'
+     :EndIf
  :EndIf
 ⍝Done

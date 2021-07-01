@@ -2,11 +2,11 @@
  :If Reg.IsValidPackageID_Complete packageID
      :If F.IsDir G.RegistryPath,'/',packageID
          response←R.NewResponse request
-         response.IsFile←1
          :If 1≠≢list←F.ListFiles G.RegistryPath,'/',packageID,'/',packageID,'*.zip'
              ⍝ Whether we find none or more than one, something is seriously wrong then
              response←Return500 request
          :Else
+             response.IsFile←1
              response.FilePath←⊃list
              response.ContentType←'application/zip'
          :EndIf

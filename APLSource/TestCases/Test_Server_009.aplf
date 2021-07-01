@@ -1,0 +1,17 @@
+ r←Test_Server_009(stopFlag batchFlag);⎕TRAP;request;response;folder;noOf
+⍝ Send a request that makes the server crash and then look for dump files
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ folder←∆GetTempDir,'/Errors/'
+ noOf←≢F.ListFiles folder
+
+ request←TC.R.NewRequest 0
+ request.RequestTarget←'v1/crash'
+ response←'https://localhost'TC.SendAndReceive request
+
+ →T.PassesIf response.StatusCode≡500
+ →T.PassesIf(2+noOf)=≢F.ListFiles folder
+
+ r←T._OK
+⍝Done

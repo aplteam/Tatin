@@ -1,0 +1,22 @@
+ r←Test_Load_008(stopFlag batchFlag);⎕TRAP;res;noOfRefs
+⍝ Exercise ⎕SE.Tatin.LoadPackage with an alias on a package that has already been loaded without
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ res←1 TC.LoadPackage'[localhost]aplteam-APLTreeUtils-6' '#.TEMP'
+ →T.GoToTidyUp''≢res
+ →T.GoToTidyUp 0≠#.TEMP.⎕NC'A'
+
+ res←1 TC.LoadPackage'A@[localhost]aplteam-APLTreeUtils-6' '#.TEMP'
+ →T.GoToTidyUp 0
+ →T.GoToTidyUp~∨/'.aplteam_APLTreeUtils_6_0_'⍷⍕#.TEMP.A
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :Trap 0 ⋄ F.RmDir res ⋄ :EndTrap
+⍝Done

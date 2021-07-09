@@ -16,12 +16,13 @@
 ⍝ Loads all dependencies, if any, as well into [#|⎕SE]._tatin but _not_ into `targetSpace`.\\
 ⍝ Leaves no trails in the file system unless a package (or one of its dependencies) relies on file assets in
 ⍝ which case the temporary directory (which is created in any case) will not be deleted.\\
-⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
+⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as ⍺.\\
 ⍝ Returns the name of the temp folder in case it could not be deleted (because of assets) and '' otherwise.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
  targetSpace←⍕targetSpace
  tempFolder←F.GetTempSubDir''
+ CheckAlias identifier targetSpace
  paths←noBetas InstallPackage identifier tempFolder
  loaded←LoadDependencies tempFolder targetSpace
  :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨F.ListDirs tempFolder

@@ -1,0 +1,24 @@
+ r←Test_Load_007(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx
+⍝ Exercise ⎕SE.Tatin.LoadPackage with an alias that is already used as a variable name
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.A←1 2 3
+
+ :Trap 98
+     res←1 TC.LoadPackage'A@[localhost]aplteam-APLTreeUtils-7' '#.TEMP'
+     →T.GoToTidyUp 0
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Name "A" already in use and therefore not suitable as alias (⎕NC=2)'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :Trap 0 ⋄ F.RmDir res ⋄ :EndTrap
+⍝Done

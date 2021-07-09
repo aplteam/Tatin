@@ -1,20 +1,13 @@
- r←{noBetas}PretendReInstallDependencies y;installFolder;registry;deps;refs;noBetas
+ refs←{noBetas}PretendReInstallDependencies y;installFolder;registry;deps;noBetas;dry
 ⍝ Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.\\
 ⍝ This function basically reports what `ReInstallDependencies` would do wuthout doing anything.\\
 ⍝ Note that a package with a higher major version number is considered a different package.\\
 ⍝ By default all known Registries with a priority greater than 0 are scanned, but you may
 ⍝ specify a particular Registry as a second (optional) argument.\\
 ⍝ By default beta versions are considered. You may change this by specifying a 1 as left argument.
- r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
- y←⊆y
- (installFolder registry)←2↑y,(≢y)↓'' ''
- 'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder
- installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
- 'Not a directory'Assert F.IsDir installFolder
- 'Directory does not host a file apl-dependencies.txt'Assert F.IsFile installFolder,'/apl-dependencies.txt'
- deps←⊃F.NGET(installFolder,'/apl-dependencies.txt')1
- 'Dependency file is empty'Assert 0<≢deps
+ (deps installFolder registry)←CheckReInstallDependencies y
  PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Would re-install packages in ',installFolder,' with',(noBetas/'out'),' any beta versions'
- refs←1 ReInstallDependencies_ deps installFolder registry noBetas
+ dry←1
+ refs←dry ReInstallDependencies_ deps installFolder registry noBetas
 ⍝Done

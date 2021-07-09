@@ -1,0 +1,8 @@
+ (deps installFolder registry)←CheckReInstallDependencies y
+ y←⊆y
+ (installFolder registry)←2↑y,(≢y)↓'' ''
+ 'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder
+ 'Not a directory'Assert F.IsDir installFolder
+ deps←Dependencies.Get installFolder
+ 'Dependency file is empty or does not exist'Assert 0<≢deps
+⍝Done

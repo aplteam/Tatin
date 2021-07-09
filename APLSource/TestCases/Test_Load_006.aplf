@@ -1,0 +1,27 @@
+ r←Test_Load_006(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx
+⍝ Exercise ⎕SE.Tatin.LoadPackage on two packages that differ only by major number both with the same alias
+⍝ This MUST NOT work because package with different major numbers are considered different packages
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ res←1 TC.LoadPackage'A@[localhost]aplteam-APLTreeUtils-6' '#.TEMP'
+ →T.GoToTidyUp''≢res
+ →T.GoToTidyUp~∨/'.aplteam_APLTreeUtils_6_0_'⍷⍕#.TEMP.A
+
+ :Trap 98
+     res←1 TC.LoadPackage'A@[localhost]aplteam-APLTreeUtils-7' '#.TEMP'
+     →T.GoToTidyUp 0
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Name "A" already in use and therefore not suitable as alias (⎕NC=9)'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :Trap 0 ⋄ F.RmDir res ⋄ :EndTrap
+⍝Done

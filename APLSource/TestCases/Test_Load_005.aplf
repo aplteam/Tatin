@@ -1,0 +1,23 @@
+ r←Test_Load_005(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx
+⍝ Exercise ⎕SE.Tatin.LoadPackage on two packages that differ only by patch number both with the same alias
+⍝ This is supposed to work, and it't the user who is responsible in case of `LoadPackage`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ res←1 TC.LoadPackage'A@[localhost]aplteam-APLTreeUtils-6.0.10' '#.TEMP'
+ →T.GoToTidyUp''≢res
+ →T.GoToTidyUp~∨/'.aplteam_APLTreeUtils_6_0_10.'⍷⍕#.TEMP.A
+
+ res←1 TC.LoadPackage'A@[localhost]aplteam-APLTreeUtils-6.0.11' '#.TEMP'
+ →T.GoToTidyUp''≢res
+ →T.GoToTidyUp~∨/'.aplteam_APLTreeUtils_6_0_11'⍷⍕#.TEMP.A
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :Trap 0 ⋄ F.RmDir res ⋄ :EndTrap
+⍝Done

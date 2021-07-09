@@ -1,0 +1,13 @@
+ {r}←CheckAliasOnInstall(path alias packageID);ns;filename;aliasse;list
+⍝ Of course the same alias must not be used for more than one package, so we need to check this.
+ r←⍬
+ :If 0<≢alias
+     filename←path,Reg.BuildListFilename{('/',⍺)/⍨⍺≢(-≢⍺)↑⍵}path
+ :AndIf F.IsFile filename
+     ns←Reg.APLfromJSON⊃F.NGET filename
+     list←Reg.RemoveMinorAndPatch¨ns.packageID
+     list~←⊂Reg.RemoveMinorAndPatch alias,packageID
+ :AndIf 0<≢aliasse←{⍵/⍨'@'∊¨⍵}list
+     ('Package alias "',alias,'" already in use')Assert~(⊂alias)∊1⊃∘SplitAtAlias¨aliasse
+ :EndIf
+⍝Done

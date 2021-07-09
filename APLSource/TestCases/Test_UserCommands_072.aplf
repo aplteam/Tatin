@@ -1,11 +1,12 @@
- r←Test_UserCommands_072(stopFlag batchFlag);⎕TRAP;rc;msg;res;dir;list
+ r←Test_UserCommands_072(stopFlag batchFlag);⎕TRAP;rc;msg;res;dir;list;stop
 ⍝ Exercise ]Tatin.ReInstallDependencies with the -dry flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  dir←GetTempDir''
- dir ⎕NCOPY⍠('Wildcard' 1)⊣'TestData/UnInstall/apl-dependencies.txt'
- (rc msg res)←∆UCMD'ReInstallDependencies "',dir,'" -dry'
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣'TestData/UnInstall/',##.Registry.DependenciesFilename
+ stop←0
+ (rc msg res)←stop ∆UCMD'ReInstallDependencies "',dir,'" -dry'
  →T.GoToTidyUp 0≠rc
  →T.GoToTidyUp 0≠+/≢¨msg res
 

@@ -35,7 +35,7 @@
  PrintToSession'  Establish dependencies...'
  :If 0<≢buildList←GetDependencyTree alias,identifier
      PrintToSession'  ',(⍕≢buildList),' dependencies identified'
-     CheckAlias targetFolder alias
+     CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename identifier)
      :For principal packageID2 url :In ↓buildList
          (alias packageID2)←SplitAtAlias packageID2
          installFolder←(Reg.AddSlash targetFolder),packageID2

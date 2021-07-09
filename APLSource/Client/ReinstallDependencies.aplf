@@ -8,16 +8,7 @@
 ⍝ By default beta versions are considered. You may change this by specifying a 1 as left argument.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
- y←⊆y
- (installFolder registry)←2↑y,(≢y)↓'' ''
- 'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder
- installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
- 'Not a directory'Assert F.IsDir installFolder
- 'Directory does not host a file apl-dependencies.txt'Assert F.IsFile installFolder,'/apl-dependencies.txt'
- deps←⊃F.NGET(installFolder,'/apl-dependencies.txt')1
- 'Dependency file is empty'Assert 0<≢deps
- F.DeleteFile installFolder∘,¨({'/',⊃,/1↓⎕NPARTS ⍵}¨F.ListFiles installFolder,'/')~⊂'/apl-dependencies.txt'
- F.RmDir F.ListDirs installFolder,'/'
+ (deps installFolder registry)←CheckReInstallDependencies y
  PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(noBetas/'out'),' any beta versions'
  refs←ReInstallDependencies_ deps installFolder registry noBetas
 ⍝Done

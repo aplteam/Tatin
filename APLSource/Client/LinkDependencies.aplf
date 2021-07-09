@@ -1,5 +1,5 @@
  {r}←LinkDependencies refs;ref;deps;root;destinations;bool;depName;destination;cfgs;cfg;list;dep;aliasOrName
-⍝ Takes a list of refs, typically returned by `LoadPackage`, and establishes any required references
+⍝ Takes a list of refs, typically returned by `LoadDependencies`, and establishes any required references
 ⍝ to dependencies within those refs.
 ⍝ `api` rules, but if it's empty then `name` is taken instead.
  r←⍬
@@ -8,7 +8,7 @@
      PrintToSession'  Establish references to dependencies...'
      :For ref :In refs
          ref←CheckWsPaths ref
-         :If 0<≢deps←Dependencies.Get⊃{0=≢⍺:⍵ ⋄ ⍺}/ref.code.TatinVars.(HOME URI)
+         :If 0<≢deps←ref.code.TatinVars.DEPENDENCIES
              deps←ReplaceRegistryAlias¨deps
              destinations←GetPackageIDFromFilename¨deps
              destinations←2⊃¨SplitAtAlias¨destinations

@@ -1,4 +1,4 @@
- response←request ProcessTestCommands(path specialCommands);⎕TRAP;version
+ response←request ProcessTestCommands(path specialCommands);version
 ⍝ This function must only be called when G.TestFlag is true
  :If G.TestFlag
      :Select ⎕C path
@@ -22,7 +22,6 @@
              response←request Respond 400 1
          :EndIf
      :Case GetVersion_REST'shutdown'
-         ⎕TRAP←0 'S'
          response←request Respond 200
          ∆SHUTDOWN←1
      :Case GetVersion_REST'crash'

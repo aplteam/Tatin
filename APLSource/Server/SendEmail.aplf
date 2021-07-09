@@ -1,0 +1,22 @@
+ {r}←SendEmail errorParms;cmd;list;msg;sendTo;domain;sendFrom
+⍝ Send an email to the address [EMAIL]SendTo regarding a Tatin crash.
+⍝ Usually called as part of HandleError.Process.
+⍝ Sends the related HTML report as attachment.
+⍝ Works under Linux only
+ r←⍬
+ :If G.IsUnix
+ :AndIf G.INI.Get'EMAIL:active'
+     sendTo←⊆⊃G.INI.Get'EMAIL:SendTo'
+     domain←⊃G.INI.Get'EMAIL:domain'
+     sendFrom←⊃G.INI.Get'EMAIL:SendFrom'
+     msg←'Tatin crashed on "',domain,'"'
+     (('\'=msg)/msg)←'/'
+     msg←'"'⎕R'\\"'⊣msg
+     cmd←'echo "',msg,'" | mutt -s "Tatin crash" ',⊃{⍺,',',⍵}/sendTo
+     cmd,←' -e ''my_hdr From:',sendFrom,''''   ⍝ my_hdr is a "mutt" convention!
+     :If errorParms.createHTML
+         cmd,←' -a ',errorParms.crashFilename,'.html'
+     :EndIf
+     {}⎕SH cmd,' &'
+ :EndIf
+⍝Done

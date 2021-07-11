@@ -1,4 +1,4 @@
- {r}←OnHouseKeeping msg;savedAt
+ {r}←OnHouseKeeping msg;savedAt;rideable;rideableOld;rideActive
 ⍝ Used for these purposes:
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
@@ -19,8 +19,18 @@
      :EndIf
      savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
      :If G.INI.EstablishedAt<savedAt
+         rideActive←0 G.INI.Get'RIDE:active'
          P.G(P.ProcessIniFile)←G.INI.IniFilename  ⍝ ... we initialize from scratch
          Log'INI file re-instantiated because it was changed on disk'
+         rideable←P.CheckForRide P.G.INI
+         :If rideActive≠rideable
+             :If rideable
+                 msg←'Ride is now enabled'
+             :Else
+                 msg←'Ride is now disabled'
+             :EndIf
+         :EndIf
+         Log msg
      :EndIf
  :EndIf
 ⍝Done

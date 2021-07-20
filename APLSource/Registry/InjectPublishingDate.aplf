@@ -1,17 +1,18 @@
  r←{path}InjectPublishingDate packageIDs;i;packageID;json
-⍝ This is used to replace the "-beta-1" part in "1.2.3-beta-1" by "99999999-{the publishing date.}"
+⍝ Returns a matrix with three columns:
+⍝ [;1] packageID (without any beta part)
+⍝ [;2] the publishing date as a real (YYYYMMDD.hhmmss)
+⍝ [;3] the publishing date but for non-betas 99999999
 ⍝ Useful for sorting purposes.
-⍝ The result is a matrix:
-⍝ [;1] package ID plus publishing date or 99999999
-⍝ [;2] publishing data as a real or 0
  path←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'path'
- r←((≢packageIDs),2)⍴''
+ r←((≢packageIDs),3)⍴''
  :For i :In ⍳≢packageIDs
      packageID←i⊃packageIDs
      json←GetJsonFromFile(AddSlash path),packageID,'/',CFG_Name
      :If NotJustDigits{⍵↓⍨1++/2>+\'-'=⍵}{∨/'/\'∊⍵:⊃,/1↓⎕NPARTS ⍵ ⋄ ⍵}packageID
-         r[i;]←({⍵/⍨3>+\⍵='-'}packageID)json.date
+         r[i;]←packageID json.date json.date
      :Else
-         r[i;]←(({⍵/⍨3>+\⍵='-'}packageID)(-json.date))
+         r[i;]←packageID json.date 99999999
      :EndIf
  :EndFor
+⍝Done

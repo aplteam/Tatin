@@ -79,11 +79,15 @@ OnStart             = 'OnStart'                        ; Once called when the se
 OnRequest           = 'OnRequest'                      ; Called in the event of a request. Setting this is mandatory
 OnCongaTimeout      = 'OnHouseKeeping'                 ; Do any housekeeping here
 
-; The following is experimental and not ready for use yet
+
 [EMAIL]             ; Tatin can send emails in case of crashes, but just under Linux (worked out by the code)
-active              = 0                                ; On/off toggle
-domain              = 'tatin.dev'                      ; Which domain did the crash occur on
-SendFrom            = 'do-not-reply@tatin.dev'         ; Sender of crash emails
-SendTo              = ''
-SendTo             ,= 'foo@mydomain.com'               ; Receiver of crash emails
-;SendTo            ,= 'another@mydomain.com'           ; Receiver of crash emails
+active              = 1                                ; On/off toggle
+domain              = ''              ; Used in the subject line
+SMTP_Server         = ''                               ; For example Google's SMTP server: smtp.gmail.com'
+Port                = 465
+SendFrom            = 'do-not-reply@foo.com'           ; Sender of crash emails
+SendTo              = 'john.doe@gmail.com'             ; Receiver of crash emails
+Password            = 'secrect'                        ; Must fit to "SendTo"
+CC                  = ''
+CC                 ,= ''                ; Receiver of crash emails
+;CC                ,= 'kai@kai-jaeger.de'              ; Receiver of crash emails

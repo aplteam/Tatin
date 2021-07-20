@@ -1,3 +1,5 @@
  ∆GetBestVersionFor←{
-     2⊃A.SplitPath{⍵⊃⍨¯1↑TC.Reg.SortIndexForPackageIDs ⍵}F.ListDirs ∆GetServerPath,⍵,'*'
+     list←F.ListDirs ∆GetServerPath,⍵,'*'
+     data←Reg.InjectPublishingDate list
+     2⊃A.SplitPath⊃⌽list[Reg.SortIndexForPackageIDs data]
  }

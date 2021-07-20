@@ -1,0 +1,23 @@
+ r←Test_Misc_016(stopFlag batchFlag);⎕TRAP;data;list;ind
+⍝ Test function Registry.SortIndexForPackageIDs for producing the correct sort index
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←'aplteam-versions-1.0.0' 'aplteam-versions-1.0.0-beta-1'
+ list,←'aplteam-versions-1.0.1-That-fix' 'aplteam-versions-1.0.1-This-fix'
+ list,←'aplteam-versions-1.0.12' 'aplteam-versions-1.0.12-That-fix' 'aplteam-versions-1.0.12-zzz'
+
+ data←0 3⍴⍬
+ data⍪←'aplteam-versions-1.0.0' 20210426.052708 99999999
+ data⍪←'aplteam-versions-1.0.0' 20210426.053736 20210426.053736
+ data⍪←'aplteam-versions-1.0.1' 20210426.054013 20210426.054013
+ data⍪←'aplteam-versions-1.0.1' 20210629.053907 20210629.053907
+ data⍪←'aplteam-versions-1.0.12' 20210720.010101 99999999
+ data⍪←'aplteam-versions-1.0.12' 20210426.053928 20210426.053928
+ data⍪←'aplteam-versions-1.0.12' 20210426.053959 20210426.053959
+
+ ind←##.Registry.SortIndexForPackageIDs data
+ →T.PassesIf 2 1 3 4 6 7 5≡ind
+
+ r←T._OK
+⍝Done

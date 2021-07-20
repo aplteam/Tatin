@@ -1,0 +1,14 @@
+ r←SendCrashMail domain;parms;myServer;srv
+ srv←⎕NS''
+ srv.Server←'smtp.gmail.com'
+ srv.Port←465
+ srv.From←'tatin.dev@gmail.com'
+ srv.Password←'A23WAWbe3E5y53CxeCJU'
+ myServer←3⊃srv SendMail'' ⍝ create the server instance
+ parms←⎕NS''
+ parms.To←'tatin.dev@gmail.com'
+ parms.CC←'kai@aplteam.com'
+ parms.Subj←domain,' has crashed'
+ parms.Body←'The Tatin server running under ',domain,' has crashed.'
+ r←myServer SendMail parms
+⍝Done

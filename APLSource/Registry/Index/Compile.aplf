@@ -9,7 +9,8 @@
  ref←⎕NS''
  :Hold 'INDEX'
      :If 0<≢packageList←##.F.ListDirs path
-         packageList←packageList[##.SortIndexForPackageIDs packageList]
+         packageList←##.InjectPublishingDate packageList
+         packageList←packageList[##.SortIndexForPackageIDs packageList;1]
          index←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¨packageList
          index←⊃,/index,¨⎕UCS 13
          ref.index←index

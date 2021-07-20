@@ -7,27 +7,15 @@
  :Else
      uri←uri_
  :EndIf
- :If 0=⎕NC'∆KNOWN_SERVERS'
-     ∆KNOWN_SERVERS←0 2⍴⍬                       ⍝ Used to remember the servers that got successfuly pinged
- :EndIf
- :If 0<≢∆KNOWN_SERVERS
- :AndIf ~∧/b←∆KNOWN_SERVERS[;2]=ts
-     ∆KNOWN_SERVERS←b⌿∆KNOWN_SERVERS            ⍝ Remove everything older than today
- :EndIf
- :If (⊂uri)∊∆KNOWN_SERVERS[;1]
+ bool←0
+ request←R.NewRequest 0
+ request.RequestTarget←'/ping'
+ client←NewClient uri
+ client.ClientTimeout←4
+ :Trap 345
+     buff←client R.SendAndReceive request
      bool←1
  :Else
-     bool←0
-     request←R.NewRequest 0
-     request.RequestTarget←'/ping'
-     client←NewClient uri
-     client.ClientTimeout←4
-     :Trap 345
-         buff←client R.SendAndReceive request
-         bool←1
-         ∆KNOWN_SERVERS⍪←uri ts
-     :Else
      ⍝ Just for debugging
-     :EndTrap
- :EndIf
+ :EndTrap
 ⍝Done

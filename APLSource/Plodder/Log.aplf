@@ -1,0 +1,11 @@
+ {r}←serverInstance Log msg
+ r←⍬
+ :If 2>≡msg
+     msg_←⎕UCS'UTF-8'⎕UCS msg
+     msg_←R.{(LogDate QTS),' ',⍵,CrLf}msg_
+     msg_ ⎕NAPPEND serverInstance.LogFileTie
+ :Else
+     ((R.LogDate R.QTS),R.CrLf)⎕NAPPEND serverInstance.LogFileTie
+     serverInstance.LogFileTie{(⎕UCS'UTF-8'⎕UCS ⍵)⎕NAPPEND ⍺}⊃,/msg,¨⊂R.CrLf
+ :EndIf
+⍝Done

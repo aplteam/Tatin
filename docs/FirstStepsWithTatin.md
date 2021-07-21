@@ -118,9 +118,23 @@ I> If you wonder why that is, then please read the document discussing [Semantic
 
 ## Consuming packages
 
-### Give it a try: `LoadPackage`
+### Overview
 
-Let's assume that you want to check whether `MarkAPL` suits your needs, in other words: you just want to check it out. 
+Packages can be consumed in two different ways:
+
+* You may load a package in order to investigate it
+* You may install a package to make it part of an application
+
+Loading a package leaves no footprint at all in the file system in case the package has no assets, or puts those assets into the temp folder of the current operating system. That's why you must specify a parent namespace but not a folder.
+
+Installing a package (and all its dependencies) means that it is saved in the file system. That's why you must specify a folder but not a parent namespace.
+
+Installed packages are considered dependencies of an application. Consequently in order to bring them into the workspace you must use the `]LoadDependencies` command (or its API equivalent), and it requires two mandatory parameters: the installation path and the parent namespace.
+
+
+### Checking out a package: `LoadPackage`
+
+Let's assume that you want to check whether the package `MarkAPL` suits your needs, in other words: you just want to check it out. 
 
 That can be achieved with the `LoadPackage` user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided.
 
@@ -202,7 +216,7 @@ MarkAPL
 `MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For those references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
 
 
-### Tatin Variables
+#### Tatin Variables
 
 For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.
 
@@ -211,39 +225,39 @@ Those variables are injected into a namespace `TatinVars` which in turn is injec
 Some of them always exist, some of them only under certain circumstances. This is a list:
 
 
-#### `CONFIG`
+##### `CONFIG`
 
 This is a simple character vector that stems from the file `apl-package.json` of the given package.
 
 
-#### `DEPENDENCIES`
+##### `DEPENDENCIES`
 
 A vector of character vectors with the package IDs of the packages the package in question relies on.
 
 
-#### `HOME`
+##### `HOME`
 
 Is either an empty vector or a character vector holding the path of a folder that carries assets; these are discussed next.
 
 
-#### `ID`
+##### `ID`
 
 The full package name. This will include a build ID if there is any.
 
 
-#### `LX`
+##### `LX`
 
-This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successully. `LX` holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.
+This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successfully. `LX` holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.
 
 Note that if there is no `lx` defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no `LX`.
 
 
-#### `URI`
+##### `URI`
 
 Character vector that holds the address of a Tatin server or the full name of a ZIP file.
 
 
-### Assets
+#### Assets
 
 `MarkAPL` comes with HTML and CSS files. Therefore `MarkAPL` must be able to find those assets. This can be achieved by referring to the Tatin variable `HOME` in `#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars`:
 
@@ -265,9 +279,9 @@ Files/
 ...
 ```
 
-### Adding packages to an application
+### Installing packages permanently: `InstallPackage`
 
-Let's assume you've checked on `MarkAPL`, and that it turns out to suit your needs. You decide to use it in your application `Foo` which happens to live in `/Path2Foo/` on disk and in `#.Foo` in the workspace. 
+Let's assume you've checked out `MarkAPL`, and that it turns out to suit your needs. You decide to use it in your application `Foo` which happens to live in `/Path2Foo/` on disk and in `#.Foo` in the workspace. 
 
 Let's also assume that the code of your application lives in `Foo.Core`, and that you want to address `MarkAPL` with `##.MarkAPL` from any function within `Foo.Core`.
 
@@ -295,7 +309,7 @@ A> Later, when the package is ready, you could publish it to, say the principal 
 A>
 A> The fact that Registries with a priority of `0` or less are ignored by Tatin when it comes to scanning Registries allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc on it.
 
-You may even omit the group name, although this would fail in case the name ("MarkAPL") is used by multiple groups.
+You may even omit the group name, although this would fail in case the name ("MarkAPL") is used in more than one group.
 
 Let's check what's now in `/Path2Foo/Packages`
 
@@ -339,7 +353,7 @@ Notes:
 
 * `principal` is a flag that tells top-level packages (these are the ones you asked for) from dependencies.
 
-* `url` carries not the package name except when it is a ZIP file, because naturally the filename carries the package ID. However, including a ZIP file as a dependency as an exception anyway. The only reason why one might do this is testing a pre-release package.
+* `url` carries not the package name except when it is a ZIP file, because naturally the filename carries the package ID. However, including a ZIP file as a dependency is an exception anyway. The only reason why one might do this is testing a pre-release package.
 
 The dependencies file specifies what packages _your application_ depends on as of yet:
 
@@ -382,5 +396,3 @@ Let's check whether it worked:
 
 [^dotnetcore]: More information on .NET Core is available at <<br>>
 <https://en.wikipedia.org/wiki/.NET_Core>
-
-		

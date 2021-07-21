@@ -15,6 +15,7 @@
      'No Registries defined in the Client config file'Assert 1≤≢registries
      registries←(0<registries.priority)/registries
      'No Registries defined in the Client config file that can be scanned'Assert 1≤≢registries
+     registries←({(⍵⍳⍵)=⍳≢⍵}registries.uri)/registries  ⍝ Because we might find the same registry multiple times with different credentials
      i←0
      :Repeat
          i+←1

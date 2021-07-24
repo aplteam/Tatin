@@ -913,7 +913,6 @@
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
           r,←⊂'Load the specified package and all its dependencies into the workspace'
-          r,←⊂'Requires two arguments:'
           r,←⊂''
           r,←⊂'A) First argument:'
           r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
@@ -938,6 +937,9 @@
           r,←⊂'Returns fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
           r,←⊂'Installs the given package and all its dependencies into the given folder.'
+          r,←⊂'If the package is already installed, it (as well as any dependencies) will be'
+          r,←⊂'installed again from scratch.'
+          r,←⊂'Requires two arguments:'
           r,←⊂''
           r,←⊂'A) First argument:'
           r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
@@ -1136,7 +1138,7 @@
       r,←⊂''
       r,←⊂'Not that if neither a Registry nor a ZIP file is specified but just a package ID'
       r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
-      r,←⊂'are scanned; the first hit wins.'
+      r,←⊂'will be scanned; the first hit wins.'
       r,←⊂''
       r,←⊂'It may be:'
       r,←⊂''
@@ -1147,13 +1149,13 @@
       r,←⊂'* You may also specify an incomplete package ID in terms of no patch number, or'
       r,←⊂'  neither minor nor patch number, or no version information at all, and leave it'
       r,←⊂'  it to Tatin to establish the latest version itself.'
-      r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
       r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
       r,←⊂'  in two or more different groups but will succeed otherwise.'
-      r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
-      r,←⊂'* Eiether a full path or a URL in front of the package ID.'
+      r,←⊂'* Either a full path or a URL in front of the package ID.'
+      r,←⊂''
+      r,←⊂'By default beta versions are included. Specify -nobetas in order to suppress those.'
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

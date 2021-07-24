@@ -1147,13 +1147,13 @@
       r,←⊂'* You may also specify an incomplete package ID in terms of no patch number, or'
       r,←⊂'  neither minor nor patch number, or no version information at all, and leave it'
       r,←⊂'  it to Tatin to establish the latest version itself.'
-      r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
       r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
       r,←⊂'  in two or more different groups but will succeed otherwise.'
-      r,←⊂'  By default beta versons are included. Specify -nobetas in order to suppress those.'
       r,←⊂''
-      r,←⊂'* Eiether a full path or a URL in front of the package ID.'
+      r,←⊂'* Either a full path or a URL in front of the package ID.'
+      r,←⊂''
+      r,←⊂'By default beta versions are included. Specify -nobetas in order to suppress those.'
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2

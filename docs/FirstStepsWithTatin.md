@@ -131,6 +131,8 @@ Installing a package (and all its dependencies) means that it is saved in the fi
 
 Installed packages are considered dependencies of an application. Consequently in order to bring them into the workspace you must use the `]LoadDependencies` command (or its API equivalent), and it requires two mandatory parameters: the installation path and the parent namespace.
 
+We discuss both options.
+
 
 ### Checking out a package: `LoadPackage`
 
@@ -307,7 +309,7 @@ A> you can run your own Tatin server on, say, your own machine, and give it the 
 A> 
 A> Later, when the package is ready, you could publish it to, say the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
 A>
-A> The fact that Registries with a priority of `0` or less are ignored by Tatin when it comes to scanning Registries allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc on it.
+A> The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc on it.
 
 You may even omit the group name, although this would fail in case the name ("MarkAPL") is used in more than one group.
 

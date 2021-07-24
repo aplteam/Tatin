@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackage(identifier_ targetFolder);bool;principal
+ r←{noBetas}InstallPackage(identifier_ targetFolder);bool;principal;msg
  ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be one of:
@@ -43,11 +43,17 @@
          :AndIf F.Exists installFolder
              ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
          :EndIf
-         :If 0=F.IsDir installFolder
-             tempDir←InstallPackage_ packageID2 url
-             installFolder ⎕NMOVE tempDir
-             F.RmDir tempDir
+         tempDir←InstallPackage_ packageID2 url
+         :If F.IsDir installFolder
+             F.RmDir installFolder
+             :If F.IsDir installFolder
+                 F.RmDir tempDir
+                 msg←'Could not remove install folder (package was apparently already installed):',⎕UCS 13
+                 msg,←installFolder
+                 msg Assert 0
+             :EndIf
          :EndIf
+         installFolder ⎕NMOVE tempDir
          :If principal
              PrintToSession'  Add ',packageID2,' to dependency file...'
              targetFolder Dependencies.Add alias,packageID2

@@ -16,10 +16,12 @@
      registries←(0<registries.priority)/registries
      'No Registries defined in the Client config file that can be scanned'Assert 1≤≢registries
      registries←({(⍵⍳⍵)=⍳≢⍵}registries.uri)/registries  ⍝ Because we might find the same registry multiple times with different credentials
+     PrintToSession'Scanning ',(⍕≢registries),' registr',((1+1=≢registries)⊃'ies' 'y'),' for ',packageID,'...'
      i←0
      :Repeat
          i+←1
          (uri alias)←i⊃registries.(uri alias)
+
          :If Reg.IsHTTP uri
              :If 0=Ping uri
                  345 ⎕SIGNAL⍨'Did not respond: ',uri
@@ -44,12 +46,15 @@
                  reg←uri
              :EndIf
          :EndIf
+         {}{PrintToSession ⍵}⍣(0=≢reg)⊣'   not found in ',uri
      :Until (i=≢registries)∨0<≢reg
      :If 0=≢reg
          CR←⎕UCS 13
-         msg←'Package:',CR,'  ',packageID,CR,'not found in any of these Registries:'
+         msg←CR,'Package <',packageID,'> not found in any of these Registries:'
          msg,←⊃,/(⊂CR,'  '),¨{0<≢2⊃⍵:'[',(2⊃⍵),']' ⋄ 1⊃⍵}¨registries.(uri alias)
          msg Assert 0
+     :Else
+         PrintToSession'   found in ',uri
      :EndIf
  :EndIf
 ⍝Done

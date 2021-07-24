@@ -25,10 +25,16 @@
          response←request Respond 200
          ∆SHUTDOWN←1
      :Case GetVersion_REST'crash'
-         ∘∘∘                              ⍝ Deliberate crash for testing error trapping
+         ∘∘∘                                ⍝ Deliberate crash for testing error trapping
+     :Case GetVersion_REST'off'
+         :If A.IsDevelopment
+             ∘∘∘                            ⍝ In runtime this would be ⎕OFF
+         :Else
+             ⎕OFF
+         :EndIf
      :Else
-         response←request Respond 404 1   ⍝ Unknown (new?!)
+         response←request Respond 404 1     ⍝ Unknown (new?!)
      :EndSelect
  :Else
-     response←request Respond 401 1       ⍝ Not a valid REST version 1 request
+     response←request Respond 401 1         ⍝ Not a valid REST version 1 request
  :EndIf

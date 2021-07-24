@@ -130,11 +130,25 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <div class="h_tag">
-<a href="#Give-it-a-try-LoadPackage" id="Give-it-a-try-LoadPackage" class="autoheader_anchor">
-<h3 data-id="Give-it-a-try-LoadPackage">Give it a try: <code>LoadPackage</code></h3>
+<a href="#Overview" id="Overview" class="autoheader_anchor">
+<h3 data-id="Overview">Overview</h3>
 </a>
 </div>
-<p>Let's assume that you want to check whether <code>MarkAPL</code> suits your needs, in other words: you just want to check it out.</p>
+<p>Packages can be consumed in two different ways:</p>
+<ul>
+<li>You may load a package in order to investigate it</li>
+<li>You may install a package to make it part of an application</li>
+</ul>
+<p>Loading a package leaves no footprint at all in the file system in case the package has no assets, or puts those assets into the temp folder of the current operating system. That's why you must specify a parent namespace but not a folder.</p>
+<p>Installing a package (and all its dependencies) means that it is saved in the file system. That's why you must specify a folder but not a parent namespace.</p>
+<p>Installed packages are considered dependencies of an application. Consequently in order to bring them into the workspace you must use the <code>]LoadDependencies</code> command (or its API equivalent), and it requires two mandatory parameters: the installation path and the parent namespace.</p>
+<p>We discuss both options.</p>
+<div class="h_tag">
+<a href="#Checking-out-a-package-LoadPackage" id="Checking-out-a-package-LoadPackage" class="autoheader_anchor">
+<h3 data-id="Checking-out-a-package-LoadPackage">Checking out a package: <code>LoadPackage</code></h3>
+</a>
+</div>
+<p>Let's assume that you want to check whether the package <code>MarkAPL</code> suits your needs, in other words: you just want to check it out.</p>
 <p>That can be achieved with the <code>LoadPackage</code> user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided.</p>
 <div class="leanpub_A">
 <h3>Leaving a trace on the file system</h3>
@@ -204,7 +218,7 @@ MarkAPL</code></pre>
 <p><code>MarkAPL</code> is the package we asked for. It depends on two packages, <code>APLTreeUtils2</code> and <code>FilesAndDirs</code>. For those references are injected. <code>FilesAndDirs</code> depends on <code>OS</code> but because that is not required by <code>MarkAPL</code> no reference to it is injected into MarkAPL's <code>code</code>, instead you would find such a reference in <code>#._tatin.aplteam_FilesAndDirs_5_0_1.code</code>.</p>
 <div class="h_tag">
 <a href="#Tatin-Variables" id="Tatin-Variables" class="autoheader_anchor">
-<h3 data-id="Tatin-Variables">Tatin Variables</h3>
+<h4 data-id="Tatin-Variables">Tatin Variables</h4>
 </a>
 </div>
 <p>For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.</p>
@@ -212,44 +226,44 @@ MarkAPL</code></pre>
 <p>Some of them always exist, some of them only under certain circumstances. This is a list:</p>
 <div class="h_tag">
 <a href="#CONFIG" id="CONFIG" class="autoheader_anchor">
-<h4 data-id="CONFIG"><code>CONFIG</code></h4>
+<h5 data-id="CONFIG"><code>CONFIG</code></h5>
 </a>
 </div>
 <p>This is a simple character vector that stems from the file <code>apl-package.json</code> of the given package.</p>
 <div class="h_tag">
 <a href="#DEPENDENCIES" id="DEPENDENCIES" class="autoheader_anchor">
-<h4 data-id="DEPENDENCIES"><code>DEPENDENCIES</code></h4>
+<h5 data-id="DEPENDENCIES"><code>DEPENDENCIES</code></h5>
 </a>
 </div>
 <p>A vector of character vectors with the package IDs of the packages the package in question relies on.</p>
 <div class="h_tag">
 <a href="#HOME" id="HOME" class="autoheader_anchor">
-<h4 data-id="HOME"><code>HOME</code></h4>
+<h5 data-id="HOME"><code>HOME</code></h5>
 </a>
 </div>
 <p>Is either an empty vector or a character vector holding the path of a folder that carries assets; these are discussed next.</p>
 <div class="h_tag">
 <a href="#ID" id="ID" class="autoheader_anchor">
-<h4 data-id="ID"><code>ID</code></h4>
+<h5 data-id="ID"><code>ID</code></h5>
 </a>
 </div>
 <p>The full package name. This will include a build ID if there is any.</p>
 <div class="h_tag">
 <a href="#LX" id="LX" class="autoheader_anchor">
-<h4 data-id="LX"><code>LX</code></h4>
+<h5 data-id="LX"><code>LX</code></h5>
 </a>
 </div>
-<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successully. <code>LX</code> holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.</p>
+<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successfully. <code>LX</code> holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.</p>
 <p>Note that if there is no <code>lx</code> defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no <code>LX</code>.</p>
 <div class="h_tag">
 <a href="#URI" id="URI" class="autoheader_anchor">
-<h4 data-id="URI"><code>URI</code></h4>
+<h5 data-id="URI"><code>URI</code></h5>
 </a>
 </div>
 <p>Character vector that holds the address of a Tatin server or the full name of a ZIP file.</p>
 <div class="h_tag">
 <a href="#Assets" id="Assets" class="autoheader_anchor">
-<h3 data-id="Assets">Assets</h3>
+<h4 data-id="Assets">Assets</h4>
 </a>
 </div>
 <p><code>MarkAPL</code> comes with HTML and CSS files. Therefore <code>MarkAPL</code> must be able to find those assets. This can be achieved by referring to the Tatin variable <code>HOME</code> in <code>#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars</code>:</p>
@@ -269,11 +283,11 @@ Files/
  C:\...\aplteam-MarkAPL-11.0.0\Files\BlackOnWhite_screen.css
 ...</code></pre>
 <div class="h_tag">
-<a href="#Adding-packages-to-an-application" id="Adding-packages-to-an-application" class="autoheader_anchor">
-<h3 data-id="Adding-packages-to-an-application">Adding packages to an application</h3>
+<a href="#Installing-packages-permanently-InstallPackage" id="Installing-packages-permanently-InstallPackage" class="autoheader_anchor">
+<h3 data-id="Installing-packages-permanently-InstallPackage">Installing packages permanently: <code>InstallPackage</code></h3>
 </a>
 </div>
-<p>Let's assume you've checked on <code>MarkAPL</code>, and that it turns out to suit your needs. You decide to use it in your application <code>Foo</code> which happens to live in <code>/Path2Foo/</code> on disk and in <code>#.Foo</code> in the workspace.</p>
+<p>Let's assume you've checked out <code>MarkAPL</code>, and that it turns out to suit your needs. You decide to use it in your application <code>Foo</code> which happens to live in <code>/Path2Foo/</code> on disk and in <code>#.Foo</code> in the workspace.</p>
 <p>Let's also assume that the code of your application lives in <code>Foo.Core</code>, and that you want to address <code>MarkAPL</code> with <code>##.MarkAPL</code> from any function within <code>Foo.Core</code>.</p>
 <p>For that you need to execute two steps:</p>
 <ol start="1">
@@ -292,10 +306,10 @@ Files/
 <h3>Scanning Registries</h3>
 <p>The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages: you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. That way Tatin would find the package on your local machine.</p>
 <p>Later, when the package is ready, you could publish it to, say the principal Tatin server on <code>https://tatin.dev</code>, and delete it from your local Registry.</p>
-<p>The fact that Registries with a priority of <code>0</code> or less are ignored by Tatin when it comes to scanning Registries allows you to include a Registry like <code>https://test.tatin.dev</code> in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like <code>]tatin.ListPackages</code> etc on it.</p>
+<p>The fact that Registries with a priority of <code>0</code> are not scanned by Tatin allows you to include a Registry like <code>https://test.tatin.dev</code> in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like <code>]tatin.ListPackages</code> etc on it.</p>
 </div>
 
-<p>You may even omit the group name, although this would fail in case the name (“MarkAPL”) is used by multiple groups.</p>
+<p>You may even omit the group name, although this would fail in case the name (“MarkAPL”) is used in more than one group.</p>
 <p>Let's check what's now in <code>/Path2Foo/Packages</code></p>
 <pre><code>      ⍪⊃⎕NINFO ⍠ 1 ⊣ '/Path2Foo/Packages\*'
  /Path2Foo/Packages/apl-buildlist.json
@@ -329,7 +343,7 @@ Files/
 <p>Notes:</p>
 <ul>
 <li><code>principal</code> is a flag that tells top-level packages (these are the ones you asked for) from dependencies.</li>
-<li><code>url</code> carries not the package name except when it is a ZIP file, because naturally the filename carries the package ID. However, including a ZIP file as a dependency as an exception anyway. The only reason why one might do this is testing a pre-release package.</li>
+<li><code>url</code> carries not the package name except when it is a ZIP file, because naturally the filename carries the package ID. However, including a ZIP file as a dependency is an exception anyway. The only reason why one might do this is testing a pre-release package.</li>
 </ul>
 <p>The dependencies file specifies what packages <em>your application</em> depends on as of yet:</p>
 <pre><code>      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-dependencies.txt' 1

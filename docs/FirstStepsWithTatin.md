@@ -53,7 +53,7 @@ You may list _all_ packages managed by Tatin's principal server with this comman
  ...
 ```
 
-The square brackets around "tatin" declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like `https://localhost/my_tatin_server`.
+The square brackets around "tatin" declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like `https://localhost/my_tatin_server` or a simple question mark: `]tatin.ListPackages ?` would present all known Registries to you.
 
 A> ### Local and remote Registries
 A>
@@ -66,8 +66,8 @@ A> Of course features like listing just the packages that carry a specific tag a
 
 `]tatin.ListPackages` will return a list with _all_ packages available in the given Registry, aggregated by major version number. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.
 
-* If you happen to know the group name you may specify `-group=whatever`; then only packages of the group "whatever" are listed.
-* Every package is tagged with keywords. You may specify one or more tags, for example `-tag=linux,date`.
+* If you happen to know the group name you may specify `-group=whatever`: then only packages of the group "whatever" are listed
+* Every package is tagged with keywords: you may specify one or more tags, for example `-tag=linux,date`
 
 A> ### Searching for tags: the strategy
 A>
@@ -118,45 +118,204 @@ I> If you wonder why that is, then please read the document discussing [Semantic
 
 ## Consuming packages
 
-### Overview
+### Installing packages
 
-Packages can be consumed in two different ways:
+Imagine you want to use the MarkAPL package in an application you are currently working on which we will call a project. Let's also assume that this project is named "Foo" and lives in `/Foo/`.
 
-* You may load a package in order to investigate it
-* You may install a package to make it part of an application
+The first step is to install the package as part of the project "Foo":
 
-Loading a package leaves no footprint at all in the file system in case the package has no assets, or puts those assets into the temp folder of the current operating system. That's why you must specify a parent namespace but not a folder.
+```
+      ]tatin.InstallPackage [tatin]MarkAPL /Foo/packages
+```
 
-Installing a package (and all its dependencies) means that it is saved in the file system. That's why you must specify a folder but not a parent namespace.
+Notes:
 
-Installed packages are considered dependencies of an application. Consequently in order to bring them into the workspace you must use the `]LoadDependencies` command (or its API equivalent), and it requires two mandatory parameters: the installation path and the parent namespace.
+* `[tatin]` tells the Tatin client to load MarkAPL from the server the alias `tatin` is pointing to: https://tatin.dev
+* "MarkAPL" specifies neither a group nor a version number
+  * If the name "MarkAPL" is used within more than just one group the operation will fail
+  * Because no version information was provided at all, the very latest version will be installed
 
-We discuss both options.
+#### What got installed?
+
+Once you executed the above statement the `packages/` sub directory carries these files:
+
+```
+apl-buildlist.json
+apl-dependencies.txt
+aplteam-APLTreeUtils2-1.1.1
+aplteam-FilesAndDirs-5.0.1
+aplteam-MarkAPL-11.0.1
+aplteam-OS-3.0.1
+```
+
+* The folder `aplteam-MarkAPL-11.0.1` contains the MarkAPL package
+* The file `apl-dependencies.txt` contains just one line: `aplteam-MarkAPL-11.0.1`
+
+  That's because you project "Foo" depends so far on just one package, MarkAPL
+
+* The file `apl-buildlist.json` carries the build list
+
+
+#### The build list
+
+The build list will be used to get all required packages into the workspace. This is how the build list looks so far:
+
+```
+{
+  packageID: [
+    "aplteam-MarkAPL-11.0.1",
+    "aplteam-OS-3.0.1",
+    "aplteam-FilesAndDirs-5.0.1",
+    "aplteam-APLTreeUtils2-1.1.1",
+  ],
+  principal: [
+    1,
+    0,
+    0,
+    0,
+  ],
+  url: [
+    "https://tatin.dev/",
+    "https://tatin.dev/",
+    "https://tatin.dev/",
+    "https://tatin.dev/",
+   ],
+}
+```
+
+Notes:
+
+* There is one package that has `principal` set to 1: MarkAPL. That's because we have explicitly asked for it
+* All other packages got installed because MarkAPL depends on them, either directly or indirectly
+* The URL points to where the packages were loaded from
+
+#### How does a package look like on disk?
+
+Let's have a look into the directory `/Foo/packages/aplteam-MarkAPL-11.0.1`:
+
+```
+apl-dependencies.txt
+apl-package.json
+aplteam-MarkAPL-11.0.1/Files
+MarkAPL.aplc
+```
+
+Again `apl-dependencies.txt` lists all dependencies, this time all the packages MarkAPL depends on.
+
+The file `apl-package.json` describes the MarkAPL package:
+
+```
+{
+  api: "MarkAPL",
+  assets: "Files/",
+  date: 20210725.153851,
+  description: "Converts Markdown to HTML5",
+  group: "aplteam",
+  info_url: "https://github.com/aplteam/MarkAPL",
+  io: 1,
+  lx: "",
+  ml: 1,
+  name: "MarkAPL",
+  source: "MarkAPL.aplc",
+  tags: "markdown,converter,windows,linux,mac-os,apltree",
+  uri: "https://tatin.dev/",
+  version: "11.0.1+232",
+  wx: 3,
+}
+```
+
+#### Assets
+
+Note that the file `apl-package.json` specifies `assets: "Files/"`. That means that all assets are to be found in the `Files/` sub directory.
+
+In case of MarkAPL these are a bunch of CSS and HTML files:
+
+```
+BlackOnWhite_print.css       
+BlackOnWhite_screen.css
+LeanPubExtensions.html
+MarkAPL.html
+MarkAPL_CheatSheet.html
+MarkAPL_for_Programmers.html
+MarkAPL_print.css
+MarkAPL_screen.css
+QuickIntro.html
+Styles.html
+```
+
+Of course it could be anything required by the package.
+
+### Getting a package into the workspace
+
+From the perspective of the application "Foo" all packages are dependencies. Therefore one must issue this command:
+
+```
+      ]tatin.LoadDependencies /Foo/packages #.Foo
+#._tatin.aplteam_MarkAPL_11_0_1 
+```
+
+I> You will also see a couple of messages the user command prints to the session in order to keep you informed about the progress of loading the packages. These are not shown here.
+
+The command prints to the session the name of the namespace into which the package was actually loaded. We can use MarkAPL by referring to it as `#.Foo.MarkAPL` because Tatin has also established a reference in `#.Foo` named `MarkAPL` that points to the real package:
+
+
+```
+      #.Foo.MarkAPL
+#._tatin.aplteam_MarkAPL_11_0_1.code.MarkAPL
+```
+
+But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries a variable `HOME` that in turn carries the path to the directory that holds the assets:
+
+```
+      #._tatin.aplteam_MarkAPL_11_0_1.code.TatinVars.HOME
+/Foo/packages/aplteam-APLTreeUtils2-1.1.1
+```
+
+That means that any MarkAPL function can refer to `HOME` with `##.TatinVars.Home`.
+
+`TatinVars` holds more potentially important data; details are discussed at [Tatin Variables](#).
+
+What else lives in `#._tatin`?
+
+
+```
+      #._tatin.⎕nl 9
+aplteam_APLTreeUtils2_1_1_1
+aplteam_FilesAndDirs_5_0_1 
+aplteam_MarkAPL_11_0_1     
+aplteam_OS_3_0_1           
+```
+
+All packages, whether principal ones or dependencies, are stored in `#._tatin`. For the principal packages a reference is injected into the target namespace.
+
+Note that by naming convention packages are always loaded into either `#._tatin` or `⎕SE._tatin`.
 
 
 ### Checking out a package: `LoadPackage`
 
-Let's assume that you want to check whether the package `MarkAPL` suits your needs, in other words: you just want to check it out. 
+Let's assume that before actually installing it you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it but just to load it into the workspace. 
 
-That can be achieved with the `LoadPackage` user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided.
+That can be achieved with the `LoadPackage` user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided, which means if it has no assets,
 
 A> ### Leaving a trace on the file system
 A>
 A> In case the package has file dependencies (assets), like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there _is_ a footprint left on the file system.
+A>
+A> Note that this also means that loading a package only works on your local machine.
 
 Notes:
 
 * Loading a package in this way has only one purpose: to investigate it.
 
-* Loading a package might be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case. 
+* Loading a package might well be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case. 
 
   This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
 
 
-Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and a target namespace:
+Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and optionally target namespace:
 
 ```
-      ]tatin.LoadPackage [tatin]MarkAPL #
+      ]tatin.LoadPackage [tatin]MarkAPL
   Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
   Establish dependencies...
   4 dependencies identified
@@ -168,13 +327,12 @@ Let's load the `MarkAPL` package into the workspace; for that we need to specify
 C:\Users\username\AppData\Local\Temp\username_155648451
 ```
 
-Here we have specified `#` as the target namespace. In case the target namespace is something like `#.MyTests` then it may or may not exist. If it does not, Tatin will create it.
+Here we did not specify a target namespace, so the package was loaded into `#`. In case the target namespace is something like `#.MyTests` then it may or may not exist. If it does not, Tatin will create it.
 
 I> If the package or any of its dependencies depend on assets the path to a directory in the temp directory of your OS is printed to the session by `]tatin.LoadPackage`.
 I>
 I> This is because this folder cannot be deleted by Tatin. If none of the loaded packages has any assets then nothing is printed to the session, indicating that no footprint is left behind.
 
-I> When you try to execute the following statements on your own machine then you will probably see different version numbers.
 
 Tatin has created a reference named `MarkAPL` in the target namespace `#`:
 
@@ -218,11 +376,24 @@ MarkAPL
 `MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For those references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
 
 
+### Misc
+
+#### Scanning Registries
+
+The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages:
+you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. That way Tatin would find the package on your local machine.
+ 
+Later, when the package is ready, you could publish it to, say the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
+
+The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc. on it.
+
+
+
 #### Tatin Variables
 
 For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.
 
-Those variables are injected into a namespace `TatinVars` which in turn is injected into `code`.
+They are injected into a namespace `TatinVars` which in turn is injected into `code`.
 
 Some of them always exist, some of them only under certain circumstances. This is a list:
 
@@ -234,12 +405,12 @@ This is a simple character vector that stems from the file `apl-package.json` of
 
 ##### `DEPENDENCIES`
 
-A vector of character vectors with the package IDs of the packages the package in question relies on.
+A vector of character vectors with the package IDs of the packages the package in question depends on.
 
 
 ##### `HOME`
 
-Is either an empty vector or a character vector holding the path of a folder that carries assets; these are discussed next.
+Is either an empty vector or a character vector holding the path of a folder that hosts the package.
 
 
 ##### `ID`
@@ -257,144 +428,3 @@ Note that if there is no `lx` defined in a package config file, or if it is empt
 ##### `URI`
 
 Character vector that holds the address of a Tatin server or the full name of a ZIP file.
-
-
-#### Assets
-
-`MarkAPL` comes with HTML and CSS files. Therefore `MarkAPL` must be able to find those assets. This can be achieved by referring to the Tatin variable `HOME` in `#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars`:
-
-```
-      ⎕←path←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.HOME
-C:\Users\...\Temp\username_155648451/aplteam-MarkAPL-11.0.0
-      F←#._tatin.aplteam_MarkAPL_11_0_0.code.FilesAndDirs
-      ⍪⊃F.Dir path,'\'
- C:\Users...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\apl-dependencies.txt 
- C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\apl-package.json     
- C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\Files                
- C:\Users\...\Temp\username_155648451\aplteam-MarkAPL-11.0.0\MarkAPL.aplc         
-      cfg←#._tatin.aplteam_MarkAPL_11_0_0.code.TatinVars.CONFIG
-      ⎕←folder←{⍵.assets}⎕JSON⍠('Dialect' 'JSON5')⊣cfg
-Files/
-      ⍪⊃F.Dir path,'\',folder
- C:\...\aplteam-MarkAPL-11.0.0\Files\BlackOnWhite_print.css       
- C:\...\aplteam-MarkAPL-11.0.0\Files\BlackOnWhite_screen.css      
-...
-```
-
-### Installing packages permanently: `InstallPackage`
-
-Let's assume you've checked out `MarkAPL`, and that it turns out to suit your needs. You decide to use it in your application `Foo` which happens to live in `/Path2Foo/` on disk and in `#.Foo` in the workspace. 
-
-Let's also assume that the code of your application lives in `Foo.Core`, and that you want to address `MarkAPL` with `##.MarkAPL` from any function within `Foo.Core`.
-
-For that you need to execute two steps:
-
-1. Install the required packages (and implicitly all dependencies)
-2. Load all these packages
-
-#### Step 1 : installing
-
-```
-      ]TATIN.InstallPackage [tatin]aplteam-MarkAPL /Path2Foo/Packages
-```
-
-Note that we did not specify any of the major, minor and patch numbers but the Registry by alias (`[tatin]`); that tells Tatin that we want to get the very latest version of `MarkAPL` from the principal Tatin server.
-
-If you do not even specify the Registry then Tatin would scan all Registries _that have a priority greater than 0_; the first hit wins. Only then would it establish the best version on that server.
-
-A> ### Scanning Registries
-A>
-A> The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages:
-A> you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. That way Tatin would find the package on your local machine.
-A> 
-A> Later, when the package is ready, you could publish it to, say the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
-A>
-A> The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc on it.
-
-You may even omit the group name, although this would fail in case the name ("MarkAPL") is used in more than one group.
-
-Let's check what's now in `/Path2Foo/Packages`
-
-```
-      ⍪⊃⎕NINFO ⍠ 1 ⊣ '/Path2Foo/Packages\*'
- /Path2Foo/Packages/apl-buildlist.json          
- /Path2Foo/Packages/apl-dependencies.txt        
- /Path2Foo/Packages/aplteam-APLTreeUtils2-1.1.0 
- /Path2Foo/Packages/aplteam-FilesAndDirs-5.0.0  
- /Path2Foo/Packages/aplteam-MarkAPL-10.0.0      
- /Path2Foo/Packages/aplteam-OS-3.0.0            
-```
-
-The build-list defines the relationship of the packages:
-
-```
-      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-buildlist.json'1
- {                                                    
-   principal: [                                           
-     1,                                               
-     0,                                               
-     0,                                               
-     0,                                               
-   ],                                                
-   packageID: [                                       
-     "aplteam-MarkAPL-10.0.0",                        
-     "aplteam-APLTreeUtils2-1.1.0",                   
-     "aplteam-FilesAndDirs-5.0.0",                    
-     "aplteam-OS-3.0.0",                              
-   ],                                                 
-   url: [                                             
-     "https://tatin.dev/",      
-     "https://tatin.dev/", 
-     "https://tatin.dev/",  
-     "https://tatin.dev/",            
-   ],                                                 
- }                                                    
-```
-
-Notes:
-
-* `principal` is a flag that tells top-level packages (these are the ones you asked for) from dependencies.
-
-* `url` carries not the package name except when it is a ZIP file, because naturally the filename carries the package ID. However, including a ZIP file as a dependency is an exception anyway. The only reason why one might do this is testing a pre-release package.
-
-The dependencies file specifies what packages _your application_ depends on as of yet:
-
-```
-      ⍪⊃⎕NGET '/Path2Foo/Packages/apl-dependencies.txt' 1
- aplteam-MarkAPL-10.0.0 
-```
-
-#### Step 2 : loading
-
-Having the packages installed you may now load them into your application. This is achieved by the `LoadDependencies` user command:
-
-```
-      ]TATIN.LoadDependencies /Path2Foo/Packages/ #.Foo
-```
-
-As you might have guessed the folder specified as first argument must contain these two files:
-
-```
-apl-dependencies.txt
-apl-buildlist.json
-```
-
-If one or both are missing an error will be thrown.
-
-A> ### `#._tatin` versus `⎕SE._tatin`
-A> 
-A> Note that whether you specify a namespace in `#` or in `⎕SE` as the target of a `LoadDependencies` operation decides whether the packages are loaded into `#._tatin` or `⎕SE._tatin`.
-
-Let's check whether it worked:
-
-```
-      ⍪⊃#.Foo.MarkAPL.Markdown2HTML 'A paragraph' '' '* This' '* That'
- <p>A paragraph</p> 
- <ul>              
- <li>This</li>     
- <li>That</li>     
- </ul>                  
-```
-
-[^dotnetcore]: More information on .NET Core is available at <<br>>
-<https://en.wikipedia.org/wiki/.NET_Core>

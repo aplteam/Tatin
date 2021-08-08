@@ -1,4 +1,4 @@
- {r}←InitConga path;flag;counter;drc;qdmx
+ {r}←InitConga path;flag;counter;drc;qdmx;max
 ⍝ The loop is required because every now and then this error is thrown:
 ⍝ 1043  ERR_ALREADY_INITIALIZED  DLL probably loaded more than once
 ⍝ It seems that executing it again is enough to get over the hurdle
@@ -7,6 +7,7 @@
      path←(##.Client.GetMyUCMDsFolder''),'/Tatin/Assets/Runtime/Conga/'
  :EndIf
  flag←counter←0
+ max←5
  :Repeat
      :Trap 999
          :If '#'≡⊃⊃1↓⎕XSI
@@ -21,10 +22,10 @@
      :Else
          qdmx←⎕DMX
          :If ∨/'Unable to find DLL'⍷qdmx.EM
-             ⎕←'Tatin: could not find required Conga DLLs within ',{'/'@(⍸'\'=⍵)⊣⍵}path
+             6 ⎕SIGNAL⍨'Tatin: could not find required Conga DLLs within ',{'/'@(⍸'\'=⍵)⊣⍵}path
          :Else
-             :If 10=counter←counter+1
-                 ∘∘∘   ⍝ Something is very wrong here: cannot initialize Conga!
+             :If max=counter←counter+1
+                 11 ⎕SIGNAL⍨'Tatin: unable to initialze Conga; rc=',(⍕qdmx.EN)
              :Else
                  ⎕DL 0.1
              :EndIf

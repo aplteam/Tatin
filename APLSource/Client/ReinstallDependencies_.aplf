@@ -3,6 +3,10 @@
 ⍝ In case `dry` is 1 it reports to the session what it _would_ do, without actually doing anything at all.\\
  dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
  refs←⍬
+ :If ~dry
+     F.RmDir F.ListDirs installFolder,'/'
+     ⍝F.DeleteFile F.ListFiles installFolder,'/*.zip'  Nope: these must survice!
+ :EndIf
  :For i :In ⍳≢deps
      pkg←i⊃deps
      pkg←Reg.RemoveMinorAndPatch pkg

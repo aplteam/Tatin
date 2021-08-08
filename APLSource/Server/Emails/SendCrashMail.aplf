@@ -1,14 +1,32 @@
- r←SendCrashMail domain;parms;myServer;srv
- srv←⎕NS''
- srv.Server←'smtp.gmail.com'
- srv.Port←465
- srv.From←'tatin.dev@gmail.com'
- srv.Password←'A23WAWbe3E5y53CxeCJU'
- myServer←3⊃srv SendMail'' ⍝ create the server instance
- parms←⎕NS''
- parms.To←'tatin.dev@gmail.com'
- parms.CC←'kai@aplteam.com'
- parms.Subj←domain,' has crashed'
- parms.Body←'The Tatin server running under ',domain,' has crashed.'
- r←myServer SendMail parms
+ r←SendCrashMail INI;parms;myServer;srv;convert;domain;folder;list;filename
+⍝ The idea isto have a GMail address dedicated for http://[test].tatin.dev
+⍝ but we use this only to logon the Google's SMTP server: the address is not monitored.
+⍝ The real consignees are listed as "To". That way we don't have to be particularly
+⍝ concerned regarding the password.
+ :If INI.Get'EMAIL:active'
+     srv←⎕NS''
+     srv.Server←⊃INI.Get'EMAIL:SMTP_Server'
+     srv.Port←⊃INI.Get'EMAIL:Port'
+     srv.From←⊃INI.Get'EMAIL:From'
+     srv.Userid←⊃INI.Get'EMAIL:To'
+     srv.Password←⊃INI.Get'EMAIL:Password'
+     myServer←3⊃srv SendMail'' ⍝ create the server instance
+     parms←⎕NS''
+     convert←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⊆⍵}
+     parms.To←⊃INI.Get'EMAIL:To'
+     parms.CC←convert⊃INI.Get'EMAIL:CC'
+     domain←⊃INI.Get'EMAIL:Domain'
+     parms.Subj←domain,' has crashed'
+     parms.Body←⊃INI.Get'EMAIL:Body'
+     parms.Body←'<DOMAIN>'⎕R domain⊣parms.Body
+     parms.Body,←⎕UCS 13 10
+     folder←⊃INI.Get'TRAP:Folder'
+     :If 0<≢list←##.F.ListFiles folder,'*.html'
+         filename←⊃¯1↑list
+ ⍝TODO⍝          parms.Attachments←filename'text/html'
+     :EndIf
+     r←myServer SendMail parms
+ :Else
+     r←⍬
+ :EndIf
 ⍝Done

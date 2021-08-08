@@ -438,12 +438,12 @@
 
 ⍝ ------------------------ Private stuff
 
-    ∇ html←CreateListingForFnsAndOpr partlyCovered;name;lines;body;width;html2;all;testable;where;buff;i;links
+    ∇ html←CreateListingForFnsAndOpr partlyCovered;name;lines;body;width;html2;all;testable;where;buff;i;links;percent
       html←''
       links←'<a class="float-right no-print no-underline top-links" href="#top" title="Go to the top of the document">↟</a>'
       links,←'<a  class="float-right no-print no-underline top-links" href="#partly-covered" title="Go to the beginning of ''Partly-covered''">↑</a>'
       :For i :In ⍳≢partlyCovered
-          (name lines testable)←partlyCovered[i;1 2 4]
+          (name lines percent testable)←partlyCovered[i;1 2 3 4]
           body←{⍵↓⍨-+/∧\' '=⌽⍵}¨↓180⌶name
           body←(,¨'&<>')⎕R'\&amp' '\&lt;' '\&gt;'⊣body
           (1⊃body)←{⍵↑⍨¯1+⌊/⍵⍳'⍝;'}1⊃body
@@ -455,7 +455,7 @@
           html2←buff,¨html2
           (1⊃html2)←'<div class="code-block">',1⊃html2
           html2,←⊂'</div>'
-          html2←(⊂'<code class="header" id="listing_',(⍕i),'">',name,links,'</code>'),html2
+          html2←(⊂'<code class="header" id="listing_',(⍕i),'">',name,(' &mdash; ',(⍕percent),'%'),links,'</code>'),html2
           html,←html2
       :EndFor
     ∇

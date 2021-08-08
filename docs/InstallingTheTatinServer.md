@@ -99,17 +99,24 @@ This setting defines whether a user might delete a package. The setting may beco
 The principal Tatin server only allows deleting beta versions. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.
 
 
-#### `[CONFIG]Secure`
+#### The section [CONFIG]Secure
 
 Flag that defines whether certificates (https) are used nor not (http).
 
 
-#### The section `[CERTIFICATES]` 
+#### The section [CERTIFICATES]
 
 A certificate is required in case you want to use https, a must on the Internet these days.
 You probably want to use your own one.
 
 For more details on certificates see "On Certificates"
+
+
+#### The section [EMAIL]
+
+A Tatin server can send emails, broadcasting any crashed. For that you must specify a couple of things in this section.
+
+The INI file is well dcoumented, so you should have no trouble to make the necessary adjustments.
  
 
 ## On Logging
@@ -180,14 +187,12 @@ In such an event you are most likely interested in the server being restarted au
 
 Under Windows you might run the Tatin Server as a Windows Service. Such a service can be configured so that it is restarted automatically in case of a failure.
 
-Alternatively it could run as a Windows Docker Container.
-
 
 ### Linux
 
-Under these operating systems you are advised to run the Tatin Server in a Docker image. 
+Under Linux you are advised to run the Tatin Server in a Docker image. 
 
-A [Dyalog docker image](https://hub.docker.com/r/dyalog/dyalog "Link to the download page") is available for download.
+A [Dyalog docker image](https://hub.docker.com/r/aplteam/docker "Link to the download page") is available for download.
 
 
 ## Testing and Debugging

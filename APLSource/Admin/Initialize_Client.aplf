@@ -3,7 +3,13 @@
 ⍝ This function is intended to be called in development only.\\
 ⍝ It does not prepare for tests; for that call `#.Tatin.TestCases.Prepare`, which will call this function along the way.\\
  :If 'CLEAR WS'≡⎕WSID
-     {}##.FilesAndDirs.Cd ##.AcreConfig.ProjectFolder
+     :If 0<##.⎕NC'AcreConfig'                                           ⍝ Managed by acre
+         {}##.FilesAndDirs.Cd ##.AcreConfig.ProjectFolder
+     :ElseIf 2=##.PromaConfig.⎕NC'HOME'                                 ⍝ Managed by LINK
+         {}##.FilesAndDirs.Cd ##.PromaConfig.HOME
+     :Else
+         ∘∘∘ ⍝ Huuh?!
+     :EndIf
  :Else
      ##.FilesAndDirs.PolishCurrentDir
  :EndIf

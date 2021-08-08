@@ -9,7 +9,7 @@
 
  ⍝ serverArgs is one of:
  ⍝ A server definition in one of the following formats:
- ⍝   ∘ a vector of Server Port From [Password [Userid [Secure]]]
+ ⍝   ∘ a vector with: Server Port From [Password [Userid [Secure]]]
  ⍝   ∘ a namespace containing required named elements: Server Port From
  ⍝     and optionally Password Userid Secure plus any other parameters applicable to the SMTP class
  ⍝ Or
@@ -37,28 +37,40 @@
  (rc msg server)←¯1 'Nothing done' ''
  params←0
  :Select ⎕NC⊂'serverArgs'
- :Case 2.1 ⋄ params←⎕NS'' ⋄ params.(Server Port From Password Userid Secure)←''⍬'' '' '' ¯1{(≢⍺)↑⍵,⍺↓⍨≢⍵},⊆serverArgs
- :Case 9.1 ⋄ params←serverArgs
- :Case 9.2 ⋄ server←serverArgs
+ :Case 2.1
+     params←⎕NS''
+     params.(Server Port From Password Userid Secure)←''⍬'' '' '' ¯1{(≢⍺)↑⍵,⍺↓⍨≢⍵},⊆serverArgs
+ :Case 9.1
+     params←serverArgs
+ :Case 9.2
+     server←serverArgs
  :Case 0 ⍝ not defined? do nothing
- :Else ⋄ →Exit⊣(rc msg)←¯1 'Invalid serverArgs' ⍝ paranoia
+ :Else
+     →Exit⊣(rc msg)←¯1 'Invalid serverArgs' ⍝ paranoia
  :EndSelect
 
  :If params≢0
-     :Trap 0 ⋄ server←⎕NEW SMTP params
-     :Else ⋄ →Exit⊣(rc msg)←⎕DMX.(EN(EM,' while creating client'))
+     :Trap 0
+         server←⎕NEW SMTP params
+     :Else
+         →Exit⊣(rc msg)←⎕DMX.(EN(EM,' while creating client'))
      :EndTrap
      (rc msg)←0 'SMTPClient created'
  :EndIf
 
- :If ~0∊⍴messageArgs
-     :If 0∊⍴server ⋄ →Exit⊣(rc msg)←¯1 'No SMTPClient defined' ⋄ :EndIf
+ :If 0≠≢messageArgs
+     :If 0∊⍴server
+         →Exit⊣(rc msg)←¯1 'No SMTPClient defined'
+     :EndIf
      :Select ⎕NC⊂'messageArgs'
-     :Case 2.1 ⋄ msgParams←⎕NS'' ⋄ msgParams.(To Subj Body)←'' '' ''{(≢⍺)↑⍵,⍺↓⍨≢⍵},⊆messageArgs
-     :Case 9.1 ⋄ msgParams←messageArgs
-     :Else ⋄ →Exit⊣(rc msg)←¯1 'Invalid messageArgs' ⍝ paranoia
+     :Case 2.1
+         msgParams←⎕NS''
+         msgParams.(To Subj Body)←'' '' ''{(≢⍺)↑⍵,⍺↓⍨≢⍵},⊆messageArgs
+     :Case 9.1
+         msgParams←messageArgs
+     :Else
+         →Exit⊣(rc msg)←¯1 'Invalid messageArgs' ⍝ paranoia
      :EndSelect
      (rc msg log)←server.Send msgParams
  :EndIf
 Exit:
-⍝∇⍣§C:\T\SMTP\APLToolsWIP-master\SMTP\SendMail.dyalog§0§ 2021 7 18 10 24 26 0 §xuùWx§0

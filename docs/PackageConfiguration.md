@@ -17,7 +17,7 @@ This is an example:
   files: "",
   group: "aplteam",
   name: "DotNetZip",
-  project_url: "https://github.com/aplteam/DotNetZip",
+  info_url: "https://github.com/aplteam/DotNetZip",
   source: "DotNetZip.aplc",
   tags: "zip-tools;windows;mac-os;linux",
   version: "0.5.4",
@@ -26,6 +26,8 @@ This is an example:
   wx: 1,
 }
 ```
+
+This is saved in a file `apl-package.json` which must live in the root of what is a package.
 
 ## Details
 
@@ -109,7 +111,7 @@ In this particular case `api` _must not_ be defined (remain empty).
 * If `api` is set then it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what `api` is pointing to become the API.
 
 
-##### Example: restricting what's "public"
+##### Restricting what's "public"
 
 The user might want to expose only a subset of functions/operators of a namespace (classes have a public interface anyway), and in that case the user must not only specify `api`, but also structure her code accordingly.
 

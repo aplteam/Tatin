@@ -37,7 +37,7 @@
      ⎕DL 0.1
      ⎕WSID←targetPath,'/Server'
      #.⎕EX'Make_'
-     ⎕SE.⎕EX ⎕SE.⎕NL⍳16             ⍝ Attempt to avoid the "Reference in ⎕SE points to #"
+     ⎕SE.⎕EX ⎕SE.⎕NL⍳16             ⍝ Attempt to avoid "Reference in ⎕SE points to #" (⎕JSON bug)
      'Plodder' 'RumbaLean'#.Tatin.⎕CY'./Assets/Runtime/Plodder/Plodder'
      0 ⎕SAVE ⎕WSID
      F.RmDir targetPath,'/Assets/'
@@ -46,6 +46,7 @@
      ⎕DL 0.1
      Assert F.IsDir targetPath,'/Assets/'
      targetPath ⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/'
+     (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./InstallAsWindowsService.dws'
      (targetPath,'/server.ini')⎕NCOPY⍠('IfExists' 'Replace')⊣'./server.ini.RemoveMe'
      F.RmDir'Dist/Server/Assets/RunTime/Plodder'
      F.DeleteFile¨F.Dir'Dist/Tatin-Server-*.zip'

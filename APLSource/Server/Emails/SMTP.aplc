@@ -4,64 +4,65 @@
 ⍝ Updated by Morten Kromberg to use UTF-8 text, 2009
 ⍝ Updated by Brian Becker in jan2011 to make compatible with Unix and Unicode
 ⍝ Updated by Brian Becker in mar2019 to use Conga, make it a class, etc
+⍝ Updated by Kai Jaeger 2021-07: better traceable & bug fixes
 
     (⎕IO ⎕ML)←1
 
-    :field public Server←''   ⍝ server address
-    :field public Port←⍬      ⍝ server port (default depends on whether running 587 or 465 (secure))
-    :field public From←''     ⍝ default from address for new messages
-    :field public Userid←''   ⍝ userid for authentication (defaults to From)
-    :field public Domain←''   ⍝ fully qualified domain name for EHLO command
-    :field public Org←''      ⍝ optional organization
-    :field public ReplyTo←''  ⍝ optional reply to email address
-    :field public Password←'' ⍝ optional password (if server requires authentication)
-    :field public XMailer←'Dyalog SMTP Client 1.1.0'  ⍝ client identifier
-    :field public Secure←¯1   ⍝ indicates whether to use SSL/TLS, 0 = no, 1 = yes, ¯1 = let port number determine
-    :field public TLSFlags←32 ⍝ by default, accept server certificate without validating (see Conga User Guide Appendix C)
-    :field public CongaRootName←'SMTP'
+    :Field public Server←''   ⍝ server address
+    :Field public Port←⍬      ⍝ server port (default depends on whether running 587 or 465 (secure))
+    :Field public From←''     ⍝ default from address for new messages
+    :Field public Userid←''   ⍝ userid for authentication (defaults to From)
+    :Field public Domain←''   ⍝ fully qualified domain name for EHLO command
+    :Field public Org←''      ⍝ optional organization
+    :Field public ReplyTo←''  ⍝ optional reply to email address
+    :Field public Password←'' ⍝ optional password (if server requires authentication)
+    :Field public XMailer←'Dyalog SMTP Client 1.1.0'  ⍝ client identifier
+    :Field public Secure←¯1   ⍝ indicates whether to use SSL/TLS, 0 = no, 1 = yes, ¯1 = let port number determine
+    :Field public TLSFlags←32 ⍝ by default, accept server certificate without validating (see Conga User Guide Appendix C)
+    :Field public CongaRootName←'SMTP'
 
-    :field public shared CongaRef←''   ⍝ user-supplied reference to location of Conga namespace
-    :field public shared LDRC←''       ⍝ reference to Conga library instance after CongaRef has been resolved
+    :Field public shared CongaRef←''   ⍝ user-supplied reference to location of Conga namespace
+    :Field public shared LDRC←''       ⍝ reference to Conga library instance after CongaRef has been resolved
 
-    :field _clt←''             ⍝ Conga client id
-    :field _loggedOn←0
-    :field _EHLOResponse←''
-    :field _conx←''            ⍝ Conga connection id
+    :Field _clt←''             ⍝ Conga client id
+    :Field _loggedOn←0
+    :Field _EHLOResponse←''
+    :Field _conx←''            ⍝ Conga connection id
 
     ∇ r←Version
       :Access public shared
-      r←'SMTP' '1.3' '2021-03-02'
+      r←'SMTP' '1.4' '2021-07-242'
     ∇
 
-    :property EHLOResponse
-    :access public
+    :Property EHLOResponse
+    :Access public
         ∇ r←get
           r←_EHLOResponse
         ∇
-    :endproperty
+    :EndProperty
 
-    :property Clt  ⍝ client
-    :access public
+    :Property Clt  ⍝ client
+    :Access public
         ∇ r←get
           r←_clt
         ∇
-    :endproperty
+    :EndProperty
 
-    :property Conx  ⍝ client connection
-    :access public
+    :Property Conx  ⍝ client connection
+    :Access public
         ∇ r←get
           r←_conx
         ∇
-    :endproperty
+    :EndProperty
 
-    :property LoggedOn  ⍝ has authentication taken place?
-    :access public
+    :Property LoggedOn  ⍝ has authentication taken place?
+    :Access public
         ∇ r←get
           r←_loggedOn
         ∇
-    :endproperty
+    :EndProperty
 
-    :section Utilities
+    :Section Utilities
     if←⍴⍨
     unless←↓⍨
     okay←{0=⊃⍺.(rc msg log)←{3↑⍵,(≢⍵)↓¯99 '' ''},⊆⍵}
@@ -146,7 +147,7 @@
     ⍝ Create a mew message instance
       r←⎕NEW Message args
       r.Client←⎕THIS
-      r.(From XMailer ReplyTo Org)←r.(From XMailer ReplyTo Org){0∊⍴⍺:⍵ ⋄ ⍺}¨From XMailer ReplyTo Org
+      r.(From XMailer ReplyTo Org)←r.(From XMailer ReplyTo Org){0=≢⍺:⍵ ⋄ ⍺}¨From XMailer ReplyTo Org
     ∇
 
     ∇ (rc msg log)←Send mail;logIt;message;text;rec
@@ -161,8 +162,12 @@
       (rc msg log)←¯1 '' ''
      
       ⍝ If one of Userid or From is specified, use it for both
-      :If 0∊⍴Userid ⋄ Userid←From ⋄ :EndIf
-      :If 0∊⍴From ⋄ From←Userid ⋄ :EndIf
+      :If 0∊⍴Userid
+          Userid←From
+      :EndIf
+      :If 0∊⍴From
+          From←Userid
+      :EndIf
      
       →Exit if 0<≢msg←(0∊⍴From)/'No From address specified'
       :If 0=mail.⎕NC'From'
@@ -219,7 +224,9 @@
     ∇ (rc msg)←Connect;r;uid;dom;cert
       :Access public
       (rc msg)←¯1 ''
-      :If 0∊⍴Server ⋄ →Exit⊣msg←'Server not defined' ⋄ :EndIf
+      :If 0∊⍴Server
+          →Exit⊣msg←'Server not defined'
+      :EndIf
      
       :If 0∊⍴Port ⍝ if port not specified, select default based on Secure
           Port←(1+0⌈Secure)⊃587 465
@@ -305,16 +312,16 @@
       uid←(1+0∊⍴Userid)⊃Userid From
       →Exit if~0∊⍴msg←(0∊⍴uid)/'No Userid or From address specified'
       auth←' '(≠⊆⊢)8↓⊃auth
-      →((⊂'LOGIN')∊auth)/LOGIN
-      →((⊂'PLAIN')∊auth)/PLAIN
-      →Exit⊣msg←'Only AUTH LOGIN or AUTH PLAIN are currently supported'
-     LOGIN:
-      →Exit if 0≠⊃(rc msg)←Do'AUTH LOGIN'
-      →Exit if 0≠⊃(rc msg)←Do Message.base64enc uid
-      →Exit⊣rc msg←Do Message.base64enc Password
-     PLAIN:
-      →Exit if 0≠⊃(rc msg)←Do'AUTH PLAIN'
-      →Exit⊣rc msg←Do Message.base64enc uid,(⎕UCS 0),uid,(⎕UCS 0),Password
+      :If (⊂'LOGIN')∊auth
+          →Exit if 0≠⊃(rc msg)←Do'AUTH LOGIN'
+          →Exit if 0≠⊃(rc msg)←Do Message.base64enc uid
+          (rc msg)←Do Message.base64enc Password
+      :ElseIf (⊂'PLAIN')∊auth
+          →Exit if 0≠⊃(rc msg)←Do'AUTH PLAIN'
+          (rc msg)←Do Message.base64enc uid,(⎕UCS 0),uid,(⎕UCS 0),Password
+      :Else
+          'Only authentication methods LOGIN and PLAIN are currently supported'⎕SIGNAL 11
+      :EndIf
      Exit:
       _loggedOn←0=rc
     ∇
@@ -442,25 +449,25 @@
         :Field public Headers←''      ⍝ vector of ('name' 'value')
         :Field public XMailer←''
         :Field public Body←''         ⍝ character vector 'content' or vector of ('MIMEType' 'content')
-        :Field public Attachments←''  ⍝ vector of ('filename' 'MIMEType' {'content'|''})
+        :Field public Attachments←''  ⍝ vector of ('filename' 'MIMEType' ['content'|''])
         :Field public Client          ⍝ reference to SMTP client that created this
 
         :Field _text←''
-        :field _recipients←''
+        :Field _recipients←''
 
-        :property Text
-        :access public
+        :Property Text
+        :Access public
             ∇ r←Get
               r←_text
             ∇
-        :endproperty
+        :EndProperty
 
-        :property Recipients
-        :access public
+        :Property Recipients
+        :Access public
             ∇ r←Get
               r←_recipients
             ∇
-        :endproperty
+        :EndProperty
 
         default←{0∊⍴⍺ : ⍵ ⋄ ⍺}
 
@@ -489,11 +496,19 @@
           :Access public
         ⍝ Compose email content
           (rc msg text)←¯1 '' ''
-          :If 0∊⍴From ⋄ →Exit⊣msg←'"From" is not defined' ⋄ :EndIf
-          :If 0∊⍴Subj ⋄ →Exit⊣msg←'"Subj" is not defined' ⋄ :EndIf
-          :If (0∊⍴Body)∧0∊⍴Attachments ⋄ →Exit⊣msg←'No body or attachments are defined' ⋄ :EndIf
+          :If 0∊⍴From
+              →Exit⊣msg←'"From" is not defined'
+          :EndIf
+          :If 0∊⍴Subj
+              →Exit⊣msg←'"Subj" is not defined'
+          :EndIf
+          :If (0∊⍴Body)∧0∊⍴Attachments
+              →Exit⊣msg←'No body or attachments are defined'
+          :EndIf
           MakeRecipients
-          :If 0∊⍴Recipients ⋄ →Exit⊣msg←'No recipients are defined' ⋄ :EndIf
+          :If 0∊⍴Recipients
+              →Exit⊣msg←'No recipients are defined'
+          :EndIf
          
           addHeader←{
               ⍵∧.=' ':''
@@ -511,10 +526,10 @@
           text,←'Subject'addHeader Subj ⍝ the message subject
          
           :If haveAtts←~0∊⍴Attachments ⍝ Any attachments?
-              boundary←'------',(∊⍕¨⎕TS),'.DyalogSMTP',CRLF ⍝ construct a boundary for attachments
+              boundary←'------',((⍕⎕TS)~' '),'DyalogSMTP',CRLF ⍝ construct a boundary for attachments
               text,←'Content-Type'addHeader'multipart/mixed; boundary="',(¯2↓boundary),'"'
               text,←CRLF
-              text,←'This is a multi-part message in MIME format.',CRLF
+⍝              text,←'This is a multi-part message in MIME format.',CRLF
               text,←'--',boundary
           :EndIf
          
@@ -525,10 +540,10 @@
               :EndIf
               :If 0∊⍴mime
                   mime←(1+'<html'≡0(819⌶)5↑body)⊃'plain' 'html'
-                  mime←'text/',mime,'; charset=utf-8;'
+                  mime←'text/',mime,'; charset="UTF-8"'
               :EndIf
               text,←'Content-Type'addHeader mime
-              text,←'Content-Transfer-Encoding'addHeader'8bit'
+⍝ ⍝TODO⍝ Google does not do this?!              text,←'Content-Transfer-Encoding'addHeader'8bit'
               text,←CRLF
               text,←⎕UCS'UTF-8'⎕UCS body
               text,←CRLF
@@ -540,14 +555,14 @@
               Attachments←FormatAttachments Attachments
          
               :For i :In ⍳n←≢Attachments
-                  :If 0∊⍴att←i Attachment i⊃,Attachments
+                  :If 0∊⍴att←i ProcessAttachment i⊃,Attachments
                       msg←'Error processing attachment ',(⍕i),', file="',(1⊃i⊃Attachments),'"'
                       →Exit
                   :EndIf
                   text,←att
                   text,←boundary
                   :If i=n ⍝ last attachment?
-                      text←(¯2↓text),'--',CRLF
+                      text←(¯2↓text),'--',CRLF,CRLF
                   :EndIf
               :EndFor
           :EndIf
@@ -563,11 +578,11 @@
         ∇ atts←FormatAttachments atts
           :Access public shared
           :Select |≡atts
-          :CaseList 0 1  ⍝ 'filename'
+          :CaseList 0 1  ⍝ filename
               atts←,⊂(⊂,atts),'' ''
-          :Case 2   ⍝ 'filename' 'mimetype' {'content'}
+          :Case 2   ⍝ filename mimetype
               atts←,⊂atts
-          :Case 3   ⍝ ('filename' 'mimetype')('filename' '
+          :Case 3   ⍝ filename mimetype content
           :EndSelect
         ∇
 
@@ -576,7 +591,7 @@
           r←Client.Send ⎕THIS
         ∇
 
-        ∇ r←i Attachment arg;mime;content;file;name
+        ∇ r←i ProcessAttachment arg;mime;content;file;name
           (file mime content)←3↑(⊆arg),'' '' ''
           :If 0∊⍴file
               name←'Attachment-',(⍕i),,'<->,4ZI2,<.>,ZI3'⎕FMT 1 5⍴2↓⎕TS  ⍝ make an arbitrary one
@@ -587,11 +602,13 @@
               :EndIf
           :EndIf
           r←''
-          :If ~0∊⍴content
-              :If 0∊⍴mime ⋄ mime←'application/octet-stream' ⋄ :EndIf
-              r←'Content-Type: ',mime,'; name="',name,'"',CRLF
-              r,←'Content-Transfer-Encoding: base64',CRLF
-              r,←'Content-Disposition: attachment; filename="',name,'"',CRLF,CRLF
+          :If 0≠≢content
+              :If 0∊⍴mime
+                  mime←'application/octet-stream'
+              :EndIf
+              r←'Content-Type: ',mime,'; charset="US-ASCII"; name="',name,'"',CRLF
+              r,←'Content-Disposition: attachment; filename="',name,'"',CRLF
+              r,←'Content-Transfer-Encoding: base64',CRLF,CRLF
               r,←chunk base64enc content
           :EndIf
         ∇
@@ -768,14 +785,16 @@
         beginsWith←{⍵≡(≢⍵)↑⍺}
     :EndClass
 
-    :section Conga
+    :Section Conga
     ∇ (rc msg)←Init rootname;ref;root;nc;class;dyalog;n;ns;congaCopied
       (rc msg)←¯1 ''
       ⍝↓↓↓ Check is LDRC exists (VALUE ERROR (6) if not), and is LDRC initialized? (NONCE ERROR (16) if not)
       :Hold 'SMTPInit'
           :If {6 16 999::1 ⋄ ''≡LDRC:1 ⋄ 0⊣LDRC.Describe'.'}''
               LDRC←''
-              :If 9=#.⎕NC'Conga' ⋄ {#.Conga.X509Cert.LDRC←''}⍬ ⋄ :EndIf ⍝ if #.Conga exists, reset X509Cert.LDRC reference
+              :If 9=#.⎕NC'Conga'
+                  {#.Conga.X509Cert.LDRC←''}⍬ ⍝ if #.Conga exists, reset X509Cert.LDRC reference
+              :EndIf
               :If ~0∊⍴CongaRef  ⍝ did the user supply a reference to Conga?
                   LDRC←rootname ResolveCongaRef CongaRef
                   :If ''≡LDRC
@@ -785,7 +804,9 @@
               :Else
                   :For root :In ##.## #
                       ref nc←root{1↑¨⍵{(×⍵)∘/¨⍺ ⍵}⍺.⎕NC ⍵}ns←(-~0∊⍴rootname)↓'Conga' 'DRC' ⍝ if rootname is supplied, can only use Conga (no DRC)
-                      :If 9=⊃⌊nc ⋄ :Leave ⋄ :EndIf
+                      :If 9=⊃⌊nc
+                          :Leave
+                      :EndIf
                   :EndFor
                   :If 9=⊃⌊nc
                       LDRC←rootname ResolveCongaRef root⍎∊ref

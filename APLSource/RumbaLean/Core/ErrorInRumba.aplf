@@ -1,0 +1,21 @@
+ {r}←ErrorInRumba server;qdmx;msg;TRAP
+
+ :If 9=#.⎕NC'ErrorParms'                    ⍝ Kai: with Plodder we want save error information
+ :AndIf 9=##.##.⎕NC'HandleError'
+     ##.##.HandleError.Process #.ErrorParms
+ :Else
+     qdmx←⎕DMX
+     msg←'Rumba Error: ',⍕2↑qdmx.DM
+     :Trap 0
+         {}server LogRumba'Rumba Error: ',msg
+     :EndTrap
+ :EndIf
+
+ :If 3501⌶0                                 ⍝ Kai: If connected to Ride we don't ⎕OFF for obvious reasons
+     TRAP←⎕TRAP
+     ⎕TRAP←0 'S'
+     ∘∘∘                                    ⍝ Check it out, dear ⎕AN
+ :EndIf
+
+ ⎕OFF 125                                   ⍝ Kai:
+⍝Done

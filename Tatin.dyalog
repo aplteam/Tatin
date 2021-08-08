@@ -1,5 +1,8 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.29.2 - 2021-08-07
+⍝   * `Ping` has no -all option anymore: specifying no argument  allows yiu now to select all
+⍝   * `LoadDependencies` and `LoadPackage` now load into # in case no target space is specified
 ⍝ * 0.29.1 - 2021-06-24
 ⍝   * `Ping` was buggy
 ⍝ * 0.29.0 - 2021-06-14
@@ -120,7 +123,7 @@
           c←⎕NS ⍬
           c.Name←'LoadPackage'
           c.Desc←'Load the package specified in the argument and all dependencies into the WS or ⎕SE'
-          c.Parse←'2 -nobetas'
+          c.Parse←'1-2 -nobetas'
           r,←c
      
           c←⎕NS ⍬
@@ -138,7 +141,7 @@
           c←⎕NS ⍬
           c.Name←'LoadDependencies'
           c.Desc←'Takes a folder (⍵[1]) with installed packages and loads all of them into ⍵[2].'
-          c.Parse←'2 -overwrite'
+          c.Parse←'1-2 -overwrite'
           r,←c
      
           c←⎕NS ⍬
@@ -228,7 +231,7 @@
           c←⎕NS ⍬
           c.Name←'Ping'
           c.Desc←'Ping a Tatin Registry with very little overhead'
-          c.Parse←'1s -all'
+          c.Parse←'1s'
           r,←c
      
           r.Group←⊂NM
@@ -345,7 +348,11 @@
 
     ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag
       installFolder←Arg._1
-      targetSpace←Arg._2
+      :If 0≡Arg._2
+          targetSpace←,'#'
+      :Else
+          targetSpace←,Arg._2
+      :EndIf
       overwriteFlag←Arg.overwrite
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
       f1←TC.F.IsDir installFolder
@@ -450,7 +457,6 @@
       :If 0≡Arg._1
           →(⍬≡uri←SelectRegistry 0)/0
       :EndIf
-      'The "Delete" policy can only be requested from a Tatin server'Assert TC.Reg.IsHTTP uri
       r←TC.GetDeletePolicy uri
     ∇
 
@@ -630,6 +636,9 @@
 
     ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn
       (identifier targetSpace)←Arg.(_1 _2)
+      :If 0≡targetSpace
+          targetSpace←,'#'
+      :EndIf
       :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
           '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       :EndIf
@@ -790,7 +799,7 @@
     ∇ r←Ping Arg;registry;registries
       r←⍬
       registry←Arg._1
-      :If Arg.all
+      :If 0≢Arg._1   ⍝ No argument specified? We ping all we know about!
           r←0 2⍴⍬
           :If 0<≢registries←GetListOfRegistriesForSelection 0
           :AndIf 0<≢registries←(TC.Reg.IsHTTP¨registries[;1])⌿registries
@@ -799,11 +808,12 @@
           :EndIf
       :Else
           :If 0≡registry
-          :AndIf 0=≢registry←SelectRegistry 0
+          :AndIf 0=≢registries←1 SelectRegistry 0
               :Return
           :EndIf
-          :If 0≠≢registry
-              r←TC.Ping registry
+          :If 0≠≢registries
+              ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
+              r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries
           :EndIf
       :EndIf
     ∇
@@ -912,12 +922,12 @@
           r,←⊂'* By default the output is aggregated. Specify -noaggr if you want the full list.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
-          r,←⊂'Load the specified package and all its dependencies into the workspace'
+          r,←⊂'Loads the specified package and all its dependencies into the workspace'
           r,←⊂''
           r,←⊂'A) First argument:'
           r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
           r,←⊂''
-          r,←⊂'B) Second argument: target namespace'
+          r,←⊂'B) Second (optional) argument: target namespace (defaults to #)'
           r,←⊂'   Must be the fully qualified name of a namespace the package will be loaded into.'
           r,←⊂'   May be # or ⎕SE or a sub-namespace of any level'
           r,←⊂''
@@ -932,9 +942,10 @@
           r,←⊂'  ]TATIN.LoadPackage [tatin]A@APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage APLTreeUtils2 #'
           r,←⊂'  ]TATIN.LoadPackage A@APLTreeUtils2 #'
+          r,←⊂'  ]TATIN.LoadPackage A@APLTreeUtils2'
           r,←⊂'  ]TATIN.LoadPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ #'
           r,←⊂''
-          r,←⊂'Returns fully qualified name of the package established in the target space'
+          r,←⊂'Returns the fully qualified name of the package established in the target space'
       :Case ⎕C'InstallPackage'
           r,←⊂'Installs the given package and all its dependencies into the given folder.'
           r,←⊂'If the package is already installed, it (as well as any dependencies) will be'
@@ -963,9 +974,9 @@
           r,←⊂''
           r,←⊂'The -quiet flag comes handy with test cases.'
       :Case ⎕C'LoadDependencies'
-          r,←⊂'Takes two arguments:'
-          r,←⊂'[1] A folder into which one or more packages have been installed.'
-          r,←⊂'[2] A namespace into which the packages are going to be loaded.'
+          r,←⊂'Takes up to two arguments:'
+          r,←⊂'[1] A folder into which one or more packages have been installed'
+          r,←⊂'[2] Optional: a namespace into which the packages are going to be loaded; default is #'
           r,←⊂''
           r,←⊂'By default a package is not loaded if it already exists. You can enforce the load by'
           r,←⊂'specifying the -overwrite flag.'
@@ -1096,36 +1107,40 @@
           r,←⊂'Puts https://tatin.dev/v1/documentation into the default browser'
       :Case ⎕C'ReinstallDependencies'
           r,←⊂''
-          r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt'
-          r,←⊂'All files and folders but the dependency file are removed from the folder and then the'
-          r,←⊂'packages are installed from scratch.'
+          r,←⊂'Re-installs all principle packages as well as all dependencies from scratch.'
+          r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
+          r,←⊂'All installed packages are removed from the folder before a new build list is compiled and then'
+          r,←⊂'used to install all packages from scratch.'
           r,←⊂''
-          r,←⊂'Note that this does not install any better versions ever. In fact as a side effect of minimmal'
-          r,←⊂'version selection you might end up with an older version under specific (and rare) circumstances.'
+          r,←⊂'Notes:'
+          r,←⊂'* This does not install a better version from the same server ever. In fact as a side'
+          r,←⊂'  effect of minimmal version selection you might end up with an older version under specific'
+          r,←⊂'  (and pretty rare) circumstances. However, due to the scanning of registries you might get a '
+          r,←⊂'  better version than before from a different server.'
+          r,←⊂'* ZIP files are not removed upfront and have higher priority than registries, so when the'
+          r,←⊂'  dependency list refers to a ZIP file then this will always survive.'
           r,←⊂''
-          r,←⊂'All defined Registries are scanned but one can specify a particular Registry as second'
-          r,←⊂'(optional) argument.'
+          r,←⊂'All defined Registries with a priority greater than 0 are scanned but one can specify a'
+          r,←⊂'particular Registry as second (optional) argument.'
+          r,←⊂''
+          r,←⊂'-force   Prevents the command from asking the user, and does not report to the session either.'
+          r,←⊂'-dry     Makes the user command report what it would do without actually doing anything at all.'
+          r,←⊂'-nobetas By default betas are included; change by specifying the -nobetas flag.'
           r,←⊂''
           r,←⊂'Examples:'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin]'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas'
-          r,←⊂''
-          r,←⊂'-force prevent the command from asking the user, and does not report to the session either.'
-          r,←⊂'-dry   makes the user command report what it would do without actually doing anything at all.'
-          r,←⊂''
-          r,←⊂'By default betas are included but this can be changed by specifying the -nobetas flag.'
+          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas -dry'
+          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas -force'
       :Case ⎕C'Ping'
           r,←⊂'Useful to find out whether a Tatin Server is alive and respondig. Returns a Boolean (1=success)'
           r,←⊂''
           r,←⊂'You may specify a Registry alias or a Registry URL.'
-          r,←⊂'If you specify no argument you will be prompted for a Registry'
-          r,←⊂''
-          r,←⊂'You may also specify a flag -all. If you do a matrix with two columns is returned:'
+          r,←⊂'If you specify no argument you will be prompted for one ore or more of the defined Registries.'
+          r,←⊂'In any case a matrix with two columns is returned:'
           r,←⊂' [;1] is a Boolean (a=success)'
           r,←⊂' [;2] is a Registry URL or, if there is one defined, an alias'
-          r,←⊂''
-          r,←⊂'Note that if -all is specified then any argument is ignored.'
       :Else
           r←'Unknown command: ',Cmd
       :EndSelect
@@ -1322,14 +1337,19 @@
       r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
     ∇
 
-    ∇ registry←SelectRegistry type;row;list
+    ∇ registry←{all}SelectRegistry type;row;list
+      all←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'all'
       :If 1=≢list←GetListOfRegistriesForSelection type
           registry←1⊃list[1;]
       :Else
-          :If ⍬≡row←'Select Tatin Registry'Select↓⎕FMT⌽list[;1 2]
+          :If ⍬≡row←'Select Tatin Registry'all Select↓⎕FMT⌽list[;1 2]
               registry←⍬
           :Else
-              registry←1⊃list[row;]
+              :If all
+                  registry←list[,row;1]
+              :Else
+                  registry←1⊃list[row;]
+              :EndIf
           :EndIf
       :EndIf
     ∇

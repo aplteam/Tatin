@@ -111,6 +111,13 @@
         ∇
     :EndProperty
 
+    :Property json
+    :Access Public Instance
+        ∇ r←get
+          r←GetJSON5
+        ∇
+    :EndProperty
+
     ∇ {r}←AddRegistry y;registry;name;alias;buff;reg
    ⍝ Adds the definition of a Registry (as a namespace) to the user settings.\\
    ⍝ If that Registry is already defined an error is thrown.\\
@@ -257,15 +264,13 @@
       :EndIf
     ∇
 
-    ∇ {r}←Save flag;ns;tmp;del
+    ∇ {r}←Save flag;tmp;del;json
       :Access Public Instance
       r←⍬
       :If flag
-          ns←⎕NS''
-          ns.registries←_registries
-          ns.source←_source
+          json←GetJSON5
           tmp←'tmp'F.GetTempFilename2 cfg_name
-          {}(⊂home.Reg.JSON ns)F.NPUT tmp 1
+          {}(⊂json)F.NPUT tmp 1
           {}F.DeleteFile path2config
           {}path2config ⎕NMOVE tmp
           _fileTimestamp←GetFileTimestamp _path2config
@@ -288,6 +293,13 @@
 ⍝ ------------------- Private stuff
 
     Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 98 ⋄ shy←0}
+
+    ∇ r←GetJSON5;ns
+      ns←⎕NS''
+      ns.registries←_registries
+      ns.source←_source
+      r←home.Reg.JSON ns
+    ∇
 
     ∇ bool←EqualsAliasOrName y;alias;uri;msg
     ⍝ Returns a vector of booleans.\\
@@ -314,7 +326,7 @@
           :If 1
               _registries←ns.registries[⍋ns.registries.priority]
           :Else
-              ⍝TODO⍝ 
+              ⍝TODO⍝
               ⍝ This avoids an orphaned reference lingering around but at the
               ⍝ same time it leads to a ref  into # from ⎕SE because ⎕JSON does not allow something like #.⎕JSON (yet)
               _registries←⎕SE.⎕JSON⍣2 ns.registries[⍋ns.registries.priority]  ⍝ To avoids creating an orphaned ref once `ns` disappears (14888, <01851>)

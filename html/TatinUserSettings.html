@@ -18,33 +18,26 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <label id="hide_toc_label" for="hide_toc"></label>
 <div class="toc-container">
 <ul>
+<li><a href="#Tatin-User-Settings">Tatin User Settings</a>
+<ul>
 <li><a href="#Introduction">Introduction</a>
 <ul>
 <li><a href="#The-default-file">The default file</a></li>
-<li><a href="#Where-does-it-live">Where does it live?</a></li>
-<li><a href="#Whats-the-name-of-that-file">What's the name of that file?</a></li>
-<li><a href="#May-I-edit-it">May I edit it?</a></li>
+<li><a href="#Where-does-the-file-live">Where does the file live?</a></li>
+<li><a href="#Whats-the-name-of-the-file">What's the name of the file?</a></li>
+<li><a href="#May-I-edit-the-file">May I edit the file?</a></li>
 <li><a href="#What-does-Tatin-do-at-start-up-time">What does Tatin do at start-up time?</a></li>
-<li><a href="#Synchronizing-file-and-workspace">Synchronizing file and workspace</a>
-<ul>
-<li><a href="#Changes-made-to-the-file">Changes made to the file</a></li>
-<li><a href="#Changes-made-in-the-workspace">Changes made in the workspace</a></li>
-<li><a href="#Comments">Comments</a></li>
-</ul></li>
+<li><a href="#Synchronizing-file-and-workspace">Synchronizing file and workspace</a></li>
 <li><a href="#Summary">Summary</a></li>
 </ul></li>
 <li><a href="#Adding-and-removing-Registries">Adding and removing Registries</a>
 <ul>
-<li><a href="#What-have-we-got">What have we got?</a>
-<ul>
-<li><a href="#Create-an-instance-of-the-DefineRegistry-class">Create an instance of the <code>DefineRegistry</code> class.</a></li>
-<li><a href="#Settings-in-der-file">Settings in der file</a></li>
-<li><a href="#Adding-the-Registry">Adding the Registry</a></li>
-</ul></li>
+<li><a href="#What-have-we-got">What have we got?</a></li>
 </ul></li>
 <li><a href="#Putting-the-user-config-file-elsewhere">Putting the user config file elsewhere</a>
 <ul>
 <li><a href="#Make-the-switch-permanent">Make the switch permanent</a>
+</li></ul></li>
 </li></ul></li>
 </ul>
 </div>
@@ -61,6 +54,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Tatin uses a file to remember all Tatin Registries you want to work with, and possibly other user-specific settings as well. We refer to this file as the user settings file.</p>
 <p>When you start using Tatin for the very first time with 18.0 or 18.1 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location.</p>
+<p>Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instanciate the <code>Tatin.UserSettings</code> class. The instance is assigned to <code>⎕SE.Tatin.MyUserSettings</code>. From then on any changes to the file with an external editor <em>does not</em> affect <code>⎕SE.Tatin.MyUserSettings</code>!</p>
+<p><code>⎕SE.Tatin.MyUserSettings</code> provides a number of properties that can be questioned as well as a number of methods that can be issued in order to manipulate the user settings.</p>
+<p>This call:</p>
+<pre><code>      ]Tatin.Listregistries -all
+ URI                 Alias                    Port  Priority  API-key
+ ------------------  -----------------------  ----  --------  ------------------------------------
+ tatin               https://tatin.dev/          0       100  xxxxxxx
+ tatin-test          https://test.tatin.dev/     0        10  Tatin-Test-API-Key
+</code></pre>
+<p>Shows most of the data that is saved in the user settings.</p>
 <div class="h_tag">
 <a href="#The-default-file" id="The-default-file" class="autoheader_anchor">
 <h3 data-id="The-default-file">The default file</h3>
@@ -75,27 +78,27 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>It has a priority of <code>0</code> assigned to it which means that it will <em>not</em> participate in Registry scans. Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is <code>0</code> or less.</p></li>
 </ul>
 <div class="h_tag">
-<a href="#Where-does-it-live" id="Where-does-it-live" class="autoheader_anchor">
-<h3 data-id="Where-does-it-live">Where does it live?</h3>
+<a href="#Where-does-the-file-live" id="Where-does-the-file-live" class="autoheader_anchor">
+<h3 data-id="Where-does-the-file-live">Where does the file live?</h3>
 </a>
 </div>
 <p>This default file will be created in the user's home folder; the API function <code>⎕SE.Tatin.GetUserHomeFolder''</code> does return that folder.</p>
 <div class="h_tag">
-<a href="#Whats-the-name-of-that-file" id="Whats-the-name-of-that-file" class="autoheader_anchor">
-<h3 data-id="Whats-the-name-of-that-file">What's the name of that file?</h3>
+<a href="#Whats-the-name-of-the-file" id="Whats-the-name-of-the-file" class="autoheader_anchor">
+<h3 data-id="Whats-the-name-of-the-file">What's the name of the file?</h3>
 </a>
 </div>
 <p>The name of the file is <code>tatin-client.json</code>.</p>
 <div class="h_tag">
-<a href="#May-I-edit-it" id="May-I-edit-it" class="autoheader_anchor">
-<h3 data-id="May-I-edit-it">May I edit it?</h3>
+<a href="#May-I-edit-the-file" id="May-I-edit-the-file" class="autoheader_anchor">
+<h3 data-id="May-I-edit-the-file">May I edit the file?</h3>
 </a>
 </div>
 <p>Of course you are free to edit that file with any editor. However, keep in mind that you are in charge for making sure that the contents of the file is valid JSON5[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]: if it's not, Tatin will crash.</p>
-<p>If you are familiar with JSON5 syntax and want to edit the file it is recommended to use</p>
+<p>If you are familiar with JSON5 syntax and want to edit the file it is recommended to use:</p>
 <pre><code>]TATIN.Usersettings -edit</code></pre>
-<p>This will allow you to edit the file, but Tatin will check the file afterwards in order to make sure that nothing invalid goes ever into the file.</p>
-<p>Note that Dyalog 18.1 and later recognise JASON5 and highlights any syntax errors which can be quite useful.</p>
+<p>This will allow you to edit the file contents, but Tatin will check it afterwards in order to make sure that nothing invalid goes ever into the file.</p>
+<p>Note that Dyalog 18.1 and later recognise JSON5 and highlight any syntax errors which can be quite useful.</p>
 <div class="h_tag">
 <a href="#What-does-Tatin-do-at-start-up-time" id="What-does-Tatin-do-at-start-up-time" class="autoheader_anchor">
 <h3 data-id="What-does-Tatin-do-at-start-up-time">What does Tatin do at start-up time?</h3>

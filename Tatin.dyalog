@@ -111,7 +111,7 @@
           c←⎕NS ⍬
           c.Name←'ListRegistries'
           c.Desc←'Lists all registries defined in the user settings'
-          c.Parse←'0 -raw -all'
+          c.Parse←'0 -raw -full'
           r,←c
      
           c←⎕NS ⍬
@@ -147,7 +147,7 @@
           c←⎕NS ⍬
           c.Name←'UserSettings'
           c.Desc←'The user settings and the fully qualified filenanme are printed to ⎕SE as JSON'
-          c.Parse←'0 -edit -apikey'
+          c.Parse←'0 -edit -apikey -refresh'
           r,←c
      
           c←⎕NS ⍬
@@ -580,8 +580,8 @@
       :If 0≢Arg.Switch'raw'
           rawFlag←Arg.Switch'raw'
       :EndIf
-      :If 0≢Arg.Switch'all'
-          type←Arg.Switch'all'
+      :If 0≢Arg.Switch'full'
+          type←Arg.Switch'full'
       :EndIf
       r←rawFlag TC.ListRegistries type
     ∇
@@ -786,6 +786,8 @@
                   ⎕←'User settings in ⎕SE updated'
               :EndIf
           :EndIf
+      :ElseIf Arg.refresh
+          r←TC.Init ⍬
       :Else
           :If ~Arg.apikey
               origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace API key by Asterisks
@@ -906,8 +908,8 @@
           r,←⊂'Note that Registry with a priority of 0  will not participate in any scan of Registries.'
           r,←⊂''
           r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
-          r,←⊂'* By default all data but the API key are listed. Specify -all if you want the API key'
-          r,←⊂'  columnsto be listed as well.'
+          r,←⊂'* By default all data but the API keys are listed. Specify -full if you want the API key'
+          r,←⊂'  column to be listed as well.'
       :Case ⎕C'ListPackages'
           r,←⊂'Lists all packages in the Registry specified as an argument. If no Registry was specified'
           r,←⊂'then the user will be prompted for the Registry, eccept when there is just one anyway.'
@@ -981,17 +983,19 @@
           r,←⊂'By default a package is not loaded if it already exists. You can enforce the load by'
           r,←⊂'specifying the -overwrite flag.'
       :Case ⎕C'UserSettings'
-          r,←⊂'Prints the user settings to the session in JSON format.'
+          r,←⊂'Prints the user settings found in the file to the session in JSON format.'
           r,←⊂'By default the API key is replaced by asterisks; specify -apikey to overwrite this.'
           r,←⊂''
-          r,←⊂'If you want to do anything more than just printing the settings to the session then'
-          r,←⊂'you are advised to use the API. Note that there is a dedicated document for how to'
-          r,←⊂'use the API, and what for.'
+          r,←⊂'If you want to investigate the current user settings (rather than the file contents)'
+          r,←⊂'please use the API. There is a dedicated document for how to use the API, and what for.'
           r,←⊂''
-          r,←⊂'If you want to change the settings anyway you can add -edit in order to get the data'
-          r,←⊂'into the editor and make changes. In this case the API key will always show.'
+          r,←⊂'If you want to change the file you can add -edit in order to get the data into the'
+          r,←⊂'editor and make changes. In this case the API key will always show.'
           r,←⊂'If you did change the data, you will first be prompted for saving the changes on disk'
-          r,←⊂'and then for executing ]TATIN.Init in order to refresh the user settings in the ⎕SE.'
+          r,←⊂'and then for refreshing the current user settings.'
+          r,←⊂''
+          r,←⊂'If you did change the user settings from another APL session, or by editing the file,'
+          r,←⊂'you can refresh the current user settings with -refresh.'
       :Case ⎕C'PackageConfig'
           r,←⊂'The argument, if specified, may be an HTTP request or a path.'
           r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
@@ -1109,8 +1113,8 @@
           r,←⊂''
           r,←⊂'Re-installs all principle packages as well as all dependencies from scratch.'
           r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
-          r,←⊂'All installed packages are removed from the folder before a new build list is compiled and then'
-          r,←⊂'used to install all packages from scratch.'
+          r,←⊂'All installed packages are removed (except ZIP files) from the folder before a new build list'
+          r,←⊂'is compiled and then used to install all packages from scratch.'
           r,←⊂''
           r,←⊂'Notes:'
           r,←⊂'* This does not install a better version from the same server ever. In fact as a side'
@@ -1120,8 +1124,9 @@
           r,←⊂'* ZIP files are not removed upfront and have higher priority than registries, so when the'
           r,←⊂'  dependency list refers to a ZIP file then this will always survive.'
           r,←⊂''
-          r,←⊂'All defined Registries with a priority greater than 0 are scanned but one can specify a'
-          r,←⊂'particular Registry as second (optional) argument.'
+          r,←⊂'All defined Registries with a priority greater than 0 are scanned for principal packages but'
+          r,←⊂'one can specify a particular Registry as second (optional) argument.'
+          r,←⊂'For dependencies scanning of all registries with a priority greater than 0 takes always place.'
           r,←⊂''
           r,←⊂'-force   Prevents the command from asking the user, and does not report to the session either.'
           r,←⊂'-dry     Makes the user command report what it would do without actually doing anything at all.'

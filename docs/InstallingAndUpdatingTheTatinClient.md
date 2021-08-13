@@ -1,6 +1,7 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = Tatin Installing and Updating
-
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
 
 
 # Installing and Updating the Tatin Cleint
@@ -86,7 +87,7 @@ A> * making changes to the session
 A> * specifying function keys 
 A> * loading stuff into `⎕SE`
 
-### There is no script `setup.dyalog` yet
+### There is no such script yet
 
 Create one that looks like this:
 
@@ -135,6 +136,6 @@ Create one that looks like this:
 :EndNamespace
 ```
 
-### There is already a script `setup.dyalog`
+### There is already such a script
 
 Make sure that you copy the functions `IfAtLeastVersion`, `GetMyUCMDsPath` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.

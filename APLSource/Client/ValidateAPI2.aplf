@@ -1,0 +1,13 @@
+ cfg←ValidateAPI2 cfg;extension;type;extensions;files
+ extension←⎕C 3⌷⎕NPARTS cfg.source
+ extensions←'.aplf' '.aplo' '.aplc' '.apli' '.apln' '.apla'
+ :If 0<≢cfg.api
+     :If extension∊extensions
+         type←(extensions⍳extension)⊃'Function' 'Operator' 'Class' 'Interface' 'Namespace' 'Array'
+         (type,' does not exist?!')Assert ⎕NEXISTS projectPath,cfg.source
+     :Else
+         files←2⊃∘⎕NPARTS¨{(≢⍵)↓¨⊃F.Dir ⍵,'/*'}projectPath,cfg.source
+         'API either does not exist or is a function/operator'Assert(1↑'.'(≠⊆⊢)cfg.api)∊files
+     :EndIf
+ :EndIf
+⍝Done

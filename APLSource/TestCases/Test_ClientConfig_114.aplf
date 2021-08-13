@@ -1,0 +1,16 @@
+ r←Test_ClientConfig_114(stopFlag batchFlag);⎕TRAP;tempDir;settings
+⍝ Check "json" property
+⍝ Note that priority is not touched if it is not in the way. Here 9000 survives!
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+
+ settings←⎕NEW TC.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp((⎕UCS 13)A.Split settings.json)≢(⊃⎕NGET(tempDir,'/tatin-client.json')1)
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir
+⍝Done

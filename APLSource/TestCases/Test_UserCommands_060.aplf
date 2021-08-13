@@ -3,11 +3,11 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (rc msg list)←∆UCMD'* -?'
+ (rc msg list)←∆UCMD' -?'
  →T.PassesIf 0=rc
  →T.PassesIf 0=≢msg
+ list←{⍵/⍨0<≢¨⍵~¨' '}1↓list
  →T.PassesIf 0<≢list
- list←2↓list
 
  :For cmd :In list
      cmd←cmd↓⍨cmd⍳'.'

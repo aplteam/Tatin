@@ -1,5 +1,7 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'SemVers'
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
 
 
 # Tatin and Semantic Versioning

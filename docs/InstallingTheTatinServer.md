@@ -1,5 +1,7 @@
 [parm]:title             = 'Tatin Server Installtion'
 [parm]:leanpubExtensions = 1
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
 
 
 # Installing the Tatin Server
@@ -104,7 +106,7 @@ The principal Tatin server only allows deleting beta versions. The simple reason
 Flag that defines whether certificates (https) are used nor not (http).
 
 
-#### The section [CERTIFICATES]
+#### The section [CERTIFICATES]{#CERTIFICATES}
 
 A certificate is required in case you want to use https, a must on the Internet these days.
 You probably want to use your own one.
@@ -112,7 +114,7 @@ You probably want to use your own one.
 For more details on certificates see "On Certificates"
 
 
-#### The section [EMAIL]
+#### The section [EMAIL]{#EMAIL}
 
 A Tatin server can send emails, broadcasting any crashed. For that you must specify a couple of things in this section.
 

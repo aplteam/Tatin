@@ -1,5 +1,5 @@
 [parm]:title             = 'Tatin User Setting'
-[parm]:toc               = 2 3 4
+[parm]:toc               = 3 
 [parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
 
@@ -13,6 +13,24 @@
 Tatin uses a file to remember all Tatin Registries you want to work with, and possibly other user-specific settings as well. We refer to this file as the user settings file.
 
 When you start using Tatin for the very first time with 18.0 or 18.1 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location. 
+
+Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instanciate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _does not_ affect `⎕SE.Tatin.MyUserSettings`!
+
+`⎕SE.Tatin.MyUserSettings` provides a number of properties that can be questioned as well as a number of methods that can be issued in order to manipulate the user settings.
+
+This call:
+
+```
+      ]Tatin.Listregistries -all 
+ URI                 Alias                    Port  Priority  API-key                              
+ ------------------  -----------------------  ----  --------  ------------------------------------ 
+ tatin               https://tatin.dev/          0       100  xxxxxxx
+ tatin-test          https://test.tatin.dev/     0        10  Tatin-Test-API-Key                   
+
+```
+
+Shows most of the data that is saved in the user settings.
+
 
 ### The default file
 
@@ -29,29 +47,29 @@ That default file will have two  Tatin Registries defined in it:
    It has a priority of `0` assigned to it which means that it will _not_ participate in Registry scans. Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is `0` or less.
 
 
-### Where does it live?
+### Where does the file live?
 
-This default file will be created in the user's home folder; the API function  `⎕SE.Tatin.GetUserHomeFolder''` does return that folder.
+This default file will be created in the user's home folder; the API function `⎕SE.Tatin.GetUserHomeFolder''` does return that folder.
 
 
-### What's the name of that file?
+### What's the name of the file?
 
 The name of the file is `tatin-client.json`.
 
 
-### May I edit it?
+### May I edit the file?
 
 Of course you are free to edit that file with any editor. However, keep in mind that you are in charge for making sure that the contents of the file is valid JSON5[^JSON5]: if it's not, Tatin will crash.
 
-If you are familiar with JSON5 syntax and want to edit the file it is recommended to use
+If you are familiar with JSON5 syntax and want to edit the file it is recommended to use:
 
 ```
 ]TATIN.Usersettings -edit
 ```
 
-This will allow you to edit the file, but Tatin will check the file afterwards in order to make sure that nothing invalid goes ever into the file.
+This will allow you to edit the file contents, but Tatin will check it afterwards in order to make sure that nothing invalid goes ever into the file.
 
-Note that Dyalog 18.1 and later recognise JASON5 and highlights any syntax errors which can be quite useful.
+Note that Dyalog 18.1 and later recognise JSON5 and highlight any syntax errors which can be quite useful.
 
 ### What does Tatin do at start-up time?
 

@@ -10,6 +10,7 @@
  request.Headers,←⊂'Accept' 'application/json'
  res←host SendAndReceive request
  :If 200≠res.StatusCode
+     'Package not found'Assert 404≠res.StatusCode
      :If 0<≢res.Content
          ('Server: ',res.Content)Assert 0
      :Else

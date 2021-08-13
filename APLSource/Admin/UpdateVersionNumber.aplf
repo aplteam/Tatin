@@ -1,12 +1,7 @@
- {r}←{quietFlag}UpdateVersionNumber type;version;date;name;buff;build;major;minor;patch;buildID;wsPath;body;newVersion
-⍝ If either `quietFlag` is 1 or the user answer "yes" when prompted this function does the following:
+ {r}←{quietFlag}UpdateVersionNumber dummy;version;date;name;buff;build;major;minor;patch;buildID;wsPath;body;newVersion
+⍝ If either `quietFlag` is 1 or the user answers "yes" when prompted this function does the following:
 ⍝ 1. It updates the "date" part of the function ##.Registry.Version
-⍝ 2. It bumps the build ID, or adds 1 as the build ID
-⍝ 3. It takes the following actions dependening on `type`:
-⍝    * If `type` ←→ 0 no further action is taken
-⍝    * If `type` ←→ 1 the "patch" number is bumped
-⍝    * If `type` ←→ 2 the "minor" number is bumped
-⍝    * If `type` ←→ 3 the "major" number is bumped
+⍝ 2. It bumps the build ID, or catenates "+1" as the (new) build ID
  r←⍬
  quietFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quietFlag'
  'Invalid right argument; must be one of 0 1 2 3)'⎕SIGNAL 11/⍨1≠+/type≡¨0 1 2 3
@@ -17,30 +12,16 @@
      :If 3=version+.='.'
          (version buff)←{⍵{((¯1+⍵)↑⍺)(⍵↓⍺)}3⍳⍨+\'.'=⍵}version
          build←⍕1+⊃(//)⎕VFI buff
+     :ElseIf 2=version+.='.'
+     :AndIf '+'∊version
+         (version buff)←{⍵{((⍵-1)↑⍺)(⍵↓⍺)}⍵⍳'+'}version
+         build←⍕1+⊃(//)⎕VFI buff
      :Else
          build←'1'
      :EndIf
-     :If '-'∊version
-         version←('.',⍕build){(1⊃⍵),⍺,'-',(2⊃⍵)}'-'(≠⊆⊢)version
-     :Else
-         version,←'.',⍕build
-     :EndIf
-     'Missing dots in version number'Assert 3=version+.='.'
+     version,←'+',⍕build
+     'Missing dots in version number'Assert 2=version+.='.'
      'Some bits in the version number are empty when they must not'Assert 0∧.<≢¨'.'(≠⊆⊢)version
-     :If 0≠type
-         (major minor patch buildID)←{⊃(//)⎕VFI ⍵}¨'.'(≠⊆⊢)version
-         :Select ⊃type
-         :Case 1
-             patch+←1
-         :Case 2
-             minor+←1
-             patch←0
-         :Case 3
-             major+←1
-             minor←patch←0
-         :EndSelect
-         version←⊃{⍺,'.',⍵}/⍕¨major minor patch buildID
-     :EndIf
      body←##.Registry.⎕NR'Version'
      newVersion←'r←''',name,''' ''',version,''' ''',date,''''
      body←'r←''[^$]+'⎕R newVersion⊣body

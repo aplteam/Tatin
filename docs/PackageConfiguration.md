@@ -1,5 +1,7 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'Tatin's Package Configuration'
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
 
 
 # Tatin's package Configuration File
@@ -86,7 +88,7 @@ I> This restriction helps to avoid confusion, but there is also a technical issu
 
 * If you don't specify `api` then the name of the namespace is the API. 
 
-* If you do specify `api` then it must be the name of the namespace. In that case the contents of the namespace becomes the API.
+* If you do specify `api` then it must be the name of the namespace. In that case the _contents_ of the namespace becomes the API.
 
 
 ##### Package consists of a single class
@@ -238,6 +240,8 @@ Must be either the name of a text file that contains code or a folder that conta
 If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script) or `.aplf` (a function) or `.aplo` (an operator).
 
 If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.
+
+In any case it needs to be relative to the root of the package.
 
 
 #### `tags`

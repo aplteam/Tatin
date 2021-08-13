@@ -1,5 +1,7 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'Tatin Load & Update'
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
 
 
 # Tatin's Load and Update Strategy
@@ -155,11 +157,11 @@ The build list comprises not only the two principal packages but also all depend
 
 ## Loading the installed packages
 
-Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two different.
+Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two differ.
 
 Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which was created when you installed your first package, and which will be extended when you install more packages.
 
-It also requires a namespace as second argument: that's where the references pointing to the principal packages are going to be created. This is similar to `LoadPackage`.
+You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to `#`.
 
 ```
       ]TATIN.LoadDependencies /myPkgs/ #.Temp

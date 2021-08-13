@@ -13,6 +13,25 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 
 </head>
 <body>
+<nav id="main_nav">
+<input type="checkbox" id="hide_toc">
+<label id="hide_toc_label" for="hide_toc"></label>
+<div class="toc-container">
+<ul>
+<li><a href="#The-Strategy-Problem">The Strategy Problem</a></li>
+<li><a href="#Loading-Dependencies">Loading Dependencies</a></li>
+<li><a href="#Installing-packages">Installing packages</a></li>
+<li><a href="#Loading-the-installed-packages">Loading the installed packages</a></li>
+<li><a href="#Special-case">Special case</a>
+<ul>
+<li><a href="#Removing-a-principal-package">Removing a principal package</a></li>
+<li><a href="#Adding-a-package">Adding a package</a></li>
+</ul></li>
+<li><a href="#Checking-and-updating">Checking and updating</a></li>
+<li><a href="#Downgrading">Downgrading</a>
+</ul>
+</div>
+</nav>
 <div class="h_tag">
 <a href="#Tatins-Load-and-Update-Strategy" id="Tatins-Load-and-Update-Strategy" class="autoheader_anchor">
 <h1 data-id="Tatins-Load-and-Update-Strategy">Tatin's Load and Update Strategy</h1>
@@ -130,9 +149,9 @@ mygroup-Goo-2.1.0</code></pre>
 <h2 data-id="Loading-the-installed-packages">Loading the installed packages</h2>
 </a>
 </div>
-<p>Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two different.</p>
+<p>Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two differ.</p>
 <p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which was created when you installed your first package, and which will be extended when you install more packages.</p>
-<p>It also requires a namespace as second argument: that's where the references pointing to the principal packages are going to be created. This is similar to <code>LoadPackage</code>.</p>
+<p>You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to <code>#</code>.</p>
 <pre><code>      ]TATIN.LoadDependencies /myPkgs/ #.Temp</code></pre>
 <p>This is what <code>LoadDependencies</code> will do:</p>
 <ol start="1">

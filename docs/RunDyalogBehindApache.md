@@ -1,3 +1,7 @@
+[parm]:leanpubExtensions = 1
+[parm]:title             = 'Tatin behind Apache'
+
+
 # Run Dyalog behind Apache
 
 With Dyalogs Conga, [Rumba](https://github.com/aplteam/RumbaLean "Link to the project on GitHub") or [Plodder ](https://github.com/aplteam/Plodder  "Link to the project on GitHub") you might well decide to serve HTTP requests with an application written in Dyalog  APL.

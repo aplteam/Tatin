@@ -1,9 +1,10 @@
- {r}←CompileDocumentation dummy;F;targetFolder;htmlFiles;markdownFiles;markdownFile;parms;html;ns;zipFilename;myZip
+ {r}←CompileDocumentation dummy;F;targetFolder;htmlFiles;markdownFiles;markdownFile;parms;html;ns;zipFilename;myZip;rc
 ⍝ Convert all markdown files in the docs/ folder to HTML and then zip the HTML files into TatinDocumentation.zip
  F←##.FilesAndDirs
  targetFolder←'./Dist/'
- htmlFiles←⊃F.Dir'./docs/*.html'
- F.DeleteFile¨htmlFiles   ⍝ Cleaning up any left-overs
+ htmlFiles←⊃F.Dir'./html/*.html'
+ rc←F.DeleteFile¨htmlFiles   ⍝ Cleaning up any left-overs
+ Assert rc∧.=1
  markdownFiles←⊃F.Dir'./docs/*.md'
  'TatinVars'##.⎕NS''
  ##.TatinVars.HOME←'./Assets/MarkAPL'

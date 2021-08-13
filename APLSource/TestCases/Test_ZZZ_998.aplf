@@ -9,7 +9,8 @@
      ⍝ First we check whether "Version" returns a valid result:
      (n v d)←rf.Version
      d←{⍵/⍨3>+\'-'=⍵}d      ⍝ Remove trailing stuff like "-beta"
-     v←{⍵/⍨3>+\'.'=⍵}v      ⍝ Remove build ID
+     v←{⍵/⍨3>+\'.'=⍵}v      ⍝ Remove build ID separated by a dot (old & deprecated syntax)
+     v←(¯1+v⍳'+')↑v         ⍝ New syntax: build no. is separated by a "+"
      f1←~5≤⍴v
      f1∨←2≠'.'+.=v
      f1∨←~∧/⎕D∊⍨v~'.'

@@ -1,5 +1,7 @@
 [parm]:title             = 'Tatin Intro'
 [parm]:leanpubExtensions = 1
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
 
 
 # Publishing Packages
@@ -9,6 +11,8 @@
 Whether you want to publish to the principal Tatin server at <https://tatin.dev> or your own Tatin Server or a Tatin Server that someone in your company runs, first you need an API key. "API key" is just a fancy expression for a password that is used by an application.
 
 API keys are only required for publishing and possibly deleting packages, but not for consuming them.
+
+They are saved in the user settings --- for details see the document "Tatin User Settings".
 
 
 ### The Server
@@ -26,9 +30,16 @@ The Tatin Test Server publishes an API key on its website; it's "Tatin-Test-API-
 Notes:
 
 * Be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later
-* You cannot publish anything with the groups "aplteam" or "dyalog"
+* You cannot publish anything for the groups "aplteam" and "dyalog"
 
 
+#### Where are API keys saved?
+
+API keys are saved in the user settings file. The quickest and yet save way to edit that file is via the user command:
+
+```
+      ]TatIN.UserSettings -edit      
+```
 
 #### Credentials for your own Tatin Server 
 

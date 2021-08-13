@@ -1,5 +1,8 @@
 [parm]:title             = 'Tatin: first steps'
 [parm]:leanpubExtensions = 1
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
+
 
 
 # First steps with the Tatin Client

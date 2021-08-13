@@ -1,5 +1,7 @@
 [parm]:title             = 'Tatin: Intro'
 [parm]:leanpubExtensions = 1
+[parm]:collapsibleTOC    = 1
+[parm]:toc               = 2 3
 
 
 # Introduction
@@ -65,6 +67,8 @@ When you're ready to create a release of your package, you'll assign a group and
 Finally you publish your package to a Tatin server.
 
 Of course you should publish your first package on the test server https://test.tatin.dev rather than on https://tatin.dev in order to gain experience without shooting yourself into the foot.
+
+That is particular important on https://tatin.dev because any package that was published cannot be changed and/or deleted.
 
 ## Now what?!
 

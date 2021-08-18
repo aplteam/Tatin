@@ -237,11 +237,11 @@ This defines the source code file(s) that are going to be part of the package.
 
 Must be either the name of a text file that contains code or a folder that contains a collection of code files. `source` _must not_ be empty.
 
-If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script) or `.apli` (an interface script) or `.aplf` (a function) or `.aplo` (an operator).
+If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script), `.apli` (an interface script), `.aplf` (a function) or `.aplo` (an operator).
 
-If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions are misplaced and will be ignored.
+If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
 
-In any case it needs to be relative to the root of the package.
+`source` must be relative to the root of the package.
 
 
 #### `tags`

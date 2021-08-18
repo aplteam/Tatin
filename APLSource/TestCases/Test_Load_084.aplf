@@ -1,0 +1,33 @@
+ r←Test_Load_084(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile;refs
+⍝ Load a package that has more than just two or less hyphens (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '1.2.3-test-1-a'
+ cfg.source←'Constants.apln'
+ cfg.api←'Constants'
+ TC.WritePackageConfigFile src cfg
+ zipfile←TC.Pack src zip
+
+ refs←TC.LoadPackage('file://',zipfile)#.TEMP
+ Assert 3=#.TEMP.Constants.⎕NC'PI'
+ →T.PassesIf 3.14=#.TEMP.Constants.PI
+ →T.PassesIf 0<≢#.TEMP.Constants.##.TatinVars.URI
+ →T.PassesIf 0=≢#.TEMP.Constants.##.TatinVars.HOME
+ →T.PassesIf 0=≢refs
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

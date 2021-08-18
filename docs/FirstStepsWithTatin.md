@@ -384,9 +384,11 @@ MarkAPL
 #### Scanning Registries
 
 The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages:
-you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. That way Tatin would find the package on your local machine.
+you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. 
+
+That way Tatin would find the package on your local machine even when the are not loaded as principal packages but just dependencies.
  
-Later, when the package is ready, you could publish it to, say the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
+Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
 
 The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc. on it.
 

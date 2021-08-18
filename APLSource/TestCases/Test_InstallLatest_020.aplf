@@ -1,5 +1,5 @@
- r←Test_InstallBest_020(stopFlag batchFlag);⎕TRAP;dir;refs2;refs;expected
-⍝ Install & load best version from given Registry with just {group}-{name} when there are beta versions around (to be ignored)
+ r←Test_InstallLatest_020(stopFlag batchFlag);⎕TRAP;dir;refs2;refs;expected
+⍝ Install & load latest version from given Registry with just {group}-{name} when there are beta versions around (to be ignored)
 ⍝ Since there is a non-beta version that one is going to be selected.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,7 +8,7 @@
  'TEMP'#.⎕NS''
  dir←GetTempDir ⍬
 
- refs←TC.InstallPackage'[local]example-versions'dir
+ refs←1 TC.InstallPackage'[local]example-versions-1'dir
  →T.GoToTidyUp 0≥≢refs
  refs2←TC.LoadDependencies dir #.TEMP
  Assert 1=≢refs2

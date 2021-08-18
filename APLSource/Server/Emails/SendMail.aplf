@@ -1,36 +1,35 @@
  (rc msg server)←serverArgs SendMail messageArgs;⎕ML;⎕IO;params;msgParams;log;server
- ⍝ Simple cover to send SMTP mail
- ⍝ Requires: SMTP class
-
- ⍝ rc   - return code; 0=no error, 1=error from the SMTP server, anything else=other error
- ⍝ msg  - descriptive message
- ⍝ server - reference to instance of SMTP (only returned when serverArgs is the server definition)
-
-
- ⍝ serverArgs is one of:
+ ⍝ Simple cover to send SMTP mail.\\
+ ⍝ Requires the `SMTP` class.\\
+ ⍝ |`rc`     | return code; 0=no error, 1=error from the SMTP server, anything else=other error
+ ⍝ |`msg`    | descriptive message
+ ⍝ |`server` | reference to instance of SMTP (only returned when serverArgs is the server definition)
+ ⍝ `serverArgs` is one of:
  ⍝ A server definition in one of the following formats:
- ⍝   ∘ a vector with: Server Port From [Password [Userid [Secure]]]
- ⍝   ∘ a namespace containing required named elements: Server Port From
- ⍝     and optionally Password Userid Secure plus any other parameters applicable to the SMTP class
- ⍝ Or
- ⍝   ∘ an instance of the SMTP class created by SendMail
+ ⍝   * a vector with `Server`, `Port`, `From` and optionally `Password`, `Userid` & `Secure`
+ ⍝   * a namespace containing required named elements: `Server`, `Port`, `From` and optionally
+ ⍝     `Password`, `Userid` & `Secure` plus any other parameters applicable to the SMTP class\\
+ ⍝   * an instance of the `SMTP` class created by `SendMail`
 
- ⍝ messageArgs is one of:
- ⍝ ∘ a vector of To Subj Body
- ⍝ ∘ a namespace containing required named elements: To Subj Body
- ⍝     and optionally any other parameters applicable to the SMTP.Message class
+ ⍝ `messageArgs` is one of:
+ ⍝ * a vector of `To`, `Subj`, `Body`
+ ⍝ * a namespace containing required named elements: `To`,  `Subj`, `Body`
+ ⍝   and optionally any other parameters applicable to the `SMTP.Message` class
 
- ⍝ Once the SMTP server instance has been created, it is passed as the left argument
- ⍝ in subsequent calls to Sendmail
+ ⍝ Once the `SMTP` server instance has been created, it can be passed as the left argument
+ ⍝ in subsequent calls to `Sendmail`.
 
  ⍝ Examples:
- ⍝ (srv←⎕NS'').(Server Port From Password)←'mail.abc.com' 465 'me@abc.com' 'secret'
- ⍝ Server←3⊃srv SendMail '' ⍝ create the server instance
- ⍝ (msg←⎕NS'').(To Subj Body)←'you@xyz.com' 'Hello' 'Hi there!'
- ⍝ Server SendMail msg
- ⍝
- ⍝ The server can be created and message sent in a single call:
- ⍝ Server←3⊃srv SendMail msg
+ ⍝ ```
+ ⍝ (srvParms←⎕NS'').(Server Port From Password)←'mail.abc.com' 465 'me@abc.com' 'secret'
+ ⍝ (rc msg Server)←3⊃srvParms SendMail ''       ⍝ create the server instance
+ ⍝ (mail←⎕NS'').(To Subj Body)←'you@xyz.com' 'Hello' 'Hi there!'
+ ⍝ Server SendMail mail
+ ⍝ ```
+ ⍝ The server can be created and a message sent in a single call if no credentials are required:
+ ⍝ ```
+ ⍝ (rc msg Server)←srv SendMail msg
+ ⍝ ```
 
  ⎕IO←⎕ML←1
 

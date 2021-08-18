@@ -1,0 +1,22 @@
+ r←Test_InstallLatest_022(stopFlag batchFlag);⎕TRAP;dir;refs2
+ ;refs
+⍝ Install and then load latest version of a package from a given Registry by specifying {group}-{name}-{major}
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ dir←GetTempDir ⍬
+
+ refs←TC.InstallPackage'[localhost]JustOneBeta'dir
+ →T.PassesIf 0<≢refs
+ refs2←TC.LoadDependencies dir #.TEMP
+
+ →T.PassesIf'0.1.0-beta-1'≡∆GetMajorMinorPatch 2⊃#.TEMP.JustOneBeta.Version
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ F.RmDir dir
+⍝Done

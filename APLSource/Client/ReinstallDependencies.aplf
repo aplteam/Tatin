@@ -7,7 +7,7 @@
 ⍝ specify a particular Registry as a second (optional) argument.\\
 ⍝ By default beta versions are considered. You may change this by specifying a 1 as left argument.
  r←''
- noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noBetas'
+ noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  (deps installFolder registry)←CheckReInstallDependencies y
  PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(noBetas/'out'),' any beta versions'
  refs←ReInstallDependencies_ deps installFolder registry noBetas

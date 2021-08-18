@@ -314,11 +314,11 @@
       auth←' '(≠⊆⊢)8↓⊃auth
       :If (⊂'LOGIN')∊auth
           →Exit if 0≠⊃(rc msg)←Do'AUTH LOGIN'
-          →Exit if 0≠⊃(rc msg)←Do Message.base64enc uid
-          (rc msg)←Do Message.base64enc Password
+          →Exit if 0≠⊃(rc msg)←Do Message.Base64Encoding uid
+          (rc msg)←Do Message.Base64Encoding Password
       :ElseIf (⊂'PLAIN')∊auth
           →Exit if 0≠⊃(rc msg)←Do'AUTH PLAIN'
-          (rc msg)←Do Message.base64enc uid,(⎕UCS 0),uid,(⎕UCS 0),Password
+          (rc msg)←Do Message.Base64Encoding uid,(⎕UCS 0),uid,(⎕UCS 0),Password
       :Else
           'Only authentication methods LOGIN and PLAIN are currently supported'⎕SIGNAL 11
       :EndIf
@@ -492,7 +492,7 @@
           :EndSelect
         ∇
 
-        ∇ (rc msg text)←Compose;addHeader;haveAtts;boundary;mime;body;atts;i;n;att
+        ∇ (rc msg text)←Compose;addHeader;haveAtts;boundary;mime;body;atts;i;n;att;⎕TRAP
           :Access public
         ⍝ Compose email content
           (rc msg text)←¯1 '' ''
@@ -513,7 +513,7 @@
           addHeader←{
               ⍵∧.=' ':''
               128∧.>⎕UCS ⍵:⍺,': ',⍵,⎕UCS 13 10
-              ⍺,': =?utf-8?B?',(base64enc ⍵),'?=',⎕UCS 13 10
+              ⍺,': =?utf-8?B?',(Base64Encoding ⍵),'?=',⎕UCS 13 10
           }
          
           text←'Date'addHeader now    ⍝ Internet-conform date first
@@ -526,14 +526,14 @@
           text,←'Subject'addHeader Subj ⍝ the message subject
          
           :If haveAtts←~0∊⍴Attachments ⍝ Any attachments?
-              boundary←'------',((⍕⎕TS)~' '),'DyalogSMTP',CRLF ⍝ construct a boundary for attachments
+              boundary←'000',((⍕⎕TS)~' '),'DyalogSMTP',CRLF ⍝ construct a boundary for attachments
               text,←'Content-Type'addHeader'multipart/mixed; boundary="',(¯2↓boundary),'"'
               text,←CRLF
-⍝              text,←'This is a multi-part message in MIME format.',CRLF
+              text,←'This is a multi-part message in MIME format.',CRLF
               text,←'--',boundary
           :EndIf
          
-          :If ~0∊⍴Body
+          :If 0≠≢Body
               (mime body)←¯2↑'' '',⊆Body
               :If Body beginsWith'file://'
                   body←⊃⎕NGET 7↓Body
@@ -543,14 +543,13 @@
                   mime←'text/',mime,'; charset="UTF-8"'
               :EndIf
               text,←'Content-Type'addHeader mime
-⍝ ⍝TODO⍝ Google does not do this?!              text,←'Content-Transfer-Encoding'addHeader'8bit'
               text,←CRLF
               text,←⎕UCS'UTF-8'⎕UCS body
               text,←CRLF
           :EndIf
          
           :If haveAtts
-              text,←haveAtts/boundary
+              text,←haveAtts/'--',boundary
          
               Attachments←FormatAttachments Attachments
          
@@ -560,9 +559,9 @@
                       →Exit
                   :EndIf
                   text,←att
-                  text,←boundary
+                  text,←'--',boundary
                   :If i=n ⍝ last attachment?
-                      text←(¯2↓text),'--',CRLF,CRLF
+⍝                      text←(¯2↓text),'--',CRLF,CRLF
                   :EndIf
               :EndFor
           :EndIf
@@ -591,7 +590,7 @@
           r←Client.Send ⎕THIS
         ∇
 
-        ∇ r←i ProcessAttachment arg;mime;content;file;name
+        ∇ r←i ProcessAttachment arg;mime;content;file;name;⎕TRAP
           (file mime content)←3↑(⊆arg),'' '' ''
           :If 0∊⍴file
               name←'Attachment-',(⍕i),,'<->,4ZI2,<.>,ZI3'⎕FMT 1 5⍴2↓⎕TS  ⍝ make an arbitrary one
@@ -609,12 +608,15 @@
               r←'Content-Type: ',mime,'; charset="US-ASCII"; name="',name,'"',CRLF
               r,←'Content-Disposition: attachment; filename="',name,'"',CRLF
               r,←'Content-Transfer-Encoding: base64',CRLF,CRLF
-              r,←chunk base64enc content
+              r,←chunk Base64Encoding content
           :EndIf
         ∇
 
-        ∇ r←ReadFile file
-          r←{0::'' ⋄ {(⎕NUNTIE ⍵)⊢⎕NREAD ⍵,(⎕DR' '),¯1 0},⍵ ⎕NTIE 0}file
+        ∇ r←ReadFile file;tno
+        ⍝ We don't trap errors here because we don't want to pretend to send emails with attachments when we might not
+          tno←file ⎕NTIE 0
+          r←⎕NREAD tno,(⎕DR' '),¯1 0
+          ⎕NUNTIE tno
         ∇
 
         ∇ MakeRecipients;addrs
@@ -719,34 +721,14 @@
           :EndIf
         ∇
 
-        ∇ r←base64 w
-        ⍝ from dfns workspace
+        ∇ r←Base64Encoding txt;⎕IO;A;ed
+        ⍝ ⍵ byte string: 256∧.>⎕ucs ⍵
+        ⍝ ← longer (4:3) string in A-Z,a-z,0-9,+/= only
           :Access public shared
-          r←{⎕IO ⎕ML←0 1             ⍝ Base64 encoding and decoding as used in MIME.
-              chars←'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-              bits←{,⍉(⍺⍴2)⊤⍵}                   ⍝ encode each element of ⍵ in ⍺ bits,
-                                                 ⍝   and catenate them all together
-              part←{((⍴⍵)⍴⍺↑1)⊂⍵}                ⍝ partition ⍵ into chunks of length ⍺
-              0=2|⎕DR ⍵:2∘⊥∘(8∘↑)¨8 part{(-8|⍴⍵)↓⍵}6 bits{(⍵≠64)/⍵}chars⍳⍵
-                                       ⍝ decode a string into octets
-              four←{                             ⍝ use 4 characters to encode either
-                  8=⍴⍵:'=='∇ ⍵,0 0 0 0           ⍝   1,
-                  16=⍴⍵:'='∇ ⍵,0 0               ⍝   2
-                  chars[2∘⊥¨6 part ⍵],⍺          ⍝   or 3 octets of input
-              }
-              cats←⊃∘(,/)∘((⊂'')∘,)              ⍝ catenate zero or more strings
-              cats''∘four¨24 part 8 bits ⍵
-          }w
-        ∇
-
-        ∇ b64←base64enc txt
-          :Access public shared
-          b64←base64'UTF-8'⎕UCS txt
-        ∇
-
-        ∇ txt←base64dec b64
-          :Access public shared
-          txt←'UTF-8'⎕UCS base64 b64
+          ⎕IO←0
+          A←'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+          ed←{⊃⍵{⍺{2⊥⍉((⌈(⍴⍵)÷⍺),⍺){⍺⍴(×/⍺)↑⍵}⍵},⍉(⍵⍴2)⊤⍺⍺}/⍺}
+          r←{⍵,'='⍴⍨4|-⍴⍵}(⊂6 8 ed ⎕UCS txt)⌷A
         ∇
 
         ∇ rc←now;time;day;mon;s;x;LOCTIME;TIMEZONE;isUnicode;twid

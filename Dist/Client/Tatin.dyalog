@@ -111,7 +111,7 @@
           c←⎕NS ⍬
           c.Name←'ListRegistries'
           c.Desc←'Lists all registries defined in the user settings'
-          c.Parse←'0 -raw -all'
+          c.Parse←'0 -raw -full'
           r,←c
      
           c←⎕NS ⍬
@@ -580,8 +580,8 @@
       :If 0≢Arg.Switch'raw'
           rawFlag←Arg.Switch'raw'
       :EndIf
-      :If 0≢Arg.Switch'all'
-          type←Arg.Switch'all'
+      :If 0≢Arg.Switch'full'
+          type←Arg.Switch'full'
       :EndIf
       r←rawFlag TC.ListRegistries type
     ∇
@@ -908,7 +908,7 @@
           r,←⊂'Note that Registry with a priority of 0  will not participate in any scan of Registries.'
           r,←⊂''
           r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
-          r,←⊂'* By default all data but the API keys are listed. Specify -all if you want the API key'
+          r,←⊂'* By default all data but the API keys are listed. Specify -full if you want the API key'
           r,←⊂'  column to be listed as well.'
       :Case ⎕C'ListPackages'
           r,←⊂'Lists all packages in the Registry specified as an argument. If no Registry was specified'

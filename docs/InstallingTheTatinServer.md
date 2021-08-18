@@ -116,10 +116,14 @@ For more details on certificates see "On Certificates"
 
 #### The section [EMAIL]{#EMAIL}
 
-A Tatin server can send emails, broadcasting any crashed. For that you must specify a couple of things in this section.
+A Tatin server can send emails, broadcasting any crashes. For that you must specify a couple of things in this section.
 
 The INI file is well dcoumented, so you should have no trouble to make the necessary adjustments.
  
+Note that both https://tatin.dev and https:/test.tatin.dev use an email address tatin.dev@gmail.com. This email addresse is not monitored; it is just use as a proxy to being able to deliver emails via Google's SMTP server. It's the CC that is more interesting. 
+
+This construct makes it possible not to worry too much regarding the password of the email address, but it also means that nothing should be send to that email address that is even remotely confidential.
+
 
 ## On Logging
 

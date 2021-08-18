@@ -180,7 +180,7 @@ None
 
 Or visit its web site, for example <https://tatin.dev>: at the bottom of the home page the server mentions the "delete" policy it operates.
 
-## Developing strategies
+## Development strategies
 
 Let's imagine that you are supposed to develop Tatin packages for your employer, the company "XYZ".
 
@@ -202,7 +202,7 @@ Let's imagine that you are supposed to develop Tatin packages for your employer,
 
 You can now develop a package `Foo` and publish it on `[my]`, probably several times until it is stable.
 
-You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want `[my]` to be ignored altogether, make its priority negative.
+You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want `[my]` to be ignored altogether, set its priority to zero.
 
 Your team can use your pacakage by referring to the team Registry.
 

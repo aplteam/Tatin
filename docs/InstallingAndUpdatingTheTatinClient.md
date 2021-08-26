@@ -16,7 +16,7 @@ However, installing and updating is, as far as the Tatin client is concerned, _t
 
 * Tatin needs a Unicode version of Dyalog.
 
-* You need at least version 18.0.44280 because that version comes with a very important fix.
+* You need at least Dyalog version 18.0.
 
 Note that when you call `]Tatin.Init` Tatin will check whether those requirements are met.
 

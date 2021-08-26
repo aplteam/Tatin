@@ -1,10 +1,15 @@
- {r}←{userName}Init pathToUserSettings;pathToUserSettings
+ {r}←{userName}Init pathToUserSettings;pathToUserSettings;⎕TRAP
 ⍝ Use this to re-establish the user settings via a user command.
  r←''
- :If 0=≢pathToUserSettings
-     userName←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'userName'
-     pathToUserSettings←FindUserSettings userName
+ :If IfAtLeastVersion 18.1
+ :OrIf 44280≤⊃(//)⎕VFI 3⊃'.'(≠⊆⊢)2⊃#.APLVersion  ⍝ 44280 has essential ⎕FIX fix for Link to work
+     :If 0=≢pathToUserSettings
+         userName←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'userName'
+         pathToUserSettings←FindUserSettings userName
+     :EndIf
+     MyUserSettings←InitUserSettings pathToUserSettings
+     r←'User settings re-established in ',(⍕⎕THIS),' from ',pathToUserSettings
+ :Else
+     'Tatin requires at least Dyalog version 18.0.44280 Unicode'⎕SIGNAL 98
  :EndIf
- MyUserSettings←InitUserSettings pathToUserSettings
- r←'User settings re-established in ',(⍕⎕THIS),' from ',pathToUserSettings
 ⍝Done

@@ -38,12 +38,18 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'FilesAndDirs' '5.0.3+101' '2021-03-28'
+      r←'FilesAndDirs' '5.1.1+106' '2021-08-20'
     ∇
 
 
     ∇ History
       :Access Public shared
+      ⍝ * 5.1.1 ⋄ 2021-08-20
+      ⍝   * `DateToReal` was buggy
+      ⍝ * 5.1.0 ⋄ 2021-08-18
+      ⍝   * `YoungerThan` introduced
+      ⍝   * `GetModifiedDate` introduced
+      ⍝   * `DateToReal` introduced
       ⍝ * 5.0.3 ⋄ 2021-03-28
       ⍝   * Bug fix: wildcard without recursion in `Dir is no longer handled correctly (introduced with 5.0.3)
       ⍝ * 5.0.2 ⋄ 2021-03-27
@@ -283,6 +289,14 @@
     ⍝ Returns what is the "correct" filename separator under the current OS.
       :Access Public Shared
       r←('Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬)⊃'/\'
+    ∇
+
+    ∇ bool←file1 YoungerThan file2;real1;real2
+    ⍝ Returns a Boolean with 1 in case `file1` is "younger" than `file2`
+      :Access Public Shared
+      real1←DateToReal GetModifiedDate file1
+      real2←DateToReal GetModifiedDate file2
+      bool←real1>real2
     ∇
 
     ∇ {(rc en more)}←{mustBeEmpty}RmDir path;list;bool;flags;flag;counter;qdmx
@@ -820,6 +834,18 @@
               success←⊃success
           :EndIf
       :EndIf
+    ∇
+
+    ∇ r←GetModifiedDate filename
+    ⍝ Returns the "Modified" date of `filename` as a timestmap
+      :Access Public Shared
+      r←⊃3 ⎕NINFO filename
+    ∇
+
+    ∇ real←DateToReal timestamp
+    ⍝ Converts a timestamp (6↑⎕TS) into a real (YYYYMMDD.hhmmss)
+      :Access Public Shared
+      real←60 ⎕DT⊂6↑timestamp
     ∇
 
     ∇ {success}←MkDir path;counter;flag

@@ -12,6 +12,14 @@ Note that you need to worry about this only if you use version 18.0 or 18.1: wit
 
 However, installing and updating is, as far as the Tatin client is concerned, _the same thing_, because updating the Tatin client basically means removing the old version and installing a new one.
 
+## Requirements
+
+* Tatin needs a Unicode version of Dyalog.
+
+* You need at least version 18.0.44280 because that version comes with a very important fix.
+
+Note that when you call `]Tatin.Init` Tatin will check whether those requirements are met.
+
 ## How to install the Tatin Client
 
 Instructions:

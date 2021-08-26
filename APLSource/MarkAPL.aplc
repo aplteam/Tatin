@@ -59,29 +59,20 @@
     ∇ r←Version
       :Access Public Shared
       ⍝ See `History`
-      r←'MarkAPL' '11.0.0+231' '2021-04-17'
+      r←'MarkAPL' '11.0.1+232' '2021-07-25'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 11.0.1
+      ⍝   Bug reports:
+      ⍝   * Internal link in a LeanPub block were wrongly reported as invalid no matter what
+      ⍝   * Footnotes that were not referenced were not displayed. They are now displayed but a warning is reported
       ⍝ * 11.0.0
       ⍝   * HTML and CSS but also Markdown documents (though only in develoment mode, read as part of the project
       ⍝     rather than the package "MarkAPL" now always live in a sub folder Files/.
       ⍝   * Both the project and the package require a variable `TatinVars.HOME`. While this variable always exists
       ⍝     for the MarkAPL package (because its a Tatin convention) it needs to be injected for the project.
-      ⍝ * 10.1.0
-      ⍝   Tatin system vars got renamed from `∆HOME` to `HOME`
-      ⍝ * 10.0.2
-      ⍝   * Package config corrected
-      ⍝ * 10.0.1
-      ⍝   * `CreateParms` did not reflect the now flat folder structure of "files/" making `MakeHTML_Doc` fail
-      ⍝     to find the default CSS files.
-      ⍝ * 10.0.0
-      ⍝   * BREAKING CHANGES:
-      ⍝     * Dyalog 18.0 is required by `MarkAPL`
-      ⍝     * `MarkAPL` now requires the class `APLTreeUtils2` rather than the namespace script `APLTreeUtils`.
-      ⍝     * The structure of files (HTML, CSS and markdown) has changed due to MarkAPL being now a Tatin package.\\
-      ⍝       This might require you to change your own application as well!
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/MarkAPL/releases>
     ∇
@@ -403,6 +394,7 @@
       ns←HandleAbbreviations ns
       ns←CheckInternalLinks ns
       ns←CheckForInvalidFootnotes ns
+      ns←PolishWarnings ns
       :If A.IsDevelopment
       :AndIf ns.parms.verbose
       :AndIf 0≠≢ns.report
@@ -2409,12 +2401,13 @@
       :EndIf
     ∇
 
-      InjectFootNotes←{
-          ns←⍵
-          0=≢hits←GatherFootNoteReferences ns:ns
-          ns←ReplaceFootnoteReferences ns hits
-          AppendFootnoteDefinitions ns
-      }
+    ∇ ns←InjectFootNotes ns;hits
+      hits←GatherFootNoteReferences ns
+      ns←ReplaceFootnoteReferences ns hits
+      :If 0<≢ns.footnoteDefs
+          ns←AppendFootnoteDefinitions ns
+      :EndIf
+    ∇
 
     ∇ ns←ReplaceLinkIDs ns;mask;linkRefs
     ⍝ Replace the [{any link text}][link id] references in the HTML against the real thing: <a href="...
@@ -2499,13 +2492,16 @@
       hits←{⍵[⍒⍵[;3];]}{⍵[⍒⍵[;4];]}hits   ⍝ It's essential to turn them around!
     ∇
 
-    ∇ ns←ReplaceFootnoteReferences(ns hits);i;ind;row;id;newID
+    ∇ ns←ReplaceFootnoteReferences(ns hits);i;ind;row;id;newID;this
     ⍝ Replaces the original footnote references (which have arbitrary names)
     ⍝ against ones which are strictly numbered from 1 to whatever.
-      :For i :In ⍳⊃⍴hits
+      :For i :In ⍳≢hits
           (id row ind)←hits[i;1 3 4]
           newID←'<a href="#fnref',(⍕id),'" class="footnote_link"><sup>',(⍕id),'</sup></a>]'
           (row⊃ns.html)←(-ind)⌽newID,{⍵↓⍨⍵⍳']'}ind⌽row⊃ns.html
+      :EndFor
+      :For this :In (~ns.footnoteDefs[;1]∊hits[;2])⌿ns.footnoteDefs[;1]
+          ns.report,←⊂'Warning: footnote "',this,'" not referenced anywhere'
       :EndFor
     ∇
 
@@ -2975,6 +2971,20 @@
       :EndIf
     ∇
 
+    ∇ ns←PolishWarnings ns;this;name;noOf;i
+      noOf←≢ns.report
+      :For i :In ⍳noOf
+          this←i⊃ns.report
+          :If 'Invalid internal link:'{⍺≡(≢⍺)↑⍵}this
+              name←{⍵↑⍨¯1+⍵⍳']'}{⍵↓⍨⍵⍳'['}this
+          :AndIf (⊂name)∊ns.headers[;2]
+          ⍝ It is an internal bookmark link, which was wrongly reported as invalid, so we remove it from the report
+              ns.report[i]←⊂''
+          :EndIf
+      :EndFor
+      ns.report←(0<≢¨ns.report)/ns.report
+    ∇
+
     ∇ ns←CheckInternalLinks ns;html;anchors;links
     ⍝ Checks all internal links for being correct (not pointing into nowhere land).
       :If ns.parms.checkLinks
@@ -3084,13 +3094,6 @@
       :Else
           noOf←1++/∧\0=IsHtmlList¨1↓noOf↑bl
           options←('Mode' 'M')('EOL' 'CR')('DotAll' 1)
-     
-⍝TODO⍝ ------------------ OBSOLETE?! --------------------------------------------------------------------
-⍝          :If 0≠≢buff←{⍵↑⍨⊃'[~`]{3,}\s{0,}'⎕S 0⍠options⊣⍵}1↓⊃,/(⎕UCS 13),¨A.DLB noOf↑bl
-⍝              noOf←⊃((⎕UCS 13)+.={⍵↑⍨⊃'[~`]{3,}\s{0,}'⎕S 0⍠options⊣⍵}1↓⊃,/(⎕UCS 13),¨A.DLB noOf↑bl),noOf
-⍝              noOf-←0=≢' '~⍨noOf⊃bl
-⍝          :EndIf
-⍝ --------------------------------------------------------------------------------------------------------
           para←A.DLB⊃,/' ',¨noOf↑bl
       :EndIf
     ∇
@@ -3372,7 +3375,7 @@
       :EndIf
     ∇
 
-    ∇ ns←parms ProcessLeanPubExtensions_ ns;leanPubExtensions;extension;isNotCodeBlock;bool;start;lengths;i;ind;noOf;openDiv;body;html;img;after;report
+    ∇ ns←parms ProcessLeanPubExtensions_ ns;leanPubExtensions;extension;isNotCodeBlock;bool;start;lengths;i;ind;noOf;openDiv;body;html;img;after;report;this
       leanPubExtensions←'AWTEIQDX'
       :For extension :In leanPubExtensions
           isNotCodeBlock←~WhereAreCodeBlocks ns.markdown
@@ -3397,7 +3400,13 @@
                           ns.markdown←(ind↑ns.markdown),html,(ind+noOf)↓ns.markdown
                           ns.lineNumbers←(ind↑ns.lineNumbers),((≢html)⍴⊂(1+ind),ind+noOf),(ind+noOf)↓ns.lineNumbers
                           :If 0≠≢report
-                              ns.report,←((ind+1)⊃ns.lineNumbers)∘{i←-(⌽⍵)⍳' ' ⋄ (i↓⍵),' ',({1=≢⍵:⍕⍵ ⋄ ⊃{⍺,'-',⍵}/⍕¨⍵}⍺),')'}¨report
+                              :For this :In report
+                                  :If ∨/'(line'⍷this
+                                      ns.report,←((ind+1)⊃ns.lineNumbers)∘{i←-(⌽⍵)⍳' ' ⋄ (i↓⍵),' ',({1=≢⍵:⍕⍵ ⋄ ⊃{⍺,'-',⍵}/⍕¨⍵}⍺),')'}¨report
+                                  :Else
+                                      ns.report,←((ind+1)⊃ns.lineNumbers)∘{i←-(⌽⍵)⍳' ' ⋄ ⍵,' (lines ',({1=≢⍵:⍕⍵ ⋄ ⊃{⍺,'-',⍵}/⍕¨⍵}⍺),')'}¨report
+                                  :EndIf
+                              :EndFor
                           :EndIf
                           (i↓start)←(i↓start)+(≢html)-noOf
                       :EndIf

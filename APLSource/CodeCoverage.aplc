@@ -50,13 +50,17 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.7.2+40' '2021-03-01'
+      r←'CodeCoverage' '0.7.3+42' '2021-05-26'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 0.7.3 from 2021-05-26
+    ⍝   * Bug fix: single report failed on a new file due to cnfusion about number of reserved components: 9 rather than 10.
+    ⍝   * Test cases added
+    ⍝   * Minor cosmetic changes
     ⍝ * 0.7.2 from 2021-03-01
-    ⍝   * Package file corrected 
+    ⍝   * Package file corrected
     ⍝ * 0.7.1 from 2020-12-20
     ⍝   * Bug fix: `NamesInScript` might crash on an {each}-operation on an empty vector
     ⍝ * 0.7.0 from 2020-12-17
@@ -236,7 +240,7 @@
           html,←⊂'</table>'
           :If 0<≢∊data[;2 4]
               html,←⊂'<p>Overall ',(⍕⌊0.5+100×÷/+⌿≢¨data[;2 4]),'% of the testable code is  covered.</p>'
-              html,←⊂'<p>(Comment lines, empty lines, all <code>:End</code>* lines etc. are all ignored)</p>'
+              html,←⊂'<p>(Comment lines, empty lines, all <code>:End</code>* lines etc. are ignored)</p>'
           :EndIf
           html,←⊂'<p>',(⍕data[;3]+.=100),' of the fns/opr are 100% covered.</p>'
           :If 0<+/b←data[;3]=0
@@ -298,7 +302,7 @@
       tno←dcfFilename ⎕FSTIE 0
       watched←⎕FREAD tno,2
       details←watch←⍬
-      :If 0<≢∊data←tno{⎕FREAD ⍺,⍵}¨10↓⍳-/⌽2↑⎕FSIZE tno
+      :If 0<≢∊data←tno{⎕FREAD ⍺,⍵}¨9↓⍳-/⌽2↑⎕FSIZE tno
           watch←⎕FREAD tno 2
           ignore←⎕FREAD tno 3
           data←⊃⍪/data
@@ -411,7 +415,7 @@
           watch ⎕FAPPEND tno
           ignore ⎕FAPPEND tno
           (CollectInformation ⍬)⎕FAPPEND tno
-          tno{⍵ ⎕FAPPEND ⍺}¨(10-¯1+2⊃⎕FSIZE tno)⍴⊂''  ⍝ Fill up to the tenth component
+          tno{⍵ ⎕FAPPEND ⍺}¨(9-¯1+2⊃⎕FSIZE tno)⍴⊂''  ⍝ Fill up to the tenth component
           details ⎕FAPPEND tno
           ⎕FUNTIE tno
       :EndIf
@@ -438,12 +442,12 @@
 
 ⍝ ------------------------ Private stuff
 
-    ∇ html←CreateListingForFnsAndOpr partlyCovered;name;lines;body;width;html2;all;testable;where;buff;i;links;percent
+    ∇ html←CreateListingForFnsAndOpr partlyCovered;name;lines;body;width;html2;all;testable;where;buff;i;links
       html←''
       links←'<a class="float-right no-print no-underline top-links" href="#top" title="Go to the top of the document">↟</a>'
       links,←'<a  class="float-right no-print no-underline top-links" href="#partly-covered" title="Go to the beginning of ''Partly-covered''">↑</a>'
       :For i :In ⍳≢partlyCovered
-          (name lines percent testable)←partlyCovered[i;1 2 3 4]
+          (name lines testable)←partlyCovered[i;1 2 4]
           body←{⍵↓⍨-+/∧\' '=⌽⍵}¨↓180⌶name
           body←(,¨'&<>')⎕R'\&amp' '\&lt;' '\&gt;'⊣body
           (1⊃body)←{⍵↑⍨¯1+⌊/⍵⍳'⍝;'}1⊃body
@@ -455,7 +459,7 @@
           html2←buff,¨html2
           (1⊃html2)←'<div class="code-block">',1⊃html2
           html2,←⊂'</div>'
-          html2←(⊂'<code class="header" id="listing_',(⍕i),'">',name,(' &mdash; ',(⍕percent),'%'),links,'</code>'),html2
+          html2←(⊂'<code class="header" id="listing_',(⍕i),'">',name,links,'</code>'),html2
           html,←html2
       :EndFor
     ∇

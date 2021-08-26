@@ -31,9 +31,10 @@
                  {(⍎⍺).⎕EX ⍵}/¯1 0↓¨'.'A.SplitPath saveIn
              :EndIf
              EstablishSystemVars saveIn cfg
-             Reg.ImportWithQuadFIX_2(path,'/',cfg.source)(saveIn,'.code')
+             Reg.ImportWithQuadFIX(path,'/',cfg.source)(saveIn,'.code')
              ⍝ Unreliable: #253    msg←Reg.ImportWithLink(saveIn,'.code')(path,'/',cfg.source)
              ⍝'Link failed to import code'Assert'Imported:'{⍺≡(≢⍺)↑⍵}msg
+             ⍝ But we also don't want Tatin to be dependent on Link, at least not yet.
              ref←⍎saveIn
              EstablishTatinConstants ref cfg path
          :Else

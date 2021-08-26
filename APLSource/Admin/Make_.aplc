@@ -4,7 +4,7 @@
 ⍝ (depending on the right argument of the `Run` function) after a new instance of Dyalog
 ⍝ was fired up by the `Admin.Make` function.
 
-    ∇ Run type;home;targetFolder
+    ∇ Run type;home;targetFolder;parms
     ⍝ Calls either the `#.Tatin.Admin.MakeClient` or the `#.Tatin.Admin.MakeSever` function depending
     ⍝ on the right argument `type`.
     ⍝ * ¯1 = call `#.Tatin.Admin.MakeSever`
@@ -19,21 +19,26 @@
           targetFolder←home,'/Dist/Client'
           3(⎕NDELETE Attempt)targetFolder
           3(⎕MKDIR Attempt)targetFolder
-          {}⎕SE.UCMD'acre.Projects'
-          Assert'#.Tatin'≡⎕SE.acre.OpenProject home'#.Tatin'
+          parms←⎕SE.Proma.CreateOpenParms ⍬
+          parms.folder←'./'
+          parms.suppressLX←1
+          'Opening the Proma project was not successful'Assert ⎕SE.Proma.OpenProject parms
           type #.Tatin.Admin.MakeClient 1
       :ElseIf ¯1≡type
           targetFolder←home,'/Dist/Server'
           3(⎕NDELETE Attempt)targetFolder
           3(⎕MKDIR Attempt)targetFolder
-          Assert'#.Tatin'≡⎕SE.acre.OpenProject home'#.Tatin'
+          parms←⎕SE.Proma.CreateOpenParms ⍬
+          parms.folder←'./'
+          parms.suppressLX←1
+          'Opening the Proma project was not successful'Assert ⎕SE.Proma.OpenProject parms
           #.Tatin.Admin.MakeServer 1
       :Else
           ∘∘∘ ⍝ Huuh?!
       :EndIf
-      ##.⎕EX 'Make_'
+      ##.⎕EX'Make_'
     ∇
-    
+
     ⍝ In case an assert is not fulfilled we ⎕OFF with an error code in runtime and crash otherwise:
     Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ##.APLTreeUtils2.IsDevelopment:⍺ ⎕SIGNAL 11 ⋄ errCode←123 ⋄ ⎕OFF errCode}
 
@@ -58,4 +63,3 @@
     ∇
 
 :EndClass
-

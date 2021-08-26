@@ -6,9 +6,8 @@
 ⍝ * major.minor number (real)
  msg←''
  :If 0<≢clientVersion←request R.GetHeaderValue'x-tatin'
- :AndIf 0≠clientVersion←⊃⊃(//)⎕VFI{⍵/⍨2>+\'.'=⍵}clientVersion
-     (clientMajor clientMinor)←0 1⊤clientVersion
-     clientMinor←A.ToNum 2↓⍕clientMinor
+     clientVersion←{⍵↑⍨¯1+⍵⍳'-'}clientVersion
+     (clientMajor clientMinor)←{⊃(//)⎕VFI ⍵}¨2↑{'.'(≠⊆⊢)⍵}clientVersion
  :AndIf G.INI.Exist'Config:MinimumTatinVersion'
      minimum←⍕⊃0 G.INI.Get'Config:MinimumTatinVersion'
  :AndIf 0≠≢minimum

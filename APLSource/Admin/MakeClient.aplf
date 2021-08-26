@@ -1,4 +1,4 @@
- {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls;myZip
+ {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls;myZip;parms
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
 ⍝ process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
@@ -13,7 +13,7 @@
  :If ~batchFlag
      ⎕←(⎕PW-1)⍴'-'
      msg←''
-     msg,←⊂'This function will close all acre projects, delete everything that is not needed in order to'
+     msg,←⊂'This function will close all Proma projects, delete everything that is not needed in order to'
      msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
      msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
      msg,←⊂'The Tatin client will be copied from that WS into ⎕SE once a Tatin user command is invoked.'
@@ -29,14 +29,18 @@
  :If batchFlag
  :OrIf 1 YesOrNo'Would you like to continue?'
      batchFlag UpdateVersionNumber type
-     {}⎕SE.acre.CloseProject''('all' 1)
-     Assert'#._Tatin'≡⎕SE.acre.OpenProject #.Tatin.AcreConfig.ProjectFolder'#._Tatin'
-     {}⎕SE.acre.CloseProject''('all' 1)
+     {}⎕SE.Proma.CloseProject''
+     parms←⎕SE.Proma.CreateOpenParms ⍬
+     parms.folder←#.Tatin.PromaConfig.HOME
+     parms.projectSpace←'_Tatin'
+     parms.suppressLX←1
+     Assert ⎕SE.Proma.OpenProject parms
+     {}⎕SE.Proma.CloseProject''
      #._Tatin.⎕EX¨'Server' 'Todo' 'TestCases' 'Simu' 'TestCasesServer' 'Tester2' 'CodeCoverage'
      #._Tatin.Admin.⎕EX¨'Initialize_Server' 'RunTestServer' 'CreateAllRefs_Server'
+     ⎕LX←''
      #._Tatin.Admin.Initialize_Client
      #._Tatin.Admin.⎕EX'Initialize_Client'
-     ⎕LX←''
      F.MkDir'Dist'
      targetPath←'Dist/Client'
      F.RmDir targetPath
@@ -97,6 +101,6 @@
      :If batchFlag
          ⎕OFF
      :Else
-         ⎕←'*** Done;  note that the Tatin acre project has been closed'
+         ⎕←'*** Done;  note that the Tatin project has been closed'
      :EndIf
  :EndIf

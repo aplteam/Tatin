@@ -12,6 +12,7 @@
  APL_Version←'C:\Program Files\Dyalog\Dyalog APL-64 18.0 Unicode\Dyalog.exe'
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
  r←⍬
+ ⎕←'Current dir is now: ',##.FilesAndDirs.Cd ##.PromaConfig.HOME
  'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
  'Invalid right argument; must be one of: 0 1 2 3'⎕SIGNAL 11/⍨~(⊂type)∊0 1 2 3
@@ -43,8 +44,6 @@
  ⎕←'   Process started for "making" the Tatin Client...'
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
- {}⎕SE.acre.Refresh'#.Tatin'                    ⍝ Because of the updated Tatin.Registry.Version function
-
  ⎕←'   Now compiling HTML from the markdown files (documentation)...'
  CompileDocumentation ⍬
  ⎕←'   Copy the documentation to the test server...'

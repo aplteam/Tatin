@@ -1,17 +1,6 @@
 # Tatin Road Map
 
 
-## Dropping packages
-
-First and foremost the INI entry "DeletePackages" deccides which strategy a server might follow:
-
-* Allow dropping any packages
-* Disallow dropping _any_ packages
-* Allow dropping only versions with a major number 0 - early betas
-* Allow dropping any betas: anything that carries something after the minor number
-
-In any case dropping means "moving of the Registry", so nothing will ever be deleted.
-
 ## Uninstalling packages
 
 We need an API function `Tatin.UninstallPackage` and the corresponding user command `]TATIN.UninstallPackage` in the long run.
@@ -36,17 +25,4 @@ aplteam-boo-1.0.0!
 ```
 
 we could treat this as "I need `Boo 1.0.0`, no matter what!"
-
-
-## `CheckForBetterVersions`
-
-How does it compare these three versions:
-
-```
-boo-foo-2.0.0-beta
-boo-foo-2.0.0-alpha
-boo-foo-1.0.0
-```
-
-??
 

@@ -1,0 +1,59 @@
+ r←Test_InstallAndLoad_060(stopFlag batchFlag);⎕TRAP;res;list;expected;ref
+ ;dir;src;dist;body;vars1;vars2;vars3;vars4;vars5;vars6;vars7;vars8;vars9;cfg;src2;zipfile
+ ⍝ Save variables of all sorts natively and make sure they are installed as well.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ src2←src,'/APLSource'
+ F.MkDir src2 dist
+
+ body←'r←Hello' 'r←''World'''
+ (⊂body)F.NPUT src2,'/Test.aplf'
+ vars1←1                    ⍝ Numeric scalar
+ vars2←'a'                  ⍝ Char scalar
+ vars3←1 2 3                ⍝ Numeric vector
+ vars4←'FOO'                ⍝ Char vector
+ vars5←'APL is Great'       ⍝ VTV
+ vars6←(1 2)(3 4)           ⍝ Nested numeric vector
+ vars7←↑vars5
+ vars8←↑vars6
+ vars9←vars1 vars2 vars3 vars4 vars5 vars6 vars7 vars8
+ (⊂⎕SE.Dyalog.Array.Serialise vars1)F.NPUT(src2,'/vars1.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars2)F.NPUT(src2,'/vars2.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars3)F.NPUT(src2,'/vars3.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars4)F.NPUT(src2,'/vars4.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars5)F.NPUT(src2,'/vars5.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars6)F.NPUT(src2,'/vars6.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars7)F.NPUT(src2,'/vars7.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars8)F.NPUT(src2,'/vars8.apla')
+ (⊂⎕SE.Dyalog.Array.Serialise vars9)F.NPUT(src2,'/vars9.apla')
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Variables'
+ cfg.version←'0.1.0'
+ cfg.source←'APLSource/'
+ TC.WritePackageConfigFile src cfg
+
+ zipfile←TC.Pack src dist
+ →T.GoToTidyUp 0≥≢zipfile
+ list←∆GetFileListFromZipArchive zipfile
+ list←{⊃,/1↓⎕NPARTS ⍵}¨list
+ expected←'apl-package.json' 'Test.aplf' 'vars1.apla' 'vars2.apla' 'vars3.apla' 'vars4.apla'
+ expected,←'vars5.apla' 'vars6.apla' 'vars7.apla' 'vars8.apla' 'vars9.apla'
+ →T.GoToTidyUp~expected ∆LazyMatch list
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ {}⎕SE.Tatin.LoadPackage zipfile'#.TEMP'
+ →T.GoToTidyUp 9≠≢#.TEMP.Variables.⎕NL 2
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -1,0 +1,34 @@
+ {r}←ImportWithQuadFIX(sourcePath target);ref;list;sourceFiles;sourceDirs;bool;i;target2;extensions;rc
+⍝ Uses just ⎕FIX with no left argument in an attempt to overcome bugs <01841> and <01843>
+ r←⍬
+ :If 0=⎕NC target
+     target CreateNamespace ⎕THIS
+ :EndIf
+ ref←⍎target
+ sourcePath←##.FilesAndDirs.NormalizePath sourcePath
+ :If F.IsDir sourcePath
+     :If 0<≢sourceFiles←F.ListFiles sourcePath,'/'
+         extensions←⎕C¨3⊃∘⎕NPARTS¨sourceFiles
+         bool←~extensions∊'.txt' '.json' '.dws'
+     :AndIf 0<≢sourceFiles←bool/sourceFiles
+         extensions←bool/extensions
+         bool←(extensions∊'.aplc' '.apln' '.apli' '.aplf' '.aplo' '.dyalog')
+         :If 0<+/bool
+             ref QuadFix¨bool/sourceFiles
+         :EndIf
+         bool←extensions≡¨⊂'.apla'
+         :If 0<≢sourceFiles←bool/sourceFiles
+             ref EstablishVariablesFromFiles sourceFiles
+         :EndIf
+     :EndIf
+     sourceDirs←F.ListDirs sourcePath,'/'
+     :If 0<≢sourceDirs
+         :For i :In ⍳≢sourceDirs
+             target2←target,{0=≢⍵:⍵ ⋄ '.',⍵}{1↓⍵↑⍨-⌊/(⌽⍵)⍳'/\'}i⊃sourceDirs
+             ImportWithQuadFIX(i⊃sourceDirs)target2
+         :EndFor
+     :EndIf
+ :Else
+     ref QuadFix sourcePath
+ :EndIf
+⍝Done

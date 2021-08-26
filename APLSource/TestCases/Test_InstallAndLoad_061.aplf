@@ -1,0 +1,51 @@
+ r←Test_InstallAndLoad_061(stopFlag batchFlag);⎕TRAP;res;ref;parms
+ ;dir;src;dist;vars1;vars2;vars3;vars4;vars5;vars6;vars7;vars8;vars9;cfg;src2;zipfile
+ ⍝ Create namespace with all sorts of variables, Link it, create a package from it and load that package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ src2←src,'/APLSource'
+ F.MkDir src2 dist
+
+ 'TEMP1'#.⎕NS'' ⋄ 'TEMP2'#.⎕NS''
+
+ #.TEMP1.⎕FX'r←Hello' 'r←''World'''
+ #.TEMP1.vars1←1                    ⍝ Numeric scalar
+ #.TEMP1.vars2←'a'                  ⍝ Char scalar
+ #.TEMP1.vars3←1 2 3                ⍝ Numeric vector
+ #.TEMP1.vars4←'FOO'                ⍝ Char vector
+ #.TEMP1.vars5←'APL is Great'       ⍝ VTV
+ #.TEMP1.vars6←(1 2)(3 4)           ⍝ Nested numeric vector
+ #.TEMP1.vars7←↑#.TEMP1.vars5
+ #.TEMP1.vars8←↑#.TEMP1.vars6
+ #.TEMP1.vars9←#.TEMP1.(vars1 vars2 vars3 vars4 vars5 vars6 vars7 vars8)
+
+ parms←⎕NS''
+ parms.arrays←1
+ {}parms ⎕SE.Link.Create #.TEMP1 src2
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Variables'
+ cfg.version←'0.2.0'
+ cfg.source←'APLSource/'
+ TC.WritePackageConfigFile src cfg
+
+ zipfile←TC.Pack src dist
+ →T.GoToTidyUp 0≥≢zipfile
+
+ {}⎕SE.Tatin.LoadPackage zipfile'#.TEMP2'
+ →T.GoToTidyUp 9≠≢#.TEMP2.Variables.⎕NL 2
+
+ r←T._OK
+
+∆TidyUp:
+ {}⎕SE.Link.Break'#.TEMP1'
+ #.⎕EX¨'TEMP1' 'TEMP2'
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

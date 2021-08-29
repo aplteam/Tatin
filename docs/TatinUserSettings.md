@@ -23,7 +23,7 @@ This call:
 ```
       ]Tatin.Listregistries -all 
  URI                 Alias                    Port  Priority  API-key                              
- ------------------  -----------------------  ----  --------  ------------------------------------ 
+ ------------------  -----------------------  ----  --------  ------------------
  tatin               https://tatin.dev/          0       100  xxxxxxx
  tatin-test          https://test.tatin.dev/     0        10  Tatin-Test-API-Key                   
 
@@ -108,9 +108,9 @@ If you manipulate the instance in the workspace, then the changes won't be writt
 
 #### Comments
 
-Not that JSON5 allows two different types of comments:
+Note that JSON5 allows two different types of comments:
 
-##### Block commenys
+##### Block comments
 
 Everything between `/*` and `*/` is recognized as a comment, like this:
 
@@ -221,6 +221,8 @@ The priority is not 0 anymore but 90: any 0 is replaced by the lowest number yet
 
 Note that so far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the change permanent. That means that other sessions won't be affected.
 
+If you want to make your changes permanent you must call the `Save` method and provide a 1 as right argument.
+
 
 ## Putting the user config file elsewhere
 
@@ -256,7 +258,7 @@ Notes:
 
 ### Make the switch permanent
 
-In order to make this user settings file the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
+In order to make this user settings file the default file, meaning that that this file will instantiate the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
 
 You can do this yourself, but you can also ask the instance for doing the job for you:
 

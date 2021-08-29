@@ -59,7 +59,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>This call:</p>
 <pre><code>      ]Tatin.Listregistries -all
  URI                 Alias                    Port  Priority  API-key
- ------------------  -----------------------  ----  --------  ------------------------------------
+ ------------------  -----------------------  ----  --------  ------------------
  tatin               https://tatin.dev/          0       100  xxxxxxx
  tatin-test          https://test.tatin.dev/     0        10  Tatin-Test-API-Key
 </code></pre>
@@ -140,10 +140,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Comments">Comments</h4>
 </a>
 </div>
-<p>Not that JSON5 allows two different types of comments:</p>
+<p>Note that JSON5 allows two different types of comments:</p>
 <div class="h_tag">
-<a href="#Block-commenys" id="Block-commenys" class="autoheader_anchor">
-<h5 data-id="Block-commenys">Block commenys</h5>
+<a href="#Block-comments" id="Block-comments" class="autoheader_anchor">
+<h5 data-id="Block-comments">Block comments</h5>
 </a>
 </div>
 <p>Everything between <code>/*</code> and <code>*/</code> is recognized as a comment, like this:</p>
@@ -236,6 +236,7 @@ https://tatin.dev/   tatin  0     100</code></pre>
  myc    https://tatin.mycompany.com/   90</code></pre>
 <p>The priority is not 0 anymore but 90: any 0 is replaced by the lowest number yet minus 10.</p>
 <p>Note that so far we have changed the user settings in the workspace, <em>not</em> on file. This allows you to experiment with certain settings without making the change permanent. That means that other sessions won't be affected.</p>
+<p>If you want to make your changes permanent you must call the <code>Save</code> method and provide a 1 as right argument.</p>
 <div class="h_tag">
 <a href="#Putting-the-user-config-file-elsewhere" id="Putting-the-user-config-file-elsewhere" class="autoheader_anchor">
 <h2 data-id="Putting-the-user-config-file-elsewhere">Putting the user config file elsewhere</h2>
@@ -269,7 +270,7 @@ https://tatin.dev/   tatin  0     100</code></pre>
 <h3 data-id="Make-the-switch-permanent">Make the switch permanent</h3>
 </a>
 </div>
-<p>In order to make this user settings file the default file, that is the file Tatin will instantiate the next time Dyalog APL is fired up, we need to make sure that a file <code>.tatin</code> in the default folder (that's the one returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code>) contains a path pointing to that folder.</p>
+<p>In order to make this user settings file the default file, meaning that that this file will instantiate the next time Dyalog APL is fired up, we need to make sure that a file <code>.tatin</code> in the default folder (that's the one returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code>) contains a path pointing to that folder.</p>
 <p>You can do this yourself, but you can also ask the instance for doing the job for you:</p>
 <pre><code>      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile</code></pre>
 <p>From now on the file <code>MyUserSettings.path2config</code> is pointing to will be used to determine the user settings.</p>

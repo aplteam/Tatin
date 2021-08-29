@@ -147,7 +147,7 @@
           registry←⎕NEW home.DefineRegistry(,⊂y)
       :EndIf
       :If 0<≢_registries
-          'This URI is already defined'Assert~(⊂registry.uri)∊_registries.uri
+          'This URI/alias combination is already defined'Assert~(⊂registry.(uri alias))∊_registries.(uri alias)
           :If 0<registry.⎕NC'alias'
           :AndIf 0<≢registry.alias
               'This alias is already used for a different uri'Assert~(⊂registry.alias)∊_registries.alias
@@ -323,6 +323,9 @@
       ns←⎕NS home.Reg.GetJsonFromFile path2config
       ns.registries.uri←{f←'\\'≡2⍴⍵ ⋄ AddSlash(f/'\\'),##.F.EnforceSlash(2×f)↓⍵}¨ns.registries.uri
       :If 0<≢ns.registries
+          :If {(≢∪⍵)≠≢⍵}ns.registries.(uri alias)
+              ('There are non-unique entries in ',path2config,' for uri+alias')Assert 0
+          :EndIf
           :If 1
               _registries←ns.registries[⍋ns.registries.priority]
           :Else

@@ -1,0 +1,29 @@
+ r←Test_ClientConfig_120(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns;dmx
+⍝ Add a URL twice with different alias names and make that accessing with URL throws an error (ambiguous)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←GetTempDir''
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name               ⍝ Precaution
+
+ settings←⎕NEW TC.UserSettings(,⊂tempDir)
+ →T.GoToTidyUp 2≠≢settings.registries
+
+ settings.AddRegistry'[alias1]https://localhost'
+ →T.GoToTidyUp 3≠≢settings.registries
+ settings.AddRegistry'[alias2]https://localhost'
+ →T.GoToTidyUp 4≠≢settings.registries
+
+ :Trap 0
+     settings.GetRegistry'https://localhost'
+     →T.GoToTidyUp 1
+ :Else
+     dmx←⎕DMX
+     →T.GoToTidyUp dmx.EM≢'Ambiguous URL'
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempDir
+⍝Done

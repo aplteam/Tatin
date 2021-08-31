@@ -1,21 +1,21 @@
- r←Test_Build_001(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir;zipFiles;∆BuildDir;∆BuildSrc;∆BuildReg
-⍝ Save build list on disk. Exercises `GetDependencyTree`, `SaveBuildList` and `LoadBuildList`.
+ r←Test_Uninstall_010(stopFlag batchFlag);⎕TRAP;clientCfg;expected;tree;tree2;path;qdmx;dir;zipFiles;∆Dir;∆Src;∆Reg
+⍝ ...
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- ∆BuildDir←'Build_Tests'GetTempDir''
- ∆BuildSrc←∆BuildDir,'/src/'
- ∆BuildReg←∆BuildDir,'/reg/'
- Assert F.MkDir ∆BuildSrc
- Assert F.MkDir ∆BuildReg
- Reg.CreateRegistry ∆BuildReg
+ ∆Dir←'Uninstall_Test'GetTempDir''
+ ∆Src←∆Dir,'/src/'
+ ∆Reg←∆Dir,'/reg/'
+ Assert F.MkDir ∆Src
+ Assert F.MkDir ∆Reg
+ Reg.CreateRegistry ∆Reg
  dir←'ConfigFile'GetTempDir''
  F.DeleteFile dir,'/',TC.UserSettings.cfg_name
  TC.InitUserSettings dir
- TC.MyUserSettings.AddRegistry'[Build]',∆BuildReg
- zipFiles←∆CreateExampleForMinimalVersionStrategy1 ∆BuildDir
+ TC.MyUserSettings.AddRegistry'[Foo]',∆Reg
+ zipFiles←∆CreateExampleForMinimalVersionStrategy1 ∆Dir
 
- path←∆BuildReg,'minimalversion-A-1.0.0'
+ path←∆Reg,'minimalversion-A-1.0.0'
 
  tree←TC.GetDependencyTree'file://',path
  expected←'A-1.0.0' 'B-1.1.2' 'C-1.1.2' 'D-1.1.4' 'E-1.1.2'  ⍝ But not 'D-1.1.3'!
@@ -55,7 +55,7 @@
 
 ∆TidyUp:
  {}TC.InitUserSettings'./TestData'
- F.RmDir ∆BuildDir
- ⎕EX'∆BuildDir'
+ F.RmDir ∆Dir
+ ⎕EX'∆Dir'
  F.DeleteFile zipFiles
 ⍝Done

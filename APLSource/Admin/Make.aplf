@@ -22,7 +22,8 @@
  :AndIf ~0 YesOrNo'An APLTree script was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
      :Return
  :EndIf
- list←⊃##.FilesAndDirs.Dir'Dist/*.zip'
+ 'Create!'##.FilesAndDirs.CheckPath'./Dist'
+ list←⊃##.FilesAndDirs.Dir'./Dist/*.zip'
  list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
  list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
  ##.FilesAndDirs.DeleteFile list

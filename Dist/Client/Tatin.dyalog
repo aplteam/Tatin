@@ -259,8 +259,8 @@
 
 
     ∇ r←(fns __ExecAsTatinUserCommand)arg
-    ⍝ Fancy name that we can work out whether a Tatin function was called via the User Command framework.
-    ⍝ That makes a difference regarding messages printed to the session.
+    ⍝ Fancy name so that we can work out whether a Tatin function was called via the User Command framework.
+    ⍝ That makes a difference regarding messages printed to the session (if at all).
      
       r←fns arg   ⍝ <===
      
@@ -443,11 +443,11 @@
       :EndIf
     ∇
 
-    ∇ r←DeletePackage Arg;path
+    ∇ msg←DeletePackage Arg;path;msg;statusCode
       path←Arg._1
-      r←TC.DeletePackage path
-      :If 200=⊃r
-          r←'Package was successfully deleted'
+      (statusCode msg)←TC.DeletePackage path
+      :If 200=statusCode
+          msg←'Package was successfully deleted'
       :EndIf
      ⍝Done
     ∇
@@ -552,7 +552,7 @@
                   packageID←2⊃⎕NPARTS source
               :AndIf ∆YesOrNo packageID,' already published on ',url_,'; overwrite?'
                   firstFlag←0
-                  (rc msg)←⎕SE.Tatin.DeletePackage url_,packageID
+                  (rc msg)←⎕SE.Tatin.DeletePackage url,packageID
                   :If 200=rc
                       →∆Again
                   :Else
@@ -616,6 +616,7 @@
       :Trap 98
           :If dateFlag
               r←dateFlag TC.ListVersions Arg._1
+              r[;2]←TC.Reg.ConvertRealDateTimeToText¨r[;2]
           :Else
               r←⍪TC.ListVersions Arg._1
           :EndIf

@@ -1,0 +1,7 @@
+ folder←∆GetTempDir;ini
+⍝ Returns the name of the directory where crash info and the log files are kept
+ ini←⎕NEW ##.IniFiles(,⊂'./TestData/Server/server.ini')
+ folder←⊃ini.Get'TRAP:Folder'
+ folder←'<TEMP>'⎕R(739⌶0)⊣folder
+ folder←¯1↓1⊃⎕NPARTS(¯1×(¯1↑folder)∊'/\')↓folder
+⍝Done

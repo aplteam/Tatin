@@ -12,7 +12,13 @@
  statusCode←HttpCodes.OK ⋄ errMsg←''
  tempDir←F.GetTempSubDir''
  zipFilename DotNetZip.UnzipTo tempDir
- cfg←ReadPackageConfigFile tempDir
+ :If F.IsFile tempDir,'/',CFG_Name
+     cfg←ReadPackageConfigFile tempDir
+ :Else
+     errMsg←'Package does not contain a file "',CFG_Name,'"'
+     statusCode←HttpCodes.BadRequest
+     :Return
+ :EndIf
  packageID←{⍵.group,'-',⍵.name,'-',⍵.version}cfg
  packageID←⊃SplitVersionFromBuild packageID
  registryPath←AddSlash registryPath

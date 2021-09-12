@@ -305,11 +305,12 @@
     ⍝ Returns a vector of booleans.\\
     ⍝ Interprets `⍵` as an alias in case is carries `[]` and as an URI otherwise.
       :If '['∊y
-          alias←⎕C y~'[]'
+          alias←{⎕C ⍵~'['}{⍵↑⍨¯1+⍵⍳']'}y
           bool←alias∘≡¨_registries.alias
           msg←'Ambiguous alias'
       :Else
           uri←F.EnforceSlash y
+          uri←{⍵/⍨3>+\⍵='/'}uri
           uri←AddSlash uri
           bool←(⊂uri)≡¨_registries.uri
           msg←'Ambiguous URL'

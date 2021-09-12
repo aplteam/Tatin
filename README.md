@@ -2,7 +2,7 @@
 
 Tatin is a community project. It is available as Open Source under the (pretty relaxed) MIT license.
 
-A Tarte Tatin is a nice way to package APpLe's.
+A Tarte Tatin is a nice way to package Apple's.
 
 ## Documentation
 
@@ -12,13 +12,14 @@ The documentation is available on [Tatin's principal server](https://tatin.dev/v
 
 Tatin consists of three modules:
 
-* `Client` - the client
-* `Server` - the Server
-* `Registry` - all code that is shared between the client and the server.
+* `Client` 
+* `Server` 
+* `Registry` - all code that is shared between client and server
 
-Client as well as Server may run under Windows, Linux and Mac-OS.
+Tatin clients may run under Windows, Linux and Mac-OS.
 
-Tatin requires Dyalog APL 18.0 Unicode or better. It will be part of the successor of 18.0
+* Tatin clients may run under Windows, Linux and Mac-OS.
+* Tatin servers may run under Windows and Linux.
 
 ## Installing and updating the Tatin Client
 

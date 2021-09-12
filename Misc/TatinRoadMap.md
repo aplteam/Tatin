@@ -14,15 +14,5 @@ Got this from Gil:
 
 The rebuild needs to be smart! If something got updated to a better version by being requested, and then the package disappears that requested that better version, then we still want to keep the better version.
 
-## Enforce usage of a particular version
 
-If I learn that my package `Foo` needs `Boo 1.0` but `Goo` and `Zoo` are quite happy with --- and requests --- `Boo 1.1` then we currently do not have the means to make all three happy: everybody is expected to get along with `Boo 1.1`...
-
-If `Foo` declares
-
-```
-aplteam-boo-1.0.0!
-```
-
-we could treat this as "I need `Boo 1.0.0`, no matter what!"
-
+Implemented but the parameter is still needed.

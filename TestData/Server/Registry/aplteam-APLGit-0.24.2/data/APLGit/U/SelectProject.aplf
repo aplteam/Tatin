@@ -1,0 +1,11 @@
+ SelectProject←{
+⍝ Presents all currently opened projects that are Git-managed and lets the user choose one.\\
+⍝ Returns a matrix with the selected project in the same format ]acre.Projects does, possibly `(⍬ ⍬ ⍬)`.
+⍝ The optional left argument (default=1) allows you to ask for **all** currently opened
+⍝ projects (rather than only those that are git-managed) by passing a 0.
+     ⍺←1
+     ~(⊂⍺)∊0 1:'Invalid left argument: not a Boolean'⎕SIGNAL 11
+     l←##.GitProjects ⍬
+     0=≢i←Select↓⎕FMT l:''
+     l[i;]
+ }

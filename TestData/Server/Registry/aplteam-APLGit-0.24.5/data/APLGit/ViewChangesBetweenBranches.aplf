@@ -1,0 +1,121 @@
+ {r}←{x}ViewChangesBetweenBranches y;tfn1;tfn2;project;folder;branch1;branch2;list;thisFile;name;header;now;buff;hash1;hash2;extension;noofBytes;buff1;buff2;currentBranch;wsName;space;nc;qdmx;rc;more
+⍝ Allows the inspection of all differences between the two branches defined by `y`.\\
+⍝ `y` might be one of:
+⍝ * Empty vector; in that case it defaults to "master" and "dev".
+⍝ * A two-element vector each of which is a text vector with a branch name.\\
+⍝ Note that in case one of the branches specified is the current branch then a dirty
+⍝ working directory is taken into account, **not** the latest commit.\\
+⍝ For the actual comparison the user command `]CompareFiles` is used.\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ Returns always `⍬`.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ r←⍬
+ project←EstablishProject x
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ (space folder)←2↑project
+ currentBranch←CurrentBranch folder
+ :If 0=≢y
+     :If 'master'≡currentBranch
+         (branch1 branch2)←'master' 'dev'
+     :Else
+         (branch1 branch2)←'master'currentBranch
+     :EndIf
+ :Else
+     (branch1 branch2)←y
+ :EndIf
+ 'Please specify two existing branches or a single empty vector'⎕SIGNAL 11/⍨0∊≢¨branch1 branch2
+ :Trap 11
+     :If 0=≢hash1←folder LogForBranch branch1 1
+         →0,⎕←'No commits found for ',branch1
+     :EndIf
+ :Else
+     (1↓⊃,/(⎕UCS 13),¨⎕DMX.DM)⎕SIGNAL 11
+ :EndTrap
+ :Trap 11
+     :If 0=≢hash2←folder LogForBranch branch2 1
+         →0,⎕←'No commits found for ',branch2
+     :EndIf
+ :Else
+     (1↓⊃,/(⎕UCS 13),¨⎕DMX.DM)⎕SIGNAL 11
+ :EndTrap
+ (hash1 hash2)←⊃¨hash1 hash2
+ noofBytes←0
+ :If hash1≢hash2
+     :If 0=≢list←folder DiffBetween branch1 branch2
+         ∆TestFlag U.Show'No changes found'
+         :Return
+     :EndIf
+     (tfn1 tfn2)←'txt'∘F.GetTempFilename2¨2⍴⊂''
+     :For thisFile :In list[;2]
+         extension←A.Lowercase 3⊃⎕NPARTS thisFile
+         :If (⊂extension)∊'.aplf' '.aplo' '.apln' '.aplc' '.apli' '.charstring' '.charlist'
+         :AndIf 'APLSource'{⍺≡(⍴⍺)↑⍵}thisFile
+             wsName←1⊃,⎕SE.acre.Itemname{~' '∊⍵:⍵ ⋄ {⍵⊃⍨⌊/2,1+{⍵/⍳≢⍵}'-'∊¨⍵}' 'A.Split{⍵/⍨~'  '⍷⍵}⍵}thisFile
+             header←↓U.Box(('⌹',[1]'⌹',,[0.5]wsName),[1]'⌹'),'⌹'
+             :If branch1≡currentBranch
+             :AndIf 0<nc←⎕NC wsName
+                 :If 9=nc
+                     buff1←⎕SRC⍎wsName
+                 :ElseIf nc∊3 4
+                     buff1←⎕NR wsName
+                 :Else
+                     :If ~(⎕DR buff1←⍎wsName)∊80 326
+                         buff1←(⎕UCS 13)A.Split ⎕SE.acre.ToAPLAN wsName
+                     :EndIf
+                 :EndIf
+             :Else
+                 (rc more buff1)←folder U.RunGitCommand3'show ',hash1,':',thisFile
+                 :If 0≠rc
+                     :If ∨/'does not exist'⍷∊more
+                     :OrIf ∨/'exists on disk, but not'⍷∊more
+                         buff1←''
+                     :Else
+                         ∘∘∘ ⍝ Huh?!
+                     :EndIf
+                 :EndIf
+             :EndIf
+             :If branch2≡currentBranch
+             :AndIf 0<nc←⎕NC wsName
+                 :If 9=nc
+                     buff2←⎕SRC⍎wsName
+                 :ElseIf nc∊3 4
+                     buff2←⎕NR wsName
+                 :Else
+                     :If ~(⎕DR buff2←⍎wsName)∊80 326
+                         buff2←(⎕UCS 13)A.Split ⎕SE.acre.ToAPLAN wsName
+                     :EndIf
+                 :EndIf
+             :Else
+                 (rc more buff2)←folder U.RunGitCommand3'show ',hash2,':',thisFile
+                 :If 0≠rc
+                     :If ∨/'does not exist'⍷∊more
+                     :OrIf ∨/'exists on disk, but not'⍷∊more
+                         buff2←''
+                     :Else
+                         ∘∘∘ ⍝ Huh?!
+                     :EndIf
+                 :EndIf
+             :EndIf
+             buff1←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}buff1
+             buff2←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}buff2
+         :Else
+             name←thisFile
+             header←↓U.Box(('⌹',[1]'⌹',,[0.5]name),[1]'⌹'),'⌹'
+             buff1←⊂'*** File ',((0<≢extension)/'type '),'ignored for comparison: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+             buff2←⊂'*** File ',((0<≢extension)/'type '),'ignored for comparison: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+         :EndIf
+         :If buff1≢buff2
+             (⊂buff1)⎕NPUT tfn1 2
+             (⊂buff2)⎕NPUT tfn2 2
+             noofBytes+←⌈/{+/≢¨⍵}¨buff1 buff2
+         :EndIf
+     :EndFor
+ :EndIf
+ :If 0<noofBytes
+     {}⎕SE.UCMD'CompareFiles "',tfn1,'" "',tfn2,'" -ro1=1 -ro2=1 -label1=''',branch1,''' -label2=''',branch2,''''
+ :Else
+     ⎕←'No APL objects found to compare'
+ :EndIf
+ :Trap 6 ⋄ F.DeleteFile tfn1 ⋄ :EndTrap
+ :Trap 6 ⋄ F.DeleteFile tfn2 ⋄ :EndTrap
+⍝Done

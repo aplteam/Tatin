@@ -1,0 +1,44 @@
+ n←Create(name log);∆;TAB
+ TAB←⎕UCS 9
+ n←⎕NS''
+ ∆←⊂'Form'
+ ∆,←⊂'Caption'('Compare different versions of ',name)
+ ∆,←⊂'Coord' 'Pixel'
+ ∆,←⊂'Size'(500 1200)
+ ∆,←⊂'Posn'(40 50)
+ n.∆Form←⍎'FF'⎕WC ∆
+ n.∆Form.on9999←'On9999'
+
+ n.Font←⍎'Font'⎕WC'Font'('PName' 'APL385 Unicode')('Size' 18)
+
+ n.MB←⍎'MB'n.∆Form.⎕WC⊂'MenuBar'
+ n.File←⍎'File'n.MB.⎕WC'Menu'('Caption' 'File')
+ n.Quit←⍎'Quit'n.File.⎕WC'MenuItem'('Quit',TAB,'Alt+F4')
+ n.Quit.onSelect←'OnQuit'
+ n.Edit←⍎'Edit'n.MB.⎕WC'Menu'('Caption' 'Edit')
+ n.Compare←⍎'Compare'n.Edit.⎕WC'MenuItem'('Compare',TAB,'=')('Accelerator'(187 0))
+ n.Compare.onSelect←'OnCompare'
+
+ ∆←⊂'Grid'
+ ∆,←⊂'Coord' 'Prop'
+ ∆,←⊂'Size'(100 100)
+ ∆,←⊂'Posn'(0 0)
+ ∆,←⊂'Values'(((≢log)↑1),((≢log)↑0 1),log)
+ ∆,←⊂'FontObj'n.Font
+ ∆,←⊂'ShowInput' 1
+ n.Grid←⍎'Grid'n.∆Form.⎕WC ∆
+
+ n.Grid.Input,←⍎'Radio'n.Grid.⎕WC'Button'('Style' 'Radio')
+ n.Grid.Input,←⍎'Label'n.Grid.⎕WC'Edit'('ReadOnly' 1)
+ n.Grid.CellTypes←(⍴n.Grid.Values)⍴1 1 2 2 2 2
+ n.Grid.ColTitles←'A' 'B' 'Hash' 'Comitter' 'Date' 'Message'
+ n.Grid.Coord←'Pixel'
+ {⎕NQ n.Grid'SetColSize'⍵ ¯3}¨⍳2⊃⍴n.Grid.Values
+ ⎕NQ n.Grid'SetColSize' 0 50
+ n.Grid.onCellUp←'OnCellUp'
+ n.Grid.onGridKeyPress←'OnKeyPressInGrid'
+ n.Grid.onContextMenu←'OnContextInGrid'
+
+ n.∆Form.n←n
+ n.∆Name←name
+⍝Done

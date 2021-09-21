@@ -1,0 +1,21 @@
+ (rc msg data)←{folder}RunGitCommand2 command;cmd;transform;tempFilename
+⍝ `command` must be a Git command.\\
+⍝ * `rc` is 0 in case the command was executed successfully, otherwise 1.
+⍝ * `msg` is '' if `rc is 0 but may carry an error message otherwise.
+⍝ * `data` is the data returned by Git.
+⍝ See also `RunGitCommand`.
+ rc←0
+ folder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'folder'
+ tempFilename←##.F.GetTempFilename2'APLGit'
+ cmd←'git -C "',folder,'" ',command,' 2>"',tempFilename,'"'    ⍝ Redirects errors to a temp file
+ transform←{'UTF-8'⎕UCS ⎕UCS ⍵}
+ data←transform¨⎕CMD cmd
+ :If 0<≢msg←{22::'' ⋄ ⊃⎕NGET ⍵ 1}tempFilename
+     rc←1
+     :If 2=|≡msg
+     :AndIf 1=≢msg
+         msg←∊msg
+     :EndIf
+ :EndIf
+ ##.F.DeleteFile tempFilename
+⍝Done

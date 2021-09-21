@@ -1,0 +1,18 @@
+ r←Test_ListPkgs_047(stopFlag batchFlag);⎕TRAP;mat;parms
+⍝ List all packages of group "aplteam" with their info_url
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.info_url←1
+ parms.group←'aplteam'
+ mat←parms TC.ListPackages'[local]'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 3=2⊃⍴mat
+ →T.PassesIf 1<≢mat
+ →T.PassesIf∧/'https://'{((≢⍺)↑[2]⍵)∧.=⍺}↑mat[;3]   ⍝ All must be URLs
+ →T.PassesIf∧/83∧.=∪⎕DR¨mat[;2]                     ⍝ Integer (no. of packages
+ →T.PassesIf∧/'aplteam-'{((≢⍺)↑[2]⍵)∧.=⍺}↑mat[;1]   ⍝ Only group "aplteam"?
+
+ r←T._OK
+⍝Done

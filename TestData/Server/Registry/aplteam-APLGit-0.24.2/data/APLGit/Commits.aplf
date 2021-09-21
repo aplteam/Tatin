@@ -1,0 +1,13 @@
+ r←{x}Commits branchName;project;folder;s;buff;buff2;rc;more
+⍝ Returns commits for `branchName`. If `branchName` is empty it defaults to the current branch.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ project←EstablishProject x
+ 'No open acre projects'⎕SIGNAL 6/⍨0=≢project
+ folder←2⊃project
+ (rc more buff)←folder U.RunGitCommand2'log ',branchName,' --pretty=format:"%h∆%ci∆%an∆%s"'
+ U.Assert 0=rc
+ buff2←↑{'∆'A.Split ⍵}¨buff
+ r←⎕NS''
+ r.(Hash Date User Message)←↓⍉buff2
+⍝Done

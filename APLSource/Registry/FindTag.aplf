@@ -15,12 +15,20 @@
  bool←tagList[;1]∊⊃∩/bool_⌿¨⊂tagList[;1]
  :If ∨/bool
      ind←∪⊃¨bool⌿tagList[;1]
-     list←allPackages[ind]
-     list←∪list
+     list←allPackages[ind;1]
+     :If 2=⍴⍴allPackages
+         list←({(⍳≢⍵)=⍵⍳⍵}list)⌿allPackages[ind;]
+     :Else
+         list←∪list
+     :EndIf
      fuzzy←⌈/fuzzy_
  :EndIf
  :If aggregate
  :AndIf 0<≢list
-     list←∪RemoveMinorAndPatch¨list        ⍝ Get rid of minor and patch number but preserve major one
+     :If 2=⍴⍴allPackages
+         list←({⌽{(⍳≢⍵)=⍵⍳⍵}⌽⍵}RemoveMinorAndPatch¨list[;1])⌿list
+     :Else
+         list←∪RemoveMinorAndPatch¨list        ⍝ Get rid of minor and patch number but preserve major one
+     :EndIf
  :EndIf
 ⍝Done

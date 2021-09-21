@@ -1,4 +1,4 @@
- (alias url)←SplitAtAlias id;pkgID;regAlias
+ (alias url)←SplitAtAlias id;pkgID;regAlias;buff
  alias←''
  :If '@'∊id
      (alias pkgID)←id{(⍵↑⍺)(⍵↓⍺)}id⍳'@'
@@ -8,7 +8,12 @@
          'Invalid package alias'Assert 0=(⎕NS'').⎕NC ¯1↓alias
          url←regAlias,pkgID
      :Else
-         url←pkgID
+         :If ∨/'/\'∊alias
+             (alias buff)←{⍵{(⍵↑⍺)(⍵↓⍺)}1+-⌊/(⌽⍵)⍳'\/'}alias
+             url←buff,pkgID
+         :Else
+             url←pkgID
+         :EndIf
      :EndIf
  :Else
      url←id

@@ -1,0 +1,17 @@
+ r←Test_ListPkgs_043(stopFlag batchFlag);⎕TRAP;mat;parms
+⍝ List all packages of group "aplteam" with their publishing dates
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.date←1
+ parms.group←'aplteam'
+ mat←parms TC.ListPackages'[local]'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 1<≢mat
+ →T.PassesIf∧/{∧/⍵∊⎕D,' :-'}¨mat[;2]                ⍝ Formatted dates?
+ →T.PassesIf∧/'aplteam-'{((≢⍺)↑[2]⍵)∧.=⍺}↑mat[;1]   ⍝ Only group "aplteam"?
+
+ r←T._OK
+⍝Done

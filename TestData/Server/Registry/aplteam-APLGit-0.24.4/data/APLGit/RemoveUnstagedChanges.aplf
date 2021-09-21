@@ -1,0 +1,36 @@
+ {r}←RemoveUnstagedChanges y;project;space;folder;rc;more;buff
+⍝ Closes the acre project, discards all unstaged changes and then re-opens the project.\\
+⍝ **Warning!** All changes removed by this command are lost - Git does not know anything
+⍝ about them after issuing the "Reset" command.
+⍝ For what `y` can actually be see `EstablishProject`.\\
+⍝ Returns 0 for okay and 1 otherwise.
+ :If 0≠≢project←EstablishProject y
+     (space folder)←project[1 2]
+     :If (⊂space)∊⎕NSI
+         ⎕←'This function MUST NOT be called from within the project in question!'
+         ⎕←'Please enter the following command before executing the function again:'
+         ⎕←'      )CS'
+         r←1
+     :Else
+         'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+         :If ~isOpenacreProject←0<+/≢¨project
+         :OrIf 1 U.YesOrNo'This will close the acre project before resetting and then re-open it; continue?'
+             :If isOpenacreProject
+                 ⎕←'*** Closing acre project ',space,'...'
+                 {}⎕SE.acre.CloseProject space
+             :EndIf
+             (rc more buff)←folder U.RunGitCommand2'reset --hard HEAD'
+             U.Assert 0=rc
+             r←∆TestFlag U.Show buff
+             :If isOpenacreProject
+                 #.⎕EX space
+                 ⎕←'*** Opening acre project ',space,'...'
+                 ⎕←⎕SE.acre.OpenProject folder
+             :EndIf
+         :EndIf
+     :EndIf
+ :Else
+     ⎕←'No projects found'
+ :EndIf
+ r←0
+⍝Done

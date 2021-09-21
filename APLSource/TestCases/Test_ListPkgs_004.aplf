@@ -1,16 +1,17 @@
  r←Test_ListPkgs_004(stopFlag batchFlag);⎕TRAP;mat;noOf;parms
-⍝ List all packages with aggregate←0
+⍝ List all packages with date←1
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  parms←TC.Reg.CheckParmsForListPackages ⍬
- parms.aggregate←0
+ parms.date←1
  mat←parms TC.ListPackages'[local]'
  →T.PassesIf 2=⍴⍴mat
  →T.PassesIf 2=2⊃⍴mat
  noOf←≢F.ListDirs ∆GetServerRegistryFolder,'\'
  Assert 0<noOf
  →T.PassesIf noOf≡≢mat
+ →T.PassesIf∧/∧/¨mat[;2]∊¨⊂⎕D,' :-'  ⍝ Dates
 
  r←T._OK
 ⍝Done

@@ -1,0 +1,70 @@
+ {r}←{noPrompt}MergeWithMaster y;project;folder;currentBranch;gitMsg;space;buff;rc;more
+⍝ This function is usually executed only in case `FastForwardMergeWithMaster` failed.
+⍝. See there why that might fail.\\
+⍝ Like `FastForwardMergeWithMaster`, `MergeWithMaster` performs several steps:
+⍝ 1. Pulls the master (if user agrees)
+⍝ 2. Merge `currentBranch` with the master
+⍝ 3. Push the master
+⍝ 4. Delete the branch in question\\
+⍝ Call `Squash` beforehand in order to clean up the commit history.\\
+⍝ Pulls the master first (the user will be prompted) and pushes after the merge.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ r←⍬
+ noPrompt←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noPrompt'
+ project←EstablishProject y
+ :If (,'#')≡,⊃⎕NSI
+ :OrIf (,'#')≡,⊃1↓⎕NSI  ⍝ When called via the API
+     'No open acre projects'⎕SIGNAL 6/⍨0=≢project
+     (space folder)←project[1 2]
+     currentBranch←CurrentBranch folder
+     :If 0=U.CheckForHistoryFolder folder
+         11 ⎕SIGNAL⍨folder,U.NameOfHistoryFolder,' exists, MergeWithMaster cannot continue'
+     :EndIf
+     :If 1<≢⎕SE.acre.Projects ⍬
+         ⎕←{(⎕PW-1)↑'--- ',⍵,' ',⎕PW⍴'-'}'Project <',(1⊃project),'> with branch "',currentBranch,'"'
+     :EndIf
+     'This command MUST NOT be executed in "master"'⎕SIGNAL 11/⍨'master'≡currentBranch
+     ('Branch "',currentBranch,'" is dirty!')⎕SIGNAL 11/⍨IsDirty folder
+     :If 1 U.YesOrNo'Would you like to pull the master?'
+         buff←PullMaster folder
+     :AndIf 0<'CONFLICT'{+/⍺∧.=⍨(≢⍺)↑[2]⍵}↑,buff
+         {}⎕SE.acre.CloseProject space
+         ⎕←'Because of the conflict the project is now closed.'
+         ⎕←'Re-open in a clean environment and then solve the merge conflicts.'
+         :Return
+     :EndIf
+     ⎕←'Now checking out master...'
+     (rc more buff)←folder U.RunGitCommand2'checkout master'
+     :If 'Switched to branch ''master'''≢more
+         U.Assert 0=rc
+     :EndIf
+     ⎕←⊃buff
+     (rc more buff)←folder U.RunGitCommand2'merge ',currentBranch
+     U.Assert 0=rc
+     ⎕←↑buff
+     (rc more buff)←folder DeleteBranch currentBranch
+     :If 1 1 1≢rc more buff  ⍝ Strangely that now means "OK"
+         U.Assert 0=rc
+         ⎕←⊃buff
+     :EndIf
+     :If noPrompt
+     :OrIf 1 U.YesOrNo'Would you like to push the master?'
+         :If 0=≢∊gitMsg←1 Push folder
+             ⎕←'Pushed!'
+         :Else
+             ⎕←↑gitMsg
+         :EndIf
+     :EndIf
+     {}⎕SE.acre.CloseProject space
+     #.⎕EX space
+     :If 0<⎕NC'∆DefaultDir'
+         ∆DefaultDir←((⊂∆DefaultDir)∊(⎕SE.acre.Projects ⍬)[;2])/∆DefaultDir
+     :EndIf
+     ⎕CS'#'
+     ⎕←'Project closed, space "',space,'" deleted and branch "',currentBranch,'" deleted'
+ :Else
+     ⎕←'This function must be called from #'
+     ⎕←'Please enter the following command before executing the function again:'
+     ⎕←'      )CS'
+ :EndIf
+⍝Done

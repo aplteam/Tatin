@@ -1,0 +1,60 @@
+ {r}←CompareCurrentBranchWithMaster y;project;space;folder;currentBranch;hash;noofBytes;tfn1;tfn2;list;thisObj;body1;rc;more;body2;extension;thisFile;wsName;header
+⍝ Assumes that the durrent branch is **not** master, and compares it with what's saved in APLsource,
+⍝ meaning that this function only makes sense in acre projects. Note that APLSource rules the day,
+⍝ meaning that in case something was deleted in the current branch it won't be mentioned.\\
+⍝ For the actual comparison the user command `]CompareFiles` is used.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+⍝ Returns always `⍬`.\\
+ r←⍬
+ ∘∘∘ ⍝ Not ready yet by any means
+ project←EstablishProject y
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ (space folder)←2↑project
+ currentBranch←CurrentBranch folder
+ 'Not on branch "master"'⎕SIGNAL 11/⍨'master'≡currentBranch
+ :Trap 11
+     :If 0=≢hash←folder LogForBranch'master' 1
+         →0,⎕←'No commits found for "master"'
+     :EndIf
+ :Else
+     (1↓⊃,/(⎕UCS 13),¨⎕DMX.DM)⎕SIGNAL 11
+ :EndTrap
+ hash←⊃hash
+ noofBytes←0
+ list←'recursive'F.ListFiles folder,'APLSource/'
+ (tfn1 tfn2)←'txt'∘F.GetTempFilename2¨2⍴⊂''
+ :For thisObj :In list
+     body1←⊃⎕NGET thisObj
+     thisFile←'APLSource'{⍵↓⍨¯1+1⍳⍨⍺⍷⍵}thisObj
+     extension←A.Lowercase 3⊃⎕NPARTS thisFile
+     :If (⊂extension)∊'.aplf' '.aplo' '.apln' '.aplc' '.apli' '.charstring' '.charlist'
+         (rc more body2)←folder GetRevision thisFile hash
+         more U.Assert 0=rc
+         :If body1≡body2
+             :Continue
+         :EndIf
+         wsName←1⊃,⎕SE.acre.Itemname{~' '∊⍵:⍵ ⋄ {⍵⊃⍨⌊/2,1+{⍵/⍳≢⍵}'-'∊¨⍵}' 'A.Split{⍵/⍨~'  '⍷⍵}⍵}thisFile
+         header←↓U.Box(('⌹',[1]'⌹',,[0.5]wsName),[1]'⌹'),'⌹'
+         body1←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}body1
+         body2←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}body2
+     :Else
+         ∘∘∘  ⍝TODO⍝
+         name←thisFile
+         header←↓U.Box(('⌹',[1]'⌹',,[0.5]name),[1]'⌹'),'⌹'
+         buff1←⊂'*** File ',((0<≢extension)/'type '),'ignored for comparison: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+         buff2←⊂'*** File ',((0<≢extension)/'type '),'ignored for comparison: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+     :EndIf
+     :If body1≢body2
+         (⊂body1)⎕NPUT tfn1 2
+         (⊂body2)⎕NPUT tfn2 2
+         noofBytes+←⌈/{+/≢¨⍵}¨body1 body2
+     :EndIf
+ :EndFor
+ :If 0<noofBytes
+     {}⎕SE.UCMD'CompareFiles "',tfn1,'" "',tfn2,'" -ro1=1 -ro2=1 -label1=''',branch1,''' -label2=''',branch2,''''
+ :Else
+     ⎕←'No APL objects found to compare'
+ :EndIf
+ :Trap 6 ⋄ F.DeleteFile tfn1 ⋄ :EndTrap
+ :Trap 6 ⋄ F.DeleteFile tfn2 ⋄ :EndTrap
+⍝Done

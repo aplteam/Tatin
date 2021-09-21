@@ -2,13 +2,13 @@
  r←0
  :For filename :In filenames
      data←⊃⎕NGET filename 1
-     data←⎕SE.Dyalog.Array.Deserialise data
-     name←StripCaseCodePart 2⊃⎕NPARTS filename
      :Trap 0
+         data←⎕SE.Dyalog.Array.Deserialise data
+         name←StripCaseCodePart 2⊃⎕NPARTS filename
          name ref.{⍎⍺,'←⍵'}data
      :Else
          dmx←⎕DMX
-         ⎕←'*** Establishing variable <',name,'> failed with a ',dmx.EM,'; RC=',⍕dmx.EN
+         ⎕←'*** Establishing variable <',name,'> failed with ',(2⊃dmx.DM),'; RC=',⍕dmx.EN
      :EndTrap
  :EndFor
 ⍝Done

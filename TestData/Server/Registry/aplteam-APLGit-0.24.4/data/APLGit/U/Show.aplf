@@ -1,0 +1,11 @@
+ {r}←{testFlag}Show msg
+⍝ Prints `msg` to the session if `testFlag` is 0 (the default).\\
+⍝ Makes `msg` a matrix in case it is nested.\\
+⍝ Always returns `⍬`.
+ r←⍬
+ testFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'testFlag'
+ :If 0=testFlag
+     :If 0≠≢msg
+         ⎕←⍪⍣(~0 1∊⍨≡msg)⊣msg
+     :EndIf
+ :EndIf

@@ -20,8 +20,14 @@
  :If (⊂'tags')∊request.QueryParameters[;1]
      parms.tags←{2⊃⍵[⍵[;1]⍳⊂'tags';]}request.QueryParameters
  :EndIf
- :If (⊂'aggregate')∊request.QueryParameters[;1]
+ :If (⊂'date')∊request.QueryParameters[;1]
+     parms.date←{⊃(//)⎕VFI ⍵}{2⊃⍵[⍵[;1]⍳⊂'date';]}request.QueryParameters
+     parms.aggregate←0
+ :ElseIf (⊂'aggregate')∊request.QueryParameters[;1]
      parms.aggregate←{⊃(//)⎕VFI ⍵}{2⊃⍵[⍵[;1]⍳⊂'aggregate';]}request.QueryParameters
+ :EndIf
+ :If (⊂'info_url')∊request.QueryParameters[;1]
+     parms.info_url←{⊃(//)⎕VFI ⍵}{2⊃⍵[⍵[;1]⍳⊂'info_url';]}request.QueryParameters
  :EndIf
  :If IsJsonRequest request.Headers
      :If 0=≢data←Reg.ListPackages(G.RegistryPath,'/',packageID)parms
@@ -33,7 +39,7 @@
      list←Reg.GetAllPackages G.RegistryPath
      list2←list Reg.ListPackages(G.RegistryPath,packageID)parms
      list3←Reg.RemoveVersionNumber¨list
-     :If 0=≢uniqueIDs←list2[;1]{⍵[(Reg.RemoveVersionNumber¨⍵)⍳⍺]}⌽list  ⍝ ⌽ them in order to get the latest description
+     :If 0=≢uniqueIDs←list2[;1]{⍵[(Reg.RemoveVersionNumber¨⍵)⍳⍺]}⌽,list  ⍝ ⌽ them in order to get the latest description
          mat←0 3⍴''
      :Else
          descriptionAndProjecturl←↑Reg.FetchDescriptionAndPackageProjectUrl¨G.RegistryPath∘,¨uniqueIDs

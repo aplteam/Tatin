@@ -1,6 +1,6 @@
  r←{removeVersionNo}AggregatePackages list;list2;list3;list4;noOfVersions
  removeVersionNo←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'removeVersionNo'
- list2←RemoveMinorAndPatch¨list
+ list2←RemoveMinorAndPatch¨list[;1]
  list3←∪list2
  :If removeVersionNo
      list4←RemoveVersionNumber¨list3
@@ -9,5 +9,8 @@
  :EndIf
  noOfVersions←{≢⍵}⌸list4
  list4←∪list4
- r←list4,[1.5],noOfVersions
+ r←list4,[1.5]noOfVersions
+ :If 2=2⊃⍴list   ⍝ Has info_url?! ("date" sets aggregate to 0 anyway)
+     r,←list[⍸{⌽{(⍳≢⍵)=⍵⍳⍵}⌽⍵}RemoveVersionNumber¨,list[;1];2]
+ :EndIf
 ⍝Done

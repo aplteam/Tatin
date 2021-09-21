@@ -1,0 +1,44 @@
+ {r}←{x}CompareVersions name;project;folder;space;log;n;buff;filename;inWs
+⍝ Takes the name of an APL object and presents a GUI with all commits that object was changed by.
+⍝ The user may then compare any two of them as many times as she likes.
+⍝ Notes:\\
+⍝ * If the name is not fully qualified (=does not start with a `#`) then it is assumed that it will
+⍝   live in the namespace this function was called from.
+⍝ * If the object does not exist any more in the project then the user will be prompted. We need
+⍝   to know because only then can we compile a proper filename which is required by Git.\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ Returns `⍬`.\\
+ r←⍬
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ :If '#'≠1⍴name
+     name←(⊃⎕NSI),'.',name
+ :EndIf
+ :If 0=≢x
+     (space folder)←name{⍵[⍺{1⍳⍨⍵∊(≢¨⍵)↑¨⊂⍺}⍵[;1];]}⎕SE.acre.Projects''
+ :Else
+     project←EstablishProject x
+     'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+     (space folder)←2↑project
+ :EndIf
+ :If inWs←(⎕NC name)∊⍳16
+     filename←'file://',(≢folder)↓⊃⎕SE.acre.Sourcefile name
+ :Else
+     :If 0=≢buff←'Select object type:'U.Select U.ValidAplObjects
+         :Return
+     :Else
+         filename←(≢folder)↓¯1↓⊃⎕SE.acre.Sourcefile name
+         filename←'file://',filename,buff⊃U.ValidFileExtensions
+     :EndIf
+ :EndIf
+ :If 0=≢log←folder ChangeLog filename
+     ⎕←'No changes found for ',name
+ :Else
+     :If inWs
+         log←'n/a' 'n/a' 'n/a' '--- The workspace version ---',[1]log
+     :EndIf
+     n←GUI_CompareVersions.Create name log
+     n.∆Folder←folder
+     n.∆Filename←(≢'file://')↓filename
+     ⎕DQ n.∆Form
+ :EndIf
+⍝Done

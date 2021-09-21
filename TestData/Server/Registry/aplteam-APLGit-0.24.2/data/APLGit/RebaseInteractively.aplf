@@ -1,0 +1,16 @@
+ r←RebaseInteractively y;project;currentBranch;ca;folder;tags;cmd;rc;more
+⍝ Allows you to interactively squash selected commits of all commits of the current branch.\\
+⍝ You will be prompted for a meaningful message unless you pick one with "fixup".\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ r←⍬
+ project←EstablishProject y
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ folder←2⊃project
+ currentBranch←CurrentBranch folder
+ 'No rebasing the master'⎕SIGNAL 11/⍨currentBranch≡'master'
+ 'There are uncommitted changes'⎕SIGNAL 11/⍨IsDirty folder
+ tags←LogForBranch currentBranch
+ cmd←'rebase -i HEAD~',⍕≢tags
+ (rc more r)←folder(({⍵}'')U.RunGitCommand2)cmd
+ U.Assert 0=rc
+⍝Done

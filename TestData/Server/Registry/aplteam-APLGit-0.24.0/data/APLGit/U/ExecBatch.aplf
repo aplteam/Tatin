@@ -1,0 +1,42 @@
+ (success rc result)←ExecBatch parms;batFilename;tempFilename;en;more;parms;i;flag;cmd
+⍝ This method executes a command and returns its standard output on `result`.\\
+⍝ ** Don't** use this for programs that interact with a user! For example, don't use
+⍝ this to fire up an APL session! This cannot work because standard output is redirected.\\
+⍝ Use `WinExecute` for this which cannot capture standard output itself.\\
+⍝ Performes the following actions:
+⍝ * Puts `cmd` into a batch file which is a temp file.
+⍝ * Execute that batch file with `WinExecute`.
+⍝ * Circumvent the standard output of the batch file into another temp file.
+⍝ * Waits until the temp file makes an appearance.
+⍝ * Reads that temp file and returns the contents as `result`.
+⍝ \\
+⍝ * `success` is a Boolean with 1 indicating success.
+⍝ * `rc` is a return code. 42 stands for "okay".
+ ∘∘∘  ⍝TODO⍝ Not ready: what is `cmd`?!
+ :Access Public Shared
+ :If 'Win'≡A.GetOperatingSystem ⍬
+     tempFilename←F.GetTempFilename''
+     batFilename←(¯3↓tempFilename),'BAT'
+⍝     parms.lpParms,←' >',tempFilename
+     parms.file,←' >',tempFilename
+     F.DeleteFile tempFilename
+     (⊂cmd)⎕NPUT batFilename
+     (success rc more)←OS.WinExecute parms
+     :If success
+         i←flag←0
+         :Repeat
+             i+←1
+             ⎕DL 0.01
+             :If F.IsFile tempFilename
+                 result←⊃⎕NGET tempFilename
+                 flag←(100<i)∨0<⍴result
+             :EndIf
+         :Until flag
+     :Else
+         result←more
+     :EndIf
+     F.DeleteFile batFilename tempFilename
+ :Else
+     'Not supported (yet)'⎕SIGNAL 11
+ :EndIf
+⍝Done

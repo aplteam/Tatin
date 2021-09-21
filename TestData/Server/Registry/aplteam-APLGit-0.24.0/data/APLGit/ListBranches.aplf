@@ -1,0 +1,21 @@
+ {r}←{suppressOutput}ListBranches y;project;folder;rc;more
+⍝ Returns a vector of vectors with branch names (the current branch starts with `* `) or `''`.
+⍝ `suppressOutput` is optional and defaults to 0. That means the result is printed to the session.\\
+⍝ If you are calling the function from code you are probably not interested in this; in this case set
+⍝ `suppressOutput` to 1.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ suppressOutput←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'suppressOutput'
+ 'Left argument must be a Boolean'⎕SIGNAL 11/⍨~(⊂suppressOutput)∊0 1
+ project←EstablishProject y
+ 'Not an acre project'⎕SIGNAL 6/⍨0=≢project
+ folder←2⊃project
+ :If IsGitProject folder
+     (rc more r)←folder U.RunGitCommand2'branch --list -a'
+     U.Assert 0=rc
+     r←{⍵/⍨0<⊃∘⍴¨⍵}⍣(0≠≢r)⊣r
+     suppressOutput U.Show'--- Project: ',(1⊃project),' (',folder,')'
+     suppressOutput U.Show r
+ :Else
+     suppressOutput U.Show'Not a git project: ',y
+ :EndIf
+⍝Done

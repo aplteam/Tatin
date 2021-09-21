@@ -1,0 +1,57 @@
+ {r}←{x}CheckOutBranch branchName;project;folder;space;allBranches;ind;buff;isOpenacreProject;rc;more
+⍝ Close the acre project, overwrites the working directory with `branchName` and then
+⍝ re-opens the acre project.\\
+⍝ Note that branch names are case insensitive.\\
+⍝ Throws an error in case the working directory is dirty.\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ Returns 0 for okay and 1 otherwise.
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ '"branchName" must not be empty'⎕SIGNAL 11/⍨0=≢branchName
+ :If (,'#')≢,⊃⎕NSI
+     ⎕←'This function must be called from #'
+     ⎕←'Please enter the following command before executing the function again:'
+     ⎕←'      )CS'
+ :Else
+     :If 0≠≢project←EstablishProject x
+         (space folder)←project[1 2]
+         :If (⊂space)∊⎕NSI
+             ⎕←'This function MUST NOT be called from within the project in question!'
+             ⎕←'Please enter the following command before executing the function again:'
+             ⎕←'      )CS'
+             r←1
+         :Else
+             'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+             :If ~isOpenacreProject←0<+/≢¨project
+             :OrIf 1 U.YesOrNo'This will close the acre project before checking out and then re-open it; continue?'
+                 'Uncommited changes'⎕SIGNAL 11/⍨IsDirty folder
+                 allBranches←1 ListBranches folder
+                 :If '?'≡branchName
+                     →(0=≢ind←U.Select 2↓¨{⍵/⍨'*'≠⊃¨⍵}allBranches)/0
+                     branchName←ind⊃2↓¨{⍵/⍨'*'≠⊃¨⍵}allBranches
+                 :Else
+                     'Branch does not exist'⎕SIGNAL 6/⍨~(⊂branchName)∊2↓¨allBranches
+                     'That''s already the current branch?!'⎕SIGNAL 11/⍨branchName≡CurrentBranch folder
+                 :EndIf
+                 :If isOpenacreProject
+                     ⎕←'*** Closing acre project ',space,'...'
+                     {}⎕SE.acre.CloseProject space
+                 :EndIf
+                 ⎕←'Checking out "',branchName,'"...'
+                 (rc more buff)←folder U.RunGitCommand2'checkout ',branchName
+                 :If 0=+/'Switched to branch'⍷more
+                     more U.Assert 0=rc
+                 :EndIf
+                 r←∆TestFlag U.Show buff
+                 :If isOpenacreProject
+                     #.⎕EX space
+                     ⎕←'*** Opening acre project ',space,'...'
+                     ⎕←⎕SE.acre.OpenProject folder
+                 :EndIf
+             :EndIf
+         :EndIf
+     :Else
+         ⎕←'No projects found'
+     :EndIf
+ :EndIf
+ r←0
+⍝Done

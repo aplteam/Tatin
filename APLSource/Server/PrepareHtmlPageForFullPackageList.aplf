@@ -1,5 +1,5 @@
- html←packageIDs PrepareHtmlPageForFullPackageList list;col1;col2;col3;buff
- buff←{(≢⍵)}⌸(⍪Reg.RemoveVersionNumber¨list),1
+ html←packageIDs PrepareHtmlPageForFullPackageList list;col1;col2;col3;buff;col4
+ buff←{(≢⍵)}⌸(⍪Reg.RemoveVersionNumber¨list[;1]),1
  html←HtmlHeader''
  html,←⊂'<h2>List of all packages</h2>'
  html,←AddSpecialMessage ⍬
@@ -7,17 +7,18 @@
  html,←⊂'<table>'
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←'<th style="align: left">Total</th>' '<th style="align: left">Pkg</th>' '<th style="align: left">Name</th>'
+ html,←'<th style="align: left">Total</th>' '<th style="align: left">Pkg</th>' '<th style="align: left">Name</th>' '<th style="align: left">Published at</th>'
 ⍝ html,←'<th style="align: left">Package name</th>' '<th style="align: left">Config file</th>'  ⍝ Maybe later
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
  :If 0<≢list
      col1←{'<td>',⍵,'.</td>'}∘⍕¨⍳≢list
      col2←{'<td>',⍵,'.</td>'}∘⍕¨⊃,/⍳¨buff
-     col3←{'<td><code>',⍵,'</code></td>'}¨list
+     col3←{'<td><code>',⍵,'</code></td>'}¨list[;1]
+     col4←{'<td><code>',⍵,'</code></td>'}¨list[;2]
      ⍝ col2←{'<td><a href="">',⍵,'</a></td>'}¨  ⍝ Maybe later
      ⍝ html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2  ⍝ Maybe later
-     html,←⊃,/{(⊂'<tr>'),⍵,⊂('</tr>')}¨↓col1,col2,⍪col3
+     html,←⊃,/{(⊂'<tr>'),⍵,⊂('</tr>')}¨↓col1,col2,col3,⍪col4
  :EndIf
  html,←⊂'</tbody>'
  html,←⊂'</table>'

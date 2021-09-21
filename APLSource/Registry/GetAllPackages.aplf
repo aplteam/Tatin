@@ -1,8 +1,16 @@
- list←GetAllPackages registryPath;list2
+ list←{addPublishingDate}GetAllPackages registryPath;list2
 ⍝ Resturn names of all folders in `registryPath` that are valid package IDs
+ addPublishingDate←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'addPublishingDate'
  list←F.ListDirs registryPath                           ⍝ All folder name
  list←{⊃,/1↓⎕NPARTS ⍵}¨list                             ⍝ Remove path: we only need the package IDs
  list←(IsValidPackageID_Complete¨list)/list             ⍝ Remove everything that is not a valid package ID
  list2←registryPath InjectPublishingDate list           ⍝ Add publishing date where required
- list←list[SortIndexForPackageIDs list2]                ⍝ Only under Windows is the list guaranteed to be sorted
+ :If addPublishingDate
+     list←list,[1.5]list2[;2]
+     :If 0<≢list←list[SortIndexForPackageIDs list2;]        ⍝ Only under Windows is the list guaranteed to be sorted
+         list[;2]←FormatFloatDate¨list[;2]
+     :EndIf
+ :Else
+     list←⍪list
+ :EndIf
 ⍝Done

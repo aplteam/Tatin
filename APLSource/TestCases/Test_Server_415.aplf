@@ -1,0 +1,12 @@
+ r←Test_Server_415(stopFlag batchFlag);⎕TRAP;html
+⍝ Ask for a list of all packages; pretends to be a Browser
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←∆GetHtmlFromServer'[localhost]/v1/all_packages'
+ →T.PassesIf∨/'<h2>List of all packages</h2>'⍷html
+
+ r←T._OK
+
+∆TidyUp:
+⍝Done

@@ -1,64 +1,68 @@
- r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;list;noOfHyphens;noOfDots;uniqueIDs
+ r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;list;noOfHyphens;noOfDots;uniqueIDs;list2
 ⍝ Documentation see ##.Client.ListPackages
  'No registry specified'Assert 0<≢uri
- r←0 2⍴⍬
+ parms←CheckParmsForListPackages parms
+ r←(0,(1+parms.date))⍴⍬
  (registryPath packageID)←SeparateUriAndPackageID uri
  registryPath←F.ExpandPath registryPath
  'Neither an alias nor a path?!'Assert F.IsDir registryPath
  :If 0=⎕NC'list'
-     list←GetAllPackages registryPath
+     list←(parms.date)GetAllPackages registryPath
  :EndIf
- :If 2=parms.⎕NC'tags'
- :AndIf 0<≢parms.tags
+ :If 0<≢parms.tags
      tags←','(≠⊆⊢)⎕C parms.tags
      (fuzzy list)←parms.aggregate FindTag registryPath tags list
+     list←⍪list
  :EndIf
- :If 2=parms.⎕NC'group'
- :AndIf 0<≢parms.group
-     list←(parms.group∘≡¨GetGroupFromPackageID¨list)/list
+ :If 0<≢parms.group
+     list←(parms.group∘≡¨GetGroupFromPackageID¨list[;1])⌿list
+ :EndIf
+ :If parms.info_url
+     list,←AddInfoURL list registryPath
  :EndIf
  :If 0=≢packageID~'*'
      :If parms.aggregate
+     :AndIf parms.date=0
          r←AggregatePackages list
      :Else
-         r←list,[1.5]⊂⍬
+         r←list
      :EndIf
  :Else
      noOfHyphens←'-'+.=packageID
      :Select noOfHyphens
      :Case 0                        ⍝ Just the group
-         :If 0<≢list←((packageID,'-')∘≡¨{⍵↑⍨⍵⍳'-'}¨list)⌿list
+         :If 0<≢list←((packageID,'-')∘≡¨{⍵↑⍨⍵⍳'-'}¨list[;1])⌿list
              :If parms.aggregate
                  r←AggregatePackages list
              :Else
-                 r←list,[1.5]⊂⍬
+                 r←list,⊂⍬
              :EndIf
          :EndIf
      :Case 1                        ⍝ group and name
-         :If 0<≢list←((packageID,'-')∘≡¨(RemoveVersionNumber¨list),¨'-')⌿list
+         :If 0<≢list←((packageID,'-')∘≡¨(RemoveVersionNumber¨list[;1]),¨'-')⌿list
              :If parms.aggregate
                  r←AggregatePackages list
              :Else
-                 r←list,[1.5]⊂⍬
+                 r←list,⊂⍬
              :EndIf
          :EndIf
      :Case 2                        ⍝ group, name and version
          noOfDots←'.'+.=packageID
          :Select noOfDots
          :Case 0                    ⍝ Just major
-             :If 0<≢list←((packageID,'.')∘≡¨{⍵↑⍨⍵⍳'.'}¨list)⌿list
+             :If 0<≢list←((packageID,'.')∘≡¨{⍵↑⍨⍵⍳'.'}¨list[;1])⌿list
                  :If parms.aggregate
                      r←0 AggregatePackages list
                  :Else
-                     r←list,[1.5]⊂⍬
+                     r←list,⊂⍬
                  :EndIf
              :EndIf
          :Case 1                    ⍝ major and minor
-             :If 0<≢list←((packageID,'.')∘≡¨{'.',⍨⍵/⍨2>+\'.'=⍵}¨list)⌿list
+             :If 0<≢list←((packageID,'.')∘≡¨{'.',⍨⍵/⍨2>+\'.'=⍵}¨list[;1])⌿list
                  :If parms.aggregate
-                     r←⍉⍪{(1⊃⍵)(≢⍵)}RemovePatch¨list
+                     r←⍉⍪{(1⊃⍵)(≢⍵)}RemovePatch¨,list
                  :Else
-                     r←list,[1.5]⊂⍬
+                     r←list,⊂⍬
                  :EndIf
              :EndIf
          :Else

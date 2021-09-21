@@ -1,0 +1,15 @@
+ {r}←BrowseCode(n row);hash;body;tmp;name
+ r←0
+ hash←⊃n.Grid.Values[row;3]
+ :Trap 11
+     body←n.∆Folder ##.GetRevision n.∆Filename hash
+ :Else
+     'Failure to get revision'##.GUI_Show.ErrMsg('Getting the revision for "',hash,'" failed!')'Details:'(1⊃⎕DM)
+     {0=⎕NC ⍵:shy←⍬ ⋄ 1:shy←##.F.DeleteFile⍎⍵}¨'tempfile1' 'tempfile2'
+     :Return
+ :EndTrap
+ tmp←⎕NS''
+ name←'∆',hash
+ ⍎'tmp.',name,'←body'
+ tmp.⎕ED⍠('ReadOnly' 1)⊣name
+⍝Done

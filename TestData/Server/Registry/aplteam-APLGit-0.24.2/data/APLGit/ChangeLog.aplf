@@ -1,0 +1,26 @@
+ r←{x}ChangeLog name;project;folder;filename;space;cmd;buff;rc;msg
+⍝ Takes the name of an APL object or a filenamem and returns a matrix with information about all commits that object was changed by.\\
+⍝ If `name` is a file (like, say, acre.config) then prefix it with "file://" in order to let the function know.\\
+⍝ The result is a matrix with zero or more rows and 4 columns:
+⍝ 1. Hash
+⍝ 2. Commiter's name
+⍝ 3. Date of the commit date in strict ISO 8601 format
+⍝ 4. Message of the commit\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ r←0 4⍴''
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ project←EstablishProject x
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ (space folder)←2↑project
+ :If 'file://'{⍺≡(≢⍺)↑⍵}name
+     filename←(⍴'file://')↓name
+ :Else
+     filename←(⍴folder)↓⊃⎕SE.acre.Sourcefile name
+ :EndIf
+ cmd←'log --follow --pretty=format:"',U.GetLogFormat,'" -- ',filename
+ (rc msg buff)←folder U.RunGitCommand2 cmd
+ msg U.Assert 0=rc
+ :If 0<≢buff
+     r←↑U.FormatLog buff
+ :EndIf
+⍝Done

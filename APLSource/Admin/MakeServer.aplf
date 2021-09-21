@@ -4,7 +4,7 @@
 ⍝ It can be called from a developer's session (⍵←0) or as part of an automated "Make" process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
 ⍝ Version 1.2.0 from 2021-07-23
-⍝ 1.2.0: acre replaced by Proma
+⍝ 1.2.0: acre replaced by Cider
 ⍝ 1.1.0: RumbaLean and Plodder are now copied into the WS rather than being an asset.
 ⍝ 1.0.1: Assets\Assets corrected
  r←⍬
@@ -14,7 +14,7 @@
  :Else
      ⎕←(⎕PW-1)⍴'-'
      msg←''
-     msg,←⊂'This function will close all Proma projects, delete everything that is not needed in order to'
+     msg,←⊂'This function will close all Cider projects, delete everything that is not needed in order to'
      msg,←⊂'run a Tatin server, re-arrange stuff, set ⎕LX and finally save the workspace together'
      msg,←⊂'with everything that is needed by the server in Dist/Server.dws'
      msg,←⊂''
@@ -26,7 +26,7 @@
  F←##.FilesAndDirs
  :If batchFlag
  :OrIf 1 YesOrNo'Would you like to continue?'
-     {}⎕SE.Proma.CloseProject''
+     {}⎕SE.Cider.CloseProject''
      #.Tatin.⎕EX¨'Client' 'Todo' 'TestCases' 'TestCasesServer' 'Simu'
      ⎕EX¨'Initialize_Client' 'RunTestServer' 'CreateAllRefs_Client'
      ⎕LX←'#.Tatin.Server.Run 1'

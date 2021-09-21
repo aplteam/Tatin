@@ -1,0 +1,14 @@
+ RunGitCommand←{
+⍝ ⍵ ←→ command.\\
+⍝ This command checks only whether the GitBash is available at all and whether the command was not recognzied.
+⍝ Everything else is passed to the caller, in particular fatal errors like "branch not found" etc.\\
+⍝ This function is now DEPRECATED: this function will be removed before 1.0.0 is released; use either
+⍝ `RunGitCommand2` or `RunGitCommand3` instead.
+     ⍺←''
+     folder←⍺
+     c←'git -C "',folder,'" ',⍵,' 2>&1'    ⍝ 2>&1 redirects errors to screen, otherwise we don't see them
+     f←{'UTF-8'⎕UCS ⎕UCS ⍵}
+     buff←⎕CMD c
+     ∨/'''git'' is not recognized as an internal or external command'⍷∊buff:'"Git" not recognized as a command?!'⎕SIGNAL 11
+     f¨buff
+ }

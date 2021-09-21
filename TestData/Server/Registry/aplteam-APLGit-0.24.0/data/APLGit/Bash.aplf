@@ -1,0 +1,25 @@
+ {r}←{pathToGitExe}Bash y;home;paths;bool;folder;project
+⍝ Starts Git Bash in `y`.\\
+⍝ If this does not work check wether the Git Bash is installed and on the %PATH% environment variable.\\
+⍝ In case Git is installed in its default directory there is no need to specify `pathToGitExe`. If you have installed
+⍝ it elsewhere then you need to specify the full path but not the EXE itself, for example: `C:\MyPrograms\Git`.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+⍝ If `y` is not empty the Bash is opened in the directory of the given project.
+ r←⍬
+ pathToGitExe←{0<⎕NC ⍵:⍵ ⋄ ''}'pathToGitExe'
+ :If 0<≢project←EstablishProject y
+     folder←2⊃project
+     :If 0=≢pathToGitExe
+         paths←';'A.Split ##.WinSys.ExpandEnv'%PATH%'
+         :If 1=+/bool←∨/¨'\git\bin'∘⍷¨A.Lowercase paths
+             home←(bool⍳1)⊃paths
+             pathToGitExe←home,'\sh.exe'
+         :Else
+             'GitBash not found!'⎕SIGNAL 6
+         :EndIf
+     :Else
+         pathToGitExe←(⊃⎕NPARTS pathToGitExe),'\sh.exe'
+     :EndIf
+     ⎕SH('"',pathToGitExe,'" --cd="',folder,'"')''
+ :EndIf
+⍝Done

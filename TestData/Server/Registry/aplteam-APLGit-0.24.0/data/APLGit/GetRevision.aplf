@@ -1,0 +1,15 @@
+ r←{x}GetRevision(filename hash);project;folder;space;cmd;qdmx;rc;more
+⍝ Takes a filename (!) and returns the content from `hash`.\\
+⍝ The result is either ¯1 (unknown) or the code of that object.\\
+⍝ If something goes wrong an error is thrown.\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ project←EstablishProject x
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ (space folder)←2↑project
+ filename{⍺↓⍨(≢⍵)×⍵≡(≢⍵)↑⍺}←⊃1 ⎕NPARTS''   ⍝ Without that the user is asked how to open the file at the time of writing; kai 2020-02-07
+ ((filename=':')/filename)←'|'
+ cmd←'cat-file blob ',hash,':',(filename~'"')
+ (rc more r)←folder U.RunGitCommand3 cmd
+ more U.Assert 0=rc
+⍝Done

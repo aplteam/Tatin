@@ -1,0 +1,11 @@
+ OnCellUp←{
+     (rf btn shift row col)←⍵[1 5 6 7 8]
+     ~col∊1 2:1             ⍝ We are only interested in clicks into column 1 or 2
+     1≠btn:1                ⍝ Not left-click? Ignore!
+     0≠shift:1              ⍝ Shift- Ctrl- and Alt key must not be pressed
+     n←GetRef2n 1⊃,⍵
+     rf.Values[;col]←0      ⍝ Reset all
+     rf.Values[row;col]←1   ⍝ Set!
+     _←⎕NQ n.∆Form 9999
+     0
+ }

@@ -1,6 +1,10 @@
  {r}←{userName}Init pathToUserSettings;pathToUserSettings;⎕TRAP
 ⍝ Use this to re-establish the user settings via a user command.
  r←''
+ :If 0=⎕SE.⎕NC'Link.Version'
+ :OrIf 3>⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
+     'Tatin requires at least Link 3.0'⎕SIGNAL 98
+ :EndIf
  :If IfAtLeastVersion 18
      :If 0=≢pathToUserSettings
          userName←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'userName'

@@ -1,0 +1,8 @@
+ FormatFloatDate←{
+⍝ '21021-01-02 17:03:04' ← FormatFloatDate 210210102.170304
+⍝ Error trapping because we have sometimes seen publishing dates like 20210101.00006 which is invalid.
+     v←⍵
+     11::∇ v-0.000001
+     v2←60 1 ⎕DT v
+     ⊃'YYYY-MM-DD hh:mm:ss'(1200⌶)v2
+ }

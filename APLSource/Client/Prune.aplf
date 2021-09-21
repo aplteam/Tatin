@@ -8,6 +8,6 @@
      ind←⍋major
      TREE.Data←TREE.Data[ind;]                                          ⍝ Secondly, sort by major
      major←major[ind]
-     TREE.Data←TREE.Data[{⊃⍵}⌸((⊃∘SplitAtAlias¨TREE.Data[;2]),¨major)⊣TREE.Data;]  ⍝ First one only, but honor alias!
-     TREE.Data[⍒TREE.{Data[;∆principal]}⍬;]                                 ⍝ Final sort order by the principal flag
+     TREE.Data←TREE.Data[{⊃⍵}⌸((TREE.Data[;1]{⍺:⍵ ⋄ ⊃SplitAtAlias ⍵}¨TREE.Data[;2]),¨major)⊣TREE.Data;]  ⍝ First one only, but honor alias though for non-principal packages only
+     TREE.Data[⍒TREE.{Data[;∆principal]}⍬;]                             ⍝ Final sort order by the principal flag
  }

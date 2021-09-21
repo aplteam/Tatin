@@ -1,0 +1,70 @@
+ {r}←{x}ViewChangesBetweenCommits y;project;folder;b;list;noofBytes;thisFile;modifiedOrAdded;name;header;extension;buff1;buff2;captions;parms;rc;more
+⍝ Allows the inspection of all changes between x[1] and x[2] (`hash1` and `hash2`). `x` might be empty or not
+⍝ specified at all, in which case the user gets a list of all commits, with the option to select two of them.
+⍝ For the actual comparison the user command `]CompareFiles` is used.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+⍝ Returns always `⍬`.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ r←⍬
+ project←EstablishProject y
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ folder←2⊃project
+ parms←⎕NS''
+ parms.(tfn1 tfn2)←'txt'∘F.GetTempFilename2¨2⍴⊂''
+ parms.hashes←folder Log 0
+ :If 0=≢x
+     →(0=≢parms.rows←'Select two commits:'U.SelectTwo(↓⍕parms.hashes))/0
+     parms.(hash1 hash2)←parms.hashes[parms.rows;1]
+ :Else
+     'Optional left argument must be a two-element vector'⎕SIGNAL 11/⍨2≠≢x
+     parms.(hash1 hash2)←x
+ :EndIf
+ parms.rows←parms.(hashes[;1]⍳hash1 hash2)
+ :If ∨/b←parms.(rows>≢hashes)
+     11 ⎕SIGNAL⍨'Not a valid hash: ',⊃{⍺,', ',⍵}/1 1/'⍺[1]' '⍺[2]'
+ :EndIf
+ list←folder DiffBetween parms.(hash2 hash1)
+ :If 0=+/modifiedOrAdded←{⊃⍵∊'AM'}¨list[;1]
+     ∆TestFlag U.Show'No changes found'
+     :Return
+ :EndIf
+ noofBytes←0
+ :For thisFile :In modifiedOrAdded⌿list[;2]
+     name←2⊃⎕NPARTS thisFile
+     header←↓U.Box(('⌹',[1]'⌹',,[0.5]name),[1]'⌹'),'⌹'
+     extension←A.Lowercase 3⊃⎕NPARTS thisFile
+     :If (⊂extension)∊'.html' '.css' '.txt' '.config' '.ini' '.aplf' '.aplo' '.apln' '.aplc' '.apli' '.charstring' '.charlist'
+         (rc more buff1)←folder U.RunGitCommand3'show ',parms.hash1,':',thisFile
+         :If 0≠rc
+             :If {(1=≢⍵)∧'fatal: '{⍺≡(⍴⍺)↑⊃,⍵}⍵}more
+                 buff1←⊂'*** ',1⊃,buff1
+             :Else
+                 ∘∘∘ ⍝ Huh?!
+             :EndIf
+         :EndIf
+         (rc more buff2)←folder U.RunGitCommand3'show ',parms.hash2,':',thisFile
+         :If 0≠rc
+             :If {(1=≢⍵)∧'fatal: '{⍺≡(⍴⍺)↑⊃,⍵}⍵}more
+                 buff2←⊂'*** ',1⊃,buff2
+             :Else
+                 buff2←⊂'*** ',name
+                 buff2,←''('>>> ',more)
+             :EndIf
+         :EndIf
+     :Else
+         buff1←⊂'*** File type ignored for comparison: ',extension
+         buff2←⊂'*** File type ignored for comparison: ',extension
+     :EndIf
+     (⊂header,buff1)⎕NPUT parms.tfn1 2
+     (⊂header,buff2)⎕NPUT parms.tfn2 2
+     noofBytes+←+/≢¨buff1
+ :EndFor
+ :If 0<noofBytes
+     captions←{(1⊃⍵),' from ',(2⊃⍵),' (',(3⊃⍵),')'}¨↓parms.hashes[parms.rows;1 3 4]
+     captions←{0=+/b←'''\'''''⍷w←⍵:w ⋄ (b/w)←(+/b)⍴'<>' ⋄ w[({⍵/⍳≢⍵}b)∘.+1 2 3]←⊂⍬ ⋄ ⊃,/w}¨captions
+     {}⎕SE.UCMD'CompareFiles "',parms.tfn1,'" "',parms.tfn2,'" -ro1=1 -ro2=1 -label1=''',(1⊃captions),''' -label2=''',(2⊃captions),''''
+ :Else
+     ⎕←'No modifiedOrAdded files found'
+ :EndIf
+ F.DeleteFile¨parms.(tfn1 tfn2)
+⍝Done

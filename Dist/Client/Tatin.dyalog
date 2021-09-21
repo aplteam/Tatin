@@ -1,7 +1,10 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.30.0 - 2021-09-21
+⍝   * `ListPackages` enhanced: -date and -info_url added
+⍝   * Minor improvements on the help pages
 ⍝ * 0.29.2 - 2021-08-07
-⍝   * `Ping` has no -all option anymore: specifying no argument  allows yiu now to select all
+⍝   * `Ping` has no -all option anymore: specifying no argument  allows you now to select all
 ⍝   * `LoadDependencies` and `LoadPackage` now load into # in case no target space is specified
 ⍝ * 0.29.1 - 2021-06-24
 ⍝   * `Ping` was buggy
@@ -117,7 +120,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'Lists all packages in the Registry specified in the argument'
-          c.Parse←'1s -raw -group= -tags= -noaggr'
+          c.Parse←'1s -raw -group= -tags= -noaggr -date -info_url'
           r,←c
      
           c←⎕NS ⍬
@@ -241,11 +244,15 @@
     ∇
 
     ∇ {r}←Run(Cmd Input);ns;flag
+      :If 0=⎕SE.⎕NC'Link.Version'
+      :OrIf 3>⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
+          'Tatin requires at least Link 3.0'⎕SIGNAL 98
+      :EndIf
       :If 0=⎕SE.⎕NC'Tatin'
-      :AndIf 'loadtatin'≢⎕C Cmd
+      :AndIf ≢/⎕C¨'LoadTatin'Cmd
           flag←LoadTatin''
       :EndIf
-      :If 'loadtatin'≡⎕C Cmd
+      :If ≡/⎕C¨'loadtatin'Cmd
           Input.force LoadTatin(1+(0≡Input._1)∨0=≢Input._1)⊃Input._1''
           r←''
       :Else
@@ -314,7 +321,7 @@
       TC←⎕SE._Tatin.Client
     ∇
 
-    ∇ r←ListPackages Arg;registry;parms;caption;width
+    ∇ r←ListPackages Arg;registry;parms
       r←''
       :If 0≡registry←Arg._1
           →(⍬≡registry←SelectRegistry 0)/0
@@ -332,16 +339,15 @@
       :If 0≢Arg.noaggr
           parms.aggregate←~Arg.noaggr
       :EndIf
+      parms.date←Arg.date
+      parms.info_url←Arg.info_url
       r←⍪parms TC.ListPackages registry
       :If 0=Arg.raw
           :If 0=≢r
               r←'No packages found'
           :Else
-              r(AddHeader)←'Group & Name' '≢ major versions'
-              r←⎕FMT r
-              caption←' *** Packages from ',registry
-              width←(2⊃⍴r)⌈≢caption
-              r←(width↑caption),[1]width↑[2]r
+              r(AddHeader)←(2⊃⍴r)↑'Group & Name' '≢ major versions'
+              r←'Packages from:'registry⍪r
           :EndIf
       :EndIf
     ∇
@@ -616,7 +622,7 @@
       :Trap 98
           :If dateFlag
               r←dateFlag TC.ListVersions Arg._1
-              r[;2]←TC.Reg.ConvertRealDateTimeToText¨r[;2]
+              r[;2]←TC.Reg.FormatFloatDate¨r[;2]
           :Else
               r←⍪TC.ListVersions Arg._1
           :EndIf
@@ -716,7 +722,7 @@
                               :EndTrap
                           :EndIf
                       :Else
-                          ⎕←'No change'
+                          ⎕←'No change, therefore no action is taken'
                       :EndIf
                   :Until flag
               :Else
@@ -918,10 +924,11 @@
           r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has'
           r,←⊂'not a trailing separator: Tatin is taking care of that.'
           r,←⊂''
-          r,←⊂'By default all packages are listed. You can influence the output in two ways:'
+          r,←⊂'By default all packages are listed. You can influence the output in several ways:'
           r,←⊂' * -group={groupname} will restrict the list the packages with the given group name.'
           r,←⊂' * -tags=foo,goo will restrict the output to packages that carry the tags "foo" & "goo".'
-          r,←⊂''
+          r,←⊂' * -date adds the publishing date to the output. -noaggr is set to 1 then.'
+          r,←⊂' * -info_url adds the URL saved in the package config file.'
           r,←⊂'* By default the output is aggregated. Specify -noaggr if you want the full list.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'
@@ -998,12 +1005,13 @@
           r,←⊂'If you did change the user settings from another APL session, or by editing the file,'
           r,←⊂'you can refresh the current user settings with -refresh.'
       :Case ⎕C'PackageConfig'
-          r,←⊂'The argument, if specified, may be an HTTP request or a path.'
-          r,←⊂'* In case of an HTTP request the package config file is returned as JSON.'
-          r,←⊂'  Specifying any of the options has no effect.'
+          r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
+          r,←⊂'The argument, if specified, may be a URL or a path.'
+          r,←⊂'* In case of a URL the package config file is returned as JSON.'
+          r,←⊂'  Specifying any of the options has no effect then.'
           r,←⊂'* In case of a path it must point to a folder that contains a Tatin package.'
           r,←⊂'  The contents of the file "',TC.CFG_Name,'" in that folder is returned.'
-          r,←⊂'  In case the file does not exist yet it will be created.'
+          r,←⊂'  In case the file does not yet exist it will be created.'
           r,←⊂''
           r,←⊂'In case no argument is specified the command tries to find a package config file in'
           r,←⊂'the current directory.'
@@ -1011,7 +1019,7 @@
           r,←⊂'You may edit the file by specifying the -edit flag.'
           r,←⊂'In case you want to delete the file: specify the -delete flag.'
           r,←⊂''
-          r,←⊂'In case of success a text vector with NLs in it is returned, otherwise an empty vector.'
+          r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
       :Case ⎕C'UninstallPackage'
           r,←⊂'This command uninstalls a given package and all its dependencies, but only if those'
           r,←⊂'are neither top-level packages nor required by any other package.'

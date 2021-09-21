@@ -1,0 +1,15 @@
+ {r}←{x}SetAcreConfigParm(names values);filename;ns;script;project;folder;aplan⍝
+⍝ Ads or overwrite `name` with `value` in acre's config file parameter.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ r←0
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ →(0=≢project←EstablishProject x)/0
+ folder←2⊃project
+ filename←folder,'acre.config'
+ aplan←⊃⎕NGET filename
+ ns←⎕SE.acre.FromAPLAN aplan
+ (names values)←{⊂,⍣(0 1∊⍨≡⍵)⊣⍵}¨names values
+ names ns.{⍎⍺,'←⍵'}¨values
+ aplan←⎕SE.acre.ToAPLAN ns
+ (⊂aplan)⎕NPUT filename
+⍝Done

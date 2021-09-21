@@ -1,0 +1,17 @@
+ r←Test_ListPkgs_044(stopFlag batchFlag);⎕TRAP;mat;parms
+⍝ List all packages with the tag "zip" with their publishing dates
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.date←1
+ parms.tags←'zip'
+ mat←parms TC.ListPackages'[local]'
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 1<≢mat
+ →T.PassesIf∧/{∧/⍵∊⎕D,' :-'}¨mat[;2]    ⍝ Formatted dates?
+ →T.PassesIf∧/∨/'zip'⍷⎕C↑mat[;1]        ⍝ name must carry "zip"
+
+ r←T._OK
+⍝Done

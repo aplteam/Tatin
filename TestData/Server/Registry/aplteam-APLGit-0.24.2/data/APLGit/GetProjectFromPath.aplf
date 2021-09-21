@@ -1,0 +1,7 @@
+ r←GetProjectFromPath space;list;row
+⍝ Takes the path of an opened acre project and returns its name.
+ list←⎕SE.acre.Projects''
+ row←(F.NormalizePath list[;2])⍳⊂F.NormalizePath space,(~(¯1↑space)∊'/\')/'/'
+ 'Path does not point to any opened acre project'⎕SIGNAL 11/⍨row>≢list
+ r←1⊃list[row;]
+⍝Done

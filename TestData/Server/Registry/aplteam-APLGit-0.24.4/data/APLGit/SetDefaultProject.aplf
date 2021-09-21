@@ -1,0 +1,24 @@
+ dir←SetDefaultProject y;buff
+⍝ Use this function to explicitly define a default project.\\
+⍝ This is particularly useful when there is more than one acre project open and the current
+⍝ current directory does **not** point to the one you want to be the default project.
+⍝ Defining a default project will effect only the current APL session.\\
+⍝ For what `y` can actually be see `EstablishProject` except whe `y` is empty: in that case the
+⍝ current setting is reported (shy!) but nothing changes. In case there is not default dir
+⍝ defined an empty vector is returned.\\
+⍝ Returns always the default project if there is any.\\
+ :If 0=≢y
+     :If 0=⎕NC'∆DefaultDir'
+     :OrIf 0=≢∆DefaultDir
+         dir←''
+     :Else
+         dir←∆DefaultDir
+     :EndIf
+ :Else
+     :If 0=≢buff←EstablishProject y
+         dir←{0<⎕NC ⍵:∆DefaultDir ⋄ ''}'∆DefaultDir'
+     :Else
+         dir←∆DefaultDir←2⊃buff
+     :EndIf
+ :EndIf
+⍝Done

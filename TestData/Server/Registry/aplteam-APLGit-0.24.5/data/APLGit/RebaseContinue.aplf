@@ -1,0 +1,13 @@
+ {r}←RebaseContinue y;project;folder;rc;more;buff
+⍝ ...
+ r←⍬
+ project←EstablishProject y
+ folder←2⊃project
+ (rc more buff)←folder U.RunGitCommand2'add --all'
+ U.Assert 0=rc
+ ⎕←buff
+ (rc more buff)←folder U.RunGitCommand2'rebase --continue'
+ U.Assert 0=rc
+ ⎕←buff
+ ⎕←'Rebase complete.'
+⍝Done

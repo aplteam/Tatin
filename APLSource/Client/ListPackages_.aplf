@@ -3,23 +3,28 @@
      parms←⎕NS''
      parms.(group tags)←⊂''
      parms.aggregate←1
+     parms.date←0
+     parms.info_url←0
  :EndIf
  (host packageID)←Reg.SeparateUriAndPackageID uri
  'Not a valid URI'Assert('/'+.=host)∊2 3
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  request←R.NewRequest 0
  request.RequestTarget←'/v1/packages/',{⍵↓⍨'/'=1⍴⍵}packageID
- :If 0<≢⊃,/parms.(group tags aggregate)
-     request.RequestTarget,←'?'
-     :If 0<≢⊃,/parms.group
-         request.RequestTarget,←'group=',parms.group,'&'
-     :EndIf
-     :If 0<≢⊃,/parms.tags
-         request.RequestTarget,←'tags=',parms.tags,'&'
-     :EndIf
-     :If 0<parms.⎕NC'aggregate'
-         request.RequestTarget,←'aggregate=',(⍕parms.aggregate),'&'
-     :EndIf
+ request.RequestTarget,←'?'
+ :If 0<≢⊃,/parms.group
+     request.RequestTarget,←'group=',parms.group,'&'
+ :EndIf
+ :If 0<≢⊃,/parms.tags
+     request.RequestTarget,←'tags=',parms.tags,'&'
+ :EndIf
+ :If parms.date
+     request.RequestTarget,←'date=1&'
+ :Else
+     request.RequestTarget,←'aggregate=',(⍕parms.aggregate),'&'
+ :EndIf
+ :If parms.info_url
+     request.RequestTarget,←'info_url=1&'
  :EndIf
  request.RequestTarget←(-'&'=¯1↑request.RequestTarget)↓request.RequestTarget
  request.Headers,←⊂'Accept' 'application/json'

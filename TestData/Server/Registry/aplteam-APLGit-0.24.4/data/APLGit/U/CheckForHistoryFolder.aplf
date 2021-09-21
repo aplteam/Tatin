@@ -1,0 +1,28 @@
+ success←{noPrompt}CheckForHistoryFolder folder;counter;rc;folder_
+⍝ Use this to check for a history folder. Useful for everything that pushes to GitHub.\\
+⍝ Returns 1 in case there is no such folder (any more), otherwise 0.
+ success←1
+ noPrompt←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noPrompt'
+ folder_←folder,NameOfHistoryFolder
+ :If F.IsDir folder_
+     :If noPrompt
+         success←0
+     :ElseIf 1 YesOrNo'Remove ',NameOfHistoryFolder,'\? Without removing it we cannot continue!'
+         counter←0
+         :Repeat
+             {}F.RmDir folder_
+             :If F.IsDir folder_
+                 ⎕DL 0.1
+                 :If 10<counter←counter+1
+                     success←0
+                     :Return
+                 :EndIf
+             :Else
+                 :Leave
+             :EndIf
+         :Until 0
+     :Else
+         success←0
+     :EndIf
+ :EndIf
+⍝Done

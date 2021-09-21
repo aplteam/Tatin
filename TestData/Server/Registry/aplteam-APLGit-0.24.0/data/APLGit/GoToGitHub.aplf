@@ -1,0 +1,22 @@
+ {r}←{user_id}GoToGitHub y;project;folder;name;url
+⍝ Opens the homepage of the current project on GitHub.\\
+⍝ `user_id` defaults to "aplteam" when not specified.\\
+⍝ `y` can be either the name of a project (like "Fire") or anything that `EstablishProject`
+⍝ can make sense of; see `EstablishProject` for details. In the former case the current
+⍝ directory must be compatible with the name given.\\
+ r←⍬
+ user_id←{0<⎕NC ⍵:⍎⍵ ⋄ 'aplteam'}'user_id'
+ :If 0=≢project←1 EstablishProject y
+     :If 0=≢y
+         'Not an acre project'⎕SIGNAL 6
+     :Else
+         name←y
+         folder←F.PWD
+     :EndIf
+ :Else
+     folder←2⊃project
+     name←⊃⌽'/'A.Split F.EnforceSlash ¯1↓folder
+ :EndIf
+ url←'https://github.com/',user_id,'/',name
+ A.GoToWebPage url
+⍝Done

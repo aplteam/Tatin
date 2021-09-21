@@ -1,0 +1,11 @@
+ OnContextInGrid←{
+     n←GetRef2n 1⊃,⍵
+     m←⎕NEW⊂'Menu'
+     row←1⊃2 ⎕NQ n.Grid'CellFromPoint',2↑3↓⍵
+     ref←m.⎕NEW'MenuItem'(('Caption' 'Browse code')('Active'(1<row)))
+     ref.onSelect←1
+     res←⎕DQ m
+     0=≢res:0
+     ref≡1⊃res:BrowseCode n row
+     0
+ }

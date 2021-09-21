@@ -1,0 +1,47 @@
+ r←{x}Commit msg;nm;m;folder;project;buff;rc;⎕TRAP⍝
+⍝ Commits all changes.\\
+⍝ If the current branch is "master" then `msg` **_must not_** be empty and should carry a meaningful message.
+⍝ Otherwise `msg` may be empty but will become three dots (`...`).\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ Returns a two-element vector:
+⍝ 1. The name of the branch
+⍝ 1. The hash of the commit as a simple text string
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ project←EstablishProject x
+ 'Not an acre project'⎕SIGNAL 11/⍨0=≢project
+ :If 0=≢project
+     r←⍬
+ :Else
+     folder←2⊃project
+     'There are no pending changes / untracked files'⎕SIGNAL 11/⍨0=≢StatusShort folder
+     nm←'master'≢CurrentBranch folder
+     :If F.IsDir folder,U.NameOfHistoryFolder
+     :AndIf U.YesOrNo'Remove ',U.NameOfHistoryFolder,'\?'
+         rc←F.RmDir folder,U.NameOfHistoryFolder
+         U.Assert 0=1⊃rc
+     :EndIf
+     'You must provide a menaningful message in the "master" branch'⎕SIGNAL 11/⍨(0=nm)∧0=≢msg
+     m←msg,(nm∧0=≢msg)/'...'
+     (rc msg buff)←folder U.RunGitCommand2'add --all'
+     :If 0≠rc
+     :AndIf ∨/'warning: LF will be replaced by CRLF'⍷msg
+         rc←0
+     :EndIf
+     :If 0≠rc
+         :If 2>|≡msg
+             msg←(⎕UCS 13)(≠⊆⊢)msg
+         :EndIf
+         msg⌿⍨←{~⊃∨/∨/¨'warning: LF will be replaced by CRLF' 'The file will have its original line endings in your working directory'⍷¨⊂⍵}¨msg
+         :If 0=≢msg
+             rc←0
+         :Else
+             msg←1↓⊃,/(⎕UCS 13),¨msg
+         :EndIf
+     :EndIf
+     msg U.Assert 0=rc
+     m←U.MassageMsg m
+     (rc msg buff)←folder U.RunGitCommand2'commit -m "',m,'"'
+     msg U.Assert 0=rc
+     r←' 'A.Split{1↓¯1↓⍵/⍨{⍵∨≠\⍵}⍵∊'[]'}⊃,/buff
+ :EndIf
+⍝Done

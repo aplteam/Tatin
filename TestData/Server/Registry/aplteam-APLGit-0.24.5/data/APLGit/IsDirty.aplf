@@ -1,0 +1,11 @@
+ r←IsDirty y;rc;more;folder;project;rcfolder;morefolder
+⍝ Returns a Boolean. 1 means there are uncommitted changes or untracked files in the working directory.\\
+⍝ Use `Status` to found out what those files/folders are.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ project←EstablishProject y
+ 'Not an acre project'⎕SIGNAL 6/⍨0=≢project
+ folder←2⊃project
+ (rc more r)←folder U.RunGitCommand2'status --short'
+ U.Assert 0=rc
+ r←0<≢r
+⍝Done

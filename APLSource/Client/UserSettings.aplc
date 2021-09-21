@@ -307,15 +307,15 @@
       :If '['∊y
           alias←{⎕C ⍵~'['}{⍵↑⍨¯1+⍵⍳']'}y
           bool←alias∘≡¨_registries.alias
-          msg←'Ambiguous alias'
       :Else
           uri←F.EnforceSlash y
-          uri←{⍵/⍨3>+\⍵='/'}uri
+          :If ##.Reg.IsHTTP uri
+              uri←{⍵/⍨3>+\⍵='/'}uri
+          :EndIf
           uri←AddSlash uri
+          uri←':[0-9]+\/'⎕R'/'⊣uri      ⍝ Remove potential port number
           bool←(⊂uri)≡¨_registries.uri
-          msg←'Ambiguous URL'
       :EndIf
-      msg Assert(+/bool)∊0 1
     ∇
 
     ∇ {r}←Read dummy;ns

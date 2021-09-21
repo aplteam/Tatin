@@ -1,0 +1,85 @@
+ {r}←{noPrompt}FastForwardMergeWithMaster y;project;folder;currentBranch;gitMsg;space;buff;rc;more
+⍝ This function is usually executed in case work on a branch is finished and the branch can be deleted.
+⍝ Like `MergeWithMaster`, `FastForwardMergeWithMaster` performs several steps:
+⍝ 1. Pulls the master (if user agrees)
+⍝ 2. Merge `currentBranch` with the master
+⍝ 3. Push the master
+⍝ 4. Delete the branch in question\\
+⍝ Call `Squash` beforehand in order to clean up the commit history.\\
+⍝ Pulls the master first (the user will be prompted) and pushes after the merge.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+⍝ Performs a fast-forward merge, meaning that it will only work if the branch stems from the master.
+⍝ If that's not the case (for example because you have fetched other people's work and therefore
+⍝ changed your master branch) then use `MergeWithMaster` instead.
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ noPrompt←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noPrompt'
+ project←EstablishProject y
+ :If (,'#')≢,⊃⎕NSI
+     ⎕←'This function must be called from #'
+     ⎕←'Please enter the following command before executing the function again:'
+     ⎕←'      )CS'
+ :Else
+     'No open acre projects'⎕SIGNAL 6/⍨0=≢project
+     (space folder)←project[1 2]
+     :If 0=1 U.CheckForHistoryFolder folder
+         11 ⎕SIGNAL⍨folder,U.NameOfHistoryFolder,' exists, FastForwardMergeWithMaster cannot continue'
+     :EndIf
+     currentBranch←CurrentBranch folder
+     :Select ≢folder LogForBranch currentBranch
+     :Case 0
+         'Nothing to fast-forward'⎕SIGNAL 11
+     :Case 1
+     ⍝ That's okay
+     :Else
+         ⎕←'*********************************************'
+         ⎕←'There are commits waiting to be squashed'
+         ⎕←'If you''ve tried a fast-forward but it failed'
+         ⎕←'then consider trying a MergeWithMaster now'
+         ⎕SIGNAL 11
+     :EndSelect
+     :If 1<≢⎕SE.acre.Projects ⍬
+         ⎕←{(⎕PW-1)↑'--- ',⍵,' ',⎕PW⍴'-'}'Project <',(1⊃project),'> with branch "',currentBranch,'"'
+     :EndIf
+     'This command MUST NOT be executed in "master"'⎕SIGNAL 11/⍨'master'≡currentBranch
+     ('Branch "',currentBranch,'" is dirty!')⎕SIGNAL 11/⍨IsDirty folder
+     :If 1 U.YesOrNo'Would you like to pull the master?'
+         buff←PullMaster folder
+         :If 0<'CONFLICT'{+/⍺∧.=⍨(≢⍺)↑[2]⍵}↑,buff
+             {}⎕SE.acre.CloseProject space
+             ⎕←'Because of the conflict the project is now closed.'
+             ⎕←'Re-open in a clean environment and then solve the merge conflicts.'
+             :Return
+         :ElseIf 0=∨/'Already up to date'⍷∊buff
+         :AndIf 0=0 U.YesOrNo'Changes have been pulled; you should probably run the test cases agein. Continue anyway?'
+             ⎕←'Fastforward cancelled...'
+             :Return
+         :EndIf
+     :EndIf
+     ⎕←'Now checking out master...'
+     (rc more buff)←folder U.RunGitCommand2'checkout master'
+     :If 'Switched to branch ''master'''≢more
+         more U.Assert 0=rc
+     :EndIf
+     ⎕←⊃buff
+     (rc more buff)←folder U.RunGitCommand2'merge ',currentBranch
+     more U.Assert 0=rc
+     ⎕←↑buff
+     ⎕←⊃folder DeleteBranch currentBranch
+     :If noPrompt
+     :OrIf 1 U.YesOrNo'Would you like to push the master?'
+         :If 0=≢∊gitMsg←1 Push folder
+             ⎕←'Pushed!'
+             ⎕←'You might want to execute:'
+             ⎕←'⎕SE.APLGit.GoToGitHub ''',(2⊃⎕NPARTS ¯1↓folder),''''
+         :Else
+             ⎕←↑gitMsg
+         :EndIf
+     :EndIf
+     {}⎕SE.acre.CloseProject space
+     #.⎕EX space
+     :If 0<⎕NC'∆DefaultDir'
+         ∆DefaultDir←((⊂∆DefaultDir)∊(⎕SE.acre.Projects ⍬)[;2])/∆DefaultDir
+     :EndIf
+     ⎕←'Project closed, space "',space,'" deleted and branch "',currentBranch,'" deleted'
+ :EndIf
+⍝Done

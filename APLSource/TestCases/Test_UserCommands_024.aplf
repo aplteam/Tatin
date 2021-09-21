@@ -7,13 +7,16 @@
 
      r←T._NoBatchTest
 
- :ElseIf 1 ∆YesOrNo'Requires you to select the [tatin] registry. Continue?'
+ :Else
+     ⎕←''
+     :If 1 ∆YesOrNo'Requires you to select the [tatin] registry. Continue?'
 
-     (rc msg res)←∆UCMD'ListPackages -raw'
-     →T.PassesIf(rc=0)∧0=≢msg
-     →T.PassesIf(2=⍴⍴res)∧0<≢res
-     →T.PassesIf 20<≢res
+         (rc msg res)←∆UCMD'ListPackages -raw'
+         →T.PassesIf(rc=0)∧0=≢msg
+         →T.PassesIf(2=⍴⍴res)∧0<≢res
+         →T.PassesIf 20<≢res
 
-     r←T._OK
+         r←T._OK
 
+     :EndIf
  :EndIf

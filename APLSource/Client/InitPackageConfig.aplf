@@ -7,7 +7,7 @@
      cfg.api←''
      cfg.assets←''
      cfg.description←''     ⍝ max 120 chars
-    ⍝cfg.date←''            ⍝ Set by the server
+    ⍝cfg.date←''            ⍝ Set by the server (publishing date)
      cfg.group←''
      cfg.name←''
      cfg.source←''
@@ -21,8 +21,8 @@
      0=≢⍵:cfg
      varsList←' '~¨⍨↓cfg.⎕NL 2
      cfg←cfg.⎕NS ⍵
-     list←(' '~¨⍨↓cfg.⎕NL 2)~' '~¨⍨↓'_'cfg.⎕NL 2  ⍝ user properties start with "_" by convention
-     bool←list∊varsList,('uri' 'date')  ⍝ These are injected by the server
+     list←(' '~¨⍨↓cfg.⎕NL 2)~' '~¨⍨↓'_'cfg.⎕NL 2    ⍝ user properties start with "_" by convention
+     bool←list∊varsList,('uri' 'date')              ⍝ These are injected by the server
      ∧/bool:cfg
      msg←'Invalid propert',((1+1<+/~bool)⊃'y' 'ies'),' in config namespace: ',⊃{⍺,',',⍵}/((~bool)/list)
      msg Assert 0

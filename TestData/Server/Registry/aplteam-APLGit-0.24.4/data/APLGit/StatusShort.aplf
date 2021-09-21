@@ -1,0 +1,12 @@
+ r←StatusShort y;folder;project;rc;more
+⍝ Reports all uncommited/untracked files.\\
+⍝ This function returns a short status, meaning that if there is nothing to report `r` will be empty.\\
+⍝ See also `Status`.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ project←EstablishProject y
+ 'No project folder or space specified/found'⎕SIGNAL 6/⍨0=≢project
+ folder←2⊃project
+ (rc more r)←folder U.RunGitCommand2'status --short'
+ U.Assert 0=rc
+ r←⍪⍣(0<≢r)⊣r
+⍝Done

@@ -1,0 +1,22 @@
+ r←Test_Load_100(stopFlag batchFlag);⎕TRAP;buff
+⍝ Load two packages and check minimal version selection with aliases used
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ buff←TC.LoadPackage'[localhost]aplteam-APLTreeUtils2' '#.TEMP'
+ →T.GoToTidyUp 0≠≢buff
+ →T.GoToTidyUp'1.1.3'≢{⍵↑⍨¯1+⍵⍳'+'}2⊃#.TEMP.APLTreeUtils2.Version
+
+ buff←TC.LoadPackage'[localhost]aplteam-APLGit' '#.TEMP'
+ →T.GoToTidyUp 0≠≢buff
+ →T.GoToTidyUp'1.1.3'≢{⍵↑⍨¯1+⍵⍳'+'}2⊃#.TEMP.APLTreeUtils2.Version
+ →T.GoToTidyUp'1.1.1'≢{⍵↑⍨¯1+⍵⍳'+'}2⊃#.TEMP.APLGit.##.A.Version   ⍝ Because the packages where laoded rather than installed: minimal version selection is only done for each package independently
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

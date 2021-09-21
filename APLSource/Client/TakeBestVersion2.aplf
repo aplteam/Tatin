@@ -1,14 +1,13 @@
- mat←TakeBestVersion2 ns;topLevel;groupNameMajor;b
+ mat←TakeBestVersion2 ns;principal;groupNameMajor;b
 ⍝ Takes the best available version; does not differantiate between principal packages and pure dependenies.
-⍝ See also TakeBestVersion1 which is considered wrong.
+⍝ See also `TakeBestVersion1` which is considered wrong.
  mat←⍉↑ns.(principal packageID url)
- topLevel←(1=mat[;1])⌿mat                               ⍝ Separate level-1 packages (topLevel) from the rest
+ principal←(1=mat[;1])⌿mat                              ⍝ Separate principal packages from the rest
  mat←⊖mat[Reg.SortIndexForPackageIDs mat[;2];]          ⍝ Make sure latest ones are at the top
  groupNameMajor←Reg.RemoveMinorAndPatch¨mat[;2]         ⍝ Majors are consiered separate packages
- topLevel[;2]←Reg.RemoveMinorAndPatch¨topLevel[;2]
- b←(groupNameMajor⍳groupNameMajor)=⍳≢mat
+ b←(⍳≢mat)=groupNameMajor⍳groupNameMajor
  mat←b⌿mat
- topLevel←Reg.RemoveMinorAndPatch¨topLevel[;2]
- mat[;1]←(Reg.RemoveMinorAndPatch¨mat[;2])∊topLevel
+ principal←Reg.RemoveMinorAndPatch¨principal[;2]
+ mat[;1]←(Reg.RemoveMinorAndPatch¨mat[;2])∊principal
  mat←mat[⍒mat[;1];]
 ⍝Done

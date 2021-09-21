@@ -1,0 +1,21 @@
+ {r}←CreateAPI flag;name
+ r←⍬
+ :If flag
+     ⎕EX'API'
+     {}⎕SE.UCMD'acre.Erase ',(⍕⎕THIS),'.API -recursive'
+     'API'⎕NS''
+     :For name :In Public
+         :Select ⊃|1 2⊃⎕AT name
+         :Case 0
+             API.⎕FX('r←',name)('r←##.',name)
+         :Case 1
+             API.⍎name,'←{##.',name,' ⍵}'
+         :Case 2
+             API.⍎name,'←{ ⍺←⊣ ⋄ ⍺ ##.',name,' ⍵}'
+         :Else
+             ∘∘∘ ⍝ Something is wrong!
+         :EndSelect
+         {}⎕SE.acre.SetChanged(⍕⎕THIS),'.API.',name
+     :EndFor
+ :EndIf
+⍝Done

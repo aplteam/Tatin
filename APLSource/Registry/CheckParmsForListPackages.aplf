@@ -15,6 +15,14 @@
  :If 0=parms.⎕NC'aggregate'
      parms.aggregate←1
  :EndIf
- 'Invalid left argument: only "group", "tags" and "aggregate" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊'group' 'tags' 'aggregate'
+ :If 0=parms.⎕NC'date'
+     parms.date←0
+ :EndIf
+ :If 0=parms.⎕NC'info_url'
+     parms.info_url←0
+ :EndIf
+ 'Invalid left argument: only "group", "tags", "date", "info_url" and "aggregate" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊'group' 'tags' 'aggregate' 'date' 'info_url'
+ '"aggregate" must be a Boolean'Assert parms.aggregate∊0 1
+ '"date" must be a Boolean'Assert parms.date∊0 1
  parms.(group tags)←⎕C¨parms.(group tags)
 ⍝Done

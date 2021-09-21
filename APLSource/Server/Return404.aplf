@@ -1,9 +1,11 @@
  Return404←{
  ⍝ ⍵ is a request object
-     ⍺←¯1
+     ⍺←'Not found (404)'
+     html←(HtmlHeader ⍬),⊆({0=≢⍵:⍵ ⋄ '<h2>',⍵,'</h2>'}⍺)'</body>' '</html>'
+     html←⊃,/html,¨⎕UCS 13
      request←⍵
      response←request Respond 404 0
      ¯1≡⍺:response
-     response.Content←⍺
+     response.Content←html
      response
  }

@@ -13,7 +13,7 @@
  :If ~batchFlag
      ⎕←(⎕PW-1)⍴'-'
      msg←''
-     msg,←⊂'This function will close all Proma projects, delete everything that is not needed in order to'
+     msg,←⊂'This function will close all Cider projects, delete everything that is not needed in order to'
      msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
      msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
      msg,←⊂'The Tatin client will be copied from that WS into ⎕SE once a Tatin user command is invoked.'
@@ -29,13 +29,13 @@
  :If batchFlag
  :OrIf 1 YesOrNo'Would you like to continue?'
      batchFlag UpdateVersionNumber type
-     {}⎕SE.Proma.CloseProject''
-     parms←⎕SE.Proma.CreateOpenParms ⍬
-     parms.folder←#.Tatin.PromaConfig.HOME
+     {}⎕SE.Cider.CloseProject''
+     parms←⎕SE.Cider.CreateOpenParms ⍬
+     parms.folder←#.Tatin.CiderConfig.HOME
      parms.projectSpace←'_Tatin'
      parms.suppressLX←1
-     Assert ⎕SE.Proma.OpenProject parms
-     {}⎕SE.Proma.CloseProject''
+     Assert ⎕SE.Cider.OpenProject parms
+     {}⎕SE.Cider.CloseProject''
      #._Tatin.⎕EX¨'Server' 'Todo' 'TestCases' 'Simu' 'TestCasesServer' 'Tester2' 'CodeCoverage'
      #._Tatin.Admin.⎕EX¨'Initialize_Server' 'RunTestServer' 'CreateAllRefs_Server'
      ⎕LX←''

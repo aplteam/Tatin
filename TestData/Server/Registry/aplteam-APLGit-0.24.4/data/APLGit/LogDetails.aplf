@@ -1,0 +1,21 @@
+ r←{x}LogDetails noOf;project;folder;buff;cmd;rc;more
+⍝ Returns a details history for the given project.\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ See also `LogForBranch`, `LogShort` and `Log`'.\\
+ r←''
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ 'Invalid right argument'⎕SIGNAL 11/⍨1≠≡,noOf
+ 'Invalid right argument'⎕SIGNAL 11/⍨~(⎕DR noOf)∊83 163 323
+ :If 0≠≢project←EstablishProject x
+     folder←2⊃project
+     :If (⊂noOf)∊''⍬
+     :OrIf 0=noOf
+         cmd←'log --name-status'
+     :Else
+         cmd←'log -',(⍕|noOf),' --name-status'
+     :EndIf
+     (rc more buff)←folder U.RunGitCommand2 cmd
+     U.Assert 0=rc
+     r←↑buff
+ :EndIf
+⍝Done

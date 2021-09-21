@@ -1,0 +1,10 @@
+ r←Methods;buff;list
+⍝ Like `Public` but adds the first line after the header and syntax information.\\
+⍝ Uses `Public` as source.
+ list←Public~⊂'Methods'
+ buff←{2↑⎕NR ⍵}¨list
+ r←{⍵↑⍨¯1+⍵⍳';'}¨1⊃¨buff
+ r←list{⍺ ⎕R'∇'⊣⍵}¨r
+ r←list,[1.5]r
+ r,←{(¯2×'\\'∘≡¨¯2↑¨⍵)↓¨2↓¨⍵}2⊃¨buff
+⍝Done

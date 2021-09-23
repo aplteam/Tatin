@@ -1,4 +1,4 @@
- parms←CheckParmsForListPackages parms
+ parms←CheckParmsForListPackages parms;list
 ⍝ Makes sure that `parms` will be a namespace that carries the required parameters.
 ⍝ If `parms` is `⍬` or '' it is replaced by `⎕NS''` and then populated with defaults.
 ⍝ `parms` is also checked for containing other stuff (not permitted) and converts
@@ -21,8 +21,17 @@
  :If 0=parms.⎕NC'info_url'
      parms.info_url←0
  :EndIf
- 'Invalid left argument: only "group", "tags", "date", "info_url" and "aggregate" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊'group' 'tags' 'aggregate' 'date' 'info_url'
+ :If 0=parms.⎕NC'since'
+     parms.since←0
+ :EndIf
+ list←'group' 'tags' 'aggregate' 'date' 'info_url' 'since'
+ 'Invalid left argument: only "group", "tags", "date", "info_url" and "aggregate" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊list
  '"aggregate" must be a Boolean'Assert parms.aggregate∊0 1
  '"date" must be a Boolean'Assert parms.date∊0 1
+ :If ' '=1↑0⍴parms.since
+     '"since", when character, must be international date format: YYYY-MM-DD'Assert(∧/parms.since[1 2 3 4 6 7 9 10]∊⎕D)∧'-'∧.=parms.since[5 8]
+ :Else
+     '"since" must be an integer: YYYYMMDD'Assert(⎕DR parms.since)∊323 83 83
+ :EndIf
  parms.(group tags)←⎕C¨parms.(group tags)
 ⍝Done

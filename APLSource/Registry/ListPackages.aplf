@@ -1,4 +1,4 @@
- r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;list;noOfHyphens;noOfDots;uniqueIDs;list2
+ r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;list;noOfHyphens;noOfDots;uniqueIDs;list2;since
 ⍝ Documentation see ##.Client.ListPackages
  'No registry specified'Assert 0<≢uri
  parms←CheckParmsForListPackages parms
@@ -6,6 +6,7 @@
  (registryPath packageID)←SeparateUriAndPackageID uri
  registryPath←F.ExpandPath registryPath
  'Neither an alias nor a path?!'Assert F.IsDir registryPath
+ parms.date{⍺:⍺ ⋄ 0≢⊃⍵}←parms.since
  :If 0=⎕NC'list'
      list←(parms.date)GetAllPackages registryPath
  :EndIf
@@ -27,10 +28,17 @@
      :Else
          r←list
      :EndIf
+     :If 0≢⊃parms.since
+         since←parms.since
+         :If ' '=1↑0⍴since                             ⍝ International date format?
+             since←⊃A.ToNum since~'-'                  ⍝ Convert to a number
+         :EndIf
+         r←(since≤{⊃A.ToNum(10↑⍵)~'-'}¨r[;2])⌿r
+     :EndIf
  :Else
      noOfHyphens←'-'+.=packageID
      :Select noOfHyphens
-     :Case 0                        ⍝ Just the group
+     :Case 0                                           ⍝ Just the group
          :If 0<≢list←((packageID,'-')∘≡¨{⍵↑⍨⍵⍳'-'}¨list[;1])⌿list
              :If parms.aggregate
                  r←AggregatePackages list
@@ -38,7 +46,7 @@
                  r←list,⊂⍬
              :EndIf
          :EndIf
-     :Case 1                        ⍝ group and name
+     :Case 1                                           ⍝ group and name
          :If 0<≢list←((packageID,'-')∘≡¨(RemoveVersionNumber¨list[;1]),¨'-')⌿list
              :If parms.aggregate
                  r←AggregatePackages list
@@ -46,10 +54,10 @@
                  r←list,⊂⍬
              :EndIf
          :EndIf
-     :Case 2                        ⍝ group, name and version
+     :Case 2                                           ⍝ group, name and version
          noOfDots←'.'+.=packageID
          :Select noOfDots
-         :Case 0                    ⍝ Just major
+         :Case 0                                       ⍝ Just major
              :If 0<≢list←((packageID,'.')∘≡¨{⍵↑⍨⍵⍳'.'}¨list[;1])⌿list
                  :If parms.aggregate
                      r←0 AggregatePackages list
@@ -57,7 +65,7 @@
                      r←list,⊂⍬
                  :EndIf
              :EndIf
-         :Case 1                    ⍝ major and minor
+         :Case 1                                       ⍝ major and minor
              :If 0<≢list←((packageID,'.')∘≡¨{'.',⍨⍵/⍨2>+\'.'=⍵}¨list[;1])⌿list
                  :If parms.aggregate
                      r←⍉⍪{(1⊃⍵)(≢⍵)}RemovePatch¨,list
@@ -66,7 +74,7 @@
                  :EndIf
              :EndIf
          :Else
-             :If (⊂packageID)∊list   ⍝ verbatim
+             :If (⊂packageID)∊list                     ⍝ verbatim
                  r←1 2⍴packageID ⍬
              :EndIf
          :EndSelect

@@ -1,0 +1,16 @@
+ r←Test_ListPkgs_051(stopFlag batchFlag);⎕TRAP;mat;parms
+⍝ List all packages from a certain date by specifying "since" by international date format
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.since←'2020-05-01'
+ mat←parms TC.ListPackages'[local]'
+
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 1<≢mat
+ →T.PassesIf∧/(⊃A.ToNum parms.since~'-')≤⊃∘A.ToNum¨'-'~¨⍨∪10↑¨mat[;2]
+
+ r←T._OK
+⍝Done

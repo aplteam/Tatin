@@ -1,5 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.31.0 - 2021-09-23
+⍝   * `ListPackages` enhanced: -since added
 ⍝ * 0.30.0 - 2021-09-21
 ⍝   * `ListPackages` enhanced: -date and -info_url added
 ⍝   * Minor improvements on the help pages
@@ -120,7 +122,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'Lists all packages in the Registry specified in the argument'
-          c.Parse←'1s -raw -group= -tags= -noaggr -date -info_url'
+          c.Parse←'1s -raw -group= -tags= -noaggr -date -info_url -since='
           r,←c
      
           c←⎕NS ⍬
@@ -340,6 +342,11 @@
           parms.aggregate←~Arg.noaggr
       :EndIf
       parms.date←Arg.date
+      :If '-'∊Arg.since
+          parms.since←⊃(//)⎕VFI Arg.since~'-'
+      :Else
+          parms.since←(4↑Arg.since),'-',(2↑4↓Arg.since),'-',2↑6↓Arg.since
+      :EndIf
       parms.info_url←Arg.info_url
       r←⍪parms TC.ListPackages registry
       :If 0=Arg.raw
@@ -929,6 +936,9 @@
           r,←⊂' * -tags=foo,goo will restrict the output to packages that carry the tags "foo" & "goo".'
           r,←⊂' * -date adds the publishing date to the output. -noaggr is set to 1 then.'
           r,←⊂' * -info_url adds the URL saved in the package config file.'
+          r,←⊂' * -since, when specified, must be a date either as YYYYMMDD or YYYY-MM-DD'
+          r,←⊂'    All packages published on that date or after are listed.'
+          r,←⊂'     Implies -date and ignores -noaggr when specified.'
           r,←⊂'* By default the output is aggregated. Specify -noaggr if you want the full list.'
           r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw list.'
       :Case ⎕C'LoadPackage'

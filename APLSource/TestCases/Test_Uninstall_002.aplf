@@ -1,4 +1,4 @@
- r←Test_Uninstall_002(stopFlag batchFlag);⎕TRAP;dir;dir2;qdmx
+ r←Test_Uninstall_002(stopFlag batchFlag);⎕TRAP;dir;dir2;msg;list
 ⍝ Uninstall a package that is not installed
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -7,13 +7,8 @@
  dir ⎕NCOPY'TestData/UnInstall/'
  dir2←dir,'/UnInstall'
 
- :Trap 98
-     {}TC.UnInstallPackage dir2'aplteam-DoesNotExit-1.0.0'
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'Package not found'≢qdmx.EM
- :EndTrap
+ (list msg)←TC.UnInstallPackage dir2'aplteam-DoesNotExit-1.0.0'
+ →T.GoToTidyUp'Package is not installed'≢msg
 
  r←T._OK
 

@@ -1,0 +1,11 @@
+ r←Test_UserCommands_075(stopFlag batchFlag);⎕TRAP;rc;msg;list
+⍝ Exercise ]Tatin.]UnInstallPackage without any argument; must fail
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg list)←∆UCMD'UnInstallPackage'
+ →T.PassesIf 0≠rc
+ →T.PassesIf∨/'No path specified'⍷msg
+
+ r←T._OK
+⍝Done

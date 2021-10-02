@@ -1,4 +1,4 @@
- r←Test_Misc_020(stopFlag batchFlag);⎕TRAP;dir;orig;buff;new
+ r←Test_ReInstall_005(stopFlag batchFlag);⎕TRAP;dir;orig;buff;new;parms
 ⍝ Exercise `ReInstallDependencies with the -dry flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -6,9 +6,12 @@
  dir←GetTempDir ⍬
  dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/dependencies/*'
  orig←F.ListDirs dir,'/*'
- buff←##.Client.PretendReInstallDependencies dir
+ parms←TC.CreateReInstallParms
+ parms.dry←1
+ buff←parms TC.ReInstallDependencies dir
+ →T.GoToTidyUp 12=≢buff
  new←F.ListDirs dir,'/*'
- →T.PassesIf≡/∪¨{{⍵/⍨2>+\⍵='-'}⊃,/1↓⎕NPARTS ⍵}¨¨orig new
+ →T.GoToTidyUp≢/∪¨{{⍵/⍨2>+\⍵='-'}⊃,/1↓⎕NPARTS ⍵}¨¨orig new
 
  r←T._OK
 

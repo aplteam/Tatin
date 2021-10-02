@@ -1,0 +1,21 @@
+ success←old ReplaceFolderBy new;temp
+⍝ Performs the following actions:
+⍝ * Establish a temp name dynamically
+⍝ * Rename `old` to "temp"
+⍝ * Re-create the folder "old"
+⍝ * Copy the contents of "new" into "old"
+⍝ * Delete "new"
+ temp←'-'{~⎕NEXISTS n←⍺{(1⊃⍵),⍺,(2⊃⍵)}⎕NPARTS ⍵:n ⋄ (⍺,⍺)∇ ⍵}old
+ temp ⎕NMOVE old
+ ⎕MKDIR old
+ :Trap 0
+     old ⎕NCOPY⍠('Wildcard' 1)⊣new,'/*'
+     3 ⎕NDELETE new
+     success←1
+ :Else                      ⍝ Roll back
+     3 ⎕NDELETE old
+     ⎕MKDIR old
+     old ⎕NMOVE⍠('Wildcard' 1)⊣temp,'/*'
+     success←0
+ :EndTrap
+ 3 ⎕NDELETE temp

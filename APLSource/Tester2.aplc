@@ -22,12 +22,12 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.2.0+101' '2021-09-19'
+      r←'Tester2' '3.2.0+102' '2021-09-19'
     ∇
 
     ∇ History
       :Access Public shared
-      ⍝ * 3.2.0 ⋄ 2021-09-09
+      ⍝ * 3.2.0 ⋄ 2021-10-01
       ⍝   * `Tester2` now tells `Link` in case an APL object was changed under the condition that it is at least
       ⍝     Link 3.0 that is managing the code
       ⍝   * New constant `NoCiderTests` introduced
@@ -1639,31 +1639,28 @@
 
     ∇ {r}←NotifyAcreAndLinkAndDeleteOldVersion(oldName newName);delFilanme;rc
       r←⍬
-      :If 'No active links in'{⍺≡(≢⍺)↑⍵}⎕SE.Link.Status _ref
-          :If 0=⎕SE.⎕NC'acre'
-              _ref.⎕EX oldName
+      :If 0<⎕SE.⎕NC'acre'
+          :Trap 22
+              rc←⎕SE.acre.SetChanged newName
           :Else
-              (oldName newName)←{(⍕_ref),'.',⍵}¨oldName newName
-              :If 3=⎕SE.acre.⎕NC'Version'
-                  delFilanme←((-≢'.change')↓⊃⎕SE.acre.Changefile newName),'.delete'
-                  :Trap 22
-                      rc←⎕SE.acre.SetChanged newName
-                  :Else
-                      :Return ⍝ Not an acre project
-                  :EndTrap
-                  rc←⎕SE.acre.Erase oldName
-                  :If ⎕NEXISTS delFilanme
-                      ⎕NDELETE delFilanme
-                  :EndIf
+              ∘∘∘ ⍝ Huh?! What's up?
+          :EndTrap
+          :If 0<≢rc
+              ⎕SE.acre.Erase oldName
+              :Return
+          :EndIf
+      :EndIf
+      :If 3≤{⊃(//)⎕VFI ⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
+          rc←⎕SE.Link.Add(⍕_ref),'.',newName
+          →('Not in a linked namespace: '{⍺≡(≢⍺)↑⍵}rc)/0
+          :If 'Added: '{⍺≡(≢⍺)↑⍵}rc
+              rc←⎕SE.Link.Expunge(⍕_ref),'.',oldName
+              :If ~rc
+                  ∘∘∘ ⍝ Huh?! What's up?
               :EndIf
           :EndIf
       :Else
-          :If 3≤{⊃(//)⎕VFI ⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
-              {}⎕SE.Link.Add(⍕_ref),'.',newName
-              {}⎕SE.Link.Expunge(⍕_ref),'.',oldName
-          :Else
-              ⎕←'Incompatible version of Link detected; we need 3.0.0 or better'
-          :EndIf
+          ⎕←'Incompatible version of Link detected; we need 3.0.0 or better'
       :EndIf
     ∇
 

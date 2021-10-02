@@ -1,11 +1,18 @@
  list←{dateFlag}ListVersions y;client;request;res;uri
 ⍝ `y` must specify a package but without version number.\\
-⍝ Returns list with all versions found for that particular package.\\
+⍝ You may omit the group name; that would not make a difference when the name is used only within one group,
+⍝ but if it is used in more than one group then all of them are listed.
+⍝ Returns a (possibly empty) list with all versions found for that particular package.\\
 ⍝ By default the publishing date is not included but you my change this by passing a 1 as ⍺.
 ⍝ If you do a matrix is returned
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
  uri←ReplaceRegistryAlias y
- 'No URI provided'Assert 0<≢uri
+ :If ∧/'[]'∊y
+     'No valid alias provided'Assert 0<≢uri
+ :Else
+     'No valid URI provided'Assert 0<≢uri
+ :EndIf
+ 'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last uri)+.='-'     ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
  :If Reg.IsHTTP uri
      list←dateFlag ListVersions_ uri
  :Else

@@ -1,0 +1,20 @@
+ r←Test_ReInstall_002(stopFlag batchFlag);⎕TRAP;dir;refs;new;res;expected
+⍝ Re-install two versions of the same package but assign an alias to one of them. Both will survive.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir ⍬
+ res←TC.InstallPackage'[localhost]example-versions-1.0.1-That-fix'dir
+ Assert'example-versions-1.0.1-That-fix'≡res
+ res←TC.InstallPackage'[localhost]V@example-versions-1.0.12-zzz'dir     ⍝ Alias!
+ Assert'V@example-versions-1.0.12-zzz'≡res
+ refs←TC.ReInstallDependencies dir
+ new←(1+≢dir)↓¨F.ListDirs dir,'/*'
+ expected←'example-versions-1.0.1-That-fix' 'example-versions-1.0.12-zzz'
+ →T.PassesIf expected≡new
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir dir
+⍝Done

@@ -1,40 +1,71 @@
- (r msg)←UnInstallPackage(folder packageID);pkgDepFilename;topDependencies;buildList;installedPkgs;toBeRemoved;rc;bool;oldBuildList;packageID2
+ (list msg)←UnInstallPackage(folder packageID);pkgDepFilename;installedPkgs;toBeRemoved;rc;bool;principalPkgs;buildList;packages;packageID_2
 ⍝ If `folder` carries a dependency file then this function attempts to un-install the package
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
-⍝ required by other packagases.\\
+⍝ required by other packages.\\
+⍝ Only top-level packages and packages that are not used anymore can be un-installed.
 ⍝ To keep things simple Tatin performs the following steps:
-⍝ 1. It checks whether `packageID` is a member of the dependency file: only those can be un-installed.\\
-⍝ 2. It removes `packagedID` from the dependency file and writes it back to disk.
-⍝ 3. It re-compiles the build list based on the new dependecy file.
-⍝ 4. It removes all packages that are not mentioned in the build list.
-⍝ For the last two steps only group name and package name are used for the check. That way we might
-⍝ delete to little, but never too much.\\
-⍝ Returns a list with the fully qualifed names of all packages removed by the un-install operation.\\
+⍝ * If `packageID` is empty:
+⍝   A new build list is compiled. Any packages that are no part of the new build list are then rmeoved.
+⍝ * Otherwise,,,
+⍝   1. It checks whether `packageID` is a member of the build list: if that is not the case then the
+⍝      package folder is removed.
+⍝   2. It checks whether the package is also mentioned in the dependeny file. (If not an error is thrown)
+⍝   3. It removes `packagedID` from the dependency file and writes it back to disk.
+⍝   4. It re-compiles the build list based on the new dependecy file.
+⍝   5. It removes all packages that are not mentioned in the build list anymore.
+⍝ Returns a two-item vector:
+⍝ 1. List with the fully qualifed names of all removed packages
+⍝ 2. Message, ideally empty.
 ⍝ Note that removing the directories hosting the packages might fail for all sorts of reasons even
-⍝ although the package and any dependencies were already successfully removed from the dependency file.
- r←msg←''
+⍝ though the package and any dependencies were already successfully removed from both the dependency
+⍝ file nad the build list
+ list←msg←''
  '"folder" is invalid'Assert F.IsDir folder
  folder←Reg.AddSlash folder
  pkgDepFilename←folder,Reg.DependenciesFilename
- 'The folder has no dependeny file'Assert F.IsFile pkgDepFilename
- topDependencies←(1⊃F.NGET pkgDepFilename 1)~⊂''
- packageID2←IdentifyInstalledPackageID topDependencies packageID
- :If 0=≢packageID2
-     'Package not found'Assert F.IsDir folder,packageID
-     F.RmDir folder,packageID
+ 'The folder has no dependency file'Assert F.IsFile pkgDepFilename
+ principalPkgs←(1⊃F.NGET pkgDepFilename 1)~⊂''
+ :If 0<≢packageID
+ :AndIf '@'∨.=packageID[1,≢packageID]
+     packageID_2←IdentifyInstalledPackageID principalPkgs packageID
  :Else
-     (⊂topDependencies~⊂packageID2)F.NPUT pkgDepFilename 1
-     oldBuildList←LoadBuildList folder
-     buildList←1 CompileBuildList folder
-     installedPkgs←(≢folder)↓¨F.ListDirs folder
-     toBeRemoved←(~installedPkgs∊(RemoveAlias¨buildList[;2]))/installedPkgs
-     :If 0<≢toBeRemoved
-         r←toBeRemoved
-         toBeRemoved←folder∘,¨toBeRemoved
-         rc←⊃∘F.RmDir¨toBeRemoved
-         :If ∨/bool←0≠rc
-             msg←'Removing package folder failed for ',⊃{⍺,', ',⍵}/bool/(≢folder)↓¨toBeRemoved
+     packageID_2←packageID
+ :EndIf
+ :If 0<≢packageID
+     :If 0=≢packageID_2
+         :If folder{0=≢⍵:0 ⋄ F.IsDir ⍵,⍵}RemoveAlias packageID
+             F.RmDir folder,packageID
+             list←,⊂packageID
+             :Return
+         :Else
+             msg←'Package is not installed'
+             :Return
+         :EndIf
+     :Else
+         'Invalid package ID'Assert Reg.IsValidPackageID_Complete RemoveAlias packageID_2
+         buildList←LoadBuildList folder
+         :If ~(⊂packageID_2)∊buildList[;2]
+             :If ~(⊂packageID_2)∊RemoveAlias¨buildList[;2]
+             :AndIf F.IsDir folder,packageID_2
+                 F.RmDir folder,packageID_2
+                 list←,⊂packageID_2
+                 :Return
+             :Else
+                 msg←'Package is not installed'
+                 :Return
+             :EndIf
+         :Else
+             :If ~(⊂packageID_2)∊principalPkgs
+                 msg←'Cannot uninstall: is not a principal package'
+             :Else
+                 (⊂principalPkgs~⊂packageID_2)F.NPUT pkgDepFilename 1
+             :EndIf
          :EndIf
      :EndIf
  :EndIf
+ buildList←1 CompileBuildList folder
+ packages←RemoveAlias¨buildList[;2]
+ installedPkgs←(≢folder)↓¨F.ListDirs folder
+ list←(~installedPkgs∊packages)/installedPkgs
+ F.RmDir folder∘,¨list
 ⍝Done

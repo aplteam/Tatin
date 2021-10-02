@@ -1,12 +1,12 @@
  Prepare;testFilename;ask;answer;ignore
  'This WS appears to be prepared for functioning as a Tatin Server'⎕SIGNAL 11/⍨0<##.Client.⎕NC''
  :If 0=##.Client.⎕NC'MyUserSettings'
-     #.Tatin.Admin.Initialize_Client
+     ##.Admin.Initialize_Client
  :EndIf
  T←⎕NEW ##.Tester2 ⎕THIS
- :If 0 ∆YesOrNo'Check Temp\ folder for left-overs?'
+ :If 0 ##.Client.YesOrNo'Check Temp\ folder for left-overs?'
      T.exec_after_each_test←'#.Tatin.Admin.CheckTempFolderAfterTestFunctionRun'
- :ElseIf 0 ∆YesOrNo'Check user settings?'
+ :ElseIf 0 ##.Client.YesOrNo'Check user settings?'
      T.exec_after_each_test←'#.Tatin.Admin.CheckUserSettings'
  :EndIf
  testFilename←##.Admin.GetCoverageFile
@@ -33,4 +33,4 @@
  Reg←##.Registry
  D←TC.Dependencies
  R←##.RumbaLean.Core
-⍝Done
+⍝Don

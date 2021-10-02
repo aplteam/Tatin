@@ -1,71 +1,67 @@
- {r}←{noQLX}Make type;P;parms;P_;list;APL_Version;scanFlag
+ {r}←{noQLX}Make flag;P;parms;P_;list;APL_Version;scanFlag
 ⍝ This function will start two APL sessions in succession in order to open the Tatin project and then execute
-⍝ first `MakeClient` (important because that bumps the version number) and then, in the second session, `MakeServer`.
+⍝ first `MakeClient` (which bumps the build number) and then, in the second session, `MakeServer`.
 ⍝ It cannot be done in one go, and it cannot be done in batch mode from the current session.
-⍝ `type` specifies how to deal with the version number; it takes the following actions dependening on `type`:
-⍝ * If `type` ←→ 0 no further action is taken
-⍝ * If `type` ←→ 1 the "patch" number is bumped
-⍝ * If `type` ←→ 2 the "minor" number is bumped
-⍝ * If `type` ←→ 3 the "major" number is bumped\\
-⍝ Note that the build ID is **always** bumped.
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
  APL_Version←'C:\Program Files\Dyalog\Dyalog APL-64 18.0 Unicode\Dyalog.exe'
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
  r←⍬
- ⎕←'Current dir is now: ',##.FilesAndDirs.Cd ##.CiderConfig.HOME
- 'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
- noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
- 'Invalid right argument; must be one of: 0 1 2 3'⎕SIGNAL 11/⍨~(⊂type)∊0 1 2 3
- :If 0 YesOrNo'Would you like to update all Tatin packages?'
-     scanFlag←0 YesOrNo'Consider https://tatin.dev only? (No = scan all registries with priority > 0)'
- :AndIf scanFlag UpdatePackages 1
- :AndIf ~0 YesOrNo'An APLTree script was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
-     :Return
+ :If flag
+     ⎕←'Current dir is now: ',##.FilesAndDirs.Cd ##.CiderConfig.HOME
+     'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
+     noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
+     :If 0 ##.Client.YesOrNo'Would you like to update all Tatin packages?'
+         scanFlag←0 ##.Client.YesOrNo'Consider https://tatin.dev only? (No = scan all registries with priority > 0)'
+     :AndIf scanFlag UpdatePackages 1
+     :AndIf ~0 ##.Client.YesOrNo'An APLTree script was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
+         :Return
+     :EndIf
+     'Create!'##.FilesAndDirs.CheckPath'./Dist'
+     list←⊃##.FilesAndDirs.Dir'./Dist/*.zip'
+     list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
+     list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
+     ##.FilesAndDirs.DeleteFile list
+     P←##.APLProcess
+     parms←P.CreateParms
+     parms.Exe←APL_Version
+     parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
+     parms.CommandLineArgs,←' lx="#.Make_.Run 0"'
+     :If 0  ⍝ Only for analyzing problems:
+         parms.CommandLineArgs,←' -exec_setup=0 '
+         parms.CommandLineArgs,←' -stop_in_setup=1 '
+     :EndIf
+     :If noQLX
+         parms.CommandLineArgs,←' -x'
+     :EndIf
+     parms.SessionFile←1
+     parms.WindowsStyle←'Normal'
+     P_←⎕NEW P parms
+     ⎕←'   Process started for "making" the Tatin Client...'
+     {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+     'The process exited with an error code'Assert 0=P_.Proc.ExitCode
+     ⎕←'   Now compiling HTML from the markdown files (documentation)...'
+     CompileDocumentation ⍬
+     ⎕←'   Copy the documentation to the test server...'
+     UpdateDocumentation ⍬
+     parms←P.CreateParms
+     parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc"'
+     parms.CommandLineArgs,←' lx="#.Make_.Run ¯1"'
+     parms.Exe←APL_Version
+     :If 0  ⍝ Only for analyzing problems:
+         parms.CommandLineArgs,←' -exec_setup=0'
+         parms.CommandLineArgs,←' -stop_in_setup=1 '
+     :EndIf
+     :If noQLX
+         parms.CommandLineArgs,←' -x'
+     :EndIf
+     parms.SessionFile←1
+     parms.WindowsStyle←'Normal'
+     P_←⎕NEW P parms
+     ⎕←'   Process started for "making" the Tatin Server...'
+     {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+     'The process exited with an error code'Assert 0=P_.Proc.ExitCode
+     UpdateTestServerAssets ⍬
+     ⎕←'*** Done'
+ :Else
+     ⎕←'Right argument is not 1, no action taken'
  :EndIf
- 'Create!'##.FilesAndDirs.CheckPath'./Dist'
- list←⊃##.FilesAndDirs.Dir'./Dist/*.zip'
- list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
- list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
- ##.FilesAndDirs.DeleteFile list
- P←##.APLProcess
- parms←P.CreateParms
- parms.Exe←APL_Version
- parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
- parms.CommandLineArgs,←' lx="#.Make_.Run ',(⍕type),'"'
- :If 0  ⍝ Only for analyzing problems:
-     parms.CommandLineArgs,←' -exec_setup=0 '
-     parms.CommandLineArgs,←' -stop_in_setup=1 '
- :EndIf
- :If noQLX
-     parms.CommandLineArgs,←' -x'
- :EndIf
- parms.SessionFile←1
- parms.WindowsStyle←'Normal'
- P_←⎕NEW P parms
- ⎕←'   Process started for "making" the Tatin Client...'
- {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
- 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
- ⎕←'   Now compiling HTML from the markdown files (documentation)...'
- CompileDocumentation ⍬
- ⎕←'   Copy the documentation to the test server...'
- UpdateDocumentation ⍬
- parms←P.CreateParms
- parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc"'
- parms.CommandLineArgs,←' lx="#.Make_.Run ¯1"'
- parms.Exe←APL_Version
- :If 0  ⍝ Only for analyzing problems:
-     parms.CommandLineArgs,←' -exec_setup=0'
-     parms.CommandLineArgs,←' -stop_in_setup=1 '
- :EndIf
- :If noQLX
-     parms.CommandLineArgs,←' -x'
- :EndIf
- parms.SessionFile←1
- parms.WindowsStyle←'Normal'
- P_←⎕NEW P parms
- ⎕←'   Process started for "making" the Tatin Server...'
- {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
- 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
- UpdateTestServerAssets ⍬
- ⎕←'*** Done'
-⍝Done

@@ -1,13 +1,21 @@
  r←{dateFlag}ListVersions uri;registryPath;packageID;group;name;version;regEx;pattern;list2;ind;list
 ⍝ Takes a package ID without minor and patch number (but possibly with major) and returns all versions saved for that package ID (vector)
 ⍝ If `dateFlag` is specified and 1 (default is 0) then a matrix is returned with the publishing date in [;2]
- 'Invalid package ID'Assert 1 2∊⍨('\/'A.Last uri)+.='-'
- 'Invalid package ID'Assert 0 1∊⍨('\/'A.Last uri)+.='.'
+ 'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last uri)+.='-'     ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
  (registryPath packageID)←SplitAtLast uri
  'Is not a folder'Assert F.IsDir registryPath
  registryPath←F.ExpandPath registryPath
- packageID,←{'*'=¯1↑⍵:'' ⋄ 2='-'+.=⍵:'.*' ⋄ '-*'}packageID
+ packageID,←{
+     '*'=¯1↑⍵:''
+     2='-'+.=⍵:'.*'
+     0='-'+.=⍵:'-*'
+     ∧/({⍵↓⍨⍵⍳'-'}⍵)∊⎕D:'*'
+     '-*'
+ }packageID
+ :If 0 1∊⍨'-'+.=packageID
+     packageID←'*-',packageID
+ :EndIf
  list←F.ListDirs registryPath,'/',packageID
  list←((~'/\'∊⍨¯1↑registryPath)+≢registryPath)↓¨list            ⍝ All package IDs
  list2←registryPath InjectPublishingDate list

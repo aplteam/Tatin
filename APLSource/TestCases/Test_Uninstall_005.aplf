@@ -1,4 +1,4 @@
- r←Test_Uninstall_005(stopFlag batchFlag);⎕TRAP;qdmx;dir;dir2
+ r←Test_Uninstall_005(stopFlag batchFlag);⎕TRAP;dir;dir2;list;msg
 ⍝ Attempt to uninstall a package by a non-existent alias
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -7,13 +7,8 @@
  dir ⎕NCOPY'TestData/UnInstall/'
  dir2←dir,'/UnInstall'
 
- :Trap 98
-     {}TC.UnInstallPackage dir2'DoesNotExist@'
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'Package not found'≢qdmx.EM
- :EndTrap
+ (list msg)←TC.UnInstallPackage dir2'DoesNotExist@'
+ →T.GoToTidyUp'Package is not installed'≢msg
 
  r←T._OK
 

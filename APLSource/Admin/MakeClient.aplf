@@ -1,4 +1,4 @@
- {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls;myZip;parms
+{r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls;myZip;parms
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
 ⍝ process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
@@ -27,7 +27,7 @@
      ⎕←''
  :EndIf
  :If batchFlag
- :OrIf 1 YesOrNo'Would you like to continue?'
+ :OrIf 1 ##.Client.YesOrNo'Would you like to continue?'
      batchFlag UpdateVersionNumber type
      {}⎕SE.Cider.CloseProject''
      parms←⎕SE.Cider.CreateOpenParms ⍬
@@ -60,7 +60,7 @@
      _userSettings.ReplaceRegistry reg
      (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'setup.dyalog.RemoveMe'
      myucmds←#._Tatin.Client.GetMyUCMDsFolder''
-     :If 1 YesOrNo'Would you like to copy the Tatin client to ',myucmds
+     :If 1 ##.Client.YesOrNo'Would you like to copy the Tatin client to ',myucmds
          F.RmDir myucmds,'/Tatin'
          F.MkDir myucmds,'/Tatin'
          (myucmds,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣⎕WSID,'.dws'
@@ -83,7 +83,7 @@
      :EndIf
      path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
      :If 0=F.IsFile path
-     :OrIf 0 YesOrNo'Overwrite "',path,'" ?'
+     :OrIf 0 ##.Client.YesOrNo'Overwrite "',path,'" ?'
          path ⎕NCOPY⍠('IfExists' 'Replace')⊣_userSettings.path2config
      :EndIf
      F.DeleteFile¨F.Dir'Dist/Tatin-Client-*.zip'

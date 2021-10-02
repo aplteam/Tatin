@@ -1,0 +1,26 @@
+ r←Test_Uninstall_013(stopFlag batchFlag);⎕TRAP;dir;res;msg;list;expected
+⍝ Install two packages, one of them in two versions, then un-install the single one
+⍝ Uninstalls the unused version of APlTreeUtils as well
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.0'dir
+ Assert'aplteam-APLTreeUtils-6.0.0'≡res
+ res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.1'dir
+ Assert'aplteam-APLTreeUtils-6.0.1'≡res
+ res←⎕SE.Tatin.InstallPackage'[localhost]P@aplteam-APLProcess-1.0.0'dir
+ Assert'P@aplteam-APLProcess-1.0.0'≡res
+
+ (list msg)←TC.UnInstallPackage dir'P@aplteam-APLProcess-1.0.0'
+ Assert 0=≢msg
+ expected←'aplteam-APLProcess-1.0.0' 'aplteam-APLTreeUtils-6.0.0'
+ →T.GoToTidyUp≢/∊¨expected list
+ →T.GoToTidyUp 1≠≢F.ListDirs dir
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

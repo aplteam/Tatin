@@ -1,4 +1,4 @@
- r←{noBetas}ReInstallDependencies y;installFolder;registry;deps;refs;noBetas
+ {refs}←{parms}ReInstallDependencies y;installFolder;registry;deps;refs
 ⍝ Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.\\
 ⍝ The file apl-buildlist.json as well as all directories in that folder will be deleted.
 ⍝ Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.\\
@@ -6,9 +6,10 @@
 ⍝ By default all known Registries with a priority greater than 0 are scanned, but you may
 ⍝ specify a particular Registry as a second (optional) argument.\\
 ⍝ By default beta versions are considered. You may change this by specifying a 1 as left argument.
- r←''
- noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
+ :If 0=⎕NC'parms'
+     parms←CreateReInstallParms
+ :EndIf
  (deps installFolder registry)←CheckReInstallDependencies y
- PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(noBetas/'out'),' any beta versions'
- refs←ReInstallDependencies_ deps installFolder registry noBetas
+ PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(parms.noBetas/'out'),' any beta versions'
+ refs←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.upgradeFlag
 ⍝Done

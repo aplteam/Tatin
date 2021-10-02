@@ -1,5 +1,5 @@
  r←Test_UserCommands_070(stopFlag batchFlag);⎕TRAP;rc;dir;dir2;oldDependencies;oldBuildlist;oldPkgList;newDependencies;newBuildlist;newPkgList;msg;list;res
-⍝ Exercise ]Tatin.UnInstallPackage
+⍝ Exercise ]Tatin.UnInstallPackage with a package ID as argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -10,9 +10,9 @@
  oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  oldPkgList←F.ListDirs dir2,'/'
 
- (rc msg list)←∆UCMD'UnInstallPackage "',dir2,'" aplteam-EventCodes-3.0.0'
+ (rc msg list)←∆UCMD'UnInstallPackage "',dir2,'" EC@aplteam-EventCodes-3.0.1'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- →T.GoToTidyUp(,⊂'aplteam-EventCodes-3.0.0')≢list
+ →T.GoToTidyUp(,⊂'aplteam-EventCodes-3.0.1')≢list
  →T.GoToTidyUp 0≠≢msg
 
  newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
@@ -20,10 +20,10 @@
  newPkgList←F.ListDirs dir2,'/'
  →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
  →T.GoToTidyUp 1≠-/≢¨oldPkgList newPkgList
- →T.GoToTidyUp'aplteam-EventCodes-3.0.0'{⍺≢(-≢⍺)↑⍵}1⊃oldPkgList~newPkgList
+ →T.GoToTidyUp'aplteam-EventCodes-3.0.1'{⍺≢(-≢⍺)↑⍵}1⊃oldPkgList~newPkgList
 
- (rc msg res)←∆UCMD'UnInstallPackage "',dir2,'" aplteam-EventCodes-3.0.0'
- →T.GoToTidyUp~∨/'Package not found'⍷msg
+ (rc msg res)←∆UCMD'UnInstallPackage "',dir2,'" aplteam-EventCodes-3.0.1'
+ →T.GoToTidyUp~∨/'Package is not installed'⍷msg
 
  r←T._OK
 

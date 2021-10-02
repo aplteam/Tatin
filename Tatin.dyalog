@@ -1,103 +1,11 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.31.0 - 2021-09-23
-⍝   * `ListPackages` enhanced: -since added
-⍝ * 0.30.0 - 2021-09-21
-⍝   * `ListPackages` enhanced: -date and -info_url added
-⍝   * Minor improvements on the help pages
-⍝ * 0.29.2 - 2021-08-07
-⍝   * `Ping` has no -all option anymore: specifying no argument  allows you now to select all
-⍝   * `LoadDependencies` and `LoadPackage` now load into # in case no target space is specified
-⍝ * 0.29.1 - 2021-06-24
-⍝   * `Ping` was buggy
-⍝ * 0.29.0 - 2021-06-14
-⍝   * New user command `Ping` added
-⍝ * 0.28.2 - 2021-05-31
-⍝   * Wording changed in CheckForLaterVersion's help
-⍝ * 0.28.1 - 2021-05-24
-⍝   * User command now prints a reasonable text message to the session in case of success rather than am HTTP code
-⍝ * 0.28.0 - 2021-05-23
-⍝   * The ReInstallDependencies command got an option -dry
-⍝   * Help for user command s polished
-⍝   * Bug fix: VALUE RROR in ReinstallDependencies due to a typo
-⍝ * 0.27.0 - 2021-04-25
-⍝   * `ListVersion` extended
-⍝ * 0.26.0 - 2021-04-19
-⍝   * Check added to `InstallPackage` regarding "installFolder"
-⍝ * 0.25.0 - 2021-04-07
-⍝   * ]ReinstallDependencies ikmplemented
-⍝   * -raw added to `CheckForLaterVersion`
-⍝ * 0.23.0 - 2021-04-02
-⍝   * ]LoadDependencies now has an overwrite flag
-⍝ * 0.22.0 - 2021-04-01
-⍝   * ]GetDeletePolicy polished and help added
-⍝ * 0.21.0 - 2021-03-24
-⍝   * User command "DeletePackage" added
-⍝   * User command "GetDeletePolicy" added
-⍝ * 0.20.0 - 2021-03-20
-⍝   * `Pack` polished
-⍝   * Bug fixes:
-⍝     * `api` was mishandled when editing a JSON package config file.
-⍝ * 0.19.0 - 2021-03-16
-⍝   * User command `CheckForBetterVersion` renamed to `CheckForLaterVersion`
-⍝   * Couple of minor changes
-⍝ * 0.18.1 - 2021-03-10
-⍝   * Bug fix for publishing a package
-⍝ * 0.18.0 - 2021-03-01
-⍝   * PackageConfig now looks into the current directory if no argument was specified
-⍝ * 0.17.2 - 2021-02-17
-⍝   * Minor improvements in user command help
-⍝ * 0.17.1 - 2021-02-18
-⍝   * Some changes to the ]TATIN.PackageConfig command
-⍝   * Documentation polished
-⍝ * 0.17.0 - 2021-02-10
-⍝   * User command ]TATIN.DeletePackage added
-⍝   * User command ]TATIN.Documentation added
-⍝   * Flag -edit added to ]TATIN.UserSettings
-⍝   * Bug fix: ]TATIN.UserSettings accepted flags but ignored them
-⍝ * 0.16.0 - 2021-02-05
-⍝   * ]TATIN.Version enhanced
-⍝ * 0.15.0 - 2021-02-01
-⍝   * `Publish` now accepts a folder that contains a Tatin package
-⍝   * Help for ListRegistries polished
-⍝ * 0.14.0 - 2021-01-22
-⍝   * User commands ]TATIN.Init and ]TATIN.CheckForBetterVersion added.
-⍝ * 0.13.2 - 2021-01-19
-⍝   * `UnInstall` was visible when it shouldn't have been
-⍝ * 0.13.1 - 2021-01-10
-⍝   * LoadPackage's help page improved.
-⍝ * 0.13.0 - 2021-01-02
-⍝   * Some minor improvements
-⍝ * 0.12.0 - 2020-12-15
-⍝   * New option -noaggr aded to ListPackages
-⍝ * 0.11.0 - 2020-12-09
-⍝   * `ListPackages` now allows call without an argument. A list of registries is presented then for user selection.
-⍝ * 0.10.1 - 2020-11-06
-⍝   * Typos in help fixed
-⍝   * Help page for `ListVersions` added
-⍝ * 0.10.0 - 2020-08-28
-⍝   * Method `UninstallPackage` added
-⍝ * 0.9.0 - 2020-08-20
-⍝   * ListRegistry now accepts a flag -all
-⍝ * 0.8.2 - 2020-08-18
-⍝   * `ListPackages` throws an error in case the -tags keyword was set but it is not an HTTP request
-⍝ * 0.8.1 - 2020-08-15
-⍝   * ]tatin.version fixed.
-⍝ * 0.8.0 - 2020-08-15
-⍝   * ]tatin.UserSettings simplified.
-⍝ * 0.7.0 - 2020-08-09
-⍝   * ListPackages now honours the -group and the -tags options
-⍝ * 0.6.2 - 2020-08-04
-⍝   * `UserSettings` replaces API-keys by stars when printing to the session
-⍝   * Internal change: "TC" is now "TC" (Tatin Client)
-⍝ * 0.6.1 - 2020-07-28
-⍝   * Shows only under 18.0 and better now.
-⍝ * 0.6.0 - 2020-07-19
+⍝ * 0.32.0 - 2021-10-02
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     NM←'tatin'
-    RS←'#._tatin' ⍝ target root space for packages
+    RS←'#._tatin' ⍝ target Root Space for packages
     SupportedExtensions←'.aplc' '.apln' '.apli' '.aplf' '.aplo' '.apla' '.charlist' '.charmat' '.charstring' '.dyalog'
     RegKey←'HKCU\Software\Tatin\ConfigPath'
 
@@ -105,7 +13,7 @@
       r←⍬
      
       :If IfAtLeastVersion 18
-   ⍝ Name, group, short description and parsing rules
+      ⍝ Name, group, short description and parsing rules
      
           c←⎕NS ⍬
           c.Name←'LoadTatin'
@@ -224,13 +132,13 @@
           c←⎕NS ⍬
           c.Name←'UninstallPackage'
           c.Desc←'Uninstalls a package and its dependencies'
-          c.Parse←'2'
+          c.Parse←'2s'
           r,←c
      
           c←⎕NS ⍬
           c.Name←'ReinstallDependencies'
           c.Desc←'Install all packages again according to the dependency file'
-          c.Parse←'2s -nobetas -dry -force'
+          c.Parse←'2s -nobetas -dry -force -update'
           r,←c
      
           c←⎕NS ⍬
@@ -429,7 +337,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;noBetas;deps;dry;msg;force
+    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;deps;msg;parms
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -437,23 +345,21 @@
       :Else
           registry←Args._2
       :EndIf
-      dry←0 Args.Switch'dry'
-      force←0 Args.Switch'force'
-      noBetas←0 Args.Switch'nobetas'
+      parms←TC.CreateReInstallParms
+      parms.dry←0 Args.Switch'dry'
+      parms.force←0 Args.Switch'force'
+      parms.noBetas←0 Args.Switch'nobetas'
+      parms.upgradeFlag←0 Args.Switch'upgradeFlag'
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       'Not a directory'Assert TC.F.IsDir installFolder
       'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'
       deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
       'Dependency file is empty'Assert 0<≢deps
-      :If dry
-          r←noBetas TC.PretendReInstallDependencies installFolder registry
-      :Else
-          :If force
-          :OrIf ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
-              r←noBetas TC.ReInstallDependencies installFolder registry
-              :If ~force
-                  ⎕←'*** Done'
-              :EndIf
+      :If parms.force
+      :OrIf ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
+          r←parms TC.ReInstallDependencies installFolder registry
+          :If ~parms.force
+              ⎕←'*** Done'
           :EndIf
       :EndIf
     ∇
@@ -584,10 +490,15 @@
       :EndTrap
     ∇
 
-    ∇ r←UninstallPackage Arg;path;packageID
+    ∇ r←UninstallPackage Arg;path;packageID;msg
     ⍝ Attempt to un-installe the top-level package `packageID` from the folder `path`
       (path packageID)←Arg.(_1 _2)
-      r←1⊃TC.UnInstallPackage path packageID
+      'No path specified'Assert 0≢path
+      :If 0≡packageID
+          packageID←''
+      :EndIf
+      (r msg)←TC.UnInstallPackage path packageID
+      msg Assert 0=≢msg
     ∇
 
     ∇ r←ListRegistries Arg;type;rawFlag
@@ -626,7 +537,6 @@
     ∇
 
     ∇ r←ListVersions Arg;qdmx;dateFlag
-      ⎕SIGNAL 0
       dateFlag←Arg.Switch'date'
       :Trap 98
           :If dateFlag
@@ -912,7 +822,7 @@
           r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
           r,←⊂''
           r,←⊂'By default the user config file is expected in the user''s home folder, and it will be'
-          r,←⊂'created there if it does not already exists.'
+          r,←⊂'created there if it does not already exist.'
           r,←⊂'Instead you may specify a different folder. Note that this is NOT a permanent change;'
           r,←⊂'if you want the change to be permanent specify it via the ]TATIN.UserSettings command'
           r,←⊂'with a -permanent flag.'
@@ -921,28 +831,28 @@
       :Case ⎕C'ListRegistries'
           r,←⊂'Lists URI, alias, priority and port of all Registries defined in the user settings.'
           r,←⊂'The result is ordered by priority: the first one is scanned first etc.'
-          r,←⊂'Note that Registry with a priority of 0  will not participate in any scan of Registries.'
+          r,←⊂'Note that Registries with a priority of 0  will not participate in a scan of Registries.'
           r,←⊂''
-          r,←⊂'* By default the output is beautified; specify -raw if you want just a raw table'
-          r,←⊂'* By default all data but the API keys are listed. Specify -full if you want the API key'
-          r,←⊂'  column to be listed as well.'
+          r,←⊂'-raw:  By default the output is beautified; specify -raw if you want just a raw table'
+          r,←⊂'-full: By default all data but the API keys are listed. Specify -full if you want the'
+          r,←⊂'       API keys to be listed as well.'
       :Case ⎕C'ListPackages'
           r,←⊂'Lists all packages in the Registry specified as an argument. If no Registry was specified'
-          r,←⊂'then the user will be prompted for the Registry, eccept when there is just one anyway.'
+          r,←⊂'then the user will be prompted for the Registry, except when there is just one anyway.'
           r,←⊂''
-          r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has'
-          r,←⊂'not a trailing separator: Tatin is taking care of that.'
+          r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has not'
+          r,←⊂'a trailing separator: Tatin is taking care of that.'
           r,←⊂''
           r,←⊂'By default all packages are listed. You can influence the output in several ways:'
-          r,←⊂' * -group={groupname} will restrict the list the packages with the given group name.'
-          r,←⊂' * -tags=foo,goo will restrict the output to packages that carry the tags "foo" & "goo".'
-          r,←⊂' * -date adds the publishing date to the output. -noaggr is set to 1 then.'
-          r,←⊂' * -info_url adds the URL saved in the package config file.'
-          r,←⊂' * -since, when specified, must be a date either as YYYYMMDD or YYYY-MM-DD'
-          r,←⊂'    Only packages published on that date or after are listed then.'
-          r,←⊂'     Implies -date and ignores -noaggr when specified.'
-          r,←⊂'* By default the output is aggregated. Specify -noaggr if you want the full list.'
-          r,←⊂'* By default the output is beautified. Specify -raw if you want just a raw data.'
+          r,←⊂'-group={foo}:  restricts the list to packages with the given group name.'
+          r,←⊂'-tags=foo,goo: restricts the output to packages that carry the tags "foo" & "goo".'
+          r,←⊂'-date:         adds the publishing date to the output. -noaggr is set to 1 then.'
+          r,←⊂'-info_url:     adds the URL saved in the package config file.'
+          r,←⊂'-since:        Must be a date either as YYYYMMDD or YYYY-MM-DD when specified.'
+          r,←⊂'               Only packages published on that date or after are listed then.'
+          r,←⊂'               Implies -date and ignores -noaggr.'
+          r,←⊂'-noaggr:       By default the output is aggregated. -noaggr prevents that.'
+          r,←⊂'-raw:          Suppresses default beautification (column headers etc).'
       :Case ⎕C'LoadPackage'
           r,←⊂'Loads the specified package and all its dependencies into the workspace'
           r,←⊂''
@@ -994,98 +904,103 @@
           r,←⊂'  ]TATIN.InstallPackage A@APLTreeUtils2 /pathTo/folder'
           r,←⊂'  ]TATIN.InstallPackage file:///pathTo/MyReg/aplteam-APLTreeUtils2-1.0.0/ /installFolder'
           r,←⊂''
-          r,←⊂'The -quiet flag comes handy with test cases.'
+          r,←⊂'-quiet: Useful for test cases etc.'
       :Case ⎕C'LoadDependencies'
           r,←⊂'Takes up to two arguments:'
           r,←⊂'[1] A folder into which one or more packages have been installed'
           r,←⊂'[2] Optional: a namespace into which the packages are going to be loaded; default is #'
           r,←⊂''
-          r,←⊂'By default a package is not loaded if it already exists. You can enforce the load by'
-          r,←⊂'specifying the -overwrite flag.'
+          r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
+          r,←⊂'            load by specifying the -overwrite flag.'
       :Case ⎕C'UserSettings'
-          r,←⊂'Prints the user settings found in the file to the session in JSON format.'
+          r,←⊂'Prints the user settings found in the config file to the session in JSON format.'
           r,←⊂'By default the API key is replaced by asterisks; specify -apikey to overwrite this.'
           r,←⊂''
           r,←⊂'If you want to investigate the current user settings (rather than the file contents)'
-          r,←⊂'please use the API. There is a dedicated document for how to use the API, and what for.'
+          r,←⊂'please use the API.'
           r,←⊂''
-          r,←⊂'If you want to change the file you can add -edit in order to get the data into the'
-          r,←⊂'editor and make changes. In this case the API key will always show.'
-          r,←⊂'If you did change the data, you will first be prompted for saving the changes on disk'
-          r,←⊂'and then for refreshing the current user settings.'
+          r,←⊂'-edit:    If you want to change the file you can add -edit in order to get the data into'
+          r,←⊂'          the editor and make changes. In this case the API key will always show.'
+          r,←⊂'          If you did change the data, you will first be prompted for saving the changes on'
+          r,←⊂'          disk and then for refreshing the current user settings.'
           r,←⊂''
-          r,←⊂'If you did change the user settings from another APL session, or by editing the file,'
-          r,←⊂'you can refresh the current user settings with -refresh.'
+          r,←⊂'-refresh: If you did change the user settings from another APL session, or by editing the'
+          r,←⊂'          file you can refresh the current user settings with -refresh.'
       :Case ⎕C'PackageConfig'
           r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
           r,←⊂'The argument, if specified, may be a URL or a path.'
-          r,←⊂'* In case of a URL the package config file is returned as JSON.'
-          r,←⊂'  Specifying any of the options has no effect then.'
-          r,←⊂'* In case of a path it must point to a folder that contains a Tatin package.'
-          r,←⊂'  The contents of the file "',TC.CFG_Name,'" in that folder is returned.'
-          r,←⊂'  In case the file does not yet exist it will be created.'
+          r,←⊂' * In case of a URL the package config file is returned as JSON.'
+          r,←⊂'   Specifying any of the options has no effect then.'
+          r,←⊂' * In case of a path it must point to a folder that contains a Tatin package.'
+          r,←⊂'   The contents of the file "',TC.CFG_Name,'" in that folder is returned.'
+          r,←⊂'   In case the file does not yet exist it will be created.'
           r,←⊂''
           r,←⊂'In case no argument is specified the command tries to find a package config file in'
           r,←⊂'the current directory.'
           r,←⊂''
-          r,←⊂'You may edit the file by specifying the -edit flag.'
-          r,←⊂'In case you want to delete the file: specify the -delete flag.'
+          r,←⊂'-edit:   You may edit the file by specifying the -edit flag.'
+          r,←⊂'-delete: In case you want to delete the file specify the -delete flag.'
           r,←⊂''
           r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
       :Case ⎕C'UninstallPackage'
           r,←⊂'This command uninstalls a given package and all its dependencies, but only if those'
           r,←⊂'are neither top-level packages nor required by any other package.'
+          r,←⊂'In addition any superfluous packages like outdated versions are removed, too.'
+          r,←⊂'If no package is specified only superfluous packages, if any, will be uninstalled.'
           r,←⊂''
-          r,←⊂'Requires two arguments:'
-          r,←⊂'* Path to a folder with installed packages'
-          r,←⊂'* A package identifier; this can be one of:'
-          r,←⊂'  * Name of the package to be un-installed'
-          r,←⊂'  * An alias; post- or prefix with a "@" in order to be recognized as an alias'
+          r,←⊂'Requires at least one argument:'
+          r,←⊂' * Path to a folder with installed packages'
+          r,←⊂' * Optionally a package identifier;  this can be one of:'
+          r,←⊂'   * Name of the package to be uninstalled'
+          r,←⊂'   * An alias; post- or prefix with a "@" in order to mark it as an alias'
       :Case ⎕C'PackageDependencies'
           r,←⊂'Takes a path to a folder and returns the contents of the file "apl-dependencies.txt".'
-          r,←⊂'You may edit the file by specifying the -edit flag. In case the file does not already'
-          r,←⊂'exist it is created.'
+          r,←⊂''          
+          r,←⊂'-edit:   You may edit the file by specifying the -edit flag. In case the file does not'
+          r,←⊂'         already exist it is created.'
           r,←⊂''
-          r,←⊂'After the edit the changes are checked for being complete and syntactically correct'
-          r,←⊂'JSON, and if they are then they are saved to the given folder.'
+          r,←⊂'         After an edit operation changes are checked for being complete and syntactically'
+          r,←⊂'         correct JSON, and if they are, then they are saved to the given folder.'
           r,←⊂''
-          r,←⊂'In case you want to delete the file specify the -delete flag.'
+          r,←⊂'-delete: In case you want to delete the file specify the -delete flag.'
           r,←⊂''
-          r,←⊂'Note that the -quiet flag prevents the "Are you sure?" question that is usually asked'
-          r,←⊂'in conjunction with the -delete flag; this is probably only useful with test cases.'
+          r,←⊂'-quiet:  Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
+          r,←⊂'         conjunction with the -delete flag; this is probably only useful with test cases.'
       :Case ⎕C'Pack'
           r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
           r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
           r,←⊂''
-          r,←⊂'* If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
-          r,←⊂'* If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
+          r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
+          r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
       :Case ⎕C'PublishPackage'
-          r,←⊂'Publish a package to a particular Registry Server.'
+          r,←⊂'Publish a package to a particular Tatin Server.'
           r,←⊂'Such a package can be one of:'
-          r,←⊂'* ZIP file, typically created by calling ]TATIN.Pack'
-          r,←⊂'* Folder that contains everything that defines a package; in this case the required ZIP is'
-          r,←⊂'  created by "PublishPackage"'
+          r,←⊂' * ZIP file, typically created by calling ]TATIN.Pack'
+          r,←⊂' * Folder that contains everything that defines a package; in this case the required ZIP is'
+          r,←⊂'   created by "PublishPackage" itself.'
           r,←⊂''
           r,←⊂'Requires two arguments:'
-          r,←⊂'* Path to ZIP file or package folder'
-          r,←⊂'* URL or alias of a Registry Server or a "?"; you may or may not embrace it with []'
+          r,←⊂' * Path to ZIP file or package folder'
+          r,←⊂' * URL or alias of a Registry Server or a "?"; you may or may not embrace it with []'
           r,←⊂''
           r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
           r,←⊂'to the Tatin rules.'
           r,←⊂''
-          r,←⊂'The -quiet flag suppresses the "Are you sure?" question (test cases).'
+          r,←⊂'-quiet: Suppresses the "Are you sure?" question (test cases).'
       :Case ⎕C'ListVersions'
-          r,←⊂'List all versions of the given package. You must specify the package as in'
-          r,←⊂'[registry]{group}-{package}'
+          r,←⊂'List all versions of the given package. You may specify the package in two different ways:'
+          r,←⊂' * [registry]{group}-{package}'
+          r,←⊂' * [registry]{package}'
           r,←⊂''
           r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem with'
           r,←⊂'beta versions) then the publishing date is taken into account.'
-          r,←⊂'Specify the -date flag if you want the publishing date to be included.'
+          r,←⊂''
+          r,←⊂'-date: Adds the publishing date to the report.'
       :Case ⎕C'Version'
           r,←⊂'Prints name, version number and version date of the client to the session.'
           r,←⊂''
-          r,←⊂'* Specify a URL or n alias if you are after the version number of a Tatin server'
-          r,←⊂'* Specify * if you are after the version numbers of all Tatin servers'
+          r,←⊂' * Specify a URL or an alias if you are after the version number of a Tatin server'
+          r,←⊂' * Specify * if you are after the version numbers of all Tatin servers'
       :Case ⎕C'ListTags'
           r,←⊂'List all unique tags used in all packages, sorted alphabetically.'
           r,←⊂''
@@ -1094,6 +1009,8 @@
           r,←⊂''
           r,←⊂'You can specify one or more tags like -tags=foo,goo'
           r,←⊂'In that case all tags are listed from packages that carry both "foo" & "goo".'
+          r,←⊂''
+          r,←⊂'For details how tags are search refer to the documentation.'
       :Case ⎕C'Init'
           r,←⊂'Re-establishes the user settings in ⎕SE. Call this in case the user settings got changed on file'
           r,←⊂'and you want to incorporate the changes in the current session.'
@@ -1107,8 +1024,8 @@
           r,←⊂''
           r,←⊂'Returns information only for packages a later version was found for.'
           r,←⊂''
-          r,←⊂'-major:        by default later MAJOR versions are ignored, but this default behaviour can be changed '
-          r,←⊂'               by specifying the flag -major: then only later major versions are reported.'
+          r,←⊂'-major:        by default later MAJOR versions are ignored, but this default behaviour can be'
+          r,←⊂'               changed by specifying -major: then only later major versions are reported.'
           r,←⊂''
           r,←⊂'-dependencies: by default only principal packages are checked. You may include dependencies by'
           r,←⊂'               specifying this flag.'
@@ -1130,26 +1047,27 @@
           r,←⊂'Puts https://tatin.dev/v1/documentation into the default browser'
       :Case ⎕C'ReinstallDependencies'
           r,←⊂''
-          r,←⊂'Re-installs all principle packages as well as all dependencies from scratch.'
+          r,←⊂'Reinstalls all packages (principals as well as dependencies) from scratch.'
           r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
           r,←⊂'All installed packages are removed (except ZIP files) from the folder before a new build list'
-          r,←⊂'is compiled and then used to install all packages from scratch.'
+          r,←⊂'is compiled and used to install all packages from scratch.'
           r,←⊂''
           r,←⊂'Notes:'
-          r,←⊂'* This does not install a better version from the same server ever. In fact as a side'
-          r,←⊂'  effect of minimmal version selection you might end up with an older version under specific'
-          r,←⊂'  (and pretty rare) circumstances. However, due to the scanning of registries you might get a '
-          r,←⊂'  better version than before from a different server.'
-          r,←⊂'* ZIP files are not removed upfront and have higher priority than registries, so when the'
-          r,←⊂'  dependency list refers to a ZIP file then this will always survive.'
+          r,←⊂' * This does not install a better version (but check on -update). In fact as a side'
+          r,←⊂'   effect of minimal version selection you might end up with an older version under specific'
+          r,←⊂'   (and pretty rare) circumstances.'
+          r,←⊂' * ZIP files are not removed upfront and have therefore higher priority than registries, so when'
+          r,←⊂'   the dependency list refers to a ZIP file then this will always survive.'
           r,←⊂''
           r,←⊂'All defined Registries with a priority greater than 0 are scanned for principal packages but'
           r,←⊂'one can specify a particular Registry as second (optional) argument.'
-          r,←⊂'For dependencies scanning of all registries with a priority greater than 0 takes always place.'
+          r,←⊂'For dependencies, scanning of all registries with a priority greater than 0 takes always place.'
           r,←⊂''
-          r,←⊂'-force   Prevents the command from asking the user, and does not report to the session either.'
-          r,←⊂'-dry     Makes the user command report what it would do without actually doing anything at all.'
-          r,←⊂'-nobetas By default betas are included; change by specifying the -nobetas flag.'
+          r,←⊂'-force:   Prevents the command from asking the user, and does not report to the session either.'
+          r,←⊂'-dry:     Makes the user command report what it would do without actually doing it.'
+          r,←⊂'-nobetas: By default betas are included; change by specifying the -nobetas flag.'
+          r,←⊂'-update:  By default ReInstallDependencies does not install later versions.'
+          r,←⊂'          You may change this by specifying this flag.'
           r,←⊂''
           r,←⊂'Examples:'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/'
@@ -1157,8 +1075,9 @@
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas -dry'
           r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas -force'
+          r,←⊂']Tatin.ReinstallDependencies /path2/installfolder/ [tatin] -nobetas -force -update'
       :Case ⎕C'Ping'
-          r,←⊂'Useful to find out whether a Tatin Server is alive and respondig. Returns a Boolean (1=success)'
+          r,←⊂'Useful to find out whether a Tatin Server is alive and responding. Returns a Boolean (1=success)'
           r,←⊂''
           r,←⊂'You may specify a Registry alias or a Registry URL.'
           r,←⊂'If you specify no argument you will be prompted for one ore or more of the defined Registries.'
@@ -1181,18 +1100,18 @@
       r,←⊂''
       r,←⊂'It may be:'
       r,←⊂''
-      r,←⊂'* A full package ID.'
+      r,←⊂' * A full package ID.'
       r,←⊂''
-      r,←⊂'  A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
+      r,←⊂'   A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
       r,←⊂''
-      r,←⊂'* You may also specify an incomplete package ID in terms of no patch number, or'
-      r,←⊂'  neither minor nor patch number, or no version information at all, and leave it'
-      r,←⊂'  it to Tatin to establish the latest version itself.'
+      r,←⊂' * You may also specify an incomplete package ID in terms of no patch number, or'
+      r,←⊂'   neither minor nor patch number, or no version information at all, and leave it'
+      r,←⊂'   it to Tatin to establish the latest version itself.'
       r,←⊂''
-      r,←⊂'* You may also omit the group. This will fail in case the same package name is used'
-      r,←⊂'  in two or more different groups but will succeed otherwise.'
+      r,←⊂' * You may also omit the group. This will fail in case the same package name is used'
+      r,←⊂'   in two or more different groups but will succeed otherwise.'
       r,←⊂''
-      r,←⊂'* Either a full path or a URL in front of the package ID.'
+      r,←⊂' * Either a full path or a URL in front of the package ID.'
       r,←⊂''
       r,←⊂'By default beta versions are included. Specify -nobetas in order to suppress those.'
     ∇

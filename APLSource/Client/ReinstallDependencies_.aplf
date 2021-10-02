@@ -1,28 +1,27 @@
- refs←{dry}ReInstallDependencies_(deps installFolder registry noBetas);i;pkg;ref;msg;alias;identifier
-⍝ Re-installs all packages according to the content of `deps`.\\
-⍝ In case `dry` is 1 it reports to the session what it _would_ do, without actually doing anything at all.\\
+ refs←{dry}ReInstallDependencies_(deps installFolder registry noBetas upgradeFlag);i;pkg;ref;msg;alias;identifier;tempDir
+⍝ Re-installs all packages listd by `deps`, including any dependencies.\\
+⍝ In case `dry` is 1 it reports to the session what it _would_ do.\\
+⍝ All work is done in a temp folder. Without -dry that temp folder will eventually replace the install folder.
+⍝ With -dry the temp folder will be deleted.
+⍝ By default principal packages are not upgraded but re-installed in exactly the same way as before.
+⍝ You can change this by setting `upgrade←1`.
+⍝ Note that this has a side effect: the same principal packages but with different version numbers (not major)
+⍝ will all be replaced by the latest version except those that have an alias assigned.
  dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
  refs←⍬
- :If ~dry
-     F.RmDir F.ListDirs installFolder,'/'   ⍝ Delete all folders (=packages) but leave any ZIP files alone
- :EndIf
+ tempDir←F.GetTempSubDir''
+ tempDir∘{⍺ ⎕NCOPY ⍵}¨F.ListFiles installFolder,'/*'    ⍝ Copy only files (config AND ZIP), no folders (=packages)
  :For i :In ⍳≢deps
      pkg←i⊃deps
-     pkg←Reg.RemoveMinorAndPatch pkg
-     :If dry
-         (alias identifier)←SplitAtAlias pkg
-         identifier←ReplaceRegistryAlias identifier
-         ('Unknown',(∧/'[]'∊identifier)/' alias')Assert 0<≢identifier
-         identifier←noBetas CheckVersion identifier
-         'Package not found'Assert 0<≢identifier
-         msg←'Would fetch package ',(⍕i),' of ',(⍕≢deps),' (',identifier,')',((0<≢registry)/' from ',registry),'...'
-     :Else
-         msg←'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),'...'
+     :If upgradeFlag
+         pkg←Reg.RemoveMinorAndPatch pkg
      :EndIf
+     msg←'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),' ',(dry/'(dry)'),'...'
      PrintToSession msg
-     :If ~dry
-         ref←noBetas InstallPackage(registry,pkg)installFolder
-         PrintToSession'  Installed: ',ref,⎕UCS 13
-         refs,←⊂ref
-     :EndIf
+     ref←noBetas InstallPackage(registry,pkg)tempDir
+     PrintToSession'  Installed',(dry/' (dry)'),': ',ref,⎕UCS 13
+     refs,←⊂ref
  :EndFor
+ :If ~dry
+     'Establishing re-installed packages failed, nothing has changed'Assert installFolder ReplaceFolderBy tempDir
+ :EndIf

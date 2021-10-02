@@ -1,0 +1,18 @@
+ {r}←{forceFlag}CheckInstallFolder path
+⍝ Checks `path`.
+⍝ * If the parent does not exist an error is thrown
+⍝ * If just the last part does not exist the user is prompted for creating it
+⍝ If ⍺ is specified and 1 then the user is NOT prompted but the folder created.
+⍝ Returns 1 in case part of `path` was created and 0 otherwise.
+ forceFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'forceFlag'
+ path←{(¯1×(¯1↑⍵)∊'/\')↓⍵}⍕path
+ '"targetFolder" is invalid'Assert ⎕NEXISTS 1⊃⎕NPARTS path
+ :If F.IsDir path
+     r←0
+ :Else
+     '"targetFolder" already exists but is not a folder'Assert~⎕NEXISTS path
+     :If forceFlag
+     :OrIf 1 YesOrNo{'Create folder "',(2⊃⍵),'" within ',(1⊃⍵),'?'}⎕NPARTS path
+         3 ⎕MKDIR path
+     :EndIf
+ :EndIf

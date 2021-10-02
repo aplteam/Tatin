@@ -6,9 +6,9 @@
  dir←GetTempDir''
  dir ⎕NCOPY⍠('Wildcard' 1)⊣'TestData/UnInstall/',##.Registry.DependenciesFilename
  stop←0
- (rc msg res)←stop ∆UCMD'ReInstallDependencies "',dir,'" -dry'
+ (rc msg res)←stop ∆UCMD'ReInstallDependencies "',dir,'" -dry -force'
  →T.GoToTidyUp 0≠rc
- →T.GoToTidyUp 0≠+/≢¨msg res
+ →T.GoToTidyUp 0≠≢msg
 
  list←⊃##.FilesAndDirs.Dir dir,'/'
  →T.GoToTidyUp 1≠≢list   ⍝ Because nothing happened due to the -dry flag

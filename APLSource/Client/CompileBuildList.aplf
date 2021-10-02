@@ -1,4 +1,4 @@
- {buildList}←{replace}CompileBuildList folder;depFilename;oldTree;newTree;b;deps2;ind
+ {buildList}←{replace}CompileBuildList folder;oldTree;newTree;b;deps2;ind
 ⍝ We distinguesh here between level-1 packages and other packages (=dependencies).
 ⍝ The level-1 packages are called top-level packages.
 ⍝ If the dependency file was modified after the build list was saved:
@@ -6,15 +6,18 @@
 ⍝ * If a dependency package is missing, re-installation is required and therefore an error thrown\\
  replace←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'replace'
  folder←Reg.AddSlash folder
- depFilename←folder,Reg.DependenciesFilename
  oldTree←LoadBuildList folder
- newTree←0(GetDependencyTree NoPrintToSession)folder
+ newTree←{0(GetDependencyTree NoPrintToSession)⍵}¨folder∘,¨⊃⎕NGET(folder,Reg.DependenciesFilename)1
+ newTree←(0<≢¨newTree)⌿newTree
+ newTree←⊃⍪/newTree
+ newTree←newTree[⍒newTree[;1];]
+ newTree←({(⍳≢⍵)=⍵⍳⍵}↓newTree)⌿newTree
  :If 0=≢⊃newTree[1;2]                                       ⍝ Is it not a package folder but just an install folder?
      newTree←1↓newTree
      newTree[;1]-←1
  :EndIf
 
- :If 0<≢newTree                                             ⍝ There might be no depen
+ :If 0<≢newTree                                             ⍝ There might be no dependencies
  :AndIf 0<≢deps2←(1<newTree[;1])⌿newTree
      deps2←1 Reg.GetBestVersionNumber∘Reg.RemoveVersionNumber¨deps2[;3]
      Assert 0∧.<≢¨deps2

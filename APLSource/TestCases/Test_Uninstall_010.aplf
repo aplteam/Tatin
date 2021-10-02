@@ -1,0 +1,25 @@
+ r←Test_Uninstall_010(stopFlag batchFlag);⎕TRAP;dir;res;msg;list
+⍝ Install three versions of the same package, then un-install one of them.
+⍝ Does what it is told: two packages remain.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.0'dir
+ Assert'aplteam-APLTreeUtils-6.0.0'≡res
+ res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.1'dir
+ Assert'aplteam-APLTreeUtils-6.0.1'≡res
+ res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.2'dir
+ Assert'aplteam-APLTreeUtils-6.0.2'≡res
+
+ (list msg)←TC.UnInstallPackage dir'aplteam-APLTreeUtils-6.0.0'
+ Assert 0=≢msg
+ →T.GoToTidyUp≢/∊¨'aplteam-APLTreeUtils-6.0.0'list
+ →T.GoToTidyUp 2≠≢F.ListDirs dir
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

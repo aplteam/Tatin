@@ -1,0 +1,13 @@
+ GetCurrentUTCHttpDate←{
+     isWin←'W'=0 0⊃'.'⎕WG'APLVersion'
+     ~isWin:1⊃##.DRC.GetProp'.' 'HttpDate'
+     ⍝ On Windows use .NET.  Avoid opening a socket on conga dll
+     ⍝ when none is required.  Prevents firewall warnings.
+     _net←#.⎕NS''
+     _net.⎕WX←1
+     _net.⎕USING←,⊂'System'
+     UTC←_net.DateTime.UtcNow.ToString(,⊂'r')
+     (¯3↓UTC),'UTC'  ⍝ Kai: it's NOT GMT, it's UTC, and in summer currently that is different
+     ⍝ Format "r" is RFC1123
+     ⍝ https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#RFC1123
+ }

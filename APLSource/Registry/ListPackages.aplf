@@ -54,7 +54,7 @@
                  r←list,⊂⍬
              :EndIf
          :EndIf
-     :Case 2                                           ⍝ group, name and version
+     :Else                                             ⍝ group, name and version, but the version mgith carry additional hyphens!
          noOfDots←'.'+.=packageID
          :Select noOfDots
          :Case 0                                       ⍝ Just major
@@ -74,7 +74,7 @@
                  :EndIf
              :EndIf
          :Else
-             :If (⊂packageID)∊list                     ⍝ verbatim
+             :If (⊂packageID)∊,list                     ⍝ verbatim
                  r←1 2⍴packageID ⍬
              :EndIf
          :EndSelect

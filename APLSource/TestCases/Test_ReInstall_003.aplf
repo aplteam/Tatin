@@ -1,0 +1,26 @@
+ r←Test_ReInstall_003(stopFlag batchFlag);⎕TRAP;dir;refs;new;res;expected;parms
+⍝ Re-install two versions of the same package. Then re-install with "updateFlag" set.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir ⍬
+ res←TC.InstallPackage'[localhost]example-versions-1.0.1-That-fix'dir
+ Assert'example-versions-1.0.1-That-fix'≡res
+ res←TC.InstallPackage'[localhost]V@example-versions-1.0.12-zzz'dir     ⍝ Alias!
+ Assert'V@example-versions-1.0.12-zzz'≡res
+ parms←TC.CreateReInstallParms
+ parms.upgradeFlag←1
+ refs←parms TC.ReInstallDependencies dir
+ new←(1+≢dir)↓¨F.ListDirs dir,'/*'
+ expected←(,⊂'example-versions-1.0.12-That-fix')
+ →T.PassesIf expected≡new
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ res←TC.LoadDependencies dir'#.TEMP'
+ →T.GoToTidyUp(,¨'V' 'versions')≢' '~⍨¨↓#.TEMP.⎕NL 9
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir dir
+⍝Done

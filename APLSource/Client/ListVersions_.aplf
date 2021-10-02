@@ -9,14 +9,16 @@
  :EndIf
  request.Headers,←⊂'Accept' 'application/json'
  res←host SendAndReceive request
- :If 200≠res.StatusCode
-     'Package not found'Assert 404≠res.StatusCode
+ :If 200=res.StatusCode
+     list←⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
+     list←↑⍣dateFlag⊣list
+ :ElseIf 404=res.StatusCode
+     list←''
+ :Else
      :If 0<≢res.Content
          ('Server: ',res.Content)Assert 0
      :Else
          ('Failed with status code ',⍕res.StatusCode)Assert 0
      :EndIf
  :EndIf
- list←⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
- list←↑⍣dateFlag⊣list
 ⍝Done

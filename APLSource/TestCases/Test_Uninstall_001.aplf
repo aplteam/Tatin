@@ -11,8 +11,12 @@
  oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  oldPkgList←F.ListDirs dir2,'/'
 
- (list msg)←TC.UnInstallPackage dir2'aplteam-EventCodes-3.0.0'
- →T.GoToTidyUp(,⊂'aplteam-EventCodes-3.0.0')≢list
+ (list msg)←TC.UnInstallPackage dir2'aplteam-EventCodes-3.0.1'          ⍝ Without alias it must not be removed!
+ →T.GoToTidyUp 0≠≢list
+ →T.GoToTidyUp'Package is not installed'≢msg
+
+ (list msg)←TC.UnInstallPackage dir2'EC@aplteam-EventCodes-3.0.1'
+ →T.GoToTidyUp(,⊂'aplteam-EventCodes-3.0.1')≢list
  →T.GoToTidyUp 0≠≢msg
 
  newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
@@ -20,7 +24,7 @@
  newPkgList←F.ListDirs dir2,'/'
  →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
  →T.GoToTidyUp 1≠-/≢¨oldPkgList newPkgList
- →T.GoToTidyUp'aplteam-EventCodes-3.0.0'{⍺≢(-≢⍺)↑⍵}1⊃oldPkgList~newPkgList
+ →T.GoToTidyUp'aplteam-EventCodes-3.0.1'{⍺≢(-≢⍺)↑⍵}1⊃oldPkgList~newPkgList
 
  r←T._OK
 

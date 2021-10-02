@@ -7,8 +7,8 @@
  isOkay←0
  default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
  isOkay←0
- :If ~0∊⍴default
-     'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠⍴,default
+ :If 0≠≢default
+     'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠≢default
  :AndIf ~default∊0 1
      'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 11
  :EndIf
@@ -22,7 +22,7 @@
      :EndIf
  :EndIf
  :If 1<≡question
-     ((⍴question)⊃question)←((⍴question)⊃question),add
+     ((≢question)⊃question)←((≢question)⊃question),add
      question←⍪question
  :Else
      question←question,add
@@ -35,7 +35,7 @@
      :OrIf 0=≢answer                            ⍝ ...user just...
          dtb←{⍵↓⍨-+/∧\' '=⌽⍵}
          answer2←dtb answer
-     :OrIf answer2≡((-≢answer2)↑dtb question)   ⍝ ...press <enter>?
+     :OrIf answer2≡((-≢answer2)↑(⎕UCS 10){~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question)   ⍝ ...press <enter>?
          :If 0≠≢default
              yesOrNo←default
              isOkay←1

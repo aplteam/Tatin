@@ -1,0 +1,19 @@
+ r←Test_Uninstall_012(stopFlag batchFlag);⎕TRAP;expected;dir;dir2;msg;list
+⍝ Attempt to uninstall a package that is not a principal package; must fail
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ dir ⎕NCOPY'TestData/UnInstall'
+ dir2←dir,'/UnInstall'
+
+ (list msg)←TC.UnInstallPackage dir2'aplteam-APLTreeUtils2-1.1.1'
+ Assert 0=≢list
+ →T.GoToTidyUp'Cannot uninstall: is not a principal package'≢msg
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

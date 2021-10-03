@@ -13,12 +13,12 @@ Tatin is published under the MIT license, so everybody is welcome to contribute 
 This is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for "contribute to a github project".
 
 
-## Tatin is managed by acre
+## Tatin is managed by Cider
 
-Note that Tatin is managed by the [acre project management tool](https://github.com/the-carlisle-group/Acre-Desktop).
-If you are not familiar with acre you are advised to spend an hour or so playing with it before using it for serious work.
+Note that Tatin is managed by the [Cider project management tool](https://github.com/aplteam/Cider).
+If you are not familiar with Cider you are advised to spend an hour or so playing with it before using it for serious work.
 
-Though it is possible making changes to Tatin or adding code without acre, using acre makes this much easier.
+Though it is possible making changes to Tatin or adding code without Cider, using Cider makes this easier.
 
 
 ## Requirements
@@ -39,12 +39,12 @@ The Pi is not supported but that restriction might be lifted with a later versio
 After downloading Tatin from GitHub and saving it somewhere, say in `C:\Tatin`, you issue the command 
 
 ```
-]acre.OpenProject C:\Tatin #.Tatin
+]Cider.OpenProject C:\Tatin
 ``` 
 
 and you are ready to go. 
 
-Note that there is no need to save a workspace or anything: every function, operator, class, interface or namespace script changed in `#.Tatin` will be automatically saved to disk by acre.
+Note that there is no need to save a workspace or anything: every function, operator, class, interface or namespace script changed in `#.Tatin` will be automatically saved to disk by [Link](https://github.com/dyalog/link).
 
 
 ## Prepare either the Client or the Server
@@ -83,7 +83,7 @@ In order to execute the full test suite you need to start a Tatin Server first. 
 2. Execute this:
 
    ```
-   ]acre.OpenProject /path/to/Tatin #.Tatin
+   ]Cider.OpenProject /path/to/Tatin
    ```
 
 3. Execute this:
@@ -102,7 +102,7 @@ Now you are ready to execute the test suite.
 2. Execute this:
 
    ```
-   ]acre.OpenProject /path/to/Tatin #.Tatin
+   ]Cider.OpenProject /path/to/Tatin 
    ```
 
 3. Execute this:
@@ -138,21 +138,16 @@ Usually your job is done once you've created a Pull Request (PR). However, here 
 In order to create new versions of the Client and the Server all you need to do is to execute:
 
 ```
-{noQLXFlag} #.Tatin.Admin.Make {type}
+{noQLXFlag} #.Tatin.Admin.Make 1
 ```
 
 * `noQLXFlag` is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.
 
-* `type` must be an integer in the range of 0, 1, 2 or 3.
-
-   | 0 | The version number is not changed
-   | 1 | The patch number is bumped
-   | 2 | The minor version number is bumped; the patch number is set to 0
-   | 3 | The major version number is bumped; minor and patch number are set to 0
+* `⍵` must be 1. This is a simple safety net against accidental calls.
 
 Notes:
 
-* The build ID is _always_ bumped
+* The build ID is always bumped when you create a new version.
 * The `Make` function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. `noQLXFlag`, if 1,  prevents the interpreter from running the code straight away. 
 
 A> ### The `load` and `lx` command line parameters

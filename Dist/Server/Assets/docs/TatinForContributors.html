@@ -18,7 +18,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <label id="hide_toc_label" for="hide_toc"></label>
 <div class="toc-container">
 <ul>
-<li><a href="#Tatin-is-managed-by-acre">Tatin is managed by acre</a></li>
+<li><a href="#Tatin-is-managed-by-Cider">Tatin is managed by Cider</a></li>
 <li><a href="#Requirements">Requirements</a></li>
 <li><a href="#How-to-work-on-Tatin">How to work on Tatin</a></li>
 <li><a href="#Prepare-either-the-Client-or-the-Server">Prepare either the Client or the Server</a></li>
@@ -37,12 +37,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Tatin is published under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody, it is rather a community project.</p>
 <p>This is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for “contribute to a github project”.</p>
 <div class="h_tag">
-<a href="#Tatin-is-managed-by-acre" id="Tatin-is-managed-by-acre" class="autoheader_anchor">
-<h2 data-id="Tatin-is-managed-by-acre">Tatin is managed by acre</h2>
+<a href="#Tatin-is-managed-by-Cider" id="Tatin-is-managed-by-Cider" class="autoheader_anchor">
+<h2 data-id="Tatin-is-managed-by-Cider">Tatin is managed by Cider</h2>
 </a>
 </div>
-<p>Note that Tatin is managed by the <a href="https://github.com/the-carlisle-group/Acre-Desktop" class="external_link">acre project management tool</a>. If you are not familiar with acre you are advised to spend an hour or so playing with it before using it for serious work.</p>
-<p>Though it is possible making changes to Tatin or adding code without acre, using acre makes this much easier.</p>
+<p>Note that Tatin is managed by the <a href="https://github.com/aplteam/Cider" class="external_link">Cider project management tool</a>. If you are not familiar with Cider you are advised to spend an hour or so playing with it before using it for serious work.</p>
+<p>Though it is possible making changes to Tatin or adding code without Cider, using Cider makes this easier.</p>
 <div class="h_tag">
 <a href="#Requirements" id="Requirements" class="autoheader_anchor">
 <h2 data-id="Requirements">Requirements</h2>
@@ -62,9 +62,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>After downloading Tatin from GitHub and saving it somewhere, say in <code>C:\Tatin</code>, you issue the command</p>
-<pre><code>]acre.OpenProject C:\Tatin #.Tatin</code></pre>
+<pre><code>]Cider.OpenProject C:\Tatin</code></pre>
 <p>and you are ready to go.</p>
-<p>Note that there is no need to save a workspace or anything: every function, operator, class, interface or namespace script changed in <code>#.Tatin</code> will be automatically saved to disk by acre.</p>
+<p>Note that there is no need to save a workspace or anything: every function, operator, class, interface or namespace script changed in <code>#.Tatin</code> will be automatically saved to disk by <a href="https://github.com/dyalog/link" class="external_link">Link</a>.</p>
 <div class="h_tag">
 <a href="#Prepare-either-the-Client-or-the-Server" id="Prepare-either-the-Client-or-the-Server" class="autoheader_anchor">
 <h2 data-id="Prepare-either-the-Client-or-the-Server">Prepare either the Client or the Server</h2>
@@ -92,7 +92,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ol start="1">
 <li>Instantiate Dyalog Unicode 18.0 or later</li>
 <li>Execute this:
-<pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
+<pre><code>]Cider.OpenProject /path/to/Tatin</code></pre></li>
 <li>Execute this:
 <pre><code>#.Tatin.TestCasesServer.RunTests</code></pre>
 <p>This function changes the current directory, establishes all required references and then instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will start a Tatin server.</p></li>
@@ -101,7 +101,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ol start="1">
 <li>Instantiate Dyalog Unicode 18.0 or later</li>
 <li>Execute this:
-<pre><code>]acre.OpenProject /path/to/Tatin #.Tatin</code></pre></li>
+<pre><code>]Cider.OpenProject /path/to/Tatin</code></pre></li>
 <li>Execute this:
 <pre><code>#.Tatin.TestCases.RunTests</code></pre>
 <p>This changes the current directory, establishes all required references, instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
@@ -128,34 +128,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.</p>
 <p>In order to create new versions of the Client and the Server all you need to do is to execute:</p>
-<pre><code>{noQLXFlag} #.Tatin.Admin.Make {type}</code></pre>
+<pre><code>{noQLXFlag} #.Tatin.Admin.Make 1</code></pre>
 <ul>
 <li><code>noQLXFlag</code> is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.</li>
-<li><code>type</code> must be an integer in the range of 0, 1, 2 or 3.
-<table>
-<tbody>
-<tr>
-<td style="text-align: right;">0</td>
-<td>The version number is not changed</td>
-</tr>
-<tr>
-<td style="text-align: right;">1</td>
-<td>The patch number is bumped</td>
-</tr>
-<tr>
-<td style="text-align: right;">2</td>
-<td>The minor version number is bumped; the patch number is set to 0</td>
-</tr>
-<tr>
-<td style="text-align: right;">3</td>
-<td>The major version number is bumped; minor and patch number are set to 0</td>
-</tr>
-</tbody>
-</table></li>
+<li><code>⍵</code> must be 1. This is a simple safety net against accidental calls.</li>
 </ul>
 <p>Notes:</p>
 <ul>
-<li>The build ID is <em>always</em> bumped</li>
+<li>The build ID is always bumped when you create a new version.</li>
 <li>The <code>Make</code> function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. <code>noQLXFlag</code>, if 1,  prevents the interpreter from running the code straight away.</li>
 </ul>
 <div class="leanpub_A">

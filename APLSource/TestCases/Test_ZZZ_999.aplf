@@ -1,0 +1,17 @@
+ r←Test_ZZZ_999(stopFlag batchFlag);⎕TRAP;request;response
+⍝ Sends "Shutdown" to the server. Tests only of course.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If 0 TC.YesOrNo'Should this test case shut the server down?'
+     request←R.NewRequest 0
+     request.RequestTarget←'/v1/shutdown'
+     response←'https://localhost'TC.SendAndReceive request
+     →T.PassesIf 200=response.StatusCode
+
+     r←T._OK
+
+ :Else
+     r←T._NotApplicable  ⍝ Prevented by user
+ :EndIf
+⍝Done

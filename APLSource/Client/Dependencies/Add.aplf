@@ -19,6 +19,7 @@
  b←##.Reg.IsValidPackageID_Complete¨{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}¨2⊃∘##.SplitAtAlias¨deps
  {}b{('Not valid package IDs: ',⊃,/{⍺,',',⍵}/(~⍺)/deps)##.Assert 0}⍣(0∊b)⊣0
  sofar←Get path
+ sofar←((⊃¨sofar)∊¨⊂'/\')↓¨sofar            ⍝ Because there was a bug in the early days of Tatin that led to a leading / or \
  tempFile←(⊃,/2↑⎕NPARTS filename),'.tmp'
  sofar←∪sofar
  sofar←(~(##.Reg.RemoveMinorAndPatch¨sofar)∊##.Reg.RemoveMinorAndPatch¨deps)/sofar

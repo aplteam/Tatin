@@ -6,7 +6,9 @@
 ⍝ Returns 1 in case part of `path` was created and 0 otherwise.
  forceFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'forceFlag'
  path←{(¯1×(¯1↑⍵)∊'/\')↓⍵}⍕path
- '"targetFolder" is invalid'Assert ⎕NEXISTS 1⊃⎕NPARTS path
+ :If ∨/'/\'∊path
+     '"targetFolder" is invalid'Assert ⎕NEXISTS 1⊃⎕NPARTS path
+ :EndIf
  :If F.IsDir path
      r←0
  :Else

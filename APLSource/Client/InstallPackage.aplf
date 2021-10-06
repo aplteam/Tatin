@@ -61,7 +61,7 @@
      :EndFor
      PrintToSession'  Saving build list... '
      buildList←SaveBuildList buildList targetFolder
-     :If ∨/bool←∨/¨({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}identifier_)∘⍷¨buildList[;2]
+     :If ∨/bool←({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}alias,identifier_){⍺∘≡¨(≢⍺)↑¨⍵}buildList[;2]
          r←2⊃buildList[bool⍳1;]
      :Else
          r←2⊃buildList[1;]

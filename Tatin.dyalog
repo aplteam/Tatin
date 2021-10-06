@@ -264,7 +264,7 @@
               r←'No packages found'
           :Else
               r(AddHeader)←(2⊃⍴r)↑'Group & Name' '≢ major versions'
-              r←'Packages from:'registry⍪r
+              r←((2⊃⍴r)↑'Packages from:'registry,(2⊃⍴r)⍴⊂'')⍪r
           :EndIf
       :EndIf
     ∇
@@ -349,7 +349,7 @@
       parms.dry←0 Args.Switch'dry'
       parms.force←0 Args.Switch'force'
       parms.noBetas←0 Args.Switch'nobetas'
-      parms.upgradeFlag←0 Args.Switch'upgradeFlag'
+      parms.update←0 Args.Switch'update'
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       'Not a directory'Assert TC.F.IsDir installFolder
       'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'

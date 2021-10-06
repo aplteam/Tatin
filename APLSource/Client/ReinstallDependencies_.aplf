@@ -1,4 +1,4 @@
- refs←{dry}ReInstallDependencies_(deps installFolder registry noBetas upgradeFlag);i;pkg;ref;msg;alias;identifier;tempDir
+ refs←{dry}ReInstallDependencies_(deps installFolder registry noBetas update);i;pkg;ref;msg;alias;identifier;tempDir
 ⍝ Re-installs all packages listd by `deps`, including any dependencies.\\
 ⍝ In case `dry` is 1 it reports to the session what it _would_ do.\\
 ⍝ All work is done in a temp folder. Without -dry that temp folder will eventually replace the install folder.
@@ -13,7 +13,7 @@
  tempDir∘{⍺ ⎕NCOPY ⍵}¨F.ListFiles installFolder,'/*'    ⍝ Copy only files (config AND ZIP), no folders (=packages)
  :For i :In ⍳≢deps
      pkg←i⊃deps
-     :If upgradeFlag
+     :If update
          pkg←Reg.RemoveMinorAndPatch pkg
      :EndIf
      msg←'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),' ',(dry/'(dry)'),'...'

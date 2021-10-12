@@ -1,13 +1,13 @@
  r←Test_UserCommands_026(stopFlag batchFlag);⎕TRAP;rc;msg;res
-⍝ Exercise ]Tatin.ListPackages with -info_url
+⍝ Exercise ]Tatin.ListPackages with -info_url and -raw
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  (rc msg res)←∆UCMD'ListPackages [local] -info_url -raw -group=aplteam'
  →T.PassesIf(rc=0)∧0=≢msg
  →T.PassesIf(2=⍴⍴res)∧0<≢res
- →T.PassesIf 20<≢res
+ →T.PassesIf 0<≢res
  →T.PassesIf 83∧.=∪⎕DR¨∪res[;2]                     ⍝ No. of packages (all integers)
- →T.PassesIf∧/'https://'{((≢⍺)↑[2]⍵)∧.=⍺}↑res[;3]   ⍝ All URLs?
+ →T.PassesIf 3=2⊃⍴res
 
  r←T._OK

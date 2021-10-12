@@ -1,9 +1,10 @@
- r←Test_UserCommands_013(stopFlag batchFlag);⎕TRAP;msg;rc;res
+ r←Test_UserCommands_013(stopFlag batchFlag);⎕TRAP;msg;rc;res;stop
 ⍝ Exercise ]Tatin.Ping with an argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (rc msg res)←∆UCMD'Ping [localhost]:5001'
+stop←0
+ (rc msg res)←stop ∆UCMD'Ping'
  Assert 0=rc
  →T.PassesIf 1 1 1≡res[;2]  ⍝ If this fails try again: for reasons yet unknwon the test server is sometimes unresponsive
 

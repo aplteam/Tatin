@@ -6,14 +6,14 @@
  GetVersion←{1↓⍵/⍨~2>+\'-'=⍵}
 
  res←⎕SE.Tatin.ListVersions'[local]example-versions'
- expected←'0.1.0' '1.0.0-beta-1' '1.0.0' '1.0.1-This-fix' '1.0.1-That-fix' '1.0.12-zzz' '1.0.12-That-fix' '2.0.0'
+ expected←⍪'0.1.0' '1.0.0-beta-1' '1.0.0' '1.0.1-This-fix' '1.0.1-That-fix' '1.0.12-zzz' '1.0.12-That-fix' '2.0.0'
  →T.PassesIf expected≡GetVersion¨res
 
  res←0 ⎕SE.Tatin.ListVersions'[local]example-versions'
  →T.PassesIf expected≡GetVersion¨res
 
  res←1 ⎕SE.Tatin.ListVersions'[local]example-versions'
- →T.PassesIf expected≡GetVersion¨res[;1]
+ →T.PassesIf expected≡⍪GetVersion¨res[;1]
  →T.PassesIf∧/∨⌿↑(2='-'+.=¨res[;1])(2≤/res[;2],99999999)
 
  r←T._OK

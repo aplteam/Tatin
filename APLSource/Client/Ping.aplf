@@ -1,21 +1,23 @@
  bool←{ts}Ping uri_;client;request;uri;buff;qdmx;b
 ⍝ Establish whether the host is up and running with very little overhead.
 ⍝ `ts` is only useful for test cases
+ bool←0
  ts←{0<⎕NC ⍵:⍎⍵ ⋄ (100000 100 100⊥3↑⎕TS)}'ts'
  :If ∧/'[]'∊uri_
      uri←ReplaceRegistryAlias uri_
  :Else
      uri←uri_
  :EndIf
- bool←0
- request←R.NewRequest 0
- request.RequestTarget←'/ping'
- client←NewClient uri
- client.ClientTimeout←4
- :Trap 345
-     buff←client R.SendAndReceive request
-     bool←1
- :Else
+ :If 0<≢uri
+     request←R.NewRequest 0
+     request.RequestTarget←'/ping'
+     client←NewClient uri
+     client.ClientTimeout←4
+     :Trap 345
+         buff←client R.SendAndReceive request
+         bool←1
+     :Else
      ⍝ Just for debugging
- :EndTrap
+     :EndTrap
+ :EndIf
 ⍝Done

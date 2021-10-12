@@ -22,6 +22,8 @@
      PrintToSession'  Installed',(dry/' (dry)'),': ',ref,⎕UCS 13
      refs,←⊂ref
  :EndFor
- :If ~dry
+ :If dry
+     ⎕←'Dry run, packages got installed into: ',tempDir
+ :Else
      'Establishing re-installed packages failed, nothing has changed'Assert installFolder ReplaceFolderBy tempDir
  :EndIf

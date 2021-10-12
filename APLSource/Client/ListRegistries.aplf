@@ -1,4 +1,4 @@
- r←{rawFlag}ListRegistries type;data
+ r←ListRegistries type;data
 ⍝ List all registries defined in the Client's config file.\\
 ⍝ Returns a matrix with these columns:
 ⍝ * [;1] Alias
@@ -7,10 +7,7 @@
 ⍝ "type" must be either 0 or 1 or empty:\\
 ⍝ * 1 means all data is listed
 ⍝ * Everything else means just the alias, the uri and the priority are listed\\
-⍝ "rawFlag" defaults to 0 and must be Boolean. If it is 1 then no beautifying takes place.
  r←(0,(2+3×1≡type))⍴''
- rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
- '"rawFlag" (⍺) must be a Boolean'Assert(⊂rawFlag)∊0 1
  '"type" (⍵) must be a Boolean or empty'Assert(⊂type)∊0 1 ''⍬
  :If 0<≢data←MyUserSettings.registries
      :If 1≡type
@@ -19,9 +16,5 @@
      :Else
          r←↑data.(uri alias port priority)
          r←r[⍒r[;4];]
-     :EndIf
-     :If ~rawFlag
-         r←((,[0.5]'URI' 'Alias' 'Port' 'Priority',(1≡type)/⊂'API-key'),[1]' ')⍪r
-         r[2;]←(⌈⌿≢¨r)⍴¨'-'
      :EndIf
  :EndIf

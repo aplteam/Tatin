@@ -1,7 +1,7 @@
  r←GetRegistriesForBuildList;buff;bool
 ⍝ Returns the URLs for all registries with a priority of greater than 0 (because we do not scan priority=0), ordered by priority.
 ⍝ The Registries are then pinged in order to find out whether they are up and running. Those which are not are remembered on ∆TREE.ignore
- buff←1 ListRegistries''
+ buff←ListRegistries''
  buff←(buff[;4]>0)⌿buff
  r←⊃¨{⍵∊0 80 443:⍺ ⋄ ({⍵↓⍨-'/'=¯1↑⍵}⍺),':',(⍕⍵),'/'}/¨↓buff[;1 3]
  r~←∆TREE.ignore

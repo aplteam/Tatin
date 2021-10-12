@@ -1,5 +1,5 @@
- mat←{parms}ListPackages y;client;request;res;uri;parms
-⍝ `uri` is at least a path to a Registry but might also specify (part of) a package ID.\\
+ mat←{parms}ListPackages uri;client;request;res;uri_;parms;registries
+⍝ `uri` must be a path to a Registry and optionally a (possibly incomplete) package ID
 ⍝ By default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.\\
 ⍝ `r` is a matrix with two columns.\\
 ⍝ `[;2]` carries the number of major versions.\\
@@ -23,11 +23,11 @@
 ⍝   All patch versions of that package are returned\\
  parms←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕NS''}'parms'
  parms←Reg.CheckParmsForListPackages parms
- uri←ReplaceRegistryAlias y
- 'No (valid) Registry specified?!'Assert 0<≢uri
- :If Reg.IsHTTP uri
-     mat←parms ListPackages_ uri
+ uri_←ReplaceRegistryAlias uri
+ 'No (valid) Registry specified?!'Assert 0<≢uri_
+ :If Reg.IsHTTP uri_
+     mat←parms ListPackages_ uri_
  :Else
-     mat←Reg.ListPackages uri parms
+     mat←Reg.ListPackages uri_ parms
  :EndIf
 ⍝Done

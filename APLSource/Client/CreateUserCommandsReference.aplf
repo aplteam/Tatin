@@ -1,0 +1,66 @@
+ filename←CreateUserCommandsReference path;ns;function;was;md;buff;paras;parms;level2Flag
+⍝ Collects all help pages (all levels available) and compiles them into a single HTML document.
+ ns←⎕NS''
+ Assert'Tatin'≡∊ns.{2 ⎕FIX ⍵}'file://',##.CiderConfig.HOME,'/Tatin.dyalog'
+ was←⎕SE.UCMD'udebug ON'
+ ⎕SE.UCMD'ns.list←TatIN -? -'
+
+ ⎕SE.UCMD'ns.list←TatIN -? -'
+
+ ns.list←⊃¨' 'A.Split¨A.DMB ¯2↓2↓(⎕UCS 13)A.Split ns.list
+ md←''
+ md,←⊂'# Tatin User Command Syntax'
+ :For function :In ns.list
+⍝     Assert(⎕C function)≢⎕C'ListPackages'
+     md,←⊂'## ',function
+     md,←⊂'### Syntax'
+     buff←⎕SE.UCMD'TATIN.',function,' -?'
+     buff←(⎕UCS 13)A.Split buff
+     :If 0<≢buff←¯1↓(4+{∨/'Accepts modifier'⍷∊⍵}buff)↓buff
+         :If level2Flag←5<≢buff
+             buff←buff[4 1 2 6]
+         :Else
+             buff←buff[4 1 2]
+         :EndIf
+         (3⊃buff)←¯1↓⊃{⍺,' ',⍵}/{(2↑⍵),{'`',⍵,'`,'}¨2↓⍵}' 'A.Split 3⊃buff
+         :If level2Flag
+             (4⊃buff)←A.DLB 4⊃buff
+             md,←(1⊃buff)''(2⊃buff)''(3⊃buff)'' '```'(4⊃buff)'```' ''
+         :Else
+             md,←(1⊃buff)''(2⊃buff)''(3⊃buff)''
+         :EndIf
+         :If level2Flag
+             md,←⊂'### Details'
+             buff←⎕SE.UCMD'TATIN.',function,' -??'
+             buff←(6+{{(∨/'Version:'⍷⍵)+∨/'Accepts modifier'⍷⍵}∊⍵}buff)↓(⎕UCS 13)A.Split buff
+             paras←⍸0,⍨¯1↓(0<≢¨1↓buff)∧'.'=⊃¨¯1↑¨¯1↓buff
+             buff[paras]←buff[paras],¨⎕UCS 13
+             buff←(⎕UCS 13)A.Split∊buff,¨⎕UCS 13
+⍝             buff←⊃¨buff{a←⍺ ⋄ a[⍵]←⊂a[⍵] ⋄ a}(⍳≢buff)~paras
+             :If ∨/' -??? '⍷⊃¯2↑buff
+                 md,←(¯2↓buff),⊂''
+                 md,←⊂'### Examples'
+                 buff←⎕SE.UCMD function,' -???'
+                 buff←10↓(⎕UCS 13)A.Split buff
+                 md,←(⊂'```'),buff,(⊂'```')
+             :EndIf
+             md,←buff
+         :EndIf
+     :EndIf
+ :EndFor
+ {}⎕SE.UCMD'udebug ',(≢'Was ')↓was
+ :If 0=≢path
+     path←F.GetTempPath
+ :EndIf
+ filename←path,'/Tatin-User-Command-Syntax.html'
+ parms←##.MarkAPL.CreateParms
+ parms.createFullHtmlPage←1
+ parms.homeFolder←'./Assets/MarkAPL'
+ parms.cssURL←parms.homeFolder,'/Files'
+ parms.outputFilename←filename
+ parms.title←'Tatin UC Syntax'
+ parms.toc←2 2
+ parms.collapsibleTOC←1
+ parms.head←'<style>' 'body {font-family:"APL385 Unicode";}' '</style>'
+ parms ##.MarkAPL.Markdown2HTML md
+⍝Done

@@ -5,7 +5,9 @@
  uri_←F.EnforceSlash ReplaceRegistryAlias uri
  'No URI provided'Assert 0<≢uri_
  (uri_ packageID)←Reg.SeparateUriAndPackageID uri_
- 'Unknown Registry'Assert(⊂EnforceTrailingSlash uri_)∊MyUserSettings.registries.uri
+ :If 'file://'{⍺≢(≢⍺)↑⍵}uri_
+     'Unknown Registry'Assert(⊂EnforceTrailingSlash uri_)∊MyUserSettings.registries.uri
+ :EndIf
  :If Reg.IsHTTP uri_
      request←R.NewRequest 0
      request.RequestTarget←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
@@ -31,7 +33,9 @@
          :EndIf
      :EndIf
  :Else
+     uri_←'file://'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}uri_
      :If F.IsDir uri_,packageID
+         'Is not a package'Assert F.IsFile uri_,packageID,'/apl-package.json'
          (rc en msg)←F.RmDir uri_,packageID
          :If 0≠rc
              statusCode←400

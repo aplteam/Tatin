@@ -15,14 +15,6 @@
  →T.PassesIf 2<≢res1
  →T.PassesIf 5=2⊃⍴res1
 
- res1←1 ⎕SE.Tatin.ListRegistries 0
- →T.PassesIf 0<≢res1
- →T.PassesIf 4=2⊃⍴res1
-
- res1←1 ⎕SE.Tatin.ListRegistries 1
- →T.PassesIf 0<≢res1
- →T.PassesIf 5=2⊃⍴res1
-
  :Trap 98
      res1←⎕SE.Tatin.ListRegistries 10
      →T.FailsIf 1
@@ -30,15 +22,6 @@
      qdmx←⎕DMX
      →T.PassesIf'"type" (⍵) must be a Boolean or empty'≡qdmx.EM
  :EndTrap
-
- :Trap 98
-     res1←3 ⎕SE.Tatin.ListRegistries''
-     →T.FailsIf 1
- :Else
-     qdmx←⎕DMX
-     →T.PassesIf'"rawFlag" (⍺) must be a Boolean'≡qdmx.EM
- :EndTrap
-
 
  r←T._OK
 ⍝Done

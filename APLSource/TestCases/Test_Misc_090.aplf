@@ -1,13 +1,12 @@
- r←Test_Misc_090(stopFlag batchFlag);⎕TRAP;dir;filename
+ r←Test_Misc_090(stopFlag batchFlag);⎕TRAP;dir;filename;html
 ⍝ Exercise `Client.CreateUserCommandsReference`
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  dir←GetTempDir ⍬
  filename←TC.CreateUserCommandsReference dir
- ∘∘∘
- →T.PassesIf
- →T.PassesIf
+ html←⊃⎕NGET filename
+ →T.PassesIf∨/'<h1 data-id="Tatin-User-Command-Syntax">Tatin User Command Syntax</h1>'⍷∊html
 
  r←T._OK
 

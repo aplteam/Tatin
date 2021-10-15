@@ -1,0 +1,19 @@
+ prevkey←(tn _predecessor root)key;ptrs;keys;at;path;found
+⍝ Find the predecessor (or last) key value in a B-tree (⍬ if non-existant)
+
+ :If ∧/0=≢¨key ⍝ Are we looking for the highest (last) key in the tree?
+     prevkey←2⊃(tn _highest root)⍬ ⍬ ⍝ We only return the (last) key value itself
+ :Else
+     found←0≠⊃path←(tn _find(-root))key
+     :While ×≢path←1↓path
+         (ptrs keys)←⎕FREAD tn,1 1⊃path ⋄ at←1 2⊃path
+         :If at>1-found∧≠/≢¨ptrs keys ⋄ :Leave ⋄ :Else ⋄ found←0 ⋄ :EndIf
+     :EndWhile
+     :If 0=≢path
+         prevkey←⍬
+     :ElseIf found∧≠/≢¨ptrs keys
+         prevkey←2⊃(tn _highest((¯1+2×at)⊃ptrs))⍬ ⍬ ⍝ Look for the lowest key value in the following sub-tree
+     :Else
+         prevkey←(at-1)⊃keys
+     :EndIf
+ :EndIf

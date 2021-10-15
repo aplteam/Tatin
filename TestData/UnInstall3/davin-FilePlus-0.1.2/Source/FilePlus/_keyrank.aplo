@@ -1,0 +1,7 @@
+ _keyrank←{ ⍝ Determine if this is a subscripted name, and if so, its rank
+     ~⍺⍺:0 ⍝ If not working on the master directory, it's never a subscripted name
+     ~(0 2∊⍨10|⎕DR ⍵)∧(1=≢⍴⍵)∧'['∊⍵:0 ⍝ Must be a simple character vector containing a '['
+     ~(1=≢⍵∩'[')∧(1=≢⍵∩']')∧(']'=⊢/⍵)∧'['≠⊣/⍵:0 ⍝ Must have exactly one '[' and one ']' and end with ']' but not begin with '['
+     ~(∧/r←';'=(⍵⍳'[')↓¯1↓⍵):0 ⍝ Must have only ';' (if anything) between '[]'
+     1+≢r ⍝ The number of ';' is 1 fewer than the array rank
+ }

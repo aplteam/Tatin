@@ -1,0 +1,11 @@
+ words←{delim}∆cuts text;⎕IO;⎕ML
+⍝ Cut a vector into nested pieces at a delimiter, including empties.
+⍝ The delimiter(s) are optional and default to a space (' '),
+⍝ NewLine, and LineFeed.
+⍝
+⍝ Written before May 1996 by Davin Church of Creative Software Design.
+⍝ Last modified 4 November 2011 by Davin Church of Creative Software Design.
+⍝ Converted to Dyalog 12 October 2019 by Davin Church of Creative Software Design.
+
+ ⎕IO←⎕ML←1 ⋄ :If 0=⎕NC'delim' ⋄ delim←' ',⎕UCS 13 10 ⋄ :EndIf ⍝ Default delimiters to space & CR/LF
+ words←1↓¨(1,text∊delim)⊂(1↑delim),text ⍝ Cut it into pieces

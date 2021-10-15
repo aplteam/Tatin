@@ -1,0 +1,30 @@
+ newwords←{dot}Quote words;t;simple;legal;x;w;q;rw;lc;ss
+⍝∇ Enclose illegal or reserved word(s) in SQL escape-quote marks
+⍝ Database configuration settings contained in global: Config
+⍝ Optional left argument is a "." character.  If provided, cut words on dots and quote each subword.
+⍝ Words containing '⍎' are never quoted and the '⍎' is removed.
+⍝ Words nested an extra level are treated as formulas and never quoted.
+⍝ Words that are exactly '*' or end in '(*)' are never quoted.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ q←'""' ⋄ lc←'_' ⋄ rw←ss←0⍴⊂'' ⋄ :If ×⎕NC'Config' ⋄ q lc ss rw←Config[3 2 6 9] ⋄ :EndIf
+ :If simple←1≥|≡words ⋄ words←⊂,words ⋄ :EndIf ⋄ words←,¨words
+ :If 0=⎕NC'dot' ⋄ dot←'' ⋄ :EndIf ⋄ legal←lc,⎕D,⎕A,819⌶⎕A
+ :If ∨/~w←,1≥|≡¨words ⋄ ((~w)/,words)←⊃¨(~w)/,words ⋄ :EndIf
+ newwords←∆dlt¨words ⍝ Don't allow leading or trailing spaces on names
+ :For x :In (∨/w)/ss ⋄ (((∊w/,newwords)∊⊃x)/∊w/,newwords)←⊃⌽x ⋄ :EndFor
+ :If ∨/t←w∧,(1∊¨newwords∊¨⊂dot)∧~'⍎'∊¨newwords
+     x←(⊃dot),¨t/,newwords ⋄ x←(x∊¨⊂dot)⊂¨x
+     (t/,newwords)←1↓¨∆sew¨(1↑¨¨x),¨¨Quote¨1↓¨¨x
+ :EndIf
+
+ w∧←(~t)∧,((∆uc newwords)∊rw)∨(~1↓[1]∧/¨1⍪newwords∊¨⊂legal)∨(⊃¨newwords)∊¨⊂(10+⍴lc)↑legal
+ w∧←~,(newwords∊⊂,'*')∨(¯3↑¨newwords)∊⊂'(*)' ⍝ Preserve special cases as always-keyword
+ :If ∨/t←'⍎'∊¨w/,newwords ⋄ (t/w/,newwords)←(t/w/,newwords)~¨'⍎' ⋄ w←w\~t ⋄ :EndIf
+ :If ∨/w ⋄ w←w\(⊂⌽2⍴q)≢¨¯1⌽¨w/,newwords ⋄ :EndIf ⍝ Ignore already-quoted words
+ :If ∨/w ⋄ (w/,newwords)←q ∆Q w/,newwords ⋄ :EndIf ⍝ Quote anything that's needed
+ :If simple ⋄ newwords←⊃newwords ⋄ :EndIf
+
+⍝? Allow a left argument flag of '!' or similar to indicate that it should always be force-quoted?  Don't need?

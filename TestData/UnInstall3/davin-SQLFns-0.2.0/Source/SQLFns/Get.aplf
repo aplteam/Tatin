@@ -1,0 +1,70 @@
+ sql←{options}Get clauses;select;from;where;order;group;having;unionall;t;quest
+⍝∇ Generate a simple Select command using the items of the argument given
+⍝∇ to pass to the subroutines Select, From, Where, OrderBy, GroupBy, & Having
+⍝∇ and return the results catenated together into a whole SQL command.
+⍝ Provide arguments in this order (the standard order of a SQL Select statement):
+⍝       {select-fields} {from-tables} [where-terms] [order-fields] [group-fields] [having-fields]
+⍝
+⍝ Get can also take a nested matrix of arguments, where each row of the matrix is a separate
+⍝ query in the above pattern.  A Select/Union statement will then be generated as the result
+⍝ of Get.  Only the first three columns may be different in each row. [order-fields] may only
+⍝ be specified once for the entire SQL command, so it should either appear only in one of the
+⍝ rows (the remainder being empty) or it should be exactly duplicated in all rows in which it
+⍝ appears.  [group-fields] and [having-fields] are not supported in Select/Union SQL commands.
+⍝ The {select-fields} list from every row must produce the same number and type of fields.
+⍝ By default, duplicate rows (from different queries) may be returned from the resulting SQL
+⍝ command (i.e. it uses the UNION ALL operator).  This may be changed to use the UNION
+⍝ operator instead to remove duplicate rows by specifying a Get-specific command option '∪'
+⍝ (mnemonic for "unique") in the left argument.  Be advised that this duplicate-removal
+⍝ request may require additional processing time for the database to perform.  All field names
+⍝ are determined by those used in the first Select command and any Order By should use those
+⍝ names (or ordinal numbers).
+⍝
+⍝ Another Get-specific command option is '?'.  A command option word may consist of one or
+⍝ more '?' characters (e.g. '???') to indicate that those characters are to be prepended to
+⍝ the (front of the) resulting SQL command.  This is merely a convenience option to avoid
+⍝ having to explicitly catenate them for interfaces that use them.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Modified 2 December 2013 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ 'Length Error'⎕SIGNAL 5/⍨(2≤|≡clauses)∧1>¯1↑1,⍴clauses
+ :If 0=⎕NC'options' ⋄ options←0⍴⊂'' ⋄ :EndIf
+ :If 1=|≡options ⋄ options←⊂options ⋄ :EndIf
+ :If ~unionall←~×≢options←(,,¨options)~⊂''
+     unionall←~∨/t←∧/¨'∪'=(1⌈⍴¨options)↑¨options ⋄ options←(~t)/options
+ :EndIf
+ :If quest←×≢options
+     quest←⌈/0,t←+/¨'?'=(1⌈⍴¨options)↑¨options ⋄ options←(t=0)/options
+ :EndIf
+
+ :If 1≥⍴⍴clauses ⍝ Generate a simple Select statement
+     :If 1≥|≡clauses ⋄ clauses←,⊂,clauses ⋄ :EndIf
+     select from where order group having←6↑clauses,6⍴⊂''
+     :Trap 0
+         :If 0∊⍴from
+             sql←options Select select
+         :Else
+             sql←(options Select select),(From from),(Where where),(OrderBy order),(GroupBy group),Having having
+         :EndIf
+     :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+ :Else ⍝ Generate a Select/Union statement
+     'Length Error (Union)'⎕SIGNAL 5/⍨4<¯1↑⍴clauses ⋄ order←0⍴⊂''
+     :If 4≤¯1↑⍴clauses ⋄ :AndIf 1<⍴t←order←clauses[;4] ⋄ :AndIf 1<⍴t←order←(×≢¨∆dim¨t)/t
+         'Domain Error (Order By)'⎕SIGNAL 11/⍨~∧/2≡/t
+     :EndIf
+     order←⊃order ⋄ sql←''
+     :For clauses :In ↓clauses
+         select from where←3↑clauses,3⍴⊂''
+         :If ×⍴sql ⋄ sql,←' Union ',unionall/'All ' ⋄ :EndIf
+         :If 0∊⍴from
+             t←~(∆uc⊃¨∆cut¨options)∊∆uc'Distinct' 'Top' ⍝ Option keywords to ignore when selecting constants
+             :Trap 0 ⋄ sql,←(t/options)Select select ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+         :Else
+             :Trap 0 ⋄ sql,←(options Select select),(From from),Where where ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+         :EndIf
+     :EndFor
+     :Trap 0 ⋄ sql,←OrderBy order ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+ :EndIf
+ sql←(quest⍴'?'),sql ⍝ Allow special prefix code of one or more "?"s

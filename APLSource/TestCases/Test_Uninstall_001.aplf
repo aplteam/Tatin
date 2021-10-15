@@ -1,6 +1,6 @@
  r←Test_Uninstall_001(stopFlag batchFlag);⎕TRAP
  ;dir;dir2;oldDependencies;oldBuildlist;msg;list;oldPkgList;newPkgList;newBuildlist;newDependencies
-⍝ Uninstall a package that has no dependencies
+⍝ Attempt to uninstall a package that has an alias assigned to it; must fail
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -13,10 +13,10 @@
 
  (list msg)←TC.UnInstallPackage dir2'aplteam-EventCodes-3.0.1'          ⍝ Without alias it must not be removed!
  →T.GoToTidyUp 0≠≢list
- →T.GoToTidyUp'Package is not installed'≢msg
+ →T.GoToTidyUp'Cannot uninstall: package has an alias assigned'≢msg
 
  (list msg)←TC.UnInstallPackage dir2'EC@aplteam-EventCodes-3.0.1'
- →T.GoToTidyUp(,⊂'aplteam-EventCodes-3.0.1')≢list
+ →T.GoToTidyUp(,⊂'EC@aplteam-EventCodes-3.0.1')≢list
  →T.GoToTidyUp 0≠≢msg
 
  newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
@@ -24,7 +24,6 @@
  newPkgList←F.ListDirs dir2,'/'
  →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
  →T.GoToTidyUp 1≠-/≢¨oldPkgList newPkgList
- →T.GoToTidyUp'aplteam-EventCodes-3.0.1'{⍺≢(-≢⍺)↑⍵}1⊃oldPkgList~newPkgList
 
  r←T._OK
 

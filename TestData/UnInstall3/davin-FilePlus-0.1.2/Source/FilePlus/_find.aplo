@@ -1,0 +1,89 @@
+ path←{route}(tn _find root)key;bmax;read;ptrs;keys;at;free;lptr;hptr;limb1;limb2;pptrs;pkeys;t;pk;st;⎕CT
+⍝ Locate a key in the B-tree starting at the given root.
+⍝ If full nodes are encountered along the way, pre-split them to leave enough room for insertions.
+⍝ Right operand:
+⍝      File component # containing the root of the B-tree.
+⍝      If root<0, then this is a read-only operation starting at |root (don't pre-split nodes).
+⍝ Right argument:
+⍝      The key value to be located within the B-tree.
+⍝ Result:
+⍝      path[1]←Component # (scalar) that contains the data for the requested key
+⍝          If path[1]=0 then the key was not found and path[2] is cmp/ndx where it should be inserted.
+⍝      (1↓path)←Nested vector of the reverse-path back through the B-tree
+⍝          (1⊃¨1↓path)←Component # of the tree node in the path
+⍝          (2⊃¨1↓path)←Key-subscript into that node that is ≥ the requested key
+
+ bmax←4⌈⌊|⊃∊TreeSize ⍝ Adjustable B-tree size
+ ⎕CT←0 ⍝ ≡ needs to perform exact comparisons like ⍋/⍸
+ read←root<0 ⋄ :If 0=⎕NC'route' ⋄ route←⍬ ⋄ :EndIf ⍝ Route is used internally for recursive calls
+ (ptrs keys)←⎕FREAD tn,root←|root ⍝ Obtain the B-tree root node to search
+
+ :If (~read)∧bmax≤≢keys ⍝ Pre-split this large (full) node before proceeding
+     at←⌈(1+≢keys)÷2 ⋄ free←⍬ ⍝ Determine split point (the key value to move up into parent)
+     ⍝ It would be possible to split new keys unevenly but that has advantages only if the keys are
+     ⍝ mostly created in order, and that isn't necessarily how it would usually be done.
+     :If =/≢¨ptrs keys ⍝ This is a leaf node being split (to leave room for inserting)
+         :If 0=≢route ⍝ Check for a parent component
+             ⍝ If no parent exists (this is the tree root and only leaf node),
+             ⍝ reuse this for a new root separating two new children.
+             lptr←tn _append limb1←(at-1)↑¨ptrs keys ⍝ Create two new subtrees
+             hptr←tn _append limb2←at↓¨ptrs keys
+             ((ptrs←lptr,ptrs[at],hptr)(keys←,keys[at]))⎕FREPLACE tn,root ⍝ Redefine the parent tree limb safely
+         :Else ⍝ If we have a parent, we have to modify it
+             at-←keys[at]≡⊂key ⍝ Let's never move the desired key up into the parent where we can no longer see it
+             (pptrs pkeys)←⎕FREAD tn,1 1⊃route ⍝ Get the parent to hold the new pointers
+             hptr←tn _append limb2←at↓¨ptrs keys ⍝ Make one new subtree to be the right child
+             t←1 2⊃route ⍝ This is the pptrs location after which we need to insert the new key + child ptr
+             pptrs←(t↑pptrs),ptrs[at],hptr,t↓pptrs ⍝ Insert new parent separator pointers
+             lptr←tn _append limb1←(at-1)↑¨ptrs keys ⍝ Redefine split (left) child subtree
+             pptrs[pptrs⍳root]←lptr ⋄ free,←root ⍝ Point to the fresh copy of the child and mark old one dead
+             t←2÷⍨t-1 ⍝ This is the pkeys location after which we need to insert the new key value
+             pkeys←(t↑pkeys),(⊂pk←at⊃keys),t↓pkeys ⍝ Insert new parent key
+             ⍝ Update parent with above changes
+             pptrs pkeys ⎕FREPLACE tn,1 1⊃route ⍝ (A direct replacement is safe - it's the last step in the split process)
+             ⍝ Now, figure out which of my split children now points to the desired search key
+             :Select ⊃⍋⍋key pk ⍝ Which do we want to continue with?
+             :Case 1 ⋄ (ptrs keys)←limb1 ⋄ root←lptr ⍝ Search left child
+             :Case 2 ⋄ (ptrs keys)←limb2 ⋄ root←hptr ⍝ Search right child
+             :EndSelect
+         :EndIf
+     :Else ⍝ This is a branch node being split
+         :If 0=≢route ⍝ Check for a parent component
+             ⍝ If no parent exists (this is the tree root), reuse this for a new root splitting into two new children
+             lptr←tn _append limb1←(1 0+2 1×at-1)↑¨ptrs keys ⍝ Create two new subtrees
+             hptr←tn _append limb2←(2 1×at)↓¨ptrs keys
+             ((ptrs←lptr,ptrs[2×at],hptr)(keys←,keys[at]))⎕FREPLACE tn,root ⍝ Redefine the parent tree limb safely
+         :Else ⍝ If we have a parent, we have to modify it instead
+             at-←keys[at]≡⊂key ⍝ Let's never move the desired key up into the parent where we can no longer see it
+             (pptrs pkeys)←⎕FREAD tn,1 1⊃route ⍝ Get the parent to hold the new pointers
+             hptr←tn _append limb2←(2 1×at)↓¨ptrs keys  ⍝ Make one new subtree to be the right child
+             t←1 2⊃route ⍝ This is the pptrs location after which we need to insert the new key + child ptr
+             pptrs←(t↑pptrs),ptrs[2×at],hptr,t↓pptrs ⍝ Insert new parent separator pointers
+             lptr←tn _append limb1←(1-⍨2 1×at)↑¨ptrs keys ⍝ Redefine split (left) child subtree
+             pptrs[pptrs⍳root]←lptr ⋄ free,←root ⍝ Point to the fresh copy of the child
+             t←2÷⍨t-1 ⍝ This is the pkeys location after which we need to insert the new key value
+             pkeys←(t↑pkeys),(⊂pk←at⊃keys),t↓pkeys ⍝ Insert new parent key
+             ⍝ Update parent with above changes
+             pptrs pkeys ⎕FREPLACE tn,1 1⊃route ⍝ (A direct replacement is safe - it's the last step in the split process)
+             ⍝ Now, figure out which of my split children now points to the desired search key
+             :Select ⊃⍋⍋key pk ⍝ Which do we want to continue with?
+             :Case 1 ⋄ (ptrs keys)←limb1 ⋄ root←lptr ⍝ Search left child
+             :Case 2 ⋄ (ptrs keys)←limb2 ⋄ root←hptr ⍝ Search right child
+             :EndSelect
+         :EndIf
+     :EndIf
+     tn _free free ⍝ We may need to create/update the free list with new component #s
+ :EndIf
+
+ :If ×(1+≢keys)|at←keys⍸⊂key ⍝ Where should this go in the list of keys?
+ :AndIf key≡at⊃keys ⍝ Is it an exact match?
+     ⍝ This is found directly in this node (most often a leaf) - just use it
+     path←(ptrs[at×2-=/≢¨keys ptrs])(root,at)
+ :Else ⍝ Time for a B-tree search
+     :If =/≢¨ptrs keys ⍝ This is a leaf node
+         path←0,⊂root,at+1 ⍝ Key value not found - return where it should be inserted
+     :Else
+         st←1+2×at ⍝ The sub-tree pointer position
+         path←((,⊂root,st)(tn _find(ptrs[st]×¯1*read))key),⊂root,at+1 ⍝ Follow the branch recursively
+     :EndIf
+ :EndIf

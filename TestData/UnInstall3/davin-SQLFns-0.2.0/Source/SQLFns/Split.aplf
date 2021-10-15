@@ -1,0 +1,64 @@
+ {names}Split records;t;type;scalar;types;empty
+⍝∇ Accept a nested array of data with field names at the top of each column
+⍝∇ (such as that returned by ADOGet with a '?Select...' command) and split
+⍝∇ each column into a (nested) vector in semi-global variables named after
+⍝∇ each field (column header).
+⍝
+⍝ Field names will be converted into legal APL variable names, or specific
+⍝   variable names or alternate variable names may be provided instead.
+⍝ The field names may be passed as a vector left argument instead of as
+⍝   the first row of the right argument data matrix.
+⍝ If the field names are passed as a left argument and the right argument
+⍝   is a data vector instead of a matrix, then the data is assumed to be
+⍝   exactly one data record and the resulting variable names will contain
+⍝   simple (unnested) character vectors and numeric scalars instead of
+⍝   nested vectors of character vectors and numeric vectors.
+⍝ If the field names are passed as a left argument and the right argument
+⍝   is an empty matrix (no records), then the left argument may optionally
+⍝   also contain data type codes so that appropriately-typed empty arrays
+⍝   may be used when creating the split variables.  To use this feature,
+⍝   make the left argument a matrix where [1;] is the field/variable name
+⍝   list and [2;] is the data type codes to use for each of them.
+⍝   Data type codes may be ADO field type numbers or may be composed of
+⍝   0 (for numeric fields) and '' (for character fields) for easier manual
+⍝   use.  This feature may not be used when Split is called monadically
+⍝   (with the field names at the top of the data matrix).
+⍝   If this feature is not used and no records are present, then the data
+⍝   type of all variables will be text (if called monadically) or will
+⍝   match that of the first field (if called dyadically).
+⍝
+⍝ Examples:
+⍝   Split ADOGet '?Select Name, Address, Phone From Customers'
+⍝   Split 'CustName' 'CustAddr' 'CustPhone'⍪ADOGet 'Select Name, Address, Phone From Customers'
+⍝   'CustName' 'CustAddr' 'CustPhone' Split ADOGet 'Select Name, Address, Phone From Customers'
+⍝   ('Name' 'Addr' 'Phone',[.5] '' '' 0) Split ADOGet 'Select Name, Address, Phone From Customers'
+⍝   x←ADOGet '??Select Name, Address, Phone From Customers' ⋄ x[1 2;] Split 2 0↓x
+⍝
+⍝ Written about 2008 by Davin Church of Creative Software Design
+⍝ Modified 22 February 2016 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ types←⍬ ⋄ :If 0=⎕NC'names' ⋄ names←records[1;] ⋄ records←2 0↓(⊂'')⍪records ⋄ :EndIf
+ :If 2=⍴⍴names ⋄ :AndIf 2=≢names ⋄ types←names[2;] ⋄ names←names[1;] ⋄ :EndIf
+ :If 1=⍴⍴names ⋄ :AndIf ∧/1=≢¨t←⍴¨names ⋄ :AndIf ∧/' '=⊃¨0⍴¨names ⋄ :AndIf ∧/×⊃¨t
+ :Else ⋄ 'Invalid structure for field names'⎕SIGNAL 11 ⋄ :EndIf
+ :If 1=⍴⍴types ⋄ :AndIf ∧/1≥≢¨t←⍴¨types ⋄ :AndIf ∧/(0≡¨⊃¨0⍴¨types)∨types∊0 ⍬ 1∘.⍴0 ' ' ⋄ :AndIf ∧/(⊃¨t)∊¨⊂0 1
+ :Else ⋄ 'Invalid structure for field types'⎕SIGNAL 11 ⋄ :EndIf
+ 'No data columns'⎕SIGNAL 11/⍨0∊¯1↑⍴records
+ :If scalar←1=≢⍴records ⋄ records←(¯2↑1 1,⍴records)⍴records ⋄ :EndIf
+ :If 2≠⍴⍴records ⋄ 'Rank Error (Records)'⎕SIGNAL 4 ⋄ :EndIf
+ :If empty←(0∊≢records)∧×⍴types←⊃¨types ⍝ Set data prototypes if there are no records but column types have been provided
+    ⍝ Create a non-empty data array so columns can be emptied individually later
+     t←types∊20 11 136 72 3 2 16 21 19 18 17 6 131 14 5 4 7 133 134,0 ⍝ Allow 0=num & ''=char for flexible typing
+     records⍪←('' 0)[1+t] ⍝ Add a dummy record to the empty matrix
+ :EndIf
+ 'Length Error (Names)'⎕SIGNAL 5/⍨(⍴names)≠¯1↑⍴records
+
+⍝ Prepare the variable names for use and check proper localization
+ (((∊names)∊'~∧')/∊names)←'∆' ⋄ (((∊names)∊' ')/∊names)←'_' ⍝ Convert to legal variable names
+ ((~(∊names)∊'∆⍙_¯',⎕D,⎕A,819⌶⎕A)/∊names)←'⍙' ⍝ Convert to legal variable names
+ 'Domain Error (Names) - Unable to assign'⎕SIGNAL 11/⍨~∧/(⎕RSI[1].⎕NC↑names)∊0 2
+
+⍝ Data and variables are checked and ready - make the assignments
+ records←empty↓¨↓[1]records ⋄ :If scalar ⋄ records←⊃¨records ⋄ :EndIf ⍝ Select output structure
+ ⎕RSI[1].⍎(⍕names),'←',(⍕⎕THIS),'.records' ⍝ Strand-assign all the names at once!

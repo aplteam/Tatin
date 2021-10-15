@@ -1,0 +1,55 @@
+ sql←{fields}Set values;t;q;n
+⍝∇ Build a SQL "Set" phrase, given field names and new values to assign
+⍝ All field names and new values must be given in a single call
+⍝
+⍝ Syntax (alternate forms):
+⍝   sql ← {fieldnames} Set {newvalues}
+⍝   sql ← Set ({fieldname} {newvalue}) [({fieldname} {newvalue})] ...
+⍝   sql ← Set {fieldnames} ,[1.5] {newvalues}  ⍝ As a two-column matrix
+⍝
+⍝ A new value of ⎕UCS 0 (ASCII NUL character) or ⎕NULL will set the field to a SQL NULL value.
+⍝ A new value of ⎕UCS 127 (ASCII DEL character) will set the field to the SQL DEFAULT value.
+⍝ A doubly-nested (scalar) text value will be taken as a literal formula.
+⍝ A doubly-nested (vector) of text values will be passed to Math for formula expansion.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Modified 30 November 2016 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ q←'''''' ⋄ :If ×⎕NC'Config' ⋄ q←4⊃Config ⋄ :EndIf ⍝ Default quotes
+
+⍝ First analyze alternate argument structures
+ :If 0=⎕NC'fields'               ⍝ -- Monadic use
+     :Select ≢⍴values
+     :CaseList 0 1               ⍝ -- Scalar or Vector
+         :If 1≥|≡⊃values         ⍝ -- A single Name:Value pair
+             fields values←,¨⊂¨values ⋄ fields←,¨fields
+         :Else                   ⍝ -- A nested vector of Name:Value pairs
+             'Rank Error'⎕SIGNAL 4/⍨∨/1≠≢¨⍴¨values
+             'Length Error'⎕SIGNAL 5/⍨∨/2≠≢¨values
+             fields←,,¨1⊃¨values ⋄ values←,2⊃¨values
+         :EndIf
+     :Case 2                     ⍝ -- Matrix
+         'Length Error'⎕SIGNAL 5/⍨2≠¯1↑⍴values
+         fields values←↓[1]values ⋄ fields←,¨fields
+     :Else
+         'Rank Error'⎕SIGNAL 4
+     :EndSelect
+ :Else ⍝ Dyadic use
+     :If 1≥|≡fields ⋄ fields←⊂fields ⋄ values←⊂values ⋄ :EndIf
+     fields←,,¨fields ⋄ values←,values
+     'Length Error'⎕SIGNAL 5/⍨(≢fields)≠≢values
+ :EndIf
+
+⍝ Next check data for proper usage
+ 'Fields Domain error'⎕SIGNAL 11/⍨∨/~0 2∊⍨10|⎕DR¨fields
+ :If ∨/n←6=t←10|⎕DR¨values←(⎕UCS 0)Null values ⋄ n←n\∧/¨∊¨(10|⎕DR¨¨¨1↑¨¨n/values)∊¨¨¨⊂⊂⊂0 2 ⋄ :EndIf
+ 'Data Domain Error'⎕SIGNAL 11/⍨∨/~n∨t∊0 2,1 3 5 7 9
+ 'Data Rank Error'⎕SIGNAL 11/⍨∨/((~n)+t←n∨t∊0 2)<≢¨⍴¨values
+
+⍝ Ok, we're ready to start formatting
+ (t/values)←,¨t/values ⋄ ((~t)/values)←⊃¨(~t)/values ⍝ Coerce ranks
+ :If ∨/t←(2≤|≡¨values)∧1<≢¨values ⋄ (t/values)←⊂¨(,¨⊃¨t/values)Math¨1↓¨t/values ⋄ :EndIf
+ values←((⊂⊂'Null')@{(⎕UCS 0)∊¨⍵})((⊂⊂'Default')@{(⎕UCS 127)∊¨⍵})values
+ :Trap 0 ⋄ values←(⊂q)∆csv¨⊂¨values ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+ sql←' Set ',', '∆sew' = '∆sew('.'Quote fields),[1.5]values

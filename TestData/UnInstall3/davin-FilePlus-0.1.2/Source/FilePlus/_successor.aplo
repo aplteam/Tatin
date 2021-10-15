@@ -1,0 +1,19 @@
+ nextkey←(tn _successor root)key;ptrs;keys;at;path;found
+⍝ Find the successor (or first) key value in a B-tree (⍬ if non-existant)
+
+ :If ∧/0=≢¨key ⍝ Are we looking for the lowest (first) key in the tree?
+     nextkey←2⊃(tn _lowest root)⍬ ⍬ ⍝ We only return the (first) key value itself
+ :Else
+     found←0≠⊃path←(tn _find(-root))key
+     :While ×≢path←1↓path
+         (ptrs keys)←⎕FREAD tn,1 1⊃path ⋄ at←(1 2⊃path)-~found
+         :If at<(≢keys)+found∧≠/≢¨ptrs keys ⋄ :Leave ⋄ :Else ⋄ found←0 ⋄ :EndIf
+     :EndWhile
+     :If 0=≢path
+         nextkey←⍬
+     :ElseIf found∧≠/≢¨ptrs keys
+         nextkey←2⊃(tn _lowest((1+2×at)⊃ptrs))⍬ ⍬ ⍝ Look for the lowest key value in the following sub-tree
+     :Else
+         nextkey←(1+at)⊃keys
+     :EndIf
+ :EndIf

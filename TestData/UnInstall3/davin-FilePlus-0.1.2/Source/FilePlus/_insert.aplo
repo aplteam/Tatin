@@ -1,0 +1,13 @@
+ component(tn _insert path)key;leaf;t
+⍝ Insert a new data component number with its key to the B-tree at the location specified by path
+⍝ Right operand:
+⍝      path must have been pre-defined by _find and path[1] must be 0
+⍝ Left argument:
+⍝      component number where the actual data has already been stored
+⍝ Right argument:
+⍝      key to be inserted into the B-tree at the given path-location
+
+ ⍝ Insert new component # & key value into B-tree leaf node (this must be a leaf node to get here)
+ leaf←⎕fread tn,2 1⊃path ⍝ Get the leaf node to modify with a new entry
+ t←1-⍨2 2⊃path ⋄ leaf←(t↑¨leaf),¨component(⊂key),¨t↓¨leaf ⍝ There will always be room
+ leaf ⎕freplace tn,2 1⊃path ⍝ Put the modified leaf node back

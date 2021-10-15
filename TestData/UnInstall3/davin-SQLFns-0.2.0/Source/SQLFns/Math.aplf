@@ -1,0 +1,82 @@
+ sql←expression Math data;t;⎕PP
+⍝∇ Generate the SQL text to call SQL functions and perform calculations involving field names
+⍝∇ that may need to use the Quote utility on the field names before imbedding them in the formulas,
+⍝∇ but without having to deal with many confusing parentheses, commas, and quotes trying to
+⍝∇ create such expressions in direct code.
+⍝
+⍝ The left argument "expression" is the text of the calculation to be performed (by SQL),
+⍝ except with the character "⎕" used in place of any field name (or other value to be
+⍝ substituted into the expression).  Each "⎕" is replaced with the value from the next item
+⍝ of the right argument.  Be sure to code parentheses ("()") and commas (",") appropriately
+⍝ for any SQL function calls.
+⍝
+⍝ For easier use, when calling Math to format a simple call to a single function and only
+⍝ want the entire argument list to be provided that function call, then the left argument
+⍝ may be shortened to just the name of the function to be called, without any parentheses,
+⍝ commas, or other operations.  The arguments will then be appended to that function name,
+⍝ surrounded by parentheses, to invoke a call to that SQL function.
+⍝
+⍝ The right argument "data" should be one or more values to be provided as substitutions
+⍝ into the expression.  If it is a single value, then a number or a text field name may
+⍝ be passed as an unnested scalar or vector.  Otherwise the right argument should be a
+⍝ (usually nested) vector of values, each of item of which should itself be in one of the
+⍝ following structures:
+⍝   * A single numeric value, to be used as a constant number in the expression.
+⍝   * A simple (unnested) text string, to be used as a SQL field name (processed with Quote).
+⍝   * A singly-nested text string, to be used as a text constant (enclosed in quotes).
+⍝   * A double-nested text string is a pre-formatted string to be inserted exactly as-is.
+⍝ (Since the primary purpose of this utility is to pass a single SQL field name to a single
+⍝ SQL function call, that syntax is designed to be the easiest to use -- see the first example.)
+⍝
+⍝ Since the purpose of this utility will often be to provide its result to companion utilities
+⍝ such as Select, Where, or Is, if any of the special Is function codes are included in
+⍝ the "expression" (left) argument, then they will remain in the output as a convenience aid
+⍝ for passing on to the companion utility.
+⍝
+⍝ Is may also be given special codes and data structures to request that it call Math
+⍝ internally.  (See Is for details.)
+⍝
+⍝ Examples:
+⍝          'RTrim' Math 'field'
+⍝    RTrim(field)
+⍝          'RTrim' Math 'table.field'
+⍝    RTrim("table".field)
+⍝          'RTrim' Math 'funny%field'
+⍝    RTrim("funny%field")
+⍝          'Left' Math 'field' 10
+⍝    Left(field,10)
+⍝          'Left(⎕,⎕)' Math 'field' 10
+⍝    Left(field,10)
+⍝          'Concat' Math 'city' 'state'
+⍝    Concat(city,state)
+⍝          'Concat(⎕,⎕)' Math 'city' 'state'
+⍝    Concat(city,state)
+⍝          'Concat(Concat(⎕,⎕),⎕)' Math 'city' 'state' 'zip'
+⍝    Concat(Concat(city,state),zip)
+⍝          'Concat(Concat(RTrim(⎕),⎕),RTrim(⎕))' Math 'city' 'state' 'zip'
+⍝    Concat(Concat(RTrim(city),state),RTrim(zip))
+⍝          'Left(⎕,Length(⎕)-1)' Math 'field' 'field'
+⍝    Left(field,Length(field)-1)
+⍝
+⍝ Subroutines required: Null, Quote (w/ ∆dlt, ∆uc), ∆sew, ∆Q
+⍝ Written 30 November 2015 by Davin Church of Creative Software Design
+⍝ Modified 11 December 2015 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ :If 1 3 5 7 9∊⍨10|⎕DR data ⋄ data←,¨data ⋄ :EndIf ⍝ Make sure numbers are separated
+ :If 1≥|≡data ⋄ data←⊂,data ⋄ :EndIf ⋄ data←,data ⍝ Nest single text arguments
+
+ :If (×⍴expression)∧∧/expression∊'_',⎕D,⎕A,819⌶⎕A ⍝ They just provided a function name without any syntax
+     expression←expression,'()'∆Q(¯1+2×⍴data)⍴'⎕,' ⍝ Assume they meant to add all these as parameters to a single fn call
+ :EndIf
+ ('Unequal number of parentheses in expression syntax: ',expression)⎕SIGNAL 11/⍨≠/+/'()'∘.=expression
+ ('Mismatched parentheses in expression syntax: ',expression)⎕SIGNAL 11/⍨∨/0>-⌿+\'()'∘.=expression
+ ('The number of ⎕ characters in expression (',(⍕+/'⎕'=expression),' does not match the total length of arguments (',(⍕≢data),')')⎕SIGNAL 1/⍨(≢data)≠+/'⎕'=expression
+
+⍝ Encode values differently based on their data type & depth
+ ⎕PP←15 ⋄ t←⎕DR¨data←((⊂⊂'Null()')@{⍵∊⎕UCS 0})data ⋄ ((6=10|t)/t)←1.1×3⌊|≡¨(6=10|t)/data ⍝ Pre-figure depth of nested items
+ data←({''''∆Q¨⊃¨⍵}@{t∊2.2})data ⍝ Singly-nested values are assumed to be text strings to be treated as constant text data
+ data←({⊃¨⊃¨⍵}@{t∊3.3})data ⍝ Doubly-nested values are assumed to be text strings to be treated as pre-formatted arguments
+ data←({⍕¨⍵}@{(10|t)∊1 3 5 7 9})data ⍝ Simple numeric values are encoded as constant numbers
+ data←({'.'Quote¨⍵}@{(10|t)∊0 2})data ⍝ Simple text values are assumed to be [table.]field names (most common usage)
+ sql←⊃,/1↓,('⎕',⍕¨data),[1.5]1↓¨(+\'⎕'='⎕',expression)⊆'⎕',expression ⍝ Replace all the '⎕'s with massaged data

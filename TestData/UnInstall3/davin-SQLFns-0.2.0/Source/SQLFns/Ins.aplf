@@ -1,0 +1,37 @@
+sql←Ins clauses;table;values;fields
+⍝∇ Generate a SQL Insert command from its component clauses, by calling
+⍝∇ Insert and Values and catenating the results together.
+⍝
+⍝ Provide arguments in this order (the standard order of a SQL Insert statement):
+⍝       {insert-table} {values}
+⍝ {values} should be a simple or nested vector of data items to insert into
+⍝ one record.
+⍝
+⍝ A specific field list, if used, may be specified in either argument using
+⍝ one of the following choices:
+⍝   {insert-table} may be a nested two-item vector containing:
+⍝       {tablename} {fieldnames}
+⍝ or
+⍝   {values} may include both field names and values as a two-column matrix:
+⍝       {fieldnames} ,[1.5] {values}
+⍝
+⍝ Written 17 December 2014 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ 'Length Error'⎕SIGNAL 5/⍨(2≤|≡clauses)∧2≠¯1↑1,⍴clauses
+ table values←clauses ⋄ fields←⍬
+ :If 1<|≡table
+     'Length Error'⎕SIGNAL 5/⍨2≠⍴table
+     table fields←table
+ :ElseIf 2=⍴⍴values
+     'Length Error'⎕SIGNAL 5/⍨2≠1↓⍴values
+     fields values←↓[1]values
+ :ElseIf 2<|≡values
+     'Length Error'⎕SIGNAL 5/⍨∨/2≠≢¨values
+     fields←⊃¨values ⋄ values←2⊃¨values
+ :EndIf
+ 'Rank Error'⎕SIGNAL 4/⍨1≠⍴⍴values
+ :Trap 0
+     :If 0∊⍴fields ⋄ sql←Insert table ⋄ :Else ⋄ sql←fields Insert table ⋄ :EndIf
+     sql,←Values values
+ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap

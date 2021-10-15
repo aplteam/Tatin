@@ -1,0 +1,26 @@
+ was←Configure as;all;p;ask
+⍝∇ Select one of the predefined database configuration options
+
+ all←'C'⎕NL ¯2.1 ⋄ all←{⍵[⍋⍵]}7↓¨((⊂p←'Config∆')≡¨7↑¨all)/all ⍝ All variables beginning with 'Config∆'
+ :If 0∊≢as←' '~⍨∊as
+     was←'Available database configurations are:',∊(⎕UCS 13),¨all
+ :ElseIf (⊂as)∊all
+     :If 2=⎕NC'Config'
+     :AndIf Config≡⍎p,as
+         was←'Database configuration is already set to ',as
+     :ElseIf (⊂Config)∊⍎¨(⊂p),¨all
+         Config←⍎p,as
+         was←'Database configuration has been changed to ',as
+     :Else
+         ask←{⍞←⍵ ⋄ ans←∆dlt,⍞ ⋄ t←(⍴ans)⌊⍴∆dlt ⍵ ⋄ ∆dlt(+/∧\(t↑ans)=t↑∆dlt ⍵)↓ans}
+         :If 'Y'∊∆uc ask'Are you sure you wish to discard your current custom configuration? '
+             Config←⍎p,as
+             was←'Database configuration has been changed to ',as
+         :Else
+             was←'Database configuration has not been changed'
+             :Return
+         :EndIf
+     :EndIf
+ :Else
+     'No such configuration available - see Configure '''''⎕SIGNAL 6
+ :EndIf

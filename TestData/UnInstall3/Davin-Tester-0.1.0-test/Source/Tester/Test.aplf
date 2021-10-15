@@ -1,0 +1,10 @@
+ Errors←{stop}Test fns;∆wl;exp;nl3;⎕IO;⎕ML;IO;ML
+⍝∇ Provide zero or more names of testing fns to execute, in any structure, possibly including "*"s
+
+ IO←⎕IO ⋄ ML←⎕ML ⋄ ⎕IO←⎕ML←1 ⋄ :If 0=⎕NC'stop' ⋄ :If 0=⎕NC'StopOnError' ⋄ stop←1 ⋄ :Else ⋄ stop←StopOnError ⋄ :EndIf ⋄ :EndIf
+ ⎕SHADOW'StopOnError' ⋄ StopOnError←stop ⍝ Provide local override for StopOnError
+ nl3←(⎕NL ¯3)~1↑⎕SI ⋄ nl3←((1 ⎕AT nl3)∧.=0)/nl3 ⍝ Functions (local only) that can be called for testing
+ ∆wl←{⍺←'' ⋄ (('[^ ',(∊{'\x{',(⎕D,⎕A)[1+⍉(8⍴16)⊤⎕UCS ⍵],'}'}¨,⍺),']+')⎕S'&'){1≥|≡⍵:,' ',⍕⍵ ⋄ ⊃,/∇¨(,⍵),⊂''}⍵} ⍝ Word-list decomposer
+ exp←{(('\?'⎕R'.')('\*'⎕R'.*')('\.'⎕R'\\.')'^',⍵,'$')⎕S'&'⊢⍺} ⍝ Expand wild-carded names and restrict with ⎕NL
+ fns←⊃,/(⊂nl3)exp¨' ,;'∆wl fns ⋄ Errors←0 ⋄ ⎕IO←IO ⋄ ⎕ML←ML ⋄ ⍎¨fns ⋄ ⎕IO←⎕ML←1 ⍝ Run each individual test function
+ :If 2=⎕NC'StopOnError' ⋄ :AndIf ¯1∊StopOnError ⋄ :Return ⋄ :EndIf ⋄ Errors←(⍕⍴fns),' tests completed'

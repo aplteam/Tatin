@@ -1,0 +1,37 @@
+ sql←Cmd clauses;fn;dyad;left;right
+⍝∇ Generate any of several SQL commands by providing only a data structure
+
+⍝ If the right argument is unnested, assume it's a finished SQL command and just return it as-is
+⍝ If it's nested, assume it's the right argument to Get (the most common operation) -- UNLESS:
+⍝ if the first simple character = '∇', then we have a special case as follows:
+⍝ The first item of the nested vector is the name of the SQL-formatting function to be called,
+⍝ with a '∇' added as the first character.  This is usually one of:
+⍝       ∇Get, ∇Upd, ∇Ins, ∇Del
+⍝ In such a case, the named subroutine is called and the remainder of the nested vector is
+⍝ passed to it as a right argument.
+⍝ Optionally, a left argument may also be passed to the subroutine.  In this case, start the
+⍝ function name (after the '∇') with the '⍺' character.  This means that the next item in the
+⍝ argument is to be passed as the left argument of the function call and any remainder is to be
+⍝ passed as the right argument.  If more than one '⍺' is prepended, then multiple items are
+⍝ taken from the input and used as the left argument.  (A single item is unnested before it is
+⍝ passed.)  Mostly for future support, a '⍵' suffix character is also allowed to be appended
+⍝ to the end of the function name to indicate that that many items of the input are to be passed
+⍝ as a right argument to the subroutine, in the same way as the left argument items.
+
+⍝ Written 16 December 2014 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 12 October 2019 by Davin Church of Creative Software Design
+
+ :If 1≥|≡sql←clauses ⋄ :Return ⋄ :EndIf ⋄ left←right←⍬
+ :If '∇'∊⊃⊃clauses ⋄ fn←(⊃clauses)~'∇' ⋄ clauses←1↓clauses ⋄ :Else ⋄ fn←'Get' ⋄ :EndIf
+ :If dyad←'⍺'∊fn
+     left←(+/fn∊'⍺')↑clauses ⋄ clauses←(⍴left)↓clauses
+     :If 1=⍴left ⋄ left←⊃left ⋄ :EndIf ⋄ fn~←'⍺'
+ :EndIf
+ right←clauses ⍝ Anything remaining is assumed to be the function's right argument
+ :If '⍵'∊fn
+     right←(+/fn∊'⍵')↑clauses ⋄ clauses←(⍴right)↓clauses
+     :If 1=⍴right ⋄ right←⊃right ⋄ :EndIf ⋄ fn~←'⍵'
+ :EndIf
+⍝ Now call the subroutine they requested (assuming there's no local-variable shadowing)
+ :Trap 0 ⋄ sql←⍎(dyad/'left '),fn,' right' ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+⍝? Allow for an '⍎' option to run arbitrary code??

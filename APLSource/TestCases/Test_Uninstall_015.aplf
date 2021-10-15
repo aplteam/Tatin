@@ -1,26 +1,18 @@
- r←Test_Uninstall_015(stopFlag batchFlag);⎕TRAP;dir;res;msg;list;qdmx
-⍝ Try to uninstall when the dependency file is empty (bad data).
+ r←Test_Uninstall_015(stopFlag batchFlag);⎕TRAP;dir;msg;list;expected
+⍝ Start with three packages, one of them in two versions, then un-install the single one
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  dir←GetTempDir''
- res←⎕SE.Tatin.InstallPackage'./TestData/ExamplePackages/Packages/aplteam-MultipleObjectsNoAPI-0.1.0.zip'dir
- Assert'aplteam-MultipleObjectsNoAPI-0.1.0'≡res
- res←⎕SE.Tatin.InstallPackage'./TestData/ExamplePackages/Packages/aplteam-SingleClassWithAPI-0.1.0.zip'dir
- Assert'aplteam-SingleClassWithAPI-0.1.0'≡res
- (⊂'')F.NPUT(dir,'/apl-dependencies.txt')1
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/UnInstall2/*'
 
- :Trap 98
-     {}TC.UnInstallPackage dir'P@aplteam-APLProcess-1.0.0'
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'apl-dependencies.txt is empty'≢qdmx.EM
- :EndTrap
+ (list msg)←TC.UnInstallPackage dir'P@'
+ Assert 0=≢msg
+ expected←'P@aplteam-APLProcess-1.0.0' 'aplteam-APLTreeUtils-6.0.0'
+ →T.GoToTidyUp expected≢list
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

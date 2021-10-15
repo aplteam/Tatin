@@ -1,0 +1,22 @@
+ r←Test_UserCommands_066(stopFlag batchFlag);⎕TRAP;dir;rc;msg;list;expected
+⍝ Exercise ]Tatin.UnInstallPackage with a package ID as argument
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/UnInstall2/*'
+
+ (rc msg list)←∆UCMD'UnInstallPackage "',dir,'" P@aplteam-APLProcess-1.0.0'
+ Assert 0=rc
+ Assert 0=≢msg
+
+ expected←'P@aplteam-APLProcess-1.0.0' 'aplteam-APLTreeUtils-6.0.0'
+ →T.GoToTidyUp expected≢list
+ →T.GoToTidyUp 1≠≢F.ListDirs dir
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

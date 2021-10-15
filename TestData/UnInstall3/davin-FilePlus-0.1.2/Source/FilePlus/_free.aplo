@@ -1,0 +1,10 @@
+ (tn _free)components;at;cn
+⍝ Mark listed component numbers as unused and reusable
+
+ :If 0=≢components←∪components ⋄ :Return ⋄ :EndIf ⍝ Nothing to be freed
+ :If 0≠⊃at←(tn _find 1)⎕UCS 127 ⍝ Do we already have a free-space component in the master directory?
+     (components∪⎕FREAD tn,⊃at)⎕FREPLACE tn,⊃at ⍝ Just in-place update the list we've already got
+ :Else
+     cn←,tn _append,components ⍝ Create the new free-list component
+     cn(tn _insert at)⎕UCS 127 ⍝ Add it to our master directory
+ :EndIf

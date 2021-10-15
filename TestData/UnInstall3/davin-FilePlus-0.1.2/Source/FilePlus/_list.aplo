@@ -1,0 +1,30 @@
+ list←{depth}(tn _list root)search;ptrs;keys;this;match
+⍝ Get a list of all the key values (2⊃{list}) and their ultimate data pointers (1⊃{list}) in the B-tree starting at {root}
+⍝ When (×≢search)∧depth≠0, pre-limit results to those keys containing that search value as a substring (1∊⍷) or prefix (⊃⍷).
+⍝ If depth=1, search within entire key value; if depth=2, search for multiple (nested) keys at once in matching dimensions.
+⍝ If depth∊¯1 ¯2, search for (1-or-2-type) values as prefixes instead of contents.
+
+ :If 0=⎕NC'depth' ⋄ depth←0 ⋄ :EndIf ⍝ Default search depth to not search at all
+ match←1⍨ ⍝ Typically just return everything (always matches) in list (when not searching)
+ :Select depth                                                  ⍝ See if they want to restrict the results
+ :Case 1 ⋄ :If ×≢search ⋄ match←search{1∊⍺⍺⍷⍵} ⋄ :EndIf         ⍝ Whole value contains ⍵
+ :Case 2 ⋄ :If ×≢search ⋄ match←search{∧/1∊¨⍺⍺⍷¨,¨⍵} ⋄ :EndIf   ⍝ Each item (⍴ must match) contains each ⍵
+ :Case ¯1 ⋄ :If ×≢search ⋄ match←search{⊃⍺⍺⍷⍵} ⋄ :EndIf         ⍝ Whole value begins with ⍵
+ :Case ¯2 ⋄ :If ×≢search ⋄ match←search{∧/⊃¨⍺⍺⍷¨,¨⍵} ⋄ :EndIf   ⍝ Each item (⍴ must match) begins with each ⍵
+ :EndSelect
+ ⍝ Prefix-searching might be improved by using TAO knowledge to check only a range of keys in certain circumstances,
+ ⍝ but it probably won't be worth the effort for such uncommon situations.
+
+ :If =/≢¨(ptrs keys)←⎕FREAD tn,root ⍝ This is a leaf node - just return the keys & pointers
+     list←(⊂match¨keys)/¨ptrs keys ⍝ Return all matching items of leaf node
+ :Else ⍝ A branch node contains mixed keys and subtrees in interleaved order
+     list←2⍴⊂⍬ ⍝ Accumulate entire tree (from here)
+     :While ×≢ptrs ⍝ Loop through limbs one at a time
+         list,¨←depth(tn _list(⊃ptrs))search ⋄ ptrs↓⍨←1 ⍝ Recurse down through the tree at each limb
+         :If ×≢keys ⍝ If there are still leaf values remaining
+         :AndIf match⊃keys ⍝ And this one matches
+             list,¨←1↑¨ptrs keys ⍝ Append next (matching) search value
+         :EndIf
+         (ptrs keys)↓⍨←1 ⍝ Until there aren't any more left
+     :EndWhile
+ :EndIf

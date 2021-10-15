@@ -1,0 +1,87 @@
+ free←(tn _rebalance)path;ptrs;keys;bmax;bmin;limbs;limb1;limb2;st;branch;leaf;pptrs;pkeys;sibling;sib;sibat;lptr;at
+⍝ Rebalance the nodes in this reverse-path through the tree and return any new component numbers that need to be freed
+⍝ {path} is the complete reverse-path (component #s only) through the B-tree starting with the deficient node
+
+ bmax←4⌈⌊|⊃∊TreeSize ⋄ bmin←¯1+⌈bmax÷2 ⍝ Adjustable B-tree size
+ path,⍨←0 ⋄ free←⍬ ⍝ The bottom-up ancestor-path through which we need to balance nodes
+ :While 2≤≢path←1↓path ⍝ Rebalance up to but not including the tree root
+     (ptrs keys)←⎕FREAD tn,path[1] ⍝ Start with the node that needs rebalancing
+     :If bmin≤≢keys ⋄ :Leave ⋄ :EndIf ⍝ This node already has sufficient keys - why did we get here?
+     (pptrs pkeys)←⎕FREAD tn,path[2] ⍝ We need to rotate through the parent node
+     at←pptrs⍳path[1] ⍝ Where does the parent point to us?
+     :While bmin>≢keys ⍝ Loop in case we're deficient by more than one key
+         ⍝ It's feasible to rotate more than one key at a time, but this would be advantageous only when keys are
+         ⍝ added or deleted generally in order, which isn't necessarily likely to be the case.
+         :If (at+2)≤≢pptrs ⍝ Check right sibling (if any) for sufficiency
+         :AndIf bmin<≢2⊃sibling←⎕FREAD tn,sib←pptrs[sibat←at+2] ⍝ Does it have enough?
+             leaf←=/≢¨ptrs keys ⍝ Is it a leaf?
+             ⍝ Rotate successor key/pointer down from parent node
+             ptrs,←pptrs[at+1] ⋄ keys,←pkeys[2÷⍨at+1]
+             :If ~leaf ⍝ We're working with branch nodes - handle an extra subtree pointer
+                ⍝ Rotate first subtree pointer from beginning of right sibling to me
+                 ptrs,←1↑1⊃sibling ⋄ (1⊃sibling)↓⍨←1
+             :EndIf
+             ⍝ Rotate right sibling's first key/pointer up into parent node
+             pptrs[at+1]←⊣/1⊃sibling ⋄ pkeys[2÷⍨at+1]←⊣/2⊃sibling
+             sibling↓¨⍨←1 ⍝ Remove first key/pointer from right sibling
+
+         :ElseIf (at-2)≥1 ⍝ Check left sibling (if any) for sufficiency
+         :AndIf bmin<≢2⊃sibling←⎕FREAD tn,sib←pptrs[sibat←at-2] ⍝ Does it have enough?
+             leaf←=/≢¨ptrs keys ⍝ Is it a leaf?
+             ⍝ Rotate predecessor key/pointer down from parent node
+             ptrs,⍨←pptrs[at-1] ⋄ keys,⍨←pkeys[2÷⍨at-1]
+             :If ~leaf ⍝ We're working with branch nodes - handle an extra subtree pointer
+                ⍝ Rotate last subtree pointer from end of left sibling to me
+                 ptrs,⍨←⊢/1⊃sibling ⋄ (1⊃sibling)↓⍨←¯1
+             :EndIf
+             ⍝ Rotate left sibling's last key/pointer up into parent node
+             pptrs[at-1]←⊢/1⊃sibling ⋄ pkeys[2÷⍨at-1]←⊢/2⊃sibling
+             sibling↓¨⍨←¯1 ⍝ Remove last key/pointer from left sibling
+
+         :Else ⍝ Rotation not available - must merge a sibling
+             :If (at-2)≥1 ⍝ Might as well merge the left one, since we have it in hand
+                 keys,⍨←pkeys[2÷⍨at-1] ⍝ Prefix my keys with the left separator from parent
+                 pkeys/⍨←(⍳≢pkeys)≠2÷⍨at-1 ⍝ ... and remove it from parent
+                 ptrs,⍨←pptrs[at-1] ⍝ Prefix pointers with parent key pointer
+                 pptrs/⍨←~(⍳≢pptrs)∊at-1 2 ⋄ at←at-2 ⍝ ... and remove left sibling & separator pointers from parent
+                 (ptrs keys),⍨←sibling ⍝ Merge left sibling to mine
+             :ElseIf (at+2)≤≢pptrs ⍝ Ok, then we have to merge the right one instead (it's still in hand here)
+                 keys,←pkeys[2÷⍨at+1] ⍝ Suffix my keys with the right separator from parent
+                 pkeys/⍨←(⍳≢pkeys)≠2÷⍨at+1 ⍝ ... and remove it from parent
+                 ptrs,←pptrs[at+1] ⍝ Suffix pointers with parent key pointer
+                 pptrs/⍨←~(⍳≢pptrs)∊at+1 2 ⍝ ... and remove right sibling & separator pointers from parent
+                 (ptrs keys),←sibling ⍝ Merge right sibling to mine
+             :Else
+                 'No sibling available for merging'⎕SIGNAL 23
+             :EndIf
+             free∪←sib ⍝ Mark sibling component to be discarded later
+         :EndIf
+
+         :If ~sib∊free ⍝ If there's anything to update in the sibling
+             free∪←sib ⍝ Mark the original component # to be discarded later anyway
+             sib←tn _append sibling ⍝ Add the new version as a substitute
+             pptrs[sibat]←sib ⍝ Tell parent to point to the revised copy instead
+         :EndIf
+     :EndWhile
+
+     :If ~(1⊃path)∊free ⍝ Only update the primary node if we're not deleting (due to merging) it
+         lptr←tn _append ptrs keys ⍝ Add the new version as a substitute
+         pptrs[at]←lptr ⍝ Tell parent to point to the revised copy instead
+         free∪←1⊃path ⍝ Mark original to be discarded later (since it wasn't already)
+         (1⊃path)←lptr ⍝ Make a note that we're routing to the new #, too
+     :EndIf
+     pptrs pkeys ⎕FREPLACE tn,2⊃path ⍝ And the parent has changed as well
+
+    ⍝ Finally, check to see if the root has gone away and replace it with sole child if so
+     :If (2≥≢path)∧(0=≢pkeys)∧1=≢pptrs ⍝ Have we collapsed the root to nothing at all?
+     :AndIf pptrs≡1↑path ⍝ (And a safety check to make sure it's really us)
+        ⍝ Remove it from the tree by replacing it with my merged node (happens infrequently)
+         free∪←1⊃path ⍝ Discard only child (that got moved to root)
+         ((pptrs pkeys)←ptrs keys)⎕FREPLACE tn,2⊃path ⋄ (ptrs keys)←bmin⍴¨0 0
+     :EndIf
+ :Until bmin≤≢pkeys ⍝ The parent node now has sufficient keys - all done
+
+ :If 1=≢path ⍝ Are we at the root?
+ :AndIf ∧/0=≢¨⎕FREAD tn,path ⍝ and is it empty?
+     ⍬(0⍴⊂⍬)⎕FREPLACE tn,path ⍝ The whole tree is now entirely empty - force the prototype key to ⍬
+ :EndIf

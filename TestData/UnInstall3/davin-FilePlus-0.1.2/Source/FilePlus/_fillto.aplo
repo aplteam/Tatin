@@ -1,0 +1,7 @@
+ (tn _fillto)comp;tn;at;reserved;size
+⍝ Prepare the file for appending to a specific component number (beyond the end of the existing file)
+
+ :If comp≤size←2⊃⎕FSIZE tn ⋄ :Return ⋄ :EndIf ⍝ It doesn't need any filling
+ reserved←⍬ ⋄ :If 0≠at←⊃(tn _find ¯1)⎕UCS 0 ⋄ reserved←⎕FREAD tn,at ⋄ :EndIf ⍝ Need to skip over any reservations?
+ ⍝ Now let's fill the file up to that point so they can append their data and mark the unused ones as free
+ tn _free reserved~⍨((comp-size)⍴⊂'')⎕FAPPEND¨tn

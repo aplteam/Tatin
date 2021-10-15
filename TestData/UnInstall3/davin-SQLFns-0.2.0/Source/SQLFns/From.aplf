@@ -1,0 +1,315 @@
+ sql←{default}From tables;joins;aliases;join;symbols;t;j;table;tbls;on;included;alias;joinnames;n;name;s;nested;j1;j2;before;query;maintenance;fields;x;tmatch;fmatch;jointype;sfd;deletion;jj;parsing;tp;extra
+⍝∇ Generate a SQL "From" clause by providing shorthand notation for easier
+⍝∇ writing and reading of code (particularly when it's complex).
+⍝
+⍝   {fromclause} ← From {join1} [join2] [join3] ...
+⍝
+⍝ The {join} arguments each specify one table connection to another table.
+⍝ Multiple {join} arguments may be required to join more than two tables together.
+⍝ They are given as a nested list of character vectors, each in one of
+⍝   several possible formats (see examples below).
+⍝ Table names in the examples below are shown as letters (e.g. A, B, C...) instead of real table names.
+⍝ Field names in the examples below are shown as digits (e.g. 1, 2, 3...) intead of real field names.
+⍝   A               Specifies an unjoined table name (or implies a separate implicit join)
+⍝   A=B             Natural Join table A to table B
+⍝   A(1)→B(2)       Inner Join table A to B On A.1=B.2
+⍝   X←A∘B           Cross Join tables A & B, but giving A an alias name of X
+⍝   A(1)<Y←B(2)     A Right Outer Join from A to B, but B gets an alias
+⍝   X←A(1)>Y←A(2)   A Left Outer self-join from A to itself, using X & Y as aliases
+⍝   A(1,2)→B(3,4)   A two-field Inner Join On A.1=B.3 And A.2=B.4
+⍝   A→B             Join A to B using previously defined join criteria
+⍝   A()→B()         Join A to B ignoring any previously defined join criteria
+⍝
+⍝ The APL assignment arrow ("←") is used to specify aliases for any table name, as in:
+⍝   X←A (X will be used as an alias for real table name A)
+⍝   When using aliases, either:
+⍝   (1) Use the entire alias specification for every occurance of that table name
+⍝       reference (e.g. X←A everywhere), or
+⍝   (2) Use the alias specification for one occurance of the table name and then
+⍝       use the alias name alone for the other references to that table.
+⍝   Use of the real table name a second time (alone or with a different alias)
+⍝   will cause a second copy of the table to be joined into the view.
+⍝   For example:  'X←A→B' 'X→C' and 'X←A→B' 'X←A→C' both use the same copy of "A",
+⍝           but   'X←A→B' 'A→C' and 'A→B'   'X←A→C' both join in two copies of "A".
+⍝
+⍝ The symbols that are used to separate the table names specify the type
+⍝   of join to be performed:
+⍝   → Inner Join                (a very common type of join)
+⍝   > Left Outer Join           (a common type of join)
+⍝   < Right Outer Join
+⍝   ≠ Full Outer Join
+⍝   ∘ Cross (Cartesian product) Join
+⍝   = Natural Join
+⍝ For all joins except the Cross Join and the Natural Join, corresponding
+⍝   pairs of fields to use for the join are required.
+⍝ These should be specified in parentheses, after the table name where they
+⍝   are found, and multiple field names are separated by commas.
+⍝ Always specify the join-from table on the left and the join-to table
+⍝   on the right -- join symmetry is not supported by this function.
+⍝ Joining fields may be globally defaulted for particular table pairs by using
+⍝   an auto-defaulting mechanism built into this function (see below).  This
+⍝   will enable field-less join specifications for many uses of From.
+⍝
+⍝ A pair of table names listed in this fashion may be augmented by including
+⍝ additional custom criteria.  This allows join conditions besides just one-for-one
+⍝ field name matching.  To specify this, replace the character vector listing the
+⍝ tables (as above) with a nested vector, the first item of which is the replaced
+⍝ vector.  Any additional items in this nested vector are additional join terms,
+⍝ each of which can be specified in any structure suitable for use by Where.
+⍝ In the rare case when ONLY custom criteria is to be used, specify no field names
+⍝ between the parentheses.  If there is a need to specify such a custom-only join
+⍝ criteria alongside other normal field-based joins, then use field names beginning
+⍝ with "⍝" to allow the special joins to be distinguished from the normal ones by
+⍝ using these "commented" names.  The commented names will be used only for this
+⍝ disambiguation and will not be returned as part of the actual join conditions.
+⍝ For example:
+⍝   From ⊂'A(1)→B(2)' ('A.3' Is 'Admin')
+⍝   From ⊂'A(⍝1)→B(⍝2)' ('⍎A.1+A.2' Is '⍎B.1+B.2')
+⍝
+⍝ "Chained" joins may also be specified (when using defaults) by including
+⍝ multiple table names in a single string, separated by appropriate join symbols.
+⍝ For example, A→B→C→D joins four tables together using their default criteria.
+⍝
+⍝ *** To define defaults, call From with a left argument, as in:
+⍝   '+' Add new join default(s) to the global table
+⍝   '←' Empty the global table, and also add joins to the table (if any are given)
+⍝   '-' Remove existing join default(s) from the global table
+⍝   '?' Display (some) join default(s) in the global table
+⍝ The right argument is the same as described above
+⍝   (although some combinations won't make much sense to use).
+⍝ If the left argument is '?', the right argument may contain table names, and
+⍝   only default-join information that involves those table(s) will be returned.
+⍝   If no table names are provided, then the entire default list is returned.
+⍝
+⍝ *** For utility use, to parse and return table and field names, call From with a left argument of '⊂'.
+⍝ The returned structure is a nested matrix with one row per provided table name, as follows:
+⍝   [;1] From table name
+⍝   [;2] Join type (a single character; ' ' for an unjoined table)
+⍝   [;3] To table name (or '' for an unjoined table)
+⍝   [;4] Nested matrix of field names used for this join, one row per join criteria (field-pair):
+⍝        [;1] From field name
+⍝        [;2] '=' (or '⍵' for custom where-clause joining)
+⍝        [;3] To field name
+⍝
+⍝ Subroutines required: And, Quote, Where, ∆Q, ∆cut, ∆cuts, ∆dlt, ∆sew, ∆uc, and their subroutines.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Last modified 22 August 2018 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 12 October 2019 by Davin Church of Creative Software Design
+
+ :If query←deletion←parsing←maintenance←×⎕NC'default'
+     query deletion parsing←(⊂⊂default)∊¨(⊂⍬ 1)⍴¨¨'?←⊂'
+ :EndIf
+ :If 1≥|≡tables ⋄ :If 2=⍴⍴tables ⋄ tables←↓tables ⋄ :Else ⋄ tables←⊂tables ⋄ :EndIf ⋄ :EndIf
+ tables←(∆dlt¨,,¨tables)~⊂''
+
+ joins←0 4⍴0 ⋄ aliases←0 2⍴0 ⋄ symbols←'→><≠∘='
+ joinnames←'Inner Join' 'Left Outer Join' 'Right Outer Join'
+ joinnames←joinnames,'Full Outer Join' 'Cross Join' 'Natural Join'
+
+ :For join :In tables
+     extra←⍬ ⍝ Allow extra Where criteria to be included for non-standard joins
+     :If 1<|≡join ⋄ extra←1↓join ⋄ join←⊃join ⋄ :EndIf ⍝ Store for later use
+     :If ∨/symbols∊join
+         :While ∨/t←join∊symbols
+             j←(¯1+(+\t)⍳2)↑join ⋄ join←(t⍳1)↓join ⋄ jointype←⊃(j∊symbols)/j
+             :If ∨/0∊¨⍴¨tbls←∆dlt¨jointype ∆cuts j ⋄ 'Missing table name'⎕SIGNAL 11 ⋄ :EndIf
+             :For t :In (tp←∨/¨(⊂'()')∊¨tbls)/⍳⍴tbls ⍝ Validate () syntax
+                 :If ~∧/1=+/t←'()'∘.=j←∆dlt t⊃tbls ⋄ :OrIf ∨/0>-⌿+\t ⋄ :OrIf ')'≠¯1↑j
+                     ('Invalid parentheses in table specification: ',j)⎕SIGNAL 11
+                 :EndIf
+             :EndFor
+             tbls←∆dlt¨¨2↑¨(⊂'()')∆cuts¨tbls
+             alias←2⍴¨∆dlt¨¨'←'∆cut¨⊃¨tbls
+             :If ×≢t←⊃(((∆uc alias)⍳∆uc alias)=⍳⍴alias)/alias
+             :AndIf ×≢t←(≢/∆uc t)⌿t
+             :AndIf ×≢t←(~∨⌿(∆uc aliases⍪⊂'')∧.≡⍉∆uc t)⌿t
+                 :If ∨/t[;1]∊aliases[;1] ⋄ 'Multiple uses of the same alias'⎕SIGNAL 11 ⋄ :EndIf
+                 aliases⍪←t
+             :EndIf
+             on←∆dlt¨¨','∆cut¨∆dlt¨2⊃¨tbls
+             :If ∨/~tp                       ⍝ If field name lists were not provided...
+             :AndIf jointype∊¯2↓symbols      ⍝ ...and it requires field names.
+                 :If ~query ⍝ Queries can be on tables only.
+                     :If 0=⎕NC'From_Defaults'
+                     :OrIf 0∊⍴sfd←From_Defaults
+                     :OrIf 0∊⍴sfd←(((∆uc sfd[;1])∊⊂∆uc 1 2⊃alias)∧(∆uc sfd[;3])∊⊂∆uc 2 2⊃alias)⌿sfd
+                     :OrIf 0∊⍴sfd←(((~tp[1])∧0∊⍴1⊃on)∨∧/¨(∆uc('⍵'≠2⌷[2]¨sfd[;4])/¨(1⌷[2]¨sfd[;4])~¨¨'⍝')∊⊂∆uc(1⊃on)~¨'⍝')⌿sfd ⍝ Left Disambiguation
+                     :OrIf 0∊⍴sfd←(((~tp[2])∧0∊⍴2⊃on)∨∧/¨(∆uc('⍵'≠2⌷[2]¨sfd[;4])/¨(3⌷[2]¨sfd[;4])~¨¨'⍝')∊⊂∆uc(2⊃on)~¨'⍝')⌿sfd ⍝ And right disambiguation
+                         'No default join found'⎕SIGNAL 11
+                     :ElseIf 1<≢sfd
+                         'Ambiguous join conditions found'⎕SIGNAL 11
+                     :EndIf
+                     :If 0∊⍴on←⊃sfd[1;4] ⋄ 'Default join is missing field names'⎕SIGNAL 11 ⋄ :EndIf
+                 :EndIf
+             :ElseIf ∨/tp                    ⍝ If any field name lists are present...
+             :AndIf jointype∊¯2↑symbols      ⍝ ...and it requires that field names be absent.
+                 ('Field indexes not permitted for ',(symbols⍳jointype)⊃joinnames)⎕SIGNAL 11
+             :EndIf
+             :If 2≠⍴⍴on ⍝ "on" is already a matrix if we read it out of the global
+                 :If ≠/≢¨on ⋄ 'Field count mismatch'⎕SIGNAL 11 ⋄ :EndIf
+                 on←(1⊃on),'=',[1.5]2⊃on
+             :EndIf
+             :If ×⍴extra
+                 ⍝ Fail if any extra criteria are not suitable for use by Where
+                 :Trap 0 ⋄ {}Where¨extra ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+                 on⍪←(⊂''),'⍵',[1.5]extra ⍝ Add directly to join terms as-is
+                 :If ∨/symbols∊join ⍝ Are there any more (chained) joins in this term?
+                     'Custom join criteria not allowed on chained joins'⎕SIGNAL 11
+                 :EndIf
+             :EndIf
+             :If (0∊⍴on)∧jointype∊¯2↓symbols
+                 'No required join criteria specified'⎕SIGNAL 11
+             :EndIf
+             joins⍪←(∆dlt⊃1⊃alias)jointype(∆dlt⊃2⊃alias)on
+         :EndWhile
+     :Else
+         :If query
+            ⍝ Do something special for the querying process.
+             table fields←∆dlt¨2↑'()'∆cut join ⋄ table←⊃⌽'←'∆cut table ⍝ Ignore aliases.
+             x←⍪∆dlt¨','∆cut fields ⋄ x←x,((≢x),2)⍴⊂''
+             joins⍪←table',' ''x
+         :ElseIf maintenance∧~parsing
+             'Invalid structure for defaulting'⎕SIGNAL 11
+         :Else
+             :If ∨/'(,)'∊join ⋄ 'Invalid argument'⎕SIGNAL 11 ⋄ :EndIf
+            ⍝ Append a single line for an independent table
+             :If ≢/alias←2⍴∆dlt¨'←'∆cut join
+             :AndIf ~∨/(aliases⍪⊂'')∧.≡alias
+                 :If alias[1]∊aliases[;1] ⋄ 'Multiple uses of the same alias'⎕SIGNAL 11 ⋄ :EndIf
+                 aliases⍪←alias
+             :EndIf
+             joins⍪←(∆dlt⊃alias)',' ''(0 3⍴⊂'')
+         :EndIf
+     :EndIf
+ :EndFor
+
+ :If (~query∨deletion)∧0∊⍴joins ⋄ 'No From information provided'⎕SIGNAL 11 ⋄ :EndIf
+ t←' '=⊃0⍴⊂∊x←↓joins ⋄ (t/∊x)←∆uc t/∊x ⋄ 'Duplicate join conditions'⎕SIGNAL 11/⍨∨/(x⍳x)≠⍳⍴x
+ t←joins[;2]=',' ⋄ 'Multiple references to the same table'⎕SIGNAL 11/⍨∨/(↑⌊/(↓[1]∆uc joins[;1 3])⍳¨⊂∆uc t/joins[;1])<t/⍳≢joins
+
+⍝ Internal notes:
+⍝ The "joins" variable:
+⍝ Each row is 1 item of the join
+⍝   [;1]  From Table (vector of table names)
+⍝   [;2]  Join Type (if this is a comma, then all we have is a table name in column 3)
+⍝   [;3]  To Table (vector of table names)
+⍝   [;4]  "On" clause:  a 3-column matrix of:
+⍝           [;1]  From Field (corresponds to From table)
+⍝           [;2]  Comparison operator (usually '='; '⍵' if extra criteria)
+⍝           [;3]  To Field (corresponds to To table)
+
+⍝ Order-of-precedence examples:
+⍝   Case 1:  A→B                     A→B
+⍝   Case 2:  A→B;B→C                (A→B)→C
+⍝   Case 3:  A→C;B→A                (B→A)→C
+⍝   Case 4:  A→B;B→C;C→D;B→D;A→D   ((A→B)→C)→D
+
+ :If maintenance
+    ⍝ They're asking to modify/query the global default join schema,
+    ⍝ rather than to produce a SQL From clause.
+    ⍝ No aliases allowed; we just can't handle the alias.
+     :If deletion∨0=⎕NC'From_Defaults' ⋄ From_Defaults←0 4⍴⊂'' ⋄ :EndIf
+    ⍝ Convert alias names back to original table names for maintenance purposes
+     t←aliases⍪2/⍪,joins[;1 3] ⋄ joins[;1 3]←t[t[;1]⍳joins[;1 3];2]
+     :Select default
+     :CaseList ⍬ 1∘.⍴'+←' ⍝ Add these joins to the default table
+         From_Defaults←((~(↓∆uc From_Defaults[;1 3 4])∊↓∆uc joins[;1 3 4])⌿From_Defaults)⍪joins
+     :CaseList ⍬ 1⍴¨'-'   ⍝ Remove these joins from the default table (must match exactly)
+         From_Defaults←(~(↓∆uc From_Defaults[;1 3 4])∊↓∆uc joins[;1 3 4])⌿From_Defaults
+     :CaseList ⍬ 1⍴¨'?'   ⍝ Format & return all or part of the default table
+        ⍝ Limit results based on what they asked for
+         :If (×≢joins←∆uc joins)∧×≢jj←∆uc j←From_Defaults
+             joins[;4]~¨←'⍝' ⋄ jj[;4]~¨←'⍝' ⍝ Allow commented fields to be matched
+             tmatch←joins[;1]∘.≡jj[;1]
+             tmatch∨←t←(joins[;1]∘.≡jj[;3])∧[1]joins[;2]=','
+             tmatch∧←(joins[;3]∘.≡jj[;3])∨[1]joins[;2]=','
+             fmatch←(~t)∧∧/¨(1⌷[2]¨joins[;4])∘.∊1⌷[2]¨jj[;4]
+             fmatch∨←t∧(∧/¨(1⌷[2]¨joins[;4])∘.∊3⌷[2]¨jj[;4])∧[1]joins[;2]=','
+             fmatch∧←(∧/¨(3⌷[2]¨joins[;4])∘.∊3⌷[2]¨jj[;4])∨[1]joins[;2]=','
+             j←(∨⌿tmatch∧fmatch)⌿j
+         :EndIf
+        ⍝ Format the joins back the way they gave 'em to us
+         :If ×≢j
+             t←'⍵'=2⌷[2]¨j[;4] ⋄ j1←(~t)⌿¨j[;4] ⋄ j2←t⌿¨j[;4]
+             j,←','∆sew¨1⌷[2]¨j1 ⋄ j,←','∆sew¨3⌷[2]¨j1
+             j[;1]←j[;1],¨(×≢¨j[;5])/¨'()'∆Q j[;5]
+             j[;3]←j[;3],¨(×≢¨j[;6])/¨'()'∆Q j[;6]
+             sql←j[;1],¨(','≠j[;2])/¨j[;2],¨j[;3]
+             :If ∨/t←×≢¨j2 ⋄ (t/sql)←(⊂¨t/sql),¨3⌷[2]¨t/j2 ⋄ :EndIf
+         :Else
+             sql←0⍴⊂''
+         :EndIf
+     :CaseList ⍬ 1⍴¨'⊂'   ⍝ Return parsed join-list, in internal format (almost)
+         sql←joins ⍝ We mostly give it to them back like this
+         ((sql[;2]=',')/sql[;2])←' ' ⍝ Convert ',' to more readable ' ' for them
+     :Else
+         'Invalid default-editing command code'⎕SIGNAL 11
+     :EndSelect
+     :Return ⍝ Just doing defaults management, so not returning a SQL command
+ :EndIf
+
+ sql←0⍴⊂'' ⍝ Where-terms for the final SQL command
+ :While ×≢joins
+     j←<\~joins[;1]∊joins[;3] ⍝ Pick a table name to start with
+     'Recursive join sequence'⎕SIGNAL 11/⍨~∨/j
+     n←'.'Quote name←⊃j/joins[;1] ⋄ included←,⊂name
+     :If (⊂name)∊aliases[;1] ⍝ Provide alias name
+         n←('.'Quote⊃aliases[aliases[;1]⍳⊂name;2]),' As ',n
+         aliases←(~aliases[;1]∊⊂name)⌿aliases ⍝? May not be needed for algorithm?
+     :EndIf
+     :If ','=⊃j/joins[;2] ⋄ joins←(~j)⌿joins ⋄ :EndIf
+     s←n ⋄ nested←0 ⍝ Start the Join term with a table name
+     :While ~∧/1,joins[;2]=',' ⍝ Stop looping if no more explicitly-joined tables exist
+         j1←(','≠joins[;2])∧(∆uc joins[;3])∊∆uc included ⍝ Antecedents satisfied?
+         j1∧←(~joins[;1]∘.≡joins[;1])∧.∨(∆uc joins[;3])∊∆uc included
+         j2←(','≠joins[;2])∧(∆uc joins[;1])∊∆uc included ⍝ Precedents satisfied?
+         j2∧←(~joins[;3]∘.≡joins[;3])∧.∨(∆uc joins[;1])∊∆uc included
+         j←<\j1∨j2 ⍝ Preferential order is the order they were given to us
+         :If ~∨/j ⋄ :Leave ⋄ :EndIf ⍝ No more can be included in this term
+         before←∨/j∧j1 ⍝ Antecedents were satisfied first?
+        ⍝? Not if sure antecedent precedence is possible any more??
+         jointype←(symbols⍳⊃j/joins[;2])⊃joinnames
+         n←'.'Quote name←⊃j/joins[;3]
+         'Table re-used'⎕SIGNAL 11/⍨(⊂∆uc name)∊∆uc included ⍝ (Debugging)
+         included,←⊂name
+         :If (⊂name)∊aliases[;1] ⍝ Provide alias name
+             n←('.'Quote⊃aliases[aliases[;1]⍳⊂name;2]),' As ',n
+             aliases←(~aliases[;1]∊⊂name)⌿aliases ⍝? May not be needed for algorithm?
+         :EndIf
+         s←((nested>0)/'()')∆Q s ⋄ nested←nested+1 ⍝ Use parens with >2 tables
+         :If before ⋄ s,⍨←n,' ',jointype,' ' ⍝ Antecedents satisfied first
+         :Else ⋄ s,←' ',jointype,' ',n ⍝ Precendents satisfied first
+         :EndIf
+         :If (⊂jointype)∊¯2↓joinnames ⍝ Do we need an 'On' sub-clause?
+             j←joins[;3]∊j/joins[;3]
+             on←⊃⍪/j/(joins[;4],¨⊂¨joins[;1]),¨⊂¨joins[;3]
+             on←(~∨/('⍝'∊¨on[;1 3])∧on[;2 2]≠'⍵')⌿on ⍝ Ignore commented fields
+             :If ∨/t←1↓'⍵'=' ',on[;2] ⋄ (t⌿on[;3])←7↓¨Where¨t⌿on[;3] ⋄ (t/on[;2])←⊂'' ⋄ :EndIf
+             :If ×⍴t←(~t)/⍳⍴t
+                 on[t;1 3 4 5]←Quote on[t;1 3 4 5]
+                 on[t;2]←' ',¨on[t;2],¨' ' ⋄ on[t;1 3]←on[t;4 5],¨'.',¨on[t;1 3]
+             :EndIf
+             s←s,(×≢on)/' On ',And ∆sew on[;⍳3] ⍝ Build the join condition
+         :ElseIf ×≢⊃j/joins[;4]
+             'Index fields not allowed'⎕SIGNAL 11
+         :EndIf
+         joins←(~j)⌿joins ⍝ This Join is done - remove it from further consideration
+     :EndWhile
+     sql←sql,⊂s ⍝ Another "From" term
+    ⍝? If this error *only* occurs due to bad input, should we return a different formal message?
+    ⍝? If it might occur elsewhere, can we pre-test for that condition (e.g. A→C;B→C)?
+    ⍝? Or should we go ahead and try to auto-reverse the table names (and join direction) for them?
+    ⍝? Prescan and have two different error messages; do not auto-reverse.  ⍝? OK now?
+     'Table not completely handled in one place'⎕SIGNAL 11/⍨∨/∨/(∆uc joins[;1 3])∊∆uc included ⍝ (Debugging)
+ :EndWhile
+
+ sql←' From ',', '∆sew sql
+
+⍝? Possible future thoughts:
+⍝  - Hints?
+⍝  - Using?
+⍝  - Consider the possibility of specifying 'A,B' and letting the default table figure out
+⍝    not only what fields to match on but also figure out what type of join to use.
+⍝    In fact, allowing 'A,B,C' to be the same as ,¨'A' 'B' 'C' in general sounds good.
+⍝  - What about allowing fields or table.fields to work with "?"?

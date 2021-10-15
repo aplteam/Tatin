@@ -1,0 +1,336 @@
+sql←fieldname Is starpattern;t;pat;origfield;q;dr;num;op;sop;upper;wild;asis;likeonly;nolike;⎕PP;math;zilde;tcnul
+⍝∇ Change a (possibly "wildcarded") search request to a SQL "WHERE" phrase
+⍝∇ using '=' (equals), 'IN', 'LIKE', or 'BETWEEN', or 'NOT' versions of
+⍝∇ these, or inequalities ('<', '<=', '>=', '>').  Also supports testing
+⍝∇ of 'NULL' values, case-insensitive text and IN/EXISTS subqueries.
+⍝
+⍝ --- Left argument:
+⍝ The name of the SQL field to be compared, or multiple fields to compare
+⍝ simultaneously as if an APL "each" ("¨") were used, then ANDed together.
+⍝ (Further syntax descriptions below assume a single field name is used.)
+⍝ If the field name contains a "~" character, the test is to be "notted",
+⍝ i.e. = becomes <>, LIKE becomes NOT LIKE, IN becomes NOT IN, etc.
+⍝ If the field name contains a "↑" character, this is a shorthand notation
+⍝ for an upper-case-only-text comparison.
+⍝ The field name may also contain one of the following APL symbols
+⍝ imbedded in the name to indicate that the comparison is not a simple
+⍝ equality, as follows:
+⍝   =   Equals or Like or In (default)
+⍝   ≠   Not equals or Not Like or Not In (default if "~" is used)
+⍝   ....The following choices do not allow wildcards or lists:
+⍝   <   Field less than value
+⍝   ≤   Field less than or equal to value
+⍝   ≥   Field greater than or equal to value
+⍝   >   Field greater than value
+⍝   →   Field between two values (two nested values must be supplied)
+⍝   ∊   Field is IN subquery or subquery result EXISTS
+⍝ Sometimes, a SQL field needs to be compared to another field or formula,
+⍝ rather than a constant value.  To indicate that Is should compare to a
+⍝ literal (unprocessed) character string, include the APL Quote-Quad ("⍞")
+⍝ symbol as part of the field name.  The data argument should then be the
+⍝ text that you wish to appear exactly as-is in the SQL command (without
+⍝ any quoting or other processing beyond space-trimming).
+⍝ Alternatively, include the APL Divide ("÷") symbol in the name and make
+⍝ the right argument a nested vector.  When this is used, Math is called
+⍝ and the first item of the nested right argument is passed as the Math
+⍝ left argument and the remainder of the nested right argument is passed
+⍝ as the Math right argument.  The result is then used as an as-is data
+⍝ value, as if the field name had contained "⍞".
+⍝ Sometimes, especially in conjunction with the "⍞" option above, it may
+⍝ be desirable to limit the operation to a "LIKE" comparison only.  This
+⍝ may be accomplished by including a "*" character in the field name, and
+⍝ it may only be used with the "=" or "≠" comparison operations.  This
+⍝ allows (usually with "⍞") the generation of LIKE-comparisons with
+⍝ substitution parameters, or (without "⍞") providing values that have
+⍝ already been pre-formatted for use with the SQL LIKE operator (no
+⍝ further wildcard conversion or reserved-character escaping is done).
+⍝ Is can be called as a utility to perform LIKE-compatible wildcard
+⍝ conversion with reserved-character escaping.  Call it with the data as
+⍝ the right argument and a '*' character as the left argument (no field
+⍝ name at all) - this invokes the special "likeness" encoding feature.
+⍝ Sometimes a value needs to be specified that contains the "*" character,
+⍝ but it is to be treated as an actual matching character rather than a
+⍝ "wildcard".  To use a non-wildcarded test, include the "⍟" character as
+⍝ part of the field name.
+⍝ The "∊" comparison is used to generate a subquery.  When used, the right
+⍝ argument should be a SQL Select command, already properly formed but
+⍝ without parentheses.  (Optionally, the right argument could be a nested
+⍝ structure suitable for passing to Get.)  The right argument will be
+⍝ treated as a literal string (as in "⍞") rather than a data value.  The
+⍝ field name will be checked to see if it's "IN" the result of the
+⍝ subquery.  If no field name is supplied (an exception to the general
+⍝ rule), then the subquery will be checked for existence of any result
+⍝ with the "EXISTS" keyword.  This comparison can be combined with the "~"
+⍝ option to generate "NOT IN" or "NOT EXISTS" instead.  Be cautious of
+⍝ using the "↑" option here, as the subquery will need to return only
+⍝ upper-case values.
+⍝ Finally, the left argument sometimes (such as in a "HAVING" clause)
+⍝ needs to be a calculation instead of a field name.  In such a case
+⍝ include the APL execute ("⍎") symbol as part of the name and the rest
+⍝ of the name (with APL symbols removed) will be used as a formula and
+⍝ will not be named-quoted if it contains non-standard symbols (which it
+⍝ almost certainly will).  However, use of this option produces a side-
+⍝ effect ... many formulas may contain some special characters that the
+⍝ Is function is treating specially.  Therefore, if you use the "⍎"
+⍝ symbol in the left argument, then the following symbols are treated as
+⍝ part of the SQL phrase instead of being treated as special commands:
+⍝ "=", "<", ">", and "*".  To reiterate, you may not use any of those four
+⍝ special comparison operations at the same time as you use "⍎" (they will
+⍝ be treated as part of the SQL computation instead).
+⍝ Alternatively, instead of using "⍎" and pre-constructing the expression,
+⍝ you may instead nest the calculation, leave "⎕" characters in place of
+⍝ field names and other values, and append the contents of those values to
+⍝ the nested expression.  This will cause Math to be called with the
+⍝ expression definition (first item) as its left argument and the rest of
+⍝ the nested vector as its right argument.  The result from Math is then
+⍝ used as an as-is field name as if "⍎" was specified.
+⍝ So the non-comparison-operator options are:
+⍝   ~   Invert ("not") the named or assumed comparison test
+⍝   ↑   Perform upper-case comparisons
+⍝   ⍬   Allow empty vectors and all-space character values to be matched
+⍝   ⍞   Literal as-is value specification (for formulas, etc.)
+⍝   *   Force the use of the LIKE operator (no inequalities)
+⍝   *   Without a field name, just LIKE-encode the right argument
+⍝   ⍟   Prevent use of the LIKE operator
+⍝   ⍎   Use the field name as an un-quoted computation expression
+⍝   ÷   Invoke Math to construct an computation expression for the data
+⍝ If all this is too complicated for you, just stick with field names and,
+⍝ optionally, the "~".  That'll cover most needs and anything special you
+⍝ can just type in your own expression without using Is.
+⍝ If you find that you need anything more complicated than Is can handle,
+⍝ which isn't too likely, then do that without Is as well.
+⍝
+⍝ --- Right argument:
+⍝ The data value(s) to compare to the above-named field.
+⍝ Trailing spaces are trimmed from the value(s) before processing.
+⍝ The incoming wildcard character is usually '*'.
+⍝ '' and ⍬ (empty vector) and single all-blank values are ignored
+⍝ entirely and produce no SQL restriction at all, unless the '⍬' option
+⍝ is used to override this behavior.
+⍝ A data pattern composed only of wildcard characters ('*') is ignored
+⍝ for equals-matching purposes and also produces no restriction (as would
+⍝ be expected).  A not-equals test, however, produces a restriction that
+⍝ will NEVER match any data (for consistency).
+⍝ If the right argument is nested or a numeric vector, it may produce an
+⍝ "IN" phrase or a series of "OR"ed phrases instead of an '='.
+⍝ Any unnested data that is all blanks (and thus an empty '' after
+⍝ trimming) does not normally produce any restriction (as noted above).
+⍝ But an all-blank item (not a '' before trimming) within a nested list of
+⍝ items is preserved and is always considered a valid choice of value to
+⍝ match, even if the '⍬' override is not specified.
+⍝ So if you need to Is to a real blank (without using the '⍬' code), or
+⍝ to any vector of scalar character values, they need to be provided as a
+⍝ nested vector. The easiest way to do this is to use ravel-each (",¨") on
+⍝ the choices first (e.g. ,¨' ' or ,¨'ABC').
+⍝ To reiterate:  Without the '⍬' override code, '' is always ignored and
+⍝ all-' ' data is only used if it's nested.
+⍝ A data value of ⎕UCS 0 (ASCII NUL character) or the ⎕NULL value can
+⍝ be used to produce an "IS NULL" test.
+⍝ If the "÷" option is invoked, then the right argument should be a nested
+⍝ vector, the first item of which is used as the left argument to Math
+⍝ and the remainder of the vector is provided as the right argument to
+⍝ Math.
+⍝
+⍝ --- Matrix right argument:
+⍝ It is sometimes desired to produce a series of multi-field conditions
+⍝ (each of which is ANDed together as usual) where any of the multi-field
+⍝ conditions may be matched.  In other words, several (parenthesized)
+⍝ expressions need to be ORed together, each of which is a set of the
+⍝ same fields being checked and ANDed together.  For instance:
+⍝   (A = 1 And B = 1) Or (A = 2 And B = 2) Or (A = 3 And B = 3)
+⍝ Of course, this can be done by using Is¨ and Or-ing the result, using
+⍝ parentheses appropriately, but this can be a little awkward to code.
+⍝ To ask Is for this multi-layer comparison, pass it a single list of
+⍝ field names as a left argument (A & B in this case) and pass it a matrix
+⍝ of values to match in the right argument (3 2⍴1 1 2 2 3 3 in this case).
+⍝ Is will perform it's normal construction work on each row of the matrix
+⍝ (reusing the field list for each row) and it will then OR the rows
+⍝ together for a final result, with parentheses as needed.
+⍝ Some extraneous parentheses might occasionally appear if Is cannot
+⍝ ensure safe imbedding in a longer SQL clause.
+⍝
+⍝ --- Examples:
+⍝       'davin' Is 'Done'
+⍝   davin = 'Done'
+⍝       'davin~' Is 'Done'
+⍝   davin <> 'Done'
+⍝       'davin↑' Is 'Done'
+⍝   Upper(davin) = 'DONE'
+⍝       'davin' Is 10×⍳5
+⍝   davin In (10, 20, 30, 40, 50)
+⍝       'davin' 'church' Is 5 10
+⍝   davin = 5 And church = 10
+⍝       'davin' Is '*hungry*'
+⍝   davin Like '%hungry%'
+⍝       'davin∊' Is 'Select FirstName From AddressBook'
+⍝   davin In (Select FirstName From AddressBook)
+⍝       'davin' 'doug' Is 2 2⍴⍳4
+⍝   ((davin = 1 And doug = 2) Or (davin = 3 And doug = 4))
+⍝       'davin' Is ''
+⍝
+⍝       'davin' Is ,¨' '
+⍝   davin = ''
+⍝       'davin⍬' Is ''
+⍝   davin = ''
+⍝       'davin' Is ,¨'ABC'
+⍝   davin In ('A', 'B', 'C')
+⍝
+⍝
+⍝ Subroutines required:  And, Null, Or, Quote, ∆Q, ∆csv, ∆dtr
+⍝ Subroutines sometimes needed:  Get (w/subroutines), Math (w/subroutines), ∆dlt, ∆sew, ∆uc
+⍝
+⍝ Written about 1999 by Davin Church of Creative Software Design
+⍝ Modified 5 January 2018 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ ⎕PP←15 ⋄ q wild tcnul←'''*',⎕UCS 0 ⋄ :If 0<⎕NC'Config' ⋄ q wild←Config[4 5] ⋄ :EndIf
+ :If 2=⍴⍴starpattern ⍝ A matrix of values requests And/Or alternative grouping
+     sql←(⊂fieldname)Is¨↓starpattern←' '∆dtr¨starpattern
+     sql←((1<t←≢¨(↓starpattern)~¨⊂''⍬)⍴¨⊂⊂'()')And¨sql
+     sql←((1<+/t)/'()')Or sql
+     :Return
+ :EndIf
+ :While ∨/math←1<|≡¨fieldname ⍝ If it's nested more than 1 deep, it must be a Math call
+     :If 0∊⍴⍴math ⋄ fieldname←⊃fieldname ⋄ :EndIf ⍝ Allow for nested-scalar processing
+     'Depth error on field expression'⎕SIGNAL 11/⍨1≠|≡⊃pat←(math←(,math)⍳⍳⍴⍴math)⊃fieldname
+     :Trap 0 ⋄ pat←(⊃pat)Math 1↓pat ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap ⍝ Perform Math substitution
+     (math⊃fieldname)←pat,'⍎'~pat
+ :EndWhile ⍝ They better all be unnested names now
+ :If 1<|≡fieldname ⍝ Multiple field names indicate multiple "likes" to be And-ed together
+     'Length Error'⎕SIGNAL 5/⍨(⍴1/fieldname)≢⍴1/starpattern
+     :Trap 0 ⋄ sql←And fieldname Is¨starpattern ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap ⋄ :Return
+ :EndIf
+ t←'↑⍬⍞*⍟⍎÷~=≠<≤≥>→←∊⍷' ⋄ :If '⍎'∊fieldname ⋄ t←t~'=<>*' ⋄ :EndIf ⍝ Options
+ op←(t∊fieldname)/t ⋄ op←op,(0∊⍴op~'↑⍬⍞*⍟⍎~÷')/'='
+ origfield←fieldname ⋄ fieldname←∆dlt fieldname~t
+ :If (×⍴fieldname)∧~'⍎'∊op ⋄ fieldname←'.'Quote fieldname ⋄ :EndIf
+ 'Conflicting comparison operations'⎕SIGNAL 11/⍨1≠≢op~'↑⍬⍞*⍟⍎~÷'
+ 'Conflicting "Like" ("*"/"⍟") operations'⎕SIGNAL 11/⍨∧/'*⍟'∊op
+ :If upper←'↑'∊op ⋄ fieldname←'Upper(',fieldname,')' ⋄ :EndIf
+ zilde asis likeonly nolike math←'⍬⍞*⍟÷'∊op ⋄ op←op~'↑⍬⍞*⍟⍎÷' ⍝ Flags
+ :If '~'∊op ⋄ op←'≠=≥><≤←→⍷∊'['=≠<≤≥>→←∊⍷'⍳op~'~'] ⋄ :EndIf ⍝ Invert test
+ sop←'=' '<>' '<' '<=' '>=' '>' 'Between' 'Not Between'
+ sop,←(1+0∊⍴fieldname)⊃('In' 'Not In')('Exists' 'Not Exists')
+ sop←(0∊⍴fieldname)↓' ',(('=≠<≤≥>→←∊⍷'⍳op←⊃op)⊃sop),' '
+ 'Inequalities cannot be used with "Like" ("*")'⎕SIGNAL 11/⍨likeonly∧~op∊'=≠'
+ num←1 3 5 7∊⍨dr←10|⎕DR starpattern←tcnul Null starpattern ⍝ What data type is this?
+ '"Uppercase" ("↑") cannot be applied to numeric values'⎕SIGNAL 11/⍨num∧upper
+ :If op∊'∊⍷' ⍝ '⍷' means not-in/not-exists internally
+     :If dr=6
+         :Trap 0 ⋄ dr←10|⎕DR starpattern←Get starpattern ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+         num←0
+     :EndIf
+     starpattern←'()'∆Q starpattern ⋄ asis←1
+ :EndIf
+ :If math
+     :If 0∊⍴starpattern ⍝ Empty Math expression should be ignored as a ''
+         dr←10|⎕DR starpattern←'' ⋄ num←0 ⋄ asis←0
+     :Else
+         'Depth error on Math value expression'⎕SIGNAL 11/⍨1≠|≡⊃starpattern
+         :Trap 0 ⋄ dr←10|⎕DR starpattern←(⊃starpattern)Math 1↓starpattern ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+         num←0 ⋄ asis←1
+     :EndIf
+ :EndIf
+ :If asis ⍝ Just plug the text straight into the SQL command
+     '"Null" cannot be used in as-is tests'⎕SIGNAL 11/⍨tcnul∊∊starpattern
+     :If likeonly ⋄ sop←((op='≠')/' Not'),' Like ' ⋄ :EndIf
+     :If op∊'→←' ⍝ Between two values
+         :If (2≠≢starpattern)∨(~zilde)∧∨/0∊¨⍴¨starpattern
+         :OrIf (≢/⊃¨0⍴¨starpattern)∨∨/(0≠⊃⊃0⍴⊃starpattern)<|≡¨starpattern
+         :OrIf ∨/tcnul∊¨starpattern
+             '"Between" ("→") must use exactly two single values of the same type'⎕SIGNAL 11
+         :EndIf
+         sql←fieldname,sop,(⍕1⊃starpattern),' And ',⍕2⊃starpattern
+     :ElseIf dr=6
+         :If (op∊'=≠')∧(~likeonly)∧1<⍴starpattern~←(~zilde)/''⍬
+             sql←fieldname,((op='≠')/' Not'),' In ','()'∆Q'' ', '∆csv starpattern
+         :Else
+             sql←(×⍴starpattern)/((1<⍴,starpattern)/'()')∆Q Or(⊂fieldname,sop),¨⍕¨starpattern
+         :EndIf
+     :Else
+         sql←(×⍴starpattern~(~zilde)/''⍬)/fieldname,sop,⍕starpattern
+     :EndIf
+ :ElseIf dr=6
+ :OrIf num∧1<⍴,starpattern
+    ⍝ Nested calls generate an IN-list and/or a OR-list of "likes"
+     :If ×⍴starpattern~←(~zilde)/''⍬
+         :If ((wild∊∊starpattern)∨∨/tcnul∊¨starpattern)∧~nolike ⍝ Any wildcards (or nulls) at all?
+         :OrIf 1=⍴starpattern ⍝ (a single term produces simple result)
+             sql←'' ⋄ t←(likeonly∨1∊⍴starpattern)∨(('*'∊¨starpattern)∧~nolike)∨tcnul∊¨starpattern
+             :If ∨/~t ⋄ :Trap 0 ⋄ sql,←⊂origfield Is(~t)/starpattern ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap ⋄ :EndIf
+             :If ∨/t ⋄ :Trap 0 ⋄ sql,←(⊂origfield)Is¨t/starpattern ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap ⋄ :EndIf
+             :If ∨/t←t∧1≥|≡¨starpattern
+             :AndIf ∨/t←t\∧/¨t/starpattern=' ' ⍝ Preserve "empty" checks in lists
+                 'Inequalities cannot be used with wildcards'⎕SIGNAL 11/⍨~op∊'=≠'
+                 (t/sql)←⊂fieldname,sop,q ∆Q''
+             :EndIf
+             :If (∨/0∊¨⍴¨sql)∨(∨/∧/¨starpattern=wild)∧~nolike
+                ⍝ This is an "*" (or blank) condition somewhere in the list.
+                ⍝ If it's an "=" choice, then it will select all records.
+                ⍝ If it's a "≠" choice, then it will select NO record!
+                ⍝ We'll simplify both these situations into a single true/false
+                 'Inequalities cannot be used with wildcards'⎕SIGNAL 11/⍨~op∊'=≠'
+                 sql←⊂(op='≠')/fieldname,' Not Like ',q ∆Q'%'
+             :EndIf
+             sql~←⊂''
+             :If op='≠' ⋄ sql←And sql ⋄ :Else ⋄ sql←((1<⍴,sql)/'()')∆Q Or sql ⋄ :EndIf
+         :Else ⍝ Nope, then try using 'IN' instead
+             t←0 2∊⍨10|⎕DR¨starpattern ⋄ (t/starpattern)←∆dtr¨t/starpattern ⍝ Trim
+             :If upper ⋄ (t/starpattern)←∆uc t/starpattern ⋄ :EndIf ⍝ Uppercase
+             :If likeonly
+                 :Trap 0 ⋄ sql←((⊂origfield)Is¨starpattern)~⊂'' ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+                 :If op='≠' ⋄ sql←And sql ⋄ :Else ⋄ sql←((1<⍴,sql)/'()')∆Q Or sql ⋄ :EndIf
+             :ElseIf op∊'→←' ⍝ Between two values
+                 :If (2≠≢starpattern)∨(~zilde)∧∨/0∊¨⍴¨starpattern
+                 :OrIf (≢/⊃¨0⍴¨starpattern)∨∨/(0≠⊃⊃0⍴⊃starpattern)<|≡¨starpattern
+                 :OrIf ∨/tcnul∊¨starpattern
+                     '"Between" ("→") must use exactly two single values of the same type'⎕SIGNAL 11
+                 :EndIf
+                 sql←fieldname,sop,(q ∆csv starpattern[1]),' And ',q ∆csv starpattern[2]
+             :Else
+                 'Inequalities cannot be used with lists'⎕SIGNAL 11/⍨~op∊'=≠'
+                 sql←fieldname,((op='≠')/' Not'),' In ','()'∆Q q', '∆csv starpattern
+             :EndIf
+         :EndIf
+     :Else
+         sql←'' ⍝ Nope, nothing here to restrict on
+     :EndIf
+ :ElseIf likeonly ⍝ Is a pre-formatted LIKE requested?
+     '"Like" ("*") cannot be used with numeric values'⎕SIGNAL 11/⍨num
+     '"Like" ("*") cannot be used for "Null" tests'⎕SIGNAL 11/⍨tcnul∊∊starpattern
+     pat←∆dtr starpattern ⋄ :If upper ⋄ pat←∆uc pat ⋄ :EndIf ⍝ Uppercase?
+     :If ×⍴fieldname
+         sql←(×⍴pat)/fieldname,((op='≠')/' Not'),' Like ',q ∆Q pat
+     :Else ⍝ They're asking for a "likeness" to be performed instead of creating a SQL command
+         :If ∧/pat∊wild ⋄ pat←⊃wild ⋄ :EndIf
+         t←,pat∊'%_\'~wild ⋄ pat←(1+t)/pat ⋄ pat[(t/⍳⍴t)+¯1+⍳+/t]←'\' ⍝ Characters to 'escape' in string first
+         sql←('%'@{⍵∊wild})pat ⍝ Change all '*'s to '%'s
+     :EndIf
+ :ElseIf (~zilde)∧(~num)∧0∊⍴pat←∆dtr starpattern ⍝ If a '' after trimming
+ :OrIf (×⍴pat)∧(~num)∧(∧/pat∊wild)∧~nolike ⍝ Or if all '*' characters
+ :OrIf (~zilde)∧num∧0∊⍴starpattern ⍝ Or if a numeric ⍬ (before trimming)
+    ⍝ This is an "*" (or blank) condition.
+    ⍝ If it's an "=" choice, then it will select all records.
+    ⍝ If it's a "≠" choice (and not a ''), then it will select NO record!
+    ⍝ We'll simplify both these situations into a single true/false
+     'Inequalities cannot be used with wildcards'⎕SIGNAL 11/⍨(wild∊pat)∧~op∊'=≠'
+     sql←((op='≠')∧(~num)∧×⍴pat)/fieldname,' Not Like ',q ∆Q'%'
+ :ElseIf (wild∊pat)∧~nolike ⍝ Anything wild?
+     'Inequalities cannot be used with wildcards'⎕SIGNAL 11/⍨~op∊'=≠'
+     :If upper ⋄ pat←∆uc pat ⋄ :EndIf ⍝ Uppercase
+     sql←fieldname,((op='≠')/' Not'),' Like ',q ∆Q'*'Is pat ⍝ Likeness-it before composing SQL
+ :Else ⍝ ** Exact match
+     '"Between" ("→") must use exactly two single values of the same type'⎕SIGNAL 11/⍨op∊'→←'
+     :If (×⍴,starpattern)∧∧/starpattern∊⎕UCS 0
+         'Inequalities cannot be used for "Null" tests'⎕SIGNAL 11/⍨~op∊'=≠'
+         sql←fieldname,' Is',((op='≠')/' Not'),' Null'
+     :Else
+         :If 0 2∊⍨10|⎕DR starpattern
+             starpattern←∆dtr starpattern ⍝ Trim
+             :If upper ⋄ starpattern←∆uc starpattern ⋄ :EndIf ⍝ Uppercase
+         :Else
+             starpattern←⊃starpattern
+         :EndIf
+         sql←fieldname,sop,q ∆csv⊂starpattern
+     :EndIf
+ :EndIf

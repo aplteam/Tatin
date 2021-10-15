@@ -1,0 +1,11 @@
+ sql←OrderBy fields;desc
+⍝∇ Produce a SQL "Order By" clause using the given field names
+⍝∇ Field names may contain ⍋ or ⍒ characters to indicate ascending (default) or descending sorts.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+
+ :If 1≥|≡fields ⋄ fields←⊂,fields ⋄ :EndIf
+ desc←('' ' Desc')[1+'⍒'∊¨fields←,,¨fields] ⋄ fields~¨←⊂'⍋⍒'
+ sql←', '∆sew('.'Quote fields),¨desc ⋄ sql←((×⍴sql)/' Order By '),sql

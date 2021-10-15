@@ -1,0 +1,121 @@
+ data←{newdata}IO item;cn;comp;file;read;sub;t;tn;untie;io;⎕TRAP;dpath;spath
+ ⍝ Read or write a named (or numbered) component of an APL component file.
+ ⍝ (File component #1 is reserved for holding the master file directory.)
+ ⍝
+ ⍝ Syntax:
+ ⍝   Reading data:
+ ⍝       <data> ← IO <file> <component>
+ ⍝   Writing data (append or replace):
+ ⍝       <newdata> IO <file> <component>
+ ⍝   Append unnamed data directly to a new component:
+ ⍝       <newcmpnum> ← <newdata> IO <file> 0
+ ⍝
+ ⍝ Originally written 27 November 2005 for APL+Win by Davin Church of Creative Software Design
+ ⍝ Converted to Dyalog APL 23 April 2021 by Davin Church of Creative Software Design
+ ⍝ Last modified 18 July 2021 by Davin Church of Creative Software Design
+
+ io←(⊃1⌽⎕RSI).⎕IO ⋄ untie←0 ⋄ read←0=⊃⎕NC'newdata' ⍝ Initialize flags
+ ⎕TRAP←,⊂0 'C' '⎕FUNTIE untie ⋄ (⊃⎕DM) ⎕SIGNAL ⎕EN' ⍝ Pass any errors upwards to caller
+ 'Argument Length Error'⎕SIGNAL 2/⍨(,2)≢⍴item
+ (file comp)←item ⍝ We should always have these two arguments
+
+ ⍝ *** Process the file ID
+ :Select 10|⎕DR file
+ :CaseList 1 3 5 ⍝ They gave us a file tie number
+     ⎕SIGNAL 18/⍨(1≠≢file)∨~(tn←|⊃file)∊⎕FNUMS
+ :CaseList 0 2 ⍝ They gave us a file name - temporarily tie it
+     untie←0⌈tn←Tie file ⋄ tn←|tn ⍝ Tied & ready for use
+ :Else
+     'Illegal file name or tie number'⎕SIGNAL 18
+ :EndSelect
+
+ ⍝ *** Check the file's master directory
+ :If (0=≢⍴comp)∧5 7∊⍨10|⎕DR comp ⋄ :AndIf comp=⌊|comp ⋄ comp←⌊comp ⋄ :EndIf ⍝ Normalize a raw component #
+ :If (0=≢⍴comp)∧1 3∊⍨10|⎕DR comp ⍝ If they gave us a raw component number
+ :AndIf comp>0 ⍝ (And not asking for an append)
+ :AndIf comp<2⊃⎕FSIZE tn ⍝ And it's an existing component #
+     ⍝ Then we don't need to spend time & space reading out and checking the main directory
+ :Else ⍝ Pre-check the master directory to make sure it at least appears to be in our file format
+     :If 1≠1⊃⎕FSIZE tn ⋄ ⎕FUNTIE untie ⋄ 'Missing master file directory'⎕SIGNAL 23 ⋄ :EndIf
+     :If 1=2⊃⎕FSIZE tn
+         ⍬(0⍴⊂⍬)⎕FAPPEND tn ⍝ Automatically initialize an empty file
+     :ElseIf (⊂t←⎕FREAD tn,1)∊⍬''
+         ⍬(0⍴⊂⍬)⎕FREPLACE tn,1 ⍝ Correct empty user-created directory
+     :ElseIf (,2)≢⍴t ⍝ Does it look about right?
+     :OrIf ~(∧/1=(≢⍴)¨t)∧(1≤|≡2⊃t)∧(1=|≡1⊃t)∧1 3∊⍨10|⎕DR 1⊃t
+         ⎕FUNTIE untie ⋄ 'Invalid master file directory'⎕SIGNAL 23
+     :EndIf
+ :EndIf
+
+ ⍝ *** Component ID processing
+ :If (0=≢⍴comp)∧1 3∊⍨10|⎕DR comp ⍝ They gave us a raw component number (for use like a normal file)
+
+    ⍝ *** Raw component # processing
+     :If read            ⍝ --- Read component (by raw number)
+         :If comp>0
+             data←⎕FREAD tn,comp
+         :Else
+             ⎕FUNTIE untie ⋄ 'Invalid raw component number'⎕SIGNAL 20
+         :EndIf
+     :ElseIf comp>0      ⍝ --- Write (replace) component (by raw number)
+         :If comp≥2⊃⎕FSIZE tn ⍝ If the component # doesn't exist yet
+             tn _fillto comp ⍝ Make sure that component # is the next one to be appended
+             comp←newdata ⎕FAPPEND tn ⍝ Store it new
+         :Else
+             newdata ⎕FREPLACE tn,comp ⍝ Store it in-place
+         :EndIf
+     :ElseIf comp=0      ⍝ --- Append (numbered) component - return new number
+         data←tn _append newdata ⍝ A logical append (reusing space if available)
+     :Else
+         ⎕FUNTIE untie ⋄ 'Invalid raw component number'⎕SIGNAL 20
+     :EndIf
+
+ :Else ⍝ They gave us a component name (almost any structure permitted)
+
+     ⍝ *** Named component analysis
+     ⍝ Simple scalars (of all non-integer types) are reserved for internal use
+     :If 0=≡comp ⋄ comp←,comp ⋄ :EndIf ⍝ Force scalars to 1⍴ vectors
+
+     sub←io _subscript comp ⋄ comp←⊃sub ⋄ sub↓⍨←1 ⍝ Allow subscript specifications after names
+     :If 0∊⍴comp ⍝ Empty arrays of any type are prohibited
+         ⎕FUNTIE untie ⋄ 'Component name missing'⎕SIGNAL 2
+     :EndIf
+     :If 0∊≢¨sub
+         ⎕FUNTIE untie ⋄ 'Component subscript missing or incomplete'⎕SIGNAL 2
+     :EndIf
+
+     ⍝ *** Locate/create component name (and any subscripts) in directory/subdirectory
+     :If 0≠cn←⊃dpath←(tn _find(¯1*read))comp ⍝ Is this component name found in the master directory?
+         :If ×≢sub ⍝ If we've got subscripts, then we'll have a subdirectory to follow
+             cn←⊃spath←(tn _find(cn×¯1*read))sub ⍝ Look up subscript in B-tree subdirectory
+         :EndIf
+     :EndIf
+
+     ⍝ *** Named component processing
+     :If read            ⍝ === Read component (by name)
+         :If cn>0
+             data←⎕FREAD tn,cn ⍝ Just read the data component and we're done
+         :Else
+             ⎕FUNTIE untie ⋄ 'Component Value Error'⎕SIGNAL 20
+         :EndIf
+     :Else               ⍝ === Write [new] component (by name)
+         :If cn>0 ⍝ Replace existing component
+             newdata ⎕FREPLACE tn,cn ⍝ Update the data component
+         :Else ⍝ Append a new component
+             :If ×≢sub ⍝ Is this for a subdirectory?
+                 :If 0=⊃dpath ⍝ We don't even have a subdirectory yet (not found in master directory)
+                     cn←tn _append ⍬(0⍴⊂⍬) ⍝ Create a new (empty) subdirectory component
+                     cn(tn _insert dpath)comp ⍝ And add it to the master directory
+                     spath←(tn _find cn)sub ⍝ Get a not-found pointer into the new (empty) subdirectory
+                 :EndIf
+                 cn←tn _append newdata ⍝ Create a new data component
+                 cn(tn _insert spath)sub ⍝ And add it to the new subdirectory
+             :Else ⍝ Create a new scalar component
+                 cn←tn _append newdata ⍝ Create a new data component
+                 cn(tn _insert dpath)comp ⍝ And add it to the master directory
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf
+
+ ⎕FUNTIE untie ⍝ Untie any temporary file tie when we're done

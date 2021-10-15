@@ -1,0 +1,28 @@
+ text←{q}∆csv values;t;u;v;w;x;⎕PP;⎕IO;⎕ML
+⍝∇ Change an array of values into simple comma-separated text string(s).
+⍝ Left argument (optional, nested or unnested, 0-2 items):
+⍝   [1] Quotation mark symbol or symbol-pair (as used by ∇∆Q) [Default = '''']
+⍝   [2] "Comma" separator symbol(s) (only when nested) [Default = ',']
+⍝ Right argument: Data to be formatted (Depth ≤ 2[text]; Any rank)
+⍝ Requires subroutine: ∆Q
+⍝ Provides features that cannot be replaced by ⎕CSV
+⍝ Doesn't do anything special with higher-resolution ⎕DR=1287 yet
+⍝
+⍝ Written by Davin Church of Creative Software Design
+⍝ Last modified 18 October 2007 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 12 October 2019 by Davin Church of Creative Software Design
+
+ ⎕IO←⎕ML←1 ⋄ ⎕PP←16 ⋄ :If 2≠⎕NC'q' ⋄ q←0⍴⊂'' ⋄ :EndIf
+ :If 1≥|≡q ⋄ q←⊂q ⋄ :EndIf ⋄ q←,¨q,(⍴,q)↓'''' ',' ⋄ t←0 ' '⍳⊃¨⊃0⍴⊂values←1/values
+ :If ∨/u←,t=1 ⍝ Numeric formatting (can get pretty complicated in extreme cases)
+     :If ∨/v←⊃¨(|x←u/,values)<0.000001 ⍝ Avoid use of miniscule exponential notation
+         x←⍕¨(u/,values)+v×w←×x ⋄ (v/x)←((v/w<0)⍴¨'-'),¨'0',¨((v/x)⍳¨'1')↓¨v/x
+     :Else
+         x←⍕¨x ⍝ Nothing too small here - just handle it trivially
+     :EndIf
+     (('¯'=∊x)/∊x)←'-' ⋄ (u/,values)←x ⍝ Ok, numbers are finally ready
+ :EndIf
+ :If ∨/u←,t=2 ⋄ (u/,values)←q[1]∆Q¨u/,values ⋄ :EndIf ⍝ Character-string formatting
+ :If ∨/u←,t=3 ⋄ (u/,values)←⍕¨⊃¨u/,values ⋄ :EndIf ⍝ Constant-text non-formatting
+ text←(⍴2⊃q)↓¨,/(⊂'')⍪(⊂''),q[2],¨values ⍝ Handle arbitrary arrays
+ :If 1=⍴⍴values ⋄ text←⊃text ⋄ :Else ⋄ text←1↓[1]text ⋄ :EndIf

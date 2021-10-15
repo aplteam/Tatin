@@ -1,0 +1,11 @@
+ result←default Null data;rho;t
+⍝∇ Replace any special ⎕NULL values in SQL data with values more easily handled by APL.
+⍝
+⍝ The right argument may be a single (simple, unnested) value or a nested array of values.
+⍝ Any single value of the argument may instead be a special ("magic") ⎕NULL value.
+⍝ Wherever encountered, this ⎕NULL value will be replaced by the left argument, usually
+⍝ 0 or '' or similar, and the same structure (rank and rho) returned with those values
+⍝ replaced.
+⍝ Converted to Dyalog 12 December 2019 by Davin Church of Creative Software Design
+
+ result←⊃⍣(0=≡data)⊢(⍴data)⍴((⊂default)@{⍵∊⎕NULL}),data

@@ -1,0 +1,28 @@
+ sql←Values values;q;t;n;rho
+⍝∇ Create a SQL Values clause, with one or more records of data.
+⍝ The data items should be in the same order as specified in the
+⍝ Insert Into clause, or in the table-defined order if none were listed.
+⍝
+⍝ A vector produces a Values clause with a single record of data.
+⍝ A matrix produces a Values clause with multiple records of data.
+⍝ Note that the multiple-record form is not accepted by all SQL DBs.
+⍝
+⍝ A new value of ⎕UCS 0 (ASCII NUL character) or ⎕NULL will set the field to a SQL NULL value.
+⍝ A new value of ⎕UCS 127 (ASCII DEL character) will set the field to the SQL DEFAULT value.
+⍝ A doubly-nested text value will be taken as a literal formula rather than data.
+⍝
+⍝ Written 15 December 2011 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ q←'''''' ⋄ :If ×⎕NC'Config' ⋄ q←4⊃Config ⋄ :EndIf ⍝ Configurable string quote marks
+ :If 1≥|≡values ⋄ :AndIf ' '=⊃0⍴values ⋄ values←⊂,values ⋄ :EndIf
+ rho←⍴values←1/values ⋄ values←,((⎕UCS 0)@{⍵∊⎕NULL})values ⍝ Let's do all the checking as a vector
+ :If ∨/n←6=t←10|⎕DR¨values ⋄ n←n\∧/¨,¨(10|⎕DR¨¨n/values)∊¨¨⊂⊂0 2 ⋄ :EndIf
+ 'Data Domain Error'⎕SIGNAL 11/⍨∨/~n∨t∊0 2,1 3 5 7 9
+ 'Data Rank Error'⎕SIGNAL 4/⍨∨/((~n)+t←n∨t∊0 2)<≢¨⍴¨values
+ (t/values)←,¨t/values ⋄ ((~t)/values)←⊃¨(~t)/values ⍝ Coerce ranks
+ values←((⊂⊂'Null')@{⍵∊⎕UCS 0})((⊂⊂'Default')@{⍵∊⎕UCS 127})values
+ :Trap 0 ⋄ sql←'()'∆Q q', '∆csv rho⍴values ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+ :If 1<|≡sql ⋄ sql←', '∆sew sql ⋄ :EndIf ⋄ sql←' Values ',sql
+
+⍝? Allow use of deeply-nested data to call Math internally?

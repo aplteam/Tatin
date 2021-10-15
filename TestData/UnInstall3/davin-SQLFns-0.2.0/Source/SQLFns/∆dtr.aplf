@@ -1,0 +1,24 @@
+ trim←{rmv}∆dtr data;⎕IO;⎕ML
+⍝∇ <D>eletes all <TR>ailing spaces
+⍝∇ (or zeros/prototypes/∆dtr-prototypes) from the rows of any array.
+⍝∇ A left argument may be specified with a vector of item values
+⍝∇ to be removed instead of spaces/zeros/[∆dtr-]prototypes.
+⍝ A "∆dtr-prototype", defined as the ∆dtr of the prototype,
+⍝ is additionally removed when the data is nested.
+⍝ For convenience, if both the left and right arguments are given as
+⍝ simple (unnested) values, and their datatypes (character or numeric)
+⍝ are different, then the right argument will be returned unchanged
+⍝ (not even ravelled, as can otherwise be common for this function).
+⍝ For instance, this allows the removal of spaces from each item
+⍝ of a nested array without ravelling any numeric scalars that may
+⍝ also be found in that array.
+⍝
+⍝ Last modified 10 October 2011 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 12 October 2019 by Davin Church of Creative Software Design
+
+ ⎕IO←⎕ML←1
+ :If 0≠⎕NC'rmv' ⋄ :AndIf ~6∊10|⎕DR¨rmv data ⋄ :AndIf ≠/⊃¨0⍴¨rmv data
+     trim←data ⋄ :Return ⍝ Different datatypes - return input unchanged
+ :EndIf
+ :If 0=⎕NC'rmv' ⋄ :AndIf 1<|≡rmv←1↑0⍴data ⋄ rmv,←∆dtr¨rmv ⋄ :EndIf
+ trim←((-1⌈⍴⍴data)↑-(¯1↑1,⍴data)⌊⌊/,+/∧\⌽data∊rmv)↓data

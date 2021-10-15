@@ -1,0 +1,14 @@
+ sql←Into table
+⍝∇ Used for SELECT INTO phrasing (must be into a single table)
+⍝∇ Not used for INSERT INTO, as that is handled by Insert.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ :If 1≥|≡table ⋄ :If 2=⍴⍴table ⋄ table←↓table ⋄ :Else ⋄ table←⊂table ⋄ :EndIf ⋄ :EndIf
+ table←(∆dlt¨,,¨table)~⊂''
+ 'Missing table name to select into'⎕SIGNAL 11/⍨0∊⍴table
+ 'Into cannot be done into multiple tables'⎕SIGNAL 11/⍨1<≢table
+ 'Into cannot be done into multiple tables'⎕SIGNAL 11/⍨∨/'→><≠∘='∊⊃table
+ 'Joined fields not permitted in a single table'⎕SIGNAL 11/⍨∨/'(,)'∊⊃table
+ :Trap 0 ⋄ sql←' Into ',6↓From table ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap

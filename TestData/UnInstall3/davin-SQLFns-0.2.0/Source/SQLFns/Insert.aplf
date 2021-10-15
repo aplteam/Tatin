@@ -1,0 +1,18 @@
+sql←{fields}Insert table
+⍝∇ Produce a SQL INSERT clause with single table name & optional field names.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ :If 1≥|≡table ⋄ :If 2=⍴⍴table ⋄ table←↓table ⋄ :Else ⋄ table←⊂table ⋄ :EndIf ⋄ :EndIf
+ table←(∆dlt¨,,¨table)~⊂''
+ 'Missing table name to insert into'⎕SIGNAL 11/⍨0∊⍴table
+ 'Insert cannot be done into multiple tables'⎕SIGNAL 11/⍨1<≢table
+ 'Insert cannot be done into multiple tables'⎕SIGNAL 11/⍨∨/'→><≠∘='∊⊃table
+ 'Joined fields not permitted in a single table'⎕SIGNAL 11/⍨∨/'(,)'∊⊃table
+ :Trap 0 ⋄ sql←'Insert Into',5↓From table ⋄ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap
+ :If 2=⎕NC'fields'
+     :If 2=⍴⍴fields ⋄ fields←↓fields ⋄ :EndIf
+     :If 1≥|≡fields ⋄ fields←⊂fields ⋄ :EndIf ⋄ fields←,,¨fields
+     sql,←' ','()'∆Q', '∆sew Quote fields
+ :EndIf

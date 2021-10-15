@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.32.2 - 2021-10-08
+⍝ * 0.32.3 - 2021-10-12
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -263,7 +263,11 @@
           :If 0=≢r
               r←'No packages found'
           :Else
-              r(AddHeader)←(2⊃⍴r)↑'Group & Name' '≢ major versions'
+              :If 0≡parms.date
+                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name') ,((parms.aggregate)/⊂'≢ major versions'),(⊂'Info URL')
+              :Else
+                  r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Info URL'
+              :EndIf
               r←((2⊃⍴r)↑'Packages from:'registry,(2⊃⍴r)⍴⊂'')⍪r
           :EndIf
       :EndIf
@@ -893,7 +897,7 @@
               r,←'' '  ]Tatin.Ping [server-url]'
           :EndSelect
           :If 'Version'≢Cmd
-              r,←''(']',Cmd,' -?? ⍝ Enter this for more information ')
+              r,←''(']Tatin.',Cmd,' -?? ⍝ Enter this for more information ')
           :EndIf
       :Case 1
           :Select ⎕C Cmd
@@ -936,11 +940,11 @@
               r,←⊂'Load the specified package and all its dependencies into the workspace.'
               r,←⊂''
               r,←⊂'A) First argument:'
-              r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
+              r,←HelpOnPackageID ⍬
               r,←⊂''
               r,←⊂'B) Second (optional) argument: target namespace (defaults to #)'
-              r,←⊂'   Must be the fully qualified name of a namespace the package will be loaded into.'
-              r,←⊂'   May be # or ⎕SE or a sub-namespace of any level'
+              r,←⊂'Must be the fully qualified name of a namespace the package will be loaded into.'
+              r,←⊂'May be # or ⎕SE or a sub-namespace of any level'
               r,←⊂''
               r,←⊂'Returns the fully qualified name of the package established in the target space'
           :Case ⎕C'InstallPackage'
@@ -950,11 +954,11 @@
               r,←⊂'Requires two arguments:'
               r,←⊂''
               r,←⊂'A) First argument:'
-              r,←(3⍴' ')∘,¨HelpOnPackageID ⍬
+              r,←HelpOnPackageID ⍬
               r,←⊂''
               r,←⊂'B) Second argument'
-              r,←⊂'   The second argument must be the path to a folder into which the packages are'
-              r,←⊂'   going to be installed.'
+              r,←⊂'The second argument must be the path to a folder into which the packages are'
+              r,←⊂'going to be installed.'
               r,←⊂''
               r,←⊂'-quiet: Useful for test cases etc.'
           :Case ⎕C'LoadDependencies'
@@ -998,15 +1002,16 @@
               r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
           :Case ⎕C'UninstallPackage'
               r,←⊂'Uninstall a given package and all its dependencies, but only if those'
-              r,←⊂'are neither top-level packages nor required by any other package.'
-              r,←⊂'In addition any superfluous packages like outdated versions are removed, too.'
+              r,←⊂'are neither top-level packages nor required by other packages.'
+              r,←⊂'In addition any superfluous packages like outdated versions) are removed, too.'
               r,←⊂'If no package is specified only superfluous packages, if any, will be uninstalled.'
               r,←⊂''
               r,←⊂'Requires at least one argument:'
               r,←⊂' * Path to a folder with installed packages'
               r,←⊂' * Optionally a package identifier;  this can be one of:'
-              r,←⊂'   * Name of the package to be uninstalled'
-              r,←⊂'   * An alias; post- or prefix with a "@" in order to mark it as an alias'
+              r,←⊂'   * Name of the package'
+              r,←⊂'   * Alias and name of the package'
+              r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as such'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←⊂'Takes a path hosting such a file as an argument.'
@@ -1014,8 +1019,8 @@
               r,←⊂'-edit   You may edit the file by specifying the -edit flag. In case the file does not'
               r,←⊂'        already exist it is created.'
               r,←⊂''
-              r,←⊂'        After an edit operation changes are checked for being complete and syntactically'
-              r,←⊂'        correct JSON, and if they are, then they are saved to the given folder.'
+              r,←⊂'        After an edit operation the data is checked for being complete and syntactically'
+              r,←⊂'        correct JSON and then saved to the given folder.'
               r,←⊂''
               r,←⊂'-delete In case you want to delete the file specify the -delete flag.'
               r,←⊂''
@@ -1047,7 +1052,7 @@
               r,←⊂' * [registry]{group}-{package}'
               r,←⊂' * [registry]{package}'
               r,←⊂''
-              r,←⊂'If the given package exists only in one group then this does not make any difference.'
+              r,←⊂'Lacking a group does not make a difference if the given package exists only in one group anyway.'
               r,←⊂'If it exists in more than one group then all of them are listed.'
               r,←⊂''
               r,←⊂'If you are interested in all registries then you can use this special syntax:'
@@ -1136,7 +1141,7 @@
           :Case ⎕C'Ping'
               r,←⊂'Try to contact one or more Tatin servers.'
               r,←⊂''
-              r,←⊂' * Optionally you may specifiy a servr URL as an argument.'
+              r,←⊂' * Optionally you may specify a server URL as an argument.'
               r,←⊂' * You can also specify just a "?"; then a list with all known Servers will be provided.'
               r,←⊂'   You may then select one or multiple of them.'
               r,←⊂' * If no argument is provided at all then all defined Servers are contacted.'
@@ -1237,7 +1242,7 @@
       r,←⊂' * A full package ID.'
       r,←⊂'   A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
       r,←⊂' * You may also specify an incomplete package ID in terms of no patch number, or'
-      r,←⊂'   neither minor nor patch number, or no version information at all, and leave it'
+      r,←⊂'   neither minor nor patch number, or no version information at all, and leave'
       r,←⊂'   it to Tatin to establish the latest version itself.'
       r,←⊂' * You may also omit the group. This will fail in case the same package name is'
       r,←⊂'   used in two or more different groups but will succeed otherwise.'

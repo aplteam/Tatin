@@ -1,0 +1,13 @@
+ component←(tn _append)data;at;unused;reserved
+⍝ Logically append a new data component to the file (reuse free space if available)
+
+ :If 0≠at←1⊃(tn _find ¯1)⎕UCS 127 ⍝ Do we already have a free-space component?
+ :AndIf ×≢unused←⎕FREAD tn,at ⍝ And it's not empty
+     data ⎕FREPLACE tn,component←⊃unused ⍝ Use the oldest available component # & write their data to it
+     (1↓unused)⎕FREPLACE tn,at ⍝ Remove it from the free-list
+ :Else ⍝ Nothing is free for reuse
+     :If 0≠at←⊃(tn _find ¯1)⎕UCS 0 ⋄ reserved←⎕FREAD tn,at ⍝ Need to skip over any reservations?
+         :While (2⊃⎕FSIZE tn)∊reserved ⋄ :Until 0=''⎕FAPPEND tn
+     :EndIf
+     component←data ⎕FAPPEND tn ⍝ Create a fresh component with the data
+ :EndIf

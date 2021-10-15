@@ -1,0 +1,16 @@
+ q←{m}∆Q x
+⍝∇ Enclose string(s) in quotes (doubling internal quotes as needed)
+⍝ Optional left argument specifies quote type ("'", '"', or ''≡none) to use.
+⍝ Left argument may be two symbols for begin/end (e.g. "[]" or "()").
+⍝ If left argument does not contain either standard quote type, then imbedded
+⍝ copies of those characters are not doubled (assuming that they're just
+⍝ wrapper chars and not true quotes).
+⍝
+⍝ Written 23 September 2003 by Davin Church of Creative Software Design
+⍝ Modified 6 October 2013 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 12 October 2019 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'm' ⋄ m←'''' ⋄ :EndIf
+ :If 1<|≡x ⋄ q←(⊂m)∆Q¨x ⋄ :Return ⋄ :EndIf ⍝ Handle multiple strings
+ :If ×⍴m←,m ⋄ m←2⍴m ⋄ :EndIf
+ q←(¯1↓m),((1+(x∊m)∧∨/'''"'∊m)/x),1↓m

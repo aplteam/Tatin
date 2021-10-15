@@ -1,0 +1,274 @@
+ result←function Dir file;io;untie;comp;tn;t;sub;sdir;emsg;dpath;spath;mlist;⎕TRAP;fixio;used
+⍝ Directory management for a FilePlus file.
+⍝
+⍝ Syntax:
+⍝   [result] ← {function} Dir {file} [component]
+⍝
+⍝   {file} is either a file name (suitable for use with Tie) or a file tie number.
+⍝       File names (that are not already tied) are tied & untied with each
+⍝       call.  Use of file tie numbers (optionally from Tie) are most
+⍝       efficient for multiple calls.
+⍝       File names without full paths (drive specification) are assumed to be
+⍝       relative to the directory in which ⎕WSID resides.
+⍝   {function} is the operation to be performed, selected from:
+⍝       '?'     Return a list of all (or selected) existing component names.
+⍝               (Results includes [;…;] rank indications on array names)
+⍝       '∊'     Return a boolean to indicate whether or not the named component
+⍝               or array exists in the file.
+⍝       '⍳'     Return the internal component # for a named component (0=None).
+⍝               (Including subscripted names but not on whole arrays.)
+⍝       '[?]'   Return a sorted list of all (or selected) defined subscript
+⍝               names/numbers for a given array.
+⍝       '[⍳]'   Return an array of internal component #s for all (or selected)
+⍝               subscripts for a given array. This list is returned in the same
+⍝               order as '[?]' for the same array name argument.
+⍝       '[>]'   Return the value of the subscript immediately following (in ⍋
+⍝               order) the subscript that is supplied, or ⍬ if none.
+⍝       '[<]'   Return the value of the subscript immediately preceeding (in ⍋
+⍝               order) the subscript that is supplied, or ⍬ if none.
+⍝       '[+]'   Return a sorted list of all subscripts that use the
+⍝               named component subscript(s) as a prefix (as if each ended in a
+⍝               wild-card-matching character).
+⍝       '↓'     Delete the named (or numbered) component from the file.
+⍝               Deleted components are then available for later re-use.
+⍝       '≠'     Return a list of all user-reserved component numbers.
+⍝       '⍬'     Return a list of all free-space component numbers.
+⍝       '⌹'     Validate file directory structure & return unindexed component #s.
+⍝       (More mnemonic function codes may be invented in the future.)
+⍝   [component] is a component name, used for some {functions}.
+⍝       See the description of IO for more details on component names.
+⍝       The usage of [component] for the various functions is as follows:
+⍝       '?'     Limit the list of component names to ones containing
+⍝               (using (1∊⍷)) the given text.  (Optional)
+⍝       '∊'     The array name or full component name to be checked.  An array name
+⍝               is a subscripted name with an empty subscript indication ('[;…;]').
+⍝       '⍳'     The full component name to be located (including complete
+⍝               subscripts for array items).
+⍝       '[?]'   Provide a component name to be queried for subscript values.
+⍝               Include a subscript indication ('[;…;]') after the name with an
+⍝               appropriate number of semicolons to indicate the rank of the array.
+⍝               Any (optional) subscript value(s) included in this subscript are to
+⍝               be used to limit the list of subscripts to those containing
+⍝               (using (1∊⍷), not as an exact match) the given text.
+⍝       '[⍳]'   Provide a component name to be queried for component numbers.
+⍝               Include a subscript indication ('[;…;]') after the name with an
+⍝               appropriate number of semicolons to indicate the rank of the array.
+⍝               Any (optional) subscript value(s) included in this subscript are to
+⍝               be used to limit the list of subscripts to those containing
+⍝               (using (1∊⍷), not as an exact match) the given text.
+⍝       '[>]'   The full component name, including subscript, to be used as the
+⍝               predecessor item. (All-empty subscript requests the lowest key.)
+⍝       '[<]'   The full component name, including subscript, to be used as the
+⍝               successor item. (All-empty subscript requests the highest key.)
+⍝       '[+]'   Provide a component name plus a subscript, but the subscript is
+⍝               not expected to be an exact match. Instead, the provided subscript
+⍝               is used as a prefix string and all defined subscripts that begin
+⍝               with that prefix (using (⊃⍷) on each dimension) are returned.
+⍝               (Numeric subscripts are matched in their entirety.)
+⍝       '↓'     The full component name (or raw component number) to be deleted.
+⍝               If subscript-notation is used without any subscript values
+⍝               ('[;…;]'), then ALL subscripts for that name and rank
+⍝               will be deleted, otherwise it applies only to a single scalar
+⍝               component or array element.
+⍝               Unnamed components can be deleted by their raw component number
+⍝               and they will then be available for re-use.
+⍝ Written 27 November 2005 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog APL 24 April 2021 by Davin Church of Creative Software Design
+⍝ Last modified 18 July 2021 by Davin Church of Creative Software Design
+
+ io←(⊃1⌽⎕RSI).⎕IO ⋄ untie←0
+ ⎕TRAP←,⊂0 'C' '⎕FUNTIE untie ⋄ (⊃⎕DM) ⎕SIGNAL ⎕EN' ⍝ Pass any errors upwards to caller
+ 'Argument Length Error'⎕SIGNAL 5/⍨~(⊂⍴1/file)∊,¨⍳2
+ (file comp)←2↑file,'' '' ⍝ Separate arguments
+
+ ⍝ *** Process the file ID
+ :Select 10|⎕DR file
+ :CaseList 1 3 5 ⍝ They gave us a file tie number
+     ⎕SIGNAL 18/⍨(1≠≢file)∨~(tn←|⊃∊file)∊⎕FNUMS
+ :CaseList 0 2 ⍝ They gave us a file name - temporarily tie it
+     untie←0⌈tn←Tie file ⋄ tn←|tn ⍝ Tied & ready for use
+ :Else
+     'Illegal file name or tie number'⎕SIGNAL 18
+ :EndSelect
+
+ ⍝ *** Check the file's master directory to make sure it at least appears to be in our file format
+ :If 1≠1⊃⎕FSIZE tn ⋄ ⎕FUNTIE untie ⋄ 'Missing master file directory'⎕SIGNAL 23 ⋄ :EndIf
+ :If 1=2⊃⎕FSIZE tn
+     ⍬(0⍴⊂⍬)⎕FAPPEND tn ⍝ Automatically initialize an empty file
+ :ElseIf (⊂t←⎕FREAD tn,1)∊⍬''
+     ⍬(0⍴⊂⍬)⎕FREPLACE tn,1 ⍝ Correct empty user-created directory
+ :ElseIf (,2)≢⍴t ⍝ Does it look about right?
+ :OrIf ~(∧/1=(≢⍴)¨t)∧(1≤|≡2⊃t)∧(1=|≡1⊃t)∧1 3∊⍨10|⎕DR 1⊃t
+     ⎕FUNTIE untie ⋄ 'Invalid master file directory'⎕SIGNAL 23
+ :EndIf
+
+ ⍝ *** Component ID processing
+ sub←⍬ ⍝ Allow subscript specifications after names...
+ :If (0=≢⍴comp)∧5 7∊⍨10|⎕DR comp ⋄ :AndIf comp=⌊|comp ⋄ comp←⌊comp ⋄ :EndIf
+ :If (0=≢⍴comp)∧1 3∊⍨10|⎕DR comp ⍝ They gave us a raw component number (for use like a normal file)
+     ⍝ We don't need to do anything here - just leave it as-is
+ :Else ⍝ They gave us a component name (almost any structure permitted)
+     ⍝ *** Named component analysis
+     ⍝ Simple scalars (of all non-integer types) are reserved for internal use
+     :If 0=≡comp ⋄ comp←,comp ⋄ :EndIf ⍝ Force scalars to 1⍴ vectors
+     ⍝ *** Pre-process component name (including subscripts)
+     sub←io _subscript comp ⋄ comp←⊃sub ⋄ sub↓⍨←1 ⍝ Allow subscript specifications after names
+ :EndIf
+
+ ⍝ *** Process function
+ :Select ⊃function←,function
+
+ :Case '?'               ⍝ === Directory list (of master directory)
+     :If ×≢sub ⋄ ⎕FUNTIE untie ⋄ 'Invalid use of subscripting'⎕SIGNAL 2 ⋄ :EndIf ⍝ Should we allow rank-searching??
+     result←2⊃1(tn _list 1)comp ⍝ Return only master name list (optionally restricted by component-name content)
+
+ :CaseList '∊⍳'          ⍝ === Check for existence (or locate cmp #)
+     :If 0∊⍴comp ⋄ ⎕FUNTIE untie ⋄ 'Component name missing'⎕SIGNAL 2 ⋄ :EndIf
+     :If ∧/0 1∊×≢¨sub ⋄ ⎕FUNTIE untie ⋄ 'Incomplete component subscript'⎕SIGNAL 2 ⋄ :EndIf
+     :If (0∊≢¨sub)∧'⍳'=⊃function ⋄ ⎕FUNTIE untie ⋄ 'Whole arrays do not have component numbers'⎕SIGNAL 16 ⋄ :EndIf
+     :If 0=sdir←result←⊃(tn _find ¯1)comp
+         result←0 ⍝ This component name is not defined with that rank
+     :Else
+         ⍝ *** Named component exists - locate it
+         :If ×≢sub ⍝ If we've got subscripts, then we'll have a subdirectory
+         :AndIf ∧/×≢¨sub ⍝ And they've specified an explicit subscript?
+             result←⊃(tn _find(-sdir))sub
+         :EndIf
+     :EndIf
+     :If '∊'∊function ⋄ result←×result ⋄ :EndIf ⍝ Just signal presence as requested
+
+ :Case '['               ⍝ === Functions for subscripted arrays
+     :If 0∊⍴comp ⋄ ⎕FUNTIE untie ⋄ 'Component name missing'⎕SIGNAL 2 ⋄ :EndIf
+     :If ×≢sub ⍝ Were there the required rank-indicators (at least) on the name?
+         :If io=0 ⋄ fixio←{1 3∊⍨10|⎕DR ⍵:⍵-1 ⋄ ⍵} ⋄ :Else ⋄ fixio←⊢ ⋄ :EndIf ⍝ Report ⎕IO=0 back in that origin
+         :If 0=sdir←⊃(tn _find ¯1)comp
+             result←⍬ ⍝ This component name is not defined with that rank
+         :Else
+             :Select function ⍝ Perform the specifically-requested array function
+             :Case '[?]' ⍝ Are they asking for the entire key list?
+                 result←2⊃(2×∨/×≢¨sub)(tn _list sdir)sub
+                 ⍝ A list of key values is returned for this function:
+                 ⍝   For a 1-D array this is a vector of single sub-values; For an n-D array this is Mixed to an n-column matrix
+                 :If 1=≢⊃result ⋄ result←fixio¨⊃¨result ⋄ :Else ⋄ result←fixio¨↑result ⋄ :EndIf
+             :Case '[⍳]' ⍝ Are they asking for component #s only?
+                 result←1⊃(2×∨/×≢¨sub)(tn _list sdir)sub
+                 ⍝ This is a simple numeric vector
+             :Case '[>]' ⍝ Are they asking for a successor key from this list?
+                 result←fixio¨(tn _successor sdir)sub
+                 ⍝ Only a single key value is returned for this function:
+                 ⍝   For a 1-D array this is Disclosed to a single simple value; For an n-D array this is a [nested] vector of sub-values
+                 :If 1=≢result ⋄ result←⊃result ⋄ :EndIf
+             :Case '[<]' ⍝ Are they asking for a predecessor key from this list?
+                 result←fixio¨(tn _predecessor sdir)sub
+                 ⍝ Only a single key value is returned for this function:
+                 ⍝   For a 1-D array this is Disclosed to a single simple value; For an n-D array this is a [nested] vector of sub-values
+                 :If 1=≢result ⋄ result←⊃result ⋄ :EndIf
+             :Case '[+]' ⍝ Are they asking for a prefixed-key list?
+                 result←2⊃¯2(tn _list sdir)sub
+                 ⍝ A list of key values is returned for this function:
+                 ⍝   For a 1-D array this is a vector of single sub-values; For an n-D array this is Mixed to an n-column matrix
+                 :If 1=≢⊃result ⋄ result←fixio¨⊃¨result ⋄ :Else ⋄ result←fixio¨↑result ⋄ :EndIf
+             :Else
+                 ⎕FUNTIE untie ⋄ 'Invalid array-subscripting function'⎕SIGNAL 11
+             :EndSelect
+         :EndIf
+     :Else
+         ⎕FUNTIE untie ⋄ 'Component subscript notation missing'⎕SIGNAL 2
+     :EndIf
+
+ :Case '↓'               ⍝ === Delete component
+     :If (0=≢⍴comp)∧1 3∊⍨10|⎕DR comp ⍝ They gave us a raw component number (when using unnamed components in the file)
+         ⍝ --- Deleting a raw component #
+         ⍝ Check to see if they're trying to delete something they're not supposed to
+         :If comp=1
+             ⎕FUNTIE untie ⋄ 'Unable to delete master file index component'⎕SIGNAL 20
+         :ElseIf (comp<1⊃⎕FSIZE tn)∨comp≥2⊃⎕FSIZE tn
+             ⎕FUNTIE untie ⋄ 'Non-existent component number to delete'⎕SIGNAL 20
+         :ElseIf ×t←⊃(tn _find ¯1)⎕UCS 0 ⍝ Do we have any reserved components?
+         :AndIf comp∊⎕FREAD tn,t
+             ⎕FUNTIE untie ⋄ 'Unable to delete reserved component number'⎕SIGNAL 19
+         :ElseIf ×t←⊃(tn _find ¯1)⎕UCS 127 ⍝ Do we have any freed components?
+         :AndIf comp∊⎕FREAD tn,t
+             ⎕FUNTIE untie ⋄ 'Unable to delete unused component number'⎕SIGNAL 19
+         :ElseIf comp∊1⊃mlist←(tn _list 1)'' ⍝ Will be a slow check on big files with subscripts, but important for safety
+             ⎕FUNTIE untie ⋄ 'Unable to delete named component by number'⎕SIGNAL 19
+         :ElseIf ×≢t←(×1 _keyrank¨2⊃mlist)/2⊃mlist ⍝ Are any of these names subscripted arrays?
+             :For t :In t ⍝ Loop through all subscripted array names ⍝ This can take a while if they're big
+                 :Trap 0
+                     used←'∞' '∞'(tn _validate(((2⊃mlist){⎕CT←0 ⋄ ⍺⍳⍵}⊂t)⊃1⊃mlist))1 _keyrank t
+                 :Else
+                     ⎕FUNTIE untie ⋄ 'Unable to delete component number from damaged file'⎕SIGNAL 23
+                 :EndTrap
+                 :If comp∊used
+                     ⎕FUNTIE untie ⋄ 'Unable to delete named component array item by number'⎕SIGNAL 19
+                 :EndIf
+             :EndFor
+         :EndIf
+         tn _free comp ⍝ This component number is OK to release (it's not indexed anywhere)
+     :Else
+          ⍝ --- Deleting a named component
+         :If 0∊⍴comp ⋄ ⎕FUNTIE untie ⋄ 'Component name missing'⎕SIGNAL 2 ⋄ :EndIf
+         :If ∧/0 1∊×≢¨sub ⋄ ⎕FUNTIE untie ⋄ 'Incomplete component subscript'⎕SIGNAL 2 ⋄ :EndIf
+         :If 0=⊃dpath←(tn _find ¯1)comp ⋄ ⎕FUNTIE untie ⋄ 'Component Value Error'⎕SIGNAL 20 ⋄ :EndIf
+         :If 0=≢sub
+             tn _free tn _delete dpath ⍝ Remove non-array component name from the master directory
+         :Else
+             :If ∧/0=≢¨sub ⍝ Delete the entire array
+                 :Trap 0
+                     comp←'∞' '∞'(tn _validate(⊃dpath))≢sub ⍝ Get list of all array data & directory components for freeing
+                 :Else
+                     ⎕FUNTIE untie ⋄ 'Unable to delete array from damaged file'⎕SIGNAL 23
+                 :EndTrap
+                 comp∪←tn _delete dpath ⍝ Remove the array name itself from the master directory
+                 tn _free comp ⍝ Free all the loose pieces
+             :Else ⍝ Delete just one subscript from the array
+                 :If 0=⊃spath←(tn _find(-⊃dpath))sub
+                     ⎕FUNTIE untie ⋄ 'Component Value Error'⎕SIGNAL 20
+                 :Else
+                     tn _free tn _delete spath ⍝ Remove and free B-tree entry and the data component
+                    ⍝ If that was the last subscript in the array going away, we need to delete the array, too
+                     :If (1=1-⍨≢dpath)∧1=2 2⊃dpath ⍝ Shortcut to avoid checking all cases
+                     :AndIf 0=⊃(tn _lowest(⊃dpath))⍬ ⍝ See if there's an initial key available
+                         tn _free tn _delete dpath ⍝ Get rid of the array name itself from the master directory
+                     :EndIf
+                 :EndIf
+             :EndIf
+         :EndIf
+     :EndIf
+
+ :Case '≠'               ⍝ === Reserved component list
+     :If (,0)≢⍴comp ⋄ ⎕FUNTIE untie ⋄ 'Component name not permitted'⎕SIGNAL 2 ⋄ :EndIf
+     :If 0=t←⊃(tn _find ¯1)⎕UCS 0 ⍝ Do we have any reserved components?
+         result←⍬ ⍝ Nope
+     :Else
+         result←⎕FREAD tn,t ⍝ These are they
+     :EndIf
+
+ :Case '⍬'               ⍝ === Free-space (available) component list
+     :If (,0)≢⍴comp ⋄ ⎕FUNTIE untie ⋄ 'Component name not permitted'⎕SIGNAL 2 ⋄ :EndIf
+     :If 0=t←⊃(tn _find ¯1)⎕UCS 127 ⍝ Do we have any free-space components?
+         result←⍬ ⍝ Nope
+     :Else
+         result←{⍵[⍋⍵]}⎕FREAD tn,t ⍝ These are they (sorted)
+     :EndIf
+
+ :Case '⌹'               ⍝ === Validate directory; return unindexed cmp #s
+     :If (,0)≢⍴comp ⋄ ⎕FUNTIE untie ⋄ 'Component name not permitted'⎕SIGNAL 2 ⋄ :EndIf
+     ⍝ Validate B-tree file root and all connected trees, and return entire list of indexed file components
+     ⍝ If an error is detected, _validate will ⎕SIGNAL the problem which will be passed upwards by ⎕TRAP
+     result←'∞' '∞'(tn _validate 1)¯1 ⍝ Start at the top and walk all the trees in the file
+     ⍝ Ok, we've got the list of all known-used component #s - check them for validity
+     :If ∨/t←(result<1⊃⎕FSIZE tn)∨(result≥2⊃⎕FSIZE tn)∨(result≠⌊|result)∨~1 3∊⍨10|⎕DR result
+         ⎕FUNTIE untie ⋄ ('Damaged file!  Invalid component numbers: ',⍕t/result)⎕SIGNAL 23
+     :EndIf
+     :If ∨/t←~≠result ⍝ Are there any duplicates?
+         ⎕FUNTIE untie ⋄ ('Damaged file!  Cross-linked components: ',⍕∪t/result)⎕SIGNAL 23
+     :EndIf
+     ⍝ The final indexed list looks OK, so return the opposing list of all the (other) un-indexed (manual) component #s
+     result~⍨←⍳¯1+2⊃⎕FSIZE tn
+
+ :Else
+     ⎕FUNTIE untie ⋄ 'Unknown function request'⎕SIGNAL 11
+ :EndSelect
+
+ ⎕FUNTIE untie ⍝ Untie any temporary file tie when we're done

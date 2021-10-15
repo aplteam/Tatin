@@ -1,0 +1,23 @@
+ text←{thread}∆sew values;t;u;v;w;x;⎕PP;⎕IO;⎕ML
+⍝∇ Join together a list (or array) of values into text string(s) separated by delimiters.
+⍝ Left argument (required): Character or string used to join adjacent values together.
+⍝ Right argument: Data to be formatted (Depth ≤ 2[text]; Any rank)
+⍝ (This is a variant of the ∆csv utility.)
+⍝
+⍝ Written 31 December 2007 by Davin Church of Creative Software Design
+
+ ⎕IO←⎕ML←1 ⋄ ⎕PP←15
+ :If 2≠⎕NC'thread' ⋄ thread←'' ⋄ :EndIf ⋄ thread←∊thread ⍝ Thread used for sewing
+ t←0 ' '⍳⊃¨⊃0⍴⊂values←1/values
+ :If ∨/u←,t=1 ⍝ Numeric formatting (can get pretty complicated in extreme cases)
+     :If ∨/v←(|x←u/,values)<0.000001 ⍝ Avoid use of miniscule exponential notation
+         x←⍕¨(u/,values)+v×w←×x ⋄ (v/x)←((v/w<0)⍴¨'-'),¨'0',¨((v/x)⍳¨'1')↓¨v/x
+     :Else
+         x←⍕¨x ⍝ Nothing too small here - just handle it trivially
+     :EndIf
+     (('¯'=∊x)/∊x)←'-' ⋄ (u/,values)←x ⍝ Ok, numbers are finally ready
+ :EndIf
+ :If ∨/u←,t=2 ⋄ (u/,values)←⍕¨u/,values ⋄ :EndIf ⍝ Character-string formatting
+ :If ∨/u←,t=3 ⋄ (u/,values)←⍕¨⊃¨u/,values ⋄ :EndIf ⍝ Constant-text non-formatting
+ text←(⍴thread)↓¨,/(⊂'')⍪(⊂''),(⊂thread),¨values ⍝ Handle arbitrary arrays
+ :If 1=⍴⍴values ⋄ text←⊃text ⋄ :Else ⋄ text←1↓[1]text ⋄ :EndIf

@@ -1,13 +1,14 @@
- {buildList}←{replace}CompileBuildList folder;oldTree;newTree;b;deps2;ind
-⍝ We distinguesh here between level-1 packages and other packages (=dependencies).
-⍝ The level-1 packages are called top-level packages.
+ {buildList}←{replace}CompileBuildList folder;oldTree;newTree;deps2;ind;deps
+⍝ We distinguesh here between principal packages and packages (=dependencies).
 ⍝ If the dependency file was modified after the build list was saved:
 ⍝ * If a top-level package was removed from the dependency file the build list is re-created
-⍝ * If a dependency package is missing, re-installation is required and therefore an error thrown\\
+⍝ * If a dependency package is missing, re-installation is required and therefore an error is thrown\\
  replace←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'replace'
  folder←Reg.AddSlash folder
  oldTree←LoadBuildList folder
- newTree←{0(GetDependencyTree NoPrintToSession)⍵}¨folder∘,¨⊃⎕NGET(folder,Reg.DependenciesFilename)1
+ deps←⊃F.NGET (folder,Reg.DependenciesFilename) 1
+ (Reg.DependenciesFilename,' is empty')Assert 0<≢deps
+ newTree←{0(GetDependencyTree NoPrintToSession)⍵}¨folder∘,¨deps
  newTree←(0<≢¨newTree)⌿newTree
  newTree←⊃⍪/newTree
  newTree←newTree[⍒newTree[;1];]
@@ -25,10 +26,6 @@
      newTree[ind;2]←GetPackageIDFromFilename¨deps2
      newTree[ind;3]←deps2
  :EndIf
-
- :If 0<≢oldTree←(oldTree[;2]∊newTree[;2])⌿oldTree
- :AndIf 0<+/b←newTree[;2]∊oldTree[;2]
-     newTree[⍸b;3]←oldTree[oldTree[;2]⍳b/newTree[;2];3]     ⍝ Preserve original URLs
- :EndIf
+ newTree[;3]←oldTree[(Reg.RemoveMinorAndPatch¨oldTree[;2])⍳Reg.RemoveMinorAndPatch¨newTree[;2];3]     ⍝ Preserve original URLs
  buildList←(~replace)SaveBuildList newTree folder
 ⍝Done

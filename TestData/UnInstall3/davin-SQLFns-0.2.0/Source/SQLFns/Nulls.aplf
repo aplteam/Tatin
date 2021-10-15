@@ -1,0 +1,14 @@
+ results←defaults Nulls matrix
+⍝∇ Calls Null on a data vector/matrix with different defaults for each item/column.
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ 'Rank Error: Only operates on vectors or matrices of data'⎕SIGNAL 11/⍨~(⍴⍴matrix)∊1 2
+ 'Rank Error: Default list must be a vector'⎕SIGNAL 11/⍨1≠⍴⍴defaults
+ 'Length Error: Length of defaults and data must match'⎕SIGNAL 11/⍨(⍴defaults)≠¯1↑⍴matrix
+⍝ (Must {each} by column rather than looping through differing defaults, otherwise
+⍝ the column datatypes may change due to demotion to a simple array.)
+ :If 1=⍴⍴matrix
+     results←defaults Null¨matrix
+ :Else
+     results←↑[0.5]defaults Null¨↓[1]matrix
+ :EndIf

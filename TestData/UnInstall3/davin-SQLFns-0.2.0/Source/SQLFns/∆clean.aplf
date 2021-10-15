@@ -1,0 +1,14 @@
+ clean←{filler}∆clean code;at;this;⎕IO;⎕ML
+⍝∇ Clean up executable APL code for analysis by blanking out strings and comments
+⍝ Handles both single and double quotes and nested/overlapping/doubled symbols.
+⍝ Accepts arguments of any size, rank or depth and returns the same structure.
+ ⎕IO←⎕ML←1 ⋄ :If 0=⎕NC'filler' ⋄ filler←' ' ⋄ :EndIf ⋄ filler←⊃filler
+ :If 1<|≡code ⋄ clean←filler ∆clean¨code ⋄ :Return ⋄ :EndIf
+ :If 1<⍴⍴code←1/code ⋄ clean←↑filler ∆clean¨↓code ⋄ :Return ⋄ :EndIf
+ :If ~∨/'''"⍝'∊clean←code ⋄ :Return ⋄ :EndIf ⋄ clean←''
+ :While (at←⌊/code⍳'''"⍝')<⍴code
+     this←¯1↑clean,←at↑code ⋄ at←(code←at↓code)∊this~'⍝'
+     at←(at∧(≠\at)∧~(2⍴this)⍷code)⍳1
+     clean,←((at-1)⍴filler),(at≤⍴code)⍴this ⋄ code←at↓code
+ :EndWhile
+ clean,←code

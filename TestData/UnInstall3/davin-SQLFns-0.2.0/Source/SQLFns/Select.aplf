@@ -1,0 +1,70 @@
+ sql←{special}Select fields;t;quote;noquote
+⍝∇ Generate a SQL Select clause given the database field names to select.
+⍝
+⍝ Right argument:
+⍝   1.  Nested vector of field names, or a single text string if only one field
+⍝
+⍝   2.  Nested vector of field names, with any individual field name nested one level
+⍝       deeper and containing a field/alias pair.  If only one field name is being
+⍝       passed in, and it includes an alias, the whole list must still be nested to
+⍝       depth 3, or else this function will assume that the field and its alias are
+⍝       actually two different field names.
+⍝
+⍝   3.  Nested vector of field names, with any individual field name being preceded
+⍝       by its alias and a "←" symbol within the text string
+⍝       (i.e. <alias>←<realfieldname>).
+⍝
+⍝   4.  2-column matrix of field names in column 1 and aliases in column 2;
+⍝       any field name with no alias may have a '' as its alias
+⍝
+⍝   An advanced option is available on options 2 and 4 to automatically call Math
+⍝   implicitly.  This can be quite confusing, but is provided for use where it is
+⍝   required.  To invoke Math functionality, any individual field name in those
+⍝   structures may be nested one further level to create a nested vector in its
+⍝   place.  The first item of the vector is the "expression" template for the
+⍝   calculation and is passed to Math as its left argument and the remaining
+⍝   nested items (which may themselves be nested as needed by Math) are provided
+⍝   as its right argument.  The data must continue to be nested and structured as
+⍝   if there were an alias, but any such alias may be specified as a '' (or left
+⍝   out in #2) if it is not needed, as long as the argument depth is correct.
+⍝   Calling Math directly (including the '⍎' option code) is usually much easier
+⍝   and more readable, but occasionally there may be a requirement to perform this
+⍝   operation using data structures alone, and this option is provided for that
+⍝   purpose.
+⍝
+⍝ Left argument:
+⍝   Optional; any special word(s) to insert into the command after the word 'Select',
+⍝   such as 'Distinct' or 'Top 5'.
+⍝
+⍝   If the left argument contains an '⍎' character (as a separate text item),
+⍝   that signals this function not to call "Quote" on any of the field names.
+⍝
+⍝ All field names and aliases will be checked for valid names using "Quote", unless
+⍝ the "⍎" option is used in the left argument.  Further, "Quote" will itself suppress
+⍝ quoting any name which itself contains the "⍎" character or is nested an extra
+⍝ level deeper (the same depth as Math nesting).  A field name of '*' itself is
+⍝ never quoted by "Quote", nor is any expression ending in '(*)'.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Modified 19 December 2015 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'special' ⋄ special←0⍴⊂'' ⋄ :EndIf
+ :If 1=|≡special ⋄ special←⊂special ⋄ :EndIf
+ :If noquote←×≢special←(,,¨special)~⊂''
+     noquote←∨/t←∧/¨'⍎'=(1⌈⍴¨special)↑¨special ⋄ special←(~t)/special
+ :EndIf
+
+ :If 2=⍴⍴fields ⋄ fields←↓fields ⋄ :EndIf
+ :If 1≥|≡fields ⋄ fields←⊂fields ⋄ :EndIf ⋄ fields←,,¨fields
+ :If ∨/t←1=|≡¨fields ⋄ (t/fields)←∆dtr¨¨⌽¨¯2↑¨'←'∆cut¨t/fields ⋄ :EndIf
+ :If ∨/t←2≥|≡¨fields
+     :If noquote ⋄ (t/fields)~¨←'⍎' ⋄ :Else ⋄ (t/fields)←↓'.'Quote↑2↑¨t/fields ⋄ :EndIf
+ :EndIf
+ :If ∨/t←3≤|≡¨fields
+     (t/fields)←(⊂¨((⊃¨1⊃¨t/fields)Math¨1↓¨1⊃¨t/fields)~¨'⍎'),¨1↓¨t/fields
+ :EndIf
+ :If ∨/t←×≢¨2⊃¨fields←∆dtr¨¨2↑¨fields ⋄ (t/fields)←(⊂' As ')∆sew¨t/fields ⋄ :EndIf
+ :If ∨/~t ⋄ ((~t)/fields)←⊃¨(~t)/fields ⋄ :EndIf
+
+ t←' '∆sew ∆dlt¨special ⋄ sql←'Select ',t,((×⍴t)/' '),', '∆sew fields

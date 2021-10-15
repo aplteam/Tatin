@@ -897,7 +897,7 @@
               r,←'' '  ]Tatin.Ping [server-url]'
           :EndSelect
           :If 'Version'≢Cmd
-              r,←''(']',Cmd,' -?? ⍝ Enter this for more information ')
+              r,←''(']Tatin.',Cmd,' -?? ⍝ Enter this for more information ')
           :EndIf
       :Case 1
           :Select ⎕C Cmd
@@ -1002,15 +1002,16 @@
               r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
           :Case ⎕C'UninstallPackage'
               r,←⊂'Uninstall a given package and all its dependencies, but only if those'
-              r,←⊂'are neither top-level packages nor required by any other package.'
-              r,←⊂'In addition any superfluous packages like outdated versions are removed, too.'
+              r,←⊂'are neither top-level packages nor required by other packages.'
+              r,←⊂'In addition any superfluous packages like outdated versions) are removed, too.'
               r,←⊂'If no package is specified only superfluous packages, if any, will be uninstalled.'
               r,←⊂''
               r,←⊂'Requires at least one argument:'
               r,←⊂' * Path to a folder with installed packages'
               r,←⊂' * Optionally a package identifier;  this can be one of:'
-              r,←⊂'   * Name of the package to be uninstalled'
-              r,←⊂'   * An alias; post- or prefix with a "@" in order to mark it as an alias'
+              r,←⊂'   * Name of the package'
+              r,←⊂'   * Alias and name of the package'
+              r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as such'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←⊂'Takes a path hosting such a file as an argument.'

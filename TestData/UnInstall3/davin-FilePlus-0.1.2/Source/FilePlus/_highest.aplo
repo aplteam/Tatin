@@ -1,0 +1,19 @@
+ path←(tn _highest root)empty;ptrs;keys
+⍝ Find the highest key in the B-tree starting at {root}
+⍝
+⍝ Argument:
+⍝       The value to be returned as a result in path[2] if the whole tree is empty
+⍝
+⍝ Result:
+⍝      path[1]←Component # (scalar) that contains the data for the highest key
+⍝          If path[1]=0 then the tree is empty and there is no highest key
+⍝      path[2]←The largest key value in the tree (or the supplied {empty} value if none)
+⍝      (2↓path)←Nested vector of the reverse-path back through the B-tree
+⍝          (1⊃¨2↓path)←Component # of the tree node in the path
+⍝          (2⊃¨2↓path)←Key-subscript into that node [always 1+≢keys for branches; ≢keys for leaves]
+
+ (ptrs keys)←⎕FREAD tn,root ⋄ path←⊂root,1+≢keys ⍝ Follow the pointer-path through the tree, starting here
+ ⍝ Traversing the highest branch-path through the tree
+ :While ≠/≢¨ptrs keys ⋄ (ptrs keys)←⎕FREAD tn,root←⊢/ptrs ⋄ path←(⊂root,1+≢keys),path ⋄ ⋄ :EndWhile
+ ⍝ Now we're at a leaf node - return the largest key value & location (if any)
+ :If 0=≢keys ⋄ path←0 empty,path ⋄ :Else ⋄ path←(⊢/ptrs),(⊢/keys),(⊂root,≢keys),1↓path ⋄ :EndIf

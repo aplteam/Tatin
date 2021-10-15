@@ -1,4 +1,4 @@
- r←Test_Uninstall_007(stopFlag batchFlag);⎕TRAP;dir;dir2;list;msg;qdmx
+ r←Test_Uninstall_007(stopFlag batchFlag);⎕TRAP;dir;dir2;list;msg
 ⍝ Uninstall a package by {group}-{name} that does not exist
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -7,13 +7,9 @@
  dir ⎕NCOPY'TestData/UnInstall/'
  dir2←dir,'/UnInstall'
 
- :Trap 98
-     (list msg)←TC.UnInstallPackage dir2'Does-NotExist'
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'Invalid package ID'≢qdmx.EM
- :EndTrap
+ (list msg)←TC.UnInstallPackage dir2'Does-NotExist'
+ →T.GoToTidyUp 0≠≢list
+ →T.GoToTidyUp msg≢'Package is not installed'
 
  r←T._OK
 

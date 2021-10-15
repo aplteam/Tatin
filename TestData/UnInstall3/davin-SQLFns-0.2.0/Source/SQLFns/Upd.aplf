@@ -1,0 +1,21 @@
+ sql←Upd clauses;table;set;where
+⍝∇ Generate a SQL Update command from its component clauses by passing them
+⍝∇ to the subroutines Update, Set, & Where and return the results
+⍝∇ catenated together into a whole SQL command.
+⍝
+⍝ Provide arguments in this order (the standard order of a SQL Update statement):
+⍝       {update-table} {set-values} {where-clause}
+⍝ Each of these values should be suitable for passing (monadically) to each
+⍝ of these corresponding functions:  Update, Set, Where
+⍝
+⍝ Written 17 December 2014 by Davin Church of Creative Software Design
+⍝ Updated 31 January 2017 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ 'Length Error'⎕SIGNAL 5/⍨(2≤|≡clauses)∧3≠¯1↑1,⍴clauses
+ table set where←clauses
+ :Trap 0
+     :If 1<|≡set ⋄ set←Set set ⋄ :EndIf ⍝ Permit Set to be called before now, as well as not
+     :If 'SET'≢3↑∆dlt ∆uc set ⋄ set←' Set ',∆dlt set ⋄ :EndIf ⍝ Add clause name if missing
+     sql←(Update table),((' '≠⊃set)/' '),set,Where where
+ :Else ⋄ ⎕SIGNAL ∆dmx ⋄ :EndTrap

@@ -1,0 +1,27 @@
+ r←Test_Uninstall_016(stopFlag batchFlag);⎕TRAP;dir;msg;list;expected
+⍝ Start with three packages, one of them in two versions, then un-install the single one
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/UnInstall3/*'
+
+ (list msg)←TC.UnInstallPackage dir'davin-FilePlus-0.1.2'
+ Assert 0=≢msg
+ →T.GoToTidyUp'davin-FilePlus-0.1.2'≢∊list
+ (list msg)←TC.UnInstallPackage dir'Davin-Tester-0.1.0-test'
+ Assert 0=≢msg
+ →T.GoToTidyUp'Davin-Tester-0.1.0-test'≢∊list
+ (list msg)←TC.UnInstallPackage dir'davin-SQLFns-0.2.0'
+ Assert 0=≢msg
+ →T.GoToTidyUp'davin-SQLFns-0.2.0'≢∊list
+
+ (list msg)←TC.UnInstallPackage dir'aplteam-DotNetZip-1.0.2'
+ →T.GoToTidyUp'The very last principal package cannot be uninstalled'≢msg
+ →T.GoToTidyUp 0≠≢list
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Done

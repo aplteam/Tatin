@@ -1,0 +1,19 @@
+ both←{left}Or right;pp;addp;cnt
+⍝∇ Join two (or more) phrases together with a SQL 'Or' conjunction.
+⍝ Handle cases where phrases may be empty.  (All-space phrases not supported.)
+⍝ Allow argument(s) to be nested to specify multiple terms.
+⍝ A special term of '()' causes non-empty results to be enclosed in parens.
+⍝ A special term of '(,)' causes results to be enclosed in parens, but only if
+⍝ there is more than one term being ORed together.  This assumes that the
+⍝ arguments are individual terms that haven't already been combined.
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Modified 14 November 2014 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'left' ⋄ left←'' ⋄ :EndIf ⋄ pp←'()' '(,)' ⋄ addp←0 0 ⋄ cnt←0 0
+ :If 1<|≡left ⋄ addp∨←pp∊left ⋄ cnt[1]←⍴left←left~pp,⊂'' ⋄ left←⊃Or/(⊂''),left ⋄ :EndIf
+ :If 1<|≡right ⋄ addp∨←pp∊right ⋄ cnt[2]←⍴right←right~pp,⊂'' ⋄ right←⊃Or/(⊂''),right ⋄ :EndIf
+ addp∨←pp∊left right ⋄ left←(~(⊂left)∊pp)/left ⋄ right←(~(⊂right)∊pp)/right ⋄ cnt+←(cnt=0)××≢¨left right
+ both←left,((∧/×(⍴left),⍴right)/' Or '),right
+ :If ∨/addp∧(×⍴both),1<+/cnt ⋄ both←'()'∆Q both ⋄ :EndIf

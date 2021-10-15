@@ -1,0 +1,32 @@
+ free←(tn _delete)path;root;at;ptrs;keys;bmax;bmin;rebalance;limbs;limb1;limb2;st;branch;leaf
+⍝ Remove the item at this path and return list of component numbers to be freed (including path[1])
+⍝ {path} is defined as the result of _find, where path[1]≠0
+
+ 'Unable to delete missing component'⎕SIGNAL 11/⍨0=free←⊃path
+ root at←⊃path←1↓path ⍝ Where will we start searching?
+ bmax←4⌈⌊|⊃∊TreeSize ⋄ bmin←¯1+⌈bmax÷2 ⍝ Adjustable B-tree size
+ :If =/≢¨(ptrs keys)←⎕FREAD tn,root ⍝ This is a leaf node - just remove this item by itself
+     (ptrs keys)/⍨←⊂at≠⍳≢ptrs ⍝ Remove this item from the node & update
+     ptrs keys ⎕FREPLACE tn,root
+     rebalance←(bmin>≢keys)/⊃¨path ⍝ Will this path need rebalancing?
+ :Else ⍝ This is an internal node so reconstruction is required
+     limbs←ptrs[¯1 1+2×at] ⋄ limb1←limb2←⍬ ⍝ Check predecessor and successor child branches
+     :If bmin<≢2⊃limb1←⎕FREAD tn,st←limbs[1] ⍝ Check size of left child - above minimum size?
+     :OrIf bmin<≢2⊃limb2←⎕FREAD tn,st←limbs[2] ⍝ Check size of right child - above minimum size?
+     :OrIf (×st←limbs[2])∧×≢2⊃limb2 ⍝ Remove from a deficient right child (there better be some)
+     :OrIf (×st←limbs[1])∧×≢2⊃limb1 ⍝ Remove from a deficient left child (there better be some)
+         :Select st ⍝ Locate largest/smallest key value in that subtree
+         :Case limbs[1] ⋄ branch←(tn _highest st)⍬
+         :Case limbs[2] ⋄ branch←(tn _lowest st)⍬
+         :EndSelect
+         ptrs[2×at]←branch[1] ⋄ keys[at]←branch[2] ⍝ Move it up to replace the deleted key
+         ptrs keys ⎕FREPLACE tn,root
+         leaf←⎕FREAD tn,3 1⊃branch ⍝ Now it's time to get rid of the leaf that was moved
+         leaf/¨⍨←⊂branch[1]≠1⊃leaf ⍝ Remove moved item from leaf & update
+         leaf ⎕FREPLACE tn,3 1⊃branch
+         rebalance←(bmin>≢2⊃leaf)/⊣/¨(2↓branch),path ⍝ Will this path need rebalancing?
+     :Else ⍝ Both predecessor and successor child branches are empty!
+         'Both empty neighbor siblings found in B-Tree!'⎕SIGNAL 23
+     :EndIf
+ :EndIf
+ :If ×≢rebalance ⋄ free∪←(tn _rebalance)rebalance ⋄ :EndIf ⍝ Rebalance underflow nodes

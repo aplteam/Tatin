@@ -1,0 +1,18 @@
+ sql←Del clauses;from;where
+⍝∇ Generate a SQL Delete command from it's two component clauses by passing them
+⍝∇ to the Delete & Where functions and catenating the results together.
+⍝
+⍝ Provide arguments in this order (the standard order of a SQL Delete statement):
+⍝       {from-table} {where-clause}
+⍝ (The where-clause is required to avoid accidental deleting of entire tables.)
+⍝
+⍝ Written 16 December 2014 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 12 October 2019 by Davin Church of Creative Software Design
+
+ 'Length Error'⎕SIGNAL 5/⍨(2≤|≡clauses)∧2≠¯1↑1,⍴clauses ⋄ from where←clauses
+ :Trap 0
+     'No Where clause constructed'⎕SIGNAL 5/⍨0∊⍴sql←Where where
+     sql←(Delete from),sql
+ :Else
+     ⎕SIGNAL ∆dmx
+ :EndTrap

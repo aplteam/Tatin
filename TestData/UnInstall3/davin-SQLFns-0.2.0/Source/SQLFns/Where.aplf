@@ -1,0 +1,20 @@
+ sql←Where phrases;t
+⍝∇ Generate a SQL "Where" clause from the argument(s) given.
+⍝ One or more phrases may be specified in any of the following formats:
+⍝   (1) A complete "Where" clause (except for the text 'Where' itself)
+⍝   (2) One or more phrases to be ANDed together to form the final clause
+⍝   (3) Any phrase (above) may instead be specified as a nested name-value
+⍝       pair to be given to Is before being further processed.
+⍝   (4) A two-column matrix of name-value pairs to be passed to Is.
+⍝ An empty call will produce a '' result (no "Where" keyword)
+⍝
+⍝ Written 15 December 2011 by Davin Church and Doug Neman of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ :If 1≥|≡phrases ⋄ phrases←,⊂phrases ⋄ :EndIf
+ :If 2=⍴⍴phrases ⋄ phrases←↓[2]phrases ⋄ :EndIf ⋄ phrases←,,¨phrases
+ :If ∨/t←6=10|⎕DR¨phrases ⍝ Run name/value pairs through Is
+     'Length Error'⎕SIGNAL 5/⍨∨/2≠≢¨t/phrases
+     (t/phrases)←⊃¨Is/¨t/phrases
+ :EndIf
+ sql←And ∆dlt¨phrases ⋄ sql←((×⍴sql)/' Where '),sql

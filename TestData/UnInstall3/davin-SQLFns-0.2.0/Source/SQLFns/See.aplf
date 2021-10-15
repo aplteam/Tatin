@@ -1,0 +1,73 @@
+ mat←{pw}See sql;kw;ind;mark;this;at;phrase;m;t;i;nl
+⍝∇ Format a SQL command as a prettily-wrapped matrix
+⍝
+⍝ Written about 2005 by Davin Church of Creative Software Design
+⍝ Modified 16 December 2015 by Davin Church of Creative Software Design
+⍝ Converted to Dyalog 8 November 2019 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'pw' ⋄ pw←⎕PW ⋄ :EndIf ⋄ nl←⎕UCS 13
+ ind←1↑1↓pw,4 ⋄ pw←⊃pw ⋄ mat←'' ⋄ sql←∆dmu,' ',(' '@{⍵∊nl})sql
+ 'Minimum display width exceeded'⎕SIGNAL 11/⍨pw<5
+ kw←'SELECT' 'INSERT' 'UPDATE' 'DELETE' 'FROM' 'SET' 'WHERE'
+ kw,←'GROUP BY' 'ORDER BY' 'HAVING' 'AND' 'OR' 'ON'
+ kw←(⊂'(SELECT '),' ',¨kw,¨' '
+ :While ×⍴sql←(+/∧\sql=' ')↓sql
+     :If '('=⊃sql
+        ⍝ Indent everything at this level of parens
+         at←(-⌿+\'()'∘.=∆clean sql)⍳0
+         :If (at+1+(⌽mat)⍳nl)≤pw-ind ⍝ Try to fit short parenthetical expressions on the same line
+             mat,←((nl≠¯1↑nl,mat)/' '),at↑sql ⍝? Are they still/more readable?
+         :ElseIf at≤pw-ind ⍝ Or perhaps on a single separate line if they don't fit on the same one
+             mat,←nl,(ind⍴' '),at↑sql ⍝? Are they still/more readable?
+         :Else ⍝ If we have to, split them all up on multiple lines
+             mat,←nl,(ind⍴' '),'('
+             m←↑nl ∆cut((pw-ind),ind)See(at-2)↑1↓sql
+             mat,←nl,nl ∆sew ∆dtr¨↓(-(0,ind)+⍴m)↑m
+             mat,←nl,(ind⍴' '),')'
+         :EndIf
+         sql←at↓sql
+     :Else
+         mark←kw⍷¨⊂∆uc ∆clean sql←' ',sql ⋄ this←∆dlt((⊃¨mark)⍳1)⊃kw,⊂''
+         :If this≡'WHERE' ⋄ at←6
+         :ElseIf (this≡'AND')∧'('=⊃∆dlt 4↓sql ⋄ at←4
+         :ElseIf (this≡'OR')∧'('=⊃∆dlt 3↓sql ⋄ at←3
+         :Else ⋄ at←(1↓⊃∨/mark)⍳1
+         :EndIf
+         :If ∨/'BETWEEN'⍷∆uc ∆clean at↑sql
+            ⍝ Override the following 'And' because it's part of 'Between'
+             t←(∆dlt¨kw)⍳⊂'AND' ⋄ ((t,1+(1↓t⊃mark)⍳1)⊃mark)←0 ⍝ Ignore first 'And' found
+             at←(1↓⊃∨/mark)⍳1 ⍝ Recompute next keyword breakpoint
+         :EndIf
+         phrase←∆dtr at↑sql ⋄ sql←at↓sql ⋄ i←0
+         :If pw≥⍴phrase←∆dlt phrase
+             mat,←nl,phrase
+         :Else ⍝ Wrap long lines as best I can
+             :While ×⍴phrase
+                 t←((pw-i)+' '=⊃(pw-i)↓phrase)↑phrase ⋄ t←(t=' ')∨(∆clean t)∊',;)' ⋄ t←0⌈(0≠t)⌈.×⍳⍴t
+                 t+←pw×t=0 ⋄ mat,←nl,(i⍴' '),∆dlt t↑phrase ⋄ phrase←∆dlt t↓phrase ⋄ i←2×ind
+             :EndWhile
+         :EndIf
+         :Select this
+         :Case 'SELECT' ⍝ Indent everything hereafter
+             m←↑nl ∆cut((pw-ind),ind)See sql
+             mat,←nl,nl ∆sew ∆dtr¨↓(-(0,ind)+⍴m)↑m
+             sql←''
+         :CaseList 'FROM' 'WHERE'
+             t←at↓⊃∨/mark[(∆dlt¨kw)⍳'WHERE' 'GROUP BY' 'ORDER BY' 'HAVING']
+             at←¯1+(t∧0=-⌿+\'()'∘.=∆clean sql)⍳1
+             m←↑nl ∆cut((pw-ind),ind)See at↑sql
+             mat,←(at=0)↓nl,nl ∆sew ∆dtr¨↓(-(0,ind)+⍴m)↑m
+             sql←at↓sql
+         :Case 'ON' ⍝ Indent just this phrase
+             t←at↓⊃∨/mark[(∆dlt¨kw)⍳'WHERE' 'GROUP BY' 'ORDER BY' 'HAVING']
+             at←¯1+(t∨<\0>-⌿+\'()'∘.=∆clean sql)⍳1
+             m←↑nl ∆cut((pw-ind),ind)See at↑sql
+             mat,←nl,nl ∆sew ∆dtr¨↓(-(0,ind)+⍴m)↑m
+             sql←at↓sql
+         :EndSelect
+     :EndIf
+ :EndWhile
+ mat←(nl=⊃mat)↓mat
+⍝? Don't break ()'s unless it's a large, complex internal statement (somehow)?
+⍝? Add support for pw to actually wrap long lines (may need to break on commas [or other non-spaces?])  Already done?
+⍝? Remove dependence on ∆dmu (only See uses it, and might cause headaches anyway)?

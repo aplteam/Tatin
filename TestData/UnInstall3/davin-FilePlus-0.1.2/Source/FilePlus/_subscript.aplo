@@ -1,0 +1,39 @@
+ subs←(io _subscript)term;t
+⍝ Decode a user specification of a name with optional subscripts
+⍝ Subscripted names are of the form: "name[subscript]".
+⍝ Any name of this form is considered to be subscripted and is not used as a raw value.
+⍝ Subscripts may be of any number of dimensions, each dimension separated by ';'.
+⍝ All simple text names (subscripted or not) have leading and trailing spaces trimmed off.
+⍝ All subscripts are themselves trimmed and positive integer representations are converted to numbers.
+⍝
+⍝ No checking is done of any required subscripts, only the values present or not present are returned.
+⍝
+⍝ In the future, some special kinds subscripts will be processed here. Until that time, those special
+⍝ cases will be reserved. This code will enforce those reservations until it is time to process them.
+⍝
+⍝ Result:
+⍝       If the argument is not a subscripted name, then it is returned just the same as it was given,
+⍝           but enclosed as the first and only item of the nested vector result.
+⍝       If the argument is subscripted, it is decomposed and returned as follows:
+⍝           [1]  ←  Base component name followed by an empty subscript notation ('FOO[;…;]')
+⍝                   If base component name is empty then this result is left entirely ''
+⍝           [2+] ←  Parsed subscripts, one per rank.
+⍝                   Empty subscript elements produce '' items.
+⍝                   Numeric subscript elements are decoded.
+
+ subs←,⊂term ⍝ Start by assuming non-subscripted result
+ :If (0 2∊⍨10|⎕DR term)∧1=≢⍴term ⍝ If this is a simple character vector, do some friendly processing on it
+ :AndIf ×≢⊃subs←,⊂term←∆dlt term ⍝ Trim simple text, even if it's not subscripted
+ :AndIf (1=≢term∩'[')∧(1=≢term∩']')∧(']'=⊢/term)∧'['≠⊣/term ⍝ Subscripts must have exactly one '[' and one ']' and end with ']' but not begin with '['
+     subs←(t←term⍳'[')↓¯1↓term ⋄ term←∆dlt(t-1)↑term ⍝ Split off root name
+     subs←∆dlt¨1↓¨(1,subs∊';')⊂';',subs ⍝ Split apart dimensions
+     :If ∨/t←(×≢¨subs)∧∧/¨subs∊¨⊂⎕D ⍝ Look for numeric subscripts (non-negative integers)
+     :AndIf ∨/t∧←(~∧/¨subs='0')∨io=0 ⍝ Special-case '0'=char if ⎕IO=1
+     :AndIf ∨/t\9≥≢¨t/subs ⍝ Allow up to 9-digit integer numerics
+         (t/subs)←(io=0)+(⊃2⊃⎕VFI)¨t/subs ⍝ Decode all-numeric subscripts
+     :EndIf
+     'The subscript "⎕" is reserved for future use'⎕SIGNAL 16/⍨(⊂,'⎕')∊subs
+     'The subscript "," is reserved for future use'⎕SIGNAL 16/⍨(⊂,',')∊subs
+     'Subscripts beginning with "⍎" are reserved for future use'⎕SIGNAL 16/⍨'⍎'∊⊃¨subs
+     subs←(⊂term,(×≢term)/'[',(';'⍴⍨1-⍨⍴subs),']'),subs ⍝ Return final result
+ :EndIf

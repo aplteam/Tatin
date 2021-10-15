@@ -1,0 +1,65 @@
+ rpt←{left}(testfn Pass_ expect)right;at;result;validate;⎕TRAP;nrr;failure;⎕IO;IO;⎕ML;ML
+ ⍝ Perform a unit-test on a simple function call that takes arguments and is expected to NOT return a result.
+ ⍝ Execute <testfn> with arguments {left} and <right> and expect no result to be returned.
+ ⍝ <expect> should be a function (passed ⍬ as any arguments) that validates
+ ⍝ any side effects of the proper operation (and returns a 1 if OK, 0 if not).
+ ⍝ A global variable StopOnError may be set to any of the following values
+ ⍝  0←Do not stop, just report invalid results
+ ⍝  1←Stop in the testing function on the line that did not validate [Default]
+ ⍝  2←Stop in the tested function at the original error without any error trapping
+ ⍝  ¯1←Do not stop, and increment global variable "Errors" if it exists
+ ⍝ See also ∇Pass to run tests that return result values to be verified.
+ ⍝ and ∇Fail to test production of ⎕SIGNAL error reports.
+
+ IO←⎕IO ⋄ ML←⎕ML ⋄ ⎕IO←⎕ML←1 ⋄ rpt←0 0⍴'' ⋄ at←⊃⎕AT'testfn' ⋄ nrr←at[1]=0
+ 'Test-fn is niladic'⎕SIGNAL 2/⍨at[2]=0
+ 'Test-fn is monadic'⎕SIGNAL 2/⍨(at[2]=1)∧0≠⎕NC'left'
+ 'Test-fn is dyadic'⎕SIGNAL 2/⍨(at[2]=2)∧0=⎕NC'left'
+ :If 0=⎕NC'left' ⋄ left←⊢ ⋄ :EndIf
+ :Select ⊃⎕NC'expect'
+ :Case 3 ⍝ A function to validate the result
+     at←⊃⎕AT'expect'
+     'Validation-fn does not return a result'⎕SIGNAL 2/⍨at[1]=0
+     :Select at[2]
+     :Case 0 ⋄ validate←{⎕IO←IO ⋄ ⎕ML←ML ⋄ expect}
+     :Case 1 ⋄ validate←{⎕IO←IO ⋄ ⎕ML←ML ⋄ expect ⍵}
+     :CaseList 2 ¯2 ⋄ validate←{⎕IO←IO ⋄ ⎕ML←ML ⋄ ⍺ expect ⍵}
+     :EndSelect
+ :Else
+     'Validation operand is not a fn'⎕SIGNAL 2
+ :EndSelect
+
+ failure←0 ⋄ ⎕TRAP←0 'E' '(1↓∊(⎕UCS 13),[⎕IO+.5]⎕DM)⎕SIGNAL(''Pass_''≢⊃⎕SI)/⎕EN ⋄ failure←1 ⋄ →⎕LC+1'
+ :If 2=⎕NC'StopOnError' ⋄ :AndIf 2∊StopOnError ⋄ ⎕TRAP←0/⎕TRAP ⋄ :EndIf
+ :If nrr
+     ⎕IO←IO ⋄ ⎕ML←ML ⋄ left testfn right
+     result←⍬ ⍝ This cannot return a result
+ :Else
+     ⎕IO←IO ⋄ ⎕ML←ML ⋄ result←left testfn right
+     :If ~failure
+         rpt←'Test-fn produced a result:',(⎕UCS 13),⎕SE.UCMD'Disp result'
+     :EndIf
+ :EndIf
+ ⎕IO←⎕ML←1 ⋄ ⎕TRAP←0/⎕TRAP
+
+ :If failure∧(⎕EN=6)∧(~(⎕UCS 13)∊⊃⎕DM)∧∨/'left testfn right'⍷⊃1↓⎕DM
+     result←⍬ ⍝ This is the expected case (a returned VALUE ERROR)
+ :ElseIf failure
+     rpt←1↓∊(⎕UCS 13),[1.5]⎕DM
+ :EndIf
+
+ :If 0∊⍴rpt
+     :Trap 0
+         :If ~⍬ validate ⍬
+             rpt←'Test-fn failed validation'
+         :EndIf
+     :Else
+         rpt←'Validation processing function failed to complete!',∊(⎕UCS 13),[1.5]⎕DM
+     :EndTrap
+ :EndIf
+
+ :If ~0∊⍴rpt
+     :If 0=⎕NC'StopOnError' ⋄ :OrIf 1∊StopOnError ⋄ rpt ⎕SIGNAL 500 ⋄ :EndIf
+     rpt,⍨←(⊃1↓⎕LC){⍵,(×⍴⍵)/'[',(⍕⍺),']: '}' '~⍨⊃1↓⎕SI
+     :If 2=⎕NC'StopOnError' ⋄ :AndIf ¯1∊StopOnError ⋄ :AndIf 2=⎕NC'Errors' ⋄ Errors+←1 ⋄ :EndIf
+ :EndIf

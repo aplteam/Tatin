@@ -1,0 +1,61 @@
+ used←fences(tn _validate root)rank;t;ptrs;keys;master;r;p;posts;u;x;bmax;bmin
+⍝ Validate the B-tree recursively starting at the node {root} and return used/indexed component numbers.
+⍝ If rank=¯1 (root will be 1), some keys may point to subdirectory B-trees which need to be recursively analyzed and included in the result.
+⍝ If rank≠¯1, all key values must imply the given rank: each a vector (if rank>0) of sub-keys where rank=≢key
+⍝ {fences} contains lower and upper bounds on the possible key values in the node, or '∞' if unbounded at that end
+
+ 'Damaged file!  Non-numeric file component number in referring directory'⎕SIGNAL 23/⍨~(1 3∊⍨10|⎕DR root)∧⍬≡⍴root
+ ('Damaged file!  No such file component number for directory: ',⍕root)⎕SIGNAL 23/⍨(root<1⊃⎕FSIZE tn)∨(root≥2⊃⎕FSIZE tn)∨root≠⌊|root
+ :If (,2)≢⍴x←⎕FREAD tn,used←,root ⍝ Is it the right shape & size?
+ :OrIf ~(∧/1=(≢⍴)¨x)∧(1≤|≡2⊃x)∧(1=|≡1⊃x)∧1 3∊⍨10|⎕DR 1⊃x ⍝ And does it have the right structure & datatypes
+ :OrIf (≠/≢¨x)∧≠/0 1+1 2×≢¨x ⍝ And do the two halves have B-tree-compatible lengths?
+     ('Damaged file!  Invalid directory structure in: ',⍕root)⎕SIGNAL 23
+ :EndIf
+ (ptrs keys)←x ⍝ Separate into halves for easier processing
+ master←rank=¯1 ⍝ Are we checking the master file directory (special rules apply)?
+ bmax←4⌈⌊|⊃∊TreeSize ⋄ bmin←¯1+⌈bmax÷2 ⍝ Adjustable B-tree size
+ ('Damaged file!  Scalar names found in directory in: ',⍕root)⎕SIGNAL 23/⍨0∊(≢⍴)¨keys~⎕UCS master/0 127
+ ('Damaged file!  Empty names found in directory in: ',⍕root)⎕SIGNAL 23/⍨∨/(0∊⍴)¨keys
+ ('Damaged file!  Duplicate names found in directory node in: ',⍕root)⎕SIGNAL 23/⍨~∧/≠keys
+ ('Damaged file!  Empty directory has bad prototype in: ',⍕root)⎕SIGNAL 23/⍨(0=≢keys)∧⍬≢⊃keys
+ ('Damaged file!  Directory not in sorted order in: ',⍕root)⎕SIGNAL 23/⍨((⍳≢)≢⍋)(fences[1]~'∞'),keys,fences[2]~'∞'
+ ⍝ ('Damaged file!  Directory branch not within standard size range: ',⍕root)⎕SIGNAL 23/⍨(bmax<≢keys)∨(bmin>≢keys)∧fences≢'∞' '∞' ⍝ Ok if TreeSize has changed!
+ :If rank≥0 ⍝ Make sure all subscripts have the right number of sub-elements
+     ('Damaged file!  Directory subscripts of improper rank: ',⍕root)⎕SIGNAL 23/⍨~∧/rank=≢¨keys
+ :EndIf
+
+ ⍝ Process this node one key (and separator) at a time
+ :If =/≢¨ptrs keys ⍝ Is this a leaf node?
+     r←master _keyrank¨keys ⍝ Which keys might have a specific-rank subdirectory?
+     used,←(r=0)/ptrs ⍝ The rest of them are just scalar data pointers
+     :For p r :InEach ((r≠0)/ptrs)(r~0) ⍝ Check subscripted names recursively
+         used,←'∞' '∞'(tn _validate p)r ⍝ Analyze the subdirectory tree from its root
+     :EndFor
+ :Else ⍝ This is a branch node
+     posts←fences[1],keys,fences[2] ⋄ u←⍬ ⍝ New fence posts for children
+     :While ×≢ptrs
+         used,←(2↑posts)(tn _validate(⊣/ptrs))rank ⍝ Check subtree preceeding next key
+         (ptrs posts)↓⍨←1 ⍝ Subtree and preceeding post are complete
+         :If ×≢keys ⍝ Examine next key
+             :If ×r←master _keyrank⊃keys ⍝ We have a subdirectory for this key
+                 used,←'∞' '∞'(tn _validate(⊣/ptrs))r ⍝ Analyze the subdirectory tree from its independent root
+             :Else
+                 u,←⊣/ptrs ⍝ Just note a straight data component (quickly)
+             :EndIf
+             (ptrs keys)↓⍨←1 ⍝ Key plus data/subtree pointer is complete
+         :EndIf
+     :EndWhile
+     used,←u ⍝ Append short list accumulated from node to full list - faster than repeatedly appending to full list
+ :EndIf
+
+ ⍝ Check built-in file component management data
+ :If master ⍝ Codes only present in master directory; only check once at top-of-file
+     :If ×t←⊃(tn _find(-root))⎕UCS 0 ⍝ Have any component numbers been reserved?
+         used,←x←⎕FREAD tn,t
+         'Damaged file!  Reserved component list is invalid'⎕SIGNAL 23/⍨~{((,1)≡⍴⍴⍵)∧1 3∊⍨10|⎕DR ⍵}x ⍝ Require integer vector
+     :EndIf
+     :If ×t←⊃(tn _find(-root))⎕UCS 127 ⍝ Have any component numbers been freed (available for re-use)?
+         used,←x←⎕FREAD tn,t
+         'Damaged file!  Free component list is invalid'⎕SIGNAL 23/⍨~{((,1)≡⍴⍴⍵)∧1 3∊⍨10|⎕DR ⍵}x ⍝ Require integer vector
+     :EndIf
+ :EndIf

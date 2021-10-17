@@ -29,7 +29,7 @@ This document gives you an overview over these HTML files: their purpose and who
   * You need multiple user settings files
   * You need different user settings files for multiple users
 
-* [Syntax Reference](./SyntaxReference.html "SyntaxReference.html") (stub)
+* [Syntax Reference](./SyntaxReference.html "SyntaxReference.html") (draft)
 
 ### The Client
 

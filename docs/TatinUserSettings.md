@@ -12,7 +12,7 @@
 
 Tatin uses a file to remember all Tatin Registries you want to work with, and possibly other user-specific settings as well. We refer to this file as the user settings file.
 
-When you start using Tatin for the very first time with 18.0 or 18.1 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location. 
+When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location. 
 
 Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instanciate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _does not_ affect `⎕SE.Tatin.MyUserSettings`!
 
@@ -69,7 +69,7 @@ If you are familiar with JSON5 syntax and want to edit the file it is recommende
 
 This will allow you to edit the file contents, but Tatin will check it afterwards in order to make sure that nothing invalid goes ever into the file.
 
-Note that Dyalog 18.1 and later recognise JSON5 and highlight any syntax errors which can be quite useful.
+Note that Dyalog 18.2 and later recognise JSON5 and highlight any syntax errors which can be quite useful.
 
 ### What does Tatin do at start-up time?
 

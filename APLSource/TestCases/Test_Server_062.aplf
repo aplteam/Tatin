@@ -1,0 +1,12 @@
+ r←Test_Server_062(stopFlag batchFlag);⎕TRAP;list
+⍝ List all versions of a particular package on all servers, using the [*] syntax with group name
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←TC.ListVersions'[*]aplteam-APLProcess'
+ →T.PassesIf 0<≢list
+ →T.PassesIf 3=≢∪list[;1]
+ →T.PassesIf 1=≢∪{⍵↑⍨¯1+⍵⍳'-'}¨Reg.RemoveVersionNumber¨list[;2]
+
+ r←T._OK
+⍝Done

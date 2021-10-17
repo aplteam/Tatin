@@ -1,0 +1,17 @@
+ CompileSyntaxRef flag;md;buff;namelist;name
+ md←''
+ namelist←⎕se.Tatin.⎕nl 3
+ :For name :In ↓namelist
+     buff←#.Tatin.APLTreeUtils2.DLB #.Tatin.Client.⎕NR name
+     buff←(1++/∧\'⍝'=⊃¨1↓buff)↑buff
+     md,←⊂''
+     md,←⊂'### ',name
+     md,←⊂''
+     md,←⊂'```'
+     md,←⊂{⍵↑⍨¯1+⍵⍳';'}1⊃buff
+     md,←⊂'```'
+     md,←⊂''
+     md,←#.Tatin.APLTreeUtils2.DLB 1↓¨1↓buff
+ :EndFor
+ md←'\\\\$'⎕R''⊣md
+ ∘∘∘  ⍝ Ready?!

@@ -1,10 +1,11 @@
  cfg←ReadPackageConfigFile path;cfg_file;cfg;buff;Reg
-⍝ Takes path to a package and returns the config file for that package.
+⍝ Takes path to a package and returns the config file for that package as a namespace populated with variables.\\
+⍝ `path` may or may not carry the filename.
  Reg←##.Registry
  :If Reg.IsHTTP path
      cfg←ReadPackageConfigFile_ path
  :Else
-     cfg_file←path,'/',CFG_Name
+     cfg_file←path,((⎕C CFG_Name≢⎕C(-≢CFG_Name)↑path))/'/',CFG_Name
      ('Config file missing: ',cfg_file)Assert F.Exists cfg_file
      cfg←InitPackageConfig''
      ⍝ load in actual

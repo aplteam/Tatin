@@ -1,18 +1,18 @@
  {(statusCode errMsg zipFilename)}←PublishPackage(source registry);uri;path;cfg;errMsg;statusCode;packageID
-⍝ Publish a package.\\
+⍝ Publishes a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
 ⍝ 2. Creates a dependency file for the package if required
-⍝ 3. Creates a zip file for the package in a Temp folder if required
-⍝ 4. Moves the zip file into the Registry
-⍝ 5. Updates the Registry index
+⍝ 3. Creates a zip file for the package in a temp folder if required
+⍝ 4. Moves the zip file into the Registry, either via HTTP or directly.
+⍝ 5. Updates the Registry index in case it's a local Registry
 ⍝ Note that if ⍵ points already to a ZIP file it is **moved** into the Registry.\\
 ⍝ `⍵` must be a two-item vector:
 ⍝ 1. `source` → folder to create package from
 ⍝ 2. `registry` → registry to publish package to (alias or uri)
 ⍝ ## The explicit result
 ⍝ * `statusCode` is an HTTP no matter whether it is an HTTP call or not.
-⍝ * `errMsg` is empty if `statusCode` is 200 but can be transferred back to the server as content otherwise.
-⍝ * `zipFilename` is empty in case `source` is a ZIP file but the name of the ZIP file created along the way otherwise.
+⍝ * `errMsg` is empty if `statusCode` is 200, otherwise it is additional informartion.
+⍝ * `zipFilename` is empty in case `source` is a ZIP file, but the name of the ZIP file created along the way otherwise.
  statusCode←200 ⋄ errMsg←''
  uri←F.EnforceSlash ReplaceRegistryAlias registry
  'No URI provided'Assert 0<≢uri

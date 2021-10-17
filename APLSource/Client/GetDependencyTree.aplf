@@ -2,16 +2,15 @@
 ⍝ Takes `identifier` (`x`) and returns the dependencies as a matrix.
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request
-⍝ * a folder holding a package (like file://C:\Temp\group-name-major.minor.patch\\)
-⍝ * a path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
+⍝ * a folder holding a package (like file://C:\Temp\{group-name-major.minor.patch})
+⍝ * a path to a package in a registry (like C:\MyReg\{packageID})
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
-⍝ Returns a dependey tree as a matrix:
+⍝ Returns a dependency tree as a matrix:
 ⍝ * [;1] Flag that indicates whether it is a principal package (1) or a dependency (0)
 ⍝ * [;2] PackageID of what required that dependency
 ⍝ * [;3] Full package ID
 ⍝ * [;4] The full URL (either a local path (without protocol) or http(s)://...)\\
 ⍝ This function requires the version number to be fully specified.\\
-⍝ By default the ciontents of a build list on file is added. You can prevent that by passing a 0 as ⍺.
  append←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'append'
  :If initialCall←80=⎕DR x
      principal←1

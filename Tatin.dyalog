@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.32.3 - 2021-10-12
+⍝ * 0.32.4 - 2021-10-16
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -264,7 +264,7 @@
               r←'No packages found'
           :Else
               :If 0≡parms.date
-                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name') ,((parms.aggregate)/⊂'≢ major versions'),(⊂'Info URL')
+                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'≢ major versions'),(⊂'Info URL')
               :Else
                   r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Info URL'
               :EndIf
@@ -867,7 +867,7 @@
               r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> <Registry-URL|[Registry-Alias]> [-quiet]'
           :Case ⎕C'ListVersions'
               r,←⊂'List all versions of the given package.'
-              r,←'' '  ]Tatin.ListVersions <(Registry-URL|[Registry-Alias]|*)package-ID> [-date]'
+              r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias|*][<group>]-<name>> [-date]'
           :Case ⎕C'Version'
               r,←⊂'Prints name, version number and version date of Tatin to the session.'
               r,←'' '  ]Tatin.Version'
@@ -1055,8 +1055,10 @@
               r,←⊂'Lacking a group does not make a difference if the given package exists only in one group anyway.'
               r,←⊂'If it exists in more than one group then all of them are listed.'
               r,←⊂''
-              r,←⊂'If you are interested in all registries then you can use this special syntax:'
-              r,←⊂']Tatin.ListVersions [*]{package}'
+              r,←⊂'The special syntax [*] will return a list of all versions of a package from all Registries:'
+              r,←⊂']Tatin.ListVersions [*]{group}-{name}'
+              r,←⊂'or'
+              r,←⊂']Tatin.ListVersions [*]{name}'
               r,←⊂''
               r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem with'
               r,←⊂'beta versions) then the publishing date is taken into account.'

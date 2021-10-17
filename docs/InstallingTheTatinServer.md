@@ -8,7 +8,7 @@
 
 ## Introduction
 
-While the Tatin Client is coming with version 18.1 and later automatically, the Tatin Server always needs to be installed in case you want to use it.
+While the Tatin Client is coming with version 19.0 and later automatically, the Tatin Server always needs to be installed in case you want to use it.
 
 After downloading it from <https://github.com/aplteam/Tatin/releases> you need to unzip it into a folder where the Tatin Server is supposed to live.
 

@@ -2,10 +2,19 @@
 ⍝ Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.\\
 ⍝ The file apl-buildlist.json as well as all directories in that folder will be deleted.
 ⍝ Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.\\
-⍝ Note that a package with a higher major version number is considered a different package.\\
+⍝ Note that a packages with different major version numbers are considered different.
 ⍝ By default all known Registries with a priority greater than 0 are scanned, but you may
 ⍝ specify a particular Registry as a second (optional) argument.\\
-⍝ By default beta versions are considered. You may change this by specifying a 1 as left argument.
+⍝ The left argument is optional and, if specified, typically created by calling `CreateReInstallParms`.\\
+⍝ It may carry three parameters:
+⍝ * `noBetas`
+⍝   By default this is 0, meaning that beta versions are considered. Set to 1 if you want betas to be ignored.
+⍝ * `update`
+⍝   Defaults to 0, meaning that the same version is installed again even if a later version is available now.
+⍝   Change to 1 to force an update.
+⍝ * `dry`
+⍝   Defaults to 0, meaning the function does business.
+⍝   Set this to 1 in order to get a report of what the function would do without actually doing it.
  :If 0=⎕NC'parms'
      parms←CreateReInstallParms
  :EndIf

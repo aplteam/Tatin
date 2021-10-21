@@ -54,6 +54,12 @@ r←GetDeletePolicy uri
 
 Takes a URI of a server (like https://tatin.dev) and returns the delete policy operated by that server.
 
+Returns one of "None", "Any", "JustBetas":
+
+* "None" means a package, once published, cannot be deleted                                
+* "Any" means any package can be deleted                                                    
+* "JustBetas" means that only beta versions can be deleted                                
+
 ### GetDependencyTree    
 
 ```

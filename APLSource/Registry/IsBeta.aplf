@@ -1,7 +1,11 @@
- IsBeta←{
+ r←IsBeta packageID;patch
 ⍝ Returns 1 in case ⍵ (a package ID) is a beta version.
-⍝ Betas are defined as having anything tailing that's neitehr a . not a digit
-     packageID←⍵
-     patch←{1↓⍵/⍨2≤+\'-'=⍵}packageID
-     0<≢patch~⎕D,'.'
- }
+⍝ Betas are defined as having anything trailing that's neither a . not a digit.
+⍝ Can also handle the name of ZIP files.
+ :If '.zip'{⍺≡⎕C(-≢⍺)↑⍵}packageID
+     packageID←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¯4↓packageID
+ :EndIf
+ packageID←(¯1+packageID⍳'+')↑packageID
+ patch←{1↓⍵/⍨2≤+\'-'=⍵}packageID
+ r←0<≢patch~⎕D,'.'
+⍝Done

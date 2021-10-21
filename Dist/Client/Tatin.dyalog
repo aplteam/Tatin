@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.32.4 - 2021-10-16
+⍝ * 0.33.0 - 2021-10-20
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -311,12 +311,12 @@
           :If 0  ⍝TODO⍝  May be one day we support this, may be not
               :If 0<≢r
                   :If 1=≢r
-                      question←'There is a later version:',⎕UCS 13
-                      question,←'  ',(∊r),⎕UCS 13
+                      question←'There is a later version:',CR
+                      question,←'  ',(∊r),CR
                       question,←'Would you like to install this later version?'
                   :Else
-                      question←'There are later versions:',⎕UCS 13
-                      question,←∊'  '∘,¨r,¨⎕UCS 13
+                      question←'There are later versions:',CR
+                      question,←∊'  '∘,¨r,¨CR
                       question,←'Would you like to install ALL these later versions?'
                       :If 1 ∆YesOrNo question
                           ∘∘∘
@@ -378,6 +378,7 @@
     ∇
 
     ∇ r←GetDeletePolicy Arg;uri
+      r←⍬
       uri←Arg._1
       :If 0≡Arg._1
           →(⍬≡uri←SelectRegistry 0)/0
@@ -427,7 +428,7 @@
       zipFilename←TC.Pack sourcePath targetPath
     ∇
 
-    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID
+    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2
       r←''
       (source url)←Arg.(_1 _2)
       :If (,'?')≡,url
@@ -448,6 +449,23 @@
           ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
       :EndIf
       firstFlag←1
+      f1←'none'≡⎕C policy←TC.GetDeletePolicy url_
+      :If f2←'justbetas'≡⎕C policy←TC.GetDeletePolicy url_
+          f2←~TC.Reg.IsBeta url_
+      :EndIf
+      :If f1∨f2
+          msg←'Attention - the server:'
+          msg,←CR,'>>> ',url_,' <<<'
+          msg,←CR,'operates a "',policy,'" delete policy.'
+          :If f2
+              msg,←CR,'The package is not e beta release.'
+          :EndIf
+          msg,←CR,'Are you sure that you want to publish anyway?'
+          :If 0=∆YesOrNo msg
+              ⎕←'Publishing cancelled'
+              :Return
+          :EndIf
+      :EndIf
      ∆Again:
       :Trap 98
           (rc msg zipFilename)←TC.PublishPackage source url
@@ -1046,6 +1064,8 @@
               r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
               r,←⊂'to the Tatin rules.'
               r,←⊂''
+              r,←⊂'Tatin checks the "delete" policy of the server. If the package cannot be deleted then the user'
+              r,←⊂'must confirm that she really wants to publish to that particular server.'
               r,←⊂'-quiet: Suppresses the "Are you sure?" question (test cases).'
           :Case ⎕C'ListVersions'
               r,←⊂'List all versions of the given package. You may specify the package in two different ways:'
@@ -1115,6 +1135,10 @@
               r,←⊂' * everything'
           :Case ⎕C'GetDeletePolicy'
               r,←⊂'Request which "Delete" policy is operated by a server.'
+              r,←⊂'Return one of "None", "Any", "JustBetas":'
+              r,←⊂' * "None" means a package, once published, cannot be deleted'
+              r,←⊂' * "Any" means any package can be deleted'
+              r,←⊂' * "JustBetas" means that only beta versions can be deleted'
               r,←⊂'If no server is specified the user will be prompted, unless there is just one server anyway.'
           :Case ⎕C'Documentation'
               r,←⊂'Put https://tatin.dev/v1/documentation into the default browser'
@@ -1348,6 +1372,12 @@
           :If '.'∊ns.source
               '"source" carries an invalid extension'Assert(⊂3⊃⎕NPARTS ns.source)∊SupportedExtensions
           :EndIf
+          :If 0<≢ns.info_url
+              :If 0=TC.SendHEAD ns.info_url
+                  msg←'No response from ',ns.info_url
+                  :Return
+              :EndIf
+          :EndIf
           json←TC.Reg.JSON ns
       :Else
           msg←⎕DMX.EM
@@ -1468,7 +1498,10 @@
     ∇
 
     JSON←{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}
-
     AddSlash←{0=≢⍵:⍵ ⋄ ⍵,(~(¯1↑⍵)∊'/\')/'/'}
+
+    ∇ r←CR
+      r←⎕UCS 13
+    ∇
 
 :EndNamespace

@@ -1,0 +1,11 @@
+ r←SendHEAD url;request;response
+ request←R.NewRequest 0
+ request.RequestTarget←url
+ request.Method←'HEAD'
+ :Trap 347
+     response←url SendAndReceive request
+     r←response.StatusCode≡200
+ :Else
+     r←0
+ :EndTrap
+⍝Done

@@ -1,0 +1,15 @@
+ r←Test_Misc_022(stopFlag batchFlag);⎕TRAP
+⍝ Exercise `IsBeta`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ →T.PassesIf 0=TC.Reg.IsBeta'group-foo-1.0.0'
+ →T.PassesIf 0=TC.Reg.IsBeta'group-foo-1.0.0+123'
+ →T.PassesIf 1=TC.Reg.IsBeta'group-foo-1.0.0-beta1+123'
+
+ →T.PassesIf 0=TC.Reg.IsBeta'/path/to/group-foo-1.0.0.zip'
+ →T.PassesIf 0=TC.Reg.IsBeta'/path/to/group-foo-1.0.0+123.zip'
+ →T.PassesIf 1=TC.Reg.IsBeta'/path/to/group-foo-1.0.0-beta1+123.ZIP'
+
+ r←T._OK
+⍝Done

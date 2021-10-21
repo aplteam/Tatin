@@ -15,6 +15,7 @@
      mat←(0,(2+dateFlag))⍴⍬
      registries←ListRegistries 0
      :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
+     :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}registries[;1])⌿registries
          :For registry :In registries[;1]
              :If 0<≢buff←dateFlag ListVersions registry,3↓uri
                  mat⍪←(⊂registry),buff

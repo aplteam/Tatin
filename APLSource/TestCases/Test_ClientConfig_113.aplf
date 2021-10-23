@@ -8,7 +8,7 @@
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
  →T.GoToTidyUp≢/F.ExpandPath¨settings.path2config(tempDir,'/',settings.cfg_name)
- settings.registries.priority←1
+ settings.registries.priority←1 0
 
  myRegDef1←'[test]http://test-tatin.dev/'
  reg←⎕NEW TC.DefineRegistry(,⊂myRegDef1)
@@ -21,8 +21,8 @@
  reg←⎕NEW TC.DefineRegistry(,⊂myRegDef2)
  settings.AddRegistry reg
 
- →T.GoToTidyUp 9000 300 200 100≢settings.registries.priority
- →T.GoToTidyUp'test' 'tatin-test' 'tatin' 'my-tatin'≢(1 settings.ListRegistries 0)[;1]
+ →T.GoToTidyUp 9000 300 100 0≢settings.registries.priority
+ →T.GoToTidyUp'test' 'tatin' 'my-tatin' 'tatin-test'≢(1 settings.ListRegistries 0)[;1]
 
  r←T._OK
 

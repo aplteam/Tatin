@@ -1,30 +1,41 @@
- r←CreateProofReadDocument dummy;M;parms;F;list;file;md;html;ns;buff
+ r←CreateProofReadDocument flag;M;parms;F;list;file;md;html;ns;buff;first
 ⍝ This creates an HTML document from all the Markdown files in the docs/ folder for proof-reading the documentation in a single document.
 ⍝ The file will be created in the temp folder. The filename is returned as result.
  r←''
- M←##.MarkAPL ⋄ F←##.FilesAndDirs
- parms←M.CreateParms
- parms.leanpubExtensions←1
- parms.outputFilename←'html'F.GetTempFilename2'tatin-proofread'
- parms.cssURL←'./Assets/CSS/'
- parms.createFullHtmlPage←0
- parms.numberHeaders←1
- parms.bookmarkLink←0
- parms.verbose←0
- html←''
- :If 0<≢list←F.ListFiles'docs/*.md'
-     :For file :In list
-         md←⊃F.NGET file 1
-         md←(~∧\'[parm]:'∘{⍺∘≡¨(≢⍺)↑¨⍵}md)/md
-         (buff ns)←parms M.Markdown2HTML md
-         :If 0<≢ns.report
-             ⎕←file,' has problem(s):'
-             ⎕←⍪ns.report
-         :EndIf
-         html,←buff
-     :EndFor
-     html←parms M.MakeHTML_Doc html
-     (⊂html)F.NPUT parms.outputFilename 1
-     r←parms.outputFilename
+ :If flag
+     M←##.MarkAPL ⋄ F←##.FilesAndDirs
+     parms←M.CreateParms
+     parms.leanpubExtensions←1
+     parms.outputFilename←'html'F.GetTempFilename2'tatin-proofread'
+     parms.cssURL←'./Assets/CSS/'
+     parms.createFullHtmlPage←0
+     parms.numberHeaders←1
+     parms.bookmarkLink←0
+     parms.verbose←0
+     html←''
+     first←1
+     :If 0<≢list←F.ListFiles'docs/*.md'
+         :For file :In list
+             :If first
+                 first←0
+             :Else
+                 html,←⊂'<p style="page-break-after:always;"></p>'
+             :EndIf
+             md←⊃F.NGET file 1
+             md←(~∧\'[parm]:'∘{⍺∘≡¨(≢⍺)↑¨⍵}md)/md
+             (buff ns)←parms M.Markdown2HTML md
+             :If 0<≢ns.report
+                 ⎕←file,' has problem(s):'
+                 ⎕←⍪ns.report
+             :EndIf
+             html,←buff
+         :EndFor
+         html←parms M.MakeHTML_Doc html
+         ⍝ html←'@page\{'⎕R'@page{@bottom-center{content:"Page " counter(page) " of " counter(pages);}'⊣html   ⍝TODO⍝ ?!
+         (⊂html)F.NPUT parms.outputFilename 1
+         r←parms.outputFilename
+     :EndIf
+ :Else
+     ⎕←'*** No action taken'
  :EndIf
 ⍝Done

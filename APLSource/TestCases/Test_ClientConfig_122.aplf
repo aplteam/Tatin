@@ -1,0 +1,19 @@
+ r←Test_ClientConfig_122(stopFlag batchFlag);⎕TRAP;tempDir;parms;qdmx
+⍝ Attempt to define a URL with an alias (invalid)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.uri←'[alias]https://localhost'  ⍝ Invalid!
+ parms.api_key←'First-one'
+
+ :Trap 98
+     {}⎕NEW TC.DefineRegistry(,⊂parms)
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'"uri" must not carry []'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

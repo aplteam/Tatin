@@ -9,7 +9,7 @@
 
 Before you start reading this document you should have read the document [Introduction.html](./Introduction.html).
 
-I> Note that you should have at least an idea of what [Semantic Versioning](./SemanticVersioning.html) is all about.
+I> Note that you should know what [Semantic Versioning](./SemanticVersioning.html) is all about.
 
 In this document additional information that you might or might not be interested in at this stage is presented in gray boxes. You might well skip over them till later.
 
@@ -56,7 +56,9 @@ You may list _all_ packages managed by Tatin's principal server with this comman
  ...
 ```
 
-The square brackets around "tatin" declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like `https://localhost/my_tatin_server` or a simple question mark: `]tatin.ListPackages ?` would present all known Registries to you.
+The square brackets around "tatin" declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like `https://localhost/my_tatin_server`
+
+If you omit the argument Tatin will present a list with all known Registries to you.
 
 A> ### Local and remote Registries
 A>
@@ -70,11 +72,13 @@ A> Of course features like listing just the packages that carry a specific tag a
 `]tatin.ListPackages` will return a list with _all_ packages available in the given Registry, aggregated by major version number. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.
 
 * If you happen to know the group name you may specify `-group=whatever`: then only packages of the group "whatever" are listed
-* Every package is tagged with keywords: you may specify one or more tags, for example `-tag=linux,date`
+* Every package is tagged with keywords
+
+  You may specify one or more tags, for example `-tag=linux,date`
 
 A> ### Searching for tags: the strategy
 A>
-A> 1. First Tatin tries to find a 100%-match
+A> 1. First Tatin tries to find 100%-matches
 A> 1. In case there is no match, Tatin tries to find it _somewhere_ (`⍷`)
 A> 1. In case there is still no match a fuzzy search is performed
 A> 
@@ -114,7 +118,7 @@ We are now ready to identify that package by executing `ListPackages` with the `
 
 ```
 
-Note that because packages which share the same group and name but have different major version numbers are considered different packages, the major version number is part of the list.
+Note that because packages which share the same group and name but have different major version numbers are considered different packages, the tally of the major version numbers is part of the list.
 
 I> If you wonder why that is, then please read the document discussing [Semantic Versioning](./SemanticVersioning.html).
 
@@ -151,10 +155,12 @@ aplteam-MarkAPL-11.0.1
 aplteam-OS-3.0.1
 ```
 
+You will probably see different version numbers here.
+
 * The folder `aplteam-MarkAPL-11.0.1` contains the MarkAPL package
 * The file `apl-dependencies.txt` contains just one line: `aplteam-MarkAPL-11.0.1`
 
-  That's because you project "Foo" depends so far on just one package, MarkAPL
+  That's because your project "Foo" depends so far on just one package, MarkAPL
 
 * The file `apl-buildlist.json` carries the build list
 
@@ -190,7 +196,7 @@ Notes:
 
 * There is one package that has `principal` set to 1: MarkAPL. That's because we have explicitly asked for it
 * All other packages got installed because MarkAPL depends on them, either directly or indirectly
-* The URL points to where the packages were loaded from
+* The URL points to where the packages was loaded from
 
 #### How does a package look like on disk?
 
@@ -267,7 +273,12 @@ The command prints to the session the name of the namespace into which the packa
 #._tatin.aplteam_MarkAPL_11_0_1.code.MarkAPL
 ```
 
-But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries a variable `HOME` that in turn carries the path to the directory that holds the assets:
+But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries two variables:
+
+* `HOME` carries the path to the directory where the package was loaded from
+* `ASSETS` is the path to the assets folder relative to `HOME`
+
+  Note that this variable only exists in case the package has assets.
 
 ```
       #._tatin.aplteam_MarkAPL_11_0_1.code.TatinVars.HOME
@@ -289,7 +300,7 @@ aplteam_MarkAPL_11_0_1
 aplteam_OS_3_0_1           
 ```
 
-All packages, whether principal ones or dependencies, are stored in `#._tatin`. For the principal packages a reference is injected into the target namespace.
+All packages, whether principal ones or dependencies, are stored in `#._tatin`. For the principal packages a reference is injected into the target namespace., in our case `#.Foo`.
 
 Note that by naming convention packages are always loaded into either `#._tatin` or `⎕SE._tatin`.
 
@@ -298,7 +309,7 @@ Note that by naming convention packages are always loaded into either `#._tatin`
 
 Let's assume that before actually installing it you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it but just to load it into the workspace. 
 
-That can be achieved with the `LoadPackage` user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided, which means if it has no assets,
+That can be achieved with the `LoadPackage` user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided, which means if it has no assets.
 
 A> ### Leaving a trace on the file system
 A>
@@ -315,7 +326,7 @@ Notes:
   This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
 
 
-Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and optionally target namespace:
+Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and optionally a target namespace:
 
 ```
       ]tatin.LoadPackage [tatin]MarkAPL
@@ -345,7 +356,7 @@ MarkAPL
 _tatin 
 ```
 
-That reference points to the namespace that holds the package as such, which is loaded into `_tatin`: this is the namespace Tatin uses to manage all the packages.
+That reference points to the namespace that holds the package as such, which is loaded into `_tatin`: this is the namespace Tatin uses to manage all packages.
 
 I> The name `_tatin` is hard-coded and _cannot_ be changed.
 
@@ -390,6 +401,18 @@ That way Tatin would find the package on your local machine even when the are no
  
 Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
 
+
+A> ### Having the same package in more than one Registry
+A>
+A> In case you juggle with the same package in several Registries you might well be interested in getting a full list.
+A> The `]ListPackages` user command has a syntax for this:
+A>
+A> ```
+A>       ]ListVersions [*]example-versions 
+A> ```
+A>
+A> This would check all Registries with a priority greater than 0 for `example-versions`, and list all hits.
+
 The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc. on it.
 
 
@@ -400,7 +423,7 @@ For every package Tatin will establish certain variables, though strictly speaki
 
 They are injected into a namespace `TatinVars` which in turn is injected into `code`.
 
-Some of them always exist, some of them only under certain circumstances. This is a list:
+Some of them always exist, some of them only under certain circumstances.
 
 
 ##### `CONFIG`
@@ -415,17 +438,19 @@ A vector of character vectors with the package IDs of the packages the package i
 
 ##### `HOME`
 
-Is either an empty vector or a character vector holding the path of a folder that hosts the package.
+Is a character vector holding the path of a folder that hosts the package. 
+
+There is an exception: when the package was brought into the workspace with `LoadPackage` rather than `LoadDependencies` then `HOME` will be an empty vector in case the package has no assets.
 
 
 ##### `ID`
 
-The full package name. This will include a build ID if there is any.
+The full package name. This will include a build ID if there is any, so it is not necessarily identical with the package ID.
 
 
 ##### `LX`
 
-This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successfully. `LX` holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.
+This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successfully. `LX` holds the result that is returned by that function if it did return a result. If it doesn't it becomes an empty vector.
 
 Note that if there is no `lx` defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no `LX`.
 

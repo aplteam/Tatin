@@ -20,7 +20,7 @@ They are saved in the user settings --- for details see the document "Tatin User
 
 #### The principal Tatin Server
 
-If you want to publish on `https://tatin.dev` you need to ask [kai@aplteam.com](mailto:kai@aplteam.com) for an API key.
+If you want to publish on `https://tatin.dev` you need to ask [server.tatin@gmail.com](mailto:server.tatin@gmail.com) for an API key.
 
 
 #### Credentials for the Tatin Test Server
@@ -95,7 +95,7 @@ group3=''
 This means:
 
 * You must provide "abc" as an API key for the group "group1"
-* You may publish packages to the groups "group1" and "group2" without an API key 
+* You may publish packages to the groups "group2" and "group3" without an API key 
 * For any group name but "group1", "group2" and "group3" you must specify "other" as API key
 
 ### The Client
@@ -156,7 +156,7 @@ Whether you can delete a package once it was published depends on the policy the
 
 * "Any": You may delete any package
 * "JustBetas": You may delete only beta versions
-* "None": You cannot delete a packages at all
+* "None": You cannot delete any packages at all
 
 Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator --- a `+` (recommended) or a `.` (deprecated) --- qualifies as a beta version.
 
@@ -196,7 +196,7 @@ Let's imagine that you are supposed to develop Tatin packages for your employer,
 
 * Your packages also have dependencies on packages published on Tatin's principal server, known as `[tatin]`.
 
-  Of the three Registries this one might have the lowest priority or the highest, depending on your goals.
+  Of the three Registries this one should probably have the lowest priority.
 
 * You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when scanning Registries, but you could still mess around with it.
 
@@ -204,7 +204,5 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 
 You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want `[my]` to be ignored altogether, set its priority to zero.
 
-Your team can use your pacakage by referring to the team Registry.
-
-When all is good the beta is promoted to an official release and publish to the Tatin company server. At the same time the package would be deleted from the Team server.
+When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package would be deleted from the Team server.
 

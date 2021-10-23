@@ -172,3 +172,12 @@ Tatin-Client-{major}.{minor}.{patch}.zip
 Tatin-Documentation-{major}.{minor}.{patch}.zip
 Tatin-Server-{major}.{minor}.{patch}.zip
 ```
+
+## Creating a proofread document
+
+There is a function that creates a single HTML files from all the Tatin markdown documentation. That makes proofreading significantly easier:
+
+```
+      htmlFilename←#.Tatin.Admin.CreateProofReadDocument 1
+```
+

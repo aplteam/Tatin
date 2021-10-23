@@ -22,15 +22,16 @@
       :AndIf 0=≡y
           ns←y
           ns.port←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'port'
-          ns.priority←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'priority'
+          ns.priority←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ⎕NULL}'priority'
           ns.api_key←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'api_key'
           ns.alias←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'alias'
           'Invalid variables'Assert∧/(' '~¨⍨↓ns.⎕NL 2)∊varsList
           _uri←ns.uri
           '"uri": invalid depth'Assert 1=≡_uri
           '"uri": invalid data type'Assert' '=1↑0⍴_uri
+          '"uri" must not carry []'Assert∧/~'[]'∊_uri
           ((_uri='\')/_uri)←'/'
-          ⍎¨ns.{'_',⍵,'←',{0=1↑0⍴⍵:⍕⍵ ⋄ '''',⍵,''''}⍎⍵}¨varsList
+          ⍎¨ns.{'_',⍵,'←',{⎕NULL≡⍵:'⎕NULL' ⋄ 0=1↑0⍴⍵:⍕⍵ ⋄ '''',⍵,''''}⍎⍵}¨varsList
       :Else
           :If ∧/'[]'∊y
               (_alias _uri)←{⍵{('[]'~⍨⍵↑⍺)(⍵↓⍺)}⍵⍳']'}y
@@ -45,7 +46,7 @@
           _alias←⎕C _alias
           _api_key←''
           _port←0
-          _priority←0
+          _priority←⎕NULL
       :EndIf
     ∇
 
@@ -120,6 +121,7 @@
           '"priority": invalid length'Assert 1=≢buff
           '"priority": invalid data type (not integer)'Assert 0=1↑0⍴buff
           '"priority": invalid value'Assert buff≥0
+          '"priority": invalid value'Assert 163≥⎕DR buff    ⍝ 16 bit signed integer is max
           _priority←buff
         ∇
     :EndProperty

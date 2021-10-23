@@ -12,6 +12,12 @@ While the Tatin Client is coming with version 19.0 and later automatically, the 
 
 After downloading it from <https://github.com/aplteam/Tatin/releases> you need to unzip it into a folder where the Tatin Server is supposed to live.
 
+## Requirements
+
+* Dyalog Unicode 18.0 or better
+* Windows or Linux
+
+  For the time being neither the Pi nor Mac OS nor AIX are supported. This restriction might be lifted for the Pi and/or Mac OS but not AIX.
 
 ## Configuration: the INI File
 
@@ -44,25 +50,25 @@ When the Tatin Server loads the INI file it will replace the string `<INIFILE>` 
 The INI file is well documented, so we won't discuss the meaning of the different sections and settings. Most of the settings don't need changing, so we will just draw your attention to those you are likely to change:
 
 
-#### `[CONFIG]AppName`
+#### [CONFIG]AppName
 
 This defines the name used by Tatin for logging to the Windows Event Log. 
 
 The parameter has no meaning on non-Windows platforms, and is ignored in case `[LOGGING]WindowsEventLog` is 0 rather than 1.
 
 
-#### `[CONFIG]Registry`
+#### [CONFIG]Registry
 
-This defines the path where the Registry lives that is managed by the Tatin Server.
+This is the path where the Registry lives that is managed by the Tatin Server.
 
-#### `[CONFIG]Base`
+#### [CONFIG]Base
 
 Replace this by your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
 
 Never add a port number to `Base`; see `[CONFIG]BaseTagPort` for this.
 
 
-#### `[CONFIG]BaseTagPort`
+#### [CONFIG]BaseTagPort
 
 Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://). 
 
@@ -73,32 +79,42 @@ However, when your Tatin Server runs "behind", say, an Apache Server then Tatin 
 See also `[CONFIG]Base`.
 
 
-#### `[CONFIG]Title`
+#### [CONFIG]Title
 
 When you use a Browser for accessing a Tatin server then `Title` defines what will become the tab title in the browser.
 
 
-#### `[CONFIG]Caption`
+#### [CONFIG]Caption
 
 This defines what all the HTML pages will display as `<h1>`.
 
 
-#### `[CONFIG]ReloadWS`
+#### [CONFIG]ReloadWS
 
-If this is 1 Tatin will check whether the workspace `Server.dws` was changed since it was loaded. If it was Tatin will load it, meaning that it will kind of restart itself.
+If this is 1 Tatin will frequently check whether the workspace `Server.dws` was changed since it was loaded. If it was then Tatin will load it, meaning that it will kind of restart itself.
 
 Whether this is a good idea in production is debatable, but it can be helpful in development.
 
 
-#### `[CONFIG]DeletePackages`
+#### [CONFIG]DeletePackages
 
 This setting defines whether a user might delete a package. The setting may become one of these:
 
 | 0 | Deleting packages is not allowed
 | 1 | Deleting packages is allowed
-| 2 | Only beta versions may be deleted (major version number is 0)
+| 2 | Only beta versions may be deleted 
 
-The principal Tatin server only allows deleting beta versions. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.
+The principal Tatin server does not allow the deletion of anything. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.
+
+A> ### Beta versions
+A>
+A> What qualifies as a beta version? Here are some examples:
+A> ```
+A> group-foo-1.0.0          ⍝ not a beta
+A> group-foo-1.0.0+123      ⍝ not a beta
+A> group-foo-1.0.0-fix      ⍝ a beta
+A> group-foo-1.0.0-fix+123  ⍝ a beta
+A> ```
 
 
 #### The section [CONFIG]Secure
@@ -120,10 +136,6 @@ A Tatin server can send emails, broadcasting any crashes. For that you must spec
 
 The INI file is well dcoumented, so you should have no trouble to make the necessary adjustments.
  
-Note that both https://tatin.dev and https:/test.tatin.dev use an email address tatin.dev@gmail.com. This email addresse is not monitored; it is just use as a proxy to being able to deliver emails via Google's SMTP server. It's the CC that is more interesting. 
-
-This construct makes it possible not to worry too much regarding the password of the email address, but it also means that nothing should be send to that email address that is even remotely confidential.
-
 
 ## On Logging
 
@@ -131,7 +143,7 @@ There are two different levels available for logging:
 
 * Low-level logging with `LogHTTP`, `LogConga` and `LogRumba`. These are useful for debugging. 
 
-  The log file these pieces of information go into is situated in the `Rumba/` sub folder.
+  These log files live in the `Rumba/` sub folder.
 
 * High level logging with `Log` and `LogFolder`. 
 
@@ -157,7 +169,7 @@ Such a server is able to deal with attacks and has also all sorts of security me
 
 There is a separate document available that discusses how to do this: [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html").
 
-In case you hide the Tatin Server behind, say, an Apache server, on the same machine there might be no need to use encryption (https).
+In case you hide the Tatin Server behind, say, an Apache server on the same machine there might be no need to use encryption (https).
 
 ## The `[MSG]` section
 

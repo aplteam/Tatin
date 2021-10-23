@@ -52,7 +52,7 @@ Whether deleting a package from a Tatin Registry depends on the delete policy it
 r←GetDeletePolicy uri
 ```
 
-Takes a URI of a server (like https://tatin.dev) and returns the delete policy operated by that server.
+Takes a URI of a server like https://tatin.dev or an alias and returns the delete policy operated by that server.
 
 Returns one of "None", "Any", "JustBetas":
 
@@ -76,10 +76,11 @@ Takes `identifier` (`x`) and returns the dependencies as a matrix.
 * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.
 
 Returns a dependency tree as a matrix:
-* [;1] Flag that indicates whether it is a principal package (1) or a dependency (0)
-* [;2] PackageID of what required that dependency
-* [;3] Full package ID
-* [;4] The full URL (either a local path (without protocol) or http(s)://...)
+
+|[;1] | Flag that indicates whether it is a principal package (1) or a dependency (0)
+|[;2] | PackageID of what required that dependency
+|[;3] | Full package ID
+|[;4] | The full URL (either a local path (without protocol) or http(s)://...)
 
 This function requires the version number to be fully specified.
 
@@ -91,7 +92,7 @@ Note that the function accepts an optional left argument, but this should not be
 path←{aplVersion} GetUserHomeFolder append
 ```
 
-Returns standard path for any user-specific data.
+Returns the standard path for any user-specific data.
 
 Works on all platforms but returns different results.
 
@@ -219,14 +220,18 @@ List all registries defined in the Client's config file.
 
 Returns a matrix with these columns:
 
-|[;1]| Alias
-|[;2]| URL
-|[;3]| Priority
+|[;1] | Alias
+|[;2] | URL
+|[;3] | Port
+|[;4] | Priority
+|[;5] | API key
 
 "type" must be either 0 or 1 or empty:
 
 * 1 means all data is listed
-* Everything else means just the alias, the uri and the priority are listed
+* 0 means the API key is not listed
+
+Note that the result of the API function and the user command differ.
 
 ### ListTags             
 
@@ -240,7 +245,7 @@ By default all tags of all packages are returned.
 
 Optionally `⍺` can be specified. Must be a namespace that might contain a variable `tags` which
 may specify one or more tags (simple comma-separated text vector). If that is the case only
-the tags shared by the packages that carries that specified tag(s).
+the tags shared by the packages that carry all of the specified tags.
 
 ### ListVersions         
 
@@ -250,7 +255,7 @@ mat←{dateFlag} ListVersions uri
 
 `uri` is one of:
 
-* "[*]" followed by "group" and "name" of a package
+* `[*]` followed by "group" and "name" of a package
 * A path to a Registry and "group" and "name" of a package
 
 In the first case all defined Registries are scanned. A matrix with two columns is returned: URL and full package ID.
@@ -299,7 +304,7 @@ Loads a package `identifier` dynamically into the workspace,
 * A folder holding a package (like file://C:/Temp/group-name-version)
 * A path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
 * A package ID; Tatin will then attempt to find that package in one of the Registries defined in the
-Client's config file.
+client's config file with a priority greater than 0.
 
 The first hit wins.
 
@@ -330,7 +335,7 @@ zipFilename←Pack (projectPath targetPath)
 
 projectPath:
 
-: folder to create package from
+: folder to create a package from
 
 targetPath:
 
@@ -339,12 +344,12 @@ targetPath:
 ### Ping                 
 
 ```
-bool←{ts} Ping uri_
+bool←Ping uri_
 ```
 
 Establishes whether the host is up and running with very little overhead.
 
-`ts` is only useful for test cases.
+The optional left argument is only useful for test cases.
 
 ### PublishPackage       
 
@@ -365,14 +370,17 @@ Note that if `⍵` points already to a ZIP file only steps 4 and 5 are performed
 `⍵` must be a two-item vector:
 
 1. `source` → folder to create package from
-2. `registry` → registry to publish package to (alias or uri)
+2. `registry` → registry to publish the package to (alias or uri)
 
 The explicit result:
 
-* `statusCode` is an HTTP no matter whether it is an HTTP call or not.
-* `errMsg` is empty if `statusCode` is 200, otherwise it is additional information.
-* `zipFilename` is empty in case `source` is a ZIP file, but the name of the ZIP file created otherwise.
+* `statusCode` is an HTTP code no matter whether it is an HTTP call or not.
+* `errMsg` is empty if `statusCode` is 200, otherwise it might carry additional information.
+* `zipFilename` is empty in case `source` is a ZIP file, otherwise it is the name of the ZIP file created.
 
+W> Note that the API function will publish the package no matter what the delete policy operated by the server is. 
+W>
+W> That is different from the user command which will ask the user for confirmation in case the user attempts to publish a package that cannot be deleted once published.
 
 ### ReInstallDependencies
 
@@ -385,7 +393,7 @@ Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.
 The file apl-buildlist.json as well as all directories in that folder will be deleted.
 Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.
 
-Note that a packages with different major version numbers are considered different.
+Note that packages with different major version numbers are considered different.
 
 By default all known Registries with a priority greater than 0 are scanned, but you may
 specify a particular Registry as a second (optional) argument.
@@ -429,14 +437,14 @@ required by other packages.
 Note that if `packageID` is empty a clean-up attempt is made.
 
 To keep things simple Tatin performs the following steps:
-1. It checks whether the package is mentioned in the dependency file. If not an error is thrown.
+1. It checks whether the package ID is mentioned in the dependency file. If not an error is thrown.
 3. It removes `packagedID` from the dependency file.
 4. It re-compiles the build list based on the new dependency file.
 5. It removes all packages that are not mentioned in the build list anymore
 
 Returns a two-item vector:
 
-1. List with the fully qualified names of all removed packages. Note that might carry an alias
+1. List with the fully qualified names of all removed packages. Note that they might carry an alias.
 2. Message, ideally empty. 
  
 Note that removing the directories hosting the packages might fail for all sorts of reasons even

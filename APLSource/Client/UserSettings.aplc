@@ -118,7 +118,7 @@
         ∇
     :EndProperty
 
-    ∇ {r}←AddRegistry y;registry;name;alias;buff;reg
+    ∇ {r}←AddRegistry y;registry;name;alias;buff;reg;isZero;ind;newPriorities
    ⍝ Adds the definition of a Registry (as a namespace) to the user settings.\\
    ⍝ If that Registry is already defined an error is thrown.\\
    ⍝ `⍵` must be one of:
@@ -159,14 +159,19 @@
           buff←registry
       :EndIf
       :If 0=buff.⎕NC'priority'
-      :OrIf 0=buff.priority
+      :OrIf ⎕NULL=buff.priority
           :If 0=≢_registries
               buff.priority←100
           :Else
-              :If 0≥buff.priority←(⌊/_registries.priority~0)-10
-              :AndIf 0≥buff.priority←⌊(⌊/_registries.priority~0)÷2
-              :AndIf 0≥buff.priority←⌈(⌊/_registries.priority~0)-1
-                  _registries.priority⌈←(100×1+⍳≢_registries.priority)[⍋_registries.priority] ⍝ Make room
+              isZero←_registries.priority≡¨0
+              :If 0≥buff.priority←(⌊/_registries.priority~0 ⎕NULL)-10
+              :AndIf 0≥buff.priority←⌊(⌊/_registries.priority~0 ⎕NULL)÷2
+              :AndIf 0≥buff.priority←⌈(⌊/_registries.priority~0 ⎕NULL)-1
+              ⍝ We need to make room
+                  ind←⍋_registries.priority
+                  newPriorities←100×1+⍳≢_registries.priority[ind]
+                  (isZero[ind]/newPriorities)←0                     ⍝ Restore zeros
+                  _registries.priority⌈←newPriorities[⍋ind]
                   buff.priority←100
               :EndIf
           :EndIf
@@ -193,7 +198,7 @@
     ⍝Done
     ∇
 
-    ∇ {r}←ReplaceRegistry registry;ind;reg
+    ∇ {r}←ReplaceRegistry registry;ind;reg;priority
    ⍝ Replaces the definition of a Registry in the user settings.\\
    ⍝ If that Registry does not already exist an error is thrown.\\
    ⍝ Note that this function requires a URI since an alias is subject to change.\\
@@ -207,7 +212,11 @@
       :EndIf
       ind←_registries.uri⍳⊂registry.uri
       :If ∨/'[DefineRegistry]'⍷⍕registry
+          priority←_registries[ind].priority
           _registries[ind]←registry.Get ⍬
+          :If ⎕NULL≡_registries[ind].priority
+              _registries[ind].priority←priority ⍝ Inherit from predecessor
+          :EndIf
       :Else
           reg←⎕NEW home.DefineRegistry(,⊂registry)
           _registries[ind]←reg.Get ⍬
@@ -248,6 +257,7 @@
       :If 0=+/bool←EqualsAliasOrName uriOrAlias
           'uri/alias not found in user settings'Assert∨/bool
       :EndIf
+      'uri is ambiguous'Assert 1=+/bool
       r←(bool⍳1)⊃_registries
     ∇
 
@@ -331,8 +341,8 @@
               _registries←ns.registries[⍋ns.registries.priority]
           :Else
               ⍝TODO⍝
-              ⍝ This avoids an orphaned reference lingering around but at the
-              ⍝ same time it leads to a ref  into # from ⎕SE because ⎕JSON does not allow something like #.⎕JSON (yet)
+              ⍝ This avoids an orphaned reference lingering around but at the same time it leads 
+              ⍝ to a ref into # from ⎕SE because ⎕JSON does not allow something like #.⎕JSON (yet)
               _registries←⎕SE.⎕JSON⍣2 ns.registries[⍋ns.registries.priority]  ⍝ To avoids creating an orphaned ref once `ns` disappears (14888, <01851>)
           :EndIf
       :Else

@@ -62,9 +62,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>You build your application again (without changing <em>anything</em>)</li>
 <li>You run your test cases again, but this time they fail</li>
 </ol>
-<p>This can happen in case the author of a package has released a new version of a package you depend on in one way or another.</p>
-<p>Attractive as an automated update mechanism might be, you want a build to be <em>reproducible</em>.</p>
-<p>Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available: check the user command <code>]TATIN.CheckForLaterVersions</code>.</p>
+<p>This can happen in case the author of a package you depend on in one way or another has released a new version of that package.</p>
+<p>Attractive as an automated update mechanism might be, you want your builds to be <em>reproducible</em>.</p>
+<p>Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available: check the user command <code>]TATIN.CheckForLaterVersions</code>. Also, check the <code>-update</code> flag of the <code>]Tatin.ReInstallDependencies</code> user command or its API equivalent.</p>
 <p>So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages <code>Foo</code> and <code>Goo</code>.</p>
 <p>Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses <em>the latest version</em>, which might or might not be the latest one available. In our example that would be 1.2.0, while 1.3.0 is ignored.</p>
 <p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest version <em>mentioned as a dependency</em>.</p>
@@ -182,7 +182,7 @@ mygroup-Goo-2.1.0</code></pre>
 </div>
 </div>
 
-<p>This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but <em>only</em> if those packages are not requested by other packages as well.</p>
+<p>This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but <em>only</em> if those packages are neither principal packages nor requested by other packages.</p>
 <p>Clearly there is a danger that you remove too much when you attempt to do this manually.</p>
 <div class="h_tag">
 <a href="#Adding-a-package" id="Adding-a-package" class="autoheader_anchor">
@@ -202,8 +202,8 @@ mygroup-Goo-2.1.0</code></pre>
 <p>There is a user command available that can help you with that:</p>
 <pre><code>      ]TATIN.CheckForLaterVersion ./</code></pre>
 <p>It requires a path to a folder that holds a file <code>apl-dependencies.txt</code> and a file <code>apl-buildlist.json</code>.</p>
-<p>This user command would check whether there are any later versions of the top-level packages available and report its findings to the session.</p>
-<p>As usual Tatin would consider packages with different major numbers as different packages, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your top-level packages.</p>
+<p>This user command would check whether there are any later versions of the principal packages available and report its findings to the session.</p>
+<p>As usual Tatin would consider packages with different major numbers as different packages, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your principal packages.</p>
 <p>It is then up to you to take action: you may or may not install a later package that is available.</p>
 <div class="leanpub_A">
 <h3>Later major versions</h3>
@@ -215,6 +215,6 @@ mygroup-Goo-2.1.0</code></pre>
 <h2 data-id="Downgrading">Downgrading</h2>
 </a>
 </div>
-<p>There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known for being okay. Tatin does not offer help here, you need to do this yourself.</p>
+<p>There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here, you need to do this yourself.</p>
 </body>
 </html>

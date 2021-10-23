@@ -4,11 +4,11 @@
 [parm]:toc               = 2 3
 
 
-# Installing and Updating the Tatin Cleint
+# Installing and Updating the Tatin Client
 
 ## Introduction
 
-You don't need to worry about installing Tatin if you use version 18.0 or 18.2: with later versions Tatin will be available in `⎕SE` after a standard installation anyway.
+You don't need to worry about installing Tatin if you use version 19.0 or later versions of Dyalog: Tatin will be available in `⎕SE` after a standard installation anyway.
 
 However, installing and updating is, as far as the Tatin client is concerned, _the same thing_, because updating the Tatin client basically means removing the old version and installing a new one.
 
@@ -48,7 +48,7 @@ I> If you want the Tatin API to be available right from the start: this is discu
 
 Putting Tatin into this folder has the benefit that it will be available in all suitable versions of Dyalog APL installed on your machine. It has the drawback that this is a user-specific folder.
 
-Tatin requires version 18.0 Unicode or better, therefore the `]TATIN` user commands won't be listed in either earlier versions of Dyalog or in any Classic version.
+Tatin requires version 18.0 Unicode or better, therefore the `]TATIN` user commands won't be listed in earlier versions of Dyalog or in any Classic version.
 
 
 ## Initializing Tatin
@@ -69,7 +69,7 @@ When any of the Tatin user commands is executed it will check whether the API is
 
 If that's not the case it will...
 
-  1. copy the code into `⎕SE._Tatin`
+  1. load the code into `⎕SE._Tatin`
   2. create a namespace `⎕SE.Tatin` 
   3. establish references in `⎕SE.Tatin` pointing to the public functions in `⎕SE._Tatin`. 
 

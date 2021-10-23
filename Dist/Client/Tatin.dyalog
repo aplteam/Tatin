@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.33.0 - 2021-10-20
+⍝ * 0.33.0 - 2021-10-21
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -796,7 +796,7 @@
               :Else
                   (msg json)←CheckFns json path
                   :If 0<≢msg
-                      flag←~1 ∆YesOrNo msg,'; want to try fixing the problem (n=abandon changes) ?'
+                      flag←~1 ∆YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
                   :Else
                       flag←1
                       newData←json
@@ -1374,7 +1374,7 @@
           :EndIf
           :If 0<≢ns.info_url
               :If 0=TC.SendHEAD ns.info_url
-                  msg←'No response from ',ns.info_url
+                  msg←ns.info_url,' did not respond'
                   :Return
               :EndIf
           :EndIf

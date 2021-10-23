@@ -35,11 +35,11 @@ But when you look at it from a different angle then things look much less appeal
 1. You build your application again (without changing _anything_)
 1. You run your test cases again, but this time they fail
 
-This can happen in case the author of a package has released a new version of a package you depend on in one way or another.
+This can happen in case the author of a package you depend on in one way or another has released a new version of that package.
 
-Attractive as an automated update mechanism might be, you want a build to be _reproducible_.
+Attractive as an automated update mechanism might be, you want your builds to be _reproducible_.
 
-Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available: check the user command `]TATIN.CheckForLaterVersions`.
+Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available: check the user command `]TATIN.CheckForLaterVersions`. Also, check the `-update` flag of the `]Tatin.ReInstallDependencies` user command or its API equivalent.
 
 So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages `Foo` and `Goo`.
 
@@ -193,7 +193,7 @@ If you want to get rid of a package then you are strongly advised to use the met
 
 I> The API equivalent is `⎕SE.Tatin.UnInstallPackage`
 
-This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but _only_ if those packages are not requested by other packages as well.
+This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but _only_ if those packages are neither principal packages nor requested by other packages.
 
 Clearly there is a danger that you remove too much when you attempt to do this manually.
 
@@ -220,9 +220,9 @@ There is a user command available that can help you with that:
 
 It requires a path to a folder that holds a file `apl-dependencies.txt`  and a file `apl-buildlist.json`. 
 
-This user command would check whether there are any later versions of the top-level packages available and report its findings to the session.
+This user command would check whether there are any later versions of the principal packages available and report its findings to the session.
 
-As usual Tatin would consider packages with different major numbers as different packages, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your top-level packages.
+As usual Tatin would consider packages with different major numbers as different packages, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your principal packages.
 
 It is then up to you to take action: you may or may not install a later package that is available.
 
@@ -232,5 +232,5 @@ A> When you specify the `-major` flag of the `CheckForLaterVersion` user command
 
 ## Downgrading
 
-There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known for being okay. Tatin does not offer help here, you need to do this yourself.
+There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here, you need to do this yourself.
 

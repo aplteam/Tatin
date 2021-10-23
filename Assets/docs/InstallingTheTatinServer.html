@@ -19,6 +19,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="toc-container">
 <ul>
 <li><a href="#Introduction">Introduction</a></li>
+<li><a href="#Requirements">Requirements</a></li>
 <li><a href="#Configuration-the-INI-File">Configuration: the INI File</a>
 <ul>
 <li><a href="#INIFILE"><code>&lt;INIFILE&gt;</code></a></li>
@@ -50,6 +51,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>While the Tatin Client is coming with version 19.0 and later automatically, the Tatin Server always needs to be installed in case you want to use it.</p>
 <p>After downloading it from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a> you need to unzip it into a folder where the Tatin Server is supposed to live.</p>
+<div class="h_tag">
+<a href="#Requirements" id="Requirements" class="autoheader_anchor">
+<h2 data-id="Requirements">Requirements</h2>
+</a>
+</div>
+<ul>
+<li>Dyalog Unicode 18.0 or better</li>
+<li>Windows or Linux
+<p>For the time being neither the Pi nor Mac OS nor AIX are supported. This restriction might be lifted for the Pi and/or Mac OS but not AIX.</p></li>
+</ul>
 <div class="h_tag">
 <a href="#Configuration-the-INI-File" id="Configuration-the-INI-File" class="autoheader_anchor">
 <h2 data-id="Configuration-the-INI-File">Configuration: the INI File</h2>
@@ -87,27 +98,27 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>The INI file is well documented, so we won't discuss the meaning of the different sections and settings. Most of the settings don't need changing, so we will just draw your attention to those you are likely to change:</p>
 <div class="h_tag">
 <a href="#AppName" id="AppName" class="autoheader_anchor">
-<h4 data-id="AppName"><code>[CONFIG]AppName</code></h4>
+<h4 data-id="AppName">[CONFIG]AppName</h4>
 </a>
 </div>
 <p>This defines the name used by Tatin for logging to the Windows Event Log.</p>
 <p>The parameter has no meaning on non-Windows platforms, and is ignored in case <code>[LOGGING]WindowsEventLog</code> is 0 rather than 1.</p>
 <div class="h_tag">
 <a href="#Registry" id="Registry" class="autoheader_anchor">
-<h4 data-id="Registry"><code>[CONFIG]Registry</code></h4>
+<h4 data-id="Registry">[CONFIG]Registry</h4>
 </a>
 </div>
-<p>This defines the path where the Registry lives that is managed by the Tatin Server.</p>
+<p>This is the path where the Registry lives that is managed by the Tatin Server.</p>
 <div class="h_tag">
 <a href="#Base" id="Base" class="autoheader_anchor">
-<h4 data-id="Base"><code>[CONFIG]Base</code></h4>
+<h4 data-id="Base">[CONFIG]Base</h4>
 </a>
 </div>
 <p>Replace this by your domain name, or “localhost” in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.</p>
 <p>Never add a port number to <code>Base</code>; see <code>[CONFIG]BaseTagPort</code> for this.</p>
 <div class="h_tag">
 <a href="#BaseTagPort" id="BaseTagPort" class="autoheader_anchor">
-<h4 data-id="BaseTagPort"><code>[CONFIG]BaseTagPort</code></h4>
+<h4 data-id="BaseTagPort">[CONFIG]BaseTagPort</h4>
 </a>
 </div>
 <p>Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://).</p>
@@ -116,26 +127,26 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>See also <code>[CONFIG]Base</code>.</p>
 <div class="h_tag">
 <a href="#Title" id="Title" class="autoheader_anchor">
-<h4 data-id="Title"><code>[CONFIG]Title</code></h4>
+<h4 data-id="Title">[CONFIG]Title</h4>
 </a>
 </div>
 <p>When you use a Browser for accessing a Tatin server then <code>Title</code> defines what will become the tab title in the browser.</p>
 <div class="h_tag">
 <a href="#Caption" id="Caption" class="autoheader_anchor">
-<h4 data-id="Caption"><code>[CONFIG]Caption</code></h4>
+<h4 data-id="Caption">[CONFIG]Caption</h4>
 </a>
 </div>
 <p>This defines what all the HTML pages will display as <code>&lt;h1&gt;</code>.</p>
 <div class="h_tag">
 <a href="#ReloadWS" id="ReloadWS" class="autoheader_anchor">
-<h4 data-id="ReloadWS"><code>[CONFIG]ReloadWS</code></h4>
+<h4 data-id="ReloadWS">[CONFIG]ReloadWS</h4>
 </a>
 </div>
-<p>If this is 1 Tatin will check whether the workspace <code>Server.dws</code> was changed since it was loaded. If it was Tatin will load it, meaning that it will kind of restart itself.</p>
+<p>If this is 1 Tatin will frequently check whether the workspace <code>Server.dws</code> was changed since it was loaded. If it was then Tatin will load it, meaning that it will kind of restart itself.</p>
 <p>Whether this is a good idea in production is debatable, but it can be helpful in development.</p>
 <div class="h_tag">
 <a href="#DeletePackages" id="DeletePackages" class="autoheader_anchor">
-<h4 data-id="DeletePackages"><code>[CONFIG]DeletePackages</code></h4>
+<h4 data-id="DeletePackages">[CONFIG]DeletePackages</h4>
 </a>
 </div>
 <p>This setting defines whether a user might delete a package. The setting may become one of these:</p>
@@ -151,11 +162,20 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tr>
 <tr>
 <td style="text-align: right;">2</td>
-<td>Only beta versions may be deleted (major version number is 0)</td>
+<td>Only beta versions may be deleted</td>
 </tr>
 </tbody>
 </table>
-<p>The principal Tatin server only allows deleting beta versions. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.</p>
+<p>The principal Tatin server does not allow the deletion of anything. The simple reason for this policy is that we want to guarantee that a build can always be reproduced.</p>
+<div class="leanpub_A">
+<h3>Beta versions</h3>
+<p>What qualifies as a beta version? Here are some examples:</p>
+<pre><code>group-foo-1.0.0          ⍝ not a beta
+group-foo-1.0.0+123      ⍝ not a beta
+group-foo-1.0.0-fix      ⍝ a beta
+group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
+</div>
+
 <div class="h_tag">
 <a href="#The-section-Secure" id="The-section-Secure" class="autoheader_anchor">
 <h4 data-id="The-section-Secure">The section [CONFIG]Secure</h4>
@@ -176,8 +196,6 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>A Tatin server can send emails, broadcasting any crashes. For that you must specify a couple of things in this section.</p>
 <p>The INI file is well dcoumented, so you should have no trouble to make the necessary adjustments.</p>
-<p>Note that both https://tatin.dev and https:/test.tatin.dev use an email address tatin.dev@gmail.com. This email addresse is not monitored; it is just use as a proxy to being able to deliver emails via Google's SMTP server. It's the CC that is more interesting.</p>
-<p>This construct makes it possible not to worry too much regarding the password of the email address, but it also means that nothing should be send to that email address that is even remotely confidential.</p>
 <div class="h_tag">
 <a href="#On-Logging" id="On-Logging" class="autoheader_anchor">
 <h2 data-id="On-Logging">On Logging</h2>
@@ -186,7 +204,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>There are two different levels available for logging:</p>
 <ul>
 <li>Low-level logging with <code>LogHTTP</code>, <code>LogConga</code> and <code>LogRumba</code>. These are useful for debugging.
-<p>The log file these pieces of information go into is situated in the <code>Rumba/</code> sub folder.</p></li>
+<p>These log files live in the <code>Rumba/</code> sub folder.</p></li>
 <li>High level logging with <code>Log</code> and <code>LogFolder</code>.
 <p>Note that IP addresses are <em>not</em> logged at this level.</p>
 <ul>
@@ -206,7 +224,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that in case you want your Tatin server to serve requests from the Internet — as opposed to an Intranet — it is strongly recommended to hide the Tatin Server behind an industrial-strength HTTP server like Apache.</p>
 <p>Such a server is able to deal with attacks and has also all sorts of security measures built into it, so it's much safer to run Tatin behind it.</p>
 <p>There is a separate document available that discusses how to do this: <a href="./RunDyalogBehindApache.html" class="external_link" title="RunDyalogBehindApache.html">Run Dyalog behind Apache</a>.</p>
-<p>In case you hide the Tatin Server behind, say, an Apache server, on the same machine there might be no need to use encryption (https).</p>
+<p>In case you hide the Tatin Server behind, say, an Apache server on the same machine there might be no need to use encryption (https).</p>
 <div class="h_tag">
 <a href="#The--section" id="The--section" class="autoheader_anchor">
 <h2 data-id="The--section">The <code>[MSG]</code> section</h2>

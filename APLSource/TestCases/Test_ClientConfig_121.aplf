@@ -1,4 +1,4 @@
- r←Test_ClientConfig_121(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns;parms;reg1;reg2;reg
+ r←Test_ClientConfig_121(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns;parms;reg1;reg2;reg;qdmx
 ⍝ Add a URL twice with different alias names and make that accessing with URL throws an error (ambiguous)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -10,7 +10,7 @@
  →T.GoToTidyUp 2≠≢settings.registries
 
  parms←⎕NS''
- parms.uri←'[alias1]https://localhost'
+ parms.uri←'https://localhost'
  parms.alias←'alias1'
  parms.api_key←'First-one'
  reg1←⎕NEW TC.DefineRegistry(,⊂parms)
@@ -30,6 +30,14 @@
  reg←settings.GetRegistry'[alias2]'
  →T.GoToTidyUp'alias2'≢reg.alias
  →T.GoToTidyUp'Second-one'≢reg.api_key
+
+ :Trap 98
+     settings.GetRegistry'https://localhost'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'uri is ambiguous'≢qdmx.EM
+ :EndTrap
 
  r←T._OK
 

@@ -44,7 +44,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
-<p>Note that you should have at least an idea of what <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a> is all about.</p>
+<p>Note that you should know what <a href="./SemanticVersioning.html" class="external_link">Semantic Versioning</a> is all about.</p>
 </div>
 </div>
 
@@ -88,7 +88,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
  aplteam-Compare                         1
  aplteam-CompareSimple                   3
  ...</code></pre>
-<p>The square brackets around “tatin” declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like <code>https://localhost/my_tatin_server</code> or a simple question mark: <code>]tatin.ListPackages ?</code> would present all known Registries to you.</p>
+<p>The square brackets around “tatin” declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like <code>https://localhost/my_tatin_server</code></p>
+<p>If you omit the argument Tatin will present a list with all known Registries to you.</p>
 <div class="leanpub_A">
 <h3>Local and remote Registries</h3>
 <p>The Tatin client can access packages that are managed by a Tatin Server, but also Registries that are locally available (read: not managed by a server). In order to address a local Registry you would just provide the path to it.</p>
@@ -103,12 +104,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p><code>]tatin.ListPackages</code> will return a list with <em>all</em> packages available in the given Registry, aggregated by major version number. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.</p>
 <ul>
 <li>If you happen to know the group name you may specify <code>-group=whatever</code>: then only packages of the group “whatever” are listed</li>
-<li>Every package is tagged with keywords: you may specify one or more tags, for example <code>-tag=linux,date</code></li>
+<li>Every package is tagged with keywords
+<p>You may specify one or more tags, for example <code>-tag=linux,date</code></p></li>
 </ul>
 <div class="leanpub_A">
 <h3>Searching for tags: the strategy</h3>
 <ol start="1">
-<li>First Tatin tries to find a 100%-match</li>
+<li>First Tatin tries to find 100%-matches</li>
 <li>In case there is no match, Tatin tries to find it <em>somewhere</em> (<code>⍷</code>)</li>
 <li>In case there is still no match a fuzzy search is performed</li>
 </ol>
@@ -138,7 +140,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
  ---------------  ----------------
  aplteam-MarkAPL                 1
 </code></pre>
-<p>Note that because packages which share the same group and name but have different major version numbers are considered different packages, the major version number is part of the list.</p>
+<p>Note that because packages which share the same group and name but have different major version numbers are considered different packages, the tally of the major version numbers is part of the list.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
@@ -180,10 +182,11 @@ aplteam-APLTreeUtils2-1.1.1
 aplteam-FilesAndDirs-5.0.1
 aplteam-MarkAPL-11.0.1
 aplteam-OS-3.0.1</code></pre>
+<p>You will probably see different version numbers here.</p>
 <ul>
 <li>The folder <code>aplteam-MarkAPL-11.0.1</code> contains the MarkAPL package</li>
 <li>The file <code>apl-dependencies.txt</code> contains just one line: <code>aplteam-MarkAPL-11.0.1</code>
-<p>That's because you project “Foo” depends so far on just one package, MarkAPL</p></li>
+<p>That's because your project “Foo” depends so far on just one package, MarkAPL</p></li>
 <li>The file <code>apl-buildlist.json</code> carries the build list</li>
 </ul>
 <div class="h_tag">
@@ -216,7 +219,7 @@ aplteam-OS-3.0.1</code></pre>
 <ul>
 <li>There is one package that has <code>principal</code> set to 1: MarkAPL. That's because we have explicitly asked for it</li>
 <li>All other packages got installed because MarkAPL depends on them, either directly or indirectly</li>
-<li>The URL points to where the packages were loaded from</li>
+<li>The URL points to where the packages was loaded from</li>
 </ul>
 <div class="h_tag">
 <a href="#How-does-a-package-look-like-on-disk" id="How-does-a-package-look-like-on-disk" class="autoheader_anchor">
@@ -283,7 +286,12 @@ Styles.html</code></pre>
 <p>The command prints to the session the name of the namespace into which the package was actually loaded. We can use MarkAPL by referring to it as <code>#.Foo.MarkAPL</code> because Tatin has also established a reference in <code>#.Foo</code> named <code>MarkAPL</code> that points to the real package:</p>
 <pre><code>      #.Foo.MarkAPL
 #._tatin.aplteam_MarkAPL_11_0_1.code.MarkAPL</code></pre>
-<p>But how does MarkAPL find its assets? Well, Tatin injects a namespace <code>TatinVars</code> into <code>#._tatin.aplteam_MarkAPL_11_0_1.code</code>, and that namespace carries a variable <code>HOME</code> that in turn carries the path to the directory that holds the assets:</p>
+<p>But how does MarkAPL find its assets? Well, Tatin injects a namespace <code>TatinVars</code> into <code>#._tatin.aplteam_MarkAPL_11_0_1.code</code>, and that namespace carries two variables:</p>
+<ul>
+<li><code>HOME</code> carries the path to the directory where the package was loaded from</li>
+<li><code>ASSETS</code> is the path to the assets folder relative to <code>HOME</code>
+<p>Note that this variable only exists in case the package has assets.</p></li>
+</ul>
 <pre><code>      #._tatin.aplteam_MarkAPL_11_0_1.code.TatinVars.HOME
 /Foo/packages/aplteam-APLTreeUtils2-1.1.1</code></pre>
 <p>That means that any MarkAPL function can refer to <code>HOME</code> with <code>##.TatinVars.Home</code>.</p>
@@ -294,7 +302,7 @@ aplteam_APLTreeUtils2_1_1_1
 aplteam_FilesAndDirs_5_0_1
 aplteam_MarkAPL_11_0_1
 aplteam_OS_3_0_1</code></pre>
-<p>All packages, whether principal ones or dependencies, are stored in <code>#._tatin</code>. For the principal packages a reference is injected into the target namespace.</p>
+<p>All packages, whether principal ones or dependencies, are stored in <code>#._tatin</code>. For the principal packages a reference is injected into the target namespace., in our case <code>#.Foo</code>.</p>
 <p>Note that by naming convention packages are always loaded into either <code>#._tatin</code> or <code>⎕SE._tatin</code>.</p>
 <div class="h_tag">
 <a href="#Checking-out-a-package-LoadPackage" id="Checking-out-a-package-LoadPackage" class="autoheader_anchor">
@@ -302,7 +310,7 @@ aplteam_OS_3_0_1</code></pre>
 </a>
 </div>
 <p>Let's assume that before actually installing it you first want to check whether the package <code>MarkAPL</code> suits your needs. In this case you might not want to install it but just to load it into the workspace.</p>
-<p>That can be achieved with the <code>LoadPackage</code> user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided, which means if it has no assets,</p>
+<p>That can be achieved with the <code>LoadPackage</code> user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided, which means if it has no assets.</p>
 <div class="leanpub_A">
 <h3>Leaving a trace on the file system</h3>
 <p>In case the package has file dependencies (assets), like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there <em>is</em> a footprint left on the file system.</p>
@@ -315,7 +323,7 @@ aplteam_OS_3_0_1</code></pre>
 <li>Loading a package might well be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case.
 <p>This is discussed in the paper <code>TatinsLoadAndUpdateStrategy.html</code></p></li>
 </ul>
-<p>Let's load the <code>MarkAPL</code> package into the workspace; for that we need to specify a URL and optionally target namespace:</p>
+<p>Let's load the <code>MarkAPL</code> package into the workspace; for that we need to specify a URL and optionally a target namespace:</p>
 <pre><code>      ]tatin.LoadPackage [tatin]MarkAPL
   Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
   Establish dependencies...
@@ -339,7 +347,7 @@ C:\Users\username\AppData\Local\Temp\username_155648451</code></pre>
 <pre><code>      #.⎕nl ⍳16
 MarkAPL
 _tatin</code></pre>
-<p>That reference points to the namespace that holds the package as such, which is loaded into <code>_tatin</code>: this is the namespace Tatin uses to manage all the packages.</p>
+<p>That reference points to the namespace that holds the package as such, which is loaded into <code>_tatin</code>: this is the namespace Tatin uses to manage all packages.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
@@ -376,6 +384,13 @@ MarkAPL</code></pre>
 <p>The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages: you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first.</p>
 <p>That way Tatin would find the package on your local machine even when the are not loaded as principal packages but just dependencies.</p>
 <p>Later, when the package is ready, you could publish it to, say, the principal Tatin server on <code>https://tatin.dev</code>, and delete it from your local Registry.</p>
+<div class="leanpub_A">
+<h3>Having the same package in more than one Registry</h3>
+<p>In case you juggle with the same package in several Registries you might well be interested in getting a full list. The <code>]ListPackages</code> user command has a syntax for this:</p>
+<pre><code>      ]ListVersions [*]example-versions</code></pre>
+<p>This would check all Registries with a priority greater than 0 for <code>example-versions</code>, and list all hits.</p>
+</div>
+
 <p>The fact that Registries with a priority of <code>0</code> are not scanned by Tatin allows you to include a Registry like <code>https://test.tatin.dev</code> in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like <code>]tatin.ListPackages</code> etc. on it.</p>
 <div class="h_tag">
 <a href="#Tatin-Variables" id="Tatin-Variables" class="autoheader_anchor">
@@ -384,7 +399,7 @@ MarkAPL</code></pre>
 </div>
 <p>For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.</p>
 <p>They are injected into a namespace <code>TatinVars</code> which in turn is injected into <code>code</code>.</p>
-<p>Some of them always exist, some of them only under certain circumstances. This is a list:</p>
+<p>Some of them always exist, some of them only under certain circumstances.</p>
 <div class="h_tag">
 <a href="#CONFIG" id="CONFIG" class="autoheader_anchor">
 <h5 data-id="CONFIG"><code>CONFIG</code></h5>
@@ -402,19 +417,20 @@ MarkAPL</code></pre>
 <h5 data-id="HOME"><code>HOME</code></h5>
 </a>
 </div>
-<p>Is either an empty vector or a character vector holding the path of a folder that hosts the package.</p>
+<p>Is a character vector holding the path of a folder that hosts the package.</p>
+<p>There is an exception: when the package was brought into the workspace with <code>LoadPackage</code> rather than <code>LoadDependencies</code> then <code>HOME</code> will be an empty vector in case the package has no assets.</p>
 <div class="h_tag">
 <a href="#ID" id="ID" class="autoheader_anchor">
 <h5 data-id="ID"><code>ID</code></h5>
 </a>
 </div>
-<p>The full package name. This will include a build ID if there is any.</p>
+<p>The full package name. This will include a build ID if there is any, so it is not necessarily identical with the package ID.</p>
 <div class="h_tag">
 <a href="#LX" id="LX" class="autoheader_anchor">
 <h5 data-id="LX"><code>LX</code></h5>
 </a>
 </div>
-<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successfully. <code>LX</code> holds the result that is returned by that function if it did return a result. Otherwise it becomes an empty vector.</p>
+<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successfully. <code>LX</code> holds the result that is returned by that function if it did return a result. If it doesn't it becomes an empty vector.</p>
 <p>Note that if there is no <code>lx</code> defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no <code>LX</code>.</p>
 <div class="h_tag">
 <a href="#URI" id="URI" class="autoheader_anchor">

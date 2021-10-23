@@ -67,7 +67,7 @@ If you specify any variable with a name that Tatin does not know about and that 
 
 ### Tatin's package configuration variables
 
-#### `api`
+#### api
 
 "api", when not empty,  must be a single name or a single class _but neither a function nor an operator_. It must be relative, never absolute; therefore it must never start with `#` or `⎕`.
 
@@ -150,7 +150,7 @@ To the outside world only two functions are visible:
 Similarly, if your package `Foo` consist of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `Foo.Run` and `Foo.CreateParmSpace`.
 
 
-#### `assets`
+#### assets
 
 This defines the files the source code relies on in one way or another, like CSS files, JavaScript files, images and what not.
 
@@ -185,7 +185,7 @@ In case you need to access assets from an instance of a package you have two cho
    Therefore the expression `(⊃⊃⎕CLASS ⎕THIS).##.TatinVars.HOME` returns the value of `HOME`.
 
 
-#### `description`
+#### description
 
 A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.
 
@@ -193,13 +193,13 @@ This information is typically used when a human accesses a Tatin Server with a B
 
 `description` _must not_ be empty.
 
-#### `group`
+#### group
 
 The group part of the package ID[^id]
 
 A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.
 
-#### `lx`
+#### lx
 
 This is optional: it may or may not exist, and it might be empty if it does.
 
@@ -215,15 +215,15 @@ The `lx` function will be executed under error trapping, and any errors will be 
 
 * Make `⎕TRAP` a local variable in the `lx` function and assign `⎕TRAP←0 'S'` to it to make any problem popping up straight away
 
-* Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with any problem yourself
+* Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with problems yourself
 
 Note that the existence of a variable `LX` indicates that there was an `lx` function successfully executed.
 
-#### `name`
+#### name
 
 The name part of the package ID[^id]
 
-#### `info_url`
+#### info_url
 
 A URL that points to something like GitHub. 
 
@@ -231,7 +231,7 @@ An example is `https://github.com/aplteam/MarkAPL`
 
 It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.
 
-#### `source`
+#### source
 
 This defines the source code file(s) that are going to be part of the package.
 
@@ -244,13 +244,13 @@ If it's a folder it might contain any number and mixture of the aforementioned f
 `source` must be relative to the root of the package.
 
 
-#### `tags`
+#### tags
 
-A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tag words. These can be helpful to filter packages when searching for a solution to a particular problem.
+A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tags (key words). These can be helpful to filter packages when searching for a solution to a particular problem.
 
-`tags` must not be empty if you wish to publish a package to a Tatin server.
+`tags` must not be empty if you wish to publish a package to a Tatin server because such a package would not be accepted by the server.
 
-#### `version`
+#### version
 
 The version[^version] part of the package ID[^id]
 
@@ -267,7 +267,7 @@ The optional build number, separated by the `+` sign, is ignored by Tatin.
 
 For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
-#### APL System variables: `⎕IO`, `⎕ML`, `⎕WX` {#SysVars}
+#### APL System variables: ⎕IO, ⎕ML, ⎕WX {#SysVars}
 
 By default the config namespace carries the values of the three Dyalog parameters `default_io`, `default_ml` and `default_wx` for the three system variables `⎕IO`, `⎕ML` and `⎕WX`. 
 

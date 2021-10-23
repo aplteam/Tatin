@@ -92,7 +92,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>r←GetDeletePolicy uri</code></pre>
-<p>Takes a URI of a server (like https://tatin.dev) and returns the delete policy operated by that server.</p>
+<p>Takes a URI of a server like https://tatin.dev or an alias and returns the delete policy operated by that server.</p>
 <p>Returns one of “None”, “Any”, “JustBetas”:</p>
 <ul>
 <li>“None” means a package, once published, cannot be deleted</li>
@@ -114,12 +114,26 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.</li>
 </ul>
 <p>Returns a dependency tree as a matrix:</p>
-<ul>
-<li>[;1] Flag that indicates whether it is a principal package (1) or a dependency (0)</li>
-<li>[;2] PackageID of what required that dependency</li>
-<li>[;3] Full package ID</li>
-<li>[;4] The full URL (either a local path (without protocol) or http(s)://…)</li>
-</ul>
+<table>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Flag that indicates whether it is a principal package (1) or a dependency (0)</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>PackageID of what required that dependency</td>
+</tr>
+<tr>
+<td>[;3]</td>
+<td>Full package ID</td>
+</tr>
+<tr>
+<td>[;4]</td>
+<td>The full URL (either a local path (without protocol) or http(s)://…)</td>
+</tr>
+</tbody>
+</table>
 <p>This function requires the version number to be fully specified.</p>
 <p>Note that the function accepts an optional left argument, but this should not be specified by a user: it is only used internally.</p>
 <div class="h_tag">
@@ -128,7 +142,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>path←{aplVersion} GetUserHomeFolder append</code></pre>
-<p>Returns standard path for any user-specific data.</p>
+<p>Returns the standard path for any user-specific data.</p>
 <p>Works on all platforms but returns different results.</p>
 <p><code>⍵</code>, if not empty, is added to the resulting path.</p>
 <p>Under Windows typically:</p>
@@ -238,15 +252,24 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tr>
 <tr>
 <td>[;3]</td>
+<td>Port</td>
+</tr>
+<tr>
+<td>[;4]</td>
 <td>Priority</td>
+</tr>
+<tr>
+<td>[;5]</td>
+<td>API key</td>
 </tr>
 </tbody>
 </table>
 <p>“type” must be either 0 or 1 or empty:</p>
 <ul>
 <li>1 means all data is listed</li>
-<li>Everything else means just the alias, the uri and the priority are listed</li>
+<li>0 means the API key is not listed</li>
 </ul>
+<p>Note that the result of the API function and the user command differ.</p>
 <div class="h_tag">
 <a href="#ListTags" id="ListTags" class="autoheader_anchor">
 <h3 data-id="ListTags">ListTags</h3>
@@ -255,7 +278,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>list←{parms} ListTags y</code></pre>
 <p><code>y</code> might be the path to a Registry or a Registry alias (embraced by <code>[]</code>).</p>
 <p>By default all tags of all packages are returned.</p>
-<p>Optionally <code>⍺</code> can be specified. Must be a namespace that might contain a variable <code>tags</code> which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carries that specified tag(s).</p>
+<p>Optionally <code>⍺</code> can be specified. Must be a namespace that might contain a variable <code>tags</code> which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carry all of the specified tags.</p>
 <div class="h_tag">
 <a href="#ListVersions" id="ListVersions" class="autoheader_anchor">
 <h3 data-id="ListVersions">ListVersions</h3>
@@ -264,7 +287,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>mat←{dateFlag} ListVersions uri</code></pre>
 <p><code>uri</code> is one of:</p>
 <ul>
-<li>“[*]” followed by “group” and “name” of a package</li>
+<li><code>[*]</code> followed by “group” and “name” of a package</li>
 <li>A path to a Registry and “group” and “name” of a package</li>
 </ul>
 <p>In the first case all defined Registries are scanned. A matrix with two columns is returned: URL and full package ID.</p>
@@ -300,7 +323,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>A ZIP file holding a package</li>
 <li>A folder holding a package (like file://C:/Temp/group-name-version)</li>
 <li>A path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg{packageID}')</li>
-<li>A package ID; Tatin will then attempt to find that package in one of the Registries defined in the Client's config file.</li>
+<li>A package ID; Tatin will then attempt to find that package in one of the Registries defined in the client's config file with a priority greater than 0.</li>
 </ul>
 <p>The first hit wins.</p>
 <dl>
@@ -322,7 +345,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>zipFilename←Pack (projectPath targetPath)</code></pre>
 <dl>
 <dt>projectPath:</dt>
-<dd><p>folder to create package from</p></dd>
+<dd><p>folder to create a package from</p></dd>
 <dt>targetPath:</dt>
 <dd><p>folder the package goes into</p></dd>
 </dl>
@@ -331,9 +354,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Ping">Ping</h3>
 </a>
 </div>
-<pre><code>bool←{ts} Ping uri_</code></pre>
+<pre><code>bool←Ping uri_</code></pre>
 <p>Establishes whether the host is up and running with very little overhead.</p>
-<p><code>ts</code> is only useful for test cases.</p>
+<p>The optional left argument is only useful for test cases.</p>
 <div class="h_tag">
 <a href="#PublishPackage" id="PublishPackage" class="autoheader_anchor">
 <h3 data-id="PublishPackage">PublishPackage</h3>
@@ -352,14 +375,22 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p><code>⍵</code> must be a two-item vector:</p>
 <ol start="1">
 <li><code>source</code> → folder to create package from</li>
-<li><code>registry</code> → registry to publish package to (alias or uri)</li>
+<li><code>registry</code> → registry to publish the package to (alias or uri)</li>
 </ol>
 <p>The explicit result:</p>
 <ul>
-<li><code>statusCode</code> is an HTTP no matter whether it is an HTTP call or not.</li>
-<li><code>errMsg</code> is empty if <code>statusCode</code> is 200, otherwise it is additional information.</li>
-<li><code>zipFilename</code> is empty in case <code>source</code> is a ZIP file, but the name of the ZIP file created otherwise.</li>
+<li><code>statusCode</code> is an HTTP code no matter whether it is an HTTP call or not.</li>
+<li><code>errMsg</code> is empty if <code>statusCode</code> is 200, otherwise it might carry additional information.</li>
+<li><code>zipFilename</code> is empty in case <code>source</code> is a ZIP file, otherwise it is the name of the ZIP file created.</li>
 </ul>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
+<div>
+<p>Note that the API function will publish the package no matter what the delete policy operated by the server is.</p>
+<p>That is different from the user command which will ask the user for confirmation in case the user attempts to publish a package that cannot be deleted once published.</p>
+</div>
+</div>
+
 <div class="h_tag">
 <a href="#ReInstallDependencies" id="ReInstallDependencies" class="autoheader_anchor">
 <h3 data-id="ReInstallDependencies">ReInstallDependencies</h3>
@@ -368,7 +399,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>{refs}←{parms} ReInstallDependencies y</code></pre>
 <p>Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.</p>
 <p>The file apl-buildlist.json as well as all directories in that folder will be deleted. Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.</p>
-<p>Note that a packages with different major version numbers are considered different.</p>
+<p>Note that packages with different major version numbers are considered different.</p>
 <p>By default all known Registries with a priority greater than 0 are scanned, but you may specify a particular Registry as a second (optional) argument.</p>
 <p>The left argument is optional and, if specified, typically created by calling <a href="#CreateReInstallParms" class="bookmark_link"><code>CreateReInstallParms</code></a>.</p>
 <p>It may carry three parameters:</p>
@@ -398,14 +429,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that if <code>packageID</code> is empty a clean-up attempt is made.</p>
 <p>To keep things simple Tatin performs the following steps:</p>
 <ol start="1">
-<li>It checks whether the package is mentioned in the dependency file. If not an error is thrown.</li>
+<li>It checks whether the package ID is mentioned in the dependency file. If not an error is thrown.</li>
 <li>It removes <code>packagedID</code> from the dependency file.</li>
 <li>It re-compiles the build list based on the new dependency file.</li>
 <li>It removes all packages that are not mentioned in the build list anymore</li>
 </ol>
 <p>Returns a two-item vector:</p>
 <ol start="1">
-<li>List with the fully qualified names of all removed packages. Note that might carry an alias</li>
+<li>List with the fully qualified names of all removed packages. Note that they might carry an alias.</li>
 <li>Message, ideally empty.</li>
 </ol>
 <p>Note that removing the directories hosting the packages might fail for all sorts of reasons even though the package and any dependencies were already successfully removed from both the dependency file and the build list.</p>

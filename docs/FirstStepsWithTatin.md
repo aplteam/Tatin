@@ -276,7 +276,7 @@ The command prints to the session the name of the namespace into which the packa
 But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries two variables:
 
 * `HOME` carries the path to the directory where the package was loaded from
-* `ASSETS` is the path to the assets folder relative to `HOME`
+* `ASSETS` is the full path to the assets folder
 
   Note that this variable only exists in case the package has assets.
 
@@ -397,7 +397,7 @@ MarkAPL
 The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages:
 you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. 
 
-That way Tatin would find the package on your local machine even when the are not loaded as principal packages but just dependencies.
+That way Tatin would find the package on your local machine even when they are not loaded as principal packages but just dependencies.
  
 Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
 
@@ -426,35 +426,40 @@ They are injected into a namespace `TatinVars` which in turn is injected into `c
 Some of them always exist, some of them only under certain circumstances.
 
 
-##### `CONFIG`
+##### ASSETS
+
+The full path to the package's assets. Is empty in case there are no assets.
+
+
+##### CONFIG
 
 This is a simple character vector that stems from the file `apl-package.json` of the given package.
 
 
-##### `DEPENDENCIES`
+##### DEPENDENCIES
 
 A vector of character vectors with the package IDs of the packages the package in question depends on.
 
 
-##### `HOME`
+##### HOME
 
 Is a character vector holding the path of a folder that hosts the package. 
 
 There is an exception: when the package was brought into the workspace with `LoadPackage` rather than `LoadDependencies` then `HOME` will be an empty vector in case the package has no assets.
 
 
-##### `ID`
+##### ID
 
 The full package name. This will include a build ID if there is any, so it is not necessarily identical with the package ID.
 
 
-##### `LX`
+##### LX
 
 This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successfully. `LX` holds the result that is returned by that function if it did return a result. If it doesn't it becomes an empty vector.
 
 Note that if there is no `lx` defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no `LX`.
 
 
-##### `URI`
+##### URI
 
 Character vector that holds the address of a Tatin server or the full name of a ZIP file.

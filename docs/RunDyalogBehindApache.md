@@ -4,7 +4,7 @@
 
 # Run Dyalog behind Apache
 
-With Dyalogs Conga, [Rumba](https://github.com/aplteam/RumbaLean "Link to the project on GitHub") or [Plodder ](https://github.com/aplteam/Plodder  "Link to the project on GitHub") you might well decide to serve HTTP requests with an application written in Dyalog  APL.
+With Dyalog's Conga, [Rumba](https://github.com/aplteam/RumbaLean "Link to the project on GitHub") or [Plodder ](https://github.com/aplteam/Plodder  "Link to the project on GitHub") you might well decide to serve HTTP requests with an application written in Dyalog  APL.
 
 However, if your application serves requests from the Internet (as opposed to an Intranet) then it is strongly recommended to hide your application behind an industrial strength web server like Apache.
 

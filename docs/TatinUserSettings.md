@@ -14,22 +14,24 @@ Tatin uses a file to remember all Tatin Registries you want to work with, and po
 
 When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location. 
 
-Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instanciate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _do not_ affect `⎕SE.Tatin.MyUserSettings`!
+Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _do not_ affect `⎕SE.Tatin.MyUserSettings`!
 
 `⎕SE.Tatin.MyUserSettings` provides a number of properties that can be questioned as well as a number of methods that can be issued in order to manipulate the user settings.
 
 This call:
 
 ```
-      ]Tatin.Listregistries -all 
- URI                 Alias                    Port  Priority  API-key                              
- ------------------  -----------------------  ----  --------  ------------------
- tatin               https://tatin.dev/          0       100  xxxxxxx
- tatin-test          https://test.tatin.dev/     0        10  Tatin-Test-API-Key                   
+      ]Tatin.Listregistries
+ URI         Alias                    Port  Priority
+ ----------  -----------------------  ----  --------
+ tatin       https://tatin.dev/          0       100
+ tatin-test  https://test.tatin.dev/     0         0
 
 ```
 
-Shows most of the data that is saved in the user settings.
+Shows most of the data that is saved in the user settings except the API key(s).
+
+If you would like to see the API keys as well specify the `-full` flag.
 
 
 ### The default file
@@ -44,7 +46,9 @@ That default file will have two  Tatin Registries defined in it:
 
    It has an alias `test-tatin` assigned to it, so you can address it as `[test-tatin]` with all user commands that require a Registry as parameter.
 
-   It has a priority of `0` assigned to it which means that it will _not_ participate in Registry scans. Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is `0`.
+   It has a priority of `0` assigned to it which means that it will _not_ participate in Registry scans.
+
+   Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is `0`.
 
 
 ### Where does the file live?
@@ -69,7 +73,7 @@ If you are familiar with JSON5 syntax and want to edit the file it is recommende
 
 This will allow you to edit the file contents, but Tatin will check it afterwards in order to make sure that nothing invalid goes ever into the file.
 
-Note that Dyalog 18.2 and later recognise JSON5 and highlight any syntax errors; that can be helpful.
+Note that Dyalog 18.2 and later recognize JSON5 and highlight any syntax errors.
 
 ### What does Tatin do at start-up time?
 
@@ -77,7 +81,7 @@ When Tatin is initialized[^init] it creates an instance of the `UserSettings` cl
 
 If the constructor does not get a fully qualified name of the user settings file as an argument then it performs two steps:
 
-1. It looks for a file `.tatin` in that folder.
+1. It looks for a file `.tatin` in the user's home folder.
 
    If the file exists and is not empty then it is expected to point to a user settings file, and Tatin will go for that file.
 
@@ -94,7 +98,7 @@ If the constructor does not get a fully qualified name of the user settings file
 
 #### Changes made to the file
 
-If you change the file that Tatin has instantiated by editing it, and have an APL session up and running, then your change does not have an impact on the APL session. 
+If you change the file that Tatin has instantiated by editing it with an external editor, and have an APL session up and running, then your change does not have an impact on the APL session. 
 
 However, you can force Tatin to bring the session in line with the file by executing:
 
@@ -148,10 +152,10 @@ Let's list all registries currently defined:
 
 ```
       ⎕se.Tatin.MyUserSettings.ListRegistries 0
-URI                     Alias  Port  Priority
-------------------      -----  ----  --------
-https://tatin.dev/      tatin  0     100 
-https://test.tatin.dev/ tatin  0       0 
+URI                     Alias       Port  Priority
+------------------      -----       ----  --------
+https://tatin.dev/      tatin       0     100 
+https://test.tatin.dev/ tatin-test  0       0 
 ```
 
 This is because originally Tatin only knows about the principal Tatin server and its cousin, the test server.
@@ -187,7 +191,7 @@ We will pass a simple text vector that specifies the alias (between `[]`) and th
 ├────────┼────────────────────────────┤
 │api_key │                            │
 ├────────┼────────────────────────────┤
-│priority│0                           │
+│priority│[Null]                      │
 └────────┴────────────────────────────┘
       ]box off
 ```
@@ -198,6 +202,8 @@ We will pass a simple text vector that specifies the alias (between `[]`) and th
 * `port` is 0 which means that it will fall back to 80 for `http://` and 443 for `https://`.
 * `priority` decides in which order Registries are scanned in case no Registry was provided. The Registry with the highest number is scanned first, and the first hit wins.
   
+  `⎕NULL` will be converted once the instance is added to the user settings, see there.
+ 
   Note that a priority of `0` or less means that the registry will **not** participate in a Registry scan.
 * `api_key` must be set only when the Registry is managed by a Tatin server _and_ you want to publish packages, or delete packages (if that is permitted by that Tatin server at all) and credentials are required for those operations.
 
@@ -214,13 +220,21 @@ Now we would expect two Registries:
 
 ```
       ↑⎕se.Tatin.MyUserSettings.registries.(alias uri priority)
- tatin  https://tatin.dev/            100
- myc    https://tatin.mycompany.com/   90
+ tatin       https://tatin.dev/           100
+ myc         https://tatin.mycompany.com/  90
+ tatin-test  https://test.tatin.dev/        0
 ```
 
 The priority is not `⎕NULL` anymore but 90: any `⎕NULL` is replaced by the lowest number yet minus 10.
 
-Note that so far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the change permanent. That means that other sessions won't be affected.
+A> ### Regarding priorities
+A> What happens when you add a Registry with `priority` being `⎕NULL` and the lowest Registry so far is 1?
+A> 
+A> In that case Tatin assigns new values to all Registries except those with a priority of zero which will remain untouched.
+A> 
+A> The new priorities will not change the order of the priorities, and the lowest one will be 100 or greater.
+
+So far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the change permanent; other sessions won't be affected.
 
 If you want to make your changes permanent you must call the `Save` method and provide a 1 as right argument.
 
@@ -229,7 +243,7 @@ If you want to make your changes permanent you must call the `Save` method and p
 
 There might be scenarios when the default location for the user config file is not suitable for you.
 
-* If you cannot make frequent changes to the Tatin user settings file in its default location due to, say,  company constraints, then of course it need to go elsewhere.
+* If you cannot make frequent changes to the Tatin user settings file in its default location due to, say,  company constraints, then of course it needs to go elsewhere.
 
 * Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 
@@ -242,13 +256,15 @@ For that you must create a user settings file in a specific location. In order t
 ```
       ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path2/user_config_file/')
       ⍴⎕←1 ⎕se.Tatin.ListRegistries 0
- https://tatin.dev  tatin   100
-1 3
+ https://tatin.dev       tatin      100
+ https://test.tatin.dev  tatin-test   0
+2 3
       ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
- Alias  URI                 Port  Priority  API-key 
- -----  ------------------  ----  --------  ------- 
- tatin  https://tatin.dev/     0       100  ***      
-3 5
+ Alias  URI                  Port  Priority  API-key 
+ -----  ------------------   ----  --------  ------- 
+ tatin  https://tatin.dev/      0       100  ***      
+ test-tatin  https://tatin.dev/ 0       100  ***      
+4 5
 ```
 
 Notes:
@@ -259,7 +275,7 @@ Notes:
 
 ### Make the switch permanent
 
-In order to make this user settings file the default file, meaning that this file will instantiated the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
+In order to make this user settings file the default file, meaning that this file will be instantiated the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
 
 You can do this yourself, but you can also ask the instance for doing the job for you:
 

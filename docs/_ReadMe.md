@@ -21,6 +21,8 @@ This document gives you an overview over these HTML files: their purpose and who
 
 * [Tatin's Load and Update Strategy](./TatinsLoadAndUpdateStrategy.html "TatinsLoadAndUpdateStrategy.html") (draft)
 
+  Discuss what measures Tatin takes when dependencies rely on different versions of the same package and related issues.
+
 * [Tatin User Settings](./TatinUserSettings.html "TatinUserSettings.html") (draft)
 
   You need to read this _only_ in case one or more of the following is true for you:
@@ -30,6 +32,8 @@ This document gives you an overview over these HTML files: their purpose and who
   * You need different user settings files for multiple users
 
 * [Syntax Reference](./SyntaxReference.html "SyntaxReference.html") (draft)
+
+  Documents the syntax of all API functions.
 
 ### The Client
 
@@ -55,6 +59,8 @@ This document gives you an overview over these HTML files: their purpose and who
 ### The Server
 
 * [Installing the Tatin Server](./InstallingTheTatinServer.html "InstallingTheTatinServer.html") (draft)
+
+  Read this if you want to run your own Tatin server.  
 
 
 ### Misc

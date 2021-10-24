@@ -1,7 +1,14 @@
- html←GetFooter
+ html←GetFooter;footer;domain;email;subject
  html←''
  html,←⊂'<div id="my-footer">'
  html,←⊂'<hr>'
- html,←⊂'<p>Created by Tatin version ',(⊃{⍺,' from ',⍵}/1↓##.Server.Version),' under ',⍕'#'⎕WG'APLVersion'
+ footer←'Created by Tatin version ',(⊃{⍺,' from ',⍵}/1↓Version),' under ',⍕'#'⎕WG'APLVersion'
+ footer,←'	&#8212; Bugs, questions, problems:'
+ domain←⊃G.INI.Get'EMAIL:Domain'
+ email←⊃G.INI.Get'EMAIL:To'
+ subject←'subject=Regarding ',domain
+ (domain subject)←{' '⎕R'\%20'⊣⍵}¨domain subject
+ footer,←'<a class="mailto_link" href="mailto:',email,'?',subject,'">',email,'</a>'
+ html,←⊂'<p>',footer,'</p>'
  html,←⊂'</div>'
 ⍝Done

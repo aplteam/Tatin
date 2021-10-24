@@ -166,23 +166,24 @@ There is one exception: when an absolute path is specified but it's partly ident
 
 Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.
 
-##### Accessing assets from an instance
-
-In case you need to access assets from an instance of a package you have two choices:
-
-1. Create a shared method like this:
-
-   ```
-   r←GetAssetFolder
-   :Access Public Shared
-   r←##.TatinVars.HOME
-   ```
-
-   You can then call this shared method from within an instance method.
-
-2. Use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
-
-   Therefore the expression `(⊃⊃⎕CLASS ⎕THIS).##.TatinVars.HOME` returns the value of `HOME`.
+A> ### Accessing assets from an instance
+A>
+A> In case you need to access assets from an instance of a package you have two choices:
+A>
+A> 1. Create a function like this:
+A> 
+A>    ```
+A>    r←GetAssetFolder
+A>    r←##.TatinVars.ASSETS
+A>    ```
+A> 
+A> 2. From within a class use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
+A> 
+A>    Therefore the following expression returns the path to the assets:
+A> 
+A>    ```
+A>    (⊃⊃⎕CLASS ⎕THIS).##.TatinVars.ASSETS
+A>    ```
 
 
 #### description
@@ -203,9 +204,9 @@ A group may be the name of a user, the owner, a company, an application name, a 
 
 This is optional: it may or may not exist, and it might be empty if it does.
 
-In case it is not empty it must be the name of a niladic or monadic function that resides in the top level namespace of the package (_not_ in what might be defined as API!) or a shared method of a class.
+In case it is not empty it must be the name of a niladic or monadic function that resides in the top-level namespace of the package (_not_ in what might be defined as API!) or a shared method of a class.
 
-This function will be executed bei either `LoadPackage` or `LoadDependencies` _after_ all dependencies have been loaded and all refs got established.
+This function will be executed by either `LoadPackage` or `LoadDependencies` _after_ all dependencies have been loaded and all refs got established.
 
 If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackage` and has no assets then the right argument will be empty.
 

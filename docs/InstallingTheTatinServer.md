@@ -134,7 +134,7 @@ For more details on certificates see "On Certificates"
 
 A Tatin server can send emails, broadcasting any crashes. For that you must specify a couple of things in this section.
 
-The INI file is well dcoumented, so you should have no trouble to make the necessary adjustments.
+The INI file is well documented, so you should have no trouble to make the necessary adjustments.
  
 
 ## On Logging

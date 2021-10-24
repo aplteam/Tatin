@@ -134,7 +134,7 @@ cfg←InitPackageConfig y
 
 Returns a namespace with default values useful for the function [`InitialisePackage`](#InitialisePackage).
 
-`⍵` might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then this namespace will be merged. Any settings in that namespace take precendence.
+`⍵` might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then this namespace will be merged. Any settings in that namespace take precedence.
 
 ### InstallPackage       
 
@@ -437,10 +437,10 @@ required by other packages.
 Note that if `packageID` is empty a clean-up attempt is made.
 
 To keep things simple Tatin performs the following steps:
-1. It checks whether the package ID is mentioned in the dependency file. If not an error is thrown.
-3. It removes `packagedID` from the dependency file.
-4. It re-compiles the build list based on the new dependency file.
-5. It removes all packages that are not mentioned in the build list anymore
+1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.
+3. Removes `packagedID` from the dependency file.
+4. Re-compiles the build list based on the new dependency file.
+5. Removes all packages that are not mentioned in the build list anymore
 
 Returns a two-item vector:
 

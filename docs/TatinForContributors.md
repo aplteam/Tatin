@@ -151,7 +151,7 @@ Notes:
 * The `Make` function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. `noQLXFlag`, if 1,  prevents the interpreter from running the code straight away. 
 
 A> ### The `load` and `lx` command line parameters
-A> Despite its name `noQLXFlag` is not associated with `⎕LX`: for this to work the command line parameters `load` and `lx` are invoked, and `-x` is added in case `noQLXFlag` is 1, preventing the interpreter from excuting the expression noted as `lx.` 
+A> Despite its name `noQLXFlag` is not associated with `⎕LX`: for this to work the command line parameters `load` and `lx` are invoked, and `-x` is added in case `noQLXFlag` is 1, preventing the interpreter from executing the expression noted as `lx.` 
 A>
 A> If this looks unfamiliar to you: these were introduced in 18.0.
 

@@ -80,15 +80,17 @@ OnRequest           = 'OnRequest'                      ; Called in the event of 
 OnCongaTimeout      = 'OnHouseKeeping'                 ; Do any housekeeping here
 
 
-[EMAIL]             ; Tatin can send emails in case of crashesActive              = 1                                ; On/off toggle
-Domain              = '?'                              ; Used in the subject line
+[EMAIL]             ; Tatin can send emails in case of crashesActive              = 1      ; On/off toggle for crash emails
+Domain              = '?'                              ; Used in the subject line  (*)
 SMTP_Server         = ''                               ; For example: smtp.gmail.com'
 Port                = 465
 From                = 'do-not-reply@your-domain.comv'  ; Sender of crash emails
-To                  = 'some-address@gmail.com'         ; Receiver of crash emails
+To                  = 'some-address@gmail.com'         ; Receiver of crash emails (*)
 Password            = '?'                              ; Must fit to "SendTo" which is also used as User-ID on the SMTP server
 ;Body                = 'The Tatin server running at "<DOMAIN>" has crashed; see attached crash report'
 Body                = 'The Tatin server running at "<DOMAIN>" has crashed'
 CC                  = ''
 CC                 ,= '?'                              ; Receiver of crash emails
 ;CC                ,= '?'                              ; Receiver of crash emails
+
+; *: "Domain" and "To" are displayed on each HTML page in the footer if both are not empty

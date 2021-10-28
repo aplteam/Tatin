@@ -152,37 +152,31 @@ Similarly, if your package `Foo` consist of the two namespaces `Boo` and `Goo`, 
 
 #### assets
 
-This defines the files the source code relies on in one way or another, like CSS files, JavaScript files, images and what not.
+If not empty (no assets) it points to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
 
-This must be a simple text vector that can represent:
+There is one exception: when an absolute path is specified but it's partly identical with what will become `HOME` (the folder where the package lives) then Tatin removes that  part silently, making the path effectively relative. 
 
-* A single filename
-* A single folder name
-* A simple text vector representing a mixture of file names and folder names separated by commas.
+Note that when the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.
 
-The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
+See also the [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) function.
 
-There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative. 
-
-Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.
-
-A> ### Accessing assets from an instance
+A> ### Accessing assets from a class instance
 A>
-A> In case you need to access assets from an instance of a package you have two choices:
+A> In case you need to access assets from an instance of a class in a package you have two choices:
 A>
-A> 1. Create a function like this:
+A> 1. Add to the class a function like this:
 A> 
 A>    ```
 A>    r←GetAssetFolder
-A>    r←##.TatinVars.ASSETS
+A>    r←##.TatinVars.GetFullPath2AssetsFolder
 A>    ```
 A> 
-A> 2. From within a class use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
+A> 2. Use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
 A> 
 A>    Therefore the following expression returns the path to the assets:
 A> 
 A>    ```
-A>    (⊃⊃⎕CLASS ⎕THIS).##.TatinVars.ASSETS
+A>    (⊃⊃⎕CLASS ⎕THIS).##.TatinVars.GetFullPath2AssetsFolder
 A>    ```
 
 
@@ -193,6 +187,16 @@ A short description of what the package is supposed to do, or what kind of probl
 This information is typically used when a human accesses a Tatin Server with a Browser.
 
 `description` _must not_ be empty.
+
+#### GetFullPath2AssetsFolder
+
+In case [`assets`](#assets) is not empty this function returns a simple char vector that represents the _full path_ to the assets, using something like:
+
+```
+  HOME,'/',ASSETS
+```
+
+If `assets` is empty the functins returns `''`.
 
 #### group
 

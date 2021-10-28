@@ -1,5 +1,5 @@
- {r}←EstablishTatinConstants(ref cfg folder);deps;ref2;res;msg;make
-⍝ We establish a couple of variables in code.TatinVars for convinience
+ {r}←EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make
+⍝ We establish some fns (mostly niladic for impersonating ""constants") in code.TatinVars for convinience
  r←⍬
  ref2←⍎'TatinVars'ref.code.⎕NS''
  make←{
@@ -23,4 +23,5 @@
      res←ref2.⎕FX'r←DEPENDENCIES' 'r←⍬'
      Assert/'DEPENDENCIES'make res
  :EndIf
+ ref2.⎕FX'r←GetFullPath2AssetsFolder' 'r←''''' ':If 0<≢ASSETS' '    r←HOME,''/'',ASSETS' ':EndIf'
 ⍝Done

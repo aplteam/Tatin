@@ -320,12 +320,11 @@ Loads the package into `(#|⎕SE)._tatin.{packageName}` and establishes a refere
 
 Loads all dependencies, if any, as well into `(#|⎕SE)._tatin` but _not_ into `targetSpace`.
 
-Leaves no trails in the file system unless a package (or one of its dependencies) relies on file assets in
-which case the temporary directory (which is created in any case) will not be deleted.
+Leaves no trail in the file system unless a package (or one of its dependencies) relies on file assets, in which case the temporary directory (which is created in any case) will not be deleted.
 
 By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as `⍺`.
 
-Returns the name of the temp folder in case it could not be deleted (because of assets) and `''` otherwise.
+Returns the name of the temp folder in case it could not be deleted (because the package comes with/relies on assets) and `''` otherwise.
 
 ### Pack                 
 

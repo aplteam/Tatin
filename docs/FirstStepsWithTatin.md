@@ -276,16 +276,18 @@ The command prints to the session the name of the namespace into which the packa
 But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries two variables:
 
 * `HOME` carries the path to the directory where the package was loaded from
-* `ASSETS` is the full path to the assets folder
+* `ASSETS` holds the path to the assets relative to `HOME`.
 
-  Note that this variable only exists in case the package has assets.
+  If there are not assets then `ASSETS` is an empty vector.
+
+I> Note that there is also a function [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) available in `TatinVars`.
 
 ```
       #._tatin.aplteam_MarkAPL_11_0_1.code.TatinVars.HOME
 /Foo/packages/aplteam-APLTreeUtils2-1.1.1
 ```
 
-That means that any MarkAPL function can refer to `HOME` with `##.TatinVars.Home`.
+That means that any MarkAPL function can refer to `HOME` with `##.TatinVars.HOME`.
 
 `TatinVars` holds more potentially important data; details are discussed at [Tatin Variables](#).
 
@@ -419,7 +421,7 @@ The fact that Registries with a priority of `0` are not scanned by Tatin allows 
 
 #### Tatin Variables
 
-For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.
+For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.
 
 They are injected into a namespace `TatinVars` which in turn is injected into `code`.
 
@@ -428,7 +430,10 @@ Some of them always exist, some of them only under certain circumstances.
 
 ##### ASSETS
 
-The full path to the package's assets. Is empty in case there are no assets.
+The path to the package's assets relative to `HOME`. Is empty in case there are no assets.
+
+See also [GetFullPath2AssetsFolder](#GetFullPath2AssetsFolder).
+
 
 
 ##### CONFIG
@@ -463,3 +468,8 @@ Note that if there is no `lx` defined in a package config file, or if it is empt
 ##### URI
 
 Character vector that holds the address of a Tatin server or the full name of a ZIP file.
+
+
+##### GetFullPath2AssetsFolder
+
+This is a function which returns the result of the expression `HOME,'/',ASSETS`.

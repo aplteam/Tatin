@@ -3,12 +3,15 @@
  html,←⊂'<div id="my-footer">'
  html,←⊂'<hr>'
  footer←'Created by Tatin version ',(⊃{⍺,' from ',⍵}/1↓Version),' under ',⍕'#'⎕WG'APLVersion'
- footer,←'	&#8212; Bugs, questions, problems:'
  domain←⊃G.INI.Get'EMAIL:Domain'
  email←⊃G.INI.Get'EMAIL:To'
- subject←'subject=Regarding ',domain
- (domain subject)←{' '⎕R'\%20'⊣⍵}¨domain subject
- footer,←'<a class="mailto_link" href="mailto:',email,'?',subject,'">',email,'</a>'
+ :If 0<≢domain
+ :AndIf 0<≢email
+     footer,←'	&#8212; Bugs, questions, problems:'
+     subject←'subject=Regarding ',domain
+     (domain subject)←{' '⎕R'\%20'⊣⍵}¨domain subject
+     footer,←'<a class="mailto_link" href="mailto:',email,'?',subject,'">',email,'</a>'
+ :EndIf
  html,←⊂'<p>',footer,'</p>'
  html,←⊂'</div>'
 ⍝Done

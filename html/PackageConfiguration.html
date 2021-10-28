@@ -177,26 +177,20 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="assets">assets</h4>
 </a>
 </div>
-<p>This defines the files the source code relies on in one way or another, like CSS files, JavaScript files, images and what not.</p>
-<p>This must be a simple text vector that can represent:</p>
-<ul>
-<li>A single filename</li>
-<li>A single folder name</li>
-<li>A simple text vector representing a mixture of file names and folder names separated by commas.</li>
-</ul>
-<p>The path must be relative to the package since the file(s) or folder(s) are part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>”. If it does anyway an error is thrown.</p>
-<p>There is one exception: when an absolute path is specified but it's partly identical with the source path of the package then Tatin removes the source part and makes the path(s) silently relative.</p>
-<p>Note that when the package configuration file is written to disk the existence of the specified assets is checked. If any of them do not exist an error is thrown.</p>
+<p>If not empty (no assets) it points to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>”. If it does anyway an error is thrown.</p>
+<p>There is one exception: when an absolute path is specified but it's partly identical with what will become <code>HOME</code> (the folder where the package lives) then Tatin removes that part silently, making the path effectively relative.</p>
+<p>Note that when the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.</p>
+<p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> function.</p>
 <div class="leanpub_A">
-<h3>Accessing assets from an instance</h3>
-<p>In case you need to access assets from an instance of a package you have two choices:</p>
+<h3>Accessing assets from a class instance</h3>
+<p>In case you need to access assets from an instance of a class in a package you have two choices:</p>
 <ol start="1">
-<li>Create a function like this:
+<li>Add to the class a function like this:
 <pre><code>r←GetAssetFolder
-r←##.TatinVars.ASSETS</code></pre></li>
-<li>From within a class use the expression <code>⊃⊃⎕CLASS ⎕THIS</code> in order to find out where the class script actually lives.
+r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
+<li>Use the expression <code>⊃⊃⎕CLASS ⎕THIS</code> in order to find out where the class script actually lives.
 <p>Therefore the following expression returns the path to the assets:</p>
-<pre><code>(⊃⊃⎕CLASS ⎕THIS).##.TatinVars.ASSETS</code></pre></li>
+<pre><code>(⊃⊃⎕CLASS ⎕THIS).##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </ol>
 </div>
 
@@ -208,6 +202,14 @@ r←##.TatinVars.ASSETS</code></pre></li>
 <p>A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.</p>
 <p>This information is typically used when a human accesses a Tatin Server with a Browser.</p>
 <p><code>description</code> <em>must not</em> be empty.</p>
+<div class="h_tag">
+<a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
+<h4 data-id="GetFullPath2AssetsFolder">GetFullPath2AssetsFolder</h4>
+</a>
+</div>
+<p>In case <a href="#assets" class="bookmark_link"><code>assets</code></a> is not empty this function returns a simple char vector that represents the <em>full path</em> to the assets, using something like:</p>
+<pre><code>  HOME,'/',ASSETS</code></pre>
+<p>If <code>assets</code> is empty the functins returns <code>''</code>.</p>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
 <h4 data-id="group">group</h4>

@@ -22,11 +22,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.2.0+103' '2021-10-06'
+      r←'Tester2' '3.2.1+103' '2021-10-28'
     ∇
 
     ∇ History
       :Access Public shared
+      ⍝ * 3.2.1 ⋄ 2021-10-28
+      ⍝   * Minor bug fix in GetTestTemplate: explicit result was ill-named ("r" rather than "R").
       ⍝ * 3.2.0 ⋄ 2021-10-01
       ⍝   * `Tester2` now informs `Link` in case an APL object was changed (`RenameTestFnsTo`) under the condition 
       ⍝     that it is at least Link 3.0 that is managing the code.
@@ -1450,7 +1452,7 @@
       :Access Public Instance
       ⍝ Injects the code (body) of the test template function into the namespace hosting the test cases if that is an
       ⍝ ordinary namespace. If it is a scripted one the user will be prompted for copying the body to the clipboard.
-      ⍝ The user can then inject that code herself into that scripted namespace.
+      ⍝ The user can then inject that code herself into the scripted namespace/class.
       r←⍬
       groupName←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'groupName'
       'Invalid right argumet: must be an integer between 1 and 999'⎕SIGNAL 11/⍨~(⊂no)∊(⍳999)
@@ -1484,21 +1486,22 @@
       :EndIf
     ∇
 
-    ∇ r←Test_000(stopFlag batchFlag);⎕TRAP
-    ⍝ Model for a test function.
+    ∇ R←Test_000(stopFlag batchFlag);⎕TRAP
+⍝ Model for a test function. 
+⍝ *** Watch out: assumes that the instance of Tester2 is called "T".
       ⎕TRAP←(999 'C' '∘∘∘ ⍝ Deliberate error')(0 'N')
       R←T._Failed
      
-    ⍝ Establish pPreconditions...
+⍝ Establish preconditions...
      
       →T.PassesIf 1≡1
       →T.FailsIf 1≢1
       →T.GoToTidyUp 1≢1
+
       R←T._OK
      
      ∆TidyUp: ⍝ Clean up after this label
-      ⍝ ...
-     
+  ⍝ ...
     ∇
 
     ∇ yesOrNo←{default}YesOrNo question;isOkay;answer;add

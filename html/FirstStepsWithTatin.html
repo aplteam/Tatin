@@ -289,12 +289,19 @@ Styles.html</code></pre>
 <p>But how does MarkAPL find its assets? Well, Tatin injects a namespace <code>TatinVars</code> into <code>#._tatin.aplteam_MarkAPL_11_0_1.code</code>, and that namespace carries two variables:</p>
 <ul>
 <li><code>HOME</code> carries the path to the directory where the package was loaded from</li>
-<li><code>ASSETS</code> is the full path to the assets folder
-<p>Note that this variable only exists in case the package has assets.</p></li>
+<li><code>ASSETS</code> holds the path to the assets relative to <code>HOME</code>.
+<p>If there are not assets then <code>ASSETS</code> is an empty vector.</p></li>
 </ul>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>Note that there is also a function <a href="#GetFullPath2AssetsFolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> available in <code>TatinVars</code>.</p>
+</div>
+</div>
+
 <pre><code>      #._tatin.aplteam_MarkAPL_11_0_1.code.TatinVars.HOME
 /Foo/packages/aplteam-APLTreeUtils2-1.1.1</code></pre>
-<p>That means that any MarkAPL function can refer to <code>HOME</code> with <code>##.TatinVars.Home</code>.</p>
+<p>That means that any MarkAPL function can refer to <code>HOME</code> with <code>##.TatinVars.HOME</code>.</p>
 <p><code>TatinVars</code> holds more potentially important data; details are discussed at <a href="#Tatin-Variables" class="bookmark_link">Tatin Variables</a>.</p>
 <p>What else lives in <code>#._tatin</code>?</p>
 <pre><code>      #._tatin.⎕nl 9
@@ -397,7 +404,7 @@ MarkAPL</code></pre>
 <h4 data-id="Tatin-Variables">Tatin Variables</h4>
 </a>
 </div>
-<p>For every package Tatin will establish certain variables, though strictly speaking they are not variables but niladic functions, the best way to simulate a constant in APL.</p>
+<p>For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.</p>
 <p>They are injected into a namespace <code>TatinVars</code> which in turn is injected into <code>code</code>.</p>
 <p>Some of them always exist, some of them only under certain circumstances.</p>
 <div class="h_tag">
@@ -405,7 +412,8 @@ MarkAPL</code></pre>
 <h5 data-id="ASSETS">ASSETS</h5>
 </a>
 </div>
-<p>The full path to the package's assets. Is empty in case there are no assets.</p>
+<p>The path to the package's assets relative to <code>HOME</code>. Is empty in case there are no assets.</p>
+<p>See also <a href="#GetFullPath2AssetsFolder" class="bookmark_link">GetFullPath2AssetsFolder</a>.</p>
 <div class="h_tag">
 <a href="#CONFIG" id="CONFIG" class="autoheader_anchor">
 <h5 data-id="CONFIG">CONFIG</h5>
@@ -444,5 +452,11 @@ MarkAPL</code></pre>
 </a>
 </div>
 <p>Character vector that holds the address of a Tatin server or the full name of a ZIP file.</p>
+<div class="h_tag">
+<a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
+<h5 data-id="GetFullPath2AssetsFolder">GetFullPath2AssetsFolder</h5>
+</a>
+</div>
+<p>This is a function which returns the result of the expression <code>HOME,'/',ASSETS</code>.</p>
 </body>
 </html>

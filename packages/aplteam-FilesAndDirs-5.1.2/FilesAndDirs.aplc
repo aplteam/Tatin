@@ -38,37 +38,21 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'FilesAndDirs' '5.1.1+106' '2021-08-20'
+      r←'FilesAndDirs' '5.1.2+107' '2021-10-18'
     ∇
 
 
     ∇ History
       :Access Public shared
+      ⍝ * 5.1.2 ⋄ 2021-10-18
+      ⍝   * GetTempSubDir was buggy
       ⍝ * 5.1.1 ⋄ 2021-08-20
       ⍝   * `DateToReal` was buggy
+      ⍝   * Internal changes: now managed by Cider rather than acre.
       ⍝ * 5.1.0 ⋄ 2021-08-18
       ⍝   * `YoungerThan` introduced
       ⍝   * `GetModifiedDate` introduced
       ⍝   * `DateToReal` introduced
-      ⍝ * 5.0.3 ⋄ 2021-03-28
-      ⍝   * Bug fix: wildcard without recursion in `Dir is no longer handled correctly (introduced with 5.0.3)
-      ⍝ * 5.0.2 ⋄ 2021-03-27
-      ⍝   * Bug fixes:
-      ⍝     * `GetTempSubDir` did not execute `⎕DL` in case of a problem, resulting in an error on fast PCs.
-      ⍝     * `Dir` did not work as expected when wildcards were used and `recursive>0`
-      ⍝     * `Dir` crashed on `recursive←2`
-      ⍝     * `depth` was ignored when wildcards were used
-      ⍝ * 5.0.1 ⋄ 2021-03-01
-      ⍝   * Package config file corrected
-      ⍝ * 5.0.0 ⋄ 2020-12-20
-      ⍝   * BREAKING CHANGE: `CopyTo` and `MoveTo` as well as `CopyTree` and `MoveTree` and also `CreateFile`
-      ⍝     were removed from `FilesAndDirs`. Reason is that the system functions `⎕NCOPY` and `⎕NMOVE`
-      ⍝     can be used for this now.
-      ⍝   * Both `NPUT` and `NGET` now try to overcome a FILE ACCESS error twice before giving up.
-      ⍝   * `DeleteFile` tries to overcome such problems in a similar fashion.
-      ⍝   * `RmDir` now uses `⎕NDELETE` internally with the benefit of being resilient when somebody
-      ⍝     is looking into a folder that is about to be deleted.
-      ⍝   * Internal change: calls to `APLTreeUtils.Lowercase` were removed by calls to `⎕C`
       ⍝\\
       ⍝ For information regarding older version see <https://github.com/aplteam/FilesAndDirs/releases>
     ∇
@@ -684,7 +668,7 @@
       filename←NormalizePath filename
     ∇
 
-    ∇ dirname←GetTempSubDir prefixString;path;start;no;flag;success
+    ∇ dirname←GetTempSubDir prefixString;path;no;flag;success;i
     ⍝ Returns name of previously unused sub directory in the `TEMP` directory with a random name.\\
     ⍝ The directory will be created.
     ⍝ `prefixString`, when empty, defaults to `⎕AN`. The name of the directory will
@@ -694,21 +678,21 @@
           prefixString←⎕AN
       :EndIf
       path←GetTempPath
-      start←no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
+      no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
+      i←0
       ⍝ no←100⊥3↓⎕TS ⍝ Not reliable: can take a large number of tries before successful
       success←flag←0
       :Repeat
-          dirname←path,(prefixString,'_',⍕no)
+          dirname←path,(({⍵↓⍨-(¯1↑⍵)∊'/\'}prefixString),'_',⍕no)
           :Trap 22
               ⎕MKDIR dirname
               flag←success←1
           :Else
               ⎕DL 0.01
           :EndTrap
-          no+←10
-      :Until flag∨no>start+1000×10  ⍝ max 1000 tries
+      :Until flag∨20<i←i+1
       dirname←NormalizePath dirname
-      ('Unable to create "',dirname,'"')⎕SIGNAL 11/⍨~success
+      ('Unable to create "',dirname,'"')⎕SIGNAL 22/⍨~success
     ∇
 
     ∇ r←{x}ListDirs path;buff;recursiveFlag;part1;part2;recursive;depth

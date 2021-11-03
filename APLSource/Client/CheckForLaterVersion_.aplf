@@ -16,9 +16,7 @@
      :If '.zip'≢⎕C 3⊃⎕NPARTS fullPath
          PrintToSession'Checking <',fullPath,'>...'
          (url packageID)←SplitUrlAndPackageID fullPath
-         :If ~Reg.IsHTTP url
-             url←Reg.RemovePackageID{⍵↓⍨-'/'=¯1↑⍵}url
-         :EndIf
+         url←Reg.RemovePackageID{⍵↓⍨-'/'=¯1↑⍵}url
          :Trap 345
              :If majorVersions
                  (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID)url

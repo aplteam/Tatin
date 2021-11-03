@@ -38,12 +38,14 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'FilesAndDirs' '5.1.2+107' '2021-10-18'
+      r←'FilesAndDirs' '5.1.3+110' '2021-10-28'
     ∇
 
 
     ∇ History
       :Access Public shared
+      ⍝ * 5.1.3 ⋄ 2021-10-28
+      ⍝   * GetTempSubDir was still buggy
       ⍝ * 5.1.2 ⋄ 2021-10-18
       ⍝   * GetTempSubDir was buggy
       ⍝ * 5.1.1 ⋄ 2021-08-20
@@ -685,7 +687,7 @@
       :Repeat
           dirname←path,(({⍵↓⍨-(¯1↑⍵)∊'/\'}prefixString),'_',⍕no)
           :Trap 22
-              ⎕MKDIR dirname
+              2 ⎕MKDIR dirname 
               flag←success←1
           :Else
               ⎕DL 0.01

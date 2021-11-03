@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.33.0 - 2021-10-21
+⍝ * 0.33.1 - 2021-10-28
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -353,7 +353,7 @@
       parms.dry←0 Args.Switch'dry'
       parms.force←0 Args.Switch'force'
       parms.noBetas←0 Args.Switch'nobetas'
-      parms.update←0 Args.Switch'update'
+      parms.update←1 Args.Switch'update'
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       'Not a directory'Assert TC.F.IsDir installFolder
       'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'

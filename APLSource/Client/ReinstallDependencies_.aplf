@@ -10,7 +10,8 @@
  dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
  refs←⍬
  tempDir←F.GetTempSubDir''
- tempDir∘{⍺ ⎕NCOPY ⍵}¨F.ListFiles installFolder,'/*'    ⍝ Copy only files (config AND ZIP), no folders (=packages)
+ tempDir ⎕NCOPY installFolder,'/',Reg.DependenciesFilename                  ⍝ Copy the dependency file
+ tempDir{0=≢⍵:shy←⍬ ⋄ ⍺∘{⍺ ⎕NCOPY ⍵}¨⍵}F.ListFiles installFolder,'/*.zip'   ⍝ Copy any ZIP files (packages)
  :For i :In ⍳≢deps
      pkg←i⊃deps
      :If update

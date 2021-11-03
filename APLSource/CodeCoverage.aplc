@@ -47,16 +47,18 @@
 ⍝ Kai Jaeger ⋄ APL Team Ltd
 
     ⎕IO←1 ⋄ ⎕ML←1
-    
+
     :Field Public Shared Info←''             ⍝ Stricly speaking this should not be shared, but then CodeCoverage should not run in multiple instances anyway
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.9.0+46' '2021-10-06'
+      r←'CodeCoverage' '0.9.1+46' '2021-10-29'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 0.9.1 from 2021-10-28
+    ⍝   * Sort order of first column of the "Partly covered" category reversed.
     ⍝ * 0.9.0 from 2021-10-06
     ⍝   * The table on coverage reports now on ALL fns (including 0% and 100%). Dedicated buttons allow selection of a category.
     ⍝     a search field helps to navigate the table. re-ordering (click a col-header) is also supported.
@@ -317,7 +319,8 @@
       html,←⊂'        ordering: true,'
       html,←⊂'        info:     true,'
       html,←⊂'        fixedHeader: true,'
-      html,←⊂'        order: [2,"desc"],'
+⍝     html,←⊂'        order: [2,"desc"],'
+      html,←⊂'        order: [2,"asc"],'
       html,←⊂'        dom: "Bft",'
       html,←⊂'        buttons: ['
       html,←AddJavaScriptButton('Partly covered' '50%'(+/~data[;2]∊0 100)'^(?!(0%|100%)).*')

@@ -7,10 +7,13 @@
  list2←registryPath InjectPublishingDate list           ⍝ Add publishing date where required
  :If addPublishingDate
      list←list,[1.5]list2[;2]
-     :If 0<≢list←list[SortIndexForPackageIDs list2;]        ⍝ Only under Windows is the list guaranteed to be sorted
+     :If 0<≢list←list[SortIndexForPackageIDs list2;]    ⍝ Only under Windows is the list guaranteed to be sorted
          list[;2]←FormatFloatDate¨list[;2]
      :EndIf
  :Else
+     :If 'Win'≢A.GetOperatingSystem ⍬                   ⍝ Only under Windows is the list guaranteed to be sorted
+         list←list[⍋list]
+     :EndIf
      list←⍪list
  :EndIf
 ⍝Done

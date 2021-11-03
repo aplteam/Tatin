@@ -5,15 +5,15 @@
 
  dir←GetTempDir''
  dir ⎕NCOPY⍠('Wildcard' 1)⊣'TestData/UnInstall/*'
- old←⊃##.FilesAndDirs.Dir dir,'/'
+ old←(1+≢dir)↓¨##.FilesAndDirs.ListDirs dir,'/'
  ##.FilesAndDirs.RmDir dir,'/aplteam-OS-3.0.1'
  stop←0
  (rc msg res)←stop ∆UCMD'ReInstallDependencies "',dir,'" -force'
  →T.GoToTidyUp 0≠rc
  →T.GoToTidyUp 0≠≢msg
 
- new←⊃##.FilesAndDirs.Dir dir,'/'
- →T.GoToTidyUp~old ∆LazyMatch new
+ new←(1+≢dir)↓¨##.FilesAndDirs.ListDirs dir,'/'
+ →T.GoToTidyUp~∧/(TC.Reg.RemoveMinorAndPatch¨new)∊TC.Reg.RemoveMinorAndPatch¨old
 
  r←T._OK
 

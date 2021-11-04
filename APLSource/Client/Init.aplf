@@ -1,18 +1,19 @@
  {r}←{userName}Init pathToUserSettings;pathToUserSettings;⎕TRAP
-⍝ Use this to re-establish the user settings via a user command.
+⍝ Use this to ...
+⍝ * perform some tests regarding requirements
+⍝ * re-establish the user settings via a user command
+⍝ * Copy the most recent version of the Conga DRC namespace
  r←''
  :If 0=⎕SE.⎕NC'Link.Version'
  :OrIf 3>⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
      'Tatin requires at least Link 3.0'⎕SIGNAL 98
  :EndIf
- :If IfAtLeastVersion 18
-     :If 0=≢pathToUserSettings
-         userName←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'userName'
-         pathToUserSettings←FindUserSettings userName
-     :EndIf
-     MyUserSettings←InitUserSettings pathToUserSettings
-     r←'User settings re-established in ',(⍕⎕THIS),' from ',pathToUserSettings
- :Else
-     'Tatin requires at least Dyalog version 18.0.44280 Unicode'⎕SIGNAL 98
+ 'Tatin requires at least Dyalog version 18.0.44280 Unicode'Reg.Assert IfAtLeastVersion 18
+
+ :If 0=≢pathToUserSettings
+     userName←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕AN}'userName'
+     pathToUserSettings←FindUserSettings userName
  :EndIf
+ MyUserSettings←InitUserSettings pathToUserSettings
+ r,←'User settings re-established in ',(⍕⎕THIS),' from ',pathToUserSettings
 ⍝Done

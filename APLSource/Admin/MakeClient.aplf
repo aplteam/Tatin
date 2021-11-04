@@ -1,4 +1,4 @@
-{r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;dlls;myZip;parms
+ {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
 ⍝ process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
@@ -6,7 +6,6 @@
 ⍝ 1 means "patch" shall be bumped, 2 for "minor" amnd 3 for "major". Other values result in an error or ⎕OFF 123 respectively.\\
 ⍝ Note that as part of an automated process this function should be called *before* `MakeServer` because it bumps the
 ⍝ version number while `MakeServer` does not.
-⍝ Version 1.0.0 from 2020-12-02
  r←⍬
  F←##.FilesAndDirs
  type←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'type'
@@ -54,7 +53,10 @@
      0 ⎕SAVE ⎕WSID   ⍝ If this crashes, in particular with "Reference in ⎕SE points to #" or vise versa) execute ⎕OFF 123 and try again
      (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'Tatin.dyalog'
      'Create!'F.CheckPath targetPath,'/Tatin/Assets'
-     (targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/Runtime/'
+     {0=≢l←F.ListFiles ⍵:shy←0 ⋄ (targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣l}'./Assets/Runtime/' ⍝ Copy all files, if any
+     dirList←F.NormalizePath F.ListDirs'./Assets/Runtime/'  ⍝ List with all sub dirs
+     dirList~←⊂F.NormalizePath'./Assets/Runtime/Conga'      ⍝ The client does not require the Conga DLLs
+     {(targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣⍵}¨dirList
      _userSettings←⎕NEW #._Tatin.Client.UserSettings(,⊂targetPath,'/Tatin/')
      reg←_userSettings.GetRegistry'[tatin]'
      _userSettings.ReplaceRegistry reg
@@ -78,8 +80,6 @@
                  :EndSelect
              :EndIf
          :EndIf
-         dlls←F.ListFiles'./CongaDlls/*'
-         (⊂F.NormalizePath myucmds,'\Tatin\Assets\Runtime\Conga'){19::shy←⍬ ⋄ ⍺ ⎕NCOPY⍠('IfExists' 'Replace')⊣⍵}¨dlls
      :EndIf
      path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
      :If 0=F.IsFile path

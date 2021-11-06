@@ -1,4 +1,4 @@
- {r}←OnHouseKeeping msg;savedAt;rideable;rideableOld;rideActive
+ {r}←OnHouseKeeping msg;savedAt;rideable;rideableOld;rideActive;⎕TRAP
 ⍝ Used for these purposes:
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
@@ -16,6 +16,10 @@
  :ElseIf ¯1≠∆SHUTDOWN
      :If 0<⎕NC'∆WS_HASH'
          ReloadThisWorkspaceIfChanged G.INI
+     :EndIf
+     ⎕TRAP←0 'S'
+     :If G.CredentialsTimestamp≢Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.RegistryPath,'/Credentials.txt'
+         G←ProcessCredentials G         ⍝  It has changed, so we read it again
      :EndIf
      savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
      :If G.INI.EstablishedAt<savedAt

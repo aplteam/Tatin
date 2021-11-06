@@ -290,7 +290,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>[*]</code> followed by “group” and “name” of a package</li>
 <li>A path to a Registry and “group” and “name” of a package</li>
 </ul>
-<p>In the first case all defined Registries are scanned. A matrix with two columns is returned: URL and full package ID.</p>
+<p>In the first case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.</p>
 <p>In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.</p>
 <p>You may omit the group name; that would not make a difference when the name is used only within one group, but if it is used in more than one group, then all of them are listed.</p>
 <p>The package ID must not specify a version number.</p>
@@ -396,12 +396,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="ReInstallDependencies">ReInstallDependencies</h3>
 </a>
 </div>
-<pre><code>{refs}←{parms} ReInstallDependencies y</code></pre>
+<pre><code>{refs}←{parms} ReInstallDependencies (dependencies installFolder [Registry])</code></pre>
 <p>Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.</p>
 <p>The file apl-buildlist.json as well as all directories in that folder will be deleted. Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.</p>
 <p>Note that packages with different major version numbers are considered different.</p>
-<p>By default all known Registries with a priority greater than 0 are scanned, but you may specify a particular Registry as a second (optional) argument.</p>
+<p>By default all known Registries with a priority greater than 0 are scanned, but you may specify a particular Registry as a third (optional) argument.</p>
 <p>The left argument is optional and, if specified, typically created by calling <a href="#CreateReInstallParms" class="bookmark_link"><code>CreateReInstallParms</code></a>.</p>
+<p>Note packages that were installed from ZIP files are just re-installed from their ZIP files.</p>
 <p>It may carry three parameters:</p>
 <ul>
 <li><code>noBetas</code>

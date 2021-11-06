@@ -1,0 +1,26 @@
+ r←Test_ScanRegistries_004(stopFlag batchFlag);⎕TRAP;path;ind;askUser
+⍝ Enforce a Registry scan after defining a non-existing Registry in order to provoke a problem (simulate user command)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If batchFlag
+     r←T._NoBatchTest
+     :Return
+ :EndIf
+
+ ⎕←'This test needs you:'
+ ⎕←'When you are given three options choose "Skip"'
+ 0 0⍴⍞,0/⎕←'To continue press <enter>'
+
+ TC.MyUserSettings.AddRegistry'[DoesNotExist]https://does-not-exist.forsure'
+ ind←TC.MyUserSettings.registries.alias⍳⊂⎕C'DoesNotExist'
+ (ind⊃TC.MyUserSettings.registries).priority←1+⌈/TC.MyUserSettings.registries.priority
+
+ askUser←1
+ path←askUser TC.EstablishRegistry'aplteam-APLProcess'
+
+ r←T._OK
+
+∆TidyUp:
+ TC.MyUserSettings.RemoveRegistry'[DoesNotExist]'
+⍝Done

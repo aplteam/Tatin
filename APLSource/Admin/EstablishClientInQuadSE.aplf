@@ -1,8 +1,8 @@
  {r}←{pathToUserSettings}EstablishClientInQuadSE dummy;C;ref;reg
-⍝ This function is called in order to establish the Tatin Client in ⎕SE._Tatin and to establish
-⍝ the API within ⎕SE.Tatin.
+⍝ This function is called in order to establish the Tatin Client in ⎕SE._Tatin and
+⍝ to establish the API within ⎕SE.Tatin.
 ⍝ By default the UserSettings class is instantiated with the default path as argument.
-⍝ Instead a left argument might be provided: that must be the folder that hosts the user settings.
+⍝ Instead ⍺ might be provided: that must be the folder that hosts the user settings.
  r←⍬
  pathToUserSettings←{0<⎕NC ⍵:⍎⍵ ⋄ ##.Client.GetUserHomeFolder ⍬}'pathToUserSettings'
  CreateAllRefs_Client
@@ -35,5 +35,8 @@
  C←##.Client
  C.InitUserSettings pathToUserSettings
  ⎕SE.Tatin.MyUserSettings←C.MyUserSettings
+ ##.RumbaLean.⎕EX'DRC'          ⍝ Paranoia; with DRC around Conga won't be initialised
+ ##.RumbaLean.⎕EX'Conga'
+ 'Conga'##.RumbaLean.⎕CY'Conga' ⍝ Copy Conga of the current APL version
  InitConga ⍬
 ⍝Done

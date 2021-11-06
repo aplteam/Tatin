@@ -20,7 +20,7 @@ They are saved in the user settings --- for details see the document "Tatin User
 
 #### The principal Tatin Server
 
-If you want to publish on `https://tatin.dev` you need to ask [server.tatin@gmail.com](mailto:server.tatin@gmail.com) for an API key.
+If you want to publish on `https://tatin.dev` you need to ask [tatin.dev@gmail.com](mailto:tatin.dev@gmail.com) for an API key.
 
 
 #### Credentials for the Tatin Test Server

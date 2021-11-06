@@ -38,6 +38,10 @@
          ('Failed with status code ',⍕res.StatusCode)Assert 0
      :EndIf
  :Else
-     list←Reg.APLfromJSON res.Content
+     :Trap 11
+         list←Reg.APLfromJSON res.Content
+     :Else
+         'Server failed to return (valid) JSON5'Assert 0
+     :EndTrap
  :EndIf
 ⍝Done

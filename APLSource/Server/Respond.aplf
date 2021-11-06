@@ -2,4 +2,7 @@
 ⍝ Cover for Rumba's `Respond` with the purpose to add Tatin-specific custom headers, for example x-tatin, carrying the Tatin version number
  r←x R.Respond y
  r.Headers,←⊂Reg.TatinVersionAsHttpHeader
+ :If (⊂'application/json')∊request.Accept.MediaRange
+     r.ContentType←'application/json'
+ :EndIf
 ⍝Done

@@ -1,14 +1,15 @@
  r←Test_ScanRegistries_003(stopFlag batchFlag);⎕TRAP;path;ind;qdmx
 ⍝ Enforce a Registry scan after defining a non-existing Registry in order to provoke a problem
+⍝ Here we call it as an API function, and that should result in an error
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- TC.MyUserSettings.AddRegistry'[DoesNotExist]https://does-not-eixst.com'
+ TC.MyUserSettings.AddRegistry'[DoesNotExist]https://does-not-exist.forsure'
  ind←TC.MyUserSettings.registries.alias⍳⊂⎕C'DoesNotExist'
  (ind⊃TC.MyUserSettings.registries).priority←1+⌈/TC.MyUserSettings.registries.priority
 
  :Trap 345 347
-     path←TC.EstablishRegistry'[DosNotExist]aplteam-APLProcess'
+     path←TC.EstablishRegistry'[DoesNotExist]aplteam-APLProcess'
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

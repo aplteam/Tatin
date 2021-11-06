@@ -1,32 +1,41 @@
- reg←{userSettings}EstablishRegistry packageID;registries;uri;alias;list;msg;CR;i
+ reg←{askUserFlag}EstablishRegistry packageID;registries;uri;alias;list;msg;CR;i;options;stopFlag;skipped;opCode
 ⍝ The purpose of this function is to establish the registry a package can be found in.
-⍝ Useful in case the user specified just a package ID.
-⍝ Note that `packageID` might be a full ({group}-{name}-{version}) or a partial one
-⍝ ({group}-{name} or {group}-{name}-{major}) or even just {name}.
+⍝ Useful in case the user specified just a package ID but no Registry but also for
+⍝ dependencies: ReInstallDependencies for example **always** scans all Registries for
+⍝ any dependencies.\\
+⍝ Note that `packageID` might be a full one ({group}-{name}-{version}) or a partial one
+⍝ ({group}-{name} or {group}-{name}-{major}) or even just {name}.\\
 ⍝ The function scans all registries according to the user settings and stops as soon
 ⍝ as it finds a Registry that hosts the package in question.\\
-⍝ In case of no hit anywhere an error is thrown.
+⍝ In case a server does not respond then `askUserFlag` decides what will happen:
+⍝ If it's called from any Tatin user command `askUserFlag` will default to 1, otherwise 0.
+⍝ A 0 means that an error will be thrown: we don't know what to do then.
+⍝ If `askUserFlag` is 1 the user will be given three options:
+⍝ * Try again
+⍝ * Skip
+⍝ * Cancel the scan (= throw an error)\\
+⍝ `askUserFlag` (`⍺`) should only be specified in a test case for simulating a user command call.
  reg←registries←''
  :If '.zip'≢⎕C ¯4↑packageID
  :AndIf ~∨/'/\:'∊packageID
      packageID←RemoveAlias packageID
-     userSettings←{0<⎕NC ⍵:⍎⍵ ⋄ MyUserSettings}'userSettings'
-     registries←userSettings.registries
+     askUserFlag←{0<⎕NC ⍵:⍎⍵ ⋄ '⎕SE.'≡1 ⎕C 4⍴⊃⎕XSI}'askUserFlag'  ⍝ defaults to 1 only when called via a user command
+     registries←MyUserSettings.registries
      'No Registries defined in the Client config file'Assert 1≤≢registries
      registries←(0<registries.priority)/registries
      'No Registries defined in the Client config file that can be scanned'Assert 1≤≢registries
      registries←({(⍵⍳⍵)=⍳≢⍵}registries.uri)/registries  ⍝ Because we might find the same registry multiple times with different credentials
      PrintToSession'Scanning ',(⍕≢registries),' registr',((1+1=≢registries)⊃'ies' 'y'),' for ',packageID,'...'
      i←0
+     skipped←⍬
      :Repeat
          i+←1
          (uri alias)←i⊃registries.(uri alias)
-
          :If Reg.IsHTTP uri
-             :If 0=≢list←ListPackages_ uri,packageID
+             (opCode reg)←EstablishRegistry_ uri packageID askUserFlag
+             :If opCode≡'skip'
+                 skipped,←⊂uri
                  :Continue
-             :Else
-                 reg←uri
              :EndIf
          :ElseIf Reg.IsValidPackageID_Complete packageID
              :If F.IsDir(RemoveFileProtocol uri),'/',packageID

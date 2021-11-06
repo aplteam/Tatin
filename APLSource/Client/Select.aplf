@@ -1,0 +1,18 @@
+ r←Select(message options);options_;okay
+⍝ Shows `message` (text vector) if not empty and presents `options` (vector of text vectors).
+⍝ The user must select one of the options in order to carry on.
+ options_←{(⍕¨⍳≢⍵),¨'.',¨' ',¨⍵}options
+ okay←0
+ :Repeat
+     :If 0<≢message
+         ⎕←message
+     :EndIf
+     ⎕←'To continue select on of the options, then press <ENTER>:'
+     ⎕←' ',' ',↑options_
+     r←⊃A.ToNum⍞
+     :If r∊⍳≢options
+         okay←1
+     :Else
+         ⎕←'Invalid input, please try again'
+     :EndIf
+ :Until okay

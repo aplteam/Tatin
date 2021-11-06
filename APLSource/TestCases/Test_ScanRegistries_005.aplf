@@ -1,0 +1,21 @@
+ r←Test_ScanRegistries_005(stopFlag batchFlag);⎕TRAP;ind;qdmx
+⍝ Enforce a Registry scan. The first "Registry" returns HTML rather JSON5
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ TC.MyUserSettings.AddRegistry'[NotTatinServer]https://guardian.co.uk'
+ ind←TC.MyUserSettings.registries.alias⍳⊂⎕C'NotTatinServer'
+ (ind⊃TC.MyUserSettings.registries).priority←1+⌈/TC.MyUserSettings.registries.priority
+
+ :Trap 98
+     {}TC.EstablishRegistry'aplteam-APLProcess'
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Failed with status code 301'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ TC.MyUserSettings.RemoveRegistry'[NotTatinServer]'
+⍝Done

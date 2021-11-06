@@ -50,6 +50,10 @@ That default file will have two  Tatin Registries defined in it:
 
    Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is `0`.
 
+A> ### Registry scans
+A>
+A> What happens when a Tatin server is down when Tatin attempts to interrogate
+
 
 ### Where does the file live?
 

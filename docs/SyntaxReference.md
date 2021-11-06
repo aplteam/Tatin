@@ -258,7 +258,7 @@ mat←{dateFlag} ListVersions uri
 * `[*]` followed by "group" and "name" of a package
 * A path to a Registry and "group" and "name" of a package
 
-In the first case all defined Registries are scanned. A matrix with two columns is returned: URL and full package ID.
+In the first case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.
 
 In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.
 
@@ -384,7 +384,7 @@ W> That is different from the user command which will ask the user for confirmat
 ### ReInstallDependencies
 
 ```
-{refs}←{parms} ReInstallDependencies y
+{refs}←{parms} ReInstallDependencies (dependencies installFolder [Registry])
 ```
 
 Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.
@@ -395,9 +395,11 @@ Then all packages listed in the file apl-dependencies.txt are re-installed from 
 Note that packages with different major version numbers are considered different.
 
 By default all known Registries with a priority greater than 0 are scanned, but you may
-specify a particular Registry as a second (optional) argument.
+specify a particular Registry as a third (optional) argument.
 
 The left argument is optional and, if specified, typically created by calling [`CreateReInstallParms`](#CreateReInstallParms).
+
+Note packages that were installed from ZIP files are just re-installed from their ZIP files.
 
 It may carry three parameters:
 

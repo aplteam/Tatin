@@ -209,7 +209,8 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </div>
 <p>In case <a href="#assets" class="bookmark_link"><code>assets</code></a> is not empty this function returns a simple char vector that represents the <em>full path</em> to the assets, using something like:</p>
 <pre><code>  HOME,'/',ASSETS</code></pre>
-<p>If <code>assets</code> is empty the functins returns <code>''</code>.</p>
+<p>If <code>HOME</code> is empty the function returns just <code>ASSETS</code>.</p>
+<p>If <code>ASSETS</code> is empty the functins returns <code>''</code>.</p>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
 <h4 data-id="group">group</h4>
@@ -255,6 +256,7 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>This defines the source code file(s) that are going to be part of the package.</p>
 <p>Must be either the name of a text file that contains code or a folder that contains a collection of code files. <code>source</code> <em>must not</em> be empty.</p>
 <p>If it's a single file it might be anything with the extension <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script), <code>.apli</code> (an interface script), <code>.aplf</code> (a function) or <code>.aplo</code> (an operator).</p>
+<p>The <code>.dyalog</code> extension is supported for limited backward compatibility — Tatin does not guarantee complete compatibility with SALT. Using this extension is not encouraged: use it at your own risk.</p>
 <p>If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.</p>
 <p><code>source</code> must be relative to the root of the package.</p>
 <div class="h_tag">
@@ -319,14 +321,21 @@ group-name-1.1.0-FixFor234</code></pre>
 <h3 data-id="Access-after-loading-a-package">Access after loading a package</h3>
 </a>
 </div>
-<p>Whether you load a package with <code>LoadPackage</code> or <code>LoadDependencies</code>, the contents of the configuration file is available as readable JSON as a character vector under the name <code>CONFIG</code> together with <code>ID</code>, <code>URI</code>, <code>HOME</code> and possibly <code>LX</code>. All these pieces of information are available in the namespace <code>TatinVars</code> which is injected into the <code>code</code> namespace.</p>
-<p>Note that <code>HOME</code> will be empty in case two conditions are met:</p>
+<p>Whether you load a package with <code>LoadPackage</code> or <code>LoadDependencies</code>, the contents of the configuration file is available as readable JSON as a character vector under the name <code>CONFIG</code> together with ``ASSETS<code>, </code>GetFullPath2Assets<code>, </code>ID<code>, </code>URI<code>, </code>HOME<code> and possibly </code>LX<code>. All these pieces of information are available in the namespace </code>TatinVars<code> which is injected into the </code>code` namespace.</p>
+<p><code>LX</code> is only available in case the package used the <a href="#lx" class="bookmark_link"><code>lx</code></a> mechanism for initializing itself.</p>
+<p>All of them are niladic functions because that's how we emulate constants in APL.</p>
+<p>Notes:</p>
+<ul>
+<li><code>HOME</code> will be empty in case these two conditions are both met:
 <ul>
 <li>The package was brought into the workspace with <code>LoadPackage</code> (as opposed to <code>LoadDependencies</code>)</li>
 <li>The package does not have any assets</li>
+</ul></li>
+<li><code>HOME</code> will also be empty in case the path it holds does not exist
+<p>This may happen in case packages are loaded into a WS, saved, and then moved elsewhere, maybe even a different machine. In that case the folder the package was loaded from is not available anymore, and therefore <code>''</code> is returned.</p></li>
+<li><code>ASSETS</code> holds the path of any assets relative to <code>HOME</code>. It is empty in case there are no assets.</li>
+<li><code>GetFullPath2Assets</code> returns <code>HOME,'/',ASSETS</code> in case <code>HOME</code> is not empty, and just <code>ASSETS</code> otherwise.</li>
 </ul>
-<p>All of them are niladic functions because that's how we emulate constants in APL.</p>
-<p>There <em>might</em> be a variable <code>LX</code> in case the package used the <a href="#lx" class="bookmark_link"><code>lx</code></a> mechanism for initializing itself.</p>
 <div id="footnotes_div">
 <hr>
 <p><strong>Footnotes</strong></p>

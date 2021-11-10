@@ -1,4 +1,4 @@
- r←{noBetas}LoadPackage(identifier targetSpace);paths;tempFolder;loaded
+ r←{noBetas}LoadPackage(identifier targetSpace);paths;tempFolder;loaded;qdmx
 ⍝ Loads package `identifier` dynamically into the workspace,\\
 ⍝ `identifier` must be one of:
 ⍝ * An HTTP request for a package
@@ -22,10 +22,32 @@
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  targetSpace←,⍕targetSpace
  tempFolder←F.GetTempSubDir''
- CheckAlias identifier targetSpace
- paths←noBetas InstallPackage identifier tempFolder
- loaded←LoadDependencies tempFolder targetSpace
+ :Trap 98
+     CheckAlias identifier targetSpace
+ :Else
+     qdmx←⎕DMX
+     ⎕DL 0.02
+     F.RmDir tempFolder
+     qdmx.EM ⎕SIGNAL qdmx.EN
+ :EndTrap
+ :Trap 98
+     paths←noBetas InstallPackage identifier tempFolder
+ :Else
+     qdmx←⎕DMX
+     ⎕DL 0.02
+     F.RmDir tempFolder
+     qdmx.EM ⎕SIGNAL qdmx.EN
+ :EndTrap
+ :Trap 98
+     loaded←LoadDependencies tempFolder targetSpace
+ :Else
+     qdmx←⎕DMX
+     ⎕DL 0.02
+     F.RmDir tempFolder
+     qdmx.EM ⎕SIGNAL qdmx.EN
+ :EndTrap
  :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨F.ListDirs tempFolder
+     ⎕DL 0.02
      F.RmDir tempFolder
      :If 0<≢loaded
          loaded.code.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'

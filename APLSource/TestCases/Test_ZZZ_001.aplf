@@ -1,0 +1,21 @@
+ R←Test_ZZZ_001(stopFlag batchFlag);⎕IO;⎕ML;⎕TRAP;allFolders;bool;msg;sourceFolder;plural
+⍝ Checks whether the APLSource\ folder contains sub-folders Plodder and/or RumbaLean
+⍝ That should not be the case because they are independent projects copied over.
+⍝ However, if one edits a function in them then Link will save that into APLSource\,
+⍝ potentially causing confusion, therefore we test for this not being the case.
+ ⎕IO←1 ⋄ ⎕ML←1
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ sourceFolder←##.CiderConfig.(HOME,'/',CIDER.source),'/'
+ allFolders←{(≢⍵)↓¨F.ListDirs ⍵}sourceFolder
+ bool←'Plodder' 'RumbaLean'∊allFolders
+ :If 0<+/bool
+     plural←(1<+/bool)/'s'
+     ⎕←'"',sourceFolder,'" contain',plural,' ',((1+1<+/bool)⊃'this' 'these'),' folder',plural,': ',⊃{⍺,', ',⍵}/bool/'Plodder/' 'RumbaLean/'
+     →T.FailsIf 1
+ :EndIf
+
+ R←T._OK
+
+⍝Done

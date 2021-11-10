@@ -395,7 +395,7 @@ MarkAPL</code></pre>
 <h3>Having the same package in more than one Registry</h3>
 <p>In case you juggle with the same package in several Registries you might well be interested in getting a full list. The <code>]ListPackages</code> user command has a syntax for this:</p>
 <pre><code>      ]ListVersions [*]example-versions</code></pre>
-<p>This would check all Registries with a priority greater than 0 for <code>example-versions</code>, and list all hits.</p>
+<p>This would check all known Registries with a priority greater than 0 for <code>example-versions</code>, and list all hits.</p>
 </div>
 
 <p>The fact that Registries with a priority of <code>0</code> are not scanned by Tatin allows you to include a Registry like <code>https://test.tatin.dev</code> in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like <code>]tatin.ListPackages</code> etc. on it.</p>
@@ -427,12 +427,24 @@ MarkAPL</code></pre>
 </div>
 <p>A vector of character vectors with the package IDs of the packages the package in question depends on.</p>
 <div class="h_tag">
+<a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
+<h5 data-id="GetFullPath2AssetsFolder">GetFullPath2AssetsFolder</h5>
+</a>
+</div>
+<p>This is a function which returns the result of the expression <code>HOME,'/',ASSETS</code> if <code>HOME</code> is not empty, otherwise it returns just <code>ASSETS</code>.</p>
+<div class="h_tag">
 <a href="#HOME" id="HOME" class="autoheader_anchor">
 <h5 data-id="HOME">HOME</h5>
 </a>
 </div>
 <p>Is a character vector holding the path of a folder that hosts the package.</p>
-<p>There is an exception: when the package was brought into the workspace with <code>LoadPackage</code> rather than <code>LoadDependencies</code> then <code>HOME</code> will be an empty vector in case the package has no assets.</p>
+<p>There are exceptions:</p>
+<ul>
+<li>When the package was brought into the workspace with <code>LoadPackage</code> rather than <code>LoadDependencies</code>.
+<p>This is because without assets <code>LoadPackage</code> loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.</p></li>
+<li>When the folder the package was loaded from does not exist for other reasons, for example because the package was loaded into the WS which then was saved and moved elsewhere, together with the <code>ASSETS</code> folder relative to the WS.</li>
+</ul>
+<p>In case one of these two conditions is met <code>HOME</code> is <code>''</code>.</p>
 <div class="h_tag">
 <a href="#ID" id="ID" class="autoheader_anchor">
 <h5 data-id="ID">ID</h5>
@@ -452,11 +464,5 @@ MarkAPL</code></pre>
 </a>
 </div>
 <p>Character vector that holds the address of a Tatin server or the full name of a ZIP file.</p>
-<div class="h_tag">
-<a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
-<h5 data-id="GetFullPath2AssetsFolder">GetFullPath2AssetsFolder</h5>
-</a>
-</div>
-<p>This is a function which returns the result of the expression <code>HOME,'/',ASSETS</code>.</p>
 </body>
 </html>

@@ -196,7 +196,9 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
   HOME,'/',ASSETS
 ```
 
-If `assets` is empty the functins returns `''`.
+If `HOME` is empty the function returns just `ASSETS`.
+
+If `ASSETS` is empty the functins returns `''`.
 
 #### group
 
@@ -243,6 +245,8 @@ This defines the source code file(s) that are going to be part of the package.
 Must be either the name of a text file that contains code or a folder that contains a collection of code files. `source` _must not_ be empty.
 
 If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script), `.apli` (an interface script), `.aplf` (a function) or `.aplo` (an operator).
+
+The `.dyalog` extension is supported for limited backward compatibility --- Tatin does not guarantee complete compatibility with SALT. Using this extension is not encouraged: use it at your own risk.
 
 If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
 
@@ -317,16 +321,22 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 ### Access after loading a package
 
-Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
+Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with ``ASSETS`, `GetFullPath2Assets`, `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
 
-Note that `HOME` will be empty in case two conditions are met:
-
-* The package was brought into the workspace with `LoadPackage` (as opposed to `LoadDependencies`)
-* The package does not have any assets
+`LX` is only available in case the package used the [`lx`](#) mechanism for initializing itself.
 
 All of them are niladic functions because that's how we emulate constants in APL.
 
-There _might_ be a variable `LX` in case the package used the [`lx`](#) mechanism for initializing itself.
+Notes:
+
+* `HOME` will be empty in case these two conditions are both met:
+  * The package was brought into the workspace with `LoadPackage` (as opposed to `LoadDependencies`)
+  * The package does not have any assets
+* `HOME` will also be empty in case the path it holds does not exist
+
+  This may happen in case packages are loaded into a WS, saved, and then moved elsewhere, maybe even a different machine. In that case the folder the package was loaded from is not available anymore, and therefore `''` is returned.
+* `ASSETS` holds the path of any assets relative to `HOME`. It is empty in case there are no assets.
+* `GetFullPath2Assets` returns `HOME,'/',ASSETS` in case `HOME` is not empty, and just `ASSETS` otherwise.
 
 [^id]: A package ID consists of `{group}-{name}-{major.{minor}.{patch}`
 

@@ -267,7 +267,7 @@ but if it is used in more than one group, then all of them are listed.
 
 The package ID must not specify a version number.
 
-By default the publishing date is not included, but you my change this by passing a 1 as `⍺`.
+By default the publishing date is not included, but you may change this by passing a 1 as `⍺`.
 In that case an additional column is added to the result.
 
 ### LoadDependencies     
@@ -343,12 +343,10 @@ targetPath:
 ### Ping                 
 
 ```
-bool←Ping uri_
+bool←Ping uri
 ```
 
-Establishes whether the host is up and running with very little overhead.
-
-The optional left argument is only useful for test cases.
+Establishes whether the host is up and running with very little overhead. If `uri` (can also be an alias) points to a folder a 1 is returned if that folder exists, otherwise 0.
 
 ### PublishPackage       
 

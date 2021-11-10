@@ -1,23 +1,27 @@
- bool←{ts}Ping uri_;client;request;uri;buff;qdmx;b
-⍝ Establish whether the host is up and running with very little overhead.
-⍝ `ts` is only useful for test cases
+ bool←Ping uri;client;request;uri_;buff;qdmx;b
+⍝ Establish either whether...
+⍝ * the host is up and running (with very little overhead) in case it is an http[s] request
+⍝ * the folder uri is pointing to exists
  bool←0
- ts←{0<⎕NC ⍵:⍎⍵ ⋄ (100000 100 100⊥3↑⎕TS)}'ts'
- :If ∧/'[]'∊uri_
-     uri←ReplaceRegistryAlias uri_
+ :If ∧/'[]'∊uri
+     uri_←ReplaceRegistryAlias uri
  :Else
-     uri←uri_
+     uri_←uri
  :EndIf
- :If 0<≢uri
-     request←R.NewRequest 0
-     request.RequestTarget←'/ping'
-     client←NewClient uri
-     client.ClientTimeout←4
-     :Trap 345
-         buff←client R.SendAndReceive request
-         bool←1
+ :If 0<≢uri_
+     :If 0=≢'^http[s]://'⎕S 0⊣⎕C uri_
+         bool←F.IsDir uri_
      :Else
-     ⍝ Just for debugging
-     :EndTrap
+         request←R.NewRequest 0
+         request.RequestTarget←'/ping'
+         client←NewClient uri_
+         client.ClientTimeout←4
+         :Trap 345
+             buff←client R.SendAndReceive request
+             bool←1
+         :Else
+             ⍝ Just for debugging
+         :EndTrap
+     :EndIf
  :EndIf
 ⍝Done

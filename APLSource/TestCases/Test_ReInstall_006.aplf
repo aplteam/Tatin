@@ -1,0 +1,43 @@
+ r←Test_ReInstall_006(stopFlag batchFlag);⎕TRAP;localWas;dir;list;parms;indTest;testWas;indLocalhost
+⍝ Exercise `ReInstallDependencies on a packages
+⍝ For this we need to change the priorities!
+⍝ Note that we install a package from "local" that
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir ⍬
+
+⍝ Make sure we re-install from "tatin test"
+ indTest←TC.MyUserSettings.registries.alias⍳⊂'tatin-test'
+ testWas←indTest⊃TC.MyUserSettings.registries.priority
+ (indTest⊃TC.MyUserSettings.registries).priority←100+⌈/TC.MyUserSettings.registries.priority
+
+ →T.GoToTidyUp'example-Goo-2.0.0'≢TC.InstallPackage'example-Goo'dir
+ list←F.ListDirs dir
+ →T.GoToTidyUp 1≠≢list
+
+⍝ Make sure we re-install from "localhost"
+ indLocalhost←TC.MyUserSettings.registries.alias⍳⊂'localhost'
+ localWas←indLocalhost⊃TC.MyUserSettings.registries.priority
+ (indLocalhost⊃TC.MyUserSettings.registries).priority←100+⌈/TC.MyUserSettings.registries.priority
+
+ →T.GoToTidyUp'example-Goo-2.0.0'≢∊TC.ReInstallDependencies dir
+ list←F.ListDirs dir
+ →T.GoToTidyUp 1≠≢list
+
+ parms←TC.CreateReInstallParms
+ parms.update←1
+ →T.GoToTidyUp'example-Goo-2.1.0'≢∊parms TC.ReInstallDependencies dir
+ list←F.ListDirs dir
+ →T.GoToTidyUp 1≠≢list
+
+ r←T._OK
+
+∆TidyUp:
+ indLocalhost←TC.MyUserSettings.registries.alias⍳⊂'localhost'
+ (indLocalhost⊃TC.MyUserSettings.registries).priority←localWas
+ indTest←TC.MyUserSettings.registries.alias⍳⊂'tatin-test'
+ (indTest⊃TC.MyUserSettings.registries).priority←testWas
+ Assert 0=⊃F.RmDir dir
+⍝Done

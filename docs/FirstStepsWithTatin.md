@@ -413,7 +413,7 @@ A> ```
 A>       ]ListVersions [*]example-versions 
 A> ```
 A>
-A> This would check all Registries with a priority greater than 0 for `example-versions`, and list all hits.
+A> This would check all known Registries with a priority greater than 0 for `example-versions`, and list all hits.
 
 The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc. on it.
 
@@ -435,7 +435,6 @@ The path to the package's assets relative to `HOME`. Is empty in case there are 
 See also [GetFullPath2AssetsFolder](#GetFullPath2AssetsFolder).
 
 
-
 ##### CONFIG
 
 This is a simple character vector that stems from the file `apl-package.json` of the given package.
@@ -446,11 +445,24 @@ This is a simple character vector that stems from the file `apl-package.json` of
 A vector of character vectors with the package IDs of the packages the package in question depends on.
 
 
+##### GetFullPath2AssetsFolder
+
+This is a function which returns the result of the expression `HOME,'/',ASSETS` if `HOME` is not empty, otherwise it returns just `ASSETS`.
+
+
 ##### HOME
 
 Is a character vector holding the path of a folder that hosts the package. 
 
-There is an exception: when the package was brought into the workspace with `LoadPackage` rather than `LoadDependencies` then `HOME` will be an empty vector in case the package has no assets.
+There are exceptions: 
+
+* When the package was brought into the workspace with `LoadPackage` rather than `LoadDependencies`.
+
+  This is because without assets `LoadPackage` loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.
+
+* When the folder the package was loaded from does not exist for other reasons, for example because the package was loaded into the WS which then was saved and moved elsewhere, together with the `ASSETS` folder relative to the WS.
+
+In case one of these two conditions is met `HOME` is `''`.
 
 
 ##### ID
@@ -468,8 +480,3 @@ Note that if there is no `lx` defined in a package config file, or if it is empt
 ##### URI
 
 Character vector that holds the address of a Tatin server or the full name of a ZIP file.
-
-
-##### GetFullPath2AssetsFolder
-
-This is a function which returns the result of the expression `HOME,'/',ASSETS`.

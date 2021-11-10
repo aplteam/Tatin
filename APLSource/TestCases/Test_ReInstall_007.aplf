@@ -1,0 +1,45 @@
+ r←Test_ReInstall_007(stopFlag batchFlag);⎕TRAP;indLocal;localWas;indTest;testWas;dir;list;expected;body;res;parms
+⍝ Exercise `ReInstallDependencies on a packages
+⍝ The package has just one dependency which lives on both the development test server and test.tatin.dev
+⍝ but with different versions.
+⍝ Yes, that should never happen, but it allows us to tell (and check) where it was loaded from.
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+⍝ Make sure we install from "local"
+ indLocal←TC.MyUserSettings.registries.alias⍳⊂'local'
+ localWas←indLocal⊃TC.MyUserSettings.registries.priority
+ (indLocal⊃TC.MyUserSettings.registries).priority←0
+
+ dir←GetTempDir ⍬
+→T.GoToTidyUp 'example-Too-1.0.0'≢ TC.InstallPackage'example-Too'dir
+ list←F.ListDirs dir
+ →T.GoToTidyUp 2≠≢list
+ expected←'example-Goo-2.0.0' 'example-Too-1.0.0'
+ →T.GoToTidyUp~expected ∆LazyMatch{⍵↑⍨1+-⌊/'/\'⍳⍨⌽⍵}¨list
+
+ body←⊃⎕NGET(dir,'/example-Goo-2.0.0/Goo.aplc')
+ →T.GoToTidyUp~∨/'Galaxy from the developer''''s test server'⍷body
+
+⍝ Now for the ReInstall we give the test server a higher priority then "local"
+ indTest←TC.MyUserSettings.registries.alias⍳⊂'tatin-test'
+ testWas←indTest⊃TC.MyUserSettings.registries.priority
+ (indTest⊃TC.MyUserSettings.registries).priority←105
+
+ parms←TC.CreateReInstallParms
+ parms.update←1                 ⍝ That must not make a difference here
+
+ →T.GoToTidyUp'example-Too-1.0.0'≢∊parms TC.ReInstallDependencies dir
+ body←⊃⎕NGET(dir,'/example-Goo-2.0.0/Goo.aplc')
+ →T.GoToTidyUp~∨/'Galaxy from 2.0.0 on Test Server'⍷body
+
+ r←T._OK
+
+∆TidyUp:
+ indLocal←TC.MyUserSettings.registries.alias⍳⊂'local'
+ (indLocal⊃TC.MyUserSettings.registries).priority←localWas
+ indTest←TC.MyUserSettings.registries.alias⍳⊂'tatin-test'
+ (indTest⊃TC.MyUserSettings.registries).priority←testWas
+ Assert 0=⊃F.RmDir dir
+⍝Done

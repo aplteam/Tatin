@@ -1,11 +1,9 @@
  Return404←{
- ⍝ ⍵ is a request object
-     ⍺←'Not found (404)'
-     html←(HtmlHeader ⍬),⊆({0=≢⍵:⍵ ⋄ '<h2>',⍵,'</h2>'}⍺)'</body>' '</html>'
-     html←⊃,/html,¨⎕UCS 13
+ ⍝ ⍵ is a request object. Call this for JSON requests
+     ⍺←''
+     msg←⍺
      request←⍵
      response←request Respond 404 0
-     ¯1≡⍺:response
-     response.Content←html
+     response.Content←msg
      response
  }

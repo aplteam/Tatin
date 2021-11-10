@@ -1,12 +1,12 @@
  {r}←EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make
-⍝ We establish some fns (mostly niladic for impersonating ""constants") in code.TatinVars for convinience
+⍝ We establish some fns (Niladic for impersonating "constants") in code.TatinVars for convinience
  r←⍬
  ref2←⍎'TatinVars'ref.code.⎕NS''
  make←{
      ' '=1↑0⍴⍵:'' 1
      msg←'Fixing Tatin''s "',⍺,'" function failed; check line(s): ',' '~⍨⍕⊃{⍺,',',⍵}/⍵-1
      msg 0}
- res←ref2.⎕FX'r←HOME'('r←''',folder,'''')   ⍝ We might change this at a later stage if the packages does not have any assets
+ res←ref2.⎕FX'r←HOME' '⍝ Returns the folder the package was loaded from or an empty vector if that cannot be established anymore'('r←''',folder,'''')':If ~⎕nexists r' 'r←''''' ':EndIf'
  Assert/'HOME'make res
  res←ref2.⎕FX'r←ASSETS'('r←''',cfg.assets,'''')
  Assert/'HOME'make res
@@ -23,5 +23,5 @@
      res←ref2.⎕FX'r←DEPENDENCIES' 'r←⍬'
      Assert/'DEPENDENCIES'make res
  :EndIf
- ref2.⎕FX'r←GetFullPath2AssetsFolder' 'r←''''' ':If 0<≢ASSETS' '    r←HOME,''/'',ASSETS' ':EndIf'
+ ref2.⎕FX'r←GetFullPath2AssetsFolder' 'r←''''' ':If 0<≢ASSETS' '    r←HOME{0=≢⍺:⍵ ⋄ ⍺,''/'',⍵}ASSETS' ':EndIf'
 ⍝Done

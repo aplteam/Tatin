@@ -1,0 +1,30 @@
+ r←Test_Misc_017(stopFlag batchFlag);⎕TRAP;data;list;ind;dir;tempFolder
+⍝ Does "HOME" return '' in case a package has no home anymore?
+⍝ This can happen in case you create a WS, load packages into it, save the WS and then move
+⍝ the WS somewhere else, without the folder the packages where loaded from.
+⍝ In that case the folder the packages where loaded from is actually unkown, and the results
+⍝ of HOME, ASSETS and GetFullPath2Assets must reflect that,
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'⎕SE'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''                ⍝ Used to load stuff into
+ dir←GetTempDir''
+ dir ⎕NCOPY'./TestData/Server/Registry/example-Zoo-3.0.0/example-Zoo-3.0.0.zip'
+
+ tempFolder←TC.LoadPackage(dir,'/example-Zoo-3.0.0.zip')#.TEMP
+ →T.GoToTidyUp 0=≢tempFolder                    ⍝ Must not be empty because that package has assets
+ →T.GoToTidyUp~F.IsDir #.TEMP.Zoo.##.TatinVars.GetFullPath2AssetsFolder
+ (tempFolder,'_')⎕NMOVE tempFolder              ⍝ Make sure that HOME does not exist anymore
+ tempFolder,←'_'
+ →T.GoToTidyUp 0≠≢#.TEMP.Zoo.##.TatinVars.HOME  ⍝ Does not exist anymore, therefore '' must be returned
+ →T.GoToTidyUp'MyAssets'≢#.TEMP.Zoo.##.TatinVars.ASSETS~'/\'
+ →T.GoToTidyUp'MyAssets'≢#.TEMP.Zoo.##.TatinVars.GetFullPath2AssetsFolder~'/\'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert 0=⊃F.RmDir tempFolder
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

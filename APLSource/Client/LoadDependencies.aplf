@@ -1,4 +1,4 @@
- {r}←LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;principalFlag;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2
+ {r}←LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;principalFlag;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2;qdmx
 ⍝ Requires two arguments:
 ⍝ * A folder with a build list (mandatory)
 ⍝ * An installation folder (mandatory)
@@ -45,7 +45,14 @@
              r,←ref
          :EndIf
          :If 1=principalFlag
-             LinkTargetToPackage cfg saveIn targetSpace alias
+             :Trap 98
+                 LinkTargetToPackage cfg saveIn targetSpace alias
+             :Else
+                 qdmx←⎕DMX
+                 ⎕DL 0.02
+                 F.RmDir path
+                 qdmx.EM ⎕SIGNAL qdmx.EN
+             :EndTrap
          :EndIf
      :EndFor
      LinkDependencies refs

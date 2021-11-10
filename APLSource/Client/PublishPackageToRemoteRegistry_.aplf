@@ -20,10 +20,10 @@
              'https:// is not supported'Assert 0
          :EndIf
      :Else
-         :If 0<≢res.Content
-             ('Server: ',res.Content)Assert 0
-         :Else
+         :If ∨/'<html'⍷res.Content
              ('Failed with status code ',⍕res.StatusCode)Assert 0
+         :Else
+             ('Server: ',res.Content)Assert 0
          :EndIf
      :EndIf
  :EndIf

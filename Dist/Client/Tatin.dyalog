@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.33.1 - 2021-10-28
+⍝ * 0.33.2 - 2021-11-09
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -1171,6 +1171,7 @@
               r,←⊂' * You can also specify just a "?"; then a list with all known Servers will be provided.'
               r,←⊂'   You may then select one or multiple of them.'
               r,←⊂' * If no argument is provided at all then all defined Servers are contacted.'
+              r,←⊂' * In case the path to a folder is passed as ⍵ a 1 is returned in case the folder exists.'
               r,←⊂''
               r,←⊂'In any case a matrix with two columns is returned:'
               r,←⊂' [;1] is the Server URL'

@@ -1,9 +1,9 @@
  cfg←ValidateAPI2(cfg projectPath);extension;type;extensions;files
  extension←⎕C 3⌷⎕NPARTS cfg.source
- extensions←'.aplf' '.aplo' '.aplc' '.apli' '.apln' '.apla'
+ extensions←'.aplf' '.aplo' '.aplc' '.apli' '.apln' '.apla' '.dyalog'
  :If 0<≢cfg.api
      :If extension∊extensions
-         type←(extensions⍳extension)⊃'Function' 'Operator' 'Class' 'Interface' 'Namespace' 'Array'
+         type←(extensions⍳extension)⊃'Function' 'Operator' 'Class' 'Interface' 'Namespace' 'Array' 'Script'
          (type,' does not exist?!')Assert ⎕NEXISTS projectPath,cfg.source
      :Else
          files←2⊃∘⎕NPARTS¨{(≢⍵)↓¨⊃F.Dir ⍵,'/*'}projectPath,cfg.source

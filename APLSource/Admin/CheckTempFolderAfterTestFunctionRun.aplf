@@ -1,0 +1,21 @@
+ r←CheckTempFolderAfterTestFunctionRun y;Dirs;Files;buff
+ r←''
+ :If 0=⎕NC'∆DIRS'
+     ∆DIRS←##.FilesAndDirs.ListDirs ##.FilesAndDirs.GetTempPath
+     ∆FILES←##.FilesAndDirs.ListFiles ##.FilesAndDirs.GetTempPath
+ :EndIf
+ Dirs←##.FilesAndDirs.ListDirs ##.FilesAndDirs.GetTempPath
+ Files←##.FilesAndDirs.ListFiles ##.FilesAndDirs.GetTempPath
+ Files←(⊃∧/Files∘{⍵∘≢¨(≢⍵)↑¨2⊃∘⎕NPARTS¨⍺}¨'dupl-' 'etilqs_')/Files  ⍝ These pop up on my PC in large numbers; kai
+ :If ∆DIRS≢Dirs
+ :AndIf 0<≢buff←(~Dirs∊∆DIRS)/Dirs
+     ⎕←⍪{⊃,/1↓⎕NPARTS ⍵}¨buff
+     {⍵:.}0 ##.Client.YesOrNo'Stop?'
+ :EndIf
+ :If ∆FILES≢Files
+ :AndIf 0<≢buff←(~Files∊∆FILES)/Files
+     ⎕←⍪{⊃,/1↓⎕NPARTS ⍵}¨buff
+     {⍵:.}0 ##.Client.YesOrNo'Stop?'
+ :EndIf
+ ∆DIRS←Dirs ⋄ ∆FILES←Files
+⍝Done

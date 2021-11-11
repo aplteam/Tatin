@@ -1,4 +1,4 @@
- html←packageIDs PrepareHtmlPageForFullPackageList list;col1;col2;col3;buff;col4
+ html←packageIDs PrepareHtmlPageForFullPackageList list;col1;col2;col3;buff;col4;col5;col6
  buff←{(≢⍵)}⌸(⍪Reg.RemoveVersionNumber¨list[;1]),1
  html←HtmlHeader''
  html,←⊂'<h2>List of all packages</h2>'
@@ -7,18 +7,17 @@
  html,←⊂'<table>'
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←'<th style="align: left">Total</th>' '<th style="align: left">Pkg</th>' '<th style="align: left">Name</th>' '<th style="align: left">Published at</th>'
-⍝ html,←'<th style="align: left">Package name</th>' '<th style="align: left">Config file</th>'  ⍝ Maybe later
+ html,←'<th></th>' '<th style="align: right">Pkg</th>' '<th>Name</th>' '<th>Published at</th>' '<th>Config</th>' '<th>Dependencies</th>'
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
  :If 0<≢list
-     col1←{'<td>',⍵,'.</td>'}∘⍕¨⍳≢list
+     col1←{'<td>',⍵,'</td>'}¨' →'[{1+(⍵⍳⍵)=⍳≢⍵}Reg.RemoveMinorAndPatch¨list[;1]]
      col2←{'<td>',⍵,'.</td>'}∘⍕¨⊃,/⍳¨buff
      col3←{'<td><code>',⍵,'</code></td>'}¨list[;1]
      col4←{'<td><code>',⍵,'</code></td>'}¨list[;2]
-     ⍝ col2←{'<td><a href="">',⍵,'</a></td>'}¨  ⍝ Maybe later
-     ⍝ html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2  ⍝ Maybe later
-     html,←⊃,/{(⊂'<tr>'),⍵,⊂('</tr>')}¨↓col1,col2,col3,⍪col4
+     col5←{'<td><a href="v1/packages/details/',⍵,'" title="Link to the package configuration">Show</a></td>'}¨list
+     col6←
+     html,←⊃,/{(⊂'<tr>'),⍵,⊂('</tr>')}¨↓col1,col2,col3,col4,col5,⍪col6
  :EndIf
  html,←⊂'</tbody>'
  html,←⊂'</table>'

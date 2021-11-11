@@ -262,8 +262,7 @@ In the first case all defined Registries with a priority greater than zero are s
 
 In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.
 
-You may omit the group name; that would not make a difference when the name is used only within one group,
-but if it is used in more than one group, then all of them are listed.
+You may omit the group name; that would not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.
 
 The package ID must not specify a version number.
 
@@ -397,8 +396,6 @@ specify a particular Registry as a third (optional) argument.
 
 The left argument is optional and, if specified, typically created by calling [`CreateReInstallParms`](#CreateReInstallParms).
 
-Note packages that were installed from ZIP files are just re-installed from their ZIP files.
-
 It may carry three parameters:
 
 * `noBetas`
@@ -412,6 +409,8 @@ It may carry three parameters:
 * `dry`
 
   Defaults to 0, meaning the function does business. Set this to 1 in order to get a report of what the function would do without actually doing it.
+
+Note that packages that were installed from ZIP files are just re-installed from their ZIP files.
 
 ### ReadPackageConfigFile
 

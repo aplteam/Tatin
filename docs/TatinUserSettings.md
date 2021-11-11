@@ -52,7 +52,15 @@ That default file will have two  Tatin Registries defined in it:
 
 A> ### Registry scans
 A>
-A> What happens when a Tatin server is down when Tatin attempts to interrogate
+A> What happens when a Tatin server is down when Tatin attempts to interrogate it?
+A> 
+A> That depends on how Tatin is called:
+A>
+A> * From a user command Tatin will stop and ask you what to do; you have three options:
+A>   * Try again
+A>   * Skip that registry and carry on
+A>   * Cancel the whole operation
+A> * If it is an API call then an error is thrown
 
 
 ### Where does the file live?

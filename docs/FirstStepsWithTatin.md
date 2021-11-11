@@ -417,6 +417,10 @@ A> This would check all known Registries with a priority greater than 0 for `exa
 
 The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc. on it.
 
+A> ### Scanning for dependencies
+A>
+A> Note that Tatin does not only scans all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies. 
+
 
 
 #### Tatin Variables

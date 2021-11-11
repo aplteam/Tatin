@@ -198,7 +198,7 @@ Let's imagine that you are supposed to develop Tatin packages for your employer,
 
   Of the three Registries this one should probably have the lowest priority.
 
-* You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when scanning Registries, but you could still mess around with it.
+* You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when Registries are scanned for packages, but you could still mess around with it.
 
 You can now develop a package `Foo` and publish it on `[my]`, probably several times until it is stable.
 

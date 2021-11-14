@@ -1,24 +1,24 @@
- html←packageIDs PrepareHtmlPageForFullPackageList list;col1;col2;col3;buff;col4
- buff←{(≢⍵)}⌸(⍪Reg.RemoveVersionNumber¨list[;1]),1
+ html←packageIDs PrepareHtmlPageForFullPackageList data;col1;col2;col3;buff;col4;col5;col6;⎕TRAP;bool
+ buff←{(≢⍵)}⌸(⍪Reg.RemoveVersionNumber¨data[;1]),1
  html←HtmlHeader''
- html,←⊂'<h2>List of all packages</h2>'
+ html,←⊂'<h2>data of all packages</h2>'
  html,←AddSpecialMessage ⍬
- html,←⊂'<p>List with ',(⍕≢list),' items from ',(⍕≢buff),' packages</p>'
+ html,←⊂'<p>List with ',(⍕≢data),' items from ',(⍕≢buff),' different packages</p>'
  html,←⊂'<table>'
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←'<th style="align: left">Total</th>' '<th style="align: left">Pkg</th>' '<th style="align: left">Name</th>' '<th style="align: left">Published at</th>'
-⍝ html,←'<th style="align: left">Package name</th>' '<th style="align: left">Config file</th>'  ⍝ Maybe later
+ html,←'<th></th>' '<th style="align: right">Pkg</th>' '<th>Name</th>' '<th>Published at</th>' '<th>Config</th>' '<th>Dependencies</th>'
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
- :If 0<≢list
-     col1←{'<td>',⍵,'.</td>'}∘⍕¨⍳≢list
+ :If 0<≢data
+     col1←{'<td>',⍵,'</td>'}¨' →'[{1+(⍵⍳⍵)=⍳≢⍵}Reg.RemoveMinorAndPatch¨data[;1]]
      col2←{'<td>',⍵,'.</td>'}∘⍕¨⊃,/⍳¨buff
-     col3←{'<td><code>',⍵,'</code></td>'}¨list[;1]
-     col4←{'<td><code>',⍵,'</code></td>'}¨list[;2]
-     ⍝ col2←{'<td><a href="">',⍵,'</a></td>'}¨  ⍝ Maybe later
-     ⍝ html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2  ⍝ Maybe later
-     html,←⊃,/{(⊂'<tr>'),⍵,⊂('</tr>')}¨↓col1,col2,col3,⍪col4
+     col3←{'<td><code>',⍵,'</code></td>'}¨data[;1]
+     col4←{'<td><code>',⍵,'</code></td>'}¨data[;2]
+     col5←{'<td><a href="v1/packages/details/',⍵,'" title="Link to the package configuration">Show</a></td>'}¨data[;1]
+     bool←PackageHasDependencies¨data[;1]
+     col6←bool{⍺:'<td><a href="v1/packages/dependencies/',⍵,'" title="Link to the dependency definition">Show</a></td>' ⋄ '<td>None</td>'}¨data[;1]
+     html,←⊃,/{(⊂'<tr>'),⍵,⊂('</tr>')}¨↓col1,col2,col3,col4,col5,⍪col6
  :EndIf
  html,←⊂'</tbody>'
  html,←⊂'</table>'

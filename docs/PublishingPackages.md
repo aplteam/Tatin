@@ -128,7 +128,7 @@ What is required and how to create and change a package configuration file is di
 
 This file is only required when the package has dependencies.
 
-Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual dependencies. Insisting on dependencies already being published would not work out well then.
+Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
 
 
 ### Final step

@@ -1,0 +1,9 @@
+ flag←PackageHasDependencies packageID;filename;tno
+⍝ It is not enough to look for the file: if it once had dependencies but they got removed
+⍝ at some point the file might well be empty, so we need to check that as well.
+ flag←0
+ filename←G.RegistryPath,packageID,'/',Reg.DependenciesFilename
+ :If F.IsFile filename
+     flag←{tno←⍵ ⎕NTIE 0 64 ⋄ flag←0<⎕NSIZE tno ⋄ flag⊣⎕NUNTIE tno}filename
+ :EndIf
+⍝Done

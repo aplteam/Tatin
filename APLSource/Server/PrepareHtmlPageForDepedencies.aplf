@@ -1,0 +1,19 @@
+ html←PrepareHtmlPageForDepedencies deps;⎕TRAP
+ html←HtmlHeader''
+ html,←⊂'<h2>Dependencies of "',packageID,'"</h2>'
+ html,←AddSpecialMessage ⍬
+ html,←⊂'<table>'
+ html,←⊂'<thead>'
+ html,←⊂'<tr class="my-first-th">'
+ html,←{'<th>',⍵,'</th>'}¨⊆'Dependencies'
+ html,←⊂'</thead>'
+ html,←⊂'<tbody>'
+ ⎕TRAP←0 'S'
+ deps←MakeLinkToPackage¨deps
+ html,←{'<tr><td><code>',⍵,'</code></td></tr>'}¨deps
+ html,←⊂'</tbody>'
+ html,←⊂'</table>'
+ html,←⊆GetFooter
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+⍝Done

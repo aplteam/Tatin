@@ -1,0 +1,12 @@
+ r←Test_API_070(stopFlag batchFlag);⎕TRAP;version
+⍝ Exercise ⎕SE.Tatin.CheckForLaterVersion
+⍝ Already tested but not called via ⎕SE.Tatin, so one more time because this function was introduced pretty late
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ version←⎕SE.Tatin.CheckForLaterVersion'TestData\Packages\Local-One\'
+ →T.PassesIf 1=≢version
+ →T.PassesIf'aplteam-APLTreeUtils-6.0.11'≡TC.GetPackageIDFromFilename⊃1 2⌷version  ⍝ But NOT 7.0.0!
+
+ r←T._OK
+⍝Done

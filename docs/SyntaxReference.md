@@ -28,6 +28,36 @@ While `⎕SE._Tatin` holds all code required for Tatin's client side, `⎕SE.Tat
 
 
 
+### CheckForLaterVersion
+
+```
+ r←{flags} CheckForLaterVersion path
+```
+
+Checks whether there are later versions available for the principal packages installed in `path`.
+
+The optional left argument can carry flags as a single integer:
+
+1. Major: should later major version be listed as well? Defaults to 0.  (1)
+2. Dependencies: should dependencies be checked as well? Defaults to 0. (2)
+
+You may specify both flags as true by passing a 3.
+
+By default only minor and patch are part of the check. By specifying 1 as `major` you may change this default behaviour and list any later major versions instead.
+
+Note that this function scans all known registries with a priority greater than zero.
+
+Returns a matrix with five columns:
+
+|Col  | Info
+|-----| ----
+|[;1] |Original package ID
+|[;2] |Lastes package ID
+|[;3] |Original URL
+|[;4] |Flag; 1 means later version is available
+|[;5] |URL the latest version was found but empty in case it's identical with [;3]
+
+
 ### CreateReInstallParms 
 
 ```

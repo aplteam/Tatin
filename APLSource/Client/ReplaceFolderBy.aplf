@@ -1,4 +1,4 @@
- success←old ReplaceFolderBy new;temp
+ success←old ReplaceFolderBy new;temp;flag;qdmx
 ⍝ Performs the following actions:
 ⍝ * Establish a temp name dynamically
 ⍝ * Rename "old" to "temp"
@@ -7,7 +7,18 @@
 ⍝ * Delete "new"
 ⍝ * Delete "temp"
  temp←'-'{~⎕NEXISTS n←⍺{(1⊃⍵),⍺,(2⊃⍵)}⎕NPARTS ⍵:n ⋄ (⍺,⍺)∇ ⍵}old
- temp ⎕NMOVE old
+ flag←0
+ :Repeat
+     :Trap 19 22
+         temp ⎕NMOVE old
+         flag←1
+     :Else
+         qdmx←⎕DMX
+         :If ~YesOrNo'Attempt to replace ',(2⊃⎕NPARTS old),' resulted in a ',qdmx.EM,' error; try again?'
+             'Cancelled by user after error'⎕SIGNAL 98
+         :EndIf
+     :EndTrap
+ :Until flag
  ⎕MKDIR old
  :Trap 0
      old ⎕NCOPY⍠('Wildcard' 1)⊣new,'/*'

@@ -1,46 +1,43 @@
- r←majorVersions CheckForLaterVersion_ fullPaths;fullPath;packageID;url;fullPath2;buff;packageID2;errMsg;statusCode
-⍝ Takes a vector of fully qualified package paths (http or local) & checks for later versions.
-⍝ `r` is a vector with fully qualified paths of any better versions, so possibly empty.
-⍝ If `majorVersions` is 0 only minor and patch number are considered. If `majorVersions` is 1
-⍝ better "major" versions are considered as well. This is used only in the user command since
-⍝ Tatin considers packages with different major numbers to be different packages.
-⍝ For every package these pieces of information are returned:
-⍝ 1. Original version
-⍝ 2. Latest version found  (or something like `<no response>` or `<not found>`)
+ r←{majorVersions}CheckForLaterVersion_ packageID;fullPath;url;fullPath2;packageID2;errMsg;statusCode;packageID_;origUrl;marker;newUrl
+⍝ Takes a packageID and checks whether it finds a later version.
+⍝ All Registries with a priority greater than 0 are scanned.\\
+⍝ If `majorVersions` is 0 only minor and patch number are considered.\\
+⍝ If `majorVersions` is 1 later "major" versions are considered as well.\\
+⍝ For every package found these pieces of information are returned:
+⍝ 1. Original package ID
+⍝ 2. Package ID of the latest version found  (or "<<< No response >>>" or "<<< Not found >>>")
 ⍝ 3. URL
-⍝ 4. "!" in case there is a later version
- r←⍬
+⍝ 4. 1 in case there is a later version (marker)
+ majorVersions←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'majorVersions'
  'Invalid left argument'Assert 1=≢majorVersions
  'Invalid left argument'Assert majorVersions∊0 1
- :For fullPath :In fullPaths
-     :If '.zip'≢⎕C 3⊃⎕NPARTS fullPath
-         PrintToSession'Checking <',fullPath,'>...'
-         (url packageID)←SplitUrlAndPackageID fullPath
-         url←Reg.RemovePackageID{⍵↓⍨-'/'=¯1↑⍵}url
-         :Trap 345
-             :If majorVersions
-                 (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID)url
-             :Else
-                 (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID)url
-             :EndIf
-         :Else
-             r,←⊂packageID'<<< No response >>>'url''
-             :Continue
-         :EndTrap
-         :If 404=statusCode
-             r,←⊂packageID'<<< Not found >>>'url''
-         :Else
-             errMsg Assert 200=statusCode
-             :If 0<≢fullPath2
-                 packageID2←GetPackageIDFromFilename fullPath2
-                 buff←packageID packageID2
-                 buff,←⊂{⍵↓⍨-'//'≡¯2↑⍵}(-+≢2⊃buff)↓fullPath2
-                 buff,←packageID≢packageID2
-                 r,←⊂buff
-             :EndIf
-         :EndIf
+ packageID_←RemoveAlias packageID
+ :If majorVersions
+     url←('⎕'=⊃⊃⎕XSI)EstablishRegistry Reg.RemoveVersionNumber packageID_
+ :Else
+     url←('⎕'=⊃⊃⎕XSI)EstablishRegistry Reg.RemoveMinorAndPatch packageID_
+ :EndIf
+ fullPath←url,packageID_
+ PrintToSession'Checking <',fullPath,'>...'
+ :Trap 345
+     :If majorVersions
+         (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID_)url
      :Else
-         PrintToSession'Ignored because it is a ZIP file: <',fullPath,'>...'
+         (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID_)url
      :EndIf
- :EndFor
+ :Else
+     r←packageID_'<<< No response >>>'url''
+ :EndTrap
+ :If 404=statusCode
+     r←packageID_'<<< Not found >>>'url''
+ :Else
+     errMsg Assert 200=statusCode
+     :If 0<≢fullPath2
+         packageID2←GetPackageIDFromFilename fullPath2
+         origUrl←RemovePackageID fullPath
+         marker←packageID_≢packageID2
+         newUrl←RemovePackageID fullPath2
+         r←packageID_ packageID2 origUrl marker(newUrl/⍨origUrl≢newUrl)
+     :EndIf
+ :EndIf
 ⍝Done

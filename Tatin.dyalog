@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.33.2 - 2021-11-09
+⍝ * 0.33.4 - 2021-11-13
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -108,7 +108,7 @@
           c←⎕NS ⍬
           c.Name←'CheckForLaterVersion'
           c.Desc←'Check whether there are later versions of a package available'
-          c.Parse←'1 -major -dependencies -raw'
+          c.Parse←'1 -major -dependencies'
           r,←c
      
           c←⎕NS ⍬
@@ -298,42 +298,15 @@
       r←⍪r
     ∇
 
-    ∇ r←CheckForLaterVersion Arg;path;majorFlag;question;this;dependencies;raw;b
+    ∇ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders
       r←''
       path←Arg._1
-      (majorFlag raw dependencies)←Arg.(major raw dependencies)
-      :If majorFlag
-          r←majorFlag TC.CheckForLaterVersion path dependencies
-          r←↑(0<≢¨r)/r
-      :Else
-          r←TC.CheckForLaterVersion path dependencies
-          r←↑(0<≢¨r)/r
-          :If 0  ⍝TODO⍝  May be one day we support this, may be not
-              :If 0<≢r
-                  :If 1=≢r
-                      question←'There is a later version:',CR
-                      question,←'  ',(∊r),CR
-                      question,←'Would you like to install this later version?'
-                  :Else
-                      question←'There are later versions:',CR
-                      question,←∊'  '∘,¨r,¨CR
-                      question,←'Would you like to install ALL these later versions?'
-                      :If 1 ∆YesOrNo question
-                          ∘∘∘
-                      :ElseIf 1 ∆YesOrNo'Would you like to install SOME of these later versions?'
-                          :For this :In r
-                              ∘∘∘
-                          :EndFor
-                      :EndIf
-                  :EndIf
-              :AndIf 1 ∆YesOrNo question
-                  ∘∘∘
-              :EndIf
-          :EndIf
-      :EndIf
-      :If ~raw
-      :AndIf 0<≢r
-          r←'Installed' 'Latest' 'URL' '?'⍪' '⍪r
+      flags←(1×Arg.major)+(2×Arg.dependencies)
+      r←flags TC.CheckForLaterVersion path
+      :If 0<≢r
+          colHeaders←'Installed' 'Latest' 'OriginalURL' '?'
+          colHeaders,←'New URL' ''[1+0<+/≢¨r[;5]]
+          r←colHeaders⍪' '⍪r
           r[2;]←(⌈⌿≢¨r)⍴¨'-'
           b←1≡¨r[;4]
           r[⍸b;4]←'*'
@@ -896,8 +869,8 @@
               r,←⊂'(Re-)Establishe the user settings in ⎕SE.'
               r,←'' '  ]Tatin.Init [<config-folder>]'
           :Case ⎕C'CheckForLaterVersion'
-              r,←⊂'Check whether for the installed packages a later version is available.'
-              r,←'' '  ]Tatin.CheckForLaterVersion <install-folder> [-major] [-dependencies] [-raw]'
+              r,←⊂'Check whether for the installed packages a later versions are available.'
+              r,←'' '  ]Tatin.CheckForLaterVersion <install-folder> [-major] [-dependencies]'
           :Case ⎕C'DeletePackage'
               r,←⊂'Delete a given package.'
               r,←'' '  ]Tatin.DeletePackage <([Registry-alias|Registry-URL|file://package-folder)package-ID)>'
@@ -1106,19 +1079,21 @@
               r,←⊂'Without an argument Init processes the default user settings file.'
               r,←⊂'Instead you may specify a folder that contains a file tatin-client.json.'
           :Case ⎕C'CheckForLaterVersion'
-              r,←⊂'Check whether for the installed packages a later version is available.'
+              r,←⊂'Check whether for the installed packages later versions are available.'
               r,←⊂'Takes a folder with a file "apl-buildlist.json" as argument.'
-              r,←⊂'Packages installed from  ZIP files are ignored: Tatin does not know where to look.'
+              r,←⊂'Scans all known registries with a priority greater than 0 for a later version.'
               r,←⊂''
-              r,←⊂'Returns information only for packages a later version was found for.'
+              r,←⊂'Returns a matrix with four columns for all packages found:'
+              r,←⊂'[;1] Currently installed packged IS'
+              r,←⊂'[;2] package ID of the latest version found or something like "no response" or "not found"'
+              r,←⊂'[;3] URL of the Registry the later version was found'
+              r,←⊂'[;4] ! for a later version'
               r,←⊂''
               r,←⊂'-major        by default later MAJOR versions are ignored, but this default behaviour can be'
               r,←⊂'              changed by specifying -major: then only later major versions are reported.'
               r,←⊂''
-              r,←⊂'-dependencies by default only principal packages are checked. You may include dependencies by'
-              r,←⊂'              specifying this flag.'
-              r,←⊂''
-              r,←⊂'-raw          by default the output is beautified; specify -raw if you want just a raw table.'
+              r,←⊂'-dependencies by default only principal packages are checked.'
+              r,←⊂'              You may include dependencies by specifying this flag.'
           :Case ⎕C'DeletePackage'
               r,←⊂'Delete a given package.'
               r,←⊂''

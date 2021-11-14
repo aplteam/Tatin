@@ -21,6 +21,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#User-Commands">User Commands</a></li>
 <li><a href="#The-API">The API</a>
 <ul>
+<li><a href="#CheckForLaterVersion">CheckForLaterVersion</a></li>
 <li><a href="#CreateReInstallParms">CreateReInstallParms</a></li>
 <li><a href="#DeletePackage">DeletePackage</a></li>
 <li><a href="#GetDeletePolicy">GetDeletePolicy</a></li>
@@ -71,6 +72,52 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>The API is established in <code>⎕SE.Tatin</code>. These are almost exclusively dfns that call a function in <code>⎕SE._Tatin</code>.</p>
 <p>While <code>⎕SE._Tatin</code> holds all code required for Tatin's client side, <code>⎕SE.Tatin</code> holds the public interface.</p>
+<div class="h_tag">
+<a href="#CheckForLaterVersion" id="CheckForLaterVersion" class="autoheader_anchor">
+<h3 data-id="CheckForLaterVersion">CheckForLaterVersion</h3>
+</a>
+</div>
+<pre><code> r←{flags} CheckForLaterVersion path</code></pre>
+<p>Checks whether there are later versions available for the principal packages installed in <code>path</code>.</p>
+<p>The optional left argument can carry flags as a single integer:</p>
+<ol start="1">
+<li>Major: should later major version be listed as well? Defaults to 0.  (1)</li>
+<li>Dependencies: should dependencies be checked as well? Defaults to 0. (2)</li>
+</ol>
+<p>You may specify both flags as true by passing a 3.</p>
+<p>By default only minor and patch are part of the check. By specifying 1 as <code>major</code> you may change this default behaviour and list any later major versions instead.</p>
+<p>Note that this function scans all known registries with a priority greater than zero.</p>
+<p>Returns a matrix with five columns:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Col  </th>
+<th style="text-align: left;"> Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Original package ID</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>Lastes package ID</td>
+</tr>
+<tr>
+<td>[;3]</td>
+<td>Original URL</td>
+</tr>
+<tr>
+<td>[;4]</td>
+<td>Flag; 1 means later version is available</td>
+</tr>
+<tr>
+<td>[;5]</td>
+<td>URL the latest version was found but empty in case it's identical with [;3]</td>
+</tr>
+</tbody>
+</table>
 <div class="h_tag">
 <a href="#CreateReInstallParms" id="CreateReInstallParms" class="autoheader_anchor">
 <h3 data-id="CreateReInstallParms">CreateReInstallParms</h3>
@@ -292,7 +339,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <p>In the first case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.</p>
 <p>In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.</p>
-<p>You may omit the group name; that would not make a difference when the name is used only within one group, but if it is used in more than one group, then all of them are listed.</p>
+<p>You may omit the group name; that would not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.</p>
 <p>The package ID must not specify a version number.</p>
 <p>By default the publishing date is not included, but you may change this by passing a 1 as <code>⍺</code>. In that case an additional column is added to the result.</p>
 <div class="h_tag">
@@ -401,7 +448,6 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that packages with different major version numbers are considered different.</p>
 <p>By default all known Registries with a priority greater than 0 are scanned, but you may specify a particular Registry as a third (optional) argument.</p>
 <p>The left argument is optional and, if specified, typically created by calling <a href="#CreateReInstallParms" class="bookmark_link"><code>CreateReInstallParms</code></a>.</p>
-<p>Note packages that were installed from ZIP files are just re-installed from their ZIP files.</p>
 <p>It may carry three parameters:</p>
 <ul>
 <li><code>noBetas</code>
@@ -411,6 +457,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>dry</code>
 <p>Defaults to 0, meaning the function does business. Set this to 1 in order to get a report of what the function would do without actually doing it.</p></li>
 </ul>
+<p>Note that packages that were installed from ZIP files are just re-installed from their ZIP files.</p>
 <div class="h_tag">
 <a href="#ReadPackageConfigFile" id="ReadPackageConfigFile" class="autoheader_anchor">
 <h3 data-id="ReadPackageConfigFile">ReadPackageConfigFile</h3>

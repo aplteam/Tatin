@@ -1,14 +1,15 @@
- r←Test_UserCommands_051(stopFlag batchFlag);⎕TRAP;res;msg;rc;path;stop
+ r←Test_UserCommands_051(stopFlag batchFlag);⎕TRAP;path;stop;rc;msg;res
 ⍝ Exercise ]Tatin.CheckForLaterVersion without the -major flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  path←'./TestData/Packages/Update-Check-Multiple'
  stop←0
- (rc msg res)←stop ∆UCMD'CheckForLaterVersion ',path,' -raw'
- →T.PassesIf 0=rc
- →T.PassesIf 0=≢msg
- →T.PassesIf 1=≢(1≡¨res[;4])⌿r
- →T.PassesIf(,⊂'aplteam-MarkAPL-9.1.13')≡(1≡¨res[;4])⌿res[;2]
+
+ (rc msg res)←stop ∆UCMD'CheckForLaterVersion ',path
+
+ →T.PassesIf 98=rc
+ →T.PassesIf∨/'Package <aplteam-EventCodes-1> not found in any of these Registries:'⍷msg
 
  r←T._OK
+⍝Done

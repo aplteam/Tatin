@@ -6,7 +6,7 @@
  (uri packageID)←Reg.SplitAtLast url
  (alias uri)←SplitAtAlias uri
  request←R.NewRequest 0
- request.RequestTarget←'/v1/packages/dependencies/',packageID
+ request.RequestTarget←Reg.VersionOf_REST,'/packages/dependencies/',packageID
  request.Headers,←⊂'Accept' 'application/json'
  res←uri SendAndReceive request
  :If 200≠res.StatusCode

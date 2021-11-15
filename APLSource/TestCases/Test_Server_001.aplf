@@ -6,6 +6,7 @@
  request←R.NewRequest 0
  request.RequestTarget←'/'
  res←'https://localhost'TC.SendAndReceive request
+ Assert 200≡res.StatusCode
  →T.PassesIf(≢res.Headers)≥ind←(⊃¨res.Headers)⍳⊂'x-tatin'
  version←2⊃Reg.Version
  serverVersion←ind 2⊃res.Headers

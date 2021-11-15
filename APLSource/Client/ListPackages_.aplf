@@ -10,7 +10,7 @@
  'Not a valid URI'Assert('/'+.=host)∊2 3
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  request←R.NewRequest 0
- request.RequestTarget←'/v1/packages/',{⍵↓⍨'/'=1⍴⍵}packageID
+ request.RequestTarget←Reg.VersionOf_REST,'/packages/',{⍵↓⍨'/'=1⍴⍵}packageID
  request.RequestTarget,←'?'
  :If 0<≢⊃,/parms.group
      request.RequestTarget,←'group=',parms.group,'&'

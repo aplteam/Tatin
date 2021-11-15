@@ -4,7 +4,7 @@
  :While 0<+/bool←0=≢¨∆TREE.Data[;∆TREE.∆url]
      registry←i⊃registries
      :If Reg.IsHTTP registry
-         request.RequestTarget←'/v1/packages/exist/',1↓∊',',¨{'@'∊⍵:⍵↓⍨⍵⍳'@' ⋄ ⍵}¨bool/∆TREE.Data[;∆TREE.∆packageID]
+         request.RequestTarget←Reg.VersionOf_REST,'/packages/exist/',1↓∊',',¨{'@'∊⍵:⍵↓⍨⍵⍳'@' ⋄ ⍵}¨bool/∆TREE.Data[;∆TREE.∆packageID]
          :Trap 345
              res←registry SendAndReceive request
          :Else

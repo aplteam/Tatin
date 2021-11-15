@@ -1,0 +1,11 @@
+ r←Test_API_071(stopFlag batchFlag);⎕TRAP;json;ns;name
+⍝ Exercise ⎕SE.Tatin.ReadPackageConfigFile on an Apache-managed Registry (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ json←⎕SE.Tatin.ReadPackageConfigFile'[tatin]aplteam-FilesAndDirs-5.1.3'
+ ns←Reg.JSON json
+ name←{⍵↑⍨¯1+⍵⍳'+'}⊃{⍺,'-',⍵}/ns.(group name version)
+ →T.PassesIf name≡'aplteam-FilesAndDirs-5.1.3'
+
+ r←T._OK

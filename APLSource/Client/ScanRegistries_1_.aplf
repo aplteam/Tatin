@@ -3,7 +3,7 @@
 ⍝ `registry` is usuall an http[s]:// address but may also be a (local) file.
  r←0
  :If Reg.IsHTTP registry
-     request.RequestTarget←'/v1/packages/dependencies/',1↓∊',',¨packageIDs
+     request.RequestTarget←Reg.VersionOf_REST,'/packages/dependencies/',1↓∊',',¨packageIDs
      res←registry SendAndReceive request
      :If 200=res.StatusCode
          ns←Reg.JSON res.Content

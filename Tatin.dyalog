@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.33.4 - 2021-11-13
+⍝ * 0.33.4 - 2021-11-15
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -580,7 +580,7 @@
       r←⍬
       :If (,0)≡,what←Arg._1
           what←TC.F.PWD
-      :ElseIf ∧/'[]'∊what
+      :ElseIf '['∊what
           what←TC.ReplaceRegistryAlias what
       :EndIf
       :If TC.Reg.IsHTTP what

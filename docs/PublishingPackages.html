@@ -21,7 +21,6 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Precondition-API-key">Precondition: API key</a>
 <ul>
 <li><a href="#The-Server">The Server</a></li>
-<li><a href="#The-Client">The Client</a></li>
 </ul></li>
 <li><a href="#Publishing">Publishing</a>
 <ul>
@@ -57,24 +56,41 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>If you want to publish on <code>https://tatin.dev</code> you need to ask <a href="mailto:tatin.dev@gmail.com" class="mailto_link">tatin.dev@gmail.com</a> for an API key.</p>
+<p>You must provide these pieces of information:</p>
+<ul>
+<li>Your desired group name (case insenstive)</li>
+<li>Your real name</li>
+<li>If it's connected to a company, the company's name</li>
+</ul>
 <div class="h_tag">
 <a href="#Credentials-for-the-Tatin-Test-Server" id="Credentials-for-the-Tatin-Test-Server" class="autoheader_anchor">
 <h4 data-id="Credentials-for-the-Tatin-Test-Server">Credentials for the Tatin Test Server</h4>
 </a>
 </div>
-<p>The Tatin Test Server publishes an API key on its website; it's “Tatin-Test-API-Key”. It allows you to publish anything you want, including any group name.</p>
+<p>The Tatin Test Server publishes an API key on its website; it's “Tatin-Test-API-Key”. It allows you to publish anything you want, including any group name except a few reserved group names: “aplteam” and “dyalog”.</p>
 <p>Notes:</p>
 <ul>
 <li>Be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later</li>
-<li>You cannot publish anything for the groups “aplteam” and “dyalog”</li>
+<li>You cannot publish anything under the group names “aplteam” and “dyalog”</li>
 </ul>
 <div class="h_tag">
 <a href="#Where-are-API-keys-saved" id="Where-are-API-keys-saved" class="autoheader_anchor">
 <h4 data-id="Where-are-API-keys-saved">Where are API keys saved?</h4>
 </a>
 </div>
+<div class="h_tag">
+<a href="#Client" id="Client" class="autoheader_anchor">
+<h5 data-id="Client">Client</h5>
+</a>
+</div>
 <p>API keys are saved in the user settings file. The quickest and yet save way to edit that file is via the user command:</p>
 <pre><code>      ]TatIN.UserSettings -edit</code></pre>
+<div class="h_tag">
+<a href="#Server" id="Server" class="autoheader_anchor">
+<h5 data-id="Server">Server</h5>
+</a>
+</div>
+<p>API keys are saved in the file “Credentials.txt” in the <code>Registry\</code> folder in the server's home folder.</p>
 <div class="h_tag">
 <a href="#Credentials-for-your-own-Tatin-Server" id="Credentials-for-your-own-Tatin-Server" class="autoheader_anchor">
 <h4 data-id="Credentials-for-your-own-Tatin-Server">Credentials for your own Tatin Server</h4>
@@ -110,13 +126,6 @@ group3=''
 <li>For any group name but “group1”, “group2” and “group3” you must specify “other” as API key</li>
 </ul>
 <div class="h_tag">
-<a href="#The-Client" id="The-Client" class="autoheader_anchor">
-<h3 data-id="The-Client">The Client</h3>
-</a>
-</div>
-<p>On the client side the API key must go into the user configuration file: the file <code>tatin-client.json</code>.</p>
-<p>It already has an API key for every Server defined in the file, but it's empty.</p>
-<div class="h_tag">
 <a href="#Publishing" id="Publishing" class="autoheader_anchor">
 <h2 data-id="Publishing">Publishing</h2>
 </a>
@@ -145,9 +154,15 @@ group3=''
 <h4 data-id="The-dependency-file">The dependency file</h4>
 </a>
 </div>
-<p>This file is only required when the package has dependencies.</p>
+<p>This file is only required when the package to be published has dependencies.</p>
 <p>Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.</p>
-<p>Note that a depedency might not mention a package</p>
+<p>Usually you will specify just a full package ID as a dependency. If you wish to you may also specify either a URL following the http:// protocol of a zip file following the file:// protocol.</p>
+<p>Notes:</p>
+<ul>
+<li>Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with 400 — bad request</li>
+<li>Specifying</li>
+</ul>
+<p>If a dependecy does not exist on the same Registry as your package ⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹</p>
 <div class="h_tag">
 <a href="#Final-step" id="Final-step" class="autoheader_anchor">
 <h3 data-id="Final-step">Final step</h3>

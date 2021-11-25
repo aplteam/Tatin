@@ -18,7 +18,7 @@
  cfg.(group name version)←'Example' 'A' '1.0.0'
  cfg.source←'A.apln'
  TC.WritePackageConfigFile src cfg
- src TC.Dependencies.Add'[local2]DoesNot-Exist-1.0.0'    ⍝ Invalid dependency
+ src TC.Dependencies.Add'DoesNot-Exist-1.0.0'    ⍝ Invalid dependency
 
  (rc msg zipFilename)←TC.PublishPackage src reg          ⍝ You might want to install a package with a not yet published dependency
  Assert 200=rc
@@ -29,15 +29,15 @@
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.GoToTidyUp 1≠≢'File <[^>]+> does not exist'⎕S 0⊣qdmx.EM
+     →T.GoToTidyUp~∨/'Package <DoesNot-Exist-1.0.0> not found in any of these Registries'⍷qdmx.EM
  :EndTrap
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert 0=⊃F.RmDir installFolder
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
  F.DeleteFile zipFilename
+ Assert 0=⊃F.RmDir installFolder
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

@@ -1,4 +1,4 @@
- {(statusCode errMsg)}←PublishPackage(zipFilename registryPath);packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2
+ {(statusCode errMsg)}←PublishPackage(zipFilename registryPath);packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps
 ⍝ Tries to publish a package locally.\\
 ⍝ * If the package already exists `errmsg` carries an appropriate message. No further action is taken.
 ⍝ * If any action along the line fails (like creating the package directory, copying the ZIP file, copying the dependency file, if any)
@@ -31,13 +31,13 @@
      errMsg←'Could not create data/ directory for ',packageID
  :ElseIf 0<≢(zipFilename2←packageDir,'/',packageID,'.zip')(⎕NCOPY Exec)zipFilename
      HttpCodes.InternalServerError
-     errMsg←'Publishing package failed :',packageID
+     errMsg←'Publishing ',packageID,' failed due to a server error'
      packageDir RollbackPublishPackage errMsg
  :Else
      (packageDir,'/data')⎕NCOPY⍠('Wildcard' 1)⊣tempDir,'/*'
      :If 0<≢packageDir(⎕NMOVE Exec)packageDir,'/data/apl-package.json'
          statusCode←HttpCodes.InternalServerError
-         errMsg←'Publishing package failed: ',packageID
+         errMsg←'Publishing ',packageID,' failed due to a server error'
          packageDir RollbackPublishPackage errMsg
      :Else
          SetPublishingDate packageDir,'/',CFG_Name
@@ -46,12 +46,22 @@
          myZip.Dispose
          dependenciesFilename←packageDir,'/data/',DependenciesFilename
          :If F.Exists dependenciesFilename
-         :AndIf 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
-             statusCode←HttpCodes.InternalServerError
-             errMsg←'Publishing package failed: ',packageID
-             packageDir RollbackPublishPackage errMsg
-         :Else
-             0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+             :If 0<≢deps←⊃F.NGET dependenciesFilename 1
+                 :If ∨/IsFILE¨deps
+                     statusCode←HttpCodes.BadRequest
+                     errMsg←'Publishing package ',packageID,' failed; dependency uses file:// protocol'
+                     packageDir RollbackPublishPackage errMsg
+                     F.RmDir tempDir
+                     :Return
+                 :EndIf
+                 :If 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
+                     statusCode←HttpCodes.InternalServerError
+                     errMsg←'Publishing package failed: ',packageID
+                     packageDir RollbackPublishPackage errMsg
+                 :Else
+                     0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+                 :EndIf
+             :EndIf
          :EndIf
      :EndIf
  :EndIf

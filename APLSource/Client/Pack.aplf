@@ -1,4 +1,4 @@
- zipFilename←Pack(projectPath targetPath);cfg;fileList;zipObj;tempFilename;deps
+ zipFilename←Pack(projectPath targetPath);cfg;fileList;zipObj;tempFilename;deps;errMsg
  ⍝ projectPath → folder to create package from\\
  ⍝ targetPath  → folder to put package in\\
  ⍝ ←             path to package file created
@@ -39,7 +39,13 @@
      tempFilename,←'/',Dependencies.DEP_NAME
      tempFilename ⎕NCOPY⍠('IfExists' 'Replace')⊣projectPath,Dependencies.DEP_NAME
      deps←1⊃F.NGET tempFilename 1
-     deps←ReplaceRegistryAlias¨deps
+     :If 0<≢errMsg←CheckDependencies deps
+         F.RmDir 1⊃⎕NPARTS tempFilename
+         zipObj.Dispose
+         F.DeleteFile zipFilename
+         errMsg Assert 0
+     :EndIf
+     deps←ReplaceRegistryAlias deps
      (⊂deps)F.NPUT tempFilename 1
      (⊃⎕NPARTS tempFilename)zipObj.Add Dependencies.DEP_NAME
      ⎕DL 0.2

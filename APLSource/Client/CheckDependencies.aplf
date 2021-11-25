@@ -1,0 +1,15 @@
+ CheckDependencies←{
+ ⍝ Checks wether ⍵ is one of:
+ ⍝ * Starts with http[s]://
+ ⍝ * Starts with file://
+ ⍝ * Is a full and valid package ID
+ ⍝ ⍵ may be a simple text vector or a vector of simple text vectors.
+ ⍝ Returns either '' or an error message
+     txts←⊆⍵
+     isFullPkgID←Reg.IsValidPackageID_Complete¨txts
+     isHTTP←IsHTTP¨txts
+     isFile←{1=≢'^file://'⎕S 0⊣⎕C ⍵}¨txts
+     buff←isFullPkgID+isHTTP+isFile
+     buff∧.=1:''
+     'Number of dependencies being neither a full package ID nor a url following either the http or file scheme: ',⍕+/~buff
+ }

@@ -22,24 +22,36 @@ They are saved in the user settings --- for details see the document "Tatin User
 
 If you want to publish on `https://tatin.dev` you need to ask [tatin.dev@gmail.com](mailto:tatin.dev@gmail.com) for an API key.
 
+You must provide these pieces of information:
+
+* Your desired group name (case insenstive)
+* Your real name
+* If it's connected to a company, the company's name
+
 
 #### Credentials for the Tatin Test Server
 
-The Tatin Test Server publishes an API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name.
+The Tatin Test Server publishes an API key on its website; it's "Tatin-Test-API-Key". It allows you to publish anything you want, including any group name except a few reserved group names: "aplteam" and "dyalog".
 
 Notes:
 
 * Be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later
-* You cannot publish anything for the groups "aplteam" and "dyalog"
+* You cannot publish anything under the group names "aplteam" and "dyalog"
 
 
 #### Where are API keys saved?
+
+##### Client 
 
 API keys are saved in the user settings file. The quickest and yet save way to edit that file is via the user command:
 
 ```
       ]TatIN.UserSettings -edit      
 ```
+
+##### Server
+
+API keys are saved in the file "Credentials.txt" in the `Registry\` folder in the server's home folder.
 
 #### Credentials for your own Tatin Server 
 
@@ -98,12 +110,6 @@ This means:
 * You may publish packages to the groups "group2" and "group3" without an API key 
 * For any group name but "group1", "group2" and "group3" you must specify "other" as API key
 
-### The Client
-
-On the client side the API key must go into the user configuration file: the file `tatin-client.json`.
-
-It already has an API key for every Server defined in the file, but it's empty.
-
 
 ## Publishing
 
@@ -126,9 +132,20 @@ What is required and how to create and change a package configuration file is di
 
 #### The dependency file
 
-This file is only required when the package has dependencies.
+This file is only required when the package to be published has dependencies.
 
 Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
+
+Usually you will specify just a full package ID as a dependency. If you wish to you may also specify either a URL following the http:// protocol of a zip file following the file:// protocol. 
+
+Notes:
+
+* Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with 400 --- bad request
+
+* Specifying 
+
+
+If a dependecy does not exist on the same Registry as your package ⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹
 
 
 ### Final step

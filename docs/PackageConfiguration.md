@@ -2,6 +2,7 @@
 [parm]:title             = 'Tatin's Package Configuration'
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
+[parm]:numberHeaders     = 2 3 4 5 6
 
 
 # Tatin's package Configuration File

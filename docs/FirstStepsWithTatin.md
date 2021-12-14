@@ -2,7 +2,7 @@
 [parm]:leanpubExtensions = 1
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
-
+[parm]:numberHeaders     = 2 3 4 5 6
 
 
 # First steps with the Tatin Client
@@ -399,7 +399,7 @@ MarkAPL
 The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages:
 you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first. 
 
-That way Tatin would find the package on your local machine even when they are not loaded as principal packages but just dependencies.
+That way Tatin would find the package on your local machine even when they are not loaded as principal packages but just as dependencies.
  
 Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
 
@@ -419,7 +419,7 @@ The fact that Registries with a priority of `0` are not scanned by Tatin allows 
 
 A> ### Scanning for dependencies
 A>
-A> Note that Tatin does not only scans all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies. 
+A> Note that Tatin does not only scans all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies as well. 
 
 
 

@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.33.4 - 2021-11-15
+⍝ * 0.33.6 - 2021-12-09
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -285,7 +285,7 @@
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
       '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
-      :If (,'#')≢,targetSpace
+      :If ~(⊂,1⎕C targetSpace)∊,¨'#' '⎕SE'
           '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       :EndIf
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
@@ -411,7 +411,8 @@
       :EndIf
       :If ~TC.Reg.IsHTTP url
       :AndIf ~TC.Reg.IsFILE url
-          url←{∧/'[]'∊⍵:⍵ ⋄ '[',⍵,']'}url
+          'Invalid target'Assert'['∊url
+          url←'[',(url~'[]'),']'
       :EndIf
       url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_

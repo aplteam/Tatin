@@ -2,6 +2,7 @@
 [parm]:title             = Tatin Installing and Updating
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
+[parm]:numberHeaders     = 2 3 4 5 6
 
 
 # Installing and Updating the Tatin Client

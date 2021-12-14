@@ -1,4 +1,4 @@
- (opCode reg)←EstablishRegistry_(uri packageID askUserFlag);stopFlag;list;options;msg
+ (opCode reg)←EstablishRegistry_(uri packageID askUserFlag);stopFlag;list;options;msg;qdmx
 ⍝ Attempts to interrogate a Tatin Server. In case the server is down (or anything else goes awry)
 ⍝ then `askUserFlag` determines what to do:
 ⍝ * If it is 0 an error is thrown
@@ -8,7 +8,7 @@
  opCode←'done'
  reg←⍬
  :Repeat
-     :Trap askUserFlag/345 347
+     :Trap 345 347
          :If 0=≢list←ListPackages_ uri,packageID
              stopFlag←1
              :Continue
@@ -18,17 +18,22 @@
              opCode←'process'
          :EndIf
      :Else
-         msg←(uri,' did not respond when interrogated for ',packageID)
-         options←'Try again'('Skip ',uri)'Quit operation'
-         :Select Select msg options
-         :Case 1
-             stopFlag←0
-         :Case 2
-             stopFlag←1
-             opCode←'skip'
-         :Case 3
-             ('Did not respond: ',uri)''⎕SIGNAL 347
-         :EndSelect
+         :If askUserFlag
+             msg←(uri,' did not respond when interrogated for ',packageID)
+             options←'Try again'('Skip ',uri)'Quit operation'
+             :Select Select msg options
+             :Case 1
+                 stopFlag←0
+             :Case 2
+                 stopFlag←1
+                 opCode←'skip'
+             :Case 3
+                 ('Did not respond: ',uri)''⎕SIGNAL 347
+             :EndSelect
+         :Else
+             qdmx←⎕DMX
+             qdmx.EM ⎕SIGNAL qdmx.EN
+         :EndIf
      :EndTrap
  :Until stopFlag
 ⍝Done

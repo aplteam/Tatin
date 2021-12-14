@@ -18,17 +18,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <label id="hide_toc_label" for="hide_toc"></label>
 <div class="toc-container">
 <ul>
-<li><a href="#The-Strategy-Problem">The Strategy Problem</a></li>
-<li><a href="#Loading-Dependencies">Loading Dependencies</a></li>
-<li><a href="#Installing-packages">Installing packages</a></li>
-<li><a href="#Loading-the-installed-packages">Loading the installed packages</a></li>
-<li><a href="#Special-case">Special case</a>
+<li><a href="#The-Strategy-Problem">1. The Strategy Problem</a></li>
+<li><a href="#Loading-Dependencies">2. Loading Dependencies</a></li>
+<li><a href="#Installing-packages">3. Installing packages</a></li>
+<li><a href="#Loading-the-installed-packages">4. Loading the installed packages</a></li>
+<li><a href="#Special-case">5. Special case</a>
 <ul>
-<li><a href="#Removing-a-principal-package">Removing a principal package</a></li>
-<li><a href="#Adding-a-package">Adding a package</a></li>
+<li><a href="#Removing-a-principal-package">5.1. Removing a principal package</a></li>
+<li><a href="#Adding-a-package">5.2. Adding a package</a></li>
 </ul></li>
-<li><a href="#Checking-and-updating">Checking and updating</a></li>
-<li><a href="#Downgrading">Downgrading</a>
+<li><a href="#Checking-and-updating">6. Checking and updating</a></li>
+<li><a href="#Downgrading">7. Downgrading</a>
 </ul>
 </div>
 </nav>
@@ -40,7 +40,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Before you read this document, you have to have a good understanding of what Semantic Versioning is. If that's the case then carry-on reading, otherwise please read <a href="./SemanticVersioning.html" class="external_link">SemanticVersioning</a> first.</p>
 <div class="h_tag">
 <a href="#The-Strategy-Problem" id="The-Strategy-Problem" class="autoheader_anchor">
-<h2 data-id="The-Strategy-Problem">The Strategy Problem</h2>
+<h2 data-id="The-Strategy-Problem">1. The Strategy Problem</h2>
 </a>
 </div>
 <p>Let's imagine that you need two packages, <code>Foo</code> and <code>Goo</code>. Both rely on package <code>Zoo</code>, but while <code>Foo</code> requests 1.1.1 of <code>Zoo</code>, <code>Goo</code> insists on version 1.2.0. However, the best version of <code>Goo</code> available is actually 2.0.0, and even for major version 1 there is a later version available: 1.3.0.</p>
@@ -70,7 +70,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest version <em>mentioned as a dependency</em>.</p>
 <div class="h_tag">
 <a href="#Loading-Dependencies" id="Loading-Dependencies" class="autoheader_anchor">
-<h2 data-id="Loading-Dependencies">Loading Dependencies</h2>
+<h2 data-id="Loading-Dependencies">2. Loading Dependencies</h2>
 </a>
 </div>
 <p>Imagine these packages:</p>
@@ -113,7 +113,7 @@ mygroup_Zoo_1_2_0</code></pre>
 <p>Note that both versions of <code>Zoo</code> have been loaded. That's because the two Load operations are independent of each other.</p>
 <div class="h_tag">
 <a href="#Installing-packages" id="Installing-packages" class="autoheader_anchor">
-<h2 data-id="Installing-packages">Installing packages</h2>
+<h2 data-id="Installing-packages">3. Installing packages</h2>
 </a>
 </div>
 <p>To make packages a part of an application (say), they first need to be installed. In the following examples we will install two packages, <code>Foo</code> and <code>Goo</code>. Both require <code>Zoo</code>, so <code>Zoo</code> will be installed as a side effect.</p>
@@ -146,7 +146,7 @@ mygroup-Goo-2.1.0</code></pre>
 <p>The build list comprises not only the two principal packages but also all dependencies.</p>
 <div class="h_tag">
 <a href="#Loading-the-installed-packages" id="Loading-the-installed-packages" class="autoheader_anchor">
-<h2 data-id="Loading-the-installed-packages">Loading the installed packages</h2>
+<h2 data-id="Loading-the-installed-packages">4. Loading the installed packages</h2>
 </a>
 </div>
 <p>Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two differ.</p>
@@ -163,12 +163,12 @@ mygroup-Goo-2.1.0</code></pre>
 <p>Note that the pruning is in charge for removing the package <code>Zoo</code> 1.1.1. That means that rather than loading <code>Zoo</code> twice <em>only the latest <strong>installed</strong> version</em> will be loaded: both <code>Foo</code> and <code>Goo</code> will use <code>Zoo</code> version 1.2.0.</p>
 <div class="h_tag">
 <a href="#Special-case" id="Special-case" class="autoheader_anchor">
-<h2 data-id="Special-case">Special case</h2>
+<h2 data-id="Special-case">5. Special case</h2>
 </a>
 </div>
 <div class="h_tag">
 <a href="#Removing-a-principal-package" id="Removing-a-principal-package" class="autoheader_anchor">
-<h3 data-id="Removing-a-principal-package">Removing a principal package</h3>
+<h3 data-id="Removing-a-principal-package">5.1. Removing a principal package</h3>
 </a>
 </div>
 <p>Let's assume that you don't need <code>Goo</code> anymore.</p>
@@ -186,7 +186,7 @@ mygroup-Goo-2.1.0</code></pre>
 <p>Clearly there is a danger that you remove too much when you attempt to do this manually.</p>
 <div class="h_tag">
 <a href="#Adding-a-package" id="Adding-a-package" class="autoheader_anchor">
-<h3 data-id="Adding-a-package">Adding a package</h3>
+<h3 data-id="Adding-a-package">5.2. Adding a package</h3>
 </a>
 </div>
 <p>If you want to add a package which has no dependencies you might feel tempted to just add it to the file “apl-dependencies.txt” and copy the package over.</p>
@@ -195,7 +195,7 @@ mygroup-Goo-2.1.0</code></pre>
 <p>When the health checks pass, the build-list would be re-created..</p>
 <div class="h_tag">
 <a href="#Checking-and-updating" id="Checking-and-updating" class="autoheader_anchor">
-<h2 data-id="Checking-and-updating">Checking and updating</h2>
+<h2 data-id="Checking-and-updating">6. Checking and updating</h2>
 </a>
 </div>
 <p>Let's assume you want to check whether there are later versions of the packages of your application.</p>
@@ -212,7 +212,7 @@ mygroup-Goo-2.1.0</code></pre>
 
 <div class="h_tag">
 <a href="#Downgrading" id="Downgrading" class="autoheader_anchor">
-<h2 data-id="Downgrading">Downgrading</h2>
+<h2 data-id="Downgrading">7. Downgrading</h2>
 </a>
 </div>
 <p>There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here, you need to do this yourself.</p>

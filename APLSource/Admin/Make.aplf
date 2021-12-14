@@ -7,7 +7,8 @@
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
  r←⍬
  :If flag
-     ⎕←'Current dir is now: ',##.FilesAndDirs.Cd ##.CiderConfig.HOME
+     ##.FilesAndDirs.Cd ##.CiderConfig.HOME
+     ⎕←'Current dir is now: ',##.CiderConfig.HOME
      'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
      noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
      :If 0 ##.Client.YesOrNo'Would you like to update all Tatin packages?'
@@ -26,7 +27,7 @@
      parms.Exe←APL_Version
      parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
      parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
-     parms.CommandLineArgs,←' lx="#.Make_.Run 0"'
+     parms.CommandLineArgs,←' lx="1 #.Make_.Run 1"'
      :If 0  ⍝ Only for analyzing problems:
          parms.CommandLineArgs,←' -exec_setup=0 '
          parms.CommandLineArgs,←' -stop_in_setup=1 '
@@ -47,7 +48,7 @@
      parms←P.CreateParms
      parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" '
      parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
-     parms.CommandLineArgs,←' lx="#.Make_.Run ¯1"'
+     parms.CommandLineArgs,←' lx="0 #.Make_.Run 2"'
      parms.Exe←APL_Version
      :If 0  ⍝ Only for analyzing problems:
          parms.CommandLineArgs,←' -exec_setup=0'

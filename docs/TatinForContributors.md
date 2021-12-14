@@ -2,6 +2,8 @@
 [parm]:title             = 'Tatin for Contributors'
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
+[parm]:numberHeaders     = 2 3 4 5
+
 
 
 # Tatin for Contributors
@@ -133,13 +135,21 @@ Whether you improved the documentation or fixed a bug or added a feature, at the
 
 ## How to create new versions
 
+### Overview {#ov1}
+
 Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.
 
-In order to create new versions of the Client and the Server all you need to do is to execute:
+In order to create new versions of the Client _and_ the Server you need to perform two steps:
 
-```
-{noQLXFlag} #.Tatin.Admin.Make 1
-```
+1. Bump the version number: major, minor or patch number. Leave the build number and the version date alone: they will be twisted as part of the build process automatically.
+
+2. Execute:
+
+   ```
+   {noQLXFlag} #.Tatin.Admin.Make 1
+   ```
+
+### Details
 
 * `noQLXFlag` is an optional Boolean that defaults to 0. Setting this to 1 makes sense only for debugging purposes.
 
@@ -159,11 +169,11 @@ The `Make` function performs the following steps:
 
 1. It runs `Tatin.Admin.MakeClient`
 
-1. It compiles the documentation (markdown) to HTML files and copies them around
+1. It compiles the documentation (markdown) to HTML files and distribute the files
 
 1. It runs `#.Tatin.Admin.MakeServer`
 
-In the process the `Dist/` folder will be recreated from scratch. The `.zip` files in `Dist/` are to be released on GitHub.
+In the process the `Dist/` folder will be recreated from scratch. The `.zip` files in `Dist/` are to be released on GitHub. The `Dist/` folder will not appear on GitHub due to `.gitignore`.
 
 There will be three zip files:
 
@@ -173,11 +183,36 @@ Tatin-Documentation-{major}.{minor}.{patch}.zip
 Tatin-Server-{major}.{minor}.{patch}.zip
 ```
 
+### Create just a new Client (or Server) version
+
+#### Overview {#ov2}
+
+If you have worked just on the Client or just the Server you may be inclined to save time by creating not both. and also avoid compiling the documentation.
+
+However, there is some danger to get it wrong:
+
+* Client and Server share the code in the namespace `Registry`, so you just **must** make sure that nothing in that namespace was changed, otherwise you should create both Client and Server
+
+* The build number is bumped, and that's how it should be, but as a result the ZIP created will have different build number for Client and Server.
+
+Therefore, as a rule of thumb, **always** create both Client and Server in case you want to publish that version. 
+
+
+#### How-to
+
+You may create just the client side with:
+
+
+Note also that 
+
+
 ## Creating a proofread document
 
-There is a function that creates a single HTML files from all the Tatin markdown documentation. That makes proofreading significantly easier:
+There is a function that creates a single HTML file from all the Tatin markdown documentation. That makes proofreading significantly easier:
 
 ```
       htmlFilename←#.Tatin.Admin.CreateProofReadDocument 1
 ```
+
+Now open that file with the word processor of your choice and use its spell-checking capabilities.
 

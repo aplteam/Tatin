@@ -1,9 +1,13 @@
- {r}←MakeServer batchFlag;F;targetPath;zipFilename;list;msg;success
+ {r}←{bumpBuild}MakeServer batchFlag;F;targetPath;zipFilename;list;msg;success
 ⍝ Creates a new server.\\
 ⍝ Call this after `MakeClient` has been called; see there for details.
 ⍝ It can be called from a developer's session (⍵←0) or as part of an automated "Make" process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
+⍝ You may call this independently from `MakeClient`.
+⍝ `bumpBuild` must be a Boolean; 1 (the default) means that the build number will be bumped.
+⍝ Other values result in an error or ⎕OFF 123 respectively.
  r←⍬
+ bumpBuild←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'bumpBuild'
  :If batchFlag
      ⎕SHADOW'Assert'
      Assert←{(,1)≡,⍵:r←1 ⋄ ⎕OFF 123}
@@ -22,6 +26,7 @@
  F←##.FilesAndDirs
  :If batchFlag
  :OrIf 1 ##.Client.YesOrNo'Would you like to continue?'
+     UpdateVersionNumber bumpBuild
      {}⎕SE.Cider.CloseProject''
      #.Tatin.⎕EX¨'Client' 'Todo' 'TestCases' 'TestCasesServer' 'Simu' 'Tester2'
      ⎕EX¨'Initialize_Client' 'RunTestServer' 'CreateAllRefs_Client'
@@ -34,7 +39,7 @@
      ⎕DL 0.1
      ⎕WSID←targetPath,'/Server'
      #.⎕EX'Make_'
-     ⎕SE.⎕EX ⎕SE.⎕NL⍳16             ⍝ Attempt to avoid "Reference in ⎕SE points to #" (⎕JSON bug)
+     ⎕SE.⎕EX ⎕SE.⎕NL⍳16                                 ⍝ Attempt to avoid "Reference in ⎕SE points to #" (⎕JSON bug)
      'Plodder' 'RumbaLean'#.Tatin.⎕CY'./Assets/Runtime/Plodder/Plodder'
      0 ⎕SAVE ⎕WSID
      F.RmDir targetPath,'/Assets/'

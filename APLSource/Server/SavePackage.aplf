@@ -10,11 +10,13 @@
      tempFolder←F.GetTempSubDir''
      filename←tempFolder,'/',packageID,'.zip'
      (Reg.Base64 request.Content)Reg.WriteNativeFile filename
-     (statusCode msg)←Reg.PublishPackage filename G.RegistryPath
+     (statusCode msg)←1 Reg.PublishPackage filename G.RegistryPath
      response←request Respond statusCode
      response.Content←msg
-     Reg.Index.Compile G.RegistryPath
-     ⎕DL 5
+     :If response.StatusCode=200
+         Reg.Index.Compile G.RegistryPath
+         ⎕DL 5
+     :EndIf
      F.RmDir tempFolder
  :EndIf
 ⍝Done

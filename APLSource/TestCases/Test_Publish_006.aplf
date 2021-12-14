@@ -1,0 +1,35 @@
+ r←Test_Publish_006(stopFlag batchFlag);⎕TRAP;dir;src;body;cfg;zip;qdmx
+⍝ Publish a package with a dependency that is defined with "file://" to a server-managed Registry (must error)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'zip'
+ F.MkDir src zip
+
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_A'
+ cfg.version←'1.0.0'
+ cfg.source←'Test.apln'
+ TC.WritePackageConfigFile src cfg
+
+ src TC.Dependencies.Add'file://./TestData/Server/Registry/aplteam-APLTreeUtils-6.0.6'
+
+ :Trap 98
+     {}TC.PublishPackage src'[localhost]'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~∨/'failed; dependency uses file:// protocol'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

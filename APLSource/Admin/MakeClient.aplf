@@ -1,14 +1,14 @@
- {r}←{type}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList
+ {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
 ⍝ process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
-⍝ `type` specifies what part of the version number should be bumped. 0 (the default) means only the build ID, which is always bumped anyway.\\
-⍝ 1 means "patch" shall be bumped, 2 for "minor" amnd 3 for "major". Other values result in an error or ⎕OFF 123 respectively.\\
-⍝ Note that as part of an automated process this function should be called *before* `MakeServer` because it bumps the
-⍝ version number while `MakeServer` does not.
+⍝ You may call this independently from `MakeServer`.\\
+⍝ `bumpBuild` must be a Boolean; 1 means that the build number will be bumped.
+⍝ Other values result in an error or ⎕OFF 123 respectively.
+⍝ Defaults to 1 if not specified.\\
  r←⍬
  F←##.FilesAndDirs
- type←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'type'
+ bumpBuild←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'bumpBuild'
  :If ~batchFlag
      ⎕←(⎕PW-1)⍴'-'
      msg←''
@@ -27,7 +27,7 @@
  :EndIf
  :If batchFlag
  :OrIf 1 ##.Client.YesOrNo'Would you like to continue?'
-     batchFlag UpdateVersionNumber type
+     UpdateVersionNumber bumpBuild
      {}⎕SE.Cider.CloseProject''
      parms←⎕SE.Cider.CreateOpenParms ⍬
      parms.folder←#.Tatin.CiderConfig.HOME

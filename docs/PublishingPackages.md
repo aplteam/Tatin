@@ -2,6 +2,8 @@
 [parm]:leanpubExtensions = 1
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
+[parm]:numberHeaders     = 2 3 4 5 6
+
 
 
 # Publishing Packages
@@ -10,7 +12,7 @@
 
 Whether you want to publish to the principal Tatin server at <https://tatin.dev> or your own Tatin Server or a Tatin Server that someone in your company runs, first you need an API key. "API key" is just a fancy expression for a password that is used by an application.
 
-API keys are only required for publishing and possibly deleting packages, but not for consuming them.
+API keys are required for publishing --- and possibly deleting --- packages, but not for consuming them.
 
 They are saved in the user settings --- for details see the document "Tatin User Settings".
 
@@ -57,7 +59,7 @@ API keys are saved in the file "Credentials.txt" in the `Registry\` folder in th
 
 If you run your own Tatin Server we suggest that you create a UUID and use that as an API key. 
 
-In order for an API key to be accepted by a Tatin Server it must be added to the file `Credentials.txt` in the Registry's root directory. The file might or might not exist, and it might be empty.
+In order for an API key to be accepted by a Tatin Server it must be added to the file `Credentials.txt` in the Registry's root directory. The file might or might not exist, and  if it exists it might be empty.
 
 Make sure that you specify it as either
 
@@ -71,7 +73,7 @@ or
 *={api-key}
 ```
 
-In the first case somebody who provides that API key may publish packages only for the group "group1".
+In the first case somebody who provides that API key may publish packages only for the group <group1>.
 
 In the second case it's a kind of master password: it allows the creation of packages with _any_ group name.
 
@@ -83,7 +85,7 @@ group2='xyz'
 *='other'
 ```
 
-This means that one can only publish packages with the groupname "group1" with the API key "abc", packages with the groupname "group2" with the API key "xyz", and anything else with the API key "other".
+This means that one can only publish packages with the groupname <group1> with the API key "abc", packages with the groupname <group2> with the API key "xyz", and anything else with the API key "other".
 
 Note that `*=` means that no API key is required. On its own it's the same as having no credentials file, but it can be useful together with other group names:
 
@@ -93,7 +95,7 @@ group2='xyz'
 *=
 ```
 
-This is interpreted as "require API keys for the groups "group1" and "group2" but allow anything else without an API key".
+This is interpreted as "require API keys for the groups <group1> and <group2> but allow anything else without an API key".
 
 Finally you can allow anybody to publish packages under a particular group name without providing an API key:
 
@@ -106,9 +108,9 @@ group3=''
 
 This means:
 
-* You must provide "abc" as an API key for the group "group1"
-* You may publish packages to the groups "group2" and "group3" without an API key 
-* For any group name but "group1", "group2" and "group3" you must specify "other" as API key
+* You must provide "abc" as an API key for the group <group1>
+* You may publish packages to the groups <group2> and <group3> without an API key 
+* For any group name but <group1>, <group2> and <group3> you must specify <other> as API key
 
 
 ## Publishing
@@ -136,16 +138,15 @@ This file is only required when the package to be published has dependencies.
 
 Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
 
-Usually you will specify just a full package ID as a dependency. If you wish to you may also specify either a URL following the http:// protocol of a zip file following the file:// protocol. 
+Usually you will specify just a full package ID as a dependency. If you wish  you may also specify either a URL following the http:// protocol or a zip file following the file:// protocol. 
 
 Notes:
 
-* Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with 400 --- bad request
+* Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with "400 --- bad request".
 
-* Specifying 
+  That is good enough a reason to use this with care. Only when messing around with packages not desiged to be published to a Tatin server on your local machine may this be used.
 
-
-If a dependecy does not exist on the same Registry as your package ⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹
+* Using the http:// protocol defeats Tatin's scan strategy: when a dependency is required Tatin will scan all defined Registries oder by their priority unless the http:// protocol is used. Again this should be used very carefully, if at all.
 
 
 ### Final step

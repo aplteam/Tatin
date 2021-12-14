@@ -2,6 +2,7 @@
 [parm]:title             = 'SemVers'
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
+[parm]:numberHeaders     = 2 3 4 5 6
 
 
 # Tatin and Semantic Versioning

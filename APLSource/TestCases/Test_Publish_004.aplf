@@ -1,0 +1,64 @@
+ r←Test_Publish_004(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;src2;zipfile2;zip2;deps;depsFilename
+ ;dir;src;body;cfg;reg;list;zipfile;zip;list2
+⍝ Publish a package with a dependency that is defined with "file://" on a Registry not managed by a server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ dir←GetTempDir ⍬
+ (src reg zip src2 zip2)←(⊂dir,'/'),¨'src' 'reg' 'zip' 'src2' 'zip2'
+ F.MkDir src reg zip src2 zip2
+
+ TC.Reg.CreateRegistry reg
+
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ body←':Namespace Test' '∇r←Hello' 'r←##.Hello.Hello' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_A'
+ cfg.version←'1.0.0'
+ cfg.source←'Test.apln'
+ TC.WritePackageConfigFile src cfg
+
+ body←':Namespace Hello' '∇r←Hello' 'r←''World''' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src2,'/Hello.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'1.2.0'
+ cfg.source←'Hello.apln'
+ TC.WritePackageConfigFile src2 cfg
+ zipfile2←TC.Pack src2 zip2
+ zip2 ⎕NCOPY src2,'/',TC.CFG_Name
+
+ src TC.Dependencies.Add'file://',zipfile2
+
+ zipfile←TC.Pack src zip
+ zip ⎕NCOPY src,'/',TC.CFG_Name
+
+ (rc msg zipFilename)←TC.PublishPackage zipfile reg
+ Assert 200=rc
+
+ →T.GoToTidyUp 1≠≢list←F.ListDirs reg
+ →T.GoToTidyUp(,⊂'Example-Package_A-1.0.0')≢{⊃,/1↓⎕NPARTS ⍵}¨list
+ →T.GoToTidyUp 3≠≢list2←F.EnforceSlash¨F.ListFiles(1⊃list),'/'
+ →T.GoToTidyUp 1≠+/'/Example-Package_A-1.0.0.zip'∘{⍺≡(-≢⍺)↑⍵}¨list2
+ depsFilename←reg,'/Example-Package_A-1.0.0/apl-dependencies.txt'
+ Assert ⎕NEXISTS depsFilename
+ deps←⊃⎕NGET depsFilename 1
+ →T.GoToTidyUp 1≠≢deps
+ →T.GoToTidyUp~⎕NEXISTS(≢'file://')↓1⊃deps
+
+ Assert 0=≢TC.LoadPackage(reg,'/Example-Package_A-1.0.0')'#.TEMP'
+ →T.GoToTidyUp'World'≢#.TEMP.Package_A.Hello.Hello
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

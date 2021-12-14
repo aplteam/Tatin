@@ -1,6 +1,6 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'Tatin behind Apache'
-
+[parm]:numberHeaders     = 2 3 4 5 6
 
 # Run Dyalog behind Apache
 

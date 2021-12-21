@@ -1,5 +1,8 @@
  mat←{parms}ListPackages uri;client;request;res;uri_;parms;registries
-⍝ `uri` must be a path to a Registry and optionally a (possibly incomplete) package ID
+⍝ `uri` must be one of:
+⍝  * A path to a Registry and optionally a (possibly incomplete) package ID
+⍝  * A path to an install folder (must host a file apl-buildlist.json)
+⍝ For the latter all installed packages are listed together with a Boolean that marks principal packages with a 1.
 ⍝ By default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.\\
 ⍝ `r` is a matrix with two columns.\\
 ⍝ `[;2]` carries the number of major versions.\\
@@ -27,6 +30,8 @@
  'No (valid) Registry specified?!'Assert 0<≢uri_
  :If Reg.IsHTTP uri_
      mat←parms ListPackages_ uri_
+ :ElseIf IsInstallFolder uri_
+     mat←ListPackagesInInstallFolder uri_
  :Else
      mat←Reg.ListPackages uri_ parms
  :EndIf

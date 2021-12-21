@@ -1,22 +1,25 @@
- r←SendCrashMail INI;parms;myServer;srv;convert;domain;folder;list;filename;rc;msg
+ r←SendCrashMail INI;parms;myConnection;mailParms;convert;domain;rc;msg;log;folder;list;filename;S
 ⍝ The idea is to have a GMail address dedicated for http://[test].tatin.dev
 ⍝ but we use this only to logon the Google's SMTP server: the address is not monitored.
 ⍝ The real consignees are listed as "To". That way we don't have to be particularly
 ⍝ concerned regarding the password.
+ r←⍬
  :If INI.Get'EMAIL:active'
-     srv←⎕NS''
-     srv.Server←⊃INI.Get'EMAIL:SMTP_Server'
-     srv.Port←⊃INI.Get'EMAIL:Port'
-     srv.From←⊃INI.Get'EMAIL:From'
-     srv.Userid←⊃INI.Get'EMAIL:To'
-     srv.Password←⊃INI.Get'EMAIL:Password'
-     (rc msg myServer)←srv SendMail'' ⍝ create the server instance
-     parms←⎕NS''
+     S←##.##.SMTP
      convert←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⊆⍵}
-     parms.To←⊃INI.Get'EMAIL:To'
-     parms.CC←convert⊃INI.Get'EMAIL:CC'
+     parms←⎕NEW S.ConnectionParameters
+     parms.Server←⊃INI.Get'EMAIL:SMTP_Server'
+     parms.Port←⊃INI.Get'EMAIL:Port'
+     parms.Userid←⊃INI.Get'EMAIL:To'
+     parms.Password←⊃INI.Get'EMAIL:Password'
+     myConnection←⎕NEW S.Connection(,⊂parms)
+     mailParms←⎕NEW S.MailParameters
+     mailParms.From←'do-not-reply@tatin.dev'
+     mailParms.To←⊃INI.Get'EMAIL:To'
+     mailParms.CC←convert⊃INI.Get'EMAIL:CC'
      domain←⊃INI.Get'EMAIL:Domain'
-     parms.Subj←domain,' has crashed'
+     mailParms.Subject←domain,' has crashed'
+     mailParms.Body←'Test E-mail' ⍝ Can also be a vector of text vectors
      parms.Body←⊃INI.Get'EMAIL:Body'
      parms.Body←'<DOMAIN>'⎕R domain⊣parms.Body
      parms.Body,←⎕UCS 13 10
@@ -25,8 +28,11 @@
          filename←⊃¯1↑list
          parms.Attachments←⊂filename'text/html'
      :EndIf
-     r←myServer SendMail parms
- :Else
-     r←⍬
+     (rc msg log)←myConnection.Send mailParms
+     :If 0=rc
+         r←'Email was sent successfully'
+     :Else
+         r←'Failed with rc=',(⍕rc),'; ',¯1↓(⊆msg),¨⎕UCS 13
+     :EndIf
  :EndIf
 ⍝Done

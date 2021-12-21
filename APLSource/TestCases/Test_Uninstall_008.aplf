@@ -1,0 +1,29 @@
+ r←Test_Uninstall_008(stopFlag batchFlag);⎕TRAP
+ ;dir;dir2;oldDependencies;oldBuildlist;msg;list;oldPkgList;newPkgList;newBuildlist;newDependencies
+⍝ Uninstall a package that has no dependencies
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ dir ⎕NCOPY'TestData/UnInstall5/'
+ dir2←dir,'/UnInstall5'
+ oldDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
+ oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
+ oldPkgList←F.ListDirs dir2,'/'
+
+ (list msg)←TC.UnInstallPackage dir2'aplteam-Execute-3.0.2'
+ →T.GoToTidyUp('aplteam-Execute-3.0.2' 'aplteam-APLTreeUtils2-1.1.1')≢list
+ →T.GoToTidyUp 0≠≢msg
+
+ newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
+ newBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
+ newPkgList←F.ListDirs dir2,'/'
+ →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
+ →T.GoToTidyUp 2≠-/≢¨oldPkgList newPkgList
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

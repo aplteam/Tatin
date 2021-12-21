@@ -1,0 +1,17 @@
+ r←ListPackagesInInstallFolder path;json;buff;list
+⍝ Takes a path to a folder that must host a file "apl-buildlist.json" - that makes it an install folder.
+⍝ Does not necessarly list only what's in the build list, it lists all installed packages.
+⍝ Returns a matrix with zero or more rows and two columns:
+⍝  * Full package name
+⍝  * Boolean; 1 for principal packages
+ r←0 2⍴''
+ path←Reg.AddSlash path
+ :If 0<≢buff←⊃F.NGET path,'/apl-buildlist.json'
+     json←Reg.APLfromJSON buff
+ :AndIf 0<≢list←(≢path)↓¨⊃F.Dir path
+     list←list[⍋list]      ⍝ Not guaranteed to be ordered on non-Windows systems
+ :AndIf 0<≢list←(Reg.IsValidPackageID_Complete¨list)/list
+     r←list,[1.5]RemoveAlias¨list∊json.(principal/packageID)
+     r←r[⍒r[;2];]
+ :EndIf
+⍝Done

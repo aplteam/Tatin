@@ -240,11 +240,38 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>mat←{parms} ListPackages uri</code></pre>
-<p><code>uri</code> must be a path to a Registry and optionally a (possibly incomplete) package ID.</p>
-<p>By default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.</p>
+<p><code>uri</code> must be one of:</p>
+<ul>
+<li>A path to an install folder, defined by the presence of a file <code>apl-buildlist.json</code></li>
+<li>A path to a Registry and optionally a (possibly incomplete) package ID</li>
+</ul>
+<div class="h_tag">
+<a href="#Install-folder" id="Install-folder" class="autoheader_anchor">
+<h4 data-id="Install-folder">2.10.1. Install folder</h4>
+</a>
+</div>
+<p>In case an install folder was specified a two-column matrix is returned:</p>
+<table>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Carries the package IS</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>Carries a star for principal packages</td>
+</tr>
+</tbody>
+</table>
+<div class="h_tag">
+<a href="#Registry" id="Registry" class="autoheader_anchor">
+<h4 data-id="Registry">2.10.2. Registry</h4>
+</a>
+</div>
+<p>In case a Registry was specified by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.</p>
 <p>You may specify an incomplete package ID; then only matching packages are listed.</p>
 <p>You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.</p>
-<p><code>r</code> is a matrix with two columns.</p>
+<p>Returns a matrix with two columns.</p>
 <table>
 <tbody>
 <tr>
@@ -472,8 +499,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>(list msg)←UnInstallPackage (folder packageID)</code></pre>
-<p>If <code>folder</code> carries a dependency file then this function attempts to un-install the package <code>packageID</code> and all its dependencies but only in case those are neither principal packages nor required by other packages.</p>
+<p>If <code>folder</code> carries a dependency file then this function attempts to un-install the package <code>packageID</code> and all its dependencies, but those only in case they are neither principal packages nor required by other packages.</p>
 <p>Note that if <code>packageID</code> is empty a clean-up attempt is made.</p>
+<p>If a package was installed with an alias you must un-install it by specifying the alias.</p>
+<p>If a package is installed twice, once with an alias and once without, running <code>]UnInstallPackage</code> on either of them does not really un-install the package but removes just the reference to it. Only when the other one is un-installed as well is the package actually removed.</p>
 <p>To keep things simple Tatin performs the following steps:</p>
 <ol start="1">
 <li>Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.</li>

@@ -3,9 +3,9 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (rc msg res)←∆UCMD'ListPackages [local] -since=2020-05-01 -raw'
+ (rc msg res)←∆UCMD'ListPackages [local] -since=2020-05-01'
  →T.PassesIf(rc=0)∧0=≢msg
  →T.PassesIf(2=⍴⍴res)∧0<≢res
- →T.PassesIf∧/20200501≤{⍎(10↑⍵)~'-'}¨res[;2]
+ →T.PassesIf∧/20200501≤{⍎(10↑⍵)~'-'}¨3↓res[;2]
 
  r←T._OK

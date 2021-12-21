@@ -196,15 +196,27 @@ By default beta versions are considered in case the package ID is incomplete, bu
 mat←{parms} ListPackages uri
 ```
 
-`uri` must be a path to a Registry and optionally a (possibly incomplete) package ID.
+`uri` must be one of:
 
-By default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.
+* A path to an install folder, defined by the presence of a file `apl-buildlist.json`
+* A path to a Registry and optionally a (possibly incomplete) package ID
+
+#### Install folder
+
+In case an install folder was specified a two-column matrix is returned:
+
+|[;1] |Carries the package IS
+|[;2] |Carries a star for principal packages
+
+#### Registry
+
+In case a Registry was specified by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.
 
 You may specify an incomplete package ID; then only matching packages are listed.
 
 You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.
 
-`r` is a matrix with two columns.
+Returns a matrix with two columns.
 
 |[;1] | Package name
 |[;2] | Carries the number of major versions
@@ -461,10 +473,14 @@ Takes a path to a package and returns the config file for that package as a name
 ```
 
 If `folder` carries a dependency file then this function attempts to un-install the package
-`packageID` and all its dependencies but only in case those are neither principal packages nor
+`packageID` and all its dependencies, but those only in case they are neither principal packages nor
 required by other packages.
 
 Note that if `packageID` is empty a clean-up attempt is made.
+
+If a package was installed with an alias you must un-install it by specifying the alias. 
+
+If a package is installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not really un-install the package but removes just the reference to it. Only when the other one is un-installed as well is the package actually removed.
 
 To keep things simple Tatin performs the following steps:
 1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.

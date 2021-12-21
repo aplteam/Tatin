@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.33.6 - 2021-12-09
+⍝ * 0.34.0 - 2021-12-20
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -24,13 +24,13 @@
           c←⎕NS ⍬
           c.Name←'ListRegistries'
           c.Desc←'Lists all registries defined in the user settings'
-          c.Parse←'0 -raw -full'
+          c.Parse←'0 -full'
           r,←c
      
           c←⎕NS ⍬
           c.Name←'ListPackages'
-          c.Desc←'Lists all packages in the Registry specified in the argument'
-          c.Parse←'1s -raw -group= -tags= -noaggr -date -info_url -since='
+          c.Desc←'Lists all packages in the Registry or install folder specified in the argument'
+          c.Parse←'1s -group= -tags= -noaggr -date -info_url -since='
           r,←c
      
           c←⎕NS ⍬
@@ -259,9 +259,12 @@
       :EndIf
       parms.info_url←Arg.info_url
       r←⍪parms TC.ListPackages registry
-      :If 0=Arg.raw
-          :If 0=≢r
-              r←'No packages found'
+      :If 0=≢r
+          r←'No packages found'
+      :Else
+          :If TC.IsInstallFolder registry
+              r[;2]←' *'[1+r[;2]]
+              r(AddHeader)←'Package-ID' 'Principal'
           :Else
               :If 0≡parms.date
                   r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'≢ major versions'),(⊂'Info URL')
@@ -285,7 +288,7 @@
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
       '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
-      :If ~(⊂,1⎕C targetSpace)∊,¨'#' '⎕SE'
+      :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
           '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       :EndIf
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
@@ -497,19 +500,14 @@
       msg Assert 0=≢msg
     ∇
 
-    ∇ r←ListRegistries Arg;type;rawFlag
-      type←rawFlag←0
-      :If 0≢Arg.Switch'raw'
-          rawFlag←Arg.Switch'raw'
-      :EndIf
+    ∇ r←ListRegistries Arg;type
+      type←0
       :If 0≢Arg.Switch'full'
           type←Arg.Switch'full'
       :EndIf
       r←TC.ListRegistries type
-      :If ~rawFlag
-          r←((,[0.5]'URI' 'Alias' 'Port' 'Priority',(1≡type)/⊂'API-key'),[1]' ')⍪r
-          r[2;]←(⌈⌿≢¨r)⍴¨'-'
-      :EndIf
+      r←((,[0.5]'URI' 'Alias' 'Port' 'Priority',(1≡type)/⊂'API-key'),[1]' ')⍪r
+      r[2;]←(⌈⌿≢¨r)⍴¨'-'
     ∇
 
     ∇ {r}←Init Arg
@@ -687,11 +685,12 @@
       (identifier installFolder)←Arg.(_1 _2)
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
       :If ~TC.F.IsDir installFolder
-          :If 0=Arg.quiet
-          :AndIf 1 ∆YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
+          :If Arg.quiet
+          :OrIf 1 ∆YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
               'Create!'TC.F.CheckPath installFolder
           :EndIf
       :EndIf
+      ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
       r←TC.InstallPackage identifier installFolder
     ∇
 
@@ -826,10 +825,10 @@
               r,←'' '  ]Tatin.LoadTatin'
           :Case ⎕C'ListRegistries'
               r,←⊂'List URL, alias, priority and port of all Registries as defined in the user settings.'
-              r,←'' '  ]Tatin.ListRegistries [-raw] [-full]'
+              r,←'' '  ]Tatin.ListRegistries [-full]'
           :Case ⎕C'ListPackages'
-              r,←⊂'List all packages in the Registry specified.'
-              r,←'' '  ]Tatin.ListPackages <URL|[Alias]> [-group=] [-tags=] [-date] [-info_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr] [-raw]'
+              r,←⊂'List all packages in the Registry or install folder passed as argument'
+              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-date] [-info_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
           :Case ⎕C'LoadPackage'
               r,←⊂'Load the specified package and all its dependencies into the workspace.'
               r,←'' '  ]Tatin.LoadPackage <packageID|package-URL|Zip-file> [<target namespace>]'
@@ -908,15 +907,18 @@
               r,←⊂'The result is ordered by priority: the first one is scanned first etc.'
               r,←⊂'Note that Registries with a priority of 0  will not participate in a scan of Registries.'
               r,←⊂''
-              r,←⊂'-raw  By default the output is beautified; specify -raw if you want just a raw table'
               r,←⊂'-full By default all data but the API keys are listed. Specify -full if you want the'
               r,←⊂'      API keys to be listed as well.'
           :Case ⎕C'ListPackages'
-              r,←⊂'List all packages in the Registry specified. If no Registry was specified then the'
-              r,←⊂'user will be prompted for the Registry, except when there is just one anyway.'
+              r,←⊂'List all packages in the Registry or install folder specified. If no argument was specified'
+              r,←⊂'then the user will be prompted for the Registry, except when there is just one anyway.'
               r,←⊂''
               r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has not'
               r,←⊂'a trailing separator: Tatin is taking care of that.'
+              r,←⊂''
+              r,←⊂'In case an install folder was specified (rather than a registry) flags are ignored'
+              r,←⊂'In this case two columns are returned: package name and a Boolean indicating principal'
+              r,←⊂'packages with a 1.'
               r,←⊂''
               r,←⊂'By default all packages are listed. You can influence the output in several ways:'
               r,←⊂'-group={foo}  restricts the list to packages with the given group name.'
@@ -927,7 +929,6 @@
               r,←⊂'              Only packages published on that date or after are listed then.'
               r,←⊂'              Implies -date and ignores -noaggr.'
               r,←⊂'-noaggr       By default the output is aggregated. -noaggr prevents that.'
-              r,←⊂'-raw          Suppresses default beautification (column headers etc).'
           :Case ⎕C'LoadPackage'
               r,←⊂'Load the specified package and all its dependencies into the workspace.'
               r,←⊂''

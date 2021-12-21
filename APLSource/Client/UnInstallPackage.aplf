@@ -1,7 +1,8 @@
- (list msg)←UnInstallPackage(folder packageID);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;packageID_2;buildList_old;b;buildList_new;installedPkgs
+(list msg)←UnInstallPackage(folder packageID);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;packageID_2;buildList_old;b;buildList_new;installedPkgs
 ⍝ If `folder` carries a dependency file then this function attempts to un-install the package
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
 ⍝ required by other packages.\\
+⍝ A package that has an alias must be uninstalled with the alias.\\
 ⍝ Note that if `packageID` is empty a clean-up attempt is made.\\
 ⍝ To keep things simple Tatin performs the following steps:
 ⍝  1. Checks whether the package is mentioned in the dependency file. If not an error is thrown.

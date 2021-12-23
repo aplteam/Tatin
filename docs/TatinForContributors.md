@@ -18,7 +18,7 @@ This is not an introduction into how to contribute to a project that is hosted o
 ## Tatin is managed by Cider
 
 Note that Tatin is managed by the [Cider project management tool](https://github.com/aplteam/Cider).
-If you are not familiar with Cider you are advised to spend an hour or so playing with it before using it for serious work.
+If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.
 
 Though it is possible making changes to Tatin or adding code without Cider, using Cider makes this easier.
 
@@ -33,7 +33,7 @@ You need one of:
 * Linux
 * Mac-OS. 
 
-The Pi is not supported but that restriction might be lifted with a later version. AIX will not be supported.
+The Pi and AIX are not supported but that restriction might be lifted with a later version.
 
 
 ## How to work on Tatin
@@ -70,25 +70,27 @@ You are advised _not to run_ the Client and the Server in the same workspace.
 
 It is recommended to start a fresh APL session and then load Tatin into the CLEAR WS before running the test cases.
 
+Use `]Cider.OpenProject` to do this.
+
 A> ### Creating a new version
 A>
 A> Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
 A>
 A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed then naturally you want the new version to be available in `⎕SE` for execution, but that is only possible if you create a new version first.
 
-By default port 443 is used for the test cases. You may change the INI files for both server and client if that does not work for you.
+By default port 5001 is used for the test cases. You may change the INI files for both server and client if that does not work for you.
 
 In order to execute the full test suite you need to start a Tatin Server first. For that execute the following steps:
 
 1. Instantiate Dyalog Unicode 18.0 or later
 
-2. Execute this:
+2. Execute:
 
    ```
    ]Cider.OpenProject /path/to/Tatin
    ```
 
-3. Execute this:
+3. Execute:
 
    ```
    #.Tatin.TestCasesServer.RunTests
@@ -101,13 +103,13 @@ Now you are ready to execute the test suite.
 
 1. Instantiate Dyalog Unicode 18.0 or later
 
-2. Execute this:
+2. Execute:
 
    ```
    ]Cider.OpenProject /path/to/Tatin 
    ```
 
-3. Execute this:
+3. Execute:
 
    ```
    #.Tatin.TestCases.RunTests
@@ -122,6 +124,20 @@ A>
 A> If you want (or must) take advantage of the test framework's features in order to, say, hunt down a bug, then you should look into the two functions `#.Tatin.TestCases.RunTests` and `#.Tatin.TestCasesServer.RunTests`.
 A>
 A> In particular the `Prepare` function, which is called by the `RunTests` functions, is important: it instantiates the `Tester2` class as `T`, and that's the starting point for whatever you are trying to achieve.
+
+## Updating Tatin packages used by Tatin
+
+Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.
+
+For that reason the packages installed in the packages\ folder are copied over to the APLSource\ folder. That allows loading the packages with Link.
+
+If you need to add a package then you need to perform a couple of steps:
+
+* Install that package in packages\ (or packages_dev/ if its only required for the test cases)
+* Add the package to the file TatinPackages.config
+* Call `#.Tatin.Admin.UpdatePackages 1`
+
+For further details see the comments in the function `UpdatePackages`.
 
 
 ## Do your thing

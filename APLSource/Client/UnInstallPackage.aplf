@@ -1,4 +1,4 @@
-(list msg)←UnInstallPackage(folder packageID);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;packageID_2;buildList_old;b;buildList_new;installedPkgs
+ (list msg)←UnInstallPackage(folder packageID);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;packageID_2;buildList_old;b;buildList_new;installedPkgs;newPrincipalPkgs
 ⍝ If `folder` carries a dependency file then this function attempts to un-install the package
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
 ⍝ required by other packages.\\
@@ -42,7 +42,10 @@
              msg←'The very last principal package cannot be uninstalled'
              :Return
          :EndIf
-         (⊂principalPkgs~⊂packageID_2)F.NPUT pkgDepFilename 1
+         newPrincipalPkgs←principalPkgs~⊂packageID_2
+         (⊂newPrincipalPkgs)F.NPUT pkgDepFilename 1
+     :Else
+         newPrincipalPkgs←principalPkgs
      :EndIf
  :EndIf
  buildList_new←1 CompileBuildList folder
@@ -51,6 +54,7 @@
      msg←'Cannot uninstall: package has an alias assigned'
  :Else
      :If 0<≢packageID_2
+     :AndIf ~(⊂RemoveAlias packageID_2)∊RemoveAlias¨newPrincipalPkgs
          :If F.IsDir folder,RemoveAlias packageID_2
              F.RmDir folder,RemoveAlias packageID_2
              list←,⊂packageID_2

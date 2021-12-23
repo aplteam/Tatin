@@ -1,0 +1,39 @@
+ r←Test_API_009(stopFlag batchFlag);⎕TRAP
+ ;dir;dir2;oldDependencies;oldBuildlist;msg;list;oldPkgList;newPkgList;newBuildlist;newDependencies
+⍝ Exercise ⎕SE.Tatin.UnInstallPackage: un-install by alias a package that is also installed by just its package ID
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←GetTempDir''
+ dir ⎕NCOPY'TestData/UnInstall6/'
+ dir2←dir,'/UnInstall6'
+ oldDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
+ oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
+ oldPkgList←F.ListDirs dir2,'/'
+
+ (list msg)←⎕SE.Tatin.UnInstallPackage dir2'P@'
+ →T.GoToTidyUp 0≠≢list
+ →T.GoToTidyUp 0≠≢msg
+
+ newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
+ newBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
+ newPkgList←F.ListDirs dir2,'/'
+ →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
+ →T.GoToTidyUp 0≠-/≢¨oldPkgList newPkgList
+
+ (list msg)←⎕SE.Tatin.UnInstallPackage dir2'aplteam-APLProcess-0.4.1'
+ →T.GoToTidyUp~list ∆LazyMatch'aplteam-APLProcess-0.4.1' 'aplteam-APLTreeUtils2-1.1.1' 'aplteam-OS-3.0.1'
+ →T.GoToTidyUp 0≠≢msg
+
+ newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
+ newBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
+ newPkgList←F.ListDirs dir2,'/'
+ →T.GoToTidyUp 2≠-/≢¨oldDependencies newDependencies  ⍝ 2 because "OS" is a dependency
+ →T.GoToTidyUp 1≠≢newPkgList
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

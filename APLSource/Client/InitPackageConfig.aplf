@@ -16,11 +16,11 @@
      cfg.version←'0.1.0'
      cfg.io←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_io'
      cfg.ml←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_ml'
-     cfg.wx←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_wx'
      cfg.lx←''              ⍝ Function in "code" to be called when package is established in the WS; EXPERIMENTAL
      0=≢⍵:cfg
      varsList←' '~¨⍨↓cfg.⎕NL 2
      cfg←cfg.⎕NS ⍵
+     _←cfg.⎕EX'wx'          ⍝ Not anymore (since 0.61.0)
      list←(' '~¨⍨↓cfg.⎕NL 2)~' '~¨⍨↓'_'cfg.⎕NL 2    ⍝ user properties start with "_" by convention
      bool←list∊varsList,('uri' 'date')              ⍝ These are injected by the server
      ∧/bool:cfg

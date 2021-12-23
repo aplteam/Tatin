@@ -1,4 +1,4 @@
- {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;myucmds;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList
+ {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;userCommandTargetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
 ⍝ process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
@@ -52,7 +52,7 @@
      #.⎕EX¨(' '~¨⍨↓#.⎕NL⍳16)~⊂'_Tatin'
      #.⎕EX'Make_'
      0 ⎕SAVE ⎕WSID   ⍝ If this crashes, in particular with "Reference in ⎕SE points to #" or vise versa) execute ⎕OFF 123 and try again
-     (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'Tatin.dyalog'
+     (targetPath,'/Tatin')⎕NCOPY⍠('IfExists' 'Replace')⊣'Tatin.dyalog'
      'Create!'F.CheckPath targetPath,'/Tatin/Assets'
      {0=≢l←F.ListFiles ⍵:shy←0 ⋄ (targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣l}'./Assets/Runtime/' ⍝ Copy all files, if any
      dirList←F.NormalizePath F.ListDirs'./Assets/Runtime/'  ⍝ List with all sub dirs
@@ -62,24 +62,25 @@
      reg←_userSettings.GetRegistry'[tatin]'
      _userSettings.ReplaceRegistry reg
      (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'setup.dyalog.RemoveMe'
-     myucmds←#._Tatin.Client.GetMyUCMDsFolder''
-     :If 1 ##.Client.YesOrNo'Would you like to copy the Tatin client to ',myucmds
-         F.RmDir myucmds,'/Tatin'
-         F.MkDir myucmds,'/Tatin'
-         (myucmds,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣⎕WSID,'.dws'
-         :If 0=F.Exists myucmds,'/tatin.dyalog'
-             (myucmds,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣targetPath,'/tatin.dyalog'
-         :Else
-             ts1←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir myucmds,'/tatin.dyalog'
-             ts2←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir'./tatin.dyalog'
+     userCommandTargetFolder←#._Tatin.Client.GetMyUCMDsFolder''
+     :If 1 ##.Client.YesOrNo'Would you like to copy the Tatin client to ',userCommandTargetFolder
+         F.RmDir userCommandTargetFolder,'/Tatin'
+         ⎕DL 1
+         F.MkDir userCommandTargetFolder,'/Tatin'
+         (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣⎕WSID,'.dws'
+         :If F.Exists userCommandTargetFolder,'/Tatin/tatin.dyalog'
+             ts1←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir userCommandTargetFolder,'/Tatin/tatin.dyalog'
+             ts2←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir'./Tatin/tatin.dyalog'
              :If ts1≢ts2
                  :Select ⍋ts1 ts2
                  :Case 1 2
-                     (myucmds,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./tatin.dyalog'
+                     (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./tatin.dyalog'
                  :Case 2 1
-                     './'⎕NCOPY⍠('IfExists' 'Replace')⊣myucmds,'/tatin.dyalog'
+                     './'⎕NCOPY⍠('IfExists' 'Replace')⊣userCommandTargetFolder,'/Tatin/tatin.dyalog'
                  :EndSelect
              :EndIf
+         :Else
+             (userCommandTargetFolder,'/Tatin/')⎕NCOPY'./tatin.dyalog'
          :EndIf
      :EndIf
      path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
@@ -99,6 +100,7 @@
      myZip.Dispose
      zipContent←##.DotNetZip.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
+     3 ⎕NDELETE userCommandTargetFolder,'/tatin.dyalog'  ⍝ Because until 0.61.0 was released the user command script was a sibling of the Tatin/ folder
      :If batchFlag
          ⎕OFF
      :Else

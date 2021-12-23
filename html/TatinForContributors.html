@@ -23,14 +23,15 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#How-to-work-on-Tatin">3. How to work on Tatin</a></li>
 <li><a href="#Prepare-either-the-Client-or-the-Server">4. Prepare either the Client or the Server</a></li>
 <li><a href="#Execute-the-test-cases">5. Execute the test cases</a></li>
-<li><a href="#Do-your-thing">6. Do your thing</a></li>
-<li><a href="#How-to-create-new-versions">7. How to create new versions</a>
+<li><a href="#Updating-Tatin-packages-used-by-Tatin">6. Updating Tatin packages used by Tatin</a></li>
+<li><a href="#Do-your-thing">7. Do your thing</a></li>
+<li><a href="#How-to-create-new-versions">8. How to create new versions</a>
 <ul>
-<li><a href="#ov1">7.1. Overview</a></li>
-<li><a href="#Details">7.2. Details</a></li>
-<li><a href="#Create-just-a-new-Client--version">7.3. Create just a new Client (or Server) version</a></li>
+<li><a href="#ov1">8.1. Overview</a></li>
+<li><a href="#Details">8.2. Details</a></li>
+<li><a href="#Create-just-a-new-Client--version">8.3. Create just a new Client (or Server) version</a></li>
 </ul></li>
-<li><a href="#Creating-a-proofread-document">8. Creating a proofread document</a>
+<li><a href="#Creating-a-proofread-document">9. Creating a proofread document</a>
 </ul>
 </div>
 </nav>
@@ -47,7 +48,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Tatin-is-managed-by-Cider">1. Tatin is managed by Cider</h2>
 </a>
 </div>
-<p>Note that Tatin is managed by the <a href="https://github.com/aplteam/Cider" class="external_link">Cider project management tool</a>. If you are not familiar with Cider you are advised to spend an hour or so playing with it before using it for serious work.</p>
+<p>Note that Tatin is managed by the <a href="https://github.com/aplteam/Cider" class="external_link">Cider project management tool</a>. If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.</p>
 <p>Though it is possible making changes to Tatin or adding code without Cider, using Cider makes this easier.</p>
 <div class="h_tag">
 <a href="#Requirements" id="Requirements" class="autoheader_anchor">
@@ -61,7 +62,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Linux</li>
 <li>Mac-OS.</li>
 </ul>
-<p>The Pi is not supported but that restriction might be lifted with a later version. AIX will not be supported.</p>
+<p>The Pi and AIX are not supported but that restriction might be lifted with a later version.</p>
 <div class="h_tag">
 <a href="#How-to-work-on-Tatin" id="How-to-work-on-Tatin" class="autoheader_anchor">
 <h2 data-id="How-to-work-on-Tatin">3. How to work on Tatin</h2>
@@ -87,28 +88,29 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>It is recommended to start a fresh APL session and then load Tatin into the CLEAR WS before running the test cases.</p>
+<p>Use <code>]Cider.OpenProject</code> to do this.</p>
 <div class="leanpub_A">
 <h3>Creating a new version</h3>
 <p>Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version <em>before</em> you execute the test cases.</p>
 <p>The reason for this is that one group of test cases executes user commands. If they are affected by anything you've contributed then naturally you want the new version to be available in <code>⎕SE</code> for execution, but that is only possible if you create a new version first.</p>
 </div>
 
-<p>By default port 443 is used for the test cases. You may change the INI files for both server and client if that does not work for you.</p>
+<p>By default port 5001 is used for the test cases. You may change the INI files for both server and client if that does not work for you.</p>
 <p>In order to execute the full test suite you need to start a Tatin Server first. For that execute the following steps:</p>
 <ol start="1">
 <li>Instantiate Dyalog Unicode 18.0 or later</li>
-<li>Execute this:
+<li>Execute:
 <pre><code>]Cider.OpenProject /path/to/Tatin</code></pre></li>
-<li>Execute this:
+<li>Execute:
 <pre><code>#.Tatin.TestCasesServer.RunTests</code></pre>
 <p>This function changes the current directory, establishes all required references and then instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will start a Tatin server.</p></li>
 </ol>
 <p>Now you are ready to execute the test suite.</p>
 <ol start="1">
 <li>Instantiate Dyalog Unicode 18.0 or later</li>
-<li>Execute this:
+<li>Execute:
 <pre><code>]Cider.OpenProject /path/to/Tatin</code></pre></li>
-<li>Execute this:
+<li>Execute:
 <pre><code>#.Tatin.TestCases.RunTests</code></pre>
 <p>This changes the current directory, establishes all required references, instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
 </ol>
@@ -120,8 +122,22 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 
 <div class="h_tag">
+<a href="#Updating-Tatin-packages-used-by-Tatin" id="Updating-Tatin-packages-used-by-Tatin" class="autoheader_anchor">
+<h2 data-id="Updating-Tatin-packages-used-by-Tatin">6. Updating Tatin packages used by Tatin</h2>
+</a>
+</div>
+<p>Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.</p>
+<p>For that reason the packages installed in the packages\ folder are copied over to the APLSource\ folder. That allows loading the packages with Link.</p>
+<p>If you need to add a package then you need to perform a couple of steps:</p>
+<ul>
+<li>Install that package in packages\ (or packages_dev/ if its only required for the test cases)</li>
+<li>Add the package to the file TatinPackages.config</li>
+<li>Call <code>#.Tatin.Admin.UpdatePackages 1</code></li>
+</ul>
+<p>For further details see the comments in the function <code>UpdatePackages</code>.</p>
+<div class="h_tag">
 <a href="#Do-your-thing" id="Do-your-thing" class="autoheader_anchor">
-<h2 data-id="Do-your-thing">6. Do your thing</h2>
+<h2 data-id="Do-your-thing">7. Do your thing</h2>
 </a>
 </div>
 <p>Now that you have a working version of Tatin on your machine you can start contributing.</p>
@@ -129,12 +145,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is APL Team Ltd, but this might (and eventually will) change in the future of course.</p>
 <div class="h_tag">
 <a href="#How-to-create-new-versions" id="How-to-create-new-versions" class="autoheader_anchor">
-<h2 data-id="How-to-create-new-versions">7. How to create new versions</h2>
+<h2 data-id="How-to-create-new-versions">8. How to create new versions</h2>
 </a>
 </div>
 <div class="h_tag">
 <a href="#ov1" id="ov1" class="autoheader_anchor">
-<h3 data-id="ov1">7.1. Overview</h3>
+<h3 data-id="ov1">8.1. Overview</h3>
 </a>
 </div>
 <p>Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.</p>
@@ -146,7 +162,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ol>
 <div class="h_tag">
 <a href="#Details" id="Details" class="autoheader_anchor">
-<h3 data-id="Details">7.2. Details</h3>
+<h3 data-id="Details">8.2. Details</h3>
 </a>
 </div>
 <ul>
@@ -177,12 +193,12 @@ Tatin-Documentation-{major}.{minor}.{patch}.zip
 Tatin-Server-{major}.{minor}.{patch}.zip</code></pre>
 <div class="h_tag">
 <a href="#Create-just-a-new-Client--version" id="Create-just-a-new-Client--version" class="autoheader_anchor">
-<h3 data-id="Create-just-a-new-Client--version">7.3. Create just a new Client (or Server) version</h3>
+<h3 data-id="Create-just-a-new-Client--version">8.3. Create just a new Client (or Server) version</h3>
 </a>
 </div>
 <div class="h_tag">
 <a href="#ov2" id="ov2" class="autoheader_anchor">
-<h4 data-id="ov2">7.3.1. Overview</h4>
+<h4 data-id="ov2">8.3.1. Overview</h4>
 </a>
 </div>
 <p>If you have worked just on the Client or just the Server you may be inclined to save time by creating not both. and also avoid compiling the documentation.</p>
@@ -194,14 +210,14 @@ Tatin-Server-{major}.{minor}.{patch}.zip</code></pre>
 <p>Therefore, as a rule of thumb, <strong>always</strong> create both Client and Server in case you want to publish that version.</p>
 <div class="h_tag">
 <a href="#How-to" id="How-to" class="autoheader_anchor">
-<h4 data-id="How-to">7.3.2. How-to</h4>
+<h4 data-id="How-to">8.3.2. How-to</h4>
 </a>
 </div>
 <p>You may create just the client side with:</p>
 <p>Note also that</p>
 <div class="h_tag">
 <a href="#Creating-a-proofread-document" id="Creating-a-proofread-document" class="autoheader_anchor">
-<h2 data-id="Creating-a-proofread-document">8. Creating a proofread document</h2>
+<h2 data-id="Creating-a-proofread-document">9. Creating a proofread document</h2>
 </a>
 </div>
 <p>There is a function that creates a single HTML file from all the Tatin markdown documentation. That makes proofreading significantly easier:</p>

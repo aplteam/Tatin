@@ -1,0 +1,15 @@
+ r←HasDOT_NET;dt;⎕USING;notwindows;netcoreset
+⍝ Checks whether .NET is really available or not.
+ notwindows←'Win'≢3↑⊃# ⎕WG'APLVersion'
+ netcoreset←(,'1')≡2 ⎕NQ'.' 'GetEnvironment' 'DYALOG_NETCORE'
+ :Trap 0
+     :If notwindows∨netcoreset                      ⍝ Under Windows, switch selects .NET version
+         ⍝ .NET Core bridge: Lookup by name:
+         ⎕USING←',System.IO.Compression.ZipFile' ',System.IO.Compression' ',System.IO.FileSystem'
+     :Else
+         ⎕USING←',System.IO.Compression.DLL' ',System.IO.Compression.FileSystem.DLL'
+     :EndIf
+     r←0≠System.IO.Compression.ZipFileExtensions.⎕NC⊂'CreateEntryFromFile'
+ :Else
+     r←0
+ :EndTrap

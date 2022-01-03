@@ -72,7 +72,7 @@ If that's not the case it will...
 
   1. load the code into `⎕SE._Tatin`
   2. create a namespace `⎕SE.Tatin` 
-  3. establish references in `⎕SE.Tatin` pointing to the public functions in `⎕SE._Tatin`. 
+  3. establish functions in `⎕SE.Tatin` that will call the public functions in `⎕SE._Tatin`. 
 
 
 ## On `setup.dyalog`

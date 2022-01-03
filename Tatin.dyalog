@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.34.0 - 2021-12-20
+⍝ * 0.36.0 - 2022-01-03
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -13,8 +13,7 @@
       r←⍬
      
       :If IfAtLeastVersion 18
-      ⍝ Name, group, short description and parsing rules
-     
+      
           c←⎕NS ⍬
           c.Name←'LoadTatin'
           c.Desc←'Loads the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
@@ -156,7 +155,7 @@
     ∇ {r}←Run(Cmd Input);ns;flag
       :If 0=⎕SE.⎕NC'Link.Version'
       :OrIf 3>⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
-          'Tatin requires at least Link 3.0'⎕SIGNAL 98
+          'Tatin requires at least Link 3.0'⎕SIGNAL 998
       :EndIf
       :If 0=⎕SE.⎕NC'Tatin'
       :AndIf ≢/⎕C¨'LoadTatin'Cmd
@@ -221,13 +220,14 @@
 
     ∇ {r}←LoadTatin_ forceLoad;filename
       r←1
-      filename←(1⊃⎕NPARTS ##.SourceFile),'Tatin/Client.dws'
+      filename←(1⊃⎕NPARTS ##.SourceFile),'/Client.dws'
       :If 0∊⊃∘⎕SE.⎕NC¨'Tatin' '_Tatin'
       :OrIf forceLoad
-          ('Workspace not found: ',filename)⎕SIGNAL 98/⍨0=⎕NEXISTS filename
+          ('Workspace not found: ',filename)⎕SIGNAL 998/⍨0=⎕NEXISTS filename
           ⎕SE.⎕EX¨'_Tatin' 'Tatin'
           '_Tatin'⎕SE.⎕CY filename
       :EndIf
+      'Tatin requires .NET to be available' ⎕SE._Tatin.Registry.Assert ⎕SE._Tatin.Registry.HasDOT_NET
       TC←⎕SE._Tatin.Client
     ∇
 
@@ -444,7 +444,7 @@
           :EndIf
       :EndIf
      ∆Again:
-      :Trap 98
+      :Trap 998
           (rc msg zipFilename)←TC.PublishPackage source url
           :If 200≡rc
               r←'Package published on ',url_
@@ -463,7 +463,7 @@
               :Case 500
                   r←'The server ',url_,' reported an internal error'
               :Else
-                  qdmx.EM ⎕SIGNAL 98
+                  qdmx.EM ⎕SIGNAL 998
               :EndSelect
           :Else
               :If firstFlag
@@ -536,7 +536,7 @@
 
     ∇ r←ListVersions Arg;qdmx;dateFlag
       dateFlag←Arg.Switch'date'
-      :Trap 98
+      :Trap 998
           :If dateFlag
               r←dateFlag TC.ListVersions Arg._1
               r[;2]←TC.Reg.FormatFloatDate¨r[;2]
@@ -546,9 +546,9 @@
       :Else
           qdmx←⎕DMX
           :If 0=≢qdmx.EM
-              ('Not found: ',Arg._1)⎕SIGNAL 98
+              ('Not found: ',Arg._1)⎕SIGNAL 998
           :Else
-              qdmx.EM ⎕SIGNAL 98
+              qdmx.EM ⎕SIGNAL 998
           :EndIf
       :EndTrap
     ∇
@@ -625,7 +625,7 @@
                           :If 0<≢∊newData
                           :AndIf newFlag∨newData≢origData
                               ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
-                              :Trap 98
+                              :Trap 998
                                   1 TC.WritePackageConfigFile path ns
                               :Else
                                   qdmx←⎕DMX
@@ -901,7 +901,7 @@
               r,←⊂'Instead you may specify a different folder. Note that this is NOT a permanent change;'
               r,←⊂''
               r,←⊂'-permanent   Make any changes permanent'
-              r,←⊂'-force       Enforce the load even if ⎕SE.Tatin already exists.'
+              r,←⊂'-force       Enforce the load even if ⎕SE.Tatin already exists'
           :Case ⎕C'ListRegistries'
               r,←⊂'List URL, alias, priority and port of all Registries as defined in the user settings.'
               r,←⊂'The result is ordered by priority: the first one is scanned first etc.'
@@ -1265,9 +1265,9 @@
       default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
       isOkay←0
       :If ~0∊⍴default
-          'Left argument must be a scalar'⎕SIGNAL 98/⍨1≠⍴,default
+          'Left argument must be a scalar'⎕SIGNAL 998/⍨1≠⍴,default
       :AndIf ~default∊0 1
-          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 98
+          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 998
       :EndIf
       :If 0=≢default
           add←' (y/n) '
@@ -1327,7 +1327,7 @@
     ⍝ Returns an empty vector if everything is okay and an error message otherwise
       msg←''
       ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
-      :Trap 98
+      :Trap 998
           cfg2←TC.InitPackageConfig ns
           'name'TC.ValidateName ns.name
           'group'TC.ValidateName ns.group
@@ -1362,7 +1362,7 @@
       :EndTrap
     ∇
 
-    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),98}
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),998}
     AddHeader←{0=≢⍺:⍺ ⋄(⍵,[0.5]'-'⍴¨⍨≢¨⍵)⍪⍺}
     EnforceSlash←{'/'@(⍸'\'=⍵)⊣⍵}
     IsScripted←{0::1 ⋄0⊣⎕src ⍵}
@@ -1383,8 +1383,8 @@
       (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
       ⎕IO←1 ⋄ ⎕ML←1
       manyFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'manyFlag'
-      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 98/⍨2≠≡options
-      'Right argument has more than 999 items'⎕SIGNAL 98/⍨999<≢options
+      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 998/⍨2≠≡options
+      'Right argument has more than 999 items'⎕SIGNAL 998/⍨999<≢options
       flag←0
       :Repeat
           ⎕←{⍵↑'--- ',caption,((0≠≢caption)/' '),⍵⍴'-'}⎕PW-1
@@ -1481,5 +1481,5 @@
     ∇ r←CR
       r←⎕UCS 13
     ∇
-
+        
 :EndNamespace

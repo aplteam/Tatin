@@ -68,19 +68,19 @@
          ⎕DL 1
          F.MkDir userCommandTargetFolder,'/Tatin'
          (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣⎕WSID,'.dws'
-         :If F.Exists userCommandTargetFolder,'/Tatin/tatin.dyalog'
-             ts1←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir userCommandTargetFolder,'/Tatin/tatin.dyalog'
-             ts2←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir'./Tatin/tatin.dyalog'
+         :If F.Exists userCommandTargetFolder,'/Tatin/Tatin.dyalog'
+             ts1←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir userCommandTargetFolder,'/Tatin/Tatin.dyalog'
+             ts2←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir'./Tatin/Tatin.dyalog'
              :If ts1≢ts2
                  :Select ⍋ts1 ts2
                  :Case 1 2
-                     (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./tatin.dyalog'
+                     (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Tatin.dyalog'
                  :Case 2 1
-                     './'⎕NCOPY⍠('IfExists' 'Replace')⊣userCommandTargetFolder,'/Tatin/tatin.dyalog'
+                     './'⎕NCOPY⍠('IfExists' 'Replace')⊣userCommandTargetFolder,'/Tatin/Tatin.dyalog'
                  :EndSelect
              :EndIf
          :Else
-             (userCommandTargetFolder,'/Tatin/')⎕NCOPY'./tatin.dyalog'
+             (userCommandTargetFolder,'/Tatin/')⎕NCOPY'./Tatin.dyalog'
          :EndIf
      :EndIf
      path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
@@ -100,7 +100,7 @@
      myZip.Dispose
      zipContent←##.DotNetZip.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
-     3 ⎕NDELETE userCommandTargetFolder,'/tatin.dyalog'  ⍝ Because until 0.61.0 was released the user command script was a sibling of the Tatin/ folder
+     3 ⎕NDELETE userCommandTargetFolder,'/Tatin.dyalog'  ⍝ Because until 0.61.0 was released the user command script was a sibling of the Tatin/ folder
      :If batchFlag
          ⎕OFF
      :Else

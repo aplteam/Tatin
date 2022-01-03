@@ -5,7 +5,9 @@
  ∆WS_HASH←GetWorkspaceHash
  CreateAllRefs
  P←##.Plodder
- Check_DYALOG_NETCORE ⍬
+ :If 0=##.Registry.HasDOT_NET
+     'Tatin Server requires .NET to be available'⎕SIGNAL 998
+ :EndIf
  P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
  P.LogFolder←P.G.INI.Get'LOGGING:Folder'
  P.G←ProcessCredentials P.G

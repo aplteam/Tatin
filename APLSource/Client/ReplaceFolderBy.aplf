@@ -6,7 +6,7 @@
 ⍝ * Copy the contents of "new" into "old"
 ⍝ * Delete "new"
 ⍝ * Delete "temp"
- temp←'-'{~⎕NEXISTS n←⍺{(1⊃⍵),⍺,(2⊃⍵)}⎕NPARTS ⍵:n ⋄ (⍺,⍺)∇ ⍵}old
+ temp←'-'{~⎕NEXISTS n←⍺{(1⊃⍵),⍺,(2⊃⍵)}⎕NPARTS ⍵:n ⋄ (⍺,⍺)∇ ⍵}{⍵↓⍨-(¯1↑⍵)∊'/\'}old
  flag←0
  :Repeat
      :Trap 19 22
@@ -14,7 +14,7 @@
          flag←1
      :Else
          qdmx←⎕DMX
-         :If ~YesOrNo'Attempt to replace ',(2⊃⎕NPARTS old),' resulted in a ',qdmx.EM,' error; try again?'
+         :If ~YesOrNo'Attempt to replace ',old,' resulted in a ',qdmx.EM,' error; try again?'
              'Cancelled by user after error'⎕SIGNAL 98
          :EndIf
      :EndTrap

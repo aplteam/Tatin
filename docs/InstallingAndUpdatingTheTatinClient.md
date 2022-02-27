@@ -19,7 +19,7 @@ However, installing and updating is, as far as the Tatin client is concerned, _t
 
 * Dyalog version 18.0 or better
 
-* Link version 3.0.0 or better
+* Link version 3.0.8 or better
 
 Note that when you call `]Tatin.Init` Tatin will check whether those requirements are met.
 

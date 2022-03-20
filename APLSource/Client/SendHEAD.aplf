@@ -1,6 +1,9 @@
  r←SendHEAD url;request;response
  request←R.NewRequest 0
- request.RequestTarget←url
+ :If '/'∊RemoveHttpProtocol url
+     request.RequestTarget←'/',{⍵↓⍨⍵⍳'/'}RemoveHttpProtocol url
+     url←(-≢request.RequestTarget)↓url
+ :EndIf
  request.Method←'HEAD'
  :Trap 347
      response←url SendAndReceive request

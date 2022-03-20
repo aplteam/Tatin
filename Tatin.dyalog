@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.36.0 - 2022-01-03
+⍝ * 0.37.0 - 2022-03-19
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -13,7 +13,7 @@
       r←⍬
      
       :If IfAtLeastVersion 18
-      
+     
           c←⎕NS ⍬
           c.Name←'LoadTatin'
           c.Desc←'Loads the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
@@ -47,7 +47,7 @@
           c←⎕NS ⍬
           c.Name←'InstallPackage'
           c.Desc←'Install a package and all its dependencies into a given folder'
-          c.Parse←'2 -nobetas -quiet'
+          c.Parse←'1-2 -nobetas -quiet'
           r,←c
      
           c←⎕NS ⍬
@@ -227,7 +227,7 @@
           ⎕SE.⎕EX¨'_Tatin' 'Tatin'
           '_Tatin'⎕SE.⎕CY filename
       :EndIf
-      'Tatin requires .NET to be available' ⎕SE._Tatin.Registry.Assert ⎕SE._Tatin.Registry.HasDOT_NET
+      'Tatin requires .NET to be available'⎕SE._Tatin.Registry.Assert ⎕SE._Tatin.Registry.HasDOT_NET
       TC←⎕SE._Tatin.Client
     ∇
 
@@ -490,7 +490,7 @@
     ∇
 
     ∇ r←UninstallPackage Arg;path;packageID;msg
-    ⍝ Attempt to un-installe the top-level package `packageID` from the folder `path`
+    ⍝ Attempt to un-install the top-level package `packageID` from the folder `path`
       (path packageID)←Arg.(_1 _2)
       'No path specified'Assert 0≢path
       :If 0≡packageID
@@ -682,7 +682,16 @@
     ∇
 
     ∇ r←InstallPackage Arg;identifier;installFolder
+      r←''
       (identifier installFolder)←Arg.(_1 _2)
+      :If 0≡installFolder
+          :If Arg.quiet 
+          :OrIf ∆YesOrNo'No install folder was provided; install into ',TC.F.PWD,' ?'
+              installFolder←TC.F.PWD
+          :Else
+              :Return
+          :EndIf
+      :EndIf
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
       :If ~TC.F.IsDir installFolder
           :If Arg.quiet
@@ -953,7 +962,7 @@
               r,←⊂'The second argument must be the path to a folder into which the packages are'
               r,←⊂'going to be installed.'
               r,←⊂''
-              r,←⊂'-quiet: Useful for test cases etc.'
+              r,←⊂'-quiet: Useful for test cases: it prevents Tatin from interrogating the user'
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←⊂''
@@ -1017,8 +1026,7 @@
               r,←⊂''
               r,←⊂'-delete In case you want to delete the file specify the -delete flag.'
               r,←⊂''
-              r,←⊂'-quiet  Note that the -quiet flag prevents the "Are you sure?" question that is asked in'
-              r,←⊂'        conjunction with the -delete flag; this is probably only useful with test cases.'
+              r,←⊂'-quiet  Useful for test cases: it prevents Tatin from interrogating the user'
           :Case ⎕C'Pack'
               r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
               r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
@@ -1041,7 +1049,8 @@
               r,←⊂''
               r,←⊂'Tatin checks the "delete" policy of the server. If the package cannot be deleted then the user'
               r,←⊂'must confirm that she really wants to publish to that particular server.'
-              r,←⊂'-quiet: Suppresses the "Are you sure?" question (test cases).'
+              r,←⊂''
+              r,←⊂'-quiet: useful for test cases; it prevents Tatin from interrogating the user'
           :Case ⎕C'ListVersions'
               r,←⊂'List all versions of the given package. You may specify the package in two different ways:'
               r,←⊂' * [registry]{group}-{package}'
@@ -1481,5 +1490,5 @@
     ∇ r←CR
       r←⎕UCS 13
     ∇
-        
+
 :EndNamespace

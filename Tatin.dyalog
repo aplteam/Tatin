@@ -685,7 +685,7 @@
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
-          :If Arg.quiet 
+          :If Arg.quiet
           :OrIf ∆YesOrNo'No install folder was provided; install into ',TC.F.PWD,' ?'
               installFolder←TC.F.PWD
           :Else
@@ -693,6 +693,16 @@
           :EndIf
       :EndIf
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
+      :If './'≢2⍴installFolder
+      :AndIf '/'≠1⍴installFolder
+      :AndIf ~':'∊installFolder
+          :If '['=1⍴installFolder
+          :AndIf ']'∊installFolder
+              installFolder←TranslateCiderAlias installFolder
+          :Else
+              installFolder←TC.F.PWD,'/',installFolder
+          :EndIf
+      :EndIf
       :If ~TC.F.IsDir installFolder
           :If Arg.quiet
           :OrIf 1 ∆YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
@@ -701,6 +711,16 @@
       :EndIf
       ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
       r←TC.InstallPackage identifier installFolder
+    ∇
+    
+    ∇ installFolder←TranslateCiderAlias installFolder;ind;alias;list
+      ind←installFolder⍳']'
+      alias←(ind↑installFolder)~'[]'
+      installFolder←ind↓installFolder
+      list←⎕SE.Cider.ListOpenProjects 1
+      'No Cider projects found'Assert 0<≢list
+      ('Alias "',alias,'" does not define an open Cider project')Assert(⊂alias)∊list[;4]
+      installFolder←(AddSlash 2⊃list[list[;4]⍳⊂alias;]),installFolder
     ∇
 
     ∇ r←UserSettings Arg;origData;filename;ns;new;buff

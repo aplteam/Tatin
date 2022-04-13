@@ -56,14 +56,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location.</p>
 <p>Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the <code>Tatin.UserSettings</code> class. The instance is assigned to <code>⎕SE.Tatin.MyUserSettings</code>. From then on any changes to the file with an external editor <em>do not</em> affect <code>⎕SE.Tatin.MyUserSettings</code>!</p>
 <p><code>⎕SE.Tatin.MyUserSettings</code> provides a number of properties that can be questioned as well as a number of methods that can be issued in order to manipulate the user settings.</p>
-<p>This call:</p>
+<p>For example, this call:</p>
 <pre><code>      ]Tatin.Listregistries
  URI         Alias                    Port  Priority
  ----------  -----------------------  ----  --------
  tatin       https://tatin.dev/          0       100
  tatin-test  https://test.tatin.dev/     0         0
 </code></pre>
-<p>Shows most of the data that is saved in the user settings except the API key(s).</p>
+<p>shows most of the data that is saved in the user settings for registries, except the API key(s).</p>
 <p>If you would like to see the API keys as well specify the <code>-full</code> flag.</p>
 <div class="h_tag">
 <a href="#The-default-file" id="The-default-file" class="autoheader_anchor">
@@ -121,7 +121,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="What-does-Tatin-do-at-start-up-time">1.5. What does Tatin do at start-up time?</h3>
 </a>
 </div>
-<p>When Tatin is initialized[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] it creates an instance of the <code>UserSettings</code> class with the name <code>MyUserSettings</code> which lives in <code>⎕se.Tatin</code>.</p>
+<p>When Tatin is initialized[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] it creates an instance of the <code>UserSettings</code> class with the name <code>MyUserSettings</code> which lives in <code>⎕se.Tatin</code>. (Strictly speaking it lives actually in <code>⎕SE._Tatin</code>; in <code>⎕SE.Tatin</code> there is just a niladic function <code>MyUserSettings</code> that returns a reference to <code>⎕SE._Tatin.MyUserSettings</code>)</p>
 <p>If the constructor does not get a fully qualified name of the user settings file as an argument then it performs two steps:</p>
 <ol start="1">
 <li>It looks for a file <code>.tatin</code> in the user's home folder.

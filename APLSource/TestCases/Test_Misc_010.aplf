@@ -1,11 +1,11 @@
- r←Test_Misc_010(stopFlag batchFlag);⎕TRAP;dir;src;reg;body;cfg;rc;msg;zipFilename;toBeDeleted;instance;tempFolder
+ r←Test_Misc_010(stopFlag batchFlag);⎕TRAP;dir;src;reg;body;cfg;rc;msg;zipFilename;toBeDeleted;instance
 ⍝ Access assets via HOME from the instance of a class
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
  toBeDeleted←''
@@ -28,8 +28,7 @@
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- tempFolder←TC.LoadPackage(reg,'/Example-AssetAccess-1.0.0')#.TEMP
- →T.GoToTidyUp 0=≢tempFolder
+ {}TC.LoadPackage(reg,'/Example-AssetAccess-1.0.0')#.TEMP
  instance←⎕NEW #.TEMP.AssetAccess.MyClass
  →T.GoToTidyUp 3.14≠instance.PI
  →T.GoToTidyUp'Example-AssetAccess-1.0.0'≢⊃,/1↓⎕NPARTS #.TEMP.AssetAccess.MyClass.AssetFolder
@@ -38,7 +37,6 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
- Assert 0=⊃F.RmDir tempFolder
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
  F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'

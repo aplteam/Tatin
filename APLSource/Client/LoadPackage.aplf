@@ -1,6 +1,8 @@
- r←{noBetas}LoadPackage(identifier targetSpace);paths;tempFolder;loaded;qdmx
+ r←{noBetas}LoadPackage(identifiers targetSpace);paths;tempFolder;loaded;qdmx
 ⍝ Loads package `identifier` dynamically into the workspace,\\
-⍝ `identifier` must be one of:
+⍝ `identifiers` must be a simple char vector identifying one or more packages.
+⍝ Multiple packages (items) must be separated by commas.
+⍝ Every item in `identifiers` must be one of:
 ⍝ * An HTTP request for a package
 ⍝ * A ZIP file holding a package
 ⍝ * A folder holding a package (like file://C:/Temp/group-name-version)
@@ -12,18 +14,23 @@
 ⍝ start with either `#.` or `⎕SE.`.\\
 ⍝ `targetSpace` might already exist, but if it doesn't it will be created. If it exists but is not an ordinary
 ⍝ namespace an error is thrown.\\
-⍝ Loads the package into `(#|⎕SE)._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
+⍝ Loads package(s) into `(#|⎕SE)._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
 ⍝ Loads all dependencies, if any, as well into (#|⎕SE)._tatin but _not_ into `targetSpace`.\\
-⍝ Leaves no trails in the file system unless a package (or one of its dependencies) relies on file assets in
-⍝ which case the temporary directory (which is created in any case) will not be deleted.\\
-⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as ⍺.\\
-⍝ Returns the name of the temp folder in case it could not be deleted (because of assets) and '' otherwise.
- r←''
+⍝ Leaves no trails in the file system unless a) caching is on (because then any package will be cached) or
+⍝ b) a package (or one of its dependencies) relies on file assets in which case the temporary directory (which is
+⍝ created in any case) will not be deleted.\\
+⍝ By default beta versions are considered in case the package ID is incomplete; suppress them by passing 1 as ⍺.\\
+⍝ Returns the total number of packages loaded, including dependencies.
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  targetSpace←,⍕targetSpace
+ 'Target namespace must be fully qualified'Assert(⊂{1 ⎕C ⍵↑⍨¯1+⍵⍳'.'}targetSpace)∊,¨'#' '⎕SE'
+ :If ~(⊂1 ⎕C targetSpace)∊,¨'#' '⎕SE'
+     'Not a valid namespace name'Assert(⎕NC targetSpace)∊0 9
+ :EndIf
  tempFolder←F.GetTempSubDir''
+ identifiers←','(≠⊆⊢)identifiers
  :Trap 998
-     CheckAlias identifier targetSpace
+     targetSpace∘{CheckAlias ⍵ ⍺}¨identifiers
  :Else
      qdmx←⎕DMX
      ⎕DL 0.02
@@ -31,7 +38,7 @@
      qdmx.EM ⎕SIGNAL qdmx.EN
  :EndTrap
  :Trap 998
-     paths←noBetas InstallPackage identifier tempFolder
+     paths←noBetas InstallPackage(⊃{⍺,',',⍵}/identifiers)tempFolder
  :Else
      qdmx←⎕DMX
      ⎕DL 0.02
@@ -46,13 +53,15 @@
      F.RmDir tempFolder
      qdmx.EM ⎕SIGNAL qdmx.EN
  :EndTrap
- :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨F.ListDirs tempFolder
-     ⎕DL 0.02
-     F.RmDir tempFolder
+ ⎕DL 0.02
+ r←≢F.ListDirs tempFolder,'/'
+ :If ~MyUserSettings.caching
+ :AndIf 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨F.ListDirs tempFolder  ⍝ If there are no assets...
+     F.RmDir tempFolder                                 ⍝ ... then we delete the temp folder...
      :If 0<≢loaded
-         loaded.code.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'
+         loaded.code.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'     ⍝ ... and undefine "HOME".
      :EndIf
- :ElseIf 0<≢loaded
-     r←tempFolder
+ :ElseIf 0=+/≢¨loaded.code.TatinVars.HOME
+     F.RmDir tempFolder                                 ⍝ No assets, so we can get rid of it
  :EndIf
 ⍝Done

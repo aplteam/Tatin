@@ -1,0 +1,16 @@
+ r←GetPathToPackageCache;folder
+⍝ The user settings rule:
+⍝ 1. If MyUserSettings.path2cache is not empty then that path is returned, otherwise:
+⍝ 2. The function returns the standard path for caching which depends on the operating system\\
+ r←MyUserSettings.path2cache           ⍝ Then this rules the day...
+ :If 0=≢r                              ⍝ ...except when it is empty: then we take OS-specific defaults
+     folder←'tatin-package-cache'
+     :Select ⎕C 3↑1⊃#.⎕WG'APLVersion'
+     :Case 'win'
+         r←(2 ⎕NQ #'GetEnvironment' 'AllUsersProfile'),'\Dyalog\',folder
+     :Case 'lin'
+         r←'/opt/mdyalog/dyalog/',folder
+     :Case 'mac'
+         r←'/Applications/Dyalog/',folder
+     :EndSelect
+ :EndIf

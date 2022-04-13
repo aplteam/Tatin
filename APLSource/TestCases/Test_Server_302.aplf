@@ -1,10 +1,10 @@
- r←Test_Server_302(stopFlag batchFlag);⎕TRAP;dir;paths;was;localReg
+ r←Test_Server_302(stopFlag batchFlag);⎕TRAP;dir;was;localReg;res
 ⍝ Install particular package without specifying a Registry. Should find it on the test server
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
 
  localReg←TC.MyUserSettings.GetRegistry'[local]'
  was←localReg.priority
@@ -12,8 +12,8 @@
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂localReg)
  localReg.priority←was
 
- paths←TC.InstallPackage'aplteam-APLProcess-0.2.4'dir
- →T.PassesIf 1<≢paths
+ res←TC.InstallPackage'aplteam-APLProcess-0.2.4'dir
+ →T.PassesIf 1=≢res
 
  r←T._OK
 

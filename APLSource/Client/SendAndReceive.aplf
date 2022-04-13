@@ -1,7 +1,21 @@
- r←uri SendAndReceive request;client;uri_;port;⎕TRAP;msg
+ r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg
+⍝ If there is a (semi-)global ∆PermanentConnections or not makes a difference here:
+⍝ * If it exists it's supposed to hold clients for all regsitries with a priority>0
+⍝   This improved performance dramatically because the same connection can be used again
+⍝ * If it does not a new client is created, and the connection closed after the request
  request.Headers,←⊂Reg.TatinVersionAsHttpHeader
- client←NewClient uri
  msg←uri,' did not respond'
  ⎕TRAP←(345 'C'('''',uri,''' SignalNoConnection ''',msg,''''))(347 'N')(0 'S')
- r←client R.SendAndReceive request
+ :If 9=⎕NC'∆PermanentConnections'
+     uri_←1 CompileNameFromUrl uri
+ :AndIf 9=∆PermanentConnections.⎕NC uri_
+     client←∆PermanentConnections.⍎uri_
+     msg←uri,' did not respond'
+     {}client R.Send¨request      ⍝ Pipeline requests
+     r←client R.Receive¨request   ⍝ Wait for all
+ :Else
+     ⎕EX'∆PermanentConnections'   ⍝ Paranoia
+     client←NewClient uri
+     r←client R.SendAndReceive request
+ :EndIf
 ⍝Done

@@ -4,14 +4,14 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- installFolder←GetTempDir'/Installed Packages'
+ installFolder←∆GetTempDir'/Installed Packages'
  packageIDs←TC.InstallPackage'https://localhost/aplteam-FilesAndDirs-3.2.2'installFolder
 
  filename←installFolder,'/',Reg.DependenciesFilename
- →T.GoToTidyUp packageIDs≢'aplteam-FilesAndDirs-3.2.2'
+ →T.GoToTidyUp 'aplteam-FilesAndDirs-3.2.2'≢∊packageIDs
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=1⊃F.RmDir GetTempDir''
+ Assert 0=1⊃F.RmDir ∆GetTempDir''
 ⍝Done

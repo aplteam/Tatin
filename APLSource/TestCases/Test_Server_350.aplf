@@ -1,4 +1,4 @@
- r←Test_Server_350(stopFlag batchFlag);⎕TRAP;refs
+ r←Test_Server_350(stopFlag batchFlag);⎕TRAP;res
 ⍝ Load particular package via http
 ⍝ Supposed to deliver the best one
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -8,8 +8,8 @@
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
 
- refs←TC.LoadPackage'https://localhost/aplteam-APLProcess-0.2.4'#.TEMP
- →T.PassesIf 0=≢refs
+ res←TC.LoadPackage'https://localhost/aplteam-APLProcess-0.2.4'#.TEMP
+ →T.PassesIf 2=res
  →T.PassesIf 3=≢#.TEMP.APLProcess.Version
 
  r←T._OK

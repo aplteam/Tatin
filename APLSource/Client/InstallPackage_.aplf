@@ -1,26 +1,39 @@
- tempDir←InstallPackage_(packageID url);zipFilename;isHTTP
-⍝ This function fetches a package and unzips it into a temp folder.
-⍝ It is called by both `InstallPackage` and `LoadPackage`.
+ (tempDir cacheFlag)←InstallPackage_(packageID url);zipFilename;isHTTP;path
+⍝ Fetches a package and unzips it into a temp folder.
+⍝ When caching is on, the temp folder is created within the top-level of the cache folder.
+⍝ Otherwise a folder is created inside the temp directory of the given OS.
  :If isHTTP←Reg.IsHTTP url
      PrintToSession'  Fetching from ',url,'...'
      zipFilename←GetPackageViaHTTP url,packageID
  :Else
      :If '.zip'≡¯4↑url
-         zipFilename←RemoveFileProtocol RemoveFileProtocol url
+         zipFilename←RemoveFileProtocol url
      :Else
-         zipFilename←RemoveFileProtocol(RemoveFileProtocol url),'/',packageID,'.zip'
+         zipFilename←RemoveFileProtocol url,'/',packageID,'.zip'
      :EndIf
  :EndIf
  ('File <',zipFilename,'> does not exist')Assert F.IsFile zipFilename
- tempDir←Reg.GetTempDir,'/',packageID,'_',GetMD5 zipFilename
- F.RmDir tempDir
- ⎕DL 0.02
- ('Does already exist: ',tempDir)Assert 0=F.IsDir tempDir
- F.MkDir tempDir
- PrintToSession'  Unzipping ',zipFilename,'...'
- zipFilename DotNetZip.UnzipTo tempDir
+ :If MyUserSettings.caching                                                              ⍝ If caching is generally active...
+ :AndIf 0=GetNoCachingFlag url                                                           ⍝ ... and is not switched off for this particular registry...
+ :AndIf 'All'≢2⊃∆DeletePolicies[∆DeletePolicies[;1]⍳⊂url;]                               ⍝ ... and the registry does not operate an "All" delete policy ...
+ :AndIf ~Reg.IsBeta packageID                                                            ⍝ ... and the package is not a beta version...
+     cacheFlag←1
+     tempDir←GetPathToPackageCache,'/temp/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN   ⍝ ... then and only then do we write to the cache folder.
+ :Else
+     tempDir←Reg.GetTempDir,'/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN               ⍝ Otherwise to the temp folder of the OS
+     cacheFlag←0
+ :EndIf
+ :If 0=F.IsDir tempDir
+     ⎕DL 0.02
+     F.MkDir tempDir
+     PrintToSession'  Unzipping ',zipFilename,'...'
+     zipFilename DotNetZip.UnzipTo tempDir
+ :EndIf
  tempDir Add2Config'uri'(RemoveFileProtocol url)
  :If isHTTP
-     F.DeleteFile zipFilename   ⍝ Then it is a temporay zipfile
+     :If cacheFlag
+         tempDir←MovePackageToCache tempDir url packageID
+     :EndIf
+     F.DeleteFile zipFilename
  :EndIf
 ⍝Done

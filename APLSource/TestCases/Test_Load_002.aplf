@@ -1,12 +1,12 @@
- r←Test_Load_002(stopFlag batchFlag);⎕TRAP
- ;dir;src;zip;body;cfg;zipfile;refs
+ r←Test_Load_002(stopFlag batchFlag);⎕TRAP;noOf
+ ;dir;src;zip;body;cfg;zipfile
 ⍝ Pack a package into a ZIP file and then load it but specify an alias
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src zip
 
@@ -19,12 +19,12 @@
  TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src zip
 
- refs←TC.LoadPackage('Foo@file://',zipfile)#.TEMP
+ noOf←TC.LoadPackage('Foo@file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Foo.⎕NC'PI'
  →T.PassesIf 3.14=#.TEMP.Foo.PI
  →T.PassesIf 0<≢#.TEMP.Foo.##.TatinVars.URI
  →T.PassesIf 0=≢#.TEMP.Foo.##.TatinVars.HOME
- →T.PassesIf 0=≢refs
+ →T.PassesIf 0<noOf
 
  r←T._OK
 

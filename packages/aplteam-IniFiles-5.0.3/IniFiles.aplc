@@ -15,11 +15,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'IniFiles' '5.0.2+20' '2021-03-02'
+      r←'IniFiles' '5.0.3+22' '2022-04-13'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 5.0.3
+      ⍝   * `GetIniFiles` did not work under Linux/Mac-OS
+      ⍝   * Now managed by Cider
       ⍝ * 5.0.2
       ⍝   * Package config file corrected
       ⍝ * 5.0.1
@@ -45,10 +48,9 @@
       :Access Public Shared
     ⍝ Returns a list of INI files.\\
     ⍝ Let's assume that "foo.ini" ←→ filename. Let's also assume that the current computer's name is "JohnDoe".
-    ⍝ Finally let's a ssumes that there are two INI files in the current directory:
+    ⍝ Finally let's assume that there are two INI files in the current directory:
     ⍝ * foo.ini
-    ⍝ * foo_johndoe.ini
-    ⍝
+    ⍝ * foo_johndoe.ini\\
     ⍝ Then `GetIniFiles` returns:\\
     ⍝ `'foo.ini' 'foo_johndoe,ini' ← #.IniFiles.GetIniFiles`\\
     ⍝ If there is no file foo_johndoe.ini however then the result is:\\
@@ -1187,7 +1189,11 @@
       }
 
     ∇ r←GetComputerName
-      r←2 ⎕NQ'#' 'GetEnvironment' 'Computername'
+      :If 'Win'≡A.GetOperatingSystem ⍬
+          r←2 ⎕NQ'#' 'GetEnvironment' 'Computername'
+      :Else
+          r←⊃⎕SH'uname -n'
+      :EndIf
     ∇
 
     ∇ r←Timestamp2Float ts

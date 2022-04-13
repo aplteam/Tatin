@@ -1,0 +1,13 @@
+ r←Test_API_066(stopFlag batchFlag);⎕TRAP;res
+⍝ Exercise ⎕SE.Tatin.GetNoCachingFlag
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←TC.GetNoCachingFlag'tatin.dev'
+ →T.PassesIf res∊0 1
+
+ res←TC.GetNoCachingFlag'[tatin]'
+ →T.PassesIf res∊0 1
+
+ r←T._OK
+⍝Done

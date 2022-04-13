@@ -1,0 +1,29 @@
+ (rc report)←ClearCache dummy;path;domains;list;this;rc_;more;en;list2;this2;rc2;en2;more2
+⍝ Clears the Tatin package cache.
+⍝ Returns a two-element vector:
+⍝ [1] A 0 in case of success and 1 otherwise
+⍝ [2] A simple char vector, possibly with injected LFs (⎕UCS 10), reporting failures. Is empty when `rc` is 0.
+⍝ Because somebody/something else might just be in the process of saving a package in the cache the operation might well fail.
+⍝ For that reason it attempts to remove one package after the other.
+⍝ Any errors during RmDir are suppressed but reflected by the result.
+ rc←0 ⋄ report←''
+ path←GetPathToPackageCache
+ :If 0<≢list←F.ListDirs path,'/*'
+     list←((⊂'temp')≢¨{2⊃⎕NPARTS ⍵}¨list)/list
+     :For this :In list
+         (rc_ en more)←F.RmDir this
+         :If 0≠rc_
+             rc←1
+             report,←(this,': ',more),⎕UCS 10
+             :If 0<≢list2←F.ListDirs this,'/*'
+                 :For this2 :In list2
+                     (rc2 en2 more2)←F.RmDir this2
+                     :If 0≠rc2
+                         report,←(this2,': ',more2),⎕UCS 10
+                     :EndIf
+                 :EndFor
+             :EndIf
+         :EndIf
+     :EndFor
+ :EndIf
+ ⍝Done

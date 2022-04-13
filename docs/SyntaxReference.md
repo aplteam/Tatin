@@ -60,6 +60,13 @@ Returns a matrix with five columns:
 |[;5] |URL the latest version was found but empty in case it's identical with [;3]
 
 
+### ClearCache
+```
+(rc report)←ClearCache dummy
+```
+
+Clears the cache, meaning that all sub directories but `temp\` are removed from the folder `GetPathToPackageCache` points to.
+
 ### CreateReInstallParms 
 
 ```
@@ -118,6 +125,30 @@ This function requires the version number to be fully specified.
 
 Note that the function accepts an optional left argument, but this should not be specified by a user: it is only used internally.
 
+### GetNoCachingFlag
+
+```
+flag←GetNoCachingFlag uri
+```
+
+Take a URI or an alias and tries to find that URI in the `MyUserSettings` instance.
+If found the value of the `noCaching` property is returned. 
+
+If URI is not found a 0 is returned.
+
+
+### GetPathToPackageCache
+```
+r←GetPathToPackageCache
+```
+
+The user settings rule:
+
+* If `MyUserSettings.path2cache` is not empty then that path is returned, otherwise:
+
+* The function returns the standard path for caching which depends on the operating system
+
+
 ### GetUserHomeFolder    
 
 ```
@@ -171,12 +202,14 @@ Returns a namespace with default values useful for the function [`InitialisePack
 ### InstallPackage       
 
 ```
-r←{noBetas} InstallPackage(identifier targetFolder)
+r←{noBetas} InstallPackage(identifiers targetFolder)
 ```
 
-Install package `identifier` in `targetFolder`.
+Installs one or more packages (`identifiers` ) in `targetFolder`.
 
-`identifier` must be one of:
+`identifiers` must be a simple character vector, specifying one or more comma-separated packages (items).
+
+Items must be one of:
 
 * an HTTP request for a package
 * a ZIP file holding a package
@@ -188,7 +221,31 @@ You may omit minor+patch or even major+minor+patch in order to install the lates
 
 By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as `⍺`.
 
-`r` is the full name of `identifier_` that is finally loaded.
+`r` is a nested vector of character vectors with the full names of all principle packages installed. The length will match the number of packages specified as `identifiers`.
+
+
+### ListCache
+```
+mat←{fullpath} Listcache uri
+```
+
+Lists the contents of the Tatin package cache. Refers to the `MyUserSettings` instance of the class `UserSettings`.
+
+`uri` might be empty of a specific domain:
+
+* In case it is empty all packages of of all domains are listed
+* In case it is a specific domain only packages of that domain are listed.
+
+The optional left argument `fullpath` defaults to 0, when just domain names and package IDs are reported.
+If it is 1 then the full paths are reported instead.
+
+The result is a vector with as many items as there are domains represented in the cache with at least one package.
+Each item is a two-element vector:
+
+ * The first item holds the url of the domain
+ * The second item holds a vector of char vectors with the package names
+
+In case the cache is empty an empty vector is returned.
 
 ### ListPackages         
 
@@ -268,7 +325,8 @@ Returns a matrix with these columns:
 |[;2] | URL
 |[;3] | Port
 |[;4] | Priority
-|[;5] | API key
+|[;5] | No-caching flag
+|[;6] | API key
 
 "type" must be either 0 or 1 or empty:
 
@@ -335,12 +393,14 @@ Returns a vector with references to the loaded packages (no dependencies, princi
 ### LoadPackage          
 
 ```
-r←{noBetas} LoadPackage(identifier targetSpace)
+r←{noBetas} LoadPackage(identifiers targetSpace)
 ```
 
-Loads a package `identifier` dynamically into the workspace,
+Loads packages dynamically into the workspace.
 
-`identifier` must be one of:
+`identifiers` must be a simple character vector specifying one or more comma-separated packages (items).
+
+Every single item must be one of:
 
 * An HTTP request for a package
 * A ZIP file holding a package
@@ -351,23 +411,17 @@ client's config file with a priority greater than 0.
 
 The first hit wins.
 
-`targetSpace`:
+`targetSpace` must be a reference or a fully qualified name of an ordinary namespace, meaning the name must start with either `#` or `⎕SE`.
 
-: Must be a reference or a fully qualified name of an ordinary namespace, meaning the name must start with either `#.` or `⎕SE.`.
+It might already exist, but if it doesn't it will be created. If it exists but is not an ordinary namespace an error is thrown.
 
-`targetSpace`:
-
-: Might already exist, but if it doesn't it will be created. If it exists but is not an ordinary namespace an error is thrown.
-
-Loads the package into `(#|⎕SE)._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`
+Loads the package(s) into `(#|⎕SE)._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`
 
 Loads all dependencies, if any, as well into `(#|⎕SE)._tatin` but _not_ into `targetSpace`.
 
-Leaves no trail in the file system unless a package (or one of its dependencies) relies on file assets, in which case the temporary directory (which is created in any case) will not be deleted.
-
 By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as `⍺`.
 
-Returns the name of the temp folder in case it could not be deleted (because the package comes with/relies on assets) and `''` otherwise.
+Returns the number of packages installed, including dependencies.
 
 ### Pack                 
 

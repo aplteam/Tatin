@@ -1,7 +1,10 @@
- bool←Ping uri;client;request;uri_;buff;qdmx;b
+ bool←{close}Ping uri;client;request;uri_;buff;qdmx;b;last
 ⍝ Establish either whether...
 ⍝ * the host is up and running (with very little overhead) in case it is an http[s] request
 ⍝ * the folder uri is pointing to exists
+⍝ `close` defaults to 0. This has an effect in case ∆PermanentConnections is used:
+⍝ If then a 1 is passed as ⍺ then `Ping` makes sure that the server is told to close the connection.
+ close←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'close'
  bool←0
  :If ∧/'[]'∊uri
      uri_←ReplaceRegistryAlias uri
@@ -14,14 +17,33 @@
      :Else
          request←R.NewRequest 0
          request.RequestTarget←'/ping'
-         client←NewClient uri_
-         client.ClientTimeout←4
-         :Trap 345
-             buff←client R.SendAndReceive request
-             bool←1
+         :If 0=⎕NC'∆PermanentConnections'
+         :OrIf 9≠∆PermanentConnections.⎕NC 1 CompileNameFromUrl uri_
+             client←NewClient uri_
+             client.ClientTimeout←4
+             :Trap 345
+                 buff←client R.SendAndReceive request
+                 bool←1
+             :Else
+                 ⍝ Just for debugging
+             :EndTrap
          :Else
-             ⍝ Just for debugging
-         :EndTrap
+             client←∆PermanentConnections.⍎1 CompileNameFromUrl uri_
+             :Trap 345
+                 :If close
+                     last←↑⌽request                         ⍝ Last Messasge
+                     last.Headers,←⊂'Connection' 'close'    ⍝ Let server know
+                     {}client R.Send request
+                     ⍝ No receive here - we are not interested in the result!
+                 :Else
+                     {}client R.Send request                ⍝ Pipeline requests
+                     buff←client R.Receive request          ⍝ Wait for all
+                 :EndIf
+                 bool←1
+             :Else
+                 ⍝ Just for debugging
+             :EndTrap
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

@@ -34,6 +34,7 @@
      parms.projectSpace←'_Tatin'
      parms.suppressLX←1
      parms.checkPackageStatus←0
+     parms.quietFlag←1
      Assert ⎕SE.Cider.OpenProject parms
      {}⎕SE.Cider.CloseProject''
      #._Tatin.⎕EX¨'Server' 'Todo' 'TestCases' 'Simu' 'TestCasesServer' 'Tester2' 'CodeCoverage'
@@ -52,7 +53,14 @@
      #.⎕EX¨(' '~¨⍨↓#.⎕NL⍳16)~⊂'_Tatin'
      #.⎕EX'Make_'
      0 ⎕SAVE ⎕WSID   ⍝ If this crashes, in particular with "Reference in ⎕SE points to #" or vise versa) execute ⎕OFF 123 and try again
-     (targetPath,'/Tatin')⎕NCOPY⍠('IfExists' 'Replace')⊣'Tatin.dyalog'
+     userCommandTargetFolder←#._Tatin.Client.GetMyUCMDsFolder''
+     :If F.IsFile userCommandTargetFolder,'/Tatin/Tatin.dyalog'
+     :AndIf (userCommandTargetFolder,'/Tatin/Tatin.dyalog')F.YoungerThan'./APLSource/Tatin.dyalog'
+     :AndIf ≢/{⊃⎕NGET ⍵}¨'./APLSource/Tatin.dyalog'(userCommandTargetFolder,'/Tatin/Tatin.dyalog')
+     :AndIf 1 ##.Client.YesOrNo'It appears that "Tatin.dyalog" in MyUCMDs/ is younger than the one in the project; copy over?'
+         './APLSource/Tatin.dyalog'⎕NCOPY⍠('IfExists' 'Replace')⊣userCommandTargetFolder,'/Tatin/Tatin.dyalog'
+     :EndIf
+     (targetPath,'/Tatin')⎕NCOPY⍠('IfExists' 'Replace')⊣'./APLSource/Tatin.dyalog'
      'Create!'F.CheckPath targetPath,'/Tatin/Assets'
      {0=≢l←F.ListFiles ⍵:shy←0 ⋄ (targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣l}'./Assets/Runtime/' ⍝ Copy all files, if any
      dirList←F.NormalizePath F.ListDirs'./Assets/Runtime/'  ⍝ List with all sub dirs
@@ -62,26 +70,12 @@
      reg←_userSettings.GetRegistry'[tatin]'
      _userSettings.ReplaceRegistry reg
      (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'setup.dyalog.RemoveMe'
-     userCommandTargetFolder←#._Tatin.Client.GetMyUCMDsFolder''
      :If 1 ##.Client.YesOrNo'Would you like to copy the Tatin client to ',userCommandTargetFolder
          F.RmDir userCommandTargetFolder,'/Tatin'
          ⎕DL 1
          F.MkDir userCommandTargetFolder,'/Tatin'
          (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣⎕WSID,'.dws'
-         :If F.Exists userCommandTargetFolder,'/Tatin/Tatin.dyalog'
-             ts1←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir userCommandTargetFolder,'/Tatin/Tatin.dyalog'
-             ts2←' -:,./'~⍨##.APLTreeUtils2.FormatDateTime⊃⊃('type' 3)F.Dir'./Tatin/Tatin.dyalog'
-             :If ts1≢ts2
-                 :Select ⍋ts1 ts2
-                 :Case 1 2
-                     (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Tatin.dyalog'
-                 :Case 2 1
-                     './'⎕NCOPY⍠('IfExists' 'Replace')⊣userCommandTargetFolder,'/Tatin/Tatin.dyalog'
-                 :EndSelect
-             :EndIf
-         :Else
-             (userCommandTargetFolder,'/Tatin/')⎕NCOPY'./Tatin.dyalog'
-         :EndIf
+         (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./APLSource/Tatin.dyalog'
      :EndIf
      path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
      :If 0=F.IsFile path
@@ -91,7 +85,7 @@
      F.DeleteFile¨F.Dir'Dist/Tatin-Client-*.zip'
      zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),''),'.zip'
      ⎕DL 0.1
-     fileList←'recursive'F.ListFiles targetPath,'\'
+     fileList←'recursive'F.ListFiles targetPath,'/'
      fileList←F.EnforceSlash¨(1+≢targetPath)↓¨fileList
      myZip←⎕NEW ##.DotNetZip(,⊂zipFilename)
      targetPath myZip.Add fileList

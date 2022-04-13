@@ -1,9 +1,16 @@
- GetMD5←{
- ⍝ Takes a filename and returns an MD5 hash for that file.
-     ('File does not exist: ',⍵)Assert F.Exists ⍵:
-     os←⊃⊃'.'⎕WG'APLVersion'
-     os≡'M':⊃⎕SH'md5 -q ',⍵
-     os≡'W':2⊃⎕SH'certutil.exe -hashfile ',⍵,' MD5'   ⍝ Tolerates slash in path
-     os≡'L':{⍵↑⍨¯1+⍵⍳' '}⊃⎕SH'md5sum ',⍵
+ md5←GetMD5 filename;os;buff
+ ('File does not exist: ',filename)Assert F.Exists filename
+ os←⊃⊃'.'⎕WG'APLVersion'
+ :Select os
+ :Case 'M'
+     md5←⊃⎕SH'md5 -q ',filename
+ :Case 'L'
+     md5←{⍵↑⍨¯1+⍵⍳' '}⊃⎕SH'md5sum ',filename
+ :Case 'W'
+     buff←⎕SH'certutil.exe -hashfile ',filename,' MD5'   ⍝ Tolerates slash in path
+     ('Cannot create MD5 for ',filename)Assert~∨/'-hashfile command completed successfully '⍷∊buff
+     md5←2⊃buff
+ :Else
      'Something is very wrong here'⎕SIGNAL 11
- }
+ :EndSelect
+⍝Done

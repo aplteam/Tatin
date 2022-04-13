@@ -6,7 +6,7 @@
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
  F.MkDir src2←src,'/package_A'
@@ -50,7 +50,7 @@
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- installFolder←GetTempDir'/Tatin_AppPackages'
+ installFolder←∆GetTempDir'/Tatin_AppPackages'
  refs←TC.InstallPackage('[local2]Example-B-1.0.0')installFolder
  expected←'Example-A-1.0.0' 'Example-B-1.0.0' 'Example-Arithmetic-1.0.0'
  →T.GoToTidyUp~expected ∆LazyMatch TC.GetPackageIDFromFilename¨F.ListDirs installFolder,'/*'

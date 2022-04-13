@@ -6,7 +6,7 @@
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  src2←src,'/Example-Constants-0.1.0/'
  src3←src,'/Example-MyMath-0.2.0/'
@@ -60,11 +60,11 @@
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- installFolder←GetTempDir'/Tatin_AppPackages'
+ installFolder←∆GetTempDir'/Tatin_AppPackages'
  res1←TC.InstallPackage('[local2]Example-MyMath-0.2.0')installFolder
- →T.GoToTidyUp res1≢'Example-MyMath-0.2.0'
+ →T.GoToTidyUp(∊res1)≢'Example-MyMath-0.2.0'
  res2←TC.InstallPackage('[local2]Example-MyTests-0.3.0')installFolder
- →T.GoToTidyUp res2≢'Example-MyTests-0.3.0'
+ →T.GoToTidyUp(∊res2)≢'Example-MyTests-0.3.0'
 
  →T.GoToTidyUp 3≠+/F.IsDir⊃F.Dir installFolder,'/*'
  →T.GoToTidyUp 2≠≢TC.Dependencies.Get installFolder

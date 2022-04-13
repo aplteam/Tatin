@@ -67,6 +67,8 @@
       F←home.F ⋄ A←home.A
       _source←''
       _registries←⍬
+      _caching←1
+      _path2cache←''
     ∇
 
     :Property source
@@ -93,7 +95,7 @@
     :EndProperty
 
     :Property fileTimestamp
-    ⍝ Returns the file timestamp. Used to detect changes maed in one way or another.
+    ⍝ Returns the file timestamp. Used to detect changes made in one way or another.
     :Access Public Instance
         ∇ r←get
           r←_fileTimestamp
@@ -115,6 +117,33 @@
     :Access Public Instance
         ∇ r←get
           r←GetJSON5
+        ∇
+    :EndProperty
+
+    :Property caching
+    ⍝ A Boolean that decides whether packages that are loaded or installed are saved to
+    ⍝ or read from the Tatin cache.
+    :Access Public Instance
+        ∇ r←get
+          r←_caching
+        ∇
+        ∇ set val
+          'Invalid: must be a Boolean'Assert(⊂val.NewValue)∊0 1
+          _caching←val.NewValue
+        ∇
+    :EndProperty
+
+    :Property path2cache
+    ⍝ Defines the path where the Tatin package cache lives.
+    ⍝ If this is empty then the path is established with defaults that depend on the operating system
+    :Access Public Instance
+        ∇ r←get
+          r←_path2cache
+        ∇
+        ∇ set val
+          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
+          _path2cache←val.NewValue
         ∇
     :EndProperty
 
@@ -177,6 +206,7 @@
           :EndIf
       :EndIf
       buff.uri←AddSlash buff.uri
+      buff.noCaching←registry.noCaching  ⍝ Why exactly is this required?!  ⍝TODO⍝ 
       _registries,←buff
     ∇
 
@@ -187,12 +217,12 @@
       :Access Public Instance
       rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
       '⍵ must be a Boolean'Assert(⊂rawFlag)∊0 1
-      r←↑registries.(alias uri port priority api_key)
+      r←↑registries.(alias uri port priority noCaching api_key)
       :If (,1)≢,showApiKey
-          r[;5]←⊂'***'          ⍝ Replace API key by Asterisks
+          r[;6]←⊂'***'          ⍝ Replace API key by Asterisks
       :EndIf
       :If ~rawFlag
-          r←((,[0.5]'Alias' 'URI' 'Port' 'Priority' 'API-key'),[1]' ')⍪r
+          r←((,[0.5]'Alias' 'URI' 'Port' 'Priority' '~caching' 'API-key'),[1]' ')⍪r
           r[2;]←(⌈⌿≢¨r)⍴¨'-'
       :EndIf
     ⍝Done
@@ -307,6 +337,8 @@
       ns←⎕NS''
       ns.registries←_registries
       ns.source←_source
+      ns.caching←_caching
+      ns.path2cache←_path2cache
       r←home.Reg.JSON ns
     ∇
 
@@ -327,7 +359,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←Read dummy;ns
+    ∇ {r}←Read dummy;ns;b
     ⍝ Reads the Client's config file
       r←⍬
       ns←⎕NS home.Reg.GetJsonFromFile path2config
@@ -339,8 +371,8 @@
           :If 1
               _registries←ns.registries[⍋ns.registries.priority]
           :Else
-              ⍝TODO⍝
-              ⍝ This avoids an orphaned reference lingering around but at the same time it leads 
+              ⍝TODO⍝ One day
+              ⍝ This avoids an orphaned reference lingering around but at the same time it leads
               ⍝ to a ref into # from ⎕SE because ⎕JSON does not allow something like #.⎕JSON (yet)
               _registries←⎕SE.⎕JSON⍣2 ns.registries[⍋ns.registries.priority]  ⍝ To avoids creating an orphaned ref once `ns` disappears (14888, <01851>)
           :EndIf
@@ -349,6 +381,9 @@
       :EndIf
       _registries.alias←_registries.alias~¨' '
       _fileTimestamp←GetFileTimestamp _path2config
+      :If 0<+/b←0=⊃¨_registries.⎕NC⊂'noCaching'
+          (b/_registries).{⎕THIS.noCaching←⍵}0  ⍝ Was introduced in 0.63.0
+      :EndIf
     ∇
 
     ∇ r←GetFileTimestamp filename

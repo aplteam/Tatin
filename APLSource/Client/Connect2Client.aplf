@@ -1,0 +1,17 @@
+ {r}←Connect2Client url;ref
+⍝ Use this for creating a global namespace "∆PermanentConnections" and populate it with variables constructed
+⍝ from their URLs, holding a client that can be used for multiple requests without closing the connection in between.
+⍝ When the job is done call:   CloseConnections ∆PermanentConnections
+⍝ Returns 0 when the client was already established and 1 otherwise.
+ r←0
+ :If IsHTTP url
+     :If 0=⎕NC'∆PermanentConnections'
+         ∆PermanentConnections←⎕NS''
+     :EndIf
+     :If 0=∆PermanentConnections.⎕NC 1 CompileNameFromUrl url
+         ref←⎕THIS ∆PermanentConnections.{⍎(1 ⍺.CompileNameFromUrl ⍵),'←⍺.NewClient ⍵'}url
+         {}ref R.Connect 0
+         r←1
+     :EndIf
+ :EndIf
+⍝Done

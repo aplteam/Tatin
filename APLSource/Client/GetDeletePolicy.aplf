@@ -1,4 +1,4 @@
- r←GetDeletePolicy uri;request;res;uri_
+ r←GetDeletePolicy uri;request;res;uri_;client;buff
 ⍝ Takes a URI of a server (like https://tatin.dev) and returns the delete policy operated by the given server.
  uri_←ReplaceRegistryAlias uri
  'No URI provided'Assert 0<≢uri_
@@ -6,13 +6,10 @@
      request←R.NewRequest 0
      request.RequestTarget←'/v1/delete-policy'
      request.Headers,←⊂'Accept' 'text/html'
-     res←uri_ SendAndReceive request
+     res←SendAndReceive uri_ request
      :If 200≠res.StatusCode
-         :If 0<≢res.Content
-             ('Server: ',res.Content)Assert 0
-         :Else
-             ('Failed with status code ',⍕res.StatusCode)Assert 0
-         :EndIf
+         ('Server: ',res.Content)Assert 0<≢res.Content
+         ('Failed with status code ',⍕res.StatusCode)Assert 0
      :EndIf
      r←res.Content
  :Else

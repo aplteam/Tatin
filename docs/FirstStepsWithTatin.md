@@ -167,7 +167,7 @@ You will probably see different version numbers here.
 
 #### The build list
 
-The build list will be used to get all required packages into the workspace. This is how the build list looks so far:
+The build list will be used to get all required packages into the workspace. This is how the build list looks like so far:
 
 ```
 {
@@ -273,7 +273,7 @@ The command prints to the session the name of the namespace into which the packa
 #._tatin.aplteam_MarkAPL_11_0_1.code.MarkAPL
 ```
 
-But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries two variables:
+But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries several variables, among them these:
 
 * `HOME` carries the path to the directory where the package was loaded from
 * `ASSETS` holds the path to the assets relative to `HOME`.
@@ -306,22 +306,26 @@ All packages, whether principal ones or dependencies, are stored in `#._tatin`. 
 
 Note that by naming convention packages are always loaded into either `#._tatin` or `⎕SE._tatin`.
 
+### Installing several packages at once
+
+Note that `InstallPackage` accepts several package IDs, separated by commas:
+
+```
+      ]tatin.InstallPackage Tester2,MarkAPL,Laguntza /Foo/packages
+```
+
+This will load three packages and all their dependencies at once. You might find this significantly faster than installing them one-by-one.
 
 ### Checking out a package: `LoadPackage`
 
-Let's assume that before actually installing it you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it but just to load it into the workspace. 
+Let's assume that before actually installing it you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace. 
 
-That can be achieved with the `LoadPackage` user command. It loads the package into the workspace and leaves no trail in the file system if that can be avoided, which means if it has no assets.
+That can be achieved with the `LoadPackage` user command. It loads the package into the workspace.
 
-A> ### Leaving a trace on the file system
-A>
-A> In case the package has file dependencies (assets), like DLLs, images, CSS files and what not, then those will be saved in a specific package-dependent directory within the temp directory of your operating system, so in such cases there _is_ a footprint left on the file system.
-A>
-A> Note that this also means that loading a package only works on your local machine.
 
 Notes:
 
-* Loading a package in this way has only one purpose: to investigate it.
+* Loading a package in this way has one major purpose: to investigate it.
 
 * Loading a package might well be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case. 
 
@@ -344,11 +348,6 @@ C:\Users\username\AppData\Local\Temp\username_155648451
 ```
 
 Here we did not specify a target namespace, so the package was loaded into `#`. In case the target namespace is something like `#.MyTests` then it may or may not exist. If it does not, Tatin will create it.
-
-I> If the package or any of its dependencies depend on assets the path to a directory in the temp directory of your OS is printed to the session by `]tatin.LoadPackage`.
-I>
-I> This is because this folder cannot be deleted by Tatin. If none of the loaded packages has any assets then nothing is printed to the session, indicating that no footprint is left behind.
-
 
 Tatin has created a reference named `MarkAPL` in the target namespace `#`:
 
@@ -391,6 +390,7 @@ MarkAPL
 
 `MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For those references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
 
+Note that like `InstallPackage` you may specify more than just one package. If you do then separate them with commas.
 
 ### Misc
 

@@ -1,0 +1,10 @@
+ {r}←CloseConnections dummy;list
+⍝ Close all permanent connections defined within ∆PermanentConnections, and delete that namespace
+ r←⍬
+ :If 9=⎕NC'∆PermanentConnections'
+ :AndIf 0<≢∆PermanentConnections.⎕NL 9
+     list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
+     {}1 Ping ∆PermanentConnections.{ref←⍎¨↓⎕NL 9 ⋄ ref.⍎⊂⍵}'Host'
+     {}R.##.DRC.Close¨list.Name
+     ⎕EX'∆PermanentConnections'
+ :EndIf

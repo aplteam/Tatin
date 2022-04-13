@@ -1,11 +1,11 @@
- r←Test_Load_084(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile;refs
+ r←Test_Load_084(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile
 ⍝ Load a package that has more than just two or less hyphens (was once a bug)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src zip
 
@@ -18,12 +18,11 @@
  TC.WritePackageConfigFile src cfg
  zipfile←TC.Pack src zip
 
- refs←TC.LoadPackage('file://',zipfile)#.TEMP
+ {}TC.LoadPackage('file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Constants.⎕NC'PI'
  →T.PassesIf 3.14=#.TEMP.Constants.PI
  →T.PassesIf 0<≢#.TEMP.Constants.##.TatinVars.URI
  →T.PassesIf 0=≢#.TEMP.Constants.##.TatinVars.HOME
- →T.PassesIf 0=≢refs
 
  r←T._OK
 

@@ -1,0 +1,14 @@
+ r←Test_Cache_031(stopFlag batchFlag);⎕TRAP;res
+⍝ Load a package from the local server which also has a port number ⍝
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ res←TC.LoadPackage'https://localhost:5001/example-versions' '#.TEMP'
+ →T.PassesIf 1<≢F.ListDirs TC.GetPathToPackageCache,'/tatin.dev'
+ →T.PassesIf 0=≢F.ListDirs TC.GetPathToPackageCache,'/temp/'
+
+ →T.PassesIf 9=#.TEMP.⎕NC'versions'
+
+ r←T._OK
+⍝Done

@@ -23,5 +23,5 @@
      res←ref2.⎕FX'r←DEPENDENCIES' 'r←⍬'
      Assert/'DEPENDENCIES'make res
  :EndIf
- ref2.⎕FX'r←GetFullPath2AssetsFolder' 'r←''''' ':If 0<≢ASSETS' '    r←HOME{0=≢⍺:⍵ ⋄ ⍺,''/'',⍵}ASSETS' ':EndIf'
+ ref2.⎕FX'r←GetFullPath2AssetsFolder' 'r←''''' ':If 0<≢ASSETS' ':AndIf 0<≢HOME' 'r←HOME{0=≢⍺:⍵ ⋄ ⍺,''/'',⍵}ASSETS' ':AndIf ~⎕NEXISTS r' 'r←''''' ':EndIf'
 ⍝Done

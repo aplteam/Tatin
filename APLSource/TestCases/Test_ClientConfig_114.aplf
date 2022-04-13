@@ -1,12 +1,15 @@
- r←Test_ClientConfig_114(stopFlag batchFlag);⎕TRAP;tempDir;settings
+ r←Test_ClientConfig_114(stopFlag batchFlag);⎕TRAP;tempDir;settings;data1;data2
 ⍝ Check "json" property
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- tempDir←GetTempDir''
+ tempDir←∆GetTempDir''
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- →T.GoToTidyUp((⎕UCS 13)A.Split settings.json)≢(⊃⎕NGET(tempDir,'/tatin-client.json')1)
+ data1←⎕JSON⍠('Dialect' 'JSON5')⊣settings.json
+ data2←⎕JSON⍠('Dialect' 'JSON5')⊣⊃⎕NGET(tempDir,'/tatin-client.json')
+ →T.GoToTidyUp~∧/⊃{(⍺∊⍵)∧(⍵∊⍺)}/{⍵⍎¨(' '~⍨¨↓⍵.⎕NL 2)~⊂'registries'}¨data1 data2
+ →T.GoToTidyUp~data1.registries.uri ∆LazyMatch data2.registries.uri
 
  r←T._OK
 

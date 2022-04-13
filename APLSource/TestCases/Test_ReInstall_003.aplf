@@ -3,11 +3,11 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  res←TC.InstallPackage'[localhost]example-versions-1.0.1-That-fix'dir
- Assert'example-versions-1.0.1-That-fix'≡res
+ Assert'example-versions-1.0.1-That-fix'≡∊res
  res←TC.InstallPackage'[localhost]V@example-versions-1.0.12-zzz'dir     ⍝ Alias!
- Assert'V@example-versions-1.0.12-zzz'≡res
+ Assert'V@example-versions-1.0.12-zzz'≡∊res
  parms←TC.CreateReInstallParms
  parms.update←1
  refs←parms TC.ReInstallDependencies dir

@@ -3,14 +3,15 @@
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
 ⍝ required by other packages.\\
 ⍝ A package that has an alias must be uninstalled with the alias.\\
-⍝ Note that if `packageID` is empty a clean-up attempt is made.\\
+⍝ If `packageID` is empty a clean-up attempt is made, meaning that all packages that are not required
+⍝ anymore are removed from the install folder.\\
 ⍝ To keep things simple Tatin performs the following steps:
 ⍝  1. Checks whether the package is mentioned in the dependency file. If not an error is thrown.
 ⍝  3. Removes `packagedID` from the dependency file.
 ⍝  4. Re-compiles the build list based on the new dependency file.
 ⍝  5. Removes all packages that are not mentioned in the build list anymore\\
 ⍝ Returns a two-item vector:
-⍝ 1. List with the fully qualified names of all removed packages. Note that might carry an alias
+⍝ 1. List with the fully qualified names of all removed packages. Note that this might carry an alias
 ⍝ 2. Message, ideally empty.\\
 ⍝ Note that removing the directories hosting the packages might fail for all sorts of reasons even
 ⍝ though the package and any dependencies were already successfully removed from both the dependency

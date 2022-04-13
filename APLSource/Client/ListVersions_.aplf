@@ -8,7 +8,7 @@
      request.RequestTarget,←'?publishingdate=1'
  :EndIf
  request.Headers,←⊂'Accept' 'application/json'
- res←host SendAndReceive request
+ res←SendAndReceive host request
  :If 200=res.StatusCode
      list←⎕JSON⍠('Dialect' 'JSON5')⊣res.Content
      list←↑⍣dateFlag⊣list

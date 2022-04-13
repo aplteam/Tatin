@@ -1,4 +1,4 @@
- r←Test_Server_304(stopFlag batchFlag);⎕TRAP;dir;refs
+ r←Test_Server_304(stopFlag batchFlag);⎕TRAP;dir;noOf
 ⍝ Load particular package with just a major number.
 ⍝ Should find the best minor+patch number on the test server.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -7,8 +7,8 @@
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
 
- refs←TC.LoadPackage'https://localhost/aplteam-APLProcess-0'#.TEMP
- →T.GoToTidyUp 0≠≢refs
+ noOf←TC.LoadPackage'https://localhost/aplteam-APLProcess-0'#.TEMP
+ →T.GoToTidyUp 2≠noOf
  →T.GoToTidyUp'0.3.0'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
 
  r←T._OK

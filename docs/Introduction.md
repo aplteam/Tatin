@@ -35,15 +35,15 @@ Packages can be updated to a later (and therefore hopefully better) version in a
 
 ## Requirements
 
-* Tatin requires version 18.0 or later. It will come automatically with version 19.0 but must be installed in ealier versions.
+* Tatin requires Dyalog version 18.0 or later. It will come automatically with version 19.0 but must be installed in ealier versions.
 
 * It needs Unicode --- Classic is not supported.
 
 * The Tatin client runs on Windows, Linux and Mac-OS.
 
-* The Tatin server runs on Windows (as a Service) and on Linux (as a Docker image). and Mac-OS. 
+* The Tatin server runs on Windows (as a Service) and on Linux (as a Docker image) and Mac-OS. 
 
-* Tatin is not compatible with SALT, although the extension `.dyalog` is supported for the time being.
+* Tatin is not compatible with SALT, although the extension `.dyalog` is supported.
 
   In particular Tatin requires source files to carry exacly one APL object, be that a function, an operator, an array, a class script, an interface script or a namespace script.
 

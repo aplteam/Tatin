@@ -22,15 +22,20 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.2.1+103' '2021-10-28'
+      r←'Tester2' '3.2.3+105' '2022-04-13'
     ∇
 
     ∇ History
       :Access Public shared
+      ⍝ * 3.2.3 ⋄ 2022-04-13
+      ⍝   * Bug fix: In case an INI file is part of a test suite then under non-Windows platform it would fail prior 3.2.3
+      ⍝ * 3.2.2 ⋄ 2022-04-06
+      ⍝   * Bug fix for `exec_before_each_test` and `exec_after_each_test`:\\
+      ⍝     When the check function did not a return a result an ERROR occured.
       ⍝ * 3.2.1 ⋄ 2021-10-28
       ⍝   * Minor bug fix in GetTestTemplate: explicit result was ill-named ("r" rather than "R").
       ⍝ * 3.2.0 ⋄ 2021-10-01
-      ⍝   * `Tester2` now informs `Link` in case an APL object was changed (`RenameTestFnsTo`) under the condition 
+      ⍝   * `Tester2` now informs `Link` in case an APL object was changed (`RenameTestFnsTo`) under the condition
       ⍝     that it is at least Link 3.0 that is managing the code.
       ⍝   * New constant `NoCiderTests` introduced.
       ⍝   * The test case that is executed next is now printed to the session BEFORE its execution. Same for the GUI.
@@ -41,7 +46,7 @@
       ⍝       now always flagged with a lamp symbol (⍝).
       ⍝     * `ListTestFunctions` does not show the lamp symbol anymore.
       ⍝     * `RenameTestFnsTo` printed to the session rather than returning the messages as result.
-      ⍝     * `CodeCoverage.Finalyze` (which has been marked as deprecated for quite a while) got replaced by 
+      ⍝     * `CodeCoverage.Finalyze` (which has been marked as deprecated for quite a while) got replaced by
       ⍝       `CodeCoverage.Finalise`, finally fixing the typo.
       ⍝\\
       ⍝ For a full history (including older versions) see <https://github.com/aplteam/Tester2/releases>
@@ -520,7 +525,7 @@
       :EndIf
     ∇
 
-    ∇ ref←ProcessIniFiles(ref ps);iniFilenames;iniFilename;report;parent
+    ∇ ref←ProcessIniFiles(ref ps);iniFilenames;iniFilename;report;parent;cn
       iniFilenames←''
       iniFilename←_IniFolder,((0<≢_IniFolder)/'/'),'Testcases.ini'
       report←,⊂'Searching for INI file ',iniFilename
@@ -530,7 +535,12 @@
       :Else
           report[≢report]←⊂((≢report)⊃report),': not found'
       :EndIf
-      iniFilename←_IniFolder,((0<≢_IniFolder)/'/'),'Testcases-',(2 ⎕NQ'#' 'GetEnvironment' 'Computername'),'.ini'
+      :If 'Win'≡A.GetOperatingSystem ⍬
+          cn←2 ⎕NQ'#' 'GetEnvironment' 'Computername'
+      :Else
+          cn←⊃⎕SH'uname -n'
+      :EndIf
+      iniFilename←_IniFolder,((0<≢_IniFolder)/'/'),'Testcases-',cn,'.ini'
       report,←⊂'Searching for INI file ',iniFilename
       :If ⎕NEXISTS iniFilename
           iniFilenames,←⊂iniFilename
@@ -883,7 +893,7 @@
       :EndIf
       :If 0<≢_exec_before_each_test
           :If 0=1 1⊃⎕AT _exec_before_each_test
-              ⍎_exec_before_each_test,' ps'
+              ⍎_exec_before_each_test,' fnsName ps'
           :Else
               :If 0<≢buff←⍎_exec_before_each_test,' fnsName ps'
                   ⎕←buff
@@ -893,7 +903,7 @@
      ∆StopHere:rc←ref.⍎fnsName,' ',(⍕ps.debugFlag),' ',(⍕ps.batchFlag)
       :If 0<≢_exec_after_each_test
           :If 0=1 1⊃⎕AT _exec_after_each_test
-              ⍎_exec_after_each_test,' ps'
+              ⍎_exec_after_each_test,' fnsName ps'
           :Else
               :If 0<≢buff←⍎_exec_after_each_test,' fnsName ps'
                   ⎕←buff
@@ -1487,7 +1497,7 @@
     ∇
 
     ∇ R←Test_000(stopFlag batchFlag);⎕TRAP
-⍝ Model for a test function. 
+⍝ Model for a test function.
 ⍝ *** Watch out: assumes that the instance of Tester2 is called "T".
       ⎕TRAP←(999 'C' '∘∘∘ ⍝ Deliberate error')(0 'N')
       R←T._Failed
@@ -1497,7 +1507,7 @@
       →T.PassesIf 1≡1
       →T.FailsIf 1≢1
       →T.GoToTidyUp 1≢1
-
+     
       R←T._OK
      
      ∆TidyUp: ⍝ Clean up after this label

@@ -1,0 +1,22 @@
+ r←Test_Cache_999(stopFlag batchFlag);⎕TRAP;tno;report;rc;filename
+⍝ Clear the Tatin package cache
+⍝ Must be executed as the very last cache-related test case because nothing will be left in the cache
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ filename←TC.GetPathToPackageCache,'/tatin.dev/aplteam-OS-3.0.1/apl-dependencies.txt'
+ tno←filename ⎕NTIE 0 16 ⍝ Exclusive tie, preventing deletion!
+ (rc report)←TC.ClearCache''
+ →T.GoToTidyUp 0=rc
+ →T.GoToTidyUp 0=+/'aplteam-OS-3.0.1'⍷report
+
+ ⎕NUNTIE tno
+ (rc report)←TC.ClearCache''
+ →T.GoToTidyUp 0≠rc
+ →T.GoToTidyUp 0≠≢report
+
+ r←T._OK
+
+∆TidyUp:
+ :Trap 11 ⋄ {}⎕NUNTIE tno ⋄ :EndTrap
+⍝Done

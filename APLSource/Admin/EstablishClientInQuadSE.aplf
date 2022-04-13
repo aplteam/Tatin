@@ -8,15 +8,18 @@
  CreateAllRefs_Client
  ⎕SE.⎕EX'Tatin'
  ref←⍎'Tatin'⎕SE.⎕NS''
- EstablishFunctionInAPI ref'DeletePackage'
  EstablishFunctionInAPI ref'CheckForLaterVersion'
+ EstablishFunctionInAPI ref'DeletePackage'
+ EstablishFunctionInAPI ref'ClearCache'
  EstablishFunctionInAPI ref'GetDeletePolicy'
  EstablishFunctionInAPI ref'GetDependencyTree'
+ EstablishFunctionInAPI ref'GetNoCachingFlag'
+ EstablishFunctionInAPI ref'GetPathToPackageCache'
  EstablishFunctionInAPI ref'GetUserHomeFolder'
- EstablishFunctionInAPI ref'GetUserHomeFolder'
- EstablishFunctionInAPI ref'InitialisePackage'
  EstablishFunctionInAPI ref'InitPackageConfig'
+ EstablishFunctionInAPI ref'InitialisePackage'
  EstablishFunctionInAPI ref'InstallPackage'
+ EstablishFunctionInAPI ref'ListCache'
  EstablishFunctionInAPI ref'ListPackages'
  EstablishFunctionInAPI ref'ListRegistries'
  EstablishFunctionInAPI ref'ListTags'
@@ -29,13 +32,14 @@
  EstablishFunctionInAPI ref'ReadPackageConfigFile'
  EstablishFunctionInAPI ref'ReInstallDependencies'
  EstablishFunctionInAPI ref'UnInstallPackage'
- ⎕SE.Tatin.⎕FX↑'r←Version' '⍝ Returns "name", "version" and "date"' 'r←⎕SE._Tatin.Registry.Version'                             ⍝ Niladic!
  ⎕SE.Tatin.⎕FX↑'r←CreateReInstallParms' '⍝ Returns NS with parameters for ReInstall' 'r←⎕SE._Tatin.Client.CreateReInstallParms' ⍝ Niladic!
+ ⎕SE.Tatin.⎕FX↑'r←GetPathToPackageCache' 'r←⎕SE._Tatin.Client.GetPathToPackageCache'                                            ⍝ Niladic!
+ ⎕SE.Tatin.⎕FX↑'r←Version' '⍝ Returns "name", "version" and "date"' 'r←⎕SE._Tatin.Registry.Version'                             ⍝ Niladic!
  ref.DefineRegistry←##.Client.DefineRegistry
  ref.UserSettings←##.Client.UserSettings
  C←##.Client
  C.InitUserSettings pathToUserSettings
- ⎕SE.Tatin.MyUserSettings←C.MyUserSettings
+ ⎕SE.Tatin.⎕FX'r←MyUserSettings' 'r←⎕SE._Tatin.Client.MyUserSettings' ⍝ Don't create a ref here because the user might assign ⎕NEW UserSettings to it, and that would NOT work!
  ##.RumbaLean.⎕EX'DRC'          ⍝ Paranoia; with DRC around Conga won't be initialised
  ##.RumbaLean.⎕EX'Conga'
  'Conga'##.RumbaLean.⎕CY'conga' ⍝ Copy Conga of the current APL version; MUST be lowercase because otherwise the WS won't be found on Linux/Mac-OS

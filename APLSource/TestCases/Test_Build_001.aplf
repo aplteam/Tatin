@@ -3,15 +3,16 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- ∆BuildDir←'Build_Tests'GetTempDir''
+ ∆BuildDir←'Build_Tests'∆GetTempDir''
  ∆BuildSrc←∆BuildDir,'/src/'
  ∆BuildReg←∆BuildDir,'/reg/'
  Assert F.MkDir ∆BuildSrc
  Assert F.MkDir ∆BuildReg
  Reg.CreateRegistry ∆BuildReg
- dir←'ConfigFile'GetTempDir''
+ dir←'ConfigFile'∆GetTempDir''
  F.DeleteFile dir,'/',TC.UserSettings.cfg_name
  TC.InitUserSettings dir
+ TC.MyUserSettings.caching←0
  TC.MyUserSettings.AddRegistry'[Build]',∆BuildReg
  zipFiles←∆CreateExampleForMinimalVersionSelection1 ∆BuildDir
 
@@ -54,7 +55,7 @@
  r←T._OK
 
 ∆TidyUp:
- {}TC.InitUserSettings'./TestData'
+ {}0 TC.InitUserSettings'./TestData'
  F.RmDir ∆BuildDir
  ⎕EX'∆BuildDir'
  F.DeleteFile zipFiles

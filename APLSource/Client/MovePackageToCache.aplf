@@ -1,0 +1,15 @@
+ {path2package}←MovePackageToCache(path2package url packageID);targetFolder;url_;targetFolder2
+⍝ Move the package installed into path2package to the Tatin package cache.
+⍝ Returns `path2package` which will point to the right place in the cache for the given package.
+⍝ This function does not check anything regarding caching.
+ targetFolder←GetPathToPackageCache
+ :If '.zip'≢⎕C ¯4↑url
+     url_←CompileNameFromUrl url
+     targetFolder2←targetFolder,'/',url_,'/',packageID
+     :If ~F.IsDir targetFolder2
+         2 ⎕MKDIR targetFolder2
+         targetFolder2 ⎕NMOVE⍠('Wildcard' 1)('RenameOnly' 1)⊣path2package,'/*'
+         F.RmDir path2package
+         path2package←targetFolder2
+     :EndIf
+ :EndIf

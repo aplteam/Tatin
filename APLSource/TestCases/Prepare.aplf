@@ -4,10 +4,13 @@
      ##.Admin.Initialize_Client
  :EndIf
  T←⎕NEW ##.Tester2 ⎕THIS
- :If 0 ##.Client.YesOrNo'Check Temp\ folder for left-overs?'
+ :If  0 ##.Client.YesOrNo'Check Temp\ folder for left-overs?'
      T.exec_after_each_test←'#.Tatin.Admin.CheckTempFolderAfterTestFunctionRun'
- :ElseIf 1 ##.Client.YesOrNo'Check user settings?'
+ :ElseIf 0 ##.Client.YesOrNo'Check user settings?'
      T.exec_after_each_test←'#.Tatin.Admin.CheckUserSettings'
+ :ElseIf 0 ##.Client.YesOrNo'Check user settings for no-caching?'
+     T.exec_before_each_test←'#.Tatin.Admin.Check_Caching_Before'
+     T.exec_after_each_test←'#.Tatin.Admin.Check_Caching_After'
  :EndIf
  testFilename←##.Admin.GetCoverageFile
  :If ⎕NEXISTS testFilename

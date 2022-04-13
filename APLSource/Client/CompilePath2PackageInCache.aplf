@@ -1,0 +1,13 @@
+ path←{force}CompilePath2PackageInCache(url packageID)
+ ⍝ Takes something like 'https://tatin.dev' 'aplteam-EventCodes-3.0.1'
+ ⍝ and returns a full path to that package in the Tatin package cache or '' if not found.
+ ⍝ You can enforce the delivery of a path even when the package does not exist by passing 1 as ⍺.
+ force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
+ url←url←ReplaceRegistryAlias url
+ url←RemoveHttpProtocol url
+ url←(-'/'=¯1↑url)↓url
+ path←GetPathToPackageCache,'/',url,'/',packageID
+ :If ~force
+     path{⍺/⍨F.IsDir ⍺}←⍬
+ :EndIf
+⍝Done

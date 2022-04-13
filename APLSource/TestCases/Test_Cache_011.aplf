@@ -1,0 +1,14 @@
+ r←Test_Cache_011(stopFlag batchFlag);⎕TRAP;res
+⍝ Load a package with plenty of dependencies and check the cache before and after
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+
+ res←TC.LoadPackage'[tatin]aplteam-Tester2'#.TEMP
+ →T.PassesIf 9=#.TEMP.⎕NC'Tester2'
+ →T.PassesIf 1<≢F.ListDirs TC.GetPathToPackageCache,'/tatin.dev'
+ →T.PassesIf 0=≢F.ListDirs TC.GetPathToPackageCache,'/temp/'
+
+ r←T._OK
+⍝Done

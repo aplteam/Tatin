@@ -1,18 +1,22 @@
- r←Test_Server_009(stopFlag batchFlag);⎕TRAP;request;response;folder;noOf
+ r←Test_Server_009(stopFlag batchFlag);⎕TRAP;request;response;folder;noOf;ini
 ⍝ Send a request that makes the server crash and then look for dump files
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- folder←∆GetTempDir,'/Errors/'
- 'Create!'F.CheckPath folder
- noOf←≢F.ListFiles folder
+ ini←⎕NEW ##.IniFiles(,⊂'./TestData/Server/server.ini')
+ folder←⊃ini.Get'TRAP:Folder'
+ folder←'<TEMP>'⎕R(739⌶0)⊣folder
+ folder←¯1↓1⊃⎕NPARTS(¯1×(¯1↑folder)∊'/\')↓folder
+
+ 'Create!'F.CheckPath folder,'/Errors'
+ noOf←≢F.ListFiles folder,'/Errors'
 
  request←TC.R.NewRequest 0
  request.RequestTarget←'v1/crash'
- response←'https://localhost'TC.SendAndReceive request
+ response←TC.SendAndReceive  'https://localhost' request
 
  →T.PassesIf response.StatusCode≡500
- →T.PassesIf(2+noOf)=≢F.ListFiles folder
+ →T.PassesIf(2+noOf)=≢F.ListFiles folder,'/Errors'
 
  r←T._OK
 ⍝Done

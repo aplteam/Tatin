@@ -1,4 +1,4 @@
- {ref}←InitUserSettings folder;ns
+ {ref}←{caching}InitUserSettings folder;ns;b
 ⍝ Establishes `MyUserSettings` by instantiating the `UserSettings` class.\\
 ⍝ `folder` is where the config file lives or is going to be created. If this is empty the
 ⍝ Tatin config file `.tatin` is checked. If no definition is found (that file does not
@@ -6,6 +6,8 @@
 ⍝ ← is a reference pointing to the instance.\\
 ⍝ Note that all functions that require user settings rely on `MyUserSettings` to exist;
 ⍝ if it doesn't a VALUE ERROR will be generated.\\
+⍝ `caching` defaults to 1, but you may overwrite this via ⍺. Mainly for test cases.
+ caching←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'caching'
  :If 0=≢folder
      folder←GetUserHomeFolder''
  :EndIf
@@ -16,4 +18,8 @@
      Assert F.MkDir folder
  :EndIf
  ref←MyUserSettings←⎕NEW UserSettings(,⊂folder)
+ ref.caching←caching
+ :If 0<+/b←0=⊃¨ref.registries.⎕NC⊂'noCaching'
+     (b/ref.registries).{⎕THIS.noCaching←⍵}0  ⍝ Was introduced in 0.63.0
+ :EndIf
 ⍝Done

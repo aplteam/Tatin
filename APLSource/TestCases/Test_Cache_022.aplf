@@ -1,0 +1,22 @@
+ r←Test_Cache_022(stopFlag batchFlag);⎕TRAP;res;cacheDir;domain;path;pkgName;noOf
+⍝ Load a package and check whether noCaching←1 is honoured
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ cacheDir←TC.GetPathToPackageCache
+ domain←'tatin.dev'
+ path←cacheDir,'/',TC.CompileNameFromUrl domain
+ pkgName←'WinSys'
+ noOf←≢F.ListDirs path,'/'
+ TC.MyUserSettings.registries.noCaching←1
+
+ res←TC.LoadPackage('https://',domain,'/',pkgName)'#.TEMP'
+ →T.GoToTidyUp 1≠res
+ →T.GoToTidyUp noOf≠≢F.ListDirs path,'/'
+
+ r←T._OK
+
+∆TidyUp:
+ TC.MyUserSettings.registries.noCaching←0
+⍝Done

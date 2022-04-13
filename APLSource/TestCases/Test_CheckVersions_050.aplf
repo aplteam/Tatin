@@ -3,14 +3,14 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- dir←GetTempDir''
+ dir←∆GetTempDir''
  dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/Packages/Install-template/*'
 
  versions←TC.CheckForLaterVersion dir
  →T.PassesIf 1=≢versions
  →T.GoToTidyUp'aplteam-MarkAPL-9.1.13'≢TC.GetPackageIDFromFilename⊃1 2⌷versions
  result←TC.InstallPackage(⊃1 2⌷versions)dir
- →T.GoToTidyUp'aplteam-MarkAPL-9.1.13'≢TC.GetPackageIDFromFilename result
+ →T.GoToTidyUp'aplteam-MarkAPL-9.1.13'≢⊃,/TC.GetPackageIDFromFilename ¨result
 
  r←T._OK
 

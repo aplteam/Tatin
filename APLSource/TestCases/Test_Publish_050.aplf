@@ -5,7 +5,7 @@
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src reg
 
@@ -23,7 +23,7 @@
  (rc msg zipFilename)←TC.PublishPackage src reg         ⍝ You might want to install a package with a not yet published dependency
  Assert 200=rc
 
- installFolder←GetTempDir'/Tatin_AppPackages'
+ installFolder←∆GetTempDir'/Tatin_AppPackages'
  :Trap 998
      refs←TC.InstallPackage('[local2]/Example-A-1.0.0')installFolder
      →T.GoToTidyUp 1

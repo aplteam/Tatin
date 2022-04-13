@@ -1,6 +1,8 @@
- r←{noBetas}InstallPackage(identifier_ targetFolder);bool;principal;msg
+ r←{noBetas}InstallPackage(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;∆PermanentConnections;identifier_;∆DeletePolicies
  ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
+⍝ `identifier` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
+⍝ Multiple packages must be separated by commas.
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request for a package
 ⍝ * a ZIP file holding a package
@@ -9,61 +11,79 @@
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
 ⍝ You may omit minor+patch or even major+minor+patch in order to install the latest version.
 ⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
-⍝ `←` Full name of `identifier_` finally loaded.
+⍝ `←` Full name of packages finally loaded.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  CheckInstallFolder targetFolder
- (alias identifier_)←SplitAtAlias identifier_
- identifier←ReplaceRegistryAlias identifier_
- ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
- identifier←noBetas CheckVersion identifier
- 'Package not found'Assert 0<≢identifier
- PrintToSession'  Attempting to install ',identifier,'...'
- :If ∧/~'\/'∊identifier
- :AndIf '.zip'≢⎕C ¯4↑identifier
-     packageID←GetPackageIDFromFilename identifier
-     :If ~∨/'/\:'∊identifier
-         identifier←(EstablishRegistry packageID),packageID
-         PrintToSession⊃{'Installing <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
-     :EndIf
- :EndIf
- :If '.zip'≡⎕C ¯4↑identifier
- :AndIf Reg.IsHTTP identifier
-     'ZIP files cannot be installed via HTTP'Assert 0
- :EndIf
- PrintToSession'  Establish dependencies...'
- :If 0<≢buildList←GetDependencyTree alias,identifier
-     PrintToSession'  ',(⍕≢buildList),' dependencies identified'
-     CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename identifier)
-     :For principal packageID2 url :In ↓buildList
-         (alias packageID2)←SplitAtAlias packageID2
-         installFolder←(Reg.AddSlash targetFolder),packageID2
-         :If principal
-         :AndIf F.Exists installFolder
-             ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
+ EstablishClients ⍬
+ identifiers←','(≠⊆⊢)identifiers
+ :For identifier_ :In identifiers
+     (alias identifier_)←SplitAtAlias identifier_
+     identifier←ReplaceRegistryAlias identifier_
+     ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
+     identifier←noBetas CheckVersion identifier
+     'Package not found'Assert 0<≢identifier
+     PrintToSession'  Attempting to install ',identifier,'...'
+     :If ∧/~'\/'∊identifier
+     :AndIf '.zip'≢⎕C ¯4↑identifier
+         packageID←GetPackageIDFromFilename identifier
+         :If ~∨/'/\:'∊identifier
+             identifier←(EstablishRegistry packageID),packageID
+             PrintToSession⊃{'Installing <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
          :EndIf
-         tempDir←InstallPackage_ packageID2 url
-         :If F.IsDir installFolder
-             F.RmDir installFolder
+     :EndIf
+     :If '.zip'≡⎕C ¯4↑identifier
+     :AndIf Reg.IsHTTP identifier
+         'ZIP files cannot be installed via HTTP'Assert 0
+     :EndIf
+     PrintToSession'  Establish dependencies...'
+     :If 0<≢buildList←GetDependencyTree alias,identifier
+         PrintToSession'  ',(⍕≢buildList),' dependencies identified'
+         CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename identifier)
+         ∆DeletePolicies←{⍵,[1.5]GetDeletePolicy¨⍵}∪buildList[;3] ⍝ Fetch delete policies just once per Tatin Server
+         :For principal packageID2 url :In ↓buildList
+             (alias packageID2)←SplitAtAlias packageID2
+             installFolder←(Reg.AddSlash targetFolder),packageID2
+             :If principal
+                 ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
+             :EndIf
              :If F.IsDir installFolder
-                 F.RmDir tempDir
+                 F.RmDir installFolder
+             :AndIf F.IsDir installFolder
+                 ⎕DL 0.02
                  msg←'Could not remove install folder (package was apparently already installed):',⎕UCS 13
                  msg,←installFolder
                  msg Assert 0
              :EndIf
+             :If MyUserSettings.caching
+             :AndIf 0<≢path2cache←CompilePath2PackageInCache url packageID2
+             :AndIf 0=GetNoCachingFlag url
+             :AndIf 0<≢path2cache
+                 PrintToSession'  Fetching from Tatin package cache...'
+                 tempDir←GetPackageFromCache url packageID2 path2cache
+                 cacheFlag←0
+             :Else
+                 (tempDir cacheFlag)←InstallPackage_ packageID2 url
+             :EndIf
+             :If IsHTTP url
+             :AndIf cacheFlag
+                 installFolder ⎕NCOPY tempDir
+             :Else
+                 installFolder ⎕NMOVE tempDir
+             :EndIf
+             :If principal
+                 PrintToSession'  Add ',packageID2,' to dependency file...'
+                 targetFolder Dependencies.Add alias,packageID2
+             :EndIf
+         :EndFor
+         PrintToSession'  Saving build list... '
+         buildList←SaveBuildList buildList targetFolder
+         :If ∨/bool←({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}alias,identifier_){⍺∘≡¨(≢⍺)↑¨⍵}buildList[;2]
+             r,←buildList[bool⍳1;2]
+         :Else
+             r,←buildList[1;2]
          :EndIf
-         installFolder ⎕NMOVE tempDir
-         :If principal
-             PrintToSession'  Add ',packageID2,' to dependency file...'
-             targetFolder Dependencies.Add alias,packageID2
-         :EndIf
-     :EndFor
-     PrintToSession'  Saving build list... '
-     buildList←SaveBuildList buildList targetFolder
-     :If ∨/bool←({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}alias,identifier_){⍺∘≡¨(≢⍺)↑¨⍵}buildList[;2]
-         r←2⊃buildList[bool⍳1;]
-     :Else
-         r←2⊃buildList[1;]
      :EndIf
- :EndIf
+ :EndFor
+ CloseConnections ⍬
 ⍝Done

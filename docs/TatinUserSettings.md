@@ -19,7 +19,7 @@ Once Tatin is installed when you fire up an instance of Dyalog APL the contents 
 
 `⎕SE.Tatin.MyUserSettings` provides a number of properties that can be questioned as well as a number of methods that can be issued in order to manipulate the user settings.
 
-This call:
+For example, this call:
 
 ```
       ]Tatin.Listregistries
@@ -30,7 +30,7 @@ This call:
 
 ```
 
-Shows most of the data that is saved in the user settings except the API key(s).
+shows most of the data that is saved in the user settings for registries, except the API key(s).
 
 If you would like to see the API keys as well specify the `-full` flag.
 
@@ -90,7 +90,7 @@ Note that Dyalog 18.2 and later recognize JSON5 and highlight any syntax errors.
 
 ### What does Tatin do at start-up time?
 
-When Tatin is initialized[^init] it creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`.
+When Tatin is initialized[^init] it creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`. (Strictly speaking it lives actually in `⎕SE._Tatin`; in `⎕SE.Tatin` there is just a niladic function `MyUserSettings` that returns a reference to `⎕SE._Tatin.MyUserSettings`)
 
 If the constructor does not get a fully qualified name of the user settings file as an argument then it performs two steps:
 

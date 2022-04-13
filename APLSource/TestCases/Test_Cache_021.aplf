@@ -1,0 +1,18 @@
+ r←Test_Cache_021(stopFlag batchFlag);⎕TRAP;res;tempDir
+⍝ Load a package with plenty of dependencies most of which were loaded by the preceding test cases
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+tempDir←∆GetTempDir'/packages'
+ res←TC.InstallPackage'[tatin]aplteam-MarkAPL'tempDir
+ →T.PassesIf∨/'-MarkAPL-'⍷∊res
+ →T.PassesIf 1<≢F.ListDirs tempDir,'/'
+ →T.PassesIf 1<≢F.ListDirs TC.GetPathToPackageCache,'/tatin.dev'
+ →T.PassesIf 0=≢F.ListDirs TC.GetPathToPackageCache,'/temp/'
+
+ TC.LoadDependencies tempDir #.TEMP
+ →T.PassesIf 9=#.TEMP.⎕NC'MarkAPL'
+
+ r←T._OK
+⍝Done

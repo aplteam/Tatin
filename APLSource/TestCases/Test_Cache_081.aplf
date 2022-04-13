@@ -1,0 +1,16 @@
+ r←Test_Cache_081(stopFlag batchFlag);⎕TRAP;res
+⍝ List packages for all domains represented in the Tatin package cache with at least one package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←TC.ListCache''
+ →T.PassesIf 2=≢res
+ →T.PassesIf(≢¨res)∧.=2
+ →T.PassesIf(|≡¨2⊃¨res)∧.=2
+ →T.PassesIf 0∧.<≢¨2⊃¨res
+ →T.PassesIf':'∊1 1⊃res     ⍝ Must come with a port number
+ →T.PassesIf~∧/{∨/'/\'∊⍵}¨1⊃¨res
+ →T.PassesIf~∧/∧/¨{∨/'/\'∊⍵}¨¨2⊃¨res
+
+ r←T._OK
+⍝Done

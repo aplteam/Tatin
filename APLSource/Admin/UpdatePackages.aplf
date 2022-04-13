@@ -1,4 +1,4 @@
- {r}←{forceTatin}UpdatePackages flag;config;packages;package;i;folders;folder;filename;rc;old;new;json
+ {r}←{forceTatin}UpdatePackages flag;config;packages;package;i;folders;folder;filename;rc;old;new;json;filenames
 ⍝ Takes TatinPackages.config as input and carries out the following steps:
 ⍝ 1. It re-installs all packages defined in that config file
 ⍝ 2. It then copies the required scripts from the folder packages\ to APLSource\
@@ -23,13 +23,18 @@
  json←##.Registry.JSON⊃##.FilesAndDirs.NGET'./packages/apl-buildlist.json'
  folders←'./packages/'∘,¨json.packageID
  :For folder :In folders
-     filename←⊃##.FilesAndDirs.ListFiles folder,'/*.aplc'
-     'Must not be empty'Assert 0<≢filename
-     old←⊃##.FilesAndDirs.NGET'./APLSource/',⊃,/1↓⎕NPARTS filename
-     new←⊃##.FilesAndDirs.NGET filename
-     :If old≢new
-         r←1
-         './APLSource'⎕NCOPY⍠('IfExists' 'Replace')⊣filename
+     :If ∨/'-SMTP-'⍷folder
+         filenames←⊃##.FilesAndDirs.ListFiles folder,'/APLSource/SMTP/*.aplc'
+         'Must not be empty'Assert 0<≢filenames
+     :Else
+         filename←⊃##.FilesAndDirs.ListFiles folder,'/*.aplc'
+         'Must not be empty'Assert 0<≢filename
+         old←⊃##.FilesAndDirs.NGET'./APLSource/',⊃,/1↓⎕NPARTS filename
+         new←⊃##.FilesAndDirs.NGET filename
+         :If old≢new
+             r←1
+             './APLSource'⎕NCOPY⍠('IfExists' 'Replace')⊣filename
+         :EndIf
      :EndIf
  :EndFor
 ⍝Done

@@ -6,7 +6,7 @@
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
- dir←GetTempDir ⍬
+ dir←∆GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
  assets←src,'/assets'
  F.MkDir src zip
@@ -28,14 +28,13 @@
  refs←TC.LoadPackage('file://',zipfile)#.TEMP
  →T.GoToTidyUp 3≠#.TEMP.Foo.⎕NC'GetAssetList'
  res←#.TEMP.Foo.GetAssetList
- →T.GoToTidyUp 2≠≢res
  →T.GoToTidyUp~∧/res∘{∨/∨/¨⍵∘⍷¨⍺}¨'first.dll' 'second.dll'
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir refs
  Assert 0=⊃F.RmDir dir
  F.DeleteFile zipfile
+ ∆RemoveTempFolders
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

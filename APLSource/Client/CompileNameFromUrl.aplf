@@ -1,0 +1,19 @@
+ r←{replaceDots}CompileNameFromUrl url
+⍝ Constructs a variable name reprsesenting the given url
+⍝ By default any dots within `url` are left alone (fine for filename)
+⍝ Change this by passing a 1 as ⍺: then any dots are replaced by `⍙` (fine for variable names)
+⍝ Examples:
+⍝ 'tatin.dev' ←→ CompileNameFromUrl 'https://tatin.dev'
+⍝ 'tatin.dev' ←→ CompileNameFromUrl 'https://tatin.dev/'
+⍝ 'tatin.dev∆9901' ←→ CompileNameFromUrl 'https://tatin.dev:9901/'
+⍝ 'tatin.dev' ←→ CompileNameFromUrl 'https://tatin.dev/foo-goo-1.2.1'
+⍝ 'tatin⍙dev' ←→ 1 CompileNameFromUrl 'https://tatin.dev'
+ replaceDots←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'replaceDots'
+ url←ReplaceRegistryAlias url
+ r←RemoveHttpProtocol url
+ r←{⍵↑⍨¯1+⍵⍳'/'}r
+ r←{':'∊⍵:'∆'@(⍸':'=⍵)⊣⍵ ⋄ ⍵}r  ⍝ If the url carries a port number we replace ":" by "∆"
+ :If replaceDots
+     (('.'=r)/r)←'⍙'
+ :EndIf
+⍝Done

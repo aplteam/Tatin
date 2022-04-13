@@ -1,0 +1,7 @@
+ flag←GetNoCachingFlag uri
+⍝ Returns the "noCaching" flag for `uri` from MyUserSettings.registries
+⍝ If `uri` is not known a 0 is returned.
+ uri←ReplaceRegistryAlias uri
+ :If flag←(⊂uri)∊MyUserSettings.registries.uri
+     flag←(MyUserSettings.GetRegistry uri).noCaching
+ :EndIf

@@ -3,10 +3,10 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- tempDir←GetTempDir''
+ tempDir←∆GetTempDir''
  F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
 
- settings←⎕NEW TC.UserSettings(,⊂tempDir)
+ settings←∆NewUserSettings(,⊂tempDir)
  →T.GoToTidyUp 2≠≢settings.registries
  reg2←⎕NEW TC.DefineRegistry(,⊂'https://localhost')
  settings.AddRegistry reg2
@@ -17,7 +17,7 @@
  settings.ReplaceRegistry reg2
  settings.Save 1
  ⎕EX'settings'
- settings←⎕NEW TC.UserSettings(,⊂tempDir)
+ settings←∆NewUserSettings(,⊂tempDir)
  →T.GoToTidyUp 3≠≢settings.registries
  →T.GoToTidyUp(settings.GetRegistry'[foo]')≢settings.GetRegistry'https://localhost'
  →T.GoToTidyUp 1≠settings.RemoveRegistry'https://localhost'

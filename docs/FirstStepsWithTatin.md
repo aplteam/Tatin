@@ -254,6 +254,12 @@ Styles.html
 
 Of course it could be anything required by the package.
 
+A> ### Regarding Assets
+A>
+A> Note that assets are to be consumed, meaning that a package _**must not**_ write to the assets folder.
+A>
+A> Among several reasons for this one stands out: in cases a package is loaded and caching in on (the default) then the asset folder is shared by all projects/people who also loaded that package.
+
 ### Getting a package into the workspace
 
 From the perspective of the application "Foo" all packages are dependencies. Therefore one must issue this command:

@@ -55,11 +55,11 @@ This document gives you an overview over these HTML files: their purpose and who
 
   Read this in case you want to publish Tatin packages.
 
-* [Caching](./Caching.html "Caching.html") (stub)
+* [Caching](./Caching.html "Caching.html") (draft)
 
-  By default the Tatin clients caches any package that was either installed or loaded. This document
+  By default the Tatin client caches any package that is either installed or loaded. This document
   discusses the implications, and under which circumstances you might want to switch caching off, either
-  globally or just for a specific Tatin server.
+  globally or just for a specific Registry.
 
 
 ### The Server

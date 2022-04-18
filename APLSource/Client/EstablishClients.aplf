@@ -1,9 +1,12 @@
  {r}←EstablishClients dummy;regs
-⍝ Established connections to all registries as Rumba clients
- r←⍬
- ∆PermanentConnections←⎕NS''
- regs←ListRegistries''
- regs←(0<regs[;4])⌿regs
- 'No registries found'Assert 0<≢regs
- Connect2Client¨regs[;1]
+⍝ Establishes connections to all registries as Rumba clients for pipelined access
+ r←0
+ :If 0=⎕NC'∆PermanentConnections'
+     ∆PermanentConnections←⎕NS''
+     regs←ListRegistries''
+     regs←(0<regs[;4])⌿regs
+     'No registries found'Assert 0<≢regs
+     Connect2Client¨regs[;1]
+     r←1
+ :EndIf
 ⍝Done

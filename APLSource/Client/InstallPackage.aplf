@@ -15,7 +15,6 @@
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  CheckInstallFolder targetFolder
- EstablishClients ⍬
  identifiers←','(≠⊆⊢)identifiers
  :For identifier_ :In identifiers
      (alias identifier_)←SplitAtAlias identifier_
@@ -40,7 +39,6 @@
      :If 0<≢buildList←GetDependencyTree alias,identifier
          PrintToSession'  ',(⍕≢buildList),' dependencies identified'
          CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename identifier)
-         ∆DeletePolicies←{⍵,[1.5]GetDeletePolicy¨⍵}∪buildList[;3] ⍝ Fetch delete policies just once per Tatin Server
          :For principal packageID2 url :In ↓buildList
              (alias packageID2)←SplitAtAlias packageID2
              installFolder←(Reg.AddSlash targetFolder),packageID2
@@ -63,6 +61,10 @@
                  tempDir←GetPackageFromCache url packageID2 path2cache
                  cacheFlag←0
              :Else
+                 :If Reg.IsHTTP url
+                 :AndIf 0=⎕NC'∆DeletePolicies'                      ⍝ Because then we know that we will need the delete policies
+                     ∆DeletePolicies←{⍵,[1.5]GetDeletePolicy¨⍵}∪buildList[;3] ⍝ Fetch delete policies just once per Tatin Server
+                 :EndIf
                  (tempDir cacheFlag)←InstallPackage_ packageID2 url
              :EndIf
              :If IsHTTP url

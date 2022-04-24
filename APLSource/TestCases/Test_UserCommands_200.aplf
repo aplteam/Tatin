@@ -17,19 +17,19 @@
 
  (rc msg res)←stop ∆UCMD'Cache'
  →T.PassesIf 0=rc
- →T.PassesIf 1<|≡res
+ →T.PassesIf 1=|≡res
 
  (rc msg res)←stop ∆UCMD'Cache -path'
  →T.PassesIf 0=rc
- →T.PassesIf 1<|≡res
+ →T.PassesIf 1=|≡res
 
- (rc msg(res report))←stop ∆UCMD'Cache -clear -force'
+ (rc msg res)←stop ∆UCMD'Cache -clear -force'
  →T.PassesIf 0=rc
- →T.PassesIf res∊0 1
+ →T.PassesIf 1=|≡res
 
- (rc msg(res report))←stop ∆UCMD'Cache -clear -force'
+ (rc msg res)←stop ∆UCMD'Cache -clear -force'
  →T.PassesIf 0=rc
- →T.PassesIf(,res)≡,0               ⍝ Because now the cache must be empty
+ →T.PassesIf 1=|≡res               ⍝ The cache is by now emptied but it must still go through
 
  r←T._OK
 ⍝Done

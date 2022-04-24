@@ -3,7 +3,7 @@
 ⍝ In case no path pointing to a folder hosting such a file is provided to `⎕NEW`, the file is searched
 ⍝ for (and created if it does not yet exist) in the default location (user's home folder) which
 ⍝ depends on your operating system.\\
-⍝ You may call `⎕SE.Tatin.GetUserHomeFolder ''` in order to find out that location.\\
+⍝ You may call `⎕SE.Tatin.GetUserHomeFolder ''` in order to establish that location.\\
 ⍝ Optionally you may specify a folder hosting the configuration file as an argument to `⎕NEW`.\\
 ⍝ Again, if the file does not yet exist it will be created with defaults.\\
 ⍝ After having created an instance you can add a Registry definition (read: an instance of the
@@ -11,8 +11,8 @@
 ⍝ `ReplaceRegistry` and `RemoveRegistry`.\\
 ⍝ Note that all changes are strictly workspace-only. If you want your changes to be written to file
 ⍝ you must call the `Save` method with a 1 as right argument. The only exception is that when the
-⍝ file does not yet exist, it is created and written to disk with default.\\
-⍝ If you have passed a path to where the user settings file should be created to `⎕NEW`, and you want
+⍝ file does not yet exist, it is created and written to disk with defaults.\\
+⍝ If you have passed to `⎕NEW` a path to where the user settings file should be created and you want
 ⍝ this file to become the default user settings file whenever Dyalog APL is fired up, then make a call
 ⍝ to the `MakeDefaultFile` instance method. This creates (or overwrites) a file '.tatin` that points
 ⍝ to that folder.\\
@@ -20,6 +20,7 @@
 ⍝ You may convert a particular Registry into an ordinary namespace by calling the `GetRegistry` method.
 
     :Field Public Shared ReadOnly cfg_name←'tatin-client.json'  ⍝ Name of the user config file is fixed
+    :Field Public Shared ReadOnly ErrorNo←997                   ⍝ Used by `Assert`
 
     ∇ make0;configFile;buff
       :Implements Constructor
@@ -148,7 +149,8 @@
     :EndProperty
 
     ∇ {r}←AddRegistry y;registry;name;alias;buff;reg;isZero;ind;newPriorities
-   ⍝ Adds the definition of a Registry (as a namespace) to the user settings.\\
+   ⍝ Adds the definition of a Registry (from a namespace or an instance of the DefineRegistry class)
+   ⍝ to the user settings.\\
    ⍝ If that Registry is already defined an error is thrown.\\
    ⍝ `⍵` must be one of:
    ⍝ * An instance of the "Registry" class.
@@ -206,7 +208,7 @@
           :EndIf
       :EndIf
       buff.uri←AddSlash buff.uri
-      buff.noCaching←registry.noCaching  ⍝ Why exactly is this required?!  ⍝TODO⍝ 
+      buff.noCaching←registry.noCaching  ⍝ Why exactly is this required?!  ⍝TODO⍝
       _registries,←buff
     ∇
 
@@ -219,7 +221,7 @@
       '⍵ must be a Boolean'Assert(⊂rawFlag)∊0 1
       r←↑registries.(alias uri port priority noCaching api_key)
       :If (,1)≢,showApiKey
-          r[;6]←⊂'***'          ⍝ Replace API key by Asterisks
+          r[;2⊃⍴r]←⊂'***'          ⍝ Replace API key by Asterisks
       :EndIf
       :If ~rawFlag
           r←((,[0.5]'Alias' 'URI' 'Port' 'Priority' '~caching' 'API-key'),[1]' ')⍪r
@@ -287,7 +289,12 @@
       :If 0=+/bool←EqualsAliasOrName uriOrAlias
           'uri/alias not found in user settings'Assert∨/bool
       :EndIf
-      r←(bool⍳1)⊃_registries  ⍝ Take the first in case of several
+      ⍝ Note that at this point we might end up with multiple hits. That's because a user might
+      ⍝ define the same url twice with different alise and different API keys.
+      ⍝ Here it does not matter which API key we use because this is about consuming a package;
+      ⍝ API keys are potentially required for delete and publish operations.
+      ⍝ Therefore we are okay taking the first hit:
+      r←(bool⍳1)⊃_registries
     ∇
 
     ∇ r←Delete flag;filename;buff
@@ -331,7 +338,7 @@
 
 ⍝ ------------------- Private stuff
 
-    Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 998 ⋄ shy←0}
+    Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL ErrorNo ⋄ shy←0}
 
     ∇ r←GetJSON5;ns
       ns←⎕NS''
@@ -342,7 +349,7 @@
       r←home.Reg.JSON ns
     ∇
 
-    ∇ bool←EqualsAliasOrName y;alias;uri;msg
+    ∇ bool←EqualsAliasOrName y;alias;uri;msg;uri_;port
     ⍝ Returns a vector of booleans.\\
     ⍝ Interprets `⍵` as an alias in case is carries `[]` and as an URI otherwise.
       :If '['∊y
@@ -354,8 +361,20 @@
               uri←{⍵/⍨3>+\⍵='/'}uri
           :EndIf
           uri←AddSlash uri
-          uri←':[0-9]+\/'⎕R'/'⊣uri      ⍝ Remove potential port number
-          bool←(⊂uri)≡¨_registries.uri
+          :If ':'∊home.RemoveHttpProtocol uri
+              port←⊃(//)⎕VFI{1↓⍵↑⍨-':'⍳⍨⌽⍵}¯1↓uri
+          :Else
+              port←0 80 443
+          :EndIf
+          uri_←':[0-9]+\/'⎕R'/'⊣uri      ⍝ Remove potential port number
+          bool←(⊂uri_)≡¨_registries.uri
+          :If 1<+/bool
+              :If 1<≢port
+                  bool∧←_registries.port∊¨⊂port
+              :Else
+                  bool∧←_registries.port=port
+              :EndIf
+          :EndIf
       :EndIf
     ∇
 

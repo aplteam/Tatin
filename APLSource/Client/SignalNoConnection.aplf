@@ -1,12 +1,14 @@
  {r}←uri SignalNoConnection msg;qdmx;EM;⎕TRAP
-⍝ Used to enable a Tatin-specific function to catch 346 and report `msg`, typically a server that does not respond.
+⍝ Used to enable a Tatin-specific function to catch 347 & 348 and report `msg`.
  r←⍬
  qdmx←⎕DMX
  EM←⎕C qdmx.EM~' '  ⍝ The Rumba message might carry more spaces than it should, so we have to do some gymnastic
- :If 'handshakecertificateisfailing'{⍺≡(≢⍺)↑⍵}EM        ⍝ That's Conga 3.3 and earlier
- :OrIf 'hostidentificationnotresolved'{⍺≡(≢⍺)↑⍵}EM      ⍝ That's Conga 3.4 and later
- :OrIf 'unabletoconnecttohostdataport'{⍺≡(≢⍺)↑⍵}EM      ⍝ That's also Conga 3.4 and later
+ :If (⎕C'HandshakeCertificateIsFailing'){⍺≡(≢⍺)↑⍵}EM        ⍝ That's Conga 3.3 and earlier
+ :OrIf (⎕C'HostIdentificationNotResolved'){⍺≡(≢⍺)↑⍵}EM      ⍝ That's Conga 3.4 and later
+ :OrIf (⎕C'UnableToConnectToHostDataPort'){⍺≡(≢⍺)↑⍵}EM      ⍝ That's also Conga 3.4 and later
      msg ⎕SIGNAL 347
+ :ElseIf (⎕C'ServerClosedConnection'){⍺≡(≢⍺)↑⍵}EM           ⍝ Should not happen but does anyway
+     msg ⎕SIGNAL 348
  :Else
      ⎕TRAP←0 'S'
      qdmx.EM ⎕SIGNAL qdmx.EN

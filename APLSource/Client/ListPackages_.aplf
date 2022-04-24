@@ -1,6 +1,7 @@
- list←{parms}ListPackages_ uri;client;request;res;host;packageID
+ list←{parms}ListPackages_ uri;client;request;res;host;packageID;uri_
 ⍝ Returns a matrix with two columns.
 ⍝ Empty in case of a 404 returned by the server
+ uri_←ReplaceRegistryAlias uri
  :If 0=⎕NC'parms'
      parms←⎕NS''
      parms.(group tags)←⊂''
@@ -8,7 +9,7 @@
      parms.date←0
      parms.info_url←0
  :EndIf
- (host packageID)←Reg.SeparateUriAndPackageID uri
+ (host packageID)←Reg.SeparateUriAndPackageID uri_
  'Not a valid URI'Assert('/'+.=host)∊2 3
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  request←R.NewRequest 0

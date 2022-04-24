@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackage(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;∆PermanentConnections;identifier_;∆DeletePolicies
+ r←{noBetas}InstallPackage(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;∆PermanentConnections;identifier_
  ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifier` in `targetFolder`.\\
 ⍝ `identifier` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -61,10 +61,6 @@
                  tempDir←GetPackageFromCache url packageID2 path2cache
                  cacheFlag←0
              :Else
-                 :If Reg.IsHTTP url
-                 :AndIf 0=⎕NC'∆DeletePolicies'                      ⍝ Because then we know that we will need the delete policies
-                     ∆DeletePolicies←{⍵,[1.5]GetDeletePolicy¨⍵}∪buildList[;3] ⍝ Fetch delete policies just once per Tatin Server
-                 :EndIf
                  (tempDir cacheFlag)←InstallPackage_ packageID2 url
              :EndIf
              :If IsHTTP url

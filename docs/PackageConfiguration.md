@@ -16,21 +16,25 @@ This is an example:
 ```
 {
   api: "DotNetZip",
+  assets: "",
   description: "Zipping and unzipping with.NET Core on all major platforms",
-  files: "",
   group: "aplteam",
-  name: "DotNetZip",
   info_url: "https://github.com/aplteam/DotNetZip",
+  io: 1,
+  ml: 1,
+  name: "DotNetZip",
   source: "DotNetZip.aplc",
   tags: "zip-tools;windows;mac-os;linux",
   version: "0.5.4",
-  io: 1,
-  ml: 1,
-  wx: 1,
 }
 ```
 
 This is saved in a file `apl-package.json` which must live in the root of what is a package.
+
+Notes:
+
+* You might see `wx` in an older package: with version 0.61.0 `wx` was removed from package config files.
+* When viewing a package config file on a Tatin Server you will also see `date`: this is injected by the Tatin server: it is the package's publishing date.
 
 ## Details
 
@@ -85,21 +89,21 @@ I>
 I> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is not possible for niladic functions and operators.
 
 
-##### Package consists of a single namespace
+##### A single namespace
 
 * If you don't specify `api` then the name of the namespace is the API. 
 
 * If you do specify `api` then it must be the name of the namespace. In that case the _contents_ of the namespace becomes the API.
 
 
-##### Package consists of a single class
+##### A single class
 
 * If you don't specify `api` then the name of the class is the API. 
 
 * If you do specify `api` then it must be the name of the class. In that case everything in the class with `:Access Public Shared` becomes the API.
 
 
-##### Single function or operator
+##### A single function or operator
 
 If the name of the package is `Foo`, and the name of the function is `MyFns`, then it is called as `Foo.MyFns`. The function may be niladic, monadic, ambivalent or dyadic.
 
@@ -108,7 +112,7 @@ The same holds true for an operator.
 In this particular case `api` _must not_ be defined (remain empty).
 
 
-##### Mixture of several APL objects
+##### A mixture of several APL objects
 
 * If `api` is not set then all top-level objects of the package become the API: functions, operators, namespaces, classes , interfaces.
 * If `api` is set then it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what `api` is pointing to become the API.
@@ -126,11 +130,15 @@ If the name of the package is `Foo`, and it is loaded into `#`, and you want to 
   Run←{⍺←⊢ ⋄ ⍺ ##.Run ⍵}
   ```
 
+  (Assumes that `Run` takes an optional left argument)
+
 * `CreateParmSpace`:
 
   ```
   CreateParmSpace←{##.CreateParmSpace ⍵}
   ```
+
+  (Assumes that `CreateParmSpace` does not accept a left argument)
 
 Finally you need to specify `api: "MyAPI"` in the package config file.
 
@@ -157,9 +165,13 @@ If not empty (no assets) it points to a folder holding the assets. The path must
 
 There is one exception: when an absolute path is specified but it's partly identical with what will become `HOME` (the folder where the package lives) then Tatin removes that  part silently, making the path effectively relative. 
 
-Note that when the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.
+Notes:
 
-See also the [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) function.
+* When the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.
+
+  See also the [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) function.
+
+* The assets\ folder must be considered read-only. Never write to it from a package!
 
 A> ### Accessing assets from a class instance
 A>
@@ -247,9 +259,11 @@ Must be either the name of a text file that contains code or a folder that conta
 
 If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script), `.apli` (an interface script), `.aplf` (a function) or `.aplo` (an operator).
 
-The `.dyalog` extension is supported for limited backward compatibility --- Tatin does not guarantee complete compatibility with SALT. Using this extension is not encouraged: use it at your own risk.
+The `.dyalog` extension is supported for limited backward compatibility --- Tatin does not guarantee complete compatibility with SALT. The `.dyalog` extension is still used by the user command framework, therefore Tatin must support it: a user command might well be delivered as a Tatin package.
 
-If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
+Note that outside this context using this extension is not encouraged.
+
+If `source` is a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
 
 `source` must be relative to the root of the package.
 
@@ -277,18 +291,18 @@ The optional build number, separated by the `+` sign, is ignored by Tatin.
 
 For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") document. 
 
-#### APL System variables: ⎕IO, ⎕ML, ⎕WX {#SysVars}
+#### APL System variables: ⎕IO and ⎕ML {#SysVars}
 
-By default the config namespace carries the values of the three Dyalog parameters `default_io`, `default_ml` and `default_wx` for the three system variables `⎕IO`, `⎕ML` and `⎕WX`. 
+By default the config namespace carries the values of the two Dyalog parameters `default_io` and `default_ml` for the system variables `⎕IO` and `⎕ML`. 
 
-Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependencies` function _before_ any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.
+Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependencies` function _before_ any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.
 
 
 #### Injected values
 
 ##### date
 
-The user must not specify "date", but when published the server will inject it as a timestamp in the format `yyyymmdd.hhmmss`. 
+The user must not specify "date", but when a package is published the server will inject "date" as a timestamp in the format `yyyymmdd.hhmmss`. 
 
 This date might play an important role in determining the precedence of versions. This is because although it's obvious which version is "better" when you look at these two packages:
 
@@ -316,13 +330,13 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 ##### url
 
-* When a package is loaded or installed from a Tatin Server, "url" is injected, and points back to that server.
+* When a package is loaded or installed from a Tatin Server, "url" is injected and points back to that server.
 
-* When a package is loaded or installed from a file, "url" is injected, and points to that file.
+* When a package is loaded or installed from a file, "url" is injected and points to that file.
 
 ### Access after loading a package
 
-Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with ``ASSETS`, `GetFullPath2Assets`, `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
+Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with `ASSETS`, `GetFullPath2Assets`, `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
 
 `LX` is only available in case the package used the [`lx`](#) mechanism for initializing itself.
 
@@ -335,11 +349,11 @@ Notes:
   * The package does not have any assets
 * `HOME` will also be empty in case the path it holds does not exist
 
-  This may happen in case packages are loaded into a WS, saved, and then moved elsewhere, maybe even a different machine. In that case the folder the package was loaded from is not available anymore, and therefore `''` is returned.
+  This may happen in case packages are loaded into a WS, saved, and then moved elsewhere, maybe even a different machine. In that case the folder the package was loaded from might not be available anymore, and therefore `''` is returned.
 * `ASSETS` holds the path of any assets relative to `HOME`. It is empty in case there are no assets.
 * `GetFullPath2Assets` returns `HOME,'/',ASSETS` in case `HOME` is not empty, and just `ASSETS` otherwise.
 
-[^id]: A package ID consists of `{group}-{name}-{major.{minor}.{patch}`
+[^id]: A package ID consists of `{group}-{name}-{major}.{minor}.{patch}`
 
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 

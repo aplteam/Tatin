@@ -43,19 +43,23 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>This is an example:</p>
 <pre><code>{
   api: "DotNetZip",
+  assets: "",
   description: "Zipping and unzipping with.NET Core on all major platforms",
-  files: "",
   group: "aplteam",
-  name: "DotNetZip",
   info_url: "https://github.com/aplteam/DotNetZip",
+  io: 1,
+  ml: 1,
+  name: "DotNetZip",
   source: "DotNetZip.aplc",
   tags: "zip-tools;windows;mac-os;linux",
   version: "0.5.4",
-  io: 1,
-  ml: 1,
-  wx: 1,
 }</code></pre>
 <p>This is saved in a file <code>apl-package.json</code> which must live in the root of what is a package.</p>
+<p>Notes:</p>
+<ul>
+<li>You might see <code>wx</code> in an older package: with version 0.61.0 <code>wx</code> was removed from package config files.</li>
+<li>When viewing a package config file on a Tatin Server you will also see <code>date</code>: this is injected by the Tatin server: it is the package's publishing date.</li>
+</ul>
 <div class="h_tag">
 <a href="#Details" id="Details" class="autoheader_anchor">
 <h2 data-id="Details">2. Details</h2>
@@ -117,8 +121,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 
 <div class="h_tag">
-<a href="#Package-consists-of-a-single-namespace" id="Package-consists-of-a-single-namespace" class="autoheader_anchor">
-<h5 data-id="Package-consists-of-a-single-namespace">2.3.1.1. Package consists of a single namespace</h5>
+<a href="#A-single-namespace" id="A-single-namespace" class="autoheader_anchor">
+<h5 data-id="A-single-namespace">2.3.1.1. A single namespace</h5>
 </a>
 </div>
 <ul>
@@ -126,8 +130,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>If you do specify <code>api</code> then it must be the name of the namespace. In that case the <em>contents</em> of the namespace becomes the API.</li>
 </ul>
 <div class="h_tag">
-<a href="#Package-consists-of-a-single-class" id="Package-consists-of-a-single-class" class="autoheader_anchor">
-<h5 data-id="Package-consists-of-a-single-class">2.3.1.2. Package consists of a single class</h5>
+<a href="#A-single-class" id="A-single-class" class="autoheader_anchor">
+<h5 data-id="A-single-class">2.3.1.2. A single class</h5>
 </a>
 </div>
 <ul>
@@ -135,16 +139,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>If you do specify <code>api</code> then it must be the name of the class. In that case everything in the class with <code>:Access Public Shared</code> becomes the API.</li>
 </ul>
 <div class="h_tag">
-<a href="#Single-function-or-operator" id="Single-function-or-operator" class="autoheader_anchor">
-<h5 data-id="Single-function-or-operator">2.3.1.3. Single function or operator</h5>
+<a href="#A-single-function-or-operator" id="A-single-function-or-operator" class="autoheader_anchor">
+<h5 data-id="A-single-function-or-operator">2.3.1.3. A single function or operator</h5>
 </a>
 </div>
 <p>If the name of the package is <code>Foo</code>, and the name of the function is <code>MyFns</code>, then it is called as <code>Foo.MyFns</code>. The function may be niladic, monadic, ambivalent or dyadic.</p>
 <p>The same holds true for an operator.</p>
 <p>In this particular case <code>api</code> <em>must not</em> be defined (remain empty).</p>
 <div class="h_tag">
-<a href="#Mixture-of-several-APL-objects" id="Mixture-of-several-APL-objects" class="autoheader_anchor">
-<h5 data-id="Mixture-of-several-APL-objects">2.3.1.4. Mixture of several APL objects</h5>
+<a href="#A-mixture-of-several-APL-objects" id="A-mixture-of-several-APL-objects" class="autoheader_anchor">
+<h5 data-id="A-mixture-of-several-APL-objects">2.3.1.4. A mixture of several APL objects</h5>
 </a>
 </div>
 <ul>
@@ -160,9 +164,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If the name of the package is <code>Foo</code>, and it is loaded into <code>#</code>, and you want to expose only the functions <code>Run</code> and <code>CreateParmSpace</code>, then the recommended way of doing this is to create a sub-namespace with the name (say) <code>MyAPI</code> and populate it with two functions:</p>
 <ul>
 <li><code>Run</code>:
-<pre><code>Run←{⍺←⊢ ⋄ ⍺ ##.Run ⍵}</code></pre></li>
+<pre><code>Run←{⍺←⊢ ⋄ ⍺ ##.Run ⍵}</code></pre>
+<p>(Assumes that <code>Run</code> takes an optional left argument)</p></li>
 <li><code>CreateParmSpace</code>:
-<pre><code>CreateParmSpace←{##.CreateParmSpace ⍵}</code></pre></li>
+<pre><code>CreateParmSpace←{##.CreateParmSpace ⍵}</code></pre>
+<p>(Assumes that <code>CreateParmSpace</code> does not accept a left argument)</p></li>
 </ul>
 <p>Finally you need to specify <code>api: "MyAPI"</code> in the package config file.</p>
 <p>Calling the function <code>Run</code> (after loading the package) would then require:</p>
@@ -179,8 +185,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>If not empty (no assets) it points to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>”. If it does anyway an error is thrown.</p>
 <p>There is one exception: when an absolute path is specified but it's partly identical with what will become <code>HOME</code> (the folder where the package lives) then Tatin removes that part silently, making the path effectively relative.</p>
-<p>Note that when the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.</p>
-<p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> function.</p>
+<p>Notes:</p>
+<ul>
+<li>When the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.
+<p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> function.</p></li>
+<li>The assets\ folder must be considered read-only. Never write to it from a package!</li>
+</ul>
 <div class="leanpub_A">
 <h3>Accessing assets from a class instance</h3>
 <p>In case you need to access assets from an instance of a class in a package you have two choices:</p>
@@ -256,8 +266,9 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>This defines the source code file(s) that are going to be part of the package.</p>
 <p>Must be either the name of a text file that contains code or a folder that contains a collection of code files. <code>source</code> <em>must not</em> be empty.</p>
 <p>If it's a single file it might be anything with the extension <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script), <code>.apli</code> (an interface script), <code>.aplf</code> (a function) or <code>.aplo</code> (an operator).</p>
-<p>The <code>.dyalog</code> extension is supported for limited backward compatibility — Tatin does not guarantee complete compatibility with SALT. Using this extension is not encouraged: use it at your own risk.</p>
-<p>If it's a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.</p>
+<p>The <code>.dyalog</code> extension is supported for limited backward compatibility — Tatin does not guarantee complete compatibility with SALT. The <code>.dyalog</code> extension is still used by the user command framework, therefore Tatin must support it: a user command might well be delivered as a Tatin package.</p>
+<p>Note that outside this context using this extension is not encouraged.</p>
+<p>If <code>source</code> is a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.</p>
 <p><code>source</code> must be relative to the root of the package.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
@@ -281,11 +292,11 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
 <a href="#SysVars" id="SysVars" class="autoheader_anchor">
-<h4 data-id="SysVars">2.3.12. APL System variables: ⎕IO, ⎕ML, ⎕WX</h4>
+<h4 data-id="SysVars">2.3.12. APL System variables: ⎕IO and ⎕ML</h4>
 </a>
 </div>
-<p>By default the config namespace carries the values of the three Dyalog parameters <code>default_io</code>, <code>default_ml</code> and <code>default_wx</code> for the three system variables <code>⎕IO</code>, <code>⎕ML</code> and <code>⎕WX</code>.</p>
-<p>Tatin uses these values for setting the three system variables accordingly in any namespace that is created by either the <code>LoadPackage</code> or the <code>LoadDependencies</code> function <em>before</em> any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.</p>
+<p>By default the config namespace carries the values of the two Dyalog parameters <code>default_io</code> and <code>default_ml</code> for the system variables <code>⎕IO</code> and <code>⎕ML</code>.</p>
+<p>Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the <code>LoadPackage</code> or the <code>LoadDependencies</code> function <em>before</em> any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.</p>
 <div class="h_tag">
 <a href="#Injected-values" id="Injected-values" class="autoheader_anchor">
 <h4 data-id="Injected-values">2.3.13. Injected values</h4>
@@ -296,7 +307,7 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <h5 data-id="date">2.3.13.1. date</h5>
 </a>
 </div>
-<p>The user must not specify “date”, but when published the server will inject it as a timestamp in the format <code>yyyymmdd.hhmmss</code>.</p>
+<p>The user must not specify “date”, but when a package is published the server will inject “date” as a timestamp in the format <code>yyyymmdd.hhmmss</code>.</p>
 <p>This date might play an important role in determining the precedence of versions. This is because although it's obvious which version is “better” when you look at these two packages:</p>
 <pre><code>group-name-1.0.0
 group-name-1.1.0</code></pre>
@@ -313,15 +324,15 @@ group-name-1.1.0-FixFor234</code></pre>
 </a>
 </div>
 <ul>
-<li>When a package is loaded or installed from a Tatin Server, “url” is injected, and points back to that server.</li>
-<li>When a package is loaded or installed from a file, “url” is injected, and points to that file.</li>
+<li>When a package is loaded or installed from a Tatin Server, “url” is injected and points back to that server.</li>
+<li>When a package is loaded or installed from a file, “url” is injected and points to that file.</li>
 </ul>
 <div class="h_tag">
 <a href="#Access-after-loading-a-package" id="Access-after-loading-a-package" class="autoheader_anchor">
 <h3 data-id="Access-after-loading-a-package">2.4. Access after loading a package</h3>
 </a>
 </div>
-<p>Whether you load a package with <code>LoadPackage</code> or <code>LoadDependencies</code>, the contents of the configuration file is available as readable JSON as a character vector under the name <code>CONFIG</code> together with ``ASSETS<code>, </code>GetFullPath2Assets<code>, </code>ID<code>, </code>URI<code>, </code>HOME<code> and possibly </code>LX<code>. All these pieces of information are available in the namespace </code>TatinVars<code> which is injected into the </code>code` namespace.</p>
+<p>Whether you load a package with <code>LoadPackage</code> or <code>LoadDependencies</code>, the contents of the configuration file is available as readable JSON as a character vector under the name <code>CONFIG</code> together with <code>ASSETS</code>, <code>GetFullPath2Assets</code>, <code>ID</code>, <code>URI</code>, <code>HOME</code> and possibly <code>LX</code>. All these pieces of information are available in the namespace <code>TatinVars</code> which is injected into the <code>code</code> namespace.</p>
 <p><code>LX</code> is only available in case the package used the <a href="#lx" class="bookmark_link"><code>lx</code></a> mechanism for initializing itself.</p>
 <p>All of them are niladic functions because that's how we emulate constants in APL.</p>
 <p>Notes:</p>
@@ -332,7 +343,7 @@ group-name-1.1.0-FixFor234</code></pre>
 <li>The package does not have any assets</li>
 </ul></li>
 <li><code>HOME</code> will also be empty in case the path it holds does not exist
-<p>This may happen in case packages are loaded into a WS, saved, and then moved elsewhere, maybe even a different machine. In that case the folder the package was loaded from is not available anymore, and therefore <code>''</code> is returned.</p></li>
+<p>This may happen in case packages are loaded into a WS, saved, and then moved elsewhere, maybe even a different machine. In that case the folder the package was loaded from might not be available anymore, and therefore <code>''</code> is returned.</p></li>
 <li><code>ASSETS</code> holds the path of any assets relative to <code>HOME</code>. It is empty in case there are no assets.</li>
 <li><code>GetFullPath2Assets</code> returns <code>HOME,'/',ASSETS</code> in case <code>HOME</code> is not empty, and just <code>ASSETS</code> otherwise.</li>
 </ul>
@@ -340,7 +351,7 @@ group-name-1.1.0-FixFor234</code></pre>
 <hr>
 <p><strong>Footnotes</strong></p>
 <ol>
-<li id="fnref1"><p>A package ID consists of <code>{group}-{name}-{major.{minor}.{patch}</code></p><a href="#fnref1" class="footnote_anchor"></a>
+<li id="fnref1"><p>A package ID consists of <code>{group}-{name}-{major}.{minor}.{patch}</code></p><a href="#fnref1" class="footnote_anchor"></a>
 <li id="fnref2"><p>A version is built from the major number, the minor number and the version number, optionally followed by a build number</p><a href="#fnref2" class="footnote_anchor"></a>
 <li id="fnref3"><p>The Tatin package variables are discussed in detail the document <code>FirstStepsWithTatin.html</code></p><a href="#fnref3" class="footnote_anchor"></a>
 </ol>

@@ -50,20 +50,25 @@
          'Not a valid package ID'Assert flag1∨flag2
      :EndIf
      PrintToSession'  Dependency ',identifier,' identified...'
-     ∆TREE.Data⍪←principal(alias,packageID)identifier
-     :If '.zip'≡⎕C ¯4↑identifier
-         filename←RemoveFileProtocol identifier
-         tempPath←Reg.GetTempDir,'/',packageID
-         F.RmDir tempPath
-         ⎕DL 0.1
-         F.MkDir tempPath
-         ⎕DL 0.1
-         filename DotNetZip.UnzipTo tempPath
-         0 GetDependencyTreeFromRegistry tempPath
-         F.RmDir tempPath
+     :If identifier{⍵≡(≢⍵)↑⍺}GetPathToPackageCache
+         ∆TREE.Data⍪←principal(alias,packageID)identifier
+         0 GetDependencyTreeFromRegistry identifier
      :Else
-         identifier←RemoveFileProtocol identifier
-         0 GetDependencyTreeFromRegistry alias,identifier
+         ∆TREE.Data⍪←principal(alias,packageID)identifier
+         :If '.zip'≡⎕C ¯4↑identifier
+             filename←RemoveFileProtocol identifier
+             tempPath←Reg.GetTempDir,'/',packageID
+             F.RmDir tempPath
+             ⎕DL 0.1
+             F.MkDir tempPath
+             ⎕DL 0.1
+             filename DotNetZip.UnzipTo tempPath
+             0 GetDependencyTreeFromRegistry tempPath
+             F.RmDir tempPath
+         :Else
+             identifier←RemoveFileProtocol identifier
+             0 GetDependencyTreeFromRegistry alias,identifier
+         :EndIf
      :EndIf
  :EndIf
  :If initialCall

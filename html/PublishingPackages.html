@@ -58,7 +58,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If you want to publish on <code>https://tatin.dev</code> you need to ask <a href="mailto:tatin.dev@gmail.com" class="mailto_link">tatin.dev@gmail.com</a> for an API key.</p>
 <p>You must provide these pieces of information:</p>
 <ul>
-<li>Your desired group name (case insenstive)</li>
+<li>Your desired group name (case insensitive)</li>
 <li>Your real name</li>
 <li>If it's connected to a company, the company's name</li>
 </ul>
@@ -155,13 +155,14 @@ group3=''
 </a>
 </div>
 <p>This file is only required when the package to be published has dependencies.</p>
-<p>Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.</p>
-<p>Usually you will specify just a full package ID as a dependency. If you wish you may also specify either a URL following the http:// protocol or a zip file following the file:// protocol.</p>
+<p>Note that in case you specify a dependency that does not (yet) exist on the Registry then this has no consequences: the server will not reject such a package.</p>
+<p>That might well come as a surprise, but there is a very good reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.</p>
+<p>Usually you will specify just a full package ID as a dependency. If you wish you may also specify either a URL following the http[s]:// protocol or a zip file following the file:// protocol.</p>
 <p>Notes:</p>
 <ul>
 <li>Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with “400 — bad request”.
 <p>That is good enough a reason to use this with care. Only when messing around with packages not desiged to be published to a Tatin server on your local machine may this be used.</p></li>
-<li>Using the http:// protocol defeats Tatin's scan strategy: when a dependency is required Tatin will scan all defined Registries oder by their priority unless the http:// protocol is used. Again this should be used very carefully, if at all.</li>
+<li>Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.</li>
 </ul>
 <div class="h_tag">
 <a href="#Final-step" id="Final-step" class="autoheader_anchor">
@@ -170,8 +171,8 @@ group3=''
 </div>
 <p>Once the preparation is done the final step is easy. You may specify the folder hosting the package:</p>
 <pre><code>]TATIN.PublishPackage /path2package [tatin]</code></pre>
-<p>The folder may or may not carry a trailing <code>/</code>.</p>
-<p>This would attempt to publish the package <code>group-name-1.2.3</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
+<p>The folder may or may not carry a trailing slash (<code>/</code>).</p>
+<p>This would attempt to publish the package found in <code>path2package/</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
 <p>You can also create a ZIP file with the <code>]TATIN.Pack</code> command and specify the ZIP file as argument:</p>
 <pre><code>]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]</code></pre>
 <div class="h_tag">
@@ -185,7 +186,7 @@ group3=''
 <li>“JustBetas”: You may delete only beta versions</li>
 <li>“None”: You cannot delete any packages at all</li>
 </ul>
-<p>Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator — a <code>+</code> (recommended) or a <code>.</code> (deprecated) — qualifies as a beta version.</p>
+<p>Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator (either a plus (“<code>+</code>”, recommended) or a — now deprecated — dot (“<code>.</code>”)) qualifies as a beta version.</p>
 <p>Examples:</p>
 <pre><code>apltree-Foo-1.0.0                 ⍝ Not a beta
 apltree-Foo-1.0.0+123             ⍝ Not a beta
@@ -209,13 +210,15 @@ None</code></pre></li>
 <p>This is just for you, nobody else. The purpose of this server is to publish packages to it at a very early stage.</p>
 <p>It has the highest priority of all Registries, ensuring that in case a package lives on several Registries it is found on <code>[my]</code> first.</p></li>
 <li>Your team runs a Tatin Server on the Intranet of your company. It carries the alias <code>[my-team]</code>.
+<p>This is used to publish beta versions that your team might want to use. This has the second-highest priority.</p>
 <p>This is used to publish beta versions that your team might want to use. This has the second-highest priority.</p></li>
-<li>Your packages also have dependencies on packages published on Tatin's principal server, known as <code>[tatin]</code>.
-<p>Of the three Registries this one should probably have the lowest priority.</p></li>
-<li>You might also have the test Registry defined in your user settings, but with a priority of <code>0</code> so that it will be ignored when Registries are scanned for packages, but you could still mess around with it.</li>
+<li>Your company also runs a Tatin Server used for producitve packages.</li>
+<li>Your packages may dependend on packages published on Tatin's principal server, known as <code>[tatin]</code>.
+<p>Of the four Registries this one should probably have the lowest priority.</p></li>
+<li>You might also have the test Registry defined in your user settings, but with a priority of <code>0</code> so that it will be ignored when Registries are scanned for packages, but you could still use it.</li>
 </ul>
 <p>You can now develop a package <code>Foo</code> and publish it on <code>[my]</code>, probably several times until it is stable.</p>
-<p>You would then publish it on <code>[my-team]</code>. At the same time you would either delete the package from <code>[my]</code> or, if you want <code>[my]</code> to be ignored altogether, set its priority to zero.</p>
-<p>When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package would be deleted from the Team server.</p>
+<p>You would then publish it on <code>[my-team]</code>. At the same time you would either delete the package from <code>[my]</code> or, if you want the Registry <code>[my]</code> to be ignored altogether, set its priority to zero.</p>
+<p>When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package might or might not be deleted from the Team server.</p>
 </body>
 </html>

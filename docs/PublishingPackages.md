@@ -26,7 +26,7 @@ If you want to publish on `https://tatin.dev` you need to ask [tatin.dev@gmail.c
 
 You must provide these pieces of information:
 
-* Your desired group name (case insenstive)
+* Your desired group name (case insensitive)
 * Your real name
 * If it's connected to a company, the company's name
 
@@ -136,9 +136,11 @@ What is required and how to create and change a package configuration file is di
 
 This file is only required when the package to be published has dependencies.
 
-Note that in case you specify a dependency that does not (yet?!) exist on the Registry then this has no consequences. The reason is that when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
+Note that in case you specify a dependency that does not (yet) exist on the Registry then this has no consequences: the server will not reject such a package. 
 
-Usually you will specify just a full package ID as a dependency. If you wish  you may also specify either a URL following the http:// protocol or a zip file following the file:// protocol. 
+That might well come as a surprise, but there is a very good reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
+
+Usually you will specify just a full package ID as a dependency. If you wish  you may also specify either a URL following the http[s]:// protocol or a zip file following the file:// protocol. 
 
 Notes:
 
@@ -146,7 +148,7 @@ Notes:
 
   That is good enough a reason to use this with care. Only when messing around with packages not desiged to be published to a Tatin server on your local machine may this be used.
 
-* Using the http:// protocol defeats Tatin's scan strategy: when a dependency is required Tatin will scan all defined Registries oder by their priority unless the http:// protocol is used. Again this should be used very carefully, if at all.
+* Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.
 
 
 ### Final step
@@ -157,9 +159,9 @@ Once the preparation is done the final step is easy. You may specify the folder 
 ]TATIN.PublishPackage /path2package [tatin]
 ```
 
-The folder may or may not carry a trailing `/`.
+The folder may or may not carry a trailing slash (`/`).
 
-This would attempt to publish the package `group-name-1.2.3` to the principal Tatin Server represented by the alias `[tatin]`.
+This would attempt to publish the package found in `path2package/` to the principal Tatin Server represented by the alias `[tatin]`.
 
 You can also create a ZIP file with the `]TATIN.Pack` command and specify the ZIP file as argument:
 
@@ -176,7 +178,7 @@ Whether you can delete a package once it was published depends on the policy the
 * "JustBetas": You may delete only beta versions
 * "None": You cannot delete any packages at all
 
-Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator --- a `+` (recommended) or a `.` (deprecated) --- qualifies as a beta version.
+Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator (either a plus ("`+`", recommended) or a --- now deprecated --- dot ("`.`")) qualifies as a beta version.
 
 Examples:
 
@@ -212,15 +214,19 @@ Let's imagine that you are supposed to develop Tatin packages for your employer,
 
   This is used to publish beta versions that your team might want to use. This has the second-highest priority.
 
-* Your packages also have dependencies on packages published on Tatin's principal server, known as `[tatin]`.
+  This is used to publish beta versions that your team might want to use. This has the second-highest priority.
 
-  Of the three Registries this one should probably have the lowest priority.
+* Your company also runs a Tatin Server used for producitve packages.
 
-* You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when Registries are scanned for packages, but you could still mess around with it.
+* Your packages may dependend on packages published on Tatin's principal server, known as `[tatin]`.
+
+  Of the four Registries this one should probably have the lowest priority.
+
+* You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when Registries are scanned for packages, but you could still use it.
 
 You can now develop a package `Foo` and publish it on `[my]`, probably several times until it is stable.
 
-You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want `[my]` to be ignored altogether, set its priority to zero.
+You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
-When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package would be deleted from the Team server.
+When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package might or might not be deleted from the Team server.
 

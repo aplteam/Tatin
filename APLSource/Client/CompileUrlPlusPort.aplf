@@ -1,0 +1,12 @@
+ url←url CompileUrlPlusPort port
+ ⍝ * If port is one of (0 80 443) then url survives untouched.
+ ⍝ * Otherwise url and port are glued together with a ":" in between.
+ ⍝ Examples:
+ ⍝ 'https:/tatin.dev/' ←→ 'https:/tatin.dev' CompileUrlPlusPort 0
+ ⍝ 'https:/tatin.dev/' ←→ 'https:/tatin.dev/' CompileUrlPlusPort 80
+ ⍝ 'https:/tatin.dev:9001/' ←→ 'https:/tatin.dev' CompileUrlPlusPort 9001
+ :If port∊0 80 443
+     url←(url↓⍨-'/'=¯1↑url),'/'
+ :Else
+     url←((-'/'=¯1↑url)↓url),':',(⍕port),'/'
+ :EndIf

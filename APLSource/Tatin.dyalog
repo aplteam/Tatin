@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.37.2 - 2022-04-10
+⍝ * 0.37.3 - 2022-04-17
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -564,7 +564,7 @@
       {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage'https://tatin.dev/v1/documentation'
     ∇
 
-    ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn
+    ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn;noOf
       (identifier targetSpace)←Arg.(_1 _2)
       :If 0≡targetSpace
           targetSpace←,'#'
@@ -578,7 +578,9 @@
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
-      r←Arg.nobetas TC.LoadPackage identifier targetSpace
+     
+      noOf←Arg.nobetas TC.LoadPackage identifier targetSpace
+      r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded'
     ∇
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data
@@ -782,8 +784,8 @@
       :EndIf
     ∇
 
-    ∇ r←Cache Arg;url;list;buff;pathFlag;flag
-      r←⍬
+    ∇ r←Cache Arg;url;list;pathFlag;flag;report;rc
+      r←''
       :If 0≡Arg._1
           url←''
       :Else
@@ -795,17 +797,30 @@
       :Else
           pathFlag←0
       :EndIf
-      :If 0<≢buff←pathFlag TC.ListCache url
-          r←⍪{⍪('*** ',1⊃⍵)(⍪2⊃⍵)}¨buff
+      :If 0<≢list←pathFlag TC.ListCache url
+          :If Arg.clear
+              r←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
+          :Else
+              r←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
+          :EndIf
+      :Else
+          r←'*** Nothing found'
       :EndIf
-      :If Arg.clear
+      :If 0<≢list
+      :AndIf Arg.clear
           :If Arg.force
               flag←1
           :Else
-              flag←∆YesOrNo'Sure that you want to delete these from the Tatin package cache?'
+              ⎕←''
+              flag←∆YesOrNo'Sure that you want delete these from the Tatin package cache?'
           :EndIf
       :AndIf flag
-          r←TC.ClearCache url
+          (rc report)←TC.ClearCache url
+          :If 0=rc
+              r←'*** Cache successfully cleared'
+          :Else
+              r←'*** Attempt to delete these failed:',⊃,/(⎕UCS 10)¨,⊆report
+          :EndIf
       :EndIf
     ∇
 

@@ -86,7 +86,7 @@ There are several scenarios:
 
 I> Note that you _must not_ specify the name of a function or an operator as the API in any of these cases.
 I> 
-I> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is not possible for niladic functions and operators.
+I> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is possible neither for niladic functions nor operators.
 
 
 ##### A single namespace

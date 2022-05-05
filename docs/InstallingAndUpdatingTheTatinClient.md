@@ -84,7 +84,7 @@ What is the application for this? Well, you might want to have an automated buil
 I> If you are not interested in this, skip the rest of this document
 
 
-The way to achieve that goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs\` folder.
+The way to achieve that goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs/` folder. Note that on non-Windows platforms the name of the file must be lowercase.
 
 A> ### How does `setup.dyalog` work?
 A>

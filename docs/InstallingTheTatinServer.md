@@ -20,6 +20,8 @@ After downloading it from <https://github.com/aplteam/Tatin/releases> you need t
 
   For the time being neither the Pi nor Mac OS nor AIX are supported. This restriction might be lifted for the Pi and/or Mac OS but not AIX.
 
+* .NET (on _all_ platforms)
+
 ## Configuration: the INI File
 
 First you need to amend the file `server.ini`.

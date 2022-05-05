@@ -41,7 +41,9 @@ Packages can be updated to a later (and therefore hopefully better) version in a
 
 * The Tatin client runs on Windows, Linux and Mac-OS.
 
-* The Tatin server runs on Windows (as a Service) and on Linux (as a Docker image) and Mac-OS. 
+* The Tatin server runs on Windows (as a Service) and on Linux (as a Docker image). 
+
+* Server as well as Client rely on .NET (Windows) or .NET Core (that is version 3.1) on non-Windows platforms.
 
 * Tatin is not compatible with SALT, although the extension `.dyalog` is supported.
 

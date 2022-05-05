@@ -20,7 +20,7 @@ And that's exactly what Tatin does by default, with two exceptions:
 
    The goal is to not clutter the cache with short-lived beta versions.
 
-1. In case a server operates an "All" delete policy then no packages of that registry will be cached.
+1. In case a server operates an "Any" delete policy then no packages of that registry will be cached.
 
    Once a package got deleted it should not be available anymore, neither from the registry itself nor from the cache.
 

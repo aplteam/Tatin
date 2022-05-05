@@ -233,6 +233,20 @@ The file `apl-package.json` describes the MarkAPL package:
 }
 ```
 
+Note that `MarkAPL` is a class. If you would leave `api` empty then when `MarkAPL` is loaded into `#` you would need to call the `Version` function with:
+
+```
+#.MarkAPL.MarkAPL.Version
+```
+
+By defining `MarkAPL` as the api you can instead say:
+
+```
+#.MarkAPL.Version
+```
+
+The `api` parameter is discussed in detail in the "PackageConfiguration" document.
+
 #### Assets
 
 Note that the file `apl-package.json` specifies `assets: "Files/"`. That means that all assets are to be found in the `Files/` sub directory.

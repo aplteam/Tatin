@@ -59,12 +59,18 @@
     ∇ r←Version
       :Access Public Shared
       ⍝ See `History`
-      r←'MarkAPL' '11.0.2+237' '2021-10-12'
+      r←'MarkAPL' '11.0.3+239' '2022-05-09'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 11.0.2
+      ⍝ * 11.0.3 ⋄ 2022-05-09
+      ⍝   * Bug fixes:
+      ⍝     * When the command line of the current instance of Dyalog contained something like
+      ⍝       lx="1 #.RunThis 1"
+      ⍝       then that expression was subject to ⍎, meaning the function got executed.
+      ⍝     * URL links with APL code in the link text were buggy
+      ⍝ * 11.0.2 ⋄ 2021-10-12
       ⍝   * Two successive lists were indistinguishable from a single one in all the CSS.
       ⍝   * Tatin packages updated
       ⍝   * Internal change: now managed by Cider rather than acre
@@ -2015,6 +2021,7 @@
           linkDef←off↑txt
           linkDef←A.DMB ReplaceQTC_byBlank linkDef
           mask←~GetMaskForCode linkDef
+          linkDef←ReplaceDoubleSmartQuotes linkDef mask
           sa←GetSpecialAttributes⌽{'{'∊⍵:{⍵↑⍨⍵⍳'{'}{⍵↓⍨¯1+⍵⍳'}'}⍵ ⋄ ''}⌽mask/linkDef   ⍝ Because special attributes for a link follow straight after the link
           txt←off↓txt
           mask←⌽~GetMaskForCode linkDef
@@ -2680,6 +2687,16 @@
           (-+/∧\~⌽bool)↓bool   ⍝ The highest levels might not be in use, so we need to drop them
       }
 
+      ReplaceDoubleSmartQuotes←{
+     ⍝ In case ⍵ carries special attributes at this point ordinary double quotes(") will be replaced
+     ⍝ by smart one like (“” and „“). We need to being them back
+          (txt mask)←⍵
+          txt2←mask\mask/txt
+          0=+/b←txt2∊'“”„“':txt
+          (b/txt)←'"'
+          txt
+      }
+
       GetSpecialAttributes←{
       ⍝ Checks whether ⍵ (a single line of Markdown) carries a "special attributes" definition.
       ⍝ If so it returns a vector of definitions.
@@ -2829,12 +2846,14 @@
     ∇
 
       GetCommandLineParms←{
+          ⍺←1↓2 ⎕NQ #'GetCommandLineArgs'
+          arg←⍺
           r←⎕NS''
-          clp←{⍵/⍨'-'≠⊃¨⍵}1↓2 ⎕NQ #'GetCommandLineArgs'
+          clp←{⍵/⍨'-'≠⊃¨⍵}arg
           0=≢clp:r
           0=≢clp←{⍵/⍨'='∊¨⍵}clp:r
           clp←'='A.Split¨clp
-          _←r.{⍎⍺,'←',{'''',⍵,''''}⍣(~⊃⊃⎕VFI ⍵)⊢⍵}/¨clp
+          _←r.{⍎⍺,'←',{'''',⍵,''''}⍣(0∊⊃⎕VFI ⍵)⊢⍵}/¨clp
           r
       }
 
@@ -3141,7 +3160,7 @@
     ⍝ '#a-bookmark-link` `The Title`
     ⍝ or [APL wiki](http://aplwiki.com "foo")
     ⍝ 'http://aplwiki.com' 'foo'
-      url←(link⍳']')↓link
+      url←((link{⍵\⍵/⍺}~GetMaskForCode link)⍳']')↓link
       url←(url⍳'(')↓url
       url↓⍨←-{⍵⍳')'}⌽url
       url←A.DTB url
@@ -3552,7 +3571,9 @@
           mask←⍺
           0=+/b←']('⍷mask\mask/txt:⍬
           link←⌽(b⍳1)↑txt
-          (≢link)-1++/∧\~(+\link='[')=+\link=']'
+          mask2←⌽(≢link)↑mask
+          link2←mask2\mask2/link
+          (≢link)-1++/∧\~(+\link2='[')=+\link2=']'
       }
 
       IsUnicodeCharacter←{

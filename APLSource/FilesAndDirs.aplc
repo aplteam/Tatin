@@ -38,55 +38,55 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'FilesAndDirs' '5.1.4+111' '2021-11-10'
+      r←'FilesAndDirs' '5.0.1+98' '2021-03-01'
     ∇
 
 
     ∇ History
-      :Access Public shared 
-      ⍝ * 5.1.4 ⋄ 2021-11-10
-      ⍝   * Strangely `GetTempSubDir` fails (very rearely) for no apparent reason, but repeating it works.
-      ⍝     Hopefully now more robust: it increases the wait time after every 5 failing tries, and it also
-      ⍝     changes the name, and it tries a maximum of 30 times rather than 20.
-      ⍝ * 5.1.3 ⋄ 2021-10-28
-      ⍝   * GetTempSubDir was still buggy
-      ⍝ * 5.1.2 ⋄ 2021-10-18
-      ⍝   * GetTempSubDir was buggy
-      ⍝ * 5.1.1 ⋄ 2021-08-20
-      ⍝   * `DateToReal` was buggy
-      ⍝   * Internal changes: now managed by Cider rather than acre.
-      ⍝ * 5.1.0 ⋄ 2021-08-18
-      ⍝   * `YoungerThan` introduced
-      ⍝   * `GetModifiedDate` introduced
-      ⍝   * `DateToReal` introduced
+      :Access Public shared
+      ⍝ * 5.0.1 ⋄ 2021-03-01
+      ⍝   * Package config file corrected
+      ⍝ * 5.0.0 ⋄ 2020-12-20
+      ⍝   * BREAKING CHANGE: `CopyTo` and `MoveTo` as well as `CopyTree` and `MoveTree` and also `CreateFile`
+      ⍝     were removed from `FilesAndDirs`. Reason is that the system functions `⎕NCOPY` and `⎕NMOVE`
+      ⍝     can be used for this now.
+      ⍝   * Both `NPUT` and `NGET` now try to overcome a FILE ACCESS error twice before giving up.
+      ⍝   * `DeleteFile` tries to overcome such problems in a similar fashion.
+      ⍝   * `RmDir` now uses `⎕NDELETE` internally with the benefit of being resilient when somebody
+      ⍝     is looking into a folder that is about to be deleted.
+      ⍝   * Internal change: calls to `APLTreeUtils.Lowercase` were removed by calls to `⎕C`
       ⍝\\
       ⍝ For information regarding older version see <https://github.com/aplteam/FilesAndDirs/releases>
     ∇
 
-    ∇ r←{parms_}Dir path;buff;list;more;parms;rc;extension;filename;folder;subFolders;pattern;isrecursiveCall
+    ∇ r←{parms_}Dir path;buff;list;more;parms;rc;extension;filename;folder;subFolders;pattern;isSelfCall
       :Access Public Shared
     ⍝ By default this function returns names. You may request further information by specifying `type`.\\
     ⍝ Without a trailing slash and any wildcards `path` is expected to be either a filename or the
     ⍝ name of a directory. `Dir` returns the requested information for just that file or directory.
+    ⍝ If the last characer of `path` is a separator then `Dir` returns the requested information for
+    ⍝ whatever `path` contains.\\
+    ⍝ If the last partition of `path` contains wildcards then `Dir` returns
+    ⍝ the requested information for zero, one or many hits.\\
     ⍝ `path` might be empty; in this case it defaults to the current directory.\\
-    ⍝ `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs` cannot deal with files
-    ⍝ that contain a `*` or a `?` as part of any name, be it directory or filename; under Linux and Mac OS
-    ⍝ these are legal characters for filenames and directory names.\\
-    ⍝ Only the very last partition of `path` is allowed to carry wildcard characters.\\
-    ⍝ If the last partition of `path` contains wildcards then `Dir` uses them to filter filenames but not
-    ⍝ directories.\\
-    ⍝ The result is a vector of the same length as `type`. `type` defaults to 0 which stands for filenames
+    ⍝ Note that `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs`
+    ⍝ cannot deal with files that contain a `*` or a `?` as part of any name, be it directory
+    ⍝ or filename; under Linux and Mac OS these are legal characters for filenames. Only the very last
+    ⍝ partition of `path` is allowed to carry wildcard characters.\\
+    ⍝ The result is a vector of the same length as `type`. `type` defaults to 0 which stands for file-
     ⍝ and directory names.\\
-    ⍝ You may specify parameters either as key/value pairs or via a namespace populated with variables.
+    ⍝ You may specify additional attributes via the `type` parameter either as key/value pairs or
+    ⍝ via a namespace populated with variables. If you do then the number of attributes specified
+    ⍝ defines the length of the result.
     ⍝ Examples:
     ⍝ ~~~
-    ⍝ ('recursive' 2) FilesAndDirs.Dir ''      ⍝ returns list with directories & files in the current dir.
-    ⍝ ('recursive' 2) FilesAndDirs.Dir '*.md'  ⍝ returns list with files with extension "md".
+    ⍝ ('recursive' 1) FilesAndDirs.Dir ''      ⍝ returns list with directories & files in the current dir.
+    ⍝ ('recursive' 1) FilesAndDirs.Dir '*.md'  ⍝ returns list with files with extension "md".
     ⍝ ~~~
     ⍝
     ⍝ ~~~
     ⍝ parms←⎕ns''
-    ⍝ parms.recursive←2
+    ⍝ parms.recursive←1
     ⍝ parms.type←3 4 5 1 0
     ⍝ parms FilesAndDirs.Dir ''
     ⍝ ~~~
@@ -94,10 +94,10 @@
     ⍝ |Parameter  |Default|Meaning|
     ⍝ |-----------|-------|-------|
     ⍝ | depth     | ⍬     | Ignored when `recursive` is 0.<<br>>Use this to restrict the number of times `Dir` goes down the directory tree.<<br>>For example, set this to 2 if you are interested just in the given directory and its sub-directories.|
-    ⍝ | follow    | 0     | 1=follow symbolic links, meaning that the properties shown are those of the file the link points to rather than the link. |
-    ⍝ | recursive | 0     | 1=scan `path` recursively; may crash with "ACCESS DENIED"; 2=like 1 but ignores directories that cause "ACCESS DENIED"|
+    ⍝ | follow    | 0     | 1=follow symbolic links   |
+    ⍝ | recursive | 0     | 1=scan `path` recursively |
     ⍝ | type      | 0     | Use this to select the information to be returned by `Dir`.<<br>>0 means names. For more information see help on `⎕NINFO`. |
-    ⍝ Note that `recursiveCall` is used internally in order to detect whether `Dir` has called itself recursively.
+    ⍝ Note that `selfCall` is used internally in order to detect whether `Dir` has called itself recursively.
       r←⍬
       path←NormalizePath path
       parms←⎕NS''
@@ -105,14 +105,14 @@
       parms.recursive←0
       parms.depth←⍬
       parms.type←0
-      parms.recursiveCall←0
+      parms.selfCall←0
       :If 0<⎕NC'parms_'
           :If {2::0 ⋄ 1⊣⍵.⎕NL 2}parms_
               {}parms.{{⍎⍺,'←⍵'}/⍵}¨parms_.({⍵(⍎⍵)}¨↓⎕NL 2)
-              'Invalid parameter'⎕SIGNAL 11/⍨∨/~(' '~¨⍨↓parms.⎕NL 2)∊'follow' 'recursive' 'type' 'recursiveCall' 'depth'
+              'Invalid parameter'⎕SIGNAL 11/⍨∨/~(' '~¨⍨↓parms.⎕NL 2)∊'follow' 'recursive' 'type' 'selfCall' 'depth'
           :Else
               parms_←,⊂∘,⍣(2=|≡parms_)⊣parms_
-              'Invalid parameter'⎕SIGNAL 11/⍨0∊(⊃¨parms_)∊(' '~¨⍨↓parms.⎕NL 2),⊂'recursiveCall'
+              'Invalid parameter'⎕SIGNAL 11/⍨0∊(⊃¨parms_)∊(' '~¨⍨↓parms.⎕NL 2),⊂'selfCall'
               parms.{{⍎⍺,'←⍵'}/⍵}¨parms_
           :EndIf
       :EndIf
@@ -140,10 +140,10 @@
               r←⍬  ⍝ Apparently we do not have the rights to read the directory, therefore we ignore it
               :Return
           :EndTrap
-          :If 0≠≢0⊃r
+          :If ~0∊0⊃r
               (0⊃r)←NormalizePath 0⊃r
           :EndIf
-          :If 0<parms.recursive
+          :If parms.recursive
               parms.depth-←1
           :AndIf 0≠≢r
           :AndIf 1∊1⊃r
@@ -167,37 +167,26 @@
               :AndIf 0=⎕NEXISTS buff
                   'path does not exist'⎕SIGNAL 6
               :EndIf
-              pattern←(folder,((~(¯1↑folder)∊'/\')∧0≠≢folder)/'/'),(filename{0=≢⍺,⍵:'' ⋄ ⍺,⍵}extension)
-              :Trap (0<parms.recursive)/19 22
-                  buff←(0 1,parms.type~0 1)⎕NINFO⍠('Follow'parms.follow)('Wildcard' 1)⊣pattern
-              :Else
-                  buff←⍬ ⍬
-              :EndTrap
-              :If 0<parms.recursive
-                  buff←((1⊃buff)∊2 4)∘/¨buff   ⍝ Just ordinary files and links
-              :EndIf
+              pattern←(folder,(0≠≢folder)/'/'),(filename{0=≢⍺,⍵:'' ⋄ ⍺,⍵}extension)
+              buff←(0 1,parms.type~0 1)⎕NINFO⍠('Follow'parms.follow)('Wildcard' 1)⊣pattern
+              buff←((1⊃buff)∊1 2 4)∘/¨buff   ⍝ Ordinary files, directories and links
               (0⊃buff)←NormalizePath 0⊃buff
               r←buff[,(0 1,parms.type~0 1)⍳parms.type]
-              isrecursiveCall←parms.recursiveCall
-              parms.recursiveCall←1
-              :If 0<parms.recursive
-                  parms.depth-←1
-              :EndIf
-              :If 0<parms.recursive
+              isSelfCall←parms.selfCall
+              parms.selfCall←1
+              :If parms.recursive
               :AndIf IsDir folder
-              :AndIf (0=≢parms.depth)∨1↑0<parms.depth
               :AndIf 0≠≢subFolders←ListDirs folder
-                  buff←parms Dir¨subFolders,¨⊂'/',filename,extension
+                  buff←parms Dir¨subFolders,¨⊂CurrentSep,filename,extension
                   :If 0=+/'*?'∊path
                       buff←(⊂∘⊂¨subFolders),¨¨buff
                   :EndIf
-                  buff←(0<≢¨buff)/buff
                   :If 0≠≢buff←⊃{⍺,¨⍵}/buff
                   :AndIf 0≠≢buff←(0<≢¨buff)/buff
                       r←r,¨buff
                   :EndIf
               :EndIf
-              :If 0=isrecursiveCall
+              :If 0=isSelfCall
               :AndIf 0=≢(filename,extension)~'*'
                   buff←(0 1,parms.type~0 1)⎕NINFO⍠('Follow'parms.follow)⊣folder
                   (0⊃buff)←NormalizePath 0⊃buff
@@ -279,14 +268,6 @@
     ⍝ Returns what is the "correct" filename separator under the current OS.
       :Access Public Shared
       r←('Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬)⊃'/\'
-    ∇
-
-    ∇ bool←file1 YoungerThan file2;real1;real2
-    ⍝ Returns a Boolean with 1 in case `file1` is "younger" than `file2`
-      :Access Public Shared
-      real1←DateToReal GetModifiedDate file1
-      real2←DateToReal GetModifiedDate file2
-      bool←real1>real2
     ∇
 
     ∇ {(rc en more)}←{mustBeEmpty}RmDir path;list;bool;flags;flag;counter;qdmx
@@ -505,7 +486,7 @@
                   :If 'Win'≢##.APLTreeUtils2.GetOperatingSystem ⍬
                   :OrIf ~{(':'=0⊃⍵)∧CurrentSep=1⊃⍵}¯2↑path
                       :Trap 22
-                          :If 0 ⍝ <1594
+                          :If 0<1594
                       ⍝ Right now, without ('Wildcard' 1), it generates a FILENAME ERROR when the user has not read access
                       ⍝ See bug report <01594>
                       ⍝ The `⊃⊃` as well as the `(-'/\'∊⍨¯1↑path)↓` are only needed with ('Wildcard' 1)
@@ -674,7 +655,7 @@
       filename←NormalizePath filename
     ∇
 
-    ∇ dirname←GetTempSubDir prefixString;path;no;flag;success;i
+    ∇ dirname←GetTempSubDir prefixString;path;start;no;flag;success
     ⍝ Returns name of previously unused sub directory in the `TEMP` directory with a random name.\\
     ⍝ The directory will be created.
     ⍝ `prefixString`, when empty, defaults to `⎕AN`. The name of the directory will
@@ -684,21 +665,21 @@
           prefixString←⎕AN
       :EndIf
       path←GetTempPath
-      no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
-      i←0
+      start←no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
       ⍝ no←100⊥3↓⎕TS ⍝ Not reliable: can take a large number of tries before successful
       success←flag←0
       :Repeat
-          dirname←path,(({⍵↓⍨-(¯1↑⍵)∊'/\'}prefixString),'_',(⍕no),'_',(⍕i))
+          dirname←path,(prefixString,'_',⍕no)
           :Trap 22
-              2 ⎕MKDIR dirname 
+              ⎕MKDIR dirname
               flag←success←1
           :Else
-              ⎕DL 0.01+0.01×0=5|5
+              flag←1
           :EndTrap
-      :Until flag∨30<i←i+1
+          no+←10
+      :Until flag∨no>start+1000×10  ⍝ max 1000 tries
       dirname←NormalizePath dirname
-      ('Unable to create "',dirname,'"')⎕SIGNAL 22/⍨~success
+      ('Unable to create "',dirname,'"')⎕SIGNAL 11/⍨~success
     ∇
 
     ∇ r←{x}ListDirs path;buff;recursiveFlag;part1;part2;recursive;depth
@@ -824,18 +805,6 @@
               success←⊃success
           :EndIf
       :EndIf
-    ∇
-
-    ∇ r←GetModifiedDate filename
-    ⍝ Returns the "Modified" date of `filename` as a timestmap
-      :Access Public Shared
-      r←⊃3 ⎕NINFO filename
-    ∇
-
-    ∇ real←DateToReal timestamp
-    ⍝ Converts a timestamp (6↑⎕TS) into a real (YYYYMMDD.hhmmss)
-      :Access Public Shared
-      real←60 ⎕DT⊂6↑timestamp
     ∇
 
     ∇ {success}←MkDir path;counter;flag

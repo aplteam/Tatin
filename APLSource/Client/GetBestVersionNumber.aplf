@@ -21,6 +21,7 @@
          r←(Reg.AddSlash url),(Reg.APLfromJSON res.Content).BestVersion
      :EndIf
  :Else
+     'Invalid URL'Assert 0=+/'[]'∊url ⍝ In case of an ill-formed attempt to specify an alias like, say, "]tatin[" or "tatin]" etc
      :If 0=≢r←noBetas Reg.GetBestVersionNumber(Reg.AddSlash url),packageID
          statusCode←404
      :EndIf

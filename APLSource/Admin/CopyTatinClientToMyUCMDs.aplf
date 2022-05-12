@@ -1,0 +1,16 @@
+ {r}←CopyTatinClientToMyUCMDs batchFlag;h;userCommandTargetFolder;path1;path2
+ r←0
+ userCommandTargetFolder←⎕SE._Tatin.Client.GetMyUCMDsFolder''
+ Assert 0<#.Tatin.⎕NC'CiderConfig'
+ :If ~batchFlag
+ :AndIf 1 ##.Client.YesOrNo'Would you like to copy the Tatin client to ',userCommandTargetFolder
+     F.RmDir userCommandTargetFolder,'/Tatin'
+     ⎕DL 1
+     F.MkDir userCommandTargetFolder,'/Tatin'
+     path1←#.Tatin.CiderConfig.HOME,'/Dist/Client/Tatin/Client.dws'
+     path2←#.Tatin.CiderConfig.HOME,'/APLSource/Tatin.dyalog'
+     (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣path1
+     (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣path2
+     r←1
+ :EndIf
+⍝Done

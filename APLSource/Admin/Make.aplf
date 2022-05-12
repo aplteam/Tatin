@@ -1,71 +1,79 @@
- {r}←{noQLX}Make flag;P;parms;P_;list;APL_Version;scanFlag
-⍝ This function will start two APL sessions in succession in order to open the Tatin project and then execute
-⍝ first `MakeClient` (which bumps the build number) and then, in the second session, `MakeServer`.
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path
+⍝ This function will start two APL sessions in succession in order to open the Tatin
+⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
+⍝ in the second session, `MakeServer`, which does not bump the version number.
+⍝ It also re-compiles the documentation (=creates HTML files from Markdown)
 ⍝ It cannot be done in one go, and it cannot be done in batch mode from the current session.
-⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
- APL_Version←'C:\Program Files\Dyalog\Dyalog APL-64 18.0 Unicode\Dyalog.exe'   ⍝ Used to create both Client & Server
-⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+⍝ The right argument is expected to be a Boolean that tells whether this runs in batch
+⍝ mode or not. In batch mode no messages are printed, and no interaction with a user is
+⍝ attempted. Also, Tatin is not updated in the MyUCMDs folder then.
  r←⍬
- :If flag
-     ##.FilesAndDirs.Cd ##.CiderConfig.HOME
-     ⎕←'Current dir is now: ',##.CiderConfig.HOME
-     'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
-     noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
-     :If 0 ##.Client.YesOrNo'Would you like to update all Tatin packages?'
-         scanFlag←0 ##.Client.YesOrNo'Consider https://tatin.dev only? (No = scan all registries with priority > 0)'
-     :AndIf scanFlag UpdatePackages 1
-     :AndIf ~0 ##.Client.YesOrNo'At least one Tatin package was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
+ Assert(⊂batchFlag)∊0 1
+ 'Currently we build on Windows only, sorry'Assert'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
+ F←##.FilesAndDirs ⋄ C←##.Client ⋄ CFG←##.CiderConfig
+ {}F.Cd CFG.HOME
+ 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'Current dir is now: ',CFG.HOME
+ 'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
+ noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
+ :If ~batchFlag
+     :If UpdatePackages ⍬
+     :AndIf ~0 C.YesOrNo'At least one Tatin package was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
          :Return
      :EndIf
-     'Create!'##.FilesAndDirs.CheckPath'./Dist'
-     list←⊃##.FilesAndDirs.Dir'./Dist/*.zip'
-     list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
-     list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
-     ##.FilesAndDirs.DeleteFile list
-     P←##.APLProcess
-     parms←P.CreateParms
-     parms.Exe←APL_Version
-     parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
-     parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
-     parms.CommandLineArgs,←' lx="1 #.Make_.Run 1"'
-     :If 0  ⍝ Only for analyzing problems:
-         parms.CommandLineArgs,←' -exec_setup=0 '
-         parms.CommandLineArgs,←' -stop_in_setup=1 '
-     :EndIf
-     :If noQLX
-         parms.CommandLineArgs,←' -x'
-     :EndIf
-     parms.SessionFile←1
-     parms.WindowsStyle←'Normal'
-     P_←⎕NEW P parms
-     ⎕←'   Process started for "making" the Tatin Client...'
-     {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
-     'The process exited with an error code'Assert 0=P_.Proc.ExitCode
-     ⎕←'   Now compiling HTML from the markdown files (documentation)...'
-     CompileDocumentation ⍬
-     ⎕←'   Copy the documentation to the test server...'
-     UpdateDocumentation ⍬
-     parms←P.CreateParms
-     parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" '
-     parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
-     parms.CommandLineArgs,←' lx="0 #.Make_.Run 2"'
-     parms.Exe←APL_Version
-     :If 0  ⍝ Only for analyzing problems:
-         parms.CommandLineArgs,←' -exec_setup=0'
-         parms.CommandLineArgs,←' -stop_in_setup=1 '
-     :EndIf
-     :If noQLX
-         parms.CommandLineArgs,←' -x'
-     :EndIf
-     parms.SessionFile←1
-     parms.WindowsStyle←'Normal'
-     P_←⎕NEW P parms
-     ⎕←'   Process started for "making" the Tatin Server...'
-     {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
-     'The process exited with an error code'Assert 0=P_.Proc.ExitCode
-     UpdateTestServerAssets ⍬
-     #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(##.CiderConfig.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
-     ⎕←'*** Done'
- :Else
-     ⎕←'Right argument is not 1, no action taken'
  :EndIf
+ 'Create!'F.CheckPath'./Dist'
+ list←⊃F.Dir'./Dist/*.zip'
+ list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
+ list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
+ F.DeleteFile list
+ P←##.APLProcess
+ parms←P.CreateParms
+ parms.Exe←GetAPLVersion
+ parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
+ parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
+ parms.CommandLineArgs,←' lx="1 #.Make_.Run 1"'
+ :If 0  ⍝ Only for analyzing problems:
+     parms.CommandLineArgs,←' -exec_setup=0 '
+     parms.CommandLineArgs,←' -stop_in_setup=1 '
+ :EndIf
+ :If noQLX
+     parms.CommandLineArgs,←' -x'
+ :EndIf
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
+ P_←⎕NEW P parms
+ 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Client...'
+ {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+ 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
+ 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Now compiling HTML from the markdown files (documentation)...'
+ CompileDocumentation ⍬
+ UpdateDocumentation ⍬
+ parms←P.CreateParms
+ parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" '
+ parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
+ parms.CommandLineArgs,←' lx="0 #.Make_.Run 2"'
+ parms.Exe←GetAPLVersion
+ :If 0          ⍝ Only for analyzing problems:
+     parms.CommandLineArgs,←' -exec_setup=0'
+     parms.CommandLineArgs,←' -stop_in_setup=1 '
+ :EndIf
+ :If noQLX      ⍝ Only for analyzing problems:
+     parms.CommandLineArgs,←' -x'
+ :EndIf
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
+ P_←⎕NEW P parms
+ 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
+ {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+ 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
+ UpdateTestServerAssets ⍬
+ {}⎕SE.Link.Refresh'#.Tatin'
+ :If CopyTatinClientToMyUCMDs batchFlag
+ :AndIf #.Tatin.Registry.Version≢⎕SE.Tatin.Version
+     ⎕SE.⎕EX¨'Tatin' '_Tatin'
+     Assert #.Tatin.Registry.Version≡⎕SE.UCMD'Tatin.Version'
+ :EndIf
+ path←(⎕SE._Tatin.Client.GetMyUCMDsFolder''),'/',⎕SE._Tatin.Client.UserSettings.cfg_name
+ #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(CFG.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
+ 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'*** Done'
+⍝Done

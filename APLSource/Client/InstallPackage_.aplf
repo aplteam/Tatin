@@ -19,6 +19,7 @@
  :AndIf 'Any'≢GetDeletePolicy url                                                        ⍝ ... and the registry does not operate an "All" delete policy ...
  :AndIf ~Reg.IsBeta packageID                                                            ⍝ ... and the package is not a beta version...
      cacheFlag←1
+     PrintToSession'  Save package in cache...'
      tempDir←GetPathToPackageCache,'/temp/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN   ⍝ ... then and only then do we write to the cache folder.
  :Else
      tempDir←Reg.GetTempDir,'/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN               ⍝ Otherwise to the temp folder of the OS

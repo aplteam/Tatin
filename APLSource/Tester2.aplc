@@ -22,11 +22,13 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.2.3+105' '2022-04-13'
+      r←'Tester2' '3.2.4+107' '2022-05-09'
     ∇
 
     ∇ History
       :Access Public shared
+      ⍝ * 3.2.4 ⋄ 2022-05-09
+      ⍝   * Bug fix: Log messages came with a LF in the middle of a message in case batchFlag was 1.
       ⍝ * 3.2.3 ⋄ 2022-04-13
       ⍝   * Bug fix: In case an INI file is part of a test suite then under non-Windows platform it would fail prior 3.2.3
       ⍝ * 3.2.2 ⋄ 2022-04-06
@@ -929,17 +931,23 @@
 
 
     ∇ {r}←{type}ShowLog msg;selog;buff
-    ⍝ `type` may be (+/-)1 or 2:
+    ⍝ `type` may be 1 or 2 or ¯1 or ¯2:
     ⍝ * A 1 means an action message
     ⍝ * A 2 means the result of the execution attempt of a test function.
-    ⍝ * A negative means message with more to come
+    ⍝ * A negative type means message with more to come
     ⍝ `ps` is a parameter space with `ps.log` being, well, the log.
       r←⍬
       :If 0<≢msg
           type←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'type'
           'Invalid type'⎕SIGNAL 11/⍨~(⊂|type)∊1 2
           :If ps.batchFlag∧0=ps.guiFlag
-              ps.log,←{1=≡⍵:⊂⍵ ⋄ '-'∧.=5↑⊃⍵:⍵ ⋄ ⊂(1⊃⍵),' ',(2⊃⍵),' ',3⊃⍵}msg
+              :If ~type∊¯2 2
+              :OrIf 0=≢ps.log
+              :OrIf 1<≡msg
+                  ps.log,←{1=≡⍵:⊂⍵ ⋄ '-'∧.=5↑⊃⍵:⍵ ⋄ ⊂(1⊃⍵),' ',(2⊃⍵),' ',3⊃⍵}msg
+              :Else
+                  (¯1↑ps.log)←⊂(⊃¯1↑ps.log),{1=≡⍵:⊂⍵ ⋄ '-'∧.=5↑⊃⍵:⍵ ⋄ ⊂(1⊃⍵),' ',(2⊃⍵),' ',3⊃⍵}msg
+              :EndIf
           :Else
               buff←{1=≡⍵:⊂⍵ ⋄ (3≠≢⍵)∨'---'≡3↑⊃⍵:⍵ ⋄ ⊂(1⊃⍵),' ',(2⊃⍵),' ',(3⊃⍵)}msg
               :If ps.guiFlag

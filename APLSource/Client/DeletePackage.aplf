@@ -1,26 +1,26 @@
- (statusCode errMsg)←DeletePackage uri;uri_;packageID;statusCode;errMsg;request;response;en;msg;rc
+ (statusCode errMsg)←DeletePackage url;url_;packageID;statusCode;errMsg;request;response;en;msg;rc
 ⍝ Deletes a package.\\
 ⍝ Whether deleting a package is possible depends on the "delete" policy operated by the server in question.\\
-⍝ On the server side it is determined by the INI setting [CONFIG]DeletePackages.
+⍝ On the server side the delete policy is defined by the INI setting [CONFIG]DeletePackages ("None", "JustBetas", "Any").
  statusCode←200 ⋄ errMsg←''
- uri_←F.EnforceSlash ReplaceRegistryAlias uri
- 'No URI provided'Assert 0<≢uri_
- (uri_ packageID)←Reg.SeparateUriAndPackageID uri_
- :If 'file://'{⍺≢(≢⍺)↑⍵}uri_
-     'Unknown Registry'Assert(⊂EnforceTrailingSlash uri_)∊MyUserSettings.registries.uri
+ url_←F.EnforceSlash ReplaceRegistryAlias url
+ 'No valid URL or alias provided'Assert 0<≢url_
+ (url_ packageID)←Reg.SeparateUriAndPackageID url_
+ :If 'file://'{⍺≢(≢⍺)↑⍵}url_
+     ('Unknown Registry/package: "',url,'"')Assert(⊂EnforceTrailingSlash url_)∊MyUserSettings.registries.uri
  :EndIf
- :If Reg.IsHTTP uri_
+ :If Reg.IsHTTP url_
      request←R.NewRequest 0
      request.RequestTarget←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
      request.Method←'DELETE'
-     request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)
-     response← SendAndReceive uri_ request
+     request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry url).api_key)
+     response←SendAndReceive url_ request
      :If response.StatusCode≢200
          statusCode←response.StatusCode
          :If 405≡statusCode
              :If 0<≢response.Content
                  errMsg←'Server: ',response.Content
-             :ElseIf ∨/'http://'⍷uri_
+             :ElseIf ∨/'http://'⍷url_
                  errMsg←'http:// is not supported'
              :Else
                  errMsg←'https:// is not supported'
@@ -34,10 +34,10 @@
          :EndIf
      :EndIf
  :Else
-     uri_←'file://'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}uri_
-     :If F.IsDir uri_,packageID
-         'Is not a package'Assert F.IsFile uri_,packageID,'/apl-package.json'
-         (rc en msg)←F.RmDir uri_,packageID
+     url_←'file://'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}url_
+     :If F.IsDir url_,packageID
+         'Is not a package'Assert F.IsFile url_,packageID,'/apl-package.json'
+         (rc en msg)←F.RmDir url_,packageID
          :If 0≠rc
              statusCode←400
              errMsg←'Remove operation failed, RC=',(⍕rc),'; ',msg
@@ -46,5 +46,8 @@
          statusCode←400
          errMsg←'Not found'
      :EndIf
+ :EndIf
+ :If 200=statusCode
+     DeletePackageFromCache url_ packageID
  :EndIf
 ⍝Done

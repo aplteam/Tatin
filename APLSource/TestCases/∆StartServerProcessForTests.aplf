@@ -1,0 +1,21 @@
+ {r}←∆StartServerProcessForTests debugFlag;parms
+ P←##.APLProcess
+ parms←P.CreateParms
+ parms.Exe←##.Admin.GetAPLVersion
+ :If 0<#.Tatin.⎕NC'CiderConfig'
+     parms.CommandLineArgs,←'load="',#.Tatin.CiderConfig.HOME,'/APLSource/Admin/LoadTatinAndStartServer.aplf" '
+ :Else
+     parms.CommandLineArgs,←'load="',F.PWD,'/APLSource/Admin/LoadTatinAndStartServer.aplf" '
+ :EndIf
+ parms.CommandLineArgs,←'lx="',(debugFlag/'1 '),'#.LoadTatinAndStartServer 1" '
+ :If 0  ⍝ Only for analyzing problems:
+     parms.CommandLineArgs,←' -exec_setup=0 '
+     parms.CommandLineArgs,←' -stop_in_setup=1 '
+ :EndIf
+ :If 0
+     parms.CommandLineArgs,←' -x'
+ :EndIf
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
+ r←⎕NEW P parms
+⍝Done

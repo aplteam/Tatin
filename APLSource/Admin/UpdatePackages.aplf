@@ -1,40 +1,37 @@
- {r}←{forceTatin}UpdatePackages flag;config;packages;package;i;folders;folder;filename;rc;old;new;json;filenames
-⍝ Takes TatinPackages.config as input and carries out the following steps:
-⍝ 1. It re-installs all packages defined in that config file
-⍝ 2. It then copies the required scripts from the folder packages\ to APLSource\
+ {r}←{force}UpdatePackages dummy;path2Packages;packages;i;targetFolder;package;list;packageID;F;parms;TC;packageName;fullName
+⍝ 1. Re-installs all packages in the ./packages folder
+⍝ 2. Copies the required scripts from the folder packages\ to APLSource\
 ⍝ 3. The assets required by MarkAPL are copied into ./Assets/MarkAPL\\
 ⍝ Right argument is just insurance against accidental calls.
-⍝ By default all known Registries are scanned. You can overwrite this by specifying
-⍝ a 1 as left argument: then only the principal Tatin server is questioned.\\
 ⍝ Returns a 1 if any of the scripts was actually exchanged, otherwise 0.
  r←0
- forceTatin←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'forceTatin'
- config←##.Registry.JSON⊃##.FilesAndDirs.NGET'TatinPackages.config'
- packages←∪⊃,/config.(Client Development Server)
- rc←##.FilesAndDirs.RmDir'packages'
- 'Removing directory packages\ failed 'Assert 0=⊃rc
- ##.FilesAndDirs.MkDir'packages'
- i←0
- :For package :In packages
-     i+←1
-     ⎕←'Loading package ',package,' (',((⍕i),' of ',(⍕≢packages)),')...'
-     ⎕SE.Tatin.InstallPackage((forceTatin/'[tatin]'),package)'./packages/'
- :EndFor
- json←##.Registry.JSON⊃##.FilesAndDirs.NGET'./packages/apl-buildlist.json'
- folders←'./packages/'∘,¨json.packageID
- :For folder :In folders
-     :If ∨/'-SMTP-'⍷folder
-         filenames←⊃##.FilesAndDirs.ListFiles folder,'/APLSource/SMTP/*.aplc'
-         'Must not be empty'Assert 0<≢filenames
-     :Else
-         filename←⊃##.FilesAndDirs.ListFiles folder,'/*.aplc'
-         'Must not be empty'Assert 0<≢filename
-         old←⊃##.FilesAndDirs.NGET'./APLSource/',⊃,/1↓⎕NPARTS filename
-         new←⊃##.FilesAndDirs.NGET filename
-         :If old≢new
-             r←1
-             './APLSource'⎕NCOPY⍠('IfExists' 'Replace')⊣filename
-         :EndIf
+ force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
+ :If force
+ :OrIf ##.Client.YesOrNo'Sure you want to re-install and possibly update all Tatin packages?'
+     :If 0=##.Client.⎕NC'Reg'
+         Initialize_Client
      :EndIf
- :EndFor
+     F←##.FilesAndDirs ⋄ TC←##.Client
+     path2Packages←##.CiderConfig.HOME,'/packages'
+     targetFolder←##.CiderConfig.HOME,'/APLSource'
+     parms←TC.CreateReInstallParms
+     parms.update←1
+     ⎕←'Now updating packages in ',path2Packages,'/ ...'
+     ⎕←{0=≢⍵:'No packages updates' ⋄ ⍪(⊂'*** Packages updated:'),⍵}parms TC.ReInstallDependencies path2Packages
+     packages←F.ListDirs path2Packages
+     :For i package :InEach (⍳≢packages)packages
+         packageID←⊃,/1↓⎕NPARTS package
+         packageName←{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}packageID
+         fullName←⊃F.Dir targetFolder,'/',packageName,'.*'
+         :If 0=≢fullName
+             '???'Assert F.IsDir targetFolder,'/',packageName
+             F.RmDir targetFolder,'/',packageName
+             r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')⊣path2Packages,'/',packageID,'/APLSource/',packageName
+         :Else ⍝ Simple files
+             fullName←⊃F.Dir package,'/',packageName,'.*'
+             r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')⊣fullName
+         :EndIf
+     :EndFor
+     ⎕←'*** Done'
+ :EndIf
 ⍝Done

@@ -1,4 +1,4 @@
- tree←{append}GetDependencyTree x;initialCall;identifier;principal;requiredBy;buildList;path;tempPath;filename;flag1;flag2;packageID;alias;uri;path2
+  tree←{append}GetDependencyTree x;initialCall;identifier;principal;requiredBy;buildList;path;tempPath;filename;flag1;flag2;packageID;alias;uri;path2
 ⍝ Takes `identifier` (`x`) and returns the dependencies as a matrix.
 ⍝ `identifier` must be one of:
 ⍝ * an HTTP request
@@ -27,7 +27,8 @@
      uri←RemovePackageID identifier
      ∆TREE.Data⍪←principal(alias,path)uri
      path2←CompilePath2PackageInCache uri path ⍝ Already available in the cache?
-     :If F.IsDir path2
+     :If 0<≢path2
+     :AndIf F.IsDir path2
          :If F.IsFile path2,'/',Reg.DependenciesFilename
              0 GetDependencyTreeFromRegistry path2
          :Else

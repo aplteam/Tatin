@@ -3,17 +3,16 @@
 ⍝ This function is intended to be called in development only.\\
 ⍝ It does not prepare for tests; for that call `#.Tatin.TestCases.Prepare`, which will call this function along the way.\\
  :If 'CLEAR WS'≡⎕WSID
-     :If 2=##.CiderConfig.⎕NC'HOME'                                 ⍝ Managed by LINK/Cider?!
+     :If 0<##.⎕nc'CiderConfig'                                 ⍝ Managed by LINK/Cider?!
+     :andIf 2=##.CiderConfig.⎕NC'HOME'                         ⍝ Managed by LINK/Cider?!
          {}##.FilesAndDirs.Cd ##.CiderConfig.HOME
-     :Else
-         ∘∘∘ ⍝ Huuh?!
      :EndIf
  :Else
      ##.FilesAndDirs.PolishCurrentDir
  :EndIf
  CopyDependencies
  ##.Client.CreateAllRefs_Client
- ##.RumbaLean.⎕EX'DRC'   ⍝ Paranoia; with DRC around Conga won't be initialised
+ ##.RumbaLean.⎕EX'DRC'                                         ⍝ Paranoia; with DRC around Conga won't be initialised
  ##.RumbaLean.⎕EX'Conga'
  'Conga'##.RumbaLean.⎕CY'Conga'
  InitConga''

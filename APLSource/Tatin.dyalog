@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.37.3 - 2022-04-17
+⍝ * 0.37.4 - 2022-05-04
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -588,6 +588,7 @@
       :If (,0)≡,what←Arg._1
           what←TC.F.PWD
       :ElseIf '['∊what
+          what←0 TC.CheckVersion what
           what←TC.ReplaceRegistryAlias what
       :EndIf
       :If TC.Reg.IsHTTP what
@@ -811,8 +812,8 @@
           :If Arg.force
               flag←1
           :Else
-              ⎕←''
-              flag←∆YesOrNo'Sure that you want delete these from the Tatin package cache?'
+              ⎕←r
+              flag←∆YesOrNo'*** Sure that you want delete these from the Tatin package cache?'
           :EndIf
       :AndIf flag
           (rc report)←TC.ClearCache url

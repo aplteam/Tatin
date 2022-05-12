@@ -1,0 +1,11 @@
+ {yesNo}←DeletePackageFromCache(url packageID);targetFolder;url_;targetFolder2;more;rc;en
+⍝ Attempts to remove the package from the cache, no questions asked.
+⍝ Returns a 1 in case of success and 0 otherwise.
+⍝ No error is thrown in case the package is not found in the cache.
+ targetFolder←GetPathToPackageCache
+ url_←CompileNameFromUrl url
+ targetFolder2←targetFolder,'/',url_,'/',packageID
+ :If yesNo←F.IsDir targetFolder2
+     (rc en more)←F.RmDir targetFolder2
+     yesNo←0=rc
+ :EndIf

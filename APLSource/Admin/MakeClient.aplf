@@ -1,11 +1,9 @@
  {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;userCommandTargetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList
-⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or as part of an automated "Make"
-⍝ process with ⍵←1.\\
-⍝ In case of a problem an error is thrown if ⍵=0 and ⎕OFF 123 if ⍵=1.\\
-⍝ You may call this independently from `MakeServer`.\\
-⍝ `bumpBuild` must be a Boolean; 1 means that the build number will be bumped.
-⍝ Other values result in an error or ⎕OFF 123 respectively.
-⍝ Defaults to 1 if not specified.\\
+⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or
+⍝ as part of an automated "Make" process with ⍵←1.\\
+⍝ In case of a problem an error is thrown in case ⍵ is 0, and ⎕OFF 123 is executed in case ⍵ is 1.\\
+⍝ You may call this function independently from `MakeServer`.\\
+⍝ `bumpBuild` must be a Boolean; 1 means that the build number will be bumped; that's the default.
  r←⍬
  F←##.FilesAndDirs
  bumpBuild←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'bumpBuild'
@@ -20,8 +18,8 @@
      msg,←⊂'It also checks whether the user command script should be copied to the MyCMDs folder or vice'
      msg,←⊂'versa, depending on where the last change was made.'
      msg,←⊂''
-     msg,←⊂'Eventually all that''s required is zipped into a file <Tatin-Client-{major}.{Minor}.{Patch}.zip'
-     msg,←⊂'That file is created within the Dist/ folder.'
+     msg,←⊂'Finally all that''s required is zipped into a file <Tatin-Client-{major}.{Minor}.{Patch}.zip'
+     msg,←⊂'That file is created within the Dist/ folder which is not managed by Git'
      ⎕←⍪msg
      ⎕←''
  :EndIf
@@ -54,7 +52,8 @@
      #.⎕EX'Make_'
      0 ⎕SAVE ⎕WSID   ⍝ If this crashes, in particular with "Reference in ⎕SE points to #" or vise versa) execute ⎕OFF 123 and try again
      userCommandTargetFolder←#._Tatin.Client.GetMyUCMDsFolder''
-     :If F.IsFile userCommandTargetFolder,'/Tatin/Tatin.dyalog'
+     :If ~batchFlag
+     :AndIf F.IsFile userCommandTargetFolder,'/Tatin/Tatin.dyalog'
      :AndIf (userCommandTargetFolder,'/Tatin/Tatin.dyalog')F.YoungerThan'./APLSource/Tatin.dyalog'
      :AndIf ≢/{⊃⎕NGET ⍵}¨'./APLSource/Tatin.dyalog'(userCommandTargetFolder,'/Tatin/Tatin.dyalog')
      :AndIf 1 ##.Client.YesOrNo'It appears that "Tatin.dyalog" in MyUCMDs/ is younger than the one in the project; copy over?'
@@ -70,18 +69,6 @@
      reg←_userSettings.GetRegistry'[tatin]'
      _userSettings.ReplaceRegistry reg
      (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'setup.dyalog.RemoveMe'
-     :If 1 ##.Client.YesOrNo'Would you like to copy the Tatin client to ',userCommandTargetFolder
-         F.RmDir userCommandTargetFolder,'/Tatin'
-         ⎕DL 1
-         F.MkDir userCommandTargetFolder,'/Tatin'
-         (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣⎕WSID,'.dws'
-         (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./APLSource/Tatin.dyalog'
-     :EndIf
-     path←#._Tatin.Client.GetUserHomeFolder,'/',#._Tatin.Client.UserSettings.cfg_name
-     :If 0=F.IsFile path
-     :OrIf 0 ##.Client.YesOrNo'Overwrite "',path,'" ?'
-         path ⎕NCOPY⍠('IfExists' 'Replace')⊣_userSettings.path2config
-     :EndIf
      F.DeleteFile¨F.Dir'Dist/Tatin-Client-*.zip'
      zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),''),'.zip'
      ⎕DL 0.1
@@ -94,7 +81,7 @@
      myZip.Dispose
      zipContent←##.DotNetZip.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
-     3 ⎕NDELETE userCommandTargetFolder,'/Tatin.dyalog'  ⍝ Because until 0.61.0 was released the user command script was a sibling of the Tatin/ folder
+     3 ⎕NDELETE userCommandTargetFolder,'/Tatin.dyalog'  ⍝ Because until 0.61.0 the user command script was a sibling of the Tatin/ folder
      :If batchFlag
          ⎕OFF
      :Else

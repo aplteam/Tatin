@@ -1,18 +1,21 @@
- r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res
+ r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res;P
  #.⎕EX'_tatin'
  r←1
- :If 0=≢parms
- :OrIf 0=parms.batchFlag
-     :If 1 ##.Client.YesOrNo'Make sure the test server runs; carry on?'
-         (rc msg res)←∆UCMD'Init ./TestData'
-         Assert 0=rc
-         ∆InitUserSettings ⍬
-         ∆CACHE_PARMS←⎕SE.Tatin.MyUserSettings.caching
-         ⎕SE.Tatin.MyUserSettings.caching←0
-         #.Tatin.Client.∆PrintToSession←0
-         ⎕SE._Tatin.Client.∆PrintToSession←0
-         {}''∆GetTempDir ⍬
-     :Else
+
+ (rc msg res)←∆UCMD'Init ./TestData'
+ Assert 0=rc
+ ∆InitUserSettings ⍬
+ ∆CACHE_PARMS←⎕SE.Tatin.MyUserSettings.caching
+ ⎕SE.Tatin.MyUserSettings.caching←0
+ #.Tatin.Client.∆PrintToSession←0
+ ⎕SE._Tatin.Client.∆PrintToSession←0
+ {}''∆GetTempDir ⍬
+
+ :If parms.batchFlag
+     ∆P←∆StartServerProcessForTests parms.debugFlag
+     ⎕DL 10
+ :Else
+     :If ~1 ##.Client.YesOrNo'Make sure the test server runs; carry on?'
          r←0
      :EndIf
  :EndIf

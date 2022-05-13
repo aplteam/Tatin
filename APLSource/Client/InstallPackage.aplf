@@ -74,6 +74,7 @@
                  targetFolder Dependencies.Add alias,packageID2
              :EndIf
          :EndFor
+         buildList[;3]←ReplaceCachePathByURL¨buildList[;3]
          PrintToSession'  Saving build list... '
          buildList←SaveBuildList buildList targetFolder
          :If ∨/bool←({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}alias,identifier_){⍺∘≡¨(≢⍺)↑¨⍵}buildList[;2]

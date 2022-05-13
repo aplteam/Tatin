@@ -1,0 +1,9 @@
+ url←ReplaceCachePathByURL url;json;ns
+⍝ url might be something like https://tatin.dev/<package-id> of /path/to/cache/<domain:port>/<package-ID>
+⍝ The former is left alone, but the latter is translated into the original url on the Net.
+ :If ~IsHTTP url
+ :AndIf {⍺≡(≢⍺)↑⍵}/F.EnforceSlash¨GetPathToPackageCache url
+     json←⊃F.NGET url,'/',Reg.CFG_Name
+     ns←Reg.APLfromJSON json
+     url←ns.uri
+ :EndIf

@@ -76,10 +76,10 @@
      fileList←F.EnforceSlash¨(1+≢targetPath)↓¨fileList
      myZip←⎕NEW ##.DotNetZip(,⊂zipFilename)
      targetPath myZip.Add fileList
-    ⍝targetPath ##.DotNetZip.ZipFolder zipFilename   ⍝ This causes potentially trouble on Linux and Mac OS because of the \
+    ⍝targetPath ##.DotNetZip.ZipFolder zipFilename   ⍝ This causes potentially trouble on Linux and Mac OS because of the "\"   ⍝TODO⍝
      ⎕DL 1
      myZip.Dispose
-     zipContent←##.DotNetZip.ListZipContents zipFilename
+     zipContent←##.DotNetZip.ListZipContents zipFilename  ⍝TODO⍝
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
      3 ⎕NDELETE userCommandTargetFolder,'/Tatin.dyalog'  ⍝ Because until 0.61.0 the user command script was a sibling of the Tatin/ folder
      :If batchFlag

@@ -1,6 +1,7 @@
  response←request ProcessTestCommands(path specialCommands);version
 ⍝ This function must only be called when G.TestFlag is true
- :If G.TestFlag
+ :If G.INI.Exist'CONFIG:SpecialCommands'
+ :AndIf G.INI.Get'CONFIG:SpecialCommands'
      :Select ⎕C path
      :Case GetVersion_REST'get-server-path'
          response←ReturnRegistryPath request

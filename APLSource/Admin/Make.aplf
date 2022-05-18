@@ -1,4 +1,4 @@
- {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
@@ -12,13 +12,27 @@
  'Currently we build on Windows only, sorry'Assert'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
  F←##.FilesAndDirs ⋄ C←##.Client ⋄ CFG←##.CiderConfig
  {}F.Cd CFG.HOME
- 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'Current dir is now: ',CFG.HOME
+ 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Current dir is now: ',CFG.HOME
  'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
  :If ~batchFlag
      :If UpdatePackages ⍬
-     :AndIf ~0 C.YesOrNo'At least one Tatin package was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
+     :AndIf ~0 C.YesOrNo'   At least one Tatin package was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
          :Return
+     :EndIf
+ :EndIf
+ :If F.IsDir path←C.GetMyUCMDsFolder'Tatin'                 ⍝ Does a folder Tatin/  live in MyUCMDs/ ?
+ :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live in MyUCMDs/ ?
+     file1←path,'/Tatin.dyalog'
+     file2←##.CiderConfig.HOME,'/APLSource/Tatin.dyalog'
+ :AndIf ≢/{⊃⎕NGET ⍵ 0}¨file1 file2                          ⍝ Are the two not identical ?
+     (ts1 ts2)←{¯1 1 ⎕DT⊂⊃⊃('type' 3)F.Dir ⍵}¨file1 file2
+     :If ts2<ts1
+         :If 1 C.YesOrNo'The Tatin user command script in MyUCMDs/ appears to be newer than the one in the project - copy?'
+             file2 ⎕NCOPY⍠('IfExists' 'Replace')⊣file1
+         :EndIf
+     :Else
+         ⍝ We don't need to do anything because it will be copied over later on, if the suer wishes so.
      :EndIf
  :EndIf
  'Create!'F.CheckPath'./Dist'

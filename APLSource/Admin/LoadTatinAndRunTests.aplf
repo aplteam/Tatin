@@ -1,10 +1,8 @@
- {debugFlag}LoadTatinAndRunTests flag
-⍝ This function is called when the test suite needs executing in batch mode.
-⍝ `flag` is just insurance against an accidental call.
-⍝ `debugFlag` is optional and defaults to 0. 1 basically switched error trapping off.
- :If flag
-     debugFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'debugFlag'
-     {}⎕SE.Link.Import'#.Tatin' './APLSource'
-     debugFlag #.Tatin.TestCases.RunBatchTests 1
- :EndIf
+ LoadTatinAndRunTests;debugFlag
+⍝ This function is called when the test suite needs to be executed in batch mode.
+⍝ Honors -debug from the command line if specified.
+ #.⎕EX'Tatin'
+ {}⎕SE.Link.Import'#.Tatin' './APLSource'
+ debugFlag←'-debug'≡'-debug '{0=+/b←⍺∘≡¨(≢⍺)↑¨' ',⍨¨⎕C¨⍵:'' ⋄ (b⍳1)⊃⍵}⊣2 ⎕NQ #'GetCommandLineArgs'
+ debugFlag #.Tatin.TestCases.RunBatchTests 1
 ⍝Done

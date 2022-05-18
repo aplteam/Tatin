@@ -3,8 +3,8 @@
 ⍝ This function is intended to be called in development only.\\
 ⍝ It does not prepare for tests; for that call `#.Tatin.TestCases.Prepare`, which will call this function along the way.\\
  :If 'CLEAR WS'≡⎕WSID
-     :If 0<##.⎕nc'CiderConfig'                                 ⍝ Managed by LINK/Cider?!
-     :andIf 2=##.CiderConfig.⎕NC'HOME'                         ⍝ Managed by LINK/Cider?!
+     :If 0<##.⎕NC'CiderConfig'                                 ⍝ Managed by ...
+     :AndIf 2=##.CiderConfig.⎕NC'HOME'                         ⍝ ...LINK/Cider?!
          {}##.FilesAndDirs.Cd ##.CiderConfig.HOME
      :EndIf
  :Else
@@ -14,7 +14,7 @@
  ##.Client.CreateAllRefs_Client
  ##.RumbaLean.⎕EX'DRC'                                         ⍝ Paranoia; with DRC around Conga won't be initialised
  ##.RumbaLean.⎕EX'Conga'
- 'Conga'##.RumbaLean.⎕CY'Conga'
+ 'Conga'##.RumbaLean.⎕CY(2 ⎕NQ #'GetEnvironment' 'DYALOG'),'/ws/conga.dws' ⍝ Don't rely on WSPATH (Linux, Mac-OS!)
  InitConga''
  ##.Client.InitUserSettings ##.Client.GetUserHomeFolder''
 ⍝Done

@@ -100,7 +100,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>For that reason the packages installed in the <code>packages/</code> folder are copied over to the <code>APLSource/</code> folder. That allows loading the packages with Link.</p>
 <p>If you need to add a package then you need to perform a couple of steps:</p>
 <ul>
-<li>Install that package in <code>packages/</code></li>
+<li>Install that package into <code>packages/</code></li>
 <li>Call <code>#.Tatin.Admin.UpdatePackages ⍬</code></li>
 </ul>
 <p>For further details see the comments in the function <code>#.Tatin.Admin.UpdatePackages</code>.</p>
@@ -129,6 +129,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that a single failing test case is considered as “failure” of the whole test suite, though the test framework will continue to execute all remaining tests.</p></li>
 </ol>
 <p>We discuss the two different scenarios one after the other.</p>
+<div class="leanpub_A">
+<h3>Creating a new version</h3>
+<p>Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version <em>before</em> you execute the test cases.</p>
+<p>The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in <code>⎕SE</code> for execution, but that is only possible if you create a new version first.</p>
+<p>For that reason one test actually checks whether the version number in the workspace and in <code>⎕SE</code> do match. If you are confident that this does not matter in your case just carry on.</p>
+</div>
+
 <div class="h_tag">
 <a href="#Testing-while-developing" id="Testing-while-developing" class="autoheader_anchor">
 <h3 data-id="Testing-while-developing">8.1. Testing while developing</h3>
@@ -141,13 +148,6 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>It is recommended to start a fresh APL session and then load the Tatin project into the CLEAR WS before running any test cases.</p>
 <p>Use <code>]Cider.OpenProject</code> to do this.</p>
-<div class="leanpub_A">
-<h3>Creating a new version</h3>
-<p>Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version <em>before</em> you execute the test cases.</p>
-<p>The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in <code>⎕SE</code> for execution, but that is only possible if you create a new version first.</p>
-<p>For that reason one test actually checks whether the version number in the workspace and in <code>⎕SE</code> do match. If you are confident that this does not matter in your case just carry on.</p>
-</div>
-
 <p>By default the test cases use port 5001 for communication between the Test Server and the client. You may change the INI files for both server and client if that does not work for you.</p>
 <p>In order to execute the full test suite you need to start a Tatin Server first. For that execute the following steps:</p>
 <ol start="1">
@@ -168,6 +168,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>#.Tatin.TestCases.RunTests</code></pre>
 <p>This changes the current directory, establishes all required references, instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
 </ol>
+<div class="leanpub_A">
+<h3>Execute the client test suite multiple times in parallel</h3>
+<p>You might come up with the idea to start the client part of the tests multiple times in parallel in order to put some pressure on the Tatin Server.</p>
+<p>In general this is a good idea, but the client test suite is not suitable for this. For example, the tests that belong to the “Cache” group <em>must</em> be executed one after the other, they rely on each other. Generally this should be avoided, but here for technical reasons it's a must. Running this group in parallel contradicts this, and is bound to fail.</p>
+</div>
+
 <div class="h_tag">
 <a href="#Executing-only-particular-tests" id="Executing-only-particular-tests" class="autoheader_anchor">
 <h4 data-id="Executing-only-particular-tests">8.1.2. Executing only particular tests</h4>
@@ -180,7 +186,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>The tests are grouped, and that is reflected by the names of the test functions. For example, the names <code>Test_API_001</code> and <code>Test_UserCommand_001</code> clearly state which group they belong to.</p>
 </div>
 
-<p>If you are not interested in executing only some of the test cases then skip this and carry on with “<a href="#How-to-create-new-versions" class="bookmark_link">How to create new versions</a>”.</p>
+<p>If you are not interested in executing only some of the test cases then skip this and carry on with “<a href="#Tests-as-part-of-an-automated-build" class="bookmark_link">Tests as part of an automated build</a>”.</p>
 <p>Before executing any test case call this function:</p>
 <pre><code>#.Tatin.TestCases.Prepare</code></pre>
 <p>This changes the current directory, establishes all required references and instantiates the <code>Tester2</code> class under the name <code>T</code>.</p>
@@ -251,17 +257,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Call this function:</p>
 <pre><code>#.Tatin.TestCases.RunBatchTests 1</code></pre>
 <p>The <code>1</code> provided as right argument is just an insurance against accidental calls.</p>
-<p>When running the test suite with the batch flag set, as <code>RunBatchTests</code> does, is fundamentally in several respects:</p>
+<p>When running the test suite with the batch flag set, as <code>RunBatchTests</code> does, is fundamentally different in several respects:</p>
 <ul>
-<li>A Tatin server that listens (by default) on port 5001 is started (and is also shutdown) by the test suite itself.</li>
+<li>A Tatin server that listens (by default) on port 5001 is started (and is also shut down) by the test suite itself.</li>
 <li>By default all errors are trapped.
-<p>If you need to track down a bug than you don't want this: in that case pass a <code>1</code> as left argument.</p></li>
+<p>If you need to track down a bug then you don't want this: in that case pass a <code>1</code> as left argument: this is treated as “debug” flag.</p></li>
 </ul>
-<p>Of course <code>RunBatchTests</code> does not execute any test cases that require a human in front of the monitor, but the number of such tests is pretty small anyway: less than 10.</p>
-<p>This function checks the command line:</p>
+<p>Of course <code>RunBatchTests</code> does not execute any test cases that require a human in front of the monitor, but the number of such tests is pretty small anyway.</p>
+<p><code>RunBatchTests</code> checks the command line:</p>
 <ul>
 <li>In case <code>OFF=1</code> was specified on the command line then <code>⎕OFF</code> is executed after the last test case got executed.
-<p>If one or more test cases failed then <code>⎕OFF 123</code> is executed eventually. That allows the calling environment to check whether the test suite was executed successfully in its entirety or not.</p></li>
+<p>If one or more test cases failed then <code>⎕OFF 123</code> is executed. That allows the calling environment to check whether the test suite was executed successfully in its entirety or not.</p></li>
 <li>If <code>OFF=1</code> was not specified a message is printed to the session, indicating success or failure.</li>
 </ul>
 <div class="h_tag">
@@ -269,6 +275,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Running-the-test-suite-from-a-console-or-terminal">8.2.2. Running the test suite from a console or terminal</h4>
 </a>
 </div>
+<p>There are two scripts available in the Tatin root directory:</p>
+<ol start="1">
+<li><code>RunTests.bat</code> if you want to run the batch tests under Windows</li>
+<li><code>RunTests.sh</code> is you want to run the batch tests on a non-Windows platform</li>
+</ol>
+<p>These are templates: check their contents, you might need to make amendments.</p>
 <div class="h_tag">
 <a href="#How-to-create-new-versions" id="How-to-create-new-versions" class="autoheader_anchor">
 <h2 data-id="How-to-create-new-versions">9. How to create new versions</h2>
@@ -309,7 +321,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>It compiles the documentation (markdown) to HTML files and distribute the files</li>
 <li>It runs <code>#.Tatin.Admin.MakeServer</code></li>
 </ol>
-<p>If the right argument was a <code>0</code> then it will also ask you whether you want to attempt an update for all packages Tatin itself depends on, and it would ask you whether the new version should be copied to the <code>MyUCMDs/</code> folder.</p>
+<p>If the right argument was a <code>0</code> then it will also ask you whether you want to attempt an update for all packages Tatin itself depends on, and it would also ask you whether the new version of the Tatin Client should be copied to the <code>MyUCMDs/</code> folder.</p>
 <p>In the process the <code>Dist/</code> folder will be recreated from scratch. The <code>.zip</code> files in <code>Dist/</code> are to be released on GitHub. The <code>Dist/</code> folder will not appear on GitHub due to <code>.gitignore</code>.</p>
 <p>There will be three zip files:</p>
 <pre><code>Tatin-Client-{major}.{minor}.{patch}.zip

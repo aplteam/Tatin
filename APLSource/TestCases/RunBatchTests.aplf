@@ -1,4 +1,5 @@
  {success}←{debugFlag}RunBatchTests flag;rc;log
+ success←0
  :If flag
      debugFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'debugFlag'
      'Invalid left argument'Assert(⊂debugFlag)∊0 1
@@ -6,12 +7,7 @@
      PrepareForBatchTesting ⍬
      (rc log)←T.RunBatchTests debugFlag
      success←0=rc
-     :If 'OFF='{0=+/b←⍺∘≡¨(≢⍺)↑¨⍵:0 ⋄ ⊃(//)⎕VFI(≢⍺)↓(b⍳1)⊃⍵}1 ⎕C¨⊣2 ⎕NQ #'GetCommandLineArgs'
-         :If success
-             ⎕OFF
-         :Else
-             ⎕OFF 123
-         :EndIf
-         ⎕←'Tatin batch test suite was ',((~success)/'un'),'successfully executed'
-     :EndIf
+     SaveBatchTestLog log
+     ExecQuadOff success'Tatin client batch'
  :EndIf
+⍝Done

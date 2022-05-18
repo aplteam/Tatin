@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.37.4 - 2022-05-04
+⍝ * 0.37.5 - 2022-05-13
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -564,7 +564,7 @@
       {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage'https://tatin.dev/v1/documentation'
     ∇
 
-    ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn;noOf
+    ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn;noOf;qdmx
       (identifier targetSpace)←Arg.(_1 _2)
       :If 0≡targetSpace
           targetSpace←,'#'
@@ -578,9 +578,15 @@
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
-     
-      noOf←Arg.nobetas TC.LoadPackage identifier targetSpace
-      r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded'
+      :Trap 0
+          noOf←Arg.nobetas TC.LoadPackage identifier targetSpace
+          r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded'
+      :Else
+          ⍝ We must make sure that all connections get closed before passing on the error
+          qdmx←⎕DMX
+          TC.CloseConnections ⍬
+          ⎕SIGNAL⊂(⊂¨'EN' 'EM'),¨⊂¨qdmx.(EN EM)
+      :EndTrap
     ∇
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data
@@ -690,7 +696,7 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackage Arg;identifier;installFolder
+    ∇ r←InstallPackage Arg;identifier;installFolder;qdmx
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
@@ -719,7 +725,14 @@
           :EndIf
       :EndIf
       ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
-      r←TC.InstallPackage identifier installFolder
+      :Trap 0
+          r←TC.InstallPackage identifier installFolder
+      :Else
+          ⍝ We must make sure that all connections get closed before passing on the error
+          qdmx←⎕DMX
+          TC.CloseConnections ⍬
+          qdmx.DM ⎕SIGNAL qdmx.EN
+      :EndTrap
     ∇
 
     ∇ installFolder←TranslateCiderAlias installFolder;ind;alias;list

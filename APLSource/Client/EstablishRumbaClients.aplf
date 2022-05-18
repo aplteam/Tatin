@@ -1,0 +1,17 @@
+ {r}←EstablishRumbaClients dummy;regs
+⍝ Establishes connections to all registries as Rumba clients for pipelined access,
+⍝ usually by InstallPackage (which is called by LoadPackage).
+⍝ We keep a record of all pre-pepared Rumba-Client on the global variable ∆PermanentConnections.
+⍝ This improved performance dramatically in case we have to communicate with a server
+⍝ several times.
+ r←0
+ :If 0=⎕NC'∆PermanentConnections'
+     ∆PermanentConnections←⎕NS''
+     regs←ListRegistries''
+     regs←(0<regs[;4])⌿regs
+     regs←(IsHTTP¨regs[;1])⌿regs
+     'No registries found'Assert 0<≢regs
+     Connect2Client¨regs[;1]
+     r←1
+ :EndIf
+⍝Done

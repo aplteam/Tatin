@@ -1,4 +1,4 @@
- r←Test_UserCommands_083(stopFlag batchFlag);⎕TRAP;res;msg;rc
+ r←Test_UserCommands_083(stopFlag batchFlag);⎕TRAP;res;msg;rc;stop
 ⍝ Exercise ]Tatin.LoadPackage on a package that has only betas but suppress betas
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -6,12 +6,13 @@
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP'
 
- (rc msg res)←∆UCMD'LoadPackage [local]Laguntza #.TEMP -nobetas'
+ stop←0
+ (rc msg res)←stop ∆UCMD'LoadPackage [local]Laguntza #.TEMP -nobetas'
  →T.GoToTidyUp~∨/'Not found: Laguntza'⍷msg
 
  r←T._OK
 
 ∆TidyUp:
  #.⎕EX TC.GetTatinRootSpace'#'
- F.RmDir res
+ :Trap 0 ⋄ F.RmDir res ⋄ :EndTrap
 ⍝Done

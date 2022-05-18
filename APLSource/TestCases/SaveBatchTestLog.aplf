@@ -1,0 +1,9 @@
+ {r}←SaveBatchTestLog log;logFolder
+ r←⍬
+ :If 0<≢logFolder←F.NormalizePath F.GetTempPath,'/TatinBatchTests/log.txt'
+     log←∊¨log                  ⍝ In order to circumvent bug #18 in Tester2
+     :If 'Create!'F.CheckPath logFolder
+         (⊂log)⎕NPUT(logFolder,'/log.txt')1
+     :EndIf
+ :EndIf
+⍝Done

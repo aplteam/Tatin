@@ -1,10 +1,11 @@
- r←GetWorkspaceHash;wsid
+  r←GetWorkspaceHash;wsid
 ⍝ Used to identify changes made to the WS on file
- :If 'CLEAR WS'≡⎕WSID
-     r←''  ⍝ WS was not loaded but created dynamically, as for the test cases
- :Else
+ r←''  ⍝ In case there is no WS on disk to be found, for example when created on the fly for tests.
+ :If 'CLEAR WS'≢⎕WSID
      wsid←(1⊃1 ⎕NPARTS''),'/Server.dws'
+ :AndIf ##.FilesAndDirs.IsFile wsid  ⍝ Alias "F" does not necessarily exist at this point!
      r←2 ⎕NQ #'GetBuildID'wsid
-     'Cannot calculate workspace hash'⎕SIGNAL 11/⍨r∧.='0'
+ :AndIf r∧.='0'  ⍝ Then something went wrong, but it's not worth to crash the server
+     r←''
  :EndIf
 ⍝Done

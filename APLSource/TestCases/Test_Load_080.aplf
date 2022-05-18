@@ -6,12 +6,12 @@
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''    ⍝ Used to load stuff into
 
- refs←TC.LoadPackage'./TestData/Tatin/Registry/aplteam-MarkAPL-10.0.0' '#.TEMP.Foo'
+ refs←TC.LoadPackage'./TestData/Tatin/Registry/aplteam-MarkAPL-11.0.3' '#.TEMP.Foo'
  →T.GoToTidyUp 0=≢refs
  (html ns)←#.TEMP.Foo.MarkAPL.Markdown2HTML'A Para' '' '* This' '* That'
  expected←'<p>A Para</p>' '<ul>' '<li>This</li>' '<li>That</li>' '</ul>'
  →T.GoToTidyUp expected≢html
- →T.GoToTidyUp 9≠#._tatin.⎕NC'aplteam_HandleError_4_0_2'
+ →T.GoToTidyUp ~1<≢#._tatin.⎕nl 9
  →T.GoToTidyUp~0<≢#.TEMP.Foo.MarkAPL.##.TatinVars.ASSETS
 
  r←T._OK

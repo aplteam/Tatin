@@ -1,11 +1,11 @@
- {success}←RunBatchTests debugFlag;log;rc
- PrepareForBatchTests
- (rc log)←T.RunBatchTests debugFlag
- success←0=rc
- :If 'OFF='{0=+/b←⍺∘≡¨(≢⍺)↑¨⍵:0 ⋄ ⊃(//)⎕VFI(≢⍺)↓(b⍳1)⊃⍵}1 ⎕C¨⊣2 ⎕NQ #'GetCommandLineArgs'
-     :If success
-         ⎕OFF
-     :Else
-         ⎕OFF 123
-     :EndIf
+ {success}←{debugFlag}RunBatchTests flag;log;rc
+ success←0
+ :If flag
+     debugFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'debugFlag'
+     PrepareForBatchTests ⍬
+     (rc log)←T.RunBatchTests debugFlag
+     success←0=rc
+     ##.TestCases.SaveBatchTestLog log
+     ##.TestCases.ExecQuadOff success'Tatin server batch'
  :EndIf
+⍝Done

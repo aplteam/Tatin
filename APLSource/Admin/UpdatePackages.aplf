@@ -1,13 +1,12 @@
  {r}←{force}UpdatePackages dummy;path2Packages;packages;i;targetFolder;package;list;packageID;F;parms;TC;packageName;fullName
 ⍝ 1. Re-installs all packages in the ./packages folder
-⍝ 2. Copies the required scripts from the folder packages\ to APLSource\
+⍝ 2. Copies the required scripts from the folder packages/ to APLSource/
 ⍝ 3. The assets required by MarkAPL are copied into ./Assets/MarkAPL\\
-⍝ Right argument is just insurance against accidental calls.
-⍝ Returns a 1 if any of the scripts was actually exchanged, otherwise 0.
+⍝ Returns a 1 if any of the scripts was actually updated, and 0 otherwise.
  r←0
  force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
  :If force
- :OrIf ##.Client.YesOrNo'Sure you want to re-install and possibly update all Tatin packages?'
+ :OrIf ##.Client.YesOrNo'   Sure you want to re-install and possibly update all Tatin packages?'
      :If 0=##.Client.⎕NC'Reg'
          Initialize_Client
      :EndIf
@@ -18,7 +17,7 @@
      parms.update←1
      ⎕←'Now updating packages in ',path2Packages,'/ ...'
      ⎕←{0=≢⍵:'No packages updates' ⋄ ⍪(⊂'*** Packages updated:'),⍵}parms TC.ReInstallDependencies path2Packages
-     packages←F.ListDirs path2Packages
+     packages←{⍵.packageID}##.Registry.APLfromJSON⊃⎕NGET path2Packages,'/apl-buildlist.json'
      :For i package :InEach (⍳≢packages)packages
          packageID←⊃,/1↓⎕NPARTS package
          packageName←{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}packageID
@@ -28,10 +27,12 @@
              F.RmDir targetFolder,'/',packageName
              r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')⊣path2Packages,'/',packageID,'/APLSource/',packageName
          :Else ⍝ Simple files
-             fullName←⊃F.Dir package,'/',packageName,'.*'
+             fullName←⊃F.Dir path2Packages,'/',package,'/',packageName,'.*'
              r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')⊣fullName
          :EndIf
      :EndFor
-     ⎕←'*** Done'
+     :If ~force
+         ⎕←'*** Done'
+     :EndIf
  :EndIf
 ⍝Done

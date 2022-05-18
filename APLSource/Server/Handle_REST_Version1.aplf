@@ -1,4 +1,4 @@
- response←request Handle_REST_Version1 path_;packageID;json;path;data;html;regFolder;⎕TRAP
+ response←request Handle_REST_Version1 path_;packageID;json;path;data;html;regFolder;⎕TRAP;specialCommands
 ⍝ Handles all commands defined in version 1 of the REST interface
  path_↓⍨←-'/'=¯1↑path_
  :If 1='/'+.=path_
@@ -9,8 +9,9 @@
      path↓⍨←-'/'=¯1↑path
  :EndIf
  path←⎕C path
- :If (⊂path)∊(⊂'v1/'),¨GetSpecialCommands request.Method
-     response←request ProcessTestCommands(⎕C path)(GetSpecialCommands request.Method)
+ specialCommands←GetSpecialCommands request.Method
+ :If (⊂path)∊(⊂'v1/'),¨specialCommands
+     response←request ProcessTestCommands(⎕C path)specialCommands
  :Else
      :Select path
      :Case GetVersion_REST'all_packages'

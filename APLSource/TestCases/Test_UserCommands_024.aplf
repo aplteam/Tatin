@@ -1,22 +1,17 @@
  r←Test_UserCommands_024(stopFlag batchFlag);⎕TRAP;rc;msg;res
-⍝ Exercise ]Tatin.ListPackages without any argument
+⍝ Exercise ]Tatin.ListPackages without an argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  :If batchFlag
-
      r←T._NoBatchTest
-
  :Else
      ⎕←''
      :If 1 TC.YesOrNo'Requires you to select the [tatin] registry. Continue?'
-
          (rc msg res)←∆UCMD'ListPackages'
          →T.PassesIf(rc=0)∧0=≢msg
          →T.PassesIf(2=⍴⍴res)∧0<≢res
          →T.PassesIf 20<≢res
-
          r←T._OK
-
      :EndIf
  :EndIf

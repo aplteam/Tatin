@@ -15,14 +15,9 @@
      {}client R.Send¨request      ⍝ Pipeline requests
      r←client R.Receive¨request   ⍝ Wait for all
  :Else
-∆Go: ⍝ Also jumped to in case the server closed the connection for some reason
 
-     :If 0 ⍝ For testing pipelined commands
-         :If 0<⎕NC'∆PermanentConnections'
-         :AndIf 0<errorCounter
-             ⎕←'*** No. of errors: ',⍕errorCounter
-         :EndIf
-     :EndIf
+∆Go: ⍝ Also jumped to in case the server closed the connection.
+     ⍝ Yes, this DOES happen for no apparent reason every now and then.
 
      ⎕EX'∆PermanentConnections'   ⍝ Paranoia
      :If errorCounter>5

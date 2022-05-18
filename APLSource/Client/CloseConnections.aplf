@@ -1,14 +1,9 @@
- {r}←CloseConnections dummy;list;connection;url
-⍝ Close all permanent connections defined within ∆PermanentConnections, and delete that namespace
+ {r}←CloseConnections dummy;list
+⍝ Close all permanent connections defined within ∆PermanentConnections, and delete that namespace.
  r←⍬
  :If 9=⎕NC'∆PermanentConnections'
  :AndIf 0<≢∆PermanentConnections.⎕NL 9
      list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
-     :For connection :In list
-         url←'http',(connection.Secure/'s'),'://',connection.Host,{(~⍵∊0 80 443)/':',⍕⍵}connection.Port
-         {}1 Ping url
-         ⍝TODO⍝          ⎕TKILL connection.Tid  ⍝ Required at all? Or a call to Rumba?!
-     :EndFor
-     {}R.##.DRC.Close¨list.Name
+     {}{⍵ R.Close 0}¨list
      ⎕EX'∆PermanentConnections'
  :EndIf

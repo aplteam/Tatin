@@ -79,7 +79,7 @@ For that reason the packages installed in the `packages/` folder are copied over
 
 If you need to add a package then you need to perform a couple of steps:
 
-* Install that package in `packages/`
+* Install that package into `packages/`
 * Call `#.Tatin.Admin.UpdatePackages ⍬`
 
 For further details see the comments in the function `#.Tatin.Admin.UpdatePackages`.
@@ -116,14 +116,6 @@ There are two scenarios:
 
 We discuss the two different scenarios one after the other.
 
-### Testing while developing
-
-#### Executing all tests
-
-It is recommended to start a fresh APL session and then load the Tatin project into the CLEAR WS before running any test cases.
-
-Use `]Cider.OpenProject` to do this.
-
 A> ### Creating a new version
 A>
 A> Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
@@ -131,6 +123,14 @@ A>
 A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in `⎕SE` for execution, but that is only possible if you create a new version first.
 A>
 A> For that reason one test actually checks whether the version number in the workspace and in `⎕SE` do match. If you are confident that this does not matter in your case just carry on.
+
+### Testing while developing
+
+#### Executing all tests
+
+It is recommended to start a fresh APL session and then load the Tatin project into the CLEAR WS before running any test cases.
+
+Use `]Cider.OpenProject` to do this.
 
 By default the test cases use port 5001 for communication between the Test Server and the client. You may change the INI files for both server and client if that does not work for you.
 
@@ -173,6 +173,12 @@ Now you are ready to execute the test suite.
 
    This changes the current directory, establishes all required references, instantiates the `Tester2` class under the name `T` before finally calling the `T.Run` function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <https://tatin.dev>
 
+A> ### Execute the client test suite multiple times in parallel
+A>
+A> You might come up with the idea to start the client part of the tests multiple times in parallel in order to put some pressure on the Tatin Server.
+A>
+A> In general this is a good idea, but the client test suite is not suitable for this. For example, the tests that belong to the "Cache" group _must_ be executed one after the other, they rely on each other. Generally this should be avoided, but here for technical reasons it's a must. Running this group in parallel contradicts this, and is bound to fail.
+
 #### Executing only particular tests
 
 The `Tester2` test framework is flexible and powerful; for example, you may execute only the tests that focus on the Tatin Client API. The names of those tests are `Test_API_<number>`.
@@ -183,7 +189,7 @@ A> The full test suite is exhaustive, and for that reason it takes considerable 
 A>
 A> The tests are grouped, and that is reflected by the names of the test functions. For example, the names `Test_API_001` and `Test_UserCommand_001` clearly state which group they belong to.
 
-If you are not interested in executing only some of the test cases then skip this and carry on with "[How to create new versions](#)".
+If you are not interested in executing only some of the test cases then skip this and carry on with "[Tests as part of an automated build](#)".
 
 Before executing any test case call this function:
 
@@ -294,24 +300,32 @@ Call this function:
 
 The `1` provided as right argument is just an insurance against accidental calls.
 
-When running the test suite with the batch flag set, as `RunBatchTests` does, is fundamentally in several respects:
+When running the test suite with the batch flag set, as `RunBatchTests` does, is fundamentally different in several respects:
 
-* A Tatin server that listens (by default) on port 5001 is started (and is also shutdown) by the test suite itself.
+* A Tatin server that listens (by default) on port 5001 is started (and is also shut down) by the test suite itself.
 * By default all errors are trapped. 
 
-  If you need to track down a bug than you don't want this: in that case pass a `1` as left argument.
+  If you need to track down a bug then you don't want this: in that case pass a `1` as left argument: this is treated as "debug" flag.
 
-Of course `RunBatchTests` does not execute any test cases that require a human in front of the monitor, but the number of such tests is pretty small anyway: less than 10.
+Of course `RunBatchTests` does not execute any test cases that require a human in front of the monitor, but the number of such tests is pretty small anyway.
 
-This function checks the command line:
+`RunBatchTests` checks the command line:
 
 * In case `OFF=1` was specified on the command line then `⎕OFF` is executed after the last test case got executed.
 
-  If one or more test cases failed then `⎕OFF 123` is executed eventually. That allows the calling environment to check whether the test suite was executed successfully in its entirety or not.
+  If one or more test cases failed then `⎕OFF 123` is executed. That allows the calling environment to check whether the test suite was executed successfully in its entirety or not.
 
 * If `OFF=1` was not specified a message is printed to the session, indicating success or failure.
 
 #### Running the test suite from a console or terminal
+
+There are two scripts available in the Tatin root directory:
+
+1. `RunTests.bat` if you want to run the batch tests under Windows
+
+2. `RunTests.sh` is you want to run the batch tests on a non-Windows platform
+
+These are templates: check their contents, you might need to make amendments. 
 
 
 ## How to create new versions
@@ -354,7 +368,7 @@ The `Make` function performs the following steps:
 
 1. It runs `#.Tatin.Admin.MakeServer`
 
-If the right argument was a `0` then it will also ask you whether you want to attempt an update for all packages Tatin itself depends on, and it would ask you whether the new version  should be copied to the `MyUCMDs/` folder.
+If the right argument was a `0` then it will also ask you whether you want to attempt an update for all packages Tatin itself depends on, and it would also ask you whether the new version of the Tatin Client should be copied to the `MyUCMDs/` folder.
 
 In the process the `Dist/` folder will be recreated from scratch. The `.zip` files in `Dist/` are to be released on GitHub. The `Dist/` folder will not appear on GitHub due to `.gitignore`.
 

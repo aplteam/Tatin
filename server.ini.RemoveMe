@@ -11,7 +11,7 @@ AppName             = 'PlodderForTatin'
 DisplayRequests     = 0                     ; 1 makes Rumba display every request in a ⎕ED windows. For debugging only of course.
 LogHTTPToSession    = 0                     ; Naturally only useful in development
 MaxNoOfThreads      = 1000
-Port                = 443                   ; This is usually 443 in case of "Secure=1" and 80 otherwise
+Port                = 0                     ; 0 becomes 443 in case of "Secure=1" and 80 otherwise; other values survive.
 BaseTagPort         = 0                     ; 0 means: do not inject a port number into the HTML meta base tag. If it is non-zero that port IS injected.
 Secure              = 1                     ; 1 for https and 0 for http
 Registry            = '{home}../Registry/'  ; Where does the data (the Registry) live?
@@ -22,7 +22,8 @@ TestFlag            = 0                     ; If 1 a couple of commands are avai
 ReloadWS            = 1                     ; Reload the server WS in case a better version is detected on disk
 HTDOCS              = '{home}'              ; Defines where the static files live (CSS, IMGs...)
 DeletePackages      = 0                     ; 0=not allowed; 1=allowed; 2=only beta versions (major=0);
-MinimumTatinVersion = '0.63'                ; Minimum version of Tatin required on the client side (major or major.minor)
+MinimumTatinVersion = '0.65'                ; Minimum version of Tatin required on the client side (major or major.minor)
+SpecialCommands     = 0                     ; Active only ever for a test server, never in production
 
 
 [HTMLBACKGROUND]
@@ -80,7 +81,8 @@ OnRequest           = 'OnRequest'                      ; Called in the event of 
 OnCongaTimeout      = 'OnHouseKeeping'                 ; Do any housekeeping here
 
 
-[EMAIL]             ; Tatin can send emails in case of crashesActive              = 1      ; On/off toggle for crash emails
+[EMAIL]             ; Tatin can send emails in case of crashes
+Active              = 1      			       ; On/off toggle for crash emails
 Domain              = '?'                              ; Used in the subject line  (*)
 SMTP_Server         = ''                               ; For example: smtp.gmail.com'
 Port                = 465

@@ -1,12 +1,11 @@
- r←Test_Server_003(stopFlag batchFlag);⎕TRAP
- ;filename;response;q
+ r←Test_Server_003(stopFlag batchFlag);⎕TRAP;filename;response;q
 ⍝ Requests an existing package with a full package ID (= including the version number)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  response←TC.GetPackageViaHTTP_'aplteam-FilesAndDirs-3.2.2'
  →T.PassesIf 200=response.StatusCode
- filename←∆GetServerRegistryFolder,{⍵,'/',⍵,'.zip'}'aplteam-FilesAndDirs-3.2.2'
+ filename←∆GetServerPath,{⍵,'/',⍵,'.zip'}'aplteam-FilesAndDirs-3.2.2'
  →T.PassesIf response.Content≡Reg.ReadNativeFile filename
 
  r←T._OK

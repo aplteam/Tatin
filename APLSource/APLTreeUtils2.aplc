@@ -17,10 +17,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'APLTreeUtils2' '1.1.1+50' '2021-03-01'
+      r←'APLTreeUtils2' '1.1.3+53' '2021-04-07'
     ∇
 
     ∇ History
+    ⍝ * 1.1.3 from 2021-04-07
+    ⍝   * `AtLeastVersion` was NOT buggy, its test case was
+    ⍝ * 1.1.2 from 2021-04-06
+    ⍝   * `AtLeastVersion` was buggy
     ⍝ * 1.1.1 from 2021-03-01
     ⍝   * Package config file corrected (new format)
     ⍝ * 1.1.0 from 2020-09-26
@@ -310,12 +314,12 @@
       :Access Public Shared
       ⍝ Returns 1 if the currently running version is at least `min`.\\
       ⍝ If the current version is 17.1 then:\\
-      ⍝ `0 0 1 1 ←→ AtLeastVersion¨16 17 17.1 18`\\
+      ⍝ `1 1 1 0 ←→ AtLeastVersion¨16 17 17.1 18`\\
       ⍝ You may specify a version different from the currently running one via `⍺`:\\
-      ⍝ `0 1 1 1 ←→ 17 AtLeastVersion¨16 17 17.1 18`
+      ⍝ `1 1 0 0 ←→ 17 AtLeastVersion¨16 17 17.1 18`
       x←{0<⎕NC ⍵:⍎⍵ ⋄ {⊃⊃(//)⎕VFI ⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion'}'x'
       'Right argument must be length 1'⎕SIGNAL 11/⍨1≠≢min
-      r←⊃min≥x
+      r←⊃min≤x
     ∇
 
     ∇ r←{length}FormatDateTime ts;ts2;formatstring;bool;buffer

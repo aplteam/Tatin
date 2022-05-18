@@ -7,7 +7,11 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←T._Failed
 
- sourceFolder←##.CiderConfig.(HOME,'/',CIDER.source),'/'
+ :If 0<##.⎕NC'CiderConfig'
+     sourceFolder←##.CiderConfig.(HOME,'/',CIDER.source),'/'
+ :Else
+     sourceFolder←F.PWD,'/APLSource/'
+ :EndIf
  allFolders←{(≢⍵)↓¨F.ListDirs ⍵}sourceFolder
  bool←'Plodder' 'RumbaLean'∊allFolders
  :If 0<+/bool

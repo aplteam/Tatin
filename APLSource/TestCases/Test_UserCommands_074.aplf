@@ -1,17 +1,17 @@
  r←Test_UserCommands_074(stopFlag batchFlag);⎕TRAP;dir;res;rc;msg;list;expected
-⍝ Exercise ]Tatin.]UnInstallPackage without a package ID: remove all superfluous packages
+⍝ Exercise ]Tatin.]UnInstallPackage without a package ID but with -cleanup: remove all superfluous packages
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  dir←∆GetTempDir''
- res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.0'dir
+ res←⎕SE.Tatin.InstallPackages'[localhost]aplteam-APLTreeUtils-6.0.0'dir
  Assert'aplteam-APLTreeUtils-6.0.0'≡∊res
- res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.1'dir
+ res←⎕SE.Tatin.InstallPackages'[localhost]aplteam-APLTreeUtils-6.0.1'dir
  Assert'aplteam-APLTreeUtils-6.0.1'≡∊res
- res←⎕SE.Tatin.InstallPackage'[localhost]aplteam-APLTreeUtils-6.0.2'dir
+ res←⎕SE.Tatin.InstallPackages'[localhost]aplteam-APLTreeUtils-6.0.2'dir
  Assert'aplteam-APLTreeUtils-6.0.2'≡∊res
 
- (rc msg list)←∆UCMD'UnInstallPackage "',dir,'"'
+ (rc msg list)←∆UCMD'UnInstallPackage "',dir,'" -cleanup'
  Assert 0=rc
  Assert 0=≢msg
  expected←'aplteam-APLTreeUtils-6.0.0' 'aplteam-APLTreeUtils-6.0.1'

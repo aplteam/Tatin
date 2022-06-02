@@ -11,11 +11,11 @@
  oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  oldPkgList←F.ListDirs dir2,'/'
 
- (list msg)←TC.UnInstallPackage dir2'aplteam-EventCodes-3.0.1'          ⍝ Without alias it must not be removed!
+ (list msg)←TC.UnInstallPackage 'aplteam-EventCodes-3.0.1' dir2          ⍝ Without alias it must not be removed!
  →T.GoToTidyUp 0≠≢list
  →T.GoToTidyUp'Cannot uninstall: package has an alias assigned'≢msg
 
- (list msg)←TC.UnInstallPackage dir2'EC@aplteam-EventCodes-3.0.1'
+ (list msg)←TC.UnInstallPackage 'EC@aplteam-EventCodes-3.0.1'dir2
  →T.GoToTidyUp(,⊂'EC@aplteam-EventCodes-3.0.1')≢list
  →T.GoToTidyUp 0≠≢msg
 

@@ -1,12 +1,12 @@
  r←Test_Load_003(stopFlag batchFlag);⎕TRAP;res;noOfRefs
-⍝ Exercise ⎕SE.Tatin.LoadPackage on a package with an alias
+⍝ Exercise ⎕SE.Tatin.LoadPackages on a package with an alias
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP'
 
- res←1 TC.LoadPackage'A@[localhost]APLTreeUtils' '#.TEMP'
+ res←1 TC.LoadPackages'A@[localhost]APLTreeUtils' '#.TEMP'
  →T.GoToTidyUp 0=res
  →T.GoToTidyUp 3.1≢|A.⎕NC⊂'Create_UUID'
 

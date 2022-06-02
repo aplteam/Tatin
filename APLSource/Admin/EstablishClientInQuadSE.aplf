@@ -1,4 +1,4 @@
- {r}←{pathToUserSettings}EstablishClientInQuadSE dummy;C;ref;reg
+ {r}←{pathToUserSettings}EstablishClientInQuadSE dummy;C;ref;reg;dyalog
 ⍝ This function is called in order to establish the Tatin Client in ⎕SE._Tatin and
 ⍝ to establish the API within ⎕SE.Tatin.
 ⍝ By default the UserSettings class is instantiated with the default path as argument.
@@ -18,14 +18,14 @@
  EstablishFunctionInAPI ref'GetUserHomeFolder'
  EstablishFunctionInAPI ref'InitPackageConfig'
  EstablishFunctionInAPI ref'InitialisePackage'
- EstablishFunctionInAPI ref'InstallPackage'
+ EstablishFunctionInAPI ref'InstallPackages'
  EstablishFunctionInAPI ref'ListCache'
  EstablishFunctionInAPI ref'ListPackages'
  EstablishFunctionInAPI ref'ListRegistries'
  EstablishFunctionInAPI ref'ListTags'
  EstablishFunctionInAPI ref'ListVersions'
  EstablishFunctionInAPI ref'LoadDependencies'
- EstablishFunctionInAPI ref'LoadPackage'
+ EstablishFunctionInAPI ref'LoadPackages'
  EstablishFunctionInAPI ref'Pack'
  EstablishFunctionInAPI ref'Ping'
  EstablishFunctionInAPI ref'PublishPackage'
@@ -42,6 +42,6 @@
  ⎕SE.Tatin.⎕FX'r←MyUserSettings' 'r←⎕SE._Tatin.Client.MyUserSettings' ⍝ Don't create a ref here because the user might assign ⎕NEW UserSettings to it, and that would NOT work!
  ##.RumbaLean.⎕EX'DRC'          ⍝ Paranoia; with DRC around Conga won't be initialised
  ##.RumbaLean.⎕EX'Conga'
- 'Conga'##.RumbaLean.⎕CY'conga' ⍝ Copy Conga of the current APL version; MUST be lowercase because otherwise the WS won't be found on Linux/Mac-OS
+ 'Conga'##.RumbaLean.⎕CY(2 ⎕NQ'.' 'GetEnvironment' 'DYALOG'),'/ws/conga' ⍝ Copy Conga of the current APL version; MUST be lowercase because otherwise the WS won't be found on Linux/Mac-OS
  InitConga ⍬
 ⍝Done

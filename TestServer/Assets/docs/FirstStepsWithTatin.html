@@ -30,7 +30,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Installing-packages">4.1. Installing packages</a></li>
 <li><a href="#Getting-a-package-into-the-workspace">4.2. Getting a package into the workspace</a></li>
 <li><a href="#Installing-several-packages-at-once">4.3. Installing several packages at once</a></li>
-<li><a href="#Checking-out-a-package-LoadPackage">4.4. Checking out a package: <code>LoadPackage</code></a></li>
+<li><a href="#Checking-out-a-package-LoadPackages">4.4. Checking out a package: <code>LoadPackages</code></a></li>
 <li><a href="#Misc">4.5. Misc</a>
 </li></ul></li>
 </ul>
@@ -161,7 +161,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Imagine you want to use the MarkAPL package in an application you are currently working on which we will call a project. Let's also assume that this project is named “Foo” and lives in <code>/Foo/</code>.</p>
 <p>The first step is to install the package as part of the project “Foo”:</p>
-<pre><code>      ]tatin.InstallPackage [tatin]MarkAPL /Foo/packages</code></pre>
+<pre><code>      ]tatin.InstallPackages [tatin]MarkAPL /Foo/packages</code></pre>
 <p>Notes:</p>
 <ul>
 <li><code>[tatin]</code> tells the Tatin client to load MarkAPL from the server the alias <code>tatin</code> is pointing to: https://tatin.dev</li>
@@ -328,16 +328,16 @@ aplteam_OS_3_0_1</code></pre>
 <h3 data-id="Installing-several-packages-at-once">4.3. Installing several packages at once</h3>
 </a>
 </div>
-<p>Note that <code>InstallPackage</code> accepts several package IDs, separated by commas:</p>
-<pre><code>      ]tatin.InstallPackage Tester2,MarkAPL,Laguntza /Foo/packages</code></pre>
+<p>Note that <code>InstallPackages</code> accepts several package IDs, separated by commas:</p>
+<pre><code>      ]tatin.InstallPackages Tester2,MarkAPL,Laguntza /Foo/packages</code></pre>
 <p>This will load three packages and all their dependencies at once. You might find this significantly faster than installing them one-by-one.</p>
 <div class="h_tag">
-<a href="#Checking-out-a-package-LoadPackage" id="Checking-out-a-package-LoadPackage" class="autoheader_anchor">
-<h3 data-id="Checking-out-a-package-LoadPackage">4.4. Checking out a package: <code>LoadPackage</code></h3>
+<a href="#Checking-out-a-package-LoadPackages" id="Checking-out-a-package-LoadPackages" class="autoheader_anchor">
+<h3 data-id="Checking-out-a-package-LoadPackages">4.4. Checking out a package: <code>LoadPackages</code></h3>
 </a>
 </div>
 <p>Let's assume that before actually installing it you first want to check whether the package <code>MarkAPL</code> suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace.</p>
-<p>That can be achieved with the <code>LoadPackage</code> user command. It loads the package into the workspace.</p>
+<p>That can be achieved with the <code>LoadPackages</code> user command. It loads the package into the workspace.</p>
 <p>Notes:</p>
 <ul>
 <li>Loading a package in this way has one major purpose: to investigate it.</li>
@@ -345,7 +345,7 @@ aplteam_OS_3_0_1</code></pre>
 <p>This is discussed in the paper <code>TatinsLoadAndUpdateStrategy.html</code></p></li>
 </ul>
 <p>Let's load the <code>MarkAPL</code> package into the workspace; for that we need to specify a URL and optionally a target namespace:</p>
-<pre><code>      ]tatin.LoadPackage [tatin]MarkAPL
+<pre><code>      ]tatin.LoadPackages [tatin]MarkAPL
   Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
   Establish dependencies...
   4 dependencies identified
@@ -384,7 +384,7 @@ APLTreeUtils2
 FilesAndDirs
 MarkAPL</code></pre>
 <p><code>MarkAPL</code> is the package we asked for. It depends on two packages, <code>APLTreeUtils2</code> and <code>FilesAndDirs</code>. For those references are injected. <code>FilesAndDirs</code> depends on <code>OS</code> but because that is not required by <code>MarkAPL</code> no reference to it is injected into MarkAPL's <code>code</code>, instead you would find such a reference in <code>#._tatin.aplteam_FilesAndDirs_5_0_1.code</code>.</p>
-<p>Note that like <code>InstallPackage</code> you may specify more than just one package. If you do then separate them with commas.</p>
+<p>Note that like <code>InstallPackages</code> you may specify more than just one package. If you do then separate them with commas.</p>
 <div class="h_tag">
 <a href="#Misc" id="Misc" class="autoheader_anchor">
 <h3 data-id="Misc">4.5. Misc</h3>
@@ -452,8 +452,8 @@ MarkAPL</code></pre>
 <p>Is a character vector holding the path of a folder that hosts the package.</p>
 <p>There are exceptions:</p>
 <ul>
-<li>When the package was brought into the workspace with <code>LoadPackage</code> rather than <code>LoadDependencies</code>.
-<p>This is because without assets <code>LoadPackage</code> loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.</p></li>
+<li>When the package was brought into the workspace with <code>LoadPackages</code> rather than <code>LoadDependencies</code>.
+<p>This is because without assets <code>LoadPackages</code> loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.</p></li>
 <li>When the folder the package was loaded from does not exist for other reasons, for example because the package was loaded into the WS which then was saved and moved elsewhere, together with the <code>ASSETS</code> folder relative to the WS.</li>
 </ul>
 <p>In case one of these two conditions is met <code>HOME</code> is <code>''</code>.</p>

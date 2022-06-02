@@ -1,18 +1,18 @@
  r←Test_API_062(stopFlag batchFlag);⎕TRAP;res
-⍝ Exercise ⎕SE.Tatin.LoadPackage on a beta package
+⍝ Exercise ⎕SE.Tatin.LoadPackages on a beta package
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP'
 
- res←⎕SE.Tatin.LoadPackage'[local]Laguntza' '#.TEMP'
+ res←⎕SE.Tatin.LoadPackages'[local]Laguntza' '#.TEMP'
  →T.GoToTidyUp 0=res
  →T.GoToTidyUp'5.0.0-beta-1'≢∆RemoveBuildFromVersion 2⊃#._tatin.aplteam_Laguntza_5_0_0_beta_1.code.Version
 
  r←T._OK
 
 ∆TidyUp:
-∆RemoveTempFolders
+ ∆RemoveTempFolders
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

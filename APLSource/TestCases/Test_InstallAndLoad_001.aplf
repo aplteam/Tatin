@@ -20,8 +20,8 @@
  zipfile←TC.Pack src zip
 
  installFolder←∆GetTempDir'/MyAppPackages'
- res←TC.InstallPackage('file://',zipfile)installFolder
- →T.GoToTidyUp (∊res)≢TC.GetPackageIDFromFilename zipfile
+ res←TC.InstallPackages('file://',zipfile)installFolder
+ →T.GoToTidyUp(∊res)≢TC.GetPackageIDFromFilename zipfile
 
  expected←,⊂TC.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
  →T.GoToTidyUp~expected ∆LazyMatch(1+≢installFolder)↓¨F.ListDirs installFolder

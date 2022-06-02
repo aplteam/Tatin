@@ -1,15 +1,21 @@
  {r}←uri SignalNoConnection msg;qdmx;EM;⎕TRAP
 ⍝ Used to enable a Tatin-specific function to catch 347 & 348 and report `msg`.
+⍝ 348 for errors when it's worthwhile to try a couple of times
+⍝ 347 for errors that must be passed through
  r←⍬
  qdmx←⎕DMX
  EM←⎕C qdmx.EM~' '  ⍝ The Rumba message might carry more spaces than it should, so we have to do some gymnastic
- :If (⎕C'HandshakeCertificateIsFailing'){⍺≡(≢⍺)↑⍵}EM        ⍝ That's Conga 3.3 and earlier
- :OrIf (⎕C'HostIdentificationNotResolved'){⍺≡(≢⍺)↑⍵}EM      ⍝ That's Conga 3.4 and later
- :OrIf (⎕C'UnableToConnectToHostDataPort'){⍺≡(≢⍺)↑⍵}EM      ⍝ That's also Conga 3.4 and later
+ ⎕TRAP←0 'S'
+ :If qdmx.ENX∊1111 11002 1201                               ⍝ 1111 is universal, 11002 is Conga 3.4, 1201 is Conga 3.3
+     msg ⎕SIGNAL 347
+ :ElseIf 'Win'≢A.GetOperatingSystem ⍬
+ :AndIf ¯3≡qdmx.ENX
      msg ⎕SIGNAL 347
  :ElseIf (⎕C'ServerClosedConnection'){⍺≡(≢⍺)↑⍵}EM           ⍝ Should not happen but does anyway
+ :OrIf (⎕C'HandshakeCertificateIsFailing'){⍺≡(≢⍺)↑⍵}EM      ⍝ That's Conga 3.3 and earlier
+ :OrIf (⎕C'UnableToConnectToHostDataPort'){⍺≡(≢⍺)↑⍵}EM      ⍝ That's also Conga 3.4 and later
+ :OrIf (⎕C'ThisIsUsuallyATemporaryErrorDuringHostNameResolutionAndMeansThatTheLocalServerDidNotReceiveAResponseFromAnAuthoritativeServer'){⍺≡(≢⍺)↑⍵}EM  ⍝ Same
      msg ⎕SIGNAL 348
  :Else
-     ⎕TRAP←0 'S'
-     qdmx.EM ⎕SIGNAL qdmx.EN
+     ⎕SIGNAL⊂('EN' 347)('ENX'qdmx.ENX)('Message'qdmx.Message)('EM'qdmx.EM)
  :EndIf

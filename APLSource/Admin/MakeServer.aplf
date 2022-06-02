@@ -57,7 +57,7 @@
      ⎕WSID←targetPath,'/Server/Server'
      #.⎕EX'Make_'
      ⎕SE.⎕EX ⎕SE.⎕NL⍳16                                 ⍝ Attempt to avoid "Reference in ⎕SE points to #" (⎕JSON bug)
-     'Plodder' 'RumbaLean'#.Tatin.⎕CY'./Assets/RunTime/Plodder/Plodder'
+     'Plodder' 'RumbaLean'#.Tatin.⎕CY ##.CiderConfig.HOME,'/Assets/RunTime/Plodder/Plodder'
      0 ⎕SAVE ⎕WSID
      (targetPath,'/Server')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/'
      (targetPath,'/Server/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./InstallAsWindowsService.dws'
@@ -66,7 +66,7 @@
      F.RmDir'Dist/Server/Assets/RunTime/Plodder'
      F.DeleteFile¨F.Dir'Dist/Tatin-Server-*.zip'
      zipFilename←'Dist/Tatin-Server-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Server.Version),''),'.zip'
-     targetPath ##.DotNetZip.ZipFolder zipFilename
+     targetPath ##.ZipArchive.ZipFolder zipFilename
      :If batchFlag
          ⎕OFF
      :Else

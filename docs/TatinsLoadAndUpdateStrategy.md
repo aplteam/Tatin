@@ -72,9 +72,9 @@ While `Foo` relies on `Zoo` 1.1.1, `Goo` needs `Zoo` 1.2.0 --- what is Tatin doi
 It depends on what you are doing. Let's first load `Zoo` and `Goo` into the workspace, the usual approach to inspect a package:
 
 ```
-      ]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
+      ]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
 #.MyPkgs.Foo
-      ]TATIN.LoadPackage [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
+      ]TATIN.LoadPackages [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
 #.MyPkgs.Goo
       #.MyPkgs.⎕nl ⍳16
 Foo
@@ -85,7 +85,7 @@ A> ### Getting the latest version
 A>
 A> Assuming that version 1.3.0 of `Foo` is the latest version available with the major number 1, then this would have been sufficient:
 A> ```
-A> ]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1 #.MyPkgs
+A> ]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1 #.MyPkgs
 A> ```
 A> Note that neither the minor nor the patch number have been specified.
 A>
@@ -93,7 +93,7 @@ A> Assuming that version 2.1.0 of `Goo` is the very latest version available at 
 A> then this would have been sufficient:
 A>
 A> ```
-A> ]TATIN.LoadPackage [MyTatin]/mygroup-Goo #.MyPkgs
+A> ]TATIN.LoadPackages [MyTatin]/mygroup-Goo #.MyPkgs
 A> ```
 A> Note that in this case not even the major number has been specified.
 
@@ -118,9 +118,9 @@ To make packages a part of an application (say), they first need to be installed
 ```
       ⎕NEXISTS /myPkgs
 0
-      ]TATIN.InstallPackage [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
+      ]TATIN.InstallPackages [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
 /myPkgs/mygroup-Foo-1.0.0
-      ]TATIN.InstallPackage [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
+      ]TATIN.InstallPackages [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
 /myPkgs/mygroup-Goo-2.1.0
       ⍪⊃⎕NINFO ⍠ 1⊢'/myPkgs/*'
 /myPkgs/apl-buildlist.json  

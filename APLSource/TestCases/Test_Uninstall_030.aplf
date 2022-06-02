@@ -4,14 +4,14 @@
  r←T._Failed
 
  dir←∆GetTempDir''
- res←⎕SE.Tatin.InstallPackage'./TestData/ExamplePackages/Packages/aplteam-MultipleObjectsNoAPI-0.1.0.zip'dir
+ res←⎕SE.Tatin.InstallPackages'./TestData/ExamplePackages/Packages/aplteam-MultipleObjectsNoAPI-0.1.0.zip'dir
  Assert'aplteam-MultipleObjectsNoAPI-0.1.0'≡∊res
- res←⎕SE.Tatin.InstallPackage'./TestData/ExamplePackages/Packages/aplteam-SingleClassWithAPI-0.1.0.zip'dir
+ res←⎕SE.Tatin.InstallPackages'./TestData/ExamplePackages/Packages/aplteam-SingleClassWithAPI-0.1.0.zip'dir
  Assert'aplteam-SingleClassWithAPI-0.1.0'≡∊res
  (⊂'')F.NPUT(dir,'/apl-dependencies.txt')1
 
  :Trap 998
-     {}TC.UnInstallPackage dir'P@aplteam-APLProcess-1.0.0'
+     {}TC.UnInstallPackage 'P@aplteam-APLProcess-1.0.0' dir
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

@@ -1,7 +1,7 @@
- mat←{dateFlag}ListVersions uri;client;request;res;uri_;registries;registry;buff
+  mat←{dateFlag}ListVersions uri;client;request;res;uri_;registries;registry;buff;flag
 ⍝ Lists all versions of a package.
 ⍝ `uri` is one of:
-⍝ * "[*]" followed by "group" and "name" of a package
+⍝ * An (optional) registry followed by "group" and "name" of a package
 ⍝ * A path to a Registry and "group" and "name" of a package
 ⍝ In the first case all defined Registries with a priority greater than zero are scanned.
 ⍝ A matrix with two columns is returned: URL and full package ID.\\
@@ -12,13 +12,14 @@
 ⍝ By default the publishing date is not included, but you my change this by passing a 1 as ⍺.
 ⍝ In that case an additional column is added to the result.
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
- :If '[*]'≡3⍴uri
+ :If flag←'[*]'≡3⍴uri           ⍝ Archaic syntax is still supported nut not documented
+ :OrIf (~IsHTTP uri)∧('['≠1⍴uri)∧({1≥+/⍵∊'/\'}uri)∧(~':'∊uri)∧('.'≠1⍴uri)
      mat←(0,(2+dateFlag))⍴⍬
      registries←ListRegistries 0
      :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
      :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}registries[;1])⌿registries
          :For registry :In registries[;1]
-             :If 0<≢buff←dateFlag ListVersions registry,3↓uri
+             :If 0<≢buff←dateFlag ListVersions registry,(flag×3)↓uri
                  mat⍪←(⊂registry),buff
              :EndIf
          :EndFor

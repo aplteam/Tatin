@@ -1,0 +1,21 @@
+ {r}←{targetFolder}CopyScriptsFromPackagesIn path2Packages;packages;i;package;packageID;packageName;fullName
+⍝ Copy scripps installed in `path2Packages` over to `targetFolder` which defaults to APLSource/
+ r←0
+ targetFolder←{0<⎕NC ⍵:⍎⍵ ⋄ './APLSource/'}'targetFolder '
+ packages←{⍵.packageID}##.Registry.APLfromJSON⊃⎕NGET path2Packages,'/apl-buildlist.json'
+ :For i package :InEach (⍳≢packages)packages
+     packageID←⊃,/1↓⎕NPARTS package
+     packageName←{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}packageID
+     fullName←⊃##.FilesAndDirs.Dir targetFolder,'/',packageName,'.*'
+     :If 0=≢fullName
+         :If ##.FilesAndDirs.IsDir path2Packages,'/',packageID,'/APLSource'
+             r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')('Wildcard' 1)⊣path2Packages,'/',packageID,'/APLSource/*'
+         :Else
+             r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')('Wildcard' 1)⊣path2Packages,'/',packageID,'/',packageName,'*'
+         :EndIf
+     :Else ⍝ Simple files
+         fullName←⊃##.FilesAndDirs.Dir path2Packages,'/',package,'/',packageName,'.*'
+         r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')⊣fullName
+     :EndIf
+ :EndFor
+⍝Done

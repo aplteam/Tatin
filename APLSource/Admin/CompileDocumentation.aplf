@@ -21,6 +21,6 @@
  htmlFiles←{⊃{⍺,⍵}/1↓⎕NPARTS ⍵}¨⊃F.Dir'html/*.html'
  zipFilename←targetFolder,'Tatin-Documentation-',({⍵/⍨3>+\'.'=⍵}2⊃##.Registry.Version),'.zip'
  F.DeleteFile zipFilename
- myZip←⎕NEW ##.DotNetZip(,⊂zipFilename)
+ myZip←⎕NEW ##.ZipArchive(,⊂zipFilename)
  (F.PWD,'/html')∘{⍺ myZip.Add ⍵}¨htmlFiles
 ⍝Done

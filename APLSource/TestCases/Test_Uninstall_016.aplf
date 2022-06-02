@@ -6,17 +6,17 @@
  dir←∆GetTempDir''
  dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/UnInstall3/*'
 
- (list msg)←TC.UnInstallPackage dir'davin-FilePlus-0.1.2'
+ (list msg)←TC.UnInstallPackage 'davin-FilePlus-0.1.2' dir
  Assert 0=≢msg
  →T.GoToTidyUp'davin-FilePlus-0.1.2'≢∊list
- (list msg)←TC.UnInstallPackage dir'Davin-Tester-0.1.0-test'
+ (list msg)←TC.UnInstallPackage 'Davin-Tester-0.1.0-test'dir
  Assert 0=≢msg
  →T.GoToTidyUp'Davin-Tester-0.1.0-test'≢∊list
- (list msg)←TC.UnInstallPackage dir'davin-SQLFns-0.2.0'
+ (list msg)←TC.UnInstallPackage 'davin-SQLFns-0.2.0' dir
  Assert 0=≢msg
  →T.GoToTidyUp'davin-SQLFns-0.2.0'≢∊list
 
- (list msg)←TC.UnInstallPackage dir'aplteam-DotNetZip-1.0.2'
+ (list msg)←TC.UnInstallPackage 'aplteam-DotNetZip-1.0.2' dir
  →T.GoToTidyUp'The very last principal package cannot be uninstalled'≢msg
  →T.GoToTidyUp 0≠≢list
 

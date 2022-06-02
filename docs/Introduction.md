@@ -57,8 +57,8 @@ Tatin consists of:
 
   The Tatin client can be used in two different ways:
 
-  * By executing user commands like `]TATIN.LoadPackage`  
-  * Via its API by executing a statement like `⎕SE.Tatin.LoadPackage '...'`
+  * By executing user commands like `]TATIN.LoadPackages`  
+  * Via its API by executing a statement like `⎕SE.Tatin.LoadPackages '...'`
 
 * A Tatin Server
 

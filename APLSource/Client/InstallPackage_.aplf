@@ -13,6 +13,7 @@
      :EndIf
      ('File <',zipFilename,'> does not exist')Assert F.IsFile zipFilename
  :EndIf
+ zipFilename←F.EnforceSlash zipFilename
  :If MyUserSettings.caching                                                              ⍝ If caching is generally active...
  :AndIf IsHTTP url                                                                       ⍝ ... and its coming from the web (rather than locally) ...
  :AndIf 0=GetNoCachingFlag url                                                           ⍝ ... and is not switched off for this particular registry...
@@ -29,7 +30,7 @@
      ⎕DL 0.02
      F.MkDir tempDir
      PrintToSession'  Unzipping ',zipFilename,'...'
-     zipFilename DotNetZip.UnzipTo tempDir
+     zipFilename ZipArchive.UnzipTo tempDir
  :EndIf
  tempDir Add2Config'uri'(RemoveFileProtocol url)
  :If isHTTP

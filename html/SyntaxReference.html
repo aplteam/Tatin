@@ -32,20 +32,20 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#GetUserHomeFolder">2.9. GetUserHomeFolder</a></li>
 <li><a href="#InitialisePackage">2.10. InitialisePackage</a></li>
 <li><a href="#InitPackageConfig">2.11. InitPackageConfig</a></li>
-<li><a href="#InstallPackage">2.12. InstallPackage</a></li>
+<li><a href="#InstallPackages">2.12. InstallPackages</a></li>
 <li><a href="#ListCache">2.13. ListCache</a></li>
 <li><a href="#ListPackages">2.14. ListPackages</a></li>
 <li><a href="#ListRegistries">2.15. ListRegistries</a></li>
 <li><a href="#ListTags">2.16. ListTags</a></li>
 <li><a href="#ListVersions">2.17. ListVersions</a></li>
 <li><a href="#LoadDependencies">2.18. LoadDependencies</a></li>
-<li><a href="#LoadPackage">2.19. LoadPackage</a></li>
+<li><a href="#LoadPackages">2.19. LoadPackages</a></li>
 <li><a href="#Pack">2.20. Pack</a></li>
 <li><a href="#Ping">2.21. Ping</a></li>
 <li><a href="#PublishPackage">2.22. PublishPackage</a></li>
 <li><a href="#ReInstallDependencies">2.23. ReInstallDependencies</a></li>
 <li><a href="#ReadPackageConfigFile">2.24. ReadPackageConfigFile</a></li>
-<li><a href="#UnInstallPackage">2.25. UnInstallPackage</a></li>
+<li><a href="#UnInstallPackages">2.25. UnInstallPackages</a></li>
 <li><a href="#Version">2.26. Version</a>
 </li></ul></li>
 </ul>
@@ -83,12 +83,33 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <pre><code> r←{flags} CheckForLaterVersion path</code></pre>
 <p>Checks whether there are later versions available for the principal packages installed in <code>path</code>.</p>
-<p>The optional left argument can carry flags as a single integer:</p>
-<ol start="1">
-<li>Major: should later major version be listed as well? Defaults to 0.  (1)</li>
-<li>Dependencies: should dependencies be checked as well? Defaults to 0. (2)</li>
-</ol>
-<p>You may specify both flags as true by passing a 3.</p>
+<p>The optional left argument must, if specified, be an integer that may carry flags as a single integer:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Value</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td>No flag set, same as no argument at all</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Major: should later major version be listed as well? Defaults to 0</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Dependencies: should dependencies be checked as well? Defaults to 0</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Both flags set</td>
+</tr>
+</tbody>
+</table>
 <p>By default only minor and patch are part of the check. By specifying 1 as <code>major</code> you may change this default behaviour and list any later major versions instead.</p>
 <p>Note that this function scans all known registries with a priority greater than zero.</p>
 <p>Returns a matrix with five columns:</p>
@@ -106,7 +127,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tr>
 <tr>
 <td>[;2]</td>
-<td>Lastes package ID</td>
+<td>Lastest package ID</td>
 </tr>
 <tr>
 <td>[;3]</td>
@@ -143,7 +164,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <pre><code>(statusCode errMsg)←DeletePackage uri</code></pre>
 <p>Deletes a package.</p>
-<p>Whether deleting a package from a Tatin Registry depends on the delete policy it operates, which is in turn determined by the INI setting <code>[CONFIG]DeletePackages</code>. See <a href="#GetDeletePolicy" class="bookmark_link"><code>GetDeletePolicy</code></a>.</p>
+<p>Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the INI setting <code>[CONFIG]DeletePackages</code>. See <a href="#GetDeletePolicy" class="bookmark_link"><code>GetDeletePolicy</code></a>.</p>
 <div class="h_tag">
 <a href="#GetDeletePolicy" id="GetDeletePolicy" class="autoheader_anchor">
 <h3 data-id="GetDeletePolicy">2.5. GetDeletePolicy</h3>
@@ -247,11 +268,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Returns a namespace with default values useful for the function <a href="#InitialisePackage" class="bookmark_link"><code>InitialisePackage</code></a>.</p>
 <p><code>⍵</code> might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then this namespace will be merged. Any settings in that namespace take precedence.</p>
 <div class="h_tag">
-<a href="#InstallPackage" id="InstallPackage" class="autoheader_anchor">
-<h3 data-id="InstallPackage">2.12. InstallPackage</h3>
+<a href="#InstallPackages" id="InstallPackages" class="autoheader_anchor">
+<h3 data-id="InstallPackages">2.12. InstallPackages</h3>
 </a>
 </div>
-<pre><code>r←{noBetas} InstallPackage(identifiers targetFolder)</code></pre>
+<pre><code>r←{noBetas} InstallPackages (identifiers targetFolder)</code></pre>
 <p>Installs one or more packages (<code>identifiers</code> ) in <code>targetFolder</code>.</p>
 <p><code>identifiers</code> must be a simple character vector, specifying one or more comma-separated packages (items).</p>
 <p>Items must be one of:</p>
@@ -415,12 +436,15 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>mat←{dateFlag} ListVersions uri</code></pre>
 <p><code>uri</code> is one of:</p>
 <ul>
-<li><code>[*]</code> followed by “group” and “name” of a package</li>
+<li>A package name</li>
+<li>A group name and a package name</li>
+<li>A URL pointing to a Registry together with a package name and possible also a group name</li>
+<li>An alias pointing to a Registry together with a package name and possible also a group name</li>
 <li>A path to a Registry and “group” and “name” of a package</li>
 </ul>
-<p>In the first case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.</p>
-<p>In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.</p>
-<p>You may omit the group name; that would not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.</p>
+<p>In the first and second case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.</p>
+<p>If a URL or an alias was specified the given Registry is scanned. A matrix with one column with full package IDs is returned.</p>
+<p>You may omit the group name; that does not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.</p>
 <p>The package ID must not specify a version number.</p>
 <p>By default the publishing date is not included, but you may change this by passing a 1 as <code>⍺</code>. In that case an additional column is added to the result.</p>
 <div class="h_tag">
@@ -432,18 +456,18 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Requires two arguments:</p>
 <ul>
 <li>A folder with a build list (mandatory)</li>
-<li>An installation folder (mandatory)</li>
+<li>A target namespace</li>
 </ul>
 <p>You may specify an optional third argument: the <code>overwriteFlag</code> flag which defaults to 0.</p>
 <p>Use <code>overwriteFlag</code> in case all packages should be loaded even if they already exist in <code>(#|⎕SE)._tatin</code></p>
 <p>Loads all packages and injects required references into <code>targetSpace</code>.</p>
 <p>Returns a vector with references to the loaded packages (no dependencies, principal packages only).</p>
 <div class="h_tag">
-<a href="#LoadPackage" id="LoadPackage" class="autoheader_anchor">
-<h3 data-id="LoadPackage">2.19. LoadPackage</h3>
+<a href="#LoadPackages" id="LoadPackages" class="autoheader_anchor">
+<h3 data-id="LoadPackages">2.19. LoadPackages</h3>
 </a>
 </div>
-<pre><code>r←{noBetas} LoadPackage(identifiers targetSpace)</code></pre>
+<pre><code>r←{noBetas} LoadPackages (identifiers targetSpace)</code></pre>
 <p>Loads packages dynamically into the workspace.</p>
 <p><code>identifiers</code> must be a simple character vector specifying one or more comma-separated packages (items).</p>
 <p>Every single item must be one of:</p>
@@ -522,9 +546,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>{refs}←{parms} ReInstallDependencies (dependencies installFolder [Registry])</code></pre>
 <p>Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.</p>
 <p>The file apl-buildlist.json as well as all directories in that folder will be deleted. Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.</p>
-<p>Note that packages with different major version numbers are considered different.</p>
+<p>Note that packages with different major version numbers are considered to be different packages.</p>
 <p>By default all known Registries with a priority greater than 0 are scanned, but you may specify a particular Registry as a third (optional) argument.</p>
-<p>The left argument is optional and, if specified, typically created by calling <a href="#CreateReInstallParms" class="bookmark_link"><code>CreateReInstallParms</code></a>.</p>
+<p>The left argument is optional and is, if specified, typically created by calling <a href="#CreateReInstallParms" class="bookmark_link"><code>CreateReInstallParms</code></a>.</p>
 <p>It may carry three parameters:</p>
 <ul>
 <li><code>noBetas</code>
@@ -544,13 +568,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Takes a path to a package and returns the config file for that package as a namespace populated with variables.</p>
 <p><code>path</code> may or may not carry the filename.</p>
 <div class="h_tag">
-<a href="#UnInstallPackage" id="UnInstallPackage" class="autoheader_anchor">
-<h3 data-id="UnInstallPackage">2.25. UnInstallPackage</h3>
+<a href="#UnInstallPackages" id="UnInstallPackages" class="autoheader_anchor">
+<h3 data-id="UnInstallPackages">2.25. UnInstallPackages</h3>
 </a>
 </div>
-<pre><code>(list msg)←UnInstallPackage (folder packageID)</code></pre>
-<p>If <code>folder</code> carries a dependency file then this function attempts to un-install the package <code>packageID</code> and all its dependencies, but those only in case they are neither principal packages nor required by other packages.</p>
+<pre><code>(list msg)←UnInstallPackage (packageID folder)</code></pre>
+<p><code>folder</code> must carry a Tatin dependency file.</p>
+<p><code>UnInstallPackage</code> attempts to un-install the package <code>packageID</code> and all its dependencies, but he latter only in case they are neither principal packages nor required by other packages.</p>
+<p><code>packageID</code> might be a full package ID but also &lt;group&gt;-&lt;name&gt; or just &lt;name&gt;. However, in case. In case more than one package qualify an error is thrown.</p>
 <p>Note that if <code>packageID</code> is empty a clean-up attempt is made.</p>
+<p><code>folder</code> may be a sub folder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.</p>
+<p><code>packageID</code> must be fully qualified: group + name + version.</p>
 <p>If a package was installed with an alias you must un-install it by specifying the alias.</p>
 <p>If a package is installed twice, once with an alias and once without, running <code>]UnInstallPackage</code> on either of them does not really un-install the package but removes just the reference to it. Only when the other one is un-installed as well is the package actually removed.</p>
 <p>To keep things simple Tatin performs the following steps:</p>

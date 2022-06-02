@@ -1,4 +1,5 @@
- refs←{dry}ReInstallDependencies_(deps installFolder registry noBetas update);i;pkg;ref;msg;alias;identifier;tempDir
+ refs←{dry}ReInstallDependencies_ y;i;pkg;ref;msg;alias;identifier;tempDir;qdmx;p
+ ;deps;installFolder;registry;noBetas;update;quiet
 ⍝ Re-installs all packages listd by `deps`, including any dependencies.\\
 ⍝ In case `dry` is 1 it reports to the session what it _would_ do.\\
 ⍝ All work is done in a temp folder. Without -dry that temp folder will eventually replace the install folder.
@@ -8,25 +9,39 @@
 ⍝ Note that this has a side effect: the same principal packages but with different version numbers (not major)
 ⍝ will all be replaced by the latest version except those that have an alias assigned.
  dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
+ 'You must specify at least 5 parameters'Assert 5≤≢y
+ (deps installFolder registry noBetas update quiet)←y,(≢y)↓⍬ ⍬ ⍬ ⍬ ⍬ 0  ⍝ Default for "quiet" is 0
  refs←⍬
  tempDir←F.GetTempSubDir''
  tempDir ⎕NCOPY installFolder,'/',Reg.DependenciesFilename                  ⍝ Copy the dependency file
  tempDir{0=≢⍵:shy←⍬ ⋄ ⍺∘{⍺ ⎕NCOPY ⍵}¨⍵}F.ListFiles installFolder,'/*.zip'   ⍝ Copy any ZIP files (packages)
+ 1 EstablishRumbaClients ⍬
+ p←(~quiet)∘PrintToSession
  :For i :In ⍳≢deps
      pkg←i⊃deps
      :If update
          pkg←Reg.RemoveMinorAndPatch pkg
      :EndIf
      msg←'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),' ',(dry/'(dry)'),'...'
-     PrintToSession msg
-     ref←noBetas InstallPackage(registry,pkg)tempDir
-     PrintToSession'  Installed',(dry/' (dry)'),': ',ref,⎕UCS 13
+     p msg
+     :Trap 998
+         ref←noBetas InstallPackages(registry,pkg)tempDir
+     :Else
+         qdmx←⎕DMX
+         :If 1=≢'Package <[^>].*> not found in any of these Registries:'⎕S 0⊣qdmx.EM
+             :Continue
+         :Else
+             ∘∘∘ ⍝ Check!
+         :EndIf
+     :EndTrap
+     p'  Installed',(dry/' (dry)'),': ',ref,⎕UCS 13
      refs,←⊆ref
  :EndFor
  :If dry
      ⎕DL 0.02
      F.RmDir tempDir
-     PrintToSession'Dry run, no packages got installed'
+     1 PrintToSession'Dry run, no packages got installed'  ⍝ Ignore "quiet" here because otherwise "dry" makes no sense
  :Else
      'Establishing re-installed packages failed, therefore nothing was changed'Assert installFolder ReplaceFolderBy tempDir
  :EndIf
+ CloseConnections 1

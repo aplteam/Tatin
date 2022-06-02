@@ -30,10 +30,12 @@
          :EndIf
      :EndIf
  :Else
-     packages←F.ListDirs path,'/',url
-     domains_←path{⍺,'/',⍵}⍣fullPath⊣url
-     :If 0<≢packages
-         r←,⊂(domains_)({{⊃,/1↓⎕NPARTS ⍵}⍣(~fullPath)⊣⍵}¨packages)
+     :If F.IsDir path,'/',url
+         packages←F.ListDirs path,'/',url
+         domains_←path{⍺,'/',⍵}⍣fullPath⊣url
+         :If 0<≢packages
+             r←,⊂(domains_)({{⊃,/1↓⎕NPARTS ⍵}⍣(~fullPath)⊣⍵}¨packages)
+         :EndIf
      :EndIf
  :EndIf
  ⍝Done

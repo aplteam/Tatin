@@ -19,11 +19,11 @@
 ∆Go: ⍝ Also jumped to in case the server closed the connection.
      ⍝ Yes, this DOES happen for no apparent reason every now and then.
 
-     ⎕EX'∆PermanentConnections'   ⍝ Paranoia
      :If errorCounter>5
          'No connection'⎕SIGNAL 347
      :Else
-         ⎕DL 0.5×errorCounter>0
+         ⍝⎕←'Trying again for the ',(⍕errorCounter),' time...'
+         ⎕DL 0.1×errorCounter
          client←NewClient uri
          r←client R.SendAndReceive request
      :EndIf

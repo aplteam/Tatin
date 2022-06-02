@@ -1,20 +1,20 @@
  r←Test_Load_004(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx
-⍝ Exercise ⎕SE.Tatin.LoadPackage on two different packages both with the same alias (must throw an error)
+⍝ Exercise ⎕SE.Tatin.LoadPackages on two different packages both with the same alias (must throw an error)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP'
 
- res←1 TC.LoadPackage'A@[localhost]APLTreeUtils' '#.TEMP'
+ res←1 TC.LoadPackages'A@[localhost]APLTreeUtils' '#.TEMP'
  →T.GoToTidyUp 0=res
  →T.GoToTidyUp~∨/'.aplteam_APLTreeUtils_7_'⍷⍕#.TEMP.A
 
- res←1 TC.LoadPackage'ZOO@[localhost]Zoo' '#.TEMP'
+ res←1 TC.LoadPackages'ZOO@[localhost]Zoo' '#.TEMP'
  →T.GoToTidyUp~∨/'.example_Zoo_3_'⍷⍕#.TEMP.ZOO
 
  :Trap 998
-     res←1 TC.LoadPackage'A@[localhost]OS' '#.TEMP'
+     res←1 TC.LoadPackages'A@[localhost]OS' '#.TEMP'
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
@@ -24,6 +24,6 @@
  r←T._OK
 
 ∆TidyUp:
-∆RemoveTempFolders
+ ∆RemoveTempFolders
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

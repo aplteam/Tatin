@@ -132,7 +132,7 @@ Imagine you want to use the MarkAPL package in an application you are currently 
 The first step is to install the package as part of the project "Foo":
 
 ```
-      ]tatin.InstallPackage [tatin]MarkAPL /Foo/packages
+      ]tatin.InstallPackages [tatin]MarkAPL /Foo/packages
 ```
 
 Notes:
@@ -328,19 +328,19 @@ Note that by naming convention packages are always loaded into either `#._tatin`
 
 ### Installing several packages at once
 
-Note that `InstallPackage` accepts several package IDs, separated by commas:
+Note that `InstallPackages` accepts several package IDs, separated by commas:
 
 ```
-      ]tatin.InstallPackage Tester2,MarkAPL,Laguntza /Foo/packages
+      ]tatin.InstallPackages Tester2,MarkAPL,Laguntza /Foo/packages
 ```
 
 This will load three packages and all their dependencies at once. You might find this significantly faster than installing them one-by-one.
 
-### Checking out a package: `LoadPackage`
+### Checking out a package: `LoadPackages`
 
 Let's assume that before actually installing it you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace. 
 
-That can be achieved with the `LoadPackage` user command. It loads the package into the workspace.
+That can be achieved with the `LoadPackages` user command. It loads the package into the workspace.
 
 
 Notes:
@@ -355,7 +355,7 @@ Notes:
 Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and optionally a target namespace:
 
 ```
-      ]tatin.LoadPackage [tatin]MarkAPL
+      ]tatin.LoadPackages [tatin]MarkAPL
   Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
   Establish dependencies...
   4 dependencies identified
@@ -410,7 +410,7 @@ MarkAPL
 
 `MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For those references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
 
-Note that like `InstallPackage` you may specify more than just one package. If you do then separate them with commas.
+Note that like `InstallPackages` you may specify more than just one package. If you do then separate them with commas.
 
 ### Misc
 
@@ -480,9 +480,9 @@ Is a character vector holding the path of a folder that hosts the package.
 
 There are exceptions: 
 
-* When the package was brought into the workspace with `LoadPackage` rather than `LoadDependencies`.
+* When the package was brought into the workspace with `LoadPackages` rather than `LoadDependencies`.
 
-  This is because without assets `LoadPackage` loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.
+  This is because without assets `LoadPackages` loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.
 
 * When the folder the package was loaded from does not exist for other reasons, for example because the package was loaded into the WS which then was saved and moved elsewhere, together with the `ASSETS` folder relative to the WS.
 

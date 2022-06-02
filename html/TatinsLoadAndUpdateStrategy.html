@@ -86,9 +86,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>For simplicity we will assume that the packages are all hosted by a Tatin server known under the alias name <code>MyTatin</code></p>
 <p>While <code>Foo</code> relies on <code>Zoo</code> 1.1.1, <code>Goo</code> needs <code>Zoo</code> 1.2.0 — what is Tatin doing about this?</p>
 <p>It depends on what you are doing. Let's first load <code>Zoo</code> and <code>Goo</code> into the workspace, the usual approach to inspect a package:</p>
-<pre><code>      ]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
+<pre><code>      ]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
 #.MyPkgs.Foo
-      ]TATIN.LoadPackage [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
+      ]TATIN.LoadPackages [MyTatin]/mygroup-Goo-2.1.0 #.MyPkgs
 #.MyPkgs.Goo
       #.MyPkgs.⎕nl ⍳16
 Foo
@@ -96,10 +96,10 @@ Goo</code></pre>
 <div class="leanpub_A">
 <h3>Getting the latest version</h3>
 <p>Assuming that version 1.3.0 of <code>Foo</code> is the latest version available with the major number 1, then this would have been sufficient:</p>
-<pre><code>]TATIN.LoadPackage [MyTatin]/mygroup-Foo-1 #.MyPkgs</code></pre>
+<pre><code>]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1 #.MyPkgs</code></pre>
 <p>Note that neither the minor nor the patch number have been specified.</p>
 <p>Assuming that version 2.1.0 of <code>Goo</code> is the very latest version available at all, and that's the version you want to use, then this would have been sufficient:</p>
-<pre><code>]TATIN.LoadPackage [MyTatin]/mygroup-Goo #.MyPkgs</code></pre>
+<pre><code>]TATIN.LoadPackages [MyTatin]/mygroup-Goo #.MyPkgs</code></pre>
 <p>Note that in this case not even the major number has been specified.</p>
 </div>
 
@@ -119,9 +119,9 @@ mygroup_Zoo_1_2_0</code></pre>
 <p>To make packages a part of an application (say), they first need to be installed. In the following examples we will install two packages, <code>Foo</code> and <code>Goo</code>. Both require <code>Zoo</code>, so <code>Zoo</code> will be installed as a side effect.</p>
 <pre><code>      ⎕NEXISTS /myPkgs
 0
-      ]TATIN.InstallPackage [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
+      ]TATIN.InstallPackages [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
 /myPkgs/mygroup-Foo-1.0.0
-      ]TATIN.InstallPackage [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
+      ]TATIN.InstallPackages [MyTatin]/mygroup-Goo-2.1.0 /myPkgs/
 /myPkgs/mygroup-Goo-2.1.0
       ⍪⊃⎕NINFO ⍠ 1⊢'/myPkgs/*'
 /myPkgs/apl-buildlist.json

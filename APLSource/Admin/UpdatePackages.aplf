@@ -1,6 +1,6 @@
- {r}←{force}UpdatePackages dummy;path2Packages;packages;i;targetFolder;package;list;packageID;F;parms;TC;packageName;fullName
+ {r}←{force}UpdatePackages dummy;path2Packages;targetFolder;list;F;parms;TC;res
 ⍝ 1. Re-installs all packages in the ./packages folder
-⍝ 2. Copies the required scripts from the folder packages/ to APLSource/
+⍝ 2. Copies the required scripts from the folder packages/ to APLSource/ by calling CopyScriptsFromPackagesIn
 ⍝ 3. The assets required by MarkAPL are copied into ./Assets/MarkAPL\\
 ⍝ Returns a 1 if any of the scripts was actually updated, and 0 otherwise.
  r←0
@@ -16,23 +16,11 @@
      parms←TC.CreateReInstallParms
      parms.update←1
      ⎕←'Now updating packages in ',path2Packages,'/ ...'
-     ⎕←{0=≢⍵:'No packages updates' ⋄ ⍪(⊂'*** Packages updated:'),⍵}parms TC.ReInstallDependencies path2Packages
-     packages←{⍵.packageID}##.Registry.APLfromJSON⊃⎕NGET path2Packages,'/apl-buildlist.json'
-     :For i package :InEach (⍳≢packages)packages
-         packageID←⊃,/1↓⎕NPARTS package
-         packageName←{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}packageID
-         fullName←⊃F.Dir targetFolder,'/',packageName,'.*'
-         :If 0=≢fullName
-             '???'Assert F.IsDir targetFolder,'/',packageName
-             F.RmDir targetFolder,'/',packageName
-             r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')⊣path2Packages,'/',packageID,'/APLSource/',packageName
-         :Else ⍝ Simple files
-             fullName←⊃F.Dir path2Packages,'/',package,'/',packageName,'.*'
-             r∨←(targetFolder,'/')⎕NCOPY⍠('IfExists' 'ReplaceIfNewer')⊣fullName
-         :EndIf
-     :EndFor
-     :If ~force
-         ⎕←'*** Done'
-     :EndIf
+
+     res←parms TC.ReInstallDependencies path2Packages               ⍝ <==
+
+     ⎕←{0=≢⍵:'No packages updated' ⋄ ⍪(⊂'*** Packages updated:'),⍵}res
+     r←targetFolder CopyScriptsFromPackagesIn path2Packages
+     {}{⎕←'*** Done'}⍣(~force)⊣⍬
  :EndIf
 ⍝Done

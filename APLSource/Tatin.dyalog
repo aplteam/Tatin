@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.37.5 - 2022-05-13
+⍝ * 0.38.0+2 - 2022-05-29
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -8,6 +8,8 @@
     RS←'#._tatin' ⍝ target Root Space for packages
     SupportedExtensions←'.aplc' '.apln' '.apli' '.aplf' '.aplo' '.apla' '.charlist' '.charmat' '.charstring' '.dyalog'
     RegKey←'HKCU\Software\Tatin\ConfigPath'
+
+    ErrNo←998
 
     ∇ r←List;c
       r←⍬
@@ -33,8 +35,8 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'LoadPackage'
-          c.Desc←'Load the package specified in the argument and all dependencies into the WS or ⎕SE'
+          c.Name←'LoadPackages'
+          c.Desc←'Load the package(s) specified in the argument and all dependencies into the WS or ⎕SE'
           c.Parse←'1-2 -nobetas'
           r,←c
      
@@ -45,8 +47,8 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'InstallPackage'
-          c.Desc←'Install a package and all its dependencies into a given folder'
+          c.Name←'InstallPackages'
+          c.Desc←'Install one or more packages and all its dependencies into a given folder'
           c.Parse←'1-2 -nobetas -quiet'
           r,←c
      
@@ -129,13 +131,13 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'UninstallPackage'
-          c.Desc←'Uninstalls a package and its dependencies'
-          c.Parse←'2s'
+          c.Name←'UnInstallPackage'
+          c.Desc←'Un-installs a package, and implicitly its dependencies'
+          c.Parse←'2s -cleanup -quiet'
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'ReinstallDependencies'
+          c.Name←'ReInstallDependencies'
           c.Desc←'Install all packages again according to the dependency file'
           c.Parse←'2s -nobetas -dry -force -update'
           r,←c
@@ -161,7 +163,7 @@
     ∇ {r}←Run(Cmd Input);ns;flag
       :If 0=⎕SE.⎕NC'Link.Version'
       :OrIf 3>⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
-          'Tatin requires at least Link 3.0'⎕SIGNAL 998
+          'Tatin requires at least Link 3.0'⎕SIGNAL ErrNo
       :EndIf
       :If 0=⎕SE.⎕NC'Tatin'
       :AndIf ≢/⎕C¨'LoadTatin'Cmd
@@ -229,11 +231,10 @@
       filename←(1⊃⎕NPARTS ##.SourceFile),'/Client.dws'
       :If 0∊⊃∘⎕SE.⎕NC¨'Tatin' '_Tatin'
       :OrIf forceLoad
-          ('Workspace not found: ',filename)⎕SIGNAL 998/⍨0=⎕NEXISTS filename
+          ('Workspace not found: ',filename)⎕SIGNAL ErrNo/⍨0=⎕NEXISTS filename
           ⎕SE.⎕EX¨'_Tatin' 'Tatin'
           '_Tatin'⎕SE.⎕CY filename
       :EndIf
-      'Tatin requires .NET to be available'⎕SE._Tatin.Registry.Assert ⎕SE._Tatin.Registry.HasDOT_NET
       TC←⎕SE._Tatin.Client
     ∇
 
@@ -323,7 +324,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReinstallDependencies Args;installFolder;registry;refs;deps;msg;parms
+    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -337,7 +338,15 @@
       parms.noBetas←0 Args.Switch'nobetas'
       parms.update←1 Args.Switch'update'
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
-      'Not a directory'Assert TC.F.IsDir installFolder
+      :If 0=≢installFolder←EstablishPackageFolder installFolder
+          :Return
+      :EndIf
+      ('Is not a directory: ',installFolder)Assert TC.F.IsDir installFolder
+      :If ~Args.force
+          :If 0=∆YesOrNo'Sure you want act on <',installFolder,'> ?'
+              :Return
+          :EndIf
+      :EndIf
       'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'
       deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
       'Dependency file is empty'Assert 0<≢deps
@@ -450,7 +459,7 @@
           :EndIf
       :EndIf
      ∆Again:
-      :Trap 998
+      :Trap ErrNo
           (rc msg zipFilename)←TC.PublishPackage source url
           :If 200≡rc
               r←'Package published on ',url_
@@ -469,7 +478,7 @@
               :Case 500
                   r←'The server ',url_,' reported an internal error'
               :Else
-                  qdmx.EM ⎕SIGNAL 998
+                  qdmx.EM ⎕SIGNAL ErrNo
               :EndSelect
           :Else
               :If firstFlag
@@ -495,14 +504,35 @@
       :EndTrap
     ∇
 
-    ∇ r←UninstallPackage Arg;path;packageID;msg
+    ∇ r←UnInstallPackage Arg;path;packageID;msg;list;ind
     ⍝ Attempt to un-install the top-level package `packageID` from the folder `path`
-      (path packageID)←Arg.(_1 _2)
-      'No path specified'Assert 0≢path
-      :If 0≡packageID
+      r←''
+      :If Arg.cleanup
+          'You must not specify more than one argument together with the -cleanup flag'Assert 0≡Arg._2
           packageID←''
+          path←Arg._1
+      :Else
+          (packageID path)←Arg.(_1 _2)
+          'You mast specify <packageID> and <installFolder>'Assert∧/0≢¨packageID path
+          'No package specified'Assert 0≢packageID
       :EndIf
-      (r msg)←TC.UnInstallPackage path packageID
+      :If './'≢2⍴path
+      :AndIf '/'≠1⍴path
+      :AndIf ~':'∊path
+          :If '['=1⍴path
+          :AndIf ']'∊path
+              path←TranslateCiderAlias path
+          :Else
+              :If 0=≢path←Arg.quiet EstablishPackageFolder path
+                  :Return
+              :EndIf
+              ('Does not exist: ',path)Assert TC.F.IsDir path
+              :If 0=∆YesOrNo'Sure that you want act on: ',path,' ?'
+                  :Return
+              :EndIf
+          :EndIf
+      :EndIf
+      (r msg)←TC.UnInstallPackage packageID path
       msg Assert 0=≢msg
     ∇
 
@@ -542,7 +572,7 @@
 
     ∇ r←ListVersions Arg;qdmx;dateFlag
       dateFlag←Arg.Switch'date'
-      :Trap 998
+      :Trap ErrNo
           :If dateFlag
               r←dateFlag TC.ListVersions Arg._1
               r[;2]←TC.Reg.FormatFloatDate¨r[;2]
@@ -552,9 +582,9 @@
       :Else
           qdmx←⎕DMX
           :If 0=≢qdmx.EM
-              ('Not found: ',Arg._1)⎕SIGNAL 998
+              ('Not found: ',Arg._1)⎕SIGNAL ErrNo
           :Else
-              qdmx.EM ⎕SIGNAL 998
+              qdmx.EM ⎕SIGNAL ErrNo
           :EndIf
       :EndTrap
     ∇
@@ -564,7 +594,7 @@
       {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage'https://tatin.dev/v1/documentation'
     ∇
 
-    ∇ r←LoadPackage Arg;targetSpace;identifier;saveIn;noOf;qdmx
+    ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx
       (identifier targetSpace)←Arg.(_1 _2)
       :If 0≡targetSpace
           targetSpace←,'#'
@@ -579,7 +609,7 @@
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       :Trap 0
-          noOf←Arg.nobetas TC.LoadPackage identifier targetSpace
+          noOf←Arg.nobetas TC.LoadPackages identifier targetSpace
           r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded'
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
@@ -640,7 +670,7 @@
                           :If 0<≢∊newData
                           :AndIf newFlag∨newData≢origData
                               ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
-                              :Trap 998
+                              :Trap ErrNo
                                   1 TC.WritePackageConfigFile path ns
                               :Else
                                   qdmx←⎕DMX
@@ -696,7 +726,7 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackage Arg;identifier;installFolder;qdmx
+    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
@@ -715,7 +745,12 @@
           :AndIf ']'∊installFolder
               installFolder←TranslateCiderAlias installFolder
           :Else
-              installFolder←TC.F.PWD,'/',installFolder
+              :If 0=≢installFolder←EstablishPackageFolder installFolder
+                  :Return
+              :EndIf
+              :If 0=∆YesOrNo'Sure that you want act on: ',installFolder,' ?'
+                  :Return
+              :EndIf
           :EndIf
       :EndIf
       :If ~TC.F.IsDir installFolder
@@ -726,7 +761,7 @@
       :EndIf
       ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
       :Trap 0
-          r←TC.InstallPackage identifier installFolder
+          r←TC.InstallPackages identifier installFolder
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
@@ -736,6 +771,7 @@
     ∇
 
     ∇ installFolder←TranslateCiderAlias installFolder;ind;alias;list
+      'Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
       ind←installFolder⍳']'
       alias←(ind↑installFolder)~'[]'
       installFolder←ind↓installFolder
@@ -920,12 +956,12 @@
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder passed as argument'
               r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-date] [-info_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
-          :Case ⎕C'LoadPackage'
-              r,←⊂'Load the specified package and all its dependencies into the workspace.'
-              r,←'' '  ]Tatin.LoadPackage <packageID|package-URL|Zip-file> [<target namespace>]'
-          :Case ⎕C'InstallPackage'
-              r,←⊂'Install the given package and all its dependencies into the given folder.'
-              r,←'' '  ]Tatin.InstallPackage <packageID|package-URL|Zip-file> <install-path> [-quiet]'
+          :Case ⎕C'LoadPackages'
+              r,←⊂'Load the specified package(s) and all dependencies into the workspace.'
+              r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>]'
+          :Case ⎕C'InstallPackages'
+              r,←⊂'Install the given package(s) and all dependencies into the given folder.'
+              r,←'' '  ]Tatin.InstallPackages <packageIDs|package-URLs|Zip-file> <install-path> [-quiet]'
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←'' '  ]Tatin.LoadDependencies <package-folder> [<parent-namespace>] [-overwrite]'
@@ -935,9 +971,9 @@
           :Case ⎕C'PackageConfig'
               r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
               r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> [-edit] [-delete]'
-          :Case ⎕C'UninstallPackage'
+          :Case ⎕C'UnInstallPackage'
               r,←⊂'Uninstalls a given package and possibly all its dependencies.'
-              r,←'' '  ]Tatin.UninstallPackage <package-folder> [<package-ID|package-alias>]'
+              r,←'' '  ]Tatin.UnInstallPackage [<package-ID|package-alias>] <package-folder> -cleanup -quiet'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←'' '  ]Tatin.PackageDependencies <package-path> [-edit] [-delete] [-quiet]'
@@ -949,7 +985,7 @@
               r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> <Registry-URL|[Registry-Alias]> [-quiet]'
           :Case ⎕C'ListVersions'
               r,←⊂'List all versions of the given package.'
-              r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias|*][<group>]-<name>> [-date]'
+              r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name> [-date]'
           :Case ⎕C'Version'
               r,←⊂'Prints name, version number and version date of Tatin to the session.'
               r,←'' '  ]Tatin.Version'
@@ -963,7 +999,7 @@
               r,←⊂'Check whether for the installed packages a later versions are available.'
               r,←'' '  ]Tatin.CheckForLaterVersion <install-folder> [-major] [-dependencies]'
           :Case ⎕C'DeletePackage'
-              r,←⊂'Delete a given package.'
+              r,←⊂'Delete a given package from a Tatin Registry.'
               r,←'' '  ]Tatin.DeletePackage <([Registry-alias|Registry-URL|file://package-folder)package-ID)>'
           :Case ⎕C'GetDeletePolicy'
               r,←⊂'Request which "Delete" policy is operated by a server.'
@@ -971,9 +1007,9 @@
           :Case ⎕C'Documentation'
               r,←⊂'Put https://tatin.dev/v1/documentation into the default browser'
               r,←'' '  ]Tatin.Documentation'
-          :Case ⎕C'ReinstallDependencies'
-              r,←⊂'Reinstall all packages defined in a folder from scratch.'
-              r,←'' '  ]Tatin.ReinstallDependencies <install-folder> [Registry-URL|Registry-alias] [-force] [-dry] [-nobeta] [-update]'
+          :Case ⎕C'ReInstallDependencies'
+              r,←⊂'ReInstall all packages installed in a folder from scratch.'
+              r,←'' '  ]Tatin.ReInstallDependencies <install-folder> [Registry-URL|Registry-alias] [-force] [-dry] [-nobeta] [-update]'
           :Case ⎕C'Ping'
               r,←⊂'Try to contact the specified or all known Tatin servers'
               r,←'' '  ]Tatin.Ping [server-url]'
@@ -1024,7 +1060,7 @@
               r,←⊂'              Only packages published on that date or after are listed then.'
               r,←⊂'              Implies -date and ignores -noaggr.'
               r,←⊂'-noaggr       By default the output is aggregated. -noaggr prevents that.'
-          :Case ⎕C'LoadPackage'
+          :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all its dependencies into the workspace.'
               r,←⊂''
               r,←⊂'A) First argument:'
@@ -1033,13 +1069,12 @@
               r,←⊂''
               r,←⊂'B) Second (optional) argument: target namespace (defaults to #)'
               r,←⊂'Must be the fully qualified name of a namespace the package will be loaded into.'
-              r,←⊂'May be # or ⎕SE or a sub-namespace of any level'
+              r,←⊂'May be # or ⎕SE or a sub-namespace of any level.'
               r,←⊂''
               r,←⊂'Returns the number of packages loaded into the workspace, including dependencies.'
-          :Case ⎕C'InstallPackage'
-              r,←⊂'Install the given package and all its dependencies into the given folder.'
-              r,←⊂'If the package is already installed, it (as well as any dependencies) will be'
-              r,←⊂'installed again from scratch.'
+          :Case ⎕C'InstallPackages'
+              r,←⊂'Install the given package(s) and all its dependencies into a given folder.'
+              r,←⊂'If the packages are already installed, they will be installed again from scratch.'
               r,←⊂'Requires two arguments:'
               r,←⊂''
               r,←⊂'A) First argument:'
@@ -1048,6 +1083,12 @@
               r,←⊂'B) Second argument'
               r,←⊂'The second argument must be the path to a folder into which the packages are'
               r,←⊂'going to be installed.'
+              r,←⊂''
+              r,←⊂'In case the second argument is relative Tatin checks whether there are open Cider projects.'
+              r,←⊂'If there is just one, it is assumed that the installation should take place there.'
+              r,←⊂'If there are multiple Cider projects open the user is questioned.'
+              r,←⊂'If Cider is not available or no projects are opened then the current directory is checked.'
+              r,←⊂'For a relative path the user is always asked for confirmation.'
               r,←⊂''
               r,←⊂'-quiet: Useful for test cases: it prevents Tatin from interrogating the user'
           :Case ⎕C'LoadDependencies'
@@ -1089,18 +1130,31 @@
               r,←⊂'-delete In case you want to delete the file specify the -delete flag.'
               r,←⊂''
               r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
-          :Case ⎕C'UninstallPackage'
-              r,←⊂'Uninstall a given package and all its dependencies, but only if those'
-              r,←⊂'are neither top-level packages nor required by other packages.'
-              r,←⊂'In addition any superfluous packages like outdated versions) are removed, too.'
-              r,←⊂'If no package is specified only superfluous packages, if any, will be uninstalled.'
+          :Case ⎕C'UnInstallPackage'
+              r,←⊂'UnInstall a given package and implicitly all its dependencies, but only if those are'
+              r,←⊂'neither top-level packages in their own rights nor required by other packages.'
+              r,←⊂'In addition any superfluous packages (like outdated versions) are removed, too.'
               r,←⊂''
-              r,←⊂'Requires at least one argument:'
-              r,←⊂' * Path to a folder with installed packages'
-              r,←⊂' * Optionally a package identifier;  this can be one of:'
-              r,←⊂'   * Name of the package'
-              r,←⊂'   * Alias and name of the package'
-              r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as such'
+              r,←⊂'If you don''t want to delete a specific package but get rid of all superfluous packages'
+              r,←⊂'then specify the -cleanup option. Note that you *must* not specify a package then.'
+              r,←⊂''
+              r,←⊂'Requires one argument in conjunction with the -cleanup option and two arguments otherwise:'
+              r,←⊂'A single argument must be a folder. Two arguments must be a package-ID and a folder.'
+              r,←⊂''
+              r,←⊂' * First argument: a package identifier;  this can be one of:'
+              r,←⊂'   * Fully qualified name of a package'
+              r,←⊂'   * Alias and fully qualified name of a package'
+              r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as alias'
+              r,←⊂'   Might be a fully qualified packageID or <group>-<name> or even just <name>.'
+              r,←⊂'   However, if more than just one package qualify an error is thrown.'
+              r,←⊂''
+              r,←⊂' * Second argument: path to a folder with installed packages'
+              r,←⊂'   If this is not an absolute path then it might be a sub folder of an open Cider project.'
+              r,←⊂'   Then Tatin works out the correct one:'
+              r,←⊂'   * If there is just one poject open it is taken'
+              r,←⊂'   * If there are multiple Cider projects open the user is questioned'
+              r,←⊂'   * If Cider is not available or no projects are open the current directory is checked'
+              r,←⊂'   For a relative path the user is always asked for confirmation.'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←⊂'Takes a path hosting such a file as an argument.'
@@ -1139,17 +1193,20 @@
               r,←⊂''
               r,←⊂'-quiet: useful for test cases; it prevents Tatin from interrogating the user'
           :Case ⎕C'ListVersions'
-              r,←⊂'List all versions of the given package. You may specify the package in two different ways:'
+              r,←⊂'List all versions of the given package. You may specify the package in several ways:'
               r,←⊂' * [registry]{group}-{package}'
               r,←⊂' * [registry]{package}'
+              r,←⊂' * {package}'
               r,←⊂''
               r,←⊂'Lacking a group does not make a difference if the given package exists only in one group anyway.'
               r,←⊂'If it exists in more than one group then all of them are listed.'
               r,←⊂''
-              r,←⊂'The special syntax [*] will return a list of all versions of a package from all Registries:'
-              r,←⊂']Tatin.ListVersions [*]{group}-{name}'
+              r,←⊂'Ommitting the registry altogether will work as well:'
+              r,←⊂']Tatin.ListVersions {name}'
               r,←⊂'or'
-              r,←⊂']Tatin.ListVersions [*]{name}'
+              r,←⊂']Tatin.ListVersions {group}-{name}'
+              r,←⊂'Naturally this comes potentially with a minor performance penalty since all registries with a'
+              r,←⊂'priority greater than zero will be questioned.'
               r,←⊂''
               r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem with'
               r,←⊂'beta versions) then the publishing date is taken into account.'
@@ -1215,9 +1272,16 @@
               r,←⊂'If no server is specified the user will be prompted, unless there is just one server anyway.'
           :Case ⎕C'Documentation'
               r,←⊂'Put https://tatin.dev/v1/documentation into the default browser'
-          :Case ⎕C'ReinstallDependencies'
-              r,←⊂'Reinstall all packages (principals as well as dependencies) from scratch.'
+          :Case ⎕C'ReInstallDependencies'
+              r,←⊂'ReInstall all packages (principals as well as dependencies) from scratch.'
               r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
+              r,←⊂'If this is not an absolute path then it might be a sub folder of an open Cider project.'
+              r,←⊂'Then Tatin works out the correct one:'
+              r,←⊂' * If there is just one poject open it is taken'
+              r,←⊂' * If there are multiple Cider projects open the user is questioned'
+              r,←⊂' * If Cider is not available or no projects are open the current directory is checked'
+              r,←⊂'For a relative path the user is always asked for confirmation.'
+              r,←⊂''
               r,←⊂'All installed packages are removed (except ZIP files) from the folder before a new build'
               r,←⊂'list is compiled and used to install all packages from scratch.'
               r,←⊂''
@@ -1230,12 +1294,13 @@
               r,←⊂''
               r,←⊂'All defined Registries with a priority greater than 0 are scanned for principal packages'
               r,←⊂'but one can specify a particular Registry as second (optional) argument.'
-              r,←⊂'For dependencies, all registries with a priority greater than 0 are scanned in aby case.'
+              r,←⊂'For dependencies, all registries with a priority greater than 0 are scanned in any case.'
               r,←⊂''
-              r,←⊂'-force   Prevents user confirmation and reporting to the session.'
+              r,←⊂'-force   Prevents user confirmation and reporting to the session, including establishing'
+              r,←⊂'         a project in case no folder was specified.'
               r,←⊂'-dry     Report what would be done without actually doing it.'
               r,←⊂'-nobetas By default betas are included; suppress with -nobetas.'
-              r,←⊂'-update  By default ReinstallDependencies does not install later versions.'
+              r,←⊂'-update  By default ReInstallDependencies does not install later versions.'
               r,←⊂'         You may change this by specifying this flag.'
           :Case ⎕C'Ping'
               r,←⊂'Try to contact one or more Tatin servers.'
@@ -1264,7 +1329,7 @@
           :Else
               r←'Unknown command: ',Cmd
           :EndSelect
-          :If (⊂⎕C Cmd)∊⎕C¨'LoadPackage' 'InstallPackage' 'DeletePackage' 'ReinstallDependencies' 'Ping'
+          :If (⊂⎕C Cmd)∊⎕C¨'LoadPackages' 'InstallPackages' 'DeletePackage' 'ReInstallDependencies' 'Ping'
           :AndIf (⎕C∊r)≢⎕C'Unknown command: ',Cmd
               r,←''(']',Cmd,' -??? ⍝ Enter this for examples ')
           :EndIf
@@ -1273,37 +1338,39 @@
           :Case ⎕C'LoadTatin'
           :Case ⎕C'ListRegistries'
           :Case ⎕C'ListPackages'
-          :Case ⎕C'LoadPackage'
+          :Case ⎕C'LoadPackages'
               r,←⊂'Examples:'
-              r,←⊂'  ]Tatin.LoadPackage group-name-2.0.0                ⍝ Just full package ID without Registry'
-              r,←⊂'  ]Tatin.LoadPackage [tatin]group-name-1.0           ⍝ Alias & package ID without patch no.'
-              r,←⊂'  ]Tatin.LoadPackage [tatin]group-name-1             ⍝ Without patch and minor no.'
-              r,←⊂'  ]Tatin.LoadPackage [tatin]group-name               ⍝ With any version information'
-              r,←⊂'  ]Tatin.LoadPackage [tatin]/group-name-1.0.0        ⍝ With "/"'
-              r,←⊂'  ]Tatin.LoadPackage [tatin]group-name-1.0.0         ⍝ Without "/"'
-              r,←⊂'  ]Tatin.LoadPackage [tatin]name #                   ⍝ With target namespace'
-              r,←⊂'  ]Tatin.LoadPackage [tatin]A@name #                 ⍝ With package alias'
-              r,←⊂'  ]Tatin.LoadPackage name #                          ⍝ No Registry and no group'
-              r,←⊂'  ]Tatin.LoadPackage A@name                          ⍝ No Registry and no group but alias'
-              r,←⊂'  ]Tatin.LoadPackage A@name #.Foo.Goo                ⍝ With target namespace'
-              r,←⊂'  ]Tatin.LoadPackage file:///path/group-name-1.0.0/  ⍝ Local Registry'
-          :Case ⎕C'InstallPackage'
+              r,←⊂'  ]Tatin.LoadPackages group-name-2.0.0                ⍝ Just full package ID without Registry'
+              r,←⊂'  ]Tatin.LoadPackages [tatin]group-name-1.0           ⍝ Alias & package ID without patch no.'
+              r,←⊂'  ]Tatin.LoadPackages [tatin]group-name-1             ⍝ Without patch and minor no.'
+              r,←⊂'  ]Tatin.LoadPackages [tatin]group-name               ⍝ With any version information'
+              r,←⊂'  ]Tatin.LoadPackages [tatin]/group-name-1.0.0        ⍝ With "/"'
+              r,←⊂'  ]Tatin.LoadPackages [tatin]group-name-1.0.0         ⍝ Without "/"'
+              r,←⊂'  ]Tatin.LoadPackages [tatin]name #                   ⍝ With target namespace'
+              r,←⊂'  ]Tatin.LoadPackages [tatin]A@name #                 ⍝ With package alias'
+              r,←⊂'  ]Tatin.LoadPackages name #                          ⍝ No Registry and no group'
+              r,←⊂'  ]Tatin.LoadPackages A@name                          ⍝ No Registry and no group but alias'
+              r,←⊂'  ]Tatin.LoadPackages A@name #.Foo.Goo                ⍝ With target namespace'
+              r,←⊂'  ]Tatin.LoadPackages file:///path/group-name-1.0.0/  ⍝ Local Registry'
+              r,←⊂'  ]Tatin.LoadPackages foo,bar                         ⍝ Multiple packages'
+          :Case ⎕C'InstallPackages'
               r,←⊂'Examples:'
-              r,←⊂'  ]Tatin.InstallPackage [tatin]/group-name-1.0.0 /path           ⍝ Alias & package ID with "/"'
-              r,←⊂'  ]Tatin.InstallPackage [tatin]group-name-1.0.0 /path            ⍝ Alias & package ID without "/"'
-              r,←⊂'  ]Tatin.InstallPackage [tatin]group-name-1.0 /path              ⍝ No patch no'
-              r,←⊂'  ]Tatin.InstallPackage [tatin]group-name-1 /path                ⍝ Neither patch nor minor no.'
-              r,←⊂'  ]Tatin.InstallPackage [tatin]group-name /path                  ⍝ No version information at all'
-              r,←⊂'  ]Tatin.InstallPackage [tatin]name /path                        ⍝ No group and no version information'
-              r,←⊂'  ]Tatin.InstallPackage [tatin]A@name /path                      ⍝ Registry alias and package alias'
-              r,←⊂'  ]Tatin.InstallPackage group-name-2.0.0 /path                   ⍝ Just a full package ID'
-              r,←⊂'  ]Tatin.InstallPackage name /path                               ⍝ Just a package name'
-              r,←⊂'  ]Tatin.InstallPackage A@name /path                             ⍝ Just a package name & a package alias'
-              r,←⊂'  ]Tatin.InstallPackage file:///path/group-name-1.0.0/ /install/ ⍝ Package in a local Registry'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]/group-name-1.0.0 /path           ⍝ Alias & package ID with "/"'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1.0.0 /path            ⍝ Alias & package ID without "/"'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1.0 /path              ⍝ No patch no'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1 /path                ⍝ Neither patch nor minor no.'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name /path                  ⍝ No version information at all'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]name /path                        ⍝ No group and no version information'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]A@name /path                      ⍝ Registry alias and package alias'
+              r,←⊂'  ]Tatin.InstallPackages group-name-2.0.0 /path                   ⍝ Just a full package ID'
+              r,←⊂'  ]Tatin.InstallPackages name /path                               ⍝ Just a package name'
+              r,←⊂'  ]Tatin.InstallPackages A@name /path                             ⍝ Just a package name & a package alias'
+              r,←⊂'  ]Tatin.InstallPackages file:///path/group-name-1.0.0/ /install/ ⍝ Package in a local Registry'
+              r,←⊂'  ]Tatin.InstallPackages faoo,bar /install/                       ⍝ Multiple packages'
           :Case ⎕C'LoadDependencies'
           :Case ⎕C'UserSettings'
           :Case ⎕C'PackageConfig'
-          :Case ⎕C'UninstallPackage'
+          :Case ⎕C'UnInstallPackage'
           :Case ⎕C'PackageDependencies'
           :Case ⎕C'Pack'
           :Case ⎕C'PublishPackage'
@@ -1320,14 +1387,14 @@
           :Case ⎕C'GetDeletePolicy'
               r←'Not ready yet'
           :Case ⎕C'Documentation'
-          :Case ⎕C'ReinstallDependencies'
+          :Case ⎕C'ReInstallDependencies'
               r,←⊂'Examples:'
-              r,←⊂'  ]Tatin.ReinstallDependencies /path/'
-              r,←⊂'  ]Tatin.ReinstallDependencies /path/ [tatin]'
-              r,←⊂'  ]Tatin.ReinstallDependencies /path/ [tatin] -nobetas'
-              r,←⊂'  ]Tatin.ReinstallDependencies /path/ [tatin] -nobetas -dry'
-              r,←⊂'  ]Tatin.ReinstallDependencies /path/ [tatin] -nobetas -force'
-              r,←⊂'  ]Tatin.ReinstallDependencies /path/ [tatin] -nobetas -force -update'
+              r,←⊂'  ]Tatin.ReInstallDependencies /path/'
+              r,←⊂'  ]Tatin.ReInstallDependencies /path/ [tatin]'
+              r,←⊂'  ]Tatin.ReInstallDependencies /path/ [tatin] -nobetas'
+              r,←⊂'  ]Tatin.ReInstallDependencies /path/ [tatin] -nobetas -dry'
+              r,←⊂'  ]Tatin.ReInstallDependencies /path/ [tatin] -nobetas -force'
+              r,←⊂'  ]Tatin.ReInstallDependencies /path/ [tatin] -nobetas -force -update'
           :Case ⎕C'Ping'
               r,←⊂'Examples:'
               r,←⊂'  ]Tatin.Ping'
@@ -1346,19 +1413,19 @@
       r,←⊂'You may specify an alias for a package by putting it to the front and separate'
       r,←⊂'it with an @.'
       r,←⊂''
-      r,←⊂'Not that if neither a Registry nor a ZIP file is specified but just a package ID'
+      r,←⊂'Note that if neither a Registry nor a ZIP file is specified but just a package ID'
       r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
       r,←⊂'will be scanned; the first hit wins.'
       r,←⊂''
-      r,←⊂'A single package might be:'
+      r,←⊂'A package might be:'
       r,←⊂' * A full package ID.'
-      r,←⊂'   A full package ID has three ingredients: {group}-{name}-{major.minor.patch}.'
+      r,←⊂'   A full package ID has three components: {group}-{name}-{major.minor.patch}.'
       r,←⊂' * You may also specify an incomplete package ID in terms of no patch number, or'
       r,←⊂'   neither minor nor patch number, or no version information at all, and leave'
       r,←⊂'   it to Tatin to establish the latest version itself.'
       r,←⊂' * You may also omit the group. This will fail in case the same package name is'
       r,←⊂'   used in two or more different groups but will succeed otherwise.'
-      r,←⊂' * Either a full path or a URL in front of the package ID.'
+      r,←⊂' * Either a full path or an http[s] URL in front of the package ID.'
       r,←⊂''
       r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
     ∇
@@ -1373,9 +1440,9 @@
       default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
       isOkay←0
       :If ~0∊⍴default
-          'Left argument must be a scalar'⎕SIGNAL 998/⍨1≠⍴,default
+          'Left argument must be a scalar'⎕SIGNAL ErrNo/⍨1≠⍴,default
       :AndIf ~default∊0 1
-          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 998
+          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL ErrNo
       :EndIf
       :If 0=≢default
           add←' (y/n) '
@@ -1435,7 +1502,7 @@
     ⍝ Returns an empty vector if everything is okay and an error message otherwise
       msg←''
       ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
-      :Trap 998
+      :Trap ErrNo
           cfg2←TC.InitPackageConfig ns
           'name'TC.ValidateName ns.name
           'group'TC.ValidateName ns.group
@@ -1470,7 +1537,7 @@
       :EndTrap
     ∇
 
-    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),998}
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),ErrNo}
     AddHeader←{0=≢⍺:⍺ ⋄(⍵,[0.5]'-'⍴¨⍨≢¨⍵)⍪⍺}
     EnforceSlash←{'/'@(⍸'\'=⍵)⊣⍵}
     IsScripted←{0::1 ⋄0⊣⎕src ⍵}
@@ -1481,22 +1548,21 @@
     ∇ index←{x}Select options;flag;answer;question;value;bool;⎕ML;⎕IO;manyFlag;mustFlag;caption
     ⍝ Presents `options` as a numbered list and allows the user to select either exactly one or multiple ones.\\
     ⍝ One is the default.\\
-    ⍝ The optional left argument allows you to specify more options:
+    ⍝ The optional left argument allows you to specify more (positional) options:
+    ⍝ * `caption` is shown above the options.
     ⍝ * `manyFlag` defaults to 0 (meaning just one item might be selected) or 1, in which case multiple items can be specified.
     ⍝ * `mustFlag` forces the user to select at least one  option.
-    ⍝ * `caption` is shown above the options.
     ⍝ `options` must not have more than 999 items.
     ⍝ If the user aborts by entering nothing or a "q" (for "quit") `index will be `⍬`.
       x←{0<⎕NC ⍵:⊆⍎⍵ ⋄ ''}'x'
       (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
       ⎕IO←1 ⋄ ⎕ML←1
-      manyFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'manyFlag'
-      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 998/⍨2≠≡options
-      'Right argument has more than 999 items'⎕SIGNAL 998/⍨999<≢options
+      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL ErrNo/⍨2≠≡options
+      'Right argument has more than 999 items'⎕SIGNAL ErrNo/⍨999<≢options
       flag←0
       :Repeat
           ⎕←{⍵↑'--- ',caption,((0≠≢caption)/' '),⍵⍴'-'}⎕PW-1
-          ⎕←⍪{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳⍴⍵),¨⍵}options
+          ⎕←⍪{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳≢⍵),¨⍵}options
           ⎕←''
           question←'Select one ',(manyFlag/'or more '),'item',((manyFlag)/'s'),' '
           question,←((manyFlag∨~mustFlag)/'('),((~mustFlag)/'q=quit'),((manyFlag∧~mustFlag)/', '),(manyFlag/'a=all'),((manyFlag∨~mustFlag)/')'),' :'
@@ -1588,6 +1654,47 @@
 
     ∇ r←CR
       r←⎕UCS 13
+    ∇
+
+    IsAbsolutePath←{'/'=1⍴⍵:1 ⋄ ':'∊⍵:1 ⋄ '//'≡2↑⍵}
+
+    ∇ folder←{quietFlag}EstablishPackageFolder folder;list;ind
+    ⍝ Checks first whether it's meant to be an open Cider project (if Cider is around).
+    ⍝ Next it tries to find it in the current dir.
+    ⍝ The user should always be asked for confirmation.
+    ⍝ If `folder` is relative and there are more than one Cider projects open then the user
+    ⍝ is asked which one she wants to act on except when `quiteFlag` is 1 (default is 0)
+    ⍝ when an error is generated instead.
+      quietFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quietFlag'
+      :If ~IsAbsolutePath folder
+          :If 0<⎕SE.⎕NC'Cider'
+              :If 1=≢list←⎕SE.Cider.ListOpenProjects 0
+                  folder←'expand'TC.F.NormalizePath(2⊃list[1;]),'/',folder
+              :ElseIf 0=≢list
+                  :If TC.F.IsDir TC.F.PWD,'/',folder
+                      folder←TC.F.PWD,'/',folder
+                  :Else
+                      ('Not found: ',folder)Assert 0
+                  :EndIf
+              :Else
+                  :If quietFlag
+                      ('Folder does not exist: ',folder)⎕SIGNAL ErrNo
+                  :Else
+                      ind←'For which project?'Select↓⍕list
+                      :If 0=≢ind
+                          folder←0⍴⎕←'Cancelled by user'
+                      :Else
+                          folder←(⊃list[ind;2]),'/',folder
+                          ('Folder does not exist: ',folder)Assert TC.F.IsDir folder
+                      :EndIf
+                  :EndIf
+              :EndIf
+          :Else
+              :If TC.F.IsDir TC.F.PWD,'/',folder
+                  folder←TC.F.PWD,'/',folder
+              :EndIf
+          :EndIf
+      :EndIf
     ∇
 
 :EndNamespace

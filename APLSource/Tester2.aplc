@@ -16,21 +16,27 @@
 ⍝ ## Misc
 ⍝ This class is part of the APLTree Open Source project.\\
 ⍝ Home page: <https://github.com/aplteam/Tester2>\\
-⍝ Kai Jaeger ⋄ APL Team Ltd
+⍝ Kai Jaeger
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.2.4+107' '2022-05-09'
+      r←'Tester2' '3.2.6+4' '2022-05-30'
     ∇
 
     ∇ History
-      :Access Public shared
+      :Access Public shared 
+      ⍝ * 3.2.6 ⋄ 2022-05-30
+      ⍝   * Bug fix: log in session was mutilated; introduced by 3.2.5 
+      ⍝ * 3.2.5 ⋄ 2022-05-22
+      ⍝   * #17 fixed
+      ⍝   * In the GUI the log (not the grid) was distorted
+      ⍝   * Local variables in `ExecuteInitial` renamed so that they explain themselves
       ⍝ * 3.2.4 ⋄ 2022-05-09
-      ⍝   * Bug fix: Log messages came with a LF in the middle of a message in case batchFlag was 1.
+      ⍝   * Log messages came with a LF in the middle of a message in case batchFlag was 1.
       ⍝ * 3.2.3 ⋄ 2022-04-13
-      ⍝   * Bug fix: In case an INI file is part of a test suite then under non-Windows platform it would fail prior 3.2.3
+      ⍝   * In case an INI file is part of a test suite then under non-Windows platform it would fail prior 3.2.3
       ⍝ * 3.2.2 ⋄ 2022-04-06
       ⍝   * Bug fix for `exec_before_each_test` and `exec_after_each_test`:\\
       ⍝     When the check function did not a return a result an ERROR occured.
@@ -293,6 +299,7 @@
     ⍝ * 2=stop in all `Initial*` functions
     ⍝ * 4=stop in all `Cleanup*` functions\\
     ⍝ You may also specify a sum of them, like 3, 5, 6 or 7
+    ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
       'Invalid left argument '⎕SIGNAL 11/⍨1≠≡,stopFlag
@@ -313,6 +320,7 @@
     ⍝ Note that this is a Windows-only feature.\\
     ⍝ The left argument is useful only for defining defaults on the GUI.\\
     ⍝ See also `Run` which does vasically the same but without a GUI.\\
+    ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
       :If 'Win'≡A.GetOperatingSystem''
           _parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateParms ⍬}'parms'
@@ -343,6 +351,7 @@
     ⍝ The result:
     ⍝ 1. A return code. 0 means all test cases passed successfully.
     ⍝ 2. A vector of text vectors with the log. The log contains detailed information about what was carried out.
+    ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
       'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1 2 4 3 5 6 7
@@ -365,6 +374,7 @@
     ⍝ You may also specify a sum of them, like 3, 5, 6 or 7.\\
     ⍝ This function does not trap errors in case `debugFlag` is 1.\\
     ⍝ Returns 0 for okay or a 1 as `rc` in case one or more test cases are broken or failed.\\
+    ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
       'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1 2 4 3 5 6 7
@@ -567,8 +577,8 @@
           {A.ToNum⌽⍵↑⍨¯1+⍨⍵⍳'_'}⌽⍵
       }
 
-    ∇ {r}←ExecuteInitial(ref ps);report
-      r←1
+    ∇ {success}←ExecuteInitial(ref ps);report
+      success←1
       report←'Looking for a function "Initial": '
       :If 3=ref.⎕NC'Initial'
           :If 2⊃⌽(8⍴2)⊤ps.stopFlag
@@ -581,18 +591,18 @@
               :If 0=⊃⊃ref.⎕AT'Initial'
      ∆stop1:      ref.Initial
               :Else
-     ∆stop2:      r←ref.Initial
+     ∆stop2:      success←ref.Initial
               :EndIf
           :Case 1
               :If 0=⊃⊃ref.⎕AT'Initial'
      ∆stop3:      ref.Initial ps
               :Else
-     ∆stop4:      r←ref.Initial ps
+     ∆stop4:      success←ref.Initial ps
               :EndIf
           :Else
               11 ⎕SIGNAL⍨'The "Initial" function in ',(⍕ref),' has an invalid signature: it''s neither monadic nor niladic'
           :EndSelect
-          :If r
+          :If success
               report,←'found and successfully executed'
           :Else
               report,←'found and executed but it signalled failure!'
@@ -758,7 +768,7 @@
               :Else
                   marker←'⍝'
               :EndIf
-              ¯2 ShowLog marker,' ',desc
+              3 ShowLog marker,' ',desc
               i AddToGui(length2↑(length↑marker,' ',testFns),' (',(cw 0⍕i),'/',max,')'),' ⍝ ',desc
               :If ~rc∊_OK,_Failed
               :AndIf ps.guiFlag
@@ -920,26 +930,24 @@
 
     ∇ {r}←QuitTests
     ⍝ Use this method to end running test cases prematurely but make sure that everything is tidied up,
-    ⍝ meaning that any `Cleanup` function is executed etc.\\
-    ⍝ For the time being this function just prints a message to the session. Maybe one day Dyalog allows
-    ⍝ Ctrl+Enter on something that the programmer **wants** to trigger error trapping, but at the time
-    ⍝ of writing this is not possible.
+    ⍝ meaning that a `Cleanup` function (if any) is executed etc.\\
       :Access Public Instance
       r←⍬
-      ⎕←'⎕SIGNAL ',(⍕QuitEvent),'   ⍝ Execute this in order to finish the current test run'
+      ⎕SIGNAL QuitEvent
     ∇
 
 
     ∇ {r}←{type}ShowLog msg;selog;buff
-    ⍝ `type` may be 1 or 2 or ¯1 or ¯2:
+    ⍝ `type` may be 1 or 2 3 or ¯1 or ¯2:
     ⍝ * A 1 means an action message
     ⍝ * A 2 means the result of the execution attempt of a test function.
+    ⍝ * A 3 means "to be appended the very last line in the log"
     ⍝ * A negative type means message with more to come
     ⍝ `ps` is a parameter space with `ps.log` being, well, the log.
       r←⍬
       :If 0<≢msg
           type←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'type'
-          'Invalid type'⎕SIGNAL 11/⍨~(⊂|type)∊1 2
+          'Invalid type'⎕SIGNAL 11/⍨~(⊂|type)∊1 2 3
           :If ps.batchFlag∧0=ps.guiFlag
               :If ~type∊¯2 2
               :OrIf 0=≢ps.log
@@ -954,16 +962,29 @@
                   :If ps.ref2Gui.∆n.∆Closed
                       ⎕SIGNAL QuitEvent
                   :EndIf
-                  ps.ref2Gui.∆n.Log.Text,←⊆msg
+                  :If 3=type
+                  :AndIf 1=≡msg
+                      ps.ref2Gui.∆n.Log.Text[≢ps.ref2Gui.∆n.Log.Text]←⊂(⊃⌽ps.ref2Gui.∆n.Log.Text),msg
+                  :Else
+                      ps.ref2Gui.∆n.Log.Text,←⊆msg
+                  :EndIf
                   ps.ref2Gui.∆n.Log.SelText←2⍴(≢ps.ref2Gui.∆n.Log.Text),¨1
               :EndIf
-              ps.log,←buff
-              selog←{1=≡⍵:⍵ ⋄ (3≠≢⍵)∨'---'≡3↑⊃⍵:⍪⍵ ⋄ (1⊃⍵),' ',(2⊃⍵),' ',(3⊃⍵)}msg
+              :If type=3
+                  ps.log[≢ps.log]←⊂((≢ps.log)⊃ps.log),⊃buff
+              :Else
+                  ps.log,←buff
+              :EndIf
               :If ~ps.guiFlag
-                  :If type<0
-                      ⍞←selog,(type=¯2)/⎕UCS 13
-                  :Else
-                      ⎕←selog
+                  :If type=3
+                      ⎕←⊃¯1↑ps.log
+                  :ElseIf ¯1≠×type
+                      selog←{1=≡⍵:⍵ ⋄ (3≠≢⍵)∨'---'≡3↑⊃⍵:⍪⍵ ⋄ (1⊃⍵),' ',(2⊃⍵),' ',(3⊃⍵)}msg
+                      :If type<0
+                          ⍞←selog,(type=¯2)/⎕UCS 13
+                      :Else
+                          ⎕←selog
+                      :EndIf
                   :EndIf
               :EndIf
           :EndIf
@@ -1698,16 +1719,22 @@
                   result←1
               :EndIf
               :If ~1↑result∊⍬ 1
+                  buff←¯1↑ps.log
+                  ps.log←¯1↓ps.log
                   ShowLog'Function "Initial_',currentGroup,'" found and executed but did not return a 1'
                   noOf←+/∨/('_',currentGroup,'_')⍷↑(i-1)↓ps.list
                   ShowLog'Therefore ',(⍕noOf),' member',((1<noOf)/'s'),' of the group "',currentGroup,'" will not be executed'
                   :If ps.guiFlag
                       ps.ref2Gui.∆n.Grid.Values[(i-1)+⍳noOf;4]←⊂'Prevented by Initial_',currentGroup
                   :EndIf
+                  ps.log,←buff
                   i+←noOf-1
                   continueFlag←1
               :Else
+                  buff←¯1↑ps.log
+                  ps.log←¯1↓ps.log
                   ShowLog'Function "Initial_',currentGroup,'" found and successfully executed'
+                  ps.log,←buff
               :EndIf
           :EndIf
       :EndIf

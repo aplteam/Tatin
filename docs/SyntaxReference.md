@@ -38,12 +38,14 @@ While `⎕SE._Tatin` holds all code required for Tatin's client side, `⎕SE.Tat
 
 Checks whether there are later versions available for the principal packages installed in `path`.
 
-The optional left argument can carry flags as a single integer:
+The optional left argument must, if specified, be an integer that may carry flags as a single integer:
 
-1. Major: should later major version be listed as well? Defaults to 0.  (1)
-2. Dependencies: should dependencies be checked as well? Defaults to 0. (2)
-
-You may specify both flags as true by passing a 3.
+|Value|Description
+|-----|---------------------------------------------------------------------
+|0    | No flag set, same as no argument at all
+|1    | Major: should later major version be listed as well? Defaults to 0
+|2    | Dependencies: should dependencies be checked as well? Defaults to 0
+|3    | Both flags set
 
 By default only minor and patch are part of the check. By specifying 1 as `major` you may change this default behaviour and list any later major versions instead.
 
@@ -54,7 +56,7 @@ Returns a matrix with five columns:
 |Col  | Info
 |-----| ----
 |[;1] |Original package ID
-|[;2] |Lastes package ID
+|[;2] |Lastest package ID
 |[;3] |Original URL
 |[;4] |Flag; 1 means later version is available
 |[;5] |URL the latest version was found but empty in case it's identical with [;3]
@@ -83,7 +85,7 @@ Creates a namespace with default parameters; it can be passed as (optional) left
 
 Deletes a package.
 
-Whether deleting a package from a Tatin Registry depends on the delete policy it operates, which is in turn determined by the INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
+Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
 
 ### GetDeletePolicy
 
@@ -199,10 +201,10 @@ Returns a namespace with default values useful for the function [`InitialisePack
 
 `⍵` might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then this namespace will be merged. Any settings in that namespace take precedence.
 
-### InstallPackage       
+### InstallPackages
 
 ```
-r←{noBetas} InstallPackage(identifiers targetFolder)
+r←{noBetas} InstallPackages (identifiers targetFolder)
 ```
 
 Installs one or more packages (`identifiers` ) in `targetFolder`.
@@ -357,19 +359,21 @@ mat←{dateFlag} ListVersions uri
 
 `uri` is one of:
 
-* `[*]` followed by "group" and "name" of a package
+* A package name
+* A group name and a package name
+* A URL pointing to a Registry together with a package name and possible also a group name
+* An alias pointing to a Registry together with a package name and possible also a group name
 * A path to a Registry and "group" and "name" of a package
 
-In the first case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.
+In the first and second case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.
 
-In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.
+If a URL or an alias was specified the given Registry is scanned. A matrix with one column with full package IDs is returned.
 
-You may omit the group name; that would not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.
+You may omit the group name; that does not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.
 
 The package ID must not specify a version number.
 
-By default the publishing date is not included, but you may change this by passing a 1 as `⍺`.
-In that case an additional column is added to the result.
+By default the publishing date is not included, but you may change this by passing a 1 as `⍺`. In that case an additional column is added to the result.
 
 ### LoadDependencies     
 
@@ -380,7 +384,7 @@ In that case an additional column is added to the result.
 Requires two arguments:
 
 * A folder with a build list (mandatory)
-* An installation folder (mandatory)
+* A target namespace
 
 You may specify an optional third argument: the `overwriteFlag` flag which defaults to 0.
 
@@ -390,10 +394,10 @@ Loads all packages and injects required references into `targetSpace`.
 
 Returns a vector with references to the loaded packages (no dependencies, principal packages only).
 
-### LoadPackage          
+### LoadPackages          
 
 ```
-r←{noBetas} LoadPackage(identifiers targetSpace)
+r←{noBetas} LoadPackages (identifiers targetSpace)
 ```
 
 Loads packages dynamically into the workspace.
@@ -487,12 +491,12 @@ Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.
 The file apl-buildlist.json as well as all directories in that folder will be deleted.
 Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.
 
-Note that packages with different major version numbers are considered different.
+Note that packages with different major version numbers are considered to be different packages.
 
 By default all known Registries with a priority greater than 0 are scanned, but you may
 specify a particular Registry as a third (optional) argument.
 
-The left argument is optional and, if specified, typically created by calling [`CreateReInstallParms`](#CreateReInstallParms).
+The left argument is optional and is, if specified, typically created by calling [`CreateReInstallParms`](#CreateReInstallParms).
 
 It may carry three parameters:
 
@@ -520,17 +524,23 @@ Takes a path to a package and returns the config file for that package as a name
 
 `path` may or may not carry the filename.
 
-### UnInstallPackage     
+### UnInstallPackages
 
 ```
-(list msg)←UnInstallPackage (folder packageID)
+(list msg)←UnInstallPackage (packageID folder)
 ```
 
-If `folder` carries a dependency file then this function attempts to un-install the package
-`packageID` and all its dependencies, but those only in case they are neither principal packages nor
-required by other packages.
+`folder` must carry a Tatin dependency file. 
+
+`UnInstallPackage` attempts to un-install the package `packageID` and all its dependencies, but he latter only in case they are neither principal packages nor required by other packages.
+
+`packageID` might be a full package ID but also <group>-<name> or just <name>. However, in case. In case more than one package qualify an error is thrown.
 
 Note that if `packageID` is empty a clean-up attempt is made.
+
+`folder` may be a sub folder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.
+
+`packageID` must be fully qualified: group + name + version.
 
 If a package was installed with an alias you must un-install it by specifying the alias. 
 

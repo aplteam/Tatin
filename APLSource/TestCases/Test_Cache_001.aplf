@@ -6,17 +6,17 @@
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
  tempDir←∆GetTempDir'/packages'
 
- res←TC.InstallPackage'[tatin]aplteam-HandleError'tempDir
- →T.GoToTidyUp ~∨/'-HandleError-'⍷∊res
- →T.GoToTidyUp ~1<≢F.ListDirs tempDir,'/'
- →T.GoToTidyUp ~1<≢F.ListDirs TC.GetPathToPackageCache,'/tatin.dev'
- →T.GoToTidyUp ~0=≢F.ListDirs TC.GetPathToPackageCache,'/temp/'
+ res←TC.InstallPackages'[tatin]aplteam-HandleError'tempDir
+ →T.GoToTidyUp~∨/'-HandleError-'⍷∊res
+ →T.GoToTidyUp~1<≢F.ListDirs tempDir,'/'
+ →T.GoToTidyUp~1<≢F.ListDirs TC.GetPathToPackageCache,'/tatin.dev'
+ →T.GoToTidyUp~0=≢F.ListDirs TC.GetPathToPackageCache,'/temp/'
 
  TC.LoadDependencies tempDir #.TEMP
- →T.GoToTidyUp ~9=#.TEMP.⎕NC'HandleError'
+ →T.GoToTidyUp~9=#.TEMP.⎕NC'HandleError'
 
  r←T._OK
 
- ∆TidyUp:
-  Assert 0=⊃F.RmDir ∆GetTempDir''
+∆TidyUp:
+ Assert 0=⊃F.RmDir ∆GetTempDir''
 ⍝Done

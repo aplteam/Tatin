@@ -225,9 +225,9 @@ This is optional: it may or may not exist, and it might be empty if it does.
 
 In case it is not empty it must be the name of a niladic or monadic function that resides in the top-level namespace of the package (_not_ in what might be defined as API!) or a shared method of a class.
 
-This function will be executed by either `LoadPackage` or `LoadDependencies` _after_ all dependencies have been loaded and all refs got established.
+This function will be executed by either `LoadPackages` or `LoadDependencies` _after_ all dependencies have been loaded and all refs got established.
 
-If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackage` and has no assets then the right argument will be empty.
+If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackages` and has no assets then the right argument will be empty.
 
 The function may or may not return a result. A result is assigned to the Tatin package variable `LX`. If there is no result `LX` becomes an empty vector. Without an `lx` function there won't be a variable `LX`.[^TatinVars]
 
@@ -295,7 +295,7 @@ For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "S
 
 By default the config namespace carries the values of the two Dyalog parameters `default_io` and `default_ml` for the system variables `⎕IO` and `⎕ML`. 
 
-Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the `LoadPackage` or the `LoadDependencies` function _before_ any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.
+Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the `LoadPackages` or the `LoadDependencies` function _before_ any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.
 
 
 #### Injected values
@@ -336,7 +336,7 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 ### Access after loading a package
 
-Whether you load a package with `LoadPackage` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with `ASSETS`, `GetFullPath2Assets`, `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
+Whether you load a package with `LoadPackages` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with `ASSETS`, `GetFullPath2Assets`, `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
 
 `LX` is only available in case the package used the [`lx`](#) mechanism for initializing itself.
 
@@ -345,7 +345,7 @@ All of them are niladic functions because that's how we emulate constants in APL
 Notes:
 
 * `HOME` will be empty in case these two conditions are both met:
-  * The package was brought into the workspace with `LoadPackage` (as opposed to `LoadDependencies`)
+  * The package was brought into the workspace with `LoadPackages` (as opposed to `LoadDependencies`)
   * The package does not have any assets
 * `HOME` will also be empty in case the path it holds does not exist
 

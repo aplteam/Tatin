@@ -1,9 +1,12 @@
- {r}←CloseConnections dummy;list
+ {r}←CloseConnections force;list
 ⍝ Close all permanent connections defined within ∆PermanentConnections, and delete that namespace.
  r←⍬
  :If 9=⎕NC'∆PermanentConnections'
  :AndIf 0<≢∆PermanentConnections.⎕NL 9
-     list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
-     {}{⍵ R.Close 0}¨list
-     ⎕EX'∆PermanentConnections'
+     :If 0=∆PermanentConnections.⎕NC'keepOpen'
+     :OrIf 0=∆PermanentConnections.keepOpen
+         list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
+         {}{⍵ R.Close 0}¨list
+         ⎕EX'∆PermanentConnections'
+     :EndIf
  :EndIf

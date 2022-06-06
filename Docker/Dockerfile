@@ -1,48 +1,73 @@
-FROM debian:buster-slim as installer
+# Pull base image:
+FROM ubuntu:18.04 as installer
+MAINTAINER aplteam kai@aplteam.com
 
-ARG DYALOG_RELEASE=18.0
-ARG DYALOG_VERSION=${DYALOG_RELEASE}.39712
-ARG BUILDTYPE=minimal
-ARG DEBFILE=https://www.dyalog.com/uploads/php/download.dyalog.com/download.php?file=${DYALOG_RELEASE}/linux_64_${DYALOG_VERSION}_unicode.x86_64.deb
+ARG DYALOG_RELEASE=18.2
+ARG DYALOG_VERSION=${DYALOG_RELEASE}.45645
+ARG DYALOG_DEBFILE=linux_64_${DYALOG_VERSION}_unicode.x86_64.deb
+#ARG DOTNET_SDK=dotnet-sdk-2.2
+#ARG DOTNET_RUNTIME=dotnet-runtime-3.1
+ARG UID=1001
+ARG GID=1001
+ARG USER_ID=tatin
 
-ADD ${DEBFILE} /tmp/dyalog.deb
-ADD rmfiles.sh /
+#ENV LANG en_GB.UTF-8
+#ENV LANGUAGE en_GB:UTF-8
+#ENV LC_ALL en_GB.UTF-8
+ENV DYALOG_SERIAL 201837
 
-RUN dpkg -i --ignore-depends=libtinfo5 /tmp/dyalog.deb && /rmfiles.sh
+RUN useradd --create-home --uid $UID $USER_ID
 
-FROM debian:buster-slim
+######################### Install latest patches
+RUN apt update \
+    && apt install -y \
+    && apt install -y wget
 
-ARG DYALOG_RELEASE=18.0
+######################### Install Dyalog APL
+# Fetch Dyalog APL from the current directory
+ADD ${DYALOG_DEBFILE} /tmp/DYALOG.deb
 
-RUN apt-get update && apt-get install -y --no-install-recommends locales && \
-    apt-get clean && rm -Rf /var/lib/apt/lists/*             && \
-    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen    && \
-    locale-gen
+# Install and remove package
+RUN dpkg -i /tmp/DYALOG.deb
+RUN rm /tmp/DYALOG.deb
+#############################################
 
-ENV LANG en_GB.UTF-8
-ENV LANGUAGE en_GB:UTF-8
-ENV LC_ALL en_GB.UTF-8
+RUN apt-get install -y zip
+RUN apt-get install -y unzip
 
-RUN apt-get update && apt-get install -y --no-install-recommends libncurses5 && \
-    apt-get clean && rm -Rf /var/lib/apt/lists/*
+########################## Install .NET
+# Fetch and install .NET
+#WORKDIR tmp
+#RUN wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
+#RUN dpkg -i ./packages-microsoft-prod.deb
+#RUN rm ./packages-microsoft-prod.deb
 
-COPY --from=0 /opt /opt
+# Installing at this point is likely to fail with "Unable to locate package dotnet-sdk-2.2"
+# Apparently no file prod.list is created, so we do it ourself:
+#RUN wget -q https://packages.microsoft.com/config/ubuntu/18.04/prod.list
+#RUN mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+#RUN apt update
+
+# Handle .NETCORE dependencies
+#RUN apt install apt-transport-https
+
+# Install .NET (CORE?!)
+# RUN apt install ${DOTNET_SDK}
+#RUN apt install -y ${DOTNET_RUNTIME}
+##############################################
 
 ADD entrypoint /
 RUN sed -i "s/{{DYALOG_RELEASE}}/${DYALOG_RELEASE}/" /entrypoint
-
-RUN ln -s /run /usr/bin/dyalog
-RUN useradd -s /bin/bash -d /home/dyalog -m dyalog
-RUN mkdir /app /storage && \
-    chmod 777 /app /storage
-
-LABEL org.label-schema.licence="proprietary / non-commercial"   \   
-      org.label-schema.licenceURL="https://www.dyalog.com/uploads/documents/Private_Personal_Educational_Licence.pdf"
-
-EXPOSE 4502
-
-USER dyalog
-WORKDIR /home/dyalog
 ENTRYPOINT ["/entrypoint"]
 
+RUN mkdir -p /app 
+RUN chmod 777 /app
+
+# Don't do this too early, otherwise you might lack required permissions:
+USER $USER_ID          
+
+WORKDIR /home/tatin
+
+# For investigating the image from the "inside" (disable ENTRYPOINT then):
+#CMD /bin/sh 
 

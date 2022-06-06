@@ -26,11 +26,15 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'ZipArchive' '0.1.2+9' '2022-06-02'
+      r←'ZipArchive' '0.1.3+13' '2022-06-06'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 0.1.3 from 2022-06-06
+    ⍝   * unzip sometimes generated an error 66 (invalid CRC) when in reality it did unzip successfully
+    ⍝   * Bash statements are now catenated with "&&" rather than ";"
+    ⍝   * ZipArchive now works out whether "zip" and/or "unzip" are installed at all, and report accordingly
     ⍝ * 0.1.2 from 2022-06-02
     ⍝   * Problem with backslashes fixed in `UnZipTo`
     ⍝ * 0.1.1 from 2022-05-31
@@ -61,7 +65,7 @@
       make zipFilename overwriteFlag
     ∇
 
-    ∇ make(filename overwriteFlag);res;tempFilename
+    ∇ make(filename overwriteFlag);msg;rc;tempFilename
       CheckMinVersion ⍬
       _filename←AddExtension filename
       :If IsWindows
@@ -77,11 +81,11 @@
           :EndIf
           :If ~F.IsFile _filename
               tempFilename←F.GetTempFilename2''
-              res←⎕SH'zip ',_filename,' ',tempFilename,' -q'
-              Assert 0=≢res
-              res←⎕SH'zip ',_filename,' ',tempFilename,' -dq'
-              Assert 0=≢res
-              ⎕SH'rm ',tempFilename,' -f'
+              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -q'
+              Assert 0=rc
+              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -dq'
+              Assert 0=rc
+              {}Exec'rm ',tempFilename,' -f'
           :EndIf
       :EndIf
      ⍝Done
@@ -97,7 +101,7 @@
         ∇
     :Endproperty
 
-    ∇ {r}←{parent}Add toBeZipped;isDir;list;res
+    ∇ {r}←{parent}Add toBeZipped;isDir;list;msg;rc
     ⍝ Use this to add one or more files to the ZIP file.\\
     ⍝ `toBeZipped` specifies the full path (or full paths) of what's going to be zipped. That's what's going to be
     ⍝ stored in the ZIP file.\\
@@ -125,42 +129,47 @@
       :Else
           toBeZipped←F.NormalizePath toBeZipped
           :If 0=⎕NC'parent'
-              res←⎕SH'zip -r ',_filename,' ',∊'"',¨(⊆toBeZipped),¨⊂'" '
+              (rc msg)←Exec'zip -r ',_filename,' ',∊'"',¨(⊆toBeZipped),¨⊂'" '
+              Assert 0=rc
           :Else
               parent←'expand'F.NormalizePath parent
               toBeZipped←{⍵↓⍨'/'=1⍴⍵}¨⊆toBeZipped
-              res←⎕SH'cd ',parent,'; zip -r ',('expand'F.NormalizePath _filename),' ',∊' ',¨'"',¨toBeZipped,¨'"'
+              (rc msg)←Exec'cd ',parent,' && zip -r ',('expand'F.NormalizePath _filename),' ',∊' ',¨'"',¨toBeZipped,¨'"'
+              Assert 0=rc
           :EndIf
       :EndIf
     ∇
 
-    ∇ r←List
+    ∇ r←List;msg;rc
     ⍝ Lists the contents of the ZIP file.
       :Access Public Instance
       :If IsWindows
           r←_ZipArchive.List
           r←{'.//'≡3⍴⍵:'./',3↓⍵ ⋄ '.\\'≡3⍴⍵:'.\',3↓⍵ ⋄ ⍵}¨r
       :Else
-          r←⎕SH'unzip -l ',_filename
-          r←MassageZipConentList r
+          (rc msg)←Exec'unzip -l ',_filename
+          Assert 0=rc
+          r←MassageZipConentList msg
       :EndIf
     ∇
 
-    ∇ {r}←Delete filenames;res
+    ∇ {r}←Delete filenames;msg;rc
     ⍝ Delete one or more files from the ZIP.\\
     ⍝ Returns `⍬` (shy).
       :Access Public Instance
+      r←⍬
       :If IsWindows
-          r←_ZipArchive.Delete filenames
+          {}_ZipArchive.Delete filenames
       :Else
           filenames←F.NormalizePath⊆filenames
           :If 0<≢filenames←(filenames∊List)/filenames
-              res←⎕SH'zip -d ',_filename,∊' ',¨'"',¨filenames,¨'"'
+              (rc msg)←Exec'zip -d ',_filename,∊' ',¨'"',¨filenames,¨'"'
+              Assert 0=rc
           :EndIf
       :EndIf
     ∇
 
-    ∇ r←names ExtractTo targetFolder;b;folders;list;msg;name;res
+    ∇ r←names ExtractTo targetFolder;b;folders;list;msg;name;rc
     ⍝ `names` is the name of one or more zipped objects (files or directories)
     ⍝ Those will be extracted into `folder\`.\\
     ⍝ `names` may be simple (single object) or nested (vector of objects).\\
@@ -184,7 +193,8 @@
                   msg←⊃{⍺,';',⍵}/{'The file ''',⍵,''' already exists.'}¨b/names
                   msg ⎕SIGNAL 11
               :EndIf
-              res←⎕SH'cd ',targetFolder,';unzip ',('expand'F.NormalizePath _filename),∊' "'∘,¨names,¨'"'
+              (rc msg)←Exec'cd ',targetFolder,' && unzip ',('expand'F.NormalizePath _filename),∊' "'∘,¨names,¨'"'
+              Assert 0=rc
           :EndIf
       :EndIf
     ∇
@@ -215,11 +225,11 @@
       :Else
           zipFilename←AddExtension zipFilename
           ('Is not a directory: ',sourceFolder)Assert(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs.IsDir sourceFolder
-          res←⎕SH'cd ',('expand'F.NormalizePath sourceFolder),'; zip -r ',zipFilename,' *'
+          res←Exec'cd ',('expand'F.NormalizePath sourceFolder),' && zip -r ',zipFilename,' *'
       :EndIf
     ∇
 
-    ∇ {r}←zipFilename UnzipTo targetFolder;F
+    ∇ {r}←zipFilename UnzipTo targetFolder;F;msg;noOf;qdmx;rc
     ⍝ Unzip `⍵` into `⍺`.\\
     ⍝ `targetFolder` must not yet exist.
       :Access Public Shared
@@ -228,14 +238,28 @@
           r←zipFilename ##.DotNetZip.UnzipTo targetFolder
       :Else
           zipFilename←F.EnforceSlash AddExtension zipFilename
-          r←⎕SH'unzip -o -qq ',zipFilename,(0<≢targetFolder)/' -d ',targetFolder
-          ⍝ On my Ubuntu VM under Hyper-V I get files and dirs with no priviliges at all, so I need to establish defaults "manually":
-          {}{⎕SH'chmod 666 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListFiles targetFolder,'/'
-          {}{⎕SH'chmod 777 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListDirs targetFolder,'/'
+          ⍝ For unknown reasons the following statement tends to crash, yet the unzip utility unzips everything anyway,
+          ⍝ therefore we trap the error and just compare the number of files in the archive with what we've got.
+          :Trap 11
+              (rc msg)←Exec'unzip -o -qq ',zipFilename,(0<≢targetFolder)/' -d ',targetFolder
+              Assert 0=rc
+          :Else
+              qdmx←⎕DMX
+              :If 66≠qdmx.ENX
+                  (rc msg)←Exec'unzip -l ',zipFilename
+                  Assert 0=rc
+                  noOf←≢msg
+              :OrIf noOf≠≢⊃('recursive' 2)F.Dir targetFolder,'/'
+                  qdmx.Message ⎕SIGNAL qdmx.EN
+              :EndIf
+          :EndTrap
+          ⍝ On my Ubuntu VM under Hyper-V I get files and dirs with no priviliges, so defaults need to be established:
+          {}{Exec'chmod 666 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListFiles targetFolder,'/'
+          {}{Exec'chmod 777 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListDirs targetFolder,'/'
       :EndIf
     ∇
 
-    ∇ r←ListZipContents zipFilename;F;instance;myZip;zipFilename
+    ∇ r←ListZipContents zipFilename;F;instance;msg;myZip;rc;zipFilename
     ⍝ List the contents of a ZIP file
       :Access Public Shared
       F←(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs
@@ -245,8 +269,9 @@
           instance.Dispose
       :Else
           zipFilename←AddExtension zipFilename
-          r←⎕SH'unzip -l ',zipFilename
-          r←MassageZipConentList r
+          (rc msg)←Exec'unzip -l ',zipFilename
+          Assert 0=rc
+          r←MassageZipConentList msg
       :EndIf
     ∇
 
@@ -264,14 +289,16 @@
       :EndIf
     ∇
 
-    ∇ r←{user}GetHomeDir dummy
+    ∇ r←{user}GetHomeDir dummy;msg;rc
       ⍝ Get the home directory for a user, by default the current one.
       ⍝ You may specify a different user via ⍺.
       ⍝ ⍵ is ignored.
       :If 0=⎕NC'user'
           user←2 ⎕NQ #'GetEnvironment' 'USER'
       :EndIf
-      r←{⍵⊃⍨¯1+≢⍵}':'(≠⊆⊢)⊃⎕SH'getent passwd ',user
+      (rc msg)←Exec'getent passwd ',user
+      Assert 0=rc
+      r←{⍵⊃⍨¯1+≢⍵}':'(≠⊆⊢)⊃msg
     ∇
 
     ∇ r←IsWindows;A
@@ -298,5 +325,19 @@
       EachIfNotEmpty←{
           0=≢⍵:shy←⍬ ⋄ 1:shy←⍺⍺¨⍵
       }
+
+    ∇ (rc msg)←Exec cmd;qdmx
+    ⍝ Works out whether "zip" and "unzip" are available at all (all other commands are always available)
+      :Trap 11
+          msg←⎕SH cmd
+          rc←0
+      :Else
+          qdmx←⎕DMX
+          rc←,⊃(//)⎕VFI⊃¯1↑' '(≠⊆⊢)qdmx.Message
+          :If (,127)≡rc
+              '"zip" and/or "unzip" not installed'⎕SIGNAL 6
+          :EndIf
+      :EndTrap
+    ∇
 
 :EndClass

@@ -1,51 +1,25 @@
 #!/bin/bash
 
+## This docker image includes a copy of Dyalog APL that should only be used within this container to run the Tatin server application and must not be extracted.
+
 ## This file replaces the Dyalog mapl script
-echo " _______     __      _      ____   _____ "
-echo "|  __ \ \   / //\   | |    / __ \ / ____|"
-echo "|_|  | \ \_/ //  \  | |   | |  | | |     "
-echo "     | |\   // /\ \ | |   | |  | | |   _ "
-echo " ____| | | |/ /  \ \| |___| |__| | |__| |"
-echo "|_____/  |_/_/    \_\______\____/ \_____|"
-echo ""
-echo "https://www.dyalog.com"
-echo ""
 
 export DYALOG=/opt/mdyalog/{{DYALOG_RELEASE}}/64/unicode/
 export LD_LIBRARY_PATH="${DYALOG}:${LD_LIBRARY_PATH}"
-export WSPATH=$WSPATH:${DYALOG}/ws
 export TERM=dumb
 export APL_TEXTINAPLCORE=${APL_TEXTINAPLCORE-1}
 export TRACE_ON_ERROR=0
 export SESSION_FILE="${SESSION_FILE-$DYALOG/default.dse}"
 
-if [ $(ls /app/*.dcfg 2>/dev/null | wc -l) = 1 ]; then
-    export CONFIGFILE=$(ls /app/*.dcfg)
-    echo "found config file Launching with CONFIGFILE=$CONFIGFILE"
-elif [ $(ls /app/*.aplf 2>/dev/null | wc -l) = 1 ]; then
-    export LOAD=$(ls /app/*.aplf)
-    echo "found aplf file Launching with LOAD=$LOAD"
-elif [ $(ls /app/*.apln 2>/dev/null | wc -l) = 1 ]; then
-    export LOAD=$(ls /app/*.apln)
-    echo "found apln file Launching with LOAD=$LOAD"
-elif [ $(ls /app/*.aplc 2>/dev/null | wc -l) = 1 ]; then
-    export LOAD=$(ls /app/*.aplc)
-    echo "found aplc file Launching with LOAD=$LOAD"
-elif [ $(ls /app/*.dyapp 2>/dev/null | wc -l) = 1 ]; then
-    export DYAPP=$(ls /app/*.dyapp)
-    echo "found dyapp file Launching with DYAPP=$DYAPP"
-elif [ $(ls /app/*.dws 2>/dev/null | wc -l) = 1 ]; then
-    WS=$(ls /app/*.dws)
-    echo "found dws file Launching with $WS"
-elif [ $(ls /app/*.dyapp 2>/dev/null | wc -l) -gt 1 ]; then
-    echo "found too many dyapp files Starting Dyalog with CLEAR WS"
-elif [ $(ls /app/*.dws 2>/dev/null | wc -l) -gt 1 ]; then
-    echo "found too many dws files Starting Dyalog with CLEAR WS"
-fi
+export CLASSICMODE=1 
+export SINGLETRACE=1
 
-if [ -n "${RIDE_INIT}" ]; then
-    $DYALOG/dyalog +s -q ${WS} $@
-else
-    $DYALOG/dyalog -s ${WS} $@
-fi
+WS="/app/Server/Server.dws"
 
+#if [ -n "${RIDE_INIT}" ]; then
+#    $DYALOG/dyalog.rt +s -q ${WS} $@
+#else
+#    $DYALOG/dyalog.rt -s ${WS} $@
+#fi
+
+$DYALOG/dyalog.rt +s -q ${WS} $@

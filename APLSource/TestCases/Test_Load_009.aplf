@@ -1,0 +1,16 @@
+ r←Test_Load_009(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx;pkgs
+⍝ Exercise ⎕SE.Tatin.LoadPackages on three packages with a typo on the second one.
+⍝ Should load the first and the third but report failure on the second.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ pkgs←'[localhost]aplteam-APLTreeUtils-6.0.10,[localhost]does-notExist-1.2.1,[localhost]aplteam-CompareSimple-3.0.2'
+ res←1 TC.LoadPackages pkgs'#.TEMP'
+
+ ∘∘∘
+
+ r←T._OK
+⍝Done

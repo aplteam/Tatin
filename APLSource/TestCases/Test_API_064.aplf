@@ -1,0 +1,17 @@
+ r←Test_API_064(stopFlag batchFlag);⎕TRAP;res
+⍝ Exercise ⎕SE.Tatin.LoadPackages on two packages both of wich do not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ res←1 ⎕SE.Tatin.LoadPackages'[local]DoesNotExist,[tatin]DoesAlsoNotExist' '#.TEMP'
+ →T.GoToTidyUp 0≠res
+ →T.GoToTidyUp 0≠≢#.TEMP.⎕NL⍳16
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

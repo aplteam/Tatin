@@ -17,27 +17,31 @@
  :Else
      url←('⎕'=⊃⊃⎕XSI)EstablishRegistry Reg.RemoveMinorAndPatch packageID_
  :EndIf
- fullPath←url,packageID_
- PrintToSession'Checking <',fullPath,'>...'
- :Trap 345
-     :If majorVersions
-         (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID_)url
+ :If 0=≢url
+     r←packageID_'<<< Not found anywhere >>>' '' ''
+ :Else
+     fullPath←url,packageID_
+     PrintToSession'Checking <',fullPath,'>...'
+     :Trap 345
+         :If majorVersions
+             (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveVersionNumber packageID_)url
+         :Else
+             (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID_)url
+         :EndIf
      :Else
-         (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID_)url
-     :EndIf
- :Else
-     r←packageID_'<<< No response >>>'url''
- :EndTrap
- :If 404=statusCode
-     r←packageID_'<<< Not found >>>'url''
- :Else
-     errMsg Assert 200=statusCode
-     :If 0<≢fullPath2
-         packageID2←GetPackageIDFromFilename fullPath2
-         origUrl←RemovePackageID fullPath
-         marker←packageID_≢packageID2
-         newUrl←RemovePackageID fullPath2
-         r←packageID_ packageID2 origUrl marker(newUrl/⍨origUrl≢newUrl)
+         r←packageID_'<<< No response >>>'url''
+     :EndTrap
+     :If 404=statusCode
+         r←packageID_'<<< Not found >>>'url''
+     :Else
+         errMsg Assert 200=statusCode
+         :If 0<≢fullPath2
+             packageID2←GetPackageIDFromFilename fullPath2
+             origUrl←RemovePackageID fullPath
+             marker←packageID_≢packageID2
+             newUrl←RemovePackageID fullPath2
+             r←packageID_ packageID2 origUrl marker(newUrl/⍨origUrl≢newUrl)
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

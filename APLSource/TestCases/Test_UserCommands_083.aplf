@@ -1,4 +1,4 @@
- r←Test_UserCommands_083(stopFlag batchFlag);⎕TRAP;res;msg;rc;stop
+r←Test_UserCommands_083(stopFlag batchFlag);⎕TRAP;res;msg;rc;stop
 ⍝ Exercise ]Tatin.LoadPackages on a package that has only betas but suppress betas
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,7 +8,7 @@
 
  stop←0
  (rc msg res)←stop ∆UCMD'LoadPackages [local]Laguntza #.TEMP -nobetas'
- →T.GoToTidyUp~∨/'Not found: Laguntza'⍷msg
+ →T.GoToTidyUp '0 packages (including dependencies) loaded'≢res
 
  r←T._OK
 

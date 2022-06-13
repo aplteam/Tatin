@@ -26,21 +26,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'ZipArchive' '0.1.3+13' '2022-06-06'
+      r←'ZipArchive' '1.0.0+15' '2022-06-13'
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 0.1.3 from 2022-06-06
-    ⍝   * unzip sometimes generated an error 66 (invalid CRC) when in reality it did unzip successfully
-    ⍝   * Bash statements are now catenated with "&&" rather than ";"
-    ⍝   * ZipArchive now works out whether "zip" and/or "unzip" are installed at all, and report accordingly
-    ⍝ * 0.1.2 from 2022-06-02
-    ⍝   * Problem with backslashes fixed in `UnZipTo`
-    ⍝ * 0.1.1 from 2022-05-31
-    ⍝   * Couple of bug fixes especially important for Linux & Mac-OS
-    ⍝ * 0.1.0 from 2022-05-20
-    ⍝   * First draft
+    ⍝ * 1.0.0 from 2022-06-13
+    ⍝   * First version ready for production
     ∇
 
     ∇ make1(filename);res;tempFilename;overwriteFlag
@@ -229,7 +221,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←zipFilename UnzipTo targetFolder;F;msg;noOf;qdmx;rc
+    ∇ {r}←zipFilename UnzipTo targetFolder;F;msg;rc;qdmx
     ⍝ Unzip `⍵` into `⍺`.\\
     ⍝ `targetFolder` must not yet exist.
       :Access Public Shared
@@ -245,13 +237,7 @@
               Assert 0=rc
           :Else
               qdmx←⎕DMX
-              :If 66≠qdmx.ENX
-                  (rc msg)←Exec'unzip -l ',zipFilename
-                  Assert 0=rc
-                  noOf←≢msg
-              :OrIf noOf≠≢⊃('recursive' 2)F.Dir targetFolder,'/'
-                  qdmx.Message ⎕SIGNAL qdmx.EN
-              :EndIf
+              qdmx.Message ⎕SIGNAL qdmx.EN
           :EndTrap
           ⍝ On my Ubuntu VM under Hyper-V I get files and dirs with no priviliges, so defaults need to be established:
           {}{Exec'chmod 666 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListFiles targetFolder,'/'
@@ -333,7 +319,7 @@
           rc←0
       :Else
           qdmx←⎕DMX
-          rc←,⊃(//)⎕VFI⊃¯1↑' '(≠⊆⊢)qdmx.Message
+          rc←,⊃(//)⎕VFI⊃¯1↑' '(≠⊆⊢)msg←qdmx.Message
           :If (,127)≡rc
               '"zip" and/or "unzip" not installed'⎕SIGNAL 6
           :EndIf

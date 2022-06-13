@@ -1,4 +1,4 @@
- r←{noBetas}LoadPackages(identifiers targetSpace);paths;tempFolder;loaded;qdmx
+ r←{noBetas}LoadPackages(identifiers targetSpace);paths;tempFolder;loaded;qdmx;list
 ⍝ Loads package `identifier` dynamically into the workspace,\\
 ⍝ `identifiers` must be a simple char vector identifying one or more packages.
 ⍝ Multiple packages (items) must be separated by commas.
@@ -56,12 +56,18 @@
  ⎕DL 0.02
  r←≢F.ListDirs tempFolder,'/'
  :If ~MyUserSettings.caching
- :AndIf 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨F.ListDirs tempFolder  ⍝ If there are no assets...
-     F.RmDir tempFolder                                 ⍝ ... then we delete the temp folder...
-     :If 0<≢loaded
-         loaded.code.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'     ⍝ ... and undefine "HOME".
+     list←F.ListDirs tempFolder
+     :If 0=≢list                                                ⍝ Anything? At all?!
+         F.RmDir tempFolder                                     ⍝ No assets, so we can get rid of it
+     :Else
+         :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨list ⍝ If there are no assets...
+             F.RmDir tempFolder                                 ⍝ ... then we delete the temp folder...
+             :If 0<≢loaded
+                 loaded.code.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'     ⍝ ... and undefine "HOME".
+             :EndIf
+         :ElseIf 0=+/≢¨loaded.code.TatinVars.HOME
+             F.RmDir tempFolder                                 ⍝ No assets, so we can get rid of it
+         :EndIf
      :EndIf
- :ElseIf 0=+/≢¨loaded.code.TatinVars.HOME
-     F.RmDir tempFolder                                 ⍝ No assets, so we can get rid of it
  :EndIf
 ⍝Done

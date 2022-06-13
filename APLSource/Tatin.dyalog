@@ -614,7 +614,7 @@
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
-          TC.CloseConnections ⍬
+          TC.CloseConnections 1
           ⎕SIGNAL⊂(⊂¨'EN' 'EM'),¨⊂¨qdmx.(EN EM)
       :EndTrap
     ∇
@@ -765,7 +765,7 @@
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
-          TC.CloseConnections ⍬
+          TC.CloseConnections 1
           qdmx.DM ⎕SIGNAL qdmx.EN
       :EndTrap
     ∇

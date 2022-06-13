@@ -1,13 +1,19 @@
  r←Test_UserCommands_084(stopFlag batchFlag);⎕TRAP;res;msg;rc;stop
-⍝ Exercise ]Tatin.GetDeletePolicy on an alias (was once a bug)
+⍝ Exercise ]Tatin.LoadPackages on several packages of which two do not exist
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
  stop←0
- (rc msg res)←stop ∆UCMD'GetDeletePolicy [tatin]'
- →T.PassesIf 0=rc
- →T.PassesIf'None'≡res
+ (rc msg res)←stop ∆UCMD'LoadPackages [local]APLTreeUtils2,Does-NotExist,[tatin]Does-AlsoNotExist #.TEMP -nobetas'
+ Assert 0=rc
+ →T.GoToTidyUp'1 package (including dependencies) loaded'≢res
 
  r←T._OK
 
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :Trap 0 ⋄ F.RmDir res ⋄ :EndTrap
 ⍝Done

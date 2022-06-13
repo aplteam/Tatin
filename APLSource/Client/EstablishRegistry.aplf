@@ -1,4 +1,4 @@
- reg←{askUserFlag}EstablishRegistry packageID;registries;uri;alias;list;msg;CR;i;options;stopFlag;skipped;opCode;port
+ reg←{askUserFlag}EstablishRegistry packageID;registries;uri;alias;list;msg;i;options;stopFlag;skipped;opCode;port
 ⍝ The purpose of this function is to establish the registry a package can be found in.
 ⍝ Useful in case the user specified just a package ID but no Registry but also for
 ⍝ dependencies: ReInstallDependencies for example **always** scans all Registries for
@@ -7,6 +7,7 @@
 ⍝ ({group}-{name} or {group}-{name}-{major}) or even just {name}.\\
 ⍝ The function scans all registries according to the user settings and stops as soon
 ⍝ as it finds a Registry that hosts the package in question.\\
+⍝ If the package os not hosted by any Registry `reg` is empty.
 ⍝ In case a server does not respond then `askUserFlag` decides what will happen:
 ⍝ If it's called from any Tatin user command `askUserFlag` will default to 1, otherwise 0.
 ⍝ A 0 means that an error will be thrown: we don't know what to do then.
@@ -59,10 +60,7 @@
          {}{PrintToSession ⍵}⍣(0=≢reg)⊣'   not found in ',uri
      :Until (i=≢registries)∨0<≢reg
      :If 0=≢reg
-         CR←⎕UCS 13
-         msg←CR,'Package <',packageID,'> not found in any of these Registries:'
-         msg,←⊃,/(⊂CR,'  '),¨{0<≢2⊃⍵:'[',(2⊃⍵),']' ⋄ 1⊃⍵}¨registries.(uri alias)
-         msg Assert 0
+         PrintToSession'   not found anywhere'
      :Else
          PrintToSession'   found in ',uri
      :EndIf

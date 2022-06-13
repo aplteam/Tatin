@@ -1,5 +1,5 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_
- ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
+ r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep
+ ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
 ⍝ Multiple packages must be separated by commas.
@@ -16,18 +16,25 @@
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  CheckInstallFolder targetFolder
  identifiers←','(≠⊆⊢)identifiers
+ ∆PermanentConnections←⎕NS''        ⍝ Establish but without any connections yert: we don't know whether we need any
+ ∆PermanentConnections.keepOpen←1   ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
  :For identifier_ :In identifiers
      (alias identifier_)←SplitAtAlias identifier_
      identifier←ReplaceRegistryAlias identifier_
      ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
      identifier←noBetas CheckVersion identifier
-     'Package not found'Assert 0<≢identifier
+     :If 0=≢identifier    ⍝ Not found?
+         :Continue
+     :EndIf
      PrintToSession'  Attempting to install ',identifier,'...'
      :If ∧/~'\/'∊identifier
      :AndIf '.zip'≢⎕C ¯4↑identifier
          packageID←GetPackageIDFromFilename identifier
          :If ~∨/'/\:'∊identifier
              identifier←(EstablishRegistry packageID),packageID
+             :If 0=≢(-≢packageID)↓identifier
+                 :Continue
+             :EndIf
              PrintToSession⊃{'Installing <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
          :EndIf
      :EndIf
@@ -36,53 +43,7 @@
          'ZIP files cannot be installed via HTTP'Assert 0
      :EndIf
      PrintToSession'  Establish dependencies...'
-     :If 0<≢buildList←GetDependencyTree alias,identifier
-         PrintToSession'  ',(⍕≢buildList),' dependenc',((1+1=≢buildList)⊃'ies' 'y'),' identified'
-         CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename identifier)
-         :For principal packageID2 url :In ↓buildList
-             (alias packageID2)←SplitAtAlias packageID2
-             installFolder←(Reg.AddSlash targetFolder),packageID2
-             :If principal
-                 ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
-             :EndIf
-             :If F.IsDir installFolder
-                 F.RmDir installFolder
-             :AndIf F.IsDir installFolder
-                 ⎕DL 0.02
-                 msg←'Could not remove install folder (package was apparently already installed):',⎕UCS 13
-                 msg,←installFolder
-                 msg Assert 0
-             :EndIf
-             :If MyUserSettings.caching
-             :AndIf 0<≢path2cache←CompilePath2PackageInCache url packageID2
-             :AndIf 0=GetNoCachingFlag url
-             :AndIf 0<≢path2cache
-                 PrintToSession'  Fetching from Tatin package cache...'
-                 tempDir←GetPackageFromCache url packageID2 path2cache
-                 cacheFlag←0
-             :Else
-                 (tempDir cacheFlag)←InstallPackage_ packageID2 url
-             :EndIf
-             :If IsHTTP url
-             :AndIf cacheFlag
-                 installFolder ⎕NCOPY tempDir
-             :Else
-                 installFolder ⎕NMOVE tempDir
-             :EndIf
-             :If principal
-                 PrintToSession'  Add ',packageID2,' to dependency file...'
-                 targetFolder Dependencies.Add alias,packageID2
-             :EndIf
-         :EndFor
-         buildList[;3]←ReplaceCachePathByURL¨buildList[;3]
-         PrintToSession'  Saving build list... '
-         buildList←SaveBuildList buildList targetFolder
-         :If ∨/bool←({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}alias,identifier_){⍺∘≡¨(≢⍺)↑¨⍵}buildList[;2]
-             r,←buildList[bool⍳1;2]
-         :Else
-             r,←buildList[1;2]
-         :EndIf
-     :EndIf
+     r,←targetFolder InstallPackage_ alias identifier
  :EndFor
- CloseConnections 0
+ CloseConnections 1
 ⍝Done

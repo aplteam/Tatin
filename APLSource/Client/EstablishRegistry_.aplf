@@ -32,7 +32,11 @@
              :EndSelect
          :Else
              qdmx←⎕DMX
-             qdmx.EM ⎕SIGNAL qdmx.EN
+             :If 'ERROR 345'≡qdmx.EM
+                 (uri,' did not respond')⎕SIGNAL qdmx.EN
+             :Else
+                 qdmx.EM ⎕SIGNAL qdmx.EN
+             :EndIf
          :EndIf
      :EndTrap
  :Until stopFlag

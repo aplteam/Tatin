@@ -11,7 +11,10 @@
  errCounter←0
  :If 0=⎕NC'∆PermanentConnections'
 ∆Try_Again:
-     ∆PermanentConnections←⎕NS''
+ :OrIf 0=≢∆PermanentConnections.⎕NL 9
+     :If 0=⎕NC'∆PermanentConnections'
+         ∆PermanentConnections←⎕NS''
+     :EndIf
      regs←ListRegistries''
      regs←(0<regs[;4])⌿regs
      regs←(IsHTTP¨regs[;1])⌿regs
@@ -25,7 +28,10 @@
          →(2>errCounter)/∆Try_Again
          'Unable to establish HTTP connections'⎕SIGNAL 998
      :EndTrap
-     ∆PermanentConnections.keepOpen←keepOpen
+     :If 0=∆PermanentConnections.⎕NC'keepOpen'
+     ⍝ If it already exists it will be 1 for sure because we did establish the namespace as empty but with keepOpen←1
+         ∆PermanentConnections.keepOpen←keepOpen
+     :EndIf
      r←1
  :EndIf
 ⍝Done

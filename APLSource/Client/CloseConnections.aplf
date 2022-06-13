@@ -1,10 +1,18 @@
- {r}←CloseConnections force;list
+ {r}←CloseConnections force;list;flag
 ⍝ Close all permanent connections defined within ∆PermanentConnections, and delete that namespace.
+⍝ That can be prevented by injecting `keepOpen←1` into ∆PermanentConnections which in turn
+⍝ can be overwritten with ⍵←1.
  r←⍬
  :If 9=⎕NC'∆PermanentConnections'
  :AndIf 0<≢∆PermanentConnections.⎕NL 9
-     :If 0=∆PermanentConnections.⎕NC'keepOpen'
-     :OrIf 0=∆PermanentConnections.keepOpen
+     flag←1
+     :If ~force
+         :If 0<∆PermanentConnections.⎕NC'keepOpen'
+         :AndIf ∆PermanentConnections.keepOpen
+             flag←0
+         :EndIf
+     :EndIf
+     :If flag
          list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
          {}{⍵ R.Close 0}¨list
          ⎕EX'∆PermanentConnections'

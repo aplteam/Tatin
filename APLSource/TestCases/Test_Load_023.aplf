@@ -1,0 +1,17 @@
+ r←Test_Load_023(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx;pkgs
+⍝ Exercise ⎕SE.Tatin.LoadPackages on two packages both of which do not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ pkgs←'DoesNotExist,DoesAlsoNotExist'
+
+ res←1 TC.LoadPackages pkgs'#.TEMP'
+
+ →T.PassesIf 0=res
+ →T.PassesIf 0=≢#.TEMP.⎕NL⍳16
+
+ r←T._OK
+⍝Done

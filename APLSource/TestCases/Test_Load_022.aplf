@@ -1,0 +1,20 @@
+ r←Test_Load_022(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx;pkgs;expected
+⍝ Exercise ⎕SE.Tatin.LoadPackages on two packages with incomplete package IDs and also a typo on the third one.
+⍝ Therefore only the first and the second one will get loaded.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ pkgs←'APLTreeUtils,notExist'
+
+ res←1 TC.LoadPackages pkgs'#.TEMP'
+
+ →T.PassesIf 1=res
+ →T.PassesIf 1=≢#.TEMP.⎕NL⍳16
+ expected←,⊂'#._tatin.aplteam_APLTreeUtils_7_0_0.code.APLTreeUtils'
+ →T.PassesIf expected≡⍕¨#.TEMP.{⍎¨⎕NL ⍵}¯9
+
+ r←T._OK
+⍝Done

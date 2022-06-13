@@ -1,4 +1,4 @@
- r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions
+ r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;∆PermanentConnections
 ⍝ `path` must point to a folder with installed packages, meaning that there
 ⍝ must be a file apl-buildlist.json available. This is mandatory.
 ⍝ The optional left argument can carry flags as a single integer:
@@ -24,9 +24,12 @@
  buildFilename←path,Reg.BuildListFilename
  ('File not found: ',buildFilename)Assert F.IsFile buildFilename
  buildList←Reg.JSON⊃F.NGET buildFilename
+ ∆PermanentConnections←⎕NS''        ⍝ Establish but without any connections yert: we don't know whether we need any
+ ∆PermanentConnections.keepOpen←1   ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
  :If 0=≢buildList.packageID
      r←0 5⍴⍬
  :Else
      r←↑majorVersions CheckForLaterVersion_¨(dependencies⌈buildList.principal)/buildList.packageID
  :EndIf
+ CloseConnections 1
  ⍝Done

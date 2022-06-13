@@ -1,42 +1,56 @@
- (tempDir cacheFlag)←InstallPackage_(packageID url);zipFilename;isHTTP;path
+ r←targetFolder InstallPackage_(alias packageID);buildList;principal;packageID2;installFolder;msg;path2cache;url;bool;tempDir;cacheFlag;success
 ⍝ Fetches a package and unzips it into a temp folder.
 ⍝ When caching is on, the temp folder is created within the top-level of the cache folder.
 ⍝ Otherwise a folder is created inside the temp directory of the given OS.
- :If isHTTP←Reg.IsHTTP url
-     PrintToSession'  Fetching from ',url,'...'
-     zipFilename←GetPackageViaHTTP url,packageID
- :Else
-     :If '.zip'≡¯4↑url
-         zipFilename←RemoveFileProtocol url
+⍝ `success` is 0 in case the server does not exist or does not respond etc but otherwise 1.
+ r←''
+ :If 0<≢buildList←GetDependencyTree alias,packageID
+     PrintToSession'  ',(⍕≢buildList),' dependenc',((1+1=≢buildList)⊃'ies' 'y'),' identified'
+     CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename packageID)
+     :For principal packageID2 url :In ↓buildList
+         (alias packageID2)←SplitAtAlias packageID2
+         installFolder←(Reg.AddSlash targetFolder),packageID2
+         :If principal
+             ('Installation folder "',installFolder,'" is a file')Assert 0=F.IsFile installFolder
+         :EndIf
+         :If F.IsDir installFolder
+             F.RmDir installFolder
+         :AndIf F.IsDir installFolder
+             ⎕DL 0.02
+             msg←'Could not remove install folder (package was apparently already installed):',⎕UCS 13
+             msg,←installFolder
+             msg Assert 0
+         :EndIf
+         :If MyUserSettings.caching
+         :AndIf 0<≢path2cache←CompilePath2PackageInCache url packageID2
+         :AndIf 0=GetNoCachingFlag url
+         :AndIf 0<≢path2cache
+             PrintToSession'  Fetching from Tatin package cache...'
+             tempDir←GetPackageFromCache url packageID2 path2cache
+             cacheFlag←0
+         :Else
+             (success tempDir cacheFlag)←InstallPackage__ packageID2 url
+             :If 0=success
+                 :Return
+             :EndIf
+         :EndIf
+         :If IsHTTP url
+         :AndIf cacheFlag
+             installFolder ⎕NCOPY tempDir
+         :Else
+             installFolder ⎕NMOVE tempDir
+         :EndIf
+         :If principal
+             PrintToSession'  Add ',packageID2,' to dependency file...'
+             targetFolder Dependencies.Add alias,packageID2
+         :EndIf
+     :EndFor
+     buildList[;3]←ReplaceCachePathByURL¨buildList[;3]
+     PrintToSession'  Saving build list... '
+     buildList←SaveBuildList buildList targetFolder
+     :If ∨/bool←({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}alias,identifier_){⍺∘≡¨(≢⍺)↑¨⍵}buildList[;2]
+         r,←buildList[bool⍳1;2]
      :Else
-         zipFilename←RemoveFileProtocol url,'/',packageID,'.zip'
+         r,←buildList[1;2]
      :EndIf
-     ('File <',zipFilename,'> does not exist')Assert F.IsFile zipFilename
  :EndIf
- zipFilename←F.EnforceSlash zipFilename
- :If MyUserSettings.caching                                                              ⍝ If caching is generally active...
- :AndIf IsHTTP url                                                                       ⍝ ... and its coming from the web (rather than locally) ...
- :AndIf 0=GetNoCachingFlag url                                                           ⍝ ... and is not switched off for this particular registry...
- :AndIf 'Any'≢GetDeletePolicy url                                                        ⍝ ... and the registry does not operate an "All" delete policy ...
- :AndIf ~Reg.IsBeta packageID                                                            ⍝ ... and the package is not a beta version...
-     cacheFlag←1
-     PrintToSession'  Save package in cache...'
-     tempDir←GetPathToPackageCache,'/temp/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN   ⍝ ... then and only then do we write to the cache folder.
- :Else
-     tempDir←Reg.GetTempDir,'/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN               ⍝ Otherwise to the temp folder of the OS
-     cacheFlag←0
- :EndIf
- :If 0=F.IsDir tempDir
-     F.MkDir tempDir
-     ⎕DL 0.2
- :EndIf
- PrintToSession'  Unzipping ',zipFilename,'...'
- zipFilename ZipArchive.UnzipTo tempDir
- tempDir Add2Config'uri'(RemoveFileProtocol url)
- :If isHTTP
-     :If cacheFlag
-         tempDir←MovePackageToCache tempDir url packageID
-     :EndIf
-     F.DeleteFile zipFilename
- :EndIf
-⍝Done

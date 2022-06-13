@@ -1,0 +1,22 @@
+ {r}←ProcessLogFile filename;data;date;packageIDs;months;months2;date2
+⍝ Take the log file `filename` is pointing to and make the data useful for a package author
+ r←⍬
+ 'File does not exist'##.Registry.Assert ⎕NEXISTS filename
+ data←⊃⎕NGET filename 1
+⍝ Compress the data so that we get group, name, YYYY-MM and count
+ data←(∨/¨'] "GET /aplteam-'∘⍷¨data)/data
+ data←(' - - '{(≢⍺)+1⍳⍨⍺⍷⍵}1⊃data)↓¨data
+ date←(-≢' 0000')↓¨({¯1+⍵⍳']'}1⊃data)↑¨data
+ packageIDs←('"get '{(≢⍺)+1⍳⍨⍺⍷⎕C ⍵}1⊃data)↓¨data
+ packageIDs←(¯1+packageIDs⍳¨' ')↑¨packageIDs
+ packageIDs←{⍵/⍨2>+\'-'=⍵}¨packageIDs
+ months←↓12 3⍴'JanFebMarAprMayJunJulAugSepOctNovDec'
+ months2←↓12 2⍴'010203040506070809101112'
+ date2←(4↑¨7↓¨date),¨'-',¨(months2[months⍳(⊂⊂4 5 6)⌷¨date])
+ r←packageIDs,[1.5]date2
+ r←r[⍒r[;2];]
+ r←r[⍋r[;1];]
+ r←{⍺,≢⍵}⌸r
+⍝ Write into a temp zip file
+∘∘∘   ⍝TODO⍝
+ ⍝Done

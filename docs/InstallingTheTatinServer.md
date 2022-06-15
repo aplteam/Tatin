@@ -196,7 +196,7 @@ This section tells Plodder where to find the application-specific logic (Tatin).
 
 ## How to start the Tatin server
 
-After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace.
+After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace. `#.Tatin.Server.Run 1` is executed via `⎕LX`, and your server is up and running.
 
 Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but would not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.
 
@@ -220,8 +220,49 @@ Running the server as a Windows Service gives you the best performance, but runn
 Under Linux you are advised to run the Tatin Server in a Docker image. 
 
 
-### Amendments 
+### Required amendments 
 
+#### The file `Dockerfile`
+
+1. Linux Version
+
+   Specify both the name of the desired distribution and the version number in the `FROM` clause at the top of the file. In the template this is "Ubuntu" and "22.04".
+
+2. It's is a Docker convention to specify the Docker username and email address of a maintainer in the `MAINTAINER` clause.
+
+3. Dyalog APL
+
+   Before anything else make sure that you copy the appropriate version of Dyalog APL into the folder that holds the Docker-related files.
+
+4. Dockerfile
+
+   This file defines what docker should put into the container. In particular it must point to the desired version of Dyalog APL, so check the variables `DYALOG_RELEASE`, `DYALOG_VERSION` and `DYALOG_DEBFILE`.
+
+5. Do **not** change the `WORKDIR`!
+
+6. Do not change `DYALOG_SERIAL`: this license number is explicitly reserved for Tatin servers.
+
+#### The file `entrypoint`
+
+In this file a couple of environment variables are defined that might not be set to your taste: `TRACE_ON_ERROR`, `SINGLETRACE` and `CLASSICMODE`. 
+
+#### The file `CreateTatinDockerContainer.sh`
+
+1. You must change the `source` parameter so that it points to the folder that hosts the Tatin server data.
+
+2. You might need to change the port 443, defined with the `-p` flag.
+
+   This can only ever be 80 or 443 on your local machine because if a Tatin server is exposed to the Internet it should run behind a web server like Appache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.
+
+3. The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note the the INI file rules whether the interpreter allows a Ride or not)
+
+### Docker work flow
+
+Execute these steps:
+
+1. Call  `./BuildImage.sh` for creating the image
+2. Call  `./CreateTatinDockerContainer.sh` for creating the container
+3. Call  `start-tatin.sh` to actually start the container; this script ensures that the container is restarted after a crash or auto-started after a reboot
 
 ## Testing and Debugging
 

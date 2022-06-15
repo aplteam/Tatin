@@ -13,14 +13,13 @@ While the Tatin Client is coming with version 19.0 and later automatically, the 
 
 After downloading it from <https://github.com/aplteam/Tatin/releases> you need to unzip it into a folder where the Tatin Server is supposed to live.
 
+
 ## Requirements
 
 * Dyalog Unicode 18.0 or better
 * Windows or Linux
 
-  For the time being neither the Pi nor Mac OS nor AIX are supported. This restriction might be lifted for the Pi and/or Mac OS but not AIX.
-
-* .NET (on _all_ platforms)
+  For the time being neither the Pi nor Mac OS nor AIX are supported. These restrictions might be lifted at a later stage.
 
 ## Configuration: the INI File
 
@@ -206,14 +205,22 @@ In such an event you are most likely interested in the server being restarted au
 
 ### Windows 
 
-Under Windows you might run the Tatin Server as a Windows Service. Such a service can be configured so that it is restarted automatically in case of a failure.
+Under Windows you have two options:
+
+* Run the Tatin Server as a Windows Service
+* Run it as a Docker container
+
+Both options allow to run the Server so that it is restarted automatically in case of a failure or a reboot.
+
+Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, and it is easy to achieve.
 
 
 ### Linux
 
 Under Linux you are advised to run the Tatin Server in a Docker image. 
 
-A [Dyalog docker image](https://hub.docker.com/r/aplteam/docker "Link to the download page") is available for download.
+
+### Amendments 
 
 
 ## Testing and Debugging

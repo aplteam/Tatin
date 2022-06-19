@@ -1,0 +1,12 @@
+ success←Initial_Log parms;path
+ :If 0<##.⎕NC'CiderConfig'
+     path←##.CiderConfig.HOME
+ :Else
+     path←F.PWD
+ :EndIf
+ ∆LOG_PATH←(F.GetTempSubDir'Tatin-Log'),'/'
+ ∆LOG_PATH ⎕NCOPY⍠('Wildcard' 1)⊣path,'/TestData/Log/*'
+ TS←##.Server
+ ##.Server.CreateAllRefs
+ success←1
+⍝Done

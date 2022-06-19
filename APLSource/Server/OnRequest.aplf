@@ -3,31 +3,33 @@
  :If '/ping'≡request.Path
      response←request R.Respond 200
  :Else
-     :If 0=G.INI.Get'Trap:Policy'
-     :AndIf ~request.Connection.Server.Trap
+     :Hold 'BLOCKED'   ⍝ Used by `Logs.CheckLogFile` for blocking all requests when dealing with the log file (once a year)
+         :If 0=G.INI.Get'Trap:Policy'
+         :AndIf ~request.Connection.Server.Trap
          ⍝ Invalidate Rumba's top level error trapping
-         ⎕SHADOW'⎕TRAP'
-         ⎕TRAP←0 'S'
-     :EndIf
-     :If 0<≢logMsg←CheckTatinVersion request
-         response←request Respond 400 0
-         response.Content←logMsg
-     :Else
-         :Select request.Method
-         :CaseList 'GET' 'HEAD'
-             response←Handle_GET request
-         :Case 'PUT'
-             response←Handle_PUT request
-         :Case 'DELETE'
-             response←Handle_Delete request
-         :Else
-             response←ReturnNOT_IMPLEMENTED request
-         :EndSelect
-         logMsg←request.Method,' ',(⍕response.StatusCode),' ',request.RequestTarget
-         :If 200≠response.StatusCode
-             logMsg,←(326≠⎕DR response.Content)/'; ',response.Content
+             ⎕SHADOW'⎕TRAP'
+             ⎕TRAP←0 'S'
          :EndIf
-     :EndIf
-     Log logMsg
+         :If 0<≢logMsg←CheckTatinVersion request
+             response←request Respond 400 0
+             response.Content←logMsg
+         :Else
+             :Select request.Method
+             :CaseList 'GET' 'HEAD'
+                 response←Handle_GET request
+             :Case 'PUT'
+                 response←Handle_PUT request
+             :Case 'DELETE'
+                 response←Handle_Delete request
+             :Else
+                 response←ReturnNOT_IMPLEMENTED request
+             :EndSelect
+             logMsg←request.Method,' ',(⍕response.StatusCode),' ',request.RequestTarget
+             :If 200≠response.StatusCode
+                 logMsg,←(326≠⎕DR response.Content)/'; ',response.Content
+             :EndIf
+         :EndIf
+         Log logMsg
+     :EndHold
  :EndIf
 ⍝Done

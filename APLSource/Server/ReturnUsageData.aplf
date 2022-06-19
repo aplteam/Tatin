@@ -1,0 +1,30 @@
+ response←ReturnUsageData request;html;filename;list
+⍝ Returns a page that offers information and download links for browser requests and lists
+⍝ and files in case of a JSON request
+ response←R.NewResponse request
+ :If IsJsonRequest request.Headers
+     :If 'list'≢request.Query
+         list←','(≠⊆⊢)2⊃request.QueryParameters[1;]
+         :If 0=≢list
+             response.StatusCode←404
+         :Else
+             filename←(∊P.LogFolder),⊃request.QueryParameters[1;2]
+             response.IsFile←1
+             response.FilePath←filename
+             response.ContentType←'application/zip'
+         :EndIf
+     :Else                          ⍝ No, so we just return a list
+         :If 0<≢list←⊃F.Dir(∊P.LogFolder),'*.zip'
+             response.Content←⊃{⍺,',',⍵}/(≢∊P.LogFolder)↓¨list
+         :EndIf
+     :EndIf
+ :Else
+     html←HtmlHeader''
+     html,←⊂'<h2>Usage data</h2>'
+     html,←GetStatistics ⍬
+     html,←⊆GetFooter
+     html,←⊂'</body>'
+     html,←⊂'</html>'
+     response←request ReturnHTML html
+ :EndIf
+⍝Done

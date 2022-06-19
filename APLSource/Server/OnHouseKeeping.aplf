@@ -1,8 +1,10 @@
- {r}←OnHouseKeeping msg;savedAt;rideable;rideableOld;rideActive;⎕TRAP
+ {r}←OnHouseKeeping msg;savedAt;rideable;rideableOld;rideActive
 ⍝ Used for these purposes:
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
 ⍝ * Check the INI file; if it has been changed re-instantiate the INI file
+⍝ * Check whether the file "year" in the log folder is identical to ⊃⎕TS; if it
+⍝   is not then take action.
  r←0
  ReportNumberOfThreads G.INI
  :If 1=∆SHUTDOWN
@@ -18,7 +20,6 @@
      :If 0<⎕NC'∆WS_HASH'
          ReloadThisWorkspaceIfChanged G.INI
      :EndIf
-     ⎕TRAP←0 'S'
      :If G.CredentialsTimestamp≢Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.RegistryPath,'/Credentials.txt'
          G←ProcessCredentials G         ⍝  It has changed, so we read it again
      :EndIf
@@ -37,5 +38,6 @@
          :EndIf
          Log msg
      :EndIf
+     Logs.CheckLogFile∊P.LogFolder
  :EndIf
 ⍝Done

@@ -1,0 +1,29 @@
+ {r}←{TS}AccumulateCurrentYear(month folder);logFilename;monthFilename;d;year;statFilename;month_;zipFilename;zip;colTitles
+ TS←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕TS}'TS'
+ r←0
+ logFilename←folder,'log.txt'
+ monthFilename←folder,'month'
+ :If 0=month←TS[2]-1
+     month←12
+     year←⍕¯1+1⊃TS
+ :Else
+     year←⍕1⊃TS
+ :EndIf
+ month_←¯2↑'00',⍕month
+ :If 0<month
+     d←⊃⎕NGET logFilename 1                 ⍝ Data
+ :AndIf 0<≢d←ProcessLogFile d
+ :AndIf 0<≢d←(month≥##.A.ToNum,' ',↑d[;5])⌿d
+ :AndIf 0<≢d←(d[;4]≡¨⊂year)⌿d
+     statFilename←folder,'stats-',(⍕year),'-',month_,'.csv'
+     ##.F.DeleteFile statFilename
+     colTitles←'Group' 'Name' 'Version' 'Year' 'Month' 'Downloads'
+     d colTitles ⎕CSV statFilename
+     zipFilename←⊃,/(¯1↓⎕NPARTS statFilename),⊂'.zip'
+     ##.F.DeleteFile zipFilename
+     zip←⎕NEW ##.ZipArchive(,⊂zipFilename)   ⍝TODO⍝  This might fail because the file is just send somewhere: add :Hold
+     folder zip.Add(≢folder)↓statFilename
+     r←1
+ :EndIf
+ (⊂⍕2⊃TS)⎕NPUT monthFilename 1
+⍝Done

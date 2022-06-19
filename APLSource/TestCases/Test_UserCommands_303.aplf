@@ -1,0 +1,18 @@
+ r←Test_UserCommands_303(stopFlag batchFlag);⎕TRAP;rc;msg;res;stop;tempFolder
+⍝ Exercise ]TatIN.UsageData with -download flag and the -folder= option
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+
+ tempFolder←F.GetTempSubDir⊃⎕SI
+ (rc msg res)←stop ∆UCMD'UsageData [localhost] -download -all -folder=',tempFolder
+ →T.GoToTidyUp 0≠rc
+ →T.GoToTidyUp tempFolder≢res
+ →T.GoToTidyUp 2≠≢F.ListFiles res
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir tempFolder
+⍝Done

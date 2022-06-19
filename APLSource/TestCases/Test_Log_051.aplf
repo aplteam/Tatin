@@ -1,0 +1,16 @@
+ r←Test_Log_051(stopFlag batchFlag);⎕TRAP;list;folder
+⍝ Exercise the "Download" method with a filename
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←TC.UsageDataGetList'[localhost]'
+ →T.PassesIf 0<≢list
+ folder←TC.UsageDataGetFiles'[localhost]'list
+ →T.PassesIf 0<≢folder
+ →T.PassesIf F.IsDir folder
+ list←F.ListFiles folder
+ →T.PassesIf 0<≢list
+ →T.PassesIf(,⊂'.zip')≡∪¯4↑¨list
+
+ r←T._OK
+⍝Done

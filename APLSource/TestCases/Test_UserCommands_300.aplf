@@ -1,0 +1,14 @@
+ r←Test_UserCommands_300(stopFlag batchFlag);⎕TRAP;rc;msg;res;stop
+⍝ Exercise ]TatIN.UsageData with just an alias to get a list of all files available for download
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+
+ (rc msg res)←stop ∆UCMD'UsageData [localhost]'
+ →T.PassesIf 0=rc
+ →T.PassesIf 0<≢res
+ →T.PassesIf 2=≡res
+
+ r←T._OK
+⍝Done

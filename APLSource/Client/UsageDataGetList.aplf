@@ -1,0 +1,23 @@
+ r←UsageDataGetList uri;uri_;request;res;client;file
+⍝ Returns a list with all usage data files available for download from `uri`.\\
+⍝ `uri` must be either the URI or an alias of a running Tatin server.
+ uri_←ReplaceRegistryAlias uri
+ 'No (valid) Registry specified?!'Assert 0<≢uri_
+ 'You must specify a running Tatin server'Assert Reg.IsHTTP uri_
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/usage-data?list'
+ request.RequestTarget←(-'&'=¯1↑request.RequestTarget)↓request.RequestTarget
+ request.Headers,←⊂'Accept' 'application/json'
+ res←SendAndReceive uri_ request
+ :If 200≡res.StatusCode
+     :If 0=≢res.Content
+         r←''
+     :Else
+         r←','(≠⊆⊢)res.Content
+     :EndIf
+ :ElseIf 404≡res.StatusCode
+     'Command is not available'Assert 0
+ :Else
+     ('Server error, RC=',res.StatusCode)Assert 0
+ :EndIf
+⍝Done

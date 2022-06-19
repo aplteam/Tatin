@@ -1,0 +1,26 @@
+ {r}←{TS}SplitLogFile(oldYear folder);d;ind;logFilename;yearFilename;statFilename;zip;zipFilename;colTitles;monthFilename
+ TS←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕TS}'TS'
+ r←⍬
+ logFilename←folder,'log.txt'
+ d←⊃⎕NGET logFilename 1                 ⍝ Data
+ ind←1+¯1↑('\[[0-3][0-9]/[a-zA-Z]{3}/',⍕oldYear)⎕S 2⊣d
+ :If ind≠≢d
+     :Hold 'BLOCKED'
+         yearFilename←folder,'year'
+         monthFilename←folder,'month'
+         (⊂ind↓d)⎕NPUT logFilename 1
+         (⊂⍕1⊃TS)⎕NPUT yearFilename 1
+         (⊂⍕2⊃TS)⎕NPUT monthFilename 1
+     :EndHold
+     :If 0<≢d←ind⍴d
+     :AndIf 0<≢d←ProcessLogFile d
+         statFilename←folder,'stats-',(⍕oldYear),'.csv'
+         colTitles←'Group' 'Name' 'Version' 'Year' 'Month' 'Downloads'
+         d colTitles ⎕CSV statFilename
+         zipFilename←⊃,/(¯1↓⎕NPARTS statFilename),⊂'.zip'
+         ##.F.DeleteFile zipFilename
+         zip←⎕NEW ##.ZipArchive(,⊂zipFilename)
+         folder zip.Add(≢folder)↓statFilename
+     :EndIf
+ :EndIf
+⍝Done

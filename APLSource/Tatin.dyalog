@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.38.0+2 - 2022-05-29
+⍝ * 0.39.0+2 - 2022-0617
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -152,6 +152,12 @@
           c.Name←'Cache'
           c.Desc←'List contents of the Tatin package cache'
           c.Parse←'1s -clear -path -force'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'UsageData'
+          c.Desc←'Make usage data available for the specified Tatin Registry'
+          c.Parse←'1s -download -unzip -all -folder='
           r,←c
      
           r.Group←⊂NM
@@ -321,6 +327,35 @@
           b←1≡¨r[;4]
           r[⍸b;4]←'*'
           r[2↓⍸~b;4]←⊂''
+      :EndIf
+    ∇
+
+    ∇ r←UsageData Arg;registry;list;ind;list2
+      :If 0≡registry←Arg._1
+          →(⍬≡registry←SelectRegistry 0)/0
+      :EndIf
+      :If 0≡Arg.download
+          r←TC.UsageDataGetList registry
+      :Else
+          r←''
+          list←TC.UsageDataGetList registry
+          :If 0≡Arg.all
+              ind←'Please select the file(s) you wish to download:' 1 0 Select list
+              →(0=ind)/0
+          :Else
+              ind←⍳≢list
+          :EndIf
+          :If 0≡Arg.folder
+              r←TC.UsageDataGetFiles registry(list[ind])
+          :Else
+              r←Arg.folder TC.UsageDataGetFiles registry(list[ind])
+          :EndIf
+          :If 0≢Arg.unzip
+              list2←(⊂r,'/'),¨list[ind]
+          :AndIf ∧/⎕NEXISTS¨list2
+              r∘{⍵ TC.ZipArchive.UnzipTo ⍺}¨list2
+              TC.F.DeleteFile TC.F.ListFiles r,'/*.zip'
+          :EndIf
       :EndIf
     ∇
 
@@ -972,7 +1007,7 @@
               r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
               r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> [-edit] [-delete]'
           :Case ⎕C'UnInstallPackage'
-              r,←⊂'Uninstalls a given package and possibly all its dependencies.'
+              r,←⊂'Uninstall a given package and possibly all its dependencies.'
               r,←'' '  ]Tatin.UnInstallPackage [<package-ID|package-alias>] <package-folder> -cleanup -quiet'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
@@ -987,13 +1022,13 @@
               r,←⊂'List all versions of the given package.'
               r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name> [-date]'
           :Case ⎕C'Version'
-              r,←⊂'Prints name, version number and version date of Tatin to the session.'
+              r,←⊂'Print name, version number and version date of Tatin to the session.'
               r,←'' '  ]Tatin.Version'
           :Case ⎕C'ListTags'
               r,←⊂'List all unique tags as defined in all packages on a server, sorted alphabetically.'
               r,←'' '  ]Tatin.ListTags [<Registry-URL>] [-tags=]'
           :Case ⎕C'Init'
-              r,←⊂'(Re-)Establishe the user settings in ⎕SE.'
+              r,←⊂'(Re-)Establish the user settings in ⎕SE.'
               r,←'' '  ]Tatin.Init [<config-folder>]'
           :Case ⎕C'CheckForLaterVersion'
               r,←⊂'Check whether for the installed packages a later versions are available.'
@@ -1014,8 +1049,11 @@
               r,←⊂'Try to contact the specified or all known Tatin servers'
               r,←'' '  ]Tatin.Ping [server-url]'
           :Case ⎕C'Cache'
-              r,←⊂'Lists the contents of the Tatin package cache.'
+              r,←⊂'List the contents of the Tatin package cache.'
               r,←'' '  ]Tatin.Cache [url] -path -clear -force'
+          :Case ⎕C'UsageData'
+              r,←⊂'Make package usage data available.'
+              r,←'' '  ]Tatin.UsageData [Registry-alias|Registry-URL] -download -all -folder='
           :EndSelect
           :If 'Version'≢Cmd
               r,←''(']Tatin.',Cmd,' -?? ⍝ Enter this for more information ')
@@ -1326,6 +1364,24 @@
               r,←⊂'       all packages of that URL.'
               r,←⊂'-force Ignored in case -clear was not specified as well. Prevents the user from being'
               r,←⊂'       interrogated regarding clearing the cache. Mainly for test cases.'
+          :Case ⎕C'UsageData'
+              r,←⊂'Use this to deal with usage data of a Tatin server.'
+              r,←⊂'If no argument was specified at all then the user will be prompted for the Registry,'
+              r,←⊂'except when there is just one anyway.'
+              r,←⊂''
+              r,←⊂'If only a URL (or alias) is specified a list with all downloadable files is printed.'
+              r,←⊂''
+              r,←⊂'-download Use this flag to indicate that you wish to download one or more files'
+              r,←⊂'          A list with all files available for download will be presented to you together'
+              r,←⊂'          with the additional options "all" and "quit". You may then select none, one,'
+              r,←⊂'          several or all files for download'
+              r,←⊂'          The folder holding the file(s) is printed together with a list of all files'
+              r,←⊂'-folder   By default downloaded files will be saved in a sub folder oy your OS''s temp'
+              r,←⊂'          folder which is prntes to the session. You may override this by spcifying this.'
+              r,←⊂'          If you do it must be an empty folder. Ignored when -download is not specified.'
+              r,←⊂'-unzip    Specify this if you want Tatin to unzip the downloaded files.'
+              r,←⊂'          Ignored when -download is not specified.'
+              r,←⊂'-all      This circumvents the selection dialog; mainly useful for test cases.'
           :Else
               r←'Unknown command: ',Cmd
           :EndSelect
@@ -1604,7 +1660,7 @@
       :If 1=≢list←GetListOfRegistriesForSelection type
           registry←1⊃list[1;]
       :Else
-          :If ⍬≡row←'Select Tatin Registry'all Select↓⎕FMT⌽list[;1 2]
+          :If ⍬≡row←'Select Tatin Registry'all Select↓⎕FMT list[;2 3 1]
               registry←⍬
           :Else
               :If all

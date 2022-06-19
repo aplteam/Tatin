@@ -1,0 +1,32 @@
+ folder←{folder}UsageDataGetFiles(uri downloadList);uri_;request;res;client;file
+⍝ Downloads usage data files into `folder` which defaults to a sub folder in the OS's temp folder.\\
+⍝  * `uri` must be a URL or an alias ponting to a running Tatin server\\
+⍝  * `downloadList` must be either a simple character vector representing a single file or a nested vector\\
+⍝    of simple character vectors each representing such a file\\
+⍝ The filenames are usually requested by calling `UsageDataGetList`.
+ uri_←ReplaceRegistryAlias uri
+ folder←{0<⎕NC ⍵:⍎⍵ ⋄ F.GetTempSubDir'Tatin-Usage-Data'}'folder'
+ 'No (valid) Registry specified?!'Assert 0<≢uri_
+ 'You must specify a running Tatin server'Assert Reg.IsHTTP uri_
+ client←NewClient uri_
+ {}client R.Connect 0
+ :If 2≠|≡downloadList
+     downloadList←','(≠⊆⊢)downloadList
+ :EndIf
+ :For file :In downloadList
+     request←R.NewRequest 0
+     request.RequestTarget←Reg.VersionOf_REST,'/usage-data?download=',file
+     request.Headers,←⊂'Accept' 'application/json'
+     {}client R.Send request
+     res←client R.Receive request
+     :If 200≡res.StatusCode
+         res.Content Reg.WriteNativeFile folder,'/',file
+     :ElseIf 404≡res.StatusCode
+         'Command is not available'Assert 0
+     :Else
+         ('Server error, RC=',res.StatusCode)Assert 0
+     :EndIf
+ :EndFor
+ ⎕DL 0.2
+ {}client R.Close 0
+⍝Done

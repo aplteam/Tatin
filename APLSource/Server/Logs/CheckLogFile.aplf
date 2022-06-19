@@ -1,0 +1,26 @@
+ {r}←{TS}CheckLogFile folder;filename;year;month
+⍝ This function has two tasks:
+⍝  * It accumulates all data for the current year (except the current month) in case the month changed since the last call
+⍝  * It splits the log file between this year and earlier in case the year changed since the last call.
+⍝ `TS` is usefull for test cases but defaults to ⎕TS.
+ r←0
+ TS←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕TS}'TS'
+ filename←folder,'year'
+ year←⊃##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+ filename←folder,'month'
+ month←##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+ :If r←month≠¯1+2⊃TS
+ :OrIf 1=month
+     :If 1≠2⊃TS
+         ##.F.DeleteFile ##.F.ListFiles folder,'stats-',(⍕year),'-*.csv'
+         ##.F.DeleteFile ##.F.ListFiles folder,'stats-',(⍕year),'-*.zip'
+         TS AccumulateCurrentYear month folder
+     :Else
+         ##.F.DeleteFile ##.F.ListFiles folder,'stats-',(⍕year),'-*.csv'
+         ##.F.DeleteFile ##.F.ListFiles folder,'stats-',(⍕year),'-*.zip'
+     :EndIf
+ :EndIf
+ :If r←year≠⊃TS
+     TS SplitLogFile year folder
+ :EndIf
+⍝Done

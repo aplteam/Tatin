@@ -6,6 +6,8 @@
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
      :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath                      ⍝ Static stuff
          response←request ReturnFiles G.HTDOCS,fullPath
+     :ElseIf 'usage-data/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath
+         response←request ReturnUsageDataFiles fullPath
      :Else
          path←Reg.RemovePackageID fullPath
          packageID←(≢path)↓fullPath

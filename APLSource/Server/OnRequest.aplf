@@ -3,7 +3,7 @@
  :If '/ping'≡request.Path
      response←request R.Respond 200
  :Else
-     :Hold 'BLOCKED'   ⍝ Used by `Logs.CheckLogFile` for blocking all requests when dealing with the log file (once a year)
+     :Hold 'App-Log'   ⍝ Used by `Logs.CheckLogFile` for blocking all requests when dealing with the APP log file (once a year)
          :If 0=G.INI.Get'Trap:Policy'
          :AndIf ~request.Connection.Server.Trap
          ⍝ Invalidate Rumba's top level error trapping
@@ -25,11 +25,15 @@
                  response←ReturnNOT_IMPLEMENTED request
              :EndSelect
              logMsg←request.Method,' ',(⍕response.StatusCode),' ',request.RequestTarget
+             :If ∨/'test-request' 'yes'∘≡¨request.Headers
+                 logMsg,←' (test)'
+             :EndIf
              :If 200≠response.StatusCode
+                 ⍝ Add potential error message in case something went wrong:
                  logMsg,←(326≠⎕DR response.Content)/'; ',response.Content
              :EndIf
          :EndIf
-         Log logMsg
+         P.AppLog logMsg
      :EndHold
  :EndIf
 ⍝Done

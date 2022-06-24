@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.39.0+2 - 2022-0617
+⍝ * 0.39.0+2 - 2022-06-23
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -330,31 +330,38 @@
       :EndIf
     ∇
 
-    ∇ r←UsageData Arg;registry;list;ind;list2
+    ∇ r←UsageData Arg;registry;list;ind;list2;b
       :If 0≡registry←Arg._1
           →(⍬≡registry←SelectRegistry 0)/0
       :EndIf
       :If 0≡Arg.download
+      :AndIf 0∊b←0≡¨Arg.(all folder unzip)
+          ('These options were ignored because -download was not specified: ',⊃{⍺,' ',⍵}/(~b)/'-all' '-folder=' '-unzip')Assert 0=+/b
           r←TC.UsageDataGetList registry
       :Else
-          r←''
           list←TC.UsageDataGetList registry
-          :If 0≡Arg.all
-              ind←'Please select the file(s) you wish to download:' 1 0 Select list
-              →(0=ind)/0
+          :If 0≡Arg.download
+              r←list
           :Else
-              ind←⍳≢list
-          :EndIf
-          :If 0≡Arg.folder
-              r←TC.UsageDataGetFiles registry(list[ind])
-          :Else
-              r←Arg.folder TC.UsageDataGetFiles registry(list[ind])
-          :EndIf
-          :If 0≢Arg.unzip
-              list2←(⊂r,'/'),¨list[ind]
-          :AndIf ∧/⎕NEXISTS¨list2
-              r∘{⍵ TC.ZipArchive.UnzipTo ⍺}¨list2
-              TC.F.DeleteFile TC.F.ListFiles r,'/*.zip'
+              r←''
+              :If 0≡Arg.all
+                  ind←'Please select the file(s) you wish to download:' 1 0 Select list
+                  →(0=ind)/0
+              :Else
+                  ind←⍳≢list
+              :EndIf
+              :If 0≡Arg.folder
+                  r←TC.UsageDataGetFiles registry(list[ind])
+              :Else
+                  r←Arg.folder TC.UsageDataGetFiles registry(list[ind])
+              :EndIf
+              :If 0≢Arg.unzip
+                  list2←(⊂r,'/'),¨list[ind]
+              :AndIf ∧/⎕NEXISTS¨list2
+                  TC.F.DeleteFile(¯3↓¨list2),¨⊂'csv'
+                  r∘{⍵ TC.ZipArchive.UnzipTo ⍺}¨list2
+                  TC.F.DeleteFile TC.F.ListFiles r,'/*.zip'
+              :EndIf
           :EndIf
       :EndIf
     ∇
@@ -1266,7 +1273,7 @@
               r,←⊂''
               r,←⊂'For details how tags are search refer to the documentation.'
           :Case ⎕C'Init'
-              r,←⊂'(Re-)Establishe the user settings in ⎕SE. Call this in case the user settings got changed on file'
+              r,←⊂'(Re-)Establish the user settings in ⎕SE. Call this in case the user settings got changed on file'
               r,←⊂'and you want to incorporate the changes in the current session.'
               r,←⊂''
               r,←⊂'Without an argument Init processes the default user settings file.'
@@ -1366,21 +1373,22 @@
               r,←⊂'       interrogated regarding clearing the cache. Mainly for test cases.'
           :Case ⎕C'UsageData'
               r,←⊂'Use this to deal with usage data of a Tatin server.'
-              r,←⊂'If no argument was specified at all then the user will be prompted for the Registry,'
+              r,←⊂'If no argument is specified then the user will be prompted for the Registry,'
               r,←⊂'except when there is just one anyway.'
+              r,←⊂'If no option is specified all available files will be listed.'
               r,←⊂''
-              r,←⊂'If only a URL (or alias) is specified a list with all downloadable files is printed.'
+              r,←⊂'If only a URL (or Registry alias) is specified a list with all downloadable files is printed.'
               r,←⊂''
-              r,←⊂'-download Use this flag to indicate that you wish to download one or more files'
+              r,←⊂'-download Use this flag to indicate that you wish to download one or more files.'
               r,←⊂'          A list with all files available for download will be presented to you together'
               r,←⊂'          with the additional options "all" and "quit". You may then select none, one,'
-              r,←⊂'          several or all files for download'
-              r,←⊂'          The folder holding the file(s) is printed together with a list of all files'
-              r,←⊂'-folder   By default downloaded files will be saved in a sub folder oy your OS''s temp'
-              r,←⊂'          folder which is prntes to the session. You may override this by spcifying this.'
+              r,←⊂'          several or all files for download or cancel the operation.'
+              r,←⊂'          The folder holding the file(s) is printed together with a list of all files.'
+              r,←⊂'-folder=  By default downloaded files will be saved in a sub folder of your OS''s temp'
+              r,←⊂'          folder which is printed to the session. You may override this by spcifying a folder.'
               r,←⊂'          If you do it must be an empty folder. Ignored when -download is not specified.'
-              r,←⊂'-unzip    Specify this if you want Tatin to unzip the downloaded files.'
-              r,←⊂'          Ignored when -download is not specified.'
+              r,←⊂'-unzip    Specify this if you want Tatin to unzip the downloaded file(s).'
+              r,←⊂'          The ZIP files will be deleted afterwards. Ignored when -download is not specified.'
               r,←⊂'-all      This circumvents the selection dialog; mainly useful for test cases.'
           :Else
               r←'Unknown command: ',Cmd

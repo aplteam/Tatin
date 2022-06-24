@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep
+ r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -16,34 +16,41 @@
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  CheckInstallFolder targetFolder
  identifiers←','(≠⊆⊢)identifiers
- ∆PermanentConnections←⎕NS''        ⍝ Establish but without any connections yert: we don't know whether we need any
+ ∆PermanentConnections←⎕NS''        ⍝ Establish but without any connections yet: we don't know whether we need any
  ∆PermanentConnections.keepOpen←1   ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
- :For identifier_ :In identifiers
-     (alias identifier_)←SplitAtAlias identifier_
-     identifier←ReplaceRegistryAlias identifier_
-     ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
-     identifier←noBetas CheckVersion identifier
-     :If 0=≢identifier    ⍝ Not found?
-         :Continue
-     :EndIf
-     PrintToSession'  Attempting to install ',identifier,'...'
-     :If ∧/~'\/'∊identifier
-     :AndIf '.zip'≢⎕C ¯4↑identifier
-         packageID←GetPackageIDFromFilename identifier
-         :If ~∨/'/\:'∊identifier
-             identifier←(EstablishRegistry packageID),packageID
-             :If 0=≢(-≢packageID)↓identifier
-                 :Continue
-             :EndIf
-             PrintToSession⊃{'Installing <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
+ :Trap 998
+     :For identifier_ :In identifiers
+         (alias identifier_)←SplitAtAlias identifier_
+         identifier←ReplaceRegistryAlias identifier_
+         ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
+         identifier←noBetas CheckVersion identifier
+         :If 0=≢identifier    ⍝ Not found?
+             :Continue
          :EndIf
-     :EndIf
-     :If '.zip'≡⎕C ¯4↑identifier
-     :AndIf Reg.IsHTTP identifier
-         'ZIP files cannot be installed via HTTP'Assert 0
-     :EndIf
-     PrintToSession'  Establish dependencies...'
-     r,←targetFolder InstallPackage_ alias identifier
- :EndFor
- CloseConnections 1
+         PrintToSession'  Attempting to install ',identifier,'...'
+         :If ∧/~'\/'∊identifier
+         :AndIf '.zip'≢⎕C ¯4↑identifier
+             packageID←GetPackageIDFromFilename identifier
+             :If ~∨/'/\:'∊identifier
+                 identifier←(EstablishRegistry packageID),packageID
+                 :If 0=≢(-≢packageID)↓identifier
+                     :Continue
+                 :EndIf
+                 PrintToSession⊃{'Installing <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
+             :EndIf
+         :EndIf
+         :If '.zip'≡⎕C ¯4↑identifier
+         :AndIf Reg.IsHTTP identifier
+             CloseConnections 1
+             'ZIP files cannot be installed via HTTP'Assert 0
+         :EndIf
+         PrintToSession'  Establish dependencies...'
+         r,←targetFolder InstallPackage_ alias identifier
+     :EndFor
+     CloseConnections 1
+ :Else
+     qdmx←⎕DMX
+     CloseConnections 1
+     (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
+ :EndTrap
 ⍝Done

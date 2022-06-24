@@ -1,7 +1,7 @@
  html←GetStatistics dummy;folder;list;p;l;filename;a;title;i;data
 ⍝ Returns a page with download links to statistical data
  folder←∊P.LogFolder
- list←⌽F.ListFiles folder,'stats-*.zip'
+ list←⌽F.ListFiles folder,'usage-data-*.zip'
  p←{'<p>',⍵,'</p>'}
  l←{'<li>',⍵,'</li>'}
  a←{'<a href="',⍺,'">',⍵,'</a>'}
@@ -22,27 +22,27 @@
      html,←⊂'<div id="info" class="tabcontent">'
      html,←⊂p'Via this page you can download usage data for packages.'
      html,←⊂'<ul>'
-     html,←⊂l'  For every year there is a file <code>stats-&lt;YYYY&gt;.zip</code> (if data is available)'
-     html,←⊂l'  For the current year there is a file <code>stats-&lt;YYYY&gt;-&lt;MM&gt;.zip</code> which means you get all data from this year except the current month'
+     html,←⊂l'  For every year there is a file <code>usage-data-&lt;YYYY&gt;.zip</code> (if data is available)'
+     html,←⊂l'  For the current year there is a file <code>usage-data-&lt;YYYY&gt;-&lt;MM&gt;.zip</code> which means you get all data from this year except the current month'
      html,←⊂'</ul>'
      html,←⊂p'The following steps are carried out by any Tatin Server:'
      html,←⊂'<ol>'
      html,←⊂l'On the first of January of any given year:'
      html,←⊂p'<ul>'
-     html,←⊂l'All the data of the pevious year is collected and saved in <code>stats-&lt;YYYY&gt;.csv</code>'
-     html,←⊂l'A file <code>stats-&lt;YYYY&gt;.zip</code> is created from that CSV file'
+     html,←⊂l'All the data of the pevious year is collected and saved in <code>usage-data-&lt;YYYY&gt;.csv</code>'
+     html,←⊂l'A file <code>usage-data-&lt;YYYY&gt;.zip</code> is created from that CSV file'
      html,←⊂p'</ul>'
      html,←⊂l'On the first day of any given month (except the first of January):'
      html,←⊂p'<ul>'
-     html,←⊂l'A file <code>stats-&lt;YYYY&gt;-&lt;MM&gt;.csv</code> is created the comprehends all the data of that year except the new month'
-     html,←⊂l'A file <code>stats-&lt;YYYY&gt;-&lt;MM&gt;.zip</code> is created from that CSV file'
+     html,←⊂l'A file <code>usage-data-&lt;YYYY&gt;-&lt;MM&gt;.csv</code> is created the comprehends all the data of that year except the new month'
+     html,←⊂l'A file <code>usage-data-&lt;YYYY&gt;-&lt;MM&gt;.zip</code> is created from that CSV file'
      html,←⊂p'</ul>'
      html,←⊂'</ol>'
      html,←⊂'</div>'
 
     ⍝ Content for the "View" Tab
      html,←⊂'<div id="view" class="tabcontent">'
-     filename←{⍵⊃⍨1+'stats-[0-9]{4}-[0-9]{2}'⎕S 2⊣(≢∊P.LogFolder)↓¨⍵}list,⊂''
+     filename←{⍵⊃⍨1+'usage-data-[0-9]{4}-[0-9]{2}'⎕S 2⊣(≢∊P.LogFolder)↓¨⍵}list,⊂''
      :If 0=≢filename  ⍝ No current-year data available (in January!)? Take last year.
          filename←⊃list
      :EndIf
@@ -69,10 +69,10 @@
      :For i :In ⍳≢list
          filename←⊃,/1↓⎕NPARTS i⊃list
          ⎕TRAP←0 'S'
-         :If (≢'stats-YYYY-MM.zip')=≢filename           ⍝ Then it is the current year's data
-             title←'Data for this year up to ',(⊃(//)⎕VFI 2↑(≢'stats-2022-')↓filename)⊃Months
+         :If (≢'usage-data-YYYY-MM.zip')=≢filename           ⍝ Then it is the current year's data
+             title←'Data for this year up to ',(⊃(//)⎕VFI 2↑(≢'usage-data-2022-')↓filename)⊃Months
          :Else
-             title←'Data for ',4↑(≢'stats-')↓filename
+             title←'Data for ',4↑(≢'usage-data-')↓filename
          :EndIf
          title,←' (zipped, ~',(⍕1⌈⌊0.5+(('type' 2)F.Dir(∊P.LogFolder),filename)÷1014),'KB)'
          html,←⊂l('usage-data/',filename)a title

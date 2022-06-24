@@ -1,0 +1,15 @@
+ {r}←CreateZippedBackup folder;zipFilename;zip;filename;bkpFilename
+⍝ Takes a folder as⍵ and expect it to contain a file "folder,'app-log.txt'"
+⍝ It creates a copy of that file by replacing the extension by "bkp".
+⍝ Then this file is zipped into a file "app-log.txt.zip".
+⍝ Finally the BKP file is deleted.
+ r←⍬
+ filename←folder,GetLogFilename
+ bkpFilename←(¯3↓filename),'bkp'
+ bkpFilename ⎕NCOPY filename
+ zipFilename←folder,'app-log.txt.zip'
+ ##.F.DeleteFile zipFilename  ⍝ Paranoia
+ zip←⎕NEW ##.ZipArchive(,⊂zipFilename)
+ folder zip.Add(≢folder)↓bkpFilename
+ ##.F.DeleteFile bkpFilename
+⍝Done

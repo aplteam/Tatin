@@ -25,7 +25,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#INIFILE">3.1. <code>&lt;INIFILE&gt;</code></a></li>
 <li><a href="#Settings-to-pay-attention-to">3.2. Settings to pay attention to</a></li>
 </ul></li>
-<li><a href="#On-Logging">4. On Logging</a></li>
+<li><a href="#On-Logging">4. On Logging</a>
+<ul>
+<li><a href="#Logging-on-file">4.1. Logging on file</a></li>
+<li><a href="#The-Windows-Event-Log">4.2. The Windows Event Log</a></li>
+</ul></li>
 <li><a href="#On-Certificates">5. On Certificates</a></li>
 <li><a href="#The--section">6. The <code>[MSG]</code> section</a></li>
 <li><a href="#the_app_section">7. The <code>[APP]</code> section</a></li>
@@ -203,21 +207,26 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <h2 data-id="On-Logging">4. On Logging</h2>
 </a>
 </div>
+<div class="h_tag">
+<a href="#Logging-on-file" id="Logging-on-file" class="autoheader_anchor">
+<h3 data-id="Logging-on-file">4.1. Logging on file</h3>
+</a>
+</div>
+<p>Tatin will always write to the log file, but how much information is written can be influenced by settings in the INI file.</p>
 <p>There are two different levels available for logging:</p>
 <ul>
-<li>Low-level logging with <code>LogHTTP</code>, <code>LogConga</code> and <code>LogRumba</code>. These are useful for debugging.
-<p>These log files live in the <code>Rumba/</code> sub folder.</p></li>
-<li>High level logging with <code>Log</code> and <code>LogFolder</code>.
-<p>Note that IP addresses are <em>not</em> logged at this level.</p>
-<ul>
-<li><code>Log</code> is a flag that indicates whether Tatin should log at all. In production it should always be 1.</li>
-<li><code>LogFolder</code> must specify the path the Log file lives in.
-<p>The name of the log file looks like <code>Tatin_{YYYYMMDD}.log</code>.</p></li>
-</ul></li>
-<li><code>WindowsEventLog</code>
-<p>This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.</p>
-<p>If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and any errors are then reported to the Windows Event Log.</p></li>
+<li>High- (or application-) level logging should always be done. Only then is usage data available.
+<p>Note that IP addresses are <em>not</em> logged at this level.</p></li>
+<li>Low-level logging is controlled by the INI file's <code>LogHTTP</code>, <code>LogConga</code> and <code>LogRumba</code> properties. These can be useful for debugging. They log IP addresses which might be illegal in certain countries.</li>
 </ul>
+<div class="h_tag">
+<a href="#The-Windows-Event-Log" id="The-Windows-Event-Log" class="autoheader_anchor">
+<h3 data-id="The-Windows-Event-Log">4.2. The Windows Event Log</h3>
+</a>
+</div>
+<p>Under Windows you may let Tatin write the the Event Log by setting <code>WindowsEventLog</code> to 1.</p>
+<p>This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.</p>
+<p>If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and any errors are then reported to the Windows Event Log.</p>
 <div class="h_tag">
 <a href="#On-Certificates" id="On-Certificates" class="autoheader_anchor">
 <h2 data-id="On-Certificates">5. On Certificates</h2>
@@ -266,7 +275,8 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <li>Run it as a Docker container</li>
 </ul>
 <p>Both options allow to run the Server so that it is restarted automatically in case of a failure or a reboot.</p>
-<p>Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, and it is easy to achieve.</p>
+<p>Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it actually runs a (very basic) version of Linux in a virtual machine.</p>
+<p>If you want run the Tatin server as a Windows Service you can put the workspace <code>InstallAsWindowsService.dws</code> to good use: it will install Tatin as a Windows service. Note that this requires admin rights.</p>
 <div class="h_tag">
 <a href="#Linux" id="Linux" class="autoheader_anchor">
 <h3 data-id="Linux">8.2. Linux</h3>
@@ -308,8 +318,8 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <ol start="1">
 <li>You must change the <code>source</code> parameter so that it points to the folder that hosts the Tatin server data.</li>
 <li>You might need to change the port 443, defined with the <code>-p</code> flag.
-<p>This can only ever be 80 or 443 on your local machine because if a Tatin server is exposed to the Internet it should run behind a web server like Appache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.</p></li>
-<li>The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note the the INI file rules whether the interpreter allows a Ride or not)</li>
+<p>This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet, because in that scenario Tatin should run behind a web server like Appache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.</p></li>
+<li>The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note that the INI file rules whether the interpreter allows a Ride or not)</li>
 </ol>
 <div class="h_tag">
 <a href="#Docker-work-flow" id="Docker-work-flow" class="autoheader_anchor">
@@ -319,7 +329,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <p>Execute these steps:</p>
 <ol start="1">
 <li>Call  <code>./BuildImage.sh</code> for creating the image</li>
-<li>Call  <code>./CreateTatinDockerContainer.sh</code> for creating the container</li>
+<li>Call  <code>./CreateTatinDockerContainer.sh</code> for creating the container from that image</li>
 <li>Call  <code>start-tatin.sh</code> to actually start the container; this script ensures that the container is restarted after a crash or auto-started after a reboot</li>
 </ol>
 <div class="h_tag">
@@ -331,7 +341,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <ul>
 <li><code>[CONFIG]DisplayRequests</code></li>
 <li><code>LogHTTPToSession</code></li>
-<li><code>TestFlag</code>; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute 'list-commands'. Naturally this makes sense only under program control, not from a browser.</li>
+<li><code>TestFlag</code>; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute “list-commands”. Naturally this makes sense only under program control, not from a browser.</li>
 <li><code>ReloadWS</code></li>
 <li>The settings in the <code>[LOGFILE]</code> section</li>
 </ul>

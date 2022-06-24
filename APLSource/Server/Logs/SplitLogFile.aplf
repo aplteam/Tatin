@@ -1,11 +1,14 @@
  {r}←{TS}SplitLogFile(oldYear folder);d;ind;logFilename;yearFilename;statFilename;zip;zipFilename;colTitles;monthFilename
  TS←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕TS}'TS'
  r←⍬
- logFilename←folder,'log.txt'
+ CreateZippedBackup folder
+ logFilename←folder,GetLogFilename
+
  d←⊃⎕NGET logFilename 1                 ⍝ Data
- ind←1+¯1↑('\[[0-3][0-9]/[a-zA-Z]{3}/',⍕oldYear)⎕S 2⊣d
+ d←(0<≢¨d)/d                            ⍝ Get rid of empty lines, if any
+ ind←+/∧\(↑d)[;⍳4]∧.=⍕oldYear
  :If ind≠≢d
-     :Hold 'BLOCKED'
+     :Hold 'App-Log'
          yearFilename←folder,'year'
          monthFilename←folder,'month'
          (⊂ind↓d)⎕NPUT logFilename 1
@@ -14,7 +17,7 @@
      :EndHold
      :If 0<≢d←ind⍴d
      :AndIf 0<≢d←ProcessLogFile d
-         statFilename←folder,'stats-',(⍕oldYear),'.csv'
+         statFilename←folder,'usage-data-',(⍕oldYear),'.csv'
          colTitles←'Group' 'Name' 'Version' 'Year' 'Month' 'Downloads'
          d colTitles ⎕CSV statFilename
          zipFilename←⊃,/(¯1↓⎕NPARTS statFilename),⊂'.zip'

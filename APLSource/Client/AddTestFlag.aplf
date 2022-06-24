@@ -1,0 +1,9 @@
+ request←AddTestFlag request
+⍝ We check whether there is a global ∆TEST and it is 1. The and only then do we add the
+⍝ HTTP header "test-request" with the value "yes".
+⍝ This allows us to ignore those entries when we do usage data (=statistics).
+ :If 9=##.⎕NC'TestCases'
+ :AndIf 0<##.TestCases.⎕NC'∆TEST'
+ :AndIf 1≡##.TestCases.∆TEST
+     request.Headers,←⊂'test-request' 'yes'
+ :EndIf

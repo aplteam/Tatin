@@ -4,6 +4,7 @@
 ⍝   This improved performance dramatically because the same connection can be used again.
 ⍝ * If it does not a new client is created, and the connection closed after the request
  request.Headers,←⊂Reg.TatinVersionAsHttpHeader
+ request←AddTestFlag request
  msg←uri,' did not respond'
  ⎕TRAP←(345 'C'('''',uri,''' SignalNoConnection ''',msg,''''))(347 'N')(348 'C' '→∆Go,errorCounter←errorCounter+1')(0 'S')
  errorCounter←0

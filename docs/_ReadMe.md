@@ -71,6 +71,10 @@ This document gives you an overview over these HTML files: their purpose and who
 
 ### Misc
 
+* [Usage data](./UsageData.html "Usage data.html") (draft)
+
+  Read this in case you want to contribute to the Tatin project on GitHub
+
 * [Tatin for Contributors](./TatinForContributors.html "TatinForContributors.html") (draft)
 
   Read this in case you want to contribute to the Tatin project on GitHub

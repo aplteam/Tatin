@@ -28,12 +28,12 @@
                  stopFlag←1
                  opCode←'skip'
              :Case 3
-                 ('Did not respond: ',uri)''⎕SIGNAL 347
+                 ('Did not respond: ',uri)⎕SIGNAL 347
              :EndSelect
          :Else
              qdmx←⎕DMX
              :If 'ERROR 345'≡qdmx.EM
-                 (uri,' did not respond')⎕SIGNAL qdmx.EN
+                 ('Did not respond: ',uri)⎕SIGNAL qdmx.EN
              :Else
                  qdmx.EM ⎕SIGNAL qdmx.EN
              :EndIf

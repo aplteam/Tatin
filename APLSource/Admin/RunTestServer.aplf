@@ -11,7 +11,7 @@
      G←⍵
      targetPath←⊃G.INI.Get'Logging:Folder'
      flag←0=##.⎕NC'CiderConfig'
-     sourcePath←{⍵:##.FilesAndDirs.PWD,'/' ⋄ ##.CiderConfig.HOME,'/TestData/Log/'}flag
+     sourcePath←{⍵:##.FilesAndDirs.PWD,'/' ⋄ ##.CiderConfig.HOME,'/TestData/App-Log/',##.Server.Logs.GetLogFilename}flag
      ⍝ Copy over some pre-prepared log files so that we have some test data
      _←targetPath∘{⍺ ⎕NCOPY⍠('IfExists' 'Replace')⊣⍵}¨##.FilesAndDirs.ListFiles sourcePath,'*'
      ##.Server.TatinAmendments G

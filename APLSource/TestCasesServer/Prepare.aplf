@@ -13,14 +13,16 @@
          1 ⎕NDELETE testFilename
      :EndIf
  :EndIf
- T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Registry,#.Tatin.Server')
- T.codeCoverage.filename←testFilename
- ignore←''
- ignore,←⊂'#.Tatin.Server.CopyDependencies'
- ignore,←⊂'#.Tatin.Server.GetPackageConfigFilename'
- ignore,←⊂'#.Tatin.Registry.Create_UUID'
- ignore,←⊂'#.Tatin.Server.PROJECT_HOME'
- ignore,←⊂'#.Tatin.Server.GetQuitDQEvent'
- ignore,←⊂'#.Tatin.Server.Run'
- T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
+ :If 0
+     T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Registry,#.Tatin.Server')
+     T.codeCoverage.filename←testFilename
+     ignore←''
+     ignore,←⊂'#.Tatin.Server.CopyDependencies'
+     ignore,←⊂'#.Tatin.Server.GetPackageConfigFilename'
+     ignore,←⊂'#.Tatin.Registry.Create_UUID'
+     ignore,←⊂'#.Tatin.Server.PROJECT_HOME'
+     ignore,←⊂'#.Tatin.Server.GetQuitDQEvent'
+     ignore,←⊂'#.Tatin.Server.Run'
+     T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
+ :EndIf
 ⍝Done

@@ -141,27 +141,25 @@ The INI file is well documented, so you should have no trouble to make the neces
 
 ## On Logging
 
+### Logging on file
+
+Tatin will always write to the log file, but how much information is written can be influenced by settings in the INI file.
+
 There are two different levels available for logging:
 
-* Low-level logging with `LogHTTP`, `LogConga` and `LogRumba`. These are useful for debugging. 
-
-  These log files live in the `Rumba/` sub folder.
-
-* High level logging with `Log` and `LogFolder`. 
+* High- (or application-) level logging should always be done. Only then is usage data available.
 
   Note that IP addresses are _not_ logged at this level.
 
-  * `Log` is a flag that indicates whether Tatin should log at all. In production it should always be 1.
+* Low-level logging is controlled by the INI file's `LogHTTP`, `LogConga` and `LogRumba` properties. These can be useful for debugging. They log IP addresses which might be illegal in certain countries.
 
-  * `LogFolder` must specify the path the Log file lives in. 
+### The Windows Event Log
 
-    The name of the log file looks like `Tatin_{YYYYMMDD}.log`.
+Under Windows you may let Tatin write the the Event Log by setting `WindowsEventLog` to 1.
 
-* `WindowsEventLog`
+This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.
 
-   This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.
-
-   If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and any errors are then reported to the Windows Event Log.
+If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and any errors are then reported to the Windows Event Log.
 
 ## On Certificates
 
@@ -212,7 +210,9 @@ Under Windows you have two options:
 
 Both options allow to run the Server so that it is restarted automatically in case of a failure or a reboot.
 
-Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, and it is easy to achieve.
+Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it actually runs a (very basic) version of Linux in a virtual machine.
+
+If you want run the Tatin server as a Windows Service you can put the workspace `InstallAsWindowsService.dws` to good use: it will install Tatin as a Windows service. Note that this requires admin rights.
 
 
 ### Linux
@@ -252,16 +252,16 @@ In this file a couple of environment variables are defined that might not be set
 
 2. You might need to change the port 443, defined with the `-p` flag.
 
-   This can only ever be 80 or 443 on your local machine because if a Tatin server is exposed to the Internet it should run behind a web server like Appache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.
+   This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet, because in that scenario Tatin should run behind a web server like Appache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.
 
-3. The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note the the INI file rules whether the interpreter allows a Ride or not)
+3. The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note that the INI file rules whether the interpreter allows a Ride or not)
 
 ### Docker work flow
 
 Execute these steps:
 
 1. Call  `./BuildImage.sh` for creating the image
-2. Call  `./CreateTatinDockerContainer.sh` for creating the container
+2. Call  `./CreateTatinDockerContainer.sh` for creating the container from that image
 3. Call  `start-tatin.sh` to actually start the container; this script ensures that the container is restarted after a crash or auto-started after a reboot
 
 ## Testing and Debugging
@@ -270,7 +270,7 @@ For testing and debugging you might want to change these settings:
 
 * `[CONFIG]DisplayRequests`
 * `LogHTTPToSession`
-* `TestFlag`; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute 'list-commands'. Naturally this makes sense only under program control, not from a browser.
+* `TestFlag`; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute "list-commands". Naturally this makes sense only under program control, not from a browser.
 * `ReloadWS`
 * The settings in the `[LOGFILE]` section
 

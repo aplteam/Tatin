@@ -35,7 +35,7 @@
      qdmx←⎕DMX
      ⎕DL 0.02
      F.RmDir tempFolder
-     qdmx.EM ⎕SIGNAL qdmx.EN
+     (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
  :Trap 998
      paths←noBetas InstallPackages(⊃{⍺,',',⍵}/identifiers)tempFolder
@@ -43,7 +43,8 @@
      qdmx←⎕DMX
      ⎕DL 0.02
      F.RmDir tempFolder
-     qdmx.EM ⎕SIGNAL qdmx.EN
+     CloseConnections 1
+     (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
  :Trap 998
      loaded←LoadDependencies tempFolder targetSpace
@@ -51,7 +52,8 @@
      qdmx←⎕DMX
      ⎕DL 0.02
      F.RmDir tempFolder
-     qdmx.EM ⎕SIGNAL qdmx.EN
+     CloseConnections 1
+     (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
  ⎕DL 0.02
  r←≢F.ListDirs tempFolder,'/'

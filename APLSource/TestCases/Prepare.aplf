@@ -1,5 +1,5 @@
  Prepare;testFilename;ask;answer;ignore
- 'This WS appears to be prepared for functioning as a Tatin Server'⎕SIGNAL 11/⍨0<##.Client.⎕NC''
+ 'This WS appears to be prepared for running as a Tatin Server'⎕SIGNAL 11/⍨0<##.Client.⎕NC''
  :If 0=##.Client.⎕NC'MyUserSettings'
      ##.Admin.Initialize_Client
  :EndIf
@@ -14,6 +14,9 @@
  :ElseIf 0 ##.Client.YesOrNo'Check user number of IP connections?'
      T.exec_before_each_test←'#.Tatin.Admin.Check_IP_Before'
      T.exec_after_each_test←'#.Tatin.Admin.Check_IP_After'
+ :ElseIf 0 ##.Client.YesOrNo'Checkfor permanent connections?'
+     T.exec_before_each_test←'#.Tatin.Admin.Check_PermanentConnection_Before'
+     T.exec_after_each_test←'#.Tatin.Admin.Check_PermanentConnection_After'
  :EndIf
  testFilename←##.Admin.GetCoverageFile
  :If ⎕NEXISTS testFilename

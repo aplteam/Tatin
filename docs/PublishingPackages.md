@@ -8,6 +8,57 @@
 
 # Publishing Packages
 
+## Groups, names and version numbers
+
+A package ID consists of at least three parts:
+
+* A group name
+* A package name
+* A version number
+
+Optionally such an ID may also comprehend a build number which is separated from the version number by a plus (`+`).
+
+### The Group
+
+A group can be anything really:
+
+* If you act on behalf of a company it might be the name of that company, like "Dyalog"
+* If you are a freelance it might be you name, or just your first name, like "davin"
+* It might be a term used to indicated something, anything, like "aplteam"
+
+Once you have chosen a group name, and published a package with that group name to the [principal Tatin Registry](https://tatin.dev "Link to tatin.dev"), you are advised to create a "home page" for that group. Use that for anything useful like background, motivation, contact details, whatever.
+
+When a group is listed in a browser , the name of a group is converted into a link to that home page.
+
+Of course group-related home pages do not always make sense, therefore by default they are not active; see `GroupHomePages` in the INI file.
+
+### The name
+
+The name should trigger an idea of what a package might do. Group+name must be unique, but you might well use a name that is already used under a different group name, though this is not recommended.
+
+### The version number
+
+The version number must consist of three parts separated by dots:
+
+* The major version number: the "1" in **1**.2.3
+* The minor version number: the "2" in 1.**2**.3
+* The patch number: the "3" in 1.2.**3**
+
+Optionally there might be a beta ID added. Examples are:
+
+* 1.2.3-beta-1
+* 1.2.3.beta-1
+* 1.2.3-fix-for-the-foo-problem
+* 1.2.3.issue-234
+
+There is one restriction: a `+` cannot be part of the name of a beta version. The reason for that is that finally a build number might be added to a version number, and a build number is separated from the rest of the version number by a plus (`+`) character. Examples:
+
+* 1.2.3+453
+* 1.2.3-beta-1+911
+
+Build numbers are mostly now shown by Tatin.
+
+
 ## Precondition: API key
 
 Whether you want to publish to the principal Tatin server at <https://tatin.dev> or your own Tatin Server or a Tatin Server that someone in your company runs, first you need an API key. "API key" is just a fancy expression for a password that is used by an application.

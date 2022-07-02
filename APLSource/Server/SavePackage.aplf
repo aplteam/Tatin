@@ -1,4 +1,4 @@
- response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode
+ response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc
 ⍝ `packageID` is a valid package ID
 ⍝ This function saves the data in the appropriate folder which of course must not exist.
  packageID←request.RequestTarget
@@ -10,7 +10,18 @@
      tempFolder←F.GetTempSubDir''
      filename←tempFolder,'/',packageID,'.zip'
      (Reg.Base64 request.Content)Reg.WriteNativeFile filename
-     (statusCode msg)←1 Reg.PublishPackage filename G.RegistryPath
+     :Trap 90
+         (statusCode msg)←1 Reg.PublishPackage filename G.RegistryPath
+     :Else
+         qdmx←⎕DMX
+         exc←⎕EXCEPTION
+         :If ∨/'Central Directory corrupt.'⍷⍕exc
+             response←request RespondWithHTML 400 'Corrupted zip file'
+         :Else
+             response←request RespondWithHTML 400 'Could not unzip'
+         :EndIf
+         :Return
+     :EndTrap
      response←request Respond statusCode
      response.Content←msg
      :If response.StatusCode=200

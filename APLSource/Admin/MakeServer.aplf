@@ -38,27 +38,25 @@
      ⎕DL 0.1
      Assert F.MkDir targetPath
      ⎕DL 0.1
-     F.RmDir targetPath,'/Server/Assets/'
+     F.MkDir targetPath,'/Server/Assets'
      ⎕DL 0.1
-     F.MkDir targetPath,'/Server/Assets/'
-     ⎕DL 0.1
-     Assert F.IsDir targetPath,'/Server/Assets/'
-     F.RmDir targetPath,'/Registry/'
-     ⎕DL 0.1
+     Assert F.IsDir targetPath,'/Server/Assets'
      F.MkDir targetPath,'/Registry/'
      ⎕DL 0.1
-     Assert F.IsDir targetPath,'/Registry/'
-     F.RmDir targetPath,'/Server/'
-     ⎕DL 0.1
+     Assert F.IsDir targetPath,'/Registry'
      F.MkDir targetPath,'/Server/'
      ⎕DL 0.1
-     Assert F.IsDir targetPath,'/Server/'
+     Assert F.IsDir targetPath,'/Server'
+     F.MkDir targetPath,'/Docker'
+     ⎕DL 0.1
+     Assert F.IsDir targetPath,'/Docker'
 
      ⎕WSID←targetPath,'/Server/Server'
      #.⎕EX'Make_'
      ⎕SE.⎕EX ⎕SE.⎕NL⍳16                                 ⍝ Attempt to avoid "Reference in ⎕SE points to #" (⎕JSON bug)
      'Plodder' 'RumbaLean'#.Tatin.⎕CY ##.CiderConfig.HOME,'/Assets/RunTime/Plodder/Plodder'
      0 ⎕SAVE ⎕WSID
+     (targetPath,'/Docker')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Docker/'
      (targetPath,'/Server')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/'
      (targetPath,'/Server/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./InstallAsWindowsService.dws'
      (targetPath,'/Server/server.ini')⎕NCOPY⍠('IfExists' 'Replace')⊣'./server.ini.RemoveMe'

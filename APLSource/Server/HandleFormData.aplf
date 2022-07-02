@@ -1,0 +1,14 @@
+ request←HandleFormData request;ind;content;parms
+⍝ This is a workaround for the fact that Rumba does not take care of data submitted via a form
+ ind←¯1+request.Content⍳'&'
+ content←ind↑request.Content
+ content←(content⍳'=')↓content
+ content←R.PercentDecode content
+ :If 0<≢parms←ind↓request.Content
+     parms←'&'(≠⊆⊢)parms
+     parms←{'='(≠⊆⊢)⍵}¨parms
+     (2⊃¨parms)←R.PercentDecode¨2⊃¨parms
+     request.QueryParameters←↑parms
+ :EndIf
+ request.Content←content
+ ⍝Done

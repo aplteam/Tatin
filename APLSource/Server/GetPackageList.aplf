@@ -1,4 +1,4 @@
- response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;uniqueIDs;list;list2;list3;descriptionAndProjecturl;list5;mat;group;msg
+ response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;uniqueIDs;list;list2;list3;descriptionAndProjecturl;list5;mat;group;msg;buff
 ⍝ Respond to a request for some or all packages, HTML or JSON
  :If Reg.IsValidPackageName packageID
      :If 0<≢group←EstablishGroup packageID
@@ -8,27 +8,24 @@
          :If IsJsonRequest request.Headers
              response←msg Return404 request
          :Else
-             response←msg Return404AsHTML request
+             response←request RespondWithHTML 404 msg
          :EndIf
          :Return
      :EndIf
  :EndIf
  parms←Reg.CheckParmsForListPackages ⍬
- :If (⊂'group')∊request.QueryParameters[;1]
-     parms.group←{2⊃⍵[⍵[;1]⍳⊂'group';]}request.QueryParameters
- :EndIf
- :If (⊂'tags')∊request.QueryParameters[;1]
-     parms.tags←{2⊃⍵[⍵[;1]⍳⊂'tags';]}request.QueryParameters
- :EndIf
- :If (⊂'date')∊request.QueryParameters[;1]
-     parms.date←{⊃(//)⎕VFI ⍵}{2⊃⍵[⍵[;1]⍳⊂'date';]}request.QueryParameters
+ parms.group←request R.GetQueryParameter'group'
+ parms.tags←request R.GetQueryParameter'tags'
+ :If 0<≢parms.date←request R.GetQueryParameter'date'
+     parms.date←{⊃(//)⎕VFI ⍵}parms.date
      parms.aggregate←0
- :ElseIf (⊂'aggregate')∊request.QueryParameters[;1]
-     parms.aggregate←{⊃(//)⎕VFI ⍵}{2⊃⍵[⍵[;1]⍳⊂'aggregate';]}request.QueryParameters
+ :Else
+     parms.date←0
+     :If 0<≢buff←request R.GetQueryParameter'aggregate'
+         parms.aggregate←⊃A.ToNum buff
+     :EndIf
  :EndIf
- :If (⊂'info_url')∊request.QueryParameters[;1]
-     parms.info_url←{⊃(//)⎕VFI ⍵}{2⊃⍵[⍵[;1]⍳⊂'info_url';]}request.QueryParameters
- :EndIf
+ parms.info_url←request R.GetQueryParameter'info_url'
  :If IsJsonRequest request.Headers
      :If 0=≢data←Reg.ListPackages(G.RegistryPath,'/',packageID)parms
          response←Return404 request

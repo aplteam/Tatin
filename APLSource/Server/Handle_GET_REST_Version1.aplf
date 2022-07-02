@@ -1,0 +1,76 @@
+ response←request Handle_GET_REST_Version1 path_;packageID;json;path;data;html;regFolder;specialCommands;groupName
+⍝ Handles all commands defined in version 1 of the REST interface
+ path_↓⍨←-'/'=¯1↑path_
+ :If 1='/'+.=path_
+     path←path_
+     packageID←''
+ :Else
+     (path packageID)←Reg.SeparateUriAndPackageID path_
+     path↓⍨←-'/'=¯1↑path
+ :EndIf
+ path←⎕C path
+ specialCommands←GetSpecialCommands request.Method
+ :If (⊂path)∊(⊂'v1/'),¨specialCommands
+     response←request ProcessTestCommands(⎕C path)specialCommands
+ :Else
+     :If path≡GetVersion_REST'groups'
+     :AndIf 0<≢packageID
+     :AndIf 0=Reg.IsValidPackageID_Complete packageID
+          ⍝ Special case: somebody asked for the home page of a group via a browser
+         :If G.INI.Exist'CONFIG:GroupHomePages'
+         :AndIf G.INI.Get'CONFIG:GroupHomePages'
+             groupName←1↓{⍵↑⍨-⌊/'/\'⍳⍨⌽⍵}path_
+             response←ReturnGroupHomepage packageID request
+         :Else
+             response←request RespondWithHTML 404
+         :EndIf
+     :Else
+         :Select path
+         :Case GetVersion_REST'all_packages'
+             response←request GetFullPackageList packageID
+         :Case GetVersion_REST'packages'
+             response←request GetPackageList packageID
+         :Case GetVersion_REST'packages/major_versions'
+             regFolder←'expand'F.NormalizePath G.RegistryPath
+             response←request GetMajorVersionList packageID regFolder
+         :Case GetVersion_REST'packages/versions'
+             response←request GetVersionList packageID
+         :Case GetVersion_REST'packages/details'
+             response←request GetDetails packageID
+         :Case GetVersion_REST'packages/dependencies'
+             response←request ReturnDependencyFiles packageID
+         :Case GetVersion_REST'packages/exist'
+             response←request CheckForExistence packageID
+         :Case GetVersion_REST'packages/dependencies'
+             response←request GetDependencies packageID
+         :Case GetVersion_REST'packages/best_version'
+             response←request GetBestVersionNumber packageID
+         :Case GetVersion_REST'groups'
+             response←GetGroupList ⍬
+         :Case GetVersion_REST'tags'
+             response←GetTagList request
+         :Case GetVersion_REST'documentation'
+             response←CreateDocumentationIndex request
+         :Case GetVersion_REST'version'
+             response←GetServerVersion request
+         :Case GetVersion_REST'version-information'
+             response←GetVersionInformation request
+         :Case GetVersion_REST'delete-policy'
+             response←ReturnDeletePolicy request
+         :Case GetVersion_REST'credential-report'
+             response←ReturnCredentialReport request
+         :Case GetVersion_REST'usage-data'
+             response←ReturnUsageData request
+         :Case GetVersion_REST'group-homepage'
+             response←HandleGroupHomePage request
+         :Case GetVersion_REST'group-homepage-edit'
+             response←EditGroupHomepage request
+         :Case GetVersion_REST'group-homepage-create'
+             response←EditGroupHomepage request
+         :Else
+         ⍝ Something new?
+             response←request RespondWithHTML 400 'Invalid Request' ⍝ Not a valid REST version 1 request
+         :EndSelect
+     :EndIf
+ :EndIf
+⍝Done

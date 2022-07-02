@@ -2,7 +2,7 @@
 ⍝ Return literally all packages. Parameters are ignored
  parms←Reg.CheckParmsForListPackages ⍬
  :If IsJsonRequest request.Headers
-     response←Return406 request  ⍝ We don't support this via JSON request
+     response←request RespondWithHTML 406 ⍝ We don't support this via JSON request
  :Else  ⍝ It's a request from a Browser
      list←1 Reg.GetAllPackages G.RegistryPath
      html←packageID PrepareHtmlPageForFullPackageList list

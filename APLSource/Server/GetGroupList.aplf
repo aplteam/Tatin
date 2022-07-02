@@ -1,17 +1,15 @@
- response←GetGroupList path;data;html;packages
+ response←GetGroupList dummy;data;html;groups;path
+ path←'expand'F.NormalizePath G.RegistryPath
  :If IsJsonRequest request.Headers
      data←Reg.ListGroups path
      response←request ReturnJSON Reg.JSON data
  :Else
-     packages←,Reg.GetAllPackages path
-     :If 0<≢data←∪{⍵↑⍨¯1+⍵⍳'.'}¨packages
-         data←{⍵↑⍨¯1+⍵⍳'-'}¨data
-         data←data,[1.5]1
-         data⍪←((,¨1⊃G.Credentials)~,⊂,'*'),[1.6]0
-         data←{(1⊃⍺)((≢⍵)×2⊃⍺)}⌸data
-         data←data[data[;1]⍳∪data[;1];]
-     :EndIf
-     html←PrepareHtmlPageForGroupList data
+     groups←GetGroupList_ path
+     groups←groups,[1.5]1
+     groups⍪←((,¨1⊃G.Credentials)~,⊂,'*'),[1.6]0
+     groups←{(1⊃⍺)((≢⍵)×2⊃⍺)}⌸groups
+     groups←groups[groups[;1]⍳∪groups[;1];]
+     html←PrepareHtmlPageForGroupList groups
      response←request ReturnHTML html
  :EndIf
 ⍝Done

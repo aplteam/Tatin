@@ -8,6 +8,9 @@
  html,←⊂'</thead>'
  html,←⊂'<body>'
  :If 0<≢list
+     :If ⊃G.INI.Get'Config:GroupHomePages'
+         list[;1]←{⍵{'<a href="',⍵,'" title="Link to the group`s home page">',⍺,'</a>'}(GetBaseForHTML,'/',GetVersion_REST'group-homepage?name='),⍵}¨list[;1]
+     :EndIf
      html,←{'<tr><td>',(1⊃⍵),'</td><td>',(⍕2⊃⍵),'</td></tr>'}¨↓list
  :EndIf
  html,←⊂'</body>'

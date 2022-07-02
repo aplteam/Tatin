@@ -18,6 +18,7 @@ This is an example:
   api: "DotNetZip",
   assets: "",
   description: "Zipping and unzipping with.NET Core on all major platforms",
+  documentation: "",
   group: "aplteam",
   info_url: "https://github.com/aplteam/DotNetZip",
   io: 1,
@@ -201,6 +202,32 @@ This information is typically used when a human accesses a Tatin Server with a B
 
 `description` _must not_ be empty.
 
+#### documentation
+
+This can be one of:
+
+* A URL pointing to an online help resource
+
+  It is identified by starting with either "`http://`" or "`https://`".
+
+* A local path pointing to a file (or program) within the package
+
+  In this case it _must_ be a relative path since you cannot know in advance where your package ends up.
+
+  It must start with "`./`".
+
+* A pointer to a function or a variable inside the package
+
+  It must start with "`⎕THIS.`", and whatever follows must be valid APL name(s). Examples:
+
+  ```
+  ⎕THIS.ShowHelp
+  ⎕THIS.Admin.ShowHelp
+  ```
+
+Content that does not qualifiy for one of these will be rejected.
+
+
 #### GetFullPath2AssetsFolder
 
 In case [`assets`](#assets) is not empty this function returns a simple char vector that represents the _full path_ to the assets, using something like:
@@ -209,9 +236,9 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
   HOME,'/',ASSETS
 ```
 
-If `HOME` is empty the function returns just `ASSETS`.
+* If `HOME` is empty the function returns just `ASSETS`.
 
-If `ASSETS` is empty the functins returns `''`.
+* If `ASSETS` is empty the functins returns `''`.
 
 #### group
 
@@ -238,6 +265,24 @@ The `lx` function will be executed under error trapping, and any errors will be 
 * Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with problems yourself
 
 Note that the existence of a variable `LX` indicates that there was an `lx` function successfully executed.
+
+#### maintainer
+
+This may be left empty. If set it must be an email address. 
+
+Two formats are possible:
+
+```
+your name <your.name@your-domain.com>
+```
+
+and
+
+```
+your.name@your-domain.com
+```
+
+
 
 #### name
 

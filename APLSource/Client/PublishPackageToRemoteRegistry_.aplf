@@ -11,20 +11,15 @@
  request.Method←'PUT'
  request.Content←Reg.Base64 Reg.ReadNativeFile filename
  request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)
- res← SendAndReceive uri_ request
+ res←SendAndReceive uri_ request
  :If res.StatusCode≢200
      :If 405≡res.StatusCode
-         :If ∨/'http://'⍷uri
-             'http:// is not supported'Assert 0
-         :Else
-             'https:// is not supported'Assert 0
+         :If IsHTTP uri
+             'http[s]:// is not supported'Assert 0
          :EndIf
      :Else
-         :If ∨/'<html'⍷res.Content
-             ('Failed with status code ',⍕res.StatusCode)Assert 0
-         :Else
-             ('Server: ',res.Content)Assert 0
-         :EndIf
+         ('Server: ',{⍵↑⍨¯1+⍵⍳'<'}'<h2>'{⍵↓⍨(¯1+≢⍺)+⍺{1⍳⍨⍺⍷⍵}⍵}res.Content)Assert~∨/'<html'⍷res.Content
+         ('Server: ',res.Content)Assert 0
      :EndIf
  :EndIf
 ⍝Done

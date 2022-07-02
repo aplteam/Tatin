@@ -1,0 +1,12 @@
+ ValidateDocumentation←{
+     doc←,⍵.documentation
+     0=≢doc:⍵
+     IsHTTP doc:⍵
+     './'≡2⍴doc:⍵
+     'Package property "documentation" is invalid'Assert'⎕THIS.'{⍺≡1 ⎕C(≢⍺)↑⍵}doc:
+     doc←(≢'.⎕THIS')↓doc
+     'Package property "documentation" is invalid'Assert 0<≢doc:
+     list←'.'(≠⊆⊢)doc   ⍝ Might well be something like "Help.View"
+     'Package property "documentation" is invalid'Assert 0=+/{⊃(⎕NS'').⎕NC ⍵}¨list: ⍝ All valid APL names?
+     ⍵  ⍝ Unfortunately we cannot check the name for pointing to something that exists at this stage
+ }

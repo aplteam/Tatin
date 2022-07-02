@@ -642,7 +642,7 @@
           targetSpace←,'#'
       :EndIf
       :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
-          '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
+          ('"',targetSpace,'" is not a valid APL name')Assert ¯1≠⎕NC targetSpace
       :EndIf
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
       :If ~(⊂1 ⎕C targetSpace)∊,¨'#' '⎕SE'
@@ -808,7 +808,7 @@
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
           TC.CloseConnections 1
-          qdmx.DM ⎕SIGNAL qdmx.EN
+          qdmx.EM ⎕SIGNAL qdmx.EN
       :EndTrap
     ∇
 
@@ -1250,11 +1250,11 @@
               r,←⊂']Tatin.ListVersions {name}'
               r,←⊂'or'
               r,←⊂']Tatin.ListVersions {group}-{name}'
-              r,←⊂'Naturally this comes potentially with a minor performance penalty since all registries with a'
-              r,←⊂'priority greater than zero will be questioned.'
+              r,←⊂'Naturally this comes potentially with a minor performance penalty since all registries'
+              r,←⊂'with a priority greater than zero will be questioned.'
               r,←⊂''
-              r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem with'
-              r,←⊂'beta versions) then the publishing date is taken into account.'
+              r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem'
+              r,←⊂'with beta versions) then the publishing date is taken into account.'
               r,←⊂''
               r,←⊂'-date Adds the publishing date to the report.'
           :Case ⎕C'Version'
@@ -1273,8 +1273,8 @@
               r,←⊂''
               r,←⊂'For details how tags are search refer to the documentation.'
           :Case ⎕C'Init'
-              r,←⊂'(Re-)Establish the user settings in ⎕SE. Call this in case the user settings got changed on file'
-              r,←⊂'and you want to incorporate the changes in the current session.'
+              r,←⊂'(Re-)Establish the user settings in ⎕SE. Call this in case the user settings got changed on'
+              r,←⊂'file and you want to incorporate the changes in the current session.'
               r,←⊂''
               r,←⊂'Without an argument Init processes the default user settings file.'
               r,←⊂'Instead you may specify a folder that contains a file tatin-client.json.'
@@ -1282,6 +1282,8 @@
               r,←⊂'Check whether later versions of the installed packages are available.'
               r,←⊂'Takes a folder that hosts a file "apl-buildlist.json" as argument.'
               r,←⊂'Scans all known registries with a priority greater than 0 for later versions.'
+              r,←⊂'Note that if you''ve loaded a package from a registry that has been removed since, or has a '
+              r,←⊂'prority of 0, then Tatin won''t be able to find any later versions!'
               r,←⊂''
               r,←⊂'Returns a matrix with four columns for all packages found:'
               r,←⊂'[;1] Currently installed packge ID'
@@ -1303,7 +1305,7 @@
               r,←⊂' * Folder hosting a package; must start with file://'
               r,←⊂'   The folder must contain a file apl-package.json, otherwise an error is thrown'
               r,←⊂''
-              r,←⊂'Whether a package can be deleted or not depends on the delete policy operated by a given server.'
+              r,←⊂'Whether a package can be deleted depends on the delete policy operated by a given server.'
               r,←⊂'A server may allow...'
               r,←⊂' * no deletion at all'
               r,←⊂' * deletion of beta versions only'

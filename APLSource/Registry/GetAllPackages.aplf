@@ -3,9 +3,9 @@
  addPublishingDate←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'addPublishingDate'
  list←F.ListDirs registryPath                           ⍝ All folder name
  list←{⊃,/1↓⎕NPARTS ⍵}¨list                             ⍝ Remove path: we only need the package IDs
- list←(IsValidPackageID_Complete¨list)/list             ⍝ Remove everything that is not a valid package ID
- list2←registryPath InjectPublishingDate list           ⍝ Add publishing date where required
+ list←(2≤list+.=¨'-')/list                              ⍝ Package IDs carry at least two hyphens
  :If addPublishingDate
+     list2←registryPath InjectPublishingDate list           ⍝ Add publishing date where required
      list←list,[1.5]list2[;2]
      :If 0<≢list←list[SortIndexForPackageIDs list2;]    ⍝ Only under Windows is the list guaranteed to be sorted
          list[;2]←FormatFloatDate¨list[;2]

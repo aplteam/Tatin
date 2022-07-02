@@ -1,0 +1,22 @@
+ r←Test_PkgCfg_020(stopFlag batchFlag);⎕TRAP;dir;cfg;cfg2
+⍝ Check the "documentation" property being a URL
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir ⍬
+ F.MkDir dir
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'0.1.0'
+ cfg.source←'TheSource/'
+ cfg.documentation←'https://aplwiki.com/wiki/Tatin'
+ cfg2←TC.WritePackageConfigFile dir cfg
+ →T.GoToTidyUp cfg2.documentation≢cfg.documentation
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Done

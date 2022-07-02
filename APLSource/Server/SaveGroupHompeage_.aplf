@@ -1,0 +1,26 @@
+ {r}←SaveGroupHompeage_(group markdown email);html;parms;folder;dcfFilename;htmlFilename;dcfTie;ns
+ parms←##.MarkAPL.CreateParms
+ parms.createFullHtmlPage←0
+ parms.verbose←0
+ parms.ignoreEmbeddedParms←1
+ markdown←MassageMarkdown markdown
+ (html ns)←parms ##.MarkAPL.Markdown2HTML markdown
+ folder←'expand'F.NormalizePath G.HTDOCS,'/../Groups/'
+ 'Create!'F.CheckPath folder
+ dcfFilename←folder,group,'.dcf'
+ htmlFilename←folder,group,'.htm'
+ :If 0=⎕NEXISTS dcfFilename
+     dcfTie←dcfFilename ⎕FCREATE 0
+     (10↑'toc' 'group' 'markdown' 'email',10⍴⊂'')⎕FAPPEND dcfTie  ⍝ Table of contents with 10 items
+     group ⎕FAPPEND dcfTie
+     markdown ⎕FAPPEND dcfTie
+     email ⎕FAPPEND dcfTie
+     {''⎕FAPPEND ⍵}¨6⍴dcfTie
+     ⎕FUNTIE dcfTie
+ :EndIf
+ dcfTie←dcfFilename ⎕FSTIE 0
+ markdown ⎕FREPLACE dcfTie 3
+ email ⎕FREPLACE dcfTie 4
+ ⎕FUNTIE dcfTie
+ (⊂html)⎕NPUT htmlFilename 1
+⍝Done

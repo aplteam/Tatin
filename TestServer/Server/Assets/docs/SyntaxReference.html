@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior:smooth" >
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title>Tatin Syntax Reference</title>
+<style media="screen">
+html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}body{margin:0;}article,aside,footer,header,nav,section{display:block;}h1{font-size:2em;margin:0.67em 0;}figcaption,figure,main{display:block;}figure{margin:1em 40px;}hr{box-sizing:content-box;height:0;overflow:visible;}pre{font-family:monospace, monospace;font-size:1em;}a{background-color:transparent;-webkit-text-decoration-skip:objects;}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted;}b,strong{font-weight:inherit;}b,strong{font-weight:bolder;}code,kbd,samp{font-family:monospace, monospace;font-size:1em;}dfn{font-style:italic;}mark{background-color:#ff0;color:#000;}small{font-size:0.8em;}sub,sup{font-size:0.75em;line-height:0;position:relative;vertical-align:baseline;}sub{bottom:-0.25em;}sup{top:-0.5em;}audio,video{display:inline-block;}audio:not([controls]){display:none;height:0;}img{border-style:none;}svg:not(:root){overflow:hidden;}button,input,optgroup,select,textarea{font-family:sans-serif;font-size:1em;line-height:1.15;margin:0;}button,input{overflow:visible;}button,select{text-transform:none;}button,html [type="button"], [type="reset"],[type="submit"]{-webkit-appearance:button;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner{border-style:none;padding:0;}button:-moz-focusring,[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring{outline:1px dotted ButtonText;}fieldset{padding:0.35em 0.75em 0.625em;}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal;}progress{display:inline-block;vertical-align:baseline;}textarea{overflow:auto;}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0;}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto;}[type="search"]{-webkit-appearance:textfield;outline-offset:-2px;}[type="search"]::-webkit-search-cancel-button,[type="search"]::-webkit-search-decoration{-webkit-appearance:none;}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit;}details, menu{display:block;}summary{display:list-item;}canvas{display:inline-block;}template{display:none;}[hidden]{display:none;}body{margin:0;font-family:"Bookman Old Style", "Callisto MT", Bookman, "Goudy Old Style", Garamond, serif;background-color:#fdfdfd;font-size:18px;line-height:1.4;max-width:900px;padding:0.83em;color:#292929;word-wrap:break-word;overflow-wrap:break-word;}h1, h2, h3, h4, h5, h6{color:#404040;font-weight:800;padding-left:0;}h1, h2, h3, h4, h5, h6{font-family:"Century Gothic", Verdana, "Sans";}h1, h2, h3, h4, p{margin-bottom:0.88em;}h1{font-size:1.8em;margin:0.27em 0 1.11em 0;}h1 > code, h2 > code, h3 > code, h4 > code, h5 > code, h6 > code{font-size:1em;background-color:inherit;}h2{font-size:1.44em;margin:0.55em 0 0.55em 0;padding-top:0.55em;border-bottom:1px solid Silver;}h3{margin:0;margin-top:0.55em;font-size:1.22em;}nav h3{font-size:0.88em;margin-left:0.83em;margin-bottom:0.27em;}h4{font-size:1em;margin:0;margin-top:0.55em;}h5{font-size:0.94em;margin:0;margin-top:0.66em;padding:0;}h6{font-size:0.88em;margin:0;margin-top:0.66em;padding:0;}a{color:#0099ff;margin:0;padding:0;vertical-align:baseline;}a:visited{color:purple;}a.autoheader_anchor{text-decoration:none;}ul{list-style-type:disc;}dd{padding-top:0.25em;}p.first_dd{padding-top:0.25em;}li > ul, ol{padding-bottom:0;}li{line-height:1.3;margin-left:1.38em;margin-bottom:0.55em;}ul > li{margin-left:2.5em;}ol > li{margin-left:2.5em;}li ul{margin-left:0.55em;}li ul{margin-left:0.27em;}li p{padding:1px 0 0 0;margin:0.55em 0 0.27em 0;line-height:1.3;}ul, ol{line-height:1.3;padding:0.33em 0 0 0;margin:0.5em;margin-top:1.2em;}p{line-height:1.2;padding:0.40em 0 0 0;margin:0;}pre{overflow:scroll;padding:0.55em 0.27em;margin:0.55em 0 0.55em 0 !important;background-color:#faebd7;color:#3e3e3e;border:1px Silver dashed;display:block;font-family:APLFont, monospace;font-weight:normal;white-space:pre-wrap;}pre > code{line-height:1.2;border:0;padding:0;margin:0;background-color:inherit;color:inherit;font-weight:inherit;white-space:pre-wrap;}td code{padding:0;}a code{padding:0;font-size:1em;}nav code{background-color:inherit;font-weight:400;color:inherit;}code{font-family:APLFont, monospace;color:Black;font-weight:800;line-height:1.2;font-size:0.88em;margin:0;color:#950000;padding:0 0.16em;}tbody tr:nth-child(even){background-color:#F0F0F0;}th{background-color:#E6E6E6;color:black;}th, td{padding:0.16em 0.55em;vertical-align:top;}table td + td{border-left:1px solid gray;}table th + th{border-left:1px solid gray;}table{border-color:Black;margin:1.5em 0;border:2px black;border-collapse:collapse;font-family:APLFont;font-size:0.88em;line-height:1.2;border:1px solid Gray;}li > table{margin:0.55em 0 0.55em 0;}tr{margin:1.11em;}th{font-weight:bold;}tfoot td{font-weight:bold;}blockquote{border-left:0.27em solid silver;padding-left:0.27em;margin:0.83em 0.27em 0.83em 0.55em;}blockquote ul li{margin-left:1.38em;}blockquote ol li{margin-left:1.38em;}li > blockquote{margin-left:0;}nav{background-color:#f5f5f5;border:1px solid Black;padding:0.55em;margin:0.55em;margin-right:0;box-shadow:0.27em 0.27em 0.27em Gray;overflow:hidden;clear:both;}nav#main_nav{position:fixed;top:0;right:0.55em;float:none;width:auto;}nav#main_nav_no_collapse li{font-size:0.77rem;}nav#main_nav_no_collapse li{line-height:1.5;}nav ul{list-style-type:none;margin:0 0 0.11em 0;padding:0;}nav a:visited{color:black;}nav ul li{margin-bottom:0.16em;}nav li p{margin:0;padding:0;line-height:1;margin:0;padding:0;}nav li{font-size:0.75rem;line-height:1.3;padding:0;margin-top:0;margin-bottom:0;margin-left:0.83em;}nav p{font-weight:bold;font-size:0.75rem;padding-top:0;}dl{margin-top:0.1em;margin-bottom:0.1em;}dt{margin-top:0.75em;margin-bottom:0.1em;font-weight:800;}label#hide_toc_label{font-size:0.8em;}.toc-container{position:relative;height:auto;}div.toc-container h1{font-size:0.88em;margin:0.27em 0 0.27em 0;}[type="checkbox"]{position:absolute;left:-9999px;}label{display:block;width:100%;height:1.1em;cursor:pointer;top:0;padding-left:1.1em;}label:before{content:'Table of contents \25BC';font-weight:bold;font-size:90%;padding-bottom:0;}[type="checkbox"] ~ div{display:none;}[type="checkbox"]:checked ~ div{display:block;margin-top:1.1em;}[type="checkbox"]:checked + label{top:100%;}[type="checkbox"]:checked + label:before{content:'Table of contents ▲';}div#footnotes_div p{line-height:1;padding-bottom:0;padding-top:0;}div#footnotes_div ol{padding-top:0;}@font-face{font-family:"APLFont";src:local("APL385 Unicode"), url("https://misc.aplteam.com/apl385.ttf") format("truetype");}.no_display{display:none;}.red{color:red;}.center{text-align:center;margin-left:auto;margin-right:auto;}.left{text-align:left;margin-right:0 auto;}.right{text-align:right;margin-left:0 auto;}img{margin-top:0.55em;margin-bottom:0.27em;}div.leanpub{padding:0.83em 0.55em 1.11em 0;margin:0.55em 0 0 0.27em;overflow:auto;}div.leanpub_A{border:1px solid black;background-color:#f1f1f1;padding:0.55em;margin:1.11em 0 0.83em 0;}div.leanpub h3, div.leanpub_A h3{font-size:1.2em;padding:0;margin:0;}div.leanpub h4, div.leanpub_A h4{font-size:1.1em;padding:0.27em 0 0 0;margin:0;}div.leanpub h5, div.leanpub h5{font-size:1.0em;padding:0.27em 0 0 0;margin:0;}div.leanpub_A h5, div.leanpub_A h5{font-size:1.0em;padding:0.27em 0 0 0;margin:0;}div.leanpub img{padding:0;margin:0 1.11em 0.27em 0;}div.leanpub_A > p:first-child{padding-top:0;margin-top:0;}div.leanpub img{float:left;padding:0;margin:0.55em 1.11em 0 0;clear:both;}div.leanpub tbody *{background-color:transparent;}div.leanpub p{padding:0.17em 0 0 0;margin:0;}span.leanpub_code{color:Red;}div.leanpub p{display:block;padding:0.44em 0 0 0;}div.leanpub > div{margin-left:2.27em;}.print_only{display:none;}
+</style>
+<style media="print">
+@page{margin:25mm 20mm 25mm 20mm;}body{font-family:"Bookman Old Style", "Callisto MT", Bookman,"Goudy Old Style", Garamond, serif;font-size:9pt;line-height:1.2;}h1{font-size:170%;}h2{font-size:110%;}h3{font-size:110%;}h4{font-size:105%;}h5{font-size:100%;}h6{font-size:95%;}h1{margin:0 0 20pt 0;}h2{margin:15pt 0 3pt 0;}h3{margin:10pt 0 0pt 0;}h4{margin:10pt 0 0pt 0;}h5{margin:9pt 0 0pt 0;}h6{margin:9pt 0 0pt 0;}h1, h2, h3, h4, h5, h6{color:black;font-family:"Century Gothic", Verdana, "Sans";page-break-after:avoid;}h1 > code, h2 > code, h3 > code, h4 > code, h5 > code, h6 > code{font-size:100%;}h2{border-bottom:1pt solid Silver;padding-bottom:2pt;}.h_tag{page-break-after:avoid;break-after:avoid;}abbr[title]{border-bottom:0;text-decoration:none;}a{color:black;margin:0;padding:0;vertical-align:baseline;text-decoration:none;font-style:italic;}a.autoheader_anchor{text-decoration:none;font-style:normal;page-break-after:avoid;break-after:avoid;}ul{list-style-type:square;}ul, ol{padding:0;margin:0;margin-top:10pt;}li > ul, ol{padding-bottom:0;}li{line-height:1.3;margin-left:13pt;margin-bottom:5pt;}ul > li{margin-left:25pt;}ol > li{margin-left:25pt;}li ul{margin-left:5pt;}li ul{margin-left:3pt;}li p{padding:1pt 0 0 0;margin:5pt 0 3pt 0;line-height:1.3;}p, ul, ol{line-height:1.3;padding:4pt 0 0 0;margin:0;color:black;}ul, ol{margin-top:0.75em;}pre{padding:3pt;margin:5pt 0;white-space:pre-wrap;background-color:#FAFAFA;border:1pt Silver solid;display:block;font-family:APLFont, monospace;page-break-inside:avoid;}pre code{background-color:#FAFAFA;color:Black;padding:0;margin:0 0 -6pt 0;line-height:1.1;border:0;white-space:pre-wrap;}code{font-family:APLFont, monospace;line-height:1.2;font-size:9pt;padding:3pt 1pt 3pt 1pt;color:#950000;padding:3pt 0pt 3pt 0pt;margin:0;}tbody th, tfoot tr{background-color:#e6e6e6;}tbody tr:nth-child(even){background-color:#fafafa;}th{background-color:#F0F0F0;}th, td{padding:1pt 5pt;border:1px solid #E3E3E3;vertical-align:top;}table td + td{border-left:1px solid gray;}table th + th{border-left:1px solid gray;}table code{font-style:normal;padding-left:0;padding-right:0;}table{margin:1.5em 0;font-family:APLFont;font-size:9pt;padding:0;border:1pt solid silver;border-collapse:collapse;}li > table{margin:10pt 0 10pt 0;}tr{margin:20pt;}th{font-weight:bold;}tfoot td{font-weight:bold;}blockquote{border-left:5pt solid silver;padding-left:5pt;margin:8pt 3pt 8pt 8pt;}nav{background-color:#f8f8f8;border:1pt solid Gray;width:auto;float:right;padding:5pt 5pt 5pt 0;margin:5pt 0 5pt 5pt;page-break-inside:avoid;break-inside:avoid;clear:both;overflow:hidden;}nav *{font-size:75%;}nav ul{list-style-type:none;margin:0 0 2pt 0;padding:0;}nav ul li{margin-bottom:0;}nav li p{margin:0;padding:0;line-height:1;margin:0;padding:0;}nav li{font-size:9pt;line-height:1;padding:0;margin-top:0;margin-bottom:0;margin-left:8pt;}dl{margin-top:0;margin-bottom:10pt;}dt{margin-top:10pt;margin-bottom:0;font-weight:800;page-break-inside:avoid;}dd{margin-top:2pt;}label#hide_toc_label{font-size:65%;}.toc-container{position:relative;height:auto;margin-top:2pt;background-color:inherit;}.toc-container h3{margin:0 0 2pt 7pt;}[type="checkbox"]{display:none;}label{display:block;width:100%;height:1.1em;top:0;padding-left:10pt;}label:before{content:'Table of contents';font-weight:bold;font-size:140%;padding-bottom:10pt;}a.external_link::before{content:" 🌎";}a.bookmark_link::before{content:" ➯";}a.mailto_link::before{content:" ✉"}nav a.bookmark_link{font-style:normal;}nav p{margin-left:10pt;font-weight:bold;font-size:9pt;}nav a{font-style:normal;}nav a.bookmark_link::before{content:"";}div#footnotes_div a::before{content:"";}div#footnotes_div a{font-style:normal;}div#footnotes_div{page-break-inside:avoid;}@font-face{font-family:"APLFont";src:local("APL385 Unicode"), url("https://misc.aplteam.com/apl385.ttf") format("truetype");}.no_print{display:none;}.red{color:red;}.center{text-align:center;margin:0 auto;}.left{text-align:left;margin-right:0 auto;}.right{text-align:right;margin-left:0 auto;}.avoid_page_break{page-break-inside:avoid;}.page_break_before{page-break-before:always;}div.leanpub{margin:10pt 0 10pt 8pt;page-break-inside:avoid;}div.leanpub_A{border:1pt solid black;background-color:#f9f9f9;padding:5pt;margin:10pt 0 10pt 0;page-break-inside:avoid;}div.leanpub h3, div.leanpub_A h3{font-size:1.2em;padding:3pt 0 0 0;margin:0;}div.leanpub h4, div.leanpub_A h4{font-size:1.1em;padding:3pt 0 0 0;margin:0;}div.leanpub h5, div.leanpub h5{font-size:1.0em;padding:3pt 0 0 0;margin:0;}div.leanpub_A h5, div.leanpub_A h5{font-size:1.0em;padding:3pt 0 0 0;margin:0;}div.leanpub img{padding:0;margin:0 10pt 2pt 0;}div.leanpub_A > p:first-child{padding-top:0;margin-top:0;}div.leanpub > div > h1:first-child{padding-top:5pt;}div.leanpub img{float:left;padding:0;margin:5pt 10pt 0 0;clear:both;}div.leanpub p{padding:3pt 0 0 0;margin:0;}span.leanpub_code{font-weight:bold;}div.leanpub p{display:block;padding:8pt 0 0 0;}div.leanpub > div{margin-left:35pt;}sup{font-size:0.75em;line-height:0;position:relative;vertical-align:baseline;top:-0.4em;}
+</style>
+
+</head>
+<body>
+<nav id="main_nav">
+<input type="checkbox" id="hide_toc">
+<label id="hide_toc_label" for="hide_toc"></label>
+<div class="toc-container">
+<ul>
+<li><a href="#User-Commands">1. User Commands</a></li>
+<li><a href="#The-API">2. The API</a>
+<ul>
+<li><a href="#CheckForLaterVersion">2.1. CheckForLaterVersion</a></li>
+<li><a href="#ClearCache">2.2. ClearCache</a></li>
+<li><a href="#CreateReInstallParms">2.3. CreateReInstallParms</a></li>
+<li><a href="#DeletePackage">2.4. DeletePackage</a></li>
+<li><a href="#GetDeletePolicy">2.5. GetDeletePolicy</a></li>
+<li><a href="#GetDependencyTree">2.6. GetDependencyTree</a></li>
+<li><a href="#GetNoCachingFlag">2.7. GetNoCachingFlag</a></li>
+<li><a href="#GetPathToPackageCache">2.8. GetPathToPackageCache</a></li>
+<li><a href="#GetUserHomeFolder">2.9. GetUserHomeFolder</a></li>
+<li><a href="#InitialisePackage">2.10. InitialisePackage</a></li>
+<li><a href="#InitPackageConfig">2.11. InitPackageConfig</a></li>
+<li><a href="#InstallPackages">2.12. InstallPackages</a></li>
+<li><a href="#ListCache">2.13. ListCache</a></li>
+<li><a href="#ListPackages">2.14. ListPackages</a></li>
+<li><a href="#ListRegistries">2.15. ListRegistries</a></li>
+<li><a href="#ListTags">2.16. ListTags</a></li>
+<li><a href="#ListVersions">2.17. ListVersions</a></li>
+<li><a href="#LoadDependencies">2.18. LoadDependencies</a></li>
+<li><a href="#LoadPackages">2.19. LoadPackages</a></li>
+<li><a href="#Pack">2.20. Pack</a></li>
+<li><a href="#Ping">2.21. Ping</a></li>
+<li><a href="#PublishPackage">2.22. PublishPackage</a></li>
+<li><a href="#ReInstallDependencies">2.23. ReInstallDependencies</a></li>
+<li><a href="#ReadPackageConfigFile">2.24. ReadPackageConfigFile</a></li>
+<li><a href="#UnInstallPackages">2.25. UnInstallPackages</a></li>
+<li><a href="#Version">2.26. Version</a>
+</li></ul></li>
+</ul>
+</div>
+</nav>
+<div class="h_tag">
+<a href="#Tatin-Syntax-Reference" id="Tatin-Syntax-Reference" class="autoheader_anchor">
+<h1 data-id="Tatin-Syntax-Reference">Tatin Syntax Reference</h1>
+</a>
+</div>
+<div class="h_tag">
+<a href="#User-Commands" id="User-Commands" class="autoheader_anchor">
+<h2 data-id="User-Commands">1. User Commands</h2>
+</a>
+</div>
+<p>Every user command comes with at least two levels of help, and a few even with a third level:</p>
+<ol start="1">
+<li><code>-?</code> shows a brief description and the syntax</li>
+<li><code>-??</code> shows a detailed description of the command and its arguments and options</li>
+<li><code>-???</code> shows examples (for some commands)</li>
+</ol>
+<p>If the third level is available then <code>-??</code> shows this at the bottom:</p>
+<pre><code>]{API-Function-name} -??? ⍝ Enter this for examples</code></pre>
+<div class="h_tag">
+<a href="#The-API" id="The-API" class="autoheader_anchor">
+<h2 data-id="The-API">2. The API</h2>
+</a>
+</div>
+<p>The API is established in <code>⎕SE.Tatin</code>. These are almost exclusively dfns that call a function in <code>⎕SE._Tatin</code>.</p>
+<p>While <code>⎕SE._Tatin</code> holds all code required for Tatin's client side, <code>⎕SE.Tatin</code> holds the public interface.</p>
+<div class="h_tag">
+<a href="#CheckForLaterVersion" id="CheckForLaterVersion" class="autoheader_anchor">
+<h3 data-id="CheckForLaterVersion">2.1. CheckForLaterVersion</h3>
+</a>
+</div>
+<pre><code> r←{flags} CheckForLaterVersion path</code></pre>
+<p>Checks whether there are later versions available for the principal packages installed in <code>path</code>.</p>
+<p>The optional left argument must, if specified, be an integer that may carry flags as a single integer:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Value</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td>No flag set, same as no argument at all</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Major: should later major version be listed as well? Defaults to 0</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Dependencies: should dependencies be checked as well? Defaults to 0</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Both flags set</td>
+</tr>
+</tbody>
+</table>
+<p>By default only minor and patch are part of the check. By specifying 1 as <code>major</code> you may change this default behaviour and list any later major versions instead.</p>
+<p>Note that this function scans all known registries with a priority greater than zero.</p>
+<p>Returns a matrix with five columns:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Col  </th>
+<th style="text-align: left;"> Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Original package ID</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>Lastest package ID</td>
+</tr>
+<tr>
+<td>[;3]</td>
+<td>Original URL</td>
+</tr>
+<tr>
+<td>[;4]</td>
+<td>Flag; 1 means later version is available</td>
+</tr>
+<tr>
+<td>[;5]</td>
+<td>URL the latest version was found but empty in case it's identical with [;3]</td>
+</tr>
+</tbody>
+</table>
+<div class="h_tag">
+<a href="#ClearCache" id="ClearCache" class="autoheader_anchor">
+<h3 data-id="ClearCache">2.2. ClearCache</h3>
+</a>
+</div>
+<pre><code>(rc report)←ClearCache dummy</code></pre>
+<p>Clears the cache, meaning that all sub directories but <code>temp\</code> are removed from the folder <code>GetPathToPackageCache</code> points to.</p>
+<div class="h_tag">
+<a href="#CreateReInstallParms" id="CreateReInstallParms" class="autoheader_anchor">
+<h3 data-id="CreateReInstallParms">2.3. CreateReInstallParms</h3>
+</a>
+</div>
+<pre><code>r←CreateReInstallParms</code></pre>
+<p>Creates a namespace with default parameters; it can be passed as (optional) left argument to the <a href="#ReInstallDependencies" class="bookmark_link"><code>ReInstallDependencies</code></a> function, in particular <code>noBetas</code>, <code>update</code> and <code>dry</code>.</p>
+<div class="h_tag">
+<a href="#DeletePackage" id="DeletePackage" class="autoheader_anchor">
+<h3 data-id="DeletePackage">2.4. DeletePackage</h3>
+</a>
+</div>
+<pre><code>(statusCode errMsg)←DeletePackage uri</code></pre>
+<p>Deletes a package.</p>
+<p>Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the INI setting <code>[CONFIG]DeletePackages</code>. See <a href="#GetDeletePolicy" class="bookmark_link"><code>GetDeletePolicy</code></a>.</p>
+<div class="h_tag">
+<a href="#GetDeletePolicy" id="GetDeletePolicy" class="autoheader_anchor">
+<h3 data-id="GetDeletePolicy">2.5. GetDeletePolicy</h3>
+</a>
+</div>
+<pre><code>r←GetDeletePolicy uri</code></pre>
+<p>Takes a URI of a server like https://tatin.dev or an alias and returns the delete policy operated by that server.</p>
+<p>Returns one of “None”, “Any”, “JustBetas”:</p>
+<ul>
+<li>“None” means a package, once published, cannot be deleted</li>
+<li>“Any” means any package can be deleted</li>
+<li>“JustBetas” means that only beta versions can be deleted</li>
+</ul>
+<div class="h_tag">
+<a href="#GetDependencyTree" id="GetDependencyTree" class="autoheader_anchor">
+<h3 data-id="GetDependencyTree">2.6. GetDependencyTree</h3>
+</a>
+</div>
+<pre><code>tree←GetDependencyTree x</code></pre>
+<p>Takes <code>identifier</code> (<code>x</code>) and returns the dependencies as a matrix.</p>
+<p><code>identifier</code> must be one of:</p>
+<ul>
+<li>an HTTP request</li>
+<li>a folder holding a package (like file://C:\Temp{group}-{name}-{major.minor.patch}\)</li>
+<li>a path to a package in a registry (like C:\MyReg\{packageID})</li>
+<li>a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.</li>
+</ul>
+<p>Returns a dependency tree as a matrix:</p>
+<table>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Flag that indicates whether it is a principal package (1) or a dependency (0)</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>PackageID of what required that dependency</td>
+</tr>
+<tr>
+<td>[;3]</td>
+<td>Full package ID</td>
+</tr>
+<tr>
+<td>[;4]</td>
+<td>The full URL (either a local path (without protocol) or http(s)://…)</td>
+</tr>
+</tbody>
+</table>
+<p>This function requires the version number to be fully specified.</p>
+<p>Note that the function accepts an optional left argument, but this should not be specified by a user: it is only used internally.</p>
+<div class="h_tag">
+<a href="#GetNoCachingFlag" id="GetNoCachingFlag" class="autoheader_anchor">
+<h3 data-id="GetNoCachingFlag">2.7. GetNoCachingFlag</h3>
+</a>
+</div>
+<pre><code>flag←GetNoCachingFlag uri</code></pre>
+<p>Take a URI or an alias and tries to find that URI in the <code>MyUserSettings</code> instance. If found the value of the <code>noCaching</code> property is returned.</p>
+<p>If URI is not found a 0 is returned.</p>
+<div class="h_tag">
+<a href="#GetPathToPackageCache" id="GetPathToPackageCache" class="autoheader_anchor">
+<h3 data-id="GetPathToPackageCache">2.8. GetPathToPackageCache</h3>
+</a>
+</div>
+<pre><code>r←GetPathToPackageCache</code></pre>
+<p>The user settings rule:</p>
+<ul>
+<li>If <code>MyUserSettings.path2cache</code> is not empty then that path is returned, otherwise:</li>
+<li>The function returns the standard path for caching which depends on the operating system</li>
+</ul>
+<div class="h_tag">
+<a href="#GetUserHomeFolder" id="GetUserHomeFolder" class="autoheader_anchor">
+<h3 data-id="GetUserHomeFolder">2.9. GetUserHomeFolder</h3>
+</a>
+</div>
+<pre><code>path←{aplVersion} GetUserHomeFolder append</code></pre>
+<p>Returns the standard path for any user-specific data.</p>
+<p>Works on all platforms but returns different results.</p>
+<p><code>⍵</code>, if not empty, is added to the resulting path.</p>
+<p>Under Windows typically:</p>
+<pre><code>`C:\Users\%USERPROFILE%\AppData\Roaming\Tatin'     ←→ GetUserHomeFolder ''
+`C:\Users\%USERPROFILE%\AppData\Roaming\Tatin\foo' ←→ GetUserHomeFolder 'foo'</code></pre>
+<p>On non-Windows platforms:</p>
+<pre><code>'/home/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''
+'/home/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'</code></pre>
+<p><code>⍺</code> is optional and only specified by test cases in order to simulate different versions of APL.</p>
+<div class="h_tag">
+<a href="#InitialisePackage" id="InitialisePackage" class="autoheader_anchor">
+<h3 data-id="InitialisePackage">2.10. InitialisePackage</h3>
+</a>
+</div>
+<pre><code>config←{configParms} InitialisePackage folder</code></pre>
+<p>Takes a folder (<code>⍵</code>) and initialises it so that it can be a package.</p>
+<p>This means in particular to create the folder (although it might already exist) and to create a package config file with default settings or what <code>⍺</code> specifies: one can pass a config namespace as <code>⍺</code>, typically created by a call to <a href="#InitPackageConfig" class="bookmark_link"><code>InitPackageConfig</code></a>.</p>
+<p>There must be no config file yet, otherwise an error is thrown.</p>
+<div class="h_tag">
+<a href="#InitPackageConfig" id="InitPackageConfig" class="autoheader_anchor">
+<h3 data-id="InitPackageConfig">2.11. InitPackageConfig</h3>
+</a>
+</div>
+<pre><code>cfg←InitPackageConfig y</code></pre>
+<p>Returns a namespace with default values useful for the function <a href="#InitialisePackage" class="bookmark_link"><code>InitialisePackage</code></a>.</p>
+<p><code>⍵</code> might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then this namespace will be merged. Any settings in that namespace take precedence.</p>
+<div class="h_tag">
+<a href="#InstallPackages" id="InstallPackages" class="autoheader_anchor">
+<h3 data-id="InstallPackages">2.12. InstallPackages</h3>
+</a>
+</div>
+<pre><code>r←{noBetas} InstallPackages (identifiers targetFolder)</code></pre>
+<p>Installs one or more packages (<code>identifiers</code> ) in <code>targetFolder</code>.</p>
+<p><code>identifiers</code> must be a simple character vector, specifying one or more comma-separated packages (items).</p>
+<p>Items must be one of:</p>
+<ul>
+<li>an HTTP request for a package</li>
+<li>a ZIP file holding a package</li>
+<li>a folder holding a package (like file://C:\Temp\group-name-version\)</li>
+<li>a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch})</li>
+<li>a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.</li>
+</ul>
+<p>You may omit minor+patch or even major+minor+patch in order to install the latest version.</p>
+<p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as <code>⍺</code>.</p>
+<p><code>r</code> is a nested vector of character vectors with the full names of all principle packages installed. The length will match the number of packages specified as <code>identifiers</code>.</p>
+<div class="h_tag">
+<a href="#ListCache" id="ListCache" class="autoheader_anchor">
+<h3 data-id="ListCache">2.13. ListCache</h3>
+</a>
+</div>
+<pre><code>mat←{fullpath} Listcache uri</code></pre>
+<p>Lists the contents of the Tatin package cache. Refers to the <code>MyUserSettings</code> instance of the class <code>UserSettings</code>.</p>
+<p><code>uri</code> might be empty of a specific domain:</p>
+<ul>
+<li>In case it is empty all packages of of all domains are listed</li>
+<li>In case it is a specific domain only packages of that domain are listed.</li>
+</ul>
+<p>The optional left argument <code>fullpath</code> defaults to 0, when just domain names and package IDs are reported. If it is 1 then the full paths are reported instead.</p>
+<p>The result is a vector with as many items as there are domains represented in the cache with at least one package. Each item is a two-element vector:</p>
+<ul>
+<li>The first item holds the url of the domain</li>
+<li>The second item holds a vector of char vectors with the package names</li>
+</ul>
+<p>In case the cache is empty an empty vector is returned.</p>
+<div class="h_tag">
+<a href="#ListPackages" id="ListPackages" class="autoheader_anchor">
+<h3 data-id="ListPackages">2.14. ListPackages</h3>
+</a>
+</div>
+<pre><code>mat←{parms} ListPackages uri</code></pre>
+<p><code>uri</code> must be one of:</p>
+<ul>
+<li>A path to an install folder, defined by the presence of a file <code>apl-buildlist.json</code></li>
+<li>A path to a Registry and optionally a (possibly incomplete) package ID</li>
+</ul>
+<div class="h_tag">
+<a href="#Install-folder" id="Install-folder" class="autoheader_anchor">
+<h4 data-id="Install-folder">2.14.1. Install folder</h4>
+</a>
+</div>
+<p>In case an install folder was specified a two-column matrix is returned:</p>
+<table>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Carries the package IS</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>Carries a star for principal packages</td>
+</tr>
+</tbody>
+</table>
+<div class="h_tag">
+<a href="#Registry" id="Registry" class="autoheader_anchor">
+<h4 data-id="Registry">2.14.2. Registry</h4>
+</a>
+</div>
+<p>In case a Registry was specified by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.</p>
+<p>You may specify an incomplete package ID; then only matching packages are listed.</p>
+<p>You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.</p>
+<p>Returns a matrix with two columns.</p>
+<table>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Package name</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>Carries the number of major versions</td>
+</tr>
+</tbody>
+</table>
+<p>Optionally <code>parms</code> can be specified. This must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>.</p>
+<ul>
+<li><code>group</code> may specify the group</li>
+<li><code>tags</code> may specify one or more tags (simple comma-separated text vector)</li>
+<li><code>aggregate</code> is a Boolean that defaults to 1.</li>
+</ul>
+<p>These combinations are available:</p>
+<ul>
+<li><code>uri</code> is empty and <code>aggregate</code> is 0:
+<p>All packages are returned; the second column carries <code>⍬</code></p></li>
+<li><code>uri</code> is empty and <code>aggregate</code> is 1 (the default):
+<p>All packages are returned with the number of major versions in <code>[;2]</code></p></li>
+<li><code>uri</code> specifies {group}-{name} and <code>aggregate</code> is 0:
+<p>All versions of that package are returned</p></li>
+<li><code>uri</code> specifies {group}-{name} and <code>aggregate</code> is 1:
+<p>All major versions of that package are returned</p>
+<p><code>[;2]</code> caries the number of versions of each major version</p></li>
+<li><code>uri</code> specifies {group}-{name}-{major}; in this case <code>aggregate</code> is ignored:
+<p>All versions (minor and patch) of that package are returned</p></li>
+<li><code>uri</code> specifies {group}-{name}-{major}-{minor}; in this case <code>aggregate</code> is ignored:
+<p>All patch versions of that package are returned</p></li>
+</ul>
+<div class="h_tag">
+<a href="#ListRegistries" id="ListRegistries" class="autoheader_anchor">
+<h3 data-id="ListRegistries">2.15. ListRegistries</h3>
+</a>
+</div>
+<pre><code>r←ListRegistries type</code></pre>
+<p>List all registries defined in the Client's config file.</p>
+<p>Returns a matrix with these columns:</p>
+<table>
+<tbody>
+<tr>
+<td>[;1]</td>
+<td>Alias</td>
+</tr>
+<tr>
+<td>[;2]</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>[;3]</td>
+<td>Port</td>
+</tr>
+<tr>
+<td>[;4]</td>
+<td>Priority</td>
+</tr>
+<tr>
+<td>[;5]</td>
+<td>No-caching flag</td>
+</tr>
+<tr>
+<td>[;6]</td>
+<td>API key</td>
+</tr>
+</tbody>
+</table>
+<p>“type” must be either 0 or 1 or empty:</p>
+<ul>
+<li>1 means all data is listed</li>
+<li>0 means the API key is not listed</li>
+</ul>
+<p>Note that the result of the API function and the user command differ.</p>
+<div class="h_tag">
+<a href="#ListTags" id="ListTags" class="autoheader_anchor">
+<h3 data-id="ListTags">2.16. ListTags</h3>
+</a>
+</div>
+<pre><code>list←{parms} ListTags y</code></pre>
+<p><code>y</code> might be the path to a Registry or a Registry alias (embraced by <code>[]</code>).</p>
+<p>By default all tags of all packages are returned.</p>
+<p>Optionally <code>⍺</code> can be specified. Must be a namespace that might contain a variable <code>tags</code> which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carry all of the specified tags.</p>
+<div class="h_tag">
+<a href="#ListVersions" id="ListVersions" class="autoheader_anchor">
+<h3 data-id="ListVersions">2.17. ListVersions</h3>
+</a>
+</div>
+<pre><code>mat←{dateFlag} ListVersions uri</code></pre>
+<p><code>uri</code> is one of:</p>
+<ul>
+<li>A package name</li>
+<li>A group name and a package name</li>
+<li>A URL pointing to a Registry together with a package name and possible also a group name</li>
+<li>An alias pointing to a Registry together with a package name and possible also a group name</li>
+<li>A path to a Registry and “group” and “name” of a package</li>
+</ul>
+<p>In the first and second case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.</p>
+<p>If a URL or an alias was specified the given Registry is scanned. A matrix with one column with full package IDs is returned.</p>
+<p>You may omit the group name; that does not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.</p>
+<p>The package ID must not specify a version number.</p>
+<p>By default the publishing date is not included, but you may change this by passing a 1 as <code>⍺</code>. In that case an additional column is added to the result.</p>
+<div class="h_tag">
+<a href="#LoadDependencies" id="LoadDependencies" class="autoheader_anchor">
+<h3 data-id="LoadDependencies">2.18. LoadDependencies</h3>
+</a>
+</div>
+<pre><code>{r}←LoadDependencies y</code></pre>
+<p>Requires two arguments:</p>
+<ul>
+<li>A folder with a build list (mandatory)</li>
+<li>A target namespace</li>
+</ul>
+<p>You may specify an optional third argument: the <code>overwriteFlag</code> flag which defaults to 0.</p>
+<p>Use <code>overwriteFlag</code> in case all packages should be loaded even if they already exist in <code>(#|⎕SE)._tatin</code></p>
+<p>Loads all packages and injects required references into <code>targetSpace</code>.</p>
+<p>Returns a vector with references to the loaded packages (no dependencies, principal packages only).</p>
+<div class="h_tag">
+<a href="#LoadPackages" id="LoadPackages" class="autoheader_anchor">
+<h3 data-id="LoadPackages">2.19. LoadPackages</h3>
+</a>
+</div>
+<pre><code>r←{noBetas} LoadPackages (identifiers targetSpace)</code></pre>
+<p>Loads packages dynamically into the workspace.</p>
+<p><code>identifiers</code> must be a simple character vector specifying one or more comma-separated packages (items).</p>
+<p>Every single item must be one of:</p>
+<ul>
+<li>An HTTP request for a package</li>
+<li>A ZIP file holding a package</li>
+<li>A folder holding a package (like file://C:/Temp/group-name-version)</li>
+<li>A path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg{packageID}')</li>
+<li>A package ID; Tatin will then attempt to find that package in one of the Registries defined in the client's config file with a priority greater than 0.</li>
+</ul>
+<p>The first hit wins.</p>
+<p><code>targetSpace</code> must be a reference or a fully qualified name of an ordinary namespace, meaning the name must start with either <code>#</code> or <code>⎕SE</code>.</p>
+<p>It might already exist, but if it doesn't it will be created. If it exists but is not an ordinary namespace an error is thrown.</p>
+<p>Loads the package(s) into <code>(#|⎕SE)._tatin.{packageName}</code> and establishes a reference pointing to it in <code>targetSpace</code></p>
+<p>Loads all dependencies, if any, as well into <code>(#|⎕SE)._tatin</code> but <em>not</em> into <code>targetSpace</code>.</p>
+<p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as <code>⍺</code>.</p>
+<p>Returns the number of packages installed, including dependencies.</p>
+<div class="h_tag">
+<a href="#Pack" id="Pack" class="autoheader_anchor">
+<h3 data-id="Pack">2.20. Pack</h3>
+</a>
+</div>
+<pre><code>zipFilename←Pack (projectPath targetPath)</code></pre>
+<dl>
+<dt>projectPath:</dt>
+<dd><p>folder to create a package from</p></dd>
+<dt>targetPath:</dt>
+<dd><p>folder the package goes into</p></dd>
+</dl>
+<div class="h_tag">
+<a href="#Ping" id="Ping" class="autoheader_anchor">
+<h3 data-id="Ping">2.21. Ping</h3>
+</a>
+</div>
+<pre><code>bool←Ping uri</code></pre>
+<p>Establishes whether the host is up and running with very little overhead. If <code>uri</code> (can also be an alias) points to a folder a 1 is returned if that folder exists, otherwise 0.</p>
+<div class="h_tag">
+<a href="#PublishPackage" id="PublishPackage" class="autoheader_anchor">
+<h3 data-id="PublishPackage">2.22. PublishPackage</h3>
+</a>
+</div>
+<pre><code>{(statusCode errMsg zipFilename)}←PublishPackage (source registry)</code></pre>
+<p>Publishes a package.</p>
+<ol start="1">
+<li>Checks for uniqueness of the given package/version combination.</li>
+<li>Creates a dependency file for the package if required</li>
+<li>Creates a zip file for the package in a Temp folder if required</li>
+<li>Moves the zip file into the Registry, either via HTTP or directly.</li>
+<li>Updates the Registry index in case it's a local Registry</li>
+</ol>
+<p>Note that if <code>⍵</code> points already to a ZIP file only steps 4 and 5 are performed.</p>
+<p><code>⍵</code> must be a two-item vector:</p>
+<ol start="1">
+<li><code>source</code> → folder to create package from</li>
+<li><code>registry</code> → registry to publish the package to (alias or uri)</li>
+</ol>
+<p>The explicit result:</p>
+<ul>
+<li><code>statusCode</code> is an HTTP code no matter whether it is an HTTP call or not.</li>
+<li><code>errMsg</code> is empty if <code>statusCode</code> is 200, otherwise it might carry additional information.</li>
+<li><code>zipFilename</code> is empty in case <code>source</code> is a ZIP file, otherwise it is the name of the ZIP file created.</li>
+</ul>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
+<div>
+<p>Note that the API function will publish the package no matter what the delete policy operated by the server is.</p>
+<p>That is different from the user command which will ask the user for confirmation in case the user attempts to publish a package that cannot be deleted once published.</p>
+</div>
+</div>
+
+<div class="h_tag">
+<a href="#ReInstallDependencies" id="ReInstallDependencies" class="autoheader_anchor">
+<h3 data-id="ReInstallDependencies">2.23. ReInstallDependencies</h3>
+</a>
+</div>
+<pre><code>{refs}←{parms} ReInstallDependencies (dependencies installFolder [Registry])</code></pre>
+<p>Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.</p>
+<p>The file apl-buildlist.json as well as all directories in that folder will be deleted. Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.</p>
+<p>Note that packages with different major version numbers are considered to be different packages.</p>
+<p>By default all known Registries with a priority greater than 0 are scanned, but you may specify a particular Registry as a third (optional) argument.</p>
+<p>The left argument is optional and is, if specified, typically created by calling <a href="#CreateReInstallParms" class="bookmark_link"><code>CreateReInstallParms</code></a>.</p>
+<p>It may carry three parameters:</p>
+<ul>
+<li><code>noBetas</code>
+<p>By default this is 0, meaning that beta versions are considered. Set to 1 if you want betas to be ignored.</p></li>
+<li><code>update</code>
+<p>Defaults to 0, meaning that the same version is installed again even if a later version is available now. Change to 1 to force an update.</p></li>
+<li><code>dry</code>
+<p>Defaults to 0, meaning the function does business. Set this to 1 in order to get a report of what the function would do without actually doing it.</p></li>
+</ul>
+<p>Note that packages that were installed from ZIP files are just re-installed from their ZIP files.</p>
+<div class="h_tag">
+<a href="#ReadPackageConfigFile" id="ReadPackageConfigFile" class="autoheader_anchor">
+<h3 data-id="ReadPackageConfigFile">2.24. ReadPackageConfigFile</h3>
+</a>
+</div>
+<pre><code>cfg←ReadPackageConfigFile path</code></pre>
+<p>Takes a path to a package and returns the config file for that package as a namespace populated with variables.</p>
+<p><code>path</code> may or may not carry the filename.</p>
+<div class="h_tag">
+<a href="#UnInstallPackages" id="UnInstallPackages" class="autoheader_anchor">
+<h3 data-id="UnInstallPackages">2.25. UnInstallPackages</h3>
+</a>
+</div>
+<pre><code>(list msg)←UnInstallPackage (packageID folder)</code></pre>
+<p><code>folder</code> must carry a Tatin dependency file.</p>
+<p><code>UnInstallPackage</code> attempts to un-install the package <code>packageID</code> and all its dependencies, but he latter only in case they are neither principal packages nor required by other packages.</p>
+<p><code>packageID</code> might be a full package ID but also &lt;group&gt;-&lt;name&gt; or just &lt;name&gt;. However, in case. In case more than one package qualify an error is thrown.</p>
+<p>Note that if <code>packageID</code> is empty a clean-up attempt is made.</p>
+<p><code>folder</code> may be a sub folder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.</p>
+<p><code>packageID</code> must be fully qualified: group + name + version.</p>
+<p>If a package was installed with an alias you must un-install it by specifying the alias.</p>
+<p>If a package is installed twice, once with an alias and once without, running <code>]UnInstallPackage</code> on either of them does not really un-install the package but removes just the reference to it. Only when the other one is un-installed as well is the package actually removed.</p>
+<p>To keep things simple Tatin performs the following steps:</p>
+<ol start="1">
+<li>Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.</li>
+<li>Removes <code>packagedID</code> from the dependency file.</li>
+<li>Re-compiles the build list based on the new dependency file.</li>
+<li>Removes all packages that are not mentioned in the build list anymore</li>
+</ol>
+<p>Returns a two-item vector:</p>
+<ol start="1">
+<li>List with the fully qualified names of all removed packages. Note that they might carry an alias.</li>
+<li>Message, ideally empty.</li>
+</ol>
+<p>Note that removing the directories hosting the packages might fail for all sorts of reasons even though the package and any dependencies were already successfully removed from both the dependency file and the build list.</p>
+<div class="h_tag">
+<a href="#Version" id="Version" class="autoheader_anchor">
+<h3 data-id="Version">2.26. Version</h3>
+</a>
+</div>
+<pre><code>r←Version</code></pre>
+<p>Returns “name”, “version” and “date”.</p>
+</body>
+</html>

@@ -218,6 +218,7 @@ The file `apl-package.json` describes the MarkAPL package:
   api: "MarkAPL",
   assets: "Files/",
   date: 20210725.153851,
+  documentation: "",
   description: "Converts Markdown to HTML5",
   group: "aplteam",
   info_url: "https://github.com/aplteam/MarkAPL",

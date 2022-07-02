@@ -1,0 +1,17 @@
+ json←MakeGroupHomepageLink json;i;item;propName;groupName;a
+⍝ For groups that actually have a homepage the propName of the group becoems a link to that page
+⍝ r←'"(http[s]://[^"]+)"'⎕R'"<a href="\1" target="_blank" title="Link is opened in a new tab">\1</a>"'⊣json
+ json←1↓json
+ :For i :In ⍳≢json
+     item←i⊃json
+     propName←{' '~⍨⍵↑⍨¯1+⍵⍳':'}item
+     :If 'group'≡propName
+         groupName←'"'~⍨{⍵/⍨{⍵∨≠\⍵}⍵='"'}item
+     :AndIf HasGroupHomePage groupName
+         a←'<a href="',(('/',GetVersion_REST'group-homepage?name='),groupName),'" title="Link the the group`s homepage">'
+         a,←groupName,'</a>'
+         (i⊃json)←((+/∧\' '=item)⍴' '),'group: "',a,'"'
+         :Return
+     :EndIf
+ :EndFor
+⍝Done

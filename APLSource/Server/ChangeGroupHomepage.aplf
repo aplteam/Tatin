@@ -1,0 +1,13 @@
+ response←ChangeGroupHomepage request;groupName;folder;dcfFilename;dcfTie;markdown;email
+ groupName←request R.GetQueryParameter'change-group-homepage'
+ folder←'expand'F.NormalizePath G.HTDOCS,'/../Groups/'
+ dcfFilename←folder,groupName,'.dcf'
+ dcfTie←dcfFilename ⎕FSTIE 0
+ :If groupName≡⎕FREAD dcfTie 2
+     markdown←⎕FREAD dcfTie 3
+     email←⎕FREAD dcfTie 4
+     ⎕FUNTIE dcfTie
+     response←(markdown email)EditGroupHomepage groupName request
+ :Else
+     response←request RespondWithHTML 500 ⍝ Must not happen
+ :EndIf

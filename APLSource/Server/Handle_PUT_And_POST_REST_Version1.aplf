@@ -1,0 +1,24 @@
+ response←request Handle_PUT_And_POST_REST_Version1 path_;packageID;json;path;data;html;regFolder;specialCommands
+⍝ Handles all PUT and POST-related commands defined in version 1 of the REST interface
+ path_↓⍨←-'/'=¯1↑path_
+ :If 1='/'+.=path_
+     path←path_
+     packageID←''
+ :Else
+     (path packageID)←Reg.SeparateUriAndPackageID path_
+     path↓⍨←-'/'=¯1↑path
+ :EndIf
+ path←⎕C path
+ specialCommands←GetSpecialCommands request.Method
+ :If (⊂path)∊(⊂'v1/'),¨specialCommands
+     response←request ProcessTestCommands(⎕C path)specialCommands
+ :Else
+     :Select path
+     :Case GetVersion_REST'group-homepage-save'
+         response←SaveGroupHompeage request
+     :Else
+         ⍝ Something new?
+         response←request Respond 400 1 ⍝ Not a valid REST version 1 request
+     :EndSelect
+ :EndIf
+⍝Done

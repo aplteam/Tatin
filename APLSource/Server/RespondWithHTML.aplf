@@ -1,0 +1,13 @@
+ response←request RespondWithHTML y;html;msg;statusCode
+⍝ Compiles an HTML response with "msg" becoming an <h2> tag
+ (statusCode msg)←2↑(⊆y),'' ''
+ :If 0=≢msg
+     msg←GetReasonPhraseFor statusCode
+ :EndIf
+ response←request Respond statusCode
+ html←HtmlHeader''
+ html,←⊂'<h2>',msg,' (',(⍕statusCode),')</h2>'
+ html,←AddSpecialMessage ⍬
+ html,←'</body>' '</html>'
+ response.Content←MassageHTML html
+⍝Done

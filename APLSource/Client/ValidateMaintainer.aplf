@@ -1,0 +1,14 @@
+ ValidateMaintainer←{
+⍝ ⍵.maintainer may be one of:
+⍝ any@email.address
+⍝ John Doe <any@email.address>
+     maintainer←A.DLB A.DTB,⍵.maintainer
+     0=≢maintainer:⍵
+     'Package property "maintainer" is invalid (does not contain a single @)'Assert'@'+.=maintainer:
+     'Package property "maintainer" is invalid'Assert 1≤'.'+.={⍵↓⍨⍵⍳'@'}maintainer:
+     0=+/'><'∊maintainer:⍵
+     'Package property "maintainer" is invalid'Assert'<'≠1⍴maintainer:
+     'Package property "maintainer" is invalid'Assert 1 1≡(⊂maintainer)+.=¨'<>':
+     'Package property "maintainer" is invalid'Assert 1 1 0≡1↓<\0,maintainer⍳'<@>':
+     ⍵
+ }

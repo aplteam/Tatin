@@ -1,0 +1,28 @@
+ r←Test_PkgCfg_023(stopFlag batchFlag);⎕TRAP;dir;cfg;qdmx
+⍝ Check the "documentation" property being something invalid
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir ⍬
+ F.MkDir dir
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'0.1.0'
+ cfg.source←'TheSource/'
+ cfg.documentation←'.\invalid'
+
+ :Trap 0
+     {}TC.WritePackageConfigFile dir cfg
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Package property "documentation" is invalid'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Done

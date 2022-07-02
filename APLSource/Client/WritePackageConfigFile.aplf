@@ -16,6 +16,8 @@
  cfg←ValidatePackageFiles cfg
  cfg←ValidateTags cfg
  cfg←ValidateAPI cfg
+ cfg←ValidateDocumentation cfg
+ cfg←ValidateMaintainer cfg
  :If 0=initializeFlag
      :If 0<≢assets←{0=≢⍵:⍵ ⋄ ','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
          assets←path∘PolishAssetsPaths¨assets
@@ -36,6 +38,6 @@
      r←cfg2
  :Else
      qdmx←⎕DMX
-     qdmx.DM ⎕SIGNAL qdmx.EM
+     qdmx.EM ⎕SIGNAL qdmx.EN
  :EndTrap
 ⍝Done

@@ -12,11 +12,16 @@
  :Case 'none'
      html,←⊂'<h2>Details of latest package for &lt;',ID,'&gt;</h2>'
  :Else
-     ∘∘∘ ⍝ Huuh?>!
+     ∘∘∘ ⍝ Paranioa: should not happen of course
  :EndSelect
  html,←AddSpecialMessage ⍬
  html,←⊂'<pre><json>',1⊃json
- html,←MakeURLsLinks 1↓json
+ json←MakeURLsLinks json
+ :If ⊃G.INI.Get'Config:GroupHomePages'
+     html,←MakeGroupHomepageLink json
+ :Else
+     html,←1↓json
+ :EndIf
  html,←⊂'</json></pre>'
  html,←⊆GetFooter
  html,←⊂'</body>'

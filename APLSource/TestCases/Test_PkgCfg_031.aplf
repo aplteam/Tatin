@@ -1,0 +1,22 @@
+ r←Test_PkgCfg_031(stopFlag batchFlag);⎕TRAP;dir;cfg;cfg2
+⍝ Check the "maintainer" property for being a valid email address
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir ⍬
+ F.MkDir dir
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Hello'
+ cfg.version←'0.1.0'
+ cfg.source←'TheSource/'
+ cfg.maintainer←'My Name <my.name@my-domain.com>'
+ cfg2←TC.WritePackageConfigFile dir cfg
+ →T.GoToTidyUp cfg2.maintainer≢cfg.maintainer
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Done

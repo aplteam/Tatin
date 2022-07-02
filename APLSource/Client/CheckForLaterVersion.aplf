@@ -8,13 +8,14 @@
 ⍝ Checks whether there are later versions available for what's specified by the build list.\\
 ⍝ By default only minor and patch are part of the check. By specifying 1 as `major`
 ⍝ you may change this default behaviour and list any later major versions instead.\\
-⍝ Note that this function scans all known registries with a priority greater than zero.
+⍝ Note that this function scans all known registries **with a priority greater than zero**!
 ⍝ Returns a matrix with five columns:
 ⍝ [;1] Original package ID
-⍝ [;2] Lastes package ID
+⍝ [;2] "Latest" package ID
 ⍝ [;3] Original URL
 ⍝ [;4] Flag; 1 means later version is available
-⍝ [;5] URL the latest version was found but empty in case it's identical with [;3]
+⍝ [;5] URL the latest version was found at but empty in case it's identical with [;3]
+ r←0 5⍴⍬
  flags←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'flags'
  'Invalid left argument'Assert 83=⎕DR flags
  'Invalid right argument'Assert(' '=1↑0⍴⊂path)∧(1=≡path)
@@ -24,11 +25,9 @@
  buildFilename←path,Reg.BuildListFilename
  ('File not found: ',buildFilename)Assert F.IsFile buildFilename
  buildList←Reg.JSON⊃F.NGET buildFilename
- ∆PermanentConnections←⎕NS''        ⍝ Establish but without any connections yert: we don't know whether we need any
- ∆PermanentConnections.keepOpen←1   ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
- :If 0=≢buildList.packageID
-     r←0 5⍴⍬
- :Else
+ ∆PermanentConnections←⎕NS''                ⍝ Establish but without any connections yet: we don't know whether we will need any
+ ∆PermanentConnections.keepOpen←1           ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
+ :If 0<≢buildList.packageID
      r←↑majorVersions CheckForLaterVersion_¨(dependencies⌈buildList.principal)/buildList.packageID
  :EndIf
  CloseConnections 1

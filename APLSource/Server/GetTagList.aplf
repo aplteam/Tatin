@@ -3,9 +3,7 @@
  :If IsJsonRequest request.Headers
      parms←⎕NS''
      parms.tags←''
-     :If (⊂'tags')∊request.QueryParameters[;1]
-         parms.tags←⎕C{2⊃⍵[⍵[;1]⍳⊂'tags';]}request.QueryParameters
-     :EndIf
+     parms.tags←⎕C request R.GetQueryParameter'tags'
      data←Reg.ListTags G.RegistryPath parms
      response←request ReturnJSON Reg.JSON data
  :Else

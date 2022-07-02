@@ -1,0 +1,12 @@
+ response←SaveGroupHompeage request;content;email;apiKey;groupName;html
+ :If ⊃G.INI.Get'Config:GroupHomePages'
+     groupName←request R.GetQueryParameter'group'
+     email←request R.GetQueryParameter'email'
+     apiKey←request R.GetQueryParameter'apiKey'
+     content←request.Content
+     SaveGroupHompeage_ groupName content email
+     response←ReturnGroupHomepage groupName request
+ :Else
+     response←RespondWithHTML 401 'Not authorized'
+ :EndIf
+⍝Done

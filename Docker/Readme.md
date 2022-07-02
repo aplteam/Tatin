@@ -11,9 +11,9 @@ on .NET on non-Windows platforms)
 
 What the scripts are doing:
 
-1. Call  ./BuildImage.sh for creating the image
-2. Check CreateTatinDockerContainer.sh
-3. Call  CreateTatinDockerContainer.sh
-4. Call  start-tatin.sh - this ensures that the container is restarted after a crash or a reboot
+1. Call  `./BuildImage.sh for creating the image
+2. Check `CreateTatinDockerContainer.sh`
+3. Call  `CreateTatinDockerContainer.sh`
+4. Call  `start-tatin.sh` - this ensures that the container is restarted after a crash or a reboot
 
  Kai Jaeger - kai@aplteam.com

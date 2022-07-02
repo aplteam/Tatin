@@ -1,0 +1,24 @@
+ response←Handle_PUT_And_POST request;filename;path;path2;groupName;apiKey;b
+ request.RequestTarget←('/'=1⍴request.RequestTarget)↓request.RequestTarget
+ :If ∨/'save-group-homepage'⍷request.Content
+     request←HandleFormData request
+ :EndIf
+ :If 0=≢apiKey←request R.GetQueryParameter'api-key'
+     apiKey←'api-key'GetFromHeaders request.Headers
+     groupName←{⍵↑⍨¯1+⍵⍳'-'}request.RequestTarget
+ :Else
+     groupName←request R.GetQueryParameter'group'
+ :EndIf
+ :If G.Credentials AcceptCredential apiKey groupName
+     :If Reg.IsValidPackageID_Complete request.RequestTarget
+         response←SavePackage request
+     :ElseIf request IsREST_v1 request.RequestTarget
+         response←request Handle_PUT_And_POST_REST_Version1 request.RequestTarget
+     :Else
+         response←request Respond 400  ⍝ 400 ←→ Bad Request
+         response.Content←'Neither valid package ID nor proper REST request'
+     :EndIf
+ :Else
+     response←request RespondWithHTML 401 'Unauthorized request'    ⍝ 401 ←→ Unauthorized
+ :EndIf
+⍝Done

@@ -4,16 +4,16 @@
          response←R.NewResponse request
          :If 1≠≢list←F.ListFiles G.RegistryPath,'/',packageID,'/',packageID,'*.zip'
              ⍝ Whether we find none or more than one, something is seriously wrong then
-             response←Return500 request
+             response←request RespondWithHTML 500
          :Else
              response.IsFile←1
              response.FilePath←⊃list
              response.ContentType←'application/zip'
          :EndIf
      :Else
-         response←Return404 request
+         response←request RespondWithHTML 404
      :EndIf
  :Else
-     response←Return404 request
+     response←request RespondWithHTML 404
  :EndIf
 ⍝Done

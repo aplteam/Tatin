@@ -1,4 +1,4 @@
- r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;list;noOfHyphens;noOfDots;uniqueIDs;list2;since
+ r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;noOfHyphens;noOfDots;uniqueIDs;list2;since
 ⍝ Documentation see ##.Client.ListPackages
  'No registry specified'Assert 0<≢uri
  parms←CheckParmsForListPackages parms
@@ -17,7 +17,7 @@
  :If 0<≢parms.group
      list←(parms.group∘≡¨GetGroupFromPackageID¨list[;1])⌿list
  :EndIf
- :If parms.info_url
+ :If 0≢parms.info_url
      list,←AddInfoURL list registryPath
  :EndIf
  :If 0=≢packageID~'*'

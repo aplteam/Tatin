@@ -1,0 +1,53 @@
+ html←data EditGroupHomepage_ groupName;html;parms;markdown;email
+ (markdown email)←data
+ html←HtmlHeader''
+ html,←⊂'<h2>Group home page of "',groupName,'"</h2>'
+ html,←⊆AddSpecialMessage''
+ html,←⊂'<form id="create-group-homepage" action="',GetVersion_REST'group-homepage-save">'
+
+ html,←⊂'content'H.Label'Content (<a href="https://download.aplteam.com/MarkAPL_CheatSheet.html" target=_blank>Markdown</a>):'
+ html,←⊂H.BR
+ html,←⊂'<textarea name="content" id="content" rows="15" placeholder="your markdown" autofocus required spellcheck="true" lang="en">'
+ html,←⊆markdown
+ html,←⊂'</textarea>'
+ html,←⊂H.BR
+ html,←⊂H.BR
+
+ html,←⊂'email'H.Label'Email address:'
+ html,←⊂H.BR
+ parms←⎕NS''
+ parms.(id name type placeholder value)←'email' 'email' 'email' 'your name <your.name@email.address>'email
+ html,←⊂'required'H.Input parms
+ html,←⊂H.BR
+
+ html,←⊂'api-key'H.Label'API key:'
+ html,←⊂H.BR
+ parms←⎕NS''
+ parms.(id name type placeholder)←'api-key' 'api-key' 'password' 'Password (API-key)'
+ html,←⊂'required'H.Input parms
+ html,←⊂H.BR
+
+ parms←⎕NS''
+ parms.(id name type value style readonly)←'group' 'group' 'text'groupName'display:none;' 'readonly'
+ html,←⊂H.Input parms
+ html,←⊂H.BR
+
+ ⍝ This is used to tell the server what this is all about. that allows the server to determine that
+ ⍝ the content must be massaged in a specific way.
+ parms←⎕NS''
+ parms.(id name type value style readonly)←'sgh' 'sgh' 'text' 'save-group-homepage' 'display:none;' 'readonly'
+ html,←⊂H.Input parms
+ html,←⊂H.BR
+
+ html,←⊂'<input id="submit-homepage" formmethod="post" class="button" value="Save" type="submit">'
+
+ html,←⊂'</form>'
+
+ html,←⊆GetFooter
+ html,←⊂'<script>'
+ html,←⊂'//set focus on input'
+ html,←⊂'$(''input[name=content]'').focus();'
+ html,←⊂'</script>'
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+⍝Done

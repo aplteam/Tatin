@@ -1,0 +1,11 @@
+ r←MassageMarkdown md;CRLF;length;drop;b
+ CRLF←⎕UCS 13 10
+ r←md
+ b←CRLF⍷r
+ r[⍸b]←⊂CRLF,CRLF
+ r←∊r
+ r←{(CRLF⍷⍵)⊂⍵}CRLF,md
+ r~¨←⊂CRLF
+ drop←-+/∧\0=⌽≢¨r
+ r←drop↓r
+ ⍝Done

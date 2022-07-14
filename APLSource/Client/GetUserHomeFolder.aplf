@@ -1,28 +1,36 @@
- GetUserHomeFolder←{
+ r←{OS}GetUserHomeFolder add;p;v;w;l;d;h;lad;as;u
 ⍝ Returns standard path for any user-specific data.\\
 ⍝ Works on all platforms but returns different results.\\
 ⍝ `⍵`, if not empty, is added to the resulting path.\\
 ⍝ Under Windows typically:\\
-⍝ `C:\Users\%USERPROFILE%\AppData\Roaming\Tatin'     ←→ GetUserHomeFolder ''
-⍝ `C:\Users\%USERPROFILE%\AppData\Roaming\Tatin\foo' ←→ GetUserHomeFolder 'foo'
+⍝ `%APPDATA%\Tatin'     ←→ GetUserHomeFolder ''
+⍝ `%APPDATA%\Tatin\foo' ←→ GetUserHomeFolder 'foo'
 ⍝ On non-Windows platforms:\\
 ⍝ '/home/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''
 ⍝ '/home/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'
-⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
-     ⍺←'.'⎕WG'APLVersion'
-     add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}⍵
-     (p v)←2↑⍺
-     (w l)←'WL'∊''⍴p
-     d←'/Tatin'
-     (h lad)←2 ⎕NQ'.' 'GetEnvironment'('HOME' 'APPDATA')
-     w:F.ExpandPath lad,d,add           ⍝ windows
-
-     as←'/Library/Application Support'  ⍝ special mac folder
-     l∧0≠≢h:F.ExpandPath h,d,add        ⍝ linux
-     0≠≢h:F.ExpandPath h,as,d,add       ⍝ mac
-
-     u←⊃~∘∊⍨2 ⎕NQ'.' 'GetEnvironment'('LOGNAME' 'USER' 'LNAME' 'USERNAME')
-     0=≢u:d                             ⍝ ? what if no user found  ⍝TODO⍝
-     l:'/home/',u,d,add                 ⍝ linux
-     '/Users/',u,as,d,add               ⍝ mac
- }
+⍝ ⍺ is optional and only specified by test cases: used to simulate different versions of the operating system.
+ OS←{0<⎕NC ⍵:⍎⍵ ⋄ '.'⎕WG'APLVersion'}'OS'
+ add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
+ (p v)←2↑OS
+ (w l)←'WL'∊''⍴p
+ d←'/Tatin'
+ (h lad)←2 ⎕NQ'.' 'GetEnvironment'('HOME' 'APPDATA')
+ :If w
+     r←F.ExpandPath lad,d,add               ⍝ windows
+ :Else
+     as←'/Library/Application Support'      ⍝ special mac folder
+     :If l∧0≠≢h
+         r←F.ExpandPath h,d,add             ⍝ linux
+     :ElseIf 0≠≢h
+         r←F.ExpandPath h,as,d,add          ⍝ mac
+     :Else
+         u←⊃~∘∊⍨2 ⎕NQ'.' 'GetEnvironment'('LOGNAME' 'USER' 'LNAME' 'USERNAME')
+         'No user found?!'Assert 0<≢u
+         :If l
+             r←'/home/',u,d,add             ⍝ linux
+         :Else
+             r←'/Users/',u,as,d,add         ⍝ mac
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

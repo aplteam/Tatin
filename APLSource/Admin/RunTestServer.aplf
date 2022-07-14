@@ -1,4 +1,4 @@
- {r}←RunTestServer y;trapFlag;testFlag;iniFile;f
+ {r}←RunTestServer y;trapFlag;testFlag;iniFile
 ⍝ This function is used to run a test server started by the Tatin test cases.
 ⍝ `testFlag`, if 1, allows additional commands to be executed useful only for tests.
 ⍝ `trapFlag`, if specified and 1, overwites any INI settings and activates error trapping.
@@ -7,15 +7,6 @@
  ⎕IO←1 ⋄ ⎕ML←1
  (testFlag trapFlag)←2↑y,(≢y)↓¯1 ¯1
  iniFile←'./TestServer/Server/server.ini'
- f←{
-     G←⍵
-     targetPath←⊃G.INI.Get'Logging:Folder'
-     flag←0=##.⎕NC'CiderConfig'
-     sourcePath←{⍵:##.FilesAndDirs.PWD,'/' ⋄ ##.CiderConfig.HOME,'/TestData/App-Log/',##.Server.Logs.GetLogFilename}flag
-     ⍝ Copy over some pre-prepared log files so that we have some test data
-     _←targetPath∘{⍺ ⎕NCOPY⍠('IfExists' 'Replace')⊣⍵}¨##.FilesAndDirs.ListFiles sourcePath,'*'
-     ##.Server.TatinAmendments G
- }
- r←iniFile(f ##.Plodder.Run)testFlag trapFlag
+ r←iniFile(PrepareTestServer ##.Plodder.Run)testFlag trapFlag
  ##.Server.∆SHUTDOWN←0
 ⍝Done

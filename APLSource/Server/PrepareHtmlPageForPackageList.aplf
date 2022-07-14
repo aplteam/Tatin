@@ -10,9 +10,9 @@
  html,←⊂'<tbody>'
  :If 0<≢mat
      col1←{'<td><code>',({'<a href="',Reg.VersionOf_REST,'/packages/major_versions/',⍵,'" title="List major versions">',⍵,'</a>'}⍵),'</code></td>'}¨mat[;1]
-     col2←{'<td>',⍵,'</td>'}¨mat[;3]
+     col2←{'<td>',⍵,'</td>'}¨⍕¨mat[;4]
      col3←{'<td align="right">',⍵,'</td>'}¨⍕¨mat[;2]
-     col4←{'<td>',⍵,'</td>'}¨mat[;1]{0=≢⍵:'- ' ⋄ '<a href="',⍵,'" title="Opens ',⍵,' in a new tab" target="_blank">',(MassageProjectURL ⍵),'</a>'}¨mat[;4]
+     col4←{'<td>',⍵,'</td>'}¨mat[;1]{0=≢⍵:'- ' ⋄ '<a href="',⍵,'" title="Opens ',⍵,' in a new tab" target="_blank">',(MassageProjectURL ⍵),'</a>'}¨mat[;3]
      html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3 col4
      html,←⊂'</tr>'
  :EndIf

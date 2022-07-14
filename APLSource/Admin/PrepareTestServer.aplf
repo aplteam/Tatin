@@ -1,0 +1,15 @@
+ r←PrepareTestServer G;targetPath;sourcePath
+ targetPath←⊃G.INI.Get'Logging:Folder'
+ :If 0<##.⎕NC'CiderConfig'
+     sourcePath←##.CiderConfig.HOME,'/TestData/App-Log/',##.Server.Logs.GetLogFilename
+ :Else
+     :If G.TestFlag
+         sourcePath←##.FilesAndDirs.PWD,'/TestData/App-Log/'
+     :Else
+         sourcePath←##.FilesAndDirs.PWD,'/'
+     :EndIf
+ :EndIf
+ ⍝ Copy over some pre-prepared log files so that we have some test data
+ {}targetPath∘{⍺ ⎕NCOPY⍠('IfExists' 'Replace')⊣⍵}¨##.FilesAndDirs.ListFiles sourcePath,'*'
+ r←##.Server.TatinAmendments G
+⍝Done

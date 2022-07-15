@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.39.0+2 - 2022-06-23
+⍝ * 0.39.1 - 2022-07-14
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -344,23 +344,25 @@
               r←list
           :Else
               r←''
-              :If 0≡Arg.all
-                  ind←'Please select the file(s) you wish to download:' 1 0 Select list
-                  →(0=ind)/0
-              :Else
-                  ind←⍳≢list
-              :EndIf
-              :If 0≡Arg.folder
-                  r←TC.UsageDataGetFiles registry(list[ind])
-              :Else
-                  r←Arg.folder TC.UsageDataGetFiles registry(list[ind])
-              :EndIf
-              :If 0≢Arg.unzip
-                  list2←(⊂r,'/'),¨list[ind]
-              :AndIf ∧/⎕NEXISTS¨list2
-                  TC.F.DeleteFile(¯3↓¨list2),¨⊂'csv'
-                  r∘{⍵ TC.ZipArchive.UnzipTo ⍺}¨list2
-                  TC.F.DeleteFile TC.F.ListFiles r,'/*.zip'
+              :If 0<≢list  ⍝ Yes, can happen: if in the very first month there are no downloads at all
+                  :If 0≡Arg.all
+                      ind←'Please select the file(s) you wish to download:' 1 0 Select list
+                      →(0=ind)/0
+                  :Else
+                      ind←⍳≢list
+                  :EndIf
+                  :If 0≡Arg.folder
+                      r←TC.UsageDataGetFiles registry(list[ind])
+                  :Else
+                      r←Arg.folder TC.UsageDataGetFiles registry(list[ind])
+                  :EndIf
+                  :If 0≢Arg.unzip
+                      list2←(⊂r,'/'),¨list[ind]
+                  :AndIf ∧/⎕NEXISTS¨list2
+                      TC.F.DeleteFile(¯3↓¨list2),¨⊂'csv'
+                      r∘{⍵ TC.ZipArchive.UnzipTo ⍺}¨list2
+                      TC.F.DeleteFile TC.F.ListFiles r,'/*.zip'
+                  :EndIf
               :EndIf
           :EndIf
       :EndIf

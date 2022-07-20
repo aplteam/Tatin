@@ -45,6 +45,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
   api: "DotNetZip",
   assets: "",
   description: "Zipping and unzipping with.NET Core on all major platforms",
+  documentation: "",
   group: "aplteam",
   info_url: "https://github.com/aplteam/DotNetZip",
   io: 1,
@@ -80,6 +81,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       parms.version←'1.0.0'
       Tatin.InitialisePackage parms</code></pre>
 <p>The user command equivalent is <code>]tatin.PackageConfig</code></p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>Instead of <code>]tatin.PackageConfig -edit</code> you may also enter <code>]tatin.CreatePackage</code></p>
+</div>
+</div>
+
 <div class="h_tag">
 <a href="#User-defined-variables" id="User-defined-variables" class="autoheader_anchor">
 <h3 data-id="User-defined-variables">2.2. User defined variables</h3>
@@ -213,24 +221,44 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>This information is typically used when a human accesses a Tatin Server with a Browser.</p>
 <p><code>description</code> <em>must not</em> be empty.</p>
 <div class="h_tag">
+<a href="#documentation" id="documentation" class="autoheader_anchor">
+<h4 data-id="documentation">2.3.4. documentation</h4>
+</a>
+</div>
+<p>This can be one of:</p>
+<ul>
+<li>A URL pointing to an online help resource
+<p>It is identified by starting with either “<code>http://</code>” or “<code>https://</code>”.</p></li>
+<li>A local path pointing to a file (or program) within the package
+<p>In this case it <em>must</em> be a relative path since you cannot know in advance where your package ends up.</p>
+<p>It must start with “<code>./</code>”.</p></li>
+<li>A pointer to a function or a variable inside the package
+<p>It must start with “<code>⎕THIS.</code>”, and whatever follows must be valid APL name(s). Examples:</p>
+<pre><code>⎕THIS.ShowHelp
+⎕THIS.Admin.ShowHelp</code></pre></li>
+</ul>
+<p>Content that does not qualifiy for one of these will be rejected.</p>
+<div class="h_tag">
 <a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
-<h4 data-id="GetFullPath2AssetsFolder">2.3.4. GetFullPath2AssetsFolder</h4>
+<h4 data-id="GetFullPath2AssetsFolder">2.3.5. GetFullPath2AssetsFolder</h4>
 </a>
 </div>
 <p>In case <a href="#assets" class="bookmark_link"><code>assets</code></a> is not empty this function returns a simple char vector that represents the <em>full path</em> to the assets, using something like:</p>
 <pre><code>  HOME,'/',ASSETS</code></pre>
-<p>If <code>HOME</code> is empty the function returns just <code>ASSETS</code>.</p>
-<p>If <code>ASSETS</code> is empty the functins returns <code>''</code>.</p>
+<ul>
+<li>If <code>HOME</code> is empty the function returns just <code>ASSETS</code>.</li>
+<li>If <code>ASSETS</code> is empty the functins returns <code>''</code>.</li>
+</ul>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
-<h4 data-id="group">2.3.5. group</h4>
+<h4 data-id="group">2.3.6. group</h4>
 </a>
 </div>
 <p>The group part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <p>A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.</p>
 <div class="h_tag">
 <a href="#lx" id="lx" class="autoheader_anchor">
-<h4 data-id="lx">2.3.6. lx</h4>
+<h4 data-id="lx">2.3.7. lx</h4>
 </a>
 </div>
 <p>This is optional: it may or may not exist, and it might be empty if it does.</p>
@@ -245,14 +273,24 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </ul>
 <p>Note that the existence of a variable <code>LX</code> indicates that there was an <code>lx</code> function successfully executed.</p>
 <div class="h_tag">
+<a href="#maintainer" id="maintainer" class="autoheader_anchor">
+<h4 data-id="maintainer">2.3.8. maintainer</h4>
+</a>
+</div>
+<p>This may be left empty. If set it must be an email address.</p>
+<p>Two formats are possible:</p>
+<pre><code>your name &lt;your.name@your-domain.com&gt;</code></pre>
+<p>and</p>
+<pre><code>your.name@your-domain.com</code></pre>
+<div class="h_tag">
 <a href="#name" id="name" class="autoheader_anchor">
-<h4 data-id="name">2.3.7. name</h4>
+<h4 data-id="name">2.3.9. name</h4>
 </a>
 </div>
 <p>The name part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <div class="h_tag">
 <a href="#info_url" id="info_url" class="autoheader_anchor">
-<h4 data-id="info_url">2.3.8. info_url</h4>
+<h4 data-id="info_url">2.3.10. info_url</h4>
 </a>
 </div>
 <p>A URL that points to something like GitHub.</p>
@@ -260,7 +298,7 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.</p>
 <div class="h_tag">
 <a href="#source" id="source" class="autoheader_anchor">
-<h4 data-id="source">2.3.9. source</h4>
+<h4 data-id="source">2.3.11. source</h4>
 </a>
 </div>
 <p>This defines the source code file(s) that are going to be part of the package.</p>
@@ -272,14 +310,14 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p><code>source</code> must be relative to the root of the package.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
-<h4 data-id="tags">2.3.10. tags</h4>
+<h4 data-id="tags">2.3.12. tags</h4>
 </a>
 </div>
 <p>A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tags (key words). These can be helpful to filter packages when searching for a solution to a particular problem.</p>
 <p><code>tags</code> must not be empty if you wish to publish a package to a Tatin server because such a package would not be accepted by the server.</p>
 <div class="h_tag">
 <a href="#version" id="version" class="autoheader_anchor">
-<h4 data-id="version">2.3.11. version</h4>
+<h4 data-id="version">2.3.13. version</h4>
 </a>
 </div>
 <p>The version[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
@@ -292,19 +330,19 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
 <a href="#SysVars" id="SysVars" class="autoheader_anchor">
-<h4 data-id="SysVars">2.3.12. APL System variables: ⎕IO and ⎕ML</h4>
+<h4 data-id="SysVars">2.3.14. APL System variables: ⎕IO and ⎕ML</h4>
 </a>
 </div>
 <p>By default the config namespace carries the values of the two Dyalog parameters <code>default_io</code> and <code>default_ml</code> for the system variables <code>⎕IO</code> and <code>⎕ML</code>.</p>
 <p>Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the <code>LoadPackages</code> or the <code>LoadDependencies</code> function <em>before</em> any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.</p>
 <div class="h_tag">
 <a href="#Injected-values" id="Injected-values" class="autoheader_anchor">
-<h4 data-id="Injected-values">2.3.13. Injected values</h4>
+<h4 data-id="Injected-values">2.3.15. Injected values</h4>
 </a>
 </div>
 <div class="h_tag">
 <a href="#date" id="date" class="autoheader_anchor">
-<h5 data-id="date">2.3.13.1. date</h5>
+<h5 data-id="date">2.3.15.1. date</h5>
 </a>
 </div>
 <p>The user must not specify “date”, but when a package is published the server will inject “date” as a timestamp in the format <code>yyyymmdd.hhmmss</code>.</p>
@@ -320,7 +358,7 @@ group-name-1.1.0-FixFor234</code></pre>
 <p>Since packages, once published, cannot be altered, it is safe to assume that the publishing date determines the correct order. However, as long as the version consists of just digits and dots, and possibly a build number, <code>date</code> does not play a role in determining precedence.</p>
 <div class="h_tag">
 <a href="#url" id="url" class="autoheader_anchor">
-<h5 data-id="url">2.3.13.2. url</h5>
+<h5 data-id="url">2.3.15.2. url</h5>
 </a>
 </div>
 <ul>

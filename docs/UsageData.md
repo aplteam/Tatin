@@ -14,7 +14,7 @@
 It is natural to assume that a package author would be interested in knowing how many people are interested in their packages, or how often a package was downloaded. 
 
 
-Tatin tries to deliver but there is one obstacle one has to be aware of:
+Tatin tries to deliver but there is an obstacle one has to be aware of:
 
 Tatin uses a machine-specific cache when downloading a package in order to save bandwidth and CPU resources in case a package is requested again by either the same user or a different user on the same machine.
 
@@ -25,13 +25,13 @@ Tatin's own test suite requests packages from both the Tatin Server and the Test
 
 ## What Tatin is doing
 
-With a new month Tatin collects all the data of the current year except the new month and saves them as a CSV file. It then compresses the file and makes it available for download.
+With the arrival of a new month Tatin collects all the data of the current year except the new month and saves them as a CSV file. It then compresses the file and makes it available for download.
 
 The name of the file is `usage-data-<YYYY>-<MM>`. For example, in May 2022 it would save `usage-data-2022-04`, and it would also delete the file `usage-data-2022-03`.
 
 So the filename `usage-data-2022-04` means _all data from 2022 up to and including April_.
 
-Once a year, in January, Tatin collects the data from last year and saves it in a file `usage-data-<YYYY>`. It also deletes the file `usage-data-<YYYY>-<MM>`.
+Once a year, in January, Tatin collects the data from last year and saves it in a file `usage-data-<YYYY>`. It also deletes any files `usage-data-<YYYY>-<MM>`.
 
 For example, in January 2023 it would create a file `usage-data-2022`, and it would delete a file `usage-data-2022-11`.
 

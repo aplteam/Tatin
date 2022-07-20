@@ -1,43 +1,38 @@
- response←ReturnGroupHomepage(groupName request);html;htmlFilename;groups;folder;p;parms;email;caption
+ response←ReturnGroupHomepage(groupName request);html;htmlFilename;folder;p;parms;email;caption
  response←R.NewResponse request
  p←{'<p>',⍵,'</p>'}
- groups←∪GetGroupList_ G.RegistryPath
- :If (⊂groupName)∊groups
-     folder←G.HTDOCS,'../Groups/'
-     'Create!'F.CheckPath folder
-     htmlFilename←folder,groupName,'.htm'
-     html←HtmlHeader''
-     html,←⊂'<h2>Home page of group "',groupName,'"</h2>'
-     html,←AddSpecialMessage ⍬
-     :If F.IsFile htmlFilename
-         html,←⊂⊃⎕NGET htmlFilename
-         html,←⊂'<br>'
-         html,←⊂'email'H.Label'Email address:'
-         html,←⊂H.BR
-         email←2⊃GetGroupData groupName
-         parms←⎕NS''
-         parms.(id name type value)←'email' 'email' 'email'email
-         html,←⊂'required disabled'H.Input parms
-         html,←⊂H.BR
-         html,←⊂'<br>'
-         html,←⊂'<form action="',(GetVersion_REST'group-homepage-edit'),'">'
-         caption←'Edit'
-     :Else
-         html,←⊂p'There is no home page yet for the group "',groupName,'"'
-         html,←⊂'<br>'
-         html,←⊂'<form action="',(GetVersion_REST'group-homepage-create'),'">'
-         caption←'Create'
-     :EndIf
+ folder←G.HTDOCS,'../Groups/'
+ 'Create!'F.CheckPath folder
+ htmlFilename←folder,groupName,'.htm'
+ html←HtmlHeader''
+ html,←⊂'<h2>Home page of group "',groupName,'"</h2>'
+ html,←AddSpecialMessage ⍬
+ :If F.IsFile htmlFilename
+     html,←⊂⊃⎕NGET htmlFilename
+     html,←⊂'<br>'
+     html,←⊂'email'H.Label'Email address:'
+     html,←⊂H.BR
+     email←2⊃GetGroupData groupName
      parms←⎕NS''
-     parms.(name method type value class title)←'name' 'post' 'submit'groupName'button' 'You may edit the home page if you can provide a valid password (API-key)'
-     html,←⊂parms H.Button caption
-     html,←⊂'</form>'
-     html,←⊆GetFooter
-     html,←⊂'</body>'
-     html,←⊂'</html>'
-     response←request ReturnHTML html
+     parms.(id name type value)←'email' 'email' 'email'email
+     html,←⊂'required disabled'H.Input parms
+     html,←⊂H.BR
+     html,←⊂'<br>'
+     html,←⊂'<form action="',(GetVersion_REST'group-homepage-edit'),'">'
+     caption←'Edit'
  :Else
-     response←request Respond 400
-     response.Content←'Group name unknown'
+     html,←⊂p'There is no home page yet for the group "',groupName,'"'
+     html,←⊂'<br>'
+     html,←⊂'<form action="',(GetVersion_REST'group-homepage-create'),'">'
+     caption←'Create'
  :EndIf
+ parms←⎕NS''
+ parms.(name method type value class)←'name' 'post' 'submit'groupName'button'
+ parms.title←'You may ',(⎕C caption),' the home page if you can provide a valid password (API-key)'
+ html,←⊂parms H.Button caption
+ html,←⊂'</form>'
+ html,←⊆GetFooter
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+ response←request ReturnHTML html
 ⍝Done

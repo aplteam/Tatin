@@ -1,6 +1,6 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.39.1 - 2022-07-14
+⍝ * 0.40.0 - 2022-07-18
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -15,6 +15,12 @@
       r←⍬
      
       :If IfAtLeastVersion 18
+     
+          c←⎕NS ⍬
+          c.Name←'CreatePackage'
+          c.Desc←'Creates a new Tatin package'
+          c.Parse←'1s'
+          r,←c
      
           c←⎕NS ⍬
           c.Name←'LoadTatin'
@@ -66,7 +72,7 @@
      
           c←⎕NS ⍬
           c.Name←'PackageConfig'
-          c.Desc←'Retrieve (HTTP) or create and/or edit a package config file for a specific package'
+          c.Desc←'Retrieve (via HTTP) or create and/or edit a package config file for a specific package'
           c.Parse←'1s -delete -edit -quiet'
           r,←c
      
@@ -242,6 +248,16 @@
           '_Tatin'⎕SE.⎕CY filename
       :EndIf
       TC←⎕SE._Tatin.Client
+    ∇
+
+    ∇ {r}←CreatePackage Arg;path;filename
+      r←''
+      ⎕←'For creating a new package execute this user command:'
+      :If (,0)≡,Arg._1
+          ⎕←'      ]Tatin.PackageConfig -edit'
+      :Else
+          ⎕←'      ]Tatin.PackageConfig ',Arg._1,' -edit'
+      :EndIf
     ∇
 
     ∇ r←ListPackages Arg;registry;parms
@@ -698,7 +714,7 @@
                   newFlag←0
               :Else
                   :If ~Arg.quiet
-                  :AndIf 0=1 ∆YesOrNo'There is no file ',TC.CFG_Name,' yet; would you like to create it?'
+                  :AndIf 0=∆YesOrNo'There is no file ',filename,' yet; would you like to create it?'
                       ⎕←'Cancelled'
                       :Return
                   :EndIf
@@ -940,7 +956,14 @@
               :Else
                   (msg json)←CheckFns json path
                   :If 0<≢msg
-                      flag←~1 ∆YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
+                      :If ' did not respond'{⍺≡(-≢⍺)↑⍵}msg
+                          :If ∆YesOrNo msg,'; leave the URL as it is (n=edit again) ?'
+                              flag←1
+                              newData←json
+                          :EndIf
+                      :Else
+                          flag←~1 ∆YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
+                      :EndIf
                   :Else
                       flag←1
                       newData←json
@@ -991,6 +1014,9 @@
       :Select level
       :Case 0
           :Select ⎕C Cmd
+          :Case ⎕C'CreatePackage'
+              r,←⊂'Create a new Tatin package with a given folder.'
+              r,←'' '  ]Tatin.CreatePackage'
           :Case ⎕C'LoadTatin'
               r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←'' '  ]Tatin.LoadTatin'
@@ -1069,6 +1095,9 @@
           :EndIf
       :Case 1
           :Select ⎕C Cmd
+          :Case ⎕C'CreatePackage'
+              r,←⊂'Prints a user command to the session that allow creating a package config file, the'
+              r,←⊂'equivalent of creating a package.'
           :Case ⎕C'LoadTatin'
               r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'

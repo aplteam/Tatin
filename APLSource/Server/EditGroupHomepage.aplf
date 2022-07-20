@@ -1,23 +1,14 @@
- response←EditGroupHomepage request;html;row;groupName;filename;groups;folder;parms;data
+ response←EditGroupHomepage request;html;row;groupName;filename;folder;parms;data
  groupName←request R.GetQueryParameter'name'
  response←R.NewResponse request
- groups←∪GetGroupList_ G.RegistryPath
- :If (⊂groupName)∊groups
-     :If request.Path≡'/',GetVersion_REST'group-homepage-edit'
-         data←GetGroupData groupName
-     :Else
-         data←'' ''
-     :EndIf
-     folder←G.HTDOCS,'../Groups/'
-     'Create!'F.CheckPath folder
-     filename←folder,groupName,'.dcf'
-     html←data EditGroupHomepage_ groupName
-     response←request ReturnHTML html
+ :If request.Path≡'/',GetVersion_REST'group-homepage-edit'
+     data←GetGroupData groupName
  :Else
-     html←HtmlHeader''
-     html,←⊆H.Para'Group name unknown'
-     response.Content←MassageHTML html
-     response.Close←1
-     response←request Respond 400
+     data←'' ''
  :EndIf
+ folder←G.HTDOCS,'../Groups/'
+ 'Create!'F.CheckPath folder
+ filename←folder,groupName,'.dcf'
+ html←data EditGroupHomepage_ groupName
+ response←request ReturnHTML html
 ⍝Done

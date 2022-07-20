@@ -59,6 +59,8 @@ Example:
 
 The user command equivalent is `]tatin.PackageConfig`
 
+I> Instead of `]tatin.PackageConfig -edit` you may also enter `]tatin.CreatePackage`
+
 
 ### User defined variables
 

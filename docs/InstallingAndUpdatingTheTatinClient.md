@@ -137,12 +137,22 @@ Create one that looks like this:
           ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
       }
 
-    ∇ r←GetMyUCMDsPath
-      :If 'Win'≡3⍴1⊃# ⎕WG'APLVersion '
-          r←(⊃⎕SH'ECHO %USERPROFILE%'),'\Documents\MyUCMDs\'
-      :Else
-          r←(⊃⎕SH'echo $HOME'),'/MyUCMDs/'
-      :EndIf
+    ∇ r←{OS}GetMyUCMDsFolder add
+     ⍝ Returns standard path for Dyalog's MyUCMDs\ folder.
+     ⍝ Works on all platforms but returns different results.\\
+     ⍝ Under Windows typically:\\
+     ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs'  ←→ GetMyUCMDsFolder ''
+     ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\aaa'  ←→ GetMyUCMDsFolder 'aaa'
+     ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
+       :If 0=⎕NC'OS'
+           OS←3↑⊃'.'⎕WG'APLVersion'
+       :EndIf
+       add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
+       :If 'Win'≡OS
+           r←⊃,/1 ⎕NPARTS (2⊃4070⌶0),'\..\MyUCMDs',add
+       :Else
+           r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
+       :EndIf
     ∇
 
 :EndNamespace
@@ -150,4 +160,4 @@ Create one that looks like this:
 
 ### There is already such a script
 
-Make sure that you copy the functions `IfAtLeastVersion`, `GetMyUCMDsPath` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+Copy the functions `IfAtLeastVersion`, `GetMyUCMDsPath` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.

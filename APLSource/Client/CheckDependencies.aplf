@@ -6,7 +6,7 @@
  ⍝ ⍵ may be a simple text vector or a vector of simple text vectors.
  ⍝ Returns either '' or an error message
      txts←⊆⍵
-     isFullPkgID←Reg.IsValidPackageID_Complete¨txts
+     isFullPkgID←Reg.IsValidPackageID_Complete∘RemoveAlias¨txts
      isHTTP←IsHTTP¨txts
      isFile←{1=≢'^file://'⎕S 0⊣⎕C ⍵}¨txts
      buff←isFullPkgID+isHTTP+isFile

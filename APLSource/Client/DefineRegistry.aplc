@@ -6,7 +6,7 @@
 ⍝ Usually a new instance is created by providing a URI. However, an new instance can also be created from the
 ⍝ ordinay namespace that is returned by the `Get` function.
 
-    :Field public Shared ReadOnly varsList←'uri'  'alias' 'port' 'api_key' 'priority' 'noCaching' ⍝ List of all variables in an instance
+    :Field public Shared ReadOnly varsList←'uri'  'alias' 'port' 'api_key' 'priority' 'noCaching' 'id'  ⍝ List of all variables in an instance
 
 ⍝ --------------- Constructors
 
@@ -26,6 +26,7 @@
           ns.api_key←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'api_key'
           ns.alias←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'alias'
           ns.noCaching←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noCaching'
+          ns.id←((⊃⊃⎕CLASS ⎕THIS).##.A)ns.{0<⎕NC ⍵:⍎⍵ ⋄ ⍺.Create_UUID}'id'
           'Invalid variables'Assert∧/(' '~¨⍨↓ns.⎕NL 2)∊varsList
           _uri←ns.uri
           '"uri": invalid depth'Assert 1=≡_uri
@@ -34,6 +35,7 @@
           ((_uri='\')/_uri)←'/'
           '"noCaching" must be a Boolean'Assert(⊂ns.noCaching)∊0 1
           _noCaching←ns.noCaching
+          _id←ns.id
           ⍎¨ns.{'_',⍵,'←',{⎕NULL≡⍵:'⎕NULL' ⋄ 0=1↑0⍴⍵:⍕⍵ ⋄ '''',⍵,''''}⍎⍵}¨varsList
       :Else
           :If ∧/'[]'∊y
@@ -50,6 +52,7 @@
           _api_key←''
           _port←0
           _priority←⎕NULL
+          _id←(⊃⊃⎕class ⎕this).##.A.Create_UUID  ⍝ Uset this to identify a registry in case you cannot use either uri and alias
           _noCaching←0
       :EndIf
     ∇
@@ -58,6 +61,8 @@
 
     :Property uri
     ⍝ The URI of the given Tatin Registry. May be "localhost" for the current machine.
+    ⍝ Note that there might be a good reason to have several instances with the same uri: in case you need
+    ⍝ several different API keys.
     :Access Public Instance
         ∇ r←get
           r←_uri
@@ -65,7 +70,7 @@
     :EndProperty
 
     :Property alias
-    ⍝ The alias one may use to specify the given Registry
+    ⍝ The alias one may use to specify the given Registry. Alternatively you may use "id" for this, see there.
     :Access Public Instance
         ∇ r←get
           r←_alias
@@ -144,6 +149,16 @@
         ∇
     :EndProperty
 
+    :Property id
+    ⍝ A UUID that can be used to identify a registry instead of using uri and alias.
+    ⍝ This is eesential when you have multiple instances for the same uri (with different API keys and aliases)
+    ⍝ and you want so change the alias, say. There might be other applications.
+    :Access Public Instance
+        ∇ r←get
+          r←_id
+        ∇
+    :EndProperty
+
     ∇ r←Get key;list;bool
     ⍝ Returns the data as a namespace. "data" is defined as the variables listed by the `varsList` field in case `key`
     ⍝ is empty. Otherwise `key` must be a valid variable name.
@@ -154,11 +169,11 @@
           r←⎕SE.⎕NS''
       :EndIf
       :If (⊂key)∊''⍬
-          r.(uri alias port api_key noCaching priority)←_uri _alias _port _api_key _noCaching _priority
+          r.(uri alias port api_key noCaching priority id)←_uri _alias _port _api_key _noCaching _priority _id
       :Else
           'Invalid right argument (depth)'Assert 1=≡key
           'Invalid right argument (data type)'Assert' '=1↑0⍴key
-          'Unknwon'Assert(⊂key)∊varsList
+          'Unknown'Assert(⊂key)∊varsList
           r←⍎'_',varsList{⍺⊃⍨⍺⍳⊂⍵}key
       :EndIf
     ∇

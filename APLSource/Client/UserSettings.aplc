@@ -151,13 +151,13 @@
     ∇ {r}←AddRegistry y;registry;name;alias;buff;reg;isZero;ind;newPriorities
    ⍝ Adds the definition of a Registry (from a namespace or an instance of the DefineRegistry class)
    ⍝ to the user settings.\\
-   ⍝ If that Registry is already defined an error is thrown.\\
+   ⍝ If a Registry with the same uri&alias is already defined an error is thrown.\\
    ⍝ `⍵` must be one of:
    ⍝ * An instance of the "Registry" class.
    ⍝ * A text vector with a name or an alias+name in the format `[alias]name`\\
    ⍝   In this case `AddRegistry` creates an instance on the fly. Of course this means that this is
    ⍝   only suitable in case specifying just the name and optionally the alias is sufficient.
-   ⍝ * A namespace that can be used to instanciate the `DefineRegistry` class.\\
+   ⍝ * A namespace that can be used to instantiate the `DefineRegistry` class.\\
    ⍝ `←` is always `⍬` (shy).
       :Access Public Instance
       r←⍬
@@ -172,7 +172,7 @@
           ((name='\')/name)←'/'
           registry←⎕NEW home.DefineRegistry(,⊂name)
           registry.alias←⎕C alias
-      :ElseIf ∨/'[DefineRegistry]'⍷⍕y
+      :ElseIf ∨/'[DefineRegistry]'⍷⍕y ⍝ Instance of the class "DefineRegistry"?
           registry←y
       :Else
           registry←⎕NEW home.DefineRegistry(,⊂y)
@@ -208,13 +208,13 @@
           :EndIf
       :EndIf
       buff.uri←AddSlash buff.uri
-      buff.noCaching←registry.noCaching  ⍝ Why exactly is this required?!  ⍝TODO⍝
+      buff.noCaching←registry.noCaching  ⍝ This IS required, otherwise it won't work though it should
       _registries,←buff
     ∇
 
     ∇ r←{rawFlag}ListRegistries showApiKey
-    ⍝ List all data of all regsitries.\\
-    ⍝ `showApiKey` must be a flag. If it 1 then the API key is shown, otherwise it is replace by "***"
+    ⍝ List all data of all registries.\\
+    ⍝ `showApiKey` must be a flag. If it 1 then the API key is shown, otherwise it is replaced by "***"
     ⍝ With `rawflag` being 0 (the default) the result is beautified.
       :Access Public Instance
       rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
@@ -233,17 +233,18 @@
     ∇ {r}←ReplaceRegistry registry;ind;reg;priority
    ⍝ Replaces the definition of a Registry in the user settings.\\
    ⍝ If that Registry does not already exist an error is thrown.\\
-   ⍝ Note that this function requires a URI since an alias is subject to change.\\
    ⍝ `⍵` must be an instance of the "Registry" class.\\
    ⍝ `←` is always `⍬` (shy).
       :Access Public Instance
       r←⍬
-      :If 0=≢_registries
-      :OrIf ~(⊂registry.uri)∊_registries.uri
-          'There is no such registry yet'Assert 0
+      'There is no such registry yet'Assert 0<≢_registries
+      :If 0<registry.⎕NC'id'    ⍝ Old stuff might lack ID (introduced with 0.74.0)
+          ind←_registries.id⍳⊂registry.id
+      :Else
+          ind←_registries.uri⍳⊂registry.uri
       :EndIf
-      ind←_registries.uri⍳⊂registry.uri
-      :If ∨/'[DefineRegistry]'⍷⍕registry
+      'There is no such registry yet'Assert(≢_registries)≥ind
+      :If ∨/'[DefineRegistry]'⍷⍕registry  ⍝ Instance of the "DefineRegistry" class?
           priority←_registries[ind].priority
           _registries[ind]←registry.Get ⍬
           :If ⎕NULL≡_registries[ind].priority
@@ -261,9 +262,9 @@
       flag←∨/EqualsAliasOrName uriOrAlias
     ∇
 
-    ∇ {r}←RemoveRegistry uriOrAlias;bool
+    ∇ {r}←RemoveRegistry idOrUriOrAlias;bool
     ⍝ Removes a Registry from the user settings.\\
-    ⍝ `⍵` can be either a name or an alias.\\
+    ⍝ `⍵` can be either an id or a uri or an alias.\\
     ⍝ `←` is 1 in case something was removed and 0 otherwise.
       :Access Public Instance
       :If 0=≢_registries
@@ -273,32 +274,32 @@
           :If 0=≢_registries
               r←0
           :Else
-              :If ∨/~bool←~EqualsAliasOrName uriOrAlias
-                  _registries←bool/_registries
+              :If (⊂idOrUriOrAlias)∊_registries.id  ⍝ Is it a UUID?
+                  bool←_registries.id≢¨⊂idOrUriOrAlias
+              :Else
+                  bool←~EqualsAliasOrName idOrUriOrAlias
               :EndIf
+              _registries←bool/_registries
               r←∨/~bool
           :EndIf
       :EndIf
     ∇
 
-    ∇ r←GetRegistry uriOrAlias;bool
+    ∇ r←GetRegistry idOrUriOrAlias;bool
     ⍝ Returns a Registry (as a namespace) or `⍬` in case the requested registry does not exist.
     ⍝ `⍵` can be either a name or an alias.\\
       :Access Public Instance
       'No Registry defined in the user settings'Assert 0<≢_registries
-      :If 0=+/bool←EqualsAliasOrName uriOrAlias
+      :If ~∨/bool←_registries.id≡¨⊂idOrUriOrAlias   ⍝ Is it a UUID?
+      :AndIf 0=+/bool←EqualsAliasOrName idOrUriOrAlias
           'uri/alias not found in user settings'Assert∨/bool
       :EndIf
-      ⍝ Note that at this point we might end up with multiple hits. That's because a user might
-      ⍝ define the same url twice with different alise and different API keys.
-      ⍝ Here it does not matter which API key we use because this is about consuming a package;
-      ⍝ API keys are potentially required for delete and publish operations.
-      ⍝ Therefore we are okay taking the first hit:
+      ''Assert 1=+/bool
       r←(bool⍳1)⊃_registries
     ∇
 
     ∇ r←Delete flag;filename;buff
-    ⍝ Call this in order to delete the currently instanciated user settings file.\\
+    ⍝ Call this in order to delete the currently instantiated user settings file.\\
     ⍝ Returns 1 in case the file was successfully deleted otherwise (Blocked by another process, already deleted...)
       :Access Public Instance
       r←0
@@ -398,10 +399,15 @@
       :Else
           _registries←⍬
       :EndIf
-      _registries.alias←_registries.alias~¨' '
       _fileTimestamp←GetFileTimestamp _path2config
-      :If 0<+/b←0=⊃¨_registries.⎕NC⊂'noCaching'
-          (b/_registries).{⎕THIS.noCaching←⍵}0  ⍝ Was introduced in 0.63.0
+      :If 0<≢_registries
+          :If 0<+/b←0=⊃¨_registries.⎕NC⊂'id'
+              A(b/_registries).{⎕THIS.id←⍺.Create_UUID}0  ⍝ Was introduced in 0.74.0
+          :EndIf
+          _registries.alias←_registries.alias~¨' '
+          :If 0<+/b←0=⊃¨_registries.⎕NC⊂'noCaching'
+              (b/_registries).{⎕THIS.noCaching←⍵}0  ⍝ Was introduced in 0.63.0
+          :EndIf
       :EndIf
     ∇
 
@@ -416,6 +422,7 @@
       buff←⎕NS''
       buff.alias←'tatin'
       buff.uri←'https://tatin.dev'
+      buff.id←A.Create_UUID   ⍝ Required by the ReplaceRegistry function
       reg←⎕NEW home.DefineRegistry(,⊂buff)
       AddRegistry reg
     ∇
@@ -426,6 +433,7 @@
       buff.api_key←'Tatin-Test-API-Key'
       buff.alias←'tatin-test'
       buff.uri←'https://test.tatin.dev'
+      buff.id←A.Create_UUID   ⍝ Required by the ReplaceRegistry function
       buff.priority←0
       reg←⎕NEW home.DefineRegistry(,⊂buff)
       AddRegistry reg

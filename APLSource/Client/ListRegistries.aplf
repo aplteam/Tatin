@@ -1,12 +1,16 @@
- r←ListRegistries type;data
+ r←{appendPort}ListRegistries type;data
 ⍝ List all registries defined in the Client's config file.\\
 ⍝ Returns a matrix with these columns:
-⍝ * [;1] Alias
-⍝ * [;2] URL\\
+⍝ * [;1] URL
+⍝ * [;2] Alias
 ⍝ * [;3] Priority\\
+⍝ * [;4] API-key (optionally)
 ⍝ "type" must be either 0 or 1 or empty:\\
 ⍝ * 1 means all data is listed
 ⍝ * Everything else means just the alias, the uri and the priority are listed\\
+⍝ If ⍺ is 1 (default is 0) then the second column carries the uri plus the port
+⍝ in case the  port is neither 80 nor 443.
+ appendPort←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'appendPort'
  r←(0,(2+3×1≡type))⍴''
  '"type" (⍵) must be a Boolean or empty'Assert(⊂type)∊0 1 ''⍬
  :If 0<≢data←MyUserSettings.registries
@@ -17,4 +21,7 @@
          r←↑data.(uri alias port priority)
          r←r[⍒r[;4];]
      :EndIf
+ :EndIf
+ :If appendPort
+     r[;1]←BindProtocolWithPort¨↓r[;1 3]
  :EndIf

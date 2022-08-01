@@ -1,4 +1,4 @@
- r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;∆PermanentConnections
+ r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;∆PermanentConnections;bool
 ⍝ `path` must point to a folder with installed packages, meaning that there
 ⍝ must be a file apl-buildlist.json available. This is mandatory.
 ⍝ The optional left argument can carry flags as a single integer:
@@ -25,10 +25,15 @@
  buildFilename←path,Reg.BuildListFilename
  ('File not found: ',buildFilename)Assert F.IsFile buildFilename
  buildList←Reg.JSON⊃F.NGET buildFilename
- ∆PermanentConnections←⎕NS''                ⍝ Establish but without any connections yet: we don't know whether we will need any
- ∆PermanentConnections.keepOpen←1           ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
- :If 0<≢buildList.packageID
-     r←↑majorVersions CheckForLaterVersion_¨(dependencies⌈buildList.principal)/buildList.packageID
+ :If bool←(∨/IsHTTP¨ buildList.url)∧0∊(RemovePackageID¨buildList.url)∊{⍵[;1]⌿⍨⍵[;4]>0}(1 ListRegistries'')
+     CloseConnections 1
+     0 Assert⍨'The build list carries entries that are not on the Tatin Registry search path'
+ :Else
+     ∆PermanentConnections←⎕NS''                ⍝ Establish but without any connections yet: we don't know whether we will need any
+     ∆PermanentConnections.keepOpen←1           ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
+     :If 0<≢buildList.packageID
+         r←↑majorVersions CheckForLaterVersion_¨(dependencies⌈buildList.principal)/buildList.packageID
+     :EndIf
+     CloseConnections 1
  :EndIf
- CloseConnections 1
  ⍝Done

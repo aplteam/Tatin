@@ -19,7 +19,7 @@
      ('Converting markdown-to-HTML failed for ',markdownFile)Assert 0=≢ns.report
  :EndFor
  htmlFiles←{⊃{⍺,⍵}/1↓⎕NPARTS ⍵}¨⊃F.Dir'html/*.html'
- zipFilename←targetFolder,'Tatin-Documentation-',({⍵/⍨3>+\'.'=⍵}2⊃##.Registry.Version),'.zip'
+ zipFilename←targetFolder,'Tatin-Documentation-',({⍵↑⍨¯1+⍵⍳'+'}{⍵/⍨3>+\'.'=⍵}2⊃##.Registry.Version),'.zip'
  F.DeleteFile zipFilename
  myZip←⎕NEW ##.ZipArchive(,⊂zipFilename)
  (F.PWD,'/html')∘{⍺ myZip.Add ⍵}¨htmlFiles

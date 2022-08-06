@@ -4,7 +4,7 @@
      response←CreateHomePage request
  :Else
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
-     :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath                      ⍝ Static stuff
+     :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath                        ⍝ Static stuff
          response←request ReturnFiles G.HTDOCS,fullPath
      :ElseIf 'usage-data/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath
          response←request ReturnUsageDataFiles fullPath
@@ -13,14 +13,19 @@
          packageID←(≢path)↓fullPath
          :If 0=≢path
              :If Reg.IsValidPackageID_Complete packageID
-                 response←request FetchPackage packageID      ⍝ It is a fully qualified packageID
+                 response←request FetchPackage packageID        ⍝ It is a fully qualified packageID
              :Else
-                 response←request Respond 404                 ⍝ Neither a valid package ID nor a proper REST request
+                 ⍝ Neither a valid package ID nor a proper REST request
+                 :If (⊂'text/html')∊request.Accept.MediaRange   ⍝ Is it a browser?
+                     response←request RespondWithHTML 404 'Invalid package ID'
+                 :Else
+                     response←request Respond 404               ⍝ Nope, so we send back JSON5
+                 :EndIf
              :EndIf
          :ElseIf request IsREST_v1 fullPath
              response←request Handle_GET_REST_Version1 fullPath
          :Else
-             response←request Respond 404                     ⍝ Neither a valid package ID nor a proper REST request
+             response←request Respond 404                       ⍝ Neither a valid package ID nor a proper REST request
          :EndIf
      :EndIf
  :EndIf

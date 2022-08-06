@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.40.0 - 2022-07-18
+⍝ * 0.40.1 - 2022-08-06
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -691,7 +691,7 @@
           r←TC.ReadPackageConfigFile_ what
       :Else
           path←what
-          filename←path,'/',TC.CFG_Name
+          filename←'expand'TC.F.NormalizePath({⍵,(~(¯1↑⍵)∊'/\')/'/'}path),TC.CFG_Name
           :If Arg.delete
               'File not found'Assert TC.F.IsFile filename
               msg←'Sure you want to delete "',filename,'" ?'
@@ -958,8 +958,9 @@
                   :If 0<≢msg
                       :If ' did not respond'{⍺≡(-≢⍺)↑⍵}msg
                           :If ∆YesOrNo msg,'; leave the URL as it is (n=edit again) ?'
-                              flag←1
                               newData←json
+                          :Else
+                              flag←0
                           :EndIf
                       :Else
                           flag←~1 ∆YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'

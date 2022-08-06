@@ -4,20 +4,24 @@
      ##.Admin.Initialize_Client
  :EndIf
  T←⎕NEW ##.Tester2 ⎕THIS
- :If 0 ##.Client.YesOrNo'Check Temp\ folder for left-overs?'
-     T.exec_after_each_test←'#.Tatin.Admin.CheckTempFolderAfterTestFunctionRun'
- :ElseIf 0 ##.Client.YesOrNo'Check user settings?'
-     T.exec_after_each_test←'#.Tatin.Admin.CheckUserSettings'
- :ElseIf 0 ##.Client.YesOrNo'Check user settings for no-caching?'
-     T.exec_before_each_test←'#.Tatin.Admin.Check_Caching_Before'
-     T.exec_after_each_test←'#.Tatin.Admin.Check_Caching_After'
- :ElseIf 0 ##.Client.YesOrNo'Check user number of IP connections?'
-     T.exec_before_each_test←'#.Tatin.Admin.Check_IP_Before'
-     T.exec_after_each_test←'#.Tatin.Admin.Check_IP_After'
- :ElseIf 0 ##.Client.YesOrNo'Checkfor permanent connections?'
-     T.exec_before_each_test←'#.Tatin.Admin.Check_PermanentConnection_Before'
-     T.exec_after_each_test←'#.Tatin.Admin.Check_PermanentConnection_After'
- :EndIf
+
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝ Might become usesul again one day ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+⍝:If 0 ##.Client.YesOrNo'Check Temp\ folder for left-overs?'
+⍝     T.exec_after_each_test←'#.Tatin.Admin.CheckTempFolderAfterTestFunctionRun'
+⍝ :ElseIf 0 ##.Client.YesOrNo'Check user settings?'
+⍝     T.exec_after_each_test←'#.Tatin.Admin.CheckUserSettings'
+⍝ :ElseIf 0 ##.Client.YesOrNo'Check user settings for no-caching?'
+⍝     T.exec_before_each_test←'#.Tatin.Admin.Check_Caching_Before'
+⍝     T.exec_after_each_test←'#.Tatin.Admin.Check_Caching_After'
+⍝ :ElseIf 0 ##.Client.YesOrNo'Check user number of IP connections?'
+⍝     T.exec_before_each_test←'#.Tatin.Admin.Check_IP_Before'
+⍝     T.exec_after_each_test←'#.Tatin.Admin.Check_IP_After'
+⍝ :ElseIf 0 ##.Client.YesOrNo'Checkfor permanent connections?'
+⍝     T.exec_before_each_test←'#.Tatin.Admin.Check_PermanentConnection_Before'
+⍝     T.exec_after_each_test←'#.Tatin.Admin.Check_PermanentConnection_After'
+⍝ :EndIf
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+
  testFilename←##.Admin.GetCoverageFile
  :If ⎕NEXISTS testFilename
      ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}

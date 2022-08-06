@@ -22,13 +22,16 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.2.6+4' '2022-05-30'
+      r←'Tester2' '3.2.7+5' '2022-08-03'
     ∇
 
     ∇ History
       :Access Public shared 
+      ⍝ * 3.2.7 ⋄ 2022-08-03
+      ⍝   * Bug fix in `ListTestFunctions`: must not cut lines short when view←1
+      ⍝   * New `Make` added
       ⍝ * 3.2.6 ⋄ 2022-05-30
-      ⍝   * Bug fix: log in session was mutilated; introduced by 3.2.5 
+      ⍝   * Bug fix: log in session was mutilated; introduced by 3.2.5
       ⍝ * 3.2.5 ⋄ 2022-05-22
       ⍝   * #17 fixed
       ⍝   * In the GUI the log (not the grid) was distorted
@@ -1306,7 +1309,9 @@
           r2←r2,[1.5]buff
           r2←r2[⍋↑⎕C r2[;1];]
           longestName←⌈/≢¨r2[;1]
-          :If 0<≢r2
+          longestName←⌈/≢¨r2[;1]
+          :If ~view
+          :AndIf 0<≢r2
           :AndIf ⎕PW<longestName+3+⌈/≢¨r2[;2]
               max←⎕PW-3+longestName
               b←max<≢¨r2[;2]

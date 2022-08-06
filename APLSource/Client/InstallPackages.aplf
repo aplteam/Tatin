@@ -16,8 +16,7 @@
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  CheckInstallFolder targetFolder
  identifiers←','(≠⊆⊢)identifiers
- ∆PermanentConnections←⎕NS''        ⍝ Establish but without any connections yet: we don't know whether we need any
- ∆PermanentConnections.keepOpen←1   ⍝ But if we do we keep them open until this functions gets back control (see bottom: CloseConnections)
+ EstablishEmptyPermanentConnections 0
  :Trap 998
      :For identifier_ :In identifiers
          (alias identifier_)←SplitAtAlias identifier_
@@ -47,7 +46,7 @@
          PrintToSession'  Establish dependencies...'
          r,←targetFolder InstallPackage_ alias identifier
      :EndFor
-     CloseConnections 1
+     CloseConnections 0
  :Else
      qdmx←⎕DMX
      CloseConnections 1

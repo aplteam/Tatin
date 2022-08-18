@@ -6,9 +6,17 @@
  r←0
  TS←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕TS}'TS'
  filename←folder,'year'
- year←⊃##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+ :If 0=≢year←##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+     ⍝ This should not happen since it is initialized in `TatinAmendments`, but it DID happen anyway...
+     (⊂⍕1⊃⎕TS)⎕NPUT filename 1
+     year←##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+ :EndIf
  filename←folder,'month'
- month←##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+ :If 0=≢month←##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+     ⍝ This should not happen since it is initialized in `TatinAmendments`, but it DID happen anyway...
+     (⊂¯2↑'00',⍕2⊃⎕TS)⎕NPUT filename 1
+     month←##.A.ToNum ⎕TC~⍨∊⊃⎕NGET filename
+ :EndIf
  :If r←month≠¯1+2⊃TS
  :OrIf 1=month
      :If 1≠2⊃TS

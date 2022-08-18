@@ -20,7 +20,11 @@
  :Else
      c.Secure←∨/'https://'⍷reg.uri
      :If 0=c.Port←reg.port
-         c.Port←(c.Secure+1)⊃80 443
+         :If HasPortNumber uri
+             c.Port←A.ToNum 1↓{⍵↑⍨-':'⍳⍨⌽⍵}{⍵/⍨3>+\⍵='/'}uri
+         :Else
+             c.Port←(c.Secure+1)⊃80 443
+         :EndIf
      :EndIf
  :EndIf
  c.Host←{⍵↑⍨¯1+⍵⍳':'}'/'~⍨RemoveHttpProtocol uri

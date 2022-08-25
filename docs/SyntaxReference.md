@@ -133,7 +133,7 @@ Note that the function accepts an optional left argument, but this should not be
 flag←GetNoCachingFlag uri
 ```
 
-Take a URI or an alias and tries to find that URI in the `MyUserSettings` instance.
+Takes a URI or an alias and tries to find that URI in the `MyUserSettings` instance.
 If found the value of the `noCaching` property is returned. 
 
 If URI is not found a 0 is returned.
@@ -199,7 +199,8 @@ cfg←InitPackageConfig y
 
 Returns a namespace with default values useful for the function [`InitialisePackage`](#InitialisePackage).
 
-`⍵` might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then this namespace will be merged. Any settings in that namespace take precedence.
+`⍵` might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then the variables in that namespace overwrite the defaults.
+
 
 ### InstallPackages
 
@@ -211,7 +212,7 @@ Installs one or more packages (`identifiers` ) in `targetFolder`.
 
 `identifiers` must be a simple character vector, specifying one or more comma-separated packages (items).
 
-Items must be one of:
+Each item must be one of:
 
 * an HTTP request for a package
 * a ZIP file holding a package
@@ -228,15 +229,15 @@ By default beta versions are considered in case the package ID is incomplete, bu
 
 ### ListCache
 ```
-mat←{fullpath} Listcache uri
+r←{fullpath} Listcache uri
 ```
 
 Lists the contents of the Tatin package cache. Refers to the `MyUserSettings` instance of the class `UserSettings`.
 
-`uri` might be empty of a specific domain:
+`uri` might be empty or a specific domain:
 
 * In case it is empty all packages of all domains are listed
-* In case it is a specific domain only packages of that domain are listed.
+* In case it is a specific domain only packages of that domain are listed
 
 The optional left argument `fullpath` defaults to 0, when just domain names and package IDs are reported.
 If it is 1 then the full paths are reported instead.
@@ -264,7 +265,7 @@ mat←{parms} ListPackages uri
 
 In case an install folder was specified a two-column matrix is returned:
 
-|[;1] |Carries the package IS
+|[;1] |Carries the package ID
 |[;2] |Carries a star for principal packages
 
 #### Registry
@@ -343,13 +344,13 @@ Note that the result of the API function and the user command differ.
 list←{parms} ListTags y
 ```
 
-`y` might be the path to a Registry or a Registry alias (embraced by `[]`).
+`y` might be URL of a Tatin server or a Registry alias (embraced by `[]`).
 
 By default all tags of all packages are returned.
 
 Optionally `⍺` can be specified. Must be a namespace that might contain a variable `tags` which
 may specify one or more tags (simple comma-separated text vector). If that is the case only
-the tags shared by the packages that carry all of the specified tags.
+the tags shared by the packages that carry all of the specified tags will be returned.
 
 ### ListVersions         
 

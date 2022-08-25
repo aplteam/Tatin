@@ -377,24 +377,7 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 * When a package is loaded or installed from a file, "url" is injected and points to that file.
 
-### Access after loading a package
 
-Whether you load a package with `LoadPackages` or `LoadDependencies`, the contents of the configuration file is available as readable JSON as a character vector under the name `CONFIG` together with `ASSETS`, `GetFullPath2Assets`, `ID`, `URI`, `HOME` and possibly `LX`. All these pieces of information are available in the namespace `TatinVars` which is injected into the `code` namespace.
-
-`LX` is only available in case the package used the [`lx`](#) mechanism for initializing itself.
-
-All of them are niladic functions because that's how we emulate constants in APL.
-
-Notes:
-
-* `HOME` will be empty in case these two conditions are both met:
-  * The package was brought into the workspace with `LoadPackages` (as opposed to `LoadDependencies`)
-  * The package does not have any assets
-* `HOME` will also be empty in case the path it holds does not exist
-
-  This may happen in case packages are loaded into a WS, saved, and then moved elsewhere, maybe even a different machine. In that case the folder the package was loaded from might not be available anymore, and therefore `''` is returned.
-* `ASSETS` holds the path of any assets relative to `HOME`. It is empty in case there are no assets.
-* `GetFullPath2Assets` returns `HOME,'/',ASSETS` in case `HOME` is not empty, and just `ASSETS` otherwise.
 
 [^id]: A package ID consists of `{group}-{name}-{major}.{minor}.{patch}`
 

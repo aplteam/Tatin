@@ -23,8 +23,8 @@ Optionally such an ID may also comprehend a build number which is separated from
 A group can be anything really:
 
 * If you act on behalf of a company it might be the name of that company, like "Dyalog"
-* If you are a freelance it might be you name, or just your first name, like "davin"
-* It might be a term used to indicated something, anything, like "aplteam"
+* If you are a freelancer it might be your name, or just your first name, like "davin"
+* It might be a term used to indicate something, anything, like "aplteam"
 
 Once you have chosen a group name, and published a package with that group name to the [principal Tatin Registry](https://tatin.dev "Link to tatin.dev"), you are advised to create a "home page" for that group. Use that for anything useful like background, motivation, contact details, whatever.
 
@@ -34,7 +34,7 @@ Of course group-related home pages do not always make sense, therefore by defaul
 
 ### The name
 
-The name should trigger an idea of what a package might do. Group+name must be unique, but you might well use a name that is already used under a different group name, though this is not recommended.
+The name should give the user an idea of what a package might do. Group+name must be unique, but you might well use a name that is already used under a different group name, though this is not recommended.
 
 ### The version number
 
@@ -44,10 +44,9 @@ The version number must consist of three parts separated by dots:
 * The minor version number: the "2" in 1.**2**.3
 * The patch number: the "3" in 1.2.**3**
 
-Optionally there might be a beta ID added. Examples are:
+Optionally additional information might be added. Examples are:
 
 * 1.2.3-beta-1
-* 1.2.3.beta-1
 * 1.2.3-fix-for-the-foo-problem
 * 1.2.3.issue-234
 
@@ -180,7 +179,7 @@ What is what is defined in the package configuration file which _must_ exist to 
 
 #### The package configuration file
 
-What is required and how to create and change a package configuration file is discussed in the document [PackageConfiguration](./PackageConfiguration.html ),
+What is required and how to create and change a package configuration file is discussed in the document [PackageConfiguration](./PackageConfiguration.html ).
 
 
 #### The dependency file
@@ -189,7 +188,7 @@ This file is only required when the package to be published has dependencies.
 
 Note that in case you specify a dependency that does not (yet) exist on the Registry then this has no consequences: the server will not reject such a package. 
 
-That might well come as a surprise, but there is a very good reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
+That might come as a surprise, but there is a very good reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
 
 Usually you will specify just a full package ID as a dependency. If you wish  you may also specify either a URL following the http[s]:// protocol or a zip file following the file:// protocol. 
 
@@ -204,7 +203,7 @@ Notes:
 
 ### Final step
 
-Once the preparation is done the final step is easy. You may specify the folder hosting the package:
+Once the preparation is done the final step is easy. Specify the folder hosting the package:
 
 ```
 ]TATIN.PublishPackage /path2package [tatin]
@@ -279,5 +278,5 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 
 You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
-When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package might or might not be deleted from the Team server.
+When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package will most likely be deleted from the Team server.
 

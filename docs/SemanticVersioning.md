@@ -9,6 +9,8 @@
 
 Tatin is based on the concept of Semantic Versioning (SemVer), so before we go into any details, we first need to understand SemVer. 
 
+If you are already familiar with the concept of semantic versioning then of course you may skip this document.
+
 ## Format
 
 The version number of a Tatin package must follow the rules for Semantic Versioning: it always has the format `{major}.{minor}.{patch}`. 
@@ -24,7 +26,7 @@ Valid examples for a version number are therefore:
 1.2.3-beta-1     
 ```
 
-These pieces of information fully participate when Tatin needs to establish package prevalence:
+These pieces of information fully participate when Tatin needs to establish package precedence:
 
 `1.2.3` is "better" than  `1.2.2` but also "better" as `1.2.3-beta1` of course.
 
@@ -34,7 +36,7 @@ The plus (`+`) is used to separate an (optional) build number from the other par
 
 ### Build numbers
 
-After {major}-{minor}-{patch} you may add the optional build number. Build numbers _do not_ participate in establishing prevalence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.
+After {major}-{minor}-{patch} you may add the optional build number. Build numbers _do not_ participate in establishing precedence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.
 
 I> That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build-numbers - they are the same as far as Tatin is concerned.
 
@@ -52,7 +54,7 @@ Note that when there are more than three dots in the version number, then the fi
 
 Therefore `1.2.3.4` is valid, with 4 being the build number. `1.2.3-beta-1.4` is valid, with 4 being the build number. `1.2.3-beta-1` is valid, no build number. `1.2.3-beta-1.abc` is _invalid_.
 
-The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing preferences: build numbers are always ignored.
+The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing precedence: build numbers are always ignored.
 
 ## Terminology and versioning Rules
 

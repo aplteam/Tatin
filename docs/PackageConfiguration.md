@@ -45,7 +45,7 @@ In the workspace a simple namespace can be a used for package configuration. On 
 
 It can be fed with an empty vector as right argument: then just defaults are established.
 
-Instead you may create a namespace and populate that namespace with Tatin package configuration variables which are discussed underneath.
+Instead you may create a namespace and populate that namespace with Tatin package configuration variables which are discussed underneath. In this case the values in the namespace overwrite the defaults.
 
 Example:
 
@@ -77,7 +77,7 @@ If you specify any variable with a name that Tatin does not know about and that 
 
 #### api
 
-"api", when not empty,  must be a single name or a single class _but neither a function nor an operator_. It must be relative, never absolute; therefore it must never start with `#` or `⎕`.
+"api", if not empty,  must be a single name or a single class _but neither a function nor an operator_. It must be relative, never absolute; therefore it must never start with `#` or `⎕`.
 
 There are several scenarios:
 
@@ -89,7 +89,7 @@ There are several scenarios:
 
 I> Note that you _must not_ specify the name of a function or an operator as the API in any of these cases.
 I> 
-I> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is possible neither for niladic functions nor operators.
+I> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is not possible for niladic functions and operators.
 
 
 ##### A single namespace
@@ -164,7 +164,7 @@ Similarly, if your package `Foo` consist of the two namespaces `Boo` and `Goo`, 
 
 #### assets
 
-If not empty (no assets) it points to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
+If not empty (meaning the package has no assets) this must point to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
 
 There is one exception: when an absolute path is specified but it's partly identical with what will become `HOME` (the folder where the package lives) then Tatin removes that  part silently, making the path effectively relative. 
 
@@ -227,7 +227,7 @@ This can be one of:
   ⎕THIS.Admin.ShowHelp
   ```
 
-Content that does not qualify for one of these will be rejected.
+Content that does not qualify for one of these options will be rejected.
 
 
 #### GetFullPath2AssetsFolder
@@ -238,9 +238,9 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
   HOME,'/',ASSETS
 ```
 
-* If `HOME` is empty the function returns just `ASSETS`.
-
-* If `ASSETS` is empty the functions returns `''`.
+* If `HOME` is empty the function returns just `ASSETS`
+* If `ASSETS` is empty the functions returns `''`
+* If `HOME` is not empty but does not exist on disk just `ASSETS` is returned
 
 #### group
 
@@ -250,7 +250,7 @@ A group may be the name of a user, the owner, a company, an application name, a 
 
 #### lx
 
-This is optional: it may or may not exist, and it might be empty if it does.
+This is optional: it may or may not exist, and it might be empty if it does exist\.
 
 In case it is not empty it must be the name of a niladic or monadic function that resides in the top-level namespace of the package (_not_ in what might be defined as API!) or a shared method of a class.
 
@@ -272,15 +272,11 @@ Note that the existence of a variable `LX` indicates that there was an `lx` func
 
 This may be left empty. If set it must be an email address. 
 
-Two formats are possible:
+These formats are valid:
 
 ```
-your name <your.name@your-domain.com>
-```
-
-and
-
-```
+your.name <your.name@your-domain.com>
+"your name" <your.name@your-domain.com>
 your.name@your-domain.com
 ```
 

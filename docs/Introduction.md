@@ -41,9 +41,7 @@ Packages can be updated to a later (and therefore hopefully better) version in a
 
 * The Tatin client runs on Windows, Linux and Mac-OS.
 
-* The Tatin server runs on Windows (as a Service) and on Linux (as a Docker image). 
-
-* Server as well as Client rely on .NET (Windows) or .NET Core (that is version 3.1) on non-Windows platforms.
+* The Tatin server runs on Windows (as a Service or a Docker container) and on Linux (as a Docker image). 
 
 * Tatin is not compatible with SALT, although the extension `.dyalog` is supported.
 
@@ -57,7 +55,7 @@ Tatin consists of:
 
   The Tatin client can be used in two different ways:
 
-  * By executing user commands like `]TATIN.LoadPackages`  
+  * By executing user commands like `]TATIN.LoadPackages ...`  
   * Via its API by executing a statement like `⎕SE.Tatin.LoadPackages '...'`
 
 * A Tatin Server
@@ -72,7 +70,7 @@ The principal Tatin server is available at <https://tatin.dev>, but you can also
 
 ## Consumers
 
-If you're a consumer, you'll use the Tatin client to load, explore, and possibly install packages from one or more Tatin servers.
+If you're a consumer, you'll use the Tatin client to load, explore, and eventually install packages from one or more Tatin servers.
 
 Note that although you can access a Tatin server with a browser, its real goal is the communication of the `]TATIN` user commands (or the Tatin API functions) with one or more Tatin servers.
 

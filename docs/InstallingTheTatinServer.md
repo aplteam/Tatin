@@ -83,7 +83,7 @@ See also `[CONFIG]Base`.
 
 #### [CONFIG]Title
 
-When you use a Browser for accessing a Tatin server then `Title` defines what will become the tab title in the browser.
+When you use a Browser for accessing a Tatin server then `Title` defines what will become the window or tab title in the browser.
 
 
 #### [CONFIG]Caption
@@ -155,11 +155,11 @@ There are two different levels available for logging:
 
 ### The Windows Event Log
 
-Under Windows you may let Tatin write the Event Log by setting `WindowsEventLog` to 1.
+Under Windows you may let Tatin write to the Event Log by setting `WindowsEventLog` to 1.
 
 This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.
 
-If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and any errors are then reported to the Windows Event Log.
+If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and crashes are then reported to the Windows Event Log.
 
 ## On Certificates
 

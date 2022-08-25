@@ -79,7 +79,7 @@ Now you might want the Tatin API to be around right from the start, so that you 
 
 What is the application for this? Well, you might want to have an automated build process available right from the start, for example.
 
-I> If you are not interested in this, skip the rest of this document
+I> If you are not interested in this or use 19.0 or later, skip the rest of this document
 
 
 The way to achieve that goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs/` folder. Note that on non-Windows platforms the name of the file must be lowercase.
@@ -136,18 +136,17 @@ Create one that looks like this:
       }
 
     ∇ r←{OS}GetMyUCMDsFolder add
-     ⍝ Returns standard path for Dyalog's MyUCMDs\ folder.
-     ⍝ Works on all platforms but returns different results.\\
-     ⍝ Under Windows typically:\\
-     ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs'  ←→ GetMyUCMDsFolder ''
-     ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\aaa'  ←→ GetMyUCMDsFolder 'aaa'
-     ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
+      ⍝ Returns standard path for Dyalog's MyUCMDs folder.\\
+      ⍝ Works on all platforms but returns different results.\\
+      ⍝ Under Windows typically:\\
+      ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\Foo'  ←→ GetMyUCMDsFolder 'Foo'
+      ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
        :If 0=⎕NC'OS'
-           OS←3↑⊃'.'⎕WG'APLVersion'
+           OS←##.APLTreeUtils2.GetOperatingSystem''
        :EndIf
        add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
        :If 'Win'≡OS
-           r←⊃,/1 ⎕NPARTS (2⊃4070⌶0),'\..\MyUCMDs',add
+           r←##.FilesAndDirs.ExpandPath(2⊃4070⌶0),'\..\MyUCMDs',add
        :Else
            r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
        :EndIf

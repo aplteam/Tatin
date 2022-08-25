@@ -121,6 +121,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>The strategy outlined above is applied on each tag independently.</li>
 <li>Searching for multiple tags would mean that only packages that have a hit for <em>all of them</em> would qualify.</li>
 <li>Searching for tags is an action that is carried out by a Tatin Server. That means that specifying <code>-tags=</code> makes sense only in HTTP requests: only then is there a server on the other side that can process the request.</li>
+<li>This feature's sole purpose is to overcome typos; it should not be used deliberately — as a shortcut for example — since the result may be incorrect.</li>
 </ul>
 </div>
 
@@ -227,7 +228,7 @@ aplteam-OS-3.0.1</code></pre>
 <h4 data-id="How-does-a-package-look-like-on-disk">4.1.3. How does a package look like on disk?</h4>
 </a>
 </div>
-<p>Let's have a look into the directory <code>/Foo/packages/aplteam-MarkAPL-11.0.1</code>:</p>
+<p>To answer this question we need to look into the directory <code>/Foo/packages/aplteam-MarkAPL-11.0.1</code>:</p>
 <pre><code>apl-dependencies.txt
 apl-package.json
 aplteam-MarkAPL-11.0.1/Files
@@ -250,11 +251,10 @@ MarkAPL.aplc</code></pre>
   tags: "markdown,converter,windows,linux,mac-os,apltree",
   uri: "https://tatin.dev/",
   version: "11.0.1+232",
-  wx: 3,
 }</code></pre>
 <p>Note that <code>MarkAPL</code> is a class. If you would leave <code>api</code> empty then when <code>MarkAPL</code> is loaded into <code>#</code> you would need to call the <code>Version</code> function with:</p>
 <pre><code>#.MarkAPL.MarkAPL.Version</code></pre>
-<p>By defining <code>MarkAPL</code> as the api you can instead say:</p>
+<p>By defining <code>MarkAPL</code> as the api this suffices:</p>
 <pre><code>#.MarkAPL.Version</code></pre>
 <p>The <code>api</code> parameter is discussed in detail in the “PackageConfiguration” document.</p>
 <div class="h_tag">
@@ -278,7 +278,7 @@ Styles.html</code></pre>
 <div class="leanpub_A">
 <h3>Regarding Assets</h3>
 <p>Note that assets are to be consumed, meaning that a package <em><strong>must not</strong></em> write to the assets folder.</p>
-<p>Among several reasons for this one stands out: in cases a package is loaded and caching in on (the default) then the asset folder is shared by all projects/people who also loaded that package.</p>
+<p>Among several reasons for this one stands out: in cases a package is loaded and caching is on (the default) then the assets folder is shared by all projects/people who also loaded that package.</p>
 </div>
 
 <div class="h_tag">
@@ -384,8 +384,8 @@ aplteam_OS_3_0_0</code></pre>
 APLTreeUtils2
 FilesAndDirs
 MarkAPL</code></pre>
-<p><code>MarkAPL</code> is the package we asked for. It depends on two packages, <code>APLTreeUtils2</code> and <code>FilesAndDirs</code>. For those references are injected. <code>FilesAndDirs</code> depends on <code>OS</code> but because that is not required by <code>MarkAPL</code> no reference to it is injected into MarkAPL's <code>code</code>, instead you would find such a reference in <code>#._tatin.aplteam_FilesAndDirs_5_0_1.code</code>.</p>
-<p>Note that like <code>InstallPackages</code> you may specify more than just one package. If you do then separate them with commas.</p>
+<p><code>MarkAPL</code> is the package we asked for. It depends on two packages, <code>APLTreeUtils2</code> and <code>FilesAndDirs</code>. For these two packages references are injected. <code>FilesAndDirs</code> depends on <code>OS</code> but because that is not required by <code>MarkAPL</code> no reference to it is injected into MarkAPL's <code>code</code>, instead you would find such a reference in <code>#._tatin.aplteam_FilesAndDirs_5_0_1.code</code>.</p>
+<p>Note that you may load multiple packages with a single call; if you do then separate them with commas.</p>
 <div class="h_tag">
 <a href="#Misc" id="Misc" class="autoheader_anchor">
 <h3 data-id="Misc">4.5. Misc</h3>
@@ -398,7 +398,7 @@ MarkAPL</code></pre>
 </div>
 <p>The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages: you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first.</p>
 <p>That way Tatin would find the package on your local machine even when they are not loaded as principal packages but just as dependencies.</p>
-<p>Later, when the package is ready, you could publish it to, say, the principal Tatin server on <code>https://tatin.dev</code>, and delete it from your local Registry.</p>
+<p>Later, when the package is ready, you could publish it to, say, the principal Tatin server on <code>https://tatin.dev</code>, and — don't forget that step! — delete it from your local Registry.</p>
 <div class="leanpub_A">
 <h3>Having the same package in more than one Registry</h3>
 <p>In case you juggle with the same package in several Registries you might well be interested in getting a full list. The <code>]ListPackages</code> user command has a syntax for this:</p>
@@ -418,7 +418,7 @@ MarkAPL</code></pre>
 </a>
 </div>
 <p>For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.</p>
-<p>They are injected into a namespace <code>TatinVars</code> which in turn is injected into <code>code</code>.</p>
+<p>They are injected into a namespace <code>TatinVars</code> which in turn is injected into the <code>code</code> namespace.</p>
 <p>Some of them always exist, some of them only under certain circumstances.</p>
 <div class="h_tag">
 <a href="#ASSETS" id="ASSETS" class="autoheader_anchor">
@@ -426,7 +426,7 @@ MarkAPL</code></pre>
 </a>
 </div>
 <p>The path to the package's assets relative to <code>HOME</code>. Is empty in case there are no assets.</p>
-<p>See also <a href="#GetFullPath2AssetsFolder" class="bookmark_link">GetFullPath2AssetsFolder</a>.</p>
+<p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link">GetFullPath2AssetsFolder</a> function.</p>
 <div class="h_tag">
 <a href="#CONFIG" id="CONFIG" class="autoheader_anchor">
 <h5 data-id="CONFIG">4.5.2.2. CONFIG</h5>
@@ -444,20 +444,17 @@ MarkAPL</code></pre>
 <h5 data-id="GetFullPath2AssetsFolder">4.5.2.4. GetFullPath2AssetsFolder</h5>
 </a>
 </div>
-<p>This is a function which returns the result of the expression <code>HOME,'/',ASSETS</code> if <code>HOME</code> is not empty, otherwise it returns just <code>ASSETS</code>.</p>
+<p>This is a function which returns the result of the expression <code>HOME,'/',ASSETS</code> if both <code>HOME</code> and <code>ASSETS</code> are not empty <em>and</em> <code>HOME</code> exists on disk. If <code>HOME</code> is empty or does not exist on disk then just <code>ASSETS</code> is returned.</p>
+<p>When accessing assets you are advised to always use the <code>GetFullPath2AssetsFolder</code> function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set <code>⎕WSID</code> and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even on a different machine. The expression <code>HOME,'/',ASSETS</code> would then fail.</p>
+<p>The function would not find <code>HOME</code> and there return just <code>ASSETS</code>, and that allows you to still access the assets sucessfully.</p>
 <div class="h_tag">
 <a href="#HOME" id="HOME" class="autoheader_anchor">
 <h5 data-id="HOME">4.5.2.5. HOME</h5>
 </a>
 </div>
 <p>Is a character vector holding the path of a folder that hosts the package.</p>
-<p>There are exceptions:</p>
-<ul>
-<li>When the package was brought into the workspace with <code>LoadPackages</code> rather than <code>LoadDependencies</code>.
-<p>This is because without assets <code>LoadPackages</code> loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.</p></li>
-<li>When the folder the package was loaded from does not exist for other reasons, for example because the package was loaded into the WS which then was saved and moved elsewhere, together with the <code>ASSETS</code> folder relative to the WS.</li>
-</ul>
-<p>In case one of these two conditions is met <code>HOME</code> is <code>''</code>.</p>
+<p>There is an exception: when the package was brought into the workspace with <code>LoadPackages</code> rather than <code>LoadDependencies</code> that has no assets. This is because without assets <code>LoadPackages</code> loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.</p>
+<p>In this case <code>HOME</code> is set to <code>''</code>.</p>
 <div class="h_tag">
 <a href="#ID" id="ID" class="autoheader_anchor">
 <h5 data-id="ID">4.5.2.6. ID</h5>
@@ -469,7 +466,7 @@ MarkAPL</code></pre>
 <h5 data-id="LX">4.5.2.7. LX</h5>
 </a>
 </div>
-<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successfully. <code>LX</code> holds the result that is returned by that function if it did return a result. If it doesn't it becomes an empty vector.</p>
+<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successfully. <code>LX</code> holds the result that is returned by that function if it did return a result. If it doesn't <code>LX</code> is an empty vector.</p>
 <p>Note that if there is no <code>lx</code> defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no <code>LX</code>.</p>
 <div class="h_tag">
 <a href="#URI" id="URI" class="autoheader_anchor">

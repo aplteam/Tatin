@@ -26,7 +26,7 @@ If the third level is available then `-??` shows this at the bottom:
 
 The API is established in `⎕SE.Tatin`. These are almost exclusively dfns that call a function in `⎕SE._Tatin`.
 
-While `⎕SE._Tatin` holds all code required for Tatin's client side, `⎕SE.Tatin` holds  the public interface.
+While `⎕SE._Tatin` holds all code required for the Tatin client, `⎕SE.Tatin` holds the public interface.
 
 
 
@@ -56,7 +56,7 @@ Returns a matrix with five columns:
 |Col  | Info
 |-----| ----
 |[;1] |Original package ID
-|[;2] |Lastest package ID
+|[;2] |Latest package ID
 |[;3] |Original URL
 |[;4] |Flag; 1 means later version is available
 |[;5] |URL the latest version was found but empty in case it's identical with [;3]
@@ -185,7 +185,7 @@ On non-Windows platforms:
 config←{configParms} InitialisePackage folder
 ```
 
-Takes a folder (`⍵`) and initialises it so that it can be a package.
+Takes a folder (`⍵`) and initializes it so that it can be a package.
 
 This means in particular to create the folder (although it might already exist) and to create a package config file with default settings or what `⍺` specifies: one can pass a config namespace as `⍺`, typically created by a call to [`InitPackageConfig`](#InitPackageConfig).
 
@@ -223,7 +223,7 @@ You may omit minor+patch or even major+minor+patch in order to install the lates
 
 By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as `⍺`.
 
-`r` is a nested vector of character vectors with the full names of all principle packages installed. The length will match the number of packages specified as `identifiers`.
+`r` is a nested vector of character vectors with the full names of all principal packages installed. The length will match the number of packages specified as `identifiers`.
 
 
 ### ListCache
@@ -235,7 +235,7 @@ Lists the contents of the Tatin package cache. Refers to the `MyUserSettings` in
 
 `uri` might be empty of a specific domain:
 
-* In case it is empty all packages of of all domains are listed
+* In case it is empty all packages of all domains are listed
 * In case it is a specific domain only packages of that domain are listed.
 
 The optional left argument `fullpath` defaults to 0, when just domain names and package IDs are reported.

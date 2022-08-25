@@ -197,7 +197,7 @@ Notes:
 
 * Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with "400 --- bad request".
 
-  That is good enough a reason to use this with care. Only when messing around with packages not desiged to be published to a Tatin server on your local machine may this be used.
+  That is good enough a reason to use this with care. Only when messing around with packages not designed to be published to a Tatin server on your local machine may this be used.
 
 * Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.
 
@@ -267,9 +267,9 @@ Let's imagine that you are supposed to develop Tatin packages for your employer,
 
   This is used to publish beta versions that your team might want to use. This has the second-highest priority.
 
-* Your company also runs a Tatin Server used for producitve packages.
+* Your company also runs a Tatin Server used for productive packages.
 
-* Your packages may dependend on packages published on Tatin's principal server, known as `[tatin]`.
+* Your packages may depend on packages published on Tatin's principal server, known as `[tatin]`.
 
   Of the four Registries this one should probably have the lowest priority.
 

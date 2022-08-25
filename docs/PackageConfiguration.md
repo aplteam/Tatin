@@ -227,7 +227,7 @@ This can be one of:
   ⎕THIS.Admin.ShowHelp
   ```
 
-Content that does not qualifiy for one of these will be rejected.
+Content that does not qualify for one of these will be rejected.
 
 
 #### GetFullPath2AssetsFolder
@@ -240,7 +240,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 
 * If `HOME` is empty the function returns just `ASSETS`.
 
-* If `ASSETS` is empty the functins returns `''`.
+* If `ASSETS` is empty the functions returns `''`.
 
 #### group
 
@@ -264,7 +264,7 @@ The `lx` function will be executed under error trapping, and any errors will be 
 
 * Make `⎕TRAP` a local variable in the `lx` function and assign `⎕TRAP←0 'S'` to it to make any problem popping up straight away
 
-* Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with problems yourself
+* Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with problems yourself, for example in the `:Else` branch.
 
 Note that the existence of a variable `LX` indicates that there was an `lx` function successfully executed.
 

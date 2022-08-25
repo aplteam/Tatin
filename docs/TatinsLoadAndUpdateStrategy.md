@@ -233,5 +233,5 @@ A> When you specify the `-major` flag of the `CheckForLaterVersion` user command
 
 ## Downgrading
 
-There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here, you need to do this yourself.
+There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here; you need to do this yourself.
 

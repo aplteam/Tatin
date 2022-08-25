@@ -88,6 +88,7 @@ A> Notes:
 A> * The strategy outlined above is applied on each tag independently.
 A> * Searching for multiple tags would mean that only packages that have a hit for _all of them_ would qualify.
 A> * Searching for tags is an action that is carried out by a Tatin Server. That means that specifying `-tags=` makes sense only in HTTP requests: only then is there a server on the other side that can process the request.
+A> * This feature's sole purpose is to overcome typos; it should not be used deliberately --- as a shortcut for example --- since the result may be incorrect.
 
 Let's assume you need a tool for converting [Markdown](https://en.wikipedia.org/wiki/Markdown "Link to the Wikipedia") into HTML, and that the package should run on all platforms.
 
@@ -200,7 +201,7 @@ Notes:
 
 #### How does a package look like on disk?
 
-Let's have a look into the directory `/Foo/packages/aplteam-MarkAPL-11.0.1`:
+To answer this question we need to look into the directory `/Foo/packages/aplteam-MarkAPL-11.0.1`:
 
 ```
 apl-dependencies.txt
@@ -230,7 +231,6 @@ The file `apl-package.json` describes the MarkAPL package:
   tags: "markdown,converter,windows,linux,mac-os,apltree",
   uri: "https://tatin.dev/",
   version: "11.0.1+232",
-  wx: 3,
 }
 ```
 
@@ -240,7 +240,7 @@ Note that `MarkAPL` is a class. If you would leave `api` empty then when `MarkAP
 #.MarkAPL.MarkAPL.Version
 ```
 
-By defining `MarkAPL` as the api you can instead say:
+By defining `MarkAPL` as the api this suffices:
 
 ```
 #.MarkAPL.Version
@@ -273,7 +273,7 @@ A> ### Regarding Assets
 A>
 A> Note that assets are to be consumed, meaning that a package _**must not**_ write to the assets folder.
 A>
-A> Among several reasons for this one stands out: in cases a package is loaded and caching in on (the default) then the asset folder is shared by all projects/people who also loaded that package.
+A> Among several reasons for this one stands out: in cases a package is loaded and caching is on (the default) then the assets folder is shared by all projects/people who also loaded that package.
 
 ### Getting a package into the workspace
 
@@ -409,9 +409,9 @@ FilesAndDirs
 MarkAPL      
 ```
 
-`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For those references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
+`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For these two packages references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
 
-Note that like `InstallPackages` you may specify more than just one package. If you do then separate them with commas.
+Note that you may load multiple packages with a single call; if you do then separate them with commas.
 
 ### Misc
 
@@ -422,7 +422,7 @@ you can run your own Tatin server on, say, your own machine, and give it the hig
 
 That way Tatin would find the package on your local machine even when they are not loaded as principal packages but just as dependencies.
  
-Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and delete it from your local Registry.
+Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and --- don't forget that step! --- delete it from your local Registry.
 
 
 A> ### Having the same package in more than one Registry
@@ -448,7 +448,7 @@ A> Note that Tatin does not only scans all known Registries with a priority grea
 
 For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.
 
-They are injected into a namespace `TatinVars` which in turn is injected into `code`.
+They are injected into a namespace `TatinVars` which in turn is injected into the `code` namespace.
 
 Some of them always exist, some of them only under certain circumstances.
 
@@ -457,7 +457,7 @@ Some of them always exist, some of them only under certain circumstances.
 
 The path to the package's assets relative to `HOME`. Is empty in case there are no assets.
 
-See also [GetFullPath2AssetsFolder](#GetFullPath2AssetsFolder).
+See also the [GetFullPath2AssetsFolder](#GetFullPath2AssetsFolder) function.
 
 
 ##### CONFIG
@@ -472,22 +472,20 @@ A vector of character vectors with the package IDs of the packages the package i
 
 ##### GetFullPath2AssetsFolder
 
-This is a function which returns the result of the expression `HOME,'/',ASSETS` if `HOME` is not empty, otherwise it returns just `ASSETS`.
+This is a function which returns the result of the expression `HOME,'/',ASSETS` if both `HOME` and `ASSETS` are not empty _and_ `HOME` exists on disk. If `HOME` is empty or does not exist on disk then just `ASSETS` is returned. 
+
+When accessing assets you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even on a different machine. The expression `HOME,'/',ASSETS` would then fail.
+
+The function would not find `HOME` and there return just `ASSETS`, and that allows you to still access the assets sucessfully.
 
 
 ##### HOME
 
 Is a character vector holding the path of a folder that hosts the package. 
 
-There are exceptions: 
+There is an exception: when the package was brought into the workspace with `LoadPackages` rather than `LoadDependencies` that has no assets. This is because without assets `LoadPackages` loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.
 
-* When the package was brought into the workspace with `LoadPackages` rather than `LoadDependencies`.
-
-  This is because without assets `LoadPackages` loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.
-
-* When the folder the package was loaded from does not exist for other reasons, for example because the package was loaded into the WS which then was saved and moved elsewhere, together with the `ASSETS` folder relative to the WS.
-
-In case one of these two conditions is met `HOME` is `''`.
+In this case `HOME` is set to `''`.
 
 
 ##### ID
@@ -497,7 +495,7 @@ The full package name. This will include a build ID if there is any, so it is no
 
 ##### LX
 
-This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successfully. `LX` holds the result that is returned by that function if it did return a result. If it doesn't it becomes an empty vector.
+This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successfully. `LX` holds the result that is returned by that function if it did return a result. If it doesn't `LX` is an empty vector.
 
 Note that if there is no `lx` defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no `LX`.
 

@@ -22,7 +22,7 @@ Once Tatin is installed when you fire up an instance of Dyalog APL the contents 
 For example, this call:
 
 ```
-      ]Tatin.Listregistries
+      ]Tatin.ListRegistries
  URI         Alias                    Port  Priority
  ----------  -----------------------  ----  --------
  tatin       https://tatin.dev/          0       100
@@ -81,7 +81,7 @@ Of course you are free to edit that file with any editor. However, keep in mind 
 If you are familiar with JSON5 syntax and want to edit the file it is recommended to use:
 
 ```
-]TATIN.Usersettings -edit
+]TATIN.UserSettings -edit
 ```
 
 This will allow you to edit the file contents, but Tatin will check it afterwards in order to make sure that nothing invalid goes ever into the file.

@@ -155,7 +155,7 @@ There are two different levels available for logging:
 
 ### The Windows Event Log
 
-Under Windows you may let Tatin write the the Event Log by setting `WindowsEventLog` to 1.
+Under Windows you may let Tatin write the Event Log by setting `WindowsEventLog` to 1.
 
 This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.
 
@@ -252,7 +252,7 @@ In this file a couple of environment variables are defined that might not be set
 
 2. You might need to change the port 443, defined with the `-p` flag.
 
-   This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet, because in that scenario Tatin should run behind a web server like Appache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.
+   This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet, because in that scenario Tatin should run behind a web server like Apache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.
 
 3. The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note that the INI file rules whether the interpreter allows a Ride or not)
 

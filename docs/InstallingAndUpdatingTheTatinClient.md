@@ -9,7 +9,7 @@
 
 ## Introduction
 
-You don't need to worry about installing Tatin if you use version 19.0 or later versions of Dyalog: Tatin will be available in `⎕SE` after a standard installation anyway.
+You don't need to worry about installing Tatin if you use version 19.0 or later of Dyalog: Tatin will be available in `⎕SE` after a standard installation anyway.
 
 However, installing and updating is, as far as the Tatin client is concerned, _the same thing_, because updating the Tatin client basically means removing the old version and installing a new one.
 
@@ -33,13 +33,11 @@ Instructions:
 
 Where to find the `MyUCMDs/` folder depends on your operating system:
 
-* Under Windows it is 
-
-  `(2 ⎕nq # 'GetEnvironment' 'USERPROFILE'),'\Documents\MyUCMDs\'`
+* Under Windows call `⎕SE.Tatin.GetMyUCMDsFolder''`
 
 * On non-Windows platforms it is `$HOME/MyUCMDs/`
 
-Note that this folder is created by the Dyalog APL installer under Windows but _not_ under Linux and Mac-OS, so you need to create the folder yourself on non-Windows platform.
+Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac-OS, so you need to create the folder yourself on non-Windows platform.
 
 Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.
 

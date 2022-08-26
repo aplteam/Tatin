@@ -1,6 +1,6 @@
-  mat←{dateFlag}ListVersions uri;client;request;res;uri_;registries;registry;buff;flag
+  mat←{dateFlag}ListVersions url;client;request;res;url_;registries;registry;buff;flag
 ⍝ Lists all versions of a package.
-⍝ `uri` is one of:
+⍝ `url` is one of:
 ⍝ * An (optional) registry followed by "group" and "name" of a package
 ⍝ * A path to a Registry and "group" and "name" of a package
 ⍝ In the first case all defined Registries with a priority greater than zero are scanned.
@@ -12,30 +12,30 @@
 ⍝ By default the publishing date is not included, but you my change this by passing a 1 as ⍺.
 ⍝ In that case an additional column is added to the result.
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
- :If flag←'[*]'≡3⍴uri           ⍝ Archaic syntax is still supported nut not documented
- :OrIf (~IsHTTP uri)∧('['≠1⍴uri)∧({1≥+/⍵∊'/\'}uri)∧(~':'∊uri)∧('.'≠1⍴uri)
+ :If flag←'[*]'≡3⍴url           ⍝ Archaic syntax is still supported but not documented
+ :OrIf (~IsHTTP url)∧('['≠1⍴url)∧({1≥+/⍵∊'/\'}url)∧(~':'∊url)∧('.'≠1⍴url)
      mat←(0,(2+dateFlag))⍴⍬
      registries←ListRegistries 0
      :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
      :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}registries[;1])⌿registries
          :For registry :In registries[;1]
-             :If 0<≢buff←dateFlag ListVersions registry,(flag×3)↓uri
+             :If 0<≢buff←dateFlag ListVersions registry,(flag×3)↓url
                  mat⍪←(⊂registry),buff
              :EndIf
          :EndFor
      :EndIf
  :Else
-     uri_←ReplaceRegistryAlias uri
-     :If ∧/'[]'∊uri
-         'No valid alias provided'Assert 0<≢uri_
+     url_←ReplaceRegistryAlias url
+     :If ∧/'[]'∊url
+         'No valid alias provided'Assert 0<≢url_
      :Else
-         'No valid URI provided'Assert 0<≢uri_
+         'No valid URI provided'Assert 0<≢url_
      :EndIf
-     'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last uri_)+.='-'     ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
-     :If Reg.IsHTTP uri_
-         mat←⍪dateFlag ListVersions_ uri_
+     'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last url_)+.='-'     ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
+     :If Reg.IsHTTP url_
+         mat←⍪dateFlag ListVersions_ url_
      :Else
-         mat←⍪dateFlag Reg.ListVersions uri_
+         mat←⍪dateFlag Reg.ListVersions url_
      :EndIf
  :EndIf
 ⍝Done

@@ -336,7 +336,13 @@ Returns a matrix with these columns:
 * 1 means all data is listed
 * 0 means the API key is not listed
 
-Note that the result of the API function and the user command differ.
+Notes:
+
+* The result of the API function and the user command differ
+
+* When a Tatin Server is questioned by `ListRegistries` but does not respond an error is thrown.
+
+
 
 ### ListTags             
 
@@ -355,10 +361,10 @@ the tags shared by the packages that carry all of the specified tags will be ret
 ### ListVersions         
 
 ```
-mat←{dateFlag} ListVersions uri
+mat←{dateFlag} ListVersions url
 ```
 
-`uri` is one of:
+`url` is one of:
 
 * A package name
 * A group name and a package name
@@ -382,9 +388,9 @@ By default the publishing date is not included, but you may change this by passi
 {r}←LoadDependencies y
 ```
 
-Requires two arguments:
+Requires two mandatory arguments:
 
-* A folder with a build list (mandatory)
+* A folder with a build list
 * A target namespace
 
 You may specify an optional third argument: the `overwriteFlag` flag which defaults to 0.
@@ -393,7 +399,7 @@ Use `overwriteFlag` in case all packages should be loaded even if they already e
 
 Loads all packages and injects required references into `targetSpace`.
 
-Returns a vector with references to the loaded packages (no dependencies, principal packages only).
+Returns a vector with references to the loaded packages (principal packages only, so no dependencies).
 
 ### LoadPackages          
 
@@ -414,15 +420,15 @@ Every single item must be one of:
 * A package ID; Tatin will then attempt to find that package in one of the Registries defined in the
 client's config file with a priority greater than 0.
 
-The first hit wins.
+  The first hit wins.
 
 `targetSpace` must be a reference or a fully qualified name of an ordinary namespace, meaning the name must start with either `#` or `⎕SE`.
 
 It might already exist, but if it doesn't it will be created. If it exists but is not an ordinary namespace an error is thrown.
 
-Loads the package(s) into `(#|⎕SE)._tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`
+Loads the package(s) into `(#|⎕SE)._tatin.{packageName}` and establishes a reference for every one of them in `targetSpace`
 
-Loads all dependencies, if any, as well into `(#|⎕SE)._tatin` but _not_ into `targetSpace`.
+Loads all dependencies, if any, as well into `(#|⎕SE)._tatin` but does _not_ create references for them in `targetSpace`.
 
 By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as `⍺`.
 
@@ -436,19 +442,19 @@ zipFilename←Pack (projectPath targetPath)
 
 projectPath:
 
-: folder to create a package from
+: A folder to create the package from
 
 targetPath:
 
-: folder the package goes into
+: A folder the ZIP file goes into
 
 ### Ping                 
 
 ```
-bool←Ping uri
+bool←Ping url
 ```
 
-Establishes whether the host is up and running with very little overhead. If `uri` (can also be an alias) points to a folder a 1 is returned if that folder exists, otherwise 0.
+Establishes whether the host is up and running with very little overhead. If `url` (can also be an alias) points to a folder a 1 is returned if that folder exists, otherwise 0.
 
 ### PublishPackage       
 
@@ -468,8 +474,8 @@ Note that if `⍵` points already to a ZIP file only steps 4 and 5 are performed
 
 `⍵` must be a two-item vector:
 
-1. `source` → folder to create package from
-2. `registry` → registry to publish the package to (alias or uri)
+1. `source` → folder to create the package from
+2. `registry` → registry to publish the package to (alias or url)
 
 The explicit result:
 
@@ -492,10 +498,9 @@ Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.
 The file apl-buildlist.json as well as all directories in that folder will be deleted.
 Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.
 
-Note that packages with different major version numbers are considered to be different packages.
+Note that packages with different major version numbers are considered as different packages.
 
-By default all known Registries with a priority greater than 0 are scanned, but you may
-specify a particular Registry as a third (optional) argument.
+By default all known Registries with a priority greater than 0 are scanned (highest priority number first), but you may specify a particular Registry as a third (optional) argument.
 
 The left argument is optional and is, if specified, typically created by calling [`CreateReInstallParms`](#CreateReInstallParms).
 
@@ -503,17 +508,28 @@ It may carry three parameters:
 
 * `noBetas`
 
-   By default this is 0, meaning that beta versions are considered. Set to 1 if you want betas to be ignored.
+   By default this is 0, meaning that beta versions are considered. Set this to 1 if you want betas to be ignored.
 
 * `update`
 
-  Defaults to 0, meaning that the same version is installed again even if a later version is available now. Change to 1 to force an update.
+  Defaults to 0, meaning that the same version is installed again even if a later version is available. Change this to 1 to force an update.
 
 * `dry`
 
   Defaults to 0, meaning the function does business. Set this to 1 in order to get a report of what the function would do without actually doing it.
 
-Note that packages that were installed from ZIP files are just re-installed from their ZIP files.
+Notes:
+
+* For every dependency this function performs a Registry scan
+* Packages that were installed from ZIP files are just re-installed from their ZIP files without further ado.
+
+A> ### Registry scans
+A>
+A> Under certain circumstances Tatin performs a Registry scan: Tatin questions every Registry with a priority greater than 0 (highest priority number first) for hosting a particular package. The first hit wins. 
+A>
+A> For example, when `ReInstallDependencies` is called for all dependencies a Registry scan is performed.
+A>
+A> Note that when you installed a package from a Tatin Registry https://MyTatin.com and then later remove that Registry from your user settings, or set its priority to 0, effectively telling Tatin not to scan that Registry anymore, then `ReInstallDependencies` will **not** scan https://MyTatin.com  anymore, despite Tatin knowing perfectly well where the package in question was originally loaded from.
 
 ### ReadPackageConfigFile
 
@@ -523,7 +539,7 @@ cfg←ReadPackageConfigFile path
 
 Takes a path to a package and returns the config file for that package as a namespace populated with variables.
 
-`path` may or may not carry the filename.
+`path` may or may not carry the filename (`apl-package.json`).
 
 ### UnInstallPackages
 
@@ -531,11 +547,11 @@ Takes a path to a package and returns the config file for that package as a name
 (list msg)←UnInstallPackage (packageID folder)
 ```
 
-`folder` must carry a Tatin dependency file. 
+`folder` must host a Tatin dependency file. 
 
-`UnInstallPackage` attempts to un-install the package `packageID` and all its dependencies, but he latter only in case they are neither principal packages nor required by other packages.
+`UnInstallPackage` attempts to un-install the package `packageID` and all its dependencies, but the latter only in case they are neither principal packages nor required by other packages.
 
-`packageID` might be a full package ID but also <group>-<name> or just <name>. However, in case. In case more than one package qualify an error is thrown.
+`packageID` might be a full package ID but also <group>-<name> or just <name>. However, in case more than one package qualify an error is thrown.
 
 Note that if `packageID` is empty a clean-up attempt is made.
 
@@ -551,7 +567,7 @@ To keep things simple Tatin performs the following steps:
 1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.
 3. Removes `packagedID` from the dependency file.
 4. Re-compiles the build list based on the new dependency file.
-5. Removes all packages that are not mentioned in the build list anymore
+5. Removes all packages that are not mentioned in the build list anymore.
 
 Returns a two-item vector:
 

@@ -43,7 +43,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="The-Strategy-Problem">1. The Strategy Problem</h2>
 </a>
 </div>
-<p>Let's imagine that you need two packages, <code>Foo</code> and <code>Goo</code>. Both rely on package <code>Zoo</code>, but while <code>Foo</code> requests 1.1.1 of <code>Zoo</code>, <code>Goo</code> insists on version 1.2.0. However, the best version of <code>Goo</code> available is actually 2.0.0, and even for major version 1 there is a later version available: 1.3.0.</p>
+<p>Let's imagine that you need two packages, <code>Foo</code> and <code>Goo</code>. Both rely on package <code>Zoo</code>, but while <code>Foo</code> requests 1.1.1 of <code>Zoo</code>, <code>Goo</code> insists on version 1.2.0. However, the best version of <code>Zoo</code> available is actually 1.3.0, and there is even a later major version available: 2.0.0.</p>
 <p>Now from what we've said so far it should be clear that version 2.0.0 is not an option at all because it is considered as a completely different package and therefore ignored.</p>
 <p>Because of SemVer we know that <code>Goo</code> would crash on version 1.1.1 of <code>Zoo</code> in case it takes advantage of the new features built into version 1.2.0. (We know there <em>are</em> new features because of the bump of the minor part of <code>Zoo</code>'s version number)</p>
 <p>We can take several different approaches here:</p>
@@ -57,17 +57,24 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>To many programmers the last option seems particularly appealing because you are always up-to-date, you always get the latest fixes when you build your application. Great!</p>
 <p>But when you look at it from a different angle then things look much less appealing:</p>
 <ol start="1">
-<li>You build your application</li>
+<li>You build your application (including updating dependencies)</li>
 <li>You run your test cases – they all pass</li>
 <li>You build your application again (without changing <em>anything</em>)</li>
 <li>You run your test cases again, but this time they fail</li>
 </ol>
 <p>This can happen in case the author of a package you depend on in one way or another has released a new version of that package.</p>
-<p>Attractive as an automated update mechanism might be, you want your builds to be <em>reproducible</em>.</p>
-<p>Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available: check the user command <code>]TATIN.CheckForLaterVersions</code>. Also, check the <code>-update</code> flag of the <code>]Tatin.ReInstallDependencies</code> user command or its API equivalent.</p>
+<p>Attractive as an automated update mechanism might be, you want your builds to be <em> 100%reproducible</em>, right?!</p>
 <p>So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages <code>Foo</code> and <code>Goo</code>.</p>
-<p>Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses <em>the latest version</em>, which might or might not be the latest one available. In our example that would be 1.2.0, while 1.3.0 is ignored.</p>
-<p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest version <em>mentioned as a dependency</em>.</p>
+<p>Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses <em>the latest installed version</em>, which might or might not be the latest one available. In our example <code>Zoo</code> is requested and installed twice, and Tatin would load 1.2.0 just once (because it is requested by <code>Goo</code>), while 1.3.0 is ignored because it is not requested and therefore not installed.</p>
+<p>This means that <code>Foo</code> will also have to use version 1.2.0 of `Zoo.</p>
+<p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest installed version.</p>
+<div class="leanpub_A">
+<h3>On updating dependencies</h3>
+<p>Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available.</p>
+<p>For that check the user command <code>]TATIN.CheckForLaterVersions</code>. Also, check the <code>-update</code> flag of the <code>]Tatin.ReInstallDependencies</code> user command or its API equivalent.</p>
+<p>We will discuss this in a minute.</p>
+</div>
+
 <div class="h_tag">
 <a href="#Loading-Dependencies" id="Loading-Dependencies" class="autoheader_anchor">
 <h2 data-id="Loading-Dependencies">2. Loading Dependencies</h2>
@@ -110,13 +117,13 @@ mygroup_Foo_1_0_0
 mygroup_Goo_2_1_3
 mygroup_Zoo_1_1_1
 mygroup_Zoo_1_2_0</code></pre>
-<p>Note that both versions of <code>Zoo</code> have been loaded. That's because the two Load operations are independent of each other.</p>
+<p>Note that both versions of <code>Zoo</code> have been loaded. That's because the two Load operations are independent of each other, therefore minimal version selection cannot be applied.</p>
 <div class="h_tag">
 <a href="#Installing-packages" id="Installing-packages" class="autoheader_anchor">
 <h2 data-id="Installing-packages">3. Installing packages</h2>
 </a>
 </div>
-<p>To make packages a part of an application (say), they first need to be installed. In the following examples we will install two packages, <code>Foo</code> and <code>Goo</code>. Both require <code>Zoo</code>, so <code>Zoo</code> will be installed as a side effect.</p>
+<p>To make packages a part of an application (say), they first need to be installed. In the following example we will install two packages, <code>Foo</code> and <code>Goo</code>. Both require <code>Zoo</code>, so <code>Zoo</code> will be installed as a side effect.</p>
 <pre><code>      ⎕NEXISTS /myPkgs
 0
       ]TATIN.InstallPackages [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
@@ -150,7 +157,7 @@ mygroup-Goo-2.1.0</code></pre>
 </a>
 </div>
 <p>Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two differ.</p>
-<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which was created when you installed your first package, and which will be extended when you install more packages.</p>
+<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which was created when you installed your first package, and which will be extended when you install additional packages.</p>
 <p>You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to <code>#</code>.</p>
 <pre><code>      ]TATIN.LoadDependencies /myPkgs/ #.Temp</code></pre>
 <p>This is what <code>LoadDependencies</code> will do:</p>

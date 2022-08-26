@@ -55,7 +55,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Tatin uses a file to remember all Tatin Registries you want to work with, and possibly other user-specific settings as well. We refer to this file as the user settings file.</p>
 <p>When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location.</p>
 <p>Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the <code>Tatin.UserSettings</code> class. The instance is assigned to <code>⎕SE.Tatin.MyUserSettings</code>. From then on any changes to the file with an external editor <em>do not</em> affect <code>⎕SE.Tatin.MyUserSettings</code>!</p>
-<p><code>⎕SE.Tatin.MyUserSettings</code> provides a number of properties that can be questioned as well as a number of methods that can be issued in order to manipulate the user settings.</p>
+<p><code>⎕SE.Tatin.MyUserSettings</code> provides a number of properties that can be referenced as well as a number of methods that can be issued in order to manipulate the user settings.</p>
 <p>For example, this call:</p>
 <pre><code>      ]Tatin.ListRegistries
  URI         Alias                    Port  Priority
@@ -72,28 +72,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>That default file will have two Tatin Registries defined in it:</p>
 <ul>
-<li>the principal Tatin server, available via the URL <code>https://tatin.dev/</code>.
+<li>the principal Tatin server, available via the URL <code>https://tatin.dev/</code>
 <p>It has an alias <code>tatin</code> assigned to it, so you can address it as <code>[tatin]</code> with all user commands that require a Registry as parameter.</p></li>
-<li>the Tatin Test server, available via the URL <code>https://test.tatin.dev/</code>.
-<p>It has an alias <code>test-tatin</code> assigned to it, so you can address it as <code>[test-tatin]</code> with all user commands that require a Registry as parameter.</p>
+<li>the Tatin Test server, available via the URL <code>https://test.tatin.dev/</code>
+<p>It has an alias <code>tatin-test</code> assigned to it, so you can address it as <code>[tatin-test]</code> with all user commands that require a Registry as parameter.</p>
 <p>It has a priority of <code>0</code> assigned to it which means that it will <em>not</em> participate in Registry scans.</p>
 <p>Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is <code>0</code>.</p></li>
 </ul>
-<div class="leanpub_A">
-<h3>Registry scans</h3>
-<p>What happens when a Tatin server is down when Tatin attempts to interrogate it?</p>
-<p>That depends on how Tatin is called:</p>
-<ul>
-<li>From a user command Tatin will stop and ask you what to do; you have three options:
-<ul>
-<li>Try again</li>
-<li>Skip that registry and carry on</li>
-<li>Cancel the whole operation</li>
-</ul></li>
-<li>If it is an API call then an error is thrown</li>
-</ul>
-</div>
-
 <div class="h_tag">
 <a href="#Where-does-the-file-live" id="Where-does-the-file-live" class="autoheader_anchor">
 <h3 data-id="Where-does-the-file-live">1.2. Where does the file live?</h3>
@@ -249,7 +234,7 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
 </div>
 <p>Adding a registry is achieved by calling the <code>AddRegistry</code> method, and providing an instance of the <code>DefineRegistry</code> class as argument:</p>
 <pre><code>      ⎕se.Tatin.MyUserSettings.AddRegistry #.myReg</code></pre>
-<p>Now we would expect two Registries:</p>
+<p>Now we would expect three Registries:</p>
 <pre><code>      ↑⎕se.Tatin.MyUserSettings.registries.(alias uri priority)
  tatin       https://tatin.dev/           100
  myc         https://tatin.mycompany.com/  90

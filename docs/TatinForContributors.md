@@ -14,9 +14,9 @@ If you want to contribute to the [Tatin project on GitHub](https://github.com/ap
 
 Tatin is published under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody; it is rather a community project.
 
-This is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for "contribute to a github project".
-
 This document also discusses how to execute the test suite and how to build a new version of Tatin.
+
+However, this is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for "contribute to a github project".
 
 
 ## Requirements
@@ -38,7 +38,7 @@ You also need to have Git installed.
 Note that Tatin is managed by the [Cider project management tool](https://github.com/aplteam/Cider).
 If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.
 
-Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process (which currently can run only on Windows) requires Cider.
+Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.
 
 
 ## How to work on Tatin
@@ -68,14 +68,14 @@ If you want to run the Tatin Server execute the function
 #.Tatin.Admin.Initialize_Server
 ```
 
-You are advised _not to run_ the Client and the Server in the same workspace.
+Note that you cannot run both the Client and the Server in the same workspace.
 
 
 ## Updating Tatin packages used by Tatin
 
 Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.
 
-For that reason the packages installed in the `packages/` folder are copied over to the `APLSource/` folder. That allows loading the packages with Link.
+For that reason the packages installed in the `packages/` folder are copied over to the `APLSource/` folder when a new version is built. That allows loading the packages with Link.
 
 If you need to add a package then you need to perform a couple of steps:
 
@@ -106,9 +106,9 @@ There are two scenarios:
 
    When a test fails then the test framework stops, and the developer can investigate on the spot.
 
-1. You might want to execute the test suite automatically and in batch mode, meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has very few test cases that fall into this category; 95% of the tests are batchable)
+1. You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; 95% of the tests are batchable)
 
-   This may be required by an automated build process.
+   This might be required by an automated build process.
 
    In this case any errors are trapped, and you get just either a single line that reports success or failure in the session or `⎕OFF` is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.
 
@@ -122,7 +122,7 @@ A> Creating a new version is actually discussed later in this document, but ther
 A>
 A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in `⎕SE` for execution, but that is only possible if you create a new version first.
 A>
-A> For that reason one test actually checks whether the version number in the workspace and in `⎕SE` do match. If you are confident that this does not matter in your case just carry on.
+A> For that reason one test actually checks whether the version number in the workspace and in `⎕SE` do match. If you are confident that this does not matter in your case you may just carry on.
 
 ### Testing while developing
 
@@ -130,48 +130,55 @@ A> For that reason one test actually checks whether the version number in the wo
 
 It is recommended to start a fresh APL session and then load the Tatin project into the CLEAR WS before running any test cases.
 
-Use `]Cider.OpenProject` to do this.
+Use `]Cider.OpenProject` to do this. Once the project is open you can ask Cider how to execute Tatin's test suite by entering:
 
-By default the test cases use port 5001 for communication between the Test Server and the client. You may change the INI files for both server and client if that does not work for you.
+```
+      ]Cider.RunTests
+#.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite
+```
 
-In order to execute the full test suite you need to start a Tatin Server first. For that execute the following steps:
+Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.
 
-1. Instantiate Dyalog Unicode 18.0 or later
+When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually you will answer with a "Yes!" to this.
 
-2. Execute:
+A> ### Starting a Tatin test server "manually"
+A>
+A> There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:
+A> 
+A> 1. Instantiate Dyalog Unicode 18.0 or later
+A> 
+A> 2. Execute the following two statements:
+A> 
+A>    ```
+A>    ]Cider.OpenProject /path/to/Tatin
+A>    #.Tatin.TestCasesServer.RunTests
+A>    ```
+A> 
+A> This starts the server in debug mode; that means that in case of an error the interpreter stops. That is different from letting the test suite start the test server: that traps all errors and carries on.
+A>
+A> If you change any coder at this stage those changes will be written back to disk, so be careful.
 
-   ```
-   ]Cider.OpenProject /path/to/Tatin
-   ```
+The `RunTests` function performs these tasks:
 
-3. Execute:
+* Change the current directory
+* Establish all required references
+* Instantiate the `Tester2` class under the name `T` 
+* Start a local Tatin test server if the user confirms this
+* Call the `T.Run` function
 
-   ```
-   #.Tatin.TestCasesServer.RunTests
-   ```
+  This will run all test cases, including those that communicate with a locally running Tatin test server and the principal Tatin server available at <https://tatin.dev>
 
-   This function changes the current directory, establishes all required references and then instantiates the `Tester2` class under the name `T` before finally calling the `T.Run` function; this will start a Tatin server in debug mode.
+#### Quitting tests
 
-   "Debug mode" means that in case of an error the interpreter stops. If you change functions at this stage those changes will be written back to disk, so be careful.
+There are scenarios where you want to quit the test suite, for example when a test unearthed a servere bug that needs fixing straight away.
 
+It may be tempting to enter just `)reset`, but that is not how you should do this: you have to make sure that the test suite cleans up after itself. 
 
-Now you are ready to execute the test suite.
+The easiest way to achieve this is to execute this statement:
 
-1. Instantiate Dyalog Unicode 18.0 or later
-
-2. Execute:
-
-   ```
-   ]Cider.OpenProject /path/to/Tatin 
-   ```
-
-3. Execute:
-
-   ```
-   #.Tatin.TestCases.RunTests
-   ```
-
-   This changes the current directory, establishes all required references, instantiates the `Tester2` class under the name `T` before finally calling the `T.Run` function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <https://tatin.dev>
+```
+      T.QuitTests
+```
 
 A> ### Execute the client test suite multiple times in parallel
 A>
@@ -185,7 +192,7 @@ The `Tester2` test framework is flexible and powerful; for example, you may exec
 
 A> ### Why executing only a few tests?
 A>
-A> The full test suite is exhaustive, and for that reason it takes considerable time. Therefore you might be interested in executing only certain parts of the test suite. 
+A> The full test suite is exhaustive. Also, caching is switched off except when caching is tested of course. For these reasons executing the full test suite takes considerable time. Therefore you might be interested in executing only certain parts of the test suite. 
 A>
 A> The tests are grouped, and that is reflected by the names of the test functions. For example, the names `Test_API_001` and `Test_UserCommand_001` clearly state which group they belong to.
 
@@ -274,7 +281,7 @@ Or run all tests but `UserCommand`:
 T.RunThese '~UserCommand'
 ```
 
-Last not least you may specify a 1 as left argument: this makes the test framework stop just before any particular test function is executed. This can be very handy in order to hunt down a bug, or any unexpected behaviour.
+Last not least you may specify a 1 as left argument: this makes the test framework stop just before any particular test function is executed. This can be handy in order to hunt down a bug, or any unexpected behaviour.
 
 ```
 1 T.RunThese 'API'
@@ -328,16 +335,17 @@ There are two scripts available in the Tatin root directory:
 These are templates: check their contents, you might need to make amendments. 
 
 
-## How to create new versions
+## How to create a new version
 
 ### Overview {#ov1}
 
 Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.
 
-In order to create new versions of the Client and the Server you just need to call this function:
+You may ask Cider for how to create a new version of Tatin:
 
 ```
-{noQLXFlag} #.Tatin.Admin.Make <batchFlag>
+      ]Cider.Make
+#.Tatin.#.Tatin.Admin.Make 0 ⍝ Execute this for creating a new version
 ```
 
 Syntax:
@@ -345,7 +353,7 @@ Syntax:
 * The right argument must be a Boolean:
   * `0` means that a human is sitting in front of the monitor and can be asked questions or perform actions
   * `1` means that no human is available; use this in case you want to create a new version automatically, for example from a batch script
-* `noQLXFlag` is an optional Boolean that defaults to `0`, see below for details.
+* The optional left argument is a Boolean that defaults to `0`, see below for details.
 
   It would mean that the instances of Dyalog started to create the Client and the Server won't execute the `lx` command line parameter, allowing you to run the code in the Tracer.
 
@@ -353,18 +361,18 @@ Syntax:
 Notes:
 
 * The build ID is always bumped when you create a new version.
-* The `Make` function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. `noQLXFlag`, if 1,  prevents the interpreter from running the code straight away. 
+* The `Make` function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. The optional left argument, if 1,  prevents the interpreter from running the code straight away. 
 
 A> ### The `load` and `lx` command line parameters
-A> Despite its name `noQLXFlag` is not associated with `⎕LX`: for this to work the command line parameters `load` and `lx` are invoked, and `-x` is added in case `noQLXFlag` is 1, preventing the interpreter from executing the expression noted as `lx.` 
+A> Despite the name of the left argument (`noQLX`) it is not associated with `⎕LX`: for this to work the command line parameters `load` and `lx` are invoked, and `-x` is added in case `noQLX` is 1, preventing the interpreter from executing the expression noted as `lx.` 
 A>
-A> If this looks unfamiliar to you: these were introduced in 18.0.
+A> If this looks unfamiliar to you: the options `lx` and `load` were introduced in 18.0.
 
 The `Make` function performs the following steps:
 
 1. It runs `Tatin.Admin.MakeClient`
 
-1. It compiles the documentation (markdown) to HTML files and distribute the files
+1. It compiles the documentation (markdown) to HTML files and distributes the files
 
 1. It runs `#.Tatin.Admin.MakeServer`
 

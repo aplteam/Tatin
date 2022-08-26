@@ -1,20 +1,20 @@
- bool←Ping uri;client;request;uri_;buff;qdmx;b;last
+ bool←Ping url_;client;request;url_;buff;qdmx;b;last
 ⍝ Establish either whether the host is up and running (with very little overhead) in case it is an http[s] request
  bool←0
- :If ∧/'[]'∊uri
-     uri_←ReplaceRegistryAlias uri
+ :If ∧/'[]'∊url_
+     url_←ReplaceRegistryAlias url_
  :Else
-     uri_←uri
+     url_←url_
  :EndIf
- :If 0<≢uri_
-     :If 0=≢'^http[s]://'⎕S 0⊣⎕C uri_
-         bool←F.IsDir uri_
+ :If 0<≢url_
+     :If 0=≢'^http[s]://'⎕S 0⊣⎕C url_
+         bool←F.IsDir url_
      :Else
          request←R.NewRequest 0
          request.RequestTarget←'/ping'
          :If 0=⎕NC'∆PermanentConnections'
-         :OrIf 9≠∆PermanentConnections.⎕NC 1 CompileNameFromUrl uri_
-             client←NewClient uri_
+         :OrIf 9≠∆PermanentConnections.⎕NC 1 CompileNameFromUrl url_
+             client←NewClient url_
              client.ClientTimeout←4
              :Trap 345
                  buff←client R.SendAndReceive request
@@ -23,7 +23,7 @@
                  ⍝ Just for debugging
              :EndTrap
          :Else
-             client←∆PermanentConnections.⍎1 CompileNameFromUrl uri_
+             client←∆PermanentConnections.⍎1 CompileNameFromUrl url_
              :Trap 345
                  {}client R.Send request                ⍝ Pipeline requests
                  buff←client R.Receive request          ⍝ Wait for all

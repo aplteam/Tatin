@@ -189,6 +189,7 @@
           :If 0=⎕SE._Tatin.RumbaLean.⎕NC'DRC'
               ⎕SE._Tatin.Admin.InitConga ⍬
           :EndIf
+
           r←((⍎Cmd)__ExecAsTatinUserCommand)Input
       :EndIf
     ∇
@@ -1113,7 +1114,11 @@
               r,←⊂'List URL, alias, priority, port  and the no-caching flag of all Registries as defined'
               r,←⊂'in the user settings.'
               r,←⊂'The result is ordered by priority: the one with the highest priority is listed first etc.'
-              r,←⊂'Note that Registries with a priority of 0  will not participate in a scan of Registries.'
+              r,←⊂''
+              r,←⊂'Notes:'
+              r,←⊂' * Registries with a priority of 0 will not participate in a scan of Registries'
+              r,←⊂' * In case a Registry server does not respond when questioned by ]ListRegistries the user is'
+              r,←⊂'   given three options: Retry, skip and cancel operation'
               r,←⊂''
               r,←⊂'-full By default all data but the API keys are listed. Specify -full if you want the'
               r,←⊂'      API keys to be listed as well.'
@@ -1695,6 +1700,7 @@
     ∇ r←GetListOfRegistriesForSelection type
       r←TC.ListRegistries type
       r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
+      r[;1]←r[;1]{⍵∊0 80 443:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}¨0 443 78 1562
     ∇
 
     ∇ registry←{all}SelectRegistry type;row;list
@@ -1702,7 +1708,7 @@
       :If 1=≢list←GetListOfRegistriesForSelection type
           registry←1⊃list[1;]
       :Else
-          :If ⍬≡row←'Select Tatin Registry'all Select↓⎕FMT list[;2 3 1]
+          :If ⍬≡row←'Select Tatin Registry'all Select↓⎕FMT list[;2 1]
               registry←⍬
           :Else
               :If all

@@ -11,14 +11,14 @@
 
 ## Overview
 
-It is natural to assume that a package author would be interested in knowing how many people are interested in their packages, or how often a package was downloaded. 
+It is natural to assume that package authors would be interested in knowing how many people are interested in their packages, or how often a package was downloaded. 
 
 
 Tatin tries to deliver but there is an obstacle one has to be aware of:
 
 Tatin uses a machine-specific cache when downloading a package in order to save bandwidth and CPU resources in case a package is requested again by either the same user or a different user on the same machine.
 
-So a single download can testify only so much: it might just be an attempt to give a package a try and then forget about it, or it might be used in several different applications, and by multiple users. You can't know.
+So a single download can testify only so much: it might just be an attempt to give a package a try and then forget about it, or it might be used in several different applications, and by multiple users, all but the first one served by the cache. You can't know.
 
 Tatin's own test suite requests packages from both the Tatin Server and the Test server, but these requests are flagged as part of a test and ignored when the usage data is compiled.
 

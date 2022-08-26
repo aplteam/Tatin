@@ -11,7 +11,7 @@ Before you read this document, you have to have a good understanding of what Sem
 
 ## The Strategy Problem
 
-Let's imagine that you need two packages, `Foo` and `Goo`. Both rely on package `Zoo`, but while `Foo` requests 1.1.1 of `Zoo`, `Goo` insists on version 1.2.0. However, the best version of `Goo` available is actually 2.0.0, and even for major version 1 there is a later version available: 1.3.0.
+Let's imagine that you need two packages, `Foo` and `Goo`. Both rely on package `Zoo`, but while `Foo` requests 1.1.1 of `Zoo`, `Goo` insists on version 1.2.0. However, the best version of `Zoo` available is actually 1.3.0, and there is even a later  major version available: 2.0.0.
 
 Now from what we've said so far it should be clear that version 2.0.0 is not an option at all because it is considered as a completely different package and therefore ignored.
 
@@ -31,22 +31,30 @@ To many programmers the last option seems particularly appealing because you are
 
 But when you look at it from a different angle then things look much less appealing: 
 
-1. You build your application
+1. You build your application (including updating dependencies)
 1. You run your test cases -- they all pass
 1. You build your application again (without changing _anything_)
 1. You run your test cases again, but this time they fail
 
 This can happen in case the author of a package you depend on in one way or another has released a new version of that package.
 
-Attractive as an automated update mechanism might be, you want your builds to be _reproducible_.
-
-Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available: check the user command `]TATIN.CheckForLaterVersions`. Also, check the `-update` flag of the `]Tatin.ReInstallDependencies` user command or its API equivalent.
+Attractive as an automated update mechanism might be, you want your builds to be _ 100%reproducible_, right?!
 
 So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages `Foo` and `Goo`.
 
-Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses _the latest version_, which might or might not be the latest one available. In our example that would be 1.2.0, while 1.3.0 is ignored.
+Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses _the latest installed version_, which might or might not be the latest one available. In our example `Zoo` is requested and installed twice, and Tatin would load 1.2.0 just once (because it is requested by `Goo`), while 1.3.0 is ignored because it is not requested and therefore not installed.
 
-This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs "Link to the paper defining it"). It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest version _mentioned as a dependency_.
+This means that `Foo` will also have to use version 1.2.0 of `Zoo.
+
+This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs "Link to the paper defining it"). It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest installed version. 
+
+A> ### On updating dependencies
+A> 
+A> Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available.
+A>
+A> For that check the user command `]TATIN.CheckForLaterVersions`. Also, check the `-update` flag of the `]Tatin.ReInstallDependencies` user command or its API equivalent.
+A> 
+A> We will discuss this in a minute.
 
 
 ## Loading Dependencies
@@ -109,11 +117,11 @@ mygroup_Zoo_1_1_1
 mygroup_Zoo_1_2_0
 ```
 
-Note that both versions of `Zoo` have been loaded. That's because the two Load operations are independent of each other.
+Note that both versions of `Zoo` have been loaded. That's because the two Load operations are independent of each other, therefore minimal version selection cannot be applied.
 
 ## Installing packages
 
-To make packages a part of an application (say), they first need to be installed. In the following examples we will install two packages, `Foo` and `Goo`. Both require `Zoo`, so `Zoo` will be installed as a side effect.
+To make packages a part of an application (say), they first need to be installed. In the following example we will install two packages, `Foo` and `Goo`. Both require `Zoo`, so `Zoo` will be installed as a side effect.
 
 ```
       ⎕NEXISTS /myPkgs
@@ -160,7 +168,7 @@ The build list comprises not only the two principal packages but also all depend
 
 Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two differ.
 
-Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which was created when you installed your first package, and which will be extended when you install more packages.
+Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which was created when you installed your first package, and which will be extended when you install additional packages.
 
 You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to `#`.
 

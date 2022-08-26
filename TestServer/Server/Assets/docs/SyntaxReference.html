@@ -221,7 +221,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>flag←GetNoCachingFlag uri</code></pre>
-<p>Take a URI or an alias and tries to find that URI in the <code>MyUserSettings</code> instance. If found the value of the <code>noCaching</code> property is returned.</p>
+<p>Takes a URI or an alias and tries to find that URI in the <code>MyUserSettings</code> instance. If found the value of the <code>noCaching</code> property is returned.</p>
 <p>If URI is not found a 0 is returned.</p>
 <div class="h_tag">
 <a href="#GetPathToPackageCache" id="GetPathToPackageCache" class="autoheader_anchor">
@@ -266,7 +266,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <pre><code>cfg←InitPackageConfig y</code></pre>
 <p>Returns a namespace with default values useful for the function <a href="#InitialisePackage" class="bookmark_link"><code>InitialisePackage</code></a>.</p>
-<p><code>⍵</code> might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then this namespace will be merged. Any settings in that namespace take precedence.</p>
+<p><code>⍵</code> might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then the variables in that namespace overwrite the defaults.</p>
 <div class="h_tag">
 <a href="#InstallPackages" id="InstallPackages" class="autoheader_anchor">
 <h3 data-id="InstallPackages">2.12. InstallPackages</h3>
@@ -275,7 +275,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>r←{noBetas} InstallPackages (identifiers targetFolder)</code></pre>
 <p>Installs one or more packages (<code>identifiers</code> ) in <code>targetFolder</code>.</p>
 <p><code>identifiers</code> must be a simple character vector, specifying one or more comma-separated packages (items).</p>
-<p>Items must be one of:</p>
+<p>Each item must be one of:</p>
 <ul>
 <li>an HTTP request for a package</li>
 <li>a ZIP file holding a package</li>
@@ -291,12 +291,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="ListCache">2.13. ListCache</h3>
 </a>
 </div>
-<pre><code>mat←{fullpath} Listcache uri</code></pre>
+<pre><code>r←{fullpath} Listcache uri</code></pre>
 <p>Lists the contents of the Tatin package cache. Refers to the <code>MyUserSettings</code> instance of the class <code>UserSettings</code>.</p>
-<p><code>uri</code> might be empty of a specific domain:</p>
+<p><code>uri</code> might be empty or a specific domain:</p>
 <ul>
 <li>In case it is empty all packages of all domains are listed</li>
-<li>In case it is a specific domain only packages of that domain are listed.</li>
+<li>In case it is a specific domain only packages of that domain are listed</li>
 </ul>
 <p>The optional left argument <code>fullpath</code> defaults to 0, when just domain names and package IDs are reported. If it is 1 then the full paths are reported instead.</p>
 <p>The result is a vector with as many items as there are domains represented in the cache with at least one package. Each item is a two-element vector:</p>
@@ -326,7 +326,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <tbody>
 <tr>
 <td>[;1]</td>
-<td>Carries the package IS</td>
+<td>Carries the package ID</td>
 </tr>
 <tr>
 <td>[;2]</td>
@@ -418,23 +418,27 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>1 means all data is listed</li>
 <li>0 means the API key is not listed</li>
 </ul>
-<p>Note that the result of the API function and the user command differ.</p>
+<p>Notes:</p>
+<ul>
+<li>The result of the API function and the user command differ</li>
+<li>When a Tatin Server is questioned by <code>ListRegistries</code> but does not respond an error is thrown.</li>
+</ul>
 <div class="h_tag">
 <a href="#ListTags" id="ListTags" class="autoheader_anchor">
 <h3 data-id="ListTags">2.16. ListTags</h3>
 </a>
 </div>
 <pre><code>list←{parms} ListTags y</code></pre>
-<p><code>y</code> might be the path to a Registry or a Registry alias (embraced by <code>[]</code>).</p>
+<p><code>y</code> might be URL of a Tatin server or a Registry alias (embraced by <code>[]</code>).</p>
 <p>By default all tags of all packages are returned.</p>
-<p>Optionally <code>⍺</code> can be specified. Must be a namespace that might contain a variable <code>tags</code> which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carry all of the specified tags.</p>
+<p>Optionally <code>⍺</code> can be specified. Must be a namespace that might contain a variable <code>tags</code> which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carry all of the specified tags will be returned.</p>
 <div class="h_tag">
 <a href="#ListVersions" id="ListVersions" class="autoheader_anchor">
 <h3 data-id="ListVersions">2.17. ListVersions</h3>
 </a>
 </div>
-<pre><code>mat←{dateFlag} ListVersions uri</code></pre>
-<p><code>uri</code> is one of:</p>
+<pre><code>mat←{dateFlag} ListVersions url</code></pre>
+<p><code>url</code> is one of:</p>
 <ul>
 <li>A package name</li>
 <li>A group name and a package name</li>
@@ -453,15 +457,15 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>{r}←LoadDependencies y</code></pre>
-<p>Requires two arguments:</p>
+<p>Requires two mandatory arguments:</p>
 <ul>
-<li>A folder with a build list (mandatory)</li>
+<li>A folder with a build list</li>
 <li>A target namespace</li>
 </ul>
 <p>You may specify an optional third argument: the <code>overwriteFlag</code> flag which defaults to 0.</p>
 <p>Use <code>overwriteFlag</code> in case all packages should be loaded even if they already exist in <code>(#|⎕SE)._tatin</code></p>
 <p>Loads all packages and injects required references into <code>targetSpace</code>.</p>
-<p>Returns a vector with references to the loaded packages (no dependencies, principal packages only).</p>
+<p>Returns a vector with references to the loaded packages (principal packages only, so no dependencies).</p>
 <div class="h_tag">
 <a href="#LoadPackages" id="LoadPackages" class="autoheader_anchor">
 <h3 data-id="LoadPackages">2.19. LoadPackages</h3>
@@ -476,13 +480,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>A ZIP file holding a package</li>
 <li>A folder holding a package (like file://C:/Temp/group-name-version)</li>
 <li>A path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg{packageID}')</li>
-<li>A package ID; Tatin will then attempt to find that package in one of the Registries defined in the client's config file with a priority greater than 0.</li>
+<li>A package ID; Tatin will then attempt to find that package in one of the Registries defined in the client's config file with a priority greater than 0.
+<p>The first hit wins.</p></li>
 </ul>
-<p>The first hit wins.</p>
 <p><code>targetSpace</code> must be a reference or a fully qualified name of an ordinary namespace, meaning the name must start with either <code>#</code> or <code>⎕SE</code>.</p>
 <p>It might already exist, but if it doesn't it will be created. If it exists but is not an ordinary namespace an error is thrown.</p>
-<p>Loads the package(s) into <code>(#|⎕SE)._tatin.{packageName}</code> and establishes a reference pointing to it in <code>targetSpace</code></p>
-<p>Loads all dependencies, if any, as well into <code>(#|⎕SE)._tatin</code> but <em>not</em> into <code>targetSpace</code>.</p>
+<p>Loads the package(s) into <code>(#|⎕SE)._tatin.{packageName}</code> and establishes a reference for every one of them in <code>targetSpace</code></p>
+<p>Loads all dependencies, if any, as well into <code>(#|⎕SE)._tatin</code> but does <em>not</em> create references for them in <code>targetSpace</code>.</p>
 <p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as <code>⍺</code>.</p>
 <p>Returns the number of packages installed, including dependencies.</p>
 <div class="h_tag">
@@ -493,17 +497,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>zipFilename←Pack (projectPath targetPath)</code></pre>
 <dl>
 <dt>projectPath:</dt>
-<dd><p>folder to create a package from</p></dd>
+<dd><p>A folder to create the package from</p></dd>
 <dt>targetPath:</dt>
-<dd><p>folder the package goes into</p></dd>
+<dd><p>A folder the ZIP file goes into</p></dd>
 </dl>
 <div class="h_tag">
 <a href="#Ping" id="Ping" class="autoheader_anchor">
 <h3 data-id="Ping">2.21. Ping</h3>
 </a>
 </div>
-<pre><code>bool←Ping uri</code></pre>
-<p>Establishes whether the host is up and running with very little overhead. If <code>uri</code> (can also be an alias) points to a folder a 1 is returned if that folder exists, otherwise 0.</p>
+<pre><code>bool←Ping url</code></pre>
+<p>Establishes whether the host is up and running with very little overhead. If <code>url</code> (can also be an alias) points to a folder a 1 is returned if that folder exists, otherwise 0.</p>
 <div class="h_tag">
 <a href="#PublishPackage" id="PublishPackage" class="autoheader_anchor">
 <h3 data-id="PublishPackage">2.22. PublishPackage</h3>
@@ -521,8 +525,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that if <code>⍵</code> points already to a ZIP file only steps 4 and 5 are performed.</p>
 <p><code>⍵</code> must be a two-item vector:</p>
 <ol start="1">
-<li><code>source</code> → folder to create package from</li>
-<li><code>registry</code> → registry to publish the package to (alias or uri)</li>
+<li><code>source</code> → folder to create the package from</li>
+<li><code>registry</code> → registry to publish the package to (alias or url)</li>
 </ol>
 <p>The explicit result:</p>
 <ul>
@@ -546,19 +550,30 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>{refs}←{parms} ReInstallDependencies (dependencies installFolder [Registry])</code></pre>
 <p>Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.</p>
 <p>The file apl-buildlist.json as well as all directories in that folder will be deleted. Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.</p>
-<p>Note that packages with different major version numbers are considered to be different packages.</p>
-<p>By default all known Registries with a priority greater than 0 are scanned, but you may specify a particular Registry as a third (optional) argument.</p>
+<p>Note that packages with different major version numbers are considered as different packages.</p>
+<p>By default all known Registries with a priority greater than 0 are scanned (highest priority number first), but you may specify a particular Registry as a third (optional) argument.</p>
 <p>The left argument is optional and is, if specified, typically created by calling <a href="#CreateReInstallParms" class="bookmark_link"><code>CreateReInstallParms</code></a>.</p>
 <p>It may carry three parameters:</p>
 <ul>
 <li><code>noBetas</code>
-<p>By default this is 0, meaning that beta versions are considered. Set to 1 if you want betas to be ignored.</p></li>
+<p>By default this is 0, meaning that beta versions are considered. Set this to 1 if you want betas to be ignored.</p></li>
 <li><code>update</code>
-<p>Defaults to 0, meaning that the same version is installed again even if a later version is available now. Change to 1 to force an update.</p></li>
+<p>Defaults to 0, meaning that the same version is installed again even if a later version is available. Change this to 1 to force an update.</p></li>
 <li><code>dry</code>
 <p>Defaults to 0, meaning the function does business. Set this to 1 in order to get a report of what the function would do without actually doing it.</p></li>
 </ul>
-<p>Note that packages that were installed from ZIP files are just re-installed from their ZIP files.</p>
+<p>Notes:</p>
+<ul>
+<li>For every dependency this function performs a Registry scan</li>
+<li>Packages that were installed from ZIP files are just re-installed from their ZIP files without further ado.</li>
+</ul>
+<div class="leanpub_A">
+<h3>Registry scans</h3>
+<p>Under certain circumstances Tatin performs a Registry scan: Tatin questions every Registry with a priority greater than 0 (highest priority number first) for hosting a particular package. The first hit wins.</p>
+<p>For example, when <code>ReInstallDependencies</code> is called for all dependencies a Registry scan is performed.</p>
+<p>Note that when you installed a package from a Tatin Registry https://MyTatin.com and then later remove that Registry from your user settings, or set its priority to 0, effectively telling Tatin not to scan that Registry anymore, then <code>ReInstallDependencies</code> will <strong>not</strong> scan https://MyTatin.com anymore, despite Tatin knowing perfectly well where the package in question was originally loaded from.</p>
+</div>
+
 <div class="h_tag">
 <a href="#ReadPackageConfigFile" id="ReadPackageConfigFile" class="autoheader_anchor">
 <h3 data-id="ReadPackageConfigFile">2.24. ReadPackageConfigFile</h3>
@@ -566,16 +581,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <pre><code>cfg←ReadPackageConfigFile path</code></pre>
 <p>Takes a path to a package and returns the config file for that package as a namespace populated with variables.</p>
-<p><code>path</code> may or may not carry the filename.</p>
+<p><code>path</code> may or may not carry the filename (<code>apl-package.json</code>).</p>
 <div class="h_tag">
 <a href="#UnInstallPackages" id="UnInstallPackages" class="autoheader_anchor">
 <h3 data-id="UnInstallPackages">2.25. UnInstallPackages</h3>
 </a>
 </div>
 <pre><code>(list msg)←UnInstallPackage (packageID folder)</code></pre>
-<p><code>folder</code> must carry a Tatin dependency file.</p>
-<p><code>UnInstallPackage</code> attempts to un-install the package <code>packageID</code> and all its dependencies, but he latter only in case they are neither principal packages nor required by other packages.</p>
-<p><code>packageID</code> might be a full package ID but also &lt;group&gt;-&lt;name&gt; or just &lt;name&gt;. However, in case. In case more than one package qualify an error is thrown.</p>
+<p><code>folder</code> must host a Tatin dependency file.</p>
+<p><code>UnInstallPackage</code> attempts to un-install the package <code>packageID</code> and all its dependencies, but the latter only in case they are neither principal packages nor required by other packages.</p>
+<p><code>packageID</code> might be a full package ID but also &lt;group&gt;-&lt;name&gt; or just &lt;name&gt;. However, in case more than one package qualify an error is thrown.</p>
 <p>Note that if <code>packageID</code> is empty a clean-up attempt is made.</p>
 <p><code>folder</code> may be a sub folder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.</p>
 <p><code>packageID</code> must be fully qualified: group + name + version.</p>
@@ -586,7 +601,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.</li>
 <li>Removes <code>packagedID</code> from the dependency file.</li>
 <li>Re-compiles the build list based on the new dependency file.</li>
-<li>Removes all packages that are not mentioned in the build list anymore</li>
+<li>Removes all packages that are not mentioned in the build list anymore.</li>
 </ol>
 <p>Returns a two-item vector:</p>
 <ol start="1">

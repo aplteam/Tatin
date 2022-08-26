@@ -17,7 +17,7 @@ When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin
 
 Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _do not_ affect `⎕SE.Tatin.MyUserSettings`!
 
-`⎕SE.Tatin.MyUserSettings` provides a number of properties that can be questioned as well as a number of methods that can be issued in order to manipulate the user settings.
+`⎕SE.Tatin.MyUserSettings` provides a number of properties that can be referenced as well as a number of methods that can be issued in order to manipulate the user settings.
 
 For example, this call:
 
@@ -39,29 +39,17 @@ If you would like to see the API keys as well specify the `-full` flag.
 
 That default file will have two  Tatin Registries defined in it: 
 
-* the principal Tatin server, available via the URL `https://tatin.dev/`. 
+* the principal Tatin server, available via the URL `https://tatin.dev/`
 
    It has an alias `tatin` assigned to it, so you can address it as `[tatin]` with all user commands that require a Registry as parameter.
 
-* the Tatin Test server, available via the URL `https://test.tatin.dev/`. 
+* the Tatin Test server, available via the URL `https://test.tatin.dev/`
 
-   It has an alias `test-tatin` assigned to it, so you can address it as `[test-tatin]` with all user commands that require a Registry as parameter.
+   It has an alias `tatin-test` assigned to it, so you can address it as `[tatin-test]` with all user commands that require a Registry as parameter.
 
    It has a priority of `0` assigned to it which means that it will _not_ participate in Registry scans.
 
    Registry scans are performed by Tatin when you ask for a package but do not specify a Registry. Tatin scans all Registries in order of their priorities (highest one first) but ignores those with a priority that is `0`.
-
-A> ### Registry scans
-A>
-A> What happens when a Tatin server is down when Tatin attempts to interrogate it?
-A> 
-A> That depends on how Tatin is called:
-A>
-A> * From a user command Tatin will stop and ask you what to do; you have three options:
-A>   * Try again
-A>   * Skip that registry and carry on
-A>   * Cancel the whole operation
-A> * If it is an API call then an error is thrown
 
 
 ### Where does the file live?
@@ -229,7 +217,7 @@ Adding a registry is achieved by calling the `AddRegistry` method, and providing
       ⎕se.Tatin.MyUserSettings.AddRegistry #.myReg
 ```
 
-Now we would expect two Registries:
+Now we would expect three Registries:
 
 ```
       ↑⎕se.Tatin.MyUserSettings.registries.(alias uri priority)

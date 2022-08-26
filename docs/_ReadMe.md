@@ -73,7 +73,7 @@ This document gives you an overview over these HTML files: their purpose and who
 
 * [Usage data](./UsageData.html "Usage data.html") (draft)
 
-  Read this in case you want to contribute to the Tatin project on GitHub
+  Read this in case you are interested in statistical data regarding downloads of packages
 
 * [Tatin for Contributors](./TatinForContributors.html "TatinForContributors.html") (draft)
 

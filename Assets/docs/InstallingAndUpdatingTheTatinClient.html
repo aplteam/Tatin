@@ -106,7 +106,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
-<p>If you are not interested in this, skip the rest of this document</p>
+<p>If you are not interested in this or use 19.0 or later, skip the rest of this document</p>
 </div>
 </div>
 
@@ -164,18 +164,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       }
 
     ∇ r←{OS}GetMyUCMDsFolder add
-     ⍝ Returns standard path for Dyalog's MyUCMDs\ folder.
-     ⍝ Works on all platforms but returns different results.\\
-     ⍝ Under Windows typically:\\
-     ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs'  ←→ GetMyUCMDsFolder ''
-     ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\aaa'  ←→ GetMyUCMDsFolder 'aaa'
-     ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
+      ⍝ Returns standard path for Dyalog's MyUCMDs folder.\\
+      ⍝ Works on all platforms but returns different results.\\
+      ⍝ Under Windows typically:\\
+      ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\Foo'  ←→ GetMyUCMDsFolder 'Foo'
+      ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
        :If 0=⎕NC'OS'
-           OS←3↑⊃'.'⎕WG'APLVersion'
+           OS←##.APLTreeUtils2.GetOperatingSystem''
        :EndIf
        add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
        :If 'Win'≡OS
-           r←⊃,/1 ⎕NPARTS (2⊃4070⌶0),'\..\MyUCMDs',add
+           r←##.FilesAndDirs.ExpandPath(2⊃4070⌶0),'\..\MyUCMDs',add
        :Else
            r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
        :EndIf

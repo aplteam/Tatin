@@ -30,7 +30,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Testing-while-developing">8.1. Testing while developing</a></li>
 <li><a href="#Tests-as-part-of-an-automated-build">8.2. Tests as part of an automated build</a></li>
 </ul></li>
-<li><a href="#How-to-create-new-versions">9. How to create new versions</a>
+<li><a href="#How-to-create-a-new-version">9. How to create a new version</a>
 <ul>
 <li><a href="#ov1">9.1. Overview</a></li>
 </ul></li>
@@ -50,8 +50,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>If you want to contribute to the <a href="https://github.com/aplteam/Tatin" class="external_link">Tatin project on GitHub</a> or make adjustments to Tatin for an in-house project, this document will help you.</p>
 <p>Tatin is published under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody; it is rather a community project.</p>
-<p>This is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for “contribute to a github project”.</p>
 <p>This document also discusses how to execute the test suite and how to build a new version of Tatin.</p>
+<p>However, this is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for “contribute to a github project”.</p>
 <div class="h_tag">
 <a href="#Requirements" id="Requirements" class="autoheader_anchor">
 <h2 data-id="Requirements">2. Requirements</h2>
@@ -71,7 +71,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Note that Tatin is managed by the <a href="https://github.com/aplteam/Cider" class="external_link">Cider project management tool</a>. If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.</p>
-<p>Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process (which currently can run only on Windows) requires Cider.</p>
+<p>Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.</p>
 <div class="h_tag">
 <a href="#How-to-work-on-Tatin" id="How-to-work-on-Tatin" class="autoheader_anchor">
 <h2 data-id="How-to-work-on-Tatin">4. How to work on Tatin</h2>
@@ -90,14 +90,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>#.Tatin.Admin.Initialize_Client</code></pre>
 <p>If you want to run the Tatin Server execute the function</p>
 <pre><code>#.Tatin.Admin.Initialize_Server</code></pre>
-<p>You are advised <em>not to run</em> the Client and the Server in the same workspace.</p>
+<p>Note that you cannot run both the Client and the Server in the same workspace.</p>
 <div class="h_tag">
 <a href="#Updating-Tatin-packages-used-by-Tatin" id="Updating-Tatin-packages-used-by-Tatin" class="autoheader_anchor">
 <h2 data-id="Updating-Tatin-packages-used-by-Tatin">6. Updating Tatin packages used by Tatin</h2>
 </a>
 </div>
 <p>Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.</p>
-<p>For that reason the packages installed in the <code>packages/</code> folder are copied over to the <code>APLSource/</code> folder. That allows loading the packages with Link.</p>
+<p>For that reason the packages installed in the <code>packages/</code> folder are copied over to the <code>APLSource/</code> folder when a new version is built. That allows loading the packages with Link.</p>
 <p>If you need to add a package then you need to perform a couple of steps:</p>
 <ul>
 <li>Install that package into <code>packages/</code></li>
@@ -123,8 +123,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>During development you might want to execute all tests or just a specific group (or groups) of tests.
 <p>You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like selecting an option from a list etc.</p>
 <p>When a test fails then the test framework stops, and the developer can investigate on the spot.</p></li>
-<li>You might want to execute the test suite automatically and in batch mode, meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has very few test cases that fall into this category; 95% of the tests are batchable)
-<p>This may be required by an automated build process.</p>
+<li>You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; 95% of the tests are batchable)
+<p>This might be required by an automated build process.</p>
 <p>In this case any errors are trapped, and you get just either a single line that reports success or failure in the session or <code>⎕OFF</code> is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.</p>
 <p>Note that a single failing test case is considered as “failure” of the whole test suite, though the test framework will continue to execute all remaining tests.</p></li>
 </ol>
@@ -133,7 +133,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3>Creating a new version</h3>
 <p>Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version <em>before</em> you execute the test cases.</p>
 <p>The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in <code>⎕SE</code> for execution, but that is only possible if you create a new version first.</p>
-<p>For that reason one test actually checks whether the version number in the workspace and in <code>⎕SE</code> do match. If you are confident that this does not matter in your case just carry on.</p>
+<p>For that reason one test actually checks whether the version number in the workspace and in <code>⎕SE</code> do match. If you are confident that this does not matter in your case you may just carry on.</p>
 </div>
 
 <div class="h_tag">
@@ -147,27 +147,42 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>It is recommended to start a fresh APL session and then load the Tatin project into the CLEAR WS before running any test cases.</p>
-<p>Use <code>]Cider.OpenProject</code> to do this.</p>
-<p>By default the test cases use port 5001 for communication between the Test Server and the client. You may change the INI files for both server and client if that does not work for you.</p>
-<p>In order to execute the full test suite you need to start a Tatin Server first. For that execute the following steps:</p>
+<p>Use <code>]Cider.OpenProject</code> to do this. Once the project is open you can ask Cider how to execute Tatin's test suite by entering:</p>
+<pre><code>      ]Cider.RunTests
+#.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite</code></pre>
+<p>Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.</p>
+<p>When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually you will answer with a “Yes!” to this.</p>
+<div class="leanpub_A">
+<h3>Starting a Tatin test server “manually”</h3>
+<p>There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:</p>
 <ol start="1">
 <li>Instantiate Dyalog Unicode 18.0 or later</li>
-<li>Execute:
-<pre><code>]Cider.OpenProject /path/to/Tatin</code></pre></li>
-<li>Execute:
-<pre><code>#.Tatin.TestCasesServer.RunTests</code></pre>
-<p>This function changes the current directory, establishes all required references and then instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will start a Tatin server in debug mode.</p>
-<p>“Debug mode” means that in case of an error the interpreter stops. If you change functions at this stage those changes will be written back to disk, so be careful.</p></li>
+<li>Execute the following two statements:
+<pre><code>]Cider.OpenProject /path/to/Tatin
+#.Tatin.TestCasesServer.RunTests</code></pre></li>
 </ol>
-<p>Now you are ready to execute the test suite.</p>
-<ol start="1">
-<li>Instantiate Dyalog Unicode 18.0 or later</li>
-<li>Execute:
-<pre><code>]Cider.OpenProject /path/to/Tatin</code></pre></li>
-<li>Execute:
-<pre><code>#.Tatin.TestCases.RunTests</code></pre>
-<p>This changes the current directory, establishes all required references, instantiates the <code>Tester2</code> class under the name <code>T</code> before finally calling the <code>T.Run</code> function; this will run all test cases, including those that communicate with the Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
-</ol>
+<p>This starts the server in debug mode; that means that in case of an error the interpreter stops. That is different from letting the test suite start the test server: that traps all errors and carries on.</p>
+<p>If you change any coder at this stage those changes will be written back to disk, so be careful.</p>
+</div>
+
+<p>The <code>RunTests</code> function performs these tasks:</p>
+<ul>
+<li>Change the current directory</li>
+<li>Establish all required references</li>
+<li>Instantiate the <code>Tester2</code> class under the name <code>T</code></li>
+<li>Start a local Tatin test server if the user confirms this</li>
+<li>Call the <code>T.Run</code> function
+<p>This will run all test cases, including those that communicate with a locally running Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
+</ul>
+<div class="h_tag">
+<a href="#Quitting-tests" id="Quitting-tests" class="autoheader_anchor">
+<h4 data-id="Quitting-tests">8.1.2. Quitting tests</h4>
+</a>
+</div>
+<p>There are scenarios where you want to quit the test suite, for example when a test unearthed a servere bug that needs fixing straight away.</p>
+<p>It may be tempting to enter just <code>)reset</code>, but that is not how you should do this: you have to make sure that the test suite cleans up after itself.</p>
+<p>The easiest way to achieve this is to execute this statement:</p>
+<pre><code>      T.QuitTests</code></pre>
 <div class="leanpub_A">
 <h3>Execute the client test suite multiple times in parallel</h3>
 <p>You might come up with the idea to start the client part of the tests multiple times in parallel in order to put some pressure on the Tatin Server.</p>
@@ -176,13 +191,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 
 <div class="h_tag">
 <a href="#Executing-only-particular-tests" id="Executing-only-particular-tests" class="autoheader_anchor">
-<h4 data-id="Executing-only-particular-tests">8.1.2. Executing only particular tests</h4>
+<h4 data-id="Executing-only-particular-tests">8.1.3. Executing only particular tests</h4>
 </a>
 </div>
 <p>The <code>Tester2</code> test framework is flexible and powerful; for example, you may execute only the tests that focus on the Tatin Client API. The names of those tests are <code>Test_API_&lt;number&gt;</code>.</p>
 <div class="leanpub_A">
 <h3>Why executing only a few tests?</h3>
-<p>The full test suite is exhaustive, and for that reason it takes considerable time. Therefore you might be interested in executing only certain parts of the test suite.</p>
+<p>The full test suite is exhaustive. Also, caching is switched off except when caching is tested of course. For these reasons executing the full test suite takes considerable time. Therefore you might be interested in executing only certain parts of the test suite.</p>
 <p>The tests are grouped, and that is reflected by the names of the test functions. For example, the names <code>Test_API_001</code> and <code>Test_UserCommand_001</code> clearly state which group they belong to.</p>
 </div>
 
@@ -239,7 +254,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>T.RunThese 'API,Misc'</code></pre>
 <p>Or run all tests but <code>UserCommand</code>:</p>
 <pre><code>T.RunThese '~UserCommand'</code></pre>
-<p>Last not least you may specify a 1 as left argument: this makes the test framework stop just before any particular test function is executed. This can be very handy in order to hunt down a bug, or any unexpected behaviour.</p>
+<p>Last not least you may specify a 1 as left argument: this makes the test framework stop just before any particular test function is executed. This can be handy in order to hunt down a bug, or any unexpected behaviour.</p>
 <pre><code>1 T.RunThese 'API'</code></pre>
 <p>The test framework offers many more options and features, refer to the documentation for exploring them: go to <a href="https://github.com/aplteam/Tester2" class="external_link">https://github.com/aplteam/Tester2</a> (full picture) or execute <code>]ADOC #.Tatin.Tester2</code> (reference).</p>
 <div class="h_tag">
@@ -282,8 +297,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ol>
 <p>These are templates: check their contents, you might need to make amendments.</p>
 <div class="h_tag">
-<a href="#How-to-create-new-versions" id="How-to-create-new-versions" class="autoheader_anchor">
-<h2 data-id="How-to-create-new-versions">9. How to create new versions</h2>
+<a href="#How-to-create-a-new-version" id="How-to-create-a-new-version" class="autoheader_anchor">
+<h2 data-id="How-to-create-a-new-version">9. How to create a new version</h2>
 </a>
 </div>
 <div class="h_tag">
@@ -292,8 +307,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.</p>
-<p>In order to create new versions of the Client and the Server you just need to call this function:</p>
-<pre><code>{noQLXFlag} #.Tatin.Admin.Make &lt;batchFlag&gt;</code></pre>
+<p>You may ask Cider for how to create a new version of Tatin:</p>
+<pre><code>      ]Cider.Make
+#.Tatin.#.Tatin.Admin.Make 0 ⍝ Execute this for creating a new version</code></pre>
 <p>Syntax:</p>
 <ul>
 <li>The right argument must be a Boolean:
@@ -301,24 +317,24 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>0</code> means that a human is sitting in front of the monitor and can be asked questions or perform actions</li>
 <li><code>1</code> means that no human is available; use this in case you want to create a new version automatically, for example from a batch script</li>
 </ul></li>
-<li><code>noQLXFlag</code> is an optional Boolean that defaults to <code>0</code>, see below for details.
+<li>The optional left argument is a Boolean that defaults to <code>0</code>, see below for details.
 <p>It would mean that the instances of Dyalog started to create the Client and the Server won't execute the <code>lx</code> command line parameter, allowing you to run the code in the Tracer.</p></li>
 </ul>
 <p>Notes:</p>
 <ul>
 <li>The build ID is always bumped when you create a new version.</li>
-<li>The <code>Make</code> function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. <code>noQLXFlag</code>, if 1,  prevents the interpreter from running the code straight away.</li>
+<li>The <code>Make</code> function will fire up two instances of Dyalog APL, one for creating the client version, one for creating the server version. The optional left argument, if 1,  prevents the interpreter from running the code straight away.</li>
 </ul>
 <div class="leanpub_A">
 <h3>The <code>load</code> and <code>lx</code> command line parameters</h3>
-<p>Despite its name <code>noQLXFlag</code> is not associated with <code>⎕LX</code>: for this to work the command line parameters <code>load</code> and <code>lx</code> are invoked, and <code>-x</code> is added in case <code>noQLXFlag</code> is 1, preventing the interpreter from executing the expression noted as <code>lx.</code></p>
-<p>If this looks unfamiliar to you: these were introduced in 18.0.</p>
+<p>Despite the name of the left argument (<code>noQLX</code>) it is not associated with <code>⎕LX</code>: for this to work the command line parameters <code>load</code> and <code>lx</code> are invoked, and <code>-x</code> is added in case <code>noQLX</code> is 1, preventing the interpreter from executing the expression noted as <code>lx.</code></p>
+<p>If this looks unfamiliar to you: the options <code>lx</code> and <code>load</code> were introduced in 18.0.</p>
 </div>
 
 <p>The <code>Make</code> function performs the following steps:</p>
 <ol start="1">
 <li>It runs <code>Tatin.Admin.MakeClient</code></li>
-<li>It compiles the documentation (markdown) to HTML files and distribute the files</li>
+<li>It compiles the documentation (markdown) to HTML files and distributes the files</li>
 <li>It runs <code>#.Tatin.Admin.MakeServer</code></li>
 </ol>
 <p>If the right argument was a <code>0</code> then it will also ask you whether you want to attempt an update for all packages Tatin itself depends on, and it would also ask you whether the new version of the Tatin Client should be copied to the <code>MyUCMDs/</code> folder.</p>

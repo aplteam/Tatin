@@ -1,17 +1,14 @@
  r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res;P
  #.⎕EX'_tatin'
  r←1
-
  (rc msg res)←∆UCMD'Init ./TestData'
  Assert 0=rc
- ∆InitUserSettings ⍬
  ∆CACHE_PARMS←⎕SE.Tatin.MyUserSettings.caching
- ⎕SE.Tatin.MyUserSettings.caching←0
+ ∆InitUserSettings 0
  #.Tatin.Client.∆PrintToSession←0
  ⎕SE._Tatin.Client.∆PrintToSession←0
  {}''∆GetTempDir ⍬
- ∆TEST←1 ⍝ Used to add an HTTP header to any request. Influences only logging on the server side
-
+ ∆TEST←1 ⍝ Used to add an HTTP header to any request. Influences only logging on the server side but implicitly also usage data
  :If (⊂parms)∊''⍬
      :If ##.Client.YesOrNo'Would you like to start the Tatin test server?'
          ∆P←∆StartServerProcessForTests 0

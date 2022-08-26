@@ -1,4 +1,4 @@
- r←Test_Server_009(stopFlag batchFlag);⎕TRAP;request;response;folder;noOf;ini
+ r←Test_Server_009(stopFlag batchFlag);⎕TRAP;request;response;folder;noOf;ini;m
 ⍝ Send a request that makes the server crash and then look for dump files
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -13,10 +13,16 @@
 
  request←TC.R.NewRequest 0
  request.RequestTarget←'v1/crash'
- response←TC.SendAndReceive  'https://localhost' request
+ response←TC.SendAndReceive'https://localhost'request
 
  →T.PassesIf response.StatusCode≡500
  →T.PassesIf(2+noOf)=≢F.ListFiles folder,'/Errors'
+
+ :If ~batchFlag
+ :AndIf 'kai'≡⎕AN
+     m←'You should have received an email from the local test server reporting a crash, correct?'
+     →T.PassesIf TC.YesOrNo m
+ :EndIf
 
  r←T._OK
 ⍝Done

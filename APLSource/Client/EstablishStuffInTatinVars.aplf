@@ -1,4 +1,4 @@
- {r}←EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make
+ {r}←EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make;check
 ⍝ We establish some fns (Niladic for impersonating "constants") in code.TatinVars for convinience
  r←⍬
  ref2←⍎'TatinVars'ref.code.⎕NS''
@@ -6,19 +6,32 @@
      ' '=1↑0⍴⍵:'' 1
      msg←'Fixing Tatin''s "',⍺,'" function failed; check line(s): ',' '~⍨⍕⊃{⍺,',',⍵}/⍵-1
      msg 0}
+ check←{
+     ref←⍺
+     name←⍵
+     msg←'Invalid definition in package config: ',name
+     0::msg Assert 0
+     msg Assert' '=1↑0⍴ref.⍎name
+ }
  res←ref2.⎕FX'r←HOME' '⍝ Returns the folder the package was loaded from or an empty vector if that cannot be established anymore'('r←''',folder,'''')':If ~⎕nexists r' 'r←''''' ':EndIf'
  Assert/'HOME'make res
+ ref2 check'HOME'
  res←ref2.⎕FX'r←ASSETS'('r←''',cfg.assets,'''')
- Assert/'HOME'make res
+ Assert/'ASSETS'make res
+ ref2 check'ASSETS'
  res←ref2.⎕FX'r←CONFIG'('r←''',(Reg.JSON cfg),'''')
  Assert/'CONFIG'make res
+ ref2 check'CONFIG'
  res←ref2.⎕FX'r←ID'('r←''',(⊃{⍺,'-',⍵}/cfg.(group name version)),'''')
  Assert/'ID'make res
+ ref2 check'ID'
  res←ref2.⎕FX'r←URI'('r←''',({0<⍵.⎕NC'uri':⍵⍎'uri' ⋄ ''}cfg),'''') ⍝ "uri" is set by server but not for local installations
  Assert/'URI'make res
+ ref2 check'URI'
  :If 0<≢deps←Dependencies.Get folder
      res←ref2.⎕FX'r←DEPENDENCIES'('r←,⊆',(⊃{⍺,' ',⍵}/'''',¨deps,¨''''),'')
      Assert/'DEPENDENCIES'make res
+     ref2 check'DEPENDENCIES'
  :Else
      res←ref2.⎕FX'r←DEPENDENCIES' 'r←⍬'
      Assert/'DEPENDENCIES'make res

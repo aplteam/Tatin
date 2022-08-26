@@ -11,9 +11,9 @@
      'Package property "maintainer" is invalid'Assert'<'≠1⍴maintainer:
      'Package property "maintainer" is invalid'Assert 1 1≡(⊂maintainer)+.=¨'<>':
      'Package property "maintainer" is invalid'Assert 1 1 0≡1↓<\0,maintainer⍳'<@>':
-     2='"'+.=maintainer:⍵
      (name email)←{⍵{((⍵-1)↑⍺)(⍵↓⍺)}¯1+⍵⍳'<'}maintainer
-     name←{' '∊⍵:'"',⍵,'"' ⋄ ⍵}name
+     name~←'"\'
+     (('"'=name)/name)←'-'
      maintainer←name,' ',email
      ⍵.maintainer←maintainer
      ⍵

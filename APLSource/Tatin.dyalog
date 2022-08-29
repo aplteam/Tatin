@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.40.1 - 2022-08-06
+⍝ * 0.40.2 - 2022-08-29
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -189,7 +189,7 @@
           :If 0=⎕SE._Tatin.RumbaLean.⎕NC'DRC'
               ⎕SE._Tatin.Admin.InitConga ⍬
           :EndIf
-
+     
           r←((⍎Cmd)__ExecAsTatinUserCommand)Input
       :EndIf
     ∇
@@ -348,6 +348,7 @@
     ∇
 
     ∇ r←UsageData Arg;registry;list;ind;list2;b
+      r←''
       :If 0≡registry←Arg._1
           →(⍬≡registry←SelectRegistry 0)/0
       :EndIf
@@ -958,10 +959,11 @@
                   (msg json)←CheckFns json path
                   :If 0<≢msg
                       :If ' did not respond'{⍺≡(-≢⍺)↑⍵}msg
-                          :If ∆YesOrNo msg,'; leave the URL as it is (n=edit again) ?'
-                              newData←json
-                          :Else
+                          :If ∆YesOrNo msg,'; edit again (N=accept the URL as it is) ?'
                               flag←0
+                          :Else
+                              newData←json
+                              flag←1
                           :EndIf
                       :Else
                           flag←~1 ∆YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
@@ -1698,9 +1700,10 @@
     ∇
 
     ∇ r←GetListOfRegistriesForSelection type
-      r←TC.ListRegistries type
-      r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
-      r[;1]←r[;1]{⍵∊0 80 443:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}¨0 443 78 1562
+      :If 0<≢r←TC.ListRegistries type
+          r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
+          r[;1]←r[;1]{⍵∊0 80 443:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}¨0 443 78 1562
+      :EndIf
     ∇
 
     ∇ registry←{all}SelectRegistry type;row;list

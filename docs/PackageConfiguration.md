@@ -1,7 +1,7 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'Tatin's Package Configuration'
 [parm]:collapsibleTOC    = 1
-[parm]:toc               = 2 3
+[parm]:toc               = 2 3 4
 [parm]:numberHeaders     = 2 3 4 5 6
 
 
@@ -310,12 +310,58 @@ If `source` is a folder it might contain any number and mixture of the aforement
 
 `source` must be relative to the root of the package.
 
+##### Cider and Tatin
+
+If you manage a project with Cider then you might wonder why both have a property `source` in their configuration file. The reason is that the Cider config file describes what's going on in the project while the Tatin package config files describes what is going on in the package that will eventually be consumed by a user.
+
+Picture the following project "Foo" which consists of a single class `Foo`:
+
+```
+/Foo/
+     APLSource/
+               Admin/
+               ...
+               TestCases/
+               ...
+               Foo.aplc
+     cider.config
+     apl-package.json
+     README.md
+```
+
+In `cider.config` the `source` parameter must be set to `APLSource` because that's where all the code lives. 
+
+In `apl-package.json` however `source` may be set to `APLSource/Foo.aplc` because you might decide that this is what will end up in the package.
+
+A slightly more complex example with a namespace that hosts several functions:
+
+```
+/Goo/
+     APLSource/
+               Admin/
+               ...
+               TestCases/
+               ...
+               Goo/
+                  Function1.aplf
+                  Function2.aplf
+     cider.config
+     apl-package.json
+     README.md
+```
+
+In this case the `source` in the package could become `APLSource/Goo` while `Admin` and `TestCases` are most likely not copied over into the package.
+
+Of course one could rearrange the code and copy `APLSource/Goo/*` from the project into `Goo/` in the package. That would get rid of one level that is not required in the package, and `source` in the package config file could be just `Goo`.
+
 
 #### tags
 
 A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tags (key words). These can be helpful to filter packages when searching for a solution to a particular problem.
 
 `tags` must not be empty if you wish to publish a package to a Tatin server because such a package would not be accepted by the server.
+
+Tags should not only be related to the problems one can solve with a particular package, it should also carry "windows", "linux" and "mac-os" when appropriate. That allows the user to filter packages by platform.
 
 #### version
 

@@ -1702,7 +1702,7 @@
     ∇ r←GetListOfRegistriesForSelection type
       :If 0<≢r←TC.ListRegistries type
           r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
-          r[;1]←r[;1]{⍵∊0 80 443:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}¨0 443 78 1562
+          r[;1]←r[;1]{⍵∊0 80 443:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}¨r[;3]
       :EndIf
     ∇
 

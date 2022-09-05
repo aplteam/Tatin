@@ -275,11 +275,12 @@ This may be left empty. If set it must be an email address.
 These formats are valid:
 
 ```
+your name <your.name@your-domain.com>
 your.name <your.name@your-domain.com>
-"your name" <your.name@your-domain.com>
 your.name@your-domain.com
 ```
 
+Note that any double quotes will be removed.
 
 
 #### name

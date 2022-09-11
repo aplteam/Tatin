@@ -98,7 +98,16 @@ But before you can create a pull request you are supposed to run the tests in or
 
 ## Executing the test cases
 
-There are two scenarios: 
+If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider for how to do that:
+
+```
+      ]Cider.RunTests
+#.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite
+```
+
+Executing `RunTests` means that you will be asked whether a test server should be started. Usually you will answer with a "Y", and that lets the test suite start another instance of Dyalog, and run a test server in that instance.
+
+However, developer might also run into one of two common scenarios: 
 
 1. During development you might want to execute all tests or just a specific group (or groups) of tests. 
 

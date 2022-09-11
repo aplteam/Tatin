@@ -1,4 +1,4 @@
- r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;bool
+ r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;bool;ind
 ⍝ `path` must point to a folder with installed packages, meaning that there
 ⍝ must be a file apl-buildlist.json available. This is mandatory.
 ⍝ The optional left argument can carry flags as a single integer:
@@ -32,6 +32,14 @@
      EstablishEmptyPermanentConnections 0
      :If 0<≢buildList.packageID
          r←↑majorVersions CheckForLaterVersion_¨(dependencies⌈buildList.principal)/buildList.packageID
+         r,←' '
+         r,←r[;3]
+         r[;3]←(dependencies∨buildList.principal)⌿buildList.url
+         r[;3 5]←{IsHTTP ⍵:⍵ ⋄ 0=≢⍵~' ':'' ⋄ 'expand'F.NormalizePath ⍵}¨r[;3 5]
+         r[;4]←(⊃¨{⍺,⍵}/¨↓r[;3 1])≢¨(⊃¨{⍺,⍵}/¨↓r[;5 2])
+         :If 0<≢ind←⍸~r[;4]
+             r[ind;5]←⊂''
+         :EndIf
      :EndIf
      CloseConnections 0
  :EndIf

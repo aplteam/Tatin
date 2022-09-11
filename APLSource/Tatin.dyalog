@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.40.2 - 2022-08-29
+⍝ * 0.41 - 2022-09-09
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -331,19 +331,35 @@
       r←⍪r
     ∇
 
-    ∇ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders
+    ∇ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders;bool;buff;info1;info2
       r←''
       path←Arg._1
       flags←(1×Arg.major)+(2×Arg.dependencies)
       r←flags TC.CheckForLaterVersion path
       :If 0<≢r
-          colHeaders←'Installed' 'Latest' 'OriginalURL' '?'
-          colHeaders,←'New URL' ''[1+0<+/≢¨r[;5]]
+          colHeaders←'Installed' 'Latest' 'Original URL' 'I' 'New URL'
           r←colHeaders⍪' '⍪r
           r[2;]←(⌈⌿≢¨r)⍴¨'-'
           b←1≡¨r[;4]
-          r[⍸b;4]←'*'
+          r[⍸b;4]←'!'
           r[2↓⍸~b;4]←⊂''
+          info1←info2←''
+          :If '!'∊r[;4]
+              info1←'! = Check version available'
+          :EndIf
+          :If ∨/bool←0={⍵[;4]}buff←(1 TC.ListRegistries'')
+              info2←'Not scanned because priority is zero: ',⊃{⍺,', ',⍵}/bool/buff[;1]
+          :EndIf
+          r←⍪↓⎕FMT r
+          :If 0<≢info1,info2
+              r⍪←⊂' '
+              :If 0<≢info1
+                  r⍪←⊂info1
+              :EndIf
+              :If 0<≢info2
+                  r⍪←⊂info2
+              :EndIf
+          :EndIf
       :EndIf
     ∇
 
@@ -1179,8 +1195,8 @@
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←⊂''
               r,←⊂'Takes up to two arguments:'
-              r,←⊂'[1] A folder into which one or more packages have been installed'
-              r,←⊂'[2] Optional: a namespace into which the packages are going to be loaded; default is #'
+              r,←⊂' [1] A folder into which one or more packages have been installed'
+              r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded; default is #'
               r,←⊂''
               r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
               r,←⊂'            load by specifying the -overwrite flag.'
@@ -1235,7 +1251,7 @@
               r,←⊂' * Second argument: path to a folder with installed packages'
               r,←⊂'   If this is not an absolute path then it might be a sub folder of an open Cider project.'
               r,←⊂'   Then Tatin works out the correct one:'
-              r,←⊂'   * If there is just one poject open it is taken'
+              r,←⊂'   * If there is just one project open it is taken'
               r,←⊂'   * If there are multiple Cider projects open the user is questioned'
               r,←⊂'   * If Cider is not available or no projects are open the current directory is checked'
               r,←⊂'   For a relative path the user is always asked for confirmation.'
@@ -1285,7 +1301,7 @@
               r,←⊂'Lacking a group does not make a difference if the given package exists only in one group anyway.'
               r,←⊂'If it exists in more than one group then all of them are listed.'
               r,←⊂''
-              r,←⊂'Ommitting the registry altogether will work as well:'
+              r,←⊂'Omitting the registry altogether will work as well:'
               r,←⊂']Tatin.ListVersions {name}'
               r,←⊂'or'
               r,←⊂']Tatin.ListVersions {group}-{name}'
@@ -1322,18 +1338,19 @@
               r,←⊂'Takes a folder that hosts a file "apl-buildlist.json" as argument.'
               r,←⊂'Scans all known registries with a priority greater than 0 for later versions.'
               r,←⊂'Note that if you''ve loaded a package from a registry that has been removed since, or has a '
-              r,←⊂'prority of 0, then Tatin won''t be able to find any later versions!'
+              r,←⊂'priority of 0, then Tatin won''t be able to find any later versions!'
               r,←⊂''
-              r,←⊂'Returns a matrix with four columns for all packages found:'
-              r,←⊂'[;1] Currently installed packge ID'
-              r,←⊂'[;2] package ID of the latest version found or something like "no response" or "not found"'
-              r,←⊂'[;3] URL of the Registry hosting the later version'
-              r,←⊂'[;4] * for a later version'
+              r,←⊂'Returns a matrix with five columns for all packages found:'
+              r,←⊂' [;1] Currently installed package ID'
+              r,←⊂' [;2] package ID of the latest version found or something like "no response" or "not found"'
+              r,←⊂' [;3] URL of the Registry the package was originally installed from'
+              r,←⊂' [;4] ! for a later version'
+              r,←⊂' [;5] URL of the Registry hosting a different (usually later) version; might be empty'
               r,←⊂''
-              r,←⊂'-major        by default later MAJOR versions are ignored, but this default behaviour can be'
+              r,←⊂'-major        By default later MAJOR versions are ignored, but this default behaviour can be'
               r,←⊂'              changed by specifying -major: then only later major versions are reported.'
               r,←⊂''
-              r,←⊂'-dependencies by default only principal packages are checked.'
+              r,←⊂'-dependencies By default only principal packages are checked.'
               r,←⊂'              You may include dependencies by specifying this flag.'
           :Case ⎕C'DeletePackage'
               r,←⊂'Delete a given package.'
@@ -1363,7 +1380,7 @@
               r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
               r,←⊂'If this is not an absolute path then it might be a sub folder of an open Cider project.'
               r,←⊂'Then Tatin works out the correct one:'
-              r,←⊂' * If there is just one poject open it is taken'
+              r,←⊂' * If there is just one project open it is taken'
               r,←⊂' * If there are multiple Cider projects open the user is questioned'
               r,←⊂' * If Cider is not available or no projects are open the current directory is checked'
               r,←⊂'For a relative path the user is always asked for confirmation.'
@@ -1426,7 +1443,7 @@
               r,←⊂'          several or all files for download or cancel the operation.'
               r,←⊂'          The folder holding the file(s) is printed together with a list of all files.'
               r,←⊂'-folder=  By default downloaded files will be saved in a sub folder of your OS''s temp'
-              r,←⊂'          folder which is printed to the session. You may override this by spcifying a folder.'
+              r,←⊂'          folder which is printed to the session. You may override this by specifying a folder.'
               r,←⊂'          If you do it must be an empty folder. Ignored when -download is not specified.'
               r,←⊂'-unzip    Specify this if you want Tatin to unzip the downloaded file(s).'
               r,←⊂'          The ZIP files will be deleted afterwards. Ignored when -download is not specified.'

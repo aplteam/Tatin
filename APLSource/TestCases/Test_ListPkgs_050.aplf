@@ -1,16 +1,19 @@
- r←Test_ListPkgs_050(stopFlag batchFlag);⎕TRAP;mat;parms
+ r←Test_ListPkgs_050(stopFlag batchFlag);⎕TRAP;parms;mat1;mat2
 ⍝ List all packages from a certain date by specifying "since" as an integer YYYYMMDD
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
+ mat1←TC.ListPackages'[local]'         ⍝ All
+
  parms←⎕NS''
  parms.since←20200501
- mat←parms TC.ListPackages'[local]'
+ mat2←parms TC.ListPackages'[local]'   ⍝ Limited number
 
- →T.PassesIf 2=⍴⍴mat
- →T.PassesIf 2=2⊃⍴mat
- →T.PassesIf 1<≢mat
- →T.PassesIf∧/parms.since≤⊃∘A.ToNum¨'-'~¨⍨∪10↑¨mat[;2]
+ →T.PassesIf >/≢¨mat1 mat2
+ →T.PassesIf 2=⍴⍴mat2
+ →T.PassesIf 2=2⊃⍴mat2
+ →T.PassesIf 1<≢mat2
+ →T.PassesIf∧/parms.since≤⊃∘A.ToNum¨'-'~¨⍨∪10↑¨mat2[;2]
 
  r←T._OK
 ⍝Done

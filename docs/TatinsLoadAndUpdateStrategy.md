@@ -236,7 +236,7 @@ As usual Tatin would consider packages with different major numbers as different
 It is then up to you to take action: you may or may not install a later package that is available.
 
 A> ### Later major versions
-A> When you specify the `-major` flag of the `CheckForLaterVersion` user command then the user command will also report later major versions.
+A> When you specify the `-major` flag of the `CheckForLaterVersion` user command then the user command will rather report later major versions.
 
 
 ## Downgrading

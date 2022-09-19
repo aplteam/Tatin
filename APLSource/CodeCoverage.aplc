@@ -52,11 +52,16 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.9.1+46' '2021-10-29'
+      r←'CodeCoverage' '0.9.2+49' '2022-09-19'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 0.9.2 from 2022-09-19
+    ⍝   * Couple of bug fixes
+    ⍝     * Typo fixed (Finalyse => Finalise)
+    ⍝     * Rearranged a few lines to avoid VALUE ERROR in CreateReport if no data was gathered 
+    ⍝     * Start: ⎕PROFILE'clear' added
     ⍝ * 0.9.1 from 2021-10-28
     ⍝   * Sort order of first column of the "Partly covered" category reversed.
     ⍝ * 0.9.0 from 2021-10-06
@@ -292,6 +297,7 @@
           html,←⊂'</tbody>'
           html,←⊂'</table>'
           html,←⊂'</div>'
+          html,←AddJavaScript buff
           :If verbose
               html,←⊂'<h2>Listings</h2>'
               html,←CreateListingForFnsAndOpr data
@@ -301,7 +307,6 @@
       html,←⊂'<hr>'
       html,←⊂'<p>Created by "CodeCoverage" version ',(2⊃Version),' from ',(3⊃Version),'</p>'
       html,←⊂'</div>'
-      html,←AddJavaScript buff
       html,←⊂''
       html,←⊂'</body>'
       html,←⊂'</html>'
@@ -311,6 +316,7 @@
 
     ∇ html←AddJavaScript data
       html←''
+      →(0=≢data)/0
       html,←⊂'<script>'
       html,←⊂'$(document).ready(function() {'
       html,←⊂'    var oTable;'
@@ -494,6 +500,7 @@
       ⍝ Execute `⎕PROFILE'start' 'coverage'`
       :Access Public Instance
       r←⍬
+      ⎕PROFILE'clear'   
       ⎕PROFILE'start' 'coverage'
     ∇
 

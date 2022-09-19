@@ -98,7 +98,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tr>
 <tr>
 <td style="text-align: right;">1</td>
-<td>Major: should later major version be listed as well? Defaults to 0</td>
+<td>Major: should rather later major versions be listed? Defaults to 0</td>
 </tr>
 <tr>
 <td style="text-align: right;">2</td>
@@ -110,7 +110,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tr>
 </tbody>
 </table>
-<p>By default only minor and patch are part of the check. By specifying 1 as <code>major</code> you may change this default behaviour and list any later major versions instead.</p>
+<p>By default only minor and patch number are part of the check. By specifying 1 as <code>major</code> you may change this default behaviour and list any later major versions instead.</p>
 <p>Note that this function scans all known registries with a priority greater than zero.</p>
 <p>Returns a matrix with five columns:</p>
 <table>
@@ -317,8 +317,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>A path to a Registry and optionally a (possibly incomplete) package ID</li>
 </ul>
 <div class="h_tag">
+<a href="#Right-argument" id="Right-argument" class="autoheader_anchor">
+<h4 data-id="Right-argument">2.14.1. Right argument</h4>
+</a>
+</div>
+<div class="h_tag">
 <a href="#Install-folder" id="Install-folder" class="autoheader_anchor">
-<h4 data-id="Install-folder">2.14.1. Install folder</h4>
+<h5 data-id="Install-folder">2.14.1.1. Install folder</h5>
 </a>
 </div>
 <p>In case an install folder was specified a two-column matrix is returned:</p>
@@ -336,13 +341,63 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </table>
 <div class="h_tag">
 <a href="#Registry" id="Registry" class="autoheader_anchor">
-<h4 data-id="Registry">2.14.2. Registry</h4>
+<h5 data-id="Registry">2.14.1.2. Registry</h5>
 </a>
 </div>
 <p>In case a Registry was specified by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.</p>
 <p>You may specify an incomplete package ID; then only matching packages are listed.</p>
 <p>You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.</p>
-<p>Returns a matrix with two columns.</p>
+<div class="h_tag">
+<a href="#uri" id="uri" class="autoheader_anchor">
+<h5 data-id="uri">2.14.1.3. uri</h5>
+</a>
+</div>
+<ul>
+<li><code>uri</code> is empty and <code>aggregate</code> is 1 (the default):
+<p>All packages are returned with the number of major versions in <code>[;2]</code></p></li>
+<li><code>uri</code> is empty and <code>aggregate</code> is 0:
+<p>All packages are returned; the second column carries <code>⍬</code></p></li>
+<li><code>uri</code> specifies {name} and <code>aggregate</code> is 0:
+<p>All packages that match <code>name</code> are returned; they might belong to different groups</p></li>
+<li><code>uri</code> specifies {group}-{name} and <code>aggregate</code> is 0:
+<p>All versions of that package are returned</p></li>
+<li><code>uri</code> specifies {group}-{name} and <code>aggregate</code> is 1:
+<p>All major versions of that package are returned</p>
+<p><code>[;2]</code> carries the number of versions of each major version</p></li>
+<li><code>uri</code> specifies {group}-{name}-{major}; in this case <code>aggregate</code> is ignored:
+<p>All versions (minor and patch) of that package are returned</p></li>
+<li><code>uri</code> specifies {group}-{name}-{major}-{minor}; in this case <code>aggregate</code> is ignored:
+<p>All patch versions of that package are returned</p></li>
+</ul>
+<div class="h_tag">
+<a href="#Left-argument" id="Left-argument" class="autoheader_anchor">
+<h4 data-id="Left-argument">2.14.2. Left argument</h4>
+</a>
+</div>
+<p>Optionally <code>parms</code> can be specified. If specified this must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>. It may contain <code>date</code>, <code>since</code> and <code>info_url</code>.</p>
+<p>The following parameters allow the user to select certain packages:</p>
+<ul>
+<li>Use <code>group</code> to specify the group.</li>
+<li>Use <code>tags</code> to specify one or more tags (simple comma-separated text vector); is case-independent.</li>
+<li>Use <code>since</code> to specify a date; all packages published before that date will be ignored.
+<p><code>since</code> can be one of:</p>
+<ul>
+<li>A character vector in the format <code>YYYY-MM-DD</code> or <code>YYYYMMDD</code> like <code>since←'2022-06-01'</code></li>
+<li>An integer in the format <code>YYYYMMDD</code> like like <code>since←20220601</code></li>
+</ul></li>
+</ul>
+<p>The following parameters allow the user to influence what data is returned:</p>
+<ul>
+<li>If <code>date</code> is <code>1</code> an additional column is added to the result with the publishing date</li>
+<li>If <code>info_url</code> is <code>1</code> an additional column is added to the result with the the <code>info_url</code>, if any</li>
+<li>If <code>aggregate</code> is <code>0</code> the data is not aggregated by minor and patch number; defaults to 1.</li>
+</ul>
+<div class="h_tag">
+<a href="#Result" id="Result" class="autoheader_anchor">
+<h4 data-id="Result">2.14.3. Result</h4>
+</a>
+</div>
+<p>Returns a matrix with at least two and up to four columns. These columns are always returned:</p>
 <table>
 <tbody>
 <tr>
@@ -355,28 +410,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </tr>
 </tbody>
 </table>
-<p>Optionally <code>parms</code> can be specified. This must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>.</p>
-<ul>
-<li><code>group</code> may specify the group</li>
-<li><code>tags</code> may specify one or more tags (simple comma-separated text vector)</li>
-<li><code>aggregate</code> is a Boolean that defaults to 1.</li>
-</ul>
-<p>These combinations are available:</p>
-<ul>
-<li><code>uri</code> is empty and <code>aggregate</code> is 0:
-<p>All packages are returned; the second column carries <code>⍬</code></p></li>
-<li><code>uri</code> is empty and <code>aggregate</code> is 1 (the default):
-<p>All packages are returned with the number of major versions in <code>[;2]</code></p></li>
-<li><code>uri</code> specifies {group}-{name} and <code>aggregate</code> is 0:
-<p>All versions of that package are returned</p></li>
-<li><code>uri</code> specifies {group}-{name} and <code>aggregate</code> is 1:
-<p>All major versions of that package are returned</p>
-<p><code>[;2]</code> caries the number of versions of each major version</p></li>
-<li><code>uri</code> specifies {group}-{name}-{major}; in this case <code>aggregate</code> is ignored:
-<p>All versions (minor and patch) of that package are returned</p></li>
-<li><code>uri</code> specifies {group}-{name}-{major}-{minor}; in this case <code>aggregate</code> is ignored:
-<p>All patch versions of that package are returned</p></li>
-</ul>
+<p>In case <code>date</code></p>
 <div class="h_tag">
 <a href="#ListRegistries" id="ListRegistries" class="autoheader_anchor">
 <h3 data-id="ListRegistries">2.15. ListRegistries</h3>

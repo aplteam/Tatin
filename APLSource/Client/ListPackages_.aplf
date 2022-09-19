@@ -8,6 +8,7 @@
      parms.aggregate←1
      parms.date←0
      parms.info_url←0
+     parms.since←0
  :EndIf
  (host packageID)←Reg.SeparateUriAndPackageID uri_
  'Not a valid URI'Assert('/'+.=host)∊2 3
@@ -28,6 +29,10 @@
  :EndIf
  :If parms.info_url
      request.RequestTarget,←'info_url=1&'
+ :EndIf
+ :If 0<≢parms.since
+ :AndIf 0≢parms.since
+     request.RequestTarget,←'since=',(⍕parms.since),'&'
  :EndIf
  request.RequestTarget←(-'&'=¯1↑request.RequestTarget)↓request.RequestTarget
  request.Headers,←⊂'Accept' 'application/json'

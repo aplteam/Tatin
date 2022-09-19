@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.41 - 2022-09-09
+⍝ * 0.42 - 2022-09-19
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -261,12 +261,10 @@
       :EndIf
     ∇
 
-    ∇ r←ListPackages Arg;registry;parms
+    ∇ r←ListPackages Arg;registry;parms;buff
       r←''
       :If 0≡registry←Arg._1
           →(⍬≡registry←SelectRegistry 0)/0
-      :Else
-          registry,←(~(¯1↑registry)∊'/\')/'/'
       :EndIf
       registry←EnforceSlash registry
       parms←⎕NS''
@@ -301,7 +299,8 @@
               :Else
                   r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Info URL'
               :EndIf
-              r←((2⊃⍴r)↑'Packages from:'registry,(2⊃⍴r)⍴⊂'')⍪r
+              buff←{'['∊⍵:⍵↑⍨⍵⍳']' ⋄ ⊃TC.Reg.SeparateUriAndPackageID ⍵}registry
+              r←((2⊃⍴r)↑(⊂'Registry: ',{⍵↓⍨-'/'=¯1↑⍵}buff),(2⊃⍴r)⍴⊂'')⍪r
           :EndIf
       :EndIf
     ∇
@@ -1147,19 +1146,20 @@
               r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has not'
               r,←⊂'a trailing separator: Tatin is taking care of that.'
               r,←⊂''
-              r,←⊂'In case an install folder was specified (rather than a registry) flags are ignored'
-              r,←⊂'In this case two columns are returned: package name and a Boolean indicating principal'
-              r,←⊂'packages with a 1.'
+              r,←⊂'In case an install folder was specified (rather than a Registry) flags are ignored and just'
+              r,←⊂'two columns are returned: package name and a Boolean indicating principal packages with a 1.'
               r,←⊂''
               r,←⊂'By default all packages are listed. You can influence the output in several ways:'
-              r,←⊂'-group={foo}  restricts the list to packages with the given group name.'
-              r,←⊂'-tags=foo,goo restricts the output to packages that carry the tags "foo" & "goo".'
-              r,←⊂'-date         adds the publishing date to the output. -noaggr is set to 1 then.'
-              r,←⊂'-info_url     adds the URL saved in the package config file.'
-              r,←⊂'-since        Must be a date either as YYYYMMDD or YYYY-MM-DD when specified.'
-              r,←⊂'              Only packages published on that date or after are listed then.'
-              r,←⊂'              Implies -date and ignores -noaggr.'
-              r,←⊂'-noaggr       By default the output is aggregated. -noaggr prevents that.'
+              r,←⊂'-group={foo}   List only packages with the given group name.'
+              r,←⊂'-tags=foo,goo  List only packages carrying the tags "foo" & "goo".'
+              r,←⊂'-since=        Must be a date (YYYYMMDD or YYYY-MM-DD) when specified.'
+              r,←⊂'               List only packages published on that date or later.'
+              r,←⊂'               Implies -date and ignores -noaggr.'
+              r,←⊂''
+              r,←⊂'You can also influence the data returned with the following flags:'
+              r,←⊂'-date          Add the publishing date to the output. -noaggr is set to 1 then.'
+              r,←⊂'-info_url      Add the URL saved in the package config file to the result.'
+              r,←⊂'-noaggr        By default the output is aggregated. -noaggr prevents that.'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all its dependencies into the workspace.'
               r,←⊂''

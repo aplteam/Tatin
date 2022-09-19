@@ -43,11 +43,11 @@ The optional left argument must, if specified, be an integer that may carry flag
 |Value|Description
 |-----|---------------------------------------------------------------------
 |0    | No flag set, same as no argument at all
-|1    | Major: should later major version be listed as well? Defaults to 0
+|1    | Major: should rather later major versions be listed? Defaults to 0
 |2    | Dependencies: should dependencies be checked as well? Defaults to 0
 |3    | Both flags set
 
-By default only minor and patch are part of the check. By specifying 1 as `major` you may change this default behaviour and list any later major versions instead.
+By default only minor and patch number are part of the check. By specifying 1 as `major` you may change this default behaviour and list any later major versions instead.
 
 Note that this function scans all known registries with a priority greater than zero.
 
@@ -261,14 +261,17 @@ mat←{parms} ListPackages uri
 * A path to an install folder, defined by the presence of a file `apl-buildlist.json`
 * A path to a Registry and optionally a (possibly incomplete) package ID
 
-#### Install folder
+
+#### Right argument
+
+##### Install folder
 
 In case an install folder was specified a two-column matrix is returned:
 
 |[;1] |Carries the package ID
 |[;2] |Carries a star for principal packages
 
-#### Registry
+##### Registry
 
 In case a Registry was specified by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.
 
@@ -276,35 +279,30 @@ You may specify an incomplete package ID; then only matching packages are listed
 
 You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.
 
-Returns a matrix with two columns.
 
-|[;1] | Package name
-|[;2] | Carries the number of major versions
-
-Optionally `parms` can be specified. This must be a namespace that must contain the variables `group`, `tags` and `aggregate`.
-
-* `group` may specify the group
-* `tags` may specify one or more tags (simple comma-separated text vector)
-* `aggregate` is a Boolean that defaults to 1.
-
-These combinations are available:
-
-* `uri` is empty and `aggregate` is 0:
-
-   All packages are returned; the second column carries `⍬`
+##### uri
 
 * `uri` is empty and `aggregate` is 1 (the default):
 
-   All packages are returned with the number of major versions in `[;2]`
+  All packages are returned with the number of major versions in `[;2]`
+
+* `uri` is empty and `aggregate` is 0:
+
+  All packages are returned; the second column carries `⍬`
+
+* `uri` specifies {name} and `aggregate` is 0:
+
+  All packages that match `name` are returned; they might belong to different groups
 
 * `uri` specifies {group}-{name} and `aggregate` is 0:
 
-   All versions of that package are returned
+  All versions of that package are returned
+
 * `uri` specifies {group}-{name} and `aggregate` is 1:
 
-   All major versions of that package are returned
+  All major versions of that package are returned
 
-   `[;2]` caries the number of versions of each major version
+  `[;2]` carries the number of versions of each major version
 
 * `uri` specifies {group}-{name}-{major}; in this case `aggregate` is ignored:
    
@@ -313,6 +311,37 @@ These combinations are available:
 * `uri` specifies {group}-{name}-{major}-{minor}; in this case `aggregate` is ignored:
 
   All patch versions of that package are returned
+
+#### Left argument
+
+Optionally `parms` can be specified. If specified this must be a namespace that must contain the variables `group`, `tags` and `aggregate`. It may contain `date`, `since` and `info_url`.
+
+The following parameters allow the user to select certain packages:
+
+* Use `group` to specify the group.
+* Use `tags` to specify one or more tags (simple comma-separated text vector); is case-independent.
+* Use `since` to specify a date; all packages published before that date will be ignored.
+
+  `since` can be one of:
+
+   * A character vector in the format `YYYY-MM-DD` or `YYYYMMDD` like `since←'2022-06-01'`
+   * An integer in the format `YYYYMMDD` like like `since←20220601`
+
+The following parameters allow the user to influence what data is returned:
+
+* If `date` is `1` an additional column is added to the result with the publishing date
+* If `info_url` is `1` an additional column is added to the result with the the `info_url`, if any
+* If `aggregate` is `0` the data is not aggregated by minor and patch number; defaults to 1.
+
+#### Result
+
+Returns a matrix with at least two and up to four columns. These columns are always returned:
+
+|[;1] | Package name |
+|[;2] | Carries the number of major versions |
+
+
+In case `date` 
 
 ### ListRegistries       
 

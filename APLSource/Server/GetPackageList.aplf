@@ -26,6 +26,7 @@
      :EndIf
  :EndIf
  parms.info_url←{(⊂∊⍵)∊,¨'01':⍵ ⋄ 0}request R.GetQueryParameter'info_url'
+ parms.since←{0=≢⍵:0 ⋄ ⍵}request R.GetQueryParameter'since'
  :If IsJsonRequest request.Headers
      :If 0=≢data←Reg.ListPackages(G.RegistryPath,'/',packageID)parms
          response←Return404 request

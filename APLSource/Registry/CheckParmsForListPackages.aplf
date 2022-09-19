@@ -28,10 +28,16 @@
  'Invalid left argument: only "group", "tags", "date", "info_url" and "aggregate" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊list
  '"aggregate" must be a Boolean'Assert parms.aggregate∊0 1
  '"date" must be a Boolean'Assert parms.date∊0 1
+ parms.since←{0=1↑0⍴∊⍵:⍵ ⋄ (flag value)←⎕VFI ⍵ ⋄ flag:value ⋄ ⍵}parms.since
  :If ' '=1↑0⍴parms.since
-     '"since", when character, must be international date format: YYYY-MM-DD'Assert(∧/parms.since[1 2 3 4 6 7 9 10]∊⎕D)∧'-'∧.=parms.since[5 8]
+     :Trap 0
+         '"since", when character, must be international date format: YYYY-MM-DD'Assert(∧/parms.since[1 2 3 4 6 7 9 10]∊⎕D)∧'-'∧.=parms.since[5 8]
+     :Else
+         '"since" is invalid'Assert 0
+     :EndTrap
  :Else
      '"since" must be an integer: YYYYMMDD'Assert(⎕DR parms.since)∊323 83 83
  :EndIf
- parms.(group tags)←⎕C¨parms.(group tags)
+⍝ parms.(group tags)←⎕C¨parms.(group tags)
+ parms.tags←⎕C parms.tags
 ⍝Done

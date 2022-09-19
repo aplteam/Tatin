@@ -13,9 +13,11 @@
      tags←','(≠⊆⊢)⎕C parms.tags
      (fuzzy list)←parms.aggregate FindTag registryPath tags list
      list←⍪list
+     →(0∊≢list)/0
  :EndIf
  :If 0<≢parms.group
      list←(parms.group∘≡¨GetGroupFromPackageID¨list[;1])⌿list
+     →(0∊≢list)/0
  :EndIf
  :If 0≢parms.info_url
      list,←AddInfoURL list registryPath

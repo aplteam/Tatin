@@ -1,0 +1,329 @@
+:Class ZipArchive
+⍝ Zipping and unzipping with .NET(Core) on Windows and "zip" on other platforms.\\
+⍝ This class offers three shared methods:
+⍝ * `ZipFolder`
+⍝ * `UnzipTo`
+⍝ * `ListZipContents`\\
+⍝ For more advanced features the class can also be instantiated.\\
+⍝ With `⎕NEW` either a new zip file is created or (by default) an existing one is opened.
+⍝ This can be changed by passing an `overwrite` flag in addition to the name of the ZIP file.\\
+⍝ You can then use these instance methods:
+⍝ * `Add`
+⍝ * `Delete`
+⍝ * `ExtractTo`
+⍝ * `List`
+⍝ * `Dispose`\\
+⍝ Once instantiated the read-only property `filename` carries the name of the ZIP file.\\
+⍝ Kai Jaeger - APL Team Ltd.\\
+⍝ Homepage: <https://github.com/aplteam/ZipArchive/>
+
+⍝ To-do:
+⍝ * Under Windows, DotNetZip does not only allow files to be extracted but also folder(s).
+⍝   This feature must be implemented within this class because "unzip" does not support it.
+⍝   However, it is not used by Tatin, so I leave this open for now.
+
+    ⎕IO←1 ⋄ ⎕ml←1
+
+    ∇ r←Version
+      :Access Public Shared
+      r←'ZipArchive' '1.0.0+15' '2022-06-13'
+    ∇
+
+    ∇ History
+      :Access Public Shared
+    ⍝ * 1.0.0 from 2022-06-13
+    ⍝   * First version ready for production
+    ∇
+
+    ∇ make1(filename);res;tempFilename;overwriteFlag
+    ⍝ Constructor that takes just one argument: the name of the ZIP file.\\
+    ⍝ If `zipFilename` already exists it is opened.
+      :Access Public instance
+      :Implements Constructor
+      overwriteFlag←0
+      make filename overwriteFlag
+     ⍝Done
+    ∇
+
+    ∇ make2(zipFilename overwriteFlag)
+    ⍝ Constructor that takes two arguments:
+    ⍝ * the name of the ZIP file
+    ⍝ * Boolean for `overwriteFlag`\\
+    ⍝ `overwriteFlag` is used to determine whether the ZIP should be opened (0=default)
+    ⍝ or overwritten (1).
+      :Access Public Instance
+      :Implements Constructor
+      '"overwriteFlag" must be a Boolean'⎕SIGNAL 11/⍨~(⊂overwriteFlag)∊0 1
+      make zipFilename overwriteFlag
+    ∇
+
+    ∇ make(filename overwriteFlag);msg;rc;tempFilename
+      CheckMinVersion ⍬
+      _filename←AddExtension filename
+      :If IsWindows
+          _ZipArchive←⎕NEW(⊃⊃⎕CLASS ⎕THIS).##.DotNetZip(_filename overwriteFlag)
+      :Else
+          :If '~/'≡2↑_filename
+              _filename←(GetHomeDir ⍬),1↓_filename
+          :EndIf
+          F←(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs
+          'Must not be a directory'Assert~F.IsDir _filename
+          :If overwriteFlag
+              F.DeleteFile _filename
+          :EndIf
+          :If ~F.IsFile _filename
+              tempFilename←F.GetTempFilename2''
+              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -q'
+              Assert 0=rc
+              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -dq'
+              Assert 0=rc
+              {}Exec'rm ',tempFilename,' -f'
+          :EndIf
+      :EndIf
+     ⍝Done
+    ∇
+
+    ⍝⍝⍝⍝⍝⍝ End Constructors ⍝⍝⍝⍝
+
+    :Property filename
+    ⍝ The name of the ZIP file of this instance of the ZipArchive class
+    :Access Public Instance
+        ∇ r←get
+          r←_filename
+        ∇
+    :Endproperty
+
+    ∇ {r}←{parent}Add toBeZipped;isDir;list;msg;rc
+    ⍝ Use this to add one or more files to the ZIP file.\\
+    ⍝ `toBeZipped` specifies the full path (or full paths) of what's going to be zipped. That's what's going to be
+    ⍝ stored in the ZIP file.\\
+    ⍝ If `toBeZipped` refers to a full path as in `C:\Foo.txt` or `/tmp/myfile` or, much more likely, refers to
+    ⍝ the current directory as in `./foo.txt` then there is no need to specify the optional left argument.\\
+    ⍝ If however you want to store the file `C:\Projects\Foo\docs\ReadMe.txt`, but it should be saved in the ZIP
+    ⍝ file as `docs\ReadMe.txt`, then you must call `Add` like this:
+    ⍝ ```
+    ⍝ `C:\Projects\Foo` myZipArchive.Add `docs\ReadMe.txt`
+    ⍝ ```
+    ⍝ Notes:
+    ⍝ * `parent` might or might not have a trailing separator, and `toBeZipped` might or might not have a
+    ⍝ leading separator: `Add` works that out.
+    ⍝ * While `parent`, if specified, must be a simple string, `toBeZipped` might be simple (single file) or nested, when
+    ⍝ every single item is treated as the name of a file or a folder.\\
+    ⍝ Returns `⍬` (shy).
+      :Access Public Instance
+      r←⍬
+      :If IsWindows
+          :If 0=⎕NC'parent'
+              res←_ZipArchive.Add toBeZipped
+          :Else
+              res←parent _ZipArchive.Add toBeZipped
+          :EndIf
+      :Else
+          toBeZipped←F.NormalizePath toBeZipped
+          :If 0=⎕NC'parent'
+              (rc msg)←Exec'zip -r ',_filename,' ',∊'"',¨(⊆toBeZipped),¨⊂'" '
+              Assert 0=rc
+          :Else
+              parent←'expand'F.NormalizePath parent
+              toBeZipped←{⍵↓⍨'/'=1⍴⍵}¨⊆toBeZipped
+              (rc msg)←Exec'cd ',parent,' && zip -r ',('expand'F.NormalizePath _filename),' ',∊' ',¨'"',¨toBeZipped,¨'"'
+              Assert 0=rc
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←List;msg;rc
+    ⍝ Lists the contents of the ZIP file.
+      :Access Public Instance
+      :If IsWindows
+          r←_ZipArchive.List
+          r←{'.//'≡3⍴⍵:'./',3↓⍵ ⋄ '.\\'≡3⍴⍵:'.\',3↓⍵ ⋄ ⍵}¨r
+      :Else
+          (rc msg)←Exec'unzip -l ',_filename
+          Assert 0=rc
+          r←MassageZipConentList msg
+      :EndIf
+    ∇
+
+    ∇ {r}←Delete filenames;msg;rc
+    ⍝ Delete one or more files from the ZIP.\\
+    ⍝ Returns `⍬` (shy).
+      :Access Public Instance
+      r←⍬
+      :If IsWindows
+          {}_ZipArchive.Delete filenames
+      :Else
+          filenames←F.NormalizePath⊆filenames
+          :If 0<≢filenames←(filenames∊List)/filenames
+              (rc msg)←Exec'zip -d ',_filename,∊' ',¨'"',¨filenames,¨'"'
+              Assert 0=rc
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←names ExtractTo targetFolder;b;folders;list;msg;name;rc
+    ⍝ `names` is the name of one or more zipped objects (files or directories)
+    ⍝ Those will be extracted into `folder\`.\\
+    ⍝ `names` may be simple (single object) or nested (vector of objects).\\
+    ⍝ There must be no file or folder of the given name in the target folder, otherwise an error is thrown.\\
+    ⍝ `r` is a vector of Booleans with the same lengths as `names`, carrying 1 for success and 0  otherwise.
+    ⍝ However, if `names` is or contains the name of a folder, the length of `r` may be smaller than the
+    ⍝ number of files and folders extracted.
+    ⍝ A typical reason for a failure is that a given file or folder does not exist in the ZIP file.
+      :Access Public Instance
+      :If IsWindows
+          r←names _ZipArchive.ExtractTo targetFolder
+      :Else
+          targetFolder←'expand'F.NormalizePath targetFolder
+          list←List
+          folders←∪(⊂'')~⍨{¯1↓1⊃⎕NPARTS ⍵}¨List
+          names←⊆names
+          ('On non-Windows platforms unzipping a folder is not supported yet')Assert 0=+/names∊folders
+          :If 0<+/r←names∊list ⍝,folders
+              names←r/names
+              :If ∨/b←F.Exists(targetFolder,'/')∘,¨names
+                  msg←⊃{⍺,';',⍵}/{'The file ''',⍵,''' already exists.'}¨b/names
+                  msg ⎕SIGNAL 11
+              :EndIf
+              (rc msg)←Exec'cd ',targetFolder,' && unzip ',('expand'F.NormalizePath _filename),∊' "'∘,¨names,¨'"'
+              Assert 0=rc
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ Dispose
+    ⍝ Use this to close the `ZipArchive` instance.\\
+    ⍝ Note that deleteting a instance of `ZipArchive` has the same effect as calling this method although the timing might differ
+      :Access Public Instance
+      :If IsWindows
+          _ZipArchive.Dispose
+      :Else
+          ⍝ Nothing to do here
+      :EndIf
+    ∇
+
+    ⍝⍝⍝⍝⍝ Shared stuff ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+
+    ∇ zipFilename←sourceFolder ZipFolder zipFilename;F;res
+    ⍝ Takes a folder and zips it. `zipFilename` must not exist.\\
+    ⍝ Returns the fully expanded name of `zipFilename`.\\
+    ⍝ This is a workaround thats gets around the `\` problem on Linux and Mac-OS.\\
+    ⍝ The "real" solution is available under the name `ZipFolder_` and can be brought back once
+    ⍝ Microsoft fixes the bug, which means probably not in the foreseeable future.
+      :Access Public Shared
+      F←(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs
+      :If IsWindows
+          zipFilename←sourceFolder ##.DotNetZip.ZipFolder zipFilename
+      :Else
+          zipFilename←AddExtension zipFilename
+          ('Is not a directory: ',sourceFolder)Assert(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs.IsDir sourceFolder
+          res←Exec'cd ',('expand'F.NormalizePath sourceFolder),' && zip -r ',zipFilename,' *'
+      :EndIf
+    ∇
+
+    ∇ {r}←zipFilename UnzipTo targetFolder;F;msg;rc;qdmx
+    ⍝ Unzip `⍵` into `⍺`.\\
+    ⍝ `targetFolder` must not yet exist.
+      :Access Public Shared
+      F←(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs
+      :If IsWindows
+          r←zipFilename ##.DotNetZip.UnzipTo targetFolder
+      :Else
+          zipFilename←F.EnforceSlash AddExtension zipFilename
+          ⍝ For unknown reasons the following statement tends to crash, yet the unzip utility unzips everything anyway,
+          ⍝ therefore we trap the error and just compare the number of files in the archive with what we've got.
+          :Trap 11
+              (rc msg)←Exec'unzip -o -qq ',zipFilename,(0<≢targetFolder)/' -d ',targetFolder
+              Assert 0=rc
+          :Else
+              qdmx←⎕DMX
+              qdmx.Message ⎕SIGNAL qdmx.EN
+          :EndTrap
+          ⍝ On my Ubuntu VM under Hyper-V I get files and dirs with no priviliges, so defaults need to be established:
+          {}{Exec'chmod 666 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListFiles targetFolder,'/'
+          {}{Exec'chmod 777 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListDirs targetFolder,'/'
+      :EndIf
+    ∇
+
+    ∇ r←ListZipContents zipFilename;F;instance;msg;myZip;rc;zipFilename
+    ⍝ List the contents of a ZIP file
+      :Access Public Shared
+      F←(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs
+      :If IsWindows
+          instance←⎕NEW ##.DotNetZip(,⊂zipFilename)
+          r←instance.List
+          instance.Dispose
+      :Else
+          zipFilename←AddExtension zipFilename
+          (rc msg)←Exec'unzip -l ',zipFilename
+          Assert 0=rc
+          r←MassageZipConentList msg
+      :EndIf
+    ∇
+
+    ⍝⍝⍝⍝⍝ Private stuff ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←1 ⋄ ⍺ ⎕SIGNAL 1↓(⊃∊⍵),11}
+
+    ∇ list←MassageZipConentList list;A
+    ⍝ `list`comes from "unzip -l and has a specific contents
+      A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
+      :If 0<≢list←3↓¯2↓list
+          list←' 'A.Split¨A.DMB list
+          list←⊃¨{⍺,' ',⍵}/¨3↓¨list
+          list←('/'≠⊃¨¯1↑¨list)/list
+      :EndIf
+    ∇
+
+    ∇ r←{user}GetHomeDir dummy;msg;rc
+      ⍝ Get the home directory for a user, by default the current one.
+      ⍝ You may specify a different user via ⍺.
+      ⍝ ⍵ is ignored.
+      :If 0=⎕NC'user'
+          user←2 ⎕NQ #'GetEnvironment' 'USER'
+      :EndIf
+      (rc msg)←Exec'getent passwd ',user
+      Assert 0=rc
+      r←{⍵⊃⍨¯1+≢⍵}':'(≠⊆⊢)⊃msg
+    ∇
+
+    ∇ r←IsWindows;A
+      A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
+      r←'Win'≡A.GetOperatingSystem''
+    ∇
+
+      AddExtension←{
+      ⍝ ⍵ is a filename. If it has no extension ".zip" is added, otherwise it is left alone
+          ⊃,/{(1⊃⍵),(2⊃⍵),{0=≢⍵:'.zip' ⋄ ⍵}3⊃⍵}⎕NPARTS ⍵
+      }
+
+      IfAtLeastVersion←{
+      ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
+      ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
+          ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
+      }
+
+      CheckMinVersion←{
+          IfAtLeastVersion 18:shy←1
+          'This class requires at least version 18.0 of Dyalog APL'⎕SIGNAL 11
+      }
+
+      EachIfNotEmpty←{
+          0=≢⍵:shy←⍬ ⋄ 1:shy←⍺⍺¨⍵
+      }
+
+    ∇ (rc msg)←Exec cmd;qdmx
+    ⍝ Works out whether "zip" and "unzip" are available at all (all other commands are always available)
+      :Trap 11
+          msg←⎕SH cmd
+          rc←0
+      :Else
+          qdmx←⎕DMX
+          rc←,⊃(//)⎕VFI⊃¯1↑' '(≠⊆⊢)msg←qdmx.Message
+          :If (,127)≡rc
+              '"zip" and/or "unzip" not installed'⎕SIGNAL 6
+          :EndIf
+      :EndTrap
+    ∇
+
+:EndClass

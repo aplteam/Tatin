@@ -1,4 +1,4 @@
- {buildList}←{replace}CompileBuildList folder;oldTree;newTree;deps2;ind;deps
+ {buildList}←{replace}CompileBuildList folder;oldTree;newTree;deps2;deps;oldToc;newToc;bool;ind
 ⍝ We distinguish here between principal packages and other packages (=dependencies).
 ⍝ If the dependency file was modified after the build list was saved:
 ⍝ * If a top-level package was removed from the dependency file the build list is re-created
@@ -26,6 +26,10 @@
      newTree[ind;2]←GetPackageIDFromFilename¨deps2
      newTree[ind;3]←deps2
  :EndIf
- newTree[;3]←oldTree[(Reg.RemoveMinorAndPatch¨oldTree[;2])⍳Reg.RemoveMinorAndPatch¨newTree[;2];3]     ⍝ Preserve original URLs
+ oldToc←RemoveAlias¨Reg.RemoveMinorAndPatch¨oldTree[;2]
+ newToc←RemoveAlias¨Reg.RemoveMinorAndPatch¨newTree[;2]
+ bool←newToc∊oldToc
+ ind←⍸bool
+ newTree[ind;3]←oldTree[oldToc⍳bool/newToc;3]     ⍝ Preserve original URLs
  buildList←(~replace)SaveBuildList newTree folder
 ⍝Done

@@ -1,0 +1,49 @@
+ {setupFilename}←{path}Run name;counter;flag;issFilename;inno;cmd;iss;batFilename;buff;msg;success;exeName;targetDir;more;rc;F
+⍝ Runs the INNO batch compiler in order to create an installer.\\
+⍝ `name` is the project name; for "Fire" that would be "Fire".\\
+⍝ Returns the full path of the setup programm created by Inno.\\
+⍝ This will work under these assumptions:
+⍝ 1. The ISS file is "{name}.iss".
+⍝ 2. The ISS file lives in the current directory.\\
+⍝ If the Inno ISS file does not exist in the current directory you can specify the path via `⍺` (optional).\\
+⍝ Running the Inno compiler fails accasionally, most often with either "file in use" or "EndUpdateResource failed",
+⍝ for no apparent reason. However, normally it helps to just try again.
+⍝ Normally after 3-5 times it works but sometimes it takes longer, so we try a max of 10 times before giving up.\\
+ F←FilesAndDirs
+ counter←flag←0
+ path←{0<⎕NC ⍵:⍎⍵ ⋄ F.PWD}'path'
+ issFilename←'expand'F.NormalizePath path,'\',name,'.iss'
+ UpdateVersionName issFilename name
+ :If 0=≢inno←SelectInno ⍬
+     :Return
+ :EndIf
+ cmd←'"',inno,'" ',issFilename,'"'
+ iss←1⊃F.NGET issFilename 1
+ :Repeat
+     ⎕DL 0.1×counter>0
+     counter+←1
+     ⎕←(⍕counter),' attempt to create the SetUp.exe...'
+     batFilename←F.GetTempFilename''
+     F.DeleteFile batFilename
+     batFilename,←'.bat'
+     (⊂cmd)⎕NPUT batFilename
+     buff←Execute.Process batFilename
+     msg←2⊃buff
+     :If 0=+/'The process cannot access the file because it is being used by another process.'⍷∊msg
+     :AndIf 0=+/'EndUpdateResource failed'⍷∊msg
+         'Inno compiler did abort'Assert 0=+/'Compile aborted'⍷∊msg
+     :EndIf
+     success←∨/'Successful compile'⍷∊msg
+     F.DeleteFile batFilename   ⍝ Delete the BAT file
+ :Until success∨10=counter
+ 'Attempted 10 times to create the installer EXE, always failed!'Assert 10>counter
+ exeName←⊃¯1↑msg
+ targetDir←iss GetDefFromInno'TargetDir'
+ '"TargetDir" needs to be defined in the Inno script'Assert 0<≢targetDir
+ :If ≢/{1⊃⎕NPARTS ⍵}¨('expand'F.NormalizePath targetDir)('expand'F.NormalizePath exeName)
+     ⍝ In case Inno's working directory and the target directory are not the same:
+     1 ⎕NDELETE targetDir,⊃,/1↓⎕NPARTS exeName
+     targetDir ⎕NMOVE exeName
+ :EndIf
+ setupFilename←F.ExpandPath targetDir,⊃,/1↓⎕NPARTS exeName
+⍝Done

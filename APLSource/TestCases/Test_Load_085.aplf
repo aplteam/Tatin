@@ -1,0 +1,21 @@
+ r←Test_Load_085(stopFlag batchFlag);⎕TRAP;tempFolder;res
+⍝ Load dependencies were the build list has aliases defined. Was once a bug
+⍝ Crashed CompileBuildList because aliase confused it
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempFolder←(F.GetTempSubDir⊃⎕SI),'/'
+ tempFolder ⎕NCOPY⍠('Wildcard' 1)⊣##.CiderConfig.HOME,'/TestData/Aliase3/*'
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ res←TC.LoadDependencies tempFolder #.TEMP
+
+ →T.PassesIf 7=≢res
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempFolder
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

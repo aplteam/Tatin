@@ -11,7 +11,7 @@
 
 You don't need to worry about installing Tatin if you use version 19.0 or later of Dyalog: Tatin will be available in `⎕SE` after a standard installation anyway.
 
-However, installing and updating is, as far as the Tatin client is concerned, _the same thing_, because updating the Tatin client basically means removing the old version and installing a new one.
+However, installing and updating is, as far as the Tatin client is concerned, the same thing, because updating the Tatin client basically means removing the old version and installing a new one.
 
 ## Requirements
 
@@ -29,7 +29,11 @@ Instructions:
 
 1. Download the latest release of the Tatin client from <https://github.com/aplteam/Tatin/releases>
 
-2. Unzip it _into_ the `MyUCMDs/` folder.   
+2. Unzip it into the `MyUCMDs/` folder --- there is now a folder `Tatin/`
+
+W> You _must not_ install it into any other folder, even if that folder is scanned by Dyalog for user commands: that would not work.
+W>
+W> However, this might change with a later version.
 
 Where to find the `MyUCMDs/` folder depends on your operating system:
 
@@ -79,7 +83,7 @@ Now you might want the Tatin API to be around right from the start, so that you 
 
 What is the application for this? Well, you might want to have an automated build process available right from the start, for example.
 
-I> If you are not interested in this or use 19.0 or later, skip the rest of this document
+I> If you are not interested in this or use 19.0 or later, skip this and carry on with "Updating Tatin".
 
 
 The way to achieve that goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs/` folder. Note that on non-Windows platforms the name of the file must be lowercase.
@@ -88,7 +92,7 @@ A> ### How does `setup.dyalog` work?
 A>
 A> The magic behind this is that whenever an instance of Dyalog is fired up it checks whether such a script exists. If that is the case it checks whether there is a function `Setup`. 
 A>
-A> If that is the case it is expected to be a monadic function which will be executed automatically as part of the instantiating process of Dyalog APL.
+A> If there is such a function then it is expected to be monadic; it will be executed automatically as part of the instantiating process of Dyalog APL.
 A>
 A> This can be used for many things like...
 A>
@@ -122,7 +126,7 @@ Create one that looks like this:
           ⎕SE.⎕EX¨'_Tatin' 'Tatin'
           wspath←(GetMyUCMDsPath),'/Tatin/Client.dws'
           '_Tatin'⎕SE.⎕CY wspath
-          path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
+          path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
           'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
           'Tatin'⎕SE.⎕NS''
           path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
@@ -158,3 +162,9 @@ Create one that looks like this:
 ### There is already such a script
 
 Copy the functions `IfAtLeastVersion`, `GetMyUCMDsPath` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+
+## Updating Tatin
+
+Although you _could_ update your Tatin client by repeating the steps listed under "How to install the Tatin client" there is an easier way to do this: just call the API function `⎕SE.Tatin.UpdateClient` and pass a zero as right argument. It would execute all necessary steps and eventually tell you the new version number.
+
+Note that this feature was introduced in 0.77.0, so it's not available in earlier versions.

@@ -1,0 +1,29 @@
+ r←Test_UserCommands_086(stopFlag batchFlag);⎕TRAP;stop;buildList
+⍝ Exercise ]Tatin.LoadDependencies from within a namespace
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If batchFlag
+     R←T._NoBatchTest
+     :Return
+ :EndIf
+
+ 0 0⍴⍞,0/⎕←'This test needs you: when given options select "Foo" as target; to continue press <enter>'
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS''
+
+ stop←0
+ #.Foo.fn←stop∘⎕THIS.{⍺ ∆UCMD'LoadDependencies ',⍵}
+ :With #.Foo
+     (∆rc ∆msg ∆res)←fn #.Tatin.CiderConfig.HOME,'/TestData/InstallFromList'
+ :EndWith
+ Assert 0=#.Foo.∆rc
+ buildList←⎕JSON(⍠'Dialect' 'JSON5')⊣⊃⎕NGET #.Tatin.CiderConfig.HOME,'/TestData/InstallFromList/apl-buildlist.json'
+ →T.GoToTidyUp 9∨.≠⊃¨#.Foo.⎕NC¨{1↓1⊃('-'=⍵)⊂⍵}¨buildList.(principal/packageID)
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

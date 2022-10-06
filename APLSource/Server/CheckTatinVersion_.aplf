@@ -1,0 +1,21 @@
+ msg←minimum CheckTatinVersion_ clientVersion;minor;major;clientVersion;clientMajor;clientMinor;majorServerVersion;patch;clientPatch;flag
+⍝ This is a sub-function of `CheckTatinVersion` without independent value.
+ msg←''
+ flag←0
+ clientVersion←{⍵↑⍨+/∧\⍵∊⎕D,'.'}clientVersion  ⍝ Remove stuff like "beta-1" or "-rc-1" etc
+ (clientMajor clientMinor clientPatch)←⊃∘A.ToNum¨3↑{'.'(≠⊆⊢)⍵}clientVersion
+ majorServerVersion←A.ToNum{⍵↑⍨¯1+⍵⍳'.'}2⊃Reg.Version
+ :If clientMajor<majorServerVersion
+     flag←1
+ :ElseIf 0≠≢minimum
+     (major minor patch)←3↑⊃¨A.ToNum¨3↑{'.'(≠⊆⊢)⍵}minimum
+     :If clientMajor≠major
+     :OrIf clientMinor<minor
+     :OrIf (clientMinor=minor)∧patch>clientPatch
+         flag←1
+     :EndIf
+ :EndIf
+ :If flag
+     msg←'Request came from an invalid version of Tatin. Update to version ',{⍵↑⍨¯1+⍵⍳'+'}2⊃Reg.Version
+ :EndIf
+⍝Done

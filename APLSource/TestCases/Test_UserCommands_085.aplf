@@ -1,0 +1,28 @@
+ r←Test_UserCommands_085(stopFlag batchFlag);⎕TRAP;stop
+⍝ Exercise ]Tatin.LoadPackages from within a namespace
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If batchFlag
+     R←T._NoBatchTest
+     :Return
+ :EndIf
+
+ 0 0⍴⍞,0/⎕←'This test needs you: when given options select "Foo" as target; to continue press <enter>'
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS''
+
+ stop←0
+ #.Foo.fn←stop∘⎕THIS.{⍺ ∆UCMD'LoadPackages ',⍵}
+ :With #.Foo
+     (∆rc ∆msg ∆res)←fn'[tatin]APLTreeUtils2'
+ :EndWith
+ Assert 0=#.Foo.∆rc
+ →T.GoToTidyUp 9≠#.Foo.⎕NC'APLTreeUtils2'
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

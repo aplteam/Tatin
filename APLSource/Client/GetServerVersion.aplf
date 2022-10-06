@@ -1,16 +1,52 @@
- r←GetServerVersion uri;client;request;res
- uri←ReplaceRegistryAlias uri
- 'No URI provided'Assert 0<≢uri
- request←R.NewRequest 0
- request.RequestTarget←'/v1/version'
- request.Headers,←⊂'Accept' 'application/json'
- res← SendAndReceive uri request
- :If 200≠res.StatusCode
-     :If 0<≢res.Content
-         ('Server: ',res.Content)Assert 0
-     :Else
-         ('Failed with status code ',⍕res.StatusCode)Assert 0
+ r←{mininumVersionFlag}GetServerVersion uri;client;request;res;∆PermanentConnections
+⍝ Without mininumVersionFlag being 1 just the version number of the server is returned.
+⍝ With mininumVersionFlag←1 a text is returned stating both the current version of the
+⍝ principal server and the minimum version required.
+ mininumVersionFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'mininumVersionFlag'
+ :If mininumVersionFlag
+     uri←ReplaceRegistryAlias'[tatin]'
+     ∆PermanentConnections←⎕NS''
+     request←R.NewRequest 0
+     request.RequestTarget←'/v1/version'
+     request.Headers,←⊂'Accept' 'application/json'
+     res←SendAndReceive uri request
+     :If 200≠res.StatusCode
+         CloseConnections 1
+         :If 0<≢res.Content
+             ('Server: ',res.Content)Assert 0
+         :Else
+             ('Failed with status code ',⍕res.StatusCode)Assert 0
+         :EndIf
      :EndIf
+     r←'Current version is ',⊃{⍺,' from ',⍵}/1↓Reg.JSON res.Content
+     request←R.NewRequest 0
+     request.RequestTarget←'/v1/minimum-version'
+     request.Headers,←⊂'Accept' 'application/json'
+     res←SendAndReceive uri request
+     :If 200≠res.StatusCode
+         CloseConnections 1
+         :If 0<≢res.Content
+             ('Server: ',res.Content)Assert 0
+         :Else
+             ('Failed with status code ',⍕res.StatusCode)Assert 0
+         :EndIf
+     :EndIf
+     CloseConnections 1
+     r,←'; minimum version required is ',⍕Reg.JSON res.Content
+ :Else
+     uri←ReplaceRegistryAlias uri
+     'No URI provided'Assert 0<≢uri
+     request←R.NewRequest 0
+     request.RequestTarget←'/v1/version'
+     request.Headers,←⊂'Accept' 'application/json'
+     res←SendAndReceive uri request
+     :If 200≠res.StatusCode
+         :If 0<≢res.Content
+             ('Server: ',res.Content)Assert 0
+         :Else
+             ('Failed with status code ',⍕res.StatusCode)Assert 0
+         :EndIf
+     :EndIf
+     r←Reg.JSON res.Content
  :EndIf
- r←Reg.JSON res.Content
 ⍝Done

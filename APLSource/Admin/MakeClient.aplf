@@ -30,8 +30,6 @@
      parms←⎕SE.Cider.CreateOpenParms ⍬
      parms.folder←#.Tatin.CiderConfig.HOME
      parms.projectSpace←'_Tatin'
-⍝     parms.suppressLX←1  ⍝TODO⍝
-⍝     parms.checkPackageStatus←0  ⍝TODO⍝
      parms.quietFlag←1
      Assert ⎕SE.Cider.OpenProject parms
      {}⎕SE.Cider.CloseProject''
@@ -60,15 +58,8 @@
          './APLSource/Tatin.dyalog'⎕NCOPY⍠('IfExists' 'Replace')⊣userCommandTargetFolder,'/Tatin/Tatin.dyalog'
      :EndIf
      (targetPath,'/Tatin')⎕NCOPY⍠('IfExists' 'Replace')⊣'./APLSource/Tatin.dyalog'
-     'Create!'F.CheckPath targetPath,'/Tatin/Assets'
-     {0=≢l←F.ListFiles ⍵:shy←0 ⋄ (targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣l}'./Assets/Runtime/' ⍝ Copy all files, if any
-     dirList←F.NormalizePath F.ListDirs'./Assets/Runtime/'  ⍝ List with all sub dirs
-     dirList~←⊂F.NormalizePath'./Assets/Runtime/Conga'      ⍝ The client does not require the Conga DLLs
-     {(targetPath,'/Tatin/Assets/')⎕NCOPY⍠('IfExists' 'Replace')⊣⍵}¨dirList
-     _userSettings←⎕NEW #._Tatin.Client.UserSettings(,⊂targetPath,'/Tatin/')
-     reg←_userSettings.GetRegistry'[tatin]'
-     _userSettings.ReplaceRegistry reg
-     (targetPath,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣'setup.dyalog.RemoveMe'
+     'Create!'F.CheckPath targetPath,'/Tatin/Assets/Runtime'
+     (targetPath,'/Tatin/Assets/Runtime/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/Runtime/Rumba'
      F.DeleteFile¨F.Dir'Dist/Tatin-Client-*.zip'
      zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version),''),'.zip'
      ⎕DL 0.1

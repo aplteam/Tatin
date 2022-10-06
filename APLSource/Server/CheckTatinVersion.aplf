@@ -1,32 +1,22 @@
  msg←CheckTatinVersion request;minimum;minor;major;clientVersion;clientMajor;clientMinor;clientVersion_;majorServVersion
-⍝ ## If the current (server) version is 0
+⍝ ## If the current (server) major version is 0
 ⍝ Checks whether the Tatin version used on the client matches the minimum version defined
 ⍝ in the INI (if any) and rejects the request as 400 (bad request) if not.\\
 ⍝ The INI entry might or might not exist but if it does it must be a number with one of:
 ⍝ * a major number (integer)
 ⍝ * major.minor number (real)
-⍝ ## If the current (server) version is greater than 0:
+⍝ ## If the current (server) major version is greater than 0:
 ⍝ The request must have a major version number that matches the server's major version number.\\
-⍝ The INI entry might or might not exist and will be ignored in any case.
+⍝ The INI entry might or might not exist; if it does it is dealt with in the same way as
+⍝ documented above.
  msg←''
  clientVersion←request R.GetHeaderValue'x-tatin'
- :If 0<majorServVersion←A.ToNum{⍵↑⍨¯1+⍵⍳'.'}2⊃Reg.Version
- :OrIf G.INI.Exist'Config:MinimumTatinVersion'
-     :If 0<≢clientVersion
-         clientVersion←{⍵↑⍨¯1+⍵⍳'-'}clientVersion
-         (clientMajor clientMinor)←{⊃(//)⎕VFI ⍵}¨2↑{'.'(≠⊆⊢)⍵}clientVersion
-         minimum←⍕⊃0 G.INI.Get'Config:MinimumTatinVersion'
-     :AndIf 0≠≢minimum
-         (major minor)←A.ToNum¨{⍵{(¯1↓⍵↑⍺)(⍵↓⍺)}⍵⍳'.'}minimum
-         :If clientMajor≠major
-         :OrIf clientMinor<minor
-             msg←'Request came from invalid version of Tatin. Minimum version required is ',minimum
-         :EndIf
+ :If 0<≢clientVersion                               ⍝ Empty? Browser request!
+     :If G.INI.Exist'Config:MinimumTatinVersion'
+         minimum←⊃0 G.INI.Get'Config:MinimumTatinVersion'
+     :Else
+         minimum←'0.0.0'
      :EndIf
- :Else
-     :If 0<≢clientVersion
-         clientVersion_←A.ToNum{⍵↑⍨¯1+⍵⍳'.'}clientVersion
-     :AndIf clientVersion_<majorServVersion
-         msg←'Request came from invalid version of Tatin. Update to version ',{⍵↑⍨¯1+⍵⍳'+'}clientVersion
-     :EndIf
+     msg←minimum CheckTatinVersion_ clientVersion
  :EndIf
+⍝Done

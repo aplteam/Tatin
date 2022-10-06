@@ -10,6 +10,7 @@
  F.MkDir src zip
  F.MkDir src,'/Assets'
  serverPath←∆GetServerPath
+ packageID←'Example-Package_A-0.1.0'
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
@@ -26,7 +27,6 @@
  (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
  Assert 200=rc
 
- packageID←'Example-Package_A-0.1.0'
  →T.GoToTidyUp 0=F.IsDir serverPath,,'/',packageID,'/data\Assets'
  →T.GoToTidyUp 2≠≢1⊃F.Dir serverPath,'/',packageID,'/data\Assets\'
 

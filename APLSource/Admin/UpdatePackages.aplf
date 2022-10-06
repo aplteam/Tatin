@@ -13,12 +13,11 @@
      F←##.FilesAndDirs ⋄ TC←##.Client
      path2Packages←##.CiderConfig.HOME,'/packages'
      targetFolder←##.CiderConfig.HOME,'/APLSource'
+     ⎕NDELETE F.ListFiles targetFolder,'/*.aplc'
      parms←TC.CreateReInstallParms
      parms.update←1
      ⎕←'Now updating packages in ',path2Packages,'/ ...'
-
      res←parms TC.ReInstallDependencies path2Packages               ⍝ <==
-
      ⎕←{0=≢⍵:'No packages updated' ⋄ ⍪(⊂'*** Packages updated:'),⍵}res
      r←targetFolder CopyScriptsFromPackagesIn path2Packages
      {}{⎕←'*** Done'}⍣(~force)⊣⍬

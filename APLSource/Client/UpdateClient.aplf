@@ -1,0 +1,59 @@
+  version←{tag}UpdateClient force;GH;request;client;data;data2;redirect;tempFile;tno;folder;target;wspath;path2Config;ref
+⍝ Updates the client to (by default) the latest version and returns the version number.
+⍝ Asks for confirmation from the user unless `force` is 1.\\
+⍝ If you want to update to a specific version you may specify it in the optional left argument.
+⍝ The format must be something like "v1.0.2".
+ 'Right argument must be a Boolean'Assert(⊂force)∊0 1
+ version←''
+ :If force
+ :OrIf 1 YesOrNo'Would you like to update the Tatin client?'
+     :If 0=⎕NC'tag'
+         GH←⎕NEW ##.GitHubAPIv3(,⊂'aplteam')
+         tag←GH.GetLatestTag'Tatin'
+     :Else
+         'Invalid version number'Assert'v'=1⍴tag
+     :EndIf
+     request←R.NewRequest 0
+     request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Tatin-Client-',(1↓tag),'.zip'
+     client←R.NewClient 0
+     client.Host←'github.com'
+     request.Headers,←⊂'User-Agent' 'aplteam'
+     data←client R.SendAndReceive request
+     'Invalid HTTP status code'Assert 302≡data.StatusCode
+     redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
+     redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
+     client←R.NewClient 0
+     (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
+     data2←client R.SendAndReceive request
+     folder←F.GetTempSubDir'Tatin-Upgrade'
+     tempFile←folder,'/',tag,'.zip'
+     tno←tempFile ⎕NCREATE 0
+     data2.Content ⎕NAPPEND tno 80
+     ⎕NUNTIE tno
+     data2.Content←''
+     tempFile ZipArchive.UnzipTo folder
+     ⎕NDELETE tempFile
+     target←GetMyUCMDsFolder'Tatin'
+     F.RmDir target
+     (⊃⎕NPARTS target)⎕NCOPY folder,'/Tatin'
+     ref←⎕NS''
+     :Trap 11
+         ⍝ We try to copy a function from the new version that can execute the remaining steps.
+         ⍝ That way we are more flexible. The ⎕CY is trapped only because in the early stages
+         ⍝ there might be no such function yet; then the required steps are execute by this fn.
+         '#._Tatin.Client.UpdateClient_Continue'ref.⎕CY folder,'/Tatin/Client.dws'
+         path2Config←ref.UpdateClient_Continue target
+     :Else
+         ⎕SE.⎕EX'_Tatin'
+         wspath←target,'/Client.dws'
+         '_Tatin'⎕SE.⎕CY wspath
+         path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
+         'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
+         'Tatin'⎕SE.⎕NS''
+     :EndTrap
+     path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+     ⎕SE.UCMD'URESET'
+     ⎕←'Tatin updated: ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
+     version←2⊃⎕SE.Tatin.Version
+ :EndIf
+⍝Done

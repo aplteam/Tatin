@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.42 - 2022-09-19
+⍝ * 0.44 - 2022-10-05
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -8,6 +8,7 @@
     RS←'#._tatin' ⍝ target Root Space for packages
     SupportedExtensions←'.aplc' '.apln' '.apli' '.aplf' '.aplo' '.apla' '.charlist' '.charmat' '.charstring' '.dyalog'
     RegKey←'HKCU\Software\Tatin\ConfigPath'
+    tatinURL←'https://tatin.dev'
 
     ErrNo←998
 
@@ -97,7 +98,7 @@
           c←⎕NS ⍬
           c.Name←'Version'
           c.Desc←'Prints name, version number and version date of the client to the session'
-          c.Parse←'1s'
+          c.Parse←'1s -check'
           r,←c
      
           c←⎕NS ⍬
@@ -217,25 +218,33 @@
      ⍝Done
     ∇
 
-    ∇ r←Version Arg;⎕TRAP;registries;registry;alias
+    ∇ r←Version Arg;⎕TRAP;registries;registry;alias;qdmx
       ⎕TRAP←0 'S'
-      :If (,'*')≡,Arg._1
-          r←⊂(⊂'{Client}'),TC.Reg.Version
-          registries←1 TC.ListRegistries 0
-          :For registry alias :In ↓registries[;1 2]
-              :If 0≠≢'http[s]://'⎕S 0⊣registry  ⍝ Not local?
-                  :Trap 0
-                      r,←⊂(⊂registry),TC.GetServerVersion registry
-                  :Else
-                      r,←⊂registry'' '*** Could not be accessed'
-                  :EndTrap
-              :EndIf
-          :EndFor
-          r←(↑r)[;1 3 4]
-      :ElseIf 0≡Arg._1
-          r←TC.Reg.Version
+      :If 0≡Arg.check
+          :If (,'*')≡,Arg._1
+              r←⊂(⊂'{Client}'),TC.Reg.Version
+              registries←1 TC.ListRegistries 0
+              :For registry alias :In ↓registries[;1 2]
+                  :If 0≠≢'http[s]://'⎕S 0⊣registry  ⍝ Not local?
+                      :Trap 0
+                          r,←⊂(⊂registry),TC.GetServerVersion registry
+                      :Else
+                          r,←⊂registry'' '*** Could not be accessed'
+                      :EndTrap
+                  :EndIf
+              :EndFor
+              r←(↑r)[;1 3 4]
+          :ElseIf 0≡Arg._1
+              r←TC.Reg.Version
+          :ElseIf (,'?')≡,Arg._1
+              →(⍬≡registry←SelectRegistry 0)/0
+              registry←EnforceSlash registry
+              r←TC.GetServerVersion registry
+          :Else
+              r←TC.GetServerVersion Arg._1
+          :EndIf
       :Else
-          r←TC.GetServerVersion Arg._1
+          r←1 TC.GetServerVersion Arg._1
       :EndIf
     ∇
 
@@ -251,19 +260,23 @@
       TC←⎕SE._Tatin.Client
     ∇
 
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝ Methods
+
     ∇ {r}←CreatePackage Arg;path;filename
-      r←''
-      ⎕←'For creating a new package execute this user command:'
+      r←'For creating a new package execute this user command:'
       :If (,0)≡,Arg._1
-          ⎕←'      ]Tatin.PackageConfig -edit'
+          r,←(⎕UCS 13),'      ]Tatin.PackageConfig -edit'
       :Else
-          ⎕←'      ]Tatin.PackageConfig ',Arg._1,' -edit'
+          r,←(⎕UCS 13),'      ]Tatin.PackageConfig ',Arg._1,' -edit'
       :EndIf
     ∇
 
-    ∇ r←ListPackages Arg;registry;parms;buff
+    ∇ r←ListPackages Arg;registry;parms;buff;qdmx
       r←''
-      :If 0≡registry←Arg._1
+      registry←Arg._1
+      :If 0≡registry
+          registry←tatinURL
+      :ElseIf (,'?')≡,registry
           →(⍬≡registry←SelectRegistry 0)/0
       :EndIf
       registry←EnforceSlash registry
@@ -286,7 +299,12 @@
           :EndIf
       :EndIf
       parms.info_url←Arg.info_url
-      r←⍪parms TC.ListPackages registry
+      :Trap ErrNo
+          r←⍪parms TC.ListPackages registry
+      :Else
+          qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
+      :EndTrap
       :If 0=≢r
           r←'No packages found'
       :Else
@@ -295,7 +313,7 @@
               r(AddHeader)←'Package-ID' 'Principal'
           :Else
               :If 0≡parms.date
-                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'≢ major versions'),(⊂'Info URL')
+                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Info URL')
               :Else
                   r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Info URL'
               :EndIf
@@ -308,7 +326,10 @@
     ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag
       installFolder←Arg._1
       :If 0≡Arg._2
-          targetSpace←,'#'
+          :If 0=≢targetSpace←DefineTargetSpace ⍬
+              ⎕←'Cancelled by user'
+              :Return
+          :EndIf
       :Else
           targetSpace←,Arg._2
       :EndIf
@@ -330,11 +351,16 @@
       r←⍪r
     ∇
 
-    ∇ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders;bool;buff;info1;info2
+    ∇ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders;bool;buff;info1;info2;qdmx
       r←''
       path←Arg._1
       flags←(1×Arg.major)+(2×Arg.dependencies)
-      r←flags TC.CheckForLaterVersion path
+      :Trap ErrNo
+          r←flags TC.CheckForLaterVersion path
+      :Else
+          qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
+      :EndTrap
       :If 0<≢r
           colHeaders←'Installed' 'Latest' 'Original URL' 'I' 'New URL'
           r←colHeaders⍪' '⍪r
@@ -362,7 +388,7 @@
       :EndIf
     ∇
 
-    ∇ r←UsageData Arg;registry;list;ind;list2;b
+    ∇ r←UsageData Arg;registry;list;ind;list2;b;qdmx
       r←''
       :If 0≡registry←Arg._1
           →(⍬≡registry←SelectRegistry 0)/0
@@ -370,9 +396,19 @@
       :If 0≡Arg.download
       :AndIf 0∊b←0≡¨Arg.(all folder unzip)
           ('These options were ignored because -download was not specified: ',⊃{⍺,' ',⍵}/(~b)/'-all' '-folder=' '-unzip')Assert 0=+/b
-          r←TC.UsageDataGetList registry
+          :Trap ErrNo
+              r←TC.UsageDataGetList registry
+          :Else
+              qdmx←⎕DMX
+              CheckForInvalidVersion qdmx
+          :EndTrap
       :Else
-          list←TC.UsageDataGetList registry
+          :Trap ErrNo
+              list←TC.UsageDataGetList registry
+          :Else
+              qdmx←⎕DMX
+              CheckForInvalidVersion qdmx
+          :EndTrap
           :If 0≡Arg.download
               r←list
           :Else
@@ -401,7 +437,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms
+    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -429,29 +465,44 @@
       'Dependency file is empty'Assert 0<≢deps
       :If parms.force
       :OrIf ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
-          r←parms TC.ReInstallDependencies installFolder registry
+          :Trap ErrNo
+              r←parms TC.ReInstallDependencies installFolder registry
+          :Else
+              qdmx←⎕DMX
+              CheckForInvalidVersion qdmx
+          :EndTrap
           :If ~parms.force
               ⎕←'*** Done'
           :EndIf
       :EndIf
     ∇
 
-    ∇ msg←DeletePackage Arg;path;msg;statusCode
+    ∇ msg←DeletePackage Arg;path;msg;statusCode;qdmx
       path←Arg._1
-      (statusCode msg)←TC.DeletePackage path
+      :Trap ErrNo
+          (statusCode msg)←TC.DeletePackage path
+      :Else
+          qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
+      :EndTrap
       :If 200=statusCode
           msg←'Package was successfully deleted'
       :EndIf
      ⍝Done
     ∇
 
-    ∇ r←GetDeletePolicy Arg;uri
+    ∇ r←GetDeletePolicy Arg;uri;qdmx
       r←⍬
       uri←Arg._1
       :If 0≡Arg._1
           →(⍬≡uri←SelectRegistry 0)/0
       :EndIf
-      r←TC.GetDeletePolicy uri
+      :Trap ErrNo
+          r←TC.GetDeletePolicy uri
+      :Else
+          qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
+      :EndTrap
     ∇
 
     ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath;prompt;msg
@@ -518,7 +569,13 @@
           ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
       :EndIf
       firstFlag←1
-      f1←'none'≡⎕C policy←TC.GetDeletePolicy url_
+      :Trap ErrNo
+          f1←'none'≡⎕C policy←TC.GetDeletePolicy url_
+      :Else
+          qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
+      :EndTrap
+      ⍝ From now on we can be confident that the version of the server is in line with the client
       :If f2←'justbetas'≡⎕C policy←TC.GetDeletePolicy url_
           f2←~TC.Reg.IsBeta url_
       :EndIf
@@ -631,11 +688,14 @@
       :EndIf
     ∇
 
-    ∇ r←ListTags Arg;parms;registry
+    ∇ r←ListTags Arg;parms;registry;qdmx
       r←''
       parms←⎕NS''
       parms.tags←''
-      :If 0≡registry←Arg._1
+      registry←Arg._1
+      :If 0≡registry
+          registry←tatinURL
+      :ElseIf (,'?')≡,registry
           →(⍬≡registry←SelectRegistry 0)/0
       :Else
           registry,←(~(¯1↑registry)∊'/\')/'/'
@@ -644,7 +704,12 @@
       :AndIf 0<≢Arg.tags
           parms.tags←Arg.tags
       :EndIf
-      r←⍪parms TC.ListTags registry
+      :Trap ErrNo
+          r←⍪({⍵((≢⍵)⍴'-')}'All tags from ',registry),parms TC.ListTags registry
+      :Else
+          qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
+      :EndTrap
     ∇
 
     ∇ r←ListVersions Arg;qdmx;dateFlag
@@ -654,10 +719,11 @@
               r←dateFlag TC.ListVersions Arg._1
               r[;2]←TC.Reg.FormatFloatDate¨r[;2]
           :Else
-              r←⍪TC.ListVersions Arg._1
+              r←(⍪↓('All versions of ',Arg._1,':'),[0.5]'-')⍪TC.ListVersions Arg._1
           :EndIf
       :Else
           qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
           :If 0=≢qdmx.EM
               ('Not found: ',Arg._1)⎕SIGNAL ErrNo
           :Else
@@ -668,13 +734,16 @@
 
     ∇ r←Documentation Arg
       r←0 0⍴⍬
-      {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage'https://tatin.dev/v1/documentation'
+      {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage tatinURL,'/v1/documentation'
     ∇
 
     ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx
+      r←''
       (identifier targetSpace)←Arg.(_1 _2)
       :If 0≡targetSpace
-          targetSpace←,'#'
+      :AndIf 0=≢targetSpace←DefineTargetSpace ⍬
+          ⎕←'Cancelled by user'
+          :Return
       :EndIf
       :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
           ('"',targetSpace,'" is not a valid APL name')Assert ¯1≠⎕NC targetSpace
@@ -692,7 +761,12 @@
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
           TC.CloseConnections 1
-          ⎕SIGNAL⊂(⊂¨'EN' 'EM'),¨⊂¨qdmx.(EN EM)
+          CheckForInvalidVersion qdmx
+          :If 0<≢qdmx.EM
+              qdmx.EM ⎕SIGNAL qdmx.EN
+          :Else
+              (⊃qdmx.DM)⎕SIGNAL qdmx.EN
+          :EndIf
       :EndTrap
     ∇
 
@@ -705,7 +779,12 @@
           what←TC.ReplaceRegistryAlias what
       :EndIf
       :If TC.Reg.IsHTTP what
-          r←TC.ReadPackageConfigFile_ what
+          :Trap ErrNo
+              r←TC.ReadPackageConfigFile_ what
+          :Else
+              qdmx←⎕DMX
+              CheckForInvalidVersion qdmx
+          :EndTrap
       :Else
           path←what
           filename←'expand'TC.F.NormalizePath({⍵,(~(¯1↑⍵)∊'/\')/'/'}path),TC.CFG_Name
@@ -842,6 +921,7 @@
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
           TC.CloseConnections 1
           qdmx.EM ⎕SIGNAL qdmx.EN
       :EndTrap
@@ -1094,7 +1174,7 @@
               r,←⊂'Request which "Delete" policy is operated by a server.'
               r,←'' '  ]Tatin.GetDeletePolicy [<Registry-URL>]'
           :Case ⎕C'Documentation'
-              r,←⊂'Put https://tatin.dev/v1/documentation into the default browser'
+              r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
               r,←'' '  ]Tatin.Documentation'
           :Case ⎕C'ReInstallDependencies'
               r,←⊂'ReInstall all packages installed in a folder from scratch.'
@@ -1141,7 +1221,8 @@
               r,←⊂'      API keys to be listed as well.'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder specified. If no argument was specified'
-              r,←⊂'then the user will be prompted for the Registry, except when there is just one anyway.'
+              r,←⊂'then the principal Tatin server will be assumed (',tatinURL,'). If a "?" is passed as argument '
+              r,←⊂'the user will be prompted for the Registry, except when there is just one anyway.'
               r,←⊂''
               r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has not'
               r,←⊂'a trailing separator: Tatin is taking care of that.'
@@ -1316,9 +1397,16 @@
               r,←⊂'Prints name, version number and version date of Tatin to the session.'
               r,←⊂''
               r,←⊂' * Specify a URL or an alias if you are after the version number of a Tatin server'
-              r,←⊂' * Specify * if you are after the version numbers of all Tatin servers'
+              r,←⊂' * Specify "*" if you are after the version numbers of the client and all Tatin servers'
+              r,←⊂' * Specify "?" if you want to be prompted with a list of all available Registries'
+              r,←⊂''
+              r,←⊂'If you want to compare the version you are using locally with what is used on the principal'
+              r,←⊂'Tatin server then specify the -check flag. Any argument is then ignored.'
           :Case ⎕C'ListTags'
               r,←⊂'List all unique tags as defined in all packages on a server, sorted alphabetically.'
+              r,←⊂'If no argument was specified then the principal Tatin server will be assumed (',tatinURL,').'
+              r,←⊂'If a "?" is passed as argument the user will be prompted for the Registry, except when there'
+              r,←⊂'is just one anyway.'
               r,←⊂''
               r,←⊂'If no Registry is specified as argument the user will be prompted unless there is only one'
               r,←⊂'Registry anyway.'
@@ -1374,7 +1462,7 @@
               r,←⊂' * "JustBetas" means that only beta versions can be deleted'
               r,←⊂'If no server is specified the user will be prompted, unless there is just one server anyway.'
           :Case ⎕C'Documentation'
-              r,←⊂'Put https://tatin.dev/v1/documentation into the default browser'
+              r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
           :Case ⎕C'ReInstallDependencies'
               r,←⊂'ReInstall all packages (principals as well as dependencies) from scratch.'
               r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
@@ -1522,7 +1610,7 @@
               r,←⊂'  ]Tatin.Ping'
               r,←⊂'  ]Tatin.Ping ?'
               r,←⊂'  ]Tatin.Ping [tatin]'
-              r,←⊂'  ]Tatin.Ping https://tatin.dev'
+              r,←⊂'  ]Tatin.Ping ',tatinURL
               r,←⊂'  ]Tatin.Ping http://tatin.dev   ⍝ This won''t work'
           :Else
               ⍝ Not available then
@@ -1553,18 +1641,18 @@
     ∇
 
     ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2
-    ⍝ Ask a simple question and allows just "Yes" or "No" as answers.
+    ⍝ Asks a simple question and allows just "Yes" or "No" as answers.
     ⍝ You may specify a default via the optional left argument which when specified
     ⍝ rules what happens when the user just presses <enter>.
     ⍝ `default` must be either 1 (yes) or 0 (no).
-    ⍝ Note that this function does not work as expected when traced!
+    ⍝ Note that this function does NOT work as expected when traced!
       isOkay←0
       default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
       isOkay←0
-      :If ~0∊⍴default
-          'Left argument must be a scalar'⎕SIGNAL ErrNo/⍨1≠⍴,default
+      :If 0≠≢default
+          'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠≢default
       :AndIf ~default∊0 1
-          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL ErrNo
+          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 11
       :EndIf
       :If 0=≢default
           add←' (y/n) '
@@ -1576,20 +1664,23 @@
           :EndIf
       :EndIf
       :If 1<≡question
-          ((⍴question)⊃question)←((⍴question)⊃question),add
+          ((≢question)⊃question)←((≢question)⊃question),add
           question←⍪question
       :Else
           question←question,add
       :EndIf
       :Repeat
+          ⎕←''
           ⍞←question
           answer←⍞
-          :If answer≡question                        ⍝ Did...  (since version 18.0 trailing blanks are not removed anynmore)
-          :OrIf (≢answer)=¯1+≢question               ⍝ ..the ...
-          :OrIf 0=≢answer                            ⍝ ...user just...
+          :If answer≡question                        ⍝ Did ...  (since version 18.0 trailing blanks are not removed anymore)
+          :OrIf (≢answer)=¯1+≢question               ⍝ ... the ...
+          :OrIf 0=≢answer                            ⍝ ... user ...
+          :OrIf question≡(-≢question)↑answer         ⍝ ... just ...
               dtb←{⍵↓⍨-+/∧\' '=⌽⍵}
               answer2←dtb answer
-          :OrIf answer2≡((-≢answer2)↑dtb question)   ⍝ ...press <enter>?
+          :OrIf answer2≡((-≢answer2)↑(⎕UCS 10){~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question)   ⍝ ... press ...
+          :OrIf answer≡{1↓⊃¯1↑(⍵∊⎕UCS 10 13)⊂⍵}(⎕UCS 10),question ⍝ ... <enter>?
               :If 0≠≢default
                   yesOrNo←default
                   isOkay←1
@@ -1666,6 +1757,20 @@
     ED←{⎕ED⍠('EditName' 'Disallow')⊣⍵}
     IsValidJSON←{0::0 ⋄ 1⊣TC.Reg.JSON ⍵}
     IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}
+
+    ∇ r←DefineTargetSpace dummy;bool;ind;NSI
+      NSI←(⎕NSI≢¨⊂⍕##.THIS)/⎕NSI
+      r←,⊃1↑(+/'⎕SE'{∧\⍺∘≡¨(≢⍺)↑¨⍵}NSI)↓NSI,'#'
+      :If ~'['∊r   ⍝ Might be called from an instance of a class
+      :AndIf (,'#')≢r
+          ind←'Select target space the package(s) shall be loaded into:'Select,¨'#'(⍕r)
+          :If 0=≢ind
+              r←''
+          :Else
+              r←ind⊃'#'(⍕r)
+          :EndIf
+      :EndIf
+    ∇
 
     ∇ index←{x}Select options;flag;answer;question;value;bool;⎕ML;⎕IO;manyFlag;mustFlag;caption
     ⍝ Presents `options` as a numbered list and allows the user to select either exactly one or multiple ones.\\
@@ -1818,6 +1923,20 @@
                   folder←TC.F.PWD,'/',folder
               :EndIf
           :EndIf
+      :EndIf
+    ∇
+
+    ∇ {r}←CheckForInvalidVersion dmx;v;f2;f1
+      r←0
+      f1←'Server: Request came from an invalid version of Tatin. Minimum version required'{⍺≡(≢⍺)↑⍵}dmx.EM
+      ⍝ Workaround for Client and Server being out of sync after injecting the originally missing "an" into the message:
+      f2←'Server: Request came from invalid version of Tatin. Minimum version required'{⍺≡(≢⍺)↑⍵}dmx.EM
+      :If f1∨f2
+      :AndIf 1 TC.YesOrNo'You are using an outdated version of the Tatin client.',(⎕UCS 13),'Would you like to update automatically?'
+          v←TC.UpdateClient 1
+          ErrNo ⎕SIGNAL⍨'Tatin client updated to ',v,'; please execute the last Tatin user command again'
+      :Else
+          dmx.EM ⎕SIGNAL ErrNo
       :EndIf
     ∇
 

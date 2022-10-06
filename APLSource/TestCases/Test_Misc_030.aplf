@@ -1,0 +1,16 @@
+ r←Test_Misc_030(stopFlag batchFlag);⎕TRAP
+⍝ Exercise `CheckTatinVersion_`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ →T.PassesIf 0=≢'0.75'TC.##.Server.CheckTatinVersion_'0.75'
+ →T.PassesIf 0<≢'0.76'TC.##.Server.CheckTatinVersion_'0.75'
+ →T.PassesIf 0=≢'0.75.1'TC.##.Server.CheckTatinVersion_'0.75.1'
+ →T.PassesIf 0<≢'0.75.2'TC.##.Server.CheckTatinVersion_'0.75.1'
+ →T.PassesIf 0<≢'1.0.0'TC.##.Server.CheckTatinVersion_'2.0.0'
+ →T.PassesIf 0=≢'1.1.0'TC.##.Server.CheckTatinVersion_'1.1.0'
+ →T.PassesIf 0<≢'1.2.0'TC.##.Server.CheckTatinVersion_'1.1.0'
+→T.PassesIf 0<≢'1.2.5'TC.##.Server.CheckTatinVersion_'1.1.2'
+
+ r←T._OK
+⍝Done

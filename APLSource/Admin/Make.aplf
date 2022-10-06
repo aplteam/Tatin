@@ -1,4 +1,4 @@
- {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
@@ -9,6 +9,7 @@
 ⍝ attempted. Also, Tatin is not updated in the MyUCMDs folder then.
  r←⍬
  Assert(⊂batchFlag)∊0 1
+ versionOfAPL←'18.0'
  'Currently we build on Windows only, sorry'Assert'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
  F←##.FilesAndDirs ⋄ C←##.Client ⋄ CFG←##.CiderConfig
  {}F.Cd CFG.HOME
@@ -42,7 +43,7 @@
  F.DeleteFile list
  P←##.APLProcess
  parms←P.CreateParms
- parms.Exe←GetAPLVersion
+ parms.Exe←GetAPLVersion versionOfAPL
  parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
  parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
  parms.CommandLineArgs,←' lx="1 #.Make_.Run 1"'
@@ -66,7 +67,7 @@
  parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" '
  parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
  parms.CommandLineArgs,←' lx="0 #.Make_.Run 2"'
- parms.Exe←GetAPLVersion
+ parms.Exe←GetAPLVersion versionOfAPL
  :If 0          ⍝ Only for analyzing problems:
      parms.CommandLineArgs,←' -exec_setup=0'
      parms.CommandLineArgs,←' -stop_in_setup=1 '

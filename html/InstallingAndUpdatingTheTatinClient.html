@@ -25,8 +25,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#On-setupdyalog">5. On <code>setup.dyalog</code></a>
 <ul>
 <li><a href="#There-is-no-such-script-yet">5.1. There is no such script yet</a></li>
-<li><a href="#There-is-already-such-a-script">5.2. There is already such a script</a>
-</li></ul></li>
+<li><a href="#There-is-already-such-a-script">5.2. There is already such a script</a></li>
+</ul></li>
+<li><a href="#Updating-Tatin">6. Updating Tatin</a>
 </ul>
 </div>
 </nav>
@@ -41,7 +42,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>You don't need to worry about installing Tatin if you use version 19.0 or later of Dyalog: Tatin will be available in <code>⎕SE</code> after a standard installation anyway.</p>
-<p>However, installing and updating is, as far as the Tatin client is concerned, <em>the same thing</em>, because updating the Tatin client basically means removing the old version and installing a new one.</p>
+<p>However, installing and updating is, as far as the Tatin client is concerned, the same thing, because updating the Tatin client basically means removing the old version and installing a new one.</p>
 <div class="h_tag">
 <a href="#Requirements" id="Requirements" class="autoheader_anchor">
 <h2 data-id="Requirements">2. Requirements</h2>
@@ -61,8 +62,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Instructions:</p>
 <ol start="1">
 <li>Download the latest release of the Tatin client from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a></li>
-<li>Unzip it <em>into</em> the <code>MyUCMDs/</code> folder.</li>
+<li>Unzip it into the <code>MyUCMDs/</code> folder — there is now a folder <code>Tatin/</code></li>
 </ol>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
+<div>
+<p>You <em>must not</em> install it into any other folder, even if that folder is scanned by Dyalog for user commands: that would not work.</p>
+<p>However, this might change with a later version.</p>
+</div>
+</div>
+
 <p>Where to find the <code>MyUCMDs/</code> folder depends on your operating system:</p>
 <ul>
 <li>Under Windows call <code>⎕SE.Tatin.GetMyUCMDsFolder''</code></li>
@@ -106,7 +115,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
-<p>If you are not interested in this or use 19.0 or later, skip the rest of this document</p>
+<p>If you are not interested in this or use 19.0 or later, skip this and carry on with “Updating Tatin”.</p>
 </div>
 </div>
 
@@ -114,7 +123,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <div class="leanpub_A">
 <h3>How does <code>setup.dyalog</code> work?</h3>
 <p>The magic behind this is that whenever an instance of Dyalog is fired up it checks whether such a script exists. If that is the case it checks whether there is a function <code>Setup</code>.</p>
-<p>If that is the case it is expected to be a monadic function which will be executed automatically as part of the instantiating process of Dyalog APL.</p>
+<p>If there is such a function then it is expected to be monadic; it will be executed automatically as part of the instantiating process of Dyalog APL.</p>
 <p>This can be used for many things like…</p>
 <ul>
 <li>making changes to the session</li>
@@ -150,7 +159,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
           ⎕SE.⎕EX¨'_Tatin' 'Tatin'
           wspath←(GetMyUCMDsPath),'/Tatin/Client.dws'
           '_Tatin'⎕SE.⎕CY wspath
-          path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
+          path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
           'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
           'Tatin'⎕SE.⎕NS''
           path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
@@ -187,5 +196,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Copy the functions <code>IfAtLeastVersion</code>, <code>GetMyUCMDsPath</code> and <code>AutoLoadTatin</code> from above into your own <code>setup.dyalog</code> script and then make sure that <code>AutoLoadTatin</code> is called from your <code>Setup</code> function.</p>
+<div class="h_tag">
+<a href="#Updating-Tatin" id="Updating-Tatin" class="autoheader_anchor">
+<h2 data-id="Updating-Tatin">6. Updating Tatin</h2>
+</a>
+</div>
+<p>Although you <em>could</em> update your Tatin client by repeating the steps listed under “How to install the Tatin client” there is an easier way to do this: just call the API function <code>⎕SE.Tatin.UpdateClient</code> and pass a zero as right argument. It would execute all necessary steps and eventually tell you the new version number.</p>
+<p>Note that this feature was introduced in 0.77.0, so it's not available in earlier versions.</p>
 </body>
 </html>

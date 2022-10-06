@@ -31,13 +31,14 @@
      ⎕←''
      ⍞←question
      answer←⍞
-     :If answer≡question                        ⍝ Did...  (since version 18.0 trailing blanks are not removed anymore)
-     :OrIf (≢answer)=¯1+≢question               ⍝ ..the ...
-     :OrIf 0=≢answer                            ⍝ ...user..
-     :OrIf question≡(-≢question)↑answer         ⍝...just...
+     :If answer≡question                        ⍝ Did ...  (since version 18.0 trailing blanks are not removed anymore)
+     :OrIf (≢answer)=¯1+≢question               ⍝ ... the ...
+     :OrIf 0=≢answer                            ⍝ ... user ...
+     :OrIf question≡(-≢question)↑answer         ⍝ ... just ...
          dtb←{⍵↓⍨-+/∧\' '=⌽⍵}
          answer2←dtb answer
-     :OrIf answer2≡((-≢answer2)↑(⎕UCS 10){~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question)   ⍝ ...press <enter>?
+     :OrIf answer2≡((-≢answer2)↑(⎕UCS 10){~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question)   ⍝ ... press ...
+     :OrIf answer≡{1↓⊃¯1↑(⍵∊⎕UCS 10 13)⊂⍵}(⎕UCS 10),question ⍝ ... <enter>?
          :If 0≠≢default
              yesOrNo←default
              isOkay←1

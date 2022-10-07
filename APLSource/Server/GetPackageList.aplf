@@ -1,4 +1,4 @@
- response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;uniqueIDs;list;list2;list3;descriptionAndProjecturl;list5;mat;group;msg;buff
+ response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;list5;mat;group;msg;buff
 ⍝ Respond to a request for some or all packages, HTML or JSON
  :If Reg.IsValidPackageName packageID
      :If 0<≢group←EstablishGroup packageID
@@ -34,15 +34,7 @@
          response←request ReturnJSON Reg.JSON data
      :EndIf
  :Else  ⍝ It's a request from a Browser
-     list←Reg.GetAllPackages G.RegistryPath
-     list2←list Reg.ListPackages(G.RegistryPath,packageID)parms
-     list3←Reg.RemoveVersionNumber¨list
-     :If 0=≢uniqueIDs←list2[;1]{⍵[(Reg.RemoveVersionNumber¨⍵)⍳⍺]}⌽,list  ⍝ ⌽ them in order to get the latest description
-         mat←0 3⍴''
-     :Else
-         descriptionAndProjecturl←↑Reg.FetchDescriptionAndPackageProjectUrl¨G.RegistryPath∘,¨uniqueIDs
-         mat←list2,descriptionAndProjecturl
-     :EndIf
+     mat←packageID GetPackageList_ parms
      html←packageID PrepareHtmlPageForPackageList mat
      response←request ReturnHTML html
  :EndIf

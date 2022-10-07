@@ -1,0 +1,10 @@
+ r←{packageID}GetPackageList_ parms;list;list2;list3;uniqueIDs;descriptionAndProjecturl
+ r←0 3⍴''
+ packageID←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'packageID'
+ list←Reg.GetAllPackages G.RegistryPath
+ list2←list Reg.ListPackages(G.RegistryPath,packageID)parms
+ list3←Reg.RemoveVersionNumber¨list
+ uniqueIDs←(⌽,list){⍺[(Reg.RemoveVersionNumber¨⍺)⍳⍵]}list2[;1]     ⍝ ⌽ them in order to get the latest version
+ descriptionAndProjecturl←↑Reg.FetchDescriptionAndPackageProjectUrl¨G.RegistryPath∘,¨uniqueIDs
+ r←list2,descriptionAndProjecturl
+⍝Done

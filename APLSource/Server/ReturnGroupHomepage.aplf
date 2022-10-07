@@ -1,4 +1,5 @@
- response←ReturnGroupHomepage(groupName request);html;htmlFilename;folder;p;parms;email;caption
+ response←ReturnGroupHomepage(groupName request);html;htmlFilename;folder;p;parms;email;caption;data;col1;col2;⎕TRAP
+ ⎕TRAP←0 'S'  ⍝TODO⍝
  response←R.NewResponse request
  p←{'<p>',⍵,'</p>'}
  folder←G.HTDOCS,'../Groups/'
@@ -31,6 +32,22 @@
  parms.title←'You may ',(⎕C caption),' the home page if you can provide a valid password (API-key)'
  html,←⊂parms H.Button caption
  html,←⊂'</form>'
+ data←GetPackagesOfGroup groupName
+ :If 0<≢data
+     html,←⊂'<h3 style="padding-top:1em;">Packages owned by "',groupName,'"</h3>'
+     html,←⊂'<table>'
+     html,←⊂'<thead>'
+   ⍝ html,←'<tr>' '<th>Package name</th>' '<th>Description</th>' '<th>Published</th>' '</tr>'  ⍝ Should we add this?!
+     html,←'<tr>' '<th>Package name</th>' '<th>Description</th>' '</tr>'
+     html,←⊂'</thead>'
+     html,←⊂'<tbody>'
+     col1←{'<td><code>',({'<a href="',Reg.VersionOf_REST,'/packages/major_versions/',⍵,'" title="List major versions">',⍵,'</a>'}⍵),'</code></td>'}¨data[;1]
+     col2←{'<td>',⍵,'</td>'}¨data[;3]
+     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2
+     html,←⊂'</tr>'
+     html,←⊂'</tbody>'
+     html,←⊂'</table>'
+ :EndIf
  html,←⊆GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

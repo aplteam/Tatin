@@ -1,9 +1,29 @@
- response←CreateHomePage request;html;policy
+ response←CreateHomePage request;html;policy;add
 ⍝ Creates the index.html
- html←HtmlHeader''
+⍝ https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html
+ add←''
+ add,←⊂'<style>'
+ add,←⊂'  .install-info{'
+ add,←⊂'    position: relative;'
+ add,←⊂'    max-width: 300px;'
+ add,←⊂'    height: auto;'
+ add,←⊂'    border: 2px solid gray;'
+ add,←⊂'    background-color: #FAEBD7;'
+ add,←⊂'    margin: 10px 20px;'
+ add,←⊂'    padding: 10px 20px;'
+ add,←⊂'    box-sizing: border-box;'
+ add,←⊂'    float: right;'
+ add,←⊂'    font-size: large;'
+ add,←⊂'    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;'
+ add,←⊂'  }'
+ add,←⊂'</style>'
+ html←HtmlHeader add
  html,←⊂'<h2>Main page</h2>'
  html,←AddSpecialMessage ⍬
  html,←⊂'<p>This is the Tatin Registry. It holds packages designed to be used under Dyalog APL.</p>'
+ html,←⊂'<div class="install-info">'
+ html,←⊂'<p>How to <a href="https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html" target=_blank>install a Tatin client</a></p>'
+ html,←⊂'</div>'
  html,←⊂'<nav>'
  html,←⊂'<ol>'
  html,←⊂'<li><a href="',Reg.VersionOf_REST,'/all_packages">List of all packages</a></li>'

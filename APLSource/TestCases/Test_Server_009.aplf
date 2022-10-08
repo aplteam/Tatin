@@ -1,5 +1,5 @@
  r←Test_Server_009(stopFlag batchFlag);⎕TRAP;request;response;folder;noOf;ini;m
-⍝ Send a request that makes the server crash and then look for dump files
+⍝ Send a request that makes the server crash and then check email and look for dump files
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -16,7 +16,7 @@
  response←TC.SendAndReceive'https://localhost'request
 
  →T.PassesIf response.StatusCode≡500
- →T.PassesIf(2+noOf)=≢F.ListFiles folder,'/Errors'
+ →T.PassesIf(2+noOf)=≢F.ListFiles folder,'/Errors'   ⍝ The HTML file and the DCF file
 
  :If ~batchFlag
  :AndIf 'kai'≡⎕AN

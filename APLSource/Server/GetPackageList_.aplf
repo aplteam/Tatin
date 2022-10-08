@@ -4,7 +4,8 @@
  list←Reg.GetAllPackages G.RegistryPath
  list2←list Reg.ListPackages(G.RegistryPath,packageID)parms
  list3←Reg.RemoveVersionNumber¨list
- uniqueIDs←(⌽,list){⍺[(Reg.RemoveVersionNumber¨⍺)⍳⍵]}list2[;1]     ⍝ ⌽ them in order to get the latest version
- descriptionAndProjecturl←↑Reg.FetchDescriptionAndPackageProjectUrl¨G.RegistryPath∘,¨uniqueIDs
- r←list2,descriptionAndProjecturl
+ :If 0<≢uniqueIDs←(⌽,list){⍺[(Reg.RemoveVersionNumber¨⍺)⍳⍵]}list2[;1]     ⍝ ⌽ them in order to get the latest version
+     descriptionAndProjecturl←↑Reg.FetchDescriptionAndPackageProjectUrl¨G.RegistryPath∘,¨uniqueIDs
+     r←list2,descriptionAndProjecturl
+ :EndIf
 ⍝Done

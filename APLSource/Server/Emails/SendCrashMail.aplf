@@ -19,10 +19,9 @@
      mailParms.CC←convert⊃INI.Get'EMAIL:CC'
      domain←⊃INI.Get'EMAIL:Domain'
      mailParms.Subject←domain,' has crashed'
-     mailParms.Body←'Test E-mail' ⍝ Can also be a vector of text vectors
-     parms.Body←⊃INI.Get'EMAIL:Body'
-     parms.Body←'<DOMAIN>'⎕R domain⊣parms.Body
-     parms.Body,←⎕UCS 13 10
+     mailParms.Body←⊃INI.Get'EMAIL:Body'
+     mailParms.Body←'<DOMAIN>'⎕R domain⊣mailParms.Body
+     mailParms.Body,←⎕UCS 13 10
      folder←⊃INI.Get'TRAP:Folder'
      :If 0<≢list←##.F.ListFiles folder,'*.html'
          filename←⊃¯1↑list

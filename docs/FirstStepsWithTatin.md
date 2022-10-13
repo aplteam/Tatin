@@ -275,6 +275,22 @@ A> Note that assets are to be consumed, meaning that a package _**must not**_ wr
 A>
 A> Among several reasons for this one stands out: in cases a package is loaded and caching is on (the default) then the assets folder is shared by all projects/people who also loaded that package.
 
+#### Tatin and Cider
+
+If the project manager [Cider](https://github.com/aplteam/cider) is installed you may take advantage of it:
+
+If you are going to install packages into a project managed by Cider then you may specify a Cider alias in order to identify the first part of the install path.
+
+* If the selected Cider project has only one Tatin folder defined in its config file then that one is taken.
+
+* If there are multiple Tatin folders defined the user is questioned which one she wants to install into.
+
+It is also possible to specify the package folder explicitly:
+
+```
+]Tatin.InstallPackages [tatin]<pkg-name> [<cider-alias/]/my-path
+```
+
 ### Getting a package into the workspace
 
 From the perspective of the application "Foo" all packages are dependencies. Therefore one must issue this command:

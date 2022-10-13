@@ -18,7 +18,7 @@ Every user command comes with at least two levels of help, and a few even with a
 If the third level is available then `-??` shows this at the bottom:
 
 ```
-]{API-Function-name} -??? ⍝ Enter this for examples                                        
+]{user-command} -??? ⍝ Enter this for examples                                        
 ```
 
 

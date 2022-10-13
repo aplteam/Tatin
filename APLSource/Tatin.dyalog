@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.44 - 2022-10-05
+⍝ * 0.45 - 2022-10-12
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -415,7 +415,7 @@
               r←''
               :If 0<≢list  ⍝ Yes, can happen: if in the very first month there are no downloads at all
                   :If 0≡Arg.all
-                      ind←'Please select the file(s) you wish to download:' 1 0 Select list
+                      ind←'Please select the file(s) you wish to download:' 1 0 TC.C.Select list
                       →(0=ind)/0
                   :Else
                       ind←⍳≢list
@@ -450,13 +450,14 @@
       parms.force←0 Args.Switch'force'
       parms.noBetas←0 Args.Switch'nobetas'
       parms.update←1 Args.Switch'update'
+      installFolder←{0≡⍵:'' ⋄ ⍵}installFolder
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       :If 0=≢installFolder←EstablishPackageFolder installFolder
           :Return
       :EndIf
       ('Is not a directory: ',installFolder)Assert TC.F.IsDir installFolder
       :If ~Args.force
-          :If 0=∆YesOrNo'Sure you want act on <',installFolder,'> ?'
+          :If 0=TC.C.YesOrNo'Sure you want act on <',installFolder,'> ?'
               :Return
           :EndIf
       :EndIf
@@ -464,7 +465,7 @@
       deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
       'Dependency file is empty'Assert 0<≢deps
       :If parms.force
-      :OrIf ∆YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
+      :OrIf TC.C.YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
           :Trap ErrNo
               r←parms TC.ReInstallDependencies installFolder registry
           :Else
@@ -536,11 +537,11 @@
           :Else
               msg,←targetPath,'?'
           :EndIf
-      :AndIf 0=1 ∆YesOrNo msg
+      :AndIf 0=1 TC.C.YesOrNo msg
           :Return
       :EndIf
       :If 0=⎕NEXISTS targetPath
-      :AndIf 1 ∆YesOrNo'Target directory does not exist yet; create it?'
+      :AndIf 1 TC.C.YesOrNo'Target directory does not exist yet; create it?'
           TC.F.MkDir targetPath
       :EndIf
       'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
@@ -587,7 +588,7 @@
               msg,←CR,'The package is not e beta release.'
           :EndIf
           msg,←CR,'Are you sure that you want to publish anyway?'
-          :If 0=∆YesOrNo msg
+          :If 0=TC.C.YesOrNo msg
               ⎕←'Publishing cancelled'
               :Return
           :EndIf
@@ -619,7 +620,7 @@
               :AndIf 'Server: The package has already been published'{⍺≡(≢⍺)↑⍵}qdmx.EM
               :AndIf 'Any'≡⎕SE.Tatin.GetDeletePolicy url_
                   packageID←2⊃⎕NPARTS source
-              :AndIf ∆YesOrNo packageID,' already published on ',url_,'; overwrite?'
+              :AndIf TC.C.YesOrNo packageID,' already published on ',url_,'; overwrite?'
                   firstFlag←0
                   (rc msg)←⎕SE.Tatin.DeletePackage url,packageID
                   :If 200=rc
@@ -661,7 +662,7 @@
                   :Return
               :EndIf
               ('Does not exist: ',path)Assert TC.F.IsDir path
-              :If 0=∆YesOrNo'Sure that you want act on: ',path,' ?'
+              :If 0=TC.C.YesOrNo'Sure that you want act on: ',path,' ?'
                   :Return
               :EndIf
           :EndIf
@@ -792,13 +793,13 @@
               'File not found'Assert TC.F.IsFile filename
               msg←'Sure you want to delete "',filename,'" ?'
               :If Arg.quiet
-              :OrIf 0 ∆YesOrNo msg
+              :OrIf 0 TC.C.YesOrNo msg
                   TC.F.DeleteFile filename
               :EndIf
           :Else
               :If 0=TC.F.IsDir path
                   :If Arg.quiet
-                  :OrIf ∆YesOrNo'The directory does not exist yet. Would you like to create it?'
+                  :OrIf TC.C.YesOrNo'The directory does not exist yet. Would you like to create it?'
                       'Could not create the directory'Assert TC.F.MkDir path
                   :Else
                       ⎕←'Cancelled'
@@ -810,7 +811,7 @@
                   newFlag←0
               :Else
                   :If ~Arg.quiet
-                  :AndIf 0=∆YesOrNo'There is no file ',filename,' yet; would you like to create it?'
+                  :AndIf 0=TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
                       ⎕←'Cancelled'
                       :Return
                   :EndIf
@@ -831,7 +832,7 @@
                               :Else
                                   qdmx←⎕DMX
                                   ⎕←qdmx.EM
-                                  :If 0=1 ∆YesOrNo'Would you like to try to fix the problem in the editor? (n=abandon changes)'
+                                  :If 0=1 TC.C.YesOrNo'Would you like to try to fix the problem in the editor? (n=abandon changes)'
                                       ⎕←'Cancelled, no change'
                                   :Else
                                       flag←0
@@ -858,7 +859,7 @@
           'File not found'Assert TC.F.IsFile filename
           msg←'Sure you want to delete the package dependency file in "',filename,'" ?'
           :If Arg.quiet
-          :OrIf 0 ∆YesOrNo msg
+          :OrIf 0 TC.C.YesOrNo msg
               TC.F.DeleteFile filename
           :EndIf
       :ElseIf Arg.edit
@@ -882,15 +883,20 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind
+    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
           :If Arg.quiet
-          :OrIf ∆YesOrNo'No install folder was provided; install into ',TC.F.PWD,' ?'
-              installFolder←TC.F.PWD
-          :Else
-              :Return
+              :If 9=⎕SE.⎕NC'Cider'
+                  openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+                  'There are multiple Cider projects open'Assert 1=≢openCiderProjects
+                  installFolder←2⊃openCiderProjects[1;]
+                  ⍝ We can savely assume that this is a test case - -quiet is designed for this
+                  ⍝ For that reason we assume a package folder "packages":
+                  installFolder←(2⊃openCiderProjects[1;]),'/packages'
+                  ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
+              :EndIf
           :EndIf
       :EndIf
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
@@ -900,18 +906,19 @@
           :If '['=1⍴installFolder
           :AndIf ']'∊installFolder
               installFolder←TranslateCiderAlias installFolder
+              'Cancelled by user'Assert 0<≢installFolder
           :Else
               :If 0=≢installFolder←EstablishPackageFolder installFolder
                   :Return
               :EndIf
-              :If 0=∆YesOrNo'Sure that you want act on: ',installFolder,' ?'
+              :If 0=TC.C.YesOrNo'Sure that you want act on: ',installFolder,' ?'
                   :Return
               :EndIf
           :EndIf
       :EndIf
       :If ~TC.F.IsDir installFolder
           :If Arg.quiet
-          :OrIf 1 ∆YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
+          :OrIf 1 TC.C.YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
               'Create!'TC.F.CheckPath installFolder
           :EndIf
       :EndIf
@@ -927,15 +934,33 @@
       :EndTrap
     ∇
 
-    ∇ installFolder←TranslateCiderAlias installFolder;ind;alias;list
+    ∇ installFolder←TranslateCiderAlias installFolder;ind;alias;list;cfgFilename;cfg;folders
       'Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
       ind←installFolder⍳']'
       alias←(ind↑installFolder)~'[]'
       installFolder←ind↓installFolder
-      list←⎕SE.Cider.ListOpenProjects 1
+      list←⎕SE.Cider.GetAliasFileContent
       'No Cider projects found'Assert 0<≢list
-      ('Alias "',alias,'" does not define an open Cider project')Assert(⊂alias)∊list[;4]
-      installFolder←(AddSlash 2⊃list[list[;4]⍳⊂alias;]),installFolder
+      ('Alias "',alias,'" does not define an open Cider project')Assert(⊂⎕C alias)∊list[;1]
+      :If 0<≢installFolder
+          installFolder←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),installFolder
+      :Else
+          cfgFilename←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),'cider.config'
+          ('No Cider config file found in ',cfgFilename)Assert ⎕NEXISTS cfgFilename
+          cfg←⎕JSON⍠('Dialect' 'JSON5')⊣⊃⎕NGET cfgFilename
+          folders←{⍵↑⍨¯1+⍵⍳'='}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+          'No Tatin folder defined in the Cider config file'Assert 0<≢folders
+          :If 1=≢folders
+              installFolder←(AddSlash 2⊃list[list[;4]⍳⊂⎕C alias;]),⊃folders
+          :Else
+              ind←('Select package install folder for ',alias,':')TC.C.Select folders
+              :If 0=≢ind
+                  installFolder←''
+              :Else
+                  installFolder←(AddSlash 2⊃list[list[;4]⍳⊂⎕C alias;]),ind⊃folders
+              :EndIf
+          :EndIf
+      :EndIf
     ∇
 
     ∇ r←UserSettings Arg;origData;filename;ns;new;buff
@@ -948,9 +973,9 @@
               ⎕←'Cancelled without a change'
           :Else
               :If new≢origData
-              :AndIf 1 ∆YesOrNo'Do you want to save your changes to disk?'
+              :AndIf 1 TC.C.YesOrNo'Do you want to save your changes to disk?'
                   (⊂new)⎕NPUT filename 1
-              :AndIf 1 ∆YesOrNo'Saved! Would you like to refresh the user settings in ⎕SE?'
+              :AndIf 1 TC.C.YesOrNo'Saved! Would you like to refresh the user settings in ⎕SE?'
                   TC.Init ⍬
                   ⎕←'User settings in ⎕SE updated'
               :EndIf
@@ -1019,7 +1044,7 @@
               flag←1
           :Else
               ⎕←r
-              flag←∆YesOrNo'*** Sure that you want delete these from the Tatin package cache?'
+              flag←TC.C.YesOrNo'*** Sure that you want delete these from the Tatin package cache?'
           :EndIf
       :AndIf flag
           (rc report)←TC.ClearCache url
@@ -1049,19 +1074,19 @@
           :AndIf 0<≢(∊json)~' '
               :If ~success←IsValidJSON json
                   msg←'This is not valid JSON; do you want to fix the problem? N=abandon changes'
-                  flag←~∆YesOrNo msg
+                  flag←~TC.C.YesOrNo msg
               :Else
                   (msg json)←CheckFns json path
                   :If 0<≢msg
                       :If ' did not respond'{⍺≡(-≢⍺)↑⍵}msg
-                          :If ∆YesOrNo msg,'; edit again (N=accept the URL as it is) ?'
+                          :If TC.C.YesOrNo msg,'; edit again (N=accept the URL as it is) ?'
                               flag←0
                           :Else
                               newData←json
                               flag←1
                           :EndIf
                       :Else
-                          flag←~1 ∆YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
+                          flag←~1 TC.C.YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
                       :EndIf
                   :Else
                       flag←1
@@ -1095,7 +1120,7 @@
           :AndIf 0<≢(∊txt)~' '
               :If 0<≢msg←CheckFns txt
                   ⎕←msg
-                  flag←~∆YesOrNo'Woulde you like to fix the problem? (N=abandon changes)'
+                  flag←~TC.C.YesOrNo'Woulde you like to fix the problem? (N=abandon changes)'
               :Else
                   flag←1
                   newData←txt
@@ -1262,8 +1287,10 @@
               r,←HelpOnPackageID ⍬
               r,←⊂''
               r,←⊂'B) Second argument'
-              r,←⊂'The second argument must be the path to a folder into which the packages are'
-              r,←⊂'going to be installed.'
+              r,←⊂'The second argument must be one of:'
+              r,←⊂' * Path to a folder into which the packages are going to be installed'
+              r,←⊂' * A Cider alias specifying a project'
+              r,←⊂''
               r,←⊂''
               r,←⊂'In case the second argument is relative Tatin checks whether there are open Cider projects.'
               r,←⊂'If there is just one, it is assumed that the installation should take place there.'
@@ -1620,8 +1647,8 @@
 
     ∇ r←HelpOnPackageID dummy
       r←''
-      r,←⊂'You may specify an alias for a package by putting it to the front and separate'
-      r,←⊂'it with an @.'
+      r,←⊂'You may specify a Tatin alias for a package by putting it to the front and'
+      r,←⊂'separate it with an @.'
       r,←⊂''
       r,←⊂'Note that if neither a Registry nor a ZIP file is specified but just a package ID'
       r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
@@ -1638,61 +1665,6 @@
       r,←⊂' * Either a full path or an http[s] URL in front of the package ID.'
       r,←⊂''
       r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
-    ∇
-
-    ∇ yesOrNo←{default}∆YesOrNo question;isOkay;answer;add;dtb;answer2
-    ⍝ Asks a simple question and allows just "Yes" or "No" as answers.
-    ⍝ You may specify a default via the optional left argument which when specified
-    ⍝ rules what happens when the user just presses <enter>.
-    ⍝ `default` must be either 1 (yes) or 0 (no).
-    ⍝ Note that this function does NOT work as expected when traced!
-      isOkay←0
-      default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
-      isOkay←0
-      :If 0≠≢default
-          'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠≢default
-      :AndIf ~default∊0 1
-          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 11
-      :EndIf
-      :If 0=≢default
-          add←' (y/n) '
-      :Else
-          :If default
-              add←' (Y/n) '
-          :Else
-              add←' (y/N) '
-          :EndIf
-      :EndIf
-      :If 1<≡question
-          ((≢question)⊃question)←((≢question)⊃question),add
-          question←⍪question
-      :Else
-          question←question,add
-      :EndIf
-      :Repeat
-          ⎕←''
-          ⍞←question
-          answer←⍞
-          :If answer≡question                        ⍝ Did ...  (since version 18.0 trailing blanks are not removed anymore)
-          :OrIf (≢answer)=¯1+≢question               ⍝ ... the ...
-          :OrIf 0=≢answer                            ⍝ ... user ...
-          :OrIf question≡(-≢question)↑answer         ⍝ ... just ...
-              dtb←{⍵↓⍨-+/∧\' '=⌽⍵}
-              answer2←dtb answer
-          :OrIf answer2≡((-≢answer2)↑(⎕UCS 10){~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question)   ⍝ ... press ...
-          :OrIf answer≡{1↓⊃¯1↑(⍵∊⎕UCS 10 13)⊂⍵}(⎕UCS 10),question ⍝ ... <enter>?
-              :If 0≠≢default
-                  yesOrNo←default
-                  isOkay←1
-              :EndIf
-          :Else
-              answer←¯1↑{⍵↓⍨-+/∧\' '=⌽⍵}answer
-              :If answer∊'YyNn'
-                  isOkay←1
-                  yesOrNo←answer∊'Yy'
-              :EndIf
-          :EndIf
-      :Until isOkay
     ∇
 
     ∇ errMsg←CheckDependencies txt;f1;f2;f3;f
@@ -1763,7 +1735,7 @@
       r←,⊃1↑(+/'⎕SE'{∧\⍺∘≡¨(≢⍺)↑¨⍵}NSI)↓NSI,'#'
       :If ~'['∊r   ⍝ Might be called from an instance of a class
       :AndIf (,'#')≢r
-          ind←'Select target space the package(s) shall be loaded into:'Select,¨'#'(⍕r)
+          ind←'Select target space the package(s) shall be loaded into:'TC.C.Select,¨'#'(⍕r)
           :If 0=≢ind
               r←''
           :Else
@@ -1772,54 +1744,6 @@
       :EndIf
     ∇
 
-    ∇ index←{x}Select options;flag;answer;question;value;bool;⎕ML;⎕IO;manyFlag;mustFlag;caption
-    ⍝ Presents `options` as a numbered list and allows the user to select either exactly one or multiple ones.\\
-    ⍝ One is the default.\\
-    ⍝ The optional left argument allows you to specify more (positional) options:
-    ⍝ * `caption` is shown above the options.
-    ⍝ * `manyFlag` defaults to 0 (meaning just one item might be selected) or 1, in which case multiple items can be specified.
-    ⍝ * `mustFlag` forces the user to select at least one  option.
-    ⍝ `options` must not have more than 999 items.
-    ⍝ If the user aborts by entering nothing or a "q" (for "quit") `index will be `⍬`.
-      x←{0<⎕NC ⍵:⊆⍎⍵ ⋄ ''}'x'
-      (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
-      ⎕IO←1 ⋄ ⎕ML←1
-      'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL ErrNo/⍨2≠≡options
-      'Right argument has more than 999 items'⎕SIGNAL ErrNo/⍨999<≢options
-      flag←0
-      :Repeat
-          ⎕←{⍵↑'--- ',caption,((0≠≢caption)/' '),⍵⍴'-'}⎕PW-1
-          ⎕←⍪{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳≢⍵),¨⍵}options
-          ⎕←''
-          question←'Select one ',(manyFlag/'or more '),'item',((manyFlag)/'s'),' '
-          question,←((manyFlag∨~mustFlag)/'('),((~mustFlag)/'q=quit'),((manyFlag∧~mustFlag)/', '),(manyFlag/'a=all'),((manyFlag∨~mustFlag)/')'),' :'
-          :If 0<≢answer←⍞,0/⍞←question
-              answer←(⍴question)↓answer
-              :If 1=≢answer
-              :AndIf answer∊'Qq',manyFlag/'Aa'
-                  :If answer∊'Qq'
-                      :If 0=mustFlag
-                          index←⍬
-                          flag←1
-                      :EndIf
-                  :Else
-                      index←⍳≢options
-                      flag←1
-                  :EndIf
-              :Else
-                  (bool value)←⎕VFI answer
-                  :If ∧/bool
-                  :AndIf manyFlag∨1=+/bool
-                      value←bool/value
-                  :AndIf ∧/value∊⍳⍴options
-                      index←value
-                      flag←0≠≢index
-                  :EndIf
-              :EndIf
-          :EndIf
-      :Until flag
-      index←{1<≢⍵:⍵ ⋄ ⊃⍵}⍣(⍬≢index)⊣index
-    ∇
 
     ∇ r←GetListOfRegistriesForSelection type
       :If 0<≢r←TC.ListRegistries type
@@ -1833,7 +1757,7 @@
       :If 1=≢list←GetListOfRegistriesForSelection type
           registry←1⊃list[1;]
       :Else
-          :If ⍬≡row←'Select Tatin Registry'all Select↓⎕FMT list[;2 1]
+          :If ⍬≡row←'Select Tatin Registry'all TC.C.Select↓⎕FMT list[;2 1]
               registry←⍬
           :Else
               :If all
@@ -1865,7 +1789,7 @@
               flag←1
           :Else
               :If {0::1 ⋄ 0⊣JSON ⍵}{b←';'≠⊃¨d←(⎕UCS 10)(≠⊆⊢)⍵ ⋄ 1↓⊃,/(⎕UCS 10),¨b/d}ns.UserSettings
-                  :If ~1 ∆YesOrNo'The JSON is invalid; would you like to edit it again? ("N"=drop out without change)'
+                  :If ~1 TC.C.YesOrNo'The JSON is invalid; would you like to edit it again? ("N"=drop out without change)'
                       r←''
                       flag←1
                   :EndIf
@@ -1909,7 +1833,7 @@
                   :If quietFlag
                       ('Folder does not exist: ',folder)⎕SIGNAL ErrNo
                   :Else
-                      ind←'For which project?'Select↓⍕list
+                      ind←'For which project?'TC.C.Select↓⍕list
                       :If 0=≢ind
                           folder←0⍴⎕←'Cancelled by user'
                       :Else
@@ -1932,7 +1856,7 @@
       ⍝ Workaround for Client and Server being out of sync after injecting the originally missing "an" into the message:
       f2←'Server: Request came from invalid version of Tatin. Minimum version required'{⍺≡(≢⍺)↑⍵}dmx.EM
       :If f1∨f2
-      :AndIf 1 TC.YesOrNo'You are using an outdated version of the Tatin client.',(⎕UCS 13),'Would you like to update automatically?'
+      :AndIf 1 TTC.C.YesOrNo'You are using an outdated version of the Tatin client.',(⎕UCS 13),'Would you like to update automatically?'
           v←TC.UpdateClient 1
           ErrNo ⎕SIGNAL⍨'Tatin client updated to ',v,'; please execute the last Tatin user command again'
       :Else

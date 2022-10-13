@@ -1,4 +1,5 @@
- html←PrepareHtmlPageForTagList list;noOfCols
+ html←PrepareHtmlPageForTagList list;noOfCols;⎕TRAP
+ ⎕TRAP←0 'S'
  html←HtmlHeader''
  html,←⊂'<h2>List of all tags</h2>'
  html,←AddSpecialMessage ⍬
@@ -9,6 +10,7 @@
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
  :If 0<≢list
+     html,←AddJavaScript list
      html,←{'<tr><td>',⍵,'</td></tr>'}¨list
  :EndIf
  html,←⊂'</tbody>'

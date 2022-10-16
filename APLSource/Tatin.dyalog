@@ -1116,7 +1116,7 @@
           :If origData≢temp.⍎name
               txt←⊆temp.⍎name
               txt←(0<≢¨txt)/txt
-              txt{TC.A.(dlb dtb)⍵}¨txt
+              txt{TC.A.(DLB DTB)⍵}¨txt
           :AndIf 0<≢(∊txt)~' '
               :If 0<≢msg←CheckFns txt
                   ⎕←msg

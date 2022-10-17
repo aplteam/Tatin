@@ -13,7 +13,7 @@ Every user command comes with at least two levels of help, and a few even with a
 
 1. `-?` shows a brief description and the syntax
 2. `-??` shows a detailed description of the command and its arguments and options
-3. `-???` shows examples (for some commands)
+3. `-???` shows examples (only available for some commands)
 
 If the third level is available then `-??` shows this at the bottom:
 
@@ -606,6 +606,11 @@ Returns a two-item vector:
 Note that removing the directories hosting the packages might fail for all sorts of reasons even
 though the package and any dependencies were already successfully removed from both the dependency
 file and the build list.
+
+### UpdateClient      
+
+The function that is eventually called by `]TATIN.UpdateTatin`. It installs a later version of Tatin and loads it into `⎕SE` and finally initialises Conga again.
+
 
 ### Version              
 

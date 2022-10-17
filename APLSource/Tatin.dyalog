@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.45 - 2022-10-12
+⍝ * 0.47 - 2022-10-17
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -98,7 +98,7 @@
           c←⎕NS ⍬
           c.Name←'Version'
           c.Desc←'Prints name, version number and version date of the client to the session'
-          c.Parse←'1s -check'
+          c.Parse←'1s -check -all'
           r,←c
      
           c←⎕NS ⍬
@@ -141,6 +141,12 @@
           c.Name←'UnInstallPackage'
           c.Desc←'Un-installs a package, and implicitly its dependencies'
           c.Parse←'2s -cleanup -quiet'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'UpdateTatin'
+          c.Desc←'Attempts to update the client and reports the result'
+          c.Parse←''
           r,←c
      
           c←⎕NS ⍬
@@ -218,10 +224,12 @@
      ⍝Done
     ∇
 
-    ∇ r←Version Arg;⎕TRAP;registries;registry;alias;qdmx
-      ⎕TRAP←0 'S'
-      :If 0≡Arg.check
+    ∇ r←Version Arg;registries;registry;alias;qdmx
+      :If Arg.check
+          r←1 TC.GetServerVersion Arg._1
+      :Else
           :If (,'*')≡,Arg._1
+          :OrIf Arg.all
               r←⊂(⊂'{Client}'),TC.Reg.Version
               registries←1 TC.ListRegistries 0
               :For registry alias :In ↓registries[;1 2]
@@ -243,8 +251,6 @@
           :Else
               r←TC.GetServerVersion Arg._1
           :EndIf
-      :Else
-          r←1 TC.GetServerVersion Arg._1
       :EndIf
     ∇
 
@@ -269,6 +275,10 @@
       :Else
           r,←(⎕UCS 13),'      ]Tatin.PackageConfig ',Arg._1,' -edit'
       :EndIf
+    ∇
+
+    ∇ {r}←UpdateTatin Arg;path;filename
+      r←⎕SE._Tatin.Client.UpdateClient 0
     ∇
 
     ∇ r←ListPackages Arg;registry;parms;buff;qdmx
@@ -1182,7 +1192,7 @@
               r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name> [-date]'
           :Case ⎕C'Version'
               r,←⊂'Print name, version number and version date of Tatin to the session.'
-              r,←'' '  ]Tatin.Version'
+              r,←'' '  ]Tatin.Version [*] [-check] [-all]'
           :Case ⎕C'ListTags'
               r,←⊂'List all unique tags as defined in all packages on a server, sorted alphabetically.'
               r,←'' '  ]Tatin.ListTags [<Registry-URL>] [-tags=]'
@@ -1213,6 +1223,9 @@
           :Case ⎕C'UsageData'
               r,←⊂'Make package usage data available.'
               r,←'' '  ]Tatin.UsageData [Registry-alias|Registry-URL] -download -all -folder='
+          :Case ⎕C'UpdateTatin'
+              r,←⊂'Attempts to update the Tatin client and reports the result'
+              r,←'' '  ]Tatin.UpdateTatin'
           :EndSelect
           :If 'Version'≢Cmd
               r,←''(']Tatin.',Cmd,' -?? ⍝ Enter this for more information ')
@@ -1423,9 +1436,10 @@
           :Case ⎕C'Version'
               r,←⊂'Prints name, version number and version date of Tatin to the session.'
               r,←⊂''
-              r,←⊂' * Specify a URL or an alias if you are after the version number of a Tatin server'
-              r,←⊂' * Specify "*" if you are after the version numbers of the client and all Tatin servers'
-              r,←⊂' * Specify "?" if you want to be prompted with a list of all available Registries'
+              r,←⊂' * Specify a URL or an alias if you are after the version number of a particular Tatin Registry'
+              r,←⊂' * Specify "*" for all version numbers of the client and all known Tatin Registries; see also -all'
+              r,←⊂' * Specify -all if you want to be prompted with a list of all available Tatin Registries; see also "*"'
+              r,←⊂' * Specify "?" if you want to be prompted with a list of all available Tatin Registries'
               r,←⊂''
               r,←⊂'If you want to compare the version you are using locally with what is used on the principal'
               r,←⊂'Tatin server then specify the -check flag. Any argument is then ignored.'
@@ -1563,6 +1577,8 @@
               r,←⊂'-unzip    Specify this if you want Tatin to unzip the downloaded file(s).'
               r,←⊂'          The ZIP files will be deleted afterwards. Ignored when -download is not specified.'
               r,←⊂'-all      This circumvents the selection dialog; mainly useful for test cases.'
+          :Case ⎕C'UpdateTatin'
+              r,←⊂'Attempts to update the Tatin client and reports the result.'
           :Else
               r←'Unknown command: ',Cmd
           :EndSelect
@@ -1852,11 +1868,11 @@
 
     ∇ {r}←CheckForInvalidVersion dmx;v;f2;f1
       r←0
-      f1←'Server: Request came from an invalid version of Tatin. Minimum version required'{⍺≡(≢⍺)↑⍵}dmx.EM
+      f1←'Server: Request came from an invalid version of Tatin.'{⍺≡(≢⍺)↑⍵}dmx.EM
       ⍝ Workaround for Client and Server being out of sync after injecting the originally missing "an" into the message:
-      f2←'Server: Request came from invalid version of Tatin. Minimum version required'{⍺≡(≢⍺)↑⍵}dmx.EM
+      f2←'Server: Request came from invalid version of Tatin.'{⍺≡(≢⍺)↑⍵}dmx.EM
       :If f1∨f2
-      :AndIf 1 TTC.C.YesOrNo'You are using an outdated version of the Tatin client.',(⎕UCS 13),'Would you like to update automatically?'
+      :AndIf 1 TC.C.YesOrNo'You are using an outdated version of the Tatin client.',(⎕UCS 13),'Would you like to update automatically?'
           v←TC.UpdateClient 1
           ErrNo ⎕SIGNAL⍨'Tatin client updated to ',v,'; please execute the last Tatin user command again'
       :Else

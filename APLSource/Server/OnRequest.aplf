@@ -11,7 +11,7 @@
              ⎕TRAP←0 'S'
          :EndIf
          :If 0<≢logMsg←CheckTatinVersion request
-         :AndIf 'v1/version'≢⎕C request.Method
+         :AndIf 'v1/version'≢⎕C{('/'=⊃⍵)↓⍵}request.Path
              response←request Respond 400 0
              response.Content←logMsg
          :Else

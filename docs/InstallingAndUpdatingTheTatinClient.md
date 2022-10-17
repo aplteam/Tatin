@@ -163,8 +163,18 @@ Create one that looks like this:
 
 Copy the functions `IfAtLeastVersion`, `GetMyUCMDsPath` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
 
+
 ## Updating Tatin
 
-Although you _could_ update your Tatin client by repeating the steps listed under "How to install the Tatin client" there is an easier way to do this: just call the API function `⎕SE.Tatin.UpdateClient` and pass a zero as right argument. It would execute all necessary steps and eventually tell you the new version number.
+Although you _could_ update your Tatin client by repeating the steps listed under "How to install the Tatin client" there is an easier way to do this; just execute:
 
-Note that this feature was introduced in 0.77.0, so it's not available in earlier versions.
+
+```
+]Tatin.UpdateClient
+````
+
+If there is a later version available all necessary steps will be executed; eventually the new version number will be reported.
+
+Note that this feature was introduced in 0.78.1, so it's not available in earlier versions.
+
+The API equivalent `⎕SE.Tatin.Update 0` however was introduced in 0.78.0.

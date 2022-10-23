@@ -18,13 +18,11 @@
  cfg←ValidateAPI cfg
  cfg←ValidateDocumentation cfg
  cfg←ValidateMaintainer cfg
- :If 0=initializeFlag
-     :If 0<≢assets←{0=≢⍵:⍵ ⋄ ','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
-         assets←path∘PolishAssetsPaths¨assets
-         {}{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}assets
-         {}path∘CheckAssetsExist¨assets
-         cfg.assets←⊃{⍺,',',⍵}/assets
-     :EndIf
+ :If 0<≢assets←{0=≢⍵:⍵ ⋄ ','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
+     assets←path∘PolishAssetsPaths¨assets
+     {}{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}assets
+     {}path∘CheckAssetsExist¨assets
+     cfg.assets←⊃{⍺,',',⍵}/assets
  :EndIf
  cfg2←InitPackageConfig cfg
  'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg2.name

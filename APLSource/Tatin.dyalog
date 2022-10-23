@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.47 - 2022-10-17
+⍝ * 0.48 - 2022-10-17
 
     ⎕IO←1 ⋄ ⎕ML←1
 

@@ -1,12 +1,18 @@
- ValidateTags←{
-     cfg←⍵
-     tags←cfg.tags
-     tags←⎕C tags
-     tags←','@(⍸';'=tags)⊣tags
-     b←tags∊(⎕C ⎕A),⎕D,' -∆⍙,'
-     ∧/b:cfg⊣cfg.tags←tags
+ cfg←ValidateTags cfg;tags;b;plural;msg;tags_
+ tags←cfg.tags
+ tags←⎕C tags
+ tags←','@(⍸';'=tags)⊣tags
+ b←tags∊(⎕C ⎕A),⎕D,' -∆⍙,'
+ :If ~∧/b
      b←~b
      plural←(1<+/b)/'s'
      msg←'Package propert',((1+1<+/b)⊃'y' 'ies'),' "tag',plural,'" contains ',((1=+/b)/'an '),'invalid character',plural,': ',(b/tags)
-     msg Assert 0:
- }
+     msg Assert 0
+ :EndIf
+ tags_←' '~⍨¨','(≠⊆⊢)tags
+ :If 0=+/'mac-os' 'windows' 'linux'∊tags_
+     msg←'None of "mac-os", "windows" and "linux" is defined, that can''t be right!'
+     msg Assert 0
+ :EndIf
+ cfg.tags←tags
+⍝Done

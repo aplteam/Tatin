@@ -1,4 +1,4 @@
- r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;bool;ind
+ r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;ind
 ⍝ `path` must point to a folder with installed packages, meaning that there
 ⍝ must be a file apl-buildlist.json available. This is mandatory.
 ⍝ The optional left argument can carry flags as a single integer:
@@ -25,21 +25,16 @@
  buildFilename←path,Reg.BuildListFilename
  ('File not found: ',buildFilename)Assert F.IsFile buildFilename
  buildList←Reg.JSON⊃F.NGET buildFilename
- :If bool←(∨/IsHTTP¨buildList.url)∧0∊(RemovePackageID¨buildList.url)∊{⍵[;1]⌿⍨⍵[;4]>0}(1 ListRegistries'')
-     CloseConnections 1
-     0 Assert⍨'The build list carries entries that are not on the Tatin Registry search path'
- :Else
-     EstablishEmptyPermanentConnections 0
-     :If 0<≢buildList.packageID
-         r←↑majorVersions CheckForLaterVersion_¨(dependencies⌈buildList.principal)/buildList.packageID
-         r,←' '
-         r,←r[;3]
-         r[;3]←(dependencies∨buildList.principal)⌿buildList.url
-         r[;3 5]←{IsHTTP ⍵:⍵ ⋄ 0=≢⍵~' ':'' ⋄ 'expand'F.NormalizePath ⍵}¨r[;3 5]
-         r[;4]←(⊃¨{⍺,⍵}/¨↓r[;3 1])≢¨(⊃¨{⍺,⍵}/¨↓r[;5 2])
-         :If 0<≢ind←⍸~r[;4]
-             r[ind;5]←⊂''
-         :EndIf
+ EstablishEmptyPermanentConnections 0
+ :If 0<≢buildList.packageID
+     r←↑majorVersions CheckForLaterVersion_¨(dependencies⌈buildList.principal)/buildList.packageID
+     r,←' '
+     r,←r[;3]
+     r[;3]←(dependencies∨buildList.principal)⌿buildList.url
+     r[;3 5]←{IsHTTP ⍵:⍵ ⋄ 0=≢⍵~' ':'' ⋄ 'expand'F.NormalizePath ⍵}¨r[;3 5]
+     r[;4]←(⊃¨{⍺,⍵}/¨↓r[;3 1])≢¨(⊃¨{⍺,⍵}/¨↓r[;5 2])
+     :If 0<≢ind←⍸~r[;4]
+         r[ind;5]←⊂''
      :EndIf
      CloseConnections 0
  :EndIf

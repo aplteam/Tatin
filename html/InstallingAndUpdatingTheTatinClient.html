@@ -144,7 +144,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       r←⍬
       ⎕IO←1 ⋄ ⎕ML←1
       :Trap ⎕SE.SALTUtils.DEBUG↓0
-          AutoloadTatin ⍬
+          ⎕←AutoloadTatin ⎕SE.SALTUtils.DEBUG
       :Else
           dmx←⎕DMX
           ⎕←'Setup.dyalog has a problem and was not executed successfully:'
@@ -152,18 +152,25 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       :EndTrap
     ∇
 
-    ∇ {r}←AutoloadTatin dummy;wspath;path2Config
-      r←⍬
-      :If IfAtLeastVersion 18
-      :AndIf 80=⎕DR' '              ⍝ Not in "Classic"
-          ⎕SE.⎕EX¨'_Tatin' 'Tatin'
-          wspath←(GetMyUCMDsPath),'/Tatin/Client.dws'
-          '_Tatin'⎕SE.⎕CY wspath
-          path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
-          'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
-          'Tatin'⎕SE.⎕NS''
-          path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
-      :EndIf
+    ∇ r←AutoloadTatin debug;wspath;path2Config
+      r←0 0⍴''
+      :Trap debug/0
+          :If ~IfAtLeastVersion 18
+              r←'Tatin not loaded: not compatible with this version of Dyalog'
+          :ElseIf 80≠⎕DR' '              ⍝ Not in "Classic"
+              r←'Tatin not loaded: not compatible with Classic'
+          :Else
+              ⎕SE.⎕EX¨'_Tatin' 'Tatin'
+              wspath←GetMyUCMDsFolder '/Tatin/Client.dws'
+              '_Tatin'⎕SE.⎕CY wspath
+              path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
+              'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
+              'Tatin'⎕SE.⎕NS''
+              path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+          :EndIf
+      :Else
+          r←'Attempt to load Tatin failed with ',⎕DMX.EM
+      :EndTrap
     ∇
 
       IfAtLeastVersion←{
@@ -195,7 +202,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="There-is-already-such-a-script">5.2. There is already such a script</h3>
 </a>
 </div>
-<p>Copy the functions <code>IfAtLeastVersion</code>, <code>GetMyUCMDsPath</code> and <code>AutoLoadTatin</code> from above into your own <code>setup.dyalog</code> script and then make sure that <code>AutoLoadTatin</code> is called from your <code>Setup</code> function.</p>
+<p>Copy the functions <code>IfAtLeastVersion</code>, <code>GetMyUCMDsFolder</code> and <code>AutoLoadTatin</code> from above into your own <code>setup.dyalog</code> script and then make sure that <code>AutoLoadTatin</code> is called from your <code>Setup</code> function.</p>
 <div class="h_tag">
 <a href="#Updating-Tatin" id="Updating-Tatin" class="autoheader_anchor">
 <h2 data-id="Updating-Tatin">6. Updating Tatin</h2>

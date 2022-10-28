@@ -44,7 +44,8 @@
          :If IsValidPackageID_WithoutPatchNo id
              r←({⍵/⍨2>+\'-'=⍵}path),'-',r
          :ElseIf IsValidPackageID_WithMajorNo id
-             r←({⍵/⍨2>+\'-'=⍵}path),'-',r
+             (path buff)←2↑⎕NPARTS path
+             r←path,({⍵/⍨2>+\'-'=⍵}buff),'-',r
          :Else
              r←((-≢id)↓path),({⍵/⍨2>+\'-'=⍵}id),'-',r
          :EndIf

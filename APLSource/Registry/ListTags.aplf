@@ -1,8 +1,8 @@
- list←ListTags(uri parms);registryPath;tagList;search;bool;fuzzy;bool_;IDs;search_
-⍝ Returns either a list with all tags or, in case `parms.tags` is not empty,
+ data←ListTags(uri parms);registryPath;tagList;search;bool;fuzzy;bool_;IDs;search_
+⍝ Returns either a data with all tags or, in case `parms.tags` is not empty,
 ⍝ all tags of all packages that carry the tags specified in `parms`.
  'No registry specified'Assert 0<≢uri
- list←0 2⍴''
+ data←0 2⍴''
  registryPath←F.ExpandPath uri
  'Neither an alias nor a path?!'Assert F.IsDir registryPath
  tagList←GetTags registryPath
@@ -18,8 +18,8 @@
          tagList←(~tagList[;2]∊search_)⌿tagList
      :EndIf
      :If 0<≢tagList
-         list←∪tagList[;2]
-         list←list[⍋list]
+         data←{⍺,≢⍵}⌸tagList[;2]
+         data←data[⍋data[;1];]
      :EndIf
  :EndIf
 ⍝Done

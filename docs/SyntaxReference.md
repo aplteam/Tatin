@@ -381,11 +381,12 @@ list←{parms} ListTags y
 
 `y` might be URL of a Tatin server or a Registry alias (embraced by `[]`).
 
-By default all tags of all packages are returned.
+By default all tags of all packages are returned as a two-column matrix:
 
-Optionally `⍺` can be specified. Must be a namespace that might contain a variable `tags` which
-may specify one or more tags (simple comma-separated text vector). If that is the case only
-the tags shared by the packages that carry all of the specified tags will be returned.
+* `[;1]` carries the name of the tags
+* `[;2]` carries the number of occurencies of that tag
+
+Optionally `⍺` can be specified. Must be a namespace that might contain a variable `tags` which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carry all of the specified tags will be returned.
 
 ### ListVersions         
 

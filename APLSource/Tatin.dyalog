@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.48 - 2022-10-17
+⍝ * 0.49 - 2022-10-27
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -49,8 +49,8 @@
      
           c←⎕NS ⍬
           c.Name←'ListVersions'
-          c.Desc←'Lists all versions of the specified package'
-          c.Parse←'1 -date'
+          c.Desc←'Lists all versions of the specified package or all versions of a particular Registry'
+          c.Parse←'1s -date'
           r,←c
      
           c←⎕NS ⍬
@@ -323,7 +323,7 @@
               r(AddHeader)←'Package-ID' 'Principal'
           :Else
               :If 0≡parms.date
-                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Info URL')
+                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'∑ major versions'),(⊂'Info URL')
               :Else
                   r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Info URL'
               :EndIf
@@ -716,27 +716,49 @@
           parms.tags←Arg.tags
       :EndIf
       :Trap ErrNo
-          r←⍪({⍵((≢⍵)⍴'-')}'All tags from ',registry),parms TC.ListTags registry
+          r←⍪({⍵((≢⍵)⍴'-')}'All tags from ',registry),{⍵[;1]}parms TC.ListTags registry
       :Else
           qdmx←⎕DMX
           CheckForInvalidVersion qdmx
       :EndTrap
     ∇
 
-    ∇ r←ListVersions Arg;qdmx;dateFlag
+    ∇ r←ListVersions Arg;qdmx;dateFlag;buff;caption;ind;arg
       dateFlag←Arg.Switch'date'
+      arg←Arg._1
       :Trap ErrNo
+          :If 0≡arg
+              arg←'[tatin]'  ⍝ Default is the principal Registry
+          :ElseIf (⊂,arg)∊,¨'?' '[?' '[?]'
+              buff←{⍵[;1 2]}TC.ListRegistries 0
+              ind←'Please select a Registry:'TC.C.Select↓⎕FMT buff
+              :If 0=≢ind
+                  r←'Cancelled by user'
+                  :Return
+              :Else
+                  arg←1⊃buff[ind;]
+              :EndIf
+          :EndIf
           :If dateFlag
-              r←dateFlag TC.ListVersions Arg._1
+              r←dateFlag TC.ListVersions arg
               r[;2]←TC.Reg.FormatFloatDate¨r[;2]
           :Else
-              r←(⍪↓('All versions of ',Arg._1,':'),[0.5]'-')⍪TC.ListVersions Arg._1
+              buff←TC.ListVersions arg
+              :If 2=2⊃⍴buff  ⍝ Then the argument was a package, not a URL
+                  caption←1 2⍴('*** All versions of package <',arg,'> :')' '
+                  caption⍪←' Registry' 'Package'
+                  caption⍪←{(-⍵)↑¨(¯1 0+⍵)⍴¨'-'}≢¨caption[2;]
+                  buff[;1]←' ',¨buff[;1]
+                  r←caption⍪buff
+              :Else
+                  r←(⍪↓('All versions of <',arg,'> :'),[0.5]'-')⍪' ',¨buff
+              :EndIf
           :EndIf
       :Else
           qdmx←⎕DMX
           CheckForInvalidVersion qdmx
           :If 0=≢qdmx.EM
-              ('Not found: ',Arg._1)⎕SIGNAL ErrNo
+              ('Not found: ',arg)⎕SIGNAL ErrNo
           :Else
               qdmx.EM ⎕SIGNAL ErrNo
           :EndIf
@@ -918,7 +940,7 @@
               installFolder←TranslateCiderAlias installFolder
               'Cancelled by user'Assert 0<≢installFolder
           :Else
-              :If 0=≢installFolder←EstablishPackageFolder installFolder
+              :If 0=≢installFolder←EstablishPackageFolder{0≡⍵:'' ⋄ ⍵}installFolder
                   :Return
               :EndIf
               :If 0=TC.C.YesOrNo'Sure that you want act on: ',installFolder,' ?'
@@ -1185,16 +1207,16 @@
               r,←⊂'Create a ZIP file that is a package from the directory.'
               r,←'' '  ]Tatin.Pack [<package-folder>] [<target-folder>]'
           :Case ⎕C'PublishPackage'
-              r,←⊂'Publish a package to a particular Tatin Server.'
+              r,←⊂'Publish a package to a particular Tatin Registry.'
               r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> <Registry-URL|[Registry-Alias]> [-quiet]'
           :Case ⎕C'ListVersions'
-              r,←⊂'List all versions of the given package.'
+              r,←⊂'List all versions of the given package or all versions of all packages of a given Registry'
               r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name> [-date]'
           :Case ⎕C'Version'
               r,←⊂'Print name, version number and version date of Tatin to the session.'
               r,←'' '  ]Tatin.Version [*] [-check] [-all]'
           :Case ⎕C'ListTags'
-              r,←⊂'List all unique tags as defined in all packages on a server, sorted alphabetically.'
+              r,←⊂'List all unique tags as defined in all packages on a Registry, sorted alphabetically.'
               r,←'' '  ]Tatin.ListTags [<Registry-URL>] [-tags=]'
           :Case ⎕C'Init'
               r,←⊂'(Re-)Establish the user settings in ⎕SE.'
@@ -1206,7 +1228,7 @@
               r,←⊂'Delete a given package from a Tatin Registry.'
               r,←'' '  ]Tatin.DeletePackage <([Registry-alias|Registry-URL|file://package-folder)package-ID)>'
           :Case ⎕C'GetDeletePolicy'
-              r,←⊂'Request which "Delete" policy is operated by a server.'
+              r,←⊂'Request which "Delete" policy is operated by a Registry.'
               r,←'' '  ]Tatin.GetDeletePolicy [<Registry-URL>]'
           :Case ⎕C'Documentation'
               r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
@@ -1215,8 +1237,8 @@
               r,←⊂'ReInstall all packages installed in a folder from scratch.'
               r,←'' '  ]Tatin.ReInstallDependencies <install-folder> [Registry-URL|Registry-alias] [-force] [-dry] [-nobeta] [-update]'
           :Case ⎕C'Ping'
-              r,←⊂'Try to contact the specified or all known Tatin servers'
-              r,←'' '  ]Tatin.Ping [server-url]'
+              r,←⊂'Try to contact the specified or all known Tatin Registries'
+              r,←'' '  ]Tatin.Ping [Registry-URL]'
           :Case ⎕C'Cache'
               r,←⊂'List the contents of the Tatin package cache.'
               r,←'' '  ]Tatin.Cache [url] -path -clear -force'
@@ -1252,14 +1274,14 @@
               r,←⊂''
               r,←⊂'Notes:'
               r,←⊂' * Registries with a priority of 0 will not participate in a scan of Registries'
-              r,←⊂' * In case a Registry server does not respond when questioned by ]ListRegistries the user is'
+              r,←⊂' * In case a Registry does not respond when questioned by ]ListRegistries the user is'
               r,←⊂'   given three options: Retry, skip and cancel operation'
               r,←⊂''
               r,←⊂'-full By default all data but the API keys are listed. Specify -full if you want the'
               r,←⊂'      API keys to be listed as well.'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder specified. If no argument was specified'
-              r,←⊂'then the principal Tatin server will be assumed (',tatinURL,'). If a "?" is passed as argument '
+              r,←⊂'then the principal Tatin Registry will be assumed (',tatinURL,'). If a "?" is passed as argument '
               r,←⊂'the user will be prompted for the Registry, except when there is just one anyway.'
               r,←⊂''
               r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has not'
@@ -1396,7 +1418,7 @@
               r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
               r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
           :Case ⎕C'PublishPackage'
-              r,←⊂'Publish a package to a particular Tatin Server.'
+              r,←⊂'Publish a package to a particular Tatin Registry.'
               r,←⊂'Such a package can be one of:'
               r,←⊂' * ZIP file, typically created by calling ]Tatin.Pack'
               r,←⊂' * Folder that contains everything that defines a package; in this case the required ZIP is'
@@ -1404,35 +1426,40 @@
               r,←⊂''
               r,←⊂'Requires two arguments:'
               r,←⊂' * Path to ZIP file or package folder'
-              r,←⊂' * URL or alias of a Registry Server or a "?"; you may or may not embrace it with []'
+              r,←⊂' * URL or alias of a Registry or a "?"; you may or may not embrace it with []'
               r,←⊂''
               r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
               r,←⊂'to the Tatin rules.'
               r,←⊂''
-              r,←⊂'Tatin checks the "delete" policy of the server. If the package cannot be deleted then the user'
-              r,←⊂'must confirm that she really wants to publish to that particular server.'
+              r,←⊂'Tatin checks the "delete" policy of the Registry. If the package cannot be deleted then the user'
+              r,←⊂'must confirm that she really wants to publish to that particular Registry.'
               r,←⊂''
               r,←⊂'-quiet: useful for test cases; it prevents Tatin from interrogating the user'
           :Case ⎕C'ListVersions'
-              r,←⊂'List all versions of the given package. You may specify the package in several ways:'
-              r,←⊂' * [registry]{group}-{package}'
-              r,←⊂' * [registry]{package}'
-              r,←⊂' * {package}'
+              r,←⊂'List all versions of the given package, if any. You may specify a package in several ways:'
+              r,←⊂' * ]Tatin.ListPackages [Registry-URL|Registry-alias]{group}-{package}'
+              r,←⊂' * ]Tatin.ListPackages [Registry-URL|Registry-alias]{package}'
+              r,←⊂' * ]Tatin.ListPackages {package}'
+              r,←⊂'In these cases just a list of packages is returned.'
+              r,←⊂'It is also possible to list all packages of a particular Registry by specifying no package:'
+              r,←⊂'   ]Tatin.ListPackages [tatin-test]'
+              r,←⊂'You may not specify an argument at all: then it falls back to the principal Tatin Registry.'
+              r,←⊂'Finally you may specify a ? (or [?]): then you will get a list with all known Registries.'
               r,←⊂''
-              r,←⊂'Lacking a group does not make a difference if the given package exists only in one group anyway.'
+              r,←⊂'If just a package is specified a matrix with two columns is returned:'
+              r,←⊂' [;1] The Registry'
+              r,←⊂' [;2] Full package ID'
+              r,←⊂''
+              r,←⊂'Lacking a group does not make a difference if the package exists only in one group anyway.'
               r,←⊂'If it exists in more than one group then all of them are listed.'
               r,←⊂''
-              r,←⊂'Omitting the registry altogether will work as well:'
-              r,←⊂']Tatin.ListVersions {name}'
-              r,←⊂'or'
-              r,←⊂']Tatin.ListVersions {group}-{name}'
-              r,←⊂'Naturally this comes potentially with a minor performance penalty since all registries'
-              r,←⊂'with a priority greater than zero will be questioned.'
+              r,←⊂'Note that omitting the Registry comes with a performance penalty since all Registries with a'
+              r,←⊂'priority greater than zero will be questioned.'
               r,←⊂''
               r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem'
               r,←⊂'with beta versions) then the publishing date is taken into account.'
               r,←⊂''
-              r,←⊂'-date Adds the publishing date to the report.'
+              r,←⊂'-date : adds the publishing date to the report.'
           :Case ⎕C'Version'
               r,←⊂'Prints name, version number and version date of Tatin to the session.'
               r,←⊂''
@@ -1442,12 +1469,12 @@
               r,←⊂' * Specify "?" if you want to be prompted with a list of all available Tatin Registries'
               r,←⊂''
               r,←⊂'If you want to compare the version you are using locally with what is used on the principal'
-              r,←⊂'Tatin server then specify the -check flag. Any argument is then ignored.'
+              r,←⊂'Tatin Registry then specify the -check flag. Any argument is then ignored.'
           :Case ⎕C'ListTags'
-              r,←⊂'List all unique tags as defined in all packages on a server, sorted alphabetically.'
-              r,←⊂'If no argument was specified then the principal Tatin server will be assumed (',tatinURL,').'
+              r,←⊂'List all unique tags as defined in all packages of a Registry, sorted alphabetically.'
+              r,←⊂'If no argument was specified then the principal Tatin Registry will be assumed (',tatinURL,').'
               r,←⊂'If a "?" is passed as argument the user will be prompted for the Registry, except when there'
-              r,←⊂'is just one anyway.'
+              r,←⊂'is just one defined anyway.'
               r,←⊂''
               r,←⊂'If no Registry is specified as argument the user will be prompted unless there is only one'
               r,←⊂'Registry anyway.'
@@ -1465,8 +1492,8 @@
           :Case ⎕C'CheckForLaterVersion'
               r,←⊂'Check whether later versions of the installed packages are available.'
               r,←⊂'Takes a folder that hosts a file "apl-buildlist.json" as argument.'
-              r,←⊂'Scans all known registries with a priority greater than 0 for later versions.'
-              r,←⊂'Note that if you''ve loaded a package from a registry that has been removed since, or has a '
+              r,←⊂'Scans all known Registries with a priority greater than 0 for later versions.'
+              r,←⊂'Note that if you''ve loaded a package from a Registry that has been removed since, or has a '
               r,←⊂'priority of 0, then Tatin won''t be able to find any later versions!'
               r,←⊂''
               r,←⊂'Returns a matrix with five columns for all packages found:'
@@ -1485,23 +1512,23 @@
               r,←⊂'Delete a given package.'
               r,←⊂''
               r,←⊂'Takes one of:'
-              r,←⊂' * URL specifying a Tatin server, followed by a full package ID'
-              r,←⊂' * [alias] specifying a Tatin server, followed by a full package ID'
+              r,←⊂' * URL specifying a Tatin Registry, followed by a full package ID'
+              r,←⊂' * [alias] specifying a Tatin Registry, followed by a full package ID'
               r,←⊂' * Folder hosting a package; must start with file://'
               r,←⊂'   The folder must contain a file apl-package.json, otherwise an error is thrown'
               r,←⊂''
-              r,←⊂'Whether a package can be deleted depends on the delete policy operated by a given server.'
-              r,←⊂'A server may allow...'
+              r,←⊂'Whether a package can be deleted depends on the delete policy operated by a given Registry.'
+              r,←⊂'A Registry may allow...'
               r,←⊂' * no deletion at all'
               r,←⊂' * deletion of beta versions only'
               r,←⊂' * everything'
           :Case ⎕C'GetDeletePolicy'
-              r,←⊂'Request which "Delete" policy is operated by a server.'
+              r,←⊂'Request which "Delete" policy is operated by a Registry.'
               r,←⊂'Return one of "None", "Any", "JustBetas":'
               r,←⊂' * "None" means a package, once published, cannot be deleted'
               r,←⊂' * "Any" means any package can be deleted'
               r,←⊂' * "JustBetas" means that only beta versions can be deleted'
-              r,←⊂'If no server is specified the user will be prompted, unless there is just one server anyway.'
+              r,←⊂'If no Registry is specified the user will be prompted, unless there is just one anyway.'
           :Case ⎕C'Documentation'
               r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
           :Case ⎕C'ReInstallDependencies'
@@ -1526,7 +1553,7 @@
               r,←⊂''
               r,←⊂'All defined Registries with a priority greater than 0 are scanned for principal packages'
               r,←⊂'but one can specify a particular Registry as second (optional) argument.'
-              r,←⊂'For dependencies, all registries with a priority greater than 0 are scanned in any case.'
+              r,←⊂'For dependencies, all Registries with a priority greater than 0 are scanned in any case.'
               r,←⊂''
               r,←⊂'-force   Prevents user confirmation and reporting to the session, including establishing'
               r,←⊂'         a project in case no folder was specified.'
@@ -1535,17 +1562,17 @@
               r,←⊂'-update  By default ReInstallDependencies does not install later versions.'
               r,←⊂'         You may change this by specifying this flag.'
           :Case ⎕C'Ping'
-              r,←⊂'Try to contact one or more Tatin servers.'
+              r,←⊂'Try to contact one or more Tatin Registries.'
               r,←⊂''
-              r,←⊂' * Optionally you may specify a server URL as an argument.'
-              r,←⊂' * You can also specify just a "?"; then a list with all known Servers will be provided.'
+              r,←⊂' * Optionally you may specify a Registry URL as an argument.'
+              r,←⊂' * You can also specify just a "?"; then a list with all known Registries will be provided.'
               r,←⊂'   You may then select one or multiple of them.'
-              r,←⊂' * If no argument is provided at all then all defined Servers are contacted.'
+              r,←⊂' * If no argument is provided at all then all defined Registries are contacted.'
               r,←⊂' * In case the path to a folder is passed as ⍵ a 1 is returned in case the folder exists.'
               r,←⊂''
               r,←⊂'In any case a matrix with two columns is returned:'
-              r,←⊂' [;1] is the Server URL'
-              r,←⊂' [;2] is a Boolean, a 1 means that the server responded'
+              r,←⊂' [;1] is the Registry URL'
+              r,←⊂' [;2] is a Boolean, a 1 means that the Registry responded'
           :Case ⎕C'Cache'
               r,←⊂'By default all packages of all URLs saved in the Tatin package cache are listed.'
               r,←⊂''
@@ -1559,7 +1586,7 @@
               r,←⊂'-force Ignored in case -clear was not specified as well. Prevents the user from being'
               r,←⊂'       interrogated regarding clearing the cache. Mainly for test cases.'
           :Case ⎕C'UsageData'
-              r,←⊂'Use this to deal with usage data of a Tatin server.'
+              r,←⊂'Use this to deal with usage data of a Tatin Registry.'
               r,←⊂'If no argument is specified then the user will be prompted for the Registry,'
               r,←⊂'except when there is just one anyway.'
               r,←⊂'If no option is specified all available files will be listed.'
@@ -1634,8 +1661,8 @@
           :Case ⎕C'CheckForLaterVersion'
           :Case ⎕C'DeletePackage'
               r,←⊂'Examples:'
-              r,←⊂'  ]Tatin.DeletePackage https:/tatin.dev/group-name-1.0.0 ⍝ Server URL & package ID'
-              r,←⊂'  ]Tatin.DeletePackage [test-tatin]group-name-1.0.0      ⍝ Server alias & package ID'
+              r,←⊂'  ]Tatin.DeletePackage https:/tatin.dev/group-name-1.0.0 ⍝ Registry URL & package ID'
+              r,←⊂'  ]Tatin.DeletePackage [test-tatin]group-name-1.0.0      ⍝ Registry alias & package ID'
               r,←⊂'  ]Tatin.DeletePackage C:\My\Registry\group-name-1.0.0   ⍝ Local package'
           :Case ⎕C'GetDeletePolicy'
               r←'Not ready yet'
@@ -1738,7 +1765,7 @@
       :EndTrap
     ∇
 
-    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ ⍺ ⎕SIGNAL 1↓(↑∊⍵),ErrNo}
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ (⍕∊⍺) ⎕SIGNAL 1↓(↑∊⍵),ErrNo}
     AddHeader←{0=≢⍺:⍺ ⋄(⍵,[0.5]'-'⍴¨⍨≢¨⍵)⍪⍺}
     EnforceSlash←{'/'@(⍸'\'=⍵)⊣⍵}
     IsScripted←{0::1 ⋄0⊣⎕src ⍵}

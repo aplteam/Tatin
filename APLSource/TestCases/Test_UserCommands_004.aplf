@@ -1,0 +1,23 @@
+ r←Test_UserCommands_004(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res3;res4;res5;res
+⍝ Exercise ]Tatin.ListVersions but requires a user
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If batchFlag
+     R←T._NoBatchTest
+     :Return
+ :EndIf
+
+ 0 0⍴⍞,0/⎕←'This test needs you: when questioned select [tatin]; to continue press <enter>'
+
+ (rc msg res)←∆UCMD'ListVersions ?'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res
+ →T.PassesIf res≡res
+
+ 0 0⍴⍞,0/⎕←'This test needs you: when questioned enter "q" (for quit); to continue press <enter>'
+ (rc msg res)←∆UCMD'ListVersions ?'
+ →T.PassesIf'Cancelled by user'≡res
+
+ r←T._OK
+⍝Done

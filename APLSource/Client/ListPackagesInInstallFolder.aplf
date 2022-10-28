@@ -9,7 +9,7 @@
  :If 0<≢buff←⊃F.NGET path,'/apl-buildlist.json'
      json←Reg.APLfromJSON buff
  :AndIf 0<≢list←(≢path)↓¨⊃F.Dir path
-     list←list[⍋list]      ⍝ Not guaranteed to be ordered on non-Windows systems
+     list←list[⍋⎕C list]      ⍝ Not guaranteed to be ordered on non-Windows systems
  :AndIf 0<≢list←(Reg.IsValidPackageID_Complete¨list)/list
      r←list,[1.5]RemoveAlias¨list∊json.(principal/packageID)
      r←r[⍒r[;2];]

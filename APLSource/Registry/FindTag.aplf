@@ -5,30 +5,31 @@
 ⍝ If not successful we try again by using ⍷. If that is successful we return the full package IDs with a hit and 1 for `fuzzy`.\\
 ⍝ If still not successful we try again with a fuzzy search. If that is successful we return the full package IDs with a hit and 2 for `fuzzy`.\\
 ⍝ If still not successful we return (¯1 '').\\
-⍝ `aggregate` defaults to 0. If it is 1 the minor version number and the patch numbers are removed and doubles dropped from the result.
+⍝ `aggregate` defaults to 0. If it is 1 the minor version number and the patch numbers are removed and duplicates dropped from the result.
  aggregate←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'aggregate'
  fuzzy←¯1
  list←''
  tags←⎕C¨⊆tags
- tagList←GetTags path
- (fuzzy_ bool_)←↓⍉↑tagList[;2]∘{FindTag_ ⍺ ⍵}¨,tags
- bool←tagList[;1]∊⊃∩/bool_⌿¨⊂tagList[;1]
- :If ∨/bool
-     ind←∪⊃¨bool⌿tagList[;1]
-     list←allPackages[ind;1]
-     :If 2=⍴⍴allPackages
-         list←({(⍳≢⍵)=⍵⍳⍵}list)⌿allPackages[ind[⍋ind];]
-     :Else
-         list←∪list
+ :If 0<≢tagList←GetTags path
+     (fuzzy_ bool_)←↓⍉↑tagList[;2]∘{FindTag_ ⍺ ⍵}¨,tags
+     bool←tagList[;1]∊⊃∩/bool_⌿¨⊂tagList[;1]
+     :If ∨/bool
+         ind←∪⊃¨bool⌿tagList[;1]
+         list←allPackages[ind;1]
+         :If 2=⍴⍴allPackages
+             list←({(⍳≢⍵)=⍵⍳⍵}list)⌿allPackages[ind[⍋ind];]
+         :Else
+             list←∪list
+         :EndIf
+         fuzzy←⌈/fuzzy_
      :EndIf
-     fuzzy←⌈/fuzzy_
- :EndIf
- :If aggregate
- :AndIf 0<≢list
-     :If 2=⍴⍴allPackages
-         list←({⌽{(⍳≢⍵)=⍵⍳⍵}⌽⍵}RemoveMinorAndPatch¨list[;1])⌿list
-     :Else
-         list←∪RemoveMinorAndPatch¨list        ⍝ Get rid of minor and patch number but preserve major one
+     :If aggregate
+     :AndIf 0<≢list
+         :If 2=⍴⍴allPackages
+             list←({⌽{(⍳≢⍵)=⍵⍳⍵}⌽⍵}RemoveMinorAndPatch¨list[;1])⌿list
+         :Else
+             list←∪RemoveMinorAndPatch¨list        ⍝ Get rid of minor and patch number but preserve major one
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

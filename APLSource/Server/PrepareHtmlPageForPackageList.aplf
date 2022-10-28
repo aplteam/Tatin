@@ -1,11 +1,12 @@
- html←packageIDs PrepareHtmlPageForPackageList mat;col1;col2;col3;col4
- html←HtmlHeader''
- html,←⊂'<h2>List of all packages (aggregated)</h2>'
+ html←packageIDs PrepareHtmlPageForPackageList mat;col1;col2;col3;col4;col5;colTitles
+ html←HtmlHeader GetDataTableStuff ⍬
+ html,←⊂'<h2>List of packages</h2>'
  html,←AddSpecialMessage ⍬
- html,←⊂'<table>'
+ colTitles←'Package name' 'Description' '∑&nbsp;Major' 'Info URL' 'Tags'
+ html,←⊂H.OpenTable+/(≢¨colTitles[2,2~⍨⍳2⊃⍴mat])⌈(≢⍕⌈/mat[;2]),⌈⌿≢¨mat[;2~⍨⍳2⊃⍴mat]
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←{'<th style="align: left">',⍵,'</th>'}¨'Package name' 'Description' 'Major<br>versions' 'Link to<br>project'
+ html,←{'<th style="align: left">',⍵,'</th>'}¨colTitles
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
  :If 0<≢mat
@@ -13,7 +14,8 @@
      col2←{'<td>',⍵,'</td>'}¨⍕¨mat[;3]
      col3←{'<td align="right">',⍵,'</td>'}¨⍕¨mat[;2]
      col4←{'<td>',⍵,'</td>'}¨mat[;1]{0=≢⍵:'- ' ⋄ '<a href="',⍵,'" title="Opens ',⍵,' in a new tab" target="_blank">',(MassageProjectURL ⍵),'</a>'}¨mat[;4]
-     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3 col4
+     col5←{'<td>',⍵,'</td>'}¨mat[;5]
+     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3 col4 col5
      html,←⊂'</tr>'
  :EndIf
  html,←⊂'</tbody>'

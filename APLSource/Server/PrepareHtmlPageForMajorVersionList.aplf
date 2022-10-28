@@ -1,11 +1,12 @@
- html←PrepareHtmlPageForMajorVersionList(packageID data)
- html←HtmlHeader''
+ html←PrepareHtmlPageForMajorVersionList(packageID data);colTitles
+ html←HtmlHeader ''
  html,←⊂'<h2>Major versions of "',packageID,'"</h2>'
  html,←AddSpecialMessage ⍬
- html,←⊂'<table>'
+ colTitles←'Package name' 'Major version No.' '∑&nbsp;Versions'
+ html,←⊂H.OpenTable colTitles CalcTableWidth data
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←{'<th>',⍵,'</th>'}¨'Package name' 'Major' 'No. of versions'
+ html,←{'<th>',⍵,'</th>'}¨colTitles
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
  html,←{'<tr><td><a href="',Reg.VersionOf_REST,'/packages/versions/',(1⊃⍵),'-',(2⊃⍵),'" title="List all versions"><code>',(1⊃⍵),'</code></a></td><td>',(2⊃⍵),'</td><td align="right">',(⍕3⊃⍵),'</td></tr>'}¨↓data

@@ -1,10 +1,10 @@
  html←packageIDs PrepareHtmlPageForFullPackageList data;col1;col2;col3;buff;col4;col5;col6;⎕TRAP;bool
  buff←{(≢⍵)}⌸(⍪Reg.RemoveVersionNumber¨data[;1]),1
- html←HtmlHeader''
+ html←HtmlHeader GetDataTableStuff ⍬
  html,←⊂'<h2>List of all packages</h2>'
  html,←AddSpecialMessage ⍬
  html,←⊂'<p>List with ',(⍕≢data),' items from ',(⍕≢buff),' different packages</p>'
- html,←⊂'<table>'
+ html,←⊂H.OpenTable CalcTableWidth data
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
  html,←'<th></th>' '<th style="align: right">Pkg</th>' '<th>Name</th>' '<th>Published at</th>' '<th>Config</th>' '<th>Dependencies</th>'

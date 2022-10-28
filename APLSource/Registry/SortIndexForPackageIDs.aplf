@@ -1,11 +1,10 @@
- ind←SortIndexForPackageIDs data;ind1;ind2
+ ind←SortIndexForPackageIDs data;ind1;ind2;buff
 ⍝ ⍵ is either a list of package IDs or a list of version numbers.
 ⍝ The versions are sorted with the latest going top, the oldest bottom.
 ⍝ For non-betas the version number rules.
-⍝ For betas the publishing dates rules for those version that are equal when the beta part is removed.
+⍝ For betas the publishing dates rule for those versions that are equal after removing the beta part
 ⍝ This needs some gymnastics for two reasons:
 ⍝ * {group}-{name}-9.0.0 comes after {group}-{name}-10.0.0
-⍝ * {group}-{name}-9.0.0 20101213.010203 comes after {group}-{name}-9.0.0 20110114.010203
 ⍝ * {group}-{name}-9.0.0 20101213.010203 comes after {group}-{name}-9.0.0 20110114.010203
  ind←⍬
  :If 0<≢data
@@ -13,7 +12,9 @@
      :If 2=⍴⍴data
          ind1←⍋data[;3]
          data←data[ind1;]
-         ind2←SeparateUriAndPackageID_ RemoveBetaPart¨data[;1]
+         buff←{⊃,/1↓⎕NPARTS ⍵}¨data[;1]
+         buff←RemoveBetaPart¨buff
+         ind2←SeparateUriAndPackageID_ buff
          ind←ind1[ind2]
      :Else
          ind←SeparateUriAndPackageID_ RemoveBetaPart¨data

@@ -111,7 +111,7 @@ Create one that looks like this:
       r←⍬
       ⎕IO←1 ⋄ ⎕ML←1
       :Trap ⎕SE.SALTUtils.DEBUG↓0
-          AutoloadTatin ⍬
+          ⎕←AutoloadTatin ⎕SE.SALTUtils.DEBUG
       :Else
           dmx←⎕DMX
           ⎕←'Setup.dyalog has a problem and was not executed successfully:'
@@ -119,18 +119,25 @@ Create one that looks like this:
       :EndTrap
     ∇
 
-    ∇ {r}←AutoloadTatin dummy;wspath;path2Config
-      r←⍬
-      :If IfAtLeastVersion 18
-      :AndIf 80=⎕DR' '              ⍝ Not in "Classic"
-          ⎕SE.⎕EX¨'_Tatin' 'Tatin'
-          wspath←(GetMyUCMDsPath),'/Tatin/Client.dws'
-          '_Tatin'⎕SE.⎕CY wspath
-          path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
-          'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
-          'Tatin'⎕SE.⎕NS''
-          path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
-      :EndIf
+    ∇ r←AutoloadTatin debug;wspath;path2Config
+      r←0 0⍴''
+      :Trap debug/0
+          :If ~IfAtLeastVersion 18
+              r←'Tatin not loaded: not compatible with this version of Dyalog'
+          :ElseIf 80≠⎕DR' '              ⍝ Not in "Classic"
+              r←'Tatin not loaded: not compatible with Classic'
+          :Else
+              ⎕SE.⎕EX¨'_Tatin' 'Tatin'
+              wspath←GetMyUCMDsFolder '/Tatin/Client.dws'
+              '_Tatin'⎕SE.⎕CY wspath
+              path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
+              'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
+              'Tatin'⎕SE.⎕NS''
+              path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+          :EndIf
+      :Else
+          r←'Attempt to load Tatin failed with ',⎕DMX.EM
+      :EndTrap
     ∇
 
       IfAtLeastVersion←{
@@ -161,7 +168,7 @@ Create one that looks like this:
 
 ### There is already such a script
 
-Copy the functions `IfAtLeastVersion`, `GetMyUCMDsPath` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+Copy the functions `IfAtLeastVersion`, `GetMyUCMDsFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
 
 
 ## Updating Tatin

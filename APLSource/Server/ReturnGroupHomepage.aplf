@@ -1,10 +1,10 @@
- response←ReturnGroupHomepage(groupName request);html;htmlFilename;folder;p;parms;email;caption;data;col1;col2
+ response←ReturnGroupHomepage(groupName request);html;htmlFilename;folder;p;parms;email;caption;data;col1;col2;colTitles
  response←R.NewResponse request
  p←{'<p>',⍵,'</p>'}
  folder←G.HTDOCS,'../Groups/'
  'Create!'F.CheckPath folder
  htmlFilename←folder,groupName,'.htm'
- html←HtmlHeader''
+ html←HtmlHeader GetDataTableStuff ⍬
  html,←⊂'<h2>Home page of group "',groupName,'"</h2>'
  html,←AddSpecialMessage ⍬
  :If F.IsFile htmlFilename
@@ -34,10 +34,12 @@
  data←GetPackagesOfGroup groupName
  :If 0<≢data
      html,←⊂'<h3 style="padding-top:1em;">Packages owned by "',groupName,'"</h3>'
-     html,←⊂'<table>'
+     colTitles←'Package name' 'Description</th>'
+     html,←⊂H.OpenTable colTitles CalcTableWidth data
      html,←⊂'<thead>'
-   ⍝ html,←'<tr>' '<th>Package name</th>' '<th>Description</th>' '<th>Published</th>' '</tr>'  ⍝ Should we add this?!
-     html,←'<tr>' '<th>Package name</th>' '<th>Description</th>' '</tr>'
+     html,←⊂'<tr>'
+     html,←{'<th>',⍵,'</th>'}¨colTitles
+     html,←⊂'</tr>'
      html,←⊂'</thead>'
      html,←⊂'<tbody>'
      col1←{'<td><code>',({'<a href="',Reg.VersionOf_REST,'/packages/major_versions/',⍵,'" title="List major versions">',⍵,'</a>'}⍵),'</code></td>'}¨data[;1]

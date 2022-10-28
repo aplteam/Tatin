@@ -1,17 +1,18 @@
- html←PrepareHtmlPageForTagList list;noOfCols;⎕TRAP
- ⎕TRAP←0 'S'
- html←HtmlHeader''
+ html←PrepareHtmlPageForTagList data;noOfCols;colTitles
+ html←HtmlHeader GetDataTableStuff ⍬
  html,←⊂'<h2>List of all tags</h2>'
  html,←AddSpecialMessage ⍬
- html,←⊂'<table>'
+ colTitles←'Tag' '∑'
+ data[;2]←⍕¨data[;2]
+ html,←⊂H.OpenTable colTitles CalcTableWidth data
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←⊂'<th style="align: left">Tag</th>'
+ html,←{'<th>',⍵,'</th>'}¨colTitles
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
- :If 0<≢list
-     html,←AddJavaScript list
-     html,←{'<tr><td>',⍵,'</td></tr>'}¨list
+ :If 0<≢data
+     html,←AddJavaScript data
+     html,←⊃¨{'<tr><td>',⍺,'</td><td>',⍵,'</td></tr>'}/¨↓data
  :EndIf
  html,←⊂'</tbody>'
  html,←⊂'</table>'

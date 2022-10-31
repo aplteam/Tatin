@@ -44,7 +44,7 @@ So, when asked to load installed packages, Tatin will just do exactly that: load
 
 Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses _the latest installed version_, which might or might not be the latest one available. In our example `Zoo` is requested and installed twice, and Tatin would load 1.2.0 just once (because it is requested by `Goo`), while 1.3.0 is ignored because it is not requested and therefore not installed.
 
-This means that `Foo` will also have to use version 1.2.0 of `Zoo.
+This means that `Foo` will also have to use version 1.2.0 of `Zoo`.
 
 This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs "Link to the paper defining it"). It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest installed version. 
 

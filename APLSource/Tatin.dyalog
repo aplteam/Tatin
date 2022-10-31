@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.49 - 2022-10-27
+⍝ * 0.50 - 2022-10-29
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -564,16 +564,17 @@
       :If (,'?')≡,url
           :If 0=≢url←SelectRegistry 1
               :Return
+          :Else
+              url←'[',url,']'
           :EndIf
       :EndIf
-      :If ~TC.Reg.IsHTTP url
+      url_←TC.ReplaceRegistryAlias url      
+      :If ~TC.Reg.IsHTTP url_
       :AndIf ~TC.Reg.IsFILE url
           'Invalid target'Assert'['∊url
           url←'[',(url~'[]'),']'
       :EndIf
-      url_←TC.ReplaceRegistryAlias url
       ('"',url,'" is not a Registry')Assert 0<≢url_
-     
       :If TC.F.IsDir source
           ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_Name
       :Else
@@ -795,11 +796,6 @@
           qdmx←⎕DMX
           TC.CloseConnections 1
           CheckForInvalidVersion qdmx
-          :If 0<≢qdmx.EM
-              qdmx.EM ⎕SIGNAL qdmx.EN
-          :Else
-              (⊃qdmx.DM)⎕SIGNAL qdmx.EN
-          :EndIf
       :EndTrap
     ∇
 
@@ -960,9 +956,8 @@
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
-          CheckForInvalidVersion qdmx
           TC.CloseConnections 1
-          qdmx.EM ⎕SIGNAL qdmx.EN
+          CheckForInvalidVersion qdmx
       :EndTrap
     ∇
 
@@ -1903,7 +1898,11 @@
           v←TC.UpdateClient 1
           ErrNo ⎕SIGNAL⍨'Tatin client updated to ',v,'; please execute the last Tatin user command again'
       :Else
-          dmx.EM ⎕SIGNAL ErrNo
+          :If ∨/'Check ⎕EXCEPTION for details'⍷dmx.Message
+              ⎕EXCEPTION.Message ⎕SIGNAL ErrNo
+          :Else
+              dmx.EM ⎕SIGNAL ErrNo
+          :EndIf
       :EndIf
     ∇
 

@@ -7,6 +7,7 @@
 ⍝ 1. Original package ID
 ⍝ 2. Package ID of the latest version found  (or "<<< No response >>>" or "<<< Not found >>>")
 ⍝ 3. URL
+⍝ 4. Boolean that is 1 in case of success and 0 ("Not found" or "No response") otherwise
  majorVersions←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'majorVersions'
  'Invalid left argument'Assert 1=≢majorVersions
  'Invalid left argument'Assert majorVersions∊0 1
@@ -17,7 +18,7 @@
      url←('⎕'=⊃⊃⎕XSI)EstablishRegistry Reg.RemoveMinorAndPatch packageID_
  :EndIf
  :If 0=≢url
-     r←packageID_'<<< Not found anywhere >>>' ''
+     r←packageID_'<<< Not found anywhere >>>' '' 0
  :Else
      fullPath←url,packageID_
      PrintToSession'Checking <',fullPath,'>...'
@@ -28,15 +29,15 @@
              (statusCode errMsg fullPath2)←GetBestVersionNumber(Reg.RemoveMinorAndPatch packageID_)url
          :EndIf
      :Else
-         r←packageID_'<<< No response >>>'url
+         r←packageID_'<<< No response >>>'url 0
      :EndTrap
      :If 404=statusCode
-         r←packageID_'<<< Not found >>>'url
+         r←packageID_'<<< Not found >>>'url 0
      :Else
          errMsg Assert 200=statusCode
          :If 0<≢fullPath2
              packageID2←GetPackageIDFromFilename fullPath2
-             r←packageID_ packageID2 url
+             r←packageID_ packageID2 url 1
          :EndIf
      :EndIf
  :EndIf

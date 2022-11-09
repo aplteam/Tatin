@@ -1,7 +1,7 @@
- r←Test_UserCommands_086(stopFlag batchFlag);⎕TRAP;stop;buildList
+ R←Test_UserCommands_086(stopFlag batchFlag);⎕TRAP;stop;buildList
 ⍝ Exercise ]Tatin.LoadDependencies from within a namespace
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- r←T._Failed
+ R←T._Failed
 
  :If batchFlag
      R←T._NoBatchTest
@@ -22,7 +22,7 @@
  buildList←⎕JSON(⍠'Dialect' 'JSON5')⊣⊃⎕NGET #.Tatin.CiderConfig.HOME,'/TestData/InstallFromList/apl-buildlist.json'
  →T.GoToTidyUp 9∨.≠⊃¨#.Foo.⎕NC¨{1↓1⊃('-'=⍵)⊂⍵}¨buildList.(principal/packageID)
 
- r←T._OK
+ R←T._OK
 
 ∆TidyUp:
  #.⎕EX TC.GetTatinRootSpace'#'

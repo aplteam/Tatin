@@ -1,8 +1,8 @@
- r←Test_Publish_021(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ R←Test_Publish_021(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;dist;body;cfg;reg;list;zipped;expected;list2
 ⍝ Publish a package with two source files in folder APLSource/
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- r←T._Failed
+ R←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  dir←∆GetTempDir ⍬
@@ -36,7 +36,7 @@
  zipped←Reg.ZipArchive.ListZipContents list2 ∆GetByExtension'.ZIP'
  →T.GoToTidyUp~expected ∆LazyMatchPaths zipped
 
- r←T._OK
+ R←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir

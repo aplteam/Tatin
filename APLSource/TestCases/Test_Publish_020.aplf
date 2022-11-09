@@ -1,8 +1,8 @@
- r←Test_Publish_020(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ R←Test_Publish_020(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
  ;dir;src;dist;body;cfg;reg;list;zipped;expected;list2
 ⍝ Publish a package with two source files in default folder ("source")
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
- r←T._Failed
+ R←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  dir←∆GetTempDir ⍬
@@ -36,7 +36,7 @@
  expected←TC.CFG_Name'source/Test.apln' 'source/Hello.aplf'
  →T.GoToTidyUp~expected ∆LazyMatchPaths zipped
 
- r←T._OK
+ R←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir

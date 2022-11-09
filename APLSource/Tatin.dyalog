@@ -277,8 +277,9 @@
       :EndIf
     ∇
 
-    ∇ {r}←UpdateTatin Arg;path;filename
-      r←⎕SE._Tatin.Client.UpdateClient 0
+    ∇ {r}←UpdateTatin Arg;path;filename;folder
+      folder←1⊃⎕NPARTS ##.SourceFile
+      r←⎕SE._Tatin.Client.UpdateClient 0 folder
     ∇
 
     ∇ r←ListPackages Arg;registry;parms;buff;qdmx
@@ -383,7 +384,7 @@
               info1←'! = Check version available'
           :EndIf
           :If ∨/bool←0={⍵[;4]}buff←(1 TC.ListRegistries'')
-              info2←'Not scanned because priority is zero: ',⊃{⍺,', ',⍵}/bool/buff[;1]
+              info2←'Not scanned because priority is zero: ',⊃{⍺,', ',⍵}/∪bool/buff[;1]
           :EndIf
           r←⍪↓⎕FMT r
           :If 0<≢info1,info2
@@ -568,7 +569,7 @@
               url←'[',url,']'
           :EndIf
       :EndIf
-      url_←TC.ReplaceRegistryAlias url      
+      url_←TC.ReplaceRegistryAlias url
       :If ~TC.Reg.IsHTTP url_
       :AndIf ~TC.Reg.IsFILE url
           'Invalid target'Assert'['∊url

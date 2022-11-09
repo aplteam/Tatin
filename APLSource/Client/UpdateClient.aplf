@@ -57,17 +57,17 @@
                  '#._Tatin.Client.UpdateClient_Continue'ref.⎕CY folder,'/Tatin/Client.dws'
                  path2Config←ref.UpdateClient_Continue target
              :Else
-                 ⎕SE.⎕EX'_Tatin'
-                 wspath←target,'/Client.dws'
                  ⎕SE._Tatin.RumbaLean.⎕EX'DRC'                      ⍝ In order to avoid...
                  ⎕SE._Tatin.RumbaLean.Conga.X509Cert.⎕EX'LDRC'      ⍝ ... the Conga 1006 error
+                 ⎕SE.⎕EX'_Tatin'
+                 wspath←target,'/Client.dws'
                  '_Tatin'⎕SE.⎕CY wspath
                  path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
                  'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
                  'Tatin'⎕SE.⎕NS''
              :EndTrap
              path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
-             ⎕se._Tatin.Admin.InitConga '' ⍝ Avoid 1006
+             ⎕SE._Tatin.Admin.InitConga'' ⍝ Avoid 1006
              ⎕←'Tatin updated: ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
              version←2⊃⎕SE.Tatin.Version
          :EndIf

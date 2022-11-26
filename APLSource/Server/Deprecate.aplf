@@ -1,0 +1,82 @@
+ response←Deprecate request;packageID;bestVersions;group;package;versions;savedVersions;tempFolder;bestMajorVersions;cfgFilename;newCfgFilename;folder;newZipFilename;Z
+ ;data;json;newFolder;version;bool;report;rcs;multiples;zipFilename
+⍝ `packageIDs` must be a simple character vector with a group name, a package name and optionally a major version number.
+⍝ Examples:
+⍝ group-package
+⍝ group-package-1
+⍝ The function creates a new version by copying the last version and carrying out the following actions:
+⍝  * Set the patch number to 0
+⍝  * Increase the minor version number
+⍝  * Inject the `deprecated` property with the value 1 into the config file
+⍝  * Assign `comment` to the config file if passed on
+⍝  * Enforce compilation of the Registry's internal data
+⍝  * Update the ZIP file
+⍝ If no major version number is specified then the aforementioned actions are carried out for all major versions of the given package.
+ packageID←{1↓⍵↑⍨-'/'⍳⍨⌽⍵}request.Path
+ (group package versions)←3↑'-'(≠⊆⊢)packageID,'-*'
+ :If 0=≢savedVersions←Reg.ListVersions G.RegistryPath,group,'-',package
+     response←request Respond 404 0
+     response.Content←'Package not found'
+ :Else
+     bestVersions←savedVersions{⍺[⌽(⌽⍳≢⍵){∪⍺[⍵⍳⍵]}⍵]}⌽Reg.RemoveMinorAndPatch¨savedVersions
+     bestMajorVersions←Reg.RemoveMinorAndPatch¨bestVersions
+     tempFolder←(F.GetTempSubDir'Tatin'),'/'
+     :If multiples←(,'*')≡,versions
+         versions←Reg.RemoveMinorAndPatch¨bestVersions
+     :Else
+         versions←⊆packageID
+     :EndIf
+     report←''
+     rcs←⍬
+     :For version :In versions
+         :If ~(⊂version)∊bestMajorVersions
+             response←request Respond 404 0
+             response.Content←'Package not found'
+             F.RmDir tempFolder
+             :Return
+         :EndIf
+         folder←(bestMajorVersions⍳⊂version)⊃bestVersions
+         'Create!'F.CheckPath tempFolder
+         tempFolder ⎕NCOPY G.RegistryPath,folder
+         cfgFilename←G.RegistryPath,folder,'/',Reg.CFG_Name
+         newCfgFilename←tempFolder,folder,'/',Reg.CFG_Name
+         data←Reg.APLfromJSON⊃F.NGET newCfgFilename
+         :If 0=data.⎕NC'deprecated'
+         :OrIf ~data.deprecated
+             data.deprecated←1
+             data.date←60 ⎕DT⊂⎕TS
+             data.comment←request.Content
+             data.version←ElevateMinorVersionNumber data.version
+             json←Reg.JSON data
+             (⊂json)F.NPUT newCfgFilename 1
+             newFolder←data.version{(⍵/⍨2>+\⍵='-'),'-',⍺}folder
+             zipFilename←⊃⊃F.Dir tempFolder,folder,'/*.zip'
+             newZipFilename←tempFolder,folder,'/',newFolder,'.zip'
+             newZipFilename ⎕NMOVE zipFilename
+             Z←⎕NEW ZipArchive(,⊂newZipFilename)
+             Z.Delete Reg.CFG_Name
+             (tempFolder,folder)Z.Add Reg.CFG_Name
+             Z.Dispose
+             (G.RegistryPath,newFolder)⎕NMOVE tempFolder,folder
+             report,←'Deprecated: ',data.group,'-',data.name,'-',data.version,CR
+             rcs,←200
+         :ElseIf ~multiples
+             response←request Respond 400
+             response.Content←'Package was already deprecated'
+             F.RmDir tempFolder
+             :Return
+         :EndIf
+     :EndFor
+     :If rcs∧.=200
+         response←request Respond 200
+     :Else
+         response←request Respond 400
+         :If 200∊rcs
+             report,←'ATTENTION: deprecation was partly successful'
+         :EndIf
+     :EndIf
+     response.Content←report
+     ##.Registry.Index.Compile G.RegistryPath
+     F.RmDir tempFolder
+ :EndIf
+⍝Done

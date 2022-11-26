@@ -5,7 +5,7 @@
  :EndIf
  :If 0=≢apiKey←request R.GetQueryParameter'api-key'
      apiKey←'api-key'GetFromHeaders request.Headers
-     groupName←{⍵↑⍨¯1+⍵⍳'-'}request.RequestTarget
+     groupName←{⍵↑⍨¯1+⍵⍳'-'}{1↓⍵↑⍨-'/'⍳⍨⌽⍵}request.RequestTarget
  :Else
      groupName←request R.GetQueryParameter'group'
  :EndIf

@@ -1,0 +1,12 @@
+ r←Test_UserCommands_401(stopFlag batchFlag);⎕TRAP;msg;rc;stop;res
+⍝ Exercise `]DeprecatePackage` on an non-existing package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg res)←stop ∆UCMD'DeprecatePackage [localhost]/does-notExist-1 "firlefanz" -force'
+ →T.PassesIf 0=rc
+ →T.PassesIf'Package not found'≡res
+
+ r←T._OK
+⍝Done

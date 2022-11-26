@@ -1,0 +1,50 @@
+ YMD←{expand}GD JJJ;Y;M;D;t;d;j;j1600;FFF;f;nz;⎕CT
+⍝ Convert a "Julian Day Number" to a Gregorian-style date (YYYYMMDD).
+⍝ If optional left argument "expand" is specified as an integer ∊⍳7, then
+⍝ each result will be separated into component values like ⎕TS and nested
+⍝ into a vector in each item in the result.  The number provided indicates
+⍝ the number of elements in each nested vector, usually 3 or 7.
+⍝ The input values may optionally specify a timestamp value by providing
+⍝ a fractional number with the fraction representing a particular time of
+⍝ day (starting at midnight) as a fraction of a whole day.  If a time is
+⍝ specified in this way, then the returned result will also be fractional
+⍝ and return the timestamp in the form YYYYMMDD.HHMMSSTTT, or as a nested
+⍝ multi-item vector (in ⎕TS form) if the left argument is provided (see above).
+⍝ ⎕DT is used if available, but if timestamps are included then this
+⍝ function defines xxx.0 as midnight beginning the day instead of noon in
+⍝ the middle of that day (as ⎕DT determines it), for convenience.
+⍝ A scalar 0 will be translated to a value of 0 (or vector of 0s), for
+⍝ convenience of handling missing dates in numeric arrays.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝   Constants: 1721117 ← 1-Jan-0001; 2299160 ← 4-Oct-1582
+⍝   Constants: 584400 ← (10 + 29-Feb-1600) - 1-Jan-0001
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Modified April 2010 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 29, 2020 by Davin Church of Creative Software Design
+
+ :If 18≤2⊃⎕VFI 3↑2⊃'.'⎕WG'APLVersion' ⍝ Use ⎕DT if it's available
+ :AndIf (∧/,JJJ≠0)∧∧/,50 0 ⎕DT JJJ ⍝ ...and within supported range
+     JJJ←JJJ-0.5 ⍝ ⎕DT starts at noon instead of midnight as we prefer
+     :If 0=⎕NC'expand' ⋄ :OrIf ~(⊃expand)∊⍳7 ⋄ YMD←50 60 ⎕DT JJJ
+     :Else ⋄ YMD←(⊃expand)↑¨50 ¯1 ⎕DT JJJ ⋄ :EndIf
+ :Else ⍝ Older version of system - simulate ⎕DT and allow for extra situations
+     ⎕CT←1E¯16 ⍝ Avoid some millisecond rounding problems
+     nz←JJJ≠0 ⋄ :If f←1∊0≠FFF←1||JJJ ⋄ JJJ←(×JJJ)×⌊|JJJ ⋄ :EndIf
+     JJJ←(JJJ+10×JJJ>2299160)-1721117 ⋄ j1600←0⌈(j←JJJ-0.25)-584400
+     t←⌈0.75×⌊j1600÷36524.25 ⋄ Y←⌊(t+j)÷365.25 ⋄ d←t+JJJ-⌊Y×365.25
+     M←(31 30 31 30 31 31 30 31 30 31 31 29/2+⍳12)[d]
+     D←d-0 0 0 31 61 92 122 153 184 214 245 275 306 337[M] ⋄ Y←Y+t←M>12 ⋄ M←M-12×t
+     :If 2=⎕NC'expand' ⋄ :AndIf ∨/t←(⊃expand)∊⍳7
+         YMD←nz×Y,¨M,¨D ⍝ Alternate (expanded) form(s)
+         :If 3<⊃expand ⍝ Add the optional time to it (whether it needs it or not)
+             YMD←(⊃expand)↑¨YMD,¨nz×(⊂0 60 60 1000)⊤¨⌊0.5+FFF×86400000
+         :EndIf
+     :Else
+         YMD←nz×(¯1*Y≤0)×(10000×|Y)+(100×M)+D ⍝ Normal form
+         :If f ⍝ Add the optional time to it (if any time was supplied)
+             FFF←(⊂0 100 100 1000)⊥¨(⊂0 60 60 1000)⊤¨⌊0.5+FFF×86400000
+             YMD←(×YMD)×(|YMD)+FFF÷1000000000
+         :EndIf
+     :EndIf
+ :EndIf

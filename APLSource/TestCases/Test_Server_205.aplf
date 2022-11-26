@@ -3,9 +3,9 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (statusCode errMsg result)←TC.GetBestVersionNumber'aplteam-APLProcess-0.2.11' 'https://localhost'
+ (statusCode errMsg result)←TC.GetBestVersionNumber'aplteam-APLProcess-0.2.11' (TC.ReplaceRegistryAlias '[localhost]')
  →T.PassesIf statusCode=200
- →T.PassesIf result≡'https://localhost/aplteam-APLProcess-0.2.11'
+ →T.PassesIf result≡(TC.ReplaceRegistryAlias '[localhost]'),'aplteam-APLProcess-0.2.11'
 
  r←T._OK
 ⍝Done

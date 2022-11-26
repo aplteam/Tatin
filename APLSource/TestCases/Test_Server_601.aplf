@@ -3,7 +3,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (rc msg res)←∆UCMD'GetDeletePolicy https://localhost'
+ (rc msg res)←∆UCMD'GetDeletePolicy ',(TC.ReplaceRegistryAlias'[localhost]')
  →T.PassesIf(rc=0)∧0=≢msg
  →T.PassesIf'Any'≡res
 

@@ -1,0 +1,27 @@
+ next←{count}(isholiday AddWorkday)JJJ;chk0;days
+⍝ Given a "Julian Day Number", add one (or the specified number of)
+⍝ work days and return the new date.  This automatically skips over
+⍝ weekends and holidays, so adding 1 to a Friday date gives a Monday
+⍝ date, and adding 2 gives a Tuesday date.  Starting dates which fall
+⍝ on weekends or holidays are automatically adjusted to the next work
+⍝ day before counting begins.
+⍝ Holidays are determined by calling the left operand function.
+⍝ It should return a 1 for each item of the argument if that date is
+⍝ a holiday, and a 0 if it is not.
+⍝ See an example of such a function named ExampleHoliday, which
+⍝ determines holidays based on the standard rules of U.S. banking.
+⍝ Code for DayOfWeek is embedded into this function.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'count' ⋄ count←1 ⋄ :EndIf
+ JJJ←JJJ+1 0 0 0 0 0 2[1+7|1+JJJ] ⍝ Adjust weekends to Monday
+ next←(JJJ>0)×JJJ+count+2×⌊(count+(1+7|1+JJJ)-2)÷5 ⍝ Skip over weekends
+ :If count<0 ⋄ chk0←⊂⍬ ⋄ :Else ⋄ chk0←0 ⋄ :EndIf ⍝ Check initial date?
+ :While 1∊∨/¨count←isholiday¨days←JJJ+(×next-JJJ)×chk0,¨⍳¨|next-JJJ
+ :AndIf 1∊×count←+/¨count∧0≠6|7|1+days ⋄ chk0←⊂⍬ ⍝ Except weekends
+     count←count×(×next-JJJ)+next=JJJ ⋄ JJJ←next
+     next←JJJ+count+2×⌊(count+(1+7|1+JJJ)-2)÷5 ⍝ Skip holidays
+ :EndWhile

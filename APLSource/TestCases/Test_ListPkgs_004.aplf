@@ -5,12 +5,12 @@
 
  parms←TC.Reg.CheckParmsForListPackages ⍬
  parms.date←1
- mat←parms TC.ListPackages'[local]'
+ mat←parms TC.ListPackages'[localhost]'
  →T.PassesIf 2=⍴⍴mat
  →T.PassesIf 2=2⊃⍴mat
  noOf←≢F.ListDirs ∆GetServerRegistryFolder,'\'
  Assert 0<noOf
- →T.PassesIf noOf≡≢mat
+ →T.PassesIf noOf≡(≢mat)+≢1 TC.ListDeprecated '[localhost]'
  →T.PassesIf∧/∧/¨mat[;2]∊¨⊂⎕D,' :-'  ⍝ Dates
 
  r←T._OK

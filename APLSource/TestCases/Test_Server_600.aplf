@@ -18,7 +18,7 @@
  cfg.source←'Test.apln'
  TC.WritePackageConfigFile src cfg
 
- (rc msg zipFilename)←TC.PublishPackage src'https://localhost'
+ (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
  →T.GoToTidyUp 200≠rc
  →T.GoToTidyUp 0≠≢msg
  →T.GoToTidyUp 0=F.IsDir serverPath,'/test-Package_A-0.1.0'

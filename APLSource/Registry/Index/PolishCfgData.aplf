@@ -1,0 +1,12 @@
+ cfgData←PolishCfgData cfgData;ind
+⍝ Checks for properties that got introduced at a later stage and therefore might not exist in
+⍝ any old config file. We inject them with default data.
+ :If 0<≢ind←⍸{0=⊃⍵.⎕NC'description'}¨cfgData
+     cfgData[ind].description←⊂''
+ :EndIf
+ :If 0<≢ind←⍸{0=⊃⍵.⎕NC'tags'}¨cfgData
+     cfgData[ind].tags←⊂''
+ :EndIf
+ :If 0<≢ind←⍸{0=⊃⍵.⎕NC'deprecated'}¨cfgData
+     cfgData[ind].deprecated←0
+ :EndIf

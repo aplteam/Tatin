@@ -1,0 +1,16 @@
+ dates←Daylight year;⎕USING;adjs;fixed;rules;delta;years;y;w
+⍝ Compute Daylight Savings Time boundaries for the local time zone in the given year(s)
+⍝ Return one nested result for each item in "year"; each result contains:
+⍝   [1] Hours to add to time zone during DST; [2] Start of DST; [3] End of DST
+⍝ See "Describe" for more details.
+⍝ Written June 30, 2020 by Davin Church of Creative Software Design
+
+ years←∪,year ⋄ ⎕USING←'' ⋄ adjs←System.TimeZoneInfo.Local.GetAdjustmentRules
+ :If 0∊⍴adjs ⋄ dates←(⍴year)⍴⊂0 0 0 ⋄ :Return ⋄ :EndIf ⍝ If there are no rules just return 0 0 0
+ rules←↑adjs.(DaylightTransitionStart DaylightTransitionEnd).(IsFixedDateRule Month Day Week DayOfWeek.value__ TimeOfDay)
+ (6⊃¨rules)←(6⊃¨rules).TimeOfDay.TotalHours÷24 ⍝ Convert transition time to day-fraction; Now all-numeric data
+ rules←rules[y←adjs.DateStart.Year⍸years;] ⋄ delta←adjs.DaylightDelta.TotalHours[y]
+ dates←(2/⍪years),¨(⊂⊂2 4 5)⌷¨rules ⋄ dates←(1+4⊃¨dates){⍵-7|(1+7|1+⍵)-⍺}JD(2↑¨dates),¨7×4⌊w←3⊃¨dates
+ dates←w{⍵+7×(⍺=5)∧=/2⊃¨2 GD ⍵+0 7}¨dates ⍝ Adjust for week=5 alternatives
+ fixed←,1⊃¨rules ⋄ (fixed/,dates)←fixed/,100⊥¨(2/⍪years),¨(⊂⊂2 3)⌷¨rules ⍝ Set fixed-date rules
+ dates←delta,¨↓dates+6⊃¨rules ⋄ dates←dates[years⍳year] ⋄ :If 0=≡year ⋄ dates←⊃dates ⋄ :EndIf

@@ -1,0 +1,14 @@
+ next←{count}AddYear JJJ;ymd;y;s
+⍝ Given a "Julian Day Number", return the number of the date which is
+⍝ one calendar year (or specified number of years) in the future (or
+⍝ past).  The month and day remain the same.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Modified 9 March 2010 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'count' ⋄ count←1 ⋄ :EndIf ⍝ Default = 1 = Next year
+ s←¯1*0>ymd←GD JJJ ⋄ y←s×⌊(|ymd)÷10000
+ s←¯1*0>y←y+count ⍝ Add in specified number of calendar years
+ next←(JJJ≠0)×JD s×(10000×|y)+10000||ymd

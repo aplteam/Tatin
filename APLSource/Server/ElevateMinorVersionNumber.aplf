@@ -1,0 +1,7 @@
+ r←ElevateMinorVersionNumber no
+ r←(⌊/¯1+no⍳'+- ')↑no               ⍝ Get rid of stuff like build number, beta, rc-1 etc, leaving just major/minor/patch
+ r←A.ToNum¨'.'(≠⊆⊢)r
+ (3⊃r)←0                            ⍝ Reset patch number
+ (2⊃r)+←1                           ⍝ Increase the minor number
+ r←⊃{⍺,'.',⍵}/⍕¨r
+⍝Done

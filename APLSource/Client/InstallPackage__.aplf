@@ -41,11 +41,17 @@
  :EndIf
  PrintToSession'  Unzipping ',zipFilename,'...'
  zipFilename ZipArchive.UnzipTo tempDir
- tempDir Add2Config'uri'(RemoveFileProtocol url)
- :If isHTTP
-     :If cacheFlag
-         tempDir←MovePackageToCache tempDir url packageID
+ :If CheckDeprecatedFlag tempDir
+     tempDir Add2Config'uri'(RemoveFileProtocol url)
+     :If isHTTP
+         :If cacheFlag
+             tempDir←MovePackageToCache tempDir url packageID
+         :EndIf
+         F.DeleteFile zipFilename
      :EndIf
+ :Else
+     F.RmDir tempDir
      F.DeleteFile zipFilename
+     success←0
  :EndIf
 ⍝Done

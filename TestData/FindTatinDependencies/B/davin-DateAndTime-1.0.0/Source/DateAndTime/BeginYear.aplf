@@ -1,0 +1,25 @@
+ begin←{start}BeginYear JJJ;ymd;y;s
+⍝ Given a "Julian Day Number", return the date of the beginning of the
+⍝ calendar year in which it falls.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Years are normally considered to begin on the first day of the first
+⍝ month (0101) of the year, but to support odd fiscal years a different
+⍝ beginning-of-year month/day number (0101-1231) may be specified as an
+⍝ optional left argument.
+⍝ Alternatively, a single digit may be specified indicating that the
+⍝ year should begin on a specific day of the first calendar week,
+⍝ where 1=Sunday ... 7=Saturday.
+⍝ The default left argument is 0, which indicates the calendar beginning
+⍝ of the year (the same as 0101).
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+⍝ Modified 6 September 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'start' ⋄ start←0 ⋄ :EndIf ⋄ start←start+101×start=0 ⍝ Default = 01/01 to begin years
+ :If ∨/s←∊start∊⍳7 ⋄ (s/∊start)←s/∊100+1+7|start-DayOfWeek BeginYear JJJ ⋄ :EndIf ⍝ Convert day-of-week
+ 'Invalid start-of-year specification'⎕SIGNAL 11/⍨∨/(~(∊100|start)∊⍳31)∨~(∊⌊start÷100)∊⍳12
+ s←¯1*0>ymd←GD JJJ ⋄ y←s×⌊(|ymd)÷10000
+ s←¯1*0>y←y-(10000||ymd)<start ⍝ Wrap to previous year if before start day
+ begin←(JJJ≠0)×JD s×start+10000×|y

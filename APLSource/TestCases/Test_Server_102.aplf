@@ -24,7 +24,7 @@
  cfg.assets←'Assets/First.dll' 'Assets/Second.dll'
  TC.WritePackageConfigFile src cfg
 
- (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
+ (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
  Assert 200=rc
 
  →T.GoToTidyUp 0=F.IsDir serverPath,,'/',packageID,'/data\Assets'

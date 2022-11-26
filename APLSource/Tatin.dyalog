@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.50 - 2022-10-29
+⍝ * 0.51 - 2022-11-25
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -19,25 +19,43 @@
      
           c←⎕NS ⍬
           c.Name←'CreatePackage'
-          c.Desc←'Creates a new Tatin package'
+          c.Desc←'Create a new Tatin package'
           c.Parse←'1s'
           r,←c
      
           c←⎕NS ⍬
+          c.Name←'DeprecatePackage'
+          c.Desc←'Declare a package as deprecated'
+          c.Parse←'2 -force'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'FindDependencies'
+          c.Desc←'Search the folder for given packages and report installed packages'
+          c.Parse←'1 -folder= -detailed -force'
+          r,←c
+     
+          c←⎕NS ⍬
           c.Name←'LoadTatin'
-          c.Desc←'Loads the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
+          c.Desc←'Load the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
           c.Parse←'1s -force'
           r,←c
      
           c←⎕NS ⍬
+          c.Name←'ListDeprecated'
+          c.Desc←'List all deprecated packages (major versions only)'
+          c.Parse←'1s -all'
+          r,←c
+     
+          c←⎕NS ⍬
           c.Name←'ListRegistries'
-          c.Desc←'Lists all registries defined in the user settings'
+          c.Desc←'List all registries defined in the user settings'
           c.Parse←'0 -full'
           r,←c
      
           c←⎕NS ⍬
           c.Name←'ListPackages'
-          c.Desc←'Lists all packages in the Registry or install folder specified in the argument'
+          c.Desc←'List all packages in the Registry or install folder specified in the argument'
           c.Parse←'1s -group= -tags= -noaggr -date -info_url -since='
           r,←c
      
@@ -49,7 +67,7 @@
      
           c←⎕NS ⍬
           c.Name←'ListVersions'
-          c.Desc←'Lists all versions of the specified package or all versions of a particular Registry'
+          c.Desc←'List all versions of the specified package or all versions of a particular Registry'
           c.Parse←'1s -date'
           r,←c
      
@@ -61,7 +79,7 @@
      
           c←⎕NS ⍬
           c.Name←'LoadDependencies'
-          c.Desc←'Takes a folder (⍵[1]) with installed packages and loads all of them into ⍵[2].'
+          c.Desc←'Take a folder (⍵[1]) with installed packages and loads all of them into ⍵[2].'
           c.Parse←'1-2 -overwrite'
           r,←c
      
@@ -85,7 +103,7 @@
      
           c←⎕NS ⍬
           c.Name←'Pack'
-          c.Desc←'Packs (zips) all required files found in ⍵[1] into the folder ⍵[2]'
+          c.Desc←'Pack (zips) all required files found in ⍵[1] into the folder ⍵[2]'
           c.Parse←'2s'
           r,←c
      
@@ -97,13 +115,13 @@
      
           c←⎕NS ⍬
           c.Name←'Version'
-          c.Desc←'Prints name, version number and version date of the client to the session'
+          c.Desc←'Print name, version number and version date of the client to the session'
           c.Parse←'1s -check -all'
           r,←c
      
           c←⎕NS ⍬
           c.Name←'ListTags'
-          c.Desc←'Lists all tags used in all packages'
+          c.Desc←'List all tags used in all packages'
           c.Parse←'1s -tags='
           r,←c
      
@@ -121,7 +139,7 @@
      
           c←⎕NS ⍬
           c.Name←'Documentation'
-          c.Desc←'Loads the documentation center into the default browser'
+          c.Desc←'Load the documentation center into the default browser'
           c.Parse←''
           r,←c
      
@@ -133,19 +151,19 @@
      
           c←⎕NS ⍬
           c.Name←'GetDeletePolicy'
-          c.Desc←'Asks the server about its "Delete" policy'
+          c.Desc←'Ask the server about its "Delete" policy'
           c.Parse←'1s'
           r,←c
      
           c←⎕NS ⍬
           c.Name←'UnInstallPackage'
-          c.Desc←'Un-installs a package, and implicitly its dependencies'
+          c.Desc←'Un-install a package, and implicitly its dependencies'
           c.Parse←'2s -cleanup -quiet'
           r,←c
      
           c←⎕NS ⍬
           c.Name←'UpdateTatin'
-          c.Desc←'Attempts to update the client and reports the result'
+          c.Desc←'Attempt to update the Tatin client and reports the result'
           c.Parse←''
           r,←c
      
@@ -179,25 +197,30 @@
      
     ∇
 
-    ∇ {r}←Run(Cmd Input);ns;flag
+    ∇ {r}←Run(Cmd Input)
+      :If Run_ Cmd Input
+          r←((⍎Cmd)__ExecAsTatinUserCommand)Input
+      :EndIf
+    ∇
+
+    ∇ r←Run_(Cmd Input);ns
+      r←0
       :If 0=⎕SE.⎕NC'Link.Version'
       :OrIf 3>⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
           'Tatin requires at least Link 3.0'⎕SIGNAL ErrNo
       :EndIf
       :If 0=⎕SE.⎕NC'Tatin'
       :AndIf ≢/⎕C¨'LoadTatin'Cmd
-          flag←LoadTatin''
+          LoadTatin''
       :EndIf
       :If ≡/⎕C¨'loadtatin'Cmd
           Input.force LoadTatin(1+(0≡Input._1)∨0=≢Input._1)⊃Input._1''
-          r←''
       :Else
           TC←⎕SE._Tatin.Client
           :If 0=⎕SE._Tatin.RumbaLean.⎕NC'DRC'
               ⎕SE._Tatin.Admin.InitConga ⍬
           :EndIf
-     
-          r←((⍎Cmd)__ExecAsTatinUserCommand)Input
+          r←1
       :EndIf
     ∇
 
@@ -271,15 +294,85 @@
     ∇ {r}←CreatePackage Arg;path;filename
       r←'For creating a new package execute this user command:'
       :If (,0)≡,Arg._1
-          r,←(⎕UCS 13),'      ]Tatin.PackageConfig -edit'
+          r,←CR,'      ]Tatin.PackageConfig -edit'
       :Else
-          r,←(⎕UCS 13),'      ]Tatin.PackageConfig ',Arg._1,' -edit'
+          r,←CR,'      ]Tatin.PackageConfig ',Arg._1,' -edit'
       :EndIf
     ∇
 
-    ∇ {r}←UpdateTatin Arg;path;filename;folder
+    ∇ r←FindDependencies Arg;folder;detailed;pkgList
+      r←'Cancelled by user'
+      :If 0=≢folder←''Arg.Switch'folder'
+          folder←TC.F.PWD
+          :If ~Arg.force
+          :AndIf ~TC.YesOrNo'Sure that you want to scan the current directory ',TC.F.PWD,' ?'
+              :Return
+          :EndIf
+      :EndIf
+      detailed←Arg.detailed
+      pkgList←','(≠⊆⊢)Arg._1
+      'Invalid package definition'Assert 0∧.=(⎕NS''){⊃∘⍺.⎕NC¨{'_'@(⍸⍵∊'.-')⊣⍵}¨⍵}pkgList
+      r←⍪detailed TC.FindTatinDependencies folder(⊃{⍺,',',⍵}/pkgList)
+    ∇
+
+    ∇ r←DeprecatePackage Arg;id;force;uri;packageID;versions;msg;rc;comment
+      r←''
+      id←Arg._1
+      'You must specify a Tatin Registry and a package ID'Assert 0<≢id
+      force←Arg.force
+      comment←Arg._2
+      id←TC.ReplaceRegistryAlias id
+      'Tatin Registry not found'Assert 0<≢id
+      (uri packageID)←TC.Reg.SeparateUriAndPackageID id
+      'You must specify a package ID'Assert 0<≢packageID
+      'You must specify at least a group and a name'Assert 1≤'-'+.=id
+      packageID←TC.Reg.RemoveMinorAndPatch packageID
+      versions←TC.ListVersions uri,TC.Reg.RemoveVersionNumber packageID
+      :If 0=≢versions
+          r←'Package not found'
+      :Else
+          versions←∪↓TC.Reg.RemoveMinorAndPatch¨versions
+          :If 1='-'+.=packageID
+          :AndIf 1<≢versions
+              :If force
+                  msg←'These major versions were found for ',packageID,' on ',uri,':',CR
+                  msg,←⊃,/(⊂'  '),¨versions,¨CR
+                  msg,←'Are you sure that you want to deprecate ALL these versions?'
+              :OrIf TC.YesOrNo msg
+                  (rc msg)←TC.DeprecatePackage uri comment packageID
+                  :If 0=rc
+                      r←'Successfully deprecated: ',packageID,' on ',uri,CR
+                  :Else
+                      r←'Deprecating ',packageID,' on ',uri,' failed; ',msg,CR
+                  :EndIf
+              :Else
+                  r←'Cancelled by user'
+                  :Return
+              :EndIf
+          :Else
+              :If force
+              :OrIf TC.YesOrNo'Sure that you want to deprecate <',packageID,'> on ',uri,' ?'
+                  (rc msg)←TC.DeprecatePackage uri comment packageID
+                  :If 0=rc
+                      r←'Successfully deprecated: ',packageID,' on ',uri
+                  :Else
+                      r←'Deprecating ',packageID,' on ',uri,' failed: ',msg
+                  :EndIf
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;ref;target
       folder←1⊃⎕NPARTS ##.SourceFile
-      r←⎕SE._Tatin.Client.UpdateClient 0 folder
+      (version ref target)←⎕SE._Tatin.Client.UpdateClient 0 folder
+      :If 0<≢version
+          ref.UpdateClient_Continue target
+          path2Config←⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+          ⎕SE._Tatin.Admin.InitConga'' ⍝ Avoid 1006
+          r←'Tatin updated to ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
+          r,←(⎕UCS 13),'The current WS has NOT been updated, please restart a fresh session.'
+      :EndIf
     ∇
 
     ∇ r←ListPackages Arg;registry;parms;buff;qdmx
@@ -331,6 +424,26 @@
               buff←{'['∊⍵:⍵↑⍨⍵⍳']' ⋄ ⊃TC.Reg.SeparateUriAndPackageID ⍵}registry
               r←((2⊃⍴r)↑(⊂'Registry: ',{⍵↓⍨-'/'=¯1↑⍵}buff),(2⊃⍴r)⍴⊂'')⍪r
           :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←ListDeprecated Arg;registry;buff;qdmx;⎕TRAP
+      r←''
+      registry←Arg._1
+      :If 0≡registry
+          registry←tatinURL
+      :ElseIf (,'?')≡,registry
+          →(⍬≡registry←SelectRegistry 0)/0
+      :EndIf
+      registry←EnforceSlash registry
+      :Trap ErrNo
+          r←⍪TC.ListDeprecated registry
+      :Else
+          qdmx←⎕DMX
+          CheckForInvalidVersion qdmx
+      :EndTrap
+      :If 0=≢r
+          r←'No deprecated packages found'
       :EndIf
     ∇
 
@@ -744,16 +857,20 @@
           :If dateFlag
               r←dateFlag TC.ListVersions arg
               r[;2]←TC.Reg.FormatFloatDate¨r[;2]
+              r←(2↑[2]⍪↓('All versions of <',arg,'> :'),[0.5]'-')⍪r
           :Else
               buff←TC.ListVersions arg
-              :If 2=2⊃⍴buff  ⍝ Then the argument was a package, not a URL
+              :If TC.Reg.IsHTTP TC.ReplaceRegistryAlias arg
                   caption←1 2⍴('*** All versions of package <',arg,'> :')' '
-                  caption⍪←' Registry' 'Package'
-                  caption⍪←{(-⍵)↑¨(¯1 0+⍵)⍴¨'-'}≢¨caption[2;]
+                  caption⍪←('-'⍴⍨≢1⊃caption[1;])''
                   buff[;1]←' ',¨buff[;1]
-                  r←caption⍪buff
+                  r←caption⍪buff,' '
               :Else
-                  r←(⍪↓('All versions of <',arg,'> :'),[0.5]'-')⍪' ',¨buff
+                  :If 2=2⊃⍴buff
+                      r←⍪(↓⎕FMT 2↑('All versions of <',arg,'> :'),[0.5]'-'),↓⎕FMT' ',¨buff
+                  :Else
+                      r←(⍪↓('All versions of <',arg,'> :'),[0.5]'-')⍪' ',¨buff
+                  :EndIf
               :EndIf
           :EndIf
       :Else
@@ -912,19 +1029,39 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects
+    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
-          :If Arg.quiet
+          :If 0=Arg.quiet
               :If 9=⎕SE.⎕NC'Cider'
                   openCiderProjects←⎕SE.Cider.ListOpenProjects 0
-                  'There are multiple Cider projects open'Assert 1=≢openCiderProjects
-                  installFolder←2⊃openCiderProjects[1;]
-                  ⍝ We can savely assume that this is a test case - -quiet is designed for this
-                  ⍝ For that reason we assume a package folder "packages":
-                  installFolder←(2⊃openCiderProjects[1;]),'/packages'
-                  ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
+                  :If 1<≢openCiderProjects
+                      ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+                      :If 0=≢ind
+                          →0 ⋄ r←'Cancelled by user'
+                      :Else
+                          project←2⊃openCiderProjects[ind;]
+                      :EndIf
+                  :ElseIf 1=≢openCiderProjects
+                      project←2⊃openCiderProjects[1;]
+                  :Else
+                      →0 ⋄ r←'No path specified & no open Cider projects found'
+                  :EndIf
+                  ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
+                  cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
+                  'In the Cider config file "tatinFolder" is empty'Assert 0<≢cfg.CIDER.tatinFolder
+                  folders←{1⊃'='(≠⊆⊢)⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+                  :If 1<≢folders
+                      ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
+                      :If 0=≢ind
+                          →0 ⋄ r←'Cancelled by user'
+                      :Else
+                          installFolder←project,'/',ind⊃folders
+                      :EndIf
+                  :ElseIf 1=≢folders
+                      installFolder←project,'/',1⊃folders
+                  :EndIf
               :EndIf
           :EndIf
       :EndIf
@@ -1169,18 +1306,27 @@
           :Case ⎕C'CreatePackage'
               r,←⊂'Create a new Tatin package with a given folder.'
               r,←'' '  ]Tatin.CreatePackage'
+          :Case ⎕C'DeprecatePackage'
+              r,←⊂'Declare packages as deprecated.'
+              r,←'' '  ]Tatin.DeprecatePackage <URL|[Alias><group><name>[<major-version>] <comment> [-force]'
+          :Case ⎕C'FindDependencies'
+              r,←⊂'Attempts to find all folder with the given Tatin packages'
+              r,←'' '  ]Tatin.FindDependencies <commad-separated list of pkgs> [-folder=] -detailed -force'
           :Case ⎕C'LoadTatin'
               r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←'' '  ]Tatin.LoadTatin'
           :Case ⎕C'ListRegistries'
               r,←⊂'List URL, alias, priority and port of all Registries as defined in the user settings.'
               r,←'' '  ]Tatin.ListRegistries [-full]'
+          :Case ⎕C'ListDeprecated'
+              r,←⊂'List all deprecated major versions'
+              r,←'' '  ]Tatin.ListDeprecated <URL|[Alias> [-all]'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder passed as argument'
               r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-date] [-info_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all dependencies into the workspace.'
-              r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>]'
+              r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>] -nobetas'
           :Case ⎕C'InstallPackages'
               r,←⊂'Install the given package(s) and all dependencies into the given folder.'
               r,←'' '  ]Tatin.InstallPackages <packageIDs|package-URLs|Zip-file> <install-path> [-quiet]'
@@ -1244,6 +1390,8 @@
           :Case ⎕C'UpdateTatin'
               r,←⊂'Attempts to update the Tatin client and reports the result'
               r,←'' '  ]Tatin.UpdateTatin'
+          :Else
+              ∘∘∘ ⍝ New?!
           :EndSelect
           :If 'Version'≢Cmd
               r,←''(']Tatin.',Cmd,' -?? ⍝ Enter this for more information ')
@@ -1253,6 +1401,35 @@
           :Case ⎕C'CreatePackage'
               r,←⊂'Prints a user command to the session that allow creating a package config file, the'
               r,←⊂'equivalent of creating a package.'
+          :Case ⎕C'DeprecatePackage'
+              r,←⊂'Declare a particular major version of a package or all major versions of a particular'
+              r,←⊂'package as deprecated. Requires two arguments:'
+              r,←⊂''
+              r,←⊂'1. Argument'
+              r,←⊂' * If a package ID like "GroupName-PkgName-6 is specified as first argument then a new'
+              r,←⊂'   version is published for the major version number 6 that will have a property "deprecated"'
+              r,←⊂'   injected into its config file with the value 1.'
+              r,←⊂'   It will also have a property "comment" that can carry stuff like "Use xyz instead".'
+              r,←⊂' * If a package ID like "GroupName-PkgName is specified then new versions are published'
+              r,←⊂'   for all major versions of that package.'
+              r,←⊂''
+              r,←⊂'2. Argument'
+              r,←⊂'A text that will be injected into the package''s config file together with "deprecated".'
+              r,←⊂''
+              r,←⊂'-force     By default the user is questioned whether she is sure. With this flag this'
+              r,←⊂'           can be overwritten. Mainly for tests.'
+          :Case ⎕C'FindDependencies'
+              r,←⊂'Scans the current folder or the given folder (see -folder=) for any Tatin packages.'
+              r,←⊂'By default it returns the folder hosting the package(s), but that can be changed'
+              r,←⊂'by specifying the -detailed flag, see there.'
+              r,←⊂''
+              r,←⊂'-folder=   Use this to specify a particular folder rather than scanning the current folder'
+              r,←⊂'-detailed  By default the hosting folder is reported. By setting this flag you can force'
+              r,←⊂'           the user command to report the actual package folder instead.'
+              r,←⊂'           As a side effect the result might be larger, in case a package is installed more'
+              r,←⊂'           than once.'
+              r,←⊂'-force     Normally when -folder= is not set the user will be questioned. With this flag you'
+              r,←⊂'           overwrite this. Mainly for test cases.'
           :Case ⎕C'LoadTatin'
               r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
@@ -1275,9 +1452,16 @@
               r,←⊂''
               r,←⊂'-full By default all data but the API keys are listed. Specify -full if you want the'
               r,←⊂'      API keys to be listed as well.'
+          :Case ⎕C'ListDeprecated'
+              r,←⊂'List all deprecated major versions'
+              r,←⊂''
+              r,←⊂'By default just the major versions would be listed.'
+              r,←⊂''
+              r,←⊂'-all    By specifying this flag you can force the command to list all versions of all'
+              r,←⊂'        deprecated mnajor versions.'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder specified. If no argument was specified'
-              r,←⊂'then the principal Tatin Registry will be assumed (',tatinURL,'). If a "?" is passed as argument '
+              r,←⊂'then the principal Tatin Registry will be assumed (',tatinURL,'). If a "?" is passed as argument'
               r,←⊂'the user will be prompted for the Registry, except when there is just one anyway.'
               r,←⊂''
               r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has not'
@@ -1318,16 +1502,20 @@
               r,←HelpOnPackageID ⍬
               r,←⊂''
               r,←⊂'B) Second argument'
-              r,←⊂'The second argument must be one of:'
+              r,←⊂'The optional second argument must be one of:'
               r,←⊂' * Path to a folder into which the packages are going to be installed'
               r,←⊂' * A Cider alias specifying a project'
-              r,←⊂''
               r,←⊂''
               r,←⊂'In case the second argument is relative Tatin checks whether there are open Cider projects.'
               r,←⊂'If there is just one, it is assumed that the installation should take place there.'
               r,←⊂'If there are multiple Cider projects open the user is questioned.'
               r,←⊂'If Cider is not available or no projects are opened then the current directory is checked.'
               r,←⊂'For a relative path the user is always asked for confirmation.'
+              r,←⊂''
+              r,←⊂'If no second argument is specified Tatin tries to find an open Cider project. If there is'
+              r,←⊂'just one Tatin acts on it, otherwise the user is questioned.'
+              r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken.'
+              r,←⊂'If there are multiple folders defined the user is questioned which one to act on.'
               r,←⊂''
               r,←⊂'-quiet: Useful for test cases: it prevents Tatin from interrogating the user'
           :Case ⎕C'LoadDependencies'
@@ -1601,7 +1789,10 @@
               r,←⊂'          The ZIP files will be deleted afterwards. Ignored when -download is not specified.'
               r,←⊂'-all      This circumvents the selection dialog; mainly useful for test cases.'
           :Case ⎕C'UpdateTatin'
-              r,←⊂'Attempts to update the Tatin client and reports the result.'
+              r,←⊂'Downloads the latest version from GitHub and installs it in the folder it was started from.'
+              r,←⊂''
+              r,←⊂'Note that this user command does not attempt to update the current workspace, therefore it'
+              r,←⊂'is recommended to close the current session and start a new one.'
           :Else
               r←'Unknown command: ',Cmd
           :EndSelect
@@ -1895,7 +2086,7 @@
       ⍝ Workaround for Client and Server being out of sync after injecting the originally missing "an" into the message:
       f2←'Server: Request came from invalid version of Tatin.'{⍺≡(≢⍺)↑⍵}dmx.EM
       :If f1∨f2
-      :AndIf 1 TC.C.YesOrNo'You are using an outdated version of the Tatin client.',(⎕UCS 13),'Would you like to update automatically?'
+      :AndIf 1 TC.C.YesOrNo'You are using an outdated version of the Tatin client.',CR,'Would you like to update automatically?'
           v←TC.UpdateClient 1
           ErrNo ⎕SIGNAL⍨'Tatin client updated to ',v,'; please execute the last Tatin user command again'
       :Else

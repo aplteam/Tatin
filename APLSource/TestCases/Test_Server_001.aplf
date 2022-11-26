@@ -5,7 +5,7 @@
 
  request←R.NewRequest 0
  request.RequestTarget←'/'
- res←TC.SendAndReceive 'https://localhost' request
+ res←TC.SendAndReceive(TC.ReplaceRegistryAlias'[localhost]')request
  Assert 200≡res.StatusCode
  →T.PassesIf(≢res.Headers)≥ind←(⊃¨res.Headers)⍳⊂'x-tatin'
  version←2⊃Reg.Version

@@ -1,4 +1,4 @@
- version←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;target;wspath;path2Config;ref;msg;flag
+ (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag
 ⍝ Updates the client to (by default) the latest version, and returns the version number of the new version.\\
 ⍝ A Boolean right argument (`force`) is mandatory, but one might specify also a folder Tatin is installed in.
 ⍝ The user command will do this automatically with the folder the user command was loaded from.\\
@@ -7,7 +7,7 @@
 ⍝ The format must be something like "v1.0.2".
  (force target)←2↑(⊆y),⊂''
  'Right argument must be a Boolean'Assert(⊂force)∊0 1
- version←''
+ version←ref←target←''
  :If force
  :OrIf 1 YesOrNo'Would you like to update the Tatin client?'
      :If flag←0=⎕NC'tag'
@@ -49,27 +49,24 @@
              :EndIf
              F.RmDir target
              (⊃⎕NPARTS target)⎕NCOPY folder,'/Tatin'
-             ref←⎕NS''
-             :Trap 11
+             version←{⍵↓⍨'v'=1⍴⍵}tag
+             ref←⎕SE.⎕NS''
+
+             :If 0
+             ⍝ It appears that overwriting Conga in the current WS does not really work, no matter what.
+             ⍝ For that reason this is not active.
+                 :Trap 11
              ⍝ We try to copy a function from the new version that can execute the remaining steps.
              ⍝ That way we are more flexible. The ⎕CY is trapped only because in the early stages (after UpdateClient was introduced)
              ⍝ there might be no such function yet; then the required steps are executed by this fn in :Else
-                 '#._Tatin.Client.UpdateClient_Continue'ref.⎕CY folder,'/Tatin/Client.dws'
-                 path2Config←ref.UpdateClient_Continue target
-             :Else
-                 ⎕SE._Tatin.RumbaLean.⎕EX'DRC'                      ⍝ In order to avoid...
-                 ⎕SE._Tatin.RumbaLean.Conga.X509Cert.⎕EX'LDRC'      ⍝ ... the Conga 1006 error
-                 ⎕SE.⎕EX'_Tatin'
-                 wspath←target,'/Client.dws'
-                 '_Tatin'⎕SE.⎕CY wspath
-                 path2Config←⎕SE._Tatin.Client.FindUserSettings ⎕AN
-                 'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
-                 'Tatin'⎕SE.⎕NS''
-             :EndTrap
-             path2Config ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
-             ⎕SE._Tatin.Admin.InitConga'' ⍝ Avoid 1006
-             ⎕←'Tatin updated: ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
-             version←2⊃⎕SE.Tatin.Version
+             ⍝ Note however that the function must not be executed from within UpdateClient because that would
+             ⍝ prevent the namespace ⎕SE.Tatin from disappearing causing potentially a Conga problem: DLL error 1006
+                     '#._Tatin.Client.UpdateClient_Continue'ref.⎕CY folder,'/Tatin/Client.dws'
+                 :Else
+                     ref.⎕FX ⎕CR'UpdateClient_Continue'
+                 :EndTrap
+             :EndIf
+
          :EndIf
      :EndIf
  :EndIf

@@ -1,4 +1,4 @@
- r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg;errorCounter;trap
+ r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg;errorCounter
 ⍝ Whether there is a (semi-)global ∆PermanentConnections or not makes a difference here:
 ⍝ * If it exists it's supposed to hold clients for all HTTP registries with a priority>0.
 ⍝   This improved performance dramatically because the same connection can be used again.
@@ -6,7 +6,6 @@
  request.Headers,←⊂Reg.TatinVersionAsHttpHeader
  request←AddTestFlag request
  msg←uri,' did not respond'
- trap←⎕TRAP
  ⎕TRAP←(345 'C'('''',uri,''' SignalNoConnection ''',msg,''''))(347 'N')(348 'C' '→∆Go,errorCounter←errorCounter+1')(0 'S')
  errorCounter←0
  :If 9=⎕NC'∆PermanentConnections'

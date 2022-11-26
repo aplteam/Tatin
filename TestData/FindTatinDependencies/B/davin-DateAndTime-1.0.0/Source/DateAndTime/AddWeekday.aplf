@@ -1,0 +1,15 @@
+ next←{count}AddWeekday JJJ
+⍝ Given a "Julian Day Number", add one (or the specified number of)
+⍝ week days and return the new date.  This automatically skips over
+⍝ weekends, so adding 1 to a Friday date gives a Monday date, and
+⍝ adding 2 gives a Tuesday date.  Starting dates which fall on weekends
+⍝ are automatically adjusted to Monday before counting begins.
+⍝ Code for DayOfWeek is embedded into this function.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'count' ⋄ count←1 ⋄ :EndIf
+ JJJ←JJJ+1 0 0 0 0 0 2[1+7|1+JJJ] ⍝ Adjust weekends to Monday
+ next←(JJJ>0)×JJJ+count+2×⌊(count+(1+7|1+JJJ)-2)÷5 ⍝ Skip over weekends

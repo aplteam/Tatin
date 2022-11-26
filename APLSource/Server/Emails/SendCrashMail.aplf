@@ -1,9 +1,9 @@
- r←SendCrashMail INI;parms;myConnection;mailParms;convert;domain;rc;msg;log;folder;list;filename;S
+ (rc msg)←SendCrashMail INI;parms;myConnection;mailParms;convert;domain;rc;msg;log;folder;list;filename;S
 ⍝ The idea is to have a GMail address dedicated for http://[test].tatin.dev
 ⍝ but we use this only to logon the Google's SMTP server: the address is not monitored.
 ⍝ The real consignees are listed as "To". That way we don't have to be particularly
 ⍝ concerned regarding the password.
- r←⍬
+ msg←⍬
  :If INI.Get'EMAIL:active'
      S←##.##.SMTP
      convert←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⊆⍵}
@@ -29,9 +29,9 @@
      :EndIf
      (rc msg log)←myConnection.Send mailParms
      :If 0=rc
-         r←'Email was sent successfully'
+         msg←'Email was sent successfully'
      :Else
-         r←'Failed with rc=',(⍕rc),'; ',¯1↓(⊆msg),¨⎕UCS 13
+         msg←'Failed with rc=',(⍕rc),'; ',¯1↓(⊆msg),¨⎕UCS 13
      :EndIf
  :EndIf
 ⍝Done

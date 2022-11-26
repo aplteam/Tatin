@@ -3,9 +3,9 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (statusCode errMsg result)←1 TC.GetBestVersionNumber'example-versions-1' 'https://localhost'
+ (statusCode errMsg result)←1 TC.GetBestVersionNumber'example-versions-1' (TC.ReplaceRegistryAlias '[localhost]')
  →T.PassesIf statusCode=200
- expected←'https://localhost/example-versions-1.0.0'
+ expected←(TC.ReplaceRegistryAlias '[localhost]'),'example-versions-1.0.0'
  →T.PassesIf expected≡result
 
  r←T._OK

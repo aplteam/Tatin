@@ -26,7 +26,7 @@ If the third level is available then `-??` shows this at the bottom:
 
 The API is established in `⎕SE.Tatin`. These are almost exclusively dfns that call a function in `⎕SE._Tatin`.
 
-While `⎕SE._Tatin` holds all code required for the Tatin client, `⎕SE.Tatin` holds the public interface.
+While `⎕SE._Tatin` holds all code required for the Tatin client, `⎕SE.Tatin` holds the public interface. A user is supposed to call functions in `Tatin` but not `_Tatin`.
 
 
 
@@ -69,7 +69,7 @@ Returns a matrix with five columns:
 
 Clears the cache, meaning that all sub directories but `temp\` are removed from the folder `GetPathToPackageCache` points to.
 
-### CreateReInstallParms 
+### CreateReInstallParms
 
 ```
 r←CreateReInstallParms
@@ -77,7 +77,7 @@ r←CreateReInstallParms
 
 Creates a namespace with default parameters; it can be passed as (optional) left argument to the [`ReInstallDependencies`](#ReInstallDependencies) function, in particular `noBetas`, `update` and `dry`.
 
-### DeletePackage        
+### DeletePackage
 
 ```
 (statusCode errMsg)←DeletePackage uri
@@ -86,6 +86,45 @@ Creates a namespace with default parameters; it can be passed as (optional) left
 Deletes a package.
 
 Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
+
+### DeprecatePackage
+
+```
+msg←DeprecatePackage y
+```
+
+Declares a package to be deprecated.
+
+`y` must provide three pieces of information:
+
+* A Registry URL or a Registry alias
+* A comment like "See package xyz instead"
+* A package ID that provides group name, package name and optionally a major version number
+
+  If no major version number is provided, then the function acts on _all_ major versions of that package.
+
+Note that because the Registry must be defined no scanning takes place with this function.
+
+
+### FindTatinDependencies
+
+```
+r←{level} FindTatinDependencies (folder pkgList)
+
+```
+
+Scans `folder` recursively for the file "apl-dependencies.txt". Folders with such a file will be scanned for packages defined in `pkgList`. Useful for finding out where one or more packages are actually used.
+
+`pkgList` must be a simple char vector with a list of comma-separated packages.
+
+The packages can be specified fully or partly. "Group" and "version" can be left out, while "Name" is mandatory. You may specify a major version but neither "Minor" nor "Patch". If you do anyway anything after the major number will be ignored.
+
+Note that the search is *not* case sensitive.
+
+Returns a fully qualified list with all hits. 
+
+By default just the folder is returned that contains the file "apl-dependencies.txt". In case a 1 is passed as left argument (default is 0, other values led to an error) the package folders are also returned, revealing the precise version installed.
+
 
 ### GetDeletePolicy
 
@@ -227,7 +266,25 @@ By default beta versions are considered in case the package ID is incomplete, bu
 `r` is a nested vector of character vectors with the full names of all principal packages installed. The length will match the number of packages specified as `identifiers`.
 
 
+### ListDeprecated
+
+```
+r←ListDeprecated uri
+```
+
+This function lists all packages that are deprecated but only if they are the last published version of any given major version number.
+
+This default behaviour can be changed with the `-all` flag: then all versions of any major version that is marked as deprecated are listed. 
+
+
+`uri` must be one of:
+
+* A path to an install folder, defined by the presence of a file `apl-buildlist.json`
+* A path to a Registry and optionally a (possibly incomplete) package ID
+
+
 ### ListCache
+
 ```
 r←{fullpath} Listcache uri
 ```
@@ -239,8 +296,7 @@ Lists the contents of the Tatin package cache. Refers to the `MyUserSettings` in
 * In case it is empty all packages of all domains are listed
 * In case it is a specific domain only packages of that domain are listed
 
-The optional left argument `fullpath` defaults to 0, when just domain names and package IDs are reported.
-If it is 1 then the full paths are reported instead.
+The optional left argument `fullpath` defaults to 0, when just domain names and package IDs are reported. If it is 1 then the full paths are reported instead.
 
 The result is a vector with as many items as there are domains represented in the cache with at least one package.
 Each item is a two-element vector:
@@ -255,6 +311,8 @@ In case the cache is empty an empty vector is returned.
 ```
 mat←{parms} ListPackages uri
 ```
+
+Lists all packages of a given Registry except when the last package of a major version number is marked as deprecated --- see `ListDepreciated` for details.
 
 `uri` must be one of:
 
@@ -341,7 +399,14 @@ Returns a matrix with at least two and up to four columns. These columns are alw
 |[;2] | Carries the number of major versions |
 
 
-In case `date` 
+In case `date` was specified, the result has one more column carrying the publishing date.
+
+#### Deprecated packages
+
+In case the last published version of a package carries a flag `deprecated` in its config file and that is a 1, such a package and all its predecessors with the same major version numer _are not listed_.
+
+To list just deprecated packages use `ListDepreciated`.
+
 
 ### ListRegistries       
 
@@ -412,7 +477,7 @@ The package ID must not specify a version number.
 
 By default the publishing date is not included, but you may change this by passing a 1 as `⍺`. In that case an additional column is added to the result.
 
-### LoadDependencies     
+### LoadDependencies
 
 ```
 {r}←LoadDependencies y
@@ -431,7 +496,7 @@ Loads all packages and injects required references into `targetSpace`.
 
 Returns a vector with references to the loaded packages (principal packages only, so no dependencies).
 
-### LoadPackages          
+### LoadPackages
 
 ```
 r←{noBetas} LoadPackages (identifiers targetSpace)
@@ -607,10 +672,6 @@ Returns a two-item vector:
 Note that removing the directories hosting the packages might fail for all sorts of reasons even
 though the package and any dependencies were already successfully removed from both the dependency
 file and the build list.
-
-### UpdateClient      
-
-The function that is eventually called by `]TATIN.UpdateTatin`. It installs a later version of Tatin and loads it into `⎕SE` and finally initialises Conga again.
 
 
 ### Version              

@@ -1,0 +1,15 @@
+ text←pattern Spell JJJ;nonzero
+⍝ Format a date or timestamp (based on a Julian Day Number) into a specified format.
+⍝ Since this routine depends on 1200⌶ all data (except the constant 0) must follow
+⍝ its range restrictions.
+⍝ Written 30 June 2020 by Davin Church of Creative Software Design
+⍝ Note:  Requires Dyalog APL v18.0 or later
+
+ JJJ←0.5-⍨(,nonzero←(JJJ≠0)∧~JJJ∊⎕NULL)/,JJJ ⍝ Format zeros as ''
+ :Trap 0
+     text←pattern(1200⌶)50 1 ⎕DT JJJ
+ :Else
+     ⎕DMX.Message ⎕SIGNAL 11
+ :EndTrap
+ text←(⍴nonzero)⍴1↓(1,,nonzero)\(⊂''),text
+ :If 0=≡nonzero ⋄ text←⊃text ⋄ :EndIf ⍝ Don't enclose scalar results

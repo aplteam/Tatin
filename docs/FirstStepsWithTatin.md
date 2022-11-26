@@ -459,6 +459,71 @@ A>
 A> Note that Tatin does not only scans all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies as well. 
 
 
+#### Deprecated packages
+
+Every piece of software will become obsolete one day. Packages are no exception. If a package is not needed anymore, or is obsolete because there is a better one available, it's time to mark it as deprecated.
+
+This can be done with the user command `]Tatin.DeprecatePackage`. In short what the user command does is to publish the latest version available yet as a new version with an increased minor version number.
+
+A> ### On deleting packages
+A>
+A> Depending on the delete policy operated on a server you might as well delete all obsolete packages, but we discourage you from doing so.
+A>
+A> The reason is that one of Tatin's design goals was to make a build 100% reproducible. This is only achievable if packages are not deleted from a server. That's the reason why the principal Tatin Registry operates a non-delete policy.
+
+For example, let's assume these three packages are published:
+
+
+```
+aplteam-Foo-1.0.0
+aplteam-Foo-1.1.0
+aplteam-Foo-1.1.1
+```
+
+Executing:
+
+```
+]Tatin.DeprecatePackage https://your-Registry/aplteam-Foo-1
+```
+
+will make the Tatin Registry publish a new version `aplteam-Foo-1.2.0` on your behalf which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `comment` which carries the comment in case you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
+
+From now on both the "Packages" web page and `]Tatin.ListPackages` won't list these four packages anymore.
+
+Note that `]Tatin.ListDeprecated` is designed to list just the deprecated packages. If you want the list to include also the earlier versions --- which are now sort of hidden by 1.2.0 --- then you need to specify the `-all` flag. 
+
+With `-all` a matrix with two columns rather than one is returned, with the second column carrying an asterisk for those packages that actually  do carry `deprecated←1` in their config file. That would be at least the very last one.
+
+##### Side effects of deprecating a package
+
+If you try to load or install a package that is marked as deprecated then you will be asked whether you really want that, but if you insist then you will get what you asked for.
+
+Note however that this is only true when you ask explicitly for the last package (the one with `deprecated←1`) and when you specify just the major version number.
+
+In our earlier example that would be either
+
+```
+]Tatin.LoadPackages https://your-registry/aplteam-Foo-1
+```
+
+or
+
+```
+]Tatin.LoadPackages https://your-registry/aplteam-Foo
+```
+
+If you ask _explicitly_ for an _earlier_ version (one that has no property `deprecated` in its config file) then that version would be loaded (or installed) without further ado, because Tatin would just assume that you know what you are doing.
+
+Note that the API functions for loading / installing packages would not complain or warn you at all. 
+
+A> ### Mistakenly deprecated a package?
+A>
+A> There is an easy escape route: just publish the package again with an increased minor version number but `deprecated` either set to 0 or removed from the config file, and the package is back on track. 
+A>
+A> If `comment` was not empty then that should be removed or emptied.
+A> 
+A> Once you've done that the very latest published package would no longer carry a "deprecated" flag with the value 1, and therefore it would no longer fulfill the criteria of a deprecated package.
+
 
 #### Tatin Variables
 

@@ -7,7 +7,7 @@
  request.RequestTarget←'/'
  request.Headers,←⊂'x-tatin' '0.1'
 
- r←TC.SendAndReceive'https://localhost'request
+ r←TC.SendAndReceive(TC.ReplaceRegistryAlias'[localhost]')request
  →T.PassesIf r.StatusCode=400
  →T.PassesIf∨/'Request came from an invalid version of Tatin. Update to version'⍷r.Content
 

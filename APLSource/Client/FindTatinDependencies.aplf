@@ -1,0 +1,23 @@
+ r←{level}FindTatinDependencies(folder pkgList);folders
+⍝ Starting in `folder`, all sub folders are scanned for a file "apl-dependencies.txt".\\
+⍝ Folders with such a file will be scanned for packages defined in `pkgList`.\\
+⍝ `pkgList` must be a simple char vector with a list of comma-separated packages.\\
+⍝ The packages can be specified fully or partly. "Group" and "Version" can all be left out,
+⍝ but "Name" is mandatory. You may specify a major version but neither minor nor patch.
+⍝ If you do anyway anything after the major number will be ignored.\\
+⍝ Note that the search is *not* case sensitive.\\
+⍝ Returns a fully qualified list with all hits.\\
+⍝ By default just the folder is returned that contains the file "apl-dependencies.txt".
+⍝ In case a 1 is passed as left argument (default is 0, other values led to an error) the
+⍝ package folders are also returned, revealing the precise version installed.
+ level←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'level'
+ folder←{0<⎕NC ⍵:⍎⍵ ⋄ './'}'folder'
+ folder,←(~(¯1↑folder)∊'/\')/'/'
+ 'The package list must be a simple comma-separated list of package naames'Assert 80=⎕DR pkgList
+ 'The folder must be a simple char vector'Assert 80=⎕DR folder
+ ('Not found: ',folder)Assert ⎕NEXISTS folder
+ pkgList←⎕C','(≠⊆⊢),pkgList
+ 'A package name must not contain more than a maximum of two hyphens'Assert{2≥'-'+.=⍵}¨pkgList
+ pkgList←Reg.RemoveMinorAndPatch¨pkgList
+ r←level FindTatinDependencies_ folder pkgList
+⍝Done

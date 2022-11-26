@@ -1,0 +1,8 @@
+ utc←UTC local;⎕USING
+⍝ Convert a local Julian Day timestamp to a UTC Julian Day timestamp
+⍝ See "Describe" for more details.
+⍝ Written July 1, 2020 by Davin Church of Creative Software Design
+
+ ⎕USING←'' ⋄ :If 0≠⍴⍴local ⋄ utc←UTC¨local ⋄ :Return ⋄ :EndIf ⍝ .NET is scalar-oriented
+ utc←(System.DateTime.SpecifyKind(⎕NEW System.DateTime(⊃7 GD local))2).ToUniversalTime
+ utc←JD⊂utc.(Year Month Day Hour Minute Second Millisecond)

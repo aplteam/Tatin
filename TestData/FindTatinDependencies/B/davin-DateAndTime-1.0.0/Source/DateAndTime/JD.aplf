@@ -1,0 +1,46 @@
+ JJJ←JD YMD;Y;M;y1600;HMS;⎕CT;UseDT;deep;D;t;hms
+⍝ Convert a Gregorian-style date (YYYYMMDD) to a "Julian Day Number".
+⍝ If any item of the input is nested, then that date is assumed to be
+⍝ separated into a 3-item nested vector containing separate numeric
+⍝ values for year, month, and day.
+⍝ Dates may optionally include a "time" portion to produce a "timestamp"
+⍝ value.  Optionally nested items (as described above) may have 5, 6, or 7
+⍝ items instead of just 3 to indicate hours, minutes, seconds, or
+⍝ milliseconds.  Standard integers are extended to allow non-integer
+⍝ values in the format (YYYYMMDD.HHMMSSTTT).  If either of these optional
+⍝ formats are used, the result will not be an integer and the fractional
+⍝ portion will be the numeric fraction of a day representing that time.
+⍝ ⎕DT is used if available, but xxx.0 is defined as midnight beginning the
+⍝ day instead of noon in the middle of that day, for convenience.
+⍝ A scalar 0 (or vector of 0s) will be translated to a value of 0, for
+⍝ convenience of handling missing dates in numeric arrays.
+⍝ Any rank & shape array accepted.  See documentation for more details.
+⍝   Constants: 1721117 ← 1-Jan-0001; 2299160 ← 4-Oct-1582
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 29, 2020 by Davin Church of Creative Software Design
+⍝ Modified November 2020 by Davin Church of Creative Software Design
+
+ :If UseDT←18≤2⊃⎕VFI 3↑2⊃'.'⎕WG'APLVersion' ⍝ Is ⎕DT available here?
+ :AndIf UseDT←1≥⍴∪deep←,1≤≡¨YMD ⍝ Only if they're all the same structure
+     :If ⊃deep ⋄ UseDT←∧/,¯1 0 ⎕DT YMD ⋄ :Else ⋄ UseDT←∧/,60 0 ⎕DT YMD ⋄ :EndIf ⍝ Make sure it's a valid/supported date
+ :EndIf
+ :If UseDT ⍝ A bit faster than native code, if everything is nice and neat
+     :If ⊃deep ⋄ JJJ←¯1 50 ⎕DT YMD ⋄ :Else ⋄ JJJ←60 50 ⎕DT YMD ⋄ :EndIf ⍝ Alternate input forms
+     JJJ←JJJ+0.5 ⍝ ⎕DT starts at noon instead of midnight as we prefer
+ :Else ⍝ Older version of system - simulate ⎕DT and allow for extra situations
+     Y←M←D←HMS←(⍴YMD)⍴0 ⋄ ⎕CT←1E¯16 ⍝ Avoid some millisecond rounding problems
+     :If 1∊t←0<|≡¨YMD ⍝ Alternate (nested/expanded) form?
+         HMS←HMS+t×(⌊0.5+(⊂0 60 60 1000)⊥¨4↑¨3↓¨YMD)÷86400000
+         Y←Y+t×1⊃¨YMD,¨1 ⋄ M←M+t×2⊃¨YMD,¨⊂1 1 ⋄ D←D+t×3⊃¨YMD,¨⊂1 1 1
+     :EndIf
+     :If 1∊t←~t ⍝ Compact form?
+         hms←10×⊃¨⌊0.5+100000000×1||YMD ⍝ Rounding any timestamp to 10ms
+         HMS←HMS+t×((⊂0 60 60 1000)⊥¨(⊂0 100 100 1000)⊤¨hms)÷86400000
+         Y←Y+⊃¨t×(×YMD)×⌊|YMD÷10000 ⋄ M←M+⊃¨t×⌊(10000||YMD)÷100 ⋄ D←D+⊃¨t×⌊100||YMD
+     :EndIf
+     (Y M D)←Y M D-(×Y M D)×1||Y M D ⋄ Y←Y+⌊(M-1)÷12 ⋄ M←1+12|M-1 ⋄ Y←Y-12<M←M+12×M≤2
+     JJJ←D+0 0 0 31 61 92 122 153 184 214 245 275 306 337[M]
+     y1600←0⌈Y-1600 ⋄ JJJ←JJJ+1721117+(⌊Y×365.25)-(⌊y1600÷100)-⌊y1600÷400
+     JJJ←HMS+(∨/¨YMD≠0)×JJJ-10×JJJ>2299160
+ :EndIf

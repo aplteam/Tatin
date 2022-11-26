@@ -1,9 +1,11 @@
- {ref}←Compile path;packageList;index;cfgFiles;descs;tags;buff;ind
+ {ref}←Compile path;packageList;index;cfgFiles;descs;tags;cfgData;ind;index2;deprecated;deprecated_
 ⍝ (Re)-builds the index for the registry pointed to by `path`.
 ⍝ Writes several files:
 ⍝ * {path}/tatin_index.txt contains a simple string with all package folder names
 ⍝ * {path}/tatin_descriptions.json contains a simple string with all package descriptions
 ⍝ * {path}/tatin_tags.txt contains the tags for all packages
+⍝ * {path}/tatin_deprecated.txt contains the names of all packages that are deprecated, but
+⍝   within a major version only the last version, if that is deprecated
 ⍝ More stuff might be added later.
 ⍝ Returns a reference to a namspace that holds veriables with these pieces of information.
  ref←⎕NS''
@@ -12,28 +14,32 @@
          packageList←##.InjectPublishingDate packageList
          packageList←packageList[##.SortIndexForPackageIDs packageList;1]
          index←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¨packageList
-         index←⊃,/index,¨⎕UCS 13
-         ref.index←index
-         (⊂index)##.F.NPUT(path,'/',GetIndexFilename)1
          cfgFiles←packageList,¨⊂'/apl-package.json'
-         cfgFiles←(##.F.IsFile cfgFiles)/cfgFiles              ⍝ Should only happen in case tracing through test cases
-         buff←{(##.ReadConfigFile ⍵)}¨cfgFiles
-         :If 0<≢ind←⍸{0=⊃⍵.⎕NC'description'}¨buff
-             buff[ind].description←⊂''
-         :EndIf
-         :If 0<≢ind←⍸{0=⊃⍵.⎕NC'tags'}¨buff
-             buff[ind].tags←⊂''
-         :EndIf
-         (descs tags)←↓⍉↑buff.(description tags)
+         cfgFiles←(##.F.IsFile cfgFiles)/cfgFiles                ⍝ Should only happen in case one is tracing through test cases
+         cfgData←{(##.ReadConfigFile ⍵)}¨cfgFiles
+         cfgData←PolishCfgData cfgData
+         (descs tags)←↓⍉↑cfgData.(description tags)
+         (cfgData.deprecated/descs)←⊂''
+         (cfgData.deprecated/tags)←⊂''
          descs←⊃,/descs,¨⎕UCS 13
          ref.descriptions←descs
+         deprecated←cfgData.deprecated⌿index
+         tags←(~index∊deprecated)/tags                           ⍝ Remove all tags that belong to deprecated packages
          (⊂descs)##.F.NPUT(path,'/tatin_descriptions.json')1
-         tags←##.TAB{(1⊃⍵),⍺,(2⊃⍵)}¨⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨{⍵⊆⍨~⍵∊';,'}⍵}¨tags  ⍝ We keep supporting ";" for the time being
+         tags←##.TAB{(1⊃⍵),⍺,(2⊃⍵)}¨⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨{⍵⊆⍨~⍵∊';,'}⍵}¨tags ⍝ We keep supporting ";" for the time being
          (⊂tags)##.F.NPUT(path,'/tatin_tags.txt')1
+         deprecated_←⊃,/deprecated,¨⎕UCS 13
+         (⊂deprecated_)##.F.NPUT(path,'/tatin_deprecated.txt')1
+         ref.deprecated←deprecated_
+         index~←deprecated
+         index2←⊃,/index,¨⎕UCS 13
+         ref.index←index2
+         (⊂index2)##.F.NPUT(path,'/',GetIndexFilename)1
      :Else
          (⊂'')##.F.NPUT(path,'/',GetIndexFilename)1
          (⊂'')##.F.NPUT(path,'/tatin_descriptions.json')1
          (⊂'')##.F.NPUT(path,'/tatin_tags.txt')1
+         (⊂'')##.F.NPUT(path,'/tatin_deprecated.txt')1
      :EndIf
  :EndHold
 ⍝Done

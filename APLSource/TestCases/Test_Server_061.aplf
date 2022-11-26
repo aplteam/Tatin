@@ -4,16 +4,16 @@
  r←T._Failed
 
  parms←⎕NS''
- list1←parms TC.ListPackages'https://localhost'
+ list1←parms TC.ListPackages(TC.ReplaceRegistryAlias'[localhost]')
  →T.PassesIf 0<≢list1
 
  parms.tags←'winndow'
- list2←parms TC.ListPackages'https://localhost'
+ list2←parms TC.ListPackages(TC.ReplaceRegistryAlias'[localhost]')
  →T.PassesIf 0<≢list2
  →T.PassesIf>/≢¨list1 list2
 
  parms.group←'aplteam'
- list3←parms TC.ListPackages'https://localhost'
+ list3←parms TC.ListPackages(TC.ReplaceRegistryAlias'[localhost]')
  →T.PassesIf 0<≢list3
  →T.PassesIf>/≢¨list1 list3
 

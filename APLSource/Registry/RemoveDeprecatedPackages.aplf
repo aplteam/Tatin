@@ -1,0 +1,7 @@
+ mat←path RemoveDeprecatedPackages mat;deprecated;deprecated_;list
+⍝ All packages of a major version are removed when the very latest package is marked as deprecated
+ deprecated←ListDeprecatedPackages path
+ deprecated_←RemoveMinorAndPatch¨deprecated
+ list←RemoveMinorAndPatch¨mat[;1]
+ mat←(~list∊deprecated_)⌿mat
+⍝Done

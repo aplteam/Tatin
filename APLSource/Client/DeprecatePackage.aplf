@@ -1,0 +1,37 @@
+ (rc msg)←DeprecatePackage(uri comment packageID);request;res
+⍝ Declare a packages as deprecated.\\
+⍝ * `uri` must be a Registry URL or a Registry alias
+⍝ * `packageID` must be one of the following:
+⍝   * GroupName-PkgName-1
+⍝   * GroupName-PkgName     ⍝ Acts on all major version numbers
+ rc←0 ⋄ msg←''
+ uri←F.EnforceSlash ReplaceRegistryAlias uri
+ 'You must specify a Registry, a group name, a package ID and optionally a major version number'Assert 0<≢packageID
+ 'You must specify a managed Registry'Assert 0<≢uri
+ 'Invalid packageID'Assert('-'+.=packageID)∊1 2
+ 'The package ID must have group name, package name and optionally a major version number'Assert(≢'-'(≠⊆⊢)packageID)∊2 3
+ packageID←Reg.RemoveMinorAndPatch packageID
+ 'You must specify a Registry, a group name, a package ID and optionally a major version number'Assert 0<≢packageID
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/deprecate',{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
+ request.Content←comment
+ request.Method←'PUT'
+ request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)
+ res←SendAndReceive uri request
+ :If res.StatusCode≢200
+     rc←1
+     :If 404≡res.StatusCode
+         :If 0<≢res.Content
+             msg←res.Content
+         :Else
+             msg←'Package not found'
+         :EndIf
+     :ElseIf 401≡res.StatusCode
+         msg←'Server: Unauthorized request (401)'
+     :ElseIf ∨/'<html'⍷res.Content
+         msg←'Server ',uri,' reported an error: ',⍕res.StatusCode
+     :Else
+         msg←'Server error: ',res.Content
+     :EndIf
+ :EndIf
+⍝Done

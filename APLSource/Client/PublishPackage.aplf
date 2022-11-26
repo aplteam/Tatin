@@ -17,8 +17,7 @@
  uri←F.EnforceSlash ReplaceRegistryAlias registry
  'No URI provided'Assert 0<≢uri
  'Not just a Registry'Assert uri≡RemovePackageID uri
- ⍝ Do we need to worry about a server that hosts several Tatin servers with the same domain name but different ports?
- 'Unknown Registry'Assert(⊂EnforceTrailingSlash RemovePort RemovePackageID uri)∊MyUserSettings.registries.uri
+ 'Unknown Registry'Assert(⊂EnforceTrailingSlash uri)∊⊃¨{0≡⍵:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}/¨MyUserSettings.registries.(uri port)
  source←RemoveFileProtocol source  ⍝ Precaution
  zipFilename←PackIfFolder source
  'Invalid URI specified: not a zip file'Assert'.zip'≡⎕C ¯4↑zipFilename

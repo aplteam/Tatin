@@ -1,17 +1,38 @@
- r←FetchBackground ini;backgroundColor;backgroundImage
+ r←FetchBackground ini;backgroundColor;text
 ⍝ The INI file section [HTMLBACKGROUND] rules how the background should like this.\\
 ⍝ * For production servers we expect "colour" to be set and used for the <body> tag.
-⍝ * For a production server we expect "image" to be set and used for the <body> tag.
- r←'<style>' 'body {'
+⍝ * You may add a text as watermark for indicating the purpose of a Tatin server.
+⍝   On https://test.tatin.dev this is used to display "Tatin Test Server" for example.
+ r←''
+ r,←⊂'<style>'
  :If ini.Exist'HTMLBACKGROUND:color'
      backgroundColor←⊃ini.Get'HTMLBACKGROUND:color'
  :AndIf 0<≢backgroundColor
+     r,←⊂'body {'
      r,←⊂'background-color: ',backgroundColor,');'
+     r,←'}'
  :EndIf
- :If ini.Exist'HTMLBACKGROUND:image'
-     backgroundImage←⊃ini.Get'HTMLBACKGROUND:image'
- :AndIf 0<≢backgroundImage
-     r,←⊂'background-image: url("/Assets/img/',backgroundImage,'");'
+ :If ini.Exist'HTMLBACKGROUND:watermark'
+     text←⊃ini.Get'HTMLBACKGROUND:watermark'
+     ((''''=text)/text)←'`'   ⍝ body:before does not show quotes in 2022-11
+ :AndIf 0<≢text
+     r,←⊂' body:before{'
+     r,←⊂'  content: ''',text,''';'
+     r,←⊂'  position: fixed;'
+     r,←⊂'  top: 0;'
+     r,←⊂'  bottom: 0;'
+     r,←⊂'  left: 0;'
+     r,←⊂'  right: 0;'
+     r,←⊂'  z-index: -1;'
+     r,←⊂'  color: #FFADAD;'
+     r,←⊂'  font-size: 100px;'
+     r,←⊂'  font-weight: 500px;'
+     r,←⊂'  display: grid;'
+     r,←⊂'  justify-content: center;'
+     r,←⊂'  align-content: center;'
+     r,←⊂'  opacity: 0.2;'
+     r,←⊂'  transform: rotate(-45deg);'
+     r,←⊂'}'
  :EndIf
- r,←'}' '</style>'
+ r,←⊂'</style>'
 ⍝Done

@@ -1,0 +1,13 @@
+ flag←CheckDeprecatedFlag folder;filename;EndIf;cfg
+⍝ Checks the `deprecated` flag of the package config file in "folder".
+⍝ If "deprecated" does not exist or is 0 or the user confirms that she really wants a deprecated package
+⍝ then a 1 is returned, otherwise a 0.
+ flag←0
+ filename←folder,'/',CFG_Name
+ :If ~⎕NEXISTS filename
+     cfg←Reg.JSON⊃F.NGET filename
+ :OrIf 0=cfg.⎕NC'deprecated'
+ :OrIf 0=cfg.deprecated
+ :OrIf YesOrNo'The package is deprecated - continue anyway?'
+     flag←1
+ :EndIf

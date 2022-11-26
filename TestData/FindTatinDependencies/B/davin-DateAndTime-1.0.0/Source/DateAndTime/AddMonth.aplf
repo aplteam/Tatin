@@ -1,0 +1,20 @@
+ next←{count}AddMonth JJJ;ymd;ym;s;y;m
+⍝ Given a "Julian Day Number", return the number of the date which is
+⍝ one calendar month (or specified number of months) in the future (or
+⍝ past).  The day of the month remains the same.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Modified 9 March 2010 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'count' ⋄ count←1 ⋄ :EndIf ⍝ Default = 1 = Next month
+ s←¯1*0>ymd←GD JJJ ⋄ ymd←|ymd
+ y←s×⌊ymd÷10000 ⋄ m←100|⌊ymd÷100 ⋄ ym←(m-1)+12×y-1 ⍝ Relative month #
+ ym←ym+count ⍝ Add in specified number of calendar months
+ m←1+12|ym ⋄ s←¯1*0>y←1+⌊ym÷12
+ next←JD s×(10000×|y)+(100×m)+100|ymd
+ ym←ym+1 ⍝ February can wrap more than 1 day ahead - limit it
+ m←1+12|ym ⋄ s←¯1*0>y←1+⌊ym÷12
+ next←next⌊JD s×(10000×|y)+(100×m)+1
+ next←next×JJJ≠0 ⍝ If incoming date = 0 (null), also return 0

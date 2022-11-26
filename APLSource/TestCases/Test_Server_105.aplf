@@ -19,11 +19,11 @@
  cfg.source←'Test.apln'
  TC.WritePackageConfigFile src cfg
 
- (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
+ (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias '[localhost]')
  Assert 200=rc
 
  :Trap 998
-     TC.PublishPackage src'https://localhost/'
+     TC.PublishPackage src (TC.ReplaceRegistryAlias '[localhost]')
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

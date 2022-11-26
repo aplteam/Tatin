@@ -1,9 +1,10 @@
  response←{host}GetPackageViaHTTP_ packageID;r;request
 ⍝ Requests a package via HTTP(S)
-⍝ `host` defaults to "https://localhost"
+⍝ `host` defaults to "https://tatin.dev"
 ⍝ Port number is defined by the client settings
 ⍝ * a package ID
- host←{0<⎕NC ⍵:⍎⍵ ⋄ 'https://localhost/'}'host'
+ host←{0<⎕NC ⍵:⍎⍵ ⋄ 'https://tatin.dev/'}'host'
+ host←ReplaceRegistryAlias host
  request←R.NewRequest 0
  request.RequestTarget←'/',packageID
  response←SendAndReceive host request   ⍝ Errors handled by caller

@@ -1,0 +1,24 @@
+ html←PrepareHtmlPageForDeprecatedList list;colTitles;col1;col2;data;links
+ html←HtmlHeader GetDataTableStuff ⍬
+ html,←⊂'<h2>List of deprecated packages</h2>'
+ html,←AddSpecialMessage ⍬
+ data←((⍪list),⊂'Config')
+ colTitles←'Package name' 'Config'
+ html,←⊂H.OpenTable colTitles CalcTableWidth data
+ html,←⊂'<thead>'
+ html,←⊂'<tr class="my-first-th">'
+ html,←{'<th style="align: left">',⍵,'</th>'}¨colTitles
+ html,←⊂'</thead>'
+ html,←⊂'<tbody>'
+ :If 0<≢list
+     col1←{'<td><code>',⍵,'</code></td>'}¨data[;1]
+     links←{'<a href="',Reg.VersionOf_REST,'/packages/details/',⍵,'" title="Link to the package configuration">Show</a>'}¨data[;1]
+     col2←{'<td>',⍵,'</td>'}¨links
+     html,←{'<tr>',⍵,'</tr>'}¨col1,¨col2
+ :EndIf
+ html,←⊂'</tbody>'
+ html,←⊂'</table>'
+ html,←⊆GetFooter
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+ ⍝Done

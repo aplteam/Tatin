@@ -2,6 +2,7 @@
  r←0 3⍴''
  packageID←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'packageID'
  list←Reg.GetAllPackages G.RegistryPath
+ list←G.RegistryPath Reg.RemoveDeprecatedPackages list
  list2←list Reg.ListPackages(G.RegistryPath,packageID)parms
  list3←Reg.RemoveVersionNumber¨list
  :If 0<≢uniqueIDs←(⌽,list){⍺[(Reg.RemoveVersionNumber¨⍺)⍳⍵]}list2[;1]     ⍝ ⌽ them in order to get the latest version

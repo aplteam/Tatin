@@ -369,12 +369,10 @@
           :EndIf
           uri_←':[0-9]+\/'⎕R'/'⊣uri      ⍝ Remove potential port number
           bool←(⊂uri_)≡¨_registries.uri
-          :If 1<+/bool
-              :If 1<≢port
-                  bool∧←_registries.port∊¨⊂port
-              :Else
-                  bool∧←_registries.port=port
-              :EndIf
+          :If 1<≢port
+              bool∧←_registries.port∊¨⊂port
+          :Else
+              bool∧←_registries.port=port
           :EndIf
       :EndIf
     ∇

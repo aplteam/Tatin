@@ -49,21 +49,24 @@
 ⍝ If you want to create a full-blown HTML page without any files being involved you
 ⍝ can also set the `createFullHtmlPage` parameter to 1.
 ⍝ ## Misc
-⍝ |Homepage:    | <http://aplwiki.com/MarkAPL> |
-⍝ |Cheat sheet: | <http://download.aplteam.com/MarkAPL_CheatSheet.html> |
-⍝ |Reference:   | <http://download.aplteam.com/MarkAPL.html> |
-⍝ Kai Jaeger ⋄ APL Team Ltd
+⍝ |Homepage:    | <http://github.com/aplteam/M<arkAPL> |
+⍝ |Cheat sheet: | #.MarkAPL.Help 0 |
+⍝ |Reference:   | #.MarkAPL.Reference 0 |
+⍝ Kai Jaeger
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public Shared
       ⍝ See `History`
-      r←'MarkAPL' '11.0.3+239' '2022-05-09'
+      r←'MarkAPL' '11.0.4+246' '2022-10-26'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 11.0.4 ⋄ 2022-10-26
+      ⍝   * Bug fixes
+      ⍝     * `ShowHtml` did not cope when the right argument pointed to the current directory
       ⍝ * 11.0.3 ⋄ 2022-05-09
       ⍝   * Bug fixes:
       ⍝     * When the command line of the current instance of Dyalog contained something like
@@ -470,7 +473,7 @@
       filename←parms.homeFolder,'/Files/MarkAPL_CheatSheet'
       filename←recompileFlag AddAppropriateExtension filename
       ns←CompileHelp filename recompileFlag parms
-      :If ¯1≠×recompileFlag  ⍝ This syntax is used only by the `Make` workspace and test cases, therefore it is not documented.
+      :If ¯1≠×recompileFlag  ⍝ This syntax is used only by `Make` and test cases, therefore it is not documented.
       :AndIf parms.viewInBrowser
           ns ShowHtml(⊃,/2↑⎕NPARTS filename),'.html'
       :EndIf
@@ -3600,6 +3603,9 @@
       }
 
     ∇ {r}←ns ShowHtml name;filename
+      :If './'≡2⍴name
+          name←(⊃1 ⎕NPARTS''),2↓name
+      :EndIf
       :If '/'≠1⍴name
       :AndIf ~':'∊name
           filename←##.FilesAndDirs.EnforceSlash parms.homeFolder,'/Docs/',name,'.html'

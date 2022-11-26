@@ -3,7 +3,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (statusCode errMsg result)←TC.GetBestVersionNumber'aplteam-APLProcess-0' 'https://localhost'
+ (statusCode errMsg result)←TC.GetBestVersionNumber'aplteam-APLProcess-0' (TC.ReplaceRegistryAlias '[localhost]')
  →T.PassesIf statusCode=200
  best←∆GetBestVersionFor'aplteam-APLProcess-0*'
  →T.PassesIf≡/{⍵↓⍨¨≢¨TC.RemovePackageID¨⍵}result best

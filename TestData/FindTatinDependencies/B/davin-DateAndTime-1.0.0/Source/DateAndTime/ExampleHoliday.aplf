@@ -1,0 +1,44 @@
+ isholiday←ExampleHoliday JJJ;fixed;days;months;years;h
+⍝ Determine if given JDN date is a standard U.S. banking holiday.
+⍝ --- For use with operator AddWorkday ---
+⍝ Any rank & shape array(s) accepted.  See "Describe" for more details.
+⍝ Code for DayOfWeek is embedded into this function.
+
+⍝ The following holidays are reported by this function:
+⍝   New Year's Day,     January 1st
+⍝   MLK Jr.'s Birthday, 3rd Monday in January
+⍝   President's Day,    3rd Monday in February
+⍝   Memorial Day,       Last Monday in May
+⍝   Independence Day,   July 4th
+⍝   Labor Day,          1st Monday in September
+⍝   Columbus Day,       2nd Monday in October
+⍝   Veterans' Day,      November 11th
+⍝   Thanksgiving Day,   4th Thursday in November
+⍝   Christmas Day,      December 25th
+⍝ The above dates are not considered holidays if they fall on a
+⍝ Saturday, but the following Monday is the observed holiday if the
+⍝ exact date falls on a Sunday.
+⍝
+⍝ (These holidays definitions are not useful prior to the last few
+⍝ decades of the 20th century, but are still computed back to 1 A.D.)
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ h←⍬ ⋄ years←,⌊(GD JJJ)÷10000 ⍝ Determine all years in question
+ years←years[⍋years] ⋄ years←(1,(1↓years)≠¯1↓years)/years ⍝ Unique list
+
+⍝ *** First check for fixed-date holidays
+ days←1+7|1+months←JD 101 704 1111 1225∘.+years×10000
+ h←h,(7≠,days)/,months+days=1 ⍝ Ignore Saturdays & move Sundays to Mondays
+
+⍝ *** Now watch for moveable holidays throughout the year
+⍝ First, get all beginning-of-month dates and starting days
+ days←1+7|1+months←JD 101 201 601 901 1001 1101∘.+years×10000
+⍝ Shift each to proper day of week and week of month, month-relative
+ days←14 14 ¯7 0 7 21+[1]7|2 2 2 2 2 5-[1]days
+⍝ And add them to beginning-of-month dates to get real holidays
+ h←h,,months+days
+
+⍝ *** Great!  That's all the holidays we're considering...
+ isholiday←JJJ∊h ⍝ Just let them know if we have any matches

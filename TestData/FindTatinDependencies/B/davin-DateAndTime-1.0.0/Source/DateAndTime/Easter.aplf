@@ -1,0 +1,17 @@
+ JJJ←Easter year;cyc;cc;yy;x;w;G;Gmd;Jmd
+⍝ Compute the JDN of the date on which Easter falls in the given year.
+⍝ Handles dates in both the Gregorian and Julian calendars.
+⍝ The Gregorian calculation is based on the 1876 method published in
+⍝ "Butcher's Ecclesiastical Calendar" (don't even ask how it works).
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Modified 9 March 2010 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ G←year>1582 ⋄ cyc←19|year ⋄ cc←⌊year÷100 ⋄ yy←100|year
+ x←30|15+(19×cyc)+G×(cc-⌊cc÷4)-⌊(cc+1-⌊(cc+8)÷25)÷3
+ w←7|32+(2×4|cc)+(2×⌊yy÷4)-x+4|yy
+ Gmd←1+100⊥0 31⊤114+x+w-7×⌊(cyc+(11×x)+(22×w))÷451
+ Jmd←1+100⊥0 31⊤114+x+7|34+(2×4|year)+(4×7|year)-x
+ JJJ←(year≠0)×JD(¯1*year<0)×(10000×|year)+(Gmd×G)+(Jmd×~G)

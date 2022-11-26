@@ -21,12 +21,12 @@
 
  packageID←'Example-Package_A-0.1.0'
 
- reg←TC.MyUserSettings.GetRegistry'https://localhost'
+ reg←TC.MyUserSettings.GetRegistry (TC.ReplaceRegistryAlias '[localhost]')
  oldCredentials←reg.api_key
  reg.api_key←'Firlefanz'
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
  :Trap 998
-     TC.PublishPackage src'https://localhost/'
+     TC.PublishPackage src (TC.ReplaceRegistryAlias '[localhost]')
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

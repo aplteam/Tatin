@@ -2,7 +2,13 @@
 ⍝ `path` is fully qualified. The packageID part might have just a major version no. or no version numer at all
  :If Reg.IsValidPackageName packageID
      :If 0<≢group←EstablishGroup packageID
-         packageID←group,packageID
+         :If 1=≢group
+             packageID←(1⊃group),'-',packageID
+         :Else
+             response←request Respond 400
+             response.Content←'The package exists in multiple groups: ',⊃{⍺,',',⍵}/group
+             :Return
+         :EndIf
      :Else
          response←'Package not found'Return404 request
          :If 200≠response.StatusCode

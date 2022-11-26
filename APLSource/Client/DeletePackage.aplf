@@ -7,7 +7,7 @@
  'No valid URL or alias provided'Assert 0<≢url_
  (url_ packageID)←Reg.SeparateUriAndPackageID url_
  :If 'file://'{⍺≢(≢⍺)↑⍵}url_
-     ('Unknown Registry/package: "',url,'"')Assert(⊂EnforceTrailingSlash url_)∊MyUserSettings.registries.uri
+     ('Unknown Registry: "',url,'"')Assert(⊂EnforceTrailingSlash url_)∊⊃¨{0≡⍵:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}/¨MyUserSettings.registries.(uri port)
  :EndIf
  :If Reg.IsHTTP url_
      request←R.NewRequest 0

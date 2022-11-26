@@ -4,7 +4,7 @@
 ⍝ and potentially be deleted after the test has been run successfully.
  q←R.NewRequest 0
  q.RequestTarget←'/v1/get-server-path'
- response←TC.SendAndReceive 'https://localhost' q
+ response←TC.SendAndReceive (TC.ReplaceRegistryAlias '[localhost]') q
  Assert response.StatusCode≡200
  path←response.Content
  :If ∧/':\'∊path

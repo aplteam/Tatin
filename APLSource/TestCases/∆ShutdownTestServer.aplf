@@ -2,7 +2,7 @@
  :If 0<⎕NC'∆P'
      request←R.NewRequest 0
      request.RequestTarget←'/v1/shutdown'
-     response←TC.SendAndReceive'https://localhost'request
+     response←TC.SendAndReceive(TC.ReplaceRegistryAlias'[localhost]')request
      success←200=response.StatusCode
      ⎕EX'∆P'
  :EndIf

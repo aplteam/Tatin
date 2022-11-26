@@ -1,22 +1,7 @@
- response←CreateHomePage request;html;policy;add
+ response←CreateHomePage request;html;policy;add;regInfo
 ⍝ Creates the index.html
 ⍝ https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html
  add←''
- add,←⊂'<style>'
- add,←⊂'  .install-info{'
- add,←⊂'    position: relative;'
- add,←⊂'    max-width: 300px;'
- add,←⊂'    height: auto;'
- add,←⊂'    border: 2px solid gray;'
- add,←⊂'    background-color: #FAEBD7;'
- add,←⊂'    margin: 10px 20px;'
- add,←⊂'    padding: 10px 20px;'
- add,←⊂'    box-sizing: border-box;'
- add,←⊂'    float: right;'
- add,←⊂'    font-size: large;'
- add,←⊂'    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;'
- add,←⊂'  }'
- add,←⊂'</style>'
  html←HtmlHeader add
  html,←⊂'<h2>Main page</h2>'
  html,←AddSpecialMessage ⍬
@@ -31,13 +16,15 @@
  html,←⊂'</div>'
  html,←⊂'<nav>'
  html,←⊂'<ol>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/packages">List packages</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/groups">List groups</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/tags">List tags</a></li>'
+ regInfo←GetRegistryInfo G.INI
+ html,←⊂'<li><a href="',Reg.VersionOf_REST,'/packages">',regInfo,'Packages</a></li>'
+ html,←⊂'<li><a href="',Reg.VersionOf_REST,'/deprecated-pkgs">',regInfo,'Deprecated packages</a></li>'
+ html,←⊂'<li><a href="',Reg.VersionOf_REST,'/groups">',regInfo,'Groups</a></li>'
+ html,←⊂'<li><a href="',Reg.VersionOf_REST,'/tags">',regInfo,'Tags</a></li>'
  html,←⊂'<li><a href="',Reg.VersionOf_REST,'/documentation">Documentation Center</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/credential-report">Credential report</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/usage-data">Download usage data for packages</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/version-information">Version information regarding Tatin</a></li>'
+ html,←⊂'<li><a href="',Reg.VersionOf_REST,'/credential-report">',regInfo,'Credential report</a></li>'
+ html,←⊂'<li><a href="',Reg.VersionOf_REST,'/usage-data">',regInfo,'Usage data</a></li>'
+ html,←⊂'<li><a href="',Reg.VersionOf_REST,'/version-information">',regInfo,'Version information</a></li>'
  html,←⊂'</ol>'
  html,←⊂'</nav>'
  :Select GetDeletePolicy

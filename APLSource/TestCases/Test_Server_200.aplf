@@ -4,9 +4,9 @@
  r←T._Failed
 
  packageID←'example-Zoo-3.0.0'
- tree←TC.GetDependencyTree'https://localhost/',packageID
+ tree←TC.GetDependencyTree(TC.ReplaceRegistryAlias'[localhost]'),packageID
  {}TC.CloseConnections 1
- →T.PassesIf 1 'example-Zoo-3.0.0' 'https://localhost/'≡,tree
+ →T.PassesIf 1 'example-Zoo-3.0.0' (TC.ReplaceRegistryAlias'[localhost]')≡,tree
 
  r←T._OK
 ⍝Done

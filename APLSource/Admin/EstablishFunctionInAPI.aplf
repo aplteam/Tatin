@@ -2,7 +2,11 @@
 ⍝ Establish cover functions serving as API functions for what are the public functions.
  r←0
  type←##.Client.⎕NC⊂name
- :If 3=⌊type
+ :If 0=type
+     ⎕←'Tatin error; "',name,'" is not defined'
+ :ElseIf 3≠⌊type
+     ⎕←'Tatin error; "',name,'" is not a function (NC=',(⍕⌊type),')'
+ :Else
      :If 2=|1 2⊃##.Client.⎕AT name
          {⎕SE.Tatin.⍎⍵,'←{⍺←⊢ ⋄ ⍺ ⎕SE._Tatin.Client.',⍵,' ⍵}'}name
      :Else

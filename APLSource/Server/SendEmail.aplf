@@ -1,8 +1,11 @@
- {r}←SendEmail y;⎕TRAP
- :If 0<≢r←Emails.SendCrashMail G.INI
-     :Trap (~G.TestFlag)/0
+ {r}←SendEmail y;⎕TRAP;rc;msg
+ (rc msg)←Emails.SendCrashMail G.INI
+ :Trap (~G.TestFlag)/0
+     :If rc≠0
          P.AppLog⊆'*** Error'
          P.AppLog⊆'Sending crash report failed: ',r
-     :EndTrap
- :EndIf
+     :Else
+         P.AppLog⊆r
+     :EndIf
+ :EndTrap
 ⍝Done

@@ -1,0 +1,19 @@
+ WOY←{start}WeekOfYear JJJ
+⍝ Given a "Julian Day Number", return the number of the week in which it falls that year.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Years are normally considered to begin on the first day of the first
+⍝ month (0101) of the calendar year, but to support odd fiscal years a
+⍝ different beginning-of-year month/day number (0101-1231) may be
+⍝ specified as an optional left argument.
+⍝ Alternatively, a single digit may be specified indicating that the
+⍝ year should begin on a specific day of the first calendar week,
+⍝ where 1=Sunday ... 7=Saturday.
+⍝ The default left argument is 0, which indicates the calendar beginning
+⍝ of the year (the same as 0101).
+⍝
+⍝ Written 5 September 2020 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog September 6, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'start' ⋄ start←0 ⋄ :EndIf
+ WOY←⌈(start DayOfYear JJJ)÷7

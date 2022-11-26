@@ -1,4 +1,4 @@
- html←PrepareHtmlPageForVersionList(packageID data);links;buff1;buff2;buff3;buff4;bool;colTitles
+ html←PrepareHtmlPageForVersionList(packageID data);links;col1;col2;col3;col4;bool;colTitles
  data←⊖data
  html←HtmlHeader ''
  html,←⊂'<h2>All versions of "',packageID,'"</h2>'
@@ -10,14 +10,14 @@
  html,←{'<th>',⍵,'</th>'}¨colTitles
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
- buff1←{'<td><code>',⍵,'</code></td>'}¨data[;1]         ⍝ The package ID
- buff2←{'<td>',(⍕⍵),'</td>'}¨data[;2]                   ⍝ The publishing Date
+ col1←{'<td><code>',⍵,'</code></td>'}¨data[;1]         ⍝ The package ID
+ col2←{'<td>',(⍕⍵),'</td>'}¨data[;2]                   ⍝ The publishing Date
  links←{'<a href="',Reg.VersionOf_REST,'/packages/details/',⍵,'" title="Link to the package configuration">Show</a>'}¨data[;1]
- buff3←{'<td>',⍵,'</td>'}¨links
+ col3←{'<td>',⍵,'</td>'}¨links
  bool←PackageHasDependencies¨data[;1]
  links←bool{⍺:'<a href="',Reg.VersionOf_REST,'/packages/dependencies/',⍵,'" title="Link to the dependency definition">Show</a>' ⋄ 'None'}¨data[;1]
- buff4←{'<td>',⍵,'</td>'}¨links
- html,←{'<tr>',⍵,'</tr>'}¨buff1,¨buff2,¨buff3,¨buff4
+ col4←{'<td>',⍵,'</td>'}¨links
+ html,←{'<tr>',⍵,'</tr>'}¨col1,¨col2,¨col3,¨col4
  html,←⊂'</tr>'
  html,←⊂'</tbody>'
  html,←⊂'</table>'

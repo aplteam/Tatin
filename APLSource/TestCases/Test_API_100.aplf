@@ -1,0 +1,11 @@
+ r←Test_API_100(stopFlag batchFlag);⎕TRAP;rc;msg
+⍝ Exercise ⎕SE.Tatin.DeprecatePackage on an unknwn package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg)←⎕SE.Tatin.DeprecatePackage'[localhost]' 'See JohnDoe instead' 'examples-does_not_exist'
+ →T.PassesIf 1≡rc
+ →T.PassesIf'Package not found'≡msg
+
+ r←T._OK
+⍝Done

@@ -21,14 +21,14 @@
  TC.WritePackageConfigFile src cfg
 
  packageID←'test-Package_A-0.1.0'
- (rc msg zipFilename)←TC.PublishPackage src'[local]'
+ (rc msg zipFilename)←TC.PublishPackage src'[localhost]'
  →T.GoToTidyUp 200≠rc
  →T.GoToTidyUp 0≠≢msg
 
- list1←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'[local]'
- (rc msg)←⎕SE.Tatin.DeletePackage'[local]',packageID
+ list1←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'[localhost]'
+ (rc msg)←⎕SE.Tatin.DeletePackage'[localhost]',packageID
  Assert 200=rc
- list2←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'[local]'
+ list2←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'[localhost]'
  →T.GoToTidyUp'test-Package_A-0.1.0'≢∊list1[;1]~list2[;1]
 
  r←T._OK

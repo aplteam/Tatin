@@ -1,0 +1,36 @@
+ list←{level}FindTatinDependencies_(folder pkgList);folders;subFolder;buff;dependencies;filename;pkg;bool;bool2
+⍝ Sub-function of FindTatinDependencies without independent meaning
+⍝ `level` can be 0 (default) or 1
+ level←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'level'
+ 'Invalid left argument'Assert(⊂level)∊0 1
+ list←''
+ :If ⎕NEXISTS filename←folder,'apl-dependencies.txt'
+ :AndIf 0<≢dependencies←⊃F.NGET filename 1
+     :For pkg :In pkgList
+         :Select '-'+.=pkg
+         :Case 0 ⍝ Just a package name
+             bool←pkg∘≡¨⎕C{⍵↑⍨¯1+⍵⍳'-'}¨{⍵↓⍨⍵⍳'-'}¨dependencies
+         :Case 1 ⍝ Group and package name
+             bool←pkg∘≡¨⎕C{⍵/⍨2>+\⍵='-'}¨dependencies
+         :Case 2 ⍝ Group and package name and version number
+             bool←pkg∘≡¨⎕C Reg.RemoveMinorAndPatch¨dependencies
+         :EndSelect
+         :If level
+             bool2←F.IsDir folder∘,¨bool/dependencies
+             list,←folder∘,¨bool2/bool/dependencies
+         :Else
+             list,←(∨/bool)/⊂¯1↓folder
+         :EndIf
+         :If 0=level
+         :AndIf ∨/bool
+             :Leave
+         :EndIf
+     :EndFor
+ :EndIf
+ :If 0<≢folders←F.ListDirs folder
+     folders←(~({⊃,/1↓⍵}¨⎕NPARTS¨folders)∊'.git' '.cider')/folders
+     :For subFolder :In folders
+         list,←level FindTatinDependencies_(subFolder,'/')pkgList
+     :EndFor
+ :EndIf
+ ⍝Done

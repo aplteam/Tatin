@@ -1,7 +1,7 @@
-  mat←{dateFlag}ListVersions url;client;request;res;url_;registries;registry;buff;flag
+ mat←{dateFlag}ListVersions url;client;request;res;url_;registries;registry;buff;flag
 ⍝ Lists all versions of a package.
 ⍝ `url` is one of:
-⍝ * An (optional) registry followed by "group" and "name" of a package
+⍝ * A package name is specified
 ⍝ * A path to a Registry and "group" and "name" of a package
 ⍝ In the first case all defined Registries with a priority greater than zero are scanned.
 ⍝ A matrix with two columns is returned: URL and full package ID.\\
@@ -12,30 +12,29 @@
 ⍝ By default the publishing date is not included, but you my change this by passing a 1 as ⍺.
 ⍝ In that case an additional column is added to the result.
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
- :If flag←'[*]'≡3⍴url           ⍝ Archaic syntax is still supported but not documented
- :OrIf (~IsHTTP url)∧('['≠1⍴url)∧({1≥+/⍵∊'/\'}url)∧(~':'∊url)∧('.'≠1⍴url)
-     mat←(0,(2+dateFlag))⍴⍬
-     registries←ListRegistries 0
-     :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
-     :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}registries[;1])⌿registries
-         :For registry :In registries[;1]
-             :If 0<≢buff←dateFlag ListVersions registry,(flag×3)↓url
-                 mat⍪←(⊂registry),buff
-             :EndIf
-         :EndFor
-     :EndIf
- :Else
-     url_←ReplaceRegistryAlias url
-     :If ∧/'[]'∊url
-         'No valid alias provided'Assert 0<≢url_
-     :Else
-         'No valid URI provided'Assert 0<≢url_
-     :EndIf
+ mat←(0,(2+dateFlag))⍴⍬
+ url_←ReplaceRegistryAlias url
+ :If IsHTTP url_
+     'No valid URI provided'Assert 0<≢url_
      'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last url_)+.='-'     ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
      :If Reg.IsHTTP url_
          mat←⍪dateFlag ListVersions_ url_
      :Else
          mat←⍪dateFlag Reg.ListVersions url_
+     :EndIf
+ :ElseIf ∨/'/\'∊url_
+     :If 0<≢buff←dateFlag Reg.ListVersions url_
+         mat←⍪buff
+     :EndIf
+ :Else
+     registries←ListRegistries 0
+     :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
+     :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}⊃¨{⍵≡0:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}/¨↓registries[;1 3])⌿registries
+         :For registry :In registries[;1]
+             :If 0<≢buff←dateFlag ListVersions registry,url
+                 mat⍪←(⊂registry),buff
+             :EndIf
+         :EndFor
      :EndIf
  :EndIf
 ⍝Done

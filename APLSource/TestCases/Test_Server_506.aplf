@@ -20,10 +20,10 @@
  TC.WritePackageConfigFile src cfg
 
  packageID←'NeedsNoAPIkey-Package_M-0.1.0'
- reg←TC.MyUserSettings.GetRegistry'https://localhost'
+ reg←TC.MyUserSettings.GetRegistry(TC.ReplaceRegistryAlias'[localhost]')
  oldCredentials←reg.api_key
  reg.api_key←''                 ⍝ We do not provide an API key here!
- res←TC.PublishPackage src'https://localhost/'
+ res←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
  →T.GoToTidyUp 200≢1⊃res
 
  r←T._OK

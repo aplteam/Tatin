@@ -1,0 +1,21 @@
+ begin←{start}BeginMonth JJJ;ymd;ym;s;y;m
+⍝ Given a "Julian Day Number", return the date of the beginning of the
+⍝ calendar month in which it falls.
+⍝ Months are normally considered to begin on the first (=1) day of the
+⍝ month, but a different beginning-of-month day number (1-31) may be
+⍝ specified as an optional left argument.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Modified 9 March 2010 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'start' ⋄ start←1 ⋄ :EndIf ⍝ Default = 1st to begin months
+ s←¯1*0>ymd←GD JJJ ⋄ ymd←|ymd
+ y←s×⌊ymd÷10000 ⋄ m←100|⌊ymd÷100 ⋄ ym←(m-1)+12×y-1 ⍝ Relative month #
+ ym←ym-(100|ymd)<start ⍝ Wrap to previous month if before start day
+ m←1+12|ym ⋄ s←¯1*0>y←1+⌊ym÷12
+ begin←(start-1)+JD s×(10000×|y)+(100×m)+1
+ ym←ym+1 ⍝ February can wrap more than 1 day ahead - limit it
+ m←1+12|ym ⋄ s←¯1*0>y←1+⌊ym÷12
+ begin←(JJJ≠0)×begin⌊JD s×(10000×|y)+(100×m)+1

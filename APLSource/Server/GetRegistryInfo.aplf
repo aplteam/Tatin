@@ -1,0 +1,8 @@
+ txt←GetRegistryInfo ini
+⍝ Checks whether there is an INI entry "MenuItemBefore" and if so, return it was a trailing space
+ txt←''
+ :If ini.Exist'CONFIG:menuItemBefore'
+ :AndIf 0<≢txt←⊃ini.Get'CONFIG:menuItemBefore'
+     txt←(-':'=¯1↑txt)↓txt
+     txt,←': '
+ :EndIf

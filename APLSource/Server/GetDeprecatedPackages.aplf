@@ -1,0 +1,14 @@
+ response←GetDeprecatedPackages request;filename;list;html;⎕TRAP;all
+⍝ Respond to a request for all deprecated packages, HTML or JSON
+ list←Reg.ListDeprecatedPackages G.RegistryPath
+ list←Reg.RemoveMinorAndPatch¨list
+ :If (⊂'all')∊request.QueryParameters[;1]
+     all←Reg.GetAllPackages G.RegistryPath
+     list←(,(Reg.RemoveMinorAndPatch¨all)∊list)⌿all
+ :EndIf
+ :If IsJsonRequest request.Headers
+     response←request ReturnJSON Reg.JSON list
+ :Else  ⍝ It's a request from a Browser
+     html←PrepareHtmlPageForDeprecatedList list
+     response←request ReturnHTML html
+ :EndIf

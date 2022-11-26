@@ -19,15 +19,15 @@
 
  TC.WritePackageConfigFile src cfg
  packageID←'test-Package_A-0.1.0'
- (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
+ (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
  Assert 200=rc
 
- reg←TC.MyUserSettings.GetRegistry'https://localhost'
+ reg←TC.MyUserSettings.GetRegistry(TC.ReplaceRegistryAlias'[localhost]')
  oldCredentials←reg.api_key     ⍝ We need to reset this later
  reg.api_key←'Invalid'
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
 
- (rc msg)←TC.DeletePackage'https://localhost/',packageID
+ (rc msg)←TC.DeletePackage(TC.ReplaceRegistryAlias'[localhost]'),packageID
  →T.GoToTidyUp rc≠401
  →T.GoToTidyUp msg≢'Server: Unauthorized request'
 

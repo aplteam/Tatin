@@ -1,0 +1,14 @@
+ begin←{start}BeginWeek JJJ
+⍝ Given a "Julian Day Number", return the date of the beginning of the
+⍝ calendar week in which it falls.
+⍝ Weeks are normally considered to begin on Sunday=1, but a different
+⍝ beginning-of-week day number (1-7) may be specified as an optional
+⍝ left argument.
+⍝ Any rank & shape array accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Modified 9 March 2010 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'start' ⋄ start←1 ⋄ :EndIf ⍝ Default = Sunday to begin weeks
+ begin←(JJJ≠0)×JJJ-7|(1+7|1+JJJ)-start ⍝ Use embedded version of DayOfWeek

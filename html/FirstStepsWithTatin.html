@@ -41,7 +41,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Misc">4.5. Misc</a>
 <ul>
 <li><a href="#Scanning-Registries">4.5.1. Scanning Registries</a></li>
-<li><a href="#Tatin-Variables">4.5.2. Tatin Variables</a>
+<li><a href="#Deprecated-packages">4.5.2. Deprecated packages</a></li>
+<li><a href="#Tatin-Variables">4.5.3. Tatin Variables</a>
 </li></ul></li>
 </li></ul></li>
 </ul>
@@ -437,8 +438,51 @@ MarkAPL</code></pre>
 </div>
 
 <div class="h_tag">
+<a href="#Deprecated-packages" id="Deprecated-packages" class="autoheader_anchor">
+<h4 data-id="Deprecated-packages">4.5.2. Deprecated packages</h4>
+</a>
+</div>
+<p>Every piece of software will become obsolete one day. Packages are no exception. If a package is not needed anymore, or is obsolete because there is a better one available, it's time to mark it as deprecated.</p>
+<p>This can be done with the user command <code>]Tatin.DeprecatePackage</code>. In short what the user command does is to publish the latest version available yet as a new version with an increased minor version number.</p>
+<div class="leanpub_A">
+<h3>On deleting packages</h3>
+<p>Depending on the delete policy operated on a server you might as well delete all obsolete packages, but we discourage you from doing so.</p>
+<p>The reason is that one of Tatin's design goals was to make a build 100% reproducible. This is only achievable if packages are not deleted from a server. That's the reason why the principal Tatin Registry operates a non-delete policy.</p>
+</div>
+
+<p>For example, let's assume these three packages are published:</p>
+<pre><code>aplteam-Foo-1.0.0
+aplteam-Foo-1.1.0
+aplteam-Foo-1.1.1</code></pre>
+<p>Executing:</p>
+<pre><code>]Tatin.DeprecatePackage https://your-Registry/aplteam-Foo-1</code></pre>
+<p>will make the Tatin Registry publish a new version <code>aplteam-Foo-1.2.0</code> on your behalf which is almost identical with version 1.1.1 except that it has two additional properties in its config file: <code>deprecated</code> with the value 1 and <code>comment</code> which carries the comment in case you've specified one with <code>-comment=</code>; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of “See package Foo-Boo”.</p>
+<p>From now on both the “Packages” web page and <code>]Tatin.ListPackages</code> won't list these four packages anymore.</p>
+<p>Note that <code>]Tatin.ListDeprecated</code> is designed to list just the deprecated packages. If you want the list to include also the earlier versions — which are now sort of hidden by 1.2.0 — then you need to specify the <code>-all</code> flag.</p>
+<p>With <code>-all</code> a matrix with two columns rather than one is returned, with the second column carrying an asterisk for those packages that actually do carry <code>deprecated←1</code> in their config file. That would be at least the very last one.</p>
+<div class="h_tag">
+<a href="#Side-effects-of-deprecating-a-package" id="Side-effects-of-deprecating-a-package" class="autoheader_anchor">
+<h5 data-id="Side-effects-of-deprecating-a-package">4.5.2.1. Side effects of deprecating a package</h5>
+</a>
+</div>
+<p>If you try to load or install a package that is marked as deprecated then you will be asked whether you really want that, but if you insist then you will get what you asked for.</p>
+<p>Note however that this is only true when you ask explicitly for the last package (the one with <code>deprecated←1</code>) and when you specify just the major version number.</p>
+<p>In our earlier example that would be either</p>
+<pre><code>]Tatin.LoadPackages https://your-registry/aplteam-Foo-1</code></pre>
+<p>or</p>
+<pre><code>]Tatin.LoadPackages https://your-registry/aplteam-Foo</code></pre>
+<p>If you ask <em>explicitly</em> for an <em>earlier</em> version (one that has no property <code>deprecated</code> in its config file) then that version would be loaded (or installed) without further ado, because Tatin would just assume that you know what you are doing.</p>
+<p>Note that the API functions for loading / installing packages would not complain or warn you at all.</p>
+<div class="leanpub_A">
+<h3>Mistakenly deprecated a package?</h3>
+<p>There is an easy escape route: just publish the package again with an increased minor version number but <code>deprecated</code> either set to 0 or removed from the config file, and the package is back on track.</p>
+<p>If <code>comment</code> was not empty then that should be removed or emptied.</p>
+<p>Once you've done that the very latest published package would no longer carry a “deprecated” flag with the value 1, and therefore it would no longer fulfill the criteria of a deprecated package.</p>
+</div>
+
+<div class="h_tag">
 <a href="#Tatin-Variables" id="Tatin-Variables" class="autoheader_anchor">
-<h4 data-id="Tatin-Variables">4.5.2. Tatin Variables</h4>
+<h4 data-id="Tatin-Variables">4.5.3. Tatin Variables</h4>
 </a>
 </div>
 <p>For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.</p>
@@ -446,26 +490,26 @@ MarkAPL</code></pre>
 <p>Some of them always exist, some of them only under certain circumstances.</p>
 <div class="h_tag">
 <a href="#ASSETS" id="ASSETS" class="autoheader_anchor">
-<h5 data-id="ASSETS">4.5.2.1. ASSETS</h5>
+<h5 data-id="ASSETS">4.5.3.1. ASSETS</h5>
 </a>
 </div>
 <p>The path to the package's assets relative to <code>HOME</code>. Is empty in case there are no assets.</p>
 <p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link">GetFullPath2AssetsFolder</a> function.</p>
 <div class="h_tag">
 <a href="#CONFIG" id="CONFIG" class="autoheader_anchor">
-<h5 data-id="CONFIG">4.5.2.2. CONFIG</h5>
+<h5 data-id="CONFIG">4.5.3.2. CONFIG</h5>
 </a>
 </div>
 <p>This is a simple character vector that stems from the file <code>apl-package.json</code> of the given package.</p>
 <div class="h_tag">
 <a href="#DEPENDENCIES" id="DEPENDENCIES" class="autoheader_anchor">
-<h5 data-id="DEPENDENCIES">4.5.2.3. DEPENDENCIES</h5>
+<h5 data-id="DEPENDENCIES">4.5.3.3. DEPENDENCIES</h5>
 </a>
 </div>
 <p>A vector of character vectors with the package IDs of the packages the package in question depends on.</p>
 <div class="h_tag">
 <a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
-<h5 data-id="GetFullPath2AssetsFolder">4.5.2.4. GetFullPath2AssetsFolder</h5>
+<h5 data-id="GetFullPath2AssetsFolder">4.5.3.4. GetFullPath2AssetsFolder</h5>
 </a>
 </div>
 <p>This is a function which returns the result of the expression <code>HOME,'/',ASSETS</code> if both <code>HOME</code> and <code>ASSETS</code> are not empty <em>and</em> <code>HOME</code> exists on disk. If <code>HOME</code> is empty or does not exist on disk then just <code>ASSETS</code> is returned.</p>
@@ -473,7 +517,7 @@ MarkAPL</code></pre>
 <p>The function would not find <code>HOME</code> and there return just <code>ASSETS</code>, and that allows you to still access the assets sucessfully.</p>
 <div class="h_tag">
 <a href="#HOME" id="HOME" class="autoheader_anchor">
-<h5 data-id="HOME">4.5.2.5. HOME</h5>
+<h5 data-id="HOME">4.5.3.5. HOME</h5>
 </a>
 </div>
 <p>Is a character vector holding the path of a folder that hosts the package.</p>
@@ -481,20 +525,20 @@ MarkAPL</code></pre>
 <p>In this case <code>HOME</code> is set to <code>''</code>.</p>
 <div class="h_tag">
 <a href="#ID" id="ID" class="autoheader_anchor">
-<h5 data-id="ID">4.5.2.6. ID</h5>
+<h5 data-id="ID">4.5.3.6. ID</h5>
 </a>
 </div>
 <p>The full package name. This will include a build ID if there is any, so it is not necessarily identical with the package ID.</p>
 <div class="h_tag">
 <a href="#LX" id="LX" class="autoheader_anchor">
-<h5 data-id="LX">4.5.2.7. LX</h5>
+<h5 data-id="LX">4.5.3.7. LX</h5>
 </a>
 </div>
 <p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successfully. <code>LX</code> holds the result that is returned by that function if it did return a result. If it doesn't <code>LX</code> is an empty vector.</p>
 <p>Note that if there is no <code>lx</code> defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no <code>LX</code>.</p>
 <div class="h_tag">
 <a href="#URI" id="URI" class="autoheader_anchor">
-<h5 data-id="URI">4.5.2.8. URI</h5>
+<h5 data-id="URI">4.5.3.8. URI</h5>
 </a>
 </div>
 <p>Character vector that holds the address of a Tatin server or the full name of a ZIP file.</p>

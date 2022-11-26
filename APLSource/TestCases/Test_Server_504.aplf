@@ -20,12 +20,12 @@
  TC.WritePackageConfigFile src cfg
 
  packageID←'test-Package_A-0.1.0'
- (rc msg zipFilename)←TC.PublishPackage src'https://localhost/'
+ (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
  →T.GoToTidyUp 200≠rc
  →T.GoToTidyUp 0≠≢msg
 
  oldPolicy←∆SetServerPolicy'JustBetas'
- (rc msg)←TC.DeletePackage'https://localhost/',packageID
+ (rc msg)←TC.DeletePackage((TC.ReplaceRegistryAlias'[localhost]')),packageID
  →T.GoToTidyUp rc≠405
  →T.GoToTidyUp'Server: This server allows only beta packages to be deleted'≢msg
 

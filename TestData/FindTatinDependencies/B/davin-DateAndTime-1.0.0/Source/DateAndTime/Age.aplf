@@ -1,0 +1,13 @@
+ age←{today}Age JJJ;this;next;bday;start
+⍝ Compute the age (in calendar years) from the given date(s)
+⍝ (in Julian Day Number) to today (or other JDN ending date).
+⍝ Any rank & shape array(s) accepted.  See "Describe" for more details.
+⍝
+⍝ Written in 1998 by Davin Church of Creative Software Design
+⍝ Modified 9 March 2010 by Davin Church of Creative Software Design
+⍝ Converted from APL+Win to Dyalog June 30, 2020 by Davin Church of Creative Software Design
+
+ :If 0=⎕NC'today' ⋄ today←JD 100⊥3↑⎕TS ⋄ :EndIf
+ (start bday)←GD today JJJ ⋄ age←⌊(start-bday)÷10000
+ next←10000+this←bday+10000×age ⋄ (this next)←JD this next
+ age←(today≠0)×(JJJ≠0)×age+(today-this)÷(JJJ=0)+next-this ⍝ Add fractional year to whole year count

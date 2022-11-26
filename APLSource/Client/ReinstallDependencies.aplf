@@ -19,6 +19,6 @@
      parms←CreateReInstallParms
  :EndIf
  (deps installFolder registry)←CheckReInstallDependencies y
- PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(parms.noBetas/'out'),' any beta versions'
+ (~parms.quiet)PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(parms.noBetas/'out'),' any beta versions'
  refs←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.update parms.quiet
 ⍝Done

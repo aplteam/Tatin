@@ -52,15 +52,17 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.9.2+49' '2022-09-19'
+      r←'CodeCoverage' '0.9.3+50' '2022-10-06'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 0.9.3 from 2022-10-06
+    ⍝   When Finalise was called without calling Stop the result appeared to be wrong. Is now called implicitly by Finalise
     ⍝ * 0.9.2 from 2022-09-19
     ⍝   * Couple of bug fixes
     ⍝     * Typo fixed (Finalyse => Finalise)
-    ⍝     * Rearranged a few lines to avoid VALUE ERROR in CreateReport if no data was gathered 
+    ⍝     * Rearranged a few lines to avoid VALUE ERROR in CreateReport if no data was gathered
     ⍝     * Start: ⎕PROFILE'clear' added
     ⍝ * 0.9.1 from 2021-10-28
     ⍝   * Sort order of first column of the "Partly covered" category reversed.
@@ -409,6 +411,7 @@
     ⍝ again, for example.
       :Access Public Instance
       r←⍬
+      {Stop ⍵}⍣(~⊃∆STOPPED)⊣⍬
       _data←_data[;1]{(⊃⍺)(∪⊃,/⍵)}⌸_data[;2]
       names←CollectDataForCoverageReport _watch
       details←0 4⍴⍬
@@ -500,8 +503,9 @@
       ⍝ Execute `⎕PROFILE'start' 'coverage'`
       :Access Public Instance
       r←⍬
-      ⎕PROFILE'clear'   
+      ⎕PROFILE'clear'
       ⎕PROFILE'start' 'coverage'
+      ∆STOPPED←0
     ∇
 
     ∇ {r}←Stop dummy;buff
@@ -512,6 +516,7 @@
       ⎕PROFILE'clear'
       buff←(buff[;2]≢¨⊂⍬)⌿buff                                 ⍝ Fns as such are not of any interest, only lines
       _data⍪←(⊃∨/watch{((1+≢¨⍺)↑¨¨⊂⍵)∊¨⊂¨⍺,¨'.'}buff[;1])⌿buff ⍝ Drop everthing that's not watched
+      ∆STOPPED←1
     ∇
 
 ⍝ ------------------------ Private stuff

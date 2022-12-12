@@ -1,0 +1,34 @@
+ (rc msg)←SendMail_PublishedPkg(INI ID regPath);cfg;parms;myConnection;mailParms;convert;domain;rc;msg;log;S;gatekeeper
+⍝ The idea is to have a GMail address dedicated for http://[test].tatin.dev
+⍝ but we use this only to logon the Google's SMTP server: the address is not monitored.
+⍝ The real consignees are listed as "To". That way we don't have to be particularly
+⍝ concerned regarding the password.
+ rc←0 ⋄ msg←''
+ :If INI.Get'EMAIL:active'
+ :AndIf INI.Exist'EMAIL:gatekeeper'
+ :AndIf 0<≢gatekeeper←⊃INI.Get'EMAIL:gatekeeper'
+     cfg←⊃##.F.NGET regPath,ID,'\',##.Reg.CFG_Name
+     S←##.##.SMTP
+     convert←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⊆⍵}
+     parms←⎕NEW S.ConnectionParameters
+     parms.Server←⊃INI.Get'EMAIL:SMTP_Server'
+     parms.Port←⊃INI.Get'EMAIL:Port'
+     parms.Userid←⊃INI.Get'EMAIL:To'
+     parms.Password←⊃INI.Get'EMAIL:Password'
+     myConnection←⎕NEW S.Connection(,⊂parms)
+     mailParms←⎕NEW S.MailParameters
+     mailParms.From←'do-not-reply@tatin.dev'
+     mailParms.To←⊃INI.Get'EMAIL:To'
+     mailParms.CC←convert gatekeeper
+     domain←⊃INI.Get'EMAIL:Domain'
+     mailParms.Subject←'Package was published on ',domain,': ',ID
+     mailParms.Body←cfg
+     mailParms.Body,←⎕UCS 13 10
+     (rc msg log)←myConnection.Send mailParms
+     :If 0=rc
+         msg←'Email was sent successfully'
+     :Else
+         msg←'Failed with rc=',(⍕rc),'; ',¯1↓(⊆msg),¨⎕UCS 13
+     :EndIf
+ :EndIf
+⍝Done

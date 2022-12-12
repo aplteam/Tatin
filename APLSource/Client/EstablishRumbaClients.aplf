@@ -18,7 +18,7 @@
      regs←(IsHTTP¨regs[;1])⌿regs
      'No registries found'Assert 0<≢regs
      :Trap 345
-         Connect2Client¨regs[;1]
+         Connect2Client¨⊃¨CompileUrlPlusPort/¨↓regs[;1 3]
      :Else
          qdmx←⎕DMX
          ⎕DL 0.2

@@ -1,0 +1,19 @@
+ {r}←ExecuteMaintenanceCode G;list;codeFile;ref;body;function;pkgFolderList;path
+⍝ Maintenance code can be executed by putting an .aplf file into a folder `INI:Config:MaintenancePath'.\\
+⍝ All those functions are executed once: after the first execution the text file is
+⍝ renamed by adding an extension `.executed`.\\
+⍝ The main purpose of this feature is to be able to polish anything in package config files, particularly tags.
+ r←⍬
+ :If 0<≢path←⊃G.INI.Get'Config:MaintenancePath'
+ :AndIf ⎕NEXISTS path
+ :AndIf 0<≢list←⊃F.Dir path,'/*.aplf'
+     :For codeFile :In list
+         ref←⎕NS''
+         body←⊃F.NGET codeFile 1
+         Reg.Assert' '=1↑0⍴ref.⎕FX body
+         function←ref.⍎⊃↓ref.⎕NL 3
+         pkgFolderList←,0 Reg.GetAllPackages G.RegistryPath
+         G.RegistryPath(function ##.Admin.LoopThrough)pkgFolderList
+         (codeFile,'.executed')⎕NMOVE codeFile
+     :EndFor
+ :EndIf

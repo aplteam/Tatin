@@ -1,0 +1,19 @@
+ ns←{initFlag}ValidateOSprops ns;list;vals;tags;b1;b2;b3;b
+⍝ Check all proper that start with "os_" for beeing Boolean, and at least one of them is
+⍝ That way an OS can be added without the need to change this fn
+ initFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'initFlag'
+ :If 0<≢list←' '~⍨¨↓'os_'{(((≢⍺)↑[2]⍵)∧.=⍺)⌿⍵}'o'ns.⎕NL 2
+     vals←ns.⍎¨list
+     ('Must be Boolean: ',{0=≢⍵:⍵ ⋄ ⊃{⍺,', ',⍵}/⍵}(~b)/vals)Assert∧/b←vals∊0 1
+ :AndIf 0=∨/vals
+     ⍝ Because with 0.81.0 we've introduced the os_* properties and deprecated the tags "linux", "mac-os" and "windows"
+     tags←','(≠⊆⊢){','@(⍸';'=⍵)⊢⍵}ns.tags
+     b1←∨/('linux' 'lin')∊tags
+     b2←∨/'macos' 'mac-os' 'mac'∊tags
+     b3←∨/('windows' 'win')∊tags
+     ns.(os_lin os_mac os_win)←b1,b2,b3
+ :EndIf
+ :If ~initFlag
+     'At least one of os_lin, os_mac, os-win must be 1'Assert∨/ns.(os_lin os_mac os_win)
+ :EndIf
+⍝Done

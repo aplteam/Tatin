@@ -7,8 +7,7 @@
  request.RequestTarget←'/v1/list-commands'
  response←TC.SendAndReceive (TC.ReplaceRegistryAlias'[localhost]') request
  →T.PassesIf 200=response.StatusCode
- →T.PassesIf∨/'list-commands'⍷response.Content
- →T.PassesIf 0<','+.=response.Content
+ →T.PassesIf∨/'<h2>All Special REST Commands</h2>'⍷response.Content
 
  r←T._OK
 ⍝Done

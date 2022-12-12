@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.51 - 2022-11-25
+⍝ * 0.53.0 - 2022-12-12
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -32,7 +32,7 @@
           c←⎕NS ⍬
           c.Name←'FindDependencies'
           c.Desc←'Search the folder for given packages and report installed packages'
-          c.Parse←'1 -folder= -detailed -force'
+          c.Parse←'2 -detailed'
           r,←c
      
           c←⎕NS ⍬
@@ -56,7 +56,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'List all packages in the Registry or install folder specified in the argument'
-          c.Parse←'1s -group= -tags= -noaggr -date -info_url -since='
+          c.Parse←'1s -group= -tags= -os= -noaggr -date -info_url -since='
           r,←c
      
           c←⎕NS ⍬
@@ -122,7 +122,7 @@
           c←⎕NS ⍬
           c.Name←'ListTags'
           c.Desc←'List all tags used in all packages'
-          c.Parse←'1s -tags='
+          c.Parse←'1s -tags= -os='
           r,←c
      
           c←⎕NS ⍬
@@ -152,7 +152,7 @@
           c←⎕NS ⍬
           c.Name←'GetDeletePolicy'
           c.Desc←'Ask the server about its "Delete" policy'
-          c.Parse←'1s'
+          c.Parse←'1s -check'
           r,←c
      
           c←⎕NS ⍬
@@ -300,19 +300,18 @@
       :EndIf
     ∇
 
-    ∇ r←FindDependencies Arg;folder;detailed;pkgList
+    ∇ r←FindDependencies Arg;folder;detailed;pkgList;buff;bool
       r←'Cancelled by user'
-      :If 0=≢folder←''Arg.Switch'folder'
-          folder←TC.F.PWD
-          :If ~Arg.force
-          :AndIf ~TC.YesOrNo'Sure that you want to scan the current directory ',TC.F.PWD,' ?'
-              :Return
-          :EndIf
-      :EndIf
       detailed←Arg.detailed
-      pkgList←','(≠⊆⊢)Arg._1
+      buff←Arg.(_1 _2)
+      :If ∨/bool←∨/¨buff∊¨'.' './'
+          (bool/buff)←1⍴1 ⎕NPARTS'./'
+      :EndIf
+      buff←{w←⍵ ⋄ w[⍋∨/¨'/\'∘∊¨w]}buff
+      pkgList←','(≠⊆⊢)1⊃buff
+      folder←2⊃buff
       'Invalid package definition'Assert 0∧.=(⎕NS''){⊃∘⍺.⎕NC¨{'_'@(⍸⍵∊'.-')⊣⍵}¨⍵}pkgList
-      r←⍪detailed TC.FindTatinDependencies folder(⊃{⍺,',',⍵}/pkgList)
+      r←⍪detailed TC.FindDependencies folder(⊃{⍺,',',⍵}/pkgList)
     ∇
 
     ∇ r←DeprecatePackage Arg;id;force;uri;packageID;versions;msg;rc;comment
@@ -375,7 +374,7 @@
       :EndIf
     ∇
 
-    ∇ r←ListPackages Arg;registry;parms;buff;qdmx
+    ∇ r←ListPackages Arg;registry;parms;buff;qdmx;OSs
       r←''
       registry←Arg._1
       :If 0≡registry
@@ -401,6 +400,13 @@
           :Else
               parms.since←(4↑Arg.since),'-',(2↑4↓Arg.since),'-',2↑6↓Arg.since
           :EndIf
+      :EndIf
+      :If 0≢Arg.os
+          OSs←⎕C','(≠⊆⊢)Arg.os
+          'Only "lin", "mac" and "win" are valid options for -os='Assert∧/OSs∊'win' 'lin' 'mac'
+          parms.os_lin←(⊂'lin')∊OSs
+          parms.os_mac←(⊂'mac')∊OSs
+          parms.os_win←(⊂'win')∊OSs
       :EndIf
       parms.info_url←Arg.info_url
       :Trap ErrNo
@@ -616,14 +622,15 @@
      ⍝Done
     ∇
 
-    ∇ r←GetDeletePolicy Arg;uri;qdmx
+    ∇ r←GetDeletePolicy Arg;uri;qdmx;check
       r←⍬
       uri←Arg._1
       :If 0≡Arg._1
           →(⍬≡uri←SelectRegistry 0)/0
       :EndIf
       :Trap ErrNo
-          r←TC.GetDeletePolicy uri
+          check←0 Arg.Switch'check'
+          r←check TC.GetDeletePolicy uri
       :Else
           qdmx←⎕DMX
           CheckForInvalidVersion qdmx
@@ -814,7 +821,7 @@
       :EndIf
     ∇
 
-    ∇ r←ListTags Arg;parms;registry;qdmx
+    ∇ r←ListTags Arg;parms;registry;qdmx;buff
       r←''
       parms←⎕NS''
       parms.tags←''
@@ -830,8 +837,18 @@
       :AndIf 0<≢Arg.tags
           parms.tags←Arg.tags
       :EndIf
+      :If 0≢Arg.os
+      :AndIf 0<≢Arg.os
+          buff←⎕C','(≠⊆⊢)Arg.os
+          'Only "lin", "mac" and "win" are valid for -os='Assert∧/buff∊'lin' 'mac' 'win'
+          parms.(os_lin os_mac os_win)←'lin' 'mac' 'win'∊','(≠⊆⊢)Arg.os
+      :EndIf
       :Trap ErrNo
-          r←⍪({⍵((≢⍵)⍴'-')}'All tags from ',registry),{⍵[;1]}parms TC.ListTags registry
+          :If 0<≢buff←parms TC.ListTags registry
+              r←⍪({⍵((≢⍵)⍴'-')}'All tags from ',registry),{⍵[;1]}buff
+          :Else
+              r←'No tags found'
+          :EndIf
       :Else
           qdmx←⎕DMX
           CheckForInvalidVersion qdmx
@@ -856,8 +873,9 @@
           :EndIf
           :If dateFlag
               r←dateFlag TC.ListVersions arg
-              r[;2]←TC.Reg.FormatFloatDate¨r[;2]
-              r←(2↑[2]⍪↓('All versions of <',arg,'> :'),[0.5]'-')⍪r
+              r[;2⊃⍴r]←TC.Reg.FormatFloatDate¨r[;2⊃⍴r]
+              r←⊃,/CR,¨↓⍕r
+              r←(1↓⊃,/CR,¨↓('All versions of <',arg,'> :'),[0.5]'-'),r
           :Else
               buff←TC.ListVersions arg
               :If TC.Reg.IsHTTP TC.ReplaceRegistryAlias arg
@@ -965,7 +983,9 @@
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
-                  data←origData←TC.Reg.JSON ns
+                  data←TC.Reg.JSON ns
+                  data←TC.AddCommentToPackageConfig data
+                  origData←data
                   :Repeat
                       (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'data path
                       flag←1
@@ -1164,6 +1184,7 @@
           r←0 2⍴⍬
           :If 0<≢registries←GetListOfRegistriesForSelection 0
           :AndIf 0<≢registries←(TC.Reg.IsHTTP¨registries[;1])⌿registries
+          :AndIf 0<≢registries←registries[∪{⍵⍳⍵}registries[;1];] ⍝ Because the same URL might turn up multiple times with different credentials/alias
               ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
               r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries[;1]
           :EndIf
@@ -1310,8 +1331,8 @@
               r,←⊂'Declare packages as deprecated.'
               r,←'' '  ]Tatin.DeprecatePackage <URL|[Alias><group><name>[<major-version>] <comment> [-force]'
           :Case ⎕C'FindDependencies'
-              r,←⊂'Attempts to find all folder with the given Tatin packages'
-              r,←'' '  ]Tatin.FindDependencies <commad-separated list of pkgs> [-folder=] -detailed -force'
+              r,←⊂'Attempts to find all folder(s) with the given Tatin package(s)'
+              r,←'' '  ]Tatin.FindDependencies <folder> <comma-separated list of pkgs> -detailed'
           :Case ⎕C'LoadTatin'
               r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←'' '  ]Tatin.LoadTatin'
@@ -1323,7 +1344,7 @@
               r,←'' '  ]Tatin.ListDeprecated <URL|[Alias> [-all]'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder passed as argument'
-              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-date] [-info_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
+              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-os=] [-date] [-info_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all dependencies into the workspace.'
               r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>] -nobetas'
@@ -1359,7 +1380,7 @@
               r,←'' '  ]Tatin.Version [*] [-check] [-all]'
           :Case ⎕C'ListTags'
               r,←⊂'List all unique tags as defined in all packages on a Registry, sorted alphabetically.'
-              r,←'' '  ]Tatin.ListTags [<Registry-URL>] [-tags=]'
+              r,←'' '  ]Tatin.ListTags [<Registry-URL>] [-tags=] [-os=]'
           :Case ⎕C'Init'
               r,←⊂'(Re-)Establish the user settings in ⎕SE.'
               r,←'' '  ]Tatin.Init [<config-folder>]'
@@ -1371,7 +1392,7 @@
               r,←'' '  ]Tatin.DeletePackage <([Registry-alias|Registry-URL|file://package-folder)package-ID)>'
           :Case ⎕C'GetDeletePolicy'
               r,←⊂'Request which "Delete" policy is operated by a Registry.'
-              r,←'' '  ]Tatin.GetDeletePolicy [<Registry-URL>]'
+              r,←'' '  ]Tatin.GetDeletePolicy [<Registry-URL>] -check'
           :Case ⎕C'Documentation'
               r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
               r,←'' '  ]Tatin.Documentation'
@@ -1419,17 +1440,17 @@
               r,←⊂'-force     By default the user is questioned whether she is sure. With this flag this'
               r,←⊂'           can be overwritten. Mainly for tests.'
           :Case ⎕C'FindDependencies'
-              r,←⊂'Scans the current folder or the given folder (see -folder=) for any Tatin packages.'
-              r,←⊂'By default it returns the folder hosting the package(s), but that can be changed'
-              r,←⊂'by specifying the -detailed flag, see there.'
+              r,←⊂'Scans the given folder for the given specified Tatin packages.'
               r,←⊂''
-              r,←⊂'-folder=   Use this to specify a particular folder rather than scanning the current folder'
-              r,←⊂'-detailed  By default the hosting folder is reported. By setting this flag you can force'
-              r,←⊂'           the user command to report the actual package folder instead.'
-              r,←⊂'           As a side effect the result might be larger, in case a package is installed more'
-              r,←⊂'           than once.'
-              r,←⊂'-force     Normally when -folder= is not set the user will be questioned. With this flag you'
-              r,←⊂'           overwrite this. Mainly for test cases.'
+              r,←⊂'Note that the sequence of the arguments does not matter.'
+              r,←⊂''
+              r,←⊂'By default the folder(s) hosting the package(s) are returned, but that can be changed'
+              r,←⊂'by specifying the -detailed flag:'
+              r,←⊂''
+              r,←⊂'-detailed  By setting this flag you can force the user command to report the actual'
+              r,←⊂'           package folder(s) instead.'
+              r,←⊂'           As a side effect the result might be larger, in case a package is'
+              r,←⊂'           installed more than once.'
           :Case ⎕C'LoadTatin'
               r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
@@ -1470,17 +1491,19 @@
               r,←⊂'In case an install folder was specified (rather than a Registry) flags are ignored and just'
               r,←⊂'two columns are returned: package name and a Boolean indicating principal packages with a 1.'
               r,←⊂''
-              r,←⊂'By default all packages are listed. You can influence the output in several ways:'
-              r,←⊂'-group={foo}   List only packages with the given group name.'
-              r,←⊂'-tags=foo,goo  List only packages carrying the tags "foo" & "goo".'
-              r,←⊂'-since=        Must be a date (YYYYMMDD or YYYY-MM-DD) when specified.'
-              r,←⊂'               List only packages published on that date or later.'
-              r,←⊂'               Implies -date and ignores -noaggr.'
+              r,←⊂'By default all  packages are listed. You can influence the output in several ways:'
+              r,←⊂'-group={foo}    List only packages with the given group name.'
+              r,←⊂'-tags=foo,goo   List only packages carrying the tags "foo" & "goo".'
+              r,←⊂'-os=mac         List only packages for the specified operating system(s). Must be a'
+              r,←⊂'                comma-seperated list with "win", "mac", "lin" being valid values.'
+              r,←⊂'-since=         Must be a date (YYYYMMDD or YYYY-MM-DD) when specified.'
+              r,←⊂'                List only packages published on that date or later.'
+              r,←⊂'                Implies -date and ignores -noaggr.'
               r,←⊂''
               r,←⊂'You can also influence the data returned with the following flags:'
-              r,←⊂'-date          Add the publishing date to the output. -noaggr is set to 1 then.'
-              r,←⊂'-info_url      Add the URL saved in the package config file to the result.'
-              r,←⊂'-noaggr        By default the output is aggregated. -noaggr prevents that.'
+              r,←⊂'-date           Add the publishing date to the output. -noaggr is set to 1 then.'
+              r,←⊂'-info_url       Add the URL saved in the package config file to the result.'
+              r,←⊂'-noaggr         By default the output is aggregated. -noaggr prevents that.'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all its dependencies into the workspace.'
               r,←⊂''
@@ -1660,12 +1683,10 @@
               r,←⊂'If a "?" is passed as argument the user will be prompted for the Registry, except when there'
               r,←⊂'is just one defined anyway.'
               r,←⊂''
-              r,←⊂'If no Registry is specified as argument the user will be prompted unless there is only one'
-              r,←⊂'Registry anyway.'
-              r,←⊂''
-              r,←⊂'You can specify one or more tags like -tags=foo,goo'
-              r,←⊂'In that case all tags are listed from packages that carry both "foo" & "goo".'
-              r,←⊂''
+              r,←⊂'-tags=   You may specify one or more tags like -tags=foo,goo'
+              r,←⊂'         In that case all tags are listed from packages that carry both "foo" & "goo".'
+              r,←⊂'-os=     You may specify one or more operating systems as a comma-separated vector.'
+              r,←⊂'         Only "lin", "mac" and "win" are valid.'
               r,←⊂'For details how tags are search refer to the documentation.'
           :Case ⎕C'Init'
               r,←⊂'(Re-)Establish the user settings in ⎕SE. Call this in case the user settings got changed on'
@@ -1713,6 +1734,11 @@
               r,←⊂' * "Any" means any package can be deleted'
               r,←⊂' * "JustBetas" means that only beta versions can be deleted'
               r,←⊂'If no Registry is specified the user will be prompted, unless there is just one anyway.'
+              r,←⊂''
+              r,←⊂'Note that Tatin interrogates all known Registries for their delete policies just once. It'
+              r,←⊂'then saves the results on a variable for better performance. This can be a problem is case the'
+              r,←⊂'policy of a server got changed, most likely your own one. To overcome this specify the -check'
+              r,←⊂'flag which will result in the servers being asked again rather than trusting former results.'
           :Case ⎕C'Documentation'
               r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
           :Case ⎕C'ReInstallDependencies'
@@ -1925,6 +1951,8 @@
           TC.ValidateVersion ns.version
           ns←TC.ValidateTags ns
           ns←TC.ValidateDescription ns
+          ns←TC.ValidateAplVersion ns
+          ns←TC.ValidateOSprops ns
           :If 0=≢ns.source
               list←(1+≢path)↓¨⊃TC.F.Dir path,'\'
               list~←⊂TC.CFG_Name

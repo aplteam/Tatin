@@ -1,4 +1,4 @@
- response←ReturnGroupHomepage(groupName request);html;htmlFilename;folder;p;parms;email;caption;data;col1;col2;colTitles
+ response←ReturnGroupHomepage(groupName request);html;htmlFilename;folder;p;parms;email;caption;data;col1;col2;colTitles;col3;col4
  response←R.NewResponse request
  p←{'<p>',⍵,'</p>'}
  folder←G.HTDOCS,'../Groups/'
@@ -34,7 +34,7 @@
  data←GetPackagesOfGroup groupName
  :If 0<≢data
      html,←⊂'<h3 style="padding-top:1em;">Packages owned by "',groupName,'"</h3>'
-     colTitles←'Package name' 'Description</th>'
+     colTitles←'Package name' 'Description' 'OS' 'Tags'
      html,←⊂H.OpenTable colTitles CalcTableWidth data
      html,←⊂'<thead>'
      html,←⊂'<tr>'
@@ -44,7 +44,9 @@
      html,←⊂'<tbody>'
      col1←{'<td><code>',({'<a href="',Reg.VersionOf_REST,'/packages/major_versions/',⍵,'" title="List major versions">',⍵,'</a>'}⍵),'</code></td>'}¨data[;1]
      col2←{'<td>',⍵,'</td>'}¨data[;3]
-     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2
+     col3←{'<td>',⍵,'</td>'}¨data[;5]
+     col4←{'<td>',⍵,'</td>'}¨data[;6]
+     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3 col4
      html,←⊂'</tr>'
      html,←⊂'</tbody>'
      html,←⊂'</table>'

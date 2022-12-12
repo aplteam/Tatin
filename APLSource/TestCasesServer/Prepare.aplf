@@ -5,26 +5,19 @@
      #.Tatin.Admin.Initialize_Server
  :EndIf
  T←⎕NEW ##.Tester2 ⎕THIS
+
+⍝ CodeCoverage: we always add, assuming that this test is running in parallel to the Client test
  testFilename←##.Admin.GetCoverageFile
- :If ⎕NEXISTS testFilename
-     ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
-     answer←⊃ask'Coverage file already exists'
-     :If 2≡answer
-         1 ⎕NDELETE testFilename
-     :EndIf
- :EndIf
- :If 0
-     T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Registry,#.Tatin.Server')
-     T.codeCoverage.filename←testFilename
-     ignore←''
-     ignore,←⊂'#.Tatin.Server.CopyDependencies'
-     ignore,←⊂'#.Tatin.Server.GetPackageConfigFilename'
-     ignore,←⊂'#.Tatin.Registry.Create_UUID'
-     ignore,←⊂'#.Tatin.Server.PROJECT_HOME'
-     ignore,←⊂'#.Tatin.Server.GetQuitDQEvent'
-     ignore,←⊂'#.Tatin.Server.Run'
-     :If 0<≢ignore
-         T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
-     :EndIf
+ T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Registry,#.Tatin.Server')
+ T.codeCoverage.filename←testFilename
+ ignore←''
+ ignore,←⊂'#.Tatin.Server.CopyDependencies'
+ ignore,←⊂'#.Tatin.Server.GetPackageConfigFilename'
+ ignore,←⊂'#.Tatin.Registry.Create_UUID'
+ ignore,←⊂'#.Tatin.Server.PROJECT_HOME'
+ ignore,←⊂'#.Tatin.Server.GetQuitDQEvent'
+ ignore,←⊂'#.Tatin.Server.Run'
+ :If 0<≢ignore
+     T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
  :EndIf
 ⍝Done

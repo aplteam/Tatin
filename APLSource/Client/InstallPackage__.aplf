@@ -1,4 +1,4 @@
- (success tempDir cacheFlag)←InstallPackage__(packageID url);zipFilename;isHTTP;path
+ (success tempDir cacheFlag)←InstallPackage__(packageID url);zipFilename;isHTTP;path;msg;rc
 ⍝ Fetches a package and unzips it into a temp folder.
 ⍝ When caching is on, the temp folder is created within the top-level of the cache folder.
 ⍝ Otherwise a folder is created inside the temp directory of the given OS.
@@ -42,7 +42,8 @@
  PrintToSession'  Unzipping ',zipFilename,'...'
  zipFilename ZipArchive.UnzipTo tempDir
  :If CheckDeprecatedFlag tempDir
-     tempDir Add2Config'uri'(RemoveFileProtocol url)
+     (rc msg)←tempDir Add2Config'uri'(RemoveFileProtocol url)
+ :AndIf 0=rc
      :If isHTTP
          :If cacheFlag
              tempDir←MovePackageToCache tempDir url packageID
@@ -51,7 +52,7 @@
      :EndIf
  :Else
      F.RmDir tempDir
-     F.DeleteFile zipFilename
-     success←0
+     F.DeleteFile isHTTP/zipFilename
+     msg ⎕SIGNAL 998
  :EndIf
 ⍝Done

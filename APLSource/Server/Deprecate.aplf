@@ -8,7 +8,7 @@
 ⍝  * Set the patch number to 0
 ⍝  * Increase the minor version number
 ⍝  * Inject the `deprecated` property with the value 1 into the config file
-⍝  * Assign `comment` to the config file if passed on
+⍝  * Assign `deprecateComment` to the config file if passed on
 ⍝  * Enforce compilation of the Registry's internal data
 ⍝  * Update the ZIP file
 ⍝ If no major version number is specified then the aforementioned actions are carried out for all major versions of the given package.
@@ -45,7 +45,7 @@
          :OrIf ~data.deprecated
              data.deprecated←1
              data.date←60 ⎕DT⊂⎕TS
-             data.comment←request.Content
+             data.deprecateComment←request.Content
              data.version←ElevateMinorVersionNumber data.version
              json←Reg.JSON data
              (⊂json)F.NPUT newCfgFilename 1

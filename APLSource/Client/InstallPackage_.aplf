@@ -1,4 +1,4 @@
- r←targetFolder InstallPackage_(alias packageID);buildList;principal;packageID2;installFolder;msg;path2cache;url;bool;tempDir;cacheFlag;success
+ r←targetFolder InstallPackage_(alias packageID);buildList;principal;packageID2;installFolder;msg;path2cache;url;bool;tempDir;cacheFlag;success;qdmx
 ⍝ Fetches a package and unzips it into a temp folder.
 ⍝ When caching is on, the temp folder is created within the top-level of the cache folder.
 ⍝ Otherwise a folder is created inside the temp directory of the given OS.
@@ -29,10 +29,15 @@
              tempDir←GetPackageFromCache url packageID2 path2cache
              cacheFlag←0
          :Else
-             (success tempDir cacheFlag)←InstallPackage__ packageID2 url
-             :If 0=success
-                 :Return
-             :EndIf
+             :Trap 998
+                 (success tempDir cacheFlag)←InstallPackage__ packageID2 url
+                 :If 0=success
+                     :Return
+                 :EndIf
+             :Else
+                 qdmx←⎕DMX
+                 qdmx.EM Assert 0
+             :EndTrap
          :EndIf
          :If IsHTTP url
          :AndIf cacheFlag

@@ -4,13 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- :If batchFlag
-     r←T._NoBatchTest
-     :Return
- :EndIf
-
- 0 0⍴⍞,0/⎕←'This test needs you: when questioned answer "Y"; press <enter> to continue'
-
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'Sure that you want to deprecate <example-versions-1> on https://localhost:5001/ ?' 'Y'
  stop←0
  (rc msg res)←stop ∆UCMD'DeprecatePackage [localhost]/example-versions-1 "Reason for deprecation"'
  →T.GoToTidyUp 0≠rc
@@ -26,4 +20,5 @@
 ∆TidyUp:
  F.RmDir ∆GetServerRegistryFolder,'example-versions-1.1.0'
  #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
+ ⎕SE._Tatin.Client.CommTools.Cleanup
 ⍝Done

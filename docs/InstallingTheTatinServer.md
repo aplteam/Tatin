@@ -5,7 +5,7 @@
 [parm]:numberHeaders     = 2 3 4 5 6
 
 
-# Installing the Tatin Server
+# Installing and Updating the Tatin Server
 
 ## Introduction
 
@@ -285,3 +285,33 @@ For details see:
 * <https://github.com/aplteam/Plodder>
 
 * <https://github.com/aplteam/RumbaLean>
+
+
+## Updating the Server
+
+Before updating the server **you must read the release notes!**. The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring a number of actions while the server is down for maintenance.
+
+### The Workspace
+
+A running server frequently checks whether the workspace on disk was changed since the server was started. If that is the case the server will load the workspace again. This allows an easy update in case no complex actions are required. 
+
+I> This mechanism is active by default but might be switched off with `[CONFIG]ReloadWS` in the INI file
+
+Naturally the server will produce an error message for a short period of time during the reload; expect 20 seconds or more, depending on the number of packages.
+
+
+## The INI file
+
+Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. _Do not replace the INI file!_
+
+The server checks the INI file for having been changed, and if that is the case re-initializse the INI file. However, whether that works or not depends on the kind of change: quite a number of settings are required at a very early stage, and cannot be simply changes later on. Again the release notes will tell.
+
+## Assets
+
+Which kind of actions needs to be taken, if any, is revealed by the release notes. Typically the sub folder `docs/` needs to be replace: this folder carries the documentation.
+
+## The folder Maintenance/
+
+First of all, never replace the folder `maintenance/`: the contents documents what changes have been carried out towards the packages in the past, and you don't want to loose this.
+
+If the new one is not empty then copy the contents over. This might be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.

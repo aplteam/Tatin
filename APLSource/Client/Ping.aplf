@@ -1,6 +1,7 @@
- bool←Ping url_;client;request;url_;buff;qdmx;b;last
-⍝ Establish either whether the host is up and running (with very little overhead) in case it is an http[s] request
+ bool←{timeout}Ping url_;client;request;url_;buff;qdmx;b;last
+⍝ Establish whether the host is up and running (with very little overhead) in case it is an http[s] request
  bool←0
+ timeout←{0<⎕NC ⍵:⍎⍵ ⋄ 4}'timeout'
  :If ∧/'[]'∊url_
      url_←ReplaceRegistryAlias url_
  :Else
@@ -15,7 +16,7 @@
          :If 0=⎕NC'∆PermanentConnections'
          :OrIf 9≠∆PermanentConnections.⎕NC 1 CompileNameFromUrl url_
              client←NewClient url_
-             client.ClientTimeout←4
+             client.ClientTimeout←timeout
              :Trap 345
                  buff←client R.SendAndReceive request
                  bool←1

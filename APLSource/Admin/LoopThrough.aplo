@@ -1,0 +1,26 @@
+ r←{registryPath}(fns LoopThrough)pkgFolderList;filename;F;i;pattern;offset;length;buff;Z;myZip;folder;pkgFolder;json;Reg;data;zipFilename
+⍝ Takes a list with all or some package folders and then executes the following steps for all of them:
+⍝  1. Read the package config filename
+⍝  2. Feed it to `fns`
+⍝  3. Write the result back to the filename
+⍝  4. Add the changed filename to the package's ZIP filename
+⍝ Can be useful to enforce certain changes, introduce a new property or polish tags.
+⍝ In that case depretaed packages are included.
+ F←##.FilesAndDirs
+ Z←##.ZipArchive
+ Reg←##.Registry
+ :For i :In ⍳≢pkgFolderList
+     ⍝⎕←(⍕i),'. of ',⍕≢pkgFolderList
+     pkgFolder←i⊃pkgFolderList
+     folder←registryPath,'/',pkgFolder
+     filename←folder,'/apl-package.json'
+     json←⊃F.NGET filename
+     data←⎕JSON⍠('Dialect' 'JSON5')⊢json
+     data←pkgFolder fns data
+     json←Reg.JSON data
+     (⊂json)F.NPUT filename 1
+     zipFilename←folder,'/',pkgFolder,'.zip'
+     myZip←⎕NEW Z(,⊂zipFilename)
+     folder myZip.Add'/apl-package.json'
+ :EndFor
+⍝Done

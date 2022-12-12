@@ -1,13 +1,13 @@
- r←{packageID}GetPackageList_ parms;list;list2;list3;uniqueIDs;descriptionAndProjecturlAndTags
- r←0 3⍴''
+ r←{packageID}GetPackageList_ parms;list;list2;list3;uniqueIDs;data
+ r←0 4⍴''
  packageID←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'packageID'
  list←Reg.GetAllPackages G.RegistryPath
  list←G.RegistryPath Reg.RemoveDeprecatedPackages list
  list2←list Reg.ListPackages(G.RegistryPath,packageID)parms
  list3←Reg.RemoveVersionNumber¨list
  :If 0<≢uniqueIDs←(⌽,list){⍺[(Reg.RemoveVersionNumber¨⍺)⍳⍵]}list2[;1]     ⍝ ⌽ them in order to get the latest version
-     descriptionAndProjecturlAndTags←↑Reg.FetchDescriptionAndPackageProjectUrlAndTags¨G.RegistryPath∘,¨uniqueIDs
-     descriptionAndProjecturlAndTags[;3]←'[,;]'⎕R', '⊣descriptionAndProjecturlAndTags[;3]  ⍝ Replace "," & ";" by ", "
-     r←list2,descriptionAndProjecturlAndTags
+     data←↑Reg.FetchDescriptionAndPackageProjectUrlAndTagsAndOS¨G.RegistryPath∘,¨uniqueIDs
+     data[;4]←'[,;]'⎕R', '⊣data[;4]  ⍝ Replace "," & ";" by ", " in description
+     r←list2,data
  :EndIf
 ⍝Done

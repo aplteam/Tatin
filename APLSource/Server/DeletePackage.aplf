@@ -1,4 +1,4 @@
- response←DeletePackage request;packageID;statusCode;errMsg;client;request;response;deletePolicy;regPath;msg
+ response←DeletePackage request;packageID;statusCode;errMsg;client;request;response;deletePolicy;regPath;msg;rc
 ⍝ Delete a package.\\
 ⍝ Whether deleting a package can be successful is determined by the INI setting [CONFIG]DeletePackages which is
 ⍝ Returned by `GetDeletePolicy` as a text vector.
@@ -18,6 +18,11 @@
              response←request Respond 200
              response.Content←'Package was deleted'
              ##.Registry.Index.Compile G.RegistryPath
+             (rc msg)←Emails.SendMail_DeletedPkg G.INI packageID
+             :If rc≠0
+                 P.AppLog⊆'*** Error'
+                 P.AppLog⊆'Sending email to gatekeeper with notification of a deleted package failed: ',(⍕rc),'; ',⍕∊rc
+             :EndIf
          :Else
              response←request Respond 400
              response.Content←msg

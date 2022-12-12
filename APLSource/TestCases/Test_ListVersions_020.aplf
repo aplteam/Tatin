@@ -1,0 +1,11 @@
+ r←Test_ListVersions_020(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ List all versions of all packages at all Registries with special syntax
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←TC.ListVersions'[*]MarkAPL'
+ →T.PassesIf 0<≢list
+ →T.PassesIf 1<≢∪list[;1]
+
+ r←T._OK
+⍝Done

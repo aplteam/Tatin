@@ -3,21 +3,18 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←T._Failed
 
- :If batchFlag
-     R←T._NoBatchTest
-     :Return
- :EndIf
-
- 0 0⍴⍞,0/⎕←'This test needs you: when questioned select [tatin]; to continue press <enter>'
-
+ ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'Please select a Registry:' 'https://tatin.dev/'
  (rc msg res)←∆UCMD'ListVersions ?'
- →T.PassesIf(rc=0)∧0=≢msg
- →T.PassesIf 0<≢res
- →T.PassesIf res≡res
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp 0=≢res
+ →T.GoToTidyUp res≢res
 
- 0 0⍴⍞,0/⎕←'This test needs you: when questioned enter "q" (for quit); to continue press <enter>'
+ ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'Please select a Registry:' 'q'
  (rc msg res)←∆UCMD'ListVersions ?'
- →T.PassesIf'Cancelled by user'≡res
+ →T.GoToTidyUp'Cancelled by user'≢res
 
  R←T._OK
+
+∆TidyUp:
+ ⎕SE._Tatin.Client.CommTools.Cleanup
 ⍝Done

@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages_(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep
+ r←{noBetas}InstallPackages_(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx
  ;buildList;level;requestedBy;packageID2;url;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -61,20 +61,25 @@
                  tempDir←GetPackageFromCache url packageID2 path2cache
                  cacheFlag←0
              :Else
-                 (success tempDir cacheFlag)←InstallPackage__ packageID2 url
-                 :If 0=success
-                     sep←⎕UCS 10
-                     question←'*** Server:',sep,'   ',url,sep,'does not host the package',sep
-                     question,←'   ',packageID2,sep,'Skip? (No=quit whole operation) '
-                     :If YesOrNo question
-                         ⎕TRAP←0 'S'
-                         ∘∘∘  ⍝ Intentional
-                         :Continue
-                     :Else
-                         CloseConnections 0
-                         :Return
+                 :Trap 998
+                     (success tempDir cacheFlag)←InstallPackage__ packageID2 url
+                     :If 0=success
+                         sep←⎕UCS 10
+                         question←'*** Server:',sep,'   ',url,sep,'does not host the package',sep
+                         question,←'   ',packageID2,sep,'Skip? (No=quit whole operation) '
+                         :If YesOrNo question
+                             ⎕TRAP←0 'S'
+                             ∘∘∘  ⍝ Intentional
+                             :Continue
+                         :Else
+                             CloseConnections 0
+                             :Return
+                         :EndIf
                      :EndIf
-                 :EndIf
+                 :Else
+                     qdmx←⎕DMX
+                     (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
+                 :EndTrap
              :EndIf
              :If IsHTTP url
              :AndIf cacheFlag

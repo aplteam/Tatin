@@ -11,21 +11,21 @@
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
- cfg←TC.InitPackageConfig ⍬
+ cfg←⎕NS''
  cfg.group←'test'
  cfg.name←'Package_A'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
- cfg.tags←'windows'
+ cfg.os_mac←1
 
- TC.WritePackageConfigFile src cfg
+ cfg←TC.WritePackageConfigFile src cfg
 
  packageID←'test-Package_A-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src'[localhost]'
  →T.GoToTidyUp 200≠rc
  →T.GoToTidyUp 0≠≢msg
 
- list1←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'[localhost]'
+ list1←({⍵.aggregate←0 ⋄ ⍵.os_mac←1 ⋄ ⍵}⎕NS'')TC.ListPackages'[localhost]'
  (rc msg)←⎕SE.Tatin.DeletePackage'[localhost]',packageID
  Assert 200=rc
  list2←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages'[localhost]'

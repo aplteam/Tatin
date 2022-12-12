@@ -22,10 +22,11 @@ TestFlag            = 0                     ; If 1 a couple of commands are avai
 ReloadWS            = 1                     ; Reload the server WS in case a better version is detected on disk
 HTDOCS              = '{home}'              ; Defines where the static files live (CSS, IMGs...)
 DeletePackages      = 0                     ; 0=not allowed; 1=allowed; 2=only beta versions (major=0);
-MinimumTatinVersion = '0.74'                ; Minimum version of Tatin required on the client side (major or major.minor)
+MinimumTatinVersion = '0.81'                ; Minimum version of Tatin required on the client side (major or major.minor)
 SpecialCommands     = 0                     ; Active only ever for a test server, never in production
 GroupHomePages      = 0                     ; 1=Allow owners to save a group home page
-menuItemBefore      = ''                    ; Prefix for some of the menu items in the main menu
+MenuItemBefore      = ''                    ; Prefix for some of the menu items in the main menu
+MaintenancePath     = ''                    ; Code to be loaded from in order to execute it once and then rename the file
 
 
 [HTMLBACKGROUND]
@@ -69,7 +70,7 @@ address             = '*'
 wait                = 1             ; If 1 wait for the user in an endless loop
 
 [TRAP]
-Folder              = '{home}../wServerData/Errors'    ; Crash file, HTML report etc.
+Folder              = '{home}../ServerData/Errors'     ; Crash file, HTML report etc.
 Policy              = ¯1        ; ¯1=General error trapping in Runtime but not otherwise; 1=Trap and 0=don't trap. General means "above" Rumba
 Rumba               = 1         ; This has an effect only in development. Rumba traps all errors in Runtime in any case.
 
@@ -88,12 +89,14 @@ Domain              = '?'                              ; Used in the subject lin
 SMTP_Server         = ''                               ; For example: smtp.gmail.com'
 Port                = 465
 From                = 'do-not-reply@your-domain.comv'  ; Sender of crash emails
-To                  = 'some-address@gmail.com'         ; Receiver of crash emails (*)
+To                  = 'some-address@gmail.com'         ; Receiver of crash emails 
 Password            = '?'                              ; Must fit to "SendTo" which is also used as User-ID on the SMTP server
 ;Body                = 'The Tatin server running at "<DOMAIN>" has crashed; see attached crash report'
 Body                = 'The Tatin server running at "<DOMAIN>" has crashed'
 CC                  = ''
 CC                 ,= '?'                              ; Receiver of crash emails
-;CC                ,= '?'                              ; Receiver of crash emails
+gatekeeper          = ''                
+gatekeeper         ,= ''                               ; Gets a notification when a package is published/deleted; empty=no notification
+
 
 ; *: "Domain" and "To" are displayed on each HTML page in the footer if both are not empty

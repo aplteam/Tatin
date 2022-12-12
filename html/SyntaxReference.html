@@ -26,7 +26,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#CreateReInstallParms">2.3. CreateReInstallParms</a></li>
 <li><a href="#DeletePackage">2.4. DeletePackage</a></li>
 <li><a href="#DeprecatePackage">2.5. DeprecatePackage</a></li>
-<li><a href="#FindTatinDependencies">2.6. FindTatinDependencies</a></li>
+<li><a href="#FindDependencies">2.6. FindDependencies</a></li>
 <li><a href="#GetDeletePolicy">2.7. GetDeletePolicy</a></li>
 <li><a href="#GetDependencyTree">2.8. GetDependencyTree</a></li>
 <li><a href="#GetNoCachingFlag">2.9. GetNoCachingFlag</a></li>
@@ -184,18 +184,18 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <p>Note that because the Registry must be defined no scanning takes place with this function.</p>
 <div class="h_tag">
-<a href="#FindTatinDependencies" id="FindTatinDependencies" class="autoheader_anchor">
-<h3 data-id="FindTatinDependencies">2.6. FindTatinDependencies</h3>
+<a href="#FindDependencies" id="FindDependencies" class="autoheader_anchor">
+<h3 data-id="FindDependencies">2.6. FindDependencies</h3>
 </a>
 </div>
-<pre><code>r←{level} FindTatinDependencies (folder pkgList)
+<pre><code>r←{level} FindDependencies (folder pkgList)
 </code></pre>
 <p>Scans <code>folder</code> recursively for the file “apl-dependencies.txt”. Folders with such a file will be scanned for packages defined in <code>pkgList</code>. Useful for finding out where one or more packages are actually used.</p>
 <p><code>pkgList</code> must be a simple char vector with a list of comma-separated packages.</p>
 <p>The packages can be specified fully or partly. “Group” and “version” can be left out, while “Name” is mandatory. You may specify a major version but neither “Minor” nor “Patch”. If you do anyway anything after the major number will be ignored.</p>
 <p>Note that the search is <em>not</em> case sensitive.</p>
 <p>Returns a fully qualified list with all hits.</p>
-<p>By default just the folder is returned that contains the file “apl-dependencies.txt”. In case a 1 is passed as left argument (default is 0, other values led to an error) the package folders are also returned, revealing the precise version installed.</p>
+<p>By default just the folder is returned that contains the file “apl-dependencies.txt”. In case a 1 is passed as left argument (default is 0, other values led to an error) the actual package folders are returned, revealing the precise version(s) installed.</p>
 <div class="h_tag">
 <a href="#GetDeletePolicy" id="GetDeletePolicy" class="autoheader_anchor">
 <h3 data-id="GetDeletePolicy">2.7. GetDeletePolicy</h3>

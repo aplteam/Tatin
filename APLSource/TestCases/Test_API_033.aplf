@@ -1,0 +1,26 @@
+ r←Test_API_033(stopFlag batchFlag);⎕TRAP;res1;dir;parms;res2
+⍝ Exercise ⎕SE.Tatin.ListTags with several -os*= mutations
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir''
+
+ parms←⎕NS''
+ parms.os_lin←1
+ parms.os_mac←1
+ res1←parms ⎕SE.Tatin.ListTags'[localhost]'
+ →T.GoToTidyUp~0<≢res1
+ →T.GoToTidyUp~2=⍴⍴res1
+
+ parms←⎕NS''
+ parms.os_win←1
+ res2←parms ⎕SE.Tatin.ListTags'[localhost]'
+ →T.GoToTidyUp~0<≢res2
+ →T.GoToTidyUp~2=⍴⍴res2
+
+ →T.GoToTidyUp~</≢¨res1 res2
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir

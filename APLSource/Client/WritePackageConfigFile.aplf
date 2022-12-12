@@ -1,10 +1,11 @@
- {r}←{initializeFlag}WritePackageConfigFile(path cfg);qdmx;cfg_file;assets;cfg2;tmp
+ {cfg}←{initializeFlag}WritePackageConfigFile(path cfg);qdmx;cfg_file;assets;tmp
 ⍝ Write package config file to disk.
 ⍝ By default several properties are checked and an error is thrown in case something is not quite right,
 ⍝ This can be changed by passing a 1 as ⍺. In this case two checks are NOT perfortmed:
 ⍝ * "source" might be empty
 ⍝ * "assets" is ignored, and therefore might not exist
  initializeFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'initializeFlag'
+ cfg←InitPackageConfig cfg
  :If 0=initializeFlag
      '"source" must not be empty'Assert 0<≢cfg.source
  :EndIf
@@ -14,6 +15,7 @@
  cfg_file←path,CFG_Name
  {}ValidateVersion cfg.version
  cfg←ValidatePackageFiles cfg
+ cfg←initializeFlag ValidateOSprops cfg
  cfg←ValidateTags cfg
  cfg←ValidateAPI cfg
  cfg←ValidateDocumentation cfg
@@ -24,16 +26,14 @@
      {}path∘CheckAssetsExist¨assets
      cfg.assets←⊃{⍺,',',⍵}/assets
  :EndIf
- cfg2←InitPackageConfig cfg
- 'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg2.name
+ 'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg.name
  tmp←cfg_file,'.tmp'
  :Trap 0
-     {}cfg2.⎕EX'∆List'
-     {}(⊆Reg.JSON cfg2)F.NPUT tmp 1
+     {}cfg.⎕EX'∆List'
+     {}(⊆Reg.JSON cfg)F.NPUT tmp 1
      {}F.DeleteFile cfg_file
      ⎕DL 0.01
      {}cfg_file ⎕NMOVE tmp
-     r←cfg2
  :Else
      qdmx←⎕DMX
      qdmx.EM ⎕SIGNAL qdmx.EN

@@ -1,15 +1,22 @@
- r←(fns LoopThroughRegistry_AplPackageJson)path;list;F;i;pattern;offset;length;buff;Z;myZip;folder;packages;package;filename;ns;zipFilename;A
+ r←{recursive}(fns LoopThroughRegistry_AplPackageJson)path;list;F;i;pattern;offset;length;buff;Z;myZip;folder;packages;package;filename;ns;zipFilename;A;paths;path_
 ⍝ Takes a path to a local Registry. Processes all directories found in that folder and ...
 ⍝ * Reads the file apl-package.json, convert the JSON5 to APL data and feeds it to `fns`
 ⍝ * Replaces the file apl-package.json in that folder with the result of `fns`
 ⍝ * Replaces apl-package.json inside the package zip file in that folder\\
 ⍝ In other words, it's designed to polish all apl-package.json files in a Registry, zipped and unzipped
+⍝ If it's not a Registry but a folder that keeps packages, and on several levels, pass a 1 as ⍺:
+⍝ that makes sure that all folders are scanned recursively for pakage config files.
  F←##.FilesAndDirs ⋄ Z←##.ZipArchive ⋄ A←##.APLTreeUtils2
+ r←0 0⍴⍬
+ recursive←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'recursive'
  packages←F.ListDirs path
  :For i :In ⍳≢packages
      package←i⊃packages
      ⎕←(⍕i),'. of ',⍕≢packages
      filename←package,'/apl-package.json'
+     :If ~⎕NEXISTS filename
+         :Continue
+     :EndIf
      ns←##.Registry.JSON⊃F.NGET filename
      ns←filename fns ns
      (⊂##.Registry.JSON ns)F.NPUT filename 1
@@ -20,5 +27,12 @@
          folder myZip.Add'/apl-package.json'
          myZip.Dispose
      :EndIf
+     ⎕←'Solved: ',⊃,/1↓⎕NPARTS filename
  :EndFor
+ :If recursive
+     paths←F.ListDirs path,'/'
+     :For path_ :In paths
+         1(fns LoopThroughRegistry_AplPackageJson)path_
+     :EndFor
+ :EndIf
 ⍝Done

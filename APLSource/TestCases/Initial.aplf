@@ -1,4 +1,4 @@
- r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res;P;f2;flag
+ r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res;P;f2;flag;flag2
  #.⎕EX'_tatin'
  r←1
  (rc msg res)←∆UCMD'Init ./TestData'
@@ -16,6 +16,9 @@
  :EndIf
  :If flag
      ∆P←∆StartServerProcessForTests parms.debugFlag
-     ⎕DL 12
+     :Repeat
+         :If 0=flag2←1 TC.Ping'[localhost]'
+         :EndIf
+     :Until flag2
  :EndIf
 ⍝Done

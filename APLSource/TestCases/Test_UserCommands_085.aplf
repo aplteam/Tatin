@@ -1,18 +1,12 @@
  R←Test_UserCommands_085(stopFlag batchFlag);⎕TRAP;stop
 ⍝ Exercise ]Tatin.LoadPackages from within a namespace
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
-R←T._Failed
-
- :If batchFlag
-     R←T._NoBatchTest
-     :Return
- :EndIf
-
- 0 0⍴⍞,0/⎕←'This test needs you: when given options select "Foo" as target; to continue press <enter>'
+ R←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS''
 
+ ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'Select target space the package(s) shall be loaded into:' '#.Foo'
  stop←0
  #.Foo.fn←stop∘⎕THIS.{⍺ ∆UCMD'LoadPackages ',⍵}
  :With #.Foo
@@ -25,4 +19,5 @@ R←T._Failed
 
 ∆TidyUp:
  #.⎕EX TC.GetTatinRootSpace'#'
+ ⎕SE._Tatin.Client.CommTools.Cleanup
 ⍝Done

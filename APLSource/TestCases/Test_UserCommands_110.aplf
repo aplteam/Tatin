@@ -1,0 +1,16 @@
+ r←Test_UserCommands_110(stopFlag batchFlag);⎕TRAP;rc;msg;res1;dir
+⍝ Exercise ]Tatin.ListTags
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir''
+
+ (rc msg res1)←∆UCMD'ListTags [local]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp~0<≢res1
+ →T.GoToTidyUp~2=⍴⍴res1
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir

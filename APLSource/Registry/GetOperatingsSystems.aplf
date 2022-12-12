@@ -1,0 +1,16 @@
+ r←pkgList GetOperatingsSystems path;filename;buff
+⍝ If ⍺ is undefined the full list is returned.
+⍝ If ⍺ is defined, only matches are returned.
+⍝ The result is a matrix with four columns:
+⍝ [;1]      Package ID
+⍝ [;2,3,4]  Booleans for os_lin, os_mac, os_win
+ r←0 4⍴''
+ filename←path,'/tatin_os.txt'
+ ('File not found: ',path)Assert F.IsFile filename
+ :If 0<≢buff←⊃F.NGET filename 1
+     r←↑{l←¯1+⍵⍳' ' ⋄ (⊂l↑⍵),⍎(l↓⍵)}¨buff
+     :If 0<⎕NC'pkgList'
+         r←(r[;1]∊pkgList)⌿r
+     :EndIf
+ :EndIf
+⍝Done

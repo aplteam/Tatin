@@ -1,6 +1,6 @@
  response←Handle_Delete request;groupName;apiKey
  request.RequestTarget←('/'=1⍴request.RequestTarget)↓request.RequestTarget
- groupName←{⍵↑⍨¯1+⍵⍳'-'}request.RequestTarget
+ groupName←Reg.GetGroupName request.RequestTarget
  apiKey←'api-key'GetFromHeaders request.Headers
  :If G.Credentials AcceptCredential apiKey groupName
      :If Reg.IsValidPackageID_Complete request.RequestTarget

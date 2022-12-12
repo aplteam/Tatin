@@ -25,7 +25,7 @@ This is an example:
   ml: 1,
   name: "DotNetZip",
   source: "DotNetZip.aplc",
-  tags: "zip-tools;windows;mac-os;linux",
+  tags: "zip-tools",
   version: "0.5.4",
 }
 ```
@@ -195,6 +195,21 @@ A>    ```
 A>    (⊃⊃⎕CLASS ⎕THIS).##.TatinVars.GetFullPath2AssetsFolder
 A>    ```
 
+#### deprecated
+
+An optional Boolean.
+
+It is injected into a package config file by the `]Tatin.DeprecatePackage` command. A 1 means that this package is deprecated.
+
+#### deprecate_comment
+
+
+An optional character vector.
+
+It is injected into a package config file by the `]Tatin.DeprecatePackage` command.
+
+Supposed to give a hint why a package is deprecated, for example "See package XYZ instead".
+
 
 #### description
 
@@ -283,6 +298,10 @@ your.name@your-domain.com
 Note that any double quotes will be removed.
 
 
+#### minimumAplVersion
+
+A character vector that must contain something like "18.0". In fact 18.0 is the minimum version for any Tatin package, for Tatin itself needs at least version 18.0.
+
 #### name
 
 The name part of the package ID[^id]
@@ -295,17 +314,28 @@ An example is `https://github.com/aplteam/MarkAPL`
 
 It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.
 
+
+#### os_win
+
+A Boolean; a 1 means that the package runs under Windows.
+
+#### os_mac
+
+A Boolean; a 1 means that the package runs under Mac-OS.
+
+#### os_lin
+
+A Boolean; a 1 means that the package runs under Linux.
+
 #### source
 
 This defines the source code file(s) that are going to be part of the package.
 
 Must be either the name of a text file that contains code or a folder that contains a collection of code files. `source` _must not_ be empty.
 
-If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script), `.apli` (an interface script), `.aplf` (a function) or `.aplo` (an operator).
+If it's a single file it might be anything with the extension `.aplc` (a class script), `.apln` (a namespace script), `.aplf` (a function) or `.aplo` (an operator).
 
-The `.dyalog` extension is supported for limited backward compatibility --- Tatin does not guarantee complete compatibility with SALT. The `.dyalog` extension is still used by the user command framework, therefore Tatin must support it: a user command might well be delivered as a Tatin package.
-
-Note that outside this context using this extension is not encouraged.
+The `.dyalog` extension is supported for limited backward compatibility --- Tatin does not guarantee complete compatibility with SALT. The `.dyalog` extension is still used by the user command framework, therefore Tatin must support it: a user command might well be delivered as a Tatin package. Note that outside this context using this extension is not encouraged.
 
 If `source` is a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
 
@@ -362,7 +392,11 @@ A simple text vector, possibly empty (though that is not recommended), that shou
 
 `tags` must not be empty if you wish to publish a package to a Tatin server because such a package would not be accepted by the server.
 
-Tags should not only be related to the problems one can solve with a particular package, it should also carry "windows", "linux" and "mac-os" when appropriate. That allows the user to filter packages by platform.
+Tags should only be related to the problems one can solve with a particular package. There is no need to specify the platform since they have their own properties: `os_lin`, os_mac`, `os_win`. Those got introduced with version 0.81.0.
+
+There is also no point in adding tags like "dyalog" or "apl" to a package: Tatin is a Dyalog APL package manager...
+
+Note that people in charge for the proncipal Tatin server will have an eye on the tags, and might silently correct them in order to keep them consistent and meaningful.
 
 #### version
 

@@ -1,4 +1,4 @@
- r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;noOfHyphens;noOfDots;uniqueIDs;list2;since;flag
+ r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;noOfHyphens;noOfDots;uniqueIDs;list2;since;flag;bool;OSlist
 ⍝ Documentation see ##.Client.ListPackages
  'No registry specified'Assert 0<≢uri
  parms←CheckParmsForListPackages parms
@@ -21,6 +21,11 @@
  :EndIf
  :If 0<≢parms.group
      list←((⎕C parms.group)∘≡¨GetGroupFromPackageID¨list[;1])⌿list
+     →(0∊≢list)/0
+ :EndIf
+ :If 0∊bool←∊parms.(os_lin os_mac os_win)
+     OSlist←list GetOperatingsSystems registryPath
+     list←(∨/bool/OSlist[;2 3 4])⌿list
      →(0∊≢list)/0
  :EndIf
  :If 0≢parms.info_url

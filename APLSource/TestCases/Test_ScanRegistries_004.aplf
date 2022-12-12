@@ -3,24 +3,17 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- :If batchFlag
-     r←T._NoBatchTest
-     :Return
- :EndIf
-
- ⎕←'This test needs you:'
- ⎕←'When you are given three options choose "Skip"'
- 0 0⍴⍞,0/⎕←'To continue press <enter>'
-
  TC.MyUserSettings.AddRegistry'[DoesNotExist]https://does-not-exist.forsure'
  ind←TC.MyUserSettings.registries.alias⍳⊂⎕C'DoesNotExist'
  (ind⊃TC.MyUserSettings.registries).priority←1+⌈/TC.MyUserSettings.registries.priority
 
  askUser←1
+ TC.CommTools.Select_Choices←1 2⍴'https://does-not-exist.forsure/ did not respond when interrogated for aplteam-APLProcess' 'Skip'
  path←askUser TC.EstablishRegistry'aplteam-APLProcess'
 
  r←T._OK
 
 ∆TidyUp:
+ TC.CommTools.Cleanup
  TC.MyUserSettings.RemoveRegistry'[DoesNotExist]'
 ⍝Done

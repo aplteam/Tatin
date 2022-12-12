@@ -1,40 +1,50 @@
- mat←{dateFlag}ListVersions url;client;request;res;url_;registries;registry;buff;flag
+ mat←{dateFlag}ListVersions url;client;request;res;url_;registries;registry;buff;flag;port;packageID
 ⍝ Lists all versions of a package.
 ⍝ `url` is one of:
-⍝ * A package name is specified
-⍝ * A path to a Registry and "group" and "name" of a package
-⍝ In the first case all defined Registries with a priority greater than zero are scanned.
-⍝ A matrix with two columns is returned: URL and full package ID.\\
-⍝ In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.\\
+⍝  * An (optional) registry followed by "group" and "name" of a package
+⍝  * A path to a Registry and "group" and "name" of a package
+⍝  * [*] followed by either a name or group-name
+⍝  1. In the first case all defined Registries with a priority greater than zero are scanned.
+⍝  2. In the second case the specified Registry is scanned. A matrix with one column with full package IDs is returned.
+⍝  3. In the third case all versions of the given package on all regsitries with a priority greater
+⍝     then 0 will be listed.\\
 ⍝ You may omit the group name; that would not make a difference when the name is used only within one group,
 ⍝ but if it is used in more than one group, then all of them are listed.
 ⍝ The package ID must not specify a version number.\\
+⍝ Returns a matrix with two columns (URL and full package ID) in case no specific domain/path was specified.\\
+⍝ If a specific domain/path was specified only one column is returned with the full package ID.
 ⍝ By default the publishing date is not included, but you my change this by passing a 1 as ⍺.
 ⍝ In that case an additional column is added to the result.
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
- mat←(0,(2+dateFlag))⍴⍬
- url_←ReplaceRegistryAlias url
- :If IsHTTP url_
-     'No valid URI provided'Assert 0<≢url_
+ :If flag←'[*]'≡3⍴url           ⍝ Special syntax!
+ :OrIf (~IsHTTP url)∧('['≠1⍴url)∧({1≥+/⍵∊'/\'}url)∧(~':'∊url)∧('.'≠1⍴url)
+     packageID←(flag×3)↓url
+     mat←(0,(2+dateFlag))⍴⍬
+     registries←ListRegistries 0
+     :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
+     :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}registries[;1])⌿registries
+         :For registry port :In ↓registries[;1 3]
+             :If IsHTTP registry
+                 url_←registry CompileUrlPlusPort port
+             :Else
+                 url_←registry
+             :EndIf
+             :If 0<≢buff←dateFlag ListVersions url_,packageID
+                 mat⍪←(⊂registry),buff
+             :EndIf
+         :EndFor
+     :EndIf
+ :Else
+     url_←ReplaceRegistryAlias url
+     :If ∧/'[]'∊url
+         'No valid alias provided'Assert 0<≢url_
+     :Else
+         'No valid URI provided'Assert 0<≢url_
+     :EndIf
      'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last url_)+.='-'     ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
      :If Reg.IsHTTP url_
          mat←⍪dateFlag ListVersions_ url_
      :Else
          mat←⍪dateFlag Reg.ListVersions url_
      :EndIf
- :ElseIf ∨/'/\'∊url_
-     :If 0<≢buff←dateFlag Reg.ListVersions url_
-         mat←⍪buff
-     :EndIf
- :Else
-     registries←ListRegistries 0
-     :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
-     :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}⊃¨{⍵≡0:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}/¨↓registries[;1 3])⌿registries
-         :For registry :In registries[;1]
-             :If 0<≢buff←dateFlag ListVersions registry,url
-                 mat⍪←(⊂registry),buff
-             :EndIf
-         :EndFor
-     :EndIf
  :EndIf
-⍝Done

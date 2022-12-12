@@ -1,5 +1,5 @@
- list←{level}FindTatinDependencies_(folder pkgList);folders;subFolder;buff;dependencies;filename;pkg;bool;bool2
-⍝ Sub-function of FindTatinDependencies without independent meaning
+ list←{level}FindDependencies_(folder pkgList);folders;subFolder;buff;dependencies;filename;pkg;bool;bool2
+⍝ Sub-function of FindDependencies without independent meaning
 ⍝ `level` can be 0 (default) or 1
  level←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'level'
  'Invalid left argument'Assert(⊂level)∊0 1
@@ -11,7 +11,7 @@
          :Case 0 ⍝ Just a package name
              bool←pkg∘≡¨⎕C{⍵↑⍨¯1+⍵⍳'-'}¨{⍵↓⍨⍵⍳'-'}¨dependencies
          :Case 1 ⍝ Group and package name
-             bool←pkg∘≡¨⎕C{⍵/⍨2>+\⍵='-'}¨dependencies
+             bool←pkg∘≡¨⎕C Reg.RemoveVersionNumber¨dependencies
          :Case 2 ⍝ Group and package name and version number
              bool←pkg∘≡¨⎕C Reg.RemoveMinorAndPatch¨dependencies
          :EndSelect
@@ -30,7 +30,7 @@
  :If 0<≢folders←F.ListDirs folder
      folders←(~({⊃,/1↓⍵}¨⎕NPARTS¨folders)∊'.git' '.cider')/folders
      :For subFolder :In folders
-         list,←level FindTatinDependencies_(subFolder,'/')pkgList
+         list,←level FindDependencies_(subFolder,'/')pkgList
      :EndFor
  :EndIf
  ⍝Done

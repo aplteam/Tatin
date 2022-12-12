@@ -1,4 +1,4 @@
- {(statusCode errMsg)}←{isHttpRequest}PublishPackage(zipFilename registryPath);packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps
+ {(statusCode errMsg)}←{isHttpRequest}PublishPackage(zipFilename registryPath);packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps;tags
 ⍝ Tries to publish a package locally.\\
 ⍝ * If the package already exists `errmsg` carries an appropriate message. No further action is taken.
 ⍝ * If any action along the line fails (like creating the package directory, copying the ZIP file, copying the dependency file, if any)
@@ -20,6 +20,25 @@
      statusCode←HttpCodes.BadRequest
      :Return
  :EndIf
+ :If 0<≢cfg.tags
+     tags←','(≠⊆⊢)cfg.tags
+     tags~←'apl' 'dyalog' 'dyalogapl' 'dyalog-apl'  ⍝ These make no sense: Tatin is a Dyalog package manager by definition
+     :If (⊂'windows')∊tags
+         cfg.os_win←1
+     :EndIf
+     :If ∨/('mac-os' 'mac' 'macos')∊tags
+         cfg.os_mac←1
+     :EndIf
+     :If (⊂'linux')∊tags
+         cfg.os_lin←1
+     :EndIf
+     tags~←'windows' 'mac-os' 'macos' 'mac' 'linux'
+     cfg.tags←{0=≢⍵:'' ⋄ ⊃{⍺,',',⍵}/⍵}tags
+ :EndIf
+ :If 0=≢cfg.minimumAplVersion
+     cfg.minimumAplVersion←'18.0' ⍝ This is the minimum by definition: Tatin does not run on earlier versions
+ :EndIf
+ (JSON cfg)F.NPUT(tempDir,'/',CFG_Name)1
  packageID←{⍵.group,'-',⍵.name,'-',⍵.version}cfg
  packageID←⊃SplitVersionFromBuild packageID
  registryPath←AddSlash registryPath

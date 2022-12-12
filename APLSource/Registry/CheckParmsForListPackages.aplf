@@ -1,4 +1,4 @@
- parms←CheckParmsForListPackages parms;list
+ parms←CheckParmsForListPackages parms;list;msg;flag
 ⍝ Makes sure that `parms` will be a namespace that carries the required parameters.
 ⍝ If `parms` is `⍬` or '' it is replaced by `⎕NS''` and then populated with defaults.
 ⍝ `parms` is also checked for containing other stuff (not permitted) and converts
@@ -24,10 +24,25 @@
  :If 0=parms.⎕NC'since'
      parms.since←0
  :EndIf
- list←'group' 'tags' 'aggregate' 'date' 'info_url' 'since'
- 'Invalid left argument: only "group", "tags", "date", "info_url" and "aggregate" are permitted'Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊list
+⍝ If at least one is specified the others default to 0. If none is specified they all default to 1
+ flag←0∧.=parms.⎕NC↑'os_win' 'os_mac' 'os_lin'
+ :If 0=parms.⎕NC'os_win'
+     parms.os_win←flag
+ :EndIf
+ :If 0=parms.⎕NC'os_mac'
+     parms.os_mac←flag
+ :EndIf
+ :If 0=parms.⎕NC'os_lin'
+     parms.os_lin←flag
+ :EndIf
+ list←'group' 'tags' 'aggregate' 'date' 'info_url' 'since' 'os_win' 'os_mac' 'os_lin'
+ msg←'Invalid left argument: only "group", "tags", "date", "info_url", "aggregate", "os_win", "os_mac" and "os_lin" are permitted'
+ msg Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊list
  '"aggregate" must be a Boolean'Assert parms.aggregate∊0 1
  '"date" must be a Boolean'Assert parms.date∊0 1
+ '"os_win" must be a Boolean'Assert parms.date∊0 1
+ '"os_mac" must be a Boolean'Assert parms.date∊0 1
+ '"os_lin" must be a Boolean'Assert parms.date∊0 1
  parms.since←{0=1↑0⍴∊⍵:⍵ ⋄ (flag value)←⎕VFI ⍵ ⋄ flag:value ⋄ ⍵}parms.since
  :If ' '=1↑0⍴parms.since
      :Trap 0
@@ -38,6 +53,5 @@
  :Else
      '"since" must be an integer: YYYYMMDD'Assert(⎕DR parms.since)∊323 83 83
  :EndIf
-⍝ parms.(group tags)←⎕C¨parms.(group tags)
  parms.tags←⎕C parms.tags
 ⍝Done

@@ -16,7 +16,7 @@
      msg←''
      msg,←⊂'This function will close all Cider projects, delete everything that is not needed in order to'
      msg,←⊂'run a Tatin server, re-arrange stuff, set ⎕LX and finally save the workspace together'
-     msg,←⊂'with everything that is needed by the server in Dist/Server.dws'
+     msg,←⊂'with everything that is required by the server in Dist/Server.dws'
      msg,←⊂''
      msg,←⊂'Finally all that''s required is zipped into a file <Tatin-Server-{major}.{Minor}.{Patch}.zip'
      msg,←⊂'That file is created within the Dist/ folder which is not managed by Git'
@@ -37,16 +37,23 @@
      F.RmDir targetPath
      ⎕DL 0.1
      Assert F.MkDir targetPath
-     ⎕DL 0.1
-     F.MkDir targetPath,'/Server/Assets'
-     ⎕DL 0.1
-     Assert F.IsDir targetPath,'/Server/Assets'
-     F.MkDir targetPath,'/Registry/'
-     ⎕DL 0.1
-     Assert F.IsDir targetPath,'/Registry'
+
      F.MkDir targetPath,'/Server/'
      ⎕DL 0.1
      Assert F.IsDir targetPath,'/Server'
+
+     F.MkDir targetPath,'/Server/Assets'
+     ⎕DL 0.1
+     Assert F.IsDir targetPath,'/Server/Assets'
+
+     F.MkDir targetPath,'/Server/Maintenance'
+     ⎕DL 0.1
+     Assert F.IsDir targetPath,'/Server/Maintenance'
+
+     F.MkDir targetPath,'/Registry/'
+     ⎕DL 0.1
+     Assert F.IsDir targetPath,'/Registry'
+
      F.MkDir targetPath,'/Docker'
      ⎕DL 0.1
      Assert F.IsDir targetPath,'/Docker'
@@ -56,15 +63,19 @@
      ⎕SE.⎕EX ⎕SE.⎕NL⍳16                                 ⍝ Attempt to avoid "Reference in ⎕SE points to #" (⎕JSON bug)
      'Plodder' 'RumbaLean'#.Tatin.⎕CY ##.CiderConfig.HOME,'/Assets/RunTime/Plodder/Plodder'
      0 ⎕SAVE ⎕WSID
+
      (targetPath,'/Docker')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Docker/'
      (targetPath,'/Server')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/'
      (targetPath,'/Server/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./InstallAsWindowsService.dws'
+     (targetPath,'/Server/Maintenance/')⎕NCOPY⍠('Wildcard' 1)('IfExists' 'Replace')⊣'Maintenance/*'
      (targetPath,'/Server/server.ini')⎕NCOPY⍠('IfExists' 'Replace')⊣'./server.ini.RemoveMe'
      (targetPath,'/Server/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./tatin.sh'
      F.RmDir'Dist/Server/Assets/RunTime/Plodder'
+
      F.DeleteFile¨F.Dir'Dist/Tatin-Server-*.zip'
      zipFilename←'Dist/Tatin-Server-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Server.Version),''),'.zip'
      targetPath ##.ZipArchive.ZipFolder zipFilename
+
      :If batchFlag
          ⎕OFF
      :Else

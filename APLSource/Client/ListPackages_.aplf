@@ -9,6 +9,9 @@
      parms.date←0
      parms.info_url←0
      parms.since←0
+     parms.os_win←1
+     parms.os_mac←1
+     parms.os_lin←1
  :EndIf
  (host packageID)←Reg.SeparateUriAndPackageID uri_
  'Not a valid URI'Assert('/'+.=host)∊2 3
@@ -21,6 +24,15 @@
  :EndIf
  :If 0<≢⊃,/parms.tags
      request.RequestTarget,←'tags=',parms.tags,'&'
+ :EndIf
+ :If parms.os_win
+     request.RequestTarget,←'os_win=1&'
+ :EndIf
+ :If parms.os_mac
+     request.RequestTarget,←'os_mac=1&'
+ :EndIf
+ :If parms.os_lin
+     request.RequestTarget,←'os_lin=1&'
  :EndIf
  :If parms.date
      request.RequestTarget,←'date=1&'

@@ -34,7 +34,7 @@ After a fresh installation you might wonder what Registries are available to you
  https://test.tatin.dev/ test-tatin       0           0 
 ```
 
-At this point Tatin only knows about the principal Tatin server and the Tatin test server. If you wish to access other servers on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelihood your own ones), then you must change the user settings. 
+At this point Tatin only knows about the principal Tatin Registry and the Tatin test Registry. If you wish to access other Registries on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelihood your own ones), then you must change the user settings. 
 
 All these topics --- and related ones --- are discussed in a separate document: "TatinUserSettings.html". Here we try to keep things simple.
 
@@ -43,7 +43,7 @@ All these topics --- and related ones --- are discussed in a separate document: 
 
 ### Listing packages
 
-You may list _all_ packages managed by Tatin's principal server with this command:
+You may list _all_ packages managed by Tatin's principal Registry with this command:
 
 ```
       ]tatin.ListPackages [tatin]
@@ -58,7 +58,19 @@ You may list _all_ packages managed by Tatin's principal server with this comman
 
 The square brackets around "tatin" declare that string to be an alias. Without the square brackets Tatin would assume the argument to be either a local path or a URL like `https://localhost/my_tatin_server`
 
-If you omit the argument Tatin will present a list with all known Registries to you.
+I> Note that because `[tatin]` is the principal Tatin Registry you might well omit `[tatin]`: without an argument the command --- like some others --- would act on the principal Registry anyway.
+
+If you specify a `?` instead of `[tatin]` then Tatin will present a list with all known Registries to you for selecting the right one:
+
+```
+]listPackages ? 
+--- Select Tatin Registry -----------------------------------------------------
+   1.  [local]               https://localhost/       
+   2.  [tatin]               https://tatin.dev/       
+   3.  [tatin-test]          https://test.tatin.dev/  
+
+Select one item (q=quit) :
+```
 
 A> ### Local and remote Registries
 A>
@@ -74,7 +86,7 @@ A> Of course features like listing just the packages that carry a specific tag a
 * If you happen to know the group name you may specify `-group=whatever`: then only packages of the group "whatever" are listed
 * Every package is tagged with keywords
 
-  You may specify one or more tags, for example `-tag=linux,date`
+  You may specify one or more tags, for example `-tag=smtp,email`
 
 A> ### Searching for tags: the strategy
 A>
@@ -82,11 +94,11 @@ A> 1. First Tatin tries to find 100%-matches
 A> 1. In case there is no match, Tatin tries to find it _somewhere_ (`⍷`)
 A> 1. In case there is still no match a fuzzy search is performed
 A> 
-A> The fuzzy search would find "windows" when you enter "winndows" and "linux" when you enter "linuks". It has limits, but in practice it works quite well unless the tags are very short: typing "AY" when you meant "AI" would not work.
+A> The fuzzy search would find "installer" when you enter "intaller" and "datetime" when you enter "dadetime". It has limits, but in practice it works quite well unless the tags are very short: typing "AY" when you meant "AI" would not work.
 A>
 A> Notes:
 A> * The strategy outlined above is applied on each tag independently.
-A> * Searching for multiple tags would mean that only packages that have a hit for _all of them_ would qualify.
+A> * Searching for multiple tags would mean that only packages would qualify that carry a hit for _all of them_.
 A> * Searching for tags is an action that is carried out by a Tatin Server. That means that specifying `-tags=` makes sense only in HTTP requests: only then is there a server on the other side that can process the request.
 A> * This feature's sole purpose is to overcome typos; it should not be used deliberately --- as a shortcut for example --- since the result may be incorrect.
 
@@ -96,23 +108,18 @@ The user command `ListTags` takes one or more tags and returns a list of tags th
 
 
 ```
-            ]Tatin.ListTags [tatin] -tags=mack-os,markd
- apltree   
- converter 
- linux     
- mac-os    
+            ]Tatin.ListTags [tatin] -tags=marckdown
+ converter
+ help 
  markdown  
- windows   
 ```
 
-Good news: there must be at least one package that carries the tags "mac-os" and "markdown" but _also_ the tags "windows" and "linux" because those are both listed, so there will be a package available that runs on all major platforms.
-
-Note that although we misspelled "mac-os" as "mack-os" it was still identified correctly. Similarly, "markd" was enough to find "markdown". 
+Note that although we misspelled "markdown" as "marckdown" it was still identified correctly. 
 
 We are now ready to identify that package by executing `ListPackages` with the `-tags` option:
 
 ```
-           ]tatin.ListPackages [tatin] -tags=mac-os,markdown
+           ]tatin.ListPackages [tatin] -tags=markdown
  Group & Name     ≢ major versions
  ---------------  ---------------- 
  aplteam-MarkAPL                 1
@@ -133,12 +140,13 @@ Imagine you want to use the MarkAPL package in an application you are currently 
 The first step is to install the package as part of the project "Foo":
 
 ```
-      ]tatin.InstallPackages [tatin]MarkAPL /Foo/packages
+      ]tatin.InstallPackages [tatin]/MarkAPL /Foo/packages
 ```
 
 Notes:
 
 * `[tatin]` tells the Tatin client to load MarkAPL from the server the alias `tatin` is pointing to: https://tatin.dev
+* The `/` between `[tatin]` and `MarkAPL` is optional
 * "MarkAPL" specifies neither a group nor a version number
   * If the name "MarkAPL" is used within more than just one group the operation will fail
   * Because no version information was provided at all, the very latest version will be installed
@@ -156,7 +164,7 @@ aplteam-MarkAPL-11.0.1
 aplteam-OS-3.0.1
 ```
 
-You will probably see different version numbers here.
+Note that you might see different version numbers.
 
 * The folder `aplteam-MarkAPL-11.0.1` contains the MarkAPL package
 * The file `apl-dependencies.txt` contains just one line: `aplteam-MarkAPL-11.0.1`
@@ -197,7 +205,7 @@ Notes:
 
 * There is one package that has `principal` set to 1: MarkAPL. That's because we have explicitly asked for it
 * All other packages got installed because MarkAPL depends on them, either directly or indirectly
-* The URL points to where the packages was loaded from
+* The URL points to where the packages were loaded from
 
 #### How does a package look like on disk?
 
@@ -219,16 +227,21 @@ The file `apl-package.json` describes the MarkAPL package:
   api: "MarkAPL",
   assets: "Files/",
   date: 20210725.153851,
-  documentation: "",
   description: "Converts Markdown to HTML5",
+  documentation: "",
   group: "aplteam",
   info_url: "https://github.com/aplteam/MarkAPL",
   io: 1,
+  maintainer: "kai@aplteam.com",
+  minimumAplVersion: "18.0",
   lx: "",
   ml: 1,
   name: "MarkAPL",
+  os_lin: 1,
+  os_mac: 1,
+  os_win: 1,
   source: "MarkAPL.aplc",
-  tags: "markdown,converter,windows,linux,mac-os,apltree",
+  tags: "markdown,converter",
   uri: "https://tatin.dev/",
   version: "11.0.1+232",
 }
@@ -427,7 +440,6 @@ MarkAPL
 
 `MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For these two packages references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
 
-Note that you may load multiple packages with a single call; if you do then separate them with commas.
 
 ### Misc
 
@@ -486,7 +498,7 @@ Executing:
 ]Tatin.DeprecatePackage https://your-Registry/aplteam-Foo-1
 ```
 
-will make the Tatin Registry publish a new version `aplteam-Foo-1.2.0` on your behalf which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `comment` which carries the comment in case you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
+will make the Tatin Registry publish a new version `aplteam-Foo-1.2.0` on your behalf which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `deprecate_comment` which carries the comment in case you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
 
 From now on both the "Packages" web page and `]Tatin.ListPackages` won't list these four packages anymore.
 
@@ -520,7 +532,7 @@ A> ### Mistakenly deprecated a package?
 A>
 A> There is an easy escape route: just publish the package again with an increased minor version number but `deprecated` either set to 0 or removed from the config file, and the package is back on track. 
 A>
-A> If `comment` was not empty then that should be removed or emptied.
+A> If `deprecate_comment` was not empty then that should be removed or emptied.
 A> 
 A> Once you've done that the very latest published package would no longer carry a "deprecated" flag with the value 1, and therefore it would no longer fulfill the criteria of a deprecated package.
 

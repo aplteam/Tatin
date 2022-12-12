@@ -1,7 +1,11 @@
  (fuzzy bool)←{minPercentage}FindTag_(tagList search);tagList_;hits;search_;b;percentage
 ⍝ Tries to find `search` (one to many tags) in `tagList`.
-⍝ Uses a fuzzy approach in case nothing fits with ∊ and ⍷.
-⍝ Returns (¯1 '') in case nothing fits
+⍝ Uses a fuzzy approach in case nothing fits with ≡ and ⍷.
+⍝ Returns:
+⍝ * (¯1 '') in case nothing fits
+⍝ * (0 <list>) for an exact match
+⍝ * (1 <list>) for a match with ⍷
+⍝ * (2 <list>) for a fuzzy match
  minPercentage←{0<⎕NC ⍵:⍎⍵ ⋄ 50}'minPercentage'
  fuzzy←¯1
  bool←0

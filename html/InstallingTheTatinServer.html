@@ -59,13 +59,20 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#Docker-work-flow">8.4. Docker work flow</a></li>
 </ul></li>
 <li><a href="#Testing-and-Debugging">9. Testing and Debugging</a></li>
-<li><a href="#Misc">10. Misc</a>
+<li><a href="#Misc">10. Misc</a></li>
+<li><a href="#Updating-the-Server">11. Updating the Server</a>
+<ul>
+<li><a href="#The-Workspace">11.1. The Workspace</a></li>
+</ul></li>
+<li><a href="#The-INI-file">12. The INI file</a></li>
+<li><a href="#Assets">13. Assets</a></li>
+<li><a href="#The-folder-Maintenance">14. The folder Maintenance/</a>
 </ul>
 </div>
 </nav>
 <div class="h_tag">
-<a href="#Installing-the-Tatin-Server" id="Installing-the-Tatin-Server" class="autoheader_anchor">
-<h1 data-id="Installing-the-Tatin-Server">Installing the Tatin Server</h1>
+<a href="#Installing-and-Updating-the-Tatin-Server" id="Installing-and-Updating-the-Tatin-Server" class="autoheader_anchor">
+<h1 data-id="Installing-and-Updating-the-Tatin-Server">Installing and Updating the Tatin Server</h1>
 </a>
 </div>
 <div class="h_tag">
@@ -374,5 +381,45 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <li><a href="https://github.com/aplteam/Plodder" class="external_link">https://github.com/aplteam/Plodder</a></li>
 <li><a href="https://github.com/aplteam/RumbaLean" class="external_link">https://github.com/aplteam/RumbaLean</a></li>
 </ul>
+<div class="h_tag">
+<a href="#Updating-the-Server" id="Updating-the-Server" class="autoheader_anchor">
+<h2 data-id="Updating-the-Server">11. Updating the Server</h2>
+</a>
+</div>
+<p>Before updating the server <strong>you must read the release notes!</strong>. The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring a number of actions while the server is down for maintenance.</p>
+<div class="h_tag">
+<a href="#The-Workspace" id="The-Workspace" class="autoheader_anchor">
+<h3 data-id="The-Workspace">11.1. The Workspace</h3>
+</a>
+</div>
+<p>A running server frequently checks whether the workspace on disk was changed since the server was started. If that is the case the server will load the workspace again. This allows an easy update in case no complex actions are required.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>This mechanism is active by default but might be switched off with <code>[CONFIG]ReloadWS</code> in the INI file</p>
+</div>
+</div>
+
+<p>Naturally the server will produce an error message for a short period of time during the reload; expect 20 seconds or more, depending on the number of packages.</p>
+<div class="h_tag">
+<a href="#The-INI-file" id="The-INI-file" class="autoheader_anchor">
+<h2 data-id="The-INI-file">12. The INI file</h2>
+</a>
+</div>
+<p>Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. <em>Do not replace the INI file!</em></p>
+<p>The server checks the INI file for having been changed, and if that is the case re-initializse the INI file. However, whether that works or not depends on the kind of change: quite a number of settings are required at a very early stage, and cannot be simply changes later on. Again the release notes will tell.</p>
+<div class="h_tag">
+<a href="#Assets" id="Assets" class="autoheader_anchor">
+<h2 data-id="Assets">13. Assets</h2>
+</a>
+</div>
+<p>Which kind of actions needs to be taken, if any, is revealed by the release notes. Typically the sub folder <code>docs/</code> needs to be replace: this folder carries the documentation.</p>
+<div class="h_tag">
+<a href="#The-folder-Maintenance" id="The-folder-Maintenance" class="autoheader_anchor">
+<h2 data-id="The-folder-Maintenance">14. The folder Maintenance/</h2>
+</a>
+</div>
+<p>First of all, never replace the folder <code>maintenance/</code>: the contents documents what changes have been carried out towards the packages in the past, and you don't want to loose this.</p>
+<p>If the new one is not empty then copy the contents over. This might be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.</p>
 </body>
 </html>

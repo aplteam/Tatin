@@ -1,4 +1,4 @@
- zipFilename←Pack(projectPath targetPath);cfg;fileList;zipObj;tempFilename;deps;errMsg
+ zipFilename←Pack(projectPath targetPath);cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_
  ⍝ projectPath → folder to create package from\\
  ⍝ targetPath  → folder to put package in\\
  ⍝ ←             path to package file created
@@ -16,7 +16,11 @@
  :Else
      targetPath←⊃1 ⎕NPARTS targetPath,'/'
  :EndIf
- cfg←ReadPackageConfigFile projectPath
+ cfg_←ReadPackageConfigFile projectPath
+ cfg←InitPackageConfig cfg_
+ :If cfg_≢cfg
+     WritePackageConfigFile projectPath cfg
+ :EndIf
  ValidateConfig cfg projectPath
  zipFilename←F.ExpandPath targetPath,(GetPackageFilenameFromCfg cfg),'.zip'
  :If 0=⎕NEXISTS targetPath

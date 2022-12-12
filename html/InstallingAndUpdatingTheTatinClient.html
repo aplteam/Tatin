@@ -72,12 +72,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 </div>
 
-<p>Where to find the <code>MyUCMDs/</code> folder depends on your operating system:</p>
-<ul>
-<li>Under Windows call <code>⎕SE.Tatin.GetMyUCMDsFolder''</code></li>
-<li>On non-Windows platforms it is <code>$HOME/MyUCMDs/</code></li>
-</ul>
-<p>Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac-OS, so you need to create the folder yourself on non-Windows platform.</p>
+<p>Where to find the <code>MyUCMDs/</code> folder depends on your operating system, but this gives you the answer in any case:</p>
+<pre><code>⎕SE.Tatin.GetMyUCMDsFolder''</code></pre>
+<p>Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac-OS in versions prior to 19.0, so you need to create the folder yourself on non-Windows platform.</p>
 <p>Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.</p>
 <p>As a side effect of executing any of the Tatin user commands the Tatin API will become available via <code>⎕SE.Tatin</code>.</p>
 <div class="leanpub">
@@ -103,7 +100,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ol start="1">
 <li>load the code into <code>⎕SE._Tatin</code></li>
 <li>create a namespace <code>⎕SE.Tatin</code></li>
-<li>establish functions in <code>⎕SE.Tatin</code> that will call the public functions in <code>⎕SE._Tatin</code>.</li>
+<li>establish functions in <code>⎕SE.Tatin</code> that represent Tatin's API</li>
 </ol>
 <div class="h_tag">
 <a href="#On-setupdyalog" id="On-setupdyalog" class="autoheader_anchor">
@@ -211,7 +208,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Although you <em>could</em> update your Tatin client by repeating the steps listed under “How to install the Tatin client” there is an easier way to do this; just execute:</p>
 <pre><code>]Tatin.UpdateClient</code></pre>
 <p>If there is a later version available all necessary steps will be executed; eventually the new version number will be reported.</p>
-<p>Note that this feature was introduced in 0.78.1, so it's not available in earlier versions.</p>
-<p>The API equivalent <code>⎕SE.Tatin.Update 0</code> however was introduced in 0.78.0.</p>
+<p>Notes:</p>
+<ul>
+<li>This feature was introduced in 0.78.1, so it's not available in earlier versions
+<p>The API equivalent <code>⎕SE.Tatin.Update 0</code> however was introduced in 0.78.0.</p></li>
+<li>Although Tatin is updated on disk, the workspace from which the command was executed is for technical reasons not — start a new instance of Dyalog in order to get the latest version</li>
+</ul>
 </body>
 </html>

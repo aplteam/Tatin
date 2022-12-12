@@ -106,10 +106,10 @@ Declares a package to be deprecated.
 Note that because the Registry must be defined no scanning takes place with this function.
 
 
-### FindTatinDependencies
+### FindDependencies
 
 ```
-r←{level} FindTatinDependencies (folder pkgList)
+r←{level} FindDependencies (folder pkgList)
 
 ```
 
@@ -123,7 +123,7 @@ Note that the search is *not* case sensitive.
 
 Returns a fully qualified list with all hits. 
 
-By default just the folder is returned that contains the file "apl-dependencies.txt". In case a 1 is passed as left argument (default is 0, other values led to an error) the package folders are also returned, revealing the precise version installed.
+By default just the folder is returned that contains the file "apl-dependencies.txt". In case a 1 is passed as left argument (default is 0, other values led to an error) the actual package folders are returned, revealing the precise version(s) installed.
 
 
 ### GetDeletePolicy

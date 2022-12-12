@@ -3,12 +3,14 @@
  r←⍬
  ⎕IO←1 ⋄ ⎕ML←1
  :If flag
-     testFlag←¯1     ⍝ Will be defined by the INI file but you may overwrite with 0 or 1
      trapFlag←¯1     ⍝ Will be defined by the INI file but you may overwrite with 0 or 1
+     testFlag←¯1     ⍝ Will be defined by the INI file but you may overwrite with 0 or 1
      iniFile←{0<⎕NC ⍵:⍎⍵ ⋄ './server.ini'}'iniFile'
-     r←iniFile(##.Server.TatinAmendments ##.Plodder.Run)testFlag trapFlag
-     ⍝ Plodder.Run executed ⎕OFF in runtime or when the INI file says so, so
-     ⍝ we get here only in development _and_ when the INI file does NOT say so.
+
+     r←iniFile(##.Server.TatinAmendments ##.Plodder.Run)testFlag trapFlag   ⍝ <== Workhorse
+
+     ⍝ Plodder.Run executes ⎕OFF in runtime or when the INI file says so,
+     ⍝ therefore we get here only in development _and_ when the INI file does NOT say so.
      ∆SHUTDOWN←0
  :EndIf
 ⍝Done

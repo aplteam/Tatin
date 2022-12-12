@@ -1,16 +1,24 @@
- r←Test_UserCommands_030(stopFlag batchFlag);⎕TRAP;rc;msg;res1;dir
-⍝ Exercise ]Tatin.ListTags
+ r←Test_UserCommands_030(stopFlag batchFlag);⎕TRAP;rc;msg;res1;dir;res3;res2;res4
+⍝ Exercise ]Tatin.ListPackages with several os* mutations
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- dir←∆GetTempDir''
+ (rc msg res1)←∆UCMD'ListPackages [localhost] -os=lin'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res1
 
- (rc msg res1)←∆UCMD'ListTags [local]'
- →T.GoToTidyUp~(rc=0)∧0=≢msg
- →T.GoToTidyUp~0<≢res1
- →T.GoToTidyUp~2=⍴⍴res1
+ (rc msg res2)←∆UCMD'ListPackages [localhost] -os=mac'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res2
+
+ (rc msg res3)←∆UCMD'ListPackages [localhost] -os=win'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res3
+
+ →T.PassesIf(+/≢¨3↓¨res1 res2)<≢res3
+
+ (rc msg res4)←∆UCMD'ListPackages [localhost] -os=lin,mac'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res4
 
  r←T._OK
-
-∆TidyUp:
- Assert 0=1⊃F.RmDir dir

@@ -1,0 +1,22 @@
+ r←Test_API_024(stopFlag batchFlag);⎕TRAP;res1;parms;res2
+⍝ Exercise ⎕SE.Tatin.ListPackages with several "os_*" mutations
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.os_mac←1
+ res1←parms ⎕SE.Tatin.ListPackages'[localhost]'
+ →T.PassesIf 0<≢res1
+ →T.PassesIf 2=|≡res1
+ →T.PassesIf 2=⍴⍴res1
+
+ parms←⎕NS''
+ parms.os_win←1
+ res2←parms ⎕SE.Tatin.ListPackages'[localhost]'
+ →T.PassesIf 0<≢res2
+ →T.PassesIf 2=|≡res2
+ →T.PassesIf 2=⍴⍴res2
+
+ →T.PassesIf </≢¨res1 res2
+
+ r←T._OK

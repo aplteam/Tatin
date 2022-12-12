@@ -1,4 +1,4 @@
- response←request ProcessTestCommands(path specialCommands);version
+ response←request ProcessTestCommands path;version
 ⍝ This function must only be called when G.TestFlag is true
  :If G.INI.Exist'CONFIG:SpecialCommands'
  :AndIf G.INI.Get'CONFIG:SpecialCommands'
@@ -13,7 +13,7 @@
          response←request Respond 200
      :Case GetVersion_REST'list-commands'
          response←request Respond 200
-         response.Content←⊃{⍺,',',⍵}/specialCommands
+         response.Content←PrepareHTMLforAllSpecialCommands ⍬
      :Case GetVersion_REST'set-delete-policy'
          response←request Respond 200
          response.Content←GetDeletePolicy

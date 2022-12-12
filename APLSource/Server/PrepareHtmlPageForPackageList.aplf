@@ -2,7 +2,7 @@
  html←HtmlHeader GetDataTableStuff ⍬
  html,←⊂'<h2>List of packages</h2>'
  html,←AddSpecialMessage ⍬
- colTitles←'Package name' 'Description' '∑&nbsp;Major' 'Info URL' 'Tags'
+ colTitles←'Package name' 'Description' '∑&nbsp;Major' 'Info URL' 'OS' 'Tags'
  html,←⊂H.OpenTable+/(≢¨colTitles[2,2~⍨⍳2⊃⍴mat])⌈(≢⍕⌈/mat[;2]),⌈⌿≢¨mat[;2~⍨⍳2⊃⍴mat]
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
@@ -15,7 +15,8 @@
      col3←{'<td align="right">',⍵,'</td>'}¨⍕¨mat[;2]
      col4←{'<td>',⍵,'</td>'}¨mat[;1]{0=≢⍵:'- ' ⋄ '<a href="',⍵,'" title="Opens ',⍵,' in a new tab" target="_blank">',(MassageProjectURL ⍵),'</a>'}¨mat[;4]
      col5←{'<td>',⍵,'</td>'}¨mat[;5]
-     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3 col4 col5
+     col6←{'<td>',⍵,'</td>'}¨mat[;6]
+     html,←⊃,/{(⊂'<tr>'),⍵,(⊂'</tr>')}¨↓⍉↑col1 col2 col3 col4 col5 col6
      html,←⊂'</tr>'
  :EndIf
  html,←⊂'</tbody>'

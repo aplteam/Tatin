@@ -35,13 +35,13 @@ W> You _must not_ install it into any other folder, even if that folder is scann
 W>
 W> However, this might change with a later version.
 
-Where to find the `MyUCMDs/` folder depends on your operating system:
+Where to find the `MyUCMDs/` folder depends on your operating system, but this gives you the answer in any case:
 
-* Under Windows call `⎕SE.Tatin.GetMyUCMDsFolder''`
+```
+⎕SE.Tatin.GetMyUCMDsFolder''
+```
 
-* On non-Windows platforms it is `$HOME/MyUCMDs/`
-
-Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac-OS, so you need to create the folder yourself on non-Windows platform.
+Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac-OS in versions prior to 19.0, so you need to create the folder yourself on non-Windows platform.
 
 Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.
 
@@ -74,7 +74,7 @@ If that's not the case it will...
 
   1. load the code into `⎕SE._Tatin`
   2. create a namespace `⎕SE.Tatin` 
-  3. establish functions in `⎕SE.Tatin` that will call the public functions in `⎕SE._Tatin`. 
+  3. establish functions in `⎕SE.Tatin` that represent Tatin's API
 
 
 ## On `setup.dyalog`
@@ -182,6 +182,10 @@ Although you _could_ update your Tatin client by repeating the steps listed unde
 
 If there is a later version available all necessary steps will be executed; eventually the new version number will be reported.
 
-Note that this feature was introduced in 0.78.1, so it's not available in earlier versions.
+Notes:
 
-The API equivalent `⎕SE.Tatin.Update 0` however was introduced in 0.78.0.
+* This feature was introduced in 0.78.1, so it's not available in earlier versions
+
+  The API equivalent `⎕SE.Tatin.Update 0` however was introduced in 0.78.0.
+
+* Although Tatin is updated on disk, the workspace from which the command was executed is for technical reasons not --- start a new instance of Dyalog in order to get the latest version

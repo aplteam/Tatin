@@ -64,9 +64,14 @@ This document gives you an overview over these HTML files: their purpose and who
 
 ### The Server
 
-* [Installing the Tatin Server](./InstallingTheTatinServer.html "InstallingTheTatinServer.html") (draft)
 
+* [Installing the Tatin Server](./InstallingTheTatinServer.html "InstallingTheTatinServer.html") (draft)
+  
   Read this if you want to run your own Tatin server.  
+
+* [Server --- Tips and tricks](./Server-TipsAndTricks.html "Server-TipsAndTricks.html") (stub)
+
+  The title says it all...
 
 
 ### Misc

@@ -1,0 +1,15 @@
+ AddCommentToPackageConfig←{
+     CR←⎕UCS 13
+     body←A.DLB ⎕CR'InitPackageConfig'
+     b←'comments,←'{((≢⍺)↑[2]⍵)∧.=⍺}body
+     body←↓b⌿body
+     body←(≢'comments,←')↓¨body
+     mat←↑⍎¨body
+     r←CR(≠⊆⊢)⍵
+     names←{~':'∊⍵:'' ⋄ {⍵↑⍨¯1+⍵⍳':'}A.DLB ⍵}¨r
+     ind←names⍳mat[;1]
+     r←(2+⌈/≢¨r)↑¨r
+     r[ind]←r[ind]{⍺,'// ',⍵}¨mat[;2]
+     r←1↓⊃,/CR,¨r
+     r
+ }

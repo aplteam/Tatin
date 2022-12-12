@@ -1,8 +1,13 @@
- Add2Config←{
-     path←⍺
-     (name value)←⍵
-     cfg←ReadPackageConfigFile path
-     _←⍎'cfg.',name,'←value'
-     _←WritePackageConfigFile path cfg
-     1:shy←0
- }
+ {(rc msg)}←path Add2Config(name value);cfg;qdmx
+ ⍝ Returns (rc msg) when in case of success rc is 0 and msg is ''
+ rc←0 ⋄ msg←''
+ cfg←ReadPackageConfigFile path
+ ⍎'cfg.',name,'←value'
+ :Trap 998
+     WritePackageConfigFile path cfg
+ :Else
+     qdmx←⎕DMX
+     msg←qdmx.EM
+     rc←1
+ :EndTrap
+⍝Done

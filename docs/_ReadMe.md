@@ -8,7 +8,7 @@ The Tatin documentation consists of a collection of HTML files.
 
 This document gives you an overview over these HTML files: their purpose and who should (or may) read them, and which ones you can safely ignore depending on your skills and goal(s).
 
-
+ 
 ### General information
 
 * [Introduction](./Introduction.html "Introduction.html") (draft)
@@ -76,7 +76,11 @@ This document gives you an overview over these HTML files: their purpose and who
 
 ### Misc
 
-* [Usage data](./UsageData.html "Usage data.html") (draft)
+* [Release Notes](./ReleaseNotes.html "ReleaseNotes.html") (draft)
+
+  Carries potentially a list of actions that need to be carried out before a new version can be used.
+
+* [Usage data](./UsageData.html "Usagedata.html") (draft)
 
   Read this in case you are interested in statistical data regarding downloads of packages
 
@@ -86,4 +90,5 @@ This document gives you an overview over these HTML files: their purpose and who
 
 * [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (draft)
 
-  Read this if you want to run a Tatin server behind an Apache server.
+  Read this if you want to run a Tatin server behind an Apache server. 
+ 

@@ -297,14 +297,14 @@ A running server frequently checks whether the workspace on disk was changed sin
 
 I> This mechanism is active by default but might be switched off with `[CONFIG]ReloadWS` in the INI file
 
-Naturally the server will produce an error message for a short period of time during the reload; expect 20 seconds or more, depending on the number of packages.
+Naturally the server will produce an error message for a short period of time during the reload; expect 20 seconds or more, depending on the number of packages managed by the server.
 
 
 ## The INI file
 
 Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. _Do not replace the INI file!_
 
-The server checks the INI file for having been changed, and if that is the case re-initializse the INI file. However, whether that works or not depends on the kind of change: quite a number of settings are required at a very early stage, and cannot be simply changes later on. Again the release notes will tell.
+The server checks the INI file for having been changed, and if that is the case re-initializse the INI file. However, whether that works or not depends on the kind of change: quite a number of settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.
 
 ## Assets
 

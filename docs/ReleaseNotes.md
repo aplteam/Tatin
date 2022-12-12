@@ -29,7 +29,7 @@ Therefore the INI entry must be checked and changed:
 From `https://tatin.dev` to `tatin.dev`
 
 
-#### New INI property "MaintenancePath"
+#### New INI property "[CONFIG]MaintenancePath"
 
 With this version a new INI entry got introduced: `MaintenancePath`. This entry **must be added** to the INI file.
 
@@ -44,3 +44,11 @@ For example:
 ```
 MaintenancePath='{home}\Maintenance\'
 ```
+
+#### New INI property [EMAIL]gatekeeper
+
+`gatekeeper` was introduced in order to allow somebody to take care of newly published packages, in particular the tags.
+
+It might be empty meaning that no actions will be taken. Instead it might be a vector of text vectors, each carrying an email address.
+
+Whenever a package is deleted or published an email is send to the gatekeeper.

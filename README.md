@@ -42,7 +42,7 @@ You might find it useful to run your own Tatin server. For example, all packages
 
 You may also keep a local Registry on your own machine, for example for development work. From a consumer's perspective there is no difference between consuming a package that is coming from a Tatin Server or from a local Registry.
 
-The document [_Installing The Tatin Server_](https://tatin.dev/Assets/docs/InstallingTheTatinServer.html "Link to InstallingTheTatinServer.html on the Tatin server") discusses how to install the Tatin client.
+The document [_Installing The Tatin Server_](https://tatin.dev/Assets/docs/InstallingTheTatinServer.html "Link to InstallingTheTatinServer.html on the Tatin server") discusses how to install the Tatin Server.
 
 ## Contributing to the code 
 

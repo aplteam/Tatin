@@ -2,7 +2,6 @@
 [parm]:toc               = 2
 [parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
-[parm]:numberHeaders     = 2
 
 
 

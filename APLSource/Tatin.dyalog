@@ -1,4 +1,4 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.54.0 - 2022-12-18
 
@@ -410,8 +410,6 @@
       folder←1⊃⎕NPARTS ##.SourceFile
       (version ref target)←⎕SE._Tatin.Client.UpdateClient 0 folder
       :If 0<≢version
-          ref.UpdateClient_Continue target
-          path2Config←⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
           ⎕SE._Tatin.APLTreeUtils2.GoToWebPage ⎕SE._Tatin.Client.GetMyUCMDsFolder'Tatin/Assets/docs/ReleaseNotes.html'
           r←'Tatin updated on disk to ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
           r,←(⎕UCS 13),'The current WS has NOT been updated, please restart a fresh session.'

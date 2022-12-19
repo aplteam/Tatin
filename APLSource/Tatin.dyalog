@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.53.0 - 2022-12-12
+⍝ * 0.54.0 - 2022-12-18
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -56,7 +56,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'List all packages in the Registry or install folder specified in the argument'
-          c.Parse←'1s -group= -tags= -os= -noaggr -date -info_url -since='
+          c.Parse←'1s -group= -tags= -os= -noaggr -date -project_url -since='
           r,←c
      
           c←⎕NS ⍬
@@ -79,8 +79,14 @@
      
           c←⎕NS ⍬
           c.Name←'LoadDependencies'
-          c.Desc←'Take a folder (⍵[1]) with installed packages and loads all of them into ⍵[2].'
+          c.Desc←'Take a folder (⍵[1]) with installed packages and loads all of them into ⍵[2]'
           c.Parse←'1-2 -overwrite'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'Maintenance'
+          c.Desc←'Checks whether there is a maintenance file to be executed'
+          c.Parse←'1s -dry -show'
           r,←c
      
           c←⎕NS ⍬
@@ -291,6 +297,44 @@
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝ Methods
 
+    ∇ r←Maintenance Arg;dry;path;home;⎕TRAP;show;filename;body;list;ind
+      (dry show)←Arg.(dry show)
+      path←Arg._1
+      home←1⊃⎕NPARTS ##.SourceFile
+      :If show
+          :If 0=≢list←TC.F.ListFiles home,'Maintenance/*.aplf'
+              r←'There are no Tatin maintenance files'
+          :Else
+              r←''
+              :For filename :In list
+                  body←1↓⊃TC.F.NGET filename 1
+                  r,←⊂'*** ',filename
+                  body←(';'≠⊃¨TC.A.DLB body)/body
+                  body←(+/∧\'⍝'=⊃¨body)↑body
+                  r,←2↓¨body
+                  r,←⊂(⎕PW-2)⍴'-'
+              :EndFor
+              r←⍪r
+          :EndIf
+      :Else
+          'You must specify a path'Assert 0≢path
+          ('Is not a folder: ',path)Assert TC.F.IsDir path
+          :If 0=≢list←TC.F.ListFiles home,'Maintenance/*.aplf'
+              r←'No maintenance files found in ',home
+          :Else
+              list←⌽list
+              :If 0<≢ind←'Which maintenance functions would you like to execute?' 1 0 TC.CommTools.Select{2⊃⎕NPARTS ⍵}¨list
+                  list←list[ind]
+                  :If 0=≢r←TC.Maintenance path dry list
+                      r←'No packages found to be changed'
+                  :EndIf
+              :Else
+                  r←'No maintenance function(s) selected'
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
     ∇ {r}←CreatePackage Arg;path;filename
       r←'For creating a new package execute this user command:'
       :If (,0)≡,Arg._1
@@ -368,8 +412,8 @@
       :If 0<≢version
           ref.UpdateClient_Continue target
           path2Config←⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
-          ⎕SE._Tatin.Admin.InitConga'' ⍝ Avoid 1006
-          r←'Tatin updated to ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
+          ⎕SE._Tatin.APLTreeUtils2.GoToWebPage ⎕SE._Tatin.Client.GetMyUCMDsFolder'Tatin/Assets/docs/ReleaseNotes.html'
+          r←'Tatin updated on disk to ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
           r,←(⎕UCS 13),'The current WS has NOT been updated, please restart a fresh session.'
       :EndIf
     ∇
@@ -408,7 +452,7 @@
           parms.os_mac←(⊂'mac')∊OSs
           parms.os_win←(⊂'win')∊OSs
       :EndIf
-      parms.info_url←Arg.info_url
+      parms.project_url←Arg.project_url
       :Trap ErrNo
           r←⍪parms TC.ListPackages registry
       :Else
@@ -1344,7 +1388,7 @@
               r,←'' '  ]Tatin.ListDeprecated <URL|[Alias> [-all]'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder passed as argument'
-              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-os=] [-date] [-info_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
+              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-os=] [-date] [-project_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all dependencies into the workspace.'
               r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>] -nobetas'
@@ -1354,6 +1398,9 @@
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←'' '  ]Tatin.LoadDependencies <package-folder> [<parent-namespace>] [-overwrite]'
+          :Case ⎕C'Maintenance'
+              r,←⊂'Checks whether there are maintenance files available and asks the user about it'
+              r,←'' '  ]Tatin.Maintenance path [-dry] [-show]'
           :Case ⎕C'UserSettings'
               r,←⊂'Print the user settings found in the config file to ⎕SE and allows manipulation via flags'
               r,←'' '  ]Tatin.UserSettings [-apikey] [-edit] [-refresh]'
@@ -1502,7 +1549,7 @@
               r,←⊂''
               r,←⊂'You can also influence the data returned with the following flags:'
               r,←⊂'-date           Add the publishing date to the output. -noaggr is set to 1 then.'
-              r,←⊂'-info_url       Add the URL saved in the package config file to the result.'
+              r,←⊂'-project_url       Add the URL saved in the package config file to the result.'
               r,←⊂'-noaggr         By default the output is aggregated. -noaggr prevents that.'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all its dependencies into the workspace.'
@@ -1550,6 +1597,27 @@
               r,←⊂''
               r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
               r,←⊂'            load by specifying the -overwrite flag.'
+          :Case ⎕C'Maintenance'
+              r,←⊂'Checks whether there are any files in the folder Maintenance/. These are expected to be'
+              r,←⊂'.aplf files (functions). Such files will be listed, and the user can select which one(s)'
+              r,←⊂'to execute. They will be fed with the argument provided, which is expected to be a folder.'
+              r,←⊂'That folder and all its sub folders will be scanned for packages, and every package will'
+              r,←⊂'be potentially changed by the maintenance file(s) selected by the user.'
+              r,←⊂'Usually this means changing the package config file.'
+              r,←⊂''
+              r,←⊂'This mechanism can be used to, say, rename properties, or inject new ones. The purpose'
+              r,←⊂'is to ensure that all packages are up to date.'
+              r,←⊂''
+              r,←⊂'-dry   When specified all actions will be listed, including a list of all packages found,'
+              r,←⊂'       but no package will actually be changed at all.'
+              r,←⊂'-show  Shows the leading comments of all maintenance files that would be executed.'
+              r,←⊂'       If this is specified, -dry is ignored, and no package is going to be changed.'
+              r,←⊂''
+              r,←⊂'Notes:'
+              r,←⊂' * This is NOT about packages that are installed or managed by a Tatin server. The server'
+              r,←⊂'   has its own mechanism for updating packages.'
+              r,←⊂' * When a package is installed then there is a file apl-buildlist.json - such folders are'
+              r,←⊂'   ignored'
           :Case ⎕C'UserSettings'
               r,←⊂'Print the user settings found in the config file to the session in JSON format.'
               r,←⊂'By default the API key is replaced by asterisks; specify -apikey to overwrite this.'
@@ -1896,7 +1964,7 @@
               r,←⊂'  ]Tatin.Ping ',tatinURL
               r,←⊂'  ]Tatin.Ping http://tatin.dev   ⍝ This won''t work'
           :Else
-              ⍝ Not available then
+                  ⍝ Not available then
           :EndSelect
       :EndSelect
     ∇
@@ -1940,7 +2008,7 @@
     ∇
 
     ∇ (msg json)←CheckPackageConfigFile(json path);cfg2;ns;extensions;⎕TRAP;list
-    ⍝ Returns an empty vector if everything is okay and an error message otherwise
+        ⍝ Returns an empty vector if everything is okay and an error message otherwise
       msg←''
       ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
       :Trap ErrNo
@@ -1968,9 +2036,9 @@
           :If '.'∊ns.source
               '"source" carries an invalid extension'Assert(⊂3⊃⎕NPARTS ns.source)∊SupportedExtensions
           :EndIf
-          :If 0<≢ns.info_url
-              :If 0=TC.SendHEAD ns.info_url
-                  msg←ns.info_url,' did not respond'
+          :If 0<≢ns.project_url
+              :If 0=TC.SendHEAD ns.project_url
+                  msg←ns.project_url,' did not respond'
                   :Return
               :EndIf
           :EndIf

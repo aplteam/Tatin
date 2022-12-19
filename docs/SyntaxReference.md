@@ -272,7 +272,7 @@ By default beta versions are considered in case the package ID is incomplete, bu
 r←ListDeprecated uri
 ```
 
-This function lists all packages that are deprecated but only if they are the last published version of any given major version number.
+Lists all packages that are deprecated but only if they are the last published version of any given major version number.
 
 This default behaviour can be changed with the `-all` flag: then all versions of any major version that is marked as deprecated are listed. 
 
@@ -372,7 +372,7 @@ You may even specify just a package name, without a group name. That would not m
 
 #### Left argument
 
-Optionally `parms` can be specified. If specified this must be a namespace that must contain the variables `group`, `tags` and `aggregate`. It may contain `date`, `since` and `info_url`.
+Optionally `parms` can be specified. If specified this must be a namespace that must contain the variables `group`, `tags` and `aggregate`. It may contain `date`, `since` and `project_url`.
 
 The following parameters allow the user to select certain packages:
 
@@ -388,7 +388,7 @@ The following parameters allow the user to select certain packages:
 The following parameters allow the user to influence what data is returned:
 
 * If `date` is `1` an additional column is added to the result with the publishing date
-* If `info_url` is `1` an additional column is added to the result with the the `info_url`, if any
+* If `project_url` is `1` an additional column is added to the result with the the `project_url`, if any
 * If `aggregate` is `0` the data is not aggregated by minor and patch number; defaults to 1.
 
 #### Result
@@ -414,7 +414,7 @@ To list just deprecated packages use `ListDepreciated`.
 r←ListRegistries type
 ```
 
-List all registries defined in the Client's config file.
+Lists all registries defined in the Client's config file.
 
 Returns a matrix with these columns:
 
@@ -444,6 +444,8 @@ Notes:
 list←{parms} ListTags y
 ```
 
+Lists all tags.
+
 `y` might be URL of a Tatin server or a Registry alias (embraced by `[]`).
 
 By default all tags of all packages are returned as a two-column matrix:
@@ -458,6 +460,8 @@ Optionally `⍺` can be specified. Must be a namespace that might contain a vari
 ```
 mat←{dateFlag} ListVersions url
 ```
+
+Lists all versions of a given package.
 
 `url` is one of:
 
@@ -482,6 +486,8 @@ By default the publishing date is not included, but you may change this by passi
 ```
 {r}←LoadDependencies y
 ```
+
+Loads all packages according to a build list in a folder.
 
 Requires two mandatory arguments:
 
@@ -534,6 +540,8 @@ Returns the number of packages installed, including dependencies.
 ```
 zipFilename←Pack (projectPath targetPath)
 ```
+
+ZIPs all files in a given folder.
 
 projectPath:
 
@@ -588,7 +596,9 @@ W> That is different from the user command which will ask the user for confirmat
 {refs}←{parms} ReInstallDependencies (dependencies installFolder [Registry])
 ```
 
-Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.
+Re-installs all files in a given file `apl-dependencies.txt`.
+
+Takes a folder that hosts a file `apl-dependencies.txt` as mandatory argument.
 
 The file apl-buildlist.json as well as all directories in that folder will be deleted.
 Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.
@@ -642,9 +652,9 @@ Takes a path to a package and returns the config file for that package as a name
 (list msg)←UnInstallPackage (packageID folder)
 ```
 
-`folder` must host a Tatin dependency file. 
-
 `UnInstallPackage` attempts to un-install the package `packageID` and all its dependencies, but the latter only in case they are neither principal packages nor required by other packages.
+
+`folder` must host a Tatin dependency file. 
 
 `packageID` might be a full package ID but also <group>-<name> or just <name>. However, in case more than one package qualify an error is thrown.
 

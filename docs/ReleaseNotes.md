@@ -1,24 +1,54 @@
 [parm]:title             = 'Release Notes'
-[parm]:toc               = 3
+[parm]:toc               = 2
 [parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
-[parm]:numberHeaders     = 2 3 4 5 6
+[parm]:numberHeaders     = 2
 
 
 
 
 # Release Notes
 
-Release notes only contain information regarding actions that need to be executed before a new version can be used. This regards almost exclusively the server.
+Tatin release notes contain information regarding...
 
+* actions that need to be executed before a new version can be used; this regards almost exclusively the server
 
-## Version 0.81.0
+* Background information worthwhile knowing
 
-### Server
+Tatin release notes _do not_ contain any information regarding added features --- except when they relate to breaking changes --- and/or bug fixes. For that visit <https://github.com/aplteam/Tatin/releases>
+
+ 
+## Version 0.82.0 from 2022-12-19
+
+**General**
+
+This version comes with one potentially breaking change: the package property `info_url` was renamed to `project_url`.
+
+This requires action for all packages that already exist, be it Client or Server
+
+**Client**
+
+This version comes with a new user command `]Tatin.Maintenance` and a file in the sub folder `Maintenance/`:
+
+* `2022-12-19-MakePackageCompatibleWith_82_0.aplf`
+
+Call the `]Tatin.Maintenance <path>` user command to execute this script so that in all packages found in `<path>` the name `info_url` is changed to `project_url`.
+
+This will also attempt to update any ZIP files as long as they are siblings of a file `apl-package.json`.
+
+**Server**
+
+This version comes with a new maintenance file `Convert_InfoUrl_to_ProjectUrl.aplf` that will be executed once by the server. 
+
+The file will rename the property `info_url` to `project_url` in all packages managed by the server. Because the script will be executed automatically by the server no action needs to be taken.
+
+## Version 0.81.0 from 2022-12-12
+
+**Server**
 
 #### The INI entry [CONFIG]base
 
-This is a **Breaking Change*!
+This is a **Breaking Change**!
 
 Until version 0.81.0 this was something like `https://tatin.dev` -- that's wrong!
 

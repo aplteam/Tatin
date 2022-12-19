@@ -323,7 +323,7 @@ When running the test suite with the batch flag set, as `RunBatchTests` does, is
 
   If you need to track down a bug then you don't want this: in that case pass a `1` as left argument: this is treated as "debug" flag.
 
-Of course `RunBatchTests` does not execute any test cases that require a human in front of the monitor, but the number of such tests is pretty small anyway.
+Of course `RunBatchTests` does not execute any test cases that require a human in front of the monitor, but the number of such tests is very small anyway.
 
 `RunBatchTests` checks the command line:
 

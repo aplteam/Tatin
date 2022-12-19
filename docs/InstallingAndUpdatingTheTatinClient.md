@@ -175,7 +175,6 @@ Copy the functions `IfAtLeastVersion`, `GetMyUCMDsFolder` and `AutoLoadTatin` fr
 
 Although you _could_ update your Tatin client by repeating the steps listed under "How to install the Tatin client" there is an easier way to do this; just execute:
 
-
 ```
 ]Tatin.UpdateClient
 ````
@@ -184,8 +183,10 @@ If there is a later version available all necessary steps will be executed; even
 
 Notes:
 
+* The command will put the release notes on display
+
 * This feature was introduced in 0.78.1, so it's not available in earlier versions
 
   The API equivalent `⎕SE.Tatin.Update 0` however was introduced in 0.78.0.
 
-* Although Tatin is updated on disk, the workspace from which the command was executed is for technical reasons not --- start a new instance of Dyalog in order to get the latest version
+* Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog in order to get the latest version

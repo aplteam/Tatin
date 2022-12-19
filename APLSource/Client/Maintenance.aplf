@@ -1,0 +1,13 @@
+ r←Maintenance(path dry functions);folders;list;ref;fns;body
+⍝ * path: Folder to be investigated
+⍝ * dry:  Boolean that decides whether real actions needs to be taken (0) or not (1)
+⍝ * home: Folder that holds the maintenance files (if any)
+⍝ Returns vector of simple char vectors (protocol).
+ ref←⎕NS''
+ ref FixMaintenanceFunctions functions
+ fns←↓ref.⎕NL 3
+ body←⊂'pkgConfig←∆Exec pkgConfig'
+ body,←'pkgConfig←'∘,¨fns,¨⊂' pkgConfig'
+ ref.⎕FX body
+ r←(ref.∆Exec Maintenance_)path dry
+ ⍝Done

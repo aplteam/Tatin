@@ -323,7 +323,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>r←ListDeprecated uri</code></pre>
-<p>This function lists all packages that are deprecated but only if they are the last published version of any given major version number.</p>
+<p>Lists all packages that are deprecated but only if they are the last published version of any given major version number.</p>
 <p>This default behaviour can be changed with the <code>-all</code> flag: then all versions of any major version that is marked as deprecated are listed.</p>
 <p><code>uri</code> must be one of:</p>
 <ul>
@@ -419,7 +419,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Left-argument">2.17.2. Left argument</h4>
 </a>
 </div>
-<p>Optionally <code>parms</code> can be specified. If specified this must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>. It may contain <code>date</code>, <code>since</code> and <code>info_url</code>.</p>
+<p>Optionally <code>parms</code> can be specified. If specified this must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>. It may contain <code>date</code>, <code>since</code> and <code>project_url</code>.</p>
 <p>The following parameters allow the user to select certain packages:</p>
 <ul>
 <li>Use <code>group</code> to specify the group.</li>
@@ -434,7 +434,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>The following parameters allow the user to influence what data is returned:</p>
 <ul>
 <li>If <code>date</code> is <code>1</code> an additional column is added to the result with the publishing date</li>
-<li>If <code>info_url</code> is <code>1</code> an additional column is added to the result with the the <code>info_url</code>, if any</li>
+<li>If <code>project_url</code> is <code>1</code> an additional column is added to the result with the the <code>project_url</code>, if any</li>
 <li>If <code>aggregate</code> is <code>0</code> the data is not aggregated by minor and patch number; defaults to 1.</li>
 </ul>
 <div class="h_tag">
@@ -469,7 +469,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>r←ListRegistries type</code></pre>
-<p>List all registries defined in the Client's config file.</p>
+<p>Lists all registries defined in the Client's config file.</p>
 <p>Returns a matrix with these columns:</p>
 <table>
 <tbody>
@@ -515,6 +515,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>list←{parms} ListTags y</code></pre>
+<p>Lists all tags.</p>
 <p><code>y</code> might be URL of a Tatin server or a Registry alias (embraced by <code>[]</code>).</p>
 <p>By default all tags of all packages are returned as a two-column matrix:</p>
 <ul>
@@ -528,6 +529,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>mat←{dateFlag} ListVersions url</code></pre>
+<p>Lists all versions of a given package.</p>
 <p><code>url</code> is one of:</p>
 <ul>
 <li>A package name</li>
@@ -547,6 +549,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>{r}←LoadDependencies y</code></pre>
+<p>Loads all packages according to a build list in a folder.</p>
 <p>Requires two mandatory arguments:</p>
 <ul>
 <li>A folder with a build list</li>
@@ -585,6 +588,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>zipFilename←Pack (projectPath targetPath)</code></pre>
+<p>ZIPs all files in a given folder.</p>
 <dl>
 <dt>projectPath:</dt>
 <dd><p>A folder to create the package from</p></dd>
@@ -638,7 +642,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>{refs}←{parms} ReInstallDependencies (dependencies installFolder [Registry])</code></pre>
-<p>Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.</p>
+<p>Re-installs all files in a given file <code>apl-dependencies.txt</code>.</p>
+<p>Takes a folder that hosts a file <code>apl-dependencies.txt</code> as mandatory argument.</p>
 <p>The file apl-buildlist.json as well as all directories in that folder will be deleted. Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.</p>
 <p>Note that packages with different major version numbers are considered as different packages.</p>
 <p>By default all known Registries with a priority greater than 0 are scanned (highest priority number first), but you may specify a particular Registry as a third (optional) argument.</p>
@@ -678,8 +683,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <pre><code>(list msg)←UnInstallPackage (packageID folder)</code></pre>
-<p><code>folder</code> must host a Tatin dependency file.</p>
 <p><code>UnInstallPackage</code> attempts to un-install the package <code>packageID</code> and all its dependencies, but the latter only in case they are neither principal packages nor required by other packages.</p>
+<p><code>folder</code> must host a Tatin dependency file.</p>
 <p><code>packageID</code> might be a full package ID but also &lt;group&gt;-&lt;name&gt; or just &lt;name&gt;. However, in case more than one package qualify an error is thrown.</p>
 <p>Note that if <code>packageID</code> is empty a clean-up attempt is made.</p>
 <p><code>folder</code> may be a sub folder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.</p>

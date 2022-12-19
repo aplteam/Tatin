@@ -230,7 +230,7 @@ The file `apl-package.json` describes the MarkAPL package:
   description: "Converts Markdown to HTML5",
   documentation: "",
   group: "aplteam",
-  info_url: "https://github.com/aplteam/MarkAPL",
+  project_url: "https://github.com/aplteam/MarkAPL",
   io: 1,
   maintainer: "kai@aplteam.com",
   minimumAplVersion: "18.0",

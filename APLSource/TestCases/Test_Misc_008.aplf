@@ -1,0 +1,12 @@
+ r←Test_Misc_008(stopFlag batchFlag);⎕TRAP;text;version
+⍝ Checks whether the file ReleaseNotes.md contains information regarding the current version
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ text←⊃TC.F.NGET(##.CiderConfig.HOME,'/docs/ReleaseNotes.md')1
+ version←{⍵↑⍨¯1+⌊/⍵⍳'-+'}2⊃TC.Version
+
+ →T.PassesIf∨/∨/¨version∘⍷¨text  ⍝ Error? The release notes don't know about this version!
+
+ r←T._OK
+⍝Done

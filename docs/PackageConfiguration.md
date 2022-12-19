@@ -20,7 +20,7 @@ This is an example:
   description: "Zipping and unzipping with.NET Core on all major platforms",
   documentation: "",
   group: "aplteam",
-  info_url: "https://github.com/aplteam/DotNetZip",
+  project_url: "https://github.com/aplteam/DotNetZip",
   io: 1,
   ml: 1,
   name: "DotNetZip",
@@ -306,14 +306,6 @@ A character vector that must contain something like "18.0". In fact 18.0 is the 
 
 The name part of the package ID[^id]
 
-#### info_url
-
-A URL that points to something like GitHub. 
-
-An example is `https://github.com/aplteam/MarkAPL`
-
-It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.
-
 
 #### os_win
 
@@ -326,6 +318,16 @@ A Boolean; a 1 means that the package runs under Mac-OS.
 #### os_lin
 
 A Boolean; a 1 means that the package runs under Linux.
+
+
+#### project_url
+
+A URL that points to something like GitHub. 
+
+An example is `https://github.com/aplteam/MarkAPL`
+
+It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.
+
 
 #### source
 

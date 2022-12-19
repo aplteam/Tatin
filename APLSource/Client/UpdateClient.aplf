@@ -1,4 +1,4 @@
- (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag
+ (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;flag2
 ⍝ Updates the client to (by default) the latest version, and returns the version number of the new version.\\
 ⍝ A Boolean right argument (`force`) is mandatory, but one might specify also a folder Tatin is installed in.
 ⍝ The user command will do this automatically with the folder the user command was loaded from.\\
@@ -47,7 +47,17 @@
              :If 0=≢target
                  target←GetMyUCMDsFolder'Tatin'
              :EndIf
-             F.RmDir target
+             flag2←0
+             :Repeat
+                 (rc msg)←F.RmDirByForce target
+                 :If rc=0
+                     flag2←1
+                 :ElseIf 0=CommTools.YesOrNo('Removing >',target,'> failed with rc=',⍕rc)('Error message: ',⍕∊msg)'Try again?'
+                     '*** Updating Tatin cancelled'⎕SIGNAL 11
+                 :Else
+                     ⎕DL 1
+                 :EndIf
+             :Until flag2
              (⊃⎕NPARTS target)⎕NCOPY folder,'/Tatin'
              version←{⍵↓⍨'v'=1⍴⍵}tag
              ref←⎕SE.⎕NS''

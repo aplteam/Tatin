@@ -1,25 +1,29 @@
- r←(fn Maintenance_)(path dry);folders;filename;data;json;data2;pkgName;zipFilename;zip
+ r←(fn Maintenance_)(path dry);folders;filename;data;json;data2;pkgName;zipFilename;zip;tempFolder;zipData
  r←''
  :If '.git'≢2⊃⎕NPARTS path,'/'
- :AndIf ~⎕NEXISTS path,'/apl-buildlist.json'
      filename←path,'/apl-package.json'
      :If ⎕NEXISTS filename
          data←⎕JSON⍠('Dialect' 'JSON5')⊢⊃F.NGET filename
          data2←⎕NS data
          data2←fn data2
+         json←Reg.JSON data2
          :If ≢/Reg.JSON¨data2 data
              :If dry
                  r,←'Would be changed: ',filename,⎕UCS 13
              :Else
-                 json←Reg.JSON data2
                  (⊂json)F.NPUT filename 1
                  r,←'Changed: ',filename,⎕UCS 13
              :EndIf
-             pkgName←⊃,/1↓⎕NPARTS ¯1↓⊃⎕NPARTS filename
-             zipFilename←path,'/',pkgName,'.zip'
-             :If ⎕NEXISTS zipFilename
-                 zip←⎕NEW ##.ZipArchive(,⊂zipFilename)
-                 :If (⊂'apl-package.json')∊zip.List
+         :EndIf
+         pkgName←data2.(group,'-',name,'-',version)
+         zipFilename←path,'/',pkgName,'.zip'
+         :If ⎕NEXISTS zipFilename
+             zip←⎕NEW ##.ZipArchive(,⊂zipFilename)
+             :If (⊂'apl-package.json')∊zip.List
+                 tempFolder←F.GetTempSubDir''
+                 Assert'apl-package.json'zip.ExtractTo tempFolder
+                 zipData←Reg.JSON⊃F.NGET tempFolder,'/apl-package.json'
+                 :If json≢Reg.JSON zipData
                      :If dry
                          r,←'Would be changed: ',zipFilename,⎕UCS 13
                      :Else
@@ -28,13 +32,13 @@
                          r,←'Changed: ',zipFilename,⎕UCS 13
                      :EndIf
                  :EndIf
-                 zip.Dispose
+                 F.RmDirByForce tempFolder
              :EndIf
-         :EndIf
-     :Else
-         :If 0<≢folders←(F.ListDirs path,'/')~⊂'.git'
-             r,←∊fn{(⍺⍺ Maintenance_)⍵}¨(⊂¨folders),¨dry
+             zip.Dispose
          :EndIf
      :EndIf
+ :EndIf
+ :If 0<≢folders←(F.ListDirs path,'/')~⊂'.git'
+     r,←∊fn{(⍺⍺ Maintenance_)⍵}¨(⊂¨folders),¨dry
  :EndIf
  ⍝Done

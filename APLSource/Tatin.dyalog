@@ -1,4 +1,4 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.54.0 - 2022-12-18
 
@@ -2054,13 +2054,15 @@
     ∇ r←DefineTargetSpace dummy;bool;ind;NSI
       NSI←(⎕NSI≢¨⊂⍕##.THIS)/⎕NSI
       r←,⊃1↑(+/'⎕SE'{∧\⍺∘≡¨(≢⍺)↑¨⍵}NSI)↓NSI,'#'
-      :If ~'['∊r   ⍝ Might be called from an instance of a class
-      :AndIf (,'#')≢r
+      :If '['∊r   ⍝ Might be called from an instance of a class
+          r←{⍵↓⍨-'.'⍳⍨⌽⍵}{⍵↑⍨⍵⍳'['}r
+      :EndIf
+      :If (,'#')≢r
           ind←'Select target space the package(s) shall be loaded into:'TC.C.Select,¨'#'(⍕r)
           :If 0=≢ind
               r←''
           :Else
-              r←ind⊃'#'(⍕r)
+              r←ind⊃,¨'#'(⍕r)
           :EndIf
       :EndIf
     ∇

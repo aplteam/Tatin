@@ -1,4 +1,4 @@
- r←{noBetas}GetBestVersionNumber path;id;pattern;list;buff;list2;level
+ r←{noBetas}GetBestVersionNumber path;id;pattern;list;buff;list2;level;id2;version
 ⍝ Establishes the best version number for ⍵
 ⍝ '{group}-{name}-3.0.0' ← GetBestVersionNumber '{group}-{name}'
 ⍝ '{group}-{name}-2.1.0' ← GetBestVersionNumber '{group}-{name}-2'
@@ -39,15 +39,15 @@
              list2←InjectPublishingDate list                    ⍝ Add publishing date where required
              list←list[SortIndexForPackageIDs list2]
          :EndIf
-         r←⊃¯1↑list
-         r←{1↓⍵/⍨2≤+\'-'=⍵}⊃,/1↓⎕NPARTS r
-         :If IsValidPackageID_WithoutPatchNo id
-             r←({⍵/⍨2>+\'-'=⍵}path),'-',r
-         :ElseIf IsValidPackageID_WithMajorNo id
+         id2←(≢⊃⎕NPARTS path)↓⊃¯1↑list
+         version←{1↓⍵/⍨2≤+\'-'=⍵}⊃,/1↓⎕NPARTS id2
+         :If IsValidPackageID_WithoutPatchNo version
+             version←({⍵/⍨2>+\'-'=⍵}path),'-',version
+         :ElseIf IsValidPackageID_WithMajorNo version
              (path buff)←2↑⎕NPARTS path
-             r←path,({⍵/⍨2>+\'-'=⍵}buff),'-',r
+             version←path,({⍵/⍨2>+\'-'=⍵}buff),'-',version
          :Else
-             r←((-≢id)↓path),({⍵/⍨2>+\'-'=⍵}id),'-',r
+             r←((-≢id)↓path),({⍵/⍨2>+\'-'=⍵}id2),'-',version
          :EndIf
      :EndIf
  :EndIf

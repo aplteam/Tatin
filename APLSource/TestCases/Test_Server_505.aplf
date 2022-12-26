@@ -8,6 +8,9 @@
  (src zip)←(⊂dir,'/'),¨'src' 'zip'
  F.MkDir src zip
  serverPath←∆GetServerPath
+ packageID←'test-Package_A-0.1.0-alpha-1'
+ Assert 0=⊃F.RmDir serverPath,'/',packageID
+ ∆RecompileIndexOnServer
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src,'/Test.apln'
@@ -19,7 +22,6 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- packageID←'test-Package_A-0.1.0-alpha-1'
  (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
  →T.GoToTidyUp 200≠rc
  →T.GoToTidyUp 0≠≢msg

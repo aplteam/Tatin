@@ -1,0 +1,28 @@
+ r←Test_Publish_008(stopFlag batchFlag);⎕TRAP;dir;src;reg;zipfile2;zipfile1;msg;rc
+⍝ Attempt to publish a package with a new version number that differs from an already published one only by case; must ERR
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir ⍬
+ (src reg)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src reg
+
+ TC.Reg.CreateRegistry reg
+
+ TC.MyUserSettings.AddRegistry'[local2]',reg
+
+ zipfile1←'./TestServer/Registry/example-Goo-2.1.0/example-Goo-2.1.0.zip'
+ {}TC.PublishPackage zipfile1'[local2]'
+
+ zipfile2←'./TestData/CaseTest/example-goo-2.9.0.zip'
+
+ (rc msg)←2↑TC.PublishPackage zipfile2'[local2]'
+ →T.GoToTidyUp 400≠rc
+ →T.GoToTidyUp~∨/'There is already such a package but with a different spelling (case)'⍷msg
+
+ r←T._OK
+
+∆TidyUp:
+ Assert TC.MyUserSettings.RemoveRegistry'[local2]'
+ Assert 0=⊃F.RmDir dir
+⍝Done⍝Done

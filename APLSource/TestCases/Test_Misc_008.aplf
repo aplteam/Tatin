@@ -1,4 +1,4 @@
- r←Test_Misc_008(stopFlag batchFlag);⎕TRAP;text;version
+ r←Test_Misc_008(stopFlag batchFlag);⎕TRAP;text;version;bool;row;date
 ⍝ Checks whether the file ReleaseNotes.md contains information regarding the current version
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -6,7 +6,11 @@
  text←⊃TC.F.NGET(##.CiderConfig.HOME,'/docs/ReleaseNotes.md')1
  version←{⍵↑⍨¯1+⌊/⍵⍳'-+'}2⊃TC.Version
 
- →T.PassesIf∨/∨/¨version∘⍷¨text  ⍝ Error? The release notes don't know about this version!
+ bool←version∘⍷¨text                ⍝ Error? The release notes don't know about this version!
+ row←⍸∨/¨bool
+ →T.PassesIf 0<≢row
+ date←{⍵↓⍨1++/2>+\' '=⍵}(1⍳⍨row⊃bool)↓row⊃text
+ →T.PassesIf date≡3⊃TC.Version      ⍝ Error? Verion's date and the date in the release notes dot not match!
 
  r←T._OK
 ⍝Done

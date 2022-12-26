@@ -1,10 +1,14 @@
- (rc msg)←SendCrashMail INI;parms;myConnection;mailParms;convert;domain;rc;msg;log;folder;list;filename;S
+ (rc msg)←{add}SendCrashMail INI;parms;myConnection;mailParms;convert;domain;rc;msg;log;folder;list;filename;S
 ⍝ The idea is to have a GMail address dedicated for http://[test].tatin.dev
 ⍝ but we use this only to logon the Google's SMTP server: the address is not monitored.
 ⍝ The real consignees are listed as "To". That way we don't have to be particularly
 ⍝ concerned regarding the password.
+⍝ You may add additional information to the standard crash email by passing `add`.
+⍝ This must be a simple character vector.
  msg←''
  :If INI.Get'EMAIL:active'
+     add←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'add'
+     '⍺ must be a simplem character vector'##.Reg.Assert(⎕DR add)∊80 160
      S←##.##.SMTP
      convert←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⊆⍵}
      parms←⎕NEW S.ConnectionParameters
@@ -21,11 +25,14 @@
      mailParms.Subject←domain,' has crashed'
      mailParms.Body←⊃INI.Get'EMAIL:Body'
      mailParms.Body←'<DOMAIN>'⎕R domain⊣mailParms.Body
+     :If 0<≢add
+         mailParms.Body,←⊆add
+     :EndIf
      mailParms.Body,←⎕UCS 13 10
      folder←⊃INI.Get'TRAP:Folder'
      :If 0<≢list←##.F.ListFiles folder,'*.html'
          filename←⊃¯1↑list
-         parms.Attachments←⊂filename'text/html'
+         mailParms.AddAttachment filename'text/html'
      :EndIf
      (rc msg log)←myConnection.Send mailParms
      :If 0=rc

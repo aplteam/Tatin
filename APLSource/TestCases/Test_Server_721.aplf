@@ -1,0 +1,26 @@
+ r←Test_Server_721(stopFlag batchFlag);⎕TRAP;toPath;counter;flag;max
+⍝ Copy a maintenance file over that will cause a crash and check whether it was deal with properly
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ toPath←⊃,/1 ⎕NPARTS ∆GetServerRegistryFolder,'../Server/Maintenance/'
+ toPath ⎕NCOPY ##.CiderConfig.HOME,'/TestData/MaintenanceFiles/Crash.aplf'
+
+ counter←flag←0
+ max←15
+ :Repeat  ⍝ We must wait until the server performs housekeeping
+     ⎕DL 1
+     flag←⎕NEXISTS toPath,'Crash.aplf.crashed'
+ :Until flag∨max<counter←counter+1
+ →T.GoToTidyUp max=counter
+
+ r←T._OK
+
+ :If ~batchFlag
+     flag←##.Client.YesOrNo'Did you receive an email regarding the crash of a maintenance file?'
+     r←(1+flag)⊃T.(_Failed _OK)
+ :EndIf
+
+∆TidyUp:
+ F.DeleteFile toPath,'Crash.aplf.crashed'
+⍝Done

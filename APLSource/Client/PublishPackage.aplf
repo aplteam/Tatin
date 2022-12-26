@@ -1,9 +1,9 @@
- {(statusCode errMsg zipFilename)}←PublishPackage(source registry);uri;path;cfg;errMsg;statusCode;packageID
+ {(statusCode errMsg zipFilename)}←PublishPackage(source registry);uri;path;cfg;errMsg;statusCode;packageID;cfgFilename
 ⍝ Publishes a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
 ⍝ 2. Creates a dependency file for the package if required
 ⍝ 3. Creates a zip file for the package in a temp folder if required
-⍝ 4. Moves the zip file into the Registry, either via HTTP or directly.
+⍝ 4. Moves the zip file into the Registry, either via HTTP or locally.
 ⍝ 5. Updates the Registry index in case it's a local Registry
 ⍝ Note that if ⍵ points already to a ZIP file it is **moved** into the Registry.\\
 ⍝ `⍵` must be a two-item vector:
@@ -25,9 +25,14 @@
      PublishPackageToRemoteRegistry_ zipFilename registry
  :Else
      PrintToSession'  Read config file for ',source,'...'
-     cfg←ReadPackageConfigFile{F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_Name}source
-     PrintToSession'  Attempting to publish ',source,'...'
-     packageID←cfg.group,'-',cfg.name,'-',cfg.version
+     cfgFilename←1 F.NormalizePath({F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_Name}source),'/',CFG_Name
+     :If F.IsFile cfgFilename
+         cfg←ReadPackageConfigFile cfgFilename
+         PrintToSession'  Attempting to publish ',source,'...'
+         packageID←cfg.group,'-',cfg.name,'-',cfg.version
+     :Else
+         packageID←2⊃⎕NPARTS source
+     :EndIf
      (statusCode errMsg)←Reg.PublishPackage zipFilename uri
      :If 200≠statusCode
      :AndIf '.zip'≢⎕C⊃¯1↑⎕NPARTS source

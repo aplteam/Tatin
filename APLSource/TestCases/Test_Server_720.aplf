@@ -1,0 +1,36 @@
+ r←Test_Server_720(stopFlag batchFlag);⎕TRAP;toPath;counter;flag;path;json;data;tempDir;zipFilename;json2;data2;max
+⍝ Copy a maintenance file over and check whether it did it's job
+⍝ Eventually the amended package is restored
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ toPath←⊃,/1 ⎕NPARTS ∆GetServerRegistryFolder,'../Server/Maintenance/'
+ toPath ⎕NCOPY ##.CiderConfig.HOME,'/TestData/MaintenanceFiles/Modify_example_foo_1_0_0.aplf'
+
+ counter←flag←0
+ max←15
+ :Repeat  ⍝ We must wait until the server performs housekeeping
+     ⎕DL 1
+     flag←⎕NEXISTS toPath,'Modify_example_foo_1_0_0.aplf.executed'
+ :Until flag∨max<counter←counter+1
+ →T.GoToTidyUp max=counter
+
+ path←∆GetServerRegistryFolder,'example-Foo-1.0.0/'
+ json←⊃F.NGET path,'apl-package.json'
+ data←⎕JSON⍠('Dialect' 'JSON5')⊢json
+ →T.GoToTidyUp data.description≢'Modified by maintenance file'
+
+ tempDir←∆GetTempDir''
+ zipFilename←path,'example-Foo-1.0.0.zip'
+ zipFilename ##.ZipArchive.UnzipTo tempDir
+ json2←⊃F.NGET tempDir,'/apl-package.json'
+ data2←⎕JSON⍠('Dialect' 'JSON5')⊢json2
+ →T.GoToTidyUp data2.description≢'Modified by maintenance file'
+
+ r←T._OK
+
+∆TidyUp:
+ 'apl-package.json'{(⍵,⍺)⎕NCOPY⍠('IfExists' 'Replace')⊢(⍵,⍺,'.bkp')}path
+ 'example-Foo-1.0.0.zip'{(⍵,⍺)⎕NCOPY⍠('IfExists' 'Replace')⊢(⍵,⍺,'.bkp')}path
+ F.DeleteFile toPath,'Modify_example_foo_1_0_0.aplf.executed'
+ {}F.RmDirByForce tempDir

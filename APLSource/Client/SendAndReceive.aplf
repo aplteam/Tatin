@@ -27,6 +27,7 @@
          ⍝⎕←'Trying again for the ',(⍕errorCounter),' time...'
          ⎕DL 0.1×errorCounter
          client←NewClient uri
+         client.Secure←'https://'{⍺≡(≢⍺)↑⍵}uri
          r←client R.SendAndReceive request
      :EndIf
  :EndIf

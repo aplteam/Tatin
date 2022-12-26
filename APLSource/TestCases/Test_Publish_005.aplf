@@ -1,0 +1,17 @@
+ r←Test_Publish_005(stopFlag batchFlag);⎕TRAP;zipfile;qdmx
+⍝ Attempt to publish a package that differs from an already published one only by case; must ERR
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zipfile←'./TestData/CaseTest/example-goo-2.1.0.zip'
+
+ :Trap 998
+     {}TC.PublishPackage zipfile'[localhost]'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'Server: The package has already been published (check case!)'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

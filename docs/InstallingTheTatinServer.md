@@ -312,6 +312,6 @@ Which kind of actions needs to be taken, if any, is revealed by the release note
 
 ## The folder Maintenance/
 
-First of all, never replace the folder `maintenance/`: the contents documents what changes have been carried out towards the packages in the past, and you don't want to loose this.
+First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to loose this.
 
-If the new one is not empty then copy the contents over. This might be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.

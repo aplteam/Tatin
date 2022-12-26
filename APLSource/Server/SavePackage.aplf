@@ -1,11 +1,14 @@
- response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;rc
+ response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;rc;list;flag
 ⍝ `packageID` is a valid package ID
 ⍝ This function saves the data in the appropriate folder which of course must not exist.
  packageID←request.RequestTarget
  target←G.RegistryPath,'/',packageID
- :If F.IsDir target
+ list←1 Reg.Index.GetRegistryIndex G.RegistryPath
+ flag←0
+ :If (⊂packageID)∊list
+ :OrIf flag←(⊂⎕C Reg.RemoveVersionNumber packageID)∊⎕C Reg.RemoveVersionNumber¨list
      response←request Respond 400
-     response.Content←'The package has already been published'
+     response.Content←'The package has already been published',flag/' (check case!)'
  :Else
      tempFolder←F.GetTempSubDir''
      filename←tempFolder,'/',packageID,'.zip'

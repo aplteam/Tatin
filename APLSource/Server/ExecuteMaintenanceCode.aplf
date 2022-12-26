@@ -22,6 +22,8 @@
              :Else
                  qdmx←⎕DMX
                  LogError'Executing maintenance file ',codeFile,' failed with rc=',(⍕qdmx.EN),'; ',⍕∊⎕DMX.EM
+                 ('Culprit was the maintenance file ',⊃,/1↓⎕NPARTS codeFile)SendCrashMail ⍬
+                 (codeFile,'.crashed')⎕NMOVE codeFile
              :EndTrap
          :EndIf
      :EndFor

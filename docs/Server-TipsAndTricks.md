@@ -17,19 +17,27 @@ The most important thing is to watch tags. Tags can be very useful in order to f
 
 That means that for tags to work there has to be a gate keeper who is responsible for correcting / removing tags.
 
-That gatekeeper needs to be able to execute code within the server, but only once. The idea is to correct problems in the package config files somehow.
+That gatekeeper needs to be able to execute code on the server, but only once. The idea is to correct problems in the package config files somehow.
 
 A> ### The package config file and the ZIP file 
 A>
-A> Note that changing the config file is enough: If the file got changes then Tatin will make sure that the new version is automatically also added to the ZIP file of the package, effectively overwriting the old version of the package file. 
+A> Note that changing the config file is enough: If the file got changed then Tatin will make sure that the new version is automatically also added to the ZIP file of the package, effectively overwriting the old version of the package file. 
 
 This can be achieved by uploading an `.aplf` text file (read: a function) into a folder that is defined in the INI file as `[CONFIG]MaintenanceFolder`.
 
-If one or more of such files are found by the Tatin Server they are loaded into the server and executed. Once executed the files are renamed by adding an extension `.executed`.
+If one or more of such files are found by the Tatin Server while doing housekeeping they are loaded into the server and executed. Once executed the files are renamed by adding an extension `.executed`.
 
 For example, if there is a file `RemoveDyalogFromTags.aplf` then it is loaded into an unnamed namespace and called with a right argument `G` (for "globals"). Once executed the file is then renamed to `RemoveDyalogFromTags.aplf.executed`.
 
 That makes sure the code is not executed again, but it is also  useful for documenting what code was executed, and when.
+
+#### Crashing maintenance files
+
+Like any other program a maintenance file may crash. If that happens the server carries out the following steps:
+
+1. Report it to the log file
+2. Send an email reporting the crash with details to the maintainer (if enabled in the INI file)
+3. Rename the file from `*.aplf` to `*.crashed` in order to avoid it being executed again
 
 
 ## Developing
@@ -41,11 +49,13 @@ If you want to make changes or add new features you need a good understanding of
 
 #### Main namespaces
 
-There are four ordinary namespace that contain all the Tatin code:
+There are four ordinary namespaces that contain all the Tatin code:
 
 `Admin`
 
 : Contains helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.
+
+: This is all about development.
 
 `Client`
 

@@ -1,6 +1,10 @@
- {r}←SendCrashMail y;⎕TRAP;rc;msg
+ {r}←{add}SendCrashMail y;rc;msg
+ ⍝ When called via HandleError then `y` is a namespace with all sorts of information.
+ ⍝ Might also be just ⍬.
+ ⍝ `add` can be additional information when called "normally".
  r←⍬
- (rc msg)←Emails.SendCrashMail G.INI
+ add←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'add'
+ (rc msg)←add Emails.SendCrashMail G.INI
  :Trap (~G.TestFlag)/0
      :If rc≠0
          P.AppLog⊆'*** Error'

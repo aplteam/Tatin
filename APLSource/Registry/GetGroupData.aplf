@@ -1,0 +1,32 @@
+ r←{what}GetGroupData(path groupName);dcfFilename;dcfTie;markdown;email;folder
+⍝ Returns the data saved for a group as a matrix:
+⍝ [;1] are the name
+⍝ [;2] the corresponding data\\
+⍝ In case a left argument is specified it must be on of the items in the first component
+⍝ but neither "toc" nor "group". In that case a character vector is returned.
+⍝ In case the folder "Groups" does not exist a matrix with zero rows is returns in case
+⍝ ⍺ was not specified, and '' otherwise.
+⍝ Examples:
+⍝ 2 2 ←→ ⍴GetGroupData 'aplteam'
+⍝ 'kai@aplteam.com' ←→ 'email' GetGroupData 'aplteam'
+ folder←'expand'F.NormalizePath path,'/../Groups/'
+ :If ⎕NEXISTS folder
+     dcfFilename←folder,groupName,'.dcf'
+ :AndIf ⎕NEXISTS dcfFilename
+     dcfTie←dcfFilename ⎕FSTIE 0
+     markdown←⎕FREAD dcfTie 3
+     email←⎕FREAD dcfTie 4
+     r←2 2⍴'markdown'markdown'email'email
+     ⎕FUNTIE dcfTie
+     :If 0<⎕NC'what'
+         ('Not a valid data item for a group: ',what)Assert(⊂what)∊r[;1]
+         r←2⊃r[;r[;1]⍳⊂what]
+     :EndIf
+ :Else
+     :If 0<⎕NC'what'
+         r←''
+     :Else
+         r←0 2⍴''
+     :EndIf
+ :EndIf
+⍝Done

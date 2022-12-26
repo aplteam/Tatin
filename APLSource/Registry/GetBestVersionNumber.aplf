@@ -1,5 +1,6 @@
- r←{noBetas}GetBestVersionNumber path;id;pattern;list;buff;list2;level;id2;version
+ r←{noBetas}GetBestVersionNumber path;id;list;buff;list2;level;version;best;path_
 ⍝ Establishes the best version number for ⍵
+⍝ '{group}-{name}-3.0.0' ← GetBestVersionNumber '{name}'
 ⍝ '{group}-{name}-3.0.0' ← GetBestVersionNumber '{group}-{name}'
 ⍝ '{group}-{name}-2.1.0' ← GetBestVersionNumber '{group}-{name}-2'
 ⍝ '{group}-{name}-1.2.1' ← GetBestVersionNumber '{group}-{name}-1'
@@ -8,47 +9,37 @@
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ GetNoBetasDefault}'noBetas '
  r←''
  id←(≢RemovePackageID path)↓path
- :If noBetas∧IsValidPackageID_Complete id
-     :If F.IsDir path
-         r←path
-     :EndIf
- :Else
-     :If IsValidPackageName id
+ path_←(-≢id)↓path
+ :If IsValidPackageName id
      ⍝ We first need to establish the group:
-         path←{⍵↓⍨-≢'/\'A.Last ⍵}path
-         :If 0=≢buff←⊃F.ListDirs path,'*-',id
+     path←{⍵↓⍨-≢'/\'A.Last ⍵}path
+     :If 0=≢buff←⊃F.ListDirs path,'*-',id
+         :Return
+     :EndIf
+     id←({⍵↑⍨⍵⍳'-'}{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}buff),id
+     path,←id
+ :EndIf
+ level←⊃'-'+.=id
+ :If 0<≢list←,GetAllPackages path_
+ :AndIf 0<≢list←('.zip'∘≢¨⎕C¨3⊃∘⎕NPARTS¨list)/list
+ :AndIf 0<≢list←((⎕C id){⍺∘≡¨⎕C(≢⍺)↑¨⍵}list)/list
+     :If 1=level
+         list←('-'=⊃¨1↑¨(≢id)↓¨list)/list
+     :EndIf
+     :If 0<≢list
+         :If noBetas
+         :AndIf 0=≢list←({3>⌈/+\'-'=⍵}¨list)/list   ⍝ Remove all beta versions
              :Return
          :EndIf
-         id←({⍵↑⍨⍵⍳'-'}{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}buff),id
-         path,←id
+         list2←path_ InjectPublishingDate list      ⍝ Add publishing date where required
+         list←list[SortIndexForPackageIDs list2]
      :EndIf
-     level←⊃'-'+.=id
-     :If level∊1 2
-         pattern←path,'*'
-     :EndIf
-     :If 0<≢list←⊃F.Dir pattern
-     :AndIf 0<≢list←('.zip'∘≢¨⎕C¨3⊃∘⎕NPARTS¨list)/list
-         :If 1=level
-             list←('-'=(1+≢id)⊃¨F.CurrentSep A.Last¨list)/list
-         :EndIf
-         :If 0<≢list
-             :If noBetas
-             :AndIf 0=≢list←({3>⌈/+\'-'=⍵}¨'/\'∘A.Last¨list)/list     ⍝ Remove all beta versions
-                 :Return
-             :EndIf
-             list2←InjectPublishingDate list                    ⍝ Add publishing date where required
-             list←list[SortIndexForPackageIDs list2]
-         :EndIf
-         id2←(≢⊃⎕NPARTS path)↓⊃¯1↑list
-         version←{1↓⍵/⍨2≤+\'-'=⍵}⊃,/1↓⎕NPARTS id2
-         :If IsValidPackageID_WithoutPatchNo version
-             version←({⍵/⍨2>+\'-'=⍵}path),'-',version
-         :ElseIf IsValidPackageID_WithMajorNo version
-             (path buff)←2↑⎕NPARTS path
-             version←path,({⍵/⍨2>+\'-'=⍵}buff),'-',version
-         :Else
-             r←((-≢id)↓path),({⍵/⍨2>+\'-'=⍵}id2),'-',version
-         :EndIf
+     best←⊃¯1↑list
+     version←{1↓⍵/⍨2≤+\'-'=⍵}⊃,/best
+     :If IsValidPackageID_WithoutPatchNo version
+         version←({⍵/⍨2>+\'-'=⍵}path),'-',version
+     :Else
+         r←path_,({⍵/⍨2>+\'-'=⍵}best),'-',version
      :EndIf
  :EndIf
 ⍝Done

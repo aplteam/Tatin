@@ -56,16 +56,27 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>The most important thing is to watch tags. Tags can be very useful in order to find a package, but the problem ist that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name as a tag, or adding “dyalog” etc.</p>
 <p>That means that for tags to work there has to be a gate keeper who is responsible for correcting / removing tags.</p>
-<p>That gatekeeper needs to be able to execute code within the server, but only once. The idea is to correct problems in the package config files somehow.</p>
+<p>That gatekeeper needs to be able to execute code on the server, but only once. The idea is to correct problems in the package config files somehow.</p>
 <div class="leanpub_A">
 <h3>The package config file and the ZIP file</h3>
-<p>Note that changing the config file is enough: If the file got changes then Tatin will make sure that the new version is automatically also added to the ZIP file of the package, effectively overwriting the old version of the package file.</p>
+<p>Note that changing the config file is enough: If the file got changed then Tatin will make sure that the new version is automatically also added to the ZIP file of the package, effectively overwriting the old version of the package file.</p>
 </div>
 
 <p>This can be achieved by uploading an <code>.aplf</code> text file (read: a function) into a folder that is defined in the INI file as <code>[CONFIG]MaintenanceFolder</code>.</p>
-<p>If one or more of such files are found by the Tatin Server they are loaded into the server and executed. Once executed the files are renamed by adding an extension <code>.executed</code>.</p>
+<p>If one or more of such files are found by the Tatin Server while doing housekeeping they are loaded into the server and executed. Once executed the files are renamed by adding an extension <code>.executed</code>.</p>
 <p>For example, if there is a file <code>RemoveDyalogFromTags.aplf</code> then it is loaded into an unnamed namespace and called with a right argument <code>G</code> (for “globals”). Once executed the file is then renamed to <code>RemoveDyalogFromTags.aplf.executed</code>.</p>
 <p>That makes sure the code is not executed again, but it is also useful for documenting what code was executed, and when.</p>
+<div class="h_tag">
+<a href="#Crashing-maintenance-files" id="Crashing-maintenance-files" class="autoheader_anchor">
+<h4 data-id="Crashing-maintenance-files">1.1.1. Crashing maintenance files</h4>
+</a>
+</div>
+<p>Like any other program a maintenance file may crash. If that happens the server carries out the following steps:</p>
+<ol start="1">
+<li>Report it to the log file</li>
+<li>Send an email reporting the crash with details to the maintainer (if enabled in the INI file)</li>
+<li>Rename the file from <code>*.aplf</code> to <code>*.crashed</code> in order to avoid it being executed again</li>
+</ol>
 <div class="h_tag">
 <a href="#Developing" id="Developing" class="autoheader_anchor">
 <h2 data-id="Developing">2. Developing</h2>
@@ -82,10 +93,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Main-namespaces">2.1.1. Main namespaces</h4>
 </a>
 </div>
-<p>There are four ordinary namespace that contain all the Tatin code:</p>
+<p>There are four ordinary namespaces that contain all the Tatin code:</p>
 <dl>
 <dt><code>Admin</code></dt>
-<dd><p>Contains helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.</p></dd>
+<dd><p class="first_dd">Contains helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.</p></dd>
+<dd><p>This is all about development.</p></dd>
 </dl>
 <p><code>Client</code></p>
 <p>Contains the code executed on the Client side of Tatin.</p>

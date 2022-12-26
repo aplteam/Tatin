@@ -7,7 +7,7 @@
  request←R.NewRequest 0
  request.RequestTarget←'aplteam-Compare-5.0.0'
  request.Method←'HEAD'
- res←TC.SendAndReceive 'localhost:5001' request
+ res←TC.SendAndReceive (TC.ReplaceRegistryAlias '[localhost]') request
 
  →T.PassesIf 200≡res.StatusCode
  →T.PassesIf 0=≢res.Content

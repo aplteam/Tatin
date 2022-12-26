@@ -1,4 +1,4 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.54.0 - 2022-12-18
 
@@ -465,9 +465,9 @@
               r(AddHeader)←'Package-ID' 'Principal'
           :Else
               :If 0≡parms.date
-                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'∑ major versions'),(⊂'Info URL')
+                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'∑ major versions'),(⊂'Project URL')
               :Else
-                  r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Info URL'
+                  r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Project URL'
               :EndIf
               buff←{'['∊⍵:⍵↑⍨⍵⍳']' ⋄ ⊃TC.Reg.SeparateUriAndPackageID ⍵}registry
               r←((2⊃⍴r)↑(⊂'Registry: ',{⍵↓⍨-'/'=¯1↑⍵}buff),(2⊃⍴r)⍴⊂'')⍪r
@@ -1554,13 +1554,14 @@
               r,←⊂''
               r,←⊂'A) First argument:'
               r,←⊂'Specify one or more (comma-separated) packages to be loaded.'
-              r,←HelpOnPackageID ⍬
               r,←⊂''
               r,←⊂'B) Second (optional) argument: target namespace (defaults to #)'
               r,←⊂'Must be the fully qualified name of a namespace the package will be loaded into.'
               r,←⊂'May be # or ⎕SE or a sub-namespace of any level.'
               r,←⊂''
               r,←⊂'Returns the number of packages loaded into the workspace, including dependencies.'
+              r,←⊂''
+              r,←HelpOnPackageID ⍬
           :Case ⎕C'InstallPackages'
               r,←⊂'Install the given package(s) and all its dependencies into a given folder.'
               r,←⊂'If the packages are already installed, they will be installed again from scratch.'
@@ -1609,7 +1610,7 @@
               r,←⊂'-dry   When specified all actions will be listed, including a list of all packages found,'
               r,←⊂'       but no package will actually be changed at all.'
               r,←⊂'-show  Shows the leading comments of all maintenance files that would be executed.'
-              r,←⊂'       If this is specified, -dry is ignored, and no package is going to be changed.'
+              r,←⊂'       If this is specified no other action is taken.'
               r,←⊂''
               r,←⊂'Note that this is NOT about packages that are managed by a Tatin server. The server has'
               r,←⊂'its own mechanism for updating packages.'
@@ -1706,15 +1707,25 @@
               r,←⊂''
               r,←⊂'-quiet: useful for test cases; it prevents Tatin from interrogating the user'
           :Case ⎕C'ListVersions'
-              r,←⊂'List all versions of the given package, if any. You may specify a package in several ways:'
-              r,←⊂' * ]Tatin.ListPackages [Registry-URL|Registry-alias]{group}-{package}'
-              r,←⊂' * ]Tatin.ListPackages [Registry-URL|Registry-alias]{package}'
-              r,←⊂' * ]Tatin.ListPackages {package}'
-              r,←⊂'In these cases just a list of packages is returned.'
+              r,←⊂'List all versions of the given package, if any.'
+              r,←⊂''
+              r,←⊂' You may specify a package in several ways:'
+              r,←⊂' * ]Tatin.ListVersions [Registry-URL|Registry-alias]{group}-{package}'
+              r,←⊂' * ]Tatin.ListVersions [Registry-URL|Registry-alias]{package}'
+              r,←⊂' * ]Tatin.ListVersions {package}'
+              r,←⊂' * ]Tatin.ListVersions {package}-{major}'
+              r,←⊂' * ]Tatin.ListVersions {package}-{major}-{minor}'
+              r,←⊂' * ]Tatin.ListVersions {package}-major}-{minor}-{patch}'
+              r,←⊂'In all these cases a list of packages is returned, possibly empty.'
+              r,←⊂''
+              r,←⊂'Note that case does not matter, meaning that package MyGroup-MyPkg can also'
+              r,←⊂'be specified as mygroup-mypkg or MYGROUP-MYPKG, it does matter.'
+              r,←⊂''
               r,←⊂'It is also possible to list all packages of a particular Registry by specifying no package:'
               r,←⊂'   ]Tatin.ListPackages [tatin-test]'
               r,←⊂'You may not specify an argument at all: then it falls back to the principal Tatin Registry.'
-              r,←⊂'Finally you may specify a ? (or [?]): then you will get a list with all known Registries.'
+              r,←⊂'Finally you may specify a ? (or [?]): then you will be prompted with a list with all known'
+              r,←⊂'Registries.'
               r,←⊂''
               r,←⊂'If just a package is specified a matrix with two columns is returned:'
               r,←⊂' [;1] The Registry'
@@ -1972,6 +1983,9 @@
       r,←⊂'Note that if neither a Registry nor a ZIP file is specified but just a package ID'
       r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
       r,←⊂'will be scanned; the first hit wins.'
+      r,←⊂''
+      r,←⊂'Note that case does not matter, meaning that package MyGroup-MyPkg-1.2.3 can also'
+      r,←⊂'be specified as mygroup-mypkg-1.2.3 or MYGROUP-MYPKG-1.2.3.'
       r,←⊂''
       r,←⊂'A package might be:'
       r,←⊂' * A full package ID.'

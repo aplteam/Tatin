@@ -265,6 +265,11 @@ By default beta versions are considered in case the package ID is incomplete, bu
 
 `r` is a nested vector of character vectors with the full names of all principal packages installed. The length will match the number of packages specified as `identifiers`.
 
+Notes:
+
+* The target folder must already exist
+* The package ID(s) might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
+
 
 ### ListDeprecated
 
@@ -481,6 +486,8 @@ The package ID must not specify a version number.
 
 By default the publishing date is not included, but you may change this by passing a 1 as `⍺`. In that case an additional column is added to the result.
 
+Note that the package ID might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
+
 ### LoadDependencies
 
 ```
@@ -535,6 +542,8 @@ By default beta versions are considered in case the package ID is incomplete, bu
 
 Returns the number of packages installed, including dependencies.
 
+Note that the package ID(s) might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
+
 ### Pack                 
 
 ```
@@ -567,18 +576,18 @@ Establishes whether the host is up and running with very little overhead. If `ur
 
 Publishes a package.
 
-1. Checks for uniqueness of the given package/version combination.
-2. Creates a dependency file for the package if required
-3. Creates a zip file for the package in a Temp folder if required
-4. Moves the zip file into the Registry, either via HTTP or directly.
-5. Updates the Registry index in case it's a local Registry
+1. Checks whether there is already such a package but with a different spelling in terms of case
+1. Creates a dependency file for the package if required
+1. Creates a zip file for the package in a Temp folder if required
+1. Moves the zip file into the Registry, either via HTTP or directly.
+1. Updates the Registry index in case it's a local Registry
 
 Note that if `⍵` points already to a ZIP file only steps 4 and 5 are performed.
 
 `⍵` must be a two-item vector:
 
 1. `source` → folder to create the package from
-2. `registry` → registry to publish the package to (alias or url)
+1. `registry` → registry to publish the package to (alias or url)
 
 The explicit result:
 

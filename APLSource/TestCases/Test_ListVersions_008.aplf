@@ -1,0 +1,12 @@
+ r←Test_ListVersions_008(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ List all versions of one particular package by specifying {group}-{name} but all in lowercase
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ list←TC.ListVersions'[local]aplteam-apltreeutils'
+ noOf←≢{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\aplteam-APLTreeUtils-*'
+ →T.PassesIf 0<noOf
+ →T.PassesIf noOf≡≢list
+
+ r←T._OK
+⍝Done

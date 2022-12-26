@@ -16,6 +16,14 @@ Tatin release notes contain information regarding...
 
 Tatin release notes _do not_ contain any information regarding added features --- except when they relate to breaking changes --- and/or bug fixes. For that visit <https://github.com/aplteam/Tatin/releases>
 
+## Version 0.83.0 from 2022-12-26
+
+No user actions required
+
+## Version 0.82.2 from 2022-12-19
+
+No user actions required
+
 ## Version 0.82.1 from 2022-12-19
 
 **Client**
@@ -24,7 +32,7 @@ Executing a client maintenance file was buggy: it did not fetch packages in sub 
 
 Make sure to execute `2022-12-19-MakePackageCompatibleWith_82_0.aplf` again to convert all packages correctly.
  
-## Version 0.82.0 from 2022-12-19
+## Version 0.82.0 from 2022-12-25
 
 **General**
 

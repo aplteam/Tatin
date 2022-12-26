@@ -1,4 +1,4 @@
- {(statusCode errMsg)}←{isHttpRequest}PublishPackage(zipFilename registryPath);packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps;tags
+ {(statusCode errMsg)}←{isHttpRequest}PublishPackage(zipFilename registryPath);packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps;tags;list
 ⍝ Tries to publish a package locally.\\
 ⍝ * If the package already exists `errmsg` carries an appropriate message. No further action is taken.
 ⍝ * If any action along the line fails (like creating the package directory, copying the ZIP file, copying the dependency file, if any)
@@ -38,19 +38,27 @@
  :If 0=≢cfg.minimumAplVersion
      cfg.minimumAplVersion←'18.0' ⍝ This is the minimum by definition: Tatin does not run on earlier versions
  :EndIf
+  :If 0=≢cfg.maintainer
+     cfg.maintainer←'email'GetGroupData registryPath cfg.group
+ :EndIf
  (JSON cfg)F.NPUT(tempDir,'/',CFG_Name)1
  packageID←{⍵.group,'-',⍵.name,'-',⍵.version}cfg
  packageID←⊃SplitVersionFromBuild packageID
  registryPath←AddSlash registryPath
  packageDir←registryPath,packageID
- :If F.IsDir packageDir
+ list←RemoveVersionNumber¨GetAllPackages registryPath
+ :If ~(⊂RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊list
+ :AndIf (⊂⎕C RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊⎕C list
+     errMsg←'There is already such a package but with a different spelling (case)'
+     statusCode←HttpCodes.BadRequest
+ :ElseIf F.IsDir packageDir
      errMsg←'Package already exists (version conflict)'
      statusCode←HttpCodes.BadRequest
  :ElseIf 0=F.MkDir packageDir,'/data'
      statusCode←HttpCodes.InternalServerError
      errMsg←'Could not create data/ directory for ',packageID
  :ElseIf 0<≢(zipFilename2←packageDir,'/',packageID,'.zip')(⎕NCOPY Exec)zipFilename
-     HttpCodes.InternalServerError
+     statusCode←HttpCodes.InternalServerError
      errMsg←'Publishing ',packageID,' failed due to a server error'
      packageDir RollbackPublishPackage errMsg
  :Else

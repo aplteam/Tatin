@@ -317,6 +317,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>You may omit minor+patch or even major+minor+patch in order to install the latest version.</p>
 <p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as <code>⍺</code>.</p>
 <p><code>r</code> is a nested vector of character vectors with the full names of all principal packages installed. The length will match the number of packages specified as <code>identifiers</code>.</p>
+<p>Notes:</p>
+<ul>
+<li>The target folder must already exist</li>
+<li>The package ID(s) might use any case, meaning that if the package's name is <code>foo-Goo-1.2.3</code> then you might as well spell it <code>foo-GOO-1.2.3</code> or <code>FOO-goo-1.2.3</code>: it would not make a difference</li>
+</ul>
 <div class="h_tag">
 <a href="#ListDeprecated" id="ListDeprecated" class="autoheader_anchor">
 <h3 data-id="ListDeprecated">2.15. ListDeprecated</h3>
@@ -543,6 +548,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>You may omit the group name; that does not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.</p>
 <p>The package ID must not specify a version number.</p>
 <p>By default the publishing date is not included, but you may change this by passing a 1 as <code>⍺</code>. In that case an additional column is added to the result.</p>
+<p>Note that the package ID might use any case, meaning that if the package's name is <code>foo-Goo-1.2.3</code> then you might as well spell it <code>foo-GOO-1.2.3</code> or <code>FOO-goo-1.2.3</code>: it would not make a difference</p>
 <div class="h_tag">
 <a href="#LoadDependencies" id="LoadDependencies" class="autoheader_anchor">
 <h3 data-id="LoadDependencies">2.21. LoadDependencies</h3>
@@ -582,6 +588,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Loads all dependencies, if any, as well into <code>(#|⎕SE)._tatin</code> but does <em>not</em> create references for them in <code>targetSpace</code>.</p>
 <p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as <code>⍺</code>.</p>
 <p>Returns the number of packages installed, including dependencies.</p>
+<p>Note that the package ID(s) might use any case, meaning that if the package's name is <code>foo-Goo-1.2.3</code> then you might as well spell it <code>foo-GOO-1.2.3</code> or <code>FOO-goo-1.2.3</code>: it would not make a difference</p>
 <div class="h_tag">
 <a href="#Pack" id="Pack" class="autoheader_anchor">
 <h3 data-id="Pack">2.23. Pack</h3>
@@ -610,7 +617,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>{(statusCode errMsg zipFilename)}←PublishPackage (source registry)</code></pre>
 <p>Publishes a package.</p>
 <ol start="1">
-<li>Checks for uniqueness of the given package/version combination.</li>
+<li>Checks whether there is already such a package but with a different spelling in terms of case</li>
 <li>Creates a dependency file for the package if required</li>
 <li>Creates a zip file for the package in a Temp folder if required</li>
 <li>Moves the zip file into the Registry, either via HTTP or directly.</li>

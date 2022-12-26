@@ -1,0 +1,13 @@
+ {data}←pkgID MaintainerEmailAddress(data registryPath);tags;groupName;pkgName
+⍝ Checks the maintainer email address. If it's empty check the group data. If available, copy the groups amail adress over to maintainer
+⍝ 2022-12-26
+ pkgName←{⍵↑⍨¯1+⍵⍳'-'}{⍵↓⍨⍵⍳'-'}pkgID
+ groupName←{⍵↑⍨¯1+⍵⍳'-'}pkgID
+
+ :If 0=data.⎕NC'maintainer'
+     data.maintainer←''
+ :EndIf
+ :If 0=≢data.maintainer
+     data.maintainer←'email'##.##.Registry.GetGroupData registryPath groupName
+ :EndIf
+⍝Done

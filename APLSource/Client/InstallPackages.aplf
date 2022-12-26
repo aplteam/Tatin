@@ -14,7 +14,7 @@
 ⍝ `←` Full name of packages finally loaded.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
- CheckInstallFolder targetFolder
+ 'Target folder does not eixst'Assert F.IsDir targetFolder
  identifiers←','(≠⊆⊢)identifiers
  EstablishEmptyPermanentConnections 0
  :Trap 998
@@ -24,6 +24,7 @@
          ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
          identifier←noBetas CheckVersion identifier
          :If 0=≢identifier    ⍝ Not found?
+             PrintToSession'Not found: ',identifier_
              :Continue
          :EndIf
          PrintToSession'  Attempting to install ',identifier,'...'

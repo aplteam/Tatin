@@ -3,7 +3,7 @@
  :If Reg.IsValidPackageName packageID
      :If 0<≢group←EstablishGroup packageID
          :If 1=≢group
-             packageID←group,'-',packageID
+             packageID←(1⊃group),'-',packageID
          :Else
              response←request Respond 400
              response.Content←'The package exists in multiple groups: ',⊃{⍺,',',⍵}/group

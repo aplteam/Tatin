@@ -49,7 +49,7 @@
      noOfHyphens←'-'+.=packageID
      :Select noOfHyphens
      :Case 0                                           ⍝ Just the group
-         :If 0<≢list←((packageID,'-')∘≡¨{⍵↑⍨⍵⍳'-'}¨list[;1])⌿list
+         :If 0<≢list←((⎕C packageID,'-')∘≡¨{⎕C ⍵↑⍨⍵⍳'-'}¨list[;1])⌿list
              :If parms.aggregate
                  r←AggregatePackages list
              :Else
@@ -57,7 +57,7 @@
              :EndIf
          :EndIf
      :Case 1                                           ⍝ group and name
-         :If 0<≢list←((packageID,'-')∘≡¨(RemoveVersionNumber¨list[;1]),¨'-')⌿list
+         :If 0<≢list←((⎕C packageID,'-')∘≡¨(⎕C∘RemoveVersionNumber¨list[;1]),¨'-')⌿list
              :If parms.aggregate
                  r←AggregatePackages list
              :Else
@@ -68,7 +68,7 @@
          noOfDots←'.'+.=packageID
          :Select noOfDots
          :Case 0                                       ⍝ Just major
-             :If 0<≢list←((packageID,'.')∘≡¨{⍵↑⍨⍵⍳'.'}¨list[;1])⌿list
+             :If 0<≢list←((⎕C packageID,'.')∘≡¨{⎕C ⍵↑⍨⍵⍳'.'}¨list[;1])⌿list
                  :If parms.aggregate
                      r←0 AggregatePackages list
                  :Else
@@ -76,7 +76,7 @@
                  :EndIf
              :EndIf
          :Case 1                                       ⍝ major and minor
-             :If 0<≢list←((packageID,'.')∘≡¨{'.',⍨⍵/⍨2>+\'.'=⍵}¨list[;1])⌿list
+             :If 0<≢list←((⎕C packageID,'.')∘≡¨{⎕C'.',⍨⍵/⍨2>+\'.'=⍵}¨list[;1])⌿list
                  :If parms.aggregate
                      r←⍉⍪{(1⊃⍵)(≢⍵)}RemovePatch¨,list
                  :Else
@@ -84,7 +84,7 @@
                  :EndIf
              :EndIf
          :Else
-             :If (⊂packageID)∊,list                     ⍝ verbatim
+             :If (⊂⎕C packageID)∊⎕C,list               ⍝ verbatim
                  r←1 2⍴packageID ⍬
              :EndIf
          :EndSelect

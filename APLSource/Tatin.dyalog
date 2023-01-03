@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.54.0 - 2022-12-18
+⍝ * 0.55.0 - 2023-01-03
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -2193,14 +2193,17 @@
       f2←'Server: Request came from invalid version of Tatin.'{⍺≡(≢⍺)↑⍵}dmx.EM
       :If f1∨f2
       :AndIf 1 TC.C.YesOrNo'You are using an outdated version of the Tatin client.',CR,'Would you like to update automatically?'
-          v←TC.UpdateClient 1
-          ErrNo ⎕SIGNAL⍨'Tatin client updated to ',v,'; please execute the last Tatin user command again'
-      :Else
-          :If ∨/'Check ⎕EXCEPTION for details'⍷dmx.Message
-              ⎕EXCEPTION.Message ⎕SIGNAL ErrNo
+          :Trap ErrNo
+              v←⊃TC.UpdateClient 1
+              ⎕←'Tatin client updated to ',v,'; please execute the last Tatin user command again'
           :Else
-              dmx.EM ⎕SIGNAL ErrNo
-          :EndIf
+              dmx←⎕DMX
+              :If ∨/'Check ⎕EXCEPTION for details'⍷dmx.Message
+                  ⎕EXCEPTION.Message ⎕SIGNAL ErrNo
+              :Else
+                  dmx.EM ⎕SIGNAL ErrNo
+              :EndIf
+          :EndTrap
       :EndIf
     ∇
 

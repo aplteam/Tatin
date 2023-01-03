@@ -482,11 +482,11 @@ If a URL or an alias was specified the given Registry is scanned. A matrix with 
 
 You may omit the group name; that does not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.
 
-The package ID must not specify a version number.
+The package ID may optionally include a major version number or a major and a minor number, but not a patch number. If a patch number is provided anyway it is ignored.
 
 By default the publishing date is not included, but you may change this by passing a 1 as `⍺`. In that case an additional column is added to the result.
 
-Note that the package ID might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
+Note that the package ID might use any case, meaning that if the package's name is `foo-Goo` then you might as well spell it `foo-GOO` or `FOO-goo`: it would not make a difference 
 
 ### LoadDependencies
 

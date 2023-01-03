@@ -1,23 +1,51 @@
- r←{dateFlag}ListVersions uri;registryPath;packageID;group;name;version;regEx;pattern;list2;ind;list
+ r←{dateFlag}ListVersions uri;registryPath;packageID;group;name;regEx;pattern;ind;list;list2;list_lc;buff;major;groups;bool;version;minor;versions;bool2
 ⍝ Takes a package ID without minor and patch number (but possibly with major) and returns all versions saved for that package ID (vector)
 ⍝ If `dateFlag` is specified and 1 (default is 0) then a matrix is returned with the publishing date in [;2]
- 'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last uri)+.='-'     ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
+ 'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last uri)+.='-' ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
  (registryPath packageID)←SplitAtLast uri
  'Is not a folder'Assert F.IsDir registryPath
  registryPath←F.ExpandPath registryPath
- packageID,←{
-     '*'=¯1↑⍵:''
-     2='-'+.=⍵:'.*'
-     0='-'+.=⍵:'-*'
-     ∧/({⍵↓⍨⍵⍳'-'}⍵)∊⎕D:'*'
-     '-*'
- }packageID
- :If 0 1∊⍨'-'+.=packageID
-     packageID←'*-',packageID
+ list_lc←⎕C list←1 Index.GetRegistryIndex registryPath
+ group←name←major←version←''
+ :Select '-'+.=packageID
+ :Case 2                        ⍝ group, name and version
+     (group name version)←⎕C'-'(≠⊆⊢)packageID
+ :Case 1                        ⍝ Either groups and name or name and major
+     buff←'-'(≠⊆⊢)packageID
+     :If (1⍴2⊃buff)∊⎕D          ⍝ Major?
+         (name major)←buff
+         name←⎕C name
+     :Else                      ⍝ group and name
+         (group name)←⎕C buff
+     :EndIf
+ :Else                          ⍝ just name
+     name←⎕C packageID
+ :EndSelect
+ 'Specifying minor and patch number is not permitted'Assert~'.'∊major
+ :If 0<≢group
+     groups←⎕C{⍵↑⍨¯1+⍵⍳'-'}¨list_lc
+     bool←groups≡¨⊂group
+     (list_lc list)←bool∘/¨list_lc list
  :EndIf
- list←F.ListDirs registryPath,'/',packageID
- list←((~'/\'∊⍨¯1↑registryPath)+≢registryPath)↓¨list            ⍝ All package IDs
+ :If 0<≢list
+     bool←(⎕C name)∘≡¨{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}¨list_lc
+     (list_lc list)←bool∘/¨list_lc list
+ :AndIf 0<≢list
+     :If 0<≢version
+         (major minor)←' '~⍨¨2↑'.'(≠⊆⊢)version,'..' ⍝ Patch is ignored
+         versions←{⍵↓⍨1++/2>+\'-'=⍵}¨list_lc
+         versions←{⍵/⍨2>+\⍵='.'}¨versions
+         versions←↑{'.'(≠⊆⊢)⍵}¨versions
+         bool←major∘≡¨versions[;1]
+         :If 0<≢minor
+             bool2←minor∘≡¨versions[;2]
+             (list_lc list)←(bool∧bool2)∘/¨list_lc list
+         :Else
+             (list_lc list)←bool∘/¨list_lc list
+         :EndIf
+     :EndIf
+ :EndIf
  list2←registryPath InjectPublishingDate list
  :If dateFlag
      ind←SortIndexForPackageIDs list2

@@ -1,4 +1,4 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.54.0 - 2022-12-18
 
@@ -1715,11 +1715,10 @@
               r,←⊂' * ]Tatin.ListVersions {package}'
               r,←⊂' * ]Tatin.ListVersions {package}-{major}'
               r,←⊂' * ]Tatin.ListVersions {package}-{major}-{minor}'
-              r,←⊂' * ]Tatin.ListVersions {package}-major}-{minor}-{patch}'
               r,←⊂'In all these cases a list of packages is returned, possibly empty.'
               r,←⊂''
               r,←⊂'Note that case does not matter, meaning that package MyGroup-MyPkg can also'
-              r,←⊂'be specified as mygroup-mypkg or MYGROUP-MYPKG, it does matter.'
+              r,←⊂'be specified as mygroup-mypkg or MYGROUP-MYPKG.'
               r,←⊂''
               r,←⊂'It is also possible to list all packages of a particular Registry by specifying no package:'
               r,←⊂'   ]Tatin.ListPackages [tatin-test]'

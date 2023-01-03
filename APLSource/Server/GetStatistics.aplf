@@ -1,4 +1,4 @@
- html←GetStatistics dummy;folder;list;filename;title;i;data
+  html←GetStatistics dummy;folder;list;filename;title;i;data
 ⍝ Returns a page with download links to statistical data
  folder←∊P.LogFolder
  list←⌽F.ListFiles folder,'usage-data-*.zip'
@@ -15,7 +15,7 @@
 
    ⍝ Content for the "Info" Tab
      html,←⊂'<div id="info" class="tabcontent">'
-     html,←⊂H.Para 'Via this page you can download usage data for packages.'
+     html,←⊂H.Para'Via this page you can download usage data for packages.'
      html,←⊂'<ul>'
      html,←⊂H.LI'  For every year there is a file <code>usage-data-&lt;YYYY&gt;.zip</code> (if data is available)'
      html,←⊂H.LI'  For the current year there is a file <code>usage-data-&lt;YYYY&gt;-&lt;MM&gt;.zip</code> which means you get all data from this year except the current month'
@@ -37,7 +37,7 @@
 
     ⍝ Content for the "View" Tab
      html,←⊂'<div id="view" class="tabcontent">'
-     filename←{⍵⊃⍨1+'usage-data-[0-9]{4}-[0-9]{2}'⎕S 2⊣(≢∊P.LogFolder)↓¨⍵}list,⊂''
+     filename←⊃{⍵⊃⍨1+'usage-data-[0-9]{4}-[0-9]{2}'⎕S 2⊣(≢∊P.LogFolder)↓¨⍵}list,⊂''
      :If 0=≢filename  ⍝ No current-year data available (in January!)? Take last year.
          filename←⊃list
      :EndIf

@@ -11,7 +11,7 @@
 
 You don't need to worry about installing Tatin if you use version 19.0 or later of Dyalog: Tatin will be available in `⎕SE` after a standard installation anyway.
 
-However, installing and updating is, as far as the Tatin client is concerned, the same thing, because updating the Tatin client basically means removing the old version and installing a new one.
+However, installing and updating is, as far as the Tatin client is concerned, the same thing, because updating the Tatin client means removing the old version and installing a new one.
 
 ## Requirements
 
@@ -41,7 +41,7 @@ Where to find the `MyUCMDs/` folder depends on your operating system, but this g
 ⎕SE.Tatin.GetMyUCMDsFolder''
 ```
 
-Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac-OS in versions prior to 19.0, so you need to create the folder yourself on non-Windows platform.
+Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.
 
 Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.
 
@@ -51,7 +51,7 @@ I> If you want the Tatin API to be available right from the start: this is discu
 
 Putting Tatin into this folder has the benefit that it will be available in all suitable versions of Dyalog APL installed on your machine. It has the drawback that this is a user-specific folder.
 
-Tatin requires version 18.0 Unicode or better, therefore the `]TATIN` user commands won't be listed in earlier versions of Dyalog or in any Classic version.
+Tatin requires version 18.0 Unicode or better, therefore the `]TATIN` user commands won't be listed in earlier versions of Dyalog or any Classic version.
 
 
 ## Initializing Tatin
@@ -74,7 +74,7 @@ If that's not the case it will...
 
   1. load the code into `⎕SE._Tatin`
   2. create a namespace `⎕SE.Tatin` 
-  3. establish functions in `⎕SE.Tatin` that represent Tatin's API
+  3. establish functions in `⎕SE.Tatin` that represents Tatin's API
 
 
 ## On `setup.dyalog`
@@ -189,4 +189,4 @@ Notes:
 
   The API equivalent `⎕SE.Tatin.Update 0` however was introduced in 0.78.0.
 
-* Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog in order to get the latest version
+* Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version

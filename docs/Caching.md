@@ -20,11 +20,11 @@ And that's exactly what Tatin does by default, with two exceptions:
 
    The goal is to not clutter the cache with short-lived beta versions.
 
-1. In case a server operates an "Any" delete policy then no packages of that registry will be cached.
+1. In case a server operates an "Any" delete policy, no packages of that registry will be cached.
 
    Once a package got deleted it should not be available anymore, neither from the registry itself nor from the cache.
 
-   Note that we advise for operating a "none" or "Betas-only" policy on non-local Tatin servers.
+   Note that we advise operating a "none" or "Betas-only" policy on non-local Tatin servers.
 
 ## Influencing caching
 
@@ -50,7 +50,7 @@ These parameters have global scope: they affect _all_ registries.
 
 #### `caching`
 
-This is a Boolean that defaults to 1. Settings this to 0 means that no caching takes place at all: no reading from the cache, and no writing to the cache.
+This is a Boolean that defaults to 1. Settings this to 0 means no caching takes place: no reading from the cache, and no writing to the cache.
 
 
 #### `path2cache`
@@ -59,12 +59,12 @@ There is no default, meaning that the folder that hosts cached packages depends 
 
 The function `GetPathToPackageCache` returns either the value of `MyUserSettings.path2cache` or the default path if `path2cache` is empty.
 
-The main purpose for this property are test cases which should not temper with the default cache.
+This property's main purpose is test cases that should not temper with the default cache.
 
 
 ### Registries saved in the user settings
 
-Defining a registry in the user settings means that an instance of the `Define Registry` class is created, amended and then added with the `Add` method to `MyUserSettings`.
+Defining a registry in the user settings means that an instance of the `Define Registry` class is created, amended, and then added with the `Add` method to `MyUserSettings`.
 
 One of the parameters of an instance of `DefineRegistry` is `noCaching`. This is a Boolean that defaults to 0, meaning that packages from that registry will be cached unless caching is switched off on a global level via `MyUserSettings.caching`.
 
@@ -74,6 +74,6 @@ This is typically used when you have a local Tatin Server running, and you are f
 
 ## The user command `Cache`
 
-The user command `]Tatin.Cache` helps managing the cache. It can be used to list the contents of the cache as well as clearing the cache.
+The user command `]Tatin.Cache` helps manage the cache. It can be used to list the contents of the cache as well as to clear the cache.
 
 Enter `]Tatin.Cache -??` for details.

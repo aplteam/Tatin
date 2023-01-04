@@ -9,7 +9,7 @@
 
 ## Overview 
 
-Every package has a configuration file: that's one of the things that make it a package. It defines all that is required in order to consume the package, and to announce its existence to the world.
+Every package has a configuration file: that's one of the things that make it a package. It defines all that is required to consume the package, and to announce its existence to the world.
 
 This is an example:
 
@@ -41,11 +41,11 @@ Notes:
 
 ### Introduction
 
-In the workspace a simple namespace can be a used for package configuration. On file it is saved as JSON5. Tatin's API offers a function `Tatin.InitialisePackage` that can be used to create a package config file.
+In the workspace, a simple namespace can be used for package configuration. On file, it is saved as JSON5. Tatin's API offers a function `Tatin.InitialisePackage` that can be used to create a package config file.
 
-It can be fed with an empty vector as right argument: then just defaults are established.
+It can be fed with an empty vector as the right argument: then just defaults are established.
 
-Instead you may create a namespace and populate that namespace with Tatin package configuration variables which are discussed underneath. In this case the values in the namespace overwrite the defaults.
+Instead, you may create a namespace and populate that namespace with Tatin package configuration variables which are discussed underneath. In this case, the values in the namespace overwrite the defaults.
 
 Example:
 
@@ -62,13 +62,13 @@ The user command equivalent is `]tatin.PackageConfig`
 I> Instead of `]tatin.PackageConfig -edit` you may also enter `]tatin.CreatePackage`
 
 
-### User defined variables
+### User-defined variables
 
 You may define your own variables in a package configuration file.
 
 However, since more Tatin-specific variables might be added at a later stage there is a danger of name clashes. This is avoided by a simple rule:
 
-| **The names of user defined variables _must_ start with an underscore** |
+| **The names of user-defined variables _must_ start with an underscore** |
 
 If you specify any variable with a name that Tatin does not know about and that does not start with an underscore an error will be thrown.
 
@@ -85,13 +85,13 @@ There are several scenarios:
 
 1. The package consists of a single function or operator.
 
-1. The package consists of several objects: a mixture of functions, operators, classes and / or namespaces. All objects are public.
+1. The package consists of several objects: a mixture of functions, operators, classes and/or namespaces. All objects are public.
 
 A> ### Single functions 
 A>
 A> You _must not_ specify the name of a function (or an operator) as the API in any of these cases.
 A> 
-A> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent and dyadic functions, this is not possible for niladic functions and operators.
+A> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent, and dyadic functions, this is not possible for niladic functions and operators.
 
 
 ##### A single namespace
@@ -102,7 +102,7 @@ A> This restriction helps to avoid confusion, but there is also a technical issu
 
   `pkgName.foo.Hello`
 
-* If you do specify `api` by assigning an APL name to it (=no extension), then it must be the name of the namespace. In that case the _contents_ of the namespace becomes the API.
+* If you do specify `api` by assigning an APL name to it (=no extension), then it must be the name of the namespace. In that case, the _contents_ of the namespace become the API.
 
   For example, if the package name is `pkgName` and the namespace's name is `foo` and it has a function `Hello`, then you specify `api` as `foo` and call `Hello` with:
 
@@ -113,13 +113,13 @@ A> This restriction helps to avoid confusion, but there is also a technical issu
 
 * If you don't specify `api` then the name of the class is the API. 
 
-  For example, if the package name is `pkgName` and the class' name is `foo` and it has a function `Hello`, then you call `Hello` with:
+  For example, if the package name is `pkgName` and the class name is `foo` and it has a function `Hello`, then you call `Hello` with:
 
   `pkgName.foo.Hello`
 
-* If you do specify `api` then it must be the name of the class. In that case everything in the class with `:Access Public Shared` becomes the API.
+* If you do specify `api` then it must be the name of the class. In that case, everything in the class with `:Access Public Shared` becomes the API.
 
-  For example, if the package name is `pkgName` and the class' name is `foo` and it has a publicly shared function `Hello`, then you call `Hello` with:
+  For example, if the package name is `pkgName` and the class name is `foo` and it has a publicly shared function `Hello`, then you call `Hello` with:
 
   `pkgName.Hello`
 
@@ -128,7 +128,7 @@ A> This restriction helps to avoid confusion, but there is also a technical issu
 
 If the name of the package is `pkgName`, and the name of the function is `MyFns`, then it is called as `pkgName.MyFns`. The function may be niladic, monadic, ambivalent or dyadic.
 
-The same holds true for an operator.
+The same holds for an operator.
 
 In this particular case `api` _must not_ be defined (remain empty).
 
@@ -142,7 +142,7 @@ In this particular case `api` _must not_ be defined (remain empty).
 
 ##### Restricting what's "public"
 
-The user might want to expose only a subset of functions/operators of a namespace (classes have such an interface anyway: `:Public Shared`), and in that case the user must not only specify `api`, but also structure her code accordingly.
+The user might want to expose only a subset of functions/operators of a namespace (classes have such an interface anyway: `:Public Shared`), and in that case, the user must not only specify `api`, but also structure her code accordingly.
 
 If the name of the package is `pkgName`, and it is loaded into `#`, and you want to expose only the functions `Run` and `CreateParmSpace`, then the recommended way of doing this is to create a sub-namespace with the name (say) `MyAPI` and populate it with two functions:
 
@@ -162,7 +162,7 @@ If the name of the package is `pkgName`, and it is loaded into `#`, and you want
 
   (Assumes that `CreateParmSpace` does not accept a left argument)
 
-Finally you need to specify `api: "MyAPI"` in the package config file.
+Finally, you need to specify `api: "MyAPI"` in the package config file.
 
 Calling the function `Run` (after loading the package) would then require:
 
@@ -178,14 +178,14 @@ To the outside world only two functions are visible:
 #.Foo.CreateParmSpace
 ```
 
-Similarly, if `PkgName` consist of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `PkgName.Run` and `PkgName.CreateParmSpace`.
+Similarly, if `PkgName` consists of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `PkgName.Run` and `PkgName.CreateParmSpace`.
 
 
 #### assets
 
-If not empty (meaning the package has no assets) this must point to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
+If not empty (meaning the package has no assets) this must point to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason, the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
 
-There is one exception: when an absolute path is specified but it's partly identical with what will become `HOME` (the folder where the package lives) then Tatin removes that  part silently, making the path effectively relative. 
+There is one exception: when an absolute path is specified but it's partly identical to what will become `HOME` (the folder where the package lives) then Tatin removes that  part silently, making the path effectively relative. 
 
 Notes:
 
@@ -206,7 +206,7 @@ A>    r←GetAssetFolder
 A>    r←##.TatinVars.GetFullPath2AssetsFolder
 A>    ```
 A> 
-A> 2. Use the expression `⊃⊃⎕CLASS ⎕THIS` in order to find out where the class script actually lives.
+A> 2. Use the expression `⊃⊃⎕CLASS ⎕THIS` to find out where the class script lives.
 A> 
 A>    Therefore the following expression returns the path to the assets:
 A> 
@@ -248,7 +248,7 @@ This can be one of:
 
 * A local path pointing to a file (or program) within the package
 
-  In this case it _must_ be a relative path since you cannot know in advance where your package ends up.
+  In this case, it _must_ be a relative path since you cannot know in advance where your package ends up.
 
   It must start with "`./`".
 
@@ -320,7 +320,7 @@ If this is empty the server will, when the package is published, check whether t
 
 #### minimumAplVersion
 
-A character vector that must contain something like "18.0". In fact 18.0 is the minimum version for any Tatin package, for Tatin itself needs at least version 18.0.
+A character vector that must contain something like "18.0". 18.0 is the minimum version for any Tatin package, for Tatin itself needs at least version 18.0.
 
 #### name
 
@@ -365,7 +365,7 @@ If `source` is a folder it might contain any number and mixture of the aforement
 
 ##### Cider and Tatin
 
-If you manage a project with Cider then you might wonder why both have a property `source` in their configuration file. The reason is that the Cider config file describes what's going on in the project while the Tatin package config files describes what is going on in the package that will eventually be consumed by a user.
+If you manage a project with Cider then you might wonder why both have a property `source` in their configuration file. The reason is that the Cider config file describes what's going on in the project while the Tatin package config files describe what is going on in the package that will eventually be consumed by a user.
 
 Picture the following project "Foo" which consists of a single class `Foo`:
 
@@ -403,14 +403,14 @@ A slightly more complex example with a namespace that hosts several functions:
      README.md
 ```
 
-In this case the `source` in the package could become `APLSource/Goo` while `Admin` and `TestCases` are most likely not copied over into the package.
+In this case, the `source` in the package could become `APLSource/Goo` while `Admin` and `TestCases` are most likely not copied over into the package.
 
-Of course one could rearrange the code and copy `APLSource/Goo/*` from the project into `Goo/` in the package. That would get rid of one level that is not required in the package, and `source` in the package config file could be just `Goo`.
+Of course, one could rearrange the code and copy `APLSource/Goo/*` from the project into `Goo/` in the package. That would get rid of one level that is not required in the package, and `source` in the package config file could be just `Goo`.
 
 
 #### tags
 
-A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tags (key words). These can be helpful to filter packages when searching for a solution to a particular problem.
+A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tags (keywords). These can be helpful to filter packages when searching for a solution to a particular problem.
 
 `tags` must not be empty if you wish to publish a package to a Tatin server because such a package would not be accepted by the server.
 
@@ -418,13 +418,13 @@ Tags should only be related to the problems one can solve with a particular pack
 
 There is also no point in adding tags like "dyalog" or "apl" to a package: Tatin is a Dyalog APL package manager...
 
-Note that people in charge for the proncipal Tatin server will have an eye on the tags, and might silently correct them in order to keep them consistent and meaningful.
+Note that people in charge of the principal Tatin server will have an eye on the tags, and might silently correct them to keep them consistent and meaningful.
 
 #### version
 
 The version[^version] part of the package ID[^id]
 
-Examples for valid version numbers are:
+Examples of valid version numbers are:
 
 ```
 1.2.3
@@ -486,4 +486,4 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
-[^TatinVars]: The Tatin package variables are discussed in detail the document `FirstStepsWithTatin.html`
+[^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`

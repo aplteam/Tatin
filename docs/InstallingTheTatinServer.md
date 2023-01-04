@@ -23,17 +23,17 @@ After downloading it from <https://github.com/aplteam/Tatin/releases> you need t
 
 ## Configuration: the INI File
 
-First you need to amend the file `server.ini`.
+First, you need to amend the file `server.ini`.
 
 A> ### Plodder
 A>
-A> Tatin uses Plodder (<https://github.com/aplteam/Plodder>) as HTTP server. 
+A> Tatin uses Plodder (<https://github.com/aplteam/Plodder>) as an HTTP server. 
 A>
 A> The INI file is originally a Plodder INI file with some additional settings used on the application level.
 
-Note that this is an old-school INI file. Well, almost: it comes with a number of features that are unusual for INI files. We just mention the most important ones here; for details see <https://github.com/aplteam/IniFiles>.
+Note that this is an old-school INI file. Well, almost: it comes with several features that are unusual for INI files. We just mention the most important ones here; for details see <https://github.com/aplteam/IniFiles>.
 
-* There are data types: text needs to go between 'quotes', everything else is considered a number
+* There are data types: text needs to go between 'quotes', and everything else is considered a number
 * You may define local variables
 
 A> ### What is a local variable?
@@ -45,7 +45,7 @@ A>
 
 ### `<INIFILE>` {#INIFILE}
 
-When the Tatin Server loads the INI file it will replace the string `<INIFILE>` by the fully qualified directory the INI file was loaded from.
+When the Tatin Server loads the INI file it will replace the string `<INIFILE>` with the fully qualified directory the INI file was loaded from.
 
 ### Settings to pay attention to
 
@@ -54,7 +54,7 @@ The INI file is well documented, so we won't discuss the meaning of the differen
 
 #### [CONFIG]AppName
 
-This defines the name used by Tatin for logging to the Windows Event Log. 
+This defines the name used by Tatin for logging into the Windows Event Log. 
 
 The parameter has no meaning on non-Windows platforms, and is ignored in case `[LOGGING]WindowsEventLog` is 0 rather than 1.
 
@@ -65,7 +65,7 @@ This is the path where the Registry lives that is managed by the Tatin Server.
 
 #### [CONFIG]Base
 
-Replace this by your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
+Replace this with your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your purposes, for example for checking it out.
 
 Never add a port number to `Base`; see `[CONFIG]BaseTagPort` for this.
 
@@ -76,7 +76,7 @@ Leave this alone in case the Tatin Server listens to either port 80 (http://) or
 
 In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set `BaseTagPort` to 9999. This makes Tatin inject that port number into the HTML "base" tag, so that for example links in the Tatin documentation would continue to work.
 
-However, when your Tatin Server runs "behind", say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
+However, when your Tatin Server runs "behind", say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case, you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
 
 See also `[CONFIG]Base`.
 
@@ -121,7 +121,7 @@ A> ```
 
 #### The section [CONFIG]Secure
 
-Flag that defines whether certificates (https) are used nor not (http).
+Flag that defines whether certificates (https) are used or not (http).
 
 
 #### The section [CERTIFICATES]{#CERTIFICATES}
@@ -134,9 +134,9 @@ For more details on certificates see "On Certificates"
 
 #### The section [EMAIL]{#EMAIL}
 
-A Tatin server can send emails, broadcasting any crashes. For that you must specify a couple of things in this section.
+A Tatin server can send emails, broadcasting any crashes. For that, you must specify a couple of things in this section.
 
-The INI file is well documented, so you should have no trouble to make the necessary adjustments.
+The INI file is well documented, so you should have no trouble making the necessary adjustments.
  
 
 ## On Logging
@@ -151,11 +151,11 @@ There are two different levels available for logging:
 
   Note that IP addresses are _not_ logged at this level.
 
-* Low-level logging is controlled by the INI file's `LogHTTP`, `LogConga` and `LogRumba` properties. These can be useful for debugging. They log IP addresses which might be illegal in certain countries.
+* Low-level logging is controlled by the INI file's `LogHTTP`, `LogConga`, and `LogRumba` properties. These can be useful for debugging. They log IP addresses which might be illegal in certain countries.
 
 ### The Windows Event Log
 
-Under Windows you may let Tatin write to the Event Log by setting `WindowsEventLog` to 1.
+Under Windows, you may let Tatin write to the Event Log by setting `WindowsEventLog` to 1.
 
 This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.
 
@@ -165,7 +165,7 @@ If you do run the Tatin Server as a Windows Service then set this to 1. Start, P
 
 Note that in case you want your Tatin server to serve requests from the Internet --- as opposed to an Intranet --- it is strongly recommended to hide the Tatin Server behind an industrial-strength HTTP server like Apache.
 
-Such a server is able to deal with attacks and has also all sorts of security measures built into it, so it's much safer to run Tatin behind it.
+Such a server can deal with attacks and has also all sorts of security measures built into it, so it's much safer to run Tatin behind it.
 
 There is a separate document available that discusses how to do this: [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html").
 
@@ -175,7 +175,7 @@ In case you hide the Tatin Server behind, say, an Apache server on the same mach
 
 This section can be useful in case you want to inject a message into every HTML page delivered by Tatin.
 
-A typical application is the announcement of down time due to maintenance.
+A typical application is the announcement of downtime due to maintenance.
 
 In case `Text` is not empty it is injected as `<div><p>{text}</p>?</div>`. If `CSS` is not empty it is injected into the `<div>` as `style="..."`.
 
@@ -196,7 +196,7 @@ This section tells Plodder where to find the application-specific logic (Tatin).
 
 After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace. `#.Tatin.Server.Run 1` is executed via `⎕LX`, and your server is up and running.
 
-Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but would not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.
+Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but would not prevent the server from running. However, some errors might bring the server down like an aplcore or a WS FULL.
 
 In such an event you are most likely interested in the server being restarted automatically.
 
@@ -208,16 +208,16 @@ Under Windows you have two options:
 * Run the Tatin Server as a Windows Service
 * Run it as a Docker container
 
-Both options allow to run the Server so that it is restarted automatically in case of a failure or a reboot.
+Both options allow running the Server so that it is restarted automatically in case of a failure or a reboot.
 
-Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it actually runs a (very basic) version of Linux in a virtual machine.
+Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it runs a (very basic) version of Linux in a virtual machine.
 
-If you want run the Tatin server as a Windows Service you can put the workspace `InstallAsWindowsService.dws` to good use: it will install Tatin as a Windows service. Note that this requires admin rights.
+If you want to run the Tatin server as a Windows Service you can put the workspace `InstallAsWindowsService.dws` to good use: it will install Tatin as a Windows service. Note that this requires admin rights.
 
 
 ### Linux
 
-Under Linux you are advised to run the Tatin Server in a Docker image. 
+Under Linux, you are advised to run the Tatin Server in a Docker image. 
 
 
 ### Required amendments 
@@ -226,9 +226,9 @@ Under Linux you are advised to run the Tatin Server in a Docker image.
 
 1. Linux Version
 
-   Specify both the name of the desired distribution and the version number in the `FROM` clause at the top of the file. In the template this is "Ubuntu" and "22.04".
+   Specify both the name of the desired distribution and the version number in the `FROM` clause at the top of the file. In the template, this is "Ubuntu" and "22.04".
 
-2. It's is a Docker convention to specify the Docker username and email address of a maintainer in the `MAINTAINER` clause.
+2. It is a Docker convention to specify the Docker username and email address of a maintainer in the `MAINTAINER` clause.
 
 3. Dyalog APL
 
@@ -236,7 +236,7 @@ Under Linux you are advised to run the Tatin Server in a Docker image.
 
 4. Dockerfile
 
-   This file defines what docker should put into the container. In particular it must point to the desired version of Dyalog APL, so check the variables `DYALOG_RELEASE`, `DYALOG_VERSION` and `DYALOG_DEBFILE`.
+   This file defines what docker should put into the container. In particular, it must point to the desired version of Dyalog APL, so check the variables `DYALOG_RELEASE`, `DYALOG_VERSION` and `DYALOG_DEBFILE`.
 
 5. Do **not** change the `WORKDIR`!
 
@@ -244,25 +244,25 @@ Under Linux you are advised to run the Tatin Server in a Docker image.
 
 #### The file `entrypoint`
 
-In this file a couple of environment variables are defined that might not be set to your taste: `TRACE_ON_ERROR`, `SINGLETRACE` and `CLASSICMODE`. 
+In this file, a couple of environment variables are defined that might not be set to your taste: `TRACE_ON_ERROR`, `SINGLETRACE` and `CLASSICMODE`. 
 
 #### The file `CreateTatinDockerContainer.sh`
 
 1. You must change the `source` parameter so that it points to the folder that hosts the Tatin server data.
 
-2. You might need to change the port 443, defined with the `-p` flag.
+2. You might need to change port 443, defined with the `-p` flag.
 
-   This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet, because in that scenario Tatin should run behind a web server like Apache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.
+   This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet because in that scenario Tatin should run behind a web server like Apache. In that case, Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.
 
 3. The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note that the INI file rules whether the interpreter allows a Ride or not)
 
-### Docker work flow
+### Docker workflow
 
 Execute these steps:
 
 1. Call  `./BuildImage.sh` for creating the image
 2. Call  `./CreateTatinDockerContainer.sh` for creating the container from that image
-3. Call  `start-tatin.sh` to actually start the container; this script ensures that the container is restarted after a crash or auto-started after a reboot
+3. Call  `start-tatin.sh` to start the container; this script ensures that the container is restarted after a crash or auto-started after a reboot
 
 ## Testing and Debugging
 
@@ -270,7 +270,7 @@ For testing and debugging you might want to change these settings:
 
 * `[CONFIG]DisplayRequests`
 * `LogHTTPToSession`
-* `TestFlag`; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute "list-commands". Naturally this makes sense only under program control, not from a browser.
+* `TestFlag`; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute "list-commands". Naturally, this makes sense only under program control, not from a browser.
 * `ReloadWS`
 * The settings in the `[LOGFILE]` section
 
@@ -289,7 +289,7 @@ For details see:
 
 ## Updating the Server
 
-Before updating the server **you must read the release notes!**. The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring a number of actions while the server is down for maintenance.
+Before updating the server **you must read the release notes!**. The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring several actions while the server is down for maintenance.
 
 ### The Workspace
 
@@ -297,21 +297,21 @@ A running server frequently checks whether the workspace on disk was changed sin
 
 I> This mechanism is active by default but might be switched off with `[CONFIG]ReloadWS` in the INI file
 
-Naturally the server will produce an error message for a short period of time during the reload; expect 20 seconds or more, depending on the number of packages managed by the server.
+Naturally, the server will produce an error message for a short period during the reload; expect 20 seconds or more, depending on the number of packages managed by the server.
 
 
 ## The INI file
 
 Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. _Do not replace the INI file!_
 
-The server checks the INI file for having been changed, and if that is the case re-initializse the INI file. However, whether that works or not depends on the kind of change: quite a number of settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.
+The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: quite several settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.
 
 ## Assets
 
-Which kind of actions needs to be taken, if any, is revealed by the release notes. Typically the sub folder `docs/` needs to be replace: this folder carries the documentation.
+What kind of actions needs to be taken, if any, is revealed by the release notes. Typically the subfolder `docs/` needs to be replaced: this folder carries the documentation.
 
 ## The folder Maintenance/
 
-First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to loose this.
+First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.

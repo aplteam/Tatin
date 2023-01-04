@@ -13,11 +13,11 @@ Tatin is a package manager for Dyalog APL that helps you use and manage packages
 
 ## What is a package?
 
-A package should serve a particular task, for example convert markdown files into HTML. A package may be independent, but it may also depend on other packages. Tatin manages dependencies behind the scene.
+A package should serve a particular task, for example,convertingt markdown files into HTML. A package may be independent, but it may also depend on other packages. Tatin manages dependencies behind the scene.
 
-A package may consist of as little as a single source file and as much as a nested folder structure with many source files. Any of those files may contain a single function, a single operator, a single class, a single interface or a single namespace. 
+A package may consist of as little as a single source file and as much as a nested folder structure with many source files. Any of those files may contain a single function, a single operator, a single class, a single interface, or a single namespace. 
 
-W> Dyalog supports several APL objects in a single text files. Tatin does _not_ support this.
+W> Dyalog supports several APL objects in a single text file. Tatin does _not_ support this.
 
 A package may also come with assets.
 
@@ -30,7 +30,7 @@ A> A package may come with all sorts of assets (CSS files, BAT files, icons, ima
 
 These days packages are available in probably 99% of all programming languages. It allows the consumption of code that others have written to solve a particular task without any problem; even name clashes can easily be avoided, and you don't have to worry about dependencies.
 
-Packages can be updated to a later (and therefore hopefully better) version in an easy and straightforward manner.
+Packages can be updated to a later (and therefore hopefully better) version easily and straightforwardly.
 
 
 ## Requirements
@@ -39,13 +39,13 @@ Packages can be updated to a later (and therefore hopefully better) version in a
 
 * It needs Unicode --- Classic is not supported.
 
-* The Tatin client runs on Windows, Linux and Mac-OS.
+* The Tatin client runs on Windows, Linux and Mac OS.
 
 * The Tatin server runs on Windows (as a Service or a Docker container) and on Linux (as a Docker image). 
 
 * Tatin is not compatible with SALT, although the extension `.dyalog` is supported.
 
-  In particular Tatin requires source files to carry exactly one APL object, be that a function, an operator, an array, a class script, an interface script or a namespace script.
+  In particular Tatin requires source files to carry exactly one APL object, be that a function, an operator, an array, a class script, an interface script, or a namespace script.
 
 ## Tatin's components
 
@@ -60,9 +60,9 @@ Tatin consists of:
 
 * A Tatin Server
 
-  A Tatin server hosts packages, and allows you to fetch packages as well as any dependencies, and to publish packages.
+  A Tatin server hosts packages and allows you to fetch packages as well as any dependencies, and to publish packages.
 
-* A set of rules that define how a package is structured, and which meta data is required or may optionally be added.
+* A set of rules that define how a package is structured, and which metadata is required or may optionally be added.
 
 * A set of HTML documents serving as documentation for different aspects of Tatin.
 
@@ -79,13 +79,13 @@ Note that although you can access a Tatin server with a browser, its real goal i
  
 You may develop Tatin packages using whatever tools you're familiar with.  These could be GitHub, GitLab or any of their competitors, or local files on your PC.
 
-When you're ready to create a release of your package, you'll assign a group and specify a name and a version number, define dependencies (if any), and you may provide additional meta information like tags, a description and more. You may even add user-defined meta data.
+When you're ready to create a release of your package, you'll assign a group and specify a name and a version number, define dependencies (if any), and you may provide additional meta information like tags, a description, and more. You may even add user-defined metadata.
 
-Finally you publish your package to a Tatin server.
+Finally, you publish your package to a Tatin server.
 
-Of course you should publish your first package on the test server https://test.tatin.dev rather than on https://tatin.dev in order to gain experience without shooting yourself into the foot.
+Of course, you should publish your first package on the test server https://test.tatin.dev rather than on https://tatin.dev to gain experience without shooting yourself in the foot.
 
-That is particular important on https://tatin.dev because any package that was published cannot be changed and/or deleted; you can only publish another version.
+That is particularly important on https://tatin.dev because any package that was published cannot be changed and/or deleted; you can only publish another version.
 
 ## Now what?!
 

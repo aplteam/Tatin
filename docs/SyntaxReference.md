@@ -472,17 +472,30 @@ Lists all versions of a given package.
 
 * A package name
 * A group name and a package name
-* A URL pointing to a Registry together with a package name and possible also a group name
-* An alias pointing to a Registry together with a package name and possible also a group name
-* A path to a Registry and "group" and "name" of a package
+* A URL pointing to a Registry together with a package name
+* An alias pointing to a Registry together with a package name
+* A (local) path to a Registry together with a package name
 
-In the first and second case all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.
+A package name may be either just the name or group and name. Additionally you may either specify a major version number, or a major and a minor version number.
 
-If a URL or an alias was specified the given Registry is scanned. A matrix with one column with full package IDs is returned.
+Specifying a patch number makes no sense. if it is specified anyway it is ignored.
+
+Therefore the follwing arguments are all valid:
+
+1. `example-versions`
+2. `example-versions-1`
+3. `example-versions-1.0`
+4. `[tatin-test]versions`
+5. `[tatin-test]example-versions`
+6. `[tatin-test]example-versions-1`
+7. `[tatin-test]example-versions-1.0`
+8. `[tatin-test]example-versions-1.0.1 ⍝ Same as 4.`
+
+In the first three cases all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.
+
+If a URL or an alias was specified the given Registry is questioned. A matrix with one column with full package IDs is returned.
 
 You may omit the group name; that does not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.
-
-The package ID may optionally include a major version number or a major and a minor number, but not a patch number. If a patch number is provided anyway it is ignored.
 
 By default the publishing date is not included, but you may change this by passing a 1 as `⍺`. In that case an additional column is added to the result.
 

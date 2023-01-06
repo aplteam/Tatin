@@ -1,0 +1,15 @@
+ r←Test_Pack_051(stopFlag batchFlag);⎕TRAP;path;zipFileName;list
+⍝ Pack a package that is not a Cider project and has dependencies in the default folder
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←∆GetProjectPath,'/TestData/Build/Default/'
+ zipFileName←TC.Pack path
+ list←TC.ZipArchive.ListZipContents zipFileName
+ →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕NDELETE zipFileName
+⍝Don

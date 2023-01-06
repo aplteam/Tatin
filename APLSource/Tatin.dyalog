@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.55.0 - 2023-01-03
+⍝ * 0.55.0 - 2023-01-05
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -68,7 +68,7 @@
           c←⎕NS ⍬
           c.Name←'ListVersions'
           c.Desc←'List all versions of the specified package or all versions of a particular Registry'
-          c.Parse←'1s -date'
+          c.Parse←'1 -date'
           r,←c
      
           c←⎕NS ⍬
@@ -110,13 +110,13 @@
           c←⎕NS ⍬
           c.Name←'Pack'
           c.Desc←'Pack (zips) all required files found in ⍵[1] into the folder ⍵[2]'
-          c.Parse←'2s'
+          c.Parse←'2s -dependencies='
           r,←c
      
           c←⎕NS ⍬
           c.Name←'PublishPackage'
           c.Desc←'Publish a package (package folder or ZIP file) to a particular Registry'
-          c.Parse←'2 -quiet'
+          c.Parse←'2 -dependencies'
           r,←c
      
           c←⎕NS ⍬
@@ -679,7 +679,7 @@
       :EndTrap
     ∇
 
-    ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath;prompt;msg
+    ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath;prompt;msg;dependencies
       (sourcePath targetPath)←Arg.(_1 _2)
       prompt←0
       :If 0≡sourcePath
@@ -694,6 +694,7 @@
           targetPath←sourcePath
           prompt∨←1
       :EndIf
+      dependencies←''Arg.Switch'dependencies'
       (sourcePath targetPath)←AddSlash¨sourcePath targetPath
       'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
       filename←sourcePath,TC.CFG_Name
@@ -718,10 +719,14 @@
           TC.F.MkDir targetPath
       :EndIf
       'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
-      zipFilename←TC.Pack sourcePath targetPath
+      :If 0=≢dependencies
+          zipFilename←TC.Pack sourcePath targetPath
+      :Else
+          zipFilename←dependencies TC.Pack sourcePath targetPath
+      :EndIf
     ∇
 
-    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2
+    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies
       r←''
       (source url)←Arg.(_1 _2)
       :If (,'?')≡,url
@@ -767,9 +772,14 @@
               :Return
           :EndIf
       :EndIf
+      dependencies←''Arg.Switch'dependencies'
      ∆Again:
       :Trap ErrNo
-          (rc msg zipFilename)←TC.PublishPackage source url
+          :If 0<≢dependencies
+              (rc msg zipFilename)←dependencies TC.PublishPackage source url
+          :Else
+              (rc msg zipFilename)←TC.PublishPackage source url
+          :EndIf
           :If 200≡rc
               r←'Package published on ',url_
           :Else
@@ -901,16 +911,15 @@
       dateFlag←Arg.Switch'date'
       arg←Arg._1
       :Trap ErrNo
-          :If 0≡arg
-              arg←'[tatin]'  ⍝ Default is the principal Registry
-          :ElseIf (⊂,arg)∊,¨'?' '[?' '[?]'
+          :If '[?]'{⍺≡(≢⍺)↑⍵}arg
+              'No package specified'Assert 0<≢{⍵↓⍨⌈/⍵⍳'?]'}arg
               buff←{⍵[;1 2]}TC.ListRegistries 0
               ind←'Please select a Registry:'TC.C.Select↓⎕FMT buff
               :If 0=≢ind
                   r←'Cancelled by user'
                   :Return
               :Else
-                  arg←1⊃buff[ind;]
+                  arg←(1⊃buff[ind;]),{⍵↓⍨⌈/⍵⍳'?]'}arg
               :EndIf
           :EndIf
           :If dateFlag
@@ -920,7 +929,9 @@
               r←(1↓⊃,/CR,¨↓('All versions of <',arg,'> :'),[0.5]'-'),r
           :Else
               buff←TC.ListVersions arg
-              :If TC.Reg.IsHTTP TC.ReplaceRegistryAlias arg
+              :If 0=≢buff
+                  r←'Not found: <',arg,'>'
+              :ElseIf TC.Reg.IsHTTP TC.ReplaceRegistryAlias arg
                   caption←1 2⍴('*** All versions of package <',arg,'> :')' '
                   caption⍪←('-'⍴⍨≢1⊃caption[1;])''
                   buff[;1]←' ',¨buff[;1]
@@ -1413,13 +1424,13 @@
               r,←'' '  ]Tatin.PackageDependencies <package-path> [-edit] [-delete] [-quiet]'
           :Case ⎕C'Pack'
               r,←⊂'Create a ZIP file that is a package from the directory.'
-              r,←'' '  ]Tatin.Pack [<package-folder>] [<target-folder>]'
+              r,←'' '  ]Tatin.Pack [<package-folder>] [<target-folder>] -dependencies='
           :Case ⎕C'PublishPackage'
               r,←⊂'Publish a package to a particular Tatin Registry.'
-              r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> <Registry-URL|[Registry-Alias]> [-quiet]'
+              r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> <Registry-URL|[Registry-Alias]> -dependencies='
           :Case ⎕C'ListVersions'
-              r,←⊂'List all versions of the given package or all versions of all packages of a given Registry'
-              r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name> [-date]'
+              r,←⊂'List all versions of the given package of a given Registry or all Registries with a priority>0'
+              r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name>-[<version>] [-date]'
           :Case ⎕C'Version'
               r,←⊂'Print name, version number and version date of Tatin to the session.'
               r,←'' '  ]Tatin.Version [*] [-check] [-all]'
@@ -1688,6 +1699,10 @@
               r,←⊂''
               r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
               r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
+              r,←⊂''
+              r,←⊂'-dependencies=  Use this to specify a subfolder of the project holding package dependencies.'
+              r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'
+              r,←⊂'                the document "Publishing Packages".'
           :Case ⎕C'PublishPackage'
               r,←⊂'Publish a package to a particular Tatin Registry.'
               r,←⊂'Such a package can be one of:'
@@ -1705,36 +1720,34 @@
               r,←⊂'Tatin checks the "delete" policy of the Registry. If the package cannot be deleted then the user'
               r,←⊂'must confirm that she really wants to publish to that particular Registry.'
               r,←⊂''
-              r,←⊂'-quiet: useful for test cases; it prevents Tatin from interrogating the user'
+              r,←⊂'-dependencies=: Use this to specify a subfolder of the project that hosts the packages the package'
+              r,←⊂'                about to be published depends on. Usually there is no need to specify this; refer'
+              r,←⊂'                to the documentation ("Publishing Packages") for details.'
           :Case ⎕C'ListVersions'
-              r,←⊂'List all versions of the given package, if any.'
+              r,←⊂'List all versions of the given package.'
               r,←⊂''
               r,←⊂' You may specify a package in several ways:'
               r,←⊂' * ]Tatin.ListVersions [Registry-URL|Registry-alias]{group}-{package}'
               r,←⊂' * ]Tatin.ListVersions [Registry-URL|Registry-alias]{package}'
               r,←⊂' * ]Tatin.ListVersions {package}'
               r,←⊂' * ]Tatin.ListVersions {package}-{major}'
-              r,←⊂' * ]Tatin.ListVersions {package}-{major}-{minor}'
+              r,←⊂' * ]Tatin.ListVersions {package}-{major}.{minor}'
               r,←⊂'In all these cases a list of packages is returned, possibly empty.'
               r,←⊂''
-              r,←⊂'Note that case does not matter, meaning that package MyGroup-MyPkg can also'
-              r,←⊂'be specified as mygroup-mypkg or MYGROUP-MYPKG.'
+              r,←⊂'Note that case does not matter, meaning that a package MyGroup-MyPkg can be specified'
+              r,←⊂'as mygroup-mypkg or MYGROUP-MYPKG, it does not matter.'
               r,←⊂''
-              r,←⊂'It is also possible to list all packages of a particular Registry by specifying no package:'
-              r,←⊂'   ]Tatin.ListPackages [tatin-test]'
-              r,←⊂'You may not specify an argument at all: then it falls back to the principal Tatin Registry.'
-              r,←⊂'Finally you may specify a ? (or [?]): then you will be prompted with a list with all known'
-              r,←⊂'Registries.'
+              r,←⊂'You may not specify a Registry at all; in that case all Registries with a priority greater'
+              r,←⊂'than zero are scanned.'
+              r,←⊂'Finally you may specify a ? (or [?]): then you will be prompted with a list of all known'
+              r,←⊂'Registries for selecting one.'
               r,←⊂''
-              r,←⊂'If just a package is specified a matrix with two columns is returned:'
+              r,←⊂'If just a package is specified, a matrix with two columns is returned:'
               r,←⊂' [;1] The Registry'
               r,←⊂' [;2] Full package ID'
               r,←⊂''
               r,←⊂'Lacking a group does not make a difference if the package exists only in one group anyway.'
               r,←⊂'If it exists in more than one group then all of them are listed.'
-              r,←⊂''
-              r,←⊂'Note that omitting the Registry comes with a performance penalty since all Registries with a'
-              r,←⊂'priority greater than zero will be questioned.'
               r,←⊂''
               r,←⊂'If version precedence cannot be established from the version numbers alone (often a problem'
               r,←⊂'with beta versions) then the publishing date is taken into account.'

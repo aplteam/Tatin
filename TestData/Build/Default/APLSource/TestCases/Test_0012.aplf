@@ -1,0 +1,33 @@
+ r←Test_0012(stopFlag batchFlag);zipFilename;list;filename;myZipper;rc;more;found;⎕TRAP;inputPath;tno1;tno2
+⍝ Provides a filename twice in two different sub folders.
+⍝ This fails although according to the zip authors this is not a bug but by design.
+⍝ Note however that it works fine with relative path names but not absolute ones.
+⍝ The workaround is to tell the user about it if it occurs but only then:
+⍝ If it starts to work one day we can simply carry on.
+ r←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ zipFilename←∆OutputPath,'zip_011'
+ inputPath←FilesAndDirs.GetTempPath,'SevenZip_Tests\'
+ 'CREATE!'FilesAndDirs.CheckPath inputPath
+ 'CREATE!'FilesAndDirs.CheckPath inputPath,'folder1'
+ 'CREATE!'FilesAndDirs.CheckPath inputPath,'folder2'
+ tno1←(inputPath,'folder1\file.txt')⎕NCREATE 0
+ tno2←(inputPath,'folder2\file.txt')⎕NCREATE 0
+ ⎕NUNTIE tno1 tno2
+ list←(inputPath,'folder1\file.txt')(inputPath,'folder2\file.txt')
+
+⍝ Delete any left overs
+ FilesAndDirs.DeleteFile zipFilename
+
+⍝ The test
+ myZipper←⎕NEW ##.SevenZip(,⊂zipFilename)
+ rc←myZipper.Add list
+ →T.GoToTidyUp 0=⊃rc
+ →T.GoToTidyUp~∨/'Use relative path names rather than absolute ones to avoid the problem'⍷⊃,/2⊃rc
+ r←T._OK
+
+∆TidyUp:
+ ⎕EX'myZipper'
+ FilesAndDirs.DeleteFile zipFilename,'.zip'
+ ⎕NDELETE¨(inputPath,'folder1\file.txt')(inputPath,'folder2\file.txt')

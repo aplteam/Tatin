@@ -1,41 +1,48 @@
- response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;rc;list;flag
+ response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;rc;list;list_lc;packageID2
 ⍝ `packageID` is a valid package ID
 ⍝ This function saves the data in the appropriate folder which of course must not exist.
  packageID←request.RequestTarget
  target←G.RegistryPath,'/',packageID
  list←1 Reg.Index.GetRegistryIndex G.RegistryPath
- flag←0
  :If (⊂packageID)∊list
- :OrIf flag←(⊂⎕C Reg.RemoveVersionNumber packageID)∊⎕C Reg.RemoveVersionNumber¨list
      response←request Respond 400
-     response.Content←'The package has already been published',flag/' (check case!)'
- :Else
-     tempFolder←F.GetTempSubDir''
-     filename←tempFolder,'/',packageID,'.zip'
-     (Reg.Base64 request.Content)Reg.WriteNativeFile filename
-     :Trap 90
-         (statusCode msg)←1 Reg.PublishPackage filename G.RegistryPath
-     :Else
-         qdmx←⎕DMX
-         exc←⎕EXCEPTION
-         :If ∨/'Central Directory corrupt.'⍷⍕exc
-             response←request RespondWithHTML 400 'Corrupted zip file'
-         :Else
-             response←request RespondWithHTML 400 'Could not unzip'
-         :EndIf
-         :Return
-     :EndTrap
-     response←request Respond statusCode
-     response.Content←msg
-     :If response.StatusCode=200
-         Reg.Index.Compile G.RegistryPath
-         ⎕DL 0.5
-         (rc msg)←Emails.SendMail_PublishedPkg G.INI packageID G.RegistryPath
-         :If rc≠0
-             P.AppLog⊆'*** Error'
-             P.AppLog⊆'Sending email to gatekeeper with notification of a published package failed: ',(⍕rc),'; ',⍕∊rc
-         :EndIf
-     :EndIf
-     F.RmDir tempFolder
+     response.Content←'The package has already been published'
+     :Return
  :EndIf
+ list←Reg.RemoveVersionNumber¨list
+ :If ~(⊂Reg.RemoveVersionNumber packageID)∊list
+     list_lc←⎕C list
+     packageID2←⎕C Reg.RemoveVersionNumber packageID
+ :AndIf (⊂packageID2)∊list_lc
+     response←request Respond 400
+     response.Content←'The package has already been published with a different spelling (case)'
+     :Return
+ :EndIf
+ tempFolder←F.GetTempSubDir''
+ filename←tempFolder,'/',packageID,'.zip'
+ (Reg.Base64 request.Content)Reg.WriteNativeFile filename
+ :Trap 90
+     (statusCode msg)←1 Reg.PublishPackage filename G.RegistryPath
+ :Else
+     qdmx←⎕DMX
+     exc←⎕EXCEPTION
+     :If ∨/'Central Directory corrupt.'⍷⍕exc
+         response←request RespondWithHTML 400 'Corrupted zip file'
+     :Else
+         response←request RespondWithHTML 400 'Could not unzip'
+     :EndIf
+     :Return
+ :EndTrap
+ response←request Respond statusCode
+ response.Content←msg
+ :If response.StatusCode=200
+     Reg.Index.Compile G.RegistryPath
+     ⎕DL 0.5
+     (rc msg)←Emails.SendMail_PublishedPkg G.INI packageID G.RegistryPath
+     :If rc≠0
+         P.AppLog⊆'*** Error'
+         P.AppLog⊆'Sending email to gatekeeper with notification of a published package failed: ',(⍕rc),'; ',⍕∊rc
+     :EndIf
+ :EndIf
+ F.RmDir tempFolder
 ⍝Done

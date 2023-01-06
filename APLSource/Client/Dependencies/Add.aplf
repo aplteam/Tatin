@@ -3,7 +3,7 @@
  ⍝ ⍵ might be simple (=single dependency) or nested.\\
  ⍝ Comments start with a ";".\\
  ⍝ If there is no such file yet it is created.\\
- ⍝ Note that although ⍵ might contain an  (like `[tatin]`), this will be replaced by what the alias stands for.
+ ⍝ Note that although ⍵ might contain an alias (like `[tatin]`), this will be replaced by what the alias stands for.
  r←0
  deps←⊆deps
  :If ∨/b←'@'∊¨deps
@@ -15,6 +15,7 @@
  'Invalid dependency'##.Assert{∧/'@['∊⍵:</⍵⍳'[@' ⋄ ⍵}¨deps
  deps←##.ReplaceRegistryAlias¨deps
  filename←path,'/',DEP_NAME
+ 3 ⎕MKDIR path
  {}Create⍣(0=##.F.Exists filename)⊣path
  b←##.Reg.IsValidPackageID_Complete¨{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}¨2⊃∘##.SplitAtAlias¨deps
  {}b{('Not valid package IDs: ',⊃,/{⍺,',',⍵}/(~⍺)/deps)##.Assert 0}⍣(0∊b)⊣0

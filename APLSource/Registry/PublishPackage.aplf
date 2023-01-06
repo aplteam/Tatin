@@ -38,7 +38,7 @@
  :If 0=≢cfg.minimumAplVersion
      cfg.minimumAplVersion←'18.0' ⍝ This is the minimum by definition: Tatin does not run on earlier versions
  :EndIf
-  :If 0=≢cfg.maintainer
+ :If 0=≢cfg.maintainer
      cfg.maintainer←'email'GetGroupData registryPath cfg.group
  :EndIf
  (JSON cfg)F.NPUT(tempDir,'/',CFG_Name)1
@@ -46,7 +46,8 @@
  packageID←⊃SplitVersionFromBuild packageID
  registryPath←AddSlash registryPath
  packageDir←registryPath,packageID
- list←RemoveVersionNumber¨GetAllPackages registryPath
+ list←GetAllPackages registryPath
+ list←RemoveVersionNumber¨list
  :If ~(⊂RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊list
  :AndIf (⊂⎕C RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊⎕C list
      errMsg←'There is already such a package but with a different spelling (case)'

@@ -1,0 +1,39 @@
+ r←Test_UserCommands_002(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg
+⍝ Exercise ]Tatin.PublishPackages with an already published package and different spelling (case)
+⍝ We publish under group "SomeGroup" twice but with different spelling (case)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir''
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name           ⍝ Precaution
+
+ packageFolder←F.ExpandPath'./TestData/Source/OS'
+ tempDir ⎕NCOPY packageFolder,'/OS.aplc'
+ tempDir ⎕NCOPY packageFolder,'/apl-package.json'
+ json←⊃F.NGET tempDir,'/apl-package.json'
+ cfg←⎕JSON⍠('Dialect' 'JSON5')⊢json
+ cfg.group←'SomeGroup'
+ cfg.version←'1.0.0'
+ json←TC.Reg.JSON cfg
+ (⊂json)F.NPUT(tempDir,'/apl-package.json')1
+
+ (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'Package published on'{⍺≢(≢⍺)↑⍵}res
+
+ cfg.version←'1.1.0'
+ cfg.name←'os'
+ json←TC.Reg.JSON cfg
+ (⊂json)F.NPUT(tempDir,'/apl-package.json')1
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'Test_UserCommands_002 already published on' 'n'
+ (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'Server: The package has already been published with a different spelling (case)'≢res
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕SE._Tatin.Client.CommTools.Cleanup
+ Assert 0=⊃F.RmDir tempDir
+ :Trap 0 ⋄ {}TC.DeletePackage'[localhost]SomeGroup-OS-1.0.0' ⋄ :EndTrap
+⍝Done

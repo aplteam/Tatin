@@ -1,30 +1,28 @@
- zipFilename←Pack(projectPath targetPath);cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_
+ zipFilename←{dependencyFolder}Pack y;projectPath;targetPath;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies
  ⍝ projectPath → folder to create package from\\
  ⍝ targetPath  → folder to put package in\\
+ ⍝ The targetPath defaults to the projectPath
  ⍝ ←             path to package file created
- (projectPath targetPath)←RemoveFileProtocol¨projectPath targetPath
+ (projectPath targetPath)←2↑(⊆y),⊆y
+ (projectPath targetPath)←Reg.AddSlash¨projectPath targetPath
+ dependencyFolder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'dependencyFolder'
  :If 0=≢projectPath
      projectPath←F.PWD,'/'
  :EndIf
+ projectPath←RemoveFileProtocol projectPath
  projectPath←⊃1 ⎕NPARTS projectPath,'/'
- :If 0=≢targetPath
-     targetPath←F.PWD,'/'
- :EndIf
- :If ~(1↑targetPath)∊'./\'
- :AndIf (1↑1↓targetPath)≠':'
-     targetPath←Reg.AddSlash targetPath
- :Else
-     targetPath←⊃1 ⎕NPARTS targetPath,'/'
- :EndIf
+ targetPath←RemoveFileProtocol projectPath{0<⎕NC ⍵:⍎⍵ ⋄ ⍺}'targetPath'
+ targetPath←⊃1 ⎕NPARTS targetPath
  cfg_←ReadPackageConfigFile projectPath
  cfg←InitPackageConfig cfg_
- :If cfg_≢cfg
+ ValidateConfig cfg projectPath
+ :If ≢/{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}¨cfg cfg_
      WritePackageConfigFile projectPath cfg
  :EndIf
- ValidateConfig cfg projectPath
+ dependencies←dependencyFolder EstablishPackageDependencies projectPath
  zipFilename←F.ExpandPath targetPath,(GetPackageFilenameFromCfg cfg),'.zip'
- :If 0=⎕NEXISTS targetPath
-     'Create!'F.CheckPath targetPath
+ :If 0=F.Exists targetPath
+     F.MkDir targetPath
  :Else
      F.DeleteFile zipFilename
  :EndIf
@@ -36,24 +34,10 @@
  :If 0<≢cfg.assets
      {projectPath zipObj.Add ⍵}¨','(≠⊆⊢)cfg.assets
  :EndIf
- :If F.Exists projectPath,Dependencies.DEP_NAME
-     tempFilename←F.GetTempFilename2''
-     F.DeleteFile tempFilename
-     F.MkDir tempFilename
-     tempFilename,←'/',Dependencies.DEP_NAME
-     tempFilename ⎕NCOPY⍠('IfExists' 'Replace')⊣projectPath,Dependencies.DEP_NAME
-     deps←1⊃F.NGET tempFilename 1
-     :If 0<≢errMsg←CheckDependencies deps
-         F.RmDir 1⊃⎕NPARTS tempFilename
-         zipObj.Dispose
-         F.DeleteFile zipFilename
-         errMsg Assert 0
-     :EndIf
-     deps←ReplaceRegistryAlias deps
-     (⊂deps)F.NPUT tempFilename 1
-     (⊃⎕NPARTS tempFilename)zipObj.Add Dependencies.DEP_NAME
-     ⎕DL 0.2
-     F.RmDir 1⊃⎕NPARTS tempFilename
+ :If 0<≢dependencies
+     (projectPath,dependencies)zipObj.Add'/apl-dependencies.txt'
+ :ElseIf F.IsFile projectPath,'apl-dependencies.txt'
+     projectPath zipObj.Add'apl-dependencies.txt'
  :EndIf
  zipObj.Dispose
 ⍝Done

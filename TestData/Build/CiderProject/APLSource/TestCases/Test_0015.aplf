@@ -1,0 +1,20 @@
+ r←Test_0015(stopFlag batchFlag);zipFilename;list;filename;myZipper;rc;more;⎕TRAP;found
+ ⍝ Add two non-existing files to an archive.
+ r←T._Failed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ zipFilename←∆OutputPath,'zip_001.zip'
+ list←∆InputPath∘,¨'ThisDoesNotExist' 'DoesNotExistEither'
+
+⍝ Delete any left overs
+ FilesAndDirs.DeleteFile zipFilename
+
+⍝ The test
+ myZipper←⎕NEW ##.SevenZip(,⊂zipFilename)
+ rc←myZipper.Add list
+ →T.GoToTidyUp 0=⊃rc
+ r←T._OK
+
+∆TidyUp:
+ {}FilesAndDirs.RmDir ∆TempPath
+ FilesAndDirs.DeleteFile zipFilename

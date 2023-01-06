@@ -47,7 +47,7 @@ The optional left argument must, if specified, be an integer that may carry flag
 |2    | Dependencies: should dependencies be checked as well? Defaults to 0
 |3    | Both flags set
 
-By default only minor and patch number are part of the check. By specifying 1 as `major` you may change this default behaviour and list any later major versions instead.
+By default, only minor and patch number are part of the check. By specifying 1 as `major` you may change this default behaviour and list any later major versions instead.
 
 Note that this function scans all known registries with a priority greater than zero.
 
@@ -67,7 +67,7 @@ Returns a matrix with five columns:
 (rc report)←ClearCache dummy
 ```
 
-Clears the cache, meaning that all sub directories but `temp\` are removed from the folder `GetPathToPackageCache` points to.
+Clears the cache, meaning that all subdirectories but `temp\` are removed from the folder `GetPathToPackageCache` points to.
 
 ### CreateReInstallParms
 
@@ -75,7 +75,7 @@ Clears the cache, meaning that all sub directories but `temp\` are removed from 
 r←CreateReInstallParms
 ```
 
-Creates a namespace with default parameters; it can be passed as (optional) left argument to the [`ReInstallDependencies`](#ReInstallDependencies) function, in particular `noBetas`, `update` and `dry`.
+Creates a namespace with default parameters; it can be passed as (optional) left argument to the [`ReInstallDependencies`](#ReInstallDependencies) function, in particular, `noBetas`, `update` and `dry`.
 
 ### DeletePackage
 
@@ -113,13 +113,13 @@ r←{level} FindDependencies (folder pkgList)
 
 ```
 
-Scans `folder` recursively for the file "apl-dependencies.txt". Folders with such a file will be scanned for packages defined in `pkgList`. Useful for finding out where one or more packages are actually used.
+Scans `folder` recursively for the file "apl-dependencies.txt". Folders with such a file will be scanned for packages defined in `pkgList`. Useful for finding out where one or more packages are used.
 
 `pkgList` must be a simple char vector with a list of comma-separated packages.
 
 The packages can be specified fully or partly. "Group" and "version" can be left out, while "Name" is mandatory. You may specify a major version but neither "Minor" nor "Patch". If you do anyway anything after the major number will be ignored.
 
-Note that the search is *not* case sensitive.
+Note that the search is *not* case-sensitive.
 
 Returns a fully qualified list with all hits. 
 
@@ -226,7 +226,7 @@ config←{configParms} InitialisePackage folder
 
 Takes a folder (`⍵`) and initializes it so that it can be a package.
 
-This means in particular to create the folder (although it might already exist) and to create a package config file with default settings or what `⍺` specifies: one can pass a config namespace as `⍺`, typically created by a call to [`InitPackageConfig`](#InitPackageConfig).
+This means in particular to create the folder (although it might already exist) and creating a package config file with default settings or what `⍺` specifies: one can pass a config namespace as `⍺`, typically created by a call to [`InitPackageConfig`](#InitPackageConfig).
 
 There must be no config file yet, otherwise an error is thrown.
 
@@ -238,7 +238,7 @@ cfg←InitPackageConfig y
 
 Returns a namespace with default values useful for the function [`InitialisePackage`](#InitialisePackage).
 
-`⍵` might be empty; then it is ignored. Alternatively it might be namespace with variables. If it is then the variables in that namespace overwrite the defaults.
+`⍵` might be empty; then it is ignored. Alternatively, it might be a namespace with variables. If it is then the variables in that namespace overwrite the defaults.
 
 
 ### InstallPackages
@@ -393,7 +393,7 @@ The following parameters allow the user to select certain packages:
 The following parameters allow the user to influence what data is returned:
 
 * If `date` is `1` an additional column is added to the result with the publishing date
-* If `project_url` is `1` an additional column is added to the result with the the `project_url`, if any
+* If `project_url` is `1` an additional column is added to the result with the `project_url`, if any
 * If `aggregate` is `0` the data is not aggregated by minor and patch number; defaults to 1.
 
 #### Result
@@ -408,7 +408,7 @@ In case `date` was specified, the result has one more column carrying the publis
 
 #### Deprecated packages
 
-In case the last published version of a package carries a flag `deprecated` in its config file and that is a 1, such a package and all its predecessors with the same major version numer _are not listed_.
+In case the last published version of a package carries a flag `deprecated` in its config file and that is a 1, such a package and all its predecessors with the same major version number _are not listed_.
 
 To list just deprecated packages use `ListDepreciated`.
 
@@ -451,12 +451,12 @@ list←{parms} ListTags y
 
 Lists all tags.
 
-`y` might be URL of a Tatin server or a Registry alias (embraced by `[]`).
+`y` might be the URL of a Tatin server or a Registry alias (embraced by `[]`).
 
 By default all tags of all packages are returned as a two-column matrix:
 
 * `[;1]` carries the name of the tags
-* `[;2]` carries the number of occurencies of that tag
+* `[;2]` carries the number of occurrences of that tag
 
 Optionally `⍺` can be specified. Must be a namespace that might contain a variable `tags` which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carry all of the specified tags will be returned.
 
@@ -476,11 +476,11 @@ Lists all versions of a given package.
 * An alias pointing to a Registry together with a package name
 * A (local) path to a Registry together with a package name
 
-A package name may be either just the name or group and name. Additionally you may either specify a major version number, or a major and a minor version number.
+A package name may be either just the name or group and name. Additionally, you may either specify a major version number, or a major and a minor version number.
 
-Specifying a patch number makes no sense. if it is specified anyway it is ignored.
+Specifying a patch number makes no sense. If it is specified anyway it is ignored.
 
-Therefore the follwing arguments are all valid:
+Therefore the following arguments are all valid:
 
 1. `example-versions`
 2. `example-versions-1`
@@ -489,7 +489,7 @@ Therefore the follwing arguments are all valid:
 5. `[tatin-test]example-versions`
 6. `[tatin-test]example-versions-1`
 7. `[tatin-test]example-versions-1.0`
-8. `[tatin-test]example-versions-1.0.1 ⍝ Same as 4.`
+8. `[tatin-test]example-versions-1.0.1 ⍝ Same as 7.`
 
 In the first three cases all defined Registries with a priority greater than zero are scanned. A matrix with two columns is returned: URL and full package ID.
 
@@ -497,7 +497,10 @@ If a URL or an alias was specified the given Registry is questioned. A matrix wi
 
 You may omit the group name; that does not make a difference when the name is used only within one group anyway, but if it is used in more than one group, then all of them are listed.
 
-By default the publishing date is not included, but you may change this by passing a 1 as `⍺`. In that case an additional column is added to the result.
+If version precedence cannot be established from the version numbers alone (often a problem
+with beta versions) then the publishing date is taken into account.                        
+
+By default, the publishing date is not included, but you may change this by passing a 1 as `⍺`. In that case, an additional column is added to the result.
 
 Note that the package ID might use any case, meaning that if the package's name is `foo-Goo` then you might as well spell it `foo-GOO` or `FOO-goo`: it would not make a difference 
 
@@ -560,10 +563,10 @@ Note that the package ID(s) might use any case, meaning that if the package's na
 ### Pack                 
 
 ```
-zipFilename←Pack (projectPath targetPath)
+zipFilename←{dependencies} Pack projectPath [targetPath]
 ```
 
-ZIPs all files in a given folder.
+ZIPs all files in a given folder and puts the ZIP file into the (optional) `targetPath`.
 
 projectPath:
 
@@ -572,6 +575,24 @@ projectPath:
 targetPath:
 
 : A folder the ZIP file goes into
+
+: Note that if `targetPath` is not specified or empty then it defaults to `projectPath`
+
+
+`Pack` tries to establish whether the package depends on other packages:
+
+1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the property `[CIDER]tatinFolder` in that file. If that defines a folder that is not assigned to a subnamespace of the package then it is taken.
+
+   Refer to the Cider documentation on `tatinFolder` for details.
+
+2. If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/.
+
+3. If there is no subfolder packages/, or if it does not host a file `apl-dependencies.txt` then Tatin looks for a file `apl-dependencies.txt` in the root of the package project.
+
+4. If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as left argument to `Pack`.
+
+If no file `apl-dependencies.txt` can be detected then Tatin assumes that the package does not depend on other packages.
+
 
 ### Ping                 
 
@@ -584,23 +605,28 @@ Establishes whether the host is up and running with very little overhead. If `ur
 ### PublishPackage       
 
 ```
-{(statusCode errMsg zipFilename)}←PublishPackage (source registry)
+{(statusCode errMsg zipFilename)}←{dependencies} PublishPackage (source registry)
 ```
 
 Publishes a package.
 
 1. Checks whether there is already such a package but with a different spelling in terms of case
-1. Creates a dependency file for the package if required
 1. Creates a zip file for the package in a Temp folder if required
 1. Moves the zip file into the Registry, either via HTTP or directly.
 1. Updates the Registry index in case it's a local Registry
 
-Note that if `⍵` points already to a ZIP file only steps 4 and 5 are performed.
+Note that if `⍵` points already to a ZIP file only steps 3 and 4 are performed.
 
 `⍵` must be a two-item vector:
 
 1. `source` → folder to create the package from
 1. `registry` → registry to publish the package to (alias or url)
+
+
+
+In case a folder is specified rather than a ZIP file then `PublishPackage` tries to establish whether the package depends on other packages. This is done by the API function `Pack`, which is called by `PublishPackage` internally. 
+
+The optional left argument `dependencies` is, when specified, passed as left argument to `Pack`; see there for details.
 
 The explicit result:
 
@@ -682,18 +708,18 @@ Takes a path to a package and returns the config file for that package as a name
 
 Note that if `packageID` is empty a clean-up attempt is made.
 
-`folder` may be a sub folder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.
+`folder` may be a subfolder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.
 
 `packageID` must be fully qualified: group + name + version.
 
 If a package was installed with an alias you must un-install it by specifying the alias. 
 
-If a package is installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not really un-install the package but removes just the reference to it. Only when the other one is un-installed as well is the package actually removed.
+If a package is installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well is the package actually removed.
 
 To keep things simple Tatin performs the following steps:
 1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.
 3. Removes `packagedID` from the dependency file.
-4. Re-compiles the build list based on the new dependency file.
+4. Re-compile the build list based on the new dependency file.
 5. Removes all packages that are not mentioned in the build list anymore.
 
 Returns a two-item vector:

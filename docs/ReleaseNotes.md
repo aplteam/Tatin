@@ -16,6 +16,14 @@ Tatin release notes contain information regarding...
 
 Tatin release notes _do not_ contain any information regarding added features --- except when they relate to breaking changes --- and/or bug fixes. For that visit <https://github.com/aplteam/Tatin/releases>
 
+## Version 0.84.0 from 2023-01-06
+
+No user actions required
+
+## Version 0.83.2 from 2023-01-03
+
+No user actions required
+
 ## Version 0.83.1 from 2023-01-03
 
 No user actions required

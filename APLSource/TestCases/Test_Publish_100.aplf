@@ -1,0 +1,12 @@
+ r←Test_Publish_100(stopFlag batchFlag);⎕TRAP;path;statusCode;errMsg
+⍝ Try to publish a package that has already been published with a different case ("APLProcess"←→"APLprocess")
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←∆GetProjectPath,'/TestData/DifferentCase/'
+ (statusCode errMsg)←2↑TC.PublishPackage path'[local]'
+ →T.PassesIf statusCode=400
+ →T.PassesIf∨/'There is already such a package but with a different spelling (case)'⍷errMsg
+
+ r←T._OK
+⍝Don

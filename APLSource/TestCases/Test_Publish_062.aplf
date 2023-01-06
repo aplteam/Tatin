@@ -1,0 +1,17 @@
+ r←Test_Publish_062(stopFlag batchFlag);⎕TRAP;path;zipFileName;statusCode;errMsg;list
+⍝ Attempts to publish a package that is a Cider project but we specify a different folder (takes precedence)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←∆GetProjectPath,'/TestData/Build/Special/'
+ (statusCode errMsg zipFileName)←'dependencies'TC.PublishPackage path'[local]'
+ Assert statusCode=200
+ list←TC.ZipArchive.ListZipContents zipFileName
+ →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕NDELETE zipFileName
+ {}F.RmDirByForce ∆GetServerPath,'/aplteam-SevenZip-4.0.0'
+⍝Don

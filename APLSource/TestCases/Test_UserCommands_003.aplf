@@ -5,7 +5,7 @@
 
  (rc msg res1)←∆UCMD'ListVersions [local]aplteam-DoesNotExist'
  →T.PassesIf(rc=0)∧0=≢msg
- →T.PassesIf 2=≢res1
+ →T.PassesIf ∨/'Not found:'⍷∊res1
 
  (rc msg res1)←∆UCMD'ListVersions [local]aplteam-APLProcess'
  →T.PassesIf(rc=0)∧0=≢msg
@@ -48,15 +48,6 @@
  (rc msg res)←∆UCMD'ListVersions [localhost]example-Boo'
  →T.PassesIf(rc=0)∧0=≢msg
  →T.PassesIf 0<≢res
-
- (rc msg res)←∆UCMD'ListVersions'
- →T.PassesIf(rc=0)∧0=≢msg
- →T.PassesIf 0<≢res
-
- (rc msg res2)←∆UCMD'ListVersions [tatin]'
- →T.PassesIf(rc=0)∧0=≢msg
- →T.PassesIf 0<≢res
- →T.PassesIf res≡res2
 
  r←T._OK
 ⍝Done

@@ -16,7 +16,7 @@ A package ID consists of at least three parts:
 * A package name
 * A version number
 
-Optionally such an ID may also comprehend a build number which is separated from the version number by a plus (`+`).
+Optionally such an ID may also comprehend a build number that is separated from the version number by a plus (`+`).
 
 ### The Group
 
@@ -28,9 +28,9 @@ A group can be anything really:
 
 Once you have chosen a group name, and published a package with that group name to the [principal Tatin Registry](https://tatin.dev "Link to tatin.dev"), you are advised to create a "home page" for that group. Use that for anything useful like background, motivation, contact details, whatever.
 
-When a group is listed in a browser , the name of a group is converted into a link to that home page.
+When a group is listed in a browser, the name of a group is converted into a link to that home page.
 
-Of course group-related home pages do not always make sense, therefore by default they are not active; see `GroupHomePages` in the INI file.
+Of course, group-related home pages do not always make sense, therefore by default they are not active; see `GroupHomePages` in the INI file.
 
 ### The name
 
@@ -95,7 +95,7 @@ Notes:
 
 ##### Client 
 
-API keys are saved in the user settings file. The quickest and yet save way to edit that file is via the user command:
+API keys are saved in the user settings file. The quickest and yet safe way to edit that file is via the user command:
 
 ```
       ]TatIN.UserSettings -edit      
@@ -109,7 +109,7 @@ API keys are saved in the file "Credentials.txt" in the `Registry\` folder in th
 
 If you run your own Tatin Server we suggest that you create a UUID and use that as an API key. 
 
-In order for an API key to be accepted by a Tatin Server it must be added to the file `Credentials.txt` in the Registry's root directory. The file might or might not exist, and  if it exists it might be empty.
+For an API key to be accepted by a Tatin Server it must be added to the file `Credentials.txt` in the Registry's root directory. The file might or might not exist, and if it exists it might be empty.
 
 Make sure that you specify it as either
 
@@ -123,9 +123,9 @@ or
 *={api-key}
 ```
 
-In the first case somebody who provides that API key may publish packages only for the group <group1>.
+In the first case, somebody who provides that API key may publish packages only for the group <group1>.
 
-In the second case it's a kind of master password: it allows the creation of packages with _any_ group name.
+In the second case, it's a kind of master password: it allows the creation of packages with _any_ group name.
 
 The two scenarios can be mixed:
 
@@ -137,7 +137,7 @@ group2='xyz'
 
 This means that one can only publish packages with the groupname <group1> with the API key "abc", packages with the groupname <group2> with the API key "xyz", and anything else with the API key "other".
 
-Note that `*=` means that no API key is required. On its own it's the same as having no credentials file, but it can be useful together with other group names:
+Note that `*=` means that no API key is required. On its own, it's the same as having no credentials file, but it can be useful together with other group names:
 
 ```
 group1='abc'
@@ -147,7 +147,7 @@ group2='xyz'
 
 This is interpreted as "require API keys for the groups <group1> and <group2> but allow anything else without an API key".
 
-Finally you can allow anybody to publish packages under a particular group name without providing an API key:
+Finally, you can allow anybody to publish packages under a particular group name without providing an API key:
 
 ```
 group1='abc'
@@ -174,7 +174,7 @@ A Tatin package requires all source code (functions, operators, classes, interfa
 
 Tatin calls the former "source" and the latter "assets". 
 
-What is what is defined in the package configuration file which _must_ exist to make a folder a Tatin package.
+What is defined in the package configuration file which _must_ exist to make a folder a Tatin package.
 
 
 #### The package configuration file
@@ -188,9 +188,9 @@ This file is only required when the package to be published has dependencies.
 
 Note that in case you specify a dependency that does not (yet) exist on the Registry then this has no consequences: the server will not reject such a package. 
 
-That might come as a surprise, but there is a very good reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work out well then.
+That might come as a surprise, but there is a reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work then.
 
-Usually you will specify just a full package ID as a dependency. If you wish  you may also specify either a URL following the http[s]:// protocol or a zip file following the file:// protocol. 
+Usually, you will specify just a full package ID as a dependency. If you wish you may also specify either a URL following the http[s]:// protocol or a zip file following the file:// protocol. The latter is always a temporary solution, however. 
 
 Notes:
 
@@ -199,6 +199,8 @@ Notes:
   That is good enough a reason to use this with care. Only when messing around with packages not designed to be published to a Tatin server on your local machine may this be used.
 
 * Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.
+
+Tatin has a convention in place: it assumes that any dependencies are installed in a folder packages/.
 
 
 ### Final step
@@ -218,6 +220,14 @@ You can also create a ZIP file with the `]TATIN.Pack` command and specify the ZI
 ```
 ]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]
 ```
+
+When a path to a package project is provided rather than a ZIP file then `]PublishProject` would create the ZIP file itself.
+
+Note that both `]PublishPackage` as well as `]Pack` assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.
+
+However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has a property `[CIDER]tatinFolder` that is designed to hold the folder with package dependencies, and if that is not empty then Tatin would use this.
+
+If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the `-dependencies=` flag.
 
 
 ## Deleting packages
@@ -248,7 +258,7 @@ You can find out which policy the server operates in two ways:
 None
   ```
 
-Or visit its web site, for example <https://tatin.dev>: at the bottom of the home page the server mentions the "delete" policy it operates.
+Or visit its website, for example, <https://tatin.dev>: at the bottom of the home page the server mentions the "delete" policy it operates.
 
 ## Development strategies
 
@@ -270,13 +280,13 @@ Let's imagine that you are supposed to develop Tatin packages for your employer,
 
 * Your packages may depend on packages published on Tatin's principal server, known as `[tatin]`.
 
-  Of the four Registries this one should probably have the lowest priority.
+  Of the four Registries, this one should probably have the lowest priority.
 
 * You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when Registries are scanned for packages, but you could still use it.
 
 You can now develop a package `Foo` and publish it on `[my]`, probably several times until it is stable.
 
-You would then publish it on `[my-team]`. At the same time you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
+You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
-When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time the package will most likely be deleted from the Team server.
+When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
 

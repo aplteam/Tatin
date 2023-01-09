@@ -1,21 +1,27 @@
- zipFilename←{dependencyFolder}Pack y;projectPath;targetPath;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies
- ⍝ projectPath → folder to create package from\\
- ⍝ targetPath  → folder to put package in\\
- ⍝ The targetPath defaults to the projectPath
- ⍝ ←             path to package file created
- (projectPath targetPath)←2↑(⊆y),⊆y
- (projectPath targetPath)←Reg.AddSlash¨projectPath targetPath
+ zipFilename←{dependencyFolder}BuildPackage(projectPath targetPath version);cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies
+ ⍝ projectPath → folder to create the package from.\\
+ ⍝ targetPath  → folder where the resulting ZIP is saved.\\
+ ⍝ The targetPath defaults to the projectPath if it is empty.\\
+ ⍝ `version`
  dependencyFolder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'dependencyFolder'
  :If 0=≢projectPath
      projectPath←F.PWD,'/'
  :EndIf
  projectPath←RemoveFileProtocol projectPath
  projectPath←⊃1 ⎕NPARTS projectPath,'/'
- targetPath←RemoveFileProtocol projectPath{0<⎕NC ⍵:⍎⍵ ⋄ ⍺}'targetPath'
+ targetPath←Reg.AddSlash RemoveFileProtocol projectPath{⍺{0=≢⍵:⍺ ⋄ ⍵}⍎⍵ ⋄ ⍺}'targetPath'
  targetPath←⊃1 ⎕NPARTS targetPath
  cfg_←ReadPackageConfigFile projectPath
  cfg←InitPackageConfig cfg_
  ValidateConfig cfg projectPath
+ :If 0<≢version
+     :If '+'=1↑version
+         cfg.version←version AddToVersion cfg.version
+     :Else
+         cfg.version←version{'+'∊⍺:⍺ ⋄ ⍺,{⍵↓⍨¯1+⍵⍳'+'}⍵}cfg.version ⍝ Assign version but preserve build no if not passed
+     :EndIf
+ :EndIf
+ cfg.version←IncreaseBuildNumber cfg.version
  :If ≢/{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}¨cfg cfg_
      WritePackageConfigFile projectPath cfg
  :EndIf

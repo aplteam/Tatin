@@ -16,6 +16,16 @@ Tatin release notes contain information regarding...
 
 Tatin release notes _do not_ contain any information regarding added features --- except when they relate to breaking changes --- and/or bug fixes. For that visit <https://github.com/aplteam/Tatin/releases>
 
+## Version 0.85.0 from 2023-01-08
+
+This version comes with a potentially breaking change: the method `Pack` has been renamed to `BuildPackage`, and the user command `]Tatin.Pack` accordingly to `]Tatin.BuildPackage`.
+
+Also, the number of right arguments of `BuildPackage` has changed from two to three.
+
+The user command has an additional modifier `-version=`.
+
+If you call the API function from you own code you must make changes.
+
 ## Version 0.84.0 from 2023-01-06
 
 No user actions required

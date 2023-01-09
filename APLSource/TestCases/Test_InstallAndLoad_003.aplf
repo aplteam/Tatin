@@ -1,6 +1,6 @@
  r←Test_InstallAndLoad_003(stopFlag batchFlag);⎕TRAP;res
  ;dir;src;zip;body;cfg;zipfile;installFolder;expected;src2
-⍝ Pack a package with multiple files (classes) into a ZIP file and then install it. One class depends on the other.
+⍝ Build a package with multiple files (classes) into a ZIP file and then install it. One class depends on the other.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -21,7 +21,7 @@
 ⍝ cfg.api←'Calc.Times'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.Pack src zip
+ zipfile←TC.BuildPackage src zip ''
 
  installFolder←∆GetTempDir'/Tatin_AppPackages'
  res←TC.InstallPackages('file://',zipfile)installFolder

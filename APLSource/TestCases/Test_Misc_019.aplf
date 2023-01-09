@@ -1,0 +1,12 @@
+ r←Test_Misc_019(stopFlag batchFlag);⎕TRAP
+⍝ Exercise the `IncreaseBuildNumber` function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ →T.PassesIf'1.2.3+1'≡TC.IncreaseBuildNumber'1.2.3'
+ →T.PassesIf'1.2.3-beta-1+1'≡TC.IncreaseBuildNumber'1.2.3-beta-1'
+ →T.PassesIf'1.2.3+457'≡TC.IncreaseBuildNumber'1.2.3+456'
+ →T.PassesIf'1.2.3-beta-1+457'≡TC.IncreaseBuildNumber'1.2.3-beta-1+456'
+
+ r←T._OK
+⍝Done

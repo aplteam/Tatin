@@ -1,6 +1,6 @@
- r←Test_Pack_035(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_030(stopFlag batchFlag);⎕TRAP
  ;dir;src;dist;cfg;zipfile;ns;list;expected
-⍝ Has several assets and does not specify the source which is single namespace script
+⍝ Has several assets and does not specify the source which is a folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -8,9 +8,11 @@
  dir←∆GetTempDir ⍬
  (src dist)←(⊂dir,'/'),¨'src' 'dist'
  src,←'/v0.1.0'
- F.MkDir(src,'/assets')dist
+ F.MkDir(src,'/source')dist
+ F.MkDir src,'/assets'
 
- ('foo←{1}')F.NPUT src,'/foo.apln'
+ ('foo1←{1}')F.NPUT src,'/source/foo1.apln'
+ ('foo2←{2}')F.NPUT src,'/source/foo2.apln'
  (⊂'a=1' 'b=2')F.NPUT src,'/assets/config.txt'
  (⊂'This' 'That')F.NPUT src,'/user_guide.txt'
  cfg←TC.InitPackageConfig ⍬
@@ -18,14 +20,14 @@
  cfg.name←'Package_B'
  cfg.version←'0.1.0'
  cfg.assets←'assets/' 'user_guide.txt'
- cfg.source←'foo.apln'
+ cfg.source←'source'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.Pack src dist
+ zipfile←TC.BuildPackage src dist ''
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
- expected←'apl-package.json' 'assets\config.txt' 'foo.apln' 'user_guide.txt'
+ expected←'apl-package.json' 'assets\config.txt' 'source\foo1.apln' 'source\foo2.apln' 'user_guide.txt'
  →T.GoToTidyUp~expected ∆LazyMatchPaths list
 
  r←T._OK

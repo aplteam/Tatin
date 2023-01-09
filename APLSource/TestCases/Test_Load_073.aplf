@@ -1,6 +1,6 @@
  r←Test_Load_073(stopFlag batchFlag);⎕TRAP;assets;res
  ;dir;src;zip;body;cfg;zipfile;refs
-⍝ Pack a package with several files in an asset folder and then load it
+⍝ Build a package with several files in an asset folder and then load it
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -24,7 +24,7 @@
  cfg.assets←assets
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.Pack src zip
+ zipfile←TC.BuildPackage src zip''
 
  refs←TC.LoadPackages('file://',zipfile)#.TEMP
  →T.GoToTidyUp 3≠#.TEMP.Foo.⎕NC'GetAssetList'

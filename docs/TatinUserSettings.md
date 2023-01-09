@@ -17,7 +17,7 @@ When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin
 
 Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _do not_ affect `⎕SE.Tatin.MyUserSettings`!
 
-`⎕SE.Tatin.MyUserSettings` provides a number of properties that can be referenced as well as a number of methods that can be issued in order to manipulate the user settings.
+`⎕SE.Tatin.MyUserSettings` provides several properties that can be referenced as well as several methods that can be issued to manipulate the user settings.
 
 For example, this call:
 
@@ -39,13 +39,13 @@ If you would like to see the API keys as well specify the `-full` flag.
 
 That default file will have two  Tatin Registries defined in it: 
 
-* the principal Tatin server, available via the URL `https://tatin.dev/`
+* The principal Tatin server, available via the URL `https://tatin.dev/`
 
-   It has an alias `tatin` assigned to it, so you can address it as `[tatin]` with all user commands that require a Registry as parameter.
+   It has an alias `tatin` assigned to it, so you can address it as `[tatin]` with all user commands that require a Registry as a parameter.
 
-* the Tatin Test server, available via the URL `https://test.tatin.dev/`
+* The Tatin Test server, available via the URL `https://test.tatin.dev/`
 
-   It has an alias `tatin-test` assigned to it, so you can address it as `[tatin-test]` with all user commands that require a Registry as parameter.
+   It has an alias `tatin-test` assigned to it, so you can address it as `[tatin-test]` with all user commands that require a Registry as a parameter.
 
    It has a priority of `0` assigned to it which means that it will _not_ participate in Registry scans.
 
@@ -64,7 +64,7 @@ The name of the file is `tatin-client.json`.
 
 ### May I edit the file?
 
-Of course you are free to edit that file with any editor. However, keep in mind that you are in charge for making sure that the contents of the file is valid JSON5[^JSON5]: if it's not, Tatin will crash.
+Of course, you are free to edit that file with any editor. However, keep in mind that you are in charge of making sure that the contents of the file is valid JSON5[^JSON5]: if it's not, Tatin will crash.
 
 If you are familiar with JSON5 syntax and want to edit the file it is recommended to use:
 
@@ -72,7 +72,7 @@ If you are familiar with JSON5 syntax and want to edit the file it is recommende
 ]TATIN.UserSettings -edit
 ```
 
-This will allow you to edit the file contents, but Tatin will check it afterwards in order to make sure that nothing invalid goes ever into the file.
+This will allow you to edit the file contents, but Tatin will check it afterward to make sure that nothing invalid goes ever into the file.
 
 Note that Dyalog 18.2 and later recognize JSON5 and highlight any syntax errors.
 
@@ -109,7 +109,7 @@ However, you can force Tatin to bring the session in line with the file by execu
 
 #### Changes made in the workspace
 
-If you manipulate the instance in the workspace, then the changes won't be written to file. You need to call the monadic `Save` method (with a `1` as right argument) to make your changes permanent.
+If you manipulate the instance in the workspace, then the changes won't be written to disk. You need to call the monadic `Save` method (with a `1` as the right argument) to make your changes permanent.
 
 #### Comments
 
@@ -128,7 +128,7 @@ Everything between `/*` and `*/` is recognized as a comment, like this:
 
 ##### Line comments
 
-This is an example for a line that is recognized as a comment:
+This is an example of a line that is recognized as a comment:
 
 ```
 // This is a comment line
@@ -137,7 +137,7 @@ This is an example for a line that is recognized as a comment:
 
 ### Summary
 
-In most scenarios you will probably be happy with having just one user settings file for Tatin, and having it in its default location.
+In most scenarios, you will probably be happy with having just one user settings file for Tatin, and having it in its default location.
 
 You may however want to have your own Tatin Registries, for example for private projects.
 
@@ -145,7 +145,7 @@ You may however want to have your own Tatin Registries, for example for private 
 
 You can manipulate the `MyUserSettings` instance via its methods.
 
-We are now going to add a registry, list all registries and then delete that registry, getting us back to where we started from.
+We are now going to add a registry, list all registries, and then delete that registry, getting us back to where we started.
 
 ### What have we got?
 
@@ -161,7 +161,7 @@ https://test.tatin.dev/ tatin-test  0       0
 
 This is because originally Tatin only knows about the principal Tatin server and its cousin, the test server.
 
-Note that the API key is not listed when a zero is provided as right argument.
+Note that the API key is not listed when a zero is provided as the right argument.
 
 Let's add a made-up registry.
 
@@ -169,7 +169,7 @@ Let's add a made-up registry.
 
 Let's assume that you work for a company "MyCompany", and that this company entertains a Tatin Server with the URL `https://tatin.mycompany.com`.
 
-In order to add that Registry to the user settings file you must first instantiate the `DefineRegistry` class. You may specify the URL and the alias in several ways; for details on the `DefineRegistry` class execute this:
+To add that Registry to the user settings file you must first instantiate the `DefineRegistry` class. You may specify the URL and the alias in several ways; for details on the `DefineRegistry` class execute this:
 
 ```
 ]adoc ⎕se.Tatin.DefineRegistry
@@ -210,7 +210,7 @@ We will pass a simple text vector that specifies the alias (between `[]`) and th
 
 #### Adding the Registry
 
-Adding a registry is achieved by calling the `AddRegistry` method, and providing an instance of the `DefineRegistry` class as argument:
+Adding a registry is achieved by calling the `AddRegistry` method, and providing an instance of the `DefineRegistry` class as an argument:
 
 
 ```
@@ -237,7 +237,7 @@ A> The new priorities will not change the order of the priorities, and the lowes
 
 So far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the change permanent; other sessions won't be affected.
 
-If you want to make your changes permanent you must call the `Save` method and provide a 1 as right argument.
+If you want to make your changes permanent you must call the `Save` method and provide a 1 as the right argument.
 
 
 ## Putting the user config file elsewhere
@@ -248,11 +248,11 @@ There might be scenarios when the default location for the user config file is n
 
 * Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
 
-   You could still use the default location, but because that location is user specific, every user would require her own user settings file, which is something you might or might not want to avoid.
+   You could still use the default location, but because that location is user-specific, every user would require her own user settings file, which is something you might or might not want to avoid.
 
 In the aforementioned cases as well as other scenarios you need more freedom than what is provided by default.
 
-For that you must create a user settings file in a specific location. In order to achieve that we re-instantiate the class `UserConfig`, and we provide a path to the folder where the file should live:
+For that, you must create a user settings file in a specific location. To achieve that we re-instantiate the class `UserConfig`, and we provide a path to the folder where the file should live:
 
 ```
       ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path2/user_config_file/')
@@ -271,12 +271,12 @@ For that you must create a user settings file in a specific location. In order t
 Notes:
 
 * We use the same name as before (`MyUserSettings`) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class `UserSettings` with that name.
-* The API key is replaced by asterisks unless you specify a `1` as right argument to `ListRegistries`
+* The API key is replaced by asterisks unless you specify a `1` as the right argument to `ListRegistries`
 * When you fire up a new session of Dyalog APL right  now, it would still look for the user settings file in its standard location.
 
 ### Make the switch permanent
 
-In order to make this user settings file the default file, meaning that this file will be instantiated the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
+To make this user settings file the default file, meaning that this file will be instantiated the next time Dyalog APL is fired up, we need to make sure that a file `.tatin` in the default folder (that's the one returned by `⎕SE.Tatin.GetUserHomeFolder''`) contains a path pointing to that folder.
 
 You can do this yourself, but you can also ask the instance for doing the job for you:
 

@@ -1,6 +1,6 @@
  r←Test_Load_070(stopFlag batchFlag);⎕TRAP
  ;dir;src;zip;body;cfg;zipfile;refs
-⍝ Pack a package with a file asset and then load it
+⍝ Build a package with a file asset and then load it
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -21,7 +21,7 @@
  cfg.assets←'file.dll'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.Pack src zip
+ zipfile←TC.BuildPackage src zip''
 
  refs←TC.LoadPackages('file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Constants.⎕NC'PI'

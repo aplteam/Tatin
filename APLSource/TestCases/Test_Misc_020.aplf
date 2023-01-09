@@ -1,0 +1,43 @@
+ r←Test_Misc_020(stopFlag batchFlag);⎕TRAP
+⍝ Exercise the `AddToVersion` function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ →T.PassesIf'0.0.2'≡'+0.0.1'TC.AddToVersion'0.0.1'
+ →T.PassesIf'0.1.1'≡'+0.0.1'TC.AddToVersion'0.1.0'
+ →T.PassesIf'0.0.3'≡'+0.0.1'TC.AddToVersion'0.0.2'
+ →T.PassesIf'0.2.0'≡'+0.1.0'TC.AddToVersion'0.1.0'
+ →T.PassesIf'0.2.0'≡'+0.1.0'TC.AddToVersion'0.1.9'
+ →T.PassesIf'2.0.0'≡'+1.0.0'TC.AddToVersion'1.0.0'
+ →T.PassesIf'1.0.0'≡'+1.0.0'TC.AddToVersion'0.1.9'
+ →T.PassesIf'2.0.0'≡'+1.0.0'TC.AddToVersion'1.1.9'
+
+ →T.PassesIf'0.0.2+1'≡'+0.0.1'TC.AddToVersion'0.0.1+1'
+ →T.PassesIf'0.1.1+1'≡'+0.0.1'TC.AddToVersion'0.1.0+1'
+ →T.PassesIf'0.0.3+1'≡'+0.0.1'TC.AddToVersion'0.0.2+1'
+ →T.PassesIf'0.2.0+1'≡'+0.1.0'TC.AddToVersion'0.1.0+1'
+ →T.PassesIf'0.2.0+1'≡'+0.1.0'TC.AddToVersion'0.1.9+1'
+ →T.PassesIf'2.0.0+1'≡'+1.0.0'TC.AddToVersion'1.0.0+1'
+ →T.PassesIf'1.0.0+1'≡'+1.0.0'TC.AddToVersion'0.1.9+1'
+ →T.PassesIf'2.0.0+1'≡'+1.0.0'TC.AddToVersion'1.1.9+1'
+
+ →T.PassesIf'0.0.2+1'≡'+0.0.1'TC.AddToVersion'0.0.1-beta-1+1'
+ →T.PassesIf'0.1.1+1'≡'+0.0.1'TC.AddToVersion'0.1.0-beta-1+1'
+ →T.PassesIf'0.0.3+1'≡'+0.0.1'TC.AddToVersion'0.0.2-beta-1+1'
+ →T.PassesIf'0.2.0+1'≡'+0.1.0'TC.AddToVersion'0.1.0-beta-1+1'
+ →T.PassesIf'0.2.0+1'≡'+0.1.0'TC.AddToVersion'0.1.9-beta-1+1'
+ →T.PassesIf'2.0.0+1'≡'+1.0.0'TC.AddToVersion'1.0.0-beta-1+1'
+ →T.PassesIf'1.0.0+1'≡'+1.0.0'TC.AddToVersion'0.1.9-beta-1+1'
+ →T.PassesIf'2.0.0+1'≡'+1.0.0'TC.AddToVersion'1.1.9-beta-1+1'
+
+ →T.PassesIf'0.0.2+1'≡'+0.0.1'TC.AddToVersion'0.0.1-beta-1+1'
+ →T.PassesIf'0.1.1+1'≡'+0.0.1'TC.AddToVersion'0.1.0-beta-1+1'
+ →T.PassesIf'0.0.3+1'≡'+0.0.1'TC.AddToVersion'0.0.2-beta-1+1'
+ →T.PassesIf'0.2.0+1'≡'+0.1.0'TC.AddToVersion'0.1.0-beta-1+1'
+ →T.PassesIf'0.2.0+1'≡'+0.1.0'TC.AddToVersion'0.1.9-beta-1+1'
+ →T.PassesIf'2.0.0+1'≡'+1.0.0'TC.AddToVersion'1.0.0-beta-1+1'
+ →T.PassesIf'1.0.0+1'≡'+1.0.0'TC.AddToVersion'0.1.9-beta-1+1'
+ →T.PassesIf'2.0.0+1'≡'+1.0.0'TC.AddToVersion'1.1.9-beta-1+1'
+
+ r←T._OK
+⍝Done

@@ -7,15 +7,15 @@
 
 # Server: Tips and tricks
 
-Once you've installed a server their are a couple of things that need to be taken care of.
+Once you've installed a server there are a couple of things that need to be taken care of.
 
 ## Maintenance
 
 ### Tags
 
-The most important thing is to watch tags. Tags can be very useful in order to find a package, but the problem ist that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name as a tag, or adding "dyalog" etc.
+The most important thing is to watch tags. Tags can be very useful to find a package, but the problem is that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name as a tag or adding "dyalog" etc.
 
-That means that for tags to work there has to be a gate keeper who is responsible for correcting / removing tags.
+That means that for tags to work there has to be a gatekeeper who is responsible for correcting/removing tags.
 
 That gatekeeper needs to be able to execute code on the server, but only once. The idea is to correct problems in the package config files somehow.
 
@@ -23,21 +23,21 @@ A> ### The package config file and the ZIP file
 A>
 A> Note that changing the config file is enough: If the file got changed then Tatin will make sure that the new version is automatically also added to the ZIP file of the package, effectively overwriting the old version of the package file. 
 
-This can be achieved by uploading an `.aplf` text file (read: a function) into a folder that is defined in the INI file as `[CONFIG]MaintenanceFolder`.
+This can be achieved by uploading a `.aplf` text file (read: a function) into a folder that is defined in the INI file as `[CONFIG]MaintenanceFolder`.
 
 If one or more of such files are found by the Tatin Server while doing housekeeping they are loaded into the server and executed. Once executed the files are renamed by adding an extension `.executed`.
 
 For example, if there is a file `RemoveDyalogFromTags.aplf` then it is loaded into an unnamed namespace and called with a right argument `G` (for "globals"). Once executed the file is then renamed to `RemoveDyalogFromTags.aplf.executed`.
 
-That makes sure the code is not executed again, but it is also  useful for documenting what code was executed, and when.
+That makes sure the code is not executed again, but it is also useful for documenting what code was executed, and when.
 
 #### Crashing maintenance files
 
-Like any other program a maintenance file may crash. If that happens the server carries out the following steps:
+Like any other program, a maintenance file may crash. If that happens the server carries out the following steps:
 
 1. Report it to the log file
 2. Send an email reporting the crash with details to the maintainer (if enabled in the INI file)
-3. Rename the file from `*.aplf` to `*.crashed` in order to avoid it being executed again
+3. Rename the file from `*.aplf` to `*.crashed` to avoid it being executed again
 
 
 ## Developing
@@ -49,7 +49,7 @@ If you want to make changes or add new features you need a good understanding of
 
 #### Main namespaces
 
-There are four ordinary namespaces that contain all the Tatin code:
+Four ordinary namespaces contain all the Tatin code:
 
 `Admin`
 
@@ -71,11 +71,11 @@ Contains all code that is shared between a Tatin client and a Tatin server.
 
 #### Other stuff
 
-There are some mory ordinary namespace that are used by Tatin
+There are some more ordinary namespace that are used by Tatin
 
 `Plodder`
 
-: A fully fledged HTTP server that is bases on Rumba and Conga
+: A fully-fledged HTTP server that is based on Rumba and Conga
 
 : For details see <https://github.com/aplteam/Plodder>
 
@@ -95,11 +95,11 @@ Note that by design new versions always comprehend both the server and the clien
 
 ### Developing with a running server
 
-You might want to run a server while Tatin is an opened Cider project. The running server allows you to investigate what the coder is doing, and at the same time any changes abd additions would be added to the project by Link.
+You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the coder is doing, and at the same time, any changes and additions would be added to the project by Link.
 
-Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed then Tatin would ask you whether you want to start the server automaticallt -- that is the server we talking about, **no** https://test.tatin.dev
+Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed then Tatin would ask you whether you want to start the server automatically -- that is the server we talking about, **no** https://test.tatin.dev
 
-In order to achive this execute the following steps:
+To achieve this execute the following steps:
 
 1. Open the Tatin project with `]CiderProject`
 
@@ -128,25 +128,25 @@ These will call the Tatin functions that perform the real actions.
 
 #### Error trapping
 
-Keep in mind that error trapping is active, so when you change a function and inject a typo it will trigger it once your code get executed.
+Keep in mind that error trapping is active, so when you change a function and inject a typo it will trigger it once your code gets executed.
 
-If there is any danger for you to lock horns with error trapping consider to put this into `OnRequest`:
+If there is any danger of you locking horns with error trapping consider putting this into `OnRequest`:
 
 `⎕TRAP←0 'S'  ⍝TODO⍝`   
 
 Also, make `⎕TRAP` a local variable in `OnRequest`.
 
-`⍝TODO⍝` is a remainder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.
+`⍝TODO⍝` is a reminder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.
 
 
 
 ### Developing with two sessions, server and client
 
-When the test cases are executed the user is asked whether she want the Tatin server required by the Tatin test cases to be started automatically.
+When the test cases are executed the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.
 
-* If the user answert this with a "yes" and instance 
+* If the user answers this with a "yes" and instance 
 
-You must know exactly what you are doing, otherwise you are likely to loose code.
+You must know exactly what you are doing, otherwise, you are likely to loose code.
 
 | **To be enhanced** |
 
@@ -154,11 +154,11 @@ You must know exactly what you are doing, otherwise you are likely to loose code
 
 ### Special REST commands 
 
-A Tatin server can offer a number of special REST commands only useful for a developer when testing Tatin. They should never be available on a production server.
+A Tatin server can offer several special REST commands only useful for a developer when testing Tatin. They should never be available on a production server.
 
 Whether these commands would be carried out is decided by the INI entry `[CONFIG]SpecialCommands`.
 
-One of the commands will return an HTML page with all available commands. We use this as example.
+One of the commands will return an HTML page with all available commands. We use this as an example.
 
 In a Browser enter this URL:
 
@@ -166,7 +166,7 @@ In a Browser enter this URL:
 https://localhost:5001/v1/list-commands
 ```
 
-Note that with the exception of `list-commands` these commands do not return HTML, they trigger actions.
+Note that except `list-commands` these commands do not return HTML, they trigger actions.
 
 
 ### Executing the Tatin test suite

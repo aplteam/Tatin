@@ -142,7 +142,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>The Tatin Test Server publishes an API key on its website; it's “Tatin-Test-API-Key”. It allows you to publish anything you want, including any group name except a few reserved group names: “aplteam” and “dyalog”.</p>
 <p>Notes:</p>
 <ul>
-<li>Be aware that the Tatin Test Server is reset every now and then, so whatever you publish will disappear sooner or later</li>
+<li>Be aware that the Tatin Test Server is reset now and then, so whatever you publish will disappear sooner or later</li>
 <li>You cannot publish anything under the group names “aplteam” and “dyalog”</li>
 </ul>
 <div class="h_tag">
@@ -226,17 +226,32 @@ group3=''
 <h4 data-id="The-dependency-file">3.1.3. The dependency file</h4>
 </a>
 </div>
-<p>This file is only required when the package to be published has dependencies.</p>
-<p>Note that in case you specify a dependency that does not (yet) exist on the Registry then this has no consequences: the server will not reject such a package.</p>
+<p>The file <code>apl-dependencies.txt</code> is only required when a package depends on other packages.</p>
+<p>Dependencies may by installed in a package project in different ways:</p>
+<ul>
+<li>By default Tatin assumes a subfolder packages/ to be used for this. If you use them Tatin will identify dependencies itself.</li>
+<li>If you manage a package project with Cider then Tatin will check the <code>tatinFolder</code> property: if it contains a definition without an assignment (namespace) then it will be taken</li>
+<li>If yiu do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
+<ul>
+<li>The user command <code>]Tatin.PublishPackage</code> has a modifier for this: <code>-dependencies=</code></li>
+<li>The API function <code>PublishPackage</code> can be fed with an optional left argument for this</li>
+</ul></li>
+</ul>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>In case you specify a dependency that has not (yet) been published then this has no consequences: the server will not reject such a package.</p>
 <p>That might come as a surprise, but there is a reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work then.</p>
+</div>
+</div>
+
 <p>Usually, you will specify just a full package ID as a dependency. If you wish you may also specify either a URL following the http[s]:// protocol or a zip file following the file:// protocol. The latter is always a temporary solution, however.</p>
 <p>Notes:</p>
 <ul>
 <li>Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with “400 — bad request”.
-<p>That is good enough a reason to use this with care. Only when messing around with packages not designed to be published to a Tatin server on your local machine may this be used.</p></li>
+<p>That is good enough a reason to use this with care. Only when messing around with packages on your local machine that are not designed to be published on a Tatin server may this be used.</p></li>
 <li>Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.</li>
 </ul>
-<p>Tatin has a convention in place: it assumes that any dependencies are installed in a folder packages/.</p>
 <div class="h_tag">
 <a href="#Final-step" id="Final-step" class="autoheader_anchor">
 <h3 data-id="Final-step">3.2. Final step</h3>
@@ -246,10 +261,10 @@ group3=''
 <pre><code>]TATIN.PublishPackage /path2package [tatin]</code></pre>
 <p>The folder may or may not carry a trailing slash (<code>/</code>).</p>
 <p>This would attempt to publish the package found in <code>path2package/</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
-<p>You can also create a ZIP file with the <code>]TATIN.Pack</code> command and specify the ZIP file as argument:</p>
+<p>You can also build a new version by calling <code>]TATIN.BuildPackage</code> and specify the resulting ZIP file as an argument to <code>PublishPackage</code>:</p>
 <pre><code>]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]</code></pre>
 <p>When a path to a package project is provided rather than a ZIP file then <code>]PublishProject</code> would create the ZIP file itself.</p>
-<p>Note that both <code>]PublishPackage</code> as well as <code>]Pack</code> assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.</p>
+<p>Note that both <code>]PublishPackage</code> as well as <code>]BuildPackage</code> assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.</p>
 <p>However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has a property <code>[CIDER]tatinFolder</code> that is designed to hold the folder with package dependencies, and if that is not empty then Tatin would use this.</p>
 <p>If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the <code>-dependencies=</code> flag.</p>
 <div class="h_tag">

@@ -15,7 +15,7 @@ If you are already familiar with the concept of semantic versioning then of cour
 
 The version number of a Tatin package must follow the rules for Semantic Versioning: it always has the format `{major}.{minor}.{patch}`. 
 
-After `{patch}` there might be more information available, separated from the patch number by a hyphen.
+After `{patch}`, more information might be available, separated from the patch number by a hyphen.
 
 Valid examples for a version number are therefore:
 
@@ -28,7 +28,7 @@ Valid examples for a version number are therefore:
 
 These pieces of information fully participate when Tatin needs to establish package precedence:
 
-`1.2.3` is "better" than  `1.2.2` but also "better" as `1.2.3-beta1` of course.
+`1.2.3` is "better" than  `1.2.2` but also "better" than `1.2.3-beta1` of course.
 
 Information after the hyphen is restricted to ASCII characters and digits until a space or a plus (`+`) is detected. 
 
@@ -40,7 +40,7 @@ After {major}-{minor}-{patch} you may add the optional build number. Build numbe
 
 I> That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build-numbers - they are the same as far as Tatin is concerned.
 
-A build number, when specified, needs to be separated by a `+` (recommended) or a `.` (deprecated). A build number may consist of digits and only digits.
+A build number, when specified, needs to be separated by a `+` (recommended) or a `.` (deprecated). A build number may consist of digits only.
 
 Note that when there are more than three dots in the version number, then the first two dots are part of establishing major, minor and patch number while the last dot defines what is considered the build number.
 
@@ -52,9 +52,9 @@ Note that when there are more than three dots in the version number, then the fi
 1.2.3-beta-1+123  (becomes 1.2.3-beta-1 as a Tatin package; recommended)
 ```
 
-Therefore `1.2.3.4` is valid, with 4 being the build number. `1.2.3-beta-1.4` is valid, with 4 being the build number. `1.2.3-beta-1` is valid, no build number. `1.2.3-beta-1.abc` is _invalid_.
+Therefore `1.2.3.4` is valid, with 4 being the build number. `1.2.3-beta-1.4` is valid, with 4 being the build number. `1.2.3-beta-1` is valid, with no build number. `1.2.3-beta-1.abc` is _invalid_.
 
-The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing precedence: build numbers are always ignored.
+The Semantic Versioning rules define when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing precedence: build numbers are always ignored.
 
 ## Terminology and versioning Rules
 
@@ -67,27 +67,27 @@ Given `1.2.3+4`:
 
 ### The Build number
 
-The build number is optional and is ignored by Tatin. However, if a package has a build-number then it is bumped whenever the package is built again, not matter what. It is never reset. 
+The build number is optional and is ignored by Tatin. However, if a package has a build-number, it is bumped whenever the package is built again, no matter what. It is never reset. 
 
 ### The Patch Number
 
 The patch number is bumped only when a change _does not affect compatibility_. 
 
-A typical example is a bug fix: imagine that a function in a package crashes because an edge condition was not handled. When you fix that problem then you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.
+A typical example is a bug fix: imagine that a function in a package crashes because an edge condition was not handled. When you fix that problem, you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.
 
 However, in real life things get messy pretty quickly: the consumer of a package might mistake a bug as a feature if it does not crash but does something it shouldn't, and take advantage of the bug. Imagine that a new version of the package comes with a fix for just that bug...
 
-If chances are high that a consumer might rely on the bug then you should actually bump the Major number rather than the Patch number - see there. Bugs that are very old are excellent candidates for that.
+If chances are high that a consumer might rely on the bug then you should bump the Major number rather than the Patch number - see there. Very old bugs are excellent candidates for that.
 
 ### The Minor number
 
 The minor version number is bumped in case functionality was added to a package. 
 
-That means that compatibility  should still be guaranteed: anything else works exactly as before. A consumer should be confident when updating the package that nothing will break. She just may take advantage of, say, a function  added to the API.
+That means that compatibility should still be guaranteed: anything else works exactly as before. A consumer should be confident when updating the package that nothing will break. She just may take advantage of, say, a function added to the API.
 
 A> ### Chances of breaking things
 A>
-A> Note that by definition it seems that a change of the minor number is indicating a very low risk: just adding functionality should never change  anything that has worked before, while a change in the patch number might come from a bug fix your code actually relies on. 
+A> Note that by definition it seems that a change of the minor number is indicating a very low risk: just adding functionality should never change anything that has worked before, while a change in the patch number might come from a bug fix your code relies on. 
 A>
 A> In reality however a version with a new (bumped) minor version number often comes with bug fixes as well.
 
@@ -120,7 +120,7 @@ Tatin reflects that by listing all major versions of a package when this user co
 
 ## Why Semantic versioning?
 
-Before the introduction of the rules of Semantic Versioning everybody assigned version numbers to their liking. Updating to a new version always carried a significant risk that things would break.
+Before the introduction of the rules of Semantic Versioning, everybody assigned version numbers to their liking. Updating to a new version always carried a significant risk that things would break.
 
 With the rules of Semantic Versioning in place, if everybody involved acts accordingly and sensibly, updating should be much safer. 
 

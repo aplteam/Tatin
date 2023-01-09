@@ -60,13 +60,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If you want to contribute to the <a href="https://github.com/aplteam/Tatin" class="external_link">Tatin project on GitHub</a> or make adjustments to Tatin for an in-house project, this document will help you.</p>
 <p>Tatin is published under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody; it is rather a community project.</p>
 <p>This document also discusses how to execute the test suite and how to build a new version of Tatin.</p>
-<p>However, this is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for “contribute to a github project”.</p>
+<p>However, this is not an introduction to how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google “contribute to a GitHub project”.</p>
 <div class="h_tag">
 <a href="#Requirements" id="Requirements" class="autoheader_anchor">
 <h2 data-id="Requirements">2. Requirements</h2>
 </a>
 </div>
-<p>In order to work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic).</p>
+<p>To work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic).</p>
 <p>You need one of:</p>
 <ul>
 <li>Windows</li>
@@ -80,7 +80,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Note that Tatin is managed by the <a href="https://github.com/aplteam/Cider" class="external_link">Cider project management tool</a>. If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.</p>
-<p>Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.</p>
+<p>Though it is possible making changes or add code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.</p>
 <div class="h_tag">
 <a href="#How-to-work-on-Tatin" id="How-to-work-on-Tatin" class="autoheader_anchor">
 <h2 data-id="How-to-work-on-Tatin">4. How to work on Tatin</h2>
@@ -106,7 +106,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.</p>
-<p>For that reason the packages installed in the <code>packages/</code> folder are copied over to the <code>APLSource/</code> folder when a new version is built. That allows loading the packages with Link.</p>
+<p>For that reason, the packages installed in the <code>packages/</code> folder are copied over to the <code>APLSource/</code> folder when a new version is built. That allows loading the packages with Link.</p>
 <p>If you need to add a package then you need to perform a couple of steps:</p>
 <ul>
 <li>Install that package into <code>packages/</code></li>
@@ -121,32 +121,32 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Now that you have a working version of Tatin on your machine you can start contributing.</p>
 <p>If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it; that might well be your first valuable contribution.</p>
 <p>Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is Kai Jaeger, but this might (and eventually will) change in the future of course.</p>
-<p>But before you can create a pull request you are supposed to run the tests in order to make sure that you did not break anything.</p>
+<p>But before you can create a pull request you are supposed to run the tests to make sure that you did not break anything.</p>
 <div class="h_tag">
 <a href="#Executing-the-test-cases" id="Executing-the-test-cases" class="autoheader_anchor">
 <h2 data-id="Executing-the-test-cases">8. Executing the test cases</h2>
 </a>
 </div>
-<p>If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider for how to do that:</p>
+<p>If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider how to do that:</p>
 <pre><code>      ]Cider.RunTests
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite</code></pre>
-<p>Executing <code>RunTests</code> means that you will be asked whether a test server should be started. Usually you will answer with a “Y”, and that lets the test suite start another instance of Dyalog, and run a test server in that instance.</p>
-<p>However, developer might also run into one of two common scenarios:</p>
+<p>Executing <code>RunTests</code> means that you will be asked whether a test server should be started. Usually, you will answer with a “Y”, and that lets the test suite start another instance of Dyalog, and run a test server in that instance.</p>
+<p>However, developers might also run into one of two common scenarios:</p>
 <ol start="1">
 <li>During development you might want to execute all tests or just a specific group (or groups) of tests.
 <p>You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like selecting an option from a list etc.</p>
 <p>When a test fails then the test framework stops, and the developer can investigate on the spot.</p></li>
 <li>You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; 95% of the tests are batchable)
 <p>This might be required by an automated build process.</p>
-<p>In this case any errors are trapped, and you get just either a single line that reports success or failure in the session or <code>⎕OFF</code> is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.</p>
+<p>In this case, any errors are trapped, and you get just either a single line that reports success or failure in the session or <code>⎕OFF</code> is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.</p>
 <p>Note that a single failing test case is considered as “failure” of the whole test suite, though the test framework will continue to execute all remaining tests.</p></li>
 </ol>
 <p>We discuss the two different scenarios one after the other.</p>
 <div class="leanpub_A">
 <h3>Creating a new version</h3>
-<p>Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version <em>before</em> you execute the test cases.</p>
+<p>Creating a new version is discussed later in this document, but there are situations when you need to create a new version <em>before</em> you execute the test cases.</p>
 <p>The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in <code>⎕SE</code> for execution, but that is only possible if you create a new version first.</p>
-<p>For that reason one test actually checks whether the version number in the workspace and in <code>⎕SE</code> do match. If you are confident that this does not matter in your case you may just carry on.</p>
+<p>For that reason one test checks whether the version number in the workspace and in <code>⎕SE</code> do match. If you are confident that this does not matter in your case you may just carry on.</p>
 </div>
 
 <div class="h_tag">
@@ -164,7 +164,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>      ]Cider.RunTests
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite</code></pre>
 <p>Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.</p>
-<p>When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually you will answer with a “Yes!” to this.</p>
+<p>When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a “Yes!” to this.</p>
 <div class="leanpub_A">
 <h3>Starting a Tatin test server “manually”</h3>
 <p>There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:</p>
@@ -192,14 +192,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Quitting-tests">8.1.2. Quitting tests</h4>
 </a>
 </div>
-<p>There are scenarios where you want to quit the test suite, for example when a test unearthed a servere bug that needs fixing straight away.</p>
+<p>There are scenarios where you want to quit the test suite, for example when a test unearthed a severe bug that needs fixing straight away.</p>
 <p>It may be tempting to enter just <code>)reset</code>, but that is not how you should do this: you have to make sure that the test suite cleans up after itself.</p>
 <p>The easiest way to achieve this is to execute this statement:</p>
 <pre><code>      T.QuitTests</code></pre>
 <div class="leanpub_A">
 <h3>Execute the client test suite multiple times in parallel</h3>
-<p>You might come up with the idea to start the client part of the tests multiple times in parallel in order to put some pressure on the Tatin Server.</p>
-<p>In general this is a good idea, but the client test suite is not suitable for this. For example, the tests that belong to the “Cache” group <em>must</em> be executed one after the other, they rely on each other. Generally this should be avoided, but here for technical reasons it's a must. Running this group in parallel contradicts this, and is bound to fail.</p>
+<p>You might come up with the idea to start the client part of the tests multiple times in parallel to put some pressure on the Tatin Server.</p>
+<p>In general this is a good idea, but the client test suite is not suitable for this. For example, the tests that belong to the “Cache” group <em>must</em> be executed one after the other, they rely on each other. Generally, this should be avoided, but here for technical reasons, it's a must. Running this group in parallel contradicts this, and is bound to fail.</p>
 </div>
 
 <div class="h_tag">
@@ -258,7 +258,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>The wildcard character (<code>*</code>) can be used to identify a group</li>
 <li>The first comment line after any header lines is displayed</li>
 </ul>
-<p>You may specify <code>'view'</code> as left argument to force the result of that function into a read-only edit window.</p>
+<p>You may specify <code>'view'</code> as the left argument to force the result of that function into a read-only edit window.</p>
 <p>Let's assume that you want to execute all tests of the group <code>API</code>:</p>
 <pre><code>T.RunThese 'API'</code></pre>
 <p>Or just the tests 8 and 20 of the group <code>API</code>:</p>
@@ -267,7 +267,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>T.RunThese 'API,Misc'</code></pre>
 <p>Or run all tests but <code>UserCommand</code>:</p>
 <pre><code>T.RunThese '~UserCommand'</code></pre>
-<p>Last not least you may specify a 1 as left argument: this makes the test framework stop just before any particular test function is executed. This can be handy in order to hunt down a bug, or any unexpected behaviour.</p>
+<p>Last but not least you may specify a 1 as the left argument: this makes the test framework stop just before any particular test function is executed. This can be handy to hunt down a bug, or any unexpected behaviour.</p>
 <pre><code>1 T.RunThese 'API'</code></pre>
 <p>The test framework offers many more options and features, refer to the documentation for exploring them: go to <a href="https://github.com/aplteam/Tester2" class="external_link">https://github.com/aplteam/Tester2</a> (full picture) or execute <code>]ADOC #.Tatin.Tester2</code> (reference).</p>
 <div class="h_tag">
@@ -284,12 +284,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Call this function:</p>
 <pre><code>#.Tatin.TestCases.RunBatchTests 1</code></pre>
-<p>The <code>1</code> provided as right argument is just an insurance against accidental calls.</p>
+<p>The <code>1</code> provided as the right argument is just insurance against accidental calls.</p>
 <p>When running the test suite with the batch flag set, as <code>RunBatchTests</code> does, is fundamentally different in several respects:</p>
 <ul>
 <li>A Tatin server that listens (by default) on port 5001 is started (and is also shut down) by the test suite itself.</li>
 <li>By default all errors are trapped.
-<p>If you need to track down a bug then you don't want this: in that case pass a <code>1</code> as left argument: this is treated as “debug” flag.</p></li>
+<p>If you need to track down a bug then you don't want this: in that case, pass a <code>1</code> as the left argument: this is treated as “debug” flag.</p></li>
 </ul>
 <p>Of course <code>RunBatchTests</code> does not execute any test cases that require a human in front of the monitor, but the number of such tests is very small anyway.</p>
 <p><code>RunBatchTests</code> checks the command line:</p>
@@ -306,7 +306,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>There are two scripts available in the Tatin root directory:</p>
 <ol start="1">
 <li><code>RunTests.bat</code> if you want to run the batch tests under Windows</li>
-<li><code>RunTests.sh</code> is you want to run the batch tests on a non-Windows platform</li>
+<li><code>RunTests.sh</code> if you want to run the batch tests on a non-Windows platform</li>
 </ol>
 <p>These are templates: check their contents, you might need to make amendments.</p>
 <div class="h_tag">
@@ -319,8 +319,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="ov1">9.1. Overview</h3>
 </a>
 </div>
-<p>Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.</p>
-<p>You may ask Cider for how to create a new version of Tatin:</p>
+<p>Usually, your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her work on a branch.</p>
+<p>You may ask Cider how to create a new version of Tatin:</p>
 <pre><code>      ]Cider.Make
 #.Tatin.#.Tatin.Admin.Make 0 ⍝ Execute this for creating a new version</code></pre>
 <p>Syntax:</p>
@@ -351,7 +351,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>It runs <code>#.Tatin.Admin.MakeServer</code></li>
 </ol>
 <p>If the right argument was a <code>0</code> then it will also ask you whether you want to attempt an update for all packages Tatin itself depends on, and it would also ask you whether the new version of the Tatin Client should be copied to the <code>MyUCMDs/</code> folder.</p>
-<p>In the process the <code>Dist/</code> folder will be recreated from scratch. The <code>.zip</code> files in <code>Dist/</code> are to be released on GitHub. The <code>Dist/</code> folder will not appear on GitHub due to <code>.gitignore</code>.</p>
+<p>In the process, the <code>Dist/</code> folder will be recreated from scratch. The <code>.zip</code> files in <code>Dist/</code> are to be released on GitHub. The <code>Dist/</code> folder will not appear on GitHub due to <code>.gitignore</code>.</p>
 <p>There will be three zip files:</p>
 <pre><code>Tatin-Client-{major}.{minor}.{patch}.zip
 Tatin-Documentation-{major}.{minor}.{patch}.zip

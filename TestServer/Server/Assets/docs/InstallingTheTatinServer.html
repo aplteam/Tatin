@@ -56,7 +56,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#The-file-entrypoint">8.3.2. The file <code>entrypoint</code></a></li>
 <li><a href="#The-file-CreateTatinDockerContainersh">8.3.3. The file <code>CreateTatinDockerContainer.sh</code></a></li>
 </ul></li>
-<li><a href="#Docker-work-flow">8.4. Docker work flow</a></li>
+<li><a href="#Docker-workflow">8.4. Docker workflow</a></li>
 </ul></li>
 <li><a href="#Testing-and-Debugging">9. Testing and Debugging</a></li>
 <li><a href="#Misc">10. Misc</a></li>
@@ -97,16 +97,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Configuration-the-INI-File">3. Configuration: the INI File</h2>
 </a>
 </div>
-<p>First you need to amend the file <code>server.ini</code>.</p>
+<p>First, you need to amend the file <code>server.ini</code>.</p>
 <div class="leanpub_A">
 <h3>Plodder</h3>
-<p>Tatin uses Plodder (<a href="https://github.com/aplteam/Plodder" class="external_link">https://github.com/aplteam/Plodder</a>) as HTTP server.</p>
+<p>Tatin uses Plodder (<a href="https://github.com/aplteam/Plodder" class="external_link">https://github.com/aplteam/Plodder</a>) as an HTTP server.</p>
 <p>The INI file is originally a Plodder INI file with some additional settings used on the application level.</p>
 </div>
 
-<p>Note that this is an old-school INI file. Well, almost: it comes with a number of features that are unusual for INI files. We just mention the most important ones here; for details see <a href="https://github.com/aplteam/IniFiles" class="external_link">https://github.com/aplteam/IniFiles</a>.</p>
+<p>Note that this is an old-school INI file. Well, almost: it comes with several features that are unusual for INI files. We just mention the most important ones here; for details see <a href="https://github.com/aplteam/IniFiles" class="external_link">https://github.com/aplteam/IniFiles</a>.</p>
 <ul>
-<li>There are data types: text needs to go between 'quotes', everything else is considered a number</li>
+<li>There are data types: text needs to go between 'quotes', and everything else is considered a number</li>
 <li>You may define local variables</li>
 </ul>
 <div class="leanpub_A">
@@ -120,7 +120,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="INIFILE">3.1. <code>&lt;INIFILE&gt;</code></h3>
 </a>
 </div>
-<p>When the Tatin Server loads the INI file it will replace the string <code>&lt;INIFILE&gt;</code> by the fully qualified directory the INI file was loaded from.</p>
+<p>When the Tatin Server loads the INI file it will replace the string <code>&lt;INIFILE&gt;</code> with the fully qualified directory the INI file was loaded from.</p>
 <div class="h_tag">
 <a href="#Settings-to-pay-attention-to" id="Settings-to-pay-attention-to" class="autoheader_anchor">
 <h3 data-id="Settings-to-pay-attention-to">3.2. Settings to pay attention to</h3>
@@ -132,7 +132,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="AppName">3.2.1. [CONFIG]AppName</h4>
 </a>
 </div>
-<p>This defines the name used by Tatin for logging to the Windows Event Log.</p>
+<p>This defines the name used by Tatin for logging into the Windows Event Log.</p>
 <p>The parameter has no meaning on non-Windows platforms, and is ignored in case <code>[LOGGING]WindowsEventLog</code> is 0 rather than 1.</p>
 <div class="h_tag">
 <a href="#Registry" id="Registry" class="autoheader_anchor">
@@ -145,7 +145,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Base">3.2.3. [CONFIG]Base</h4>
 </a>
 </div>
-<p>Replace this by your domain name, or “localhost” in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.</p>
+<p>Replace this with your domain name, or “localhost” in case you just want to run a Tatin Server on your local machine for your purposes, for example for checking it out.</p>
 <p>Never add a port number to <code>Base</code>; see <code>[CONFIG]BaseTagPort</code> for this.</p>
 <div class="h_tag">
 <a href="#BaseTagPort" id="BaseTagPort" class="autoheader_anchor">
@@ -154,7 +154,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://).</p>
 <p>In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set <code>BaseTagPort</code> to 9999. This makes Tatin inject that port number into the HTML “base” tag, so that for example links in the Tatin documentation would continue to work.</p>
-<p>However, when your Tatin Server runs “behind”, say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case you would leave <code>BaseTagPort</code> alone, except when the Apache Server itself listens to a non-standard port: then <code>BaseTagPort</code> needs to be <em>that</em> port.</p>
+<p>However, when your Tatin Server runs “behind”, say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case, you would leave <code>BaseTagPort</code> alone, except when the Apache Server itself listens to a non-standard port: then <code>BaseTagPort</code> needs to be <em>that</em> port.</p>
 <p>See also <code>[CONFIG]Base</code>.</p>
 <div class="h_tag">
 <a href="#Title" id="Title" class="autoheader_anchor">
@@ -212,7 +212,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <h4 data-id="The-section-Secure">3.2.9. The section [CONFIG]Secure</h4>
 </a>
 </div>
-<p>Flag that defines whether certificates (https) are used nor not (http).</p>
+<p>Flag that defines whether certificates (https) are used or not (http).</p>
 <div class="h_tag">
 <a href="#CERTIFICATES" id="CERTIFICATES" class="autoheader_anchor">
 <h4 data-id="CERTIFICATES">3.2.10. The section [CERTIFICATES]</h4>
@@ -225,8 +225,8 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <h4 data-id="EMAIL">3.2.11. The section [EMAIL]</h4>
 </a>
 </div>
-<p>A Tatin server can send emails, broadcasting any crashes. For that you must specify a couple of things in this section.</p>
-<p>The INI file is well documented, so you should have no trouble to make the necessary adjustments.</p>
+<p>A Tatin server can send emails, broadcasting any crashes. For that, you must specify a couple of things in this section.</p>
+<p>The INI file is well documented, so you should have no trouble making the necessary adjustments.</p>
 <div class="h_tag">
 <a href="#On-Logging" id="On-Logging" class="autoheader_anchor">
 <h2 data-id="On-Logging">4. On Logging</h2>
@@ -242,14 +242,14 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <ul>
 <li>High- (or application-) level logging should always be done. Only then is usage data available.
 <p>Note that IP addresses are <em>not</em> logged at this level.</p></li>
-<li>Low-level logging is controlled by the INI file's <code>LogHTTP</code>, <code>LogConga</code> and <code>LogRumba</code> properties. These can be useful for debugging. They log IP addresses which might be illegal in certain countries.</li>
+<li>Low-level logging is controlled by the INI file's <code>LogHTTP</code>, <code>LogConga</code>, and <code>LogRumba</code> properties. These can be useful for debugging. They log IP addresses which might be illegal in certain countries.</li>
 </ul>
 <div class="h_tag">
 <a href="#The-Windows-Event-Log" id="The-Windows-Event-Log" class="autoheader_anchor">
 <h3 data-id="The-Windows-Event-Log">4.2. The Windows Event Log</h3>
 </a>
 </div>
-<p>Under Windows you may let Tatin write to the Event Log by setting <code>WindowsEventLog</code> to 1.</p>
+<p>Under Windows, you may let Tatin write to the Event Log by setting <code>WindowsEventLog</code> to 1.</p>
 <p>This parameter is ignored on non-Windows platforms and has no effect under Windows when Tatin is not running as a Windows Service.</p>
 <p>If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and crashes are then reported to the Windows Event Log.</p>
 <div class="h_tag">
@@ -258,7 +258,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </a>
 </div>
 <p>Note that in case you want your Tatin server to serve requests from the Internet — as opposed to an Intranet — it is strongly recommended to hide the Tatin Server behind an industrial-strength HTTP server like Apache.</p>
-<p>Such a server is able to deal with attacks and has also all sorts of security measures built into it, so it's much safer to run Tatin behind it.</p>
+<p>Such a server can deal with attacks and has also all sorts of security measures built into it, so it's much safer to run Tatin behind it.</p>
 <p>There is a separate document available that discusses how to do this: <a href="./RunDyalogBehindApache.html" class="external_link" title="RunDyalogBehindApache.html">Run Dyalog behind Apache</a>.</p>
 <p>In case you hide the Tatin Server behind, say, an Apache server on the same machine there might be no need to use encryption (https).</p>
 <div class="h_tag">
@@ -267,7 +267,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </a>
 </div>
 <p>This section can be useful in case you want to inject a message into every HTML page delivered by Tatin.</p>
-<p>A typical application is the announcement of down time due to maintenance.</p>
+<p>A typical application is the announcement of downtime due to maintenance.</p>
 <p>In case <code>Text</code> is not empty it is injected as <code>&lt;div&gt;&lt;p&gt;{text}&lt;/p&gt;?&lt;/div&gt;</code>. If <code>CSS</code> is not empty it is injected into the <code>&lt;div&gt;</code> as <code>style="..."</code>.</p>
 <div class="h_tag">
 <a href="#the_app_section" id="the_app_section" class="autoheader_anchor">
@@ -287,7 +287,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </a>
 </div>
 <p>After having made the necessary adjustments in the INI file you could of course simply start an instance of Dyalog with ample memory, and load the workspace. <code>#.Tatin.Server.Run 1</code> is executed via <code>⎕LX</code>, and your server is up and running.</p>
-<p>Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but would not prevent the server from running. However, there are errors that might bring the server down like an aplcore or a WS FULL.</p>
+<p>Most errors that could occur (bugs in Tatin etc.) are trapped and will return a 500 (Internal Server Error) but would not prevent the server from running. However, some errors might bring the server down like an aplcore or a WS FULL.</p>
 <p>In such an event you are most likely interested in the server being restarted automatically.</p>
 <div class="h_tag">
 <a href="#Windows" id="Windows" class="autoheader_anchor">
@@ -299,15 +299,15 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <li>Run the Tatin Server as a Windows Service</li>
 <li>Run it as a Docker container</li>
 </ul>
-<p>Both options allow to run the Server so that it is restarted automatically in case of a failure or a reboot.</p>
-<p>Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it actually runs a (very basic) version of Linux in a virtual machine.</p>
-<p>If you want run the Tatin server as a Windows Service you can put the workspace <code>InstallAsWindowsService.dws</code> to good use: it will install Tatin as a Windows service. Note that this requires admin rights.</p>
+<p>Both options allow running the Server so that it is restarted automatically in case of a failure or a reboot.</p>
+<p>Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it runs a (very basic) version of Linux in a virtual machine.</p>
+<p>If you want to run the Tatin server as a Windows Service you can put the workspace <code>InstallAsWindowsService.dws</code> to good use: it will install Tatin as a Windows service. Note that this requires admin rights.</p>
 <div class="h_tag">
 <a href="#Linux" id="Linux" class="autoheader_anchor">
 <h3 data-id="Linux">8.2. Linux</h3>
 </a>
 </div>
-<p>Under Linux you are advised to run the Tatin Server in a Docker image.</p>
+<p>Under Linux, you are advised to run the Tatin Server in a Docker image.</p>
 <div class="h_tag">
 <a href="#Required-amendments" id="Required-amendments" class="autoheader_anchor">
 <h3 data-id="Required-amendments">8.3. Required amendments</h3>
@@ -320,12 +320,12 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </div>
 <ol start="1">
 <li>Linux Version
-<p>Specify both the name of the desired distribution and the version number in the <code>FROM</code> clause at the top of the file. In the template this is “Ubuntu” and “22.04”.</p></li>
-<li>It's is a Docker convention to specify the Docker username and email address of a maintainer in the <code>MAINTAINER</code> clause.</li>
+<p>Specify both the name of the desired distribution and the version number in the <code>FROM</code> clause at the top of the file. In the template, this is “Ubuntu” and “22.04”.</p></li>
+<li>It is a Docker convention to specify the Docker username and email address of a maintainer in the <code>MAINTAINER</code> clause.</li>
 <li>Dyalog APL
 <p>Before anything else make sure that you copy the appropriate version of Dyalog APL into the folder that holds the Docker-related files.</p></li>
 <li>Dockerfile
-<p>This file defines what docker should put into the container. In particular it must point to the desired version of Dyalog APL, so check the variables <code>DYALOG_RELEASE</code>, <code>DYALOG_VERSION</code> and <code>DYALOG_DEBFILE</code>.</p></li>
+<p>This file defines what docker should put into the container. In particular, it must point to the desired version of Dyalog APL, so check the variables <code>DYALOG_RELEASE</code>, <code>DYALOG_VERSION</code> and <code>DYALOG_DEBFILE</code>.</p></li>
 <li>Do <strong>not</strong> change the <code>WORKDIR</code>!</li>
 <li>Do not change <code>DYALOG_SERIAL</code>: this license number is explicitly reserved for Tatin servers.</li>
 </ol>
@@ -334,7 +334,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <h4 data-id="The-file-entrypoint">8.3.2. The file <code>entrypoint</code></h4>
 </a>
 </div>
-<p>In this file a couple of environment variables are defined that might not be set to your taste: <code>TRACE_ON_ERROR</code>, <code>SINGLETRACE</code> and <code>CLASSICMODE</code>.</p>
+<p>In this file, a couple of environment variables are defined that might not be set to your taste: <code>TRACE_ON_ERROR</code>, <code>SINGLETRACE</code> and <code>CLASSICMODE</code>.</p>
 <div class="h_tag">
 <a href="#The-file-CreateTatinDockerContainersh" id="The-file-CreateTatinDockerContainersh" class="autoheader_anchor">
 <h4 data-id="The-file-CreateTatinDockerContainersh">8.3.3. The file <code>CreateTatinDockerContainer.sh</code></h4>
@@ -342,20 +342,20 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </div>
 <ol start="1">
 <li>You must change the <code>source</code> parameter so that it points to the folder that hosts the Tatin server data.</li>
-<li>You might need to change the port 443, defined with the <code>-p</code> flag.
-<p>This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet, because in that scenario Tatin should run behind a web server like Apache. In that case Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.</p></li>
+<li>You might need to change port 443, defined with the <code>-p</code> flag.
+<p>This can only ever be 80 or 443 on your local machine if the Tatin server is not exposed to the Internet because in that scenario Tatin should run behind a web server like Apache. In that case, Apache would listen to 80 or 443 but communicate with the Tatin server on a different port.</p></li>
 <li>The second port exposed in that script is used for connecting with Ride to the interpreter, if ever. (Note that the INI file rules whether the interpreter allows a Ride or not)</li>
 </ol>
 <div class="h_tag">
-<a href="#Docker-work-flow" id="Docker-work-flow" class="autoheader_anchor">
-<h3 data-id="Docker-work-flow">8.4. Docker work flow</h3>
+<a href="#Docker-workflow" id="Docker-workflow" class="autoheader_anchor">
+<h3 data-id="Docker-workflow">8.4. Docker workflow</h3>
 </a>
 </div>
 <p>Execute these steps:</p>
 <ol start="1">
 <li>Call  <code>./BuildImage.sh</code> for creating the image</li>
 <li>Call  <code>./CreateTatinDockerContainer.sh</code> for creating the container from that image</li>
-<li>Call  <code>start-tatin.sh</code> to actually start the container; this script ensures that the container is restarted after a crash or auto-started after a reboot</li>
+<li>Call  <code>start-tatin.sh</code> to start the container; this script ensures that the container is restarted after a crash or auto-started after a reboot</li>
 </ol>
 <div class="h_tag">
 <a href="#Testing-and-Debugging" id="Testing-and-Debugging" class="autoheader_anchor">
@@ -366,7 +366,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <ul>
 <li><code>[CONFIG]DisplayRequests</code></li>
 <li><code>LogHTTPToSession</code></li>
-<li><code>TestFlag</code>; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute “list-commands”. Naturally this makes sense only under program control, not from a browser.</li>
+<li><code>TestFlag</code>; in case this is 1 a Tatin Server supports additional commands. To get a list of these commands execute “list-commands”. Naturally, this makes sense only under program control, not from a browser.</li>
 <li><code>ReloadWS</code></li>
 <li>The settings in the <code>[LOGFILE]</code> section</li>
 </ul>
@@ -386,7 +386,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <h2 data-id="Updating-the-Server">11. Updating the Server</h2>
 </a>
 </div>
-<p>Before updating the server <strong>you must read the release notes!</strong>. The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring a number of actions while the server is down for maintenance.</p>
+<p>Before updating the server <strong>you must read the release notes!</strong>. The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring several actions while the server is down for maintenance.</p>
 <div class="h_tag">
 <a href="#The-Workspace" id="The-Workspace" class="autoheader_anchor">
 <h3 data-id="The-Workspace">11.1. The Workspace</h3>
@@ -400,26 +400,26 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </div>
 </div>
 
-<p>Naturally the server will produce an error message for a short period of time during the reload; expect 20 seconds or more, depending on the number of packages managed by the server.</p>
+<p>Naturally, the server will produce an error message for a short period during the reload; expect 20 seconds or more, depending on the number of packages managed by the server.</p>
 <div class="h_tag">
 <a href="#The-INI-file" id="The-INI-file" class="autoheader_anchor">
 <h2 data-id="The-INI-file">12. The INI file</h2>
 </a>
 </div>
 <p>Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. <em>Do not replace the INI file!</em></p>
-<p>The server checks the INI file for having been changed, and if that is the case re-initializse the INI file. However, whether that works or not depends on the kind of change: quite a number of settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.</p>
+<p>The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: quite several settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.</p>
 <div class="h_tag">
 <a href="#Assets" id="Assets" class="autoheader_anchor">
 <h2 data-id="Assets">13. Assets</h2>
 </a>
 </div>
-<p>Which kind of actions needs to be taken, if any, is revealed by the release notes. Typically the sub folder <code>docs/</code> needs to be replace: this folder carries the documentation.</p>
+<p>What kind of actions needs to be taken, if any, is revealed by the release notes. Typically the subfolder <code>docs/</code> needs to be replaced: this folder carries the documentation.</p>
 <div class="h_tag">
 <a href="#The-folder-Maintenance" id="The-folder-Maintenance" class="autoheader_anchor">
 <h2 data-id="The-folder-Maintenance">14. The folder Maintenance/</h2>
 </a>
 </div>
-<p>First of all, never replace the folder <code>maintenance/</code>: its content documents what changes have been carried out towards the packages in the past, and you don't want to loose this.</p>
+<p>First of all, never replace the folder <code>maintenance/</code>: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.</p>
 <p>If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.</p>
 </body>
 </html>

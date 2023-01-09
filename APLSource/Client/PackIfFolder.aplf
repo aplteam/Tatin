@@ -1,5 +1,5 @@
  PackIfFolder←{
-⍝ If `⍵` is a file `⍵` is returned: it's probably a ZIP file that was typically created by `Pack`.\\
+⍝ If `⍵` is a file `⍵` is returned: it's probably a ZIP file that was typically created by `BuildPackage`.\\
 ⍝ If it's a folder it's packed into a temporay folder, and the name of that zipfile is returned.
      ⍺←''
      dependencies←⍺
@@ -7,5 +7,5 @@
      F.IsFile path:path         ⍝ Exit if it's not a folder: then it must be a ZIP file already
      CheckWouldBePackage path:
      tempDir←F.GetTempPath
-     dependencies Pack path tempDir
+     dependencies BuildPackage path tempDir''
  }

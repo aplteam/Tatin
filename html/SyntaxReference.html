@@ -21,29 +21,29 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#User-Commands">1. User Commands</a></li>
 <li><a href="#The-API">2. The API</a>
 <ul>
-<li><a href="#CheckForLaterVersion">2.1. CheckForLaterVersion</a></li>
-<li><a href="#ClearCache">2.2. ClearCache</a></li>
-<li><a href="#CreateReInstallParms">2.3. CreateReInstallParms</a></li>
-<li><a href="#DeletePackage">2.4. DeletePackage</a></li>
-<li><a href="#DeprecatePackage">2.5. DeprecatePackage</a></li>
-<li><a href="#FindDependencies">2.6. FindDependencies</a></li>
-<li><a href="#GetDeletePolicy">2.7. GetDeletePolicy</a></li>
-<li><a href="#GetDependencyTree">2.8. GetDependencyTree</a></li>
-<li><a href="#GetNoCachingFlag">2.9. GetNoCachingFlag</a></li>
-<li><a href="#GetPathToPackageCache">2.10. GetPathToPackageCache</a></li>
-<li><a href="#GetUserHomeFolder">2.11. GetUserHomeFolder</a></li>
-<li><a href="#InitialisePackage">2.12. InitialisePackage</a></li>
-<li><a href="#InitPackageConfig">2.13. InitPackageConfig</a></li>
-<li><a href="#InstallPackages">2.14. InstallPackages</a></li>
-<li><a href="#ListDeprecated">2.15. ListDeprecated</a></li>
-<li><a href="#ListCache">2.16. ListCache</a></li>
-<li><a href="#ListPackages">2.17. ListPackages</a></li>
-<li><a href="#ListRegistries">2.18. ListRegistries</a></li>
-<li><a href="#ListTags">2.19. ListTags</a></li>
-<li><a href="#ListVersions">2.20. ListVersions</a></li>
-<li><a href="#LoadDependencies">2.21. LoadDependencies</a></li>
-<li><a href="#LoadPackages">2.22. LoadPackages</a></li>
-<li><a href="#Pack">2.23. Pack</a></li>
+<li><a href="#BuildPackage">2.1. BuildPackage</a></li>
+<li><a href="#CheckForLaterVersion">2.2. CheckForLaterVersion</a></li>
+<li><a href="#ClearCache">2.3. ClearCache</a></li>
+<li><a href="#CreateReInstallParms">2.4. CreateReInstallParms</a></li>
+<li><a href="#DeletePackage">2.5. DeletePackage</a></li>
+<li><a href="#DeprecatePackage">2.6. DeprecatePackage</a></li>
+<li><a href="#FindDependencies">2.7. FindDependencies</a></li>
+<li><a href="#GetDeletePolicy">2.8. GetDeletePolicy</a></li>
+<li><a href="#GetDependencyTree">2.9. GetDependencyTree</a></li>
+<li><a href="#GetNoCachingFlag">2.10. GetNoCachingFlag</a></li>
+<li><a href="#GetPathToPackageCache">2.11. GetPathToPackageCache</a></li>
+<li><a href="#GetUserHomeFolder">2.12. GetUserHomeFolder</a></li>
+<li><a href="#InitialisePackage">2.13. InitialisePackage</a></li>
+<li><a href="#InitPackageConfig">2.14. InitPackageConfig</a></li>
+<li><a href="#InstallPackages">2.15. InstallPackages</a></li>
+<li><a href="#ListDeprecated">2.16. ListDeprecated</a></li>
+<li><a href="#ListCache">2.17. ListCache</a></li>
+<li><a href="#ListPackages">2.18. ListPackages</a></li>
+<li><a href="#ListRegistries">2.19. ListRegistries</a></li>
+<li><a href="#ListTags">2.20. ListTags</a></li>
+<li><a href="#ListVersions">2.21. ListVersions</a></li>
+<li><a href="#LoadDependencies">2.22. LoadDependencies</a></li>
+<li><a href="#LoadPackages">2.23. LoadPackages</a></li>
 <li><a href="#Ping">2.24. Ping</a></li>
 <li><a href="#PublishPackage">2.25. PublishPackage</a></li>
 <li><a href="#ReInstallDependencies">2.26. ReInstallDependencies</a></li>
@@ -79,9 +79,67 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>The API is established in <code>⎕SE.Tatin</code>. These are almost exclusively dfns that call a function in <code>⎕SE._Tatin</code>.</p>
 <p>While <code>⎕SE._Tatin</code> holds all code required for the Tatin client, <code>⎕SE.Tatin</code> holds the public interface. A user is supposed to call functions in <code>Tatin</code> but not <code>_Tatin</code>.</p>
+<p>The API funcion are listed alphabetically.</p>
+<div class="h_tag">
+<a href="#BuildPackage" id="BuildPackage" class="autoheader_anchor">
+<h3 data-id="BuildPackage">2.1. BuildPackage</h3>
+</a>
+</div>
+<pre><code>zipFilename←{dependencies} BuildPackage projectPath targetPath version</code></pre>
+<p>ZIPs all files that are required for a package and/or defined in the <code>apl-package.json</code> file and (optionally) a dependency file from a given folder and creates a ZIP file containing these files in the (optional) <code>targetPath</code>.</p>
+<dl>
+<dt>projectPath:</dt>
+<dd><p>A folder to create the package from: a package project</p></dd>
+<dt>targetPath:</dt>
+<dd><p class="first_dd">The folder the ZIP file is created in</p></dd>
+<dd><p>Note that if <code>targetPath</code> is empty then it defaults to <code>projectPath</code></p></dd>
+<dt>version:</dt>
+<dd><p>Either empty or a replacement string for “version” or a rule how to modify the version number</p></dd>
+</dl>
+<div class="h_tag">
+<a href="#The-version-number" id="The-version-number" class="autoheader_anchor">
+<h4 data-id="The-version-number">2.1.1. The version number</h4>
+</a>
+</div>
+<div class="h_tag">
+<a href="#version-starts-with-a" id="version-starts-with-a" class="autoheader_anchor">
+<h5 data-id="version-starts-with-a">2.1.1.1. “version” starts with a “+”</h5>
+</a>
+</div>
+<p>It's treated as a rule. For that it must come with three digits separated by dots. The digits may be just 0 or 1.</p>
+<p>The rules:</p>
+<ul>
+<li><code>+0.0.1</code> bumps the patch number</li>
+<li><code>+0.1.0</code> bumps the minor number and resets the patch number</li>
+<li><code>+1.0.0</code> bumps the major number and resets both the patch number and the minor number</li>
+</ul>
+<div class="h_tag">
+<a href="#version-does-not-start-with-a" id="version-does-not-start-with-a" class="autoheader_anchor">
+<h5 data-id="version-does-not-start-with-a">2.1.1.2. “version” does not start with a “+”</h5>
+</a>
+</div>
+<ul>
+<li>If <code>version</code> is empty then just the build number is bumped</li>
+<li>If <code>version</code> is not empty but does not carry a build number then it replaces the version information but the build number, which is bumped</li>
+<li>If <code>version</code> is not empty and carries a build number then it replaces the version information including the build number, and that build number is still bumped</li>
+</ul>
+<div class="h_tag">
+<a href="#Dependencies" id="Dependencies" class="autoheader_anchor">
+<h4 data-id="Dependencies">2.1.2. Dependencies</h4>
+</a>
+</div>
+<p>Called without an (optional) left argument <code>BuildPackage</code> tries to establish whether the package depends on other packages:</p>
+<ol start="1">
+<li>It checks whether the package is managed by Cider (read: has a file <code>cider.config</code>). If that is the case it checks the property <code>[CIDER]tatinFolder</code> in that file. If that defines a folder that is not assigned to a subnamespace of the package then it is taken.
+<p>Refer to the Cider documentation on <code>tatinFolder</code> for details.</p></li>
+<li>If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/.</li>
+<li>If there is no subfolder packages/, or if it does not host a file <code>apl-dependencies.txt</code> then Tatin looks for a file <code>apl-dependencies.txt</code> in the root of the package project.</li>
+<li>If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as left argument to <code>BuildPackage</code>.</li>
+</ol>
+<p>If no file <code>apl-dependencies.txt</code> can be detected then Tatin assumes that the package does not depend on other packages.</p>
 <div class="h_tag">
 <a href="#CheckForLaterVersion" id="CheckForLaterVersion" class="autoheader_anchor">
-<h3 data-id="CheckForLaterVersion">2.1. CheckForLaterVersion</h3>
+<h3 data-id="CheckForLaterVersion">2.2. CheckForLaterVersion</h3>
 </a>
 </div>
 <pre><code> r←{flags} CheckForLaterVersion path</code></pre>
@@ -148,21 +206,21 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </table>
 <div class="h_tag">
 <a href="#ClearCache" id="ClearCache" class="autoheader_anchor">
-<h3 data-id="ClearCache">2.2. ClearCache</h3>
+<h3 data-id="ClearCache">2.3. ClearCache</h3>
 </a>
 </div>
 <pre><code>(rc report)←ClearCache dummy</code></pre>
 <p>Clears the cache, meaning that all subdirectories but <code>temp\</code> are removed from the folder <code>GetPathToPackageCache</code> points to.</p>
 <div class="h_tag">
 <a href="#CreateReInstallParms" id="CreateReInstallParms" class="autoheader_anchor">
-<h3 data-id="CreateReInstallParms">2.3. CreateReInstallParms</h3>
+<h3 data-id="CreateReInstallParms">2.4. CreateReInstallParms</h3>
 </a>
 </div>
 <pre><code>r←CreateReInstallParms</code></pre>
 <p>Creates a namespace with default parameters; it can be passed as (optional) left argument to the <a href="#ReInstallDependencies" class="bookmark_link"><code>ReInstallDependencies</code></a> function, in particular, <code>noBetas</code>, <code>update</code> and <code>dry</code>.</p>
 <div class="h_tag">
 <a href="#DeletePackage" id="DeletePackage" class="autoheader_anchor">
-<h3 data-id="DeletePackage">2.4. DeletePackage</h3>
+<h3 data-id="DeletePackage">2.5. DeletePackage</h3>
 </a>
 </div>
 <pre><code>(statusCode errMsg)←DeletePackage uri</code></pre>
@@ -170,7 +228,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the INI setting <code>[CONFIG]DeletePackages</code>. See <a href="#GetDeletePolicy" class="bookmark_link"><code>GetDeletePolicy</code></a>.</p>
 <div class="h_tag">
 <a href="#DeprecatePackage" id="DeprecatePackage" class="autoheader_anchor">
-<h3 data-id="DeprecatePackage">2.5. DeprecatePackage</h3>
+<h3 data-id="DeprecatePackage">2.6. DeprecatePackage</h3>
 </a>
 </div>
 <pre><code>msg←DeprecatePackage y</code></pre>
@@ -185,7 +243,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that because the Registry must be defined no scanning takes place with this function.</p>
 <div class="h_tag">
 <a href="#FindDependencies" id="FindDependencies" class="autoheader_anchor">
-<h3 data-id="FindDependencies">2.6. FindDependencies</h3>
+<h3 data-id="FindDependencies">2.7. FindDependencies</h3>
 </a>
 </div>
 <pre><code>r←{level} FindDependencies (folder pkgList)
@@ -198,7 +256,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>By default just the folder is returned that contains the file “apl-dependencies.txt”. In case a 1 is passed as left argument (default is 0, other values led to an error) the actual package folders are returned, revealing the precise version(s) installed.</p>
 <div class="h_tag">
 <a href="#GetDeletePolicy" id="GetDeletePolicy" class="autoheader_anchor">
-<h3 data-id="GetDeletePolicy">2.7. GetDeletePolicy</h3>
+<h3 data-id="GetDeletePolicy">2.8. GetDeletePolicy</h3>
 </a>
 </div>
 <pre><code>r←GetDeletePolicy uri</code></pre>
@@ -211,7 +269,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#GetDependencyTree" id="GetDependencyTree" class="autoheader_anchor">
-<h3 data-id="GetDependencyTree">2.8. GetDependencyTree</h3>
+<h3 data-id="GetDependencyTree">2.9. GetDependencyTree</h3>
 </a>
 </div>
 <pre><code>tree←GetDependencyTree x</code></pre>
@@ -248,7 +306,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that the function accepts an optional left argument, but this should not be specified by a user: it is only used internally.</p>
 <div class="h_tag">
 <a href="#GetNoCachingFlag" id="GetNoCachingFlag" class="autoheader_anchor">
-<h3 data-id="GetNoCachingFlag">2.9. GetNoCachingFlag</h3>
+<h3 data-id="GetNoCachingFlag">2.10. GetNoCachingFlag</h3>
 </a>
 </div>
 <pre><code>flag←GetNoCachingFlag uri</code></pre>
@@ -256,7 +314,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If URI is not found a 0 is returned.</p>
 <div class="h_tag">
 <a href="#GetPathToPackageCache" id="GetPathToPackageCache" class="autoheader_anchor">
-<h3 data-id="GetPathToPackageCache">2.10. GetPathToPackageCache</h3>
+<h3 data-id="GetPathToPackageCache">2.11. GetPathToPackageCache</h3>
 </a>
 </div>
 <pre><code>r←GetPathToPackageCache</code></pre>
@@ -267,7 +325,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#GetUserHomeFolder" id="GetUserHomeFolder" class="autoheader_anchor">
-<h3 data-id="GetUserHomeFolder">2.11. GetUserHomeFolder</h3>
+<h3 data-id="GetUserHomeFolder">2.12. GetUserHomeFolder</h3>
 </a>
 </div>
 <pre><code>path←{aplVersion} GetUserHomeFolder append</code></pre>
@@ -283,7 +341,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p><code>⍺</code> is optional and only specified by test cases in order to simulate different versions of APL.</p>
 <div class="h_tag">
 <a href="#InitialisePackage" id="InitialisePackage" class="autoheader_anchor">
-<h3 data-id="InitialisePackage">2.12. InitialisePackage</h3>
+<h3 data-id="InitialisePackage">2.13. InitialisePackage</h3>
 </a>
 </div>
 <pre><code>config←{configParms} InitialisePackage folder</code></pre>
@@ -292,7 +350,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>There must be no config file yet, otherwise an error is thrown.</p>
 <div class="h_tag">
 <a href="#InitPackageConfig" id="InitPackageConfig" class="autoheader_anchor">
-<h3 data-id="InitPackageConfig">2.13. InitPackageConfig</h3>
+<h3 data-id="InitPackageConfig">2.14. InitPackageConfig</h3>
 </a>
 </div>
 <pre><code>cfg←InitPackageConfig y</code></pre>
@@ -300,7 +358,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p><code>⍵</code> might be empty; then it is ignored. Alternatively, it might be a namespace with variables. If it is then the variables in that namespace overwrite the defaults.</p>
 <div class="h_tag">
 <a href="#InstallPackages" id="InstallPackages" class="autoheader_anchor">
-<h3 data-id="InstallPackages">2.14. InstallPackages</h3>
+<h3 data-id="InstallPackages">2.15. InstallPackages</h3>
 </a>
 </div>
 <pre><code>r←{noBetas} InstallPackages (identifiers targetFolder)</code></pre>
@@ -324,7 +382,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#ListDeprecated" id="ListDeprecated" class="autoheader_anchor">
-<h3 data-id="ListDeprecated">2.15. ListDeprecated</h3>
+<h3 data-id="ListDeprecated">2.16. ListDeprecated</h3>
 </a>
 </div>
 <pre><code>r←ListDeprecated uri</code></pre>
@@ -337,7 +395,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#ListCache" id="ListCache" class="autoheader_anchor">
-<h3 data-id="ListCache">2.16. ListCache</h3>
+<h3 data-id="ListCache">2.17. ListCache</h3>
 </a>
 </div>
 <pre><code>r←{fullpath} Listcache uri</code></pre>
@@ -356,7 +414,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>In case the cache is empty an empty vector is returned.</p>
 <div class="h_tag">
 <a href="#ListPackages" id="ListPackages" class="autoheader_anchor">
-<h3 data-id="ListPackages">2.17. ListPackages</h3>
+<h3 data-id="ListPackages">2.18. ListPackages</h3>
 </a>
 </div>
 <pre><code>mat←{parms} ListPackages uri</code></pre>
@@ -368,12 +426,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#Right-argument" id="Right-argument" class="autoheader_anchor">
-<h4 data-id="Right-argument">2.17.1. Right argument</h4>
+<h4 data-id="Right-argument">2.18.1. Right argument</h4>
 </a>
 </div>
 <div class="h_tag">
 <a href="#Install-folder" id="Install-folder" class="autoheader_anchor">
-<h5 data-id="Install-folder">2.17.1.1. Install folder</h5>
+<h5 data-id="Install-folder">2.18.1.1. Install folder</h5>
 </a>
 </div>
 <p>In case an install folder was specified a two-column matrix is returned:</p>
@@ -391,7 +449,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </table>
 <div class="h_tag">
 <a href="#Registry" id="Registry" class="autoheader_anchor">
-<h5 data-id="Registry">2.17.1.2. Registry</h5>
+<h5 data-id="Registry">2.18.1.2. Registry</h5>
 </a>
 </div>
 <p>In case a Registry was specified by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.</p>
@@ -399,7 +457,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.</p>
 <div class="h_tag">
 <a href="#uri" id="uri" class="autoheader_anchor">
-<h5 data-id="uri">2.17.1.3. uri</h5>
+<h5 data-id="uri">2.18.1.3. uri</h5>
 </a>
 </div>
 <ul>
@@ -421,7 +479,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#Left-argument" id="Left-argument" class="autoheader_anchor">
-<h4 data-id="Left-argument">2.17.2. Left argument</h4>
+<h4 data-id="Left-argument">2.18.2. Left argument</h4>
 </a>
 </div>
 <p>Optionally <code>parms</code> can be specified. If specified this must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>. It may contain <code>date</code>, <code>since</code> and <code>project_url</code>.</p>
@@ -444,7 +502,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#Result" id="Result" class="autoheader_anchor">
-<h4 data-id="Result">2.17.3. Result</h4>
+<h4 data-id="Result">2.18.3. Result</h4>
 </a>
 </div>
 <p>Returns a matrix with at least two and up to four columns. These columns are always returned:</p>
@@ -463,14 +521,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>In case <code>date</code> was specified, the result has one more column carrying the publishing date.</p>
 <div class="h_tag">
 <a href="#Deprecated-packages" id="Deprecated-packages" class="autoheader_anchor">
-<h4 data-id="Deprecated-packages">2.17.4. Deprecated packages</h4>
+<h4 data-id="Deprecated-packages">2.18.4. Deprecated packages</h4>
 </a>
 </div>
 <p>In case the last published version of a package carries a flag <code>deprecated</code> in its config file and that is a 1, such a package and all its predecessors with the same major version number <em>are not listed</em>.</p>
 <p>To list just deprecated packages use <code>ListDepreciated</code>.</p>
 <div class="h_tag">
 <a href="#ListRegistries" id="ListRegistries" class="autoheader_anchor">
-<h3 data-id="ListRegistries">2.18. ListRegistries</h3>
+<h3 data-id="ListRegistries">2.19. ListRegistries</h3>
 </a>
 </div>
 <pre><code>r←ListRegistries type</code></pre>
@@ -516,7 +574,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#ListTags" id="ListTags" class="autoheader_anchor">
-<h3 data-id="ListTags">2.19. ListTags</h3>
+<h3 data-id="ListTags">2.20. ListTags</h3>
 </a>
 </div>
 <pre><code>list←{parms} ListTags y</code></pre>
@@ -530,7 +588,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Optionally <code>⍺</code> can be specified. Must be a namespace that might contain a variable <code>tags</code> which may specify one or more tags (simple comma-separated text vector). If that is the case only the tags shared by the packages that carry all of the specified tags will be returned.</p>
 <div class="h_tag">
 <a href="#ListVersions" id="ListVersions" class="autoheader_anchor">
-<h3 data-id="ListVersions">2.20. ListVersions</h3>
+<h3 data-id="ListVersions">2.21. ListVersions</h3>
 </a>
 </div>
 <pre><code>mat←{dateFlag} ListVersions url</code></pre>
@@ -564,7 +622,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Note that the package ID might use any case, meaning that if the package's name is <code>foo-Goo</code> then you might as well spell it <code>foo-GOO</code> or <code>FOO-goo</code>: it would not make a difference</p>
 <div class="h_tag">
 <a href="#LoadDependencies" id="LoadDependencies" class="autoheader_anchor">
-<h3 data-id="LoadDependencies">2.21. LoadDependencies</h3>
+<h3 data-id="LoadDependencies">2.22. LoadDependencies</h3>
 </a>
 </div>
 <pre><code>{r}←LoadDependencies y</code></pre>
@@ -580,7 +638,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Returns a vector with references to the loaded packages (principal packages only, so no dependencies).</p>
 <div class="h_tag">
 <a href="#LoadPackages" id="LoadPackages" class="autoheader_anchor">
-<h3 data-id="LoadPackages">2.22. LoadPackages</h3>
+<h3 data-id="LoadPackages">2.23. LoadPackages</h3>
 </a>
 </div>
 <pre><code>r←{noBetas} LoadPackages (identifiers targetSpace)</code></pre>
@@ -602,29 +660,6 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as <code>⍺</code>.</p>
 <p>Returns the number of packages installed, including dependencies.</p>
 <p>Note that the package ID(s) might use any case, meaning that if the package's name is <code>foo-Goo-1.2.3</code> then you might as well spell it <code>foo-GOO-1.2.3</code> or <code>FOO-goo-1.2.3</code>: it would not make a difference</p>
-<div class="h_tag">
-<a href="#Pack" id="Pack" class="autoheader_anchor">
-<h3 data-id="Pack">2.23. Pack</h3>
-</a>
-</div>
-<pre><code>zipFilename←{dependencies} Pack projectPath [targetPath]</code></pre>
-<p>ZIPs all files in a given folder and puts the ZIP file into the (optional) <code>targetPath</code>.</p>
-<dl>
-<dt>projectPath:</dt>
-<dd><p>A folder to create the package from</p></dd>
-<dt>targetPath:</dt>
-<dd><p class="first_dd">A folder the ZIP file goes into</p></dd>
-<dd><p>Note that if <code>targetPath</code> is not specified or empty then it defaults to <code>projectPath</code></p></dd>
-</dl>
-<p><code>Pack</code> tries to establish whether the package depends on other packages:</p>
-<ol start="1">
-<li>It checks whether the package is managed by Cider (read: has a file <code>cider.config</code>). If that is the case it checks the property <code>[CIDER]tatinFolder</code> in that file. If that defines a folder that is not assigned to a subnamespace of the package then it is taken.
-<p>Refer to the Cider documentation on <code>tatinFolder</code> for details.</p></li>
-<li>If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/.</li>
-<li>If there is no subfolder packages/, or if it does not host a file <code>apl-dependencies.txt</code> then Tatin looks for a file <code>apl-dependencies.txt</code> in the root of the package project.</li>
-<li>If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as left argument to <code>Pack</code>.</li>
-</ol>
-<p>If no file <code>apl-dependencies.txt</code> can be detected then Tatin assumes that the package does not depend on other packages.</p>
 <div class="h_tag">
 <a href="#Ping" id="Ping" class="autoheader_anchor">
 <h3 data-id="Ping">2.24. Ping</h3>
@@ -651,8 +686,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><code>source</code> → folder to create the package from</li>
 <li><code>registry</code> → registry to publish the package to (alias or url)</li>
 </ol>
-<p>In case a folder is specified rather than a ZIP file then <code>PublishPackage</code> tries to establish whether the package depends on other packages. This is done by the API function <code>Pack</code>, which is called by <code>PublishPackage</code> internally.</p>
-<p>The optional left argument <code>dependencies</code> is, when specified, passed as left argument to <code>Pack</code>; see there for details.</p>
+<p>In case a folder is specified rather than a ZIP file then <code>PublishPackage</code> tries to establish whether the package depends on other packages. This is done by the API function <code>BuildPackage</code>, which is called by <code>PublishPackage</code> internally.</p>
+<p>The optional left argument <code>dependencies</code> is, when specified, passed as left argument to <code>BuildPackage</code>; see there for details.</p>
 <p>The explicit result:</p>
 <ul>
 <li><code>statusCode</code> is an HTTP code no matter whether it is an HTTP call or not.</li>

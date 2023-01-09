@@ -1,6 +1,6 @@
- r←Test_Pack_044(stopFlag batchFlag);⎕TRAP;qdmx
- ;dir;src;dist;cfg;ns;list;expected
-⍝ Package with an invalid built number (separated by "+")
+ r←Test_BuildPackage_040(stopFlag batchFlag);⎕TRAP
+ ;dir;src;dist;cfg;zipfile;ns
+⍝ Package with a build number
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -18,17 +18,16 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_B'
- cfg.version←'0.1.0+4a'
+ cfg.version←'0.1.0+456'
  cfg.assets←'assets/' 'user_guide.txt'
  cfg.source←'source'
+ cfg.os_win←1
+ TC.WritePackageConfigFile src cfg
 
- :Trap 998
-     TC.WritePackageConfigFile src cfg
-     →T.GoToTidyUp 1
- :Else
-     qdmx←⎕DMX
-     →T.GoToTidyUp'Build number must be nothing but digits'≢qdmx.EM
- :EndTrap
+ zipfile←TC.BuildPackage src dist''
+
+ →T.GoToTidyUp 0≥≢zipfile
+ →T.GoToTidyUp'Example-Package_B-0.1.0'≢2⊃⎕NPARTS zipfile
 
  r←T._OK
 

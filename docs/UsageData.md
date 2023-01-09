@@ -20,12 +20,12 @@ Tatin uses a machine-specific cache when downloading a package in order to save 
 
 So a single download can testify only so much: it might just be an attempt to give a package a try and then forget about it, or it might be used in several different applications, and by multiple users, all but the first one served by the cache. You can't know.
 
-Tatin's own test suite requests packages from both the Tatin Server and the Test server, but these requests are flagged as part of a test and ignored when the usage data is compiled.
+Tatin's test suite requests packages from both the Tatin Server and the Test server, but these requests are flagged as part of a test and ignored when the usage data is compiled.
 
 
 ## What Tatin is doing
 
-With the arrival of a new month Tatin collects all the data of the current year except the new month and saves them as a CSV file. It then compresses the file and makes it available for download.
+With the arrival of a new month, Tatin collects all the data of the current year except the new month and saves them as a CSV file. It then compresses the file and makes it available for download.
 
 The name of the file is `usage-data-<YYYY>-<MM>`. For example, in May 2022 it would save `usage-data-2022-04`, and it would also delete the file `usage-data-2022-03`.
 

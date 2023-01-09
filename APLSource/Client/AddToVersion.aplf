@@ -1,0 +1,33 @@
+ r←add AddToVersion txt;version;build;add_;version_;trailer;buff
+⍝ `txt` is something like "1.2.3" or "1.2.3-beta-1" or "1.2.3-beta-1+121"
+⍝ `add` is something like "0.0.1" or "0.1.0"
+⍝ Examples:
+⍝ '1.2.4' ← '0.0.1' AddToVersion '1.2.3'
+⍝ '1.3.0' ← '0.1.0' AddToVersion '1.2.3'
+⍝ '2.0.0' ← '1.0.0' AddToVersion '1.2.3'
+⍝ '2.0.0' ← '1.0.0' AddToVersion '1.2.3-beta-1'  (!)
+ :If '+'∊txt
+     (version build)←'+'(≠⊆⊢)txt
+     build←'+',build
+ :Else
+     version←txt
+     build←''
+ :EndIf
+ version_←3↑('.'(≠⊆⊢)version),'.0'
+ :If ⊃⎕VFI 3⊃version_
+     trailer←''
+ :Else
+     (buff trailer)←{⍵{(⍵↑⍺)(⍵↓⍺)}¯1+⍵⍳'-'}3⊃version_
+     (3⊃version_)←buff
+ :EndIf
+ version_←⊃∘A.ToNum¨version_
+ add_←3↑('.'(≠⊆⊢)add~'+'),'.0'
+ add_←⊃∘A.ToNum¨add_
+ :If 1⊃add_
+     version_[2 3]←0
+ :ElseIf 2⊃add_
+     version_[3]←0
+ :EndIf
+ r←⊃{⍺,'.',⍵}/⍕¨version_+add_
+ r,←build
+⍝Done

@@ -1,6 +1,6 @@
- r←Test_Pack_040(stopFlag batchFlag);⎕TRAP
- ;dir;src;dist;cfg;zipfile;ns
-⍝ Package with a build number
+ r←Test_BuildPackage_043(stopFlag batchFlag);⎕TRAP
+ ;dir;src;dist;cfg;zipfile;ns;list;expected
+⍝ Package with a patch number with additional information ("1-beta-2") and a built number (separated by "+")
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -18,16 +18,16 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_B'
- cfg.version←'0.1.0+456'
+ cfg.version←'0.1.0-beta-2+456'
  cfg.assets←'assets/' 'user_guide.txt'
  cfg.source←'source'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.Pack src dist
+ zipfile←TC.BuildPackage src dist''
 
  →T.GoToTidyUp 0≥≢zipfile
- →T.GoToTidyUp'Example-Package_B-0.1.0'≢2⊃⎕NPARTS zipfile
+ →T.GoToTidyUp'Example-Package_B-0.1.0-beta-2'≢2⊃⎕NPARTS zipfile
 
  r←T._OK
 

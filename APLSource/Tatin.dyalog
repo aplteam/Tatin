@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.55.0 - 2023-01-05
+⍝ * 0.56.0 - 2023-01-06
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -16,6 +16,12 @@
       r←⍬
      
       :If IfAtLeastVersion 18
+     
+          c←⎕NS ⍬
+          c.Name←'BuildPackage'
+          c.Desc←'Build a new version of a package (zips) all required files in ⍵[1] into the folder ⍵[2]'
+          c.Parse←'2s -dependencies= -version='
+          r,←c
      
           c←⎕NS ⍬
           c.Name←'CreatePackage'
@@ -105,12 +111,6 @@
           c.Name←'PackageDependencies'
           c.Desc←'Create and/or edit a package dependency file for a specific folder'
           c.Parse←'1 -delete -edit -quiet'
-          r,←c
-     
-          c←⎕NS ⍬
-          c.Name←'Pack'
-          c.Desc←'Pack (zips) all required files found in ⍵[1] into the folder ⍵[2]'
-          c.Parse←'2s -dependencies='
           r,←c
      
           c←⎕NS ⍬
@@ -679,9 +679,10 @@
       :EndTrap
     ∇
 
-    ∇ zipFilename←Pack Arg;filename;sourcePath;targetPath;prompt;msg;dependencies
+    ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version
       (sourcePath targetPath)←Arg.(_1 _2)
       prompt←0
+      zipFilename←''
       :If 0≡sourcePath
       :OrIf (,'.')≡,sourcePath
       :OrIf 0=≢sourcePath
@@ -695,6 +696,11 @@
           prompt∨←1
       :EndIf
       dependencies←''Arg.Switch'dependencies'
+      version←''Arg.Switch'version'
+      :If '+'=1⍴version
+          'A rule for "version" must have two dots and just 0 and 1'Assert 2+.='.'=1↓version
+          'A rule for "version" must have two dots and just 0 and 1'Assert∧/('.'~⍨1↓version)∊'01'
+      :EndIf
       (sourcePath targetPath)←AddSlash¨sourcePath targetPath
       'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
       filename←sourcePath,TC.CFG_Name
@@ -712,6 +718,7 @@
               msg,←targetPath,'?'
           :EndIf
       :AndIf 0=1 TC.C.YesOrNo msg
+          ⎕←'Cancelled by user'
           :Return
       :EndIf
       :If 0=⎕NEXISTS targetPath
@@ -719,11 +726,7 @@
           TC.F.MkDir targetPath
       :EndIf
       'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
-      :If 0=≢dependencies
-          zipFilename←TC.Pack sourcePath targetPath
-      :Else
-          zipFilename←dependencies TC.Pack sourcePath targetPath
-      :EndIf
+      zipFilename←dependencies TC.BuildPackage sourcePath targetPath version
     ∇
 
     ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies
@@ -1377,6 +1380,9 @@
       :Select level
       :Case 0
           :Select ⎕C Cmd
+          :Case ⎕C'BuildPackage'
+              r,←⊂'Create a new version of a package (resulting in a ZIP) from the directory.'
+              r,←'' '  ]Tatin.BuildPackage [<package-folder>] [<target-folder>] -dependencies= -version='
           :Case ⎕C'CreatePackage'
               r,←⊂'Create a new Tatin package with a given folder.'
               r,←'' '  ]Tatin.CreatePackage'
@@ -1411,7 +1417,7 @@
               r,←⊂'Checks whether there are maintenance files available and asks the user about it'
               r,←'' '  ]Tatin.Maintenance path [-dry] [-show]'
           :Case ⎕C'UserSettings'
-              r,←⊂'Print the user settings found in the config file to ⎕SE and allows manipulation via flags'
+              r,←⊂'Print the usfer settings found in the config file to ⎕SE and allows manipulation via flags'
               r,←'' '  ]Tatin.UserSettings [-apikey] [-edit] [-refresh]'
           :Case ⎕C'PackageConfig'
               r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
@@ -1422,9 +1428,6 @@
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←'' '  ]Tatin.PackageDependencies <package-path> [-edit] [-delete] [-quiet]'
-          :Case ⎕C'Pack'
-              r,←⊂'Create a ZIP file that is a package from the directory.'
-              r,←'' '  ]Tatin.Pack [<package-folder>] [<target-folder>] -dependencies='
           :Case ⎕C'PublishPackage'
               r,←⊂'Publish a package to a particular Tatin Registry.'
               r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> <Registry-URL|[Registry-Alias]> -dependencies='
@@ -1475,6 +1478,27 @@
           :EndIf
       :Case 1
           :Select ⎕C Cmd
+          :Case ⎕C'BuildPackage'
+              r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
+              r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
+              r,←⊂'Note that calling this function will always increase the build number if there is one.'
+              r,←⊂''
+              r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
+              r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
+              r,←⊂''
+              r,←⊂'-version=       Use this to set the version number in both the package project and the package'
+              r,←⊂'                that is about to be created. You have several options:'
+              r,←⊂'                * -version=+0.0.1 → bumps the patch number'
+              r,←⊂'                * -version=+0.1.0 → bumps the minor number, and resets the patch number'
+              r,←⊂'                * -version=+1.0.0 → bumps the major number, and resets patch & minor number'
+              r,←⊂'                * -version=1.2.3-beta-2 assigns the given string to "version"'
+              r,←⊂'                  It will preserve the build number and bump it'
+              r,←⊂'                * -version=1.2.3-beta-2+123 will replace whatever is saved on "version", including'
+              r,←⊂'                  the build number, which will still be bumped'
+              r,←⊂''
+              r,←⊂'-dependencies=  Use this to specify a subfolder of the project holding package dependencies.'
+              r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'
+              r,←⊂'                the document "Publishing Packages".'
           :Case ⎕C'CreatePackage'
               r,←⊂'Prints a user command to the session that allow creating a package config file, the'
               r,←⊂'equivalent of creating a package.'
@@ -1693,20 +1717,10 @@
               r,←⊂'-delete In case you want to delete the file specify the -delete flag.'
               r,←⊂''
               r,←⊂'-quiet  Useful for test cases: it prevents Tatin from interrogating the user'
-          :Case ⎕C'Pack'
-              r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
-              r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
-              r,←⊂''
-              r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
-              r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
-              r,←⊂''
-              r,←⊂'-dependencies=  Use this to specify a subfolder of the project holding package dependencies.'
-              r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'
-              r,←⊂'                the document "Publishing Packages".'
           :Case ⎕C'PublishPackage'
               r,←⊂'Publish a package to a particular Tatin Registry.'
               r,←⊂'Such a package can be one of:'
-              r,←⊂' * ZIP file, typically created by calling ]Tatin.Pack'
+              r,←⊂' * ZIP file, typically created by calling ]Tatin.BuildPackage'
               r,←⊂' * Folder that contains everything that defines a package; in this case the required ZIP is'
               r,←⊂'   created by "PublishPackage" itself.'
               r,←⊂''
@@ -1951,7 +1965,7 @@
           :Case ⎕C'PackageConfig'
           :Case ⎕C'UnInstallPackage'
           :Case ⎕C'PackageDependencies'
-          :Case ⎕C'Pack'
+          :Case ⎕C'BuildPackage'
           :Case ⎕C'PublishPackage'
           :Case ⎕C'ListVersions'
           :Case ⎕C'Version'

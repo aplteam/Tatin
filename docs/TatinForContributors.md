@@ -16,12 +16,12 @@ Tatin is published under the MIT license, so everybody is welcome to contribute 
 
 This document also discusses how to execute the test suite and how to build a new version of Tatin.
 
-However, this is not an introduction into how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google for "contribute to a github project".
+However, this is not an introduction to how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google "contribute to a GitHub project".
 
 
 ## Requirements
 
-In order to work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic).
+To work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic).
 
 You need one of: 
 
@@ -38,7 +38,7 @@ You also need to have Git installed.
 Note that Tatin is managed by the [Cider project management tool](https://github.com/aplteam/Cider).
 If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.
 
-Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.
+Though it is possible making changes or add code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.
 
 
 ## How to work on Tatin
@@ -75,7 +75,7 @@ Note that you cannot run both the Client and the Server in the same workspace.
 
 Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.
 
-For that reason the packages installed in the `packages/` folder are copied over to the `APLSource/` folder when a new version is built. That allows loading the packages with Link.
+For that reason, the packages installed in the `packages/` folder are copied over to the `APLSource/` folder when a new version is built. That allows loading the packages with Link.
 
 If you need to add a package then you need to perform a couple of steps:
 
@@ -93,21 +93,21 @@ If you find parts of this document confusing, outdated, unclear or missing bits 
 
 Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is Kai Jaeger, but this might (and eventually will) change in the future of course.
 
-But before you can create a pull request you are supposed to run the tests in order to make sure that you did not break anything.
+But before you can create a pull request you are supposed to run the tests to make sure that you did not break anything.
 
 
 ## Executing the test cases
 
-If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider for how to do that:
+If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider how to do that:
 
 ```
       ]Cider.RunTests
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite
 ```
 
-Executing `RunTests` means that you will be asked whether a test server should be started. Usually you will answer with a "Y", and that lets the test suite start another instance of Dyalog, and run a test server in that instance.
+Executing `RunTests` means that you will be asked whether a test server should be started. Usually, you will answer with a "Y", and that lets the test suite start another instance of Dyalog, and run a test server in that instance.
 
-However, developer might also run into one of two common scenarios: 
+However, developers might also run into one of two common scenarios: 
 
 1. During development you might want to execute all tests or just a specific group (or groups) of tests. 
 
@@ -119,7 +119,7 @@ However, developer might also run into one of two common scenarios:
 
    This might be required by an automated build process.
 
-   In this case any errors are trapped, and you get just either a single line that reports success or failure in the session or `⎕OFF` is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.
+   In this case, any errors are trapped, and you get just either a single line that reports success or failure in the session or `⎕OFF` is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.
 
    Note that a single failing test case is considered as "failure" of the whole test suite, though the test framework will continue to execute all remaining tests.
 
@@ -127,11 +127,11 @@ We discuss the two different scenarios one after the other.
 
 A> ### Creating a new version
 A>
-A> Creating a new version is actually discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
+A> Creating a new version is discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
 A>
 A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in `⎕SE` for execution, but that is only possible if you create a new version first.
 A>
-A> For that reason one test actually checks whether the version number in the workspace and in `⎕SE` do match. If you are confident that this does not matter in your case you may just carry on.
+A> For that reason one test checks whether the version number in the workspace and in `⎕SE` do match. If you are confident that this does not matter in your case you may just carry on.
 
 ### Testing while developing
 
@@ -148,7 +148,7 @@ Use `]Cider.OpenProject` to do this. Once the project is open you can ask Cider 
 
 Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.
 
-When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually you will answer with a "Yes!" to this.
+When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!" to this.
 
 A> ### Starting a Tatin test server "manually"
 A>
@@ -179,7 +179,7 @@ The `RunTests` function performs these tasks:
 
 #### Quitting tests
 
-There are scenarios where you want to quit the test suite, for example when a test unearthed a servere bug that needs fixing straight away.
+There are scenarios where you want to quit the test suite, for example when a test unearthed a severe bug that needs fixing straight away.
 
 It may be tempting to enter just `)reset`, but that is not how you should do this: you have to make sure that the test suite cleans up after itself. 
 
@@ -191,9 +191,9 @@ The easiest way to achieve this is to execute this statement:
 
 A> ### Execute the client test suite multiple times in parallel
 A>
-A> You might come up with the idea to start the client part of the tests multiple times in parallel in order to put some pressure on the Tatin Server.
+A> You might come up with the idea to start the client part of the tests multiple times in parallel to put some pressure on the Tatin Server.
 A>
-A> In general this is a good idea, but the client test suite is not suitable for this. For example, the tests that belong to the "Cache" group _must_ be executed one after the other, they rely on each other. Generally this should be avoided, but here for technical reasons it's a must. Running this group in parallel contradicts this, and is bound to fail.
+A> In general this is a good idea, but the client test suite is not suitable for this. For example, the tests that belong to the "Cache" group _must_ be executed one after the other, they rely on each other. Generally, this should be avoided, but here for technical reasons, it's a must. Running this group in parallel contradicts this, and is bound to fail.
 
 #### Executing only particular tests
 
@@ -264,7 +264,7 @@ Notes:
 * The wildcard character (`*`) can be used to identify a group
 * The first comment line after any header lines is displayed
 
-You may specify `'view'` as left argument to force the result of that function into a read-only edit window.
+You may specify `'view'` as the left argument to force the result of that function into a read-only edit window.
 
 Let's assume that you want to execute all tests of the group `API`:
 
@@ -290,7 +290,7 @@ Or run all tests but `UserCommand`:
 T.RunThese '~UserCommand'
 ```
 
-Last not least you may specify a 1 as left argument: this makes the test framework stop just before any particular test function is executed. This can be handy in order to hunt down a bug, or any unexpected behaviour.
+Last but not least you may specify a 1 as the left argument: this makes the test framework stop just before any particular test function is executed. This can be handy to hunt down a bug, or any unexpected behaviour.
 
 ```
 1 T.RunThese 'API'
@@ -314,14 +314,14 @@ Call this function:
 #.Tatin.TestCases.RunBatchTests 1
 ```
 
-The `1` provided as right argument is just an insurance against accidental calls.
+The `1` provided as the right argument is just insurance against accidental calls.
 
 When running the test suite with the batch flag set, as `RunBatchTests` does, is fundamentally different in several respects:
 
 * A Tatin server that listens (by default) on port 5001 is started (and is also shut down) by the test suite itself.
 * By default all errors are trapped. 
 
-  If you need to track down a bug then you don't want this: in that case pass a `1` as left argument: this is treated as "debug" flag.
+  If you need to track down a bug then you don't want this: in that case, pass a `1` as the left argument: this is treated as "debug" flag.
 
 Of course `RunBatchTests` does not execute any test cases that require a human in front of the monitor, but the number of such tests is very small anyway.
 
@@ -339,7 +339,7 @@ There are two scripts available in the Tatin root directory:
 
 1. `RunTests.bat` if you want to run the batch tests under Windows
 
-2. `RunTests.sh` is you want to run the batch tests on a non-Windows platform
+2. `RunTests.sh` if you want to run the batch tests on a non-Windows platform
 
 These are templates: check their contents, you might need to make amendments. 
 
@@ -348,9 +348,9 @@ These are templates: check their contents, you might need to make amendments.
 
 ### Overview {#ov1}
 
-Usually your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her own work on a branch.
+Usually, your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her work on a branch.
 
-You may ask Cider for how to create a new version of Tatin:
+You may ask Cider how to create a new version of Tatin:
 
 ```
       ]Cider.Make
@@ -387,7 +387,7 @@ The `Make` function performs the following steps:
 
 If the right argument was a `0` then it will also ask you whether you want to attempt an update for all packages Tatin itself depends on, and it would also ask you whether the new version of the Tatin Client should be copied to the `MyUCMDs/` folder.
 
-In the process the `Dist/` folder will be recreated from scratch. The `.zip` files in `Dist/` are to be released on GitHub. The `Dist/` folder will not appear on GitHub due to `.gitignore`.
+In the process, the `Dist/` folder will be recreated from scratch. The `.zip` files in `Dist/` are to be released on GitHub. The `Dist/` folder will not appear on GitHub due to `.gitignore`.
 
 There will be three zip files:
 

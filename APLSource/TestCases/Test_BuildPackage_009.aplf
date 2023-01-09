@@ -1,6 +1,6 @@
- r←Test_Pack_008(stopFlag batchFlag);⎕TRAP
- ;dir;src;dist;cfg;zipfile;ns;list;expected;clientConfigFile;registries;deps
-⍝ Pack one source file with a single dependency in a folder APLSource\
+ r←Test_BuildPackage_009(stopFlag batchFlag);⎕TRAP
+ ;dir;src;dist;zipfile;ns;list;expected;dep;cfg
+⍝ Build a package with two source files with multiple dependencies from a folder APLSource\
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -11,6 +11,7 @@
  F.MkDir(src,'/APLSource')dist(src,'/docs')
 
  ('foo1←{1}')F.NPUT src,'/APLSource/foo1.apln'
+ ('foo2←{1}')F.NPUT src,'/APLSource/foo2.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_B'
@@ -22,19 +23,19 @@
  TC.MyUserSettings.AddRegistry'[Dyalog]https://packages.dyalog.com'
  TC.MyUserSettings.AddRegistry'[MyCompany]https://packages.my-company.com'
 
- src D.Add'[tatin]aplteam-APLTreeUtils-1.0.0'
+ src D.Add'[tatin]aplteam-APLTreeUtils-5.0.0' '[tatin]aplteam-FilesAndDirs-3.1.1' '[tatin]aplteam-OS-9.0.1'
 
- zipfile←TC.Pack src dist
+ zipfile←TC.BuildPackage src dist''
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
- expected←'apl-package.json' 'APLSource/foo1.apln'TC.Reg.DependenciesFilename
+ expected←'apl-package.json' 'APLSource/foo1.apln' 'APLSource/foo2.apln'TC.Reg.DependenciesFilename
  →T.GoToTidyUp~expected ∆LazyMatchPaths list
 
  r←T._OK
 
 ∆TidyUp:
- Assert TC.MyUserSettings.RemoveRegistry'[dyalog]'
- Assert TC.MyUserSettings.RemoveRegistry'[myCompany]'
+ Assert TC.MyUserSettings.RemoveRegistry'[Dyalog]'
+ Assert TC.MyUserSettings.RemoveRegistry'[MyCompany]'
  Assert 0=⊃F.RmDir dir
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

@@ -14,19 +14,19 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- zipfile←TC.Pack(prjPath,'/APLTree')src
+ zipfile←TC.BuildPackage(prjPath,'/APLTree')src''
  src ⎕NCOPY prjPath,'/APLTree/apl-package.json'
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
 
  Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
- zipfile←TC.Pack(prjPath,'/F-D')src
+ zipfile←TC.BuildPackage(prjPath,'/F-D')src''
  src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/F-D/apl-package.json'
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
 
  Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
- zipfile←TC.Pack(prjPath,'/OS')src
+ zipfile←TC.BuildPackage(prjPath,'/OS')src''
  src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/OS/apl-package.json'
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc

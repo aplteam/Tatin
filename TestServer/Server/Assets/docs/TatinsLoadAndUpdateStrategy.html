@@ -43,8 +43,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="The-Strategy-Problem">1. The Strategy Problem</h2>
 </a>
 </div>
-<p>Let's imagine that you need two packages, <code>Foo</code> and <code>Goo</code>. Both rely on package <code>Zoo</code>, but while <code>Foo</code> requests 1.1.1 of <code>Zoo</code>, <code>Goo</code> insists on version 1.2.0. However, the best version of <code>Zoo</code> available is actually 1.3.0, and there is even a later major version available: 2.0.0.</p>
-<p>Now from what we've said so far it should be clear that version 2.0.0 is not an option at all because it is considered as a completely different package and therefore ignored.</p>
+<p>Let's imagine that you need two packages, <code>Foo</code> and <code>Goo</code>. Both rely on package <code>Zoo</code>, but while <code>Foo</code> requests 1.1.1 of <code>Zoo</code>, <code>Goo</code> insists on version 1.2.0. However, the best version of <code>Zoo</code> available is 1.3.0, and there is even a later major version available: 2.0.0.</p>
+<p>Now from what we've said so far it should be clear that version 2.0.0 is not an option at all because it is considered a completely different package and therefore ignored.</p>
 <p>Because of SemVer we know that <code>Goo</code> would crash on version 1.1.1 of <code>Zoo</code> in case it takes advantage of the new features built into version 1.2.0. (We know there <em>are</em> new features because of the bump of the minor part of <code>Zoo</code>'s version number)</p>
 <p>We can take several different approaches here:</p>
 <ul>
@@ -53,8 +53,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>We could check the server, find that there is an even later version available (1.3.0) and use that one
 <p>(More generally, always check for the latest version and use that one)</p></li>
 </ul>
-<p>All these options are actually used by different package managers in the wild, so there is no consensus on what's best.</p>
-<p>To many programmers the last option seems particularly appealing because you are always up-to-date, you always get the latest fixes when you build your application. Great!</p>
+<p>All these options are used by different package managers in the wild, so there is no consensus on what's best.</p>
+<p>To many programmers, the last option seems particularly appealing because you are always up-to-date, and you always get the latest fixes when you build your application. Great!</p>
 <p>But when you look at it from a different angle then things look much less appealing:</p>
 <ol start="1">
 <li>You build your application (including updating dependencies)</li>
@@ -65,9 +65,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>This can happen in case the author of a package you depend on in one way or another has released a new version of that package.</p>
 <p>Attractive as an automated update mechanism might be, you want your builds to be <em> 100%reproducible</em>, right?!</p>
 <p>So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages <code>Foo</code> and <code>Goo</code>.</p>
-<p>Except when a package is requested more than once, and with different minor and/or patch numbers: in that case Tatin uses <em>the latest installed version</em>, which might or might not be the latest one available. In our example <code>Zoo</code> is requested and installed twice, and Tatin would load 1.2.0 just once (because it is requested by <code>Goo</code>), while 1.3.0 is ignored because it is not requested and therefore not installed.</p>
+<p>Except when a package is requested more than once, and with different minor and/or patch numbers: in that case, Tatin uses <em>the latest installed version</em>, which might or might not be the latest one available. In our example, <code>Zoo</code> is requested and installed twice, and Tatin would load 1.2.0 just once (because it is requested by <code>Goo</code>), while 1.3.0 is ignored because it is not requested and therefore not installed.</p>
 <p>This means that <code>Foo</code> will also have to use version 1.2.0 of <code>Zoo</code>.</p>
-<p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get exactly the same result, but it will grab the latest installed version.</p>
+<p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get the same result, but it will grab the latest installed version.</p>
 <div class="leanpub_A">
 <h3>On updating dependencies</h3>
 <p>Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available.</p>
@@ -90,7 +90,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
     +-----------+        +-----------+
     | Zoo 1.1.1 |        | Zoo 1.2.0 |
     +-----------+        +-----------+</code></pre>
-<p>For simplicity we will assume that the packages are all hosted by a Tatin server known under the alias name <code>MyTatin</code></p>
+<p>For simplicity, we will assume that the packages are all hosted by a Tatin server known under the alias name <code>MyTatin</code></p>
 <p>While <code>Foo</code> relies on <code>Zoo</code> 1.1.1, <code>Goo</code> needs <code>Zoo</code> 1.2.0 — what is Tatin doing about this?</p>
 <p>It depends on what you are doing. Let's first load <code>Zoo</code> and <code>Goo</code> into the workspace, the usual approach to inspect a package:</p>
 <pre><code>      ]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
@@ -104,14 +104,14 @@ Goo</code></pre>
 <h3>Getting the latest version</h3>
 <p>Assuming that version 1.3.0 of <code>Foo</code> is the latest version available with the major number 1, then this would have been sufficient:</p>
 <pre><code>]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1 #.MyPkgs</code></pre>
-<p>Note that neither the minor nor the patch number have been specified.</p>
+<p>Note that neither the minor nor the patch number has been specified.</p>
 <p>Assuming that version 2.1.0 of <code>Goo</code> is the very latest version available at all, and that's the version you want to use, then this would have been sufficient:</p>
 <pre><code>]TATIN.LoadPackages [MyTatin]/mygroup-Goo #.MyPkgs</code></pre>
 <p>Note that in this case not even the major number has been specified.</p>
 </div>
 
 <p>You wanted <code>Foo</code> and <code>Goo</code> to be loaded into <code>#.MyPkgs</code>, and that's exactly what Tatin did. But where are the dependencies?</p>
-<p>Note that <code>#.MyPkgs</code> just carries references pointing to where the packages have really been loaded into, and that is the namespace <code>#._tatin</code>:</p>
+<p>Note that <code>#.MyPkgs</code> just carries references pointing to where the packages have been loaded into, and that is the namespace <code>#._tatin</code>:</p>
 <pre><code>      #._tatin.⎕nl 9
 mygroup_Foo_1_0_0
 mygroup_Goo_2_1_3
@@ -123,7 +123,7 @@ mygroup_Zoo_1_2_0</code></pre>
 <h2 data-id="Installing-packages">3. Installing packages</h2>
 </a>
 </div>
-<p>To make packages a part of an application (say), they first need to be installed. In the following example we will install two packages, <code>Foo</code> and <code>Goo</code>. Both require <code>Zoo</code>, so <code>Zoo</code> will be installed as a side effect.</p>
+<p>To make packages a part of an application (say), they first need to be installed. In the following example, we will install two packages, <code>Foo</code> and <code>Goo</code>. Both require <code>Zoo</code>, so <code>Zoo</code> will be installed as a side effect.</p>
 <pre><code>      ⎕NEXISTS /myPkgs
 0
       ]TATIN.InstallPackages [MyTatin]/mygroup-Foo-1.0.0 /myPkgs/
@@ -156,8 +156,8 @@ mygroup-Goo-2.1.0</code></pre>
 <h2 data-id="Loading-the-installed-packages">4. Loading the installed packages</h2>
 </a>
 </div>
-<p>Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allows Tatin to optimize what's actually loaded, and in this respect the two differ.</p>
-<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which was created when you installed your first package, and which will be extended when you install additional packages.</p>
+<p>Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allow Tatin to optimize what's loaded, and in this respect the two differ.</p>
+<p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as an argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which was created when you installed your first package, and which will be extended when you install additional packages.</p>
 <p>You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to <code>#</code>.</p>
 <pre><code>      ]TATIN.LoadDependencies /myPkgs/ #.Temp</code></pre>
 <p>This is what <code>LoadDependencies</code> will do:</p>
@@ -167,7 +167,7 @@ mygroup-Goo-2.1.0</code></pre>
 <p>If that is the case, the build list will be checked for consistency with <code>apl-dependencies.txt</code>; if that   is fine then the build list is created from scratch,</p></li>
 <li>Finally it will prune the build list and bring in the remaining packages.</li>
 </ol>
-<p>Note that the pruning is in charge for removing the package <code>Zoo</code> 1.1.1. That means that rather than loading <code>Zoo</code> twice <em>only the latest <strong>installed</strong> version</em> will be loaded: both <code>Foo</code> and <code>Goo</code> will use <code>Zoo</code> version 1.2.0.</p>
+<p>Note that the pruning is in charge of removing the package <code>Zoo</code> 1.1.1. That means that rather than loading <code>Zoo</code> twice <em>only the latest <strong>installed</strong> version</em> will be loaded: both <code>Foo</code> and <code>Goo</code> will use <code>Zoo</code> version 1.2.0.</p>
 <div class="h_tag">
 <a href="#Special-case" id="Special-case" class="autoheader_anchor">
 <h2 data-id="Special-case">5. Special case</h2>
@@ -179,7 +179,7 @@ mygroup-Goo-2.1.0</code></pre>
 </a>
 </div>
 <p>Let's assume that you don't need <code>Goo</code> anymore.</p>
-<p>Generally we advise to <em>not</em> delete stuff manually from the folder that holds all packages of an application.</p>
+<p>Generally, we advise to <em>not</em> delete stuff manually from the folder that holds all packages of an application.</p>
 <p>If you want to get rid of a package then you are strongly advised to use the method</p>
 <p><code>]TATIN.UnInstallPackage</code></p>
 <div class="leanpub">
@@ -190,16 +190,16 @@ mygroup-Goo-2.1.0</code></pre>
 </div>
 
 <p>This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but <em>only</em> if those packages are neither principal packages nor requested by other packages.</p>
-<p>Clearly there is a danger that you remove too much when you attempt to do this manually.</p>
+<p>Clearly, there is a danger that you remove too much when you attempt to do this manually.</p>
 <div class="h_tag">
 <a href="#Adding-a-package" id="Adding-a-package" class="autoheader_anchor">
 <h3 data-id="Adding-a-package">5.2. Adding a package</h3>
 </a>
 </div>
-<p>If you want to add a package which has no dependencies you might feel tempted to just add it to the file “apl-dependencies.txt” and copy the package over.</p>
+<p>If you want to add a package that has no dependencies you might feel tempted to just add it to the file “apl-dependencies.txt” and copy the package over.</p>
 <p>That would indeed not cause a problem because when the <code>LoadDependencies</code> command is issued the next time, Tatin would check whether the file <code>apl-dependencies.txt</code> was changed after <code>apl-buildlist.json</code> was created by Tatin.</p>
-<p>In our case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly an insurance against people manually changing <code>apl-dependencies.txt</code> and making mistakes.</p>
-<p>When the health checks pass, the build-list would be re-created..</p>
+<p>In our case this is true, so Tatin would perform some health checks, and an error would be thrown in case they fail. This is mainly insurance against people manually changing <code>apl-dependencies.txt</code> and making mistakes.</p>
+<p>When the health checks pass, the build-list would be re-created.</p>
 <div class="h_tag">
 <a href="#Checking-and-updating" id="Checking-and-updating" class="autoheader_anchor">
 <h2 data-id="Checking-and-updating">6. Checking and updating</h2>
@@ -210,7 +210,7 @@ mygroup-Goo-2.1.0</code></pre>
 <pre><code>      ]TATIN.CheckForLaterVersion ./</code></pre>
 <p>It requires a path to a folder that holds a file <code>apl-dependencies.txt</code> and a file <code>apl-buildlist.json</code>.</p>
 <p>This user command would check whether there are any later versions of the principal packages available and report its findings to the session.</p>
-<p>As usual Tatin would consider packages with different major numbers as different packages, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your principal packages.</p>
+<p>As usual, Tatin would consider packages with different major numbers as different packages, so by default you will get only a list of packages that have the same group-name, package-name and major version number as your principal packages.</p>
 <p>It is then up to you to take action: you may or may not install a later package that is available.</p>
 <div class="leanpub_A">
 <h3>Later major versions</h3>

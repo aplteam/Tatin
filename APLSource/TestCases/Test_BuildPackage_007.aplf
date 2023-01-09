@@ -1,6 +1,6 @@
- r←Test_Pack_006(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_007(stopFlag batchFlag);⎕TRAP
  ;dir;src;dist;cfg;zipfile;ns;list;expected
-⍝ Pack one code file together with several "assets" files
+⍝ Build a package with a code file with a file and a directory as "assets"; requires "source" in Client Config to point to correct folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -8,7 +8,7 @@
  dir←∆GetTempDir ⍬
  (src dist)←(⊂dir,'/'),¨'src' 'dist'
  src,←'/v0.1.0'
- F.MkDir(src,'/source')dist
+ F.MkDir(src,'/source')dist(src,'/docs')
 
  ('foo1←{1}')F.NPUT src,'/source/foo1.apln'
  cfg←TC.InitPackageConfig ⍬
@@ -17,14 +17,15 @@
  cfg.version←'0.1.0'
  cfg.source←'source'
  (F.ExpandPath src,'/README.md')⎕NCOPY F.ExpandPath'README.md'
- (F.ExpandPath src,'/Managing_packages_with_Tatin.md')⎕NCOPY F.ExpandPath'docs_archive/Managing_packages_with_Tatin.md'
- cfg.assets←'README.md' 'Managing_packages_with_Tatin.md'
+ (F.ExpandPath src,'/docs/Managing_packages_with_Tatin.md')⎕NCOPY F.ExpandPath'docs_archive/Managing_packages_with_Tatin.md'
+ cfg.assets←'README.md' 'docs/Managing_packages_with_Tatin.md'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.Pack src dist
+
+ zipfile←TC.BuildPackage src dist''
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
- expected←'apl-package.json' 'source/foo1.apln' 'README.md' 'Managing_packages_with_Tatin.md'
+ expected←'apl-package.json' 'source/foo1.apln' 'README.md' 'docs/Managing_packages_with_Tatin.md'
  →T.GoToTidyUp~expected ∆LazyMatchPaths list
 
  r←T._OK

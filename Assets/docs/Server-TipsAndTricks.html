@@ -43,7 +43,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h1 data-id="Server-Tips-and-tricks">Server: Tips and tricks</h1>
 </a>
 </div>
-<p>Once you've installed a server their are a couple of things that need to be taken care of.</p>
+<p>Once you've installed a server there are a couple of things that need to be taken care of.</p>
 <div class="h_tag">
 <a href="#Maintenance" id="Maintenance" class="autoheader_anchor">
 <h2 data-id="Maintenance">1. Maintenance</h2>
@@ -54,15 +54,15 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Tags">1.1. Tags</h3>
 </a>
 </div>
-<p>The most important thing is to watch tags. Tags can be very useful in order to find a package, but the problem ist that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name as a tag, or adding “dyalog” etc.</p>
-<p>That means that for tags to work there has to be a gate keeper who is responsible for correcting / removing tags.</p>
+<p>The most important thing is to watch tags. Tags can be very useful to find a package, but the problem is that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name as a tag or adding “dyalog” etc.</p>
+<p>That means that for tags to work there has to be a gatekeeper who is responsible for correcting/removing tags.</p>
 <p>That gatekeeper needs to be able to execute code on the server, but only once. The idea is to correct problems in the package config files somehow.</p>
 <div class="leanpub_A">
 <h3>The package config file and the ZIP file</h3>
 <p>Note that changing the config file is enough: If the file got changed then Tatin will make sure that the new version is automatically also added to the ZIP file of the package, effectively overwriting the old version of the package file.</p>
 </div>
 
-<p>This can be achieved by uploading an <code>.aplf</code> text file (read: a function) into a folder that is defined in the INI file as <code>[CONFIG]MaintenanceFolder</code>.</p>
+<p>This can be achieved by uploading a <code>.aplf</code> text file (read: a function) into a folder that is defined in the INI file as <code>[CONFIG]MaintenanceFolder</code>.</p>
 <p>If one or more of such files are found by the Tatin Server while doing housekeeping they are loaded into the server and executed. Once executed the files are renamed by adding an extension <code>.executed</code>.</p>
 <p>For example, if there is a file <code>RemoveDyalogFromTags.aplf</code> then it is loaded into an unnamed namespace and called with a right argument <code>G</code> (for “globals”). Once executed the file is then renamed to <code>RemoveDyalogFromTags.aplf.executed</code>.</p>
 <p>That makes sure the code is not executed again, but it is also useful for documenting what code was executed, and when.</p>
@@ -71,11 +71,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Crashing-maintenance-files">1.1.1. Crashing maintenance files</h4>
 </a>
 </div>
-<p>Like any other program a maintenance file may crash. If that happens the server carries out the following steps:</p>
+<p>Like any other program, a maintenance file may crash. If that happens the server carries out the following steps:</p>
 <ol start="1">
 <li>Report it to the log file</li>
 <li>Send an email reporting the crash with details to the maintainer (if enabled in the INI file)</li>
-<li>Rename the file from <code>*.aplf</code> to <code>*.crashed</code> in order to avoid it being executed again</li>
+<li>Rename the file from <code>*.aplf</code> to <code>*.crashed</code> to avoid it being executed again</li>
 </ol>
 <div class="h_tag">
 <a href="#Developing" id="Developing" class="autoheader_anchor">
@@ -93,7 +93,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Main-namespaces">2.1.1. Main namespaces</h4>
 </a>
 </div>
-<p>There are four ordinary namespaces that contain all the Tatin code:</p>
+<p>Four ordinary namespaces contain all the Tatin code:</p>
 <dl>
 <dt><code>Admin</code></dt>
 <dd><p class="first_dd">Contains helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.</p></dd>
@@ -110,10 +110,10 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Other-stuff">2.1.2. Other stuff</h4>
 </a>
 </div>
-<p>There are some mory ordinary namespace that are used by Tatin</p>
+<p>There are some more ordinary namespace that are used by Tatin</p>
 <dl>
 <dt><code>Plodder</code></dt>
-<dd><p class="first_dd">A fully fledged HTTP server that is bases on Rumba and Conga</p></dd>
+<dd><p class="first_dd">A fully-fledged HTTP server that is based on Rumba and Conga</p></dd>
 <dd><p>For details see <a href="https://github.com/aplteam/Plodder" class="external_link">https://github.com/aplteam/Plodder</a></p></dd>
 <dt><code>RumbaLean</code></dt>
 <dd><p class="first_dd">An implementation of HTTP 1.1 in APL</p></dd>
@@ -131,9 +131,9 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Developing-with-a-running-server">2.3. Developing with a running server</h3>
 </a>
 </div>
-<p>You might want to run a server while Tatin is an opened Cider project. The running server allows you to investigate what the coder is doing, and at the same time any changes abd additions would be added to the project by Link.</p>
-<p>Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed then Tatin would ask you whether you want to start the server automaticallt – that is the server we talking about, <strong>no</strong> https://test.tatin.dev</p>
-<p>In order to achive this execute the following steps:</p>
+<p>You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the coder is doing, and at the same time, any changes and additions would be added to the project by Link.</p>
+<p>Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed then Tatin would ask you whether you want to start the server automatically – that is the server we talking about, <strong>no</strong> https://test.tatin.dev</p>
+<p>To achieve this execute the following steps:</p>
 <ol start="1">
 <li>Open the Tatin project with <code>]CiderProject</code></li>
 <li>Execute <code>#.Tatin.Admin.Initialize_Server</code></li>
@@ -162,21 +162,21 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Error-trapping">2.3.1. Error trapping</h4>
 </a>
 </div>
-<p>Keep in mind that error trapping is active, so when you change a function and inject a typo it will trigger it once your code get executed.</p>
-<p>If there is any danger for you to lock horns with error trapping consider to put this into <code>OnRequest</code>:</p>
+<p>Keep in mind that error trapping is active, so when you change a function and inject a typo it will trigger it once your code gets executed.</p>
+<p>If there is any danger of you locking horns with error trapping consider putting this into <code>OnRequest</code>:</p>
 <p><code>⎕TRAP←0 'S' ⍝TODO⍝</code></p>
 <p>Also, make <code>⎕TRAP</code> a local variable in <code>OnRequest</code>.</p>
-<p><code>⍝TODO⍝</code> is a remainder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.</p>
+<p><code>⍝TODO⍝</code> is a reminder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.</p>
 <div class="h_tag">
 <a href="#Developing-with-two-sessions-server-and-client" id="Developing-with-two-sessions-server-and-client" class="autoheader_anchor">
 <h3 data-id="Developing-with-two-sessions-server-and-client">2.4. Developing with two sessions, server and client</h3>
 </a>
 </div>
-<p>When the test cases are executed the user is asked whether she want the Tatin server required by the Tatin test cases to be started automatically.</p>
+<p>When the test cases are executed the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.</p>
 <ul>
-<li>If the user answert this with a “yes” and instance</li>
+<li>If the user answers this with a “yes” and instance</li>
 </ul>
-<p>You must know exactly what you are doing, otherwise you are likely to loose code.</p>
+<p>You must know exactly what you are doing, otherwise, you are likely to loose code.</p>
 <table>
 <tbody>
 <tr>
@@ -194,12 +194,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="Special-REST-commands">3.1. Special REST commands</h3>
 </a>
 </div>
-<p>A Tatin server can offer a number of special REST commands only useful for a developer when testing Tatin. They should never be available on a production server.</p>
+<p>A Tatin server can offer several special REST commands only useful for a developer when testing Tatin. They should never be available on a production server.</p>
 <p>Whether these commands would be carried out is decided by the INI entry <code>[CONFIG]SpecialCommands</code>.</p>
-<p>One of the commands will return an HTML page with all available commands. We use this as example.</p>
+<p>One of the commands will return an HTML page with all available commands. We use this as an example.</p>
 <p>In a Browser enter this URL:</p>
 <pre><code>https://localhost:5001/v1/list-commands</code></pre>
-<p>Note that with the exception of <code>list-commands</code> these commands do not return HTML, they trigger actions.</p>
+<p>Note that except <code>list-commands</code> these commands do not return HTML, they trigger actions.</p>
 <div class="h_tag">
 <a href="#Executing-the-Tatin-test-suite" id="Executing-the-Tatin-test-suite" class="autoheader_anchor">
 <h3 data-id="Executing-the-Tatin-test-suite">3.2. Executing the Tatin test suite</h3>

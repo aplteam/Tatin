@@ -1,5 +1,5 @@
  r←Test_UserCommands_006(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;packageFolder;zipfile;res;more;cfg;version
-⍝ Exercise ]Tatin.Pack and ]Tatin.Publish
+⍝ Exercise ]Tatin.BuildPackage and ]Tatin.PublishPackage
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -9,7 +9,7 @@
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
 
  packageFolder←F.ExpandPath './TestData/Source/OS'
- (rc msg zipfile)←∆UCMD'Pack "',packageFolder,'" "',tempDir,'"'
+ (rc msg zipfile)←∆UCMD'BuildPackage "',packageFolder,'" "',tempDir,'"'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
  res←⊃F.Dir tempDir,'/'
  →T.GoToTidyUp 0=≢zipfile

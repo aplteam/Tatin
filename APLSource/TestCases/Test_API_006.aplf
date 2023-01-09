@@ -1,5 +1,5 @@
  r←Test_API_006(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;tempDir;packageFolder;cfg;version;rc;more;zipfile
-⍝ Exercise ⎕SE.Tatin.Pack and ⎕SE.Tatin.PublishPackage
+⍝ Exercise ⎕SE.Tatin.BuildPackage and ⎕SE.Tatin.PublishPackage
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -9,7 +9,7 @@
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
 
  packageFolder←'./TestData/Source/OS'
- res←⎕SE.Tatin.Pack packageFolder tempDir
+ res←⎕SE.Tatin.BuildPackage packageFolder tempDir''
  res←⊃F.Dir tempDir,'/'
  →T.GoToTidyUp 1≠≢res
  zipfile←⊃res
@@ -18,7 +18,7 @@
  (F.NormalizePath tempDir,'/')⎕NCOPY F.NormalizePath⊃⊃F.Dir packageFolder,'/*.json'
 
  cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_Name)0
- version←⊃{⍺,'-',⍵}/cfg.(group name version)
+ version←{⍵↑⍨¯1+⍵⍳'+'}⊃{⍺,'-',⍵}/cfg.(group name version)
  F.RmDir ∆GetServerRegistryFolder,version
 
  res←⎕SE.Tatin.PublishPackage zipfile'[local]'

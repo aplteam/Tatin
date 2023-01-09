@@ -1,6 +1,6 @@
- r←Test_Pack_004(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_003(stopFlag batchFlag);⎕TRAP
  ;dir;src;dist;cfg;zipfile;ns;list;expected
-⍝ Pack multiple files spreaded over several levels into special source folder
+⍝ Build a package with multiple files into special source folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -8,10 +8,10 @@
  dir←∆GetTempDir ⍬
  (src dist)←(⊂dir,'/'),¨'src' 'dist'
  src,←'/v0.1.0'
- F.MkDir(src,'/APLSource/SubDir')dist
+ F.MkDir(src,'/APLSource')dist
 
  ('foo1←{1}')F.NPUT src,'/APLSource/foo1.apln'
- ('foo2←{2}')F.NPUT src,'/APLSource/SubDir/foo2.apln'
+ ('foo2←{2}')F.NPUT src,'/APLSource/foo2.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.group←'Example'
  cfg.name←'Package_B'
@@ -19,11 +19,10 @@
  cfg.source←'APLSource'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
-
- zipfile←TC.Pack src dist
+ zipfile←TC.BuildPackage src dist ''
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
- expected←'apl-package.json' 'APLSource/foo1.apln' 'APLSource/SubDir/foo2.apln'
+ expected←'apl-package.json' 'APLSource/foo1.apln' 'APLSource/foo2.apln'
  →T.GoToTidyUp~expected ∆LazyMatchPaths list
 
  r←T._OK

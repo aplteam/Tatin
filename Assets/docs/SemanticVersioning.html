@@ -46,14 +46,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>The version number of a Tatin package must follow the rules for Semantic Versioning: it always has the format <code>{major}.{minor}.{patch}</code>.</p>
-<p>After <code>{patch}</code> there might be more information available, separated from the patch number by a hyphen.</p>
+<p>After <code>{patch}</code>, more information might be available, separated from the patch number by a hyphen.</p>
 <p>Valid examples for a version number are therefore:</p>
 <pre><code>0.1.0
 1.0.0
 12.23.199
 1.2.3-beta-1</code></pre>
 <p>These pieces of information fully participate when Tatin needs to establish package precedence:</p>
-<p><code>1.2.3</code> is “better” than <code>1.2.2</code> but also “better” as <code>1.2.3-beta1</code> of course.</p>
+<p><code>1.2.3</code> is “better” than <code>1.2.2</code> but also “better” than <code>1.2.3-beta1</code> of course.</p>
 <p>Information after the hyphen is restricted to ASCII characters and digits until a space or a plus (<code>+</code>) is detected.</p>
 <p>The plus (<code>+</code>) is used to separate an (optional) build number from the other parts of a version number.</p>
 <div class="h_tag">
@@ -69,15 +69,15 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 </div>
 
-<p>A build number, when specified, needs to be separated by a <code>+</code> (recommended) or a <code>.</code> (deprecated). A build number may consist of digits and only digits.</p>
+<p>A build number, when specified, needs to be separated by a <code>+</code> (recommended) or a <code>.</code> (deprecated). A build number may consist of digits only.</p>
 <p>Note that when there are more than three dots in the version number, then the first two dots are part of establishing major, minor and patch number while the last dot defines what is considered the build number.</p>
 <pre><code>2.3.4.1456    ⍝ deprecated
 2.3.4+1456    ⍝ recommended
 1.2.3-beta-1      (becomes 1.2.3-beta-1 as a Tatin package)
 1.2.3-beta-1.123  (becomes 1.2.3-beta-1 as a Tatin package; deprecated)
 1.2.3-beta-1+123  (becomes 1.2.3-beta-1 as a Tatin package; recommended)</code></pre>
-<p>Therefore <code>1.2.3.4</code> is valid, with 4 being the build number. <code>1.2.3-beta-1.4</code> is valid, with 4 being the build number. <code>1.2.3-beta-1</code> is valid, no build number. <code>1.2.3-beta-1.abc</code> is <em>invalid</em>.</p>
-<p>The Semantic Versioning rules lay out when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing precedence: build numbers are always ignored.</p>
+<p>Therefore <code>1.2.3.4</code> is valid, with 4 being the build number. <code>1.2.3-beta-1.4</code> is valid, with 4 being the build number. <code>1.2.3-beta-1</code> is valid, with no build number. <code>1.2.3-beta-1.abc</code> is <em>invalid</em>.</p>
+<p>The Semantic Versioning rules define when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing precedence: build numbers are always ignored.</p>
 <div class="h_tag">
 <a href="#Terminology-and-versioning-Rules" id="Terminology-and-versioning-Rules" class="autoheader_anchor">
 <h2 data-id="Terminology-and-versioning-Rules">2. Terminology and versioning Rules</h2>
@@ -95,16 +95,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="The-Build-number">2.1. The Build number</h3>
 </a>
 </div>
-<p>The build number is optional and is ignored by Tatin. However, if a package has a build-number then it is bumped whenever the package is built again, not matter what. It is never reset.</p>
+<p>The build number is optional and is ignored by Tatin. However, if a package has a build-number, it is bumped whenever the package is built again, no matter what. It is never reset.</p>
 <div class="h_tag">
 <a href="#The-Patch-Number" id="The-Patch-Number" class="autoheader_anchor">
 <h3 data-id="The-Patch-Number">2.2. The Patch Number</h3>
 </a>
 </div>
 <p>The patch number is bumped only when a change <em>does not affect compatibility</em>.</p>
-<p>A typical example is a bug fix: imagine that a function in a package crashes because an edge condition was not handled. When you fix that problem then you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.</p>
+<p>A typical example is a bug fix: imagine that a function in a package crashes because an edge condition was not handled. When you fix that problem, you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.</p>
 <p>However, in real life things get messy pretty quickly: the consumer of a package might mistake a bug as a feature if it does not crash but does something it shouldn't, and take advantage of the bug. Imagine that a new version of the package comes with a fix for just that bug…</p>
-<p>If chances are high that a consumer might rely on the bug then you should actually bump the Major number rather than the Patch number - see there. Bugs that are very old are excellent candidates for that.</p>
+<p>If chances are high that a consumer might rely on the bug then you should bump the Major number rather than the Patch number - see there. Very old bugs are excellent candidates for that.</p>
 <div class="h_tag">
 <a href="#The-Minor-number" id="The-Minor-number" class="autoheader_anchor">
 <h3 data-id="The-Minor-number">2.3. The Minor number</h3>
@@ -114,7 +114,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>That means that compatibility should still be guaranteed: anything else works exactly as before. A consumer should be confident when updating the package that nothing will break. She just may take advantage of, say, a function added to the API.</p>
 <div class="leanpub_A">
 <h3>Chances of breaking things</h3>
-<p>Note that by definition it seems that a change of the minor number is indicating a very low risk: just adding functionality should never change anything that has worked before, while a change in the patch number might come from a bug fix your code actually relies on.</p>
+<p>Note that by definition it seems that a change of the minor number is indicating a very low risk: just adding functionality should never change anything that has worked before, while a change in the patch number might come from a bug fix your code relies on.</p>
 <p>In reality however a version with a new (bumped) minor version number often comes with bug fixes as well.</p>
 </div>
 
@@ -138,7 +138,7 @@ aplteam-foo-2.0.0</code></pre>
 <h2 data-id="Why-Semantic-versioning">3. Why Semantic versioning?</h2>
 </a>
 </div>
-<p>Before the introduction of the rules of Semantic Versioning everybody assigned version numbers to their liking. Updating to a new version always carried a significant risk that things would break.</p>
+<p>Before the introduction of the rules of Semantic Versioning, everybody assigned version numbers to their liking. Updating to a new version always carried a significant risk that things would break.</p>
 <p>With the rules of Semantic Versioning in place, if everybody involved acts accordingly and sensibly, updating should be much safer.</p>
 <p>However, things can get pretty complicated even with Semantic Versioning; see the <a href="http://TatinsLoadAndUpdateStrategy.html" class="external_link" title="Link to the HTML document">TatinsLoadAndUpdateStrategy</a>.</p>
 <p>Semantic versioning came into being via this website:</p>

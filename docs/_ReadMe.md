@@ -6,7 +6,7 @@
 
 The Tatin documentation consists of a collection of HTML files.
 
-This document gives you an overview over these HTML files: their purpose and who should (or may) read them, and which ones you can safely ignore depending on your skills and goal(s).
+This document gives you an overview of these HTML files: their purpose and who should (or may) read them, and which ones you can safely ignore depending on your skills and goal(s).
 
  
 ### General information
@@ -57,7 +57,7 @@ This document gives you an overview over these HTML files: their purpose and who
 
 * [Caching](./Caching.html "Caching.html") (draft)
 
-  By default the Tatin client caches any package that is either installed or loaded. This document
+  By default, the Tatin client caches any package that is either installed or loaded. This document
   discusses the implications, and under which circumstances you might want to switch caching off, either
   globally or just for a specific Registry.
 
@@ -91,4 +91,4 @@ This document gives you an overview over these HTML files: their purpose and who
 * [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (draft)
 
   Read this if you want to run a Tatin server behind an Apache server. 
- 
+

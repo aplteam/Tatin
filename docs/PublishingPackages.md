@@ -184,11 +184,22 @@ What is required and how to create and change a package configuration file is di
 
 #### The dependency file
 
-This file is only required when the package to be published has dependencies.
+The file `apl-dependencies.txt` is only required when a package depends on other packages.
 
-Note that in case you specify a dependency that does not (yet) exist on the Registry then this has no consequences: the server will not reject such a package. 
+Dependencies may by installed in a package project in different ways:
 
-That might come as a surprise, but there is a reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work then.
+* By default Tatin assumes a subfolder packages/ to be used for this. If you use them Tatin will identify dependencies itself.
+
+* If you manage a package project with Cider then Tatin will check the `tatinFolder` property: if it contains a definition without an assignment (namespace) then it will be taken
+
+* If yiu do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
+
+  * The user command `]Tatin.PublishPackage` has a modifier for this: `-dependencies=`
+  * The API function `PublishPackage` can be fed with an optional left argument for this
+
+I> In case you specify a dependency that has not (yet) been published then this has no consequences: the server will not reject such a package. 
+I>
+I> That might come as a surprise, but there is a reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work then.
 
 Usually, you will specify just a full package ID as a dependency. If you wish you may also specify either a URL following the http[s]:// protocol or a zip file following the file:// protocol. The latter is always a temporary solution, however. 
 
@@ -196,11 +207,9 @@ Notes:
 
 * Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with "400 --- bad request".
 
-  That is good enough a reason to use this with care. Only when messing around with packages not designed to be published to a Tatin server on your local machine may this be used.
+  That is good enough a reason to use this with care. Only when messing around with packages on your local machine that are not designed to be published on a Tatin server may this be used.
 
 * Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.
-
-Tatin has a convention in place: it assumes that any dependencies are installed in a folder packages/.
 
 
 ### Final step
@@ -215,7 +224,7 @@ The folder may or may not carry a trailing slash (`/`).
 
 This would attempt to publish the package found in `path2package/` to the principal Tatin Server represented by the alias `[tatin]`.
 
-You can also create a ZIP file with the `]TATIN.Pack` command and specify the ZIP file as an argument:
+You can also build a new version by calling `]TATIN.BuildPackage` and specify the resulting ZIP file as an argument to `PublishPackage`:
 
 ```
 ]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]
@@ -223,7 +232,7 @@ You can also create a ZIP file with the `]TATIN.Pack` command and specify the ZI
 
 When a path to a package project is provided rather than a ZIP file then `]PublishProject` would create the ZIP file itself.
 
-Note that both `]PublishPackage` as well as `]Pack` assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.
+Note that both `]PublishPackage` as well as `]BuildPackage` assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.
 
 However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has a property `[CIDER]tatinFolder` that is designed to hold the folder with package dependencies, and if that is not empty then Tatin would use this.
 

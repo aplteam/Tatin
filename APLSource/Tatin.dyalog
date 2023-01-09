@@ -991,10 +991,32 @@
       :EndTrap
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind
       r←⍬
       :If (,0)≡,what←Arg._1
-          what←TC.F.PWD
+          :If 9=⎕SE.⎕NC'Cider'
+              openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+              :If 1<≢openCiderProjects
+                  ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+                  :If 0=≢ind
+                      →0 ⋄ r←'Cancelled by user'
+                  :Else
+                      what←2⊃openCiderProjects[ind;]
+                  :EndIf
+              :ElseIf 1=≢openCiderProjects
+                  what←2⊃openCiderProjects[1;]
+              :Else
+                  what←TC.F.PWD
+                  :If TC.YesOrNo'Sure you want to deal with ',what,' ?'
+                      →0 ⋄ r←'Cancelled by user'
+                  :EndIf
+              :EndIf
+          :Else
+              what←TC.F.PWD
+              :If TC.YesOrNo'Sure you want to deal with ',what,' ?'
+                  →0 ⋄ r←'Cancelled by user'
+              :EndIf
+          :EndIf
       :ElseIf '['∊what
           what←0 TC.CheckVersion what
           what←TC.ReplaceRegistryAlias what
@@ -1665,15 +1687,18 @@
               r,←⊂'         file, you can refresh the current user settings with -refresh.'
           :Case ⎕C'PackageConfig'
               r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
-              r,←⊂'The argument, if specified, may be a URL or a path.'
+              r,←⊂'The argument, if specified, must be either a URL or a path.'
               r,←⊂' * In case of a URL the package config file is returned as JSON.'
               r,←⊂'   Specifying any of the options has no effect then.'
               r,←⊂' * In case of a path it must point to a folder that contains a Tatin package.'
               r,←⊂'   The contents of the file "',TC.CFG_Name,'" in that folder is returned.'
               r,←⊂'   In case the file does not yet exist it will be created.'
               r,←⊂''
-              r,←⊂'In case no argument is specified the command tries to find a package config file in'
-              r,←⊂'the current directory.'
+              r,←⊂'In case no argument is specified Tatin checks whether there is an open Cider projects'
+              r,←⊂'and asks the user whether that should be used.'
+              r,←⊂''
+              r,←⊂'If Cider is not available or no project is open the command tries to find a package'
+              r,←⊂'config file in the current directory but the user is asked for confirmation.'
               r,←⊂''
               r,←⊂'-edit   You may edit the file by specifying the -edit flag.'
               r,←⊂'-delete In case you want to delete the file specify the -delete flag.'

@@ -9,7 +9,7 @@
 
 ## Overview 
 
-Every package has a configuration file: that's one of the things that make it a package. It defines all that is required to consume the package, and to announce its existence to the world.
+Every package has a configuration file: that's one of the things that make it a package. It defines all that is required to consume the package and to announce its existence to the world.
 
 This is an example:
 
@@ -170,7 +170,7 @@ Calling the function `Run` (after loading the package) would then require:
       #.PkgName.Run
 ```
 
-To the outside world only two functions are visible:
+To the outside world, only two functions are visible:
 
 ```
       #.PkgName.⎕nl ⍳16
@@ -183,13 +183,17 @@ Similarly, if `PkgName` consists of the two namespaces `Boo` and `Goo`, and `Run
 
 #### assets
 
-If not empty (meaning the package has no assets) this must point to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason, the path may not contain a "`:`" under Windows, and not start with "`/`". If it does anyway an error is thrown.
+If this is empty then the package has no assets.
 
-There is one exception: when an absolute path is specified but it's partly identical to what will become `HOME` (the folder where the package lives) then Tatin removes that  part silently, making the path effectively relative. 
+Instead it can point to a single file (typically `LICENSE`) or a folder or several files and folders, separated by a comma.
+
+Any folder must be relative to the package since the folder is part of the package. For that reason, folders may not contain a "`:`" under Windows, and not start with "`/`". If one does anyway an error is thrown.
+
+There is one exception: when an absolute path is specified but it's partly identical to what will become `HOME` (the folder where the package lives) then Tatin removes that part silently, making it effectively relative. 
 
 Notes:
 
-* When the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.
+* When the package configuration file is written to disk the existence of any assets is checked. If one does not exist an error is thrown.
 
   See also the [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) function.
 
@@ -220,19 +224,19 @@ An optional Boolean.
 
 It is injected into a package config file by the `]Tatin.DeprecatePackage` command. A 1 means that this package is deprecated.
 
-#### deprecate_comment
 
+#### deprecate_comment
 
 An optional character vector.
 
 It is injected into a package config file by the `]Tatin.DeprecatePackage` command.
 
-Supposed to give a hint why a package is deprecated, for example "See package XYZ instead".
+Supposed to give a hint why a package is deprecated, for example, "See package XYZ instead".
 
 
 #### description
 
-A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.
+A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable and meaningful to humans.
 
 This information is typically used when a human accesses a Tatin Server with a Browser.
 
@@ -346,7 +350,7 @@ A URL that points to something like GitHub.
 
 An example is `https://github.com/aplteam/MarkAPL`
 
-It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.
+It's supposed to point to a place on the Web where the project that the package was built from is hosted.
 
 
 #### source

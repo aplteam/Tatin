@@ -1,10 +1,16 @@
- {success}←∆ShutdownTestServer dummy;request;response
+ {success}←∆ShutdownTestServer dummy;request;response;counter;max
  success←0
  :If 0<⎕NC'∆P'
      request←R.NewRequest 0
      request.RequestTarget←'/v1/shutdown'
      response←TC.SendAndReceive(TC.ReplaceRegistryAlias'[localhost]')request
      success←200=response.StatusCode
-     ⎕EX'∆P'
+     counter←0
+     max←20
+     :Repeat
+         ⎕DL 1
+     :Until ∆P.HasExited∨max<counter←counter+1
+     'Something is wrong with the server process'Assert max>counter
  :EndIf
+ ⎕EX'∆P'
 ⍝Done

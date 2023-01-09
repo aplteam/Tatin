@@ -1,10 +1,13 @@
- r←Test_Publish_060(stopFlag batchFlag);⎕TRAP;path;zipFileName;statusCode;errMsg;list
+ r←Test_Publish_060(stopFlag batchFlag);⎕TRAP;path;zipFileName;statusCode;errMsg;list;tempPath
 ⍝ Attempt to publish a package that has dependencies in a non-default folder and is a Cider project
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  path←∆GetProjectPath,'/TestData/Build/CiderProject/'
- (statusCode errMsg zipFileName)←TC.PublishPackage path'[local]'
+ tempPath←∆GetTempDir'/'
+ tempPath ⎕NCOPY path
+ tempPath,←'CiderProject/'
+ (statusCode errMsg zipFileName)←TC.PublishPackage tempPath'[local]'
  Assert statusCode=200
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
@@ -13,5 +16,7 @@
 
 ∆TidyUp:
  ⎕NDELETE zipFileName
- {}F.RmDirByForce ∆GetServerPath,'/aplteam-SevenZip-4.0.0'
+ {}F.RmDirByForce tempPath
+ {}F.RmDirByForce ∆GetServerRegistryFolder,'aplteam-Seven7Zip-9.0.1'
+ ∆RecompileIndexOnServer
 ⍝Done

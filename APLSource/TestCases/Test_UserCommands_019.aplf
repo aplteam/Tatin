@@ -29,7 +29,7 @@
 
  (rc msg res)←∆UCMD'PublishPackage "',zipfile,'" [local] -dependencies=dependencies'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- (∆GetServerRegistryFolder,'aplteam-SevenZip-4.0.0/aplteam-SevenZip-4.0.0.zip')TC.ZipArchive.UnzipTo tempDir2
+ (∆GetServerRegistryFolder,'aplteam-Seven7Zip-4.0.0/aplteam-Seven7Zip-4.0.0.zip')TC.ZipArchive.UnzipTo tempDir2
  deps←⊃F.NGET(tempDir2,'/apl-dependencies.txt')1
  →T.GoToTidyUp(,⊂'aplteam-FilesAndDirs-5.2.1')≢deps
 
@@ -38,6 +38,7 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDirByForce tempDir
  Assert 0=⊃F.RmDirByForce tempDir2
+ Assert 0=⊃F.RmDirByForce ∆GetServerRegistryFolder,'aplteam-Seven7Zip-4.0.0'
  #.⎕EX TC.GetTatinRootSpace'#'
  #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
 ⍝Done

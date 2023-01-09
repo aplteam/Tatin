@@ -61,7 +61,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Overview">1. Overview</h2>
 </a>
 </div>
-<p>Every package has a configuration file: that's one of the things that make it a package. It defines all that is required to consume the package, and to announce its existence to the world.</p>
+<p>Every package has a configuration file: that's one of the things that make it a package. It defines all that is required to consume the package and to announce its existence to the world.</p>
 <p>This is an example:</p>
 <pre><code>{
   api: "DotNetZip",
@@ -209,7 +209,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Finally, you need to specify <code>api: "MyAPI"</code> in the package config file.</p>
 <p>Calling the function <code>Run</code> (after loading the package) would then require:</p>
 <pre><code>      #.PkgName.Run</code></pre>
-<p>To the outside world only two functions are visible:</p>
+<p>To the outside world, only two functions are visible:</p>
 <pre><code>      #.PkgName.⎕nl ⍳16
 #.Foo.Run
 #.Foo.CreateParmSpace</code></pre>
@@ -219,11 +219,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="assets">2.3.2. assets</h4>
 </a>
 </div>
-<p>If not empty (meaning the package has no assets) this must point to a folder holding the assets. The path must be relative to the package since the folder is part of the package. For that reason, the path may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>”. If it does anyway an error is thrown.</p>
-<p>There is one exception: when an absolute path is specified but it's partly identical to what will become <code>HOME</code> (the folder where the package lives) then Tatin removes that part silently, making the path effectively relative.</p>
+<p>If this is empty then the package has no assets.</p>
+<p>Instead it can point to a single file (typically <code>LICENSE</code>) or a folder or several files and folders, separated by a comma.</p>
+<p>Any folder must be relative to the package since the folder is part of the package. For that reason, folders may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>”. If one does anyway an error is thrown.</p>
+<p>There is one exception: when an absolute path is specified but it's partly identical to what will become <code>HOME</code> (the folder where the package lives) then Tatin removes that part silently, making it effectively relative.</p>
 <p>Notes:</p>
 <ul>
-<li>When the package configuration file is written to disk the existence of the assets folder is checked. If it does not exist an error is thrown.
+<li>When the package configuration file is written to disk the existence of any assets is checked. If one does not exist an error is thrown.
 <p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> function.</p></li>
 <li>The assets\ folder must be considered read-only. Never write to it from a package!</li>
 </ul>
@@ -254,13 +256,13 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </div>
 <p>An optional character vector.</p>
 <p>It is injected into a package config file by the <code>]Tatin.DeprecatePackage</code> command.</p>
-<p>Supposed to give a hint why a package is deprecated, for example “See package XYZ instead”.</p>
+<p>Supposed to give a hint why a package is deprecated, for example, “See package XYZ instead”.</p>
 <div class="h_tag">
 <a href="#description" id="description" class="autoheader_anchor">
 <h4 data-id="description">2.3.5. description</h4>
 </a>
 </div>
-<p>A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable by and meaningful to humans.</p>
+<p>A short description of what the package is supposed to do, or what kind of problems it solves. This is supposed to be readable and meaningful to humans.</p>
 <p>This information is typically used when a human accesses a Tatin Server with a Browser.</p>
 <p><code>description</code> <em>must not</em> be empty.</p>
 <div class="h_tag">
@@ -365,7 +367,7 @@ your.name@your-domain.com</code></pre>
 </div>
 <p>A URL that points to something like GitHub.</p>
 <p>An example is <code>https://github.com/aplteam/MarkAPL</code></p>
-<p>It's supposed to point to a place on the Web where the project that package was constructed from is managed, or at least to provide information about the project like background, license, author etc.</p>
+<p>It's supposed to point to a place on the Web where the project that the package was built from is hosted.</p>
 <div class="h_tag">
 <a href="#source" id="source" class="autoheader_anchor">
 <h4 data-id="source">2.3.17. source</h4>

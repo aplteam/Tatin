@@ -1,4 +1,4 @@
- r←Test_BuildPackage_052(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;oldBuildNo;newBuildNo;oldVersion;newVersion;cfg
+ r←Test_BuildPackage_052(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;oldBuildNo;newBuildNo;oldVersion;newVersion;cfg;deps;tempDir
 ⍝ Build a package that is a Cider project but we specify a different folder (takes precedence)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,6 +8,10 @@
  zipFileName←'dependencies'TC.BuildPackage path path''
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
+ tempDir←∆GetTempDir'-ZIP'
+ zipFileName TC.ZipArchive.UnzipTo tempDir
+ deps←⊃F.NGET(tempDir,'/apl-dependencies.txt')1
+ →T.GoToTidyUp(,⊂'aplteam-FilesAndDirs-5.2.1')≢deps
  cfg2←TC.ReadPackageConfigFile path,'apl-package.json'
  oldBuildNo←A.ToNum{⍵↓⍨⍵⍳'+'}cfg.version
  newBuildNo←A.ToNum{⍵↓⍨⍵⍳'+'}cfg2.version
@@ -19,5 +23,6 @@
  r←T._OK
 
 ∆TidyUp:
+ {}F.RmDirByForce tempDir
  ⎕NDELETE zipFileName
-⍝Don
+⍝Done

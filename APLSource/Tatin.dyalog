@@ -116,7 +116,7 @@
           c←⎕NS ⍬
           c.Name←'PublishPackage'
           c.Desc←'Publish a package (package folder or ZIP file) to a particular Registry'
-          c.Parse←'2 -dependencies'
+          c.Parse←'2 -dependencies='
           r,←c
      
           c←⎕NS ⍬

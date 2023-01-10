@@ -1164,7 +1164,9 @@
           :EndIf
       :EndIf
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
-      :If './'≢2⍴installFolder
+      :If '[myucmds]'≡⎕C installFolder
+          installFolder←⎕SE._Tatin.Client.GetMyUCMDsFolder''
+      :ElseIf './'≢2⍴installFolder
       :AndIf '/'≠1⍴installFolder
       :AndIf ~':'∊installFolder
           :If '['=1⍴installFolder
@@ -1630,6 +1632,7 @@
               r,←⊂'B) Second argument'
               r,←⊂'The optional second argument must be one of:'
               r,←⊂' * Path to a folder into which the packages are going to be installed'
+              r,←⊂' * The alias [MyUCMDs] (case insensitive)'
               r,←⊂' * A Cider alias specifying a project'
               r,←⊂''
               r,←⊂'In case the second argument is relative Tatin checks whether there are open Cider projects.'

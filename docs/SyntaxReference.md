@@ -327,6 +327,7 @@ By default beta versions are considered in case the package ID is incomplete, bu
 
 Notes:
 
+* You may use the alias `[MyUCMDs]` (case independent) at the beginning of `targetFolder` --- this will then be replaced by the actual path to the MyUCMDs/ folder
 * The target folder must already exist
 * The package ID(s) might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
 

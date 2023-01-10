@@ -14,6 +14,9 @@
 ⍝ `←` Full name of packages finally loaded.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
+ :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
+     targetFolder←(GetMyUCMDsFolder''),'/',{⍵↓⍨⍵⍳']'}targetFolder
+ :EndIf
  'Target folder does not eixst'Assert F.IsDir targetFolder
  identifiers←','(≠⊆⊢)identifiers
  EstablishEmptyPermanentConnections 0

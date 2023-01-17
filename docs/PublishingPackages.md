@@ -247,7 +247,7 @@ Whether you can delete a package once it was published depends on the policy the
 * "JustBetas": You may delete only beta versions
 * "None": You cannot delete any packages at all
 
-Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator (either a plus ("`+`", recommended) or a --- now deprecated --- dot ("`.`")) qualifies as a beta version.
+Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator "`+`" qualifies as a beta version.
 
 Examples:
 

@@ -80,7 +80,7 @@
           c←⎕NS ⍬
           c.Name←'InstallPackages'
           c.Desc←'Install one or more packages and all its dependencies into a given folder'
-          c.Parse←'1-2 -nobetas -quiet'
+          c.Parse←'1-2 -nobetas'
           r,←c
      
           c←⎕NS ⍬
@@ -1018,8 +1018,10 @@
               :EndIf
           :EndIf
       :ElseIf '['∊what
-          what←0 TC.CheckVersion what
           what←TC.ReplaceRegistryAlias what
+          'Alias is not a known Registry'Assert 0<≢what
+          what←0 TC.CheckVersion what
+          'Unknwon package name'Assert 0<≢what
       :EndIf
       :If TC.Reg.IsHTTP what
           :Trap ErrNo
@@ -1127,45 +1129,46 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders
+    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;buff
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
-          :If 0=Arg.quiet
-              :If 9=⎕SE.⎕NC'Cider'
-                  openCiderProjects←⎕SE.Cider.ListOpenProjects 0
-                  :If 1<≢openCiderProjects
-                      ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
-                      :If 0=≢ind
-                          →0 ⋄ r←'Cancelled by user'
-                      :Else
-                          project←2⊃openCiderProjects[ind;]
-                      :EndIf
-                  :ElseIf 1=≢openCiderProjects
-                      project←2⊃openCiderProjects[1;]
+          :If 9=⎕SE.⎕NC'Cider'
+              openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+              :If 1<≢openCiderProjects
+                  ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+                  :If 0=≢ind
+                      →0 ⋄ r←'Cancelled by user'
                   :Else
-                      →0 ⋄ r←'No path specified & no open Cider projects found'
+                      project←2⊃openCiderProjects[ind;]
                   :EndIf
-                  ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
-                  cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
-                  'In the Cider config file "tatinFolder" is empty'Assert 0<≢cfg.CIDER.tatinFolder
-                  folders←{1⊃'='(≠⊆⊢)⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
-                  :If 1<≢folders
-                      ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
-                      :If 0=≢ind
-                          →0 ⋄ r←'Cancelled by user'
-                      :Else
-                          installFolder←project,'/',ind⊃folders
-                      :EndIf
-                  :ElseIf 1=≢folders
-                      installFolder←project,'/',1⊃folders
+              :ElseIf 1=≢openCiderProjects
+                  project←2⊃openCiderProjects[1;]
+              :Else
+                  →0 ⋄ r←'No path specified & no open Cider projects found'
+              :EndIf
+              ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
+              cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
+              'In the Cider config file "tatinFolder" is empty'Assert 0<≢cfg.CIDER.tatinFolder
+              folders←{1⊃'='(≠⊆⊢)⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+              :If 1<≢folders
+                  ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
+                  :If 0=≢ind
+                      →0 ⋄ r←'Cancelled by user'
+                  :Else
+                      installFolder←project,'/',ind⊃folders
                   :EndIf
+              :ElseIf 1=≢folders
+                  installFolder←project,'/',1⊃folders
               :EndIf
           :EndIf
       :EndIf
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
-      :If '[myucmds]'≡⎕C installFolder
-          installFolder←⎕SE._Tatin.Client.GetMyUCMDsFolder''
+      :If '[myucmds]'{⍺≡(≢⍺)↑⍵}⎕C installFolder
+          buff←(⎕SE._Tatin.Client.GetMyUCMDsFolder''),'/',{⍵↓⍨⍵⍳']'}installFolder
+          'You MUST specify a name after [MyUCMDs]'Assert 0<≢buff
+          'You can install only a single package into [MyUCMDs]'Assert~','∊identifier
+          installFolder←(⎕SE._Tatin.Client.GetMyUCMDsFolder''),'/',buff
       :ElseIf './'≢2⍴installFolder
       :AndIf '/'≠1⍴installFolder
       :AndIf ~':'∊installFolder
@@ -1183,8 +1186,7 @@
           :EndIf
       :EndIf
       :If ~TC.F.IsDir installFolder
-          :If Arg.quiet
-          :OrIf 1 TC.C.YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
+          :If 1 TC.C.YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
               'Create!'TC.F.CheckPath installFolder
           :EndIf
       :EndIf
@@ -1433,7 +1435,7 @@
               r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>] -nobetas'
           :Case ⎕C'InstallPackages'
               r,←⊂'Install the given package(s) and all dependencies into the given folder.'
-              r,←'' '  ]Tatin.InstallPackages <packageIDs|package-URLs|Zip-file> <install-path> [-quiet]'
+              r,←'' '  ]Tatin. <packageIDs|package-URLs|Zip-file> <install-path>'
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←'' '  ]Tatin.LoadDependencies <package-folder> [<parent-namespace>] [-overwrite]'
@@ -1622,7 +1624,7 @@
               r,←⊂''
               r,←HelpOnPackageID ⍬
           :Case ⎕C'InstallPackages'
-              r,←⊂'Install the given package(s) and all its dependencies into a given folder.'
+              r,←⊂'Install the given package(s) and all dependencies into a given folder.'
               r,←⊂'If the packages are already installed, they will be installed again from scratch.'
               r,←⊂'Requires two arguments:'
               r,←⊂''
@@ -1632,21 +1634,14 @@
               r,←⊂'B) Second argument'
               r,←⊂'The optional second argument must be one of:'
               r,←⊂' * Path to a folder into which the packages are going to be installed'
-              r,←⊂' * The alias [MyUCMDs] (case insensitive)'
               r,←⊂' * A Cider alias specifying a project'
-              r,←⊂''
-              r,←⊂'In case the second argument is relative Tatin checks whether there are open Cider projects.'
-              r,←⊂'If there is just one, it is assumed that the installation should take place there.'
-              r,←⊂'If there are multiple Cider projects open the user is questioned.'
-              r,←⊂'If Cider is not available or no projects are opened then the current directory is checked.'
-              r,←⊂'For a relative path the user is always asked for confirmation.'
+              r,←⊂' * The alias [MyUCMDs] (case insensitive) followed by the name of a user command'
+              r,←⊂'   You can install only a single package because only a single target can be defined.'
               r,←⊂''
               r,←⊂'If no second argument is specified Tatin tries to find an open Cider project. If there is'
               r,←⊂'just one Tatin acts on it, otherwise the user is questioned.'
               r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken.'
               r,←⊂'If there are multiple folders defined the user is questioned which one to act on.'
-              r,←⊂''
-              r,←⊂'-quiet: Useful for test cases: it prevents Tatin from interrogating the user'
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←⊂''
@@ -1988,6 +1983,7 @@
               r,←⊂'  ]Tatin.InstallPackages A@name /path                             ⍝ Just a package name & a package alias'
               r,←⊂'  ]Tatin.InstallPackages file:///path/group-name-1.0.0/ /install/ ⍝ Package in a local Registry'
               r,←⊂'  ]Tatin.InstallPackages faoo,bar /install/                       ⍝ Multiple packages'
+              r,←⊂'  ]Tatin.InstallPackages faoo [MyUCMDs]faoo                       ⍝ Install user command'
           :Case ⎕C'LoadDependencies'
           :Case ⎕C'UserSettings'
           :Case ⎕C'PackageConfig'

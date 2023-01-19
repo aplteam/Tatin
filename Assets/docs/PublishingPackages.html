@@ -43,6 +43,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#The-dependency-file">3.1.3. The dependency file</a></li>
 </ul></li>
 <li><a href="#Final-step">3.2. Final step</a></li>
+<li><a href="#User-command-packages">3.3. User command packages</a></li>
 </ul></li>
 <li><a href="#Deleting-packages">4. Deleting packages</a></li>
 <li><a href="#Development-strategies">5. Development strategies</a>
@@ -268,6 +269,41 @@ group3=''
 <p>However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has a property <code>[CIDER]tatinFolder</code> that is designed to hold the folder with package dependencies, and if that is not empty then Tatin would use this.</p>
 <p>If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the <code>-dependencies=</code> flag.</p>
 <div class="h_tag">
+<a href="#User-command-packages" id="User-command-packages" class="autoheader_anchor">
+<h3 data-id="User-command-packages">3.3. User command packages</h3>
+</a>
+</div>
+<p>Packages that are user commands are a special case. Here is why:</p>
+<p>User commands must have a user command script — that's what makes them a user command. They can simply be installed as Tatin packages and the job is done. But there is a problem.</p>
+<p>The package might look similar to this:</p>
+<pre><code>MyUserCommand/
+    APLSource/
+        MyUserCommand/        ⍝ Contains the code
+        TestData/
+        TestCases/
+        MyUserCommand.dyalog  ⍝ The user command script
+    packages/
+        ...
+    packages_dev/
+        ...
+    apl-package.json
+    cider.config
+    LICENSE
+    README</code></pre>
+<p>The package configuration parameter <code>source</code> will then read <code>APLSource/MyUserCommand</code> because we don't want <code>TestData/</code> and <code>TestCases/</code> to be part of the installed package.</p>
+<p>But that would mean that the script <code>MyUserCommand.dyalog</code> would not be installed either, so there is a problem: the script would not make it when the packages is installed.</p>
+<p>That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:</p>
+<pre><code>userCommandScript: "APLSource/MyUserCommand.dyalog",</code></pre>
+<p>The fact that the parameter exists and is not empty tells Tatin that is is a user command, and the path allows Tatin to first install everything as usual and then copy the script to the root of the package installation folder.</p>
+<p>The installed package will then comprise:</p>
+<ul>
+<li>a folder for the <code>MyUserCommand</code> package</li>
+<li>folders for all dependencies</li>
+<li>a file <code>apl-buildlist.json</code></li>
+<li>a file <code>apl-dependencies.txt</code></li>
+<li>the user command script: <code>MyUserCommand.dyalog</code></li>
+</ul>
+<div class="h_tag">
 <a href="#Deleting-packages" id="Deleting-packages" class="autoheader_anchor">
 <h2 data-id="Deleting-packages">4. Deleting packages</h2>
 </a>
@@ -278,7 +314,7 @@ group3=''
 <li>“JustBetas”: You may delete only beta versions</li>
 <li>“None”: You cannot delete any packages at all</li>
 </ul>
-<p>Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator (either a plus (“<code>+</code>”, recommended) or a — now deprecated — dot (“<code>.</code>”)) qualifies as a beta version.</p>
+<p>Note that anything that carries something that is not a digit after the second dot in the version number and before the build separator “<code>+</code>” qualifies as a beta version.</p>
 <p>Examples:</p>
 <pre><code>apltree-Foo-1.0.0                 ⍝ Not a beta
 apltree-Foo-1.0.0+123             ⍝ Not a beta

@@ -1,0 +1,20 @@
+ {r}←OpenGitShell y;home;paths;bool;path;pathToGitExe;space
+⍝ Starts Git Bash in `y`.\\
+⍝ If this fn does not work check wether the Git Bash is installed and on the %PATH% environment variable.\\
+⍝ `y` must be one of:
+⍝   * Fully qualfied name of a namespace that is an opened Cider project
+⍝   * Fully qualified path to a Git-managed project
+⍝ Returns a two-element vector:
+⍝  1. The name of the branch
+⍝  2. The hash of the commit as a simple text string
+ r←⍬
+ (space path)←EstablishProject y
+ paths←';'A.Split 2 ⎕NQ #'GetEnvironment' 'PATH'
+ :If 1=+/bool←∨/¨'\git\bin'∘⍷¨⎕C paths
+     home←(bool⍳1)⊃paths
+     pathToGitExe←home,'\sh.exe'
+ :Else
+     'GitBash not found!'⎕SIGNAL 6
+ :EndIf
+ ⎕SH('"',pathToGitExe,'" --cd="',path,'"')''
+⍝Done

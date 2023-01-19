@@ -1,0 +1,16 @@
+ r←IsDirty y;rc;more;path;project;buff
+⍝ Returns 0, 1, 2 or 3
+⍝ * 0 means "clean"
+⍝ * 1 means there are just uncommitted files
+⍝ * 2 means there are just unstaged files
+⍝ * 4 means there are just untracked files
+⍝ * Other numbers are the sum of these
+⍝ Use `Status` to find out details.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ project←EstablishProject y
+ 'Not a Cider project'⎕SIGNAL 6/⍨0=≢project
+ path←2⊃project
+ (rc more buff)←path U.RunGitCommand'status --porcelain'
+ more U.Assert 0=rc
+ r←0<≢buff
+⍝Done

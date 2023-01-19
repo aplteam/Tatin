@@ -1,0 +1,19 @@
+ r←source GetAllObjectNamesFromWorkingArea folder;status;types;deleted;names
+⍝ Establishes a r with all objects in the working area that got deleted, added or changed.
+⍝ `r` is a matrix with zero to many rows and two columns:
+⍝ [;1] is the fully qualified filename
+⍝ [;2] is the fully qualified APL name
+ status←1 Status folder                        ⍝ Get Short statuses
+ 'Branch is dirty'U.Assert' '∧.=2⊃¨status
+ types←1⊃¨status
+ deleted←(types='D')⌿status
+ status←(types∊'AM')⌿status                ⍝ Keep only added and modified files
+ status←3↓¨status
+ r←(≢{0=≢⍵:⍵ ⋄ '/',⍵}source)↓¨status
+ :If 0=≢r
+     r←0 2⍴
+ :Else
+     r←(⊂(folder,{0=≢⍵:⍵ ⋄ '/',⍵}source),'/'),¨r
+     names←⎕SE.Link.GetItemName¨r
+     r←r,[1.5]names
+ :EndIf

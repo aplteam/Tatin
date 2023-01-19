@@ -1,0 +1,13 @@
+ r←CurrentBranch y;project;rc;more;buff;⎕TRAP;path;space;folder;msg
+⍝ Returns the name of the current branch for `y`.\\
+⍝ For what `y` can actually be see `EstablishProject`.\\
+ ⎕TRAP←(811 'E' '⎕DMX.EM ⎕signal 811')(0 'N')
+ (space folder)←EstablishProject y
+ buff←Status folder
+ msg←1⊃buff
+ :If 2=⍴⍴msg
+     r←'On branch '{{⍵↑⍨¯1+⍵⍳' '}⍵↓⍨¯1+(≢⍺)+1⍳⍨⍺⍷⍵}msg[2;]
+ :Else
+     r←(≢'On branch ')↓1⊃buff
+ :EndIf
+⍝Done

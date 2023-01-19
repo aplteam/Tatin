@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.56.0 - 2023-01-06
+⍝ * 0.57.0 - 2023-01-18
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -498,18 +498,25 @@
     ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag
       installFolder←Arg._1
       :If 0≡Arg._2
-          :If 0=≢targetSpace←DefineTargetSpace ⍬
-              ⎕←'Cancelled by user'
-              :Return
+          :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+              targetSpace←'⎕SE'
+          :Else
+              :If 0=≢targetSpace←DefineTargetSpace'#'
+                  ⎕←'Cancelled by user'
+                  :Return
+              :EndIf
           :EndIf
       :Else
           targetSpace←,Arg._2
       :EndIf
       overwriteFlag←Arg.overwrite
+      :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+          installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+      :EndIf
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
       f1←TC.F.IsDir installFolder
       f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
-      '⍵[1] is neither a folder nor a ZIP file'Assert f1∨f2
+      ('Neither a folder nor a ZIP file: ',installFolder)Assert f1∨f2
       :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
           '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       :EndIf
@@ -1635,8 +1642,8 @@
               r,←⊂'The optional second argument must be one of:'
               r,←⊂' * Path to a folder into which the packages are going to be installed'
               r,←⊂' * A Cider alias specifying a project'
-              r,←⊂' * The alias [MyUCMDs] (case insensitive) followed by the name of a user command'
-              r,←⊂'   You can install only a single package because only a single target can be defined.'
+              r,←⊂' * The alias [MyUCMDs] (case insensitive) followed by the name of a package/user command'
+              r,←⊂'   In this case only a single package can be installed because only a single target can be defined.'
               r,←⊂''
               r,←⊂'If no second argument is specified Tatin tries to find an open Cider project. If there is'
               r,←⊂'just one Tatin acts on it, otherwise the user is questioned.'
@@ -1648,6 +1655,12 @@
               r,←⊂'Takes up to two arguments:'
               r,←⊂' [1] A folder into which one or more packages have been installed'
               r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded; default is #'
+              r,←⊂''
+              r,←⊂'Note that this user command also accepts something like:'
+              r,←⊂' ]LoadDependencies [MyUCMDs]Foo'
+              r,←⊂'It would replace [MyUCMDs] by the actual path to the MyUCMDs/ folder in your OS, and try to'
+              r,←⊂'find a folder or user command script "Foo" there.'
+              r,←⊂'Note also that in this special case the default for the second argument is ⎕SE rather than #.'
               r,←⊂''
               r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
               r,←⊂'            load by specifying the -overwrite flag.'
@@ -2034,7 +2047,7 @@
       r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
       r,←⊂'will be scanned; the first hit wins.'
       r,←⊂''
-      r,←⊂'Note that case does not matter, meaning that package MyGroup-MyPkg-1.2.3 can also'
+      r,←⊂'Note that case does not matter, meaning that a package MyGroup-MyPkg-1.2.3 can also'
       r,←⊂'be specified as mygroup-mypkg-1.2.3 or MYGROUP-MYPKG-1.2.3.'
       r,←⊂''
       r,←⊂'A package might be:'

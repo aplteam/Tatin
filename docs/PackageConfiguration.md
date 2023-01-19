@@ -426,6 +426,14 @@ There is also no point in adding tags like "dyalog" or "apl" to a package: Tatin
 
 Note that people in charge of the principal Tatin server will have an eye on the tags, and might silently correct them to keep them consistent and meaningful.
 
+
+#### userCommandScript
+
+If a package is a user command then this must contain the path to the user command script relative to the projects root. `InstallPackages` uses this to identify a user command script and to move it from the source folder (if any) to the root of the install folder.
+
+This optional flag was introduced with version 0.86.0. It might not exist in older versions of a package. If it does not exist then Tatin assumes that the package in question is not a user command.
+
+
 #### version
 
 The version[^version] part of the package ID[^id]

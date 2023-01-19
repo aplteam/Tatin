@@ -1,0 +1,64 @@
+ {r}←RunProcess(EXE command);cmd;folder;i;msg;op;p;pfn;re;ro;rtc;t;⎕IO;⎕USING;tfn;buff;dmx
+⍝ Runs EXE and returns a namespace with all sorts of variables, among them StdOut and StdErr.
+⍝ Requires .NET under Windows but not elsewhere.
+⍝ Cannot run in elevated mode because for that we would need to set i.Verb to 'runas' which
+⍝ we can't because "UseShellEexecute" must be set to 1 for this which we can't because we must
+⍝ redirect StdOut and StdErr, something we can only do with "UseShellEexecute←0"
+⍝ ⍵[0] ←→ Executable
+⍝ ⍵[1] ←→ Argument
+ r←⎕NS''
+ :If 'Win'≡A.GetOperatingSystem ⍬
+     ⎕IO←0
+     ⎕USING←'System' 'System.IO' 'System.Diagnostics,System.dll'
+     p←⎕NEW Process
+     i←p.StartInfo
+     i.FileName←EXE
+     i.Arguments←command
+     i.RedirectStandardOutput←1
+     i.RedirectStandardInput←1
+     i.RedirectStandardError←1
+     i.UseShellExecute←0
+     i.CreateNoWindow←1
+     {}p.Start ⍬
+     re←⎕NEW StreamReader p.StandardError.BaseStream
+     ro←⎕NEW StreamReader p.StandardOutput.BaseStream
+     t←r{⍺.StdErr←⍵.ReadToEnd}&re
+     r.StdOut←ro.ReadToEnd
+     op←{6::0 ⋄ z←⍺⍺ ⍵}
+     {}p.WaitForExit op ⍬
+     {}⎕TSYNC op t
+     r.ExitCode←p.ExitCode
+     rtc←{' '@((⎕UCS 9)∘=)⍵}
+     pfn←{⍵⊆⍨~⍵∊⎕UCS 10 13}
+     r.StdOut←pfn rtc r.StdOut
+     r.StdErr←pfn rtc r.StdErr
+ :Else
+     ⎕IO←1
+     r←⎕NS''
+     r.ExitCode←0
+     r.StdErr←r.StdOut←''
+     folder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'folder'
+     tfn←##.F.GetTempFilename2'APLGit'   ⍝ Temp FileName
+     cmd←EXE,' ',command,' 2>"',tfn,'"'
+     :Trap 11
+         buff←⎕SH cmd
+     :Else
+         dmx←⎕DMX
+         :If ∨/'code 127'⍷dmx.Message
+             r.ExitCode←127
+             r.StdErr←dmx.Message
+             :Return
+         :Else
+             dmx.Message ⎕SIGNAL 11
+         :EndIf
+     :EndTrap
+     r.StdOut←{'UTF-8'⎕UCS ⎕UCS ⍵}¨buff
+     :If 0<≢msg←{22::'' ⋄ ⊃⎕NGET ⍵ 1}tfn
+         r.ExitCode←1
+         :If 2=|≡msg
+         :AndIf 1=≢msg
+             r.StdErr←∊msg
+         :EndIf
+     :EndIf
+     ##.F.DeleteFile tfn
+ :EndIf

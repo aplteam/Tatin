@@ -9,6 +9,9 @@
  'Length error on right argument'Assert(≢y)∊2 3
  'Invalid right argument'Assert 2=|≡y
  (installFolder targetSpace overwriteFlag)←3↑y,0
+ :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+     installFolder←GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+ :EndIf
  ('Folder does not exist:',⍕installFolder)Assert ⎕NEXISTS installFolder
  r←refs←⍬
  targetSpace←⍕targetSpace

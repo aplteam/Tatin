@@ -1,0 +1,16 @@
+ r←Test_Misc_050(stopFlag batchFlag);⎕TRAP;res;qdmx
+⍝ Passes [MyUCMDs]/foo as package to be loaded into #
+⍝ This will fail because "foo" is (hopefully) not an installed user command, but we make sure that [MyUCMDs] is understood
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :Trap 998
+     res←⎕SE.Tatin.LoadDependencies'[myucmds]foo'#
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf qdmx.EM{⍵≡⎕C(-≢⍵)↑⍺}F.CurrentSep{⍺,⍵,⍺,'foo'}'myucmds'
+ :EndTrap
+
+ r←T._OK
+⍝Done

@@ -1,0 +1,21 @@
+r←{x}RefLog restrictFlag;space;folder;rc;more;branch;buff
+⍝ Execute Git's "reflog" command.
+⍝ Returns a matrix with zero or more rows and these columns
+⍝ [1] Hash
+⍝ [2] Symbolic pointer (HEAD)
+⍝ [3] Commit message
+⍝ `restrictFlag` defaults to 0 when empty; this lists all entries.
+⍝ If this is 1 then only the entries up to the last checkout are listed.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ r←⍬
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ restrictFlag←{0=≢⍵:0 ⋄ ⍵}restrictFlag
+ 'Right argument must be a Boolean'U.Assert(⊂restrictFlag)∊0 1
+ (space folder)←EstablishProject x
+ (rc more buff)←folder U.RunGitCommand'reflog '
+ ('RefLog crashed with RC=',(⍕rc),'; ',∊more)U.Assert 0=rc
+ r←↑3{⍺{(⍺↑⍵),{⍺,' ',⍵}/⍺↓⍵}' '(≠⊆⊢)⍵}¨buff
+ :If restrictFlag
+     r←(¯1+r[;3]⍳⊂'checkout:')↑r
+ :EndIf
+⍝Done

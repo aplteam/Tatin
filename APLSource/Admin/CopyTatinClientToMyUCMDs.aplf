@@ -1,12 +1,24 @@
- {r}←CopyTatinClientToMyUCMDs batchFlag;h;userCommandTargetFolder;msg;rc
+ {r}←CopyTatinClientToMyUCMDs batchFlag;h;userCommandTargetFolder;msg;rc;flag;counter;max
  r←0
  userCommandTargetFolder←⎕SE._Tatin.Client.GetMyUCMDsFolder''
  Assert 0<#.Tatin.⎕NC'CiderConfig'
  :If ~batchFlag
  :AndIf 1 ##.Client.YesOrNo'   Would you like to copy the Tatin client to ',userCommandTargetFolder
-     (rc msg)←F.RmDirByForce userCommandTargetFolder,'/Tatin'
+     counter←flag←0
+     max←6
+     :Repeat
+         (rc msg)←F.RmDirByForce userCommandTargetFolder,'/Tatin'
+         :If rc=0
+             flag←1
+         :Else
+             counter+←1
+             :If max>counter
+                 ⎕←'Removing ',userCommandTargetFolder,'/Tatin failed, retrying in one second (',(⍕counter),'/',(⍕max),')'
+                 ⎕DL 1
+             :EndIf
+         :EndIf
+     :Until flag∨max=counter
      ('Removing failed: ',userCommandTargetFolder,'/Tatin','; RC=',⍕rc)Assert 0=rc
-     ⎕DL 0.5
      (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣#.Tatin.CiderConfig.HOME,'/Dist/Client/Tatin'
      r←1
  :EndIf

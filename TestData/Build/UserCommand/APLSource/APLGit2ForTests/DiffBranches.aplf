@@ -1,0 +1,32 @@
+ r←{x}DiffBranches y;⎕TRAP;space;path;branch2;msg;rc;buff;branch1;branches;branch;currentBranch
+⍝ Peforma `Diff` on (by default) the current branch and main
+ ⎕TRAP←(811 'E' '⎕DMX.EM ⎕signal 811')(0 'N')
+ (space path)←EstablishProject y
+ :If 0=⎕NC'x'
+ :OrIf 0=≢x
+     branches←(ListBranches path)~¨⊂' *'
+     'There is just one branch?!'U.Assert 1<≢branches
+     currentBranch←CurrentBranch path
+     :If 1=≢branches~⊂currentBranch
+         branch1←currentBranch
+         branch2←⊃branches~⊂currentBranch
+     :Else
+         'It''s not clear which branches you want to diff'U.Assert~(⊂currentBranch)∊'main' 'master'
+         branch1←currentBranch
+         branch2←⊃branches~⊂currentBranch
+     :EndIf
+ :Else
+     x←⊆x
+     'Optional left argument must have a length of 0, 1 or 2'U.Assert(≢x)∊1 2
+     :If 1=≢⊆x
+         branch1←1⊃,x
+         branches←(ListBranches path)~¨⊂' *'
+         branch2←⊃branches~⊂branch1
+     :Else
+         (branch1 branch2)←x
+     :EndIf
+ :EndIf
+ (rc msg buff)←path U.RunGitCommand'diff ',branch1,'..',branch2
+ msg U.Assert 0=rc
+ r←buff
+⍝Done

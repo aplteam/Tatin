@@ -1,0 +1,18 @@
+ {r}←{quiet}AddGitAttributes path;buff
+ r←⍬
+ quiet←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quiet'
+ :If quiet
+ :OrIf CommTools.YesOrNo'Add .gitattributes for APLers to ',path,' ?'
+     buff←''
+     buff,←⊂'# Auto detect text files (for EOL-auto conversion)'
+     buff,←⊂'* text=auto'
+     buff,←⊂''
+     buff,←⊂'*.apl? linguist-language=apl'
+     buff,←⊂'*.dyapp linguist-language=apl'
+     buff,←⊂'*.dyalog linguist-language=apl'
+     buff,←⊂'*.dws linguist-language=apl'
+     (⊂buff)⎕NPUT path,'/.gitattributes'
+     :If ~quiet
+         ⎕←'.gitattributes created in ',path,' but check content!'
+     :EndIf
+ :EndIf

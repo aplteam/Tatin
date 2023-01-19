@@ -1,0 +1,16 @@
+ Cleanup;openProjects;rc;msg;buff
+ G.∆TestFlag←0
+ ⎕SE.Link.NOTIFY←∆LINK_NOTIFY_WAS
+ openProjects←⎕SE.Cider.ListOpenProjects 0
+ openProjects←('#.Proj_'∘{⍺≡(≢⍺)↑⍵}¨openProjects[;1])⌿openProjects
+ {}⎕SE.Cider.CloseProject¨openProjects[;1]
+
+ :If 0<⎕NC'∆TempDir'
+     Assert 0=⊃buff←FilesAndDirs.RmDirByForce ∆TempDir   ⍝ Requires admin rights
+ :EndIf
+
+ ⎕EX¨'AF'
+ ⎕EX¨'∆Folder1' '∆Folder2' '∆TempDir'
+ #.⎕EX¨'Proj_1' 'Proj_2'
+ ⎕EX'∆LINK_NOTIFY_WAS'
+⍝Done

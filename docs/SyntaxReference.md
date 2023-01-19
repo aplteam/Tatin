@@ -586,6 +586,18 @@ Loads all packages and injects required references into `targetSpace`.
 
 Returns a vector with references to the loaded packages (principal packages only, so no dependencies).
 
+#### MyUCMDs/
+
+In case a Tatin package is a Dyalog user command it can be installed in the special folder MyUCMDs/. Now where this folder lives depends on the operating system used.
+
+However, if you want to load a user command "foo" from that folder you can do this:
+
+```
+⎕SE.Tatin.LoadDependencies '[MyUCMDs]foo` ⎕SE
+```
+
+Note that `MyUCMDs` is case independent, so specifying `MYUCMDS` or `myucmds` will do as well.
+
 ### LoadPackages
 
 ```

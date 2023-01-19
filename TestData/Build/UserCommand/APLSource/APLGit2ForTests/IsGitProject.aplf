@@ -1,0 +1,8 @@
+ r←IsGitProject path;list
+⍝ Returns a Boolean indicating whether `path` is Git-managed or not.\\
+⍝ Checks whether `path` has a sub-folder `.git` - that indicates a Git-managed project.\\
+⍝ Is not limited to opened Cider projects.
+ path←{0=≢⍵:F.PWD ⋄ ⍵}path
+ 'No directory provided'⎕SIGNAL 6/⍨0=F.IsDir path
+ r←F.IsDir path,'/.git'
+⍝Done

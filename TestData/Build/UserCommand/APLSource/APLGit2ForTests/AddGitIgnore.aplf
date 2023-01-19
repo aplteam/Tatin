@@ -1,0 +1,51 @@
+ r←{quiet}AddGitIgnore y;buff;space;path;ref;cfg;installFolders;q;ind
+⍝ Add a .gitignore file to a project, oe merge default values into an existing one.
+⍝ The user is questioned several times, and she may edit the result before it is written to file.
+⍝ All interrogations as well as the ability to edit the file can be supressed by passing a 0 as ⍺ ("quiet").
+⍝ Also, there is no option to overwrite or merge, it's always merge then.
+ quiet←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quiet'
+ r←'AddGitIgnore: no action taken'
+ (space path)←EstablishProject y
+ →(0=≢space,path)/0
+ :If quiet
+ :OrIf CommTools.YesOrNo'Add .gitignore for APLers to ',path,' ?'
+     buff←'aplcore' 'CONTINUE.dws' 'conga.crash'
+     :If 0<≢space
+         ref←⍎space
+         cfg←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET ref.CiderConfig.HOME,'/cider.config'
+     :AndIf 0<≢cfg.CIDER.tatinFolder
+         installFolders←{1⊃'='(≠⊆⊢)⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+         installFolders←{⍵,(~(¯1↑⍵)∊'/\')/'/'}¨installFolders
+         q←'Install folders: ',⊃{⍺,'/ and ',⍵,'/'}/installFolders
+         q,←(⎕UCS 13),'  Add special statements for them?'
+         :If quiet
+         :OrIf CommTools.YesOrNo q
+             buff,←⊃,/{r←''
+                 r,←⊂'/',⍵,'*'
+                 r,←⊂'!/',⍵,'apl-dependencies.txt'
+                 r,←⊂'!/',⍵,'apl-buildlist.json'
+                 r
+             }¨installFolders
+         :EndIf
+     :EndIf
+     :If ⎕NEXISTS path,'/.gitignore'
+         :If quiet
+             ind←2          ⍝ Merge
+         :Else
+             ind←('Select desired action on ',path,'/.gitignore')0 1 CommTools.Select'Replace' 'Merge' 'Quit'
+         :EndIf
+         →(ind=3)/0
+         :If ind=2
+             buff←∪(⊃F.NGET(path,'/.gitignore')1),buff
+         :EndIf
+     :EndIf
+     :If ~quiet
+         ref←⎕NS''
+         ref.gitIgnore←buff
+         ref.⎕ED'gitIgnore'
+         buff←ref.gitIgnore
+         →(0=≢' '~⍨∊buff)/0
+     :EndIf
+     (⊂buff)F.NPUT(path,'/.gitignore')1
+     r←'.gitignore created in ',path
+ :EndIf

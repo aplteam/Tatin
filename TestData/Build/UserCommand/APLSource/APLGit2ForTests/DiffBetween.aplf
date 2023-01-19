@@ -1,0 +1,17 @@
+ r←{x}DiffBetween y;buff;folder;d1;d2;rc;more;space
+⍝ Lists all file differences between `y`.\\
+⍝ * In case `y` is empty it defaults to "master" and "dev".
+⍝ * If it is not empty it must be a two-element vector.\\
+⍝   The two items can each specify a branch but also a commit-hash.\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ (space folder)←EstablishProject x
+ :If 0=≢y
+     (d1 d2)←'main' 'dev'
+ :Else
+     (d1 d2)←y
+ :EndIf
+ (rc more buff)←folder U.RunGitCommand('diff --name-status ',d1,'..',d2)
+ more U.Assert 0=rc
+ r←↑{i←⍵⍳' ' ⋄ ((i-1)↑⍵)(A.DLB i↓⍵)}¨buff
+⍝Done

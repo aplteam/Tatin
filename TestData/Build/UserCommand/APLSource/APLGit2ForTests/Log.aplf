@@ -1,0 +1,60 @@
+ r←{parms_}Log y;buff;cmd;msg;rc;⎕TRAP;path;parms;folder;space;unwantedBranches;list
+⍝ Returns the log of commits.\\
+⍝ The result depends on `verbose`.
+⍝ * If it's 0 (the default) then r is a nested matrix with four columns:\\
+⍝    1. Hash of the commit
+⍝    2. Committer
+⍝    3. Commit date
+⍝    4. Commit message; multi-line messages are compressed
+⍝ * It it's 1 r is a simple character matrix
+⍝ With the optional `since` you can limit the result by date.\\
+⍝ For the date two formats are supported:
+⍝  * 'YYY-MM-DD' as text
+⍝  * yyyymmdd as an integer\\
+⍝ `y` must be one of:
+⍝   * Fully qualified name of a namespace  that is an opened Cider project
+⍝   * Fully qualified path to a Git-managed project
+ ⎕TRAP←(811 'E' '⎕DMX.EM ⎕signal 811')(0 'N')
+ r←''
+ (space folder)←EstablishProject y
+ parms←⎕NS''
+ parms.since←''
+ parms.verbose←0
+ parms.branch←''
+ parms.max←¯1
+ :If 9=⎕NC'parms_'
+     'parms'⎕NS parms_
+ :EndIf
+ :If 0<parms.⎕NC'since'
+ :AndIf 0=1↑0⍴parms.since
+     parms.since←{(4↑⍵),'-',(2↑4↓⍵),'-',(2↑6↓⍵)}⍕⌊parms.since
+ :EndIf
+ :If ~∧/(parms.⎕NL-2)∊list←'since' 'verbose' 'branch' 'max'
+     811 ⎕SIGNAL⍨'Invalid parameters: ',⊃{⍺,',',⍵}/(parms.⎕NL-2)~list
+ :EndIf
+ cmd←'log '
+ :If 0<≢parms.branch
+     cmd,←parms.branch,' '
+     unwantedBranches←((⊂' *')~⍨¨ListBranches folder)~⊂parms.branch
+     cmd,←⊃,/{'--not ',⍵,' '}¨unwantedBranches
+ :EndIf
+ :If ¯1≢parms.max
+     cmd,←' -n ',(⍕parms.max),' '
+ :EndIf
+ cmd,←(0<≢parms.since)/'--since=',(⍕parms.since),' '
+ :If 0=parms.verbose
+     cmd,←'--pretty=format:"',U.GetLogFormat,'" '
+ :EndIf
+ cmd,←'--date=',U.GetDateFormat
+ (rc msg buff)←folder U.RunGitCommand cmd
+ msg U.Assert 0=rc
+ :If parms.verbose
+     r←⍕⍪buff
+ :Else
+     :If 0=≢buff
+         r←0 4⍴''
+     :Else
+         r←U.FormatLog buff
+     :EndIf
+ :EndIf
+⍝Done

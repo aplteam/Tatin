@@ -1,0 +1,18 @@
+ r←{x}GetMostRecentAncestor y;rc;branch2;branch1;space;folder;branches;data;msg
+⍝
+ r←''
+ (space folder)←EstablishProject y
+ →(0=≢folder)/0
+ :If 0=⎕NC'x'
+     branch1←CurrentBranch folder
+     'Without ⍺ the current branch must not be either "main" or "master"'U.Assert~(⊂branch1)∊'main' 'master'
+     branches←2↓¨ListBranches folder
+     branches~←⊂branch1
+     branch2←(⌊/branches⍳'main' 'master')⊃branches
+ :Else
+     ∘∘∘
+ :EndIf
+ (rc msg data)←folder U.RunGitCommand'merge-base ',branch1,' ',branch2
+ msg U.Assert 0=rc
+ r←⊃data
+ ⍝Done

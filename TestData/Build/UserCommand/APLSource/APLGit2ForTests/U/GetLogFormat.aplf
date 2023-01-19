@@ -1,0 +1,14 @@
+ format←GetLogFormat;SEP;TAB
+⍝ Returns a proper format string useful to get what we want from Git's Log.
+
+⍝SEP←'%x09'                  ⍝ This does not work: arrives as space in APL!
+ SEP←'⍙'                     ⍝ Therefore we settle for a very special seperator.
+ format←''
+ format,←'%h'                ⍝ Commit hash (short; %H would be long)
+ format,←SEP
+ format,←'%cn'               ⍝ Committer's name
+ format,←SEP
+ format,←'%cd'               ⍝ Commit date
+ format,←SEP
+ format,←'%s'                ⍝ Subject
+⍝Done

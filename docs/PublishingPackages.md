@@ -239,6 +239,52 @@ However, if the project is managed by Cider then Tatin investigates the Cider co
 If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the `-dependencies=` flag.
 
 
+### User command packages
+
+Packages that are user commands are a special case. Here is why:
+
+User commands must have a user command script --- that's what makes them a user command. They can simply be installed as Tatin packages and the job is done. But there is a problem.
+
+The package might look similar to this:
+
+```
+MyUserCommand/
+    APLSource/
+        MyUserCommand/        ⍝ Contains the code
+        TestData/
+        TestCases/
+        MyUserCommand.dyalog  ⍝ The user command script
+    packages/
+        ...
+    packages_dev/
+        ...
+    apl-package.json
+    cider.config
+    LICENSE
+    README
+```
+
+The package configuration parameter `source` will then read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
+
+But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages is installed.
+
+That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:
+
+```
+userCommandScript: "APLSource/MyUserCommand.dyalog",
+```
+
+The fact that the parameter exists and is not empty tells Tatin that is is a user command, and the path allows Tatin to first install everything as usual and then copy the script to the root of the package installation folder.
+
+The installed package will then comprise:
+
+* a folder for the `MyUserCommand` package 
+* folders for all dependencies 
+* a file `apl-buildlist.json`
+* a file `apl-dependencies.txt`
+* the user command script: `MyUserCommand.dyalog`
+
+
 ## Deleting packages
 
 Whether you can delete a package once it was published depends on the policy the server operates:

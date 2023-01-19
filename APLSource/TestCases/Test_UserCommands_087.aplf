@@ -1,0 +1,12 @@
+ R←Test_UserCommands_087(stopFlag batchFlag);⎕TRAP;stop;msg;rc
+⍝ Exercise ]Tatin.LoadDependencies with [MyUCMDs] as argument
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ stop←0
+ (rc msg)←2↑stop ∆UCMD'LoadDependencies [MyUCMDs]foo'
+ →T.PassesIf rc=911
+ →T.PassesIf'/MyUCMDs/foo'{≡/⎕C ⍺((-≢⍺)↑⍵)}F.EnforceSlash msg
+
+ R←T._OK
+⍝Done

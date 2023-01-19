@@ -1,0 +1,23 @@
+ r←{verbose}LatestRelease(username repoName);GH;qdmx;data;rc;msg
+ ⍝ Returns the tag of the latest release.
+ ⍝ By default any draft releases are ignored.
+ ⍝ "username" is expected to be the GitHub username. It's the equivalent of "group" in Tatin.
+ verbose←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
+ 'Both "username" and "repoName" must not be empty'U.Assert 0∧.<≢¨username repoName
+ GH←⎕NEW ##.GitHubAPIv3(,⊂username)
+ :Trap 0
+     (rc msg data)←GH.GetLatestReleaseInfo repoName
+ :Else
+     qdmx←⎕DMX
+     U.ErrNo ⎕SIGNAL⍨qdmx.EM
+ :EndTrap
+ :If 90=rc
+     msg U.Assert rc≠90
+ :Else
+     :If verbose
+         r←data.(tag_name published_at name)
+     :Else
+         r←data.tag_name
+     :EndIf
+ :EndIf
+⍝Done

@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff
+ r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff;cfg;isUsercommand;uc_filename;userCommandName
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -14,7 +14,8 @@
 ⍝ `←` Full name of packages finally loaded.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
- :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
+ :If isUsercommand←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
+     'You can install just ONE package with [MyUCMDs]'Assert~','∊identifiers
      buff←{⍵↓⍨⍵⍳']'}targetFolder
      'No name specified after [MyUCMDs]'Assert 0<≢buff
      targetFolder←(GetMyUCMDsFolder''),'/',buff
@@ -53,10 +54,19 @@
          r,←targetFolder InstallPackage_ alias identifier
      :EndFor
      CloseConnections 0
+     :If isUsercommand
+         userCommandName←2⊃⎕NPARTS⊃identifiers
+         cfg←ReadPackageConfigFile targetFolder,'/',userCommandName,'/',CFG_Name
+         :If 0<cfg.⎕NC'userCommandScript'
+         :AndIf 0<≢cfg.userCommandScript
+             uc_filename←⊃,/1↓⎕NPARTS cfg.userCommandScript
+             targetFolder ⎕NMOVE targetFolder,'/',userCommandName,'/',uc_filename
+         :EndIf
+     :EndIf
  :Else
      qdmx←⎕DMX
      CloseConnections 1
      :Trap 0 ⋄ F.RmDir tempDir ⋄ :EndTrap
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
-⍝Done
+⍝Donet

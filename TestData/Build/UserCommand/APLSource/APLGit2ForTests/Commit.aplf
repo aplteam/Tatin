@@ -1,0 +1,27 @@
+ r←{msg}Commit y;nm;project;buff;rc;⎕TRAP;cb;path;cmd;msg_;space
+⍝ Commit changes.\\
+⍝ If the current branch is "main" (or "master") then `msg` **_must not_** be empty and should carry a meaningful message.
+⍝ Otherwise `msg` may be empty but will become three dots (`...`).\\
+⍝ `y` must be one of:
+⍝   * Fully qualfied name of a namespace that is an opened Cider project
+⍝   * Fully qualified path to a Git-managed project
+⍝ Returns a two-element vector:
+⍝  1. The name of the branch
+⍝  2. The hash of the commit as a simple text string
+ ⎕TRAP←(811 'E' '⎕DMX.EM ⎕signal 811')(0 'N')
+ msg←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'msg'
+ msg←{0=≢⍵:'...' ⋄ ⍵}msg
+ (space path)←EstablishProject y
+ cb←CurrentBranch path
+ nm←~(⊂cb)∊'master' 'main'
+ ('You must provide a meaningful message in the "',cb,'" branch')⎕SIGNAL 11/⍨(0=nm)∧0=≢msg
+ msg_←U.MassageMsg msg
+ cmd←'commit -m "',msg_,'"'
+ (rc msg buff)←path U.RunGitCommand cmd
+ :If ∨/'nothing to commit, working tree clean'⍷∊buff
+     r←buff
+ :Else
+     msg U.Assert 0=rc
+     r←buff
+ :EndIf
+⍝Done

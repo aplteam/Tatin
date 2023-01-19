@@ -1,0 +1,63 @@
+ (filename1 filename2)←{x}ViewChanges y;space;folder;currentBranch;hashList;branchHashes;firstHash;ind;beforeHash;lastHash;list;noofBytes
+⍝ Puts all changes on display since the current branch was created.
+⍝ Note that for this to work one should consider deleting and re-creating a branch after merging it with "main".
+⍝ `y` might be one of:
+⍝ * Empty vector; The current state (work dir!) is viewed against where the current branch started from.
+⍝ * A two-element vector ; each item must then be a hash of a commit. The two commits are the input.
+⍝ Note that instead of a hash you mith specify a '?". In that case a list is presented the user may
+⍝ select a hash from.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ Returns either two empty vectors in case no difference was detected or two filenames otherwise.\\
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ (space folder)←EstablishProject x
+ 'Is dirty'U.Assert 0=IsDirty space
+ hashList←space RefLog 0
+ :If 0=≢y
+     currentBranch←CurrentBranch space
+     branchHashes←space LogForBranch currentBranch
+     firstHash←⊃⊢⌿branchHashes
+     lastHash←⊃branchHashes
+     ind←hashList[;1]⍳⊂firstHash
+     :If ind=≢hashList
+         ⍝ It all started from firstHash, so there no "before"
+         beforeHash←firstHash
+         firstHash←⊃hashList[ind-1;]
+     :Else
+         beforeHash←⊃hashList[ind+1;]
+     :EndIf
+ :Else
+     'Right argument must be either empty or a two-element vector'U.Assert(≢y)∊0 2
+     :If (,'?')≡,1⊃
+
+     :EndIf
+     :If
+
+     :EndIf
+ :EndIf
+
+ :If 0=≢list←folder DiffBetween lastHash beforeHash
+     ∆TestFlag U.Show'No changes found'
+     :Return
+ :EndIf
+ (filename1 filename2)←'txt'∘F.GetTempFilename2¨2⍴⊂''
+ noofBytes←ViewChanges_ list folder lastHash beforeHash filename1 filename2
+ :If 0<noofBytes
+     :If flag←9=⎕SE.⎕NC'CompareFiles'
+         :Trap 911
+             (exe alias)←⎕SE.CompareFiles.EstablishCompareEXE''
+         :Else
+             :Return
+         :EndTrap
+     :AndIf 0<≢exe
+         parms←⎕SE.CompareFiles.ComparisonTools.⍎'CreateParmsFor',alias
+         parms.(file1 file2)←filename1 filename2
+         parms.(use name)←exe alias
+         parms.(caption1 caption2)←branch1 branch2
+         ⎕SE.CompareFiles.Compare parms
+         :Trap 6 ⋄ F.DeleteFile filename2 ⋄ :EndTrap
+         filename1←filename2←''
+     :EndIf
+ :Else
+     ⎕←'No APL objects found to compare'
+ :EndIf
+⍝Done

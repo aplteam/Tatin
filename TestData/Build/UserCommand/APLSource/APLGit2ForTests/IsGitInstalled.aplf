@@ -1,0 +1,15 @@
+ yesNo←IsGitInstalled;path;exeName
+⍝ Checks the PATH variable of the current operating system and tries to find the git executable.
+ yesNo←0
+ :If 'Win'≡A.GetOperatingSystem ⍬
+     path←⊃⎕SH'echo %PATH%'
+     path←';'(≠⊆⊢)path
+     exeName←'git.exe'
+ :Else
+     path←⊃⎕SH'echo $PATH'
+     path←':'(≠⊆⊢)path
+     exeName←'git'
+ :EndIf
+ :If 0<≢path
+     yesNo←∨/F.IsFile F.NormalizePath¨(⊂'/',exeName),⍨¨path
+ :EndIf

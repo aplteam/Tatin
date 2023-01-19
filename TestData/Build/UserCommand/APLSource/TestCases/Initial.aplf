@@ -1,0 +1,42 @@
+ Initial;result;buff
+⍝ 1. Create the needed references
+⍝ 2. Set global `∆TestFlag` to 1
+⍝ 3. Create two namespaces with (very little) content
+⍝ 4. Create two Cider projects from those two namespaces
+⍝ 5. Initialize both Cider projects as local Git repositories
+
+ A←APLTreeUtils2
+ F←FilesAndDirs
+ G←##.APLGit2
+ G.InitializeGitUserCommand ⍬
+
+ G.∆TestFlag←1
+
+ ∆TempDir←F.GetTempSubDir'Git_Tests'
+ 3 ⎕MKDIR ∆Folder1←G.U.EnforceSlashes ∆TempDir,'/NoBlanks'
+ 3 ⎕MKDIR ∆Folder2←G.U.EnforceSlashes ∆TempDir,'/Has Blanks'
+
+ 'Proj_1'#.⎕NS''
+ #.Proj_1.(⎕IO ⎕ML)←1
+ #.Proj_1.⎕FX↑'r←WhoAmI' 'r←''Proj_1'''
+ (∆Folder1,'/cider.config')⎕NCOPY ##.CiderConfig.HOME,'/TestData/cider.config.1'
+ result←⎕SE.UCMD'Cider.CreateProject ',∆Folder1,' #.Proj_1 -acceptConfig -noEdit -quiet'
+ {}∆Initialize ∆Folder1
+ (⊂'r←Hello' 'r←''worlt''')⎕NPUT ∆Folder1,'/APLSource/help.aplf'
+ G.Add ∆Folder1
+ buff←'Function added'G.Commit ∆Folder1
+ (⊂'r←Hello' 'r←''World''')⎕NPUT (∆Folder1,'/APLSource/help.aplf') 1
+ G.Add ∆Folder1
+ ⍝buff←'Typo fixed'G.Commit ∆Folder1
+
+ 'Proj_2'#.⎕NS''
+ #.Proj_2.(⎕IO ⎕ML)←1
+ #.Proj_2.⎕FX↑'r←WhoAmI' 'r←''Proj_2'''
+ (∆Folder2,'/cider.config')⎕NCOPY ##.CiderConfig.HOME,'/TestData/cider.config.2'
+ result←⎕SE.UCMD'Cider.CreateProject "',∆Folder2,'" #.Proj_2 -acceptConfig -noEdit -quiet'
+ {}∆Initialize ∆Folder2
+ (⊂'r←Hello2' 'r←''Galaxy''')⎕NPUT ∆Folder2,'/APLSource/help2.aplf'
+
+ ∆LINK_NOTIFY_WAS←⎕SE.Link.NOTIFY
+ ⎕SE.Link.NOTIFY←0
+⍝Done

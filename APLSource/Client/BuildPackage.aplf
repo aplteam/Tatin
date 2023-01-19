@@ -40,6 +40,17 @@
  :If 0<≢cfg.assets
      {projectPath zipObj.Add ⍵}¨','(≠⊆⊢)cfg.assets
  :EndIf
+ :If 0<cfg.⎕NC'userCommandScript'
+ :AndIf 0<≢cfg.userCommandScript
+     :If F.IsFile projectPath,cfg.userCommandScript
+         (projectPath,⊃⎕NPARTS cfg.userCommandScript)zipObj.Add⊃,/1↓⎕NPARTS cfg.userCommandScript
+     :Else
+         zipObj.Dispose
+         ⎕DL 0.2
+         3 ⎕NDELETE zipFilename
+         ('Not found: ',cfg.userCommandScript)Assert 0
+     :EndIf
+ :EndIf
  :If 0<≢dependencies
      (projectPath,dependencies)zipObj.Add'/apl-dependencies.txt'
  :ElseIf F.IsFile projectPath,'apl-dependencies.txt'

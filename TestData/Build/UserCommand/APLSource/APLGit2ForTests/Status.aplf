@@ -1,0 +1,22 @@
+ r←{short}Status y;rc;more;path;⎕TRAP;short;space;ind;branch;msg
+⍝ Reports all uncommited/untracked files.\\
+⍝ `y` must be one of:
+⍝   * Fully qualfied name of a namespace  that is an opened Cider project
+⍝   * Fully qualified path to a Git-managed project
+⍝ `short` defaults to 0 which gives you a detailed report.
+ ⎕TRAP←(811 'E' '⎕DMX.EM ⎕signal 811')(0 'N')
+ short←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'short'
+ (space path)←EstablishProject y
+ (rc more r)←path U.RunGitCommand('status',short/' --short')
+ more U.Assert 0=rc
+ :If ~short
+     ind←⍸∨/¨'On branch'∘⍷¨r
+     branch←⊃¯1↑' '(≠⊆⊢)ind⊃r
+     :If (⊂branch)∊'main' 'master'
+         msg←U.Box{⍵{(⍵⍴'⌹')⍺(⍵⍴'⌹')}≢⍵}'⌹ On branch ',branch,' ⌹'
+     :Else
+         msg←'On branch ',branch
+     :EndIf
+     (ind⊃r)←msg
+ :EndIf
+⍝Done

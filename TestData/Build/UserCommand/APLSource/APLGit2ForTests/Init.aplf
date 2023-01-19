@@ -1,0 +1,42 @@
+ path←{quiet}Init y;space;msg;rc;path;buff
+⍝ Initialize a folder as being managed by Git.\\
+⍝ If the user wants to she can also add a .gitignore and/or a .gitattributes file that makes sense for APLers.\\
+⍝ `y` must be one of:
+⍝  * Empty: then `Git` tries to find an open Cider project and uses that
+⍝  * Fully qualfied name of a namespace of an opened Cider project
+⍝  * Fully qualified path to a Git-managed project\\
+⍝ Explicit result:\\
+⍝ `path` is the path to a folder that was (re-) initialized as a Git project and otherwise an empty text vector.\\
+⍝ The optional left argument defaults to 0. If 1 then Init does not ask any question but carries out its job,
+⍝ including the creation of .gitignore and .gitattributes
+ quiet←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quiet'
+ (space path)←EstablishProject y
+ :If IsGitProject path
+     :If quiet
+     :OrIf CommTools.YesOrNo space,' is already managed by Git; would you like to re-initialize it?'
+         (rc msg buff)←path U.RunGitCommand'init'
+         ('Init command files with RC=',(⍕rc),'; ',msg)U.Assert 0=rc
+         quiet AddGitIgnore path
+         quiet AddGitAttributes path
+     :EndIf
+ :Else
+     :If 0<≢path
+         :If quiet
+         :OrIf CommTools.YesOrNo'Would you like to initialize ',path,' for Git?'
+             (rc msg buff)←path U.RunGitCommand'init'
+             ('Init command files with RC=',(⍕rc),'; ',msg)U.Assert 0=rc
+             quiet AddGitAttributes path
+             {}quiet AddGitIgnore path
+         :EndIf
+     :Else
+         :If quiet
+         :OrIf CommTools.YesOrNo'Would you like to initialize the current directory ',F.PWD,' for Git?'
+             path←F.PWD
+             (rc msg buff)←path U.RunGitCommand'init'
+             ('Init command files with RC=',(⍕rc),'; ',msg)U.Assert 0=rc
+             quiet AddGitAttributes path
+             {}quiet AddGitIgnore path
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

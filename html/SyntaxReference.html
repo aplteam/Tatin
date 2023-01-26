@@ -371,13 +371,18 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>a folder holding a package (like file://C:\Temp\group-name-version\)</li>
 <li>a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch})</li>
 <li>a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.</li>
+<li>The internal alias <code>[MyUCMDs]</code> (case independent); this will then be replaced by the actual path to the MyUCMDs/ folder while the name of the sub-folder is derived from the package ID.
+<p>Note that in this case you..</p>
+<ul>
+<li><strong>must not</strong> specify anything after <code>[MyUCMDs]</code></li>
+<li>can only install a single package at the time</li>
+</ul></li>
 </ul>
 <p>You may omit minor+patch or even major+minor+patch in order to install the latest version.</p>
 <p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as <code>⍺</code>.</p>
 <p><code>r</code> is a nested vector of character vectors with the full names of all principal packages installed. The length will match the number of packages specified as <code>identifiers</code>.</p>
 <p>Notes:</p>
 <ul>
-<li>You may use the alias <code>[MyUCMDs]</code> (case independent) at the beginning of <code>targetFolder</code> — this will then be replaced by the actual path to the MyUCMDs/ folder</li>
 <li>The target folder will be created if it does not already exist</li>
 <li>The package ID(s) might use any case, meaning that if the package's name is <code>foo-Goo-1.2.3</code> then you might as well spell it <code>foo-GOO-1.2.3</code> or <code>FOO-goo-1.2.3</code>: it would not make a difference</li>
 </ul>
@@ -483,11 +488,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Left-argument">2.18.2. Left argument</h4>
 </a>
 </div>
-<p>Optionally <code>parms</code> can be specified. If specified this must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>. It may contain <code>date</code>, <code>since</code> and <code>project_url</code>.</p>
+<p>Optionally <code>parms</code> can be specified. If specified this must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>. It may contain <code>date</code>, <code>since</code>, <code>project_url</code> and/or <code>userCommand</code>.</p>
 <p>The following parameters allow the user to select certain packages:</p>
 <ul>
 <li>Use <code>group</code> to specify the group.</li>
 <li>Use <code>tags</code> to specify one or more tags (simple comma-separated text vector); is case-independent.</li>
+<li><code>userCommand</code>, if specified, must be a Boolean. If it is 1 only packages that are user commands are returned.</li>
 <li>Use <code>since</code> to specify a date; all packages published before that date will be ignored.
 <p><code>since</code> can be one of:</p>
 <ul>

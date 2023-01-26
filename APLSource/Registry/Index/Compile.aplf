@@ -1,11 +1,12 @@
- {ref}←Compile path;packageList;index;cfgFiles;descs;tags;cfgData;ind;index2;deprecated;deprecated_;osList;os_lin;os_mac;os_win
+ {ref}←Compile path;packageList;index;cfgFiles;descs;tags;cfgData;ind;index2;deprecated;deprecated_;osList;os_lin;os_mac;os_win;UC
 ⍝ (Re)-builds the index for the registry pointed to by `path`.
 ⍝ Writes several files:
 ⍝ * {path}/tatin_index.txt contains a simple string with all package folder names, including deprecated packages
 ⍝ * {path}/tatin_descriptions.json contains a simple string with all package descriptions
 ⍝ * {path}/tatin_tags.txt contains the tags for all packages
 ⍝ * {path}/tatin_deprecated.txt contains the names of all packages that are deprecated, but
-⍝ * {path}/tatin_OS.txt contains Booleans for all Operatings System with one line per package
+⍝ * {path}/tatin_os.txt contains Booleans for all Operatings System with one line per package
+⍝ * {path}/tatin_uc.txt contains a Boolean to indicate whether a package is a user command or not (one line per package)
 ⍝   within a major version only the last version, if that is deprecated
 ⍝ More stuff might be added later.
 ⍝ Returns a reference to a namspace that holds veriables with these pieces of information.
@@ -21,14 +22,16 @@
          cfgData←PolishCfgData cfgData
          (descs tags os_lin os_mac os_win)←↓⍉↑cfgData.(description tags os_lin os_mac os_win)
          osList←((≢path)↓¨packageList),¨' ',¨⍕¨os_lin,¨os_mac,¨os_win
+         UC←index{⍵\⍵/⍺}{0=⍵.⎕NC'userCommandScript':0 ⋄ 0<≢⍵.userCommandScript}¨cfgData
          (cfgData.deprecated/descs)←⊂''
          (cfgData.deprecated/tags)←⊂''
+         (cfgData.deprecated/UC)←⊂''
          descs←⊃,/descs,¨⎕UCS 13
          ref.descriptions←descs
          deprecated←cfgData.deprecated⌿index
          (⊂descs)##.F.NPUT(path,'/tatin_descriptions.json')1
          tags←##.TAB{(1⊃⍵),⍺,(2⊃⍵)}¨⊃,/(⍳≢tags){(⊂⍕⍺)∘,¨⊂¨{⍵⊆⍨~⍵∊';,'}⍵}¨tags ⍝ We keep supporting ";" for the time being
-         tags←(~({⊃⊃(//)⎕vfi ⍵↑⍨¯1+⍵⍳⎕ucs 9}¨tags)∊deprecated)⌿tags     ⍝ Remove all tags that belong to deprecated packages
+         tags←(~({⊃⊃(//)⎕VFI ⍵↑⍨¯1+⍵⍳⎕UCS 9}¨tags)∊deprecated)⌿tags     ⍝ Remove all tags that belong to deprecated packages
          (⊂tags)##.F.NPUT(path,'/tatin_tags.txt')1
          deprecated_←⊃,/deprecated,¨⎕UCS 13
          (⊂deprecated_)##.F.NPUT(path,'/tatin_deprecated.txt')1
@@ -37,12 +40,14 @@
          ref.index←index2
          (⊂index2)##.F.NPUT(path,'/',GetIndexFilename)1
          (⊂osList)##.F.NPUT(path,'/tatin_os.txt')1
+         (⊂UC)##.F.NPUT(path,'/tatin_uc.txt')1
      :Else
          (⊂'')##.F.NPUT(path,'/',GetIndexFilename)1
          (⊂'')##.F.NPUT(path,'/tatin_descriptions.json')1
          (⊂'')##.F.NPUT(path,'/tatin_tags.txt')1
          (⊂'')##.F.NPUT(path,'/tatin_deprecated.txt')1
          (⊂'')##.F.NPUT(path,'/tatin_os.txt')1
+         (⊂'')##.F.NPUT(path,'/tatin_uc.txt')1
      :EndIf
  :EndHold
 ⍝Done

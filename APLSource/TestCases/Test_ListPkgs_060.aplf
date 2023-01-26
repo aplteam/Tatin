@@ -1,0 +1,15 @@
+ r←Test_ListPkgs_060(stopFlag batchFlag);⎕TRAP;parms;mat
+⍝ List all packages that are user commands
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.userCommand←1
+ mat←parms TC.ListPackages'[local]'
+
+ →T.PassesIf 2=⍴⍴mat
+ →T.PassesIf 2=2⊃⍴mat
+ →T.PassesIf 1=≢mat
+
+ r←T._OK
+⍝Done

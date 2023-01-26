@@ -81,15 +81,14 @@
                      statusCode←HttpCodes.BadRequest
                      errMsg←'Publishing package ',packageID,' failed; dependency uses file:// protocol'
                      packageDir RollbackPublishPackage errMsg
-                     F.RmDir tempDir
-                     :Return
-                 :EndIf
-                 :If 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
-                     statusCode←HttpCodes.InternalServerError
-                     errMsg←'Publishing package failed: ',packageID
-                     packageDir RollbackPublishPackage errMsg
                  :Else
-                     0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+                     :If 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
+                         statusCode←HttpCodes.InternalServerError
+                         errMsg←'Publishing package failed: ',packageID
+                         packageDir RollbackPublishPackage errMsg
+                     :Else
+                         0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+                     :EndIf
                  :EndIf
              :EndIf
          :EndIf

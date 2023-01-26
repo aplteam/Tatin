@@ -11,7 +11,7 @@
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
 
-## Version 0.86.0 from 2023-01-19
+## Version 0.86.0 from 2023-01-26
 
 No user actions required.
 
@@ -19,10 +19,12 @@ No user actions required.
 * The document "PublishingPackages.md" has a new sub chapter "User Command packages"
 * Syntax change: `InstallPackages` now creates the target folder if it does not already exist
 * `LoadDependencies` now understands `[MyUCMDs]` 
-* ]InstallPackages now understands [MyUCMDs] as target folder
+* `]InstallPackages` now understands `[MyUCMDs]` as target folder
+* Server: The "Packages" page has an additional column: "UC" (user command)
+* The User Command `]ListPackages` has an additional modifier: `-uc=`
 * Bug fixes
-  * ]PackageConfig -edit caused an index error under some circumstances
-  * ]PackageConfig did not handle neither unknown registries nor unknown packages well
+  * `]PackageConfig -edit` caused an index error under some circumstances
+  * `]PackageConfig` did not handle neither unknown registries nor unknown packages well
 
 ## Version 0.85.0 from 2023-01-09
 

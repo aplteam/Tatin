@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.57.0 - 2023-01-18
+⍝ * 0.57.0 - 2023-01-25
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -62,7 +62,7 @@
           c←⎕NS ⍬
           c.Name←'ListPackages'
           c.Desc←'List all packages in the Registry or install folder specified in the argument'
-          c.Parse←'1s -group= -tags= -os= -noaggr -date -project_url -since='
+          c.Parse←'1s -group= -tags= -os= -noaggr -date -project_url -since= -uc'
           r,←c
      
           c←⎕NS ⍬
@@ -435,6 +435,7 @@
       :If 0≢Arg.noaggr
           parms.aggregate←~Arg.noaggr
       :EndIf
+      parms.userCommand←Arg.uc
       parms.date←Arg.date
       :If 0≢Arg.since
           :If '-'∊Arg.since
@@ -1136,7 +1137,7 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;buff
+    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;buff;msg;rc
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
@@ -1172,10 +1173,11 @@
       :EndIf
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
       :If '[myucmds]'{⍺≡(≢⍺)↑⍵}⎕C installFolder
-          buff←(⎕SE._Tatin.Client.GetMyUCMDsFolder''),'/',{⍵↓⍨⍵⍳']'}installFolder
-          'You MUST specify a name after [MyUCMDs]'Assert 0<≢buff
+          buff←{⍵↓⍨⍵⍳']'}installFolder
+          'You must no specify a name with [MyUCMDs]'Assert 0=≢buff
           'You can install only a single package into [MyUCMDs]'Assert~','∊identifier
-          installFolder←(⎕SE._Tatin.Client.GetMyUCMDsFolder''),'/',buff
+          buff←{1=≢⍵:⍵ ⋄ 3=≢⍵:2⊃⍵ ⋄ ⎕D∊⍨⊃2⊃⍵:1⊃⍵ ⋄ 2⊃⍵}'-'(≠⊆⊢)TC.GetPackageIDFromFilename identifier
+          installFolder←TC.GetMyUCMDsFolder buff
       :ElseIf './'≢2⍴installFolder
       :AndIf '/'≠1⍴installFolder
       :AndIf ~':'∊installFolder
@@ -1198,6 +1200,16 @@
           :EndIf
       :EndIf
       ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
+      :If 0<≢⊃TC.F.Dir installFolder,'/'
+          :If TC.YesOrNo'The folder <',installFolder,'> is not empty - clear it? (N=cancel)'
+              (rc msg)←TC.F.RmDirByForce installFolder
+              'Clearing the installation folder failed'Assert 0=rc
+              'Create!'TC.F.CheckPath installFolder
+          :Else
+              r←'Cancelled by user'
+              :Return
+          :EndIf
+      :EndIf
       :Trap 0
           r←TC.InstallPackages identifier installFolder
       :Else
@@ -1436,7 +1448,7 @@
               r,←'' '  ]Tatin.ListDeprecated <URL|[Alias> [-all]'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder passed as argument'
-              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-group=] [-tags=] [-os=] [-date] [-project_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
+              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-uc] [-group=] [-tags=] [-os=] [-date] [-project_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all dependencies into the workspace.'
               r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>] -nobetas'
@@ -1607,6 +1619,7 @@
               r,←⊂'By default all  packages are listed. You can influence the output in several ways:'
               r,←⊂'-group={foo}    List only packages with the given group name.'
               r,←⊂'-tags=foo,goo   List only packages carrying the tags "foo" & "goo".'
+              r,←⊂'-uc             List only packages that are user commands'
               r,←⊂'-os=mac         List only packages for the specified operating system(s). Must be a'
               r,←⊂'                comma-seperated list with "win", "mac", "lin" being valid values.'
               r,←⊂'-since=         Must be a date (YYYYMMDD or YYYY-MM-DD) when specified.'
@@ -1632,7 +1645,9 @@
               r,←HelpOnPackageID ⍬
           :Case ⎕C'InstallPackages'
               r,←⊂'Install the given package(s) and all dependencies into a given folder.'
-              r,←⊂'If the packages are already installed, they will be installed again from scratch.'
+              r,←⊂'If the installation folder does not yet exist it will be created, but the user must confirm this.'
+              r,←⊂'If the folder does exist but is not empty then the user is asked whether she want it to be cleared.'
+              r,←⊂'In case this is confirmed the folder will be removed and then recreated, otherwise an error is thrown.'
               r,←⊂'Requires two arguments:'
               r,←⊂''
               r,←⊂'A) First argument:'
@@ -1642,13 +1657,13 @@
               r,←⊂'The optional second argument must be one of:'
               r,←⊂' * Path to a folder into which the packages are going to be installed'
               r,←⊂' * A Cider alias specifying a project'
-              r,←⊂' * The alias [MyUCMDs] (case insensitive) followed by the name of a package/user command'
-              r,←⊂'   In this case only a single package can be installed because only a single target can be defined.'
+              r,←⊂' * Just "[MyUCMDs]" (case insensitive) without specifying a name: it will be derived from the package ID'
+              r,←⊂'   Note that you may install only a single package at the time this way.'
               r,←⊂''
               r,←⊂'If no second argument is specified Tatin tries to find an open Cider project. If there is'
-              r,←⊂'just one Tatin acts on it, otherwise the user is questioned.'
-              r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken.'
-              r,←⊂'If there are multiple folders defined the user is questioned which one to act on.'
+              r,←⊂'just one open, Tatin acts on it, otherwise the user is questioned.'
+              r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken as install folder.'
+              r,←⊂'If there are multiple folders defined the user is questioned which one to install into.'
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←⊂''

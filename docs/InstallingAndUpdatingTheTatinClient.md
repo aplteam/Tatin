@@ -35,11 +35,10 @@ W> You _must not_ install it into any other folder, even if that folder is scann
 W>
 W> However, this might change with a later version.
 
-Where to find the `MyUCMDs/` folder depends on your operating system, but this gives you the answer in any case:
+Where to find the `MyUCMDs/` folder depends on your operating system
 
-```
-⎕SE.Tatin.GetMyUCMDsFolder''
-```
+* Under Windows it's usually `C:\Users\<username>\Documents\`
+* Under Linux and Mac OS it is `/home/<username>/`
 
 Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.
 

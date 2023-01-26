@@ -1,0 +1,17 @@
+ r←Test_API_010(stopFlag batchFlag);⎕TRAP;res;zipFilename;installFolder
+⍝ Exercise "InstallPackages" with a package that's a user command
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ installFolder←TC.GetMyUCMDsFolder'UC'
+ 'Check!'Assert 0=⎕NEXISTS installFolder  ⍝ Should not exist. If it does, is it a leftover from an earlier test?!
+ res←TC.InstallPackages zipFilename'[myucmdS]'
+ →T.GoToTidyUp'example-UC-1.0.0'≢∊res
+ →T.GoToTidyUp~⎕NEXISTS installFolder,'/UC.aplc'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDirByForce installFolder
+⍝Done

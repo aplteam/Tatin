@@ -1200,16 +1200,6 @@
           :EndIf
       :EndIf
       ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
-      :If 0<≢⊃TC.F.Dir installFolder,'/'
-          :If TC.YesOrNo'The folder <',installFolder,'> is not empty - clear it? (N=cancel)'
-              (rc msg)←TC.F.RmDirByForce installFolder
-              'Clearing the installation folder failed'Assert 0=rc
-              'Create!'TC.F.CheckPath installFolder
-          :Else
-              r←'Cancelled by user'
-              :Return
-          :EndIf
-      :EndIf
       :Trap 0
           r←TC.InstallPackages identifier installFolder
       :Else
@@ -1640,14 +1630,14 @@
               r,←⊂'Must be the fully qualified name of a namespace the package will be loaded into.'
               r,←⊂'May be # or ⎕SE or a sub-namespace of any level.'
               r,←⊂''
+              r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
+              r,←⊂''
               r,←⊂'Returns the number of packages loaded into the workspace, including dependencies.'
               r,←⊂''
               r,←HelpOnPackageID ⍬
           :Case ⎕C'InstallPackages'
               r,←⊂'Install the given package(s) and all dependencies into a given folder.'
               r,←⊂'If the installation folder does not yet exist it will be created, but the user must confirm this.'
-              r,←⊂'If the folder does exist but is not empty then the user is asked whether she want it to be cleared.'
-              r,←⊂'In case this is confirmed the folder will be removed and then recreated, otherwise an error is thrown.'
               r,←⊂'Requires two arguments:'
               r,←⊂''
               r,←⊂'A) First argument:'
@@ -1659,11 +1649,12 @@
               r,←⊂' * A Cider alias specifying a project'
               r,←⊂' * Just "[MyUCMDs]" (case insensitive) without specifying a name: it will be derived from the package ID'
               r,←⊂'   Note that you may install only a single package at the time this way.'
-              r,←⊂''
               r,←⊂'If no second argument is specified Tatin tries to find an open Cider project. If there is'
               r,←⊂'just one open, Tatin acts on it, otherwise the user is questioned.'
               r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken as install folder.'
               r,←⊂'If there are multiple folders defined the user is questioned which one to install into.'
+              r,←⊂''
+              r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
               r,←⊂''
@@ -2074,8 +2065,6 @@
       r,←⊂' * You may also omit the group. This will fail in case the same package name is'
       r,←⊂'   used in two or more different groups but will succeed otherwise.'
       r,←⊂' * Either a full path or an http[s] URL in front of the package ID.'
-      r,←⊂''
-      r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
     ∇
 
     ∇ errMsg←CheckDependencies txt;f1;f2;f3;f

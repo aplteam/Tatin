@@ -11,6 +11,10 @@
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
 
+## Version 0.86.1 from 2023-01-27
+
+No user actions required. Just two important bug fixes.
+
 ## Version 0.86.0 from 2023-01-26
 
 No user actions required.

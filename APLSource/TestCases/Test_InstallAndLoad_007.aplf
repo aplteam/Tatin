@@ -1,0 +1,27 @@
+ r←Test_InstallAndLoad_007(stopFlag batchFlag);⎕TRAP;dir;refs;list1;list2;res
+⍝ Install a package into a folder with already installed packages (must be added)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←∆GetTempDir'/'
+ dir ⎕NCOPY⍠('Wildcard' 1)⊢'./TestData/InstallFromList/*'
+ list1←(≢dir)↓¨⊃TC.F.Dir dir
+
+ refs←TC.InstallPackages'[localhost]example-versions'dir
+ →T.GoToTidyUp 1≠≢refs
+
+ list2←(≢dir)↓¨⊃TC.F.Dir dir
+ →T.GoToTidyUp≢/1 0+≢¨list1 list2
+ →T.GoToTidyUp~∧/list1∊list2
+ →T.GoToTidyUp 1≠+/'-versions-'⍷∊list2
+
+ res←TC.LoadDependencies dir #.TEMP
+ →T.GoToTidyUp 1≠+/'_versions_'⍷⍕res
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDirByForce dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -58,6 +58,7 @@
          cfg←ReadPackageConfigFile targetFolder,'/',packageID,'/',CFG_Name
          :If 0<cfg.⎕NC'userCommandScript'
          :AndIf 0<≢cfg.userCommandScript
+             F.DeleteFile targetFolder,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
              targetFolder ⎕NMOVE targetFolder,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
          :EndIf
      :EndFor

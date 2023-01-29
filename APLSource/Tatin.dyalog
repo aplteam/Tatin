@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.57.0 - 2023-01-25
+⍝ * 0.58.0 - 2023-01-29
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -1176,7 +1176,7 @@
           buff←{⍵↓⍨⍵⍳']'}installFolder
           'You must no specify a name with [MyUCMDs]'Assert 0=≢buff
           'You can install only a single package into [MyUCMDs]'Assert~','∊identifier
-          buff←{1=≢⍵:⍵ ⋄ 3=≢⍵:2⊃⍵ ⋄ ⎕D∊⍨⊃2⊃⍵:1⊃⍵ ⋄ 2⊃⍵}'-'(≠⊆⊢)TC.GetPackageIDFromFilename identifier
+          buff←{(1<|≡⍵)∧1=≢⍵:⊃⍵ ⋄ 3=≢⍵:2⊃⍵ ⋄ ⎕D∊⍨⊃2⊃⍵:1⊃⍵ ⋄ 2⊃⍵}'-'(≠⊆⊢)TC.GetPackageIDFromFilename identifier
           installFolder←TC.GetMyUCMDsFolder buff
       :ElseIf './'≢2⍴installFolder
       :AndIf '/'≠1⍴installFolder
@@ -1208,6 +1208,12 @@
           TC.CloseConnections 1
           CheckForInvalidVersion qdmx
       :EndTrap
+      ⍝ At the early stage we did not know about the exact name in terms os capital letters,
+      ⍝ so we know have to make sure that we get it right. Under Windows it is cosmetic
+      ⍝ but elsewhere it is essential.
+      buff←{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}⊃r
+      (installFolder,'_')⎕NMOVE installFolder
+      ((1⊃⎕NPARTS installFolder),buff)⎕NMOVE installFolder,'_'
     ∇
 
     ∇ installFolder←TranslateCiderAlias installFolder;ind;alias;list;cfgFilename;cfg;folders

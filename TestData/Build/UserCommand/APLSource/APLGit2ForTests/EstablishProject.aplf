@@ -1,0 +1,49 @@
+ (namespace folder)←{noSelect}EstablishProject y;list;folder;ind;bool;msg;plural;flag
+⍝ If `y` is empty:
+⍝  * In case of a single open Cider project its project path is taken.
+⍝  * If there are several Cider projects open then the user will be asked whether she wants to act on DEFAULT_PROJECT
+⍝    if that points to an open Cider project. If she refuses she will be prompted for the correct one.\\
+⍝ Otherwise `y` must be the name of an opened Cider project or a path to a project.\\
+⍝ Note that projects defined this way cannot become the default project. See ]APLGit2.SetDefaultProject for that.\\
+⍝ Returns a two-column matrix with namespace name and folder, or both empty.\\
+⍝ In case a path is specified it does not have to be an opened Cider project. However, this will effect only a few
+⍝ commands (like `IsDirty`, `OpenGitShell` and `Init`) since most commands are bound to be executed on a Cider project.\\
+⍝ `noSelect` defaults to 0, meaning that the user will be presented a list of opened Cider projects ind case no
+⍝ project can be established by other means. To supress this specify a 1 as ⍺.
+ noSelect←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noSelect'
+ y←⍕y
+ (namespace folder)←'' ''
+ list←⎕SE.Cider.ListOpenProjects 0
+ DEFAULT_PROJECT←{0<⎕NC ⍵:DEFAULT_PROJECT ⋄ ''}'DEFAULT_PROJECT'    ⍝ Initalise the default project as undefined
+ :If 0=≢y
+     :If 0=≢list
+         :Return
+     :ElseIf 0<≢DEFAULT_PROJECT
+         (namespace folder)←DEFAULT_PROJECT
+     :ElseIf 1=≢list
+         (namespace folder)←list[1;]
+         :If (⊂DEFAULT_PROJECT)∊↓list                               ⍝ Only if it's an opened Cider project
+             (namespace folder)←DEFAULT_PROJECT
+             :Return
+         :Else
+             DEFAULT_PROJECT←''
+         :EndIf
+     :ElseIf ~noSelect
+         (namespace folder)←U.SelectProject list
+     :EndIf
+ :Else
+     :If ∨/'/\:'∊y
+         folder←y
+         :If 1=+/bool←(F.EnforceSlash¨list[;2])≡¨⊂F.EnforceSlash folder
+             namespace←⊃list[bool⍳1;]
+         :EndIf
+     :Else
+         'Is not a namespace'U.Assert(⊃y)∊'#⎕'
+         'There are no open Cider projects'U.Assert 0<≢list
+         bool←list[;1]≡¨⊂y
+         'Is not an opened Cider project'U.Assert 1=+/bool
+         (namespace folder)←list[bool⍳1;]
+     :EndIf
+     'Folder does not exist'U.Assert ⎕NEXISTS folder
+ :EndIf
+⍝Done

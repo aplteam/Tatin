@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx
+ r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff;cfg
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -9,15 +9,20 @@
 ⍝ * a folder holding a package (like file://C:\Temp\group-name-version\\)
 ⍝ * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch})
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
+⍝ * The internal alias [MyUCMDs] (case independent). In this case only a single package can be installed at the time.
 ⍝ You may omit minor+patch or even major+minor+patch in order to install the latest version.
 ⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
 ⍝ `←` Full name of packages finally loaded.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
-     targetFolder←(GetMyUCMDsFolder''),'/',{⍵↓⍨⍵⍳']'}targetFolder
+     'You can install just ONE package with [MyUCMDs]'Assert~','∊identifiers
+     buff←{⍵↓⍨⍵⍳']'}targetFolder
+     'You MUST NOT specify a name after [MyUCMDs]'Assert 0=≢buff
+     buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}Reg.RemoveVersionNumber 2⊃1 ⎕NPARTS identifiers
+     targetFolder←(GetMyUCMDsFolder''),'/',buff
  :EndIf
- 'Target folder does not eixst'Assert F.IsDir targetFolder
+ {}F.MkDir⍣(~F.IsDir targetFolder)⊢targetFolder
  identifiers←','(≠⊆⊢)identifiers
  EstablishEmptyPermanentConnections 0
  :Trap 998
@@ -49,6 +54,13 @@
          :EndIf
          PrintToSession'  Establish dependencies...'
          r,←targetFolder InstallPackage_ alias identifier
+         packageID←GetPackageIDFromFilename identifier
+         cfg←ReadPackageConfigFile targetFolder,'/',packageID,'/',CFG_Name
+         :If 0<cfg.⎕NC'userCommandScript'
+         :AndIf 0<≢cfg.userCommandScript
+             F.DeleteFile targetFolder,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+             targetFolder ⎕NMOVE targetFolder,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+         :EndIf
      :EndFor
      CloseConnections 0
  :Else
@@ -57,4 +69,4 @@
      :Trap 0 ⋄ F.RmDir tempDir ⋄ :EndTrap
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
-⍝Done
+⍝Donet

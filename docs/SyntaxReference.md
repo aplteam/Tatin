@@ -318,6 +318,11 @@ Each item must be one of:
 * a folder holding a package (like file://C:\Temp\group-name-version\\)
 * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\\{group}-{name}-{major.minor.patch})
 * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.
+* The internal alias `[MyUCMDs]` (case independent); this will then be replaced by the actual path to the MyUCMDs/ folder while the name of the sub-folder is derived from the package ID.
+
+  Note that in this case you..
+  * **must not** specify anything after `[MyUCMDs]`
+  * can only install a single package at the time
 
 You may omit minor+patch or even major+minor+patch in order to install the latest version.
 
@@ -327,8 +332,7 @@ By default beta versions are considered in case the package ID is incomplete, bu
 
 Notes:
 
-* You may use the alias `[MyUCMDs]` (case independent) at the beginning of `targetFolder` --- this will then be replaced by the actual path to the MyUCMDs/ folder
-* The target folder must already exist
+* The target folder will be created if it does not already exist
 * The package ID(s) might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
 
 
@@ -438,12 +442,13 @@ You may even specify just a package name, without a group name. That would not m
 
 #### Left argument
 
-Optionally `parms` can be specified. If specified this must be a namespace that must contain the variables `group`, `tags` and `aggregate`. It may contain `date`, `since` and `project_url`.
+Optionally `parms` can be specified. If specified this must be a namespace that must contain the variables `group`, `tags` and `aggregate`. It may contain `date`, `since`, `project_url` and/or `userCommand`.
 
 The following parameters allow the user to select certain packages:
 
 * Use `group` to specify the group.
 * Use `tags` to specify one or more tags (simple comma-separated text vector); is case-independent.
+* `userCommand`, if specified, must be a Boolean. If it is 1 only packages that are user commands are returned.
 * Use `since` to specify a date; all packages published before that date will be ignored.
 
   `since` can be one of:
@@ -585,6 +590,18 @@ Use `overwriteFlag` in case all packages should be loaded even if they already e
 Loads all packages and injects required references into `targetSpace`.
 
 Returns a vector with references to the loaded packages (principal packages only, so no dependencies).
+
+#### MyUCMDs/
+
+In case a Tatin package is a Dyalog user command it can be installed in the special folder MyUCMDs/. Now where this folder lives depends on the operating system used.
+
+However, if you want to load a user command "foo" from that folder you can do this:
+
+```
+⎕SE.Tatin.LoadDependencies '[MyUCMDs]foo` ⎕SE
+```
+
+Note that `MyUCMDs` is case independent, so specifying `MYUCMDS` or `myucmds` will do as well.
 
 ### LoadPackages
 

@@ -1,0 +1,13 @@
+ {r}←∆ModifyCounter path;filename;ns;val
+⍝ Either creates a file "Counter.aplf" within the folder "APLSource" or
+⍝ modifies it when it already exists.
+ r←⍬
+ filename←path,'/APLSource/Counter.aplf'
+ :If ⎕NEXISTS filename
+     ns←⎕NS''
+     ns.⎕FX⊃⎕NGET filename 1
+     val←ns.Counter
+     (⊂'r←Counter'('r←',⍕1+val))⎕NPUT filename 1
+ :Else
+     (⊂'r←Counter' 'r←0')⎕NPUT filename
+ :EndIf

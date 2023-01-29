@@ -6,7 +6,7 @@
  list2←list Reg.ListPackages(G.RegistryPath,packageID)parms
  list3←Reg.RemoveVersionNumber¨list
  :If 0<≢uniqueIDs←(⌽,list){⍺[(Reg.RemoveVersionNumber¨⍺)⍳⍵]}list2[;1]     ⍝ ⌽ them in order to get the latest version
-     data←↑Reg.FetchDescriptionAndPackageProjectUrlAndTagsAndOS¨G.RegistryPath∘,¨uniqueIDs
+     data←↑Reg.FetchAdditionalDataForListPackages¨G.RegistryPath∘,¨uniqueIDs
      data[;4]←'[,;]'⎕R', '⊣data[;4]  ⍝ Replace "," & ";" by ", " in description
      r←list2,data
  :EndIf

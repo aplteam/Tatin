@@ -1,0 +1,20 @@
+ no←GetNumberOfCommits(commits branch folder caption);val;flag;b
+ no←flag←0
+ :Repeat
+     ⎕←'*** Commits in branch "',branch,'" of project "',folder,'"'
+     ⎕←↑((⍕¨⍳≢commits),¨⊂'. '),¨↓commits
+     ⍞←caption
+     val←⍞
+     val←(≢caption)↓val
+     :If 0=≢val
+         flag←1
+     :ElseIf ∨/b←⊃⎕VFI val
+     :AndIf 1=≢b
+         no←2⊃⎕VFI val
+         :If no∊0,⍳≢commits
+             flag←1
+         :Else
+             0 0⍴⍞,⍞←'Please enter a number between 1 and ',(⍕≢commits),' or nothing to quit; press <enter> to continue'
+         :EndIf
+     :EndIf
+ :Until flag

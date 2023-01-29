@@ -1,0 +1,37 @@
+ (filename1 filename2)←{x}CompareCommits y;space;folder;hash1;hash2;list;noofBytes;flag;exe;alias;parms;branch
+⍝ Allows inspection of all differences between two commits.\\
+⍝ In case `⍵` is empty the last commit is compared with the checkout commit of the current branch.
+⍝ In case `⍵` is a single commit it is compared with the last commit.
+⍝ Instead one can specify two commits (hashes) explicitly via the right argument.
+⍝ For what `x` can actually be see `EstablishProject`.\\
+⍝ Returns either two empty vectors in case no differences were detected or two filenames otherwise.\\
+⍝ If the user command `CompareFiles` and one of its comparison utilities is available the two files are compared straight away.
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+ (space folder)←EstablishProject x
+ filename1←filename2←''
+ :If 0<≢space,folder
+     y←{0=≢⍵:⍵ ⋄ ⊆⍵}y
+     :If 0=≢y
+     :OrIf 0=+/≢¨y
+         hash1←GetLastCommit folder
+         hash2←GetMostRecentAncestor folder
+     :ElseIf 1=≢y
+     :OrIf 1=+/0=≢¨y
+         hash1←GetLastCommit folder
+         hash2←1⊃,y
+     :Else
+         (hash1 hash2)←y~''⍬ 0
+     :EndIf
+     'The two hashes match - that makes no sense'U.Assert hash1≢hash2
+     branch←CurrentBranch folder
+     :If 0<≢list←folder DiffBetween hash1 hash2
+         (filename1 filename2)←'txt'∘F.GetTempFilename2¨2⍴⊂''
+         noofBytes←CompareCommits_ list(branch,': ',hash1)(branch,': ',hash2)folder branch hash1 hash2 filename1 filename2
+         :If 0=noofBytes
+             ⎕NDELETE filename1 filename2
+             filename1←filename2←''
+         :EndIf
+     :EndIf
+     ⎕se._CompareFiles. .Compare
+ :EndIf
+⍝Done

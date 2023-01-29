@@ -77,7 +77,9 @@ If you specify any variable with a name that Tatin does not know about and that 
 
 #### api
 
-"api", if not empty,  must be a single name or a single class _but neither a function nor an operator_. It must be relative, never absolute; therefore it must never start with `#` or `⎕`.
+"api", if not empty,  must be a single name or a single class _but neither a function nor an operator_. It must be relative to `source`.
+
+It might use dottet syntax.
 
 There are several scenarios:
 
@@ -91,7 +93,7 @@ A> ### Single functions
 A>
 A> You _must not_ specify the name of a function (or an operator) as the API in any of these cases.
 A> 
-A> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent, and dyadic functions, this is not possible for niladic functions and operators.
+A> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent, and dyadic functions, this is not possible for neither operators nor niladic functions.
 
 
 ##### A single namespace
@@ -423,6 +425,14 @@ Tags should only be related to the problems one can solve with a particular pack
 There is also no point in adding tags like "dyalog" or "apl" to a package: Tatin is a Dyalog APL package manager...
 
 Note that people in charge of the principal Tatin server will have an eye on the tags, and might silently correct them to keep them consistent and meaningful.
+
+
+#### userCommandScript
+
+If a package is a user command then this must contain the path to the user command script relative to the projects root. `InstallPackages` uses this to identify a user command script and to move it from the source folder (if any) to the root of the install folder.
+
+This optional flag was introduced with version 0.86.0. It might not exist in older versions of a package. If it does not exist then Tatin assumes that the package in question is not a user command.
+
 
 #### version
 

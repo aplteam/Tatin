@@ -1,0 +1,64 @@
+ {noofBytes}←ViewChanges_(list folder hash1 hash2 filename1 filename2);thisFile;extension;wsName;header;nc;buff1;rc;more;buff2;name
+ noofBytes←0
+ :For thisFile :In list[;2]
+     extension←⎕C 3⊃⎕NPARTS thisFile
+     :If (⊂extension)∊'.aplf' '.aplo' '.apln' '.aplc' '.apli' '.dyalog' '.apla'
+         wsName←⎕SE.Link.GetItemName folder,'/',thisFile
+         header←↓U.Box(('⌹',[1]'⌹',,[0.5]wsName),[1]'⌹'),'⌹'
+         :If 0<nc←⎕NC wsName
+             :If 9=nc
+                 buff1←⎕SRC⍎wsName
+             :ElseIf nc∊3 4
+                 buff1←⎕NR wsName
+             :Else
+                 :If ~(⎕DR buff1←⍎wsName)∊80 326
+                     buff1←⎕SE.Dyalog.Array.Serialise wsName
+                 :EndIf
+             :EndIf
+         :Else
+             (rc more buff1)←folder U.RunGitCommand('show ',hash1,':',folder,'/',thisFile,' --raw')
+             :If 0≠rc
+                 :If ∨/'does not exist'⍷∊more
+                 :OrIf ∨/'exists on disk, but not'⍷∊more
+                     buff1←''
+                 :Else
+                     ∘∘∘ ⍝ Huh?!
+                 :EndIf
+             :EndIf
+         :EndIf
+         :If 0<nc←⎕NC wsName
+             :If 9=nc
+                 buff2←⎕SRC⍎wsName
+             :ElseIf nc∊3 4
+                 buff2←⎕NR wsName
+             :Else
+                 :If ~(⎕DR buff2←⍎wsName)∊80 326
+                     buff2←⎕SE.Dyalog.Array.Serialise wsName
+                 :EndIf
+             :EndIf
+         :Else
+             (rc more buff2)←folder U.RunGitCommand('show ',hash2,':',folder,'/',thisFile,' --raw')
+             :If 0≠rc
+                 :If ∨/'does not exist'⍷∊more
+                 :OrIf ∨/'exists on disk, but not'⍷∊more
+                     buff2←''
+                 :Else
+                     ∘∘∘ ⍝ Huh?!
+                 :EndIf
+             :EndIf
+         :EndIf
+         buff1←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}buff1
+         buff2←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}buff2
+     :Else
+         name←thisFile
+         header←↓U.Box(('⌹',[1]'⌹',,[0.5]name),[1]'⌹'),'⌹'
+         buff1←⊂'*** File ',((0<≢extension)/'type '),'ignored: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+         buff2←⊂'*** File ',((0<≢extension)/'type '),'ignored: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+     :EndIf
+     :If buff1≢buff2
+         (⊂buff1)⎕NPUT filename1 2
+         (⊂buff2)⎕NPUT filename2 2
+         noofBytes+←⌈/{+/≢¨⍵}¨buff1 buff2
+     :EndIf
+ :EndFor
+⍝Done

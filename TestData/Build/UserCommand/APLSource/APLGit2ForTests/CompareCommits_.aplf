@@ -1,0 +1,65 @@
+ {noofBytes}←CompareCommits_(list branch1 branch2 folder currentBranch hash1 hash2 filename1 filename2);thisFile;extension;wsName;header;nc;buff1;rc;more;buff2;name
+ noofBytes←0
+ :For thisFile :In list[;2]
+     extension←⎕C 3⊃⎕NPARTS thisFile
+     :If (⊂extension)∊'.aplf' '.aplo' '.apln' '.aplc' '.apli' '.dyalog' '.apla'
+         wsName←⎕SE.Link.GetItemName folder,'/',thisFile
+         header←↓U.Box(('⌹',[1]'⌹',,[0.5]wsName),[1]'⌹'),'⌹'
+         :If branch1≡currentBranch
+         :AndIf 0<nc←⎕NC wsName
+             :If 9=nc
+                 buff1←⎕SRC⍎wsName
+             :ElseIf nc∊3 4
+                 buff1←⎕NR wsName
+             :Else
+                 :If ~(⎕DR buff1←⍎wsName)∊80 326
+                     buff1←⎕SE.Dyalog.Array.Serialise wsName
+                 :EndIf
+             :EndIf
+         :Else
+             (rc more buff1)←folder U.RunGitCommand('show  --raw ',hash1,':',thisFile)
+             :If 0≠rc
+                 :If ∨/∨/¨'does not exist' 'exists on disk, but not' 'unknown revision or path not in the working tree'⍷¨⊂∊more
+                     buff1←''
+                 :Else
+                     ∘∘∘ ⍝ It appears that the file does not exist but we fail to analyze the error message correctly in this respect
+                 :EndIf
+             :EndIf
+         :EndIf
+         :If branch2≡currentBranch
+         :AndIf 0<nc←⎕NC wsName
+             :If 9=nc
+                 buff2←⎕SRC⍎wsName
+             :ElseIf nc∊3 4
+                 buff2←⎕NR wsName
+             :Else
+                 :If ~(⎕DR buff2←⍎wsName)∊80 326
+                     buff2←⎕SE.Dyalog.Array.Serialise wsName
+                 :EndIf
+             :EndIf
+         :Else
+             (rc more buff2)←folder U.RunGitCommand('show  --raw ',hash2,':',thisFile)
+             :If 0≠rc
+                 :If ∨/'does not exist'⍷∊more
+                 :OrIf ∨/'exists on disk, but not'⍷∊more
+                     buff2←''
+                 :Else
+                     ∘∘∘ ⍝ Huh?!
+                 :EndIf
+             :EndIf
+         :EndIf
+         buff1←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}buff1
+         buff2←header{⍺{⍺,⍵}⍣(0<≢⍵)⊣⍵}buff2
+     :Else
+         name←thisFile
+         header←↓U.Box(('⌹',[1]'⌹',,[0.5]name),[1]'⌹'),'⌹'
+         buff1←⊂'*** File ',((0<≢extension)/'type '),'ignored: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+         buff2←⊂'*** File ',((0<≢extension)/'type '),'ignored: ',name{0=≢⍵:⍺ ⋄ ⍵}extension
+     :EndIf
+     :If buff1≢buff2
+         (⊂buff1)⎕NPUT filename1 2
+         (⊂buff2)⎕NPUT filename2 2
+         noofBytes+←⌈/{+/≢¨⍵}¨buff1 buff2
+     :EndIf
+ :EndFor
+⍝Done

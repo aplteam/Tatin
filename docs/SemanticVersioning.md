@@ -40,19 +40,15 @@ After {major}-{minor}-{patch} you may add the optional build number. Build numbe
 
 I> That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build-numbers - they are the same as far as Tatin is concerned.
 
-A build number, when specified, needs to be separated by a `+` (recommended) or a `.` (deprecated). A build number may consist of digits only.
-
-Note that when there are more than three dots in the version number, then the first two dots are part of establishing major, minor and patch number while the last dot defines what is considered the build number.
+A build number, when specified, needs to be separated by a `+`. A build number may consist of digits only.
 
 ```
-2.3.4.1456    ⍝ deprecated
-2.3.4+1456    ⍝ recommended
-1.2.3-beta-1      (becomes 1.2.3-beta-1 as a Tatin package)
-1.2.3-beta-1.123  (becomes 1.2.3-beta-1 as a Tatin package; deprecated)
-1.2.3-beta-1+123  (becomes 1.2.3-beta-1 as a Tatin package; recommended)
+2.3.4+1456
+1.2.3-beta-1      ⍝ becomes 1.2.3-beta-1 as a Tatin package
+1.2.3-beta-1+123  ⍝ becomes 1.2.3-beta-1 as a Tatin package
 ```
 
-Therefore `1.2.3.4` is valid, with 4 being the build number. `1.2.3-beta-1.4` is valid, with 4 being the build number. `1.2.3-beta-1` is valid, with no build number. `1.2.3-beta-1.abc` is _invalid_.
+Therefore `1.2.3-beta-1.abc` is _invalid_.
 
 The Semantic Versioning rules define when exactly which part of the version number may or must be bumped. They also define which parts are considered when establishing precedence: build numbers are always ignored.
 

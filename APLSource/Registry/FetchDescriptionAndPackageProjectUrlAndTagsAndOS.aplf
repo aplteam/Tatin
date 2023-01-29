@@ -1,7 +1,0 @@
- FetchDescriptionAndPackageProjectUrlAndTagsAndOS←{
-     path←⍵
-     cfg←ReadConfigFile path,'/',CFG_Name
-     OSes←⊃{0=≢⍵:'' ⋄ {⍺,', ',⍵}/⍵}cfg.(os_lin os_mac os_win)/'Lin' 'Mac' 'Win'
-     0=cfg.⎕NC'project_url':cfg.description''OSes cfg.tags  ⍝ Because project_url was introduced after packages were already published
-     cfg.(description project_url),OSes cfg.tags
- }

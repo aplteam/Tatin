@@ -1,0 +1,14 @@
+ r←{option}ListBranches y;path;buff;more;rc;space;⎕TRAP
+⍝ Returns a vector of vector with branch names (the current branch starts with "\* ") or ''.\\
+⍝ `options might be either -a ("all") or -r ("remote"); there is no default.
+⍝ `y` must be one of:
+⍝   * Fully qualfied name of a namespace  that is an opened Cider project
+⍝   * Fully qualified path to a Git-managed project
+ ⎕TRAP←(811 'E' '⎕DMX.EM ⎕signal 811')(0 'N')
+ option←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'option'
+ (space path)←EstablishProject y
+ 'Invalid left argument: must be empty or "a" (all) or "r" (remote)'U.Assert(⊂option)∊''⍬'a' 'r' '-a' '-r'
+ (rc more buff)←path U.RunGitCommand('branch --list',{0=≢⍵:⍵ ⋄ ' -',⍵~'-'}option)
+ more U.Assert 0=rc
+ r←{⍵/⍨0<≢¨⍵}⍣(0≠≢buff)⊣buff
+⍝Done

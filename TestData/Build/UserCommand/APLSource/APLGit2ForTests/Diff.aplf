@@ -1,0 +1,20 @@
+ r←{verbose}Diff y;rc;more;path;⎕TRAP;short;space;folder;buff
+⍝ Returns a list with all APL objects/files that are different compared with HEAD.
+⍝ r is a matrix with two columns and zero or more rows.
+⍝ If `verbose` is 1 (default is 0) then a full report is returned instead.
+⍝ `y` must be one of:
+⍝   * Fully qualfied name of a namespace  that is an opened Cider project
+⍝   * Fully qualified path to a Git-managed project
+⍝ `verbose` defaults to 0 which gives you a short report.
+ ⎕TRAP←(811 'E' '⎕DMX.EM ⎕signal 811')(0 'N')
+ verbose←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
+ (space folder)←EstablishProject y
+ :If verbose
+     (rc more r)←folder U.RunGitCommand'diff HEAD'
+     more U.Assert 0=rc
+ :Else
+     (rc more buff)←folder U.RunGitCommand'diff HEAD --name-only'
+     more U.Assert 0=rc
+     r←(⎕SE.Link.GetItemName(⊂folder,'/'),¨buff),[1.5]buff
+ :EndIf
+⍝Done

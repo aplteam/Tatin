@@ -6,7 +6,9 @@
      comments←''                ⍝ These are extracted by "AddCommentToPackageConfig"
      cfg←Reg.CreateNamespace ⎕THIS
      cfg.api←''
+     comments,←'api' 'The public interface of the package'
      cfg.assets←''
+     comments,←'assets' 'Folder(s) and/or file(s) required by the package'
      cfg.description←''
      comments,←'description' 'Mandatory. Maximum length is 120 chars.'
     ⍝cfg.deprecated←0           ⍝ Injected only when a package...
@@ -34,10 +36,14 @@
      comments,←'tags' 'A comma-separated list of tags'
      cfg.minimumAplVersion←'18.0' ⍝ That's the minimum version: Tatin does not run in earlier versions
      comments,←'minimumAplVersion' 'Minimum version required to run the package'
+     cfg.userCommandScript←''
+     comments,←'userCommandScript' 'Path to the user command script within the project'
      cfg.version←'0.1.0'
      comments,←'version' 'Mandatory. The project''s version number'
      cfg.io←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_io'
+     comments,←'io' 'Value for index origin'
      cfg.ml←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_ml'
+     comments,←'ml' 'Value for migration level'
      cfg.lx←''
      comments,←'lx' 'Function to be called when the package is established in the WS'
      0=≢⍵:cfg

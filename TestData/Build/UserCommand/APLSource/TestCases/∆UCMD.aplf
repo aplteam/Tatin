@@ -1,0 +1,10 @@
+ (rc msg result)←{stopFlag}∆UCMD arg;qdmx
+ rc←0 ⋄ result←msg←''
+ stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
+ :Trap (~stopFlag)/0
+     result←⎕SE.UCMD'APLGit2.',arg,stopFlag/' -'
+ :Else
+     qdmx←⎕DMX
+     rc←qdmx.EN
+     msg←qdmx.EM
+ :EndTrap

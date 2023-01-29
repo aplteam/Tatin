@@ -1,0 +1,16 @@
+ {r}←∆Initialize path;rc;more;buff;msg2;more2
+⍝ Makes `path` a Git Repository and commits what's there as "Initial commit".\\
+⍝ Always returns ⍬.
+ (rc more buff)←path G.U.RunGitCommand'init --initial-branch=main'
+ G.U.Assert 0=rc
+ (⊂G.U.GetGitAttributes)⎕NPUT path,'/.gitattributes'
+ (rc more buff)←path G.U.RunGitCommand'add .'
+ :If 0≠rc
+     more2←(⎕UCS 13)(≠⊆⊢)more
+ :AndIf ~∧/⊃∨/'warning: LF will be replaced by CRLF' 'The file will have its original line endings'{⍺∘≡¨(≢⍺)↑¨⍵}¨⊂more2
+     more G.U.Assert 0
+ :EndIf
+ (rc more buff)←path G.U.RunGitCommand'commit -m "Initial commit"'
+ G.U.Assert 0=rc
+ r←⍬
+⍝Done

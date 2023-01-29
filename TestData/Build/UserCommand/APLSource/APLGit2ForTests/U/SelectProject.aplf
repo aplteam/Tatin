@@ -1,0 +1,12 @@
+ SelectProject←{
+⍝ Presents all currently opened Cider projects and lets the user choose one.\\
+⍝ Returns a matrix with the selected project in the same format ]Cider.Projects does, possibly `(⍬ ⍬ ⍬)`.
+⍝ The optional left argument (default=1) allows you to ask for **all** currently opened
+⍝ projects (rather than only those that are git-managed) by passing a 0.
+     ⍺←1
+     ~(⊂⍺)∊0 1:'Invalid left argument: not a Boolean'⎕SIGNAL 11
+     l←⍵
+     0=≢l:l
+     0=≢i←'APLGit2: please select a project'##.CommTools.Select↓⎕FMT l:'' ''
+     l[i;]
+ }

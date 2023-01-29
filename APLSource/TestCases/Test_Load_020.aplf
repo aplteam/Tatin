@@ -1,4 +1,4 @@
- r←Test_Load_020(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx;pkgs;expected
+ r←Test_Load_020(stopFlag batchFlag);⎕TRAP;res;noOfRefs;pkgs;expected;qdmx
 ⍝ Exercise ⎕SE.Tatin.LoadPackages on three packages from a particular Registry with a typo on the second one.
 ⍝ Therefore only the first and third will get loaded.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -8,12 +8,14 @@
  #.⎕SHADOW'TEMP'
 
  pkgs←'[localhost]aplteam-APLTreeUtils-6.0.10,[localhost]does-notExist-1.2.1,[localhost]aplteam-CompareSimple-3.0.2'
- res←1 TC.LoadPackages pkgs'#.TEMP'
 
- →T.PassesIf 11=res
- →T.PassesIf 2=≢#.TEMP.⎕NL⍳16
- expected←'#._tatin.aplteam_APLTreeUtils_6_0_10.code.APLTreeUtils' '#._tatin.aplteam_CompareSimple_3_0_2.code.CompareSimple'
- →T.PassesIf expected≡⍕¨#.TEMP.{⍎¨⎕NL ⍵}¯9
+ :Trap 998
+     res←1 TC.LoadPackages pkgs'#.TEMP'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'Config file missing:'⍷qdmx.EM
+ :EndTrap
 
  r←T._OK
 ⍝Done

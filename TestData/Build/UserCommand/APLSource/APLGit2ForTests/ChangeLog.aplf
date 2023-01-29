@@ -1,0 +1,40 @@
+ r←{x}ChangeLog name;project;path;filename;space;cmd;buff;rc;msg;allProjects;bool
+⍝ Takes the name of an APL object or a filenamem and returns a matrix with information about all commits that object was changed by.\\
+⍝ The result is a matrix with zero or more rows and 4 columns:
+⍝ 1. Hash
+⍝ 2. Commiter's name
+⍝ 3. Date of the commit date in strict ISO 8601 format
+⍝ 4. Message of the commit\\
+⍝ For what `x` can actually be see `EstablishProject`.\\
+ r←0 4⍴''
+ :If ∨/'/\:'∊name
+     filename←F.EnforceSlash name
+     :If ':'∊filename
+     :OrIf '/'=⊃filename
+         allProjects←(⎕SE.Cider.ListOpenProjects 0)[;2],¨'/'
+         path←⊃⎕NPARTS filename
+         'No fitting project found'U.Assert∨/bool←allProjects∊(≢¨allProjects)↑¨⊂filename
+         path←(bool⍳1)⊃allProjects
+     :EndIf
+ :Else
+     x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+     project←EstablishProject x
+     'Not a Cider project'⎕SIGNAL 11/⍨0=≢project
+     (space path)←2↑project
+     :If ~(⊃name)∊'#⎕'
+         name←space,'.',name
+     :EndIf
+     filename←(1+≢path)↓⎕SE.Link.GetFileName name
+     ('APL  object not found: ',name)⎕SIGNAL 6/⍨0=≢filename
+ :EndIf
+ cmd←'log --follow --pretty=format:"',U.GetLogFormat,'" -- ',filename
+ (rc msg buff)←path U.RunGitCommand cmd
+ :If 1=≢'fatal: your current branch ''[^'']+'' does not have any commits yet'⎕S 0⊣∊msg
+     r←''
+ :Else
+     (∊msg) U.Assert 0=rc
+     :If 0<≢buff
+         r←↑U.FormatLog buff
+     :EndIf
+ :EndIf
+⍝Done

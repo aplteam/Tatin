@@ -1,0 +1,12 @@
+ r←FormatLog logData;ind;b
+⍝ Formats the Git Log properly when GetLogFormat was used to retrieve the data.
+ ⍝ First we transform any multi-line messages into simple ";"-separated ones:
+ :If ∨/b←'⍙'∊¨logData
+     logData←⊃¨{⍺,';',⍵}/¨(+\b)⊆logData
+ :EndIf
+ ⍝ Now we split the data appropriately and ridden us of the separator:
+ ind←{⍸'⍙'=⍵}¨logData
+ b←{∊0,⍨¨(⍵-1+(0,¯1↓⍵))⍴¨⍳3}¨ind
+ b,¨←((≢¨logData)-≢¨b)⍴¨4
+ r←↑b⊆¨logData
+⍝Done

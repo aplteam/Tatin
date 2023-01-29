@@ -1,0 +1,14 @@
+ {r}←{filter}Add y;path;rc;msg;buff;space
+⍝ Stage all files according to `filter` which defaults to ".".\\
+⍝ Alternatively you may specify a specific file, or a RegEx as filter that catches a number of files etc.\\
+⍝ `y` must be one of:
+⍝   * Fully qualfied name of a namespace that is an opened Cider project
+⍝   * Fully qualified path to a Git-managed project
+⍝ Returns a 0
+ filter←{0<⎕NC ⍵:⍎⍵ ⋄ '.'}' filter'
+ r←0
+ (space path)←EstablishProject y
+ 'No filter specified?!'⎕SIGNAL 11/⍨0=≢filter
+ (rc msg buff)←path U.RunGitCommand 'add ',filter
+ msg U.Assert 0=rc
+⍝Done

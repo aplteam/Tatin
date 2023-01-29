@@ -1,0 +1,10 @@
+ r←Test_UserCommands_031(stopFlag batchFlag);⎕TRAP;rc;msg;res
+⍝ Exercise ]Tatin.ListPackages on packages that are user commands
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg res)←∆UCMD'ListPackages [localhost] -uc'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 3<≢res
+
+ r←T._OK

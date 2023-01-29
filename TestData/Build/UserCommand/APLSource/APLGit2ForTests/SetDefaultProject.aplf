@@ -1,0 +1,42 @@
+ {r}←{force}SetDefaultProject y;list;row;space;folder;DEFAULT_PROJECT_was
+⍝ `y` may be either the name of a namespace or a folder.\\
+⍝ That defines an opened Cider project; if it does not an error is thrown.\\
+⍝  * In case `y` is '?' the user is presented a list of opened Cider projects to select from
+⍝  * In case `y` is empty DEFAULT_PROJECT←'' is executed
+⍝ `force` is useful for test cases in order to avoid interaction with a user.\\
+⍝ Returns (space folder) for the selected project or '' if there isn't one set.
+ force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
+ list←⎕SE.Cider.ListOpenProjects 0
+ r←''
+ DEFAULT_PROJECT←{0<⎕NC ⍵:DEFAULT_PROJECT ⋄ ''}'DEFAULT_PROJECT'    ⍝ Initalise the default project as undefined
+ :If 0=≢y←⍕y
+     :If 0<≢DEFAULT_PROJECT
+         :If force
+         :OrIf 1 CommTools.YesOrNo'Undefine default project (Is currently ',(⊃{0=≢⍺:⍵ ⋄ ⍺,' [',⍵,']'}/DEFAULT_PROJECT),') '
+             r←DEFAULT_PROJECT←''
+         :Else
+             r←DEFAULT_PROJECT,' remaines to be the default project'
+         :EndIf
+     :EndIf
+ :ElseIf (,'?')≡,y~'[]'
+     DEFAULT_PROJECT_was←DEFAULT_PROJECT
+     DEFAULT_PROJECT←''
+     :If 0=≢r←DEFAULT_PROJECT←EstablishProject''
+         r←DEFAULT_PROJECT←DEFAULT_PROJECT_was                      ⍝ User did cancel, so we restore the original setting
+     :EndIf
+ :Else
+     :If ∨/'/\:'∊y
+         folder←F.EnforceSlash y
+         row←(F.EnforceSlash¨list[;2])⍳⊂folder
+     :Else
+         '⍵ is not a namespace'U.Assert 9=⎕NC y
+         row←list[;1]⍳⊂y
+     :EndIf
+     :If row≤≢list
+         (space folder)←list[row;]
+     :Else
+         space←''
+     :EndIf
+     r←DEFAULT_PROJECT←space folder
+ :EndIf
+⍝Done

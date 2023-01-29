@@ -1,0 +1,11 @@
+ r←GetProjectFromPath path;list;row
+⍝ Takes the path of an opened Cider project and returns its name.\\
+⍝ If path does not point to an opened Cider project then r is empty.
+ list←⎕SE.Cider.ListOpenProjects 0
+ row←(F.NormalizePath U.AddSlash¨list[;2])⍳⊂F.NormalizePath U.AddSlash path
+ :If row≤≢list
+     r←1⊃list[row;]
+ :Else
+     r←''
+ :EndIf
+⍝Done

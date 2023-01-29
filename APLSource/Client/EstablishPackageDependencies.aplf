@@ -21,8 +21,7 @@
      tatinFolder←cfg.CIDER.tatinFolder
      :If 0<≢tatinFolder
          tatinFolder←','(≠⊆⊢)tatinFolder
-     :AndIf 0<≢tatinFolder←(~'='∊¨tatinFolder)/tatinFolder
-         r←⊃tatinFolder
+         r←{⍵↑⍨¯1+⍵⍳'='}⊃tatinFolder  ⍝ The first one are the principal dependencies
      :EndIf
  :ElseIf F.IsDir path,'packages'
  :AndIf F.IsFile path,'packages/apl-dependencies.txt'

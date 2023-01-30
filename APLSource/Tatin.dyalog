@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.58.0 - 2023-01-29
+⍝ * 0.58.1 - 2023-01-30
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -381,7 +381,7 @@
                   msg←'These major versions were found for ',packageID,' on ',uri,':',CR
                   msg,←⊃,/(⊂'  '),¨versions,¨CR
                   msg,←'Are you sure that you want to deprecate ALL these versions?'
-              :OrIf TC.YesOrNo msg
+              :OrIf TC.C.YesOrNo msg
                   (rc msg)←TC.DeprecatePackage uri comment packageID
                   :If 0=rc
                       r←'Successfully deprecated: ',packageID,' on ',uri,CR
@@ -394,7 +394,7 @@
               :EndIf
           :Else
               :If force
-              :OrIf TC.YesOrNo'Sure that you want to deprecate <',packageID,'> on ',uri,' ?'
+              :OrIf TC.C.YesOrNo'Sure that you want to deprecate <',packageID,'> on ',uri,' ?'
                   (rc msg)←TC.DeprecatePackage uri comment packageID
                   :If 0=rc
                       r←'Successfully deprecated: ',packageID,' on ',uri
@@ -1015,13 +1015,13 @@
                   what←2⊃openCiderProjects[1;]
               :Else
                   what←TC.F.PWD
-                  :If TC.YesOrNo'Sure you want to deal with ',what,' ?'
+                  :If TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
                       →0 ⋄ r←'Cancelled by user'
                   :EndIf
               :EndIf
           :Else
               what←TC.F.PWD
-              :If TC.YesOrNo'Sure you want to deal with ',what,' ?'
+              :If TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
                   →0 ⋄ r←'Cancelled by user'
               :EndIf
           :EndIf

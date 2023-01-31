@@ -2,7 +2,7 @@
 ⍝ Fetches a package and unzips it into a temp folder.
 ⍝ When caching is on, the temp folder is created within the top-level of the cache folder.
 ⍝ Otherwise a folder is created inside the temp directory of the given OS.
-⍝ `success` is 0 in case the server does not exist or does not respond etc but otherwise 1.
+⍝ ← is a vector of names with the principle packages, including any alias(es).
  r←''
  :If 0<≢buildList←GetDependencyTree alias,packageID
      PrintToSession'  ',(⍕≢buildList),' dependenc',((1+1=≢buildList)⊃'ies' 'y'),' identified'
@@ -52,10 +52,6 @@
      :EndFor
      buildList[;3]←ReplaceCachePathByURL¨buildList[;3]
      PrintToSession'  Saving build list... '
-     buildList←SaveBuildList buildList targetFolder
-     :If ∨/bool←({'['∊⍵:⍵↓⍨⍵⍳']' ⋄ ∨/b←'://'⍷⍵:(2+b⍳1)↓⍵ ⋄ ⍵}alias,identifier_){⍺∘≡¨(≢⍺)↑¨⍵}buildList[;2]
-         r,←buildList[bool⍳1;2]
-     :Else
-         r,←buildList[1;2]
-     :EndIf
+     SaveBuildList buildList targetFolder
+     r←buildList[1;2]
  :EndIf

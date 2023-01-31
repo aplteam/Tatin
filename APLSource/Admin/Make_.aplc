@@ -6,7 +6,7 @@
 ⍝ ⍵ = 1 = Client
 ⍝ ⍵ = 2 = Server
 
-    ∇ {r}←bumpBuild Run type;home;targetFolder;parms
+    ∇ {r}←bumpBuild Run type;home;targetFolder;parms;success;log
     ⍝ Calls either the `#.Tatin.Admin.MakeClient` or the `#.Tatin.Admin.MakeSever` function depending
     ⍝ on the right argument `type`.
     ⍝ * 1 = call `#.Tatin.Admin.MakeClient`
@@ -24,7 +24,8 @@
           parms←⎕SE.Cider.CreateOpenParms ⍬
           parms.folder←'./'
           parms.quietFlag←1
-          'Opening the Cider project was not successful'Assert ⎕SE.Cider.OpenProject parms
+          (success log)←⎕SE.Cider.OpenProject parms
+          'Opening the Cider project was not successful'Assert success
           bumpBuild #.Tatin.Admin.MakeClient 1          ⍝ Must be addressed with absolute path!
       :ElseIf type≡2
           targetFolder←home,'/Dist/Server'
@@ -33,7 +34,8 @@
           parms←⎕SE.Cider.CreateOpenParms ⍬
           parms.folder←'./'
           parms.quietFlag←1
-          'Opening the Cider project was not successful'Assert ⎕SE.Cider.OpenProject parms
+          (success log)←⎕SE.Cider.OpenProject parms
+          'Opening the Cider project was not successful'Assert success
           bumpBuild #.Tatin.Admin.MakeServer 1          ⍝ Must be addressed with absolute path!
       :Else
           ∘∘∘ ⍝ Huuh?!
@@ -42,7 +44,7 @@
     ∇
 
     ⍝ In case an assert is not fulfilled we ⎕OFF with an error code in runtime and crash otherwise:
-    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ##.APLTreeUtils2.IsDevelopment:⍺ ⎕SIGNAL 11 ⋄ errCode←123 ⋄ ⎕OFF errCode}
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ 'Development'≡4⊃'#'⎕WG'APLVersion':⍺ ⎕SIGNAL 11 ⋄ errCode←123 ⋄ ⎕OFF errCode}
 
     ∇ {r}←{x}(f Attempt)y;success;counter
     ⍝ Uses this in case a function might fail on the first attempt. `⎕NDELETE` and `⎕MKDIR` are candidates.\\

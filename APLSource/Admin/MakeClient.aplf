@@ -1,4 +1,4 @@
- {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;userCommandTargetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList
+ {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;userCommandTargetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList;success;log
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or
 ⍝ as part of an automated "Make" process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown in case ⍵ is 0, and ⎕OFF 123 is executed in case ⍵ is 1.\\
@@ -31,7 +31,8 @@
      parms.folder←#.Tatin.CiderConfig.HOME
      parms.projectSpace←'_Tatin'
      parms.quietFlag←1
-     Assert ⎕SE.Cider.OpenProject parms
+     (success log)←⎕SE.Cider.OpenProject parms
+     Assert success
      {}⎕SE.Cider.CloseProject''
      #._Tatin.⎕EX¨'Server' 'Todo' 'TestCases' 'Simu' 'TestCasesServer' 'Tester2' 'CodeCoverage'
      #._Tatin.Admin.⎕EX¨'Initialize_Server' 'RunTestServer' 'CreateAllRefs_Server'

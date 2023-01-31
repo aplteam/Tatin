@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff;cfg
+ r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff;cfg;isUserCommand;firstFlag
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -12,7 +12,7 @@
 ⍝ * The internal alias [MyUCMDs] (case independent). In this case only a single package can be installed at the time.
 ⍝ You may omit minor+patch or even major+minor+patch in order to install the latest version.
 ⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
-⍝ `←` Full name of packages finally loaded.
+⍝ `←` Full name of principal packages finally loaded, including an alias if specified.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
@@ -22,15 +22,21 @@
      buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}Reg.RemoveVersionNumber 2⊃1 ⎕NPARTS identifiers
      targetFolder←(GetMyUCMDsFolder''),'/',buff
  :EndIf
- {}F.MkDir⍣(~F.IsDir targetFolder)⊢targetFolder
+ isUserCommand←∨/(F.EnforceSlash¨GetAllUserCommandFolder,¨'\'){⍺∊(≢¨⍺)↑¨⊂⍵}F.EnforceSlash targetFolder,'/'
  identifiers←','(≠⊆⊢)identifiers
  EstablishEmptyPermanentConnections 0
+ firstFlag←1
  :Trap 998
      :For identifier_ :In identifiers
          (alias identifier_)←SplitAtAlias identifier_
          identifier←ReplaceRegistryAlias identifier_
          ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
          identifier←noBetas CheckVersion identifier
+         packageID←GetPackageIDFromFilename identifier
+         :If isUserCommand
+             targetFolder←(1⊃⎕NPARTS targetFolder),{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}packageID ⍝ Correct casing
+         :EndIf
+         {}{'Unable to create target directory'Assert F.MkDir ⍵}⍣(firstFlag∧~F.IsDir targetFolder)⊢targetFolder
          :If 0=≢identifier    ⍝ Not found?
              PrintToSession'Not found: ',identifier_
              :Continue
@@ -38,7 +44,6 @@
          PrintToSession'  Attempting to install ',identifier,'...'
          :If ∧/~'\/'∊identifier
          :AndIf '.zip'≢⎕C ¯4↑identifier
-             packageID←GetPackageIDFromFilename identifier
              :If ~∨/'/\:'∊identifier
                  identifier←(EstablishRegistry packageID),packageID
                  :If 0=≢(-≢packageID)↓identifier
@@ -56,11 +61,10 @@
          r,←targetFolder InstallPackage_ alias identifier
          packageID←GetPackageIDFromFilename identifier
          cfg←ReadPackageConfigFile targetFolder,'/',packageID,'/',CFG_Name
-         :If 0<cfg.⎕NC'userCommandScript'
-         :AndIf 0<≢cfg.userCommandScript
-             F.DeleteFile targetFolder,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+         :If isUserCommand
              targetFolder ⎕NMOVE targetFolder,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
          :EndIf
+         firstFlag←0
      :EndFor
      CloseConnections 0
  :Else
@@ -69,4 +73,4 @@
      :Trap 0 ⋄ F.RmDir tempDir ⋄ :EndTrap
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
-⍝Donet
+⍝Done

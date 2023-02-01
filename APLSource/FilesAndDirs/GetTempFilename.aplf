@@ -1,0 +1,40 @@
+ filename←{prefixString}GetTempFilename path;rc;start;no;fno
+⍝ Returns the name of an unused temporary filename. If `path` is empty the default temp
+⍝ path is taken; that's what `GetTempPath` would return. This means you can overwrite
+⍝ this by specifying a path.\\
+⍝ `prefixString`, if defined, is a leading string of the filename
+⍝ going to be generated. This is **not** the same as\\
+⍝ `'pref',GetTempFileName ''`\\
+⍝ because specified as left argument it is taken into account
+⍝ when the uniqueness of the created filename is tested.\\
+⍝ See also `GetTempFilename2` which is recommended.\\
+⍝ This function does **not** use the Windows built-in function since
+⍝ it has proven to be unreliable under W7 (at least).
+ prefixString←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'prefixString'
+ path←NormalizePath path
+ path,←((0≠≢path)∧CurrentSep≠¯1↑path)/CurrentSep
+ :If 0=≢path
+     :Trap 0
+         path←GetTempPath
+     :Else
+         11 ⎕SIGNAL⍨'Cannot get a temp path; rc=',⍕⎕EN
+     :EndTrap
+ :EndIf
+ :If 0=rc←'Create!'CheckPath path
+     11 ⎕SIGNAL⍨'Error during "Create <',path,'>"; rc=',⍕GetLastError
+ :Else
+     start←no←⍎ProduceRandomName
+     :Repeat
+         filename←path,prefixString,(⎕AN,'_',⍕no),'.tmp'
+         :Trap 22
+             fno←filename ⎕NCREATE 0
+             ⎕NUNTIE fno
+         :Else
+             fno←0
+         :EndTrap
+         no+←10
+     :Until (fno≠0)∨no>start+30×10  ⍝ max 30 tries
+     'Unable to create temporay file'⎕SIGNAL 11/⍨fno=0
+ :EndIf
+ filename←NormalizePath filename
+⍝Done

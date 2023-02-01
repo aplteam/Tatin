@@ -62,7 +62,8 @@
          packageID←GetPackageIDFromFilename identifier
          cfg←ReadPackageConfigFile targetFolder,'/',packageID,'/',CFG_Name
          :If isUserCommand
-             targetFolder ⎕NMOVE targetFolder,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+             ⍝ Move the user command script to the root of the User Command folder
+             targetFolder(⎕NMOVE Reg.ExecNfunction)targetFolder,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
          :EndIf
          firstFlag←0
      :EndFor

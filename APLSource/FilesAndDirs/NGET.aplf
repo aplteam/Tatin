@@ -1,0 +1,28 @@
+ r←{encoding}NGET x;flag;filename;counter;success;qdmx
+⍝ The purpose of this function is to cover `⎕NGET` and make sure that the filename is normalized.
+ :If 326=⎕DR x
+     (filename flag)←x
+     filename←NormalizePath filename
+ :Else
+     filename←NormalizePath x
+     flag←0
+ :EndIf
+ success←counter←0
+ :Repeat
+     :Trap 19
+         :If 0=⎕NC'encoding'
+             r←⎕NGET filename flag
+         :Else
+             r←encoding ⎕NGET filename flag
+         :EndIf
+         success←1
+     :Else
+         :If 4>counter←counter+1
+             ⎕DL 0.1×counter
+         :Else
+             qdmx←⎕DMX
+             (1↓⊃,/(⎕UCS 13),¨qdmx.DM)⎕SIGNAL qdmx.EN
+         :EndIf
+     :EndTrap
+ :Until success
+⍝Done

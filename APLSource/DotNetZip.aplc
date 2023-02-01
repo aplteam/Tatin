@@ -23,11 +23,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '2.0.2+67' '2022-05-31'
+      r←'DotNetZip' '2.1.0+67' '2023-02-01'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 2.1.0 from 2023-02-01
+    ⍝   * Constructor is now more resilient against a temporary "File is in use" problem.
     ⍝ * 2.0.2 from 2022-05-31
     ⍝   * Bug fixed in "Delete"
     ⍝ * 2.0.1 from 2022-05-20
@@ -84,25 +86,38 @@
     ⍝Done
     ∇
 
-    ∇ make(zipFilename overwriteFlag);stream
+    ∇ make(zipFilename overwriteFlag);stream;msg;flag;counter;doesExist
       CheckMinVersion ⍬
       Initialize ⍬
       zipFilename←AddExtension F.ExpandPath zipFilename
       QEX_System
-      :If F.Exists zipFilename
+      :If doesExist←F.Exists zipFilename
       :AndIf 0=overwriteFlag
-          :Trap 90
-              stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
-          :Else
-              99 ⎕SIGNAL⍨{⍵↓⍨1+⍵⍳':'}{⍵↑⍨¯1+⌊/⍵⍳⎕UCS 10 13}∊⍕⎕EXCEPTION
-          :EndTrap
+          flag←counter←0
+          :Repeat
+              :Trap 90
+                  stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
+                  flag←1
+              :Else
+                  msg←⍕⊃⎕EXCEPTION
+                  :If ~∨/'The process cannot access the file'⍷msg
+                  :OrIf 5=counter←counter+1
+                      99 ⎕SIGNAL⍨{⍵↓⍨1+⍵⍳':'}{⍵↑⍨¯1+⌊/⍵⍳⎕UCS 10 13}∊msg
+                  :Else
+                      ⎕DL 0.1
+                  :EndIf
+              :EndTrap
+          :Until flag
           _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Update)
       :Else
-          F.DeleteFile zipFilename
+          :If doesExist
+              ('Cannot delete ',zipFilename)Assert F.DeleteFile zipFilename
+          :EndIf
           :Trap 90
               stream←System.IO.File.Open(zipFilename System.IO.FileMode.CreateNew)
           :Else
-              99 ⎕SIGNAL⍨{⍵↓⍨1+⍵⍳':'}{⍵↑⍨¯1+⌊/⍵⍳⎕UCS 10 13}∊⍕⎕EXCEPTION
+              msg←⍕⊃⎕EXCEPTION
+              99 ⎕SIGNAL⍨{⍵↓⍨1+⍵⍳':'}{⍵↑⍨¯1+⌊/⍵⍳⎕UCS 10 13}∊msg
           :EndTrap
           _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Create)
           _zip.Dispose

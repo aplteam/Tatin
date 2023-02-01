@@ -1,0 +1,59 @@
+ {(rc en more)}←{mustBeEmpty}RmDir path;list;bool;flags;flag;counter;qdmx
+⍝ Tries to remove `path`.\\
+⍝ The method attempts to remove `path` and, by default, **all its contents**.\\
+⍝ If for some reason you want to make sure that `path` is only removed when empty you can
+⍝ specify a 1 as left argument. In that case the method will not do anything if the directory
+⍝ `path` is not empty.\\
+⍝ However, the method may still be partly successful because it might have deleted files
+⍝ in `path` before it actually fails to remove the directory `path` itself.\\
+⍝ The result is a three-element vector:
+⍝ 1. `rc`: return code with 0 for "okay" (=deleted) and 1 otherwise.
+⍝ 1. `en`: event number (`⎕EN`) in case of an error.
+⍝ 1. `more`: empty text vector in case `rc` is 0 and possible additional information otherwise.\\
+⍝ Notes:
+⍝ * If `path` does not exist `(0 0 'Directory does not exist')` is returned
+⍝ * If `path` exists but is not a directory `(1 6 'Not a directory')` is returned
+⍝ * Wildcard characters (`*` and `?`) are not allowed as part of `path`
+⍝   If such characters are specified anyway then an error is signalled.\\
+⍝   This is true even under Linux and Mac OS despite the fact that these characters are legal in
+⍝   the names of any files and directories.
+⍝ * If `path` is a nested vector `RmDir` calls itself recurively. The length of `rc` and `en` and `more`
+⍝   match `≢path` in this case.
+⍝ * The underlying system function ⎕NDELETE cannot delete read-only files. That means that you cannot
+⍝   delete a directory that contains a folder .git, for exmaple. See `RmDirByForce` as an alternative
+ mustBeEmpty←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'mustBeEmpty'
+ 'Invalid left argument.'⎕SIGNAL 11/⍨~(⊂mustBeEmpty)∊0 1
+ rc←0 ⋄ en←0 ⋄ more←''
+ 'Wildcard characters are not allowed'⎕SIGNAL 11/⍨∨/'*?'∊path
+ :If 2=|≡path
+     (rc en more)←↓⍉↑mustBeEmpty RmDir¨path
+ :Else
+     path←NormalizePath path
+     :If ⎕NEXISTS path
+         :If IsDir path
+             flags←1+2×~mustBeEmpty
+             counter←flag←0
+             :Repeat
+                 :Trap 19 22
+                     flags ⎕NDELETE path
+                     flag←1
+                 :Else
+                     :If 4>counter←counter+1
+                         ⎕DL 0.1×counter
+                     :Else
+                         qdmx←⎕DMX
+                         en←qdmx.EN
+                         more←qdmx.EM
+                         flag←rc←1
+                     :EndIf
+                 :EndTrap
+             :Until flag
+         :Else
+             more←'Not a directory'
+             rc←1
+             en←6
+         :EndIf
+     :Else
+         more←'Directory does not exist'
+     :EndIf
+ :EndIf

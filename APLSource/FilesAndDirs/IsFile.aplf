@@ -1,0 +1,23 @@
+ r←IsFile y
+⍝ Returns 1 if `filename` is a regular file and a 0 otherwise, even if `y` does exist as a directory.\\
+⍝ `y` must be either a text vector or a (negative!) tie number of a native file.
+⍝ If it is a number but not a tie number then an error is signalled.
+ :If 2=≡y
+     r←IsFile¨y
+ :Else
+     :If 0=1↑0⍴y
+         'Not tied'⎕SIGNAL 18/⍨~y∊⎕NNUMS
+         r←2=1 ⎕NINFO y
+     :Else
+         y←NormalizePath y
+         :Trap 11
+             :If r←⎕NEXISTS y
+                 r←2=1 ⎕NINFO y
+             :Else
+                 r←0
+             :EndIf
+         :Else
+             r←0
+         :EndTrap
+     :EndIf
+ :EndIf

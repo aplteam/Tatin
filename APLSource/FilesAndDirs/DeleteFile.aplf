@@ -1,0 +1,41 @@
+ {success}←DeleteFile filenames;thisFile;flag;counter;i;depth
+⍝ Attempts to delete one or more files. Returns 1 in case of success and 0 otherwise
+⍝ for each file in `filenames`.\\
+⍝ Retries up to three times for every single files in case of any error 19 or 22.\\
+⍝ This function does not care whether the file exists or not, although naturally
+⍝ `success` will be 0 for any non-existing file.\\
+⍝ `filenames` can be one of:
+⍝ * Text vector representing a single filename.
+⍝ * Vector of text vectors each representing a single file.\\
+⍝ In case `filenames` is empty a 0 is returned.\\
+⍝ Do not uses this function for removing directories: use `RmDir` instead.
+ :If 0=≢filenames
+     success←0
+ :Else
+     depth←≡filenames
+     filenames←,⊆filenames
+     filenames←NormalizePath filenames
+     success←(≢filenames)⍴0
+     :For i :In ⍳≢filenames
+         thisFile←i⊃filenames
+         :If ⎕NEXISTS thisFile
+             flag←counter←0
+             :Repeat
+                 :Trap 19 22
+                     1 ⎕NDELETE thisFile
+                     success[i]←flag←1
+                     flag←1
+                 :Else
+                     :If 4>counter←counter+1
+                         ⎕DL 0.1×counter
+                     :Else
+                         flag←1
+                     :EndIf
+                 :EndTrap
+             :Until flag
+         :EndIf
+     :EndFor
+     :If 1≡depth
+         success←⊃success
+     :EndIf
+ :EndIf

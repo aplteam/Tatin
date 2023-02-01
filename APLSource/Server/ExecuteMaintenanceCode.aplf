@@ -17,13 +17,13 @@
              pkgFolderList←,0 Reg.GetAllPackages G.RegistryPath
              :Trap 0
                  G.RegistryPath(function ##.Admin.LoopThrough)pkgFolderList
-                 (codeFile,'.executed')⎕NMOVE codeFile
+                 (codeFile,'.executed')(⎕NMOVE Reg.ExecNfunction)codeFile
                  Log'Successfully executed maintenance file ',codeFile
              :Else
                  qdmx←⎕DMX
                  LogError'Executing maintenance file ',codeFile,' failed with rc=',(⍕qdmx.EN),'; ',⍕∊⎕DMX.EM
                  ('Culprit was the maintenance file ',⊃,/1↓⎕NPARTS codeFile)SendCrashMail ⍬
-                 (codeFile,'.crashed')⎕NMOVE codeFile
+                 (codeFile,'.crashed')(⎕NMOVE Reg.ExecNfunction)codeFile
              :EndTrap
          :EndIf
      :EndFor

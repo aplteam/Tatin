@@ -63,7 +63,7 @@
      errMsg←'Publishing ',packageID,' failed due to a server error'
      packageDir RollbackPublishPackage errMsg
  :Else
-     (packageDir,'/data')⎕NCOPY⍠('Wildcard' 1)⊣tempDir,'/*'
+     (packageDir,'/data')(⎕NCOPY⍠('Wildcard' 1)ExecNfunction)tempDir,'/*'
      :If 0<≢packageDir(⎕NMOVE Exec)packageDir,'/data/apl-package.json'
          statusCode←HttpCodes.InternalServerError
          errMsg←'Publishing ',packageID,' failed due to a server error'

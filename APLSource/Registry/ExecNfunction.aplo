@@ -1,0 +1,16 @@
+ {r}←x(f ExecNfunction)y;counter;max;flag
+⍝ Use this to call ⎕NMOVE or ⎕NCOPY because it will try more than once before eventually giving up.
+⍝ Helpful in case a file is in use temporarily by, say, DropBox.
+ counter←flag←0
+ max←10
+ :Repeat
+     :Trap 0
+         r←x f y
+         flag←1
+     :Else
+         counter+←1
+         flag←max<counter
+         ⎕DL 0.01×counter
+     :EndTrap
+ :Until flag
+⍝Done

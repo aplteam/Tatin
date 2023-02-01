@@ -175,7 +175,7 @@ Copy the functions `IfAtLeastVersion`, `GetMyUCMDsFolder` and `AutoLoadTatin` fr
 Although you _could_ update your Tatin client by repeating the steps listed under "How to install the Tatin client" there is an easier way to do this; just execute:
 
 ```
-]Tatin.UpdateClient
+]Tatin.UpdateTatin
 ````
 
 If there is a later version available all necessary steps will be executed; eventually the new version number will be reported.

@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.58.2 - 2023-01-31
+⍝ * 0.58.4 - 2023-02-01
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -466,7 +466,7 @@
               r(AddHeader)←'Package-ID' 'Principal'
           :Else
               :If 0≡parms.date
-                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'∑ major versions'),(⊂'Project URL')
+                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Project URL')
               :Else
                   r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Project URL'
               :EndIf
@@ -1194,12 +1194,6 @@
               :EndIf
           :EndIf
       :EndIf
-      :If ~TC.F.IsDir installFolder
-          :If 1 TC.C.YesOrNo'Install folder <',installFolder,'> does not yet exist; create?'
-              'Create!'TC.F.CheckPath installFolder
-          :EndIf
-      :EndIf
-      ('Does not exist: ',installFolder)Assert ⎕NEXISTS installFolder
       :Trap 0
           r←TC.InstallPackages identifier installFolder
       :Else
@@ -1208,15 +1202,7 @@
           TC.CloseConnections 1
           CheckForInvalidVersion qdmx
       :EndTrap
-      :If ∨/(TC.F.EnforceSlash¨TC.GetAllUserCommandFolder,¨'\'){⍺∊(≢¨⍺)↑¨⊂⍵}TC.F.EnforceSlash installFolder,'/'
-          ⍝ At the early stage we did not know about the exact name in terms of casing,
-          ⍝ so we now have to make sure that we get it right. Under Windows it is cosmetic,
-          ⍝ but elsewhere it is essential.
-          buff←{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}⊃r
-          installFolder_←{⍵↓⍨-(¯1↑⍵)∊'/\'}installFolder
-          (installFolder_,'_')⎕NMOVE installFolder_
-          ((1⊃⎕NPARTS installFolder_),buff)⎕NMOVE installFolder_,'_'
-      :EndIf
+      ⍝Done
     ∇
 
     ∇ installFolder←TranslateCiderAlias installFolder;ind;alias;list;cfgFilename;cfg;folders

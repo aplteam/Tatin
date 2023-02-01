@@ -1,0 +1,40 @@
+ path←{expandFlag}NormalizePath path;UNCflag;sep;ExpandEnvironmentStrings;isScalar
+⍝ `path` might be either a simple text vector or scalar representing a single filename or a
+⍝ vector of text vectors with each item representing a single filename.
+⍝ Enforces either `\` or `/` as separator in `path` depending on the current operating system.\\
+⍝ If you need a particular separator no matter what the current OS is then use either
+⍝ `EnforceBackslash` or `EnforceSlash`.\\
+⍝ Note that by default a relative path remains relative and any `../` (or `..\`) is not touched.
+⍝ You can change this by specifying `'expand'` as the (optional) left argument; then `path` is
+⍝ expanded to an absolute path. As a side effect any `../` is transformed appropriately as well.\\
+⍝ Notes:
+⍝ * The left argument is not case sensitive.
+⍝ * Any pair of `//` or `\\` is reduced to a single one except the first two.
+⍝ * Environment variables are expanded.
+ isScalar←⍬≡⍴path
+ :If 0≠≢path
+     :If '%'∊path
+     :AndIf 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+         'ExpandEnvironmentStrings'⎕NA'I4 KERNEL32.C32|ExpandEnvironmentStrings* <0T >0T I4'
+         path←1⊃ExpandEnvironmentStrings path 2048 2048
+     :EndIf
+     expandFlag←{0<⎕NC ⍵:{0=1↑0⍴⍵:⍵ ⋄ 'expand'≡⎕C ⍵}w←⍎⍵ ⋄ 0}'expandFlag'
+     :If 1<≡path
+         path←expandFlag NormalizePath¨path
+     :Else
+         UNCflag←(⊂2⍴path)∊'\\' '//'
+         :If expandFlag
+             path←⊃,/1 ⎕NPARTS path
+         :EndIf
+         sep←('Win'≡APLTreeUtils2.GetOperatingSystem ⍬)⌽'\/'
+         ((path=0⊃sep)/path)←1⊃sep
+         path←(~(2⍴1⊃sep)⍷path)/path
+         :If UNCflag
+             path←'\\',1↓path
+         :EndIf
+         :If isScalar
+         :AndIf 1=≢path
+             path←⊃path
+         :EndIf
+     :EndIf
+ :EndIf

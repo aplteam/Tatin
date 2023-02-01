@@ -16,12 +16,16 @@
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Current dir is now: ',CFG.HOME
  'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
- :If ~batchFlag
-     :If UpdatePackages ⍬
-     :AndIf ~0 C.YesOrNo'   At least one Tatin package was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
-         :Return
+
+ :If 0 ⍝ I am afraid this must be done manually...
+     :If ~batchFlag
+         :If UpdatePackages ⍬
+         :AndIf ~0 C.YesOrNo'   At least one Tatin package was updated. It is recommended to reload the project and run "Make" from scratch. Continue anyway?'
+             :Return
+         :EndIf
      :EndIf
  :EndIf
+
  :If F.IsDir path←C.GetMyUCMDsFolder'Tatin'                 ⍝ Does a folder Tatin/  live in MyUCMDs/ ?
  :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live in MyUCMDs/ ?
      file1←path,'/Tatin.dyalog'

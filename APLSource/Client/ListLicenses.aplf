@@ -1,0 +1,31 @@
+ r←{verbose}ListLicenses url;url_;request;res
+⍝ Returns a list with all licenses tolerated by a managed Tatin Registry.
+⍝ If `full` is a 1 a matrix rather than a list is returned:!
+⍝ [;1] Name of a license
+⍝ [;2] URL of a license
+ url_←ReplaceRegistryAlias url
+ 'No (valid) Registry specified?!'Assert 0<≢url_
+ '"url" is not an HTTP request'Assert IsHTTP url_
+ verbose←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/get-licenses'
+ request.RequestTarget,←'?verbose=',⍕verbose
+ request.Headers,←⊂'Accept' 'application/json'
+ res←SendAndReceive url_ request
+ :If 200≠res.StatusCode
+     :If 0<≢res.Content
+         ('Server: ',res.Content)Assert 0
+     :Else
+         ('Failed with status code ',⍕res.StatusCode)Assert 0
+     :EndIf
+ :Else
+     :Trap 11
+         r←Reg.APLfromJSON res.Content
+         :If 2=⍴⍴r
+             r←⍉↑r[;2]
+         :EndIf
+     :Else
+         'Server failed to return (valid) JSON5'Assert 0
+     :EndTrap
+ :EndIf
+⍝Done

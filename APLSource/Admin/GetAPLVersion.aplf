@@ -1,7 +1,14 @@
  r←GetAPLVersion version
 ⍝ Used to create both Client & Server.
 ⍝ If `version` is empty it defaults to the current version
+⍝ A non-empty right argument works under Windows only.
  :If 0=≢version
-     version←{⍵/⍨2>+\⍵='.'}2⊃#.APLVersion
+     :If 'win'≡⎕C ##.APLTreeUtils2.GetOperatingSystem ⍬
+         r←(2 ⎕NQ'#' 'GetEnvironment' 'Dyalog'),'\Dyalog.exe'
+     :Else
+         r←(2 ⎕NQ'#' 'GetEnvironment' 'Dyalog'),'/mapl'
+     :EndIf
+ :Else
+     Assert'win'≡⎕C ##.APLTreeUtils2.GetOperatingSystem ⍬
+     r←'C:\Program Files\Dyalog\Dyalog APL-64 ',version,' Unicode\Dyalog.exe'
  :EndIf
- r←'C:\Program Files\Dyalog\Dyalog APL-64 ',version,' Unicode\Dyalog.exe'

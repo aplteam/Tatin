@@ -1,21 +1,25 @@
- {r}←x(f ExecNfunction)y;counter;max;flag
+ {r}←x(f ExecNfunction)y;counter;max;flag;path;success
 ⍝ Use this to call ⎕NMOVE or ⎕NCOPY because it will try more than once before eventually giving up.\\
 ⍝ Is an operator in order to allow constructs like this:\\
 ⍝ ```
 ⍝ targetPath (⎕NMOVE⍠('IfExists' 'Skip')FilesAndDirs.ExecNFunction) sourcePath
 ⍝ ```
 ⍝ Helpful in case a file is in use temporarily by, say, DropBox.
- ('Not found: ',y)⎕SIGNAL(~⎕NEXISTS y)/6
- counter←flag←0
+ path←{∨/'?*'∊⍵:⊃⎕NPARTS ⍵ ⋄ ⍵}y
+ ('Not found: ',path)⎕SIGNAL(~⎕NEXISTS path)/6 ⍝ The last part carries "?*", so we have to ignore it
+ counter←flag←success←0
  max←10
  :Repeat
-     :Trap 0
+     :Trap 19 22
          r←x f y
-         flag←1
+         success←flag←1
      :Else
          counter+←1
          flag←max<counter
          ⎕DL 0.01×counter
      :EndTrap
  :Until flag
+ :If ~success
+     ⎕EM ⎕SIGNAL ⎕EN
+ :EndIf
 ⍝Done

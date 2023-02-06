@@ -8,17 +8,21 @@
  ⎕SE._Tatin.Client.∆PrintToSession←0
  {}''∆GetTempDir ⍬
  ∆TEST←1 ⍝ Used to add an HTTP header to any request. Influences only logging on the server side but implicitly also usage data
- :If ~(⊂parms)∊''⍬
- :AndIf ~parms.batchFlag
-     flag←##.Client.YesOrNo'Would you like to start the Tatin test server?'
+ :If 'win'≡⎕C ##.APLTreeUtils2.GetOperatingSystem ⍬
+     :If ~(⊂parms)∊''⍬
+     :AndIf ~parms.batchFlag
+         flag←##.Client.YesOrNo'Would you like to start the Tatin test server?'
+     :Else
+         flag←1
+     :EndIf
+     :If flag
+         ∆P←∆StartServerProcessForTests 0
+         :Repeat
+             :If 0=flag2←1 TC.Ping'[localhost]'
+             :EndIf
+         :Until flag2
+     :EndIf
  :Else
-     flag←1
- :EndIf
- :If flag
-     ∆P←∆StartServerProcessForTests parms.debugFlag
-     :Repeat
-         :If 0=flag2←1 TC.Ping'[localhost]'
-         :EndIf
-     :Until flag2
+     0 0⍴⍞,0/⍞←'Please start the Tatin server; when it is running press <enter>'
  :EndIf
 ⍝Done

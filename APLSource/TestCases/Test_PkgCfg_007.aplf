@@ -10,20 +10,19 @@
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
  assets←src,'/assets'
  F.MkDir src zip
- F.MkDir assets
 
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Foo' '0.1.0'
  cfg.source←'Foo.apln'
  cfg.api←'Foo'
- cfg.assets←assets,'/first.dll'
+ cfg.assets←assets
  cfg.os_win←1
  :Trap 998
      TC.WritePackageConfigFile src cfg
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.GoToTidyUp'This asset does not exist: assets/first.dll'≢qdmx.EM
+     →T.GoToTidyUp'The asset folder does not exist: assets'≢qdmx.EM
  :EndTrap
 
  r←T._OK

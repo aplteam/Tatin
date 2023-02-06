@@ -226,6 +226,22 @@ This function requires the version number to be fully specified.
 
 Note that the function accepts an optional left argument, but this should not be specified by a user: it is only used internally.
 
+### GetLicenses
+
+```
+r←{verbose} GetNoCachingFlag url
+```
+
+`verbose` defaults to 0 but might be 1.
+
+* With `verbose←0` a list with the names of all licenses tolerated by the given managed Tatin Registry is returned. Might be empty.
+
+* With `verbose←1` a matrix with two columns and zero or more rows is returned:
+
+  * `[;1]` Names of all licenses 
+  * `[;2]` URLs of all licenses
+
+
 ### GetNoCachingFlag
 
 ```

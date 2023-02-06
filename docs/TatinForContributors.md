@@ -28,7 +28,7 @@ You need one of:
 * Windows
 * Linux
 
-The Pi and AIX are not supported, but that restriction might be lifted with a later version. Mac-OS is fine for running the client but not (yet) the server, therefore for development the Mac is not a choice for the time being.
+The Pi and AIX are not supported, but that restriction might be lifted with a later version. Mac-OS is fine for running the client but not (yet) the server, therefore for development the Mac is not a choice for the time being in case you need to run the test suite: it requires running a server locally.
 
 You also need to have Git installed.
 
@@ -105,17 +105,19 @@ If you just want to execute all test cases before pushing your changes to GitHub
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite
 ```
 
-Executing `RunTests` means that you will be asked whether a test server should be started. Usually, you will answer with a "Y", and that lets the test suite start another instance of Dyalog, and run a test server in that instance.
+Executing `RunTests` means that on Windows you will be asked whether a test server should be started. Usually, you will answer with a "Y", and that lets the test suite start another instance of Dyalog, and run a test server in that instance.
 
-However, developers might also run into one of two common scenarios: 
+On non-Windows platforms you will be be asked to start the server yourself and press <enter> once that is done.
+
+Developers might also run into one of two common scenarios: 
 
 1. During development you might want to execute all tests or just a specific group (or groups) of tests. 
 
-   You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like selecting an option from a list etc.
+   You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like closing an edit windows etc.
 
    When a test fails then the test framework stops, and the developer can investigate on the spot.
 
-1. You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; 95% of the tests are batchable)
+1. You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; more than 95% of the tests are batchable)
 
    This might be required by an automated build process.
 
@@ -148,11 +150,11 @@ Use `]Cider.OpenProject` to do this. Once the project is open you can ask Cider 
 
 Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.
 
-When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!" to this.
+When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!" to this. (Windows only, elsewhere you must start the server yourself)
 
 A> ### Starting a Tatin test server "manually"
 A>
-A> There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:
+A> There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux. For that execute the following steps:
 A> 
 A> 1. Instantiate Dyalog Unicode 18.0 or later
 A> 
@@ -163,9 +165,7 @@ A>    ]Cider.OpenProject /path/to/Tatin
 A>    #.Tatin.TestCasesServer.RunTests
 A>    ```
 A> 
-A> This starts the server in debug mode; that means that in case of an error the interpreter stops. That is different from letting the test suite start the test server: that traps all errors and carries on.
-A>
-A> If you change any coder at this stage those changes will be written back to disk, so be careful.
+A> If you change any code at this stage those changes will be written back to disk, so be careful.
 
 The `RunTests` function performs these tasks:
 
@@ -179,7 +179,7 @@ The `RunTests` function performs these tasks:
 
 #### Quitting tests
 
-There are scenarios where you want to quit the test suite, for example when a test unearthed a severe bug that needs fixing straight away.
+There are scenarios where you want to quit the test suite, for example when a test unearthed a severe bug that needs fixing straight away, before executing the remaining tests.
 
 It may be tempting to enter just `)reset`, but that is not how you should do this: you have to make sure that the test suite cleans up after itself. 
 
@@ -327,11 +327,13 @@ Of course `RunBatchTests` does not execute any test cases that require a human i
 
 `RunBatchTests` checks the command line:
 
-* In case `OFF=1` was specified on the command line then `⎕OFF` is executed after the last test case got executed.
+* In case `OFF2=1` was specified on the command line then `⎕OFF` is executed after the last test case got executed.
 
   If one or more test cases failed then `⎕OFF 123` is executed. That allows the calling environment to check whether the test suite was executed successfully in its entirety or not.
 
-* If `OFF=1` was not specified a message is printed to the session, indicating success or failure.
+* If `OFF2=1` was not specified a message is printed to the session, indicating success or failure.
+
+Note that `OFF=1` would kind of also work, but it would make Plodder `⎕OFF`, the underlying HTTP server uses by Tatin. That is for some things too early. For example you cannot get a code coverage report then.
 
 #### Running the test suite from a console or terminal
 

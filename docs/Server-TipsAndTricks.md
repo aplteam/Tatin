@@ -176,3 +176,23 @@ Note that except `list-commands` these commands do not return HTML, they trigger
 ### Creating a new version
 
 | **To be enhanced** |
+
+
+
+### Licencing
+
+
+#### INI entries
+
+The names of the licenses as well as the URLs that are to be accepted by a server must be defined in the INI file of the server within the `[LICENSE]` section.
+
+Note that the INI section `[LICENSE]` _may_ exist, but it does not has to: if it does not then no menu item "Licencing" will show in the main menu of the website, and the server will accept any license, including packages that do not even carry a property `license`.
+
+
+#### The menu item "Licencing"
+
+The text shown on the web page is defined in the document "Licencing.html" in the `html/` folder.
+
+#### A "LICENSE" file
+
+By convention a file named "LICENSE" when placed in the root of the project will be copied automatically to the root of a package when build by `BuildPackage`. This convention is independent from the INI file.

@@ -1,6 +1,6 @@
  r←Test_BuildPackage_006(stopFlag batchFlag);⎕TRAP
  ;dir;src;dist;cfg;zipfile;ns;list;expected
-⍝ Build a package with one code file together with several "assets" files
+⍝ Build a package with one code file together with an assets folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -16,15 +16,16 @@
  cfg.name←'Package_B'
  cfg.version←'0.1.0'
  cfg.source←'source'
- (F.ExpandPath src,'/README.md')⎕NCOPY F.ExpandPath'README.md'
- (F.ExpandPath src,'/Managing_packages_with_Tatin.md')⎕NCOPY F.ExpandPath'docs_archive/Managing_packages_with_Tatin.md'
- cfg.assets←'README.md' 'Managing_packages_with_Tatin.md'
+ 'Create!'F.CheckPath src,'/Assets'
+ (F.ExpandPath src,'/Assets/README.md')⎕NCOPY F.ExpandPath'README.md'
+ (F.ExpandPath src,'/Assets/Managing_packages_with_Tatin.md')⎕NCOPY F.ExpandPath'docs_archive/Managing_packages_with_Tatin.md'
+ cfg.assets←'Assets'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
  zipfile←TC.BuildPackage src dist''
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
- expected←'apl-package.json' 'source/foo1.apln' 'README.md' 'Managing_packages_with_Tatin.md'
+ expected←'apl-package.json' 'source/foo1.apln' 'Assets\README.md' 'Assets\Managing_packages_with_Tatin.md'
  →T.GoToTidyUp~expected ∆LazyMatchPaths list
 
  r←T._OK

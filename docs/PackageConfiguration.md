@@ -185,21 +185,25 @@ Similarly, if `PkgName` consists of the two namespaces `Boo` and `Goo`, and `Run
 
 #### assets
 
-If this is empty then the package has no assets.
+If this is empty then the package has no assets. Instead it can point to a folder hosting assets. 
 
-Instead it can point to a single file (typically `LICENSE`) or a folder or several files and folders, separated by a comma.
-
-Any folder must be relative to the package since the folder is part of the package. For that reason, folders may not contain a "`:`" under Windows, and not start with "`/`". If one does anyway an error is thrown.
+The folder must be relative to the package since the folder is part of the package. For that reason, a folder may not contain a "`:`", and not start with "`/`". If one does anyway an error is thrown.
 
 There is one exception: when an absolute path is specified but it's partly identical to what will become `HOME` (the folder where the package lives) then Tatin removes that part silently, making it effectively relative. 
 
 Notes:
 
-* When the package configuration file is written to disk the existence of any assets is checked. If one does not exist an error is thrown.
+* When the package configuration file is written to disk the existence of "assets" is checked. If it's not a folder an error is thrown.
 
   See also the [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) function.
 
-* The assets\ folder must be considered read-only. Never write to it from a package!
+* The `assets\` folder must be considered read-only. Never write to it from a package!
+
+* Watch out for the convention regarding a file "LICENSE" in the root of a project; refer to the "Server-TipsAndTricks" document for details
+
+* Check the "[files](#)" property for files like "ReadMe.txt" and the like
+
+* A file named "LICENSE" in the root of a project will always be copied to the root of a package
 
 A> ### Accessing assets from a class instance
 A>
@@ -270,6 +274,24 @@ This can be one of:
 Content that does not qualify for one of these options will be rejected.
 
 
+#### files
+
+You might want to get one or more specific files into the root of the package although they are not really assets. 
+
+Typical examples are "LICENSE" and "ReadMe.[md\|txt\|html]". Strictly speaking they are not assets because the package will still function perfectly well without them. Also, you want them to go to the root of the project, not into a sub-folder, so that they stand out. 
+
+That can be achieved by adding them to the "files" property. This can be one of:
+
+* Absend
+* Empty
+* A single file
+* A comma-separated list of files
+
+Note that if it specifies a sub-folder `BuildPackage` will copy the file from that project-specific sub-folder to the root of the package.
+
+See als "[assets](#)".
+
+
 #### GetFullPath2AssetsFolder
 
 In case [`assets`](#assets) is not empty this function returns a simple char vector that represents the _full path_ to the assets, using something like:
@@ -287,6 +309,20 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 The group part of the package ID[^id]
 
 A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.
+
+#### license
+
+This might be empty, but you might be unable to publish a package to a Tatin Registry then. It depends on the licenses tolerated by a Registry.
+
+Not that you may specify a default license in your user settings:
+
+```
+]TATIN.UserSettings -edit
+```
+
+At the bottom there are defaults defined for `license`, `source` etc.
+
+The user command `]Tatin.GetLicenses` and the API function `⎕SE.Tatin.GetLicenses` can be used to fetch a list with all licenses tolerated by a Tatin Registry.
 
 #### lx
 
@@ -368,6 +404,14 @@ The `.dyalog` extension is supported for limited backward compatibility --- Tati
 If `source` is a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
 
 `source` must be relative to the root of the package.
+
+Not that you may specify a default source in your user settings:
+
+```
+]TATIN.UserSettings -edit
+```
+
+At the bottom there are defaults defined for `license`, `source` etc.
 
 ##### Cider and Tatin
 

@@ -42,7 +42,7 @@
      #._Tatin.Admin.⎕EX'Initialize_Client'
      F.MkDir'Dist'
      targetPath←'Dist/Client'
-     F.RmDir targetPath
+     {}F.RmDirByForce targetPath
      ⎕DL 0.1
      F.MkDir targetPath
      ⎕DL 0.1
@@ -60,14 +60,14 @@
      :AndIf (userCommandTargetFolder,'/Tatin/Tatin.dyalog')F.YoungerThan'./APLSource/Tatin.dyalog'
      :AndIf ≢/{⊃⎕NGET ⍵}¨'./APLSource/Tatin.dyalog'(userCommandTargetFolder,'/Tatin/Tatin.dyalog')
      :AndIf 1 ##.Client.YesOrNo'It appears that "Tatin.dyalog" in MyUCMDs/ is younger than the one in the project; copy over?'
-         './APLSource/Tatin.dyalog'⎕NCOPY⍠('IfExists' 'Replace')⊣userCommandTargetFolder,'/Tatin/Tatin.dyalog'
+         './APLSource/Tatin.dyalog'(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)userCommandTargetFolder,'/Tatin/Tatin.dyalog'
      :EndIf
-     (targetPath,'/Tatin/Maintenance/')⎕NCOPY⍠('Wildcard' 1)('IfExists' 'Replace')⊣'./Maintenance/Client/*'
-     (targetPath,'/Tatin')⎕NCOPY⍠('IfExists' 'Replace')⊣'./APLSource/Tatin.dyalog'
+     (targetPath,'/Tatin/Maintenance/')(⎕NCOPY⍠('Wildcard' 1)('IfExists' 'Replace')F.ExecNfunction)'./Maintenance/Client/*'
+     (targetPath,'/Tatin')(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction )'./APLSource/Tatin.dyalog'
      'Create!'F.CheckPath targetPath,'/Tatin/Assets/Runtime'
-     (targetPath,'/Tatin/Assets/Runtime/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./Assets/Runtime/Rumba'
+     (targetPath,'/Tatin/Assets/Runtime/')(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)'./Assets/Runtime/Rumba'
      'Create!'F.CheckPath targetPath,'/Tatin/Assets/docs'
-     (targetPath,'/Tatin/Assets/docs/')⎕NCOPY⍠('IfExists' 'Replace')⊣'./html/ReleaseNotes.html'
+     (targetPath,'/Tatin/Assets/docs/')(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)'./html/ReleaseNotes.html'
      F.DeleteFile¨F.Dir'Dist/Tatin-Client-*.zip'
      zipFilename←'Dist/Tatin-Client-',({{⍵/⍨∧\⍵∊'.',⎕D}⍵/⍨3>+\'.'=⍵}(2⊃##.Client.Version)),'.zip'
      ⎕DL 0.1

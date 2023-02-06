@@ -1,0 +1,15 @@
+ r←Test_API_034(stopFlag batchFlag);⎕TRAP;res
+⍝ Exercise ⎕SE.Tatin.ListLicenses with and without -verbose
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ res←⎕SE.Tatin.ListLicenses '[localhost]'
+ →T.PassesIf 2=≡res
+ →T.PassesIf 1=⍴⍴res
+
+ res←1 ⎕SE.Tatin.ListLicenses'[localhost]'
+ →T.PassesIf 2=≡res
+ →T.PassesIf 2=⍴⍴res
+
+ r←T._OK
+⍝Done

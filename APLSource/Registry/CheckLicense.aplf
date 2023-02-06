@@ -1,0 +1,16 @@
+ (success msg)←G CheckLicense cfg;names
+ success←1 ⋄ msg←''
+ :If 0=cfg.⎕NC'license'
+     success←0
+     msg←'"license" property is missing'
+ :Else
+     :If G.INI.Exist'LICENSE'
+     :AndIf G.INI.Exist'LICENSE:urls'
+     :AndIf G.INI.Exist'LICENSE:names'
+     :AndIf 0<≢names←⊃G.INI.Get'LICENSE:names'
+     :AndIf ~(⊂cfg.license)∊names
+         msg←'License is invalid - valid are: ',⊃{⍺,', ',⍵}/names
+         success←0
+     :EndIf
+ :EndIf
+⍝Done

@@ -52,12 +52,12 @@
              newFolder←data.version{(⍵/⍨2>+\⍵='-'),'-',⍺}folder
              zipFilename←⊃⊃F.Dir tempFolder,folder,'/*.zip'
              newZipFilename←tempFolder,folder,'/',newFolder,'.zip'
-             newZipFilename(⎕NMOVE Reg.ExecNfunction)zipFilename
+             newZipFilename(⎕NMOVE Reg.F.ExecNfunction)zipFilename
              Z←⎕NEW ZipArchive(,⊂newZipFilename)
              Z.Delete Reg.CFG_Name
              (tempFolder,folder)Z.Add Reg.CFG_Name
              Z.Dispose
-             (G.RegistryPath,newFolder)(⎕NMOVE Reg.ExecNfunction)tempFolder,folder
+             (G.RegistryPath,newFolder)(⎕NMOVE Reg.F.ExecNfunction)tempFolder,folder
              report,←'Deprecated: ',data.group,'-',data.name,'-',data.version,CR
              rcs,←200
          :ElseIf ~multiples

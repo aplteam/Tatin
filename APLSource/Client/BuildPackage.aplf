@@ -22,6 +22,9 @@
      :EndIf
  :EndIf
  cfg.version←IncreaseBuildNumber cfg.version
+ :If 0<≢cfg.assets
+     cfg.assets←{1=≢⍵:⊃⍵ ⋄ 1↓⊃,/',',¨⍵}ProcessAssetsProp projectPath cfg.assets
+ :EndIf
  :If ≢/{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}¨cfg cfg_
      WritePackageConfigFile projectPath cfg
  :EndIf
@@ -51,6 +54,13 @@
          3 ⎕NDELETE zipFilename
          ('Not found: ',cfg.userCommandScript)Assert 0
      :EndIf
+ :EndIf
+ :If F.IsFile projectPath,'LICENSE'    ⍝ By convention...
+     projectPath zipObj.Add'LICENSE'   ⍝ ... we add a file "LICENSE" if there is one
+ :EndIf
+ :If 0<cfg.⎕NC'files'
+ :AndIf 0<≢cfg.files
+     projectPath∘{(p f e)←⎕NPARTS ⍵ ⋄ 0=≢p:⍺ zipObj.Add ⍵ ⋄ (⍺,p,'/')zipObj.Add f,e}¨','(≠⊆⊢)cfg.files
  :EndIf
  :If 0<≢dependencies
      (projectPath,dependencies)zipObj.Add'/apl-dependencies.txt'

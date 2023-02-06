@@ -10,6 +10,28 @@
 
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
+## Version 0.88.0 from 2023-02-06
+
+* New INI category `[LICENSE]` added for licenses, see the INI template
+
+* If the category `[LICENSE]` exists, the licenses accepted by the server are listed on the home page, otherwise that menu item will not show.
+
+* Any attempt to publish a package without valid license information is rejected by the Tatin server in case licences are defined in the INI file
+
+* The "assets" property was inconsistently defined. It now must be a single folder within the package.
+
+* A new property `license` got introduced which on https://tatin.dev must point to one of the defined licenses.
+
+  There is a maintenance function that will inject it into all existing packages and set it to "MIT". If you don't want that you must amend the function accordingly.
+
+* A new property `isUserCommand` got introduced which is a Boolean
+
+  There is a maintenance function that will inject this flag into all existing packages, deleting `userCommandScript` along the way. If `userCommandScript` is not empty, the contents will go on the new property "files", see next topic.
+
+* A new property `files` got introduced. This can be empty, a single file or a comma-separated list of files names. They must be defined relative to the project.
+
+  Such files are copied to the root of a package by `BuildPackage`. 
+
 ## Version 0.87.0 from 2023-02-01
 
 No user actions required.

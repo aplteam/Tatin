@@ -225,7 +225,7 @@ The file `apl-package.json` describes the MarkAPL package:
 ```
 {
   api: "MarkAPL",
-  assets: "Files/",
+  assets: "Files",
   date: 20210725.153851,
   description: "Converts Markdown to HTML5",
   documentation: "",
@@ -263,7 +263,7 @@ The `api` parameter is discussed in detail in the "PackageConfiguration" documen
 
 #### Assets
 
-Note that the file `apl-package.json` specifies `assets: "Files/"`. That means that all assets are to be found in the `Files/` sub directory.
+Note that the file `apl-package.json` specifies `assets: "Files"`. That means that there are assets, and that they can be found in the `Files/` sub directory.
 
 In case of MarkAPL these are a bunch of CSS and HTML files:
 
@@ -569,7 +569,7 @@ This is a function which returns the result of the expression `HOME,'/',ASSETS` 
 
 When accessing assets you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even on a different machine. The expression `HOME,'/',ASSETS` would then fail.
 
-The function would not find `HOME` and there return just `ASSETS`, and that allows you to still access the assets sucessfully.
+In such a case the function would not find `HOME` and therefore return just `ASSETS`, and that allows you to still access the assets sucessfully.
 
 
 ##### HOME

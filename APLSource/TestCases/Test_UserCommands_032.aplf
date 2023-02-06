@@ -1,0 +1,16 @@
+ r←Test_UserCommands_032(stopFlag batchFlag);⎕TRAP;rc;msg;res
+⍝ Exercise ]Tatin.ListLicenses with and without -verbose
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg res)←∆UCMD'ListLicenses [localhost]'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 2=≡res
+ →T.PassesIf 1=⍴⍴res
+
+ (rc msg res)←∆UCMD'ListLicenses [localhost] -verbose'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 2=≡res
+ →T.PassesIf 2=⍴⍴res
+
+ r←T._OK

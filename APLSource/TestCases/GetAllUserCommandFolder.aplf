@@ -1,0 +1,7 @@
+ r←GetAllUserCommandFolder
+⍝ Returns a list with all folders scanned by Dyalog for user commands.\\
+⍝ Removes trailing (back-)slashes if any.
+ r←⎕SE.SALT.Settings'cmddir'
+ ((':'=r)/r)←';' ⍝ Linux!
+ r←';'(≠⊆⊢)r
+ r←(-(⊃¨¯1↑¨r)∊¨⊂'/\')↓¨r

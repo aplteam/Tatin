@@ -1,13 +1,18 @@
- {(statusCode errMsg)}←{isHttpRequest}PublishPackage(zipFilename registryPath);packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps;tags;list
+ {(statusCode errMsg)}←{isHttpRequest}PublishPackage y;packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps;tags;list;zipFilename;registryPath;G;msg;success
 ⍝ Tries to publish a package locally.\\
 ⍝ * If the package already exists `errmsg` carries an appropriate message. No further action is taken.
 ⍝ * If any action along the line fails (like creating the package directory, copying the ZIP file, copying the dependency file, if any)
 ⍝   then all actions carried out so far are rolled back.
+⍝ Two rights arguments are mandatory:
+⍝ [1] Name of a zip file
+⍝ [2] Path to the folder where the Registry data lives
+⍝ The third argument is optional and only provided by a running server: it's the namespace G (Globals).
 ⍝ No matter whether this functions was called by a Tatin server or not, it returns HTTP status codes:
 ⍝ * In case of success 200
 ⍝ * In case the package is already published 400 (Bad request)
 ⍝ * In case something else went wrong 500 (Internal Server error)
 ⍝ In case the function is called by a Tatin server, `errMsg` should be returned as content; that's why we do not just use `Assert`.
+ (zipFilename registryPath G)←3↑y,⊂⍬
  isHttpRequest←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'isHttpRequest'
  HttpCodes←⎕NS'' ⋄ HttpCodes.OK←200 ⋄ HttpCodes.InternalServerError←500 ⋄ HttpCodes.BadRequest←400
  statusCode←HttpCodes.OK ⋄ errMsg←''
@@ -21,6 +26,8 @@
      :Return
  :EndIf
  :If 0<≢cfg.tags
+     ⍝ The following code still lives because the os_* flags got introduced pretty late, and at that point
+     ⍝ people gut used to add tags to indicate OS compatability.
      tags←','(≠⊆⊢)cfg.tags
      tags~←'apl' 'dyalog' 'dyalogapl' 'dyalog-apl'  ⍝ These make no sense: Tatin is a Dyalog package manager by definition
      :If (⊂'windows')∊tags
@@ -41,53 +48,60 @@
  :If 0=≢cfg.maintainer
      cfg.maintainer←'email'GetGroupData registryPath cfg.group
  :EndIf
- (JSON cfg)F.NPUT(tempDir,'/',CFG_Name)1
- packageID←{⍵.group,'-',⍵.name,'-',⍵.version}cfg
- packageID←⊃SplitVersionFromBuild packageID
- registryPath←AddSlash registryPath
- packageDir←registryPath,packageID
- list←GetAllPackages registryPath
- list←RemoveVersionNumber¨list
- :If ~(⊂RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊list
- :AndIf (⊂⎕C RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊⎕C list
-     errMsg←'There is already such a package but with a different spelling (case)'
+ :If 0<≢G
+     (success msg)←G CheckLicense cfg
+ :AndIf 0=success
+     errMsg←msg
      statusCode←HttpCodes.BadRequest
- :ElseIf F.IsDir packageDir
-     errMsg←'Package already exists (version conflict)'
-     statusCode←HttpCodes.BadRequest
- :ElseIf 0=F.MkDir packageDir,'/data'
-     statusCode←HttpCodes.InternalServerError
-     errMsg←'Could not create data/ directory for ',packageID
- :ElseIf 0<≢(zipFilename2←packageDir,'/',packageID,'.zip')(⎕NCOPY Exec)zipFilename
-     statusCode←HttpCodes.InternalServerError
-     errMsg←'Publishing ',packageID,' failed due to a server error'
-     packageDir RollbackPublishPackage errMsg
  :Else
-     (packageDir,'/data')(⎕NCOPY⍠('Wildcard' 1)ExecNfunction)tempDir,'/*'
-     :If 0<≢packageDir(⎕NMOVE Exec)packageDir,'/data/apl-package.json'
+     (JSON cfg)F.NPUT(tempDir,'/',CFG_Name)1
+     packageID←{⍵.group,'-',⍵.name,'-',⍵.version}cfg
+     packageID←⊃SplitVersionFromBuild packageID
+     registryPath←AddSlash registryPath
+     packageDir←registryPath,packageID
+     list←GetAllPackages registryPath
+     list←RemoveVersionNumber¨list
+     :If ~(⊂RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊list
+     :AndIf (⊂⎕C RemoveVersionNumber 2⊃⎕NPARTS packageDir)∊⎕C list
+         errMsg←'There is already such a package but with a different spelling (case)'
+         statusCode←HttpCodes.BadRequest
+     :ElseIf F.IsDir packageDir
+         errMsg←'Package already exists (version conflict)'
+         statusCode←HttpCodes.BadRequest
+     :ElseIf 0=F.MkDir packageDir,'/data'
+         statusCode←HttpCodes.InternalServerError
+         errMsg←'Could not create data/ directory for ',packageID
+     :ElseIf 0<≢(zipFilename2←packageDir,'/',packageID,'.zip')(⎕NCOPY Exec)zipFilename
          statusCode←HttpCodes.InternalServerError
          errMsg←'Publishing ',packageID,' failed due to a server error'
          packageDir RollbackPublishPackage errMsg
      :Else
-         SetPublishingDate packageDir,'/',CFG_Name
-         myZip←⎕NEW ZipArchive(,⊂zipFilename2)
-         packageDir myZip.Add CFG_Name
-         myZip.Dispose
-         dependenciesFilename←packageDir,'/data/',DependenciesFilename
-         :If F.Exists dependenciesFilename
-             :If 0<≢deps←⊃F.NGET dependenciesFilename 1
-                 :If isHttpRequest      ⍝ If the Registry is managed by a server we cannot allow file://
-                 :AndIf ∨/IsFILE¨deps
-                     statusCode←HttpCodes.BadRequest
-                     errMsg←'Publishing package ',packageID,' failed; dependency uses file:// protocol'
-                     packageDir RollbackPublishPackage errMsg
-                 :Else
-                     :If 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
-                         statusCode←HttpCodes.InternalServerError
-                         errMsg←'Publishing package failed: ',packageID
+         (packageDir,'/data')(⎕NCOPY⍠('Wildcard' 1)F.ExecNfunction)tempDir,'/*'
+         :If 0<≢packageDir(⎕NMOVE Exec)packageDir,'/data/apl-package.json'
+             statusCode←HttpCodes.InternalServerError
+             errMsg←'Publishing ',packageID,' failed due to a server error'
+             packageDir RollbackPublishPackage errMsg
+         :Else
+             SetPublishingDate packageDir,'/',CFG_Name
+             myZip←⎕NEW ZipArchive(,⊂zipFilename2)
+             packageDir myZip.Add CFG_Name
+             myZip.Dispose
+             dependenciesFilename←packageDir,'/data/',DependenciesFilename
+             :If F.Exists dependenciesFilename
+                 :If 0<≢deps←⊃F.NGET dependenciesFilename 1
+                     :If isHttpRequest      ⍝ If the Registry is managed by a server we cannot allow file://
+                     :AndIf ∨/IsFILE¨deps
+                         statusCode←HttpCodes.BadRequest
+                         errMsg←'Publishing package ',packageID,' failed; dependency uses file:// protocol'
                          packageDir RollbackPublishPackage errMsg
                      :Else
-                         0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+                         :If 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
+                             statusCode←HttpCodes.InternalServerError
+                             errMsg←'Publishing package failed: ',packageID
+                             packageDir RollbackPublishPackage errMsg
+                         :Else
+                             0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+                         :EndIf
                      :EndIf
                  :EndIf
              :EndIf

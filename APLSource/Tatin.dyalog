@@ -1,6 +1,6 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.58.4 - 2023-02-01
+⍝ * 0.59.0 - 2023-02-06
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -24,6 +24,12 @@
           r,←c
      
           c←⎕NS ⍬
+          c.Name←'Cache'
+          c.Desc←'List contents of the Tatin package cache'
+          c.Parse←'1s -clear -path -force'
+          r,←c
+     
+          c←⎕NS ⍬
           c.Name←'CreatePackage'
           c.Desc←'Create a new Tatin package'
           c.Parse←'1s'
@@ -42,9 +48,15 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'LoadTatin'
-          c.Desc←'Load the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
-          c.Parse←'1s -force'
+          c.Name←'InstallPackages'
+          c.Desc←'Install one or more packages and all its dependencies into a given folder'
+          c.Parse←'1-2 -nobetas'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'ListLicenses'
+          c.Desc←'Returns information regarding the licenses tolerated by a managed Tatin Registry'
+          c.Parse←'1s -verbose'
           r,←c
      
           c←⎕NS ⍬
@@ -66,21 +78,21 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'LoadPackages'
-          c.Desc←'Load the package(s) specified in the argument and all dependencies into the WS or ⎕SE'
-          c.Parse←'1-2 -nobetas'
-          r,←c
-     
-          c←⎕NS ⍬
           c.Name←'ListVersions'
           c.Desc←'List all versions of the specified package or all versions of a particular Registry'
           c.Parse←'1 -date'
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'InstallPackages'
-          c.Desc←'Install one or more packages and all its dependencies into a given folder'
+          c.Name←'LoadPackages'
+          c.Desc←'Load the package(s) specified in the argument and all dependencies into the WS or ⎕SE'
           c.Parse←'1-2 -nobetas'
+          r,←c
+     
+          c←⎕NS ⍬
+          c.Name←'LoadTatin'
+          c.Desc←'Load the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
+          c.Parse←'1s -force'
           r,←c
      
           c←⎕NS ⍬
@@ -183,12 +195,6 @@
           c.Name←'Ping'
           c.Desc←'Ping Tatin server(s) with very little overhead'
           c.Parse←'1s'
-          r,←c
-     
-          c←⎕NS ⍬
-          c.Name←'Cache'
-          c.Desc←'List contents of the Tatin package cache'
-          c.Parse←'1s -clear -path -force'
           r,←c
      
           c←⎕NS ⍬
@@ -296,6 +302,16 @@
     ∇
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝ Methods
+
+
+    ∇ r←ListLicenses Arg;url;verbose
+      url←''Arg.Switch'_1'
+      verbose←Arg.verbose
+      :If 0=≢url
+          url←'https://tatin.dev'
+      :EndIf
+      r←verbose TC.ListLicenses url
+    ∇
 
     ∇ r←Maintenance Arg;dry;path;home;⎕TRAP;show;filename;body;list;ind
       (dry show)←Arg.(dry show)
@@ -752,6 +768,7 @@
       :AndIf ~TC.Reg.IsFILE url
           'Invalid target'Assert'['∊url
           url←'[',(url~'[]'),']'
+          url_←TC.ReplaceRegistryAlias url
       :EndIf
       ('"',url,'" is not a Registry')Assert 0<≢url_
       :If TC.F.IsDir source
@@ -1422,9 +1439,9 @@
           :Case ⎕C'FindDependencies'
               r,←⊂'Attempts to find all folder(s) with the given Tatin package(s)'
               r,←'' '  ]Tatin.FindDependencies <folder> <comma-separated list of pkgs> -detailed'
-          :Case ⎕C'LoadTatin'
-              r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
-              r,←'' '  ]Tatin.LoadTatin'
+          :Case ⎕C'ListLicenses'
+              r,←⊂'Returns information regarding the licenses tolerated by a managed Tatin Registry'
+              r,←'' '  ]Tatin.ListLicenses <url> -verbose'
           :Case ⎕C'ListRegistries'
               r,←⊂'List URL, alias, priority and port of all Registries as defined in the user settings.'
               r,←'' '  ]Tatin.ListRegistries [-full]'
@@ -1437,6 +1454,9 @@
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all dependencies into the workspace.'
               r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>] -nobetas'
+          :Case ⎕C'LoadTatin'
+              r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
+              r,←'' '  ]Tatin.LoadTatin'
           :Case ⎕C'InstallPackages'
               r,←⊂'Install the given package(s) and all dependencies into the given folder.'
               r,←'' '  ]Tatin. <packageIDs|package-URLs|Zip-file> <install-path>'
@@ -1501,6 +1521,8 @@
               r,←⊂'Attempts to update the Tatin client and reports the result'
               r,←'' '  ]Tatin.UpdateTatin'
           :Else
+              ⎕SHADOW'⎕trap'
+              ⎕TRAP←0 'S'
               ∘∘∘ ⍝ New?!
           :EndSelect
           :If 'Version'≢Cmd
@@ -1561,16 +1583,11 @@
               r,←⊂'           package folder(s) instead.'
               r,←⊂'           As a side effect the result might be larger, in case a package is'
               r,←⊂'           installed more than once.'
-          :Case ⎕C'LoadTatin'
-              r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
-              r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
+          :Case ⎕C'ListLicenses'
+              r,←⊂'Returns a list with all licenses tolerated by a managed Tatin Registry'
+              r,←⊂'If no Registry is specified https://tatin.dev is assumed.'
               r,←⊂''
-              r,←⊂'By default the user config file is expected in the user''s home folder, and it will be'
-              r,←⊂'created there if it does not already exist.'
-              r,←⊂'Instead you may specify a different folder. Note that this is NOT a permanent change;'
-              r,←⊂''
-              r,←⊂'-permanent   Make any changes permanent'
-              r,←⊂'-force       Enforce the load even if ⎕SE.Tatin already exists'
+              r,←⊂'-verbose  If specified not only the names of the licenses are returned but also their URLs.'
           :Case ⎕C'ListRegistries'
               r,←⊂'List URL, alias, priority, port  and the no-caching flag of all Registries as defined'
               r,←⊂'in the user settings.'
@@ -1665,6 +1682,16 @@
               r,←⊂''
               r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
               r,←⊂'            load by specifying the -overwrite flag.'
+          :Case ⎕C'LoadTatin'
+              r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
+              r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
+              r,←⊂''
+              r,←⊂'By default the user config file is expected in the user''s home folder, and it will be'
+              r,←⊂'created there if it does not already exist.'
+              r,←⊂'Instead you may specify a different folder. Note that this is NOT a permanent change;'
+              r,←⊂''
+              r,←⊂'-permanent   Make any changes permanent'
+              r,←⊂'-force       Enforce the load even if ⎕SE.Tatin already exists'
           :Case ⎕C'Maintenance'
               r,←⊂'Checks whether there are any files in the folder Maintenance/. These are expected to be'
               r,←⊂'.aplf files (functions). Such files will be listed, and the user can select which one(s)'
@@ -1706,8 +1733,9 @@
               r,←⊂'   The contents of the file "',TC.CFG_Name,'" in that folder is returned.'
               r,←⊂'   In case the file does not yet exist it will be created.'
               r,←⊂''
-              r,←⊂'In case no argument is specified Tatin checks whether there is an open Cider projects'
-              r,←⊂'and asks the user whether that should be used.'
+              r,←⊂'In case no argument is specified Tatin checks whether there is are any open Cider projects.'
+              r,←⊂'If there is just one open it will act on it, if there are multiple projects opened the user'
+              r,←⊂'will be asked which one it should act on.'
               r,←⊂''
               r,←⊂'If Cider is not available or no project is open the command tries to find a package'
               r,←⊂'config file in the current directory but the user is asked for confirmation.'

@@ -8,6 +8,19 @@
 
 # Publishing Packages
 
+
+## Licencing
+
+### The principal Tatin server
+
+If you want to publish packages to the Principal Tatin server (<https://tatin.dev>) then your package _must carry_ a property `license`, and its value  must be one of the licenses listed on the web page. All licenses that will be accepted offer a great deal of freedom to a user of a package: there are almost no restrictions.
+
+Note that the same holds true for the test server (<https://test.tatin.dev>)
+
+### Your own server
+
+If you want to run your own server then you can do whatever you like, of course. The document  "Server --- Tips and Tricks" offers details.
+
 ## Groups, names and version numbers
 
 A package ID consists of at least three parts:
@@ -266,7 +279,7 @@ MyUserCommand/
 
 The package configuration parameter `source` will then read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
 
-But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages is installed.
+But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages are installed.
 
 That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:
 
@@ -274,7 +287,7 @@ That's why Tatin needs to know that the package is a user command, and where to 
 userCommandScript: "APLSource/MyUserCommand.dyalog",
 ```
 
-The fact that the parameter exists and is not empty tells Tatin that is is a user command, and the path allows Tatin to first install everything as usual and then copy the script to the root of the package installation folder.
+The fact that the parameter exists and is not empty tells Tatin that it is a user command, and the path allows Tatin to first install everything as usual and then move the script to the root of the package installation folder.
 
 The installed package will then comprise:
 

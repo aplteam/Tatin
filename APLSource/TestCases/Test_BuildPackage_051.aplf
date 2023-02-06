@@ -5,7 +5,7 @@
 
  path←∆GetProjectPath,'/TestData/Build/Default/'
  cfg←TC.ReadPackageConfigFile path,'apl-package.json'
- zipFileName←TC.BuildPackage path path ''
+ zipFileName←TC.BuildPackage path path''
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
  cfg2←TC.ReadPackageConfigFile path,'apl-package.json'
@@ -19,5 +19,5 @@
  r←T._OK
 
 ∆TidyUp:
- ⎕NDELETE zipFileName
+ F.DeleteFile zipFileName
 ⍝Don

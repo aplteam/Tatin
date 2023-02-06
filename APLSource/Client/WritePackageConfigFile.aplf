@@ -1,4 +1,4 @@
- {cfg}←{initializeFlag}WritePackageConfigFile(path cfg);qdmx;cfg_file;assets;tmp
+ {cfg}←{initializeFlag}WritePackageConfigFile(path cfg);qdmx;cfg_file;tmp
 ⍝ Write package config file to disk.
 ⍝ By default several properties are checked and an error is thrown in case something is not quite right,
 ⍝ This can be changed by passing a 1 as ⍺. In this case two checks are NOT perfortmed:
@@ -19,13 +19,15 @@
  cfg←ValidateTags cfg
  cfg←ValidateAPI cfg
  cfg←ValidateDocumentation cfg
- cfg←ValidateMaintainer cfg
- :If 0<≢assets←{0=≢⍵:⍵ ⋄ ','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}cfg.assets
-     assets←path∘PolishAssetsPaths¨assets
-     {}{0=≢⍵:⍬ ⋄ {'assets'ValidateAssets ⍵}¨⍵}assets
-     {}path∘CheckAssetsExist¨assets
-     cfg.assets←⊃{⍺,',',⍵}/assets
+ :If 0=≢cfg.license
+     cfg.license←MyUserSettings.license
  :EndIf
+ cfg←ValidateMaintainer cfg
+ ⍝ cfg←ValidateLicense cfg  ⍝  We cannot validate here, that's up to the server: it knows what to accepts and what not
+ 'Invalid: "assets" - not a path'Assert~','∊cfg.assets
+ cfg.assets←path PolishAssetsPaths cfg.assets
+ path ValidateAssets cfg.assets
+ {}path CheckAssetsExist cfg.assets
  'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg.name
  tmp←cfg_file,'.tmp'
  :Trap 0
@@ -33,7 +35,7 @@
      {}(⊆Reg.JSON cfg)F.NPUT tmp 1
      {}F.DeleteFile cfg_file
      ⎕DL 0.01
-     {}cfg_file(⎕NMOVE Reg.ExecNfunction)tmp
+     {}cfg_file(⎕NMOVE Reg.F.ExecNfunction)tmp
  :Else
      qdmx←⎕DMX
      qdmx.EM ⎕SIGNAL qdmx.EN

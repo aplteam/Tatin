@@ -1,8 +1,11 @@
- response←request FetchPackage packageID;list
+ response←request FetchPackage packageID;list;ind;packageID_
  :If Reg.IsValidPackageID_Complete packageID
-     :If F.IsDir G.RegistryPath,'/',packageID
+     list←1 Reg.Index.GetRegistryIndex G.RegistryPath
+     ind←(⎕C list)⍳⊂⎕C packageID
+     :If ind≤≢list
+         packageID_←ind⊃list
          response←R.NewResponse request
-         :If 1≠≢list←F.ListFiles G.RegistryPath,'/',packageID,'/',packageID,'*.zip'
+         :If 1≠≢list←F.ListFiles G.RegistryPath,'/',packageID,'/',packageID_,'*.zip'
              ⍝ Whether we find none or more than one, something is seriously wrong then
              response←request RespondWithHTML 500
          :Else

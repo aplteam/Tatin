@@ -72,7 +72,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Windows</li>
 <li>Linux</li>
 </ul>
-<p>The Pi and AIX are not supported, but that restriction might be lifted with a later version. Mac-OS is fine for running the client but not (yet) the server, therefore for development the Mac is not a choice for the time being.</p>
+<p>The Pi and AIX are not supported, but that restriction might be lifted with a later version. Mac-OS is fine for running the client but not (yet) the server, therefore for development the Mac is not a choice for the time being in case you need to run the test suite: it requires running a server locally.</p>
 <p>You also need to have Git installed.</p>
 <div class="h_tag">
 <a href="#Tatin-is-managed-by-Cider" id="Tatin-is-managed-by-Cider" class="autoheader_anchor">
@@ -130,13 +130,14 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider how to do that:</p>
 <pre><code>      ]Cider.RunTests
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite</code></pre>
-<p>Executing <code>RunTests</code> means that you will be asked whether a test server should be started. Usually, you will answer with a “Y”, and that lets the test suite start another instance of Dyalog, and run a test server in that instance.</p>
-<p>However, developers might also run into one of two common scenarios:</p>
+<p>Executing <code>RunTests</code> means that on Windows you will be asked whether a test server should be started. Usually, you will answer with a “Y”, and that lets the test suite start another instance of Dyalog, and run a test server in that instance.</p>
+<p>On non-Windows platforms you will be be asked to start the server yourself and press &lt;enter&gt; once that is done.</p>
+<p>Developers might also run into one of two common scenarios:</p>
 <ol start="1">
 <li>During development you might want to execute all tests or just a specific group (or groups) of tests.
-<p>You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like selecting an option from a list etc.</p>
+<p>You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like closing an edit windows etc.</p>
 <p>When a test fails then the test framework stops, and the developer can investigate on the spot.</p></li>
-<li>You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; 95% of the tests are batchable)
+<li>You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; more than 95% of the tests are batchable)
 <p>This might be required by an automated build process.</p>
 <p>In this case, any errors are trapped, and you get just either a single line that reports success or failure in the session or <code>⎕OFF</code> is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.</p>
 <p>Note that a single failing test case is considered as “failure” of the whole test suite, though the test framework will continue to execute all remaining tests.</p></li>
@@ -164,18 +165,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <pre><code>      ]Cider.RunTests
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite</code></pre>
 <p>Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.</p>
-<p>When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a “Yes!” to this.</p>
+<p>When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a “Yes!” to this. (Windows only, elsewhere you must start the server yourself)</p>
 <div class="leanpub_A">
 <h3>Starting a Tatin test server “manually”</h3>
-<p>There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:</p>
+<p>There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux. For that execute the following steps:</p>
 <ol start="1">
 <li>Instantiate Dyalog Unicode 18.0 or later</li>
 <li>Execute the following two statements:
 <pre><code>]Cider.OpenProject /path/to/Tatin
 #.Tatin.TestCasesServer.RunTests</code></pre></li>
 </ol>
-<p>This starts the server in debug mode; that means that in case of an error the interpreter stops. That is different from letting the test suite start the test server: that traps all errors and carries on.</p>
-<p>If you change any coder at this stage those changes will be written back to disk, so be careful.</p>
+<p>If you change any code at this stage those changes will be written back to disk, so be careful.</p>
 </div>
 
 <p>The <code>RunTests</code> function performs these tasks:</p>
@@ -192,7 +192,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="Quitting-tests">8.1.2. Quitting tests</h4>
 </a>
 </div>
-<p>There are scenarios where you want to quit the test suite, for example when a test unearthed a severe bug that needs fixing straight away.</p>
+<p>There are scenarios where you want to quit the test suite, for example when a test unearthed a severe bug that needs fixing straight away, before executing the remaining tests.</p>
 <p>It may be tempting to enter just <code>)reset</code>, but that is not how you should do this: you have to make sure that the test suite cleans up after itself.</p>
 <p>The easiest way to achieve this is to execute this statement:</p>
 <pre><code>      T.QuitTests</code></pre>
@@ -294,10 +294,11 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>Of course <code>RunBatchTests</code> does not execute any test cases that require a human in front of the monitor, but the number of such tests is very small anyway.</p>
 <p><code>RunBatchTests</code> checks the command line:</p>
 <ul>
-<li>In case <code>OFF=1</code> was specified on the command line then <code>⎕OFF</code> is executed after the last test case got executed.
+<li>In case <code>OFF2=1</code> was specified on the command line then <code>⎕OFF</code> is executed after the last test case got executed.
 <p>If one or more test cases failed then <code>⎕OFF 123</code> is executed. That allows the calling environment to check whether the test suite was executed successfully in its entirety or not.</p></li>
-<li>If <code>OFF=1</code> was not specified a message is printed to the session, indicating success or failure.</li>
+<li>If <code>OFF2=1</code> was not specified a message is printed to the session, indicating success or failure.</li>
 </ul>
+<p>Note that <code>OFF=1</code> would kind of also work, but it would make Plodder <code>⎕OFF</code>, the underlying HTTP server uses by Tatin. That is for some things too early. For example you cannot get a code coverage report then.</p>
 <div class="h_tag">
 <a href="#Running-the-test-suite-from-a-console-or-terminal" id="Running-the-test-suite-from-a-console-or-terminal" class="autoheader_anchor">
 <h4 data-id="Running-the-test-suite-from-a-console-or-terminal">8.2.2. Running the test suite from a console or terminal</h4>

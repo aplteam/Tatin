@@ -10,9 +10,9 @@
 ⍝ `DefineRegistry` class) to the user settings with `AddRegistry`, and you may also call
 ⍝ `ReplaceRegistry` and `RemoveRegistry`.\\
 ⍝ Note that all changes are strictly workspace-only. If you want your changes to be written to file
-⍝ you must call the `Save` method with a 1 as right argument. The only exception is that when the
-⍝ file does not yet exist, it is created and written to disk with defaults.\\
-⍝ If you have passed to `⎕NEW` a path to where the user settings file should be created and you want
+⍝ you must call the `Save` method with a 1 as right argument. The exception is that when the file
+⍝ does not yet exist, it is created and written to disk with defaults.\\
+⍝ If you have passed to `⎕NEW` a path to where the user settings file should be created, and you want
 ⍝ this file to become the default user settings file whenever Dyalog APL is fired up, then make a call
 ⍝ to the `MakeDefaultFile` instance method. This creates (or overwrites) a file '.tatin` that points
 ⍝ to that folder.\\
@@ -70,6 +70,7 @@
       _registries←⍬
       _caching←1
       _path2cache←''
+      _license←''
     ∇
 
     :Property source
@@ -145,6 +146,19 @@
           'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
           'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
           _path2cache←val.NewValue
+        ∇
+    :EndProperty
+
+    :Property license
+    ⍝ Defines the type of license that you want any new package config file default to.
+    :Access Public Instance
+        ∇ r←get
+          r←_license
+        ∇
+        ∇ set val
+          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
+          _license←val.NewValue
         ∇
     :EndProperty
 
@@ -319,7 +333,7 @@
           tmp←'tmp'F.GetTempFilename2 cfg_name
           {}(⊂json)F.NPUT tmp 1
           {}F.DeleteFile path2config
-          {}path2config(⎕NMOVE home.Reg.ExecNfunction)tmp
+          {}path2config(⎕NMOVE home.Reg.F.ExecNfunction)tmp
           _fileTimestamp←GetFileTimestamp _path2config
       :EndIf
     ∇
@@ -327,7 +341,7 @@
     ∇ {r}←MakeDefaultFile flag;defaultFolder
       :Access Public Instance
       ⍝ Checks whether the current file is in a non-standard location. If that it the case it will create or overwrite
-      ⍝ any file `.tatin` in the default folder, and add the path to the current user settings file to it.
+      ⍝ any file `.tatin` in the default folder, and add the path to the current user settings file.
       r←0
       :If flag
           defaultFolder←AddSlash home.GetUserHomeFolder''
@@ -347,6 +361,7 @@
       ns.source←_source
       ns.caching←_caching
       ns.path2cache←_path2cache
+      ns.license←_license
       r←home.Reg.JSON ns
     ∇
 
@@ -381,6 +396,10 @@
     ⍝ Reads the Client's config file
       r←⍬
       ns←⎕NS home.Reg.GetJsonFromFile path2config
+      :If 0=ns.⎕NC'license'
+          ⍝ Introduced in 2023-02
+          ns.license←''
+      :EndIf
       ns.registries.uri←{f←'\\'≡2⍴⍵ ⋄ AddSlash(f/'\\'),##.F.EnforceSlash(2×f)↓⍵}¨ns.registries.uri
       :If 0<≢ns.registries
           :If {(≢∪⍵)≠≢⍵}ns.registries.(uri alias)
@@ -407,6 +426,8 @@
               (b/_registries).{⎕THIS.noCaching←⍵}0  ⍝ Was introduced in 0.63.0
           :EndIf
       :EndIf
+      _source←ns.source
+      _license←ns.license
     ∇
 
     ∇ r←GetFileTimestamp filename

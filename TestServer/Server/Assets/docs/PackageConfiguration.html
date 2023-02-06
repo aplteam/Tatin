@@ -31,22 +31,24 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li><a href="#deprecate_comment">2.3.4. deprecate_comment</a></li>
 <li><a href="#description">2.3.5. description</a></li>
 <li><a href="#documentation">2.3.6. documentation</a></li>
-<li><a href="#GetFullPath2AssetsFolder">2.3.7. GetFullPath2AssetsFolder</a></li>
-<li><a href="#group">2.3.8. group</a></li>
-<li><a href="#lx">2.3.9. lx</a></li>
-<li><a href="#maintainer">2.3.10. maintainer</a></li>
-<li><a href="#minimumAplVersion">2.3.11. minimumAplVersion</a></li>
-<li><a href="#name">2.3.12. name</a></li>
-<li><a href="#os_win">2.3.13. os_win</a></li>
-<li><a href="#os_mac">2.3.14. os_mac</a></li>
-<li><a href="#os_lin">2.3.15. os_lin</a></li>
-<li><a href="#project_url">2.3.16. project_url</a></li>
-<li><a href="#source">2.3.17. source</a></li>
-<li><a href="#tags">2.3.18. tags</a></li>
-<li><a href="#userCommandScript">2.3.19. userCommandScript</a></li>
-<li><a href="#version">2.3.20. version</a></li>
-<li><a href="#SysVars">2.3.21. APL System variables: ⎕IO and ⎕ML</a></li>
-<li><a href="#Injected-values">2.3.22. Injected values</a>
+<li><a href="#files">2.3.7. files</a></li>
+<li><a href="#GetFullPath2AssetsFolder">2.3.8. GetFullPath2AssetsFolder</a></li>
+<li><a href="#group">2.3.9. group</a></li>
+<li><a href="#license">2.3.10. license</a></li>
+<li><a href="#lx">2.3.11. lx</a></li>
+<li><a href="#maintainer">2.3.12. maintainer</a></li>
+<li><a href="#minimumAplVersion">2.3.13. minimumAplVersion</a></li>
+<li><a href="#name">2.3.14. name</a></li>
+<li><a href="#os_win">2.3.15. os_win</a></li>
+<li><a href="#os_mac">2.3.16. os_mac</a></li>
+<li><a href="#os_lin">2.3.17. os_lin</a></li>
+<li><a href="#project_url">2.3.18. project_url</a></li>
+<li><a href="#source">2.3.19. source</a></li>
+<li><a href="#tags">2.3.20. tags</a></li>
+<li><a href="#userCommandScript">2.3.21. userCommandScript</a></li>
+<li><a href="#version">2.3.22. version</a></li>
+<li><a href="#SysVars">2.3.23. APL System variables: ⎕IO and ⎕ML</a></li>
+<li><a href="#Injected-values">2.3.24. Injected values</a>
 </li></ul></li>
 </li></ul></li>
 </ul>
@@ -221,15 +223,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="assets">2.3.2. assets</h4>
 </a>
 </div>
-<p>If this is empty then the package has no assets.</p>
-<p>Instead it can point to a single file (typically <code>LICENSE</code>) or a folder or several files and folders, separated by a comma.</p>
-<p>Any folder must be relative to the package since the folder is part of the package. For that reason, folders may not contain a “<code>:</code>” under Windows, and not start with “<code>/</code>”. If one does anyway an error is thrown.</p>
+<p>If this is empty then the package has no assets. Instead it can point to a folder hosting assets.</p>
+<p>The folder must be relative to the package since the folder is part of the package. For that reason, a folder may not contain a “<code>:</code>”, and not start with “<code>/</code>”. If one does anyway an error is thrown.</p>
 <p>There is one exception: when an absolute path is specified but it's partly identical to what will become <code>HOME</code> (the folder where the package lives) then Tatin removes that part silently, making it effectively relative.</p>
 <p>Notes:</p>
 <ul>
-<li>When the package configuration file is written to disk the existence of any assets is checked. If one does not exist an error is thrown.
+<li>When the package configuration file is written to disk the existence of “assets” is checked. If it's not a folder an error is thrown.
 <p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> function.</p></li>
-<li>The assets\ folder must be considered read-only. Never write to it from a package!</li>
+<li>The <code>assets\</code> folder must be considered read-only. Never write to it from a package!</li>
+<li>Watch out for the convention regarding a file “LICENSE” in the root of a project; refer to the “Server-TipsAndTricks” document for details</li>
+<li>Check the “<a href="#files" class="bookmark_link">files</a>” property for files like “ReadMe.txt” and the like</li>
+<li>A file named “LICENSE” in the root of a project will always be copied to the root of a package</li>
 </ul>
 <div class="leanpub_A">
 <h3>Accessing assets from a class instance</h3>
@@ -286,8 +290,24 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </ul>
 <p>Content that does not qualify for one of these options will be rejected.</p>
 <div class="h_tag">
+<a href="#files" id="files" class="autoheader_anchor">
+<h4 data-id="files">2.3.7. files</h4>
+</a>
+</div>
+<p>You might want to get one or more specific files into the root of the package although they are not really assets.</p>
+<p>Typical examples are “LICENSE” and “ReadMe.[md|txt|html]”. Strictly speaking they are not assets because the package will still function perfectly well without them. Also, you want them to go to the root of the project, not into a sub-folder, so that they stand out.</p>
+<p>That can be achieved by adding them to the “files” property. This can be one of:</p>
+<ul>
+<li>Absend</li>
+<li>Empty</li>
+<li>A single file</li>
+<li>A comma-separated list of files</li>
+</ul>
+<p>Note that if it specifies a sub-folder <code>BuildPackage</code> will copy the file from that project-specific sub-folder to the root of the package.</p>
+<p>See als “<a href="#assets" class="bookmark_link">assets</a>”.</p>
+<div class="h_tag">
 <a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
-<h4 data-id="GetFullPath2AssetsFolder">2.3.7. GetFullPath2AssetsFolder</h4>
+<h4 data-id="GetFullPath2AssetsFolder">2.3.8. GetFullPath2AssetsFolder</h4>
 </a>
 </div>
 <p>In case <a href="#assets" class="bookmark_link"><code>assets</code></a> is not empty this function returns a simple char vector that represents the <em>full path</em> to the assets, using something like:</p>
@@ -299,14 +319,24 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </ul>
 <div class="h_tag">
 <a href="#group" id="group" class="autoheader_anchor">
-<h4 data-id="group">2.3.8. group</h4>
+<h4 data-id="group">2.3.9. group</h4>
 </a>
 </div>
 <p>The group part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <p>A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.</p>
 <div class="h_tag">
+<a href="#license" id="license" class="autoheader_anchor">
+<h4 data-id="license">2.3.10. license</h4>
+</a>
+</div>
+<p>This might be empty, but you might be unable to publish a package to a Tatin Registry then. It depends on the licenses tolerated by a Registry.</p>
+<p>Not that you may specify a default license in your user settings:</p>
+<pre><code>]TATIN.UserSettings -edit</code></pre>
+<p>At the bottom there are defaults defined for <code>license</code>, <code>source</code> etc.</p>
+<p>The user command <code>]Tatin.GetLicenses</code> and the API function <code>⎕SE.Tatin.GetLicenses</code> can be used to fetch a list with all licenses tolerated by a Tatin Registry.</p>
+<div class="h_tag">
 <a href="#lx" id="lx" class="autoheader_anchor">
-<h4 data-id="lx">2.3.9. lx</h4>
+<h4 data-id="lx">2.3.11. lx</h4>
 </a>
 </div>
 <p>This is optional: it may or may not exist, and it might be empty if it does exist\.</p>
@@ -322,7 +352,7 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>Note that the existence of a variable <code>LX</code> indicates that there was an <code>lx</code> function successfully executed.</p>
 <div class="h_tag">
 <a href="#maintainer" id="maintainer" class="autoheader_anchor">
-<h4 data-id="maintainer">2.3.10. maintainer</h4>
+<h4 data-id="maintainer">2.3.12. maintainer</h4>
 </a>
 </div>
 <p>This may be left empty. If set it must be an email address.</p>
@@ -334,37 +364,37 @@ your.name@your-domain.com</code></pre>
 <p>If this is empty the server will, when the package is published, check whether there is a group home page. If that's the case then there is an email address associated with that group, and that email address is then assigned to <code>maintainer</code>.</p>
 <div class="h_tag">
 <a href="#minimumAplVersion" id="minimumAplVersion" class="autoheader_anchor">
-<h4 data-id="minimumAplVersion">2.3.11. minimumAplVersion</h4>
+<h4 data-id="minimumAplVersion">2.3.13. minimumAplVersion</h4>
 </a>
 </div>
 <p>A character vector that must contain something like “18.0”. 18.0 is the minimum version for any Tatin package, for Tatin itself needs at least version 18.0.</p>
 <div class="h_tag">
 <a href="#name" id="name" class="autoheader_anchor">
-<h4 data-id="name">2.3.12. name</h4>
+<h4 data-id="name">2.3.14. name</h4>
 </a>
 </div>
 <p>The name part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
 <div class="h_tag">
 <a href="#os_win" id="os_win" class="autoheader_anchor">
-<h4 data-id="os_win">2.3.13. os_win</h4>
+<h4 data-id="os_win">2.3.15. os_win</h4>
 </a>
 </div>
 <p>A Boolean; a 1 means that the package runs under Windows.</p>
 <div class="h_tag">
 <a href="#os_mac" id="os_mac" class="autoheader_anchor">
-<h4 data-id="os_mac">2.3.14. os_mac</h4>
+<h4 data-id="os_mac">2.3.16. os_mac</h4>
 </a>
 </div>
 <p>A Boolean; a 1 means that the package runs under Mac-OS.</p>
 <div class="h_tag">
 <a href="#os_lin" id="os_lin" class="autoheader_anchor">
-<h4 data-id="os_lin">2.3.15. os_lin</h4>
+<h4 data-id="os_lin">2.3.17. os_lin</h4>
 </a>
 </div>
 <p>A Boolean; a 1 means that the package runs under Linux.</p>
 <div class="h_tag">
 <a href="#project_url" id="project_url" class="autoheader_anchor">
-<h4 data-id="project_url">2.3.16. project_url</h4>
+<h4 data-id="project_url">2.3.18. project_url</h4>
 </a>
 </div>
 <p>A URL that points to something like GitHub.</p>
@@ -372,7 +402,7 @@ your.name@your-domain.com</code></pre>
 <p>It's supposed to point to a place on the Web where the project that the package was built from is hosted.</p>
 <div class="h_tag">
 <a href="#source" id="source" class="autoheader_anchor">
-<h4 data-id="source">2.3.17. source</h4>
+<h4 data-id="source">2.3.19. source</h4>
 </a>
 </div>
 <p>This defines the source code file(s) that are going to be part of the package.</p>
@@ -381,9 +411,12 @@ your.name@your-domain.com</code></pre>
 <p>The <code>.dyalog</code> extension is supported for limited backward compatibility — Tatin does not guarantee complete compatibility with SALT. The <code>.dyalog</code> extension is still used by the user command framework, therefore Tatin must support it: a user command might well be delivered as a Tatin package. Note that outside this context using this extension is not encouraged.</p>
 <p>If <code>source</code> is a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.</p>
 <p><code>source</code> must be relative to the root of the package.</p>
+<p>Not that you may specify a default source in your user settings:</p>
+<pre><code>]TATIN.UserSettings -edit</code></pre>
+<p>At the bottom there are defaults defined for <code>license</code>, <code>source</code> etc.</p>
 <div class="h_tag">
 <a href="#Cider-and-Tatin" id="Cider-and-Tatin" class="autoheader_anchor">
-<h5 data-id="Cider-and-Tatin">2.3.17.1. Cider and Tatin</h5>
+<h5 data-id="Cider-and-Tatin">2.3.19.1. Cider and Tatin</h5>
 </a>
 </div>
 <p>If you manage a project with Cider then you might wonder why both have a property <code>source</code> in their configuration file. The reason is that the Cider config file describes what's going on in the project while the Tatin package config files describe what is going on in the package that will eventually be consumed by a user.</p>
@@ -417,7 +450,7 @@ your.name@your-domain.com</code></pre>
 <p>Of course, one could rearrange the code and copy <code>APLSource/Goo/*</code> from the project into <code>Goo/</code> in the package. That would get rid of one level that is not required in the package, and <code>source</code> in the package config file could be just <code>Goo</code>.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
-<h4 data-id="tags">2.3.18. tags</h4>
+<h4 data-id="tags">2.3.20. tags</h4>
 </a>
 </div>
 <p>A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tags (keywords). These can be helpful to filter packages when searching for a solution to a particular problem.</p>
@@ -427,14 +460,14 @@ your.name@your-domain.com</code></pre>
 <p>Note that people in charge of the principal Tatin server will have an eye on the tags, and might silently correct them to keep them consistent and meaningful.</p>
 <div class="h_tag">
 <a href="#userCommandScript" id="userCommandScript" class="autoheader_anchor">
-<h4 data-id="userCommandScript">2.3.19. userCommandScript</h4>
+<h4 data-id="userCommandScript">2.3.21. userCommandScript</h4>
 </a>
 </div>
 <p>If a package is a user command then this must contain the path to the user command script relative to the projects root. <code>InstallPackages</code> uses this to identify a user command script and to move it from the source folder (if any) to the root of the install folder.</p>
 <p>This optional flag was introduced with version 0.86.0. It might not exist in older versions of a package. If it does not exist then Tatin assumes that the package in question is not a user command.</p>
 <div class="h_tag">
 <a href="#version" id="version" class="autoheader_anchor">
-<h4 data-id="version">2.3.20. version</h4>
+<h4 data-id="version">2.3.22. version</h4>
 </a>
 </div>
 <p>The version[<a href="#fnref2" class="footnote_link"><sup>2</sup></a>] part of the package ID[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]</p>
@@ -447,19 +480,19 @@ your.name@your-domain.com</code></pre>
 <p>For details see the <a href="./SemanticVersioning.html" class="external_link" title="SemanticVersioning.html">Tatin and Semantic Versioning</a> document.</p>
 <div class="h_tag">
 <a href="#SysVars" id="SysVars" class="autoheader_anchor">
-<h4 data-id="SysVars">2.3.21. APL System variables: ⎕IO and ⎕ML</h4>
+<h4 data-id="SysVars">2.3.23. APL System variables: ⎕IO and ⎕ML</h4>
 </a>
 </div>
 <p>By default the config namespace carries the values of the two Dyalog parameters <code>default_io</code> and <code>default_ml</code> for the system variables <code>⎕IO</code> and <code>⎕ML</code>.</p>
 <p>Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the <code>LoadPackages</code> or the <code>LoadDependencies</code> function <em>before</em> any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.</p>
 <div class="h_tag">
 <a href="#Injected-values" id="Injected-values" class="autoheader_anchor">
-<h4 data-id="Injected-values">2.3.22. Injected values</h4>
+<h4 data-id="Injected-values">2.3.24. Injected values</h4>
 </a>
 </div>
 <div class="h_tag">
 <a href="#date" id="date" class="autoheader_anchor">
-<h5 data-id="date">2.3.22.1. date</h5>
+<h5 data-id="date">2.3.24.1. date</h5>
 </a>
 </div>
 <p>The user must not specify “date”, but when a package is published the server will inject “date” as a timestamp in the format <code>yyyymmdd.hhmmss</code>.</p>
@@ -475,7 +508,7 @@ group-name-1.1.0-FixFor234</code></pre>
 <p>Since packages, once published, cannot be altered, it is safe to assume that the publishing date determines the correct order. However, as long as the version consists of just digits and dots, and possibly a build number, <code>date</code> does not play a role in determining precedence.</p>
 <div class="h_tag">
 <a href="#url" id="url" class="autoheader_anchor">
-<h5 data-id="url">2.3.22.2. url</h5>
+<h5 data-id="url">2.3.24.2. url</h5>
 </a>
 </div>
 <ul>

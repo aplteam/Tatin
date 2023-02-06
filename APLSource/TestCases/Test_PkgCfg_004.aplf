@@ -10,26 +10,27 @@
  (src zip)←(⊂dir,'/'),¨'src' 'reg'
  F.MkDir src zip
 
- (⊂'first')F.NPUT dir,'/first.dll'
- (⊂'second')F.NPUT dir,'/second.dll'
+ F.MkDir(739⌶0),'/',⊃⎕SI
+ (⊂'first')F.NPUT(739⌶0),'/',(⊃⎕SI),'/first.dll'
 
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Foo' '0.1.0'
  cfg.source←'Foo.apln'
  cfg.api←'Foo'
- cfg.assets←dir∘,¨'/first.dll' '/second.dll'
+ cfg.assets←dir,'/first.dll'
  cfg.os_win←1
  :Trap 998
      TC.WritePackageConfigFile src cfg
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.GoToTidyUp'"assets" must be addressed by relativ path(s)'≢qdmx.EM
+     →T.GoToTidyUp'"assets" must be addressed by a relativ path'≢qdmx.EM
  :EndTrap
 
  r←T._OK
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir dir
+ F.DeleteFile(739⌶0),'/',(⊃⎕SI),'/first.dll'
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

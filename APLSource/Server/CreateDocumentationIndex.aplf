@@ -1,11 +1,12 @@
  response←CreateDocumentationIndex request;html;specialMsg;html2;h2;offset;length;sf;options;html3
 ⍝
- html←HtmlHeader'<style>body{max-width: 700px;}</style>'
+ html←HtmlHeader''
  html2←⊃F.NGET(StaticFolder,'docs/_ReadMe.html')1
  h2←{row←1⍳⍨∨/¨'<h2 '∘⍷¨⍵ ⋄ row⊃⍵}html2
  offset←¯1+{1⍳⍨∨/¨'<div class="h_tag">'∘⍷¨⍵}html2
  length←{1⍳⍨∨/¨'</div>'∘⍷¨⍵}offset↓html2
  html2←(length+offset)↓html2
+ html2←(¯1+html2⍳⊂'</body>')↑html2
  html2←1↓⊃,/(⎕UCS 13),¨(⊂h2),(AddSpecialMessage ⍬),html2
  sf←'<div[^>]*>\r<a[^>]*>\r(<h3[^>]*>[^<]*<\/h3>)\r</a>\r</div>'  ⍝ sf = search for
  options←('Greedy' 0)('Mode' 'D')('DotAll' 1)
@@ -16,7 +17,6 @@
  html2←sf ⎕R'\1Opens \2 in a new Tab" target=_blank'⍠options⊣html2
  html2←(⎕UCS 13)A.Split html2
  html,←html2
- html←'</body'{⍵↑⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html
  html,←GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

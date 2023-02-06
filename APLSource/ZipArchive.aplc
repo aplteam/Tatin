@@ -26,11 +26,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'ZipArchive' '1.0.0+15' '2022-06-13'
+      r←'ZipArchive' '1.0.1+16' '2023-02-06'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.0.1 from 2023-02-06
+    ⍝   * `UnzipTo` is more resilient under Linux now
     ⍝ * 1.0.0 from 2022-06-13
     ⍝   * First version ready for production
     ∇
@@ -234,11 +236,16 @@
           ⍝ therefore we trap the error and just compare the number of files in the archive with what we've got.
           :Trap 11
               (rc msg)←Exec'unzip -o -qq ',zipFilename,(0<≢targetFolder)/' -d ',targetFolder
-              Assert 0=rc
           :Else
               qdmx←⎕DMX
               qdmx.Message ⎕SIGNAL qdmx.EN
           :EndTrap
+          :If rc≠0
+              :If rc≠2
+              :OrIf ~(ListZipContents zipFilename){(∧/⍺∊⍵)∧∧/⍵∊⍺}(1+≢targetFolder)↓¨⊃F.Dir targetFolder,'/*'
+                  msg Assert 0=rc
+              :EndIf
+          :EndIf
           ⍝ On my Ubuntu VM under Hyper-V I get files and dirs with no priviliges, so defaults need to be established:
           {}{Exec'chmod 666 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListFiles targetFolder,'/'
           {}{Exec'chmod 777 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListDirs targetFolder,'/'

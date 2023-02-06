@@ -1,4 +1,4 @@
- (rc msg)←RmDirByForce path;r;buff;flag;i
+ (rc msg)←RmDirByForce path;r;buff;flag;i;os;max
 ⍝ Removes files and directories by force no matter what, inlcuding files that has the read-only flag set.\\
 ⍝ Notes:
 ⍝ * If `path` does not exist `(0 'Directory does not exist')` is returned
@@ -18,16 +18,20 @@
      rc←1
      msg←'Not a directory'
  :Else
+     os←⎕C APLTreeUtils2.GetOperatingSystem ⍬
+     max←5+3×os≢'win'
      :Repeat
-         :Select APLTreeUtils2.GetOperatingSystem ⍬
-         :Case 'Win'
-             buff←∊⎕SH'rmdir /s /q "',(path~'"'),'"'
-         :Else
-             buff←∊⎕SH'rm -f -r "',(path~'"'),'"'
-         :EndSelect
+         :Trap 11
+             :Select os
+             :Case 'win'
+                 buff←∊⎕SH'rmdir /s /q "',(path~'"'),'"'
+             :Else
+                 buff←∊⎕SH'rm -f -r "',(path~'"'),'"'
+             :EndSelect
+         :EndTrap
          flag←i←0
          :If 0≠rc←⎕NEXISTS path
-             :If 5=i←i+1
+             :If max=i←i+1
                  :If 0=≢msg←buff
                      msg←'Removing directory failed'
                  :EndIf

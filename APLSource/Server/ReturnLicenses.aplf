@@ -1,0 +1,37 @@
+ response←ReturnLicenses request;data;response;html;path;txt;html2;ns;names;urls
+⍝ Returns information regarding the licenses tolerated by the server, if any.
+ :If IsJsonRequest request.Headers
+     :If G.INI.Exist'LICENSE'
+         data←G.INI.Get'LICENSE:'
+     :AndIf 0<≢⊃data[1;2]
+         response←R.NewResponse request
+         response.StatusCode←200
+         :If (,'1')≡,request R.GetQueryParameter'verbose'
+             response←request ReturnJSON Reg.JSON data
+         :Else
+             response←request ReturnJSON Reg.JSON 2⊃data[1;]
+         :EndIf
+     :EndIf
+ :Else
+     html←HtmlHeader''
+     html,←⊂'<h2>Licenses</h2>'
+     html,←AddSpecialMessage ⍬
+     html,←⊂'<div style="max-width: 1000px;">'
+     path←G.HTDOCS,'Assets/snippets/'
+     txt←⊃F.NGET(path,'Licensing.md')1
+     (html2 ns)←##.MarkAPL.Markdown2HTML txt
+     'Converting License markdown failed'Reg.Assert ns.report
+     html,←html2
+     names←⊃G.INI.Get'LICENSE:names'
+     urls←⊃G.INI.Get'LICENSE:urls'
+     (html2 ns)←##.MarkAPL.Markdown2HTML urls{'* [',⍵,'](',⍺,')'}¨names
+     'Converting License markdown failed'Reg.Assert ns.report
+     html,←html2
+     html,←⊂'</div>'
+     html←'</body'{⍵↑⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html
+     html,←GetFooter
+     html,←⊂'</body>'
+     html,←⊂'</html>'
+     response←request ReturnHTML html
+ :EndIf
+⍝Done

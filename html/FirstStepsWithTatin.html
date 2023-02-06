@@ -260,7 +260,7 @@ MarkAPL.aplc</code></pre>
 <p>The file <code>apl-package.json</code> describes the MarkAPL package:</p>
 <pre><code>{
   api: "MarkAPL",
-  assets: "Files/",
+  assets: "Files",
   date: 20210725.153851,
   description: "Converts Markdown to HTML5",
   documentation: "",
@@ -290,7 +290,7 @@ MarkAPL.aplc</code></pre>
 <h4 data-id="Assets">4.1.4. Assets</h4>
 </a>
 </div>
-<p>Note that the file <code>apl-package.json</code> specifies <code>assets: "Files/"</code>. That means that all assets are to be found in the <code>Files/</code> sub directory.</p>
+<p>Note that the file <code>apl-package.json</code> specifies <code>assets: "Files"</code>. That means that there are assets, and that they can be found in the <code>Files/</code> sub directory.</p>
 <p>In case of MarkAPL these are a bunch of CSS and HTML files:</p>
 <pre><code>BlackOnWhite_print.css
 BlackOnWhite_screen.css
@@ -529,7 +529,7 @@ aplteam-Foo-1.1.1</code></pre>
 </div>
 <p>This is a function which returns the result of the expression <code>HOME,'/',ASSETS</code> if both <code>HOME</code> and <code>ASSETS</code> are not empty <em>and</em> <code>HOME</code> exists on disk. If <code>HOME</code> is empty or does not exist on disk then just <code>ASSETS</code> is returned.</p>
 <p>When accessing assets you are advised to always use the <code>GetFullPath2AssetsFolder</code> function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set <code>⎕WSID</code> and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even on a different machine. The expression <code>HOME,'/',ASSETS</code> would then fail.</p>
-<p>The function would not find <code>HOME</code> and there return just <code>ASSETS</code>, and that allows you to still access the assets sucessfully.</p>
+<p>In such a case the function would not find <code>HOME</code> and therefore return just <code>ASSETS</code>, and that allows you to still access the assets sucessfully.</p>
 <div class="h_tag">
 <a href="#HOME" id="HOME" class="autoheader_anchor">
 <h5 data-id="HOME">4.5.3.5. HOME</h5>

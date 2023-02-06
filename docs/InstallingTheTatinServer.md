@@ -308,7 +308,7 @@ The server checks the INI file for having been changed, and if that is the case 
 
 ## Assets
 
-What kind of actions needs to be taken, if any, is revealed by the release notes. Typically the subfolder `docs/` needs to be replaced: this folder carries the documentation.
+What kind of actions need to be taken, if any, is revealed by the release notes. Typically the subfolder `docs/` needs to be replaced: this folder carries the documentation.
 
 ## The folder Maintenance/
 

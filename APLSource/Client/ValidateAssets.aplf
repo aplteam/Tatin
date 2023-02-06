@@ -1,7 +1,16 @@
- ValidateAssets←{
-     msg←'"',⍺,'" must be addressed by relativ path(s)'
-     msg Assert'/'≠1⍴⍵:
-     msg Assert'./'≢2⍴⍵:
-     msg Assert~':'∊⍵:      ⍝ Though on non-Windows platforms the colon might be part of a path we don't allow this anyway
-     1:shy←0
- }
+ {r}←x ValidateAssets y;msg
+ r←0
+ :If {⍺≡(≢⍺)↑⍵}/F.EnforceSlash¨x y
+     y←(≢x)↓y
+ :EndIf
+ :If 0<≢y
+     msg←'"assets" must be addressed by a relativ path'
+     msg Assert'/'≠1⍴y
+     msg Assert'./'≢2⍴y
+     ⍝ Though on non-Windows platforms the colon might be part of a path we don't allow this anyway
+     msg Assert~':'∊y
+     :If ~F.IsDir x,y
+         '"assets" must be a folder but does not exist'Assert F.IsDir 1⊃⎕NPARTS x,y
+     :EndIf
+ :EndIf
+⍝Done

@@ -10,6 +10,23 @@
 
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
+## Version 0.89.0 from 2023-02-07
+
+Affects only ther server; there are no changes in the client.
+
+**If you run a Tatin server then you must check your INI file!**
+
+* The `Secure` property in the INI file now rules just the protocol the server is running: 1 makes it use https while a 0 makes it use http, though only when `port` is zero, which is usually the case
+
+  This effects only the communication as such, **not** the protocol of the base tag.
+
+* The `base` property now must define both the protocol and the domain name but not a specific port.
+
+  This rolls back a change that was (wrongly) introduced with version 0.81.0
+
+Note that this version will throw an error in case `base` does not define both protocol and domain name.
+
+
 ## Version 0.88.0 from 2023-02-06
 
 * New INI category `[LICENSE]` added for licenses, see the INI template

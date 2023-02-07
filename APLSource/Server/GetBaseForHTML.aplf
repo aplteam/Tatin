@@ -1,15 +1,9 @@
  r←GetBaseForHTML;port
  r←⊃G.INI.Get'Config:Base'
+ ##.Registry.Assert 1=≢'http[s]?://'⎕S 0⊣r  ⍝ MUST define the protocol
  :If G.INI.Exist'Config:BaseTagPort'
      port←⊃G.INI.Get'Config:BaseTagPort'
  :AndIf 0≠port
      r,←':',⍕port
  :EndIf
-⍝ Originally (until version 0.80.0) this INI entry came (wrongly) WITH
-⍝ the protocol which should be defined be the INI "Secure" flag instead.
-⍝ Therefore we remove the protocol in case somebody did not amend the INI file:
- r←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}r
- r←'http://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}r
-⍝ Now we let "Secure decide which protocol to use:
- r←'http',('s'/⍨G.INI.Get'Config:Secure'),'://',r
 ⍝Done

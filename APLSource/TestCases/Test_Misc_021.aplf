@@ -1,4 +1,4 @@
- r←Test_Misc_021(stopFlag batchFlag);⎕TRAP;dir;orig;buff;new;files
+ r←Test_Misc_021(stopFlag batchFlag);⎕TRAP;dir;orig;buff;new;fileList
 ⍝ Exercise `ReInstallDependencies`
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -9,8 +9,8 @@
  buff←TC.ReInstallDependencies dir
  new←F.ListDirs dir,'/*'
  →T.PassesIf≡/∪¨{{⍵/⍨2>+\⍵='-'}⊃,/1↓⎕NPARTS ⍵}¨¨orig new
- files←F.ListFiles dir,'/*.zip'
- →T.PassesIf 2=≢files
+ fileList←F.ListFiles dir,'/*.zip'
+ →T.PassesIf 2=≢fileList
 
  r←T._OK
 

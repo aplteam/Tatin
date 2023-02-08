@@ -1,0 +1,8 @@
+ ValidateFiles←{
+⍝ Validate "files": must all be files, and must exist
+     path←⍺
+     files←','(≠⊆⊢)cfg.files
+     bool←F.IsFile path∘,¨files
+     ∧/bool:⍵
+     ('"files": ',(⊃{⍺,',',⍵}/(~bool)/files),' not found/not a directory')Assert 0
+ }

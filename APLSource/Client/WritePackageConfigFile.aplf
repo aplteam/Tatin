@@ -23,7 +23,8 @@
      cfg.license←MyUserSettings.license
  :EndIf
  cfg←ValidateMaintainer cfg
- ⍝ cfg←ValidateLicense cfg  ⍝  We cannot validate here, that's up to the server: it knows what to accepts and what not
+ cfg←path ValidateFiles cfg
+ ⍝ Note that we cannot validate the license, that's up to the server.
  'Invalid: "assets" - not a path'Assert~','∊cfg.assets
  cfg.assets←path PolishAssetsPaths cfg.assets
  path ValidateAssets cfg.assets

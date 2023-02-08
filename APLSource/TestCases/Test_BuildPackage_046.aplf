@@ -1,0 +1,34 @@
+ r←Test_BuildPackage_046(stopFlag batchFlag);⎕TRAP;qdmx
+ ;dir;src;dist;cfg;zipfile;ns;list;expected
+⍝ Package with "files" pointing to a direcotry
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←∆GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir(src,'/source')(src,'/FOO')dist
+
+ (⊂'foo1←{1}')F.NPUT src,'/source/foo1.apln'
+ (⊂'Bla')F.NPUT src,'/ReadMe'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_B'
+ cfg.version←'0.1.0+456'
+ cfg.files←'FOO,ReadMe'
+ cfg.source←'source'
+ cfg.os_win←1
+ :Trap 998
+     TC.WritePackageConfigFile src cfg
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'"files": FOO not found/not a directory'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+⍝Don

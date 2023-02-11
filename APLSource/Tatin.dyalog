@@ -652,11 +652,6 @@
           :Return
       :EndIf
       ('Is not a directory: ',installFolder)Assert TC.F.IsDir installFolder
-      :If ~Args.force
-          :If 0=TC.C.YesOrNo'Sure you want act on <',installFolder,'> ?'
-              :Return
-          :EndIf
-      :EndIf
       'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'
       deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
       'Dependency file is empty'Assert 0<≢deps

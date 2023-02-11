@@ -1,4 +1,4 @@
- success←old ReplaceFolderBy new;temp;flag;qdmx
+ success←old ReplaceFolderBy new;temp;flag;qdmx;msg;rc
 ⍝ Performs the following actions:
 ⍝ * Establish a temp name dynamically
 ⍝ * Rename "old" to "temp"
@@ -10,7 +10,7 @@
  flag←0
  :Repeat
      :Trap 19 22
-         temp ⎕NMOVE old
+         temp(⎕NMOVE F.ExecNfunction)old
          flag←1
      :Else
          qdmx←⎕DMX
@@ -19,15 +19,18 @@
          :EndIf
      :EndTrap
  :Until flag
- ⎕MKDIR old
+ F.MkDir old
  :Trap 0
-     old ⎕NCOPY⍠('Wildcard' 1)⊣new,'/*'
-     3 ⎕NDELETE new
+     old(⎕NCOPY⍠('Wildcard' 1)F.ExecNfunction)new,'/*'
+     {}F.RmDirByForce new
      success←1
  :Else                      ⍝ Roll back
-     3 ⎕NDELETE old
-     ⎕MKDIR old
-     old ⎕NMOVE⍠('Wildcard' 1)⊣temp,'/*'
+     {}F.RmDirByForce old
+     F.MkDir old
+     old(⎕NMOVE⍠('Wildcard' 1)F.ExecNfunction)temp,'/*'
      success←0
  :EndTrap
- 3 ⎕NDELETE temp
+ (rc msg)←F.RmDirByForce temp
+ :If rc≠0
+     ⎕←'*** Warning: removing ',temp,' failed but the re-installed worked!'   ⍝TODO⍝ This has failed a number of times, and we don't know yet why
+ :EndIf

@@ -1786,7 +1786,7 @@
               r,←⊂''
               r,←⊂'Requires two arguments:'
               r,←⊂' * Path to ZIP file or package folder'
-              r,←⊂' * URL or alias of a Registry or a "?"; you may or may not embrace it with []'
+              r,←⊂' * URL or alias of a Registry or a "?" (you may or may not embrace the "?" with [])'
               r,←⊂''
               r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
               r,←⊂'to the Tatin rules.'

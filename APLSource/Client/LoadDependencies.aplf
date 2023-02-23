@@ -1,18 +1,24 @@
- {r}←LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;principalFlag;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2;qdmx
-⍝ Requires two arguments:
+ {r}←{overwriteFlag}LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;principalFlag;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2;qdmx;isUC
+⍝ Requires at least one arguments but accepts up to two:
 ⍝ * Folder with a build list (mandatory)
-⍝ * Name of the target namespace
-⍝ You may specify an optional third argument: the `overwriteFlag` flag which defaults to 0.
+⍝ * Name of the target namespace\\
+⍝ If no target namespace was specified then by default packages are loaded into `#` excepts when the folder
+⍝ is `MyUCMDs` in which case they are loaded into `⎕SE.
+⍝ You may specify an optional left argument: `overwriteFlag` defaults to 0.
 ⍝ Use `overwriteFlag` in case all packages should be loaded even if they already exist in (#|⎕SE)._tatin\\
 ⍝ Loads all packages and injects required references into `targetSpace`.
 ⍝ Returns a vector with references to the loaded packages (no dependencies, principal packages only).
- 'Length error on right argument'Assert(≢y)∊2 3
- 'Invalid right argument'Assert 2=|≡y
- (installFolder targetSpace overwriteFlag)←3↑y,0
- :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
-     installFolder←GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+ overwriteFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'overwriteFlag'
+ 'Length error on right argument'Assert(≢y)∊1 2
+ (installFolder targetSpace)←2↑(⊆y),⊆''
+ :If isUC←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+     'You MUST NOT specify anything after [MyUCMDs]'Assert(≢'[myucmds]')=≢installFolder
+     installFolder←GetMyUCMDsFolder'/packages/'
  :EndIf
  ('Folder does not exist:',⍕installFolder)Assert ⎕NEXISTS installFolder
+ :If 0=≢targetSpace
+     installFolder←(1+isUC)⊃'#' '⎕SE'
+ :EndIf
  r←refs←⍬
  targetSpace←⍕targetSpace
  :If 0=⎕NC targetSpace

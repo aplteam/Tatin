@@ -334,11 +334,9 @@ Each item must be one of:
 * a folder holding a package (like file://C:\Temp\group-name-version\\)
 * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\\{group}-{name}-{major.minor.patch})
 * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.
-* The internal alias `[MyUCMDs]` (case independent); this will then be replaced by the actual path to the MyUCMDs/ folder while the name of the sub-folder is derived from the package ID.
+* The internal alias `[MyUCMDs]` (case independent); this will then be replaced by the actual path to the `MyUCMDs/` folder followed by `/packages/`
 
-  Note that in this case you..
-  * **must not** specify anything after `[MyUCMDs]`
-  * can only install a single package at the time
+  Note that in this case you **must not** specify anything after `[MyUCMDs]`, otherwise an error is thrown.
 
 You may omit minor+patch or even major+minor+patch in order to install the latest version.
 
@@ -589,35 +587,38 @@ Note that the package ID might use any case, meaning that if the package's name 
 ### LoadDependencies
 
 ```
-{r}←LoadDependencies y
+{r}←{overwriteFlag} LoadDependencies y
 ```
 
 Loads all packages according to a build list in a folder.
 
-Requires two mandatory arguments:
+Requires one mandatory right argument and accepts up to two:
 
-* A folder with a build list
+* A source folder (a folder with a build list)
 * A target namespace
 
-You may specify an optional third argument: the `overwriteFlag` flag which defaults to 0.
+If the target namespace is not specified then it defaults to `#` except when `[MyUCMDs]` is specified as source folder: in that case it defaults to `⎕SE`.
 
-Use `overwriteFlag` in case all packages should be loaded even if they already exist in `(#|⎕SE)._tatin`
+The optional `overwriteFlag` flag defaults to 0. Use this in case all packages should be loaded even if they already exist in `#._tatin` or `⎕SE._tatin`.
 
-Loads all packages and injects required references into `targetSpace`.
-
-Returns a vector with references to the loaded packages (principal packages only, so no dependencies).
+Returns a vector with references to the loaded packages (principal packages only, not dependencies).
 
 #### MyUCMDs/
 
-In case a Tatin package is a Dyalog user command it can be installed in the special folder MyUCMDs/. Now where this folder lives depends on the operating system used.
+In case a Tatin package is a Dyalog user command it can be installed into the special folder `MyUCMDs/packages/`. Where `MyUCMDs/` lives depends on the operating system.
 
-However, if you want to load a user command "foo" from that folder you can do this:
+Note that all user commands installed as Tatin in that folder can be loaded at once with this statement:
 
 ```
-⎕SE.Tatin.LoadDependencies '[MyUCMDs]foo` ⎕SE
+⎕SE.Tatin.LoadDependencies '[MyUCMDs]`
 ```
 
-Note that `MyUCMDs` is case independent, so specifying `MYUCMDS` or `myucmds` will do as well.
+Notes:
+
+* `MyUCMDs` is case independent, so specifying `[MYUCMDS]` or `[myucmds]` will do as well
+* Where the folder `MyUCMDs/` lives depends on your operating system
+* The sub-folder `packages/` is added automatically after `MyUCMDs/`
+
 
 ### LoadPackages
 
@@ -764,6 +765,10 @@ Takes a path to a package and returns the config file for that package as a name
 `UnInstallPackage` attempts to un-install the package `packageID` and all its dependencies, but the latter only in case they are neither principal packages nor required by other packages.
 
 `folder` must host a Tatin dependency file. 
+
+`folder` must be either a path or the (case independent) symbolic name `[MyUCMDs]` 
+
+`[MyUCMDS]` would translate into `MyUCMDs/packages/`.
 
 `packageID` might be a full package ID but also <group>-<name> or just <name>. However, in case more than one package qualify an error is thrown.
 

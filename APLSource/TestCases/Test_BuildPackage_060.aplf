@@ -7,6 +7,7 @@
  path←∆GetProjectPath,'/TestData/Build/UserCommand/'
  cfg←TC.ReadPackageConfigFile path,'apl-package.json'
  zipFileName←TC.BuildPackage path tempPath''
+ TC.CommTools.YesOrNo_Answers←1 2⍴'Sure that you want to install:' 'y'
  res←TC.InstallPackages zipFileName'[myucmds]'
  →T.GoToTidyUp~F.IsFile TC.GetMyUCMDsFolder'APLGit2ForTests/APLGit2ForTests_UC.dyalog'
  res←TC.LoadDependencies'[myucmDS]/APLGit2ForTests' '⎕SE'
@@ -16,6 +17,7 @@
  r←T._OK
 
 ∆TidyUp:
+ TC.CommTools.Cleanup
  F.DeleteFile zipFileName
  (rc msg)←F.RmDirByForce tempPath
  msg Assert rc=0

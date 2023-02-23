@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.59.0 - 2023-02-06
+⍝ * 0.59.0 - 2023-02-23
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -512,28 +512,31 @@
       :EndIf
     ∇
 
-    ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag
+    ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag;isUCMD
       installFolder←Arg._1
+      isUCMD←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
       :If 0≡Arg._2
-          :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+          :If isUCMD
               targetSpace←'⎕SE'
           :Else
               :If 0=≢targetSpace←DefineTargetSpace'#'
-                  ⎕←'Cancelled by user'
-                  :Return
+                  →0 ⋄ ⎕←'Cancelled by user'
               :EndIf
           :EndIf
       :Else
           targetSpace←,Arg._2
       :EndIf
-      overwriteFlag←Arg.overwrite
-      :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
-          installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+      :If isUCMD
+          '[MyUCMDs] must stand on its own'Assert 0=≢(≢'[myucmds]')↓installFolder
+          installFolder←TC.GetMyUCMDsFolder'/packages/'
       :EndIf
+      overwriteFlag←Arg.overwrite
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
       f1←TC.F.IsDir installFolder
-      f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
-      ('Neither a folder nor a ZIP file: ',installFolder)Assert f1∨f2
+      :If ~isUCMD
+          f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
+          ('Neither a folder nor a ZIP file: ',installFolder)Assert f1∨f2
+      :EndIf
       :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
           '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
       :EndIf
@@ -543,7 +546,7 @@
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
-      r←TC.LoadDependencies installFolder targetSpace overwriteFlag
+      r←overwriteFlag TC.LoadDependencies installFolder targetSpace
       r←⍪r
     ∇
 
@@ -1149,7 +1152,7 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;buff;msg;rc;installFolder_;isUserCommand
+    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;msg;rc;installFolder_;isUserCommand;buff
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
@@ -1184,13 +1187,8 @@
           :EndIf
       :EndIf
       'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
-      :If '[myucmds]'{⍺≡(≢⍺)↑⍵}⎕C installFolder
-          buff←{⍵↓⍨⍵⍳']'}installFolder
-          'You must no specify a name with [MyUCMDs]'Assert 0=≢buff
-          'You can install only a single package into [MyUCMDs]'Assert~','∊identifier
-          buff←{(1<|≡⍵)∧1=≢⍵:⊃⍵ ⋄ 3=≢⍵:2⊃⍵ ⋄ ⎕D∊⍨⊃2⊃⍵:1⊃⍵ ⋄ 2⊃⍵}'-'(≠⊆⊢)TC.GetPackageIDFromFilename identifier
-          installFolder←TC.GetMyUCMDsFolder buff
-      :ElseIf './'≢2⍴installFolder
+      :If '[myucmds]'{⍺≢(≢⍺)↑⍵}⎕C installFolder
+      :AndIf './'≢2⍴installFolder
       :AndIf '/'≠1⍴installFolder
       :AndIf ~':'∊installFolder
           :If '['=1⍴installFolder
@@ -1667,16 +1665,13 @@
               r,←⊂''
               r,←⊂'Takes up to two arguments:'
               r,←⊂' [1] A folder into which one or more packages have been installed'
-              r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded; default is #'
+              r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded; default is # except'
+              r,←⊂'     when "folder" is [MyUCMDs] when the default is ⎕SE instead.'
               r,←⊂''
-              r,←⊂'Note that this user command also accepts something like:'
-              r,←⊂' ]LoadDependencies [MyUCMDs]Foo'
-              r,←⊂'It would replace [MyUCMDs] by the actual path to the MyUCMDs/ folder in your OS, and try to'
-              r,←⊂'find a folder or user command script "Foo" there.'
-              r,←⊂'Note also that in this special case the default for the second argument is ⎕SE rather than #.'
+              r,←⊂'Note that [MyUCMDs] does actually install into MyUCDMs/packages.'
               r,←⊂''
               r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
-              r,←⊂'            load by specifying the -overwrite flag.'
+              r,←⊂'            load operation by specifying the -overwrite flag.'
           :Case ⎕C'LoadTatin'
               r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
@@ -1763,6 +1758,8 @@
               r,←⊂'   * If there is just one project open it is taken'
               r,←⊂'   * If there are multiple Cider projects open the user is questioned'
               r,←⊂'   * If Cider is not available or no projects are open the current directory is checked'
+              r,←⊂'   The second argument may also be the symbolic name [MyUCMDs] (case independent).'
+              r,←⊂'   This would translate into MyUCMDs/packages.'
               r,←⊂'   For a relative path the user is always asked for confirmation.'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'

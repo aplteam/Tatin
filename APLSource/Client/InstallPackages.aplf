@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff;cfg;isUserCommand;firstFlag
+ r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff;cfg;isUserCommand;firstFlag;filename
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -9,18 +9,21 @@
 ⍝ * a folder holding a package (like file://C:\Temp\group-name-version\\)
 ⍝ * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch})
 ⍝ * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.\\
-⍝ * The internal alias [MyUCMDs] (case independent). In this case only a single package can be installed at the time.
+⍝ * The internal alias [MyUCMDs] (case independent). This installs the package(s) into a folder MyUCMDs/packages
 ⍝ You may omit minor+patch or even major+minor+patch in order to install the latest version.
 ⍝ By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as ⍺.\\
 ⍝ `←` Full name of principal packages finally loaded, including an alias if specified.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
-     'You can install just ONE package with [MyUCMDs]'Assert~','∊identifiers
      buff←{⍵↓⍨⍵⍳']'}targetFolder
-     'You MUST NOT specify a name after [MyUCMDs]'Assert 0=≢buff
-     buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}Reg.RemoveVersionNumber 2⊃1 ⎕NPARTS identifiers
-     targetFolder←(GetMyUCMDsFolder''),'/',buff
+     'You must not specify anything after [MyUCMDs]'Assert 0=≢buff
+     targetFolder←(GetMyUCMDsFolder''),'/packages/'
+     msg←'Sure that you want to install:',LF,'  ',(2⊃⎕NPARTS identifiers),LF,'into:',LF,'   ',targetFolder,LF,'?'
+     :If 0=CommTools.YesOrNo msg
+         ⎕←'Cancelled by user'
+         :Return
+     :EndIf
  :EndIf
  isUserCommand←∨/(F.EnforceSlash¨GetAllUserCommandFolder,¨'\'){⍺∊(≢¨⍺)↑¨⊂⍵}F.EnforceSlash targetFolder,'/'
  identifiers←','(≠⊆⊢)identifiers
@@ -33,9 +36,6 @@
          ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
          identifier←noBetas CheckVersion identifier
          packageID←GetPackageIDFromFilename identifier
-         :If isUserCommand
-             targetFolder←(1⊃⎕NPARTS targetFolder),{{⍵↑⍨¯1+⍵⍳'-'}⍵↓⍨⍵⍳'-'}packageID ⍝ Correct casing
-         :EndIf
          {}{'Unable to create target directory'Assert F.MkDir ⍵}⍣(firstFlag∧~F.IsDir targetFolder)⊢targetFolder
          :If 0=≢identifier    ⍝ Not found?
              PrintToSession'Not found: ',identifier_
@@ -59,15 +59,16 @@
          :EndIf
          PrintToSession'  Establish dependencies...'
          r,←targetFolder InstallPackage_ alias identifier
+         CloseConnections 0
          packageID←GetPackageIDFromFilename identifier
          cfg←ReadPackageConfigFile targetFolder,'/',packageID,'/',CFG_Name
          :If isUserCommand
-             ⍝ Move the user command script to the root of the User Command folder
-             targetFolder(⎕NMOVE Reg.F.ExecNfunction)targetFolder,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+             filename←⊃,/1↓⎕NPARTS cfg.userCommandScript
+             F.DeleteFile targetFolder,filename  ⍝ In case the user command is installed again
+             targetFolder(⎕NMOVE Reg.F.ExecNfunction)targetFolder,'/',packageID,'/',filename  ⍝ Move UC script to the root
          :EndIf
          firstFlag←0
      :EndFor
-     CloseConnections 0
  :Else
      qdmx←⎕DMX
      CloseConnections 1

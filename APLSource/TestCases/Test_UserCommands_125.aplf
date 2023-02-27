@@ -1,0 +1,23 @@
+ r←Test_UserCommands_125(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;list1;res;list2
+⍝ Exercise ]Tatin.InstallPackages on a folder that is not empty
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir'/'
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
+ tempDir ⎕NCOPY⍠('Wildcard' 1)⊢'./TestData/InstallFromList/*'
+ list1←(≢tempDir)↓¨⊃TC.F.Dir tempDir
+
+ (rc msg res)←∆UCMD'InstallPackages [localhost]versions ',tempDir
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+
+ list2←(≢tempDir)↓¨⊃TC.F.Dir tempDir
+ →T.GoToTidyUp≢/1 0+≢¨list1 list2
+ →T.GoToTidyUp~∧/list1∊list2
+ →T.GoToTidyUp 1≠+/'-versions-'⍷∊list2
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempDir
+⍝Done

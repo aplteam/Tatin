@@ -10,9 +10,19 @@
 
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
+## Version 0.90.0 from 2023-02-27
+
+This version comes with a number of breaking changes!
+
+Syntax and behaviour of `LoadDependencies` as well as `]LoadDependencies` have changed: The default space a package is loaded into depends on the argument: usually it's `#` (as before), but it will be `⎕SE` in case `[MyUCMDs]` is specified. 
+
+In addition the API function has changed in terms of its arguments.
+
+* Behaviour of the user command has changed
+
 ## Version 0.89.0 from 2023-02-07
 
-Affects only ther server; there are no changes in the client.
+Affects only the server; there are no changes in the client.
 
 **If you run a Tatin server then you must check your INI file!**
 

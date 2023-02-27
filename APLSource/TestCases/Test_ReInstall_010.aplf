@@ -1,0 +1,20 @@
+ r←Test_ReInstall_010(stopFlag batchFlag);⎕TRAP;zipFilename;installFolder;res;rc;msg
+⍝ Exercise `ReInstallDependencies on a user command package (install into [MyUCMDs])
+
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ installFolder←TC.GetMyUCMDsFolder'UC'
+ res←TC.InstallPackages zipFilename'[myucmdS]'
+ Assert'example-UC-1.0.0'≡∊res
+
+ res←TC.ReInstallDependencies'[myucmds]UC'∆GetServerRegistryFolder
+ →T.GoToTidyUp'example-UC-1.0.0'≢∊res
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce TC.GetMyUCMDsFolder'UC'
+ msg Assert rc=0
+⍝Done

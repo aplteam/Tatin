@@ -2,8 +2,8 @@
 ⍝ Requires at least one arguments but accepts up to two:
 ⍝ * Folder with a build list (mandatory)
 ⍝ * Name of the target namespace\\
-⍝ If no target namespace was specified then by default packages are loaded into `#` excepts when the folder
-⍝ is `MyUCMDs` in which case they are loaded into `⎕SE.
+⍝ If no target namespace was specified then by default packages are loaded into `#` except when the folder
+⍝ is `[MyUCMDs]` in which case they are loaded into `⎕SE.
 ⍝ You may specify an optional left argument: `overwriteFlag` defaults to 0.
 ⍝ Use `overwriteFlag` in case all packages should be loaded even if they already exist in (#|⎕SE)._tatin\\
 ⍝ Loads all packages and injects required references into `targetSpace`.
@@ -12,8 +12,7 @@
  'Length error on right argument'Assert(≢y)∊1 2
  (installFolder targetSpace)←2↑(⊆y),⊆''
  :If isUC←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
-     'You MUST NOT specify anything after [MyUCMDs]'Assert(≢'[myucmds]')=≢installFolder
-     installFolder←GetMyUCMDsFolder'/packages/'
+     installFolder←GetMyUCMDsFolder(≢'[myucmds]')↓installFolder
  :EndIf
  ('Folder does not exist:',⍕installFolder)Assert ⎕NEXISTS installFolder
  :If 0=≢targetSpace

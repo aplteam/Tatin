@@ -1,0 +1,28 @@
+{r}←{levels}RecreateFolder targetFolder;rc;flag;more;counter;max;targetFolder2
+⍝ Typically the right argument is `./Dist`. The folder will be removed and then created.\\
+⍝ `level` defaults to 1, meaning that only the very last level of the path is removed.\\
+⍝ Tries a maximum of 4 times with a delay in between when an error occurs.
+⍝ The loop was introduced because on some systems the first attempt often, the second attempt
+⍝ sometimes failed, but finally it would succeed.
+ r←⍬
+ targetFolder←F.NormalizePath targetFolder
+ levels←¯1+{0<⎕NC ⍵:⍎⍵ ⋄ 1}'levels'
+ targetFolder2←F.CurrentSep{1↓⊃,/⍺,¨⍵}(-levels)↓F.CurrentSep A.Split targetFolder
+ :If F.IsDir targetFolder2
+     max←4
+     counter←flag←0
+     :Repeat
+         counter+←1
+         (rc more)←F.RmDirByForce targetFolder2
+         :If rc=0
+             flag←1
+         :Else
+             ⎕DL 0.25
+         :EndIf
+     :Until flag∨max=counter
+     :If ~flag
+         (more,'; rc= ',⍕rc)Assert 0
+     :EndIf
+ :EndIf
+ 'Could not create the target folder'Assert'Create!'F.CheckPath targetFolder
+⍝Done

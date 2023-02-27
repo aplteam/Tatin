@@ -1,0 +1,52 @@
+ {body}←x AddBuildIDtoVersionSimple buildID;version;row;version2;fnsname;ref;rc;buff;offset;length;varsName;line;result;assignment;flag
+ ⍝ `x` can either be a reference pointing to a class, an Interface or a scripted namespace
+ ⍝ or the name of a function in an ordinary namespace.\\
+ ⍝ Generally `AddBuildIDtoVersionSimple` executes the `Version` function (⍺) if there is
+ ⍝ any. It then either adds the build ID (⍵, an integer) if there was not any yet
+ ⍝ or replaces it by the built ID given.
+ :If ¯1≡×⎕NC⊂⍕x                                  ⍝ Member of a class?
+ :OrIf {0::0 ⋄ 1⊣⎕SRC⍎⍵}¯1↓1⊃'.'A.SplitPath x    ⍝ Function in a scripted namespace?
+     x←⍎⊃{⍺,'.',⍵}/¯1↓'.'(≠⊆⊢)x
+ :EndIf
+ :If flag←0=≡x
+     body←⎕SRC ref←x
+     result←ref.Version
+     :If 0=≢buff←'∇ *[A-Za-z]←Version'⎕S 0 1 2⍠('Mode' 'L')('Greedy' 0)('IC' 1)⊣body
+         'Could not find function `Version`'⎕SIGNAL 6
+     :EndIf
+     (offset length row)←⊃buff   ⍝ There might be other `Version` functions but the first one is "ours"
+     varsName←{{⍵↑⍨¯1+⍵⍳'←'}' '~⍨⍵↓⍨⍵⍳'∇'}(row+1)⊃body
+     row+←2+⊃('\b',varsName,'←')⎕S 2⊣(1+row)↓body
+     version←{⍵↑⍨¯1+⍵⍳''''}{{⌽⍵/⍨2>+\''''=⍵}⌽⍵}row⊃body
+ :Else
+     ref←⍎¯1↓⊃'.'A.SplitPath fnsname←x
+     body←⎕NR fnsname
+     version←⍎fnsname
+     row←⊃¯1↑⍸∨/¨version∘⍷¨body
+ :EndIf
+ :If 2='.'+.=version
+     :If '+'∊version
+         version2←(version↑⍨version⍳'+'),⍕buildID
+     :Else
+         version2←version,'+',⍕buildID
+     :EndIf
+ :Else
+     :If 2<'.'+.=version
+         version[3⊃⍸'.'=version]←'+'
+     :EndIf
+     version2←({⍵↑⍨¯1+⍵⍳'+'}version),'+',⍕buildID
+ :EndIf
+ version←⊃,/(⊂'\.')@(⍸'.'=version)⊣version
+ version←⊃,/(⊂'\+')@(⍸'+'=version)⊣version
+ line←row⊃body
+ :If 2<'.'+.=line
+     line[3⊃⍸'.'=line]←'+'
+ :EndIf
+ line←('''',version,'''')⎕R('''',version2,'''')⊣line
+ (row⊃body)←line
+ :If flag
+     ref.##.⎕FIX body
+ :Else
+     ref.⎕FX body
+ :EndIf
+⍝Done

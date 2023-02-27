@@ -13,11 +13,12 @@
  →T.GoToTidyUp 0≠≢msg
 
  new←(1+≢dir)↓¨##.FilesAndDirs.ListDirs dir,'/'
- →T.GoToTidyUp~∧/(TC.Reg.RemoveMinorAndPatch¨new)∊TC.Reg.RemoveMinorAndPatch¨old
+ →T.GoToTidyUp~∧/(TC.Reg.RemoveMinorAndPatch¨old)∊TC.Reg.RemoveMinorAndPatch¨new
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
  #.⎕EX TC.GetTatinRootSpace'#'
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
 ⍝Done

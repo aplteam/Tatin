@@ -249,12 +249,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <pre><code>r←{level} FindDependencies (folder pkgList)
 </code></pre>
-<p>Scans <code>folder</code> recursively for the file “apl-dependencies.txt”. Folders with such a file will be scanned for packages defined in <code>pkgList</code>. Useful for finding out where one or more packages are used.</p>
+<p>Scans <code>folder</code> recursively for a file “apl-dependencies.txt”. Folders with such a file will be scanned for packages defined in <code>pkgList</code>. Useful for finding out where one or more packages are used.</p>
 <p><code>pkgList</code> must be a simple char vector with a list of comma-separated packages.</p>
-<p>The packages can be specified fully or partly. “Group” and “version” can be left out, while “Name” is mandatory. You may specify a major version but neither “Minor” nor “Patch”. If you do anyway anything after the major number will be ignored.</p>
+<p>The packages can be specified fully or partly. “Group” and “version” can be left out while “Name” is mandatory. You may specify a major version but “minor” and “patch” will be ignored when specified.</p>
 <p>Note that the search is <em>not</em> case-sensitive.</p>
 <p>Returns a fully qualified list with all hits.</p>
-<p>By default just the folder is returned that contains the file “apl-dependencies.txt”. In case a 1 is passed as left argument (default is 0, other values led to an error) the actual package folders are returned, revealing the precise version(s) installed.</p>
+<p>By default just the folder is returned that contains a file “apl-dependencies.txt” that carries at least one of the packages defined.</p>
+<p>In case a 1 is passed as left argument (default is 0) the actual package folders rather than the hosting folder(s) are returned, revealing the precise version(s) installed.</p>
 <div class="h_tag">
 <a href="#GetDeletePolicy" id="GetDeletePolicy" class="autoheader_anchor">
 <h3 data-id="GetDeletePolicy">2.8. GetDeletePolicy</h3>
@@ -387,8 +388,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>a folder holding a package (like file://C:\Temp\group-name-version\)</li>
 <li>a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\{group}-{name}-{major.minor.patch})</li>
 <li>a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.</li>
-<li>The internal alias <code>[MyUCMDs]</code> (case independent); this will then be replaced by the actual path to the <code>MyUCMDs/</code> folder followed by <code>/packages/</code>
-<p>Note that in this case you <strong>must not</strong> specify anything after <code>[MyUCMDs]</code>, otherwise an error is thrown.</p></li>
+<li>The internal alias <code>[MyUCMDs]</code> (case independent); this will then be replaced by the actual path to the <code>MyUCMDs/</code> folder followed by the name specified or, if none was specified, the name of the package`</li>
 </ul>
 <p>You may omit minor+patch or even major+minor+patch in order to install the latest version.</p>
 <p>By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as <code>⍺</code>.</p>
@@ -659,14 +659,13 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4 data-id="MyUCMDs">2.23.1. MyUCMDs/</h4>
 </a>
 </div>
-<p>In case a Tatin package is a Dyalog user command it can be installed into the special folder <code>MyUCMDs/packages/</code>. Where <code>MyUCMDs/</code> lives depends on the operating system.</p>
-<p>Note that all user commands installed as Tatin in that folder can be loaded at once with this statement:</p>
-<pre><code>⎕SE.Tatin.LoadDependencies '[MyUCMDs]`</code></pre>
+<p>In case a Tatin package is a Dyalog user command it can be installed into the special folder <code>MyUCMDs/</code>. Where <code>MyUCMDs/</code> lives depends on the operating system.</p>
 <p>Notes:</p>
 <ul>
-<li><code>MyUCMDs</code> is case independent, so specifying <code>[MYUCMDS]</code> or <code>[myucmds]</code> will do as well</li>
+<li><code>MyUCMDs</code> is case independent, so specifying <code>[MYUCMDS]</code> or <code>[myucmds]</code> does not make a difference</li>
 <li>Where the folder <code>MyUCMDs/</code> lives depends on your operating system</li>
-<li>The sub-folder <code>packages/</code> is added automatically after <code>MyUCMDs/</code></li>
+<li>In case no name is specified after <code>[MyUCMDs]</code> the name of the sub-folder is derived from the package name</li>
+<li>If you want to install multiple user command packages in one go you must not specify a name after <code>[MyUCMDs]</code>, otherwise an error is thrown</li>
 </ul>
 <div class="h_tag">
 <a href="#LoadPackages" id="LoadPackages" class="autoheader_anchor">

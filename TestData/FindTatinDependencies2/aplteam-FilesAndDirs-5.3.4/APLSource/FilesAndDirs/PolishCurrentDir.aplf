@@ -1,0 +1,10 @@
+ {r}←PolishCurrentDir;wsid
+⍝ If `⎕WSID` is relative this function does nothing.\\
+⍝ Otherwise the current directory is changed so that it becomes the path part of `⎕WSID`.\\
+⍝ Returns either `''` or the old directory in case of a change.
+ r←''
+ wsid←NormalizePath ⎕WSID
+ :If ('.',CurrentSep)≢2⍴⎕WSID,' '
+ :AndIf CurrentSep∊wsid
+     r←NormalizePath Cd 0⊃APLTreeUtils2.SplitPath wsid
+ :EndIf

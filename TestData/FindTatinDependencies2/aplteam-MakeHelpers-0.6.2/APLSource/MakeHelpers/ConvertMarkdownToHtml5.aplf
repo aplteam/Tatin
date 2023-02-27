@@ -1,0 +1,19 @@
+ {noOf}←{cssFolder}ConvertMarkdownToHtml5(sourceFolder targetFolder);noOf;markdownFile;parms;markdownFiles;html;ns
+⍝ Convert all Markdown files found in `sourceFolder` into `targetFolder`.\\
+⍝ CSS files are picked up from `cssFolder`.\\
+⍝ Returns the number of markdown files converted.
+ noOf←0
+ 'Create!'F.CheckPath targetFolder
+ markdownFiles←⊃F.Dir sourceFolder,'/*.md'
+ cssFolder←{0<⎕nc ⍵:⍎⍵ ⋄ MarkAPL.##.TatinVars.GetFullPath2AssetsFolder}'cssFolder' ⍝##⍝
+ parms←MarkAPL.CreateParms  ⍝##⍝
+ parms.cssURL←cssFolder
+ parms.verbose←0
+ :For markdownFile :In markdownFiles
+     noOf+←1
+     parms.inputFilename←markdownFile
+     parms.outputFilename←targetFolder,'/',(2⊃⎕NPARTS markdownFile),'.html'
+     (html ns)←parms MarkAPL.Markdown2HTML'' ⍝##⍝
+     (⊂html)F.NPUT(targetFolder,(2⊃⎕NPARTS markdownFile),'.html')1
+ :EndFor
+⍝Done

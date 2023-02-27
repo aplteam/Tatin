@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.59.0 - 2023-02-23
+⍝ * 0.60.0 - 2023-02-26
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -520,15 +520,15 @@
               targetSpace←'⎕SE'
           :Else
               :If 0=≢targetSpace←DefineTargetSpace'#'
-                  →0 ⋄ ⎕←'Cancelled by user'
+                  ⎕←'Cancelled by user' ⋄ →0
               :EndIf
           :EndIf
       :Else
           targetSpace←,Arg._2
       :EndIf
       :If isUCMD
-          '[MyUCMDs] must stand on its own'Assert 0=≢(≢'[myucmds]')↓installFolder
-          installFolder←TC.GetMyUCMDsFolder'/packages/'
+          '[MyUCMDs] must stand on its own'Assert 0<≢(≢'[myucmds]')↓installFolder
+          installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
       :EndIf
       overwriteFlag←Arg.overwrite
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
@@ -542,7 +542,7 @@
       :EndIf
       saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
       ({⍵↓⍨⍵⍳'.'}targetSpace)saveIn.⎕NS''
-      :If 0=saveIn.⎕NC'targetSpace'
+      :If 0=saveIn.⎕NC targetSpace
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
@@ -858,7 +858,7 @@
           path←Arg._1
       :Else
           (packageID path)←Arg.(_1 _2)
-          'You mast specify <packageID> and <installFolder>'Assert∧/0≢¨packageID path
+          'You must specify <packageID> and <installFolder>'Assert∧/0≢¨packageID path
           'No package specified'Assert 0≢packageID
       :EndIf
       :If './'≢2⍴path
@@ -866,7 +866,9 @@
       :AndIf ~':'∊path
           :If '['=1⍴path
           :AndIf ']'∊path
-              path←TranslateCiderAlias path
+              :If '[myucmds]'≢⎕C{⍵↑⍨⍵⍳']'}path
+                  path←TranslateCiderAlias path
+              :EndIf
           :Else
               :If 0=≢path←Arg.quiet EstablishPackageFolder path
                   :Return
@@ -1022,7 +1024,7 @@
               :If 1<≢openCiderProjects
                   ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
                   :If 0=≢ind
-                      →0 ⋄ r←'Cancelled by user'
+                      r←'Cancelled by user' ⋄ →0
                   :Else
                       what←2⊃openCiderProjects[ind;]
                   :EndIf
@@ -1031,13 +1033,13 @@
               :Else
                   what←TC.F.PWD
                   :If TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
-                      →0 ⋄ r←'Cancelled by user'
+                      r←'Cancelled by user' ⋄ →0
                   :EndIf
               :EndIf
           :Else
               what←TC.F.PWD
               :If TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
-                  →0 ⋄ r←'Cancelled by user'
+                  r←'Cancelled by user' ⋄ →0
               :EndIf
           :EndIf
       :ElseIf '['∊what
@@ -1161,14 +1163,14 @@
               :If 1<≢openCiderProjects
                   ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
                   :If 0=≢ind
-                      →0 ⋄ r←'Cancelled by user'
+                      r←'Cancelled by user' ⋄ →0
                   :Else
                       project←2⊃openCiderProjects[ind;]
                   :EndIf
               :ElseIf 1=≢openCiderProjects
                   project←2⊃openCiderProjects[1;]
               :Else
-                  →0 ⋄ r←'No path specified & no open Cider projects found'
+                  r←'No path specified & no open Cider projects found' ⋄ →0
               :EndIf
               ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
               cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
@@ -1177,7 +1179,7 @@
               :If 1<≢folders
                   ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
                   :If 0=≢ind
-                      →0 ⋄ r←'Cancelled by user'
+                      r←'Cancelled by user' ⋄ →0
                   :Else
                       installFolder←project,'/',ind⊃folders
                   :EndIf
@@ -1202,6 +1204,23 @@
               :If 0=TC.C.YesOrNo'Sure that you want act on: ',installFolder,' ?'
                   :Return
               :EndIf
+          :EndIf
+      :EndIf
+      :If '[myucmds]'{⍺≡(≢⍺)↑⍵}⎕C installFolder
+          :If ','∊identifier
+              'You must not specify a name after [MyUCMDs] when installing more than one package'Assert 0=≢(≢'[myucmds]')↓installFolder
+          :EndIf
+          buff←(≢'[myucmds]')↓installFolder
+          :If 0=≢buff
+              :If TC.IsHTTP identifier
+                  buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}{'/'∊⍵:⍵↓⍨⍵⍳'/' ⋄ ⍵}TC.RemoveHttpProtocol TC.Reg.RemoveVersionNumber{'['∊⍵:⍵↓⍨⍵⍳']'}identifier
+              :Else
+                  buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}2⊃⎕NPARTS TC.Reg.RemoveVersionNumber identifier
+              :EndIf
+          :EndIf
+          msg←'Sure you want to install',CR,'   ',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),CR,'into [MyUCMDs]',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),' ?'
+          :If ~TC.CommTools.YesOrNo msg
+              r←'Cancelled by user' ⋄ →0
           :EndIf
       :EndIf
       :Trap 0
@@ -1565,7 +1584,13 @@
               r,←⊂'-force     By default the user is questioned whether she is sure. With this flag this'
               r,←⊂'           can be overwritten. Mainly for tests.'
           :Case ⎕C'FindDependencies'
-              r,←⊂'Scans the given folder for the given specified Tatin packages.'
+              r,←⊂'Scans "folder" recursively for a file "apl-dependencies.txt". Folders with such a file will'
+              r,←⊂'be scanned for packages defined in "pkgList".'
+              r,←⊂'Useful for finding out where one or more packages are used.'
+              r,←⊂''
+              r,←⊂'"pkgList" must be a simple char vector with a list of comma-separated packages. The packages'
+              r,←⊂'can be specified fully or partly. "Group" and "version" can be left out while "Name" is'
+              r,←⊂'mandatory. You may specify a major version but "minor" and "patch" will be ignored.'
               r,←⊂''
               r,←⊂'Note that the sequence of the arguments does not matter.'
               r,←⊂''
@@ -1573,7 +1598,7 @@
               r,←⊂'by specifying the -detailed flag:'
               r,←⊂''
               r,←⊂'-detailed  By setting this flag you can force the user command to report the actual'
-              r,←⊂'           package folder(s) instead.'
+              r,←⊂'           package folder(s) rather than the hosting folder.'
               r,←⊂'           As a side effect the result might be larger, in case a package is'
               r,←⊂'           installed more than once.'
           :Case ⎕C'ListLicenses'
@@ -1651,12 +1676,14 @@
               r,←⊂'B) Second argument'
               r,←⊂'The optional second argument must be one of:'
               r,←⊂' * Path to a folder into which the packages are going to be installed'
+              r,←⊂' * "[MyUCMDs]" (case insensitive) with or without specifying a name; the name will'
+              r,←⊂'   be derived from the package ID if none was specified'
               r,←⊂' * A Cider alias specifying a project'
-              r,←⊂' * Just "[MyUCMDs]" (case insensitive) without specifying a name: it will be derived from the package ID'
-              r,←⊂'   Note that you may install only a single package at the time this way.'
-              r,←⊂'If no second argument is specified Tatin tries to find an open Cider project. If there is'
-              r,←⊂'just one open, Tatin acts on it, otherwise the user is questioned.'
-              r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken as install folder.'
+              r,←⊂''
+              r,←⊂'If more than one user command package and a name is specified after [MyUCMDs] an error is thrown.'
+              r,←⊂'If no second argument is specified Tatin tries to find an open Cider project.'
+              r,←⊂'If there is just one open, Tatin acts on it, otherwise the user is questioned.'
+              r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken.'
               r,←⊂'If there are multiple folders defined the user is questioned which one to install into.'
               r,←⊂''
               r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
@@ -1665,10 +1692,8 @@
               r,←⊂''
               r,←⊂'Takes up to two arguments:'
               r,←⊂' [1] A folder into which one or more packages have been installed'
-              r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded; default is # except'
-              r,←⊂'     when "folder" is [MyUCMDs] when the default is ⎕SE instead.'
-              r,←⊂''
-              r,←⊂'Note that [MyUCMDs] does actually install into MyUCDMs/packages.'
+              r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded'
+              r,←⊂'     Default is # except when "folder" is [MyUCMDs] when the default is ⎕SE instead.'
               r,←⊂''
               r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
               r,←⊂'            load operation by specifying the -overwrite flag.'
@@ -1750,7 +1775,7 @@
               r,←⊂'   * Alias and fully qualified name of a package'
               r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as alias'
               r,←⊂'   Might be a fully qualified packageID or <group>-<name> or even just <name>.'
-              r,←⊂'   However, if more than just one package qualify an error is thrown.'
+              r,←⊂'   If more than one package qualifies an error is thrown.'
               r,←⊂''
               r,←⊂' * Second argument: path to a folder with installed packages'
               r,←⊂'   If this is not an absolute path then it might be a sub folder of an open Cider project.'
@@ -1759,7 +1784,6 @@
               r,←⊂'   * If there are multiple Cider projects open the user is questioned'
               r,←⊂'   * If Cider is not available or no projects are open the current directory is checked'
               r,←⊂'   The second argument may also be the symbolic name [MyUCMDs] (case independent).'
-              r,←⊂'   This would translate into MyUCMDs/packages.'
               r,←⊂'   For a relative path the user is always asked for confirmation.'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
@@ -2005,19 +2029,20 @@
               r,←⊂'  ]Tatin.LoadPackages foo,bar                         ⍝ Multiple packages'
           :Case ⎕C'InstallPackages'
               r,←⊂'Examples:'
-              r,←⊂'  ]Tatin.InstallPackages [tatin]/group-name-1.0.0 /path           ⍝ Alias & package ID with "/"'
-              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1.0.0 /path            ⍝ Alias & package ID without "/"'
-              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1.0 /path              ⍝ No patch no'
-              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1 /path                ⍝ Neither patch nor minor no.'
-              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name /path                  ⍝ No version information at all'
-              r,←⊂'  ]Tatin.InstallPackages [tatin]name /path                        ⍝ No group and no version information'
-              r,←⊂'  ]Tatin.InstallPackages [tatin]A@name /path                      ⍝ Registry alias and package alias'
-              r,←⊂'  ]Tatin.InstallPackages group-name-2.0.0 /path                   ⍝ Just a full package ID'
-              r,←⊂'  ]Tatin.InstallPackages name /path                               ⍝ Just a package name'
-              r,←⊂'  ]Tatin.InstallPackages A@name /path                             ⍝ Just a package name & a package alias'
-              r,←⊂'  ]Tatin.InstallPackages file:///path/group-name-1.0.0/ /install/ ⍝ Package in a local Registry'
-              r,←⊂'  ]Tatin.InstallPackages faoo,bar /install/                       ⍝ Multiple packages'
-              r,←⊂'  ]Tatin.InstallPackages faoo [MyUCMDs]faoo                       ⍝ Install user command'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]/group-name-1.0.0 /path       ⍝ Alias & package ID with "/"'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1.0.0 /path        ⍝ Alias & package ID without "/"'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1.0 /path          ⍝ No patch no'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name-1 /path            ⍝ Neither patch nor minor no.'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]group-name /path              ⍝ No version information at all'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]name /path                    ⍝ No group and no version information'
+              r,←⊂'  ]Tatin.InstallPackages [tatin]A@name /path                  ⍝ Registry alias and package alias'
+              r,←⊂'  ]Tatin.InstallPackages group-name-2.0.0 /path               ⍝ Just a full package ID'
+              r,←⊂'  ]Tatin.InstallPackages name /path                           ⍝ Just a package name'
+              r,←⊂'  ]Tatin.InstallPackages A@name /path                         ⍝ Just a package name with an alias'
+              r,←⊂'  ]Tatin.InstallPackages file:///path/grp-name-1.0.0/ /path/  ⍝ Package in a local Registry'
+              r,←⊂'  ]Tatin.InstallPackages foo,bar /install/                    ⍝ Multiple packages'
+              r,←⊂'  ]Tatin.InstallPackages foo [MyUCMDs]                        ⍝ Install user command foo'
+              r,←⊂'  ]Tatin.InstallPackages foo [MyUCMDs]test                    ⍝ Install user command foo into test/'
           :Case ⎕C'LoadDependencies'
           :Case ⎕C'UserSettings'
           :Case ⎕C'PackageConfig'
@@ -2064,12 +2089,10 @@
       r,←⊂'You may specify a Tatin alias for a package by putting it to the front and'
       r,←⊂'separate it with an @.'
       r,←⊂''
-      r,←⊂'Note that if neither a Registry nor a ZIP file is specified but just a package ID'
-      r,←⊂'(partly or fully) then all defined Registries with a priority of greater than 0'
-      r,←⊂'will be scanned; the first hit wins.'
+      r,←⊂'If neither a Registry nor a ZIP is specified but just a package ID (partly/fully)'
+      r,←⊂'then all defined Registries with priority>0 will be scanned; the first hit wins.'
       r,←⊂''
-      r,←⊂'Note that case does not matter, meaning that a package MyGroup-MyPkg-1.2.3 can also'
-      r,←⊂'be specified as mygroup-mypkg-1.2.3 or MYGROUP-MYPKG-1.2.3.'
+      r,←⊂'Case does not matter: MyGrp-MyPkg, mygrp-mypkg, MYGRP-MYPKG are all considered equal.'
       r,←⊂''
       r,←⊂'A package might be:'
       r,←⊂' * A full package ID.'

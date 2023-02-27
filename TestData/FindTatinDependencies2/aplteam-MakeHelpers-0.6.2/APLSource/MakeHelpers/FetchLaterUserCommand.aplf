@@ -1,0 +1,33 @@
+ {r}←{batch}FetchLaterUserCommand(uc cfg C path);fn2;caption1;caption2;cfg;cfgFilename;json;buff;fn1
+⍝ Check whether the user command `uc` in `path` is identical with the one in the project.\\
+⍝ If so then the user is asked whether she wants to copy that version over, unless `batch` is 1;
+⍝ in that case the copy operation is carried out silently.
+⍝ * `uc` is the name of the user command file, including the extension
+⍝ * `C` is a namespace with a Cider configuration
+⍝ * `path` is something like the Dyalog MyUCMDs/ folder  (`[myucmds]` is understood)
+⍝ * `batch`, if specified, must be a boolean indicating the function is called as part of an
+⍝   automated "make" process, meaning that no user is available in front of the monitor\\
+⍝ Returns 0 for "no action", 1 for the file in `path` winning the day and 2 if the project's version is younger.
+ r←0
+ batch←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'batch'
+ :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}path
+     path←1 FilesAndDirs.NormalizePath(GetMyUCMDsFolder''),'/',{⍵↓⍨⍵⍳']'}path
+ :EndIf
+ path,←{'/'/⍨~'/\'∊⍨¯1↑⍵}path
+ fn1←path,uc
+ :If F.IsFile fn1
+     caption1←path
+     caption2←C.CIDER.source,'/'
+     buff←{⍵↑⍨(≢⍵)⌊⌊/⍵⍳'/\'}cfg.source
+     fn2←C.HOME,'/',buff,'/',uc
+     :If cfg.source≢buff
+         (fn2,' not found in neither ',cfg.source,' nor ',buff)Assert ⎕NEXISTS fn2
+     :Else
+         (fn2,' not found in ',cfg.source)Assert ⎕NEXISTS fn2
+     :EndIf
+     caption2←buff
+     r←batch CopyBetter fn1 fn2 caption1 caption2
+ :Else
+     ⎕←'Could not locate the user command script ',fn1
+ :EndIf
+⍝Done

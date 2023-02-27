@@ -1,0 +1,16 @@
+ r←{os}GetMyUCMDsFolder add
+⍝ Returns the standard path for Dyalog's `MyUCMDs\` folder.\\
+⍝ Works on all platforms but returns different results.\\
+⍝ Under Windows typically:\\
+⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\Foo'  ←→ GetMyUCMDsFolder 'Foo'`\\
+⍝ `⍺` is optional and only specified by test cases: simulating different versions of the operating system.
+ :If 0=⎕NC'os'
+     os←A.GetOperatingSystem''
+ :EndIf
+ add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
+ :If 'Win'≡os
+     r←F.ExpandPath(2⊃4070⌶0),'\..\MyUCMDs',add
+ :Else
+     r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
+ :EndIf
+ ⍝Done

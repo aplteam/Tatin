@@ -1,0 +1,43 @@
+ {r}←{quietFlag}CopyBetter y;file1;file2;caption1;caption2;ts2;ts1;msg;sep;ts1_;ts2_;b
+⍝ Compare two different files and asks the user for copying over the "better" one.\\
+⍝ Both files are checked for existence. If one or both are missing no action is taken.\\
+⍝ `⍵` must be a vector of length 2 or 4. The first two are mandatory: the two filenames.\\
+⍝ Optionally you may also specify two captions used when the user is questioned.
+⍝ The captions default to the filenames.\\
+⍝ `⍺` defaults to 0 but may be 1 in which case the user will not be prompted (tests and automated processes).\\
+⍝ Returns 0 for "no action", 1 for `file1` winning the day and 2 otherwise.
+ r←0
+ quietFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quietFlag'
+ y←⊆y
+ '⍵ must have a length of 2 or 4'⎕SIGNAL 11/⍨~(≢y)∊2 4
+ (file1 file2 caption1 caption2)←4↑y,y
+ :If 0∊b←⎕NEXISTS¨file1 file2
+     ('Does not exist: ',⊃{⍺,',',⍵}/(~b)/file1 file2)Assert 0
+ :EndIf
+ 'You cannot copy a file onto itself'Assert file1≢file2
+ :If ≢/{F.NGET ⍵}¨file1 file2
+     (ts1 ts2)←F.GetModifiedDate¨file1 file2
+     (ts1_ ts2_)←F.DateToReal¨ts1 ts2
+     sep←⎕UCS 10
+     :If ts1_>ts2_
+         :If quietFlag
+             msg←'Copy newer version in',sep,('  ',caption1),sep,'from ',A.FormatDateTime ts1
+             msg,←sep,'over',sep,('  ',caption2),sep,'from ',(A.FormatDateTime ts2),'  ?'
+         :OrIf YesOrNo msg
+             file1 CopyTo file2
+         :EndIf
+         r←1
+     :ElseIf ts1_<ts2_
+         :If quietFlag
+             msg←'Copy newer version in',sep,('  ',caption2),sep,'from ',A.FormatDateTime ts2
+             msg,←sep,'over',sep,('  ',caption1),sep,'from ',(A.FormatDateTime ts1),'  ?'
+         :OrIf YesOrNo msg
+             file2 CopyTo file1
+             r←2
+             :Return
+         :EndIf
+     :Else
+         'The two files share a timestamp but differ in content?!'Assert≡/{⊃F.NGET ⍵ 1}¨file1 file2
+     :EndIf
+ :EndIf
+⍝Done

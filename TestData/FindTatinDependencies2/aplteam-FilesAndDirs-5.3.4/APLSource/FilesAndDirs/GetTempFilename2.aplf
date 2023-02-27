@@ -1,0 +1,28 @@
+ filename←{extension}GetTempFilename2 prefixString;rc;start;no;fno;path
+⍝ Returns the name of a previously unused temporary filename. The file will be created.\\
+⍝ `prefixString`, when empty, defaults to `⎕AN`. The name of
+⍝ the file will match `prefixString` followed by an `_` and a randomly generated number.\\
+⍝ `extension`, if defined, defines the extension of the temp file without the dot.
+⍝ This defaults to `tmp`.\\
+⍝ This function does **not** use the Windows built-in function since
+⍝ it has proven to be unreliable under W7 (at least).
+ extension←{0<⎕NC ⍵:⍎⍵ ⋄ 'tmp'}'extension'
+ extension←('.'=1⍴extension)↓extension
+ :If 0=≢prefixString
+     prefixString←⎕AN
+ :EndIf
+ path←GetTempPath
+ start←no←⍎ProduceRandomName
+ :Repeat
+     filename←path,(prefixString,'_',⍕no),{0=≢⍵:⍵ ⋄ '.',⍵}extension
+     :Trap 22
+         fno←filename ⎕NCREATE 0
+         ⎕NUNTIE fno
+     :Else
+         fno←0
+     :EndTrap
+     no+←10
+ :Until (fno≠0)∨no>start+30×10  ⍝ max 30 tries
+ 'Unable to create temporay file'⎕SIGNAL 11/⍨fno=0
+ filename←NormalizePath filename
+⍝Done

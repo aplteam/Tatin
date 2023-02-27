@@ -1,0 +1,31 @@
+ r←CreateStandAloneExeParms(Filename ProjectName)
+⍝ Creates a parameter space for the `MakeStandAloneRunTimeExe` function.\\
+⍝ This is a Windows-only helper.\\
+⍝ `⍵` is a two-element vector:
+⍝ 1. The filename of the EXE to be created.
+⍝ 2. Name of the project. For "Fire" that would be "Fire"\\
+⍝ Workflow:\\
+⍝ 1. Create parameter space
+⍝ 1. Make amendments
+⍝ 1. Call `MakeStandAloneRunTimeExe` and pass the parameter space as right argument
+ r←⎕NS''
+ r.(Filename ProjectName)←Filename ProjectName
+ r.Filename←(⊃,/¯1↓⎕nparts r.Filename),'.exe'
+ r.Icon←''
+ r.CompanyName←'YourCompany'
+ r.LegalCopyright←'See https://github.com/aplteam/',r.ProjectName
+ r.ProductName←r.ProjectName
+ :If 0<(⍎r.ProjectName).⎕NC'Version'
+     r.FileVersion←{1=≡⍵:⍵ ⋄ 2⊃⍵}#.⍎r.ProjectName,'.Version'  ⍝ Backwards compatability
+ :Else
+     r.FileVersion←''
+ :EndIf
+ r.FileDescription←''
+ r.ProductVersion←2⊃#.⍎r.ProjectName,'.Version'
+ r.CompanyName←'YourCompany'        ⍝ Not shown by Windows Explorer anyway
+ r.Comments←''                      ⍝ Not shown by Windows Explorer anyway
+ r.Commandline←''                   ⍝ Any commandline parameters to be passed on
+ r.Resource←''
+ r.RunTime←1                        ⍝ Set this to 1 only when you need to debug the EXE.
+ Assert' '=1↑0⍴r.⎕FX'r←∆List' 'r←{⍵,[1.5]⍎¨⍵}'' ''~⍨¨↓⎕nl 2'
+⍝Done

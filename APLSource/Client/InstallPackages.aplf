@@ -1,8 +1,12 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);bool;principal;msg;path2cache;cacheFlag;identifier_;success;question;sep;qdmx;buff;cfg;isUserCommand;firstFlag;filename
+ r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
-⍝ Install package `identifiers` in `targetFolder`.\\
+⍝ Install package(s) `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
 ⍝ Multiple packages must be separated by commas.
+⍝ `targetFolder` must be one of:
+⍝ * Path to a folder
+⍝ * [MyUCMDs] (case independent)\\
+⍝   In this case you may of may not specify the name of a sub-folder after `[MyUCMDs`]`; if you don't then the name of the package rules.
 ⍝ `identifierd` must be one (or more) of:
 ⍝ * an HTTP request for a package
 ⍝ * a ZIP file holding a package
@@ -15,28 +19,33 @@
 ⍝ `←` Full name of principal packages finally loaded, including an alias if specified.
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
- :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
-     buff←{⍵↓⍨⍵⍳']'}targetFolder
-     'You must not specify anything after [MyUCMDs]'Assert 0=≢buff
-     targetFolder←(GetMyUCMDsFolder''),'/packages/'
-     msg←'Sure that you want to install:',LF,'  ',(2⊃⎕NPARTS identifiers),LF,'into:',LF,'   ',targetFolder,LF,'?'
-     :If 0=CommTools.YesOrNo msg
-         ⎕←'Cancelled by user'
-         :Return
-     :EndIf
- :EndIf
- isUserCommand←∨/(F.EnforceSlash¨GetAllUserCommandFolder,¨'\'){⍺∊(≢¨⍺)↑¨⊂⍵}F.EnforceSlash targetFolder,'/'
  identifiers←','(≠⊆⊢)identifiers
  EstablishEmptyPermanentConnections 0
- firstFlag←1
+ isUCMD←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
+ :If isUCMD∧1<≢identifiers
+     'You must not specify a name after [MyUCMDs] when installing more than one package'Assert 0=≢(≢'[myucmds]')↓targetFolder
+ :EndIf
  :Trap 998
      :For identifier_ :In identifiers
          (alias identifier_)←SplitAtAlias identifier_
          identifier←ReplaceRegistryAlias identifier_
          ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
          identifier←noBetas CheckVersion identifier
+         :If isUCMD
+             :If 0=≢{⍵↓⍨⍵⍳']'}targetFolder
+                 :If IsHTTP identifier
+                     targetFolder_←GetMyUCMDsFolder{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}{'/'∊⍵:⍵↓⍨⍵⍳'/' ⋄ ⍵}RemoveHttpProtocol Reg.RemoveVersionNumber identifier
+                 :Else
+                     targetFolder_←GetMyUCMDsFolder{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}Reg.RemoveVersionNumber 2⊃⎕NPARTS identifier
+                 :EndIf
+             :Else
+                 targetFolder_←GetMyUCMDsFolder'/',{⍵↓⍨⍵⍳']'}targetFolder
+             :EndIf
+         :Else
+             targetFolder_←targetFolder
+         :EndIf
          packageID←GetPackageIDFromFilename identifier
-         {}{'Unable to create target directory'Assert F.MkDir ⍵}⍣(firstFlag∧~F.IsDir targetFolder)⊢targetFolder
+         {}{'Unable to create target directory'Assert F.MkDir ⍵}⍣(~F.IsDir targetFolder_)⊢targetFolder_
          :If 0=≢identifier    ⍝ Not found?
              PrintToSession'Not found: ',identifier_
              :Continue
@@ -58,17 +67,15 @@
              'ZIP files cannot be installed via HTTP'Assert 0
          :EndIf
          PrintToSession'  Establish dependencies...'
-         r,←targetFolder InstallPackage_ alias identifier
-         CloseConnections 0
+         r,←targetFolder_ InstallPackage_ alias identifier
          packageID←GetPackageIDFromFilename identifier
-         cfg←ReadPackageConfigFile targetFolder,'/',packageID,'/',CFG_Name
-         :If isUserCommand
-             filename←⊃,/1↓⎕NPARTS cfg.userCommandScript
-             F.DeleteFile targetFolder,filename  ⍝ In case the user command is installed again
-             targetFolder(⎕NMOVE Reg.F.ExecNfunction)targetFolder,'/',packageID,'/',filename  ⍝ Move UC script to the root
+         cfg←ReadPackageConfigFile targetFolder_,'/',packageID,'/',CFG_Name
+         :If 0<≢cfg.userCommandScript
+             ⍝ Move the user command script to the root of the User Command folder
+             (targetFolder_,'/')(⎕NMOVE Reg.F.ExecNfunction)targetFolder_,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
          :EndIf
-         firstFlag←0
      :EndFor
+     CloseConnections 0
  :Else
      qdmx←⎕DMX
      CloseConnections 1

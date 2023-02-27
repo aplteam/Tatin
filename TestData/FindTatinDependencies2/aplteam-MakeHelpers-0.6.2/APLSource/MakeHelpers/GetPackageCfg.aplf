@@ -1,0 +1,13 @@
+ cfg←GetPackageCfg path;cfgFilename;json
+⍝ Returns a Tatin package config file as a namespace.\\
+⍝ `path` can be either a folder hosting a package config file or the full filename.
+⍝ If no such file can be found `⍬` is returned.
+ path←F.EnforceSlash path
+ cfgFilename←path{⍺,(⍵≢(-≢⍵)↑⍺)/'/',⍵}'apl-package.json'
+ :If ⎕NEXISTS cfgFilename
+     json←⊃F.NGET cfgFilename
+     cfg←⎕JSON⍠('Dialect' 'JSON5')⊢json
+ :Else
+     cfg←⍬
+ :EndIf
+⍝Done

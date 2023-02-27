@@ -1,0 +1,36 @@
+ r←{os}GetUserHomeFolder add;p;v;w;l;d;h;lad;as;u
+⍝ Returns standard path for any user-specific data.\\
+⍝ Works on all platforms but returns different results.\\
+⍝ `⍵`, if not empty, is added to the resulting path.\\
+⍝ Under Windows typically:\\
+⍝ * ``%APPDATA%\Tatin'     ←→ GetUserHomeFolder ''`
+⍝ * ``%APPDATA%\Tatin\foo' ←→ GetUserHomeFolder 'foo'`\\
+⍝ On non-Windows platforms:\\
+⍝ * `'/home/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''`
+⍝ * `'/home/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'`\\
+⍝ `⍺` is optional and only specified by test cases: used to simulate different versions of the operating system.
+ os←{0<⎕NC ⍵:⍎⍵ ⋄ A.GetOperatingSystem''}'os'
+ add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
+ (p v)←2↑os
+ (w l)←'WL'∊''⍴p
+ d←'/Tatin'
+ (h lad)←2 ⎕NQ'.' 'GetEnvironment'('HOME' 'APPDATA')
+ :If w
+     r←F.ExpandPath lad,d,add               ⍝ windows
+ :Else
+     as←'/Library/Application Support'      ⍝ special mac folder
+     :If l∧0≠≢h
+         r←F.ExpandPath h,d,add             ⍝ linux
+     :ElseIf 0≠≢h
+         r←F.ExpandPath h,as,d,add          ⍝ mac
+     :Else
+         u←⊃~∘∊⍨2 ⎕NQ'.' 'GetEnvironment'('LOGNAME' 'USER' 'LNAME' 'USERNAME')
+         'No user found?!'Assert 0<≢u
+         :If l
+             r←'/home/',u,d,add             ⍝ linux
+         :Else
+             r←'/Users/',u,as,d,add         ⍝ mac
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

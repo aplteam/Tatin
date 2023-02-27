@@ -1,0 +1,140 @@
+ {r}←{savePath}CreateAPI y;refTosourceNS;names;API_name;type;name;at;body;header;fullName;targetNamespace;Tref;filename;extension;flag;b;subNamespace;backRef;level
+⍝ Deletes and then re-creates a namespace `API_Name` within `refTosourceNS` and then establishes cover fns/opr
+⍝ or references (variables) etc serving as API (public interface).\\
+⍝ If you wish you may specify `API_name` as a fully qualified name which is useful mostly for test cases.
+⍝ If you don't then it is assumed to live inside `refTosourceNS`.\\
+⍝ `⍵` must be a vector of length 2 or 3:\\
+⍝ [1] (`refTosourceNS`, mandatory) name of the source namespace\\
+⍝ [2] (`names`, mandatory) list of all public names, typically returned by a function named "Public" or the like\\
+⍝ [3] (`API_name`, optional): the name of the target namespace; defaults to "API"\\
+⍝ By default Link is told about the functions (but not refs) created.
+⍝ Instead you may specify a folder via `⍺` which must exist.
+⍝ If you do then all fns/opr are saved within that folder without involving Link.
+⍝ If you don't want anything to be saved on disk at all then specify `''` as `⍺`.\\
+⍝ Returns the number of fns/opr and refs established.\\
+⍝ Handles all kinds of objects: niladic, monadic, dyadic and ambivalent fns as well as
+⍝ monadic and dyadic operators and scripted namespaces, classes, interfaces and variables.
+⍝ It also honors shy results.
+ r←0
+ (refTosourceNS names API_name)←3↑y,⊂'API'
+ 'Source namespace (1⊃⍵) is not a reference'Assert 0 1≡{(≡⍵)(≢⍵)}refTosourceNS
+ 'Source namespace (1⊃⍵) is not a namespace'Assert 0=+/'[]'∊refTosourceNS
+ 'Source namespace (1⊃⍵) is not a namespace'Assert 9.1≡⎕NC⊂⍕refTosourceNS
+ savePath←{0<⎕NC ⍵:⍎⍵ ⋄ ¯1}'savePath'
+ 'No API names specified?!'Assert 0<≢names
+ names←⊆names
+ API_name←⍕{0<⎕NC ⍵:⍎⍵ ⋄ 'API'}'API_name'
+ :If (⊃API_name)∊'#⎕'
+     targetNamespace←API_name
+ :Else
+     targetNamespace←(⍕refTosourceNS),'.',API_name
+ :EndIf
+ :If 0<⎕NC targetNamespace
+     :If 0<≢(⍎targetNamespace).⎕NL⍳16
+         :Trap 0
+             {}⎕SE.Link.Expunge targetNamespace
+             ⎕DL 0.05
+         :Else
+             {}⎕SE.Link.Expunge targetNamespace
+             ⎕DL 0.05
+         :EndTrap
+     :EndIf
+ :EndIf
+ Tref←⍎targetNamespace ⎕NS''
+ :If ¯1≢savePath
+ :AndIf 0<≢savePath
+     'Create!'F.CheckPath savePath
+ :EndIf
+ :If ∨/b←0=refTosourceNS.⎕NC↑names
+     0 Assert⍨'Not found in ',(⍕refTosourceNS),': ',⊃{⍺,', ',⍵}/b/names
+ :EndIf
+ :For name :In names
+     name~←' '
+     :Select level←'.'+.=name
+     :Case 0
+         subNamespace←''
+     :Case 1
+         subNamespace←{⍵↑⍨¯1+⍵⍳'.'}name
+         :If 0=Tref.⎕NC subNamespace
+             subNamespace Tref.⎕NS''
+         :EndIf
+     :Else
+         'API must not contain namespaces more than level deep'Assert 0
+     :EndSelect
+     flag←1
+     type←refTosourceNS.⎕NC⊂name
+     backRef←⊃,/(level+1)⍴⊂'##.'
+     :If 3=⌊type        ⍝ Function?
+         r+←1
+         at←refTosourceNS.⎕AT name
+         header←1⊃refTosourceNS.⎕NR name
+         :If 0=1 2⊃at   ⍝ Niladic functions need special treatment
+             backRef,←{0=≢⍵:⍵ ⋄ ⍵,'.'}subNamespace
+             header←{⍵↑⍨¯1+⌊/⍵⍳'⍝;'}header
+             :If 0=≢subNamespace
+                 Tref.⎕FX header({('{}'~⍨1⊃⍵),'←',backRef,(2⊃⍵)}'←'A.Split{⍵↑⍨¯1+⍵⍳'⍝'}header)
+             :Else
+                 (Tref⍎subNamespace).⎕FX header({(1⊃⍵),'←',backRef,(2⊃⍵)}'←'A.Split{⍵↑⍨¯1+⍵⍳'⍝'}header)
+             :EndIf
+         :Else
+             :If 2=|1 2⊃at
+                 :If '{'=⊃A.DLB header
+                     backRef Tref.{⍎⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ ',⍺,⍵,' ⍵}'}name
+                 :Else
+                     backRef Tref.{⍎⍵,'←{⍺←⊢ ⋄ ⍺ ',⍺,⍵,' ⍵}'}name
+                 :EndIf
+             :Else
+                 :If '{'=⊃A.DLB header
+                     backRef Tref.{⍎⍵,'←{1:shy←',⍺,⍵,' ⍵}'}name
+                 :Else
+                     backRef Tref.{⍎⍵,'←{',⍺,⍵,' ⍵}'}name
+                 :EndIf
+             :EndIf
+         :EndIf
+     :ElseIf 4=⌊type     ⍝ Operator
+         :Select 12 refTosourceNS.⎕ATX name  ⍝ Syntax
+         :Case 1 ⍝ monadic operator
+             backRef Tref.{⍎⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ (⍺⍺ ',⍺,⍵,') ⍵}'}name
+         :Case 2 ⍝ monadic operator
+             backRef Tref.{⍎⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ (⍺⍺ ',⍺,⍵,' ⍵⍵) ⍵}'}name
+         :Else
+             'An operator that is neither monadic nor dyadic?!'⎕SIGNAL 11
+         :EndSelect
+         r+←1
+     :ElseIf 2=⌊type     ⍝ Variable
+         backRef Tref.{⍎'⎕THIS.',⍵,'←',⍺,⍵}name
+         r+←1
+         extension←'apla'
+     :ElseIf 9.1=type   ⍝ Namespace script?
+         backRef Tref.{⍎'⎕THIS.',⍵,'←',⍺,⍵}name
+         r+←1
+         extension←'apln'
+     :ElseIf 9.4=type   ⍝ Class?
+         backRef Tref.{⍎'⎕THIS.',⍵,'←',⍺,⍵}name
+         r+←1
+         extension←'aplc'
+     :ElseIf 9.5=type   ⍝ Interface?
+         backRef Tref.{⍎'⎕THIS.',⍵,'←',⍺,⍵}name
+         r+←1
+         extension←'apli'
+     :Else
+         ⎕←'*** Ignored: ',name,' (name class=',(⍕type),')'
+         flag←0
+     :EndIf
+     :If flag
+     :AndIf (⌊type)∊2 3 4
+         :If ¯1≡savePath
+             fullName←(⍕Tref),'.',name
+             ⎕DL 0.05
+             {}⎕SE.Link.Add fullName
+         :ElseIf 0<≢savePath
+             extension←'aplf'
+             filename←name,'.',extension
+             body←Tref.⎕NR name
+             (⊂body)⎕NPUT(savePath,'/',filename)1
+         :Else
+             ⍝ User does not want to save anything.
+         :EndIf
+     :EndIf
+ :EndFor
+⍝Done

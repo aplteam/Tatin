@@ -1,4 +1,4 @@
- (list msg)←UnInstallPackage(packageID folder);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;noOf;noOfComponents
+ (list msg)←UnInstallPackage(packageID folder);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;noOf;noOfComponents;buff;cleanup
  ;packageID_2;buildList_old;b;buildList_new;installedPkgs;newPrincipalPkgs
 ⍝ If `folder` carries a dependency file then this function attempts to un-install the package
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
@@ -14,19 +14,23 @@
 ⍝ `folder` can be one of:
 ⍝ * Any folder that carries a file apl-dependencies.txt
 ⍝ * The (case independent) string `[MyUCMDs]`\\
-⍝   In this case Tatin attempts to un-install the given package from the user command folder
+⍝   In this case Tatin attempts to un-install the given package from the MyUCMDs/ folder
 ⍝ Returns a two-item vector:
-⍝ 1. List with the fully qualified names of all removed packages. Note that this might carry an alias
+⍝ 1. List with the fully qualified names of all removed packages; might carry an alias
 ⍝ 2. Message, ideally empty.\\
-⍝ Note that removing the directories hosting the packages might fail for all sorts of reasons even
-⍝ though the package and any dependencies were already successfully removed from both the dependency
-⍝ file and the build list.
+⍝ Notes:
+⍝ * Removing the directories hosting the packages might fail for all sorts of reasons even though the
+⍝   package & dependencies were already successfully removed from both dependency file and build list
+⍝ * The search for package names is case independent
  list←msg←''
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}folder
-     'You MUST NOT specify anything after [MyUCMDs]'Assert 0=≢(≢'[myucmds]')↓folder
-     folder←GetMyUCMDsFolder'/packages'
+     :If 0=≢buff←(≢']MyUCMDs]')↓folder
+         folder←GetMyUCMDsFolder{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}RemoveHttpProtocol Reg.RemoveVersionNumber packageID
+     :ElseIf
+         folder←GetMyUCMDsFolder,'/',buff
+     :EndIf
  :EndIf
- '"folder" is invalid'Assert F.IsDir folder
+ ('Not found: ',LF,folder)Assert F.IsDir folder
  folder←Reg.AddSlash folder
  pkgDepFilename←folder,Reg.DependenciesFilename
  'The folder has no dependency file'Assert F.IsFile pkgDepFilename
@@ -47,9 +51,9 @@
      noOfComponents←packageID_2+.='-'
      :If noOfComponents∊0 1
          :If noOfComponents=0
-             noOf←+/b←∨/¨('-',packageID_2,'-')∘⍷¨buildList_old[;2]
+             noOf←+/b←∨/¨('-',(⎕C packageID_2),'-')∘⍷¨⎕C buildList_old[;2]
          :Else
-             noOf←+/b←(packageID_2,'-'){((≢⍺)↑[2]⍵)∧.=⍺}(↑buildList_old[;2])
+             noOf←+/b←(packageID_2,'-'){⎕C((≢⍺)↑[2]⍵)∧.=⍺}(↑buildList_old[;2])
          :EndIf
          :If 0=noOf
              list←''
@@ -60,6 +64,7 @@
          packageID_2←2⊃buildList_old[b⍳1;]
      :EndIf
  :EndIf
+ cleanup←1
  :If 0<≢packageID_2
      :If (⊂packageID_2)∊buildList_old[;2]
          :If ~(⊂packageID_2)∊principalPkgs
@@ -70,6 +75,7 @@
          (⊂newPrincipalPkgs)F.NPUT pkgDepFilename 1
      :Else
          newPrincipalPkgs←principalPkgs
+         cleanup←0
      :EndIf
  :EndIf
  :If 0=≢⊃⎕NGET folder,Reg.DependenciesFilename
@@ -79,11 +85,13 @@
          {}F.RmDirByForce¨F.ListDirs folder
          F.DeleteFile F.ListFiles folder
      :EndIf
+     list,←⊂packageID_2
  :Else
      buildList_new←1 CompileBuildList folder
      :If (⊂packageID_2)∊RemoveAlias¨buildList_new[;2]
      :AndIf ~(⊂packageID_2)∊buildList_new[;2]
          msg←'Cannot uninstall: package has an alias assigned'
+         cleanup←0
      :Else
          :If 0<≢packageID_2
          :AndIf ~(⊂RemoveAlias packageID_2)∊RemoveAlias¨newPrincipalPkgs
@@ -92,11 +100,13 @@
                  list←,⊂packageID_2
              :Else
                  msg←'Package is not installed'
+                 cleanup←0
              :EndIf
          :EndIf
      :EndIf
-     installedPkgs←(≢folder)↓¨F.ListDirs folder
-     :If 0<≢toBeRemoved←installedPkgs~RemoveAlias¨buildList_new[;2],⊂packageID_2
+     :If cleanup
+         installedPkgs←(≢folder)↓¨F.ListDirs folder
+     :AndIf 0<≢toBeRemoved←installedPkgs~RemoveAlias¨buildList_new[;2],⊂packageID_2
          F.RmDir folder∘,¨RemoveAlias¨toBeRemoved
          list,←toBeRemoved~list
      :EndIf

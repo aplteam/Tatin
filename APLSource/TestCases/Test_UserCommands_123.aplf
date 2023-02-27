@@ -1,0 +1,16 @@
+ r←Test_UserCommands_123(stopFlag batchFlag);⎕TRAP;rc;msg;zip1;zip2;stop
+⍝ Exercise ]Tatin.InstallPackages on multiple user command packages with a name after [MyUCMDs] (invalid)
+⍝ Should install into a sub-folder that is named after the package because only [MyUCMDs] is paased
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zip1←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ zip2←∆GetServerRegistryFolder,'example-UC_2-1.0.0/example-UC_2-1.0.0.zip'
+
+ stop←0
+ (rc msg)←2↑stop ∆UCMD'InstallPackages "',zip1,',',zip2,'" [myucmds]Foo'
+ →T.PassesIf rc=911
+ →T.PassesIf∨/'You must not specify a name after [MyUCMDs] when installing more than one package'⍷msg
+
+ r←T._OK
+⍝Done

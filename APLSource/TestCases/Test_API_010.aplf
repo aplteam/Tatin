@@ -4,17 +4,14 @@
  r←T._Failed
 
  zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
- installFolder←TC.GetMyUCMDsFolder'packages'
- TC.CommTools.YesOrNo_Answers←1 2⍴'Sure that you want to install:' 'y'
+ installFolder←TC.GetMyUCMDsFolder'UC'
  res←TC.InstallPackages zipFilename'[myucmdS]'
- →T.GoToTidyUp'example-UC-1.0.0'≢∊res
- →T.GoToTidyUp~TC.F.IsDir installFolder,'/example-UC-1.0.0'
- →T.GoToTidyUp~TC.F.IsFile installFolder,'/UC.aplc'
- (list msg)←TC.UnInstallPackage'example-UC-1.0.0' '[MyUCMDs]'
- →T.GoToTidyUp 0≠≢list,msg
+ →T.PassesIf'example-UC-1.0.0'≡∊res
+ →T.PassesIf TC.F.IsDir installFolder,'/example-UC-1.0.0'
+ →T.PassesIf TC.F.IsFile installFolder,'/UC.aplc'
+ (list msg)←TC.UnInstallPackage'UC' '[MyUCMDs]'
+ →T.PassesIf'example-UC-1.0.0'≡∊list
+ →T.PassesIf 0=≢msg
 
  r←T._OK
-
-∆TidyUp:
- TC.CommTools.Cleanup
 ⍝Done

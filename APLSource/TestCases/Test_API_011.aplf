@@ -1,0 +1,22 @@
+ r←Test_API_011(stopFlag batchFlag);⎕TRAP;res;rc;msg;list;zip1;zip2;expected;Done;dir1;dir2
+⍝ Exercise "InstallPackages" with multiple packages that are user commands
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zip1←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ zip2←∆GetServerRegistryFolder,'example-UC_2-1.0.0/example-UC_2-1.0.0.zip'
+ res←TC.InstallPackages(zip1,',',zip2)'[myucmdS]'
+ expected←'example-UC-1.0.0' 'example-UC_2-1.0.0'
+ →T.GoToTidyUp expected≢res
+
+ →T.GoToTidyUp~TC.F.IsDir dir1←TC.GetMyUCMDsFolder'UC/example-UC-1.0.0'
+ →T.GoToTidyUp~TC.F.IsDir dir2←TC.GetMyUCMDsFolder'UC_2/example-UC_2-1.0.0'
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce dir1
+ Assert rc=0
+ (rc msg)←F.RmDirByForce dir2
+ Assert rc=0
+⍝Done

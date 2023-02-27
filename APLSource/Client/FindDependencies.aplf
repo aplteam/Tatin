@@ -1,15 +1,16 @@
  r←{level}FindDependencies(folder pkgList);folders
 ⍝ Starting in `folder`, all sub folders are scanned for a file "apl-dependencies.txt".\\
-⍝ Folders with such a file will be scanned for packages defined in `pkgList`.\\
+⍝ Folders with such a file will be scanned for packages in `pkgList`.\\
 ⍝ `pkgList` must be a simple char vector with a list of comma-separated packages.\\
 ⍝ The packages can be specified fully or partly. "Group" and "Version" can all be left out,
-⍝ but "Name" is mandatory. You may specify a major version but neither minor nor patch.
-⍝ If you do anyway anything after the major number will be ignored.\\
+⍝ but "Name" is mandatory. You may specify a major version but minor and patch are ignored
+⍝ if specified.\\
 ⍝ Note that the search is *not* case sensitive.\\
 ⍝ Returns a fully qualified list with all hits.\\
-⍝ By default just the folder is returned that contains the file "apl-dependencies.txt".
+⍝ By default just the folder(s) are returned that contain a file "apl-dependencies.txt"
+⍝ that carry at least one of the given packages.\\
 ⍝ In case a 1 is passed as left argument (default is 0, other values led to an error) the
-⍝ package folders are also returned, revealing the precise version installed.
+⍝ package folders are also returned, revealing the precise version(s) installed.
  level←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'level'
  folder←{0<⎕NC ⍵:⍎⍵ ⋄ './'}'folder'
  folder,←(~(¯1↑folder)∊'/\')/'/'
@@ -19,5 +20,5 @@
  pkgList←⎕C','(≠⊆⊢),pkgList
  'A package name must not contain more than a maximum of two hyphens'Assert{2≥'-'+.=⍵}¨pkgList
  pkgList←Reg.RemoveMinorAndPatch¨pkgList
- r←level FindDependencies_ folder pkgList
+ r←level FindDependencies_ folder folder pkgList
 ⍝Done

@@ -1,0 +1,49 @@
+ {r}←x CopyTo y
+⍝ Copy `x` to `y`.\\
+⍝ `x` can be one of:
+⍝ * A nested vector of character vectors, each being a filename
+⍝ * A simple string representing either a filename or a folder
+⍝   * A folder is copied over together with its contents
+⍝   * A simple file is copied over as such\\
+⍝ `y` must be a folder in case `x` specified a folder or is a list of files.
+⍝ Otherwise it must be a filename.\\
+⍝ Note that if the "name" and/or the "extension" part of `x` contain either "*" or "?"
+⍝ then the matching files and folders are copied.\\
+⍝ Throws an error in case something went wrong.\\
+⍝ Returns always a 0.
+ r←0
+ :If 2>|≡x
+     (x y)←F.NormalizePath¨x y
+     :If F.IsFile x
+     :AndIf F.IsDir y
+     :AndIf ~(¯1↑y)∊'/\'
+         'Cannot copy file over folder'⎕SIGNAL 11
+     :EndIf
+     :If F.IsFile x
+     :AndIf (¯1↑y)∊'/\'
+         y,←⊃{⍺,⍵}/1↓⎕NPARTS x
+     :Else
+         y↓⍨←-∨/'/\'∊⍨¯1↑y
+     :EndIf
+     :If F.IsFile x
+         :If ~F.Exists y
+             'Create!'F.CheckPath(1⊃⎕NPARTS y)
+         :EndIf
+     :Else
+         F.MkDir y
+     :EndIf
+     :If ∨/'?*'∊⊃,/1↓⎕NPARTS x
+         y ⎕NCOPY⍠('IfExists' 'Replace')('Wildcard' 1)('PreserveAttributes' 1)⊣x
+     :Else
+         y ⎕NCOPY⍠('IfExists' 'Replace')('PreserveAttributes' 1)⊣x
+     :EndIf
+ :Else
+     :If ~(¯1↑y)∊'/\'
+         'Cannot copy file over folder'Assert 0=F.IsDir y
+     :EndIf
+     y←F.NormalizePath y
+     x←F.NormalizePath¨x
+     'Could not create target directory'Assert'Create!'F.CheckPath y
+     {}y ⎕NCOPY⍠('IfExists' 'Replace')⊣x
+ :EndIf
+⍝Done

@@ -1,0 +1,16 @@
+ version←{cfg}CompileVersionNumberPattern path;cfg;currentVersion;caption;options;choice;version
+⍝ Establishes the current version of a Tatin package and then asks the user whether she wants to
+⍝ bump any part of the version number, or non at all. You cannot bump the build number but that
+⍝ will always be bumped (or added) automatically by `]Tatin.BuildPackage`.
+⍝ Requires a path to a Tatin package and reads the Tatin package config file. If you have read the
+⍝ config file already anyway you may pass it as `⍺` (and ⍬ as right argument) to avoid the overhead.
+ :If 0=⎕NC'cfg'
+     cfg←GetPackageCfg path
+     'No package config file found'Assert~(⊂cfg)∊''⍬
+ :EndIf
+ currentVersion←DropBuildNumber version←cfg.version
+ caption←'Bump version of ',cfg.name,' (currently on ',currentVersion,')'
+ options←'No action' 'Bump patch number' 'Bump minor number' 'Bump major number'
+ choice←caption 0 1 Select options
+ version←choice⊃'' '+0.0.1' '+0.1.0' '+1.0.0'
+⍝Done

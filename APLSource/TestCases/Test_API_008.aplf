@@ -1,4 +1,4 @@
- r←Test_API_008(stopFlag batchFlag);⎕TRAP
+ r←Test_API_008(stopFlag batchFlag);⎕TRAP;rc
  ;dir;dir2;oldDependencies;oldBuildlist;msg;list;oldPkgList;newPkgList;newBuildlist;newDependencies
 ⍝ Exercise ⎕SE.Tatin.UnInstallPackage: un-install by alias
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -11,20 +11,21 @@
  oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  oldPkgList←F.ListDirs dir2,'/'
 
- (list msg)←⎕SE.Tatin.UnInstallPackage 'EC@aplteam-EventCodes-3.0.1'dir2
- →T.GoToTidyUp(,⊂'EC@aplteam-EventCodes-3.0.1')≢list
+ (list msg)←⎕SE.Tatin.UnInstallPackage'EC@aplteam-EventCodes-3.0.1'dir2
+ →T.GoToTidyUp~(⊂'EC@aplteam-EventCodes-3.0.1')∊list
  →T.GoToTidyUp 0≠≢msg
 
  newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
  newBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  newPkgList←F.ListDirs dir2,'/'
  →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
- →T.GoToTidyUp 1≠-/≢¨oldPkgList newPkgList
- →T.GoToTidyUp'aplteam-EventCodes-3.0.1'{⍺≢(-≢⍺)↑⍵}1⊃oldPkgList~newPkgList
+ →T.GoToTidyUp 0=-/≢¨oldPkgList newPkgList
+ →T.GoToTidyUp~'aplteam-EventCodes-3.0.1'{(⊂⍺)∊(-≢⍺)↑¨⍵}oldPkgList~newPkgList
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
  #.⎕EX TC.GetTatinRootSpace'#'
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
 ⍝Done

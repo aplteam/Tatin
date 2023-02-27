@@ -173,17 +173,19 @@ r←{level} FindDependencies (folder pkgList)
 
 ```
 
-Scans `folder` recursively for the file "apl-dependencies.txt". Folders with such a file will be scanned for packages defined in `pkgList`. Useful for finding out where one or more packages are used.
+Scans `folder` recursively for a file "apl-dependencies.txt". Folders with such a file will be scanned for packages defined in `pkgList`. Useful for finding out where one or more packages are used.
 
 `pkgList` must be a simple char vector with a list of comma-separated packages.
 
-The packages can be specified fully or partly. "Group" and "version" can be left out, while "Name" is mandatory. You may specify a major version but neither "Minor" nor "Patch". If you do anyway anything after the major number will be ignored.
+The packages can be specified fully or partly. "Group" and "version" can be left out while "Name" is mandatory. You may specify a major version but "minor" and "patch" will be ignored when specified.
 
 Note that the search is *not* case-sensitive.
 
 Returns a fully qualified list with all hits. 
 
-By default just the folder is returned that contains the file "apl-dependencies.txt". In case a 1 is passed as left argument (default is 0, other values led to an error) the actual package folders are returned, revealing the precise version(s) installed.
+By default just the folder is returned that contains a file "apl-dependencies.txt" that carries at least one of the packages defined.
+
+In case a 1 is passed as left argument (default is 0) the actual package folders rather than the hosting folder(s) are returned, revealing the precise version(s) installed.
 
 
 ### GetDeletePolicy
@@ -334,9 +336,7 @@ Each item must be one of:
 * a folder holding a package (like file://C:\Temp\group-name-version\\)
 * a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\\{group}-{name}-{major.minor.patch})
 * a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.
-* The internal alias `[MyUCMDs]` (case independent); this will then be replaced by the actual path to the `MyUCMDs/` folder followed by `/packages/`
-
-  Note that in this case you **must not** specify anything after `[MyUCMDs]`, otherwise an error is thrown.
+* The internal alias `[MyUCMDs]` (case independent); this will then be replaced by the actual path to the `MyUCMDs/` folder followed by the name specified or, if none was specified, the name of the package`
 
 You may omit minor+patch or even major+minor+patch in order to install the latest version.
 
@@ -605,19 +605,14 @@ Returns a vector with references to the loaded packages (principal packages only
 
 #### MyUCMDs/
 
-In case a Tatin package is a Dyalog user command it can be installed into the special folder `MyUCMDs/packages/`. Where `MyUCMDs/` lives depends on the operating system.
-
-Note that all user commands installed as Tatin in that folder can be loaded at once with this statement:
-
-```
-⎕SE.Tatin.LoadDependencies '[MyUCMDs]`
-```
+In case a Tatin package is a Dyalog user command it can be installed into the special folder `MyUCMDs/`. Where `MyUCMDs/` lives depends on the operating system.
 
 Notes:
 
-* `MyUCMDs` is case independent, so specifying `[MYUCMDS]` or `[myucmds]` will do as well
+* `MyUCMDs` is case independent, so specifying `[MYUCMDS]` or `[myucmds]` does not make a difference
 * Where the folder `MyUCMDs/` lives depends on your operating system
-* The sub-folder `packages/` is added automatically after `MyUCMDs/`
+* In case no name is specified after `[MyUCMDs]` the name of the sub-folder is derived from the package name
+* If you want to install multiple user command packages in one go you must not specify a name after `[MyUCMDs]`, otherwise an error is thrown
 
 
 ### LoadPackages

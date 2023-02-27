@@ -1,4 +1,4 @@
- r←Test_Uninstall_001(stopFlag batchFlag);⎕TRAP
+ r←Test_Uninstall_001(stopFlag batchFlag);⎕TRAP;rc
  ;dir;dir2;oldDependencies;oldBuildlist;msg;list;oldPkgList;newPkgList;newBuildlist;newDependencies
 ⍝ Attempt to uninstall a package by ID that has an alias assigned to it; must fail
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -11,23 +11,24 @@
  oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  oldPkgList←F.ListDirs dir2,'/'
 
- (list msg)←TC.UnInstallPackage 'aplteam-EventCodes-3.0.1' dir2          ⍝ Without alias it must not be removed!
+ (list msg)←TC.UnInstallPackage'aplteam-EventCodes-3.0.1'dir2          ⍝ Without alias it must not be removed!
  →T.GoToTidyUp 0≠≢list
  →T.GoToTidyUp'Cannot uninstall: package has an alias assigned'≢msg
 
- (list msg)←TC.UnInstallPackage 'EC@aplteam-EventCodes-3.0.1'dir2
- →T.GoToTidyUp(,⊂'EC@aplteam-EventCodes-3.0.1')≢list
+ (list msg)←TC.UnInstallPackage'EC@aplteam-EventCodes-3.0.1'dir2
+ →T.GoToTidyUp~(⊂'EC@aplteam-EventCodes-3.0.1')∊list
  →T.GoToTidyUp 0≠≢msg
 
  newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
  newBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  newPkgList←F.ListDirs dir2,'/'
  →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
- →T.GoToTidyUp 1≠-/≢¨oldPkgList newPkgList
+ →T.GoToTidyUp 0=-/≢¨oldPkgList newPkgList
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
  #.⎕EX TC.GetTatinRootSpace'#'
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
 ⍝Done

@@ -1,0 +1,18 @@
+ r←Test_API_012(stopFlag batchFlag);⎕TRAP;res;rc;msg;list;zip1;zip2;Done;qdmx
+⍝ Exercise "InstallPackages" with two user command packages but specify a name after [MyUCMDs] (invalid if multiple)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zip1←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ zip2←∆GetServerRegistryFolder,'example-UC_2-1.0.0/example-UC_2-1.0.0.zip'
+
+ :Trap 998
+     res←TC.InstallPackages(zip1,',',zip2)'[myucmdS]Foo'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'You must not specify a name after [MyUCMDs] when installing more than one package'≡qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

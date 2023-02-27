@@ -1,0 +1,13 @@
+ version←DropBuildNumber version;b
+⍝ Checks `⍵` (text vector that is a version number) and removes any build number from it.\\
+⍝ Examples:
+⍝ * `'1.2.3' ← DropBuildNumber '1.2.3'`
+⍝ * `'1.2.3' ← DropBuildNumber '1.2.3+1234'`
+⍝ * `'1.2.3' ← DropBuildNumber 'Foo' '1.2.3' '2019-03-07'`
+⍝ * `'1.2.3' ← DropBuildNumber 'Foo' '1.2.3+1234' '2019-03-07'`
+ :If 1<≡version
+     (2⊃version)←DropBuildNumber 2⊃version  ⍝ History...
+ :ElseIf '+'∊version
+     version←(¯1+version⍳'+')↑version
+ :EndIf
+⍝Done

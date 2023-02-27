@@ -1,0 +1,21 @@
+ {zipFilename}←CreateZipFile(name folder version)
+⍝ Everything in `folder\` goes into `<name>.zip`.\\
+⍝ `version` should be a simple text string with something like `'1.2.3'` or `'1.2.3'` or `'1.2.3-beta-1'`\\
+⍝ In case `version` carries a build number it will be removed.\\
+⍝ If you don't want a version number to be added at all then just pass an empty vector.\\
+ zipFilename←name
+ :If 2=≡version
+     version←2⊃version
+ :EndIf
+ :If 0<≢version
+     'Version number must be simple text'Assert 1=≡version
+     'Version number must be simple text'Assert' '=1↑0⍴∊version
+     'Version number must carry two dots'Assert('.'+.=version)∊2 3  ⍝ 3 for (deprecated) build numbers
+     zipFilename←name,'-',DropBuildNumber version
+ :EndIf
+ zipFilename,←{'.zip'/⍨'.zip'≢⎕C ¯4↑⍵}zipFilename
+ 1 ⎕NDELETE folder,'/',zipFilename
+ zipFilename←folder,'/',zipFilename
+ 1 ⎕NDELETE zipFilename
+ {}folder ZipArchive.ZipFolder zipFilename  ⍝##⍝
+⍝Done

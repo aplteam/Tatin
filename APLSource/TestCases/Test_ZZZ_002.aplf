@@ -1,0 +1,32 @@
+ R←Test_ZZZ_002(stopFlag batchFlag);⎕IO;⎕ML;⎕TRAP;list;report;filename;ns;bool
+⍝ Checks whether any build list refers to a non-local ZIP file.
+⍝ Always returns OK but reports any bad findings to the session.
+⍝ Not executed in batch mode.
+ ⎕IO←1 ⋄ ⎕ML←1
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     R←T._NoBatchTest ⋄ →0
+ :EndIf
+
+ list←⊃('recursive' 1)F.Dir ##.CiderConfig.HOME,'/apl-buildlist.json*'
+ :If 0<≢list
+ :AndIf 0<≢list←(∨/¨'zip'∘⍷¨⊃∘F.NGET¨list)/list
+     report←''
+     :For filename :In list
+         ns←TC.Reg.GetJsonFromFile filename
+         :If 0<≢ns.url
+             bool←'.zip'{⍺∘≡¨(-≢⍺)↑¨⍵}ns.url
+             :If ∨/'./'∘≢¨2↑¨'file://'∘{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}¨bool/ns.url
+                 report,←⊂filename
+             :EndIf
+         :EndIf
+     :EndFor
+ :AndIf 0<≢report
+     ⎕←'>>> These build lists point to a non-local ZIP file:'
+     ⎕←↑report
+ :EndIf
+
+ R←T._OK
+⍝Done

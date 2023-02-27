@@ -1,0 +1,35 @@
+ r←IsDir path
+⍝ Returns 1 if `path` is a directory and 0 otherwise, even if `path` does exist as a file.\\
+⍝ Notes:
+⍝ * If `path` is a directory the current user has no "read" access to then it returns 0!
+⍝ * `C:\` is considered a directory, though strictly speaking it is not.
+ :If 2=≡path
+     r←IsDir¨path
+ :Else
+     path←NormalizePath path
+     :Trap 11
+         :If r←⎕NEXISTS path
+             :If 'Win'≢APLTreeUtils2.GetOperatingSystem ⍬
+             :OrIf ~{(':'=0⊃⍵)∧CurrentSep=1⊃⍵}¯2↑path
+                 :Trap 22
+                     :If 0 ⍝ <1594
+                      ⍝ Right now, without ('Wildcard' 1), it generates a FILENAME ERROR when the user has not read access
+                      ⍝ See bug report <01594>
+                      ⍝ The `⊃⊃` as well as the `(-'/\'∊⍨¯1↑path)↓` are only needed with ('Wildcard' 1)
+                         :If ('.',CurrentSep)≡2↑path
+                             r←{⊃⊃1=1 ⎕NINFO⍠('Wildcard' 1)⊣(-'/\'∊⍨¯1↑⍵)↓⍵}'expand'NormalizePath path
+                         :Else
+                             r←{⊃⊃1=1 ⎕NINFO⍠('Wildcard' 1)⊣(-'/\'∊⍨¯1↑⍵)↓⍵}path
+                         :EndIf
+                     :Else
+                         r←1=1 ⎕NINFO path
+                     :EndIf
+                 :Else
+                     r←0
+                 :EndTrap
+             :EndIf
+         :EndIf
+     :Else
+         r←0
+     :EndTrap
+ :EndIf

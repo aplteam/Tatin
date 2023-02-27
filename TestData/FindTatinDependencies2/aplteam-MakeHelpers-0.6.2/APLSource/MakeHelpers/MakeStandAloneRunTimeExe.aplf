@@ -1,0 +1,70 @@
+ {rc}←{testFlag}MakeStandAloneRunTimeExe p;counter;success;RUNTIME;details;sw;tempFile;more;rc;version
+⍝ Attempts to create a stand-alone EXE from the current workspace.\\
+⍝ This is a Windows-ony helper.\\
+⍝ `p` is a parameter space, typically created by calling `CreateStandAloneExeParms`.\\
+⍝ `←` is what the `Bind` method returns or `⍬` in case something goes wrong without throwing an error.\\
+⍝ Because the creation of a stand-alone EXE quite often fails for no apparent reason this function
+⍝ tries up to 10 times. However, the most common reason for a failure is that the EXE
+⍝ is actually running and therefore cannot be overwritten. In case "Autostatus" in the "Options"
+⍝ of the session is ticked the error message "Could not copy stub exe" would be displayed. This function
+⍝ will check for this and tell the user. (There is an REF 13574 to make this accessible via `⎕DMX`; 2019-11)\\
+⍝ When the option `testFlag` is `1` then only **one** attempt is made to create the EXE, and
+⍝ in case of the aformentioned problem no intercation with the user is attempted, and `¯1` is returned.
+⍝ Otherwise a 1 is returned.\\
+ rc←¯1
+ testFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'testFlag'
+ 'Right argument is not a parameter space'⎕SIGNAL 11/⍨9.1≠⎕NC⊂,'p'
+ 'Parameter space does not provide a filename'⎕SIGNAL 11/⍨0=p.⎕NC'Filename'
+ '"Filename" is empty'⎕SIGNAL 11/⍨0=≢p.Filename
+ counter←success←0
+ RUNTIME←8×p.RunTime
+ details←0 2⍴''
+ details⍪←'FileDescription'p.FileDescription
+ details⍪←'ProductVersion'p.ProductVersion
+ details⍪←'CompanyName'p.CompanyName           ⍝ Not shown by Windows Explorer anyway
+ details⍪←'Comments'p.Comments                 ⍝ Not shown by Windows Explorer anyway
+ details⍪←'ProductName'p.ProjectName
+ :If 0<(⍎p.ProjectName).⎕NC'Version'
+     version←#.⍎p.ProjectName,'.Version'
+     :If 1<≡version
+         details⍪←'FileVersion'({⍵↑⍨¯1+⍵⍳'+'}2⊃version)
+     :Else
+         details⍪←'FileVersion'({⍵↑⍨¯1+⍵⍳'+'}version)
+     :EndIf
+ :EndIf
+ details⍪←'LegalCopyright'('See https://github.com/aplteam/',p.ProjectName)
+ tempFile←'exe'F.GetTempFilename2 2⊃⎕NPARTS p.Filename
+ :Repeat
+     :Trap 11
+         rc←2 #.⎕NQ'#' 'Bind'tempFile'StandaloneNativeExe'RUNTIME p.Resource p.Icon p.Commandline details
+         '"Bind" failed'Assert 1=rc
+         success←1
+     :Else
+         :Trap 0
+             sw←⎕SE.⎕WG'StatusWindow'
+             :If 0<≢sw.⎕WG'Text'
+                 :If ∨/'Could not copy stub exe'⍷⊃⌽{⍵/⍨0<≢¨⍵}sw.⎕WG'Text'
+                     :If testFlag
+                         rc←¯1
+                     :Else
+                         ⎕←'It seeems that the EXE that should be created is currently running - that cannot work!'
+                         ⎕←'Please make sure the EXE (',p.Filename,') is not running any more and then press <enter>.'
+                         {}⍞
+                     :EndIf
+                 :EndIf
+             :EndIf
+         :EndTrap
+         ⎕DL 0.25
+     :EndTrap
+ :Until testFlag∨success∨10<counter←counter+1
+ 'Creating stand-alone EXE failed even after 10 attempts'Assert success
+ ⎕DL 0.1
+ :Trap 19 22
+     1 ⎕NDELETE p.Filename        ⍝ Paranoia
+     ⎕DL 0.2
+     p.Filename ⎕NMOVE tempFile
+ :Else
+     :Trap 0 ⋄ 1 ⎕NDELETE tempFile ⋄ :EndTrap
+     rc←¯1
+ :EndTrap
+⍝Done

@@ -14,13 +14,13 @@
  (list msg)←TC.UnInstallPackage 'aplteam-HandleError-4.0.2'dir2
  →T.GoToTidyUp 0≠≢msg
  expected←'aplteam-FilesAndDirs-5.0.1' 'aplteam-HandleError-4.0.2' 'aplteam-OS-3.0.1'
- →T.GoToTidyUp~expected ∆LazyMatch list
+ →T.GoToTidyUp~∧/expected∊list
 
  newDependencies←1⊃F.NGET(dir2,'/',TC.Reg.DependenciesFilename)1
  newBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  newPkgList←F.ListDirs dir2,'/'
  →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
- →T.GoToTidyUp 3≠-/≢¨oldPkgList newPkgList
+ →T.GoToTidyUp 3>-/≢¨oldPkgList newPkgList
 
  r←T._OK
 

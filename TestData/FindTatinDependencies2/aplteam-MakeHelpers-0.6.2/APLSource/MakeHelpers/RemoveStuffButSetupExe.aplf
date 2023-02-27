@@ -1,0 +1,16 @@
+ {r}←RemoveStuffButSetupExe folder;list;ind;isFile;isDir
+⍝ Use this to remove everything from `folder/` but a file with a name that starts with "Setup" and has the extension ".exe".\\
+⍝ Does not worry about case sensitivity because this is Windows-only in any case.
+ r←⍬
+ list←⊃('recursive' 1)F.Dir folder,'/'
+ :If 0<≢ind←(⍳≢list)~1+'^setUp.*\.exe$'⎕S 2⍠('Greedy' 0)('IC' 1)⊣{⊃,/1↓⎕NPARTS ⍵}¨list
+     list←list[ind]
+     :If 0<+/isFile←F.IsFile list
+         F.DeleteFile isFile/list
+     :EndIf
+     isDir←~isFile
+     :If 0<+/isDir
+         {}F.RmDirByForce isDir/list
+     :EndIf
+ :EndIf
+⍝Done

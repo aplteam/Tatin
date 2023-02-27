@@ -1,0 +1,16 @@
+ r←Test_Uninstall_040(stopFlag batchFlag);⎕TRAP;res;msg;zipFilename;rc;list
+⍝ Uninstall a user command package from [MyUCMDs]
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ res←⎕SE.Tatin.InstallPackages zipFilename'[MyUCMDs]'
+ Assert'example-UC-1.0.0'≡∊res
+
+ (list msg)←TC.UnInstallPackage'example-UC-1.0.0' '[Myucmds]'
+ →T.PassesIf'example-UC-1.0.0'≡∊list
+ →T.PassesIf 0=≢msg
+ →T.PassesIf~F.IsDir TC.GetMyUCMDsFolder'UC'
+
+ r←T._OK
+⍝Done

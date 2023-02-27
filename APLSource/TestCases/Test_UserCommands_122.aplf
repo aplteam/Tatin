@@ -1,23 +1,23 @@
- r←Test_UserCommands_122(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;list1;res;list2
-⍝ Exercise ]Tatin.InstallPackages on a folder that is not empty
+ r←Test_UserCommands_122(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;res;installFolder;stop
+⍝ Exercise ]Tatin.InstallPackages on a user command package with a specific name that differs from the package
+⍝ Usually no name is given, and therefore the package name is used.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- tempDir←∆GetTempDir'/'
- F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
- tempDir ⎕NCOPY⍠('Wildcard' 1)⊢'./TestData/InstallFromList/*'
- list1←(≢tempDir)↓¨⊃TC.F.Dir tempDir
-
- (rc msg res)←∆UCMD'InstallPackages [localhost]versions ',tempDir
- →T.GoToTidyUp~(rc=0)∧0=≢msg
-
- list2←(≢tempDir)↓¨⊃TC.F.Dir tempDir
- →T.GoToTidyUp≢/1 0+≢¨list1 list2
- →T.GoToTidyUp~∧/list1∊list2
- →T.GoToTidyUp 1≠+/'-versions-'⍷∊list2
+ zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ installFolder←TC.GetMyUCMDsFolder'Foo_UC'
+ 'Check!'Assert 0=⎕NEXISTS installFolder  ⍝ Should not exist. If it does, is it a leftover from an earlier test?!
+ stop←0
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'Sure you want to install' 'y'
+ (rc msg res)←stop ∆UCMD'InstallPackages "',zipFilename,'" [myucmds]Foo_UC'
+ →T.GoToTidyUp~(rc=0)∧(0=≢msg)
+ →T.GoToTidyUp'example-UC-1.0.0'≢∊res
+ →T.GoToTidyUp~⎕NEXISTS installFolder,'/UC.aplc'
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir tempDir
+ ⎕SE._Tatin.Client.CommTools.Cleanup
+ (rc msg)←F.RmDirByForce installFolder
+ Assert rc=0
 ⍝Done

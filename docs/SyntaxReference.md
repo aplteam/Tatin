@@ -55,6 +55,12 @@ version:
 
 #### The version number
 
+The problem with version numbers is that a package configuration file **must** contain a version number. Many programmers want to have the version number also available in their code. So which one rules?
+
+Clearly there is no right or wrong answer here: it depends on personal preferences, or the work flow.
+
+`BuildPackage` is part of Tatin, therefore it takes care of the `version` information in the package configuration file. Everything else is left to the user.
+
 ##### "version" starts with a "+"
 
 It's treated as a rule. For that it must come with three digits separated by dots. The digits may be just 0 or 1.
@@ -72,8 +78,9 @@ The rules:
 * If `version` is not empty but does not carry a build number then it replaces the version information but the build number, which is bumped
 * If `version` is not empty and carries a build number then it replaces the version information including the build number, and that build number is still bumped
 
-#### Dependencies
 
+
+#### Dependencies
 
 Called without an (optional) left argument `BuildPackage` tries to establish whether the package depends on other packages:
 

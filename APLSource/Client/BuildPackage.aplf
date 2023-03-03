@@ -2,7 +2,12 @@
  ⍝ projectPath → folder to create the package from.\\
  ⍝ targetPath  → folder where the resulting ZIP is saved.\\
  ⍝ The targetPath defaults to the projectPath if it is empty.\\
- ⍝ `version`
+ ⍝ `version` can be one of:
+ ⍝ * A pattern starting with a plus (+) like +0.0.1 or +0.1.0 or +1.0.0\\
+ ⍝   This leads to a bumped patch number of patch minor number or patched major number.
+ ⍝ * A string representing a version number like "1.2.3" or "10.2.43+123"\\
+ ⍝   If no build number is specified the original build number is preserved. Otherwise
+ ⍝   the build number is overwritten. In any case is the build number bumped.
  dependencyFolder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'dependencyFolder'
  :If 0=≢projectPath
      projectPath←F.PWD,'/'
@@ -18,7 +23,7 @@
      :If '+'=1↑version
          cfg.version←version AddToVersion cfg.version
      :Else
-         cfg.version←version{'+'∊⍺:⍺ ⋄ ⍺,{⍵↓⍨¯1+⍵⍳'+'}⍵}cfg.version ⍝ Assign version but preserve build no if not passed
+         cfg.version←version{'+'∊⍺:⍺ ⋄ ⍺,{⍵↓⍨¯1+⍵⍳'+'}⍵}cfg.version ⍝ Assign `version` but preserves build number if not specified
      :EndIf
  :EndIf
  cfg.version←IncreaseBuildNumber cfg.version

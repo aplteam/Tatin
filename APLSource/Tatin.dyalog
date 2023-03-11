@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.60.0 - 2023-02-26
+⍝ * 0.61.0 - 2023-03-01
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -2253,7 +2253,7 @@
 
     IsAbsolutePath←{'/'=1⍴⍵:1 ⋄ ':'∊⍵:1 ⋄ '//'≡2↑⍵}
 
-    ∇ folder←{quietFlag}EstablishPackageFolder folder;list;ind
+    ∇ folder←{quietFlag}EstablishPackageFolder folder;list;ind;cfg;buff
     ⍝ Checks first whether it's meant to be an open Cider project (if Cider is around).
     ⍝ Next it tries to find it in the current dir.
     ⍝ The user should always be asked for confirmation.
@@ -2265,6 +2265,22 @@
           :If 0<⎕SE.⎕NC'Cider'
               :If 1=≢list←⎕SE.Cider.ListOpenProjects 0
                   folder←'expand'TC.F.NormalizePath(2⊃list[1;]),'/',folder
+                  :If 0=TC.F.IsFile folder,'apl-dependencies.txt'
+                      cfg←TC.Reg.JSON⊃TC.F.NGET folder,'cider.config'
+                      :If 0=≢cfg.CIDER.tatinFolder
+                          folder←''
+                      :ElseIf ','∊cfg.CIDER.tatinFolder
+                          buff←{⍵↑⍨¯1+⍵⍳'='}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+                          ind←'Select target folder:'TC.CommTools.Select folder∘,¨buff
+                          :If 0=≢ind
+                              folder←''
+                          :Else
+                              folder,←ind⊃buff
+                          :EndIf
+                      :Else
+                          folder←{⍵↑⍨¯1+⍵⍳'='}cfg.CIDER.tatinFolder
+                      :EndIf
+                  :EndIf
               :ElseIf 0=≢list
                   :If TC.F.IsDir TC.F.PWD,'/',folder
                       folder←TC.F.PWD,'/',folder

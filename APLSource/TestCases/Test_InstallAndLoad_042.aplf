@@ -1,0 +1,35 @@
+ r←Test_InstallAndLoad_042(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile;installFolder;res;rc;msg
+⍝ Install and load simple package without specifying a target namespace; was once a bug
+⍝ Must be loaded into #
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir''
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace CrazyName___' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/CrazyName___.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'CrazyName___' '0.1.0'
+ cfg.source←'CrazyName___.apln'
+ cfg.api←'CrazyName___'
+ cfg.os_win←1
+ TC.WritePackageConfigFile src cfg
+ zipfile←TC.BuildPackage src zip''
+ installFolder←∆GetTempDir'/MyAppPackages'
+ {}TC.InstallPackages('file://',zipfile)installFolder
+
+ res←TC.LoadDependencies⊆installFolder    ⍝ Only one argument
+ →T.GoToTidyUp'#._tatin.Example_CrazyName____0_1_0'≢⍕⊃,/res
+ →T.GoToTidyUp 9≠#._tatin.⎕NC'Example_CrazyName____0_1_0'
+ →T.GoToTidyUp 9≠#.⎕NC'CrazyName___'
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX'CrazyName___'
+ (rc msg)←F.RmDirByForce dir
+ Assert 0=rc
+ #._tatin.⎕EX'Example_CrazyName____0_1_0'
+⍝Done

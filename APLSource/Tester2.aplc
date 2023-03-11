@@ -22,11 +22,24 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.2.7+5' '2022-08-03'
+      r←'Tester2' '3.3.1+5' '2023-03-08'
     ∇
 
     ∇ History
-      :Access Public shared 
+      :Access Public shared
+      ⍝ * 3.3.1 ⋄ 2023-03-08
+      ⍝   * Bug fix: The QuitTests would not work with "Options > Disable traps in session" being ticked and
+      ⍝     therefore this is now temporarily disabled with 600⌶
+      ⍝ * 3.3.0 ⋄ 2023-02-09
+      ⍝   * Syntax of `RenameTestFnsTo` clarified and enhanced
+      ⍝   * `EditTestFunctions` now accepts a trailing wildcard (*)
+      ⍝   * ReadMe polished
+      ⍝   * New constant _SkippedByUser introduced
+      ⍝   * Custom return codes are now fully reported
+      ⍝   * Tester2 now depends on CommTools rather than having a private version of `YesOrNo`
+      ⍝   * Bug fixes
+      ⍝     * `_NotImplemented` was not correctly reported
+      ⍝     * In case `Initial` was not executed `Cleanup` should not be executed either
       ⍝ * 3.2.7 ⋄ 2022-08-03
       ⍝   * Bug fix in `ListTestFunctions`: must not cut lines short when view←1
       ⍝   * New `Make` added
@@ -73,11 +86,12 @@
     :Field Public Instance Readonly _LinuxOrMacOnly←¯15
     :Field Public Instance Readonly _LinuxOrWindowsOnly←¯16
     :Field Public Instance Readonly _MacOrWindowsOnly←¯17
-    :Field Public Instance Readonly _NoAcreTests←¯18
-    :Field Public Instance Readonly _NoCiderTests←¯19
+    :Field Public Instance Readonly _NoAcreTest←¯18
+    :Field Public Instance Readonly _NoCiderTest←¯19
     :Field Public Instance Readonly _NotApplicable←¯20
     :Field Public Instance Readonly _NotImplemented←¯21
     :Field Public Instance Readonly _IncompatibleVersion←¯22
+    :Field Public Instance Readonly _SkippedByUser←¯23
 
     :Field Public Instance ReadOnly QuitEvent←993
     :Field Public Instance ReadOnly PassEvent←994
@@ -421,7 +435,7 @@
       r.⎕FX'r←List' 'r←↑{⍵(⍎⍵)}¨'' ''~¨⍨↓⎕NL 2'
     ∇
 
-    ∇ {r}←Run__ ps;rc;log;⎕TRAP;rc2;filename;tno;buff;res
+    ∇ {r}←Run__ ps;rc;log;⎕TRAP;rc2;filename;tno;buff;res;initialFlag
         ⍝ Run all test cases to be found in `_ref`.\\
         ⍝ The right argument is a parameter space, typically created by calling `CreateParms ⍬`.\\
         ⍝ The shy explicit result is a two-element vector:
@@ -441,6 +455,7 @@
       ShowLog{'--- Test framework "Tester2" version ',(2⊃⍵),' from ',(3⊃⍵),' ----'}Version
       _ref←ProcessIniFiles _ref ps
       ps.returnCodes←⍬
+      initialFlag←0 ⍝ Tells whether `Initial was executed or not
       :If 0=≢ps.list←{⍵[;1]}ListTestFunctions''
           →∆GetOutOfHere,rc←0
       :EndIf
@@ -462,14 +477,16 @@
           :EndIf
           ps←CopyGUI2Parms ps
       :EndIf
-      :If 0=ExecuteInitial _ref ps
-          ShowLog'*** "Initial" could not initialize'
-          ps.errCounter←1
-          rc←2
-          ps.list←''
-          →∆GetOutOfHere
-      :Else
-          rc←0
+      :If initialFlag←0<≢ps.list
+          :If 0=ExecuteInitial _ref ps
+              ShowLog'*** "Initial" could not initialize'
+              ps.errCounter←1
+              rc←2
+              ps.list←''
+              →∆GetOutOfHere
+          :Else
+              rc←0
+          :EndIf
       :EndIf
       ps.returnCodes←⍬
       ps.processedGroups←''
@@ -479,6 +496,10 @@
       ps.stopFlag←2⊥⌽buff
       ProcessTestCases _ref ps
      ∆GetOutOfHere:
+      :If 0<⎕NC'∆TRAPS_IN_SESSION'
+          {}600⌶∆TRAPS_IN_SESSION ⍝ Restore former setting
+          ⎕EX'∆TRAPS_IN_SESSION'
+      :EndIf
       :If ps.guiFlag
       :AndIf {6::1 ⋄ 0⊣⍵.Type}ps.ref2Gui.∆n.Form
           ⎕←'*** Tests cancelled'
@@ -487,6 +508,7 @@
       :EndIf
       _INI←⍬                    ⍝ Flatten any leftovers
       :If 0<ps.⎕NC'list'        ⍝ Then no test cases got executed, probably because `Initial` failed.
+      :AndIf 0<≢ps.list
           (rc2 log)←ReportTestResults ps
           :If rc2≠2
               rc←rc2
@@ -494,7 +516,9 @@
           _ref.TestCasesExecutedAt←A.FormatDateTime ⎕TS
           ShowLog'Time of execution recorded on variable ',(⍕_ref),'.TestCasesExecutedAt as: ',_ref.TestCasesExecutedAt
       :EndIf
-      {}ExecuteCleanup _ref ps
+      :If initialFlag
+          {}ExecuteCleanup _ref ps
+      :EndIf
       :If 0<≢_codeCoverage
           :If 0=≢res←_codeCoverage.Finalise 1
               ⎕←'Coverage report: nothing to report'
@@ -825,49 +849,26 @@
       :EndIf
     ∇
 
-    ∇ (rc log)←ReportTestResults ps;noOf
+    ∇ (rc log)←ReportTestResults ps;noOf;constant;constants;comment
       log←''
       log,←⊂'-----'
       log,←⊂'  ',(⍕ps.totalCounter),' test case',((1≠ps.totalCounter)/'s'),' of ',(⍕≢ps.list),' called'
       log,←⊂'  ',(⍕ps.failedCounter),' test case',((1≠+/ps.failedCounter)/'s'),' failed',(0<ps.failedCounter)/' (flagged with "*")'
       log,←⊂'  ',(⍕ps.errCounter),' test case',((1≠+/ps.errCounter)/'s'),' broken',(0<ps.errCounter)/' (flagged with "#")'
-      :If 0≠≢ps.returnCodes
-          :If _NoBatchTest∊ps.returnCodes
-              log,←⊂'  ',(⍕_NoBatchTest+.=ps.returnCodes),' test cases not executed because they are not "batchable" (flagged with "⍝")'
-          :EndIf
-          :If _Inactive∊ps.returnCodes
-              log,←⊂'  ',(⍕_Inactive+.=ps.returnCodes),' test cases not executed because they were inactive (flagged with "⍝")'
-          :EndIf
-          :If _WindowsOnly∊ps.returnCodes
-              log,←⊂'  ',(⍕_WindowsOnly+.=ps.returnCodes),' test cases not executed because they can only run under Window (flagged with "⍝")'
-          :EndIf
-          :If _LinuxOnly∊ps.returnCodes
-              log,←⊂'  ',(⍕_LinuxOnly+.=ps.returnCodes),' test cases not executed because they can only run under Linux (flagged with "⍝")'
-          :EndIf
-          :If _MacOnly∊ps.returnCodes
-              log,←⊂'  ',(⍕_MacOnly+.=ps.returnCodes),' test cases not executed because they can only run under Mac OS (flagged with "⍝")'
-          :EndIf
-          :If _LinuxOrMacOnly∊ps.returnCodes
-              log,←⊂'  ',(⍕_LinuxOrMacOnly+.=ps.returnCodes),' test cases not executed because they can only run under Linux or Mac OS (flagged with "⍝")'
-          :EndIf
-          :If _LinuxOrWindowsOnly∊ps.returnCodes
-              log,←⊂'  ',(⍕_LinuxOrWindowsOnly+.=ps.returnCodes),' test cases not executed because they can only run under Linux or Windows (flagged with "⍝")'
-          :EndIf
-          :If _MacOrWindowsOnly∊ps.returnCodes
-              log,←⊂'  ',(⍕_MacOrWindowsOnly+.=ps.returnCodes),' test cases not executed because they can only run under Mac OS or Windows (flagged with "⍝")'
-          :EndIf
-          :If _NoAcreTests∊ps.returnCodes
-              log,←⊂'  ',(⍕_NoAcreTests+.=ps.returnCodes),' test cases not executed because they are acre-related (flagged with "⍝")'
-          :EndIf
-          :If _NoCiderTests∊ps.returnCodes
-              log,←⊂'  ',(⍕_NoCiderTests+.=ps.returnCodes),' test cases not executed because they are Cider-related (flagged with "⍝")'
-          :EndIf
-          :If _NotApplicable∊ps.returnCodes
-              log,←⊂'  ',(⍕_NotApplicable+.=ps.returnCodes),' test cases not executed because they were not applicable (flagged with "⍝")'
-          :EndIf
-          :If 0<noOf←+/ps.returnCodes∊ListCustomNumbers
-              log,←⊂'  ',(⍕noOf),' test cases not executed because of custom checks (flagged with "⍝")'
-          :EndIf
+      :If 0≠ps.totalCounter
+          constants←ListSymbolicNames
+          constants←(~constants[;1]∊'_OK' '_Failed')⌿constants
+          :For constant comment :In ↓constants
+              :If '_custom'{⍺≡(≢⍺)↑⍵}constant
+              :AndIf 0<≢comment
+              :AndIf 0<noOf←ps.returnCodes+.=-⊃(//)⎕VFI(≢'_custom_')↓constant
+                  log,←⊂'  ',(⍕noOf),' test cases not executed because of "',comment,'" (flagged with "⍝")'
+              :ElseIf 0<noOf←ps.returnCodes+.=⍎constant
+                  log,←⊂'  ',(⍕noOf),' test cases not executed because of "',(1↓constant),'" (flagged with "⍝")'
+              :EndIf
+          :EndFor
+      :Else
+          log,←⊂'0 test cases executed'
       :EndIf
       ShowLog log
       rc←0<ps.failedCounter+ps.errCounter
@@ -931,11 +932,11 @@
     ⍝Done
     ∇
 
-    ∇ {r}←QuitTests
-    ⍝ Use this method to end running test cases prematurely but make sure that everything is tidied up,
-    ⍝ meaning that a `Cleanup` function (if any) is executed etc.\\
+    ∇ QuitTests;was
+    ⍝ Use this method to quit a test run prematurely and make sure that everything is tidied up,
+    ⍝ meaning that a `Cleanup` function (if any) is executed.\\
       :Access Public Instance
-      r←⍬
+      ∆TRAPS_IN_SESSION←600⌶0  ⍝ Enable traps in the session and save original setting
       ⎕SIGNAL QuitEvent
     ∇
 
@@ -1241,7 +1242,7 @@
       r←flag/label
     ∇
 
-    ∇ {list}←EditTestFunctions list
+    ∇ {list}←EditTestFunctions list;name
 ⍝ Get all functions into the editor starting their names with `Test_` in case `list` is empty.\\
 ⍝ If `list` is not empty it may be one of:
 ⍝ * A matrix with test function names in the first column; typically the result of `ListTestFunctions`.
@@ -1260,7 +1261,12 @@
       :ElseIf 2=|≡list
           list←⊃list
       :Else
-          list←,[0.5]list
+          :If '*'=¯1↑list
+              name←'Test_'{(⍺/⍨⍺≢(≢⍺)↑⍵),⍵}¯1↓list
+              list←name{⍵⌿⍨((≢⍺)↑[2]⍵)∧.=⍺}'T'_ref.⎕NL 3
+          :Else
+              list←,[0.5]list
+          :EndIf
       :EndIf
       :If 0<≢list←' '~⍨¨↓'Test_'{⍵⌿⍨⍺∧.=⍨(≢⍺)↑[1+⎕IO]⍵}list
           _ref{(0=≢⍵): ⋄ ⍺.⎕ED ⍵}&list
@@ -1395,41 +1401,46 @@
     ∇ {r}←oldName RenameTestFnsTo newName;body;rc;header;comment;res;name;right;left;delFilanme;list;this;no;buff;val;f1;f2
      ⍝ Renames a test function or a group of test functions and tells acre and Link.\\
      ⍝ `oldName` and `newName` **must not** contain a dot.\\
+     ⍝ Note that names of test functions are supposed to start with "Test_", so if the arguments do not start
+     ⍝ with "Test_" the string is added.
      ⍝ Examples:
      ⍝ ```
-     ⍝ 'Test_999' ← 'Test_001' T.RenameTestFnsTo 'Test_999'
-     ⍝ 'Test_BBB_002' ← 'Test_001' T.RenameTestFnsTo 'Test_BBB_002'
-     ⍝ 'Test_CCC_003' ← 'Test_BBB_002' T.RenameTestFnsTo 'Test_CCC_003'
-     ⍝ 'Test_YYY*' ← 'AAA; T.RenameTestFnsTo 'YYY'
-     ⍝ 'Test_YYY*' ← 'Test_AAA; T.RenameTestFnsTo 'Test_YYY'
-     ⍝ 'Test_VVV*' ← '' T.RenameTestFnsTo 'Test_VVV'  ⍝ all NOT belonging to a group are renamed
+     ⍝ 'Test_999'   ← 'Test_001' T.RenameTestFnsTo 'Test_999'     ⍝ Rename a single test function without group
+     ⍝ 'Test_BBB_2' ← 'Test_1' T.RenameTestFnsTo 'Test_BBB_2'     ⍝ Rename a single test function with group
+     ⍝ 'Test_BBB_2' ← 'BBB_1' T.RenameTestFnsTo 'BBB_2'           ⍝ Rename a single test function with group without "Test_"
+     ⍝ 'Test_CCC_3' ← 'Test_BBB_2' T.RenameTestFnsTo 'Test_CCC_3' ⍝ Change group and number
+     ⍝ 'Test_YYY*'  ← 'Test_AAA; T.RenameTestFnsTo 'Test_YYY'     ⍝ Rename all members of a group with full name
+     ⍝ 'Test_YYY*'  ← 'AAA' T.RenameTestFnsTo 'YYY'               ⍝ Rename all members of a group without "Test_"
+     ⍝ 'Test_VVV*'  ← '' T.RenameTestFnsTo 'Test_VVV'             ⍝ all NOT belonging to a group are renamed
      ⍝ ```
      ⍝ `r ← ⍬`
       :Access Public Instance
       r←⍬
       (oldName newName)←oldName newName~¨' '
       'Names must not contain dots'⎕SIGNAL 11/⍨↑∨/'.'∊¨oldName newName
-      :If ~'.'∊oldName
-      :AndIf ~'.'∊newName
-          :If 0=≢buff←ListGroups
-              f1←0
-              f2←0=≢Remove∆Test_ oldName
-          :Else
-              f1←(⊂Remove∆Test_ oldName)∊(≢'Test_')↓¨{⍵[;1]}buff     ⍝ Group name?
-              f2←0=≢Remove∆Test_ oldName
-          :EndIf
-      :AndIf f1∨f2
+      (oldName newName)←'Test_'∘{⍺≡(≢⍺)↑⍵:⍵ ⋄ ⍺,⍵}¨oldName newName
+      :If 0=≢buff←ListGroups
+          f1←0
+          f2←0=≢Remove∆Test_ oldName
+      :Else
+          f1←(⊂Remove∆Test_ oldName)∊(≢'Test_')↓¨{⍵[;1]}buff     ⍝ Group name?
+          f2←0=≢Remove∆Test_ oldName
+      :EndIf
+      :If f1
+          'New name is invalid'⎕SIGNAL 11/⍨¯1=⎕NC Remove∆Test_ newName
+      :EndIf
+      :If f1∨f2
           list←{⍵[;1]}ListTestFunctions Remove∆Test_ oldName
           :If f2
               list←((⊃∘Remove∆Test_¨list)∊⎕D)/list
           :EndIf
           :For this :In list
               no←{⍵↑⍨-¯1+(⌽⍵)⍳'_'}this
-              :If 0<_ref.⎕NC'Test_',newName,'_',no  ⍝ Already occupied
+              :If 0<_ref.⎕NC'Test_',(Remove∆Test_ newName),'_',no  ⍝ Already occupied
                   val←⊃(//)⎕VFI no
-                  no←(-≢no)↑((≢no)⍴'0'),' '~⍨⍕1+⌈/{⊃(//)⎕VFI ⍵↑⍨-¯1+(⌽⍵)⍳'_'}¨↓_ref.{l←'T'⎕NL 3 ⋄ l⌿⍨((≢⍵)↑[2]l)∧.=⍵}'Test_',newName,'_'
+                  no←(-≢no)↑((≢no)⍴'0'),' '~⍨⍕1+⌈/{⊃(//)⎕VFI ⍵↑⍨-¯1+(⌽⍵)⍳'_'}¨↓_ref.{l←'T'⎕NL 3 ⋄ l⌿⍨((≢⍵)↑[2]l)∧.=⍵}newName,'_'
               :EndIf
-              this RenameTestFnsTo'Test_',newName,'_',no
+              this RenameTestFnsTo'Test_',(Remove∆Test_ newName),'_',no
           :EndFor
           →∆Go
       :Else
@@ -1546,55 +1557,6 @@
      
      ∆TidyUp: ⍝ Clean up after this label
   ⍝ ...
-    ∇
-
-    ∇ yesOrNo←{default}YesOrNo question;isOkay;answer;add
-⍝ Ask a simple question and allows just "Yes" or "No" as answers.
-⍝ You may specify a default via the optional left argument which when specified
-⍝ rules what happens when the user just presses <enter>.
-⍝ `default` must be either 1 (yes) or 0 (no).
-⍝ Note that this function does not work as expected when traced!
-      isOkay←0
-      default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
-      isOkay←0
-      :If 0≠≢default
-          'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠≢default
-      :AndIf ~default∊0 1
-          'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 11
-      :EndIf
-      :If 0=≢default
-          add←' (y/n) '
-      :Else
-          :If default
-              add←' (Y/n) '
-          :Else
-              add←' (y/N) '
-          :EndIf
-      :EndIf
-      :If 1<≡question
-          ((≢question)⊃question)←((≢question)⊃question),add
-          question←⍪question
-      :Else
-          question←question,add
-      :EndIf
-      :Repeat
-          ⍞←question
-          answer←⍞
-          :If (≢answer)=¯1+≢question                 ⍝ Did the...
-          :OrIf 0=≢answer                            ⍝ ...user just...
-          :OrIf answer≡{⍵↓⍨-+/∧\' '=⌽⍵}⎕PW↓question  ⍝ ...press <enter>?
-              :If 0≠≢default
-                  yesOrNo←default
-                  isOkay←1
-              :EndIf
-          :Else
-              answer←¯1↑{⍵↓⍨-+/∧\' '=⌽⍵}answer
-              :If answer∊'YyNn'
-                  isOkay←1
-                  yesOrNo←answer∊'Yy'
-              :EndIf
-          :EndIf
-      :Until isOkay
     ∇
 
       CopyGUI2Parms←{
@@ -1762,6 +1724,14 @@
      ∆stop11:     ref.⍎'Cleanup_',currentGroup
               :EndIf
           :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←{x}YesOrNo y
+      :If 0=⎕NC'x'
+          r←##.CommTools.YesOrNo y
+      :Else
+          r←x ##.CommTools.YesOrNo y
       :EndIf
     ∇
 

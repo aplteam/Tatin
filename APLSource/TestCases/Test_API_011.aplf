@@ -1,4 +1,4 @@
- r←Test_API_011(stopFlag batchFlag);⎕TRAP;res;rc;msg;list;zip1;zip2;expected;Done;dir1;dir2
+ r←Test_API_011(stopFlag batchFlag);⎕TRAP;res;rc;msg;list;zip1;zip2;expected;Done
 ⍝ Exercise "InstallPackages" with multiple packages that are user commands
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -9,14 +9,14 @@
  expected←'example-UC-1.0.0' 'example-UC_2-1.0.0'
  →T.GoToTidyUp expected≢res
 
- →T.GoToTidyUp~TC.F.IsDir dir1←TC.GetMyUCMDsFolder'UC/example-UC-1.0.0'
- →T.GoToTidyUp~TC.F.IsDir dir2←TC.GetMyUCMDsFolder'UC_2/example-UC_2-1.0.0'
+ →T.GoToTidyUp~TC.F.IsDir TC.GetMyUCMDsFolder'UC/example-UC-1.0.0'
+ →T.GoToTidyUp~TC.F.IsDir TC.GetMyUCMDsFolder'UC_2/example-UC_2-1.0.0'
 
  r←T._OK
 
 ∆TidyUp:
- (rc msg)←F.RmDirByForce dir1
+ (rc msg)←F.RmDirByForce TC.GetMyUCMDsFolder'UC'
  Assert rc=0
- (rc msg)←F.RmDirByForce dir2
+ (rc msg)←F.RmDirByForce TC.GetMyUCMDsFolder'UC_2'
  Assert rc=0
 ⍝Done

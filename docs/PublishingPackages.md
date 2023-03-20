@@ -68,7 +68,7 @@ There is one restriction: a `+` cannot be part of the name of a beta version. Th
 * 1.2.3+453
 * 1.2.3-beta-1+911
 
-Build numbers are mostly now shown by Tatin.
+Build numbers are mostly not shown by Tatin.
 
 
 ## Precondition: API key

@@ -858,6 +858,9 @@
           path←Arg._1
       :Else
           (packageID path)←Arg.(_1 _2)
+          :If path≡0
+              path←EstablishPackageFolder''
+          :EndIf
           'You must specify <packageID> and <installFolder>'Assert∧/0≢¨packageID path
           'No package specified'Assert 0≢packageID
       :EndIf
@@ -1767,15 +1770,16 @@
               r,←⊂'If you don''t want to delete a specific package but get rid of all superfluous packages'
               r,←⊂'then specify the -cleanup option. Note that you *must* not specify a package then.'
               r,←⊂''
-              r,←⊂'Requires one argument in conjunction with the -cleanup option and two arguments otherwise:'
-              r,←⊂'A single argument must be a folder. Two arguments must be a package-ID and a folder.'
+              r,←⊂'Requires at least one argument. A single argment must be a folder in conjunction with'
+              r,←⊂'-cleanup and a fully qualified package ID otherwise. In the second case Tatin works out the'
+              r,←⊂'folder by checking for open Cider projects etc.'
+              r,←⊂'Two arguments must be a package-ID and a folder.'
               r,←⊂''
               r,←⊂' * First argument: a package identifier;  this can be one of:'
               r,←⊂'   * Fully qualified name of a package'
               r,←⊂'   * Alias and fully qualified name of a package'
               r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as alias'
-              r,←⊂'   Might be a fully qualified packageID or <group>-<name> or even just <name>.'
-              r,←⊂'   If more than one package qualifies an error is thrown.'
+              r,←⊂'   Might be a fully qualified packageID or <group>-<name>.'
               r,←⊂''
               r,←⊂' * Second argument: path to a folder with installed packages'
               r,←⊂'   If this is not an absolute path then it might be a sub folder of an open Cider project.'

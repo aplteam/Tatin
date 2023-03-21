@@ -1,0 +1,16 @@
+ r←Test_BuildPackage_056(stopFlag batchFlag);⎕TRAP;zipFileName;qdmx
+⍝ Build a package and specify a specific version number with a build number and "-beta.1"
+⍝ This was originally not supported: the dot would be used to separate the build number; not any more
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :Trap 6
+     zipFileName←'dependencies'TC.BuildPackage path path'4.0.0-beta.2+99'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'"version" is invalid'≢qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Don

@@ -10,6 +10,13 @@
 
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
+## Version 0.91.0 from 2023-03-21
+
+* **Breaking change**: When a version number is passed to `BuildPackage` *with* a build number then this build number is accepted as  it is; formerly it was bumped.
+
+* A version number must now contain exactly three dots used to part major, minor and patch number. A build ID must be marked by a `+`.
+
+
 ## Version 0.90.1 from 2023-03-11
 
 No user actions required.

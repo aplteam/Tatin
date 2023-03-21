@@ -1,5 +1,6 @@
- r←Test_BuildPackage_053(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;oldBuildNo;newBuildNo;cfg;tempDir;tempDir2;deps
+ r←Test_BuildPackage_053(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;newBuildNo;cfg;tempDir;tempDir2;deps
 ⍝ Build a package and specify a specific version number with a build number
+⍝ In this case the build number is NOT bumped
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -8,7 +9,7 @@
  path←tempDir,'/Special/'
 
  cfg←TC.ReadPackageConfigFile path,'apl-package.json'
- zipFileName←'dependencies'TC.BuildPackage path path'4.0.0+99'
+ zipFileName←'dependencies'TC.BuildPackage path path'4.0.0+135'
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
  tempDir2←∆GetTempDir'-ZIP'
@@ -16,9 +17,8 @@
  deps←⊃F.NGET(tempDir2,'/apl-dependencies.txt')1
  →T.GoToTidyUp(,⊂'aplteam-FilesAndDirs-5.2.1')≢deps
  cfg2←TC.ReadPackageConfigFile path,'apl-package.json'
- oldBuildNo←A.ToNum{⍵↓⍨⍵⍳'+'}cfg.version
  newBuildNo←A.ToNum{⍵↓⍨⍵⍳'+'}cfg2.version
- →T.GoToTidyUp newBuildNo≠100
+ →T.GoToTidyUp newBuildNo≠135
 
  r←T._OK
 

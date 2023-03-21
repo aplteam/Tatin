@@ -1,4 +1,4 @@
- zipFilename←{dependencyFolder}BuildPackage(projectPath targetPath version);cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies
+ zipFilename←{dependencyFolder}BuildPackage(projectPath targetPath version);cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo
  ⍝ projectPath → folder to create the package from.\\
  ⍝ targetPath  → folder where the resulting ZIP is saved.\\
  ⍝ The targetPath defaults to the projectPath if it is empty.\\
@@ -19,14 +19,16 @@
  cfg_←ReadPackageConfigFile projectPath
  cfg←InitPackageConfig cfg_
  ValidateConfig cfg projectPath
+ hasBuildNo←0
  :If 0<≢version
      :If '+'=1↑version
          cfg.version←version AddToVersion cfg.version
      :Else
+         hasBuildNo←'+'∊version
          cfg.version←version{'+'∊⍺:⍺ ⋄ ⍺,{⍵↓⍨¯1+⍵⍳'+'}⍵}cfg.version ⍝ Assign `version` but preserves build number if not specified
      :EndIf
  :EndIf
- cfg.version←IncreaseBuildNumber cfg.version
+ cfg.version←IncreaseBuildNumber⍣(⊃~hasBuildNo)⊣cfg.version
  :If 0<≢cfg.assets
      cfg.assets←{1=≢⍵:⊃⍵ ⋄ 1↓⊃,/',',¨⍵}ProcessAssetsProp projectPath cfg.assets
  :EndIf

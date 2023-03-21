@@ -1,7 +1,7 @@
  {r}←ValidateVersion version;bool;version2;ind;buildNo
  r←⍬
  '"version" is not a string'Assert 0 2∊⍨10|⎕DR version                          ⍝ Must be char
- '"version" is invalid'Assert 2≤'.'+.=version                                   ⍝ At least two dots
+ '"version" is invalid'Assert 2='.'+.=version                                ⍝ Two dots: no lesss, no more
  '"version" is ill-formed'Assert 0='-'+.={⍵↑⍨¯1+⍵⍳'.'}version                   ⍝ No hyphen before the first dot
  (version2 buildNo)←Reg.SplitVersionFromBuild version
  'Build number must be nothing but digits'Assert∧/buildNo∊⎕D

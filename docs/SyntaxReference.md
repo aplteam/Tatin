@@ -76,7 +76,7 @@ The rules:
 
 * If `version` is empty then just the build number is bumped
 * If `version` is not empty but does not carry a build number then it replaces the version information but the build number, which is bumped
-* If `version` is not empty and carries a build number then it replaces the version information including the build number, and that build number is still bumped
+* If `version` is not empty and carries a build number then it replaces the version information including the build number, and that build number is **not** bumped
 
 
 

@@ -1,4 +1,4 @@
- r←Test_BuildPackage_054(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;oldBuildNo;newBuildNo;cfg;tempDir;tempDir2;deps
+ r←Test_BuildPackage_054(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;oldBuildNo;newBuildNo;cfg;tempDir;tempDir2;deps;msg;rc
 ⍝ Build a package and specify a specific version number without a build number
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,7 +8,7 @@
  path←tempDir,'/Special/'
 
  cfg←TC.ReadPackageConfigFile path,'apl-package.json'
- zipFileName←'dependencies'TC.BuildPackage path path'4.0.2'
+ zipFileName←'dependencies'TC.BuildPackage path path'9.0.1'
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
  tempDir2←∆GetTempDir'-ZIP'
@@ -24,6 +24,8 @@
 
 ∆TidyUp:
  F.DeleteFile zipFileName
- {}F.RmDirByForce tempDir
- {}F.RmDirByForce tempDir2
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+ (rc msg)←F.RmDirByForce tempDir2
+ msg Assert rc=0
 ⍝Done

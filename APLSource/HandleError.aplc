@@ -1,8 +1,14 @@
 :Class HandleError
-⍝ This class offers the method `Process`, which is useful to handle application
+⍝ This class offers the method `Process` which is useful to handle application
 ⍝ errors on a general (or application) level. `Process` in turn is triggered via `⎕TRAP`;
-⍝ use the method `HandleError.SetTrap` in order to set `⎕TRAP` properly.\\
+⍝ use the method `HandleError.SetTrap` in order to set `⎕TRAP` accordingly.\\
+⍝ Note that the main function, `HandleError.Process`, will run in the same thread the error
+⍝ did ouccur in. However, while the code of that function is executed, thread switches may
+⍝ well occur. To prevent other threads from invoking `HandleError.Process` it uses `:Hold`.
 ⍝ ## Goals
+⍝ The goal of `HandleError` is to collect as many pieces of information as posssible and make
+⍝ them accessible so that they can later be used to analyze (and hopefully solve) the problem.\\
+⍝ In order to achieve this `HandleError` takes the following actions, if technically possible:
 ⍝ * Create an HTML page with essential information regarding the error, for example:
 ⍝   * Error message
 ⍝   * Stack
@@ -10,8 +16,8 @@
 ⍝   * Current directory
 ⍝   * Command line
 ⍝   * and more\\
-⍝ * Create a namespace `crash` and populate it with variables providing all
-⍝   sorts of information potentially important for analyzing the error.
+⍝ * Create a namespace `crash` and populate it with variables providing information
+⍝   potentially important for analyzing the error.
 ⍝   The namespace `crash` is saved in a component file. By default all variables
 ⍝   visible at the time of the crash are saved in a sub namespace of `crash` called
 ⍝   `Vars`.\\
@@ -42,13 +48,13 @@
 ⍝   The `customFns` must accept  a right argument. This is the parameter namespace
 ⍝   which holds all the parameters plus three additional variables:
 ⍝   * `crashFilename` holds the name used for the crash files (HTML file, workspace,
-⍝     DCF file) but without `.extension`.
-⍝   * `LastError` holds `⎕DMX.DM` at the moment of the crash.
-⍝   * `LastErrorNumber` holds `⎕DMX.EN` at the moment of the crash.\\
+⍝     DCF file) but without `.extension`
+⍝   * `LastError` holds `⎕DMX.DM` at the moment of the crash
+⍝   * `LastErrorNumber` holds `⎕DMX.EN` at the moment of the crash\\
 ⍝   The last two steps are necessary because something might go wrong inside `HandleError` and,
 ⍝   though trapped, as a side effect overwrite both `⎕DMX.DM` and `⎕DMX.EN`.\\
 ⍝   The `customFns` shall not return a result. If it does it must be "shy" and will be ignored.\\
-⍝ Although both function names may use dotted syntax that would not help in case
+⍝ Although both function names may use dotted syntax, that would not help in case
 ⍝ they live in an instance of a class. In such a case use `logFunctionParent`
 ⍝ and `customFnsParent` respectively in order to define the parent of the functions.\\
 ⍝ ## Windows Event Log
@@ -70,18 +76,25 @@
 ⍝   within %LOCALAPPDATA%, with a sub-folder "Errors" inside it.\\
 ⍝   This is because under Windows the application is unlikely to have the right to
 ⍝   write to the directory the EXE was loaded from.\\
-⍝ Kai Jaeger ⋄ APL Team Ltd\\
+⍝ Kai Jaeger\\
 ⍝ Homepage: <https://github.com/aplteam/HandleError>
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public Shared
-      r←'HandleError' '4.1.0+57' '2021-07-01'
+      r←'HandleError' '4.1.2+60' '2023-02-22'
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 4.1.2 ⋄ 2023-02-21
+      ⍝   * ⎕TNUMS was reported in too many cells
+      ⍝ * 4.1.1 ⋄ 2021-07-24
+      ⍝   * `Process` now uses `:Hold` for preventing itself from running twice in two threads.
+      ⍝   * Documentation polished
+      ⍝   * Dependencies updated
+      ⍝   * "Make" now uses the `MakeHelpers` package and is called by the newly introduced `Admin.Make` function
       ⍝ * 4.1.0
       ⍝   * Parameter `killThreads` introduced.
       ⍝   * `Process` hardened against unforseeable problems.
@@ -112,54 +125,56 @@
     ⍝ All actions `Process` will execute are performed under error trapping, so it should never fail.\\
     ⍝ `signal`: if specified this overwrites `parms.signal`; this is for test cases only.
       r←⍬
-      ⎕IO←1 ⋄ ⎕ML←1
-      TRAP←⎕TRAP                                    ⍝ Remember old setting (for reporting)
-      ⎕TRAP←(0 1000)'C' '→∆End'                     ⍝ Make sure that it does not crash itself
-      parms←⍎⍣((0≠≢parms)∧(⎕DR parms)∊320 160 80 82)⊣parms     ⍝ Convert name into reference
-      :If 9≠⎕NC'parms'
-      :OrIf 0=≢parms
-          parms←CreateParms
-      :EndIf
-      :If 0<⎕NC'signal'
-          parms.signal←signal
-      :EndIf
-      parms.(LastError LastErrorNumber)←⎕DMX.(DM EN)
-      parms.(EN ENX EM Message)←⎕DMX.(EN ENX EM Message)
-      CheckErrorFolder parms
-      crash←CreateCrash parms TRAP
-      filename←CreateFilename parms.errorFolder
-      parms.∆ERROR_WS←filename
-      parms.crashFilename←filename
-      {}{0 ⎕TKILL ⍵}⍣parms.killThreads⊣⎕TNUMS~⎕TID   ⍝ Try to kill all threads but itself and the main thread
-      :Trap 0
-          WriteHtmlFile parms crash filename
-      :EndTrap
-      :Trap 0
-          WriteToLogFile parms
-      :EndTrap
-      ⎕DL 0.2
-      :Trap 0
-          crash←SaveErrorWorkspace filename parms crash
-      :Else
-          crash←⎕NS''
-      :EndTrap
-      SaveCrash filename crash parms
-      WriteToWindowsEvents parms
-      ExecuteCustomFns parms
-      :If 0≠parms.signal
-          ⎕SIGNAL parms.signal
-      :ElseIf parms.off
-          :If ##.APLTreeUtils2.IsDevelopment∧0=parms.enforceOff
-              PrintErrorToSession 1⊃parms.LastError
+      :Hold 'HandleError.Process'
+          ⎕IO←1 ⋄ ⎕ML←1
+          TRAP←⎕TRAP                                    ⍝ Remember old setting (for reporting)
+          ⎕TRAP←(0 1000)'C' '→∆End'                     ⍝ Make sure that it does not crash itself
+          parms←⍎⍣((0≠≢parms)∧(⎕DR parms)∊320 160 80 82)⊣parms     ⍝ Convert name into reference
+          :If 9≠⎕NC'parms'
+          :OrIf 0=≢parms
+              parms←CreateParms
+          :EndIf
+          :If 0<⎕NC'signal'
+              parms.signal←signal
+          :EndIf
+          parms.(LastError LastErrorNumber)←⎕DMX.(DM EN)
+          parms.(EN ENX EM Message)←⎕DMX.(EN ENX EM Message)
+          CheckErrorFolder parms
+          crash←CreateCrash parms TRAP
+          filename←CreateFilename parms.errorFolder
+          parms.∆ERROR_WS←filename
+          parms.crashFilename←filename
+          {}{0 ⎕TKILL ⍵}⍣parms.killThreads⊣⎕TNUMS~⎕TID   ⍝ Try to kill all threads but itself and the main thread
+          :Trap 0
+              WriteHtmlFile parms crash filename
+          :EndTrap
+          :Trap 0
+              WriteToLogFile parms
+          :EndTrap
+          ⎕DL 0.2
+          :Trap 0
+              crash←SaveErrorWorkspace filename parms crash
           :Else
-              ⎕OFF parms.returnCode
+              crash←⎕NS''
+          :EndTrap
+          SaveCrash filename crash parms
+          WriteToWindowsEvents parms
+          ExecuteCustomFns parms
+          :If 0≠parms.signal
+              ⎕SIGNAL parms.signal
+          :ElseIf parms.off
+              :If ##.APLTreeUtils2.IsDevelopment∧0=parms.enforceOff
+                  PrintErrorToSession 1⊃parms.LastError
+              :Else
+                  ⎕OFF parms.returnCode
+              :EndIf
+          :Else
+              :If ##.APLTreeUtils2.IsDevelopment∧0=parms.enforceOff
+                  PrintErrorToSession 1⊃parms.LastError
+              :EndIf
           :EndIf
-      :Else
-          :If ##.APLTreeUtils2.IsDevelopment∧0=parms.enforceOff
-              PrintErrorToSession 1⊃parms.LastError
-          :EndIf
-      :EndIf
      ∆End:⎕TRAP←TRAP
+      :EndHold
     ∇
 
     ∇ r←{force}SetTrap parameterSpaceName;⎕TRAP;⎕ML;⎕IO;calledFrom
@@ -310,7 +325,7 @@
       html,←'  ⎕IO'MarkupAsTableRow⍕⎕IO
       html,←'  ⎕ML'MarkupAsTableRow⍕⎕ML
       html,←'  ⎕WA'MarkupAsTableRow⍕⎕WA
-      html,←'  ⎕TNUMS'MarkupAsTableRow⍕⎕TNUMS
+      html,←'  ⎕TNUMS'MarkupAsTableRow{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⍕¨⍵}⎕TNUMS
       html,←'  Category'MarkupAsTableRow crash.Category
       html,←'  EM'MarkupAsTableRow crash.EM
       html,←'  HelpURL'MarkupAsTableRow crash.HelpURL

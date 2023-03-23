@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.61.0 - 2023-03-01
+⍝ * 0.61.1 - 2023-03-23
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -2269,6 +2269,7 @@
           :If 0<⎕SE.⎕NC'Cider'
               :If 1=≢list←⎕SE.Cider.ListOpenProjects 0
                   folder←'expand'TC.F.NormalizePath(2⊃list[1;]),'/',folder
+                  folder,←(~(¯1↑folder)∊'/\')/'/'
                   :If 0=TC.F.IsFile folder,'apl-dependencies.txt'
                       cfg←TC.Reg.JSON⊃TC.F.NGET folder,'cider.config'
                       :If 0=≢cfg.CIDER.tatinFolder

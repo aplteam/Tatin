@@ -1,6 +1,6 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.61.1 - 2023-03-23
+⍝ * 0.61.1 - 2023-03-31
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -1019,7 +1019,7 @@
       :EndTrap
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error
       r←⍬
       :If (,0)≡,what←Arg._1
           :If 9=⎕SE.⎕NC'Cider'
@@ -1091,13 +1091,12 @@
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
-                  data←TC.Reg.JSON ns
                   data←TC.AddCommentToPackageConfig data
                   origData←data
                   :Repeat
                       (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'data path
                       flag←1
-                      :If success
+                      :If success∨error
                           :If 0<≢∊newData
                           :AndIf newFlag∨newData≢origData
                               ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
@@ -1110,6 +1109,7 @@
                                       ⎕←'Cancelled, no change'
                                   :Else
                                       flag←0
+                                      error←1
                                       data←newData
                                   :EndIf
                               :EndTrap
@@ -1370,7 +1370,7 @@
       ⍎'temp.',name,'←origData'
       flag←1
       success←0
-      newData←''
+      newData←temp.⍎name
       :Repeat
           temp.ED name
           :If origData≢temp.⍎name
@@ -2155,7 +2155,7 @@
               '"source" carries an invalid extension'Assert(⊂3⊃⎕NPARTS ns.source)∊SupportedExtensions
           :EndIf
           :If 0<≢ns.project_url
-              :If 0=TC.SendHEAD ns.project_url
+              :If 0=TC.FetchHTMLpage ns.project_url  ⍝ GitHub does not support HEAD
                   msg←ns.project_url,' did not respond'
                   :Return
               :EndIf
@@ -2331,6 +2331,8 @@
                   dmx.EM ⎕SIGNAL ErrNo
               :EndIf
           :EndTrap
+      :Else
+          dmx.EM ⎕SIGNAL dmx.EN
       :EndIf
     ∇
 

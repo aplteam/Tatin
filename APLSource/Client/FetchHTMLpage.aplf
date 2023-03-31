@@ -1,0 +1,13 @@
+ r←FetchHTMLpage url;request;response
+ request←R.NewRequest 0
+ :If '/'∊RemoveHttpProtocol url
+     request.RequestTarget←'/',{⍵↓⍨⍵⍳'/'}RemoveHttpProtocol url
+     url←(-≢request.RequestTarget)↓url
+ :EndIf
+ :Trap 347
+     response←SendAndReceive url request
+     r←response.StatusCode≡200
+ :Else
+     r←0
+ :EndTrap
+⍝Done

@@ -1,8 +1,9 @@
- ValidateFiles←{
-⍝ Validate "files": must all be files, and must exist
-     path←⍺
-     files←','(≠⊆⊢)cfg.files
-     bool←F.IsFile path∘,¨files
-     ∧/bool:⍵
-     ('"files": ',(⊃{⍺,',',⍵}/(~bool)/files),' not found/not a directory')Assert 0
- }
+ cfg←path ValidateFiles cfg;files;bool
+⍝ Validate "files": must either be files or not exist (because they might be created later)
+ files←','(≠⊆⊢)cfg.files
+ :If 0∊bool←~⎕NEXISTS path∘,¨files
+     bool∨←(~bool)\F.IsFile path∘,¨(~bool)/files
+ :AndIf 0∊bool
+     ('"files": ',(⊃{⍺,',',⍵}/(~bool)/files),' pose a problem')Assert 0
+ :EndIf
+ ⍝Done

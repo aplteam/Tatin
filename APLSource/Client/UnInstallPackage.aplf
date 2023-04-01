@@ -1,4 +1,4 @@
- (list msg)←UnInstallPackage(packageID folder);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;noOf;noOfComponents;buff;cleanup
+ (list msg)←UnInstallPackage(packageID folder);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;noOf;noOfComponents;buff;cleanup;cfg
  ;packageID_2;buildList_old;b;buildList_new;installedPkgs;newPrincipalPkgs
 ⍝ If `folder` carries a dependency file then this function attempts to un-install the package
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
@@ -26,7 +26,7 @@
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}folder
      :If 0=≢buff←(≢']MyUCMDs]')↓folder
          folder←GetMyUCMDsFolder{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}RemoveHttpProtocol Reg.RemoveVersionNumber packageID
-     :ElseIf
+     :Else
          folder←GetMyUCMDsFolder,'/',buff
      :EndIf
  :EndIf
@@ -87,6 +87,10 @@
      :EndIf
      list,←⊂packageID_2
  :Else
+     cfg←ReadPackageConfigFile folder,packageID_2
+     :If 0<≢cfg.userCommandScript ⍝ Is it a user command?!
+         F.DeleteFile folder,cfg.userCommandScript
+     :EndIf
      buildList_new←1 CompileBuildList folder
      :If (⊂packageID_2)∊RemoveAlias¨buildList_new[;2]
      :AndIf ~(⊂packageID_2)∊buildList_new[;2]

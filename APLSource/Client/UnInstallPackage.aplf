@@ -87,10 +87,16 @@
      :EndIf
      list,←⊂packageID_2
  :Else
-     cfg←ReadPackageConfigFile folder,RemoveAlias packageID_2
-     :If 0<cfg.⎕NC'userCommandScript'
-     :AndIf 0<≢cfg.userCommandScript ⍝ Is it a user command?!
-         F.DeleteFile folder,cfg.userCommandScript
+     :If 0<≢packageID_2
+         :If 0=⎕NEXISTS folder,RemoveAlias packageID_2
+             msg←'Package is not installed'
+             →cleanup←0
+         :EndIf
+         cfg←ReadPackageConfigFile folder,RemoveAlias packageID_2
+         :If 0<cfg.⎕NC'userCommandScript'
+         :AndIf 0<≢cfg.userCommandScript ⍝ Is it a user command?!
+             F.DeleteFile folder,cfg.userCommandScript
+         :EndIf
      :EndIf
      buildList_new←1 CompileBuildList folder
      :If (⊂packageID_2)∊RemoveAlias¨buildList_new[;2]

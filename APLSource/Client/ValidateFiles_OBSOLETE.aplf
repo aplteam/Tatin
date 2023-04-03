@@ -1,0 +1,10 @@
+ cfg←path ValidateFiles_OBSOLETE cfg;files;bool
+⍝ Validate "files": must either be files or not exist (because they might be created later)
+ files←','(≠⊆⊢)cfg.files
+ ⍝TODO⍝  :If 0∊bool←~⎕NEXISTS path∘,¨files
+ :If 0∊bool←(≢files)⍴0
+     bool∨←(~bool)\F.IsFile path∘,¨(~bool)/files
+ :AndIf 0∊bool
+     ('"files": ',(⊃{⍺,',',⍵}/(~bool)/files),' pose a problem')Assert 0
+ :EndIf
+ ⍝Done

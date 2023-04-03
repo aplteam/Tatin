@@ -87,8 +87,9 @@
      :EndIf
      list,←⊂packageID_2
  :Else
-     cfg←ReadPackageConfigFile folder,packageID_2
-     :If 0<≢cfg.userCommandScript ⍝ Is it a user command?!
+     cfg←ReadPackageConfigFile folder,RemoveAlias packageID_2
+     :If 0<cfg.⎕NC'userCommandScript'
+     :AndIf 0<≢cfg.userCommandScript ⍝ Is it a user command?!
          F.DeleteFile folder,cfg.userCommandScript
      :EndIf
      buildList_new←1 CompileBuildList folder

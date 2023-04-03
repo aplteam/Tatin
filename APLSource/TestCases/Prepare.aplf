@@ -23,11 +23,24 @@
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 
  testFilename←##.Admin.GetCoverageFile
- :If ⎕NEXISTS testFilename
-     ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
-     answer←⊃ask'Coverage file already exists'
-     :If 2≡answer
-         1 ⎕NDELETE testFilename
+ :If '0.9.'{⍺≡(≢⍺)↑⍵}2⊃##.CodeCoverage.Version
+ ⍝ This ↓ can go once CodeCoverage 0.10 (or better) is available
+     :If ⎕NEXISTS testFilename,'.dcf'
+         ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
+         answer←⊃ask'Coverage file already exists'
+         :If 2≡answer
+             1 ⎕NDELETE testFilename,'.dcf'
+             1 ⎕NDELETE testFilename,'-CR.dcf'
+         :EndIf
+     :EndIf
+ :Else
+     :If ⎕NEXISTS testFilename,'.profile'
+         ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
+         answer←⊃ask'Coverage file already exists'
+         :If 2≡answer
+             1 ⎕NDELETE testFilename,'.profile'
+             1 ⎕NDELETE testFilename,'.cr'
+         :EndIf
      :EndIf
  :EndIf
  T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Client,#.Tatin.Registry,#.Tatin.Server')

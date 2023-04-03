@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.61.1 - 2023-03-31
+⍝ * 0.61.1 - 2023-04-02
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -849,7 +849,7 @@
       :EndTrap
     ∇
 
-    ∇ r←UnInstallPackage Arg;path;packageID;msg;list;ind
+    ∇ r←UnInstallPackage Arg;path;packageID;msg;ind;list;candidates;what;subFolders
     ⍝ Attempt to un-install the top-level package `packageID` from the folder `path`
       r←''
       :If Arg.cleanup
@@ -860,9 +860,46 @@
           (packageID path)←Arg.(_1 _2)
           :If path≡0
               path←EstablishPackageFolder''
+              :If ⎕NEXISTS path,TC.Reg.CFG_Name
+                  :If 9=⎕SE.⎕NC'Cider'
+                      cfg←⎕SE.Cider.ReadProjectConfigFile path
+                  :AndIf 0<≢cfg.CIDER.tatinFolder
+                      subFolders←{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+                      :If 1=≢subFolders
+                          path,←⊃subFolders
+                          :If 0=1 TC.C.YesOrNo'Sure you want to act on ',path,' ?'
+                              r←'Cancelled by user' ⋄ →0
+                          :EndIf
+                      :Else
+                          ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+                          :If 0=≢ind
+                              r←'Cancelled by user' ⋄ →0
+                          :Else
+                              what←2⊃openCiderProjects[ind;]
+                          :EndIf
+                      :EndIf
+                  :Else
+                      ∘∘∘
+                  :EndIf
+              :EndIf
           :EndIf
-          'You must specify <packageID> and <installFolder>'Assert∧/0≢¨packageID path
-          'No package specified'Assert 0≢packageID
+          :If (,'?')≡,packageID
+              candidates←{⍵[;2]}1 TC.LoadBuildList path
+              :Select ≢candidates
+              :Case 0
+                  r←'No packages found' ⋄ →0
+              :Case 1
+                  packageID←⊃candidates
+              :Else
+                  :If 0<≢ind←('Which packages do you wish to uninstall from ',path,' ?')TC.CommTools.Select candidates
+                      packageID←ind⊃candidates ⍝ We allow only one package at the time to be uninstalled
+                  :Else
+                      r←'No package selected' ⋄ →0
+                  :EndIf
+              :EndSelect
+              'You must specify <packageID> and <installFolder>'Assert∧/0≢¨packageID path
+              'No package specified'Assert 0≢packageID
+          :EndIf
       :EndIf
       :If './'≢2⍴path
       :AndIf '/'≠1⍴path
@@ -882,8 +919,10 @@
               :EndIf
           :EndIf
       :EndIf
-      (r msg)←TC.UnInstallPackage packageID path
+      'Please specify only one package at the time'Assert~','∊packageID
+      (list msg)←TC.UnInstallPackage packageID path
       msg Assert 0=≢msg
+      r←⍪(⊂'*** These packages were uninstalled:'),list
     ∇
 
     ∇ r←ListRegistries Arg;type
@@ -1035,7 +1074,7 @@
                   what←2⊃openCiderProjects[1;]
               :Else
                   what←TC.F.PWD
-                  :If TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
+                  :If ~TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
                       r←'Cancelled by user' ⋄ →0
                   :EndIf
               :EndIf
@@ -1091,15 +1130,17 @@
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
+                  data←TC.Reg.JSON ns
                   data←TC.AddCommentToPackageConfig data
                   origData←data
+                  error←0
                   :Repeat
                       (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'data path
                       flag←1
                       :If success∨error
                           :If 0<≢∊newData
                           :AndIf newFlag∨newData≢origData
-                              ns←⎕JSON⍠('Dialect' 'JSON5')⊣newData
+                              ns←TC.Reg.JSON newData
                               :Trap ErrNo
                                   1 TC.WritePackageConfigFile path ns
                               :Else
@@ -1113,13 +1154,17 @@
                                       data←newData
                                   :EndIf
                               :EndTrap
+                              :If 0<≢ns.source                                  ⍝ Is defined...
+                              :AndIf 0=≢3⊃⎕NPARTS ns.source                     ⍝ ...and has no extension...
+                                  'Create!'TC.F.CheckPath path,'/',ns.source    ⍝ ...so we create it in case it does not exist yet
+                              :EndIf
                           :EndIf
                       :Else
                           ⎕←'No change, therefore no action is taken'
                       :EndIf
                   :Until flag
               :Else
-                  r←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+                  r←TC.Reg.JSON ns
               :EndIf
           :EndIf
       :EndIf
@@ -1250,7 +1295,7 @@
       :Else
           cfgFilename←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),'cider.config'
           ('No Cider config file found in ',cfgFilename)Assert ⎕NEXISTS cfgFilename
-          cfg←⎕JSON⍠('Dialect' 'JSON5')⊣⊃⎕NGET cfgFilename
+          cfg←TC.ReadPackageConfigFile cfgFilename
           folders←{⍵↑⍨¯1+⍵⍳'='}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
           'No Tatin folder defined in the Cider config file'Assert 0<≢folders
           :If 1=≢folders
@@ -1763,32 +1808,30 @@
               r,←⊂''
               r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
           :Case ⎕C'UnInstallPackage'
-              r,←⊂'UnInstall a given package and implicitly all its dependencies, but only if those are'
-              r,←⊂'neither top-level packages in their own rights nor required by other packages.'
-              r,←⊂'In addition any superfluous packages (like outdated versions) are removed, too.'
+              r,←⊂'UnInstall a given package and its dependencies if those are neither top-level packages nor'
+              r,←⊂'required by other packages. Superfluous packages (like outdated versions) are removed ws well.'
               r,←⊂''
               r,←⊂'If you don''t want to delete a specific package but get rid of all superfluous packages'
-              r,←⊂'then specify the -cleanup option. Note that you *must* not specify a package then.'
+              r,←⊂'then don''t specify a package ID but the -cleanup option.'
               r,←⊂''
-              r,←⊂'Requires at least one argument. A single argment must be a folder in conjunction with'
-              r,←⊂'-cleanup and a fully qualified package ID otherwise. In the second case Tatin works out the'
-              r,←⊂'folder by checking for open Cider projects etc.'
-              r,←⊂'Two arguments must be a package-ID and a folder.'
+              r,←⊂'Requires at least one argument which must be one of:'
+              r,←⊂' * A folder in conjunction with -cleanup flag'
+              r,←⊂' * A package ID; this works only in conjunction with the Cider project manager,'
+              r,←⊂'   since Tatin will work out the folder by looking at any open Cider projects.'
+              r,←⊂' * A "?"; Tatin will then present all top-level packages for selecting one'
+              r,←⊂'Two arguments must be a package-ID/alias/? and a folder.'
               r,←⊂''
-              r,←⊂' * First argument: a package identifier;  this can be one of:'
-              r,←⊂'   * Fully qualified name of a package'
+              r,←⊂'In case the first argument is a package ID it must be one of:'
+              r,←⊂'   * Package ID '
               r,←⊂'   * Alias and fully qualified name of a package'
               r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as alias'
-              r,←⊂'   Might be a fully qualified packageID or <group>-<name>.'
+              r,←⊂'A package ID mMight be fully qualified or <group>-<name>.'
               r,←⊂''
-              r,←⊂' * Second argument: path to a folder with installed packages'
-              r,←⊂'   If this is not an absolute path then it might be a sub folder of an open Cider project.'
-              r,←⊂'   Then Tatin works out the correct one:'
-              r,←⊂'   * If there is just one project open it is taken'
-              r,←⊂'   * If there are multiple Cider projects open the user is questioned'
-              r,←⊂'   * If Cider is not available or no projects are open the current directory is checked'
-              r,←⊂'   The second argument may also be the symbolic name [MyUCMDs] (case independent).'
-              r,←⊂'   For a relative path the user is always asked for confirmation.'
+              r,←⊂'If a second argument is specified it must be a path to a folder with installed packages.'
+              r,←⊂'If this is not an absolute path then it must be a sub folder of an open Cider project.'
+              r,←⊂'Then Tatin works out the correct one.'
+              r,←⊂'The second argument may also be the symbolic name [MyUCMDs] (case independent).'
+              r,←⊂'In case Tatin tries to establish name or path the user will always be asked for confirmation.'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←⊂'Takes a path hosting such a file as an argument.'
@@ -2128,7 +2171,7 @@
     ∇ (msg json)←CheckPackageConfigFile(json path);cfg2;ns;extensions;⎕TRAP;list
         ⍝ Returns an empty vector if everything is okay and an error message otherwise
       msg←''
-      ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
+      ns←TC.Reg.JSON json
       :Trap ErrNo
           cfg2←TC.InitPackageConfig ns
           'name'TC.ValidateName ns.name

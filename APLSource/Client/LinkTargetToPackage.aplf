@@ -1,20 +1,19 @@
- {r}←LinkTargetToPackage(cfg source target alias);ref;parent;name
+ {r}←LinkTargetToPackage(cfg source target alias);ref;name
 ⍝ Establishes a reference in the target space pointing to the loaded package.\\
 ⍝ Returns the fully qualified names of what was established in the target space.
  r←⍬
  ref←⍎source
- parent←source,'.code'
  :If 0=≢alias
      name←cfg.name
  :Else
      name←alias
  :EndIf
  :If 0<≢cfg.api
-     ('Not found in ',parent,': ',cfg.api)Assert 0<⍎parent,'.⎕NC ''',cfg.api,''''
-     ('Is neither class nor namespace: ',cfg.api)Assert 9=⍎parent,'.⎕NC ''',cfg.api,''''
-     target⍎name,'←',parent,'.',cfg.api
+     ('Not found in ',source,': ',cfg.api)Assert 0<⍎source,'.⎕NC ''',cfg.api,''''
+     ('Is neither class nor namespace: ',cfg.api)Assert 9=⍎source,'.⎕NC ''',cfg.api,''''
+     target⍎name,'←',source,'.',cfg.api
  :Else
-     target⍎name,'←',parent
+     target⍎name,'←',source
  :EndIf
  r,←target,'.',name
 ⍝Done

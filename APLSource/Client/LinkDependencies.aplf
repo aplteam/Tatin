@@ -8,24 +8,24 @@
      PrintToSession'  Establish references to dependencies...'
      :For ref :In refs
          ref←CheckWsPaths ref
-         :If 0<≢deps←ref.code.TatinVars.DEPENDENCIES
+         :If 0<≢deps←ref.TatinVars.DEPENDENCIES
              deps←ReplaceRegistryAlias¨deps
              destinations←GetPackageIDFromFilename¨deps
              destinations←2⊃¨SplitAtAlias¨destinations
              destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨destinations
              destinations←CheckWsPaths¨destinations
-             cfgs←Reg.JSON¨destinations⍎¨⊂'code.TatinVars.CONFIG'
+             cfgs←Reg.JSON¨destinations⍎¨⊂'TatinVars.CONFIG'
              :For cfg destination dep :InEach cfgs destinations deps
                  depName←{⍵↑⍨¯1+⍵⍳'-'}{⍵↓⍨⍵⍳'-'}GetPackageIDFromFilename dep
                  aliasOrName←depName{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ⍺}dep
                  :If 0=≢cfg.api
-                     :If 1≠≢list←(' '~¨⍨↓⍎destination,'.code.⎕NL 9')~⊂'TatinVars'
-                         aliasOrName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code'
+                     :If 1≠≢list←(' '~¨⍨↓⍎destination,'.⎕NL 9')~⊂'TatinVars'
+                         aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination
                      :Else
-                         aliasOrName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code.',1⊃list
+                         aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination,'.',1⊃list
                      :EndIf
                  :Else
-                     aliasOrName ref.{⍎'⎕THIS.code.',⍺,'←',⍵}destination,'.code.',cfg.api
+                     aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination,'.',cfg.api
                  :EndIf
              :EndFor
          :EndIf

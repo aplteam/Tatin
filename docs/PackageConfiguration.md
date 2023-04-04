@@ -77,17 +77,17 @@ If you specify any variable with a name that Tatin does not know about and that 
 
 #### api
 
-"api", if not empty,  must be a single name or a single class _but neither a function nor an operator_. It must be relative to `source`.
+"api", if not empty,  must be a single namespace or a single class _but neither a function nor an operator_. It must be relative to `source`.
 
 It might use dottet syntax.
 
 There are several scenarios:
 
-1. The package consists of a single class or a single namespace, be it scripted or not.
+1. The package consists of a single class or a single namespace, be it scripted or not
 
-1. The package consists of a single function or operator.
+1. The package consists of a single function or operator
 
-1. The package consists of several objects: a mixture of functions, operators, classes and/or namespaces. All objects are public.
+1. The package consists of several objects: a mixture of functions, operators, classes and/or namespaces
 
 A> ### Single functions 
 A>
@@ -334,7 +334,7 @@ This function will be executed by either `LoadPackages` or `LoadDependencies` _a
 
 If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackages` and has no assets then the right argument will be empty.
 
-The function may or may not return a result. A result is assigned to the Tatin package variable `LX`. If there is no result `LX` becomes an empty vector. Without an `lx` function there won't be a variable `LX`.[^TatinVars]
+The function may or may not return a result. A result is assigned to `TatinVars.LX` inside the package namespace. If there is no result `TatinVars.LX` becomes an empty vector. Without an `lx` function there won't be a variable `LX` in `TatinVars`.[^TatinVars]
 
 The `lx` function will be executed under error trapping, and any errors will be silently ignored. If you do not want this then you have two options:
 
@@ -342,7 +342,9 @@ The `lx` function will be executed under error trapping, and any errors will be 
 
 * Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with problems yourself, for example in the `:Else` branch.
 
-Note that the existence of a variable `LX` indicates that there was an `lx` function successfully executed.
+Note that the existence of a variable `TatinVars.LX` indicates that there was an `lx` function executed successfully, even when `TatinVars.LX` is empty.
+
+If no variable `TatinVars.LX` exists then there was either no `lx` function defined in the package config file or the function did crash.
 
 #### maintainer
 
@@ -454,8 +456,6 @@ A slightly more complex example with a namespace that hosts several functions:
 ```
 
 In this case, the `source` in the package could become `APLSource/Goo` while `Admin` and `TestCases` are most likely not copied over into the package.
-
-Of course, one could rearrange the code and copy `APLSource/Goo/*` from the project into `Goo/` in the package. That would get rid of one level that is not required in the package, and `source` in the package config file could be just `Goo`.
 
 
 #### tags

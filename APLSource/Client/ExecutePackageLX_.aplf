@@ -4,14 +4,14 @@
  r←⍬
  :If 2=cfg.⎕NC'lx'
  :AndIf 0<≢cfg.lx
-     ref←⍎name,'.code'
+     ref←⍎name
      'Package LX is set but it is not a function'Assert 3=ref.⎕NC cfg.lx
      valence←1 2⊃ref.⎕AT cfg.lx
      :Trap 0
          :If 0=valence      ⍝ Niladic fn
-             ref.##.LX←ref.{6::⍬ ⋄ ⍎⍵}cfg.lx
+             ref.TatinVars.LX←ref.{6::⍬ ⋄ ⍎⍵}cfg.lx
          :ElseIf 1=valence  ⍝ Monadic fn
-             ref.##.LX←homePath ref.{6::⍬ ⋄ ⍎⍵}cfg.lx,' ''',homePath,''''
+             ref.TatinVars.LX←homePath ref.{6::⍬ ⋄ ⍎⍵}cfg.lx,' ''',homePath,''''
          :Else
              'lx is neither a niladic nor a monadic function'Assert 0
          :EndIf

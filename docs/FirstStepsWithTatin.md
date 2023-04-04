@@ -320,10 +320,10 @@ The command prints to the session the name of the namespace into which the packa
 
 ```
       #.Foo.MarkAPL
-#._tatin.aplteam_MarkAPL_11_0_1.code.MarkAPL
+#._tatin.aplteam_MarkAPL_11_0_1.MarkAPL
 ```
 
-But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1.code`, and that namespace carries several variables, among them these:
+But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1`, and that namespace carries several variables, among them these:
 
 * `HOME` carries the path to the directory where the package was loaded from
 * `ASSETS` holds the path to the assets relative to `HOME`.
@@ -333,7 +333,7 @@ But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars
 I> Note that there is also a function [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) available in `TatinVars`.
 
 ```
-      #._tatin.aplteam_MarkAPL_11_0_1.code.TatinVars.HOME
+      #._tatin.aplteam_MarkAPL_11_0_1.TatinVars.HOME
 /Foo/packages/aplteam-APLTreeUtils2-1.1.1
 ```
 
@@ -427,18 +427,18 @@ aplteam_MarkAPL_10_0_0
 aplteam_OS_3_0_0          
 ```
 
-No matter whether the APL code of a package is a single function (or operator) or a bunch of functions and operators or a single namespace (ordinary or scripted) or a bunch of namespaces or a single class or a bunch of classes or a mixture of all these APL objects, they are going to live in a namespace `code`.
+No matter whether the APL code of a package is a single function (or operator) or a bunch of functions and operators or a single namespace (ordinary or scripted) or a bunch of namespaces or a single class or a bunch of classes or a mixture of all these APL objects, they are going to live in the top namespace of a package.
 
-But Tatin will also inject references pointing to the dependencies into `code`, therefore:
+But Tatin will also inject references pointing to the dependencies into that namespace, therefore:
 
 ```
-      #._tatin.aplteam_MarkAPL_11_0_0.code.⎕nl⍳16
+      #._tatin.aplteam_MarkAPL_11_0_0.⎕nl⍳16
 APLTreeUtils2
 FilesAndDirs 
 MarkAPL      
 ```
 
-`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For these two packages references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to it is injected into MarkAPL's `code`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1.code`.
+`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For these two packages references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to `OS` is injected into `aplteam_MarkAPL_11_0_0.`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1`.
 
 
 ### Misc
@@ -541,7 +541,9 @@ A> Once you've done that the very latest published package would no longer carry
 
 For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.
 
-They are injected into a namespace `TatinVars` which in turn is injected into the `code` namespace.
+They are injected into a namespace `TatinVars` which in turn is injected into the top package namespace.
+
+I> Of course this means that theoretically there could be a name clash, but it is unlikely that the name `TatinVars` is used for anything else but Tatin, and even if so, as a developer you have the tools available to deal with that.
 
 Some of them always exist, some of them only under certain circumstances.
 
@@ -588,9 +590,11 @@ The full package name. This will include a build ID if there is any, so it is no
 
 ##### LX
 
-This might or might not exist. If it does exist then it means that the package config file defined a function name as `lx`, and that this function was executed successfully. `LX` holds the result that is returned by that function if it did return a result. If it doesn't `LX` is an empty vector.
+In a package config file a function can be defined on the `lx` parameter. Such a function would be executed after the package was loaded. The purpose of the function is to perform some sort of initialisation.
 
-Note that if there is no `lx` defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no `LX`.
+If such a function returns a result then it is assigned to `LX` in the `TatinVars` namespace.
+
+Note that `LX` does not exist in case no such function is defined, or the function did not return a result.
 
 
 ##### URI

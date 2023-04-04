@@ -38,7 +38,7 @@ You also need to have Git installed.
 Note that Tatin is managed by the [Cider project management tool](https://github.com/aplteam/Cider).
 If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.
 
-Though it is possible making changes or add code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.
+Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.
 
 
 ## How to work on Tatin

@@ -343,13 +343,14 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>In case it is not empty it must be the name of a niladic or monadic function that resides in the top-level namespace of the package (<em>not</em> in what might be defined as API!) or a shared method of a class.</p>
 <p>This function will be executed by either <code>LoadPackages</code> or <code>LoadDependencies</code> <em>after</em> all dependencies have been loaded and all refs got established.</p>
 <p>If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by <code>LoadPackages</code> and has no assets then the right argument will be empty.</p>
-<p>The function may or may not return a result. A result is assigned to the Tatin package variable <code>LX</code>. If there is no result <code>LX</code> becomes an empty vector. Without an <code>lx</code> function there won't be a variable <code>LX</code>.[<a href="#fnref3" class="footnote_link"><sup>3</sup></a>]</p>
+<p>The function may or may not return a result. A result is assigned to <code>TatinVars.LX</code> inside the package namespace. If there is no result <code>TatinVars.LX</code> becomes an empty vector. Without an <code>lx</code> function there won't be a variable <code>LX</code> in <code>TatinVars</code>.[<a href="#fnref3" class="footnote_link"><sup>3</sup></a>]</p>
 <p>The <code>lx</code> function will be executed under error trapping, and any errors will be silently ignored. If you do not want this then you have two options:</p>
 <ul>
 <li>Make <code>⎕TRAP</code> a local variable in the <code>lx</code> function and assign <code>⎕TRAP←0 'S'</code> to it to make any problem popping up straight away</li>
 <li>Put <code>:TRAP ⋄ :EndTrap</code> around the code in the <code>lx</code> function and deal with problems yourself, for example in the <code>:Else</code> branch.</li>
 </ul>
-<p>Note that the existence of a variable <code>LX</code> indicates that there was an <code>lx</code> function successfully executed.</p>
+<p>Note that the existence of a variable <code>TatinVars.LX</code> indicates that there was an <code>lx</code> function executed successfully, even when <code>TatinVars.LX</code> is empty.</p>
+<p>If no variable <code>TatinVars.LX</code> exists then there was either no <code>lx</code> function defined in the package config file or the function did crash.</p>
 <div class="h_tag">
 <a href="#maintainer" id="maintainer" class="autoheader_anchor">
 <h4 data-id="maintainer">2.3.12. maintainer</h4>
@@ -447,7 +448,6 @@ your.name@your-domain.com</code></pre>
      apl-package.json
      README.md</code></pre>
 <p>In this case, the <code>source</code> in the package could become <code>APLSource/Goo</code> while <code>Admin</code> and <code>TestCases</code> are most likely not copied over into the package.</p>
-<p>Of course, one could rearrange the code and copy <code>APLSource/Goo/*</code> from the project into <code>Goo/</code> in the package. That would get rid of one level that is not required in the package, and <code>source</code> in the package config file could be just <code>Goo</code>.</p>
 <div class="h_tag">
 <a href="#tags" id="tags" class="autoheader_anchor">
 <h4 data-id="tags">2.3.20. tags</h4>

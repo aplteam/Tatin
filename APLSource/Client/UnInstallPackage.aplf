@@ -1,4 +1,4 @@
- (list msg)←UnInstallPackage(packageID folder);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;noOf;noOfComponents;buff;cleanup;cfg
+ (list msg)←UnInstallPackage(packageID folder);pkgDepFilename;toBeRemoved;rc;bool;principalPkgs;buildList_old;packages;noOf;noOfComponents;buff;cleanup;cfg;writeDependencyFile
  ;packageID_2;buildList_old;b;buildList_new;installedPkgs;newPrincipalPkgs
 ⍝ If `folder` carries a dependency file then this function attempts to un-install the package
 ⍝ `packageID` and all its dependencies but only in case those are neither top-level packages nor
@@ -65,6 +65,7 @@
      :EndIf
  :EndIf
  cleanup←1
+ writeDependencyFile←0
  :If 0<≢packageID_2
      :If (⊂packageID_2)∊buildList_old[;2]
          :If ~(⊂packageID_2)∊principalPkgs
@@ -72,7 +73,7 @@
              :Return
          :EndIf
          newPrincipalPkgs←principalPkgs~⊂packageID_2
-         (⊂newPrincipalPkgs)F.NPUT pkgDepFilename 1
+         writeDependencyFile←1 ⍝ We write later in case of a connectivity problem
      :Else
          newPrincipalPkgs←principalPkgs
          cleanup←0
@@ -95,7 +96,7 @@
          cfg←ReadPackageConfigFile folder,RemoveAlias packageID_2
          :If 0<cfg.⎕NC'userCommandScript'
          :AndIf 0<≢cfg.userCommandScript ⍝ Is it a user command?!
-             F.DeleteFile folder,cfg.userCommandScript
+             F.DeleteFile folder,⊃,/1↓⎕NPARTS cfg.userCommandScript
          :EndIf
      :EndIf
      buildList_new←1 CompileBuildList folder
@@ -114,6 +115,9 @@
                  cleanup←0
              :EndIf
          :EndIf
+     :EndIf
+     :If writeDependencyFile
+         (⊂newPrincipalPkgs)F.NPUT pkgDepFilename 1
      :EndIf
      :If cleanup
          installedPkgs←(≢folder)↓¨F.ListDirs folder

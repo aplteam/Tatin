@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.61.1 - 2023-04-02
+⍝ * 0.61.2 - 2023-04-08
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -666,7 +666,10 @@
               qdmx←⎕DMX
               CheckForInvalidVersion qdmx
           :EndTrap
-          :If ~parms.force
+          :If parms.force
+              r←''
+          :Else
+              r←⍪(⊂'Re-installed:'),' ',¨r
               ⎕←'*** Done'
           :EndIf
       :EndIf
@@ -849,9 +852,10 @@
       :EndTrap
     ∇
 
-    ∇ r←UnInstallPackage Arg;path;packageID;msg;ind;list;candidates;what;subFolders
+    ∇ r←UnInstallPackage Arg;path;packageID;msg;ind;list;candidates;subFolders;cfg
     ⍝ Attempt to un-install the top-level package `packageID` from the folder `path`
       r←''
+      'You must specify a package ID or at least "?"'Assert 0 0≢Arg.(_1 _2)
       :If Arg.cleanup
           'You must not specify more than one argument together with the -cleanup flag'Assert 0≡Arg._2
           packageID←''
@@ -871,15 +875,15 @@
                               r←'Cancelled by user' ⋄ →0
                           :EndIf
                       :Else
-                          ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+                          ind←'Which folder would you like to un-install from?'TC.C.Select path∘,¨subFolders
                           :If 0=≢ind
                               r←'Cancelled by user' ⋄ →0
                           :Else
-                              what←2⊃openCiderProjects[ind;]
+                              path,←ind⊃subFolders
                           :EndIf
                       :EndIf
                   :Else
-                      ∘∘∘
+                      r←'No project/folder identified' ⋄ →0
                   :EndIf
               :EndIf
           :EndIf
@@ -1279,6 +1283,7 @@
           TC.CloseConnections 1
           CheckForInvalidVersion qdmx
       :EndTrap
+      r←⍪(⊂'*** Installed into ',installFolder,':'),' ',¨r
       ⍝Done
     ∇
 

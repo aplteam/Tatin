@@ -1,8 +1,8 @@
  r←folder EstablishPackageDependencies path;cfg;json;tatinFolder
-⍝ Tries to establish whether the package saved in `path` depends on Tatin packages.
+⍝ Tries to establish whether the package saved in `path` depends on any Tatin packages.
 ⍝ 1. First it checks whether the left argument points to a folder that contains a file
 ⍝    `apl-dependencies.txt` - if so it is returned.
-⍝ 2. Next it checks whether the packaged is managed by Cider because Cider would know.
+⍝ 2. Next it checks whether the package is managed by Cider because Cider would know.
 ⍝ 3. Then it checks a convention: is there a subfolder packages/, and if so, does it
 ⍝    contain a file `apl-dependencies.txt` - if so it is returned.
 ⍝ At a later stage the `BuildPackage` function will also check whether there is a file
@@ -20,8 +20,12 @@
      cfg←Reg.APLfromJSON json
      tatinFolder←cfg.CIDER.tatinFolder
      :If 0<≢tatinFolder
-         tatinFolder←','(≠⊆⊢)tatinFolder
-         r←{⍵↑⍨¯1+⍵⍳'='}⊃tatinFolder  ⍝ The first one are the principal dependencies
+         :If ','=1⍴∊tatinFolder
+             r←'' ⍝ Because a leading , means there are only development dependencies
+         :Else
+             tatinFolder←','(≠⊆⊢)tatinFolder
+             r←{⍵↑⍨¯1+⍵⍳'='}⊃tatinFolder  ⍝ The first one are the principal dependencies
+         :EndIf
      :EndIf
  :ElseIf F.IsDir path,'packages'
  :AndIf F.IsFile path,'packages/apl-dependencies.txt'

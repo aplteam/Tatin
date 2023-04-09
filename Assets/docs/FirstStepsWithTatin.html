@@ -339,8 +339,8 @@ Styles.html</code></pre>
 
 <p>The command prints to the session the name of the namespace into which the package was actually loaded. We can use MarkAPL by referring to it as <code>#.Foo.MarkAPL</code> because Tatin has also established a reference in <code>#.Foo</code> named <code>MarkAPL</code> that points to the real package:</p>
 <pre><code>      #.Foo.MarkAPL
-#._tatin.aplteam_MarkAPL_11_0_1.code.MarkAPL</code></pre>
-<p>But how does MarkAPL find its assets? Well, Tatin injects a namespace <code>TatinVars</code> into <code>#._tatin.aplteam_MarkAPL_11_0_1.code</code>, and that namespace carries several variables, among them these:</p>
+#._tatin.aplteam_MarkAPL_11_0_1.MarkAPL</code></pre>
+<p>But how does MarkAPL find its assets? Well, Tatin injects a namespace <code>TatinVars</code> into <code>#._tatin.aplteam_MarkAPL_11_0_1</code>, and that namespace carries several variables, among them these:</p>
 <ul>
 <li><code>HOME</code> carries the path to the directory where the package was loaded from</li>
 <li><code>ASSETS</code> holds the path to the assets relative to <code>HOME</code>.
@@ -353,7 +353,7 @@ Styles.html</code></pre>
 </div>
 </div>
 
-<pre><code>      #._tatin.aplteam_MarkAPL_11_0_1.code.TatinVars.HOME
+<pre><code>      #._tatin.aplteam_MarkAPL_11_0_1.TatinVars.HOME
 /Foo/packages/aplteam-APLTreeUtils2-1.1.1</code></pre>
 <p>That means that any MarkAPL function can refer to <code>HOME</code> with <code>##.TatinVars.HOME</code>.</p>
 <p><code>TatinVars</code> holds more potentially important data; details are discussed at <a href="#Tatin-Variables" class="bookmark_link">Tatin Variables</a>.</p>
@@ -419,13 +419,13 @@ aplteam_APLTreeUtils2_1_1_0
 aplteam_FilesAndDirs_5_0_0
 aplteam_MarkAPL_10_0_0
 aplteam_OS_3_0_0</code></pre>
-<p>No matter whether the APL code of a package is a single function (or operator) or a bunch of functions and operators or a single namespace (ordinary or scripted) or a bunch of namespaces or a single class or a bunch of classes or a mixture of all these APL objects, they are going to live in a namespace <code>code</code>.</p>
-<p>But Tatin will also inject references pointing to the dependencies into <code>code</code>, therefore:</p>
-<pre><code>      #._tatin.aplteam_MarkAPL_11_0_0.code.⎕nl⍳16
+<p>No matter whether the APL code of a package is a single function (or operator) or a bunch of functions and operators or a single namespace (ordinary or scripted) or a bunch of namespaces or a single class or a bunch of classes or a mixture of all these APL objects, they are going to live in the top namespace of a package.</p>
+<p>But Tatin will also inject references pointing to the dependencies into that namespace, therefore:</p>
+<pre><code>      #._tatin.aplteam_MarkAPL_11_0_0.⎕nl⍳16
 APLTreeUtils2
 FilesAndDirs
 MarkAPL</code></pre>
-<p><code>MarkAPL</code> is the package we asked for. It depends on two packages, <code>APLTreeUtils2</code> and <code>FilesAndDirs</code>. For these two packages references are injected. <code>FilesAndDirs</code> depends on <code>OS</code> but because that is not required by <code>MarkAPL</code> no reference to it is injected into MarkAPL's <code>code</code>, instead you would find such a reference in <code>#._tatin.aplteam_FilesAndDirs_5_0_1.code</code>.</p>
+<p><code>MarkAPL</code> is the package we asked for. It depends on two packages, <code>APLTreeUtils2</code> and <code>FilesAndDirs</code>. For these two packages references are injected. <code>FilesAndDirs</code> depends on <code>OS</code> but because that is not required by <code>MarkAPL</code> no reference to <code>OS</code> is injected into <code>aplteam_MarkAPL_11_0_0.</code>, instead you would find such a reference in <code>#._tatin.aplteam_FilesAndDirs_5_0_1</code>.</p>
 <div class="h_tag">
 <a href="#Misc" id="Misc" class="autoheader_anchor">
 <h3 data-id="Misc">4.5. Misc</h3>
@@ -501,7 +501,14 @@ aplteam-Foo-1.1.1</code></pre>
 </a>
 </div>
 <p>For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.</p>
-<p>They are injected into a namespace <code>TatinVars</code> which in turn is injected into the <code>code</code> namespace.</p>
+<p>They are injected into a namespace <code>TatinVars</code> which in turn is injected into the top package namespace.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>Of course this means that theoretically there could be a name clash, but it is unlikely that the name <code>TatinVars</code> is used for anything else but Tatin, and even if so, as a developer you have the tools available to deal with that.</p>
+</div>
+</div>
+
 <p>Some of them always exist, some of them only under certain circumstances.</p>
 <div class="h_tag">
 <a href="#ASSETS" id="ASSETS" class="autoheader_anchor">
@@ -549,8 +556,9 @@ aplteam-Foo-1.1.1</code></pre>
 <h5 data-id="LX">4.5.3.7. LX</h5>
 </a>
 </div>
-<p>This might or might not exist. If it does exist then it means that the package config file defined a function name as <code>lx</code>, and that this function was executed successfully. <code>LX</code> holds the result that is returned by that function if it did return a result. If it doesn't <code>LX</code> is an empty vector.</p>
-<p>Note that if there is no <code>lx</code> defined in a package config file, or if it is empty, or the function crashed (that will be trapped and ignored by Tatin) then there is no <code>LX</code>.</p>
+<p>In a package config file a function can be defined on the <code>lx</code> parameter. Such a function would be executed after the package was loaded. The purpose of the function is to perform some sort of initialisation.</p>
+<p>If such a function returns a result then it is assigned to <code>LX</code> in the <code>TatinVars</code> namespace.</p>
+<p>Note that <code>LX</code> does not exist in case no such function is defined, or the function did not return a result.</p>
 <div class="h_tag">
 <a href="#URI" id="URI" class="autoheader_anchor">
 <h5 data-id="URI">4.5.3.8. URI</h5>

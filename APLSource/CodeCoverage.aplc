@@ -1,71 +1,80 @@
 :Class CodeCoverage
 ⍝ # The class `CodeCoverage`
-⍝ This class offers methods to watch certain parts of the workspace for being executed, probably as part of executing
-⍝ a test framework like [https://github.com/aplteam/Tester2](`Tester2` "Link to Tester2 on GitHub"), although checking
-⍝ on code coverage by just running an application can make sense as well, in particular with legacy code.\\
-⍝ For that the following steps need to be executed:
+⍝ This class provides methods to watch certain parts of the workspace being executed, presumably as part of running
+⍝ a test framework such as [https://github.com/aplteam/Tester2](`Tester2` "Link to Tester2 on GitHub"), although checking
+⍝ on code coverage by simply running an application can also be useful, especially for legacy code.\\
+⍝ To do this, the following steps need to be performed:
 ⍝ ## Prepare
-⍝ * Instantiate `CodeCoverage` and specify a comma-separated list of namespaces and/or classes to be watched as argument
+⍝ * Instantiate `CodeCoverage` and pass a comma-separated list of namespaces and/or classes to monitor as an argument
 ⍝   to `⎕NEW`.
-⍝ * You might want to set the following two properties to make `CodeCoverage` fit your needs:
-⍝   * `ignore`: comma-separated list of fully qualified names of functions, operators, namespaces and scripts to be
-⍝      ignored.
-⍝   * `filename`: name used for saving the data (with the extension .DCF) and also the HTML report (with the
-⍝     extension .HTML).\\
-⍝     The collected data and the list of namespaces/classes to be watched can be referenced as `data` and
+⍝ * You may want to set the following two properties to customize `CodeCoverage` to your needs:
+⍝   * `ignore`: comma-separated list of fully qualified names of functions, operators, namespaces and scripts to
+⍝      ignore.
+⍝   * `filename`: name used for three different files:
+⍝     * To save the `⎕PROFILE` data in a component file with the extension `.profile`
+⍝     * To save the canonical representations of the code in a component file with the extension `.cr`
+⍝     * To save the HTML report with the `.html` extension\\
+⍝     The collected data and the list of namespaces/classes to watch can be referenced as `data` and
 ⍝     `watch` but _not_ set: they are read-only instance properties.\\
-⍝ ## Executing the code
-⍝ You neeed to call the `Start` method before you execute any code that shall be watched for coverage. Assuming that
-⍝ the instance created was assigned to `C` then call `C.Start ⍬`.\\
+⍝ ## Running the code
+⍝ You must call the `Start` method before executing any code that is to be be watched for coverage. Assuming that
+⍝ the instance has been assigned to `C` then call `C.Start ⍬`.\\
 ⍝ Once all the code you are interested in has been executed call `C.Stop ⍬`.\\
-⍝ When the test framework is done execute `C.Finalise ⍬`.\\
+⍝ When the test framework is finished, run `C.Finalise ⍬`.\\
 ⍝ **Notes:**
-⍝ * You may well restart and stop again as many times as you like. This can be useful to avoid `⎕PROFILE` to collect
+⍝ * You can stop and restart again as many times as you like. This can be useful to avoid `⎕PROFILE` collecting
 ⍝   data while a test framework is running rather than the application you are interested in: `⎕PROFILE` is expensive!
-⍝ * You may run the test framework again, say on a different platform: if the `filename` property points to an already
+⍝ * You can run the test framework again, say on a different platform: if the `filename` property points to an already
 ⍝   existing component file, additional data is added by appending more components.
 ⍝ * The first component self-documents such a DCF file.\\
-⍝ ## Producing a report
-⍝ In order to produce a meaningful report call the shared method `CodeCoverage.ProcessDataAndCreateReport` and
-⍝ pass `C.filename` (or a character vector that holds the filename) as right argument.\\
+⍝ ## Generating a report
+⍝ To create a meaningful report, call the shared method `CodeCoverage.ProcessDataAndCreateReport` and
+⍝ pass `C.filename` (or a character vector containing the filename) as the right argument.\\
 ⍝ This method will aggregate the data, massage it, process it and finally create an HTML report from it.\\
-⍝ Note that by default the report is not verbose, meaning that only the (fully qualified) names of all functions
-⍝ and operators that were not executed at all and all the names of functions and operators that have only been partly
+⍝ Note that by default the report is not verbose, i.e. only the (fully qualified) names of all functions
+⍝ and operators that were not executed at all and all the names of functions and operators that were only partially
 ⍝ executed are reported together with the lines not executed and the total number of lines.\\
-⍝ This is a good starting point. Usually that results in expanding the list of stuff to be ignored, adding more
-⍝ test cases, deleting blocks of code that became superfluous etc.\\
-⍝ However, at one point or another you want the full details: for that just add a 1 as left argument when calling
+⍝ This is a good place to start. Usually this leads to extending the list of things to ignore, adding more
+⍝ test cases, deleting blocks of code that have become obsolete etc.\\
+⍝ At one point, however, or may want the full details: to do this, add a 1 as the left argument when calling
 ⍝ `CodeCoverage.ProcessDataAndCreateReport`. Now the canonical representations of all functions and operators that are
-⍝ only partly covered will become part of the report. The lines that weren't executed are highlighted (bold) and carry
+⍝ only partially covered will become part of the report. The lines that weren't executed are highlighted (bold) and have
 ⍝ a right-pointing arrow on the left.\\
-⍝ ## Restrictions and flaws
-⍝ * For the time being nested namespaces/classes are not processed. This restriction might be lifted in a future release.
-⍝ * Named dfns that are kept local inside a traditional function are not processed correctly. This is a consequence of a
-⍝   flaw of `⎕PROFILE`. Without changing `⎕PROFILE` this cannot be overcome.\\
+⍝ ## Limitations and flaws
+⍝ * Nested namespaces/classes are currently not processed. This restriction may be lifted in a future release.
+⍝ * Named dfns kept local within a traditional function are not processed correctly. This is a consequence of a
+⍝   flaw of `⎕PROFILE`. This cannot be overcome without changing `⎕PROFILE`.\\
 ⍝ This class is part of the APLTree Open Source project.\\
 ⍝ Home page: <https://github.com/aplteam/CodeCoverage>\\
 ⍝ Kai Jaeger
 
     ⎕IO←1 ⋄ ⎕ML←1
 
-    :Field Public Shared Info←''             ⍝ Stricly speaking this should not be shared, but then CodeCoverage should not run in multiple instances anyway
+    :Field Public Shared Info←''             ⍝ Strictly speaking this should not be shared, but then CodeCoverage should not run in multiple instances anyway
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.9.4+52' '2022-12-12'
-
+      r←'CodeCoverage' '0.10.2+52' '2023-04-09'
     ∇
 
     ∇ History
-      :Access Public Shared    
+      :Access Public Shared
+    ⍝ * 0.10.2 from 2023-04-09
+    ⍝   * On non-Windows platforms the file access matrix needs setting to avoid problems
+    ⍝ * 0.10.1 from 2023-04-08
+    ⍝   The `CreateListingForFnsAndOpr` function deleted the "*.cr" file when it should not have
+    ⍝ * 0.10.0 from 2023-03-23
+    ⍝   * New function `DeleteFiles` added for getting rid of the two reporting files create/used by `CodeCoverage`, and
+    ⍝     optionally also of the HML file
+    ⍝   * Bug fix: ∆STOPPED caused a VALUE ERROR nothing wa actually executed
     ⍝ * 0.9.4 from 2022-12-12
     ⍝   * Reports which edition of the interpreter a test was run on
     ⍝   * Precaution against code changes while accumulating test results: a warning is shown in the session if differences were found
-    ⍝   * Runs under classic (no guarantees!)
-    ⍝   * When filtering the table the listings below the table are updated to only show code of functions matching the filter      
+    ⍝   * Might run under classic at your own risk
+    ⍝   * When filtering the table the listings below the table are updated to only show code of functions matching the filter
     ⍝ * 0.9.3 from 2022-10-06
     ⍝   * When `Finalise` was called without calling `Stop` the result appeared to be wrong. Is now called implicitly by `Finalise`.
-    ⍝   * Destructor added that executes `⎕PROFILE 'clear'`   
+    ⍝   * Destructor added that executes `⎕PROFILE 'clear'`
     ⍝ * 0.9.2 from 2022-09-19
     ⍝   * Couple of bug fixes
     ⍝     * Typo fixed (Finalyse => Finalise)
@@ -85,32 +94,6 @@
     ⍝     * "&" was transformed into "&amp" (missing ";")
     ⍝     * <thead> was not closed
     ⍝     * <tbody> was closed twice, but never opened
-    ⍝ * 0.7.3 from 2021-05-26
-    ⍝   * Bug fix: single report failed on a new file due to cnfusion about number of reserved components: 9 rather than 10.
-    ⍝   * Test cases added
-    ⍝   * Minor cosmetic changes
-    ⍝ * 0.7.2 from 2021-03-01
-    ⍝   * Package file corrected
-    ⍝ * 0.7.1 from 2020-12-20
-    ⍝   * Bug fix: `NamesInScript` might crash on an {each}-operation on an empty vector
-    ⍝ * 0.7.0 from 2020-12-17
-    ⍝   * For every test run a row is appended onto component number xx. It conains three pieces of information:
-    ⍝     1. Version of Dyalog and which OS
-    ⍝     2. Timestamp of execution
-    ⍝     3. `⎕WA` in MB
-    ⍝   * Function `Finalyze` renamed to `Finalise`
-    ⍝   * A function operand passed to an operator cause CodeCoverage to crash. This is caused by assigned (derived)
-    ⍝     function definitions
-    ⍝   * Documentation corrected and enhanced
-    ⍝ * 0.6.1 from 2020-09-16
-    ⍝   * Some minor bug fixes:
-    ⍝     * In case the directory supposed to hold the report does not exist `CodeCoverage` now attenpts to create it.
-    ⍝     * Creating the HTML report crashed under some circumstances (empty array).
-    ⍝ * 0.6.0 from 2020-09-04
-    ⍝   * This version requires at least version 18.0 of Dyalog
-    ⍝   * Property Getters and Setters are now reported (lifted restriction)
-    ⍝   * Bug fix: `ignore` did not work as expected on ordinary namespaces.
-    ⍝ * 0.5.0 from 2020-07-14
     ∇
 
     :Field Public Shared Readonly APL_Chars←'ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüþ0123456789∆⍙',⎕ucs (80=⎕dr' ')/9397+⍳26
@@ -129,11 +112,12 @@
       watch←'⎕se'⎕R'⎕SE'⍠('IC' 1)⊣watch_
       _filename←(739⌶0),'/CodeCoverage-',' '~⍨⍕⎕TS
       _data←0 2⍴''
+      ∆STOPPED←0
     ∇
 
     ∇ Close
       :Implements destructor
-      ⎕PROFILE'clear'  
+      ⎕PROFILE'clear'
     ∇
 
     :Property data
@@ -146,9 +130,9 @@
 
     :Property ignore
     ⍝ Either empty or a comma-separated list of fully qualified function, operator class and namespace names
-    ⍝ that should be ignored when the coverage report is compiled.\\
-    ⍝ Note that in case it is an ordinary namespace this means that all objects in that namespace are ignored,
-    ⍝ incluuding all sub-namespaces.
+    ⍝ that should be ignored when compiling the coverage report.\\
+    ⍝ Note that in case it is an ordinary namespace this means that all objects in that namespace will be ignored,
+    ⍝ including any sub-namespaces.
     :Access Public Instance
         ∇ r←Get
           r←','(≠⊆⊢),_ignore
@@ -170,7 +154,7 @@
     :EndProperty
 
     :Property watch
-    ⍝ Comma-separated list of namspaces and/or classes that are going to be watched for coverage,
+    ⍝ A comma-separated list of namespaces and/or classes that are going to be watched for coverage,
     :Access Public Instance
         ∇ r←Get
           r←_watch
@@ -189,9 +173,9 @@
 
     :Property filename
     :Access Public Instance
-    ⍝ By default `filename` is a temp file. However, you may specify your own filename here, with or without
-    ⍝ file extension.\\
-    ⍝ Note that this name would also be used for creating the HTML file, just with a different extension.
+    ⍝ By default `filename` is a temporary file. However, you can specify your own filename here, with or without
+    ⍝ an extension.\\
+    ⍝ Note that this name will also be used to create the HTML file, just with a different extension.
         ∇ r←get
           r←_filename
         ∇
@@ -203,23 +187,48 @@
         ∇
     :EndProperty
 
-    ∇ htmlFilename←{verbose}ProcessDataAndCreateReport filename;details;watch;dcfFilename
-     ⍝ Takes the name of a component file that was created by first instatiating `CodeCoverage` and then calling
-     ⍝ the instance methods `Start`, `Stop` and `Finalise`.\\
-     ⍝ The components holding the `⎕PROFILE` data (10 and running) are then read, aggregated, massaged and
-     ⍝ finally saved in the tenth component.\\
-     ⍝ Then a report is created from the aggregated data and saved on disk.
-     ⍝ `filename` is used for both, identifying the DCF file and the HTML, just the extensions are different.\\
-     ⍝ The optional left argument `verbose` defaults to 0, meaning that the code of the functions and operators
-     ⍝ that are only partly covered is not going to be listed.\\
-     ⍝ However, by specifying a 1 as left argument you can force the canonical representations of those functions
-     ⍝ and operators to become part of the report with all lines that were not executed highlighted.\\
-     ⍝ Note that this function can be called more than once on the same component file. It just wastes some ressources
-     ⍝ on calculating the result again, which is not necessary. However, as long as the number of functions and operators
-     ⍝ is not very large that does not matter much. If it does matter then call `ProcessData` and `CreateReport` instead:
-     ⍝ that is all this function is doing anyway.
+    ∇ {r}←{htmlFile}DeleteFiles filename
+    ⍝ Delete both files created by `CodeCoverage` with the extensions `.profile` and `.cr`.\\
+    ⍝ `filename` must be a single filename with path but without extension.\\
+    ⍝ `htmlFile` defaults to 0, meaning that `filename` with an extension `.html` will not be deleted.
+    ⍝ By specifying a 1 as left argument you can enforce it to be deleted.\\
+    ⍝ `R` is an integer with the number of files deleted.
       :Access Public Shared
-      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.dcf'
+      'Right argument must be a simple character vector'Assert(≡filename)∊0 1
+      'Right argument must be a simple character vector'Assert' '=1↑0⍴filename
+      'You MUST not specify a file extension'Assert~'.'∊3⊃⎕NPARTS filename
+      r←0
+      htmlFile←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'htmlFile'
+      'The optional left argument must be 0 (default) or 1'Assert(⊂htmlFile)∊0 1
+      :If IsFile filename,'.profile'
+          r+←⎕NDELETE filename,'.profile'
+      :EndIf
+      :If IsFile filename,'.cr'
+          r+←⎕NDELETE filename,'.cr'
+      :EndIf
+      :If htmlFile
+      :AndIf IsFile filename,'.html'
+          r+←⎕NDELETE filename,'.html'
+      :EndIf
+    ∇
+
+    ∇ htmlFilename←{verbose}ProcessDataAndCreateReport filename;details;watch;dcfFilename
+     ⍝ Takes the name of a component file created by first instantiating `CodeCoverage` and then calling
+     ⍝ the instance methods `Start`, `Stop` and `Finalise`.\\
+     ⍝ The components containing the `⎕PROFILE` data (11 and running) are then read, aggregated, massaged and
+     ⍝ finally stored in the tenth component.\\
+     ⍝ A report is then generated from the aggregated data and saved on disk.
+     ⍝ `filename` is used for both, identifying the DCF file and the HTML, only the extensions are different.\\
+     ⍝ The optional left argument `verbose` defaults to 0, which means that the code of the functions and operators
+     ⍝ that are only partially covered will to be listed.\\
+     ⍝ However, by specifying a 1 as left argument you can force the canonical representations of these functions
+     ⍝ and operators to become part of the report with any lines that were not executed highlighted.\\
+     ⍝ Note that this function can be called more than once on the same component file. It just wastes some resources
+     ⍝ calculating the result again, which is not necessary. However, as long as the number of functions and operators
+     ⍝ is not very large that does not matter much. If it does matter then call `ProcessData` and `CreateReport` instead:
+     ⍝ that is all this function does anyway.
+      :Access Public Shared
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.profile'
       'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
       verbose←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'verbose'
       {}ProcessData dcfFilename
@@ -227,13 +236,12 @@
     ∇
 
     ∇ filename←{verbose}CreateReport filename;html;tally;caption;b;buff2;linkAndName;buff3;dcfFilename;tno;watched;data;watch;ignore;align;runs;buff
-    ⍝ This function creates an HTML file with a coverage report from the data collected while executing
-    ⍝ one or more test suites or running an application.\\
+    ⍝ This function creates an HTML file containing a coverage report from the data collected during the execution of an application.\\
     ⍝ You must call `ProcessData` first: this function relies on the data being aggregated.\\
-    ⍝ If the file extension of `filename` is not ".html" this is enforced.\\
+    ⍝ If the file extension of `filename` is not ".html" this will be enforced.\\
     ⍝ The optional ⍺ (`verbose`) defaults to 0, meaning that no code listings are part of the report.
       :Access Public Shared
-      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.dcf'
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.profile'
       'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
       tno←dcfFilename ⎕FSTIE 0
       watched←⎕FREAD tno,2
@@ -394,11 +402,11 @@
     ∇
 
     ∇ {(details watch)}←ProcessData filename;tno;watched;data;b;details;where;wi;dcfFilename;ignore
-     ⍝ Takes the name of a component file that was created by calling `Start`, `Stop` and `Finalise`.\\
-     ⍝ The components are read, aggregated and massaged and finally saved in the tenth component,
-     ⍝ but the aggregated data is also returned as a shy result together with what has been watched.
+     ⍝ Takes the name of a component file created by calling `Start`, `Stop` and `Finalise`.\\
+     ⍝ The components are read, aggregated and massaged and finally stored in the tenth component,
+     ⍝ but the aggregated data is also returned as a shy result along with the watched data.
       :Access Public Shared
-      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.dcf'
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.profile'
       'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
       tno←dcfFilename ⎕FSTIE 0
       watched←⎕FREAD tno,2
@@ -413,8 +421,7 @@
           details,←data[where;3 4]
           details(RemoveToBeIgnored)←ignore
           b←details[;3]≠100
-          :If 0<≢b
-          :AndIf ∨/b
+          :If ∨/b
               (b/details[;3])←100⌊⌊0.5+100×÷/≢¨b⌿details[;2 4]         ⍝ Recalculate percentage
           :EndIf
           details ⎕FREPLACE tno 10
@@ -423,13 +430,13 @@
     ∇
 
     ∇ r←Finalise dummy;names;details;i;name;row;linesCovered;body;lines;bool;regExPattern;filename;tno;d;buff;crF;crX;crT;crN;fileM;bodyC;t∆
-    ⍝ Call this once all the code you want to check on has been executed`.\\
-    ⍝ It investigates all functions and operators that are only partly covered, and saves the lines that
-    ⍝ have been executed as well as the lines that could have been executed.\\
-    ⍝ For the latter a number of lines are ignored, for example empty lines, comment lines and all lines
-    ⍝ that carry non-meaningful lines (with regard to being executed), like all `:End*` lines etc.\\
+    ⍝ Call this when all the code you want to check on has been executed`.\\
+    ⍝ It examines all functions and operators that are only partially covered, and saves the lines that
+    ⍝ were executed as well as the lines that could have been executed.\\
+    ⍝ For the latter, a number of lines are ignored, such as empty lines, comment lines and all lines
+    ⍝ that contain meaningless code (in terms of being executed), such as all `:End*` lines etc.\\
     ⍝ Note that the collected data is appended to the DCF file associated with the instance. Therefore
-    ⍝ you can move the DCF file to another platform and run the code under the supervision of `CodeCoverage`
+    ⍝ you can move the DCF file to another platform and re-run the code under the supervision of `CodeCoverage`
     ⍝ again, for example.
       :Access Public Instance
       r←⍬
@@ -437,19 +444,20 @@
       _data←_data[;1]{(⊃⍺)(∪⊃,/⍵)}⌸_data[;2]
       names←CollectDataForCoverageReport _watch
       details←0 4⍴⍬
-      regExPattern←'^ *:else$' '^ *:section$'                   ⍝ Lines that contain just these patterns...
-      regExPattern,←'^ *:access ' '^ *:field ' '^ *:attribute'  ⍝ ... or these are to be ignored.
-      regExPattern,←⊂'^ *:end[a-zA-Z]*$'                        ⍝ All sorts of :End* statements are not of interest either
+      regExPattern←'^ *:else$' '^ *:section$'                       ⍝ Lines that contain just these patterns...
+      regExPattern,←'^ *:access ' '^ *:field ' '^ *:attribute'      ⍝ ... or these are to be ignored.
+      regExPattern,←⊂'^ *:end[a-zA-Z]*$'                            ⍝ All sorts of :End* statements are not of interest either
       regExPattern,←⊂'^ *:implements'
       regExPattern,←⊂'^ *:signature'
       regExPattern,←⊂'^ *:section'
-      filename←(⊃,/2↑⎕NPARTS _filename),'.dcf'
-      crF←(∊2↑⎕NPARTS filename),'-CR.dcf'             ⍝ this file has the CRs of everything we watched
+      filename←(⊃,/2↑⎕NPARTS _filename),'.profile'
+      crF←(∊2↑⎕NPARTS filename),'.cr'                               ⍝ this file has the CRs of everything we watched
       :If crX←⎕NEXISTS crF
           crT←crF ⎕FTIE 0
-          crN←⎕FREAD crT,1                                        ⍝ the list of names for which we have CRs in component 1+index
+          crN←⎕FREAD crT,1                                          ⍝ the list of names for which we have CRs in component 1+index
       :Else
           crT←crF ⎕FCREATE 0
+          (1 3⍴0 ¯1 0)⎕FSTAC crT                                    ⍝ Everybody everything; important for non-Windows platforms
           crN←⍬
           ⍬ ⎕FAPPEND crT
       :EndIf
@@ -466,16 +474,12 @@
           :AndIf 2≠|≡buff←180⌶name                                  ⍝ For weird staff (like function operands of an operator) we need to check
               :If 0=≢body←{⍵↓⍨-+/∧\' '=⌽⍵}¨↓buff                    ⍝ True for localized dfns
             ⍝ ---------- TODO
-            ⍝     ∘∘∘ ⍝TODO⍝ We cannot get the body of that dfn with ⎕CR or 180⌶, so we need to take other measures.
+            ⍝     ∘∘∘                                               ⍝TODO⍝ We cannot get the body of that dfn with ⎕CR or 180⌶, so we need to take other measures
             ⍝ ----------
               :EndIf
               :If crX
                   :If (⊂name)∊crN
                       :If ~body CompareCR bodyC←⎕FREAD crT,1+crN⍳⊂name
-                          fileM←(∊2↑⎕NPARTS _filename),'_mismatches'
-                          t∆←{0::⍵ ⎕FCREATE 0 ⋄ ⍵ ⎕FTIE 0}fileM
-                          (body bodyC)⎕FAPPEND t∆
-                          ⎕FUNTIE t∆
                           ⎕←'Current definition of function "',name,'" does not match the one captured earlier - do not trust the results' ⍝ ⎕SIGNAL?!
                       :EndIf
                   :Else
@@ -520,6 +524,7 @@
       :Else
           3 ⎕MKDIR 1⊃⎕NPARTS filename
           tno←filename ⎕FCREATE 0
+          (1 3⍴0 ¯1 0)⎕FSTAC tno                                    ⍝ Everybody everything; important for non-Windows platforms
           d←''
           d,←⊂'Documentation regarding the contents of this file'
           d,←⊂(⍴1⊃d)⍴'-'
@@ -545,7 +550,7 @@
           watch ⎕FAPPEND tno
           ignore ⎕FAPPEND tno
           (CollectInformation ⍬)⎕FAPPEND tno
-          tno{⍵ ⎕FAPPEND ⍺}¨(9-¯1+2⊃⎕FSIZE tno)⍴⊂''  ⍝ Fill up to the tenth component
+          tno{⍵ ⎕FAPPEND ⍺}¨(9-¯1+2⊃⎕FSIZE tno)⍴⊂''                 ⍝ Fill up to the tenth component
           details ⎕FAPPEND tno
           ⎕FUNTIE tno
       :EndIf
@@ -563,7 +568,7 @@
     ∇
 
     ∇ {r}←Stop dummy;buff
-    ⍝ Stores all the data collected since `Start` has been called, and then executes `⎕PROFILE'clear'`
+    ⍝ Stores all the data collected since `Start` was invoked, and then executes `⎕PROFILE'clear'`
       :Access Public Instance
       r←⍬
       buff←(⎕PROFILE'data')[;1 2]
@@ -575,31 +580,31 @@
 
 ⍝ ------------------------ Private stuff
 
-    ∇ html←CreateListingForFnsAndOpr partlyCovered;name;lines;body;width;html2;all;testable;where;buff;i;links;percent;crT;crN;crF
+    ∇ html←CreateListingForFnsAndOpr partlyCovered;name;lines;body;width;html2;all;testable;where;buff;i;links;percent;cr
+      cr←⎕NS''
       html←''
       links←'<a class="float-right no-print no-underline top-links" href="#top" title="Go to the top of the document">&#8607;</a>'
       links,←'<a  class="float-right no-print no-underline top-links" href="#partly-covered" title="Go to the beginning of ''Partly-covered''">↑</a>'
-      crF←(⊃,/2↑⎕NPARTS filename),'-CR.dcf'             ⍝ this file has the CRs of everything we watched
-      :If ~⎕NEXISTS crF
-          ⎕←'Did not find file "',crF,'" with CRs collected by fn "Finalize" - will try to work without it'
-          crT←0
+      cr.filename←(⊃,/2↑⎕NPARTS filename),'.cr'             ⍝ this file has the CRs of everything we watched
+      :If ⎕NEXISTS cr.filename
+          cr.tno←cr.filename ⎕FTIE 0
+          cr.names←⎕FREAD cr.tno,1
+          ⎕←'tied ',cr.filename,' for listings'
       :Else
-          crT←crF ⎕FTIE 0
-          crN←⎕FREAD crT,1
-          ⎕←'tied ',crF,' for listings'
+          ⎕←'Did not find file "',cr.filename,'" with CRs collected by fn "Finalize" - will try to work without it'
+          cr.tno←0
       :EndIf
       :For i :In ⍳≢partlyCovered
           (name lines percent testable)←partlyCovered[i;1 2 3 4]
-          :If (crT=0)∨~(⊂name)∊crN
+          :If (cr.tno=0)∨~(⊂name)∊cr.names
               body←{⍵↓⍨-+/∧\' '=⌽⍵}¨↓180⌶name
           :Else
-              :If ~crT∊⎕FNUMS
-                  body←⍬
+              :If cr.tno∊⎕FNUMS
+                  body←⎕FREAD cr.tno,1+cr.names⍳⊂name
               :Else
-                  body←⎕FREAD crT,1+crN⍳⊂name
+                  body←⍬
               :EndIf
           :EndIf
-     
           :If 0<≢body
               body←ExchangeHtmlSpecialChars body
               (1⊃body)←{⍵↑⍨¯1+⌊/⍵⍳'⍝;'}1⊃body
@@ -621,7 +626,8 @@
               html,←html2
           :EndIf
       :EndFor
-      ⎕FUNTIE crT
+      ⎕FUNTIE cr.tno
+      ⎕DL 0.1
     ∇
 
       Shorten←{
@@ -783,8 +789,8 @@
     ⍝ Takes a ref pointing to a class or interface script and returns the names of all functions and operators
     ⍝ within that script.\\
     ⍝ Has two limitations:
-    ⍝ * Cannot process nested classes and nested namespaces.
-    ⍝ * Might well mistake a variable name as the name of a dfn.\\
+    ⍝ * Cannot handle nested classes and nested namespaces.
+    ⍝ * May well mistake a variable name for the name of a dfn.\\
       r←''
       body←⎕SRC ref
       body←'''[^'']*'''⎕R''⊣body                                     ⍝ Get rid of everything between quotes
@@ -886,11 +892,8 @@
       ⍝    it will crash with errors because it can't deal with these characters...
       :If {0::1 ⋄ 0⊣⎕UCS ⍵}8838  ⍝ do not even attempt to execute this on Classic!
           z←1
-          →0
-      :EndIf
-      :If a≠⍥≢b   ⍝ no of lines must match
+      :ElseIf a≠⍥≢b   ⍝ no of lines must match
           z←0
-          →0
       :Else
           args←{1=≡⍵:↓⍵ ⋄ ⍵}¨a b
           :For i :In ⍳2
@@ -920,5 +923,15 @@
           11::'Too big'⎕SIGNAL 11                     ⍝ number too big.
           (16⊥v)-⍺×(8≤⊃v)×16*≢v                       ⍝ (signed) decimal number.
       }
+
+
+    Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 998 ⋄ shy←0}
+
+    ∇ r←IsFile filename
+      r←0
+      :Trap 22
+          r←2=1 ⎕NINFO filename
+      :EndTrap
+    ∇
 
 :EndClass

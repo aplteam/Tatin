@@ -1,4 +1,4 @@
- r←Test_BuildPackage_008(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_008(stopFlag batchFlag);⎕TRAP;rc;msg
  ;dir;src;dist;cfg;zipfile;ns;list;expected;clientConfigFile;registries;deps
 ⍝ Build a package with one source file with a single dependency in a folder APLSource\
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -35,6 +35,7 @@
 ∆TidyUp:
  Assert TC.MyUserSettings.RemoveRegistry'[dyalog]'
  Assert TC.MyUserSettings.RemoveRegistry'[myCompany]'
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

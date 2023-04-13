@@ -6,8 +6,9 @@
  ⍝ * A pattern starting with a plus (+) like +0.0.1 or +0.1.0 or +1.0.0\\
  ⍝   This leads to a bumped patch number of patch minor number or patched major number.
  ⍝ * A string representing a version number like "1.2.3" or "10.2.43+123"\\
- ⍝   If no build number is specified the original build number is preserved. Otherwise
- ⍝   the build number is overwritten. In any case is the build number bumped.
+ ⍝   If no build number is specified the original build number is taken and bumped.
+ ⍝   Otherwise the build number is overwritten (not bumped).
+ ⍝ The package config file is updated as a side effect.
  dependencyFolder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'dependencyFolder'
  :If 0=≢projectPath
      projectPath←F.PWD,'/'
@@ -15,7 +16,10 @@
  projectPath←RemoveFileProtocol projectPath
  projectPath←⊃1 ⎕NPARTS projectPath,'/'
  targetPath←Reg.AddSlash RemoveFileProtocol projectPath{⍺{0=≢⍵:⍺ ⋄ ⍵}⍎⍵ ⋄ ⍺}'targetPath'
- targetPath←⊃1 ⎕NPARTS targetPath
+ :If ~':'∊targetPath
+ :AndIf '/'≠1⍴targetPath
+     targetPath←(Reg.AddSlash projectPath),targetPath
+ :EndIf
  cfg_←ReadPackageConfigFile projectPath
  cfg←InitPackageConfig cfg_
  ValidateConfig cfg projectPath

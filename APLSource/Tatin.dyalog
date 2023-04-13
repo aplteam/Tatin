@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.61.2 - 2023-04-08
+⍝ * 0.61.2 - 2023-04-10
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -128,7 +128,7 @@
           c←⎕NS ⍬
           c.Name←'PublishPackage'
           c.Desc←'Publish a package (package folder or ZIP file) to a particular Registry'
-          c.Parse←'2 -dependencies='
+          c.Parse←'2s -dependencies='
           r,←c
      
           c←⎕NS ⍬
@@ -482,9 +482,9 @@
               r(AddHeader)←'Package-ID' 'Principal'
           :Else
               :If 0≡parms.date
-                  r(AddHeader)←(2⊃⍴r)↑(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Project URL')
+                  r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Project URL')
               :Else
-                  r(AddHeader)←(2⊃⍴r)↑'Group & Name' 'Published at' 'Project URL'
+                  r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),'Group & Name' 'Published at' 'Project URL'
               :EndIf
               buff←{'['∊⍵:⍵↑⍨⍵⍳']' ⋄ ⊃TC.Reg.SeparateUriAndPackageID ⍵}registry
               r←((2⊃⍴r)↑(⊂'Registry: ',{⍵↓⍨-'/'=¯1↑⍵}buff),(2⊃⍴r)⍴⊂'')⍪r
@@ -636,7 +636,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx
+    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;subFolders;ind
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -650,12 +650,37 @@
       parms.noBetas←0 Args.Switch'nobetas'
       parms.update←1 Args.Switch'update'
       installFolder←{0≡⍵:'' ⋄ ⍵}installFolder
+      :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+          installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+      :EndIf
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       :If 0=≢installFolder←EstablishPackageFolder installFolder
-          :Return
+          r←'Nothing specified',(0<⎕SE.⎕NC'Cider')/' and nothing obvious found either' ⋄ →0
       :EndIf
       ('Is not a directory: ',installFolder)Assert TC.F.IsDir installFolder
-      'Directory does not host a file apl-dependencies.txt'Assert TC.F.IsFile installFolder,'/apl-dependencies.txt'
+      :If ~TC.F.IsFile installFolder,'/apl-dependencies.txt'
+          :If 9=⎕SE.⎕NC'Cider'
+          :AndIf TC.F.IsFile installFolder,'/cider.config'
+              cfg←⎕SE.Cider.ReadProjectConfigFile installFolder
+          :AndIf 0<≢cfg.CIDER.tatinFolder
+              subFolders←{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+              :If 1=≢subFolders
+                  installFolder,←⊃subFolders
+                  :If 0=1 TC.C.YesOrNo'Sure you want to act on ',installFolder,' ?'
+                      r←'Cancelled by user' ⋄ →0
+                  :EndIf
+              :Else
+                  ind←'Which folder would you like to re-install into?'TC.C.Select installFolder∘,¨subFolders
+                  :If 0=≢ind
+                      r←'Cancelled by user' ⋄ →0
+                  :Else
+                      installFolder,←ind⊃subFolders
+                  :EndIf
+              :EndIf
+          :Else
+              r←'Directory does not host a file apl-dependencies.txt, and no dependencies are defined' ⋄ →0
+          :EndIf
+      :EndIf
       deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
       'Dependency file is empty'Assert 0<≢deps
       :If parms.force
@@ -757,12 +782,16 @@
     ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies
       r←''
       (source url)←Arg.(_1 _2)
+      'No package specified'Assert 0≢source
       :If (,'?')≡,url
           :If 0=≢url←SelectRegistry 1
               :Return
           :Else
               url←'[',url,']'
           :EndIf
+      :EndIf
+      :If 0≡url
+          url←'[tatin]'
       :EndIf
       url_←TC.ReplaceRegistryAlias url
       :If ~TC.Reg.IsHTTP url_
@@ -1131,6 +1160,7 @@
                       :Return
                   :EndIf
                   ns←TC.InitPackageConfig ⍬
+                  ns←TC.DiscussNewConfigFile ns
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
@@ -1419,8 +1449,8 @@
       temp.⎕FX ⎕CR'ED'
       ⍎'temp.',name,'←origData'
       flag←1
-      success←0
       newData←temp.⍎name
+      success←1
       :Repeat
           temp.ED name
           :If origData≢temp.⍎name
@@ -1545,7 +1575,7 @@
               r,←'' '  ]Tatin.PackageDependencies <package-path> [-edit] [-delete] [-quiet]'
           :Case ⎕C'PublishPackage'
               r,←⊂'Publish a package to a particular Tatin Registry.'
-              r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> <Registry-URL|[Registry-Alias]> -dependencies='
+              r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> [<Registry-URL|Registry-Alias]> -dependencies='
           :Case ⎕C'ListVersions'
               r,←⊂'List all versions of the given package of a given Registry or all Registries with a priority>0'
               r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name>-[<version>] [-date]'
@@ -1598,7 +1628,7 @@
           :Case ⎕C'BuildPackage'
               r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
               r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
-              r,←⊂'Note that calling this function will always increase the build number if there is one.'
+              r,←⊂'Note that calling this function will always increase the build number but check -version'
               r,←⊂''
               r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
               r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
@@ -1609,9 +1639,9 @@
               r,←⊂'                * -version=+0.1.0 → bumps the minor number, and resets the patch number'
               r,←⊂'                * -version=+1.0.0 → bumps the major number, and resets patch & minor number'
               r,←⊂'                * -version=1.2.3-beta-2 assigns the given string to "version"'
-              r,←⊂'                  It will preserve the build number and bump it'
+              r,←⊂'                  It will bump the build number if there is one.'
               r,←⊂'                * -version=1.2.3-beta-2+123 will replace whatever is saved on "version", including'
-              r,←⊂'                  the build number, which will still be bumped'
+              r,←⊂'                  the build number, which will therefore NOT be bumped'
               r,←⊂''
               r,←⊂'-dependencies=  Use this to specify a subfolder of the project holding package dependencies.'
               r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'
@@ -1679,9 +1709,10 @@
               r,←⊂'-all    By specifying this flag you can force the command to list all versions of all'
               r,←⊂'        deprecated mnajor versions.'
           :Case ⎕C'ListPackages'
-              r,←⊂'List all packages in the Registry or install folder specified. If no argument was specified'
-              r,←⊂'then the principal Tatin Registry will be assumed (',tatinURL,'). If a "?" is passed as argument'
-              r,←⊂'the user will be prompted for the Registry, except when there is just one anyway.'
+              r,←⊂'List all packages in the Registry or install folder specified.'
+              r,←⊂' * If no argument was specified then the principal Tatin Registry will be assumed (',tatinURL,')'
+              r,←⊂' * If "?" is specified the user will be prompted for the Registry if there are multiple'
+              r,←⊂' * If "[*]" is specified then ALL registries are questioned.'
               r,←⊂''
               r,←⊂'It does not matter whether you specify / or \ in a path, or whether it has or has not'
               r,←⊂'a trailing separator: Tatin is taking care of that.'
@@ -1701,7 +1732,7 @@
               r,←⊂''
               r,←⊂'You can also influence the data returned with the following flags:'
               r,←⊂'-date           Add the publishing date to the output. -noaggr is set to 1 then.'
-              r,←⊂'-project_url       Add the URL saved in the package config file to the result.'
+              r,←⊂'-project_url    Add the URL saved in the package config file to the result.'
               r,←⊂'-noaggr         By default the output is aggregated. -noaggr prevents that.'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all its dependencies into the workspace.'
@@ -1815,7 +1846,6 @@
           :Case ⎕C'UnInstallPackage'
               r,←⊂'UnInstall a given package and its dependencies if those are neither top-level packages nor'
               r,←⊂'required by other packages. Superfluous packages (like outdated versions) are removed ws well.'
-              r,←⊂''
               r,←⊂'If you don''t want to delete a specific package but get rid of all superfluous packages'
               r,←⊂'then don''t specify a package ID but the -cleanup option.'
               r,←⊂''
@@ -1829,14 +1859,14 @@
               r,←⊂'In case the first argument is a package ID it must be one of:'
               r,←⊂'   * Package ID '
               r,←⊂'   * Alias and fully qualified name of a package'
-              r,←⊂'   * Just an alias; post- or prefix with a "@" in order to mark it as alias'
-              r,←⊂'A package ID mMight be fully qualified or <group>-<name>.'
+              r,←⊂'   * Just an alias; postfix with a "@" in order to mark it as alias'
+              r,←⊂'A package ID might be fully qualified or <group>-<name>.'
               r,←⊂''
               r,←⊂'If a second argument is specified it must be a path to a folder with installed packages.'
               r,←⊂'If this is not an absolute path then it must be a sub folder of an open Cider project.'
               r,←⊂'Then Tatin works out the correct one.'
               r,←⊂'The second argument may also be the symbolic name [MyUCMDs] (case independent).'
-              r,←⊂'In case Tatin tries to establish name or path the user will always be asked for confirmation.'
+              r,←⊂'In case Tatin had to establish name or path the user will be asked for confirmation.'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←⊂'Takes a path hosting such a file as an argument.'
@@ -1857,9 +1887,10 @@
               r,←⊂' * Folder that contains everything that defines a package; in this case the required ZIP is'
               r,←⊂'   created by "PublishPackage" itself.'
               r,←⊂''
-              r,←⊂'Requires two arguments:'
-              r,←⊂' * Path to ZIP file or package folder'
+              r,←⊂'Requires up to two arguments:'
+              r,←⊂' * Path to ZIP file or package folder (mandatory)'
               r,←⊂' * URL or alias of a Registry or a "?" (you may or may not embrace the "?" with [])'
+              r,←⊂'   In case this is not specified the principal Registry is assumed.'
               r,←⊂''
               r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
               r,←⊂'to the Tatin rules.'

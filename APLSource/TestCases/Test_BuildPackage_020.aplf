@@ -1,4 +1,4 @@
- r←Test_BuildPackage_020(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_020(stopFlag batchFlag);⎕TRAP;rc;msg
  ;dir;src;dist;body;cfg;zipfile;ns;qdmx
 ⍝ Build a single file (function) with an incompatible "source" setting.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -31,6 +31,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

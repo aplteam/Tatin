@@ -18,7 +18,7 @@
          index←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¨packageList
          cfgFiles←packageList,¨⊂'/apl-package.json'
          cfgFiles←(##.F.IsFile cfgFiles)/cfgFiles                       ⍝ Should only happen in case one is tracing through test cases
-         cfgData←{(##.ReadConfigFile ⍵)}¨cfgFiles
+         cfgData←{(##.ReadPackageConfigFile ⍵)}¨cfgFiles
          cfgData←PolishCfgData cfgData
          (descs tags os_lin os_mac os_win)←↓⍉↑cfgData.(description tags os_lin os_mac os_win)
          osList←((≢path)↓¨packageList),¨' ',¨⍕¨os_lin,¨os_mac,¨os_win

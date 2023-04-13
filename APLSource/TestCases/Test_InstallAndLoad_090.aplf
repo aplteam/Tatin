@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_090(stopFlag batchFlag);⎕TRAP;html;ns;expected;qdmx;dir
+ r←Test_InstallAndLoad_090(stopFlag batchFlag);⎕TRAP;html;ns;expected;qdmx;dir;msg;rc
 ⍝ Attempt to install a package as a ZIP file from Github
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -16,5 +16,6 @@
  r←T._OK
 
 ∆TidyUp:
- ##.FilesAndDirs.RmDir dir
+ (rc msg)←##.FilesAndDirs.RmDirByForce dir
+ msg Assert rc=0
 ⍝Done

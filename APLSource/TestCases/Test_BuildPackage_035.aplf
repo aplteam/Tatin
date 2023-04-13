@@ -1,4 +1,4 @@
- r←Test_BuildPackage_035(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_035(stopFlag batchFlag);⎕TRAP;rc;msg
  ;dir;src;dist;cfg;zipfile;ns;list;expected
 ⍝ Has several assets and does not specify the source which is single namespace script
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -32,6 +32,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Don

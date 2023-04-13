@@ -1,4 +1,4 @@
- r←Test_ClientConfig_113(stopFlag batchFlag);⎕TRAP;settings;tempDir;reg;myRegDef1;myRegDef2
+ r←Test_ClientConfig_113(stopFlag batchFlag);⎕TRAP;settings;tempDir;reg;myRegDef1;myRegDef2;rc;msg
 ⍝ Check whether the priorities are reset in case a new registry is added but the lowest priority is 1; non-standard order
 ⍝ Note that priority is not touched if it is not in the way. Here 9000 survives!
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -27,5 +27,6 @@
  r←T._OK
 
 ∆TidyUp:
- F.RmDir tempDir
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
 ⍝Done

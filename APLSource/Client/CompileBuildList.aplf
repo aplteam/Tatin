@@ -1,4 +1,4 @@
- {buildList}←{replace}CompileBuildList folder;oldTree;newTree;deps2;deps;oldToc;newToc;bool;ind
+ {buildList}←{replace}CompileBuildList (folder deps);oldTree;newTree;deps2;deps;oldToc;newToc;bool;ind
 ⍝ We distinguish here between principal packages and other packages (=dependencies).
 ⍝ If the dependency file was modified after the build list was saved:
 ⍝ * If a top-level package was removed from the dependency file the build list is re-created
@@ -6,7 +6,6 @@
  replace←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'replace'
  folder←Reg.AddSlash folder
  oldTree←LoadBuildList folder
- deps←⊃F.NGET(folder,Reg.DependenciesFilename)1
  (Reg.DependenciesFilename,' is empty')Assert 0<≢deps
  newTree←{0(GetDependencyTree NoPrintToSession)⍵}¨folder∘,¨deps
  newTree←(0<≢¨newTree)⌿newTree

@@ -35,7 +35,9 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
- Assert 0=⊃F.RmDir serverPath,'/',packageID
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+ (rc msg)←F.RmDirByForce serverPath,'/',packageID
+ msg Assert rc=0
  Assert F.DeleteFile zipFilename
 ⍝Done

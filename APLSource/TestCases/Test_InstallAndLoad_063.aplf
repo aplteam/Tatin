@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_063(stopFlag batchFlag);⎕TRAP;res;ref;parms
+ r←Test_InstallAndLoad_063(stopFlag batchFlag);⎕TRAP;res;ref;parms;msg;rc
  ;dir;src;dist;vars1;vars2;vars3;vars4;vars5;vars6;vars7;vars8;vars9;cfg;src2;zipfile
  ⍝ Create namespace with all sorts of variables but name only two of them, Link it, create a package from it and load that package
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -36,7 +36,7 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist ''
+ zipfile←TC.BuildPackage src dist''
  →T.GoToTidyUp 0≥≢zipfile
 
  {}⎕SE.Tatin.LoadPackages zipfile'#.TEMP2'
@@ -47,6 +47,7 @@
 ∆TidyUp:
  {}⎕SE.Link.Break'#.TEMP1'
  #.⎕EX¨'TEMP1' 'TEMP2'
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

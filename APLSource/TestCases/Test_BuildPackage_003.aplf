@@ -1,4 +1,4 @@
- r←Test_BuildPackage_003(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_003(stopFlag batchFlag);⎕TRAP;rc;msg
  ;dir;src;dist;cfg;zipfile;ns;list;expected
 ⍝ Build a package with multiple files into special source folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -28,6 +28,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

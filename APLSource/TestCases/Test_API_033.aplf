@@ -1,4 +1,4 @@
- r←Test_API_033(stopFlag batchFlag);⎕TRAP;res1;dir;parms;res2
+ r←Test_API_033(stopFlag batchFlag);⎕TRAP;res1;dir;parms;res2;msg;rc
 ⍝ Exercise ⎕SE.Tatin.ListTags with several -os*= mutations
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -23,4 +23,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=1⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+ ⍝Done

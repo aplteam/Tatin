@@ -1,0 +1,28 @@
+ ns←DiscussNewConfigFile ns;C;ind;multiples;enforce;single
+⍝ `ns` is a namespace that contains all package config properties.
+⍝ It is typically created by calling InitPackageConfig
+⍝ This function asks the user the mandatory questions in a sensible order
+⍝ before allowing the user to edit the JSON eventually.
+⍝ `success` is 1 in case the user entered all the mandatory data but 0 if she cancelled.
+ C←CommTools
+ multiples←1
+ single←0
+ enforce←1
+ ns.group←enforce({1}C.AskForText)'pkg-owner@Enter the group name (mandatory)'
+ ns.name←enforce({1}C.AskForText)'pkg-name@Enter the package name (mandatory)'
+ ns.description←enforce({1}C.AskForText)'pkg-description@Enter a description of what the package is doing (mandatory)'
+ ns.maintainer←({1}C.AskForText)'pkg-maintainer@Enter the email address of the maintainer'
+ ns.tags←enforce({1}C.AskForText)'pkg-tags@Enter a comma-separated list of tags'
+ ind←'On which operating system will the package be usable'multiples enforce C.Select'Windows' 'Linux' 'Mac-OS'
+ ns.(os_win os_lin os_mac)←1 2 3∊ind
+ ns.io←1 C.YesOrNo'Is ⎕IO 1?'
+ ns.ml←enforce({⍵∊0 1 2 3:1 ⋄ ⎕←'Enter 0, 1, 2 or 3' ⋄ 0}C.AskForNumber)'Enter value for ⎕ML'
+ :If C.YesOrNo'Is the project (going to be) hosted on GitHub?'
+     ns.project_url←'https://github.com/',ns.group,'/',ns.name
+ :Else
+     ns.project_url←({1}C.AskForText)'pkg-projectUrl@Enter the URL of the project'
+ :EndIf
+ :If 0 C.YesOrNo'Is the package a user command?'
+     ns.userCommandScript←({1}C.AskForText)'Enter the name of the user command script, including the file extension'
+ :EndIf
+⍝Done

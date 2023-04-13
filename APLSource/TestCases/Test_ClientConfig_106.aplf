@@ -1,4 +1,4 @@
- r←Test_ClientConfig_106(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns
+ r←Test_ClientConfig_106(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns;rc;msg
 ⍝ Exercise AddRegistry and and RemoveRegistry with a character vector specifying just a URL (without alias)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -18,5 +18,6 @@
  r←T._OK
 
 ∆TidyUp:
- F.RmDir tempDir
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
 ⍝Done

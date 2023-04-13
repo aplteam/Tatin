@@ -1,4 +1,4 @@
- r←Test_Cache_001(stopFlag batchFlag);⎕TRAP;res;tempDir
+ r←Test_Cache_001(stopFlag batchFlag);⎕TRAP;res;tempDir;rc;msg
 ⍝ Install a package with plenty of dependencies and check the cache before and after
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -18,5 +18,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir ∆GetTempDir''
+ (rc msg)←F.RmDirByForce ∆GetTempDir''
+ msg Assert rc=0
 ⍝Done

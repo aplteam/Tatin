@@ -1,4 +1,4 @@
- r←Test_Cache_021(stopFlag batchFlag);⎕TRAP;res;tempDir
+ r←Test_Cache_021(stopFlag batchFlag);⎕TRAP;res;tempDir;rc;msg
 ⍝ Load a package with plenty of dependencies most of which were loaded by the preceding test cases
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -18,5 +18,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir ∆GetTempDir''
+ (rc msg)←F.RmDirByForce ∆GetTempDir''
+ msg Assert rc=0
 ⍝Done

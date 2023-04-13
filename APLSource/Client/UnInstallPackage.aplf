@@ -66,20 +66,20 @@
  :EndIf
  cleanup←1
  writeDependencyFile←0
+ newPrincipalPkgs←principalPkgs
  :If 0<≢packageID_2
      :If (⊂packageID_2)∊buildList_old[;2]
          :If ~(⊂packageID_2)∊principalPkgs
              msg←'Cannot uninstall: is not a principal package'
              :Return
          :EndIf
-         newPrincipalPkgs←principalPkgs~⊂packageID_2
+         newPrincipalPkgs~←⊂packageID_2
          writeDependencyFile←1 ⍝ We write later in case of a connectivity problem
      :Else
-         newPrincipalPkgs←principalPkgs
          cleanup←0
      :EndIf
  :EndIf
- :If 0=≢⊃⎕NGET folder,Reg.DependenciesFilename
+ :If 0=≢newPrincipalPkgs
    ⍝ This may happen when the last user command package was un-installed, for example
      (rc msg)←F.RmDirByForce folder
      :If rc≠0
@@ -99,7 +99,7 @@
              F.DeleteFile folder,⊃,/1↓⎕NPARTS cfg.userCommandScript
          :EndIf
      :EndIf
-     buildList_new←1 CompileBuildList folder
+     buildList_new←1 CompileBuildList folder newPrincipalPkgs
      :If (⊂packageID_2)∊RemoveAlias¨buildList_new[;2]
      :AndIf ~(⊂packageID_2)∊buildList_new[;2]
          msg←'Cannot uninstall: package has an alias assigned'

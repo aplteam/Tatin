@@ -1,4 +1,4 @@
- r←Test_API_006(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;tempDir;packageFolder;cfg;version;rc;more;zipfile
+ r←Test_API_006(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;tempDir;packageFolder;cfg;version;rc;more;zipfile;msg
 ⍝ Exercise ⎕SE.Tatin.BuildPackage and ⎕SE.Tatin.PublishPackage
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -19,7 +19,7 @@
 
  cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_Name)0
  version←{⍵↑⍨¯1+⍵⍳'+'}⊃{⍺,'-',⍵}/cfg.(group name version)
- F.RmDir ∆GetServerRegistryFolder,version
+ {}F.RmDirByForce ∆GetServerRegistryFolder,version
 
  res←⎕SE.Tatin.PublishPackage zipfile'[local]'
  →T.GoToTidyUp 200≠1⊃res
@@ -28,7 +28,8 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir tempDir
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
  #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
 ⍝Done

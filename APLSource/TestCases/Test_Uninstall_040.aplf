@@ -8,9 +8,12 @@
  Assert'example-UC-1.0.0'≡∊res
 
  (list msg)←TC.UnInstallPackage'example-UC-1.0.0' '[Myucmds]'
- →T.PassesIf'example-UC-1.0.0'≡∊list
- →T.PassesIf 0=≢msg
- →T.PassesIf~F.IsDir TC.GetMyUCMDsFolder'UC'
+ →T.GoToTidyUp'example-UC-1.0.0'≢∊list
+ →T.GoToTidyUp 0≠≢msg
+ →T.GoToTidyUp F.IsDir TC.GetMyUCMDsFolder'UC'
 
  r←T._OK
+
+∆TidyUp:
+ {}F.RmDirByForce TC.GetMyUCMDsFolder'UC'
 ⍝Done

@@ -1,4 +1,4 @@
- r←Test_ClientConfig_104(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns;list
+ r←Test_ClientConfig_104(stopFlag batchFlag);⎕TRAP;tempDir;settings;ns;list;rc;msg
 ⍝ Exercise both AddRegistry and ReplaceRegistry with ⎕NS''
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -29,4 +29,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir tempDir
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+⍝Done

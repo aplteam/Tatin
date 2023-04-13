@@ -26,11 +26,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'ZipArchive' '1.0.1+16' '2023-02-06'
+      r←'ZipArchive' '1.0.2+16' '2023-04-09'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.0.2 from 2023-04-09
+    ⍝   * Bug fix in `UnzipTo`: issues with spaces in filenames on non-Windows platforms
     ⍝ * 1.0.1 from 2023-02-06
     ⍝   * `UnzipTo` is more resilient under Linux now
     ⍝ * 1.0.0 from 2022-06-13
@@ -128,7 +130,7 @@
           :Else
               parent←'expand'F.NormalizePath parent
               toBeZipped←{⍵↓⍨'/'=1⍴⍵}¨⊆toBeZipped
-              (rc msg)←Exec'cd ',parent,' && zip -r ',('expand'F.NormalizePath _filename),' ',∊' ',¨'"',¨toBeZipped,¨'"'
+              (rc msg)←Exec'cd ',parent,' && zip -r "',('expand'F.NormalizePath _filename~'"'),'" ',∊' ',¨'"',¨(toBeZipped~¨'"'),¨'"'
               Assert 0=rc
           :EndIf
       :EndIf
@@ -227,15 +229,16 @@
     ⍝ Unzip `⍵` into `⍺`.\\
     ⍝ `targetFolder` must not yet exist.
       :Access Public Shared
+      r←0
       F←(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs
       :If IsWindows
-          r←zipFilename ##.DotNetZip.UnzipTo targetFolder
+          {}zipFilename ##.DotNetZip.UnzipTo targetFolder
       :Else
           zipFilename←F.EnforceSlash AddExtension zipFilename
           ⍝ For unknown reasons the following statement tends to crash, yet the unzip utility unzips everything anyway,
           ⍝ therefore we trap the error and just compare the number of files in the archive with what we've got.
           :Trap 11
-              (rc msg)←Exec'unzip -o -qq ',zipFilename,(0<≢targetFolder)/' -d ',targetFolder
+              (rc msg)←Exec'unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'
           :Else
               qdmx←⎕DMX
               qdmx.Message ⎕SIGNAL qdmx.EN

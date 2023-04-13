@@ -1,4 +1,4 @@
- r←Test_API_005(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;tempDir;res;expected
+ r←Test_API_005(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;tempDir;res;expected;rc;msg
 ⍝ Exercise ⎕SE.Tatin.InstallPackages and ⎕SE.Tatin.LoadDependencies
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -19,6 +19,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir tempDir
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

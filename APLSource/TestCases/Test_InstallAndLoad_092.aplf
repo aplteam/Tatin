@@ -1,0 +1,25 @@
+ r←Test_InstallAndLoad_092(stopFlag batchFlag);⎕TRAP;targetDir;res;zipFilename;rc;msg
+⍝ Install and load a package from a ZIP file that had a dependency (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ targetDir←∆GetTempDir''
+ zipFilename←##.CiderConfig.HOME,'/TestData/ZipWithDeps/aplteam-MyApp1-1.0.0.zip'
+
+ res←TC.InstallPackages zipFilename targetDir
+ →T.GoToTidyUp'aplteam-MyApp1-1.0.0'≢∊res
+
+ res←TC.LoadDependencies targetDir #.TEMP
+ →T.GoToTidyUp'#._tatin.aplteam_MyApp1_1_0_0'≢' '~⍨⍕res
+
+ →T.GoToTidyUp'Universe'≢#.TEMP.MyApp1.Zoo.Hello3
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce targetDir
+ msg Assert rc=0
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

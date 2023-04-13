@@ -4,7 +4,8 @@
  ⎕SE._Tatin.Client.⎕EX'∆PrintToSession'
  F←##.FilesAndDirs
  folder←(739⌶0),'/TatinTests/'
- F.RmDir folder
+ (rc msg)←F.RmDirByForce folder
+ Assert rc=0
  ⎕DL 0.2
  Assert~F.IsDir folder
  (rc msg res)←∆UCMD'Init '

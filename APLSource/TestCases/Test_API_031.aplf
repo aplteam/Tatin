@@ -1,4 +1,4 @@
- r←Test_API_031(stopFlag batchFlag);⎕TRAP;res1;dir;parms
+ r←Test_API_031(stopFlag batchFlag);⎕TRAP;res1;dir;parms;rc;msg
 ⍝ Exercise ⎕SE.Tatin.ListTags for a particular tag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -14,4 +14,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=1⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+⍝Done

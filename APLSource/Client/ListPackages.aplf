@@ -1,4 +1,4 @@
- mat←{parms}ListPackages uri;client;request;res;uri_;parms;registries
+ mat←{parms}ListPackages uri;client;request;res;uri_;parms;registries;registry;buff
 ⍝ `uri` must be one of:
 ⍝  * A path to a Registry and optionally a (possibly incomplete) package ID
 ⍝  * A path to an install folder (must host a file apl-buildlist.json)
@@ -6,6 +6,7 @@
 ⍝ By default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.\\
 ⍝ `r` is a matrix with two columns.\\
 ⍝ `[;2]` carries the number of major versions.\\
+⍝ In case "[*]" instead of a certain registry `r` has three columns: the first column caries the registry name
 ⍝ Optionally `parms` can be specified. This must be a namespace that must contain the variables `group`, `tags`, `aggregate`, `userCommand`.\\
 ⍝ * `group` may specify the group
 ⍝ * `tags` may specify one or more tags (simple comma-separated text vector)
@@ -27,13 +28,25 @@
 ⍝   All patch versions of that package are returned\\
  parms←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕NS''}'parms'
  parms←Reg.CheckParmsForListPackages parms
- uri_←ReplaceRegistryAlias uri
- 'No (valid) Registry specified?!'Assert 0<≢uri_
- :If Reg.IsHTTP uri_
-     mat←parms ListPackages_ uri
- :ElseIf IsInstallFolder uri_
-     mat←ListPackagesInInstallFolder uri_
+ :If '[*]'{⍺≡(≢⍺)↑⍵}uri
+     registries←∪{⍵[;1]}ListRegistries''
+     registries←(IsHTTP¨registries)/registries
+     mat←(0,2+parms.aggregate)⍴''
+     :For registry :In registries
+         :If 0<≢buff←parms ListPackages registry,{⍵↓⍨⍵⍳']'}uri
+             mat⍪←(2⊃⍴mat)↑registry' ' ' '
+             mat⍪←' ',buff
+         :EndIf
+     :EndFor
  :Else
-     mat←Reg.ListPackages uri_ parms
+     uri_←ReplaceRegistryAlias uri
+     'No (valid) Registry specified?!'Assert 0<≢uri_
+     :If Reg.IsHTTP uri_
+         mat←parms ListPackages_ uri
+     :ElseIf IsInstallFolder uri_
+         mat←ListPackagesInInstallFolder uri_
+     :Else
+         mat←Reg.ListPackages uri_ parms
+     :EndIf
  :EndIf
 ⍝Done

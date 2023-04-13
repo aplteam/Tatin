@@ -10,20 +10,14 @@
 
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
+## Version 0.93.0 from 2023-04-13
+
+No breaking changes, no user actions required.
+
+
 ## Version 0.92.0 from 2023-04-03
 
 No breaking changes, but this version is required to overcome a Dyalog bug introduced in March 2023.
-
-* `]UnInstallPackage` now accepts "?" rather than a package ID
-* Bug fixes      
-  * Workaround for Dyalog bug: FILE ACCESS ERROR when trying to `⎕NCOPY` a file that has been tied in the same WS
-  * Error trapping in the Tatin user command script fixed
-  * `UnInstallPackage` did not remove a user command script from the install folder if other packages remain
-  * `UnInstallPackage` did not complain about a "," in the package ID
-  * Minor fix in `ReadPackageConfigFile`
-  * `EstablishPackageFolder` could suffer from a missing trailing `/`
-  * Checking whether `project_url` was pointing to a responsive server never worked on GitHub (they do not do "HEAD")
-⍝⍝  * "files" in a package config file can only be changed for either being a file or non-existend
 
 ## Version 0.91.0 from 2023-03-21
 
@@ -35,6 +29,7 @@ No breaking changes, but this version is required to overcome a Dyalog bug intro
 ## Version 0.90.1 from 2023-03-11
 
 No user actions required.
+
 
 ## Version 0.90.0 from 2023-02-27
 

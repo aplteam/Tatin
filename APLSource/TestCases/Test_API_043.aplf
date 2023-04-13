@@ -1,4 +1,4 @@
- r←Test_API_043(stopFlag batchFlag);⎕TRAP;res1;dir;list;json
+ r←Test_API_043(stopFlag batchFlag);⎕TRAP;res1;dir;list;json;msg;rc
 ⍝ Exercise ⎕SE.Tatin.InitialisePackage and ⎕SE.Tatin.ReadPackageConfigFile
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -17,4 +17,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+ ⍝Done

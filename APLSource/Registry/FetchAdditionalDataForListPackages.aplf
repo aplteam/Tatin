@@ -1,5 +1,5 @@
  r←FetchAdditionalDataForListPackages path;cfg;OSes
- cfg←ReadConfigFile path,'/',CFG_Name
+ cfg←ReadPackageConfigFile path
  OSes←⊃{0=≢⍵:'' ⋄ {⍺,', ',⍵}/⍵}cfg.(os_lin os_mac os_win)/'Lin' 'Mac' 'Win'
  :If 0=cfg.⎕NC'project_url'             ⍝ Was introduced after packages were already published
      r←cfg.description''OSes

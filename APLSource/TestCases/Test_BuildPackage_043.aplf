@@ -1,4 +1,4 @@
- r←Test_BuildPackage_043(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_043(stopFlag batchFlag);⎕TRAP;rc;msg
  ;dir;src;dist;cfg;zipfile;ns;list;expected
 ⍝ Package with a patch number with additional information ("1-beta-2") and a built number (separated by "+")
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -33,6 +33,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Don

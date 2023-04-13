@@ -1,4 +1,4 @@
- r←Test_ClientConfig_103(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg2;reg1;ns
+ r←Test_ClientConfig_103(stopFlag batchFlag);⎕TRAP;tempDir;settings;reg2;reg1;ns;rc;msg
 ⍝ Exercise AddRegistry, ListRegistries, ReplaceRegistry and RemoveRegistry on a config file with 1 to 2 registries
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -31,4 +31,6 @@
  r←T._OK
 
 ∆TidyUp:
- F.RmDir tempDir
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+⍝Done

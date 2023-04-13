@@ -1,4 +1,4 @@
- r←Test_UserCommands_073(stopFlag batchFlag);⎕TRAP;dir;res;rc;msg;list;stop
+ r←Test_UserCommands_073(stopFlag batchFlag);⎕TRAP;dir;res;rc;msg;list;stop;expected
 ⍝ Exercise ]Tatin.ReInstallDependencies with the -update flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -12,12 +12,15 @@
  stop←0
  (rc msg list)←stop ∆UCMD'ReInstallDependencies "',dir,'" -update -force'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- →T.GoToTidyUp'example-versions-1.0.12-That-fix' 'V@example-versions-1.0.12-That-fix'≢list
  →T.GoToTidyUp 0≠≢msg
+ →T.GoToTidyUp 3≠≢⊃F.Dir dir,'/'
+ expected←'example-versions-1.0.12-That-fix' 'V@example-versions-1.0.12-That-fix'
+ →T.GoToTidyUp~expected ∆LazyMatch⊃F.NGET(dir,'/',TC.Reg.DependenciesFilename)1
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

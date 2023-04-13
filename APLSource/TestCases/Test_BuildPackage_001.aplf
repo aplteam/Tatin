@@ -1,4 +1,4 @@
- r←Test_BuildPackage_001(stopFlag batchFlag);⎕TRAP
+ r←Test_BuildPackage_001(stopFlag batchFlag);⎕TRAP;rc;msg
  ;dir;src;dist;body;cfg;zipfile;ns;list;expected
 ⍝ Build a package with a single file with a namespace.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -20,7 +20,7 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist ''
+ zipfile←TC.BuildPackage src dist''
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←'apl-package.json' 'Test.apln'
@@ -29,6 +29,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

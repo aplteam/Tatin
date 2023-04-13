@@ -1,4 +1,4 @@
- r←Test_BuildPackage_044(stopFlag batchFlag);⎕TRAP;qdmx
+ r←Test_BuildPackage_044(stopFlag batchFlag);⎕TRAP;qdmx;rc;msg
  ;dir;src;dist;cfg;ns;list;expected
 ⍝ Package with an invalid built number (separated by "+")
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -33,6 +33,7 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Don

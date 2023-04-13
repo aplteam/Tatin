@@ -1,4 +1,4 @@
- r←Test_API_020(stopFlag batchFlag);⎕TRAP;res2;dir;res1;res3
+ r←Test_API_020(stopFlag batchFlag);⎕TRAP;res2;dir;res1;res3;rc;msg
 ⍝ Exercise ⎕SE.Tatin.ListPackages; simple case: all packages aggregated by {major}
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -21,4 +21,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=1⊃F.RmDir dir
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+⍝Done

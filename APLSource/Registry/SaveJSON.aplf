@@ -1,0 +1,6 @@
+ {r}←json SaveJSON y;filename;flags
+⍝ Attempts to write `json` to `filename` and makes sure that all ⎕UCS 10 are replaced by ⎕UCS 13.\\
+⍝ This is necessary in order to overcome the shortcomings of the current implementation of ⎕JSON (April 2023).
+ (filename flags)←2↑(⊆y),0
+ r←(⊂json)(⎕NPUT⍠'NEOL' 2)filename flags
+⍝Done

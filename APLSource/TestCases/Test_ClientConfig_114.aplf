@@ -6,8 +6,8 @@
  tempDir←∆GetTempDir''
 
  settings←⎕NEW TC.UserSettings(,⊂tempDir)
- data1←⎕JSON⍠('Dialect' 'JSON5')⊣settings.json
- data2←⎕JSON⍠('Dialect' 'JSON5')⊣⊃⎕NGET(tempDir,'/tatin-client.json')
+ data1←∆JSON settings.json
+ data2←∆JSON⊃⎕NGET(tempDir,'/tatin-client.json')
  →T.GoToTidyUp~∧/⊃{(⍺∊⍵)∧(⍵∊⍺)}/{⍵⍎¨(' '~⍨¨↓⍵.⎕NL 2)~⊂'registries'}¨data1 data2
  →T.GoToTidyUp~data1.registries.uri ∆LazyMatch data2.registries.uri
 

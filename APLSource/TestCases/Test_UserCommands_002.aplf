@@ -16,7 +16,7 @@
  cfg.version←'1.0.0'
  cfg.license←'MIT'
  json←TC.Reg.JSON cfg
- (⊂json)F.NPUT(tempDir,'/apl-package.json')1
+ json TC.Reg.SaveJSON(tempDir,'/apl-package.json')1
 
  (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
@@ -25,7 +25,7 @@
  cfg.version←'1.1.0'
  cfg.name←'os'
  json←TC.Reg.JSON cfg
- (⊂json)F.NPUT(tempDir,'/apl-package.json')1
+ json TC.Reg.SaveJSON(tempDir,'/apl-package.json')1
  ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'Test_UserCommands_002 already published on' 'n'
  (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
  →T.GoToTidyUp~(rc=0)∧0=≢msg

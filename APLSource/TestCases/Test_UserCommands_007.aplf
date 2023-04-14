@@ -24,7 +24,7 @@
 
  cfg.version←'1.1.0'
  json←TC.Reg.JSON cfg
- (⊂json)F.NPUT(tempDir,'/apl-package.json')1
+ json TC.Reg.SaveJSON(tempDir,'/apl-package.json')1
  (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
  →T.GoToTidyUp'Package published on'{⍺≢(≢⍺)↑⍵}res

@@ -17,14 +17,14 @@
 
  path←∆GetServerRegistryFolder,'example-Foo-1.0.0/'
  json←⊃F.NGET path,'apl-package.json'
- data←⎕JSON⍠('Dialect' 'JSON5')⊢json
+ data←∆JSON json
  →T.GoToTidyUp data.description≢'Modified by maintenance file'
 
  tempDir←∆GetTempDir''
  zipFilename←path,'example-Foo-1.0.0.zip'
  zipFilename ##.ZipArchive.UnzipTo tempDir
  json2←⊃F.NGET tempDir,'/apl-package.json'
- data2←⎕JSON⍠('Dialect' 'JSON5')⊢json2
+ data2←∆JSON json2
  →T.GoToTidyUp data2.description≢'Modified by maintenance file'
 
  r←T._OK

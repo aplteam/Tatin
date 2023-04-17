@@ -225,7 +225,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←zipFilename UnzipTo targetFolder;F;msg;rc;qdmx
+    ∇ {r}←zipFilename UnzipTo targetFolder;F;cmd;msg;qdmx;rc
     ⍝ Unzip `⍵` into `⍺`.\\
     ⍝ `targetFolder` must not yet exist.
       :Access Public Shared
@@ -238,7 +238,8 @@
           ⍝ For unknown reasons the following statement tends to crash, yet the unzip utility unzips everything anyway,
           ⍝ therefore we trap the error and just compare the number of files in the archive with what we've got.
           :Trap 11
-              (rc msg)←Exec'unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'
+              cmd←'LC_TYPE=C unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'
+              (rc msg)←Exec cmd
           :Else
               qdmx←⎕DMX
               qdmx.Message ⎕SIGNAL qdmx.EN

@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.61.2 - 2023-04-10
+⍝ * 0.62.0 - 2023-04-17
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -428,7 +428,7 @@
       :If 0<≢version
           ⎕SE._Tatin.APLTreeUtils2.GoToWebPage ⎕SE._Tatin.Client.GetMyUCMDsFolder'Tatin/Assets/docs/ReleaseNotes.html'
           r←'Tatin updated on disk to ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
-          r,←(⎕UCS 13),'The current WS has NOT been updated, please restart a fresh session.'
+          r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
       :EndIf
     ∇
 
@@ -772,7 +772,10 @@
           :Return
       :EndIf
       :If 0=⎕NEXISTS targetPath
-      :AndIf 1 TC.C.YesOrNo'Target directory does not exist yet; create it?'
+          msg←'Target directory',CR
+          msg,←targetPath,CR
+          msg,←'does not exist yet; create it?'
+      :AndIf 1 TC.C.YesOrNo msg
           TC.F.MkDir targetPath
       :EndIf
       'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
@@ -1626,12 +1629,13 @@
       :Case 1
           :Select ⎕C Cmd
           :Case ⎕C'BuildPackage'
-              r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
+r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
               r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
-              r,←⊂'Note that calling this function will always increase the build number but check -version'
+              r,←⊂'Always bumps the build number except when -version= is specified *and* carries a build number.'
               r,←⊂''
-              r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted.'
-              r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted.'
+              r,←⊂''
+              r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted'
+              r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted'
               r,←⊂''
               r,←⊂'-version=       Use this to set the version number in both the package project and the package'
               r,←⊂'                that is about to be created. You have several options:'
@@ -1639,9 +1643,9 @@
               r,←⊂'                * -version=+0.1.0 → bumps the minor number, and resets the patch number'
               r,←⊂'                * -version=+1.0.0 → bumps the major number, and resets patch & minor number'
               r,←⊂'                * -version=1.2.3-beta-2 assigns the given string to "version"'
-              r,←⊂'                  It will bump the build number if there is one.'
+              r,←⊂'                  It will preserve any build number and bump it'
               r,←⊂'                * -version=1.2.3-beta-2+123 will replace whatever is saved on "version", including'
-              r,←⊂'                  the build number, which will therefore NOT be bumped'
+              r,←⊂'                  the build number'
               r,←⊂''
               r,←⊂'-dependencies=  Use this to specify a subfolder of the project holding package dependencies.'
               r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'

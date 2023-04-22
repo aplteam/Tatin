@@ -1,4 +1,4 @@
- r←Test_UserCommands_008(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;res3;res4;res5;res;tempDir;ns
+ r←Test_UserCommands_008(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;res3;res4;res5;res;tempDir;ns;config
 ⍝ Exercise ]Tatin.PackageConfig locally
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -24,7 +24,9 @@
 
  (rc msg res)←∆UCMD'PackageConfig ',tempDir
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- →T.GoToTidyUp~∨/'[JSON object]'⍷⍕∆JSON∊res
+ config←∆JSON∊res
+ →T.GoToTidyUp~∨/'[JSON object]'⍷⍕config
+ →T.GoToTidyUp~0∧.<≢¨config.(name group)
 
  (rc msg res)←∆UCMD'PackageConfig ',tempDir,' -delete -quiet'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
@@ -33,5 +35,6 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir tempDir
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
 ⍝Done

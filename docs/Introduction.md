@@ -43,6 +43,8 @@ Packages can be updated to a later (and therefore hopefully better) version easi
 
 * The Tatin server runs on Windows (as a Service or a Docker container) and on Linux (as a Docker image). 
 
+  In principle the server also runs on a Mac but the docker container has not been tested on a Mac.
+
 * Tatin is not compatible with SALT, although the extension `.dyalog` is supported.
 
   In particular Tatin requires source files to carry exactly one APL object, be that a function, an operator, an array, a class script, an interface script, or a namespace script.

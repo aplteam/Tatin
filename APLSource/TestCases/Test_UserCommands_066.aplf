@@ -1,12 +1,12 @@
  r←Test_UserCommands_066(stopFlag batchFlag);⎕TRAP;dir;rc;msg;list;expected
-⍝ Exercise ]Tatin.UnInstallPackage with a package ID as argument
+⍝ Exercise ]Tatin.UnInstallPackages with a package ID as argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  dir←∆GetTempDir''
  dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/UnInstall2/*'
 
- (rc msg list)←∆UCMD'UnInstallPackage P@aplteam-APLProcess-1.0.0 "',dir,'"'
+ (rc msg list)←∆UCMD'UnInstallPackages P@aplteam-APLProcess-1.0.0 "',dir,'"'
  Assert 0=rc
  Assert 0=≢msg
 

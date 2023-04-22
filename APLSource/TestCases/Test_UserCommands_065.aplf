@@ -1,5 +1,5 @@
  r←Test_UserCommands_065(stopFlag batchFlag);⎕TRAP;rc;dir;dir2;oldDependencies;oldBuildlist;oldPkgList;newDependencies;newBuildlist;newPkgList;msg;list;res
-⍝ Exercise ]Tatin.UnInstallPackage with a package ID as argument
+⍝ Exercise ]Tatin.UnInstallPackages with a package ID as argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -10,7 +10,7 @@
  oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  oldPkgList←F.ListDirs dir2,'/'
 
- (rc msg list)←∆UCMD'UnInstallPackage EC@aplteam-EventCodes-3.0.1 "',dir2,'"'
+ (rc msg list)←∆UCMD'UnInstallPackages EC@aplteam-EventCodes-3.0.1 "',dir2,'"'
  Assert rc=0
  →T.GoToTidyUp~(rc=0)∧0=≢msg
  →T.GoToTidyUp~∨/' EC@aplteam-EventCodes-3.0.1 '⍷∊' ',¨list,¨' '
@@ -22,7 +22,7 @@
  →T.GoToTidyUp 1≠+/~oldDependencies∊newDependencies
  →T.GoToTidyUp 1≠+/~oldPkgList∊newPkgList
 
- (rc msg res)←∆UCMD'UnInstallPackage aplteam-EventCodes-3.0.1 "',dir2,'"'
+ (rc msg res)←∆UCMD'UnInstallPackages aplteam-EventCodes-3.0.1 "',dir2,'"'
  →T.GoToTidyUp~∨/'Package is not installed'⍷msg
 
  r←T._OK

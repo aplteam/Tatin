@@ -74,9 +74,8 @@
      projectPath∘{(p f e)←⎕NPARTS ⍵ ⋄ 0=≢p:⍺ zipObj.Add ⍵ ⋄ (⍺,p,'/')zipObj.Add f,e}¨','(≠⊆⊢)cfg.files
  :EndIf
  :If 0<≢dependencies
-     (projectPath,dependencies)zipObj.Add'/apl-dependencies.txt'
+     (projectPath,{⍵↑⍨¯1+⍵⍳'='}dependencies)zipObj.Add'/apl-dependencies.txt'
  :ElseIf F.IsFile projectPath,'apl-dependencies.txt'
      projectPath zipObj.Add'apl-dependencies.txt'
  :EndIf
  zipObj.Dispose
-⍝Done

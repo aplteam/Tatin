@@ -134,8 +134,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Called without an (optional) left argument <code>BuildPackage</code> tries to establish whether the package depends on other packages:</p>
 <ol start="1">
-<li>It checks whether the package is managed by Cider (read: has a file <code>cider.config</code>). If that is the case it checks the property <code>[CIDER]tatinFolder</code> in that file. If that defines a folder that is not assigned to a subnamespace of the package then it is taken.
-<p>Refer to the Cider documentation on <code>tatinFolder</code> for details.</p></li>
+<li>It checks whether the package is managed by Cider (read: has a file <code>cider.config</code>). If that is the case it checks the properties <code>[CIDER]dependencies.tatin</code> as well as <code>[CIDER]dependencies_dev.tatin</code> in that file. If one of them or both define a folder that is not assigned to a subnamespace of the package then it is taken.
+<p>Refer to the Cider documentation on <code>(dependencies dependencies_dev).tatin</code> for details.</p></li>
 <li>If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/.</li>
 <li>If there is no subfolder packages/, or if it does not host a file <code>apl-dependencies.txt</code> then Tatin looks for a file <code>apl-dependencies.txt</code> in the root of the package project.</li>
 <li>If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as left argument to <code>BuildPackage</code>.</li>

@@ -84,9 +84,9 @@ The rules:
 
 Called without an (optional) left argument `BuildPackage` tries to establish whether the package depends on other packages:
 
-1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the property `[CIDER]tatinFolder` in that file. If that defines a folder that is not assigned to a subnamespace of the package then it is taken.
+1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the properties `[CIDER]dependencies.tatin` as well as `[CIDER]dependencies_dev.tatin` in that file. If one of them or both define a folder that is not assigned to a subnamespace of the package then it is taken.
 
-   Refer to the Cider documentation on `tatinFolder` for details.
+   Refer to the Cider documentation on `(dependencies dependencies_dev).tatin` for details.
 
 2. If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/.
 

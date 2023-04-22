@@ -203,9 +203,9 @@ Dependencies may by installed in a package project in different ways:
 
 * By default Tatin assumes a subfolder packages/ to be used for this. If you use them Tatin will identify dependencies itself.
 
-* If you manage a package project with Cider then Tatin will check the `tatinFolder` property: if it contains a definition without an assignment (namespace) then it will be taken
+* If you manage a package project with Cider then Tatin will check the properties `dependencies.tatin` and `dependencies_dev.tatin`: if one of them or both define a folder then it will be taken
 
-* If yiu do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
+* If you do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
 
   * The user command `]Tatin.PublishPackage` has a modifier for this: `-dependencies=`
   * The API function `PublishPackage` can be fed with an optional left argument for this
@@ -247,7 +247,7 @@ When a path to a package project is provided rather than a ZIP file then `]Publi
 
 Note that both `]PublishPackage` as well as `]BuildPackage` assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.
 
-However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has a property `[CIDER]tatinFolder` that is designed to hold the folder with package dependencies, and if that is not empty then Tatin would use this.
+However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has two properties `dependencies.tatin` and `dependencies_dev.tatin` designed to hold the folder with package dependencies, and if one of them is not empty then Tatin would use it, or question the user if both are set.
 
 If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the `-dependencies=` flag.
 

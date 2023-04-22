@@ -1,4 +1,4 @@
- r←folder EstablishPackageDependencies path;cfg;json;tatinFolder
+ r←folder EstablishPackageDependencies path;cfg;json;pkgFolder
 ⍝ Tries to establish whether the package saved in `path` depends on any Tatin packages.
 ⍝ 1. First it checks whether the left argument points to a folder that contains a file
 ⍝    `apl-dependencies.txt` - if so it is returned.
@@ -18,14 +18,9 @@
  :ElseIf F.IsFile path,'cider.config'
      json←⊃F.NGET path,'cider.config'
      cfg←Reg.APLfromJSON json
-     tatinFolder←cfg.CIDER.tatinFolder
-     :If 0<≢tatinFolder
-         :If ','=1⍴∊tatinFolder
-             r←'' ⍝ Because a leading , means there are only development dependencies
-         :Else
-             tatinFolder←','(≠⊆⊢)tatinFolder
-             r←{⍵↑⍨¯1+⍵⍳'='}⊃tatinFolder  ⍝ The first one are the principal dependencies
-         :EndIf
+     pkgFolder←cfg.CIDER.dependencies.tatin
+     :If 0<≢pkgFolder
+         r←pkgFolder
      :EndIf
  :ElseIf F.IsDir path,'packages'
  :AndIf F.IsFile path,'packages/apl-dependencies.txt'

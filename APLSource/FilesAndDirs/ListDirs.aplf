@@ -3,18 +3,17 @@
 ⍝ `path` must of course be a directory.\\
 ⍝ Specify the string `recursive` (not case sensitive) as left argument to make the
 ⍝ function work recursively.\\
-⍝ In addition to `recursive` you may also specify an integer defining the depth. For
-⍝ example, if you are interested just in the given directories and its sub-directory set this to 2.\\
-⍝ `path` might contain wildcard characters (`*` and `?`) nowhere but in the last part
-⍝ of the path and only if `recursive` is **not** specified as left argument. However,
-⍝ note that these are treated as wildcard characters only under Windows; under Linux and
-⍝ Mac OS they are both regular characters that might well be part of a name.\\
+⍝ In addition to `recursive` you may also specify an integer defining the depth. For example,
+⍝ if you are interested just in the given directories and its sub-directory set this to 2.\\
+⍝ `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs` cannot deal with files
+⍝ that contain a `*` or a `?` as part of any name, be it directory or filename; under Linux and Mac OS
+⍝ these are legal characters for filenames and directory names.\\
 ⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.
  x←{0<⎕NC ⍵:⍎⍵ ⋄ ''⍬}'x'
  x←⊂∘,⍣((⊃' '=1↑0⍴↑x)∧1=≡x)⊣x
  (recursive depth)←2↑x,(≢x)↓0 ⍬
  depth-←1
- path←NormalizePath path
+ path←NormalizePath ,path
  (part1 part2)←APLTreeUtils2.SplitPath path
  'Wildcard characters are allowed only in the last part of a path'⎕SIGNAL 11/⍨∨/'?*'∊part1
  :If 'Win'≢APLTreeUtils2.GetOperatingSystem ⍬

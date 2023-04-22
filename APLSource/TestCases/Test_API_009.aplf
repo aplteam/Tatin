@@ -1,6 +1,6 @@
  r←Test_API_009(stopFlag batchFlag);⎕TRAP;rc
  ;dir;dir2;oldDependencies;oldBuildlist;msg;list;oldPkgList;newPkgList;newBuildlist;newDependencies
-⍝ Exercise ⎕SE.Tatin.UnInstallPackage: un-install by alias a package that is also installed by just its package ID
+⍝ Exercise ⎕SE.Tatin.UnInstallPackages: un-install by alias a package that is also installed by just its package ID
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -11,7 +11,7 @@
  oldBuildlist←Reg.GetJsonFromFile dir2,'/',TC.Reg.BuildListFilename
  oldPkgList←F.ListDirs dir2,'/'
 
- (list msg)←⎕SE.Tatin.UnInstallPackage'P@'dir2
+ (list msg)←⎕SE.Tatin.UnInstallPackages'P@'dir2
  →T.GoToTidyUp 0≠≢list
  →T.GoToTidyUp 0≠≢msg
 
@@ -21,7 +21,7 @@
  →T.GoToTidyUp 1≠-/≢¨oldDependencies newDependencies
  →T.GoToTidyUp 0≠-/≢¨oldPkgList newPkgList
 
- (list msg)←⎕SE.Tatin.UnInstallPackage'aplteam-APLProcess-0.4.1'dir2
+ (list msg)←⎕SE.Tatin.UnInstallPackages'aplteam-APLProcess-0.4.1'dir2
  →T.GoToTidyUp~list ∆LazyMatch'aplteam-APLProcess-0.4.1' 'aplteam-APLTreeUtils2-1.1.1' 'aplteam-OS-3.0.1'
  →T.GoToTidyUp 0≠≢msg
 

@@ -1,6 +1,6 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.62.0 - 2023-04-17
+⍝ * 0.63.0 - 2023-04-22
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -174,7 +174,7 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'UnInstallPackage'
+          c.Name←'UnInstallPackages'
           c.Desc←'Un-install a package, and implicitly its dependencies'
           c.Parse←'2s -cleanup -quiet'
           r,←c
@@ -636,7 +636,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;subFolders;ind
+    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -662,8 +662,8 @@
           :If 9=⎕SE.⎕NC'Cider'
           :AndIf TC.F.IsFile installFolder,'/cider.config'
               cfg←⎕SE.Cider.ReadProjectConfigFile installFolder
-          :AndIf 0<≢cfg.CIDER.tatinFolder
-              subFolders←{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+          :AndIf 0<≢∊cfg.CIDER.(dependencies dependencies_dev).tatin
+              subFolders←({⍵↑⍨¯1+⍵⍳'='}¨cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
               :If 1=≢subFolders
                   installFolder,←⊃subFolders
                   :If 0=1 TC.C.YesOrNo'Sure you want to act on ',installFolder,' ?'
@@ -884,7 +884,7 @@
       :EndTrap
     ∇
 
-    ∇ r←UnInstallPackage Arg;path;packageID;msg;ind;list;candidates;subFolders;cfg
+    ∇ r←UnInstallPackages Arg;path;packageID;msg;ind;list;candidates;subFolders;cfg
     ⍝ Attempt to un-install the top-level package `packageID` from the folder `path`
       r←''
       'You must specify a package ID or at least "?"'Assert 0 0≢Arg.(_1 _2)
@@ -899,8 +899,8 @@
               :If ⎕NEXISTS path,TC.Reg.CFG_Name
                   :If 9=⎕SE.⎕NC'Cider'
                       cfg←⎕SE.Cider.ReadProjectConfigFile path
-                  :AndIf 0<≢cfg.CIDER.tatinFolder
-                      subFolders←{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+                  :AndIf 0<≢∊cfg.CIDER.(dependencies dependencies_dev).tatin
+                      subFolders←{⍵↑⍨¯1+⍵⍳'='}¨(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
                       :If 1=≢subFolders
                           path,←⊃subFolders
                           :If 0=1 TC.C.YesOrNo'Sure you want to act on ',path,' ?'
@@ -942,7 +942,9 @@
       :AndIf ~':'∊path
           :If '['=1⍴path
           :AndIf ']'∊path
-              :If '[myucmds]'≢⎕C{⍵↑⍨⍵⍳']'}path
+              :If '[myucmds]'≡⎕C{⍵↑⍨⍵⍳']'}path
+                  path←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}path
+              :Else
                   path←TranslateCiderAlias path
               :EndIf
           :Else
@@ -955,10 +957,14 @@
               :EndIf
           :EndIf
       :EndIf
-      'Please specify only one package at the time'Assert~','∊packageID
-      (list msg)←TC.UnInstallPackage packageID path
-      msg Assert 0=≢msg
-      r←⍪(⊂'*** These packages were uninstalled:'),list
+      :If 0=≢path
+          r←'Cancelled by user'
+      :Else
+          'Please specify only one package at the time'Assert~','∊packageID
+          (list msg)←TC.UnInstallPackages packageID path
+          msg Assert 0=≢msg
+          r←⍪(⊂'*** These packages were uninstalled:'),list
+      :EndIf
     ∇
 
     ∇ r←ListRegistries Arg;type
@@ -1259,9 +1265,11 @@
               :EndIf
               ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
               cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
-              'In the Cider config file "tatinFolder" is empty'Assert 0<≢cfg.CIDER.tatinFolder
-              folders←{1⊃'='(≠⊆⊢)⍵}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
+              (project,' has not been converted yet: cannot be processed')Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+              folders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+              (project,' has no dependency folder(s) defined')Assert 0<≢⊃,/folders
               :If 1<≢folders
+                  folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
                   ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
                   :If 0=≢ind
                       r←'Cancelled by user' ⋄ →0
@@ -1281,7 +1289,9 @@
           :If '['=1⍴installFolder
           :AndIf ']'∊installFolder
               installFolder←TranslateCiderAlias installFolder
-              'Cancelled by user'Assert 0<≢installFolder
+              :If 0=≢installFolder
+                  r←'Cancelled by user' ⋄ →0
+              :EndIf
           :Else
               :If 0=≢installFolder←EstablishPackageFolder{0≡⍵:'' ⋄ ⍵}installFolder
                   :Return
@@ -1332,18 +1342,23 @@
           installFolder←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),installFolder
       :Else
           cfgFilename←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),'cider.config'
-          ('No Cider config file found in ',cfgFilename)Assert ⎕NEXISTS cfgFilename
-          cfg←TC.ReadPackageConfigFile cfgFilename
-          folders←{⍵↑⍨¯1+⍵⍳'='}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
-          'No Tatin folder defined in the Cider config file'Assert 0<≢folders
+          ('No Cider config file found in ',⊃⎕NPARTS cfgFilename)Assert ⎕NEXISTS cfgFilename
+          cfg←⎕SE.Cider.ReadProjectConfigFile cfgFilename
+          'This project has not been converted ("tatinFolder" => (dependencies dependencies_dev).tatin'Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+          folders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+          'No Tatin dependencies defined in the Cider config file'Assert 0<≢folders
+          folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
           :If 1=≢folders
-              installFolder←(AddSlash 2⊃list[list[;4]⍳⊂⎕C alias;]),⊃folders
+              installFolder←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),⊃folders
+              :If 0=TC.YesOrNo'InstallConfirmation@Sure that you want to install into ',installFolder,' ?'
+                  installFolder←''
+              :EndIf
           :Else
               ind←('Select package install folder for ',alias,':')TC.C.Select folders
               :If 0=≢ind
                   installFolder←''
               :Else
-                  installFolder←(AddSlash 2⊃list[list[;4]⍳⊂⎕C alias;]),ind⊃folders
+                  installFolder←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),ind⊃folders
               :EndIf
           :EndIf
       :EndIf
@@ -1570,9 +1585,9 @@
           :Case ⎕C'PackageConfig'
               r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
               r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> [-edit] [-delete]'
-          :Case ⎕C'UnInstallPackage'
+          :Case ⎕C'UnInstallPackages'
               r,←⊂'Uninstall a given package and possibly all its dependencies.'
-              r,←'' '  ]Tatin.UnInstallPackage [<package-ID|package-alias>] <package-folder> -cleanup -quiet'
+              r,←'' '  ]Tatin.UnInstallPackages [<package-ID|package-alias>] <package-folder> -cleanup -quiet'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←'' '  ]Tatin.PackageDependencies <package-path> [-edit] [-delete] [-quiet]'
@@ -1629,7 +1644,7 @@
       :Case 1
           :Select ⎕C Cmd
           :Case ⎕C'BuildPackage'
-r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
+              r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
               r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
               r,←⊂'Always bumps the build number except when -version= is specified *and* carries a build number.'
               r,←⊂''
@@ -1771,7 +1786,8 @@ r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and save
               r,←⊂'If more than one user command package and a name is specified after [MyUCMDs] an error is thrown.'
               r,←⊂'If no second argument is specified Tatin tries to find an open Cider project.'
               r,←⊂'If there is just one open, Tatin acts on it, otherwise the user is questioned.'
-              r,←⊂'It then inspects the "tatinFolder" property. If that defines just one folder it is taken.'
+              r,←⊂'It then inspects the "dependencies" & "dependencies_dev" property.'
+              r,←⊂'If that defines just one folder, that one is taken.'
               r,←⊂'If there are multiple folders defined the user is questioned which one to install into.'
               r,←⊂''
               r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
@@ -1847,7 +1863,7 @@ r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and save
               r,←⊂'-delete In case you want to delete the file specify the -delete flag.'
               r,←⊂''
               r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
-          :Case ⎕C'UnInstallPackage'
+          :Case ⎕C'UnInstallPackages'
               r,←⊂'UnInstall a given package and its dependencies if those are neither top-level packages nor'
               r,←⊂'required by other packages. Superfluous packages (like outdated versions) are removed ws well.'
               r,←⊂'If you don''t want to delete a specific package but get rid of all superfluous packages'
@@ -1866,11 +1882,12 @@ r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and save
               r,←⊂'   * Just an alias; postfix with a "@" in order to mark it as alias'
               r,←⊂'A package ID might be fully qualified or <group>-<name>.'
               r,←⊂''
-              r,←⊂'If a second argument is specified it must be a path to a folder with installed packages.'
-              r,←⊂'If this is not an absolute path then it must be a sub folder of an open Cider project.'
-              r,←⊂'Then Tatin works out the correct one.'
-              r,←⊂'The second argument may also be the symbolic name [MyUCMDs] (case independent).'
-              r,←⊂'In case Tatin had to establish name or path the user will be asked for confirmation.'
+              r,←⊂'If a second argument is specified it must be one of:'
+              r,←⊂' * Path to a folder with installed packages'
+              r,←⊂'   If this is not an absolute path then it must be a sub folder of an open Cider project.'
+              r,←⊂'   Then Tatin works out the correct one.'
+              r,←⊂' * The symbolic name [MyUCMDs] (case independent).'
+              r,←⊂' * A Cider alias in square brackets'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
               r,←⊂'Takes a path hosting such a file as an argument.'
@@ -2133,7 +2150,7 @@ r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and save
           :Case ⎕C'LoadDependencies'
           :Case ⎕C'UserSettings'
           :Case ⎕C'PackageConfig'
-          :Case ⎕C'UnInstallPackage'
+          :Case ⎕C'UnInstallPackages'
           :Case ⎕C'PackageDependencies'
           :Case ⎕C'BuildPackage'
           :Case ⎕C'PublishPackage'
@@ -2340,7 +2357,7 @@ r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and save
 
     IsAbsolutePath←{'/'=1⍴⍵:1 ⋄ ':'∊⍵:1 ⋄ '//'≡2↑⍵}
 
-    ∇ folder←{quietFlag}EstablishPackageFolder folder;list;ind;cfg;buff
+    ∇ folder←{quietFlag}EstablishPackageFolder folder;list;ind;cfg;pkgFolders
     ⍝ Checks first whether it's meant to be an open Cider project (if Cider is around).
     ⍝ Next it tries to find it in the current dir.
     ⍝ The user should always be asked for confirmation.
@@ -2355,20 +2372,21 @@ r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and save
                   folder,←(~(¯1↑folder)∊'/\')/'/'
                   :If 0=TC.F.IsFile folder,'apl-dependencies.txt'
                       cfg←TC.Reg.JSON⊃TC.F.NGET folder,'cider.config'
-                      :If 0=≢cfg.CIDER.tatinFolder
+                      pkgFolders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+                      :If 0=≢pkgFolders
                           folder←''
-                      :ElseIf ','∊cfg.CIDER.tatinFolder
-                          buff←{⍵↑⍨¯1+⍵⍳'='}¨','(≠⊆⊢)cfg.CIDER.tatinFolder
-                          ind←'Select target folder:'TC.CommTools.Select folder∘,¨buff
+                      :ElseIf 2=≢pkgFolders
+                          ind←'Select target folder:'TC.CommTools.Select folder∘,¨pkgFolders
                           :If 0=≢ind
                               folder←''
                           :Else
-                              folder,←ind⊃buff
+                              folder,←ind⊃pkgFolders
                           :EndIf
                       :Else
-                          folder←{⍵↑⍨¯1+⍵⍳'='}cfg.CIDER.tatinFolder
+                          folder←1⊃pkgFolders
                       :EndIf
                   :EndIf
+                  folder←{⍵↑⍨¯1+⍵⍳'='}folder
               :ElseIf 0=≢list
                   :If TC.F.IsDir TC.F.PWD,'/',folder
                       folder←TC.F.PWD,'/',folder

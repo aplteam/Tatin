@@ -254,8 +254,8 @@ group3=''
 <p>Dependencies may by installed in a package project in different ways:</p>
 <ul>
 <li>By default Tatin assumes a subfolder packages/ to be used for this. If you use them Tatin will identify dependencies itself.</li>
-<li>If you manage a package project with Cider then Tatin will check the <code>tatinFolder</code> property: if it contains a definition without an assignment (namespace) then it will be taken</li>
-<li>If yiu do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
+<li>If you manage a package project with Cider then Tatin will check the properties <code>dependencies.tatin</code> and <code>dependencies_dev.tatin</code>: if one of them or both define a folder then it will be taken</li>
+<li>If you do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
 <ul>
 <li>The user command <code>]Tatin.PublishPackage</code> has a modifier for this: <code>-dependencies=</code></li>
 <li>The API function <code>PublishPackage</code> can be fed with an optional left argument for this</li>
@@ -289,7 +289,7 @@ group3=''
 <pre><code>]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]</code></pre>
 <p>When a path to a package project is provided rather than a ZIP file then <code>]PublishProject</code> would create the ZIP file itself.</p>
 <p>Note that both <code>]PublishPackage</code> as well as <code>]BuildPackage</code> assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.</p>
-<p>However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has a property <code>[CIDER]tatinFolder</code> that is designed to hold the folder with package dependencies, and if that is not empty then Tatin would use this.</p>
+<p>However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has two properties <code>dependencies.tatin</code> and <code>dependencies_dev.tatin</code> designed to hold the folder with package dependencies, and if one of them is not empty then Tatin would use it, or question the user if both are set.</p>
 <p>If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the <code>-dependencies=</code> flag.</p>
 <div class="h_tag">
 <a href="#User-command-packages" id="User-command-packages" class="autoheader_anchor">

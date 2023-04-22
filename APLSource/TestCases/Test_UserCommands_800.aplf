@@ -1,0 +1,38 @@
+ r←Test_UserCommands_800(stopFlag batchFlag);⎕TRAP;res;rc;msg;aliasFilename;aliase;aliase2;alias;zipFilename;targetDir;qdmx;list;expected
+⍝ Exercise ]Tatin.InstallPackages with a Cider alias and load it
+⍝ The Cider alias is introduced temporarily
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ zipFilename←'file://',##.CiderConfig.HOME,'/TestData/ZIP-file/aplteam-APLGit-0.24.0.zip'
+ aliasFilename←⎕SE.Cider.GetCiderAliasFilename
+ aliase←⊃##.FilesAndDirs.NGET aliasFilename 1
+ alias←(⊃⎕SI)~'_'
+ targetDir←∆GetTempDir''
+ aliase2←aliase,⊂alias,'=',targetDir
+ (⊂aliase2)##.FilesAndDirs.NPUT aliasFilename 1
+ 'CREATE!'##.FilesAndDirs.CheckPath targetDir,'/packages'
+ targetDir ⎕NCOPY ##.CiderConfig.HOME,'/TestData/ConfigFile/cider.config'
+
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'InstallConfirmation@' 'Y'
+ (rc msg list)←∆UCMD'InstallPackages "',zipFilename,'" [',alias,']'
+ msg Assert 0=rc
+ expected←,⊂'aplteam-APLGit-0.24.0'
+ →T.GoToTidyUp expected≢' '~⍨¨1↓,list
+
+ res←TC.LoadDependencies(targetDir,'/packages')#.TEMP
+ →T.GoToTidyUp'#._tatin.aplteam_APLGit_0_24_0'≢' '~⍨⍕res
+
+ →T.GoToTidyUp 2≠⍴⍴#.TEMP.APLGit.Methods
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕SE._Tatin.Client.CommTools.Cleanup
+ (⊂aliase)##.FilesAndDirs.NPUT aliasFilename 1
+ (rc msg)←F.RmDirByForce targetDir
+ msg Assert rc=0
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

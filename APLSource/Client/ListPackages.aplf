@@ -31,11 +31,11 @@
  :If '[*]'{⍺≡(≢⍺)↑⍵}uri
      registries←∪{⍵[;1]}ListRegistries''
      registries←(IsHTTP¨registries)/registries
-     mat←(0,2+parms.aggregate)⍴''
+     mat←(0,1++/parms.(date project_url aggregate))⍴''
      :For registry :In registries
          :If 0<≢buff←parms ListPackages registry,{⍵↓⍨⍵⍳']'}uri
              mat⍪←(2⊃⍴mat)↑registry' ' ' '
-             mat⍪←' ',buff
+             mat⍪←(2⊃⍴mat)↑[2]' ',buff
          :EndIf
      :EndFor
  :Else

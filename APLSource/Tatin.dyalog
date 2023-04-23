@@ -450,6 +450,8 @@
       :EndIf
       :If 0≢Arg.noaggr
           parms.aggregate←~Arg.noaggr
+      :Else
+          parms.aggregate←1
       :EndIf
       parms.userCommand←Arg.uc
       parms.date←Arg.date

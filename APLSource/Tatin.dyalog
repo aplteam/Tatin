@@ -2277,12 +2277,12 @@
     IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}
 
     ∇ r←DefineTargetSpace dummy;bool;ind;NSI
-      NSI←(⎕NSI≢¨⊂⍕##.THIS)/⎕NSI
+      NSI←⎕NSI
       r←,⊃1↑(+/'⎕SE'{∧\⍺∘≡¨(≢⍺)↑¨⍵}NSI)↓NSI,'#'
       :If '['∊r   ⍝ Might be called from an instance of a class
           r←{⍵↓⍨-'.'⍳⍨⌽⍵}{⍵↑⍨⍵⍳'['}r
       :EndIf
-      :If (,'#')≢r
+      :If (,'#')≢,r
           ind←'Select target space the package(s) shall be loaded into:'TC.C.Select,¨'#'(⍕r)
           :If 0=≢ind
               r←''

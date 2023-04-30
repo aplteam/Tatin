@@ -1,4 +1,4 @@
- r←Test_BuildPackage_012(stopFlag batchFlag);⎕TRAP;rc;msg
+ r←Test_BuildPackage_012(stopFlag batchFlag);⎕TRAP;rc;msg;parms
  ;dir;src;dist;cfg;zipfile;ns;list;expected
 ⍝ Build multiple files with default "source"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,9 @@
 
  TC.MyUserSettings.source←'source'
 
- zipfile←TC.BuildPackage src dist''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←'apl-package.json' 'source/foo1.apln' 'source/foo2.apln'

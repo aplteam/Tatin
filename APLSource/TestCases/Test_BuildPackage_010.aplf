@@ -1,4 +1,4 @@
- r←Test_BuildPackage_010(stopFlag batchFlag);⎕TRAP;src2;src3;rc;msg
+ r←Test_BuildPackage_010(stopFlag batchFlag);⎕TRAP;src2;src3;rc;msg;parms
  ;dir;src;dist;body;cfg;zipfile;ns;list;expected
 ⍝ Build a package that has a folder as "assets" property.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -25,7 +25,9 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←F.NormalizePath'Assets/myFirst.dll' 'Assets/mySecond.dll' 'TheSource\Hello.aplf' 'apl-package.json'

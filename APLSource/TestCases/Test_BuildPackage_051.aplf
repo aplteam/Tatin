@@ -1,11 +1,13 @@
- r←Test_BuildPackage_051(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg;cfg2;oldBuildNo;newBuildNo;oldVersion;newVersion
+ r←Test_BuildPackage_051(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg;cfg2;oldBuildNo;newBuildNo;oldVersion;newVersion;parms
 ⍝ Build a package that is not a Cider project and has dependencies in the default folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  path←∆GetProjectPath,'/TestData/Build/Default/'
  cfg←TC.ReadPackageConfigFile path,'apl-package.json'
- zipFileName←TC.BuildPackage path path''
+ parms←TC.CreateBuildParms path
+ parms.targetPath←path
+ zipFileName←TC.BuildPackage parms
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
  cfg2←TC.ReadPackageConfigFile path,'apl-package.json'

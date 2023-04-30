@@ -1,4 +1,4 @@
- r←Test_BuildPackage_006(stopFlag batchFlag);⎕TRAP;rc;msg
+ r←Test_BuildPackage_006(stopFlag batchFlag);⎕TRAP;rc;msg;parms
  ;dir;src;dist;cfg;zipfile;ns;list;expected
 ⍝ Build a package with one code file together with an assets folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,10 @@
  cfg.assets←'Assets'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src dist''
+
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←'apl-package.json' 'source/foo1.apln' 'Assets\README.md' 'Assets\Managing_packages_with_Tatin.md'

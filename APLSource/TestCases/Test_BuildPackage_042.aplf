@@ -1,4 +1,4 @@
- r←Test_BuildPackage_042(stopFlag batchFlag);⎕TRAP;rc;msg
+ r←Test_BuildPackage_042(stopFlag batchFlag);⎕TRAP;rc;msg;parms
  ;dir;src;dist;cfg;zipfile;ns;list;expected
 ⍝ Package with a patch number with additional information ("1-beta-2") and a built number (separated by "."; deprecated)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -25,7 +25,9 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
 
  →T.GoToTidyUp 0≥≢zipfile
  →T.GoToTidyUp'Example-Package_B-0.1.0-beta-2'≢2⊃⎕NPARTS zipfile

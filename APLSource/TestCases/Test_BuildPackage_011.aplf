@@ -1,4 +1,4 @@
- r←Test_BuildPackage_011(stopFlag batchFlag);⎕TRAP;src2;src3;rc;msg
+ r←Test_BuildPackage_011(stopFlag batchFlag);⎕TRAP;src2;src3;rc;msg;parms
  ;dir;src;dist;body;cfg;zipfile;ns;list;expected
 ⍝ Packaage that has a folder and a file as "assets" property.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -28,7 +28,9 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←{(1+≢⍵)↓¨{⍵/⍨F.IsFile ⍵}⊃('recursive' 1)F.Dir ⍵,'/'}src

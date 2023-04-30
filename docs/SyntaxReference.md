@@ -26,44 +26,68 @@ If the third level is available then `-??` shows this at the bottom:
 
 The API is established in `⎕SE.Tatin`. These are almost exclusively dfns that call a function in `⎕SE._Tatin`.
 
-While `⎕SE._Tatin` holds all code required for the Tatin client, `⎕SE.Tatin` holds the public interface. A user is supposed to call functions in `Tatin` but not `_Tatin`.
+While `⎕SE._Tatin` holds all packages loaded into `⎕SE`, among them those required by the Tatin client, `⎕SE.Tatin` holds the public interface of the Tatin client. A user is supposed to call functions in `Tatin` but not `_Tatin`.
 
-The API funcion are listed alphabetically.
+The API funcions are listed alphabetically.
 
 
 ### BuildPackage
 
 ```
-zipFilename←{dependencies} BuildPackage projectPath targetPath version
+zipFilename←BuildPackage parameterSpace
 ```
 
-ZIPs all files that are required for a package and/or defined in the `apl-package.json` file  and (optionally) a dependency file from a given folder and creates a ZIP file containing these files in the (optional) `targetPath`.
+ZIPs all files that are required for a package and/or defined in the `apl-package.json` file  and (optionally) a dependency file from a given folder and creates a ZIP file containing these files in `targetPath`.
 
-projectPath:
+Requires a namespace with parameters as right argument, typically created by calling `CreateBuildParms` which requires a path to the project as right argument:
 
-: A folder to create the package from: a package project
+```
+   parms←⎕SE.Cider.CreateBuildParms '/path/2/project`
+   parms.⎕nl 2
+dependencyFolder
+projectPath     
+targetPath      
+version         
 
-targetPath:
+```
 
-: The folder the ZIP file is created in
+#### dependencyFolder
 
-: Note that if `targetPath` is empty then it defaults to `projectPath`
+A folder with packages the project depends on. Might be empty, in case there are'nt any dependencies.
 
-version:
+#### projectPath
 
-: Either empty or a replacement string for "version" or a rule how to modify the version number
+The folder the package is going to be created from. To be specified as the right argument of `CreateBuildParms`.
 
-#### The version number
+#### targetPath
 
-The problem with version numbers is that a package configuration file **must** contain a version number. Many programmers want to have the version number also available in their code. So which one rules?
+The folder the ZIP file is created in.
 
-Clearly there is no right or wrong answer here: it depends on personal preferences, or the work flow.
+Note that if `targetPath` is empty then Tatin checks whether the project is managed by Cider. 
 
-`BuildPackage` is part of Tatin, therefore it takes care of the `version` information in the package configuration file. Everything else is left to the user.
+If that's the case `targetPath` becomes the Cider config parameter `distributionFolder`.
+
+I that is not the case or if `distributionFolder` is empty then `targetPath` defaults to the `projectPath`.
+
+#### version
+
+Must be one of:
+
+* A rule how to modify the version number in the package config file
+* An empty character vector
+* A character vector that replaces "version" in the package config file
+
+A> ### The version number
+A>
+A> The problem with version numbers is that a package configuration file **must** contain a version number, but many programmers want to have the version number also available in their code. So which one rules?
+A>
+A> Clearly there is no right or wrong answer here: it depends on personal preferences, or the work flow.
+A>
+A> `BuildPackage` is part of Tatin, therefore it takes care of the `version` information in the package configuration file. Everything else is left to the user.
 
 ##### "version" starts with a "+"
 
-It's treated as a rule. For that it must come with three digits separated by dots. The digits may be just 0 or 1.
+The "+" makes it a rule. It must come with three digits separated by dots. The digits may be just 0 or 1.
 
 The rules:
 
@@ -76,25 +100,24 @@ The rules:
 
 * If `version` is empty then just the build number is bumped
 * If `version` is not empty but does not carry a build number then it replaces the version information but the build number, which is bumped
-* If `version` is not empty and carries a build number then it replaces the version information including the build number, and that build number is **not** bumped
-
+* If `version` is not empty and includes a build number then it replaces the version information including the build number, and that build number is **not** bumped
 
 
 #### Dependencies
 
-Called without an (optional) left argument `BuildPackage` tries to establish whether the package depends on other packages:
+When `dependencyFolder` is empty `BuildPackage` tries to establish whether the package depends on other packages:
 
-1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the properties `[CIDER]dependencies.tatin` as well as `[CIDER]dependencies_dev.tatin` in that file. If one of them or both define a folder that is not assigned to a subnamespace of the package then it is taken.
+1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the property `[CIDER]dependencies.tatin` in that file. If it defines a folder then it is taken.
 
-   Refer to the Cider documentation on `(dependencies dependencies_dev).tatin` for details.
+   Refer to the Cider documentation on `dependencies.tatin` for details.
 
-2. If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/.
+2. If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/ (convention).
 
-3. If there is no subfolder packages/, or if it does not host a file `apl-dependencies.txt` then Tatin looks for a file `apl-dependencies.txt` in the root of the package project.
+3. If there is no subfolder packages/, or if it does not host a file `apl-dependencies.txt`, then Tatin looks for a file `apl-dependencies.txt` in the root of the package project.
 
-4. If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as left argument to `BuildPackage`.
+4. If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as `dependencyFolder` in the parameter space.
 
-If no file `apl-dependencies.txt` can be detected then Tatin assumes that the package does not depend on other packages.
+If no file `apl-dependencies.txt` can be detected then Tatin will assume that the package does not depend on other packages.
 
 
 ### CheckForLaterVersion

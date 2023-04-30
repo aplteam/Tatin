@@ -1,4 +1,4 @@
- r←Test_BuildPackage_020(stopFlag batchFlag);⎕TRAP;rc;msg
+ r←Test_BuildPackage_020(stopFlag batchFlag);⎕TRAP;rc;msg;parms
  ;dir;src;dist;body;cfg;zipfile;ns;qdmx
 ⍝ Build a single file (function) with an incompatible "source" setting.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -20,8 +20,10 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
  :Trap 998
-     zipfile←TC.BuildPackage src dist''
+     zipfile←TC.BuildPackage parms
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

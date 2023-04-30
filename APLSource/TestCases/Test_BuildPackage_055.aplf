@@ -1,4 +1,4 @@
- r←Test_BuildPackage_055(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;cfg;tempDir
+ r←Test_BuildPackage_055(stopFlag batchFlag);⎕TRAP;path;zipFileName;list;cfg2;cfg;tempDir;parms
 ⍝ Build a package and specify a specific version number with a build number and "-beta-2"
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,7 +8,11 @@
  path←tempDir,'/Special/'
 
  cfg←TC.ReadPackageConfigFile path,'apl-package.json'
- zipFileName←'dependencies'TC.BuildPackage path path'4.0.0-beta-2+99'
+ parms←TC.CreateBuildParms path
+ parms.targetPath←path
+ parms.version←'4.0.0-beta-2+99'
+ parms.dependencyFolder←'dependencies'
+ zipFileName←TC.BuildPackage parms
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
  cfg2←TC.ReadPackageConfigFile path,'apl-package.json'

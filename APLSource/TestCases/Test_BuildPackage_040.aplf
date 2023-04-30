@@ -1,4 +1,4 @@
- r←Test_BuildPackage_040(stopFlag batchFlag);⎕TRAP;rc;msg
+ r←Test_BuildPackage_040(stopFlag batchFlag);⎕TRAP;rc;msg;parms
  ;dir;src;dist;cfg;zipfile;ns
 ⍝ Package with a build number
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -26,7 +26,9 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
 
  →T.GoToTidyUp 0≥≢zipfile
  →T.GoToTidyUp'Example-Package_B-0.1.0'≢2⊃⎕NPARTS zipfile

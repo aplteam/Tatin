@@ -1,4 +1,4 @@
- r←Test_BuildPackage_009(stopFlag batchFlag);⎕TRAP;rc;msg
+ r←Test_BuildPackage_009(stopFlag batchFlag);⎕TRAP;rc;msg;parms
  ;dir;src;dist;zipfile;ns;list;expected;dep;cfg
 ⍝ Build a package with two source files with multiple dependencies from a folder APLSource\
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -25,7 +25,9 @@
 
  src D.Add'[tatin]aplteam-APLTreeUtils-5.0.0' '[tatin]aplteam-FilesAndDirs-3.1.1' '[tatin]aplteam-OS-9.0.1'
 
- zipfile←TC.BuildPackage src dist''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←'apl-package.json' 'APLSource/foo1.apln' 'APLSource/foo2.apln'TC.Reg.DependenciesFilename

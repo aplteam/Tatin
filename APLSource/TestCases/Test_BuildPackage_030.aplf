@@ -1,4 +1,4 @@
- r←Test_BuildPackage_030(stopFlag batchFlag);⎕TRAP;rc;msg
+ r←Test_BuildPackage_030(stopFlag batchFlag);⎕TRAP;rc;msg;parms
  ;dir;src;dist;cfg;zipfile;ns;list;expected
 ⍝ Has assets and does not specify the source which is a folder
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -26,7 +26,9 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
  →T.GoToTidyUp 0≥≢zipfile
  list←∆GetFileListFromZipArchive zipfile
  expected←'apl-package.json' 'assets\config.txt' 'source\foo1.apln' 'source\foo2.apln' 'user_guide.txt'

@@ -79,38 +79,68 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>The API is established in <code>⎕SE.Tatin</code>. These are almost exclusively dfns that call a function in <code>⎕SE._Tatin</code>.</p>
-<p>While <code>⎕SE._Tatin</code> holds all code required for the Tatin client, <code>⎕SE.Tatin</code> holds the public interface. A user is supposed to call functions in <code>Tatin</code> but not <code>_Tatin</code>.</p>
-<p>The API funcion are listed alphabetically.</p>
+<p>While <code>⎕SE._Tatin</code> holds all packages loaded into <code>⎕SE</code>, among them those required by the Tatin client, <code>⎕SE.Tatin</code> holds the public interface of the Tatin client. A user is supposed to call functions in <code>Tatin</code> but not <code>_Tatin</code>.</p>
+<p>The API funcions are listed alphabetically.</p>
 <div class="h_tag">
 <a href="#BuildPackage" id="BuildPackage" class="autoheader_anchor">
 <h3 data-id="BuildPackage">2.1. BuildPackage</h3>
 </a>
 </div>
-<pre><code>zipFilename←{dependencies} BuildPackage projectPath targetPath version</code></pre>
-<p>ZIPs all files that are required for a package and/or defined in the <code>apl-package.json</code> file and (optionally) a dependency file from a given folder and creates a ZIP file containing these files in the (optional) <code>targetPath</code>.</p>
-<dl>
-<dt>projectPath:</dt>
-<dd><p>A folder to create the package from: a package project</p></dd>
-<dt>targetPath:</dt>
-<dd><p class="first_dd">The folder the ZIP file is created in</p></dd>
-<dd><p>Note that if <code>targetPath</code> is empty then it defaults to <code>projectPath</code></p></dd>
-<dt>version:</dt>
-<dd><p>Either empty or a replacement string for “version” or a rule how to modify the version number</p></dd>
-</dl>
+<pre><code>zipFilename←BuildPackage parameterSpace</code></pre>
+<p>ZIPs all files that are required for a package and/or defined in the <code>apl-package.json</code> file and (optionally) a dependency file from a given folder and creates a ZIP file containing these files in <code>targetPath</code>.</p>
+<p>Requires a namespace with parameters as right argument, typically created by calling <code>CreateBuildParms</code> which requires a path to the project as right argument:</p>
+<pre><code>   parms←⎕SE.Cider.CreateBuildParms '/path/2/project`
+   parms.⎕nl 2
+dependencyFolder
+projectPath
+targetPath
+version
+</code></pre>
 <div class="h_tag">
-<a href="#The-version-number" id="The-version-number" class="autoheader_anchor">
-<h4 data-id="The-version-number">2.1.1. The version number</h4>
+<a href="#dependencyFolder" id="dependencyFolder" class="autoheader_anchor">
+<h4 data-id="dependencyFolder">2.1.1. dependencyFolder</h4>
 </a>
 </div>
-<p>The problem with version numbers is that a package configuration file <strong>must</strong> contain a version number. Many programmers want to have the version number also available in their code. So which one rules?</p>
+<p>A folder with packages the project depends on. Might be empty, in case there are'nt any dependencies.</p>
+<div class="h_tag">
+<a href="#projectPath" id="projectPath" class="autoheader_anchor">
+<h4 data-id="projectPath">2.1.2. projectPath</h4>
+</a>
+</div>
+<p>The folder the package is going to be created from. To be specified as the right argument of <code>CreateBuildParms</code>.</p>
+<div class="h_tag">
+<a href="#targetPath" id="targetPath" class="autoheader_anchor">
+<h4 data-id="targetPath">2.1.3. targetPath</h4>
+</a>
+</div>
+<p>The folder the ZIP file is created in.</p>
+<p>Note that if <code>targetPath</code> is empty then Tatin checks whether the project is managed by Cider.</p>
+<p>If that's the case <code>targetPath</code> becomes the Cider config parameter <code>distributionFolder</code>.</p>
+<p>I that is not the case or if <code>distributionFolder</code> is empty then <code>targetPath</code> defaults to the <code>projectPath</code>.</p>
+<div class="h_tag">
+<a href="#version" id="version" class="autoheader_anchor">
+<h4 data-id="version">2.1.4. version</h4>
+</a>
+</div>
+<p>Must be one of:</p>
+<ul>
+<li>A rule how to modify the version number in the package config file</li>
+<li>An empty character vector</li>
+<li>A character vector that replaces “version” in the package config file</li>
+</ul>
+<div class="leanpub_A">
+<h3>The version number</h3>
+<p>The problem with version numbers is that a package configuration file <strong>must</strong> contain a version number, but many programmers want to have the version number also available in their code. So which one rules?</p>
 <p>Clearly there is no right or wrong answer here: it depends on personal preferences, or the work flow.</p>
 <p><code>BuildPackage</code> is part of Tatin, therefore it takes care of the <code>version</code> information in the package configuration file. Everything else is left to the user.</p>
+</div>
+
 <div class="h_tag">
 <a href="#version-starts-with-a" id="version-starts-with-a" class="autoheader_anchor">
-<h5 data-id="version-starts-with-a">2.1.1.1. “version” starts with a “+”</h5>
+<h5 data-id="version-starts-with-a">2.1.4.1. “version” starts with a “+”</h5>
 </a>
 </div>
-<p>It's treated as a rule. For that it must come with three digits separated by dots. The digits may be just 0 or 1.</p>
+<p>The “+” makes it a rule. It must come with three digits separated by dots. The digits may be just 0 or 1.</p>
 <p>The rules:</p>
 <ul>
 <li><code>+0.0.1</code> bumps the patch number</li>
@@ -119,28 +149,28 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <div class="h_tag">
 <a href="#version-does-not-start-with-a" id="version-does-not-start-with-a" class="autoheader_anchor">
-<h5 data-id="version-does-not-start-with-a">2.1.1.2. “version” does not start with a “+”</h5>
+<h5 data-id="version-does-not-start-with-a">2.1.4.2. “version” does not start with a “+”</h5>
 </a>
 </div>
 <ul>
 <li>If <code>version</code> is empty then just the build number is bumped</li>
 <li>If <code>version</code> is not empty but does not carry a build number then it replaces the version information but the build number, which is bumped</li>
-<li>If <code>version</code> is not empty and carries a build number then it replaces the version information including the build number, and that build number is <strong>not</strong> bumped</li>
+<li>If <code>version</code> is not empty and includes a build number then it replaces the version information including the build number, and that build number is <strong>not</strong> bumped</li>
 </ul>
 <div class="h_tag">
 <a href="#Dependencies" id="Dependencies" class="autoheader_anchor">
-<h4 data-id="Dependencies">2.1.2. Dependencies</h4>
+<h4 data-id="Dependencies">2.1.5. Dependencies</h4>
 </a>
 </div>
-<p>Called without an (optional) left argument <code>BuildPackage</code> tries to establish whether the package depends on other packages:</p>
+<p>When <code>dependencyFolder</code> is empty <code>BuildPackage</code> tries to establish whether the package depends on other packages:</p>
 <ol start="1">
-<li>It checks whether the package is managed by Cider (read: has a file <code>cider.config</code>). If that is the case it checks the properties <code>[CIDER]dependencies.tatin</code> as well as <code>[CIDER]dependencies_dev.tatin</code> in that file. If one of them or both define a folder that is not assigned to a subnamespace of the package then it is taken.
-<p>Refer to the Cider documentation on <code>(dependencies dependencies_dev).tatin</code> for details.</p></li>
-<li>If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/.</li>
-<li>If there is no subfolder packages/, or if it does not host a file <code>apl-dependencies.txt</code> then Tatin looks for a file <code>apl-dependencies.txt</code> in the root of the package project.</li>
-<li>If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as left argument to <code>BuildPackage</code>.</li>
+<li>It checks whether the package is managed by Cider (read: has a file <code>cider.config</code>). If that is the case it checks the property <code>[CIDER]dependencies.tatin</code> in that file. If it defines a folder then it is taken.
+<p>Refer to the Cider documentation on <code>dependencies.tatin</code> for details.</p></li>
+<li>If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/ (convention).</li>
+<li>If there is no subfolder packages/, or if it does not host a file <code>apl-dependencies.txt</code>, then Tatin looks for a file <code>apl-dependencies.txt</code> in the root of the package project.</li>
+<li>If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as <code>dependencyFolder</code> in the parameter space.</li>
 </ol>
-<p>If no file <code>apl-dependencies.txt</code> can be detected then Tatin assumes that the package does not depend on other packages.</p>
+<p>If no file <code>apl-dependencies.txt</code> can be detected then Tatin will assume that the package does not depend on other packages.</p>
 <div class="h_tag">
 <a href="#CheckForLaterVersion" id="CheckForLaterVersion" class="autoheader_anchor">
 <h3 data-id="CheckForLaterVersion">2.2. CheckForLaterVersion</h3>

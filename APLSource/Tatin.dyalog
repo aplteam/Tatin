@@ -1,4 +1,4 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.63.0 - 2023-04-22
 
@@ -784,10 +784,33 @@
       zipFilename←dependencies TC.BuildPackage sourcePath targetPath version
     ∇
 
-    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies
+    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies;openCiderProjects;ind;project;cfg;folder;zipFolder
       r←''
       (source url)←Arg.(_1 _2)
-      'No package specified'Assert 0≢source
+      :If 0≡source
+          'No ZIP file specified?!'Assert 9=⎕SE.⎕NC'Cider'
+          openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+          :If 1<≢openCiderProjects
+              ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+              :If 0=≢ind
+                  r←'Cancelled by user' ⋄ →0
+              :Else
+                  (project folder)←openCiderProjects[ind;]
+              :EndIf
+          :ElseIf 1=≢openCiderProjects
+              (project folder)←openCiderProjects[1;]
+          :Else
+              r←'No path specified & no open Cider projects found' ⋄ →0
+          :EndIf
+          ('No Cider config file found in ',project)Assert ⎕NEXISTS folder,'/cider.config'
+          cfg←TC.Reg.GetJsonFromFile folder,'/cider.config'
+          'Has no property "distributionFolder" yet?!'Assert 0<cfg.CIDER.⎕NC'distributionFolder' ⍝ was introduced in 0.26.0
+          zipFolder←(TC.Reg.AddSlash folder),cfg.CIDER.distributionFolder
+          source←TC.F.ListFiles zipFolder,'/*.zip'
+          ('No ZIP file found in ',zipFolder)Assert 0<≢source
+          ('More than one ZIP file found in ',zipFolder)Assert 1=≢source
+          source←⊃source
+      :EndIf
       :If (,'?')≡,url
           :If 0=≢url←SelectRegistry 1
               :Return
@@ -829,7 +852,9 @@
           :If f2
               msg,←CR,'The package is not e beta release.'
           :EndIf
-          msg,←CR,'Are you sure that you want to publish anyway?'
+          msg,←CR,'Are you sure that you want to publish'
+          msg,←CR,'   ',source
+          msg,←CR,'anyway?'
           :If 0=TC.C.YesOrNo msg
               ⎕←'Publishing cancelled'
               :Return

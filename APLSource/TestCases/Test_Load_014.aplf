@@ -1,4 +1,4 @@
- r←Test_Load_014(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_Load_014(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;parms
  ;dir;src;reg;prjPath;zipfile;path;refs
 ⍝ Publish two classes and one namespace script. The classes :Include the NS script.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -14,19 +14,25 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- zipfile←TC.BuildPackage(prjPath,'/APLTree')src''
+ parms←TC.CreateBuildParms prjPath,'/APLTree'
+ parms.targetPath←src
+ zipfile←TC.BuildPackage parms
  src ⎕NCOPY prjPath,'/APLTree/apl-package.json'
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
 
  Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
- zipfile←TC.BuildPackage(prjPath,'/F-D')src''
+ parms←TC.CreateBuildParms prjPath,'/F-D'
+ parms.targetPath←src
+ zipfile←TC.BuildPackage parms
  src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/F-D/apl-package.json'
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
 
  Assert 0=⊃F.RmDir src ⋄ F.MkDir src ⍝ Necessary to overcome bug <01722>
- zipfile←TC.BuildPackage(prjPath,'/OS')src''
+ parms←TC.CreateBuildParms prjPath,'/OS'
+ parms.targetPath←src
+ zipfile←TC.BuildPackage parms
  src ⎕NCOPY⍠('IfExists' 'Replace')⊣prjPath,'/OS/apl-package.json'
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc

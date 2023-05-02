@@ -10,17 +10,24 @@
 
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
 
+## Version 0.95.0 from 2023-05-02
+
+This version comes with a breaking change:
+
+`BuildPackage` now requires a namespace with parameters as right argument rather than three positional parameters, and it does not accept an optional left argument anymore
+
+
 ## Version 0.94.0 from 2023-04-28
 
 **Important**: though this release is not exactly coming with a breaking change, it is something close to that: this version can only cooperate with Cider 0.25.0 or later!
 
 That's because the Cider configuration property `tatinFolder` has been replaced by the two properties `dependencies.tatin` and `dependencies_dev.tatin`.
 
-Aprt from using compatible versions of Cider and Tatin no user action is required because Cider inspects the config file and suggest an automated conversion whe `tatinFolder` is detected.
+Apart from using compatible versions of Cider and Tatin no user action is required because Cider inspects the config file and suggest an automated conversion when `tatinFolder` is detected.
 
 In addition Cider would also remove the now deprecated property `githubUsername` from the Cider config file.
 
-Also, `UnInstallPackage` got renamed: it's now `UnInstallPackages` (plural!). This is true for both the API function and the user commands. Strictly speaking this is actually a breaking change though probably nobody is affected.
+Also, `UnInstallPackage` got renamed: it's now `UnInstallPackages` (plural!). This is true for both the API function and the user command. Strictly speaking this is actually a breaking change though probably nobody is affected.
 
 ## Version 0.93.0 from 2023-04-18
 

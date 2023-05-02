@@ -1,4 +1,4 @@
- r←Test_LX_003(stopFlag batchFlag);⎕TRAP;dir;body;src;cfg;zipFilename
+ r←Test_LX_003(stopFlag batchFlag);⎕TRAP;dir;body;src;cfg;zipFilename;parms
 ⍝ There should be a vars LX because there is a monadic `lx` function but it should be empty (no result)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -21,7 +21,8 @@
  cfg.source←'ns/'
  cfg.os_win←1
  TC.WritePackageConfigFile dir cfg
- zipFilename←TC.BuildPackage dir dir''
+ parms←TC.CreateBuildParms dir
+ zipFilename←TC.BuildPackage parms
 
  {}TC.LoadPackages zipFilename #.TEMP
  →T.GoToTidyUp 3.14≢#.TEMP.LX.PI

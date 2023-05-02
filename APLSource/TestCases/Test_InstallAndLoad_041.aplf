@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_041(stopFlag batchFlag);⎕TRAP;dir;installFolder;src;zip;body;cfg;zipfile
+ r←Test_InstallAndLoad_041(stopFlag batchFlag);⎕TRAP;dir;installFolder;src;zip;body;cfg;zipfile;parms
  ;src4;list1;list2;refs
 ⍝ Install and load simple package with crazy name into ⎕SE.
 ⍝ We do this because we cannot temper with ⎕SE._tatin!
@@ -18,7 +18,9 @@
  cfg.api←'CrazyName___'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src zip ''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
  installFolder←∆GetTempDir'/MyAppPackages'
  {}TC.InstallPackages('file://',zipfile)installFolder
 

@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.63.0 - 2023-04-22
+⍝ * 0.64.0 - 2023-05-01
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -731,19 +731,34 @@
       :EndTrap
     ∇
 
-    ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version
+    ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms
       (sourcePath targetPath)←Arg.(_1 _2)
       prompt←0
       zipFilename←''
       :If 0≡sourcePath
-      :OrIf (,'.')≡,sourcePath
       :OrIf 0=≢sourcePath
+          openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+          :If 1<≢openCiderProjects
+              ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+              'Cancelled by user'Assert 0<≢ind
+              sourcePath←2⊃openCiderProjects[ind;]
+          :ElseIf 1=≢openCiderProjects
+              sourcePath←2⊃openCiderProjects[1;]
+          :Else
+              'No path specified & no open Cider projects found'Assert 0
+          :EndIf
+      :ElseIf (,'.')≡,sourcePath
           sourcePath←TC.F.PWD
           prompt∨←1
       :EndIf
       :If 0≡targetPath
-      :OrIf (,'.')≡,targetPath
       :OrIf 0=≢targetPath
+          ('No target path specified and no Cider config file found in ',sourcePath)Assert ⎕NEXISTS sourcePath,'/cider.config'
+          cfg←TC.Reg.GetJsonFromFile sourcePath,'/cider.config'
+          'No target path specified and project has no property "distributionFolder"'Assert 0<cfg.CIDER.⎕NC'distributionFolder' ⍝ was introduced in 0.26.0
+          targetPath←(TC.Reg.AddSlash sourcePath),cfg.CIDER.distributionFolder
+          prompt∨←1
+      :ElseIf (,'.')≡,targetPath
           targetPath←sourcePath
           prompt∨←1
       :EndIf
@@ -763,11 +778,13 @@
       :EndIf
       (sourcePath targetPath)←{⊃1 ⎕NPARTS ⍵,'/'}¨sourcePath targetPath
       :If prompt
-          msg←'Sure that you want to pack ',sourcePath,' into '
+          msg←⊂'Sure that you want to pack'
+          msg,←⊂'   ',sourcePath
+          msg,←⊂'into'
           :If sourcePath≡targetPath
-              msg,←'the same directory?'
+              ((≢msg)⊃msg)←((≢msg)⊃msg),' the same directory?'
           :Else
-              msg,←targetPath,'?'
+              msg,←⊂targetPath,'?'
           :EndIf
       :AndIf 0=1 TC.C.YesOrNo msg
           ⎕←'Cancelled by user'
@@ -781,13 +798,23 @@
           TC.F.MkDir targetPath
       :EndIf
       'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
-      zipFilename←dependencies TC.BuildPackage sourcePath targetPath version
+      parms←TC.CreateBuildParms sourcePath
+      parms.dependencyFolder←dependencies
+      parms.version←version
+      parms.targetPath←targetPath
+      zipFilename←TC.BuildPackage parms
     ∇
 
     ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies;openCiderProjects;ind;project;cfg;folder;zipFolder
       r←''
       (source url)←Arg.(_1 _2)
+      :If (,0)≡,url
+      :AndIf '.zip'≢⎕C ¯4↑source
+          url←source
+          source←''
+      :EndIf
       :If 0≡source
+      :OrIf 0=≢source
           'No ZIP file specified?!'Assert 9=⎕SE.⎕NC'Cider'
           openCiderProjects←⎕SE.Cider.ListOpenProjects 0
           :If 1<≢openCiderProjects
@@ -812,6 +839,7 @@
           source←⊃source
       :EndIf
       :If (,'?')≡,url
+      :OrIf '[?]'≡url
           :If 0=≢url←SelectRegistry 1
               :Return
           :Else
@@ -846,15 +874,15 @@
           f2←~TC.Reg.IsBeta url_
       :EndIf
       :If f1∨f2
-          msg←'Attention - the server:'
-          msg,←CR,'>>> ',url_,' <<<'
-          msg,←CR,'operates a "',policy,'" delete policy.'
+          msg←⊂'Attention - the server:'
+          msg,←⊂'   ',url_
+          msg,←⊂'operates a "',policy,'" delete policy.'
           :If f2
-              msg,←CR,'The package is not e beta release.'
+              msg,←⊂'The package is not e beta release.'
           :EndIf
-          msg,←CR,'Are you sure that you want to publish'
-          msg,←CR,'   ',source
-          msg,←CR,'anyway?'
+          msg,←⊂'Are you sure that you want to publish'
+          msg,←⊂'   ',source
+          msg,←⊂'anyway?'
           :If 0=TC.C.YesOrNo msg
               ⎕←'Publishing cancelled'
               :Return
@@ -1671,13 +1699,13 @@
       :Case 1
           :Select ⎕C Cmd
           :Case ⎕C'BuildPackage'
-              r,←⊂'Create a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
+              r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
               r,←⊂'Requires directory ⍵[1] to host a file "',TC.CFG_Name,'" defining the package.'
               r,←⊂'Always bumps the build number except when -version= is specified *and* carries a build number.'
               r,←⊂''
-              r,←⊂''
-              r,←⊂' * If ⍵[2] is not specified the pack file will be created in ⍵[1], but the user will be prompted'
-              r,←⊂' * If ⍵[1] is not specified it will act on the current directory, but the user will be prompted'
+              r,←⊂' * If ⍵[2] is not specified Cider (if available) will be questioned: "distributionFolder"'
+              r,←⊂' * If ⍵[1] is not specified it will act on any open Cider project'
+              r,←⊂'If BuildPackage makes any assumptions at all then the user will be asked for confirmation.'
               r,←⊂''
               r,←⊂'-version=       Use this to set the version number in both the package project and the package'
               r,←⊂'                that is about to be created. You have several options:'
@@ -1696,7 +1724,7 @@
               r,←⊂'Prints a user command to the session that allow creating a package config file, the'
               r,←⊂'equivalent of creating a package.'
           :Case ⎕C'DeprecatePackage'
-              r,←⊂'Declare a particular major version of a package or all major versions of a particular'
+              r,←⊂'Declares a particular major version of a package or all major versions of a particular'
               r,←⊂'package as deprecated. Requires two arguments:'
               r,←⊂''
               r,←⊂'1. Argument'
@@ -1736,7 +1764,7 @@
               r,←⊂''
               r,←⊂'-verbose  If specified not only the names of the licenses are returned but also their URLs.'
           :Case ⎕C'ListRegistries'
-              r,←⊂'List URL, alias, priority, port  and the no-caching flag of all Registries as defined'
+              r,←⊂'Lists URL, alias, priority, port  and the no-caching flag of all Registries as defined'
               r,←⊂'in the user settings.'
               r,←⊂'The result is ordered by priority: the one with the highest priority is listed first etc.'
               r,←⊂''
@@ -1748,14 +1776,14 @@
               r,←⊂'-full By default all data but the API keys are listed. Specify -full if you want the'
               r,←⊂'      API keys to be listed as well.'
           :Case ⎕C'ListDeprecated'
-              r,←⊂'List all deprecated major versions'
+              r,←⊂'Lists all deprecated major versions'
               r,←⊂''
               r,←⊂'By default just the major versions would be listed.'
               r,←⊂''
               r,←⊂'-all    By specifying this flag you can force the command to list all versions of all'
               r,←⊂'        deprecated mnajor versions.'
           :Case ⎕C'ListPackages'
-              r,←⊂'List all packages in the Registry or install folder specified.'
+              r,←⊂'Lists all packages in the Registry or install folder specified.'
               r,←⊂' * If no argument was specified then the principal Tatin Registry will be assumed (',tatinURL,')'
               r,←⊂' * If "?" is specified the user will be prompted for the Registry if there are multiple'
               r,←⊂' * If "[*]" is specified then ALL registries are questioned.'
@@ -1781,7 +1809,7 @@
               r,←⊂'-project_url    Add the URL saved in the package config file to the result.'
               r,←⊂'-noaggr         By default the output is aggregated. -noaggr prevents that.'
           :Case ⎕C'LoadPackages'
-              r,←⊂'Load the specified package(s) and all its dependencies into the workspace.'
+              r,←⊂'Loads the specified package(s) and all its dependencies into the workspace.'
               r,←⊂''
               r,←⊂'A) First argument:'
               r,←⊂'Specify one or more (comma-separated) packages to be loaded.'
@@ -1796,7 +1824,7 @@
               r,←⊂''
               r,←HelpOnPackageID ⍬
           :Case ⎕C'InstallPackages'
-              r,←⊂'Install the given package(s) and all dependencies into a given folder.'
+              r,←⊂'Installs the given package(s) and all dependencies into a given folder.'
               r,←⊂'If the installation folder does not yet exist it will be created, but the user must confirm this.'
               r,←⊂'Requires two arguments:'
               r,←⊂''
@@ -1819,7 +1847,7 @@
               r,←⊂''
               r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
           :Case ⎕C'LoadDependencies'
-              r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
+              r,←⊂'Loads all packages defined in a file apl-dependencies.txt.'
               r,←⊂''
               r,←⊂'Takes up to two arguments:'
               r,←⊂' [1] A folder into which one or more packages have been installed'
@@ -1829,7 +1857,7 @@
               r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
               r,←⊂'            load operation by specifying the -overwrite flag.'
           :Case ⎕C'LoadTatin'
-              r,←⊂'Load the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
+              r,←⊂'Loads the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'
               r,←⊂''
               r,←⊂'By default the user config file is expected in the user''s home folder, and it will be'
@@ -1857,7 +1885,7 @@
               r,←⊂'Note that this is NOT about packages that are managed by a Tatin server. The server has'
               r,←⊂'its own mechanism for updating packages.'
           :Case ⎕C'UserSettings'
-              r,←⊂'Print the user settings found in the config file to the session in JSON format.'
+              r,←⊂'Prints the user settings found in the config file to the session in JSON format.'
               r,←⊂'By default the API key is replaced by asterisks; specify -apikey to overwrite this.'
               r,←⊂''
               r,←⊂'If you want to investigate the current user settings (rather than the file contents)'
@@ -1871,7 +1899,7 @@
               r,←⊂'-refresh If you did change the user settings from another APL session, or by editing the'
               r,←⊂'         file, you can refresh the current user settings with -refresh.'
           :Case ⎕C'PackageConfig'
-              r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
+              r,←⊂'Manages a package config file: fetch, create, edit or delete it.'
               r,←⊂'The argument, if specified, must be either a URL or a path.'
               r,←⊂' * In case of a URL the package config file is returned as JSON.'
               r,←⊂'   Specifying any of the options has no effect then.'
@@ -1891,7 +1919,7 @@
               r,←⊂''
               r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
           :Case ⎕C'UnInstallPackages'
-              r,←⊂'UnInstall a given package and its dependencies if those are neither top-level packages nor'
+              r,←⊂'UnInstalls a given package and its dependencies if those are neither top-level packages nor'
               r,←⊂'required by other packages. Superfluous packages (like outdated versions) are removed ws well.'
               r,←⊂'If you don''t want to delete a specific package but get rid of all superfluous packages'
               r,←⊂'then don''t specify a package ID but the -cleanup option.'
@@ -1916,7 +1944,7 @@
               r,←⊂' * The symbolic name [MyUCMDs] (case independent).'
               r,←⊂' * A Cider alias in square brackets'
           :Case ⎕C'PackageDependencies'
-              r,←⊂'Return the contents of a file "apl-dependencies.txt".'
+              r,←⊂'Returns the contents of a file "apl-dependencies.txt".'
               r,←⊂'Takes a path hosting such a file as an argument.'
               r,←⊂''
               r,←⊂'-edit   You may edit the file by specifying the -edit flag. In case the file does not'
@@ -1929,16 +1957,19 @@
               r,←⊂''
               r,←⊂'-quiet  Useful for test cases: it prevents Tatin from interrogating the user'
           :Case ⎕C'PublishPackage'
-              r,←⊂'Publish a package to a particular Tatin Registry.'
+              r,←⊂'Publishes a package to a particular Tatin Registry.'
               r,←⊂'Such a package can be one of:'
               r,←⊂' * ZIP file, typically created by calling ]Tatin.BuildPackage'
               r,←⊂' * Folder that contains everything that defines a package; in this case the required ZIP is'
               r,←⊂'   created by "PublishPackage" itself.'
               r,←⊂''
               r,←⊂'Requires up to two arguments:'
-              r,←⊂' * Path to ZIP file or package folder (mandatory)'
+              r,←⊂' * Path to ZIP file or package folder'
               r,←⊂' * URL or alias of a Registry or a "?" (you may or may not embrace the "?" with [])'
               r,←⊂'   In case this is not specified the principal Registry is assumed.'
+              r,←⊂''
+              r,←⊂'If the path to the ZIP file is not specified Tatin asks Cider for any open projects, and takes'
+              r,←⊂'it if it''s a single one or let the user choose one. Cider knows where to find a ZIP file.'
               r,←⊂''
               r,←⊂'The name of the resulting package is extracted from the ZIP file which therefore must conform'
               r,←⊂'to the Tatin rules.'
@@ -1950,7 +1981,7 @@
               r,←⊂'                about to be published depends on. Usually there is no need to specify this; refer'
               r,←⊂'                to the documentation ("Publishing Packages") for details.'
           :Case ⎕C'ListVersions'
-              r,←⊂'List all versions of the given package.'
+              r,←⊂'Lists all versions of the given package.'
               r,←⊂''
               r,←⊂' You may specify a package in several ways:'
               r,←⊂' * ]Tatin.ListVersions [Registry-URL|Registry-alias]{group}-{package}'
@@ -1990,7 +2021,7 @@
               r,←⊂'If you want to compare the version you are using locally with what is used on the principal'
               r,←⊂'Tatin Registry then specify the -check flag. Any argument is then ignored.'
           :Case ⎕C'ListTags'
-              r,←⊂'List all unique tags as defined in all packages of a Registry, sorted alphabetically.'
+              r,←⊂'Lists all unique tags as defined in all packages of a Registry, sorted alphabetically.'
               r,←⊂'If no argument was specified then the principal Tatin Registry will be assumed (',tatinURL,').'
               r,←⊂'If a "?" is passed as argument the user will be prompted for the Registry, except when there'
               r,←⊂'is just one defined anyway.'
@@ -2001,13 +2032,13 @@
               r,←⊂'         Only "lin", "mac" and "win" are valid.'
               r,←⊂'For details how tags are search refer to the documentation.'
           :Case ⎕C'Init'
-              r,←⊂'(Re-)Establish the user settings in ⎕SE. Call this in case the user settings got changed on'
+              r,←⊂'(Re-)Establishes the user settings in ⎕SE. Call this in case the user settings got changed on'
               r,←⊂'file and you want to incorporate the changes in the current session.'
               r,←⊂''
               r,←⊂'Without an argument Init processes the default user settings file.'
               r,←⊂'Instead you may specify a folder that contains a file tatin-client.json.'
           :Case ⎕C'CheckForLaterVersion'
-              r,←⊂'Check whether later versions of the installed packages are available.'
+              r,←⊂'Checks whether later versions of the installed packages are available.'
               r,←⊂'Takes a folder that hosts a file "apl-buildlist.json" as argument.'
               r,←⊂'Scans all known Registries with a priority greater than 0 for later versions.'
               r,←⊂'Note that if you''ve loaded a package from a Registry that has been removed since, or has a '
@@ -2026,7 +2057,7 @@
               r,←⊂'-dependencies By default only principal packages are checked.'
               r,←⊂'              You may include dependencies by specifying this flag.'
           :Case ⎕C'DeletePackage'
-              r,←⊂'Delete a given package.'
+              r,←⊂'Deletes a given package.'
               r,←⊂''
               r,←⊂'Takes one of:'
               r,←⊂' * URL specifying a Tatin Registry, followed by a full package ID'
@@ -2040,7 +2071,7 @@
               r,←⊂' * deletion of beta versions only'
               r,←⊂' * everything'
           :Case ⎕C'GetDeletePolicy'
-              r,←⊂'Request which "Delete" policy is operated by a Registry.'
+              r,←⊂'Requests which "Delete" policy is operated by a Registry.'
               r,←⊂'Return one of "None", "Any", "JustBetas":'
               r,←⊂' * "None" means a package, once published, cannot be deleted'
               r,←⊂' * "Any" means any package can be deleted'
@@ -2054,7 +2085,7 @@
           :Case ⎕C'Documentation'
               r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
           :Case ⎕C'ReInstallDependencies'
-              r,←⊂'ReInstall all packages (principals as well as dependencies) from scratch.'
+              r,←⊂'ReInstalls all packages (principals as well as dependencies) from scratch.'
               r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
               r,←⊂'If this is not an absolute path then it might be a sub folder of an open Cider project.'
               r,←⊂'Then Tatin works out the correct one:'
@@ -2084,7 +2115,7 @@
               r,←⊂'-update  By default ReInstallDependencies does not install later versions.'
               r,←⊂'         You may change this by specifying this flag.'
           :Case ⎕C'Ping'
-              r,←⊂'Try to contact one or more Tatin Registries.'
+              r,←⊂'Tries to contact one or more Tatin Registries.'
               r,←⊂''
               r,←⊂' * Optionally you may specify a Registry URL as an argument.'
               r,←⊂' * You can also specify just a "?"; then a list with all known Registries will be provided.'
@@ -2096,7 +2127,7 @@
               r,←⊂' [;1] is the Registry URL'
               r,←⊂' [;2] is a Boolean, a 1 means that the Registry responded'
           :Case ⎕C'Cache'
-              r,←⊂'By default all packages of all URLs saved in the Tatin package cache are listed.'
+              r,←⊂'Lists all packages of all URLs saved in the Tatin package cache.'
               r,←⊂''
               r,←⊂'One may specify a URL as argument; then only packages of that URL are listed.'
               r,←⊂''

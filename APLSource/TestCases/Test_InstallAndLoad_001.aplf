@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_001(stopFlag batchFlag);⎕TRAP;res
+ r←Test_InstallAndLoad_001(stopFlag batchFlag);⎕TRAP;res;parms
  ;dir;src;zip;body;cfg;zipfile;installFolder;expected
 ⍝ Build a package with a single file into a ZIP file, install and load it.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -18,7 +18,9 @@
  cfg.api←'Constants'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src zip ''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
 
  installFolder←∆GetTempDir'/MyAppPackages'
  res←TC.InstallPackages('file://',zipfile)installFolder

@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD
+  r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD;ucScriptName
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package(s) `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -74,8 +74,12 @@
          packageID←GetPackageIDFromFilename identifier
          cfg←ReadPackageConfigFile targetFolder_,'/',packageID,'/',CFG_Name
          :If 0<≢cfg.userCommandScript
+             ucScriptName←⊃,/1↓⎕NPARTS cfg.userCommandScript
+             :If Reg.F.IsFile targetFolder_,'/',ucScriptName
+                 Reg.F.DeleteFile targetFolder_,'/',ucScriptName  ⍝ Probably a re-install
+             :EndIf
              ⍝ Move the user command script to the root of the install folder (usually something like [MyUCMDs])
-             (targetFolder_,'/')(⎕NMOVE Reg.F.ExecNfunction)targetFolder_,'/',packageID,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+             (targetFolder_,'/')(⎕NMOVE Reg.F.ExecNfunction)targetFolder_,'/',packageID,'/',ucScriptName
          :EndIf
      :EndFor
      CloseConnections 0

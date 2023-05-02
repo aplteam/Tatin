@@ -1,4 +1,4 @@
- r←Test_API_006(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;tempDir;packageFolder;cfg;version;rc;more;zipfile;msg
+ r←Test_API_006(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;tempDir;packageFolder;cfg;version;rc;more;zipfile;msg;parms
 ⍝ Exercise ⎕SE.Tatin.BuildPackage and ⎕SE.Tatin.PublishPackage
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -9,7 +9,9 @@
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
 
  packageFolder←'./TestData/Source/OS'
- res←⎕SE.Tatin.BuildPackage packageFolder tempDir''
+ parms←⎕SE.Tatin.CreateBuildParms packageFolder
+ parms.targetPath←tempDir
+ res←⎕SE.Tatin.BuildPackage parms
  res←⊃F.Dir tempDir,'/'
  →T.GoToTidyUp 1≠≢res
  zipfile←⊃res

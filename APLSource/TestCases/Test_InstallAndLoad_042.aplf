@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_042(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile;installFolder;res;rc;msg
+ r←Test_InstallAndLoad_042(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile;installFolder;res;rc;msg;parms
 ⍝ Install and load simple package without specifying a target namespace; was once a bug
 ⍝ Must be loaded into #
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -16,7 +16,9 @@
  cfg.api←'CrazyName___'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src zip''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
  installFolder←∆GetTempDir'/MyAppPackages'
  {}TC.InstallPackages('file://',zipfile)installFolder
 

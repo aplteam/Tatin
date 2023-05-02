@@ -4,10 +4,9 @@
 ⍝ These are the parameters:\\
 ⍝ * `projectPath` → folder to create the package from; mandatory. Must be specified as right argument of `CreateBuildParms`.
 ⍝ * `targetPath` (optional); defines the folder where the resulting ZIP is saved.
-⍝    If this is not provided or empty the Cider config  property `CIDER.distributionFoler` is used.
-⍝    If that is not possible then it defaults to `projectPath`.
+⍝    If this is not provided or empty it defaults to `projectPath`
 ⍝ * `dependencyFolder` (optional); if not empty all packages in this folder are going to become dependencies.
-⍝   If this is empty `BuildPackage` will do some gymnastics to establish any dependencies, refer to the documentation for details.
+⍝   If this is empty `BuildPackage` will check the root of the project for a folder packages/ and take that by convention.
 ⍝ * `version` can be one of:
 ⍝    * An empty character vector\\
 ⍝      The version info from the package config file rules, and the build number (if any) is bumped
@@ -23,15 +22,7 @@
  cfg←InitPackageConfig cfg_
  ValidateConfig cfg parms.projectPath
  :If 0=≢parms.targetPath
-     :If 9=⎕SE.⎕NC'Cider'                                               ⍝ Is Cider available?
-     :AndIf ##.FilesAndDirs.IsFile parms.projectPath,'cider.config'     ⍝ Is the project managed by Cider?
-         ciderCfg←⎕SE.Cider.ReadProjectConfigFile parms.projectPath
-     :AndIf 0<ciderCfg.CIDER.⎕NC'distributionFolder'                    ⍝ Was introduced in 0.25.0
-     :AndIf 0<≢ciderCfg.CIDER.distributionFolder
-         parms.targetPath←(Reg.AddSlash parms.projectPath),Reg.AddSlash ciderCfg.CIDER.distributionFolder
-     :Else
-         parms.targetPath←Reg.AddSlash parms.projectPath
-     :EndIf
+     parms.targetPath←Reg.AddSlash parms.projectPath
  :Else
      parms.targetPath←Reg.AddSlash RemoveFileProtocol parms.targetPath
  :EndIf

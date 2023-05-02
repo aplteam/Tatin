@@ -1,4 +1,4 @@
- r←Test_Load_074(stopFlag batchFlag);⎕TRAP
+ r←Test_Load_074(stopFlag batchFlag);⎕TRAP;parms
  ;dir;src;zip;assets;body;cfg;zipfile;refs;res
 ⍝ Build a package with several files and folders as assets
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -27,7 +27,9 @@
  cfg.assets←'assets'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src zip''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
 
  refs←TC.LoadPackages('file://',zipfile)#.TEMP
  →T.GoToTidyUp 3≠#.TEMP.Foo.⎕NC'GetAssetList'

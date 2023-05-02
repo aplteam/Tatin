@@ -1,4 +1,4 @@
- r←Test_Publish_002(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_Publish_002(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;parms
  ;dir;src;body;cfg;reg;list;expected;zipfile;zip;list2
 ⍝ Publish a ZIP file via a URI
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -23,7 +23,9 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src zip''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
  zip ⎕NCOPY src,'/',TC.CFG_Name
 
  (rc msg zipFilename)←TC.PublishPackage zipfile reg

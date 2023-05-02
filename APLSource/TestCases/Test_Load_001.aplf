@@ -1,4 +1,4 @@
- r←Test_Load_001(stopFlag batchFlag);⎕TRAP;noOf
+ r←Test_Load_001(stopFlag batchFlag);⎕TRAP;noOf;parms
  ;dir;src;zip;body;cfg;zipfile
 ⍝ Build a package into a ZIP file and then load it. Must not leave anything behind in the file system.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -18,7 +18,9 @@
  cfg.api←'Constants'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src zip ''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
 
  noOf←TC.LoadPackages('file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Constants.⎕NC'PI'

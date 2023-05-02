@@ -63,11 +63,8 @@ The folder the package is going to be created from. To be specified as the right
 
 The folder the ZIP file is created in.
 
-Note that if `targetPath` is empty then Tatin checks whether the project is managed by Cider. 
+In case `targetPath` is empty it defaults to `projectPath`.
 
-If that's the case `targetPath` becomes the Cider config parameter `distributionFolder`.
-
-I that is not the case or if `distributionFolder` is empty then `targetPath` defaults to the `projectPath`.
 
 #### version
 

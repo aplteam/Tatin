@@ -1,4 +1,4 @@
- r←Test_Publish_004(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;src2;zipfile2;zip2;deps;depsFilename
+ r←Test_Publish_004(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;src2;zipfile2;zip2;deps;depsFilename;parms
  ;dir;src;body;cfg;reg;list;zipfile;zip;list2
 ⍝ Publish a package with a dependency that is defined with "file://" on a Registry not managed by a server
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -33,12 +33,17 @@
  cfg.source←'Hello.apln'
  cfg.os_win←1
  TC.WritePackageConfigFile src2 cfg
- zipfile2←TC.BuildPackage src2 zip2''
+
+ parms←TC.CreateBuildParms src2
+ parms.targetPath←zip2
+ zipfile2←TC.BuildPackage parms
  zip2 ⎕NCOPY src2,'/',TC.CFG_Name
 
  src TC.Dependencies.Add'file://',zipfile2
 
- zipfile←TC.BuildPackage src zip''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
  zip ⎕NCOPY src,'/',TC.CFG_Name
 
  (rc msg zipFilename)←TC.PublishPackage zipfile reg

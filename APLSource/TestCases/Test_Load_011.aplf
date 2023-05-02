@@ -1,4 +1,4 @@
- r←Test_Load_011(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename
+ r←Test_Load_011(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;parms
  ;dir;src;reg1;reg2;body;cfg;zipfile;refs
 ⍝ Publish simple package to the second registry and then load it from there using just a package ID.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -22,7 +22,8 @@
  cfg.source←'Test.apln'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src src ''
+ parms←TC.CreateBuildParms src
+ zipfile←TC.BuildPackage parms
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
 
@@ -33,7 +34,8 @@
  cfg.source←'Constants.apln'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src src ''
+ parms←TC.CreateBuildParms src
+ zipfile←TC.BuildPackage parms
  (rc msg zipFilename)←TC.PublishPackage zipfile'[local2]'
  Assert 200=rc
 

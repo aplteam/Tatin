@@ -5,7 +5,9 @@
      dependencies←⍺
      path←⍵
      F.IsFile path:path         ⍝ Exit if it's not a folder: then it must be a ZIP file already
-     CheckWouldBePackage path:
-     tempDir←F.GetTempPath
-     dependencies BuildPackage path tempDir''
+     parms←CreateBuildParms path
+     parms.dependencyFolder←dependencies
+     CheckWouldBePackage parms.projectPath:
+     parms.targetPath←F.GetTempPath
+     BuildPackage parms
  }

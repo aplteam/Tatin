@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_061(stopFlag batchFlag);⎕TRAP;res;ref;parms
+ r←Test_InstallAndLoad_061(stopFlag batchFlag);⎕TRAP;res;ref;parms;parms2
  ;dir;src;dist;vars1;vars2;vars3;vars4;vars5;vars6;vars7;vars8;vars9;cfg;src2;zipfile
  ⍝ Create namespace with all sorts of variables, Link it, create a package from it and load that package
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -36,7 +36,9 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
- zipfile←TC.BuildPackage src dist ''
+ parms2←TC.CreateBuildParms src
+ parms2.targetPath←dist
+ zipfile←TC.BuildPackage parms2
  →T.GoToTidyUp 0≥≢zipfile
 
  {}⎕SE.Tatin.LoadPackages zipfile'#.TEMP2'

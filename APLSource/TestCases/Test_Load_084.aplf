@@ -1,4 +1,4 @@
- r←Test_Load_084(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile
+ r←Test_Load_084(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile;parms
 ⍝ Load a package that has more than just two or less hyphens (was once a bug)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -17,7 +17,9 @@
  cfg.api←'Constants'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
- zipfile←TC.BuildPackage src zip''
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ zipfile←TC.BuildPackage parms
 
  {}TC.LoadPackages('file://',zipfile)#.TEMP
  Assert 3=#.TEMP.Constants.⎕NC'PI'

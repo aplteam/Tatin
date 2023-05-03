@@ -6,7 +6,7 @@
 ⍝ Usually a new instance is created by providing a URI. However, an new instance can also be created from the
 ⍝ ordinay namespace that is returned by the `Get` function.
 
-    :Field public Shared ReadOnly varsList←'uri'  'alias' 'port' 'api_key' 'priority' 'noCaching' 'id'  ⍝ List of all variables in an instance
+    :Field public Shared ReadOnly varsList←'uri' 'alias' 'port' 'api_key' 'priority' 'noCaching' 'id' 'proxy'  ⍝ List of all variables in an instance
 
 ⍝ --------------- Constructors
 
@@ -18,43 +18,31 @@
     ⍝   it could have been created "manually".
       :Implements Constructor
       :Access Public
+      ⍝ define defaults
+      ns←⎕NS''
+      ns.port←0
+      ns.priority←⎕NULL
+      ns.api_key←''
+      ns.alias←''
+      ns.noCaching←0
+      ns.id←(⊃⊃⎕CLASS ⎕THIS).##.A.Create_UUID ⍝ Uset this to identify a registry in case you cannot use either uri and alias
+      ns.proxy←''
       :If 326=⎕DR y
       :AndIf 0=≡y
-          ns←y
-          ns.port←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'port'
-          ns.priority←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ⎕NULL}'priority'
-          ns.api_key←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'api_key'
-          ns.alias←ns.{0<⎕NC ⍵:⍎⍵ ⋄ ''}'alias'
-          ns.noCaching←ns.{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noCaching'
-          ns.id←((⊃⊃⎕CLASS ⎕THIS).##.A)ns.{0<⎕NC ⍵:⍎⍵ ⋄ ⍺.Create_UUID}'id'
-          'Invalid variables'Assert∧/(' '~¨⍨↓ns.⎕NL 2)∊varsList
-          _uri←ns.uri
-          '"uri": invalid depth'Assert 1=≡_uri
-          '"uri": invalid data type'Assert' '=1↑0⍴_uri
-          '"uri" must not carry []'Assert∧/~'[]'∊_uri
-          ((_uri='\')/_uri)←'/'
-          '"noCaching" must be a Boolean'Assert(⊂ns.noCaching)∊0 1
-          _noCaching←ns.noCaching
-          _id←ns.id
-          ⍎¨ns.{'_',⍵,'←',{⎕NULL≡⍵:'⎕NULL' ⋄ 0=1↑0⍴⍵:⍕⍵ ⋄ '''',⍵,''''}⍎⍵}¨varsList
+          'ns'⎕NS y          ⍝ overwrite with provided properties
+      :ElseIf ∧/'[]'∊y
+          ns.(alias uri)←y{('[]'~⍨⍵↑⍺)(⍵↓⍺)}y⍳']'
       :Else
-          :If ∧/'[]'∊y
-              (_alias _uri)←{⍵{('[]'~⍨⍵↑⍺)(⍵↓⍺)}⍵⍳']'}y
-          :Else
-              _uri←y
-              _alias←''
-          :EndIf
-          '"uri": invalid depth'Assert 1=≡_uri
-          '"uri": invalid data type'Assert' '=1↑0⍴_uri
-          ((_uri='\')/_uri)←'/'
-          _uri,←('/'≠¯1↑_uri)/'/'
-          _alias←⎕C _alias
-          _api_key←''
-          _port←0
-          _priority←⎕NULL
-          _id←(⊃⊃⎕class ⎕this).##.A.Create_UUID  ⍝ Uset this to identify a registry in case you cannot use either uri and alias
-          _noCaching←0
+          ns.uri←y
       :EndIf
+      'Invalid variables'Assert∧/(' '~¨⍨↓ns.⎕NL 2)∊varsList
+      ⍎¨ns.{'_',⍵,'←','ns.',⍵}¨'id' 'uri' 'priority'      ⍝ use private fields for reserved properties
+      ⍎¨ns.{⍵,'←','ns.',⍵}¨varsList~'id' 'uri' 'priority' ⍝ use property setters for validation on rest
+      '"uri": invalid depth'Assert 1=≡_uri
+      '"uri": invalid data type'Assert' '=1↑0⍴_uri
+      '"uri" must not carry []'Assert∧/~'[]'∊_uri
+      ((_uri='\')/_uri)←'/'
+      _uri,←('/'≠¯1↑_uri)/'/'
     ∇
 
 ⍝ ---------- Properties
@@ -79,7 +67,7 @@
           buff←,value.NewValue
           '"alias": invalid depth'Assert 1=≡buff
           '"alias": invalid data type'Assert' '=1↑0⍴buff
-          _alias←buff~' '
+          _alias←⎕C buff~' '
         ∇
     :EndProperty
 
@@ -159,6 +147,20 @@
         ∇
     :EndProperty
 
+    :Property proxy
+    ⍝ An optional proxy uri. If defined should ba a complete uri (http[s]://example.com[:port]/)
+    :Access Public Instance
+        ∇ r←get
+          r←_proxy
+        ∇
+        ∇ set value;buff
+          buff←,value.NewValue~' '
+          '"proxy": invalid depth'Assert 1=≡buff
+          '"proxy": invalid data type'Assert' '=1↑0⍴buff
+          _proxy←buff
+        ∇
+    :EndProperty
+
     ∇ r←Get key;list;bool
     ⍝ Returns the data as a namespace. "data" is defined as the variables listed by the `varsList` field in case `key`
     ⍝ is empty. Otherwise `key` must be a valid variable name.
@@ -169,7 +171,7 @@
           r←⎕SE.⎕NS''
       :EndIf
       :If (⊂key)∊''⍬
-          r.(uri alias port api_key noCaching priority id)←_uri _alias _port _api_key _noCaching _priority _id
+          r.(uri alias port api_key noCaching priority id proxy)←_uri _alias _port _api_key _noCaching _priority _id _proxy
       :Else
           'Invalid right argument (depth)'Assert 1=≡key
           'Invalid right argument (data type)'Assert' '=1↑0⍴key

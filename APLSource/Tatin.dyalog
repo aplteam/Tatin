@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.64.0 - 2023-05-01
+⍝ * 0.65.0 - 2023-05-06
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -115,7 +115,7 @@
      
           c←⎕NS ⍬
           c.Name←'PackageConfig'
-          c.Desc←'Retrieve (via HTTP) or create and/or edit a package config file for a specific package'
+          c.Desc←'Retrieve (via HTTP or file://) or create and/or edit a package config file for a specific package'
           c.Parse←'1s -delete -edit -quiet'
           r,←c
      
@@ -1901,23 +1901,21 @@
           :Case ⎕C'PackageConfig'
               r,←⊂'Manages a package config file: fetch, create, edit or delete it.'
               r,←⊂'The argument, if specified, must be either a URL or a path.'
-              r,←⊂' * In case of a URL the package config file is returned as JSON.'
+              r,←⊂' * In case of a URL the package config file is printed to the session (JSON).'
               r,←⊂'   Specifying any of the options has no effect then.'
-              r,←⊂' * In case of a path it must point to a folder that contains a Tatin package.'
-              r,←⊂'   The contents of the file "',TC.CFG_Name,'" in that folder is returned.'
+              r,←⊂' * In case it is a path it must point to a folder that contains a Tatin package.'
+              r,←⊂'   The contents of the file "',TC.CFG_Name,'" in that folder is printed to the ssion (JSON).'
               r,←⊂'   In case the file does not yet exist it will be created.'
               r,←⊂''
-              r,←⊂'In case no argument is specified Tatin checks whether there is are any open Cider projects.'
-              r,←⊂'If there is just one open it will act on it, if there are multiple projects opened the user'
-              r,←⊂'will be asked which one it should act on.'
+              r,←⊂'In case no argument is specified Tatin checks whether there are any open Cider projects.'
+              r,←⊂'If there is just one open it will act on it, if there are multiple projects open the user'
+              r,←⊂'will be asked which one she wants to act on.'
               r,←⊂''
               r,←⊂'If Cider is not available or no project is open the command tries to find a package'
-              r,←⊂'config file in the current directory but the user is asked for confirmation.'
+              r,←⊂'config file in the current directory, but the user is asked for confirmation.'
               r,←⊂''
-              r,←⊂'-edit   You may edit the file by specifying the -edit flag.'
-              r,←⊂'-delete In case you want to delete the file specify the -delete flag.'
-              r,←⊂''
-              r,←⊂'In case of success a text vector (with NLs) is returned, otherwise an empty vector.'
+              r,←⊂'-edit    You may edit the file by specifying the -edit flag.'
+              r,←⊂'-delete  In case you want to delete the file specify the -delete flag.'
           :Case ⎕C'UnInstallPackages'
               r,←⊂'UnInstalls a given package and its dependencies if those are neither top-level packages nor'
               r,←⊂'required by other packages. Superfluous packages (like outdated versions) are removed ws well.'
@@ -2457,7 +2455,12 @@
                           folder←0⍴⎕←'Cancelled by user'
                       :Else
                           folder←(⊃list[ind;2]),'/',folder
-                          ('Folder does not exist: ',folder)Assert TC.F.IsDir folder
+                          :If TC.F.IsDir folder
+                          :OrIf TC.CommTools.YesOrNo'The folder'folder'does not yet exist! Shall it be created?'
+                              'CREATE!'TC.F.CheckPath folder
+                          :Else
+                              ('Folder does not exist: ',folder)Assert 0
+                          :EndIf
                       :EndIf
                   :EndIf
               :EndIf
@@ -2487,6 +2490,8 @@
                   dmx.EM ⎕SIGNAL ErrNo
               :EndIf
           :EndTrap
+      :ElseIf 'ERROR 345'≡dmx.EM
+          (dmx.EM,' (check your Internet connection)')⎕SIGNAL dmx.EN
       :Else
           dmx.EM ⎕SIGNAL dmx.EN
       :EndIf

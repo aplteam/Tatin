@@ -22,11 +22,20 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.3.1+5' '2023-03-08'
+      r←'Tester2' '3.5.0+5' '2023-04-28'
     ∇
 
-    ∇ History
+    ∇ r←History
       :Access Public shared
+      ⍝ * 3.5.0 ⋄ 2023-04-28
+      ⍝   * Helpers updated
+      ⍝ * 3.4.0 ⋄ 2023-04-10
+      ⍝   * Helper `RunTests` improved
+      ⍝   * `History now returns a useful result: its own comments
+      ⍝ * 3.4.0 ⋄ 2023-04-10
+      ⍝   * Shared method `EstablishHelpers` added which allows establishing the three helpers `RunTests`,
+      ⍝     `RunBatchTests` and `Prepare`.
+      ⍝   * Bug fix: when the tests were run in batch mode the log was mutilated
       ⍝ * 3.3.1 ⋄ 2023-03-08
       ⍝   * Bug fix: The QuitTests would not work with "Options > Disable traps in session" being ticked and
       ⍝     therefore this is now temporarily disabled with 600⌶
@@ -40,40 +49,9 @@
       ⍝   * Bug fixes
       ⍝     * `_NotImplemented` was not correctly reported
       ⍝     * In case `Initial` was not executed `Cleanup` should not be executed either
-      ⍝ * 3.2.7 ⋄ 2022-08-03
-      ⍝   * Bug fix in `ListTestFunctions`: must not cut lines short when view←1
-      ⍝   * New `Make` added
-      ⍝ * 3.2.6 ⋄ 2022-05-30
-      ⍝   * Bug fix: log in session was mutilated; introduced by 3.2.5
-      ⍝ * 3.2.5 ⋄ 2022-05-22
-      ⍝   * #17 fixed
-      ⍝   * In the GUI the log (not the grid) was distorted
-      ⍝   * Local variables in `ExecuteInitial` renamed so that they explain themselves
-      ⍝ * 3.2.4 ⋄ 2022-05-09
-      ⍝   * Log messages came with a LF in the middle of a message in case batchFlag was 1.
-      ⍝ * 3.2.3 ⋄ 2022-04-13
-      ⍝   * In case an INI file is part of a test suite then under non-Windows platform it would fail prior 3.2.3
-      ⍝ * 3.2.2 ⋄ 2022-04-06
-      ⍝   * Bug fix for `exec_before_each_test` and `exec_after_each_test`:\\
-      ⍝     When the check function did not a return a result an ERROR occured.
-      ⍝ * 3.2.1 ⋄ 2021-10-28
-      ⍝   * Minor bug fix in GetTestTemplate: explicit result was ill-named ("r" rather than "R").
-      ⍝ * 3.2.0 ⋄ 2021-10-01
-      ⍝   * `Tester2` now informs `Link` in case an APL object was changed (`RenameTestFnsTo`) under the condition
-      ⍝     that it is at least Link 3.0 that is managing the code.
-      ⍝   * New constant `NoCiderTests` introduced.
-      ⍝   * The test case that is executed next is now printed to the session BEFORE its execution. Same for the GUI.
-      ⍝     As a consequence the order of the items of a single test call needed to change, but the same information
-      ⍝     is provided as before anyway.
-      ⍝   * Bug fixes
-      ⍝     * The flagging of test cases that are inactive for one reason or another was inconsistant. Those are
-      ⍝       now always flagged with a lamp symbol (⍝).
-      ⍝     * `ListTestFunctions` does not show the lamp symbol anymore.
-      ⍝     * `RenameTestFnsTo` printed to the session rather than returning the messages as result.
-      ⍝     * `CodeCoverage.Finalyze` (which has been marked as deprecated for quite a while) got replaced by
-      ⍝       `CodeCoverage.Finalise`, finally fixing the typo.
       ⍝\\
       ⍝ For a full history (including older versions) see <https://github.com/aplteam/Tester2/releases>
+      r←↑{⍵↓⍨+/∧\∧⌿(↑⍵)=' '}{⍵↓⍨⍵⍳'⍝'}¨{⍵/⍨'⍝'=⊃¨⍵}{⍵↓⍨+/∧\(↑⍵)=' '}¨1↓⎕NR⊃⎕SI
     ∇
 
     :Field Public Instance Readonly _OK←0
@@ -216,7 +194,7 @@
           r←_codeCoverage
         ∇
         ∇ set value;buff;bool
-          'Is not an instance of the "CodeCoverage" class'⎕SIGNAL 11/⍨~∨/'[CodeCoverage]'⍷⍕value.NewValue
+          'Is not an instance of the "CodeCoverage" class'Assert∨/'[CodeCoverage]'⍷⍕value.NewValue
           :If 0<≢value.NewValue
               _codeCoverage←value.NewValue
           :Else
@@ -232,11 +210,11 @@
         ∇
         ∇ set arg
           :If 0<≢arg.NewValue
-              'Must be a simple character vector'⎕SIGNAL 11/⍨1≠≡arg.NewValue
-              'Must be a simple character vector'⎕SIGNAL 11/⍨0=1↑0⍴∊arg.NewValue
-              'Must be a simple character vector'⎕SIGNAL 11/⍨1≠⍴⍴arg.NewValue
-              'Does not exist'⎕SIGNAL 11/⍨0=⎕NEXISTS arg.NewValue
-              'Is not a folder'⎕SIGNAL 11/⍨1≠1 ⎕NINFO arg.NewValue
+              'Must be a simple character vector'Assert 1=≡arg.NewValue
+              'Must be a simple character vector'Assert 0≠1↑0⍴∊arg.NewValue
+              'Must be a simple character vector'Assert 1=⍴⍴arg.NewValue
+              'Does not exist'Assert 0≠⎕NEXISTS arg.NewValue
+              'Is not a folder'Assert 1=1 ⎕NINFO arg.NewValue
           :EndIf
           _IniFolder←arg.NewValue
         ∇
@@ -248,8 +226,8 @@
           r←_exec_before_each_test
         ∇
         ∇ set arg
-          'Must be fully qualified name of a function'⎕SIGNAL 11/⍨' '≠1↑0⍴∊arg.NewValue
-          'Must be fully qualified name of a function'⎕SIGNAL 11/⍨3≠⎕NC arg.NewValue
+          'Must be fully qualified name of a function'Assert' '=1↑0⍴∊arg.NewValue
+          'Must be fully qualified name of a function'Assert 3=⎕NC arg.NewValue
           _exec_before_each_test←arg.NewValue
         ∇
     :endproperty
@@ -261,8 +239,8 @@
           r←_exec_after_each_test
         ∇
         ∇ set arg
-          'Must be fully qualified name of a function'⎕SIGNAL 11/⍨' '≠1↑0⍴∊arg.NewValue
-          'Must be fully qualified name of a function'⎕SIGNAL 11/⍨3≠⎕NC arg.NewValue
+          'Must be fully qualified name of a function'Assert' '=1↑0⍴∊arg.NewValue
+          'Must be fully qualified name of a function'Assert 3=⎕NC arg.NewValue
           _exec_after_each_test←arg.NewValue
         ∇
     :endproperty
@@ -319,10 +297,10 @@
     ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument '⎕SIGNAL 11/⍨1≠≡,stopFlag
-      'Invalid left argument '⎕SIGNAL 11/⍨1≠≢stopFlag
-      'Invalid left argument '⎕SIGNAL 11/⍨83≠⎕DR stopFlag
-      'Invalid right argument '⎕SIGNAL 11/⍨~(⊂debugFlag)∊0 1
+      'Invalid left argument 'Assert 1=≡,stopFlag
+      'Invalid left argument 'Assert 1=≢stopFlag
+      'Invalid left argument 'Assert 83=⎕DR stopFlag
+      'Invalid right argument 'Assert(⊂debugFlag)∊0 1
       _parms←CreateParms ⍬
       _parms.debugFlag←debugFlag
       _parms.stopFlag←stopFlag
@@ -371,7 +349,7 @@
     ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1 2 4 3 5 6 7
+      'Invalid left argument 'Assert(⊂stopFlag)∊0 1 2 4 3 5 6 7
       _parms←CreateParms ⍬
       _parms.testCaseNos←these
       _parms.debugFlag←1
@@ -394,8 +372,8 @@
     ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
       stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument '⎕SIGNAL 11/⍨~(⊂stopFlag)∊0 1 2 4 3 5 6 7
-      'Invalid right argument '⎕SIGNAL 11/⍨~(⊂debugFlag)∊0 1
+      'Invalid left argument 'Assert(⊂stopFlag)∊0 1 2 4 3 5 6 7
+      'Invalid right argument 'Assert(⊂debugFlag)∊0 1
       _parms←CreateParms ⍬
       _parms.debugFlag←debugFlag
       _parms.stopFlag←stopFlag
@@ -647,14 +625,14 @@
               :If 0 1∊⍨≡ps.testCaseNos
                   ps.group←ps.testCaseNos
                   :If '~'≠1⍴ps.group
-                      '"~" must be the very first character in a group definition'⎕SIGNAL 11/⍨'~'∊1↓ps.group
+                      '"~" must be the very first character in a group definition'Assert~'~'∊1↓ps.group
                   :EndIf
                   ps.testCaseNos←⍬
               :Else
                   ps.group←1⊃ps.testCaseNos
-                  'Group definition must not carry "," or "~" in case test case number were specified'⎕SIGNAL 11/⍨∨/',~'∊ps.group
+                  'Group definition must not carry "," or "~" in case test case number were specified'Assert~∨/',~'∊ps.group
                   ps.testCaseNos←∊1↓ps.testCaseNos
-                  'Test case number(s) must be numeric'⎕SIGNAL 11/⍨∨/~{⊃0=1↑0⍴⍵}¨ps.testCaseNos
+                  'Test case number(s) must be numeric'Assert~∨/~{⊃0=1↑0⍴⍵}¨ps.testCaseNos
               :EndIf
           :EndIf
           :If 0≠≢ps.group
@@ -942,7 +920,7 @@
 
 
     ∇ {r}←{type}ShowLog msg;selog;buff
-    ⍝ `type` may be 1 or 2 3 or ¯1 or ¯2:
+    ⍝ `type` may be 1 or 2 or 3 or ¯1 or ¯2:
     ⍝ * A 1 means an action message
     ⍝ * A 2 means the result of the execution attempt of a test function.
     ⍝ * A 3 means "to be appended the very last line in the log"
@@ -951,14 +929,16 @@
       r←⍬
       :If 0<≢msg
           type←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'type'
-          'Invalid type'⎕SIGNAL 11/⍨~(⊂|type)∊1 2 3
+          'Invalid type'Assert(⊂|type)∊1 2 3
           :If ps.batchFlag∧0=ps.guiFlag
-              :If ~type∊¯2 2
-              :OrIf 0=≢ps.log
-              :OrIf 1<≡msg
-                  ps.log,←{1=≡⍵:⊂⍵ ⋄ '-'∧.=5↑⊃⍵:⍵ ⋄ ⊂(1⊃⍵),' ',(2⊃⍵),' ',3⊃⍵}msg
+              :If type=3
+                  ps.log[≢ps.log]←⊂((≢ps.log)⊃ps.log),msg
               :Else
-                  (¯1↑ps.log)←⊂(⊃¯1↑ps.log),{1=≡⍵:⊂⍵ ⋄ '-'∧.=5↑⊃⍵:⍵ ⋄ ⊂(1⊃⍵),' ',(2⊃⍵),' ',3⊃⍵}msg
+                  :If 1<≡msg
+                      ps.log,←msg
+                  :Else
+                      ps.log,←⊂msg
+                  :EndIf
               :EndIf
           :Else
               buff←{1=≡⍵:⊂⍵ ⋄ (3≠≢⍵)∨'---'≡3↑⊃⍵:⍵ ⋄ ⊂(1⊃⍵),' ',(2⊃⍵),' ',(3⊃⍵)}msg
@@ -985,7 +965,7 @@
                   :ElseIf ¯1≠×type
                       selog←{1=≡⍵:⍵ ⋄ (3≠≢⍵)∨'---'≡3↑⊃⍵:⍪⍵ ⋄ (1⊃⍵),' ',(2⊃⍵),' ',(3⊃⍵)}msg
                       :If type<0
-                          ⍞←selog,(type=¯2)/⎕UCS 13
+                          ⍞←selog,(type=¯2)/CR
                       :Else
                           ⎕←selog
                       :EndIf
@@ -1140,7 +1120,7 @@
           :Case n2.Edit
               _ref.⎕ED'Test_',name
           :Case n2.Copy
-              buff←¯1↓⊃,/{(A.DTB ⍵),⎕UCS 13}¨↓⎕FMT{((¯3↑¨⍕¨⍳≢⍵),¨⊂'. '),⍵}{⍵⌿⍨(≢¨⍵)∨.≠0 0}n.Grid.Values[;2 3]
+              buff←¯1↓⊃,/{(A.DTB ⍵),CR}¨↓⎕FMT{((¯3↑¨⍕¨⍳≢⍵),¨⊂'. '),⍵}{⍵⌿⍨(≢¨⍵)∨.≠0 0}n.Grid.Values[;2 3]
               {{}(#.⎕NS'').(⎕ED⍠('ReadOnly' 1)&{'ed'}ed←⍵)}buff
           :Else
               ∘∘∘ ⍝ Huh?!
@@ -1291,7 +1271,7 @@
               numbers←⍬
           :EndIf
       :Else
-          ''⎕SIGNAL 11/⍨2≠≢x
+          Assert 2=≢x
           (view numbers)←(0=1↑0⍴1⊃x)⌽x
           view←'view'≡⎕C view
       :EndIf
@@ -1366,7 +1346,7 @@
    ⍝ * If it is a single integer a string is returned
    ⍝ * If `constant` is more than one integer a vector of strings is returned
       :Access Public Instance
-      'Invalid right argument: must be one or more integers'⎕SIGNAL 11/⍨~∧/{(0 1 2∊⍨≡⍵)∧83∧.=⎕DR ⍵}¨1(2 3)
+      'Invalid right argument: must be one or more integers'Assert∧/{(0 1 2∊⍨≡⍵)∧83∧.=⎕DR ⍵}¨1(2 3)
       names←,ListSymbolicNames[;1]
       values←⍎¨names
       :If 1<≢constant
@@ -1382,7 +1362,7 @@
       ⍝ 0 0 1 1 ←→ AtLeastVersion¨16 17 17.1 18
       :Access Public Instance
       currentVersion←{0<⎕NC ⍵:⍎⍵ ⋄ {⊃⊃(//)⎕VFI ⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion'}'currentVersion'
-      'Right argument must be length 1'⎕SIGNAL 11/⍨1≠≢min
+      'Right argument must be length 1'Assert 1=≢min
      
       r←min≤currentVersion
     ∇
@@ -1417,7 +1397,7 @@
       :Access Public Instance
       r←⍬
       (oldName newName)←oldName newName~¨' '
-      'Names must not contain dots'⎕SIGNAL 11/⍨↑∨/'.'∊¨oldName newName
+      'Names must not contain dots'Assert~↑∨/'.'∊¨oldName newName
       (oldName newName)←'Test_'∘{⍺≡(≢⍺)↑⍵:⍵ ⋄ ⍺,⍵}¨oldName newName
       :If 0=≢buff←ListGroups
           f1←0
@@ -1427,7 +1407,7 @@
           f2←0=≢Remove∆Test_ oldName
       :EndIf
       :If f1
-          'New name is invalid'⎕SIGNAL 11/⍨¯1=⎕NC Remove∆Test_ newName
+          'New name is invalid'Assert ¯1≠⎕NC Remove∆Test_ newName
       :EndIf
       :If f1∨f2
           list←{⍵[;1]}ListTestFunctions Remove∆Test_ oldName
@@ -1436,17 +1416,18 @@
           :EndIf
           :For this :In list
               no←{⍵↑⍨-¯1+(⌽⍵)⍳'_'}this
-              :If 0<_ref.⎕NC'Test_',(Remove∆Test_ newName),'_',no  ⍝ Already occupied
+              :If 0<_ref.⎕NC'Test_',(Remove∆Test_ newName),'_',no  ⍝ Already occupied?
                   val←⊃(//)⎕VFI no
+                  ⍝ We need to establish the next free number:
                   no←(-≢no)↑((≢no)⍴'0'),' '~⍨⍕1+⌈/{⊃(//)⎕VFI ⍵↑⍨-¯1+(⌽⍵)⍳'_'}¨↓_ref.{l←'T'⎕NL 3 ⋄ l⌿⍨((≢⍵)↑[2]l)∧.=⍵}newName,'_'
               :EndIf
               this RenameTestFnsTo'Test_',(Remove∆Test_ newName),'_',no
           :EndFor
           →∆Go
       :Else
-          'Function to be renamed not found'⎕SIGNAL 11/⍨3≠_ref.⎕NC oldName
-          'New name is already used'⎕SIGNAL 11/⍨0<_ref.⎕NC newName
-          'New name is invalid'⎕SIGNAL 11/⍨¯1=_ref.⎕NC newName
+          'Function to be renamed not found'Assert 3=_ref.⎕NC oldName
+          'New name is already used'Assert 0≥_ref.⎕NC newName
+          'New name is invalid'Assert ¯1≠_ref.⎕NC newName
       :EndIf
       body←_ref.⎕NR oldName
       header←⎕IO⊃body
@@ -1510,8 +1491,8 @@
       ⍝ The user can then inject that code herself into the scripted namespace/class.
       r←⍬
       groupName←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'groupName'
-      'Invalid right argumet: must be an integer between 1 and 999'⎕SIGNAL 11/⍨~(⊂no)∊(⍳999)
-      'Invalid left argumet: must be a char vector'⎕SIGNAL 11/⍨~((≡groupName)∊0 1)∧' '≡⊃0⍴groupName
+      'Invalid right argumet: must be an integer between 1 and 999'Assert(⊂no)∊(⍳999)
+      'Invalid left argumet: must be a char vector'Assert((≡groupName)∊0 1)∧' '≡⊃0⍴groupName
       body←A.DTB↓180⌶'Test_000'
       :If 0=≢groupName
           newName←'Test_',(¯3↑'000',⍕no)
@@ -1532,12 +1513,38 @@
       :If {16::0 ⋄ 1⊣⎕SRC ⍵}_ref
           :If 1 YesOrNo'Cannot fix function in  a script; shall the body be copied to the clipboard?'
               'cl'⎕WC'Clipboard'
-              cl.Text←2↓⊃,/(⊂⎕UCS 13 10),¨body
+              cl.Text←2↓⊃,/(⊂CRLF),¨body
           :Else
               ⎕←'No action taken'
           :EndIf
       :Else
           _ref.⎕FX body
+      :EndIf
+    ∇
+
+    ∇ r←{force}EstablishHelpers ref;res
+    ⍝ Establishes the three helpers `Prepare`, `RunTests` and `RunBatchTests` in `ref`.\\
+    ⍝ The user is asked for confirmation, but you can prevent that (and enforce the operation) by passing
+    ⍝ a 1 as the left argument `force`.\\
+    ⍝ Returns an empty vector if force is ` or the user has not confirmed the operation, otherwise a message.
+      :Access Public Shared
+      r←''
+      force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
+      :If (⊂ref)∊''⍬
+          ref←⊃⎕RSI
+      :EndIf
+      'Cannot establish helpers in class instances/unnamed namespaces'Assert~'['∊⍕ref
+      :If force
+      :OrIf YesOrNo'Helpers@Sure you wanna establish three helpers "Prepare", "RunTests" & "RunTestsInBatchMode" in ',(⍕ref),' ?'
+          res←ref.⎕FX ⎕CR'Prepare'
+          ('Fixing helper "Prepare" in ',(⍕ref),' failed on line(s) ',⍕res)Assert' '=1↑0⍴res
+          res←ref.⎕FX ⎕CR'RunTests'
+          ('Fixing helper "RunTests" in ',(⍕ref),' failed on line(s) ',⍕res)Assert' '=1↑0⍴res
+          res←ref.⎕FX ⎕CR'RunTestsInBatchMode'
+          ('Fixing helper "RunBatchTests" in ',(⍕ref),' failed on line(s) ',⍕res)Assert' '=1↑0⍴res
+          r←(~force)/'"Prepare", "RunTests" & "RunTestsInBatchMode" successfully established in ',⍕ref
+          r,←CR,'⍝ You might want to inform Link:'
+          r,←CR,'⍝ ⎕SE.Link.Add ',⊃,/('''','.',⍨⍕ref)∘,¨'Prepare'' ' 'RunTests'' ' 'RunTestsInBatchMode'' '
       :EndIf
     ∇
 
@@ -1734,5 +1741,78 @@
           r←x ##.CommTools.YesOrNo y
       :EndIf
     ∇
+
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←1 ⋄ ⍺ ⎕SIGNAL 1↓(⊃∊⍵),11}
+
+    ∇ r←CR
+      r←⎕UCS 13
+    ∇
+
+    ∇ r←CRLF
+      r←⎕UCS 13 10
+    ∇
+
+    :Section Helpers
+    ∇ Prepare;testPath;testFilename;ask;answer;options;flag;ind
+⍝ Creates an instance of the class `Tester2` named `T` and configures it for
+⍝ Assumes that the project is handled by the project manager "Cider", and that there is
+⍝ a namespace ##.CiderConfig available with the Cider config parameters.
+⍝ As a side effect is creates a folder "TestResults" in the project's root folder if the
+⍝ user wants to do code coverage with the `CodeCoverage` class.
+      ⎕IO←1 ⋄ ⎕ML←1
+      T←⎕NEW Tester2 ⎕THIS
+      testPath←##.CiderConfig.HOME,'/TestResults'
+      testFilename←testPath,'/CodeCoverage'
+      flag←0
+      :If ⎕NEXISTS testPath
+          :If ⎕NEXISTS testFilename,'.profile'
+              ind←('Code Coverage' 0 1)CommTools.Select'Append' 'Replace' 'Neither'
+              →(3=ind)/0
+              flag←1
+              :If 2=ind
+                  1 CodeCoverage.DeleteFiles testFilename
+              :EndIf
+          :Else
+              flag←0 CommTools.YesOrNo'Code coverage?'
+          :EndIf
+      :Else
+          flag←0 CommTools.YesOrNo'Code coverage?'
+      :EndIf
+      :If flag
+          3 ⎕MKDIR testPath  ⍝
+          T.codeCoverage←⎕NEW CodeCoverage(,⊂'#.',{⍵,'.',⍵}2↓⍕⎕THIS.##)
+          T.codeCoverage.filename←testFilename
+      :EndIf
+    ∇
+
+    ∇ RunTests;htmlFilename;verbose;option
+⍝ 1. Prepares the test framework
+⍝ 2. Runs all test cases
+⍝ 3. Processes the code coverage data (if collected)
+⍝ 4. Asks the user whether the code coverage report should be put on view
+      Prepare
+      T.Run 1
+      :If 0<≢T.codeCoverage
+          {}CodeCoverage.ProcessData T.codeCoverage.filename
+          option←'Type of code coverage report' 0 1 CommTools.Select'Overview' 'Verbose' 'None'
+          :If 3>option
+              verbose←2=option
+              htmlFilename←verbose CodeCoverage.CreateReport T.codeCoverage.filename
+              ⎕←']Open file://',htmlFilename
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ (success log)←RunTestsInBatchMode;rc
+⍝ Runs all test with the batch flag on and the debug flag off.
+⍝ Returns a two-item vector:\\
+⍝ [1] Boolean with 1 indicating success and 0 failure\\
+⍝ [2] A vector of character vectors with the messages
+      Prepare
+      (rc log)←T.RunBatchTests 0
+      success←rc=0
+    ∇
+
+    :EndSection
 
 :EndClass

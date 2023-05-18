@@ -11,7 +11,7 @@
  'The question must contain neither a carriage return nor a line feed'Assert∧/~(⎕UCS 10 13)∊question
  text←''
  success←flag←0
- question←{⍵↓⍨+/∧\' '=⍵}question
+ question←{~'@'∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳'@'}{⍵↓⍨+/∧\' '=⍵}question
  :Repeat
      :If 0<⎕NC'AskForText_Answers'
          AskForText_Answers←(0<≢¨' '~⍨¨AskForText_Answers[;1])⌿AskForText_Answers
@@ -27,6 +27,8 @@
              'Multiple pre-prepared answers qualify?!'Assert 1=+/bool
              text←2⊃AskForText_Answers[bool⍳1;]
          :EndIf
+     :Else
+         question←{~'@'∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳'@'}question
      :EndIf
      :If ~flag
          text←⍞,0/⍞←question,': '

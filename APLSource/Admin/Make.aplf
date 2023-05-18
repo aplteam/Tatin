@@ -60,7 +60,7 @@
  :EndIf
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
- P_←⎕NEW P parms
+ P_←⎕NEW P(,⊂parms)
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Client...'
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
@@ -81,7 +81,7 @@
  :EndIf
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
- P_←⎕NEW P parms
+ P_←⎕NEW P(,⊃parms)
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode

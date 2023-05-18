@@ -1,31 +1,33 @@
- c←NewClient uri;reg
+ c←NewClient uri;reg;puri
 ⍝ Create a Rumba client tailored for Tatin
  c←R.NewClient 0
- uri←(-'/'=¯1↑uri)↓uri
  :Trap 997
      reg←MyUserSettings.GetRegistry uri
  :Else
      reg←⍬  ⍝ We allow accessing a server that's not defined in MyUserSettings
  :EndTrap
  :If ⍬≡reg
-     :If ':'∊RemoveHttpProtocol uri
-         c.Port←A.ToNum{⍵↑⍨¯1+⍵⍳'/'}{⍵↓⍨⍵⍳':'}RemoveHttpProtocol uri
-     :Else
-         :If 'http://'{⍺≡(≢⍺)↑⍵}uri
-             c.Port←80
-         :ElseIf 'https://'{⍺≡(≢⍺)↑⍵}uri
-             c.Port←443
-         :EndIf
+     puri←R.ParseURI uri
+     c.Host←puri.Host
+     c.Secure←puri.Scheme≡'https'
+     :If 0=c.Port←⊃A.ToNum puri.Port
+         c.Port←80 443[c.Secure+⎕IO]
      :EndIf
  :Else
-     c.Secure←∨/'https://'⍷reg.uri
+     puri←R.ParseURI reg.uri
+     c.Secure←puri.Scheme≡'https'
+     c.Host←puri.Host
      :If 0=c.Port←reg.port
-         :If HasPortNumber uri
-             c.Port←A.ToNum 1↓{⍵↑⍨-':'⍳⍨⌽⍵}{⍵/⍨3>+\⍵='/'}uri
-         :Else
-             c.Port←(c.Secure+1)⊃80 443
+     :AndIf 0=c.Port←⊃A.ToNum puri.Port
+         c.Port←80 443[c.Secure+⎕IO]
+     :EndIf
+     :If ~0∊⍴reg.proxy
+         puri←R.ParseURI reg.proxy
+         c.ProxySecure←puri.Scheme≡'https'
+         c.ProxyHost←puri.Host
+         :If 0=c.ProxyPort←⊃A.ToNum puri.Port
+             c.ProxyPort←80 443[c.Secure+⎕IO]
          :EndIf
      :EndIf
  :EndIf
- c.Host←{⍵↑⍨¯1+⍵⍳':'}'/'~⍨RemoveHttpProtocol uri
 ⍝Done

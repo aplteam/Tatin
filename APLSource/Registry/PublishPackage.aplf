@@ -42,10 +42,12 @@
      tags~←'windows' 'mac-os' 'macos' 'mac' 'linux'
      cfg.tags←{0=≢⍵:'' ⋄ ⊃{⍺,',',⍵}/⍵}tags
  :EndIf
- :If 0=≢cfg.minimumAplVersion
+ :If 0=cfg.⎕NC'minimumAplVersion'
+ :OrIf 0=≢cfg.minimumAplVersion
      cfg.minimumAplVersion←'18.0' ⍝ This is the minimum by definition: Tatin does not run on earlier versions
  :EndIf
- :If 0=≢cfg.maintainer
+ :If 0=cfg.⎕NC'maintainer'
+ :OrIf 0=≢cfg.maintainer
      cfg.maintainer←'email'GetGroupData registryPath cfg.group
  :EndIf
  :If 0<≢G

@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.65.0 - 2023-05-06
+⍝ * 0.65.1 - 2023-05-19
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -2039,8 +2039,6 @@
               r,←⊂'Checks whether later versions of the installed packages are available.'
               r,←⊂'Takes a folder that hosts a file "apl-buildlist.json" as argument.'
               r,←⊂'Scans all known Registries with a priority greater than 0 for later versions.'
-              r,←⊂'Note that if you''ve loaded a package from a Registry that has been removed since, or has a '
-              r,←⊂'priority of 0, then Tatin won''t be able to find any later versions!'
               r,←⊂''
               r,←⊂'Returns a matrix with five columns for all packages found:'
               r,←⊂' [;1] Currently installed package ID'
@@ -2498,3 +2496,4 @@
     ∇
 
 :EndNamespace
+

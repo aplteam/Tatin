@@ -1,0 +1,18 @@
+ cfg←MassageTags cfg;tags
+⍝ This code still lives only because the os_* flags got introduced pretty late, and at that point
+⍝ people got used to add tags to indicate OS compatability.
+ :If 0<≢cfg.tags
+     tags←','(≠⊆⊢)cfg.tags
+     tags~←'apl' 'dyalog' 'dyalogapl' 'dyalog-apl'  ⍝ These make no sense: Tatin is a Dyalog package manager by definition
+     :If (⊂'windows')∊tags
+         cfg.os_win←1
+     :EndIf
+     :If ∨/('mac-os' 'mac' 'macos')∊tags
+         cfg.os_mac←1
+     :EndIf
+     :If (⊂'linux')∊tags
+         cfg.os_lin←1
+     :EndIf
+     tags~←'windows' 'mac-os' 'macos' 'mac' 'linux'
+     cfg.tags←{0=≢⍵:'' ⋄ ⊃{⍺,',',⍵}/⍵}tags
+ :EndIf

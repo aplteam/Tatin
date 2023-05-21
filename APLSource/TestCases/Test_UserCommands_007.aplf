@@ -1,4 +1,4 @@
- r←Test_UserCommands_007(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg
+ r←Test_UserCommands_007(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg;statusCode;errMsg
 ⍝ Exercise ]Tatin.PublishPackages with an already published package (was once a bug)
 ⍝ We publish under group "SomeGroup" twice
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -33,6 +33,6 @@
 
 ∆TidyUp:
  Assert 0=⊃F.RmDir tempDir
- :Trap 0 ⋄ {}TC.DeletePackage'[localhost]SomeGroup-OS-1.0.0' ⋄ :EndTrap
- :Trap 0 ⋄ {}TC.DeletePackage'[localhost]SomeGroup-OS-1.1.0' ⋄ :EndTrap
+ :Trap 0 ⋄ (statusCode errMsg)←TC.DeletePackage'[localhost]SomeGroup-OS-1.0.0' ⋄ :EndTrap
+ :Trap 0 ⋄ (statusCode errMsg)←TC.DeletePackage'[localhost]SomeGroup-OS-1.1.0' ⋄ :EndTrap
 ⍝Done

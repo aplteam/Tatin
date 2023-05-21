@@ -1,4 +1,4 @@
- {(statusCode errMsg)}←{isHttpRequest}PublishPackage y;packageID;packageDir;dependenciesFilename;errMsg;HttpCodes;tempDir;cfg;myZip;zipFilename2;deps;tags;list;zipFilename;registryPath;G;msg;success
+ {(statusCode errMsg)}←{isHttpRequest}PublishPackage y;packageID;zipFilename;registryPath;G;HttpCodes;tempDir;cfg;packageDir;list;zipFilename2
 ⍝ Tries to publish a package locally.\\
 ⍝ * If the package already exists `errmsg` carries an appropriate message. No further action is taken.
 ⍝ * If any action along the line fails (like creating the package directory, copying the ZIP file, copying the dependency file, if any)
@@ -15,7 +15,6 @@
  (zipFilename registryPath G)←3↑y,⊂⍬
  isHttpRequest←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'isHttpRequest'
  HttpCodes←⎕NS'' ⋄ HttpCodes.OK←200 ⋄ HttpCodes.InternalServerError←500 ⋄ HttpCodes.BadRequest←400
- statusCode←HttpCodes.OK ⋄ errMsg←''
  tempDir←F.GetTempSubDir''
  zipFilename ZipArchive.UnzipTo tempDir
  :If F.IsFile tempDir,'/',CFG_Name
@@ -23,39 +22,19 @@
  :Else
      errMsg←'Package does not contain a file "',CFG_Name,'"'
      statusCode←HttpCodes.BadRequest
-     :Return
+     →∆GetOut
  :EndIf
- :If 0<≢cfg.tags
-     ⍝ The following code still lives because the os_* flags got introduced pretty late, and at that point
-     ⍝ people gut used to add tags to indicate OS compatability.
-     tags←','(≠⊆⊢)cfg.tags
-     tags~←'apl' 'dyalog' 'dyalogapl' 'dyalog-apl'  ⍝ These make no sense: Tatin is a Dyalog package manager by definition
-     :If (⊂'windows')∊tags
-         cfg.os_win←1
-     :EndIf
-     :If ∨/('mac-os' 'mac' 'macos')∊tags
-         cfg.os_mac←1
-     :EndIf
-     :If (⊂'linux')∊tags
-         cfg.os_lin←1
-     :EndIf
-     tags~←'windows' 'mac-os' 'macos' 'mac' 'linux'
-     cfg.tags←{0=≢⍵:'' ⋄ ⊃{⍺,',',⍵}/⍵}tags
- :EndIf
- :If 0=cfg.⎕NC'minimumAplVersion'
- :OrIf 0=≢cfg.minimumAplVersion
-     cfg.minimumAplVersion←'18.0' ⍝ This is the minimum by definition: Tatin does not run on earlier versions
- :EndIf
- :If 0=cfg.⎕NC'maintainer'
- :OrIf 0=≢cfg.maintainer
-     cfg.maintainer←'email'GetGroupData registryPath cfg.group
- :EndIf
- :If 0<≢G
-     (success msg)←G CheckLicense cfg
- :AndIf 0=success
-     errMsg←msg
+ :If 0<≢errMsg←CheckConfigProperties cfg G
      statusCode←HttpCodes.BadRequest
  :Else
+     cfg←MassageTags cfg
+     statusCode←HttpCodes.OK ⋄ errMsg←''
+     :If 0=≢cfg.minimumAplVersion
+         cfg.minimumAplVersion←'18.0' ⍝ This is the minimum by definition: Tatin does not run on earlier versions
+     :EndIf
+     :If 0=≢cfg.maintainer
+         cfg.maintainer←'email'GetGroupData registryPath cfg.group
+     :EndIf
      (JSON cfg)F.NPUT(tempDir,'/',CFG_Name)1
      packageID←{⍵.group,'-',⍵.name,'-',⍵.version}cfg
      packageID←⊃SplitVersionFromBuild packageID
@@ -84,31 +63,10 @@
              errMsg←'Publishing ',packageID,' failed due to a server error'
              packageDir RollbackPublishPackage errMsg
          :Else
-             SetPublishingDate packageDir,'/',CFG_Name
-             myZip←⎕NEW ZipArchive(,⊂zipFilename2)
-             packageDir myZip.Add CFG_Name
-             myZip.Dispose
-             dependenciesFilename←packageDir,'/data/',DependenciesFilename
-             :If F.Exists dependenciesFilename
-                 :If 0<≢deps←⊃F.NGET dependenciesFilename 1
-                     :If isHttpRequest      ⍝ If the Registry is managed by a server we cannot allow file://
-                     :AndIf ∨/IsFILE¨deps
-                         statusCode←HttpCodes.BadRequest
-                         errMsg←'Publishing package ',packageID,' failed; dependency uses file:// protocol'
-                         packageDir RollbackPublishPackage errMsg
-                     :Else
-                         :If 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
-                             statusCode←HttpCodes.InternalServerError
-                             errMsg←'Publishing package failed: ',packageID
-                             packageDir RollbackPublishPackage errMsg
-                         :Else
-                             0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
-                         :EndIf
-                     :EndIf
-                 :EndIf
-             :EndIf
+             (statusCode errMsg)←PublishPackage_ packageID packageDir tempDir zipFilename2 isHttpRequest
          :EndIf
      :EndIf
  :EndIf
+∆GetOut:
  F.RmDir tempDir
 ⍝Done

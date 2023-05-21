@@ -1,0 +1,27 @@
+ CheckPackageScripts flag;pkgFolder;aplFolder;folders;folder;content;filename;path;extension;F
+⍝ Tatin cannot load packages it uses by itself when bootstrapping.
+⍝ Therefore we use a semi-automated approach: we install all packages in a sub-folder packages as usual.
+⍝ But we don't (can't) load from that folder, so we copy all scripts into APLSource "manually"
+⍝ This script compares the scripts with the packages in packages/ - they should be the same!
+⍝ Note that packages that are not single scripts (like FilesAndDirs) are not handled that way.
+ :If flag
+     F←##.FilesAndDirs
+     pkgFolder←##.CiderConfig.HOME,'/packages/'
+     aplFolder←##.CiderConfig.HOME,'/APLSource/'
+     folders←F.ListDirs pkgFolder
+     :For folder :In folders
+         :If F.IsDir folder,'/APLSource/'
+             content←F.ListFiles folder,'/APLSource/'
+             :If 1=≢content
+                 (path filename extension)←⎕NPARTS 1⊃content
+             :AndIf (⊂extension)∊'.aplc' '.apln'
+             :AndIf F.IsFile aplFolder,filename,extension
+             :AndIf ≢/⊃∘F.NGET¨(aplFolder,filename,extension)(1⊃content)
+                 ⎕←filename,' differs in ',aplFolder,' and ',folder
+             :EndIf
+         :Else
+             ⎕←'Ignore conventions: ',folder
+         :EndIf
+     :EndFor
+ :EndIf
+⍝Done

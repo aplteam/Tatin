@@ -1,0 +1,22 @@
+ msg←CheckConfigProperties(cfg G);success;names
+ msg←''  ⍝ Indicates success
+⍝ === Check license
+ :If 0=cfg.⎕NC'license'
+     msg←'"license" property is missing'
+ :ElseIf 0<≢G
+ :AndIf G.INI.Exist'LICENSE'
+ :AndIf G.INI.Exist'LICENSE:urls'
+ :AndIf G.INI.Exist'LICENSE:names'
+ :AndIf 0<≢names←⊃G.INI.Get'LICENSE:names'
+ :AndIf ~(⊂cfg.license)∊names
+     msg←'License is invalid - valid options are: ',⊃{⍺,', ',⍵}/names
+⍝ === Check minimumAplVersion
+ :ElseIf 0=cfg.⎕NC'minimumAplVersion'
+     msg←'"minimumAplVersion" property is missing'
+⍝ === Check maintainer
+ :ElseIf 0=cfg.⎕NC'maintainer'
+     msg←'"maintainer" property is missing'
+⍝ === Check tags
+ :ElseIf 0=cfg.⎕NC'tags'
+     msg←'"tags" property is missing'
+ :EndIf

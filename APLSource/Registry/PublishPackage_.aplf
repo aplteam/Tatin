@@ -1,0 +1,27 @@
+ (statusCode errMsg)←PublishPackage_(packageID packageDir path zipFilename isHttpRequest);myZip;dependenciesFilename;deps
+⍝ Sub-function of PublishPackage without independent meaning other than clearifying matter: it really does the job.
+ statusCode←HttpCodes.OK ⋄ errMsg←''
+ SetPublishingDate packageDir,'/',CFG_Name
+ myZip←⎕NEW ZipArchive(,⊂zipFilename)
+ packageDir myZip.Add CFG_Name
+ myZip.Dispose
+ dependenciesFilename←packageDir,'/data/',DependenciesFilename
+ :If F.Exists dependenciesFilename
+     :If 0<≢deps←⊃F.NGET dependenciesFilename 1
+         :If isHttpRequest      ⍝ If the Registry is managed by a server we cannot allow file://
+         :AndIf ∨/IsFILE¨deps
+             statusCode←HttpCodes.BadRequest
+             errMsg←'Publishing package ',packageID,' failed; dependency uses file:// protocol'
+             packageDir RollbackPublishPackage errMsg
+         :Else
+             :If 0<≢errMsg←packageDir(⎕NMOVE Exec)dependenciesFilename
+                 statusCode←HttpCodes.InternalServerError
+                 errMsg←'Publishing package failed: ',packageID
+                 packageDir RollbackPublishPackage errMsg
+             :Else
+                 0 RemoveDataFolder packageDir ⍝ For the time being we keep `data/`. If we change our mind pass 1 as left argument
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

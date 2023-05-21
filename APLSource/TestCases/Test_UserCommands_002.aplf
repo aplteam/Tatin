@@ -1,4 +1,4 @@
- r←Test_UserCommands_002(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg
+ r←Test_UserCommands_002(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg;statusCode;errMsg
 ⍝ Exercise ]Tatin.PublishPackages with an already published package and different spelling (case)
 ⍝ We publish under group "SomeGroup" twice but with different spelling (case)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -36,5 +36,5 @@
 ∆TidyUp:
  ⎕SE._Tatin.Client.CommTools.Cleanup
  Assert 0=⊃F.RmDir tempDir
- :Trap 0 ⋄ {}TC.DeletePackage'[localhost]SomeGroup-OS-1.0.0' ⋄ :EndTrap
+ :Trap 0 ⋄ (statusCode errMsg)←TC.DeletePackage'[localhost]SomeGroup-OS-1.0.0' ⋄ :EndTrap
 ⍝Done

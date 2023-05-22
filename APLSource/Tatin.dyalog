@@ -1,4 +1,4 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.65.1 - 2023-05-19
 
@@ -815,7 +815,7 @@
       :EndIf
       :If 0≡source
       :OrIf 0=≢source
-          'No ZIP file specified?!'Assert 9=⎕SE.⎕NC'Cider'
+          'No ZIP file specified?!'Assert 9=⎕SE.⎕NC'Cider' ⍝ Without Cider we cannot look any further
           openCiderProjects←⎕SE.Cider.ListOpenProjects 0
           :If 1<≢openCiderProjects
               ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
@@ -2496,4 +2496,3 @@
     ∇
 
 :EndNamespace
-

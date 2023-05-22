@@ -26,11 +26,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'ZipArchive' '1.0.2+16' '2023-04-09'
+      r←'ZipArchive' '1.1.0-beta-1+16' '2023-05-21'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.1.0 from 2023-05-21
+    ⍝   * Under Linux, the `Add` method keeps failing every now and then for no apparent reason. Doe retry now.
+    ⍝   * Many errors signalled by the `Assert` function did not incorporate a message when they should and could
     ⍝ * 1.0.2 from 2023-04-09
     ⍝   * Bug fix in `UnzipTo`: issues with spaces in filenames on non-Windows platforms
     ⍝ * 1.0.1 from 2023-02-06
@@ -78,9 +81,9 @@
           :If ~F.IsFile _filename
               tempFilename←F.GetTempFilename2''
               (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -q'
-              Assert 0=rc
+              msg Assert 0=rc
               (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -dq'
-              Assert 0=rc
+              msg Assert 0=rc
               {}Exec'rm ',tempFilename,' -f'
           :EndIf
       :EndIf
@@ -97,7 +100,7 @@
         ∇
     :Endproperty
 
-    ∇ {r}←{parent}Add toBeZipped;isDir;list;msg;rc
+    ∇ {r}←{parent}Add toBeZipped;isDir;list;msg;rc;cmd;res;counter;success;first;max
     ⍝ Use this to add one or more files to the ZIP file.\\
     ⍝ `toBeZipped` specifies the full path (or full paths) of what's going to be zipped. That's what's going to be
     ⍝ stored in the ZIP file.\\
@@ -126,12 +129,22 @@
           toBeZipped←F.NormalizePath toBeZipped
           :If 0=⎕NC'parent'
               (rc msg)←Exec'zip -r ',_filename,' ',∊'"',¨(⊆toBeZipped),¨⊂'" '
-              Assert 0=rc
+              msg Assert 0=rc
           :Else
               parent←'expand'F.NormalizePath parent
               toBeZipped←{⍵↓⍨'/'=1⍴⍵}¨⊆toBeZipped
-              (rc msg)←Exec'cd ',parent,' && zip -r "',('expand'F.NormalizePath _filename~'"'),'" ',∊' ',¨'"',¨(toBeZipped~¨'"'),¨'"'
-              Assert 0=rc
+              cmd←'cd ',parent,' && zip -r "',('expand'F.NormalizePath _filename~'"'),'" ',∊' ',¨'"',¨(toBeZipped~¨'"'),¨'"'
+              success←counter←0
+              max←5
+              first←1
+              :Repeat
+                  ⎕DL 0.1×counter×~first  ⍝ No delay on first attempt but increasing delays after that
+                  first←0
+                  (rc msg)←Exec cmd
+                  success←rc=0
+                  counter←counter+1
+              :Until success∨max<counter
+              msg Assert 0=rc
           :EndIf
       :EndIf
     ∇
@@ -144,7 +157,7 @@
           r←{'.//'≡3⍴⍵:'./',3↓⍵ ⋄ '.\\'≡3⍴⍵:'.\',3↓⍵ ⋄ ⍵}¨r
       :Else
           (rc msg)←Exec'unzip -l ',_filename
-          Assert 0=rc
+          msg Assert 0=rc
           r←MassageZipConentList msg
       :EndIf
     ∇
@@ -160,7 +173,7 @@
           filenames←F.NormalizePath⊆filenames
           :If 0<≢filenames←(filenames∊List)/filenames
               (rc msg)←Exec'zip -d ',_filename,∊' ',¨'"',¨filenames,¨'"'
-              Assert 0=rc
+              msg Assert 0=rc
           :EndIf
       :EndIf
     ∇
@@ -190,7 +203,7 @@
                   msg ⎕SIGNAL 11
               :EndIf
               (rc msg)←Exec'cd ',targetFolder,' && unzip ',('expand'F.NormalizePath _filename),∊' "'∘,¨names,¨'"'
-              Assert 0=rc
+              msg Assert 0=rc
           :EndIf
       :EndIf
     ∇
@@ -266,7 +279,7 @@
       :Else
           zipFilename←AddExtension zipFilename
           (rc msg)←Exec'unzip -l ',zipFilename
-          Assert 0=rc
+          msg Assert 0=rc
           r←MassageZipConentList msg
       :EndIf
     ∇
@@ -293,7 +306,7 @@
           user←2 ⎕NQ #'GetEnvironment' 'USER'
       :EndIf
       (rc msg)←Exec'getent passwd ',user
-      Assert 0=rc
+      msg Assert 0=rc
       r←{⍵⊃⍨¯1+≢⍵}':'(≠⊆⊢)⊃msg
     ∇
 

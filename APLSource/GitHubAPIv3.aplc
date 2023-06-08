@@ -1,47 +1,35 @@
 :Class GitHubAPIv3
 ⍝ This class offers methods that allows one to communicate with GitHub by using GitHub's REST API from Dyalog APL.
-⍝ Note that this is version 3 of the GitHub API; the coming version 4 is **_not_** a REST interface!\\
-⍝ Most methods of this class become available only by instanciating the class. At the moment this might seem
-⍝ unnecessary because there is only one constructor requiring an owner's name, but this will change once OAuth
-⍝ is going to be implemented.\\
-⍝ Apart from the REST interface the class also offers one method that relies on the REST interface but goes beyond
-⍝ it: `GetRelease`returns the URL of a tarball or a zipball or an EXE from GitHub.\\
-⍝ For the time being this class runs only under Windows: it relies on .NET. If there is demand for other platforms
-⍝ the .NET calls could be exchanged against Rumba or .NET core.\\
-⍝ The project lives on <https://github.com/aplteam/GitHubAPIv3>\\
-⍝ It is part of the [APLTree library](https://github.com/aplteam/apltree/wiki)
-⍝ Kai Jaeger ⋄ APL Team Ltd
+⍝ Note that this is version 3 of the GitHub API; Later versions doe **not** use REST.\\
+⍝ Most methods of this class become available only by instantiating the class. `⎕NEW` requires an owner as argument.\\
+⍝ However, there are also a few shared methods beyond `Version` and `History` available.\\
+⍝ Kai Jaeger\\
+⍝ Homepage: <https://github.com/aplteam//GitHubAPIv3>
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHub' '0.7.0+22' '2020-03-17'
+      r←'GitHubAPIv3' '0.8.0-beta-1+24' '2020-06-06'
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 0.7.0
-    ⍝   * Is a Tatin package now and therefore requires 18.0 Unicode or better
-    ⍝   * Does not :Include APLTreeUtils anymore (but does depend on APLTreeUtils2 being a sibling)
-    ⍝ * 0.6.0
-    ⍝   * File extension is now .aplc rather than .dyalog
-    ⍝ * 0.5.0
-    ⍝   * Issue-related methods added: `GetAllIssues`, `GetIssue`, `CreateIssue`, `UpdateIssue`.
-    ⍝   * Topic-related methods added: `GetAllTopics` and ...  (not yet) `ReplaceAllTopics`.
-    ⍝ * 0.4.0
-    ⍝   * New methods added: `GetRelease`, `GetLatestTag` and `CheckForUpdate`.
-    ⍝   * There is now a property `regEx`.
-    ⍝ * 0.3.0
-    ⍝   * Versioning corrected.
-    ⍝   * Documentation polished.
-    ⍝   * :Include ##.APLTreeUtils fixed
+    ⍝ * 0.8.0
+    ⍝   * This release comes with several breaking changes:
+    ⍝     1. It does not depend on .NET anymore, meaning is works on Linux and Mac-OS without .NET
+    ⍝        Instead it now depends on the `HttpCommand` package.
+    ⍝     2. The functions return neither an error code nor an error message, just the result
+    ⍝        Errors are signalled now
+    ⍝     3. `GetAllReleases` now returns by default a vector of character vectors with the versions.
+    ⍝        The newly introduced optional left argument `verbose` can be used to get the full data instead.
+    ⍝     4. The `CheckForUpdate` now returns a character vector rather than a Boolean, see there
+    ⍝     5. The `regEx` property was removed because it is not required anymore
+    ⍝     6. `PutTopics` removed
+    ⍝   * There is now a property "personal_access_token" which when not empty is used to authenticate requests.
+    ⍝   * This version works cross-platform **without** depending on .NET.
     ⍝   * Bug fixes
-    ⍝     * `CastTagname2Number` did not accept something like `1.0.2`
-    ⍝ * 0.0.2
-    ⍝   * Method `GetAllTopics` added.
-    ⍝ * 0.0.1
-    ⍝   First release.
+    ⍝     * Package config was faulty (source). Functionality was not affected by this bug.
     ⍝\\
     ⍝ For information regarding older versions see <https://github.com/aplteam/GitHubAPIv3/releases>
     ∇
@@ -52,26 +40,13 @@
         ∇
     :EndProperty
 
-    :Property regEx
-    ⍝ In order to download an EXE the GitHub HTML page "releases" needs to be analyzed. We try to find the EXE
-    ⍝ name within the page and then extract the associated URL. That is the only way to establish the download
-    ⍝ URL for an EXE because the REST interface does not provide any information regarding EXEs.\\
-    ⍝ In order to find the appropriate EXE a regular expresseion is used. That's what `regEx` is for.\\
-    ⍝ The default `regEx` is assuming that any EXE looks like "SetUp_{repoName}_1.2.3.exe" or
-    ⍝ "SetUp_{repoName}_1.2.3.999.exe".\\
-    ⍝ Set this if you need to call the "GetRelease` method and the default regEx would not catch the EXE you are
-    ⍝  after.
+    :Property personal_access_token
     :Access Public Instance
-        ∇ r←get
-          r←_regEx
+        ∇ r←Get
+          r←_personal_access_token
         ∇
-        ∇ set arg
-          :Trap 0
-              {}arg.NewValue ⎕S 0⊣''
-          :Else
-              'Invalid regular expression'⎕SIGNAL 11
-          :EndTrap
-          _regEx←arg.NewValue
+        ∇ Set ipa
+          _personal_access_token←ipa.NewValue
         ∇
     :EndProperty
 
@@ -79,112 +54,97 @@
       :Access Public Instance
       :Implements Constructor
       _owner←owner
+      _personal_access_token←''
       _regEx←'setup_<repoName>_<version>[.\]*.[0-9]{0,6}\.exe'  ⍝ After version there _might_ be a built number
       A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
+      H←(⊃⊃⎕CLASS ⎕THIS).##.HttpCommand
     ∇
 
-    ∇ (rc msg ns)←GetLatestReleaseInfo repoName;gitPath
+    ∇ ns←GetLatestReleaseInfo repoName;gitPath
       :Access Public Instance
     ⍝ Returns meta data regarding the latest release. Drafts and beta releases are ignored.\\
     ⍝ You must use `https://` as protocol or not specify a protocol at all.\\
-    ⍝ `rc`
-    ⍝ : Either 0 for okay or an error code.\\
-    ⍝ `msg`
-    ⍝ : Is empty in case `rc ←→ 0` but might offer addtional information otherwise.
-    ⍝ `ns`
-    ⍝ : Namespace with the data received from GitHub.
+    ⍝ Returns a namespace with the data received from GitHub.
       'Right argument is not a repository name'⎕SIGNAL 11/⍨0=≢repoName
       gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/releases/latest'
-      (rc msg ns)←GetJson gitPath
-      :If 0=rc
-          ns.⎕DF'[JSON object: ',repoName,'-',ns.tag_name,']'
-      :EndIf
+      ns←GetJson gitPath
+      ns.⎕DF'[JSON object: ',repoName,'-',ns.tag_name,']'
     ∇
 
-    ∇ (rc msg ns)←GetReleaseInfoByTagName(repoName tagName);gitPath
+    ∇ ns←GetReleaseInfoByTagName(repoName tagName);gitPath;rc;msg
       :Access Public Instance
     ⍝ Fetches release meta data with `tagName` from `repoName`.\\
     ⍝ You must use `https://` as protocol or not specify a protocol at all.
     ⍝ ## Right argument
     ⍝ * Name of the repository
-    ⍝ * The tag name
-    ⍝ `rc`
-    ⍝ : Either 0 for okay or an error code.\\
-    ⍝ `msg`
-    ⍝ : Is empty in case `rc ←→ 0` but might offer addtional information otherwise.
-    ⍝ `ns`
-    ⍝ : Namespace with the data received from GitHub.
+    ⍝ * The tag name\\
+    ⍝ Returns a namespace with the data received from GitHub.
       gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/releases/tags/',tagName
-      (rc msg ns)←GetJson gitPath
-      :If 0=rc
-          ns.⎕DF'[JSON object: ',repoName,'-',tagName,']'
-      :EndIf
+      ns←GetJson gitPath
+      ns.⎕DF'[JSON object: ',repoName,'-',tagName,']'
     ∇
 
-    ∇ (rc msg ns)←GetAllReleases repoName;gitPath
+    ∇ data←{verbose}GetAllReleases repoName;gitPath;ns
       :Access Public Instance
-    ⍝ Returns all releases of a given repository.\\
+    ⍝ Returns information regarding all releases of a given repository.\\
     ⍝ Notes:
     ⍝ * Pre-release are included.
     ⍝ * Users without "Push" access will **_not_** see any draft releases\\
-    ⍝ You must use `https://` as protocol or not specify a protocol at all.
-    ⍝ `rc`
-    ⍝ : Either 0 for okay or an error code.\\
-    ⍝ `msg`
-    ⍝ : Is empty in case `rc ←→ 0` but might offer addtional information otherwise.
-    ⍝ `ns`
-    ⍝ : Namespace with the data received from GitHub.
+    ⍝ By default a vector of text vectors is returned with the tags assigned.
+    ⍝ In case `verbose` is 1 namespaces for each release are returned.
+      verbose←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
       gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/tags'
-      (rc msg ns)←GetJson gitPath
-      :If 0≠≢ns
-          ns.{⎕DF'[JSON Object: ',⍵,' ',name,']'}⊂repoName
+      ns←GetJson gitPath
+      :If verbose
+          data←ns
+          :If 0≠≢data
+              data.{⎕DF'[JSON Object: ',⍵,' ',name,']'}⊂repoName
+          :EndIf
+      :Else
+          data←ns.name
       :EndIf
     ∇
 
-    ∇ (rc msg r)←GetAllTopics repoName;gitPath;parms;ns
+    ∇ rateLimits←GetRateLimits;gitPath;parms
+     :Access Public Shared
+    ⍝ Returns information regarding rate limits without hitting the limits
+      gitPath←'https://api.github.com/rate_limit'
+      parms←CreateHttpParms
+      parms.Accepted←'application/vnd.github+json"'
+      rateLimits←parms GetJson gitPath
+    ∇
+
+    ∇ topics←GetAllTopics repoName;gitPath;parms;ns;data
       :Access Public Instance
     ⍝ Returns all topics of a given repository.\\
     ⍝ You must use `https://` as protocol or not specify a protocol at all.
-    ⍝ `rc`
-    ⍝ : Either 0 for okay or an error code.\\
-    ⍝ `msg`
-    ⍝ : Is empty in case `rc ←→ 0` but might offer addtional information otherwise.
-    ⍝ `ns`
-    ⍝ : Namespace with the data received from GitHub.
-      r←''
       gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/topics'
       parms←CreateHttpParms
       parms.Accepted←'application/vnd.github.mercy-preview+json'
-      (rc msg ns)←parms GetJson gitPath
-      :If 0=rc
-          r←ns.names
-      :EndIf
+      data←parms GetJson gitPath
+      topics←data.names
     ∇
 
-    ∇ (rc msg ns)←GetAllRepos;gitPath
+    ∇ ns←GetAllRepos;gitPath
       :Access Public Instance
     ⍝ Returns data of all **public** repositories for the current owner.\\
       gitPath←'https://api.github.com/users/',(_owner),'/repos'
-      (rc msg ns)←GetJson gitPath
-      :If 0≠≢ns
-          ns.{⎕DF'[JSON Object: ',name,']'}⊂⍬
-      :EndIf
+      ns←GetJson gitPath
+      ns.{⎕DF'[JSON Object: ',name,']'}⊂⍬
     ∇
 
-    ∇ (rc msg ns)←GetAllIssues repoName;gitPath
+    ∇ ns←GetAllIssues repoName;gitPath
       :Access Public Instance
     ⍝ Returns all issues for a given repository
       gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues'
-      (rc msg ns)←GetJson gitPath
-      :If 0≠≢ns
-          ns.{⎕DF'[Issues of repo ',⍵,']'}⊂repoName
-          ns.⎕FX⊂⎕CR'∆List'
-          ns.⎕FX⊂'r←∆Details instance' 'r←∆List' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name'''
-          ns.⎕FX⊂'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
-      :EndIf
+      ns←GetJson gitPath
+      ns.{⎕DF'[Issues of repo ',⍵,']'}⊂repoName
+      ns.⎕FX⊂⎕CR'∆List'
+      ns.⎕FX⊂'r←∆Details instance' 'r←∆List' ' :If 0<≢instance' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name''' ':EndIf'
+      ns.⎕FX⊂'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
     ∇
 
-    ∇ (rc msg ns)←GetIssue(repoName number);gitPath
+    ∇ ns←GetIssue(repoName number);gitPath
       :Access Public Instance
     ⍝ Returns exactly one issue for a given repository.\\
     ⍝ Note that `ns` gets three functions injected: ∆List, ∆Details and ∆QuickView. While ∆List does not
@@ -192,63 +152,23 @@
     ⍝ ∆Details and ∆QuickView both replace the JSON objects "assignees" and "labels" by real data, but
     ⍝ ∆QuickView returns a small subset for a quick glance.
       gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues/',⍕number
-      (rc msg ns)←GetJson gitPath
-      :If 0≠≢ns
-          ns.{⎕DF ⍵}'[Issue ',(⍕number),' of repo ',repoName,']'
-          ns.⎕FX ⎕CR'∆List'
-          ns.⎕FX'r←∆Details instance' 'r←∆List' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name'''
-          ns.⎕FX'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
-      :EndIf
+      ns←GetJson gitPath
+      ns.{⎕DF ⍵}'[Issue ',(⍕number),' of repo ',repoName,']'
+      ns.⎕FX ⎕CR'∆List'
+      ns.⎕FX'r←∆Details instance' 'r←∆List' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name'''
+      ns.⎕FX'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
     ∇
 
-    ∇ (rc msg ns)←UpdateIssue(repoName parms);gitPath
-      :Access Public Instance
-    ⍝ Typically the (probably modified) result of call to `GetIssue` is passed as "parms".
-      ∘∘∘ ⍝TODO⍝  requires a POST
-      gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues/',⍕number
-      (rc msg ns)←GetJson gitPath
-      :If 0≠≢ns
-          ns.{⎕DF ⍵}'[Issue ',(⍕number),' of repo ',repoName,']'
-          ns.⎕FX ⎕CR'∆List'
-          ns.⎕FX'r←∆Details instance' 'r←∆List' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name'''
-          ns.⎕FX'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
-      :EndIf
-    ∇
-
-    ∇ (rc msg endpoints)←GetAllEndpoints;gitPath;msg;rc;A
+    ∇ endpoints←GetAllEndpoints;gitPath;A
       :Access Public Shared
     ⍝ This method returns all REST endpoints offered by the API.\\
     ⍝ It returns a namespace. Use the built-in `List` function for an overview.
-    ⍝ `endpoints` is empty in case of an error.\\
-    ⍝ `rc`
-    ⍝ : Either 0 for okay or an error code.\\
-    ⍝ `msg`
-    ⍝ : Is empty in case `rc ←→ 0` but might offer addtional information otherwise.
-    ⍝ `ns`
-    ⍝ : Namespace with the data received from GitHub.
       A←##.APLTreeUtils2
       gitPath←'https://api.github.com/'
       endpoints←⎕NS''
-      (rc msg endpoints)←GetJson gitPath
-      :If 0=rc
-          endpoints.⎕FX'r←List' 'r←{⍵,[1.5]⍎¨⍵}⎕NL-2'
-      :EndIf
-      :If 0≠≢endpoints
-          endpoints.⎕DF'[JSON Object: EndPoints]'
-      :EndIf
-    ∇
-
-    ∇ (rc msg)←PutTopics(repoName topics);gitPath;parms;dummy
-    ⍝  :Access Public Instance   ⍝TODO⍝ Not implemented yet
-    ⍝ ...
-      ∘∘∘ ⍝TODO⍝
-      '"topics" must be a vector of character vectors'⎕SIGNAL 11/⍨2≠≡topics
-      gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/topics'
-      parms←CreateHttpParms
-      parms.Accepted←'application/vnd.github.mercy-preview+json'
-      parms.Method←'PUT'
-      parms.Body←'{',(1 JSON'names'topics),'}'
-      (rc msg dummy)←parms GetJson gitPath
+      endpoints←GetJson gitPath
+      endpoints.⎕FX'r←List' 'r←{⍵,[1.5]⍎¨⍵}⎕NL-2'
+      endpoints.⎕DF'[JSON Object: EndPoints]'
     ∇
 
     ∇ number←CastTagname2Number text;vec;bool
@@ -299,107 +219,64 @@
       :EndIf
     ∇
 
-    ∇ url←{tag}GetRelease(repoName type);regEx;rc;more;html;buff;itemNo;length;info;tagName;offset
+    ∇ url←{tag}GetRelease(repoName type);more;length;info;gitPath;ns;ind
     ⍝ Returns the URL of a version (release) of `repoName`, be default the latest one.
     ⍝ Draft releases are ignored.\\
     ⍝ The URL depends on what `type` is.
     ⍝ `type` may be one of: <EXE>, <ZIP>, <TAR>. `type` is not case sensitive.\\
-    ⍝ Note that in case `type` is `EXE` then the property `regEx` is an impicit argument of this function.
-    ⍝ The regular expression is used to find the name of the EXE in the HTML "releases" web page.
-    ⍝ See there for more information what `regEx` is used for.\\
     ⍝ The optional left argument `tag` can be used to request a particular version rather than the latest one.
     ⍝ `tag` can be something like `1.2.3` (or `1.2.3.4`) or `v1.2.3` (or `v1.2.3.4`).\\
-    ⍝ Returns the url or an empty vector in case of failure, for example when the web site does not carry any hits for `regEx`.\\
+    ⍝ Returns the url or an empty vector in case of failure, for example when the given type cannot be detected.
       :Access Public Instance
+      gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/releases'
+      ns←GetJson gitPath
       url←''
-      :If 0=⎕NC'regEx'
-          regEx←_regEx
-      :EndIf
       type←1 ⎕C type
       'Invalid right argument ("type")'⎕SIGNAL 11/⍨~(⊂type)∊'EXE' 'ZIP' 'TAR'
       :If 0=⎕NC'tag'
-          (rc more info)←GetLatestReleaseInfo repoName
-          more ⎕SIGNAL 11/⍨0≠rc
+          info←GetLatestReleaseInfo repoName
           tag←((1⍴info.tag_name)∊'Vv')↓info.tag_name
       :Else
-          tag←((1⍴tag)∊'Vv')↓tag
+          info←GetReleaseInfoByTagName repoName tag
       :EndIf
       :If (⊂type)∊'ZIP' 'TAR'
           url←('ZIP' 'TAR'⍳⊂type)⊃info.(zipball_url tarball_url)
       :ElseIf 'EXE'≡type
-          :Trap 11
-              html←GetGitHubPage repoName tag
-          :Else
-              'Reading the GitHub "Releases" page failed'⎕SIGNAL 11
-          :EndTrap
-          :If 0<≢html
-              tagName←{b←'.'=w←⍵ ⋄ (b/w)←⊂'\.' ⋄ ⊃,/w}tag~'v'
-              regEx←Replace(regEx'<repoName>'repoName)
-              regEx←Replace(regEx'<version>'tagName)
-              regEx←'/',_owner,'/',repoName,'/releases/download/v',tag,'/',regEx
-              :If 1=≢buff←regEx ⎕S 2 0 1⍠('Greedy' 0)('IC' 1)⊣html
-                  (itemNo offset length)←⊃buff
-                  url←'https://github.com/',1↓(1+length)↑(offset-1)↓(itemNo+1)⊃(⎕UCS 10)A.Split html
-              :EndIf
-          :EndIf
+      :AndIf 0<≢info.assets
+          ind←(⎕C ¯4↑¨info.assets.name)⍳⊂'.exe'
+      :AndIf (≢info.assets)≥ind
+          url←ind⊃info.assets.browser_download_url
       :EndIf
     ∇
 
-    ∇ tag←GetLatestTag repoName;MyGitAPI;rc;more;ns;gitVersion;api
+    ∇ tag←GetLatestTag repoName;MyGitAPI;ns;gitVersion;api
     ⍝ This method returns the latest `tag` (version number) for `repoName`.\\
-    ⍝ Note that drafted release and pre-release are both ignored.
+    ⍝ Note that drafted releases and pre-releases are both ignored.
       :Access Public Instance
-      (rc more ns)←GetLatestReleaseInfo repoName
-      :If 0≠rc
-      :OrIf ∨/'Error'⍷∊more
-          :If 0=≢more
-              'Error accessing GitHub via the REST API'⎕SIGNAL 11
-          :Else
-              more ⎕SIGNAL 11
-          :EndIf
-      :Else
-          tag←ns.tag_name
-      :EndIf
+      ns←GetLatestReleaseInfo repoName
+      tag←ns.tag_name
     ∇
 
-    ∇ r←CheckForUpdate(repoName version);gitVersion;version_
-    ⍝ Takes a version number like `1.2.3` or `1.2.3.4` and returns 1 in case there is a better
-    ⍝ version available on GitHub and 0 otherwise.
+    ∇ betterVersion←CheckForUpdate(repoName version);gitVersion;version_;gitVersion_
+    ⍝ Takes a version number like `1.2.3` or `1.2.3.4` (usually what is currently installed/used).\\
+    ⍝ Returns one of:
+    ⍝ * An empty vector in case no better version is available
+    ⍝ * The better version number
       :Access Public Instance
-      gitVersion←⌊CastTagname2Number GetLatestTag repoName
+      betterVersion←''
+      gitVersion_←GetLatestTag repoName
+      gitVersion←⌊CastTagname2Number gitVersion_
       version_←CastTagname2Number version~'v'
-      r←version_<gitVersion
-    ∇
-
-    ∇ r←CreateIssueParms
-⍝      :Access Public Instance    ⍝TODO⍝  NOT IMPLEMENTED YET
-      r←⎕NS''
-      r.title←''
-      r.body←''
-      r.milestone←0
-      r.labels←''       ⍝ Nested vector
-      r.assignees←''    ⍝ Nested vector
-      r.⎕FX'r←∆List' 'r←{⍉⍵,[.5]⍎¨⍵}'' ''~¨⍨↓⎕NL 2'
-    ∇
-
-    ∇ r←CreateIssue(repoName parms);gitPath;rc;msg;ns
-⍝      :Access Public Instance    ⍝TODO⍝  NOT IMPLEMENTED YET
-      'Invalid: "title"'⎕SIGNAL 11/⍨1≠≡,parms.title
-      'Invalid: "title"'⎕SIGNAL 11/⍨' '≠1↑0⍴∊parms.title
-      'Invalid: "milestone"'⎕SIGNAL 11/⍨1≠≢parms.milestone
-      'Invalid: "milestone"'⎕SIGNAL 11/⍨0≠1↑0⍴∊parms.milestone
-      'Invalid: "milestone"'⎕SIGNAL 11/⍨1≠≡,parms.milestone
-⍝  ... and so on ...
-      gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues/'
-      gitPath,←'?title=',EncodeBlank parms.title
-      (rc msg ns)←GetJson gitPath
-      .
-     
+      :If version_<gitVersion
+          betterVersion←gitVersion_
+      :EndIf
     ∇
 
     ∇ r←CreateHttpParms
-    ⍝ Create a parameter space that can be passed to some method that actually write to GitHub like `PutTopics'
-      :Access Public Instance
+    ⍝ Creates a parameter space that can be passed to some method.
+    ⍝ Currently this is private. We might need to change this once we introduce methods
+    ⍝ that actually write data, like, say, `CreateIssue`.
+    ⍝ :Access Public Instance
       r←⎕NS''
       r.Accepted←'Accept: application/vnd.github.v3+json'
       r.Method←'GET'
@@ -408,145 +285,61 @@
 
     ⍝ ------------------------------------------ Private stuff ----------------------------------
 
-    ∇ html←GetGitHubPage(repoName tag);c;q;buff;⎕USING;cp;req;res
-      :Trap 90
-          ⎕USING←'System.Net,system.dll' 'System.IO' 'System.Text'
-          cp←ServicePointManager.SecurityProtocol   ⍝ current protocol
-          ServicePointManager.SecurityProtocol←SecurityProtocolType.Tls12
-          req←WebRequest.CreateHttp⊂'https://github.com/',_owner,'/',repoName,'/releases/'
-          req.UserAgent←_owner              ⍝ MUST NOT be empty: required by the github api!
-         ⍝req.Accept←                       ⍝ Default is fine
-          req.Method←'GET'
-          res←req.GetResponse
-          ServicePointManager.SecurityProtocol←cp
-          :If res.StatusCode≠res.StatusCode.OK
-              11 ⎕SIGNAL⍨'HTTP error: ',⍕res.StatusCode
-          :EndIf
-          html←GetText res.GetResponseStream
-      :Else
-          11 ⎕SIGNAL⍨{⍵↓⍨1+⍵⍳':'}{⍵↑⍨1⍳⍨(⎕UCS 8 10)⍷⍵}⍕⎕EXCEPTION
-      :EndTrap
-    ∇
-
       GetNoOfPages←{
    ⍝ Takes HTTP headers and returns the number of pages. If there are not any a zero is returned.
           headers←⍵
-          bool←'link:'{⍺∘≡¨(⍴⍺)↑¨⍵}⎕C headers
+          bool←'link'∘≡¨⎕C headers[;1]
           0=+/bool:0
-          link←(bool⍳1)⊃headers
+          link←(bool⍳1)⊃headers[;2]
           buff←' 'A.Split link
           last←(¯1+⍴buff)⊃buff
           buff←{⍵{(⍴'?page-')↓⍵[2]↑⍵[1]↓⍺}⊃'(&|\?)page=[0-9]{1,}'⎕S 0 1⊣⍵}last
           ⊃⊃(//)⎕VFI buff
       }
 
-      GetLinkToNextPage←{
-   ⍝ Takes HTTP headers and returns the link pointing to the next page, if any
-          headers←⍵
-          bool←'link:'{⍺∘≡¨(⍴⍺)↑¨⍵}⎕C headers
-          0=+/bool:0
-          link←(bool⍳1)⊃headers
-          buff←' 'A.Split link
-          1↓¯2↓⊃1↓buff
-      }
-
-      SplitHeaders←{
-          headers←⍵↑⍨1⍳⍨(⎕UCS 10 13)⍷⍵
-          A.Split headers
-      }
-
-    ∇ txt←GetText obj;ts
-      ts←⎕NEW StreamReader obj   ⍝ text stream
-      txt←ts.ReadToEnd
-    ∇
-
-    ∇ (rc msg ns)←{parms}GetJson gitURL;cp;ServicePointManager;req;res;data;WebRequest;i;noOfPages;headers;owner;parms;str;c;q;⎕USING
-    ⍝ Takes `gitURL`which must specify a valid GitHub API URL and returns the data from GitHub.\\
-    ⍝ `⍵`: Project URL, for example 'api.github.com/repos/aplteam/testrepo/releases/latest'
-    ⍝ `⍺`: Optional parameter space, typically create by calling `CreateHttpParms`.
-    ⍝ | `rc`  | Either 0 for okay or an error code.
-    ⍝ | `msg` | Is empty in case `rc←→0` but might offer addtional information otherwise.
-    ⍝ | `ns`  | Namespace with the data received from GitHub.
-      parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHttpParms}'parms'
-      :If 0=⎕NC'_owner'
-          owner←'APL GitHub API'
+    ∇ data←{parms}GetJson gitURL;h;json;r;noOfPages;i;ind;link;r2;links;H_
+    ⍝ Takes a URL and returns a namespace, possibly with sub namespaces.
+    ⍝ In case the result is virtually paged by the server this function collects all data!
+      :If 0=⎕NC'H'
+          H_←(⊃⊃⎕CLASS ⎕THIS).##.HttpCommand
       :Else
-          owner←_owner
+          H_←H
       :EndIf
-      gitURL←'https://'{⍵,⍨⍺/⍨⍺≢(⍴⍺)↑⍵}⎕C gitURL
-      rc←0
-      msg←''
-      ns←⎕NS''
-      :Trap 90
-          ⎕USING←'System.Net,system.dll' 'System.IO' 'System.Text'
-          cp←ServicePointManager.SecurityProtocol   ⍝ current protocol
-          ServicePointManager.SecurityProtocol←SecurityProtocolType.Tls12
-          req←WebRequest.CreateHttp⊂gitURL
-          req.UserAgent←owner                   ⍝ MUST NOT be empty: required by the github api!
-          req.Accept←parms.Accepted
-          req.Method←parms.Method
-          res←req.GetResponse
-          ServicePointManager.SecurityProtocol←cp
-          :If res.StatusCode≠res.StatusCode.OK
-              rc←res.StatusCode
-              msg←'HTTP error'
-              :Return
-          :EndIf
-          ns←JSON GetText res.GetResponseStream
-          headers←SplitHeaders⍕res.Headers
-          :If 0<noOfPages←GetNoOfPages headers
-              :For i :In 1↓⍳noOfPages
-                  req←WebRequest.CreateHttp⊂GetLinkToNextPage headers
-                  req.UserAgent←owner           ⍝ MUST NOT be empty: required by the github api!
-                  res←req.GetResponse
-                  :If res.StatusCode≠res.StatusCode.OK
-                      rc←res.StatusCode
-                      msg←'HTTP error'
-                      :Return
-                  :EndIf
-                  ns,←JSON GetText res.GetResponseStream
+      h←⎕NEW H_(,⊂'')
+      :If 0<⎕NC'_personal_access_token'
+      :AndIf 0<≢_personal_access_token
+          'Authorization'h.AddHeader('Bearer ',_personal_access_token)
+      :EndIf
+      h.URL←gitURL
+      r←h.Run
+      r.HttpMessage Assert r.HttpStatus=200
+      data←⎕JSON r.Data
+      noOfPages←GetNoOfPages r.Headers
+      :If 0<noOfPages
+          ⍝ Fetch second page
+          ind←r.Headers[;1]⍳⊂'Link'
+          link←2⊃r.Headers[ind;]
+          h.URL←{¯1↓1↓⍵↑⍨¯1+⍵⍳';'}link
+          r2←h.Run
+          r.HttpMessage Assert r.HttpStatus≠200 Assert 200=r.HttpStatus
+          data,←⎕JSON r2.Data
+          :If 2<noOfPages
+              ⍝ Fetch all remaining pages
+              links←({¯2↓1↓⍵↑⍨¯1+⍵⍳';'}link)∘{⍺,⍕⍵}¨2↓⍳noOfPages
+              :For link :In links
+                  h.URL←link
+                  r2←h.Run
+                  r.HttpMessage Assert r.HttpStatus=200
+                  data,←⎕JSON r2.Data
               :EndFor
           :EndIf
-      :Else
-          rc←90
-          msg←{⍵↓⍨1+⍵⍳':'}{⍵↑⍨1⍳⍨(⎕UCS 8 10)⍷⍵}⍕⎕EXCEPTION
-      :EndTrap
-    ∇
-
-    ∇ r←{type}JSON y;version;buff
-    ⍝ Cover for `⎕JSON` in order to support 15.0 which had only an `⌶` for what became later `⎕JSON`.\\
-    ⍝ Note that by default this function imports JSON (`type`=0).\\
-    ⍝ In order to export `type` must be specified as 1.\\
-    ⍝ `y` must be a nested vector representing JSON in case `type` is 0 (the default).
-    ⍝ Otherwise `y` must be an APL array (including a namespace) that will be exported to JSON.
-      type←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'type'
-      version←⊃(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion'
-      'This version of Dyalog is not supported'⎕SIGNAL 11/⍨15>version
-      'Invalid left argument: must be Boolean'⎕SIGNAL 11/⍨~(⊂type)∊0 1
-      :If 15=version
-          :If 0=type        ⍝ Import?
-              r←7159⌶y
-          :ElseIf 1=type    ⍝ Export!
-              ∘∘∘           ⍝ Not implemented yet (because never required)
-              7160⌶
-          :Else
-              ∘∘∘           ⍝ Huuh?!
-          :EndIf
-      :Else
-          r←⍎'type ⎕JSON y' ⍝ Must be executed to make sure it works in any version of APL, no matter which version a WS was saved with!
       :EndIf
-    ∇
-
-    ∇ txt←Replace(txt old new);offset
-      offset←¯1+1⍳⍨old⍷txt
-      txt←(-offset)⌽new,(≢old)↓offset⌽txt
     ∇
 
     ∇ data←data GetPrinciple(propName principleName);row;jsonObj;buff
     ⍝ * `propName` is the name of a variable in a data space that is a JSON object
-    ⍝ * `principleName` is the principle name of all the properies of that JSON object\\
-    ⍝ Take a ref
-    ⍝ is concatenated with a comma and a blank, so ('bug' 'question') become:
+    ⍝ * `principleName` is the principle name of all the properties of that JSON object\\
+    ⍝ Is concatenated with a comma and a blank, so ('bug' 'question') become:
     ⍝ 'bug, question'
       :Access Public instance
       row←data[;1]⍳⊂propName
@@ -556,9 +349,9 @@
       :EndIf
     ∇
 
-⍝ The following function is fixed within the data spaces returned by many if not all commands:
+⍝ The following function is fixed within the data spaces returned by some commands:
     ∇ r←∆List;names;values;bool
-    ⍝ List all variables and their values. See also ∆View
+    ⍝ List all variables and their values.
       names←' '~¨⍨↓⎕NL 2
       values←⍎¨names
       bool←{16::1 ⋄ 0⊣1↑0⍴⍵}¨values  ⍝ Were are objects?
@@ -572,5 +365,7 @@
       ((' '=r)/r)←⊂'%20'
       ∊r
     ∇
+
+    Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←1 ⋄ ⍺ ⎕SIGNAL 1↓(⊃∊⍵),11}
 
 :EndClass

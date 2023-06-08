@@ -1,7 +1,0 @@
- JSON←RemoveAliasFromJSON JSON;pattern;buff;offset;length
-⍝ Takes a nested JSON vector and removes alias: ".*" from it
- pattern←'^ *alias *: *"[^"]*" *, *$'
- :If 0<≢buff←pattern ⎕S 0 1⍠('Greedy' 0)('Mode' 'M')⊣JSON
-     (offset length)←⊃buff
-     JSON←(-offset-1)⌽(1+length)↓(offset-1)⌽JSON
- :EndIf

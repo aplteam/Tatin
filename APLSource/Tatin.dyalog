@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.65.1 - 2023-05-19
+⍝ * 0.66.2 - 2023-06-06
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -423,6 +423,7 @@
     ∇
 
     ∇ {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;ref;target
+      r←''
       folder←1⊃⎕NPARTS ##.SourceFile
       (version ref target)←⎕SE._Tatin.Client.UpdateClient 0 folder
       :If 0<≢version
@@ -1228,6 +1229,9 @@
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
+                  :If 0=ns.⎕NC'license'
+                      ns.license←''
+                  :EndIf
                   data←TC.Reg.JSON ns
                   data←TC.AddCommentToPackageConfig data
                   origData←data
@@ -1838,11 +1842,11 @@
               r,←⊂'   be derived from the package ID if none was specified'
               r,←⊂' * A Cider alias specifying a project'
               r,←⊂''
-              r,←⊂'If more than one user command package and a name is specified after [MyUCMDs] an error is thrown.'
+              r,←⊂'If more than one user command package is specified after [MyUCMDs] an error is thrown.'
               r,←⊂'If no second argument is specified Tatin tries to find an open Cider project.'
               r,←⊂'If there is just one open, Tatin acts on it, otherwise the user is questioned.'
-              r,←⊂'It then inspects the "dependencies" & "dependencies_dev" property.'
-              r,←⊂'If that defines just one folder, that one is taken.'
+              r,←⊂'It then inspects the "dependencies" & "dependencies_dev" properties.'
+              r,←⊂'If that defines just one folder Tatin acts on it.'
               r,←⊂'If there are multiple folders defined the user is questioned which one to install into.'
               r,←⊂''
               r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
@@ -2154,7 +2158,8 @@
               r,←⊂'          The ZIP files will be deleted afterwards. Ignored when -download is not specified.'
               r,←⊂'-all      This circumvents the selection dialog; mainly useful for test cases.'
           :Case ⎕C'UpdateTatin'
-              r,←⊂'Downloads the latest version from GitHub and installs it in the folder it was started from.'
+              r,←⊂'Downloads the latest version from GitHub and installs it in the folder it was started from'
+              r,←⊂'in case there is a later version available.'
               r,←⊂''
               r,←⊂'Note that this user command does not attempt to update the current workspace, therefore it'
               r,←⊂'is recommended to close the current session and start a new one.'

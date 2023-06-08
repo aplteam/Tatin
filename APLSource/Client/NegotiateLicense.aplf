@@ -1,0 +1,22 @@
+ license←NegotiateLicense ns;list;ind
+⍝ If "license" is not empty at this stage it's the default according to the user settings.
+⍝ In that case the user is asked for confirmation
+⍝ plus the option to define the license manually.
+ license←ns.license
+ list←ListLicenses'[tatin]'
+ :If 0<≢license
+     :If 1 C.YesOrNo'pkg-license-default-okay@Is the license "',ns.license,'" okay?'
+         :Return
+     :Else
+         list←(list~⊂license),⊂license
+     :EndIf
+ :EndIf
+ list,←⊂'<Ask for license name>'
+ ind←'pkg-license-select@Select license'C.Select list
+ 'Cancelled by user (no license defined)'Assert 0<≢ind
+ :If ind=≢list
+     license←1({1}C.AskForText)'pkg-license-ask@Enter name of the license'
+ :Else
+     license←ind⊃list
+ :EndIf
+ ⍝Done

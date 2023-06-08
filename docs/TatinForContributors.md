@@ -129,11 +129,11 @@ We discuss the two different scenarios one after the other.
 
 A> ### Creating a new version
 A>
-A> Creating a new version is discussed later in this document, but there are situations when you need to create a new version _before_ you execute the test cases.
+A> Creating a new version is discussed later in this document, but there are scenarios when you need to create a new version _before_ you execute the test cases.
 A>
 A> The reason for this is that one group of test cases executes user commands. If they are affected by anything you've changed then naturally you want the new version to be available in `⎕SE` for execution, but that is only possible if you create a new version first.
 A>
-A> For that reason one test checks whether the version number in the workspace and in `⎕SE` do match. If you are confident that this does not matter in your case you may just carry on.
+A> For that reason one test checks whether the version number in the workspace and in `⎕SE` do match. If you are confident that this does not matter in your case you may just carry on. 
 
 ### Testing while developing
 
@@ -154,7 +154,7 @@ When you run the test suite you will be asked whether you want to start a Tatin 
 
 A> ### Starting a Tatin test server "manually"
 A>
-A> There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux. For that execute the following steps:
+A> There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux or Mac-OS. For that execute the following steps:
 A> 
 A> 1. Instantiate Dyalog Unicode 18.0 or later
 A> 

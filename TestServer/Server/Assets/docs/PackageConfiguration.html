@@ -329,11 +329,12 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <h4 data-id="license">2.3.10. license</h4>
 </a>
 </div>
-<p>This might be empty, but you might be unable to publish a package to a Tatin Registry then. It depends on the licenses tolerated by a Registry.</p>
-<p>Not that you may specify a default license in your user settings:</p>
+<p>This may be empty, or it may specify a license such as:</p>
+<pre><code>  license: "MIT",</code></pre>
+<p>You may not be able to publish a package to a Tatin registry without specifying a license: this depends on the licensing policy of a particular registry. The main Tatin registry <a href="https://tatin.dev" class="external_link">https://tatin.dev</a> is an example: you <em>must</em> specify a license in order to publish a package to it. Note that you can specify a default license in your user settings:</p>
 <pre><code>]TATIN.UserSettings -edit</code></pre>
-<p>At the bottom there are defaults defined for <code>license</code>, <code>source</code> etc.</p>
-<p>The user command <code>]Tatin.GetLicenses</code> and the API function <code>⎕SE.Tatin.GetLicenses</code> can be used to fetch a list with all licenses tolerated by a Tatin Registry.</p>
+<p>At the bottom there are defaults defined for <code>license</code> and <code>source</code> and possibly other properties. If it is not empty then the value will be used as default when creating a new package config file.</p>
+<p>Both the user command <code>]Tatin.ListLicenses</code> and the API function <code>⎕SE.Tatin.ListLicenses</code> can be used to get a list of all licenses tolerated by a Tatin Registry.</p>
 <div class="h_tag">
 <a href="#lx" id="lx" class="autoheader_anchor">
 <h4 data-id="lx">2.3.11. lx</h4>
@@ -483,7 +484,7 @@ your.name@your-domain.com</code></pre>
 <h4 data-id="SysVars">2.3.23. APL System variables: ⎕IO and ⎕ML</h4>
 </a>
 </div>
-<p>By default the config namespace carries the values of the two Dyalog parameters <code>default_io</code> and <code>default_ml</code> for the system variables <code>⎕IO</code> and <code>⎕ML</code>.</p>
+<p>By default the package configuration file carries the values of the two Dyalog parameters (environment variables) <code>Default_IO</code> and <code>Default_ML</code> for the system variables <code>⎕IO</code> and <code>⎕ML</code>, or, if these are not defined, <code>⎕IO←1</code> and <code>⎕ML←1</code> which are the built-in defaults.</p>
 <p>Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the <code>LoadPackages</code> or the <code>LoadDependencies</code> function <em>before</em> any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.</p>
 <div class="h_tag">
 <a href="#Injected-values" id="Injected-values" class="autoheader_anchor">

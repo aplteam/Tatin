@@ -13,7 +13,7 @@
  ns.description←enforce({1}C.AskForText)'pkg-description@Enter a description of what the package is doing (mandatory)'
  ns.maintainer←({1}C.AskForText)'pkg-maintainer@Enter the email address of the maintainer'
  ns.tags←enforce({1}C.AskForText)'pkg-tags@Enter a comma-separated list of tags'
- ns.license←({1}C.AskForText)'pkg-license@Enter the name of the license'
+ ns.license←NegotiateLicense ns
  ind←'On which operating system will the package be usable'multiples enforce C.Select'Windows' 'Linux' 'Mac-OS'
  ns.(os_win os_lin os_mac)←1 2 3∊ind
  ns.io←⊃1 C.YesOrNo'Is ⎕IO 1?'

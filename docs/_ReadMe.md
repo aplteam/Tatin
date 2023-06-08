@@ -61,6 +61,10 @@ This document gives you an overview of these HTML files: their purpose and who s
   discusses the implications, and under which circumstances you might want to switch caching off, either
   globally or just for a specific Registry.
 
+* [GitHub](./GitHub.html "GitHub.html") (draft)
+
+  Discusses GitHub-related issues, typically only relevant for contributors 
+
 
 ### The Server
 

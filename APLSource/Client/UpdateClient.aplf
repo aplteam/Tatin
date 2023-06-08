@@ -1,4 +1,4 @@
- (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;flag2
+ (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;⎕TRAP;filename;currentVersion
 ⍝ Updates the client to (by default) the latest version, and returns the version number of the new version.\\
 ⍝ A Boolean right argument (`force`) is mandatory, but one might specify also a folder Tatin is installed in.
 ⍝ The user command will do this automatically with the folder the user command was loaded from.\\
@@ -8,14 +8,19 @@
  (force target)←2↑(⊆y),⊂''
  'Right argument must be a Boolean'Assert(⊂force)∊0 1
  'Updating Tatin requires at least 20 MB WSSIZE'Assert 20<⌊⎕WA÷1024×1024
- version←ref←target←''
+ version←ref←''
  :If flag←0=⎕NC'tag'
      GH←⎕NEW ##.GitHubAPIv3(,⊂'aplteam')
-     tag←GH.GetLatestTag'Tatin'
+     filename←GetMyUCMDsFolder'Tatin/GitHub-personal-token.txt'
+     :If F.IsFile filename
+         GH.personal_access_token←∊⊃F.NGET filename 1
+     :EndIf
+     currentVersion←({⍵↑⍨¯1+⌊/⍵⍳'+-'}2⊃Reg.Version)
+     tag←GH.CheckForUpdate'Tatin'currentVersion
  :Else
      'Invalid version number'Assert'v'=1⍴tag
  :EndIf
- :If (1↓tag)≡{⍵↑⍨¯1+⍵⍳'+'}2⊃Reg.Version
+ :If 0=≢tag
      ⎕←'Tatin is up-to-date: ',⊃{⍺,' from ',⍵}/1↓Reg.Version
  :Else
      msg←'You version of Tatin is ',2⊃Reg.Version
@@ -44,38 +49,11 @@
          tempFile ZipArchive.UnzipTo folder
          ⎕NDELETE tempFile
          :If 0=≢target
-             target←GetMyUCMDsFolder'Tatin'
+             target←GetMyUCMDsFolder'Tatin'  ⍝ Establish default
          :EndIf
-         flag2←0
-         :Repeat
-             (rc msg)←F.RmDirByForce target
-             :If rc=0
-                 flag2←1
-             :ElseIf 0=YesOrNo('Removing >',target,'> failed with rc=',⍕rc)('Error message: ',⍕∊msg)'Try again?'
-                 '*** Updating Tatin cancelled'⎕SIGNAL 11
-             :Else
-                 ⎕DL 1
-             :EndIf
-         :Until flag2
-         (⊃⎕NPARTS target)⎕NCOPY folder,'/Tatin'
+         (⊃⎕NPARTS{⍵↓⍨-'/\'∊⍨¯1↑⍵}target)⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
          version←{⍵↓⍨'v'=1⍴⍵}tag
          ref←⎕SE.⎕NS''
-
-         :If 0
-             ⍝ It appears that overwriting Conga in the current WS does not really work, no matter what.
-             ⍝ For that reason this is not active.
-             :Trap 11
-             ⍝ We try to copy a function from the new version that can execute the remaining steps.
-             ⍝ That way we are more flexible. The ⎕CY is trapped only because in the early stages (after UpdateClient was introduced)
-             ⍝ there might be no such function yet; then the required steps are executed by this fn in :Else
-             ⍝ Note however that the function must not be executed from within UpdateClient because that would
-             ⍝ prevent the namespace ⎕SE.Tatin from disappearing causing potentially a Conga problem: DLL error 1006
-                 '#._Tatin.Client.UpdateClient_Continue'ref.⎕CY folder,'/Tatin/Client.dws'
-             :Else
-                 ref.⎕FX ⎕CR'UpdateClient_Continue'
-             :EndTrap
-         :EndIf
-
      :EndIf
  :EndIf
 ⍝Done

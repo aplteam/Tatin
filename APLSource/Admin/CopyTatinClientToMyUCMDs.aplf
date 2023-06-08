@@ -1,4 +1,4 @@
- {r}←CopyTatinClientToMyUCMDs batchFlag;h;userCommandTargetFolder;msg;rc;flag;counter;max
+ {r}←CopyTatinClientToMyUCMDs batchFlag;h;userCommandTargetFolder;msg;rc;flag;counter;max;filename
  r←0
  userCommandTargetFolder←⎕SE._Tatin.Client.GetMyUCMDsFolder''
  Assert 0<#.Tatin.⎕NC'CiderConfig'
@@ -21,5 +21,11 @@
      ('Removing failed: ',userCommandTargetFolder,'/Tatin','; RC=',⍕rc)Assert 0=rc
      (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣#.Tatin.CiderConfig.HOME,'/Dist/Client/Tatin'
      r←1
+     filename←#.Tatin.CiderConfig.HOME,'/GitHub-personal-token.txt'
+     :If ⎕NEXISTS filename
+         :If 1 ##.Client.YesOrNo'Copy over the personal GitHub token as well?'
+             (userCommandTargetFolder,'/Tatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣filename
+         :EndIf
+     :EndIf
  :EndIf
 ⍝Done

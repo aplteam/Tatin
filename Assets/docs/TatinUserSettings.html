@@ -54,7 +54,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 <p>Tatin uses a file to remember all Tatin Registries you want to work with, and possibly other user-specific settings as well. We refer to this file as the user settings file.</p>
 <p>When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location.</p>
-<p>Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the <code>Tatin.UserSettings</code> class. The instance is assigned to <code>⎕SE.Tatin.MyUserSettings</code>. From then on any changes to the file with an external editor <em>do not</em> affect <code>⎕SE.Tatin.MyUserSettings</code>!</p>
+<p>Once Tatin is installed, when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the <code>Tatin.UserSettings</code> class. The instance is assigned to <code>⎕SE.Tatin.MyUserSettings</code>. From then on any changes to the file with an external editor <em>do not</em> affect <code>⎕SE.Tatin.MyUserSettings</code>!</p>
 <p><code>⎕SE.Tatin.MyUserSettings</code> provides several properties that can be referenced as well as several methods that can be issued to manipulate the user settings.</p>
 <p>For example, this call:</p>
 <pre><code>      ]Tatin.ListRegistries
@@ -96,7 +96,7 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h3 data-id="May-I-edit-the-file">1.4. May I edit the file?</h3>
 </a>
 </div>
-<p>Of course, you are free to edit that file with any editor. However, keep in mind that you are in charge of making sure that the contents of the file is valid JSON5[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]: if it's not, Tatin will crash.</p>
+<p>Of course you are free to edit that file with any editor. However, keep in mind that you are in charge of making sure that the contents of the file is valid JSON5[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]: if it's not, Tatin will crash.</p>
 <p>If you are familiar with JSON5 syntax and want to edit the file it is recommended to use:</p>
 <pre><code>]TATIN.UserSettings -edit</code></pre>
 <p>This will allow you to edit the file contents, but Tatin will check it afterward to make sure that nothing invalid goes ever into the file.</p>
@@ -257,16 +257,17 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
 <p>There might be scenarios when the default location for the user config file is not suitable for you.</p>
 <ul>
 <li>If you cannot make frequent changes to the Tatin user settings file in its default location due to, say,  company constraints, then of course it needs to go elsewhere.</li>
-<li>Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
+<li>Your computer is used by several people, and they all (or at least two of them) need write access to the Tatin user settings file.
 <p>You could still use the default location, but because that location is user-specific, every user would require her own user settings file, which is something you might or might not want to avoid.</p></li>
 </ul>
 <p>In the aforementioned cases as well as other scenarios you need more freedom than what is provided by default.</p>
 <p>For that, you must create a user settings file in a specific location. To achieve that we re-instantiate the class <code>UserConfig</code>, and we provide a path to the folder where the file should live:</p>
-<pre><code>      ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path2/user_config_file/')
+<pre><code>      p←,⊂'/path2/user_config_file/'
+      ⎕SE._Tatin.Client.MyUserSettings←⎕SE._Tatin.Client.⎕NEW ⎕SE.Tatin.UserSettings p
       ⍴⎕←1 ⎕se.Tatin.ListRegistries 0
- https://tatin.dev       tatin      100
- https://test.tatin.dev  tatin-test   0
-2 3
+ https://tatin.dev       tatin      0 100
+ https://test.tatin.dev  tatin-test 0   0
+2 4
       ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
  Alias  URI                  Port  Priority  API-key
  -----  ------------------   ----  --------  -------
@@ -286,7 +287,7 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
 </div>
 <p>To make this user settings file the default file, meaning that this file will be instantiated the next time Dyalog APL is fired up, we need to make sure that a file <code>.tatin</code> in the default folder (that's the one returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code>) contains a path pointing to that folder.</p>
 <p>You can do this yourself, but you can also ask the instance for doing the job for you:</p>
-<pre><code>      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile</code></pre>
+<pre><code>      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile 1</code></pre>
 <p>From now on the file <code>MyUserSettings.path2config</code> is pointing to will be used to determine the user settings.</p>
 <div id="footnotes_div">
 <hr>

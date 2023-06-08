@@ -312,17 +312,22 @@ A group may be the name of a user, the owner, a company, an application name, a 
 
 #### license
 
-This might be empty, but you might be unable to publish a package to a Tatin Registry then. It depends on the licenses tolerated by a Registry.
+This may be empty, or it may specify a license such as:
 
-Not that you may specify a default license in your user settings:
+```
+  license: "MIT",
+```
+
+You may not be able to publish a package to a Tatin registry without specifying a license: this depends on the licensing policy of a particular registry. The main Tatin registry <https://tatin.dev> is an example: you *must* specify a license in order to publish a package to it.
+Note that you can specify a default license in your user settings:
 
 ```
 ]TATIN.UserSettings -edit
 ```
 
-At the bottom there are defaults defined for `license`, `source` etc.
+At the bottom there are defaults defined for `license` and `source` and possibly other properties. If it is not empty then the value will be used as default when creating a new package config file.
 
-The user command `]Tatin.GetLicenses` and the API function `⎕SE.Tatin.GetLicenses` can be used to fetch a list with all licenses tolerated by a Tatin Registry.
+Both the user command `]Tatin.ListLicenses` and the API function `⎕SE.Tatin.ListLicenses` can be used to get a list of all licenses tolerated by a Tatin Registry.
 
 #### lx
 
@@ -497,7 +502,7 @@ For details see the [Tatin and Semantic Versioning](./SemanticVersioning.html "S
 
 #### APL System variables: ⎕IO and ⎕ML {#SysVars}
 
-By default the config namespace carries the values of the two Dyalog parameters `default_io` and `default_ml` for the system variables `⎕IO` and `⎕ML`. 
+By default the package configuration file carries the values of the two Dyalog parameters (environment variables) `Default_IO` and `Default_ML` for the system variables `⎕IO` and `⎕ML`, or, if these are not defined, `⎕IO←1` and `⎕ML←1` which are the built-in defaults. 
 
 Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the `LoadPackages` or the `LoadDependencies` function _before_ any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.
 

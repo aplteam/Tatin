@@ -15,7 +15,7 @@ Tatin uses a file to remember all Tatin Registries you want to work with, and po
 
 When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location. 
 
-Once Tatin is installed when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _do not_ affect `⎕SE.Tatin.MyUserSettings`!
+Once Tatin is installed, when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _do not_ affect `⎕SE.Tatin.MyUserSettings`!
 
 `⎕SE.Tatin.MyUserSettings` provides several properties that can be referenced as well as several methods that can be issued to manipulate the user settings.
 
@@ -64,7 +64,7 @@ The name of the file is `tatin-client.json`.
 
 ### May I edit the file?
 
-Of course, you are free to edit that file with any editor. However, keep in mind that you are in charge of making sure that the contents of the file is valid JSON5[^JSON5]: if it's not, Tatin will crash.
+Of course you are free to edit that file with any editor. However, keep in mind that you are in charge of making sure that the contents of the file is valid JSON5[^JSON5]: if it's not, Tatin will crash.
 
 If you are familiar with JSON5 syntax and want to edit the file it is recommended to use:
 
@@ -246,7 +246,7 @@ There might be scenarios when the default location for the user config file is n
 
 * If you cannot make frequent changes to the Tatin user settings file in its default location due to, say,  company constraints, then of course it needs to go elsewhere.
 
-* Your computer is used by several people, and they all (or at least two of them) need access to the Tatin user settings file.
+* Your computer is used by several people, and they all (or at least two of them) need write access to the Tatin user settings file.
 
    You could still use the default location, but because that location is user-specific, every user would require her own user settings file, which is something you might or might not want to avoid.
 
@@ -255,11 +255,12 @@ In the aforementioned cases as well as other scenarios you need more freedom tha
 For that, you must create a user settings file in a specific location. To achieve that we re-instantiate the class `UserConfig`, and we provide a path to the folder where the file should live:
 
 ```
-      ⎕SE.Tatin.MyUserSettings←⎕NEW ⎕SE.Tatin.UserSettings (,⊂'/path2/user_config_file/')
+      p←,⊂'/path2/user_config_file/'
+      ⎕SE._Tatin.Client.MyUserSettings←⎕SE._Tatin.Client.⎕NEW ⎕SE.Tatin.UserSettings p
       ⍴⎕←1 ⎕se.Tatin.ListRegistries 0
- https://tatin.dev       tatin      100
- https://test.tatin.dev  tatin-test   0
-2 3
+ https://tatin.dev       tatin      0 100
+ https://test.tatin.dev  tatin-test 0   0
+2 4
       ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
  Alias  URI                  Port  Priority  API-key 
  -----  ------------------   ----  --------  ------- 
@@ -281,7 +282,7 @@ To make this user settings file the default file, meaning that this file will be
 You can do this yourself, but you can also ask the instance for doing the job for you:
 
 ```
-      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile
+      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile 1
 ```
 
 From now on the file `MyUserSettings.path2config` is pointing to will be used to determine the user settings.

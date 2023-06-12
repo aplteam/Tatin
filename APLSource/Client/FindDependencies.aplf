@@ -1,24 +1,54 @@
- r←{level}FindDependencies(folder pkgList);folders
+ r←{depth}FindDependencies y;pkgList;target;level;folders;folder;registries;targets;buff
+⍝ `target` can be a Registry alias, [*] for all defined Regiestries, a URL pointing to a URL or a folder.
+⍝ If it is a folder:\\
 ⍝ Starting in `folder`, all sub folders are scanned for a file "apl-dependencies.txt".\\
 ⍝ Folders with such a file will be scanned for packages in `pkgList`.\\
 ⍝ `pkgList` must be a simple char vector with a list of comma-separated packages.\\
 ⍝ The packages can be specified fully or partly. "Group" and "Version" can all be left out,
 ⍝ but "Name" is mandatory. You may specify a major version but minor and patch are ignored
 ⍝ if specified.\\
+⍝ If it is one or more Registries those are approached and the result collected
 ⍝ Note that the search is *not* case sensitive.\\
 ⍝ Returns a fully qualified list with all hits.\\
 ⍝ By default just the folder(s) are returned that contain a file "apl-dependencies.txt"
 ⍝ that carry at least one of the given packages.\\
-⍝ In case a 1 is passed as left argument (default is 0, other values led to an error) the
+⍝ In case "level" is 1 (default is 0, other values led to an error) the
 ⍝ package folders are also returned, revealing the precise version(s) installed.
- level←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'level'
- folder←{0<⎕NC ⍵:⍎⍵ ⋄ './'}'folder'
- folder,←(~(¯1↑folder)∊'/\')/'/'
- 'The package list must be a simple comma-separated list of package naames'Assert 80=⎕DR pkgList
- 'The folder must be a simple char vector'Assert 80=⎕DR folder
- ('Not found: ',folder)Assert ⎕NEXISTS folder
- pkgList←⎕C','(≠⊆⊢),pkgList
- 'A package name must not contain more than a maximum of two hyphens'Assert{2≥'-'+.=⍵}¨pkgList
- pkgList←Reg.RemoveMinorAndPatch¨pkgList
- r←level FindDependencies_ folder folder pkgList
+⍝ "depth" should only be used when a folder is scanned that contains packages. It prevents the search
+⍝ for all sub folders. In particular useful on a server managing a Registry because it **knows**
+⍝ that there cannot be any dependencies in any sub folder. Leave it alone in normal cases but
+⍝ specify a 2 for a Registry folder. "depth" has an effect only for folders, not for URLs pointing
+⍝ to a managed server. That's because the server manages that itself.
+ depth←{0<⎕NC ⍵:⍎⍵ ⋄ ¯1}'depth'
+ '⍵ must have a length of 2 or 3'Assert(≢y)∊2 3
+ (pkgList target level)←3↑y,(≢y)↓'' '' 0
+ :If 0=≢target
+     target←'./'
+ :EndIf
+ :If '[]'≡target[1,≢target]
+     :If '[*]'≡target
+         registries←1 ListRegistries''
+         target←(registries[;4]>0)⌿registries  ⍝ All Registries with a priority greater than 0
+         target←target[;1]
+     :ElseIf '[]'≡target[1,≢target]
+         target←ReplaceRegistryAlias target
+     :EndIf
+     'No (valid) Registry specified?!'Assert 0<≢target
+ :EndIf
+ targets←⊆target
+ r←''
+ :For target :In targets
+     :If IsHTTP target
+         r,←⊂target(FindDependencies_ pkgList target level)
+     :Else
+         folder←F.AddTrailingSep target
+         'The folder must be a simple char vector'Assert 80=⎕DR folder
+         ('Not found: ',folder)Assert ⎕NEXISTS folder
+         pkgList←⎕C','(≠⊆⊢),pkgList
+         'A package name must not contain more than a maximum of two hyphens'Assert{2≥'-'+.=⍵}¨pkgList
+         pkgList←Reg.RemoveMinorAndPatch¨pkgList
+         buff←depth Reg.FindDependenciesLocally folder folder pkgList level
+         r,←⊂target buff
+     :EndIf
+ :EndFor
 ⍝Done

@@ -1,8 +1,9 @@
  r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg;errorCounter
 ⍝ Whether there is a (semi-)global ∆PermanentConnections or not makes a difference here:
 ⍝ * If it exists it's supposed to hold clients for all HTTP registries with a priority>0.
-⍝   This improves performance dramatically because the same connection can be used again.
-⍝ * If ∆PermanentConnections does not exist a new client is created & the connection closed when done.
+⍝   This can improve performance dramatically because the same connection can be used again.
+⍝ * If ∆PermanentConnections does not exist, a new client is created & the connection is closed when done.
+ 'Invalid request parameter: RequestTarget'Assert(≡request.RequestTarget)∊0 1
  request.Headers,←⊂Reg.TatinVersionAsHttpHeader
  request←AddTestFlag request
  msg←uri,' did not respond'

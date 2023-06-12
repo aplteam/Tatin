@@ -278,15 +278,25 @@ version
 <h3 data-id="FindDependencies">2.7. FindDependencies</h3>
 </a>
 </div>
-<pre><code>r←{level} FindDependencies (folder pkgList)
+<pre><code>r←{depth} FindDependencies (target pkgList [verbose])
 </code></pre>
-<p>Scans <code>folder</code> recursively for a file “apl-dependencies.txt”. Folders with such a file will be scanned for packages defined in <code>pkgList</code>. Useful for finding out where one or more packages are used.</p>
-<p><code>pkgList</code> must be a simple char vector with a list of comma-separated packages.</p>
-<p>The packages can be specified fully or partly. “Group” and “version” can be left out while “Name” is mandatory. You may specify a major version but “minor” and “patch” will be ignored when specified.</p>
+<p><code>target</code> can be any of the following:</p>
+<ul>
+<li>A Registry alias</li>
+<li><code>[*]</code> for all defined Regiestries with a priority greater than 0</li>
+<li>A URL pointing to a Tatin server</li>
+<li>A folder</li>
+</ul>
+<p>The first three options will eventually become the folder where the packages of a Registry are stored.</p>
+<p>Scans <code>folder</code> recursively for a file “apl-dependencies.txt”. Folders with such a file will be searched for packages defined in <code>pkgList</code>. Useful to find out where one or more packages are used.</p>
+<p><code>pkgList</code> must be a simple char vector with a list of packages separated by commas.</p>
+<p>The packages can be specified fully or partially specified. “Group” and “Version” can be omitted while “Name” is mandatory. You can specify a major version, but “minor” and “patch” are ignored if specified.</p>
 <p>Note that the search is <em>not</em> case-sensitive.</p>
-<p>Returns a fully qualified list with all hits.</p>
-<p>By default just the folder is returned that contains a file “apl-dependencies.txt” that carries at least one of the packages defined.</p>
-<p>In case a 1 is passed as left argument (default is 0) the actual package folders rather than the hosting folder(s) are returned, revealing the precise version(s) installed.</p>
+<p>Returns a fully qualified list of all matches.</p>
+<p>By default only the folder containing a file “apl-dependencies.txt” with at least one of the defined packages is returned.</p>
+<p>If a 1 is passed as <code>verbose</code> (optional, defaults to 0) the actual package folders will be returned instead of the hosting folder(s), revealing the precise version(s) installed.</p>
+<p>The optional left argument can be used to limit the number of levels to be searched recursively. A server sets this to 1 because it knows that it only needs to search the sub folders of the Registry folder, which greatly reduces the time spent on the task.</p>
+<p>The user can use it in the same way if she knows exactly what is stored where.</p>
 <div class="h_tag">
 <a href="#GetDeletePolicy" id="GetDeletePolicy" class="autoheader_anchor">
 <h3 data-id="GetDeletePolicy">2.8. GetDeletePolicy</h3>

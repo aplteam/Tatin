@@ -1,0 +1,13 @@
+ r←Test_UserCommands_500(stopFlag batchFlag);⎕TRAP;rc;msg;result;stop
+⍝ Exercise ]Tatin.FindDependencies for two packages without folder (defaults to current direcotry)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg result)←stop ∆UCMD'FindDependencies APLTreeUtils2,Tester2'
+ Assert 0=rc
+ →T.PassesIf 2=⍴⍴result
+ →T.PassesIf ∆CheckForHavingDependencyFile result
+
+ r←T._OK
+⍝Done

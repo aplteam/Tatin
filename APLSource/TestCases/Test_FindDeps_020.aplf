@@ -1,0 +1,14 @@
+ r←Test_FindDeps_020(stopFlag batchFlag);⎕TRAP;list
+⍝ Exercise FindDependencies with level←1 on just a package name
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ r←T._Failed
+
+ list←##.Client.FindDependencies'Inno,Tester2'(##.CiderConfig.HOME,'/TestData/Aliase3') 1
+ →T.PassesIf 0<≢list
+ →T.PassesIf 1=≢list
+ →T.PassesIf 2=≡1 2⊃list
+ →T.PassesIf∧/F.IsDir 1 2⊃list
+ →T.PassesIf 2∧.≤{'-'+.=⊃,/1↓⎕NPARTS ⍵}¨1 2⊃list  ⍝ Must be valid package names and therefore have AT LEAST two hyphens
+
+ r←T._OK

@@ -1,0 +1,16 @@
+ r←Test_UserCommands_514(stopFlag batchFlag);⎕TRAP;rc;msg;res;stop;regList
+⍝ Exercise ]Tatin.FindDependencies with on all servers with a priority greater than 0 for a non-existend package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg res)←stop ∆UCMD'FindDependencies DosNotExist [*]'
+ →T.PassesIf rc=0
+ →T.PassesIf 2=⍴⍴res
+ →T.PassesIf 0=+/≢¨res[;2]              ⍝ No hits
+ regList←TC.ListRegistries''
+ regList←(regList[;4]>0)⌿regList
+ →T.PassesIf(≢regList)=+/0<≢¨res[;1]
+
+ r←T._OK
+⍝Done

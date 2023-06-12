@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.66.2 - 2023-06-06
+⍝ * 0.67.0 - 2023-06-10
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -44,7 +44,7 @@
           c←⎕NS ⍬
           c.Name←'FindDependencies'
           c.Desc←'Search the folder for given packages and report installed packages'
-          c.Parse←'2 -detailed'
+          c.Parse←'1-2 -verbose'
           r,←c
      
           c←⎕NS ⍬
@@ -360,18 +360,22 @@
       :EndIf
     ∇
 
-    ∇ r←FindDependencies Arg;folder;detailed;pkgList;buff;bool
+    ∇ r←FindDependencies Arg;pkgList;target;verbose;buff;bool
       r←'Cancelled by user'
-      detailed←Arg.detailed
-      buff←Arg.(_1 _2)
-      :If ∨/bool←∨/¨buff∊¨'.' './'
-          (bool/buff)←1⍴1 ⎕NPARTS'./'
-      :EndIf
-      buff←{w←⍵ ⋄ w[⍋∨/¨'/\'∘∊¨w]}buff
-      pkgList←','(≠⊆⊢)1⊃buff
-      folder←2⊃buff
+      verbose←Arg.verbose
+      pkgList←','(≠⊆⊢)Arg._1
+      target←''Arg.Switch'_2'
       'Invalid package definition'Assert 0∧.=(⎕NS''){⊃∘⍺.⎕NC¨{'_'@(⍸⍵∊'.-')⊣⍵}¨⍵}pkgList
-      r←⍪detailed TC.FindDependencies folder(⊃{⍺,',',⍵}/pkgList)
+      :If 0<≢r←TC.FindDependencies(⊃{⍺,',',⍵}/pkgList)target verbose
+          buff←{((⊂''),⍪2⊃⍵)}¨r
+          r←{TC.F.EnforceSlash TC.F.AddTrailingSep⊃⍵}¨r
+          :If ∨/bool←{∨/'/\'∊↑⍵[;2]}¨buff ⍝ Only local data is a full path
+              (bool/buff)←(bool/r){l←≢⍺ ⋄ l↓¨⍵}¨(bool/buff)
+              (bool/buff)←{w←⍵ ⋄ w[;2]←TC.F.EnforceSlash¨⍵[;2] ⋄ w}¨bool/buff
+          :EndIf
+          r←r{((⊂⍺)'')⍪⍵}¨buff
+          r←⊃⍪/r
+      :EndIf
     ∇
 
     ∇ r←DeprecatePackage Arg;id;force;uri;packageID;versions;msg;rc;comment
@@ -1607,22 +1611,22 @@
               r,←'' '  ]Tatin.CreatePackage'
           :Case ⎕C'DeprecatePackage'
               r,←⊂'Declare packages as deprecated.'
-              r,←'' '  ]Tatin.DeprecatePackage <URL|[Alias><group><name>[<major-version>] <comment> [-force]'
+              r,←'' '  ]Tatin.DeprecatePackage <URL|[Alias><group><name>[<major-version>] <comment> -force'
           :Case ⎕C'FindDependencies'
               r,←⊂'Attempts to find all folder(s) with the given Tatin package(s)'
-              r,←'' '  ]Tatin.FindDependencies <folder> <comma-separated list of pkgs> -detailed'
+              r,←'' '  ]Tatin.FindDependencies <comma-separated list of pkgs> [target] -verbose '
           :Case ⎕C'ListLicenses'
               r,←⊂'Returns information regarding the licenses tolerated by a managed Tatin Registry'
               r,←'' '  ]Tatin.ListLicenses <url> -verbose'
           :Case ⎕C'ListRegistries'
               r,←⊂'List URL, alias, priority and port of all Registries as defined in the user settings.'
-              r,←'' '  ]Tatin.ListRegistries [-full]'
+              r,←'' '  ]Tatin.ListRegistries -full'
           :Case ⎕C'ListDeprecated'
               r,←⊂'List all deprecated major versions'
-              r,←'' '  ]Tatin.ListDeprecated <URL|[Alias> [-all]'
+              r,←'' '  ]Tatin.ListDeprecated <URL|[Alias> -all'
           :Case ⎕C'ListPackages'
               r,←⊂'List all packages in the Registry or install folder passed as argument'
-              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> [-uc] [-group=] [-tags=] [-os=] [-date] [-project_url] [-since={YYYYMMDD|YYYY-MM-DD}] [-noaggr]'
+              r,←'' '  ]Tatin.ListPackages <URL|[Alias|<path/to/registry>|<install-folder>]> -uc -group= -tags= -os= -date -project_url -since={YYYYMMDD|YYYY-MM-DD} -noaggr'
           :Case ⎕C'LoadPackages'
               r,←⊂'Load the specified package(s) and all dependencies into the workspace.'
               r,←'' '  ]Tatin.LoadPackages <packageIDs|package-URLs|Zip-file> [<target namespace>] -nobetas'
@@ -1634,40 +1638,40 @@
               r,←'' '  ]Tatin. <packageIDs|package-URLs|Zip-file> <install-path>'
           :Case ⎕C'LoadDependencies'
               r,←⊂'Load all packages defined in a file apl-dependencies.txt.'
-              r,←'' '  ]Tatin.LoadDependencies <package-folder> [<parent-namespace>] [-overwrite]'
+              r,←'' '  ]Tatin.LoadDependencies <package-folder> [<parent-namespace>] -overwrite'
           :Case ⎕C'Maintenance'
               r,←⊂'Checks whether there are maintenance files available and asks the user about it'
-              r,←'' '  ]Tatin.Maintenance path [-dry] [-show]'
+              r,←'' '  ]Tatin.Maintenance path -dry -show'
           :Case ⎕C'UserSettings'
               r,←⊂'Print the usfer settings found in the config file to ⎕SE and allows manipulation via flags'
-              r,←'' '  ]Tatin.UserSettings [-apikey] [-edit] [-refresh]'
+              r,←'' '  ]Tatin.UserSettings -apikey -edit -refresh'
           :Case ⎕C'PackageConfig'
               r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
-              r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> [-edit] [-delete]'
+              r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> -edit -delete'
           :Case ⎕C'UnInstallPackages'
               r,←⊂'Uninstall a given package and possibly all its dependencies.'
               r,←'' '  ]Tatin.UnInstallPackages [<package-ID|package-alias>] <package-folder> -cleanup -quiet'
           :Case ⎕C'PackageDependencies'
               r,←⊂'Return the contents of a file "apl-dependencies.txt".'
-              r,←'' '  ]Tatin.PackageDependencies <package-path> [-edit] [-delete] [-quiet]'
+              r,←'' '  ]Tatin.PackageDependencies <package-path> -edit -delete -quiet'
           :Case ⎕C'PublishPackage'
               r,←⊂'Publish a package to a particular Tatin Registry.'
               r,←'' '  ]Tatin.PublishPackage <package-folder|ZIP-file> [<Registry-URL|Registry-Alias]> -dependencies='
           :Case ⎕C'ListVersions'
               r,←⊂'List all versions of the given package of a given Registry or all Registries with a priority>0'
-              r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name>-[<version>] [-date]'
+              r,←'' '  ]Tatin.ListVersions <[Registry-URL|[Registry-Alias][<group>]-<name>-[<version>] -date'
           :Case ⎕C'Version'
               r,←⊂'Print name, version number and version date of Tatin to the session.'
-              r,←'' '  ]Tatin.Version [*] [-check] [-all]'
+              r,←'' '  ]Tatin.Version [*] -check -all'
           :Case ⎕C'ListTags'
               r,←⊂'List all unique tags as defined in all packages on a Registry, sorted alphabetically.'
-              r,←'' '  ]Tatin.ListTags [<Registry-URL>] [-tags=] [-os=]'
+              r,←'' '  ]Tatin.ListTags [<Registry-URL>] -tags= -os='
           :Case ⎕C'Init'
               r,←⊂'(Re-)Establish the user settings in ⎕SE.'
               r,←'' '  ]Tatin.Init [<config-folder>]'
           :Case ⎕C'CheckForLaterVersion'
               r,←⊂'Check whether for the installed packages a later versions are available.'
-              r,←'' '  ]Tatin.CheckForLaterVersion <install-folder> [-major] [-dependencies]'
+              r,←'' '  ]Tatin.CheckForLaterVersion <install-folder> -major -dependencies'
           :Case ⎕C'DeletePackage'
               r,←⊂'Delete a given package from a Tatin Registry.'
               r,←'' '  ]Tatin.DeletePackage <([Registry-alias|Registry-URL|file://package-folder)package-ID)>'
@@ -1679,7 +1683,7 @@
               r,←'' '  ]Tatin.Documentation'
           :Case ⎕C'ReInstallDependencies'
               r,←⊂'ReInstall all packages installed in a folder from scratch.'
-              r,←'' '  ]Tatin.ReInstallDependencies <install-folder> [Registry-URL|Registry-alias] [-force] [-dry] [-nobeta] [-update]'
+              r,←'' '  ]Tatin.ReInstallDependencies <install-folder> [Registry-URL|Registry-alias] -force -dry -nobeta -update'
           :Case ⎕C'Ping'
               r,←⊂'Try to contact the specified or all known Tatin Registries'
               r,←'' '  ]Tatin.Ping [Registry-URL]'
@@ -1701,6 +1705,7 @@
               r,←''(']Tatin.',Cmd,' -?? ⍝ Enter this for more information ')
           :EndIf
       :Case 1
+          r←⊂{⍵↓⍨+/∧\' '=⍵}{(¯2+≢⍵)⊃⍵}0 Help Cmd
           :Select ⎕C Cmd
           :Case ⎕C'BuildPackage'
               r,←⊂'Creates a ZIP file from the directory ⍵[1] that is a package, and saves it in ⍵[2].'
@@ -1745,23 +1750,29 @@
               r,←⊂'-force     By default the user is questioned whether she is sure. With this flag this'
               r,←⊂'           can be overwritten. Mainly for tests.'
           :Case ⎕C'FindDependencies'
-              r,←⊂'Scans "folder" recursively for a file "apl-dependencies.txt". Folders with such a file will'
-              r,←⊂'be scanned for packages defined in "pkgList".'
+              r,←⊂'Scans "target" recursively for a file "apl-dependencies.txt".'
+              r,←⊃'"target" can be a folder or a URL or registry alias or [*] for all defined Registries.'
+              r,←⊂'Folders with such a file will be scanned for packages defined in "pkgList".'
               r,←⊂'Useful for finding out where one or more packages are used.'
               r,←⊂''
-              r,←⊂'"pkgList" must be a simple char vector with a list of comma-separated packages. The packages'
+              r,←⊂' * If "target" is embraced by square brackets it is interpreted as a Registry alias'
+              r,←⊂' * If it is [*] all defined Registries with a priority greater than 0 are scanned'
+              r,←⊂' * If it starts with http[s]:// it is interpreted as a URL pointing to a Registry'
+              r,←⊂' * Otherwise "target" is treated as path'
+              r,←⊂' * If "target" is not specified it becomes the current dir, but confirmation is required'
+              r,←⊂''
+              r,←⊂'"pkgList" must be a simple char vector with ","-separated package IDs. The packages'
               r,←⊂'can be specified fully or partly. "Group" and "version" can be left out while "Name" is'
               r,←⊂'mandatory. You may specify a major version but "minor" and "patch" will be ignored.'
-              r,←⊂''
               r,←⊂'Note that the sequence of the arguments does not matter.'
               r,←⊂''
-              r,←⊂'By default the folder(s) hosting the package(s) are returned, but that can be changed'
-              r,←⊂'by specifying the -detailed flag:'
+              r,←⊂'By default the folder(s)/Registries hosting the package(s) are returned, but that can'
+              r,←⊂'be changed by specifying the -verbose flag:'
               r,←⊂''
-              r,←⊂'-detailed  By setting this flag you can force the user command to report the actual'
-              r,←⊂'           package folder(s) rather than the hosting folder.'
-              r,←⊂'           As a side effect the result might be larger, in case a package is'
-              r,←⊂'           installed more than once.'
+              r,←⊂'-verbose  By setting this flag you can force the user command to report the actual'
+              r,←⊂'          package folder(s) rather than the hosting folder.'
+              r,←⊂'          As a side effect the result might be larger, in case a package is installed'
+              r,←⊂'          more than once.'
           :Case ⎕C'ListLicenses'
               r,←⊂'Returns a list with all licenses tolerated by a managed Tatin Registry'
               r,←⊂'If no Registry is specified https://tatin.dev is assumed.'

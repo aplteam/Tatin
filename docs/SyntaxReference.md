@@ -196,23 +196,36 @@ Note that because the Registry must be defined no scanning takes place with this
 ### FindDependencies
 
 ```
-r←{level} FindDependencies (folder pkgList)
+r←{depth} FindDependencies (target pkgList [verbose])
 
 ```
 
-Scans `folder` recursively for a file "apl-dependencies.txt". Folders with such a file will be scanned for packages defined in `pkgList`. Useful for finding out where one or more packages are used.
+`target` can be any of the following:
 
-`pkgList` must be a simple char vector with a list of comma-separated packages.
+* A Registry alias
+* `[*]` for all defined Regiestries with a priority greater than 0
+* A URL pointing to a Tatin server 
+* A folder
 
-The packages can be specified fully or partly. "Group" and "version" can be left out while "Name" is mandatory. You may specify a major version but "minor" and "patch" will be ignored when specified.
+The first three options will eventually become the folder where the packages of a Registry are stored.
+
+Scans `folder` recursively for a file "apl-dependencies.txt". Folders with such a file will be searched for packages defined in `pkgList`. Useful to find out where one or more packages are used.
+
+`pkgList` must be a simple char vector with a list of packages separated by commas.
+
+The packages can be specified fully or partially specified. "Group" and "Version" can be omitted while "Name" is mandatory. You can specify a major version, but "minor" and "patch" are ignored if specified.
 
 Note that the search is *not* case-sensitive.
 
-Returns a fully qualified list with all hits. 
+Returns a fully qualified list of all matches. 
 
-By default just the folder is returned that contains a file "apl-dependencies.txt" that carries at least one of the packages defined.
+By default only the folder containing a file "apl-dependencies.txt" with at least one of the defined packages is returned.
 
-In case a 1 is passed as left argument (default is 0) the actual package folders rather than the hosting folder(s) are returned, revealing the precise version(s) installed.
+If a 1 is passed as `verbose` (optional, defaults to 0) the actual package folders will be returned instead of the hosting folder(s), revealing the precise version(s) installed.
+
+The optional left argument can be used to limit the number of levels to be searched recursively. A server sets this to 1 because it knows that it only needs to search the sub folders of the Registry folder, which greatly reduces the time spent on the task.
+
+The user can use it in the same way if she knows exactly what is stored where.
 
 
 ### GetDeletePolicy

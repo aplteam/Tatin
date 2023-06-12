@@ -8,7 +8,15 @@
 
 # Release Notes
 
-Tatin release notes contain information regarding actions that need to be executed before a new version can be used; this regards almost exclusively the server.
+Tatin release notes contain information regarding actions that need to be executed before a new version can be used.
+
+## Version 0.97.0 from 2023-06-10
+
+This version comes with several breaking changes:
+
+* The `]FindDependencies` user command's `-detailed` property has been renamed to `verbose`
+* The API function `FindDependencies` has a changed syntax and returns a changed result.
+
 
 ## Version 0.96.2 from 2023-06-08
 

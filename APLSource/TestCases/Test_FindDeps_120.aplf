@@ -1,0 +1,11 @@
+ r←Test_FindDeps_120(stopFlag batchFlag);⎕TRAP;data
+⍝ Exercise FindDependencies on all known Registries
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ r←T._Failed
+
+ data←##.Client.FindDependencies'HandleError,OS' '[*]'
+ →T.PassesIf 3=≢data
+ →T.PassesIf ¯3 ¯3 ¯3≡≡¨data
+
+ r←T._OK

@@ -1,0 +1,10 @@
+ r←Test_FindDeps_100(stopFlag batchFlag);⎕TRAP;list
+⍝ Exercise FindDependencies on the test server for a single package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ r←T._Failed
+
+ list←##.Client.FindDependencies'OS' '[localhost]'
+ →T.PassesIf 250<≢1 2⊃list
+
+ r←T._OK

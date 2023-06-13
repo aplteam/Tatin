@@ -1341,6 +1341,9 @@
                   :EndIf
               :ElseIf 1=≢folders
                   installFolder←project,'/',1⊃folders
+                  :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',({'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}installFolder),'?'
+                      →0 ⋄ r←'Cancelled by user'
+                  :EndIf
               :EndIf
           :EndIf
       :EndIf

@@ -10,22 +10,24 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHubAPIv3' '0.8.0-beta-1+24' '2020-06-06'
+      r←'GitHubAPIv3' '1.0.0+24' '2020-06-06'
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 0.8.0
-    ⍝   * This release comes with several breaking changes:
+    ⍝ * 1.0.0
+    ⍝   * This release comes with several breaking changes due to a re-design:
     ⍝     1. It does not depend on .NET anymore, meaning is works on Linux and Mac-OS without .NET
     ⍝        Instead it now depends on the `HttpCommand` package.
-    ⍝     2. The functions return neither an error code nor an error message, just the result
-    ⍝        Errors are signalled now
+    ⍝     2. The functions return neither an error code nor an error message anymore, just the result;
+    ⍝        errors are signalled now
     ⍝     3. `GetAllReleases` now returns by default a vector of character vectors with the versions.
     ⍝        The newly introduced optional left argument `verbose` can be used to get the full data instead.
     ⍝     4. The `CheckForUpdate` now returns a character vector rather than a Boolean, see there
-    ⍝     5. The `regEx` property was removed because it is not required anymore
-    ⍝     6. `PutTopics` removed
+    ⍝     5. `GetAllEndpoints` now requires a Boolean right argument. If this is a 0 a two-column matrix is
+    ⍝        returned, though by passing a 1 as ⍺ ("verbose") one can still get the JSON objects as namespaces.
+    ⍝     6. The `regEx` property was removed because it is not required anymore
+    ⍝     7. `PutTopics` removed
     ⍝   * There is now a property "personal_access_token" which when not empty is used to authenticate requests.
     ⍝   * This version works cross-platform **without** depending on .NET.
     ⍝   * Bug fixes
@@ -35,6 +37,8 @@
     ∇
 
     :Property owner
+    :Access Public Instance
+    ⍝ This is set once with the constructor, therefore no setter
         ∇ r←Get
           r←_owner
         ∇
@@ -88,9 +92,9 @@
       :Access Public Instance
     ⍝ Returns information regarding all releases of a given repository.\\
     ⍝ Notes:
-    ⍝ * Pre-release are included.
+    ⍝ * Pre-releases are included
     ⍝ * Users without "Push" access will **_not_** see any draft releases\\
-    ⍝ By default a vector of text vectors is returned with the tags assigned.
+    ⍝ By default a vector of text vectors is returned with the tags.
     ⍝ In case `verbose` is 1 namespaces for each release are returned.
       verbose←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
       gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/tags'
@@ -106,7 +110,7 @@
     ∇
 
     ∇ rateLimits←GetRateLimits;gitPath;parms
-     :Access Public Shared
+      :Access Public Shared
     ⍝ Returns information regarding rate limits without hitting the limits
       gitPath←'https://api.github.com/rate_limit'
       parms←CreateHttpParms
@@ -127,17 +131,23 @@
 
     ∇ ns←GetAllRepos;gitPath
       :Access Public Instance
-    ⍝ Returns data of all **public** repositories for the current owner.\\
+    ⍝ Returns data of all **public** repositories of the current owner.\\
       gitPath←'https://api.github.com/users/',(_owner),'/repos'
       ns←GetJson gitPath
       ns.{⎕DF'[JSON Object: ',name,']'}⊂⍬
     ∇
 
-    ∇ ns←GetAllIssues repoName;gitPath
+    ∇ ns←{addPullRequests}GetAllIssues repoName;gitPath
       :Access Public Instance
-    ⍝ Returns all issues for a given repository
+    ⍝ Returns all issues for a given repository but no pull requests by default.\\
+    ⍝ In GitHub, every pull request is an issue, but now all issues are pull requests.
+    ⍝ This function does not show pull requests by default, by you can change this by passing a 1 as left argument.
+      addPullRequests←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'addPullRequests'
       gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues'
       ns←GetJson gitPath
+      :If ~addPullRequests
+          ns←(0=⊃¨ns.⎕NC⊂'pull_request')/ns
+      :EndIf
       ns.{⎕DF'[Issues of repo ',⍵,']'}⊂repoName
       ns.⎕FX⊂⎕CR'∆List'
       ns.⎕FX⊂'r←∆Details instance' 'r←∆List' ' :If 0<≢instance' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name''' ':EndIf'
@@ -147,10 +157,10 @@
     ∇ ns←GetIssue(repoName number);gitPath
       :Access Public Instance
     ⍝ Returns exactly one issue for a given repository.\\
-    ⍝ Note that `ns` gets three functions injected: ∆List, ∆Details and ∆QuickView. While ∆List does not
-    ⍝ require an argument, ∆Details and ∆QuickView require an instance of this class as right argument.\\
-    ⍝ ∆Details and ∆QuickView both replace the JSON objects "assignees" and "labels" by real data, but
-    ⍝ ∆QuickView returns a small subset for a quick glance.
+    ⍝ Note that `ns` gets three functions injected: `∆List`, `∆Details` and `∆QuickView`. While `∆List` does not
+    ⍝ require an argument, `∆Details` and `∆QuickView` require an instance of this class as right argument.\\
+    ⍝ `∆Details` and `∆QuickView` both replace the JSON objects "assignees" and "labels" by real data, but
+    ⍝ `∆QuickView` returns a small subset for a quick glance.
       gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues/',⍕number
       ns←GetJson gitPath
       ns.{⎕DF ⍵}'[Issue ',(⍕number),' of repo ',repoName,']'
@@ -159,16 +169,16 @@
       ns.⎕FX'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
     ∇
 
-    ∇ endpoints←GetAllEndpoints;gitPath;A
+    ∇ endpoints←GetAllEndpoints;gitPath;A;data
       :Access Public Shared
-    ⍝ This method returns all REST endpoints offered by the API.\\
+    ⍝ This method returns all REST endpoints offered by the API as a two-column matrix:\\
+    ⍝ * [;1] is the name of the endpoint
+    ⍝ * [;2] is the URL of the endpoint
     ⍝ It returns a namespace. Use the built-in `List` function for an overview.
       A←##.APLTreeUtils2
       gitPath←'https://api.github.com/'
-      endpoints←⎕NS''
-      endpoints←GetJson gitPath
-      endpoints.⎕FX'r←List' 'r←{⍵,[1.5]⍎¨⍵}⎕NL-2'
-      endpoints.⎕DF'[JSON Object: EndPoints]'
+      data←GetJson gitPath
+      endpoints←data.{{⍵,[1.5]⍎¨⍵}⎕NL-2}⍬
     ∇
 
     ∇ number←CastTagname2Number text;vec;bool
@@ -301,16 +311,16 @@
     ⍝ Takes a URL and returns a namespace, possibly with sub namespaces.
     ⍝ In case the result is virtually paged by the server this function collects all data!
       :If 0=⎕NC'H'
-          H_←(⊃⊃⎕CLASS ⎕THIS).##.HttpCommand
+          H_←(⊃⊃⎕CLASS ⎕THIS).##.HttpCommand    ⍝ Called as a shared method
       :Else
-          H_←H
+          H_←H                                  ⍝ Called from an instance
       :EndIf
       h←⎕NEW H_(,⊂'')
       :If 0<⎕NC'_personal_access_token'
       :AndIf 0<≢_personal_access_token
           'Authorization'h.AddHeader('Bearer ',_personal_access_token)
       :EndIf
-      h.URL←gitURL
+      h.URL←EncodeBlank gitURL
       r←h.Run
       r.HttpMessage Assert r.HttpStatus=200
       data←⎕JSON r.Data
@@ -337,8 +347,10 @@
     ∇
 
     ∇ data←data GetPrinciple(propName principleName);row;jsonObj;buff
-    ⍝ * `propName` is the name of a variable in a data space that is a JSON object
+    ⍝ * `propName` is the name of a variable in a data space that is one or more JSON object(s)
     ⍝ * `principleName` is the principle name of all the properties of that JSON object\\
+    ⍝   Typical examples are "label" or "name"\\
+    ⍝ The generic names are then replaced but the "real" ones.
     ⍝ Is concatenated with a comma and a blank, so ('bug' 'question') become:
     ⍝ 'bug, question'
       :Access Public instance
@@ -363,7 +375,7 @@
 
     ∇ r←EncodeBlank r
       ((' '=r)/r)←⊂'%20'
-      ∊r
+      r←∊r
     ∇
 
     Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←1 ⋄ ⍺ ⎕SIGNAL 1↓(⊃∊⍵),11}

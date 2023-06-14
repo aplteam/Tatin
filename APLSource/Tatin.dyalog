@@ -1340,8 +1340,8 @@
                       installFolder←project,'/',ind⊃folders
                   :EndIf
               :ElseIf 1=≢folders
-                  installFolder←project,'/',1⊃folders
-                  :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',({'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}installFolder),'?'
+                  installFolder←project,'/',{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}1⊃folders
+                  :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',installFolder,'?'
                       →0 ⋄ r←'Cancelled by user'
                   :EndIf
               :EndIf

@@ -1,4 +1,4 @@
- yesOrNo←{default}YesOrNo question;isOkay;answer;add;dtb;answer2;bool;flag;buff;alias
+ yesOrNo←{default}YesOrNo question;isOkay;answer;add;dtb;answer2;bool;flag;buff;alias;firstPart;ind
  ⍝ Asks a simple question and allows just "Y" (or "y") or "N" (or "n") as answers.\\
  ⍝ The question may be a simple character vector, possibly with `⎕UCS 10` in between,
  ⍝ or a vector of simple character vectors.\\
@@ -12,19 +12,24 @@
  isOkay←0
  default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
  isOkay←0
- question←⊃LF{⍺,⍺⍺,⍵}/⊆question
- question←{LF@(⍸⍵=⎕UCS 13)⊣⍵}question
+ :If ~(≡question)∊0 1
+     question←1↓⊃,/LF,¨question
+ :EndIf
+ question←ReplaceCRbyLF question
+ question←{⍵↓⍨+/∧\' '=⍵}question
  :If 0≠≢default
      'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠≢default
  :AndIf ~default∊0 1
      'The left argument. if specified, must be a Boolean or empty'⎕SIGNAL 11
  :EndIf
  flag←1
+ firstPart←{⍵↑⍨⍵⍳LF}question
  :If 0<⎕NC'YesOrNo_Answers'
      YesOrNo_Answers←(0<≢¨' '~⍨¨YesOrNo_Answers[;1])⌿YesOrNo_Answers
  :AndIf 0<≢YesOrNo_Answers
-     :If AliasChar∊question
-         (alias question)←{l←⍵⍳AliasChar ⋄ (l↑⍵)(l↓⍵)}question
+     :If AliasChar∊firstPart
+         ind←firstPart⍳AliasChar
+         (alias question)←ind{(⍺↑⍵)(⍺↓⍵)}firstPart
          flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨YesOrNo_Answers[;1])≡¨⊂alias
      :ElseIf ~flag←0<+/bool←YesOrNo_Answers[;1]≡¨⊂question
      :AndIf ~flag←0<+/bool←question∘{⍵≡(≢⍵)↑⍺}¨YesOrNo_Answers[;1]
@@ -56,21 +61,25 @@
          :EndIf
      :EndIf
      :If 1<≡question
-         question←1↓⊃,/(⎕UCS 10),¨question
+         question←1↓⊃,/LF,¨question
      :EndIf
-     question←{~'@'∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳'@'}question,add
+     :If (⌊/firstPart⍳' ',LF)>firstPart⍳AliasChar
+         question←{~AliasChar∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳AliasChar}question,add
+     :Else
+         question,←add
+     :EndIf
      :Repeat
          ⎕←''
          ⍞←question
          answer←⍞
          :If answer≡question ⍝ Did ...  (since version 18.0 trailing blanks are not removed anymore)
          :OrIf (≢answer)=¯1+≢question ⍝ ... the ...
-         :OrIf 0=≢answer ⍝ ... user ...
-         :OrIf question≡(-≢question)↑answer ⍝ ... just ...
+         :OrIf 0=≢answer                                                          ⍝ ... user ...
+         :OrIf question≡(-≢question)↑answer                                       ⍝ ... just ...
              dtb←{⍵↓⍨-+/∧\' '=⌽⍵}
              answer2←dtb answer
-         :OrIf answer2≡((-≢answer2)↑(⎕UCS 10){~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question) ⍝ ... press ...
-         :OrIf answer≡{1↓⊃¯1↑(⍵∊⎕UCS 10 13)⊂⍵}(⎕UCS 10),question ⍝ ... <enter>?
+         :OrIf answer2≡((-≢answer2)↑LF{~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question)  ⍝ ... press ...
+         :OrIf answer≡{1↓⊃¯1↑(⍵=LF)⊂⍵}LF,question                                 ⍝ ... <enter>?
              :If 0≠≢default
                  yesOrNo←default
                  isOkay←1

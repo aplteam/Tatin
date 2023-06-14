@@ -1,4 +1,4 @@
- text←{enforce}(CheckFn AskForText)question;flag;alias;bool;buff;success
+ text←{enforce}(CheckFn AskForText)question;flag;alias;bool;buff;success;firstPart
 ⍝ Operator asking a question and allowing the user to enter text.\\
 ⍝ By entering "`∘∘∘`" the user may interrupt `AskForText`: this activates a stop.\\
 ⍝ `CheckFn` is supposed to be a function that gets the input as `⍵` and must return a Boolean
@@ -8,11 +8,15 @@
 ⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning that
 ⍝ the user must enter something in order to continue.
  enforce←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'enforce'
- 'The question must contain neither a carriage return nor a line feed'Assert∧/~(⎕UCS 10 13)∊question
  text←''
  success←flag←0
- question←{~'@'∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳'@'}{⍵↓⍨+/∧\' '=⍵}question
+ :If ~(≡question)∊0 1
+     question←1↓⊃,/LF,¨question
+ :EndIf
+ question←ReplaceCRbyLF question
+ question←{⍵↓⍨+/∧\' '=⍵}question
  :Repeat
+     firstPart←{⍵↑⍨⍵⍳LF}question
      :If 0<⎕NC'AskForText_Answers'
          AskForText_Answers←(0<≢¨' '~⍨¨AskForText_Answers[;1])⌿AskForText_Answers
          AskForText_Answers[;1]←{⍵↓⍨+/∧\' '=⍵}¨AskForText_Answers[;1]
@@ -28,7 +32,9 @@
              text←2⊃AskForText_Answers[bool⍳1;]
          :EndIf
      :Else
-         question←{~'@'∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳'@'}question
+         :If (⌊/firstPart⍳' ',LF)>firstPart⍳AliasChar
+             question←{~AliasChar∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳AliasChar}question
+         :EndIf
      :EndIf
      :If ~flag
          text←⍞,0/⍞←question,': '
@@ -36,7 +42,7 @@
              (1+⊃⎕LC)⎕STOP⊃⎕SI
              ∘∘∘ ⍝ Deliberate stop caused by user input
          :EndIf
-         text←(2+≢question)↓text  ⍝ Plus 2 for the appended ": "
+         text←(≢{⍵↑⍨-¯1+(⌽⍵)⍳LF}question,': ')↓text
      :EndIf
      :If 0=≢text
          :If enforce

@@ -10,7 +10,7 @@
 
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used.
 
-## Version 0.97.0 from 2023-06-10
+## Version 0.97.0 from 2023-06-14
 
 This version comes with several breaking changes:
 

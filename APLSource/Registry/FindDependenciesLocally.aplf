@@ -1,0 +1,44 @@
+ list←{depth}FindDependenciesLocally(folder subFolder pkgList level);folders;subFolder;buff;dependencies;filename;pkg;bool;thisFolder
+⍝ Sub-function of FindDependencies without independent meaning
+⍝ `level` can be 0 (default) or 1
+ depth←{0<⎕NC ⍵:⍎⍵ ⋄ ¯1}'depth'
+ 'Invalid: "level"'Assert(⊂level)∊0 1
+ 'Files not found'Assert F.IsDir folder
+ 'Files not found'Assert F.IsDir subFolder
+ 'Package list is empty'Assert 0<≢pkgList
+ list←''
+ :If ⎕NEXISTS filename←subFolder,'apl-dependencies.txt'
+ :AndIf 0<≢dependencies←⊃F.NGET filename 1
+     :For pkg :In pkgList
+         :Select '-'+.=pkg
+         :Case 0 ⍝ Just a package name
+             bool←pkg∘≡¨⎕C{⍵↑⍨¯1+⍵⍳'-'}¨{⍵↓⍨⍵⍳'-'}¨dependencies
+         :Case 1 ⍝ Group and package name
+             bool←pkg∘≡¨⎕C RemoveVersionNumber¨dependencies
+         :Case 2 ⍝ Group and package name and version number
+             bool←pkg∘≡¨⎕C RemoveMinorAndPatch¨dependencies
+         :EndSelect
+         :If level
+             :If ∨/bool
+                 list,←subFolder∘,¨bool/dependencies
+             :EndIf
+         :Else
+             list,←(∨/bool)/⊂¯1↓subFolder
+         :EndIf
+         :If 0=level
+         :AndIf ∨/bool  ⍝ One hit is enough
+             :Leave
+         :EndIf
+     :EndFor
+ :EndIf
+ :If depth=¯1
+ :OrIf 0<depth←depth-1
+     :If 0<≢folders←F.ListDirs subFolder
+         folders←(~({⊃,/1↓⍵}¨⎕NPARTS¨folders)∊'.git' '.cider')/folders
+         :For thisFolder :In folders
+             thisFolder←F.AddTrailingSep thisFolder
+             list,←depth FindDependenciesLocally folder thisFolder pkgList level
+         :EndFor
+     :EndIf
+ :EndIf
+ ⍝Done

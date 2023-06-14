@@ -1,0 +1,13 @@
+ r←Test_UserCommands_512(stopFlag batchFlag);⎕TRAP;rc;msg;res;stop
+⍝ Exercise ]Tatin.FindDependencies with one package on the locally running test server
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg res)←stop ∆UCMD'FindDependencies APLTreeUtils2,tester2 [localhost]'
+ →T.PassesIf rc=0
+ →T.PassesIf 2=⍴⍴res
+ →T.PassesIf 200<≢res
+
+ r←T._OK
+⍝Done

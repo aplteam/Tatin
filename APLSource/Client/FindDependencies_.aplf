@@ -1,37 +1,17 @@
- list←{level}FindDependencies_(folder subFolder pkgList);folders;subFolder;buff;dependencies;filename;pkg;bool;folder_
-⍝ Sub-function of FindDependencies without independent meaning
-⍝ `level` can be 0 (default) or 1
- level←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'level'
- 'Invalid left argument'Assert(⊂level)∊0 1
- list←''
- :If ⎕NEXISTS filename←subFolder,'apl-dependencies.txt'
- :AndIf 0<≢dependencies←⊃F.NGET filename 1
-     :For pkg :In pkgList
-         :Select '-'+.=pkg
-         :Case 0 ⍝ Just a package name
-             bool←pkg∘≡¨⎕C{⍵↑⍨¯1+⍵⍳'-'}¨{⍵↓⍨⍵⍳'-'}¨dependencies
-         :Case 1 ⍝ Group and package name
-             bool←pkg∘≡¨⎕C Reg.RemoveVersionNumber¨dependencies
-         :Case 2 ⍝ Group and package name and version number
-             bool←pkg∘≡¨⎕C Reg.RemoveMinorAndPatch¨dependencies
-         :EndSelect
-         :If level
-             :If ∨/bool
-                 list,←subFolder∘,¨bool/dependencies
-             :EndIf
-         :Else
-             list,←(∨/bool)/⊂¯1↓subFolder
-         :EndIf
-         :If 0=level
-         :AndIf ∨/bool  ⍝ One hit is enough
-             :Leave
-         :EndIf
-     :EndFor
+ r←FindDependencies_(pkgList url level);request;res;buff
+ request←R.NewRequest 0
+ request.RequestTarget←'/v1/dependencies'
+ request.RequestTarget,←'?level=',⍕level
+ request.RequestTarget,←'&packages=',⊃{⍺,',',⍵}/⊆pkgList
+ request.Headers,←⊂'Accept' 'application/json'
+ res←SendAndReceive url request
+ :If 200≠res.StatusCode
+     ('Server: ',res.Content)Assert 0=≢res.Content
+     ('Failed with status code ',⍕res.StatusCode)Assert 0
+ :ElseIf 0<≢res.Content
+     buff←(⎕JSON⍠('Dialect' 'JSON5')⊣res.Content)
+     r←buff
+ :Else
+     r←''
  :EndIf
- :If 0<≢folders←F.ListDirs subFolder
-     folders←(~({⊃,/1↓⍵}¨⎕NPARTS¨folders)∊'.git' '.cider')/folders
-     :For folder_ :In folders
-         list,←level FindDependencies_ folder(folder_,'/')pkgList
-     :EndFor
- :EndIf
- ⍝Done
+⍝Done

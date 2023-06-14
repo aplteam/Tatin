@@ -1,0 +1,13 @@
+ r←Test_FindDeps_050(stopFlag batchFlag);⎕TRAP;list
+⍝ Exercise FindDependencies with defaults on a group and a package name and major version number
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ r←T._Failed
+
+ list←##.Client.FindDependencies'davin-DateAndTime-1'(##.CiderConfig.HOME,'/TestData/')
+ →T.PassesIf 1=≢list
+ →T.PassesIf 2=≡1 2⊃list
+ →T.PassesIf F.IsDir 1 2⊃list
+ →T.PassesIf(,'B')≡2⊃⎕NPARTS ∊1 2⊃list
+
+ r←T._OK

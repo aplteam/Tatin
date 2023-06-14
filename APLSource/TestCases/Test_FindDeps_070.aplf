@@ -1,0 +1,16 @@
+ r←Test_FindDeps_070(stopFlag batchFlag);⎕TRAP;list;expected
+⍝ Exercise FindDependencies on a nested folder structure with both level←0 and level←1
+⍝ Was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ r←T._Failed
+
+ list←##.Client.FindDependencies'OS'(##.CiderConfig.HOME,'/TestData/FindTatinDependencies2')
+ expected←'aplteam-FilesAndDirs' 'aplteam-MakeHelpers'
+ →T.PassesIf expected≡{Reg.RemoveVersionNumber⊃,/1↓⎕NPARTS ⍵}¨1 2⊃list
+
+ list←##.Client.FindDependencies'OS'(##.CiderConfig.HOME,'/TestData/FindTatinDependencies2') 1
+ expected←'aplteam-OS-3.0.1' 'aplteam-OS-3.0.1'
+ →T.PassesIf expected≡{⊃,/1↓⎕NPARTS ⍵}¨1 2⊃list
+
+ r←T._OK

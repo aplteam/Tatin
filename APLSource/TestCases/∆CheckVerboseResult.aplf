@@ -1,0 +1,13 @@
+ r←∆CheckVerboseResult(data pkgList);bool1;data2;bool2
+⍝ Takes the result of ]FindDependencies and checks whether paths have either a file "apl-dependencies.txt"
+⍝ or carry one of "pkgList" in the name of the last part.
+ data←(0<≢¨data[;1])⊂[1]data
+ bool1←{⎕NEXISTS((⊃⊃⍵)∘,¨1↓⍵[;2]),¨⊂'/apl-dependencies.txt'}¨data
+ data2←(0,¨~bool1)⌿¨data
+ :If 2>≡pkgList
+     pkgList←','(≠⊆⊢)pkgList
+ :EndIf
+ pkgList←⎕C pkgList
+ data2←↑¨{{⎕C⊃,/1↓⎕NPARTS ⍵}¨⍵[;2]}¨data2
+ r←∧/¨bool1∨(~bool1)\¨pkgList∘{∨/⊃∨/⍺⍷¨⊂⍵}¨data2
+⍝Done

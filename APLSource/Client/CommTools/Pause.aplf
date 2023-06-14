@@ -1,4 +1,4 @@
- {flag}←{lineFlag}Pause msg;input;alias
+ {flag}←{lineFlag}Pause msg;input;alias;ind
  ⍝ Prints `msg` to he session and tells the user that she must press <enter> if she wants to continue.
  ⍝ By entering "`∘∘∘`" the user may interrupt `Pause`: this activates a stop.\\
  ⍝ The optional left argument `lineFlag` defaults to 0. If it's 1 then a line is printed. The length
@@ -8,7 +8,7 @@
  ⍝ The function will return 1 in case it did present the message and stopped, and 0 otherwise.
  lineFlag←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'lineFlag'
  msg←⊃LF{⍺,⍺⍺,⍵}/⊆msg
- msg←{LF@(⍸⍵=⎕UCS 13)⊣⍵}msg
+ msg←ReplaceCRbyLF msg
  flag←1
  :If AliasChar∊msg
      :If 0<⎕NC'NoPause'
@@ -28,7 +28,12 @@
      :If lineFlag
          ⍞←((⎕PW-1)⍴'─'),LF
      :EndIf
-     input←⍞,0/⍞←(({0=≢⍵:⍵ ⋄ ⍵,LF}{~AliasChar∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳AliasChar}msg)),'In order to continue press <enter> '
+     :If AliasChar∊msg
+         ind←msg⍳AliasChar
+     :AndIf ∧/~(ind↑msg)∊' ',LF
+         msg←ind↓msg
+     :EndIf
+     input←⍞,0/⍞←({0=≢⍵:⍵ ⋄ ⍵,LF}msg),'In order to continue press <enter> '
      :If '∘∘∘'≡¯3↑input
          (1+⊃⎕LC)⎕STOP⊃⎕SI
          ∘∘∘ ⍝ Deliberate stop caused by user input

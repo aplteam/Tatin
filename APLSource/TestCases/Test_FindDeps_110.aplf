@@ -1,0 +1,11 @@
+ r←Test_FindDeps_110(stopFlag batchFlag);⎕TRAP;data
+⍝ Exercise FindDependencies on the test server for two packages
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+
+ r←T._Failed
+
+ data←##.Client.FindDependencies'HandleError,OS' '[localhost]'
+ →T.PassesIf 2=≡1 2⊃data
+ →T.PassesIf(##.Client.ReplaceRegistryAlias '[localhost]')≡1 1⊃data
+
+ r←T._OK

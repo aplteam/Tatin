@@ -1,0 +1,13 @@
+ r←Test_UserCommands_502(stopFlag batchFlag);⎕TRAP;rc;msg;result;stop
+⍝ Exercise ]Tatin.FindDependencies with -verbose
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg result)←stop ∆UCMD'FindDependencies APLTreeUtils2,Tester2 ',##.CiderConfig.HOME,' -verbose'
+ Assert 0=rc
+ →T.PassesIf 2=⍴⍴result
+ →T.PassesIf ∆CheckVerboseResult result 'APLTreeUtils2,Tester2'
+
+ r←T._OK
+⍝Done

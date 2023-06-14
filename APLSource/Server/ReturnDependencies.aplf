@@ -1,0 +1,16 @@
+ response←ReturnDependencies request;level;packages;data;qdmx
+⍝ Returns all dependencies for the given package(s)
+ :Trap 998
+     response←R.NewResponse request
+     response.StatusCode←200
+     level←⊃A.ToNum request R.GetQueryParameter'level'
+     packages←','A.Split ⎕C request R.GetQueryParameter'packages'
+     data←2 Reg.FindDependenciesLocally G.RegistryPath G.RegistryPath packages level
+     data←{⊃,/1↓⎕NPARTS ⍵}¨data
+     response←request ReturnJSON Reg.JSON data
+ :Else
+     qdmx←⎕DMX
+     response←request Respond 400 0
+     response.Content←qdmx.EM
+ :EndTrap
+⍝Done

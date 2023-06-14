@@ -1,4 +1,4 @@
- value←{enforce}(CheckFn AskForNumber)question;flag;input;valid;alias;bool;buff;success
+ value←{enforce}(CheckFn AskForNumber)question;flag;input;valid;alias;bool;buff;success;firstPart;ind
 ⍝ Operator asking a question and allowing the user to enter a number.\\
 ⍝ By entering "`∘∘∘`" the user may interrupt `AskForNumber`: this activates a stop.\\
 ⍝ `CheckFn` is supposed to be a function that gets the input as `⍵` and must return a Boolean
@@ -8,27 +8,35 @@
 ⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning that
 ⍝ the user must enter a number in order to continue.
  enforce←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'enforce'
- 'The question must contain neither a carriage return nor a line feed'Assert∧/~(⎕UCS 10 13)∊question
  value←⍬
  success←flag←0
+ :If ~(≡question)∊0 1
+     question←1↓⊃,/LF,¨question
+ :EndIf
+ question←ReplaceCRbyLF question
  question←{⍵↓⍨+/∧\' '=⍵}question
  :Repeat
+     firstPart←{⍵↑⍨⍵⍳LF}question
      :If 0<⎕NC'AskForNumber_Answers'
          AskForNumber_Answers←(0<≢¨' '~⍨¨AskForNumber_Answers[;1])⌿AskForNumber_Answers
          AskForNumber_Answers[;1]←{⍵↓⍨+/∧\' '=⍵}¨AskForNumber_Answers[;1]
      :AndIf 0<≢AskForNumber_Answers
-         :If AliasChar∊question
-             (alias question)←{l←⍵⍳AliasChar ⋄ (l↑⍵)(l↓⍵)}question
+         :If AliasChar∊firstPart
+             ind←firstPart⍳AliasChar
+         :AndIf ∧/~(LF,' ')∊ind↑question
+             (alias question)←ind{(⍺↑⍵)(⍺↓⍵)}firstPart
              flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨AskForNumber_Answers[;1])≡¨⊂alias
-         :ElseIf ~flag←0<+/bool←AskForNumber_Answers[;1]≡¨⊂question
-             flag←0<+/bool←question∘{⍵≡(≢⍵)↑⍺}¨AskForNumber_Answers[;1]
+         :ElseIf ~flag←0<+/bool←AskForNumber_Answers[;1]≡¨⊂firstPart
+             flag←0<+/bool←firstPart∘{⍵≡(≢⍵)↑⍺}¨AskForNumber_Answers[;1]
          :EndIf
          :If flag
              'Multiple pre-prepared answers qualify?!'Assert 1=+/bool
              input←⍕2⊃AskForNumber_Answers[bool⍳1;]
          :EndIf
      :Else
-         question←{~'@'∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳'@'}question
+         :If (⌊/firstPart⍳' ',LF)>firstPart⍳AliasChar
+             question←{~AliasChar∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳AliasChar}question
+         :EndIf
      :EndIf
      :If ~flag
          input←⍞,0/⍞←question,': '
@@ -36,9 +44,9 @@
              (1+⊃⎕LC)⎕STOP⊃⎕SI
              ∘∘∘ ⍝ Deliberate stop caused by user input
          :EndIf
-         input←(2+≢question)↓input  ⍝ Plus 2 for the appended ": "
+         input←{⍵↑⍨1+-(⌽⍵)⍳':'}input
      :EndIf
-     :If 0=≢input
+     :If 0=≢input~' '
      :AndIf ~enforce
          value←⍬
          :Return
@@ -48,6 +56,7 @@
              ⎕←'Please enter precisely one number'
          :ElseIf valid
              success←CheckFn value
+             value←⊃value
          :Else
              ⎕←'You did not enter a valid number, please retry!'
          :EndIf

@@ -1,0 +1,15 @@
+ r←Test_UserCommands_513(stopFlag batchFlag);⎕TRAP;rc;msg;res;stop;regList
+⍝ Exercise ]Tatin.FindDependencies with on all servers with a priority greater than 0 for two common packages
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg res)←stop ∆UCMD'FindDependencies APLTreeUtils2,tester2 [*]'
+ →T.PassesIf rc=0
+ →T.PassesIf 2=⍴⍴res
+ regList←TC.ListRegistries''
+ regList←(regList[;4]>0)⌿regList
+ →T.PassesIf(≢regList)=+/0<≢¨res[;1]
+
+ r←T._OK
+⍝Done

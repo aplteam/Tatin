@@ -2446,7 +2446,7 @@
                       :If 0=≢pkgFolders
                           folder←''
                       :ElseIf 2=≢pkgFolders
-                          ind←'Select target folder:'TC.CommTools.Select folder∘,¨pkgFolders
+                          ind←'Select target folder:'TC.CommTools.Select folder∘,¨{'='∊⍵:⍵↑⍨¯1+⍵⍳'='  ⋄⍵}¨pkgFolders
                           :If 0=≢ind
                               folder←''
                           :Else

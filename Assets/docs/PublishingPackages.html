@@ -298,7 +298,7 @@ group3=''
 </div>
 <p>Packages that are user commands are a special case. Here is why:</p>
 <p>User commands must have a user command script — that's what makes them a user command. They can simply be installed as Tatin packages and the job is done. But there is a problem.</p>
-<p>The package might look similar to this:</p>
+<p>The package might look like this:</p>
 <pre><code>MyUserCommand/
     APLSource/
         MyUserCommand/        ⍝ Contains the code
@@ -314,18 +314,20 @@ group3=''
     LICENSE
     README</code></pre>
 <p>The package configuration parameter <code>source</code> will then read <code>APLSource/MyUserCommand</code> because we don't want <code>TestData/</code> and <code>TestCases/</code> to be part of the installed package.</p>
-<p>But that would mean that the script <code>MyUserCommand.dyalog</code> would not be installed either, so there is a problem: the script would not make it when the packages are installed.</p>
+<p>But that would mean that the script <code>MyUserCommand.dyalog</code> would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder.</p>
 <p>That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:</p>
 <pre><code>userCommandScript: "APLSource/MyUserCommand.dyalog",</code></pre>
 <p>The fact that the parameter exists and is not empty tells Tatin that it is a user command, and the path allows Tatin to first install everything as usual and then move the script to the root of the package installation folder.</p>
-<p>The installed package will then comprise:</p>
+<p>The installed package will then consist of:</p>
 <ul>
-<li>a folder for the <code>MyUserCommand</code> package</li>
-<li>folders for all dependencies</li>
-<li>a file <code>apl-buildlist.json</code></li>
-<li>a file <code>apl-dependencies.txt</code></li>
-<li>the user command script: <code>MyUserCommand.dyalog</code></li>
+<li>A folder for the <code>MyUserCommand</code> package</li>
+<li>Folders for all dependencies</li>
+<li>A file <code>apl-buildlist.json</code></li>
+<li>A file <code>apl-dependencies.txt</code></li>
+<li>The user command script: <code>MyUserCommand.dyalog</code></li>
 </ul>
+<p>Note that by definition a package must contain some code. If a user command is implemented as a single script file, which is possible and perfectly fine with simple user commands, this would not be the case. For this reason, it is advisable to separate the user command as such (with the necessary <code>Run</code>, <code>List</code> and <code>Help</code> functions) from the “business logic” that does the real work.</p>
+<p>The latter one would remain in the package, fulfilling the requirement.</p>
 <div class="h_tag">
 <a href="#Deleting-packages" id="Deleting-packages" class="autoheader_anchor">
 <h2 data-id="Deleting-packages">5. Deleting packages</h2>
@@ -346,7 +348,7 @@ apltree-Foo-1.0.0-alpha-1+123     ⍝ A beta</code></pre>
 <p>You can find out which policy the server operates in two ways:</p>
 <ul>
 <li>Execute this user command:
-<pre><code>  ]Tatin.GetDeletePolicy [tatin]
+<pre><code>]Tatin.GetDeletePolicy [tatin]
 None</code></pre></li>
 </ul>
 <p>Or visit its website, for example, <a href="https://tatin.dev" class="external_link">https://tatin.dev</a>: at the bottom of the home page the server mentions the “delete” policy it operates.</p>

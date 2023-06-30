@@ -482,7 +482,7 @@ If a package is a user command then this must contain the path to the user comma
 
 This optional flag was introduced with version 0.86.0. It might not exist in older versions of a package. If it does not exist then Tatin assumes that the package in question is not a user command.
 
-Note that for a package to be a user command the package must be constructed in a particular way. This is documented in a separate document.
+Note that for a package to be a user command the package must be constructed in a particular way. This is discussed in the "Publishing Packages" document.
 
 
 #### version

@@ -258,7 +258,7 @@ Packages that are user commands are a special case. Here is why:
 
 User commands must have a user command script --- that's what makes them a user command. They can simply be installed as Tatin packages and the job is done. But there is a problem.
 
-The package might look similar to this:
+The package might look like this:
 
 ```
 MyUserCommand/
@@ -279,7 +279,7 @@ MyUserCommand/
 
 The package configuration parameter `source` will then read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
 
-But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages are installed.
+But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder.
 
 That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:
 
@@ -289,13 +289,17 @@ userCommandScript: "APLSource/MyUserCommand.dyalog",
 
 The fact that the parameter exists and is not empty tells Tatin that it is a user command, and the path allows Tatin to first install everything as usual and then move the script to the root of the package installation folder.
 
-The installed package will then comprise:
+The installed package will then consist of:
 
-* a folder for the `MyUserCommand` package 
-* folders for all dependencies 
-* a file `apl-buildlist.json`
-* a file `apl-dependencies.txt`
-* the user command script: `MyUserCommand.dyalog`
+* A folder for the `MyUserCommand` package 
+* Folders for all dependencies 
+* A file `apl-buildlist.json`
+* A file `apl-dependencies.txt`
+* The user command script: `MyUserCommand.dyalog`
+
+Note that by definition a package must contain some code. If a user command is implemented as a single script file, which is possible and perfectly fine with simple user commands, this would not be the case. For this reason, it is advisable to separate the user command as such (with the necessary `Run`, `List` and `Help` functions) from the "business logic" that does the real work.
+
+The latter one would remain in the package, fulfilling the requirement.
 
 
 ## Deleting packages
@@ -323,7 +327,7 @@ You can find out which policy the server operates in two ways:
 
   ```
   ]Tatin.GetDeletePolicy [tatin]
-None
+  None
   ```
 
 Or visit its website, for example, <https://tatin.dev>: at the bottom of the home page the server mentions the "delete" policy it operates.

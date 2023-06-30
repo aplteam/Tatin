@@ -1,0 +1,20 @@
+ {r}←CreateAPIfromCFG cfg;api
+⍝ Checks the package config file: if there is an API defined and it is an ordinary (non-scripted!)
+⍝ namespace then it is re-created from scratch. If there is a function "Public" available in the main ...
+⍝
+⍝ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+⍝ We need to establish a way that allows indentifying the namespace within a project that is going to be the package, if any!
+⍝ In my (Kai's) case it is by convention: A project Foo always has a namepsace Foo.Foo that is going to be the package.
+⍝ However, other people may have different ideas, including one where the project is actually identical with the package.
+ ∘∘∘
+ r←⍬
+ api←'##.',cfg.name,'.',cfg.api
+ :If ~(⎕NC⊂api)∊9.4 9.5             ⍝ Not for classes and interfaces
+     ref←⍎'##.',cfg.name
+     :If 3=(⍎'##.',cfg.name).⎕NC'Public'
+         public←
+     :Else
+         public←
+     :EndIf
+     M.CreateAPI ##.Inno public cfg.api
+ :EndIf

@@ -1754,7 +1754,7 @@
               r,←⊂'           can be overwritten. Mainly for tests.'
           :Case ⎕C'FindDependencies'
               r,←⊂'Scans "target" recursively for a file "apl-dependencies.txt".'
-              r,←⊃'"target" can be a folder or a URL or registry alias or [*] for all defined Registries.'
+              r,←⊂'"target" can be a folder or a URL or registry alias or [*] for all defined Registries.'
               r,←⊂'Folders with such a file will be scanned for packages defined in "pkgList".'
               r,←⊂'Useful for finding out where one or more packages are used.'
               r,←⊂''

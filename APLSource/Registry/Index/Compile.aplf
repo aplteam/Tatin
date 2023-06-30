@@ -21,7 +21,7 @@
          cfgData←{(##.ReadPackageConfigFile ⍵)}¨cfgFiles
          cfgData←PolishCfgData cfgData
          (descs tags os_lin os_mac os_win)←↓⍉↑cfgData.(description tags os_lin os_mac os_win)
-         osList←({⊃,/1↓⎕nparts ⍵}¨packageList),¨' ',¨⍕¨os_lin,¨os_mac,¨os_win
+         osList←({⊃,/1↓⎕NPARTS ⍵}¨packageList),¨' ',¨⍕¨os_lin,¨os_mac,¨os_win
          UC←index{⍵\⍵/⍺}{0=⍵.⎕NC'userCommandScript':0 ⋄ 0<≢⍵.userCommandScript}¨cfgData
          (cfgData.deprecated/descs)←⊂''
          (cfgData.deprecated/tags)←⊂''
@@ -39,10 +39,6 @@
          index2←⊃,/index,¨⎕UCS 13
          ref.index←index2
          (⊂index2)##.F.NPUT(path,'/',GetIndexFilename)1
-        :if 'a'≠⊃1⊃osList
-⎕trap←0'S'
-∘∘∘
-        :endif
          (⊂osList)##.F.NPUT(path,'/tatin_os.txt')1
          (⊂UC)##.F.NPUT(path,'/tatin_uc.txt')1
      :Else

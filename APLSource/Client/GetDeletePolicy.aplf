@@ -20,8 +20,10 @@
          request.Headers,←⊂'Accept' 'text/html'
          res←SendAndReceive url_ request
          :If 200≠res.StatusCode
+             'Server not found'Assert 404≠res.StatusCode
+             'Bad request'Assert 400≠res.StatusCode
              :If 0<≢res.Content
-                 ('Server: ',res.Content)Assert 0<≢res.Content
+                 ('Server: ',res.Content)Assert 0
              :Else
                  ('Failed with status code ',⍕res.StatusCode)Assert 0
              :EndIf

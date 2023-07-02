@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.67.0 - 2023-06-10
+⍝ * 0.68.0 - 2023-07-02
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -842,6 +842,9 @@
           ('No ZIP file found in ',zipFolder)Assert 0<≢source
           ('More than one ZIP file found in ',zipFolder)Assert 1=≢source
           source←⊃source
+          :If 0=TC.CommTools.YesOrNo'Sure you want to publish ',(⊃,/1↓⎕nparts source),'?'
+              :Return
+          :EndIf
       :EndIf
       :If (,'?')≡,url
       :OrIf '[?]'≡url
@@ -2446,7 +2449,7 @@
                       :If 0=≢pkgFolders
                           folder←''
                       :ElseIf 2=≢pkgFolders
-                          ind←'Select target folder:'TC.CommTools.Select folder∘,¨{'='∊⍵:⍵↑⍨¯1+⍵⍳'='  ⋄⍵}¨pkgFolders
+                          ind←'Select target folder:'TC.CommTools.Select folder∘,¨{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨pkgFolders
                           :If 0=≢ind
                               folder←''
                           :Else

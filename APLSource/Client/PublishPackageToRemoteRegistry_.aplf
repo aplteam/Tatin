@@ -13,11 +13,16 @@
  request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)
  res←SendAndReceive uri_ request
  :If res.StatusCode≢200
-     'Bad request'Assert 400≠res.StatusCode
-     'Page not found'Assert 404≠res.StatusCode
-     'Method is not allowed'Assert 405≠res.StatusCode
-     'Server: Unauthorized request (401)'Assert 401≠res.StatusCode
-     ('Server ',uri,' reported an error ',⍕res.StatusCode)Assert~∨/'<html'⍷res.Content
-     ('Server: ',res.Content)Assert 0
+     :If 0<≢res.Content
+     :AndIf ∧/~'<>'∊res.Content ⍝ No HTML?!
+         ('Server: ',res.Content)Assert 0
+     :Else
+         'Bad request'Assert 400≠res.StatusCode
+         'Page not found'Assert 404≠res.StatusCode
+         'Method is not allowed'Assert 405≠res.StatusCode
+         'Server: Unauthorized request (401)'Assert 401≠res.StatusCode
+         ('Server ',uri,' reported an error ',⍕res.StatusCode)Assert~∨/'<html'⍷res.Content
+         ('Server: ',res.Content)Assert 0
+     :EndIf
  :EndIf
 ⍝Done

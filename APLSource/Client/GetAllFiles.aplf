@@ -4,11 +4,13 @@
 ⍝ ← Is a list of all files within cfg.source.\\
 ⍝ This function has a side effect: if "source" is not found on disk at all, it is created as a folder.
 ⍝ This might happen when "source" will be exclusively used for dependencies.
+ extension←'.aplf' '.aplo' '.aplc' '.apln' '.dyalog' '.apla'
  :If F.IsFile home,cfg.source
      list←home∘,¨⊆cfg.source
  :Else
      home,←(~(¯1↑home)∊'\/')/'/'
      :If 0=F.IsDir home,cfg.source
+         ('"',cfg.source,'" is neither file nor folder')Assert~(⊂3⊃⎕NPARTS cfg.source)∊extension
          'Create!'F.CheckPath home,cfg.source
          list←''
          :Return
@@ -19,6 +21,5 @@
  list/⍨←F.IsFile list
  list←(≢home)↓¨list
  list~←Reg.DependenciesFilename CFG_Name
- extension←'.aplf' '.aplo' '.aplc' '.apln' '.dyalog' '.apla'
  list/⍨←(3⊃∘⎕NPARTS¨list)∊extension
 ⍝Done

@@ -256,9 +256,9 @@ If you do not use Cider but want to establish a non-default subfolder (read: not
 
 Packages that are user commands are a special case. Here is why:
 
-User commands must have a user command script --- that's what makes them a user command. They can simply be installed as Tatin packages and the job is done. But there is a problem.
+User commands must have a user command script --- that's what makes them a user command. They can be installed as a Tatin package and the job is done. But there is a problem...
 
-The package might look like this:
+A package might look like this:
 
 ```
 MyUserCommand/
@@ -277,11 +277,13 @@ MyUserCommand/
     README
 ```
 
-The package configuration parameter `source` will then read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
+The package configuration parameter `source` will read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
 
-But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder.
+But that would mean that the script `MyUserCommand.dyalog` would not be installed either: the script would be ignored. 
 
-That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:
+Also, the user command script should live in the root of the package's installation folder rather than in a sub folder, for that reason moving it into `MyUserCommand/` would not help.
+
+That's why Tatin needs to know that the package is a user command, and where to find its script. Specifying the package config parameter `userCommandScript` does the trick:
 
 ```
 userCommandScript: "APLSource/MyUserCommand.dyalog",
@@ -297,9 +299,53 @@ The installed package will then consist of:
 * A file `apl-dependencies.txt`
 * The user command script: `MyUserCommand.dyalog`
 
-Note that by definition a package must contain some code. If a user command is implemented as a single script file, which is possible and perfectly fine with simple user commands, this would not be the case. For this reason, it is advisable to separate the user command as such (with the necessary `Run`, `List` and `Help` functions) from the "business logic" that does the real work.
+#### One-script only user commands
 
-The latter one would remain in the package, fulfilling the requirement.
+Simple user commands might well consist of just a single script: the user command script. But what if the script has dependencies? Where should they go?
+
+For example, using the example from above:
+
+```
+MyUserCommand/
+    APLSource/
+        MyUserCommand/
+        TestData/
+        TestCases/
+        MyUserCommand.dyalog  ⍝ The user command script
+    packages/
+        ...
+    packages_dev/
+        ...
+    apl-package.json
+    cider.config
+    LICENSE
+    README
+```
+
+The only difference would be that the folder `MyUserCommand/` is empty here: no code at all. Strictly speaking the folder does not even need to exist.
+
+In Cider's `cider.config` we specify this:
+
+```
+    dependencies: {
+      tatin: "packages=Snippets",
+    },
+    ...
+    source: "APLSource",
+    ...
+```
+
+The Tatin package config file defines this:
+
+```
+  source: "APLSource/Snippets",
+```
+
+This makes sure that the folders `TestData/` and `TestCases/` are not going to be part of the package, just the empty folder `Snipppets/`.
+
+When the package is loaded then an empty namespace `Snippets` will be established, which eventually will be populated by references pointing to the dependencies.
+
+The user command script will be copied to the root of the installation folder due to the definition of `userCommandScript` and the already mentioned special processing of that property.
 
 
 ## Deleting packages

@@ -1,4 +1,4 @@
- r←FetchAdditionalDataForListPackages path;cfg;OSes
+r←FetchAdditionalDataForListPackages path;cfg;OSes;f
  cfg←ReadPackageConfigFile path
  OSes←⊃{0=≢⍵:'' ⋄ {⍺,', ',⍵}/⍵}cfg.(os_lin os_mac os_win)/'Lin' 'Mac' 'Win'
  :If 0=cfg.⎕NC'project_url'             ⍝ Was introduced after packages were already published
@@ -6,11 +6,9 @@
  :Else
      r←cfg.(description project_url),⊂OSes
  :EndIf
- :If 0=cfg.⎕NC'userCommandScript'      ⍝ Was introduced after packages were already published
- :OrIf 0=≢cfg.userCommandScript
-     r,←⊂''
- :Else
-     r,←⊂'Y'
+ :If f←0<cfg.⎕NC'userCommandScript'     ⍝ Was introduced after packages were already published
+     f←0<≢cfg.userCommandScript
  :EndIf
+ r,←⊂f/'Yes'                            ⍝ Mark as a user command
  r,←⊂cfg.tags
 ⍝Done

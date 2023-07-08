@@ -1,4 +1,4 @@
- zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg
+zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg
 ⍝ Build a new version of a Tatin package.\\
 ⍝ The right argument must be a namespace with the required parameters, typically created by calling  `CreateBuildParms`.
 ⍝ These are the parameters:\\
@@ -56,8 +56,11 @@
  :EndIf
  zipObj←⎕NEW ZipArchive(,⊂zipFilename)
  fileList←parms.projectPath GetAllFiles cfg
- 'No source code?!'Assert 0<≢fileList
- parms.projectPath zipObj.Add fileList
+ :If 0=≢fileList
+     ⎕←'No files found in ',parms.projectPath,cfg.source,'...'
+ :Else
+     parms.projectPath zipObj.Add fileList
+ :EndIf
  parms.projectPath zipObj.Add CFG_Name
  :If 0<≢cfg.assets
      parms.projectPath∘{⍺ zipObj.Add ⍵}¨','(≠⊆⊢)cfg.assets

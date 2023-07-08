@@ -28,7 +28,9 @@
              ImportWithQuadFIX(i⊃sourceDirs)target2
          :EndFor
      :EndIf
- :Else
+ :ElseIf ⎕NEXISTS sourcePath    ⍝ Then we can assume it's a fn or an op
      ref QuadFix sourcePath
+ :Else                          ⍝ Probably an empty namespace, so we create one (might later host refs to dependencies!)
+     (2⊃⎕NPARTS sourcePath)ref.⎕NS''
  :EndIf
 ⍝Done

@@ -20,7 +20,8 @@
      :If 0<⎕NC'∆WS_HASH'
          ReloadThisWorkspaceIfChanged G.INI
      :EndIf
-     :If G.CredentialsTimestamp≢Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.RegistryPath,'/Credentials.txt'
+     :If F.IsFile G.RegistryPath,'/Credentials.txt'
+     :OrIf G.CredentialsTimestamp≢Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.RegistryPath,'/Credentials.csv'
          G←ProcessCredentials G         ⍝  It has changed, so we read it again
      :EndIf
      savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename

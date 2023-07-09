@@ -6,7 +6,12 @@
  :Else
      groups←GetGroupList_ path
      groups←groups,[1.5]1
-     groups⍪←((,¨1⊃G.Credentials)~,⊂,'*'),[1.6]0
+     :If 2=⍴⍴G.Credentials
+         groups⍪←(G.Credentials[;1]~,⊂,'*'),[1.6]0
+     :Else
+         ⍝TODO⍝ Old format of the credentials, which will disappear in 0.99.00
+         groups⍪←((,¨1⊃G.Credentials)~,⊂,'*'),[1.6]0
+     :EndIf
      groups←{(1⊃⍺)((≢⍵)×2⊃⍺)}⌸groups
      groups←groups[groups[;1]⍳∪groups[;1];]
      html←PrepareHtmlPageForGroupList groups

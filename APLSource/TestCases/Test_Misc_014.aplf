@@ -1,4 +1,4 @@
- r←Test_Misc_014(stopFlag batchFlag);⎕TRAP;G;filename;res;expected
+ r←Test_Misc_014(stopFlag batchFlag);⎕TRAP;G;filename;res;expected;filename2
 ⍝ Exercise `ProcessCredentials` locally
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -7,34 +7,39 @@
  G←⎕NS''
  G.RegistryPath←##.FilesAndDirs.GetTempSubDir''
  filename←G.RegistryPath,'/Credentials.txt'
+ filename2←G.RegistryPath,'/Credentials.csv'
 
  G←##.Server.ProcessCredentials G
- →T.GoToTidyUp 2≠≢G.Credentials
- res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp 0≠≢G.Credentials
+ res←##.Server.GetCredentialReport↓⍉G.Credentials[;1 2]
  →T.GoToTidyUp'<p>Anybody can publish anything.</p>'≢∊res
+ ⎕NDELETE filename2
 
  (⊂'*=')##.FilesAndDirs.NPUT filename 1
  G←##.Server.ProcessCredentials G
- →T.GoToTidyUp 2≠≢G.Credentials
- res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp 0=≢G.Credentials
+ res←##.Server.GetCredentialReport↓⍉G.Credentials[;1 2]
  →T.GoToTidyUp'<p>Anybody can publish anything.</p>'≢∊res
+ ⎕NDELETE filename2
 
  (⊂'abc=xyz')##.FilesAndDirs.NPUT filename 1
  G←##.Server.ProcessCredentials G
- →T.GoToTidyUp 2≠≢G.Credentials
- res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp 1≠≢G.Credentials
+ res←##.Server.GetCredentialReport↓⍉G.Credentials[;1 2]
  →T.GoToTidyUp'<p>All groups require a specific API key.</p>'≢∊res
+ ⎕NDELETE filename2
 
- (⊂'abc=xyz' 'ABC=XYZ')##.FilesAndDirs.NPUT filename 1
+ (⊂'abc=xyz' 'ABC,XYZ')##.FilesAndDirs.NPUT filename 1
  G←##.Server.ProcessCredentials G
  →T.GoToTidyUp 2≠≢G.Credentials
- res←##.Server.GetCredentialReport G.Credentials
+ res←##.Server.GetCredentialReport↓⍉G.Credentials[;1 2]
  →T.GoToTidyUp'<p>All groups require a specific API key.</p>'≢∊res
+ ⎕NDELETE filename2
 
  (⊂'abc=xyz' '*=')##.FilesAndDirs.NPUT filename 1
  G←##.Server.ProcessCredentials G
  →T.GoToTidyUp 2≠≢G.Credentials
- res←##.Server.GetCredentialReport G.Credentials
+ res←##.Server.GetCredentialReport↓⍉G.Credentials[;1 2]
  expected←''
  expected,←⊂'<p>These groups require a specific API key:</p>'
  expected,←⊂'<ul>'
@@ -42,11 +47,12 @@
  expected,←⊂'</ul>'
  expected,←⊂'<p>Anybody can publish any other group.</p>'
  →T.GoToTidyUp expected≢res
+ ⎕NDELETE filename2
 
  (⊂'abc=xyz' 'foo=' '*=other')##.FilesAndDirs.NPUT filename 1
  G←##.Server.ProcessCredentials G
- →T.GoToTidyUp 2≠≢G.Credentials
- res←##.Server.GetCredentialReport G.Credentials
+ →T.GoToTidyUp 3≠≢G.Credentials
+ res←##.Server.GetCredentialReport ↓⍉G.Credentials[;1 2]
  expected←''
  expected,←⊂'<p>These groups do <b>not</b> require an API key:</p>'
  expected,←⊂'<ul>'
@@ -58,6 +64,7 @@
  expected,←⊂'</ul>'
  expected,←⊂'<p>Anybody can publish any other group.</p>'
  →T.GoToTidyUp expected≢res
+ ⎕NDELETE filename2
 
  r←T._OK
 

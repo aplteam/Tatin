@@ -1,4 +1,4 @@
- r←Test_Server_500(stopFlag batchFlag);⎕TRAP;packageID;serverPath;qdmx;reg;oldCredentials
+ r←Test_Server_500(stopFlag batchFlag);⎕TRAP;packageID;serverPath;qdmx;reg;oldCredentials;buff
  ;zip;cfg;body;clientCfg;dir;src;res
 ⍝ Try to publish a package with an invalid API key
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -17,17 +17,18 @@
  cfg.name←'Package_A'
  cfg.version←'0.1.0'
  cfg.source←'Test.apln'
+ cfg.license←'MIT'
  cfg.os_win←1
  TC.WritePackageConfigFile src cfg
 
  packageID←'Example-Package_A-0.1.0'
 
- reg←TC.MyUserSettings.GetRegistry (TC.ReplaceRegistryAlias '[localhost]')
+ reg←TC.MyUserSettings.GetRegistry(TC.ReplaceRegistryAlias'[localhost]')
  oldCredentials←reg.api_key
  reg.api_key←'Firlefanz'
  TC.MyUserSettings.ReplaceRegistry ⎕NEW TC.DefineRegistry(,⊂reg)
  :Trap 998
-     TC.PublishPackage src (TC.ReplaceRegistryAlias '[localhost]')
+     buff←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

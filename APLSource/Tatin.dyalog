@@ -810,9 +810,10 @@
       zipFilename←TC.BuildPackage parms
     ∇
 
-    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies;openCiderProjects;ind;project;cfg;folder;zipFolder
+    ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies;openCiderProjects;ind;project;cfg;folder;zipFolder;askForConfirmation
       r←''
       (source url)←Arg.(_1 _2)
+      askForConfirmation←0
       :If (,0)≡,url
       :AndIf '.zip'≢⎕C ¯4↑source
           url←source
@@ -842,9 +843,7 @@
           ('No ZIP file found in ',zipFolder)Assert 0<≢source
           ('More than one ZIP file found in ',zipFolder)Assert 1=≢source
           source←⊃source
-          :If 0=TC.CommTools.YesOrNo'Sure you want to publish ',(⊃,/1↓⎕nparts source),'?'
-              :Return
-          :EndIf
+          askForConfirmation←1
       :EndIf
       :If (,'?')≡,url
       :OrIf '[?]'≡url
@@ -858,6 +857,10 @@
           url←'[tatin]'
       :EndIf
       url_←TC.ReplaceRegistryAlias url
+      :If askForConfirmation
+      :AndIf 0=TC.CommTools.YesOrNo'Sure you want to publish ',(⊃,/1↓⎕NPARTS source),' to ',url,' ?'
+          :Return
+      :EndIf
       :If ~TC.Reg.IsHTTP url_
       :AndIf ~TC.Reg.IsFILE url
           'Invalid target'Assert'['∊url

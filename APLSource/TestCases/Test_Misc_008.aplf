@@ -7,7 +7,7 @@
  version←{⍵↑⍨¯1+⌊/⍵⍳'-+'}2⊃TC.Version
 
  bool←version∘⍷¨text                ⍝ Error? The release notes don't know about this version!
- row←⍸∨/¨bool
+ row←⌊/⍸∨/¨bool
  →T.PassesIf 0<≢row
  date←{⍵↓⍨1++/2>+\' '=⍵}(1⍳⍨row⊃bool)↓row⊃text
  →T.PassesIf date≡3⊃TC.Version      ⍝ Error? Verion's date and the date in the release notes dot not match!

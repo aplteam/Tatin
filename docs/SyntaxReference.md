@@ -746,7 +746,7 @@ Re-installs all files in a given file `apl-dependencies.txt`.
 Takes a folder that hosts a file `apl-dependencies.txt` as mandatory argument.
 
 The file apl-buildlist.json as well as all directories in that folder will be deleted.
-Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.
+Then all packages listed in the file apl-dependencies.txt are re-installed from scratch. Lines in apl-dependencies.txt that start with a lamp character (`⍝`) are ignored.
 
 Note that packages with different major version numbers are considered as different packages.
 

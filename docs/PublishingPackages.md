@@ -116,46 +116,63 @@ API keys are saved in the user settings file. The quickest and yet safe way to e
 
 ##### Server
 
-API keys are saved in the file "Credentials.txt" in the `Registry\` folder in the server's home folder.
+Credentials are saved in the file "Credentials.csv" in the `Registry\` folder in the server's home folder.
 
 #### Credentials for your own Tatin Server 
 
 If you run your own Tatin Server we suggest that you create a UUID and use that as an API key. 
 
-For an API key to be accepted by a Tatin Server it must be added to the file `Credentials.txt` in the Registry's root directory. The file might or might not exist, and if it exists it might be empty.
+For an API key to be accepted by a Tatin Server, it must be added to a file `Credentials.txt` in the Registry's root directory. 
 
 Make sure that you specify it as either
 
 ```
-group1={api-key}
+<group-name>,<api-key>
 ```
 
 or
 
 ```
-*={api-key}
+*,<api-key>
 ```
 
-In the first case, somebody who provides that API key may publish packages only for the group <group1>.
+Instead of the "`,`" you can also use "`=`" as separator but that is deprecated.
 
-In the second case, it's a kind of master password: it allows the creation of packages with _any_ group name.
+If the server finds such a file it will perform the following actions:
 
-The two scenarios can be mixed:
+* Take the data and convert it to a different format
+* Delete rows from `Credential.csv` that share a group name with `Credential.txt`
+* Add the data to `Credentials.cvs` 
+* Delete the file `Credentials.txt`.
 
-```
-group1='abc'
-group2='xyz'
-*='other'
-```
-
-This means that one can only publish packages with the groupname <group1> with the API key "abc", packages with the groupname <group2> with the API key "xyz", and anything else with the API key "other".
-
-Note that `*=` means that no API key is required. On its own, it's the same as having no credentials file, but it can be useful together with other group names:
+The format of the file `Credentials.csv` is this:
 
 ```
-group1='abc'
-group2='xyz'
-*=
+<group-name<,<api-key-hash>,<salt>
+*,<api-key-hash>,<salt>
+*
+```
+
+* In the first case, anybody who provides the API key the hash was produced from, can publish packages for that group.
+* In the second case, the password the hash was created from, is a kind of master password: it allows the creation of packages with _any_ group name.
+* The third case means that no API key is required for any (remaining) group(s).
+
+The different scenarios can be mixed:
+
+```
+group1,<hash1,<salt1>
+group2,<hash2,<salt2>
+*,{hash3>,<salt3>
+```
+
+This means that one can only publish packages with the group name <group1> with the API key "hash1" was generated from, packages with the group name <group2> with the API key "hash2" was generated from, and anything else with the API key "hash3" was created from.
+
+Note that `*` or`*,` or `*=` all mean that no API key is required. On its own, it's the same as having no credentials file, but it can be useful together with other group names:
+
+```
+<group1>,<hash1>
+<group2>,<hash2>
+*
 ```
 
 This is interpreted as "require API keys for the groups <group1> and <group2> but allow anything else without an API key".
@@ -163,17 +180,25 @@ This is interpreted as "require API keys for the groups <group1> and <group2> bu
 Finally, you can allow anybody to publish packages under a particular group name without providing an API key:
 
 ```
-group1='abc'
-group2=
-group3=''
-*='other'
+<group1>,<hash1>
+<group2>,
+*,<hash3>
 ```
 
 This means:
 
-* You must provide "abc" as an API key for the group <group1>
-* You may publish packages to the groups <group2> and <group3> without an API key 
-* For any group name but <group1>, <group2> and <group3> you must specify <other> as API key
+* In order to publish anything to the group "group1" you must provide the API key "hash1" was generated from
+
+* You may publish packages to the group "group2" without an API key 
+
+* For any group name but <group1> and <group2> you must specify the API key "hash3" was generated from
+
+
+##### Editing the file "Credentials.csv" 
+
+There is only one reason why you might need to change the file `Credentials.csv`: when a group name must be deleted for some reason.
+
+If a new group needs to be added, or a new API key needs to be assigned to an existing group, you must create a file `Credentials.txt`, see above.
 
 
 ## Publishing
@@ -256,9 +281,9 @@ If you do not use Cider but want to establish a non-default subfolder (read: not
 
 Packages that are user commands are a special case. Here is why:
 
-User commands must have a user command script --- that's what makes them a user command. They can be installed as a Tatin package and the job is done. But there is a problem...
+User commands must have a user command script --- that's what makes them a user command. They can simply be installed as Tatin packages and the job is done. But there is a problem.
 
-A package might look like this:
+The package might look like this:
 
 ```
 MyUserCommand/
@@ -277,13 +302,11 @@ MyUserCommand/
     README
 ```
 
-The package configuration parameter `source` will read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
+The package configuration parameter `source` will then read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
 
-But that would mean that the script `MyUserCommand.dyalog` would not be installed either: the script would be ignored. 
+But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder.
 
-Also, the user command script should live in the root of the package's installation folder rather than in a sub folder, for that reason moving it into `MyUserCommand/` would not help.
-
-That's why Tatin needs to know that the package is a user command, and where to find its script. Specifying the package config parameter `userCommandScript` does the trick:
+That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:
 
 ```
 userCommandScript: "APLSource/MyUserCommand.dyalog",
@@ -299,53 +322,9 @@ The installed package will then consist of:
 * A file `apl-dependencies.txt`
 * The user command script: `MyUserCommand.dyalog`
 
-#### One-script only user commands
+Note that by definition a package must contain some code. If a user command is implemented as a single script file, which is possible and perfectly fine with simple user commands, this would not be the case. For this reason, it is advisable to separate the user command as such (with the necessary `Run`, `List` and `Help` functions) from the "business logic" that does the real work.
 
-Simple user commands might well consist of just a single script: the user command script. But what if the script has dependencies? Where should they go?
-
-For example, using the example from above:
-
-```
-MyUserCommand/
-    APLSource/
-        MyUserCommand/
-        TestData/
-        TestCases/
-        MyUserCommand.dyalog  ⍝ The user command script
-    packages/
-        ...
-    packages_dev/
-        ...
-    apl-package.json
-    cider.config
-    LICENSE
-    README
-```
-
-The only difference would be that the folder `MyUserCommand/` is empty here: no code at all. Strictly speaking the folder does not even need to exist.
-
-In Cider's `cider.config` we specify this:
-
-```
-    dependencies: {
-      tatin: "packages=Snippets",
-    },
-    ...
-    source: "APLSource",
-    ...
-```
-
-The Tatin package config file defines this:
-
-```
-  source: "APLSource/Snippets",
-```
-
-This makes sure that the folders `TestData/` and `TestCases/` are not going to be part of the package, just the empty folder `Snipppets/`.
-
-When the package is loaded then an empty namespace `Snippets` will be established, which eventually will be populated by references pointing to the dependencies.
-
-The user command script will be copied to the root of the installation folder due to the definition of `userCommandScript` and the already mentioned special processing of that property.
+The latter one would remain in the package, fulfilling the requirement.
 
 
 ## Deleting packages

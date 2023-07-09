@@ -19,13 +19,13 @@
          tree←Reg.GetJsonFromFile filename1
          tree←⍉↑tree.(principal packageID url)
          deps←(1⊃F.NGET filename2 1)~⊂''
+         deps←('⍝'≠⊃¨deps)/deps
          deps_←RemoveAlias¨deps
          b←deps_∊RemoveAlias¨tree[;2]                       ⍝ Check consistency
          :If ∨/~b
              ('Invalid entry: ',(⊃{⍺,', ',⍵}/(~b)/deps_),'; re-install!')Assert 0
          :EndIf
      :EndIf
-     deps←⊃F.NGET(folder,Reg.DependenciesFilename)1
      0 CompileBuildList folder deps
  :EndIf
 ⍝Done

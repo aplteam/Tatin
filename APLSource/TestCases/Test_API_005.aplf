@@ -4,13 +4,15 @@
  r←T._Failed
 
  tempDir←∆GetTempDir''
- F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                          ⍝ Precaution
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'TEMP'
  'TEMP'#.⎕NS''
 
  res←⎕SE.Tatin.InstallPackages'[local]aplteam-APLProcess-0.2'tempDir
  →T.GoToTidyUp(∊res)≢∆GetBestVersionFor'aplteam-APLProcess-0.2'
+
+ (⊂'⍝aplteam-HashPassword-0.1.0')⎕NPUT(tempDir,'/apl-dependencies.txt')2    ⍝ Comments should be ignored
 
  res←⎕SE.Tatin.LoadDependencies tempDir'#.TEMP'
  expected←,⊂'#._tatin.aplteam_APLProcess_0_2_12'

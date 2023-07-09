@@ -20,7 +20,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><a href="#Release-Notes">Release Notes</a>
 <ul>
-<li><a href="#Version-0971-from-2023-06-30">Version 0.97.1 from 2023-06-30</a></li>
+<li><a href="#Version-0981-from-2023-07-08">Version 0.98.1 from 2023-07-08</a></li>
+<li><a href="#Version-0980-from-2023-07-05">Version 0.98.0 from 2023-07-05</a></li>
 <li><a href="#Version-0970-from-2023-06-14">Version 0.97.0 from 2023-06-14</a></li>
 <li><a href="#Version-0962-from-2023-06-08">Version 0.96.2 from 2023-06-08</a></li>
 <li><a href="#Version-0961-from-2023-05-21">Version 0.96.1 from 2023-05-21</a></li>
@@ -58,11 +59,40 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </a>
 </div>
 <p>Tatin release notes contain information regarding actions that need to be executed before a new version can be used.</p>
+<p>This document does not come with notes regarding fixes, added features etc. Consult <a href="https://github.com/aplteam/Tatin" class="external_link">Tatin on GitHub</a> for that.</p>
 <div class="h_tag">
-<a href="#Version-0971-from-2023-06-30" id="Version-0971-from-2023-06-30" class="autoheader_anchor">
-<h2 data-id="Version-0971-from-2023-06-30">Version 0.97.1 from 2023-06-30</h2>
+<a href="#Version-0981-from-2023-07-08" id="Version-0981-from-2023-07-08" class="autoheader_anchor">
+<h2 data-id="Version-0981-from-2023-07-08">Version 0.98.1 from 2023-07-08</h2>
 </a>
 </div>
+<p>No breaking changes, no user actions required.</p>
+<div class="h_tag">
+<a href="#Version-0980-from-2023-07-05" id="Version-0980-from-2023-07-05" class="autoheader_anchor">
+<h2 data-id="Version-0980-from-2023-07-05">Version 0.98.0 from 2023-07-05</h2>
+</a>
+</div>
+<ul>
+<li>No breaking changes for the Tatin client, therefore there are no user actions required</li>
+<li>If you run a Tatin server you don't need to take action but you should be aware of a major change</li>
+</ul>
+<p>Before version 0.98.0 credentials got stored in a file <code>Credentials.txt</code>. The format was:</p>
+<pre><code>&lt;group&gt;=&lt;api-key&gt;</code></pre>
+<p>The API-keys were stored as clear text. We don't want that anymore.</p>
+<p>With version 0.98.0 credentials will be stored in a file <code>Credentials.csv</code>. The format is different:</p>
+<pre><code>&lt;group&gt;,&lt;api-key-hash&gt;,&lt;Salt&gt;</code></pre>
+<p>The server will convert <code>Credentials.txt</code> automatically into <code>Credentials.csv</code>. Afterwards there is a new file <code>Credentials.csv</code> while the old file <code>Credentials.txt</code> will be deleted.</p>
+<p>Note that you might create at a later stage a new file <code>Credentials.txt</code> with entries like</p>
+<pre><code>&lt;group-name&gt;=&lt;api-key&gt;</code></pre>
+<p>or</p>
+<pre><code>&lt;group-name&gt;,&lt;api-key&gt;</code></pre>
+<p>That allows you to add new groups, or overwrite existing ones, for example when somebody lost the API-key.</p>
+<p>The server will perform the following actions:</p>
+<ul>
+<li>Take the data and convert it</li>
+<li>Delete rows from <code>Credentials.csv</code> that are also contained in <code>Credentials.txt</code> (same group name)</li>
+<li>Add the data to <code>Credentials.csv</code></li>
+<li>Delete <code>Credentials.txt</code> ## Version 0.97.1 from 2023-06-30</li>
+</ul>
 <p>No breaking changes, no user actions required.</p>
 <div class="h_tag">
 <a href="#Version-0970-from-2023-06-14" id="Version-0970-from-2023-06-14" class="autoheader_anchor">

@@ -18,8 +18,46 @@ No breaking changes, no user actions required.
 
 ## Version 0.98.0 from 2023-07-05
 
-`⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹`
+* No breaking changes for the Tatin client, therefore there are no user actions required
 
+* If you run a Tatin server you don't need to take action but you should be aware of a major change
+
+Before version 0.98.0 credentials got stored in a file `Credentials.txt`. The format was:
+
+```
+<group>=<api-key>
+```
+
+The API-keys were stored as clear text. We don't want that anymore.
+
+With version 0.98.0 credentials will be stored in a file `Credentials.csv`. The format is different:
+
+```
+<group>,<api-key-hash>,<Salt>
+```
+
+The server will convert `Credentials.txt` automatically into `Credentials.csv`. Afterwards there is a new file `Credentials.csv` while the old file `Credentials.txt` will be deleted.
+
+Note that you might create at a later stage a new file `Credentials.txt` with entries like
+
+```
+<group-name>=<api-key>
+```
+
+or
+
+```
+<group-name>,<api-key>
+```
+
+That allows you to add new groups, or overwrite existing ones, for example when somebody lost the API-key.
+
+The server will perform the following actions:
+
+* Take the data and convert it
+* Delete rows from `Credentials.csv` that are also contained in `Credentials.txt` (same group name)
+* Add the data to `Credentials.csv` 
+* Delete `Credentials.txt`
 ## Version 0.97.1 from 2023-06-30
 
 No breaking changes, no user actions required.

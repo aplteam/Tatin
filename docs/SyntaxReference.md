@@ -102,7 +102,7 @@ The rules:
 
 #### Dependencies
 
-When `dependencyFolder` is empty `BuildPackage` tries to establish whether the package depends on other packages:
+If `dependencyFolder` is empty `BuildPackage` tries to establish whether the package depends on other packages:
 
 1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the property `[CIDER]dependencies.tatin` in that file. If it defines a folder then it is taken.
 

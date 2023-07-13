@@ -74,10 +74,17 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 
 <p>Where to find the <code>MyUCMDs/</code> folder depends on your operating system</p>
 <ul>
-<li>Under Windows it's usually <code>C:\Users\&lt;username&gt;\Documents\</code></li>
-<li>Under Linux and Mac OS it is <code>/home/&lt;username&gt;/</code></li>
+<li>On Windows it's usually <code>C:\Users\&lt;username&gt;\Documents\</code></li>
+<li>On Linux (including the PI) it is <code>/home/&lt;username&gt;/</code></li>
+<li>On Mac OS it is <code>/Users/&lt;username&gt;/</code></li>
 </ul>
-<p>Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p><code>MyUCMDs/</code> is created by the Dyalog APL installer on Windows, but it won't exist on Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.</p>
+</div>
+</div>
+
 <p>Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.</p>
 <p>As a side effect of executing any of the Tatin user commands the Tatin API will become available via <code>⎕SE.Tatin</code>.</p>
 <div class="leanpub">
@@ -150,6 +157,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
           ⎕←'Setup.dyalog has a problem and was not executed successfully:'
           ⎕←↑'  '∘,¨dmx.DM
       :EndTrap
+      folder←GetMyUCMDsFolder''
+      folder LoadUserCommandPackages 0
     ∇
 
     ∇ r←AutoloadTatin debug;wspath;path2Config
@@ -186,14 +195,37 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\Foo'  ←→ GetMyUCMDsFolder 'Foo'
       ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
        :If 0=⎕NC'OS'
-           OS←##.APLTreeUtils2.GetOperatingSystem''
+           OS←3↑⊃#⎕WG'APLVersion'
        :EndIf
        add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
        :If 'Win'≡OS
-           r←##.FilesAndDirs.ExpandPath(2⊃4070⌶0),'\..\MyUCMDs',add
+           r←⊃,/1 ⎕NPARTS (2⊃4070⌶0),'\..\MyUCMDs',add
        :Else
            r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
        :EndIf
+    ∇
+
+    ∇ r←path LoadUserCommandPackages debug;home;name;res;folders;folder;F
+    ⍝ This loads Tatin packages that are user commands installed in MyUCMDs
+      r←''
+      F←⎕SE._Tatin.FilesAndDirs
+      :If 0&lt;≢folders←F.ListDirs path
+          :For folder :In folders
+              :If F.IsFile folder,'/apl-buildlist.json'
+                  name←2⊃⎕NPARTS folder
+                  :Trap (~debug)/0
+                      {}⎕SE.Tatin.LoadDependencies folder ⎕SE
+                  :Else
+                      r,←⊂'&gt;&gt;&gt; Attempt to load ',name,' failed with ',⎕DMX.EM
+                  :EndTrap
+              :EndIf
+          :EndFor
+      :EndIf
+      :If 0=≢r
+          r←0 0⍴''
+      :Else
+          r←⍪r
+      :EndIf
     ∇
 
 :EndNamespace</code></pre>

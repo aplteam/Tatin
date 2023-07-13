@@ -37,10 +37,11 @@ W> However, this might change with a later version.
 
 Where to find the `MyUCMDs/` folder depends on your operating system
 
-* Under Windows it's usually `C:\Users\<username>\Documents\`
-* Under Linux and Mac OS it is `/home/<username>/`
+* On Windows it's usually `C:\Users\<username>\Documents\`
+* On Linux (including the PI) it is `/home/<username>/`
+* On Mac OS it is `/Users/<username>/`
 
-Note that this folder is created by the Dyalog APL installer under Windows but it won't exist under Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.
+I> `MyUCMDs/` is created by the Dyalog APL installer on Windows, but it won't exist on Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.
 
 Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.
 
@@ -116,6 +117,8 @@ Create one that looks like this:
           ⎕←'Setup.dyalog has a problem and was not executed successfully:'
           ⎕←↑'  '∘,¨dmx.DM
       :EndTrap
+      folder←GetMyUCMDsFolder''
+      folder LoadUserCommandPackages 0
     ∇
 
     ∇ r←AutoloadTatin debug;wspath;path2Config
@@ -152,14 +155,37 @@ Create one that looks like this:
       ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\Foo'  ←→ GetMyUCMDsFolder 'Foo'
       ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
        :If 0=⎕NC'OS'
-           OS←##.APLTreeUtils2.GetOperatingSystem''
+           OS←3↑⊃#⎕WG'APLVersion'
        :EndIf
        add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
        :If 'Win'≡OS
-           r←##.FilesAndDirs.ExpandPath(2⊃4070⌶0),'\..\MyUCMDs',add
+           r←⊃,/1 ⎕NPARTS (2⊃4070⌶0),'\..\MyUCMDs',add
        :Else
            r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
        :EndIf
+    ∇
+
+    ∇ r←path LoadUserCommandPackages debug;home;name;res;folders;folder;F
+    ⍝ This loads Tatin packages that are user commands installed in MyUCMDs
+      r←''
+      F←⎕SE._Tatin.FilesAndDirs
+      :If 0<≢folders←F.ListDirs path
+          :For folder :In folders
+              :If F.IsFile folder,'/apl-buildlist.json'
+                  name←2⊃⎕NPARTS folder
+                  :Trap (~debug)/0
+                      {}⎕SE.Tatin.LoadDependencies folder ⎕SE
+                  :Else
+                      r,←⊂'>>> Attempt to load ',name,' failed with ',⎕DMX.EM
+                  :EndTrap
+              :EndIf
+          :EndFor
+      :EndIf
+      :If 0=≢r
+          r←0 0⍴''
+      :Else
+          r←⍪r
+      :EndIf
     ∇
 
 :EndNamespace

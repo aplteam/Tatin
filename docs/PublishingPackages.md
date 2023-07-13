@@ -141,7 +141,7 @@ Instead of the "`,`" you can also use "`=`" as separator but that is deprecated.
 If the server finds such a file it will perform the following actions:
 
 * Take the data and convert it to a different format
-* Delete rows from `Credential.csv` that share a group name with `Credential.txt`
+* Delete rows from `Credential.csv` that share a group name with `Credentials.txt`
 * Add the data to `Credentials.cvs` 
 * Delete the file `Credentials.txt`.
 

@@ -28,7 +28,7 @@ You need one of:
 * Windows
 * Linux
 
-The Pi and AIX are not supported, but that restriction might be lifted with a later version. Mac-OS is fine for running the client but not (yet) the server, therefore for development the Mac is not a choice for the time being in case you need to run the test suite: it requires running a server locally.
+AIX is not supported.
 
 You also need to have Git installed.
 
@@ -69,6 +69,10 @@ If you want to run the Tatin Server execute the function
 ```
 
 Note that you cannot run both the Client and the Server in the same workspace.
+
+GitHub does not allow downloading certificates, therefore you must take action in this respect. Tatin comes with test certificates, and in order to get around the GitHub restriction the certificates have an "additional extension" `.RemoveMe` which needs, well, removing.
+
+Check the folder `TestServer/Server/Assets/Runtime/Certificates`
 
 
 ## Updating Tatin packages used by Tatin

@@ -1,5 +1,5 @@
  {r}←{force}Init_SHA256 dummy;extn;⎕USING;filename;path;OS
-⍝ Make the necessary preparations for actually hashing password.\\
+⍝ Make the necessary preparations for hashing a password.\\
 ⍝ Once initiallized, the function does not run its code again, except when a 1 is passed as `⍺`.
  force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
  '⍺ must be a Boolean'Assert(⊂force)∊0 1
@@ -14,11 +14,11 @@
          :If 0=≢path←PathToCongaDLLs
              path←(2 ⎕NQ #'GetEnvironment' 'Dyalog'),'/lib/'
          :EndIf
-         filename←⊃FilesAndDirs.ListFiles path,'libconga??ssl64.',(1+'Mac'≡OS)⊃'so' 'dylib'
+         filename←⊃FilesAndDirs.ListFiles path,'libconga??ssl',((1+Is64Bit)⊃'32' '64'),'.',(1+'Mac'≡OS)⊃'so' 'dylib'
          'Conga DLL not found'Assert 0<≢filename
          'Init'SHA256.⎕NA filename,'|nettle_sha256_init >I1[112]'
          'Update'SHA256.⎕NA filename,'|nettle_sha256_update =I1[112] U8 <T1[]'
          'Digest'SHA256.⎕NA filename,'|nettle_sha256_digest =I1[112] U8 >U1[32]'
-         SHA256.⎕FX'digest←ComputeHash data' 'data←⎕UCS⊃data' 'ctx←Init 112' 'ctx←Update ctx(⍴data)data' '(ctx digest)←Digest ctx 32 32'
+         SHA256.⎕FX'digest←ComputeHash data;ctx' 'data←⎕UCS⊃data' 'ctx←Init 112' 'ctx←Update ctx(⍴data)data' '(ctx digest)←Digest ctx 32 32'
      :EndIf
  :EndIf

@@ -643,7 +643,7 @@
       :EndIf
     ∇
 
-    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders
+    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders
       r←''
       'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
       :If 0≡Args._2
@@ -659,6 +659,43 @@
       installFolder←{0≡⍵:'' ⋄ ⍵}installFolder
       :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
           installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+      :ElseIf 0=≢installFolder
+          :If 9=⎕SE.⎕NC'Cider'
+              openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+              :If 1<≢openCiderProjects
+                  ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+                  :If 0=≢ind
+                      r←'Cancelled by user' ⋄ →0
+                  :Else
+                      project←2⊃openCiderProjects[ind;]
+                  :EndIf
+              :ElseIf 1=≢openCiderProjects
+                  project←2⊃openCiderProjects[1;]
+              :Else
+                  r←'No path specified & no open Cider projects found' ⋄ →0
+              :EndIf
+              ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
+              cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
+              (project,' has not been converted yet: cannot be processed')Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+              folders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+              :If 0=≢⊃,/folders
+                  r←(project,' has no dependency folder(s) defined') ⋄ →0
+              :EndIf
+              :If 1<≢folders
+                  folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
+                  ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
+                  :If 0=≢ind
+                      r←'Cancelled by user' ⋄ →0
+                  :Else
+                      installFolder←project,'/',ind⊃folders
+                  :EndIf
+              :ElseIf 1=≢folders
+                  installFolder←project,'/',{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}1⊃folders
+                  :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',installFolder,'?'
+                      →0 ⋄ r←'Cancelled by user'
+                  :EndIf
+              :EndIf
+          :EndIf
       :EndIf
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
       :If 0=≢installFolder←EstablishPackageFolder installFolder
@@ -1390,6 +1427,10 @@
               r←'Cancelled by user' ⋄ →0
           :EndIf
       :EndIf
+      :If ~⎕NEXISTS installFolder
+      :AndIf 0=TC.CommTools.YesOrNo'ConfirmInstallFolder@Sure you want to create and install into',CR,installFolder,' ?'
+          r←'Cancelled by user' ⋄ →0
+      :EndIf
       :Trap 0
           r←TC.InstallPackages identifier installFolder
       :Else
@@ -1525,7 +1566,7 @@
           :If 0=rc
               r←'*** Cache successfully cleared'
           :Else
-              r←'*** Attempt to delete these failed:',⊃,/(⎕UCS 10)¨,⊆report
+              r←'*** Attempt to delete these failed:',⊃,/CR¨,⊆report
           :EndIf
       :EndIf
     ∇
@@ -1692,7 +1733,7 @@
               r,←'' '  ]Tatin.Documentation'
           :Case ⎕C'ReInstallDependencies'
               r,←⊂'ReInstall all packages installed in a folder from scratch.'
-              r,←'' '  ]Tatin.ReInstallDependencies <install-folder> [Registry-URL|Registry-alias] -force -dry -nobeta -update'
+              r,←'' '  ]Tatin.ReInstallDependencies [install-folder] [Registry-URL|Registry-alias] -force -dry -nobeta -update'
           :Case ⎕C'Ping'
               r,←⊂'Try to contact the specified or all known Tatin Registries'
               r,←'' '  ]Tatin.Ping [Registry-URL]'
@@ -2106,21 +2147,22 @@
               r,←⊂'Put ',tatinURL,'/v1/documentation into the default browser'
           :Case ⎕C'ReInstallDependencies'
               r,←⊂'ReInstalls all packages (principals as well as dependencies) from scratch.'
-              r,←⊂'Takes a folder as mandatory argument. That folder must host a file apl-dependencies.txt.'
+              r,←⊂'Takes a folder as argument. If specified the folder must host a file apl-dependencies.txt.'
               r,←⊂'If this is not an absolute path then it might be a sub folder of an open Cider project.'
               r,←⊂'Then Tatin works out the correct one:'
               r,←⊂' * If there is just one project open it is taken'
               r,←⊂' * If there are multiple Cider projects open the user is questioned'
               r,←⊂' * If Cider is not available or no projects are open the current directory is checked'
               r,←⊂'For a relative path the user is always asked for confirmation.'
+              r,←⊂'If it was not specified at all then all open Cider projects are presented for selection,'
+              r,←⊂'except if there is only one open anyway. The the Tatin dependency is taken. If there is more'
+              r,←⊂'than one then they are presented for selection by the user.'
               r,←⊂''
-              r,←⊂'All installed packages are removed (except ZIP files) from the folder before a new build'
+              r,←⊂'All installed packages are removed from the folder (except ZIP files) before a new build'
               r,←⊂'list is compiled and used to install all packages from scratch.'
               r,←⊂''
               r,←⊂'Notes:'
-              r,←⊂' * This does not install a later version (but check on -update). In fact as a side'
-              r,←⊂'   effect of minimal version selection you might end up with an older version under'
-              r,←⊂'   specific (and pretty rare) circumstances.'
+              r,←⊂' * This does not install a later version (but check on -update).'
               r,←⊂' * ZIP files are not removed upfront and have therefore a higher priority,'
               r,←⊂'   so when the dependency list refers to a ZIP file then it will always survive.'
               r,←⊂''

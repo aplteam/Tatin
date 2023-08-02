@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.68.0 - 2023-07-02
+⍝ * 0.69.0 - 2023-07-31
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -98,7 +98,7 @@
           c←⎕NS ⍬
           c.Name←'LoadDependencies'
           c.Desc←'Take a folder (⍵[1]) with installed packages and loads all of them into ⍵[2]'
-          c.Parse←'1-2 -overwrite'
+          c.Parse←'1-2 -overwrite -makeHomeRelative'
           r,←c
      
           c←⎕NS ⍬
@@ -519,7 +519,7 @@
       :EndIf
     ∇
 
-    ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag;isUCMD
+    ∇ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag;isUCMD;makeHomeRelative
       installFolder←Arg._1
       isUCMD←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
       :If 0≡Arg._2
@@ -538,6 +538,7 @@
           installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
       :EndIf
       overwriteFlag←Arg.overwrite
+      makeHomeRelative←Arg.makeHomeRelative
       installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
       f1←TC.F.IsDir installFolder
       :If ~isUCMD
@@ -553,7 +554,7 @@
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
-      r←overwriteFlag TC.LoadDependencies installFolder targetSpace
+      r←(TC.Reg.BitsToInt overwriteFlag makeHomeRelative)TC.LoadDependencies installFolder targetSpace
       r←⍪r
     ∇
 
@@ -940,9 +941,9 @@
      ∆Again:
       :Trap ErrNo
           :If 0<≢dependencies
-              (rc msg zipFilename)←dependencies TC.PublishPackage source url
+              (rc msg zipFilename)←dependencies TC.PublishPackage source url_
           :Else
-              (rc msg zipFilename)←TC.PublishPackage source url
+              (rc msg zipFilename)←TC.PublishPackage source url_
           :EndIf
           :If 200≡rc
               r←'Package published on ',url_
@@ -1351,7 +1352,7 @@
       :EndIf
     ∇
 
-    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;msg;rc;installFolder_;isUserCommand;buff
+    ∇ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;msg;rc;installFolder_;isUserCommand;buff;confirmed
       r←''
       (identifier installFolder)←Arg.(_1 _2)
       :If 0≡installFolder
@@ -1410,6 +1411,7 @@
               :EndIf
           :EndIf
       :EndIf
+      confirmed←0
       :If '[myucmds]'{⍺≡(≢⍺)↑⍵}⎕C installFolder
           :If ','∊identifier
               'You must not specify a name after [MyUCMDs] when installing more than one package'Assert 0=≢(≢'[myucmds]')↓installFolder
@@ -1423,11 +1425,12 @@
               :EndIf
           :EndIf
           msg←'Sure you want to install',CR,'   ',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),CR,'into [MyUCMDs]',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),' ?'
-          :If ~TC.CommTools.YesOrNo msg
+          :If ~confirmed←TC.CommTools.YesOrNo msg
               r←'Cancelled by user' ⋄ →0
           :EndIf
       :EndIf
       :If ~⎕NEXISTS installFolder
+      :AndIf ~confirmed
       :AndIf 0=TC.CommTools.YesOrNo'ConfirmInstallFolder@Sure you want to create and install into',CR,installFolder,' ?'
           r←'Cancelled by user' ⋄ →0
       :EndIf
@@ -1439,7 +1442,9 @@
           TC.CloseConnections 1
           CheckForInvalidVersion qdmx
       :EndTrap
-      r←⍪(⊂'*** Installed into ',installFolder,':'),' ',¨r
+      :If 0<≢r
+          r←⍪(⊂'*** Installed into ',installFolder,':'),' ',¨r
+      :EndIf
       ⍝Done
     ∇
 
@@ -1919,8 +1924,11 @@
               r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded'
               r,←⊂'     Default is # except when "folder" is [MyUCMDs] when the default is ⎕SE instead.'
               r,←⊂''
-              r,←⊂'-overwrite: By default a package is not loaded if it already exists. You can enforce the'
-              r,←⊂'            load operation by specifying the -overwrite flag.'
+              r,←⊂'-overwrite:        By default a package is not loaded if it already exists. You can'
+              r,←⊂'                   enforce the load operation by specifying the -overwrite flag.'
+              r,←⊂'-makeHomeRelative  By default the paths returned by HOME and GetFullPath2AssetsFolder'
+              r,←⊂'                   would be absolute. By specifying this you can enforce them to be'
+              r,←⊂'                   relative: onle the package folder and its parent are returned.'
           :Case ⎕C'LoadTatin'
               r,←⊂'Loads the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
               r,←⊂'Allows accessing the Tatin API via ⎕SE.Tatin.'

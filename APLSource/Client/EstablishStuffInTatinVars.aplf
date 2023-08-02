@@ -1,6 +1,7 @@
- {r}←EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make;check
+ {r}←{makeHomeRelative}EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make;check;f
 ⍝ We establish some fns (Niladic for impersonating "constants") in TatinVars for convinience
  r←⍬
+ makeHomeRelative←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'makeHomeRelative'
  ref2←⍎'TatinVars'ref.⎕NS''
  make←{
      ' '=1↑0⍴⍵:'' 1
@@ -13,7 +14,12 @@
      0::msg Assert 0
      msg Assert' '=1↑0⍴ref.⍎name
  }
- res←ref2.⎕FX'r←HOME' '⍝ Returns the folder the package was loaded from or an empty vector if that cannot be established anymore'('r←''',folder,'''')':If ~⎕nexists r' 'r←''''' ':EndIf'
+ :If makeHomeRelative
+     f←{⍵/⍨⌽2>+\(⌽⍵)∊'/\'}folder
+ :Else
+     f←folder
+ :EndIf
+ res←ref2.⎕FX'r←HOME' '⍝ Returns the folder the package was loaded from or an empty vector if that cannot be established anymore'('r←''',f,'''')':If ~⎕nexists r' 'r←''''' ':EndIf'
  Assert/'HOME'make res
  ref2 check'HOME'
  res←ref2.⎕FX'r←ASSETS'('r←''',cfg.assets,'''')
@@ -36,5 +42,9 @@
      res←ref2.⎕FX'r←DEPENDENCIES' 'r←⍬'
      Assert/'DEPENDENCIES'make res
  :EndIf
- ref2.⎕FX'r←GetFullPath2AssetsFolder' ':If 0<≢r←ASSETS' ':AndIf 0<≢HOME' ':AndIf ⎕NEXISTS HOME' 'r←HOME,''/'',ASSETS' ':EndIf'
+ :If makeHomeRelative
+     ref2.⎕FX'r←GetFullPath2AssetsFolder;p' 'p←⊃1 ⎕NPARTS''''' ':If 0<≢r←ASSETS' ':AndIf 0<≢HOME' ':AndIf ⎕NEXISTS p,HOME' 'r←p,HOME,''/'',ASSETS' ':EndIf'
+ :Else
+     ref2.⎕FX'r←GetFullPath2AssetsFolder' ':If 0<≢r←ASSETS' ':AndIf 0<≢HOME' ':AndIf ⎕NEXISTS HOME' 'r←HOME,''/'',ASSETS' ':EndIf'
+ :EndIf
 ⍝Done

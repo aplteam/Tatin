@@ -685,7 +685,7 @@ version
 <h3 data-id="LoadDependencies">2.23. LoadDependencies</h3>
 </a>
 </div>
-<pre><code>{r}←{overwriteFlag} LoadDependencies y</code></pre>
+<pre><code>{r}←{flags} LoadDependencies y</code></pre>
 <p>Loads all packages according to a build list in a folder.</p>
 <p>Requires one mandatory right argument and accepts up to two:</p>
 <ul>
@@ -693,7 +693,17 @@ version
 <li>A target namespace</li>
 </ul>
 <p>If the target namespace is not specified then it defaults to <code>#</code> except when <code>[MyUCMDs]</code> is specified as source folder: in that case it defaults to <code>⎕SE</code>.</p>
-<p>The optional <code>overwriteFlag</code> flag defaults to 0. Use this in case all packages should be loaded even if they already exist in <code>#._tatin</code> or <code>⎕SE._tatin</code>.</p>
+<p>The optional left argument <code>flags</code> can be used to define two flags which default to 0:</p>
+<ul>
+<li><code>overwrite</code> enforces a load even if the package is already available in <code>#._tatin</code> or <code>⎕SE._tatin</code></li>
+<li><code>makeHomeRelative</code> influences the result of <code>HOME</code> and <code>GetFullPath2AssetsFolder</code>: rather then returning the full path only the folder holding the packages and its parent are returned, making it a relative path</li>
+</ul>
+<div class="leanpub_A">
+<h3>Relative <code>HOME</code></h3>
+<p>In case Tatin packages become part of an application that is bundled with the Dyalog runtime you cannot use absolute paths for referring to assets for obvious reasons.</p>
+<p>In that case the paths must be relative, and that's what the <code>makeHomeRelative</code> flag is for.</p>
+</div>
+
 <p>Returns a vector with references to the loaded packages (principal packages only, not dependencies).</p>
 <div class="h_tag">
 <a href="#MyUCMDs" id="MyUCMDs" class="autoheader_anchor">
@@ -704,7 +714,6 @@ version
 <p>Notes:</p>
 <ul>
 <li><code>MyUCMDs</code> is case independent, so specifying <code>[MYUCMDS]</code> or <code>[myucmds]</code> does not make a difference</li>
-<li>Where the folder <code>MyUCMDs/</code> lives depends on your operating system</li>
 <li>In case no name is specified after <code>[MyUCMDs]</code> the name of the sub-folder is derived from the package name</li>
 <li>If you want to install multiple user command packages in one go you must not specify a name after <code>[MyUCMDs]</code>, otherwise an error is thrown</li>
 </ul>

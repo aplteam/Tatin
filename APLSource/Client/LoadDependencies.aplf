@@ -1,14 +1,22 @@
- {r}←{overwriteFlag}LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;principalFlag;refs;alias;installFolder;targetSpace;overwriteFlag;packageID2;qdmx;isUC
-⍝ Requires at least one arguments but accepts up to two:
+ {r}←{flags}LoadDependencies y;path;tree;dep2;saveIn;cfg;msg;packageID;saveIn2;ref;url;principalFlag;refs;alias;installFolder;targetSpace;packageID2;qdmx;isUC;makeHomeRelative;overwrite
+⍝ Requires at least one argument but accepts up to two:
 ⍝ * Folder with a build list (mandatory)
 ⍝ * Name of the target namespace\\
 ⍝ If no target namespace was specified then by default packages are loaded into `#` except when the folder
 ⍝ is `[MyUCMDs]` in which case they are loaded into `⎕SE.
-⍝ You may specify an optional left argument: `overwriteFlag` defaults to 0.
-⍝ Use `overwriteFlag` in case all packages should be loaded even if they already exist in (#|⎕SE)._tatin\\
-⍝ Loads all packages and injects required references into `targetSpace`.
+⍝ Via the optional left argument you may specify 0, 1 or 2 flags which default to 0:
+⍝ * `overwrite` (1) enforces a load even if the package already exists in (#|⎕SE)._tatin
+⍝ * `makeHomeRelative` (2) enforces the HOME path of the package to be relative: only the package folder
+⍝   and the parent of that folder survice.
+⍝ Specify a 3 as `⍺` in order to switch both flags on.\\
+⍝ Loads all packages and injects required references into `targetSpace`.\\
 ⍝ Returns a vector with references to the loaded packages (no dependencies: principal packages only).
- overwriteFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'overwriteFlag'
+ :If 0=⎕NC'flags'
+     overwrite←makeHomeRelative←0
+ :Else
+     (overwrite makeHomeRelative)←2↑Reg.IntToBits flags
+ :EndIf
+ overwrite←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'overwrite'
  'Length error on right argument'Assert(≢y)∊1 2
  (installFolder targetSpace)←2↑(⊆y),⊆''
  :If isUC←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
@@ -36,9 +44,9 @@
          cfg←ReadPackageConfigFile path
          packageID2←1 GetPackageIDFromFilename path
          saveIn,←'.',packageID2
-         :If 0=⎕NC saveIn   ⍝ Might already exist
-         :OrIf overwriteFlag
-             :If overwriteFlag
+         :If 0=⎕NC saveIn                       ⍝ If it already exists we don't do anything...
+         :OrIf overwrite                        ⍝ ... unless we are are explicitly asked to
+             :If overwrite
                  {(⍎⍺).⎕EX ⍵}/¯1 0↓¨'.'A.SplitPath saveIn
              :EndIf
              EstablishSystemVars saveIn cfg
@@ -47,7 +55,7 @@
          :Else
              ref←⍎saveIn
          :EndIf
-         EstablishStuffInTatinVars ref cfg path
+         makeHomeRelative EstablishStuffInTatinVars ref cfg path
          refs,←ref
          :If 1=principalFlag
              r,←ref

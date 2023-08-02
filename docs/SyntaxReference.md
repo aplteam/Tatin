@@ -627,7 +627,7 @@ Note that the package ID might use any case, meaning that if the package's name 
 ### LoadDependencies
 
 ```
-{r}←{overwriteFlag} LoadDependencies y
+{r}←{flags} LoadDependencies y
 ```
 
 Loads all packages according to a build list in a folder.
@@ -639,7 +639,16 @@ Requires one mandatory right argument and accepts up to two:
 
 If the target namespace is not specified then it defaults to `#` except when `[MyUCMDs]` is specified as source folder: in that case it defaults to `⎕SE`.
 
-The optional `overwriteFlag` flag defaults to 0. Use this in case all packages should be loaded even if they already exist in `#._tatin` or `⎕SE._tatin`.
+The optional left argument `flags` can be used to define two flags which default to 0:
+
+* `overwrite` enforces a load even if the package is already available in `#._tatin` or `⎕SE._tatin`
+* `makeHomeRelative` influences the result of `HOME` and `GetFullPath2AssetsFolder`: rather then returning the full path only the folder holding the packages and its parent are returned, making it a relative path
+
+A> ### Relative `HOME`
+A>
+A> In case Tatin packages become part of an application that is bundled with the Dyalog runtime you cannot use absolute paths for referring to assets for obvious reasons. 
+A>
+A> In that case the paths must be relative, and that's what the `makeHomeRelative` flag is for.
 
 Returns a vector with references to the loaded packages (principal packages only, not dependencies).
 
@@ -650,7 +659,6 @@ In case a Tatin package is a Dyalog user command it can be installed into the sp
 Notes:
 
 * `MyUCMDs` is case independent, so specifying `[MYUCMDS]` or `[myucmds]` does not make a difference
-* Where the folder `MyUCMDs/` lives depends on your operating system
 * In case no name is specified after `[MyUCMDs]` the name of the sub-folder is derived from the package name
 * If you want to install multiple user command packages in one go you must not specify a name after `[MyUCMDs]`, otherwise an error is thrown
 
@@ -840,3 +848,4 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+

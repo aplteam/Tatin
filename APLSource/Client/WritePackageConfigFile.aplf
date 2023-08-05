@@ -34,7 +34,9 @@
  :Trap 0
      {}cfg.⎕EX'∆List'
      {}(Reg.JSON cfg)Reg.SaveJSON tmp 1
-     ('Unable to replace ',cfg_file)Assert F.DeleteFile cfg_file
+     :If ⎕NEXISTS cfg_file
+         ('Unable to replace ',cfg_file)Assert F.DeleteFile cfg_file
+     :EndIf
      ⎕DL 0.01
      {}cfg_file(⎕NMOVE Reg.F.ExecNfunction)tmp
  :Else

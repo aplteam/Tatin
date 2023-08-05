@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.69.0 - 2023-07-31
+⍝ * 0.69.1 - 2023-08-05
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -1421,7 +1421,7 @@
               :If TC.IsHTTP identifier
                   buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}{'/'∊⍵:⍵↓⍨⍵⍳'/' ⋄ ⍵}TC.RemoveHttpProtocol TC.Reg.RemoveVersionNumber{'['∊⍵:⍵↓⍨⍵⍳']'}identifier
               :Else
-                  buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}2⊃⎕NPARTS TC.Reg.RemoveVersionNumber identifier
+                  buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}2⊃⎕NPARTS TC.Reg.RemoveVersionNumber 2⊃⎕nparts identifier
               :EndIf
           :EndIf
           msg←'Sure you want to install',CR,'   ',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),CR,'into [MyUCMDs]',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),' ?'

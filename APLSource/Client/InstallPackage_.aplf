@@ -1,4 +1,4 @@
- r←targetFolder InstallPackage_(alias packageID);buildList;principal;packageID2;installFolder;msg;path2cache;url;bool;tempDir;cacheFlag;success;qdmx
+ r←targetFolder InstallPackage_(alias packageID);buildList;principal;packageID2;installFolder;msg;path2cache;url;bool;tempDir;cacheFlag;success;qdmx;cfg
 ⍝ Fetches a package and unzips it into a temp folder.
 ⍝ When caching is on, the temp folder is created within the top-level of the cache folder.
 ⍝ Otherwise a folder is created inside the temp directory of the given OS.
@@ -48,6 +48,12 @@
          :If principal
              PrintToSession'    Add ',packageID2,' to dependency file...'
              targetFolder Dependencies.Add alias,packageID2
+         :Else
+             cfg←Reg.ReadPackageConfigFile installFolder
+             :If 0<cfg.⎕NC'userCommandScript'
+             :AndIf 0<≢cfg.userCommandScript
+                 ⎕NDELETE installFolder,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+             :EndIf
          :EndIf
      :EndFor
      buildList[;3]←ReplaceCachePathByURL¨buildList[;3]

@@ -5,11 +5,11 @@
 ⍝ `success` is 0 in case the server does not exist or does not respond etc but otherwise 1.
  success←1
  :If isHTTP←Reg.IsHTTP url
-     PrintToSession'  Fetching from ',url,'...'
+     PrintToSession'  Fetching <',packageID,'>from ',url,'...'
      :Trap 998
          zipFilename←GetPackageViaHTTP url,packageID
      :Else
-         PrintToSession url,' does not host package ',packageID
+         PrintToSession'    ',url,' does not host package <',packageID,'>'
          tempDir←''
          cacheFlag←success←0
          :Return
@@ -29,7 +29,7 @@
  :AndIf 'Any'≢GetDeletePolicy url                                                        ⍝ ... and the registry does not operate an "All" delete policy ...
  :AndIf ~Reg.IsBeta packageID                                                            ⍝ ... and the package is not a beta version...
      cacheFlag←1
-     PrintToSession'  Save package in cache...'
+     PrintToSession'    Save package in cache...'
      tempDir←GetPathToPackageCache,'/temp/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN   ⍝ ... then and only then do we write to the cache folder.
  :Else
      tempDir←Reg.GetTempDir,'/',packageID,'_',(GetMD5 zipFilename),'_',⎕AN               ⍝ Otherwise to the temp folder of the OS
@@ -39,7 +39,7 @@
      F.MkDir tempDir
      ⎕DL 0.2
  :EndIf
- PrintToSession'  Unzipping ',zipFilename,'...'
+ PrintToSession'    Unzipping ',zipFilename,'...'
  zipFilename ZipArchive.UnzipTo tempDir
  :If CheckDeprecatedFlag tempDir
      (rc msg)←tempDir Add2Config'uri'(RemoveFileProtocol url)

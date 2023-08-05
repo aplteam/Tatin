@@ -25,7 +25,7 @@
          :AndIf 0<≢path2cache←CompilePath2PackageInCache url packageID2
          :AndIf 0=GetNoCachingFlag url
          :AndIf 0<≢path2cache
-             PrintToSession'  Fetching from Tatin package cache...'
+             PrintToSession'  Fetching ',packageID2,' from Tatin package cache...'
              tempDir←GetPackageFromCache url packageID2 path2cache
              cacheFlag←0
          :Else
@@ -46,12 +46,12 @@
              installFolder(⎕NMOVE Reg.F.ExecNfunction)tempDir
          :EndIf
          :If principal
-             PrintToSession'  Add ',packageID2,' to dependency file...'
+             PrintToSession'    Add ',packageID2,' to dependency file...'
              targetFolder Dependencies.Add alias,packageID2
          :EndIf
      :EndFor
      buildList[;3]←ReplaceCachePathByURL¨buildList[;3]
-     PrintToSession'  Saving build list... '
+     PrintToSession'    Saving build list... '
      SaveBuildList buildList targetFolder
      r←buildList[1;2]
  :EndIf

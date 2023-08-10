@@ -7,7 +7,7 @@
  :Case 'L'
      md5←{⍵↑⍨¯1+⍵⍳' '}⊃⎕SH'md5sum ',filename
  :Case 'W'
-     buff←⎕SH'certutil.exe -hashfile ',filename,' MD5'   ⍝ Tolerates slash in path
+     buff←⎕SH'certutil.exe -hashfile "',(filename~'"'),'" MD5'   ⍝ Tolerates slash in path
      ('Cannot create MD5 for ',filename)Assert~∨/'-hashfile command completed successfully '⍷∊buff
      md5←2⊃buff
  :Else

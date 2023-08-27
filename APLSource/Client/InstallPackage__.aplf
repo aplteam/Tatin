@@ -6,7 +6,7 @@
  success←1
  :If isHTTP←Reg.IsHTTP url
      PrintToSession'  Fetching <',packageID,'>from ',url,'...'
-     :Trap 998
+     :Trap Reg.ErrorNo
          zipFilename←GetPackageViaHTTP url,packageID
      :Else
          PrintToSession'    ',url,' does not host package <',packageID,'>'
@@ -53,6 +53,6 @@
  :Else
      F.RmDir tempDir
      F.DeleteFile isHTTP/zipFilename
-     msg ⎕SIGNAL 998
+     msg ⎕SIGNAL Reg.ErrorNo
  :EndIf
 ⍝Done

@@ -6,7 +6,7 @@
  r←''
  :If 0<≢buildList←GetDependencyTree alias,packageID
      PrintToSession'  ',(⍕≢buildList),' dependenc',((1+1=≢buildList)⊃'ies' 'y'),' identified'
-     CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename packageID)
+     CheckAliasOnInstall targetFolder alias(GetPackageIDFrom packageID)
      :For principal packageID2 url :In ↓buildList
          (alias packageID2)←SplitAtAlias packageID2
          installFolder←(Reg.AddSlash targetFolder),packageID2
@@ -16,7 +16,7 @@
          :If F.IsDir installFolder
              F.RmDir installFolder
          :AndIf F.IsDir installFolder
-             ⎕DL 0.02
+             ⎕DL 0.01
              msg←'Could not remove install folder (package was apparently already installed):',⎕UCS 13
              msg,←installFolder
              msg Assert 0
@@ -29,7 +29,7 @@
              tempDir←GetPackageFromCache url packageID2 path2cache
              cacheFlag←0
          :Else
-             :Trap 998
+             :Trap Reg.ErrorNo
                  (success tempDir cacheFlag)←InstallPackage__ packageID2 url
                  :If 0=success
                      :Return
@@ -52,12 +52,12 @@
              cfg←Reg.ReadPackageConfigFile installFolder
              :If 0<cfg.⎕NC'userCommandScript'
              :AndIf 0<≢cfg.userCommandScript
-                 ⎕NDELETE installFolder,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript
+                 ⎕NDELETE installFolder,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript  ⍝  ⍝TODO⍝ Remove once User Command Framework stops scanning cmddirs for more than 1 level
              :EndIf
          :EndIf
      :EndFor
      buildList[;3]←ReplaceCachePathByURL¨buildList[;3]
      PrintToSession'    Saving build list... '
-     SaveBuildList buildList targetFolder
      r←buildList[1;2]
+     SaveBuildList buildList targetFolder
  :EndIf

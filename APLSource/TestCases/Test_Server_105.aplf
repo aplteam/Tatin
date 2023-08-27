@@ -21,11 +21,11 @@
  cfg.license←'MIT'
  TC.WritePackageConfigFile src cfg
 
- (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias '[localhost]')
+ (rc msg zipFilename)←TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
  Assert 200=rc
 
- :Trap 998
-     TC.PublishPackage src (TC.ReplaceRegistryAlias '[localhost]')
+ :Trap ##.Registry.ErrorNo
+     TC.PublishPackage src(TC.ReplaceRegistryAlias'[localhost]')
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX

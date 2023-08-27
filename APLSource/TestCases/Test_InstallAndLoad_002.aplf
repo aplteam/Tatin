@@ -27,9 +27,9 @@
 
  installFolder←∆GetTempDir'/Tatin_AppPackages'
  res←TC.InstallPackages('file://',zipfile)installFolder
- →T.GoToTidyUp(∊res)≢TC.GetPackageIDFromFilename zipfile
+ →T.GoToTidyUp(∊res)≢TC.GetPackageIDFrom zipfile
 
- expected←,⊂TC.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
+ expected←,⊂TC.GetPackageIDFrom⊃{⍺,'-',⍵}/cfg.(group name version)
  →T.GoToTidyUp~expected ∆LazyMatch(1+≢installFolder)↓¨F.ListDirs installFolder
  →T.GoToTidyUp~F.Exists installFolder,'/',TC.Reg.DependenciesFilename
 

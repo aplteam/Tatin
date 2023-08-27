@@ -1,10 +1,14 @@
- {r}←{force}CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b;newTree;deps2;ind;deps_
+ {r}←{force}CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b;newTree;deps2;ind;deps_;msg
 ⍝ Checks the last modification date of both the build list and the dependency file.\\
 ⍝ We distinguish here between level-1 packages and other packages (=dependencies).
 ⍝ The level-1 packages are called top-level packages.
 ⍝ If the dependency file was modified after the build list was saved:
 ⍝ * If a top-level package was removed from the dependency file the build list is re-created
 ⍝ * If a dependency package is missing, re-installation is required and therefore an error thrown\\
+⍝ In a second step we check whether the two files are consistent. If not we try to recompile and
+⍝ check again. If that does not help an error is thrown.\\
+⍝ In a second step we check whether the two files are consistent. If not we try to recompile and
+⍝ check again. If that does not help an error is thrown.
  force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}' force'
  folder←Reg.AddSlash folder
  filename2←folder,Reg.DependenciesFilename
@@ -13,19 +17,33 @@
      ts1←1 ⎕DT⊃('type' 3)F.Dir filename1
      ts2←1 ⎕DT⊃('type' 3)F.Dir filename2
  :EndIf
+ tree←ReadBuildList filename1
+ deps←ReadDependencyList filename2
+ deps_←RemoveAlias¨deps
  :If force
  :OrIf r←ts2>ts1
      :If F.IsFile filename1
-         tree←Reg.GetJsonFromFile filename1
-         tree←⍉↑tree.(principal packageID url)
-         deps←(1⊃F.NGET filename2 1)~⊂''
-         deps←('⍝'≠⊃¨deps)/deps
-         deps_←RemoveAlias¨deps
          b←deps_∊RemoveAlias¨tree[;2]                       ⍝ Check consistency
          :If ∨/~b
              ('Invalid entry: ',(⊃{⍺,', ',⍵}/(~b)/deps_),'; re-install!')Assert 0
          :EndIf
      :EndIf
      0 CompileBuildList folder deps
+ :EndIf
+ :If 0∊deps∊tree[;2]
+     0 CompileBuildList folder deps
+     tree←ReadBuildList filename1
+     deps←ReadDependencyList filename2
+     deps_←RemoveAlias¨deps
+     ('Build list and dependency list are incompatible in ',folder)Assert~0∊(Reg.RemoveMinorAndPatch¨  deps_)∊Reg.RemoveMinorAndPatch¨tree[;2]
+ :EndIf
+ :If ∨/b←~F.IsDir¨folder∘,¨RemoveAlias¨tree[;2]
+     msg←'The build list in ',LF,'  ',folder,LF,'  refers to'
+     :If 1=+/b
+         msg,←' a package that is not installed:',LF,'  ',(⍸b)⊃tree[;2]
+     :Else
+         msg,←' packages that are not installed:',LF,'  ',⊃{⍺,', ',⍵}/b/tree[;2]
+     :EndIf
+     msg Assert 0
  :EndIf
 ⍝Done

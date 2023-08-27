@@ -25,7 +25,7 @@
      PrintToSession'  Attempting to install ',identifier,'...'
      :If ∧/~'\/'∊identifier
      :AndIf '.zip'≢⎕C ¯4↑identifier
-         packageID←GetPackageIDFromFilename identifier
+         packageID←GetPackageIDFrom identifier
          :If ~∨/'/\:'∊identifier
              identifier←(EstablishRegistry packageID),packageID
              PrintToSession⊃{'Installing <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
@@ -38,7 +38,7 @@
      PrintToSession'  Establish dependencies...'
      :If 0<≢buildList←GetDependencyTree alias,identifier
          PrintToSession'  ',(⍕≢buildList),' dependenc',((1+1=≢buildList)⊃'ies' 'y'),' identified'
-         CheckAliasOnInstall targetFolder alias(GetPackageIDFromFilename identifier)
+         CheckAliasOnInstall targetFolder alias(GetPackageIDFrom identifier)
          :For principal packageID2 url :In ↓buildList
              (alias packageID2)←SplitAtAlias packageID2
              installFolder←(Reg.AddSlash targetFolder),packageID2
@@ -48,7 +48,7 @@
              :If F.IsDir installFolder
                  F.RmDir installFolder
              :AndIf F.IsDir installFolder
-                 ⎕DL 0.02
+                 ⎕DL 0.01
                  msg←'Could not remove install folder (package was apparently already installed):',⎕UCS 13
                  msg,←installFolder
                  msg Assert 0

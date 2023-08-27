@@ -1,4 +1,4 @@
-r←Test_Load_007(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx
+ r←Test_Load_007(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx
 ⍝ Exercise ⎕SE.Tatin.LoadPackages with an alias that is already used as a variable name
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,7 +8,7 @@ r←Test_Load_007(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx
  'TEMP'#.⎕NS''
  #.TEMP.A←1 2 3
 
- :Trap 998
+ :Trap ##.Registry.ErrorNo
      res←1 TC.LoadPackages'A@[localhost]aplteam-APLTreeUtils-7' '#.TEMP'
      →T.GoToTidyUp 0
  :Else

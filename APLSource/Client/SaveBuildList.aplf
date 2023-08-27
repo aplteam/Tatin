@@ -1,4 +1,4 @@
- {buildList}←{append}SaveBuildList(buildList path);filename;ns;bool;b;groupNameMajor;topLevel;mat
+ {buildList}←{append}SaveBuildList(buildList path);filename;ns;bool;b;groupNameMajor;topLevel;mat;json
 ⍝ Takes a dependency tree (`buildlist`) and saves it into `path`.\\
 ⍝ The optional left argument `append` defaults to 1, meaning that `buildlist` is
 ⍝ appended to an already existing build list. If set to 0 an existing build list is replaced.
@@ -18,6 +18,7 @@
  ns.url←{'/'@(⍸'\'=⍵)⊢⍵}¨ns.url
  mat←TakeBestVersion2 ns
  ns.(principal packageID url)←↓⍉mat
- (⊂Reg.JSON ns)F.NPUT filename 1
+ json←Reg.JSON ns
+ (⊂json)F.NPUT filename 1
  buildList←mat
 ⍝Done

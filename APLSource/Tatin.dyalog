@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.69.1 - 2023-08-05
+⍝ * 0.69.2 - 2023-08-14
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -644,9 +644,40 @@
       :EndIf
     ∇
 
-    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders
+    ∇ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders;bool;aliasDefs;alias;info
       r←''
-      'Mandatory argument (install directory) must not be empty'Assert 0<≢installFolder←Args._1
+      'Mandatory argument (install directory or project) must not be empty'Assert 0<≢installFolder←Args._1
+      :If '[]'≡¯2↑⌽¯1⌽installFolder
+          'You''ve specified a Cider project alias but Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
+          project←installFolder
+          aliasDefs←⎕SE.Cider.GetAliasFileContent
+          ind←aliasDefs[;1]⍳⊂⎕C project~'[]'
+          'Project not found'Assert ind≤≢aliasDefs
+          installFolder←2⊃aliasDefs[ind;]
+          :If ~TC.CommTools.YesOrNo'Sure you want to act on project ',installFolder,' ?'
+              r←'Cancelled by user' ⋄ →0
+          :EndIf
+          cfg←⎕SE.Cider.ReadProjectConfigFile installFolder
+          (project,' has not been converted yet: cannot be processed')Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+          folders←{⍵↑⍨¯1+⍵⍳'='}¨(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+          :If 0=≢⊃,/folders
+              r←(project,' has no dependency folder(s) defined') ⋄ →0
+          :EndIf
+          :If 1<≢folders
+              folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
+              ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
+              :If 0=≢ind
+                  r←'Cancelled by user' ⋄ →0
+              :Else
+                  installFolder,←'/',ind⊃folders
+              :EndIf
+          :ElseIf 1=≢folders
+              installFolder,←'/',{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}1⊃folders
+              :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',installFolder,'?'
+                  →0 ⋄ r←'Cancelled by user'
+              :EndIf
+          :EndIf
+      :EndIf
       :If 0≡Args._2
           registry←''
       :Else
@@ -678,12 +709,11 @@
               ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
               cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
               (project,' has not been converted yet: cannot be processed')Assert 0=cfg.CIDER.⎕NC'tatinFolder'
-              folders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+              folders←{⍵↑⍨¯1+⍵⍳'='}¨(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
               :If 0=≢⊃,/folders
                   r←(project,' has no dependency folder(s) defined') ⋄ →0
               :EndIf
               :If 1<≢folders
-                  folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
                   ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
                   :If 0=≢ind
                       r←'Cancelled by user' ⋄ →0
@@ -1421,7 +1451,7 @@
               :If TC.IsHTTP identifier
                   buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}{'/'∊⍵:⍵↓⍨⍵⍳'/' ⋄ ⍵}TC.RemoveHttpProtocol TC.Reg.RemoveVersionNumber{'['∊⍵:⍵↓⍨⍵⍳']'}identifier
               :Else
-                  buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}2⊃⎕NPARTS TC.Reg.RemoveVersionNumber 2⊃⎕nparts identifier
+                  buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}2⊃⎕NPARTS TC.Reg.RemoveVersionNumber 2⊃⎕NPARTS identifier
               :EndIf
           :EndIf
           msg←'Sure you want to install',CR,'   ',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),CR,'into [MyUCMDs]',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),' ?'

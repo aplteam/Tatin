@@ -1,0 +1,36 @@
+ r←CheckBuildLists pathToRegistry;folder;folders;buildList;packageID;buildList2;groupAndName;filename;F;qdmx
+⍝ Takes the path to a local Registries and checks whether the packages published have a build list that
+⍝ contains the package itself, either with the precise ID or a different version.
+ r←''
+ F←##.##.FilesAndDirs
+ :Trap 6
+     folders←F.ListDirs pathToRegistry
+ :Else
+     qdmx←⎕DMX
+     :If 'Undefined name: APLTreeUtils2'≡qdmx.Message
+         ⎕←'Initialize Tatin (#.Tatin.Admin.Initialize_Client) and then try again' ⋄ →0
+     :Else
+         qdmx.Message ⎕SIGNAL qdmx.EN
+     :EndIf
+ :EndTrap
+ :For folder :In folders
+     packageID←⊃,/1↓⎕NPARTS folder
+     filename←folder,'/apl-dependencies.txt'
+     :If ⎕NEXISTS filename
+         buildList←⊃F.NGET filename 1
+         buildList2←##.##.Client.RemoveAlias¨buildList
+         :If (⊂packageID)∊buildList2
+             r,←⊂packageID,' (points to itself)'
+         :Else
+             groupAndName←'-',⍨{⍵/⍨2>+\⍵='-'}packageID
+             :If ∨/∨/¨groupAndName∘⍷¨buildList2
+                 r,←⊂packageID,' (points to itself with a different version)'
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndFor
+ :If 0=≢r
+     ⎕←'>>> All fine'
+ :Else
+     r←⍪r
+ :EndIf

@@ -1,0 +1,28 @@
+ r←Test_Load_087(stopFlag batchFlag);⎕TRAP;tempFolder;qdmx
+⍝ Load dependencies were the installed packages dont' fit the dependency list; was once bug
+⍝ This can happen by updating the installed packages in a folder and then checking out another branch
+⍝ of the project: the packages will survive (because they are .gitignored) but the dependency list
+⍝ will go back to an older version, referring potentially to packages that are now only available in
+⍝ a later version.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempFolder←(F.GetTempSubDir⊃⎕SI),'/'
+ tempFolder ⎕NCOPY⍠('Wildcard' 1)⊣##.CiderConfig.HOME,'/TestData/PksDontFitBuildList/*'
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ :Trap ##.Registry.ErrorNo
+     TC.LoadDependencies tempFolder #.TEMP
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~∧/∨/¨'The build list in' 'refers to packages that are not installed:'⍷¨⊂qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempFolder
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

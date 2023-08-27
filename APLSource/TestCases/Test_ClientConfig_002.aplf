@@ -3,23 +3,23 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- →T.PassesIf{998::1 ⋄ 0⊣⎕NEW TC.DefineRegistry(,⊂⍵)}⊂'Wrong depth'
- →T.PassesIf{998::1 ⋄ 0⊣⎕NEW TC.DefineRegistry(,⊂⍵)}⊂1 2 3
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣⎕NEW TC.DefineRegistry(,⊂⍵)}⊂'Wrong depth'
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣⎕NEW TC.DefineRegistry(,⊂⍵)}⊂1 2 3
  reg←⎕NEW TC.DefineRegistry(,⊂'https://foo.com')
  →T.PassesIf{2::1 ⋄ 0⊣reg.uri←⍵}'johndoe.org'
- →T.PassesIf{998::1 ⋄ 0⊣reg.alias←⍵}⊂'Wrong depth'
- →T.PassesIf{998::1 ⋄ 0⊣reg.alias←⍵}⊂1                   ⍝ Wrong data type
- →T.PassesIf{998::1 ⋄ 0⊣reg.api_key←⍵}⊂'foo'             ⍝ Wrong depth
- →T.PassesIf{998::1 ⋄ 0⊣reg.api_key←⍵}⊂1                 ⍝ Wrong data type
- →T.PassesIf{998::1 ⋄ 0⊣reg.port←⍵}⊂,1                   ⍝ Wrong dapth
- →T.PassesIf{998::1 ⋄ 0⊣reg.port←⍵}1 2                   ⍝ Wrong length
- →T.PassesIf{998::1 ⋄ 0⊣reg.port←⍵}¯1                    ⍝ Wrong value
- →T.PassesIf{998::1 ⋄ 0⊣reg.port←⍵}70000                 ⍝ Wrong value
- →T.PassesIf{998::1 ⋄ 0⊣reg.port←⍵}⊂'foo'                ⍝ Wrong data type
- →T.PassesIf{998::1 ⋄ 0⊣reg.priority←⍵}⊂'foo'            ⍝ Wrong data type
- →T.PassesIf{998::1 ⋄ 0⊣reg.priority←⍵}⎕NULL             ⍝ Wrong data type
- →T.PassesIf{998::1 ⋄ 0⊣reg.priority←⍵}¯1                ⍝ Invalid domain
- →T.PassesIf{998::1 ⋄ 0⊣reg.priority←⍵}32768             ⍝ Invalid domain
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.alias←⍵}⊂'Wrong depth'
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.alias←⍵}⊂1                   ⍝ Wrong data type
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.api_key←⍵}⊂'foo'             ⍝ Wrong depth
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.api_key←⍵}⊂1                 ⍝ Wrong data type
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.port←⍵}⊂,1                   ⍝ Wrong dapth
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.port←⍵}1 2                   ⍝ Wrong length
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.port←⍵}¯1                    ⍝ Wrong value
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.port←⍵}70000                 ⍝ Wrong value
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.port←⍵}⊂'foo'                ⍝ Wrong data type
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.priority←⍵}⊂'foo'            ⍝ Wrong data type
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.priority←⍵}⎕NULL             ⍝ Wrong data type
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.priority←⍵}¯1                ⍝ Invalid domain
+ →T.PassesIf{##.Registry.ErrorNo::1 ⋄ 0⊣reg.priority←⍵}32768             ⍝ Invalid domain
 
  r←T._OK
 ⍝Done

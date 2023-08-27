@@ -1,12 +1,14 @@
- response←CreateDocumentationIndex request;html;specialMsg;html2;h2;offset;length;sf;options;html3
+  response←CreateDocumentationIndex request;html;specialMsg;html2;offset;length;sf;options;html3;filename;h1;h2
 ⍝
  html←HtmlHeader''
- html2←⊃F.NGET(StaticFolder,'docs/_ReadMe.html')1
- h2←{row←1⍳⍨∨/¨'<h2 '∘⍷¨⍵ ⋄ row⊃⍵}html2
+ filename←StaticFolder,'docs/_ReadMe.html'
+ html2←⊃F.NGET filename 1
+ h1←{row←1⍳⍨∨/¨'<h1 '∘⍷¨⍵ ⋄ row⊃⍵}html2
  offset←¯1+{1⍳⍨∨/¨'<div class="h_tag">'∘⍷¨⍵}html2
  length←{1⍳⍨∨/¨'</div>'∘⍷¨⍵}offset↓html2
  html2←(length+offset)↓html2
  html2←(¯1+html2⍳⊂'</body>')↑html2
+ h2←'<h2',(3↓¯3↓h1),'h2>'
  html2←1↓⊃,/(⎕UCS 13),¨(⊂h2),(AddSpecialMessage ⍬),html2
  sf←'<div[^>]*>\r<a[^>]*>\r(<h3[^>]*>[^<]*<\/h3>)\r</a>\r</div>'  ⍝ sf = search for
  options←('Greedy' 0)('Mode' 'D')('DotAll' 1)

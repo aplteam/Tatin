@@ -1,0 +1,947 @@
+:Class FilesAndDirs
+⍝ ## Overview
+⍝ This class offers methods useful for dealing with files and directories. The class aims
+⍝ to be platform-independent and works under Windows, Linux and Mac OS.\\
+⍝ Note that error codes as well as messages may differ between operating systems for the same
+⍝ kind of problem.\\
+⍝ ## Characters to avoid in file names and paths
+⍝ Windows filenames cannot include any of these characters: `\/:*?"<>|`.
+⍝ If you want platform-independent code now or in the future,
+⍝ avoid using them even in Mac OS or Linux filenames.\\
+⍝ ## Separators in filepaths
+⍝ Dyalog tried to ease the pain by converting any `\` character under Windows to a `/`.
+⍝ The notion of sticking always with the `/` as separator because it works anyway is
+⍝ attractive but creates new poblems: when you call third-party software such as a .NET
+⍝ assembly or an EXE such as 7zip.exe under Windows, then you **must** use `\` as a separator.
+⍝ Even setting the `Directory` property of a `FileBox` object fails with `/` as a separator.\\
+⍝ For platform independence it is essential that filenames and directory names are _normalized_.
+⍝ That means using the correct separator for the current operating system.
+⍝ Otherwise you might create a directory or file with a backslash in its name, something that
+⍝ turns easily catastrophic under Linux or Mac OS.\\
+⍝ The methods of `FilesAndDirs` protect you from this problem by normalizing their filepaths.
+⍝ Use cover functions such as `MkDir`, `NNAMES` and `NCREATE` etc. in preference to the
+⍝ corresponding built-in system functions to overcome the problem.\\
+⍝ `⎕NCOPY` and `⎕NMOVE` (introduced in 17.0) are exceptions: because these allow setting options
+⍝ with the `⍠` operator cover functions would have to invent a complex syntax in order to mimic
+⍝ this, so instead we suggest to use the native system functions and massage the paths with
+⍝ `ExpandPath` befor passing them on.
+⍝ The `CurrentSep` method returns the correct separator for the current operating system.\\
+⍝ The `NormalizePath` method normalizes a filepath for the current operating system.\\
+⍝ If you have a particular reason for using `/` under Windows or `\` under Linux
+⍝ or Mac OS then you can use the methods `EnforceBackslash` or `EnforceSlash`.\\
+⍝ ## Misc
+⍝ This class supports Windows, Mac OS and Linux but neither the Raspberry Pi nor AIX.\\
+⍝ Kai Jaeger ⋄ APL Team Ltd\\
+⍝ Homepage: <http://github.com/aplteam/FilesAndDirs>
+
+    ⎕IO←0 ⋄ ⎕ML←1
+
+    ∇ r←Version
+      :Access Public shared
+      r←'FilesAndDirs' '5.0.0.94' '2020-12-20'
+    ∇
+
+
+    ∇ History
+      :Access Public shared
+      ⍝ * 5.0.0 ⋄ 2020-12-20
+      ⍝   * BREAKING CHANGE: `CopyTo` and `MoveTo` as well as `CopyTree` and `MoveTree` and also `CreateFile`
+      ⍝     were removed from `FilesAndDirs`. Reason is that the system functions `⎕NCOPY` and `⎕NMOVE`
+      ⍝     can be used for this now.
+      ⍝   * Both `NPUT` and `NGET` now try to overcome a FILE ACCESS error twice before giving up.
+      ⍝   * `DeleteFile` tries to overcome such problems in a similar fashion.
+      ⍝   * `RmDir` now uses `⎕NDELETE` internally with the benefit of being resilient when somebody
+      ⍝     is looking into a folder that is about to be deleted.
+      ⍝   * Internal change: calls to `APLTreeUtils.Lowercase` were removed by calls to `⎕C`
+      ⍝\\
+      ⍝ For information regarding older version see <https://github.com/aplteam/FilesAndDirs/releases>
+    ∇
+
+    ∇ r←{parms_}Dir path;buff;list;more;parms;rc;extension;filename;folder;subFolders;pattern;isSelfCall
+      :Access Public Shared
+    ⍝ By default this function returns names. You may request further information by specifying `type`.\\
+    ⍝ Without a trailing slash and any wildcards `path` is expected to be either a filename or the
+    ⍝ name of a directory. `Dir` returns the requested information for just that file or directory.
+    ⍝ If the last characer of `path` is a separator then `Dir` returns the requested information for
+    ⍝ whatever `path` contains.\\
+    ⍝ If the last partition of `path` contains wildcards then `Dir` returns
+    ⍝ the requested information for zero, one or many hits.\\
+    ⍝ `path` might be empty; in this case it defaults to the current directory.\\
+    ⍝ Note that `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs`
+    ⍝ cannot deal with files that contain a `*` or a `?` as part of any name, be it directory
+    ⍝ or filename; under Linux and Mac OS these are legal characters for filenames. Only the very last
+    ⍝ partition of `path` is allowed to carry wildcard characters.\\
+    ⍝ The result is a vector of the same length as `type`. `type` defaults to 0 which stands for file-
+    ⍝ and directory names.\\
+    ⍝ You may specify additional attributes via the `type` parameter either as key/value pairs or
+    ⍝ via a namespace populated with variables. If you do then the number of attributes specified
+    ⍝ defines the length of the result.
+    ⍝ Examples:
+    ⍝ ~~~
+    ⍝ ('recursive' 1) FilesAndDirs.Dir ''      ⍝ returns list with directories & files in the current dir.
+    ⍝ ('recursive' 1) FilesAndDirs.Dir '*.md'  ⍝ returns list with files with extension "md".
+    ⍝ ~~~
+    ⍝
+    ⍝ ~~~
+    ⍝ parms←⎕ns''
+    ⍝ parms.recursive←1
+    ⍝ parms.type←3 4 5 1 0
+    ⍝ parms FilesAndDirs.Dir ''
+    ⍝ ~~~
+    ⍝ Note that the names of parameters are case sensitive.\\
+    ⍝ |Parameter  |Default|Meaning|
+    ⍝ |-----------|-------|-------|
+    ⍝ | depth     | ⍬     | Ignored when `recursive` is 0.<<br>>Use this to restrict the number of times `Dir` goes down the directory tree.<<br>>For example, set this to 2 if you are interested just in the given directory and its sub-directories.|
+    ⍝ | follow    | 0     | 1=follow symbolic links   |
+    ⍝ | recursive | 0     | 1=scan `path` recursively |
+    ⍝ | type      | 0     | Use this to select the information to be returned by `Dir`.<<br>>0 means names. For more information see help on `⎕NINFO`. |
+    ⍝ Note that `selfCall` is used internally in order to detect whether `Dir` has called itself recursively.
+      r←⍬
+      path←NormalizePath path
+      parms←⎕NS''
+      parms.follow←1
+      parms.recursive←0
+      parms.depth←⍬
+      parms.type←0
+      parms.selfCall←0
+      :If 0<⎕NC'parms_'
+          :If {2::0 ⋄ 1⊣⍵.⎕NL 2}parms_
+              {}parms.{{⍎⍺,'←⍵'}/⍵}¨parms_.({⍵(⍎⍵)}¨↓⎕NL 2)
+              'Invalid parameter'⎕SIGNAL 11/⍨∨/~(' '~¨⍨↓parms.⎕NL 2)∊'follow' 'recursive' 'type' 'selfCall' 'depth'
+          :Else
+              parms_←,⊂∘,⍣(2=|≡parms_)⊣parms_
+              'Invalid parameter'⎕SIGNAL 11/⍨0∊(⊃¨parms_)∊(' '~¨⍨↓parms.⎕NL 2),⊂'selfCall'
+              parms.{{⍎⍺,'←⍵'}/⍵}¨parms_
+          :EndIf
+      :EndIf
+      :If 0=≢path
+          path←PWD,CurrentSep
+      :EndIf
+      path↓⍨←-(CurrentSep,'*')≡¯2↑path
+      :If CurrentSep=¯1↑{⍵↓⍨-'*'=¯1↑⍵}path
+          'Directory does not exist'⎕SIGNAL 6/⍨0=⎕NEXISTS path
+          :If 'Win'≢##.APLTreeUtils2.GetOperatingSystem ⍬
+          :OrIf ~{(':'=0⊃⍵)∧CurrentSep=1⊃⍵}¯2↑path
+              :Trap 19 22
+                  'Not a directory'⎕SIGNAL 11/⍨1≠1 ⎕NINFO⊣path
+              :Else
+                  :If 1 5 'Access is denied.'≢⎕DMX.OSError
+                      ({1↓⊃,/(⎕UCS 13),¨⍵}⎕DMX.DM)⎕SIGNAL ⎕EN
+                  :Else
+                      :Return
+                  :EndIf
+              :EndTrap
+          :EndIf
+          :Trap 10 19 22
+              r←(0 1,parms.type~0 1)⎕NINFO⍠('Follow'parms.follow)('Wildcard' 1)⊣path,'*'
+          :Else
+              r←⍬  ⍝ Apparently we do not have the rights to read the directory, therefore we ignore it
+              :Return
+          :EndTrap
+          :If ~0∊0⊃r
+              (0⊃r)←NormalizePath 0⊃r
+          :EndIf
+          :If parms.recursive
+              parms.depth-←1
+          :AndIf 0≠≢r
+          :AndIf 1∊1⊃r
+          :AndIf (0=≢parms.depth)∨1↑0<parms.depth
+              buff←parms∘Dir¨((1=1⊃r)/0⊃r),¨CurrentSep
+              :If 0≠≢buff←(0<≢¨buff)/buff
+                  r←r,¨⊃,¨/buff
+              :EndIf
+              :If 1=+/∧\'Dir'∘≡¨⎕SI
+                  r←(⊂⍋↑0⊃r)∘⌷¨r
+              :EndIf
+          :EndIf
+          :If 1=+/∧\'Dir'∘≡¨⎕SI
+              r←r[,(0 1,parms.type~0 1)⍳parms.type]
+          :EndIf
+      :Else
+          :If ∨/'*?'∊path
+              (folder filename extension)←⎕NPARTS path
+              ('Wildcard characters are allowed only after the last "',CurrentSep,'"')⎕SIGNAL 11/⍨∨/'*?'∊folder
+              :If 0≠≢buff←⊃⎕NPARTS ¯1↓⊃⎕NPARTS folder
+              :AndIf 0=⎕NEXISTS buff
+                  'path does not exist'⎕SIGNAL 6
+              :EndIf
+              pattern←(folder,(0≠≢folder)/'/'),(filename{0=≢⍺,⍵:'' ⋄ ⍺,⍵}extension)
+              buff←(0 1,parms.type~0 1)⎕NINFO⍠('Follow'parms.follow)('Wildcard' 1)⊣pattern
+              buff←((1⊃buff)∊1 2 4)∘/¨buff   ⍝ Ordinary files, directories and links
+              (0⊃buff)←NormalizePath 0⊃buff
+              r←buff[,(0 1,parms.type~0 1)⍳parms.type]
+              isSelfCall←parms.selfCall
+              parms.selfCall←1
+              :If parms.recursive
+              :AndIf IsDir folder
+              :AndIf 0≠≢subFolders←ListDirs folder
+                  buff←parms Dir¨subFolders,¨⊂CurrentSep,filename,extension
+                  :If 0=+/'*?'∊path
+                      buff←(⊂∘⊂¨subFolders),¨¨buff
+                  :EndIf
+                  :If 0≠≢buff←⊃{⍺,¨⍵}/buff
+                  :AndIf 0≠≢buff←(0<≢¨buff)/buff
+                      r←r,¨buff
+                  :EndIf
+              :EndIf
+              :If 0=isSelfCall
+              :AndIf 0=≢(filename,extension)~'*'
+                  buff←(0 1,parms.type~0 1)⎕NINFO⍠('Follow'parms.follow)⊣folder
+                  (0⊃buff)←NormalizePath 0⊃buff
+                  r←(⊂¨buff),¨r
+              :EndIf
+          :Else
+              'path does not exist'⎕SIGNAL 6/⍨0=⎕NEXISTS path
+              r←(0 1,parms.type~0 1)⎕NINFO⍠('Follow'parms.follow)⊣path
+              (0⊃r)←NormalizePath 0⊃r
+              r←,⊂r[,(0 1,parms.type~0 1)⍳parms.type]
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {r}←data NPUT y;filename;flags;data;counter;success;qdmx
+      :Access Public Shared
+    ⍝ The purpose of this function is to cover `⎕NPUT` and make sure that the filename is normalized.\\
+    ⍝ In addition the function tries to overcome FILE ACCESS ERRROs twice. They are pretty common these days with
+    ⍝ tools like DropBox etc.\\
+    ⍝ The left as well as the right argument must be the same as for a call to the native `⎕NPUT`.
+      :If (≡y)∊0 1
+          filename←FilesAndDirs.NormalizePath y
+          flags←¯1
+      :Else
+          (filename flags)←y
+          filename←FilesAndDirs.NormalizePath filename
+      :EndIf
+      success←counter←0
+      :Repeat
+          :Trap 19
+              :If flags≡¯1
+                  r←data ⎕NPUT filename
+              :Else
+                  r←data ⎕NPUT filename flags
+              :EndIf
+              success←1
+          :Else
+              :If 4>counter←counter+1
+                  ⎕DL 0.1×counter
+              :Else
+                  qdmx←⎕DMX
+                  (1↓⊃,/(⎕UCS 13),¨qdmx.DM)⎕SIGNAL qdmx.EN
+              :EndIf
+          :EndTrap
+      :Until success
+    ∇
+
+    ∇ r←{encoding}NGET x;flag;filename;counter;success;qdmx
+      :Access Public Shared
+    ⍝ The purpose of this function is to cover `⎕NGET` and make sure that the filename is normalized.
+      :If 326=⎕DR x
+          (filename flag)←x
+          filename←FilesAndDirs.NormalizePath filename
+      :Else
+          filename←FilesAndDirs.NormalizePath x
+          flag←0
+      :EndIf
+      success←counter←0
+      :Repeat
+          :Trap 19
+              :If 0=⎕NC'encoding'
+                  r←⎕NGET filename flag
+              :Else
+                  r←encoding ⎕NGET filename flag
+              :EndIf
+              success←1
+          :Else
+              :If 4>counter←counter+1
+                  ⎕DL 0.1×counter
+              :Else
+                  qdmx←⎕DMX
+                  (1↓⊃,/(⎕UCS 13),¨qdmx.DM)⎕SIGNAL qdmx.EN
+              :EndIf
+          :EndTrap
+      :Until success
+    ∇
+
+    ∇ r←CurrentSep
+    ⍝ Returns what is the "correct" filename separator under the current OS.
+      :Access Public Shared
+      r←('Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬)⊃'/\'
+    ∇
+
+    ∇ {(rc en more)}←{mustBeEmpty}RmDir path;list;bool;flags;flag;counter;qdmx
+      :Access Public Shared
+      ⍝ Tries to remove `path`.\\
+      ⍝ The method attempts to remove `path` and, by default, **all its contents**.\\
+      ⍝ If for some reason you want to make sure that `path` is only removed when empty you can
+      ⍝ specify a 1 as left argument. In that case the method will not do anything if the directory
+      ⍝ `path` is not empty.\\
+      ⍝ However, the method may still be partly successful because it might have deleted files
+      ⍝ in `path` before it actually fails to remove the directory `path` itself.\\
+      ⍝ The result is a three-element vector:
+      ⍝ 1. `rc`: return code with 0 for "okay" (=deleted) and 1 otherwise.
+      ⍝ 1. `en`: event number (`⎕EN`) in case of an error.
+      ⍝ 1. `more`: empty text vector in case `rc` is 0 and possible additional information otherwise.\\
+      ⍝ Notes:
+      ⍝ * If `path` does not exist `(0 0 'Directory does not exist')` is returned.
+      ⍝ * If `path` exists but is not a directory `(1 6 'Not a directory')` is returned.
+      ⍝ * Wildcard characters (`*` and `?`) are not allowed as part of `path`.
+      ⍝   If such characters are specified anyway then an error is signalled.\\
+      ⍝   This is true even under Linux and Mac OS despite the fact that these characters are legal in
+      ⍝   the names of any files and directories.
+      ⍝ * If `path` is a nested vector `RmDir` calls itself recurively. The length of `rc` and `en` and `more`
+      ⍝   match `≢path` in this case.
+      mustBeEmpty←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'mustBeEmpty'
+      'Invalid left argument.'⎕SIGNAL 11/⍨~(⊂mustBeEmpty)∊0 1
+      rc←0 ⋄ en←0 ⋄ more←''
+      'Wildcard characters are not allowed'⎕SIGNAL 11/⍨∨/'*?'∊path
+      :If 2=|≡path
+          (rc en more)←↓⍉↑mustBeEmpty RmDir¨path
+      :Else
+          path←NormalizePath path
+          :If ⎕NEXISTS path
+              :If IsDir path
+                  flags←1+2×~mustBeEmpty
+                  counter←flag←0
+                  :Repeat
+                      :Trap 19 22
+                          flags ⎕NDELETE path
+                          flag←1
+                      :Else
+                          :If 4>counter←counter+1
+                              ⎕DL 0.1×counter
+                          :Else
+                              qdmx←⎕DMX
+                              en←qdmx.EN
+                              more←qdmx.EM
+                              flag←rc←1
+                          :EndIf
+                      :EndTrap
+                  :Until flag
+              :Else
+                  more←'Not a directory'
+                  rc←1
+                  en←6
+              :EndIf
+          :Else
+              more←'Directory does not exist'
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←PWD
+      :Access Public Shared
+      ⍝ Print Work Directory; same as `Cd''`.
+      r←⊃1 ⎕NPARTS''
+      r↓⍨←-(¯1↑r)∊'/\'
+      r←NormalizePath r
+    ∇
+
+    ∇ r←ExpandPath path
+    ⍝ Shortcut for  `'expand' NormalizePath` - see there.
+      :Access Public Shared
+      r←1 NormalizePath path
+    ∇
+
+    ∇ path←{expandFlag}NormalizePath path;UNCflag;sep;ExpandEnvironmentStrings;isScalar
+      :Access Public Shared
+      ⍝ `path` might be either a simple text vector or scalar representing a single filename or a
+      ⍝ vector of text vectors with each item representing a single filename.
+      ⍝ Enforces either `\` or `/` as separator in `path` depending on the current operating system.\\
+      ⍝ If you need a particular separator no matter what the current OS is then use either
+      ⍝ `EnforceBackslash` or `EnforceSlash`.\\
+      ⍝ Note that by default a relative path remains relative and any `../` (or `..\`) is not touched.
+      ⍝ You can change this by specifying `'expand'` as the (optional) left argument; then `path` is
+      ⍝ expanded to an absolute path. As a side effect any `../` is transformed appropriately as well.\\
+      ⍝ Notes:
+      ⍝ * The left argument is not case sensitive.
+      ⍝ * Any pair of `//` or `\\` is reduced to a single one except the first two.
+      ⍝ * Environment variables are expanded.
+      isScalar←⍬≡⍴path
+      :If 0≠≢path
+          :If '%'∊path
+          :AndIf 'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
+              'ExpandEnvironmentStrings'⎕NA'I4 KERNEL32.C32|ExpandEnvironmentStrings* <0T >0T I4'
+              path←1⊃ExpandEnvironmentStrings path 2048 2048
+          :EndIf
+          expandFlag←{0<⎕NC ⍵:{0=1↑0⍴⍵:⍵ ⋄ 'expand'≡⎕C ⍵}w←⍎⍵ ⋄ 0}'expandFlag'
+          :If 1<≡path
+              path←expandFlag NormalizePath¨path
+          :Else
+              UNCflag←(⊂2⍴path)∊'\\' '//'
+              :If expandFlag
+                  path←⊃,/1 ⎕NPARTS path
+              :EndIf
+              sep←('Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬)⌽'\/'
+              ((path=0⊃sep)/path)←1⊃sep
+              path←(~(2⍴1⊃sep)⍷path)/path
+              :If UNCflag
+                  path←'\\',1↓path
+              :EndIf
+              :If isScalar
+              :AndIf 1=≢path
+                  path←⊃path
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ path←EnforceBackslash path
+      :Access Public Shared
+    ⍝ Use this if you must make sure that `path` contains `\` rather than `/`.\\
+      ((path='/')/path)←'\'
+    ∇
+
+    ∇ path←EnforceSlash path
+      :Access Public Shared
+    ⍝ Use this if you must make sure that `path` contains `/` rather than `\`.\\
+    ⍝ Preserves the first two characters if they are `\\`.
+      ((path='\')/path)←'/'
+    ∇
+
+    ∇ {r}←PolishCurrentDir;wsid
+      :Access Public Shared
+    ⍝ If `⎕WSID` is relative this function does nothing.\\
+    ⍝ Otherwise the current directory is changed so that it becomes the path part of `⎕WSID`.\\
+    ⍝ Returns either `''` or the old directory in case of a change.
+      r←''
+      wsid←NormalizePath ⎕WSID
+      :If ('.',CurrentSep)≢2⍴⎕WSID,' '
+      :AndIf CurrentSep∊wsid
+          r←NormalizePath Cd 0⊃##.APLTreeUtils2.SplitPath wsid
+      :EndIf
+    ∇
+
+    ∇ r←Cd path;Lin;r;rc;∆GetCurrentDirectory;∆SetCurrentDirectory;∆chdir
+    ⍝ Reports and/or changes the current directory.
+    ⍝ The method changes the current directory to what is passed as the right argument.\\
+    ⍝ It returns the former current directory as a result.\\
+    ⍝ Because an empty right argument has no effect, `Cd ''` effectively reports the
+    ⍝ current directory. See also [`PWD`](#) (Print Work Directory).
+      :Access Public Shared
+      path←NormalizePath path
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
+      :Case 'Win'
+          '∆GetCurrentDirectory'⎕NA'I4 KERNEL32.C32|GetCurrentDirectory* I4 >T[]'
+          '∆SetCurrentDirectory'⎕NA'I4 KERNEL32.C32|SetCurrentDirectory* <0T'
+          :If 0=⊃rc←∆GetCurrentDirectory 260 260
+              r←GetLastError'GetCurrentDirectory error' ''
+          :Else
+              r←NormalizePath⊃↑/rc
+          :EndIf
+          :If 0≠≢path←path~'"'
+          :AndIf ' '=1↑0⍴path
+              path,←(CurrentSep≠¯1↑path)/CurrentSep
+              :If ~∆SetCurrentDirectory⊂path
+                  11 ⎕SIGNAL⍨↑{⍵,'; rc=',⍕⍺}/GetLastError'SetCurrentDirectory error'
+              :EndIf
+          :EndIf
+      :CaseList 'Lin' 'Mac'
+          path←NormalizePath path
+          :If 0=≢path
+              r←⊃⎕SH'pwd'
+          :Else
+              '∆chdir'⎕NA'I ',##.OS.GetSharedLib,'| chdir <0T1[]'
+              r←∆chdir⊂path
+          :EndIf
+      :Else
+          .  ⍝ Huuh?!
+      :EndSelect
+    ∇
+
+    ∇ path←GetTempPath;∆GetTempPath
+    ⍝ Returns the path to the temp directory on the current system.
+      :Access Public Shared
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
+      :Case 'Win'
+          '∆GetTempPath'⎕NA'I4 KERNEL32.C32|GetTempPath* I4 >T[]'
+          path←⊃↑/∆GetTempPath 1024 1024
+          :If 0=≢path
+              11 ⎕SIGNAL⍨'Problem getting Windows temp path!; rc=',⍕GetLastError
+          :Else
+              path←NormalizePath path
+          :EndIf
+      :Case 'Lin'
+          path←'/tmp/'
+      :Case 'Mac'
+          path←'/private/tmp/'
+      :Else
+          .⍝ Huuh?!
+      :EndSelect
+    ∇
+
+    ∇ r←IsDir path
+      :Access Public Shared
+    ⍝ Returns 1 if `path` is a directory and 0 otherwise, even if `path` does exist as a file.\\
+    ⍝ Notes:
+    ⍝ * If `path` is a directory the current user has no "read" access to then it returns 0!
+    ⍝ * `C:\` is considered a directory, though strictly speaking it is not.
+      :If 2=≡path
+          r←IsDir¨path
+      :Else
+          path←NormalizePath path
+          :Trap 11
+              :If r←⎕NEXISTS path
+                  :If 'Win'≢##.APLTreeUtils2.GetOperatingSystem ⍬
+                  :OrIf ~{(':'=0⊃⍵)∧CurrentSep=1⊃⍵}¯2↑path
+                      :Trap 22
+                          :If 0<1594
+                      ⍝ Right now, without ('Wildcard' 1), it generates a FILENAME ERROR when the user has not read access
+                      ⍝ See bug report <01594>
+                      ⍝ The `⊃⊃` as well as the `(-'/\'∊⍨¯1↑path)↓` are only needed with ('Wildcard' 1)
+                              :If ('.',CurrentSep)≡2↑path
+                                  r←{⊃⊃1=1 ⎕NINFO⍠('Wildcard' 1)⊣(-'/\'∊⍨¯1↑⍵)↓⍵}'expand'NormalizePath path
+                              :Else
+                                  r←{⊃⊃1=1 ⎕NINFO⍠('Wildcard' 1)⊣(-'/\'∊⍨¯1↑⍵)↓⍵}path
+                              :EndIf
+                          :Else
+                              r←1=1 ⎕NINFO path
+                          :EndIf
+                      :Else
+                          r←0
+                      :EndTrap
+                  :EndIf
+              :EndIf
+          :Else
+              r←0
+          :EndTrap
+      :EndIf
+    ∇
+
+    ∇ r←IsFile y
+      :Access Public Shared
+    ⍝ Returns 1 if `filename` is a regular file and a 0 otherwise, even if `y` does exist as a directory.\\
+    ⍝ `y` must be either a text vector or a (negative!) tie number of a native file.
+    ⍝ If it is a number but not a tie number then an error is signalled.
+      :If 2=≡y
+          r←IsFile¨y
+      :Else
+          :If 0=1↑0⍴y
+              'Not tied'⎕SIGNAL 18/⍨~y∊⎕NNUMS
+              r←2=1 ⎕NINFO y
+          :Else
+              y←NormalizePath y
+              :Trap 11
+                  :If r←⎕NEXISTS y
+                      r←2=1 ⎕NINFO y
+                  :Else
+                      r←0
+                  :EndIf
+              :Else
+                  r←0
+              :EndTrap
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ r←IsSymbolicLink y
+      :Access Public Shared
+    ⍝ Returns a 1 if `y` is a symbolic link and a 0 otherwise, even if `y` does exist as a file or directory.\\
+    ⍝ `y` must be a text vector.
+      :If 2=≡y
+          r←IsSymbolicLink¨y
+      :Else
+          'Invalid right argument'⎕SIGNAL 11/⍨' '≠1↑0⍴y
+          y←NormalizePath y
+          :Trap 19 22
+              r←4=1 ⎕NINFO⍠('Follow' 0)⊣y
+          :Else
+              r←0
+          :EndTrap
+      :EndIf
+    ∇
+
+    ∇ {success}←{new}CheckPath path;newFlag
+      :Access Public Shared
+    ⍝ Returns a 1 if the `path` to be checked is fine, otherwise 0.\\
+    ⍝ If `path` is nested it will return a vector of the same length as `path`
+    ⍝ * If `path` exists but is not a directory a 0 is returned.\\
+    ⍝ * If `path` does not exist a 0 is returned.\\
+    ⍝ * If `path` does not exist but the left argument is "CREATE!" it will be created,
+    ⍝ including any sub directories.\\
+    ⍝ The left argument is case insensitive.
+      :If 2=|≡path
+          :If 0=⎕NC'new'
+              success←CheckPath¨path
+          :Else
+              success←new∘CheckPath¨path
+          :EndIf
+      :Else
+          path←NormalizePath path
+          :If 1=⎕NEXISTS path
+              success←IsDir path
+          :Else
+              success←0
+              newFlag←'CREATE!' 1∊⍨⊂{6::0 ⋄ {(0=1↑0⍴⍵):⍵ ⋄ 1 ⎕C ⍵}⍎⍵}'new'
+              :If newFlag
+                  success←MkDir path
+              :EndIf
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ filename←{prefixString}GetTempFilename path;rc;start;no;fno
+    ⍝ Returns the name of an unused temporary filename. If `path` is empty the default temp
+    ⍝ path is taken; that's what `GetTempPath` would return. This means you can overwrite
+    ⍝ this by specifying a path.\\
+    ⍝ `prefixString`, if defined, is a leading string of the filename
+    ⍝ going to be generated. This is **not** the same as\\
+    ⍝ `'pref',GetTempFileName ''`\\
+    ⍝ because specified as left argument it is taken into account
+    ⍝ when the uniqueness of the created filename is tested.\\
+    ⍝ See also `GetTempFilename2` which is recommended.\\
+    ⍝ This function does **not** use the Windows built-in function since
+    ⍝ it has proven to be unreliable under W7 (at least).
+      :Access Public Shared
+      prefixString←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'prefixString'
+      path←NormalizePath path
+      path,←((0≠≢path)∧CurrentSep≠¯1↑path)/CurrentSep
+      :If 0=≢path
+          :Trap 0
+              path←GetTempPath
+          :Else
+              11 ⎕SIGNAL⍨'Cannot get a temp path; rc=',⍕⎕EN
+          :EndTrap
+      :EndIf
+      :If 0=rc←'Create!'CheckPath path
+          11 ⎕SIGNAL⍨'Error during "Create <',path,'>"; rc=',⍕GetLastError
+      :Else
+          start←no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
+          ⍝ no←100⊥3↓⎕TS ⍝ Not reliable: can take a large number of tries before successful
+          :Repeat
+              filename←path,prefixString,(⎕AN,'_',⍕no),'.tmp'
+              :Trap 22
+                  fno←filename ⎕NCREATE 0
+                  ⎕NUNTIE fno
+              :Else
+                  fno←0
+              :EndTrap
+              no+←10
+          :Until (fno≠0)∨no>start+1000×10  ⍝ max 1000 tries
+          'Unable to create temporay file'⎕SIGNAL 11/⍨fno=0
+      :EndIf
+      filename←NormalizePath filename
+    ∇
+
+    ∇ filename←{extension}GetTempFilename2 prefixString;rc;start;no;fno;path
+    ⍝ Returns the name of a previously unused temporary filename. The file will be created.\\
+    ⍝ `prefixString`, when empty, defaults to `⎕AN`. The name of
+    ⍝ the file will match `prefixString` followed by an `_` and a randomly generated number.\\
+    ⍝ `extension`, if defined, defines the extension of the temp file without the dot.
+    ⍝ This defaults to `tmp`.\\
+    ⍝ This function does **not** use the Windows built-in function since
+    ⍝ it has proven to be unreliable under W7 (at least).
+      :Access Public Shared
+      extension←{0<⎕NC ⍵:⍎⍵ ⋄ 'tmp'}'extension'
+      extension←('.'=1⍴extension)↓extension
+      :If 0=≢prefixString
+          prefixString←⎕AN
+      :EndIf
+      path←GetTempPath
+      start←no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
+      ⍝ no←100⊥3↓⎕TS ⍝ Not reliable: can take a large number of tries before successful
+      :Repeat
+          filename←path,(prefixString,'_',⍕no),{0=≢⍵:⍵ ⋄ '.',⍵}extension
+          :Trap 22
+              fno←filename ⎕NCREATE 0
+              ⎕NUNTIE fno
+          :Else
+              fno←0
+          :EndTrap
+          no+←10
+      :Until (fno≠0)∨no>start+1000×10  ⍝ max 1000 tries
+      'Unable to create temporay file'⎕SIGNAL 11/⍨fno=0
+      filename←NormalizePath filename
+    ∇
+
+    ∇ dirname←GetTempSubDir prefixString;path;start;no;flag;success
+    ⍝ Returns name of previously unused sub directory in the `TEMP` directory with a random name.\\
+    ⍝ The directory will be created.
+    ⍝ `prefixString`, when empty, defaults to `⎕AN`. The name of the directory will
+    ⍝ match `prefixString` followed by an `_` and a randomly generated number.\\
+      :Access Public Shared
+      :If 0=≢prefixString
+          prefixString←⎕AN
+      :EndIf
+      path←GetTempPath
+      start←no←⍎{(,'ZI2,ZI2,ZI2'⎕FMT 3↑⍵),⍕3↓⍵}3↓⎕TS  ⍝ Expensive but successful very soon
+      ⍝ no←100⊥3↓⎕TS ⍝ Not reliable: can take a large number of tries before successful
+      success←flag←0
+      :Repeat
+          dirname←path,(prefixString,'_',⍕no)
+          :Trap 22
+              ⎕MKDIR dirname
+              flag←success←1
+          :Else
+              flag←1
+          :EndTrap
+          no+←10
+      :Until flag∨no>start+1000×10  ⍝ max 1000 tries
+      dirname←NormalizePath dirname
+      ('Unable to create "',dirname,'"')⎕SIGNAL 11/⍨~success
+    ∇
+
+    ∇ r←{x}ListDirs path;buff;recursiveFlag;part1;part2;recursive;depth
+      :Access Public Shared
+      ⍝ Lists all directories (but nothing else) in `path`.\\
+      ⍝ `path` must of course be a directory.\\
+      ⍝ Specify the string `recursive` (not case sensitive) as left argument to make the
+      ⍝ function work recursively.\\
+      ⍝ In addition to `recursive` you may also specify an integer defining the depth. For
+      ⍝ example, if you are interested just in the given directories and its sub-directory set this to 2.\\
+      ⍝ `path` might contain wildcard characters (`*` and `?`) nowhere but in the last part
+      ⍝ of the path and only if `recursive` is **not** specified as left argument. However,
+      ⍝ note that these are treated as wildcard characters only under Windows; under Linux and
+      ⍝ Mac OS they are both regular characters that might well be part of a name.\\
+      ⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.
+      x←{0<⎕NC ⍵:⍎⍵ ⋄ ''⍬}'x'
+      x←⊂∘,⍣((⊃' '=1↑0⍴↑x)∧1=≡x)⊣x
+      (recursive depth)←2↑x,(≢x)↓0 ⍬
+      depth-←1
+      path←NormalizePath path
+      (part1 part2)←##.APLTreeUtils2.SplitPath path
+      'Wildcard characters are allowed only in the last part of a path'⎕SIGNAL 11/⍨∨/'?*'∊part1
+      :If 'Win'≢##.APLTreeUtils2.GetOperatingSystem ⍬
+      :OrIf {(':'=0⊃⍵)∧(1⊃⍵)∊'\/'}¯2↑{⍵↓⍨-(¯1↑⍵)∊'/\'}path
+          'Right argument is not a directory'⎕SIGNAL 11/⍨0=IsDir{(a b)←##.APLTreeUtils2.SplitPath ⍵ ⋄ ~∨/'*?'∊b:⍵ ⋄ a}path
+      :EndIf
+      path↓⍨←-CurrentSep=¯1↑path
+      recursiveFlag←{0=⎕NC ⍵:0 ⋄ w←⍎⍵ ⋄ 0=1↑0⍴w:w ⋄ 'recursive'≡⎕C w}'recursive'
+      :If recursiveFlag
+      :AndIf ∨/'*?'∊path
+          '"path" must not carry wildcard chars in case "Recursive" is specified'⎕SIGNAL 11
+      :EndIf
+      path,←(~∨/'?*'∊path)/CurrentSep
+      :Trap 10 19 22
+          buff←(0 1)⎕NINFO⍠('Wildcard' 1)⊣path,'*'
+      :Else
+          r←''  ⍝ Apparently we do not have the rights to read the directory, therefore we ignore it
+          :Return
+      :EndTrap
+      r←(1=1⊃buff)/0⊃buff
+      :If 0≠≢r←NormalizePath r
+      :AndIf 1=recursiveFlag
+      :AndIf 0=+/'*?'∊path
+      :AndIf (0=≢depth)∨1↑0<depth
+      :AndIf 0≠≢buff←⊃,/(⊂recursiveFlag depth)ListDirs¨r,¨'/'
+          r,←buff
+      :EndIf
+    ∇
+
+    ∇ r←{x}ListFiles path;buff;recursiveFlag;part1;part2;recursive;depth
+      :Access Public Shared
+      ⍝ Lists all files (but nothing else) in `path`.\\
+      ⍝ `path` must of course be a directory.
+      ⍝ Specify the string "recursive" (not case sensitive) as left argument to make the
+      ⍝ function work recursively.\\
+      ⍝ In addition to "recursive" you may also specify an integer defining the depth. For
+      ⍝ example, if you are interested just in the content of the given directory and its sub-directories
+      ⍝ (but not any sub-sub directories!) then set this to 2.\\
+      ⍝ `path` might contain wildcard characters (`*` and `?`) but only in the last part
+      ⍝ of the path and only if "recursive" is **not** specified as left argument.\\
+      ⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.
+      x←{0<⎕NC ⍵:⍎⍵ ⋄ ''⍬}'x'
+      x←⊂∘,⍣((⊃' '=1↑0⍴↑x)∧1=≡x)⊣x
+      (recursive depth)←2↑x,(≢x)↓0 ⍬
+      path←NormalizePath path
+      (part1 part2)←##.APLTreeUtils2.SplitPath path
+      'Wildcard characters are allowed only in the last part of a path'⎕SIGNAL 11/⍨∨/'?*'∊part1
+      'Right argument is not a directory'⎕SIGNAL 11/⍨0=IsDir part1
+      path↓⍨←-CurrentSep=¯1↑path
+      recursiveFlag←'recursive'≡⎕C{0<⎕NC ⍵:⍎⍵ ⋄ ''}'recursive'
+      :If recursiveFlag
+      :AndIf ∨/'*?'∊path
+          '"path" must not carry wildcard chars in case "Recursive" is specified'⎕SIGNAL 11
+      :EndIf
+      path,←(~∨/'?*'∊path)/CurrentSep
+      :If 0=≢buff←('recursive'recursiveFlag)('type'(0 1))('depth'depth)Dir path
+          r←''
+      :Else
+          r←(2=1⊃buff)/0⊃buff
+          r←NormalizePath r
+      :EndIf
+    ∇
+
+    ∇ {success}←DeleteFile filenames;thisFile;flag;counter;i;depth
+      :Access Public Shared
+      ⍝ Attempts to delete one or more files. Returns 1 in case of success and 0 otherwise
+      ⍝ for each file in `filenames`.\\
+      ⍝ Retries up to three times for every single files in case of any error 19 or 22.\\
+      ⍝ This function does not care whether the file exists or not, although naturally
+      ⍝ `success` will be 0 for any non-existing file.\\
+      ⍝ `filenames` can be one of:
+      ⍝ * Text vector representing a single filename.
+      ⍝ * Vector of text vectors each representing a single file.\\
+      ⍝ In case `filenames` is empty a 0 is returned.\\
+      ⍝ Do not uses this function for removing directories: use `RmDir` instead.
+      :If 0=≢filenames
+          success←0
+      :Else
+          depth←≡filenames
+          filenames←,⊆filenames
+          filenames←NormalizePath filenames
+          success←(≢filenames)⍴0
+          :For i :In ⍳≢filenames
+              thisFile←i⊃filenames
+              :If ⎕NEXISTS thisFile
+                  flag←counter←0
+                  :Repeat
+                      :Trap 19 22
+                          1 ⎕NDELETE thisFile
+                          success[i]←flag←1
+                          flag←1
+                      :Else
+                          :If 4>counter←counter+1
+                              ⎕DL 0.1×counter
+                          :Else
+                              flag←1
+                          :EndIf
+                      :EndTrap
+                  :Until flag
+              :EndIf
+          :EndFor
+          :If 1≡depth
+              success←⊃success
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ {success}←MkDir path;counter;flag
+      :Access Public Shared
+      ⍝ Make directory. If the directory already exists no action is taken and a 1 returned.\\
+      ⍝ Any part of `path` which does not already exist will be created along the way.\\
+      ⍝ In comparison with `⎕MKDIR` there are some differences:
+      ⍝ * This method normalizes `path`.
+      ⍝ * Errors 19 & 22 are trapped. The function tries again 9 more times at most.
+      ⍝ * The function overcomes a strange problem: on some systems `⎕MKDIR` refuses to create
+      ⍝   the directory repeatedly unless the code is traced.\\
+      ⍝ In any other respect `MkDir` acts like `3 ⎕MKDIR`.\\
+      ⍝ `success` is 1 in case the directory was created successfully or already existed, otherwise 0.
+      ⍝ If `path` is nested then `success` will have the same length as `path`.
+      :If 2=|≡path
+          success←MkDir¨path
+      :Else
+          path←NormalizePath path
+          success←0
+          :If IsDir path
+              success←1
+          :Else
+              :Trap 19 22
+                  counter←flag←0
+                  ⍝ This loop tries to overcome the problem that on some machines ⎕MKDIR does not work
+                  ⍝ as expected. This cannot (!) be solved by a simple delay.
+                  ⍝ However, tracing as well as the loop do work.
+                  :Repeat
+                      :Trap 19 22
+                          success←3 ⎕MKDIR path
+                      :Else
+                          :Leave ⍝ Something went wrong, indicated by `success ←→ 0`
+                      :EndTrap
+                      flag←⎕NEXISTS path
+                      ⎕DL(~flag)×0.05×counter+1
+                  :Until flag∨10<counter←counter+1
+              :EndTrap
+          :EndIf
+      :EndIf
+    ∇
+
+    ∇ bool←Exists y
+      :Access Public Shared
+    ⍝ Same as `⎕NEXISTS` but `y` is normalized.\\
+    ⍝ Note that if `y` is a symbolic link that exists then a 1 will be returned, no matter
+    ⍝ whether the target the link is pointing to actually does exist or not.
+      y←NormalizePath y
+      :If 1<|≡y
+          bool←⎕NEXISTS¨y
+      :Else
+          bool←⎕NEXISTS y
+      :EndIf
+    ∇
+
+    ∇ newline←GetNewLineCharsFor os
+      :Access Public Shared
+      ⍝ Returns the proper `newline` character(s) for `os` or, if `os` is empty, for the current OS.
+      :If 0=≢os
+          os←##.APLTreeUtils2.GetOperatingSystem ⍬
+      :EndIf
+      '⍵ is not a supported Operating System'⎕SIGNAL 11/⍨~(⊂os)∊'Win' 'Lin' 'Mac'
+      newline←('Win' 'Lin' 'Mac'⍳⊂os)⊃(⎕UCS 13 10)(⎕UCS 10)(⎕UCS 10)
+    ∇
+
+    ∇ r←NNAMES
+    ⍝ Same as `⎕NNAMES` but...
+    ⍝ * returns a vector rather than a matrix.
+    ⍝ * normalizes all filenames
+      :Access Public Shared
+      r←NormalizePath{⍵↓⍨-+/∧\' '=⌽⍵}¨↓⎕NNAMES
+    ∇
+
+    ∇ r←filename NCREATE tieNo
+    ⍝ Same as `⎕NCREATE` but normalizes `filename`.
+      :Access Public Shared
+      r←(NormalizePath filename)⎕NCREATE tieNo
+    ∇
+
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝ Private stuff
+
+    ∇ r←GetLastError;∆GetLastError
+      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
+      :Case 'Win'
+          '∆GetLastError'⎕NA'I4 kernel32.C32|GetLastError'
+          r←∆GetLastError
+      :CaseList 'Lin' 'Mac'
+          r←⎕SH'$errno'   ⍝TODO⍝
+      :Else
+          .  ⍝ Huuh?!
+      :EndSelect
+    ∇
+
+    ∇ (drive path)←HandlePath path
+      path←NormalizePath⊃,/1 ⎕NPARTS path
+      drive←''
+      :If '\\'≢2↑path
+          :If ~':'∊path
+              path←PWD,path
+          :EndIf
+          :If ':'∊path
+              drive←1↑path
+          :EndIf
+      :EndIf
+    ∇
+
+    EncodeBlanks←{0=+/b←' '=w←⍵:w ⋄ (b/w)←⊂'\ '⋄ ⊃,/w}
+
+    ∇ r←GetMsgFromError mid;FORMAT_MESSAGE_IGNORE_INSERTS;FORMAT_MESSAGE_FROM_SYSTEM;FormatMsg;mid;size;LangID;LoadLibrary;this;FORMAT_MESSAGE_FROM_HMODULE;hModule;FreeLibrary;ind;multiByte
+    ⍝ Translate Message ID (mid) to something more useful for human beings.
+      FORMAT_MESSAGE_IGNORE_INSERTS←512
+      FORMAT_MESSAGE_FROM_HMODULE←2048
+      FORMAT_MESSAGE_FROM_SYSTEM←4096
+      LangID←0
+      'FormatMsg'⎕NA'I KERNEL32|FormatMessage* I4 I4 I4 I4 >T[] I4 I4'
+      :If 0>mid←⊃mid
+      :AndIf ¯16777216≤mid
+          mid←-mid
+      :EndIf
+      multiByte←80=⎕DR' '                  ⍝ Flag: is Unicode
+      size←1024×1+multiByte                ⍝ Dynamic buffer size
+      r←↑⊃/FormatMsg(FORMAT_MESSAGE_FROM_SYSTEM+FORMAT_MESSAGE_IGNORE_INSERTS)0 mid LangID size size 0
+      :If 0=≢r
+          'LoadLibrary'⎕NA'I KERNEL32|LoadLibrary* <0T'
+          ⎕NA'I KERNEL32|FreeLibrary I'
+          :For this :In 'ADVAPI32' 'NETMSG' 'WININET' 'WSOCK32'
+              :If 0≠hModule←LoadLibrary(⊂this)
+                  :If this≡'WSOCK32'
+                      ind←10013 10014 10024 10035 10036 10037 10038 10039 10040 10041 10042 10043 10044 10046 10047 10048 10049 10050 10051 10052 10053 10054 10055 10056 10057 10058 10059 10060 10061 10063 10064 10065 10066 10067 10068 10069 10070 10071 10091 10092 10093 10112 11001 11002 11003 11004
+                      mid←(10060 10013 10023 10010 10011 10012 10026 10014 10015 10044 10036 10031 10030 10016 10029 10028 10122 10039 10046 10040 10038 10037 10127 10034 10035 10003 10047 10033 10135 10000 10042 10043 10017 10018 10019 10020 10021 10025 10001 10002 10148 10041 10005 10006 10007 10114,mid)[ind⍳mid]
+                  :EndIf
+                  r←↑⊃/FormatMsg(FORMAT_MESSAGE_FROM_HMODULE+FORMAT_MESSAGE_IGNORE_INSERTS)hModule mid LangID size size 0
+                  {}FreeLibrary hModule
+                  :If ×⊃⍴r
+                      :Leave
+                  :EndIf
+              :EndIf
+          :EndFor
+      :EndIf
+      r←¯2↓r
+    ∇
+
+:EndClass

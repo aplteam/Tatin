@@ -24,9 +24,9 @@
 
  installFolder←∆GetTempDir'/MyAppPackages'
  res←TC.InstallPackages('X@file://',zipfile)installFolder
- →T.GoToTidyUp(∊res)≢'X@',TC.GetPackageIDFromFilename zipfile
+ →T.GoToTidyUp(∊res)≢'X@',TC.GetPackageIDFrom zipfile
 
- expected←,⊂TC.GetPackageIDFromFilename⊃{⍺,'-',⍵}/cfg.(group name version)
+ expected←,⊂TC.GetPackageIDFrom⊃{⍺,'-',⍵}/cfg.(group name version)
  →T.GoToTidyUp~expected ∆LazyMatch(1+≢installFolder)↓¨F.ListDirs installFolder
  →T.GoToTidyUp~F.Exists installFolder,'/',TC.Reg.DependenciesFilename
 

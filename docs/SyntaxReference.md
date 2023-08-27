@@ -151,10 +151,13 @@ Returns a matrix with five columns:
 
 ### ClearCache
 ```
-(rc report)←ClearCache dummy
+(rc report)←ClearCache url
 ```
 
-Clears the cache, meaning that all subdirectories but `temp\` are removed from the folder `GetPathToPackageCache` points to.
+Clears the cache, which is the folder `GetPathToPackageCache` points to.
+
+* If `url` is empty all subdirectories but `temp\` are removed
+* If `url` is not empty then only the given domain is removed from the cache
 
 ### CreateReInstallParms
 
@@ -848,4 +851,5 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 

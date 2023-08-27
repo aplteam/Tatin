@@ -24,7 +24,7 @@
      :EndIf
      msg←'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),' ',(dry/'(dry)'),'...'
      p msg
-     :Trap 998
+     :Trap Reg.ErrorNo
          ref←noBetas InstallPackages(registry,pkg)tempDir
      :Else
          qdmx←⎕DMX
@@ -34,7 +34,7 @@
      refs,←⊆ref
  :EndFor
  :If dry
-     ⎕DL 0.02
+     ⎕DL 0.01
      F.RmDir tempDir
      1 PrintToSession'Dry run, no packages got installed'  ⍝ Ignore "quiet" here because otherwise "dry" makes no sense
  :Else

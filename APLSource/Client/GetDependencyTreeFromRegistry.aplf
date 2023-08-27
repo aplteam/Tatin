@@ -1,5 +1,5 @@
  {r}←principal GetDependencyTreeFromRegistry path;deps;dep;identifier;dep2;alias
-⍝ Reads the dependency file of `path` and process them.\\
+⍝ Reads the dependency files of packages in `path` and processes them.\\
 ⍝ Requires semi-global ∆TREE
  r←⍬
  path←Reg.AddSlash path
@@ -17,7 +17,7 @@
      :Else
          identifier←(Reg.RemoveOneLevel path),'/',dep2
      :EndIf
-     :If (⊂alias,GetPackageIDFromFilename identifier)∊GetPackageIDFromFilename¨∆TREE.{Data[;∆packageID]}⍬ ⍝ Avoid circular references
+     :If (⊂alias,GetPackageIDFrom identifier)∊GetPackageIDFrom¨∆TREE.{Data[;∆packageID]}⍬ ⍝ Avoid circular references
          :Continue
      :EndIf
      :If ~Reg.IsHTTP identifier

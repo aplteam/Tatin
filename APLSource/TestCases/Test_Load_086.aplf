@@ -1,0 +1,26 @@
+ r←Test_Load_086(stopFlag batchFlag);⎕TRAP;tempFolder;qdmx;expected
+⍝ Load dependencies were the dependency file and the build list contradict each other
+⍝ Note that in this particular test case the timestamp doesn't allow spotting the problem
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempFolder←(F.GetTempSubDir⊃⎕SI),'/'
+ tempFolder ⎕NCOPY⍠('Wildcard' 1)('PreserveAttributes' 1)⊣##.CiderConfig.HOME,'/TestData/InconsistentDefinitionFiles/*'
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ :Trap ##.Registry.ErrorNo
+     TC.LoadDependencies tempFolder #.TEMP
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     expected←'The build list in' 'refers to a package that is not installed:'
+     →T.GoToTidyUp~∧/∨/¨expected⍷¨⊂qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempFolder
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

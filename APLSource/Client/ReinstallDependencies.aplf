@@ -1,4 +1,4 @@
- {refs}←{parms}ReInstallDependencies y;installFolder;registry;deps;refs
+ {refs}←{parms}ReInstallDependencies y;installFolder;registry;deps;refs;msg
 ⍝ Takes a folder that hosts a file apl-dependencies.txt as mandatory argument.\\
 ⍝ The file apl-buildlist.json as well as all directories in that folder will be deleted.
 ⍝ Then all packages listed in the file apl-dependencies.txt are re-installed from scratch.\\
@@ -19,6 +19,7 @@
      parms←CreateReInstallParms
  :EndIf
  (deps installFolder registry)←CheckReInstallDependencies y
- (~parms.quiet)PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}'Re-installing packages in ',installFolder,' with',(parms.noBetas/'out'),' any beta versions'
+ msg←'Re-installing packages in ',installFolder,((1+parms.noBetas)⊃' including' ' without'),' beta versions'
+ (~parms.quiet)PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}msg
  refs←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.update parms.quiet
 ⍝Done

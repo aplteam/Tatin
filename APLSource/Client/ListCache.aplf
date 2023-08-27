@@ -1,19 +1,31 @@
- r←{fullPath}ListCache url;path;list;list_;domains;domains_;packages
+ r←{fullPath}ListCache y;path;list;list_;domains;domains_;packages;principalOnly;bool;url
 ⍝ Lists the contents of the Tatin package cache.
+⍝ ⍵ must be one of:
+⍝ * A character vector with a Registry domain name or empty
+⍝ * A nested vector of length 2: first item see above, second must be a Boolean that defaults to 0.
+⍝ This is interpreted as `url` and `principalFlag`.
 ⍝ If url is empty all packages for all urls are listed.
 ⍝ The result is a vector with as many items as there are domains represented in the cache with at least one package.
 ⍝ Each item is a two-element vector:
 ⍝  * The first item holds the url of the domain
 ⍝  * The second item holds a vector of char vectors with the package names
 ⍝ In case the cache is empty an empty vector is returned.
-⍝ If a url is specified but does not exist in the cache, ditto.
+⍝ If a url is specified but does not exist in the cache, ditto.\\
+⍝ If `principalOnly` is 0 (the default) all packages are listed. If it's 1 only principal
+⍝ packages are listed: these have a build list saved and therefore can be loaded offline.
 ⍝ `fullPath` defaults to 0, meaning that just domain names and packages names are returned.
 ⍝ Specify a 1 as ⍺ and you get full path names instead.
 ⍝ ---
-⍝ You might want to check the result in a readable format; for that execute:
+⍝ You might want to change the result in a readable format; for that execute:
 ⍝ ⎕←⍪{⍪('*** ',1⊃⍵)(⍪2⊃⍵)}¨ListCache ⍬
  r←''
  fullPath←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'fullPath'
+ :If 1=≡,y
+     url←y
+     principalOnly←0
+ :Else
+     (url principalOnly)←y
+ :EndIf
  url←ReplaceRegistryAlias url
  url←RemoveHttpProtocol url
  path←GetPathToPackageCache
@@ -22,14 +34,19 @@
          domains_←{{⊃,/1↓⎕NPARTS ⍵}⍣(~fullPath)⊣⍵}¨domains
          domains_←{':'@(⍸'∆'=⍵)⊣⍵}¨domains_  ⍝ Restore port number
          packages←F.ListDirs¨domains
-         packages←{GetPackageIDFromFilename¨¨⍵}⍣(~fullPath)⊣packages
+         packages←{GetPackageIDFrom¨¨⍵}⍣(~fullPath)⊣packages
          r←(⊂¨domains_),¨⊂¨packages
+         :If principalOnly
+             bool←⎕NEXISTS¨path∘{(⊂⍺,'/'),¨(⊂(1⊃⍵),'/'),¨(2⊃⍵),¨⊂'/apl-buildlist.json'}¨r
+             (2⊃¨r)←bool/¨2⊃¨r
+         :EndIf
          r←(0<≢¨2⊃¨r)/r                      ⍝ Drop domains without packages
          :If 0=≢r
              r←''
          :EndIf
      :EndIf
  :Else
+     ((':'=url)/url)←'∆' ⍝ Port numbers!
      :If F.IsDir path,'/',url
          packages←F.ListDirs path,'/',url
          domains_←path{⍺,'/',⍵}⍣fullPath⊣url

@@ -41,7 +41,7 @@
          ('Cannot find package "',path,'"')Assert F.Exists path
          saveIn←GetTatinRootSpace 3⍴targetSpace
          cfg←ReadPackageConfigFile path
-         packageID2←1 GetPackageIDFromFilename path
+         packageID2←1 GetPackageIDFrom path
          saveIn,←'.',packageID2
          :If 0=⎕NC saveIn                       ⍝ If it already exists we don't do anything...
          :OrIf overwrite                        ⍝ ... unless we are are explicitly asked to
@@ -60,11 +60,11 @@
              r,←ref
          :EndIf
          :If 1=principalFlag
-             :Trap 998
+             :Trap Reg.ErrorNo
                  LinkTargetToPackage cfg saveIn targetSpace alias
              :Else
                  qdmx←⎕DMX
-                 ⎕DL 0.02
+                 ⎕DL 0.01
                  F.RmDir path
                  qdmx.EM ⎕SIGNAL qdmx.EN
              :EndTrap

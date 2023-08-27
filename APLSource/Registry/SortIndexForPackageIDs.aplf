@@ -6,6 +6,11 @@
 ⍝ This needs some gymnastics for two reasons:
 ⍝ * {group}-{name}-9.0.0 comes after {group}-{name}-10.0.0
 ⍝ * {group}-{name}-9.0.0 20101213.010203 comes after {group}-{name}-9.0.0 20110114.010203
+⍝ `data` must be a matrix with at least three columns:
+⍝ [;1] packageID (without any beta part) or version numbers
+⍝ [;2] the publishing date as a real (YYYYMMDD.hhmmss)
+⍝ [;3] the publishing date but for non-betas 99999999 - this col determins the sort sequence
+⍝ Additional columns beyond the first three don't hurt.
  ind←⍬
  :If 0<≢data
      Assert 0=∧/~'.'∊¨data

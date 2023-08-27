@@ -1,4 +1,4 @@
- r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg;errorCounter
+ r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg;errorCounter;qdmx
 ⍝ Whether there is a (semi-)global ∆PermanentConnections or not makes a difference here:
 ⍝ * If it exists it's supposed to hold clients for all HTTP registries with a priority>0.
 ⍝   This can improve performance dramatically because the same connection can be used again.
@@ -28,7 +28,20 @@
          ⍝⎕←'Trying again for the ',(⍕errorCounter),' time...'
          ⎕DL 0.1×errorCounter
          client←NewClient uri
-         r←client R.SendAndReceive request
+         :Trap 999
+             r←client R.SendAndReceive request
+         :Else
+             ⍝ This is a workaround for the problem that a )LOAD or )XLOAD will unload
+             ⍝ the Conga DLL, resulting in a DLL Error: 1006
+             qdmx←⎕DMX
+             :If ∨/'DLL Error: 1006 '⍷∊qdmx.DM
+                 ⎕EX'⎕se._Tatin.RumbaLean.DRC'
+                 ⎕SE._Tatin.Admin.InitConga ⍬           ⍝ Re-initalize
+                 r←client R.SendAndReceive request
+             :Else
+                 ∘∘∘ ⍝ Error?!
+             :EndIf
+         :EndTrap
      :EndIf
  :EndIf
 ⍝Done

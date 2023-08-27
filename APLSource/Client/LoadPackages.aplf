@@ -30,34 +30,34 @@
  :EndIf
  tempFolder←F.GetTempSubDir''
  identifiers←','(≠⊆⊢)identifiers
- :Trap 998
+ :Trap Reg.ErrorNo
      targetSpace∘{CheckAlias ⍵ ⍺}¨identifiers
  :Else
      qdmx←⎕DMX
-     ⎕DL 0.02
+     ⎕DL 0.01
      F.RmDir tempFolder
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
- :Trap 998
+ :Trap Reg.ErrorNo
      paths←noBetas InstallPackages(⊃{⍺,',',⍵}/identifiers)tempFolder
  :Else
      qdmx←⎕DMX
-     ⎕DL 0.02
+     ⎕DL 0.01
      F.RmDir tempFolder
      CloseConnections 1
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
  →(0=≢paths)/0
- :Trap 998
+ :Trap Reg.ErrorNo
      loaded←LoadDependencies tempFolder targetSpace
  :Else
      qdmx←⎕DMX
-     ⎕DL 0.02
+     ⎕DL 0.01
      F.RmDir tempFolder
      CloseConnections 1
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
- ⎕DL 0.02
+ ⎕DL 0.01
  r←≢F.ListDirs tempFolder,'/'
  :If ~MyUserSettings.caching
      list←F.ListDirs tempFolder

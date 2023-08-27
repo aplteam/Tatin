@@ -1,0 +1,704 @@
+:Class CodeCoverage
+⍝ # The class `CodeCoverage`
+⍝ This class offers methods to watch certain parts of the workspace for being executed, probably as part of executing
+⍝ a test framework like [https://github.com/aplteam/Tester2](`Tester2` "Link to Tester2 on GitHub"), although checking
+⍝ on code coverage by just running an application can make sense as well, in particular with legacy code.\\
+⍝ For that the following steps need to be executed:
+⍝ ## Prepare
+⍝ * Instantiate `CodeCoverage` and specify a comma-separated list of namespaces and/or classes to be watched as argument
+⍝   to `⎕NEW`.
+⍝ * You might want to set the following two properties to make `CodeCoverage` fit your needs:
+⍝   * `ignore`: comma-separated list of fully qualified names of functions, operators, namespaces and scripts to be
+⍝      ignored.
+⍝   * `filename`: name used for saving the data (with the extension .DCF) and also the HTML report (with the
+⍝     extension .HTML).\\
+⍝     The collected data and the list of namespaces/classes to be watched can be referenced as `data` and
+⍝     `watch` but _not_ set: they are read-only instance properties.\\
+⍝ ## Executing the code
+⍝ You neeed to call the `Start` method before you execute any code that shall be watched for coverage. Assuming that
+⍝ the instance created was assigned to `C` then call `C.Start ⍬`.\\
+⍝ Once all the code you are interested in has been executed call `C.Stop ⍬`.\\
+⍝ When the test framework is done execute `C.Finalise ⍬`.\\
+⍝ **Notes:**
+⍝ * You may well restart and stop again as many times as you like. This can be useful to avoid `⎕PROFILE` to collect
+⍝   data while a test framework is running rather than the application you are interested in: `⎕PROFILE` is expensive!
+⍝ * You may run the test framework again, say on a different platform: if the `filename` property points to an already
+⍝   existing component file, additional data is added by appending more components.
+⍝ * The first component self-documents such a DCF file.\\
+⍝ ## Producing a report
+⍝ In order to produce a meaningful report call the shared method `CodeCoverage.ProcessDataAndCreateReport` and
+⍝ pass `C.filename` (or a character vector that holds the filename) as right argument.\\
+⍝ This method will aggregate the data, massage it, process it and finally create an HTML report from it.\\
+⍝ Note that by default the report is not verbose, meaning that only the (fully qualified) names of all functions
+⍝ and operators that were not executed at all and all the names of functions and operators that have only been partly
+⍝ executed are reported together with the lines not executed and the total number of lines.\\
+⍝ This is a good starting point. Usually that results in expanding the list of stuff to be ignored, adding more
+⍝ test cases, deleting blocks of code that became superfluous etc.\\
+⍝ However, at one point or another you want the full details: for that just add a 1 as left argument when calling
+⍝ `CodeCoverage.ProcessDataAndCreateReport`. Now the canonical representations of all functions and operators that are
+⍝ only partly covered will become part of the report. The lines that weren't executed are highlighted (bold) and carry
+⍝ a right-pointing arrow on the left.\\
+⍝ ## Restrictions and flaws
+⍝ * For the time being nested namespaces/classes are not processed. This restriction might be lifted in a future release.
+⍝ * Named dfns that are kept local inside a traditional function are not processed correctly. This is a consequence of a
+⍝   flaw of `⎕PROFILE`. Without changing `⎕PROFILE` this cannot be overcome.\\
+⍝ This class is part of the APLTree Open Source project.\\
+⍝ Home page: <https://github.com/aplteam/CodeCoverage>\\
+⍝ Kai Jaeger ⋄ APL Team Ltd
+
+    ⎕IO←1 ⋄ ⎕ML←1
+
+    ∇ r←Version
+      :Access Public Shared
+      r←'CodeCoverage' '0.7.1.37' '2020-12-20'
+    ∇
+
+    ∇ History
+      :Access Public Shared
+    ⍝ * 0.7.1 from 2020-12-20
+    ⍝   * Bug fix: `NamesInScript` might crash on an {each}-operation on an empty vector
+    ⍝ * 0.7.0 from 2020-12-17
+    ⍝   * For every test run a row is appended onto component number xx. It conains three pieces of information:
+    ⍝     1. Version of Dyalog and which OS
+    ⍝     2. Timestamp of execution
+    ⍝     3. `⎕WA` in MB
+    ⍝   * Function `Finalyze` renamed to `Finalise`
+    ⍝   * A function operand passed to an operator cause CodeCoverage to crash. This is caused by assigned (derived)
+    ⍝     function definitions
+    ⍝   * Documentation corrected and enhanced
+    ⍝ * 0.6.1 from 2020-09-16
+    ⍝   * Some minor bug fixes:
+    ⍝     * In case the directory supposed to hold the report does not exist `CodeCoverage` now attenpts to create it.
+    ⍝     * Creating the HTML report crashed under some circumstances (empty array).
+    ⍝ * 0.6.0 from 2020-09-04
+    ⍝   * This version requires at least version 18.0 of Dyalog
+    ⍝   * Property Getters and Setters are now reported (lifted restriction)
+    ⍝   * Bug fix: `ignore` did not work as expected on ordinary namespaces.
+    ⍝ * 0.5.0 from 2020-07-14
+    ∇
+
+    :Field Public Shared Readonly APL_Chars←'ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüþ0123456789∆⍙ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ'
+
+    ∇ make1(watch_)
+      :Access Public Instance
+      :Implements Constructor
+      :Access Public
+      _ignore←''
+      :If ~(⊃watch_)∊'#⎕'
+      :AndIf 0<(⊃1↓⎕RSI).⎕NC watch_
+          watch_←(⊃1↓⎕NSI),'.',watch_
+      :EndIf
+      watch←watch_
+      _filename←(739⌶0),'/CodeCoverage-',' '~⍨⍕⎕TS
+      _data←0 2⍴''
+    ∇
+
+    :Property data
+    ⍝ Matrix with two columns and as many rows as there are observations collected by `⎕PROFILE`.\\
+    :Access Public Instance
+        ∇ r←Get
+          r←_data
+        ∇
+    :EndProperty
+
+    :Property ignore
+    ⍝ Either empty or a comma-separated list of fully qualified function, operator class and namespace names
+    ⍝ that should be ignored when the coverage report is compiled.\\
+    ⍝ Note that in case it is an ordinary namespace this means that all objects in that namespace are ignored,
+    ⍝ incluuding all sub-namespaces.
+    :Access Public Instance
+        ∇ r←Get
+          r←','(≠⊆⊢),_ignore
+        ∇
+        ∇ set value;v;b;v2;noOf
+          :If 0=noOf←+/∧\1=≡¨value.NewValue
+              v←∊value.NewValue
+          :Else
+              v←(⊃{⍺,',',⍵}/noOf↑value.NewValue),noOf↓value.NewValue
+          :EndIf
+          'Must be character vector'⎕SIGNAL 11/⍨' '≠1↑0⍴v
+          ('Has invalid characters',b/v)⎕SIGNAL 11/⍨∨/b←~v∊APL_Chars,',⎕#.'
+          v2←','(≠⊆⊢),v
+          :If ∨/~b←0<⎕NC⊃v2
+              11 ⎕SIGNAL⍨'Unknown names: ',⊃{⍺,',',⍵}/(~b)/v2
+          :EndIf
+          _ignore←v
+        ∇
+    :EndProperty
+
+    :Property watch
+    ⍝ Comma-separated list of namspaces and/or classes that are going to be watched for coverage,
+    :Access Public Instance
+        ∇ r←Get
+          r←_watch
+        ∇
+        ∇ set value;v;b;v2
+          v←∊value.NewValue
+          'Must be character vector'⎕SIGNAL 11/⍨' '≠1↑0⍴v
+          ('Has invalid characters',b/v)⎕SIGNAL 11/⍨∨/b←~v∊APL_Chars,',⎕#.'
+          v2←','(≠⊆⊢),v
+          :If ∨/~b←0<⎕NC↑v2
+              11 ⎕SIGNAL⍨'Unknown names: ',⊃{⍺,',',⍵}/(~b)/v2
+          :EndIf
+          _watch←v2
+        ∇
+    :EndProperty
+
+    :Property filename
+    :Access Public Instance
+    ⍝ By default `filename` is a temp file. However, you may specify your own filename here, with or without
+    ⍝ file extension.\\
+    ⍝ Note that this name would also be used for creating the HTML file, just with a different extension.
+        ∇ r←get
+          r←_filename
+        ∇
+        ∇ set value;v
+          v←value.NewValue
+          'Invalid depth'⎕SIGNAL 11/⍨~(≡v)∊0 1
+          'Must be a character vector'⎕SIGNAL 11/⍨' '≠1↑0⍴∊v
+          _filename←⊃,/2↑⎕NPARTS v
+        ∇
+    :EndProperty
+
+    ∇ htmlFilename←{verbose}ProcessDataAndCreateReport filename;details;watch;dcfFilename
+     ⍝ Takes the name of a component file that was created by first instatiating `CodeCoverage` and then calling
+     ⍝ the instance methods `Start`, `Stop` and `Finalise`.\\
+     ⍝ The components holding the `⎕PROFILE` data (10 and running) are then read, aggregated, massaged and
+     ⍝ finally saved in the tenth component.\\
+     ⍝ Then a report is created from the aggregated data and saved on disk.
+     ⍝ `filename` is used for both, identifying the DCF file and the HTML, just the extensions are different.\\
+     ⍝ The optional left argument `verbose` defaults to 0, meaning that the code of the functions and operators
+     ⍝ that are only partly covered is not going to be listed.\\
+     ⍝ However, by specifying a 1 as left argument you can force the canonical representations of those functions
+     ⍝ and operators to become part of the report with all lines that were not executed highlighted.\\
+     ⍝ Note that this function can be called more than once on the same component file. It just wastes some ressources
+     ⍝ on calculating the result again, which is not necessary. However, as long as the number of functions and operators
+     ⍝ is not very large that does not matter much. If it does matter then call `ProcessData` and `CreateReport` instead:
+     ⍝ that is all this function is doing anyway.
+      :Access Public Shared
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.dcf'
+      'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
+      verbose←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'verbose'
+      {}ProcessData dcfFilename
+      htmlFilename←verbose CreateReport filename
+    ∇
+
+    ∇ filename←{verbose}CreateReport filename;html;tally;caption;b;buff;buff2;linkAndName;buff3;dcfFilename;tno;watched;data;watch;ignore;align;runs
+    ⍝ This function creates an HTML file with a coverage report from the data collected while executing
+    ⍝ one or more test suites or running an application.\\
+    ⍝ You must call `ProcessData` first: this function relies on the data being aggregated.\\
+    ⍝ If the file extension of `filename` is not ".html" this is enforced.\\
+    ⍝ The optional ⍺ (`verbose`) defaults to 0, meaning that no code listings are part of the report.
+      :Access Public Shared
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.dcf'
+      'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
+      tno←dcfFilename ⎕FSTIE 0
+      watched←⎕FREAD tno,2
+      data←⎕FREAD tno 10
+      watch←⎕FREAD tno 2
+      ignore←⎕FREAD tno 3
+      runs←⎕FREAD tno 4
+      ⎕FUNTIE tno
+      verbose←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'verbose'
+      html←''
+      html,←⊂'<!DOCTYPE html>'
+      html,←⊂'<html lang="en">'
+      html,←⊂'<head>'
+      html,←⊂'<title>Coverage</title>'
+      html,←⊂'<meta charset="utf-8"/>'
+      html,←⊂'<style>'
+      html,←GetScreenCss
+      html,←GetPrintCss
+      html,←⊂'</style>'
+      html,←⊂'</head>'
+      html,←⊂'<body>'
+      html,←⊂'<h1 id="top">Coverage Report</h1>'
+      :If 0=≢data
+          html,←⊂'<p>Nothing to report at all</p>'
+      :Else
+          tally←≢data[;4]
+          caption←⊃,/{⍺,', ',⍵}/watched
+          html,←⊂'<p>Watched: ',(⍕tally),' fns/opr within <code>',caption,'</code></p>'
+          :If 1=≢runs
+              html,←⊂'<p>The test test suite was execute once:</p>'
+          :Else
+              html,←⊂'<p>The test test suite was executed ',(⍕≢runs),' times:</p>'
+          :EndIf
+          html,←⊂'<table>'
+          html,←⊂'<thead>'
+          html,←⊂{'<tr>',(⊃,/{'<th>',⍵,'</th>'}¨⍵),'</tr>'}'Executed at' 'APLVersion' 'Memory (MB)'
+          html,←⊂'<thead>'
+          html,←⊂'</tbody>'
+          html,←{'<tr>',(⊃,/{'<td>',⍵,'</td>'}¨⍵),'</tr>'}¨↓runs
+          html,←⊂'</tbody>'
+          html,←⊂'</table>'
+          :If 0<≢∊data[;2 4]
+              html,←⊂'<p>Overall ',(⍕⌊0.5+100×÷/+⌿≢¨data[;2 4]),'% of the testable code is  covered.</p>'
+              html,←⊂'<p>(Comment lines, empty lines, all <code>:End</code>* lines etc. are all ignored)</p>'
+          :EndIf
+          html,←⊂'<p>',(⍕data[;3]+.=100),' of the fns/opr are 100% covered.</p>'
+          :If 0<+/b←data[;3]=0
+              html,←⊂'<p>',(⍕+/b),' are not covered at all:</p>'
+              html,←⊂'<table>'
+              html,←⊂'<tbody>'
+              html,←{'<tr><td>',⍵,'</td></tr>'}¨b/data[;1]
+              html,←⊂'</tbody>'
+              html,←⊂'</table>'
+          :EndIf
+          :If 0<+/b←~data[;3]∊0 100
+              buff←{⍵[⍋⍵[;3];]}b⌿data
+              html,←⊂'<div id="partly-covered" class="keep-together">'
+              html,←⊂'<p>',(⍕+/b),' are partly covered:</p>'
+              html,←⊂'<table>'
+              html,←⊂'<thead>'
+              align←'left' 'left' 'left' 'right'
+              html,←⊂{'<tr>',⍵,'</tr>'}⊃,/align{'<th style="text-align:',⍺,';">',⍵,'</th>'}¨'Function/Operator' 'Lines not executed' 'Coverage' '≢'
+              html,←⊂'</thead>'
+              html,←⊂'<tbody>'
+              buff2←((≢buff),3)⍴0
+              buff[;2]←buff[;4]~¨buff[;2]   ⍝ From "executed" to "not executed"
+              buff2[;1]←{4>≢⍵:{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⍵}⍕¨⍵ ⋄ (⍕≢⍵),'←≢',Shorten ⍵}¨buff[;2]
+              buff2[;2]←⍕¨buff[;3]
+              buff2[;3]←⍕¨≢¨buff[;4]
+              :If verbose
+                  linkAndName←buff[;1]{'<a href="#listing_',⍵,'" title="Link to listing">',⍺,'</a>'}∘⍕¨⍳≢buff
+                  buff3←linkAndName{'<td>',⍺,'</td><td>',(1⊃⍵),'</td><td>',(2⊃⍵),'%</td><td class="align-right">',(3⊃⍵),'</td>'}¨↓buff2
+              :Else
+                  buff3←buff[;1]{'<td>',⍺,'</td><td>',(1⊃⍵),'</td><td>',(2⊃⍵),'%</td><td class="align-right">',(3⊃⍵),'</td>'}¨↓buff2
+              :EndIf
+              html,←{'<tr>',⍵,'</tr>'}¨buff3
+              html,←⊂'</tbody>'
+              html,←⊂'</table>'
+              html,←⊂'</div>'
+              :If verbose
+                  html,←⊂'<h2>Listings</h2>'
+                  html,←CreateListingForFnsAndOpr buff
+              :EndIf
+          :EndIf
+      :EndIf
+      html,←⊂'<div id="footer">'
+      html,←⊂'<hr>'
+      html,←⊂'<p>Created by "CodeCoverage" version ',(2⊃Version),' from ',(3⊃Version),'</p>'
+      html,←⊂'</div>'
+      html,←⊂'</body>'
+      html,←⊂'</html>'
+      filename←(⊃,/2↑⎕NPARTS filename),'.html'
+      (⊂html)⎕NPUT filename 1
+    ∇
+
+    ∇ {(details watch)}←ProcessData filename;tno;watched;data;b;details;where;wi;dcfFilename;ignore
+     ⍝ Takes the name of a component file that was created by calling `Start`, `Stop` and `Finalise`.\\
+     ⍝ The components are read, aggregated and massaged and finally saved in the tenth component,
+     ⍝ but the aggregated data is also returned as a shy result together with what has been watched.
+      :Access Public Shared
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.dcf'
+      'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
+      tno←dcfFilename ⎕FSTIE 0
+      watched←⎕FREAD tno,2
+      details←watch←⍬
+      :If 0<≢∊data←tno{⎕FREAD ⍺,⍵}¨10↓⍳-/⌽2↑⎕FSIZE tno
+          watch←⎕FREAD tno 2
+          ignore←⎕FREAD tno 3
+          data←⊃⍪/data
+          data[;2]←(data[;2]∊¨data[;4])/¨data[;2]
+          details←data[;1]{(⊃⍺)(∪⊃,/⍵)}⌸data[;2]
+          where←data[;1]⍳details[;1]
+          details,←data[where;3 4]
+          details(RemoveToBeIgnored)←ignore
+          b←details[;3]≠100
+          :If ∨/b
+              (b/details[;3])←⌊0.5+100×÷/≢¨b⌿details[;2 4]         ⍝ Recalculate percentage
+          :EndIf
+          details ⎕FREPLACE tno 10
+      :EndIf
+      ⎕FUNTIE tno
+    ∇
+
+    ∇ r←Finalyze dummy
+     ⍝ This function is obsolete and will be deleted in 1.0.0. It's temporarily available for compatability only.
+      :Access Public Instance
+      r←Finalise dummy
+    ∇
+
+    ∇ r←Finalise dummy;names;details;i;name;row;linesCovered;body;lines;bool;regExPattern;filename;tno;d;buff
+    ⍝ Call this once all the code you want to check on has been executed`.\\
+    ⍝ It investigates all functions and operators that are only partly covered, and saves the lines that
+    ⍝ have been executed as well as the lines that could have been executed.\\
+    ⍝ For the latter a number of lines are ignored, for example empty lines, comment lines and all lines
+    ⍝ that carry non-meaningful lines (with regard to being executed), like all `:End*` lines etc.\\
+    ⍝ Note that the collected data is appended to the DCF file associated with the instance. Therefore
+    ⍝ you can move the DCF file to another platform and run the code under the supervision of `CodeCoverage`
+    ⍝ again, for example.
+      :Access Public Instance
+      r←⍬
+      _data←_data[;1]{(⊃⍺)(∪⊃,/⍵)}⌸_data[;2]
+      names←CollectDataForCoverageReport _watch
+      details←0 4⍴⍬
+      regExPattern←'^ *:else$' '^ *:section$'                   ⍝ Lines that contain just these patterns...
+      regExPattern,←'^ *:access ' '^ *:field ' '^ *:attribute'  ⍝ ... or these are to be ignored.
+      regExPattern,←⊂'^ *:end[a-zA-Z]*$'                        ⍝ All sorts of :End* statements are not of interest either
+      regExPattern,←⊂'^ *:implements'
+      regExPattern,←⊂'^ *:signature'
+      regExPattern,←⊂'^ *:section'
+     
+      :For i :In ⍳≢names
+          name←i⊃names
+          :If (≢_data)≥row←_data[;1]⍳⊂name
+              linesCovered←2⊃_data[row;]
+          :Else
+              linesCovered←⍬
+          :EndIf
+          :If {~3 4∊⍨10×⍵-⌊⍵}⎕NC names[i]                           ⍝ Ignore derived functions and derived operators
+          :AndIf 2≠|≡buff←180⌶i⊃names                               ⍝ For weird staff (like function operands of an operator) we need to check
+              :If 0=≢body←{⍵↓⍨-+/∧\' '=⌽⍵}¨↓buff                    ⍝ True for localyzed dfns
+            ⍝ ---------- TODO
+            ⍝     ∘∘∘ ⍝TODO⍝ We cannot get the body of that dfn with ⎕CR or 180⌶, so we need to take other measures.
+            ⍝ ----------
+              :EndIf
+              body←'''[^'']*'''⎕R''⍠('Greedy' 0)⊣body               ⍝ Remove text
+              body←'⍝.*$'⎕R''⍠('Greedy' 0)⊣body                     ⍝ Remove comments
+              lines←¯1+⍳≢body
+              :If '}'=¯1↑⊃¯1↑body                                   ⍝ Is it possibly a dfn? (⎕NC does only work on stuff that's not part of a class!)
+              :AndIf ∨/(({⍵↑⍨1+-{⍵⍳'.'}⌽⍵}name),'←{')⍷1⊃body        ⍝ First line carries <name>←{   - then it must be a dfn
+              :AndIf (,'}')≡¯1↑' '~⍨⊃¯1↑body
+                  (body lines)←(0=≢{⍵↓⍨⍵⍳'{'}⊃body)↓¨body lines     ⍝ Drop first line if it is nothing but <name>←{
+                  (body lines)←(-(,'}')≡' '~⍨⊃¯1↑body)↓¨body lines  ⍝ Drop last line if it is nothing but a closing "`}`
+              :Else
+                  (body lines)←1↓¨body lines                        ⍝ Always drop first line in case of a tfn
+                  bool←regExPattern∘{0=≢⍺ ⎕S 0⍠('IC' 1)('Greedy' 0)⊣⍵}¨body
+                  (body lines)←bool∘/¨body lines
+              :EndIf
+              (body lines)←(0<≢¨body~¨' ')∘/¨body lines             ⍝ Remove empty lines
+              details⍪←name linesCovered(100-⌊0.5+100×(≢lines~linesCovered)÷≢lines)lines
+          :EndIf
+      :EndFor
+      details←('.'≠⊃¨¯1↑¨details[;1])⌿details
+      filename←(⊃,/2↑⎕NPARTS _filename),'.dcf'
+      :If ⎕NEXISTS filename
+          tno←filename ⎕FSTIE 0
+          (∪watch,⎕FREAD tno 2)⎕FREPLACE tno 2
+          (∪ignore,⎕FREAD tno 3)⎕FREPLACE tno 3
+          (({0=≢d←⎕FREAD tno 4:0 3⍴'' ⋄ d}⍬)⍪CollectInformation ⍬)⎕FREPLACE tno 4 ⍝ Old versions might still carry an empty forth component
+          details ⎕FAPPEND tno
+          ⎕FUNTIE tno
+      :Else
+          3 ⎕MKDIR 1⊃⎕NPARTS filename
+          tno←filename ⎕FCREATE 0
+          d←''
+          d,←⊂'Documentation regarding the contents of this file'
+          d,←⊂(⍴1⊃d)⍴'-'
+          d,←⊂'* The first component contains this documentation'
+          d,←⊂'* The second one contains what has been watched; this will eventually be used to'
+          d,←⊂'  compile the caption for the coverage report.'
+          d,←⊂'* The third component holds the names of functions and operators to be ignored.'
+          d,←⊂'* The fourth component holds a matrix with as many rows as test runs have been performed:'
+          d,←⊂'  [;1] Timestamp ("YYYY-MM-DD hh:mm:ss")'
+          d,←⊂'  [;2] The result of the "APLVersion" property'
+          d,←⊂'  [;3] ⎕WA in KB'
+          d,←⊂'* Components five to nine are reserved'
+          d,←⊂'* The tenth one is originally empty. when "ProcessData" or "ProcessDataAndCreateReport"'
+          d,←⊂'  is called the resulting data is written to this component.'
+          d,←⊂'After the tenth one all components carry a matrix with n rows and 4 columns. n is'
+          d,←⊂'determined by the number of fns/oprs involved. The columns:'
+          d,←⊂'[;1] The name of the function or operator'
+          d,←⊂'[;2] Either empty or a vector of line numbers there were *not* executed.'
+          d,←⊂'     Empty in case none or all lines were executed.'
+          d,←⊂'[;3] Coverage percentage.'
+          d,←⊂'[;4] Total number of lines that can be expected to be tested.'
+          d ⎕FAPPEND tno
+          watch ⎕FAPPEND tno
+          ignore ⎕FAPPEND tno
+          (CollectInformation ⍬)⎕FAPPEND tno
+          tno{⍵ ⎕FAPPEND ⍺}¨(10-¯1+2⊃⎕FSIZE tno)⍴⊂''  ⍝ Fill up to the tenth component
+          details ⎕FAPPEND tno
+          ⎕FUNTIE tno
+      :EndIf
+      r←filename
+      ⍝Done
+    ∇
+
+    ∇ {r}←Start dummy
+      ⍝ Execute `⎕PROFILE'start' 'coverage'`
+      :Access Public Instance
+      r←⍬
+      ⎕PROFILE'start' 'coverage'
+    ∇
+
+    ∇ {r}←Stop dummy;buff
+    ⍝ Stores all the data collected since `Start` has been called, and then executes `⎕PROFILE'clear'`
+      :Access Public Instance
+      r←⍬
+      buff←(⎕PROFILE'data')[;1 2]
+      ⎕PROFILE'clear'
+      buff←(buff[;2]≢¨⊂⍬)⌿buff                                 ⍝ Fns as such are not of any interest, only lines
+      _data⍪←(⊃∨/watch{((1+≢¨⍺)↑¨¨⊂⍵)∊¨⊂¨⍺,¨'.'}buff[;1])⌿buff ⍝ Drop everthing that's not watched
+    ∇
+
+⍝ ------------------------ Private stuff
+
+    ∇ html←CreateListingForFnsAndOpr partlyCovered;name;lines;body;width;html2;all;testable;where;buff;i;links
+      html←''
+      links←'<a class="float-right no-print no-underline top-links" href="#top" title="Go to the top of the document">↟</a>'
+      links,←'<a  class="float-right no-print no-underline top-links" href="#partly-covered" title="Go to the beginning of ''Partly-covered''">↑</a>'
+      :For i :In ⍳≢partlyCovered
+          (name lines testable)←partlyCovered[i;1 2 4]
+          body←{⍵↓⍨-+/∧\' '=⌽⍵}¨↓180⌶name
+          body←(,¨'&<>')⎕R'\&amp' '\&lt;' '\&gt;'⊣body
+          (1⊃body)←{⍵↑⍨¯1+⌊/⍵⍳'⍝;'}1⊃body
+          width←≢⍕≢body
+          html2←((⊂(width-1)⍴' '),(width+4){⍺↑' [',(⍕⍵),']'}¨¯1↓⍳≢body),¨body,¨⊂'</code>'
+          (⊃¨html2[lines+1])←'→'
+          buff←(≢body)⍴⊂'<code>'
+          buff[lines+1]←⊂'<code class="emphasize">'
+          html2←buff,¨html2
+          (1⊃html2)←'<div class="code-block">',1⊃html2
+          html2,←⊂'</div>'
+          html2←(⊂'<code class="header" id="listing_',(⍕i),'">',name,links,'</code>'),html2
+          html,←html2
+      :EndFor
+    ∇
+
+      Shorten←{
+    ⍝ '1-3,5,6-9,11' ← Shorten 1 2 3 5 6 7 8 9 11
+          ⍺←''
+          0=≢⍵:¯1↓⍺
+          n←+/∧\⍵=(⊃⍵)+¯1+⍳≢⍵
+          1=n:(⍺,(⍕⊃⍵),',')∇ 1↓⍵
+          (⍺,({(⍕⊃⍵),'-',(⍕¯1↑⍵)}n↑⍵),',')∇ n↓⍵
+      }
+
+    ∇ r←GetScreenCss
+      r←''
+      r,←⊂'@media screen{'
+      r,←⊂'    html {background-color: #FFFFF0;}'
+      r,←⊂'body {'
+      r,←⊂'    font-size: 16px;'
+      r,←⊂'    font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;'
+      r,←⊂'    margin: 1em;'
+      r,←⊂'}'
+      r,←⊂'th, td {padding: 5px 10px;}'
+      r,←⊂'th {text-align: left;}'
+      r,←⊂'h1, h2, h3, h4, h5, h6 {color: #424242;}'
+      r,←⊂'h1 {font-size: 22px;}'
+      r,←⊂'h2 {font-size: 18px; margin-top: 2em; margin-bottom:0.3em;}'
+      r,←⊂'tbody tr:nth-child(even) {background-color: #F0F0F0;}'
+      r,←⊂'tbody tr:nth-child(odd) {background-color: #FAFAFA;}'
+      r,←⊂'th {background-color: #E6E6E6;color: #424242;}'
+      r,←⊂'table {border: silver 1px solid; font-size: 14px;font-family: APLFont, monospace;}'
+      r,←⊂'code , code a {font-size: 14px; font-family: APLFont, monospace;}'
+      r,←⊂'code.header {'
+      r,←⊂'    font-size: 16px; '
+      r,←⊂'    font-family: APLFont, monospace; '
+      r,←⊂'    margin: 1.5em 0.5em 0 0.5em; '
+      r,←⊂'    padding:0;'
+      r,←⊂'    display: block;'
+      r,←⊂'}'
+      r,←⊂'div.code-block {'
+      r,←⊂'    border: 1px silver dashed;'
+      r,←⊂'    background-color: #F2F2F2;'
+      r,←⊂'    display: block;'
+      r,←⊂'    margin: 0.5em 0.5em 0.5em 0.5em;'
+      r,←⊂'    padding: 0.5em;'
+      r,←⊂'}'
+      r,←⊂'div.code-block code {display: block; white-space: pre-wrap; margin:0; padding:0; word-wrap: break-word;}'
+      r,←⊂'.emphasize { font-weight: 800;}'
+      r,←⊂'ul li, ol li {margin: 0.7em 0.2em;}'
+      r,←⊂'.float-right {float:right;}'
+      r,←⊂'.no-underline {    text-decoration :none;}'
+      r,←⊂'.top-links {font-size:20px; padding-left: 0.6em;}'
+      r,←⊂'.align-right {text-align: right;}'
+      r,←⊂'#footer hr {margin-top:1.5em;}'
+      r,←⊂'#footer p {margin-top:5px; padding-top:0; font-size: 9px;}'
+      r,←⊂'@font-face {'
+      r,←⊂'        font-family: "APLFont";'
+      r,←⊂'    src:'
+      r,←⊂'        local("APL385 Unicode"),'
+      r,←⊂'        url("https://misc.aplteam.com/apl385.ttf") format("truetype");'
+      r,←⊂'}}'
+    ∇
+
+    ∇ r←GetPrintCss
+      r←''
+      r,←⊂'@media print{@page {size: portrait}'
+      r,←⊂'@page {'
+      r,←⊂'    margin: 1cm 1cm 1cm 1.75cm;'
+      r,←⊂'    @bottom-right {'
+      r,←⊂'        content: counter(page) " / " counter(pages);'
+      r,←⊂'  }'
+      r,←⊂'}'
+      r,←⊂'body {'
+      r,←⊂'    font: 12pt "Times New Roman", Times, serif;'
+      r,←⊂'    line-height: 1.2;'
+      r,←⊂'     /* CSS3 filter, at the moment Webkit only. Prefix it for future implementations */'
+      r,←⊂'    -webkit-filter: grayscale(100%);'
+      r,←⊂'    filter: grayscale(100%); /* future-proof */'
+      r,←⊂'}'
+      r,←⊂'h1 {font-size: 18pt;}'
+      r,←⊂'h2 {font-size: 16pt; margin-top: 10pt; margin-bottom: 3pt;}'
+      r,←⊂'th, td {padding: 2pt 3pt;}'
+      r,←⊂'th {text-align: left;background-color: #DBDBDB;}'
+      r,←⊂'tbody tr:nth-child(odd) {background-color: #EDEDED;}'
+      r,←⊂'table {'
+      r,←⊂'    color-adjust: exact !important;'
+      r,←⊂'    -webkit-print-color-adjust: exact !important;'
+      r,←⊂'    print-color-adjust: exact !important;'
+      r,←⊂'    font-size: 8pt;'
+      r,←⊂'    font-family: APLFont, monospace;'
+      r,←⊂'}'
+      r,←⊂'div.keep-together {break-inside: avoid; break-before:auto;}'
+      r,←⊂'table {border: silver 1pt solid;}'
+      r,←⊂'code , code a {font-size: 8pt; font-family: APLFont, monospace;}'
+      r,←⊂'code.header {'
+      r,←⊂'    font-size: 8pt;'
+      r,←⊂'    font-family: APLFont, monospace;'
+      r,←⊂'    margin: 7pt 3pt 0 10pt;'
+      r,←⊂'    padding:0;'
+      r,←⊂'    display: block;'
+      r,←⊂'}'
+      r,←⊂'div.code-block {'
+      r,←⊂'    border: 1pt silver dashed;'
+      r,←⊂'    background-color: #F2F2F2;'
+      r,←⊂'    display: block;'
+      r,←⊂'    margin: 4pt 4pt 4pt 4pt;'
+      r,←⊂'    padding: 4pt;'
+      r,←⊂'}'
+      r,←⊂'div.code-block code {display: block; white-space: pre-wrap; margin:0; padding:0; word-wrap: break-word;}'
+      r,←⊂'.emphasize { font-weight: 800;}'
+      r,←⊂'a {text-decoration: none;color: black;}'
+      r,←⊂'ul li, ol li {margin: 8pt 3pt;}'
+      r,←⊂'.no-print {display:none;}'
+      r,←⊂'.align-right {text-align: right;}'
+      r,←⊂'#footer hr {margin-top:1.5em;}'
+      r,←⊂'#footer p {margin-top:5pt; padding-top:0; font-size: 6pt;}'
+      r,←⊂'@font-face {'
+      r,←⊂'        font-family: "APLFont";'
+      r,←⊂'    src:'
+      r,←⊂'        local("APL385 Unicode"),'
+      r,←⊂'        url("https://misc.aplteam.com/apl385.ttf") format("truetype");'
+      r,←⊂'}}'
+    ∇
+
+    ∇ names←CollectDataForCoverageReport watch;this;ref;list;isScripted;this2;ref2
+    ⍝ Determins all objects tro be observed together with the number of lines.
+      names←''
+      :For this :In ,⊆watch
+          ref←⍎this
+          :If IsScripted ref
+              names,←(⊂this,'.'),¨NamesInScript ref
+          :Else
+              names,←(⊂this,'.'),¨' '~¨⍨↓ref.⎕NL 3 4
+              :If 0<≢list←ref.⎕NL 9
+                  list←' '~¨⍨↓list
+                  isScripted←IsScripted¨ref⍎¨list
+                  :For this2 :In isScripted/list
+                      ref2←ref⍎this2
+                      :If (⍕ref2)≡this,'.',this2                            ⍝ Ignore references
+                          names,←(⊂this,'.',this2,'.'),¨NamesInScript ref2
+                      :EndIf
+                  :EndFor
+                  :If 0<≢list←(~isScripted)/list
+                  :AndIf 0<≢list←({⍵≡⍕⍎⍵}¨(⊂this,'.'),¨list)/list           ⍝ Ignore references
+                      names,←⊃,/CollectDataForCoverageReport¨(⊂this,'.'),¨list
+                  :EndIf
+              :EndIf
+          :EndIf
+      :EndFor
+    ∇
+
+    ∇ r←NamesInScript ref;body;options;b;tfns;dfns;b2;bodies
+      :Access Public Shared
+    ⍝ Takes a ref pointing to a class or interface script and returns the names of all functions and operators
+    ⍝ within that script.\\
+    ⍝ Has two limitations:
+    ⍝ * Cannot process nested classes and nested namespaces.
+    ⍝ * Might well mistake a variable name as the name of a dfn.\\
+      r←''
+      body←⎕SRC ref
+      body←'''[^'']*'''⎕R''⊣body                                     ⍝ Get rid of everything between quotes
+      body←'⍝.*$'⎕R''⊣body                                           ⍝ Get rid of comments
+      options←('IC' 1)('Greedy' 0)('DotAll' 1)('Mode' 'D')
+      r,←options GeterAndSetterNames body                            ⍝ Extract the names of all getters and setters (if any)
+      body←':Property .*:EndProperty'⎕R''⍠options⊣body               ⍝ Remove Properties (because they carry `∇`!)
+      body←¯1↓1↓(~body∧.=¨' ')/body                                  ⍝ Remove first, last and all empty lines
+      body←'^ {5,}∇.*$'⎕R''⊣body                                     ⍝ Remove recursive ∇ calls that stand on their own
+      b←'∇'∊¨body                                                    ⍝ Which lines carry a ∇?
+      ((b\{{1=≢⍵:0 ⋄ '∇'≠⊃⍵}⍵~' '}¨b/body)/body)←' '                 ⍝ Remove all other recursive ∇ calls
+      body↓¨⍨←{+/∧\' '=⍵}¨body                                       ⍝ Drop all leading spaces
+      b←'∇'=⊃¨body                                                   ⍝ All lines that start with a nabla
+      tfns←b/body                                                    ⍝ Trad fns headers
+      tfns←1↓¨tfns                                                   ⍝ Remove the nablas
+      tfns←((≢tfns)⍴1 0)/tfns                                        ⍝ Remove every second line: those are the closing ones
+      tfns←{'←'∊⍵:⍵↓⍨⍵⍳'←' ⋄ ⍵}¨tfns                                 ⍝ Remove all explicit results
+      tfns←{'{'∊⍵:⍵↓⍨⍵⍳'}' ⋄ ⍵}¨tfns                                 ⍝ Remove optional left argument
+      tfns←{⍵↓⍨+/∧\' '=⍵}¨tfns                                       ⍝ Remove all leading spaces
+      tfns←{⍵/⍨~'  '⍷⍵}¨tfns                                         ⍝ Remove all multiple spaces
+      tfns←{⍵↓⍨{-+/∧\' '=⍵}⌽⍵}¨tfns                                  ⍝ Remove all trailing spaces
+      :If ∨/b←'('=⊃¨tfns                                             ⍝ These must be operators
+          (b/tfns)←{{⍵↑⍨¯1+⍵⍳')'}⍵↓⍨⍵⍳' '}¨b/tfns                    ⍝ Extract the operator names
+      :EndIf
+      tfns←'\([^)]+\)'⎕R' foo'⊣tfns                                  ⍝ Replace anything betwen () by ` foo` = impersonate a simple ⍵
+      :If 0<≢tfns←{2=' '+.=⍵:⍵↓⍨⍵⍳' ' ⋄ ⍵}¨tfns                      ⍝ Remove left arguments
+          r,←{⍵↑⍨¯1+⌊/⍵⍳' ;'}¨tfns                                   ⍝ Name of all trad fns
+      :EndIf
+      :If 0<≢bodies←'∇[^∇]*∇'⎕S{⍵.Match}⍠options⊣body                ⍝ Every trad fn must be investigated for any local dfns.
+      :AndIf 0<≢bodies←{(⎕UCS 10)~¨⍨(~(⎕UCS 13 10)⍷⍵)⊆⍵}¨bodies      ⍝ Split them one-by-one
+          r,←{0=≢⍵:⍵ ⋄ ⊃,/⍵}EstablishDfns¨bodies                     ⍝ All dfns defined within tradfns
+      :EndIf
+      body←'∇[^∇]*∇'⎕R''⍠options⊣body                                ⍝ Wipe out all trad fns
+      body←(0<≢¨body~¨' ')/body                                      ⍝ No empty lines
+      ⍝ --- Next two lines are future stuff
+      ⍝ dfns←EstablishDfns body                                      ⍝ Extract the dfns (and dops of course)
+      ⍝ r,←∪dfns                                                     ⍝ Those might well be variable assignment, therefore ∪!
+    ∇
+
+    IsScripted←{16::0 ⋄ 1⊣⎕SRC ⍵}
+
+      EstablishDfns←{
+      ⍝ In case ⍺ is 1 just the names of all dfns (dops) found in ⍵ are returned.
+      ⍝ In case ⍺ is 0 only names that are localized are returned.
+          ⍺←1
+          body←⍵
+          dfns←(∨/¨'←{'∘⍷¨body)/body                                 ⍝ Only lines that carry ←{ will survive
+          0=≢dfns:''
+          dfns←(0=≢¨1↓¨⊃¨{'\}(.*$)'⎕S{⍵.Match}⊣⍵}¨dfns)/dfns         ⍝ Get rid of one-line unnamed dfns
+          0=≢dfns:''
+          dfns←{⍵↑⍨¯1+⍵⍳'←'}¨dfns                                    ⍝ Assignments survive
+          dfns←(¯1≠⊃∘⎕NC¨dfns)/dfns                                  ⍝ Get rid of what is an invalid name (those are variable assignments)
+          0=≢dfns:''
+          dfns~¨←' '                                                 ⍝ Remove all spaces
+          ⍺:dfns
+          ∘∘∘ ⍝TODO⍝
+      }
+
+    ∇ r←options GeterAndSetterNames body;bool
+      r←''
+      body←1↓⊃,/(⎕UCS 10),¨body
+      :If ∨/bool←':property'⍷⎕C body
+          r,←⊃,/body∘{'set_' 'get_',¨⊂(1+≢':propert')↓{⍵↑⍨¯1+⍵⍳⎕UCS 10}⍵↓⍺}¨{⍵/⍳≢⍵}bool
+      :EndIf
+    ∇
+
+    ∇ data←data RemoveToBeIgnored ignore;bool
+      ⍝ `ignore` is a nested vector with nanes. In case such a name identifies any APL object it is removed.\\
+      ⍝ However, if an ordinary namespace is part of `ignore` then it won't appear in `data`.
+      ⍝ Therefore we identify container names in a second step and remove everything that belongs to such a container.
+      ⍝ That means it works recursively.
+      :If 0<≢ignore
+      :AndIf 0<≢data←(~data[;1]∊ignore)⌿data
+          bool←9=⊃∘⎕NC¨ignore
+          data←(⊃∧/data∘{⍵∘≢¨(≢⍵)↑¨⍺[;1]}¨((bool/ignore),¨'.'))⌿data
+      :EndIf
+    ∇
+
+    ∇ r←FormatDateTime ts
+      r←⊃'YYYY-MM-DD hh:mm:ss'(1200⌶)¯1 1 ⎕DT⊂ts
+    ∇
+
+    ∇ r←CollectInformation dummy;version;ts
+    ⍝ Collects information about the current test run.
+      ts←FormatDateTime ⎕TS
+      version←⊃{⍺,' ⋄ ',⍵}/# ⎕WG'APLVersion'
+      r←1 3⍴ts version(' '~⍨,'K0G⊂ZZZ.ZZZ.ZZZ.ZZZ.ZZ9⊃'⎕FMT⌊⎕WA÷1024×1024) ⍝ MBs
+    ∇
+
+:EndClass

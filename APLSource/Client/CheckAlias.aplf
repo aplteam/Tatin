@@ -7,10 +7,10 @@
      alias←¯1↓1⊃SplitAtAlias packageID
  :AndIf 0<ref.⎕NC alias
      :If 9=ref.⎕NC alias
-         packageID_←GetPackageIDFromFilename packageID
+         packageID_←GetPackageIDFrom packageID
          old←⍕targetSpace⍎alias
          packageID_old←{⍵↑⍨1+-'.'⍳⍨⌽⍵}{¯1↓⍵/⍨⌽1≤+\'.'=⌽⍵}old
-         packageID_old_←GetPackageIDFromFilename packageID_old
+         packageID_old_←GetPackageIDFrom packageID_old
          packageID_old_[{2↓⍸'_'=⍵}packageID_old_]←'.'
          ((packageID_old_='_')/packageID_old_)←'-'
          :If ≢/Reg.RemovePatch¨packageID_ packageID_old_

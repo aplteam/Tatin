@@ -10,13 +10,13 @@
          ref←CheckWsPaths ref
          :If 0<≢deps←ref.TatinVars.DEPENDENCIES
              deps←ReplaceRegistryAlias¨deps
-             destinations←GetPackageIDFromFilename¨deps
+             destinations←GetPackageIDFrom¨deps
              destinations←2⊃¨SplitAtAlias¨destinations
              destinations←(⊂root,'.'),¨Reg.EnforceAPL_Name¨destinations
              destinations←CheckWsPaths¨destinations
              cfgs←Reg.JSON¨destinations⍎¨⊂'TatinVars.CONFIG'
              :For cfg destination dep :InEach cfgs destinations deps
-                 depName←{⍵↑⍨¯1+⍵⍳'-'}{⍵↓⍨⍵⍳'-'}GetPackageIDFromFilename dep
+                 depName←{⍵↑⍨¯1+⍵⍳'-'}{⍵↓⍨⍵⍳'-'}GetPackageIDFrom dep
                  aliasOrName←depName{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ⍺}dep
                  :If 0=≢cfg.api
                      :If 1≠≢list←(' '~¨⍨↓⍎destination,'.⎕NL 9')~⊂'TatinVars'

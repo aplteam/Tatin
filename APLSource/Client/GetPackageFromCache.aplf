@@ -1,8 +1,8 @@
  tempDir←GetPackageFromCache(url packageID path2cache)
-⍝ Copies a packages from the Tatin package cache into a newly created temp folder and returns it.
+⍝ Copies a packages from the Tatin package cache into a newly created temp folder and returns the folder.
  tempDir←Reg.GetTempDir,'/',packageID,'_',GetMD5 path2cache,'/',CFG_Name
- F.RmDir tempDir
- ⎕DL 0.02
+ F.RmDir tempDir ⍝ Might have happened earlier
+ ⎕DL 0.01
  ('Does already exist: ',tempDir)Assert 0=F.IsDir tempDir
  F.MkDir tempDir
  tempDir ⎕NCOPY⍠('Wildcard' 1)⊣path2cache,'/*'

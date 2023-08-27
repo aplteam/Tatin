@@ -1,98 +1,92 @@
 [parm]:title             = 'Tatin ReadMe'
 
-⍝ Note that the document "Documentation Center" that is offered on Tatin's home page is dynamically generated from this page.
+⍝ Note that the document "Documentation Center" is offered on Tatin's home page is dynamically generated from this page. The <h1> tag will then become an <h2> tag. That's why what normally would be an <h2> tag is an <h3> tag in this document.
 
-## Documentation Center
+Tatin Documentation Center
+==========================
 
-The Tatin documentation consists of a collection of HTML files.
 
-This document gives you an overview of these HTML files: their purpose and who should (or may) read them, and which ones you can safely ignore depending on your skills and goal(s).
+Explore Tatin's comprehensive documentation presented as a collection of HTML files. This guide offers an overview of each document's intent, the target audience, and which ones might be relevant based on your requirements and skill set.
 
- 
-### General information
+### General Information
 
 * [Introduction](./Introduction.html "Introduction.html") (draft)
 
-  A must-read for _everybody_.
+  Essential for all users.
 
 * [Semantic Versioning](./SemanticVersioning.html "SemanticVersioning.html") (draft)
 
-  Read this if you don't know what Semantic Versioning is; an understanding is essential for using Tatin.
+  Understand the importance of Semantic Versioning in Tatin.
 
 * [Tatin's Load and Update Strategy](./TatinsLoadAndUpdateStrategy.html "TatinsLoadAndUpdateStrategy.html") (draft)
 
-  Discuss what measures Tatin takes when dependencies rely on different versions of the same package and related issues.
+  Discover how Tatin handles dependencies with varied package versions.
 
 * [Tatin User Settings](./TatinUserSettings.html "TatinUserSettings.html") (draft)
 
-  You need to read this _only_ in case one or more of the following is true for you:
-  
-  * You are unhappy with Tatin's default location for the user settings file
-  * You need multiple user settings files
-  * You need different user settings files for multiple users
+  Relevant if:
+
+  * you wish to change Tatin's default user settings location.
+  * you require multiple user settings files.
+  * different users need distinct settings files.
 
 * [Syntax Reference](./SyntaxReference.html "SyntaxReference.html") (draft)
 
-  Documents the syntax of all API functions.
+  Comprehensive syntax guide for all API functions.
 
-### The Client
+### Client Side
 
 * [Installing and updating the Tatin Client](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") (draft)
 
-  Check whether autocomplete in the Dyalog session offers you something after entering `]Tatin` - if that's the case Tatin is already available, so no need to install it.
-
-  However, you might still want to update Tatin.
+  If `]Tatin.` autocompletes in the Dyalog session, installation isn't required. However, updates might be beneficial.
 
 * [First Steps with Tatin](./FirstStepsWithTatin.html "FirstStepsWithTatin.html") (draft)
 
-  Read this before you consume your first package
+  An introductory guide for first-time package consumption.
 
 * [Package Configuration](./PackageConfiguration.html "Regarding Package Configuration") (draft)
 
-  Read this for discussing the details of package configuration files.
+  Delve into the details of package configuration files.
 
 * [Publishing Packages](./PublishingPackages.html "PublishingPackages.html") (draft)
 
-  Read this in case you want to publish Tatin packages.
+  For those keen on publishing Tatin packages.
 
 * [Caching](./Caching.html "Caching.html") (draft)
 
-  By default, the Tatin client caches any package that is either installed or loaded. This document
-  discusses the implications, and under which circumstances you might want to switch caching off, either
-  globally or just for a specific Registry.
+  Understand the default caching behavior, its implications, and instances when you might want to modify it.
 
 * [GitHub](./GitHub.html "GitHub.html") (draft)
 
-  Discusses GitHub-related issues, typically only relevant for contributors 
+  Addresses GitHub-specific topics, primarily for contributors.
 
-
-### The Server
-
+### Server Side
 
 * [Installing the Tatin Server](./InstallingTheTatinServer.html "InstallingTheTatinServer.html") (draft)
-  
-  Read this if you want to run your own Tatin server.  
+
+  A guide for users interested in hosting a Tatin server.
 
 * [Server --- Tips and tricks](./Server-TipsAndTricks.html "Server-TipsAndTricks.html") (stub)
 
-  The title says it all...
+  Useful insights for optimal server performance.
 
-
-### Misc
+### Miscellaneous
 
 * [Release Notes](./ReleaseNotes.html "ReleaseNotes.html") (draft)
 
-  Carries potentially a list of actions that need to be carried out before a new version can be used.
+  Highlights any necessary actions for seamless transitions between versions.
 
 * [Usage data](./UsageData.html "Usagedata.html") (draft)
 
-  Read this in case you are interested in statistical data regarding downloads of packages
+  For those curious about package download statistics.
 
 * [Tatin for Contributors](./TatinForContributors.html "TatinForContributors.html") (draft)
 
-  Read this in case you want to contribute to the Tatin project on GitHub
+  A guide for potential contributors to Tatin's GitHub project.
 
 * [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (draft)
 
-  Read this if you want to run a Tatin server behind an Apache server. 
+  Instructions for integrating a Tatin server with an Apache server.
+
+
 

@@ -1,4 +1,4 @@
-  r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD;ucScriptName
+ r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD;ucScriptName
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package(s) `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -6,7 +6,7 @@
 ⍝ `targetFolder` must be one of:
 ⍝ * Path to a folder
 ⍝ * [MyUCMDs] (case independent)\\
-⍝   In this case you may of may not specify the name of a sub-folder after `[MyUCMDs`]`; if you don't then the name of the package rules.
+⍝   In this case you may or may not specify the name of a sub-folder after `[MyUCMDs`]`; if you don't then the name of the package rules.
 ⍝ `identifierd` must be one (or more) of:
 ⍝ * an HTTP request for a package
 ⍝ * a ZIP file holding a package
@@ -28,9 +28,10 @@
  :If isUCMD∧1<≢identifiers
      'You must not specify a name after [MyUCMDs] when installing more than one package'Assert 0=≢(≢'[myucmds]')↓targetFolder
  :EndIf
- :Trap 998
+ :Trap Reg.ErrorNo
      :For identifier_ :In identifiers
          (alias identifier_)←SplitAtAlias identifier_
+         ('Invalid alias: ',identifier_)Assert(,'@')≢alias
          identifier←ReplaceRegistryAlias identifier_
          ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
          identifier←noBetas CheckVersion identifier
@@ -47,7 +48,7 @@
          :Else
              targetFolder_←targetFolder
          :EndIf
-         packageID←GetPackageIDFromFilename identifier
+         packageID←GetPackageIDFrom identifier
          {}{'Unable to create target directory'Assert F.MkDir ⍵}⍣(~F.IsDir targetFolder_)⊢targetFolder_
          :If 0=≢identifier    ⍝ Not found?
              PrintToSession'Not found: ',identifier_
@@ -71,7 +72,7 @@
          :EndIf
          PrintToSession'  Establish dependencies...'
          r,←targetFolder_ InstallPackage_ alias identifier
-         packageID←GetPackageIDFromFilename identifier
+         packageID←GetPackageIDFrom identifier
          cfg←ReadPackageConfigFile targetFolder_,'/',packageID,'/',CFG_Name
          :If 0<≢cfg.userCommandScript
              ucScriptName←⊃,/1↓⎕NPARTS cfg.userCommandScript

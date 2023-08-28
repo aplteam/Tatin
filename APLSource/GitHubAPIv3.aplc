@@ -10,11 +10,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHubAPIv3' '1.0.0+24' '2020-06-06'
+      r←'GitHubAPIv3' '1.0.1' '2023-08-28'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.0.1
+    ⍝   * Domain of the function `CastTagname2Number` extended: Major and minor nmber might both carry 3 digits,
+    ⍝     while a build number might carry up to 5 digits.
     ⍝ * 1.0.0
     ⍝   * This release comes with several breaking changes due to a re-design:
     ⍝     1. It does not depend on .NET anymore, meaning is works on Linux and Mac-OS without .NET
@@ -189,11 +192,11 @@
     ⍝ Assumptions:
     ⍝ * `text` may or may not start with a non-digit. All leading non-digit characters are ignored.\\
     ⍝   Therefore both `1.2.3` and `v.1.2.3` are valid input.
-    ⍝ * No part is allowed to start with a zero followd by a non-zero digit. Therefore 1.0.0 is valid input but
+    ⍝ * No part is allowed to start with a zero followed by a non-zero digit. Therefore 1.0.0 is valid input but
     ⍝   01.2.3, 1.02.3 and 1.2.03 are not.
     ⍝ * The remaining `text` must consist of nothing but digits and dots.
-    ⍝ * The first two numbers ("major" and "minor") must not be bigger than 99.
-    ⍝ * The third number ("path") must not be bigger than 999.
+    ⍝ * The first two numbers ("major" and "minor") must not be bigger than 999.
+    ⍝ * The third number ("patch") must not be bigger than 9999.
     ⍝ * The optional last (forth) number must not be bigger than 99999.
     ⍝ * `text` must come either with three numbers (as in `1.2.3`) or with four number (as in `1.2.3.9999`).
     ⍝ If the tag name does not fulfil the assumptions the conversion might fail; in that case `⍬` is
@@ -214,14 +217,14 @@
       :AndIf 3 4∊⍨⍴bool
           vec←{⍵↑⍨3⌈4⌊⍴⍵}↑vec
           :If 3=⍴vec
-              :If ∧/100 100 1000>vec
-              :AndIf 0=number←100 100 1000⊥vec
+              :If ∧/1000 1000 10000>vec
+              :AndIf 0=number←1000 1000 10000⊥vec
                   number←⍬
               :EndIf
           :Else
-              :If ~∧/100 100 1000 100000>vec
+              :If ~∧/1000 1000 10000 100000>vec
                   number←⍬
-              :ElseIf 0=number←100 100 1000 100000⊥vec
+              :ElseIf 0=number←1000 1000 10000 100000⊥vec
                   number←⍬
               :EndIf
               number÷←100000

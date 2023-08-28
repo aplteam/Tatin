@@ -14,8 +14,8 @@
  filename2←folder,Reg.DependenciesFilename
  filename1←folder,Reg.BuildListFilename
  :If ~force
-     ts1←1 ⎕DT⊃('type' 3)F.Dir filename1
-     ts2←1 ⎕DT⊃('type' 3)F.Dir filename2
+     ts1←1 ⎕DT⊂6↑⊃⊃('type' 3)F.Dir filename1
+     ts2←1 ⎕DT⊂0 0 0 0 0 1+6↑⊃⊃('type' 3)F.Dir filename2 ⍝ Add one second for strange behaviour under Windows
  :EndIf
  tree←ReadBuildList filename1
  deps←ReadDependencyList filename2
@@ -35,7 +35,7 @@
      tree←ReadBuildList filename1
      deps←ReadDependencyList filename2
      deps_←RemoveAlias¨deps
-     ('Build list and dependency list are incompatible in ',folder)Assert~0∊(Reg.RemoveMinorAndPatch¨  deps_)∊Reg.RemoveMinorAndPatch¨tree[;2]
+     ('Build list and dependency list are incompatible in ',folder)Assert~0∊(Reg.RemoveMinorAndPatch¨deps_)∊Reg.RemoveMinorAndPatch¨tree[;2]
  :EndIf
  :If ∨/b←~F.IsDir¨folder∘,¨RemoveAlias¨tree[;2]
      msg←'The build list in ',LF,'  ',folder,LF,'  refers to'

@@ -14,8 +14,8 @@
  filename2←folder,Reg.DependenciesFilename
  filename1←folder,Reg.BuildListFilename
  :If ~force
-     ts1←1 ⎕DT⊂6↑⊃⊃('type' 3)F.Dir filename1
-     ts2←1 ⎕DT⊂0 0 0 0 0 1+6↑⊃⊃('type' 3)F.Dir filename2 ⍝ Add one second for strange behaviour under Windows
+     ts1←GetFileTime filename1
+     ts2←1 GetFileTime filename2 ⍝ Add one second for strange behaviour under Windows
  :EndIf
  tree←ReadBuildList filename1
  deps←ReadDependencyList filename2

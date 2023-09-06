@@ -331,7 +331,7 @@ Both the user command `]Tatin.ListLicenses` and the API function `⎕SE.Tatin.Li
 
 #### lx
 
-This is optional: it may or may not exist, and it might be empty if it does exist\.
+This is optional: it may or may not exist, and it might be empty if it does exist.
 
 In case it is not empty it must be the name of a niladic or monadic function that resides in the top-level namespace of the package (_not_ in what might be defined as API!) or a shared method of a class.
 
@@ -552,3 +552,4 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+

@@ -72,6 +72,8 @@
       _caching←1
       _path2cache←''
       _license←''
+      _groupname←''
+      _email←''
     ∇
 
     :Property source
@@ -160,6 +162,33 @@
           'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
           'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
           _license←val.NewValue
+        ∇
+    :EndProperty
+
+    :Property groupname
+    ⍝ Defines the default group name used for new packages
+    :Access Public Instance
+        ∇ r←get
+          r←_groupname
+        ∇
+        ∇ set val
+          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
+          _groupname←val.NewValue
+        ∇
+    :EndProperty
+
+    :Property email
+    ⍝ Defines the default for the maintainer's email address
+    :Access Public Instance
+        ∇ r←get
+          r←_email
+        ∇
+        ∇ set val
+          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
+          'Invalid: must carry a "@" character'Assert'@'∊val.NewValue
+          _email←val.NewValue
         ∇
     :EndProperty
 

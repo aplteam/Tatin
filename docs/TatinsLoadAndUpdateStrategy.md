@@ -170,7 +170,7 @@ Though installing packages is roughly the same as loading packages except that t
 
 Installed packages are loaded with the Tatin user command `LoadDependencies` which takes a folder as an argument that must have a file `apl-dependencies.txt` but also a file `apl-buildlist.json` which was created when you installed your first package, and which will be extended when you install additional packages.
 
-You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to `#`.
+You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to `#` in case you are in `#`. If you are, say, in `#.foo` then Tatin will ask you whether you want to install into `#` or into `#.foo`.
 
 ```
       ]TATIN.LoadDependencies /myPkgs/ #.Temp
@@ -181,8 +181,7 @@ This is what `LoadDependencies` will do:
 1. It reads the file `apl-dependencies.txt`.
 2. It checks whether this file was changed _after_ the file `apl-buildlist.json` was written to disk.
 
-  If that is the case, the build list will be checked for consistency with `apl-dependencies.txt`; if that 
-  is fine then the build list is created from scratch,
+  If that is the case, the build list will be checked for consistency with `apl-dependencies.txt`; if it's okay then the build list is created from scratch,
 3. Finally it will prune the build list and bring in the remaining packages.
 
 Note that the pruning is in charge of removing the package `Zoo` 1.1.1. That means that rather than loading `Zoo` twice _only the latest **installed** version_ will be loaded: both `Foo` and `Goo` will use `Zoo` version 1.2.0. 
@@ -242,4 +241,5 @@ A> When you specify the `-major` flag of the `CheckForLaterVersion` user command
 ## Downgrading
 
 There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here; you need to do this yourself.
+
 

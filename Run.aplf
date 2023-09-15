@@ -1,0 +1,13 @@
+﻿ Run path;⎕TRAP;source
+⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the user command will be found.
+⍝ This is for version 19.0 onwards.
+⍝ The function is part of the Tatin project.
+ ⎕TRAP←0 'S'
+ :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃#.APLVersion
+     source←'C:/Users/kai/Documents/Dyalog APL-64 19.0 Unicode Files/StartupSession/SessionExtensions'
+     '_Tatin'⎕SE.⎕CY source,'/Tatin/Client.dws'
+     ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+     ⍝TODO⍝ ⎕SE.SALT.Set ....
+     ⎕SE.Tatin.LoadDependencies(source,'/Cider')⎕SE
+ :EndIf
+ ⍝Done

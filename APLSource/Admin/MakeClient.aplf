@@ -31,15 +31,18 @@
      parms←⎕SE.Cider.CreateOpenParms ⍬
      parms.folder←#.Tatin.CiderConfig.HOME
      parms.projectSpace←'_Tatin'
-     parms.quietFlag←1
+     parms.batch←1
+     parms.verbose←0
      (success log)←⎕SE.Cider.OpenProject parms
      Assert success
      {}⎕SE.Cider.CloseProject''
-     #._Tatin.⎕EX¨'Server' 'Todo' 'TestCases' 'Simu' 'TestCasesServer' 'Tester2' 'CodeCoverage'
-     #._Tatin.Admin.⎕EX¨'Initialize_Server' 'RunTestServer' 'CreateAllRefs_Server'
      ⎕LX←''
      #._Tatin.Admin.Initialize_Client
-     #._Tatin.Admin.⎕EX'Initialize_Client'
+     #._Tatin.⎕EX¨'Server' 'Todo' 'TestCases' 'Simu' 'TestCasesServer' 'Tester2' 'CodeCoverage'
+     #._Tatin.Admin.⎕FX'___Delete;CreateAllRefs_Client;EstablishClientInQuadSE;EstablishFunctionInAPI;InitConga' '⎕EX ⎕NL⍳16'
+     #._Tatin.Admin.___Delete
+     #._Tatin.⎕EX'CiderConfig'
+     #._Tatin.⎕EX¨'APLProcess' 'HandleError' 'IniFiles' 'MarkAPL' 'SMTP' 'WindowsEventLog'  ⍝ Server only
      F.MkDir'Dist'
      targetPath←'Dist/Client'
      {}F.RmDirByForce targetPath
@@ -63,7 +66,7 @@
          './APLSource/Tatin.dyalog'(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)userCommandTargetFolder,'/Tatin/Tatin.dyalog'
      :EndIf
      (targetPath,'/Tatin/Maintenance/')(⎕NCOPY⍠('Wildcard' 1)('IfExists' 'Replace')F.ExecNfunction)'./Maintenance/Client/*'
-     (targetPath,'/Tatin')(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction )'./APLSource/Tatin.dyalog'
+     (targetPath,'/Tatin')(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)'./APLSource/Tatin.dyalog'
      'Create!'F.CheckPath targetPath,'/Tatin/Assets/Runtime'
      (targetPath,'/Tatin/Assets/Runtime/')(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)'./Assets/Runtime/Rumba'
      'Create!'F.CheckPath targetPath,'/Tatin/Assets/docs'

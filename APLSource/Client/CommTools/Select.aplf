@@ -26,7 +26,7 @@
  :AndIf 0<≢Select_Choices
      :If AliasChar∊caption
          (alias caption)←{l←⍵⍳AliasChar ⋄ (l↑⍵)(l↓⍵)}caption
-         flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨Select_Choices[;1])≡¨⊂alias
+         flag←0<+/bool←({⍵↑⍨(,⍵)⍳AliasChar}¨Select_Choices[;1])≡¨⊂alias
      :Else
          :If 0=+/bool←Select_Choices[;1]≡¨⊂caption
              bool←caption∘{⍵≡⍺↑⍨≢⍵}¨Select_Choices[;1]
@@ -39,14 +39,19 @@
          :If (⊂index)∊0 ⍬
              index←⍬
          :ElseIf ' '=1↑0⍴∊index ⍝ Text?!
-             :If (,'a')≡,index
+             :If '*'=¯1↑index
+                 index←((¯1+≢index)↑¨{⍵↓⍨+/∧\' '=⍵}¨choices)⍳⊂(¯1↓index)
+                 'Invalid selection'Assert index∊⍳≢choices
+             :ElseIf (,'a')≡,index
                  index←⍳≢choices
              :ElseIf (,'q')≡,index
                  index←⍬
              :ElseIf 0<≢buff←⍸index∘≡¨choices
                  index←buff
+                 'Invalid selection'Assert index∊⍳≢choices
              :ElseIf 1=≢index←⍸index∘≡¨(≢index)↑¨{⍵↓⍨+/∧\' '=⍵}¨choices
                  index←⊃index
+                 'Invalid selection'Assert index∊⍳≢choices
              :Else
                  'Invalid selection'Assert 0
              :EndIf

@@ -14,16 +14,15 @@
  ns.maintainer←({1}C.AskForText)'pkg-maintainer@Enter the email address of the maintainer'
  ns.tags←enforce({1}C.AskForText)'pkg-tags@Enter a comma-separated list of tags'
  ns.license←NegotiateLicense ns
- ind←'On which operating system will the package be usable'multiples enforce C.Select'Windows' 'Linux' 'Mac-OS'
- ns.(os_win os_lin os_mac)←1 2 3∊ind
- ns.io←⊃1 C.YesOrNo'Is ⎕IO 1?'
- ns.ml←⊃enforce({⍵∊0 1 2 3:1 ⋄ ⎕←'Enter 0, 1, 2 or 3' ⋄ 0}C.AskForNumber)'Enter value for ⎕ML'
- :If C.YesOrNo'Is the project (going to be) hosted on GitHub?'
+ ns.(os_win os_lin os_mac)←1
+ ns.io←#.⎕IO
+ ns.ml←#.⎕ML
+ :If 1 C.YesOrNo'Is the project (going to be) hosted on GitHub? (a URL will then be compiled for "project_url")'
      ns.project_url←'https://github.com/',ns.group,'/',ns.name
  :Else
      ns.project_url←({1}C.AskForText)'pkg-projectUrl@Enter the URL of the project'
  :EndIf
- :If 0 C.YesOrNo'Is the package a user command?'
+ :If 0 C.YesOrNo'Does the package come with a user command script?'
      ns.userCommandScript←({1}C.AskForText)'Enter the name of the user command script (including file extension) in "source"'
  :EndIf
 ⍝Done

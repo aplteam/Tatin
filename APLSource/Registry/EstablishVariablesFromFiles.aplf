@@ -1,10 +1,15 @@
- {r}←ref EstablishVariablesFromFiles filenames;filename;data;name;dmx
+{r}←ref EstablishVariablesFromFiles filenames;filename;data;name;dmx
  r←0
  :For filename :In filenames
      data←⊃⎕NGET filename 1
      :Trap 0
          data←⎕SE.Dyalog.Array.Deserialise data
-         name←⎕se.Link.U.StripCaseCodePart 2⊃⎕NPARTS filename
+     :Else
+         dmx←⎕DMX
+         ⎕←'*** Deserialising a variable failed with ',(2⊃dmx.DM),'; RC=',⍕dmx.EN
+     :EndTrap
+     :Trap 0
+         name←⎕SE.Link.U.StripCaseCodePart 2⊃⎕NPARTS filename
          name ref.{⍎⍺,'←⍵'}data
      :Else
          dmx←⎕DMX

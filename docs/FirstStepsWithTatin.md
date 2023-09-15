@@ -385,7 +385,7 @@ Notes:
 Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and optionally a target namespace:
 
 ```
-      ]tatin.LoadPackages [tatin]MarkAPL
+      ]tatin.LoadPackages [tatin]MarkAPL -verbose
   Attempting to install https://tatin.dev/aplteam-MarkAPL-10.0.0...
   Establish dependencies...
   4 dependencies identified
@@ -394,8 +394,13 @@ Let's load the `MarkAPL` package into the workspace; for that we need to specify
   Add aplteam-MarkAPL-10.0.0 to dependency file...
   Fetching https://tatin.dev/aplteam-APLTreeUtils2-1.1.0...
   ...
-C:\Users\username\AppData\Local\Temp\username_155648451
 ```
+
+I> Without `-verbose` the command is taciturn:
+I> ```
+I> ]tatin.LoadPackages [tatin]MarkAPL
+I> 4 packages (including dependencies) loaded
+I> ```
 
 Here we did not specify a target namespace, so the package was loaded into `#`. In case the target namespace is something like `#.MyTests` then it may or may not exist. If it does not, Tatin will create it.
 
@@ -600,3 +605,4 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 ##### URI
 
 Character vector that holds the address of a Tatin server or the full name of a ZIP file.
+

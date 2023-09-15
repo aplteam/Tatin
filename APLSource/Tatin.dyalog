@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.69.2 - 2023-08-14
+⍝ * 0.70.0 - 2023-09-08
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -86,7 +86,7 @@
           c←⎕NS ⍬
           c.Name←'LoadPackages'
           c.Desc←'Load the package(s) specified in the argument and all dependencies into the WS or ⎕SE'
-          c.Parse←'1-2 -nobetas'
+          c.Parse←'1-2 -nobetas -verbose'
           r,←c
      
           c←⎕NS ⍬
@@ -228,7 +228,12 @@
       :If ≡/⎕C¨'loadtatin'Cmd
           Input.force LoadTatin(1+(0≡Input._1)∨0=≢Input._1)⊃Input._1''
       :Else
-          TC←⎕SE._Tatin.Client
+          :If 1
+              TC←⎕SE._Tatin.Client
+          :Else
+              TC←#.Tatin.Client
+              ⎕←'*** TC←#.Tatin.Client'
+          :EndIf
           :If 0=⎕SE._Tatin.RumbaLean.⎕NC'DRC'
               ⎕SE._Tatin.Admin.InitConga ⍬
           :EndIf
@@ -770,7 +775,7 @@
               r←''
           :Else
               r←⍪(⊂'Re-installed:'),' ',¨r
-              ⎕←'*** Done'
+              ⎕←'Done'
           :EndIf
       :EndIf
     ∇
@@ -1030,27 +1035,8 @@
           (packageID path)←Arg.(_1 _2)
           :If path≡0
               path←EstablishPackageFolder''
-              :If ⎕NEXISTS path,TC.Reg.CFG_Name
-                  :If 9=⎕SE.⎕NC'Cider'
-                      cfg←⎕SE.Cider.ReadProjectConfigFile path
-                  :AndIf 0<≢∊cfg.CIDER.(dependencies dependencies_dev).tatin
-                      subFolders←{⍵↑⍨¯1+⍵⍳'='}¨(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
-                      :If 1=≢subFolders
-                          path,←⊃subFolders
-                          :If 0=1 TC.C.YesOrNo'Sure you want to act on ',path,' ?'
-                              r←'Cancelled by user' ⋄ →0
-                          :EndIf
-                      :Else
-                          ind←'Which folder would you like to un-install from?'TC.C.Select path∘,¨subFolders
-                          :If 0=≢ind
-                              r←'Cancelled by user' ⋄ →0
-                          :Else
-                              path,←ind⊃subFolders
-                          :EndIf
-                      :EndIf
-                  :Else
-                      r←'No project/folder identified' ⋄ →0
-                  :EndIf
+              :If 0=≢path
+                  r←'Cancelled by user' ⋄ →0
               :EndIf
           :EndIf
           :If (,'?')≡,packageID
@@ -1097,7 +1083,7 @@
           'Please specify only one package at the time'Assert~','∊packageID
           (list msg)←TC.UnInstallPackages packageID path
           msg Assert 0=≢msg
-          r←⍪(⊂'*** These packages were uninstalled:'),list
+          r←⍪(⊂'These packages were uninstalled:'),list
       :EndIf
     ∇
 
@@ -1178,7 +1164,7 @@
               :If 0=≢buff
                   r←'Not found: <',arg,'>'
               :ElseIf TC.Reg.IsHTTP TC.ReplaceRegistryAlias arg
-                  caption←1 2⍴('*** All versions of package <',arg,'> :')' '
+                  caption←1 2⍴('All versions of package <',arg,'> :')' '
                   caption⍪←('-'⍴⍨≢1⊃caption[1;])''
                   buff[;1]←' ',¨buff[;1]
                   r←caption⍪buff,' '
@@ -1206,8 +1192,10 @@
       {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage tatinURL,'/v1/documentation'
     ∇
 
-    ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx
+    ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx;verboseWas
       r←''
+      verboseWas←TC.∆VERBOSE
+      TC.∆VERBOSE←Arg.verbose
       (identifier targetSpace)←Arg.(_1 _2)
       :If 0≡targetSpace
       :AndIf 0=≢targetSpace←DefineTargetSpace ⍬
@@ -1232,6 +1220,7 @@
           TC.CloseConnections 1
           CheckForInvalidVersion qdmx
       :EndTrap
+      TC.∆VERBOSE←verboseWas
     ∇
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error
@@ -1473,7 +1462,7 @@
           CheckForInvalidVersion qdmx
       :EndTrap
       :If 0<≢r
-          r←⍪(⊂'*** Installed into ',installFolder,':'),' ',¨r
+          r←⍪(⊂'Installed into ',installFolder,':'),' ',¨r
       :EndIf
       ⍝Done
     ∇
@@ -1586,7 +1575,7 @@
               r←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
           :EndIf
       :Else
-          r←'*** Nothing found'
+          r←'Nothing found in ',TC.GetPathToPackageCache
       :EndIf
       :If 0<≢list
       :AndIf Arg.clear
@@ -1594,14 +1583,14 @@
               flag←1
           :Else
               ⎕←r
-              flag←TC.C.YesOrNo'*** Sure that you want delete these from the Tatin package cache?'
+              flag←TC.C.YesOrNo'Sure that you want delete these from the Tatin package cache?'
           :EndIf
       :AndIf flag
           (rc report)←TC.ClearCache url
           :If 0=rc
-              r←'*** Cache successfully cleared'
+              r←'Cache successfully cleared'
           :Else
-              r←'*** Attempt to delete these failed:',⊃,/CR¨,⊆report
+              r←'Attempt to delete these failed:',⊃,/CR¨,⊆report
           :EndIf
       :EndIf
     ∇
@@ -1918,14 +1907,14 @@
               r,←⊂'Must be the fully qualified name of a namespace the package will be loaded into.'
               r,←⊂'May be # or ⎕SE or a sub-namespace of any level.'
               r,←⊂''
-              r,←⊂'-nobetas: By default beta versions are included. Specify -nobetas to suppress them.'
+              r,←⊂'-nobetas  By default beta versions are included. Specify -nobetas to suppress them.'
+              r,←⊂'-verbose  Let the command report steps along the way.'
               r,←⊂''
               r,←⊂'Returns the number of packages loaded into the workspace, including dependencies.'
-              r,←⊂''
               r,←HelpOnPackageID ⍬
           :Case ⎕C'InstallPackages'
               r,←⊂'Installs the given package(s) and all dependencies into a given folder.'
-              r,←⊂'If the installation folder does not yet exist it will be created, but the user must confirm this.'
+              r,←⊂'If the installation folder does not yet exist it will be created; user must confirm.'
               r,←⊂'Requires two arguments:'
               r,←⊂''
               r,←⊂'A) First argument:'
@@ -2004,10 +1993,10 @@
           :Case ⎕C'PackageConfig'
               r,←⊂'Manages a package config file: fetch, create, edit or delete it.'
               r,←⊂'The argument, if specified, must be either a URL or a path.'
-              r,←⊂' * In case of a URL the package config file is printed to the session (JSON).'
-              r,←⊂'   Specifying any of the options has no effect then.'
+              r,←⊂' * In case of a URL the contents of the config file is printed to the session (JSON).'
+              r,←⊂'   Specifying any of the flags has no effect then.'
               r,←⊂' * In case it is a path it must point to a folder that contains a Tatin package.'
-              r,←⊂'   The contents of the file "',TC.CFG_Name,'" in that folder is printed to the ssion (JSON).'
+              r,←⊂'   The contents "',TC.CFG_Name,'" in that folder is printed to the session (JSON).'
               r,←⊂'   In case the file does not yet exist it will be created.'
               r,←⊂''
               r,←⊂'In case no argument is specified Tatin checks whether there are any open Cider projects.'
@@ -2021,16 +2010,16 @@
               r,←⊂'-delete  In case you want to delete the file specify the -delete flag.'
           :Case ⎕C'UnInstallPackages'
               r,←⊂'UnInstalls a given package and its dependencies if those are neither top-level packages nor'
-              r,←⊂'required by other packages. Superfluous packages (like outdated versions) are removed ws well.'
+              r,←⊂'required by other packages. Superfluous packages (like outdated versions) are removed as well.'
               r,←⊂'If you don''t want to delete a specific package but get rid of all superfluous packages'
-              r,←⊂'then don''t specify a package ID but the -cleanup option.'
+              r,←⊂'then don''t specify a package ID but -cleanup.'
               r,←⊂''
               r,←⊂'Requires at least one argument which must be one of:'
               r,←⊂' * A folder in conjunction with -cleanup flag'
               r,←⊂' * A package ID; this works only in conjunction with the Cider project manager,'
               r,←⊂'   since Tatin will work out the folder by looking at any open Cider projects.'
-              r,←⊂' * A "?"; Tatin will then present all top-level packages for selecting one'
-              r,←⊂'Two arguments must be a package-ID/alias/? and a folder.'
+              r,←⊂' * A "?"; Tatin will then present all top-level packages for selection.'
+              r,←⊂'Two arguments must be  [package-ID|alias|?] and a folder.'
               r,←⊂''
               r,←⊂'In case the first argument is a package ID it must be one of:'
               r,←⊂'   * Package ID '
@@ -2290,6 +2279,7 @@
               r,←⊂'  ]Tatin.LoadPackages A@name #.Foo.Goo                ⍝ With target namespace'
               r,←⊂'  ]Tatin.LoadPackages file:///path/group-name-1.0.0/  ⍝ Local Registry'
               r,←⊂'  ]Tatin.LoadPackages foo,bar                         ⍝ Multiple packages'
+              r,←⊂'  ]Tatin.LoadPackages [company]foo,[personal]bar      ⍝ Multiple packages from specific servers'
           :Case ⎕C'InstallPackages'
               r,←⊂'Examples:'
               r,←⊂'  ]Tatin.InstallPackages [tatin]/group-name-1.0.0 /path       ⍝ Alias & package ID with "/"'
@@ -2350,10 +2340,12 @@
     ∇ r←HelpOnPackageID dummy
       r←''
       r,←⊂'You may specify a Tatin alias for a package by putting it to the front and'
-      r,←⊂'separate it with an @.'
+      r,←⊂'separate it with an @. This allows to use different versions of the same package'
+      r,←⊂'in parallel. Don''t use it for other purposes.'
       r,←⊂''
       r,←⊂'If neither a Registry nor a ZIP is specified but just a package ID (partly/fully)'
       r,←⊂'then all defined Registries with priority>0 will be scanned; the first hit wins.'
+      r,←⊂'(For dependencies a scan will be performed in any case)'
       r,←⊂''
       r,←⊂'Case does not matter: MyGrp-MyPkg, mygrp-mypkg, MYGRP-MYPKG are all considered equal.'
       r,←⊂''
@@ -2518,7 +2510,7 @@
     ⍝ Next it tries to find it in the current dir.
     ⍝ The user should always be asked for confirmation.
     ⍝ If `folder` is relative and there are more than one Cider projects open then the user
-    ⍝ is asked which one she wants to act on except when `quiteFlag` is 1 (default is 0)
+    ⍝ is asked which one she wants to act on except when `quietFlag` is 1 (default is 0)
     ⍝ when an error is generated instead.
       quietFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quietFlag'
       :If ~IsAbsolutePath folder

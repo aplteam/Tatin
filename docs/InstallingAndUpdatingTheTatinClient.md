@@ -31,10 +31,6 @@ Instructions:
 
 2. Unzip it into the `MyUCMDs/` folder --- there is now a folder `Tatin/`
 
-W> You _must not_ install it into any other folder, even if that folder is scanned by Dyalog for user commands: that would not work.
-W>
-W> However, this might change with a later version.
-
 Where to find the `MyUCMDs/` folder depends on your operating system
 
 * On Windows it's usually `C:\Users\<username>\Documents\`
@@ -124,7 +120,8 @@ Create one that looks like this:
     ∇ r←AutoloadTatin debug;wspath;path2Config
       r←0 0⍴''
       :Trap debug/0
-          :If ~IfAtLeastVersion 18
+          :If 0=⎕SE.⎕NC'_Tatin'  ⍝ In 19.0 it might already be there!
+          :AndIf ~IfAtLeastVersion 18
               r←'Tatin not loaded: not compatible with this version of Dyalog'
           :ElseIf 80≠⎕DR' '              ⍝ Not in "Classic"
               r←'Tatin not loaded: not compatible with Classic'
@@ -215,3 +212,4 @@ Notes:
   The API equivalent `⎕SE.Tatin.Update 0` however was introduced in 0.78.0.
 
 * Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+

@@ -158,13 +158,13 @@ mygroup-Goo-2.1.0</code></pre>
 </div>
 <p>Though installing packages is roughly the same as loading packages except that the packages end up in the file system rather than the workspace, loading installed packages allow Tatin to optimize what's loaded, and in this respect the two differ.</p>
 <p>Installed packages are loaded with the Tatin user command <code>LoadDependencies</code> which takes a folder as an argument that must have a file <code>apl-dependencies.txt</code> but also a file <code>apl-buildlist.json</code> which was created when you installed your first package, and which will be extended when you install additional packages.</p>
-<p>You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to <code>#</code>.</p>
+<p>You may also specify a second argument: that's where the references pointing to the principal packages are going to be created. If you do not specify this it defaults to <code>#</code> in case you are in <code>#</code>. If you are, say, in <code>#.foo</code> then Tatin will ask you whether you want to install into <code>#</code> or into <code>#.foo</code>.</p>
 <pre><code>      ]TATIN.LoadDependencies /myPkgs/ #.Temp</code></pre>
 <p>This is what <code>LoadDependencies</code> will do:</p>
 <ol start="1">
 <li>It reads the file <code>apl-dependencies.txt</code>.</li>
 <li>It checks whether this file was changed <em>after</em> the file <code>apl-buildlist.json</code> was written to disk.
-<p>If that is the case, the build list will be checked for consistency with <code>apl-dependencies.txt</code>; if that   is fine then the build list is created from scratch,</p></li>
+<p>If that is the case, the build list will be checked for consistency with <code>apl-dependencies.txt</code>; if it's okay then the build list is created from scratch,</p></li>
 <li>Finally it will prune the build list and bring in the remaining packages.</li>
 </ol>
 <p>Note that the pruning is in charge of removing the package <code>Zoo</code> 1.1.1. That means that rather than loading <code>Zoo</code> twice <em>only the latest <strong>installed</strong> version</em> will be loaded: both <code>Foo</code> and <code>Goo</code> will use <code>Zoo</code> version 1.2.0.</p>

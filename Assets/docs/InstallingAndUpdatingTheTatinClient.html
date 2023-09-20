@@ -64,14 +64,6 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>Download the latest release of the Tatin client from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a></li>
 <li>Unzip it into the <code>MyUCMDs/</code> folder — there is now a folder <code>Tatin/</code></li>
 </ol>
-<div class="leanpub">
-<img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
-<div>
-<p>You <em>must not</em> install it into any other folder, even if that folder is scanned by Dyalog for user commands: that would not work.</p>
-<p>However, this might change with a later version.</p>
-</div>
-</div>
-
 <p>Where to find the <code>MyUCMDs/</code> folder depends on your operating system</p>
 <ul>
 <li>On Windows it's usually <code>C:\Users\&lt;username&gt;\Documents\</code></li>
@@ -164,7 +156,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
     ∇ r←AutoloadTatin debug;wspath;path2Config
       r←0 0⍴''
       :Trap debug/0
-          :If ~IfAtLeastVersion 18
+          :If 0=⎕SE.⎕NC'_Tatin'  ⍝ In 19.0 it might already be there!
+          :AndIf ~IfAtLeastVersion 18
               r←'Tatin not loaded: not compatible with this version of Dyalog'
           :ElseIf 80≠⎕DR' '              ⍝ Not in "Classic"
               r←'Tatin not loaded: not compatible with Classic'

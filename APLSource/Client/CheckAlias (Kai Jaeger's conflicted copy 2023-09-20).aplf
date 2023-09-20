@@ -1,0 +1,23 @@
+ {r}←CheckAlias(packageID targetSpace);msg;ref;this;alias;old;packageID_;packageID_old;packageID_old_
+⍝ Check `alias` for already being in use in the target namespace.
+⍝ Must check whether the alias is used for the same package again because that's okay.
+ r←⍬
+ :If 9=⎕NC⍕targetSpace  ⍝ Because the target space might not yet exist
+     ref←⍎targetSpace
+     alias←¯1↓1⊃SplitAtAlias packageID
+ :AndIf 0<ref.⎕NC alias
+     :If 9=ref.⎕NC alias
+         packageID_←GetPackageIDFrom packageID
+         old←⍕targetSpace⍎alias
+         packageID_old←{⍵↑⍨1+-'.'⍳⍨⌽⍵}{¯1↓⍵/⍨⌽1≤+\'.'=⌽⍵}old
+         packageID_old_←GetPackageIDFrom packageID_old
+         packageID_old_[{2↓⍸'_'=⍵}packageID_old_]←'.'
+         ((packageID_old_='_')/packageID_old_)←'-'
+         :If ≢/Reg.RemovePatch¨packageID_ packageID_old_
+             ('Name "',alias,'" already in use and therefore not suitable as alias (⎕NC=9)')Assert 0
+         :EndIf
+     :Else
+         ('Name "',alias,'" already in use and therefore not suitable as alias (⎕NC=',(⍕ref.⎕NC alias),')')Assert 0
+     :EndIf
+ :EndIf
+⍝Done

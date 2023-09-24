@@ -1,4 +1,4 @@
- (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;⎕TRAP;filename;currentVersion
+ (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;⎕TRAP;filename;currentVersion;run
 ⍝ Updates the client to (by default) the latest version, and returns the version number of the new version.\\
 ⍝ A Boolean right argument (`force`) is mandatory, but one might specify also a folder Tatin is installed in.
 ⍝ The user command will do this automatically with the folder the user command was loaded from.\\
@@ -23,11 +23,11 @@
  :If 0=≢tag
      ⎕←'Tatin is up-to-date: ',⊃{⍺,' from ',⍵}/1↓Reg.Version
  :Else
-     msg←'You version of Tatin is ',2⊃Reg.Version
+     msg←'UpdateTatin@You version of Tatin is ',2⊃Reg.Version
      msg,←(⎕UCS 13),'Latest published version is ',1↓tag
      msg,←(⎕UCS 13),'Would you like to download and install ',(1↓tag),' ?'
      :If ~flag ⍝ Then the user has requested a particular version, and we assume she knows what she's doing
-     :OrIf msg{⍵:⍵ ⋄ YesOrNo ⍺}force
+     :OrIf msg{⍵:⍵ ⋄ 1 YesOrNo ⍺}force
          request←R.NewRequest 0
          request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Tatin-Client-',(1↓tag),'.zip'
          client←R.NewClient 0
@@ -47,9 +47,24 @@
          ⎕NUNTIE tno
          data2.Content←''
          tempFile ZipArchive.UnzipTo folder
+     ⍝ Now we need to catch the "Run" function
+         request←R.NewRequest 0
+         request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
+         client←R.NewClient 0
+         client.Host←'github.com'
+         request.Headers,←⊂'User-Agent' 'aplteam'
+         data←client R.SendAndReceive request
+         'Invalid HTTP status code'Assert 302≡data.StatusCode
+         redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
+         redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
+         client←R.NewClient 0
+         (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
+         data2←client R.SendAndReceive request
+         run←'UTF-8'⎕UCS ⎕UCS data2.Content
+         (⊂run)⎕NPUT folder,'/Run.aplf'
          ⎕NDELETE tempFile
          :If 0=≢target
-             target←GetMyUCMDsFolder'Tatin'  ⍝ Establish default
+             target←GetProgramFilesFolder'Tatin'  ⍝ Establish default
          :EndIf
          (⊃⎕NPARTS{⍵↓⍨-'/\'∊⍨¯1↑⍵}target)⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
          version←{⍵↓⍨'v'=1⍴⍵}tag

@@ -1,12 +1,12 @@
- {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
 ⍝ It also re-compiles the documentation (=creates HTML files from Markdown)
 ⍝ It cannot be done in one go, and it cannot be done in batch mode from the current session.
-⍝ The right argument is expected to be a Boolean that tells whether this runs in batch
+⍝ The right argument is expected to be a Boolean that tells whether this functions runs in batch
 ⍝ mode or not. In batch mode no messages are printed, and no interaction with a user is
-⍝ attempted. Also, Tatin is not updated in the MyUCMDs folder then.
+⍝ attempted. Also, Tatin is not updated in the C:\Users\<⎕AN>\Documents\Dyalog* folder then.
  r←⍬
  Assert(⊂batchFlag)∊0 1
  versionOfAPL←'18.0'
@@ -26,14 +26,18 @@
      :EndIf
  :EndIf
 
- :If F.IsDir path←C.GetMyUCMDsFolder'Tatin'                 ⍝ Does a folder Tatin/  live in MyUCMDs/ ?
- :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live in MyUCMDs/ ?
+ path←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Unicode Files\CiderTatin\Tatin'
+ :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in Programs folder for 18.2-64?
+ :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live there?
      file1←path,'/Tatin.dyalog'
      file2←##.CiderConfig.HOME,'/APLSource/Tatin.dyalog'
  :AndIf ≢/{⊃⎕NGET ⍵ 0}¨file1 file2                          ⍝ Are the two not identical ?
      (ts1 ts2)←{¯1 1 ⎕DT⊂⊃⊃('type' 3)F.Dir ⍵}¨file1 file2
      :If ts2<ts1
-         :If 1 C.YesOrNo'The Tatin user command script in MyUCMDs/ appears to be newer than the one in the project - copy?'
+         q←'The Tatin user command script in',⎕UCS 13
+         q,←path,⎕UCS 13
+         q,←' appears to be newer than the one in the project - copy?'
+         :If 1 C.YesOrNo q
              file2 ⎕NCOPY⍠('IfExists' 'Replace')⊣file1
          :EndIf
      :Else
@@ -87,12 +91,11 @@
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  UpdateTestServerAssets ⍬
  {}⎕SE.Link.Refresh'#.Tatin'
- :If CopyTatinClientToMyUCMDs batchFlag
+ :If CopyTatinClientToUserDocuments batchFlag
  :AndIf #.Tatin.Registry.Version≢⎕SE.Tatin.Version
      ⎕SE.⎕EX¨'Tatin' '_Tatin'
      Assert #.Tatin.Registry.Version≡⎕SE.UCMD'Tatin.Version'
  :EndIf
- path←(⎕SE._Tatin.Client.GetMyUCMDsFolder''),'/',⎕SE._Tatin.Client.UserSettings.cfg_name
  #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(CFG.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'*** Done'
 ⍝Done

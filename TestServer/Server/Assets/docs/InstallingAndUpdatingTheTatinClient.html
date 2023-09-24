@@ -20,14 +20,25 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <ul>
 <li><a href="#Introduction">1. Introduction</a></li>
 <li><a href="#Requirements">2. Requirements</a></li>
-<li><a href="#How-to-install-the-Tatin-Client">3. How to install the Tatin Client</a></li>
-<li><a href="#Initializing-Tatin">4. Initializing Tatin</a></li>
-<li><a href="#On-setupdyalog">5. On <code>setup.dyalog</code></a>
+<li><a href="#How-to-activate-Tatin-in-190">3. How to activate Tatin in 19.0</a>
 <ul>
-<li><a href="#There-is-no-such-script-yet">5.1. There is no such script yet</a></li>
-<li><a href="#There-is-already-such-a-script">5.2. There is already such a script</a></li>
+<li><a href="#Windows">3.1. Windows</a></li>
+<li><a href="#Linux">3.2. Linux</a></li>
+<li><a href="#Mac-OS">3.3. Mac OS</a></li>
 </ul></li>
-<li><a href="#Updating-Tatin">6. Updating Tatin</a>
+<li><a href="#How-to-install-the-Tatin-Client">4. How to install the Tatin Client</a>
+<ul>
+<li><a href="#Windows-1">4.1. Windows</a></li>
+<li><a href="#Linux-1">4.2. Linux</a></li>
+<li><a href="#Mac-OS-1">4.3. Mac OS</a></li>
+</ul></li>
+<li><a href="#Initializing-Tatin">5. Initializing Tatin</a></li>
+<li><a href="#On-setupdyalog">6. On <code>setup.dyalog</code></a>
+<ul>
+<li><a href="#There-is-no-such-script-yet">6.1. There is no such script yet</a></li>
+<li><a href="#There-is-already-such-a-script">6.2. There is already such a script</a></li>
+</ul></li>
+<li><a href="#Updating-Tatin">7. Updating Tatin</a>
 </ul>
 </div>
 </nav>
@@ -41,8 +52,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h2 data-id="Introduction">1. Introduction</h2>
 </a>
 </div>
-<p>You don't need to worry about installing Tatin if you use version 19.0 or later of Dyalog: Tatin will be available in <code>⎕SE</code> after a standard installation anyway.</p>
-<p>However, installing and updating is, as far as the Tatin client is concerned, the same thing, because updating the Tatin client means removing the old version and installing a new one.</p>
+<p>You don't need to worry about installing Tatin if you use version 19.0 of Dyalog: In 19.0 Tatin just needs to be activated.</p>
+<p>In 18.0 and 18.2 you need to install Tatin youself.</p>
 <div class="h_tag">
 <a href="#Requirements" id="Requirements" class="autoheader_anchor">
 <h2 data-id="Requirements">2. Requirements</h2>
@@ -55,29 +66,86 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </ul>
 <p>Note that when you call <code>]Tatin.Init</code> Tatin will check whether those requirements are met.</p>
 <div class="h_tag">
+<a href="#How-to-activate-Tatin-in-190" id="How-to-activate-Tatin-in-190" class="autoheader_anchor">
+<h2 data-id="How-to-activate-Tatin-in-190">3. How to activate Tatin in 19.0</h2>
+</a>
+</div>
+<p>In order to activate Tatin, the folder <code>[DYALOG]/Experimental/CiderTatin</code> needs to be copied into one of the following folders:</p>
+<div class="h_tag">
+<a href="#Windows" id="Windows" class="autoheader_anchor">
+<h3 data-id="Windows">Windows</h3>
+</a>
+</div>
+<pre><code>C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL 19.0 Unicode Files\StartupSession\    ⍝ 32-bit
+C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL-64 19.0 Unicode Files\StartupSession\ ⍝ 64-bit
+C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL Files\StartupSession\                 ⍝ version agnostic</code></pre>
+<p>Once the folder <code>CiderTatin/</code> is in place, any newly started version of Dyalog comes with the user commands <code>]Tatin.*</code> as well as <code>]Cider.*</code>; the APIs are both available via <code>⎕SE.Tatin</code> and <code>⎕SE.Cider</code>.</p>
+<div class="h_tag">
+<a href="#Linux" id="Linux" class="autoheader_anchor">
+<h3 data-id="Linux">Linux</h3>
+</a>
+</div>
+<pre><code>/home/&lt;⎕AN&gt;/dyalog.190U32.files ⍝ 32-bit
+/home/&lt;⎕AN&gt;/dyalog.190U64.files ⍝ 64-bit
+/home/&lt;⎕AN&gt;/dyalog.files        ⍝ version agnostic</code></pre>
+<p>Note that your intended target directory might not exist yet.</p>
+<p>Once the folder <code>CiderTatin/</code> is in place, any newly started version of Dyalog comes with the user commands <code>]Tatin.*</code> as well as <code>]Cider.*</code>; the APIs are both available via <code>⎕SE.Tatin</code> and <code>⎕SE.Cider</code>.</p>
+<div class="h_tag">
+<a href="#Mac-OS" id="Mac-OS" class="autoheader_anchor">
+<h3 data-id="Mac-OS">Mac OS</h3>
+</a>
+</div>
+<pre><code>/Users/&lt;⎕AN&gt;/dyalog.190U32.files ⍝ 32-bit
+/Users/&lt;⎕AN&gt;/dyalog.190U64.files ⍝ 64-bit
+/Users/&lt;⎕AN&gt;/dyalog.files        ⍝ version agnostic</code></pre>
+<p>Note that your intended target directory might not exist yet.</p>
+<p>Once the folder <code>CiderTatin/</code> is in place, any newly started version of Dyalog comes with the user commands <code>]Tatin.*</code> as well as <code>]Cider.*</code>; the APIs are both available via <code>⎕SE.Tatin</code> and <code>⎕SE.Cider</code>.</p>
+<div class="h_tag">
 <a href="#How-to-install-the-Tatin-Client" id="How-to-install-the-Tatin-Client" class="autoheader_anchor">
-<h2 data-id="How-to-install-the-Tatin-Client">3. How to install the Tatin Client</h2>
+<h2 data-id="How-to-install-the-Tatin-Client">4. How to install the Tatin Client</h2>
 </a>
 </div>
 <p>Instructions:</p>
 <ol start="1">
 <li>Download the latest release of the Tatin client from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a></li>
-<li>Unzip it into the <code>MyUCMDs/</code> folder — there is now a folder <code>Tatin/</code></li>
+<li>Unzip it into one of the potential target folders</li>
 </ol>
-<p>Where to find the <code>MyUCMDs/</code> folder depends on your operating system</p>
-<ul>
-<li>On Windows it's usually <code>C:\Users\&lt;username&gt;\Documents\</code></li>
-<li>On Linux (including the PI) it is <code>/home/&lt;username&gt;/</code></li>
-<li>On Mac OS it is <code>/Users/&lt;username&gt;/</code></li>
-</ul>
+<div class="h_tag">
+<a href="#Windows-1" id="Windows-1" class="autoheader_anchor">
+<h3 data-id="Windows-1">Windows</h3>
+</a>
+</div>
+<pre><code>C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL 19.0 Unicode Files\StartupSession\    ⍝ 32-bit
+C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL-64 19.0 Unicode Files\StartupSession\ ⍝ 64-bit
+C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL Files\StartupSession\                 ⍝ version agnostic</code></pre>
+<p>Once the folder <code>Tatin/</code> is in place, any newly started version of Dyalog comes with the user command <code>]Tatin.*</code>.</p>
+<div class="h_tag">
+<a href="#Linux-1" id="Linux-1" class="autoheader_anchor">
+<h3 data-id="Linux-1">Linux</h3>
+</a>
+</div>
+<pre><code>/home/&lt;⎕AN&gt;/dyalog.190U32.files ⍝ 32-bit
+/home/&lt;⎕AN&gt;/dyalog.190U64.files ⍝ 64-bit
+/home/&lt;⎕AN&gt;/dyalog.files        ⍝ version agnostic</code></pre>
+<p>Note that your intended target directory might not exist yet.</p>
+<p>Once the folder <code>Tatin/</code> is in place, any newly started version of Dyalog comes with the user command <code>]Tatin.*</code>.</p>
+<div class="h_tag">
+<a href="#Mac-OS-1" id="Mac-OS-1" class="autoheader_anchor">
+<h3 data-id="Mac-OS-1">Mac OS</h3>
+</a>
+</div>
+<pre><code>/Users/&lt;⎕AN&gt;/dyalog.190U32.files ⍝ 32-bit
+/Users/&lt;⎕AN&gt;/dyalog.190U64.files ⍝ 64-bit
+/Users/&lt;⎕AN&gt;/dyalog.files        ⍝ version agnostic</code></pre>
+<p>Note that your intended target directory might not exist yet.</p>
+<p>Once the folder <code>Tatin/</code> is in place, any newly started version of Dyalog comes with the user command <code>]Tatin.*</code>.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
 <div>
-<p><code>MyUCMDs/</code> is created by the Dyalog APL installer on Windows, but it won't exist on Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.</p>
+<p>Note that there is no point in having a function <code>Run.aplf</code> in place with 18.0 and 18.2: only in 19.0 did Dyalog add that feature. In earlier versions such a function is loaded but not executed.</p>
 </div>
 </div>
 
-<p>Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.</p>
 <p>As a side effect of executing any of the Tatin user commands the Tatin API will become available via <code>⎕SE.Tatin</code>.</p>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
@@ -86,27 +154,18 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 </div>
 
-<p>Putting Tatin into this folder has the benefit that it will be available in all suitable versions of Dyalog APL installed on your machine. It has the drawback that this is a user-specific folder.</p>
-<p>Tatin requires version 18.0 Unicode or better, therefore the <code>]TATIN</code> user commands won't be listed in earlier versions of Dyalog or any Classic version.</p>
 <div class="h_tag">
 <a href="#Initializing-Tatin" id="Initializing-Tatin" class="autoheader_anchor">
-<h2 data-id="Initializing-Tatin">4. Initializing Tatin</h2>
+<h2 data-id="Initializing-Tatin">5. Initializing Tatin</h2>
 </a>
 </div>
-<p>As already mentioned, Tatin comes with a self-initializing feature: once installed any suitable version of Dyalog will provide a list of the Tatin user commands once you enter:</p>
+<p>As already mentioned, Tatin comes with a self-initializing feature: once installed, any suitable version of Dyalog will provide a list of the Tatin user commands once you enter:</p>
 <pre><code>      ]tatin -?</code></pre>
 <p>The script <code>Tatin.dyalog</code> is the interface between the Dyalog user command framework and the Tatin API.</p>
-<p>When any of the Tatin user commands is executed it will check whether the API is already loaded with:</p>
-<pre><code>0&lt;⎕NC '⎕SE.Tatin'</code></pre>
-<p>If that's not the case it will…</p>
-<ol start="1">
-<li>load the code into <code>⎕SE._Tatin</code></li>
-<li>create a namespace <code>⎕SE.Tatin</code></li>
-<li>establish functions in <code>⎕SE.Tatin</code> that represents Tatin's API</li>
-</ol>
+<p>When any of the Tatin user commands is executed it will check whether the API is already loaded. If it's not available yet, it will be loaded.</p>
 <div class="h_tag">
 <a href="#On-setupdyalog" id="On-setupdyalog" class="autoheader_anchor">
-<h2 data-id="On-setupdyalog">5. On <code>setup.dyalog</code></h2>
+<h2 data-id="On-setupdyalog">6. On <code>setup.dyalog</code></h2>
 </a>
 </div>
 <p>Now you might want the Tatin API to be around right from the start, so that you can invoke any of the Tatin API functions without first executing any of the Tatin user commands.</p>
@@ -119,6 +178,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 </div>
 
 <p>The way to achieve that goal requires the introduction or modification of a file <code>setup.dyalog</code> in your <code>MyUCMDs/</code> folder. Note that on non-Windows platforms the name of the file must be lowercase.</p>
+<p>Where to find the MyUCMDs/ folder depends on your operating system</p>
+<ul>
+<li>On Windows it's usually C:\Users&lt;username&gt;\Documents <br></li>
+<li>On Linux (including the PI) it is /home/&lt;username&gt;/</li>
+<li>On Mac OS it is /Users/&lt;username&gt;/</li>
+</ul>
 <div class="leanpub_A">
 <h3>How does <code>setup.dyalog</code> work?</h3>
 <p>The magic behind this is that whenever an instance of Dyalog is fired up it checks whether such a script exists. If that is the case it checks whether there is a function <code>Setup</code>.</p>
@@ -129,11 +194,12 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>specifying function keys</li>
 <li>loading stuff into <code>⎕SE</code></li>
 </ul>
+<p>In version 19.0 the <code>Run.aplf</code> function offers a better way to achieve that, rendering any <code>setup.dyalog</code> superfluous.</p>
 </div>
 
 <div class="h_tag">
 <a href="#There-is-no-such-script-yet" id="There-is-no-such-script-yet" class="autoheader_anchor">
-<h3 data-id="There-is-no-such-script-yet">5.1. There is no such script yet</h3>
+<h3 data-id="There-is-no-such-script-yet">6.1. There is no such script yet</h3>
 </a>
 </div>
 <p>Create one that looks like this:</p>
@@ -144,26 +210,25 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       ⎕IO←1 ⋄ ⎕ML←1
       :Trap ⎕SE.SALTUtils.DEBUG↓0
           ⎕←AutoloadTatin ⎕SE.SALTUtils.DEBUG
+          ⎕←AddPathToCmdDir path
       :Else
           dmx←⎕DMX
           ⎕←'Setup.dyalog has a problem and was not executed successfully:'
           ⎕←↑'  '∘,¨dmx.DM
       :EndTrap
-      folder←GetMyUCMDsFolder''
-      folder LoadUserCommandPackages 0
     ∇
 
     ∇ r←AutoloadTatin debug;wspath;path2Config
       r←0 0⍴''
       :Trap debug/0
-          :If 0=⎕SE.⎕NC'_Tatin'  ⍝ In 19.0 it might already be there!
+          :If 0=⎕SE.⎕NC'_Tatin'  ⍝ In 19.0 it moste likely will already be there!
           :AndIf ~IfAtLeastVersion 18
               r←'Tatin not loaded: not compatible with this version of Dyalog'
           :ElseIf 80≠⎕DR' '              ⍝ Not in "Classic"
               r←'Tatin not loaded: not compatible with Classic'
           :Else
               ⎕SE.⎕EX¨'_Tatin' 'Tatin'
-              wspath←GetMyUCMDsFolder '/Tatin/Client.dws'
+              wspath←GetProgramFilesFolder '/CiderTatin/Tatin/Client.dws'
               '_Tatin'⎕SE.⎕CY wspath
               path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
               'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
@@ -175,72 +240,76 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
       :EndTrap
     ∇
 
+    ∇ r←AddPathToCmdDir path;res;sep;paths;qdmx
+     ⍝ Make sure that SALT will find the Tatin user command
+      r←0 0⍴''
+      :Trap 0
+          :If 'Win'≡3↑1⊃# ⎕WG'APLVersion'
+              path←{'\'@(⍸'/'=⍵)⊣⍵}path
+              res←{'\'@(⍸'/'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+              sep←';'
+              paths←sep(≠⊆⊢)res
+          :Else
+              path←{'/'@(⍸'\'=⍵)⊣⍵}path
+              res←{'/'@(⍸'\'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+              sep←':'
+              paths←sep(≠⊆⊢)res
+          :EndIf
+          :If ~(⊂path)∊paths ⍝ Already known?
+              {}⎕SE.SALT.Settings'cmddir ,',path,' -permanent'
+          :EndIf
+      :Else
+          qdmx←⎕DMX
+          ⎕←'Attempt to add &lt;',path,' to the search paths for user commands failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
+     :EndTrap
+    ∇
+
       IfAtLeastVersion←{
       ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
       ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
           ⍵≤{⊃(//)⎕VFI ⍵/⍨2&gt;+\'.'=⍵}2⊃# ⎕WG'APLVersion'
       }
 
-    ∇ r←{OS}GetMyUCMDsFolder add
-      ⍝ Returns standard path for Dyalog's MyUCMDs folder.\\
-      ⍝ Works on all platforms but returns different results.\\
-      ⍝ Under Windows typically:\\
-      ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\Foo'  ←→ GetMyUCMDsFolder 'Foo'
-      ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
+    ∇  r←{OS}GetProgramFilesFolder add;version;aplVersion
+      ⍝ Returns standard path for Dyalog's version-specific program files folder.
+      ⍝ Works on all platforms but returns different results.
+      ⍝ Under Windows typically:
+      ⍝ `C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL[-64] 19.0 Unicode Files'  ←→ GetMyUCMDsFolder
+      ⍝ ⍺ is optional and only specified by test cases: simulating different operating systems.
        :If 0=⎕NC'OS'
-           OS←3↑⊃#⎕WG'APLVersion'
+           OS←3↑⊃# ⎕WG'APLVersion'
        :EndIf
        add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
-       :If 'Win'≡OS
-           r←⊃,/1 ⎕NPARTS (2⊃4070⌶0),'\..\MyUCMDs',add
+       aplVersion←# ⎕WG'APLVersion'
+       :If OS≡'Win'
+           version←((∨/'-64'⍷1⊃aplVersion)/'-64'),' ',({⍵/⍨2&gt;+\⍵='.'}2⊃aplVersion),' ',(80=⎕DR' ')/'Unicode'
+           r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL',version,' Files',add
        :Else
-           r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
+           version←({'.'~⍨⍵/⍨2&gt;+\⍵='.'}2⊃aplVersion),((80=⎕DR' ')/'U'),((1+∨/'-64'⍷1⊃aplVersion)⊃'32' '64')
+           r←(⊃⎕SH'echo $HOME'),'/dyalog.',version,'.files',add
        :EndIf
-    ∇
-
-    ∇ r←path LoadUserCommandPackages debug;home;name;res;folders;folder;F
-    ⍝ This loads Tatin packages that are user commands installed in MyUCMDs
-      r←''
-      F←⎕SE._Tatin.FilesAndDirs
-      :If 0&lt;≢folders←F.ListDirs path
-          :For folder :In folders
-              :If F.IsFile folder,'/apl-buildlist.json'
-                  name←2⊃⎕NPARTS folder
-                  :Trap (~debug)/0
-                      {}⎕SE.Tatin.LoadDependencies folder ⎕SE
-                  :Else
-                      r,←⊂'&gt;&gt;&gt; Attempt to load ',name,' failed with ',⎕DMX.EM
-                  :EndTrap
-              :EndIf
-          :EndFor
-      :EndIf
-      :If 0=≢r
-          r←0 0⍴''
-      :Else
-          r←⍪r
-      :EndIf
-    ∇
+      ∇
 
 :EndNamespace</code></pre>
 <div class="h_tag">
 <a href="#There-is-already-such-a-script" id="There-is-already-such-a-script" class="autoheader_anchor">
-<h3 data-id="There-is-already-such-a-script">5.2. There is already such a script</h3>
+<h3 data-id="There-is-already-such-a-script">6.2. There is already such a script</h3>
 </a>
 </div>
-<p>Copy the functions <code>IfAtLeastVersion</code>, <code>GetMyUCMDsFolder</code> and <code>AutoLoadTatin</code> from above into your own <code>setup.dyalog</code> script and then make sure that <code>AutoLoadTatin</code> is called from your <code>Setup</code> function.</p>
+<p>Copy the functions <code>IfAtLeastVersion</code>, <code>GetProgramFilesFolder</code> and <code>AutoLoadTatin</code> from above into your own <code>setup.dyalog</code> script and then make sure that <code>AutoLoadTatin</code> is called from your <code>Setup</code> function.</p>
 <div class="h_tag">
 <a href="#Updating-Tatin" id="Updating-Tatin" class="autoheader_anchor">
-<h2 data-id="Updating-Tatin">6. Updating Tatin</h2>
+<h2 data-id="Updating-Tatin">7. Updating Tatin</h2>
 </a>
 </div>
-<p>Although you <em>could</em> update your Tatin client by repeating the steps listed under “How to install the Tatin client” there is an easier way to do this; just execute:</p>
+<p>Just execute:</p>
 <pre><code>]Tatin.UpdateTatin</code></pre>
 <p>If there is a later version available all necessary steps will be executed; eventually the new version number will be reported.</p>
 <p>Notes:</p>
 <ul>
 <li>The command will put the release notes on display</li>
 <li>This feature was introduced in 0.78.1, so it's not available in earlier versions
-<p>The API equivalent <code>⎕SE.Tatin.Update 0</code> however was introduced in 0.78.0.</p></li>
+<p>Note that the API equivalent <code>⎕SE.Tatin.Update 0</code> was introduced in 0.78.0.</p></li>
 <li>Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons — start a new instance of Dyalog to get the latest version</li>
 </ul>
 </body>

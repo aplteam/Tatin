@@ -70,9 +70,16 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <p>This is called <a href="https://research.swtch.com/vgo-mvs" class="external_link" title="Link to the paper defining it">“Minimal Version Selection”</a>. It guarantees that when you re-build, you will get the same result, but it will grab the latest installed version.</p>
 <div class="leanpub_A">
 <h3>On updating dependencies</h3>
-<p>Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available.</p>
+<p>Though Tatin will not assist you in updating dependencies, it will assist you in finding out whether there are later packages available.</p>
 <p>For that check the user command <code>]TATIN.CheckForLaterVersions</code>. Also, check the <code>-update</code> flag of the <code>]Tatin.ReInstallDependencies</code> user command or its API equivalent.</p>
 <p>We will discuss this in a minute.</p>
+</div>
+
+<div class="leanpub_A">
+<h3>Forcing updates</h3>
+<p>Imagine a package of yours depends on somebody else's package <code>Foo</code> which in turn depends on <code>Goo</code> 1.1.0, and you stumble over a bug in <code>Goo</code> 1.1.0 while using <code>Foo</code>.</p>
+<p>You send an email to the author of <code>Foo</code>, pointing out that there is already <code>Goo</code> 1.1.1 available that fixes that very bug, but the author does not reply, or tells you that she will produce and publish a new version in two weeks time while you struggle whith a tight dealine.</p>
+<p>Solution: create a package <code>Mock</code> that declares to depend on <code>Goo</code> 1.1.1 and voila! everything works.</p>
 </div>
 
 <div class="h_tag">

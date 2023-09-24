@@ -12,7 +12,7 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with notes regarding fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.100.2 from 2023-09-08
+## Version 0.100.2 from 2023-09-23
 
 No breaking changes, no user actions required.
 

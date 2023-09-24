@@ -1,0 +1,31 @@
+ {r}←CopyTatinClientToUserDocuments batchFlag;h;msg;rc;flag;counter;max;filename;targetFolder
+ r←0
+ targetFolder←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files\StartupSession/CiderTatin\Tatin'
+ Assert 0<#.Tatin.⎕NC'CiderConfig'
+ :If ~batchFlag
+ :AndIf 1 ##.Client.YesOrNo'   Would you like to copy the Tatin client to ',targetFolder
+     counter←flag←0
+     max←6
+     :Repeat
+         (rc msg)←F.RmDirByForce targetFolder
+         :If rc=0
+             flag←1
+         :Else
+             counter+←1
+             :If max>counter
+                 ⎕←'Removing ',targetFolder,' failed, retrying in one second (',(⍕counter),'/',(⍕max),')'
+                 ⎕DL 1
+             :EndIf
+         :EndIf
+     :Until flag∨max=counter
+     ('Removing failed: ',targetFolder,'/Tatin','; RC=',⍕rc)Assert 0=rc
+     (targetFolder,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣#.Tatin.CiderConfig.HOME,'/Dist/Client/Tatin'
+     r←1
+     filename←#.Tatin.CiderConfig.HOME,'/GitHub-personal-token.txt'
+     :If ⎕NEXISTS filename
+         :If 1 ##.Client.YesOrNo'Copy over the personal GitHub token as well?'
+             (targetFolder,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣filename
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

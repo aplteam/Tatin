@@ -1,0 +1,15 @@
+ r←GetProgramFilesFolder add;version;aplVersion;OS
+⍝ Returns standard path for Dyalog's version-specific folder in %USERPROFILE%\Documents\.\\
+⍝ Works on all platforms but returns different results.\\
+⍝ Under Windows typically:\\
+⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 19.0 Unicode Files'  ←→ GetProgramFilesFolder ''
+ OS←3↑⊃# ⎕WG'APLVersion'
+ add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
+ aplVersion←# ⎕WG'APLVersion'
+ :If OS≡'Win'
+     version←((∨/'-64'⍷1⊃aplVersion)/'-64'),' ',({⍵/⍨2>+\⍵='.'}2⊃aplVersion),' ',(80=⎕DR' ')/'Unicode'
+     r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL',version,' Files',add
+ :Else
+     version←({'.'~⍨⍵/⍨2>+\⍵='.'}2⊃aplVersion),((80=⎕DR' ')/'U'),((1+∨/'-64'⍷1⊃aplVersion)⊃'32' '64')
+     r←(⊃⎕SH'echo $HOME'),'/dyalog.',version,'.files',add
+ :EndIf

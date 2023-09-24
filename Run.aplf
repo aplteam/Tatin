@@ -1,13 +1,54 @@
-﻿ Run path;⎕TRAP;source
-⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the user command will be found.
-⍝ This is for version 19.0 onwards.
+﻿ Run path;res;qdmx;sep;paths;⎕TRAP
+⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the associated user commands will be found.
+⍝ This is for version 19.0 
 ⍝ The function is part of the Tatin project.
- ⎕TRAP←0 'S'
+⍝ Version 0.1.0 from 2023-09-23 ⋄ Kai Jaeger
+ :If 0
+     ⎕TRAP←0 'S'
+     ∘∘∘
+ :EndIf
  :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃#.APLVersion
-     source←'C:/Users/kai/Documents/Dyalog APL-64 19.0 Unicode Files/StartupSession/SessionExtensions'
-     '_Tatin'⎕SE.⎕CY source,'/Tatin/Client.dws'
-     ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
-     ⍝TODO⍝ ⎕SE.SALT.Set ....
-     ⎕SE.Tatin.LoadDependencies(source,'/Cider')⎕SE
+ :AndIf 0=⎕SE.⎕NC'_Tatin'
+     path←∊path
+     :Trap 0
+         '_Tatin'⎕SE.⎕CY path,'/Tatin/Client.dws'
+     :Else
+         qdmx←⎕DMX
+         ⎕←'Copying Tatin from <',path,'> failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
+     :EndTrap
+     :Trap 0
+         ⎕SE._Tatin.Admin.EstablishClientInQuadSE ⍬
+     :Else
+         qdmx←⎕DMX
+         ⎕←'Attempt to establish Tatin in ⎕SE failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
+     :EndTrap
+     :Trap 0
+         :If 'Win'≡3↑1⊃#.APLVersion
+             path←{'\'@(⍸'/'=⍵)⊣⍵}path
+             res←{'\'@(⍸'/'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+             sep←';'
+             paths←sep(≠⊆⊢)res
+         :Else
+             path←{'/'@(⍸'\'=⍵)⊣⍵}path
+             res←{'/'@(⍸'\'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+             sep←':'
+             paths←sep(≠⊆⊢)res
+         :EndIf
+         :If ~(⊂path)∊paths ⍝ Already known?
+             {}⎕SE.SALT.Settings'cmddir ,',path,' -permanent'
+         :EndIf
+     :Else
+         qdmx←⎕DMX
+         ⎕←'Attempt to add <',path,' to the search paths for user commands failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
+     :EndTrap
+     :Trap 0
+         res←⎕SE.Tatin.LoadDependencies(path,'/Cider')⎕SE
+         :If ~∨/'_Cider_'⍷∊⍕res
+             ⎕←'Attempt to load the "Cider" package failed' ⋄ →0
+         :EndIf
+     :Else
+         qdmx←⎕DMX
+         ⎕←'Attempt to load the "Cider" package failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
+     :EndTrap
  :EndIf
  ⍝Done

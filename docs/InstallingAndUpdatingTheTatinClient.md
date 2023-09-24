@@ -9,9 +9,9 @@
 
 ## Introduction
 
-You don't need to worry about installing Tatin if you use version 19.0 or later of Dyalog: Tatin will be available in `⎕SE` after a standard installation anyway.
+You don't need to worry about installing Tatin if you use version 19.0 of Dyalog: In 19.0 Tatin just needs to be activated.
 
-However, installing and updating is, as far as the Tatin client is concerned, the same thing, because updating the Tatin client means removing the old version and installing a new one.
+In 18.0 and 18.2 you need to install Tatin youself.
 
 ## Requirements
 
@@ -23,36 +23,103 @@ However, installing and updating is, as far as the Tatin client is concerned, th
 
 Note that when you call `]Tatin.Init` Tatin will check whether those requirements are met.
 
-## How to install the Tatin Client
+## How to activate Tatin in 19.0
+
+In order to activate Tatin, the folder `[DYALOG]/Experimental/CiderTatin` needs to be copied into one of the following folders:
+
+### Windows
+
+```
+C:\Users\<⎕AN>\Documents\Dyalog APL 19.0 Unicode Files\StartupSession\    ⍝ 32-bit
+C:\Users\<⎕AN>\Documents\Dyalog APL-64 19.0 Unicode Files\StartupSession\ ⍝ 64-bit
+C:\Users\<⎕AN>\Documents\Dyalog APL Files\StartupSession\                 ⍝ version agnostic
+```
+
+It's you choice whether you want to install in into a folder associated with a particular version or the version agnostic folder.
+
+Once the folder `CiderTatin/` is in place, any newly started version of Dyalog comes with the user commands `]Tatin.*` as well as `]Cider.*`; the APIs are both available via `⎕SE.Tatin` and `⎕SE.Cider`.
+
+### Linux
+
+```
+/home/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
+/home/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
+/home/<⎕AN>/dyalog.files        ⍝ version agnostic
+```
+
+Note that your intended target directory might not exist yet.
+
+Once the folder `CiderTatin/` is in place, any newly started version of Dyalog comes with the user commands `]Tatin.*` as well as `]Cider.*`; the APIs are both available via `⎕SE.Tatin` and `⎕SE.Cider`.
+
+### Mac OS
+
+```
+/Users/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
+/Users/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
+/Users/<⎕AN>/dyalog.files        ⍝ version agnostic
+```
+
+Note that your intended target directory might not exist yet.
+
+Once the folder `CiderTatin/` is in place, any newly started version of Dyalog comes with the user commands `]Tatin.*` as well as `]Cider.*`; the APIs are both available via `⎕SE.Tatin` and `⎕SE.Cider`.
+
+## How to install in 18.0 and 18.2
 
 Instructions:
 
 1. Download the latest release of the Tatin client from <https://github.com/aplteam/Tatin/releases>
 
-2. Unzip it into the `MyUCMDs/` folder --- there is now a folder `Tatin/`
+2. Unzip it into one of the potential target folders
 
-Where to find the `MyUCMDs/` folder depends on your operating system
+It's you choice whether to install in into a folder associated with a particular version or the version agnostic folder.
 
-* On Windows it's usually `C:\Users\<username>\Documents\`
-* On Linux (including the PI) it is `/home/<username>/`
-* On Mac OS it is `/Users/<username>/`
 
-I> `MyUCMDs/` is created by the Dyalog APL installer on Windows, but it won't exist on Linux and Mac OS in versions before 19.0, so you need to create the folder yourself on non-Windows platform.
+### Windows
 
-Any newly started instance of Dyalog 18.0 or later will now come with the Tatin user commands.
+```
+C:\Users\<⎕AN>\Documents\Dyalog APL 19.0 Unicode Files\StartupSession\    ⍝ 32-bit
+C:\Users\<⎕AN>\Documents\Dyalog APL-64 19.0 Unicode Files\StartupSession\ ⍝ 64-bit
+C:\Users\<⎕AN>\Documents\Dyalog APL Files\StartupSession\                 ⍝ version agnostic
+```
+
+Once the folder `Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
+
+### Linux
+
+```
+/home/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
+/home/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
+/home/<⎕AN>/dyalog.files        ⍝ version agnostic
+```
+
+Note that your intended target directory might not exist yet.
+
+Once the folder `Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
+
+### Mac OS
+
+```
+/Users/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
+/Users/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
+/Users/<⎕AN>/dyalog.files        ⍝ version agnostic
+```
+
+Note that your intended target directory might not exist yet.
+
+Once the folder `Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
+
+
+I> Note that there is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add that feature. In earlier versions such a function is loaded but not executed.
+
 
 As a side effect of executing any of the Tatin user commands the Tatin API will become available via `⎕SE.Tatin`.
 
 I> If you want the Tatin API to be available right from the start: this is discussed under "[Initializing Tatin](#)".
 
-Putting Tatin into this folder has the benefit that it will be available in all suitable versions of Dyalog APL installed on your machine. It has the drawback that this is a user-specific folder.
-
-Tatin requires version 18.0 Unicode or better, therefore the `]TATIN` user commands won't be listed in earlier versions of Dyalog or any Classic version.
-
 
 ## Initializing Tatin
 
-As already mentioned, Tatin comes with a self-initializing feature: once installed any suitable version of Dyalog will provide a list of the Tatin user commands once you enter:
+As already mentioned, Tatin comes with a self-initializing feature: once installed, any suitable version of Dyalog will provide a list of the Tatin user commands once you enter:
 
 ```
       ]tatin -?
@@ -60,17 +127,7 @@ As already mentioned, Tatin comes with a self-initializing feature: once install
 
 The script `Tatin.dyalog` is the interface between the Dyalog user command framework and the Tatin API.
 
-When any of the Tatin user commands is executed it will check whether the API is already loaded with:
-
-```
-0<⎕NC '⎕SE.Tatin'
-```
-
-If that's not the case it will...
-
-  1. load the code into `⎕SE._Tatin`
-  2. create a namespace `⎕SE.Tatin` 
-  3. establish functions in `⎕SE.Tatin` that represents Tatin's API
+When any of the Tatin user commands is executed it will check whether the API is already loaded. If it's not available yet, it will be loaded.
 
 
 ## On `setup.dyalog`
@@ -81,8 +138,13 @@ What is the application for this? Well, you might want to have an automated buil
 
 I> If you are not interested in this or use 19.0 or later, skip this and carry on with "Updating Tatin".
 
-
 The way to achieve that goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs/` folder. Note that on non-Windows platforms the name of the file must be lowercase.
+
+Where to find the MyUCMDs/ folder depends on your operating system
+
+* On Windows it's usually C:\Users\<username>\Documents\
+* On Linux (including the PI) it is /home/<username>/
+* On Mac OS it is /Users/<username>/
 
 A> ### How does `setup.dyalog` work?
 A>
@@ -95,6 +157,8 @@ A>
 A> * making changes to the session
 A> * specifying function keys 
 A> * loading stuff into `⎕SE`
+A> 
+A> In version 19.0 the `Run.aplf` function offers a better way to achieve that, rendering any `setup.dyalog` superfluous.
 
 ### There is no such script yet
 
@@ -108,26 +172,25 @@ Create one that looks like this:
       ⎕IO←1 ⋄ ⎕ML←1
       :Trap ⎕SE.SALTUtils.DEBUG↓0
           ⎕←AutoloadTatin ⎕SE.SALTUtils.DEBUG
+          ⎕←AddPathToCmdDir path
       :Else
           dmx←⎕DMX
           ⎕←'Setup.dyalog has a problem and was not executed successfully:'
           ⎕←↑'  '∘,¨dmx.DM
       :EndTrap
-      folder←GetMyUCMDsFolder''
-      folder LoadUserCommandPackages 0
     ∇
 
     ∇ r←AutoloadTatin debug;wspath;path2Config
       r←0 0⍴''
       :Trap debug/0
-          :If 0=⎕SE.⎕NC'_Tatin'  ⍝ In 19.0 it might already be there!
+          :If 0=⎕SE.⎕NC'_Tatin'  ⍝ In 19.0 it moste likely will already be there!
           :AndIf ~IfAtLeastVersion 18
               r←'Tatin not loaded: not compatible with this version of Dyalog'
           :ElseIf 80≠⎕DR' '              ⍝ Not in "Classic"
               r←'Tatin not loaded: not compatible with Classic'
           :Else
               ⎕SE.⎕EX¨'_Tatin' 'Tatin'
-              wspath←GetMyUCMDsFolder '/Tatin/Client.dws'
+              wspath←GetProgramFilesFolder '/CiderTatin/Tatin/Client.dws'
               '_Tatin'⎕SE.⎕CY wspath
               path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
               'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
@@ -139,63 +202,67 @@ Create one that looks like this:
       :EndTrap
     ∇
 
+    ∇ r←AddPathToCmdDir path;res;sep;paths;qdmx
+     ⍝ Make sure that SALT will find the Tatin user command
+      r←0 0⍴''
+      :Trap 0
+          :If 'Win'≡3↑1⊃# ⎕WG'APLVersion'
+              path←{'\'@(⍸'/'=⍵)⊣⍵}path
+              res←{'\'@(⍸'/'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+              sep←';'
+              paths←sep(≠⊆⊢)res
+          :Else
+              path←{'/'@(⍸'\'=⍵)⊣⍵}path
+              res←{'/'@(⍸'\'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+              sep←':'
+              paths←sep(≠⊆⊢)res
+          :EndIf
+          :If ~(⊂path)∊paths ⍝ Already known?
+              {}⎕SE.SALT.Settings'cmddir ,',path,' -permanent'
+          :EndIf
+      :Else
+          qdmx←⎕DMX
+          ⎕←'Attempt to add <',path,' to the search paths for user commands failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
+     :EndTrap
+    ∇
+
       IfAtLeastVersion←{
       ⍝ ⍵ is supposed to be a number like 15 or 17.1, representing a version of Dyalog APL.
       ⍝ Returns a Boolean that is 1 only if the current version is at least as good.
           ⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'
       }
 
-    ∇ r←{OS}GetMyUCMDsFolder add
-      ⍝ Returns standard path for Dyalog's MyUCMDs folder.\\
-      ⍝ Works on all platforms but returns different results.\\
-      ⍝ Under Windows typically:\\
-      ⍝ `C:\Users\{⎕AN}\Documents\MyUCMDs\Foo'  ←→ GetMyUCMDsFolder 'Foo'
-      ⍝ ⍺ is optional and only specified by test cases: simulating different versions of the operating system.
+    ∇  r←{OS}GetProgramFilesFolder add;version;aplVersion
+      ⍝ Returns standard path for Dyalog's version-specific program files folder.
+      ⍝ Works on all platforms but returns different results.
+      ⍝ Under Windows typically:
+      ⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 19.0 Unicode Files'  ←→ GetMyUCMDsFolder
+      ⍝ ⍺ is optional and only specified by test cases: simulating different operating systems.
        :If 0=⎕NC'OS'
-           OS←3↑⊃#⎕WG'APLVersion'
+           OS←3↑⊃# ⎕WG'APLVersion'
        :EndIf
        add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
-       :If 'Win'≡OS
-           r←⊃,/1 ⎕NPARTS (2⊃4070⌶0),'\..\MyUCMDs',add
+       aplVersion←# ⎕WG'APLVersion'
+       :If OS≡'Win'
+           version←((∨/'-64'⍷1⊃aplVersion)/'-64'),' ',({⍵/⍨2>+\⍵='.'}2⊃aplVersion),' ',(80=⎕DR' ')/'Unicode'
+           r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL',version,' Files',add
        :Else
-           r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
+           version←({'.'~⍨⍵/⍨2>+\⍵='.'}2⊃aplVersion),((80=⎕DR' ')/'U'),((1+∨/'-64'⍷1⊃aplVersion)⊃'32' '64')
+           r←(⊃⎕SH'echo $HOME'),'/dyalog.',version,'.files',add
        :EndIf
-    ∇
-
-    ∇ r←path LoadUserCommandPackages debug;home;name;res;folders;folder;F
-    ⍝ This loads Tatin packages that are user commands installed in MyUCMDs
-      r←''
-      F←⎕SE._Tatin.FilesAndDirs
-      :If 0<≢folders←F.ListDirs path
-          :For folder :In folders
-              :If F.IsFile folder,'/apl-buildlist.json'
-                  name←2⊃⎕NPARTS folder
-                  :Trap (~debug)/0
-                      {}⎕SE.Tatin.LoadDependencies folder ⎕SE
-                  :Else
-                      r,←⊂'>>> Attempt to load ',name,' failed with ',⎕DMX.EM
-                  :EndTrap
-              :EndIf
-          :EndFor
-      :EndIf
-      :If 0=≢r
-          r←0 0⍴''
-      :Else
-          r←⍪r
-      :EndIf
-    ∇
+      ∇
 
 :EndNamespace
 ```
 
 ### There is already such a script
 
-Copy the functions `IfAtLeastVersion`, `GetMyUCMDsFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
 
 
 ## Updating Tatin
 
-Although you _could_ update your Tatin client by repeating the steps listed under "How to install the Tatin client" there is an easier way to do this; just execute:
+Just execute:
 
 ```
 ]Tatin.UpdateTatin
@@ -209,7 +276,10 @@ Notes:
 
 * This feature was introduced in 0.78.1, so it's not available in earlier versions
 
-  The API equivalent `⎕SE.Tatin.Update 0` however was introduced in 0.78.0.
+  Note that the API equivalent `⎕SE.Tatin.Update 0` was introduced in 0.78.0.
 
 * Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+
+
+
 

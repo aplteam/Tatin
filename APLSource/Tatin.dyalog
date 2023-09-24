@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
-⍝ The ]Tatin user command script for managing packages.
-⍝ * 0.70.0 - 2023-09-15 ⋄ Kai Jaeger
+⍝ The ]Tatin user commands for managing packages.\\
+⍝ * 0.71.0 - 2023-09-23
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -115,8 +115,8 @@
      
           c←⎕NS ⍬
           c.Name←'PackageConfig'
-          c.Desc←'Retrieve (via HTTP or file://) or create and edit a package config file for a specific package'
-          c.Parse←'1s -delete -quiet'
+          c.Desc←'Retrieve (via HTTP or file://) or create and/or edit a package config file for a specific package'
+          c.Parse←'1s -delete -edit -quiet'
           r,←c
      
           c←⎕NS ⍬
@@ -316,7 +316,6 @@
           url←'https://tatin.dev'
       :EndIf
       r←verbose TC.ListLicenses url
-      ⍝Done
     ∇
 
     ∇ r←Maintenance Arg;dry;path;home;⎕TRAP;show;filename;body;list;ind
@@ -360,9 +359,9 @@
     ∇ {r}←CreatePackage Arg;path;filename
       r←'For creating a new package execute this user command:'
       :If (,0)≡,Arg._1
-          r,←CR,'      ]Tatin.PackageConfig'
+          r,←CR,'      ]Tatin.PackageConfig -edit'
       :Else
-          r,←CR,'      ]Tatin.PackageConfig ',Arg._1
+          r,←CR,'      ]Tatin.PackageConfig ',Arg._1,' -edit'
       :EndIf
     ∇
 
@@ -562,7 +561,6 @@
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
       r←(TC.Reg.BitsToInt overwriteFlag makeHomeRelative)TC.LoadDependencies installFolder targetSpace
       r←⍪r
-      ⍝Done
     ∇
 
     ∇ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders;bool;buff;info1;info2;qdmx
@@ -883,7 +881,6 @@
       parms.version←version
       parms.targetPath←targetPath
       zipFilename←TC.BuildPackage parms
-      ⍝Done
     ∇
 
     ∇ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies;openCiderProjects;ind;project;cfg;folder;zipFolder;askForConfirmation
@@ -1098,7 +1095,6 @@
       r←TC.ListRegistries type
       r←((,[0.5]'URI' 'Alias' 'Port' 'Priority',(1≡type)/⊂'API-key'),[1]' ')⍪r
       r[2;]←(⌈⌿≢¨r)⍴¨'-'
-      ⍝Done
     ∇
 
     ∇ {r}←Init Arg
@@ -1194,7 +1190,6 @@
     ∇ r←Documentation Arg
       r←0 0⍴⍬
       {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage tatinURL,'/v1/documentation'
-      ⍝Done
     ∇
 
     ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx;verboseWas
@@ -1226,7 +1221,6 @@
           CheckForInvalidVersion qdmx
       :EndTrap
       TC.∆VERBOSE←verboseWas
-      ⍝Done
     ∇
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error
@@ -1281,7 +1275,7 @@
           :Else
               :If 0=TC.F.IsDir path
                   :If Arg.quiet
-                  :OrIf 1 TC.C.YesOrNo'The directory does not exist yet. Would you like to create it?'
+                  :OrIf TC.C.YesOrNo'The directory does not exist yet. Would you like to create it?'
                       'Could not create the directory'Assert TC.F.MkDir path
                   :Else
                       ⎕←'Cancelled'
@@ -1293,7 +1287,7 @@
                   newFlag←0
               :Else
                   :If ~Arg.quiet
-                  :AndIf 0=1 TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
+                  :AndIf 0=TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
                       ⎕←'Cancelled'
                       :Return
                   :EndIf
@@ -1726,8 +1720,8 @@
               r,←⊂'Print the usfer settings found in the config file to ⎕SE and allows manipulation via flags'
               r,←'' '  ]Tatin.UserSettings -apikey -edit -refresh'
           :Case ⎕C'PackageConfig'
-              r,←⊂'Manage a package config file: fetch, create&edit or delete it.'
-              r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> -delete'
+              r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
+              r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> -edit -delete'
           :Case ⎕C'UnInstallPackages'
               r,←⊂'Uninstall a given package and possibly all its dependencies.'
               r,←'' '  ]Tatin.UnInstallPackages [<package-ID|package-alias>] <package-folder> -cleanup -quiet'
@@ -2508,15 +2502,8 @@
     ∇ r←CR
       r←⎕UCS 13
     ∇
-   
-    ∇ r←IsAbsolutePath path      
-      :If '/'=1⍴path
-      :OrIf ':'∊path
-          r←1
-      :Else
-          r←'//'≡2↑path
-      :EndIf
-    ∇
+
+    IsAbsolutePath←{'/'=1⍴⍵:1 ⋄ ':'∊⍵:1 ⋄ '//'≡2↑⍵}
 
     ∇ folder←{quietFlag}EstablishPackageFolder folder;list;ind;cfg;pkgFolders
     ⍝ Checks first whether it's meant to be an open Cider project (if Cider is around).

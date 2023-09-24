@@ -50,12 +50,18 @@ This is called ["Minimal Version Selection"](https://research.swtch.com/vgo-mvs 
 
 A> ### On updating dependencies
 A> 
-A> Though Tatin will not assist you in updating packages, it will assist you in finding out whether there are later packages available.
+A> Though Tatin will not assist you in updating dependencies, it will assist you in finding out whether there are later packages available.
 A>
 A> For that check the user command `]TATIN.CheckForLaterVersions`. Also, check the `-update` flag of the `]Tatin.ReInstallDependencies` user command or its API equivalent.
 A> 
 A> We will discuss this in a minute.
 
+A> ### Forcing updates
+A> Imagine a package of yours depends on somebody else's package `Foo` which in turn depends on `Goo` 1.1.0, and you stumble over a bug in `Goo` 1.1.0 while using `Foo`.
+A>
+A> You send an email to the author of `Foo`, pointing out that there is already `Goo` 1.1.1 available that fixes that very bug, but the author does not reply, or tells you that she will produce and publish a new version in two weeks time while you struggle whith a tight dealine.
+A> 
+A> Solution: create a package `Mock` that declares to depend on `Goo` 1.1.1 and voila! everything works.
 
 ## Loading Dependencies
 
@@ -241,5 +247,6 @@ A> When you specify the `-major` flag of the `CheckForLaterVersion` user command
 ## Downgrading
 
 There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here; you need to do this yourself.
+
 
 

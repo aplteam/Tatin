@@ -13,6 +13,35 @@ You don't need to worry about installing Tatin if you use version 19.0 of Dyalog
 
 In 18.0 and 18.2 you need to install Tatin yourself.
 
+## Updating Tatin in 18.0 and 18.2
+
+If you have installed Tatin prior to version 101.0 then it was installed into the `MyUCMDs/` folder.
+
+With version 0.100.1 this has changed: it's now installed into a different folder:
+
+Windows
+
+```
+C:\Users\<⎕AN>\Documents\Dyalog APL[-64] <version> Unicode Files\
+```
+
+Linux
+
+```
+/home/<⎕AN>/dyalog.<version>U<bit>.files
+```
+
+Mac OS
+
+```
+Users/<⎕AN>/dyalog.<version>U<bit>.files
+```
+
+However, your old version's `]UpdateTatin` cannot know this, and will therefore keep updating Tatin in the wrong folder.
+
+It's best to remove the `Tatin/` folder from `MyUCMDs/` and install Tatin from scratch. Once you have Tatin 0.100.1 installed in the right place you can use `]Tatin.UpdateTatin` again.
+
+
 ## Requirements
 
 * Tatin needs a Unicode version of Dyalog
@@ -42,9 +71,7 @@ Instructions:
 
 2. Unzip it into one of the potential target folders
 
-It's your choice whether to install in into a folder associated with a particular version or to the version agnostic folder, making it available to all suitable versions of Dyalog.
-
-You must install into a folder `SatrtupSession/`. Where that folder lives depends on your operating system. The following examples are for 18.2 64-bit:
+You must install into a folder `StartupSession/`. Where that folder lives depends on your operating system. The following examples are for 18.2 64-bit:
 
 
 ### Windows
@@ -52,7 +79,6 @@ You must install into a folder `SatrtupSession/`. Where that folder lives depend
 ```
 C:\Users\<⎕AN>\Documents\Dyalog APL 18.2 Unicode Files\     ⍝ 32-bit
 C:\Users\<⎕AN>\Documents\Dyalog APL-64 18.2 Unicode Files\  ⍝ 64-bit
-C:\Users\<⎕AN>\Documents\Dyalog APL Files\                  ⍝ version agnostic
 ```
 
 Once the folder `StartupSession/Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
@@ -63,7 +89,6 @@ Once the folder `StartupSession/Tatin/` is in place, any newly started version o
 ```
 /home/<⎕AN>/dyalog.182U32.files  ⍝ 32-bit
 /home/<⎕AN>/dyalog.182U64.files  ⍝ 64-bit
-/home/<⎕AN>/dyalog.files         ⍝ version agnostic
 ```
 
 Note that your intended target directory might not exist yet.
@@ -75,7 +100,6 @@ Once the folder `StartupSession/Tatin/` is in place, any newly started version o
 ```
 /Users/<⎕AN>/dyalog.182U32.files  ⍝ 32-bit
 /Users/<⎕AN>/dyalog.182U64.files  ⍝ 64-bit
-/Users/<⎕AN>/dyalog.files         ⍝ version agnostic
 ```
 
 Note that your intended target directory might not exist yet.
@@ -83,7 +107,7 @@ Note that your intended target directory might not exist yet.
 Once the folder `StartupSession/Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
 
 
-I> Note that there is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature the a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure. In earlier versions such a function is loaded but not executed.
+I> Note that there is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature that a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure. In earlier versions such a function is not executed.
 
 
 As a side effect of executing any of the Tatin user commands the Tatin API will become available via `⎕SE.Tatin`.
@@ -285,6 +309,7 @@ Notes:
   Note that the API equivalent `⎕SE.Tatin.Update 0` was introduced in 0.78.0.
 
 * Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+
 
 
 

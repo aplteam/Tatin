@@ -12,17 +12,17 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with notes regarding fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.101.0 from 2023-09-26
+## Version 0.101.1 from 2023-09-26
 
 Two massive changes:
 
-* This version is only compatiable with Cider 0.36.0 or later!
+* This version is only compatible with Cider 0.36.0 or later
 
-* The installation folder is not `MyUCMDs/` anymore. See the "InstallingAndUpdatingTheTatinClient.html" document for details.
+* The installation folder is not `MyUCMDs/` anymore. However, `]Tatin.UpdateTatin` of your old version cannot know about this, therefore you have to take action once in order to get Tatin into the right folder. 
 
-* Note that `]Tatin.UpdateTatin` will use the new installation folder and ask the user whether she wants to delete Tatin from `MyUCMDs/` if found there
+  See the "InstallingAndUpdatingTheTatinClient.html" document for details.
 
-If for whatever reason you update manually, then you must make sure that Tatin is removed from the `[MyUCMDs]` folder yourself.
+* Note that in the future `]Tatin.UpdateTatin` will use the new installation folder 
 
 ## Version 0.100.2 from 2023-09-23
 
@@ -120,6 +120,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

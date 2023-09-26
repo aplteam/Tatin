@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.71.0 - 2023-09-23
+⍝ * 0.72.0 - 2023-09-26
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -234,10 +234,15 @@
               TC←#.Tatin.Client
               ⎕←'*** TC←#.Tatin.Client'
           :EndIf
-          :If 0=⎕SE._Tatin.RumbaLean.⎕NC'DRC'
-              ⎕SE._Tatin.Admin.InitConga ⍬
+          :If 0=TC.##.RumbaLean.⎕NC'DRC'
+              TC.##.Admin.InitConga ⍬
           :EndIf
           r←1
+      :EndIf
+      :If 0<≢'[/\\]MyUCMDs[/\\]'⎕S 0⍠('IC' 1)⊣##.SourceFile
+          ⎕←'-----------------------------------------------------------------------------------------------------------------'
+          ⎕←'*** Tatin was installed into MyUCMDs/ - please remove and install from scratch according to the documentation ***'
+          ⎕←'-----------------------------------------------------------------------------------------------------------------'
       :EndIf
     ∇
 
@@ -428,14 +433,22 @@
       :EndIf
     ∇
 
-    ∇ {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;ref;target
+    ∇ {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;ref;target;q
       r←''
-      folder←1⊃⎕NPARTS ##.SourceFile
-      (version ref target)←⎕SE._Tatin.Client.UpdateClient 0 folder
+      folder←1 TC.GetProgramFilesFolder''
+      (version ref target)←TC.UpdateClient 0 folder
       :If 0<≢version
-          ⎕SE._Tatin.APLTreeUtils2.GoToWebPage ⎕SE._Tatin.Client.GetMyUCMDsFolder'Tatin/Assets/docs/ReleaseNotes.html'
-          r←'Tatin updated on disk to ',⊃{⍺,' from ',⍵}/1↓⎕SE.Tatin.Version
+          TC.A.GoToWebPage TC.GetMyUCMDsFolder'Tatin/Assets/docs/ReleaseNotes.html'
+          r←'Tatin updated on disk to ',⊃{⍺,' from ',⍵}/1↓TC.Version
           r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
+      :EndIf
+      ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
+      folder←TC.GetMyUCMDsFolder'Tatin'
+      :If TC.F.IsDir folder
+          q←'RemoveTatinFromMyUCMDs@'
+          q,←'There is a folder ',folder,' on disk - do you want the folder removed?'
+      :AndIf 1 TC.C.YesOrNo q
+          {}TC.F.RmDirByForce folder
       :EndIf
     ∇
 

@@ -1,4 +1,4 @@
- (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;⎕TRAP;filename;currentVersion;run
+  (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;⎕TRAP;filename;currentVersion;run;q
 ⍝ Updates the client to (by default) the latest version, and returns the version number of the new version.\\
 ⍝ A Boolean right argument (`force`) is mandatory, but one might specify also a folder Tatin is installed in.
 ⍝ The user command will do this automatically with the folder the user command was loaded from.\\
@@ -11,7 +11,7 @@
  version←ref←''
  :If flag←0=⎕NC'tag'
      GH←⎕NEW ##.GitHubAPIv3(,⊂'aplteam')
-     filename←GetMyUCMDsFolder'Tatin/GitHub-personal-token.txt'
+     filename←GetProgramFilesFolder'StartupSession\CiderTatin\Tatin\GitHub-personal-token.txt'
      :If F.IsFile filename
          GH.personal_access_token←∊⊃F.NGET filename 1
      :EndIf
@@ -23,7 +23,7 @@
  :If 0=≢tag
      ⎕←'Tatin is up-to-date: ',⊃{⍺,' from ',⍵}/1↓Reg.Version
  :Else
-     msg←'UpdateTatin@You version of Tatin is ',2⊃Reg.Version
+     msg←'UpdateTatin@Your version of Tatin is ',{⍵↑⍨¯1+⍵⍳'+'}2⊃Reg.Version
      msg,←(⎕UCS 13),'Latest published version is ',1↓tag
      msg,←(⎕UCS 13),'Would you like to download and install ',(1↓tag),' ?'
      :If ~flag ⍝ Then the user has requested a particular version, and we assume she knows what she's doing
@@ -71,16 +71,12 @@
          :If 0=≢target
              target←GetProgramFilesFolder'Tatin'  ⍝ Establish default
          :EndIf
-         (⊃⎕NPARTS{⍵↓⍨-'/\'∊⍨¯1↑⍵}target)⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
+         3 ⎕MKDIR target,'/StartupSession/CiderTatin/Tatin'
+         (target,'/StartupSession/CiderTatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
+         :If ⎕NEXISTS folder,'/Run.aplf'
+             (target,'/StartupSession/CiderTatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Run.aplf'
+         :EndIf
          version←{⍵↓⍨'v'=1⍴⍵}tag
          ref←⎕SE.⎕NS''
-
-     ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
-         folder←GetMyUCMDsFolder'Tatin'
-         :If F.IsDir folder
-         :AndIf C.YesOrNo'RemoveTatinFromMyUCMDs@There is a folder ',folder,' on disk - do you want the folder removed?'
-             {}F.RmDirByForce folder
-         :EndIf
-     :EndIf
  :EndIf
 ⍝Done

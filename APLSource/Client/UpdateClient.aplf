@@ -47,28 +47,40 @@
          ⎕NUNTIE tno
          data2.Content←''
          tempFile ZipArchive.UnzipTo folder
-     ⍝ Now we need to catch the "Run" function
-         request←R.NewRequest 0
-         request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
-         client←R.NewClient 0
-         client.Host←'github.com'
-         request.Headers,←⊂'User-Agent' 'aplteam'
-         data←client R.SendAndReceive request
-         'Invalid HTTP status code'Assert 302≡data.StatusCode
-         redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
-         redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
-         client←R.NewClient 0
-         (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
-         data2←client R.SendAndReceive request
-         run←'UTF-8'⎕UCS ⎕UCS data2.Content
-         (⊂run)⎕NPUT folder,'/Run.aplf'
-         ⎕NDELETE tempFile
+
+     ⍝ Now we need to catch the "Run" function if 19.0 or later
+         :If 19≤⊃⊃(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion'
+             request←R.NewRequest 0
+             request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
+             client←R.NewClient 0
+             client.Host←'github.com'
+             request.Headers,←⊂'User-Agent' 'aplteam'
+             data←client R.SendAndReceive request
+             'Invalid HTTP status code'Assert 302≡data.StatusCode
+             redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
+             redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
+             client←R.NewClient 0
+             (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
+             data2←client R.SendAndReceive request
+             run←'UTF-8'⎕UCS ⎕UCS data2.Content
+             (⊂run)⎕NPUT folder,'/Run.aplf'
+             ⎕NDELETE tempFile
+         :EndIf
+
+     ⍝ Now we move the new version from temp to the correct place
          :If 0=≢target
              target←GetProgramFilesFolder'Tatin'  ⍝ Establish default
          :EndIf
          (⊃⎕NPARTS{⍵↓⍨-'/\'∊⍨¯1↑⍵}target)⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
          version←{⍵↓⍨'v'=1⍴⍵}tag
          ref←⎕SE.⎕NS''
+
+     ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
+         folder←GetMyUCMDsFolder'Tatin'
+         :If F.IsDir folder
+         :AndIf C.YesOrNo'RemoveTatinFromMyUCMDs@There is a folder ',folder,' on disk - do you want the folder removed?'
+             {}F.RmDirByForce folder
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

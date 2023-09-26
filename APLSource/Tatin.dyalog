@@ -32,7 +32,7 @@
           c←⎕NS ⍬
           c.Name←'CreatePackage'
           c.Desc←'Create a new Tatin package'
-          c.Parse←'1s'
+          c.Parse←'1'
           r,←c
      
           c←⎕NS ⍬
@@ -357,12 +357,9 @@
     ∇
 
     ∇ {r}←CreatePackage Arg;path;filename
-      r←'For creating a new package execute this user command:'
-      :If (,0)≡,Arg._1
-          r,←CR,'      ]Tatin.PackageConfig -edit'
-      :Else
-          r,←CR,'      ]Tatin.PackageConfig ',Arg._1,' -edit'
-      :EndIf
+      Arg.(delete quiet)←0
+      Arg.edit←1
+      r←PackageConfig Arg
     ∇
 
     ∇ r←FindDependencies Arg;pkgList;target;verbose;buff;bool
@@ -531,12 +528,13 @@
           :If isUCMD
               targetSpace←'⎕SE'
           :Else
-              :If 0=≢targetSpace←DefineTargetSpace'#'
-                  ⎕←'Cancelled by user' ⋄ →0
-              :EndIf
+              targetSpace←CalledFrom ⎕NSI
           :EndIf
       :Else
           targetSpace←,Arg._2
+          :If ~(⊃targetSpace)∊'⎕#'
+              targetSpace←(CalledFrom ⎕NSI),'.',targetSpace
+          :EndIf
       :EndIf
       :If isUCMD
           '[MyUCMDs] must stand on its own'Assert 0<≢(≢'[myucmds]')↓installFolder
@@ -560,7 +558,7 @@
       :EndIf
       'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
       r←(TC.Reg.BitsToInt overwriteFlag makeHomeRelative)TC.LoadDependencies installFolder targetSpace
-      r←⍪r
+      r←⍪(⊂'Dependencies loaded into ',targetSpace,':'),r
     ∇
 
     ∇ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders;bool;buff;info1;info2;qdmx
@@ -655,7 +653,7 @@
       :If '[]'≡¯2↑⌽¯1⌽installFolder
           'You''ve specified a Cider project alias but Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
           project←installFolder
-          aliasDefs←⎕SE.Cider.GetAliasFileContent
+          aliasDefs←⎕SE.Cider.GetAliasFileContent ⍬
           ind←aliasDefs[;1]⍳⊂⎕C project~'[]'
           'Project not found'Assert ind≤≢aliasDefs
           installFolder←2⊃aliasDefs[ind;]
@@ -1198,14 +1196,17 @@
       TC.∆VERBOSE←Arg.verbose
       (identifier targetSpace)←Arg.(_1 _2)
       :If 0≡targetSpace
-      :AndIf 0=≢targetSpace←DefineTargetSpace ⍬
-          ⎕←'Cancelled by user'
-          :Return
+          targetSpace←CalledFrom ⎕NSI
       :EndIf
       :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
           ('"',targetSpace,'" is not a valid APL name')Assert ¯1≠⎕NC targetSpace
       :EndIf
-      saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
+      :If ~(⊃targetSpace)∊'#⎕'
+          targetSpace←(CalledFrom ⎕NSI),'.',targetSpace
+      :EndIf
+      saveIn←{⍵↑⍨¯1+⍵⍳'.'}targetSpace
+      'Invalid target namespace'Assert{(⊂1 ⎕C,⍵)∊,¨'#':1 ⋄ (⎕NC ⍵)∊0 9}saveIn,'.foo'
+      saveIn←⍎saveIn
       :If ~(⊂1 ⎕C targetSpace)∊,¨'#' '⎕SE'
       :AndIf 0=saveIn.⎕NC'targetSpace'
           '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
@@ -1213,7 +1214,7 @@
       :EndIf
       :Trap 0
           noOf←Arg.nobetas TC.LoadPackages identifier targetSpace
-          r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded'
+          r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded into ',targetSpace
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
@@ -1472,7 +1473,7 @@
       ind←installFolder⍳']'
       alias←(ind↑installFolder)~'[]'
       installFolder←ind↓installFolder
-      list←⎕SE.Cider.GetAliasFileContent
+      list←⎕SE.Cider.GetAliasFileContent ⍬
       'No Cider projects found'Assert 0<≢list
       ('Alias "',alias,'" does not define an open Cider project')Assert(⊂⎕C alias)∊list[;1]
       :If 0<≢installFolder
@@ -1804,8 +1805,11 @@
               r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'
               r,←⊂'                the document "Publishing Packages".'
           :Case ⎕C'CreatePackage'
-              r,←⊂'Prints a user command to the session that allow creating a package config file, the'
-              r,←⊂'equivalent of creating a package.'
+              r,←⊂'This user command is an alias for:'
+              r,←⊂']Tatin.PackageConfig -edit'
+              r,←⊂'which in turn is an equivalent of creating a package.'
+              r,←⊂''
+              r,←⊂'The mandatory parameter must be a path to a folder that is going to become a package.'
           :Case ⎕C'DeprecatePackage'
               r,←⊂'Declares a particular major version of a package or all major versions of a particular'
               r,←⊂'package as deprecated. Requires two arguments:'
@@ -1903,9 +1907,8 @@
               r,←⊂'A) First argument:'
               r,←⊂'Specify one or more (comma-separated) packages to be loaded.'
               r,←⊂''
-              r,←⊂'B) Second (optional) argument: target namespace (defaults to #)'
-              r,←⊂'Must be the fully qualified name of a namespace the package will be loaded into.'
-              r,←⊂'May be # or ⎕SE or a sub-namespace of any level.'
+              r,←⊂'B) Second (optional) argument: target namespace (defaults to the current namespace)'
+              r,←⊂'Might be # or ⎕SE or a sub-namespace of any level.'
               r,←⊂''
               r,←⊂'-nobetas  By default beta versions are included. Specify -nobetas to suppress them.'
               r,←⊂'-verbose  Let the command report steps along the way.'
@@ -1941,12 +1944,13 @@
               r,←⊂'Takes up to two arguments:'
               r,←⊂' [1] A folder into which one or more packages have been installed'
               r,←⊂' [2] Optional: a namespace into which the packages are going to be loaded'
-              r,←⊂'     Default is # except when "folder" is [MyUCMDs] when the default is ⎕SE instead.'
+              r,←⊂'     Default is the current namespace except when "folder" is [MyUCMDs] when the default'
+              r,←⊂'     is ⎕SE instead.'
               r,←⊂''
               r,←⊂'-overwrite:        By default a package is not loaded if it already exists. You can'
               r,←⊂'                   enforce the load operation by specifying the -overwrite flag.'
               r,←⊂'-makeHomeRelative  By default the paths returned by HOME and GetFullPath2AssetsFolder'
-              r,←⊂'                   would be absolute. By specifying this you can enforce them to be'
+              r,←⊂'                   are absolute. By specifying this you can enforce them to be'
               r,←⊂'                   relative: onle the package folder and its parent are returned.'
           :Case ⎕C'LoadTatin'
               r,←⊂'Loads the Tatin client into ⎕SE (if it''s not already there) and initializes it.'
@@ -2425,20 +2429,6 @@
     IsValidJSON←{0::0 ⋄ 1⊣TC.Reg.JSON ⍵}
     IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}
 
-    ∇ r←DefineTargetSpace dummy;bool;ind;NSI
-      NSI←⎕NSI
-      r←,⊃⌽{⍵/⍨~∨\'['∊¨⍵}(+/'⎕SE'{∧\⍺∘≡¨(≢⍺)↑¨⍵}NSI)↓NSI
-      :If (,'#')≢,r
-          ind←'Select target space the package(s) shall be loaded into:'TC.C.Select,¨'#'(⍕r)
-          :If 0=≢ind
-              r←''
-          :Else
-              r←ind⊃,¨'#'(⍕r)
-          :EndIf
-      :EndIf
-    ∇
-
-
     ∇ r←GetListOfRegistriesForSelection type
       :If 0<≢r←TC.ListRegistries type
           r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
@@ -2591,5 +2581,7 @@
           dmx.EM ⎕SIGNAL dmx.EN
       :EndIf
     ∇
+
+    CalledFrom←{⊃{⍵↓⍨+/∧\'⎕'=⊃¨⍵}⍵}
 
 :EndNamespace

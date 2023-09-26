@@ -20,6 +20,7 @@
  :Else
      os←⎕C APLTreeUtils2.GetOperatingSystem ⍬
      max←5+3×os≢'win'
+     flag←i←0
      :Repeat
          :Trap 11
              :Select os
@@ -29,7 +30,6 @@
                  buff←∊⎕SH'rm -f -r "',(path~'"'),'"'
              :EndSelect
          :EndTrap
-         flag←i←0
          :If 0≠rc←⎕NEXISTS path
              :If max=i←i+1
                  :If 0=≢msg←buff

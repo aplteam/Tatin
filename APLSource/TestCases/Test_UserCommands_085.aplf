@@ -1,4 +1,4 @@
- R←Test_UserCommands_085(stopFlag batchFlag);⎕TRAP;stop
+ R←Test_UserCommands_085(stopFlag batchFlag);⎕TRAP
 ⍝ Exercise ]Tatin.LoadPackages from within a namespace
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←T._Failed
@@ -6,18 +6,14 @@
  #.⎕EX TC.GetTatinRootSpace'#'
  #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS''
 
- ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'Select target space the package(s) shall be loaded into:' '#.Foo'
- stop←0
- #.Foo.fn←stop∘{⍺ #.Tatin.TestCases.∆UCMD'LoadPackages ',⍵}
  :With #.Foo
-     (∆rc ∆msg ∆res)←fn'[tatin]APLTreeUtils2'
+     ∆res←⎕SE.UCMD'Tatin.LoadPackages [tatin]APLTreeUtils2'
  :EndWith
- Assert 0=#.Foo.∆rc
  →T.GoToTidyUp 9≠#.Foo.⎕NC'APLTreeUtils2'
+ →T.GoToTidyUp'1 package (including dependencies) loaded into #.Foo'≢#.Foo.∆res
 
  R←T._OK
 
 ∆TidyUp:
  #.⎕EX TC.GetTatinRootSpace'#'
- ⎕SE._Tatin.Client.CommTools.Cleanup
 ⍝Done

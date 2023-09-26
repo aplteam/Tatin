@@ -1,4 +1,4 @@
- r←Test_Server_300(stopFlag batchFlag);⎕TRAP;dir;res
+ r←Test_Server_300(stopFlag batchFlag);⎕TRAP;dir;res;url
 ⍝ Install a particular package via http.
 ⍝ Supposed to deliver the best one
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -7,7 +7,8 @@
  #.⎕EX TC.GetTatinRootSpace'#'
  dir←∆GetTempDir ⍬
 
- res←TC.InstallPackages((TC.ReplaceRegistryAlias '[localhost]'),'aplteam-APLProcess-0.2.4')dir
+ url←TC.ReplaceRegistryAlias'[localhost]'
+ res←TC.InstallPackages(url,'aplteam-APLProcess-0.2.4')dir
  →T.PassesIf 1=≢res
 
  r←T._OK

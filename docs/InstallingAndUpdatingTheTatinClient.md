@@ -11,7 +11,7 @@
 
 You don't need to worry about installing Tatin if you use version 19.0 of Dyalog: In 19.0 Tatin just needs to be activated.
 
-In 18.0 and 18.2 you need to install Tatin youself.
+In 18.0 and 18.2 you need to install Tatin yourself.
 
 ## Requirements
 
@@ -25,43 +25,14 @@ Note that when you call `]Tatin.Init` Tatin will check whether those requirement
 
 ## How to activate Tatin in 19.0
 
-In order to activate Tatin, the folder `[DYALOG]/Experimental/CiderTatin` needs to be copied into one of the following folders:
-
-### Windows
+In order to activate Tatin, execute
 
 ```
-C:\Users\<⎕AN>\Documents\Dyalog APL 19.0 Unicode Files\StartupSession\    ⍝ 32-bit
-C:\Users\<⎕AN>\Documents\Dyalog APL-64 19.0 Unicode Files\StartupSession\ ⍝ 64-bit
-C:\Users\<⎕AN>\Documents\Dyalog APL Files\StartupSession\                 ⍝ version agnostic
+]Activate -??
 ```
 
-It's you choice whether you want to install in into a folder associated with a particular version or the version agnostic folder.
+and follow the instructions that suit you best.
 
-Once the folder `CiderTatin/` is in place, any newly started version of Dyalog comes with the user commands `]Tatin.*` as well as `]Cider.*`; the APIs are both available via `⎕SE.Tatin` and `⎕SE.Cider`.
-
-### Linux
-
-```
-/home/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
-/home/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
-/home/<⎕AN>/dyalog.files        ⍝ version agnostic
-```
-
-Note that your intended target directory might not exist yet.
-
-Once the folder `CiderTatin/` is in place, any newly started version of Dyalog comes with the user commands `]Tatin.*` as well as `]Cider.*`; the APIs are both available via `⎕SE.Tatin` and `⎕SE.Cider`.
-
-### Mac OS
-
-```
-/Users/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
-/Users/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
-/Users/<⎕AN>/dyalog.files        ⍝ version agnostic
-```
-
-Note that your intended target directory might not exist yet.
-
-Once the folder `CiderTatin/` is in place, any newly started version of Dyalog comes with the user commands `]Tatin.*` as well as `]Cider.*`; the APIs are both available via `⎕SE.Tatin` and `⎕SE.Cider`.
 
 ## How to install in 18.0 and 18.2
 
@@ -71,50 +42,53 @@ Instructions:
 
 2. Unzip it into one of the potential target folders
 
-It's you choice whether to install in into a folder associated with a particular version or the version agnostic folder.
+It's your choice whether to install in into a folder associated with a particular version or to the version agnostic folder, making it available to all suitable versions of Dyalog.
+
+You must install into a folder `SatrtupSession/`. Where that folder lives depends on your operating system. The following examples are for 18.2 64-bit:
 
 
 ### Windows
 
 ```
-C:\Users\<⎕AN>\Documents\Dyalog APL 19.0 Unicode Files\StartupSession\    ⍝ 32-bit
-C:\Users\<⎕AN>\Documents\Dyalog APL-64 19.0 Unicode Files\StartupSession\ ⍝ 64-bit
-C:\Users\<⎕AN>\Documents\Dyalog APL Files\StartupSession\                 ⍝ version agnostic
+C:\Users\<⎕AN>\Documents\Dyalog APL 18.2 Unicode Files\     ⍝ 32-bit
+C:\Users\<⎕AN>\Documents\Dyalog APL-64 18.2 Unicode Files\  ⍝ 64-bit
+C:\Users\<⎕AN>\Documents\Dyalog APL Files\                  ⍝ version agnostic
 ```
 
-Once the folder `Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
+Once the folder `StartupSession/Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
+
 
 ### Linux
 
 ```
-/home/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
-/home/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
-/home/<⎕AN>/dyalog.files        ⍝ version agnostic
+/home/<⎕AN>/dyalog.182U32.files  ⍝ 32-bit
+/home/<⎕AN>/dyalog.182U64.files  ⍝ 64-bit
+/home/<⎕AN>/dyalog.files         ⍝ version agnostic
 ```
 
 Note that your intended target directory might not exist yet.
 
-Once the folder `Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
+Once the folder `StartupSession/Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
 
 ### Mac OS
 
 ```
-/Users/<⎕AN>/dyalog.190U32.files ⍝ 32-bit
-/Users/<⎕AN>/dyalog.190U64.files ⍝ 64-bit
-/Users/<⎕AN>/dyalog.files        ⍝ version agnostic
+/Users/<⎕AN>/dyalog.182U32.files  ⍝ 32-bit
+/Users/<⎕AN>/dyalog.182U64.files  ⍝ 64-bit
+/Users/<⎕AN>/dyalog.files         ⍝ version agnostic
 ```
 
 Note that your intended target directory might not exist yet.
 
-Once the folder `Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
+Once the folder `StartupSession/Tatin/` is in place, any newly started version of Dyalog comes with the user command `]Tatin.*`.
 
 
-I> Note that there is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add that feature. In earlier versions such a function is loaded but not executed.
+I> Note that there is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature the a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure. In earlier versions such a function is loaded but not executed.
 
 
 As a side effect of executing any of the Tatin user commands the Tatin API will become available via `⎕SE.Tatin`.
 
-I> If you want the Tatin API to be available right from the start: this is discussed under "[Initializing Tatin](#)".
+If you want the Tatin API to be available right from the start: this is discussed next.
 
 
 ## Initializing Tatin
@@ -132,23 +106,27 @@ When any of the Tatin user commands is executed it will check whether the API is
 
 ## On `setup.dyalog`
 
+
+
 Now you might want the Tatin API to be around right from the start, so that you can invoke any of the Tatin API functions without first executing any of the Tatin user commands. 
 
-What is the application for this? Well, you might want to have an automated build process available right from the start, for example.
+I> What is the application for this? Well, you might want to have an automated build process available right from the start, for example.
+I>
+I> If you are not interested in this, or use 19.0 or later, skip this and carry on with "Updating Tatin".
 
-I> If you are not interested in this or use 19.0 or later, skip this and carry on with "Updating Tatin".
+The way to achieve that goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs/` folder. 
 
-The way to achieve that goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs/` folder. Note that on non-Windows platforms the name of the file must be lowercase.
+Where to find the `MyUCMDs/` folder depends on your operating system
 
-Where to find the MyUCMDs/ folder depends on your operating system
+* On Windows it's usually `C:\Users\{username}\Documents\`
+* On Linux (including the PI) it is `/home/{username}/`
+* On Mac OS it is `/Users/{username}/`
 
-* On Windows it's usually C:\Users\<username>\Documents\
-* On Linux (including the PI) it is /home/<username>/
-* On Mac OS it is /Users/<username>/
+Note that only on Windows is the folder created as part of the installation routine. On other platform you must create the folder yourself.
 
 A> ### How does `setup.dyalog` work?
 A>
-A> The magic behind this is that whenever an instance of Dyalog is fired up it checks whether such a script exists. If that is the case it checks whether there is a function `Setup`. 
+A> The magic behind this is that whenever an instance of Dyalog is fired up, it checks whether such a script exists. If that is the case it checks whether there is a function `Setup`. 
 A>
 A> If there is such a function then it is expected to be monadic; it will be executed automatically as part of the instantiating process of Dyalog APL.
 A>
@@ -158,7 +136,7 @@ A> * making changes to the session
 A> * specifying function keys 
 A> * loading stuff into `⎕SE`
 A> 
-A> In version 19.0 the `Run.aplf` function offers a better way to achieve that, rendering any `setup.dyalog` superfluous.
+A> In version 19.0 the `Run.aplf` function offers a better way to achieve that, probably rendering `setup.dyalog` superfluous.
 
 ### There is no such script yet
 
@@ -252,12 +230,40 @@ Create one that looks like this:
        :EndIf
       ∇
 
+    ∇  r←{current}GetProgramFilesFolder postFix;version;aplVersion;OS
+      ⍝ Returns standard path for Dyalog's version-specific program files folder.\\
+      ⍝ Works on all platforms but returns different results.\\
+      ⍝ Under Windows typically:\\
+      ⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 19.0 Unicode Files' ←→ GetMyUCMDsFolder
+      ⍝ ⍺ is optional and defaults to 0, meaning the version-agnostic folder is returned.
+      ⍝ If ⍺←1, the folder associated with the currently running version of Dyalog is returned.
+       current←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'current'
+       OS←3↑1⊃# ⎕WG'APLVersion'
+       postFix←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}postFix
+       aplVersion←# ⎕WG'APLVersion'
+       :If current
+           :If OS≡'Win'
+               version←((∨/'-64'⍷1⊃aplVersion)/'-64'),' ',({⍵/⍨2>+\⍵='.'}2⊃aplVersion),' ',(80=⎕DR' ')/'Unicode'
+               r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL',version,' Files',postFix
+           :Else
+               version←({'.'~⍨⍵/⍨2>+\⍵='.'}2⊃aplVersion),((80=⎕DR' ')/'U'),((1+∨/'-64'⍷1⊃aplVersion)⊃'32' '64')
+               r←(⊃⎕SH'echo $HOME'),'/dyalog.',version,'.files',postFix
+           :EndIf
+       :Else
+           :If OS≡'Win'
+             r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files',postFix
+           :Else
+               r←(⊃⎕SH'echo $HOME'),'/dyalog.files',postFix
+           :EndIf
+       :EndIf
+    ∇
+
 :EndNamespace
 ```
 
 ### There is already such a script
 
-Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder`, `AddPathToCmdDir` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` and `AddPathToCmdDir` are called from your `Setup` function.
 
 
 ## Updating Tatin
@@ -279,6 +285,10 @@ Notes:
   Note that the API equivalent `⎕SE.Tatin.Update 0` was introduced in 0.78.0.
 
 * Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+
+
+
+
 
 
 

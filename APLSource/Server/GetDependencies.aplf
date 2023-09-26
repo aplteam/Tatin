@@ -1,6 +1,6 @@
  response←request GetDependencies packageID;html;filename;list;content;dependencies
 ⍝ Collect dependencies if not http: those need to be dealt with by the caller since this is
-⍝ the server module, so we don't have the means to query servers at this point.
+⍝ the server module, and we don't query other servers.
  :If Reg.IsValidPackageID_Complete packageID
      filename←(⊃¯1↑1⊃F.Dir G.RegistryPath,packageID,'*'),'/',Reg.DependenciesFilename
      :If F.IsFile filename

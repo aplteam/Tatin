@@ -1,13 +1,10 @@
-﻿ Run path;res;qdmx;sep;paths;⎕TRAP
+﻿Run path;res;qdmx;sep;paths
 ⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the associated user commands will be found.
-⍝ This is for version 19.0 
+⍝ This is for version 19.0
 ⍝ The function is part of the Tatin project.
-⍝ Version 0.1.0 from 2023-09-23 ⋄ Kai Jaeger
- :If 0
-     ⎕TRAP←0 'S'
-     ∘∘∘
- :EndIf
+⍝ Version 0.1.0 from 2023-09-26  ⋄  Kai Jaeger
  :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃#.APLVersion
+ ⎕SE.⎕EX'CiderTatin'
  :AndIf 0=⎕SE.⎕NC'_Tatin'
      path←∊path
      :Trap 0
@@ -50,5 +47,4 @@
          qdmx←⎕DMX
          ⎕←'Attempt to load the "Cider" package failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
      :EndTrap
- :EndIf
- ⍝Done
+     :EndIf

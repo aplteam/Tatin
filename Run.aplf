@@ -2,8 +2,8 @@
 ⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the associated user commands will be found.
 ⍝ This is for version 19.0
 ⍝ The function is part of the Tatin project.
-⍝ Version 0.1.0 from 2023-09-26  ⋄  Kai Jaeger
- :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃#.APLVersion
+⍝ Version 0.1.1 from 2023-09-28  ⋄  Kai Jaeger
+ :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃2 ⎕nq # 'APLVersion'
  ⎕SE.⎕EX'CiderTatin'
  :AndIf 0=⎕SE.⎕NC'_Tatin'
      path←∊path
@@ -20,7 +20,7 @@
          ⎕←'Attempt to establish Tatin in ⎕SE failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
      :EndTrap
      :Trap 0
-         :If 'Win'≡3↑1⊃#.APLVersion
+         :If 'Win'≡3↑1⊃2 ⎕nq # 'APLVersion'
              path←{'\'@(⍸'/'=⍵)⊣⍵}path
              res←{'\'@(⍸'/'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
              sep←';'
@@ -47,4 +47,4 @@
          qdmx←⎕DMX
          ⎕←'Attempt to load the "Cider" package failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
      :EndTrap
-     :EndIf
+ :EndIf

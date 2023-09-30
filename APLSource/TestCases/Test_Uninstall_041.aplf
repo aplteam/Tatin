@@ -1,25 +1,22 @@
  r←Test_Uninstall_041(stopFlag batchFlag);⎕TRAP;res;msg;zipFilename;rc;list
-⍝ Uninstall a user command package from a sub-folder in [MyUCMDs]; was once a bug
-⍝ In reality this will probably never happen, but then, who knows...
+⍝ Uninstall a user command package from [MyUCMDs] but from a folder that carries other files as well
+⍝ In this case the installation folder MUST NOT be removed!
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
- res←⎕SE.Tatin.InstallPackages zipFilename'[MyUCMDs]/test-uninstall'
+ res←⎕SE.Tatin.InstallPackages zipFilename'[MyUCMDs]'
  Assert'example-UC-1.0.0'≡∊res
 
- zipFilename←∆GetServerRegistryFolder,'aplteam-APLTreeUtils-7.0.0/aplteam-APLTreeUtils-7.0.0.zip'
- res←⎕SE.Tatin.InstallPackages zipFilename'[MyUCMDs]/test-uninstall'
- Assert'aplteam-APLTreeUtils-7.0.0'≡∊res
+ (⊂'Hello')⎕NPUT TC.GetMyUCMDsFolder'UC/World.txt'  ⍝ This file prevents the folder from being deleted
 
- (list msg)←TC.UnInstallPackages'example-UC-1.0.0' '[Myucmds]test-uninstall'
+ (list msg)←TC.UnInstallPackages'example-UC-1.0.0' '[Myucmds]'
  →T.GoToTidyUp'example-UC-1.0.0'≢∊list
  →T.GoToTidyUp 0≠≢msg
- →T.GoToTidyUp F.IsFile TC.GetMyUCMDsFolder'test-uninstall/UC.aplc'
+ →T.GoToTidyUp~F.IsDir TC.GetMyUCMDsFolder'UC'
 
  r←T._OK
 
 ∆TidyUp:
- (rc msg)←F.RmDirByForce TC.GetMyUCMDsFolder,'/test-uninstall'
- Assert 0=rc
+ {}F.RmDirByForce TC.GetMyUCMDsFolder'UC'
 ⍝Done

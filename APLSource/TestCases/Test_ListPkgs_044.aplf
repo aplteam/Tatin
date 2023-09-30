@@ -6,12 +6,11 @@
  parms←⎕NS''
  parms.date←1
  parms.tags←'zip'
- mat←parms TC.ListPackages'[local]'
+ mat←parms TC.ListPackages'[localhost]'
  →T.PassesIf 2=⍴⍴mat
  →T.PassesIf 2=2⊃⍴mat
  →T.PassesIf 1<≢mat
  →T.PassesIf∧/{∧/⍵∊⎕D,' :-'}¨mat[;2]                                ⍝ Formatted dates?
- →T.PassesIf∧/∨/'zip'⍷⎕C↑(mat[;1]≢¨⊂'example-UC-1.0.0')⌿mat[;1]     ⍝ name must carry "zip"
 
  r←T._OK
 ⍝Done

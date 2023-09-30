@@ -1,27 +1,42 @@
 :Class APLProcess
-⍝ Start (and eventually dispose of) an APL Process.\\
-⍝ By default the version of Dyalog APL a new process is going to be created from defines which version
+⍝ Start (and optionally dispose of) an APL Process.\\
+⍝ By default the version of Dyalog APL a new process is going to be created from defines, which version
 ⍝ of APL will be started, be it development or runtime.\\
 ⍝ You can change that by first creating a parameter space by calling `CreateParms`, then making the necessary
 ⍝ adjustments, and finally passing that namespace as parameter to `⎕NEW` when instantiating `APLProcess`.\\
 ⍝ Instead of passing a parameter space to the constructor you can also pass a simple text vector, specifying a
 ⍝ workspace and possibly other command line parameters like, say, `MAXWS=32GB` and the like.\\
+⍝ Whether it is a parameter space or a character vector, when passed as argument to `⎕NEW` is must be a nested
+⍝ vecor, for example:\\
+⍝ ```
+⍝ ⎕NEW APLProcess (,⊂parmspace) ⍝ parameter space
+⍝ ⎕NEW APLProcess (,⊂'')        ⍝ Character vector
+⍝ ```
+⍝
 ⍝ Notes:
 ⍝ * This class is designed for test cases that require one or more additional instances of APL for some reason.
-⍝   For that reason it does not offer encryption for a RIDE.\\
+⍝   That's why it does not offer encryption for a RIDE.\\
 ⍝   This restriction might be lifted at a later stage depending on demand.
-⍝ * The destructor of this class will attempt to kill the process that was started.\\
+⍝ * The destructor of this class will attempt to kill the process that was started (only relevant with `ait←0`).\\
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
     ⍝ See also `History`
       :Access Public Shared
-      r←'APLProcess' '0.5.1' '2021-05-08'    ⍝ Still work in progress, especially on the Mac
+      r←'APLProcess' '0.7.0' '2023-09-26'    ⍝ Without Ride all fine, with Ride the Mac is still posing problems
     ∇
 
     ∇ r←History
       :Access Public Shared
+    ⍝ * 0.7.0 from 2023-09-26
+    ⍝   * Now APLProcess can use .NET or .NET Framework (former version only worked with .NET Framework)
+    ⍝ * 0.6.0 from 2021-05-27
+    ⍝   * BREAKING CHANGE: the property `LogFilename` has been renamed: `OutputFilename`
+    ⍝   * With  `Wait←1` a return code is returned now
+    ⍝   * A parameter space is now copied rather than modified
+    ⍝   * Problems on Linux fixed
+    ⍝   * Problems on Mac-OS fixed accept when you need a Ride
     ⍝ * 0.5.1 from 2021-05-08
     ⍝   * Bug fix: addressing APLTreeUtils2 did not always work
     ⍝ * 0.5.0 from 2021-05-02
@@ -34,7 +49,7 @@
     ⍝   * Package config file corrected
     ⍝ * 0.4.0 from 2021-01-29
     ⍝   * Fully transformed into a Tatin package
-      r←↑{⍵↓⍨+/∧\∧⌿(↑⍵)=' '}{⍵↓⍨⍵⍳'⍝'}¨{⍵/⍨'⍝'=⊃¨⍵}{⍵↓⍨+/∧\(↑⍵)=' '}¨1↓⎕NR⊃⎕SI
+      r←↑{⍵↓⍨+/∧\∧⌿(↑⍵)=' '}{⍵↓⍨⍵⍳'⍝'}¨{⍵/⍨'⍝'=⊃¨⍵}{⍵↓⍨+/∧\(↑⍵)=' '}¨1↓⎕NR⊃⎕SI Proc
     ∇
 
     :Field Public Instance Args←''              ⍝ Command line parameter (but not session_file!).
@@ -62,6 +77,13 @@
     :Access Public Instance
         ∇ r←get
           r←_WindowsStyle
+        ∇
+    :EndProperty
+
+    :Property LogFilename
+    :Access Public Instance
+        ∇ r←get
+          r←Proc.LogFilename
         ∇
     :EndProperty
 
@@ -94,12 +116,13 @@
       make_common
       :If 2=⎕NC'y'
       :AndIf (≡y)∊0 1
+          'Invalid right argument'Assert{16::0 ⋄ 1⊢' '=1↑0⍴⍵}y
       :AndIf ' '=1↑0⍴y
           commandline←y
           parmSpace←⍬
       :ElseIf 0≡≡y
       :AndIf 9=⎕NC'y'
-          parmSpace←y
+          parmSpace←⎕NS y
           commandline←⍬
       :Else
           'Invalid right argument: must be either a parameter space or a text vector (command line)'Assert 0
@@ -117,7 +140,7 @@
           parmSpace.CommandLineArgs←1↓⊃,/' ',¨buff
       :EndIf
       'Invalid window style'Assert(⊂parmSpace.WindowsStyle)∊'Hidden' 'Maximized' 'Minimized' 'Normal'
-      (RidePort OUT_FILE WorkspaceName Args _Wait)←parmSpace.(RidePort LogFilename WorkspaceName CommandLineArgs Wait)
+      (RidePort OUT_FILE WorkspaceName Args _Wait)←parmSpace.(RidePort OutputFilename WorkspaceName CommandLineArgs Wait)
       PATH←SourcePath
       Start parmSpace
     ∇
@@ -129,7 +152,7 @@
       APLTreeUtils2←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
     ∇
 
-    ∇ Start ps;psi;pid;cmd;host;port;keyfile;exe;z;output;args;Z;qdmx;ride
+    ∇ Start ps;Z;args;cmd;exe;host;keyfile;output;pid;port;psi;qdmx;ride;z
       :If 0=≢ps.Exe
           ps.Exe←(GetRuntimeName⍣ps.Runtime)GetCurrentExecutable ⍝ else, deduce it
       :EndIf
@@ -137,10 +160,13 @@
       ride←''
       :If 0≠ps.RidePort
           ride←'RIDE_INIT="SERVE:*:',(⍕ps.RidePort),'" RIDE_SPAWNED=1 '
+      :Else
+          ride←'RIDE_INIT= '
       :EndIf
       args←ps.CommandLineArgs
-      args,←(0<≢ps.LogFilename)/' LOG_FILE="',ps.LogFilename,'" '
-      ⍝ NB Always set RIDE_INIT to override current process setting
+      args,←(0<≢ps.OutputFilename)/' LOG_FILE="',ps.OutputFilename,'" '
+      output←(1+×≢OUT_FILE)⊃'/dev/null'OUT_FILE
+      Proc.LogFilename←(739⌶0),'/APLProcess-Logfile-',{⎕RL←+/⎕TS ⋄ ⍕?⍵}100000
       :Select APLTreeUtils2.GetOperatingSystem ⍬
       :Case 'Win'
           :If ~ps.Runtime
@@ -156,7 +182,8 @@
               :EndIf
           :EndIf
           cmd←ps.Exe
-          ⎕USING←'System,System.dll'
+     
+          ⎕USING←UsingSystemDiagnostics
           psi←⎕NEW Diagnostics.ProcessStartInfo,⊂ps.Exe(({0=≢⍵:⍵ ⋄ '"',(⍵~'"'),'" '}ps.WorkspaceName),args)
           psi.WindowStyle←Diagnostics.ProcessWindowStyle.⍎ps.WindowsStyle
           Proc←Diagnostics.Process.Start psi
@@ -164,34 +191,82 @@
               Proc.WaitForExit ⍬
           :EndIf
       :Case 'Lin'
+          cmd←ride,' '
           :If ps.Wait
-              cmd←'"',ps.Exe,'" ',ps.WorkspaceName
+              cmd←'"',ps.Exe,'"'
+              :If 0≠≢ride
+                  cmd,←' +s -q'
+              :EndIf
+              cmd,←' "',(ps.WorkspaceName~'"'),'"'
               cmd,←' ',args
-              cmd,←' ',ride
-              cmd,←' 0<&- >/dev/null 2>&1'
-              Z←⎕SH cmd
-              _ExitCode←0
+              :If ps.RidePort=0
+                  cmd,←' 0<&-'
+              :EndIf
+              cmd,←' 1>',output
+              cmd,←,' 2>',Proc.LogFilename
+              :Trap 0
+                  Z←⎕SH cmd
+                  _ExitCode←0
+              :Else
+                  qdmx←⎕DMX
+                  _ExitCode←{{⊃⊃(//)⎕VFI⌽⍵↑⍨¯1+⍵⍳' '}⌽⍵}qdmx.Message
+              :EndTrap
               Proc.HasExited←1
           :Else
-              output←(1+×≢OUT_FILE)⊃'/dev/null'OUT_FILE
-              cmd←'{ ',args,' ',ride,' "',ps.Exe,'" +s -q ',ps.WorkspaceName,' -c APLPPID=$PPID 0<&- 1>',output,' 2>&1 & } ; echo $!'
+              cmd←'{ ',ride
+              cmd,←{0=≢⍵:⍵ ⋄ ⍵,' '}args
+              cmd,←' "',ps.Exe,'"'
+              :If 0≠≢ride
+                  cmd,←' +s -q'
+              :EndIf
+              cmd,←' "',(ps.WorkspaceName~'"'),'"'
+              :If ps.RidePort=0
+                  cmd,←' 0<&-'
+              :EndIf
+              cmd,←' 1>',output
+              cmd,←,' 2>',Proc.LogFilename
+              cmd,←' & }'
+              cmd,←'; echo $!'
               pid←⎕SH cmd
               Proc.Id←⊃⊃(//)⎕VFI∊pid
               Proc.HasExited←0
           :EndIf
           Proc.StartTime←⎕TS
       :Case 'Mac'
+          cmd←ride,' '
           :If ps.Wait
-              cmd←ride
-              cmd,←'"',ps.Exe,'" ',ps.WorkspaceName
-              cmd,←' ',args
-              cmd,←' 0<&- >/dev/null 2>&1'
-              Z←⎕SH cmd
-              _ExitCode←0
+              cmd,←'"',ps.Exe,'" '
+              :If 0≠≢ride
+                  cmd,←' +s -q'
+              :EndIf
+              cmd,←' "',(ps.WorkspaceName~' '),'"'
+              cmd,←{0=≢⍵:⍵ ⋄ ' ',⍵}args
+              :If ps.RidePort=0
+                  cmd,←' 0<&-'
+                  cmd,←' 1>',output
+                  cmd,←,' 2>',Proc.LogFilename
+              :Else
+                  'Riding into a runtime is not implemented yet'⎕SIGNAL 11
+              :EndIf
+              :Trap 0
+                  Z←⎕SH cmd
+                  _ExitCode←0
+              :Else
+                  qdmx←⎕DMX
+                  _ExitCode←{{⊃⊃(//)⎕VFI⌽⍵↑⍨¯1+⍵⍳' '}⌽⍵}qdmx.Message
+              :EndTrap
               Proc.HasExited←1
+              Proc.Id←0
           :Else
-              output←(1+×≢OUT_FILE)⊃'/dev/null'OUT_FILE
-              cmd←'{ ',cmd,' ',ps.Exe,' +s -q ',ps.WorkspaceName,' -c APLPPID=$PPID 0<&- 1>',output,' 2>&1 & } ; echo $!'
+              cmd←'{ ',cmd,' "',(ps.Exe~' '),'" "',(ps.WorkspaceName~' '),'" -c APLPPID=$PPID'
+              :If ps.RidePort=0
+                  cmd,←' 0<&-'
+                  cmd,←' 1>',output
+                  cmd,←,' 2>',Proc.LogFilename
+                  cmd,←'} ; echo $!'
+              :Else
+                  'Riding into a runtime is not implemented yet'⎕SIGNAL 11/⍨ps.Runtime
+              :EndIf
               pid←⎕SH cmd
               Proc.Id←⊃⊃(//)⎕VFI∊pid
               Proc.HasExited←0
@@ -217,7 +292,7 @@
     ⍝ |------------------|-------------|
     ⍝ | `CommandLineArg` | By default empty. Optional command line parameters passed to `Exe`. (Don't specify a session file here!)|
     ⍝ | `Exe`            | Defaults to `''` which means that the same EXE is executed the instance was created from. Can also be a fully qualified name of the exe to be run.|
-    ⍝ | `LogFilename`    | By default empty, meaning that any output is thrown away. If this is specified it is expected to be the name of a file.|
+    ⍝ | `OutputFilename` | By default empty, meaning that any output is thrown away. If this is specified it is expected to be the name of a file.|
     ⍝ | `RidePort`       | By default 0 (no effect). When a positive integer > 0 this is used as port number for `RIDE_INIT`.|
     ⍝ | `Runtime`        | Boolean that defaults to 0. Is ignored in case `Exe` is not empty.|
     ⍝ | `SessionFile`    | Defaults to 0 which means no session file is loaded. A 1 will load the default DSE file. May also be the fully qualified path to a DSE file.|
@@ -227,7 +302,7 @@
       r←⎕NS''
       r.CommandLineArgs←''
       r.Exe←''
-      r.LogFilename←''
+      r.OutputFilename←''
       r.RidePort←0
       r.Runtime←0
       r.SessionFile←0
@@ -235,6 +310,14 @@
       r.WorkspaceName←''
       r.Wait←1
       r.⎕FX'r←∆List;⎕IO' '⎕IO←⎕ML←1' 'r←{(⍵,[1.5]⎕nc¨⊂¨⍵),⍎¨⍵}(⊂''∆List'')~⍨⎕NL-2 9 3' ⍝ Vars, refs and niladic functions
+    ∇
+
+    ∇ r←GetLog
+      :Access Public Instance
+      r←''
+      :If ⎕NEXISTS Proc.LogFilename
+          r←⊃⎕NGET Proc.LogFilename
+      :EndIf
     ∇
 
     ∇ WaitForKill(limit interval);count
@@ -260,7 +343,7 @@
           'gmfn'⎕NA'U4 kernel32|GetModuleFileName* P =T[] U4'
           r←⊃⍴/gmfn 0(1024⍴' ')1024
           :If 0=≢r
-              ⎕USING←'System,system.dll'
+              ⎕USING←UsingSystemDiagnostics
               r←2 ⎕NQ'.' 'GetEnvironment' 'DYALOG'
               r←r,(~(¯1↑r)∊'\/')/'/' ⍝ Add separator if necessary
               r←r,(Diagnostics.Process.GetCurrentProcess.ProcessName),'.exe'
@@ -294,11 +377,7 @@
       :Access Public Instance
       ⍝ Boolean that is 1 if and only if the process started by `APLProcess` has stopped running.
       ⍝ Under Windows .NET tells us. On non-Windows platforms we need to check
-      :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
-          r←Proc.HasExited
-      :Else
-          r←0=≢Proc.Id OS.GetTaskList 0 0 0
-      :EndIf
+      r←0=≢Proc.Id OS.GetTaskList 0 0 0
     ∇
 
     ∇ r←GetPID
@@ -337,5 +416,15 @@
     ∇
 
     Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←1 ⋄ ⍺ ⎕SIGNAL 1↓(⊃∊⍵),11}
+
+    ∇ r←IsNetCore
+      :Access public shared
+      r←(,'1')≡,2 ⎕NQ'.' 'GetEnvironment' 'DYALOG_NETCORE'
+    ∇
+
+    ∇ r←UsingSystemDiagnostics
+      :Access public shared
+      r←(1+IsNetCore)⊃'System,System.dll' 'System,System.Diagnostics.Process'
+    ∇
 
 :EndClass

@@ -1,9 +1,10 @@
- r←Test_Server_220(stopFlag batchFlag);⎕TRAP;result;reg;res
+ r←Test_Server_220(stopFlag batchFlag);⎕TRAP;result;reg;res;packageID
 ⍝ Request a package config file
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- res←TC.ReadPackageConfigFile(TC.ReplaceRegistryAlias'[localhost]'),'aplteam-OS-2.0.0'
+ packageID←(TC.ReplaceRegistryAlias'[localhost]'),'aplteam-OS-2.0.1'
+ res←TC.ReadPackageConfigFile packageID
  →T.PassesIf 0<≢res
  →T.PassesIf'{}'≡∊res[1,≢res]
 

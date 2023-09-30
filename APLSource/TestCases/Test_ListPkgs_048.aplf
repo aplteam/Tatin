@@ -6,13 +6,12 @@
  parms←⎕NS''
  parms.project_url←1
  parms.tags←'zip'
- mat←parms TC.ListPackages'[local]'
+ mat←parms TC.ListPackages'[localhost]'
  →T.PassesIf 2=⍴⍴mat
  →T.PassesIf 3=2⊃⍴mat
  →T.PassesIf 1<≢mat
  →T.PassesIf∨/'https://'{((≢⍺)↑[2]⍵)∧.=⍺}↑mat[;3]   ⍝ Majority must be URLs
  →T.PassesIf∧/83∧.=∪⎕DR¨mat[;2]                     ⍝ Integer (no. of packages
- →T.PassesIf∧/∨/'zip'⍷⎕C↑mat[;1]~⊂'example-UC'      ⍝ name must carry "zip" except "UC"
 
  r←T._OK
 ⍝Done

@@ -1,4 +1,6 @@
  {r}←∆StartServerProcessForTests debugFlag;parms
+⍝ This function copies the files from the TestServer\ folder to a temp folder
+⍝ and start a server that acts on that temp folder.
  P←##.APLProcess
  parms←P.CreateParms
  parms.Exe←##.Admin.GetAPLVersion ⍬
@@ -6,6 +8,9 @@
      parms.CommandLineArgs,←'load="',#.Tatin.CiderConfig.HOME,'/APLSource/Admin/LoadTatinAndStartServer.aplf" '
  :Else
      parms.CommandLineArgs,←'load="',F.PWD,'/APLSource/Admin/LoadTatinAndStartServer.aplf" '
+ :EndIf
+ :If 0<⎕NC'∆TEMP_SERVER_FOLDER'
+     parms.CommandLineArgs,←'serverPath="',∆TEMP_SERVER_FOLDER,'" '
  :EndIf
  parms.CommandLineArgs,←'lx="',(debugFlag/'1 '),'#.LoadTatinAndStartServer 1" '
  :If 0  ⍝ Only for analyzing problems:
@@ -20,5 +25,5 @@
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  parms.Wait←0
- r←⎕NEW P (,⊂parms)
+ r←⎕NEW P(,⊂parms)
 ⍝Done

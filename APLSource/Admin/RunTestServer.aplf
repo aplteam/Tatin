@@ -1,4 +1,4 @@
- {r}←RunTestServer y;trapFlag;testFlag;iniFile
+ {r}←RunTestServer y;trapFlag;testFlag;iniFile;args;bool
 ⍝ This function is used to run a test server started by the Tatin test cases.
 ⍝ `testFlag`, if 1, allows additional commands to be executed useful only for tests.
 ⍝ `trapFlag`, if specified and 1, overwites any INI settings and activates error trapping.
@@ -6,7 +6,12 @@
  r←⍬
  ⎕IO←1 ⋄ ⎕ML←1
  (testFlag trapFlag)←2↑y,(≢y)↓¯1 ¯1
- iniFile←'./TestServer/Server/server.ini'
+ args←2 ⎕NQ #'GetCommandLineArgs'
+ :If ∨/bool←'SERVERPATH='∘{⍺≡1 ⎕C(≢⍺)↑⍵}¨args
+     iniFile←((1+≢'serverPath')↓args⊃⍨⍸bool),'/Server/server.ini'
+ :Else
+     iniFile←'./TestServer/Server/server.ini'
+ :EndIf
  r←iniFile(PrepareTestServer ##.Plodder.Run)testFlag trapFlag
  ##.Server.∆SHUTDOWN←0
 ⍝Done

@@ -1,13 +1,33 @@
- r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res;P;f2;flag;flag2
+ r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res;P;f2;flag;flag2;json;ns;local
  #.⎕EX'_tatin'
  r←1
+
+⍝ Managed Registry:
+ ∆TEMP_SERVER_FOLDER←F.GetTempSubDir'Tatin-Test-Server'
+ (∆TEMP_SERVER_FOLDER,'/')⎕NCOPY⍠1⊣#.Tatin.CiderConfig.HOME,'/TestServer/*'
+
+⍝ Local folder, not managed:
+ ∆TEMP_REGISTRY_FOLDER←F.GetTempSubDir'Tatin-Test-Registry'
+ ∆TEMP_REGISTRY_FOLDER∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨F.ListDirs #.Tatin.CiderConfig.HOME,'/TestServer/Registry/*'
+
+ json←⊃⎕NGET'./TestData/tatin-client.json'
+ ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
+ local←1⊃ns.registries
+ Assert'local'≡local.alias
+ local.uri←∆TEMP_REGISTRY_FOLDER
+ (1⊃ns.registries)←local
+ json←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+ (⊂json) ⎕NPUT'./TestData/tatin-client.json' 1
+
  (rc msg res)←∆UCMD'Init ./TestData'
  Assert 0=rc
+
  ∆CACHE_PARMS←∆InitUserSettings 0
  #.Tatin.Client.∆PrintToSession←0
  ⎕SE._Tatin.Client.∆PrintToSession←0
  {}''∆GetTempDir ⍬
  ∆TEST←1 ⍝ Used to add an HTTP header to any request. Influences only logging on the server side but implicitly also usage data
+
  :If 'win'≡⎕C ##.APLTreeUtils2.GetOperatingSystem ⍬
      :If ~(⊂parms)∊''⍬
      :AndIf ~parms.batchFlag

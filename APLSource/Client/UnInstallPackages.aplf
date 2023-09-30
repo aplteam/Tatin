@@ -80,6 +80,17 @@
      :EndIf
  :EndIf
  :If 0=≢newPrincipalPkgs
+     cfg←ReadPackageConfigFile folder,RemoveAlias packageID_2
+     :If 0<cfg.⎕NC'userCommandScript'
+     :AndIf 0<≢cfg.userCommandScript ⍝ Is it a user command?!
+         F.DeleteFile folder,⊃,/1↓⎕NPARTS cfg.userCommandScript
+     :EndIf
+     F.RmDir folder,RemoveAlias packageID_2
+     F.DeleteFile folder∘,¨'apl-buildlist.json' 'apl-dependencies.txt'
+    ⍝ ↓ This may happen when the last user command package was un-installed, for example:
+     :If 0=≢⊃F.Dir folder,'/*'
+         (rc msg)←F.RmDirByForce folder
+     :EndIf
      list,←⊂packageID_2
  :Else
      :If 0<≢packageID_2

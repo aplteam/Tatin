@@ -3,7 +3,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- (rc msg res)←∆UCMD'PackageDependencies ',∆GetServerRegistryFolder,'/aplteam-FilesAndDirs-3.2.3'
+ (rc msg res)←∆UCMD'PackageDependencies ',∆TEMP_REGISTRY_FOLDER,'/aplteam-FilesAndDirs-3.2.7'
  →T.PassesIf(rc=0)∧0=≢msg
  →T.PassesIf 0<≢res
  res←(⎕UCS 10)(≠⊆⊢)res
@@ -12,10 +12,10 @@
  :If batchFlag
      →0,r←T._OK
  :EndIf
- ⎕←''
- {}⍞,0/⎕←'This test needs YOU in order to close an edit window without making changes; press <enter> to continue'
 
- folder←∆GetServerRegistryFolder,'/aplteam-FilesAndDirs-3.2.3'
+ ##.Client.CommTools.Pause 'This test needs YOU in order to close an edit window without making changes'
+
+ folder←∆TEMP_REGISTRY_FOLDER,'/aplteam-FilesAndDirs-3.2.7'
  filename←folder,'/',TC.Dependencies.DEP_NAME
  (rc msg res)←∆UCMD'PackageDependencies ',folder,' -edit'
  →T.PassesIf(rc=0)∧0=≢msg

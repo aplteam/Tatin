@@ -11,16 +11,20 @@
 ⍝ check again. If that does not help an error is thrown.
  force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}' force'
  folder←Reg.AddSlash folder
- filename2←folder,Reg.DependenciesFilename
  filename1←folder,Reg.BuildListFilename
+ filename2←folder,Reg.DependenciesFilename
  :If ~force
-     ts1←GetFileTime filename1
+     ⍝ Tatin always writes the dependency file first and the build list next to file,
+     ⍝ yet the timestamps in the milliseconds sometimes pretend it to be the other way round.
+     ⍝ Therefore we add one second to make sure that we only re-build the build list when the
+     ⍝ dependency file has really been modified by a user with an editor.
+     ts1←1 GetFileTime filename1
      ts2←GetFileTime filename2
  :EndIf
  tree←ReadBuildList filename1
  deps←ReadDependencyList filename2
  deps_←RemoveAlias¨deps
- :If force
+ :If r←force
  :OrIf r←ts2>ts1
      :If F.IsFile filename1
          b←deps_∊RemoveAlias¨tree[;2]                       ⍝ Check consistency

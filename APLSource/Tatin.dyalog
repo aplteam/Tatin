@@ -1,6 +1,6 @@
 :Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.72.0 - 2023-09-26
+⍝ * 0.73.0 - 2023-10-01
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -32,7 +32,7 @@
           c←⎕NS ⍬
           c.Name←'CreatePackage'
           c.Desc←'Create a new Tatin package'
-          c.Parse←'1'
+          c.Parse←'1s'
           r,←c
      
           c←⎕NS ⍬
@@ -361,7 +361,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←CreatePackage Arg;path;filename
+    ∇ {r}←CreatePackage Arg;path;filename;openCiderProjects;ind;project
       Arg.(delete quiet)←0
       Arg.edit←1
       r←PackageConfig Arg
@@ -854,7 +854,7 @@
       dependencies←''Arg.Switch'dependencies'
       version←''Arg.Switch'version'
       :If '+'=1⍴version
-          'A rule for "version" must have two dots and just 0 and 1'Assert 2+.='.'=1↓version
+          'A rule for "version" must have two dots and just 0 and 1'Assert 2='.'+.=1↓version
           'A rule for "version" must have two dots and just 0 and 1'Assert∧/('.'~⍨1↓version)∊'01'
       :EndIf
       (sourcePath targetPath)←AddSlash¨sourcePath targetPath
@@ -1237,10 +1237,12 @@
       TC.∆VERBOSE←verboseWas
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error;project
       r←⍬
+      project←0
       :If (,0)≡,what←Arg._1
           :If 9=⎕SE.⎕NC'Cider'
+              project←1
               openCiderProjects←⎕SE.Cider.ListOpenProjects 0
               :If 1<≢openCiderProjects
                   ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
@@ -1301,12 +1303,17 @@
                   newFlag←0
               :Else
                   :If ~Arg.quiet
-                  :AndIf 0=TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
+                  :AndIf 0=1 TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
                       ⎕←'Cancelled'
                       :Return
                   :EndIf
-                  ns←TC.InitPackageConfig ⍬
-                  ns←TC.DiscussNewConfigFile ns
+                  :If project
+                      ns←what TC.InitPackageConfig ⍬
+                      ns←what TC.DiscussNewConfigFile ns
+                  :Else
+                      ns←TC.InitPackageConfig ⍬
+                      ns←TC.DiscussNewConfigFile ns
+                  :EndIf
                   newFlag←1
               :EndIf
               :If Arg.edit∨newFlag
@@ -2598,3 +2605,4 @@
     CalledFrom←{⊃{⍵↓⍨+/∧\'⎕'=⊃¨⍵}⍵}
 
 :EndNamespace
+

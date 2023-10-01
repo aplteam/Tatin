@@ -72,22 +72,22 @@
       _caching←1
       _path2cache←''
       _license←''
-      _groupname←''
-      _email←''
+      _group←''
+      _maintainer←''
     ∇
 
     :Property source
-    ⍝ Defines the default for the "source" property of any package.\\
+    ⍝ Defines the default for the "source" property of a new package.\\
     ⍝ Setting this might be useful in case you use most of the time the same source folder, so it makes
-    ⍝ sense to pre-populate a packages "source" property with a default defined here.
+    ⍝ sense to pre-populate a package's "source" property with a default defined here.
     :Access Public Instance
         ∇ r←get
           r←_source
         ∇
         ∇ set value;buff
           buff←value.NewValue
-          '"source" is invalid (depth)'Assert 1=≡buff
-          '"source" is invalid (data type)'Assert' '=1↑0⍴buff
+          'Invalid: "source"; (depth)'Assert 1=≡buff
+          'Invalid: "source"; (data type)'Assert' '=1↑0⍴buff
           _source←buff
         ∇
     :EndProperty
@@ -133,7 +133,7 @@
           r←_caching
         ∇
         ∇ set val
-          'Invalid: must be a Boolean'Assert(⊂val.NewValue)∊0 1
+          'Invalid: "caching"; must be a Boolean'Assert(⊂val.NewValue)∊0 1
           _caching←val.NewValue
         ∇
     :EndProperty
@@ -146,49 +146,49 @@
           r←_path2cache
         ∇
         ∇ set val
-          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
-          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
+          'Invalid: "patch2cache"; must be a simpe char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: "patch2cache";  must be a simple char vector'Assert' '=1↑0⍴val.NewValue
           _path2cache←val.NewValue
         ∇
     :EndProperty
 
     :Property license
-    ⍝ Defines the type of license that you want any new package config file default to.
+    ⍝ Defines the default for the "license" property of a new package.\\
     :Access Public Instance
         ∇ r←get
           r←_license
         ∇
         ∇ set val
-          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
-          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
+          'Invalid: "license"; must be a simple char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: "license"; must be a simple char vector'Assert' '=1↑0⍴val.NewValue
           _license←val.NewValue
         ∇
     :EndProperty
 
-    :Property groupname
-    ⍝ Defines the default group name used for new packages
+    :Property group
+    ⍝ Defines the default for the "group" property of a new package.\\
     :Access Public Instance
         ∇ r←get
-          r←_groupname
+          r←_group
         ∇
         ∇ set val
-          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
-          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
-          _groupname←val.NewValue
+          'Invalid: "group"; must be a simple char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: "group"; must be a simple char vector'Assert' '=1↑0⍴val.NewValue
+          _group←val.NewValue
         ∇
     :EndProperty
 
-    :Property email
-    ⍝ Defines the default for the maintainer's email address
+    :Property maintainer
+    ⍝ Defines the default for the "maintainer" property of a new package.\\
     :Access Public Instance
         ∇ r←get
-          r←_email
+          r←_maintainer
         ∇
         ∇ set val
-          'Invalid: must be a char vector'Assert(≡val.NewValue)∊0 1
-          'Invalid: must be a char vector'Assert' '=1↑0⍴val.NewValue
-          'Invalid: must carry a "@" character'Assert'@'∊val.NewValue
-          _email←val.NewValue
+          'Invalid: "maintainer"; must be a simple char vector'Assert(≡val.NewValue)∊0 1
+          'Invalid: "maintainer"; must be a simple char vector'Assert' '=1↑0⍴val.NewValue
+          'Invalid: "maintainer"; must carry a "@" character'Assert'@'∊val.NewValue
+          _maintainer←val.NewValue
         ∇
     :EndProperty
 
@@ -430,19 +430,20 @@
           ⍝ Introduced in 2023-02
           ns.license←''
       :EndIf
+      :If 0=ns.⎕NC'maintainer'
+          ⍝ Introduced in 2023-10
+          ns.maintainer←''
+      :EndIf
+      :If 0=ns.⎕NC'group'
+          ⍝ Introduced in 2023-10
+          ns.group←''
+      :EndIf
       ns.registries.uri←{f←'\\'≡2⍴⍵ ⋄ AddSlash(f/'\\'),##.F.EnforceSlash(2×f)↓⍵}¨ns.registries.uri
       :If 0<≢ns.registries
           :If {(≢∪⍵)≠≢⍵}ns.registries.(uri alias)
               ('There are non-unique entries in ',path2config,' for uri+alias')Assert 0
           :EndIf
-          :If 1
-              _registries←ns.registries[⍋ns.registries.priority]
-          :Else
-              ⍝TODO⍝ One day
-              ⍝ This avoids an orphaned reference lingering around but at the same time it leads
-              ⍝ to a ref into # from ⎕SE because ⎕JSON does not allow something like #.⎕JSON (yet)
-              _registries←⎕SE.⎕JSON⍣2 ns.registries[⍋ns.registries.priority]  ⍝ To avoids creating an orphaned ref once `ns` disappears (14888, <01851>)
-          :EndIf
+          _registries←ns.registries[⍋ns.registries.priority]
       :Else
           _registries←⍬
       :EndIf
@@ -458,6 +459,8 @@
       :EndIf
       _source←ns.source
       _license←ns.license
+      _group←ns.group
+      _maintainer←ns.maintainer
     ∇
 
     ∇ r←GetFileTimestamp filename

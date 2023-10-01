@@ -310,6 +310,8 @@ The group part of the package ID[^id]
 
 A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.
 
+You can define a default for `group` in the user settings file. The default will be used when a new package is created.
+
 #### license
 
 This may be empty, or it may specify a license such as:
@@ -328,6 +330,8 @@ Note that you can specify a default license in your user settings:
 At the bottom there are defaults defined for `license` and `source` and possibly other properties. If it is not empty then the value will be used as default when creating a new package config file.
 
 Both the user command `]Tatin.ListLicenses` and the API function `⎕SE.Tatin.ListLicenses` can be used to get a list of all licenses tolerated by a Tatin Registry.
+
+You can define a default for `license` in the user settings file. The default will be used when a new package is created.
 
 #### lx
 
@@ -366,6 +370,8 @@ your.name@your-domain.com
 Note that any double quotes will be removed.
 
 If this is empty the server will, when the package is published, check whether there is a group home page. If that's the case then there is an email address associated with that group, and that email address is then assigned to `maintainer`.
+
+You can define a default for `maintainer` in the user settings file. The default will be used when a new package is created.
 
 #### minimumAplVersion
 
@@ -462,6 +468,12 @@ A slightly more complex example with a namespace that hosts several functions:
 
 In this case, the `source` in the package could become `APLSource/Goo` while `Admin` and `TestCases` are most likely not copied over into the package.
 
+##### The default
+
+You can define a default for `source` in the user settings file. The default will be used when a new package is created.
+
+If you don't do this and the new package is managed by Cider then Tatin's `source` property` falls back to Cider's `source` property.
+
 
 #### tags
 
@@ -552,4 +564,5 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 

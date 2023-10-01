@@ -1,62 +1,68 @@
- InitPackageConfig←{
+ cfg←{projectPath}InitPackageConfig y;comments;msg;bool;list;varsList;projectConfig
 ⍝ Initialise a package config namespace
 ⍝ ⍵ might be empty; then it is ignored.
 ⍝ ⍵ might be a namespace; then the content is copied into the config namespace after
 ⍝ it got populated with defaults.
-     comments←''                ⍝ These are extracted by "AddCommentToPackageConfig"
-     cfg←Reg.CreateNamespace ⎕THIS
-     cfg.api←''
-     comments,←'api' 'The public interface of the package'
-     cfg.assets←''
-     comments,←'assets' 'Empty or a single folder holding assets required by the package'
-     cfg.description←''
-     comments,←'description' 'Mandatory. Maximum length is 120 chars.'
-    ⍝cfg.deprecated←0           ⍝ Injected only when a package...
-    ⍝cfg.deprecateComment←''    ⍝ ... is deprecated!
-     cfg.documentation←''
-     comments,←'documentation' 'A URL or a local path or a function providing documentation'
+ projectPath←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'projectPath'
+ comments←''                ⍝ These are extracted by "AddCommentToPackageConfig"
+ cfg←Reg.CreateNamespace ⎕THIS
+ cfg.api←''
+ comments,←'api' 'The public interface of the package'
+ cfg.assets←''
+ comments,←'assets' 'Empty or a single folder holding assets required by the package'
+ cfg.description←''
+ comments,←'description' 'Mandatory. Maximum length is 120 chars.'
+ ⍝cfg.deprecated←0           ⍝ Injected only when a package...
+ ⍝cfg.deprecateComment←''    ⍝ ... is deprecated!
+ cfg.documentation←''
+ comments,←'documentation' 'A URL or a local path or a function providing documentation'
     ⍝cfg.date←''                ⍝ Injected by the server (publishing date)
-     cfg.files←''
-     comments,←'files' 'Optional. For files like "ReadMe.txt" to go to the root of the package'
-     cfg.group←''
-     comments,←'group' 'Mandatory. Maximum length is 120 chars.'
-     cfg.license←MyUserSettings.license
-     comments,←'license' 'Name of the license; see ]Tatin.ListLicenses'
-     cfg.maintainer←''
-     comments,←'maintainer' 'The email address of the maintainer'
-     cfg.name←''
-     comments,←'name' 'Mandatory. The project''s name'
-     cfg.source←MyUserSettings.source
-     comments,←'source' 'Mandatory. Either a code file (.aplc, .apln, etc.) or a folder'
-     cfg.os_win←0
-     comments,←'os_win' '1=the package runs under Windows'
-     cfg.os_mac←0
-     comments,←'os_mac' '1=the package runs under Mac OS'
-     cfg.os_lin←0
-     comments,←'os_lin' '1=the package runs under Linux'
-     cfg.project_url←''
-     comments,←'project_url' 'The project''s home for example'
-     cfg.tags←''
-     comments,←'tags' 'A comma-separated list of tags'
-     cfg.minimumAplVersion←'18.0' ⍝ That's the minimum version: Tatin does not run in earlier versions
-     comments,←'minimumAplVersion' 'Minimum version required to run the package'
-     cfg.userCommandScript←''
-     comments,←'userCommandScript' 'Path to the user command script within the project'
-     cfg.version←'0.1.0'
-     comments,←'version' 'Mandatory. The project''s version number'
-     cfg.io←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_io'
-     comments,←'io' 'Value for index origin'
-     cfg.ml←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_ml'
-     comments,←'ml' 'Value for migration level'
-     cfg.lx←''
-     comments,←'lx' 'Function to be called when the package is established in the WS'
-     0=≢⍵:cfg
+ cfg.files←''
+ comments,←'files' 'Optional. For files like "ReadMe.txt" to go to the root of the package'
+ cfg.group←MyUserSettings.group
+ comments,←'group' 'Mandatory. Maximum length is 120 chars.'
+ cfg.license←MyUserSettings.license
+ comments,←'license' 'Name of the license; see ]Tatin.ListLicenses'
+ cfg.maintainer←MyUserSettings.maintainer
+ comments,←'maintainer' 'The email address of the maintainer'
+ cfg.name←''
+ comments,←'name' 'Mandatory. The project''s name'
+ :If 0=≢cfg.source←MyUserSettings.source
+ :AndIf 0<≢projectPath
+     projectConfig←⎕SE.Cider.ReadProjectConfigFile projectPath
+     cfg.source←projectConfig.CIDER.source
+ :EndIf
+ comments,←'source' 'Mandatory. Either a code file (.aplc, .apln, etc.) or a folder'
+ cfg.os_win←1
+ comments,←'os_win' '1=the package runs under Windows'
+ cfg.os_mac←1
+ comments,←'os_mac' '1=the package runs under Mac OS'
+ cfg.os_lin←1
+ comments,←'os_lin' '1=the package runs under Linux'
+ cfg.project_url←''
+ comments,←'project_url' 'The project''s home for example'
+ cfg.tags←''
+ comments,←'tags' 'A comma-separated list of tags'
+ cfg.minimumAplVersion←'18.0' ⍝ That's the minimum version: Tatin does not run in earlier versions
+ comments,←'minimumAplVersion' 'Minimum version required to run the package'
+ cfg.userCommandScript←''
+ comments,←'userCommandScript' 'Path to the user command script within the project'
+ cfg.version←'0.1.0'
+ comments,←'version' 'Mandatory. The project''s version number'
+ cfg.io←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_io'
+ comments,←'io' 'Value for index origin'
+ cfg.ml←{⊃⊃(//)⎕VFI ⍵}2 ⎕NQ #'GetEnvironment' 'default_ml'
+ comments,←'ml' 'Value for migration level'
+ cfg.lx←''
+ comments,←'lx' 'Function to be called when the package is established in the WS'
+ :If 0<≢y
      varsList←(' '~¨⍨↓cfg.⎕NL 2),'deprecateComment' 'deprecated'
-     _←'cfg'⎕NS ⍵
-     _←cfg.⎕EX'wx'              ⍝ Not anymore (since 0.61.0)
+     {}'cfg'⎕NS y
+     {}cfg.⎕EX'wx'              ⍝ Not anymore (since 0.61.0)
      list←(' '~¨⍨↓cfg.⎕NL 2)~' '~¨⍨↓'_'cfg.⎕NL 2 ⍝ user properties start with "_" by convention
      bool←list∊varsList,('uri' 'date') ⍝ These are injected by the server
-     ∧/bool:cfg
-     msg←'Invalid propert',((1+1<+/~bool)⊃'y' 'ies'),' in config namespace: ',⊃{⍺,',',⍵}/((~bool)/list)
-     msg Assert 0
- }
+     :If ∨/~bool
+         msg←'Invalid propert',((1+1<+/~bool)⊃'y' 'ies'),' in config namespace: ',⊃{⍺,',',⍵}/((~bool)/list)
+         msg Assert 0
+     :EndIf
+ :EndIf

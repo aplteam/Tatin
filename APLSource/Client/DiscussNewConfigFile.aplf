@@ -1,28 +1,28 @@
- ns←DiscussNewConfigFile ns;C;ind;multiples;enforce;single
+ ns←{projectPath}DiscussNewConfigFile ns;C;ind;multiples;single;Enforce
 ⍝ `ns` is a namespace that contains all package config properties.
 ⍝ It is typically created by calling InitPackageConfig
 ⍝ This function asks the user the mandatory questions in a sensible order
 ⍝ before allowing the user to edit the JSON eventually.
 ⍝ `success` is 1 in case the user entered all the mandatory data but 0 if she cancelled.
+ projectPath←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'projectPath'
  C←CommTools
  multiples←1
  single←0
- enforce←1
- ns.group←enforce({1}C.AskForText)'pkg-owner@Enter the group name (mandatory)'
- ns.name←enforce({1}C.AskForText)'pkg-name@Enter the package name (mandatory)'
- ns.description←enforce({1}C.AskForText)'pkg-description@Enter a description of what the package is doing (mandatory)'
- ns.maintainer←({1}C.AskForText)'pkg-maintainer@Enter the email address of the maintainer'
- ns.tags←enforce({1}C.AskForText)'pkg-tags@Enter a comma-separated list of tags'
+ Enforce←{⍺←1 ⋄ 0=≢⍵:⍺ ⋄ ⍵}
+ ns.group←(Enforce ns.group)({1}C.AskForText)'pkg-owner@Enter the group name (mandatory)'
+ :If 0=≢ns.name
+ :AndIf 0<≢projectPath
+     ns.name←2⊃⎕NPARTS{⍵↓⍨-'/\'∊⍨¯1↑⍵}projectPath,'/'
+ :EndIf
+ ns.name←(Enforce ns.name)({1}C.AskForText)'pkg-name@Enter the package name (mandatory)'
+ ns.description←(Enforce'')({1}C.AskForText)'pkg-description@Enter a description of what the package is doing (mandatory)'
+ ns.maintainer←(Enforce ns.maintainer)({1}C.AskForText)'pkg-maintainer@Enter the email address of the maintainer'
+ ns.tags←(Enforce ns.tags)({1}C.AskForText)'pkg-tags@Enter a comma-separated list of tags'
  ns.license←NegotiateLicense ns
- ns.(os_win os_lin os_mac)←1
- ns.io←#.⎕IO
- ns.ml←#.⎕ML
- :If 1 C.YesOrNo'Is the project (going to be) hosted on GitHub? (a URL will then be compiled for "project_url")'
+ :If 1 C.YesOrNo'Is the project (going to be) hosted on GitHub? (a URL will then be compiled for the "project_url" property)'
      ns.project_url←'https://github.com/',ns.group,'/',ns.name
  :Else
      ns.project_url←({1}C.AskForText)'pkg-projectUrl@Enter the URL of the project'
  :EndIf
- :If 0 C.YesOrNo'Does the package come with a user command script?'
-     ns.userCommandScript←({1}C.AskForText)'Enter the name of the user command script (including file extension) in "source"'
- :EndIf
+ns.userCommandScript←NegotiateUserCommandScript ns
 ⍝Done

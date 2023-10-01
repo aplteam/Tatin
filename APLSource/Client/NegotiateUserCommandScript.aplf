@@ -1,0 +1,10 @@
+ userCommandScript←NegotiateUserCommandScript ns;list;ind
+ userCommandScript←''
+ :If 0 C.YesOrNo'Does the package come with a user command script?'
+∆Again:
+     userCommandScript←({1}C.AskForText)'Enter the name of the user command script (including file extension) in "source"'
+     :If 0=≢userCommandScript
+     :AndIf 0=C.YesOrNo'You''ve entered no user command script - is that really okay?'
+         →∆Again
+     :EndIf
+ :EndIf

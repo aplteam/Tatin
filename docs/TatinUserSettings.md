@@ -13,7 +13,7 @@
 
 Tatin uses a file to remember all Tatin Registries you want to work with, and possibly other user-specific settings as well. We refer to this file as the user settings file.
 
-When you start using Tatin for the very first time with 18.0 or 18.2 (when Tatin is not part of a standard installation of Dyalog APL) there is no such file, and therefore Tatin will create one in a specific location. 
+When you start using Tatin for the very first time there is no such file, and therefore Tatin will create one in a specific location. 
 
 Once Tatin is installed, when you fire up an instance of Dyalog APL the contents of the file is used to instantiate the `Tatin.UserSettings` class. The instance is assigned to `⎕SE.Tatin.MyUserSettings`. From then on any changes to the file with an external editor _do not_ affect `⎕SE.Tatin.MyUserSettings`!
 
@@ -290,3 +290,16 @@ From now on the file `MyUserSettings.path2config` is pointing to will be used to
 [^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site")  rather than JSON.
 
 [^init]: Tatin will be initialized either explicitly or as a side effect when the first Tatin user command is issued. See ["Installing and updating the Tatin Client"](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.
+
+## Other settings
+
+You can specify these pieces of information as well:
+
+* `group`
+* `license`
+* `maintainer`
+* `source`
+
+These define the defaults when a new package is created.
+
+

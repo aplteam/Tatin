@@ -1,0 +1,13 @@
+ {r}←TellLinkRegardingNew∆TopicProperty where;res
+⍝ Tell Link
+ r←0
+ :If 0=⎕SE.⎕NC'Link'            ⍝ If the Link API is not in ⎕SE...
+     {}⎕SE.UCMD'Link.Status'    ⍝ ... force it to be loaded
+ :EndIf
+ res←⎕SE.Link.Add(⍕where),'.∆TopicProperties'
+ :If ∨/'Not in a linked namespace:'⍷res
+ :AndIf ∆Ref.p.reportToSession
+     ⎕←'*** Link was told about ∆TopicProperties in ',(⍕where),' but it wasn''t interested'
+     r←1
+ :EndIf
+⍝Done

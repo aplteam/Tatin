@@ -1,4 +1,4 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.73.0 - 2023-10-01
 
@@ -1304,8 +1304,7 @@
               :Else
                   :If ~Arg.quiet
                   :AndIf 0=1 TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
-                      ⎕←'Cancelled'
-                      :Return
+                      ⎕←'Cancelled by user' ⋄ →0
                   :EndIf
                   :If project
                       ns←what TC.InitPackageConfig ⍬
@@ -1326,6 +1325,9 @@
                   error←0
                   :Repeat
                       (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'data path
+                      :If ¯1=success
+                          ⎕←'Cancelled by user' ⋄ →0
+                      :EndIf
                       flag←1
                       :If success∨error
                           :If 0<≢∊newData
@@ -1471,7 +1473,7 @@
       :EndIf
       :If ~⎕NEXISTS installFolder
       :AndIf ~confirmed
-      :AndIf 0=TC.CommTools.YesOrNo'ConfirmInstallFolder@Sure you want to create and install into',CR,installFolder,' ?'
+      :AndIf 0=1 TC.CommTools.YesOrNo'ConfirmInstallFolder@Sure you want to create and install into',CR,installFolder,' ?'
           r←'Cancelled by user' ⋄ →0
       :EndIf
       :Trap 0
@@ -1629,32 +1631,31 @@
       success←1
       :Repeat
           temp.ED name
-          :If origData≢temp.⍎name
-              json←temp.⍎name
-          :AndIf 0<≢(∊json)~' '
-              :If ~success←IsValidJSON json
-                  msg←'This is not valid JSON; do you want to fix the problem? N=abandon changes'
-                  flag←~TC.C.YesOrNo msg
-              :Else
-                  (msg json)←CheckFns json path
-                  :If 0<≢msg
-                      :If ' did not respond'{⍺≡(-≢⍺)↑⍵}msg
-                          :If TC.C.YesOrNo msg,'; edit again (N=accept the URL as it is) ?'
-                              flag←0
-                          :Else
-                              newData←json
-                              flag←1
-                          :EndIf
+          json←temp.⍎name
+          :If 0=≢(∊json)~' '
+              success←¯1 ⋄ →0
+          :EndIf
+          success←IsValidJSON json
+          :If ~success
+              msg←'This is not valid JSON; do you want to fix the problem? N=abandon changes'
+              flag←~TC.C.YesOrNo msg
+          :Else
+              (msg json)←CheckFns json path
+              :If 0<≢msg
+                  :If ' did not respond'{⍺≡(-≢⍺)↑⍵}msg
+                      :If TC.C.YesOrNo msg,'; edit again (N=accept the URL as it is) ?'
+                          flag←0
                       :Else
-                          flag←~1 TC.C.YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
+                          newData←json
+                          flag←1
                       :EndIf
                   :Else
-                      flag←1
-                      newData←json
+                      flag←~1 TC.C.YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
                   :EndIf
+              :Else
+                  flag←1
+                  newData←json
               :EndIf
-          :Else
-              flag←1
           :EndIf
       :Until flag
     ∇
@@ -2430,10 +2431,10 @@
               '"source" carries an invalid extension'Assert(⊂3⊃⎕NPARTS ns.source)∊SupportedExtensions
           :EndIf
           :If 0<≢ns.project_url
-              :If 0=TC.FetchHTMLpage ns.project_url  ⍝ GitHub does not support HEAD
-                  msg←ns.project_url,' did not respond'
-                  :Return
-              :EndIf
+⍝         :If 0=TC.FetchHTMLpage ns.project_url  ⍝ GitHub does not support HEAD
+⍝                  msg←ns.project_url,' did not respond'
+⍝                  :Return
+⍝              :EndIf
           :EndIf
           json←TC.Reg.JSON ns
       :Else
@@ -2605,4 +2606,3 @@
     CalledFrom←{⊃{⍵↓⍨+/∧\'⎕'=⊃¨⍵}⍵}
 
 :EndNamespace
-

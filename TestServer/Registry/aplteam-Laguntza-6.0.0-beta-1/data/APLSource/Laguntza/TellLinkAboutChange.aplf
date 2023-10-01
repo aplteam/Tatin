@@ -1,0 +1,17 @@
+ {r}←∆Ref TellLinkAboutChange y;res;name;list;bool
+⍝ `y` is either a name of a single funtion/operator/variable or a ref pointing to a namespace.
+⍝ If it is a namespace Link's `Add` method is called in order to make sure that Link
+⍝ is told about all functions/operators/variables in `y` and any sub-namespaces.
+⍝ Returns 0 in case Link was not interested (or not supposed to be told anyway) and 1 otherwise.
+ r←0
+ :If ∆Ref.p.notifyLink
+     'Link is not present in ⎕SE'⎕SIGNAL 11/⍨9≠⎕SE.⎕NC'Link'
+     name←⍕y
+     res←⎕SE.Link.Add name
+     r←0<≢res
+     :If ∆Ref.p.reportToSession
+     :AndIf 0=≢res
+         ⎕←'*** Link was told that ',name,((9=⎕NC name)/'.*'),' got changed but wasn''t interested.'
+     :EndIf
+ :EndIf
+⍝Done

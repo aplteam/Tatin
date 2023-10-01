@@ -1,0 +1,12 @@
+ r←GetHome add;path;F
+⍝ Tries first ##.TatinVars and then ##.CiderConfig.HOME.\\
+⍝ If both fail it settles for the current directory.\\
+ F←FilesAndDirs
+ :If 0<⎕NC'TatinVars.HOME'
+     r←TatinVars.HOME,add
+ :ElseIf 0<##.⎕NC'CiderConfig.HOME'
+     r←##.CiderConfig.HOME,add
+ :Else
+     r←'.\',(F.AddTrailingSep postfix),add
+ :EndIf
+⍝Done

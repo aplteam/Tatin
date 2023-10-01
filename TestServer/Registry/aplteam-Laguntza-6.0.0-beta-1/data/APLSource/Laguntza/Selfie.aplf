@@ -1,0 +1,22 @@
+ {r}←{wait}Selfie parms;ps;source
+⍝ Runs Laguntza's own help in developer's mode.\\
+⍝ The right argument might be either an empty vector or a parameter
+⍝ space. If is is the latter than the contents is merged with the
+⍝ result or `CreateParms ⍬`, with the right argument taking precedence.\\
+⍝ **Note:** This function always forces the help system to be recompiled.
+ wait←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'wait'
+ {}2704⌶1
+ ⍝1 AllowRide 4711
+ ps←CreateParms parms
+ ps.helpCaption←'Laguntza''s Help'
+ ps.source←HelpHelp
+ ps.expand←'None'
+ ps.visible←1
+ r←1 New ps
+ source←GetHome'\Assets\Images\FlipDB-Team.png'
+ 1 ⎕MKDIR ps.folderName,'\Assets\Images\'
+ {}source File.CopyFilesTo ps.folderName,'\Assets\Images\'
+ :If wait
+     ⎕DQ'.'
+ :EndIf
+⍝Done

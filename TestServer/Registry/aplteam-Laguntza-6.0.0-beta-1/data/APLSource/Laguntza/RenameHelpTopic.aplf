@@ -1,0 +1,47 @@
+ {r}←{testflag}RenameHelpTopic(∆Ref in);fullPageName;pageName;parent;old;newName;oldTitle;msg;rc
+⍝ Let user (developers only) edit item number ⍵.
+⍝ The user is expected to have changed the name.
+⍝ If that is the case then the original one is deleted and Link is told.
+⍝ This MUST NOT be called on any ∆DefaultPage.
+ r←0
+ testflag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'testflag'
+ {}ResetStatusbar ∆Ref
+ fullPageName←∆Ref GetHelpVarsName in
+ pageName←1⊃'.'A.SplitPath fullPageName
+ parent←⍎¯1↓↑'.'A.SplitPath fullPageName
+ :If '.∆DefaultPage'{⍺≡(-≢⍺)↑⍵}pageName
+     {}Show'You MUST NOT change the name of a ∆DefaultPage!'
+ :Else
+     old←parent.⍎pageName
+     :If testflag
+         newName←'A_Test'
+     :Else
+         newName←∆Ref AskForRename parent pageName
+     :EndIf
+     :If 0=≢newName
+     :OrIf newName≡pageName
+         {}Show'No rename performed, therefore no action taken.'
+         :Return
+     :EndIf
+     {}testflag RenameInTopicProperties ∆Ref pageName newName parent
+     ⍎(⍕parent),'.',newName,'←',fullPageName    ⍝ Copy old to new
+     :If ∆Ref.p.notifyLink
+         {}⎕SE.Link.Add(⍕parent),'.',newName
+         {}⎕SE.Link.Expunge fullPageName
+     :Else
+         ⎕EX(⍕parent),'.',pageName              ⍝ Remove old one
+     :EndIf
+     oldTitle←HTML.GetTitle old
+     :If 0=testflag
+         {}parent EditByQED newName
+         :If 0≠≢oldTitle
+         :AndIf oldTitle≡HTML.GetTitle parent⍎newName
+         :AndIf oldTitle≢newName
+             msg←⊂'You have renamed the help page but not changed the "Title" tag.'
+             msg,←'' 'If this was a mistake then don''t forget to fix it.'
+             'Help: rename problem?!'Show msg
+         :EndIf
+     :EndIf
+     {}Compile ∆Ref
+     ∆Ref ShowTopic(⍕parent),'.',newName
+ :EndIf

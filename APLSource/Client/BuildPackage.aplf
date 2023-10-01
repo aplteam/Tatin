@@ -1,4 +1,4 @@
-zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg
+ zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg
 ⍝ Build a new version of a Tatin package.\\
 ⍝ The right argument must be a namespace with the required parameters, typically created by calling  `CreateBuildParms`.
 ⍝ These are the parameters:\\
@@ -85,6 +85,7 @@ zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cf
      parms.projectPath∘{(p f e)←⎕NPARTS ⍵ ⋄ 0=≢p:⍺ zipObj.Add ⍵ ⋄ (⍺,p,'/')zipObj.Add f,e}¨','(≠⊆⊢)cfg.files
  :EndIf
  :If 0<≢dependencies
+ :AndIf F.IsFile(parms.projectPath,{⍵↑⍨¯1+⍵⍳'='}dependencies),'/apl-dependencies.txt'
      (parms.projectPath,{⍵↑⍨¯1+⍵⍳'='}dependencies)zipObj.Add'/apl-dependencies.txt'
  :ElseIf F.IsFile parms.projectPath,'apl-dependencies.txt'
      parms.projectPath zipObj.Add'apl-dependencies.txt'

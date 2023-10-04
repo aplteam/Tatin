@@ -1,12 +1,11 @@
-﻿Run path;res;qdmx;sep;paths
+﻿ Run path_;res;qdmx;sep;paths;DLB;DTB;path
 ⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the associated user commands will be found.
 ⍝ This is for version 19.0
 ⍝ The function is part of the Tatin project.
-⍝ Version 0.1.1 from 2023-09-28  ⋄  Kai Jaeger
- :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃2 ⎕nq # 'APLVersion'
- ⎕SE.⎕EX'CiderTatin'
+⍝ Version 0.1.2 from 2023-10-03  ⋄  Kai Jaeger
+ path←⊃,/1 ⎕NPARTS∊path_,'/../../CiderTatin'
+ :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃# ⎕WG'APLVersion'
  :AndIf 0=⎕SE.⎕NC'_Tatin'
-     path←∊path
      :Trap 0
          '_Tatin'⎕SE.⎕CY path,'/Tatin/Client.dws'
      :Else
@@ -19,20 +18,23 @@
          qdmx←⎕DMX
          ⎕←'Attempt to establish Tatin in ⎕SE failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
      :EndTrap
+     DLB←{⍵↓⍨+/∧\' '=⍵}
+     DTB←{⍵↓⍨-+/∧\' '=⌽⍵}
      :Trap 0
-         :If 'Win'≡3↑1⊃2 ⎕nq # 'APLVersion'
-             path←{'\'@(⍸'/'=⍵)⊣⍵}path
-             res←{'\'@(⍸'/'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+         :If 'Win'≡3↑1⊃# ⎕WG'APLVersion'
+             res←⎕SE.SALT.Settings'cmddir'
              sep←';'
              paths←sep(≠⊆⊢)res
          :Else
-             path←{'/'@(⍸'\'=⍵)⊣⍵}path
-             res←{'/'@(⍸'\'=⍵)⊣⍵}⎕SE.SALT.Settings'cmddir'
+             res←⎕SE.SALT.Settings'cmddir'
              sep←':'
              paths←sep(≠⊆⊢)res
          :EndIf
+         paths←{DTB DLB ⍵}¨paths
+         paths←(⎕NEXISTS¨paths)/paths
+         paths←∪{⊃,/1 ⎕NPARTS ⍵}¨paths
          :If ~(⊂path)∊paths ⍝ Already known?
-             {}⎕SE.SALT.Settings'cmddir ,',path,' -permanent'
+             {}⎕SE.SALT.Settings'cmddir ',path,(⊃,/';',¨paths),' -permanent'
          :EndIf
      :Else
          qdmx←⎕DMX
@@ -48,3 +50,5 @@
          ⎕←'Attempt to load the "Cider" package failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
      :EndTrap
  :EndIf
+ ⎕SE.⎕EX'CiderTatin'
+ ⍝Done

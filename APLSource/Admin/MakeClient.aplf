@@ -1,4 +1,4 @@
- {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;userCommandTargetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList;success;log
+ {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;targetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList;success;log
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or
 ⍝ as part of an automated "Make" process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown in case ⍵ is 0, and ⎕OFF 123 is executed in case ⍵ is 1.\\
@@ -57,13 +57,13 @@
      #.⎕EX¨(' '~¨⍨↓#.⎕NL⍳16)~⊂'_Tatin'
      #.⎕EX'Make_'
      0 ⎕SAVE ⎕WSID   ⍝ If this crashes, in particular with "Reference in ⎕SE points to #" or vise versa) execute ⎕OFF 123 and try again
-     userCommandTargetFolder←#._Tatin.Client.GetMyUCMDsFolder''
+     targetFolder←#._Tatin.Client.GetProgramFilesFolder'CiderTatin/Tatin'
      :If ~batchFlag
-     :AndIf F.IsFile userCommandTargetFolder,'/Tatin/Tatin.dyalog'
-     :AndIf (userCommandTargetFolder,'/Tatin/Tatin.dyalog')F.YoungerThan'./APLSource/Tatin.dyalog'
-     :AndIf ≢/{⊃⎕NGET ⍵}¨'./APLSource/Tatin.dyalog'(userCommandTargetFolder,'/Tatin/Tatin.dyalog')
-     :AndIf 1 ##.Client.YesOrNo'It appears that "Tatin.dyalog" in MyUCMDs/ is younger than the one in the project; copy over?'
-         './APLSource/Tatin.dyalog'(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)userCommandTargetFolder,'/Tatin/Tatin.dyalog'
+     :AndIf F.IsFile targetFolder,'/Tatin/Tatin.dyalog'
+     :AndIf (targetFolder,'/Tatin/Tatin.dyalog')F.YoungerThan'./APLSource/Tatin.dyalog'
+     :AndIf ≢/{⊃⎕NGET ⍵}¨'./APLSource/Tatin.dyalog'(targetFolder,'/Tatin/Tatin.dyalog')
+     :AndIf 1 ##.Client.YesOrNo'It appears that "Tatin.dyalog" in ',targetFolder,' is younger than the one in the project; copy over?'
+         './APLSource/Tatin.dyalog'(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)targetFolder,'/Tatin/Tatin.dyalog'
      :EndIf
      (targetPath,'/Tatin/Maintenance/')(⎕NCOPY⍠('Wildcard' 1)('IfExists' 'Replace')F.ExecNfunction)'./Maintenance/Client/*'
      (targetPath,'/Tatin')(⎕NCOPY⍠('IfExists' 'Replace')F.ExecNfunction)'./APLSource/Tatin.dyalog'
@@ -83,7 +83,7 @@
      myZip.Dispose
      zipContent←##.ZipArchive.ListZipContents zipFilename
      'Something went wrong with the ZIP file'Assert fileList{(∧/⍺∊⍵)∧(∧/⍵∊⍺)}zipContent
-     3 ⎕NDELETE userCommandTargetFolder,'/Tatin.dyalog'  ⍝ Because until 0.61.0 the user command script was a sibling of the Tatin/ folder
+     3 ⎕NDELETE targetFolder,'/Tatin.dyalog'  ⍝ Because until 0.61.0 the user command script was a sibling of the Tatin/ folder
      :If batchFlag
          ⎕OFF
      :Else

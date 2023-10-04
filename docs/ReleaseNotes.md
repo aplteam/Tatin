@@ -12,6 +12,10 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with notes regarding fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.102.0 from 2023-10-04
+
+* Most importantly, a revised install procedure
+
 ## Version 0.101.2 from 2023-09-30
 
 * Very important bug fix in `UnInstallPackages`
@@ -124,6 +128,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

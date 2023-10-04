@@ -1,15 +1,15 @@
- r←{current}GetProgramFilesFolder postFix;version;aplVersion;OS
-⍝ Returns standard path for Dyalog's version-specific program files folder.\\
+ r←{versionAgnostic}GetProgramFilesFolder postFix;version;aplVersion;OS
+⍝ Returns the path to Dyalog's version-specific program files folder.\\
 ⍝ Works on all platforms but returns different results.\\
 ⍝ Under Windows typically:\\
 ⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 19.0 Unicode Files' ←→ GetMyUCMDsFolder
 ⍝ ⍺ is optional and defaults to 0, meaning the version-agnostic folder is returned.
 ⍝ If ⍺←1, the folder associated with the currently running version of Dyalog is returned.
- current←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'current'
+ versionAgnostic←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'versionAgnostic'
  OS←3↑1⊃# ⎕WG'APLVersion'
  postFix←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}postFix
  aplVersion←# ⎕WG'APLVersion'
- :If current
+ :If versionAgnostic
      :If OS≡'Win'
          version←((∨/'-64'⍷1⊃aplVersion)/'-64'),' ',({⍵/⍨2>+\⍵='.'}2⊃aplVersion),' ',(80=⎕DR' ')/'Unicode'
          r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL',version,' Files',postFix

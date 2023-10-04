@@ -18,7 +18,7 @@
      :AndIf 0<≢d←ProcessLogFile d
          statFilename←folder,'usage-data-',(⍕oldYear),'.csv'
          colTitles←'Group' 'Name' 'Version' 'Year' 'Month' 'Downloads'
-         d colTitles ⎕CSV statFilename
+             d colTitles ⎕CSV⍠('IfExists' 'Replace')⊢statFilename
          zipFilename←⊃,/(¯1↓⎕NPARTS statFilename),⊂'.zip'
          ##.F.DeleteFile zipFilename
          zip←⎕NEW ##.ZipArchive(,⊂zipFilename)

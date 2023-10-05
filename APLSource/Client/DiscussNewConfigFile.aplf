@@ -5,6 +5,7 @@
 ⍝ before allowing the user to edit the JSON eventually.
 ⍝ `success` is 1 in case the user entered all the mandatory data but 0 if she cancelled.
  projectPath←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'projectPath'
+ projectPath←'expand'F.NormalizePath projectPath
  C←CommTools
  multiples←1
  single←0
@@ -24,5 +25,5 @@
  :Else
      ns.project_url←({1}C.AskForText)'pkg-projectUrl@Enter the URL of the project'
  :EndIf
-ns.userCommandScript←NegotiateUserCommandScript ns
+ ns.userCommandScript←NegotiateUserCommandScript ns
 ⍝Done

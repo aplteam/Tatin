@@ -17,10 +17,12 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'APLTreeUtils2' '1.2.0+62' '2023-05-08'
+      r←'APLTreeUtils2' '1.2.1+62' '2023-10-05'
     ∇
 
     ∇ History
+    ⍝ * 1.2.0 from 2023-10-05
+    ⍝   * Bug fix in `Create_UUID`
     ⍝ * 1.2.0 from 2023-05-08
     ⍝   * Bug fix: version number corrected
     ⍝ * 1.1.4 from 2023-04-09
@@ -297,11 +299,10 @@
       r←3↑⊃'.'⎕WG'APLVersion'
     ∇
 
-    ∇ r←Create_UUID;⎕RL
+    ∇ r←Create_UUID
     ⍝ Produces a UUID
       :Access Public Shared
-      ⎕RL←+/⎕TS
-      r←'-'@(+\9,3⍴5)⊢(⎕D,⎕C ⎕A)[?36⍴16]
+      r←'-'@(4+5×⍳4)⊢(⎕D,⎕C ⎕A)[4{9+|⍵}@20⊢5@15?36⍴16]
     ∇
 
     ∇ r←{type}Base64 txt;charset

@@ -300,6 +300,7 @@ You can specify these pieces of information as well:
 * `maintainer`
 * `source`
 
-These define the defaults when a new package is created.
+These define the defaults to be used when a new package is created.
+
 
 

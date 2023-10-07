@@ -8,9 +8,13 @@
 
 # Release Notes
 
-Tatin release notes contain information regarding actions that need to be executed before a new version can be used.
+Tatin release notes contain information regarding actions that need to be executed before a new version can be used, or oustandingly important pieces of information.
 
-This document does not come with notes regarding fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
+This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
+
+## Version 0.102.1 from 2023-10-07
+
+* Most importantly, a bug fix in `]Tatin.CiderUpdate`
 
 ## Version 0.102.0 from 2023-10-04
 
@@ -128,6 +132,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

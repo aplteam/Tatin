@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.73.0 - 2023-10-01
+⍝ * 0.74.0 - 2023-10-07
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -433,22 +433,41 @@
       :EndIf
     ∇
 
-    ∇ {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;ref;target;q
+    ∇ {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;q;folder2;GH;currentVersion;tag;msg
       r←''
-      folder←1 TC.GetProgramFilesFolder''
-      (version ref target)←TC.UpdateClient 0 folder
-      :If 0<≢version
-          TC.A.GoToWebPage TC.GetMyUCMDsFolder'Tatin/Assets/docs/ReleaseNotes.html'
-          r←'Tatin updated on disk to ',⊃{⍺,' from ',⍵}/1↓TC.Version
-          r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
+      folder←1⊃⎕NPARTS ##.SourceFile
+      :If ~{{⍺≡(≢⍺)↑⍵}/'expand'∘TC.F.NormalizePath¨⍵}(1 TC.GetProgramFilesFolder'')folder
+          ('Cannot deal with ',folder)Assert{{⍺≡(≢⍺)↑⍵}/'expand'∘TC.F.NormalizePath¨⍵}(0 TC.GetProgramFilesFolder'')folder
       :EndIf
-      ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
-      folder←TC.GetMyUCMDsFolder'Tatin'
-      :If TC.F.IsDir folder
-          q←'RemoveTatinFromMyUCMDs@'
-          q,←'There is a folder ',folder,' on disk - do you want the folder removed?'
-      :AndIf 1 TC.C.YesOrNo q
-          {}TC.F.RmDirByForce folder
+      GH←⎕NEW TC.##.GitHubAPIv3(,⊂'aplteam')
+      filename←folder,'/../../GitHub-personal-token.txt'
+      :If TC.F.IsFile filename
+          GH.personal_access_token←∊⊃TC.F.NGET filename 1
+      :EndIf
+      currentVersion←({⍵↑⍨¯1+⌊/⍵⍳'+-'}2⊃TC.Version)
+      tag←GH.CheckForUpdate'Tatin'currentVersion
+      :If 0=≢tag
+          r←'Tatin is up-to-date: ',⊃{⍺,' from ',⍵}/1↓TC.Version
+      :Else
+          msg←'UpdateTatin@Your version of Tatin is ',{⍵↑⍨¯1+⍵⍳'+'}2⊃TC.Version
+          msg,←(⎕UCS 13),'Latest published version is ',1↓tag
+          msg,←(⎕UCS 13),'Would you like to download and install ',(1↓tag),' ?'
+          :If 1 TC.YesOrNo msg
+              version←TC.UpdateClient tag folder
+              :If 0<≢version
+                  ⎕CMD '"',folder,'/Assets/docs/ReleaseNotes.html"'
+                  r←'Tatin updated on disk to ',version
+                  r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
+              :EndIf
+              ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
+              folder2←TC.GetMyUCMDsFolder'Tatin'
+              :If TC.F.IsDir folder2
+                  q←'RemoveTatinFromMyUCMDs@'
+                  q,←'There is a folder ',folder2,' on disk - do you want the folder removed?'
+              :AndIf 1 TC.C.YesOrNo q
+                  {}TC.F.RmDirByForce folder2
+              :EndIf
+          :EndIf
       :EndIf
     ∇
 
@@ -2272,11 +2291,11 @@
               r,←⊂'          The ZIP files will be deleted afterwards. Ignored when -download is not specified.'
               r,←⊂'-all      This circumvents the selection dialog; mainly useful for test cases.'
           :Case ⎕C'UpdateTatin'
-              r,←⊂'Downloads the latest version from GitHub and installs it in the folder it was started from'
+              r,←⊂'Downloads the latest version from GitHub and installs it into the folder it was started from'
               r,←⊂'in case there is a later version available.'
               r,←⊂''
               r,←⊂'Note that this user command does not attempt to update the current workspace, therefore it'
-              r,←⊂'is recommended to close the current session and start a new one.'
+              r,←⊂'is required to close the current session and start a new one.'
           :Else
               r←'Unknown command: ',Cmd
           :EndSelect

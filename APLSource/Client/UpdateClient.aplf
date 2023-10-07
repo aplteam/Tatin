@@ -1,83 +1,51 @@
- (version ref target)←{tag}UpdateClient y;force;GH;request;client;data;data2;redirect;tempFile;tno;folder;wspath;msg;flag;rc;⎕TRAP;filename;currentVersion;run;q
-⍝ Updates the client to (by default) the latest version, and returns the version number of the new version.\\
-⍝ A Boolean right argument (`force`) is mandatory, but one might specify also a folder Tatin is installed in.
-⍝ The user command will do this automatically with the folder the user command was loaded from.\\
-⍝ Asks for confirmation from the user unless `force` is 1.\\
-⍝ If you want to update to a specific version you may specify the desired version in ⍺.
-⍝ The format must be something like "v1.0.2".
- (force target)←2↑(⊆y),⊂''
- 'Right argument must be a Boolean'Assert(⊂force)∊0 1
+ version←UpdateClient(tag targetFolder);request;client;data;redirect;data2;folder;tempFile;tno;run;targetStUp
+⍝ Updates the client to the version indicated by `tag`, and returns the version number of the new version.\\
  'Updating Tatin requires at least 20 MB WSSIZE'Assert 20<⌊⎕WA÷1024×1024
- version←ref←''
- :If flag←0=⎕NC'tag'
-     GH←⎕NEW ##.GitHubAPIv3(,⊂'aplteam')
-     filename←GetProgramFilesFolder'StartupSession\CiderTatin\Tatin\GitHub-personal-token.txt'
-     :If F.IsFile filename
-         GH.personal_access_token←∊⊃F.NGET filename 1
-     :EndIf
-     currentVersion←({⍵↑⍨¯1+⌊/⍵⍳'+-'}2⊃Reg.Version)
-     tag←GH.CheckForUpdate'Tatin'currentVersion
- :Else
-     'Invalid version number'Assert'v'=1⍴tag
- :EndIf
- :If 0=≢tag
-     ⎕←'Tatin is up-to-date: ',⊃{⍺,' from ',⍵}/1↓Reg.Version
- :Else
-     msg←'UpdateTatin@Your version of Tatin is ',{⍵↑⍨¯1+⍵⍳'+'}2⊃Reg.Version
-     msg,←(⎕UCS 13),'Latest published version is ',1↓tag
-     msg,←(⎕UCS 13),'Would you like to download and install ',(1↓tag),' ?'
-     :If ~flag ⍝ Then the user has requested a particular version, and we assume she knows what she's doing
-     :OrIf msg{⍵:⍵ ⋄ 1 YesOrNo ⍺}force
-         request←R.NewRequest 0
-         request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Tatin-Client-',(1↓tag),'.zip'
-         client←R.NewClient 0
-         client.Host←'github.com'
-         request.Headers,←⊂'User-Agent' 'aplteam'
-         data←client R.SendAndReceive request
-         'Invalid HTTP status code'Assert 302≡data.StatusCode
-         redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
-         redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
-         client←R.NewClient 0
-         (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
-         data2←client R.SendAndReceive request
-         folder←F.GetTempSubDir'Tatin-Upgrade'
-         tempFile←folder,'/',tag,'.zip'
-         tno←tempFile ⎕NCREATE 0
-         data2.Content ⎕NAPPEND tno 80
-         ⎕NUNTIE tno
-         data2.Content←''
-         tempFile ZipArchive.UnzipTo folder
+ version←''
+ request←R.NewRequest 0
+ request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Tatin-Client-',(1↓tag),'.zip'
+ client←R.NewClient 0
+ client.Host←'github.com'
+ request.Headers,←⊂'User-Agent' 'aplteam'
+ data←client R.SendAndReceive request
+ 'Invalid HTTP status code'Assert 302≡data.StatusCode
+ redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
+ redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
+ client←R.NewClient 0
+ (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
+ data2←client R.SendAndReceive request
+ folder←F.GetTempSubDir'Tatin-Upgrade'
+ tempFile←folder,'/',tag,'.zip'
+ tno←tempFile ⎕NCREATE 0
+ data2.Content ⎕NAPPEND tno 80
+ ⎕NUNTIE tno
+ data2.Content←''
+ tempFile ZipArchive.UnzipTo folder
 
-     ⍝ Now we need to catch the "Run" function if 19.0 or later
-         :If 19≤⊃⊃(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃'#'⎕WG'APLVersion'
-             request←R.NewRequest 0
-             request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
-             client←R.NewClient 0
-             client.Host←'github.com'
-             request.Headers,←⊂'User-Agent' 'aplteam'
-             data←client R.SendAndReceive request
-             'Invalid HTTP status code'Assert 302≡data.StatusCode
-             redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
-             redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
-             client←R.NewClient 0
-             (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
-             data2←client R.SendAndReceive request
-             run←'UTF-8'⎕UCS ⎕UCS data2.Content
-             (⊂run)⎕NPUT folder,'/Run.aplf'
-             ⎕NDELETE tempFile
-         :EndIf
+⍝ Now we need to catch the "Run" function
+ request←R.NewRequest 0
+ request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
+ client←R.NewClient 0
+ client.Host←'github.com'
+ request.Headers,←⊂'User-Agent' 'aplteam'
+ data←client R.SendAndReceive request
+ 'Invalid HTTP status code'Assert 302≡data.StatusCode
+ redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
+ redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
+ client←R.NewClient 0
+ (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
+ data2←client R.SendAndReceive request
+ run←'UTF-8'⎕UCS ⎕UCS data2.Content
+ (⊂run)⎕NPUT folder,'/Run.aplf'
+ ⎕NDELETE tempFile
 
-     ⍝ Now we move the new version from temp to the correct place
-         :If 0=≢target
-             target←GetProgramFilesFolder'Tatin'  ⍝ Establish default
-         :EndIf
-         3 ⎕MKDIR target,'/StartupSession/CiderTatin/Tatin'
-         (target,'/StartupSession/CiderTatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
-         :If ⎕NEXISTS folder,'/Run.aplf'
-             (target,'/StartupSession/CiderTatin/')⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Run.aplf'
-         :EndIf
-         version←{⍵↓⍨'v'=1⍴⍵}tag
-         ref←⎕SE.⎕NS''
-     :EndIf
+⍝ Now we move the new version from temp to the correct place
+ 3 ⎕MKDIR targetFolder
+ (targetFolder,'/..')⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
+ :If ⎕NEXISTS folder,'/Run.aplf'
+     targetStUp←targetFolder,'/../../../StartupSession/CiderTatin/'
+     3 ⎕MKDIR targetStUp
+     targetStUp ⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Run.aplf'
  :EndIf
+ version←{⍵↓⍨'v'=1⍴⍵}tag
 ⍝Done

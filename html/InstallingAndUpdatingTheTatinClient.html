@@ -78,22 +78,27 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h4>Tatin version 0.100.1 and earlier</h4>
 <p>0.100.1 and ealier version were installed into the <code>MyUCMDs/</code> folder.</p>
 <p>That has changed: it's now installed into a different folder. Please delete it from <code>MyUCMDs/</code>.</p>
-<h4>Tatin version 0.101.*</h4>
+<h4>Any Tatin version 0.101.0 and 0.100.1</h4>
 <p>These versions told you to install Tatin into</p>
 <pre><code>C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL[-64] 18.2 Unicode Files\StartupSession\CiderTatin\Tatin</code></pre>
 <p>or an equivalent on Linux or Mac OS.</p>
 <p>This was the wrong folder: please delete it.</p>
+<h4>Tatin version 0.102.0</h4>
+<p>These versions told you to install Tatin into</p>
+<pre><code>C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL[-64] 18.2 Unicode Files\StartupSession\CiderTatin\Tatin</code></pre>
+<p>or an equivalent on Linux or Mac OS.</p>
+<p>This was the wrong folder: please delete <code>CiderTatin\</code>.</p>
 </div>
 
-<p>From version 0.102.0 onwards, Tatin must be installed into one of these folders:</p>
+<p>From version 0.102.1 onwards, Tatin must be installed into one of these folders:</p>
 <pre><code>  ⍝ Windows
-C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL[-64] &lt;version&gt; Unicode Files\CiderTatin
+C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL[-64] &lt;version&gt; Unicode Files\SessionExtensions\CiderTatin
   ⍝ Linux
-/home/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/CiderTatin
+/home/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/SessionExtensions/CiderTatin
   ⍝ Mac OS
-Users/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/CiderTatin</code></pre>
+Users/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/SessionExtensions/CiderTatin</code></pre>
 <p>However, your old version's <code>]Tatin.UpdateTatin</code> cannot know this, and must therefore not be used.</p>
-<p>Once you have Tatin 0.102.0 installed in the right place you can use <code>]Tatin.UpdateTatin</code> again.</p>
+<p>Once you have Tatin 0.102.1 installed in the right place you can use <code>]Tatin.UpdateTatin</code> again.</p>
 <div class="h_tag">
 <a href="#How-to-install-in-180-and-182" id="How-to-install-in-180-and-182" class="autoheader_anchor">
 <h2 data-id="How-to-install-in-180-and-182">5. How to install in 18.0 and 18.2</h2>
@@ -104,7 +109,7 @@ Users/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/CiderTatin</code></
 <li>Download the latest release of the Tatin client from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a></li>
 <li>Unzip it into the target folder
 <p>As a result you should see something like this:</p>
-<p><code>...\Dyalog APL[-64] &lt;version&gt; Unicode Files\CiderTatin\Tatin</code></p></li>
+<p><code>...\Dyalog APL[-64] &lt;version&gt; Unicode Files\SessionExtensions\CiderTatin\Tatin</code></p></li>
 </ol>
 <div class="h_tag">
 <a href="#Tell-Dyalog-where-to-look-for-user-commands" id="Tell-Dyalog-where-to-look-for-user-commands" class="autoheader_anchor">
@@ -112,22 +117,32 @@ Users/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/CiderTatin</code></
 </a>
 </div>
 <p>Though Tatin's user command script is now in place, Dyalog does not know yet about it. For that we have to add the folder to SALT's search path. This step needs to be carried out only once for any installed version 18.0 or 18.2</p>
-<p>For that you need to execute one of the following commands:</p>
-<pre><code>⍝ Windows
-]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL-64 18.0 Unicode Files\CiderTatin" -p  ⍝ 18.0 64-bit
-]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL 18.0 Unicode Files\CiderTatin"    -p  ⍝ 18.0 32-bit
-]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL-64 18.2 Unicode Files\CiderTatin" -p  ⍝ 18.2 64-bit
-]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL 18.2 Unicode Files\CiderTatin"    -p  ⍝ 18.2 32-bit
-⍝ Linux &amp; Mac OS
-]SALT.Settings cmddir ",/home/&lt;⎕AN&gt;/dyalog.180U64.files/CiderTatin -p      ⍝ 18.0
-]SALT.Settings cmddir ",/home/&lt;⎕AN&gt;/dyalog.180U64.files/CiderTatin -p      ⍝ 18.2
-⍝ Mac OS
-]SALT.Settings cmddir ",/Users/&lt;⎕AN&gt;/dyalog.182U64.files/CiderTatin" -p    ⍝ 18.0
-]SALT.Settings cmddir ",/Users/&lt;⎕AN&gt;/dyalog.182U64.files/CiderTatin" -p    ⍝ 18.2</code></pre>
+<p>Execute one of the following commands:</p>
+<pre><code>  ⍝ Windows
+  ⍝ 18.0 64-bit:
+]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL-64 18.0 Unicode Files\SessionExtensions\CiderTatin" -p
+  ⍝ 18.0 32-bit:
+]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL 18.0 Unicode Files\SessionExtensions\CiderTatin"    -p
+  ⍝ 18.2 64-bit
+]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL-64 18.2 Unicode Files\SessionExtensions\CiderTatin" -p
+  ⍝ 18.2 32-bit
+]SALT.Settings cmddir ",C:\Users\&lt;⎕AN&gt;\Documents\Dyalog APL 18.2 Unicode Files\SessionExtensions\CiderTatin"    -p
+
+  ⍝ Linux &amp; Mac OS
+  ⍝ 18.0
+]SALT.Settings cmddir ",/home/&lt;⎕AN&gt;/dyalog.180U64.files/SessionExtensions/CiderTatin -p
+  ⍝ 18.2
+]SALT.Settings cmddir ",/home/&lt;⎕AN&gt;/dyalog.180U64.files/SessionExtensions/CiderTatin -p
+
+  ⍝ Mac OS
+  ⍝ 18.0
+]SALT.Settings cmddir ",/Users/&lt;⎕AN&gt;/dyalog.182U64.files/SessionExtensions/CiderTatin" -p
+  ⍝ 18.2
+]SALT.Settings cmddir ",/Users/&lt;⎕AN&gt;/dyalog.182U64.files/SessionExtensions/CiderTatin" -p</code></pre>
 <div class="leanpub">
 <img src="https://download.aplwiki.com/LeanPub/Images/warning.png" alt="Warning">
 <div>
-<p>Note the comma (<code>,</code>) in front of the path: it tells SALT to add the path, rather than using it as a replacement</p>
+<p>Note the comma (<code>,</code>) in front of the path: it tells SALT to <em>add</em> the path, rather than using it as a replacement.</p>
 </div>
 </div>
 
@@ -139,7 +154,8 @@ Users/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/CiderTatin</code></
 </div>
 
 <p>Any newly started version of Dyalog now comes with the user command <code>]Tatin.*</code>.</p>
-<p>There is no point in having a function <code>Run.aplf</code> in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature that a function <code>Run.aplf</code> will be loaded and executed as part of Dyalog's bootstrapping procedure. In earlier versions such a function is not executed. As a side effect of executing any of the Tatin user commands the Tatin API will become available via <code>⎕SE.Tatin</code>.</p>
+<p>There is no point in having a function <code>Run.aplf</code> in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature that a function <code>Run.aplf</code> will be loaded and executed as part of Dyalog's bootstrapping procedure. In earlier versions such a function is not executed.</p>
+<p>As a side effect of executing any of the Tatin user commands the Tatin API will become available via <code>⎕SE.Tatin</code>.</p>
 <p>If you want the Tatin API to be available right from the start: this is discussed next.</p>
 <div class="h_tag">
 <a href="#Initializing-Tatin" id="Initializing-Tatin" class="autoheader_anchor">
@@ -215,7 +231,7 @@ Users/&lt;⎕AN&gt;/dyalog.&lt;version&gt;U&lt;bit&gt;.files/CiderTatin</code></
                   r←'Tatin not loaded: not compatible with Classic'
               :Else
                   ⎕SE.⎕EX¨'_Tatin' 'Tatin'
-                  wspath←GetProgramFilesFolder '/CiderTatin/Tatin/Client.dws'
+                  wspath←GetProgramFilesFolder '/SessionExtensions/CiderTatin/Tatin/Client.dws'
                   '_Tatin'⎕SE.⎕CY wspath
                   path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
                   'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config

@@ -2,7 +2,7 @@
 ⍝ Copies Tatin into the version-agnostic "Dyalog APL Files\" folder
  r←0
  Assert 0<#.Tatin.⎕NC'CiderConfig'
- targetFolder←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files\CiderTatin\Tatin'
+ targetFolder←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files\SessionExtensions\CiderTatin\Tatin'
  :If ~batchFlag
  :AndIf 1 ##.Client.YesOrNo'   Would you like to copy the Tatin client to ',targetFolder
      counter←flag←0
@@ -25,7 +25,7 @@
      filename←#.Tatin.CiderConfig.HOME,'/GitHub-personal-token.txt'
      :If ⎕NEXISTS filename
          :If 1 ##.Client.YesOrNo'Copy over the personal GitHub token as well?'
-             (targetFolder,'/')⎕NCOPY⍠('IfExists' 'Replace')⊣filename
+             (targetFolder,'/../')⎕NCOPY⍠('IfExists' 'Replace')⊣filename
          :EndIf
      :EndIf
  :EndIf

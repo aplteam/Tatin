@@ -219,7 +219,7 @@ Create one that looks like this:
                   r←'Tatin not loaded: not compatible with Classic'
               :Else
                   ⎕SE.⎕EX¨'_Tatin' 'Tatin'
-                  wspath←GetProgramFilesFolder '/SessionExtensions/CiderTatin/Tatin/Client.dws'
+                  wspath←1 GetProgramFilesFolder '/SessionExtensions/CiderTatin/Tatin/Client.dws'
                   '_Tatin'⎕SE.⎕CY wspath
                   path2Config←⊃⎕nparts ⎕SE._Tatin.Client.FindUserSettings ⎕AN
                   'Create!'⎕SE._Tatin.Client.F.CheckPath path2Config
@@ -295,6 +295,7 @@ Notes:
   Note that the API equivalent `⎕SE.Tatin.Update 0` was introduced in 0.78.0.
 
 * Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+
 
 
 

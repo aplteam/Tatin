@@ -199,11 +199,9 @@ Notes:
 
 * The `assets\` folder must be considered read-only. Never write to it from a package!
 
-* Watch out for the convention regarding a file "LICENSE" in the root of a project; refer to the "Server-TipsAndTricks" document for details
-
 * Check the "[files](#)" property for files like "ReadMe.txt" and the like
 
-* A file named "LICENSE" in the root of a project will always be copied to the root of a package
+* A file named "LICENSE" in the root of a project will always be copied to the root of a package by convention when a package is build.
 
 A> ### Accessing assets from a class instance
 A>
@@ -280,16 +278,18 @@ You might want to get one or more specific files into the root of the package al
 
 Typical examples are "LICENSE" and "ReadMe.[md\|txt\|html]". Strictly speaking they are not assets because the package will still function perfectly well without them. Also, you want them to go to the root of the project, not into a sub-folder, so that they stand out. 
 
-That can be achieved by adding them to the "files" property. This can be one of:
+That can be achieved by adding them to the "files" property. `files` can be one of:
 
 * Absend
 * Empty
 * A single file
 * A comma-separated list of files
 
-Note that if it specifies a sub-folder `BuildPackage` will copy the file from that project-specific sub-folder to the root of the package.
+Note that if it specifies a sub-folder, `BuildPackage` will copy the folder from that project-specific sub-folder to the root of the package.
 
-See als "[assets](#)".
+See also "[assets](#)".
+
+I> Note that a file `LICENSE` in the root of a project is by convention copied to the root of a package when a package is build.
 
 
 #### GetFullPath2AssetsFolder
@@ -564,5 +564,6 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 

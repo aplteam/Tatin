@@ -231,9 +231,8 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <li>When the package configuration file is written to disk the existence of “assets” is checked. If it's not a folder an error is thrown.
 <p>See also the <a href="#GetFullPath2AssetsFolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> function.</p></li>
 <li>The <code>assets\</code> folder must be considered read-only. Never write to it from a package!</li>
-<li>Watch out for the convention regarding a file “LICENSE” in the root of a project; refer to the “Server-TipsAndTricks” document for details</li>
 <li>Check the “<a href="#files" class="bookmark_link">files</a>” property for files like “ReadMe.txt” and the like</li>
-<li>A file named “LICENSE” in the root of a project will always be copied to the root of a package</li>
+<li>A file named “LICENSE” in the root of a project will always be copied to the root of a package by convention when a package is build.</li>
 </ul>
 <div class="leanpub_A">
 <h3>Accessing assets from a class instance</h3>
@@ -296,15 +295,22 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </div>
 <p>You might want to get one or more specific files into the root of the package although they are not really assets.</p>
 <p>Typical examples are “LICENSE” and “ReadMe.[md|txt|html]”. Strictly speaking they are not assets because the package will still function perfectly well without them. Also, you want them to go to the root of the project, not into a sub-folder, so that they stand out.</p>
-<p>That can be achieved by adding them to the “files” property. This can be one of:</p>
+<p>That can be achieved by adding them to the “files” property. <code>files</code> can be one of:</p>
 <ul>
 <li>Absend</li>
 <li>Empty</li>
 <li>A single file</li>
 <li>A comma-separated list of files</li>
 </ul>
-<p>Note that if it specifies a sub-folder <code>BuildPackage</code> will copy the file from that project-specific sub-folder to the root of the package.</p>
-<p>See als “<a href="#assets" class="bookmark_link">assets</a>”.</p>
+<p>Note that if it specifies a sub-folder, <code>BuildPackage</code> will copy the folder from that project-specific sub-folder to the root of the package.</p>
+<p>See also “<a href="#assets" class="bookmark_link">assets</a>”.</p>
+<div class="leanpub">
+<img src="https://download.aplwiki.com/LeanPub/Images/information.png" alt="Information">
+<div>
+<p>Note that a file <code>LICENSE</code> in the root of a project is by convention copied to the root of a package when a package is build.</p>
+</div>
+</div>
+
 <div class="h_tag">
 <a href="#GetFullPath2AssetsFolder" id="GetFullPath2AssetsFolder" class="autoheader_anchor">
 <h4 data-id="GetFullPath2AssetsFolder">2.3.8. GetFullPath2AssetsFolder</h4>

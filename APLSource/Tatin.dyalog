@@ -467,6 +467,7 @@
               :AndIf 1 TC.C.YesOrNo q
                   {}TC.F.RmDirByForce folder2
               :EndIf
+              r←'Tatin successfully updated to version ',(1↓tag),' in ',folder2
           :EndIf
       :EndIf
     ∇

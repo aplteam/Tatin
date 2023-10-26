@@ -116,7 +116,7 @@ API keys are saved in the user settings file. The quickest and yet safe way to e
 
 ##### Server
 
-Credentials are saved in the file "Credentials.csv" in the `Registry\` folder in the server's home folder.
+Credentials are saved in the file "Credentials.csv" in the Registry's home folder.
 
 #### Credentials for your own Tatin Server 
 
@@ -142,19 +142,20 @@ If the server finds such a file it will perform the following actions:
 
 * Take the data and convert it to a different format
 * Delete rows from `Credential.csv` that share a group name with `Credentials.txt`
-* Add the data to `Credentials.cvs` 
-* Delete the file `Credentials.txt`.
+* Create a Salt for any API key in `Credentials.txt`
+* Convert every API-key and its Salt into a hash and add them together with the according group name to `Credentials.csv`
+* Delete the file `Credentials.txt`
 
-The format of the file `Credentials.csv` is this:
+The format of the file `Credentials.csv` is:
 
 ```
-<group-name<,<api-key-hash>,<salt>
+<group-name>,<api-key-hash>,<salt>
 *,<api-key-hash>,<salt>
 *
 ```
 
-* In the first case, anybody who provides the API key the hash was produced from, can publish packages for that group.
-* In the second case, the password the hash was created from, is a kind of master password: it allows the creation of packages with _any_ group name.
+* In the first case, anybody who provides the API key the hash was produced from can publish packages for that group.
+* In the second case, the password the hash was created from is a kind of master password: it allows the creation of packages with _any_ group name.
 * The third case means that no API key is required for any (remaining) group(s).
 
 The different scenarios can be mixed:
@@ -386,3 +387,6 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
+
+

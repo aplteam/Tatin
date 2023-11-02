@@ -25,6 +25,7 @@ This is an example:
   ml: 1,
   name: "DotNetZip",
   source: "DotNetZip.aplc",
+  tatin_version: "0.103.0",
   tags: "zip-tools",
   version: "0.5.4",
 }
@@ -487,6 +488,11 @@ There is also no point in adding tags like "dyalog" or "apl" to a package: Tatin
 
 Note that people in charge of the principal Tatin server will have an eye on the tags, and might silently correct them to keep them consistent and meaningful.
 
+#### tatin_version
+
+The Tatin version number without any build ID the config data was created / changed by.
+
+You should not edit this because it is overwritten before saving the data anyway.
 
 #### userCommandScript
 
@@ -564,6 +570,7 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

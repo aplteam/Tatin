@@ -43,7 +43,7 @@ A> In that case you need to perform some action, depending on the version of Tat
 A>
 A> #### Tatin version 0.100.1 and earlier
 A>
-A> 0.100.1 and ealier version were installed into the `MyUCMDs/` folder.
+A> 0.100.1 and earlier versions were installed into the `MyUCMDs/` folder.
 A> 
 A> That has changed: it's now installed into a different folder. Please delete it from `MyUCMDs/`.
 A> 
@@ -295,6 +295,7 @@ Notes:
   Note that the API equivalent `⎕SE.Tatin.Update 0` was introduced in 0.78.0.
 
 * Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+
 
 
 

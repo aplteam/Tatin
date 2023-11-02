@@ -10,13 +10,17 @@
      groupName←request R.GetQueryParameter'group'
  :EndIf
  :If G.Credentials AcceptCredential apiKey groupName
-     :If Reg.IsValidPackageID_Complete request.RequestTarget
-         response←SavePackage request
-     :ElseIf request IsREST_v1 request.RequestTarget
-         response←request Handle_PUT_And_POST_REST_Version1 request.RequestTarget
+     :If 0=≢'email'Reg.GetGroupData G.RegistryPath groupName
+         response←request RespondWithHTML 400 'No email address defined' 'You cannot publish without defining an email address for your group.'
      :Else
-         response←request Respond 400  ⍝ 400 ←→ Bad Request
-         response.Content←'Neither valid package ID nor proper REST request'
+         :If Reg.IsValidPackageID_Complete request.RequestTarget
+             response←SavePackage request
+         :ElseIf request IsREST_v1 request.RequestTarget
+             response←request Handle_PUT_And_POST_REST_Version1 request.RequestTarget
+         :Else
+             response←request Respond 400  ⍝ 400 ←→ Bad Request
+             response.Content←'Neither valid package ID nor proper REST request'
+         :EndIf
      :EndIf
  :Else
      response←request RespondWithHTML 401 'Unauthorized request'    ⍝ 401 ←→ Unauthorized

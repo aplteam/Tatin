@@ -186,33 +186,39 @@ html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}b
 <h5 data-id="Server">3.1.3.2. Server</h5>
 </a>
 </div>
-<p>Credentials are saved in the file “Credentials.csv” in the <code>Registry\</code> folder in the server's home folder.</p>
+<p>Credentials are saved in the file “Credentials.csv” in the Registry's home folder.</p>
 <div class="h_tag">
 <a href="#Credentials-for-your-own-Tatin-Server" id="Credentials-for-your-own-Tatin-Server" class="autoheader_anchor">
 <h4 data-id="Credentials-for-your-own-Tatin-Server">3.1.4. Credentials for your own Tatin Server</h4>
 </a>
 </div>
 <p>If you run your own Tatin Server we suggest that you create a UUID and use that as an API key.</p>
+<div class="leanpub_A">
+<h3>Email address is required</h3>
+<p>Note that having a valid API key is not enough for publishing a package: you must also define an email address for your group.</p>
+<p>For that click “Groups &gt; {your-group-name} &gt; Create” and add at least an email address.</p>
+</div>
+
 <p>For an API key to be accepted by a Tatin Server, it must be added to a file <code>Credentials.txt</code> in the Registry's root directory.</p>
 <p>Make sure that you specify it as either</p>
 <pre><code>&lt;group-name&gt;,&lt;api-key&gt;</code></pre>
 <p>or</p>
 <pre><code>*,&lt;api-key&gt;</code></pre>
-<p>Instead of the “<code>,</code>” you can also use “<code>=</code>” as separator but that is deprecated.</p>
 <p>If the server finds such a file it will perform the following actions:</p>
 <ul>
 <li>Take the data and convert it to a different format</li>
 <li>Delete rows from <code>Credential.csv</code> that share a group name with <code>Credentials.txt</code></li>
-<li>Add the data to <code>Credentials.cvs</code></li>
-<li>Delete the file <code>Credentials.txt</code>.</li>
+<li>Create a Salt for every API key in <code>Credentials.txt</code></li>
+<li>Convert every API-key and its Salt into a hash and add them together with the according group name to <code>Credentials.csv</code></li>
+<li>Delete the file <code>Credentials.txt</code></li>
 </ul>
-<p>The format of the file <code>Credentials.csv</code> is this:</p>
-<pre><code>&lt;group-name&lt;,&lt;api-key-hash&gt;,&lt;salt&gt;
+<p>The format of the file <code>Credentials.csv</code> is:</p>
+<pre><code>&lt;group-name&gt;,&lt;api-key-hash&gt;,&lt;salt&gt;
 *,&lt;api-key-hash&gt;,&lt;salt&gt;
 *</code></pre>
 <ul>
-<li>In the first case, anybody who provides the API key the hash was produced from, can publish packages for that group.</li>
-<li>In the second case, the password the hash was created from, is a kind of master password: it allows the creation of packages with <em>any</em> group name.</li>
+<li>In the first case, anybody who provides the API key the hash was produced from can publish packages for that group.</li>
+<li>In the second case, the password the hash was created from is a kind of master password: it allows the creation of packages with <em>any</em> group name.</li>
 <li>The third case means that no API key is required for any (remaining) group(s).</li>
 </ul>
 <p>The different scenarios can be mixed:</p>
@@ -226,7 +232,7 @@ group2,&lt;hash2,&lt;salt2&gt;
 *</code></pre>
 <p>This is interpreted as “require API keys for the groups &lt;group1&gt; and &lt;group2&gt; but allow anything else without an API key”.</p>
 <p>Finally, you can allow anybody to publish packages under a particular group name without providing an API key:</p>
-<pre><code>&lt;group1&gt;,&lt;hash1&gt;
+<pre><code>&lt;group1&gt;,&lt;hash1&gt;,&lt;email-address&gt;
 &lt;group2&gt;,
 *,&lt;hash3&gt;</code></pre>
 <p>This means:</p>
@@ -240,8 +246,14 @@ group2,&lt;hash2,&lt;salt2&gt;
 <h5 data-id="Editing-the-file-Credentialscsv">3.1.4.1. Editing the file “Credentials.csv”</h5>
 </a>
 </div>
-<p>There is only one reason why you might need to change the file <code>Credentials.csv</code>: when a group name must be deleted for some reason.</p>
+<p>There is one reasons why you might need to change the file <code>Credentials.csv</code>: when a group name must be deleted for some reason.</p>
 <p>If a new group needs to be added, or a new API key needs to be assigned to an existing group, you must create a file <code>Credentials.txt</code>, see above.</p>
+<div class="h_tag">
+<a href="#Comments" id="Comments" class="autoheader_anchor">
+<h5 data-id="Comments">3.1.4.2. Comments</h5>
+</a>
+</div>
+<p>The files <code>Credentials.txt</code> as well as <code>Credentials.csv</code> both allow comment lines: any line that has a <code>;</code> as the very first character is regarded a comment.</p>
 <div class="h_tag">
 <a href="#Publishing" id="Publishing" class="autoheader_anchor">
 <h2 data-id="Publishing">4. Publishing</h2>

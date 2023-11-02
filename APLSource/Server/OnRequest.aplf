@@ -31,7 +31,7 @@
              :EndIf
              :If 200≠response.StatusCode
                  ⍝ Add potential error message in case something went wrong:
-                 logMsg,←(326≠⎕DR response.Content)/'; ',response.Content
+                 logMsg,←((~∨/'<!DOCTYPE html>'⍷∊response.Content)∧326≠⎕DR response.Content)/'; ',response.Content
              :EndIf
          :EndIf
          P.AppLog logMsg

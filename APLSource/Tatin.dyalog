@@ -1,6 +1,6 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.75.0 - 2023-10-14
+⍝ * 0.76.0 - 2023-11-03
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -841,6 +841,9 @@
     ∇
 
     ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms
+      :If 'Win'≡TC.##.APLTreeUtils2.GetOperatingSystem ⍬
+          'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
+      :EndIf
       (sourcePath targetPath)←Arg.(_1 _2)
       prompt←0
       zipFilename←''

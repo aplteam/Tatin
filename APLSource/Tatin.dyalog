@@ -1,4 +1,4 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.76.0 - 2023-11-03
 
@@ -1226,7 +1226,7 @@
       {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage tatinURL,'/v1/documentation'
     ∇
 
-    ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx;verboseWas
+    ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx;verboseWas;totalNoOf
       r←''
       verboseWas←TC.∆VERBOSE
       TC.∆VERBOSE←Arg.verbose
@@ -1249,8 +1249,9 @@
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       :Trap 0
-          noOf←Arg.nobetas TC.LoadPackages identifier targetSpace
-          r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded into ',targetSpace
+          totalNoOf←Arg.nobetas TC.LoadPackages identifier targetSpace
+          noOf←1+','+.=identifier
+          r←(⍕noOf),' package',((1≠noOf)/'s'),' loaded into ',targetSpace
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
@@ -2629,3 +2630,4 @@
     CalledFrom←{⊃{⍵↓⍨+/∧\'⎕'=⊃¨⍵}⍵}
 
 :EndNamespace
+

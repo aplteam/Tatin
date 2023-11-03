@@ -3,13 +3,13 @@
 ⍝ While `APLTreeUtils` was a namespace scipt designed to be included into pretty much every member of the
 ⍝ APLTree library, `APLTreeUtils2` is a class with shared methods. You are supposed to call those methods.
 ⍝ This has some major advantageous over the old approach:
-⍝ * It's possible to add new functions to `APLTreeUtils`. With the old approach there was always the possibility
+⍝ * It's possible to add new functions to `APLTreeUtils2`. With the old approach there was always the possibility
 ⍝   of a name clash, so adding new function was practically impossible.
 ⍝ * The sequence of fixing does not matter (though with lazy fixing that should not be an issue anymore anyway,
 ⍝    but at the time of writing it still is).
 ⍝ * Over the years we have seen rare `⎕IO` and `⎕ML` issues with `:Include`. We just avoid the possibility now.\\
 ⍝ For a list with the precise differences between `APLTreeUtils` and `APLTreeUtils2` see the project ReadMe on
-⍝ GitHub. Note that there are many. Most importantly, `APLTreeUtils2` requires Dyalog 18.0.
+⍝ GitHub. Note that there are many. Most importantly, `APLTreeUtils2` requires at least Dyalog 18.0.
 ⍝ Kai Jaeger\\
 ⍝ Homepage: <https://github.com/aplteam/APLTreeUtils2/>
 
@@ -17,11 +17,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'APLTreeUtils2' '1.2.1+62' '2023-10-05'
+      r←'APLTreeUtils2' '1.2.2+62' '2023-10-07'
     ∇
 
     ∇ History
-    ⍝ * 1.2.0 from 2023-10-05
+    ⍝ * 1.2.2 from 2023-10-09
+    ⍝   * Minor fix in CreateUUID
+    ⍝   * License corrected
+    ⍝ * 1.2.1 from 2023-10-05
     ⍝   * Bug fix in `Create_UUID`
     ⍝ * 1.2.0 from 2023-05-08
     ⍝   * Bug fix: version number corrected
@@ -302,7 +305,7 @@
     ∇ r←Create_UUID
     ⍝ Produces a UUID
       :Access Public Shared
-      r←'-'@(4+5×⍳4)⊢(⎕D,⎕C ⎕A)[4{9+|⍵}@20⊢5@15?36⍴16]
+      r←'-'@(4+5×⍳4)⊢(⎕D,⎕C ⎕A)[4(9+|)@20⊢5@15?36⍴16]
     ∇
 
     ∇ r←{type}Base64 txt;charset

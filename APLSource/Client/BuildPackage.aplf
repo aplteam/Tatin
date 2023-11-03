@@ -17,7 +17,7 @@
 ⍝      Otherwise the given version and build number rule (the build number is not bumped).
 ⍝   The package config file is updated as a side effect.
  :If 'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
-     'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
+     'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=##.APLTreeUtils2.ToNum 2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
  :EndIf
  parms.projectPath←RemoveFileProtocol parms.projectPath
  parms.projectPath←⊃1 ⎕NPARTS ##.FilesAndDirs.AddTrailingSep parms.projectPath

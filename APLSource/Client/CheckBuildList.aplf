@@ -14,12 +14,12 @@
  filename1←folder,Reg.BuildListFilename
  filename2←folder,Reg.DependenciesFilename
  :If ~force
-     ⍝ Tatin always writes the dependency file first and the build list next to file,
-     ⍝ yet the timestamps in the milliseconds sometimes pretend it to be the other way round.
-     ⍝ Therefore we add one second to make sure that we only re-build the build list when the
-     ⍝ dependency file has really been modified by a user with an editor.
-     ts1←1 GetFileTime filename1
-     ts2←GetFileTime filename2
+     ⍝ Tatin always writes first the dependency file and only then the build list to the disk,
+     ⍝ yet the timestamps in the milliseconds sometimes pretend it to be the other way round (Windows).
+     ⍝ Therefore we add one second for the build list to make sure that we only re-build the build list
+     ⍝ when the dependency file has really been modified by a user with an editor.
+     ts1←GetFileTime filename1
+     ts2←1 GetFileTime filename2
  :EndIf
  tree←ReadBuildList filename1
  deps←ReadDependencyList filename2

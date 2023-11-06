@@ -95,7 +95,7 @@ Note that by design new versions always comprehend both the server and the clien
 
 ### Developing with a running server
 
-You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the coder is doing, and at the same time, any changes and additions would be added to the project by Link.
+You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the code is doing, and at the same time, any changes and additions would be added to the project by Link.
 
 Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed then Tatin would ask you whether you want to start the server automatically -- that is the server we talking about, **no** https://test.tatin.dev
 
@@ -128,7 +128,7 @@ These will call the Tatin functions that perform the real actions.
 
 #### Error trapping
 
-Keep in mind that error trapping is active, so when you change a function and inject a typo it will trigger it once your code gets executed.
+Keep in mind that error trapping is active, so when you change a function and inject a typo this will trigger error trapping  once your code gets executed.
 
 If there is any danger of you locking horns with error trapping consider putting this into `OnRequest`:
 
@@ -139,14 +139,13 @@ Also, make `⎕TRAP` a local variable in `OnRequest`.
 `⍝TODO⍝` is a reminder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.
 
 
-
 ### Developing with two sessions, server and client
 
 When the test cases are executed the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.
 
-* If the user answers this with a "yes" and instance 
+If the user answers this with a "yes" an instance of the server is 
 
-You must know exactly what you are doing, otherwise, you are likely to loose code.
+You must know exactly what you are doing, otherwise you are likely to loose code.
 
 | **To be enhanced** |
 
@@ -196,3 +195,4 @@ The text shown on the web page is defined in the document "Licencing.html" in th
 #### A "LICENSE" file
 
 By convention a file named "LICENSE" when placed in the root of the project will be copied automatically to the root of a package when build by `BuildPackage`. This convention is independent from the INI file.
+

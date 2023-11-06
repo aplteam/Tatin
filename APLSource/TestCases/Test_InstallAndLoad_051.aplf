@@ -1,4 +1,4 @@
- r←Test_InstallAndLoad_051(stopFlag batchFlag);⎕TRAP;targetPath
+ r←Test_InstallAndLoad_051(stopFlag batchFlag);⎕TRAP;targetPath;msg;rc;en;res1;res2;res3
 ⍝ Install and load two packages of which the second brings in a better version of the first one as dependency (was a bug)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,15 +8,20 @@
 
  targetPath←∆GetTempDir ⍬
 
- {}TC.InstallPackages'[localhost]aplteam-APLProcess-0.2.10'targetPath
- {}TC.InstallPackages'[localhost]example-Boo-1.0.0'targetPath
+ res1←TC.InstallPackages'[localhost]aplteam-APLProcess-0.2.10'targetPath
+ →T.GoToTidyUp(,⊆'aplteam-APLProcess-0.2.10')≢res1
+ res2←TC.InstallPackages'[localhost]example-Boo-1.0.0'targetPath
+ →T.GoToTidyUp(,⊆'example-Boo-1.0.0')≢res2
 
- {}TC.LoadDependencies targetPath #.TEMP
+ res3←TC.LoadDependencies targetPath #.TEMP
+ →T.GoToTidyUp'#._tatin.example_Boo_1_0_0' '#._tatin.aplteam_APLProcess_0_3_0'≢⍕¨res3
+
  →T.GoToTidyUp'0.3.0'≢{⍵/⍨3>+\'.'=⍵}2⊃#.TEMP.APLProcess.Version
  →T.GoToTidyUp'0.3.0'≢{⍵/⍨3>+\'.'=⍵}2⊃#.TEMP.Boo.Version
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir targetPath
+ (rc en msg)←F.RmDir targetPath
+ msg Assert 0=rc
 ⍝Done

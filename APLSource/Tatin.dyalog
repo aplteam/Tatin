@@ -842,7 +842,7 @@
 
     ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms
       :If 'Win'≡TC.##.APLTreeUtils2.GetOperatingSystem ⍬
-          'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
+          'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=0 TC.##.APLTreeUtils2.ToNum 2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
       :EndIf
       (sourcePath targetPath)←Arg.(_1 _2)
       prompt←0
@@ -1226,7 +1226,7 @@
       {}⎕SE._Tatin.APLTreeUtils2.GoToWebPage tatinURL,'/v1/documentation'
     ∇
 
-    ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx;verboseWas;totalNoOf
+    ∇ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx;verboseWas
       r←''
       verboseWas←TC.∆VERBOSE
       TC.∆VERBOSE←Arg.verbose
@@ -1249,8 +1249,7 @@
           ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
       :EndIf
       :Trap 0
-          totalNoOf←Arg.nobetas TC.LoadPackages identifier targetSpace
-          noOf←1+','+.=identifier
+          noOf←Arg.nobetas TC.LoadPackages identifier targetSpace
           r←(⍕noOf),' package',((1≠noOf)/'s'),' loaded into ',targetSpace
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
@@ -2630,4 +2629,3 @@
     CalledFrom←{⊃{⍵↓⍨+/∧\'⎕'=⊃¨⍵}⍵}
 
 :EndNamespace
-

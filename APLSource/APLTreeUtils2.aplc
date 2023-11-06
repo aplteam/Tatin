@@ -17,10 +17,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'APLTreeUtils2' '1.2.2+62' '2023-10-07'
+      r←'APLTreeUtils2' '1.3.0+62' '2023-11-05'
     ∇
 
     ∇ History
+    ⍝ * 1.3.0 from 2023-11-05
+    ⍝   * `ToNum` now accepts a left argument which is returned in case the right argument is an empty vector.
+    ⍝   * New methods: `BitsToInt` and `IntToBits`
     ⍝ * 1.2.2 from 2023-10-09
     ⍝   * Minor fix in CreateUUID
     ⍝   * License corrected
@@ -70,10 +73,16 @@
       r←0 2∊⍨10|⎕DR y
     ∇
 
-    ∇ r←ToNum y
-    ⍝ Transforms `y` into number(s)
+    ∇ r←{default}ToNum y
+    ⍝ Transforms `y` into number(s).\\
+    ⍝ In case `y` is empty `default` is returned which defaults to ⍬ (empty numeric vector).
       :Access Public Shared
-      r←⊃(//)⎕VFI y
+      :If 0=≢y
+      :AndIf 0<⎕NC'default'
+          r←default
+      :Else
+          r←⊃(//)⎕VFI y
+      :EndIf
     ∇
 
     ∇ r←IsScripted y
@@ -422,5 +431,19 @@
           cats←⊃∘(,/)∘((⊂'')∘,)              ⍝ catenate zero or more strings
           cats''∘four¨24 part 8 bits ⍵
       }
+
+    ∇ r←BitsToInt y
+    ⍝ Unsigned
+      :Access Public Shared
+      r←(32⍴2)⊥⌽32↑y
+    ∇
+
+
+    ∇ r←IntToBits y
+    ⍝ Unsigned
+      :Access Public Shared
+      r←⌽(32⍴2)⊤y
+    ∇
+
 
 :EndClass

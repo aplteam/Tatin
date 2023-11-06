@@ -697,7 +697,7 @@ Loads all dependencies, if any, as well into `(#|⎕SE)._tatin` but does _not_ c
 
 By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as `⍺`.
 
-Returns the number of packages installed, including dependencies.
+Returns the number of principal packages installed.
 
 Note that the package ID(s) might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
 
@@ -851,5 +851,6 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 

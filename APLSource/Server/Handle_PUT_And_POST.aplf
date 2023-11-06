@@ -11,6 +11,7 @@
  :EndIf
  :If G.Credentials AcceptCredential apiKey groupName
      :If 0=≢'email'Reg.GetGroupData G.RegistryPath groupName
+     :AndIf 0 G.INI.Get 'CONFIG:EnforceEmailAddress'
          response←request RespondWithHTML 400 'No email address defined' 'You cannot publish without defining an email address for your group.'
      :Else
          :If Reg.IsValidPackageID_Complete request.RequestTarget

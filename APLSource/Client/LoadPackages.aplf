@@ -49,7 +49,7 @@
  :EndTrap
  →(0=≢paths)/0
  :Trap Reg.ErrorNo
-     loaded←LoadDependencies tempFolder targetSpace
+     r←≢loaded←LoadDependencies tempFolder targetSpace
  :Else
      qdmx←⎕DMX
      ⎕DL 0.01
@@ -58,7 +58,6 @@
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
  ⎕DL 0.01
- r←≢F.ListDirs tempFolder,'/'
  :If ~MyUserSettings.caching
      list←F.ListDirs tempFolder
      :If 0=≢list                                                ⍝ Anything? At all?!

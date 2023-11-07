@@ -1,0 +1,9 @@
+ {r}←HandleRunFunction dummy;myZip;zipFilename
+⍝ Copies the "Run.aplf" function and also creates a ZIP file for it
+ r←0
+ './Dist/'⎕NCOPY⍠('IfExists' 'Replace')⊣'Run.aplf'
+ zipFilename←'./Dist/Run.zip'
+ myZip←⎕NEW ##.ZipArchive(,⊂zipFilename)
+ F.PWD myZip.Add'Run.aplf'
+ myZip.Dispose
+⍝Done

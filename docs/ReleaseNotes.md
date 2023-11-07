@@ -12,6 +12,18 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.103.0 from 2023-11-04
+
+* No action required but note that the result of the API function `LoadPackages` has changed.
+
+## Version 0.102.3 from 2023-10-13
+
+* No action required
+
+## Version 0.102.2 from 2023-10-09
+
+* No action required
+
 ## Version 0.102.1 from 2023-10-07
 
 * Most importantly, a bug fix in `]Tatin.CiderUpdate`
@@ -132,6 +144,11 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
+
+
+
+
 
 
 

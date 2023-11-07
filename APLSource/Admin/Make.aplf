@@ -26,7 +26,7 @@
      :EndIf
  :EndIf
 
- path←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files\StartupSession\CiderTatin\Tatin'
+ path←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files\SessionExtensions\CiderTatin\Tatin'
  :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in the version-agnostic folder?
  :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live there?
      file1←path,'/Tatin.dyalog'
@@ -89,6 +89,7 @@
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
+ HandleRunFunction ⍬
  UpdateTestServerAssets ⍬
  {}⎕SE.Link.Refresh'#.Tatin'
  :If CopyTatinClientToUserDocuments batchFlag

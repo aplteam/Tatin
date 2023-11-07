@@ -19,6 +19,7 @@ And if you like the project, but just don't have time to contribute, that's fine
 - [Reporting Bugs](#reporting-bugs)
 - [Suggesting Enhancements](#suggesting-enhancements)
 
+
 ## Code of Conduct
 
 We don't have one, and we don't need one. APLers are a friendly species.
@@ -48,6 +49,7 @@ When contributing to this project, you must agree that you have authored 100% of
 
 If you want to contribute then looking at the document ["Tatin for contributors"](https://tatin.dev/Assets/docs/TatinForContributors.html) is a must.
 
+
 ### Reporting Bugs
 
 
@@ -70,7 +72,6 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 
 > You must never report security-related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public. Instead sensitive bugs must be sent by email to <kai@aplteam.com>, probably encrypted.
 
-
 We use GitHub issues to track bugs and errors. If you run into an issue with the project:
 
 * Open an [Issue](/issues/new). (Since we can't be sure at this point whether it is a bug or not, we ask you not to talk about a bug yet and not to label the issue.)
@@ -86,8 +87,6 @@ Once it's filed:
 - The project team will label the issue accordingly.
 - A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will ask you for those steps and label the issue as `needs-repro`. Bugs with the `needs-repro` tag will not be addressed until they are reproduced.
 - If the team is able to reproduce the issue, it will be labelled as a `bug`, as well as possibly other labels (such as `critical`), and the issue will be left to be implemented by someone (it could be your first code contribution?!).
-
-
 
 
 ### Suggesting Enhancements
@@ -115,4 +114,5 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/apltea
 
 
 ## Attribution
+
 This guide is based on the https://contributing.md/

@@ -5,7 +5,8 @@
 
  stop←0
  (rc msg)←2↑stop ∆UCMD'LoadDependencies [MyUCMDs]foo'
- →T.PassesIf rc=911
+ →T.PassesIf 0≠rc
+ →T.PassesIf∨/'Folder does not exist:'⍷msg
  →T.PassesIf'/MyUCMDs/foo'{≡/⎕C ⍺((-≢⍺)↑⍵)}F.EnforceSlash msg
 
  R←T._OK

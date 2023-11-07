@@ -54,11 +54,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.10.2+52' '2023-04-09'
+      r←'CodeCoverage' '0.10.3+52' '2023-06-23'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 0.10.3 from 2023-04-23
+    ⍝   * Bug fix: Instance names could not be assigned to "ignore"
     ⍝ * 0.10.2 from 2023-04-09
     ⍝   * On non-Windows platforms the file access matrix needs setting to avoid problems
     ⍝ * 0.10.1 from 2023-04-08
@@ -137,7 +139,7 @@
         ∇ r←Get
           r←','(≠⊆⊢),_ignore
         ∇
-        ∇ set value;v;b;v2;noOf
+        ∇ set value;v;noOf
           :If 0=noOf←+/∧\1=≡¨value.NewValue
               v←∊value.NewValue
           :Else
@@ -145,10 +147,6 @@
           :EndIf
           'Must be character vector'⎕SIGNAL 11/⍨' '≠1↑0⍴v
           ('Has invalid characters',b/v)⎕SIGNAL 11/⍨∨/b←~v∊APL_Chars,',⎕#.'
-          v2←','(≠⊆⊢),v
-          :If ∨/~b←0<⎕NC⊃v2
-              11 ⎕SIGNAL⍨'Unknown names: ',⊃{⍺,',',⍵}/(~b)/v2
-          :EndIf
           _ignore←v
         ∇
     :EndProperty

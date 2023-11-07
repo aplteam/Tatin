@@ -1,4 +1,4 @@
- r←{what}GetGroupData(path groupName);dcfFilename;dcfTie;markdown;email;folder
+ r←{what}GetGroupData(path groupName);dcfFilename;dcfTie;markdown;email;folder;cred;ind
 ⍝ Returns the data saved for a group as a matrix:
 ⍝ [;1] The name
 ⍝ [;2] The corresponding data\\
@@ -16,6 +16,12 @@
      dcfTie←dcfFilename ⎕FSTIE 0
      markdown←⎕FREAD dcfTie 3
      email←⎕FREAD dcfTie 4
+     :If 0=≢email
+         cred←##.Server.ReadCredentialFile ##.Server.G.RegistryPath,'/Credentials.csv'
+         ind←cred[;1]⍳⊂groupName
+     :AndIf ind≤≢cred
+         email←4⊃cred[ind;],'' ''  ⍝ Paranoia because of format change in 2023-11
+     :EndIf
      r←2 2⍴'markdown'markdown'email'email
      ⎕FUNTIE dcfTie
      :If 0<⎕NC'what'

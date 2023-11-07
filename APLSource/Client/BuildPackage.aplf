@@ -16,6 +16,9 @@
 ⍝      If no build number is specified the original build number is taken and bumped.
 ⍝      Otherwise the given version and build number rule (the build number is not bumped).
 ⍝   The package config file is updated as a side effect.
+ :If 'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
+     'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=##.APLTreeUtils2.ToNum 2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
+ :EndIf
  parms.projectPath←RemoveFileProtocol parms.projectPath
  parms.projectPath←⊃1 ⎕NPARTS ##.FilesAndDirs.AddTrailingSep parms.projectPath
  cfg_←ReadPackageConfigFile parms.projectPath
@@ -43,7 +46,7 @@
  :If 0<≢cfg.assets
      cfg.assets←{1=≢⍵:⊃⍵ ⋄ 1↓⊃,/',',¨⍵}ProcessAssetsProp parms.projectPath cfg.assets
  :EndIf
- ⍝ CreateAPIfromCFG cfg   ⍝TODO⍝ Should we implement this?!
+ ⍝ CreateAPIfromCFG cfg   ⍝TODO⍝ Should we implement this?! Yes we should!
  :If ≢/{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}¨cfg cfg_
      WritePackageConfigFile parms.projectPath cfg
  :EndIf

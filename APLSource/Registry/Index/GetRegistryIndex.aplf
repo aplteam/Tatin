@@ -1,6 +1,6 @@
  r←{nested}GetRegistryIndex path;filename;list
 ⍝ In a managed Tatin Registry there must be a file "tatin_index.txt".
-⍝ In a local un-managed Registry there is none, so we list all directories
+⍝ In a local un-managed Registry there is none.
 ⍝ By default a simple character vector (⎕UCS 10-separated) is returned.
 ⍝ You may change this by specifying a 1 as `⍺`.
  nested←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'nested'
@@ -8,5 +8,6 @@
  :If 0<##.F.IsFile filename
      r←⊃##.F.NGET filename nested
  :Else
-     r←(1+≢path)↓¨##.F.ListDirs path
+     r←(1+≢path)↓¨##.F.ListDirs path  ⍝ It's a local Registry, and it is not managed, se we go for directories
  :EndIf
+⍝Done

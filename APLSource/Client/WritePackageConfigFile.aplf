@@ -1,34 +1,34 @@
- {cfg}←{initializeFlag}WritePackageConfigFile(path cfg);qdmx;cfg_file;tmp
-⍝ Write package config file to disk.
-⍝ By default several properties are checked and an error is thrown in case something is not quite right,
-⍝ This can be changed by passing a 1 as ⍺. In this case two checks are NOT perfortmed:
-⍝ * "source" might be empty
-⍝ * "assets" is ignored, and therefore might not exist
- initializeFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'initializeFlag'
+{cfg}←{check}WritePackageConfigFile(path cfg);qdmx;cfg_file;tmp
+⍝ Write package config file to disk.\\
+⍝ By default several properties are checked and an error is thrown in case something is not quite right.\\
+⍝ This can be changed by passing a 0 as ⍺. In this case the checks are **not** performed.
+ check←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'check'
  cfg←InitPackageConfig cfg
- :If 0=initializeFlag
+ :If check
      '"source" must not be empty'Assert 0<≢cfg.source
  :EndIf
  '"source" must be simple'Assert 1=|≡cfg.source
  '"source" must be character'Assert' '=1↑0⍴cfg.source
  path←⊃1 ⎕NPARTS path,'/'
  cfg_file←path,CFG_Name
- {}ValidateVersion cfg.version
- cfg←ValidatePackageFiles cfg
- cfg←initializeFlag ValidateOSprops cfg
- cfg←ValidateTags cfg
- cfg←ValidateAPI cfg
- cfg←ValidateDocumentation cfg
- :If 0=≢cfg.license
-     cfg.license←MyUserSettings.license
+ :If check
+     {}ValidateVersion cfg.version
+     cfg←ValidatePackageFiles cfg
+     cfg←check ValidateOSprops cfg
+     cfg←ValidateTags cfg
+     cfg←ValidateAPI cfg
+     cfg←ValidateDocumentation cfg
+     :If 0=≢cfg.license
+         cfg.license←MyUserSettings.license
+     :EndIf
+     cfg←ValidateMaintainer cfg
+     cfg←path ValidateFiles cfg
+     ⍝ Note that we cannot validate the license, that's up to the server.
+     'Invalid: "assets" - not a path'Assert~','∊cfg.assets
+     cfg.assets←path PolishAssetsPaths cfg.assets
+     path ValidateAssets cfg.assets
+     {}path CheckAssetsExist cfg.assets
  :EndIf
- cfg←ValidateMaintainer cfg
- cfg←path ValidateFiles cfg
- ⍝ Note that we cannot validate the license, that's up to the server.
- 'Invalid: "assets" - not a path'Assert~','∊cfg.assets
- cfg.assets←path PolishAssetsPaths cfg.assets
- path ValidateAssets cfg.assets
- {}path CheckAssetsExist cfg.assets
  'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg.name
  tmp←cfg_file,'.tmp'
  :Trap 0

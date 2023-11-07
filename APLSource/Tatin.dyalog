@@ -1,6 +1,6 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.74.0 - 2023-10-07
+⍝ * 0.76.0 - 2023-11-03
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -455,7 +455,7 @@
           :If 1 TC.YesOrNo msg
               version←TC.UpdateClient tag folder
               :If 0<≢version
-                  ⎕CMD '"',folder,'/Assets/docs/ReleaseNotes.html"'
+                  ⎕CMD'"',folder,'/Assets/docs/ReleaseNotes.html"'
                   r←'Tatin updated on disk to ',version
                   r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
               :EndIf
@@ -467,6 +467,7 @@
               :AndIf 1 TC.C.YesOrNo q
                   {}TC.F.RmDirByForce folder2
               :EndIf
+              r←'Tatin successfully updated to version ',(1↓tag),' in ',folder2
           :EndIf
       :EndIf
     ∇
@@ -840,6 +841,9 @@
     ∇
 
     ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms
+      :If 'Win'≡TC.##.APLTreeUtils2.GetOperatingSystem ⍬
+          'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=0 TC.##.APLTreeUtils2.ToNum 2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
+      :EndIf
       (sourcePath targetPath)←Arg.(_1 _2)
       prompt←0
       zipFilename←''
@@ -1246,7 +1250,7 @@
       :EndIf
       :Trap 0
           noOf←Arg.nobetas TC.LoadPackages identifier targetSpace
-          r←(⍕noOf),' package',((1≠noOf)/'s'),' (including dependencies) loaded into ',targetSpace
+          r←(⍕noOf),' package',((1≠noOf)/'s'),' loaded into ',targetSpace
       :Else
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX

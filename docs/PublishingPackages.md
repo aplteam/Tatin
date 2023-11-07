@@ -116,11 +116,17 @@ API keys are saved in the user settings file. The quickest and yet safe way to e
 
 ##### Server
 
-Credentials are saved in the file "Credentials.csv" in the `Registry\` folder in the server's home folder.
+Credentials are saved in the file "Credentials.csv" in the Registry's home folder.
 
 #### Credentials for your own Tatin Server 
 
 If you run your own Tatin Server we suggest that you create a UUID and use that as an API key. 
+
+A> ### Email address is required
+A>
+A> Note that having a valid API key is not enough for publishing a package: you must also define an email address for your group.
+A>
+A> For that click "Groups > {your-group-name} > Create" and add at least an email address.
 
 For an API key to be accepted by a Tatin Server, it must be added to a file `Credentials.txt` in the Registry's root directory. 
 
@@ -136,25 +142,24 @@ or
 *,<api-key>
 ```
 
-Instead of the "`,`" you can also use "`=`" as separator but that is deprecated.
-
 If the server finds such a file it will perform the following actions:
 
 * Take the data and convert it to a different format
 * Delete rows from `Credential.csv` that share a group name with `Credentials.txt`
-* Add the data to `Credentials.cvs` 
-* Delete the file `Credentials.txt`.
+* Create a Salt for every API key in `Credentials.txt`
+* Convert every API-key and its Salt into a hash and add them together with the according group name to `Credentials.csv`
+* Delete the file `Credentials.txt`
 
-The format of the file `Credentials.csv` is this:
+The format of the file `Credentials.csv` is:
 
 ```
-<group-name<,<api-key-hash>,<salt>
+<group-name>,<api-key-hash>,<salt>
 *,<api-key-hash>,<salt>
 *
 ```
 
-* In the first case, anybody who provides the API key the hash was produced from, can publish packages for that group.
-* In the second case, the password the hash was created from, is a kind of master password: it allows the creation of packages with _any_ group name.
+* In the first case, anybody who provides the API key the hash was produced from can publish packages for that group.
+* In the second case, the password the hash was created from is a kind of master password: it allows the creation of packages with _any_ group name.
 * The third case means that no API key is required for any (remaining) group(s).
 
 The different scenarios can be mixed:
@@ -180,7 +185,7 @@ This is interpreted as "require API keys for the groups <group1> and <group2> bu
 Finally, you can allow anybody to publish packages under a particular group name without providing an API key:
 
 ```
-<group1>,<hash1>
+<group1>,<hash1>,<email-address>
 <group2>,
 *,<hash3>
 ```
@@ -196,9 +201,13 @@ This means:
 
 ##### Editing the file "Credentials.csv" 
 
-There is only one reason why you might need to change the file `Credentials.csv`: when a group name must be deleted for some reason.
+There is one reasons why you might need to change the file `Credentials.csv`: when a group name must be deleted for some reason.
 
 If a new group needs to be added, or a new API key needs to be assigned to an existing group, you must create a file `Credentials.txt`, see above.
+
+##### Comments
+
+The files `Credentials.txt` as well as `Credentials.csv` both allow comment lines: any line that has a `;` as the very first character is regarded a comment.
 
 
 ## Publishing
@@ -386,3 +395,9 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
+
+
+
+
+

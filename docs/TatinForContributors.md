@@ -27,8 +27,9 @@ You need one of:
 
 * Windows
 * Linux
+* Mac OS
 
-AIX is not supported.
+AIX is not supported. The PI is not officially supported but it will probably work anyway.
 
 You also need to have Git installed.
 
@@ -39,6 +40,8 @@ Note that Tatin is managed by the [Cider project management tool](https://github
 If you are not familiar with Cider you are advised to spend some time playing with it before using it for serious work. 30 minutes should suffice.
 
 Though it is possible making changes or adding code to Tatin without Cider, using Cider makes it significantly easier. Also, the build process requires Cider.
+
+Having said this, you don't neccessarily need to build a new version for creating a pull request, so you might get away without Cider, but using Cider is certainly recommended.
 
 
 ## How to work on Tatin
@@ -111,13 +114,13 @@ If you just want to execute all test cases before pushing your changes to GitHub
 
 Executing `RunTests` means that on Windows you will be asked whether a test server should be started. Usually, you will answer with a "Y", and that lets the test suite start another instance of Dyalog, and run a test server in that instance.
 
-On non-Windows platforms you will be be asked to start the server yourself and press <enter> once that is done.
+On non-Windows platforms you will be be asked to start the server yourself and press `<enter>` once that has been done.
 
 Developers might also run into one of two common scenarios: 
 
 1. During development you might want to execute all tests or just a specific group (or groups) of tests. 
 
-   You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like closing an edit windows etc.
+   You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like closing an edit window etc.
 
    When a test fails then the test framework stops, and the developer can investigate on the spot.
 
@@ -175,7 +178,7 @@ The `RunTests` function performs these tasks:
 
 * Change the current directory
 * Establish all required references
-* Instantiate the `Tester2` class under the name `T` 
+* Instantiate the `Tester2` class as `T` 
 * Start a local Tatin test server if the user confirms this
 * Call the `T.Run` function
 
@@ -217,9 +220,9 @@ Before executing any test case call this function:
 #.Tatin.TestCases.Prepare
 ```
 
-This changes the current directory, establishes all required references and instantiates the `Tester2` class under the name `T`.
+This changes the current directory, establishes all required references and instantiates the `Tester2` class as `T`.
 
-You can now list all groups of tests:
+You can now list the groups:
 
 ```
       T.ListGroups
@@ -268,7 +271,7 @@ Notes:
 * The wildcard character (`*`) can be used to identify a group
 * The first comment line after any header lines is displayed
 
-You may specify `'view'` as the left argument to force the result of that function into a read-only edit window.
+You may specify `'view'` as the left argument to force the result of that function into a read-only `⎕ED` window.
 
 Let's assume that you want to execute all tests of the group `API`:
 
@@ -327,7 +330,7 @@ When running the test suite with the batch flag set, as `RunBatchTests` does, is
 
   If you need to track down a bug then you don't want this: in that case, pass a `1` as the left argument: this is treated as "debug" flag.
 
-Of course `RunBatchTests` does not execute any test cases that require a human in front of the monitor, but the number of such tests is very small anyway.
+Of course `RunBatchTests` does not execute any test cases that require a human in front of the monitor, but the number of such tests is small anyway.
 
 `RunBatchTests` checks the command line:
 
@@ -337,7 +340,7 @@ Of course `RunBatchTests` does not execute any test cases that require a human i
 
 * If `OFF2=1` was not specified a message is printed to the session, indicating success or failure.
 
-Note that `OFF=1` would kind of also work, but it would make Plodder `⎕OFF`, the underlying HTTP server uses by Tatin. That is for some things too early. For example you cannot get a code coverage report then.
+Note that `OFF=1` would kind of also work, but it would make Plodder `⎕OFF`, the underlying HTTP server used by Tatin. That might be too early. For example, you cannot get a code coverage report then.
 
 #### Running the test suite from a console or terminal
 
@@ -412,4 +415,5 @@ There is a function that creates a single HTML file from all the Tatin markdown 
 ```
 
 Now open that file with the word processor of your choice and use its spell-checking capabilities.
+
 

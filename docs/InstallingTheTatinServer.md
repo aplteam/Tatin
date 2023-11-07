@@ -289,7 +289,7 @@ For details see:
 
 ## Updating the Server
 
-Before updating the server **you must read the release notes!**. The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring several actions while the server is down for maintenance.
+Before updating the server **you must read the release notes!** The reason is that an update might be as easy as copying the workspace over while the server is running but as complex as requiring several actions while the server is down for maintenance.
 
 ### The Workspace
 
@@ -304,7 +304,7 @@ Naturally, the server will produce an error message for a short period during th
 
 Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. _Do not replace the INI file!_
 
-The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: quite several settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.
+The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: a number of settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.
 
 ## Assets
 
@@ -315,3 +315,4 @@ What kind of actions need to be taken, if any, is revealed by the release notes.
 First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+

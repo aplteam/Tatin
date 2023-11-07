@@ -1,4 +1,4 @@
- r←Test_Publish_062(stopFlag batchFlag);⎕TRAP;path;zipFileName;statusCode;errMsg;list
+ r←Test_Publish_062(stopFlag batchFlag);⎕TRAP;path;zipFileName;statusCode;errMsg;list;rc;msg
 ⍝ Attempts to publish a package that is a Cider project but we specify a different folder (takes precedence)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -13,6 +13,7 @@
 
 ∆TidyUp:
  F.DeleteFile zipFileName
- Assert 0=⊃F.RmDirByForce ∆GetServerRegistryFolder,'aplteam-Seven7Zip-9.0.1'
+ (rc msg)←F.RmDirByForce ∆TEMP_REGISTRY_FOLDER,'/aplteam-Seven7Zip-9.0.1'
+ msg Assert 0=rc
  ∆RecompileIndexOnServer
 ⍝Don

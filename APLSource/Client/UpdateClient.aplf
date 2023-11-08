@@ -1,6 +1,6 @@
  version←UpdateClient(tag targetFolder);request;client;data;redirect;data2;folder;tempFile;tno;run;targetStUp
 ⍝ Updates the client to the version indicated by `tag`, and returns the version number of the new version.\\
- 'Updating Tatin requires at least 20 MB WSSIZE'Assert 20<⌊⎕WA÷1024×1024
+ 'Updating Tatin requires at least 20 MB free memory'Assert 20<⌊⎕WA÷1024×1024
  version←''
  request←R.NewRequest 0
  request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Tatin-Client-',(1↓tag),'.zip'
@@ -8,12 +8,13 @@
  client.Host←'github.com'
  request.Headers,←⊂'User-Agent' 'aplteam'
  data←client R.SendAndReceive request
- 'Invalid HTTP status code'Assert 302≡data.StatusCode
+ ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert 302≡data.StatusCode
  redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
  redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
  client←R.NewClient 0
  (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
  data2←client R.SendAndReceive request
+ ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data2.StatusCode),' rather than the expected 200')Assert 200≡data2.StatusCode
  folder←F.GetTempSubDir'Tatin-Upgrade'
  tempFile←folder,'/',tag,'.zip'
  tno←tempFile ⎕NCREATE 0
@@ -22,24 +23,25 @@
  data2.Content←''
  tempFile ZipArchive.UnzipTo folder
 
-⍝ Now we need to catch the "Run" function
+⍝ Catch the "Run" function
  request←R.NewRequest 0
  request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
  client←R.NewClient 0
  client.Host←'github.com'
  request.Headers,←⊂'User-Agent' 'aplteam'
  data←client R.SendAndReceive request
- 'Invalid HTTP status code'Assert 302≡data.StatusCode
+ ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert 200≡data.StatusCode
  redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
  redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
  client←R.NewClient 0
  (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
  data2←client R.SendAndReceive request
+ ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data2.StatusCode),' rather than the expected 200')Assert 200≡data2.StatusCode
  run←'UTF-8'⎕UCS ⎕UCS data2.Content
  (⊂run)⎕NPUT folder,'/Run.aplf'
  ⎕NDELETE tempFile
 
-⍝ Now we move the new version from temp to the correct place
+⍝ Move the new version from temp to the target folder
  3 ⎕MKDIR targetFolder
  (targetFolder,'/..')⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
  :If ⎕NEXISTS folder,'/Run.aplf'

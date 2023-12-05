@@ -1,5 +1,6 @@
- {r}←{force}CheckBuildList folder;ts1;ts2;filename1;filename2;deps;tree;b;newTree;deps2;ind;deps_;msg
-⍝ Checks the last modification date of both the build list and the dependency file.\\
+ {r}←{force}CheckBuildList folder;ts_build;ts_deps;filenameBuild;filenameDeps;deps;tree;b;newTree;deps2;ind;deps_;msg
+⍝ Checks the modification dates of both the build list and the dependency file and also the consistancy
+⍝ of these files, and re-compiles the build list if this seems appropriate.\\
 ⍝ We distinguish here between level-1 packages and other packages (=dependencies).
 ⍝ The level-1 packages are called top-level packages.
 ⍝ If the dependency file was modified after the build list was saved:
@@ -7,37 +8,35 @@
 ⍝ * If a dependency package is missing, re-installation is required and therefore an error thrown\\
 ⍝ In a second step we check whether the two files are consistent. If not we try to recompile and
 ⍝ check again. If that does not help an error is thrown.\\
-⍝ In a second step we check whether the two files are consistent. If not we try to recompile and
-⍝ check again. If that does not help an error is thrown.
  force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}' force'
  folder←Reg.AddSlash folder
- filename1←folder,Reg.BuildListFilename
- filename2←folder,Reg.DependenciesFilename
+ filenameBuild←folder,Reg.BuildListFilename
+ filenameDeps←folder,Reg.DependenciesFilename
  :If ~force
      ⍝ Tatin always writes first the dependency file and only then the build list to the disk,
      ⍝ yet the timestamps in the milliseconds sometimes pretend it to be the other way round (Windows).
      ⍝ Therefore we add one second for the build list to make sure that we only re-build the build list
-     ⍝ when the dependency file has really been modified by a user with an editor.
-     ts1←GetFileTime filename1
-     ts2←1 GetFileTime filename2
+     ⍝ when the dependency file has really been modified by a user with an editor; the user won't be able
+     ⍝ to manage that within a single second.
+     ts_build←1 GetFileTime filenameBuild
+     ts_deps←GetFileTime filenameDeps
  :EndIf
- tree←ReadBuildList filename1
- deps←ReadDependencyList filename2
+ tree←ReadBuildList filenameBuild
+ deps←ReadDependencyList filenameDeps
  deps_←RemoveAlias¨deps
  :If r←force
- :OrIf r←ts2>ts1
-     :If F.IsFile filename1
+ :OrIf r←ts_deps>ts_build
+     :If F.IsFile filenameBuild
          b←deps_∊RemoveAlias¨tree[;2]                       ⍝ Check consistency
          :If ∨/~b
              ('Invalid entry: ',(⊃{⍺,', ',⍵}/(~b)/deps_),'; re-install!')Assert 0
          :EndIf
      :EndIf
-     0 CompileBuildList folder deps
+     1 CompileBuildList folder deps
  :EndIf
  :If 0∊deps∊tree[;2]
-     0 CompileBuildList folder deps
-     tree←ReadBuildList filename1
-     deps←ReadDependencyList filename2
+     tree←0 CompileBuildList folder deps
+     deps←ReadDependencyList filenameDeps
      deps_←RemoveAlias¨deps
      ('Build list and dependency list are incompatible in ',folder)Assert~0∊(Reg.RemoveMinorAndPatch¨deps_)∊Reg.RemoveMinorAndPatch¨tree[;2]
  :EndIf

@@ -17,7 +17,7 @@
  local.uri←∆TEMP_REGISTRY_FOLDER
  (1⊃ns.registries)←local
  json←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
- (⊂json) ⎕NPUT'./TestData/tatin-client.json' 1
+ (⊂json)⎕NPUT'./TestData/tatin-client.json' 1
 
  (rc msg res)←∆UCMD'Init ./TestData'
  Assert 0=rc
@@ -45,4 +45,6 @@
  :Else
      ##.Client.CommTools.Pause'Please start the Tatin server'
  :EndIf
+
+ T.exec_after_each_test←(⍕⎕THIS),'.CheckTempFolder'
 ⍝Done

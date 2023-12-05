@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD;ucScriptName
+ r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD;ucScriptName;forceClose
  ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
 ⍝ Install package(s) `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
@@ -20,7 +20,7 @@
  r←''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  identifiers←','(≠⊆⊢)identifiers
- EstablishEmptyPermanentConnections 0
+ forceClose←~EstablishEmptyPermanentConnections 0
  isUCMD←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}targetFolder
  :If ~isUCMD
      'Invalid target folder: must not contain "[]" (except for [MyUCMDs])'Assert~∨/'[]'∊targetFolder
@@ -67,7 +67,7 @@
          :EndIf
          :If '.zip'≡⎕C ¯4↑identifier
          :AndIf Reg.IsHTTP identifier
-             CloseConnections 1
+             CloseConnections forceClose
              'ZIP files cannot be installed via HTTP'Assert 0
          :EndIf
          PrintToSession'  Establish dependencies...'
@@ -83,10 +83,10 @@
              (targetFolder_,'/')(⎕NMOVE Reg.F.ExecNfunction)targetFolder_,'/',packageID,'/',ucScriptName
          :EndIf
      :EndFor
-     CloseConnections 0
+     CloseConnections forceClose
  :Else
      qdmx←⎕DMX
-     CloseConnections 1
+     CloseConnections forceClose
      :Trap 0 ⋄ F.RmDir tempDir ⋄ :EndTrap
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap

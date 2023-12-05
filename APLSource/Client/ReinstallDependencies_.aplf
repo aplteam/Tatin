@@ -1,4 +1,4 @@
- refs←{dry}ReInstallDependencies_ y;i;pkg;ref;msg;alias;identifier;tempDir;qdmx;p
+ refs←{dry}ReInstallDependencies_ y;i;pkg;ref;msg;alias;identifier;tempDir;qdmx;p;forceClose
  ;deps;installFolder;registry;noBetas;update;quiet
 ⍝ Re-installs all packages listd by `deps`, including any dependencies.\\
 ⍝ In case `dry` is 1 it reports to the session what it _would_ do.\\
@@ -15,7 +15,7 @@
  tempDir←F.GetTempSubDir''
  tempDir ⎕NCOPY installFolder,'/',Reg.DependenciesFilename                  ⍝ Copy the dependency file
  tempDir{0=≢⍵:shy←⍬ ⋄ ⍺∘{⍺ ⎕NCOPY ⍵}¨⍵}F.ListFiles installFolder,'/*.zip'   ⍝ Copy any ZIP files (packages)
- 1 EstablishRumbaClients ⍬
+ forceClose←1 EstablishRumbaClients ⍬
  p←(~quiet)∘PrintToSession
  :For i :In ⍳≢deps
      pkg←i⊃deps
@@ -40,4 +40,4 @@
  :Else
      'Establishing re-installed packages failed, therefore nothing was changed'Assert installFolder ReplaceFolderBy tempDir
  :EndIf
- CloseConnections 1  ⍝ We've set "keepOpen" when calling `EstablishRumbaClients`, so we need to enforce the close
+ CloseConnections forceClose

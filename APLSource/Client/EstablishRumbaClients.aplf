@@ -3,8 +3,11 @@
 ⍝ usually by InstallPackages (which is called by LoadPackages).
 ⍝ We keep a record of all pre-pepared Rumba-Client on the global variable ∆PermanentConnections.
 ⍝ This improves performance dramatically in case we have to communicate with a server several times.
-⍝ `keepOpen` can be used to tell CloseConnections to not close the connection unless the right argument says so.
+⍝ `r` is 0 if it did not do anything (typically because there are already connections established), and 1 otherwise.
+⍝ Use `keepOpen` in order to prevent and call to `CloseConnections` down the stack to close connections
+⍝ when you know that connections are still required later on.
  r←0
+ ⎕←⊃⎕xsi ⍝TODO⍝
  keepOpen←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'keepOpen'
  errCounter←0
  :If 0=⎕NC'∆PermanentConnections'
@@ -32,4 +35,5 @@
      :EndIf
      r←1
  :EndIf
+ ⎕←r  ⍝TODO⍝
 ⍝Done

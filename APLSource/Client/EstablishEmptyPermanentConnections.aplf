@@ -1,9 +1,11 @@
  {r}←EstablishEmptyPermanentConnections keepOpen
 ⍝ Establish PermanentConnections but without any connections yet:
 ⍝ we don't know whether we will need any.
-⍝ Returns always 0.
+⍝ Returns 0 in case there were no connections yet but 1 otherwise
  r←0
  :If 0=⎕NC'∆PermanentConnections'
      ∆PermanentConnections←⎕NS''
      ∆PermanentConnections.keepOpen←keepOpen
+ :ElseIf 0<≢∆PermanentConnections.⎕NL 9
+     r←1
  :EndIf

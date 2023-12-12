@@ -1,0 +1,29 @@
+ {report}←{parms}ConvertMarkdownFile filename;ns
+⍝ Converts the contents of `filename` to HTML5. The output filename equals `filename` except that
+⍝ the extension changes from `.md` to `.html`.\\
+⍝ This can be overwritten by specifying a parameter space as left argument (typically created
+⍝ by calling `CreateParms`) and setting `outputFilename`.\\
+⍝ Note however that when you specify `inputFilename` to anything but '' an error is
+⍝ generated. Other settings in parms are honoured.\\
+⍝ If no left argument is passed then defaults take place, in particular regarding the CSS.\\
+⍝ Note that by default `ConvertMarkdownFile` creates a fully-fledged HTML page.\\
+⍝ The result is either an empty text vector or a vector of text vectors. It may contain warnings or error
+⍝ messages. It's what is returned by `Init` on `ns.report`.
+ parms←{0=⎕NC ⍵:CreateParms ⋄ ⍎⍵}'parms'
+ :If 0≠≢parms.inputFilename
+ :AndIf parms.inputFilename≢filename
+     '"inputFilename" must not be specified'⎕SIGNAL 11
+ :EndIf
+ parms.inputFilename←FilesAndDirs.NormalizePath filename
+ parms.createFullHtmlPage←(1+¯1≡parms.createFullHtmlPage)⊃parms.createFullHtmlPage 1
+ :If 0=≢parms.outputFilename
+     parms.outputFilename←FilesAndDirs.NormalizePath∊(¯1↓⎕NPARTS filename),'.html'
+ :EndIf
+ ns←Init parms''
+ ns←Process ns
+ :If parms.createFullHtmlPage
+     ns.html←ns.parms MakeHTML_Doc ns.html
+ :EndIf
+ (⊂ns.html)⎕NPUT parms.outputFilename 1
+ report←ns.report
+⍝Done

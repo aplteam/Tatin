@@ -1,0 +1,19 @@
+ {r}←ns ShowHtml name;filename
+ :If './'≡2⍴name
+     name←(⊃1 ⎕NPARTS''),2↓name
+ :EndIf
+ :If '/'≠1⍴name
+ :AndIf ~':'∊name
+     filename←FilesAndDirs.EnforceSlash parms.homeFolder,'/Docs/',name,'.html'
+ :Else
+     filename←name
+ :EndIf
+ :If ⍬≢ns
+     A.GoToWebPage'file:///',filename
+ :Else
+     :If FilesAndDirs.IsFile filename
+         A.GoToWebPage'file:///',filename
+     :Else
+         6 ⎕SIGNAL⍨'File not found: "',name,'"'
+     :EndIf
+ :EndIf

@@ -1,0 +1,27 @@
+ r←ProcessBlockQuotes ns;parms;md;ns2;sa
+⍝ Processes any blockquotes recursively. That way they can contain **everything**, including blockquotes.
+ r←0
+ :If '> '≡2↑⊃ns.leadingChars
+     ns.noOf←ScanForBlockQuotes ns
+     parms←CreateParms
+     parms.bookmarkLink←0
+     parms.markdownStrict←ns.parms.markdownStrict
+     parms.verbose←0
+     parms.checkLinks←0
+     parms.checkFootnotes←0
+     parms.subTocs←0
+     parms.syntaxSugar←ns.parms.syntaxSugar
+     parms.lineNumberOffset←⊃ns.lineNumbers
+     md←ns.noOf↑ns.markdown
+     (1⊃md)←2↓1⊃md
+     (1↓md)←(2×'> '∘≡¨2↑¨1↓md)↓¨1↓md
+     sa←GetSpecialAttributes⊃md
+     (⊃md)←sa DropSpecialAttributes⊃md
+     ns2←Init parms md
+     ns2←Process ns2
+     ns.html,←(⊂'<blockquote',((0<≢sa)/' ',A.DLB sa),'>'),ns2.html,⊂'</blockquote>'
+     ns.report,←ns2.report
+     ns←Drop ns
+     r←1
+ :EndIf
+⍝Done

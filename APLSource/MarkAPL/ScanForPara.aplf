@@ -1,0 +1,18 @@
+ noOf←{dontCheckForBlockQuote}ScanForPara ns;buff;bool
+⍝ `noOf` : Number of lines, if any), the next paragraph will comprise.
+ dontCheckForBlockQuote←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dontCheckForBlockQuote'
+ :If 1≠noOf←+/∧\0=ns.emptyLines                                                          ⍝ How many lines until next empty line?
+ :AndIf 1≠noOf←noOf⌊¯1+⊃'='IotaSetextHeader noOf↑¨ns.(withoutBlanks markdown emptyLines) ⍝ Header (= syntax)
+ :AndIf 1≠noOf←noOf⌊¯1+⊃'-'IotaSetextHeader noOf↑¨ns.(withoutBlanks markdown emptyLines) ⍝ Header (- syntax)
+ :AndIf 1≠noOf←+/∧\~(noOf↑⊃¨ns.leadingChars)∊'|#='                                       ⍝ header, tables?
+ :AndIf 1≠noOf←+/∧\~(noOf↑⊃¨ns.leadingChars)∊'|#='                                       ⍝ HTML header, tables?
+ :AndIf 1≠noOf←+/∧\~{⊃⍴'^\s{0,3}[-+\*]\s'⎕S 0⊣⍵}¨noOf↑ns.markdown                        ⍝ bulleted list
+ :AndIf 1≠noOf←+/∧\~{⊃⍴'^\s{0,3}[0-9]{1,9}[.)] '⎕S 0⊣⍵}¨noOf↑ns.markdown                 ⍝ Ordered lists?
+ :AndIf 1≠noOf←+/∧\~{∨/({⍵⍴⍨3⌊≢⍵}⍵~' ')∘≡¨'***' '---' '___'}¨noOf↑ns.markdown            ⍝ Horizontal rulers?
+ :AndIf 1≠noOf←+/∧\~'```'∘{⍺≡(≢⍺)↑⍵}¨noOf↑ns.markdown                                    ⍝ Code block (``` syntax)
+ :AndIf 1≠noOf←+/∧\~'~~~'∘{⍺≡(≢⍺)↑⍵}¨noOf↑ns.markdown                                    ⍝ Code block (~~~ syntax)
+ :AndIf 1≠noOf←+/∧\'<<subtoc>>'∘≢¨⎕C noOf↑ns.markdown                                    ⍝ Sub TOCs
+ :AndIf 1≠noOf←+/∧\{0=≢'<pre\b[^>]*>' '<style\b[^>]*>' '<script\b[^>]*>'⎕S 0⊣⍵}¨noOf↑ns.leadingChars               ⍝
+ :AndIf ~dontCheckForBlockQuote
+     noOf←+/∧\~(noOf↑⊃¨ns.leadingChars)∊'|>#='                                           ⍝ Blockquote (>) MUST be the last check!
+ :EndIf

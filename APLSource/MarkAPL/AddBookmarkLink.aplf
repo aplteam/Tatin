@@ -1,0 +1,10 @@
+ anchor←AddBookmarkLink(level ns bookmarkName)
+⍝ Add ID and HREF if that is okay with ns.parms.bookmarkLink
+ anchor←''
+ :If 0<ns.parms.bookmarkLink
+ :AndIf ns.parms.bookmarkLink≥level
+     anchor,←' href="#',bookmarkName,'" id="',bookmarkName,'"'
+     ⍝ Make sure the class is assigned after ID/Href, otherwise you'll break `CheckInternalLinks`
+     anchor,←' class="autoheader_anchor"'
+     anchor←'<a',anchor,'>'
+ :EndIf

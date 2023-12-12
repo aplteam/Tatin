@@ -1,0 +1,18 @@
+ r←IdentifyListItems ns;max;buff;ind;b1;b2;b
+⍝ Takes "ns" as right argument and figures out how many items belong to the current list.
+⍝ Things are complicated by ...
+⍝ * the fact that lazyness is allowed.
+⍝ * lines might be glued together with a trailing `\` or divided by <<br>>.
+⍝ * Laziness and indentation might be mixed together.
+⍝ * Lists might be nested.
+⍝ Note that a single blank line between items is okay; only more than one empty line breaks a list definition.
+⍝ We know already where two blank lines occur (max).
+ r←max←{0=+/⍵:≢⍵ ⋄ ⍵⍳1}⍨1 1⍷ns.emptyLines      ⍝ Two empty lines stop a list dead in any case
+ buff←max↑ns.markdown
+ :If 0≠≢ind←(⍸max↑ns.emptyLines)~max     ⍝ We are interested in the lines after any empty line
+     b1←0=+/∧\' '=↑buff[ind+1]                 ⍝ If those are not indented they potentially break the list
+     b2←~IsHtmlList¨buff[ind+1]                ⍝ Which ones are not list items as such at all?
+     :If 0<+/b←b1∧b2
+         r←⊃b/ind
+     :EndIf
+ :EndIf

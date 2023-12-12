@@ -1,0 +1,9 @@
+ GetListBlock←{
+     bl←⍵
+     mask←~Between{⊃3>≢⍵:0 ⋄ (⊂3⍴⍵)∊'```' '~~~'}¨bl~¨' '
+     bl←(⌊/(~(≢bl)⍴ns.emptyLines)⌿+/∧\' '=↑bl)↓¨bl
+     (mask/bl)←HandleEscapedNewLines mask/bl
+     leadingBlanks←+/∧\' '=↑bl
+     drop←{⍵⌊⊃⍵}leadingBlanks
+     drop↓¨bl
+ }

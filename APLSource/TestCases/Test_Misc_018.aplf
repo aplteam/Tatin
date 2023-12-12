@@ -49,7 +49,8 @@
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.GoToTidyUp'Invalid entry:'{⍺≢(≢⍺)↑⍵}qdmx.EM
+     expected←'The build list in' 'refers to packages that are not installed:'
+     →T.GoToTidyUp~∧/∨/¨expected⍷¨⊂qdmx.EM
  :EndTrap
 
  r←T._OK

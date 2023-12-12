@@ -1,6 +1,5 @@
 [parm]:title             = 'Release Notes'
 [parm]:toc               = 2
-[parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
 
 
@@ -11,6 +10,13 @@
 Tatin release notes contain information regarding actions that need to be executed before a new version can be used, or oustandingly important pieces of information.
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
+
+## Version 0.103.1 from 2023-12-05
+
+  * The Tatin client does not rely on .NET Framwork on Windows anymore, .NET (formerly known as .NET Core) will do.
+  * `UpdateTatin` now checks all HTTP status codes and reports any problems early and in detail.
+  * Bug fixes
+    * `CheckBuildList` got the timestamps wrong when checking the dependency file and the build list
 
 ## Version 0.103.0 from 2023-11-04
 
@@ -144,6 +150,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

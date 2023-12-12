@@ -1,0 +1,22 @@
+ ns←CalculateHeaderNumbers ns;nos;current;level;lastLevel;i;bool;headers
+ current←6⍴0
+ :If ∧/bool←CheckHeaders ns
+     bool←ns.headers[;1]∊{1=≢⍵:⍳⍵ ⋄ ⍵}ns.parms.numberHeaders
+     :If 0≠≢headers←bool⌿ns.headers
+         headers[;1]-←(⊃headers)-1
+         nos←(⊃≢headers)⍴0
+         lastLevel←1
+         :For i :In ⍳⊃≢headers
+             level←headers[i;1]
+             :If lastLevel>level
+                 (level↓current)←0
+             :EndIf
+             current[level]+←1
+             nos[i]←⊂level↑current
+             lastLevel←level
+         :EndFor
+         (bool⌿ns.headers)[;4]←{⊃,/(⍕¨⍵),¨'.'}¨nos
+     :EndIf
+ :Else
+     ns.report,←⊂'Headers are ill-nested and need correction - check level(s) ',⍕⍸~bool
+ :EndIf

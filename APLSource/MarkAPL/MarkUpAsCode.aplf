@@ -1,0 +1,8 @@
+ MarkUpAsCode←{
+     (code specialAttrs infoString)←⍵
+     code←,⊆code
+     st←'<pre',((0≠≢infoString)/' class="',infoString,'"'),' tabindex="0"><code',({0=≢⍵:⍵ ⋄ ' ',⍵}A.DMB specialAttrs),'>'    ⍝ Start tag
+     (1⊃code)←st,1⊃code
+     ((≢code)⊃code),←'</code></pre>'
+     code
+ }

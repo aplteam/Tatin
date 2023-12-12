@@ -11,7 +11,7 @@
 
 ## Licencing
 
-### The principal Tatin server
+### https://tatin.dev
 
 If you want to publish packages to the Principal Tatin server (<https://tatin.dev>) then your package _must carry_ a property `license`, and its value  must be one of the licenses listed on the web page. All licenses that will be accepted offer a great deal of freedom to a user of a package: there are almost no restrictions.
 
@@ -395,6 +395,7 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
 
 
 

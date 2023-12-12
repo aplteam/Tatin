@@ -1,0 +1,37 @@
+ name←{ns}GetBookMarkNameFromCaption(txt specialAttrs)
+⍝ Remove all formatting, links, etc.
+⍝ Remove everything between <>, () and [].
+⍝ Remove all punctuation except underscores, hyphens, and periods.
+⍝ Remove all HTML &{word}: entities
+⍝ Remove all code.
+⍝ Remove HTML.
+⍝ Remove leading and trailing spaces.
+⍝ Replace all remaining spaces with hyphens.
+⍝ Convert all alphabetic characters to lowercase.
+⍝ Remove everything up to the first letter or `∆⍙`.
+⍝ If nothing is left after this, use `section` as identifier.
+ ns←{
+     0<⎕NC ⍵:⍎⍵
+     r←⎕NS''
+     r.headerLineNos←⍬
+     r.headers←0 3⍴''
+     r.lineNumbers←0
+     r.report←''
+     r.parms←⎕NS''
+     r.parms.bookmarkMayStartWithDigit←1
+     r.parms.lineNumberOffset←0
+     r
+ }'ns'
+ :If 0={0=⍵.⎕NC'parms.bookmarkLink':1 ⋄ ⍵.parms.bookmarkLink}ns
+     name←''
+ :Else
+     name←ns.parms.bookmarkMayStartWithDigit CompileBookMarkName txt specialAttrs
+     :If 0=≢name                              ⍝ Nothing left?
+         name←'section'                       ⍝ Go for the name section
+         ns.report,←⊂'Warning: header on line ',(⍕ns.parms.lineNumberOffset+⊃ns.lineNumbers),': no bookmark name left; name assigned'
+     :EndIf
+     :If (⊂LowercaseID name)∊ns.headers[;2]   ⍝ Does this bookmark already exist?
+         name←1{n←⍵,'-',⍕⍺ ⋄ ~(⊂n)∊ns.headers[;2]:n ⋄ (1+⍺)∇ ⍵ ⋄ }LowercaseID name  ⍝ Append a number to `name`
+         ns.report,←⊂'Warning: header on line ',(⍕ns.parms.lineNumberOffset+⊃ns.lineNumbers),': ambiguous name; number added'
+     :EndIf
+ :EndIf

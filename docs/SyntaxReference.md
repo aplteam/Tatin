@@ -66,7 +66,7 @@ The folder the ZIP file is created in.
 In case `targetPath` is empty it defaults to `projectPath`.
 
 
-#### version
+#### version{#version-parms}
 
 Must be one of:
 
@@ -851,6 +851,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

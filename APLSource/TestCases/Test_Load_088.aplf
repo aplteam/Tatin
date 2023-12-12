@@ -17,8 +17,8 @@
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     expected←'Invalid entry: aplteam-Tester2-3.5.0 ; re-install!'
-     →T.GoToTidyUp~∨/expected⍷qdmx.EM
+     expected←'The build list in' 'refers to a package that is not installed:' 'aplteam-Tester2-3.5.0'
+     →T.GoToTidyUp~∧/expected{∨/⍺⍷⍵}¨⊂qdmx.EM
  :EndTrap
 
  r←T._OK

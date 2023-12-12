@@ -1,0 +1,24 @@
+ r←ProcessHtmlBlockType_Tags ns;start;t;f2;tag;noOfEmptyLines
+⍝ Check for all HTML5 tags as well as self-defined tags.
+⍝ Note that self-defined tags must contain a hyphen by definition
+⍝ Note also that an HTML block MUST START with a < in the first column, and will
+⍝ end at the first empty line to be found
+⍝ ← is 1 when found and processed, otherwise 0.
+ r←1
+ :If ns.topOfDocument∨∆LastLineWasEmpty∨⊃ns.emptyLines
+     :If 0<ns.noOf←+/∧\ns.emptyLines           ⍝ Let's get rid...
+         ns←Drop ns                            ⍝ ...of any empty lines first.
+     :EndIf
+     ns.noOf←1
+     tag←'/'~⍨{⍵↑⍨¯1+⌊/⍵⍳'> '}1↓⊃ns.markdownLC ⍝ Just the tag name, no matter whether closing or opening
+     :If (⊂tag)∊HtmlTags
+     :OrIf IsSelfDefinedHtmlTag tag
+         ns.noOf←(≢ns.markdown)⌊ns.emptyLines⍳1
+         ns.html,←ns.noOf↑ns.markdown
+         ns←Drop ns
+         ∆LastLineWasEmpty←1
+         r←0
+     :ElseIf '@'∊∊tag
+         r←1
+     :EndIf
+ :EndIf

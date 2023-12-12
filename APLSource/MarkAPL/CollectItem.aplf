@@ -1,0 +1,11 @@
+ (noOf item)←CollectItem bl
+⍝ Collects as many lines from `bl` as belong to what's a single list item.
+⍝ bl:    All the lines a list may be compiled from.
+⍝ The end is defined by one of:
+⍝ * Empty line
+⍝ * Line consisting of nothing but spaces
+⍝ * The next list item (either numbered or bulleted, no matter what the indentation is)
+⍝ Whatever comes first.
+ noOf←+/∧\0≠≢¨bl~¨' '
+ noOf←1++/∧\~IsHtmlList¨1↓noOf↑bl
+ item←FlattenNestedItem noOf↑bl

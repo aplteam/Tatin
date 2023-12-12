@@ -1,0 +1,15 @@
+ CorrectSlash←{
+      ⍝ ⍺ is a Boolean that decides whether ⍵ shall be normalized (1) or not (0).
+      ⍝ For everything that points to the local file system we want normalization,
+      ⍝ but for stuff that potentially points elsewhere (like `cssUrl`) we don't want that:
+      ⍝ We don't necessarily know the OS over there!
+      ⍝ Default is normalization.
+      ⍝ Leave any kind of protocol alone like "http://" etc. but also stuff like "foo://".
+     ⍺←1
+     ss←'://' ⍝ Search string
+     0=+/bool←ss⍷⍵:FilesAndDirs.NormalizePath⍣(⊃⍺)⊣⍵
+     length←(¯1+≢ss)+bool⍳1
+     r←(length↑⍵),FilesAndDirs.NormalizePath⍣(⊃⍺)⊣length↓⍵
+     0='file://'{((⊃(≢⍺)↓⍵)∊'\/')∧⍺≡(≢⍺)↑⍵}r:r
+     'file:///',(1+≢'file://')↓r
+ }

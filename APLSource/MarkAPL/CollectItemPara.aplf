@@ -1,0 +1,13 @@
+ (noOf para)←CollectItemPara bl;options;buff
+⍝ Collects as many lines from `bl` as belong to what's a paragraph.
+⍝ bl:    All the lines a list may be compiled from.
+⍝ indentation:   Number of blanks defining the indentation. May be zero.
+⍝ ←:     [1]=Number of lines in bl the para is made of; [2]=the para as such
+⍝ Note: this function must be called only when at least ⊃bl is a para indeed.
+ :If 1=noOf←+/∧\0≠≢¨bl
+     para←⊃bl
+ :Else
+     noOf←1++/∧\0=IsHtmlList¨1↓noOf↑bl
+     options←('Mode' 'M')('EOL' 'CR')('DotAll' 1)
+     para←A.DLB⊃,/' ',¨noOf↑bl
+ :EndIf

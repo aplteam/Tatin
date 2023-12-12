@@ -1,0 +1,14 @@
+ r←ProcessHtmlBlock_HtmlComments ns;start;md;bool
+⍝ <!-- and -->
+⍝ ← is 0 when found and processed, otherwise 1.
+ r←1
+ :If 2<≢ns.markdown
+ :AndIf 1∊(1↓ns.emptyLines),1
+ :AndIf '<!--'{⍺≡(≢⍺)↑⍵}⊃1↓ns.markdown
+ :AndIf 0<+/bool←(~∨/¨'-->'∘⍷¨ns.markdown)
+     ns.noOf←1++/∧\bool
+     md←1↓ns.noOf↑ns.markdown
+     ns.html,←'-->'DropTailAfterClosingTag md
+     ns←Drop ns
+     r←0
+ :EndIf

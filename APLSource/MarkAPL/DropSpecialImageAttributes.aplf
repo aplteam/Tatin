@@ -1,0 +1,13 @@
+ DropSpecialImageAttributes←{
+⍝ In general special attributes are always located at the end of an object
+⍝ while an image might might well be inside something else like a para or a cell etc.
+     specialAttrs←⍺
+     0=≢specialAttrs:⍵
+     '\'=1↑¯2↑⍵:⍵
+     buff←(⎕UCS 13)A.Split ⍵     ⍝ In case of <<BR>>!
+     tx←A.DTB⊃buff
+     ~'{'∊tx:⍵
+     no←¯1+tx⍳'{'
+     tx←no⌽⍵
+     (-no)⌽{⍵↓⍨⍵⍳'}'}tx
+ }

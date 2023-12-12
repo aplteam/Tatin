@@ -1,0 +1,12 @@
+ GetMaskForCodeTags←{
+ ⍝ Returns a mask for everything between <code*> and </code>.
+ ⍝ We can savely assume valid HTML5 here.
+     txt←⍵
+     r←(≢txt)⍴0=1
+     0=+/b←'</code>'⍷txt:r         ⍝ No closing tag? Done!
+     r[(¯1+≢'</code>')+⍸b]←1
+     ind←⍸'<code'⍷txt
+     ind←(txt[ind+≢'<code']∊'> ')/ind
+     r[ind]←1
+     Between r
+ }

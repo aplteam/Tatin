@@ -1,0 +1,71 @@
+ r←ProcessTable_ ns;specialAttrs;ind;align;drop;cells;rows;b;head;noOfCols;footer;buff
+ :Trap (~ns.parms.debug)/0
+     specialAttrs←GetSpecialAttributes⊃ns.markdown
+     ns.html,←⊂{0=≢⍵:'<table>' ⋄ '<table',⍵,'>'}specialAttrs
+     :If {∧/'-'='|: '~⍨⍵}2⊃ns.markdown
+         ns.html,←⊂'<thead>'
+         ns.html,←⊂'<tr>'
+         ind←{~':'∊⍵:1 ⋄ '::'≡2⍴¯1⌽⍵:3 ⋄ ':'=1⍴⍵:2 ⋄ 4}¨' '~¨⍨SplitTableRowButMaskCode 2⊃ns.markdown
+         align←↑¨ind⌷¨⊂'?' 'left' 'center' 'right'
+         head←SplitTableRowButMaskCode specialAttrs DropSpecialAttributes 1⊃ns.markdown
+         head←ns{⍺ CheckOddNumberOfDoubleQuotes ⍵'header'}¨head
+         head←⊃¨ns ProcessInlineMarkUp¨head
+         :If ns.parms.syntaxSugar
+             head←ns.parms.lang∘SmartQuotes¨head
+         :EndIf
+         drop←2
+     :Else
+         ind←{~':'∊⍵:1 ⋄ '::'≡2⍴¯1⌽⍵:3 ⋄ ':'=1⍴⍵:2 ⋄ 4}¨' '~¨⍨SplitTableRowButMaskCode 1⊃ns.markdown
+         align←↑¨ind⌷¨⊂'?' 'left' 'center' 'right'
+         drop←1
+     :EndIf
+     :If 0≠≢cells←drop↓ns.noOf↑ns.markdown
+         cells←SplitTableRowButMaskCode¨cells
+         cells←{A.DLB∘A.DTB ⍵}¨¨cells
+         cells←ns{⍺ CheckOddNumberOfDoubleQuotes ⍵'header'}¨¨cells
+         cells←⊃¨¨ns ProcessInlineMarkUp¨¨cells
+         :If ∨/b←∨/¨'?'=align
+             noOfCols←⌈/(≢align),≢¨cells
+             b←noOfCols↑b
+             :If (≢align)>noOfCols
+                 cells←cells,¨((≢align)-noOfCols)⍴(⊃⌈/≢¨cells)⍴⊂,' '
+             :ElseIf (≢align)<noOfCols
+                 align←noOfCols↑align,noOfCols⍴⊂'left'
+             :EndIf
+             :If noOfCols∨.≠≢¨cells
+                 cells←noOfCols↑¨cells,¨noOfCols⍴¨⊂,' '
+             :EndIf
+             buff←⍉↑b∘/¨cells
+             buff[;⍸∧⌿buff∧.=¨'=']←'0'
+             (b/align)←('left' 'right')[{{0=≢⍵~' ':1 ⋄ 1+⊃∧/⊃⎕VFI ⍵}⊃,/' ',¨⍵}¨↓buff]
+         :EndIf
+     :Else
+         :If ∨/b←∨/¨'?'=align
+             (b/align)←⊂'left'
+         :EndIf
+     :EndIf
+
+     :If 2=drop
+         buff←('th'∘{⍺,⍵}¨1 AddAlignStyle¨align)Tag¨(≢align)↑head,(≢align)⍴⊂''
+         ns.html,←buff
+         ns.html,←⊂'</tr>'
+         ns.html,←⊂'</thead>'
+     :EndIf
+     (footer cells)←ns.parms.markdownStrict GetFooter cells
+     ns.html,←⊂'<tbody>'
+     rows←{('td'∘{⍺,⍵}¨2 AddAlignStyle¨align)Tag¨⍵}¨(≢align)↑¨cells
+     ns.html,←⊃,/{(⊂'<tr>'),⍵,⊂'</tr>'}¨rows
+     ns.html,←⊂'</tbody>'
+     :If 0≠≢footer
+         ns.html,←⊂'<tfoot>'
+         ns.html,←⊃,/{(⊂'<tr>'),⍵,⊂'</tr>'}¨{('td'∘{⍺,⍵}¨2 AddAlignStyle¨align)Tag¨⍵}¨(≢align)↑¨footer
+         ns.html,←⊂'</tfoot>'
+     :EndIf
+     ns.html,←⊂'</table>'
+     ns←Drop ns
+     r←1
+ :Else
+     r←1
+     ns←Drop ns
+ :EndTrap
+⍝Done

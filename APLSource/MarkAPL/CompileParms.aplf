@@ -1,0 +1,13 @@
+ parms←CompileParms parms
+ :If 0=≢parms
+     parms←CreateParms
+ :EndIf
+ parms←EstablishDefaultHomeFolder parms
+ :If ⎕NULL≡parms.cssURL
+     parms.cssURL←'file:///',FilesAndDirs.NormalizePath parms.homeFolder,'/Files/'
+ :EndIf
+ ((parms.cssURL='\')/parms.cssURL)←'/'
+ parms.cssURL,←(~(¯1↑parms.cssURL)∊' /')/'/'
+ parms.(inputFilename outputFilename)←1 CorrectSlash¨parms.(inputFilename outputFilename)
+ parms.(cssURL screenCSS printCSS)←0 CorrectSlash¨parms.(cssURL screenCSS printCSS)
+⍝Done

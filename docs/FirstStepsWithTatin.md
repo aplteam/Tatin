@@ -261,7 +261,7 @@ By defining `MarkAPL` as the api this suffices:
 
 The `api` parameter is discussed in detail in the "PackageConfiguration" document.
 
-#### Assets
+#### Files assets
 
 Note that the file `apl-package.json` specifies `assets: "Files"`. That means that there are assets, and that they can be found in the `Files/` sub directory.
 
@@ -605,4 +605,5 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 ##### URI
 
 Character vector that holds the address of a Tatin server or the full name of a ZIP file.
+
 

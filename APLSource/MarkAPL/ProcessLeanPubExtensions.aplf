@@ -1,0 +1,13 @@
+ ns←parms ProcessLeanPubExtensions ns;flag
+⍝ Replaces `A> ` and alikes against a <div> that is used to give it an outlook similar to what LeanPub is doing.
+⍝ When this functions runs we have not yet established all embedded parameters from the Markdown, and we can't
+⍝ at this stage - too early. But we cannot process the LeanPub extensions later either, so we have to look up for
+⍝ any embedded parameter `leanpubExtensions` ourself.
+ :If 0=flag←parms.leanpubExtensions
+     :If 0=parms.ignoreEmbeddedParms
+         flag←(,1)≡,'leanpubExtensions'LookForEmbeddedParm RemoveLeanpubEncoding ns.markdown
+     :EndIf
+ :EndIf
+ :If flag
+     ns←parms ProcessLeanPubExtensions_ ns
+ :EndIf

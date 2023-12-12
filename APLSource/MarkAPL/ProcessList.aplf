@@ -1,0 +1,197 @@
+ r←ProcessList ns;bl;type;i;startAt;item;pFlag;noOfBlanks;levels;levelChange;buff;sa;lastType;lastItem;toBeAdded;indentations;html;lastWasEmpty;indendations;cb;drop;para;Max;buff2;ns2;parms;ns3;md;report;infoString;buff3
+⍝ Processing lists is more complex than one would think at first glance for several reasons:
+⍝ * Lists can be nested at any level.
+⍝ * A nested list can have a different type.
+⍝ * Changing the bullet char for bulleted lists (+-*) starts a new list!
+⍝ * Lists may contain independent paragrahs; their level is defined by indenting.
+⍝ * MarkAPL allows lazy indenting: if a list item spans over several lines only the first
+⍝   line must be indented properly. All other lines may or may not be indented.
+⍝ * A single backslash at the end of an item are interpreted as "inject <br> here".
+ :If 0=ns.noOf←IdentifyListItems ns
+     r←0
+ :Else
+     type←,(1+(⊃⊃ns.leadingChars)∊'*+-')⌷'ou'
+     bl←A.DTB GetListBlock ns.noOf↑ns.markdown
+     report←''
+     :If type='u'
+         html←,⊂'<ul>'
+     :Else
+         startAt←{⍵↑⍨¯1+⌊/⍵⍳'.)'}A.DLB⊃bl
+         html←,⊂'<ol start="',startAt,'">'
+     :EndIf
+     i←lastWasEmpty←levelChange←0
+    ⍝ `levels` and `indentation` record almost the same thing:
+    ⍝ * `level` counts white-space until the first non-white-space character.
+    ⍝ * `indentation` does the same but then adds the length of the list-marker.
+    ⍝ The latter is needed in order to identify the level of paragraphs and code blocks within a list.
+     levels←+/∧\' '=⊃bl
+     indendations←GetLengthOfLeadingWhitespacePlusListMarker⊃bl
+     lastType←⊃A.DLB⊃bl
+     :Repeat
+         drop←1
+         i←i+1
+         :If IsHtmlList A.DLB⊃bl
+             noOfBlanks←+/∧\' '=⊃bl
+             :If noOfBlanks≠¯1↑levels
+                 :If noOfBlanks>¯1↑levels
+                     type,←(1+(⊃i⊃ns.leadingChars)∊'*+-')⌷'ou'
+                     ((≢html)⊃html)←'</li>'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}(≢html)⊃html
+                     :If 'u'=¯1↑type
+                         html,←⊂'<ul>'
+                     :Else
+                         startAt←{⍵↑⍨¯1+⌊/⍵⍳'.)'}A.DLB⊃bl
+                         html,←⊂'<ol start="',startAt,'">'
+                     :EndIf
+                     levels,←noOfBlanks
+                     indendations,←GetLengthOfLeadingWhitespacePlusListMarker⊃bl
+                     lastType,←⊃A.DLB⊃bl
+                 :Else
+                     levelChange←+/∧\(⌽levels)>noOfBlanks
+                     html,←({'</',(¯1↑⍵),'l>'}¨⌽(-levelChange)↑type),¨⊂'</li>'
+                     (levels indendations lastType type)←(-levelChange)↓¨levels indendations lastType type
+                 :EndIf
+             :ElseIf 0≠≢⊃bl
+             :AndIf (¯1↑lastType){~⍺∊'+-*':~⍵∊⎕D ⋄ ⍺≠⍵}⊃A.DLB⊃bl
+                 html,←⊂'</',(¯1↑type),'l>'
+                 ((≢type)⊃type)←(1+(⊃i⊃ns.leadingChars)∊'*+-')⌷'ou'
+                 lastType,←⊃A.DLB⊃bl
+                 :If 'u'=¯1↑type
+                     html,←⊂'<ul>'
+                 :Else
+                     startAt←{⍵↑⍨¯1+⍵⍳'.'}A.DLB⊃bl
+                     html,←⊂'<ol start="',startAt,'">'
+                 :EndIf
+             :EndIf
+         :EndIf
+         :If 0=≢' '~⍨⊃bl
+             lastWasEmpty←1
+         :Else
+             :If IsHtmlList A.DLB⊃bl
+                 (drop item)←CollectItem bl
+                 :If 0≠≢sa←GetSpecialAttributes⊃bl
+                     :If (⊂3↑(≢html)⊃html)∊'<ul' '<ol'
+                         ((≢html)⊃html)←(¯1↓((≢html)⊃html)),sa,'>'
+                         item←A.DLB A.DTB sa DropSpecialAttributes item
+                     :EndIf
+                 :Else
+                     item←A.DLB A.DTB item
+                 :EndIf
+                 i←i+drop-1
+                 item←ns CheckOddNumberOfDoubleQuotes item'list item'
+                 :If '\'=¯1↑item
+                     item,←'<br>'
+                 :EndIf
+                 buff←⊃¯1↑html
+                 :If ~(⊂{' '~⍨{⍵↑⍨⌊/⍵⍳' >'}{⌽⍵↑⍨⍵⍳'<'}⌽⍵}buff)∊'</ul>' '</ol>' '</li>' '<ul' '<ol' '<ul>' '<ol>'
+                     (¯1↑html)←⊂buff,'</li>'
+                 :EndIf
+                 buff3←⊃ns ProcessInlineMarkUp{A.DLB ⍵↓⍨⍵⍳' '},item
+                 html,←⊂'<li>',(A.DLB buff3),'</li>'
+                 lastWasEmpty←0
+             :Else
+                 noOfBlanks←+/∧\' '=⊃bl
+                 :If (¯1↑indendations){0=⍵:0 ⋄ ⍵≠⍺}noOfBlanks          ⍝ The level has changed
+                     :If noOfBlanks∊indendations                       ⍝ Did the user get the indentation right?
+                         levelChange←¯1+(⌽indendations)⍳noOfBlanks
+                     :Else                                             ⍝ No he did not.
+                         levelChange←0⌈¯1++/indendations<noOfBlanks    ⍝ Let's get as close as possible
+                     :EndIf
+                     :If 0≠levelChange
+                         :If '>'=¯1↑buff←⊃¯1↑html
+                         :AndIf ~(⊂{⌽⍵↑⍨⍵⍳'<'}⌽buff)∊'</ul>' '</ol>' '<ul>' '<ol>'
+⍝                                  (¯1↑html)←⊂buff,'</li>'
+                         :EndIf
+                         html,←({'</',⍵,'l>'}¨(-levelChange)↑type),¨⊂'</li>'
+                         (type levels indendations lastType)←(-levelChange)↓¨type levels indendations lastType
+                     :EndIf
+                 :EndIf
+                 :If lastWasEmpty
+                     buff←⊃bl
+                     :If 0≠≢cb←(¯1↑indendations)GetCodeBlockFrom bl
+                         sa←GetSpecialAttributes⊃cb
+                         infoString←(¯1↑indendations)GetInfoString⊃cb
+                         :If (+/∧\' '=⊃cb)≥⊃noOfBlanks                  ⍝ Max number of spaces is the indentation
+                             cb←MassageCodeBlock cb noOfBlanks
+                             cb←¯1↓1↓cb
+                             :If 0<+/≢¨cb~¨' '
+                                 buff2←⊃¯1↑html
+                                 :If '</li>'{⍺≡(-≢⍺)↑⍵}buff2
+                                     buff2←(-≢'</li>')↓buff2
+                                     (¯1↑html)←⊂buff2
+                                 :EndIf
+                                 html,←MarkUpAsCode(2 EscapeSpecialChars¨cb)sa infoString
+                                 (¯1↑html)←⊂(⊃¯1↑html),'</li>'
+                             :EndIf
+                             drop←2+≢cb
+                             i+←1+≢cb
+                         :EndIf
+                     :ElseIf '|'=⊃A.DLB buff                             ⍝ Is it a table?
+                     :AndIf (+/∧\' '=buff)≥⊃noOfBlanks                 ⍝ Max number of spaces is the indentation
+                         drop←+/∧\'|'=,1↑[2]A.DLB↑bl
+                         buff←drop↑bl
+                         parms←CreateParms
+                         parms←ns.parms CopyTo parms
+                         parms.lineNumberOffset←⊃ns.lineNumbers
+                         ns2←Init parms(A.DLB buff)
+                         ns2←Process ns2
+                         report,←ns2.report
+                         ((≢html)⊃html)←(-≢'</li>')↓(≢html)⊃html
+                         html,←ns2.html
+                         ((≢html)⊃html),←'</li>'
+                     :ElseIf '> '≡2⍴A.DLB buff                           ⍝ Is it a blockquote?
+                         ns3←⎕NS''
+                         ns3.(markdown markdownLC leadingChars emptyLines withoutBlanks lineNumbers)←(ns.noOf-≢bl)↓¨ns.noOf↑¨ns.(markdown markdownLC leadingChars emptyLines withoutBlanks lineNumbers)
+                         drop←ScanForBlockQuotes ns3
+                         parms←CreateParms
+                         parms.bookmarkLink←0
+                         parms.markdownStrict←ns.parms.markdownStrict
+                         parms.verbose←0
+                         parms.checkLinks←0
+                         parms.checkFootnotes←0
+                         parms.subTocs←0
+                         parms.syntaxSugar←ns.parms.syntaxSugar
+                         parms.lineNumberOffset←⊃ns.lineNumbers
+                         md←noOfBlanks↓¨drop↑ns3.markdown
+                         ns2←Init parms md
+                         ns2←Process ns2
+                         ((≢html)⊃html)←(-≢'</li>')↓(≢html)⊃html
+                         html,←ns2.html
+                         ((≢html)⊃html),←'</li>'
+                         report,←ns2.report
+                     :Else
+                         (drop para)←CollectItemPara bl
+                         i←i+drop-1
+                         :If '!['{⍺≡(≢⍺)↑⍵}A.DLB buff
+                         :AndIf '![CDATA['{⍺≢(≢⍺)↑⍵}A.DLB buff
+                         :AndIf 1
+                              ⍝ Regular expression needed that catches the image.
+                              ⍝ If nothing is left then any special attributes belong to the image rather than the paragraph.
+                              ⍝ OR: The definition of images is wrong and special attributes MUST be specified inside the ()!!!!
+                              ⍝ (That's much more likely!)
+                             sa←'' ⍝ then any special attributes
+                         :Else
+                             sa←GetSpecialAttributes para
+                         :EndIf
+                         para←A.DTB sa DropSpecialAttributes para
+                         buff←⊃¯1↑html
+                         :If '</li>'≡({{⌽⍵↑⍨⍵⍳'<'}⌽⍵}buff)
+                             buff←(-≢'</li>')↓buff
+                             (¯1↑html)←⊂buff
+                         :EndIf
+                         buff3←⊃ns ProcessInlineMarkUp para
+                         html,←⊂'<p',sa,'>',(A.DLB buff3),'</p></li>'
+                     :EndIf
+                 :Else
+                     html,←⊂'<p>',(⊃bl),'</p>'
+                 :EndIf
+                 lastWasEmpty←0
+             :EndIf
+         :EndIf
+         bl←drop↓bl
+     :Until 0=≢bl
+     html,←({'</',(¯1↑⍵),'l>'}¨⌽type),¨((¯1+≢type)⍴⊂'</li>'),⊂''
+     html←InjectBR¨html
+     ns.html,←html
+     ns←Drop ns
+     r←1
+ :EndIf

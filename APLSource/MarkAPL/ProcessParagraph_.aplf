@@ -1,0 +1,13 @@
+ {r}←ns ProcessParagraph_ para;sa;isHtmlBlock
+ r←⍬
+ para←ns CheckOddNumberOfDoubleQuotes para'paragraph'
+ sa←GetSpecialAttributes para
+ para←sa DropSpecialAttributes⍣(0<⊃⍴sa)⊣para
+ (para isHtmlBlock)←ns ProcessInlineMarkUp para
+ :If 0≠≢para
+     :If isHtmlBlock
+         ns.html,←para
+     :Else
+         ns.html,←,⊆sa{2=≡⍵:⍺∘∇¨⍵ ⋄ '<p',({0=≢⍵:'>' ⋄ ⍵,'>'}⍺),⍵,'</p>'}para
+     :EndIf
+ :EndIf

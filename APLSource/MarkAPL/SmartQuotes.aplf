@@ -1,0 +1,20 @@
+ SmartQuotes←{
+⍝ Exchange pairs of double quotes ←→ “„ but in DE, AT and CH ←→ „“.
+⍝ See also SmartTypography for similar stuff.
+⍝ This function does not check ns.syntaxSugar: that's up to the caller.
+     ⍺←'en'                             ⍝ Default language is English.
+     lang←⍺
+     html←⍵
+     bbt←'`[^`].*?`'                    ⍝ Between back-ticks (= code)
+     cdq←'"".+?""'                      ⍝ Catch what is enclosed between two pairs (that is four of them!) of double quotes
+     cim←'!\[[^\)].*?\){.*?}'           ⍝ Catch image with special attributes
+     cl1←'\[\]\([^)]*.?\)'              ⍝ Catch simple link
+     cl2←'\[[^]]*.?\]\([^)]*.?\)'       ⍝ Catch simple link
+     ced←'\\"'                          ⍝ Catch escaped double quote
+     ctag←'<[^>]*?>'                    ⍝ Catch opening HTML tag
+     cpb←'&amp;pointybracket_open([^&]*.?)&amp;pointybracket_close' ⍝ Catch pointy brackets
+     me←'\0'
+     quotes1←'"(.*?)"'
+     quotes2←(1+(⊂lang)∊'de' 'at' 'ch')⊃'“\1”' '„\1“'
+     cpb cl1 cl2 cim bbt cdq ctag ced quotes1 ⎕R((7⍴⊂me),'"'quotes2)⍠('Mode' 'D')('DotAll' 1)⊣html
+ }

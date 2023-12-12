@@ -1,0 +1,53 @@
+ r←CreateParms;clp;SetTo
+⍝ Returns a parameter namespace with default values. Use method `∆List` to list all names and their values.\\
+⍝ For a documentation of all parameters refer to the MarkAPL reference. Call `MarkAPL.Reference 0` for that.
+ r←⎕NS''
+ clp←GetCommandLineParms''
+ SetTo←{0=clp.⎕NC ⍺:⍎'r.',⍺,'←⍵' ⋄ ⍎'r.',⍺,'←clp.⍎⍺'}  ⍝ Take command line parms or default
+ 'bookmarkLink'SetTo 6
+ 'bookmarkMayStartWithDigit'SetTo 1
+ r.debug←A.IsDevelopment
+ 'charset'SetTo'utf-8'
+ 'checkFootnotes'SetTo r.debug
+ 'checkLinks'SetTo r.debug
+ 'compressCSS'SetTo 1
+ 'copy2ClipboardBtn'SetTo 1
+ 'createFullHtmlPage'SetTo ¯1
+ 'cssURL'SetTo ⎕NULL
+ 'div_h_tag'SetTo 1
+ 'enforceEdge'SetTo 1
+ 'footnotesCaption'SetTo'Footnotes'
+ 'head'SetTo''
+ :If 0<##.⎕NC'TatinVars.HOME'
+     'homeFolder'SetTo⍎'##.TatinVars.HOME'
+ :Else
+     'homeFolder'SetTo''
+ :EndIf
+ 'ignoreEmbeddedParms'SetTo 0
+ 'imageURL'SetTo''
+ 'inputFilename'SetTo''
+ 'javaScript'SetTo 1
+ 'lang'SetTo'en'
+ 'leanpubExtensions'SetTo 0
+ 'lineNumberOffset'SetTo 0
+ 'linkToCSS'SetTo 0
+ 'lowercaseID'SetTo 1
+ 'markdownStrict'SetTo 0
+ 'numberHeaders'SetTo 0
+ 'noCSS'SetTo 0
+ 'outputFilename'SetTo''
+ 'printCSS'SetTo'Dark_print.css'
+ 'reportLinks'SetTo 0
+ 'reportLinksCaption'SetTo'Link report'
+ 'saveHTML'SetTo ¯1                            ⍝ Meddy parameter
+ 'screenCSS'SetTo'Dark_screen.css'
+ 'smoothScrolling'SetTo 1
+ 'subTocs'SetTo 1
+ 'syntaxSugar'SetTo 1
+ 'title'SetTo ⎕NULL
+ 'toc'SetTo 0
+ 'tocCaption'SetTo'Table of contents'
+ 'verbose'SetTo r.debug
+ 'width'SetTo 900
+ r.⎕FX'r←∆List;⎕IO' '⍝ List all variables and possible references in this namespace' '⎕IO←1' 'r←{⍵,[1.5]⍎¨⍵}⎕NL-2 9'
+⍝Done

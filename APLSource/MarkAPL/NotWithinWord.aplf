@@ -1,0 +1,17 @@
+ flag←x NotWithinWord hit;txt;length;boundary1;boundary2;flag1;flag2;l;offset;buff
+⍝ ⍵ is a vector of hits for, say, `_`
+⍝ ⍺ is a two-element vector:
+⍝   [1] Something like a paragraph
+⍝   [2] Length of markup (_, *, **, __, ~~, ...); 1∨2
+ (txt length)←x
+ :If ~flag←' '=boundary1←(⊂hit+¯1)⌷txt       ⍝ What's to the left of the hit? ∆⍙>,⎕D and Unicode "letters" qualify
+     boundary2←(⊂hit+length)⌷txt   ⍝ What's to the left and right of the hit
+     :If '>'=boundary1
+         flag1←0
+     :ElseIf 0=flag1←IsUnicodeCharacter boundary1
+         l←¯1+⊃'[\p{L}0-9∆⍙]+'⎕S 1⊣'a',buff←⌽¯2↓hit↑txt    ⍝ How many are there?
+         flag1←∨/IsUnicodeCharacter l↑buff                 ⍝ Investigate whether at least one "letter" is part of it
+     :EndIf
+     flag2←(IsUnicodeCharacter boundary2)∨boundary1∊'<∆⍙',⎕D
+     flag←~flag1∧flag2
+ :EndIf

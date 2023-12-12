@@ -1,0 +1,30 @@
+ r←ProcessDataDefs ns;def;value;id;b;v
+ r←0
+ :If '['=⊃⊃ns.leadingChars
+     :If 0≠≢⍸'[data]:'≡⎕C 7↑⊃ns.leadingChars      ⍝ Find identifiers
+         def←⊃ns.markdown
+         :If '='∊def
+             (id value)←¯1 0↓¨7 0↓¨{i←⍵⍳'=' ⋄ (i↑⍵)(i↓⍵)}def
+             id←A.DLB A.DTB id
+             value←A.DLB A.DTB value
+             :If ''''∊value
+                 :If ''''''≡2⍴¯1⌽value
+                     value←¯1↓1↓value
+                 :Else
+                     value←''
+                     ns.report,←⊂'Data value definition for line ',(⍕ns.parms.lineNumberOffset+⊃ns.lineNumbers),' is invalid'
+                 :EndIf
+             :Else
+                 (b v)←⎕VFI value
+                 :If ∧/b
+                     value←{1=≢⍵:⍬⍴⍵ ⋄ ⍵}v
+                 :EndIf
+             :EndIf
+             ns.data,←⊂id value
+         :Else
+             ns.report,←⊂'Data definition on line ',(⍕ns.parms.lineNumberOffset+⊃ns.lineNumbers),' is invalid'
+         :EndIf
+         ns←Drop ns
+         r←1
+     :EndIf
+ :EndIf

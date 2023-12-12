@@ -1,0 +1,40 @@
+ r←ns CreateTOC def;lastLevel;level;caption;id;no;bf;nf;co;ff
+⍝ def:
+⍝ [;1] level
+⍝ [;2] caption
+⍝ [;3] running no
+⍝ [;4] id
+ r←⊂'<nav id="main_nav" class="toc">'
+ r,←⊂'<h2 id="toc-heading">',ns.parms.tocCaption,'</h2>'
+ :If ns.parms.javaScript
+     r,←⊂'<button id="toc-toggle" aria-controls="toc-list" aria-expanded="false">Show</button>'
+ :EndIf
+ r,←⊂''
+ r,←⊂'<div class="toc-container">'
+ r,←⊂'<ul id="toc-list"',(ns.parms.javaScript/' class="hide print"'),'>'
+ lastLevel←⊃⊃def
+ bf←(,0)≢,ns.parms.bookmarkLink        ⍝ Bookmark flag
+ nf←(,0)≢,ns.parms.numberHeaders       ⍝ Numbered flag
+ co←1                                  ⍝ Count opened lists
+ ff←1                                  ⍝ "First" flag
+ :For (level caption no id) :In ↓def
+     :If lastLevel<level
+         r,←⊂'<ul>'
+         co+←1
+     :ElseIf lastLevel>level
+         ((≢r)⊃r),←'</li>'
+         r,←(lastLevel-level)⍴⊂'</ul>',(co>1)/'</li>'
+         co-←lastLevel-level
+     :ElseIf lastLevel=level
+     :AndIf ~ff
+         ((≢r)⊃r),←'</li>'
+     :EndIf
+     caption←⊃ns ProcessInlineMarkUp caption
+     r,←⊂'<li class="toc-entry toc-h',(⍕level),'"><a href="#',(LowercaseID id),'">',caption,'</a>'
+     lastLevel←level
+     ff←0
+ :EndFor
+ r,←(0⌈co-1)⍴⊂'</li></ul></li>'
+ r,←⊂'</ul>'
+ r,←⊂'</div>'
+ r,←⊂'</nav>'

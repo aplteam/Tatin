@@ -1,0 +1,16 @@
+ SplitTableRowButMaskCode←{
+ ⍝  'First' 'Second' ←→ SplitTableRowButMaskCode 'First',(⎕UCS 13 10),'Second'
+ ⍝ (,¨'1' '2' '3') ←→ '.' SplitTableRowButMaskCode '1.2.3'
+ ⍝ But:
+ ⍝ 'Code' '`{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}`' '' ←→ '|' SplitTableRowButMaskCode '|Code | `{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}` |
+     ⎕ML←⎕IO←1
+     txt←A.DLB A.DTB ⍵
+     txt←(('|'≠⊃txt)/'|'),txt
+     txt,←{'|'/⍨('|'≠1↑1↓⍵)∧'\|'≢⊃⍵}¯2⌽txt
+     txt←{⍵,'`|'}⍣(1=2|+/txt='`')⊣txt           ⍝ Add trailing tick and pipe in case of odd number of ticks
+     mask←~GetMaskForCode txt
+     bool←mask\'|'=mask/txt
+     bool[1~⍨⍸bool]←'\'≠txt[¯1+1~⍨⍸bool]
+     r←1↓¨¯1↓bool⊂txt
+     {0=+/b←'\|'⍷w←⍵:w ⋄ (~b)/w}¨r
+ }

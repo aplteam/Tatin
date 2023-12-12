@@ -1,0 +1,20 @@
+ hits←GatherFootNoteReferences ns;i;id;footnote;mask;bool;row;ind
+⍝ Finds all the references to footnotes in the HTML
+⍝ `hits` is a matrix with 4 columns:
+⍝ [;1] Number
+⍝ [;2] Original name
+⍝ [;3] Row in ns.html where a hit was found
+⍝ [;4] Index of the hit in that row.
+ hits←0 4⍴⍬
+ :For i id footnote :In ↓(⍳⊃⍴ns.footnoteDefs),ns.footnoteDefs
+     mask←{~Between⊃∨/'<code>' '</code>'⍷¨⊂⍵}¨ns.html
+     :If 0<+/∊bool←('[^',id,']')∘⍷¨mask/¨ns.html
+         :For row :In ⍸∨/¨bool
+             ind←1⍳⍨('[^',id,']')⍷row⊃ns.html                                      ⍝ Only the first one is taken into account
+             :If 0≠≢ind←(~ind∊⍸GetMaskForCodeTags row⊃ns.html)/ind  ⍝ Remove those between <code tags
+                 hits⍪←i,(⊂id),row,ind
+             :EndIf
+         :EndFor
+     :EndIf
+ :EndFor
+ hits←{⍵[⍒⍵[;3];]}{⍵[⍒⍵[;4];]}hits   ⍝ It's essential to turn them around!

@@ -1,0 +1,8 @@
+ IotaSetextHeader←{
+ ⍝ Returns indices as a vector of Booleans for all lines in ns.markdown that in itself would qualify as a SeText header.
+ ⍝ "In itself" means that it does not check whether what is above it is a para; that need to be checked independently.
+     type←⍺
+     (withoutBlanks markdown emptyLines)←⍵
+     0=+/b←(~emptyLines)∧withoutBlanks∧.=¨type:1+⍴markdown
+     ⍸b\{4>+/∧\' '=⍵}¨b/markdown          ⍝ Max 3 leading blanks
+ }

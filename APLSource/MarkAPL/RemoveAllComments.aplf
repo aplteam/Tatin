@@ -1,0 +1,17 @@
+ RemoveAllComments←{
+     ns←⍵
+     markdown←ns.markdown
+     markdown←1↓∊(⎕UCS 10),¨markdown
+     ind←1+'^\s{0,3}[~`]{3,}\s{0,}({.*?})?\s{0,}$'⎕S 0⍠('Mode' 'M')('DotAll' 1)('EOL' 'LF')⊣markdown
+     ind,←1+'<pre\b' '</pre>'⎕S 0⍠('Mode' 'M')('DotAll' 1)⊣markdown
+     ind←ind[⍋ind]
+     b←(≢markdown)⍴0
+     b[ind]←1
+     b←Between b
+     b∧←markdown≠⎕UCS 10
+     markdown[⍸b]←' '
+     b2←'⍝'≠⊃¨(⎕UCS 10)A.Split markdown
+     ns.markdown←b2/ns.markdown
+     ns.lineNumbers←(+\~b2/b2)+b2/ns.lineNumbers
+     ns
+ }

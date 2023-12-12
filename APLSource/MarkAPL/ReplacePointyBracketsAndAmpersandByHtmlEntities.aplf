@@ -1,0 +1,22 @@
+ tx←ReplacePointyBracketsAndAmpersandByHtmlEntities tx;m;b;buff;i;item;start;end;b1;b2;b3
+ :If ∨/b←'<code'⍷tx
+ ⍝ This will rarely be the case, so performance is not a great concern here.
+     buff←(~b)⊆tx
+     :For i :In ⍳≢buff
+         item←i⊃buff
+         :If 'code'{⍺≡(≢⍺)↑⍵}item
+             start←'<',item↑⍨item⍳'>'
+             item←(¯1+≢start)↓item
+             end←(¯1+⍸'</code>'⍷item)↓item
+             item←(-≢end)↓item
+             b1←item='<'
+             b2←item='>'
+             b3←item='&'
+             (b1/item)←⊂'&lt;'
+             (b2/item)←⊂'&gt;'
+             (b3/item)←⊂'&amp;'
+             (i⊃buff)←start,item,end
+         :EndIf
+     :EndFor
+     tx←∊buff
+ :EndIf

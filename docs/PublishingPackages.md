@@ -9,7 +9,7 @@
 # Publishing Packages
 
 
-## Licencing
+## Licensing
 
 ### https://tatin.dev
 
@@ -61,7 +61,7 @@ Optionally additional information might be added. Examples are:
 
 * 1.2.3-beta-1
 * 1.2.3-fix-for-the-foo-problem
-* 1.2.3.issue-234
+* 1.2.3-issue-234
 
 There is one restriction: a `+` cannot be part of the name of a beta version. The reason for that is that finally a build number might be added to a version number, and a build number is separated from the rest of the version number by a plus (`+`) character. Examples:
 
@@ -92,6 +92,7 @@ You must provide these pieces of information:
 * Your desired group name (case insensitive)
 * Your real name
 * If it's connected to a company, the company's name
+* Email address (if different from the one you are using to send the email)
 
 
 #### Credentials for the Tatin Test Server
@@ -120,13 +121,7 @@ Credentials are saved in the file "Credentials.csv" in the Registry's home folde
 
 #### Credentials for your own Tatin Server 
 
-If you run your own Tatin Server we suggest that you create a UUID and use that as an API key. 
-
-A> ### Email address is required
-A>
-A> Note that having a valid API key is not enough for publishing a package: you must also define an email address for your group.
-A>
-A> For that click "Groups > {your-group-name} > Create" and add at least an email address.
+If you run your own Tatin Server, we suggest that you create a UUID and use that as an API key. 
 
 For an API key to be accepted by a Tatin Server, it must be added to a file `Credentials.txt` in the Registry's root directory. 
 
@@ -170,7 +165,12 @@ group2,<hash2,<salt2>
 *,{hash3>,<salt3>
 ```
 
-This means that one can only publish packages with the group name <group1> with the API key "hash1" was generated from, packages with the group name <group2> with the API key "hash2" was generated from, and anything else with the API key "hash3" was created from.
+This means that one can only publish packages with the group name...
+
+* `<group1>` by using the API key "hash1" was generated from...
+* `<group2>` by using the API key "hash2" was generated from...
+
+and anything else by using the API key "hash3" was created from.
 
 Note that `*` or`*,` or `*=` all mean that no API key is required. On its own, it's the same as having no credentials file, but it can be useful together with other group names:
 
@@ -180,7 +180,7 @@ Note that `*` or`*,` or `*=` all mean that no API key is required. On its own, i
 *
 ```
 
-This is interpreted as "require API keys for the groups <group1> and <group2> but allow anything else without an API key".
+This is interpreted as "require API keys for the groups `<group1>` and `<group2>` but allow anything else without an API key".
 
 Finally, you can allow anybody to publish packages under a particular group name without providing an API key:
 
@@ -196,12 +196,12 @@ This means:
 
 * You may publish packages to the group "group2" without an API key 
 
-* For any group name but <group1> and <group2> you must specify the API key "hash3" was generated from
+* For any group name but `<group1>` and `<group2>` you must specify the API key "hash3" was generated from
 
 
 ##### Editing the file "Credentials.csv" 
 
-There is one reasons why you might need to change the file `Credentials.csv`: when a group name must be deleted for some reason.
+There is one reason why you might need to change the file `Credentials.csv`: when a group name must be deleted for some reason.
 
 If a new group needs to be added, or a new API key needs to be assigned to an existing group, you must create a file `Credentials.txt`, see above.
 
@@ -221,10 +221,10 @@ A Tatin package requires all source code (functions, operators, classes, interfa
 
 Tatin calls the former "source" and the latter "assets". 
 
-What is defined in the package configuration file which _must_ exist to make a folder a Tatin package.
-
 
 #### The package configuration file
+
+The file `apl-package.json` must exist in order to make a folder a package.
 
 What is required and how to create and change a package configuration file is discussed in the document [PackageConfiguration](./PackageConfiguration.html ).
 
@@ -235,16 +235,16 @@ The file `apl-dependencies.txt` is only required when a package depends on other
 
 Dependencies may by installed in a package project in different ways:
 
-* By default Tatin assumes a subfolder packages/ to be used for this. If you use them Tatin will identify dependencies itself.
+* By default Tatin assumes a subfolder `packages/` to save dependencies.
 
-* If you manage a package project with Cider then Tatin will check the properties `dependencies.tatin` and `dependencies_dev.tatin`: if one of them or both define a folder then it will be taken
+* If you manage a package project with Cider, then Tatin will check the properties `dependencies.tatin` and `dependencies_dev.tatin`: if one of them or both define a folder then it will be taken
 
-* If you do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
+* If you do not use Cider and prefer a subfolder not named `packages/` for any dependencies, then you must specify them explicitly:
 
   * The user command `]Tatin.PublishPackage` has a modifier for this: `-dependencies=`
   * The API function `PublishPackage` can be fed with an optional left argument for this
 
-I> In case you specify a dependency that has not (yet) been published then this has no consequences: the server will not reject such a package. 
+I> In case you specify a dependency that has not (yet) been published, then this has no consequences: the server will not reject such a package. 
 I>
 I> That might come as a surprise, but there is a reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work then.
 
@@ -269,9 +269,9 @@ Once the preparation is done the final step is easy. Specify the folder hosting 
 
 The folder may or may not carry a trailing slash (`/`).
 
-This would attempt to publish the package found in `path2package/` to the principal Tatin Server represented by the alias `[tatin]`.
+This would attempt to publish the package found in `path2package/` to the principal Tatin Server.
 
-You can also build a new version by calling `]TATIN.BuildPackage` and specify the resulting ZIP file as an argument to `PublishPackage`:
+You can also build a new version by calling `]TATIN.BuildPackage` (or its API aquivalent `BuildPackage`) and specify the resulting ZIP file as an argument to `PublishPackage`:
 
 ```
 ]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]
@@ -279,11 +279,11 @@ You can also build a new version by calling `]TATIN.BuildPackage` and specify th
 
 When a path to a package project is provided rather than a ZIP file then `]PublishProject` would create the ZIP file itself.
 
-Note that both `]PublishPackage` as well as `]BuildPackage` assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.
+Note that both `]PublishPackage` as well as `]BuildPackage` assume that if the package about to be published depends on other packages these packages will be installed in a subfolder `packages/`.
 
-However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has two properties `dependencies.tatin` and `dependencies_dev.tatin` designed to hold the folder with package dependencies, and if one of them is not empty then Tatin would use it, or question the user if both are set.
+However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has two properties `dependencies.tatin` and `dependencies_dev.tatin` designed to hold the folder with package dependencies, and if one of them is not empty then Tatin would use it, or question the user if both are set and not empty.
 
-If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the `-dependencies=` flag.
+If you do not use Cider but want to establish a non-default subfolder (read: not named `packages/`) as the one holding package dependencies then you must specify the subfolder with the `-dependencies=` flag.
 
 
 ### User command packages
@@ -313,7 +313,7 @@ MyUserCommand/
 
 The package configuration parameter `source` will then read `APLSource/MyUserCommand` because we don't want `TestData/` and `TestCases/` to be part of the installed package.
 
-But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder.
+But that would mean that the script `MyUserCommand.dyalog` would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder, not in a sub folder.
 
 That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:
 
@@ -380,13 +380,11 @@ Let's imagine that you are supposed to develop Tatin packages for your employer,
 
   This is used to publish beta versions that your team might want to use. This has the second-highest priority.
 
-  This is used to publish beta versions that your team might want to use. This has the second-highest priority.
-
 * Your company also runs a Tatin Server used for productive packages.
 
 * Your packages may depend on packages published on Tatin's principal server, known as `[tatin]`.
 
-  Of the four Registries, this one should probably have the lowest priority.
+  Of the four Registries, this one should have the lowest priority.
 
 * You might also have the test Registry defined in your user settings, but with a priority of `0` so that it will be ignored when Registries are scanned for packages, but you could still use it.
 
@@ -395,6 +393,9 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
+
+
 
 
 

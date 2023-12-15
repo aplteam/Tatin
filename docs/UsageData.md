@@ -11,10 +11,10 @@
 
 ## Overview
 
-It is natural to assume that package authors would be interested in knowing how many people are interested in their packages, or how often a package was downloaded. 
+It is natural to assume that package authors would like to know how many people are interested in their packages, or how often a package was downloaded. 
 
 
-Tatin tries to deliver but there is an obstacle one has to be aware of:
+Tatin tries to deliver that information, but there is an obstacle one has to be aware of:
 
 Tatin uses a machine-specific cache when downloading a package in order to save bandwidth and CPU resources in case a package is requested again by either the same user or a different user on the same machine.
 
@@ -33,7 +33,7 @@ So the filename `usage-data-2022-04` means _all data from 2022 up to and includi
 
 Once a year, in January, Tatin collects the data from last year and saves it in a file `usage-data-<YYYY>`. It also deletes any files `usage-data-<YYYY>-<MM>`.
 
-For example, in January 2023 it would create a file `usage-data-2022`, and it would delete a file `usage-data-2022-11`.
+For example, in January 2023 it would create a file `usage-data-2022`, and it would delete all file `usage-data-2022-*`.
 
 
 ## How to retrieve the data
@@ -52,3 +52,4 @@ Enter `]Tatin.UsageData -??` for details.
 ### API
 
 There are no API functions available for retrieving usage data.
+

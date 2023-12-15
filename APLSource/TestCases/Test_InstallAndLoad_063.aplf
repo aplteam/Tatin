@@ -48,8 +48,11 @@
 
 ∆TidyUp:
  {}⎕SE.Link.Break'#.TEMP1'
- #.⎕EX¨'TEMP1' 'TEMP2'
  (rc msg)←F.RmDirByForce dir
  msg Assert rc=0
  #.⎕EX TC.GetTatinRootSpace'#'
+ :If 9=#.⎕NC'TEMP2.Variables'
+     F.RmDir #.TEMP2.Variables.TatinVars.HOME,'/..'
+ :EndIf
+ #.⎕EX¨'TEMP1' 'TEMP2'
 ⍝Done

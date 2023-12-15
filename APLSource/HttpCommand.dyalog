@@ -1,8 +1,14 @@
 ﻿:Class HttpCommand
 ⍝ General HTTP Commmand utility
-⍝ Documentation is found at https://dyalog.github.io/HttpCommand
+⍝ Documentation is found at https://dyalog.github.io/HttpCommand/
 
     ⎕ML←⎕IO←1
+
+    ∇ r←Version
+    ⍝ Return the current version
+      :Access public shared
+      r←'HttpCommand' '5.4.4' '2023-10-31'
+    ∇
 
 ⍝ Request-related fields
     :field public Command←'get'                    ⍝ HTTP command (method)
@@ -13,6 +19,7 @@
     :field public Cookies←⍬                        ⍝ request cookies - vector of namespaces
     :field public Auth←''                          ⍝ authentication string
     :field public AuthType←''                      ⍝ authentication type
+    :field public BaseURL←''                       ⍝ base URL to use when making multiple requests to the same host
 
 ⍝ Proxy-related fields - only used if connecting through a proxy server
     :field public ProxyURL←''                      ⍝ address of the proxy server
@@ -42,6 +49,8 @@
     :field public MaxRedirections←10               ⍝ set to 0 if you don't want to follow any redirected references, ¯1 for unlimited
     :field public KeepAlive←1                      ⍝ default to not close client connection
     :field public TranslateData←0                  ⍝ set to 1 to translate XML or JSON response data
+    :field public UseZip←0                         ⍝ zip request payload (0-no, 1-use gzip, 2-use deflate)
+    :field public ZipLevel←1                       ⍝ default compression level (0-9)
     :field public shared Debug←0                   ⍝ set to 1 to disable trapping, 2 to stop just before creating client
 
     :field public readonly shared ValidFormUrlEncodedChars←'&=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~*+~%'
@@ -49,12 +58,6 @@
     :field Client←''                               ⍝ Conga client ID
     :field ConxProps←''                            ⍝ when a client is made, its connection properties are saved so that if either changes, we close the previous client
     :field origCert←¯1                             ⍝ used to check if Cert changed between calls
-
-    ∇ r←Version
-    ⍝ Return the current version
-      :Access public shared
-      r←'HttpCommand' '5.1.14' '2022-01-04'
-    ∇
 
     ∇ make
     ⍝ No argument constructor
@@ -84,7 +87,8 @@
     ⍝ initialize the namespace result
       :Access shared
       ns.(Command URL rc msg HttpVersion HttpStatus HttpMessage Headers Data PeerCert Redirections Cookies OutFile Elapsed BytesWritten)←'' '' ¯1 '' ''⍬''(0 2⍴⊂'')''⍬(0⍴⊂'')⍬'' 0 ¯1
-      ns.GetHeader←{⎕IO←⎕ML←1 ⋄ ⍺←Headers ⋄ ⍺{1<|≡⍵:⍺∘∇¨⍵ ⋄ (⍺[;2],⊂'')⊃⍨⍺[;1](⍳{(⍵⍵ ⍺)⍺⍺(⍵⍵ ⍵)}(1∘(819⌶)))⊆,⍵}⍵} ⍝ return header value or '' if not found
+      ns.GetHeader←{⎕IO←⎕ML←1 ⋄ ⍺←Headers ⋄ ⍺{1<|≡⍵:⍺∘∇¨⍵ ⋄ (⍺[;2],⊂'')⊃⍨⍺[;1](⍳{(⍵⍵ ⍺)⍺⍺(⍵⍵ ⍵)}{2::0(819⌶)⍵ ⋄ ¯3 ⎕C ⍵})⊆,⍵}⍵} ⍝ return header value or '' if not found
+      ns.⎕FX'∇r←IsOK' 'r←0 2≡rc,⌊.01×HttpStatus' '∇'
     ∇
 
     ∇ Goodbye
@@ -191,7 +195,6 @@
               :Trap Debug↓0
                   cmd.Params←JSONexport cmd.Params
               :Else
-                  r←cmd.Result
                   →∆DONE⊣r.(rc msg)←¯1 'Could not convert parameters to JSON format'
               :EndTrap
           :EndIf
@@ -204,7 +207,7 @@
           :If ¯1=r.BytesWritten ⍝ if not writing to file
               :If ∨/'application/json'⍷lc r.Headers getHeader'content-type'
                   JSONimport r
-              :Else ⋄ →∆DONE⊣r.(rc msg)←2 'Response content-type is not application/json'
+              :Else ⋄ →∆DONE⊣r.(rc msg)←¯2 'Response content-type is not application/json'
               :EndIf
           :EndIf
       :EndIf
@@ -323,7 +326,7 @@
               :EndIf
               :If ∨/'.Conga'⍷⍕CongaRef ⍝ Conga?
                   LDRC←CongaPath CongaRef.Init'HttpCommand'
-              :ElseIf 0≡⊃CongaPath CongaRef.Init'' ⍝ DRC?
+              :ElseIf 0≡⊃CongaRef.Init CongaPath ⍝ DRC?
                   LDRC←CongaRef
               :Else ⍝ should never get to here, but... (paranoia)
                   r.msg←'it does not refer to a valid Conga interface'
@@ -397,7 +400,7 @@
      ∆FAIL:(rc secureParams)←¯1 msg ⍝ failure
     ∇
 
-    ∇ {r}←certs HttpCmd args;url;parms;hdrs;urlparms;p;b;secure;port;host;path;auth;req;err;done;data;datalen;rc;donetime;ind;len;obj;evt;dat;z;msg;timedOut;certfile;keyfile;simpleChar;defaultPort;cookies;domain;t;replace;outFile;toFile;startSize;options;congaPath;progress;starttime;outTn;secureParams;ct;forceClose;headers;cmd;file;protocol;conx;proxied;proxy;cert;noCT;simpleParms;noContentLength;connectionClose
+    ∇ {r}←certs HttpCmd args;url;parms;hdrs;urlparms;p;b;secure;port;host;path;auth;req;err;done;data;datalen;rc;donetime;ind;len;obj;evt;dat;z;msg;timedOut;certfile;keyfile;simpleChar;defaultPort;cookies;domain;t;replace;outFile;toFile;startSize;options;congaPath;progress;starttime;outTn;secureParams;ct;forceClose;headers;cmd;file;protocol;conx;proxied;proxy;cert;noCT;simpleParms;noContentLength;connectionClose;tmpFile;tmpTn;redirected;encoding;compType;isutf8
     ⍝ issue an HTTP command
     ⍝ certs - X509Cert|(PublicCertFile PrivateKeyFile) SSLValidation Priority PublicCertFile PrivateKeyFile
     ⍝ args  - [1] HTTP method
@@ -414,6 +417,8 @@
       :If 0∊⍴cmd ⋄ cmd←'GET' ⋄ :EndIf
      
       r←Result
+      toFile←redirected←outTn←tmpTn←0 ⍝ initial settings
+      tmpFile←''
      
     ⍝ Do some cursory parameter checking
       →∆END↓⍨0∊⍴r.msg←'No URL specified'/⍨0∊⍴url ⍝ exit early if no URL
@@ -426,13 +431,17 @@
       :EndIf
      
       url←,url
+      url←BaseURL makeURL url
       cmd←uc,cmd
      
      ∆GET:
      
     ⍝ do header initialization here because we may return here on a redirect
-      hdrs←makeHeaders headers
-      →∆END↓⍨0∊⍴r.msg←'Improper header format'/⍨¯1≡hdrs
+      :Trap 7
+          hdrs←makeHeaders headers
+      :Else
+          →∆END⊣r.msg←'Improper header format'
+      :EndTrap
      
       conx←ConxProps ConnectionProperties r.URL←url
       →∆END↓⍨0∊⍴r.msg←conx.msg
@@ -454,6 +463,7 @@
           hdrs←'Host'(hdrs addHeader)host,((~defaultPort)/':',⍕port)
           hdrs←'User-Agent'(hdrs addHeader)deb'Dyalog-',1↓∊'/',¨2↑Version
           hdrs←'Accept'(hdrs addHeader)'*/*'
+          hdrs←'Accept-Encoding'(hdrs addHeader)'gzip, deflate'
           :If ~0∊⍴Auth
               :If (1<|≡Auth)∨':'∊Auth ⍝ (userid password) or userid:password
               :AndIf ('basic'≡lc AuthType)∨0∊⍴AuthType
@@ -484,12 +494,12 @@
           :EndIf
       :EndIf
      
-      :If ~0∊⍴parms ⍝ do we have any parameters?
+      noCT←(0∊⍴ContentType)∧('∘???∘'≡hdrs getHeader'content-type') ⍝ no content-type specified
+      :If noCT⍲0∊⍴parms ⍝ do we have any parameters or a content-type
           simpleParms←{2≠⎕NC'⍵':0 ⋄ 1≥|≡⍵}parms ⍝ simple vector or scalar and not a reference
-          noCT←(0∊⍴ContentType)∧('∘???∘'≡hdrs getHeader'content-type') ⍝ no content-type specified
+     
           :If (⊆cmd)∊'GET' 'HEAD' ⍝ if the command is GET or HEAD
           :AndIf noCT
-     
               ⍝ params needs to be URLEncoded and will be appended to the query string
               :If simpleParms
                   parms←∊⍕parms       ⍝ deal with possible numeric
@@ -529,51 +539,77 @@
               :Case 'application/json'
                   :If ~isJSON parms ⍝ if it's not already JSON
                       parms←JSONexport parms ⍝ JSONify it
+                  :Else
+                      parms←SafeJSON parms
                   :EndIf
               :Else
                   parms←∊⍕parms
               :EndSelect
+     
+              :Select UseZip
+              :Case 1 ⍝ gzip
+                  :Trap 0
+                      parms←toChar 2⊃3 ZipLevel Zipper sint parms
+                      hdrs←'Content-Encoding'(hdrs setHeader)'gzip'
+                  :Else
+                      r.msg←'gzip encoding on request payload failed'
+                  :EndTrap
+              :Case 2 ⍝ deflate
+                  :Trap 0
+                      parms←toChar 2⊃2 ZipLevel Zipper sint parms
+                      hdrs←'Content-Encoding'(hdrs setHeader)'deflate'
+                  :Else
+                      r.msg←'deflate encoding on request payload failed'
+                  :EndTrap
+              :EndSelect
+     
               :If RequestOnly>SuppressHeaders ⍝ Conga supplies content-length, but for RequestOnly we need to insert it
                   hdrs←'Content-Length'(hdrs addHeader)⍴parms
               :EndIf
           :EndIf
       :EndIf
      
+      hdrs⌿⍨←~0∊¨≢¨hdrs[;2] ⍝ remove any headers with empty values
+     
       :If RequestOnly
           r←cmd,' ',(path,(0∊⍴urlparms)↓'?',urlparms),' HTTP/1.1',(∊{NL,⍺,': ',∊⍕⍵}/hdrs),NL,NL,parms
           →∆EXIT
       :EndIf
      
-      outTn←0
       (outFile replace)←2↑{⍵,(≢⍵)↓'' 0}eis OutFile
-      :If toFile←~0∊⍴outFile
-          :Trap Debug↓0
-              outFile←1 ⎕NPARTS outFile
-              :If ~⎕NEXISTS⊃outFile
-                  →∆END⊣r.msg←'Output file folder "',(⊃outFile),'" does not exist'
-              :EndIf
-              :If 0∊⍴∊1↓outFile ⍝ no file name specified, try to use the name from the URL
-                  :If ~0∊⍴file←∊1↓1 ⎕NPARTS path
-                      outFile←(⊃outFile),file
-                  :Else ⍝ no file name specified and none in the URL
-                      →∆END⊣r.msg←'No file name specified in OutFile or URL'
+      :If 0=outTn ⍝ if we don't already have an output file tied
+          :If toFile←~0∊⍴outFile ⍝ if we're directing the response payload to file
+              :Trap Debug↓0
+                  outFile←1 ⎕NPARTS outFile
+                  :If ~⎕NEXISTS⊃outFile
+                      →∆END⊣r.msg←'Output file folder "',(⊃outFile),'" does not exist'
                   :EndIf
-              :EndIf
-              :If ⎕NEXISTS outFile←∊outFile
-                  :If (0=replace)∧0≠2 ⎕NINFO outFile
-                      →∆END⊣r.msg←'Output file "',outFile,'" is not empty'
+                  :If 0∊⍴∊1↓outFile ⍝ no file name specified, try to use the name from the URL
+                      :If ~0∊⍴file←∊1↓1 ⎕NPARTS path
+                          outFile←(⊃outFile),file
+                      :Else ⍝ no file name specified and none in the URL
+                          →∆END⊣r.msg←'No file name specified in OutFile or URL'
+                      :EndIf
+                  :EndIf
+                  :If ⎕NEXISTS outFile←∊outFile
+                      :If (0=replace)∧0≠2 ⎕NINFO outFile
+                          →∆END⊣r.msg←'Output file "',outFile,'" is not empty'
+                      :Else
+                          outTn←outFile ⎕NTIE 0
+                          {}0 ⎕NRESIZE⍣(1=replace)⊢outTn
+                      :EndIf
                   :Else
-                      outTn←outFile ⎕NTIE 0
-                      {}0 ⎕NRESIZE⍣(1=replace)⊢outTn
+                      outTn←outFile ⎕NCREATE 0
                   :EndIf
+                  startSize←⎕NSIZE outTn
+                  r.OutFile←outFile
+                  tmpFile←tempFolder,'/',(∊1↓1 ⎕NPARTS outFile) ⍝ create temporary file to work with
+                  tmpTn←tmpFile(⎕NCREATE⍠'Unique' 1)0 ⍝ create with a unique name
+                  tmpFile←∊1 ⎕NPARTS ⎕NNAMES[⎕NNUMS⍳tmpTn;] ⍝ save the name for ⎕NDELETE later
               :Else
-                  outTn←outFile ⎕NCREATE 0
-              :EndIf
-              startSize←⎕NSIZE outTn
-              r.OutFile←outFile
-          :Else
-              →∆END⊣r.msg←({⍺,(~0∊⍴⍵)/' (',⍵,')'}/⎕DMX.(EM Message)),' occurred while trying to initialize output file "',(⍕outFile),'"'
-          :EndTrap
+                  →∆END⊣r.msg←({⍺,(~0∊⍴⍵)/' (',⍵,')'}/⎕DMX.(EM Message)),' occurred while trying to initialize output file "',(⍕outFile),'"'
+              :EndTrap
+          :EndIf
       :EndIf
      
       secureParams←''
@@ -680,6 +716,7 @@
                           :Else
                               r.(HttpVersion HttpStatus HttpMessage Headers)←4↑dat
                               r.HttpStatus←toInt r.HttpStatus
+                              redirected←3=⌊0.01×r.HttpStatus
                               datalen←⊃toInt{0∊⍴⍵:'¯1' ⋄ ⍵}r.GetHeader'Content-Length' ⍝ ¯1 if no content length not specified
                               connectionClose←'close'≡lc r.GetHeader'Connection'
                               noContentLength←datalen=¯1
@@ -688,9 +725,10 @@
                           :EndIf
                       :Case 'HTTPBody'
                           →∆END⍴⍨forceClose←r CheckPayloadSize(≢data)+≢dat
-                          :If toFile
-                              →∆END⍴⍨forceClose←r CheckPayloadSize(⎕NSIZE outTn)+≢dat
-                              dat ⎕NAPPEND outTn
+                          :If toFile>redirected ⍝ don't write redirect response payload to file
+                              →∆END⍴⍨forceClose←r CheckPayloadSize(⎕NSIZE tmpTn)+≢dat
+                              dat ⎕NAPPEND tmpTn
+                              ⎕NUNTIE ⍬
                           :Else
                               data,←dat
                           :EndIf
@@ -698,9 +736,10 @@
                       :Case 'HTTPChunk'
                           :If 1=≡dat
                               →∆END⊣r.(Data msg)←dat'Conga failed to parse the response HTTP chunk' ⍝ HTTP chunk parsing failed?
-                          :ElseIf toFile
-                              →∆END⍴⍨forceClose←r CheckPayloadSize(⎕NSIZE outTn)+≢1⊃dat
-                              (1⊃dat)⎕NAPPEND outTn
+                          :ElseIf toFile>redirected ⍝ don't write redirect response payload to file
+                              →∆END⍴⍨forceClose←r CheckPayloadSize(⎕NSIZE tmpTn)+≢1⊃dat
+                              (1⊃dat)⎕NAPPEND tmpTn
+                              ⎕NUNTIE ⍬
                           :Else
                               →∆END⍴⍨forceClose←r CheckPayloadSize(≢data)+≢1⊃dat
                               data,←1⊃dat
@@ -728,9 +767,10 @@
                           :EndIf
                       :Case 'BlockLast' ⍝ BlockLast included for pre-Conga v3.4 compatibility for RFC7230 (Sec 3.3.3 item 7)
                           →∆END⍴⍨forceClose←r CheckPayloadSize(≢data)+≢dat
-                          :If toFile
-                              →∆END⍴⍨forceClose←r CheckPayloadSize(⎕NSIZE outTn)+≢dat
-                              dat ⎕NAPPEND outTn
+                          :If toFile<redirected
+                              →∆END⍴⍨forceClose←r CheckPayloadSize(⎕NSIZE tmpTn)+≢dat
+                              dat ⎕NAPPEND tmpTn
+                              ⎕NUNTIE ⍬
                           :Else
                               data,←dat
                           :EndIf
@@ -759,11 +799,7 @@
                   :EndIf
               :EndWhile
           :EndTrap
-          :If toFile
-              r.BytesWritten←(⎕NSIZE outTn)-startSize
-          :EndIf
      
-          {}⎕NUNTIE outTn
           r.Elapsed←⎕AI[3]-starttime
      
           :If timedOut
@@ -776,25 +812,39 @@
           forceClose∨←connectionClose ⍝ if there's a 'Connection: close' header
      
           :If 0=err
-              :If ~toFile
-                  :Trap Debug↓0 ⍝ If any errors occur, abandon conversion
-                      :Select z←lc r.GetHeader'content-encoding' ⍝ was the response compressed?
-                      :Case '' ⍝ no content-encoding header, do nothing
-                      :Case 'deflate'
-                          data←120 ¯100{(2×⍺≡2↑⍵)↓⍺,⍵}83 ⎕DR data ⍝ append 120 156 signature because web servers strip it out due to IE
-                          data←fromutf8 256|¯2(219⌶)data
-                      :Case 'gzip' ⋄ data←fromutf8 256|¯3(219⌶)83 ⎕DR data
-                      :Else ⋄ r.msg←'Unhandled content-encoding: ',z
-                      :EndSelect
+              ct←lc r.GetHeader'content-type'
+              isutf8←0<≢'charset\s*=\s*utf-8'⎕S'&'⍠1⊢ct←lc r.GetHeader'content-type'
+              isutf8∨←(∨/'application/json'⍷ct)∧~∨/'charset'⍷ct ⍝ application/json defaults to UTF-8 unless other charset specified
+              encoding←lc r.GetHeader'content-encoding' ⍝ response payload compressed?
+              compType←¯2 ¯3 0['deflate' 'gzip'⍳⊂encoding]
      
-                      :If 0<≢'charset\s*=\s*utf-8'⎕S'&'⍠1⊢ct←lc r.GetHeader'content-type'
-                      :OrIf (∨/'application/json'⍷ct)∧~∨/'charset'⍷ct
-                          data←'UTF-8'⎕UCS ⎕UCS data ⍝ Convert from UTF-8
+     
+              :If toFile≤redirected
+                  :Trap Debug↓0 ⍝ If any errors occur, abandon conversion
+                      :If ~0∊⍴data
+                          :If ~0∊⍴encoding
+                              :If 0≠compType
+                                  data←256|compType Zipper 83 ⎕DR data ⍝ unzip
+                                  data←⎕UCS data ⍝ try to translate
+                              :Else
+                                  r.msg←'Unhandled content-encoding: ',compType,', could not decode response payload'
+                              :EndIf
+                          :EndIf
+                      :EndIf
+     
+                      :If isutf8
+                          data←'UTF-8'⎕UCS ⎕UCS data
                           data←(65279=⎕UCS⊃data)↓data ⍝ drop off BOM, if any
                       :EndIf
+                  :Else
+                      r.rc←⎕DMX.EN
+                      r.msg←⎕DMX.EM,' occurred during response payload conversion (Data was not converted)'
+                      r.Data←data
+                      →∆END
                   :EndTrap
+     
                   :If TranslateData=1
-                      :If ∨/∊'text/xml' 'application/xml'⍷¨⊂ct←lc r.GetHeader'content-type'
+                      :If ∨/∊'text/xml' 'application/xml'⍷¨⊂ct
                           r{0::⍺.(rc Data msg)←¯2 ⍵'Could not translate XML payload' ⋄ ⍺.Data←⎕XML ⍵}data
                       :ElseIf ∨/'application/json'⍷ct
                           r.Data←data
@@ -805,7 +855,20 @@
                   :Else
                       r.Data←data
                   :EndIf
-              :EndIf
+     
+              :Else ⍝ toFile and not redirected
+                  :If ~0∊⍴encoding ⍝ content-encoding header?
+                      :If 0≠compType
+                          :If 0≠z←compType UnzipFile tmpTn
+                              r.msg←(⎕EM z),' occurred when attempting to decompress response payload'
+                          :EndIf
+                      :Else
+                          r.msg←'Unhandled content-encoding: ',compType,', could not decode response payload'
+                      :EndIf
+                  :EndIf
+                  r.BytesWritten←⎕NSIZE tmpTn
+                  (⎕NREAD tmpTn,83,(r.BytesWritten),0)⎕NAPPEND outTn
+              :EndIf ⍝ ~toFile
      
               r.Cookies←parseCookies r.Headers r.Host(extractPath r.Path)
               Cookies←Cookies updateCookies r.Cookies
@@ -816,7 +879,7 @@
                       :If ''≢url←r.GetHeader'location' ⍝ if we were redirected use the "location" header field for the URL
                           :If '/'=⊃url ⋄ url,⍨←host ⋄ :EndIf ⍝ if a relative redirection, use the current host
                           r.Redirections,←t←#.⎕NS''
-                          t.(URL HttpVersion HttpStatus HttpMessage Headers)←r.(URL HttpVersion HttpStatus HttpMessage Headers)
+                          t.(URL HttpVersion HttpStatus HttpMessage Headers Data)←r.(URL HttpVersion HttpStatus HttpMessage Headers Data)
                           {}LDRC.Close Client
                           cmd←(1+303=r.HttpStatus)⊃cmd'GET' ⍝ 303 (See Other) is always followed by a 'GET'. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
                           →∆GET
@@ -840,6 +903,8 @@
       :EndIf
       r.rc←1⊃rc ⍝ set the return code to the Conga return code
      ∆END:
+      ⎕NUNTIE tmpTn,outTn
+      {0:: ⋄ ⎕NDELETE ⍵}tmpFile
       Client←{0::'' ⋄ KeepAlive>forceClose:⍵ ⋄ ''⊣LDRC.Close ⍵}Client
      ∆EXIT:
     ∇
@@ -868,12 +933,31 @@
      ∆EXIT:
     ∇
 
+    ∇ {r}←type UnzipFile tn;data
+      :Access public shared
+    ⍝ Unzip an output file
+    ⍝ type is compression type: ¯2 for gzip, ¯3 for deflate
+    ⍝ tn is the tie number of the file to unzip
+    ⍝ r is 0 for success or ⎕EN
+      :Trap 0
+          data←⎕NREAD tn 83,(⎕NSIZE tn),0
+          data←⎕UCS 256|type Zipper data
+          0 ⎕NRESIZE tn
+          data ⎕NAPPEND tn
+          ⎕NUNTIE ⍬
+          r←0
+      :Else
+          r←⎕EN
+      :EndTrap
+    ∇
+
     NL←⎕UCS 13 10
+    toChar←{(⎕DR'')⎕DR ⍵}
     fromutf8←{0::(⎕AV,'?')[⎕AVU⍳⍵] ⋄ 'UTF-8'⎕UCS ⍵} ⍝ Turn raw UTF-8 input into text
     utf8←{3=10|⎕DR ⍵: 256|⍵ ⋄ 'UTF-8' ⎕UCS ⍵}
-    sint←{⎕io←0 ⋄ 83=⎕DR ⍵:⍵ ⋄ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 ¯128 ¯127 ¯126 ¯125 ¯124 ¯123 ¯122 ¯121 ¯120 ¯119 ¯118 ¯117 ¯116 ¯115 ¯114 ¯113 ¯112 ¯111 ¯110 ¯109 ¯108 ¯107 ¯106 ¯105 ¯104 ¯103 ¯102 ¯101 ¯100 ¯99 ¯98 ¯97 ¯96 ¯95 ¯94 ¯93 ¯92 ¯91 ¯90 ¯89 ¯88 ¯87 ¯86 ¯85 ¯84 ¯83 ¯82 ¯81 ¯80 ¯79 ¯78 ¯77 ¯76 ¯75 ¯74 ¯73 ¯72 ¯71 ¯70 ¯69 ¯68 ¯67 ¯66 ¯65 ¯64 ¯63 ¯62 ¯61 ¯60 ¯59 ¯58 ¯57 ¯56 ¯55 ¯54 ¯53 ¯52 ¯51 ¯50 ¯49 ¯48 ¯47 ¯46 ¯45 ¯44 ¯43 ¯42 ¯41 ¯40 ¯39 ¯38 ¯37 ¯36 ¯35 ¯34 ¯33 ¯32 ¯31 ¯30 ¯29 ¯28 ¯27 ¯26 ¯25 ¯24 ¯23 ¯22 ¯21 ¯20 ¯19 ¯18 ¯17 ¯16 ¯15 ¯14 ¯13 ¯12 ¯11 ¯10 ¯9 ¯8 ¯7 ¯6 ¯5 ¯4 ¯3 ¯2 ¯1[utf8 ⍵]}
-    lc←(819⌶) ⍝ lower case conversion
-    uc←1∘lc   ⍝ upper case conversion
+    sint←{⎕IO←0 ⋄ 83=⎕DR ⍵:⍵ ⋄ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 ¯128 ¯127 ¯126 ¯125 ¯124 ¯123 ¯122 ¯121 ¯120 ¯119 ¯118 ¯117 ¯116 ¯115 ¯114 ¯113 ¯112 ¯111 ¯110 ¯109 ¯108 ¯107 ¯106 ¯105 ¯104 ¯103 ¯102 ¯101 ¯100 ¯99 ¯98 ¯97 ¯96 ¯95 ¯94 ¯93 ¯92 ¯91 ¯90 ¯89 ¯88 ¯87 ¯86 ¯85 ¯84 ¯83 ¯82 ¯81 ¯80 ¯79 ¯78 ¯77 ¯76 ¯75 ¯74 ¯73 ¯72 ¯71 ¯70 ¯69 ¯68 ¯67 ¯66 ¯65 ¯64 ¯63 ¯62 ¯61 ¯60 ¯59 ¯58 ¯57 ¯56 ¯55 ¯54 ¯53 ¯52 ¯51 ¯50 ¯49 ¯48 ¯47 ¯46 ¯45 ¯44 ¯43 ¯42 ¯41 ¯40 ¯39 ¯38 ¯37 ¯36 ¯35 ¯34 ¯33 ¯32 ¯31 ¯30 ¯29 ¯28 ¯27 ¯26 ¯25 ¯24 ¯23 ¯22 ¯21 ¯20 ¯19 ¯18 ¯17 ¯16 ¯15 ¯14 ¯13 ¯12 ¯11 ¯10 ¯9 ¯8 ¯7 ¯6 ¯5 ¯4 ¯3 ¯2 ¯1[utf8 ⍵]}
+    lc←{2::0(819⌶)⍵ ⋄ ¯3 ⎕C ⍵} ⍝ lower case conversion
+    uc←{2::1(819⌶)⍵ ⋄ 1 ⎕C ⍵}  ⍝ upper case conversion
     ci←{(lc ⍺)⍺⍺ lc ⍵} ⍝ case insensitive operator
     deb←' '∘(1↓,(/⍨)1(⊢∨⌽)0,≠) ⍝ delete extraneous blanks
     dlb←{(+/∧\' '=⍵)↓⍵} ⍝ delete leading blanks
@@ -887,9 +971,8 @@
     getchunklen←{¯1=len←¯1+⊃(NL⍷⍵)/⍳⍴⍵:¯1 ¯1 ⋄ chunklen←h2d len↑⍵ ⋄ (⍴⍵)<len+chunklen+4:¯1 ¯1 ⋄ len chunklen}
     toInt←{0∊⍴⍵:⍬ ⋄ ~3 5∊⍨10|⎕DR t←1⊃2⊃⎕VFI ⍕⍵:⍬ ⋄ t≠⌊t:⍬ ⋄ t} ⍝ simple char to int
     fmtHeaders←{0∊⍴⍵:'' ⋄ (firstCaps¨⍵[;1])(,∘⍕¨⍵[;2])} ⍝ formatted HTTP headers
-    firstCaps←{1↓{(¯1↓0,'-'=⍵) (819⌶)¨ ⍵}'-',⍵} ⍝ capitalize first letters e.g. Content-Encoding
-    addHeader←{'∘???∘'≡⍺⍺ getHeader ⍺:⍺⍺⍪⍺ (⍕⍵) ⋄ ⍺⍺} ⍝ add a header unless it's already defined
-    getHeader←{⍺{1<|≡⍵:⍺∘∇¨⍵ ⋄ (⍺[;2],⊂'∘???∘')⊃⍨⍺[;1](⍳{(⍵⍵ ⍺)⍺⍺(⍵⍵ ⍵)}(1∘(819⌶)))⊆,⍵}⍵} ⍝ return header value(s) or '∘???∘' if not found
+    firstCaps←{1↓uc@(¯1↓0,'-'∘=)lc '-',⍵} ⍝ capitalize first letters e.g. Content-Encoding
+    getHeader←{⍺{1<|≡⍵:⍺∘∇¨⍵ ⋄ (⍺[;2],⊂'∘???∘')⊃⍨⍺[;1](⍳{(⍵⍵ ⍺)⍺⍺(⍵⍵ ⍵)}lc)⊆,⍵}⍵} ⍝ return header value(s) or '∘???∘' if not found
     tableGet←{⍺[;2]/⍨⍺[;1](≡ ci)¨⊂⍵}
     endsWith←{∧/⍵=⍺↑⍨-≢⍵}
     beginsWith←{∧/⍵=⍺↑⍨≢⍵}
@@ -902,6 +985,16 @@
     stopIf←{1∊⍵:-⎕TRAP←0 'C' '⎕←''Stopped for debugging... (Press Ctrl-Enter)''' ⋄ shy←0} ⍝ faster alternative to setting ⎕STOP
     seconds←{⍵÷86400} ⍝ convert seconds to fractional day (for cookie max-age)
     atLeast←{a←(≢⍵)↑⍺ ⋄ ⊃((~∧\⍵=a)/a>⍵),1} ⍝ checks if ⍺ is at least version ⍵
+    Zipper←219⌶
+    tempFolder←739⌶0
+
+      makeURL←{ ⍝ build URL from BaseURL (⍺) and URL (⍵)
+          ~0∊⍴'^https?\:\/\/'⎕S 3⍠('IC' 1)⊢⍵:⍵  ⍝ URL begins with http:// or https://
+          0∊⍴⍺:⍵        ⍝ no BaseURL
+          t←'/'=⊃⍵      ⍝ URL begins with '/'?
+          '/'=⊃⌽⍺:⍺,t↓⍵ ⍝ BaseURL ends with '/'
+          ⍺,t↓'/',⍵     ⍝ insert '/' if not already there
+      }
 
     ∇ r←makeHeaders w
       r←{
@@ -913,7 +1006,7 @@
               dlb¨¨((,⍵)((~∊)⊆⊣)NL)splitOnFirst¨':'
           }⍵
           2=⍴⍴⍵:{          ⍝ matrix
-              0∊≢¨⍵:¯1     ⍝ no empty names or values
+              0∊≢¨⍵[;1]:¯1 ⍝ no empty names
               0 1 1/0,,¨⍵  ⍝ ensure it's 2 columns
           }⍵
           3=|≡⍵:∇{         ⍝ depth 3
@@ -926,18 +1019,19 @@
           }⍵
           ¯1
       }w
+      'Invalid Headers format'⎕SIGNAL 7/⍨r≡¯1
     ∇
 
     ∇ r←JSONexport data
       :Trap 11
           r←SafeJSON 1(3⊃⎕RSI,##).⎕JSON data ⍝ attempt to export
       :Else
-          r←SafeJSON(1(3⊃⎕RSI,##).⎕JSON⍠'HighRank' 'Split')data ⍝ Dyalog v18.0 and later
+          r←SafeJSON 1(3⊃⎕RSI,##).⎕JSON⍠'HighRank' 'Split'⊢data ⍝ Dyalog v18.0 and later
       :EndTrap
     ∇
 
       JSONimport←{
-          0::⍵.(rc msg)←¯2 ⍵'Could not translate JSON payload'
+          0::⍵.(rc msg)←¯2 'Could not translate JSON payload'
           11::⍵.Data←0(3⊃⎕RSI,##).⎕JSON ⍵.Data
           ⍵.Data←0(3⊃⎕RSI,##).⎕JSON⍠'Dialect' 'JSON5'⊢⍵.Data}
 
@@ -996,7 +1090,7 @@
       ns.msg←msg
     ∇
 
-    ∇ (protocol secure host path urlparms)←{conx}parseURL url;path;p
+    ∇ (protocol secure host path urlparms)←{conx}parseURL url;path;p;ind
     ⍝ Parses a URL and returns
     ⍝   secure - Boolean whether running HTTPS or not based on leading http://
     ⍝   host - domain or IP address
@@ -1009,7 +1103,8 @@
       secure←protocol beginsWith'https:'
       url←p↓url                          ⍝ Remove HTTP[s]:// if present
       (host path)←url splitOnFirst'/'    ⍝ Extract host and path from url
-      host←lc host                       ⍝ host (domain) is case-insensitive
+      ind←host iotaz'@'                  ⍝ any credentials?
+      host←(ind↑host),lc ind↓host        ⍝ host (domain) is case-insensitive (credentials are not)
       :If ~0∊⍴conx ⍝ if we have an existing connection
       :AndIf 0∊⍴protocol ⍝ and no protocol was specified
           secure←(conx.Host≡host)∧conx.Secure ⍝ use the protocol from the existing connection
@@ -1150,17 +1245,30 @@
       r←2↓∊cookies.('; ',Name,'=',Value)
     ∇
 
-    ∇ name AddHeader value
+    ∇ {r}←name AddHeader value;hdrs
     ⍝ add a header unless it's already defined
       :Access public
-      Headers←makeHeaders Headers
-      Headers←name(Headers addHeader)value
+      :Trap 7
+          r←Headers←name(Headers addHeader)value
+      :Else
+          ⎕EM ⎕SIGNAL ⎕EN
+      :EndTrap
     ∇
 
-    ∇ name SetHeader value;ind
+    ∇ hdrs←name(hdrs addHeader)value
+    ⍝ add a header unless it's already defined
+      hdrs←makeHeaders hdrs
+      hdrs⍪←('∘???∘'≡hdrs getHeader name)⌿⍉⍪name value
+    ∇
+
+    ∇ {r}←name SetHeader value;ind
     ⍝ set a header value, overwriting any existing one
       :Access public
-      Headers←name(Headers setHeader)value
+      :Trap 7
+          r←Headers←name(Headers setHeader)value
+      :Else
+          ⎕EM ⎕SIGNAL ⎕EN
+      :EndTrap
     ∇
 
     ∇ hdrs←name(hdrs setHeader)value;ind
@@ -1170,11 +1278,16 @@
       hdrs[ind;]←name(⍕value)
     ∇
 
-    ∇ RemoveHeader name
+    ∇ {r}←RemoveHeader name
     ⍝ remove a header
       :Access public
-      Headers←makeHeaders Headers
+      :Trap 7
+          Headers←makeHeaders Headers
+      :Else
+          ⎕EM ⎕SIGNAL ⎕EN
+      :EndTrap
       Headers⌿⍨←Headers[;1](≢¨ci)eis name
+      r←Headers
     ∇
 
     ∇ r←{a}eis w;f
@@ -1307,6 +1420,9 @@
     ⍝ loads the latest released version from GitHub
       :Access public shared
       (rc msg)←¯1 'Default message'
+      :If 82=⎕DR''
+          →0⊣msg←'Upgrade is not available on Classic interpreters'
+      :EndIf
       :Trap Debug↓0
           latest←GetJSON'get' 'https://api.github.com/repos/Dyalog/HttpCommand/releases/latest'
           :If 0 200≢latest.(rc HttpStatus)

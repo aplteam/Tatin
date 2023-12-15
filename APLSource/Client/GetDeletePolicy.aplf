@@ -1,6 +1,6 @@
  r←{check}GetDeletePolicy url;request;res;client;buff;row;url_
-⍝ Takes a URI of a server (like https://tatin.dev) and returns the delete policy operated by the given server.
-⍝ Note that for a file (rather than a URL) "Any" is returned, otherwise we could not delete a folder from a non-managed Registry.
+⍝ Takes the URL of a server (like https://tatin.dev) and returns the delete policy operated by the given server.
+⍝ Note that for a folder (rather than a URL) "Any" is returned, otherwise we could not delete a folder from a non-managed Registry.
 ⍝ If there is a global ∆DeletePolicies' around (which will be created by this function after the first call
 ⍝ for better performance) then this will be used to determine the delete policy.
  check←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'check'
@@ -34,6 +34,7 @@
          r←2⊃∆DeletePolicies[row;]
      :EndIf
  :Else
+     ('<',url,'> is not a folder')Assert F.IsDir url
      r←'Any'
  :EndIf
 ⍝Done

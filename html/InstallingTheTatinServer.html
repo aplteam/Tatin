@@ -56,7 +56,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <ul>
 <li class="toc-entry toc-h3"><a href="#windows">8.1. Windows</a></li>
 <li class="toc-entry toc-h3"><a href="#linux">8.2. Linux</a></li>
-<li class="toc-entry toc-h3"><a href="#required-amendments">8.3. Required amendments</a>
+<li class="toc-entry toc-h3"><a href="#docker-required-amendments">8.3. Docker: required amendments</a>
 <ul>
 <li class="toc-entry toc-h4"><a href="#the-file-dockerfile">8.3.1. The file <code>Dockerfile</code></a></li>
 <li class="toc-entry toc-h4"><a href="#the-file-entrypoint">8.3.2. The file <code>entrypoint</code></a></li>
@@ -81,7 +81,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <h2 data-id="Introduction">1. Introduction</h2>
 </a>
 </div>
-<p>While the Tatin Client is coming with version 19.0 and later automatically, the Tatin Server always needs to be installed in case you want to use it.</p>
+<p>While the Tatin Client is coming with version 19.0 and later automatically, the Tatin Server always needs to be installed in case you want to run your own managed Tatin Registry.</p>
 <p>After downloading it from <a href="https://github.com/aplteam/Tatin/releases" class="external_link">https://github.com/aplteam/Tatin/releases</a> you need to unzip it into a folder where the Tatin Server is supposed to live.</p>
 <div class="h_tag">
 <a href="#requirements" id="requirements" class="autoheader_anchor">
@@ -112,8 +112,8 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </ul>
 <div class="leanpub_A">
 <h3>What is a local variable?</h3>
-<p>On top of the INI file, before any <code>[SECTION]</code> is defined, the local variable <code>home</code> is defined. It carries the value <code>&lt;INIFILE&gt;</code>.</p>
-<p>Further down the local variable is referenced as <code>{home}</code>; that simply means that <code>{home}</code> will be replaced by <code>&lt;INIFILE&gt;</code> once the INI file is instantiated.</p>
+<p>On top of the INI file, before any <code>[SECTION]</code>, the local variable <code>home</code> is defined. It carries the value <code>&lt;INIFILE&gt;</code>.</p>
+<p>Further down this local variable is referenced as <code>{home}</code>; that simply means that <code>{home}</code> will be replaced by <code>&lt;INIFILE&gt;</code> once the INI file is instantiated.</p>
 </div>
 
 <div class="h_tag">
@@ -146,7 +146,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <h4 data-id="Base">3.2.3. [CONFIG]Base</h4>
 </a>
 </div>
-<p>Replace this with your domain name, or “localhost” in case you just want to run a Tatin Server on your local machine for your purposes, for example for checking it out.</p>
+<p>Replace this with your domain name, or “localhost” in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.</p>
 <p>Never add a port number to <code>Base</code>; see <code>[CONFIG]BaseTagPort</code> for this.</p>
 <div class="h_tag">
 <a href="#basetagport" id="basetagport" class="autoheader_anchor">
@@ -155,7 +155,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </div>
 <p>Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://).</p>
 <p>In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set <code>BaseTagPort</code> to 9999. This makes Tatin inject that port number into the HTML “base” tag, so that for example links in the Tatin documentation would continue to work.</p>
-<p>However, when your Tatin Server runs “behind”, say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case, you would leave <code>BaseTagPort</code> alone, except when the Apache Server itself listens to a non-standard port: then <code>BaseTagPort</code> needs to be <em>that</em> port.</p>
+<p>However, when your Tatin Server runs behind, say, an Apache Server, then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case, you would leave <code>BaseTagPort</code> alone, except when the Apache Server itself listens to a non-standard port: then <code>BaseTagPort</code> needs to be <em>that</em> port.</p>
 <p>See also <code>[CONFIG]Base</code>.</p>
 <div class="h_tag">
 <a href="#title" id="title" class="autoheader_anchor">
@@ -202,10 +202,11 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <div class="leanpub_A">
 <h3>Beta versions</h3>
 <p>What qualifies as a beta version? Here are some examples:</p>
-<pre tabindex="0"><code>group-foo-1.0.0          ⍝ not a beta
-group-foo-1.0.0+123      ⍝ not a beta
-group-foo-1.0.0-fix      ⍝ a beta
-group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
+<pre tabindex="0"><code>group-foo-1.0.0              ⍝ not a beta
+group-foo-1.0.0+123          ⍝ not a beta
+group-foo-1.0.0-fix          ⍝ a beta
+group-foo-1.0.0-fix+123      ⍝ a beta
+group-foo-1.0.0-beta-23+123  ⍝ a beta</code></pre>
 </div>
 
 <div class="h_tag">
@@ -269,7 +270,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </div>
 <p>This section can be useful in case you want to inject a message into every HTML page delivered by Tatin.</p>
 <p>A typical application is the announcement of downtime due to maintenance.</p>
-<p>In case <code>Text</code> is not empty it is injected as <code>&lt;div&gt;&lt;p&gt;{text}&lt;/p&gt;?&lt;/div&gt;</code>. If <code>CSS</code> is not empty it is injected into the <code>&lt;div&gt;</code> as <code>style="..."</code>.</p>
+<p>The section has two values, <code>Text</code> and <code>CSS</code>. In case <code>Text</code> is not empty it is injected as <code>&lt;div&gt;&lt;p&gt;{text}&lt;/p&gt;?&lt;/div&gt;</code>. If <code>CSS</code> is not empty it is injected into the <code>&lt;div&gt;</code> as <code>style="..."</code>.</p>
 <div class="h_tag">
 <a href="#the_app_section" id="the_app_section" class="autoheader_anchor">
 <h2 data-id="the_app_section">7. The <code>[APP]</code> section</h2>
@@ -298,7 +299,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <p>Under Windows you have two options:</p>
 <ul>
 <li>Run the Tatin Server as a Windows Service</li>
-<li>Run it as a Docker container</li>
+<li>Run it in a Docker container</li>
 </ul>
 <p>Both options allow running the Server so that it is restarted automatically in case of a failure or a reboot.</p>
 <p>Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it runs a (very basic) version of Linux in a virtual machine.</p>
@@ -310,8 +311,8 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </div>
 <p>Under Linux, you are advised to run the Tatin Server in a Docker image.</p>
 <div class="h_tag">
-<a href="#required-amendments" id="required-amendments" class="autoheader_anchor">
-<h3 data-id="Required-amendments">8.3. Required amendments</h3>
+<a href="#docker-required-amendments" id="docker-required-amendments" class="autoheader_anchor">
+<h3 data-id="Docker-required-amendments">8.3. Docker: required amendments</h3>
 </a>
 </div>
 <div class="h_tag">
@@ -393,7 +394,7 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 <h3 data-id="The-Workspace">11.1. The Workspace</h3>
 </a>
 </div>
-<p>A running server frequently checks whether the workspace on disk was changed since the server was started. If that is the case the server will load the workspace again. This allows an easy update in case no complex actions are required.</p>
+<p>A running server might frequently check whether the workspace on disk was changed since the server was started if configured accordingly. If that is the case the server will load the workspace again. This allows an easy update in case no complex actions are required.</p>
 <div class="leanpub">
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="[title]" width="20px" height="20px" viewBox="0 0 20 20" preserveAspectRatio="xMidYMid meet"><title>Information</title><g transform="translate(0,20) scale(0.1,-0.1)" fill="#000000" stroke="none"><path d="M0 100 l0 -100 105 0 105 0 0 100 0 100 -105 0 -105 0 0 -100z m190 0 l0 -80 -85 0 -85 0 0 80 0 80 85 0 85 0 0 -80z"/><path d="M90 140 c0 -5 7 -10 15 -10 8 0 15 5 15 10 0 6 -7 10 -15 10 -8 0 -15 -4 -15 -10z"/> <path d="M90 80 c0 -20 5 -30 15 -30 10 0 15 10 15 30 0 20 -5 30 -15 30 -10 0 -15 -10 -15 -30z"/></g></svg>
 <div>
@@ -401,14 +402,14 @@ group-foo-1.0.0-fix+123  ⍝ a beta</code></pre>
 </div>
 </div>
 
-<p>Naturally, the server will produce an error message for a short period during the reload; expect 20 seconds or more, depending on the number of packages managed by the server.</p>
+<p>Naturally, the server will produce an error message for a short period during the reload; expect 10 seconds or more, depending on the number of packages managed by the server.</p>
 <div class="h_tag">
 <a href="#the-ini-file" id="the-ini-file" class="autoheader_anchor">
 <h2 data-id="The-INI-file">12. The INI file</h2>
 </a>
 </div>
 <p>Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. <em>Do not replace the INI file!</em></p>
-<p>The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: a number of settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.</p>
+<p>The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: a number of settings are required at a very early stage, and cannot be changed later on. Again the release notes will tell.</p>
 <div class="h_tag">
 <a href="#assets" id="assets" class="autoheader_anchor">
 <h2 data-id="Assets">13. Assets</h2>

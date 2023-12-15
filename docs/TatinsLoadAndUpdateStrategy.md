@@ -36,9 +36,9 @@ But when you look at it from a different angle then things look much less appeal
 1. You build your application again (without changing _anything_)
 1. You run your test cases again, but this time they fail
 
-This can happen in case the author of a package you depend on in one way or another has released a new version of that package.
+This situation can arise if the author of a package you depend on releases a new version between the first and second build. If this new version is buggy, the second build will fetch it, leading to a different outcome even though you haven't made any changes.
 
-Attractive as an automated update mechanism might be, you want your builds to be _ 100%reproducible_, right?!
+As appealing as an automated update mechanism might seem, you'd want your builds to be 100% reproducible, right?!
 
 So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages `Foo` and `Goo`.
 
@@ -224,7 +224,7 @@ When the health checks pass, the build-list would be re-created.
 
 ## Checking and updating
 
-Let's assume you want to check whether there are later versions of the packages of your application.
+Let's assume you want to check whether there are later versions of the principal packages of your application available.
 
 There is a user command available that can help you with that:
 
@@ -241,12 +241,13 @@ As usual, Tatin would consider packages with different major numbers as differen
 It is then up to you to take action: you may or may not install a later package that is available.
 
 A> ### Later major versions
-A> When you specify the `-major` flag of the `CheckForLaterVersion` user command then the user command will rather report later major versions.
+A> When you specify the `-major` flag of the `CheckForLaterVersion` user command, the user command will report later major versions as well.
 
 
 ## Downgrading
 
 There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here; you need to do this yourself.
+
 
 
 

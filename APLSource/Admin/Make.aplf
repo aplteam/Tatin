@@ -96,7 +96,8 @@
  :If CopyTatinClientToUserDocuments batchFlag
  :AndIf #.Tatin.Registry.Version≢⎕SE.Tatin.Version
      ⎕SE.⎕EX¨'Tatin' '_Tatin'
-     Assert #.Tatin.Registry.Version≡⎕SE.UCMD'Tatin.Version'
+     ⎕←'*** New version ',({(2⊃⍵),' from ',(3⊃⍵)}##.Registry.Version),' created, but version in ⎕SE is not up-to-date anymore, please restart Dyalog'
+     :Return
  :EndIf
  #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(CFG.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'*** Done'

@@ -1,4 +1,4 @@
- r←Test_Misc_017(stopFlag batchFlag);⎕TRAP;data;list;ind;dir;assetFolder
+ r←Test_Misc_017(stopFlag batchFlag);⎕TRAP;data;list;ind;dir;assetFolder;msg;en;rc
 ⍝ Does "HOME" return '' in case a package has no home anymore?
 ⍝ This can happen in case you create a WS, load packages into it, save the WS and then move
 ⍝ the WS somewhere else, without the folder the packages where loaded from.
@@ -20,11 +20,14 @@
  assetFolder,←'_'
  →T.GoToTidyUp 0≠≢#.TEMP.Zoo.##.TatinVars.HOME  ⍝ Does not exist anymore, therefore '' must be returned
  →T.GoToTidyUp'MyAssets'≢#.TEMP.Zoo.##.TatinVars.ASSETS~'/\'
- →T.GoToTidyUp 'MyAssets'≢#.TEMP.Zoo.##.TatinVars.GetFullPath2AssetsFolder~'/\'
+ →T.GoToTidyUp'MyAssets'≢#.TEMP.Zoo.##.TatinVars.GetFullPath2AssetsFolder~'/\'
 
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc en msg)←F.RmDir dir
+ msg Assert 0=rc
+ (rc en msg)←F.RmDir'expand'F.NormalizePath assetFolder,'/..'
+ msg Assert 0=rc
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

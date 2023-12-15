@@ -11,7 +11,7 @@ Before you start reading this document you should have read the document [Introd
 
 I> Note that you should know what [Semantic Versioning](./SemanticVersioning.html) is all about.
 
-In this document additional information that you might or might not be interested in at this stage is presented in gray boxes. You might well skip over them till later.
+In this document additional information, that you might or might not be interested in at this stage, is presented in boxes. You might well skip over them till later.
 
 ## Where we start from
 
@@ -83,7 +83,7 @@ A> Of course features like listing just the packages that carry a specific tag a
 
 `]tatin.ListPackages` will return a list with _all_ packages available in the given Registry, aggregated by major version number. Now that can be a pretty long list. It might therefore be a good idea to tell something about what you are looking for in order to make the server shrink the list.
 
-* If you happen to know the group name you may specify `-group=whatever`: then only packages of the group "whatever" are listed
+* If you happen to know the group name, you may specify `-group=whatever`: then only packages of the group "whatever" are listed
 * Every package is tagged with keywords
 
   You may specify one or more tags, for example `-tag=smtp,email`
@@ -135,7 +135,7 @@ I> If you wonder why that is, then please read the document discussing [Semantic
 
 ### Installing packages
 
-Imagine you want to use the MarkAPL package in an application you are currently working on which we will call a project. Let's also assume that this project is named "Foo" and lives in `/Foo/`.
+Imagine you want to use the `MarkAPL` package in an application you are currently working on, which we will call a project. Let's also assume that this project is named "Foo" and lives in `/Foo/`.
 
 The first step is to install the package as part of the project "Foo":
 
@@ -145,15 +145,15 @@ The first step is to install the package as part of the project "Foo":
 
 Notes:
 
-* `[tatin]` tells the Tatin client to load MarkAPL from the server the alias `tatin` is pointing to: https://tatin.dev
+* `[tatin]` tells the Tatin client to load `MarkAPL` from the server the alias `tatin` is pointing to: https://tatin.dev
 * The `/` between `[tatin]` and `MarkAPL` is optional
-* "MarkAPL" specifies neither a group nor a version number
-  * If the name "MarkAPL" is used within more than just one group the operation will fail
+* `MarkAPL` specifies neither a group nor a version number
+  * If the name `MarkAPL` is used within more than just one group the operation will fail
   * Because no version information was provided at all, the very latest version will be installed
 
 #### What got installed?
 
-Once you executed the above statement the `packages/` sub directory carries these files:
+Once you executed the above statement, the `packages/` sub directory carries these files:
 
 ```
 apl-buildlist.json
@@ -166,10 +166,10 @@ aplteam-OS-3.0.1
 
 Note that you might see different version numbers.
 
-* The folder `aplteam-MarkAPL-11.0.1` contains the MarkAPL package
+* The folder `aplteam-MarkAPL-11.0.1` contains the `MarkAPL` package
 * The file `apl-dependencies.txt` contains just one line: `aplteam-MarkAPL-11.0.1`
 
-  That's because your project "Foo" depends so far on just one package, MarkAPL
+  That's because your project "Foo" depends so far on just one package, `MarkAPL`
 
 * The file `apl-buildlist.json` carries the build list
 
@@ -203,8 +203,8 @@ The build list will be used to get all required packages into the workspace. Thi
 
 Notes:
 
-* There is one package that has `principal` set to 1: MarkAPL. That's because we have explicitly asked for it
-* All other packages got installed because MarkAPL depends on them, either directly or indirectly
+* There is one package that has `principal` set to 1: `MarkAPL`. That's because we have explicitly asked for it
+* All other packages got installed because `MarkAPL` depends on them, either directly or indirectly
 * The URL points to where the packages were loaded from
 
 #### How does a package look like on disk?
@@ -218,9 +218,9 @@ aplteam-MarkAPL-11.0.1/Files
 MarkAPL.aplc
 ```
 
-Again `apl-dependencies.txt` lists all dependencies, this time all the packages MarkAPL depends on.
+Again `apl-dependencies.txt` lists all dependencies, this time all the packages `MarkAPL` depends on.
 
-The file `apl-package.json` describes the MarkAPL package:
+The file `apl-package.json` describes the `MarkAPL` package:
 
 ```
 {
@@ -265,11 +265,13 @@ The `api` parameter is discussed in detail in the "PackageConfiguration" documen
 
 Note that the file `apl-package.json` specifies `assets: "Files"`. That means that there are assets, and that they can be found in the `Files/` sub directory.
 
-In case of MarkAPL these are a bunch of CSS and HTML files:
+In case of `MarkAPL` these are a bunch of CSS and HTML files:
 
 ```
 BlackOnWhite_print.css       
 BlackOnWhite_screen.css
+Dark_screen.css
+Dark_print.css
 LeanPubExtensions.html
 MarkAPL.html
 MarkAPL_CheatSheet.html
@@ -285,18 +287,17 @@ Of course it could be anything required by the package.
 A> ### Regarding Assets
 A>
 A> Note that assets are to be consumed, meaning that a package _**must not**_ write to the assets folder.
-A>
-A> Among several reasons for this one stands out: in cases a package is loaded and caching is on (the default) then the assets folder is shared by all projects/people who also loaded that package.
+
 
 #### Tatin and Cider
 
 If the project manager [Cider](https://github.com/aplteam/cider) is installed you may take advantage of it:
 
-If you are going to install packages into a project managed by Cider then you may specify a Cider alias in order to identify the first part of the install path.
+If you are going to install packages into a project managed by Cider, then you may specify a Cider alias in order to identify the first part of the install path.
 
-* If the selected Cider project has only one Tatin folder defined in its config file then that one is taken.
+* If the selected Cider project has only one Tatin folder defined in its config file, then that one is taken
 
-* If there are multiple Tatin folders defined the user is questioned which one she wants to install into.
+* If there are multiple Tatin folders defined, the user is questioned which one she wants to install into
 
 It is also possible to specify the package folder explicitly:
 
@@ -313,9 +314,11 @@ From the perspective of the application "Foo" all packages are dependencies. The
 #._tatin.aplteam_MarkAPL_11_0_1 
 ```
 
-I> You will also see a couple of messages the user command prints to the session in order to keep you informed about the progress of loading the packages. These are not shown here.
+I> By default Tatin does no jabber when going about its business, but by specifying the `-verbose` flag you can change this: if specified you will see a number of messages printed to the session in order to keep you informed about the progress of loading the packages. 
+I>
+I> At the very least the command prints to the session the name of the namespace into which the package was actually loaded. 
 
-The command prints to the session the name of the namespace into which the package was actually loaded. We can use MarkAPL by referring to it as `#.Foo.MarkAPL` because Tatin has also established a reference in `#.Foo` named `MarkAPL` that points to the real package:
+We can use `MarkAPL` by referring to it as `#.Foo.MarkAPL` because Tatin has also established a reference in `#.Foo` named `MarkAPL` that points to the real package:
 
 
 ```
@@ -323,7 +326,7 @@ The command prints to the session the name of the namespace into which the packa
 #._tatin.aplteam_MarkAPL_11_0_1.MarkAPL
 ```
 
-But how does MarkAPL find its assets? Well, Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1`, and that namespace carries several variables, among them these:
+But how does `MarkAPL` find its assets? Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1`, and that namespace carries several variables, among them these:
 
 * `HOME` carries the path to the directory where the package was loaded from
 * `ASSETS` holds the path to the assets relative to `HOME`.
@@ -337,7 +340,7 @@ I> Note that there is also a function [`GetFullPath2AssetsFolder`](#GetFullPath2
 /Foo/packages/aplteam-APLTreeUtils2-1.1.1
 ```
 
-That means that any MarkAPL function can refer to `HOME` with `##.TatinVars.HOME`.
+That means that any `MarkAPL` function can refer to `HOME` with `##.TatinVars.HOME`.
 
 `TatinVars` holds more potentially important data; details are discussed at [Tatin Variables](#).
 
@@ -352,7 +355,7 @@ aplteam_MarkAPL_11_0_1
 aplteam_OS_3_0_1           
 ```
 
-All packages, whether principal ones or dependencies, are stored in `#._tatin`. For the principal packages a reference is injected into the target namespace., in our case `#.Foo`.
+All packages, whether principal ones or dependencies, are stored in `#._tatin`. For the principal packages a reference is injected into the target namespace, in our case `#.Foo`.
 
 Note that by naming convention packages are always loaded into either `#._tatin` or `⎕SE._tatin`.
 
@@ -368,7 +371,7 @@ This will load three packages and all their dependencies at once. You might find
 
 ### Checking out a package: `LoadPackages`
 
-Let's assume that before actually installing it you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace. 
+Let's assume that before actually installing it, you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace. 
 
 That can be achieved with the `LoadPackages` user command. It loads the package into the workspace.
 
@@ -434,7 +437,7 @@ aplteam_OS_3_0_0
 
 No matter whether the APL code of a package is a single function (or operator) or a bunch of functions and operators or a single namespace (ordinary or scripted) or a bunch of namespaces or a single class or a bunch of classes or a mixture of all these APL objects, they are going to live in the top namespace of a package.
 
-But Tatin will also inject references pointing to the dependencies into that namespace, therefore:
+But Tatin will also inject references into that namespace pointing to the dependencies, therefore:
 
 ```
       #._tatin.aplteam_MarkAPL_11_0_0.⎕nl⍳16
@@ -443,7 +446,7 @@ FilesAndDirs
 MarkAPL      
 ```
 
-`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For these two packages references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL` no reference to `OS` is injected into `aplteam_MarkAPL_11_0_0.`, instead you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1`.
+`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For these two packages references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL`, no reference to `OS` is injected into `aplteam_MarkAPL_11_0_0.`, but you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1`.
 
 
 ### Misc
@@ -473,16 +476,16 @@ The fact that Registries with a priority of `0` are not scanned by Tatin allows 
 
 A> ### Scanning for dependencies
 A>
-A> Note that Tatin does not only scans all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies as well. 
+A> Note that Tatin does not only scan all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies as well. 
 
 
 #### Deprecated packages
 
 Every piece of software will become obsolete one day. Packages are no exception. If a package is not needed anymore, or is obsolete because there is a better one available, it's time to mark it as deprecated.
 
-This can be done with the user command `]Tatin.DeprecatePackage`. In short what the user command does is to publish the latest version available yet as a new version with an increased minor version number.
+This can be done with the user command `]Tatin.DeprecatePackage`. In short what the user command does is to publish the latest version available yet as a new version with an increased minor version number and an injected flag `deprecated←1`
 
-A> ### On deleting packages
+A> ### Deleting versus deprecating packages
 A>
 A> Depending on the delete policy operated on a server you might as well delete all obsolete packages, but we discourage you from doing so.
 A>
@@ -503,7 +506,7 @@ Executing:
 ]Tatin.DeprecatePackage https://your-Registry/aplteam-Foo-1
 ```
 
-will make the Tatin Registry publish a new version `aplteam-Foo-1.2.0` on your behalf which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `deprecate_comment` which carries the comment in case you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
+will publish a new version `aplteam-Foo-1.2.0` which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `deprecate_comment` which carries the comment in case you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
 
 From now on both the "Packages" web page and `]Tatin.ListPackages` won't list these four packages anymore.
 
@@ -515,21 +518,23 @@ With `-all` a matrix with two columns rather than one is returned, with the seco
 
 If you try to load or install a package that is marked as deprecated then you will be asked whether you really want that, but if you insist then you will get what you asked for.
 
-Note however that this is only true when you ask explicitly for the last package (the one with `deprecated←1`) and when you specify just the major version number.
+Note however that this is only true when you ask explicitly for the last package (the one with `deprecated←1`).
 
-In our earlier example that would be either
+In our example that would be:
 
 ```
 ]Tatin.LoadPackages https://your-registry/aplteam-Foo-1
 ```
 
-or
+This statement:
 
 ```
 ]Tatin.LoadPackages https://your-registry/aplteam-Foo
 ```
 
-If you ask _explicitly_ for an _earlier_ version (one that has no property `deprecated` in its config file) then that version would be loaded (or installed) without further ado, because Tatin would just assume that you know what you are doing.
+would yield the same result, but only because there is just one major version anyway.
+
+If you ask _explicitly_ for an _earlier_ version than the deprecated one,  then that version would be loaded (or installed) without further ado, because Tatin would just assume that you know what you are doing.
 
 Note that the API functions for loading / installing packages would not complain or warn you at all. 
 
@@ -539,7 +544,7 @@ A> There is an easy escape route: just publish the package again with an increas
 A>
 A> If `deprecate_comment` was not empty then that should be removed or emptied.
 A> 
-A> Once you've done that the very latest published package would no longer carry a "deprecated" flag with the value 1, and therefore it would no longer fulfill the criteria of a deprecated package.
+A> Once you've done that the very latest published package would no longer carry a "deprecated" flag with the value 1, and therefore it would no longer fulfil the criteria of a deprecated package.
 
 
 #### Tatin Variables
@@ -548,9 +553,11 @@ For every package Tatin will establish a couple of constants. Because APL has no
 
 They are injected into a namespace `TatinVars` which in turn is injected into the top package namespace.
 
-I> Of course this means that theoretically there could be a name clash, but it is unlikely that the name `TatinVars` is used for anything else but Tatin, and even if so, as a developer you have the tools available to deal with that.
+W> Of course this means that theoretically there could be a name clash, but then the name `TatinVars` should certainly not be used by any package author.
 
-Some of them always exist, some of them only under certain circumstances.
+Strictly speaking `TatinVars` is a misnomer because the namespace carries just functions, and not a single variable, but all but one of those act as constants, and the exception `GetFullPath2-AssetsFolder` was introduced at a later stage, so it was decided to stick with the name `TatinVars` for compatability.
+
+Note that we refer to, say, `HOME` as a character vector because the niladic function `HOME` returns a character vector.
 
 
 ##### ASSETS
@@ -574,9 +581,9 @@ A vector of character vectors with the package IDs of the packages the package i
 
 This is a function which returns the result of the expression `HOME,'/',ASSETS` if both `HOME` and `ASSETS` are not empty _and_ `HOME` exists on disk. If `HOME` is empty or does not exist on disk then just `ASSETS` is returned. 
 
-When accessing assets you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even on a different machine. The expression `HOME,'/',ASSETS` would then fail.
+When accessing assets you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even to a different machine. The expression `HOME,'/',ASSETS` would then fail.
 
-In such a case the function would not find `HOME` and therefore return just `ASSETS`, and that allows you to still access the assets sucessfully.
+But the function `GetFullPath2AssetsFolder` would not find `HOME` and therefore return just `ASSETS`, and that allows you to still access the assets sucessfully, assuming that you changed the current directory to where the workspace was loaded from.
 
 
 ##### HOME
@@ -604,6 +611,8 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 
 ##### URI
 
-Character vector that holds the address of a Tatin server or the full name of a ZIP file.
+Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
+
+
 
 

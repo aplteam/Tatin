@@ -94,7 +94,7 @@ For further details see the comments in the function `#.Tatin.Admin.UpdatePackag
 
 ## Do your thing
 
-Now that you have a working version of Tatin on your machine you can start contributing.
+Now that you have a working version of Tatin on your machine, you can start contributing.
 
 If you find parts of this document confusing, outdated, unclear or missing bits and pieces: change it; that might well be your first valuable contribution.
 
@@ -148,7 +148,7 @@ A> For that reason one test checks whether the version number in the workspace a
 
 It is recommended to start a fresh APL session and then load the Tatin project into the CLEAR WS before running any test cases.
 
-Use `]Cider.OpenProject` to do this. Once the project is open you can ask Cider how to execute Tatin's test suite by entering:
+Use `]Cider.OpenProject` to do this. Once the project has been opened, you can ask Cider how to execute Tatin's test suite by entering:
 
 ```
       ]Cider.RunTests
@@ -157,11 +157,11 @@ Use `]Cider.OpenProject` to do this. Once the project is open you can ask Cider 
 
 Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.
 
-When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!" to this. (Windows only, elsewhere you must start the server yourself)
+When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!". (Windows only, elsewhere you must start the server yourself)
 
 A> ### Starting a Tatin test server "manually"
 A>
-A> There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux or Mac-OS. For that execute the following steps:
+A> There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux or Mac-OS when this is a requirement. For that execute the following steps:
 A> 
 A> 1. Instantiate Dyalog Unicode 18.0 or later
 A> 
@@ -208,7 +208,7 @@ The `Tester2` test framework is flexible and powerful; for example, you may exec
 
 A> ### Why executing only a few tests?
 A>
-A> The full test suite is exhaustive. Also, caching is switched off except when caching is tested of course. For these reasons executing the full test suite takes considerable time. Therefore you might be interested in executing only certain parts of the test suite. 
+A> The full test suite is exhaustive. Also, caching is switched off (except when caching is tested of course). For these reasons executing the full test suite takes considerable time. Therefore you might be interested in executing only certain parts of the test suite. 
 A>
 A> The tests are grouped, and that is reflected by the names of the test functions. For example, the names `Test_API_001` and `Test_UserCommand_001` clearly state which group they belong to.
 
@@ -254,7 +254,7 @@ You can now list the groups:
  Test_ZZZ              4   
 ```
 
-The number tells how many tests a group comprehends.
+The number tells how many tests a group comprehends, so when you execute this command on your own machine, the numbers and rows will possibly be slightly different.
 
 You can also list all tests, say for the group `ScanRegistries`:
 
@@ -415,5 +415,6 @@ There is a function that creates a single HTML file from all the Tatin markdown 
 ```
 
 Now open that file with the word processor of your choice and use its spell-checking capabilities.
+
 
 

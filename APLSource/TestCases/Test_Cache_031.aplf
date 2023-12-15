@@ -1,14 +1,18 @@
- r←Test_Cache_031(stopFlag batchFlag);⎕TRAP;res
+ r←Test_Cache_031(stopFlag batchFlag);⎕TRAP;res;tempFolder
 ⍝ Load a package from the local server which also has a port number ⍝
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
  res←TC.LoadPackages(∆LocalHostAndPort,'example-versions')'#.TEMP'
- →T.PassesIf 1<≢F.ListDirs TC.GetPathToPackageCache,'/tatin.dev'
- →T.PassesIf 0=≢F.ListDirs TC.GetPathToPackageCache,'/temp/'
+ →T.GoToTidyUp 1≥≢F.ListDirs TC.GetPathToPackageCache,'/tatin.dev'
+ →T.GoToTidyUp 0≠≢F.ListDirs TC.GetPathToPackageCache,'/temp/'
 
- →T.PassesIf 9=#.TEMP.⎕NC'versions'
+ →T.GoToTidyUp 9≠#.TEMP.⎕NC'versions'
 
  r←T._OK
+
+∆TidyUp:
+ tempFolder←'expand'F.NormalizePath #.TEMP.versions.##.TatinVars.HOME,'/..'
+ F.RmDir tempFolder
 ⍝Done

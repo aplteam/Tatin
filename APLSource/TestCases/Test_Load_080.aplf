@@ -1,4 +1,4 @@
- r←Test_Load_080(stopFlag batchFlag);⎕TRAP;refs;html;ns;expected
+ r←Test_Load_080(stopFlag batchFlag);⎕TRAP;refs;html;ns;expected;rc;en;msg
 ⍝ Load a package that has several dependencies (local & remote) into non-existing #.TEMP.Foo
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -16,6 +16,8 @@
 
  r←T._OK
 
-∆TidyUp:∆RemoveTempFolders
+∆TidyUp:
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.Foo.MarkAPL.##.TatinVars.HOME,'/..'
+ msg Assert 0=rc
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

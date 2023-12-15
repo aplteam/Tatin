@@ -12,7 +12,7 @@
 
 ## Background 
 
-When a Tatin package and any dependencies are installed or loaded it seems to be a good idea to save those packages in a machine-specific cache because obviously when the package is requested again, be it by the same user but for a different purpose or a different user, downloading should be avoided because it's already saved on the machine.
+When a Tatin package and its dependencies are installed or loaded, it seems to be a good idea to save those packages in a machine-specific cache because obviously when the package is requested again, be it by the same user but for a different purpose or a different user, downloading should be avoided because it's already saved on the machine.
 
 And that's exactly what Tatin does by default, with two exceptions:
 
@@ -32,7 +32,7 @@ Caching can be influenced by setting particular parameters in `⎕SE.Tatin.MyUse
 
 These parameters allow you to...
 
-* define the folder which hosts the cached packages
+* define the folder that hosts the cached packages
 
 * toggle caching on a global level  
 
@@ -57,14 +57,18 @@ This is a Boolean that defaults to 1. Settings this to 0 means no caching takes 
 
 There is no default, meaning that the folder that hosts cached packages depends on the operating system.
 
-The function `GetPathToPackageCache` returns either the value of `MyUserSettings.path2cache` or the default path if `path2cache` is empty.
+The function `GetPathToPackageCache` returns either the value of `MyUserSettings.path2cache` or the OS-specific default path if `path2cache` is empty.
 
-This property's main purpose is test cases that should not temper with the default cache.
+This property's main purpose is to allow test cases using a temp folder: the tests should not temper with the default cache.
 
 
 ### Registries saved in the user settings
 
-Defining a registry in the user settings means that an instance of the `Define Registry` class is created, amended, and then added with the `Add` method to `MyUserSettings`.
+Adding a registry to the user settings requires...
+
+* creating an instance of the `Define Registry` class 
+* amended the properties of that instance
+* add the instance with the `Add` method to `MyUserSettings`
 
 One of the parameters of an instance of `DefineRegistry` is `noCaching`. This is a Boolean that defaults to 0, meaning that packages from that registry will be cached unless caching is switched off on a global level via `MyUserSettings.caching`.
 
@@ -77,3 +81,5 @@ This is typically used when you have a local Tatin Server running, and you are f
 The user command `]Tatin.Cache` helps manage the cache. It can be used to list the contents of the cache as well as to clear the cache.
 
 Enter `]Tatin.Cache -??` for details.
+
+

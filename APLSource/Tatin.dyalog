@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.76.1 - 2023-12-05
+⍝ * 0.76.1 - 2023-12-15
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -20,7 +20,7 @@
           c←⎕NS ⍬
           c.Name←'BuildPackage'
           c.Desc←'Build a new version of a package (zips) all required files in ⍵[1] into the folder ⍵[2]'
-          c.Parse←'2s -dependencies= -version='
+          c.Parse←'2s -dependencies= -version= -tatinVars='
           r,←c
      
           c←⎕NS ⍬
@@ -841,7 +841,7 @@
       :EndTrap
     ∇
 
-    ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms
+    ∇ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms;ref2TatinVars
       :If 'Win'≡TC.##.APLTreeUtils2.GetOperatingSystem ⍬
           'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=0 TC.##.APLTreeUtils2.ToNum 2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
       :EndIf
@@ -915,6 +915,10 @@
       parms.dependencyFolder←dependencies
       parms.version←version
       parms.targetPath←targetPath
+      :If 0<≢ref2TatinVars←''Arg.Switch'tatinVars'
+          'Invalid: "tatinVars"'Assert 9=⎕NC ref2TatinVars
+          parms.tatinVars←⍎ref2TatinVars
+      :EndIf
       zipFilename←TC.BuildPackage parms
     ∇
 
@@ -1725,7 +1729,7 @@
           :Select ⎕C Cmd
           :Case ⎕C'BuildPackage'
               r,←⊂'Create a new version of a package (resulting in a ZIP) from the directory.'
-              r,←'' '  ]Tatin.BuildPackage [<package-folder>] [<target-folder>] -dependencies= -version='
+              r,←'' '  ]Tatin.BuildPackage [<package-folder>] [<target-folder>] -dependencies= -version= -tatinVars='
           :Case ⎕C'CreatePackage'
               r,←⊂'Create a new Tatin package with a given folder.'
               r,←'' '  ]Tatin.CreatePackage'
@@ -1845,7 +1849,8 @@
               r,←⊂'                  It will preserve any build number and bump it'
               r,←⊂'                * -version=1.2.3-beta-2+123 will replace whatever is saved on "version", including'
               r,←⊂'                  the build number'
-              r,←⊂''
+              r,←⊂'-tatinVars=     Use this to point to the TatinVars namespace. If specified TatinVars.CONFIG will be'
+              r,←⊂'                updated. That might be a good idea because the build number is usually bumped.'
               r,←⊂'-dependencies=  Use this to specify a subfolder of the project holding package dependencies.'
               r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'
               r,←⊂'                the document "Publishing Packages".'

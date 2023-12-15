@@ -1,7 +1,7 @@
 [parm]:title             = 'Tatin Server Installtion'
 [parm]:leanpubExtensions = 1
 [parm]:collapsibleTOC    = 1
-[parm]:toc               = 2 3 4
+[parm]:toc               = 2 3 4 5 6
 [parm]:numberHeaders     = 2 3 4 5 6
 
 
@@ -9,7 +9,7 @@
 
 ## Introduction
 
-While the Tatin Client is coming with version 19.0 and later automatically, the Tatin Server always needs to be installed in case you want to use it.
+While the Tatin Client is coming with version 19.0 and later automatically, the Tatin Server always needs to be installed in case you want to run your own managed Tatin Registry.
 
 After downloading it from <https://github.com/aplteam/Tatin/releases> you need to unzip it into a folder where the Tatin Server is supposed to live.
 
@@ -38,9 +38,9 @@ Note that this is an old-school INI file. Well, almost: it comes with several fe
 
 A> ### What is a local variable?
 A>
-A> On top of the INI file, before any `[SECTION]` is defined, the local variable `home` is defined. It carries the value `<INIFILE>`.
+A> On top of the INI file, before any `[SECTION]`, the local variable `home` is defined. It carries the value `<INIFILE>`.
 A>
-A> Further down the local variable is referenced as `{home}`; that simply means that `{home}` will be replaced by `<INIFILE>` once the INI file is instantiated. 
+A> Further down this local variable is referenced as `{home}`; that simply means that `{home}` will be replaced by `<INIFILE>` once the INI file is instantiated. 
 A>
 
 ### `<INIFILE>` {#INIFILE}
@@ -65,7 +65,7 @@ This is the path where the Registry lives that is managed by the Tatin Server.
 
 #### [CONFIG]Base
 
-Replace this with your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your purposes, for example for checking it out.
+Replace this with your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
 
 Never add a port number to `Base`; see `[CONFIG]BaseTagPort` for this.
 
@@ -76,7 +76,7 @@ Leave this alone in case the Tatin Server listens to either port 80 (http://) or
 
 In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set `BaseTagPort` to 9999. This makes Tatin inject that port number into the HTML "base" tag, so that for example links in the Tatin documentation would continue to work.
 
-However, when your Tatin Server runs "behind", say, an Apache Server then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case, you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
+However, when your Tatin Server runs behind, say, an Apache Server, then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case, you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
 
 See also `[CONFIG]Base`.
 
@@ -112,10 +112,11 @@ A> ### Beta versions
 A>
 A> What qualifies as a beta version? Here are some examples:
 A> ```
-A> group-foo-1.0.0          ⍝ not a beta
-A> group-foo-1.0.0+123      ⍝ not a beta
-A> group-foo-1.0.0-fix      ⍝ a beta
-A> group-foo-1.0.0-fix+123  ⍝ a beta
+A> group-foo-1.0.0              ⍝ not a beta
+A> group-foo-1.0.0+123          ⍝ not a beta
+A> group-foo-1.0.0-fix          ⍝ a beta
+A> group-foo-1.0.0-fix+123      ⍝ a beta
+A> group-foo-1.0.0-beta-23+123  ⍝ a beta
 A> ```
 
 
@@ -177,7 +178,7 @@ This section can be useful in case you want to inject a message into every HTML 
 
 A typical application is the announcement of downtime due to maintenance.
 
-In case `Text` is not empty it is injected as `<div><p>{text}</p>?</div>`. If `CSS` is not empty it is injected into the `<div>` as `style="..."`.
+The section has two values, `Text` and `CSS`. In case `Text` is not empty it is injected as `<div><p>{text}</p>?</div>`. If `CSS` is not empty it is injected into the `<div>` as `style="..."`.
 
 ## The `[APP]` section {#the_app_section}
 
@@ -206,7 +207,7 @@ In such an event you are most likely interested in the server being restarted au
 Under Windows you have two options:
 
 * Run the Tatin Server as a Windows Service
-* Run it as a Docker container
+* Run it in a Docker container
 
 Both options allow running the Server so that it is restarted automatically in case of a failure or a reboot.
 
@@ -220,7 +221,7 @@ If you want to run the Tatin server as a Windows Service you can put the workspa
 Under Linux, you are advised to run the Tatin Server in a Docker image. 
 
 
-### Required amendments 
+### Docker: required amendments 
 
 #### The file `Dockerfile`
 
@@ -293,18 +294,18 @@ Before updating the server **you must read the release notes!** The reason is th
 
 ### The Workspace
 
-A running server frequently checks whether the workspace on disk was changed since the server was started. If that is the case the server will load the workspace again. This allows an easy update in case no complex actions are required. 
+A running server might frequently check whether the workspace on disk was changed since the server was started if configured accordingly. If that is the case the server will load the workspace again. This allows an easy update in case no complex actions are required. 
 
 I> This mechanism is active by default but might be switched off with `[CONFIG]ReloadWS` in the INI file
 
-Naturally, the server will produce an error message for a short period during the reload; expect 20 seconds or more, depending on the number of packages managed by the server.
+Naturally, the server will produce an error message for a short period during the reload; expect 10 seconds or more, depending on the number of packages managed by the server.
 
 
 ## The INI file
 
 Entries in the INI file might have been added or removed. Whether that is the case will be revealed by the release notes. If something has changed follow the release notes. _Do not replace the INI file!_
 
-The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: a number of settings are required at a very early stage, and cannot be simply changed later on. Again the release notes will tell.
+The server checks the INI file for having been changed, and if that is the case re-initialize the INI file. However, whether that works or not depends on the kind of change: a number of settings are required at a very early stage, and cannot be changed later on. Again the release notes will tell.
 
 ## Assets
 
@@ -315,4 +316,5 @@ What kind of actions need to be taken, if any, is revealed by the release notes.
 First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+
 

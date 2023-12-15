@@ -24,7 +24,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 
 <div class="toc-container">
 <ul id="toc-list" class="hide print">
-<li class="toc-entry toc-h2"><a href="#licencing">1. Licencing</a>
+<li class="toc-entry toc-h2"><a href="#licensing">1. Licensing</a>
 <ul>
 <li class="toc-entry toc-h3"><a href="#httpstatindev">1.1. https://tatin.dev</a></li>
 <li class="toc-entry toc-h3"><a href="#your-own-server">1.2. Your own server</a></li>
@@ -62,8 +62,8 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </div>
 </nav>
 <div class="h_tag">
-<a href="#licencing" id="licencing" class="autoheader_anchor">
-<h2 data-id="Licencing">1. Licencing</h2>
+<a href="#licensing" id="licensing" class="autoheader_anchor">
+<h2 data-id="Licensing">1. Licensing</h2>
 </a>
 </div>
 <div class="h_tag">
@@ -126,7 +126,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <ul>
 <li>1.2.3-beta-1</li>
 <li>1.2.3-fix-for-the-foo-problem</li>
-<li>1.2.3.issue-234</li>
+<li>1.2.3-issue-234</li>
 </ul>
 <p>There is one restriction: a <code>+</code> cannot be part of the name of a beta version. The reason for that is that finally a build number might be added to a version number, and a build number is separated from the rest of the version number by a plus (<code>+</code>) character. Examples:</p>
 <ul>
@@ -158,6 +158,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <li>Your desired group name (case insensitive)</li>
 <li>Your real name</li>
 <li>If it's connected to a company, the company's name</li>
+<li>Email address (if different from the one you are using to send the email)</li>
 </ul>
 <div class="h_tag">
 <a href="#credentials-for-the-tatin-test-server" id="credentials-for-the-tatin-test-server" class="autoheader_anchor">
@@ -193,13 +194,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <h4 data-id="Credentials-for-your-own-Tatin-Server">3.1.4. Credentials for your own Tatin Server</h4>
 </a>
 </div>
-<p>If you run your own Tatin Server we suggest that you create a UUID and use that as an API key.</p>
-<div class="leanpub_A">
-<h3>Email address is required</h3>
-<p>Note that having a valid API key is not enough for publishing a package: you must also define an email address for your group.</p>
-<p>For that click “Groups &gt; {your-group-name} &gt; Create” and add at least an email address.</p>
-</div>
-
+<p>If you run your own Tatin Server, we suggest that you create a UUID and use that as an API key.</p>
 <p>For an API key to be accepted by a Tatin Server, it must be added to a file <code>Credentials.txt</code> in the Registry's root directory.</p>
 <p>Make sure that you specify it as either</p>
 <pre tabindex="0"><code>&lt;group-name&gt;,&lt;api-key&gt;</code></pre>
@@ -226,12 +221,17 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <pre tabindex="0"><code>group1,&lt;hash1,&lt;salt1&gt;
 group2,&lt;hash2,&lt;salt2&gt;
 *,{hash3&gt;,&lt;salt3&gt;</code></pre>
-<p>This means that one can only publish packages with the group name <group1> with the API key “hash1” was generated from, packages with the group name <group2> with the API key “hash2” was generated from, and anything else with the API key “hash3” was created from.</p>
+<p>This means that one can only publish packages with the group name…</p>
+<ul>
+<li><code>&lt;group1&gt;</code> by using the API key “hash1” was generated from…</li>
+<li><code>&lt;group2&gt;</code> by using the API key “hash2” was generated from…</li>
+</ul>
+<p>and anything else by using the API key “hash3” was created from.</p>
 <p>Note that <code>*</code> or<code>*,</code> or <code>*=</code> all mean that no API key is required. On its own, it's the same as having no credentials file, but it can be useful together with other group names:</p>
 <pre tabindex="0"><code>&lt;group1&gt;,&lt;hash1&gt;
 &lt;group2&gt;,&lt;hash2&gt;
 *</code></pre>
-<p>This is interpreted as “require API keys for the groups <group1> and <group2> but allow anything else without an API key”.</p>
+<p>This is interpreted as “require API keys for the groups <code>&lt;group1&gt;</code> and <code>&lt;group2&gt;</code> but allow anything else without an API key”.</p>
 <p>Finally, you can allow anybody to publish packages under a particular group name without providing an API key:</p>
 <pre tabindex="0"><code>&lt;group1&gt;,&lt;hash1&gt;,&lt;email-address&gt;
 &lt;group2&gt;,
@@ -240,14 +240,14 @@ group2,&lt;hash2,&lt;salt2&gt;
 <ul>
 <li>In order to publish anything to the group “group1” you must provide the API key “hash1” was generated from</li>
 <li>You may publish packages to the group “group2” without an API key</li>
-<li>For any group name but <group1> and <group2> you must specify the API key “hash3” was generated from</li>
+<li>For any group name but <code>&lt;group1&gt;</code> and <code>&lt;group2&gt;</code> you must specify the API key “hash3” was generated from</li>
 </ul>
 <div class="h_tag">
 <a href="#editing-the-file-credentialscsv" id="editing-the-file-credentialscsv" class="autoheader_anchor">
 <h5 data-id="Editing-the-file-Credentialscsv">3.1.4.1. Editing the file “Credentials.csv”</h5>
 </a>
 </div>
-<p>There is one reasons why you might need to change the file <code>Credentials.csv</code>: when a group name must be deleted for some reason.</p>
+<p>There is one reason why you might need to change the file <code>Credentials.csv</code>: when a group name must be deleted for some reason.</p>
 <p>If a new group needs to be added, or a new API key needs to be assigned to an existing group, you must create a file <code>Credentials.txt</code>, see above.</p>
 <div class="h_tag">
 <a href="#comments" id="comments" class="autoheader_anchor">
@@ -272,12 +272,12 @@ group2,&lt;hash2,&lt;salt2&gt;
 </div>
 <p>A Tatin package requires all source code (functions, operators, classes, interfaces and namespace scripts) to be separated from other files (like CSS files, EXEs, DLLs etc.).</p>
 <p>Tatin calls the former “source” and the latter “assets”.</p>
-<p>What is defined in the package configuration file which <em>must</em> exist to make a folder a Tatin package.</p>
 <div class="h_tag">
 <a href="#the-package-configuration-file" id="the-package-configuration-file" class="autoheader_anchor">
 <h4 data-id="The-package-configuration-file">4.1.2. The package configuration file</h4>
 </a>
 </div>
+<p>The file <code>apl-package.json</code> must exist in order to make a folder a package.</p>
 <p>What is required and how to create and change a package configuration file is discussed in the document <a href="./PackageConfiguration.html" class="external_link">PackageConfiguration</a>.</p>
 <div class="h_tag">
 <a href="#the-dependency-file" id="the-dependency-file" class="autoheader_anchor">
@@ -287,9 +287,9 @@ group2,&lt;hash2,&lt;salt2&gt;
 <p>The file <code>apl-dependencies.txt</code> is only required when a package depends on other packages.</p>
 <p>Dependencies may by installed in a package project in different ways:</p>
 <ul>
-<li>By default Tatin assumes a subfolder packages/ to be used for this. If you use them Tatin will identify dependencies itself.</li>
-<li>If you manage a package project with Cider then Tatin will check the properties <code>dependencies.tatin</code> and <code>dependencies_dev.tatin</code>: if one of them or both define a folder then it will be taken</li>
-<li>If you do not use Cider and prefer a subfolder not namded packages/ for any dependencies then you must specify them explicitly:
+<li>By default Tatin assumes a subfolder <code>packages/</code> to save dependencies.</li>
+<li>If you manage a package project with Cider, then Tatin will check the properties <code>dependencies.tatin</code> and <code>dependencies_dev.tatin</code>: if one of them or both define a folder then it will be taken</li>
+<li>If you do not use Cider and prefer a subfolder not named <code>packages/</code> for any dependencies, then you must specify them explicitly:
 <ul>
 <li>The user command <code>]Tatin.PublishPackage</code> has a modifier for this: <code>-dependencies=</code></li>
 <li>The API function <code>PublishPackage</code> can be fed with an optional left argument for this</li>
@@ -298,7 +298,7 @@ group2,&lt;hash2,&lt;salt2&gt;
 <div class="leanpub">
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="[title]" width="20px" height="20px" viewBox="0 0 20 20" preserveAspectRatio="xMidYMid meet"><title>Information</title><g transform="translate(0,20) scale(0.1,-0.1)" fill="#000000" stroke="none"><path d="M0 100 l0 -100 105 0 105 0 0 100 0 100 -105 0 -105 0 0 -100z m190 0 l0 -80 -85 0 -85 0 0 80 0 80 85 0 85 0 0 -80z"/><path d="M90 140 c0 -5 7 -10 15 -10 8 0 15 5 15 10 0 6 -7 10 -15 10 -8 0 -15 -4 -15 -10z"/> <path d="M90 80 c0 -20 5 -30 15 -30 10 0 15 10 15 30 0 20 -5 30 -15 30 -10 0 -15 -10 -15 -30z"/></g></svg>
 <div>
-<p>In case you specify a dependency that has not (yet) been published then this has no consequences: the server will not reject such a package.</p>
+<p>In case you specify a dependency that has not (yet) been published, then this has no consequences: the server will not reject such a package.</p>
 <p>That might come as a surprise, but there is a reason for this: when a bunch of packages is published then there might well be mutual or worse circular dependencies. Insisting on dependencies already being published would not work then.</p>
 </div>
 </div>
@@ -318,13 +318,13 @@ group2,&lt;hash2,&lt;salt2&gt;
 <p>Once the preparation is done the final step is easy. Specify the folder hosting the package:</p>
 <pre tabindex="0"><code>]TATIN.PublishPackage /path2package [tatin]</code></pre>
 <p>The folder may or may not carry a trailing slash (<code>/</code>).</p>
-<p>This would attempt to publish the package found in <code>path2package/</code> to the principal Tatin Server represented by the alias <code>[tatin]</code>.</p>
-<p>You can also build a new version by calling <code>]TATIN.BuildPackage</code> and specify the resulting ZIP file as an argument to <code>PublishPackage</code>:</p>
+<p>This would attempt to publish the package found in <code>path2package/</code> to the principal Tatin Server.</p>
+<p>You can also build a new version by calling <code>]TATIN.BuildPackage</code> (or its API aquivalent <code>BuildPackage</code>) and specify the resulting ZIP file as an argument to <code>PublishPackage</code>:</p>
 <pre tabindex="0"><code>]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]</code></pre>
 <p>When a path to a package project is provided rather than a ZIP file then <code>]PublishProject</code> would create the ZIP file itself.</p>
-<p>Note that both <code>]PublishPackage</code> as well as <code>]BuildPackage</code> assume that if the package about to be published depends on other packages these packages will be installed in a subfolder packages/.</p>
-<p>However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has two properties <code>dependencies.tatin</code> and <code>dependencies_dev.tatin</code> designed to hold the folder with package dependencies, and if one of them is not empty then Tatin would use it, or question the user if both are set.</p>
-<p>If you do not use Cider but want to establish a non-default subfolder (read: not named packages/) as the one holding package dependencies then you must specify the subfolder with the <code>-dependencies=</code> flag.</p>
+<p>Note that both <code>]PublishPackage</code> as well as <code>]BuildPackage</code> assume that if the package about to be published depends on other packages these packages will be installed in a subfolder <code>packages/</code>.</p>
+<p>However, if the project is managed by Cider then Tatin investigates the Cider config file. Cider has two properties <code>dependencies.tatin</code> and <code>dependencies_dev.tatin</code> designed to hold the folder with package dependencies, and if one of them is not empty then Tatin would use it, or question the user if both are set and not empty.</p>
+<p>If you do not use Cider but want to establish a non-default subfolder (read: not named <code>packages/</code>) as the one holding package dependencies then you must specify the subfolder with the <code>-dependencies=</code> flag.</p>
 <div class="h_tag">
 <a href="#user-command-packages" id="user-command-packages" class="autoheader_anchor">
 <h3 data-id="User-command-packages">4.3. User command packages</h3>
@@ -348,7 +348,7 @@ group2,&lt;hash2,&lt;salt2&gt;
     LICENSE
     README</code></pre>
 <p>The package configuration parameter <code>source</code> will then read <code>APLSource/MyUserCommand</code> because we don't want <code>TestData/</code> and <code>TestCases/</code> to be part of the installed package.</p>
-<p>But that would mean that the script <code>MyUserCommand.dyalog</code> would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder.</p>
+<p>But that would mean that the script <code>MyUserCommand.dyalog</code> would not be installed either, so there is a problem: the script would not make it when the packages are installed. Also, the user command script should live in the root of the package's installation folder, not in a sub folder.</p>
 <p>That's why Tatin needs to know that the package is a user command, and where to find its script. This does the trick:</p>
 <pre tabindex="0"><code>userCommandScript: "APLSource/MyUserCommand.dyalog",</code></pre>
 <p>The fact that the parameter exists and is not empty tells Tatin that it is a user command, and the path allows Tatin to first install everything as usual and then move the script to the root of the package installation folder.</p>
@@ -397,11 +397,10 @@ None</code></pre></li>
 <p>This is just for you, nobody else. The purpose of this server is to publish packages to it at a very early stage.</p>
 <p>It has the highest priority of all Registries, ensuring that in case a package lives on several Registries it is found on <code>[my]</code> first.</p></li>
 <li>Your team runs a Tatin Server on the Intranet of your company. It carries the alias <code>[my-team]</code>.
-<p>This is used to publish beta versions that your team might want to use. This has the second-highest priority.</p>
 <p>This is used to publish beta versions that your team might want to use. This has the second-highest priority.</p></li>
 <li>Your company also runs a Tatin Server used for productive packages.</li>
 <li>Your packages may depend on packages published on Tatin's principal server, known as <code>[tatin]</code>.
-<p>Of the four Registries, this one should probably have the lowest priority.</p></li>
+<p>Of the four Registries, this one should have the lowest priority.</p></li>
 <li>You might also have the test Registry defined in your user settings, but with a priority of <code>0</code> so that it will be ignored when Registries are scanned for packages, but you could still use it.</li>
 </ul>
 <p>You can now develop a package <code>Foo</code> and publish it on <code>[my]</code>, probably several times until it is stable.</p>

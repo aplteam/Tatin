@@ -1,4 +1,4 @@
- r←Test_LX_004(stopFlag batchFlag);⎕TRAP;dir;body;src;cfg;zipFilename;parms
+ r←Test_LX_004(stopFlag batchFlag);⎕TRAP;dir;body;src;cfg;zipFilename;parms;msg;en;rc
 ⍝ There should be a vars LX because there is a monadic `lx` function, and there should be a right argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -35,6 +35,9 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc en msg)←F.RmDir dir
+ msg Assert 0=rc
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.LX.TatinVars.HOME,'/..'
+ msg Assert 0=rc
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

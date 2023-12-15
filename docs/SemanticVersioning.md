@@ -71,7 +71,7 @@ The patch number is bumped only when a change _does not affect compatibility_.
 
 A typical example is a bug fix: imagine that a function in a package crashes because an edge condition was not handled. When you fix that problem, you may bump the patch number because nothing else has changed. A consumer of the package can be reasonably confident that everything that worked before will continue to work.
 
-However, in real life things get messy pretty quickly: the consumer of a package might mistake a bug as a feature if it does not crash but does something it shouldn't, and take advantage of the bug. Imagine that a new version of the package comes with a fix for just that bug...
+However, in real life things get messy pretty quickly: the consumer of a package might mistake a bug for a feature if it does not crash but does something it shouldn't, and take advantage of the bug. Imagine that a new version of the package comes with a fix for just that bug...
 
 If chances are high that a consumer might rely on the bug then you should bump the Major number rather than the Patch number - see there. Very old bugs are excellent candidates for that.
 
@@ -107,7 +107,7 @@ aplteam-foo-2.0.0
 
 ... are _also_ considered to be different packages.
 
-Tatin reflects that by listing all major versions of a package when this user command is invoked:
+Tatin reflects that in several ways, for example by listing all major versions of a package when this user command is invoked:
 
 ```
       ]tatin.ListPackages
@@ -125,3 +125,4 @@ However, things can get pretty complicated even with Semantic Versioning; see th
 Semantic versioning came into being via this website:
 
 [https://semver.org/](https://semver.org/ {target="_blank"})
+

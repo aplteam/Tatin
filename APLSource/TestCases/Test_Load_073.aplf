@@ -1,4 +1,4 @@
- r←Test_Load_073(stopFlag batchFlag);⎕TRAP;assets;res;parms
+ r←Test_Load_073(stopFlag batchFlag);⎕TRAP;assets;res;parms;msg;en;rc
  ;dir;src;zip;body;cfg;zipfile;refs
 ⍝ Build a package with several files in an asset folder and then load it
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -36,8 +36,10 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc en msg)←F.RmDir dir
+ msg Assert 0=rc
  F.DeleteFile zipfile
- ∆RemoveTempFolders
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.Foo.##.TatinVars.HOME,'/..'
+ msg Assert 0=rc
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

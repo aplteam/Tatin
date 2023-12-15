@@ -1,2 +1,9 @@
  r←A
- r←APLTreeUtils2
+ :If 0<⎕NC'APLTreeUtils2'
+     r←APLTreeUtils2
+ :ElseIf 0<##.⎕NC'APLTreeUtils2'
+     ⍝ Hack required when MarkAPL is used by Tatin: cannot be loaded as a package
+     r←##.APLTreeUtils2
+ :Else
+     'APLTreeUtils2 is missing?!'⎕signal 6
+ :EndIf

@@ -1,4 +1,4 @@
- r←Test_API_062(stopFlag batchFlag);⎕TRAP;res
+ r←Test_API_062(stopFlag batchFlag);⎕TRAP;res;rc;en;msg
 ⍝ Exercise ⎕SE.Tatin.LoadPackages on a beta package
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -13,6 +13,7 @@
  r←T._OK
 
 ∆TidyUp:
- ∆RemoveTempFolders
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.versions.##.TatinVars.HOME,'/..'
+ msg Assert 0=rc
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

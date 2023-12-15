@@ -4,14 +4,14 @@
  :EndIf
  :If '/'≠1⍴name
  :AndIf ~':'∊name
-     filename←FilesAndDirs.EnforceSlash parms.homeFolder,'/Docs/',name,'.html'
+     filename←F.EnforceSlash parms.homeFolder,'/Docs/',name,'.html'
  :Else
      filename←name
  :EndIf
  :If ⍬≢ns
      A.GoToWebPage'file:///',filename
  :Else
-     :If FilesAndDirs.IsFile filename
+     :If F.IsFile filename
          A.GoToWebPage'file:///',filename
      :Else
          6 ⎕SIGNAL⍨'File not found: "',name,'"'

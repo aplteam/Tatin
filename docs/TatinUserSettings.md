@@ -41,7 +41,7 @@ That default file will have two  Tatin Registries defined in it:
 
 * The principal Tatin server, available via the URL `https://tatin.dev/`
 
-   It has an alias `tatin` assigned to it, so you can address it as `[tatin]` with all user commands that require a Registry as a parameter.
+   It has an alias `tatin` assigned to it, so you can address it as `[tatin]` with all user commands that require a Registry as a parameter, though if you don't specify any server at all, they will act on the principal server by default.
 
 * The Tatin Test server, available via the URL `https://test.tatin.dev/`
 
@@ -72,7 +72,7 @@ If you are familiar with JSON5 syntax and want to edit the file it is recommende
 ]TATIN.UserSettings -edit
 ```
 
-This will allow you to edit the file contents, but Tatin will check it afterward to make sure that nothing invalid goes ever into the file.
+This will allow you to edit the file contents, but Tatin will check it afterward to make sure that nothing invalid ever goes into the file.
 
 Note that Dyalog 18.2 and later recognize JSON5 and highlight any syntax errors.
 
@@ -262,17 +262,17 @@ For that, you must create a user settings file in a specific location. To achiev
  https://test.tatin.dev  tatin-test 0   0
 2 4
       ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
- Alias  URI                  Port  Priority  API-key 
- -----  ------------------   ----  --------  ------- 
- tatin  https://tatin.dev/      0       100  ***      
- test-tatin  https://tatin.dev/ 0       100  ***      
+ Alias  URI                  Port  Priority
+ -----  ------------------   ----  --------
+ tatin  https://tatin.dev/      0       100
+ test-tatin  https://tatin.dev/ 0       100
 4 5
 ```
 
 Notes:
 
 * We use the same name as before (`MyUserSettings`) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class `UserSettings` with that name.
-* The API key is replaced by asterisks unless you specify a `1` as the right argument to `ListRegistries`
+* API keys are not shown unless you specify a `1` as the right argument to `ListRegistries`
 * When you fire up a new session of Dyalog APL right  now, it would still look for the user settings file in its standard location.
 
 ### Make the switch permanent
@@ -285,9 +285,9 @@ You can do this yourself, but you can also ask the instance for doing the job fo
       ⎕SE.Tatin.MyUserSettings.MakeDefaultFile 1
 ```
 
-From now on the file `MyUserSettings.path2config` is pointing to will be used to determine the user settings.
+From now on, the file `MyUserSettings.path2config` is pointing to, will be used to determine the user settings.
 
-[^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site")  rather than JSON.
+[^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site") rather than JSON.
 
 [^init]: Tatin will be initialized either explicitly or as a side effect when the first Tatin user command is issued. See ["Installing and updating the Tatin Client"](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.
 
@@ -295,12 +295,58 @@ From now on the file `MyUserSettings.path2config` is pointing to will be used to
 
 You can specify these pieces of information as well:
 
-* `group`
-* `license`
-* `maintainer`
-* `source`
+`group`
+
+: The name your packages will use.
+
+`license`
+
+: The license you usually use to publish a package.
+
+`maintainer`
+
+: The email address of themaintainer of your packages (most likely your email address).
+
+`source`
+
+: The name of a folder in your package where all source files are stored.
 
 These define the defaults to be used when a new package is created.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -28,7 +28,7 @@ The API is established in `⎕SE.Tatin`. These are almost exclusively dfns that 
 
 While `⎕SE._Tatin` holds all packages loaded into `⎕SE`, among them those required by the Tatin client, `⎕SE.Tatin` holds the public interface of the Tatin client. A user is supposed to call functions in `Tatin` but not `_Tatin`.
 
-The API funcions are listed alphabetically.
+The API functions are listed alphabetically.
 
 
 ### BuildPackage
@@ -37,7 +37,7 @@ The API funcions are listed alphabetically.
 zipFilename←BuildPackage parameterSpace
 ```
 
-ZIPs all files that are required for a package and/or defined in the `apl-package.json` file  and (optionally) a dependency file from a given folder and creates a ZIP file containing these files in `targetPath`.
+ZIPs all files that are required for a package according to the specified parameters and creates a ZIP file containing these files in `parameterSpace.targetPath`.
 
 Requires a namespace with parameters as right argument, typically created by calling `CreateBuildParms` which requires a path to the project as right argument:
 
@@ -46,24 +46,31 @@ Requires a namespace with parameters as right argument, typically created by cal
    parms.⎕nl 2
 dependencyFolder
 projectPath     
-targetPath      
+targetPath   
+tatinVars   
 version         
-
 ```
 
 #### dependencyFolder
 
 A folder with packages the project depends on. Might be empty, in case there are'nt any dependencies.
 
+
 #### projectPath
 
 The folder the package is going to be created from. To be specified as the right argument of `CreateBuildParms`.
+
 
 #### targetPath
 
 The folder the ZIP file is created in.
 
-In case `targetPath` is empty it defaults to `projectPath`.
+Defaults to `projectPath` in case `targetPath` is empty.
+
+
+#### `tatinVars`
+
+Reference pointing to the `TatinVars` namespace of the package. Required if `TatinVars.CONFIG` in the workspace should be updated (build number).
 
 
 #### version{#version-parms}
@@ -104,15 +111,15 @@ The rules:
 
 If `dependencyFolder` is empty `BuildPackage` tries to establish whether the package depends on other packages:
 
-1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the property `[CIDER]dependencies.tatin` in that file. If it defines a folder then it is taken.
+1. It checks whether the package is managed by Cider (read: has a file `cider.config`). If that is the case it checks the property `[CIDER]dependencies:tatin` in that file. If it defines a folder then it is taken.
 
-   Refer to the Cider documentation on `dependencies.tatin` for details.
+   Refer to the Cider documentation on `dependencies:tatin` for details.
 
-2. If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder packages/ (convention).
+2. If the package is not managed by Cider then Tatin assumes that package dependencies (if any) would be installed into a subfolder `packages/` (convention).
 
-3. If there is no subfolder packages/, or if it does not host a file `apl-dependencies.txt`, then Tatin looks for a file `apl-dependencies.txt` in the root of the package project.
+3. If there is no subfolder `packages/`, or if it does not host a file `apl-dependencies.txt`, then Tatin looks for a file `apl-dependencies.txt` in the root of the package project.
 
-4. If the package is not managed by Cider and depends on packages that are installed in a different subfolder than packages/, then the name of the subfolder must be passed as `dependencyFolder` in the parameter space.
+4. If the package is not managed by Cider and depends on packages that are installed in a different subfolder than `packages/`, then the name of the subfolder must be passed as `dependencyFolder` in the parameter space.
 
 If no file `apl-dependencies.txt` can be detected then Tatin will assume that the package does not depend on other packages.
 
@@ -159,6 +166,25 @@ Clears the cache, which is the folder `GetPathToPackageCache` points to.
 * If `url` is empty all subdirectories but `temp\` are removed
 * If `url` is not empty then only the given domain is removed from the cache
 
+
+### CreateBuildParms
+
+```
+r←CreateBuildParms path
+```
+
+Creates a namespace with parameters for the `BuildPackage` function.
+
+Contains these parameters:
+
+```
+dependencyFolder
+projectPath          ⍝ Set to `path`
+targetPath
+version
+tatinVars
+```
+
 ### CreateReInstallParms
 
 ```
@@ -170,12 +196,12 @@ Creates a namespace with default parameters; it can be passed as (optional) left
 ### DeletePackage
 
 ```
-(statusCode errMsg)←DeletePackage uri
+(statusCode errMsg)←DeletePackage url
 ```
 
 Deletes a package.
 
-Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
+Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
 
 ### DeprecatePackage
 
@@ -206,7 +232,7 @@ r←{depth} FindDependencies (target pkgList [verbose])
 `target` can be any of the following:
 
 * A Registry alias
-* `[*]` for all defined Regiestries with a priority greater than 0
+* `[*]` for all defined Registries with a priority greater than 0
 * A URL pointing to a Tatin server 
 * A folder
 
@@ -234,10 +260,10 @@ The user can use it in the same way if she knows exactly what is stored where.
 ### GetDeletePolicy
 
 ```
-r←GetDeletePolicy uri
+r←GetDeletePolicy url
 ```
 
-Takes a URI of a server like https://tatin.dev or an alias and returns the delete policy operated by that server.
+Takes the alias or the URL of a server like https://tatin.dev or an alias and returns the delete policy operated by that server.
 
 Returns one of "None", "Any", "JustBetas":
 
@@ -248,7 +274,7 @@ Returns one of "None", "Any", "JustBetas":
 ### GetDependencyTree    
 
 ```
-tree←GetDependencyTree x
+tree←{append} GetDependencyTree x
 ```
 
 Takes `identifier` (`x`) and returns the dependencies as a matrix.
@@ -271,20 +297,9 @@ This function requires the version number to be fully specified.
 
 Note that the function accepts an optional left argument, but this should not be specified by a user: it is only used internally.
 
-### GetLicenses
+#### Optional left argument `append`
 
-```
-r←{verbose} GetNoCachingFlag url
-```
-
-`verbose` defaults to 0 but might be 1.
-
-* With `verbose←0` a list with the names of all licenses tolerated by the given managed Tatin Registry is returned. Might be empty.
-
-* With `verbose←1` a matrix with two columns and zero or more rows is returned:
-
-  * `[;1]` Names of all licenses 
-  * `[;2]` URLs of all licenses
+The optional left argument defaults to 0, meaning a saved dependency tree is replaced. By passing a 1 as the left argument one can add to the saved dependency tree.
 
 
 ### GetNoCachingFlag
@@ -296,7 +311,7 @@ flag←GetNoCachingFlag uri
 Takes a URI or an alias and tries to find that URI in the `MyUserSettings` instance.
 If found the value of the `noCaching` property is returned. 
 
-If URI is not found a 0 is returned.
+If URI is unknown a 0 is returned.
 
 
 ### GetPathToPackageCache
@@ -323,19 +338,23 @@ Works on all platforms but returns different results.
 
 `⍵`, if not empty, is added to the resulting path.
 
-Under Windows typically:
 
-```
-`C:\Users\%USERPROFILE%\AppData\Roaming\Tatin'     ←→ GetUserHomeFolder ''
-`C:\Users\%USERPROFILE%\AppData\Roaming\Tatin\foo' ←→ GetUserHomeFolder 'foo'
-```
-
-On non-Windows platforms:
-
-```
-'/home/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''
-'/home/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'
-```
+!> ### On Windows 
+=> It is typically:
+=> ```
+=> `C:\Users\%USERPROFILE%\AppData\Roaming\Tatin'     ←→ GetUserHomeFolder ''
+=> `C:\Users\%USERPROFILE%\AppData\Roaming\Tatin\foo' ←→ GetUserHomeFolder 'foo'
+=> ```
+!> ### On Linux
+=> ```
+=> '/home/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''
+=> '/home/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'
+=> ```
+!> ### On Mac-OS
+=> ```
+=> '/Users/{⎕AN}/Tatin'     ←→ GetUserHomeFolder ''
+=> '/Users/{⎕AN}/Tatin/foo' ←→ GetUserHomeFolder 'foo'
+=> ```
 
 `⍺` is optional and only specified by test cases in order to simulate different versions of APL.
 
@@ -354,12 +373,14 @@ There must be no config file yet, otherwise an error is thrown.
 ### InitPackageConfig
 
 ```
-cfg←InitPackageConfig y
+cfg←{projectPath}  InitPackageConfig y
 ```
 
 Returns a namespace with default values useful for the function [`InitialisePackage`](#InitialisePackage).
 
 `⍵` might be empty; then it is ignored. Alternatively, it might be a namespace with variables. If it is then the variables in that namespace overwrite the defaults.
+
+`projectPath` is optional. It is used only in case `source` is not specified, not even as a global default in the user settings.
 
 
 ### InstallPackages
@@ -368,7 +389,7 @@ Returns a namespace with default values useful for the function [`InitialisePack
 r←{noBetas} InstallPackages (identifiers targetFolder)
 ```
 
-Installs one or more packages (`identifiers` ) in `targetFolder`.
+Installs one or more packages (`identifiers`) in `targetFolder`.
 
 `identifiers` must be a simple character vector, specifying one or more comma-separated packages (items).
 
@@ -376,14 +397,14 @@ Each item must be one of:
 
 * an HTTP request for a package
 * a ZIP file holding a package
-* a folder holding a package (like file://C:\Temp\group-name-version\\)
-* a path to a package in a registry (like [RegistryAlias]{group}-{name}-{major.minor.patch} or C:\MyReg\\{group}-{name}-{major.minor.patch})
-* a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file.
-* The internal alias `[MyUCMDs]` (case independent); this will then be replaced by the actual path to the `MyUCMDs/` folder followed by the name specified or, if none was specified, the name of the package`
+* a folder holding a package (like `file://C:\Temp\group-name-version\`)
+* a path to a package in a registry (like `[RegistryAlias]{group}-{name}-{major.minor.patch}` or `C:\MyReg\{group}-{name}-{major.minor.patch})`
+* a package ID; Tatin will then attempt to find that package in the Registries defined in the Client's config file
+* The internal alias `[MyUCMDs]` (case independent); this will then be replaced by the actual path to the `MyUCMDs/` folder followed by the name specified or, if none was specified, the name of the package
 
 You may omit minor+patch or even major+minor+patch in order to install the latest version.
 
-By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 0 as `⍺`.
+By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing `1` as `⍺`.
 
 `r` is a nested vector of character vectors with the full names of all principal packages installed. The length will match the number of packages specified as `identifiers`.
 
@@ -396,7 +417,7 @@ Notes:
 ### ListDeprecated
 
 ```
-r←ListDeprecated uri
+r←{all} ListDeprecated uri
 ```
 
 Lists all packages that are deprecated but only if they are the last published version of any given major version number.
@@ -413,15 +434,17 @@ This default behaviour can be changed with the `-all` flag: then all versions of
 ### ListCache
 
 ```
-r←{fullpath} Listcache uri
+r←{fullpath} ListCache y
 ```
 
 Lists the contents of the Tatin package cache. Refers to the `MyUserSettings` instance of the class `UserSettings`.
 
-`uri` might be empty or a specific domain:
+`y` must be one of:
 
-* In case it is empty all packages of all domains are listed
-* In case it is a specific domain only packages of that domain are listed
+* A character vector with a Registry domain name or a Registry alias or empty
+* A nested vector of length 2: first item see above, second must be a Boolean that defaults to 0.
+
+  This is interpreted as `principalFlag`.
 
 The optional left argument `fullpath` defaults to 0, when just domain names and package IDs are reported. If it is 1 then the full paths are reported instead.
 
@@ -433,13 +456,30 @@ Each item is a two-element vector:
 
 In case the cache is empty an empty vector is returned.
 
+
+### ListLicenses
+
+```
+r←{verbose} GetNoCachingFlag url
+```
+
+`verbose` defaults to 0 but might be 1.
+
+* With `verbose←0` a list with the names of all licenses tolerated by the given managed Tatin Registry is returned. Might be empty.
+
+* With `verbose←1` a matrix with two columns and zero or more rows is returned:
+
+  * `[;1]` Names of all licenses 
+  * `[;2]` URLs of all licenses
+
+
 ### ListPackages         
 
 ```
 mat←{parms} ListPackages uri
 ```
 
-Lists all packages of a given Registry except when the last package of a major version number is marked as deprecated --- see `ListDepreciated` for details.
+Lists all packages of a given Registry except when the last package of a major version number is marked as deprecated --- see `ListDepreciated` for listing those.
 
 `uri` must be one of:
 
@@ -465,38 +505,6 @@ You may specify an incomplete package ID; then only matching packages are listed
 You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.
 
 
-##### uri
-
-* `uri` is empty and `aggregate` is 1 (the default):
-
-  All packages are returned with the number of major versions in `[;2]`
-
-* `uri` is empty and `aggregate` is 0:
-
-  All packages are returned; the second column carries `⍬`
-
-* `uri` specifies {name} and `aggregate` is 0:
-
-  All packages that match `name` are returned; they might belong to different groups
-
-* `uri` specifies {group}-{name} and `aggregate` is 0:
-
-  All versions of that package are returned
-
-* `uri` specifies {group}-{name} and `aggregate` is 1:
-
-  All major versions of that package are returned
-
-  `[;2]` carries the number of versions of each major version
-
-* `uri` specifies {group}-{name}-{major}; in this case `aggregate` is ignored:
-   
-  All versions (minor and patch) of that package are returned
-
-* `uri` specifies {group}-{name}-{major}-{minor}; in this case `aggregate` is ignored:
-
-  All patch versions of that package are returned
-
 #### Left argument
 
 Optionally `parms` can be specified. If specified this must be a namespace that must contain the variables `group`, `tags` and `aggregate`. It may contain `date`, `since`, `project_url` and/or `userCommand`.
@@ -511,13 +519,46 @@ The following parameters allow the user to select certain packages:
   `since` can be one of:
 
    * A character vector in the format `YYYY-MM-DD` or `YYYYMMDD` like `since←'2022-06-01'`
-   * An integer in the format `YYYYMMDD` like like `since←20220601`
+   * An integer in the format `YYYYMMDD` like `since←20220601`
 
 The following parameters allow the user to influence what data is returned:
 
 * If `date` is `1` an additional column is added to the result with the publishing date
 * If `project_url` is `1` an additional column is added to the result with the `project_url`, if any
 * If `aggregate` is `0` the data is not aggregated by minor and patch number; defaults to 1.
+
+##### packageID
+
+* `packageID` is empty and `aggregate` is 1 (the default):
+
+  All packages are returned with the number of major versions in `[;2]`
+
+* `packageID` is empty and `aggregate` is 0:
+
+  All packages are returned; the second column carries `⍬`
+
+* `packageID` specifies {name} and `aggregate` is 0:
+
+  All packages that match `name` are returned; they might belong to different groups
+
+* `packageID` specifies {group}-{name} and `aggregate` is 0:
+
+  All versions of that package are returned
+
+* `packageID` specifies {group}-{name} and `aggregate` is 1:
+
+  All major versions of that package are returned
+
+  `[;2]` carries the number of versions of each major version
+
+* `packageID` specifies {group}-{name}-{major}; in this case `aggregate` is ignored:
+   
+  All versions (minor and patch) of that package are returned
+
+* `packageID` specifies {group}-{name}-{major}-{minor}; in this case `aggregate` is ignored:
+
+  All patch versions of that package are returned
+
 
 #### Result
 
@@ -527,7 +568,8 @@ Returns a matrix with at least two and up to four columns. These columns are alw
 |[;2] | Carries the number of major versions |
 
 
-In case `date` was specified, the result has one more column carrying the publishing date.
+* In case `date` was specified a column is added carrying the publishing date
+* In case `project_url` was specified a column is added carrying the project URL (if any)
 
 #### Deprecated packages
 
@@ -562,7 +604,7 @@ Notes:
 
 * The result of the API function and the user command differ
 
-* When a Tatin Server is questioned by `ListRegistries` but does not respond an error is thrown.
+* When a Tatin Server is questioned by `ListRegistries` but does not respond, an error is thrown.
 
 
 
@@ -591,7 +633,7 @@ mat←{dateFlag} ListVersions url
 
 Lists all versions of a given package.
 
-`url` is one of:
+`url` must be one of:
 
 * A package name
 * A group name and a package name
@@ -599,7 +641,7 @@ Lists all versions of a given package.
 * An alias pointing to a Registry together with a package name
 * A (local) path to a Registry together with a package name
 
-A package name may be either just the name or group and name. Additionally, you may either specify a major version number, or a major and a minor version number.
+A package name may be either just the name or the group and the name. Additionally, you may either specify a major version number, or a major and a minor version number.
 
 Specifying a patch number makes no sense. If it is specified anyway it is ignored.
 
@@ -645,7 +687,7 @@ If the target namespace is not specified then it defaults to `#` except when `[M
 The optional left argument `flags` can be used to define two flags which default to 0:
 
 * `overwrite` enforces a load even if the package is already available in `#._tatin` or `⎕SE._tatin`
-* `makeHomeRelative` influences the result of `HOME` and `GetFullPath2AssetsFolder`: rather then returning the full path only the folder holding the packages and its parent are returned, making it a relative path
+* `makeHomeRelative` influences the result of `HOME` and `GetFullPath2AssetsFolder`: rather than returning the full path only the folder holding the packages and its parent are returned, making it a relative path
 
 A> ### Relative `HOME`
 A>
@@ -680,8 +722,8 @@ Every single item must be one of:
 
 * An HTTP request for a package
 * A ZIP file holding a package
-* A folder holding a package (like file://C:/Temp/group-name-version)
-* A path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
+* A folder holding a package (like `file://C:/Temp/group-name-version`)
+* A path to a package in a registry (like `[RegistryAlias]{packageID}` or `C:\MyReg\{packageID}'`)
 * A package ID; Tatin will then attempt to find that package in one of the Registries defined in the
 client's config file with a priority greater than 0.
 
@@ -695,9 +737,9 @@ Loads the package(s) into `(#|⎕SE)._tatin.{packageName}` and establishes a ref
 
 Loads all dependencies, if any, as well into `(#|⎕SE)._tatin` but does _not_ create references for them in `targetSpace`.
 
-By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing 1 as `⍺`.
+By default beta versions are considered in case the package ID is incomplete, but you can suppress them by passing `1` as `⍺`.
 
-Returns the number of principal packages installed.
+Returns the number of principal packages loaded.
 
 Note that the package ID(s) might use any case, meaning that if the package's name is `foo-Goo-1.2.3` then you might as well spell it `foo-GOO-1.2.3` or `FOO-goo-1.2.3`: it would not make a difference 
 
@@ -723,14 +765,12 @@ Publishes a package.
 1. Moves the zip file into the Registry, either via HTTP or directly.
 1. Updates the Registry index in case it's a local Registry
 
-Note that if `⍵` points already to a ZIP file only steps 3 and 4 are performed.
-
 `⍵` must be a two-item vector:
 
 1. `source` → folder to create the package from
 1. `registry` → registry to publish the package to (alias or url)
 
-
+Note that if `⍵[1]` points already to a ZIP file only steps 3 and 4 are performed.
 
 In case a folder is specified rather than a ZIP file then `PublishPackage` tries to establish whether the package depends on other packages. This is done by the API function `BuildPackage`, which is called by `PublishPackage` internally. 
 
@@ -738,9 +778,9 @@ The optional left argument `dependencies` is, when specified, passed as left arg
 
 The explicit result:
 
-* `statusCode` is an HTTP code no matter whether it is an HTTP call or not.
-* `errMsg` is empty if `statusCode` is 200, otherwise it might carry additional information.
-* `zipFilename` is empty in case `source` is a ZIP file, otherwise it is the name of the ZIP file created.
+* `statusCode` is an HTTP code no matter whether it is an HTTP call or not
+* `errMsg` is empty if `statusCode` is 200, otherwise it might carry additional information
+* `zipFilename` is empty in case `source` is a ZIP file, otherwise it is the name of the ZIP file created
 
 W> Note that the API function will publish the package no matter what the delete policy operated by the server is. 
 W>
@@ -756,12 +796,12 @@ Re-installs all files in a given file `apl-dependencies.txt`.
 
 Takes a folder that hosts a file `apl-dependencies.txt` as mandatory argument.
 
-The file apl-buildlist.json as well as all directories in that folder will be deleted.
-Then all packages listed in the file apl-dependencies.txt are re-installed from scratch. Lines in apl-dependencies.txt that start with a lamp character (`⍝`) are ignored.
+Optionally a second right argument might be specified: a Registry, either as a URL or an alias. Without this all known Registries with a priority greater than `0` will be scanned.
+
+The file `apl-buildlist.json` as well as all directories in that folder will be deleted.
+Then all packages listed in the file `apl-dependencies.txt` are re-installed from scratch. Lines in `apl-dependencies.txt` that start with a lamp character (`⍝`) are ignored.
 
 Note that packages with different major version numbers are considered as different packages.
-
-By default all known Registries with a priority greater than 0 are scanned (highest priority number first), but you may specify a particular Registry as a third (optional) argument.
 
 The left argument is optional and is, if specified, typically created by calling [`CreateReInstallParms`](#CreateReInstallParms).
 
@@ -781,7 +821,7 @@ It may carry three parameters:
 
 Notes:
 
-* For every dependency this function performs a Registry scan
+* For every dependency this function performs a Registry scan, even if a Registry was specified.
 * Packages that were installed from ZIP files are just re-installed from their ZIP files without further ado.
 
 A> ### Registry scans
@@ -816,7 +856,7 @@ Takes a path to a package and returns the config file for that package as a name
 
 `[MyUCMDS]` would translate into `MyUCMDs/packages/`.
 
-`packageID` might be a full package ID but also <group>-<name> or just <name>. However, in case more than one package qualify an error is thrown.
+`packageID` might be a full package ID but also `<group>-<name>` or just `<name>`. However, in case more than one package qualifies an error is thrown.
 
 Note that if `packageID` is empty a clean-up attempt is made.
 
@@ -829,10 +869,10 @@ If a package was installed with an alias you must un-install it by specifying th
 If a package is installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well is the package actually removed.
 
 To keep things simple Tatin performs the following steps:
-1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown.
-3. Removes `packagedID` from the dependency file.
-4. Re-compile the build list based on the new dependency file.
-5. Removes all packages that are not mentioned in the build list anymore.
+1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown
+3. Removes `packagedID` from the dependency file
+4. Re-compile the build list based on the new dependency file
+5. Removes all packages that are not mentioned in the build list anymore
 
 Returns a two-item vector:
 
@@ -851,6 +891,9 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
+
+
 
 
 

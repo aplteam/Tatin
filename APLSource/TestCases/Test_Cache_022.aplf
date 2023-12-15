@@ -1,4 +1,4 @@
- r←Test_Cache_022(stopFlag batchFlag);⎕TRAP;res;cacheDir;domain;path;pkgName;noOf
+ r←Test_Cache_022(stopFlag batchFlag);⎕TRAP;res;cacheDir;domain;path;pkgName;noOf;tempFolder
 ⍝ Load a package and check whether noCaching←1 is honoured
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -19,4 +19,6 @@
 
 ∆TidyUp:
  TC.MyUserSettings.registries.noCaching←0
+ tempFolder←'expand'F.NormalizePath #.TEMP.WinSys.##.TatinVars.HOME,'/..'
+ F.RmDir tempFolder
 ⍝Done

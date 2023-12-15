@@ -47,29 +47,32 @@
      CloseConnections 1
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
- →(0=≢paths)/0
- :Trap Reg.ErrorNo
-     r←≢loaded←LoadDependencies tempFolder targetSpace
+ :If 0=≢paths
+     F.RmDir tempFolder                                             ⍝ Nothing was loaded, so we can get rid of it
  :Else
-     qdmx←⎕DMX
-     ⎕DL 0.01
-     F.RmDir tempFolder
-     CloseConnections 1
-     (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
- :EndTrap
- ⎕DL 0.01
- :If ~MyUserSettings.caching
-     list←F.ListDirs tempFolder
-     :If 0=≢list                                                ⍝ Anything? At all?!
-         F.RmDir tempFolder                                     ⍝ No assets, so we can get rid of it
+     :Trap Reg.ErrorNo
+         r←≢loaded←LoadDependencies tempFolder targetSpace
      :Else
-         :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨list ⍝ If there are no assets...
-             F.RmDir tempFolder                                 ⍝ ... then we delete the temp folder...
-             :If 0<≢loaded
-                 loaded.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'          ⍝ ... and undefine "HOME".
+         qdmx←⎕DMX
+         ⎕DL 0.01
+         F.RmDir tempFolder
+         CloseConnections 1
+         (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
+     :EndTrap
+     ⎕DL 0.01
+     :If ~MyUserSettings.caching
+         list←F.ListDirs tempFolder
+         :If 0=≢list                                                ⍝ Anything? At all?!
+             F.RmDir tempFolder                                     ⍝ No assets, so we can get rid of it
+         :Else
+             :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨list ⍝ If there are no assets...
+                 F.RmDir tempFolder                                 ⍝ ... then we delete the temp folder...
+                 :If 0<≢loaded
+                     loaded.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'          ⍝ ... and undefine "HOME".
+                 :EndIf
+             :ElseIf 0=+/≢¨loaded.TatinVars.HOME
+                 F.RmDir tempFolder                                 ⍝ No assets, so we can get rid of it
              :EndIf
-         :ElseIf 0=+/≢¨loaded.TatinVars.HOME
-             F.RmDir tempFolder                                 ⍝ No assets, so we can get rid of it
          :EndIf
      :EndIf
  :EndIf

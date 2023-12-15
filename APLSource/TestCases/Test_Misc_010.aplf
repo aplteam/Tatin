@@ -1,4 +1,4 @@
- r←Test_Misc_010(stopFlag batchFlag);⎕TRAP;dir;src;reg;body;cfg;rc;msg;zipFilename;toBeDeleted;instance
+ r←Test_Misc_010(stopFlag batchFlag);⎕TRAP;dir;src;reg;body;cfg;rc;msg;zipFilename;toBeDeleted;instance;en
 ⍝ Access assets via HOME from the instance of a class
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -37,7 +37,10 @@
  r←T._OK
 
 ∆TidyUp:
- Assert 0=⊃F.RmDir dir
+ (rc en msg)←F.RmDir dir
+ msg Assert 0=rc
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.AssetAccess.TatinVars.HOME,'/..'
+ msg Assert 0=rc
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
  F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'

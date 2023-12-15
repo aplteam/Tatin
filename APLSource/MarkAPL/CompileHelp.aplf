@@ -10,18 +10,18 @@
  :If (':'∊filename)∨'/'=1⍴filename
      fn←CorrectSlash filename
  :Else
-     fn←CorrectSlash FilesAndDirs.PWD,'/',filename
+     fn←CorrectSlash F.PWD,'/',filename
  :EndIf
  parms.inputFilename←fn
  :If 0=≢parms.inputFilename
- :AndIf 0=FilesAndDirs.IsFile parms.inputFilename←(⊃,/2↑⎕NPARTS fn),(1+recompileFlag)⊃'.html' '.md'
+ :AndIf 0=F.IsFile parms.inputFilename←(⊃,/2↑⎕NPARTS fn),(1+recompileFlag)⊃'.html' '.md'
      ('Could not find "',parms.inputFilename,'"')⎕SIGNAL 6
  :EndIf
  :If 0=≢parms.outputFilename
      parms.outputFilename←(⊃,/2↑⎕NPARTS fn),'.html'
  :EndIf
  :If |recompileFlag
-     :If 0=FilesAndDirs.Exists parms.inputFilename
+     :If 0=F.Exists parms.inputFilename
          6 ⎕SIGNAL⍨'File "',parms.inputFilename,'" not found; set "homeFolder"'
      :EndIf
      :If 0=≢parms.outputFilename

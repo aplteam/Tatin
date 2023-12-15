@@ -19,14 +19,23 @@ This is an example:
   assets: "",
   description: "Zipping and unzipping with.NET Core on all major platforms",
   documentation: "",
+  files: "",
   group: "aplteam",
-  project_url: "https://github.com/aplteam/DotNetZip",
   io: 1,
+  license: "MIT",
+  lx: "",
+  maintainer: "kai@aplteam.com",
+  minimumAplVersion: "18.0",
   ml: 1,
   name: "DotNetZip",
+  os_lin: 1,
+  os_mac: 1,
+  os_win: 1,
+  project_url: "https://github.com/aplteam/DotNetZip",
   source: "DotNetZip.aplc",
-  tatin_version: "0.103.0",
   tags: "zip-tools",
+  tatin_version: "0.103.0",
+  userCommandScript: "",
   version: "0.5.4",
 }
 ```
@@ -69,7 +78,7 @@ You may define your own variables in a package configuration file.
 
 However, since more Tatin-specific variables might be added at a later stage there is a danger of name clashes. This is avoided by a simple rule:
 
-| **The names of user-defined variables _must_ start with an underscore** |
+I> The names of user-defined variables _must_ start with an underscore
 
 If you specify any variable with a name that Tatin does not know about and that does not start with an underscore an error will be thrown.
 
@@ -194,13 +203,13 @@ There is one exception: when an absolute path is specified but it's partly ident
 
 Notes:
 
-* When the package configuration file is written to disk the existence of "assets" is checked. If it's not a folder an error is thrown.
+* When the package configuration file is written to disk, the existence of "assets" is checked. If it's not a folder an error is thrown.
 
   See also the [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) function.
 
 * The `assets\` folder must be considered read-only. Never write to it from a package!
 
-* Check the "[files](#)" property for files like "ReadMe.txt" and the like
+* Check the "[files](#)" property for files like "ReadMe.txt" and the like.
 
 * A file named "LICENSE" in the root of a project will always be copied to the root of a package by convention when a package is build.
 
@@ -225,7 +234,7 @@ A>    ```
 
 #### deprecated
 
-An optional Boolean.
+A Boolean that is optional. 
 
 It is injected into a package config file by the `]Tatin.DeprecatePackage` command. A 1 means that this package is deprecated.
 
@@ -236,7 +245,7 @@ An optional character vector.
 
 It is injected into a package config file by the `]Tatin.DeprecatePackage` command.
 
-Supposed to give a hint why a package is deprecated, for example, "See package XYZ instead".
+You are supposed to give a hint why a package became deprecated, for example, "See package XYZ instead".
 
 
 #### description
@@ -281,7 +290,7 @@ Typical examples are "LICENSE" and "ReadMe.[md\|txt\|html]". Strictly speaking t
 
 That can be achieved by adding them to the "files" property. `files` can be one of:
 
-* Absend
+* Absent
 * Empty
 * A single file
 * A comma-separated list of files
@@ -293,25 +302,14 @@ See also "[assets](#)".
 I> Note that a file `LICENSE` in the root of a project is by convention copied to the root of a package when a package is build.
 
 
-#### GetFullPath2AssetsFolder
-
-In case [`assets`](#assets) is not empty this function returns a simple char vector that represents the _full path_ to the assets, using something like:
-
-```
-  HOME,'/',ASSETS
-```
-
-* If `HOME` is empty the function returns just `ASSETS`
-* If `ASSETS` is empty the functions returns `''`
-* If `HOME` is not empty but does not exist on disk just `ASSETS` is returned
 
 #### group
 
-The group part of the package ID[^id]
+The "group" part of the package ID[^id]
 
 A group may be the name of a user, the owner, a company, an application name, a publisher or anything else that makes sense. It's totally up to you and might well depend on who is running the Tatin Server you want to publish to.
 
-You can define a default for `group` in the user settings file. The default will be used when a new package is created.
+You can define a default for `group` in the user settings file. The default will be injected when a new package is created.
 
 #### license
 
@@ -328,11 +326,10 @@ Note that you can specify a default license in your user settings:
 ]TATIN.UserSettings -edit
 ```
 
-At the bottom there are defaults defined for `license` and `source` and possibly other properties. If it is not empty then the value will be used as default when creating a new package config file.
+At the bottom there are defaults defined for `license` and `source` and possibly other properties. The default will be injected when a new package is created.
 
 Both the user command `]Tatin.ListLicenses` and the API function `⎕SE.Tatin.ListLicenses` can be used to get a list of all licenses tolerated by a Tatin Registry.
 
-You can define a default for `license` in the user settings file. The default will be used when a new package is created.
 
 #### lx
 
@@ -344,11 +341,11 @@ This function will be executed by either `LoadPackages` or `LoadDependencies` _a
 
 If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackages` and has no assets then the right argument will be empty.
 
-The function may or may not return a result. A result is assigned to `TatinVars.LX` inside the package namespace. If there is no result `TatinVars.LX` becomes an empty vector. Without an `lx` function there won't be a variable `LX` in `TatinVars`.[^TatinVars]
+The function must return a result which is assigned to `TatinVars.LX` inside the package namespace. Without an `lx` function there won't be a variable `LX` in `TatinVars`.[^TatinVars]
 
 The `lx` function will be executed under error trapping, and any errors will be silently ignored. If you do not want this then you have two options:
 
-* Make `⎕TRAP` a local variable in the `lx` function and assign `⎕TRAP←0 'S'` to it to make any problem popping up straight away
+* Make `⎕TRAP` a local variable in the `lx` function and assign `⎕TRAP←0 'S'` to it to make any problem pop up straight away
 
 * Put `:TRAP ⋄ :EndTrap` around the code in the `lx` function and deal with problems yourself, for example in the `:Else` branch.
 
@@ -370,31 +367,34 @@ your.name@your-domain.com
 
 Note that any double quotes will be removed.
 
-If this is empty the server will, when the package is published, check whether there is a group home page. If that's the case then there is an email address associated with that group, and that email address is then assigned to `maintainer`.
+If this is empty the server will, when the package is published, check whether there is a group home page. If that's the case, then there is an email address associated with that group, and that email address is then assigned to `maintainer`.
 
-You can define a default for `maintainer` in the user settings file. The default will be used when a new package is created.
+You can define a default for `maintainer` in the user settings file. The default will be injected when a new package is created.
 
 #### minimumAplVersion
 
 A character vector that must contain something like "18.0". 18.0 is the minimum version for any Tatin package, for Tatin itself needs at least version 18.0.
 
+#### ml
+
+An integer that will be assigned to `⎕ML`.
+
 #### name
 
-The name part of the package ID[^id]
+The "name" part of the package ID[^id]
 
-
-#### os_win
-
-A Boolean; a 1 means that the package runs under Windows.
-
-#### os_mac
-
-A Boolean; a 1 means that the package runs under Mac-OS.
 
 #### os_lin
 
 A Boolean; a 1 means that the package runs under Linux.
 
+#### os_mac
+
+A Boolean; a 1 means that the package runs under Mac-OS.
+
+#### os_win
+
+A Boolean; a 1 means that the package runs under Windows.
 
 #### project_url
 
@@ -402,7 +402,7 @@ A URL that points to something like GitHub.
 
 An example is `https://github.com/aplteam/MarkAPL`
 
-It's supposed to point to a place on the Web where the project that the package was built from is hosted.
+It's supposed to point to a place on the Web where the project is hosted that the package was built from.
 
 
 #### source
@@ -419,13 +419,8 @@ If `source` is a folder it might contain any number and mixture of the aforement
 
 `source` must be relative to the root of the package.
 
-Not that you may specify a default source in your user settings:
+Not that you may specify a default source in your user settings.  The default will be injected when a new package is created.
 
-```
-]TATIN.UserSettings -edit
-```
-
-At the bottom there are defaults defined for `license`, `source` etc.
 
 ##### Cider and Tatin
 
@@ -448,7 +443,7 @@ Picture the following project "Foo" which consists of a single class `Foo`:
 
 In `cider.config` the `source` parameter must be set to `APLSource` because that's where all the code lives. 
 
-In `apl-package.json` however `source` may be set to `APLSource/Foo.aplc` because you might decide that this is what will end up in the package.
+In `apl-package.json` however, `source` may be set to `APLSource/Foo.aplc` because you might decide that this is what will end up in the package.
 
 A slightly more complex example with a namespace that hosts several functions:
 
@@ -467,22 +462,16 @@ A slightly more complex example with a namespace that hosts several functions:
      README.md
 ```
 
-In this case, the `source` in the package could become `APLSource/Goo` while `Admin` and `TestCases` are most likely not copied over into the package.
-
-##### The default
-
-You can define a default for `source` in the user settings file. The default will be used when a new package is created.
-
-If you don't do this and the new package is managed by Cider then Tatin's `source` property` falls back to Cider's `source` property.
+In this case, the `source` in the package could become `APLSource/Goo` because`Admin` and `TestCases` do not have to be part of the package.
 
 
 #### tags
 
-A simple text vector, possibly empty (though that is not recommended), that should contain a comma-separated list of tags (keywords). These can be helpful to filter packages when searching for a solution to a particular problem.
+A simple text vector with a comma-separated list of tags (keywords). These can be helpful to filter packages when searching for a solution to a particular problem.
 
 `tags` must not be empty if you wish to publish a package to a Tatin server because such a package would not be accepted by the server.
 
-Tags should only be related to the problems one can solve with a particular package. There is no need to specify the platform since they have their own properties: `os_lin`, os_mac`, `os_win`. Those got introduced with version 0.81.0.
+Tags should only be related to the problems one can solve with a particular package. There is no need to specify the platform since they have their own properties: `os_lin`, `os_mac`, `os_win`. Those got introduced with version 0.81.0.
 
 There is also no point in adding tags like "dyalog" or "apl" to a package: Tatin is a Dyalog APL package manager...
 
@@ -498,14 +487,14 @@ You should not edit this because it is overwritten before saving the data anyway
 
 If a package is a user command then this must contain the path to the user command script relative to the projects root. `InstallPackages` uses this to identify a user command script and to move it from the source folder (if any) to the root of the install folder.
 
-This optional flag was introduced with version 0.86.0. It might not exist in older versions of a package. If it does not exist then Tatin assumes that the package in question is not a user command.
+This optional property was introduced with version 0.86.0. It might not exist in older versions of a package. If it does not exist then Tatin assumes that the package in question is not a user command.
 
-Note that for a package to be a user command the package must be constructed in a particular way. This is discussed in the "Publishing Packages" document.
+Note that for a package to be a user command, the package must be constructed in a particular way. This is discussed in the "Publishing Packages" document.
 
 
 #### version
 
-The version[^version] part of the package ID[^id]
+The "version"[^version] part of the package ID[^id]
 
 Examples of valid version numbers are:
 
@@ -531,7 +520,7 @@ Tatin uses these values for setting the system variables accordingly in any name
 
 ##### date
 
-The user must not specify "date", but when a package is published the server will inject "date" as a timestamp in the format `yyyymmdd.hhmmss`. 
+The user must not specify "date", but when a package is published, the server will inject "date" as a timestamp in the format `yyyymmdd.hhmmss`. 
 
 This date might play an important role in determining the precedence of versions. This is because although it's obvious which version is "better" when you look at these two packages:
 
@@ -563,6 +552,21 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 
 * When a package is loaded or installed from a file, "url" is injected and points to that file.
 
+## Misc
+
+### GetFullPath2AssetsFolder
+
+In case [`assets`](#assets) is not empty this function returns a simple char vector that represents the _full path_ to the assets, using something like:
+
+```
+  HOME,'/',ASSETS
+```
+
+* If `HOME` is empty the function returns just `ASSETS`
+* If `ASSETS` is empty the functions returns `''`
+* If `HOME` is not empty but does not exist on disk just `ASSETS` is returned
+
+
 
 
 [^id]: A package ID consists of `{group}-{name}-{major}.{minor}.{patch}`
@@ -570,6 +574,8 @@ Since packages, once published, cannot be altered, it is safe to assume that the
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
+
 
 
 

@@ -63,8 +63,8 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <li>You build your application again (without changing <em>anything</em>)</li>
 <li>You run your test cases again, but this time they fail</li>
 </ol>
-<p>This can happen in case the author of a package you depend on in one way or another has released a new version of that package.</p>
-<p>Attractive as an automated update mechanism might be, you want your builds to be <em> 100%reproducible</em>, right?!</p>
+<p>This situation can arise if the author of a package you depend on releases a new version between the first and second build. If this new version is buggy, the second build will fetch it, leading to a different outcome even though you haven't made any changes.</p>
+<p>As appealing as an automated update mechanism might seem, you'd want your builds to be 100% reproducible, right?!</p>
 <p>So, when asked to load installed packages, Tatin will just do exactly that: load the packages defined as required by the configuration files of the main packages <code>Foo</code> and <code>Goo</code>.</p>
 <p>Except when a package is requested more than once, and with different minor and/or patch numbers: in that case, Tatin uses <em>the latest installed version</em>, which might or might not be the latest one available. In our example, <code>Zoo</code> is requested and installed twice, and Tatin would load 1.2.0 just once (because it is requested by <code>Goo</code>), while 1.3.0 is ignored because it is not requested and therefore not installed.</p>
 <p>This means that <code>Foo</code> will also have to use version 1.2.0 of <code>Zoo</code>.</p>
@@ -213,7 +213,7 @@ mygroup-Goo-2.1.0</code></pre>
 <h2 data-id="Checking-and-updating">6. Checking and updating</h2>
 </a>
 </div>
-<p>Let's assume you want to check whether there are later versions of the packages of your application.</p>
+<p>Let's assume you want to check whether there are later versions of the principal packages of your application available.</p>
 <p>There is a user command available that can help you with that:</p>
 <pre tabindex="0"><code>      ]TATIN.CheckForLaterVersion ./</code></pre>
 <p>It requires a path to a folder that holds a file <code>apl-dependencies.txt</code> and a file <code>apl-buildlist.json</code>.</p>
@@ -222,7 +222,7 @@ mygroup-Goo-2.1.0</code></pre>
 <p>It is then up to you to take action: you may or may not install a later package that is available.</p>
 <div class="leanpub_A">
 <h3>Later major versions</h3>
-<p>When you specify the <code>-major</code> flag of the <code>CheckForLaterVersion</code> user command then the user command will rather report later major versions.</p>
+<p>When you specify the <code>-major</code> flag of the <code>CheckForLaterVersion</code> user command, the user command will report later major versions as well.</p>
 </div>
 
 <div class="h_tag">

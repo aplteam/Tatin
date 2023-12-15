@@ -75,7 +75,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>That default file will have two Tatin Registries defined in it:</p>
 <ul>
 <li>The principal Tatin server, available via the URL <code>https://tatin.dev/</code>
-<p>It has an alias <code>tatin</code> assigned to it, so you can address it as <code>[tatin]</code> with all user commands that require a Registry as a parameter.</p></li>
+<p>It has an alias <code>tatin</code> assigned to it, so you can address it as <code>[tatin]</code> with all user commands that require a Registry as a parameter, though if you don't specify any server at all, they will act on the principal server by default.</p></li>
 <li>The Tatin Test server, available via the URL <code>https://test.tatin.dev/</code>
 <p>It has an alias <code>tatin-test</code> assigned to it, so you can address it as <code>[tatin-test]</code> with all user commands that require a Registry as a parameter.</p>
 <p>It has a priority of <code>0</code> assigned to it which means that it will <em>not</em> participate in Registry scans.</p>
@@ -101,7 +101,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>Of course you are free to edit that file with any editor. However, keep in mind that you are in charge of making sure that the contents of the file is valid JSON5[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]: if it's not, Tatin will crash.</p>
 <p>If you are familiar with JSON5 syntax and want to edit the file it is recommended to use:</p>
 <pre tabindex="0"><code>]TATIN.UserSettings -edit</code></pre>
-<p>This will allow you to edit the file contents, but Tatin will check it afterward to make sure that nothing invalid goes ever into the file.</p>
+<p>This will allow you to edit the file contents, but Tatin will check it afterward to make sure that nothing invalid ever goes into the file.</p>
 <p>Note that Dyalog 18.2 and later recognize JSON5 and highlight any syntax errors.</p>
 <div class="h_tag">
 <a href="#what-does-tatin-do-at-start-up-time" id="what-does-tatin-do-at-start-up-time" class="autoheader_anchor">
@@ -271,15 +271,15 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
  https://test.tatin.dev  tatin-test 0   0
 2 4
       ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
- Alias  URI                  Port  Priority  API-key
- -----  ------------------   ----  --------  -------
- tatin  https://tatin.dev/      0       100  ***
- test-tatin  https://tatin.dev/ 0       100  ***
+ Alias  URI                  Port  Priority
+ -----  ------------------   ----  --------
+ tatin  https://tatin.dev/      0       100
+ test-tatin  https://tatin.dev/ 0       100
 4 5</code></pre>
 <p>Notes:</p>
 <ul>
 <li>We use the same name as before (<code>MyUserSettings</code>) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class <code>UserSettings</code> with that name.</li>
-<li>The API key is replaced by asterisks unless you specify a <code>1</code> as the right argument to <code>ListRegistries</code></li>
+<li>API keys are not shown unless you specify a <code>1</code> as the right argument to <code>ListRegistries</code></li>
 <li>When you fire up a new session of Dyalog APL right  now, it would still look for the user settings file in its standard location.</li>
 </ul>
 <div class="h_tag">
@@ -290,19 +290,23 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
 <p>To make this user settings file the default file, meaning that this file will be instantiated the next time Dyalog APL is fired up, we need to make sure that a file <code>.tatin</code> in the default folder (that's the one returned by <code>⎕SE.Tatin.GetUserHomeFolder''</code>) contains a path pointing to that folder.</p>
 <p>You can do this yourself, but you can also ask the instance for doing the job for you:</p>
 <pre tabindex="0"><code>      ⎕SE.Tatin.MyUserSettings.MakeDefaultFile 1</code></pre>
-<p>From now on the file <code>MyUserSettings.path2config</code> is pointing to will be used to determine the user settings.</p>
+<p>From now on, the file <code>MyUserSettings.path2config</code> is pointing to, will be used to determine the user settings.</p>
 <div class="h_tag">
 <a href="#other-settings" id="other-settings" class="autoheader_anchor">
 <h2 data-id="Other-settings">4. Other settings</h2>
 </a>
 </div>
 <p>You can specify these pieces of information as well:</p>
-<ul>
-<li><code>group</code></li>
-<li><code>license</code></li>
-<li><code>maintainer</code></li>
-<li><code>source</code></li>
-</ul>
+<dl>
+<dt><code>group</code></dt>
+<dd><p>The name your packages will use.</p></dd>
+<dt><code>license</code></dt>
+<dd><p>The license you usually use to publish a package.</p></dd>
+<dt><code>maintainer</code></dt>
+<dd><p>The email address of themaintainer of your packages (most likely your email address).</p></dd>
+<dt><code>source</code></dt>
+<dd><p>The name of a folder in your package where all source files are stored.</p></dd>
+</dl>
 <p>These define the defaults to be used when a new package is created.</p>
 <div id="footnotes_div">
 <hr>

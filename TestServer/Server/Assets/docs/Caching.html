@@ -43,7 +43,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <h2 data-id="Background">1. Background</h2>
 </a>
 </div>
-<p>When a Tatin package and any dependencies are installed or loaded it seems to be a good idea to save those packages in a machine-specific cache because obviously when the package is requested again, be it by the same user but for a different purpose or a different user, downloading should be avoided because it's already saved on the machine.</p>
+<p>When a Tatin package and its dependencies are installed or loaded, it seems to be a good idea to save those packages in a machine-specific cache because obviously when the package is requested again, be it by the same user but for a different purpose or a different user, downloading should be avoided because it's already saved on the machine.</p>
 <p>And that's exactly what Tatin does by default, with two exceptions:</p>
 <ol start="1">
 <li>Packages that are betas are never cached.
@@ -60,7 +60,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>Caching can be influenced by setting particular parameters in <code>⎕SE.Tatin.MyUserSettings</code>, an instance of the <code>UserSettings</code> class, but also by setting particular parameters in the registries saved in the user settings.</p>
 <p>These parameters allow you to…</p>
 <ul>
-<li>define the folder which hosts the cached packages</li>
+<li>define the folder that hosts the cached packages</li>
 <li>toggle caching on a global level</li>
 <li>disable caching for particular registries</li>
 </ul>
@@ -88,14 +88,19 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </a>
 </div>
 <p>There is no default, meaning that the folder that hosts cached packages depends on the operating system.</p>
-<p>The function <code>GetPathToPackageCache</code> returns either the value of <code>MyUserSettings.path2cache</code> or the default path if <code>path2cache</code> is empty.</p>
-<p>This property's main purpose is test cases that should not temper with the default cache.</p>
+<p>The function <code>GetPathToPackageCache</code> returns either the value of <code>MyUserSettings.path2cache</code> or the OS-specific default path if <code>path2cache</code> is empty.</p>
+<p>This property's main purpose is to allow test cases using a temp folder: the tests should not temper with the default cache.</p>
 <div class="h_tag">
 <a href="#registries-saved-in-the-user-settings" id="registries-saved-in-the-user-settings" class="autoheader_anchor">
 <h3 data-id="Registries-saved-in-the-user-settings">3.2. Registries saved in the user settings</h3>
 </a>
 </div>
-<p>Defining a registry in the user settings means that an instance of the <code>Define Registry</code> class is created, amended, and then added with the <code>Add</code> method to <code>MyUserSettings</code>.</p>
+<p>Adding a registry to the user settings requires…</p>
+<ul>
+<li>creating an instance of the <code>Define Registry</code> class</li>
+<li>amended the properties of that instance</li>
+<li>add the instance with the <code>Add</code> method to <code>MyUserSettings</code></li>
+</ul>
 <p>One of the parameters of an instance of <code>DefineRegistry</code> is <code>noCaching</code>. This is a Boolean that defaults to 0, meaning that packages from that registry will be cached unless caching is switched off on a global level via <code>MyUserSettings.caching</code>.</p>
 <p>If it is 1 instead then packages from that registry will never be cached.</p>
 <p>This is typically used when you have a local Tatin Server running, and you are fiddling with packages managed by that server.</p>

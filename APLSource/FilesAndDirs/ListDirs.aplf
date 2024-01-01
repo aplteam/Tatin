@@ -13,13 +13,9 @@
  x←⊂∘,⍣((⊃' '=1↑0⍴↑x)∧1=≡x)⊣x
  (recursive depth)←2↑x,(≢x)↓0 ⍬
  depth-←1
- path←NormalizePath ,path
+ path←NormalizePath,path
  (part1 part2)←APLTreeUtils2.SplitPath path
  'Wildcard characters are allowed only in the last part of a path'⎕SIGNAL 11/⍨∨/'?*'∊part1
- :If 'Win'≢APLTreeUtils2.GetOperatingSystem ⍬
- :OrIf {(':'=0⊃⍵)∧(1⊃⍵)∊'\/'}¯2↑{⍵↓⍨-(¯1↑⍵)∊'/\'}path
-     'Right argument is not a directory'⎕SIGNAL 11/⍨0=IsDir{(a b)←APLTreeUtils2.SplitPath ⍵ ⋄ ~∨/'*?'∊b:⍵ ⋄ a}path
- :EndIf
  path↓⍨←-CurrentSep=¯1↑path
  recursiveFlag←{0=⎕NC ⍵:0 ⋄ w←⍎⍵ ⋄ 0=1↑0⍴w:w ⋄ 'recursive'≡⎕C w}'recursive'
  :If recursiveFlag
@@ -27,6 +23,7 @@
      '"path" must not carry wildcard chars in case "Recursive" is specified'⎕SIGNAL 11
  :EndIf
  path,←(~∨/'?*'∊path)/CurrentSep
+ 'Right argument is not a directory'⎕SIGNAL 11/⍨0=IsDir{~∨/'*?'∊⍵:⍵ ⋄ 0⊃⎕NPARTS ⍵}path
  :Trap 10 19 22
      buff←(0 1)⎕NINFO⍠('Wildcard' 1)⊣path,'*'
  :Else

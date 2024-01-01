@@ -5,7 +5,7 @@
  logFilename←folder,GetLogFilename
  d←⊃⎕NGET logFilename 1                 ⍝ Data
  d←(0<≢¨d)/d                            ⍝ Get rid of empty lines, if any
- ind←+/∧\(↑d)[;⍳4]∧.=⍕oldYear
+ ind←+/∧\(4↑¨d)≡¨⊂⍕oldYear
  :If ind≠≢d
      :Hold 'App-Log'
          yearFilename←folder,'year'
@@ -18,7 +18,7 @@
      :AndIf 0<≢d←ProcessLogFile d
          statFilename←folder,'usage-data-',(⍕oldYear),'.csv'
          colTitles←'Group' 'Name' 'Version' 'Year' 'Month' 'Downloads'
-             d colTitles ⎕CSV⍠('IfExists' 'Replace')⊢statFilename
+         d colTitles ⎕CSV⍠('IfExists' 'Replace')⊢statFilename
          zipFilename←⊃,/(¯1↓⎕NPARTS statFilename),⊂'.zip'
          ##.F.DeleteFile zipFilename
          zip←⎕NEW ##.ZipArchive(,⊂zipFilename)

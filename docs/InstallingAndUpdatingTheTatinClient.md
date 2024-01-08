@@ -35,7 +35,7 @@ In order to activate Tatin, execute
 and follow the instructions.
 
 
-## Updating Tatin in 18.0 and 18.2
+## Updating Tatin
 
 You've installed Tatin before and want to update it to the latest version.
 
@@ -65,16 +65,32 @@ In that case you might need to perform some action, depending on how old your ve
 
 Once you have Tatin 0.102.1 (or later) installed in the right place you can use `]Tatin.UpdateTatin` for updating Tatin to a later version.
 
+Just execute:
+
+```
+]Tatin.UpdateTatin
+````
+
+All necessary steps will be executed; eventually the new version number will be reported.
+
+Notes:
+
+* The command will put the release notes on display
+
+* Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+
 
 !> ### What is the correct installation folder?
 => From version 0.102.1 onwards, Tatin must be installed into one of these folders:
 => ```
 => ⍝ Windows
 => C:\Users\<⎕AN>\Documents\Dyalog APL[-64] <version> Unicode Files\SessionExtensions\CiderTatin
+=> 
 => ⍝ Linux
-=> /home/<⎕AN>/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> /home/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> 
 => ⍝ Mac OS
-=> Users/<⎕AN>/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> Users/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
 => ```
 
 ## How to install in 18.0 and 18.2
@@ -265,40 +281,3 @@ Create one that looks like this:
 ### There is already such a script
 
 Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
-
-
-## Updating Tatin
-
-Just execute:
-
-```
-]Tatin.UpdateTatin
-````
-
-If there is a later version available all necessary steps will be executed; eventually the new version number will be reported.
-
-Notes:
-
-* Due to the massive change of the installation process you cannot use `]Tatin.UpdateTatin` to update any version before 0.102.1
-
-* The command will put the release notes on display
-
-* Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

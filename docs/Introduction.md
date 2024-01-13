@@ -12,7 +12,7 @@ Tatin is a package manager for Dyalog APL that helps you use and manage packages
 
 ## What is a package?
 
-A package should serve a particular task, for example convertingt markdown files into HTML. A package may be independent, but it may also depend on other packages. Tatin manages dependencies behind the scene.
+A package should serve a particular task, for example converting markdown files into HTML. A package may be independent, but it may also depend on other packages. Tatin manages dependencies behind the scene.
 
 A package may consist of as little as a single source file and as much as a nested folder structure with many source files. Any of those files may contain a single function, a single operator, a single class, a single interface, or a single namespace. 
 
@@ -96,6 +96,7 @@ Now is the time to read [First Steps with Tatin](./FirstStepsWithTatin.html "Fir
 A> ### Semantic versioning and Minimal Version Selection
 A>
 A> We suggest that you make yourself familiar with the concepts of [Semantic Versioning](https://semver.org/ "External link, opened in a new Tab" {target="_blank"}) and [Minimum Version Selection](https://research.swtch.com/vgo-mvs "External link, opened in a new Tab" {target="_blank"}), and how exactly these concepts are implemented in Tatin by reading the document [Tatin's load- and update strategy](./TatinsLoadAndUpdateStrategy.html "Opens the document TatinsLoadAndUpdateStrategy.html").
+
 
 
 

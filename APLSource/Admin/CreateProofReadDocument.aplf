@@ -1,7 +1,12 @@
- r←CreateProofReadDocument flag;M;parms;F;list;file;md;html;ns;buff;first
+ r←{type}CreateProofReadDocument flag;M;parms;F;list;file;md;html;ns;buff;first;names;ind;name;i;hrefs;captions
 ⍝ This creates an HTML document from all the Markdown files in the docs/ folder for proof-reading the documentation in a single document.
 ⍝ The file will be created in the temp folder. The filename is returned as result.
+⍝ `type` can be used to get very different documents:
+⍝  1 (the default) compiles all documents into a single one for the sole purpose of proof-reading the lot
+⍝  2 Leads to a document that gives on overview of what Tatin can do. A significant number of documents that do not fit are left out
  r←''
+ type←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'type'
+ '"type" must be either 1 or 2'⎕SIGNAL 11/⍨~type∊1 2
  :If flag
      M←##.MarkAPL ⋄ F←##.FilesAndDirs
      parms←M.CreateParms
@@ -9,17 +14,40 @@
      parms.outputFilename←'html'F.GetTempFilename2'tatin-proofread'
      parms.cssURL←##.CiderConfig.HOME,'/Assets/CSS/'
      parms.createFullHtmlPage←0
-     parms.numberHeaders←1
-     parms.bookmarkLink←0
+     parms.numberHeaders←1 2 3 4 5 6
+     parms.bookmarkLink←1
      parms.verbose←0
      html←''
      first←1
      :If 0<≢list←F.ListFiles ##.CiderConfig.HOME,'/docs/*.md'
-         :For file :In list
+         :If type=2
+             names←{2⊃⎕NPARTS ⍵}¨list
+             (names list)←(~names∊'ReleaseNotes' 'RunDyalogBehindApache' 'GitHub' 'SyntaxReference' 'TatinForContributors' 'UsageData' '_ReadMe')∘/¨names list
+             ind←names⍳'Introduction' 'InstallingAndUpdatingTheTatinClient' 'FirstStepsWithTatin' 'SemanticVersioning' 'PackageConfiguration' 'PublishingPackages' 'TatinsLoadAndUpdateStrategy' 'Caching' 'TatinUserSettings' 'InstallingTheTatinServer' 'Server-TipsAndTricks'
+             (names list)←ind∘{(⊂⍺)⌷⍵}¨names list
+             captions←{md←⊃F.NGET ⍵ 1 ⋄ ##.APLTreeUtils2.(DLB DTB)2↓(1⍳⍨'# '∘≡¨2↑¨md)⊃md}¨list
+             hrefs←{'-'@(⍸' '=⍵)⊢⎕C ⍵}¨captions
+             hrefs←{⍵/⍨⍵∊(⎕C ⎕A),⎕D,'-'}¨hrefs
+             html,←⊂'<p style="font-size: 200%;"><strong>Table of Contents</strong></p>'
+             html,←⊂'<hr>'
+             html,←⊂'<ol style="font-size: 125%;">'
+             html,←hrefs{href←⍺ ⋄ '<li><a href="#',(href),'">',⍵,'</a></li>'}¨captions
+             html,←⊂'</ol>'
+             html,←⊂'<p style="page-break-before:always;"></p>'
+         :EndIf
+         :For i :In ⍳≢list
+             file←i⊃list
+             :If type=2
+                 name←i⊃names
+             :EndIf
              :If first
                  first←0
              :Else
                  html,←⊂'<p style="page-break-after:always;"></p>'
+                 html,←(type=2)/⊂'<p style="page-break-before:always;"></p>'
+             :EndIf
+             :If type=2
+                 parms.startHeaderNoWith←i
              :EndIf
              md←⊃F.NGET file 1
              md←(~∧\'[parm]:'∘{⍺∘≡¨(≢⍺)↑¨⍵}md)/md

@@ -22,7 +22,7 @@
  parms←EstablishDefaultHomeFolder parms
  :If 0=parms.noCSS
      :If ⎕NULL≡parms.cssURL
-         parms.cssURL←parms.homeFolder,'/Files/'
+         parms.cssURL←({0=≢⍵:'.',⍵ ⋄ ⍵}parms.homeFolder),'/Files/'
      :EndIf
      parms.cssURL~←'"'
      :If 0≠≢parms.cssURL
@@ -60,10 +60,10 @@
  copyCodeJavaScript←toggleTocJavaScript←''
  :If parms.javaScript
      :If hasCodeBlock
-         copyCodeJavaScript←GetCopyCodeJavaScript parms.copy2ClipboardBtn
+         copyCodeJavaScript←GetCopyCodeJavaScript parms
      :EndIf
      :If hasTOC
-         toggleTocJavaScript←GetJavaScriptForTogglingTOC
+         toggleTocJavaScript←GetJavaScriptForTogglingTOC parms
      :EndIf
      javaScript←copyCodeJavaScript,toggleTocJavaScript,hasCollapsible/GetJavaScriptForTogglingCollapsibles
      :If 0<≢javaScript

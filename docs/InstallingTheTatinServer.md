@@ -125,7 +125,7 @@ A> ```
 Flag that defines whether certificates (https) are used or not (http).
 
 
-#### The section [CERTIFICATES]{#CERTIFICATES}
+#### The section [CERTIFICATES]{#certificates}
 
 A certificate is required in case you want to use https, a must on the Internet these days.
 You probably want to use your own one.
@@ -162,7 +162,7 @@ This parameter is ignored on non-Windows platforms and has no effect under Windo
 
 If you do run the Tatin Server as a Windows Service then set this to 1. Start, Pause, Stop and crashes are then reported to the Windows Event Log.
 
-## On Certificates
+## On Certificates{#certificates2}
 
 Note that in case you want your Tatin server to serve requests from the Internet --- as opposed to an Intranet --- it is strongly recommended to hide the Tatin Server behind an industrial-strength HTTP server like Apache.
 
@@ -316,6 +316,7 @@ What kind of actions need to be taken, if any, is revealed by the release notes.
 First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+
 
 
 

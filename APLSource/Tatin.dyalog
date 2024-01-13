@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.76.1 - 2023-12-15
+⍝ * 0.76.2 - 2024-01-13
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -1510,7 +1510,11 @@
           ⍝ We must make sure that all connections get closed before passing on the error
           qdmx←⎕DMX
           TC.CloseConnections 1
-          CheckForInvalidVersion qdmx
+          :If 90=qdmx.EN  ⍝ .NET error?!
+              (⍕⎕EXCEPTION)⎕SIGNAL 11
+          :Else
+              CheckForInvalidVersion qdmx
+          :EndIf
       :EndTrap
       :If 0<≢r
           r←⍪(⊂'Installed into ',installFolder,':'),' ',¨r

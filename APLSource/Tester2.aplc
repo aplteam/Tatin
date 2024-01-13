@@ -22,11 +22,17 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.5.0+5' '2023-04-28'
+      r←'Tester2' '3.6.0+5' '2024-01-11'
     ∇
 
     ∇ r←History
       :Access Public shared
+      ⍝ * 3.6.0 ⋄ 2024-01-11
+      ⍝   * Any a general `Initial` function as well as any group-specific one can now return a text vector
+      ⍝     rather than a Boolean. Empty=success, otherwise it is treated as an error msg and reported.
+      ⍝   * So far, in case a test suite was executed in batch mode, there was no information provided which
+      ⍝     line did cause a test case to fail.
+      ⍝   * Shared method `Help` added that provides a full documentation of Tester2.
       ⍝ * 3.5.0 ⋄ 2023-04-28
       ⍝   * Helpers updated
       ⍝ * 3.4.0 ⋄ 2023-04-10
@@ -383,6 +389,11 @@
       (rc log)←Run__ _parms
     ∇
 
+    ∇ r←Help
+      :Access Public Shared
+      r←']open ',##.TatinVars.GetFullPath2AssetsFolder,'Tester2-Reference.html'
+    ∇
+
     ⍝⍝⍝ Private stuff
 
     ∇ r←CreateParms dummy
@@ -413,13 +424,13 @@
       r.⎕FX'r←List' 'r←↑{⍵(⍎⍵)}¨'' ''~¨⍨↓⎕NL 2'
     ∇
 
-    ∇ {r}←Run__ ps;rc;log;⎕TRAP;rc2;filename;tno;buff;res;initialFlag
+    ∇ {(rc log)}←Run__ ps;⎕TRAP;rc2;filename;tno;buff;res;initialFlag
         ⍝ Run all test cases to be found in `_ref`.\\
         ⍝ The right argument is a parameter space, typically created by calling `CreateParms ⍬`.\\
         ⍝ The shy explicit result is a two-element vector:
-        ⍝ 1. `r ←→  0`  when all tests got executed succesfully.\\
-        ⍝    `r ←→  1`  when at least one test failed
-        ⍝    `r ←→  2   when `Initial` prevented any test case to be executed.\\
+        ⍝ 1. `r ←→  0 <log>`  when all tests got executed succesfully.\\
+        ⍝    `r ←→  1 <log>`  when at least one test failed
+        ⍝    `r ←→  2 <log>   when `Initial` prevented any test case to be executed.\\
         ⍝ 2. Nested vector with the log information
       :Access Public Instance
       ⎕TRAP←(QuitEvent'C' '→∆GetOutOfHere')(PassEvent'C'('⎕SIGNAL ',⍕PassEvent))((0 1000)'N')
@@ -450,14 +461,16 @@
           :EndIf
           {}{_←⎕DQ ⍵ ⋄ ⎕DL 0.1}⍣(0=TestFlag)⊣ps.ref2Gui.∆n.Form
           :If ps.ref2Gui.∆n.∆Closed
-              r←0 ''
+              (rc log)←0 ''
               :Return
           :EndIf
           ps←CopyGUI2Parms ps
       :EndIf
       :If initialFlag←0<≢ps.list
           :If 0=ExecuteInitial _ref ps
-              ShowLog'*** "Initial" could not initialize'
+              :If ~CR∊⊃¯1↑ps.log
+                  ShowLog'*** "Initial" could not initialize'
+              :EndIf
               ps.errCounter←1
               rc←2
               ps.list←''
@@ -481,7 +494,7 @@
       :If ps.guiFlag
       :AndIf {6::1 ⋄ 0⊣⍵.Type}ps.ref2Gui.∆n.Form
           ⎕←'*** Tests cancelled'
-          r←rc ps.log
+          log←ps.log
           →0
       :EndIf
       _INI←⍬                    ⍝ Flatten any leftovers
@@ -506,7 +519,6 @@
       :EndIf
       ShowLog'*** Tests done'
       log←ps.log
-      r←rc log
       :If ps.guiFlag
           _ref2GUI←ps.ref2Gui
           :If ps.ref2Gui.∆n.∆Closed   ⍝ The user has clicked the "Close" box but the GUI is still around
@@ -582,9 +594,10 @@
           {A.ToNum⌽⍵↑⍨¯1+⍨⍵⍳'_'}⌽⍵
       }
 
-    ∇ {success}←ExecuteInitial(ref ps);report
+    ∇ {success}←ExecuteInitial(ref ps);report;buff;initMsg
       success←1
       report←'Looking for a function "Initial": '
+      initMsg←''
       :If 3=ref.⎕NC'Initial'
           :If 2⊃⌽(8⍴2)⊤ps.stopFlag
               (∪(⎕STOP 1⊃⎕SI),∆stop1,∆stop2,∆stop3,∆stop4)⎕STOP 1⊃⎕SI
@@ -596,13 +609,29 @@
               :If 0=⊃⊃ref.⎕AT'Initial'
      ∆stop1:      ref.Initial
               :Else
-     ∆stop2:      success←ref.Initial
+     ∆stop2:      buff←ref.Initial
+                  :If ' '=1↑0⍴buff
+                      success←0=≢buff
+                      :If 0<≢buff
+                          initMsg←buff
+                      :EndIf
+                  :Else
+                      success←buff
+                  :EndIf
               :EndIf
           :Case 1
               :If 0=⊃⊃ref.⎕AT'Initial'
      ∆stop3:      ref.Initial ps
               :Else
-     ∆stop4:      success←ref.Initial ps
+     ∆stop4:      buff←ref.Initial ps
+                  :If ' '=1↑0⍴buff
+                      success←0=≢buff
+                      :If 0<≢buff
+                          initMsg←buff
+                      :EndIf
+                  :Else
+                      success←buff
+                  :EndIf
               :EndIf
           :Else
               11 ⎕SIGNAL⍨'The "Initial" function in ',(⍕ref),' has an invalid signature: it''s neither monadic nor niladic'
@@ -610,7 +639,10 @@
           :If success
               report,←'found and successfully executed'
           :Else
-              report,←'found and executed but it signalled failure!'
+              report,←'found and executed but it signalled failure'
+              :If 0<≢initMsg
+                  report,←':',CR,initMsg
+              :EndIf
           :EndIf
       :Else
           report,←'not found'
@@ -773,8 +805,9 @@
               :Else
                   marker←'⍝'
               :EndIf
-              3 ShowLog marker,' ',desc
-              i AddToGui(length2↑(length↑marker,' ',testFns),' (',(cw 0⍕i),'/',max,')'),' ⍝ ',desc
+              3 ShowLog marker,' ',desc,ReportLineNumber
+              i AddToGui(length2↑(length↑marker,' ',testFns),' (',(cw 0⍕i),'/',max,')'),' ⍝ ',desc,ReportLineNumber
+              ⎕EX'∆FAILING_LINE'
               :If ~rc∊_OK,_Failed
               :AndIf ps.guiFlag
               :AndIf ps.ref2Gui.∆n.∆Closed=0
@@ -925,7 +958,7 @@
     ⍝ * A 2 means the result of the execution attempt of a test function.
     ⍝ * A 3 means "to be appended the very last line in the log"
     ⍝ * A negative type means message with more to come
-    ⍝ `ps` is a parameter space with `ps.log` being, well, the log.
+    ⍝ Requires semi-global `ps`: a parameter space with `ps.log` being, well, the log.
       r←⍬
       :If 0<≢msg
           type←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'type'
@@ -1199,10 +1232,14 @@
     ⍝ Usage : `→PassesIf x`, whith `x` being a boolean scalar
       :Access Public Instance
       r←⍬
+      ⎕EX'∆FAILING_LINE'
       :If ~y                        ⍝ Passes test, so →PassesIf x just continues
           :If 2=_ref.⎕NC'stopFlag'  ⍝ Stop not defined, continue with test suite
           :AndIf ~_ref.stopFlag     ⍝ Do not stop, continue with test suite
               r←0
+              :If _ref.batchFlag
+                  ∆FAILING_LINE←2⊃⎕LC
+              :EndIf
           :Else
               ⎕SIGNAL 999           ⍝ Otherwise stop for investigation
           :EndIf
@@ -1213,6 +1250,7 @@
 ⍝ Returns either an empty vector or `label, which defaults to `∆TidyUp`.\\
 ⍝ Signals 999 when `flag` is 1 and `stopFlag` exists and is 1.
       :Access Public Instance
+      ⎕EX'∆FAILING_LINE'
       :If 1=flag
       :AndIf 0<_ref.⎕NC'stopFlag'
       :AndIf _ref.stopFlag
@@ -1220,6 +1258,9 @@
       :EndIf
       label←{(0<⎕NC ⍵):⍎⍵ ⋄ r←_ref.⍎'∆TidyUp'}'label'
       r←flag/label
+      :If _ref.batchFlag
+          ∆FAILING_LINE←2⊃⎕LC
+      :EndIf
     ∇
 
     ∇ {list}←EditTestFunctions list;name
@@ -1671,7 +1712,7 @@
       :EndIf
     ∇
 
-    ∇ {(continueFlag i noOf)}←{force}HandleInitialize(ref ps currentGroup i noOf);at;result
+    ∇ {(continueFlag i noOf)}←{force}HandleInitialize(ref ps currentGroup i noOf);at;result;buff
       force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
       continueFlag←0
       :If 0<≢currentGroup
@@ -1692,10 +1733,15 @@
      ∆stop3:      ref⍎'Initial_',currentGroup
                   result←1
               :EndIf
-              :If ~1↑result∊⍬ 1
+              :If ~(⊂result)∊⍬ 1
+              :AndIf ''≢result
                   buff←¯1↑ps.log
                   ps.log←¯1↓ps.log
-                  ShowLog'Function "Initial_',currentGroup,'" found and executed but did not return a 1'
+                  :If ' '=1↑0⍴∊result
+                      ShowLog'Function "Initial_',currentGroup,'" found and executed, but it returned an error message:',CR,result
+                  :Else
+                      ShowLog'Function "Initial_',currentGroup,'" found and executed but did not return a 1'
+                  :EndIf
                   noOf←+/∨/('_',currentGroup,'_')⍷↑(i-1)↓ps.list
                   ShowLog'Therefore ',(⍕noOf),' member',((1<noOf)/'s'),' of the group "',currentGroup,'" will not be executed'
                   :If ps.guiFlag
@@ -1739,6 +1785,13 @@
           r←##.CommTools.YesOrNo y
       :Else
           r←x ##.CommTools.YesOrNo y
+      :EndIf
+    ∇
+
+    ∇ r←ReportLineNumber
+      r←''
+      :If 0<⎕NC'∆FAILING_LINE'
+          r←' [',(⍕∆FAILING_LINE),']'
       :EndIf
     ∇
 

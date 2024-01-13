@@ -1,5 +1,10 @@
- ns←CalculateHeaderNumbers ns;nos;current;level;lastLevel;i;bool;headers
+ns←CalculateHeaderNumbers ns;nos;current;level;lastLevel;i;bool;headers
  current←6⍴0
+ :If 0<ns.parms.⎕NC'startHeaderNoWith'
+     current[1]←ns.parms.startHeaderNoWith-1
+ :Else
+     ns.parms.startHeaderNoWith←0
+ :EndIf
  :If ∧/bool←CheckHeaders ns
      bool←ns.headers[;1]∊{1=≢⍵:⍳⍵ ⋄ ⍵}ns.parms.numberHeaders
      :If 0≠≢headers←bool⌿ns.headers

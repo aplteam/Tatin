@@ -1,10 +1,10 @@
- r←GetCopyCodeJavaScript flag;copyCaption
+ r←GetCopyCodeJavaScript parms;copyCaption
  ⍝ Returns the JavaScript that adds a "Copy" button to every `<pre>` and established the handler for the "Click" event.
  r←⊂''
- :If flag
+ :If parms.copy2ClipboardBtn
      r←''
      copyCaption←' ',(⎕UCS 128203),' '
-     copyCaption←' Copy '
+     copyCaption←' ',parms.copyCaption,' '
      r,←⊂''
      r,←⊂'// Adds a "Copy" button to every code block & established the event handler'
      r,←⊂'const copyButtonLabel = "',(copyCaption),'" ;'
@@ -31,8 +31,7 @@
      r,←⊂''
      r,←⊂'  await navigator.clipboard.writeText(text);'
      r,←⊂''
-    ⍝r,←⊂'  button.innerText = " ✓ ";'
-     r,←⊂'  button.innerText = " Copied ";'
+     r,←⊂'  button.innerText = " ',parms.copiedCaption,' ";'
      r,←⊂''
      r,←⊂'  setTimeout(() => {'
      r,←⊂'    button.innerText = copyButtonLabel;'

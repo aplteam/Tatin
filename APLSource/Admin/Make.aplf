@@ -6,7 +6,10 @@
 ⍝ It cannot be done in one go, and it cannot be done in batch mode from the current session.
 ⍝ The right argument is expected to be a Boolean that tells whether this functions runs in batch
 ⍝ mode or not. In batch mode no messages are printed, and no interaction with a user is
-⍝ attempted. Also, Tatin is not updated in the C:\Users\<⎕AN>\Documents\Dyalog* folder then.
+⍝ attempted.
+⍝ Also, Tatin is not updated in "C:\Users\<⎕AN>\Documents\Dyalog APL-64 19.0 Unicode Files\" then.
+⍝ `noQLX` defaults to 0. By passing a 1 no function is called after instantiating Dyalog
+⍝ for the Client and the Server; useful for debugging.
  r←⍬
  Assert(⊂batchFlag)∊0 1
  versionOfAPL←'18.0'
@@ -29,7 +32,7 @@
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Compiling HTML from the markdown files (documentation)...'
  CompileDocumentation ⍬
 
- path←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files\SessionExtensions\CiderTatin\Tatin'
+ path←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL-64 19.0 Unicode Files\SessionExtensions\CiderTatin\Tatin'
  :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in the version-agnostic folder?
  :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live there?
      file1←path,'/Tatin.dyalog'

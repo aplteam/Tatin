@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.76.2 - 2024-01-13
+⍝ * 0.77.0 - 2024-01-13
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -687,7 +687,7 @@
       :If '[]'≡¯2↑⌽¯1⌽installFolder
           'You''ve specified a Cider project alias but Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
           project←installFolder
-          aliasDefs←⎕SE.Cider.GetAliasFileContent ⍬
+          aliasDefs←⎕SE.Cider.GetCiderAliasFileContent ⍬
           ind←aliasDefs[;1]⍳⊂⎕C project~'[]'
           'Project not found'Assert ind≤≢aliasDefs
           installFolder←2⊃aliasDefs[ind;]
@@ -1265,13 +1265,14 @@
       TC.∆VERBOSE←verboseWas
     ∇
 
-    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error;project
+    ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error;project;ref;name
       r←⍬
       project←0
       :If (,0)≡,what←Arg._1
           :If 9=⎕SE.⎕NC'Cider'
               project←1
               openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+              ref←⍬
               :If 1<≢openCiderProjects
                   ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
                   :If 0=≢ind
@@ -1280,7 +1281,8 @@
                       what←2⊃openCiderProjects[ind;]
                   :EndIf
               :ElseIf 1=≢openCiderProjects
-                  what←2⊃openCiderProjects[1;]
+                  (name what)←openCiderProjects[1;1 2]
+                  ref←⍎name
               :Else
                   what←TC.F.PWD
                   :If ~TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
@@ -1374,9 +1376,15 @@
                                       data←newData
                                   :EndIf
                               :EndTrap
-                              :If 0<≢ns.source                                  ⍝ Is defined...
-                              :AndIf 0=≢3⊃⎕NPARTS ns.source                     ⍝ ...and has no extension...
-                                  'Create!'TC.F.CheckPath path,'/',ns.source    ⍝ ...so we create it in case it does not exist yet
+                              :If flag
+                                  :If 0<≢ns.source                                  ⍝ Is defined...
+                                  :AndIf 0=≢3⊃⎕NPARTS ns.source                     ⍝ ...and has no extension...
+                                      'Create!'TC.F.CheckPath path,'/',ns.source    ⍝ ...so we create it in case it does not exist yet
+                                  :EndIf
+                                  :If ⍬≢ref
+                                  :AndIf 3=ref.⎕NC'TatinVars.CONFIG'
+                                      ref.TatinVars.⎕FX 'r←CONFIG' ('r←''',(''''⎕R''''''⊢⎕JSON⍠('Compact' 0)⊣ns),'''')
+                                  :EndIf
                               :EndIf
                           :EndIf
                       :Else
@@ -1527,7 +1535,7 @@
       ind←installFolder⍳']'
       alias←(ind↑installFolder)~'[]'
       installFolder←ind↓installFolder
-      list←⎕SE.Cider.GetAliasFileContent ⍬
+      list←⎕SE.Cider.GetCiderAliasFileContent ⍬
       'No Cider projects found'Assert 0<≢list
       ('Alias "',alias,'" does not define an open Cider project')Assert(⊂⎕C alias)∊list[;1]
       :If 0<≢installFolder
@@ -2065,6 +2073,7 @@
               r,←⊂'config file in the current directory, but the user is asked for confirmation.'
               r,←⊂''
               r,←⊂'-edit    You may edit the file by specifying the -edit flag.'
+              r,←⊂'         Note that since version 0.104.0 Tatin updates the workspace with the new version.'
               r,←⊂'-delete  In case you want to delete the file specify the -delete flag.'
           :Case ⎕C'UnInstallPackages'
               r,←⊂'UnInstalls a given package and its dependencies if those are neither top-level packages nor'

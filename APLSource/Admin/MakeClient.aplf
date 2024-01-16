@@ -1,4 +1,4 @@
- {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;targetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList;success;log
+ {r}←{bumpBuild}MakeClient batchFlag;msg;F;targetPath;targetFolder;ts1;ts2;path;reg;_userSettings;list;zipFilename;zipContent;fileList;b;rc;more;en;myZip;parms;dirList;success;log;APL
 ⍝ This functions creates a new Tatin Client. It can be called from a developer's session (⍵←0) or
 ⍝ as part of an automated "Make" process with ⍵←1.\\
 ⍝ In case of a problem an error is thrown in case ⍵ is 0, and ⎕OFF 123 is executed in case ⍵ is 1.\\
@@ -14,13 +14,14 @@
      msg,←⊂'This function will close all Cider projects, delete everything that is not needed in order to'
      msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
      msg,←⊂'everything that is needed by the client in Dist/Client/Client.dws'
-     msg,←⊂'The Tatin client will be copied from that WS into ⎕SE once a Tatin user command is invoked.'
+     msg,←⊂'The Tatin client will be copied from that WS into ⎕SE either once a Tatin user command is'
+     msg,←⊂'invoked or by other means, like using a "Run" fn in 19.0 or setup.dyalog in earlier versions.'
      msg,←⊂''
-     msg,←⊂'It also checks whether the user command script should be copied to the MyCMDs folder or vice'
-     msg,←⊂'versa, depending on where the last change was made.'
+     msg,←⊂'It also checks whether the user command script should be copied from the 19.0-64-specific program'
+     msg,←⊂'folder to the project or vice versa, depending on where the last change was made.'
      msg,←⊂''
-     msg,←⊂'Finally all that''s required is zipped into a file <Tatin-Client-{major}.{Minor}.{Patch}.zip'
-     msg,←⊂'That file is created within the Dist/ folder which is not managed by Git'
+     msg,←⊂'In the last step all that''s required is zipped into <Tatin-Client-{major}.{Minor}.{Patch}.zip'
+     msg,←⊂'That file is created within the Dist/ folder which is not managed by Git.'
      ⎕←⍪msg
      ⎕←''
  :EndIf
@@ -58,6 +59,7 @@
      #.⎕EX'Make_'
      0 ⎕SAVE ⎕WSID   ⍝ If this crashes, in particular with "Reference in ⎕SE points to #" or vise versa) execute ⎕OFF 123 and try again
      targetFolder←#._Tatin.Client.GetProgramFilesFolder'CiderTatin/Tatin'
+     targetFolder←'Dyalog[^U]*'⎕R'Dyalog APL-64 19.0 '⊢targetFolder
      :If ~batchFlag
      :AndIf F.IsFile targetFolder,'/Tatin/Tatin.dyalog'
      :AndIf (targetFolder,'/Tatin/Tatin.dyalog')F.YoungerThan'./APLSource/Tatin.dyalog'

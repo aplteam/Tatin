@@ -56,6 +56,12 @@ That default file will have two  Tatin Registries defined in it:
 
 This default file will be created in the user's home folder; the API function `⎕SE.Tatin.GetUserHomeFolder''` does return that folder.
 
+You may also ask the user command with:
+
+```
+]UserSettings -home
+```
+
 
 ### What's the name of the file?
 
@@ -197,6 +203,8 @@ We will pass a simple text vector that specifies the alias (between `[]`) and th
       ]box off
 ```
 
+"id" is not mentioned here, because it is optional, and `DefineRegistry` will assign a freshly generated UUID to it for you. Refer to [The "id"](#) for details.
+
 #### Settings in the file
 
 * `uri` and `alias` are already set by the constructor.
@@ -287,10 +295,6 @@ You can do this yourself, but you can also ask the instance for doing the job fo
 
 From now on, the file `MyUserSettings.path2config` is pointing to, will be used to determine the user settings.
 
-[^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site") rather than JSON.
-
-[^init]: Tatin will be initialized either explicitly or as a side effect when the first Tatin user command is issued. See ["Installing and updating the Tatin Client"](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.
-
 ## Other settings
 
 You can specify these pieces of information as well:
@@ -314,39 +318,36 @@ You can specify these pieces of information as well:
 These define the defaults to be used when a new package is created.
 
 
+`id`
+
+: A unique key that can be used to identify a Registry definition in the user settings file when neither the URL nor an alias can be used for this. 
+
+However, because mot of the time URL or alias are sufficient for this, setting `id` is optional.
+
+## Editing the file
+
+Editing the file with an editor is possible but has the disadvantage that you might make a mistake without noticing.
+
+If you find using an instance of `DefineRegistry` and the `Add` method too cumbersome but want to edit the file use this:
+
+```
+]UserSettings -edit
+```
+
+This checks the file and tries hard to make sure that it is valid and fulfils Tatin's needs.
+
+### The "id"
+
+Because it must be possible to define more than one set for the same URL --- for different groups! --- in the user settings, the URL does not necessarily qualify as a unique key for a Registry. Neither does the alias, because it is optional, and you may reset it to "undefined".
+
+So we need a unique key for this (though admittedly not many will be in need for this). That's why you may set "id". 
+
+If you use the `DefineRegistry` class then "id" will be a newly created UUID. If you prefer to add a new Registry to the user settings by editing the user settings file then you should add "id" yourself. 
+
+This has only an impact locally in a scenario mentioned above, and that's why this is optional.
 
 
 
+[^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site") rather than JSON.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+[^init]: Tatin will be initialized either explicitly or as a side effect when the first Tatin user command is issued. See ["Installing and updating the Tatin Client"](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.

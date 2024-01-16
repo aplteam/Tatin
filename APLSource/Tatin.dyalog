@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.77.0 - 2024-01-13
+⍝ * 0.77.0 - 2024-01-16
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -110,7 +110,7 @@
           c←⎕NS ⍬
           c.Name←'UserSettings'
           c.Desc←'The user settings and the fully qualified filenanme are printed to ⎕SE as JSON'
-          c.Parse←'0 -edit -apikey -refresh'
+          c.Parse←'0 -edit -apikey -refresh -home'
           r,←c
      
           c←⎕NS ⍬
@@ -1267,12 +1267,12 @@
 
     ∇ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error;project;ref;name
       r←⍬
+      ref←⍬
       project←0
       :If (,0)≡,what←Arg._1
           :If 9=⎕SE.⎕NC'Cider'
               project←1
               openCiderProjects←⎕SE.Cider.ListOpenProjects 0
-              ref←⍬
               :If 1<≢openCiderProjects
                   ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
                   :If 0=≢ind
@@ -1383,7 +1383,7 @@
                                   :EndIf
                                   :If ⍬≢ref
                                   :AndIf 3=ref.⎕NC'TatinVars.CONFIG'
-                                      ref.TatinVars.⎕FX 'r←CONFIG' ('r←''',(''''⎕R''''''⊢⎕JSON⍠('Compact' 0)⊣ns),'''')
+                                      ref.TatinVars.⎕FX'r←CONFIG'('r←''',(''''⎕R''''''⊢⎕JSON⍠('Compact' 0)⊣ns),'''')
                                   :EndIf
                               :EndIf
                           :EndIf
@@ -1567,6 +1567,10 @@
     ∇ r←UserSettings Arg;origData;filename;ns;new;buff
       r←''
       filename←TC.F.NormalizePath TC.MyUserSettings.path2config
+      :If Arg.home
+          r←filename
+          :Return
+      :EndIf
       ('User setting file "',filename,'" does not exist?!')Assert ⎕NEXISTS filename
       origData←1⊃⎕NGET filename
       :If Arg.edit
@@ -1780,7 +1784,7 @@
               r,←'' '  ]Tatin.Maintenance path -dry -show'
           :Case ⎕C'UserSettings'
               r,←⊂'Print the usfer settings found in the config file to ⎕SE and allows manipulation via flags'
-              r,←'' '  ]Tatin.UserSettings -apikey -edit -refresh'
+              r,←'' '  ]Tatin.UserSettings -apikey -edit -refresh -home'
           :Case ⎕C'PackageConfig'
               r,←⊂'Manage a package config file: fetch, create, edit or delete it.'
               r,←'' '  ]Tatin.PackageConfig <package-URL|package-folder> -edit -delete'
@@ -2053,9 +2057,10 @@
               r,←⊂'         the editor and make changes. In this case the API key will always show.'
               r,←⊂'         If you did change the data, you will first be prompted for saving the changes on'
               r,←⊂'         disk and then for refreshing the current user settings.'
-              r,←⊂''
               r,←⊂'-refresh If you did change the user settings from another APL session, or by editing the'
               r,←⊂'         file, you can refresh the current user settings with -refresh.'
+              r,←⊂'-home    This let the user command print the folder the user settings are saved in to ⎕SE.'
+              r,←⊂'         If this is specified everything else is ignored.'
           :Case ⎕C'PackageConfig'
               r,←⊂'Manages a package config file: fetch, create, edit or delete it.'
               r,←⊂'The argument, if specified, must be either a URL or a path.'

@@ -44,7 +44,11 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <ul>
 <li class="toc-entry toc-h3"><a href="#make-the-switch-permanent">3.1. Make the switch permanent</a></li>
 </ul></li>
-<li class="toc-entry toc-h2"><a href="#other-settings">4. Other settings</a>
+<li class="toc-entry toc-h2"><a href="#other-settings">4. Other settings</a></li>
+<li class="toc-entry toc-h2"><a href="#editing-the-file">5. Editing the file</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#the-id">5.1. The “id”</a>
+</li></ul></li>
 </li></ul></li>
 </ul>
 </div>
@@ -87,6 +91,8 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </a>
 </div>
 <p>This default file will be created in the user's home folder; the API function <code>⎕SE.Tatin.GetUserHomeFolder''</code> does return that folder.</p>
+<p>You may also ask the user command with:</p>
+<pre tabindex="0"><code>]UserSettings -home</code></pre>
 <div class="h_tag">
 <a href="#whats-the-name-of-the-file" id="whats-the-name-of-the-file" class="autoheader_anchor">
 <h3 data-id="Whats-the-name-of-the-file">1.3. What's the name of the file?</h3>
@@ -216,6 +222,7 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
 │priority│[Null]                      │
 └────────┴────────────────────────────┘
       ]box off</code></pre>
+<p>“id” is not mentioned here, because it is optional, and <code>DefineRegistry</code> will assign a freshly generated UUID to it for you. Refer to <a href="#the-id" class="bookmark_link">The “id”</a> for details.</p>
 <div class="h_tag">
 <a href="#settings-in-the-file" id="settings-in-the-file" class="autoheader_anchor">
 <h4 data-id="Settings-in-the-file">2.1.2. Settings in the file</h4>
@@ -308,6 +315,29 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
 <dd><p>The name of a folder in your package where all source files are stored.</p></dd>
 </dl>
 <p>These define the defaults to be used when a new package is created.</p>
+<dl>
+<dt><code>id</code></dt>
+<dd><p>A unique key that can be used to identify a Registry definition in the user settings file when neither the URL nor an alias can be used for this.</p></dd>
+</dl>
+<p>However, because mot of the time URL or alias are sufficient for this, setting <code>id</code> is optional.</p>
+<div class="h_tag">
+<a href="#editing-the-file" id="editing-the-file" class="autoheader_anchor">
+<h2 data-id="Editing-the-file">5. Editing the file</h2>
+</a>
+</div>
+<p>Editing the file with an editor is possible but has the disadvantage that you might make a mistake without noticing.</p>
+<p>If you find using an instance of <code>DefineRegistry</code> and the <code>Add</code> method too cumbersome but want to edit the file use this:</p>
+<pre tabindex="0"><code>]UserSettings -edit</code></pre>
+<p>This checks the file and tries hard to make sure that it is valid and fulfils Tatin's needs.</p>
+<div class="h_tag">
+<a href="#the-id" id="the-id" class="autoheader_anchor">
+<h3 data-id="The-id">5.1. The “id”</h3>
+</a>
+</div>
+<p>Because it must be possible to define more than one set for the same URL — for different groups! — in the user settings, the URL does not necessarily qualify as a unique key for a Registry. Neither does the alias, because it is optional, and you may reset it to “undefined”.</p>
+<p>So we need a unique key for this (though admittedly not many will be in need for this). That's why you may set “id”.</p>
+<p>If you use the <code>DefineRegistry</code> class then “id” will be a newly created UUID. If you prefer to add a new Registry to the user settings by editing the user settings file then you should add “id” yourself.</p>
+<p>This has only an impact locally in a scenario mentioned above, and that's why this is optional.</p>
 <div id="footnotes_div">
 <hr>
 <p><strong>Footnotes</strong></p>

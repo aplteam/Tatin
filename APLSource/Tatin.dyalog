@@ -1,4 +1,4 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.77.0 - 2024-01-16
 
@@ -2492,7 +2492,7 @@
     Assert←{⍺←'' ⋄ (,1)≡,⍵:r←1 ⋄ ⎕ML←3 ⋄ (⍕∊⍺) ⎕SIGNAL 1↓(↑∊⍵),ErrNo}
     AddHeader←{0=≢⍺:⍺ ⋄(⍵,[0.5]'-'⍴¨⍨≢¨⍵)⍪⍺}
     EnforceSlash←{'/'@(⍸'\'=⍵)⊣⍵}
-    IsScripted←{0::1 ⋄0⊣⎕src ⍵}
+    IsScripted←{16::1 ⋄0⊣⎕src ⍵}
     ED←{⎕ED⍠('EditName' 'Disallow')⊣⍵}
     IsValidJSON←{0::0 ⋄ 1⊣TC.Reg.JSON ⍵}
     IfAtLeastVersion←{⍵≤{⊃(//)⎕VFI ⍵/⍨2>+\'.'=⍵}2⊃# ⎕WG'APLVersion'}

@@ -30,7 +30,7 @@
  client.Host←'github.com'
  request.Headers,←⊂'User-Agent' 'aplteam'
  data←client R.SendAndReceive request
- ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert 200≡data.StatusCode
+ ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert 302≡data.StatusCode
  redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
  redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
  client←R.NewClient 0

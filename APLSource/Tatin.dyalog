@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.77.0 - 2024-01-16
+⍝ * 0.77.1 - 2024-01-21
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -1039,17 +1039,26 @@
                   qdmx.EM ⎕SIGNAL ErrNo
               :EndSelect
           :Else
-              :If firstFlag
-              :AndIf 'Server: The package has already been published'{⍺≡(≢⍺)↑⍵}qdmx.EM
-              :AndIf 'Any'≡⎕SE.Tatin.GetDeletePolicy url_
-                  packageID←2⊃⎕NPARTS source
-              :AndIf TC.C.YesOrNo packageID,' already published on ',url_,'; overwrite?'
-                  firstFlag←0
-                  (rc msg)←⎕SE.Tatin.DeletePackage url,packageID
-                  :If 200=rc
-                      →∆Again
+              :If 'Server: The package has already been published'{⍺≡(≢⍺)↑⍵}qdmx.EM
+                  :If 'Any'≡⎕SE.Tatin.GetDeletePolicy url_
+                      :If firstFlag
+                          packageID←2⊃⎕NPARTS source
+                          :If TC.C.YesOrNo packageID,' already published on ',url_,'; overwrite?'
+                              firstFlag←0
+                              (rc msg)←⎕SE.Tatin.DeletePackage url,packageID
+                              :If 200=rc
+                                  →∆Again
+                              :Else
+                                  ⎕←'Delete attempt failed with status ',(⍕rc),'; publishing therefore not possible'
+                                  :Return
+                              :EndIf
+                          :EndIf
+                      :Else
+                          ⎕←'Deleting already published package failed with status ',(⍕rc),'; publishing therefore not possible'
+                          :Return
+                      :EndIf
                   :Else
-                      ⎕←'Delete attempt failed with status ',(⍕rc),'; publishing therefore not possible'
+                      ⎕←'Server does not allow overwriting an already published package; publishing therefore not possible'
                       :Return
                   :EndIf
               :EndIf
@@ -1126,13 +1135,14 @@
       :EndIf
     ∇
 
-    ∇ r←ListRegistries Arg;type
+    ∇ r←ListRegistries Arg;type;captions
       type←0
       :If 0≢Arg.Switch'full'
           type←Arg.Switch'full'
       :EndIf
       r←TC.ListRegistries type
-      r←((,[0.5]'URI' 'Alias' 'Port' 'Priority',(1≡type)/⊂'API-key'),[1]' ')⍪r
+      captions←TC.RegistryIndices.AllNames
+      r←((,[0.5](-1≢type)↓captions),[1]' ')⍪r
       r[2;]←(⌈⌿≢¨r)⍴¨'-'
     ∇
 
@@ -1184,7 +1194,7 @@
       :Trap ErrNo
           :If '[?]'{⍺≡(≢⍺)↑⍵}arg
               'No package specified'Assert 0<≢{⍵↓⍨⌈/⍵⍳'?]'}arg
-              buff←{⍵[;1 2]}TC.ListRegistries 0
+              buff←{⍵[;,2]}1 TC.ListRegistries 0
               ind←'Please select a Registry:'TC.C.Select↓⎕FMT buff
               :If 0=≢ind
                   r←'Cancelled by user'
@@ -1603,10 +1613,10 @@
       :If 0≡registry   ⍝ No argument specified? We ping all we know about!
           r←0 2⍴⍬
           :If 0<≢registries←GetListOfRegistriesForSelection 0
-          :AndIf 0<≢registries←(TC.Reg.IsHTTP¨registries[;1])⌿registries
-          :AndIf 0<≢registries←registries[∪{⍵⍳⍵}registries[;1];] ⍝ Because the same URL might turn up multiple times with different credentials/alias
+          :AndIf 0<≢registries←(TC.Reg.IsHTTP¨registries[;2])⌿registries
+          :AndIf 0<≢registries←registries[∪{⍵⍳⍵}registries[;2];] ⍝ Because the same URL might turn up multiple times with different credentials/alias
               ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
-              r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries[;1]
+              r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries[;2]
           :EndIf
       :ElseIf (,'?')≡,registry
           :If 0=≢registries←1 SelectRegistry 0
@@ -1759,7 +1769,7 @@
               r,←⊂'Returns information regarding the licenses tolerated by a managed Tatin Registry'
               r,←'' '  ]Tatin.ListLicenses <url> -verbose'
           :Case ⎕C'ListRegistries'
-              r,←⊂'List URL, alias, priority and port of all Registries as defined in the user settings.'
+              r,←⊂'List Alias, URL, ID, port and priority all Registries as defined in the user settings.'
               r,←'' '  ]Tatin.ListRegistries -full'
           :Case ⎕C'ListDeprecated'
               r,←⊂'List all deprecated major versions'
@@ -1923,17 +1933,17 @@
               r,←⊂''
               r,←⊂'-verbose  If specified not only the names of the licenses are returned but also their URLs.'
           :Case ⎕C'ListRegistries'
-              r,←⊂'Lists URL, alias, priority, port  and the no-caching flag of all Registries as defined'
+              r,←⊂'Lists alias, URL, ID, port, priority and the no-caching flag of all Registries as defined'
               r,←⊂'in the user settings.'
               r,←⊂'The result is ordered by priority: the one with the highest priority is listed first etc.'
               r,←⊂''
               r,←⊂'Notes:'
               r,←⊂' * Registries with a priority of 0 will not participate in a scan of Registries'
               r,←⊂' * In case a Registry does not respond when questioned by ]ListRegistries the user is'
-              r,←⊂'   given three options: Retry, skip and cancel operation'
+              r,←⊂'   given three options: Retry, skip and cancel the whole operation'
               r,←⊂''
-              r,←⊂'-full By default all data but the API keys are listed. Specify -full if you want the'
-              r,←⊂'      API keys to be listed as well.'
+              r,←⊂'-full   By default all data but the API keys are listed. Specify -full if you want the'
+              r,←⊂'        API keys to be listed as well.'
           :Case ⎕C'ListDeprecated'
               r,←⊂'Lists all deprecated major versions'
               r,←⊂''
@@ -2499,8 +2509,8 @@
 
     ∇ r←GetListOfRegistriesForSelection type
       :If 0<≢r←TC.ListRegistries type
-          r[;2]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;2]
-          r[;1]←r[;1]{⍵∊0 80 443:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}¨r[;3]
+          r[;1]←{0=≢⍵:'' ⋄ '[',⍵,']'}¨r[;1]
+          r[;2]←r[;2]{⍵∊0 80 443:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}¨r[;4]
       :EndIf
     ∇
 
@@ -2509,7 +2519,7 @@
       :If 1=≢list←GetListOfRegistriesForSelection type
           registry←1⊃list[1;]
       :Else
-          :If ⍬≡row←'Select Tatin Registry'all TC.C.Select↓⎕FMT list[;2 1]
+          :If ⍬≡row←'Select Tatin Registry'all TC.C.Select↓⎕FMT list[;1 2]
               registry←⍬
           :Else
               :If all

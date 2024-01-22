@@ -28,10 +28,10 @@ After a fresh installation you might wonder what Registries are available to you
 
 ```
       ]tatin.ListRegistries
- URL                     Alias         Port    Priority
- ----                    ----------    ----    --------
- https://tatin.dev/      tatin            0         100
- https://test.tatin.dev/ test-tatin       0           0 
+Alias      URL                     Port Priority No caching Proxy API-key
+---------- ----------------------- ---- -------- ---------- ----- -------
+tatin      https://tatin.dev/         0      100          0           ***
+test-tatin https://test.tatin.dev/    0        0          0           ***
 ```
 
 At this point Tatin only knows about the principal Tatin Registry and the Tatin test Registry. If you wish to access other Registries on the Internet or your company's Intranet, or you want to host and publish packages locally (in all likelihood your own ones), then you must change the user settings. 
@@ -612,6 +612,7 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 ##### URI
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
+
 
 
 

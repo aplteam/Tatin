@@ -23,10 +23,10 @@ For example, this call:
 
 ```
       ]Tatin.ListRegistries
- URI         Alias                    Port  Priority
- ----------  -----------------------  ----  --------
- tatin       https://tatin.dev/          0       100
- tatin-test  https://test.tatin.dev/     0         0
+Alias                    URL         ID  Port  Priority No-Caching Proxy
+-----------------------  ----------  --- ----  -------- ---------- -----
+https://tatin.dev/       tatin       ...    0       100           0
+https://test.tatin.dev/  tatin-test  ...    0         0           0
 
 ```
 
@@ -159,10 +159,10 @@ Let's list all registries currently defined:
 
 ```
       ⎕se.Tatin.MyUserSettings.ListRegistries 0
-URI                     Alias       Port  Priority
-------------------      -----       ----  --------
-https://tatin.dev/      tatin       0     100 
-https://test.tatin.dev/ tatin-test  0       0 
+Alias      URL                     Port  Priority No caching Proxy API-key
+-----      ------------------      ----  -------- ---------- ----- -------
+tatin      https://tatin.dev/         0       100          0           ***
+tatin-test https://test.tatin.dev/    0         0          0           ***
 ```
 
 This is because originally Tatin only knows about the principal Tatin server and its cousin, the test server.
@@ -266,15 +266,15 @@ For that, you must create a user settings file in a specific location. To achiev
       p←,⊂'/path2/user_config_file/'
       ⎕SE._Tatin.Client.MyUserSettings←⎕SE._Tatin.Client.⎕NEW ⎕SE.Tatin.UserSettings p
       ⍴⎕←1 ⎕se.Tatin.ListRegistries 0
- https://tatin.dev       tatin      0 100
- https://test.tatin.dev  tatin-test 0   0
-2 4
+tatin      https://tatin.dev       ... 0 100 0
+tatin-test https://test.tatin.dev  ... 0   0 0
+2 7
       ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
- Alias  URI                  Port  Priority
- -----  ------------------   ----  --------
- tatin  https://tatin.dev/      0       100
- test-tatin  https://tatin.dev/ 0       100
-4 5
+ Alias  URL                  Port  Priority No caching Proxy API-key
+ -----  ------------------   ----  -------- ---------- ----- -------
+ tatin  https://tatin.dev/      0       100          0           ***
+ test-tatin  https://tatin.dev/ 0       100          0           ***
+2 7
 ```
 
 Notes:
@@ -351,3 +351,4 @@ This has only an impact locally in a scenario mentioned above, and that's why th
 [^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site") rather than JSON.
 
 [^init]: Tatin will be initialized either explicitly or as a side effect when the first Tatin user command is issued. See ["Installing and updating the Tatin Client"](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.
+

@@ -590,10 +590,12 @@ Returns a matrix with these columns:
 
 |[;1] | Alias
 |[;2] | URL
-|[;3] | Port
-|[;4] | Priority
-|[;5] | No-caching flag
-|[;6] | API key
+|[;3] | ID
+|[;4] | Port
+|[;5] | Priority
+|[;6] | No-caching flag
+|[;7] | Proxy
+|[;8] | API key
 
 "type" must be either 0 or 1 or empty:
 
@@ -603,9 +605,7 @@ Returns a matrix with these columns:
 Notes:
 
 * The result of the API function and the user command differ
-
 * When a Tatin Server is questioned by `ListRegistries` but does not respond, an error is thrown.
-
 
 
 ### ListTags             
@@ -891,6 +891,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

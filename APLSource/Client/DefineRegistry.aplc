@@ -35,6 +35,12 @@
       :Else
           ns.uri←y
       :EndIf
+      '"uri": invalid data type'Assert' '=1↑0⍴∊ns.uri
+      :If {1=≢'^http[s]?://'⎕S 0⊣⎕C ⍵}ns.uri
+      :AndIf 1<+/∊ns.uri=':'
+          ns.(uri port)←{((1⊃⍵),':',(2⊃⍵))(3⊃⍵)}':'(≠⊆⊢)ns.uri
+          ns.port←⊃⊃(//)⎕VFI ns.port
+      :EndIf
       'Invalid variables'Assert∧/(' '~¨⍨↓ns.⎕NL 2)∊varsList
       ⍎¨ns.{'_',⍵,'←','ns.',⍵}¨'id' 'uri' 'priority'      ⍝ use private fields for reserved properties
       ⍎¨ns.{⍵,'←','ns.',⍵}¨varsList~'id' 'uri' 'priority' ⍝ use property setters for validation on rest
@@ -144,6 +150,11 @@
     :Access Public Instance
         ∇ r←get
           r←_id
+        ∇
+        ∇ set value
+          '"id": invalid depth'Assert 1=≡value.NewValue
+          '"id": invalid data type'Assert' '=1↑0⍴value.NewValue
+          _id←value.NewValue
         ∇
     :EndProperty
 

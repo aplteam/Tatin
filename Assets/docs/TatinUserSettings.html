@@ -64,10 +64,10 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p><code>⎕SE.Tatin.MyUserSettings</code> provides several properties that can be referenced as well as several methods that can be issued to manipulate the user settings.</p>
 <p>For example, this call:</p>
 <pre tabindex="0"><code>      ]Tatin.ListRegistries
- URI         Alias                    Port  Priority
- ----------  -----------------------  ----  --------
- tatin       https://tatin.dev/          0       100
- tatin-test  https://test.tatin.dev/     0         0
+Alias                    URL         ID  Port  Priority No-Caching Proxy
+-----------------------  ----------  --- ----  -------- ---------- -----
+https://tatin.dev/       tatin       ...    0       100           0
+https://test.tatin.dev/  tatin-test  ...    0         0           0
 </code></pre>
 <p>shows most of the data that is saved in the user settings for registries, except the API key(s).</p>
 <p>If you would like to see the API keys as well specify the <code>-full</code> flag.</p>
@@ -189,10 +189,10 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </div>
 <p>Let's list all registries currently defined:</p>
 <pre tabindex="0"><code>      ⎕se.Tatin.MyUserSettings.ListRegistries 0
-URI                     Alias       Port  Priority
-------------------      -----       ----  --------
-https://tatin.dev/      tatin       0     100
-https://test.tatin.dev/ tatin-test  0       0</code></pre>
+Alias      URL                     Port  Priority No caching Proxy API-key
+-----      ------------------      ----  -------- ---------- ----- -------
+tatin      https://tatin.dev/         0       100          0           ***
+tatin-test https://test.tatin.dev/    0         0          0           ***</code></pre>
 <p>This is because originally Tatin only knows about the principal Tatin server and its cousin, the test server.</p>
 <p>Note that the API key is not listed when a zero is provided as the right argument.</p>
 <p>Let's add a made-up registry.</p>
@@ -274,15 +274,15 @@ https://test.tatin.dev/ tatin-test  0       0</code></pre>
 <pre tabindex="0"><code>      p←,⊂'/path2/user_config_file/'
       ⎕SE._Tatin.Client.MyUserSettings←⎕SE._Tatin.Client.⎕NEW ⎕SE.Tatin.UserSettings p
       ⍴⎕←1 ⎕se.Tatin.ListRegistries 0
- https://tatin.dev       tatin      0 100
- https://test.tatin.dev  tatin-test 0   0
-2 4
+tatin      https://tatin.dev       ... 0 100 0
+tatin-test https://test.tatin.dev  ... 0   0 0
+2 7
       ⍴⎕←⎕se.Tatin.MyUserSettings.ListRegistries 0
- Alias  URI                  Port  Priority
- -----  ------------------   ----  --------
- tatin  https://tatin.dev/      0       100
- test-tatin  https://tatin.dev/ 0       100
-4 5</code></pre>
+ Alias  URL                  Port  Priority No caching Proxy API-key
+ -----  ------------------   ----  -------- ---------- ----- -------
+ tatin  https://tatin.dev/      0       100          0           ***
+ test-tatin  https://tatin.dev/ 0       100          0           ***
+2 7</code></pre>
 <p>Notes:</p>
 <ul>
 <li>We use the same name as before (<code>MyUserSettings</code>) because all Tatin user commands as well as all Tatin API functions assume the existence of an instance of the class <code>UserSettings</code> with that name.</li>

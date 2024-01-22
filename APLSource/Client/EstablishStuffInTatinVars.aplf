@@ -1,4 +1,4 @@
- {r}←{makeHomeRelative}EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make;check;f
+ {r}←{makeHomeRelative}EstablishStuffInTatinVars(ref cfg folder);deps;ref2;res;msg;make;check;f;body
 ⍝ We establish some fns (Niladic for impersonating "constants") in TatinVars for convinience
  r←⍬
  makeHomeRelative←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'makeHomeRelative'
@@ -19,7 +19,20 @@
  :Else
      f←folder
  :EndIf
- res←ref2.⎕FX'r←HOME' '⍝ Returns the folder the package was loaded from or an empty vector if that cannot be established anymore'('r←''',f,'''')':If ~⎕nexists r' 'r←''''' ':EndIf'
+ body←''
+ body,←⊂'r←HOME;⎕IO;⎕ML;dir;name;extension'
+ body,←⊂'⍝ Returns folder package was loaded from or current directory or an empty vector if both are not valid'
+ body,←⊂'⎕IO←1 ⋄ ⎕ML←1'
+ body,←⊂('r←''',f,'''   ⍝ Original source')
+ body,←⊂':If ~⎕nexists r'
+ body,←⊂'(dir name extension)←⎕NPARTS r'
+ body,←⊂'r←(⊃1 ⎕NPARTS''''),(2⊃⎕NPARTS ¯1↓dir),''/'',name,extension ⍝ Try current dir'
+ body,←⊂':AndIf ~⎕nexists r'
+ body,←⊂'r←(⊃1 ⎕NPARTS''''),name,extension'
+ body,←⊂':AndIf ~⎕nexists r'
+ body,←⊂'r←'''''
+ body,←⊂':EndIf'
+ res←ref2.⎕FX body
  Assert/'HOME'make res
  ref2 check'HOME'
  res←ref2.⎕FX'r←ASSETS'('r←''',cfg.assets,'''')

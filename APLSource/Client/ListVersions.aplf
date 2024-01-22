@@ -1,4 +1,4 @@
- mat←{dateFlag}ListVersions url;client;request;res;url_;registries;registry;buff;flag;port;packageID
+ mat←{dateFlag}ListVersions url;client;request;res;url_;registries;registry;buff;flag;port;packageID;RI
 ⍝ Lists all versions of a package.
 ⍝ `url` is one of:
 ⍝  * An (optional) registry followed by "group" and "name" of a package
@@ -16,14 +16,15 @@
 ⍝ By default the publishing date is not included, but you my change this by passing a 1 as ⍺.
 ⍝ In that case an additional column is added to the result.
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
+ RI←RegistryIndices
  :If flag←'[*]'≡3⍴url           ⍝ Special syntax!
  :OrIf (~IsHTTP url)∧('['≠1⍴url)∧({1≥+/⍵∊'/\'}url)∧(~':'∊url)∧('.'≠1⍴url)
      packageID←(flag×3)↓url
      mat←(0,(2+dateFlag))⍴⍬
      registries←ListRegistries 0
-     :If 0<≢registries←(0<registries[;4])⌿registries ⍝ Ignore those with a priority of 0
-     :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}registries[;1])⌿registries
-         :For registry port :In ↓registries[;1 3]
+     :If 0<≢registries←(0<registries[;RI.priority])⌿registries ⍝ Ignore those with a priority of 0
+     :AndIf 0<≢registries←({(⍳≢⍵)=⍵⍳⍵}registries[;RI.url])⌿registries
+         :For registry port :In ↓registries[;RI.(url port)]
              :If IsHTTP registry
                  url_←registry CompileUrlPlusPort port
              :Else

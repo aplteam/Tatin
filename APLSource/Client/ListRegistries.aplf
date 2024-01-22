@@ -1,28 +1,27 @@
- r←{appendPort}ListRegistries type;data
+ r←{appendPort}ListRegistries type;data;RI
 ⍝ List all registries defined in the Client's config file.\\
 ⍝ Returns a matrix with these columns:
-⍝ * [;1] URL
-⍝ * [;2] Alias
-⍝ * [;3] Priority\\
-⍝ * [;4] API-key (optionally)
+⍝ * [;1] Alias
+⍝ * [;2] URL
+⍝ * [;3] ID
+⍝ * [;4] Port
+⍝ * [;5] Priority
+⍝ * [;6] NoCaching
+⍝ * [;7] Proxy
+⍝ * [;8] API-key (optionally)\\
 ⍝ "type" must be either 0 or 1 or empty:\\
 ⍝ * 1 means all data is listed
-⍝ * Everything else means just the alias, the uri and the priority are listed\\
+⍝ * Everything else means the API key is not listed\\
 ⍝ If ⍺ is 1 (default is 0) then the second column carries the uri plus the port
 ⍝ in case the  port is neither 80 nor 443.
  appendPort←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'appendPort'
- r←(0,(2+3×1≡type))⍴''
+ RI←RegistryIndices
+ r←(0,((-1≢type)+≢RI.AllIndices))⍴''
  '"type" (⍵) must be a Boolean or empty'Assert(⊂type)∊0 1 ''⍬
  :If 0<≢data←MyUserSettings.registries
-     :If 1≡type
-         r←↑data.(alias uri port priority api_key)
-         r←r[⍒r[;4];]
-     :Else
-         r←↑data.(uri alias port priority)
-         r←r[⍒r[;4];]
-     :EndIf
+     r←(-1≢type)↓⍤1↑data.(alias uri id port priority noCaching proxy api_key)
+     r←r[⍒r[;RI.priority];]
  :EndIf
- :If 0<≢r
- :AndIf appendPort
-     r[;1]←BindProtocolWithPort¨↓r[;1 3]
+ :If appendPort∧0<≢r
+     r[;RI.url]←BindProtocolWithPort¨↓r[;RI.(url port)]
  :EndIf

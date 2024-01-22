@@ -1,0 +1,15 @@
+ r←{loop}Base64_Encode data
+⍝ Base64-encodes "data". Tries to do it in one go but falls back to a loop if that causes a WS FULL
+⍝ `loop` defaults to 0, meaning that we first try to encode the data in one go but fall back to a loop in case of a WS FULL.
+⍝ You may specify a 1 as left argument in order to enforce the loop
+ loop←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'loop'
+ :If 0=loop
+     :Trap 1 ⍝ WS FULL
+         r←1 Base64_ data
+     :Else
+         →∆Loop
+     :EndTrap
+     :Return
+ :EndIf
+⍝ -------------------------------
+∆Loop:

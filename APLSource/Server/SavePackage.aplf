@@ -1,4 +1,4 @@
- response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;rc;list;list_lc;packageID2
+response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;rc;list;list_lc;packageID2
 ⍝ `packageID` is a valid package ID
 ⍝ This function saves the data in the appropriate folder which of course must not exist.
  packageID←request.RequestTarget
@@ -20,7 +20,13 @@
  :EndIf
  tempFolder←F.GetTempSubDir''
  filename←tempFolder,'/',packageID,'.zip'
- (Reg.Base64 request.Content)Reg.WriteNativeFile filename
+ ⍝ Tatin 0.104.0 and earlier did Base64-encode zipped data. There is no need to do this when it
+ ⍝ is properly indicated with on the HTTP header. We tell by the "Content-type".
+ :If 'application/octet-stream'≡'content-type'GetFromHeaders request.Headers
+     request.Content Reg.WriteNativeFile filename
+ :Else
+     (Reg.Base64 request.Content)Reg.WriteNativeFile filename
+ :EndIf
  :Trap 90
      (statusCode msg)←1 Reg.PublishPackage filename G.RegistryPath G
  :Else

@@ -1,4 +1,4 @@
- {filename}←PublishPackageToRemoteRegistry_(filename uri);request;res;packageID;uri_
+{filename}←PublishPackageToRemoteRegistry_(filename uri);request;res;packageID;uri_
 ⍝ This sends the file "manually". See also PublishPackageToRemoteRegistry_2.
  (uri packageID)←Reg.SeparateUriAndPackageID uri
  uri_←ReplaceRegistryAlias uri
@@ -9,8 +9,9 @@
  request←R.NewRequest 0
  request.RequestTarget←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
  request.Method←'PUT'
- request.Content←Reg.Base64 Reg.ReadNativeFile filename
+ request.Content←Reg.ReadNativeFile filename
  request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry uri).api_key)
+ request.Headers,←⊂'Content-Type' 'application/octet-stream'
  res←SendAndReceive uri_ request
  :If res.StatusCode≢200
      :If 400=res.StatusCode

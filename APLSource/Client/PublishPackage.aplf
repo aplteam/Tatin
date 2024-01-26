@@ -1,4 +1,4 @@
- {(statusCode errMsg zipFilename)}←{dependencies}PublishPackage(source registry);uri;path;cfg;errMsg;statusCode;packageID;cfgFilename
+ {(statusCode errMsg zipFilename)}←{dependencies}PublishPackage(source registry);uri;cfgFilename;cfg;packageID
 ⍝ Publishes a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
 ⍝ 2. Creates a dependency file for the package if required
@@ -24,6 +24,7 @@
  'Invalid URI specified: not a zip file'Assert'.zip'≡⎕C ¯4↑zipFilename
  :If Reg.IsHTTP uri
      PublishPackageToRemoteRegistry_ zipFilename registry
+     ⍝PublishPackageToRemoteRegistry_2 zipFilename registry
  :Else
      PrintToSession'  Read config file for ',source,'...'
      cfgFilename←1 F.NormalizePath({F.IsDir ⍵:⍵ ⋄ 1⊃⎕NPARTS ⍵,CFG_Name}source),'/',CFG_Name

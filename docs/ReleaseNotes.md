@@ -11,13 +11,17 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.104.1 from 2024-01-28
+
+* The client requires a server on 0.104.1 as well
+
 ## Version 0.104.0 from 2024-01-22
 
 * The result of both `]ListRegistries` and the corresponding API function return a different (extended) result now.
 
   This implies that older versions of Tatin than 0.104.0 are incompatible with this new version, therefore you are forced to update.
 
-  Aprt from the update no action is required.
+  Apart from the update no action is required.
 
 ## Version 0.103.2 from 2024-01-16
 
@@ -159,6 +163,8 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

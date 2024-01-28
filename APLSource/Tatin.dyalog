@@ -1,6 +1,6 @@
 ﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.77.1 - 2024-01-21
+⍝ * 0.77.2 - 2024-01-26
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -961,8 +961,6 @@
       :OrIf '[?]'≡url
           :If 0=≢url←SelectRegistry 1
               :Return
-          :Else
-              url←'[',url,']'
           :EndIf
       :EndIf
       :If 0≡url
@@ -1015,9 +1013,9 @@
      ∆Again:
       :Trap ErrNo
           :If 0<≢dependencies
-              (rc msg zipFilename)←dependencies TC.PublishPackage source url_
+              (rc msg zipFilename)←dependencies TC.PublishPackage source url
           :Else
-              (rc msg zipFilename)←TC.PublishPackage source url_
+              (rc msg zipFilename)←TC.PublishPackage source url
           :EndIf
           :If 200≡rc
               r←'Package published on ',url_

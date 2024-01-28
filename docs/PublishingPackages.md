@@ -154,7 +154,7 @@ The format of the file `Credentials.csv` is:
 ```
 
 * In the first case, anybody who provides the API key the hash was produced from can publish packages for that group.
-* In the second case, the password the hash was created from is a kind of master password: it allows the creation of packages with _any_ group name.
+* In the second case, the password the hash was created from is a kind of master password: it allows the creation of packages with _any_ group name, except any group that was already handled by then of course.
 * The third case means that no API key is required for any (remaining) group(s).
 
 The different scenarios can be mixed:
@@ -393,6 +393,7 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
 
 
 

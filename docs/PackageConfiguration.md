@@ -1,5 +1,5 @@
 [parm]:leanpubExtensions = 1
-[parm]:title             = 'Tatin's Package Configuration'
+[parm]:title             = 'Tatin: Package Configuration'
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3 4
 [parm]:numberHeaders     = 2 3 4 5 6
@@ -574,6 +574,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

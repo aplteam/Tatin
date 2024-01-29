@@ -1,4 +1,4 @@
-[parm]:title             = 'Usage Data'
+[parm]:title             = 'Tatin: Usage Data'
 [parm]:toc               = 3
 [parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
@@ -52,4 +52,5 @@ Enter `]Tatin.UsageData -??` for details.
 ### API
 
 There are no API functions available for retrieving usage data.
+
 

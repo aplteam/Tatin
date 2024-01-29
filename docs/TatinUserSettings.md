@@ -1,4 +1,4 @@
-[parm]:title             = 'Tatin User Setting'
+[parm]:title             = 'Tatin: User Setting'
 [parm]:toc               = 3
 [parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
@@ -351,4 +351,5 @@ This has only an impact locally in a scenario mentioned above, and that's why th
 [^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site") rather than JSON.
 
 [^init]: Tatin will be initialized either explicitly or as a side effect when the first Tatin user command is issued. See ["Installing and updating the Tatin Client"](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.
+
 

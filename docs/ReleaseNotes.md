@@ -1,4 +1,4 @@
-[parm]:title             = 'Release Notes'
+[parm]:title             = 'Tatin: Release Notes'
 [parm]:toc               = 2 2
 [parm]:leanpubExtensions = 1
 
@@ -163,6 +163,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

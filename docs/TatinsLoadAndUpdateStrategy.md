@@ -1,5 +1,5 @@
 [parm]:leanpubExtensions = 1
-[parm]:title             = 'Tatin Load & Update'
+[parm]:title             = 'Tatin: Load & Update'
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
 [parm]:numberHeaders     = 2 3 4 5 6
@@ -247,6 +247,7 @@ A> When you specify the `-major` flag of the `CheckForLaterVersion` user command
 ## Downgrading
 
 There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here; you need to do this yourself.
+
 
 
 

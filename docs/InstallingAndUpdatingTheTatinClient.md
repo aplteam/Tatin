@@ -1,5 +1,5 @@
 [parm]:leanpubExtensions = 1
-[parm]:title             = Tatin Installing and Updating
+[parm]:title             = 'Tatin: Installing & Updating'
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
 [parm]:numberHeaders     = 2 3 4 5 6
@@ -281,3 +281,4 @@ Create one that looks like this:
 ### There is already such a script
 
 Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+

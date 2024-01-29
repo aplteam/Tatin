@@ -1,5 +1,5 @@
 [parm]:leanpubExtensions = 1
-[parm]:title             = 'SemVers'
+[parm]:title             = 'Tatin: SemVers'
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
 [parm]:numberHeaders     = 2 3 4 5 6
@@ -125,4 +125,5 @@ However, things can get pretty complicated even with Semantic Versioning; see th
 Semantic versioning came into being via this website:
 
 [https://semver.org/](https://semver.org/ {target="_blank"})
+
 

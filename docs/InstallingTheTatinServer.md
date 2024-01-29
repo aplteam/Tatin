@@ -1,4 +1,4 @@
-[parm]:title             = 'Tatin Server Installtion'
+[parm]:title             = 'Tatin: Server Installtion'
 [parm]:leanpubExtensions = 1
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3 4 5 6
@@ -316,6 +316,7 @@ What kind of actions need to be taken, if any, is revealed by the release notes.
 First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+
 
 
 

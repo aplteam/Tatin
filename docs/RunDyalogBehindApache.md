@@ -1,5 +1,5 @@
 [parm]:leanpubExtensions = 1
-[parm]:title             = 'Tatin behind Apache'
+[parm]:title             = 'Tatin & Apache'
 [parm]:numberHeaders     = 2 3 4 5 6
 
 # Run Dyalog behind Apache
@@ -31,3 +31,4 @@ The `ProxyPass` directive is doing the magic.
 The `ProxyPassReverse` directive ensures that the `Location:` headers generated from the backend (your Tatin Server) are modified to point to the reverse proxy instead of itself.
 
 For details see the ["Reverse Proxy Guide"](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html "Link to the Apache documentation") and [Apache Module mod_proxy](https://httpd.apache.org/docs/2.4/mod/mod_proxy.html "Link to the Apache documentation")
+

@@ -1,4 +1,4 @@
-[parm]:title             = 'Tatin: first steps'
+[parm]:title             = 'Tatin: First steps'
 [parm]:leanpubExtensions = 1
 [parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3 4
@@ -612,6 +612,7 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 ##### URI
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
+
 
 
 

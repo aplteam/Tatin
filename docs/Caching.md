@@ -1,4 +1,4 @@
-[parm]:title             = 'Caching in Tatin'
+[parm]:title             = 'Tatin: Caching'
 [parm]:toc               = 3
 [parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
@@ -81,5 +81,6 @@ This is typically used when you have a local Tatin Server running, and you are f
 The user command `]Tatin.Cache` helps manage the cache. It can be used to list the contents of the cache as well as to clear the cache.
 
 Enter `]Tatin.Cache -??` for details.
+
 
 

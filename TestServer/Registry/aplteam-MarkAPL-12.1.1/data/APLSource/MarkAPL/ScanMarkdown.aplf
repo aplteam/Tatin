@@ -1,0 +1,56 @@
+ ns←ScanMarkdown ns;∆LastLineWasEmpty;isHtmlBlock;html
+ ∆LastLineWasEmpty←0
+ ns.topOfDocument←1
+ :Repeat
+     :If 0≠≢'^⍎⍎[#_A-Za-z∆⍙].*⍎⍎$'⎕S 0⍠('Greedy' 0)⊣⊃ns.markdown ⍝  Does the line call an embedded function but nothing else?
+     :AndIf 3=⎕NC{⍵↑⍨¯1+⌊/⍵⍳'⍎ '''}2↓⊃ns.markdown
+         (html isHtmlBlock)←ns ProcessFunctionCalls⊃ns.markdown
+     :AndIf 0≠≢html
+         :If 0=isHtmlBlock
+             :If {~'<'∊⍵:1 ⋄ (⊂'> '~⍨⍵↑⍨⌊/⍵⍳'> ')∊¯1↓¨HtmlBlockTags}html
+                 html←'<p>'∘,¨(,⊆html),¨⊂'</p>'
+             :EndIf
+         :EndIf
+         ns.html,←,⊆html
+         ns←Drop ns
+     :Else
+         :If ProcessEmeddedHTML ns
+             :If ⊃ns.emptyLines
+                  ⍝ ns.noOf←+/∧\ns.emptyLines  ⍝ No! Don't do this: it breaks the logic
+                 ns←Drop ns
+                 ∆LastLineWasEmpty←1
+             :Else
+                 :If 0=ProcessSubTOC ns
+                 :AndIf 0=ProcessFootnoteDefs ns
+                 :AndIf 0=ProcessAbbreviationDefs ns
+                 :AndIf 0=ProcessDataDefs ns
+                 :AndIf 0=ProcessReferenceLinks ns
+                 :AndIf 0=ProcessCodeBlock ns
+                 :AndIf 0=ProcessHeaders ns
+                 :AndIf 0=RemoveLampLines ns
+                 :AndIf 0=ProcessBlockQuotes ns
+                 :AndIf 0=ProcessTable ns
+                 :AndIf 0=ProcessHorizontalRulers ns
+                 :AndIf 0=ProcessLists ns
+                 :AndIf 0=ProcessDefinitionLists ns
+                 :AndIf 0=ProcessCheckBoxes ns
+                 :AndIf 0=ProcessMarkAPLExtensions ns
+                     ∆LastLineWasEmpty ProcessParagraph ns      ⍝ This must be the last one!
+                     ∆LastLineWasEmpty←0
+                 :EndIf
+             :EndIf
+         :Else
+             :If ⊃ns.emptyLines
+                 ns.noOf←1
+                 ns←Drop ns
+                 ∆LastLineWasEmpty←1
+             :EndIf
+         :EndIf
+     :EndIf
+     ns.topOfDocument←0
+ :Until 0=≢ns.leadingChars
+ :If 0≠≢ns.html
+     ns.html←{'&#96;'⎕R'`'⊣⍵}⊣,¨ns.html
+ :EndIf
+ ns.html[⍸ns.html∧.=¨' ']←⊂''
+⍝Done

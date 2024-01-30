@@ -1,4 +1,4 @@
- (statusCode errMsg)←DeletePackage url;url_;packageID;statusCode;errMsg;request;response;en;msg;rc
+ (statusCode errMsg)←DeletePackage_ url;url_;packageID;statusCode;errMsg;request;response;en;msg;rc
 ⍝ Deletes a package.\\
 ⍝ Whether deleting a package is possible depends on the "delete" policy operated by the server in question.\\
 ⍝ On the server side the delete policy is defined by the INI setting [CONFIG]DeletePackages ("None", "JustBetas", "Any").
@@ -6,6 +6,7 @@
  url_←F.EnforceSlash ReplaceRegistryAlias url
  'No valid URL or alias provided'Assert 0<≢url_
  (url_ packageID)←Reg.SeparateUriAndPackageID url_
+ Connect2Client url_
  :If 'file://'{⍺≢(≢⍺)↑⍵}url_
      ('Unknown Registry: "',url,'"')Assert(⊂EnforceTrailingSlash url_)∊⊃¨{0≡⍵:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}/¨MyUserSettings.registries.(uri port)
  :EndIf
@@ -50,4 +51,5 @@
  :If 200=statusCode
      DeletePackageFromCache url_ packageID
  :EndIf
+ CloseConnections 0
 ⍝Done

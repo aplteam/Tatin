@@ -1,0 +1,12 @@
+ InsertTocCaption←{
+⍝ Replace "<<tocCaption>>" in the css against "parms.tocCaption"
+⍝ ⍺ is 1 for print CSS and 2 for screen CSS.
+     (parms css)←⍵
+     lines←⍸∨/¨bool←'<<tocCaption>>'∘⍷¨css
+     0=≢lines:css
+     bool←bool[lines]
+     (tpd tpu)←⎕UCS 9660 9650   ⍝ Triangle Point Down, Triangle Pointing Up
+     (1=⍺)∨1=≢lines:css
+     css[lines[2]]←⊂'content: ''',(parms.tocCaption,' ',tpu,''''),';'
+     css
+ }

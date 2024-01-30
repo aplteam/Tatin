@@ -1,0 +1,22 @@
+ CompileBookMarkName←{
+⍝ Returns the bookmark name
+     ⍺←1
+     bookmarkMayStartWithDigit←⍺
+     (txt specialAttrs)←⍵
+     txt←BringBackSpecialHtmlEntities txt
+     r←GetIdFromSpecialAttributes specialAttrs
+     0≠≢r:{{⍵↑⍨¯1+⍵⍳'"'}⍵↓⍨⍵⍳'"'}r
+     r←txt
+     r←'&[A-Za-z]*;'⎕R''⊢r                 ⍝ Remove HTML entities (&{word}; only)
+     r←'<.+?>'⎕R''⊣r                       ⍝ Remove everything between <>
+     r←RemoveHTML r
+     r←'\[.*\]'⎕R''⊣r                      ⍝ Remove everything between []
+     r←'\(.*\)'⎕R''⊣r                      ⍝ Remove everything between ()
+     allowed←' ∆⍙_-',⎕D,⎕A,⎕C ⎕A
+     r←(r∊allowed)/r                       ⍝ Remove invalid characters
+     r←allowed{⍵↓⍨+/∧\~⍵∊⍺~⎕D}⍣(~bookmarkMayStartWithDigit)⊣r ⍝ Remove all leading digits if ~bookmarkMayStartWithDigit
+     r←A.DLB A.DTB r                           ⍝ Remove leading and trailing blanks
+     r←{0=≢⍵:⍵ ⋄ (⊃⍵)∊'∆⍙_',⎕D,⎕A,⎕C ⎕A:⍵ ⋄ ∇ 1↓⍵}r
+     ((' '=r)/r)←'-'                       ⍝ Replace remaining blanks by hyphens
+     r
+ }

@@ -1,0 +1,21 @@
+ txt←ProcessDoubleAsterisks txt_;noOf;bool;ind;start;end;mask
+⍝ Takes a string and marks up everything between ** and ** as <strong>
+⍝ except when it occurs within a word or within APL code or the ** are surrounded on both sides by white space.
+⍝ Call this **before** calling ProcessAsterisks.
+ txt←'  ',txt_,'  '
+ :If 0<+/bool←'**'⍷txt
+ :AndIf 0<+/bool←bool∧bool\~∧/⍉txt[¯1 2∘.+⍸bool]∊AllWhiteSpaceChars
+ :AndIf 0<+/bool←bool∧bool\txt[¯1+⍸bool]≠'\'
+     mask←GetMaskForCode txt
+     bool∧←~mask
+ :AndIf 0≠≢ind←⍸bool
+ :AndIf 0≠≢ind←(-2|≢ind)↓ind
+     start←((≢ind)⍴1 0)/ind
+     end←((≢ind)⍴0 1)/ind
+     txt[start]←⊂'<strong>'
+     txt[end]←⊂'</strong>'
+     txt[1+start,end]←⊂''
+     txt←⊃,/txt
+ :EndIf
+ txt←2↓¯2↓txt
+⍝Done

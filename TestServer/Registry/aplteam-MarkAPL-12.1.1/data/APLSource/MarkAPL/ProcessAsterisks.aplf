@@ -1,0 +1,27 @@
+ txt←ProcessAsterisks txt_;noOf;bool;ind;start;end;txt2
+⍝ Takes a string and marks up everything between * and * as <em>
+⍝ except when it...
+⍝ * occurs within a word
+⍝ * occurs within APL code
+⍝ * has a white-space char to the right of any opening marker
+⍝ * has a white-space char to the left of any closing marker
+⍝ Call this **after** having called ProcessDoubleAsterisks
+ txt2←txt←'  ',txt_,'  '
+ txt2←'\\\*'⎕R'⌹⌹'⍠('Mode' 'D')⊣txt2
+ ((GetMaskForCode txt2)/txt2)←' '
+ :If 0<+/bool←'*'=txt2
+ :AndIf 1<+/bool
+ :AndIf 0<+/bool∧bool\~∧/⍉txt2[¯1 1∘.+⍸bool]∊AllWhiteSpaceChars
+ :AndIf 0<+/bool∧bool\∧/⍉txt2[¯1 1∘.+⍸bool]≠'*'
+     mask←GetMaskForCode txt
+     bool∧←~mask
+ :AndIf 0≠≢ind←⍸bool
+     ind←{⍵↑⍨(≢⍵)-2|≢⍵}ind
+     start←((≢ind)⍴1 0)/ind
+     end←((≢ind)⍴0 1)/ind
+     txt[start]←⊂'<em>'
+     txt[end]←⊂'</em>'
+     txt←⊃,/txt
+ :EndIf
+ txt←2↓¯2↓txt
+⍝Done

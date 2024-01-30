@@ -1,0 +1,18 @@
+ {r}←ns ReplaceLinkID(linkText id searchFor);ind;url;title;sa;new
+ r←⍬
+ ind←(⊃¨ns.linkRefs)⍳⊂id
+ :If ind≤≢ns.linkRefs
+     (url title sa)←1↓ind⊃ns.linkRefs
+     :If 0=≢title
+         :If 0=≢linkText
+             linkText←((ind,3)⊃ns.linkRefs)←url
+         :Else
+             ((ind,3)⊃ns.linkRefs)←linkText
+         :EndIf
+     :EndIf
+     :If 0=≢linkText
+         linkText←title
+     :EndIf
+     new←'<a href="',url,'" class="external_link"',((0≠≢title)/' title="',title,'"'),sa,'>',linkText,'</a>'
+     ns.html←'<code>.*?</code>'(MakeLiteralForRegex searchFor)⎕R'\0'new⍠('Mode' 'D')('DotAll' 1)⊣ns.html
+ :EndIf

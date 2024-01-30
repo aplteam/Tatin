@@ -1,0 +1,24 @@
+ r←ProcessHtmlBlock_ScriptStylePre ns;start
+⍝ <script>, <style> or <pre>.
+⍝ These are special because the first two can never be nested while the last one
+⍝ preserves white space by definition.
+⍝ ← is 0 when found and processed, otherwise 1.
+ r←0
+ :If '^<script\b[^>]*>'DetectOpeningTag(⊃ns.emptyLines)↓ns.markdown
+     ns←Drop⍣(⊃ns.emptyLines)⊣ns
+     ns.noOf←DetectClosingTag ns.markdownLC'</script>'
+     ns.html,←'</script>'DropTailAfterClosingTag ns.noOf↑ns.markdown
+     ns←Drop ns
+ :ElseIf '^<pre\b[^>]*>'DetectOpeningTag(⊃ns.emptyLines)↓ns.markdown
+     ns←Drop⍣(⊃ns.emptyLines)⊣ns
+     ns.noOf←DetectClosingTag ns.markdownLC'</pre>'
+     ns.html,←Process_PRE ns.noOf↑ns.markdown
+     ns←Drop ns
+ :ElseIf '^<style>'DetectOpeningTag(⊃ns.emptyLines)↓ns.markdown
+     ns←Drop⍣(⊃ns.emptyLines)⊣ns
+     ns.noOf←DetectClosingTag ns.markdownLC'</style>'
+     ns.html,←'</style>'DropTailAfterClosingTag ns.noOf↑ns.markdown
+     ns←Drop ns
+ :Else
+     r←1
+ :EndIf

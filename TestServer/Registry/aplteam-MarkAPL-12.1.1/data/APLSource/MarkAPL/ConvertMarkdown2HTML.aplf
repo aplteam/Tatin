@@ -1,0 +1,17 @@
+ (html report)←ConvertMarkdown2HTML markdown;parms;ns
+⍝ `markdown` may come from an aside (= LeanPub extension like `A> `) or a collapsible (`^> `).
+⍝ This requires to be converted to HTML with MarkAPL but without...
+⍝ * header anchors
+⍝ * numbering headers
+⍝ etc.
+ parms←CreateParms
+ parms.numberHeaders←0
+ parms.bookmarkLink←0
+ parms.createFullHtmlPage←0
+ parms.verbose←0
+ parms.ignoreEmbeddedParms←1
+ parms.div_h_tag←0
+ (html ns)←parms Markdown2HTML markdown
+ html←ConvertH1AndH2HeadersToH3 html
+ report←ns.report
+⍝Done

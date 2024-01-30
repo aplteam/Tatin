@@ -1,0 +1,11 @@
+ ns←CheckInternalLinks ns;html;anchors;links
+⍝ Checks all internal links for being correct (not pointing into nowhere land).
+ :If ns.parms.checkLinks
+ :AndIf 0≠≢ns.html
+     html←⊃,/ns.html
+ :AndIf 0≠≢html←(~GetMaskForCodeTags html)/html
+     anchors←GetBookmarkAnchors html
+     links←GetBookmarkLinks html
+ :AndIf 0≠≢links←(~links∊anchors)/links
+     ns.report,←'Invalid internal link: ['∘,¨links,¨']'
+ :EndIf

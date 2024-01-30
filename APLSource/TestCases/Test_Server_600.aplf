@@ -1,5 +1,5 @@
  r←Test_Server_600(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;res;msg;rc;dir;src;zip;serverPath;body;cfg;zipFilename;stop
-⍝ Exercise ]Tatin.DeletePackage on a just-published package on the server
+⍝ Exercise ]Tatin.DeletePackages on a just-published package on the server
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -26,7 +26,7 @@
  →T.GoToTidyUp 0=F.IsDir serverPath,'/test-Package_A-0.1.0'
 
  stop←0
- (rc msg res)←stop ∆UCMD'DeletePackage [localhost]/test-Package_A-0.1.0'
+ (rc msg res)←stop ∆UCMD'DeletePackages [localhost]/test-Package_A-0.1.0'
  →T.GoToTidyUp(rc≠0)∨(0<≢msg)
  →T.GoToTidyUp 1=F.IsDir serverPath,'/test-Package_A-0.1.0'
 

@@ -1,0 +1,30 @@
+ flag←ProcessSetextHeader ns;noOf;ind;sa;l;c;c2;anchor;bookmarkName;bookmarkName_
+ flag←0
+ noOf←ScanForPara ns                           ⍝ Because only what qualifies as paragraph can be an ATX header
+ :If noOf≠0
+ :AndIf noOf<≢ns.markdown
+ :AndIf 0<≢∊(1+noOf)⌷ns.withoutBlanks          ⍝ Must not be empty of course
+     ind←noOf+⍸∊'-='IotaSetextHeader¨⊂(1+noOf)⌷¨ns.(withoutBlanks markdown emptyLines)
+ :AndIf 0≠≢ind                             ⍝ It's not a Setext header
+     ind←⊃ind
+     sa←GetSpecialAttributes(ind-1)⊃ns.markdown
+     l←1+'-'=⊃ind⊃ns.leadingChars
+     c←CompilePara noOf↑ns.markdown
+     c←sa DropSpecialAttributes c
+     ns.noOf←1+noOf
+     c2←⊃ns ProcessInlineMarkUp c
+     c←ns CheckOddNumberOfDoubleQuotes c'header'
+     bookmarkName←ns GetBookMarkNameFromCaption c2((l≤ns.parms.bookmarkLink)/sa)
+     bookmarkName_←LowercaseID bookmarkName
+     anchor←AddBookmarkLink l ns bookmarkName_
+     ns.html,←ns.parms.div_h_tag/⊂'<div class="h_tag">'
+     ns.html,←{⊂⍣(0≠≢⍵)⊣⍵}anchor
+     ns.html,←⊂A.DMB'<h',(⍕l),({0=≢⍵:⍵ ⋄ ' data-id="',⍵,'"'}bookmarkName),({0=≢⍵:⍵ ⋄ ' ',⍵}RemoveIdFromSpecialAttributes⍣(0≠≢anchor)⊣sa),'>',c2,'</h',(⍕l),'>'
+     ns.html,←(0<≢anchor)/⊂'</a>'
+     ns.html,←ns.parms.div_h_tag/⊂'</div>'
+     ns.headers⍪←l bookmarkName_ c2''
+     ns.headerLineNos,←⊃ns.lineNumbers
+     ns←Drop ns
+     flag←1
+ :EndIf
+⍝Done

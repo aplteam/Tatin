@@ -1,0 +1,16 @@
+ r←ProcessEmeddedHTML ns;tags;b;flag
+⍝ Figures out whether the current line begins an HTML block.\\
+⍝ For details regarding HTML block see <http://spec.commonmark.org/0.24/#html-blocks>.\\
+⍝ There's more to it than meets the eye at first glance.
+ r←1
+ :If CheckForHtmlBlock ns.(markdown emptyLines topOfDocument)
+     :If r←ProcessHtmlBlock_ScriptStylePre ns
+     :AndIf r←ProcessHtmlBlock_HtmlComments ns
+     :AndIf r←ProcessHtmlBlockType_CDATA ns
+     :AndIf r←ProcessHtmlBlockType_Tags ns
+         {⍵:.}ns.noOf=0                         ⍝ That must not happen at this stage!
+     :AndIf ⊃ns.emptyLines
+         ns.noOf←1
+         ns←Drop ns
+     :EndIf
+ :EndIf

@@ -1,0 +1,12 @@
+ ns←PolishWarnings ns;this;name;noOf;i
+ noOf←≢ns.report
+ :For i :In ⍳noOf
+     this←i⊃ns.report
+     :If 'Invalid internal link:'{⍺≡(≢⍺)↑⍵}this
+         name←{⍵↑⍨¯1+⍵⍳']'}{⍵↓⍨⍵⍳'['}this
+     :AndIf (⊂name)∊ns.headers[;2]
+          ⍝ It is an internal bookmark link, which was wrongly reported as invalid, so we remove it from the report
+         ns.report[i]←⊂''
+     :EndIf
+ :EndFor
+ ns.report←(0<≢¨ns.report)/ns.report

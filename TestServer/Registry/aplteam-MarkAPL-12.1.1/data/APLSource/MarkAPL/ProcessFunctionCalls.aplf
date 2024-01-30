@@ -1,0 +1,36 @@
+ (html isHtmlBlock)←ns ProcessFunctionCalls html;mask;ind;noOf;call;result;flag;isEmpty
+ mask←~GetMaskForCodeTags html
+ isHtmlBlock←0
+ :If 0≠≢ind←'[^⍎]⍎⍎[^⍎]'⎕S 0⊣' ',(mask/html),' '  ⍝ Two blanks for the ≠ to fit start and end. The first one also fixes ⎕io
+ :AndIf 0≠≢ind←(2×⌊0.5×≢ind)↑ind
+     :Repeat
+         html←(⊃ind)⌽html
+         noOf←-/ind[2 1]
+         call←A.DLB A.DTB 1↓(noOf-1)↑1↓html
+         html←(2+noOf)↓html
+         result←ns ExecExternalFns call
+         :If 0≠≢result
+             isEmpty←0=≢¨result~¨' '
+             result←(0⌈¯1++/∧\isEmpty)↓(-0⌈¯1++/∧\⌽isEmpty)↓result ⍝ Allow max 1 leading/trailing blank line
+             flag←⊃ns.parms.syntaxSugar
+             isHtmlBlock←CheckForHtmlBlock (⊆result)(0=≢¨' '~¨⍨⊆result)ns.topOfDocument
+             :If 1=≡result
+                 :If flag∧~isHtmlBlock
+                     result←⊃ns ProcessInlineMarkUp result
+                 :EndIf
+             :Else
+                 'Embeded function returned invalid result'⎕SIGNAL 11/⍨(,1)≢∪≡¨,¨result
+                 :If flag∧~isHtmlBlock
+                     result←,⊆result
+                     result←,⊃¨ns ProcessInlineMarkUp¨A.DMB result
+                 :EndIf
+             :EndIf
+             'Called function returned an HTML block but does not stand on its own'⎕SIGNAL 11/⍨isHtmlBlock∧0≠≢html
+             :If 0=≢html
+                 html←(-ind[1])⌽result,html
+             :Else
+                 html←(-ind[1])⌽(⊃⍣(1<≡html)⊣result),html
+             :EndIf
+         :EndIf
+     :Until 0=≢ind←2↓ind
+ :EndIf

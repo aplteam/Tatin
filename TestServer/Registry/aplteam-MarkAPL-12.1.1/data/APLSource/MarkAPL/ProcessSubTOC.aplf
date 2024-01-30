@@ -1,0 +1,22 @@
+ r←ProcessSubTOC ns;header;level;nextHeader;specialAttrs;subToc;depth
+ r←0
+ :If 0<≢subToc←GetRegExPatternForSubToc ⎕S{⍵.Match}⍠('Greedy' 0)('IC' 1)⊣⊃ns.markdown
+     :If (,0)≢,ns.parms.toc
+     :AndIf ns.parms.subTocs
+         subToc←⊃subToc
+         :If 0<≢ns.html
+         :AndIf 0<≢nextHeader←{⍵⊃⍨1⍳⍨'<h'∘≡¨(≢'<h')↑¨⍵}⌽ns.html
+             header←{⍵↑⍨¯1+⍵⍳'<'}{⍵↓⍨⍵⍳'>'}nextHeader
+             level←{⊃(//)⎕VFI ⍵↑⍨¯1+⌊/⍵⍳' >'}2↓nextHeader
+             specialAttrs←GetSpecialAttributes(∧/'{}'∊subToc)/{⍵↑⍨⍵⍳'}'}{⍵↓⍨¯1+⍵⍳'{'}subToc
+             depth←0
+             :If '-'∊subToc
+                 depth←⊃(//)⎕VFI{⊃⍵↓⍨⍵⍳'-'}subToc
+             :EndIf
+             ns.subToc,←⊂level header depth specialAttrs
+             ns.html,←⎕C 1↑ns.markdown
+         :EndIf
+     :EndIf
+     ns←Drop ns
+     r←1
+ :EndIf

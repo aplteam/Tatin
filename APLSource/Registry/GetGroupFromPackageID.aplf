@@ -1,1 +1,21 @@
- GetGroupFromPackageID←{⎕C ⍵↑⍨¯1+⍵⍳'-'}
+ group←GetGroupFromPackageID packageID;buff;ind
+⍝ Returns the group name of packageID
+⍝ 'aplteam' ← GetGroupFromPackageID 'aplteam-name-1.2.3'
+⍝ 'aplteam' ← GetGroupFromPackageID 'aplteam-name-1.2.3-beta-1'
+ buff←'-'(≠⊆⊢)packageID
+ :If 1=≢buff              ⍝ just a name without group and version?!
+     group←''             ⍝ There is no group name
+ :ElseIf IsValidPackageID_Complete packageID
+     group←1⊃buff
+ :Else
+     'Invalid package ID'Assert 2≤≢buff ⍝ Must at least be "<name>-<version>" or "<group>-<name>-<version>"
+     ⍝ index of first item that is a version number (without build no. and "beta" stuff etc):
+     ind←1⍳⍨{∧/(⎕D∊⍨⍵~'.')∧('.'∧.=⍵~⎕D)}¨buff
+     'Invalid package ID'Assert ind∊2 3
+     :If 2=ind
+         group←''         ⍝ There is no group name
+     :Else
+         group←1⊃buff
+     :EndIf
+ :EndIf
+ ⍝Done

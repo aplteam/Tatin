@@ -1,0 +1,38 @@
+ ns←InjectSubTOCs ns;where;i;header;level;ind;from;noOf;levels;toc;drop;md;ns2;parms;specialAttrs;depth;subToc
+ :If (,0)≢,ns.parms.toc
+ :AndIf 0≠≢ns.subToc
+     where←⍸{≢GetRegExPatternForSubToc ⎕S 0⍠('Greedy' 0)('IC' 1)⊣⍵}¨ns.html
+     :For i :In ⍳≢ns.subToc
+         (level header depth specialAttrs)←i⊃ns.subToc
+         ind←i⊃where
+         from←1⍳⍨(ns.headers[;1]=level)∧(ns.headers[;3]≡¨⊂header)
+         noOf←+/∧\level<from↓ns.headers[;1]
+         levels←noOf↑from↓ns.headers[;1]
+         toc←↑3↑¨noOf↑from↓ns.toc
+         :If depth>0
+             toc←((depth+¯1+⊃toc[;1])≥toc[;1])⌿toc
+         :EndIf
+         :If (≢toc)∊0 1
+             ns.html[i⊃where]←⊂''
+             ns.report,←⊂'No SubTOC injected for "',header,'": ',((1+1=≢toc)⊃'no item' 'just one sub-header'),' found'
+             :Leave
+         :Else
+             drop←⌊/toc[;1]
+             md←{(' '⍴⍨(1⊃⍵)-drop),'* [',(2⊃⍵),'](#',(3⊃⍵),')'}¨↓toc
+             parms←CreateParms
+             parms.markdownStrict←ns.parms.markdownStrict
+             parms.verbose←0
+             parms.checkLinks←0
+             parms.checkFootnotes←0
+             parms.syntaxSugar←0
+             ns2←Init parms md
+             {}ProcessLists ns2
+             :If (,0)≢,ns.parms.numberHeaders
+                 ns2.html←'href="#\d{0,}-'⎕R'href="#'⍠('Greedy' 0)⊣ns2.html
+             :EndIf
+             subToc←('<nav',specialAttrs,' class="sub-toc">')('<p>Topics:</p>'),ns2.html,⊂'</nav>'
+             ns.html[i⊃where]←⊂subToc
+         :EndIf
+     :EndFor
+     ns.html←⊃,/{1=≡⍵:⊂⍵ ⋄ ⍵}¨ns.html
+ :EndIf

@@ -1,0 +1,12 @@
+ (statusCodes errMsgs)←DeletePackages urls;url;statusCode;errMsg
+⍝ Deletes a package.\\
+⍝ Whether deleting a package is possible depends on the "delete" policy operated by the server in question.\\
+⍝ On the server side the delete policy is defined by the INI setting [CONFIG]DeletePackages ("None", "JustBetas", "Any").
+ urls←⊆urls
+ statusCodes←⍬ ⋄ errMsgs←''
+ :For url :In urls
+     (statusCode errMsg)←DeletePackage_ url
+     statusCodes,←statusCode
+     errMsgs,←errMsg
+ :EndFor
+⍝Done

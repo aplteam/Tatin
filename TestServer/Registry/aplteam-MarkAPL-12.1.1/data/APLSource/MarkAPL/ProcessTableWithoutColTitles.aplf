@@ -1,0 +1,31 @@
+ r←ProcessTableWithoutColTitles ns;specialAttrs;cells;footer;rows;align;hasFooter;html
+ r←1
+ specialAttrs←GetSpecialAttributes⊃ns.markdown
+ html←⊂{0=≢⍵:'<table>' ⋄ '<table',⍵,'>'}specialAttrs
+ cells←SplitTableRowButMaskCode¨{(⊂specialAttrs DropSpecialAttributes⊃⍵),1↓⍵}ns.noOf↑ns.markdown
+ cells←{A.DLB∘A.DTB ⍵}¨¨cells
+ cells←ns{⍺ CheckOddNumberOfDoubleQuotes ⍵'header'}¨¨cells
+ hasFooter←'='∧.={2≥≢⍵:0 ⋄ ∊(¯1+≢⍵)⊃⍵}cells
+ align←('left' 'right')[1+{∧/⊃⎕VFI∊' ',¨⍵}¨↓⍉↑hasFooter{1=⍺:1↓¯2⌽⍵ ⋄ ⍵}cells]
+ :If {(∧/⍵∊' -:')∧('-'∊⍵)}↑,/1⊃cells
+     cells←1↓cells
+ :EndIf
+ cells←⊃¨¨ns ProcessInlineMarkUp¨¨cells
+ (footer cells)←ns.parms.markdownStrict GetFooter cells
+ :If 0=≢cells
+     r←0
+ :Else
+     :If 0≠≢footer
+         html,←⊂'<tfoot>'
+         html,←⊃,/{(⊂'<tr>'),⍵,⊂'</tr>'}¨{('td'∘{⍺,⍵}¨2 AddAlignStyle¨align)Tag¨⍵}¨(≢align)↑¨footer
+         html,←⊂'</tfoot>'
+     :EndIf
+     html,←⊂'<tbody>'
+     rows←{('td'∘{⍺,⍵}¨AddAlignStyle¨align)Tag¨⍵}¨(⊃⌈/≢¨cells)↑¨cells
+     html,←⊃,/{(⊂'<tr>'),⍵,⊂'</tr>'}¨rows
+     html,←⊂'</tbody>'
+     html,←⊂'</table>'
+     ns.html,←html
+     ns←Drop ns
+ :EndIf
+⍝Done

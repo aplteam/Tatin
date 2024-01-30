@@ -1,0 +1,28 @@
+ GetSpecialAttributes←{
+ ⍝ Checks whether ⍵ (a single line of Markdown) carries a "special attributes" definition.
+ ⍝ If so it returns a vector of definitions.
+ ⍝ Example:
+ ⍝ 'id="foo" class="cl1 cl2" attr1="A B C" attr2=123' ←→ ∇ '{#foo .cl1 .cl2 attr1="A B C" attr2=123}'
+ ⍝  'style="color=red;font-family='APL385 Unicode'"' ←→ ∇ 'style="color:red;font-family:'APL385 Unicode'"
+     md←A.DTB ⍵
+     ('!['≡2⍴md)∧0=(+/'<<br>>'⍷md)++/'<br>'⍷md:''  ⍝ Might be a stand-alone image!
+     '}'≠¯1↑md:''
+     '\'=1↑¯2↑md:'' ⍝ Escaped?
+     ~'{'∊md:''
+     0=≢def←A.DMB{¯1↓1↓⌽⍵↑⍨⍵⍳'{'}⌽md:''
+     mask←~Between'"'=def
+     defs←1↓¨(1,mask\' '=mask/def)⊂' ',def
+     0∊'='∊¨{⍵/⍨~(⊃¨⍵)∊'.#'}defs:''
+     0∨.≠2|'"'+.=¨defs:''
+     sp←⎕NS''          ⍝ Result space
+     sp.r←''           ⍝ Collects the result(s)
+     b←'.'=⊃¨defs      ⍝ All class definitions (if any)
+     sp{0=≢⍵:⍺ ⋄ ⍺ CompileClassNames ⍵}←b/defs
+     b←'#'=⊃¨defs      ⍝ An id definitions (if any)
+     1<+/b:'Invalid special attribute: more than one "id"'⎕SIGNAL 11
+     sp{0=≢⍵:⍺ ⋄ ⍺ CompileID_Names ⍵}←(b⍳1)⊃defs,⊂''
+     b←~(⊃¨defs)∊'#.'  ⍝ Any attribute defs
+     sp{0=≢⍵:⍺ ⋄ ⍺ CompileAttributes ⍵}←b/defs
+     sp.r/⍨←~''''''⍷sp.r  ⍝ APLers might specify double-quotes, so we remove them.
+     {⍵/⍨~'  '⍷⍵}sp.r
+ }

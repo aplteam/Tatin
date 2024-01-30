@@ -1,0 +1,13 @@
+ r←ProcessTable ns;b;max
+ r←0
+ :If IsTableRow⊃ns.markdown
+     max←+/∧\∨/'|'=↑ns.withoutBlanks
+     ns.noOf←+/∧\IsTableRow¨max↑ns.markdown
+     :If 1<ns.noOf
+     :AndIf ∨/{∧/'-'='|: '~⍨⍵}¨{⍵↑⍨¯1+⍵⍳'{'}¨2↑ns.markdown
+         r←ProcessTable_ ns
+     :Else
+         r←ProcessTableWithoutColTitles ns
+     :EndIf
+ :EndIf
+⍝Done

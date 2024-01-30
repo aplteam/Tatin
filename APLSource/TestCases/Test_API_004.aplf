@@ -1,5 +1,5 @@
  r←Test_API_004(stopFlag batchFlag);⎕TRAP;dir;src;zip;registryPath;body;cfg;packageID;rc;msg;zipFilename;list2;list1
-⍝ Exercise ⎕SE.Tatin.DeletePackage on local Registry
+⍝ Exercise ⎕SE.Tatin.DeletePackages on local Registry
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -28,7 +28,7 @@
  →T.GoToTidyUp 0≠≢msg
 
  list1←({ns←⍵ ⋄ ns.aggregate←0 ⋄ ns}⎕NS'')TC.ListPackages'[local]'
- (rc msg)←⎕SE.Tatin.DeletePackage'[local]',packageID
+ (rc msg)←⎕SE.Tatin.DeletePackages'[local]',packageID
  Assert 200=rc
  list2←({ns←⍵ ⋄ ns.aggregate←0 ⋄ ns}⎕NS'')TC.ListPackages'[local]'
  →T.GoToTidyUp'test-Package_A-0.1.0'≢∊list1[;1]~list2[;1]

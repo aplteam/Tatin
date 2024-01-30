@@ -1,0 +1,11 @@
+ GetInfoString←{
+     ⍺←3
+     indendation←⍺
+     md←⍵
+     fence←⊃md~' '
+     0=≢md←(+/∧\md=fence)↓md:''
+     0=≢md←(¯1+md⍳'{')↑md:''               ⍝ Remove special attributes (if any)
+     pattern←'^\s{0,',(⍕indendation),'}',fence,'{3,}'
+     0=≢infoString←A.DLB A.DTB pattern ⎕R''⊣md:''
+     (~fence∊infoString)/infoString        ⍝ Any info string must not contain a fencing character
+ }

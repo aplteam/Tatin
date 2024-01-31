@@ -821,8 +821,9 @@
       TC.EstablishEmptyPermanentConnections 1
       :If 0=≢group
           TC.Connect2Client url
-          list←TC.ListPackages url
-          list2←↑{'-'(≠⊆⊢)⍵}¨list[;1]
+          list←{⍵[;1]}TC.ListPackages url
+          list,←∪{⍵/⍨2>+\⍵='-'}¨,TC.ListDeprecated url
+          list2←↑{'-'(≠⊆⊢)⍵}¨list
           flag←1
           groups←∪list2[;1]
           :If 1=≢groups
@@ -2289,12 +2290,13 @@
               r,←⊂'   The folder must contain a file apl-package.json, otherwise an error is thrown'
               r,←⊂''
               r,←⊂'Notes:'
-              r,←⊂' * If no group name is specified and the package name is used in more than one group the user'
-              r,←⊂'   will be asked from which group the package shall be deleted.'
-              r,←⊂' * If an incomplete version number is specified, the user will be presented with a list of'
-              r,←⊂'   package IDs'
+              r,←⊂' * DeletePackages acts on ALL packages, including deprecated ones'
+              r,←⊂' * If no group name is specified and the package name is used in more than one group the'
+              r,←⊂'   user will be asked from which group the package shall be deleted'
+              r,←⊂' * If no or an incomplete version number is specified, the user will be presented with a'
+              r,←⊂'   list of package IDs'
               r,←⊂''
-              r,←⊂'Whether a package can be deleted depends on the delete policy operated by a given Registry.'
+              r,←⊂'Whether packages can be deleted depends on the delete policy operated by a given Registry.'
           :Case ⎕C'GetDeletePolicy'
               r,←⊂'Requests which "Delete" policy is operated by a Registry.'
               r,←⊂'Return one of "None", "Any", "JustBetas":'

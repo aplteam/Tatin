@@ -1,12 +1,25 @@
- (statusCodes errMsgs)←DeletePackages urls;url;statusCode;errMsg
+ (statusCodes errMsgs)←DeletePackages urls;url;statusCode;errMsg;list
 ⍝ Deletes a package.\\
 ⍝ Whether deleting a package is possible depends on the "delete" policy operated by the server in question.\\
 ⍝ On the server side the delete policy is defined by the INI setting [CONFIG]DeletePackages ("None", "JustBetas", "Any").
  urls←⊆urls
  statusCodes←⍬ ⋄ errMsgs←''
+ :If 1=≢urls
+ :AndIf '-*'≡¯2↑⊃urls
+     list←ListVersions ¯2↓⊃urls
+     'No package(s) found'Assert 0<≢list
+     :If '['=1⍴⊃urls
+         urls←{⍵↑⍨⍵⍳']'}⊃urls
+     :Else
+         urls←{⍵/⍨3>+\⍵='/'}⊃urls
+     :EndIf
+     urls←urls∘,¨,list
+ :EndIf
+ EstablishEmptyPermanentConnections 0
  :For url :In urls
      (statusCode errMsg)←DeletePackage_ url
      statusCodes,←statusCode
      errMsgs,←errMsg
  :EndFor
+ CloseConnections 0
 ⍝Done

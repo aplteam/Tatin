@@ -56,7 +56,7 @@ window.matchMedia("print").addEventListener("change", evt => {
 <li class="toc-entry toc-h3"><a href="#clearcache">2.3. ClearCache</a></li>
 <li class="toc-entry toc-h3"><a href="#createbuildparms">2.4. CreateBuildParms</a></li>
 <li class="toc-entry toc-h3"><a href="#createreinstallparms">2.5. CreateReInstallParms</a></li>
-<li class="toc-entry toc-h3"><a href="#deletepackage">2.6. DeletePackage</a></li>
+<li class="toc-entry toc-h3"><a href="#deletepackages">2.6. DeletePackages</a></li>
 <li class="toc-entry toc-h3"><a href="#deprecatepackage">2.7. DeprecatePackage</a></li>
 <li class="toc-entry toc-h3"><a href="#finddependencies">2.8. FindDependencies</a></li>
 <li class="toc-entry toc-h3"><a href="#getdeletepolicy">2.9. GetDeletePolicy</a></li>
@@ -300,13 +300,20 @@ tatinVars</code></pre>
 <pre tabindex="0"><code>r←CreateReInstallParms</code></pre>
 <p>Creates a namespace with default parameters; it can be passed as (optional) left argument to the <a href="#reinstalldependencies" class="bookmark_link"><code>ReInstallDependencies</code></a> function, in particular, <code>noBetas</code>, <code>update</code> and <code>dry</code>.</p>
 <div class="h_tag">
-<a href="#deletepackage" id="deletepackage" class="autoheader_anchor">
-<h3 data-id="DeletePackage">2.6. DeletePackage</h3>
+<a href="#deletepackages" id="deletepackages" class="autoheader_anchor">
+<h3 data-id="DeletePackages">2.6. DeletePackages</h3>
 </a>
 </div>
-<pre tabindex="0"><code>(statusCode errMsg)←DeletePackage url</code></pre>
+<pre tabindex="0"><code>(statusCode errMsg)←DeletePackages url</code></pre>
 <p>Deletes a package.</p>
-<p>Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting <code>[CONFIG]DeletePackages</code>. See <a href="#getdeletepolicy" class="bookmark_link"><code>GetDeletePolicy</code></a>.</p>
+<p>Whether deleting packages from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting <code>[CONFIG]DeletePackages</code>. See <a href="#getdeletepolicy" class="bookmark_link"><code>GetDeletePolicy</code></a>.</p>
+<p>There are three options:</p>
+<ul>
+<li><code>&lt;Registry&gt;&lt;group-name&gt;-&lt;package-name&gt;-&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code></li>
+<li><code>&lt;Registry&gt;&lt;group-name&gt;-&lt;package-name&gt;-&lt;major&gt;.*</code></li>
+<li><code>&lt;Registry&gt;&lt;group-name&gt;-&lt;package-name&gt;-*</code></li>
+</ul>
+<p>While the first syntax defines precisely one (or none) package, the other two might well delete more than just one package.</p>
 <div class="h_tag">
 <a href="#deprecatepackage" id="deprecatepackage" class="autoheader_anchor">
 <h3 data-id="DeprecatePackage">2.7. DeprecatePackage</h3>

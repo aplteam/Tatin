@@ -193,15 +193,23 @@ r←CreateReInstallParms
 
 Creates a namespace with default parameters; it can be passed as (optional) left argument to the [`ReInstallDependencies`](#ReInstallDependencies) function, in particular, `noBetas`, `update` and `dry`.
 
-### DeletePackage
+### DeletePackages
 
 ```
-(statusCode errMsg)←DeletePackage url
+(statusCode errMsg)←DeletePackages url
 ```
 
 Deletes a package.
 
-Whether deleting a package from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
+Whether deleting packages from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
+
+There are three options:
+
+* `<Registry><group-name>-<package-name>-<major>.<minor>.<patch>`
+* `<Registry><group-name>-<package-name>-<major>.*`
+* `<Registry><group-name>-<package-name>-*`
+
+While the first syntax defines precisely one (or none) package, the other two might well delete more than just one package.
 
 ### DeprecatePackage
 
@@ -891,6 +899,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

@@ -1,4 +1,4 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
 ⍝ * 0.78.0 - 2024-01-31
 
@@ -456,7 +456,7 @@
           :If 1 TC.YesOrNo msg
               version←TC.UpdateClient tag folder
               :If 0<≢version
-                  ⎕CMD'"',folder,'/Assets/docs/ReleaseNotes.html"'
+                  {}⎕SE.UCMD'Open ','"',folder,'/Assets/docs/ReleaseNotes.html"'
                   r←'Tatin updated on disk to ',version
                   r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
               :EndIf

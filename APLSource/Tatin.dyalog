@@ -1,6 +1,6 @@
 :Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.78.0 - 2024-01-31
+⍝ * 0.78.1 - 2024-02-24
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -2705,6 +2705,7 @@
           :Trap ErrNo
               v←⊃TC.UpdateClient 1
               ⎕←'Tatin client updated to ',v,'; please execute the last Tatin user command again'
+              ⎕←'Workspace has not been updated. Start a new instance of Dyalog.'
           :Else
               dmx←⎕DMX
               :If ∨/'Check ⎕EXCEPTION for details'⍷dmx.Message

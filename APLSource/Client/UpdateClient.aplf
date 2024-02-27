@@ -1,53 +1,31 @@
- version←UpdateClient(tag targetFolder);request;client;data;redirect;data2;folder;tempFile;tno;run;targetStUp
+ version←UpdateClient(tag targetFolder);data;folder;tempFile;tno;run;targetStUp;atLeast19
 ⍝ Updates the client to the version indicated by `tag`, and returns the version number of the new version.\\
  'Updating Tatin requires at least 20 MB free memory'Assert 20<⌊⎕WA÷1024×1024
  version←''
- request←R.NewRequest 0
- request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Tatin-Client-',(1↓tag),'.zip'
- client←R.NewClient 0
- client.Host←'github.com'
- request.Headers,←⊂'User-Agent' 'aplteam'
- data←client R.SendAndReceive request
- ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert 302≡data.StatusCode
- redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
- redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
- client←R.NewClient 0
- (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
- data2←client R.SendAndReceive request
- ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data2.StatusCode),' rather than the expected 200')Assert 200≡data2.StatusCode
+ data←GetContentFromGitHub'/aplteam/Tatin/releases/download/',tag,'/Tatin-Client-',(1↓tag),'.zip'
  folder←F.GetTempSubDir'Tatin-Upgrade'
  tempFile←folder,'/',tag,'.zip'
  tno←tempFile ⎕NCREATE 0
- data2.Content ⎕NAPPEND tno 80
+ data.Content ⎕NAPPEND tno 80
  ⎕NUNTIE tno
- data2.Content←''
  tempFile ZipArchive.UnzipTo folder
-
-⍝ Catch the "Run" function
- request←R.NewRequest 0
- request.RequestTarget←'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
- client←R.NewClient 0
- client.Host←'github.com'
- request.Headers,←⊂'User-Agent' 'aplteam'
- data←client R.SendAndReceive request
- ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert 302≡data.StatusCode
- redirect←2⊃'location'{⍵⊃⍨(⊃¨⍵)⍳⊂⍺}data.Headers
- redirect←'https://'{l←≢⍺ ⋄ ⍵↓⍨l×⍺≡l↑⍵}redirect
- client←R.NewClient 0
- (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
- data2←client R.SendAndReceive request
- ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data2.StatusCode),' rather than the expected 200')Assert 200≡data2.StatusCode
- run←'UTF-8'⎕UCS ⎕UCS data2.Content
- (⊂run)⎕NPUT folder,'/Run.aplf'
  ⎕NDELETE tempFile
+
+⍝ Catch the "Run" function for 19.0 or later
+ :If atLeast19←19≤⊃(//)⎕VFI{⍵/⍨2>+\⍵='.'}2⊃# ⎕WG'APLVersion'
+     data←GetContentFromGitHub'/aplteam/Tatin/releases/download/',tag,'/Run.aplf'
+     run←'UTF-8'⎕UCS ⎕UCS data.Content
+     (⊂run)⎕NPUT folder,'/Run.aplf'
+ :EndIf
 
 ⍝ Move the new version from temp to the target folder
  3 ⎕MKDIR targetFolder
  (targetFolder,'/..')⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Tatin'
- :If ⎕NEXISTS folder,'/Run.aplf'
+ :If atLeast19
      targetStUp←targetFolder,'/../../../StartupSession/CiderTatin/'
      3 ⎕MKDIR targetStUp
      targetStUp ⎕NCOPY⍠('IfExists' 'Replace')⊣folder,'/Run.aplf'
  :EndIf
+
  version←{⍵↓⍨'v'=1⍴⍵}tag
 ⍝Done

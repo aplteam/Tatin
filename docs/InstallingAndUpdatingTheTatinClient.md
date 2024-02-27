@@ -34,54 +34,17 @@ In order to activate Tatin, execute
 
 and follow the instructions.
 
+## How to install in 18.0 and 18.2
 
-## Updating Tatin
+Instructions:
 
-You've installed Tatin before and want to update it to the latest version.
+1. Download the latest release of the Tatin client from <https://github.com/aplteam/Tatin/releases>
 
-In that case you might need to perform some action, depending on how old your version of Tatin is.
-
-### Tatin versions before 0.102.1
-
-!> ### Tatin version 0.100.1 and earlier
-=> 0.100.1 and earlier versions were installed into the `MyUCMDs/` folder.
-=> That has changed: it's now installed into a different folder. Please delete it from `MyUCMDs/`.
-!> ### Any Tatin version 0.101.0 and 0.100.1
-=> These versions told you to install Tatin into
-=> ```
-=> C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 18.2 Unicode Files\StartupSession\CiderTatin\Tatin
-= >```
-=> or an equivalent on Linux or Mac OS.
-=> This was the wrong folder: please delete it.
-!> ### Tatin version 0.102.0
-=> These versions told you to install Tatin into
-=> ```
-=> C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 18.2 Unicode Files\StartupSession\CiderTatin\Tatin
-=> ```
-=> or an equivalent on Linux or Mac OS.
-=> This was the wrong folder: please delete `CiderTatin\`.
-
-### Tatin version 0.102.1 and later
-
-Once you have Tatin 0.102.1 (or later) installed in the right place you can use `]Tatin.UpdateTatin` for updating Tatin to a later version.
-
-Just execute:
-
-```
-]Tatin.UpdateTatin
-````
-
-All necessary steps will be executed; eventually the new version number will be reported.
-
-Notes:
-
-* The command will put the release notes on display
-
-* Although Tatin is updated on disk, the workspace from which the command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+2. Unzip it into the installaton folder
 
 
 !> ### What is the correct installation folder?
-=> From version 0.102.1 onwards, Tatin must be installed into one of these folders:
+=> Tatin must be installed into one of these folders dependening on your OS:
 => ```
 => ⍝ Windows
 => C:\Users\<⎕AN>\Documents\Dyalog APL[-64] <version> Unicode Files\SessionExtensions\CiderTatin
@@ -93,47 +56,42 @@ Notes:
 => Users/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
 => ```
 
-## How to install in 18.0 and 18.2
+As a result you should see something like this:
 
-Instructions:
+```
+⍝ Windows
+...\Dyalog APL[-64] <version> Unicode Files\SessionExtensions\CiderTatin\Tatin
 
-1. Download the latest release of the Tatin client from <https://github.com/aplteam/Tatin/releases>
+⍝ Linux & Mac OS
+.../.dyalog/dyalog.<version><bit>.files/SessionExtensions/CiderTatin/Tatin
 
-2. Unzip it into the target folder
-
-   As a result you should see something like this:
-
-   `...\Dyalog APL[-64] <version> Unicode Files\SessionExtensions\CiderTatin\Tatin`
+```
 
 
 ### Tell Dyalog where to look for user commands
 
-Though Tatin's user command script is now in place, Dyalog does not know about it yet. To achieve that we have to add the folder to SALT's search path. This step needs to be carried out only once for any installed version 18.0 or 18.2
+Though Tatin's user command script etc. is now in place, Dyalog does not know about it yet. To achieve that we have to add the folder to SALT's search path. This step needs to be carried out only once for any installed version 18.0 or 18.2
 
 Execute one of the following commands:
 
 !> ### Windows 
 => ```
-=>  ⍝ 18.0 64-bit:
+=>  ⍝ 18.0
 => ]SALT.Settings cmddir ",C:\Users\<⎕AN>\Documents\Dyalog APL-64 18.0 Unicode Files\SessionExtensions\CiderTatin" -p
-=>  ⍝ 18.0 32-bit:
-=> ]SALT.Settings cmddir ",C:\Users\<⎕AN>\Documents\Dyalog APL 18.0 Unicode Files\SessionExtensions\CiderTatin"    -p
-=>  ⍝ 18.2 64-bit
+=>  ⍝ 18.2
 => ]SALT.Settings cmddir ",C:\Users\<⎕AN>\Documents\Dyalog APL-64 18.2 Unicode Files\SessionExtensions\CiderTatin" -p
-=>  ⍝ 18.2 32-bit  
-=> ]SALT.Settings cmddir ",C:\Users\<⎕AN>\Documents\Dyalog APL 18.2 Unicode Files\SessionExtensions\CiderTatin"    -p
   
 !> ### Linux
 => ```
 =>  ⍝ 18.0
 => ]SALT.Settings cmddir ",/home/<⎕AN>/dyalog.180U64.files/SessionExtensions/CiderTatin -p
 =>   ⍝ 18.2
-=> ]SALT.Settings cmddir ",/home/<⎕AN>/dyalog.180U64.files/SessionExtensions/CiderTatin -p
+=> ]SALT.Settings cmddir ",/home/<⎕AN>/dyalog.182U64.files/SessionExtensions/CiderTatin -p
 
 !> ###  Mac OS
 => ```
 =>   ⍝ 18.0
-=> ]SALT.Settings cmddir ",/Users/<⎕AN>/dyalog.182U64.files/SessionExtensions/CiderTatin" -p
+=> ]SALT.Settings cmddir ",/Users/<⎕AN>/dyalog.180U64.files/SessionExtensions/CiderTatin" -p
 =>   ⍝ 18.2
 => ]SALT.Settings cmddir ",/Users/<⎕AN>/dyalog.182U64.files/SessionExtensions/CiderTatin" -p
 => ```
@@ -142,7 +100,7 @@ Notes:
 
 * Note the comma (`,`) in front of the path: it tells SALT to _add_ the path, rather than using it as a replacement
 
-* The `-p` stand for "permanent"; this makes sure your addition to the search path is permanent
+* The `-p` stands for "permanent"; this makes sure your addition to the search path is permanent
 
 
 Any newly started version of Dyalog now comes with the user command `]Tatin.*`.
@@ -151,7 +109,7 @@ There is no point in having a function `Run.aplf` in place with 18.0 and 18.2: o
 
 As a side effect of executing any of the Tatin user commands the Tatin API will become available via `⎕SE.Tatin`.
 
-If you want the Tatin API to be available right from the start: this is discussed next.
+If you want the Tatin API to be available right from the start: this is discussed soon.
 
 
 ## Initializing Tatin
@@ -169,15 +127,17 @@ When any of the Tatin user commands is executed, it will check whether the API i
 
 ## On `setup.dyalog` (18.0 and 18.2)
 
-You might want the Tatin API to be around right from the start, so that you can invoke any of the Tatin API functions without first executing a Tatin user commands. 
+I> This is 18.0/18.2 only because in later versions of Dyalog, Tatin's API will be available in `⎕SE` right from the start
+
+You might want the Tatin API to be available right from the start, so that you can invoke any of the Tatin API functions without first executing a Tatin user command. 
 
 I> What is the application for this? Well, you might want to have an automated build process available right from the start, for example.
 I>
-I> If you are not interested in this, skip this and carry on with "Updating Tatin".
+I> If you are not interested in this: skip it and carry on with [Updating Tatin](#).
 
 The way to achieve this goal requires the introduction or modification of a file `setup.dyalog` in your `MyUCMDs/` folder. 
 
-Where to find the `MyUCMDs/` folder depends on your operating system
+Where to find the `MyUCMDs/` folder depends on your operating system:
 
 * On Windows it's usually `C:\Users\{username}\Documents\`
 * On Linux (including the PI) it is `/home/{username}/`
@@ -187,7 +147,7 @@ Note that only on Windows is the folder created as part of the installation rout
 
 A> ### How does `setup.dyalog` work?
 A>
-A> Whenever an instance of Dyalog is fired up, it checks whether such a script exists. If that is the case it checks whether there is a function `Setup`. 
+A> Whenever an instance of Dyalog is fired up, it checks whether such a script exists. If that is the case it checks whether there is a function `Setup` in the script. 
 A>
 A> If there is such a function then it is expected to be monadic; it will be executed automatically as part of the instantiating process of Dyalog APL.
 A>
@@ -281,4 +241,47 @@ Create one that looks like this:
 ### There is already such a script
 
 Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+
+## Updating Tatin
+
+You've installed (18.0, 18.2) or activated (later than 18.2) Tatin before and want to update it to the latest version.
+
+In that case you might need to perform some action, depending on how old your version of Tatin is.
+
+### Tatin versions before 0.105.0
+
+Versions before 0.105.0 might have been installed into one of these folders:
+
+```
+C:\Users\<user>\Documents\MyUCMDs\     ⍝ Windows
+/users/<user>/MyUCMDs/                 ⍝ Mac-OS
+/home/<user>/MyUCMDs/                  ⍝ Linux
+```
+
+If that is the case then, in order to keep things simple, you are advised to remove the folder `Tatin` from the `MyUCMDs/` folder and install Tatin (and, if installed, Cider) from scratch rather than updating it.
+
+If have loaded Tatin into `⎕SE` with a script `setup.dyalog` you might need to make amendment to it.
+
+
+### Tatin version 0.105.0 and later
+
+Once you have Tatin 0.102.1 (or later) installed in the right place you can use `]Tatin.UpdateTatin` for updating Tatin to a later version.
+
+Just execute:
+
+```
+]Tatin.UpdateTatin
+````
+
+All necessary steps will be executed; eventually the new version number will be reported.
+
+Notes:
+
+* The command will put the release notes on display in your default browser
+
+* Although Tatin is updated on disk, the workspace from which the update command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+
+
+* 19.0 and later only: Tatin's `Update` command changes the installation directory, not the version of Tatin the `]Activate` user command copied it originally from; that remains unchanged.
+
 

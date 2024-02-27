@@ -1,91 +1,122 @@
-* 0.105.0 ⋄ 2024-02-24
-  * `]DeletePackage` renamed to `]DeletePackages`
-  * `]DeletePackages` now accepts an incomplete package ID and works out group name and list of packages
-    fitting the input. 
-  * `⎕SE.Tatin.DeletePackages` now accepts these inputs (exampes):
-    * aplteam-foo
-    * aplteam-foo-*
-    * aplteam-foo-1*
-  * New version of MarkAPL integrated with a bug fix in the dark print theme
-  * Bug fixes
-    * `UpdateClient` appeared to hang once the new release notes were shown in the default browser (#186)
-* 0.104.1 ⋄ 2024-01-28
-  * No instance of the UserSettings class is any longer distributed with the Client workspace
-  * Sending ZIPped data is no longer Base64-encoded but declared as binary data with the HTTP header "Content-Type".
-* 0.104.0 ⋄ 2024-01-22
-  * The results of both `]ListRegistries` and its API counterpart have changed. 
-  * `TatinVars.HOME` is now much more flexible now, addressing Dyalog stand-alone applications
-  * Bug fixes
-    * `UpdateClient` had a problem with `Run.aplf`
-    * `UserSettings.ReplaceRegistry` did not correcly identify an `id`
-    * `DefineRegistry` did not allow changing the `id`
-    * `DefineRegistry`'s constructor did not handle a port number as in `'https://localhost:9090'`
-    * `Client.ListRegistries` did not return the `id` - delivers now a changed and complete result
-* 0.103.2 ⋄ 2024-01-16
-  * New version of FilesAndDirs integrated
-  * ]UserSettings now accepts a flag -home that prints the folder hosting the user settings file
-  * UserSettings documentation improved.  
-  * Bug fixes
-    * It was possible to publish without an API key though not with an invalid one
-    * The function `SplitLogFile` caused a WS FULL at the turn of the year due to a bad implementation
-    * `GetProgramFilesFolder` did return a wrong folder on Linux and Mac-OS
-    * `]UpdateTatin` did not put the release notes into a Ride browser when it should
-    * ]InstallPackage when acting on a non-existing ZIP file did not provide a useful error message
-* 0.103.1 ⋄ 2023-12-15
-  * `BuildPackage` can now update `TatinVars.CONFIG`. For that the newly introduced parameter `tatinVars`
-    (see `CreateBuildParms`) must point to the package's `TatinVars` 
-  * Documentation now uses the new version of "MarkAPL", including the new "Dark" theme. 
-  * The Tatin client does not rely on .NET Framwork on Windows anymore, .NET (formerly known as .NET Core) will do.
-  * `UpdateTatin` now checks all HTTP status codes and reports any problems early and in detail
-    versions was asked for by the user
-  * Bug fixes
-    * `CheckBuildList` got the timestamps wrong when checking the dependency file and the build list
-    * Test cases left much too many temp files and temp dirs behind
-    * `]PackageConfig -edit` crashed when the config did not have a `minimumAplVersion`
-* 0.103.0 ⋄ 2023-11-07
-  * You must specify now an email address for your group before you can publish a package 
-  * Bug fixes
-    * `BuildPackages` checks whether the .NET Framework is available and throws an error if not
-    * `ListVersions` works on local un-managed Registries
-    * `UpdateTatin` did not define its explicit result in case of success, causing a VALUE ERROR
-    * Documentation for how to add a new API key was flawed.
-    * `GetRegistryIndex` did not return anything useful in case of a local but unmanaged Registry
-* 0.102.3 ⋄ 2023-10-13
-  * Bug fix regarding the `files` property: if that pointed to a file in a sub-folder it was not handled correctly
-* 0.102.2 ⋄ 2023-10-09
-  * Documentation corrected regarding installation
-* 0.102.1 ⋄ 2023-10-07
-  * Bug fix in DiscussNewConfigFile
-* 0.102.0 ⋄ 2023-10-05
-  * User settings allows now to define defaults for "maintainer", "license" and "group"
-  * Process of creating a new package improved
-  * Internal changes
-    * New version of `APLProcess 
-    * `SaveBuildList` and `EstablishRegistry` improved
-    * `Admin` namespace tidied up
-    * `Make` amended so that it copied to the correct folder
-* 0.101.2 ⋄ 2023-09-29
-  * Bug fix in `UnInstallPackages`
-  * Internal changes
-    * A test run does not cause a plethora of "changed" messages by Git anymore
-* 0.101.1 ⋄ 2023-09-26
-  * Bug fix in `]Tatin.UpdateTatin`
-* 0.101.0 ⋄ 2023-09-25
-  * `]Tatin.LoadPackages` does not report every step anymore by default but has -verbose now
-  * Installation procedure amended: No MyUCMDs/ anymore
-  * Documentation amended according to changed installation
-  * Bug fixes
-    * `]Tatin.Cache` did not provide the path to the cache when the cache was empty
-* 0.100.1 ⋄ 2023-08-28
-  * Bug fixes
-    * Updating with ]Tatin.UpdateTatin did not work because the minor number was larger than 99
-    * CheckBuildlist sometimes rebuilt the build list when there was no need to do this due to strange things
-      happening under Windows with the milliseconds of modification time of files.
-* 0.100.0 ⋄ 2023-08-24
-  * `]ReInstallDependencies` now accepts a Cider alias instead of a path
-  * Bug fixes
-    * Specifying an alias with `]LoadPackages` crashed
-    * A ZIP file with spaces in its name was not processed
-    * A build list that did not fit with the packages installed made Tatin crash. It now signals an error
-    * A build list that contradicts the dependency list was not discovered as early as it should
-    * ]Tatin.Cache xyz -clear removed everthing from the cache rather than just xyz
+(
+ '* 0.105.0 ⋄ 2024-02-26'
+ '  * `]DeletePackage` renamed to `]DeletePackages`'
+ '  * `]DeletePackages` now accepts an incomplete package ID and works out group name and list of packages'
+ '    fitting the input'
+ '  * `⎕SE.Tatin.DeletePackages` now accepts these inputs (examples):'
+ '    * aplteam-foo'
+ '    * aplteam-foo-*'
+ '    * aplteam-foo-1*'
+ '  * `UpdateClient` handles 302 (redirect) now automaitcally.'
+ '  * New version of MarkAPL integrated with a bug fix in the dark print theme'
+ '  * Bug fixes'
+ '    * `UpdateClient` appeared to hang once the new release notes were shown in the default browser (#186)'
+ '    * Instructions for installing and updating Tatin corrected and polished'
+ '* 0.104.1 ⋄ 2024-01-27'
+ '  * No instance of the UserSettings class is any longer distributed with the Client workspace'
+ '  * Sending ZIPped data is no longer Base64-encoded but declared as binary data with the HTTP header "Content-Type".'
+ '* 0.104.0 ⋄ 2024-01-22'
+ '  * The results of both `]ListRegistries` and its API counterpart have changed. '
+ '  * `TatinVars.HOME` is now much more flexible now, addressing Dyalog stand-alone applications'
+ '  * Bug fixes'
+ '    * `UpdateClient` had a problem with `Run.aplf`'
+ '    * `UserSettings.ReplaceRegistry` did not correcly identify an `id`'
+ '    * `DefineRegistry` did not allow changing the `id`'
+ '    * `DefineRegistry`''s constructor did not handle a port number as in `''https://localhost:9090''`'
+ '    * `Client.ListRegistries` did not return the `id` - delivers now a changed and complete result'
+ '* 0.103.2 ⋄ 2024-01-16'
+ '  * New version of FilesAndDirs integrated'
+ '  * ]UserSettings now accepts a flag -home that prints the folder hosting the user settings file'
+ '  * UserSettings documentation improved.  '
+ '  * Bug fixes'
+ '    * It was possible to publish without an API key though not with an invalid one'
+ '    * The function `SplitLogFile` caused a WS FULL at the turn of the year due to a bad implementation'
+ '    * `GetProgramFilesFolder` did return a wrong folder on Linux and Mac-OS'
+ '    * `]UpdateTatin` did not put the release notes into a Ride browser when it should'
+ '    * ]InstallPackage when acting on a non-existing ZIP file did not provide a useful error message'
+ '* 0.103.1 ⋄ 2023-12-15'
+ '  * `BuildPackage` can now update `TatinVars.CONFIG`. For that the newly introduced parameter `tatinVars`'
+ '    (see `CreateBuildParms`) must point to the package''s `TatinVars` '
+ '  * Documentation now uses the new version of "MarkAPL", including the new "Dark" theme. '
+ '  * The Tatin client does not rely on .NET Framwork on Windows anymore, .NET (formerly known as .NET Core) will do.'
+ '  * `UpdateTatin` now checks all HTTP status codes and reports any problems early and in detail'
+ '    versions was asked for by the user'
+ '  * Bug fixes'
+ '    * `CheckBuildList` got the timestamps wrong when checking the dependency file and the build list'
+ '    * Test cases left much too many temp files and temp dirs behind'
+ '    * `]PackageConfig -edit` crashed when the config did not have a `minimumAplVersion`'
+ '* 0.103.0 ⋄ 2023-11-07'
+ '  * You must specify now an email address for your group before you can publish a package '
+ '  * Bug fixes'
+ '    * `BuildPackages` checks whether the .NET Framework is available and throws an error if not'
+ '    * `ListVersions` works on local un-managed Registries'
+ '    * `UpdateTatin` did not define its explicit result in case of success, causing a VALUE ERROR'
+ '    * Documentation for how to add a new API key was flawed.'
+ '    * `GetRegistryIndex` did not return anything useful in case of a local but unmanaged Registry'
+ '* 0.102.3 ⋄ 2023-10-13'
+ '  * Bug fix regarding the `files` property: if that pointed to a file in a sub-folder it was not handled correctly'
+ '* 0.102.2 ⋄ 2023-10-09'
+ '  * Documentation corrected regarding installation'
+ '* 0.102.1 ⋄ 2023-10-07'
+ '  * Bug fix in DiscussNewConfigFile'
+ '* 0.102.0 ⋄ 2023-10-05'
+ '  * User settings allows now to define defaults for "maintainer", "license" and "group"'
+ '  * Process of creating a new package improved'
+ '  * Internal changes'
+ '    * New version of `APLProcess '
+ '    * `SaveBuildList` and `EstablishRegistry` improved'
+ '    * `Admin` namespace tidied up'
+ '    * `Make` amended so that it copied to the correct folder'
+ '* 0.101.2 ⋄ 2023-09-29'
+ '  * Bug fix in `UnInstallPackages`'
+ '  * Internal changes'
+ '    * A test run does not cause a plethora of "changed" messages by Git anymore'
+ '* 0.101.1 ⋄ 2023-09-26'
+ '  * Bug fix in `]Tatin.UpdateTatin`'
+ '* 0.101.0 ⋄ 2023-09-25'
+ '  * `]Tatin.LoadPackages` does not report every step anymore by default but has -verbose now'
+ '  * Installation procedure amended: No MyUCMDs/ anymore'
+ '  * Documentation amended according to changed installation'
+ '  * Bug fixes'
+ '    * `]Tatin.Cache` did not provide the path to the cache when the cache was empty'
+ '* 0.100.1 ⋄ 2023-08-28'
+ '  * Bug fixes'
+ '    * Updating with ]Tatin.UpdateTatin did not work because the minor number was larger than 99'
+ '    * CheckBuildlist sometimes rebuilt the build list when there was no need to do this due to strange things'
+ '      happening under Windows with the milliseconds of modification time of files.'
+ '* 0.100.0 ⋄ 2023-08-24'
+ '  * `]ReInstallDependencies` now accepts a Cider alias instead of a path'
+ '  * Bug fixes'
+ '    * Specifying an alias with `]LoadPackages` crashed'
+ '    * A ZIP file with spaces in its name was not processed'
+ '    * A build list that did not fit with the packages installed made Tatin crash. It now signals an error'
+ '    * A build list that contradicts the dependency list was not discovered as early as it should'
+ '    * ]Tatin.Cache xyz -clear removed everthing from the cache rather than just xyz'
+ '* 0.99.1 ⋄ 2023-08-05'
+ '  * Reporting of InstallPackages improved'
+ '  * For a package that is a dependency but also a user command in its own rights the user command script '
+ '    needs to be deleted after its installation as a dependency'
+ '* 0.99.0 ⋄ 2023-08-02'
+ '  * ReInstallPackages now works out the Cider project to act on'
+ '  * ReInstallPackages Help page improved'
+ '  * `LoadDependencies` has an additional flag `makeHomeRelative` that can be specified via `⍺`'
+ '  * `]LoadDependencies` has a new flag `makeHomeRelative`'
+ '  * New version of `HashPasswords` with 32-bit support'
+ '  * ]InstallPackages now asks for confirmation before creating the install folder'
+ '* 0.98.2 ⋄ 2023-07-14'
+ '  * Editing a groups homepage text and email address was not possible'
+ '  * Information added to the "TatinForContributors" document regarding certificates'
+ '* 0.98.1 ⋄ 2023-07-13'
+ '  * Restriction removed that required a placeholder for user command packages'
+ '  * Documentation corrected: Credentials.txt and setup.dyalog'
+ '* 0.98.0 ⋄ 2023-07-05'
+ '  * Passwords are now salted and hashed'
+ '  * The file `Credentials.txt` is automatically converted to a new format which is saved'
+ '    in a file `Credentials.csv` while `Credentials.txt` is deleted'
+ '  * A file `apl-dependencies.txt` may now carry comment lines, recognized by a leading `⍝`'
+ '  * Bug fixes'
+ '    * `GetDeletePolicy` did not react well in case of a 400 or 404'
+ '    * Error handling in `PublishPackageToRemoteRegistry_` improved'
+ '    * `]Tatin.PublishPackage` did not ask for confirmation when it established the zip file itself'
+ ''
+)

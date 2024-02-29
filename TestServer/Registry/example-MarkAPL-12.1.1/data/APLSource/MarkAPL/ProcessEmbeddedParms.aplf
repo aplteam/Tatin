@@ -1,0 +1,31 @@
+ ns←ignoreEmbeddedParms ProcessEmbeddedParms ns;noOf;b1;buff;b2;b3;bool
+⍝ Here we do not need to add ns.parms.lineNumberOffset because there are no
+⍝ embedded parameters with recursive calls anyway!
+ :If 0<noOf←{¯1+1⍳⍨1 1⍷((0=≢¨⍵)∨⍵∧.=¨' '),1 1}¯1↓ns.markdown            ⍝ Two consecutive blank lines break the [parm]: definitions
+     :If 0=⊃b1←(⊃¨noOf↑ns.markdown)∊'[ ⍝'                               ⍝ First character must be one of those
+         b1[1]←IsLeanPubEncodingLine⊃ns.markdown                        ⍝ But it might also be a LeanPub encoding directive
+     :EndIf
+     (b1 buff)←noOf↑¨b1 ns.markdown
+     :If 0<noOf←{(≢⍵)-¯1+(⌽⍵)⍳1},b1                                     ⍝ The number of candidates
+         buff←noOf↑buff
+     :AndIf 0<+/b1←'['=⊃¨buff                                           ⍝ Leading `[` are required for [parm]: definitions!
+     :AndIf 0<noOf←{(≢⍵)-¯1+(⌽⍵)⍳1},b1                                  ⍝ The number of candidates
+         buff[(IsLeanPubEncodingLine⊃buff)/1]←⊂''                       ⍝ Erase the LeanPub encoding directive
+         buff←noOf↑buff
+     :AndIf 0<+/b1←'[parm]:'{⍺∘≡¨(≢⍺)↑¨⍵}buff                           ⍝ Now we are getting more specific because of `[data]:`
+     :AndIf 0<noOf←{(≢⍵)-¯1+(⌽⍵)⍳1},b1
+         (b1 buff)←noOf↑¨b1 buff
+         b2←0=≢¨buff~¨' '                                               ⍝ Between any [parm]: lines there might be single blank lines
+         b3←'⍝'=⊃¨buff                                                  ⍝ Between any [parm]: lines there might be comment lines
+     :AndIf 0<noOf←+/b1∨b2∨b3
+         buff←noOf↑buff
+         ns.markdown[(IsLeanPubEncodingLine⊃buff)↓⍳noOf]←⊂''            ⍝ Convert the [parm] definitions in the markdown to blank lines
+         bool←'[parm]:'∘{⍺≡(≢⍺)↑⍵}¨buff                                 ⍝ Otherwise we are not interested
+         :If ~ignoreEmbeddedParms
+             (⍸bool)ProcessEmbeddedParms_¨bool/buff                         ⍝ Process the rows one by one
+             :If ∨/bool←~ns.embeddedParms[;1]∊(CreateHelpParms.∆List[;1]),⊂'collapsibleTOC'     ⍝ Report any invalid keys   ⍝TODO⍝ Remove collapsibleTOC soon
+                 ns.report,←⊂'Invalid embbed parameter',((1<+/bool)/'s'),': ',⊃{⍺,',',⍵}/'"',¨'"',⍨¨bool/ns.embeddedParms[;1]
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf

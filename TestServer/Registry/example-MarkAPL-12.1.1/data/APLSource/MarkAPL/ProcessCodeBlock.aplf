@@ -1,0 +1,33 @@
+ r←ProcessCodeBlock ns;bl;buff;sa;pattern;min;line;infoString;fence
+⍝ Handles code block, either "~~~" (Markdown2 Extra) or "```" (Git).
+ r←0
+ line←⊃ns.markdown
+ :If IsFenceStart line
+     line←A.DLB line
+     min←{(⊃⍵)+.=⍵}line
+     fence←⊃line
+     pattern←('^\s{0,3}'),fence,'{',(⍕,min),',}'
+ :AndIf ¯1≢ns.noOf←pattern FindFenceEnd 1↓ns.markdown
+     :If 2<ns.noOf
+         bl←1↓¯1↓ns.noOf↑ns.markdown
+         sa←GetSpecialAttributes line
+         line←sa DropSpecialAttributes line
+         infoString←GetInfoString line
+         :If 0<+/≢¨bl~¨' '
+             bl←((+/∧\' '=⊃ns.markdown)⌊⌊/+/∧\' '=↑bl)↓¨bl   ⍝ Drop as many blanks as there are indendet blanks
+             buff←(2 EscapeSpecialChars¨bl)sa infoString
+             buff←ns MarkUpAsCode buff
+             :If ns.parms.leanpubExtensions
+                 buff←ProcessLeanPubCodeEmphasizing buff
+             :EndIf
+             ns.html,←buff
+         :EndIf
+         ns.noOf←2+≢bl
+     :ElseIf 2≠ns.noOf
+     :OrIf 0≠≢(⊃ns.markdown)~'~` '
+         ns.noOf←0
+         :Return
+     :EndIf
+     r←1
+     ns←Drop ns
+ :EndIf

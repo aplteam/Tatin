@@ -1,0 +1,30 @@
+ (url title)←GetUrlAndTitleFromLink link;noOf
+⍝ Takes something like [Link Text](#A BookMark Link "The Title") and returns
+⍝ '#a-bookmark-link` `The Title`
+⍝ or [APL wiki](http://aplwiki.com "foo")
+⍝ 'http://aplwiki.com' 'foo'
+ url←((link{⍵\⍵/⍺}~GetMaskForCode link)⍳']')↓link
+ url←(url⍳'(')↓url
+ url↓⍨←-{⍵⍳')'}⌽url
+ url←A.DTB url
+ ((url='\')/url)←'/'
+ :If '"'=¯1↑url           ⍝ Has it a title?!
+ :AndIf 2≤'"'+.=url
+     noOf←1+{+/∧\1=+\⍵='"'}⌽url
+     title←¯1↓1↓(-noOf)↑url
+     url←A.DTB A.DLB(-noOf)↓url
+ :Else
+     title←''
+ :EndIf
+ :If 0=+/'://'⍷url         ⍝ Protocol
+ :AndIf 'mailto:'{⍺≢(≢⍺)↑⍵}url ⍝ Is not a "mailto" link
+ :AndIf '#'≠1⍴url          ⍝ Bookmark
+ :AndIf ':/'≢2⍴1↓url,'  '  ⍝ Absolute Windows path
+ :AndIf './'≢2⍴url,'  '    ⍝ Relative path
+ :AndIf '/'≠1⍴url          ⍝ Absolute UNIX path
+     :If '@'∊url
+         url←'mailto:',url
+     :Else
+         url←'http://',url
+     :EndIf
+ :EndIf

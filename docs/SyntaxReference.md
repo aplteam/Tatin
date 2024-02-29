@@ -199,17 +199,22 @@ Creates a namespace with default parameters; it can be passed as (optional) left
 (statusCode errMsg)←DeletePackages url
 ```
 
-Deletes a package.
+Deletes one or more packages.
 
-Whether deleting packages from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy).
+Whether deleting packages from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy). The principal Tatin server operates a "None" policy, meaning that you cannot delete anything from it.
 
-There are three options:
+In order to delete a package you must identify the package precisely:
 
-* `<Registry><group-name>-<package-name>-<major>.<minor>.<patch>`
-* `<Registry><group-name>-<package-name>-<major>.*`
-* `<Registry><group-name>-<package-name>-*`
+```
+<Registry><group-name>-<package-name>-<precise_version_number>
+```
 
-While the first syntax defines precisely one (or none) package, the other two might well delete more than just one package.
+You may delete several packages in one go by specifying several complete package IDs.
+
+The function returns a vector of HTTP status codes and a vector of messages. The length of these vectors matches the number of packages specified.
+
+Ideally all status codes are 200 and all items in `msg` are empty.
+
 
 ### DeprecatePackage
 
@@ -899,6 +904,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

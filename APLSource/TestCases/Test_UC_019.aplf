@@ -1,0 +1,43 @@
+ r←Test_UC_019(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;packageFolder;zipfile;res;more;cfg;version;tempDir2;deps
+⍝ Exercise ]Tatin.BuildPackage and ]Tatin.PublishPackage with a non-default dependency folder
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir''
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ packageFolder←F.ExpandPath'./TestData/Build/Special'
+ (rc msg zipfile)←∆UCMD'BuildPackage "',packageFolder,'" "',tempDir,'" -dependencies=dependencies'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ res←⊃F.Dir tempDir,'/'
+ →T.GoToTidyUp 0=≢zipfile
+ →T.GoToTidyUp'.zip'≢⎕C ¯4↑zipfile
+
+ tempDir2←∆GetTempDir'-ZIP'
+ zipfile TC.ZipArchive.UnzipTo tempDir2
+ deps←⊃F.NGET(tempDir2,'/apl-dependencies.txt')1
+ →T.GoToTidyUp(,⊂'aplteam-FilesAndDirs-5.2.1')≢deps
+ Assert 0=⊃F.RmDirByForce tempDir2
+ tempDir2←∆GetTempDir'-ZIP'
+
+ cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_Name)0
+ version←⊃{⍺,'-',⍵}/cfg.(group name version)
+ F.RmDir ∆TEMP_REGISTRY_FOLDER,'/',version
+
+ (rc msg res)←∆UCMD'PublishPackage "',zipfile,'" [local] -dependencies=dependencies'
+ →T.GoToTidyUp(rc≠0)∨(0<≢msg)
+ →T.GoToTidyUp~∨/'Package publish'⍷res
+ (∆TEMP_REGISTRY_FOLDER,'/aplteam-Seven7Zip-9.0.1/aplteam-Seven7Zip-9.0.1.zip')TC.ZipArchive.UnzipTo tempDir2
+ deps←⊃F.NGET(tempDir2,'/apl-dependencies.txt')1
+ →T.GoToTidyUp(,⊂'aplteam-FilesAndDirs-5.2.1')≢deps
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDirByForce tempDir
+ Assert 0=⊃F.RmDirByForce tempDir2
+ Assert 0=⊃F.RmDirByForce ∆TEMP_REGISTRY_FOLDER,'/aplteam-Seven7Zip-9.0.1'
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

@@ -1,0 +1,19 @@
+ r←RemoveEscapeChars tx;mask;b;specialChars;ind;b2
+⍝ Remove the "\" (Escape character) from ⍵ except when ...
+⍝ * they are part of code (survives untouched)
+⍝ * there are two of them in succession (one survives)
+⍝ * it appears within an attribute definition like <a title="\3">
+⍝ * any character to the right of the `\` is not one of `_*|~{}(&<>`
+⍝ This does not work on, say, "\\\\\\\\\\\\\\\; that why this is not legal.
+ mask←~GetMaskForCodeTags tx
+ mask←mask\{~Between ⍵∊'<>'}mask/tx
+ b←'\'=(mask/tx),' '
+    ⍝ We try to be smart: those are to be escaped anyway, so nothing else is touched
+ specialChars←'_*|~`{}(&\'
+ b∧←b\((mask/tx),' ')[1+⍸b]∊specialChars
+ b←¯1↓b∧b\'\'≠((mask/tx),' ')[1+⍸b]
+ r←((~mask)∨mask\~b)/tx
+ mask←~GetMaskForCodeTags r
+ b←~mask\'\\'⍷mask/r
+ r←b/r
+⍝Done

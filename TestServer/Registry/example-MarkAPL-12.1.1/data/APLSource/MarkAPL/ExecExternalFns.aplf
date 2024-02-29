@@ -1,0 +1,39 @@
+ result←ns ExecExternalFns y;fns;__arg;nc;dmx
+ result←''
+ (fns __arg)←{∨/' '''∊⍵:(¯1+⌊/⍵⍳' '''){(⍺↑⍵)(A.DLB ⍺↓⍵)}⍵ ⋄ ⍵ ⍬}y
+ nc←⎕NC⊂fns
+ :If 3≠⌊|nc
+     ns.report,←⊂'Unknown external function: <',fns,'>'
+ :Else
+     :If (1=×nc)∧0=2⊃1 ⎕AT fns
+         ns.report,←⊂'External function <',fns,'> is niladic but must not!'  ⍝ We cannot perform this check on class methods!
+     :Else
+         :Trap 0
+             ⍎'result←',fns,' ns'
+             :If ¯1=×≡result
+                 ns.report,←⊂'External function <',fns,'> is niladic but must not!'  ⍝ Only thiss can explain a negative result
+                 result←''
+             :EndIf
+         :Case 2
+             :Trap 0
+                 ⍎'result←__arg ',fns,' ns'
+             :Else
+                 ns.report,←⊂'External function <',fns,'> did crash'
+             :EndTrap
+         :Else
+             dmx←⎕DMX
+                  ⍝ At this stage it might be a dfn that requires a left argument, meaning that we have a VALUE ERROR on `⍺`!
+             :If 6=dmx.EN
+             :AndIf {'⍺'∊⍵/⍨{~⍵∨≠\⍵}⍵=''''}2⊃dmx.DM
+                 :Trap 0
+                     ⍎'result←__arg ',fns,' ns'
+                 :Else
+                     result←''
+                     ns.report,←⊂'External function <',fns,'> did crash'
+                 :EndTrap
+             :Else
+                 ns.report,←⊂'External function <',fns,'> did crash'
+             :EndIf
+         :EndTrap
+     :EndIf
+ :EndIf

@@ -1,0 +1,12 @@
+ ns←AppendFootnoteDefinitions ns;i;footnote;html
+ html←''
+ html,←⊂'<div id="footnotes_div">'
+ html,←⊂'<hr>'
+ html,←⊂'<p><strong>',ns.parms.footnotesCaption,'</strong></p>'
+ html,←⊂'<ol>'
+ :For i footnote :InEach {(⍳≢⍵)⍵}ns.footnoteDefs[;2]
+     html,←⊂'<li id="fnref',(⍕i),'">',(⊃,/Tag¨footnote),'<a href="#fnref',(⍕i),'" class="footnote_anchor"></a>'
+ :EndFor
+ html,←'</ol>' '</div>'
+ ns.html,←html
+⍝Done

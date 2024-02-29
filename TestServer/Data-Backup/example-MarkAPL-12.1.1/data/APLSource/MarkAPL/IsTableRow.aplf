@@ -1,0 +1,7 @@
+ IsTableRow←{
+ ⍝ ⍵ qualifies as a table row if it contains at least 2 un-escaped pipes (`|`).
+     row←,⍵
+     mask←~GetMaskForCode row
+     0=+/b←'|'=mask/row:0
+     ∨/'\'≠(' ',row)[⍸b]
+ }

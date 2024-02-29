@@ -1,18 +1,23 @@
- r←Test_CheckVersions_051(stopFlag batchFlag);⎕TRAP;dir;versions;result;rc;msg
+ r←Test_CheckVersions_051(stopFlag batchFlag);⎕TRAP;dir;versions;result;rc;msg;tempDir;buff
 ⍝ Run CheckForLaterVersion on a package and then install the better version with -all (include better major versions)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  dir←∆GetTempDir''
  dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/Packages/Install-template/*'
+ tempDir←∆GetTempDir'_install'
 
  versions←1 TC.CheckForLaterVersion dir
  →T.PassesIf 1=≢versions
- →T.GoToTidyUp'aplteam-MarkAPL-11.0.3'≢TC.GetPackageIDFrom⊃1 2⌷versions
+ buff←⎕SE.Tatin.InstallPackages'[tatin]aplteam-MarkAPL'tempDir
+
+ →T.GoToTidyUp(⊃buff)≢TC.GetPackageIDFrom⊃1 2⌷versions
 
  r←T._OK
 
 ∆TidyUp:
  (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+ (rc msg)←F.RmDirByForce tempDir
  msg Assert rc=0
 ⍝Done

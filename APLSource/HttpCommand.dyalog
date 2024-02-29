@@ -7,7 +7,7 @@
     ∇ r←Version
     ⍝ Return the current version
       :Access public shared
-      r←'HttpCommand' '5.4.4' '2023-10-31'
+      r←'HttpCommand' '5.4.6' '2024-02-28'
     ∇
 
 ⍝ Request-related fields
@@ -420,6 +420,10 @@
       toFile←redirected←outTn←tmpTn←0 ⍝ initial settings
       tmpFile←''
      
+      url←,url
+      url←BaseURL makeURL url
+      cmd←uc,cmd
+     
     ⍝ Do some cursory parameter checking
       →∆END↓⍨0∊⍴r.msg←'No URL specified'/⍨0∊⍴url ⍝ exit early if no URL
       →∆END↓⍨0∊⍴r.msg←'URL is not a simple character vector'/⍨~isSimpleChar url
@@ -429,10 +433,6 @@
       :If ~RequestOnly  ⍝ don't bother initializing Conga if only returning request
           →∆END↓⍨0∊⍴(Initialize r).msg
       :EndIf
-     
-      url←,url
-      url←BaseURL makeURL url
-      cmd←uc,cmd
      
      ∆GET:
      

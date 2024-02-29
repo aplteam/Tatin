@@ -1,0 +1,27 @@
+ html←type InjectCssIntoHtml parms;css;cssFiles;cssFile;blockNo;cssFile_
+⍝ Inject zero, one or many CSS files and embrace them with a <style> tag.
+⍝ The CSS is converted into a single line if `compressCSS` is 1.
+⍝ The parameter `tocCaption` is honoured.
+ 'Invalid CSS media type'⎕SIGNAL 11/⍨0=+/(⊂type)∊'screen' 'print'
+ cssFiles←','A.Split parms.⍎type,'CSS'
+ html←''
+ :For cssFile :In cssFiles
+     :If 0=≢parms.cssURL
+         cssFile_←cssFile
+     :Else
+         cssFile_←parms.cssURL,'/',cssFile
+     :EndIf
+     css←⊃⎕NGET(MassageFilename cssFile_)1
+     :If type≡'screen'
+     :AndIf 0≠≢blockNo←'<<maxwidth>>'⎕S 2⊣css
+         blockNo+←1
+         (blockNo⊃css)←'max-width:',({' '=1↑0⍴⍵:⍵,(0=≢⍵~⎕D)/'px' ⋄ (⍕⍵),'px'}parms.width),';'
+     :EndIf
+     css←2 InsertTocCaption parms css
+     css←{CompressCSS 2↓⊃,/(⎕UCS 13 10)∘,¨⍵}⍣parms.compressCSS⊣css
+     html,←,⊆css
+ :EndFor
+ :If 0≠≢html
+     html←(⊂'<style media="',type,'">'),html,(⊂'</style>')
+ :EndIf
+⍝Done

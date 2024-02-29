@@ -1,0 +1,24 @@
+ ns←HandleAbbreviations ns;html;abbr;comment;match2;match1;tag1;tag2;b;ignore;comment_
+ :If 0≠≢ns.abbreviations
+     html←ns.html
+     :For abbr comment :In ↓ns.abbreviations
+         comment←2 EscapeSpecialChars comment
+         :If ns.parms.syntaxSugar
+             comment←ns.parms SmartStuff comment
+             comment_←'&'⎕R'\\&'⊣comment         ⍝ & is a reserved character (Dyalog, not PCRE!)
+         :Else
+             comment_←{b←'&'=w←⍵ ⋄ (b/w)←⊂'\&' ⋄ ⊃,/w}comment_      ⍝ Escape "&"
+         :EndIf
+         tag1←'<abbr title="',comment_,'">\&ldquo;',abbr,'\&rdquo;</abbr>'   ⍝ &ldquo;=left double quote and &rdquo;=right double quote
+         tag2←'<abbr title="',comment_,'">',abbr,'</abbr>'
+         match2←{0=+/b←'&'=w←⍵:w ⋄ (b/w)←⊂'&amp;' ⋄ ⊃,/w}abbr
+         match1←'"',match2,'"'
+         match2←'\b',match2,'\b'
+         ignore←'<img.*>' '<a .*>.*</a>' '<code>.*</code>' '<code .*>.*</code>'
+         ignore,←⊂'<abbr .*>[^<]*</abbr>'       ⍝ Abbreviations themselves should be left alone
+         ignore,←⊂'<dt>.*</dt>'                 ⍝ The keyword of a definition should not become an <abbr> tag.
+         ignore,←⊂'<dt .*>.*</dt>'              ⍝ Same in case of special attributes
+         html←(ignore,match1 match2)⎕R((,¨(≢ignore)⍴'&'),tag1 tag2)⍠('Mode' 'D')('DotAll' 1)('Greedy' 0)⊣html
+     :EndFor
+     ns.html←html
+ :EndIf

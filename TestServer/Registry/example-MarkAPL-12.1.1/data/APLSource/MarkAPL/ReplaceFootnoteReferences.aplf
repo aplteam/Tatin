@@ -1,0 +1,11 @@
+ ns←ReplaceFootnoteReferences(ns hits);i;ind;row;id;newID;this
+⍝ Replaces the original footnote references (which have arbitrary names)
+⍝ against ones which are strictly numbered from 1 to whatever.
+ :For i :In ⍳≢hits
+     (id row ind)←hits[i;1 3 4]
+     newID←'<a href="#fnref',(⍕id),'" class="footnote_link"><sup>',(⍕id),'</sup></a>]'
+     (row⊃ns.html)←(-ind)⌽newID,{⍵↓⍨⍵⍳']'}ind⌽row⊃ns.html
+ :EndFor
+ :For this :In (~ns.footnoteDefs[;1]∊hits[;2])⌿ns.footnoteDefs[;1]
+     ns.report,←⊂'Warning: footnote "',this,'" not referenced anywhere'
+ :EndFor

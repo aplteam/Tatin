@@ -1,0 +1,20 @@
+ md←Matrix2MarkdownList mat;i;type
+ :Access Public Shared
+⍝ Converts an APL matrix in to list definition(s).\\
+⍝ The matrix must have three columns:\\
+⍝ 1. List type. 0=bulleted list, 1 etc numeric list **and** starting point.
+⍝ 2. Nesting level. May start with either 0 or 1.
+⍝ 3. Text vector of vector of text vector.
+ 'Invalid right argument - not a matrix'⎕SIGNAL 11/⍨2≠⍴⍴mat
+ 'Invalid right argument - must have 3 columns'⎕SIGNAL 11/⍨3≠2⊃⍴mat
+ 'First line''s level must be either 0 or 1'⎕SIGNAL 11/⍨~(⊃mat)∊0 1
+ 'Invalid right argument - must have 3 columns'⎕SIGNAL 11/⍨~∧/mat[;1]∊0,⍳999
+ mat[;2]←{⍵-1}⍣(1=⊃mat[;2])⊣mat[;2]        ⍝ Ensure 0 is first level
+ md←mat[;2]⍴¨' '
+ type←0=mat[;1]
+ (type/md)←(type/md),¨⊂'* '
+ type←~type
+ (type/md)←(type/md),¨(⍕¨type/mat[;1]),¨⊂'. '
+ md←⊃,/md{(≡⍵)∊0 1:⊂⍺,⍵ ⋄ (⊂⍺,⊃⍵),(⊂(≢⍺)⍴' '),¨1↓⍵}¨mat[;3]
+ md←'' '',md,'' ''
+⍝Done

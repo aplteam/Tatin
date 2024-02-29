@@ -1,0 +1,20 @@
+ r←Test_UC_012(stopFlag batchFlag);⎕TRAP;paths;res;msg;rc;ref;buildList
+⍝ Exercise ]Tatin.Dependencies on packages with alias below top level and overwrite
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ ref←⍎'TEMP'#.⎕NS''
+
+ (rc msg res)←∆UCMD'LoadDependencies "./TestData/Aliase2" #.TEMP -overwrite'
+ Assert(0=rc)∧0=≢msg
+
+ →T.GoToTidyUp 9.4≠#._tatin.aplteam_APLGit_0_24_0.⎕NC⊂,'F'
+ buildList←∆JSON⊃F.NGET'./TestData/Aliase2/apl-buildlist.json'
+ →T.GoToTidyUp 12∨.≠≢¨buildList.(principal packageID url)
+
+ r←T._OK
+
+∆TidyUp:
+ #._tatin.⎕EX'aplteam_APLGit_0_24_0'
+⍝Done

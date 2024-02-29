@@ -1,0 +1,9 @@
+ MakeLiteralForRegex←{
+⍝ Escapes all reserved chars in ⍵ which is a RegEx search pattern that needs to be interpreted literal.
+     literal←⍵
+     reservedChars←'^.\$|?+()['
+     b←literal∊reservedChars
+     0=+/b:literal
+     (b/literal)←('\',¨reservedChars)[reservedChars⍳b/literal]
+     ⊃,/literal
+ }

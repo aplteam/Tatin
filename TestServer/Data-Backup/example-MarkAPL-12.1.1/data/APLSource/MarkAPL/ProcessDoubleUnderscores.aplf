@@ -1,0 +1,23 @@
+ txt←ProcessDoubleUnderscores txt_;noOf;bool;ind;start;end;txt2
+⍝ Takes a string and marks up everything between __ and __ as <strong>
+⍝ except when it occurs within a word or within APL code or as part of a function call.
+ txt2←txt←'  ',txt_,'  '
+ ((GetMaskForCode txt2)/txt2)←' '
+ :If ∨/bool←'\_'⍷txt2
+⍝          txt2[,⍉0 1∘.+⍸ bool]←(2×+/bool)⍴'' '_'
+     txt2←'\\_'⎕R'aa'⊣txt2
+ :EndIf
+ :If 0<+/bool←'__'⍷txt2
+ :AndIf 0<+/bool∧bool\~∧/⍉txt2[¯1 2∘.+⍸bool]∊AllWhiteSpaceChars
+ :AndIf 0≠≢ind←⍸bool
+ :AndIf 0≠≢ind←((txt 2∘NotWithinWord¨ind))/ind
+     ind←{⍵↑⍨(≢⍵)-2|≢⍵}ind
+     start←((≢ind)⍴1 0)/ind
+     end←((≢ind)⍴0 1)/ind
+     txt[start]←⊂'<strong>'
+     txt[end]←⊂'</strong>'
+     txt[1+start,end]←⊂''
+     txt←⊃,/txt
+ :EndIf
+ txt←2↓¯2↓txt
+⍝Done

@@ -1,0 +1,32 @@
+ r←Test_UC_006(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;packageFolder;zipfile;res;more;cfg;version
+⍝ Exercise ]Tatin.BuildPackage and ]Tatin.PublishPackage
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir''
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name                           ⍝ Precaution
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+
+ packageFolder←F.ExpandPath'./TestData/Source/OS'
+ (rc msg zipfile)←∆UCMD'BuildPackage "',packageFolder,'" "',tempDir,'"'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ res←⊃F.Dir tempDir,'/'
+ →T.GoToTidyUp 0=≢zipfile
+ →T.GoToTidyUp'.zip'≢⎕C ¯4↑zipfile
+
+ cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_Name)0
+ version←⊃{⍺,'-',⍵}/cfg.(group name version)
+ F.RmDir ∆GetServerRegistryFolder,version
+ #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
+
+ (rc msg res)←∆UCMD'PublishPackage "',zipfile,'" [local]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempDir
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
+⍝Done

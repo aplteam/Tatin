@@ -1,0 +1,33 @@
+ {r}←i ProcessEmbeddedParms_ def;key;value;allowed;b;v
+⍝ `def` is a single definition (like `[parm]:name=value`) or a blank or comment line or a LeanPub directive.
+⍝ Returns the number of succesdsfully established key/value pairs.
+⍝ Is called by `ProcessEmbeddedParms` and requiresd access to `ns`/
+ r←0
+ allowed←CreateParms.∆List[;1]                                     ⍝ List of allowed parameter names
+ :If '='∊def                                                       ⍝ A definition MUST contain this
+     (key value)←¯1 0↓¨((≢'[parm]:'),0)↓¨{i←⍵⍳'=' ⋄ (i↑⍵)(i↓⍵)}def ⍝ Split into name and value
+     key~←' '
+     :If 0=≢value←A.DLB A.DTB value                                    ⍝ Empty values do not make sense
+         ns.report,←⊂'Parameter definition on line ',(⍕i),' is invalid'
+     :Else
+         :If ''''∊value
+             :If ''''''≡2⍴¯1⌽value
+                 value←¯1↓1↓value
+             :Else
+                 value←''
+                 ns.report,←⊂'Parameter value definition for line ',(⍕⊃i),' is invalid'
+             :EndIf
+         :ElseIf '⎕null'{⍺≡⎕C(≢⍺)↑⍵}value
+             value←⎕NULL
+         :Else
+             (b v)←⎕VFI value
+             :If ∧/b
+                 value←{1=≢⍵:⍬⍴⍵ ⋄ ⍵}v
+             :EndIf
+         :EndIf
+     :EndIf
+     ns.embeddedParms⍪←key value
+     ⍎'ns.parms.',key,'←value'
+ :Else
+     ns.report,←⊂'Parameter definition on line ',(⍕i),' is invalid'
+ :EndIf

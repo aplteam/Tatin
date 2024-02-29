@@ -1,0 +1,30 @@
+ ns←InjectTOC ns;param;levels;b;h;ns2;html;r;tocHtml;drop;parms;links;noOf;buff;toc;i
+⍝ Inject a TOC in case the user has specified this
+ :If 1=≢ns.parms.toc
+     levels←⍳ns.parms.toc
+ :Else
+     levels←ns.parms.toc
+ :EndIf
+ :If 0≠≢toc←↑((⊃¨ns.toc)∊levels)/ns.toc
+     drop←⌊/toc[;1]
+     :If (,0)≢,ns.parms.numberHeaders
+         toc,←toc{⍵[;4]⌿⍨⍵[;2]∊LowercaseID ⍺[;3]}ns.headers
+         links←ns.parms.bookmarkMayStartWithDigit{LowercaseID ⍺ CompileBookMarkName ⍵''}¨toc[;3]
+         tocHtml←ns CreateTOC toc[;1 2 5],links
+     :Else
+         links←{(3⊃⍵)≡GetBookMarkNameFromCaption(2⊃⍵)'':3⊃⍵ ⋄ 3⊃⍵}¨↓toc
+         tocHtml←ns CreateTOC(toc[;1 2],(⊂'')),links
+     :EndIf
+     :If '<a' '<h'≡2↑¨2↑ns.html                        ⍝ First two lines define a header?!
+         noOf←1⍳⍨'</a>'{⍺∘≡¨(≢⍺)↑¨⍵}ns.html
+         ns.html←(noOf↑ns.html),tocHtml,noOf↓ns.html   ⍝ Insert after the first header
+     :Else
+         :If ∨/'<h1 '⍷∊ns.html
+         ⍝ Insert TOC after <h1>
+             :If ∨/'<div class="h_tag">'⍷∊ns.html
+                 i←⊃ns.html⍳⊂'</div>'
+                 ns.html←(i↑ns.html),tocHtml,i↓ns.html
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf

@@ -1,0 +1,16 @@
+ r←ProcessAutomaticLinks_ txt;link;trailer;sa
+ (link trailer)←{i←⍵⍳'>' ⋄ (i↑⍵)(i↓⍵)}txt
+ link←¯1↓1↓link
+ sa←GetSpecialAttributes link
+ link←sa DropSpecialAttributes link
+ :If IsHTTP link
+ :OrIf IsFTP link
+ :OrIf IsFileProtocol link
+     r←(sa{'<a href="',⍵,'" class="external_link"',⍺,'>',⍵,'</a>'}link),trailer
+ :ElseIf IsMailTo link
+     r←(sa{'<a href="',⍵,'" class="mailto_link"',⍺,'>',({⍵↓⍨⍵⍳':'}link),'</a>'}link),trailer
+ :ElseIf '@'∊link
+     r←(sa{'<a href="mailto:',⍵,'" class="mailto_link"',⍺,'>',⍵,'</a>'}link),trailer
+ :Else
+     r←txt
+ :EndIf

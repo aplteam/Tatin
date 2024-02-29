@@ -1,0 +1,23 @@
+ r←Test_UC_121(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;res;installFolder;stop
+⍝ Exercise ]Tatin.InstallPackages on a package that is a user command
+⍝ Should install into a sub-folder that is named after the package because only [MyUCMDs] is paased
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ installFolder←TC.GetMyUCMDsFolder'UC'
+ 'Check!'Assert 0=⎕NEXISTS installFolder  ⍝ Should not exist. If it does, is it a leftover from an earlier test?!
+ stop←0
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'Sure you want to install' 'y'
+ (rc msg res)←stop ∆UCMD'InstallPackages "',zipFilename,'" [myucmds]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp~∨/' example-UC-1.0.0 '⍷∊' ',¨res,¨' '
+ →T.GoToTidyUp~⎕NEXISTS installFolder,'/UC.aplc'
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕SE._Tatin.Client.CommTools.Cleanup
+ (rc msg)←F.RmDirByForce installFolder
+ Assert rc=0
+⍝Done

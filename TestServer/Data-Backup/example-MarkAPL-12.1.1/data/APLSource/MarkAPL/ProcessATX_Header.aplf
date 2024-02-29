@@ -1,0 +1,31 @@
+ flag←ProcessATX_Header ns;l;txt;sa;c;c2;bookmarkName;anchor;level;bookmarkName_
+ flag←0
+ l←+/∧\'#'=1⊃ns.leadingChars                   ⍝ Level
+ 'Invalid header level'⎕SIGNAL 11/⍨~l∊⍳6
+ txt←1⊃ns.markdown
+ :If 4>+/∧\' '=txt                             ⍝ A maximum of three spaces is allowed
+ :AndIf ' '=⊃txt~'#'                           ⍝ The first char after the # must be a blank
+     sa←GetSpecialAttributes⊃ns.markdown
+     txt←sa DropSpecialAttributes txt
+ :AndIf '#'∨.≠txt~' '
+     (level c)←txt{(⍵↑⍺)((1+⍵)↓⍺)}⊃⍸'# '⍷txt   ⍝ c=Caption; first eliminate leading `#`
+     :If (' ',level)≡(-1+≢level)↑c             ⍝ Does it have a closing tag?
+         c←(-1+≢level)↓c                       ⍝ Remove closing tag
+     :EndIf
+     c←ns CheckOddNumberOfDoubleQuotes c'header'
+     c2←⊃ns ProcessInlineMarkUp c
+     bookmarkName←ns GetBookMarkNameFromCaption txt((l≤ns.parms.bookmarkLink)/sa)
+     bookmarkName_←LowercaseID bookmarkName
+     anchor←AddBookmarkLink l ns bookmarkName_
+     ns.html,←ns.parms.div_h_tag/⊂'<div class="h_tag">'
+     ns.html,←{⊂⍣(0≠≢⍵)⊣⍵}anchor
+     ns.html,←⊂A.DMB'<h',(⍕l),({0=≢⍵:⍵ ⋄ ' data-id="',⍵,'"'}bookmarkName),({0=≢⍵:⍵ ⋄ ' ',⍵}RemoveIdFromSpecialAttributes⍣(0≠≢anchor)⊣sa),'>',c2,'</h',(⍕l),'>'
+     ns.html,←(0<≢anchor)/⊂'</a>'
+     ns.html,←ns.parms.div_h_tag/⊂'</div>'
+     ns.headers⍪←l bookmarkName_ c2''
+     ns.headerLineNos,←⊃ns.lineNumbers
+     ns.noOf←1
+     ns←Drop ns
+     flag←1
+ :EndIf
+⍝Done

@@ -1,0 +1,18 @@
+ r←Test_UC∆DeletePkg_005(stopFlag batchFlag);⎕TRAP;rc;msg;res2;stop;res
+⍝ Exercise ]Tatin.DeletePackages on markapl (no group name)
+⍝ The user must select a group; The question whether anything should be deleted in answerd with "n".
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'SelectGroup@' 'example'
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'DeleteThisPkg@' 'n'
+ stop←0
+ (rc msg res)←stop ∆UCMD'DeletePackages [localhost]markapl'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'Cancelled by user'≢res
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕SE._Tatin.Client.CommTools.Cleanup
+⍝Done

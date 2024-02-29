@@ -1,0 +1,11 @@
+ DropSpecialAttributes←{
+     specialAttrs←⍺
+     0=≢specialAttrs:⍵
+     '\'=1↑¯2↑⍵:⍵
+     buff←(⎕UCS 13)A.Split ⍵     ⍝ In case of <<BR>>!
+     tx←A.DTB⊃buff
+     '}'≠¯1↑tx:1↓⊃,/(⎕UCS 13),¨(⊂tx),1↓buff
+     ~'{'∊tx:1↓⊃,/(⎕UCS 13),¨(⊂tx),1↓buff
+     tx←A.DTB{⌽⍵↓⍨⍵⍳'{'}1↓⌽tx
+     1↓⊃,/(⎕UCS 13),¨(⊂tx),1↓buff
+ }

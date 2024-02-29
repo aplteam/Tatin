@@ -1,0 +1,35 @@
+ r←{colHeader}Matrix2MarkdownTable mat;b;⎕IO;dt;mask;noOfColumns
+ :Access Public Shared
+⍝ Converts an APL matrix into Markdown.\\
+⍝ Since the Markdown is created automatically we value space & performance more than readability.\\
+⍝ Without a left argument the right argument transforms into a matrix without
+⍝ column headers. If a column is strictly numeric it is right-aligned.\\
+⍝ If a left argument is provided then it is expected to be a vector of text vectors
+⍝ defining column headers.\\
+⍝ Such column headers may define column alignment via a leading and/or a trailing `:`; that means
+⍝ that when using this method you cannot have a trailing `:` in a column header.\\
+⍝ In case no column headers are specified or the column headers don't define alignment then columns
+⍝ that contain nothing but numeric data are by default right-aligned while all other columns
+⍝ are left-aligned.\\
+⍝ This method does not allow special attributes, although they may be added in a seperate
+⍝ step of course.
+ 'Invalid right argument - not a matrix'⎕SIGNAL 11/⍨2≠⍴⍴r←mat
+ :If 0<=/b←,∨/¨'|'∊¨r                          ⍝ Any "|" anywhere?!
+     (b/,r)←EscapePipeSymbolInCell¨b/,r
+ :EndIf
+ dt←0=⊃¨0⍴¨r                                   ⍝ Data type
+ :If 0=⎕NC'colHeader'                          ⍝ If no left argument...
+     colHeader←,[0.5](':-' '-:')[1+∧⌿dt]       ⍝ ... then we right-align numeric cols.
+ :Else
+     'Left argument: length error'⎕SIGNAL 6/⍨(≢colHeader)≠2⊃⍴mat
+     'Left argument: depth error'⎕SIGNAL 11/⍨2≠≡colHeader
+     colHeader←⍉↑(∧⌿dt)BuildColumnHeader¨colHeader
+ :EndIf
+ r←colHeader⍪r
+ dt←((⍴colHeader)⍴0)⍪dt
+ ((,dt)/,r)←⍕¨(,dt)/,r                         ⍝ Format numeric cells only
+ r←'|',¨r                                      ⍝ Insert the "|" for cell recognition
+ noOfColumns←2⊃⍴r
+ r←↓r
+ r←noOfColumns{⎕ML←3 ⋄ (1<⍺)↓¨∊¨⍵}r
+⍝Done

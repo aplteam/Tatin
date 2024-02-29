@@ -1,0 +1,40 @@
+ r←Test_UC_007(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg;statusCode;errMsg
+⍝ Exercise ]Tatin.PublishPackages with an already published package (was once a bug)
+⍝ We publish under group "SomeGroup" twice
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir''
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name           ⍝ Precaution
+
+ packageFolder←F.ExpandPath'./TestData/Source/OS'
+ tempDir ⎕NCOPY packageFolder,'/OS.aplc'
+ tempDir ⎕NCOPY packageFolder,'/apl-package.json'
+ json←⊃F.NGET tempDir,'/apl-package.json'
+ cfg←⎕JSON⍠('Dialect' 'JSON5')⊢json
+ cfg.group←'SomeGroup'
+ cfg.version←'1.0.0'
+ cfg.license←'MIT'
+ json←TC.Reg.JSON cfg
+ (⊂json)F.NPUT(tempDir,'/apl-package.json')1
+
+ (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'Package published on'{⍺≢(≢⍺)↑⍵}res
+
+ cfg.version←'1.1.0'
+ json←TC.Reg.JSON cfg
+ json TC.Reg.SaveJSON(tempDir,'/apl-package.json')1
+ (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'Package published on'{⍺≢(≢⍺)↑⍵}res
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir tempDir
+ (statusCode errMsg)←TC.DeletePackages'[localhost]SomeGroup-OS-1.0.0'
+ Assert statusCode∧.=200
+ (statusCode errMsg)←TC.DeletePackages'[localhost]SomeGroup-OS-1.1.0'
+ Assert statusCode∧.=200
+⍝Done

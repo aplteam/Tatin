@@ -1,0 +1,11 @@
+ ns←CheckForInvalidFootnotes2 ns;ind;ids;mask;html
+⍝ At this point if we find any footnote refs they must be invalid, otherwise we wouldn't find them. (Let check)
+ :If ns.parms.checkFootnotes
+ :AndIf 0≠≢ns.html
+     html←FlattenHTML ns.html
+     mask←~GetMaskForCodeTags html
+ :AndIf 0≠≢html←mask/html
+ :AndIf 0≠≢ind←⍸'[^'⍷html
+     ids←ind{{⍵↑⍨¯1+⍵⍳']'}(⍺+1)↓⍵}¨⊂html
+     ns.report,←'Warning: invalid footnote: '∘,¨ids
+ :EndIf

@@ -1,0 +1,11 @@
+ IsFenceStart←{
+ ⍝ The start of a code block fence may have an info string after the fence as such.
+     md←⍵
+     3<noOfBlanks←+/∧\' '=md:0             ⍝ Max three blanks
+     md←noOfBlanks↓md
+     fence←⊃md
+     ~fence∊'`~':0
+     3>noOfFencingChars←+/∧\md=fence:0     ⍝ At least three fencing characters
+     0=≢md←noOfFencingChars↓md:1
+     ~fence∊md                             ⍝ Any info string must not contain the fence character
+ }

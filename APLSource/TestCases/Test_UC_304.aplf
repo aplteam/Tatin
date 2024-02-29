@@ -1,0 +1,15 @@
+ r←Test_UC_304(stopFlag batchFlag);⎕TRAP;rc;msg;res;stop
+⍝ Exercise ]Tatin.UsageData with -download and the -unzip flag
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg res)←stop ∆UCMD'UsageData [localhost] -download -unzip -all'
+ →T.GoToTidyUp 0≠rc
+ →T.GoToTidyUp~0<≢F.ListFiles res
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir res
+⍝Done

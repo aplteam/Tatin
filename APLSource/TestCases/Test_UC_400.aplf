@@ -1,0 +1,24 @@
+ r←Test_UC_400(stopFlag batchFlag);⎕TRAP;msg;rc;stop;res
+⍝ Exercise ]DeprecatePackage on an existing package twice
+⍝ First time it should work, second time it shouldn't because it is already deprecated.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴('Sure that you want to deprecate <example-versions-1> on ',∆LocalHostAndPort,' ?')'Y'
+ stop←0
+ (rc msg res)←stop ∆UCMD'DeprecatePackage [localhost]/example-versions-1 "Reason for deprecation"'
+ →T.GoToTidyUp 0≠rc
+ →T.GoToTidyUp 1≠⎕NEXISTS ∆GetServerRegistryFolder,'example-versions-1.1.0'
+ →T.GoToTidyUp 1≠⎕NEXISTS ∆GetServerRegistryFolder,'example-versions-1.1.0/example-versions-1.1.0.zip'
+
+ (rc msg res)←stop ∆UCMD'DeprecatePackage [localhost]/example-versions-1 "Reason for deprecation" -force'
+ →T.GoToTidyUp 0≠rc
+ →T.GoToTidyUp~∨/'Package was already deprecated'⍷res
+
+ r←T._OK
+
+∆TidyUp:
+ F.RmDir ∆GetServerRegistryFolder,'example-versions-1.1.0'
+ #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
+ ⎕SE._Tatin.Client.CommTools.Cleanup
+⍝Done

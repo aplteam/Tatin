@@ -1,0 +1,20 @@
+ tx2←MarkUpInlineCode tx;mask;offset1;offset2;noOf;i;buff;leading
+ :If 0<+/mask←GetMaskForCode tx2←tx
+     offset1←⍸0 1⍷0,mask
+     tx2[offset1]←⊂'<code>'
+     offset2←⍸1 0⍷mask,0
+     tx2[offset2]←⊂'</code>'
+     ⍝ In case a block was opened/closed by more than just one backtick we need to get rid of the additonal ones:
+     noOf←tx2∘{+/∧\'`'=∊⍵↓⍺}¨offset1           ⍝ noOf opening (closing backticks). Those larger than 0 need attention
+     :For i :In ⍳≢noOf
+         :If 0<i⊃noOf
+             tx2[offset1[i]+⍸{(∧\'`'=⍵)∨⌽∧\'`'=⌽⍵}tx2[offset1[i]+⍳offset2[i]-offset1[i]+1]]←⊂''
+         :EndIf
+     :EndFor
+     tx2←⊃,/tx2
+     leading←(¯1+1⊃⍸'<code>'⍷tx2)↑tx2
+     tx2←(≢leading)↓tx2
+     tx2←(≢'code>')↓¨{⍵⊆⍨~'<code>'⍷⍵}tx2
+     tx2←'<code>'∘,¨MarkUpInlineCode_¨tx2
+     tx2←leading,⊃,/tx2
+ :EndIf

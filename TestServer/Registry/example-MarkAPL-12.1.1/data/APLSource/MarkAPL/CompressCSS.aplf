@@ -1,0 +1,30 @@
+ css←CompressCSS css;start;end;mask;bool;flag;b1;b2;b
+ :Access Public Shared
+⍝ Takes CSS and compresses it to a single line.
+⍝ Along the way it...
+⍝ * removes all comments
+⍝ * removes any spaces around `;:{}`
+⍝ * replaces <TAB> chars by spaces
+⍝ * removes multiple spaces
+⍝
+⍝ Note that this method can have desastrous results when performed on non-valid CSS!\\
+⍝ Throws an error in case something is not right with the CSS.
+ css←{(1↓⊃,/(⎕UCS 13),¨⍵)}⍣(1≠≡css)⊣css
+ start←'/*'⍷css
+ end←'*/'⍷css
+ mask←~{⍵∨≠\⍵}css='"'
+ 'Cannot compress CSS: number of occurrences of /* and */ are different'⎕SIGNAL 11/⍨0=≡/+/¨mask∘/¨start end
+ 'Cannot compress CSS: Invalid nested comments'⎕SIGNAL 11/⍨0≠≢(∪⊃-/+\¨start end)~0 1
+ start∧←mask
+ end∧←mask
+ bool←~{⍵∨≠\⍵}start∨end
+ bool[1+⍸end]←0
+ css←bool/css
+ css←A.DMB css~⎕TC
+ ((css=⎕UCS 9)/css)←' '
+ mask←~{⍵∨≠\⍵}css='"'
+ b1←mask\mask/⊃∨/' :' ' ;' ' {' ' }'⍷¨⊂css
+ b2←mask\mask/⊃∨/': ' '; ' '{ ' '} '⍷¨⊂css
+ b←~b1∨0,¯1↓b2
+ css←b/css
+⍝Done

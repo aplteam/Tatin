@@ -1,0 +1,13 @@
+ EscapePipeSymbolInCell←{
+⍝ ⍵ is a cell from any APL matrix.
+⍝ We convert any | to \| (escaping) except when it lives within code
+     c←⍵
+     mask←~GetMaskForCode c     ⍝ We must ignore code
+     0=+/mask:c                 ⍝ Everything is code? Done!
+     b←'|'=mask/c               ⍝ Where are the | when we ignore the code?
+     0=+/b:c                    ⍝ None?! Done!
+     buff←mask/c                ⍝ Get what's not code
+     (b/buff)←⊂'\|'             ⍝ Replace all | by \|
+     (mask/c)←buff              ⍝ Put stuff back
+     ⊃,/c                       ⍝ Simplify
+ }

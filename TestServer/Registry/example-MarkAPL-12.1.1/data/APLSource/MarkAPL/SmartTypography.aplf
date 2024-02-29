@@ -1,0 +1,16 @@
+ html_←SmartTypography html;cb;bbt;ignore
+⍝ Does all the smart stuff except double + single quote handling; see `SmartQuotes` for that.
+⍝ This function does not check ns.syntaxSugar: that's up to the caller.
+ cb←'(^ {0,3}[~`]{3,}).*\1'                                                         ⍝ Code blocks (anything between `~~~` and three back ticks.
+ bbt←'`[^`].*?`'                                                                    ⍝ Between back-ticks (= code)
+ ignore←'<!--[^-]+-->'cb bbt
+ html_←(ignore,⊂'---')⎕R(,¨((≢ignore)⍴⊂'\0'),'—')⍠('Mode' 'D')('DotAll' 1)⊣html     ⍝ em dash
+ html_←(ignore,⊂'--')⎕R(,¨((≢ignore)⍴⊂'\0'),'–')⍠('Mode' 'D')('DotAll' 1)⊣html_     ⍝ en dash
+ html_←(ignore,⊂'\.\.\.')⎕R(,¨((≢ignore)⍴'&'),'…')⍠('Mode' 'D')('DotAll' 1)⊣html_   ⍝ Ellipses
+ html_←(ignore,⊂'<<')⎕R(,¨((≢ignore)⍴'&'),'«')⍠('Mode' 'D')('DotAll' 1)⊣html_       ⍝ Chevron
+ html_←(ignore,⊂'>>')⎕R(,¨((≢ignore)⍴'&'),'»')⍠('Mode' 'D')('DotAll' 1)⊣html_       ⍝ Chevron
+ html_←(ignore,'\B\(c\)\B' '\B\(tm\)\B' '\B\(C\)\B' '\B\(TM\)\B')⎕R(,¨((≢ignore)⍴'&'),'©' '™' '©' '™')⊣html_ ⍝ Copyright and Trademark
+ html_←(ignore,⊂'\B\&lt;==&gt;\B')⎕R(,¨((≢ignore)⍴'&'),'↔')⊣html_                   ⍝ Left-and-right arrow
+ html_←(ignore,⊂'\B\&lt;==\B')⎕R(,¨((≢ignore)⍴'&'),'←')⊣html_                       ⍝ Left arrow
+ html_←(ignore,⊂'\B\==&gt;\B')⎕R(,¨((≢ignore)⍴'&'),'→')⊣html_                       ⍝ Right arrow
+⍝Done

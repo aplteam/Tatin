@@ -1,0 +1,41 @@
+ response←DeletePackages request;deletePolicy;packageID;regPath;rc;msg;⎕TRAP;b
+⍝ Delete one or more packages.\\
+⍝ Whether deleting a package is an option is determined by the INI setting [CONFIG]DeletePackages
+⍝ which is returned by `GetDeletePolicy` as a text vector.
+ deletePolicy←GetDeletePolicy
+ packageID←{','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}request.RequestTarget
+ :If 'None'≡deletePolicy
+     response←request Respond 405
+     response.Content←'This server does not allow deleting packages'
+ :ElseIf ~∧/Reg.IsValidPackageID_Complete¨packageID
+     Reg.IsValidPackageID_Complete packageID
+     response←request Respond 400
+     response.Content←'Invalid package ID'
+ :Else
+     :If 'JustBetas'≢deletePolicy
+     :OrIf Reg.IsBeta packageID
+         regPath←(Reg.AddSlash G.RegistryPath)∘,¨packageID
+         :If 1∊b←~⎕NEXISTS¨regPath
+             response←request Respond 404
+             response.Content←'Package',((1<+/b)/'s'),' <',(⊃{⍺,',',⍵}/b/packageID),'> ',((1+1=+/b)⊃'do' 'does'),' not exist'
+         :Else
+             :If 0∧.=≢¨msg←Reg.DeletePackage¨regPath
+                 response←request Respond 200
+                 response.Content←'Package',((1<≢msg)/'s'),' deleted'
+                 ##.Registry.Index.Compile G.RegistryPath
+                 (rc msg)←Emails.SendMail_DeletedPkg G.INI packageID
+                 :If rc≠0
+                     P.AppLog⊆'*** Error'
+                     P.AppLog⊆'Sending email to gatekeeper with notification of a deleted package failed: ',(⍕rc),'; ',⍕∊rc
+                 :EndIf
+             :Else
+                 response←request Respond 400
+                 response.Content←{⍵/⍨0<≢¨⍵}msg
+             :EndIf
+         :EndIf
+     :Else
+         response←request Respond 405
+         response.Content←'This server allows only beta packages to be deleted'
+     :EndIf
+ :EndIf
+⍝Done

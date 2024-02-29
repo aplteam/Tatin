@@ -1,0 +1,12 @@
+ r←ProcessHtmlBlockType_CDATA ns;start
+⍝ <![CDATA[ and ]]
+⍝ ← is 0 when found and processed, otherwise 1.
+ r←1
+ :If 2<≢ns.markdown
+ :AndIf 0=≢⊃ns.markdown
+ :AndIf '<![CDATA['{⍺≡(≢⍺)↑⍵}2⊃ns.leadingChars
+ :AndIf 0<ns.noOf←DetectClosingTagBeforeEmptyLine ns.markdown']]>'
+     ns.html,←']]>'DropTailAfterClosingTag 1↓ns.noOf↑ns.markdown
+     ns←Drop ns
+     r←0
+ :EndIf

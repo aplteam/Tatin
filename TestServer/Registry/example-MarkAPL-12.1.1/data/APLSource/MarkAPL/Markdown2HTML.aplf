@@ -1,0 +1,31 @@
+ {(html ns)}←{parms}Markdown2HTML markdown
+⍝ `⍵` is one of:
+⍝   * Vector of character vectors representing a Markdown document.
+⍝   * Empty vector. In this case the parameter "inputFilename" must be specified.
+⍝ `⍺` Is a namespace with parameters, typically create by calling `CreateParms`.\\
+⍝ `←` Is a two-element vector starting from version 1.7.0:
+⍝ 1. Is always the HTML created. As a side effect this HTML will also be written
+⍝    to the file specified by `outputFilename` - if that is not empty that is.
+⍝ 2. The `ns` namespace created by `Init` and needed / processed by `Process. This contains `ns.report`,
+⍝    something you might want to check.
+⍝ In case `outputFilename` is not empty the HTML is also written to file.
+ :Access Public Shared
+ parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateParms}'parms'
+ :If 0=≢markdown
+     :If 0=≢parms.inputFilename
+         'Neither "markdown" nor "inputFilename" defined'⎕SIGNAL 6
+     :Else
+         markdown←⊃⎕NGET parms.inputFilename 1
+     :EndIf
+ :EndIf
+ ns←Init parms markdown
+ ns←Process ns
+ html←ns.html
+ :If (0≠≢ns.parms.outputFilename)∧0≠ns.parms.createFullHtmlPage
+ :OrIf 1=ns.parms.createFullHtmlPage
+     html←ns.parms MakeHTML_Doc html
+ :EndIf
+ :If 0<≢ns.parms.outputFilename
+     (⊂html)⎕NPUT ns.parms.outputFilename 1
+ :EndIf
+⍝Done

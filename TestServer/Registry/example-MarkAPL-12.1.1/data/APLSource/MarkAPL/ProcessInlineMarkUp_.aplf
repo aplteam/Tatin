@@ -1,0 +1,20 @@
+ r←escapeFlag ProcessInlineMarkUp_(tx parms)
+⍝ Note: sequence matters! Think thrice before changing, and run test cases immediately if you do anyway.
+ r←tx
+ r←Process_BR r
+ r←ProcessAutomaticLinks r
+ r←ConvertEscapedAmpersand r
+ r←ProcessSpecialHTML_Chars⍣escapeFlag⊣r
+ r←parms SmartStuff⍣(⊃parms.syntaxSugar)⊣r
+⍝ r←ConvertEscapedAmpersand r
+ r←ProcessImages r
+ r←parms.bookmarkMayStartWithDigit ProcessLinks r
+ r←ProcessDoubleAsterisks r
+ r←ProcessAsterisks r
+ r←ProcessDoubleUnderscores r
+ r←1 ProcessUnderscores r
+ r←ProcessDoubleTildes r
+ r←MarkUpInlineCode r
+ r←RemoveEscapeChars r
+ r←InjectBR r
+⍝Done

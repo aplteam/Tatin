@@ -1,0 +1,12 @@
+ r←Test_UC_503(stopFlag batchFlag);⎕TRAP;rc;msg;result;stop
+⍝ Exercise ]Tatin.FindDependencies with an invalid package list
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg result)←stop ∆UCMD'FindDependencies 1APLTreeUtils2,Tester2 ./'
+ →T.PassesIf rc∊911 ##.Registry.ErrorNo
+ →T.PassesIf∨/'Invalid package definition'⍷msg
+
+ r←T._OK
+⍝Done

@@ -1,0 +1,21 @@
+ R←Test_UC_086(stopFlag batchFlag);⎕TRAP;buildList
+⍝ Exercise ]Tatin.LoadDependencies from within a namespace
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS''
+
+ ⍝#.Foo.fn←stop∘⎕THIS.{⍺ ∆UCMD'LoadDependencies ',⍵}
+ :With #.Foo
+     ∆res←⎕SE.UCMD'Tatin.LoadDependencies ',#.Tatin.CiderConfig.HOME,'/TestData/InstallFromList'
+ :EndWith
+ →T.GoToTidyUp'Dependencies loaded into #.Foo:'{⍺≢(≢⍺)↑⍵}∊#.Foo.∆res
+ buildList←∆JSON⊃⎕NGET #.Tatin.CiderConfig.HOME,'/TestData/InstallFromList/apl-buildlist.json'
+ →T.GoToTidyUp 9∨.≠⊃¨#.Foo.⎕NC¨{1↓1⊃('-'=⍵)⊂⍵}¨buildList.(principal/packageID)
+
+ R←T._OK
+
+∆TidyUp:
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

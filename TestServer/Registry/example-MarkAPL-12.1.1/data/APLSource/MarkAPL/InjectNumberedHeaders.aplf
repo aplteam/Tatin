@@ -1,0 +1,18 @@
+ {ns}←InjectNumberedHeaders ns;html;no;header;new;level;searchFor;ind;length;levelsToBeNumbered;i;bool
+ :If 0≠≢ns.headers  ⍝ Are their any headers at all?
+     levelsToBeNumbered←{1≠≢⍵:⍵ ⋄ ⍳⍵}ns.parms.numberHeaders
+ :AndIf ∨/levelsToBeNumbered∊ns.headers[;1] ⍝ Right levels?!
+     html←FlattenHTML ns.html
+     :For i :In ⍳≢ns.headers
+         (level header no)←ns.headers[i;1 3 4]
+         :If level∊levelsToBeNumbered
+             searchFor←A.DMB'>',header,'</h',(⍕level),'>'
+         :AndIf 1=+/bool←searchFor⍷html
+             ind←bool⍳1
+             length←¯1+1⍳⍨'</h'⍷{m←~GetMaskForCodeTags ⍵ ⋄ m\m/⍵}ind↓html
+             new←no,((0<≢no)/' '),header
+             html←(-ind)⌽new,length↓ind⌽html
+         :EndIf
+     :EndFor
+     ns.html←(⎕UCS 13)A.Split html
+ :EndIf

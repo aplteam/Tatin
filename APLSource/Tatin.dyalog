@@ -1,6 +1,6 @@
 :Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.78.1 - 2024-02-24
+⍝ * 0.79.0 - 2024-02-29
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -164,7 +164,7 @@
           c←⎕NS ⍬
           c.Name←'DeletePackages'
           c.Desc←'Delete one or more packages from a Tatin Registry'
-          c.Parse←'1'
+          c.Parse←'1 -force'
           r,←c
      
           c←⎕NS ⍬
@@ -236,6 +236,7 @@
               ⎕←'*** TC←#.Tatin.Client'
           :EndIf
           :If 0=TC.##.RumbaLean.⎕NC'DRC'
+          :OrIf {16::1 ⋄ 0⊣TC.##.RumbaLean.DRC.Version}''   ⍝ Can happen when the session was saved WITH Tatin, for example
               TC.##.Admin.InitConga ⍬
           :EndIf
           r←1
@@ -812,19 +813,19 @@
       :EndIf
     ∇
 
-    ∇ msg←DeletePackages Arg;qdmx;url;group;list;list2;flag;groups;packageIDs;b;ind;buff;msgs;statusCodes
+    ∇ msg←DeletePackages Arg;qdmx;url;group;list;list2;groups;packageIDs;b;ind;buff;msgs;statusCodes;force;flag
       (url packageIDs)←TC.SplitUrlAndPackageID TC.ReplaceRegistryAlias Arg._1
       'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert 0<≢url
       'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert'https://tatin.dev'{⍺≢(≢⍺)↑⍵}url
+      force←Arg.Switch'force'
       group←TC.Reg.GetGroupFromPackageID packageIDs
       flag←0
-      TC.EstablishEmptyPermanentConnections 1
       :If 0=≢group
+          TC.EstablishEmptyPermanentConnections 1
           TC.Connect2Client url
           list←{⍵[;1]}TC.ListPackages url
           list,←∪{⍵/⍨2>+\⍵='-'}¨,TC.ListDeprecated url
           list2←↑{'-'(≠⊆⊢)⍵}¨list
-          flag←1
           groups←∪list2[;1]
           :If 1=≢groups
               group←1⊃groups
@@ -847,21 +848,33 @@
           :EndIf
           packageIDs←group,'-',packageIDs
       :EndIf
-      :If ~TC.Reg.IsValidPackageID_Complete packageIDs
+      :If TC.Reg.IsValidPackageID_Complete packageIDs
+          packageIDs←⊆packageIDs
+      :Else
+          TC.EstablishEmptyPermanentConnections 1
           TC.Connect2Client url
           list←TC.ListVersions url,packageIDs
-          :If 1=≢list
-              :If 1 TC.C.YesOrNo'DeleteThisPkg@Are you sure you want to delete the package',CR,('   ',⊃list),CR,'from ',url,' ?'
-                  packageIDs←⊃list
-              :Else
-                  msg←'Cancelled by user' ⋄ →∆Quit
+          'No matching packages found'Assert 0<≢list
+          packageIDs←,list
+          flag←1
+          :If ~force
+              :If ~flag
+                  TC.Connect2Client url
+                  list←TC.ListVersions url,packageIDs
               :EndIf
-          :Else
-              ind←'SelectVersionsForDeletion@Select versions for deletion' 1 TC.C.Select,list
-              :If 0=≢ind
-                  msg←'Cancelled by user' ⋄ →∆Quit
+              :If 1=≢list
+                  :If 1 TC.C.YesOrNo'DeleteThisPkg@Are you sure you want to delete the package',CR,('   ',⊃list),CR,'from ',url,' ?'
+                      packageIDs←⊂⊃list
+                  :Else
+                      msg←'Cancelled by user' ⋄ →∆Quit
+                  :EndIf
               :Else
-                  packageIDs←,list[ind;]
+                  ind←'SelectVersionsForDeletion@Select versions for deletion' 1 TC.C.Select,list
+                  :If 0=≢ind
+                      msg←'Cancelled by user' ⋄ →∆Quit
+                  :Else
+                      packageIDs←,list[ind;]
+                  :EndIf
               :EndIf
           :EndIf
       :EndIf

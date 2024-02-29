@@ -1,0 +1,47 @@
+ r←Test_UC_081(stopFlag batchFlag);⎕TRAP;res1;res2;res3;res4;res5;rc;msg;en
+⍝ Exercise ]Tatin.LoadPackages
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP'
+
+ (rc msg res1)←∆UCMD'LoadPackages [local]aplteam-APLProcess-0.2.9 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg    ⍝ Error?! 1043 Conga?!  just do →⎕lc-1
+ →T.GoToTidyUp'0.2.9'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.APLProcess.##.TatinVars.HOME
+ msg Assert 0=rc
+ #.⎕EX'TEMP'
+
+ (rc msg res2)←∆UCMD'LoadPackages [local]aplteam-APLProcess-0.2 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.2.12'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.APLProcess.##.TatinVars.HOME
+ msg Assert 0=rc
+ #.⎕EX'TEMP'
+
+ (rc msg res3)←∆UCMD'LoadPackages [local]aplteam-APLProcess-0 #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'0.5.1'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.APLProcess.##.TatinVars.HOME
+ msg Assert 0=rc
+ #.⎕EX'TEMP'
+
+ (rc msg res4)←∆UCMD'LoadPackages [local]aplteam-APLProcess #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'1.0.0'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.APLProcess.##.TatinVars.HOME
+ msg Assert 0=rc
+ #.⎕EX'TEMP'
+
+ (rc msg res5)←∆UCMD'LoadPackages [local]aplteam-APLProcess #.TEMP'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'1.0.0'≢∆RemoveBuildFromVersion 2⊃#.TEMP.APLProcess.Version
+
+ r←T._OK
+
+∆TidyUp:
+ (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.APLProcess.##.TatinVars.HOME
+ msg Assert 0=rc
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

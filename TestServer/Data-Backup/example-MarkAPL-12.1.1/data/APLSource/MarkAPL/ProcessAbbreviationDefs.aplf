@@ -1,0 +1,13 @@
+ r←ProcessAbbreviationDefs ns;def;abbr;comment
+ r←0
+ :If '*['≡2⍴⊃ns.leadingChars
+     r←1
+     :If 0≠≢'\*\[[\p{L} \/\+-_=&]*\]:'⎕S 0⊣⊃ns.markdown      ⍝ Find identifiers
+         (abbr comment)←¯1 0↓¨':'A.Split 2↓⊃ns.markdown
+         (abbr comment)←A.DLB∘A.DTB¨abbr comment
+         ns.abbreviations⍪←abbr comment
+     :Else
+         ns.report,←⊂'Invalid abbreviation in line ',⍕ns.parms.lineNumberOffset+⊃ns.lineNumbers
+     :EndIf
+     ns←Drop ns
+ :EndIf

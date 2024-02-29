@@ -1,0 +1,1 @@
+This folder contains data that is deleted by some test cases and must be brought back afterwards.

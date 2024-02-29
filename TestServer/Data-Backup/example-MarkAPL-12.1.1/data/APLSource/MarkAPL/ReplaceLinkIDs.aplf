@@ -1,0 +1,7 @@
+ ns←ReplaceLinkIDs ns;mask;linkRefs
+⍝ Replace the [{any link text}][link id] references in the HTML against the real thing: <a href="...
+ :If 0≠≢ns.linkRefs
+ :AndIf 0<+/mask←∨/¨~GetMaskForCodeTags¨ns.html
+ :AndIf 0≠≢∊linkRefs←GetAllLinkRefs mask/ns.html
+     ns ReplaceLinkID¨linkRefs
+ :EndIf

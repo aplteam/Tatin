@@ -1,0 +1,20 @@
+ r←ProcessFootnoteDefs ns;b1;noOf;b2;def;id
+ r←0
+ :If 0≠≢'^\[\^[A-Za-z0-9_⍙∆]*\]:'⎕S 0⊣⊃ns.markdown       ⍝ Find identifiers
+     noOf←ScanForPara ns
+     noOf←1⍳⍨'[^'∘≡¨2↑¨(noOf-1)↑1↓ns.markdown
+     b1←'  '∘≡¨2↑¨noOf↓ns.markdown
+     b2←noOf↓ns.emptyLines
+     ns.noOf←noOf+(+/∧\b1)⌊1⍳⍨1 1⍷b2
+     def←A.DLB{(⊂{'  ',A.DLB ⍵↓⍨⍵⍳':'}⊃⍵),1↓⍵}ns.noOf↑ns.markdown
+ :AndIf ':'=1↑{⍵↓⍨⍵⍳']'}⊃ns.markdown
+     id←{⍵↑⍨¯1+⍵⍳']'}2↓⊃ns.markdown
+ :AndIf ∧/~AllWhiteSpaceChars∊id
+ :AndIf 0≠≢def←(-+/∧\0=⌽≢¨def)↓def
+ :AndIf 0≠≢def←{1↓¨(' '=⊃¨⍵)⊂⍵}' ',def
+ :AndIf 0≠≢def←CompilePara¨def
+ :AndIf 0≠≢def←⊃¨ns ProcessInlineMarkUp¨def
+     ns.footnoteDefs⍪←id def
+     ns←Drop ns
+     r←1
+ :EndIf

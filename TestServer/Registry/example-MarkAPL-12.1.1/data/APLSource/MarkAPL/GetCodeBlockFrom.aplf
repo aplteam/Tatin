@@ -1,0 +1,10 @@
+ r←indendations GetCodeBlockFrom list;fence;pattern;bool;noOf
+ r←''
+ fence←⊃(⊃list)~' '
+ :If fence∊'~`'
+     pattern←'^\s{0,',(⍕indendations),'}',fence,'{3,}'
+ :AndIf 0≠≢pattern ⎕S 0⊣⊃list
+ :AndIf 0<+/bool←pattern∘{⊃⍴⍺ ⎕S 0⍠('Mode' 'L')('Greedy' 0)⊣⍵}¨1↓list
+     noOf←2++/∧\~bool
+     r←noOf↑list
+ :EndIf

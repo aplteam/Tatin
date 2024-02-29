@@ -1,0 +1,14 @@
+ toc←CollectToc ns;ind;buff;level;caption;IDs;bool
+ toc←⍬
+ :If 0≠≢ind←'<h[1-6][ >]'⎕S 2⍠('Greedy' 0)⊣ns.html
+     level←{⊃A.ToNum 1↑2↓⊃'<h[1-6].*>'⎕S{⍵.Match}⍠('Greedy' 0)⊣⍵}¨ns.html[ind+1]
+     caption←{1↓¨(-1+≢'<hx>')↓¨{⊃'\>.*\</h[1-6]>'⎕S{⍵.Match}⍠('Greedy' 0)⊣⍵}¨⍵}ns.html[1+ind]
+     caption←{0=≢⍵:⍵ ⋄ '&lt;' '&gt;' '&amp;' '<code.*>' '</code>'⎕R('<' '>' '\&' '`' '`')⍠('Greedy' 0)('Mode' 'L')⊣⍵}¨caption
+     IDs←{⊃'data-id="[^"]*"'⎕S{⍵.Match}⊣⍵}¨ns.html[ind+1]
+     ((0=⊃¨1↑¨0⍴¨IDs)/IDs)←⊂''
+     toc←↓(level,[1.5]caption),IDs
+     (3⊃¨toc)←{0=≢⍵:⍵ ⋄ ¯1↓⍵↓⍨⍵⍳'"'}¨3⊃¨toc
+     bool←{2<+/{⍵∨≠\⍵}⍵='"'}¨IDs
+ :AndIf 0≠≢toc←bool⌿toc
+     toc,¨←ns.headerLineNos
+ :EndIf

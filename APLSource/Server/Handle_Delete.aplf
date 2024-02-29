@@ -3,8 +3,8 @@
  groupName←Reg.GetGroupName request.RequestTarget
  apiKey←'api-key'GetFromHeaders request.Headers
  :If G.Credentials AcceptCredential apiKey groupName
-     :If Reg.IsValidPackageID_Complete request.RequestTarget
-         response←DeletePackage request
+     :If ∧/Reg.IsValidPackageID_Complete¨{','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}request.RequestTarget
+         response←DeletePackages request
      :Else
          response←request Respond 400  ⍝ 400 ←→ Bad Request
          response.Content←'Neither valid package ID nor proper REST request'

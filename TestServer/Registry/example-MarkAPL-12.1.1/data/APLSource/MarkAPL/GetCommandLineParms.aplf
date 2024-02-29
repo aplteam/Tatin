@@ -1,0 +1,11 @@
+ GetCommandLineParms←{
+     ⍺←1↓2 ⎕NQ #'GetCommandLineArgs'
+     arg←⍺
+     r←⎕NS''
+     clp←{⍵/⍨'-'≠⊃¨⍵}arg
+     0=≢clp:r
+     0=≢clp←{⍵/⍨'='∊¨⍵}clp:r
+     clp←'='A.Split¨clp
+     _←r.{⍎⍺,'←',{'''',⍵,''''}⍣(0∊⊃⎕VFI ⍵)⊢⍵}/¨clp
+     r
+ }

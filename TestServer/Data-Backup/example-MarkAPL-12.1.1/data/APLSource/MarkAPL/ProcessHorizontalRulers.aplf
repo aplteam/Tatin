@@ -1,0 +1,13 @@
+ ProcessHorizontalRulers←{
+     ns←⍵
+     3<+/∧\' '=⊃ns.markdown:0              ⍝ Zero to a maximum of three leading white space characters are allowed.
+     sa←GetSpecialAttributes⊃ns.markdown
+     line←A.DLB⊃ns.markdown
+     line←sa DropSpecialAttributes line
+     0=+/∧/¨(⊂line~⎕UCS 9 10 11 12 13 32 133 160)='*-_':0
+     3>line+.=⊃line:0
+     0≠≢line~' ',⊃line:0
+     ns.html,←⊂'<hr',sa,'>'
+     ns←Drop ns
+     1
+ }

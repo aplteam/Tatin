@@ -1,0 +1,19 @@
+ r←ProcessReferenceLinks ns;line;id;url;alt;sa
+ r←0
+ :If '['=⊃⊃ns.leadingChars
+ :AndIf 0≠≢'\[[A-Za-z0-9_-]*\]:'⎕S 0⊣⊃ns.markdown      ⍝ Find identifiers
+     id←{1↓⍵↑⍨¯2+⍵⍳':'}⊃ns.markdown
+     url←A.DLB A.DTB{⍵↓⍨⍵⍳':'}⊃ns.markdown
+ :AndIf {~'='∊⍵↑⍨⌊/⍵⍳'?{'}url   ⍝ `?` parts URL parameter, `{` parts special attributes. Both may carry `=`!
+     sa←GetSpecialAttributes url
+     url←A.DTB sa DropSpecialAttributes url
+     :If 2=+/'"'=url
+         alt←{¯1↓⍵↓⍨⍵⍳'"'}url
+         url←A.DTB{⍵↑⍨¯1+⍵⍳'"'}url
+     :Else
+         alt←''
+     :EndIf
+     ns.linkRefs,←⊂id url alt sa
+     ns←Drop ns
+     r←1
+ :EndIf

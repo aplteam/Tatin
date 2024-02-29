@@ -1,0 +1,38 @@
+ r←Test_UC_088(stopFlag batchFlag);⎕TRAP;dir;src;zip;body;cfg;zipfile;parms;path2Namespace;rc;msg;res
+⍝ Load a package into a sub-namespace of the current namespace
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ dir←∆GetTempDir ⍬
+ (src zip)←(⊂dir,'/'),¨'src' 'reg'
+ F.MkDir src zip
+
+ body←':Namespace Constants' '∇r←PI' 'r←3.14' '∇' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Constants.apln'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.(group name version)←'Example' 'Constants' '1.2.3-test-1-a'
+ cfg.source←'Constants.apln'
+ cfg.api←'Constants'
+ cfg.os_win←1
+ TC.WritePackageConfigFile src cfg
+ parms←TC.CreateBuildParms src
+ parms.targetPath←zip
+ path2Namespace←⍕TC
+ zipfile←TC.BuildPackage parms
+
+ ((⊃⎕SI),'_Foo')⎕NS''
+ (rc msg res)←#.Tatin.TestCases.∆UCMD'LoadPackages file://',zipfile,' Foo'
+ Assert 0=rc
+ Assert 3=Foo.Constants.⎕NC'PI'
+ →T.PassesIf 3.14=Foo.Constants.PI
+ →T.PassesIf 0<≢Foo.Constants.##.TatinVars.URI
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕EX(⊃⎕SI),'_Foo'
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

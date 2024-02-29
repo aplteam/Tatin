@@ -1,0 +1,13 @@
+ r←Test_UC∆DeletePkg_901(stopFlag batchFlag);⎕TRAP;rc;msg;stop;res
+⍝ Exercise ]Tatin.DeletePackages on example-markapl-999 which does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg res)←stop ∆UCMD'DeletePackages [localhost]example-markapl-999'
+ →T.PassesIf rc=998
+ →T.PassesIf msg≡'No matching packages found'
+ →T.PassesIf 0=≢res
+
+ r←T._OK
+⍝Done

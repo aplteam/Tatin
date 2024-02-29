@@ -1,0 +1,18 @@
+ r←ScanForBlockQuotes ns;ns2;lc;b;max
+ r←0
+ ns2←⎕NS''
+ lc←↑2↑¨ns.leadingChars        ⍝ Leading two chars
+ max←¯1+ns.emptyLines⍳1        ⍝ An empty line marks the end
+ ns2.(markdown markdownLC leadingChars emptyLines withoutBlanks lineNumbers)←max↑¨ns.(markdown markdownLC leadingChars emptyLines withoutBlanks lineNumbers)
+ lc←max↑lc                     ⍝ Leading chars
+ :While 0<ns2.noOf←1 ScanForPara ns2
+     lc←ns2.noOf↓lc            ⍝ Leading chars
+     :If 0=≢lc                 ⍝ No blockquotes...
+     :OrIf '> '≢lc[1;]         ⍝ any more?
+         r+←ns2.noOf
+         :Leave                ⍝ No - we are done
+     :EndIf
+     ns2.noOf+←+/∧\lc∧.='> '   ⍝ Add them
+     r+←ns2.noOf
+     ns2←Drop ns2
+ :EndWhile

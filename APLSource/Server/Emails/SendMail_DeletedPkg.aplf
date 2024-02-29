@@ -20,8 +20,8 @@
      mailParms.To←⊃INI.Get'EMAIL:To'
      mailParms.CC←convert gatekeeper
      domain←⊃INI.Get'EMAIL:Domain'
-     mailParms.Subject←'Package was deleted on ',domain,': ',ID
-     mailParms.Body,←⎕UCS 13 10
+     mailParms.Subject←(⍕≢ID),' package got deleted on ',domain
+     mailParms.Body←(⊃{⍺,(⎕UCS 13),⍵}/ID),⎕UCS 13 10
      (rc msg log)←myConnection.Send mailParms
      :If 0=rc
          msg←'Email was sent successfully'

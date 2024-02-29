@@ -1,0 +1,18 @@
+ r←Test_UC∆DeletePkg_002(stopFlag batchFlag);⎕TRAP;rc;msg;res2;stop;res
+⍝ Exercise ]Tatin.DeletePackages on example-markapl-9
+⍝ Deletes all packages of example-markapl with major version number 9 (=4)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'DeleteThisPkg@' 'y'
+ ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'SelectVersionsForDeletion@' 'a'
+ (rc msg res)←stop ∆UCMD'DeletePackages [localhost]example-markapl-9'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp~' packages successfully deleted'{⍺≡(-≢⍺)↑⍵}res
+
+ r←T._OK
+
+∆TidyUp:
+ ⎕SE._Tatin.Client.CommTools.Cleanup
+⍝Done

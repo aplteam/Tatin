@@ -1,0 +1,20 @@
+ {ns}←{parms}Help recompileFlag;filename
+⍝ Displays the file MarkAPL_CheatSheet.html with your default browser.\\
+⍝ `recompileFlag`:
+⍝ * 0 shows the file as it stands.
+⍝ * 1 lets MarkAPL recompile it from MarkAPL_CheatSheet.md first.
+⍝ Returns either `⍬` or the `ns` namespace created by `Init` and modified by `Process`.
+⍝ However, if the markdown file does not exist then `recompileFlag` has no effect (is always 0).
+ :Access Public Shared
+ parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHelpParms}'parms'
+ :If ~⎕NEXISTS parms.homeFolder,'/Files/MarkAPL_CheatSheet.md'
+     recompileFlag←0
+ :EndIf
+ filename←parms.homeFolder,'/Files/MarkAPL_CheatSheet'
+ filename←recompileFlag AddAppropriateExtension filename
+ ns←CompileHelp filename recompileFlag parms
+ :If ¯1≠×recompileFlag  ⍝ This syntax is used only by `Make` and test cases, therefore it is not documented.
+ :AndIf parms.viewInBrowser
+     ns ShowHtml(⊃,/2↑⎕NPARTS filename),'.html'
+ :EndIf
+⍝Done

@@ -1,0 +1,26 @@
+ r←Test_UC_021(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res2;dir;stop;path
+⍝ Exercise ]Tatin.ListPackages on an install folder
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir''
+
+ :If 0<##.⎕NC'CiderConfig'
+     path←##.CiderConfig.HOME
+ :Else
+     path←F.PWD
+ :EndIf
+
+ stop←0
+ (rc msg res1)←stop ∆UCMD'ListPackages ',path,'/TestData/ListPackages'
+ →T.GoToTidyUp~0<≢res1
+ →T.GoToTidyUp~2=⍴⍴res1
+
+ (rc msg res2)←∆UCMD'ListPackages ',(dir,'')
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ →T.GoToTidyUp'No packages found'≢res2
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=1⊃F.RmDir dir

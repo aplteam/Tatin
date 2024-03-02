@@ -11,9 +11,12 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.105.0 from 2024-02-29
+## Version 0.105.0 from 2024-03-02
 
-* Potentially breaking change: the function `DeletePackage` was renamed: `DeletePackages`
+Potentially breaking changes: 
+
+* The function `DeletePackage` was renamed: `DeletePackages`
+* The user command `]DeletePackage` was renamed: `]DeletePackages`
 
 ## Version 0.104.1 from 2024-01-28
 
@@ -167,6 +170,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

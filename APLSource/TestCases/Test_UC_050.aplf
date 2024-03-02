@@ -1,19 +1,22 @@
- r←Test_UC_050(stopFlag batchFlag);⎕TRAP;res;msg;rc;path;stop;buff2;buff1
+ r←Test_UC_050(stopFlag batchFlag);⎕TRAP;res;msg;rc;path;stop
 ⍝ Exercise ]Tatin.CheckForLaterVersion with the -major flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  path←'./TestData/Packages/Update-Check-Multiple'
  stop←0
- buff1←TC.ListVersions'aplteam-Markapl'
- ∘∘∘
- buff2←TC.ListVersions'aplteam-EventCodes'
- ∘∘∘
+ res←TC.ListVersions'aplteam-Markapl'
+ →T.PassesIf 0<+/'C:/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ →T.PassesIf 0<+/'https://localhost/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+
+ res←TC.ListVersions'aplteam-EventCodes'
+ →T.PassesIf 0<+/'C:/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ →T.PassesIf 0<+/'https://localhost/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
 
  (rc msg res)←stop ∆UCMD'CheckForLaterVersion ',path,' -major'
  →T.PassesIf 0=rc
  →T.PassesIf 0=≢msg
  →T.PassesIf 7=≢res
- →T.PassesIf 2=+/⊃∨/∨/¨'aplteam-MarkAPL-11.0.3' 'aplteam-EventCodes-2.1.2'⍷¨⊂⎕FMT res
+ →T.PassesIf 2=+/⊃∨/∨/¨'aplteam-MarkAPL-12.1.1' 'aplteam-EventCodes-2.1.2'⍷¨⊂⎕FMT res
 
  r←T._OK

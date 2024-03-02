@@ -22,11 +22,16 @@
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.6.0+5' '2024-01-11'
+      r←'Tester2' '3.7.0-beta-1+5' '2024-03-02'
     ∇
 
     ∇ r←History
       :Access Public shared
+      ⍝ * 3.7.0 ⋄ 2024-03-02
+      ⍝   * The restriction that "," and "*" cannot go together has been lifted.
+      ⍝   * The restriction that `~` could only be used at the beginning has been lifted
+      ⍝   * Bug fixes
+      ⍝     *
       ⍝ * 3.6.0 ⋄ 2024-01-11
       ⍝   * Any a general `Initial` function as well as any group-specific one can now return a text vector
       ⍝     rather than a Boolean. Empty=success, otherwise it is treated as an error msg and reported.
@@ -35,26 +40,6 @@
       ⍝   * Shared method `Help` added that provides a full documentation of Tester2.
       ⍝ * 3.5.0 ⋄ 2023-04-28
       ⍝   * Helpers updated
-      ⍝ * 3.4.0 ⋄ 2023-04-10
-      ⍝   * Helper `RunTests` improved
-      ⍝   * `History now returns a useful result: its own comments
-      ⍝ * 3.4.0 ⋄ 2023-04-10
-      ⍝   * Shared method `EstablishHelpers` added which allows establishing the three helpers `RunTests`,
-      ⍝     `RunBatchTests` and `Prepare`.
-      ⍝   * Bug fix: when the tests were run in batch mode the log was mutilated
-      ⍝ * 3.3.1 ⋄ 2023-03-08
-      ⍝   * Bug fix: The QuitTests would not work with "Options > Disable traps in session" being ticked and
-      ⍝     therefore this is now temporarily disabled with 600⌶
-      ⍝ * 3.3.0 ⋄ 2023-02-09
-      ⍝   * Syntax of `RenameTestFnsTo` clarified and enhanced
-      ⍝   * `EditTestFunctions` now accepts a trailing wildcard (*)
-      ⍝   * ReadMe polished
-      ⍝   * New constant _SkippedByUser introduced
-      ⍝   * Custom return codes are now fully reported
-      ⍝   * Tester2 now depends on CommTools rather than having a private version of `YesOrNo`
-      ⍝   * Bug fixes
-      ⍝     * `_NotImplemented` was not correctly reported
-      ⍝     * In case `Initial` was not executed `Cleanup` should not be executed either
       ⍝\\
       ⍝ For a full history (including older versions) see <https://github.com/aplteam/Tester2/releases>
       r←↑{⍵↓⍨+/∧\∧⌿(↑⍵)=' '}{⍵↓⍨⍵⍳'⍝'}¨{⍵/⍨'⍝'=⊃¨⍵}{⍵↓⍨+/∧\(↑⍵)=' '}¨1↓⎕NR⊃⎕SI
@@ -650,15 +635,12 @@
       ShowLog report
     ∇
 
-    ∇ ProcessGroupAndTestCaseNumbers(ref ps);rc;buff;isWithout
+    ∇ ProcessGroupAndTestCaseNumbers(ref ps);rc;buff
       ps.group←''
       :If 0≠≢ps.testCaseNos
           :If ' '=1↑0⍴∊ps.testCaseNos
               :If 0 1∊⍨≡ps.testCaseNos
                   ps.group←ps.testCaseNos
-                  :If '~'≠1⍴ps.group
-                      '"~" must be the very first character in a group definition'Assert~'~'∊1↓ps.group
-                  :EndIf
                   ps.testCaseNos←⍬
               :Else
                   ps.group←1⊃ps.testCaseNos
@@ -669,79 +651,78 @@
           :EndIf
           :If 0≠≢ps.group
               :If ','∊ps.group
-              :AndIf '*'∊ps.group
-                  'You cannot mix "*" (wildcard) with ","'⎕SIGNAL 11
-              :EndIf
-              isWithout←'~'=1↑ps.group
-              ps.group←isWithout↓ps.group
-              :If isWithout
-                  :If ','∊ps.group
-                      ps.group←','(≠⊆⊢)ps.group
-                      ps.list/⍨←⊃∧/ps.list∘{~({⍵/⍨2>+\⍵='_'}¨⍺)≡¨⊂'Test_',⍵}¨ps.group
-                  :Else
-                      :If '*'=¯1↑ps.group
-                          ps.list←(~('Test_',¯1↓ps.group){⍺∘≡¨(≢⍺)↑¨⍵}ps.list)/ps.list
-                      :Else
-                          buff←'Test_'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}ps.group
-                          ps.list←(~({⍵/⍨2>+\⍵='_'}¨ps.list)≡¨⊂'Test_',ps.group)/ps.list
-                      :EndIf
-                  :EndIf
+                  ps.group←','(≠⊆⊢)ps.group
               :Else
-                  :If ','∊ps.group
-                      ps.group←','(≠⊆⊢)ps.group
-                      ps.group←'Test_'∘{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}¨ps.group
-                      buff←'' ''
-                      buff,¨←{ref ProcessGroup(ps.list)⍵}¨ps.group
-                      buff←↓⍉↑buff
-                      ps.list←⊃,/1⊃buff
-                  :Else
-                      ps.group←'Test_'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}ps.group
-                      ps.(list group)←ref ProcessGroup ps.(list group)
-                  :EndIf
+                  ps.group←,⊆ps.group
               :EndIf
+              ref ProcessGroup ps
           :EndIf
-          :If 0=≢ps.list
-              rc←0
-              :Return
-          :EndIf
-          :If (,0)≡,ps.testCaseNos
-              ps.testCaseNos←¯1
-          :Else
-              :If 0≠≢ps.testCaseNos
-                  :If 0=≢ps.group
-                      :If 0=≢ps.list←(1={'_'+.=⍵}¨ps.list)/ps.list
-                          rc←0
-                          :Return
-                      :EndIf
-                  :EndIf
-                  ps.list←((⊃¨GetTestNo¨ps.list)∊|ps.testCaseNos)/ps.list   ⍝ Now select the numbers
-                  :If 0=≢ps.list
+      :EndIf
+      :If 0=≢ps.list
+          rc←0
+          :Return
+      :EndIf
+      :If (,0)≡,ps.testCaseNos
+          ps.testCaseNos←¯1
+      :Else
+          :If 0≠≢ps.testCaseNos
+              :If 0=≢ps.group
+                  :If 0=≢ps.list←(1={'_'+.=⍵}¨ps.list)/ps.list
                       rc←0
                       :Return
                   :EndIf
               :EndIf
-          :EndIf
-      :EndIf
-      ps.groups←∪(≢'Test_')GetGroupName¨ps.list
-    ∇
-
-    ∇ (list group)←ref ProcessGroup(list group);lookFor;buff
-      :If 3=ref.⎕NC'Test_'{((⍺≢(≢⍺)↑⍵)/⍺),⍵}group
-          list←,⊂'Test_',group
-          group←''
-      :Else
-          lookFor←{(('Test_'{⍺/⍨⍺≢(≢⍺)↑⍵}⍵)),⍵}group
-          :If '*'=¯1↑lookFor
-              lookFor←¯1↓lookFor
-              list←(∨/¨(⊂lookFor)⍷¨list)/list  ⍝ First restrict to group
-          :Else
-              :If 0=≢buff←(∨/¨(⊂lookFor)⍷¨list)/list  ⍝ First restrict to group
-                  list←''
-              :Else
-                  list←buff/⍨lookFor∘≡¨{⍵↓⍨-(⌽⍵)⍳'_'}¨buff
+              ps.list←((⊃¨GetTestNo¨ps.list)∊|ps.testCaseNos)/ps.list   ⍝ Now select the numbers
+              :If 0=≢ps.list
+                  rc←0
+                  :Return
               :EndIf
           :EndIf
       :EndIf
+      ps.groups←∪GetGroupName¨{⍵/⍨'_'∊¨⍵}ps.list
+      ps.group←ps.group[⍋ps.group]
+      ps.list←ps.list[⍋ps.list]
+     ⍝Done
+    ∇
+
+    ∇ {r}←ref ProcessGroup ps;list;groups;grp;collect;without
+    ⍝ `def` is a group definition or a specific test case.
+    ⍝ This function
+      r←⍬
+      ps.group←ps.group[⍋'~'=⊃¨ps.group]    ⍝ Make sure "without" is handled at the very end
+      list←Remove∆Test_¨ps.list             ⍝ All
+      groups←Remove∆Test_¨ps.group
+      collect←''
+      :If 1=≢groups
+      :AndIf '~'=⊃⊃groups
+          collect←(≢'Test_')↓¨' '~⍨¨↓'Test_'{⍵⌿⍨((≢⍺)↑[2]⍵)∧.=⍺}'T'ref.⎕NL 3  ⍝ All
+      :Else
+          :For grp :In groups                   ⍝ Loops over group definitions and collect hits
+              :If '~'=1⍴grp
+                  :Leave
+              :EndIf
+              :If '*'∊grp
+                  collect,←(list{(↑⍺)[;⍳≢⍵]∧.=⍵}grp~'*')/list
+              :ElseIf ∧/grp∊⎕D                  ⍝ Specific test case rather than group?
+                  collect,←((↑list)[;⍳≢grp]∧.=grp)/list
+              :ElseIf '_'∊grp
+              :AndIf ∧/({⍵↓⍨⍵⍳'_'}grp)∊⎕D
+                  collect,←(list≡¨⊂grp)/list
+              :Else
+                  collect,←(({~'_'∊⍵:'' ⋄ ⍵↑⍨¯1+⍵⍳'_'}¨list)≡¨⊂grp)/list
+              :EndIf
+          :EndFor
+      :EndIf
+      without←{⍵/⍨'~'=⊃¨⍵}groups
+      :If 0<≢collect
+          :For grp :In without                  ⍝ Loops over "without" definitions and removes stuff
+              :If '*'∊grp
+                  collect←(~collect{(↑⍺)[;⍳≢⍵]∧.=⍵}grp~'~*')/collect
+              :EndIf
+              collect←((~collect{((≢⍵)↑[2](↑⍺))∧.=⍵}1↓grp))/collect
+          :EndFor
+      :EndIf
+      ps.list←'Test_'∘,¨∪collect
     ∇
 
     ∇ ProcessTestCases(ref ps);cw;max;noOf;length2;length;i;testFns;currentGroup;testNo;continueFlag;rc;comment;desc;marker
@@ -767,7 +748,8 @@
       :Repeat
           i+←1
           testFns←i⊃ps.list
-          currentGroup←GetGroupName testFns
+          currentGroup←GetGroupName Remove∆Test_ testFns
+          currentGroup←(~∧/currentGroup∊⎕D)/currentGroup  ⍝ If it's just digits its a number rather than a group name
           testNo←GetTestNo testFns
           :Trap QuitEvent,ps.trapFlag/0
               :If ps.guiFlag
@@ -1300,7 +1282,7 @@
 ⍝ If `groupName` is not empty then it will return only the members of that group (case dependent) or,
 ⍝ if the expression carries a wildcard, all groups matching the given string.\\
 ⍝ `groupName` may or may not start with `Test_`.\\
-⍝ If the optional left argument (`numbers`)" is defined only those numbers are printed.
+⍝ If the optional left argument (`numbers`)" is defined only those numbers are returned.
       :Access Public Instance
       x←{(0<⎕NC ⍵):⍎⍵ ⋄ ⍬}'x'
       :If (≡x)∊0 1
@@ -1630,8 +1612,7 @@
       }
 
       GetGroupName←{
-          ⍺←≢'Test_'
-          ⍺{⍵↓⍨-'_'⍳⍨⌽⍵}⍺↓⍵
+          {⍵↓⍨-'_'⍳⍨⌽⍵}Remove∆Test_¨⍵
       }
 
     ∇ r←i CheckCustomDef msg;list
@@ -1715,6 +1696,7 @@
     ∇ {(continueFlag i noOf)}←{force}HandleInitialize(ref ps currentGroup i noOf);at;result;buff
       force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
       continueFlag←0
+      currentGroup←Remove∆Test_ currentGroup
       :If 0<≢currentGroup
       :AndIf force∨currentGroup≢⊃⌽ps.processedGroups
           ps.processedGroups,←⊂currentGroup
@@ -1762,8 +1744,9 @@
 
     ∇ {r}←HandleCleanup(ref ps currentGroup i);at
       r←0
-      :If i=≢ps.list                                                ⍝ Last one?
-      :OrIf currentGroup{0=≢⍺:0 ⋄ ⍺≢GetGroupName(i+1)⊃⍵}ps.list     ⍝ Group change?!
+      currentGroup←Remove∆Test_ currentGroup
+      :If i=≢ps.list                                                            ⍝ Last one?
+      :OrIf currentGroup{0=≢⍺:0 ⋄ ⍺≢Remove∆Test_ GetGroupName(i+1)⊃⍵}ps.list    ⍝ Group change?!
           :If 3=ref.⎕NC'Cleanup_',currentGroup
               :If 3⊃⌽(8⍴2)⊤ps.stopFlag
                   (∪(⎕STOP 1⊃⎕SI),∆stop10,∆stop11)⎕STOP 1⊃⎕SI
@@ -1771,7 +1754,7 @@
                   ((⎕STOP 1⊃⎕SI)~,∆stop10,∆stop11)⎕STOP 1⊃⎕SI
               :EndIf
               at←1⊃ref.⎕AT'Cleanup_',currentGroup
-              :If (2⊃at)∊1 ¯2 ⍝ Accepts a right argument (1=monadic, ¯2=ambivalent)?
+              :If (2⊃at)∊1 ¯2                                                   ⍝ Accepts a right argument (1=monadic, ¯2=ambivalent)?
      ∆stop10:     ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Cleanup_',currentGroup
               :Else
      ∆stop11:     ref.⍎'Cleanup_',currentGroup

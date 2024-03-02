@@ -155,7 +155,7 @@ Use `]Cider.OpenProject` to do this. Once the project has been opened, you can a
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite
 ```
 
-Note that by default the test cases use port 5001 for communication between the local Test Server and the client. Change the INI files for both server and client if that does not work for you.
+Note that by default the test cases use port 5001 for communication between the client and the Test Server that is part of Tatin. Change the INI files for both server and client if that does not work for you.
 
 When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!". (Windows only, elsewhere you must start the server yourself)
 
@@ -415,6 +415,7 @@ There is a function that creates a single HTML file from all the Tatin markdown 
 ```
 
 Now open that file with the word processor of your choice and use its spell-checking capabilities.
+
 
 
 

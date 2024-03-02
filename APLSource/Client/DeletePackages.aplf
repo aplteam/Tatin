@@ -1,10 +1,9 @@
- (statusCodes errMsgs)←DeletePackages urls_;url;statusCode;errMsg;list;urls;flag;b
-⍝ Deletes or more packages.\\
-⍝ Very package must be defined precisely.\\
+ (statusCode errMsg)←DeletePackages urls_;url;list;urls;flag;b
+⍝ Deletes one or more packages.\\
+⍝ Every package must be defined precisely.\\
 ⍝ Whether deleting a package is possible depends on the "delete" policy operated by the server in question.\\
 ⍝ On the server side the delete policy is defined by the INI setting [CONFIG]DeletePackages ("None", "JustBetas", "Any").
  urls←⊆urls_
- statusCodes←⍬ ⋄ errMsgs←''
  urls←SplitUrlAndPackageID∘ReplaceRegistryAlias¨urls
  :If 0∊b←Reg.IsValidPackageID_Complete¨2⊃¨urls
      ('Incomplete package IDs: ',⊃{⍺,', ',⍵}/(~b)/2⊃¨urls)Assert∧/b
@@ -12,10 +11,6 @@
  (1⊃¨urls)←F.EnforceSlash¨1⊃¨urls
  flag←∨/Reg.IsHTTP¨urls
  {}EstablishEmptyPermanentConnections⍣flag⊢0
- :For url :In urls
-     (statusCode errMsg)←DeletePackage_ url
-     statusCodes,←statusCode
-     errMsgs,←⊂errMsg
- :EndFor
- {}CloseConnections⍣flag⊢0
+ (statusCode errMsg)←DeletePackage_(⊃⊃urls)(⊃{⍺,',',⍵}/2⊃¨urls)
+ {}CloseConnections⍣flag⊢1
 ⍝Done

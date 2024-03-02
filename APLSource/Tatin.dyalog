@@ -1,6 +1,6 @@
-:Namespace Tatin
+﻿:Namespace Tatin
 ⍝ The ]Tatin user commands for managing packages.\\
-⍝ * 0.79.0 - 2024-02-29
+⍝ * 0.77.2 - 2024-01-26
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -162,9 +162,9 @@
           r,←c
      
           c←⎕NS ⍬
-          c.Name←'DeletePackages'
-          c.Desc←'Delete one or more packages from a Tatin Registry'
-          c.Parse←'1 -force'
+          c.Name←'DeletePackage'
+          c.Desc←'Delete a package from a Tatin Registry'
+          c.Parse←'1'
           r,←c
      
           c←⎕NS ⍬
@@ -236,7 +236,6 @@
               ⎕←'*** TC←#.Tatin.Client'
           :EndIf
           :If 0=TC.##.RumbaLean.⎕NC'DRC'
-          :OrIf {16::1 ⋄ 0⊣TC.##.RumbaLean.DRC.Version}''   ⍝ Can happen when the session was saved WITH Tatin, for example
               TC.##.Admin.InitConga ⍬
           :EndIf
           r←1
@@ -457,7 +456,7 @@
           :If 1 TC.YesOrNo msg
               version←TC.UpdateClient tag folder
               :If 0<≢version
-                  {}⎕SE.UCMD'Open ','"',folder,'/Assets/docs/ReleaseNotes.html"'
+                  ⎕CMD'"',folder,'/Assets/docs/ReleaseNotes.html"'
                   r←'Tatin updated on disk to ',version
                   r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
               :EndIf
@@ -813,88 +812,17 @@
       :EndIf
     ∇
 
-    ∇ msg←DeletePackages Arg;qdmx;url;group;list;list2;groups;packageIDs;b;ind;buff;msgs;statusCodes;force;flag
-      (url packageIDs)←TC.SplitUrlAndPackageID TC.ReplaceRegistryAlias Arg._1
-      'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert 0<≢url
-      'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert'https://tatin.dev'{⍺≢(≢⍺)↑⍵}url
-      force←Arg.Switch'force'
-      group←TC.Reg.GetGroupFromPackageID packageIDs
-      flag←0
-      :If 0=≢group
-          TC.EstablishEmptyPermanentConnections 1
-          TC.Connect2Client url
-          list←{⍵[;1]}TC.ListPackages url
-          list,←∪{⍵/⍨2>+\⍵='-'}¨,TC.ListDeprecated url
-          list2←↑{'-'(≠⊆⊢)⍵}¨list
-          groups←∪list2[;1]
-          :If 1=≢groups
-              group←1⊃groups
-          :Else
-              b←list2[;2]≡¨⊂{⍵↓⍨⍵⍳'-'}TC.Reg.RemoveVersionNumber'dummy-',packageIDs
-              :If 0=+/b
-                  msg←'Package(s) not found' ⋄ →∆Quit
-              :EndIf
-              list2←b⌿list2
-              :If 1=+/b
-                  group←⊃list2
-              :Else
-                  ind←'SelectGroup@Select group'TC.C.Select list2[;1]
-                  :If 0=≢ind
-                      msg←'Cancelled by user' ⋄ →∆Quit
-                  :Else
-                      group←ind⊃list2[;1]
-                  :EndIf
-              :EndIf
-          :EndIf
-          packageIDs←group,'-',packageIDs
-      :EndIf
-      :If TC.Reg.IsValidPackageID_Complete packageIDs
-          packageIDs←⊆packageIDs
-      :Else
-          TC.EstablishEmptyPermanentConnections 1
-          TC.Connect2Client url
-          list←TC.ListVersions url,packageIDs
-          'No matching packages found'Assert 0<≢list
-          packageIDs←,list
-          flag←1
-          :If ~force
-              :If ~flag
-                  TC.Connect2Client url
-                  list←TC.ListVersions url,packageIDs
-              :EndIf
-              :If 1=≢list
-                  :If 1 TC.C.YesOrNo'DeleteThisPkg@Are you sure you want to delete the package',CR,('   ',⊃list),CR,'from ',url,' ?'
-                      packageIDs←⊂⊃list
-                  :Else
-                      msg←'Cancelled by user' ⋄ →∆Quit
-                  :EndIf
-              :Else
-                  ind←'SelectVersionsForDeletion@Select versions for deletion' 1 TC.C.Select,list
-                  :If 0=≢ind
-                      msg←'Cancelled by user' ⋄ →∆Quit
-                  :Else
-                      packageIDs←,list[ind;]
-                  :EndIf
-              :EndIf
-          :EndIf
-      :EndIf
-     
+    ∇ msg←DeletePackage Arg;path;msg;statusCode;qdmx
+      path←Arg._1
       :Trap ErrNo
-          (statusCodes msgs)←TC.DeletePackages url{⍺∘,¨⊆⍵}packageIDs
+          (statusCode msg)←TC.DeletePackage path
       :Else
-          TC.CloseConnections 1
           qdmx←⎕DMX
           CheckForInvalidVersion qdmx
-          0 Assert⍨'Deleting package',(()/'s'),' failed: ',qdmx.EM,' (rc=',(⍕qdmx.EN),')'
       :EndTrap
-      :If statusCodes∧.=200
-          msg←{(⍕⍵),' package',(((1<⍵)/'s')),' successfully deleted'}≢packageIDs
-      :Else
-          msg←↑(⊂¨url{⍺∘,¨⊆⍵}packageIDs),¨(⊂∘,¨statusCodes),¨⊂¨msgs
+      :If 200=statusCode
+          msg←'Package was successfully deleted'
       :EndIf
-     
-     ∆Quit:
-      TC.CloseConnections 1
      ⍝Done
     ∇
 
@@ -1115,7 +1043,7 @@
                           packageID←2⊃⎕NPARTS source
                           :If TC.C.YesOrNo packageID,' already published on ',url_,'; overwrite?'
                               firstFlag←0
-                              (rc msg)←⎕SE.Tatin.DeletePackages url,packageID
+                              (rc msg)←⎕SE.Tatin.DeletePackage url,packageID
                               :If 200=rc
                                   →∆Again
                               :Else
@@ -1892,9 +1820,9 @@
           :Case ⎕C'CheckForLaterVersion'
               r,←⊂'Check whether for the installed packages a later versions are available.'
               r,←'' '  ]Tatin.CheckForLaterVersion <install-folder> -major -dependencies'
-          :Case ⎕C'DeletePackages'
-              r,←⊂'Delete a given package (or packages) from a Tatin Registry.'
-              r,←'' '  ]Tatin.DeletePackages <([Registry-alias|Registry-URL|file://package-folder)package-ID)>'
+          :Case ⎕C'DeletePackage'
+              r,←⊂'Delete a given package from a Tatin Registry.'
+              r,←'' '  ]Tatin.DeletePackage <([Registry-alias|Registry-URL|file://package-folder)package-ID)>'
           :Case ⎕C'GetDeletePolicy'
               r,←⊂'Request which "Delete" policy is operated by a Registry.'
               r,←'' '  ]Tatin.GetDeletePolicy [<Registry-URL>] -check'
@@ -2232,9 +2160,12 @@
               r,←⊂' * ]Tatin.ListVersions {package}-{major}'
               r,←⊂' * ]Tatin.ListVersions {package}-{major}.{minor}'
               r,←⊂'In all these cases a list of packages is returned, possibly empty.'
-              r,←⊂'Note that case does not matter.'
               r,←⊂''
-              r,←⊂'If no Registry is specified all Registries with a priority greater than 0 are scanned.'
+              r,←⊂'Note that case does not matter, meaning that a package MyGroup-MyPkg can be specified'
+              r,←⊂'as mygroup-mypkg or MYGROUP-MYPKG, it does not matter.'
+              r,←⊂''
+              r,←⊂'You may not specify a Registry at all; in that case all Registries with a priority greater'
+              r,←⊂'than zero are scanned.'
               r,←⊂'Finally you may specify a ? (or [?]): then you will be prompted with a list of all known'
               r,←⊂'Registries for selecting one.'
               r,←⊂''
@@ -2293,23 +2224,20 @@
               r,←⊂''
               r,←⊂'-dependencies By default only principal packages are checked.'
               r,←⊂'              You may include dependencies by specifying this flag.'
-          :Case ⎕C'DeletePackages'
-              r,←⊂'Deletes one or more packages.'
+          :Case ⎕C'DeletePackage'
+              r,←⊂'Deletes a given package.'
               r,←⊂''
               r,←⊂'Takes one of:'
-              r,←⊂' * URL specifying a Tatin Registry, followed by a package ID'
-              r,←⊂' * [alias] specifying a Tatin Registry, followed by a package ID'
+              r,←⊂' * URL specifying a Tatin Registry, followed by a full package ID'
+              r,←⊂' * [alias] specifying a Tatin Registry, followed by a full package ID'
               r,←⊂' * Folder hosting a package; must start with file://'
               r,←⊂'   The folder must contain a file apl-package.json, otherwise an error is thrown'
               r,←⊂''
-              r,←⊂'Notes:'
-              r,←⊂' * DeletePackages acts on ALL packages, including deprecated ones'
-              r,←⊂' * If no group name is specified and the package name is used in more than one group the'
-              r,←⊂'   user will be asked from which group the package shall be deleted'
-              r,←⊂' * If no or an incomplete version number is specified, the user will be presented with a'
-              r,←⊂'   list of package IDs'
-              r,←⊂''
-              r,←⊂'Whether packages can be deleted depends on the delete policy operated by a given Registry.'
+              r,←⊂'Whether a package can be deleted depends on the delete policy operated by a given Registry.'
+              r,←⊂'A Registry may allow...'
+              r,←⊂' * no deletion at all'
+              r,←⊂' * deletion of beta versions only'
+              r,←⊂' * everything'
           :Case ⎕C'GetDeletePolicy'
               r,←⊂'Requests which "Delete" policy is operated by a Registry.'
               r,←⊂'Return one of "None", "Any", "JustBetas":'
@@ -2407,7 +2335,7 @@
           :Else
               r←'Unknown command: ',Cmd
           :EndSelect
-          :If (⊂⎕C Cmd)∊⎕C¨'LoadPackages' 'InstallPackages' 'DeletePackages' 'ReInstallDependencies' 'Ping'
+          :If (⊂⎕C Cmd)∊⎕C¨'LoadPackages' 'InstallPackages' 'DeletePackage' 'ReInstallDependencies' 'Ping'
           :AndIf (⎕C∊r)≢⎕C'Unknown command: ',Cmd
               r,←''(']',Cmd,' -??? ⍝ Enter this for examples ')
           :EndIf
@@ -2460,14 +2388,11 @@
           :Case ⎕C'ListTags'
           :Case ⎕C'Init'
           :Case ⎕C'CheckForLaterVersion'
-          :Case ⎕C'DeletePackages'
+          :Case ⎕C'DeletePackage'
               r,←⊂'Examples:'
-              r,←⊂'  ]Tatin.DeletePackages https:/tatin.dev/group-name-1.0.0 ⍝ Registry URL & package ID'
-              r,←⊂'  ]Tatin.DeletePackages [test-tatin]group-name-1.0.0      ⍝ Registry alias & package ID'
-              r,←⊂'  ]Tatin.DeletePackages [test-tatin]name-1.0.0            ⍝ No group name'
-              r,←⊂'  ]Tatin.DeletePackages [test-tatin]name-1                ⍝ All packages with major=1'
-              r,←⊂'  ]Tatin.DeletePackages [test-tatin]name                  ⍝ All packages with that name'
-              r,←⊂'  ]Tatin.DeletePackages C:\My\Registry\group-name-1.0.0   ⍝ Local package'
+              r,←⊂'  ]Tatin.DeletePackage https:/tatin.dev/group-name-1.0.0 ⍝ Registry URL & package ID'
+              r,←⊂'  ]Tatin.DeletePackage [test-tatin]group-name-1.0.0      ⍝ Registry alias & package ID'
+              r,←⊂'  ]Tatin.DeletePackage C:\My\Registry\group-name-1.0.0   ⍝ Local package'
           :Case ⎕C'GetDeletePolicy'
               r←'Not ready yet'
           :Case ⎕C'Documentation'
@@ -2718,7 +2643,6 @@
           :Trap ErrNo
               v←⊃TC.UpdateClient 1
               ⎕←'Tatin client updated to ',v,'; please execute the last Tatin user command again'
-              ⎕←'Workspace has not been updated. Start a new instance of Dyalog.'
           :Else
               dmx←⎕DMX
               :If ∨/'Check ⎕EXCEPTION for details'⍷dmx.Message

@@ -7,11 +7,8 @@
  ⎕IO←1 ⋄ ⎕ML←1
  (testFlag trapFlag)←2↑y,(≢y)↓¯1 ¯1
  args←2 ⎕NQ #'GetCommandLineArgs'
- :If ∨/bool←'SERVERPATH='∘{⍺≡1 ⎕C(≢⍺)↑⍵}¨args
-     iniFile←((1+≢'serverPath')↓args⊃⍨⍸bool),'/Server/server.ini'
- :Else
-     iniFile←'./TestServer/Server/server.ini'
- :EndIf
+ 'No command line parameter "SERVERPATH" found - cannot continue'Assert∨/bool←'SERVERPATH='∘{⍺≡1 ⎕C(≢⍺)↑⍵}¨args
+ iniFile←((1+≢'serverPath')↓args⊃⍨⍸bool),'/Server/server.ini'
  r←iniFile(PrepareTestServer ##.Plodder.Run)testFlag trapFlag
  ##.Server.∆SHUTDOWN←0
 ⍝Done

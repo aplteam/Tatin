@@ -28,7 +28,7 @@
  oldPolicy←∆SetServerPolicy'JustBetas'
  (rc msg)←TC.DeletePackages((TC.ReplaceRegistryAlias'[localhost]')),packageID
  →T.GoToTidyUp rc≠405
- →T.GoToTidyUp'Server: This server allows only beta packages to be deleted'≢msg
+ →T.GoToTidyUp~∧/∨/¨'test-Package_A-0.1.0' 'Not a beta version but the server policies allows deletion of betas only'⍷¨⊂msg
 
  r←T._OK
 
@@ -36,5 +36,6 @@
  Assert 0=⊃F.RmDir dir
  F.DeleteFile(739⌶0),'/',packageID,'.zip'
  Assert 0=⊃F.RmDir serverPath,'/',packageID
+ ∆RecompileIndexOnServer
  ∆SetServerPolicy oldPolicy
 ⍝Done

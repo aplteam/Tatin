@@ -5,8 +5,8 @@
 
  stop←0
  (rc msg res)←stop ∆UCMD'DeletePackages [localhost]example-markapl-999'
- →T.PassesIf rc=998
- →T.PassesIf msg≡'No matching packages found'
+ →T.PassesIf rc≠0
+ →T.PassesIf∨/'No matching packages found'⍷msg
  →T.PassesIf 0=≢res
 
  r←T._OK

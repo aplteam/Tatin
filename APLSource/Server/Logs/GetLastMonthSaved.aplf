@@ -1,0 +1,8 @@
+ r←GetLastMonthSaved folder;list
+ :If 0<≢list←##.F.ListFiles folder,'usage-data-????-*.csv'     ⍝ All monthly data saved
+     list←{⊃,/1↓⎕NPARTS ⍵}¨list
+     r←##.A.ToNum(⊃list[≢list])[1 2+≢'usage-data-2024-']  ⍝ Last month saved
+ :Else
+     r←0
+ :EndIf
+⍝Done

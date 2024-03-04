@@ -13,8 +13,6 @@
      P.WindowsEventLog'Shutting down'
      P.G.Server Log'Tatin Server is shutting down'
      :If ~A.IsDevelopment                 ⍝ Will ⎕OFF in runtime
-         ⎕TRAP←0 'S'
-         ∘∘∘ ⍝ Intentional
      :EndIf
  :ElseIf ¯1≠∆SHUTDOWN
      :If 0<⎕NC'∆WS_HASH'
@@ -22,7 +20,7 @@
      :EndIf
      :If F.IsFile G.RegistryPath,'/Credentials.txt'
      :OrIf G.CredentialsTimestamp≢Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.RegistryPath,'/Credentials.csv'
-         G←ProcessCredentials G         ⍝  It has changed, so we read it again
+         G←ProcessCredentials G         ⍝  Credentials have changed, so we read them again
      :EndIf
      savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
      :If G.INI.EstablishedAt<savedAt
@@ -39,7 +37,7 @@
          :EndIf
          Log msg
      :EndIf
-     Logs.CheckLogFile∊P.LogFolder
+     Logs.ProcessLogFile(∊P.LogFolder)(3↑⎕TS)
      ExecuteMaintenanceCode G
  :EndIf
 ⍝Done

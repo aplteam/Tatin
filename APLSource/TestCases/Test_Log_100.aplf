@@ -1,0 +1,23 @@
+ r←Test_Log_100(stopFlag batchFlag);⎕TRAP;tempDir;msg;rc;L;list;expected
+⍝ Uses data from mid 2022 until 2024-03 to simulate turn of year
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir'-Log/'
+ rc←'Create!'F.CheckPath tempDir
+ Assert rc
+ tempDir ⎕NCOPY'./TestData/LogFile/app-log.txt'
+ L←##.Server.Logs
+ L.ProcessLogFile tempDir(2024 3 4)
+
+ list←{⊃,/1↓⎕NPARTS ⍵}¨F.ListFiles tempDir,'usage-data-20*'
+ →T.GoToTidyUp 3≠≢list
+ expected←'usage-data-2022.csv' 'usage-data-2023.csv' 'usage-data-2024-02.csv'
+ →T.GoToTidyUp expected≢list
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+⍝Done

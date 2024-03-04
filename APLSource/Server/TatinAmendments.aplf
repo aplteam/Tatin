@@ -7,12 +7,6 @@
  P←##.Plodder
  P.G.RegistryPath←F.ExpandPath⊃P.G.INI.Get'CONFIG:Registry'
  P.LogFolder←P.G.INI.Get'LOGGING:Folder'
- :If ~F.IsFile(∊P.LogFolder),'year'
-     (⊂⍕1⊃⎕TS)⎕NPUT(∊P.LogFolder),'year'
- :EndIf
- :If ~F.IsFile(∊P.LogFolder),'month'
-     (⊂¯2↑'00',⍕2⊃⎕TS)⎕NPUT(∊P.LogFolder),'month'
- :EndIf
  P.G←ProcessCredentials P.G
  :If 0=P.G.INI.Exist'CONFIG:GroupHomePages'
      0 P.G.INI.Put'CONFIG:GroupHomePages'  ⍝ INI entry was created in 0.72.0, and the default is 0

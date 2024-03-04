@@ -1,0 +1,9 @@
+ {r}←{colTitles}SaveAsCSV(filename data);colTitles
+⍝ Save `data` in `filename` as CSV
+ r←⍬
+ :If 0=⎕NC'colTitles'
+     colTitles←'Group' 'Name' 'Version' 'Year' 'Month' 'Downloads'
+ :EndIf
+ filename,←('.csv'≢⎕C ¯4↑filename)/'.csv'
+ 1 ⎕NDELETE filename
+ data colTitles ⎕CSV filename

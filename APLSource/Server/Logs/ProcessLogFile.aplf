@@ -1,22 +1,42 @@
- r←ProcessLogFile data;date;packageIDs;Reg;date2
-⍝ Takes the data saved in the log file and reduces them to the essentials, aggregate just by day
- r←0 4⍴⊂''
- Reg←##.##.Registry
- :If 0<≢data←(∨/¨' GET 200 '∘⍷¨data)/data
-     data←(1=(↑data)+.='/')⌿data
-     data←(2≤(19↓[2]↑data)+.='-')/data
- :AndIf 0<≢data←↑data
-     date←10↑[2]data
-     date2←(⊃∘##.A.ToNum¨↓data[;⍳4]),(⊃∘##.A.ToNum¨↓data[;5+⍳2]),[1.5](⊃∘##.A.ToNum¨↓data[;8+⍳2])
-     packageIDs←↓(≢'YYYY-MM-DD hh:mm:ss GET 200 /')↓[2]data
-     packageIDs←↑{ind←⍸'-'=⍵ ⋄ ((ind[1]-1)↑⍵)((ind[2]-1+ind[1])↑ind[1]↓⍵)(ind[2]↓⍵)}¨packageIDs
-     r←packageIDs,date2
-     r←r[⍋r[;3];]
-     r←r[⍋r[;2];]
-     r←r[⍋r[;1];]
-     r←r[⍋r[;6];]
-     r←r[⍋r[;5];]
-     r←r[⍋r[;4];]
-     r←{⍺,≢⍵}⌸r[;6~⍨⍳2⊃⍴r]  ⍝ Without the day
+ {r}←ProcessLogFile(folder TS);filename;raw;y;b;data;y2;m;m_;until;f;lms;flag
+⍝ Old years are removed from the log file
+⍝ Months of the current year are accumulated until the current month-1 (TS[2])
+⍝ * `folder` is where the log files live
+⍝ * `TS` is todays timestamp: Y M D
+ filename←folder,GetLogFilename
+ raw←⊃⎕NGET filename 1
+ y←4↑¨raw
+ b←∧/(↑y)∊⎕D                                                ⍝ Row of interest all start with a year
+ raw←b/raw                                                  ⍝ Throw away stuff we are...
+ y←b/y                                                      ⍝ ... not interested in
+ flag←0                                                     ⍝ Used to tell that raw data needs to be written back to disk
+ :While ≢/y[1,≢y]                                           ⍝ Any old data found?
+     b←y≡¨y[1]
+     data←b/raw                                             ⍝ The year we are interested in
+     raw←(~b)/raw                                           ⍝ Throw...
+     y←(~b)/y                                               ⍝ ... away
+     data←ProcessLogData data                               ⍝ Aggregate
+     y2←⍕⊃data[1;4]
+     :If flag=0                                             ⍝ First time?
+         CreateZippedBackup folder y2
+     :EndIf
+     SaveAsCSV(folder,'usage-data-',y2)data                 ⍝ Save
+     CreateZipFile folder,'usage-data-',y2,'.csv'
+     flag←1
+ :EndWhile
+ {}(⊂raw)⎕NPUT⍣flag⊢filename 1                              ⍝ Save back the raw data (from current year only)
+ m←(⊃⊃(//)⎕VFI(⊃raw[≢raw])[6 7])                            ⍝ Month of last entry
+ :If 1<m                                                    ⍝ If current one is January we have no data yet
+     lms←GetLastMonthSaved folder                           ⍝ Last month saved
+     m_←({⊃⊃(//)⎕VFI ⍵}¨↓(↑raw)[;6 7])                      ⍝ All months in raw
+ :AndIf ((≢m_)⊃m_)>lms+1                                    ⍝ New month?! (But never Jan until current month is at least Feb)
+     b←m_<m                                                 ⍝ All before the current month
+     data←b/raw                                             ⍝ We are interested in everything but the current month
+     data←ProcessLogData data                               ⍝ Aggregate
+     y2←⍕⊃data[1;4]
+     until←¯2↑'00',⍕5⊃data[≢data;]
+     f←folder,'usage-data-',y2,'-',until
+     SaveAsCSV f data                                       ⍝ Save
+     CreateZipFile f,'.csv'
  :EndIf
- ⍝Done
+⍝Done

@@ -1,0 +1,9 @@
+ {r}←CreateZipFile filename;zipFilename;zip;folder
+⍝ Creates a ZIP file from `filename`.
+ r←⍬
+ zipFilename←(¯4↓filename),'.zip'
+ ##.F.DeleteFile zipFilename  ⍝ Paranoia
+ zip←⎕NEW ##.ZipArchive(,⊂zipFilename)
+ folder←⊃⎕nparts filename
+ folder zip.Add(≢folder)↓filename
+⍝Done

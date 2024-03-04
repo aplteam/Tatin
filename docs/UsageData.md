@@ -33,7 +33,7 @@ So the filename `usage-data-2022-04` means _all data from 2022 up to and includi
 
 Once a year, in January, Tatin collects the data from last year and saves it in a file `usage-data-<YYYY>`. It also deletes any files `usage-data-<YYYY>-<MM>`.
 
-For example, in January 2023 it would create a file `usage-data-2022`, and it would delete all file `usage-data-2022-*`.
+For example, in January 2023 it would create a file `usage-data-2022`, and it would delete all files `usage-data-2022-*`.
 
 
 ## How to retrieve the data
@@ -52,5 +52,6 @@ Enter `]Tatin.UsageData -??` for details.
 ### API
 
 There are no API functions available for retrieving usage data.
+
 
 

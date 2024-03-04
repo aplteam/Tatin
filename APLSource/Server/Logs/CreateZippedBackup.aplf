@@ -1,32 +1,15 @@
- {r}←CreateZippedBackup folder;zipFilename;zip;filename;bkpFilename;list;ind;tno;flag
-⍝ Takes a folder as ⍵ and expect it to contain a file "folder,'app-log.txt'"
+ {r}←CreateZippedBackup(folder year);zipFilename;zip;filename;bkpFilename
+⍝ Takes a folder as ⍵ and expect it to contain a file "folder,'/app-log.txt'"
 ⍝ It creates a copy of that file by replacing the extension by "bkp".
-⍝ Then this file is zipped into a file "app-log.txt.zip".
+⍝ Then this file is zipped into a file "app-log-<year>.bkp.zip".
 ⍝ Finally the BKP file is deleted.
  r←⍬
  filename←folder,GetLogFilename
- bkpFilename←(¯3↓filename),'bkp'
-
- ⍝ Workaround for bug <02075>  ⍝TODO⍝
- list←{⍵↓⍨-+/∧\' '=⌽⍵}¨↓⎕NNAMES
- flag←0
- :If (⊂filename)∊list
-     ind←list⍳⊂filename
-     tno←ind⊃⎕NNUMS
-     flag←##.G.AppLogTie=tno
-     ⎕NUNTIE tno
- :EndIf
-
+ bkpFilename←(¯4↓filename),'-',year,'.bkp'
  bkpFilename ⎕NCOPY filename
- zipFilename←folder,'app-log.txt.zip'
+ zipFilename←folder,'app-log-',year,'.bkp.zip'
  ##.F.DeleteFile zipFilename  ⍝ Paranoia
  zip←⎕NEW ##.ZipArchive(,⊂zipFilename)
  folder zip.Add(≢folder)↓bkpFilename
  ##.F.DeleteFile bkpFilename
-
- ⍝ Workaround for bug <02075>  ⍝TODO⍝
- :If flag
-     filename ⎕NTIE ##.G.AppLogTie
- :EndIf
-
 ⍝Done

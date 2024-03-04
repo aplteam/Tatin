@@ -265,7 +265,7 @@ If have loaded Tatin into `⎕SE` with a script `setup.dyalog` you might need to
 
 ### Tatin version 0.105.0 and later
 
-Once you have Tatin 0.102.1 (or later) installed in the right place you can use `]Tatin.UpdateTatin` for updating Tatin to a later version.
+Once you have Tatin 0.105.0 (or later) installed in the right place you can use `]Tatin.UpdateTatin` for updating Tatin to a later version.
 
 Just execute:
 
@@ -283,5 +283,6 @@ Notes:
 
 
 * 19.0 and later only: Tatin's `Update` command changes the installation directory, not the version of Tatin the `]Activate` user command copied it originally from; that remains unchanged.
+
 
 

@@ -1,0 +1,28 @@
+ (success newData)←(CheckFns EditText)(name origData);temp;msg;flag;txt
+    ⍝ Operator that allows the user to edit `origData`. The function `CheckFns` is supposes to either
+    ⍝ return an empty char vector (interpret3d as "okay") or an error message.\\
+    ⍝ If you don't want to perform a check specify `{''}` as left operand.\\
+    ⍝ The user must either fix any problems or make sure that the text is empty,
+    ⍝ in which case no action is taken
+ temp←⎕SE.⎕NS''
+ temp.⎕FX ⎕CR'ED'
+ ⍎'temp.',name,'←origData'
+ flag←1
+ success←0
+ newData←''
+ :Repeat
+     temp.ED name
+     :If origData≢temp.⍎name
+         txt←⊆temp.⍎name
+         txt←(0<≢¨txt)/txt
+         txt{TC.A.(DLB DTB)⍵}¨txt
+     :AndIf 0<≢(∊txt)~' '
+         :If 0<≢msg←CheckFns txt
+             ⎕←msg
+             flag←~TC.C.YesOrNo'Woulde you like to fix the problem? (N=abandon changes)'
+         :Else
+             flag←1
+             newData←txt
+         :EndIf
+     :EndIf
+ :Until flag

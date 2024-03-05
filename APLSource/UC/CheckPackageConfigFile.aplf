@@ -1,0 +1,39 @@
+ (msg json)←CheckPackageConfigFile(json path);cfg2;ns;extensions;⎕TRAP;list
+ ⍝ Returns an empty vector if everything is okay and an error message otherwise
+ msg←''
+ ns←TC.Reg.JSON json
+ :Trap ErrNo
+     cfg2←TC.InitPackageConfig ns
+     'name'TC.ValidateName ns.name
+     'group'TC.ValidateName ns.group
+     {}'api'TC.ValidateName⍣(0<≢ns.api)⊣ns.api
+     TC.ValidateVersion ns.version
+     ns←TC.ValidateTags ns
+     ns←TC.ValidateDescription ns
+     ns←TC.ValidateAplVersion ns
+     ns←TC.ValidateOSprops ns
+     :If 0=≢ns.source
+         list←(1+≢path)↓¨⊃TC.F.Dir path,'\'
+         list~←⊂TC.CFG_Name
+         :If 1=≢list
+         :AndIf ((⊂3⊃⎕NPARTS⊃list)∊'.apln' '.aplc')∨TC.F.IsDir path,⊃list
+             ns.source←⊃list
+         :Else
+             msg←'Invalid: "source"'
+             :Return
+         :EndIf
+     :EndIf
+     {}{{'source'TC.ValidateName ⍵}⍣(0<≢⍵)⊣⍵}ns.source~'/\'
+     :If '.'∊ns.source
+         '"source" carries an invalid extension'Assert(⊂3⊃⎕NPARTS ns.source)∊SupportedExtensions
+     :EndIf
+     :If 0<≢ns.project_url
+⍝         :If 0=TC.FetchHTMLpage ns.project_url  ⍝ GitHub does not support HEAD
+⍝                  msg←ns.project_url,' did not respond'
+⍝                  :Return
+⍝              :EndIf
+     :EndIf
+     json←TC.Reg.JSON ns
+ :Else
+     msg←⎕DMX.EM
+ :EndTrap

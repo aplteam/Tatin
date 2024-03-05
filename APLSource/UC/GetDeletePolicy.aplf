@@ -1,0 +1,13 @@
+ r←GetDeletePolicy Arg;uri;qdmx;check
+ r←⍬
+ uri←Arg._1
+ :If 0≡Arg._1
+     →(⍬≡uri←SelectRegistry 0)/0
+ :EndIf
+ :Trap ErrNo
+     check←0 Arg.Switch'check'
+     r←check TC.GetDeletePolicy uri
+ :Else
+     qdmx←⎕DMX
+     CheckForInvalidVersion qdmx
+ :EndTrap

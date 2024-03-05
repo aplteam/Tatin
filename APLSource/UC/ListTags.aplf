@@ -1,0 +1,32 @@
+ r←ListTags Arg;parms;registry;qdmx;buff
+ r←''
+ parms←⎕NS''
+ parms.tags←''
+ registry←Arg._1
+ :If 0≡registry
+     registry←tatinURL
+ :ElseIf (,'?')≡,registry
+     →(⍬≡registry←SelectRegistry 0)/0
+ :Else
+     registry,←(~(¯1↑registry)∊'/\')/'/'
+ :EndIf
+ :If 0≢Arg.tags
+ :AndIf 0<≢Arg.tags
+     parms.tags←Arg.tags
+ :EndIf
+ :If 0≢Arg.os
+ :AndIf 0<≢Arg.os
+     buff←⎕C','(≠⊆⊢)Arg.os
+     'Only "lin", "mac" and "win" are valid for -os='Assert∧/buff∊'lin' 'mac' 'win'
+     parms.(os_lin os_mac os_win)←'lin' 'mac' 'win'∊','(≠⊆⊢)Arg.os
+ :EndIf
+ :Trap ErrNo
+     :If 0<≢buff←parms TC.ListTags registry
+         r←⍪({⍵((≢⍵)⍴'-')}'All tags from ',registry),{⍵[;1]}buff
+     :Else
+         r←'No tags found'
+     :EndIf
+ :Else
+     qdmx←⎕DMX
+     CheckForInvalidVersion qdmx
+ :EndTrap

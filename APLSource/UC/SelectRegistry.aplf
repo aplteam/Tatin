@@ -1,0 +1,15 @@
+ registry←{all}SelectRegistry type;row;list
+ all←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'all'
+ :If 1=≢list←GetListOfRegistriesForSelection type
+     registry←1⊃list[1;]
+ :Else
+     :If ⍬≡row←'Select Tatin Registry'all TC.C.Select↓⎕FMT list[;1 2]
+         registry←⍬
+     :Else
+         :If all
+             registry←list[,row;1]
+         :Else
+             registry←1⊃list[row;]
+         :EndIf
+     :EndIf
+ :EndIf

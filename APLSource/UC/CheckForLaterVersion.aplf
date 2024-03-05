@@ -1,0 +1,35 @@
+ r←CheckForLaterVersion Arg;path;question;this;b;flags;colHeaders;bool;buff;info1;info2;qdmx
+ r←''
+ path←Arg._1
+ flags←(1×Arg.major)+(2×Arg.dependencies)
+ :Trap ErrNo
+     r←flags TC.CheckForLaterVersion path
+ :Else
+     qdmx←⎕DMX
+     CheckForInvalidVersion qdmx
+ :EndTrap
+ :If 0<≢r
+     colHeaders←'Installed' 'Latest' 'Original URL' 'I' 'New URL'
+     r←colHeaders⍪' '⍪r
+     r[2;]←(⌈⌿≢¨r)⍴¨'-'
+     b←1≡¨r[;4]
+     r[⍸b;4]←'!'
+     r[2↓⍸~b;4]←⊂''
+     info1←info2←''
+     :If '!'∊r[;4]
+         info1←'! = Check version available'
+     :EndIf
+     :If ∨/bool←0={⍵[;4]}buff←(1 TC.ListRegistries'')
+         info2←'Not scanned because priority is zero: ',⊃{⍺,', ',⍵}/∪bool/buff[;1]
+     :EndIf
+     r←⍪↓⎕FMT r
+     :If 0<≢info1,info2
+         r⍪←⊂' '
+         :If 0<≢info1
+             r⍪←⊂info1
+         :EndIf
+         :If 0<≢info2
+             r⍪←⊂info2
+         :EndIf
+     :EndIf
+ :EndIf

@@ -1,0 +1,145 @@
+ r←PublishPackage Arg;url;url_;qdmx;statusCode;list;source;msg;rc;zipFilename;firstFlag;packageID;policy;f1;f2;dependencies;openCiderProjects;ind;project;cfg;folder;zipFolder;askForConfirmation
+ r←''
+ (source url)←Arg.(_1 _2)
+ askForConfirmation←0
+ :If (,0)≡,url
+ :AndIf '.zip'≢⎕C ¯4↑source
+     url←source
+     source←''
+ :EndIf
+ :If 0≡source
+ :OrIf 0=≢source
+     'No ZIP file specified?!'Assert 9=⎕SE.⎕NC'Cider' ⍝ Without Cider we cannot look any further
+     openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+     :If 1<≢openCiderProjects
+         ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+         :If 0=≢ind
+             r←'Cancelled by user' ⋄ →0
+         :Else
+             (project folder)←openCiderProjects[ind;]
+         :EndIf
+     :ElseIf 1=≢openCiderProjects
+         (project folder)←openCiderProjects[1;]
+     :Else
+         r←'No path specified & no open Cider projects found' ⋄ →0
+     :EndIf
+     ('No Cider config file found in ',project)Assert ⎕NEXISTS folder,'/cider.config'
+     cfg←TC.Reg.GetJsonFromFile folder,'/cider.config'
+     'Has no property "distributionFolder" yet?!'Assert 0<cfg.CIDER.⎕NC'distributionFolder' ⍝ was introduced in 0.26.0
+     zipFolder←(TC.Reg.AddSlash folder),cfg.CIDER.distributionFolder
+     source←TC.F.ListFiles zipFolder,'/*.zip'
+     ('No ZIP file found in ',zipFolder)Assert 0<≢source
+     ('More than one ZIP file found in ',zipFolder)Assert 1=≢source
+     source←⊃source
+     askForConfirmation←1
+ :EndIf
+ :If (,'?')≡,url
+ :OrIf '[?]'≡url
+     :If 0=≢url←SelectRegistry 1
+         :Return
+     :EndIf
+ :EndIf
+ :If 0≡url
+     url←'[tatin]'
+ :EndIf
+ url_←TC.ReplaceRegistryAlias url
+ :If askForConfirmation
+ :AndIf 0=TC.CommTools.YesOrNo'Sure you want to publish ',(⊃,/1↓⎕NPARTS source),' to ',url,' ?'
+     :Return
+ :EndIf
+ :If ~TC.Reg.IsHTTP url_
+ :AndIf ~TC.Reg.IsFILE url
+     'Invalid target'Assert'['∊url
+     url←'[',(url~'[]'),']'
+     url_←TC.ReplaceRegistryAlias url
+ :EndIf
+ ('"',url,'" is not a Registry')Assert 0<≢url_
+ :If TC.F.IsDir source
+     ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_Name
+ :Else
+     ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
+ :EndIf
+ firstFlag←1
+ :Trap ErrNo
+     f1←'none'≡⎕C policy←TC.GetDeletePolicy url_
+ :Else
+     qdmx←⎕DMX
+     CheckForInvalidVersion qdmx
+ :EndTrap
+      ⍝ From now on we can be confident that the version of the server is in line with the client
+ :If f2←'justbetas'≡⎕C policy←TC.GetDeletePolicy url_
+     f2←~TC.Reg.IsBeta url_
+ :EndIf
+ :If f1∨f2
+     msg←⊂'Attention - the server:'
+     msg,←⊂'   ',url_
+     msg,←⊂'operates a "',policy,'" delete policy.'
+     :If f2
+         msg,←⊂'The package is not e beta release.'
+     :EndIf
+     msg,←⊂'Are you sure that you want to publish'
+     msg,←⊂'   ',source
+     msg,←⊂'anyway?'
+     :If 0=TC.C.YesOrNo msg
+         ⎕←'Publishing cancelled'
+         :Return
+     :EndIf
+ :EndIf
+ dependencies←''Arg.Switch'dependencies'
+∆Again:
+ :Trap ErrNo
+     :If 0<≢dependencies
+         (rc msg zipFilename)←dependencies TC.PublishPackage source url
+     :Else
+         (rc msg zipFilename)←TC.PublishPackage source url
+     :EndIf
+     :If 200≡rc
+         r←'Package published on ',url_
+     :Else
+         r←msg,'; RC=',⍕rc
+     :EndIf
+ :Else
+     qdmx←⎕DMX
+     :If 'HTTP status code:'{⍺≡(≢⍺)↑⍵}qdmx.EM
+         statusCode←⊃⊃(//)⎕VFI ¯3↑qdmx.EM
+         :Select statusCode
+         :Case 400
+             r←'Bad request'
+         :Case 401
+             r←'Your are not authorized to publish at ',url_
+         :Case 500
+             r←'The server ',url_,' reported an internal error'
+         :Else
+             qdmx.EM ⎕SIGNAL ErrNo
+         :EndSelect
+     :Else
+         :If 'Server: The package has already been published'{⍺≡(≢⍺)↑⍵}qdmx.EM
+             :If 'Any'≡⎕SE.Tatin.GetDeletePolicy url_
+                 :If firstFlag
+                     packageID←2⊃⎕NPARTS source
+                     :If TC.C.YesOrNo packageID,' already published on ',url_,'; overwrite?'
+                         firstFlag←0
+                         (rc msg)←⎕SE.Tatin.DeletePackages url,packageID
+                         :If 200=rc
+                             →∆Again
+                         :Else
+                             ⎕←'Delete attempt failed with status ',(⍕rc),'; publishing therefore not possible'
+                             :Return
+                         :EndIf
+                     :EndIf
+                 :Else
+                     ⎕←'Deleting already published package failed with status ',(⍕rc),'; publishing therefore not possible'
+                     :Return
+                 :EndIf
+             :Else
+                 ⎕←'Server does not allow overwriting an already published package; publishing therefore not possible'
+                 :Return
+             :EndIf
+         :EndIf
+         :If ∨/'<title>'⍷qdmx.EM
+             r←GetTitleFromHtml qdmx.EM
+         :ElseIf 0<≢r←qdmx.EM
+             r←qdmx.EM
+         :EndIf
+     :EndIf
+ :EndTrap

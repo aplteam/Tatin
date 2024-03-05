@@ -1,0 +1,60 @@
+ r←ListPackages Arg;registry;parms;buff;qdmx;OSs
+ r←''
+ registry←Arg._1
+ :If 0≡registry
+     registry←tatinURL
+ :ElseIf (,'?')≡,registry
+     →(⍬≡registry←SelectRegistry 0)/0
+ :EndIf
+ registry←EnforceSlash registry
+ parms←⎕NS''
+ :If 0≢Arg.group
+     parms.group←Arg.group
+ :EndIf
+ :If 0≢Arg.tags
+     parms.tags←Arg.tags
+ :EndIf
+ :If 0≢Arg.noaggr
+     parms.aggregate←~Arg.noaggr
+ :Else
+     parms.aggregate←1
+ :EndIf
+ parms.userCommand←Arg.uc
+ parms.date←Arg.date
+ :If 0≢Arg.since
+     :If '-'∊Arg.since
+         parms.since←⊃(//)⎕VFI Arg.since~'-'
+     :Else
+         parms.since←(4↑Arg.since),'-',(2↑4↓Arg.since),'-',2↑6↓Arg.since
+     :EndIf
+ :EndIf
+ :If 0≢Arg.os
+     OSs←⎕C','(≠⊆⊢)Arg.os
+     'Only "lin", "mac" and "win" are valid options for -os='Assert∧/OSs∊'win' 'lin' 'mac'
+     parms.os_lin←(⊂'lin')∊OSs
+     parms.os_mac←(⊂'mac')∊OSs
+     parms.os_win←(⊂'win')∊OSs
+ :EndIf
+ parms.project_url←Arg.project_url
+ :Trap ErrNo
+     r←⍪parms TC.ListPackages registry
+ :Else
+     qdmx←⎕DMX
+     CheckForInvalidVersion qdmx
+ :EndTrap
+ :If 0=≢r
+     r←'No packages found'
+ :Else
+     :If TC.IsInstallFolder registry
+         r[;2]←' *'[1+r[;2]]
+         r(AddHeader)←'Package-ID' 'Principal'
+     :Else
+         :If 0≡parms.date
+             r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Project URL')
+         :Else
+             r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),'Group & Name' 'Published at' 'Project URL'
+         :EndIf
+         buff←{'['∊⍵:⍵↑⍨⍵⍳']' ⋄ ⊃TC.Reg.SeparateUriAndPackageID ⍵}registry
+         r←((2⊃⍴r)↑(⊂'Registry: ',{⍵↓⍨-'/'=¯1↑⍵}buff),(2⊃⍴r)⍴⊂'')⍪r
+     :EndIf
+ :EndIf

@@ -1,0 +1,16 @@
+ r←FindDependencies Arg;pkgList;target;verbose;buff;bool
+ r←'Cancelled by user'
+ verbose←Arg.verbose
+ pkgList←','(≠⊆⊢)Arg._1
+ target←''Arg.Switch'_2'
+ 'Invalid package definition'Assert 0∧.=(⎕NS''){⊃∘⍺.⎕NC¨{'_'@(⍸⍵∊'.-')⊣⍵}¨⍵}pkgList
+ :If 0<≢r←TC.FindDependencies(⊃{⍺,',',⍵}/pkgList)target verbose
+     buff←{((⊂''),⍪2⊃⍵)}¨r
+     r←{TC.F.EnforceSlash TC.F.AddTrailingSep⊃⍵}¨r
+     :If ∨/bool←{∨/'/\'∊↑⍵[;2]}¨buff ⍝ Only local data is a full path
+         (bool/buff)←(bool/r){l←≢⍺ ⋄ l↓¨⍵}¨(bool/buff)
+         (bool/buff)←{w←⍵ ⋄ w[;2]←TC.F.EnforceSlash¨⍵[;2] ⋄ w}¨bool/buff
+     :EndIf
+     r←r{((⊂⍺)'')⍪⍵}¨buff
+     r←⊃⍪/r
+ :EndIf

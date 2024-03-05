@@ -1,0 +1,40 @@
+ (success newData)←(CheckFns EditJson)(name origData path);temp;msg;flag;json
+    ⍝ Operator that allows the user to edit `origData` which is supposed to be JSON.\\
+    ⍝ After editing it the function checks whether it is still valid JSON.
+    ⍝ The user must either fix any problems or make sure that the JSON is empty,
+    ⍝ in which case no action is taken
+ temp←⎕SE.⎕NS''
+ temp.⎕FX ⎕CR'ED'
+ ⍎'temp.',name,'←origData'
+ flag←1
+ newData←temp.⍎name
+ success←1
+ :Repeat
+     temp.ED name
+     json←temp.⍎name
+     :If 0=≢(∊json)~' '
+         success←¯1 ⋄ →0
+     :EndIf
+     success←IsValidJSON json
+     :If ~success
+         msg←'This is not valid JSON; do you want to fix the problem? N=abandon changes'
+         flag←~TC.C.YesOrNo msg
+     :Else
+         (msg json)←CheckFns json path
+         :If 0<≢msg
+             :If ' did not respond'{⍺≡(-≢⍺)↑⍵}msg
+                 :If TC.C.YesOrNo msg,'; edit again (N=accept the URL as it is) ?'
+                     flag←0
+                 :Else
+                     newData←json
+                     flag←1
+                 :EndIf
+             :Else
+                 flag←~1 TC.C.YesOrNo msg,CR,'Want to try fixing the problem (n=abandon ALL changes) ?'
+             :EndIf
+         :Else
+             flag←1
+             newData←json
+         :EndIf
+     :EndIf
+ :Until flag

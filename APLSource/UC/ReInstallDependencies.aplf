@@ -1,0 +1,129 @@
+ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders;bool;aliasDefs;alias;info
+ r←''
+ 'Mandatory argument (install directory or project) must not be empty'Assert 0<≢installFolder←Args._1
+ :If '[]'≡¯2↑⌽¯1⌽installFolder
+     'You''ve specified a Cider project alias but Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
+     project←installFolder
+     aliasDefs←⎕SE.Cider.GetCiderAliasFileContent ⍬
+     ind←aliasDefs[;1]⍳⊂⎕C project~'[]'
+     'Project not found'Assert ind≤≢aliasDefs
+     installFolder←2⊃aliasDefs[ind;]
+     :If ~TC.CommTools.YesOrNo'Sure you want to act on project ',installFolder,' ?'
+         r←'Cancelled by user' ⋄ →0
+     :EndIf
+     cfg←⎕SE.Cider.ReadProjectConfigFile installFolder
+     (project,' has not been converted yet: cannot be processed')Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+     folders←{⍵↑⍨¯1+⍵⍳'='}¨(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+     :If 0=≢⊃,/folders
+         r←(project,' has no dependency folder(s) defined') ⋄ →0
+     :EndIf
+     :If 1<≢folders
+         folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
+         ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
+         :If 0=≢ind
+             r←'Cancelled by user' ⋄ →0
+         :Else
+             installFolder,←'/',ind⊃folders
+         :EndIf
+     :ElseIf 1=≢folders
+         installFolder,←'/',{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}1⊃folders
+         :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',installFolder,'?'
+             →0 ⋄ r←'Cancelled by user'
+         :EndIf
+     :EndIf
+ :EndIf
+ :If 0≡Args._2
+     registry←''
+ :Else
+     registry←Args._2
+ :EndIf
+ parms←TC.CreateReInstallParms
+ parms.dry←0 Args.Switch'dry'
+ parms.force←0 Args.Switch'force'
+ parms.noBetas←0 Args.Switch'nobetas'
+ parms.update←1 Args.Switch'update'
+ installFolder←{0≡⍵:'' ⋄ ⍵}installFolder
+ :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+     installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+ :ElseIf 0=≢installFolder
+     :If 9=⎕SE.⎕NC'Cider'
+         openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+         :If 1<≢openCiderProjects
+             ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+             :If 0=≢ind
+                 r←'Cancelled by user' ⋄ →0
+             :Else
+                 project←2⊃openCiderProjects[ind;]
+             :EndIf
+         :ElseIf 1=≢openCiderProjects
+             project←2⊃openCiderProjects[1;]
+         :Else
+             r←'No path specified & no open Cider projects found' ⋄ →0
+         :EndIf
+         ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
+         cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
+         (project,' has not been converted yet: cannot be processed')Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+         folders←{⍵↑⍨¯1+⍵⍳'='}¨(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+         :If 0=≢⊃,/folders
+             r←(project,' has no dependency folder(s) defined') ⋄ →0
+         :EndIf
+         :If 1<≢folders
+             ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
+             :If 0=≢ind
+                 r←'Cancelled by user' ⋄ →0
+             :Else
+                 installFolder←project,'/',ind⊃folders
+             :EndIf
+         :ElseIf 1=≢folders
+             installFolder←project,'/',{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}1⊃folders
+             :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',installFolder,'?'
+                 →0 ⋄ r←'Cancelled by user'
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf
+ installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
+ :If 0=≢installFolder←EstablishPackageFolder installFolder
+     r←'Nothing specified',(0<⎕SE.⎕NC'Cider')/' and nothing obvious found either' ⋄ →0
+ :EndIf
+ ('Is not a directory: ',installFolder)Assert TC.F.IsDir installFolder
+ :If ~TC.F.IsFile installFolder,'/apl-dependencies.txt'
+     :If 9=⎕SE.⎕NC'Cider'
+     :AndIf TC.F.IsFile installFolder,'/cider.config'
+         cfg←⎕SE.Cider.ReadProjectConfigFile installFolder
+     :AndIf 0<≢∊cfg.CIDER.(dependencies dependencies_dev).tatin
+         subFolders←({⍵↑⍨¯1+⍵⍳'='}¨cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+         :If 1=≢subFolders
+             installFolder,←⊃subFolders
+             :If 0=1 TC.C.YesOrNo'Sure you want to act on ',installFolder,' ?'
+                 r←'Cancelled by user' ⋄ →0
+             :EndIf
+         :Else
+             ind←'Which folder would you like to re-install into?'TC.C.Select installFolder∘,¨subFolders
+             :If 0=≢ind
+                 r←'Cancelled by user' ⋄ →0
+             :Else
+                 installFolder,←ind⊃subFolders
+             :EndIf
+         :EndIf
+     :Else
+         r←'Directory does not host a file apl-dependencies.txt, and no dependencies are defined' ⋄ →0
+     :EndIf
+ :EndIf
+ deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
+ 'Dependency file is empty'Assert 0<≢deps
+ :If parms.force
+ :OrIf TC.C.YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
+     :Trap ErrNo
+         r←parms TC.ReInstallDependencies installFolder registry
+     :Else
+         qdmx←⎕DMX
+         CheckForInvalidVersion qdmx
+     :EndTrap
+     :If parms.force
+         r←''
+     :Else
+         r←⍪(⊂'Re-installed:'),' ',¨r
+         ⎕←'Done'
+     :EndIf
+ :EndIf

@@ -1,0 +1,28 @@
+ r←Version Arg;registries;registry;alias;qdmx
+ :If Arg.check
+     r←1 TC.GetServerVersion Arg._1
+ :Else
+     :If (,'*')≡,Arg._1
+     :OrIf Arg.all
+         r←⊂(⊂'{Client}'),TC.Reg.Version
+         registries←1 TC.ListRegistries 0
+         :For registry alias :In ↓registries[;1 2]
+             :If 0≠≢'http[s]://'⎕S 0⊣registry  ⍝ Not local?
+                 :Trap 0
+                     r,←⊂(⊂registry),TC.GetServerVersion registry
+                 :Else
+                     r,←⊂registry'' '*** Could not be accessed'
+                 :EndTrap
+             :EndIf
+         :EndFor
+         r←(↑r)[;1 3 4]
+     :ElseIf 0≡Arg._1
+         r←TC.Reg.Version
+     :ElseIf (,'?')≡,Arg._1
+         →(⍬≡registry←SelectRegistry 0)/0
+         registry←EnforceSlash registry
+         r←TC.GetServerVersion registry
+     :Else
+         r←TC.GetServerVersion Arg._1
+     :EndIf
+ :EndIf

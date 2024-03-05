@@ -1,0 +1,24 @@
+ {r}←CheckForInvalidVersion dmx;v;f2;f1
+ r←0
+ f1←'Server: Request came from an invalid version of Tatin.'{⍺≡(≢⍺)↑⍵}dmx.EM
+      ⍝ Workaround for Client and Server being out of sync after injecting the originally missing "an" into the message:
+ f2←'Server: Request came from invalid version of Tatin.'{⍺≡(≢⍺)↑⍵}dmx.EM
+ :If f1∨f2
+ :AndIf 1 TC.C.YesOrNo'You are using an outdated version of the Tatin client.',CR,'Would you like to update automatically?'
+     :Trap ErrNo
+         v←⊃TC.UpdateClient 1
+         ⎕←'Tatin client updated to ',v,'; please execute the last Tatin user command again'
+         ⎕←'Workspace has not been updated. Start a new instance of Dyalog.'
+     :Else
+         dmx←⎕DMX
+         :If ∨/'Check ⎕EXCEPTION for details'⍷dmx.Message
+             ⎕EXCEPTION.Message ⎕SIGNAL ErrNo
+         :Else
+             dmx.EM ⎕SIGNAL ErrNo
+         :EndIf
+     :EndTrap
+ :ElseIf 'ERROR 345'≡dmx.EM
+     (dmx.EM,' (check your Internet connection)')⎕SIGNAL dmx.EN
+ :Else
+     dmx.EM ⎕SIGNAL dmx.EN
+ :EndIf

@@ -1,0 +1,38 @@
+ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag;isUCMD;makeHomeRelative
+ installFolder←Arg._1
+ isUCMD←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
+ :If 0≡Arg._2
+     :If isUCMD
+         targetSpace←'⎕SE'
+     :Else
+         targetSpace←CalledFrom ⎕NSI
+     :EndIf
+ :Else
+     targetSpace←,Arg._2
+     :If ~(⊃targetSpace)∊'⎕#'
+         targetSpace←(CalledFrom ⎕NSI),'.',targetSpace
+     :EndIf
+ :EndIf
+ :If isUCMD
+     '[MyUCMDs] must stand on its own'Assert 0<≢(≢'[myucmds]')↓installFolder
+     installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
+ :EndIf
+ overwriteFlag←Arg.overwrite
+ makeHomeRelative←Arg.makeHomeRelative
+ installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡(-≢⍺)↑⍵}installFolder
+ f1←TC.F.IsDir installFolder
+ :If ~isUCMD
+     f2←(TC.F.IsFile installFolder)∧'.zip'≡⎕C ¯4↑installFolder
+     ('Neither a folder nor a ZIP file: ',installFolder)Assert f1∨f2
+ :EndIf
+ :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
+     '"targetSpace" is not a valid APL name'Assert ¯1≠⎕NC targetSpace
+ :EndIf
+ saveIn←⍎{⍵↑⍨¯1+⍵⍳'.'}targetSpace
+ ({⍵↓⍨⍵⍳'.'}targetSpace)saveIn.⎕NS''
+ :If 0=saveIn.⎕NC targetSpace
+     ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
+ :EndIf
+ 'Arg[2] must not be scripted'Assert IsScripted⍎targetSpace
+ r←(TC.Reg.BitsToInt overwriteFlag makeHomeRelative)TC.LoadDependencies installFolder targetSpace
+ r←⍪(⊂'Dependencies loaded into ',targetSpace,':'),r

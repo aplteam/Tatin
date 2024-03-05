@@ -1,0 +1,32 @@
+ installFolder←TranslateCiderAlias installFolder;ind;alias;list;cfgFilename;cfg;folders
+ 'Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
+ ind←installFolder⍳']'
+ alias←(ind↑installFolder)~'[]'
+ installFolder←ind↓installFolder
+ list←⎕SE.Cider.GetCiderAliasFileContent ⍬
+ 'No Cider projects found'Assert 0<≢list
+ ('Alias "',alias,'" does not define an open Cider project')Assert(⊂⎕C alias)∊list[;1]
+ :If 0<≢installFolder
+     installFolder←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),installFolder
+ :Else
+     cfgFilename←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),'cider.config'
+     ('No Cider config file found in ',⊃⎕NPARTS cfgFilename)Assert ⎕NEXISTS cfgFilename
+     cfg←⎕SE.Cider.ReadProjectConfigFile cfgFilename
+     'This project has not been converted ("tatinFolder" => (dependencies dependencies_dev).tatin'Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+     folders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+     'No Tatin dependencies defined in the Cider config file'Assert 0<≢folders
+     folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
+     :If 1=≢folders
+         installFolder←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),⊃folders
+         :If 0=TC.YesOrNo'InstallConfirmation@Sure that you want to install into ',installFolder,' ?'
+             installFolder←''
+         :EndIf
+     :Else
+         ind←('Select package install folder for ',alias,':')TC.C.Select folders
+         :If 0=≢ind
+             installFolder←''
+         :Else
+             installFolder←(AddSlash 2⊃list[list[;1]⍳⊂⎕C alias;]),ind⊃folders
+         :EndIf
+     :EndIf
+ :EndIf

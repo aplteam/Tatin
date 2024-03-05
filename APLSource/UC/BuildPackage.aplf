@@ -1,0 +1,79 @@
+ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms;ref2TatinVars
+ :If 'Win'≡TC.##.APLTreeUtils2.GetOperatingSystem ⍬
+     'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=0 TC.##.APLTreeUtils2.ToNum 2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
+ :EndIf
+ (sourcePath targetPath)←Arg.(_1 _2)
+ prompt←0
+ zipFilename←''
+ :If 0≡sourcePath
+ :OrIf 0=≢sourcePath
+     openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+     :If 1<≢openCiderProjects
+         ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+         'Cancelled by user'Assert 0<≢ind
+         sourcePath←2⊃openCiderProjects[ind;]
+     :ElseIf 1=≢openCiderProjects
+         sourcePath←2⊃openCiderProjects[1;]
+     :Else
+         'No path specified & no open Cider projects found'Assert 0
+     :EndIf
+ :ElseIf (,'.')≡,sourcePath
+     sourcePath←TC.F.PWD
+     prompt∨←1
+ :EndIf
+ :If 0≡targetPath
+ :OrIf 0=≢targetPath
+     ('No target path specified and no Cider config file found in ',sourcePath)Assert ⎕NEXISTS sourcePath,'/cider.config'
+     cfg←TC.Reg.GetJsonFromFile sourcePath,'/cider.config'
+     'No target path specified and project has no property "distributionFolder"'Assert 0<cfg.CIDER.⎕NC'distributionFolder' ⍝ was introduced in 0.26.0
+     targetPath←(TC.Reg.AddSlash sourcePath),cfg.CIDER.distributionFolder
+     prompt∨←1
+ :ElseIf (,'.')≡,targetPath
+     targetPath←sourcePath
+     prompt∨←1
+ :EndIf
+ dependencies←''Arg.Switch'dependencies'
+ version←''Arg.Switch'version'
+ :If '+'=1⍴version
+     'A rule for "version" must have two dots and just 0 and 1'Assert 2='.'+.=1↓version
+     'A rule for "version" must have two dots and just 0 and 1'Assert∧/('.'~⍨1↓version)∊'01'
+ :EndIf
+ (sourcePath targetPath)←AddSlash¨sourcePath targetPath
+ 'Source path (⍵[1]) is not a directory'Assert TC.F.IsDir sourcePath
+ filename←sourcePath,TC.CFG_Name
+ ('Could not find a file "',TC.CFG_Name,'" in ',sourcePath)Assert TC.F.IsFile filename
+ :If ~(1↑targetPath)∊'/\'
+ :AndIf (1↑1↓targetPath)≠':'
+     targetPath←sourcePath,targetPath
+ :EndIf
+ (sourcePath targetPath)←{⊃1 ⎕NPARTS ⍵,'/'}¨sourcePath targetPath
+ :If prompt
+     msg←⊂'Sure that you want to pack'
+     msg,←⊂'   ',sourcePath
+     msg,←⊂'into'
+     :If sourcePath≡targetPath
+         ((≢msg)⊃msg)←((≢msg)⊃msg),' the same directory?'
+     :Else
+         msg,←⊂targetPath,'?'
+     :EndIf
+ :AndIf 0=1 TC.C.YesOrNo msg
+     ⎕←'Cancelled by user'
+     :Return
+ :EndIf
+ :If 0=⎕NEXISTS targetPath
+     msg←'Target directory',CR
+     msg,←targetPath,CR
+     msg,←'does not exist yet; create it?'
+ :AndIf 1 TC.C.YesOrNo msg
+     TC.F.MkDir targetPath
+ :EndIf
+ 'Target path (⍵[2]) is not a directory'Assert TC.F.IsDir targetPath
+ parms←TC.CreateBuildParms sourcePath
+ parms.dependencyFolder←dependencies
+ parms.version←version
+ parms.targetPath←targetPath
+ :If 0<≢ref2TatinVars←''Arg.Switch'tatinVars'
+     'Invalid: "tatinVars"'Assert 9=⎕NC ref2TatinVars
+     parms.tatinVars←⍎ref2TatinVars
+ :EndIf
+ zipFilename←TC.BuildPackage parms

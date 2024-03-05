@@ -1,0 +1,47 @@
+ r←UsageData Arg;registry;list;ind;list2;b;qdmx
+ r←''
+ :If 0≡registry←Arg._1
+     →(⍬≡registry←SelectRegistry 0)/0
+ :EndIf
+ :If 0≡Arg.download
+ :AndIf 0∊b←0≡¨Arg.(all folder unzip)
+     ('These options were ignored because -download was not specified: ',⊃{⍺,' ',⍵}/(~b)/'-all' '-folder=' '-unzip')Assert 0=+/b
+     :Trap ErrNo
+         r←TC.UsageDataGetList registry
+     :Else
+         qdmx←⎕DMX
+         CheckForInvalidVersion qdmx
+     :EndTrap
+ :Else
+     :Trap ErrNo
+         list←TC.UsageDataGetList registry
+     :Else
+         qdmx←⎕DMX
+         CheckForInvalidVersion qdmx
+     :EndTrap
+     :If 0≡Arg.download
+         r←list
+     :Else
+         r←''
+         :If 0<≢list  ⍝ Yes, can happen: if in the very first month there are no downloads at all
+             :If 0≡Arg.all
+                 ind←'Please select the file(s) you wish to download:' 1 0 TC.C.Select list
+                 →(0=ind)/0
+             :Else
+                 ind←⍳≢list
+             :EndIf
+             :If 0≡Arg.folder
+                 r←TC.UsageDataGetFiles registry(list[ind])
+             :Else
+                 r←Arg.folder TC.UsageDataGetFiles registry(list[ind])
+             :EndIf
+             :If 0≢Arg.unzip
+                 list2←(⊂r,'/'),¨list[ind]
+             :AndIf ∧/⎕NEXISTS¨list2
+                 TC.F.DeleteFile(¯3↓¨list2),¨⊂'csv'
+                 r∘{⍵ TC.ZipArchive.UnzipTo ⍺}¨list2
+                 TC.F.DeleteFile TC.F.ListFiles r,'/*.zip'
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf

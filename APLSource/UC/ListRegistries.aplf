@@ -1,0 +1,12 @@
+ r←ListRegistries Arg;type;captions;raw
+ type←0
+ :If 0≢Arg.Switch'full'
+     type←Arg.Switch'full'
+ :EndIf
+ raw←Arg.Switch'raw'
+ r←TC.ListRegistries type
+ captions←TC.RegistryIndices.AllNames
+ :If ~raw
+     r←((,[0.5](-1≢type)↓captions),[1]' ')⍪r
+     r[2;]←(⌈⌿≢¨r)⍴¨'-'
+ :EndIf

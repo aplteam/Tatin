@@ -1,0 +1,23 @@
+ r←Ping Arg;registry;registries
+ r←⍬
+ registry←Arg._1
+ :If 0≡registry   ⍝ No argument specified? We ping all we know about!
+     r←0 2⍴⍬
+     :If 0<≢registries←GetListOfRegistriesForSelection 0
+     :AndIf 0<≢registries←(TC.Reg.IsHTTP¨registries[;2])⌿registries
+     :AndIf 0<≢registries←registries[∪{⍵⍳⍵}registries[;2];] ⍝ Because the same URL might turn up multiple times with different credentials/alias
+         ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
+         r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries[;2]
+     :EndIf
+ :ElseIf (,'?')≡,registry
+     :If 0=≢registries←1 SelectRegistry 0
+         :Return
+     :EndIf
+     :If 0≠≢registries
+         ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
+         r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries
+     :EndIf
+ :Else
+     ⎕←'Questioning 1 Tatin Registry...'
+     r←⍉⍪TC.Ping registry
+ :EndIf

@@ -1,0 +1,31 @@
+ r←UserSettings Arg;origData;filename;ns;new;buff
+ r←''
+ filename←TC.F.NormalizePath TC.MyUserSettings.path2config
+ :If Arg.home
+     r←filename
+     :Return
+ :EndIf
+ ('User setting file "',filename,'" does not exist?!')Assert ⎕NEXISTS filename
+ origData←1⊃⎕NGET filename
+ :If Arg.edit
+     :If 0=≢new←EditJSON origData
+         ⎕←'Cancelled without a change'
+     :Else
+         :If new≢origData
+         :AndIf 1 TC.C.YesOrNo'Do you want to save your changes to disk?'
+             (⊂new)⎕NPUT filename 1
+         :AndIf 1 TC.C.YesOrNo'Saved! Would you like to refresh the user settings in ⎕SE?'
+             TC.Init ⍬
+             ⎕←'User settings in ⎕SE updated'
+         :EndIf
+     :EndIf
+ :ElseIf Arg.refresh
+     r←TC.Init ⍬
+ :Else
+     :If ~Arg.apikey
+         origData←'api_key["]*: "[^"]+'⎕R'api_key: "***'⊣origData          ⍝ Replace API key by Asterisks
+     :EndIf
+     buff←(⎕UCS 10)(≠⊆⊢)origData
+     buff←(';'≠⊃¨buff)⌿buff
+     r←⍪(⊂'User settings in <',filename,'> :'),buff
+ :EndIf

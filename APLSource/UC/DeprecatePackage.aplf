@@ -1,0 +1,46 @@
+ r←DeprecatePackage Arg;id;force;uri;packageID;versions;msg;rc;comment
+ r←''
+ id←Arg._1
+ 'You must specify a Tatin Registry and a package ID'Assert 0<≢id
+ force←Arg.force
+ comment←Arg._2
+ id←TC.ReplaceRegistryAlias id
+ 'Tatin Registry not found'Assert 0<≢id
+ (uri packageID)←TC.Reg.SeparateUriAndPackageID id
+ 'You must specify a package ID'Assert 0<≢packageID
+ 'You must specify at least a group and a name'Assert 1≤'-'+.=id
+ packageID←TC.Reg.RemoveMinorAndPatch packageID
+ versions←TC.ListVersions uri,TC.Reg.RemoveVersionNumber packageID
+ :If 0=≢versions
+     r←'Package not found'
+ :Else
+     versions←∪↓TC.Reg.RemoveMinorAndPatch¨versions
+     :If 1='-'+.=packageID
+     :AndIf 1<≢versions
+         :If force
+             msg←'These major versions were found for ',packageID,' on ',uri,':',CR
+             msg,←⊃,/(⊂'  '),¨versions,¨CR
+             msg,←'Are you sure that you want to deprecate ALL these versions?'
+         :OrIf TC.C.YesOrNo msg
+             (rc msg)←TC.DeprecatePackage uri comment packageID
+             :If 0=rc
+                 r←'Successfully deprecated: ',packageID,' on ',uri,CR
+             :Else
+                 r←'Deprecating ',packageID,' on ',uri,' failed; ',msg,CR
+             :EndIf
+         :Else
+             r←'Cancelled by user'
+             :Return
+         :EndIf
+     :Else
+         :If force
+         :OrIf TC.C.YesOrNo'Sure that you want to deprecate <',packageID,'> on ',uri,' ?'
+             (rc msg)←TC.DeprecatePackage uri comment packageID
+             :If 0=rc
+                 r←'Successfully deprecated: ',packageID,' on ',uri
+             :Else
+                 r←'Deprecating ',packageID,' on ',uri,' failed: ',msg
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf

@@ -1,0 +1,30 @@
+ r←Run_(Cmd Input);ns
+ r←0
+ :If 0=⎕SE.⎕NC'Link.Version'
+ :OrIf 3>⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}⎕SE.Link.Version
+     'Tatin requires at least Link 3.0'⎕SIGNAL ErrNo
+ :EndIf
+ :If 0=⎕SE.⎕NC'Tatin'
+ :AndIf ≢/⎕C¨'LoadTatin'Cmd
+     LoadTatin''
+ :EndIf
+ :If ≡/⎕C¨'loadtatin'Cmd
+     Input.force LoadTatin(1+(0≡Input._1)∨0=≢Input._1)⊃Input._1''
+ :Else
+     :If 1
+         TC←⎕SE._Tatin.Client
+     :Else
+         TC←#.Tatin.Client
+         ⎕←'*** TC←#.Tatin.Client'
+     :EndIf
+     :If 0=TC.##.RumbaLean.⎕NC'DRC'
+     :OrIf {16::1 ⋄ 0⊣TC.##.RumbaLean.DRC.Version}''   ⍝ Can happen when the session was saved WITH Tatin, for example
+         TC.##.Admin.InitConga ⍬
+     :EndIf
+     r←1
+ :EndIf
+ :If 0<≢'[/\\]MyUCMDs[/\\]'⎕S 0⍠('IC' 1)⊣(2⊃⎕RSI).##.SourceFile
+     ⎕←'-----------------------------------------------------------------------------------------------------------------'
+     ⎕←'*** Tatin was installed into MyUCMDs/ - please remove and install from scratch according to the documentation ***'
+     ⎕←'-----------------------------------------------------------------------------------------------------------------'
+ :EndIf

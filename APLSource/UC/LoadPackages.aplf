@@ -1,0 +1,33 @@
+ r←LoadPackages Arg;targetSpace;identifier;saveIn;noOf;qdmx;verboseWas
+ r←''
+ verboseWas←TC.∆VERBOSE
+ TC.∆VERBOSE←Arg.verbose
+ (identifier targetSpace)←Arg.(_1 _2)
+ :If 0≡targetSpace
+     targetSpace←CalledFrom ⎕NSI
+ :EndIf
+ :If ~(⊂,1 ⎕C targetSpace)∊,¨'#' '⎕SE'
+     ('"',targetSpace,'" is not a valid APL name')Assert ¯1≠⎕NC targetSpace
+ :EndIf
+ :If ~(⊃targetSpace)∊'#⎕'
+     targetSpace←(CalledFrom ⎕NSI),'.',targetSpace
+ :EndIf
+ saveIn←{⍵↑⍨¯1+⍵⍳'.'}targetSpace
+ 'Invalid target namespace'Assert{(⊂1 ⎕C,⍵)∊,¨'#':1 ⋄ (⎕NC ⍵)∊0 9}saveIn,'.foo'
+ saveIn←⍎saveIn
+ :If ~(⊂1 ⎕C targetSpace)∊,¨'#' '⎕SE'
+ :AndIf 0=saveIn.⎕NC'targetSpace'
+     '"targetSpace" does not specify a fully qualified namespace in either # or ⎕SE'Assert'.'∊targetSpace
+     ((1+≢saveIn)↓targetSpace)saveIn.⎕NS''
+ :EndIf
+ :Trap 0
+     noOf←Arg.nobetas TC.LoadPackages identifier targetSpace
+     r←(⍕noOf),' package',((1≠noOf)/'s'),' loaded into ',targetSpace
+ :Else
+          ⍝ We must make sure that all connections get closed before passing on the error
+     qdmx←⎕DMX
+     TC.CloseConnections 1
+     CheckForInvalidVersion qdmx
+ :EndTrap
+ TC.∆VERBOSE←verboseWas
+⍝Done

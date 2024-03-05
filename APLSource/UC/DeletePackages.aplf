@@ -1,0 +1,83 @@
+ msg←DeletePackages Arg;qdmx;url;group;list;list2;groups;packageIDs;b;ind;buff;msgs;statusCodes;force;flag
+ (url packageIDs)←TC.SplitUrlAndPackageID TC.ReplaceRegistryAlias Arg._1
+ 'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert 0<≢url
+ 'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert'https://tatin.dev'{⍺≢(≢⍺)↑⍵}url
+ force←Arg.Switch'force'
+ group←TC.Reg.GetGroupFromPackageID packageIDs
+ flag←0
+ :If 0=≢group
+     TC.EstablishEmptyPermanentConnections 1
+     TC.Connect2Client url
+     list←{⍵[;1]}TC.ListPackages url
+     list,←∪{⍵/⍨2>+\⍵='-'}¨,TC.ListDeprecated url
+     list2←↑{'-'(≠⊆⊢)⍵}¨list
+     groups←∪list2[;1]
+     :If 1=≢groups
+         group←1⊃groups
+     :Else
+         b←(⎕C list2[;2])≡¨⊂TC.Reg.RemoveVersionNumber ⎕C packageIDs
+         :If 0=+/b
+             msg←'Package(s) not found' ⋄ →∆Quit
+         :EndIf
+         list2←b⌿list2
+         :If 1=+/b
+             group←⊃list2
+         :Else
+             ind←'SelectGroup@Select group'TC.C.Select list2[;1]
+             :If 0=≢ind
+                 msg←'Cancelled by user' ⋄ →∆Quit
+             :Else
+                 group←ind⊃list2[;1]
+             :EndIf
+         :EndIf
+     :EndIf
+     packageIDs←group,'-',packageIDs
+ :EndIf
+ :If TC.Reg.IsValidPackageID_Complete packageIDs
+     packageIDs←⊆packageIDs
+ :Else
+     TC.EstablishEmptyPermanentConnections 1
+     TC.Connect2Client url
+     list←TC.ListVersions url,packageIDs
+     'No matching packages found'Assert 0<≢list
+     packageIDs←,list
+     flag←1
+     :If ~force
+         :If ~flag
+             TC.Connect2Client url
+             list←TC.ListVersions url,packageIDs
+         :EndIf
+         :If 1=≢list
+             :If 1 TC.C.YesOrNo'DeleteThisPkg@Are you sure you want to delete the package',CR,('   ',⊃list),CR,'from ',url,' ?'
+                 packageIDs←⊂⊃list
+             :Else
+                 msg←'Cancelled by user' ⋄ →∆Quit
+             :EndIf
+         :Else
+             ind←'SelectVersionsForDeletion@Select versions for deletion' 1 TC.C.Select,list
+             :If 0=≢ind
+                 msg←'Cancelled by user' ⋄ →∆Quit
+             :Else
+                 packageIDs←,list[ind;]
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf
+
+ :Trap ErrNo
+     (statusCodes msgs)←TC.DeletePackages url{⍺∘,¨⊆⍵}packageIDs
+ :Else
+     TC.CloseConnections 1
+     qdmx←⎕DMX
+     CheckForInvalidVersion qdmx
+     0 Assert⍨'Deleting package',(()/'s'),' failed: ',qdmx.EM,' (rc=',(⍕qdmx.EN),')'
+ :EndTrap
+ :If statusCodes∧.=200
+     msg←{(⍕⍵),' package',(((1<⍵)/'s')),' successfully deleted'}≢packageIDs
+ :Else
+     msg←↑(⊂¨url{⍺∘,¨⊆⍵}packageIDs),¨(⊂∘,¨statusCodes),¨⊂¨msgs
+ :EndIf
+
+∆Quit:
+ TC.CloseConnections 1
+⍝Done

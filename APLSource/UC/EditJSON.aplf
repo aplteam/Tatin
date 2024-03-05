@@ -1,0 +1,22 @@
+ r←EditJSON data;ns;flag
+ flag←0
+ ns←#.⎕NS''
+ ns.UserSettings←data
+ :Repeat
+     ns.⎕ED'UserSettings'
+     :If 0=≢ns.UserSettings
+         r←⍬
+         flag←1
+     :Else
+         :If {0::1 ⋄ 0⊣JSON ⍵}{b←';'≠⊃¨d←(⎕UCS 10)(≠⊆⊢)⍵ ⋄ 1↓⊃,/(⎕UCS 10),¨b/d}ns.UserSettings
+             :If ~1 TC.C.YesOrNo'The JSON is invalid; would you like to edit it again? ("N"=drop out without change)'
+                 r←''
+                 flag←1
+             :EndIf
+         :Else
+             r←ns.UserSettings
+             flag←1
+         :EndIf
+     :EndIf
+ :Until flag
+⍝Done

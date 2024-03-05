@@ -1,0 +1,131 @@
+ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename;what;uri;list;flag;data;openCiderProjects;ind;error;project;ref;name
+ r←⍬
+ ref←⍬
+ project←0
+ :If (,0)≡,what←Arg._1
+     :If 9=⎕SE.⎕NC'Cider'
+         project←1
+         openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+         :If 1<≢openCiderProjects
+             ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+             :If 0=≢ind
+                 r←'Cancelled by user' ⋄ →0
+             :Else
+                 what←2⊃openCiderProjects[ind;]
+             :EndIf
+         :ElseIf 1=≢openCiderProjects
+             (name what)←openCiderProjects[1;1 2]
+             ref←⍎name
+         :Else
+             what←TC.F.PWD
+             :If ~TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
+                 r←'Cancelled by user' ⋄ →0
+             :EndIf
+         :EndIf
+     :Else
+         what←TC.F.PWD
+         :If TC.C.YesOrNo'Sure you want to deal with ',what,' ?'
+             r←'Cancelled by user' ⋄ →0
+         :EndIf
+     :EndIf
+ :ElseIf '['∊what
+     what←TC.ReplaceRegistryAlias what
+     'Alias is not a known Registry'Assert 0<≢what
+     what←0 TC.CheckVersion what
+     'Unknwon package name'Assert 0<≢what
+ :EndIf
+ :If TC.Reg.IsHTTP what
+     :Trap ErrNo
+         r←TC.ReadPackageConfigFile_ what
+     :Else
+         qdmx←⎕DMX
+         CheckForInvalidVersion qdmx
+     :EndTrap
+ :Else
+     path←what
+     filename←'expand'TC.F.NormalizePath({⍵,(~(¯1↑⍵)∊'/\')/'/'}path),TC.CFG_Name
+     :If Arg.delete
+         'File not found'Assert TC.F.IsFile filename
+         msg←'Sure you want to delete "',filename,'" ?'
+         :If Arg.quiet
+         :OrIf 0 TC.C.YesOrNo msg
+             TC.F.DeleteFile filename
+         :EndIf
+     :Else
+         :If 0=TC.F.IsDir path
+             :If Arg.quiet
+             :OrIf TC.C.YesOrNo'The directory does not exist yet. Would you like to create it?'
+                 'Could not create the directory'Assert TC.F.MkDir path
+             :Else
+                 ⎕←'Cancelled'
+                 :Return ⍝ Give up
+             :EndIf
+         :EndIf
+         :If TC.F.IsFile filename
+             ns←TC.ReadPackageConfigFile path
+             newFlag←0
+         :Else
+             :If ~Arg.quiet
+             :AndIf 0=1 TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
+                 ⎕←'Cancelled by user' ⋄ →0
+             :EndIf
+             :If project
+                 ns←what TC.InitPackageConfig ⍬
+                 ns←what TC.DiscussNewConfigFile ns
+             :Else
+                 ns←TC.InitPackageConfig ⍬
+                 ns←TC.DiscussNewConfigFile ns
+             :EndIf
+             newFlag←1
+         :EndIf
+         :If Arg.edit∨newFlag
+             :If 0=ns.⎕NC'license'
+                 ns.license←''
+             :EndIf
+             data←TC.Reg.JSON ns
+             data←TC.AddCommentToPackageConfig data
+             origData←data
+             error←0
+             :Repeat
+                 (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'data path
+                 :If ¯1=success
+                     ⎕←'Cancelled by user' ⋄ →0
+                 :EndIf
+                 flag←1
+                 :If success∨error
+                     :If 0<≢∊newData
+                     :AndIf newFlag∨newData≢origData
+                         ns←TC.Reg.JSON newData
+                         :Trap ErrNo
+                             1 TC.WritePackageConfigFile path ns
+                         :Else
+                             qdmx←⎕DMX
+                             ⎕←qdmx.EM
+                             :If 0=1 TC.C.YesOrNo'Would you like to try to fix the problem in the editor? (n=abandon changes)'
+                                 ⎕←'Cancelled, no change'
+                             :Else
+                                 flag←0
+                                 error←1
+                                 data←newData
+                             :EndIf
+                         :EndTrap
+                         :If flag
+                             :If 0<≢ns.source                                  ⍝ Is defined...
+                             :AndIf 0=≢3⊃⎕NPARTS ns.source                     ⍝ ...and has no extension...
+                                 'Create!'TC.F.CheckPath path,'/',ns.source    ⍝ ...so we create it in case it does not exist yet
+                             :EndIf
+                             :If ⍬≢ref
+                             :AndIf 3=ref.⎕NC'TatinVars.CONFIG'
+                                 ref.TatinVars.⎕FX'r←CONFIG'('r←''',(''''⎕R''''''⊢⎕JSON⍠('Compact' 0)⊣ns),'''')
+                             :EndIf
+                         :EndIf
+                     :EndIf
+                 :Else
+                     ⎕←'No change, therefore no action is taken'
+                 :EndIf
+             :Until flag
+         :Else
+             r←TC.Reg.JSON ns
+         :EndIf
+     :EndIf
+ :EndIf

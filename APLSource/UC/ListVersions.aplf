@@ -1,0 +1,46 @@
+ r←ListVersions Arg;qdmx;dateFlag;buff;caption;ind;arg
+ dateFlag←Arg.Switch'date'
+ arg←Arg._1
+ :Trap ErrNo
+     :If '[?]'{⍺≡(≢⍺)↑⍵}arg
+         'No package specified'Assert 0<≢{⍵↓⍨⌈/⍵⍳'?]'}arg
+         buff←{⍵[;,2]}1 TC.ListRegistries 0
+         ind←'Please select a Registry:'TC.C.Select↓⎕FMT buff
+         :If 0=≢ind
+             r←'Cancelled by user'
+             :Return
+         :Else
+             arg←(1⊃buff[ind;]),{⍵↓⍨⌈/⍵⍳'?]'}arg
+         :EndIf
+     :EndIf
+     :If dateFlag
+         r←dateFlag TC.ListVersions arg
+         r[;2⊃⍴r]←TC.Reg.FormatFloatDate¨r[;2⊃⍴r]
+         r←⊃,/CR,¨↓⍕r
+         r←(1↓⊃,/CR,¨↓('All versions of <',arg,'> :'),[0.5]'-'),r
+     :Else
+         buff←TC.ListVersions arg
+         :If 0=≢buff
+             r←'Not found: <',arg,'>'
+         :ElseIf TC.Reg.IsHTTP TC.ReplaceRegistryAlias arg
+             caption←1 2⍴('All versions of package <',arg,'> :')' '
+             caption⍪←('-'⍴⍨≢1⊃caption[1;])''
+             buff[;1]←' ',¨buff[;1]
+             r←caption⍪buff,' '
+         :Else
+             :If 2=2⊃⍴buff
+                 r←⍪(↓⎕FMT 2↑('All versions of <',arg,'> :'),[0.5]'-'),↓⎕FMT' ',¨buff
+             :Else
+                 r←(⍪↓('All versions of <',arg,'> :'),[0.5]'-')⍪' ',¨buff
+             :EndIf
+         :EndIf
+     :EndIf
+ :Else
+     qdmx←⎕DMX
+     CheckForInvalidVersion qdmx
+     :If 0=≢qdmx.EM
+         ('Not found: ',arg)⎕SIGNAL ErrNo
+     :Else
+         qdmx.EM ⎕SIGNAL ErrNo
+     :EndIf
+ :EndTrap

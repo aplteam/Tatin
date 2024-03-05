@@ -1,0 +1,98 @@
+ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;msg;rc;installFolder_;isUserCommand;buff;confirmed
+ r←''
+ (identifier installFolder)←Arg.(_1 _2)
+ :If 0≡installFolder
+     :If 9=⎕SE.⎕NC'Cider'
+         openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+         :If 1<≢openCiderProjects
+             ind←'Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+             :If 0=≢ind
+                 r←'Cancelled by user' ⋄ →0
+             :Else
+                 project←2⊃openCiderProjects[ind;]
+             :EndIf
+         :ElseIf 1=≢openCiderProjects
+             project←2⊃openCiderProjects[1;]
+         :Else
+             r←'No path specified & no open Cider projects found' ⋄ →0
+         :EndIf
+         ('No Cider config file found in ',project)Assert ⎕NEXISTS project,'/cider.config'
+         cfg←TC.Reg.GetJsonFromFile project,'/cider.config'
+         (project,' has not been converted yet: cannot be processed')Assert 0=cfg.CIDER.⎕NC'tatinFolder'
+         folders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+         (project,' has no dependency folder(s) defined')Assert 0<≢⊃,/folders
+         :If 1<≢folders
+             folders←{⍵↑⍨¯1+⍵⍳'='}¨folders
+             ind←'Which folder would you like to install packages into?'TC.C.Select(⊂project,'/'),¨folders
+             :If 0=≢ind
+                 r←'Cancelled by user' ⋄ →0
+             :Else
+                 installFolder←project,'/',ind⊃folders
+             :EndIf
+         :ElseIf 1=≢folders
+             installFolder←project,'/',{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}1⊃folders
+             :If ~TC.C.YesOrNo'ConFirmInstallFolder@Sure that you want to install into ',installFolder,'?'
+                 →0 ⋄ r←'Cancelled by user'
+             :EndIf
+         :EndIf
+     :EndIf
+ :EndIf
+ 'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
+ :If '[myucmds]'{⍺≢(≢⍺)↑⍵}⎕C installFolder
+ :AndIf './'≢2⍴installFolder
+ :AndIf '/'≠1⍴installFolder
+ :AndIf ~':'∊installFolder
+     :If '['=1⍴installFolder
+     :AndIf ']'∊installFolder
+         installFolder←TranslateCiderAlias installFolder
+         :If 0=≢installFolder
+             r←'Cancelled by user' ⋄ →0
+         :EndIf
+     :Else
+         :If 0=≢installFolder←EstablishPackageFolder{0≡⍵:'' ⋄ ⍵}installFolder
+             :Return
+         :EndIf
+         :If 0=TC.C.YesOrNo'Sure that you want act on: ',installFolder,' ?'
+             :Return
+         :EndIf
+     :EndIf
+ :EndIf
+ confirmed←0
+ :If '[myucmds]'{⍺≡(≢⍺)↑⍵}⎕C installFolder
+     :If ','∊identifier
+         'You must not specify a name after [MyUCMDs] when installing more than one package'Assert 0=≢(≢'[myucmds]')↓installFolder
+     :EndIf
+     buff←(≢'[myucmds]')↓installFolder
+     :If 0=≢buff
+         :If TC.IsHTTP identifier
+             buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}{'/'∊⍵:⍵↓⍨⍵⍳'/' ⋄ ⍵}TC.RemoveHttpProtocol TC.Reg.RemoveVersionNumber{'['∊⍵:⍵↓⍨⍵⍳']'}identifier
+         :Else
+             buff←{'-'∊⍵:⍵↓⍨⍵⍳'-' ⋄ ⍵}2⊃⎕NPARTS TC.Reg.RemoveVersionNumber 2⊃⎕NPARTS identifier
+         :EndIf
+     :EndIf
+     msg←'Sure you want to install',CR,'   ',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),CR,'into [MyUCMDs]',({']'∊⍵:⍵↓⍨⍵⍳']' ⋄ ⍵}buff),' ?'
+     :If ~confirmed←TC.CommTools.YesOrNo msg
+         r←'Cancelled by user' ⋄ →0
+     :EndIf
+ :EndIf
+ :If ~⎕NEXISTS installFolder
+ :AndIf ~confirmed
+ :AndIf 0=1 TC.CommTools.YesOrNo'ConfirmInstallFolder@Sure you want to create and install into',CR,installFolder,' ?'
+     r←'Cancelled by user' ⋄ →0
+ :EndIf
+ :Trap 0
+     r←TC.InstallPackages identifier installFolder
+ :Else
+          ⍝ We must make sure that all connections get closed before passing on the error
+     qdmx←⎕DMX
+     TC.CloseConnections 1
+     :If 90=qdmx.EN  ⍝ .NET error?!
+         (⍕⎕EXCEPTION)⎕SIGNAL 11
+     :Else
+         CheckForInvalidVersion qdmx
+     :EndIf
+ :EndTrap
+ :If 0<≢r
+     r←⍪(⊂'Installed into ',installFolder,':'),' ',¨r
+ :EndIf
+⍝Done

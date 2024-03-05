@@ -1,0 +1,193 @@
+ r←List
+ r←⍬
+ :If IfAtLeastVersion 18
+
+     c←⎕NS ⍬
+     c.Name←'BuildPackage'
+     c.Desc←'Build a new version of a package (zips) all required files in ⍵[1] into the folder ⍵[2]'
+     c.Parse←'2s -dependencies= -version= -tatinVars='
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'Cache'
+     c.Desc←'List contents of the Tatin package cache'
+     c.Parse←'1s -clear -path -force'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'CreatePackage'
+     c.Desc←'Create a new Tatin package'
+     c.Parse←'1s'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'DeprecatePackage'
+     c.Desc←'Declare a package as deprecated'
+     c.Parse←'2 -force'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'FindDependencies'
+     c.Desc←'Search the folder for given packages and report installed packages'
+     c.Parse←'1-2 -verbose'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'InstallPackages'
+     c.Desc←'Install one or more packages and all its dependencies into a given folder'
+     c.Parse←'1-2 -nobetas'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'ListLicenses'
+     c.Desc←'Returns information regarding the licenses tolerated by a managed Tatin Registry'
+     c.Parse←'1s -verbose'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'ListDeprecated'
+     c.Desc←'List all deprecated packages (major versions only)'
+     c.Parse←'1s -all'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'ListRegistries'
+     c.Desc←'List all registries defined in the user settings'
+     c.Parse←'0 -full -raw'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'ListPackages'
+     c.Desc←'List all packages in the Registry or install folder specified in the argument'
+     c.Parse←'1s -group= -tags= -os= -noaggr -date -project_url -since= -uc'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'ListVersions'
+     c.Desc←'List all versions of the specified package or all versions of a particular Registry'
+     c.Parse←'1 -date'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'LoadPackages'
+     c.Desc←'Load the package(s) specified in the argument and all dependencies into the WS or ⎕SE'
+     c.Parse←'1-2 -nobetas -verbose'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'LoadTatin'
+     c.Desc←'Load the Tatin client into ⎕SE, resulting in ⎕SE.Tatin, and initializes it'
+     c.Parse←'1s -force'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'LoadDependencies'
+     c.Desc←'Take a folder (⍵[1]) with installed packages and loads all of them into ⍵[2]'
+     c.Parse←'1-2 -overwrite -makeHomeRelative'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'Maintenance'
+     c.Desc←'Checks whether there is a maintenance file to be executed'
+     c.Parse←'1s -dry -show'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'UserSettings'
+     c.Desc←'The user settings and the fully qualified filenanme are printed to ⎕SE as JSON'
+     c.Parse←'0 -edit -apikey -refresh -home'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'PackageConfig'
+     c.Desc←'Retrieve (via HTTP or file://) or create and/or edit a package config file for a specific package'
+     c.Parse←'1s -delete -edit -quiet'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'PackageDependencies'
+     c.Desc←'Create and/or edit a package dependency file for a specific folder'
+     c.Parse←'1 -delete -edit -quiet'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'PublishPackage'
+     c.Desc←'Publish a package (package folder or ZIP file) to a particular Registry'
+     c.Parse←'2s -dependencies='
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'Version'
+     c.Desc←'Print name, version number and version date of the client to the session'
+     c.Parse←'1s -check -all'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'ListTags'
+     c.Desc←'List all tags used in all packages'
+     c.Parse←'1s -tags= -os='
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'Init'
+     c.Desc←'(Re)-establish the user settings'
+     c.Parse←'1s'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'CheckForLaterVersion'
+     c.Desc←'Check whether there are later versions of a package available'
+     c.Parse←'1 -major -dependencies'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'Documentation'
+     c.Desc←'Load the documentation center into the default browser'
+     c.Parse←''
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'DeletePackages'
+     c.Desc←'Delete one or more packages from a Tatin Registry'
+     c.Parse←'1 -force'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'GetDeletePolicy'
+     c.Desc←'Ask the server about its "Delete" policy'
+     c.Parse←'1s -check'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'UnInstallPackages'
+     c.Desc←'Un-install a package, and implicitly its dependencies'
+     c.Parse←'2s -cleanup -quiet'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'UpdateTatin'
+     c.Desc←'Attempt to update the Tatin client and reports the result'
+     c.Parse←''
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'ReInstallDependencies'
+     c.Desc←'Install all packages again according to the dependency file'
+     c.Parse←'2s -nobetas -dry -force -update'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'Ping'
+     c.Desc←'Ping Tatin server(s) with very little overhead'
+     c.Parse←'1s'
+     r,←c
+
+     c←⎕NS ⍬
+     c.Name←'UsageData'
+     c.Desc←'Make usage data available for the specified Tatin Registry'
+     c.Parse←'1s -download -unzip -all -folder='
+     r,←c
+
+     r.Group←⊂NM
+
+ :EndIf

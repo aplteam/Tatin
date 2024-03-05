@@ -1,0 +1,30 @@
+ r←PackageDependencies Arg;path;newFlag;origData;success;newData;msg;temp;filename
+ r←⍬
+ path←Arg._1
+ filename←path,'/apl-dependencies.txt'
+ :If Arg.delete
+     'File not found'Assert TC.F.IsFile filename
+     msg←'Sure you want to delete the package dependency file in "',filename,'" ?'
+     :If Arg.quiet
+     :OrIf 0 TC.C.YesOrNo msg
+         TC.F.DeleteFile filename
+     :EndIf
+ :ElseIf Arg.edit
+     'Path does not exist'Assert TC.F.IsDir path
+     temp←⎕NS'EditText'
+     :If TC.F.IsFile filename
+         origData←1⊃TC.F.NGET filename 1
+         newFlag←0
+     :Else
+         origData←,⊂''
+         newFlag←1
+     :EndIf
+     (success newData)←(CheckDependencies EditText)'PackageDependencies'origData
+     :If 0<≢∊newData
+     :AndIf newFlag∨newData≢origData
+         (⊂newData)TC.F.NPUT filename 1
+     :EndIf
+ :Else
+     'File not found'Assert TC.F.IsFile filename
+     r←⊃TC.F.NGET filename
+ :EndIf

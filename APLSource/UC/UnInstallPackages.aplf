@@ -1,0 +1,62 @@
+ r←UnInstallPackages Arg;path;packageID;msg;ind;list;candidates;subFolders;cfg
+    ⍝ Attempt to un-install the top-level package `packageID` from the folder `path`
+ r←''
+ 'You must specify a package ID or at least "?"'Assert 0 0≢Arg.(_1 _2)
+ :If Arg.cleanup
+     'You must not specify more than one argument together with the -cleanup flag'Assert 0≡Arg._2
+     packageID←''
+     path←Arg._1
+ :Else
+     (packageID path)←Arg.(_1 _2)
+     :If path≡0
+         path←EstablishPackageFolder''
+         :If 0=≢path
+             r←'Cancelled by user' ⋄ →0
+         :EndIf
+     :EndIf
+     :If (,'?')≡,packageID
+         candidates←{⍵[;2]}1 TC.LoadBuildList path
+         :Select ≢candidates
+         :Case 0
+             r←'No packages found' ⋄ →0
+         :Case 1
+             packageID←⊃candidates
+         :Else
+             :If 0<≢ind←('Which packages do you wish to uninstall from ',path,' ?')TC.CommTools.Select candidates
+                 packageID←ind⊃candidates ⍝ We allow only one package at the time to be uninstalled
+             :Else
+                 r←'No package selected' ⋄ →0
+             :EndIf
+         :EndSelect
+         'You must specify <packageID> and <installFolder>'Assert∧/0≢¨packageID path
+         'No package specified'Assert 0≢packageID
+     :EndIf
+ :EndIf
+ :If './'≢2⍴path
+ :AndIf '/'≠1⍴path
+ :AndIf ~':'∊path
+     :If '['=1⍴path
+     :AndIf ']'∊path
+         :If '[myucmds]'≡⎕C{⍵↑⍨⍵⍳']'}path
+             path←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}path
+         :Else
+             path←TranslateCiderAlias path
+         :EndIf
+     :Else
+         :If 0=≢path←Arg.quiet EstablishPackageFolder path
+             :Return
+         :EndIf
+         ('Does not exist: ',path)Assert TC.F.IsDir path
+         :If 0=TC.C.YesOrNo'Sure that you want act on: ',path,' ?'
+             :Return
+         :EndIf
+     :EndIf
+ :EndIf
+ :If 0=≢path
+     r←'Cancelled by user'
+ :Else
+     'Please specify only one package at the time'Assert~','∊packageID
+     (list msg)←TC.UnInstallPackages packageID path
+     msg Assert 0=≢msg
+     r←⍪(⊂'These packages were uninstalled:'),list
+ :EndIf

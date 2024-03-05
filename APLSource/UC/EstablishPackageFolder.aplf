@@ -1,0 +1,60 @@
+ folder←{quietFlag}EstablishPackageFolder folder;list;ind;cfg;pkgFolders
+    ⍝ Checks first whether it's meant to be an open Cider project (if Cider is around).
+    ⍝ Next it tries to find it in the current dir.
+    ⍝ The user should always be asked for confirmation.
+    ⍝ If `folder` is relative and there are more than one Cider projects open then the user
+    ⍝ is asked which one she wants to act on except when `quietFlag` is 1 (default is 0)
+    ⍝ when an error is generated instead.
+ quietFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'quietFlag'
+ :If ~IsAbsolutePath folder
+     :If 0<⎕SE.⎕NC'Cider'
+         :If 1=≢list←⎕SE.Cider.ListOpenProjects 0
+             folder←'expand'TC.F.NormalizePath(2⊃list[1;]),'/',folder
+             folder,←(~(¯1↑folder)∊'/\')/'/'
+             :If 0=TC.F.IsFile folder,'apl-dependencies.txt'
+                 cfg←TC.Reg.JSON⊃TC.F.NGET folder,'cider.config'
+                 pkgFolders←(cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+                 :If 0=≢pkgFolders
+                     folder←''
+                 :ElseIf 2=≢pkgFolders
+                     ind←'Select target folder:'TC.CommTools.Select folder∘,¨{'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨pkgFolders
+                     :If 0=≢ind
+                         folder←''
+                     :Else
+                         folder,←ind⊃pkgFolders
+                     :EndIf
+                 :Else
+                     folder←1⊃pkgFolders
+                 :EndIf
+             :EndIf
+             folder←{⍵↑⍨¯1+⍵⍳'='}folder
+         :ElseIf 0=≢list
+             :If TC.F.IsDir TC.F.PWD,'/',folder
+                 folder←TC.F.PWD,'/',folder
+             :Else
+                 ('Not found: ',folder)Assert 0
+             :EndIf
+         :Else
+             :If quietFlag
+                 ('Folder does not exist: ',folder)⎕SIGNAL ErrNo
+             :Else
+                 ind←'For which project?'TC.C.Select↓⍕list
+                 :If 0=≢ind
+                     folder←0⍴⎕←'Cancelled by user'
+                 :Else
+                     folder←(⊃list[ind;2]),'/',folder
+                     :If TC.F.IsDir folder
+                     :OrIf TC.CommTools.YesOrNo'The folder'folder'does not yet exist! Shall it be created?'
+                         'CREATE!'TC.F.CheckPath folder
+                     :Else
+                         ('Folder does not exist: ',folder)Assert 0
+                     :EndIf
+                 :EndIf
+             :EndIf
+         :EndIf
+     :Else
+         :If TC.F.IsDir TC.F.PWD,'/',folder
+             folder←TC.F.PWD,'/',folder
+         :EndIf
+     :EndIf
+ :EndIf

@@ -1,0 +1,14 @@
+ errMsg←CheckDependencies txt;f1;f2;f3;f
+⍝ Every single line must have at least a group name and a package name
+⍝ but optionally also major.minor.patch
+ f1←TC.Reg.IsValidPackageID_Complete¨txt
+ f2←TC.Reg.IsValidPackageID_WithMajorNo¨txt
+ f3←TC.Reg.IsValidPackageID_WithoutVersionNo¨txt
+ errMsg←''
+ :If ∨/~f←f1+f2+f3
+     :If 1=+/~f
+         errMsg←'Not a valid package ID: ',⊃(~f)/txt
+     :Else
+         errMsg←'Not valid package IDs: ',⊃{⍺',',⍵}/(~f)/txt
+     :EndIf
+ :EndIf

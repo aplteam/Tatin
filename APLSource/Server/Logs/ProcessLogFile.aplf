@@ -1,4 +1,4 @@
- {r}←ProcessLogFile(folder TS);filename;raw;y;b;data;y2;m;m_;until;f;lms;flag
+ {r}←ProcessLogFile(folder TS);filename;raw;y;b;data;y2;m;m_;until;f;lms;flag;⎕TRAP
 ⍝ Old years are removed from the log file
 ⍝ Months of the current year are accumulated until the current month-1 (TS[2])
 ⍝ * `folder` is where the log files live
@@ -32,7 +32,9 @@
  :AndIf ((≢m_)⊃m_)>lms+1                                    ⍝ New month?! (But never Jan until current month is at least Feb)
      b←m_<m                                                 ⍝ All before the current month
      data←b/raw                                             ⍝ We are interested in everything but the current month
+     ⎕TRAP←0 'S'   ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝
      data←ProcessLogData data                               ⍝ Aggregate
+ :AndIf 0<≢data
      y2←⍕⊃data[1;4]
      until←¯2↑'00',⍕5⊃data[≢data;]
      f←folder,'usage-data-',y2,'-',until

@@ -3,16 +3,12 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- {}2022 2 15 TS.Logs.CheckLogFile ∆LOG_PATH
+ TS.Logs.ProcessLogFile ∆LOG_PATH(2022 2 15)
  →T.PassesIf 0=≢⊃F.Dir ∆LOG_PATH,'usage-data-2021-*'
  →T.PassesIf 1=⎕NEXISTS ∆LOG_PATH,'usage-data-2021.csv'
  →T.PassesIf 1=⎕NEXISTS ∆LOG_PATH,'usage-data-2021.zip'
- →T.PassesIf 1=⎕NEXISTS ∆LOG_PATH,'usage-data-2022-01.csv'
- →T.PassesIf 1=⎕NEXISTS ∆LOG_PATH,'usage-data-2022-01.zip'
- →T.PassesIf 2=⊃⊃(//)⎕VFI ⎕TC~⍨⊃⎕NGET ∆LOG_PATH,'month'
- →T.PassesIf 2022=⊃⊃(//)⎕VFI ⎕TC~⍨⊃⎕NGET ∆LOG_PATH,'year'
  data←⎕CSV ∆LOG_PATH,'usage-data-2021.csv'
- →T.PassesIf ~(⊂'Must-NotShow')∊ ⊃¨{⍺,'.',⍵}/¨↓2↑[2]1↓data ⍝ Because that is flagged as a test case
+ →T.PassesIf~(⊂'Must-NotShow')∊⊃¨{⍺,'.',⍵}/¨↓2↑[2]1↓data ⍝ Because that is flagged as a test case
 
  r←T._OK
 ⍝Done

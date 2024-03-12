@@ -31,25 +31,26 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <li class="toc-entry toc-h2"><a href="#prepare-either-the-client-or-the-server">5. Prepare either the Client or the Server</a></li>
 <li class="toc-entry toc-h2"><a href="#updating-tatin-packages-used-by-tatin">6. Updating Tatin packages used by Tatin</a></li>
 <li class="toc-entry toc-h2"><a href="#do-your-thing">7. Do your thing</a></li>
-<li class="toc-entry toc-h2"><a href="#executing-the-test-cases">8. Executing the test cases</a>
+<li class="toc-entry toc-h2"><a href="#special-case-working-on-user-commands">8. Special case: working on user commands</a></li>
+<li class="toc-entry toc-h2"><a href="#executing-the-test-cases">9. Executing the test cases</a>
 <ul>
-<li class="toc-entry toc-h3"><a href="#testing-while-developing">8.1. Testing while developing</a>
+<li class="toc-entry toc-h3"><a href="#testing-while-developing">9.1. Testing while developing</a>
 <ul>
-<li class="toc-entry toc-h4"><a href="#executing-all-tests">8.1.1. Executing all tests</a></li>
-<li class="toc-entry toc-h4"><a href="#quitting-tests">8.1.2. Quitting tests</a></li>
-<li class="toc-entry toc-h4"><a href="#executing-only-particular-tests">8.1.3. Executing only particular tests</a></li>
+<li class="toc-entry toc-h4"><a href="#executing-all-tests">9.1.1. Executing all tests</a></li>
+<li class="toc-entry toc-h4"><a href="#quitting-tests">9.1.2. Quitting tests</a></li>
+<li class="toc-entry toc-h4"><a href="#executing-only-particular-tests">9.1.3. Executing only particular tests</a></li>
 </ul></li>
-<li class="toc-entry toc-h3"><a href="#tests-as-part-of-an-automated-build">8.2. Tests as part of an automated build</a>
+<li class="toc-entry toc-h3"><a href="#tests-as-part-of-an-automated-build">9.2. Tests as part of an automated build</a>
 <ul>
-<li class="toc-entry toc-h4"><a href="#running-the-test-suite-from-apl">8.2.1. Running the test suite from APL</a></li>
-<li class="toc-entry toc-h4"><a href="#running-the-test-suite-from-a-console-or-terminal">8.2.2. Running the test suite from a console or terminal</a></li>
+<li class="toc-entry toc-h4"><a href="#running-the-test-suite-from-apl">9.2.1. Running the test suite from APL</a></li>
+<li class="toc-entry toc-h4"><a href="#running-the-test-suite-from-a-console-or-terminal">9.2.2. Running the test suite from a console or terminal</a></li>
 </ul></li>
 </ul></li>
-<li class="toc-entry toc-h2"><a href="#how-to-create-a-new-version">9. How to create a new version</a>
+<li class="toc-entry toc-h2"><a href="#how-to-create-a-new-version">10. How to create a new version</a>
 <ul>
-<li class="toc-entry toc-h3"><a href="#ov1">9.1. Overview</a></li>
+<li class="toc-entry toc-h3"><a href="#ov1">10.1. Overview</a></li>
 </ul></li>
-<li class="toc-entry toc-h2"><a href="#creating-a-document-for-proofreading">10. Creating a document for proofreading</a>
+<li class="toc-entry toc-h2"><a href="#creating-a-document-for-proofreading">11. Creating a document for proofreading</a>
 </ul>
 </div>
 </nav>
@@ -61,7 +62,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>If you want to contribute to the <a href="https://github.com/aplteam/Tatin" class="external_link">Tatin project on GitHub</a> or make adjustments to Tatin for an in-house project, this document will help you.</p>
 <p>Tatin is published under the MIT license, so everybody is welcome to contribute to the code. It is not owned by anybody; it is rather a community project.</p>
 <p>This document also discusses how to execute the test suite and how to build a new version of Tatin.</p>
-<p>However, this is not an introduction to how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google “contribute to a GitHub project”.</p>
+<p>Note that this is not an introduction to how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google “contribute to a GitHub project”.</p>
 <div class="h_tag">
 <a href="#requirements" id="requirements" class="autoheader_anchor">
 <h2 data-id="Requirements">2. Requirements</h2>
@@ -76,6 +77,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </ul>
 <p>AIX is not supported. The PI is not officially supported but it will probably work anyway.</p>
 <p>You also need to have Git installed.</p>
+<p>While you can develop on any operating system, building a new version is currently only supported on Windows. This restriction is likely to be lifted in a later version.</p>
 <div class="h_tag">
 <a href="#tatin-is-managed-by-cider" id="tatin-is-managed-by-cider" class="autoheader_anchor">
 <h2 data-id="Tatin-is-managed-by-Cider">3. Tatin is managed by Cider</h2>
@@ -111,13 +113,11 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </a>
 </div>
 <p>Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.</p>
-<p>For that reason, the packages installed in the <code>packages/</code> folder are copied over to the <code>APLSource/</code> folder when a new version is built. That allows loading the packages with Link.</p>
-<p>If you need to add a package then you need to perform a couple of steps:</p>
+<p>For that reason, the packages installed in the <code>packages/</code> folder a need to be brought into the <code>APLSource/</code> folder by other means:</p>
 <ul>
-<li>Install that package into <code>packages/</code></li>
-<li>Call <code>#.Tatin.Admin.UpdatePackages ⍬</code></li>
+<li>All packages that are single class or namespace scripts can simply by copied over; an example is the <code>Tester2</code> class.</li>
+<li>Packages that consist of an ordinary namespace need to be copied over as a folder; an example is <code>CommTools</code>.</li>
 </ul>
-<p>For further details see the comments in the function <code>#.Tatin.Admin.UpdatePackages</code>.</p>
 <div class="h_tag">
 <a href="#do-your-thing" id="do-your-thing" class="autoheader_anchor">
 <h2 data-id="Do-your-thing">7. Do your thing</h2>
@@ -128,8 +128,20 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is Kai Jaeger, but this might (and eventually will) change in the future of course.</p>
 <p>But before you can create a pull request you are supposed to run the tests to make sure that you did not break anything.</p>
 <div class="h_tag">
+<a href="#special-case-working-on-user-commands" id="special-case-working-on-user-commands" class="autoheader_anchor">
+<h2 data-id="Special-case-working-on-user-commands">8. Special case: working on user commands</h2>
+</a>
+</div>
+<p>When you work on user commands, by default the code is executed in <code>⎕SE</code> rather than <code>#</code>. This also means that changes are not saved automatically by Link.</p>
+<p>This is a major stumble stone, and therefore it was addressed with version 0.106.0: when the Tatin project is opened with Cider the user is asked:</p>
+<pre tabindex="0"><code>Set DEVELOPMENT←1 in ⎕SE._Tatin?
+(Allows executing user command code in # rather than ⎕SE)
+(Y/n)</code></pre>
+<p>The variable <code>⎕SE._Tatin.DEVELOPMENT←1</code> tells that the user wants to work on Tatin while calling code in <code>⎕SE</code>, and therefore Tatin makes sure that the code in <code>#</code> is executed rather than <code>⎕SE</code>.</p>
+<p>Note that if there is a variable <code>⎕SE._Tatin.DEVELOPMENT←0</code> Cider won't ask the question, and code is executed in <code>⎕SE</code>, as it is if there is no variable <code>⎕SE._Tatin.DEVELOPMENT</code> at all.</p>
+<div class="h_tag">
 <a href="#executing-the-test-cases" id="executing-the-test-cases" class="autoheader_anchor">
-<h2 data-id="Executing-the-test-cases">8. Executing the test cases</h2>
+<h2 data-id="Executing-the-test-cases">9. Executing the test cases</h2>
 </a>
 </div>
 <p>If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider how to do that:</p>
@@ -157,12 +169,12 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 
 <div class="h_tag">
 <a href="#testing-while-developing" id="testing-while-developing" class="autoheader_anchor">
-<h3 data-id="Testing-while-developing">8.1. Testing while developing</h3>
+<h3 data-id="Testing-while-developing">9.1. Testing while developing</h3>
 </a>
 </div>
 <div class="h_tag">
 <a href="#executing-all-tests" id="executing-all-tests" class="autoheader_anchor">
-<h4 data-id="Executing-all-tests">8.1.1. Executing all tests</h4>
+<h4 data-id="Executing-all-tests">9.1.1. Executing all tests</h4>
 </a>
 </div>
 <p>It is recommended to start a fresh APL session and then load the Tatin project into the CLEAR WS before running any test cases.</p>
@@ -194,7 +206,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </ul>
 <div class="h_tag">
 <a href="#quitting-tests" id="quitting-tests" class="autoheader_anchor">
-<h4 data-id="Quitting-tests">8.1.2. Quitting tests</h4>
+<h4 data-id="Quitting-tests">9.1.2. Quitting tests</h4>
 </a>
 </div>
 <p>There are scenarios where you want to quit the test suite, for example when a test unearthed a severe bug that needs fixing straight away, before executing the remaining tests.</p>
@@ -209,7 +221,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 
 <div class="h_tag">
 <a href="#executing-only-particular-tests" id="executing-only-particular-tests" class="autoheader_anchor">
-<h4 data-id="Executing-only-particular-tests">8.1.3. Executing only particular tests</h4>
+<h4 data-id="Executing-only-particular-tests">9.1.3. Executing only particular tests</h4>
 </a>
 </div>
 <p>The <code>Tester2</code> test framework is flexible and powerful; for example, you may execute only the tests that focus on the Tatin Client API. The names of those tests are <code>Test_API_&lt;number&gt;</code>.</p>
@@ -277,14 +289,14 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>The test framework offers many more options and features, refer to the documentation for exploring them: go to <a href="https://github.com/aplteam/Tester2" class="external_link">https://github.com/aplteam/Tester2</a> (full picture) or execute <code>]ADOC #.Tatin.Tester2</code> (reference).</p>
 <div class="h_tag">
 <a href="#tests-as-part-of-an-automated-build" id="tests-as-part-of-an-automated-build" class="autoheader_anchor">
-<h3 data-id="Tests-as-part-of-an-automated-build">8.2. Tests as part of an automated build</h3>
+<h3 data-id="Tests-as-part-of-an-automated-build">9.2. Tests as part of an automated build</h3>
 </a>
 </div>
 <p>You may wish to execute the tests that do not require a human in front of the monitor as part of an automated build process. Tatin is prepared for this.</p>
 <p>You can start the test suite either from APL or from the command line.</p>
 <div class="h_tag">
 <a href="#running-the-test-suite-from-apl" id="running-the-test-suite-from-apl" class="autoheader_anchor">
-<h4 data-id="Running-the-test-suite-from-APL">8.2.1. Running the test suite from APL</h4>
+<h4 data-id="Running-the-test-suite-from-APL">9.2.1. Running the test suite from APL</h4>
 </a>
 </div>
 <p>Call this function:</p>
@@ -306,7 +318,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>Note that <code>OFF=1</code> would kind of also work, but it would make Plodder <code>⎕OFF</code>, the underlying HTTP server used by Tatin. That might be too early. For example, you cannot get a code coverage report then.</p>
 <div class="h_tag">
 <a href="#running-the-test-suite-from-a-console-or-terminal" id="running-the-test-suite-from-a-console-or-terminal" class="autoheader_anchor">
-<h4 data-id="Running-the-test-suite-from-a-console-or-terminal">8.2.2. Running the test suite from a console or terminal</h4>
+<h4 data-id="Running-the-test-suite-from-a-console-or-terminal">9.2.2. Running the test suite from a console or terminal</h4>
 </a>
 </div>
 <p>There are two scripts available in the Tatin root directory:</p>
@@ -317,12 +329,12 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>These are templates: check their contents, you might need to make amendments.</p>
 <div class="h_tag">
 <a href="#how-to-create-a-new-version" id="how-to-create-a-new-version" class="autoheader_anchor">
-<h2 data-id="How-to-create-a-new-version">9. How to create a new version</h2>
+<h2 data-id="How-to-create-a-new-version">10. How to create a new version</h2>
 </a>
 </div>
 <div class="h_tag">
 <a href="#ov1" id="ov1" class="autoheader_anchor">
-<h3 data-id="ov1">9.1. Overview</h3>
+<h3 data-id="ov1">10.1. Overview</h3>
 </a>
 </div>
 <p>Usually, your job is done once you've created a Pull Request (PR). However, here we document what the administrator of the Tatin project on GitHub needs to do once she has accepted at least one PR or finished her work on a branch.</p>
@@ -364,7 +376,7 @@ Tatin-Documentation-{major}.{minor}.{patch}.zip
 Tatin-Server-{major}.{minor}.{patch}.zip</code></pre>
 <div class="h_tag">
 <a href="#creating-a-document-for-proofreading" id="creating-a-document-for-proofreading" class="autoheader_anchor">
-<h2 data-id="Creating-a-document-for-proofreading">10. Creating a document for proofreading</h2>
+<h2 data-id="Creating-a-document-for-proofreading">11. Creating a document for proofreading</h2>
 </a>
 </div>
 <p>There is a function that creates a single HTML file from all the Tatin markdown documentation. That makes proofreading significantly easier:</p>

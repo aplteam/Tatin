@@ -16,7 +16,7 @@ Tatin is published under the MIT license, so everybody is welcome to contribute 
 
 This document also discusses how to execute the test suite and how to build a new version of Tatin.
 
-However, this is not an introduction to how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google "contribute to a GitHub project".
+Note that this is not an introduction to how to contribute to a project that is hosted on GitHub. If you are not familiar with that then google "contribute to a GitHub project".
 
 
 ## Requirements
@@ -32,6 +32,8 @@ You need one of:
 AIX is not supported. The PI is not officially supported but it will probably work anyway.
 
 You also need to have Git installed.
+
+While you can develop on any operating system, building a new version is currently only supported on Windows. This restriction is likely to be lifted in a later version.
 
 
 ## Tatin is managed by Cider
@@ -82,14 +84,10 @@ Check the folder `TestServer/Server/Assets/Runtime/Certificates`
 
 Although Tatin depends on a couple of Tatin packages, it cannot be used to load those packages; the common bootstrap problem.
 
-For that reason, the packages installed in the `packages/` folder are copied over to the `APLSource/` folder when a new version is built. That allows loading the packages with Link.
+For that reason, the packages installed in the `packages/` folder a need to be brought into the `APLSource/` folder by other means:
 
-If you need to add a package then you need to perform a couple of steps:
-
-* Install that package into `packages/`
-* Call `#.Tatin.Admin.UpdatePackages ⍬`
-
-For further details see the comments in the function `#.Tatin.Admin.UpdatePackages`.
+* All packages that are single class or namespace scripts can simply by copied over; an example is the `Tester2` class.
+* Packages that consist of an ordinary namespace need to be copied over as a folder; an example is `CommTools`.
 
 
 ## Do your thing
@@ -101,6 +99,23 @@ If you find parts of this document confusing, outdated, unclear or missing bits 
 Whether you improved the documentation or fixed a bug or added a feature, at the end of the day you need to create a Pull Request (PR). That will make the people in charge of the Tatin project check your contribution. At the time of writing that is Kai Jaeger, but this might (and eventually will) change in the future of course.
 
 But before you can create a pull request you are supposed to run the tests to make sure that you did not break anything.
+
+
+## Special case: working on user commands
+
+When you work on user commands, by default the code is executed in `⎕SE` rather than `#`. This also means that changes are not saved automatically by Link. 
+
+This is a major stumble stone, and therefore it was addressed with version 0.106.0: when the Tatin project is opened with Cider the user is asked:
+
+```
+Set DEVELOPMENT←1 in ⎕SE._Tatin? 
+(Allows executing user command code in # rather than ⎕SE) 
+(Y/n) 
+```
+
+The variable `⎕SE._Tatin.DEVELOPMENT←1` tells that the user wants to work on Tatin while calling code in `⎕SE`, and therefore Tatin makes sure that the code in `#` is executed rather than `⎕SE`. 
+
+Note that if there is a variable `⎕SE._Tatin.DEVELOPMENT←0` Cider won't ask the question, and code is executed in `⎕SE`, as it is if there is no variable `⎕SE._Tatin.DEVELOPMENT` at all.
 
 
 ## Executing the test cases
@@ -415,6 +430,8 @@ There is a function that creates a single HTML file from all the Tatin markdown 
 ```
 
 Now open that file with the word processor of your choice and use its spell-checking capabilities.
+
+
 
 
 

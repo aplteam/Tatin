@@ -3,12 +3,10 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- {}2022 1 1 TS.Logs.CheckLogFile ∆LOG_PATH
+ TS.Logs.ProcessLogFile ∆LOG_PATH(2022 1 1)
  →T.PassesIf 0=≢⊃F.Dir ∆LOG_PATH,'usage-data-2021-*'
  →T.PassesIf 1=⎕NEXISTS ∆LOG_PATH,'usage-data-2021.csv'
  →T.PassesIf 1=⎕NEXISTS ∆LOG_PATH,'usage-data-2021.zip'
- →T.PassesIf 1=⊃⊃(//)⎕VFI ⎕TC~⍨⊃⎕NGET ∆LOG_PATH,'month'
- →T.PassesIf 2022=⊃⊃(//)⎕VFI ⎕TC~⍨⊃⎕NGET ∆LOG_PATH,'year'
 
  r←T._OK
 ⍝Done

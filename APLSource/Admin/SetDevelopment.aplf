@@ -1,0 +1,11 @@
+ SetDevelopment ini
+⍝ This sets the global DEVELOPMENT which allows the user to execute user commands in # rather than ⎕SE,
+⍝ so changes will be recorded by Link.
+⍝ The function must only be called by Cider when opening the Tatin project. The function performs some checks
+⍝ in order to ensure this.
+ :If 0=⎕SE._Tatin.⎕NC'DEVELOPMENT'
+ :AndIf 1 ##.Client.CommTools.YesOrNo'Set DEVELOPMENT←1 in ⎕SE._Tatin? (Allows executing user command code in # rather than ⎕SE)'
+     ⎕SE._Tatin.DEVELOPMENT←1
+ :Else
+     Info
+ :EndIf

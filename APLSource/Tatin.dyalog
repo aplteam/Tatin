@@ -23,7 +23,7 @@
       :EndIf
     ∇
 
-    ∇ r←level Help cmd
+    ∇ r←level Help cmd;ref
       r←0⍴⊂''
       :If 9=⎕NC'⎕SE._Tatin'
           ref←GetRefToTatin''
@@ -37,7 +37,7 @@
       :EndIf
     ∇
 
-    ∇ r←Run(cmd args)
+    ∇ r←Run(cmd args);ref
       r←''
       :If 9=⎕NC'⎕SE._Tatin'
            ref←GetRefToTatin''

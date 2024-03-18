@@ -1,7 +1,7 @@
 ﻿:Namespace Tatin
 ⍝ This script directs calls to Tatin user command to Tatin itself.
 ⍝ It's just an interface that does not do anything by itself.
-⍝ Version 0.3.0 ⋄ 2024-03-07 ⋄ Kai Jaeger
+⍝ Version 0.4.0 ⋄ 2024-03-18 ⋄ Kai Jaeger
 
     ∇ PrintError dummy;msg
       msg←''
@@ -23,7 +23,7 @@
       :EndIf
     ∇
 
-    ∇ r←level Help cmd;ref
+    ∇ r←level Help cmd;ref;SourceFile
       r←0⍴⊂''
       :If 9=⎕NC'⎕SE._Tatin'
           ref←GetRefToTatin''
@@ -37,10 +37,11 @@
       :EndIf
     ∇
 
-    ∇ r←Run(cmd args);ref
+    ∇ r←Run(cmd args);ref;SourceFile
       r←''
+      SourceFile←##.SourceFile
       :If 9=⎕NC'⎕SE._Tatin'
-           ref←GetRefToTatin''
+          ref←GetRefToTatin''
           :If 3=ref.⎕NC'UC.List'
               r←ref.UC.Run(cmd args)
           :Else

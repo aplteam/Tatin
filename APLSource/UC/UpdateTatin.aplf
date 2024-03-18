@@ -1,6 +1,6 @@
  {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;q;folder2;GH;currentVersion;tag;msg
  r←''
- folder←1⊃⎕NPARTS ##.SourceFile
+ folder←1⊃⎕NPARTS GetSourceFile
  :If ~{{⍺≡(≢⍺)↑⍵}/'expand'∘TC.F.NormalizePath¨⍵}(1 TC.GetProgramFilesFolder'')folder
      ('Cannot deal with ',folder)Assert{{⍺≡(≢⍺)↑⍵}/'expand'∘TC.F.NormalizePath¨⍵}(0 TC.GetProgramFilesFolder'')folder
  :EndIf
@@ -32,6 +32,6 @@
          :AndIf 1 TC.C.YesOrNo q
              {}TC.F.RmDirByForce folder2
          :EndIf
-         r←'Tatin successfully updated to version ',(1↓tag),' in ',folder2
+         r←'Tatin was successfully updated to version ',(1↓tag),' in',(⎕UCS 13),'  ',folder2,(⎕UCS 13),'Now restart APL'
      :EndIf
  :EndIf

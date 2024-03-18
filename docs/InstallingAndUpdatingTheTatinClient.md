@@ -285,4 +285,17 @@ Notes:
 * 19.0 and later only: Tatin's `Update` command changes the installation directory, not the version of Tatin the `]Activate` user command copied it originally from; that remains unchanged.
 
 
+### When updating goes wrong
 
+Debugging is the process of removing bugs from code, while programming is how you introduce them in the first place.
+
+There is always the possibility that the update process is itself buggy. Calling it again usually does not help, so you need an escape route.
+
+
+
+!> 18.2 and 18.0
+=> The easiest way to recover it by uninstalling and then installing Tatin again.
+!> 19.0 and later
+=> 1. Execute `]DeActivate tatin` --- that removes Tatin.
+=> 2. Execute `]Activate tatin` --- that brings the version of Tatin back that your installation originally came with.
+=> 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version.

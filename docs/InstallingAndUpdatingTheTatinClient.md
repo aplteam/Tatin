@@ -103,7 +103,7 @@ Notes:
 * The `-p` stands for "permanent"; this makes sure your addition to the search path is permanent
 
 
-Any newly started version of Dyalog now comes with the user command `]Tatin.*`.
+Any newly started instance of Dyalog now comes with the user command `]Tatin.*`.
 
 There is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature that a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure. In earlier versions such a function is not executed.
 
@@ -299,3 +299,4 @@ There is always the possibility that the update process is itself buggy. Calling
 => 1. Execute `]DeActivate tatin` --- that removes Tatin.
 => 2. Execute `]Activate tatin` --- that brings the version of Tatin back that your installation originally came with.
 => 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version.
+

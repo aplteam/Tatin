@@ -15,23 +15,25 @@
      r←'Tatin is up-to-date: ',⊃{⍺,' from ',⍵}/1↓TC.Version
  :Else
      msg←'UpdateTatin@Your version of Tatin is ',{⍵↑⍨¯1+⍵⍳'+'}2⊃TC.Version
-     msg,←(⎕UCS 13),'Latest published version is ',1↓tag
-     msg,←(⎕UCS 13),'Would you like to download and install ',(1↓tag),' ?'
+     msg,←CR,'Latest published version is ',1↓tag
+     msg,←CR,'Would you like to download and install ',(1↓tag),' ?'
      :If 1 TC.YesOrNo msg
          version←TC.UpdateClient tag folder
          :If 0<≢version
-             {}⎕SE.UCMD'Open ','"',folder,'/Assets/docs/ReleaseNotes.html"'
+             0 TC.A.GoToWebPage 'file://',folder,'/Assets/docs/ReleaseNotes.html'
              r←'Tatin updated on disk to ',version
              r,←CR,'The current WS has NOT been updated, please restart a fresh session.'
          :EndIf
-              ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
+         ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
          folder2←TC.GetMyUCMDsFolder'Tatin'
          :If TC.F.IsDir folder2
              q←'RemoveTatinFromMyUCMDs@'
-             q,←'There is a folder ',folder2,' on disk - do you want the folder removed?'
+             q,←'There is a folder ',folder2,' on disk.',CR
+             q,←'That''s where Tatin was previously installed.',CR
+             q,←'Do you want that folder to be removed?'
          :AndIf 1 TC.C.YesOrNo q
              {}TC.F.RmDirByForce folder2
          :EndIf
-         r←'Tatin was successfully updated to version ',(1↓tag),' in',(⎕UCS 13),'  ',folder2,(⎕UCS 13),'Now restart APL'
+         r←'Tatin was successfully updated to version ',(1↓tag),' in',CR,'  ',folder,CR,'Now restart APL'
      :EndIf
  :EndIf

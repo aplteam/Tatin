@@ -1,0 +1,13 @@
+ r←Test_UC_092(stopFlag batchFlag);⎕TRAP;res;msg;rc;stop
+⍝ Exercise ]Tatin.GetDeletePolicy without argument (goes for the principal Tatin server)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg res)←stop ∆UCMD'GetDeletePolicy'
+ →T.PassesIf 0=rc
+ →T.PassesIf'[tatin]''s delete policy is: None'≡res
+
+ r←T._OK
+
+⍝Done

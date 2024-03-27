@@ -24,7 +24,13 @@ In 18.0 and 18.2 you need to install Tatin yourself.
 Note that when you call `]Tatin.Init`, Tatin will check whether those requirements are met.
 
 
-## How to activate Tatin in 19.0
+## Installing Tatin
+
+### 19.0
+
+Strictly speaking it is not necessary to install Tatin for 19.0, because Tatin is part of a 19.0-installation. However, before it can be used it must be activated.
+
+Note that activating is available in 19.0 only. It's not supported in 18.0 and 18.2.
 
 In order to activate Tatin, execute
 
@@ -34,13 +40,53 @@ In order to activate Tatin, execute
 
 and follow the instructions.
 
-## How to install in 18.0 and 18.2
+!> ### Activating, deactivating, resetting, updating
+=> #### Activating
+=> Activating means to copy Tatin (and possibly Cider) from the Dyalog installation directory's sub folder `Experimental\CiderTatin\` to either a version specific folder (the default) or a version agnostic folder in your home directory, and to instruct the user command framework to scan the chosen directory for user commands.
+=> 
+=> Which folder that is exactly depends on the operating system:
+=> 
+=> ```
+=> ⍝⍝⍝ Version specific
+=> 
+=> ⍝ Windows
+=> <HOME>\Documents\Dyalog APL-64 19.0 Unicode Files
+=> 
+=> ⍝ Others
+=> <HOME>/.dyalog/dyalog.190U64.files
+=> 
+=> ⍝⍝⍝ Version agnostic
+=> 
+=> ⍝ Windows
+=> <HOME>\Documents\Dyalog APL Files
+=> 
+=> ⍝ Others
+=> <HOME>/.dyalog/dyalog.files
+=> 
+=> ```
+=> #### Deactivating
+=> Deactivating means to remove Tatin (and possibly Cider) from that folder. It has its own user command:
+=> 
+=> ```
+=> ]Deactivate [all|cider|tatin] [-versionagnostic]
+=> ```
+=> #### Resetting
+=> Resetting means to replace the current version by the one the installation originally came with.
+=> 
+=> This can be useful when you have updated Tatin with `]UpdateTatin` and then find the new version to be buggy.
+=> #### Updating
+=> Updating means that the version that is currently available is updated to the latest version available from GitHub.
+=> 
+=> This can be achieved with the user command `]UpdateTatin`.
+
+
+### 18.0 and 18.2
 
 Instructions:
 
 1. Download the latest release of the Tatin client from <https://github.com/aplteam/Tatin/releases>
 
-2. Unzip it into the installaton folder
+2. Unzip it into the installation folder
 
 
 !> ### What is the correct installation folder?
@@ -53,7 +99,21 @@ Instructions:
 => /home/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
 => 
 => ⍝ Mac OS
-=> Users/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> /Users/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> ```
+=> However, these folders are version specific. Instead you might consider installing them into a version
+=> agnostic folder in order to make Tatin available to, say, 18.0 and 18.2 at the same time.
+=> 
+=> For that install into one of these folders:
+=> ```
+=> ⍝ Windows
+=> C:\Users\<⎕AN>\Documents\Dyalog APL Files\SessionExtensions\CiderTatin
+=> 
+=> ⍝ Linux
+=> /home/<⎕AN>/.dyalog/dyalog.files/SessionExtensions/CiderTatin
+=> 
+=> ⍝ Mac OS
+=> /Users/<⎕AN>/.dyalog/dyalog.files/SessionExtensions/CiderTatin
 => ```
 
 As a result you should see something like this:
@@ -68,7 +128,7 @@ As a result you should see something like this:
 ```
 
 
-### Tell Dyalog where to look for user commands
+#### Tell Dyalog where to look for user commands
 
 Though Tatin's user command script etc. is now in place, Dyalog does not know about it yet. To achieve that we have to add the folder to SALT's search path. This step needs to be carried out only once for any installed version 18.0 or 18.2
 
@@ -99,13 +159,13 @@ Execute one of the following commands:
 Notes: 
 
 * Note the comma (`,`) in front of the path: it tells SALT to _add_ the path, rather than using it as a replacement
-
 * The `-p` stands for "permanent"; this makes sure your addition to the search path is permanent
+* In case you installed Tatin into a version-agnostic folder you must specify that folder of course
 
 
 Any newly started instance of Dyalog now comes with the user command `]Tatin.*`.
 
-There is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature that a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure. In earlier versions such a function is not executed.
+There is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature that a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure; in earlier versions such a function is not executed.
 
 As a side effect of executing any of the Tatin user commands the Tatin API will become available via `⎕SE.Tatin`.
 
@@ -127,11 +187,11 @@ When any of the Tatin user commands is executed, it will check whether the API i
 
 ## On `setup.dyalog` (18.0 and 18.2)
 
-I> This is 18.0/18.2 only because in later versions of Dyalog, Tatin's API will be available in `⎕SE` right from the start
-
-You might want the Tatin API to be available right from the start, so that you can invoke any of the Tatin API functions without first executing a Tatin user command. 
-
-I> What is the application for this? Well, you might want to have an automated build process available right from the start, for example.
+I> This is 18.0/18.2 only because in later versions of Dyalog, Tatin's API will be available in `⎕SE` right from the start anyway.
+I> 
+I> You might want the Tatin API to be available right from the start in earlier versions of Dyalog as well, so that you can invoke any of the Tatin API functions without first executing a Tatin user command. 
+I> 
+I> What is the application for this? Well, you might want to have an automated build process available, for example.
 I>
 I> If you are not interested in this: skip it and carry on with [Updating Tatin](#).
 
@@ -169,13 +229,10 @@ Create one that looks like this:
     ∇ {r}←Setup arg;⎕IO;⎕ML;dmx
       r←⍬
       ⎕IO←1 ⋄ ⎕ML←1
-      :Trap ⎕SE.SALTUtils.DEBUG↓0
-          ⎕←AutoloadTatin ⎕SE.SALTUtils.DEBUG
-      :Else
-          dmx←⎕DMX
-          ⎕←'Setup.dyalog has a problem and was not executed successfully:'
-          ⎕←↑'  '∘,¨dmx.DM
-      :EndTrap
+      :If ~IfAtLeastVersion 19
+      :AndIf 0=≢⎕←AutoloadTatin ⎕SE.SALTUtils.DEBUG
+          {}⎕SE.SALTUtils.ResetUCMDcache -1
+      :EndIf
     ∇
 
     ∇ r←AutoloadTatin debug;wspath;path2Config
@@ -240,7 +297,9 @@ Create one that looks like this:
 
 ### There is already such a script
 
-Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function.
+Copy the functions `IfAtLeastVersion`, `GetProgramFilesFolder` and `AutoLoadTatin` from above into your own `setup.dyalog` script and then make sure that `AutoLoadTatin` is called from your `Setup` function. 
+
+Also, call `{}⎕SE.SALTUtils.ResetUCMDcache -1` in case `AutoLoadTatin` returned an empty vector (read: was executed successfully) in order to make sure that the Tatin user commands are found.
 
 ## Updating Tatin
 
@@ -279,10 +338,10 @@ Notes:
 
 * The command will put the release notes on display in your default browser
 
-* Although Tatin is updated on disk, the workspace from which the update command was executed is not for technical reasons --- start a new instance of Dyalog to get the latest version
+* Although Tatin is updated on disk, the workspace from which the update command was executed is not updated for technical reasons --- start a new instance of Dyalog to get the latest version
 
 
-* 19.0 and later only: Tatin's `Update` command changes the installation directory, not the version of Tatin the `]Activate` user command copied it originally from; that remains unchanged.
+* 19.0 and later only: Tatin's `Update` command overwrites the version in the installation directory in your home directory, not the version that came originally with Dyalog APL; that remains unchanged.
 
 
 ### When updating goes wrong
@@ -296,7 +355,12 @@ There is always the possibility that the update process is itself buggy. Calling
 !> 18.2 and 18.0
 => The easiest way to recover it by uninstalling and then installing Tatin again.
 !> 19.0 and later
-=> 1. Execute `]DeActivate tatin` --- that removes Tatin.
-=> 2. Execute `]Activate tatin` --- that brings the version of Tatin back that your installation originally came with.
-=> 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version.
+=> 1. Execute `]DeActivate tatin` --- that removes Tatin
+=> 2. Execute `]Activate tatin` --- that brings back the version of Tatin that your installation originally came with
+=> 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version
+
+
+
+
+
 

@@ -11,6 +11,18 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.106.2 from 2024-03-27
+
+* Action is required with version 18.2 and/or 18.0
+
+  With this version the Tatin user commands won't be available in the session until you either execute `]UReset` yourself, or you add the following code to your `setup.dyalog` in `MyUCMDs/`:
+
+  ```
+  :If ~IfAtLeastVersion 19
+      {}⎕SE.SALTUtils.ResetUCMDcache -1                 
+  :EndIf
+  ```
+
 ## Version 0.106.1 from 2024-03-18
 
 * No action required when running Tatin. 
@@ -180,6 +192,9 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
+
+
 
 
 

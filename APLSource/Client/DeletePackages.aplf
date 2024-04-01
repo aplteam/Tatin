@@ -1,16 +1,18 @@
- (statusCode errMsg)←DeletePackages urls_;url;list;urls;flag;b
+ (statusCode errMsg)←DeletePackages(regID packageIDs);url;list;flag;b
 ⍝ Deletes one or more packages.\\
-⍝ Every package must be defined precisely.\\
+⍝ Because multiple packages means in this contect multiple versions of the same package only one Registry ID
+⍝ (URL or alias) is required.\\
+⍝ Every package must be defined fully: group, name and full version number.\\
 ⍝ Whether deleting a package is possible depends on the "delete" policy operated by the server in question.\\
 ⍝ On the server side the delete policy is defined by the INI setting [CONFIG]DeletePackages ("None", "JustBetas", "Any").
- urls←⊆urls_
- urls←SplitUrlAndPackageID∘ReplaceRegistryAlias¨urls
- :If 0∊b←Reg.IsValidPackageID_Complete¨2⊃¨urls
-     ('Incomplete package IDs: ',⊃{⍺,', ',⍵}/(~b)/2⊃¨urls)Assert∧/b
+ packageIDs←⊆packageIDs
+ :If 0∊b←Reg.IsValidPackageID_Complete¨packageIDs
+     ('Incomplete package IDs: ',⊃{⍺,', ',⍵}/(~b)/packageIDs)Assert∧/b
  :EndIf
- (1⊃¨urls)←F.EnforceSlash¨1⊃¨urls
- flag←∨/Reg.IsHTTP¨urls
+ url←ReplaceRegistryAlias regID
+ url←F.EnforceSlash url
+ flag←Reg.IsHTTP url
  {}EstablishEmptyPermanentConnections⍣flag⊢0
- (statusCode errMsg)←DeletePackage_(⊃⊃urls)(⊃{⍺,',',⍵}/2⊃¨urls)
+ (statusCode errMsg)←DeletePackage_ regID packageIDs
  {}CloseConnections⍣flag⊢1
 ⍝Done

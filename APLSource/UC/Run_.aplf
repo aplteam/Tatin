@@ -11,7 +11,16 @@
  :If ≡/⎕C¨'loadtatin'Cmd
      Input.force LoadTatin(1+(0≡Input._1)∨0=≢Input._1)⊃Input._1''
  :Else
-     TC←⎕SE._Tatin.Client
+     :If 0<⎕SE._Tatin.⎕NC'DEVELOPMENT'
+     :AndIf 0<⎕SE._Tatin.⎕NC'DEVELOPMENT'
+     :AndIf 0<#.⎕NC'Tatin'
+         TC←#.Tatin.Client
+         :If 0=TC.##.⎕NC'RumbaLean'
+             #.Tatin.Admin.Initialize_Client
+         :EndIf
+     :Else
+         TC←⎕SE._Tatin.Client
+     :EndIf
      :If 0=TC.##.RumbaLean.⎕NC'DRC'
      :OrIf {16::1 ⋄ 0⊣TC.##.RumbaLean.DRC.Version}''   ⍝ Can happen when the session was saved WITH Tatin, for example
          TC.##.Admin.InitConga ⍬

@@ -196,24 +196,29 @@ Creates a namespace with default parameters; it can be passed as (optional) left
 ### DeletePackages
 
 ```
-(statusCode errMsg)←DeletePackages url
+(statusCode errMsg)←DeletePackages (regID packageID)
 ```
 
-Deletes one or more packages.
+Deletes one or more packages, usually several versions of the same package.
 
 Whether deleting packages from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting `[CONFIG]DeletePackages`. See [`GetDeletePolicy`](#GetDeletePolicy). The principal Tatin server operates a "None" policy, meaning that you cannot delete anything from it.
+
+!> ### Why can't I delete a package from the Tatin server?
+=> The main design objective was to make sure that a build that includes packages from the principal Tatin Registries can always be reproduced in precisely the same way. 
+=>
+=> If deleting a package is allowed --- even when it is a beta version --- then this cannot be guaranteed.
+=>
+=> If you happen to publish a package and realize seconds later that you made a formidable mistake? Well, you increase the patch number, fix the problem and publish a new version, that's the only way.
 
 In order to delete a package you must identify the package precisely:
 
 ```
-<Registry><group-name>-<package-name>-<precise_version_number>
+<group-name>-<package-name>-<precise_version_number>
 ```
 
-You may delete several packages in one go by specifying several complete package IDs.
+You may delete several packages in one go by specifying several complete package IDs. However, all packages will be deleted from the Registry identified by `regID`. `regID` can be a URL or a Registry alias or a Registry ID.
 
-The function returns a vector of HTTP status codes and a vector of messages. The length of these vectors matches the number of packages specified.
-
-Ideally all status codes are 200 and all items in `msg` are empty.
+The function returns an HTTP status code and a message, which will be empty in case of success.
 
 
 ### DeprecatePackage
@@ -904,6 +909,8 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
+
 
 
 

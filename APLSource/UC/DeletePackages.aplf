@@ -1,4 +1,9 @@
- msg←DeletePackages Arg;qdmx;url;group;list;list2;groups;packageIDs;b;ind;buff;msgs;statusCodes;force;flag
+ msg←DeletePackages Arg;qdmx;url;group;list;list2;groups;packageIDs;b;ind;buff;msgs;statusCodes;force;flag;regID
+ :If '['=1⍴Arg._1
+     regID←{⍵↑⍨⍵⍳']'}Arg._1
+ :Else
+     regID←Arg._1
+ :EndIf
  (url packageIDs)←TC.SplitUrlAndPackageID TC.ReplaceRegistryAlias Arg._1
  'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert 0<≢url
  'You must specify a Tatin server since the principal Tatin server does not allow deleting packages'Assert'https://tatin.dev'{⍺≢(≢⍺)↑⍵}url
@@ -38,7 +43,7 @@
  :Else
      TC.EstablishEmptyPermanentConnections 1
      TC.Connect2Client url
-     list←TC.ListVersions url,packageIDs
+     list←TC.ListVersions regID,packageIDs
      'No matching packages found'Assert 0<≢list
      packageIDs←,list
      flag←1
@@ -65,7 +70,7 @@
  :EndIf
 
  :Trap ErrNo
-     (statusCodes msgs)←TC.DeletePackages url{⍺∘,¨⊆⍵}packageIDs
+     (statusCodes msgs)←TC.DeletePackages regID packageIDs
  :Else
      TC.CloseConnections 1
      qdmx←⎕DMX
@@ -75,7 +80,7 @@
  :If statusCodes∧.=200
      msg←{(⍕⍵),' package',(((1<⍵)/'s')),' successfully deleted'}≢packageIDs
  :Else
-     msg←↑(⊂¨url{⍺∘,¨⊆⍵}packageIDs),¨(⊂∘,¨statusCodes),¨⊂¨msgs
+     msg←↑(⊂¨url{⍺∘,¨⊆⍵}packageIDs),¨(⊂∘,¨statusCodes),¨⊂¨⊆msgs
  :EndIf
 
 ∆Quit:

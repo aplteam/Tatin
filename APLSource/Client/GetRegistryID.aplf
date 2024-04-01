@@ -1,0 +1,40 @@
+ r←{cfg}GetRegistryID y;b;url;port
+ ⍝ `y` might by a URL (http[s]://...) or an alias ([...]) or a Registry ID.
+ ⍝ The function returns one of:
+ ⍝  * A namespace with all the Registry-specific data if a single unique Registry could be identified by `y`
+ ⍝  * ⍬ if none or multiple Registries match `y`
+ cfg←{0<⎕NC ⍵:⍎⍵ ⋄ MyUserSettings}'cfg'
+ r←⍬
+ :If IsHTTP y
+     url←{⍵,('/'≠¯1↑⍵)/'/'}{⍵/⍨3>+\⍵='/'}y
+     port←⍬
+     :If 2=url+.=':'
+         port←{⍵↑⍨¯1+⍵⍳'/'}{1↓⍵/⍨2=+\⍵=':'}y
+         url←((-2+≢port)↓url),'/'
+         port←A.ToNum port
+     :EndIf
+     :If 0<+/b←cfg.registries.uri≡¨⊂url
+         :If ⍬≡port
+             :If 1=+/b
+                 r←(⍸b)⊃cfg.registries
+             :EndIf
+         :Else
+             b∧←cfg.registries.port≡¨port
+             :If 1=+/b
+                 r←(⍸b)⊃cfg.registries
+             :EndIf
+         :EndIf
+     :EndIf
+ :ElseIf ∧/'[]'∊y
+     :If 1=+/b←cfg.registries.alias≡¨⊂1↓y↑⍨¯1+y⍳']'
+         r←(⍸b)⊃cfg.registries
+     :EndIf
+ :Else
+     :If 1=+/b←cfg.registries.id≡¨⊂{⍵↑⍨¯1+⍵⍳'/'}y
+         r←(⍸b)⊃cfg.registries
+     :EndIf
+ :EndIf
+ :If 1=≢r
+     r.⎕DF r.id
+ :EndIf
+ ⍝Done

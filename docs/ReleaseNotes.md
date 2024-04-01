@@ -11,6 +11,10 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.107.0 from 2024-03-31
+
+* The syntax of the API function `DeletePackages` has changed.s
+
 ## Version 0.106.2 from 2024-03-27
 
 * Action is required with version 18.2 and/or 18.0
@@ -192,6 +196,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

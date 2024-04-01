@@ -1,17 +1,18 @@
- (statusCode errMsg)←DeletePackage_(url packageID);statusCode;errMsg;request;response;en;msg;rc
+ (statusCode errMsg)←DeletePackage_(regID packageID);statusCode;errMsg;request;response;en;msg;rc;url;packageID_;b
 ⍝ Deletes a package.\\
 ⍝ Whether deleting a package is possible depends on the "delete" policy operated by the server in question.\\
 ⍝ On the server side the delete policy is defined by the INI setting [CONFIG]DeletePackages ("None", "JustBetas", "Any").
  statusCode←200 ⋄ errMsg←''
+ url←ReplaceRegistryAlias regID
  :If 'file://'{⍺≢(≢⍺)↑⍵}url
      ('Unknown Registry: "',url,'"')Assert(⊂EnforceTrailingSlash url)∊⊃¨{0≡⍵:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}/¨MyUserSettings.registries.(uri port)
  :EndIf
  :If Reg.IsHTTP url
      {}Connect2Client url
      request←R.NewRequest 0
-     request.RequestTarget←{'/'=1⍴⍵:⍵ ⋄ '/',⍵}packageID
+     request.RequestTarget←'/',{(≡⍵)∊0 1:⍵ ⋄ 1↓⊃,/',',¨⍵}packageID
      request.Method←'DELETE'
-     request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry url).api_key)
+     request.Headers,←⊂'api-key'((MyUserSettings.GetRegistry regID).api_key)
      response←SendAndReceive url request
      :If response.StatusCode≢200
          statusCode←response.StatusCode
@@ -33,16 +34,24 @@
      :EndIf
  :Else
      url←'file://'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}url
-     :If F.IsDir url,packageID
-         'Is not a package'Assert F.IsFile url,packageID,'/apl-package.json'
-         (rc en msg)←F.RmDir url,packageID
-         :If 0≠rc
-             statusCode←400
-             errMsg←'Remove operation failed, RC=',(⍕rc),'; ',msg
-         :EndIf
-     :Else
+     b←F.IsDir¨url∘,¨packageID
+     :If 0∊b
          statusCode←400
-         errMsg←'Not found'
+         errMsg←'Not found in ',url,': ',⊃{⍺,', ',⍵}/(~b)/packageID
+     :Else
+         b←F.IsFile¨url∘,¨packageID,¨⊂'/apl-package.json'
+         :If 0∊b
+             statusCode←400
+             errMsg←'Is not a package: ',⊃{⍺,', ',⍵}/(~b)/packageID
+         :Else
+             (rc en msg)←F.RmDir url∘,¨packageID
+             :If rc∨.≠0
+                 statusCode←400
+                 b←rc≠0
+                 errMsg←'Remove operation failed partly:'
+                 errMsg,←⊃,/(⎕UCS 13),¨(b/packageID){'  ',⍺,': ',(1⊃⍵),' (rc=',(⍕2⊃⍵),')'}¨↓⍉↑b∘/¨msg en
+             :EndIf
+         :EndIf
      :EndIf
  :EndIf
  :If 200=statusCode

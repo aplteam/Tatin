@@ -1,5 +1,5 @@
- r←Test_API_004(stopFlag batchFlag);⎕TRAP;dir;src;zip;registryPath;body;cfg;packageID;rc;msg;zipFilename;list2;list1
-⍝ Delete a single package with ⎕SE.Tatin.DeletePackages on local Registry
+ r←Test_API_004(stopFlag batchFlag);⎕TRAP;dir;src;zip;registryPath;body;cfg;packageID;rc;msg;zipFilename;list2;list1;cfg2;packageID2;zip2;src2
+⍝ Delete two packages with ⎕SE.Tatin.DeletePackages on local Registry
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -7,6 +7,8 @@
  dir←∆GetTempDir ⍬
  (src zip)←(⊂dir,'/'),¨'src' 'zip'
  F.MkDir src zip
+ (src2 zip2)←(⊂dir,'/'),¨'src2' 'zip2'
+ F.MkDir src2 zip2
  registryPath←∆TEMP_REGISTRY_FOLDER,'\Registry'
 
  body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
@@ -19,19 +21,32 @@
  cfg.license←'MIT'
  cfg.tags←'foo,boo'
  cfg.os_mac←1
-
  cfg←TC.WritePackageConfigFile src cfg
-
  packageID←'test-Package_A-0.1.0'
  (rc msg zipFilename)←TC.PublishPackage src'[local]'
  →T.GoToTidyUp 200≠rc
  →T.GoToTidyUp 0≠≢msg
 
+ (⊂body)F.NPUT src2,'/Test.apln'
+ cfg2←⎕NS''
+ cfg2.group←'test'
+ cfg2.name←'Package_A'
+ cfg2.version←'0.2.0'
+ cfg2.source←'Test.apln'
+ cfg2.license←'MIT'
+ cfg2.tags←'foo,boo'
+ cfg2.os_mac←1
+ cfg2←TC.WritePackageConfigFile src2 cfg2
+ packageID2←'test-Package_A-0.2.0'
+ (rc msg zipFilename)←TC.PublishPackage src2'[local]'
+ →T.GoToTidyUp 200≠rc
+ →T.GoToTidyUp 0≠≢msg
+
  list1←({ns←⍵ ⋄ ns.aggregate←0 ⋄ ns}⎕NS'')TC.ListPackages'[local]'
- (rc msg)←⎕SE.Tatin.DeletePackages'[local]',packageID
+ (rc msg)←⎕SE.Tatin.DeletePackages'[local]'(packageID packageID2)
  Assert 200=rc
  list2←({ns←⍵ ⋄ ns.aggregate←0 ⋄ ns}⎕NS'')TC.ListPackages'[local]'
- →T.GoToTidyUp'test-Package_A-0.1.0'≢∊list1[;1]~list2[;1]
+ →T.GoToTidyUp'test-Package_A-0.1.0' 'test-Package_A-0.2.0'≢list1[;1]~list2[;1]
 
  r←T._OK
 
@@ -39,6 +54,8 @@
  (rc msg)←F.RmDirByForce dir
  msg Assert rc=0
  (rc msg)←F.RmDirByForce registryPath,'/',packageID
+ msg Assert rc=0
+ (rc msg)←F.RmDirByForce registryPath,'/',packageID2
  msg Assert rc=0
  Assert F.DeleteFile zipFilename
 ⍝Done

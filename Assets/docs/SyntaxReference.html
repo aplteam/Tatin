@@ -304,14 +304,26 @@ tatinVars</code></pre>
 <h3 data-id="DeletePackages">2.6. DeletePackages</h3>
 </a>
 </div>
-<pre tabindex="0"><code>(statusCode errMsg)←DeletePackages url</code></pre>
-<p>Deletes one or more packages.</p>
+<pre tabindex="0"><code>(statusCode errMsg)←DeletePackages (regID packageID)</code></pre>
+<p>Deletes one or more packages, usually several versions of the same package.</p>
 <p>Whether deleting packages from a Tatin Registry is possible at all depends on the delete policy it operates, which is in turn determined by the server's INI setting <code>[CONFIG]DeletePackages</code>. See <a href="#getdeletepolicy" class="bookmark_link"><code>GetDeletePolicy</code></a>. The principal Tatin server operates a “None” policy, meaning that you cannot delete anything from it.</p>
+<div class="collapsible">
+<details>
+<summary>
+<h3>Why can't I delete a package from the Tatin server?</h3>
+</summary>
+<div class="collapsible-content">
+<hr>
+<p>The main design objective was to make sure that a build that includes packages from the principal Tatin Registries can always be reproduced in precisely the same way.</p>
+<p>If deleting a package is allowed — even when it is a beta version — then this cannot be guaranteed.</p>
+<p>If you happen to publish a package and realize seconds later that you made a formidable mistake? Well, you increase the patch number, fix the problem and publish a new version, that's the only way.</p>
+</div>
+</details>
+</div>
 <p>In order to delete a package you must identify the package precisely:</p>
-<pre tabindex="0"><code>&lt;Registry&gt;&lt;group-name&gt;-&lt;package-name&gt;-&lt;precise_version_number&gt;</code></pre>
-<p>You may delete several packages in one go by specifying several complete package IDs.</p>
-<p>The function returns a vector of HTTP status codes and a vector of messages. The length of these vectors matches the number of packages specified.</p>
-<p>Ideally all status codes are 200 and all items in <code>msg</code> are empty.</p>
+<pre tabindex="0"><code>&lt;group-name&gt;-&lt;package-name&gt;-&lt;precise_version_number&gt;</code></pre>
+<p>You may delete several packages in one go by specifying several complete package IDs. However, all packages will be deleted from the Registry identified by <code>regID</code>. <code>regID</code> can be a URL or a Registry alias or a Registry ID.</p>
+<p>The function returns an HTTP status code and a message, which will be empty in case of success.</p>
 <div class="h_tag">
 <a href="#deprecatepackage" id="deprecatepackage" class="autoheader_anchor">
 <h3 data-id="DeprecatePackage">2.7. DeprecatePackage</h3>

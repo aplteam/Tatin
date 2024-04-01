@@ -191,6 +191,15 @@
       :EndIf
     ∇
 
+    ∇ r←GetURL
+    ⍝ Returns the URL with port number though only if the port number is not zero
+      :Access Public Instance
+      r←uri
+      :If 0≠port
+          r←(¯1↓r),':',(⍕port),'/'
+      :EndIf
+    ∇
+
 ⍝ ------------ Private stuff
 
     Assert←{⍺←⊢ ⋄ 0∊⍵:⍺ ⎕SIGNAL 998 ⋄ shy←0}

@@ -309,7 +309,7 @@ You can specify these pieces of information as well:
 
 `maintainer`
 
-: The email address of themaintainer of your packages (most likely your email address).
+: The email address of the maintainer of your packages (most likely your email address).
 
 `source`
 
@@ -351,5 +351,6 @@ This has only an impact locally in a scenario mentioned above, and that's why th
 [^JSON5]: Tatin uses [JSON5](https://json5.org/ "Link to the JSON5 web site") rather than JSON.
 
 [^init]: Tatin will be initialized either explicitly or as a side effect when the first Tatin user command is issued. See ["Installing and updating the Tatin Client"](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") for details.
+
 
 

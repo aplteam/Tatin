@@ -13,6 +13,9 @@
  r←⍬
  Assert(⊂batchFlag)∊0 1
  versionOfAPL←'18.0'
+ :If 0=##.Client.CommTools.YesOrNo'Create Tatin with version ',versionOfAPL,' ?'
+     ⎕←'Cancelled by user' ⋄ →0
+ :EndIf
  'Currently we build on Windows only, sorry'Assert'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
  F←##.FilesAndDirs ⋄ C←##.Client ⋄ CFG←##.CiderConfig ⋄ F.APLTreeUtils2←##.APLTreeUtils2
  {}F.Cd CFG.HOME
@@ -49,7 +52,7 @@
  P←##.APLProcess
  parms←P.CreateParms
  parms.Exe←GetAPLVersion versionOfAPL
- parms.CommandLineArgs,←'load="APLSource/Admin/Make_.aplc" '
+ parms.CommandLineArgs,←'load="',F.PWD,'\APLSource\Admin\Make_.aplc" '
  parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
  parms.CommandLineArgs,←' lx="1 #.Make_.Run 1"'
  :If 0  ⍝ Only for analyzing problems:

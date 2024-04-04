@@ -27,7 +27,7 @@
 
  list1←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages(TC.ReplaceRegistryAlias'[localhost]')
  oldPolicy←∆SetServerPolicy'Any'
- (rc msg)←TC.DeletePackages((TC.ReplaceRegistryAlias'[localhost]')),packageID
+ (rc msg)←TC.DeletePackages((TC.ReplaceRegistryAlias'[localhost]')) packageID
  Assert 200=rc
  list2←({⍵.aggregate←0 ⋄ ⍵}⎕NS'')TC.ListPackages(TC.ReplaceRegistryAlias'[localhost]')
  →T.GoToTidyUp'test-Package_A-0.1.0'≢∊list1[;1]~list2[;1]

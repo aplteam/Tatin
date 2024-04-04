@@ -9,6 +9,7 @@
 ⍝   This is true even on Linux and Mac OS despite the fact that these characters are legal in
 ⍝   the names of any files and directories.
 ⍝ * The function checks whether `path` was successfully removed indeed.
+ '"path" must not be /..'⎕SIGNAL 11/⍨(⊂path)∊'\..' '/..'
  path←'expand'NormalizePath path
  'Wildcard characters are not allowed'⎕SIGNAL 11/⍨∨/'*?'∊path
  rc←0 ⋄ msg←''

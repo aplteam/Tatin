@@ -1,9 +1,10 @@
- R←Test_UC_004(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res3;res4;res5;res
+ R←Test_UC_004(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res3;res4;res5;res;ref
 ⍝ Exercise ]Tatin.ListVersions; would normally interacts with the user
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←T._Failed
 
- ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'Please select a Registry:' 'https://tatin.dev/'
+ ref←∆GetRefToTatin
+ ref.Client.CommTools.Select_Choices←1 2⍴'Please select a Registry:' 'https://tatin.dev/'
  (rc msg res)←∆UCMD'ListVersions [?]aplprocess'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
  →T.GoToTidyUp 0=≢res
@@ -11,5 +12,5 @@
  R←T._OK
 
 ∆TidyUp:
- ⎕SE._Tatin.Client.CommTools.Cleanup
+ ref.Client.CommTools.Cleanup
 ⍝Done

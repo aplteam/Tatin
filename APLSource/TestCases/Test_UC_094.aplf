@@ -1,10 +1,11 @@
- r←Test_UC_094(stopFlag batchFlag);⎕TRAP;res;msg;rc;stop
+ r←Test_UC_094(stopFlag batchFlag);⎕TRAP;res;msg;rc;stop;ref
 ⍝ Exercise ]Tatin.GetDeletePolicy with user interaction
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
+ ref←∆GetRefToTatin
+ ref.Client.CommTools.Select_Choices←1 2⍴'SelectRegistry@'(2 4)
  stop←0
- ⎕SE._Tatin.Client.CommTools.Select_Choices←1 2⍴'SelectRegistry@'(2 4)
  (rc msg res)←stop ∆UCMD'GetDeletePolicy ?'
  →T.GoToTidyUp 0≠rc
  →T.GoToTidyUp'[tatin]' '[tatin-test]'≢res[;1]
@@ -12,5 +13,5 @@
  r←T._OK
 
 ∆TidyUp:
- ⎕SE._Tatin.Client.CommTools.Cleanup
+ ref.Client.CommTools.Cleanup
 ⍝Done

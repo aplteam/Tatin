@@ -13,7 +13,9 @@
  r←T._OK
 
 ∆TidyUp:
- (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.versions.##.TatinVars.HOME,'/..'
- msg Assert 0=rc
+ :If 0<≢#.TEMP.versions.##.TatinVars.HOME
+     (rc en msg)←F.RmDir'expand'F.NormalizePath #.TEMP.versions.##.TatinVars.HOME,'/..'
+     msg Assert 0=rc
+ :EndIf
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

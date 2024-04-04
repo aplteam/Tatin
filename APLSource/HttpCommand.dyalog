@@ -7,7 +7,7 @@
     ∇ r←Version
     ⍝ Return the current version
       :Access public shared
-      r←'HttpCommand' '5.4.6' '2024-02-28'
+      r←'HttpCommand' '5.6.0' '2024-03-17'
     ∇
 
 ⍝ Request-related fields
@@ -46,6 +46,7 @@
     :field public Timeout←10                       ⍝ seconds to wait for a response before timing out, negative means reset timeout if any activity
     :field public RequestOnly←¯1                   ⍝ set to 1 if you only want to return the generated HTTP request, but not actually send it
     :field public OutFile←''                       ⍝ name of file to send payload to (format is same as ⎕NPUT right argument)
+    :field public Secret←1                         ⍝ suppress displaying credentials in Authorization header
     :field public MaxRedirections←10               ⍝ set to 0 if you don't want to follow any redirected references, ¯1 for unlimited
     :field public KeepAlive←1                      ⍝ default to not close client connection
     :field public TranslateData←0                  ⍝ set to 1 to translate XML or JSON response data
@@ -96,10 +97,14 @@
       {}{0::'' ⋄ LDRC.Names'.'⊣LDRC.Close ⍵}⍣(~0∊⍴Client)⊢Client
     ∇
 
-    ∇ r←Config
+    ∇ r←Config;i
     ⍝ Returns current configuration
       :Access public
       r←↑{6::⍵'not set' ⋄ ⍵(⍎⍵)}¨(⎕THIS⍎'⎕NL ¯2.2')~⊂'ValidFormUrlEncodedChars'
+      :If (≢r)≥i←r[;1]⍳⊂'Auth'
+      :AndIf Secret
+          r[i;2]←⊂'>>> Secret setting is 1 <<<'
+      :EndIf
     ∇
 
     ∇ r←Run
@@ -400,7 +405,7 @@
      ∆FAIL:(rc secureParams)←¯1 msg ⍝ failure
     ∇
 
-    ∇ {r}←certs HttpCmd args;url;parms;hdrs;urlparms;p;b;secure;port;host;path;auth;req;err;done;data;datalen;rc;donetime;ind;len;obj;evt;dat;z;msg;timedOut;certfile;keyfile;simpleChar;defaultPort;cookies;domain;t;replace;outFile;toFile;startSize;options;congaPath;progress;starttime;outTn;secureParams;ct;forceClose;headers;cmd;file;protocol;conx;proxied;proxy;cert;noCT;simpleParms;noContentLength;connectionClose;tmpFile;tmpTn;redirected;encoding;compType;isutf8
+    ∇ {r}←certs HttpCmd args;url;parms;hdrs;urlparms;p;b;secure;port;host;path;auth;req;err;done;data;datalen;rc;donetime;ind;len;obj;evt;dat;z;msg;timedOut;certfile;keyfile;simpleChar;defaultPort;cookies;domain;t;replace;outFile;toFile;startSize;options;congaPath;progress;starttime;outTn;secureParams;ct;forceClose;headers;cmd;file;protocol;conx;proxied;proxy;cert;noCT;simpleParms;noContentLength;connectionClose;tmpFile;tmpTn;redirected;encoding;compType;isutf8;boundary
     ⍝ issue an HTTP command
     ⍝ certs - X509Cert|(PublicCertFile PrivateKeyFile) SSLValidation Priority PublicCertFile PrivateKeyFile
     ⍝ args  - [1] HTTP method
@@ -542,6 +547,17 @@
                   :Else
                       parms←SafeJSON parms
                   :EndIf
+              :Case 'multipart/form-data'
+                  :If 9.1≠nameClass parms ⍝ must be a namespace
+                      →∆END⊣r.msg←'Params must be a namespace when using "multipart/form-data" content type'
+                  :Else
+                      boundary←50{⍵[?⍺⍴≢⍵]}⎕D,⎕A,⎕C ⎕A
+                      hdrs←'Content-Type'(hdrs setHeader)'multipart/form-data; boundary=',boundary
+                      (parms msg)←boundary multipart parms
+                      :If ~0∊⍴msg
+                          →∆END⊣r.msg←msg
+                      :EndIf
+                  :EndIf
               :Else
                   parms←∊⍕parms
               :EndSelect
@@ -564,7 +580,7 @@
               :EndSelect
      
               :If RequestOnly>SuppressHeaders ⍝ Conga supplies content-length, but for RequestOnly we need to insert it
-                  hdrs←'Content-Length'(hdrs addHeader)⍴parms
+                  hdrs←'Content-Length'(hdrs addHeader)⍕⍴parms
               :EndIf
           :EndIf
       :EndIf
@@ -572,7 +588,7 @@
       hdrs⌿⍨←~0∊¨≢¨hdrs[;2] ⍝ remove any headers with empty values
      
       :If RequestOnly
-          r←cmd,' ',(path,(0∊⍴urlparms)↓'?',urlparms),' HTTP/1.1',(∊{NL,⍺,': ',∊⍕⍵}/hdrs),NL,NL,parms
+          r←cmd,' ',(path,(0∊⍴urlparms)↓'?',urlparms),' HTTP/1.1',(∊{NL,⍺,': ',∊⍕⍵}/privatize environment hdrs),NL,NL,parms
           →∆EXIT
       :EndIf
      
@@ -699,7 +715,7 @@
      
       (ConxProps←⎕NS'').(Host Port Secure certs)←r.(Host Port Secure),⊂certs ⍝ preserve connection settings for subsequent calls
      
-      :If 0=⊃rc←LDRC.Send Client(cmd(path,(0∊⍴urlparms)↓'?',urlparms)'HTTP/1.1'hdrs parms)
+      :If 0=⊃rc←LDRC.Send Client(cmd(path,(0∊⍴urlparms)↓'?',urlparms)'HTTP/1.1'(environment hdrs)parms)
      
      ∆LISTEN:
           forceClose←~KeepAlive
@@ -895,7 +911,7 @@
           :EndIf
       :Else
           :If 1081=⊃rc ⍝ 1081 could be due to an error in Conga that fails on long URLs, so try sending request as a character vector
-              :If 0=⊃rc←LDRC.Send Client(cmd,' ',(path,(0∊⍴urlparms)↓'?',urlparms),' HTTP/1.1',(⎕UCS 13 10),(∊': '(⎕UCS 13 10),⍨¨⍤1⊢hdrs),(⎕UCS 13 10),parms)
+              :If 0=⊃rc←LDRC.Send Client(cmd,' ',(path,(0∊⍴urlparms)↓'?',urlparms),' HTTP/1.1',NL,(∊': 'NL,⍨¨⍤1⊢hdrs),NL,parms)
                   →∆LISTEN
               :EndIf
           :EndIf
@@ -949,6 +965,49 @@
       :Else
           r←⎕EN
       :EndTrap
+    ∇
+
+    ∇ (payload msg)←boundary multipart parms;name;value;filename;contentType;content
+    ⍝ format multipart/form-data payload
+    ⍝ parms is a namespace with named objects
+    ⍝
+      msg←payload←''
+      :For name :In parms.⎕NL ¯2
+          payload,←'--',boundary
+          (value contentType)←2↑(⊆parms⍎name),⊂''
+          payload,←NL,'Content-Disposition: form-data; name="',name,'"'
+          :If ~0∊⍴contentType
+              payload,←NL,'Content-Type: ',contentType
+          :EndIf
+          :If '@<'∊⍨⊃value
+              :If ⎕NEXISTS 1↓value
+              :AndIf 2=1 ⎕NINFO 1↓value
+                  payload,←('@'=⊃value)/'; filename="',(∊¯2↑1 ⎕NPARTS value),'"'
+                  (contentType content)←contentType readFile 1↓value
+                  payload,←NL,'Content-Type: ',contentType,NL,NL
+                  payload,←content,NL
+              :Else
+                  →0⊣msg←'File not found: "',(1↓value),'"'
+              :EndIf
+          :Else
+              payload,←NL,NL,(∊⍕value),NL
+          :EndIf
+      :EndFor
+      payload,←'--',boundary,'--'
+    ∇
+
+    ∇ (contentType content)←contentType readFile filename;ext;tn
+    ⍝ return file content in a manner consistent with multipart/form-data
+      :Access public shared
+      :If 0∊⍴contentType
+          ext←⎕C 3⊃1 ⎕NPARTS filename
+          :If ext≡'.txt' ⋄ contentType←'text/plain'
+          :Else ⋄ contentType←'application/octet-stream'
+          :EndIf
+      :EndIf
+      tn←filename ⎕NTIE 0
+      content←⎕NREAD tn,(⎕DR''),¯1
+      ⎕NUNTIE tn
     ∇
 
     NL←⎕UCS 13 10
@@ -1035,9 +1094,15 @@
           11::⍵.Data←0(3⊃⎕RSI,##).⎕JSON ⍵.Data
           ⍵.Data←0(3⊃⎕RSI,##).⎕JSON⍠'Dialect' 'JSON5'⊢⍵.Data}
 
+    ∇ r←GetEnv var
+    ⍝ return enviroment variable setting for var
+      :Access public shared
+      r←2 ⎕NQ'.' 'GetEnvironment'var
+    ∇
+
     ∇ r←dyalogRoot
     ⍝ return path to interpreter
-      r←{⍵,('/\'∊⍨⊢/⍵)↓'/'}{0∊⍴t←2 ⎕NQ'.' 'GetEnvironment' 'DYALOG':⊃1 ⎕NPARTS⊃2 ⎕NQ'.' 'GetCommandLineArgs' ⋄ t}''
+      r←{⍵,('/\'∊⍨⊢/⍵)↓'/'}{0∊⍴t←GetEnv'DYALOG':⊃1 ⎕NPARTS⊃2 ⎕NQ'.' 'GetCommandLineArgs' ⋄ t}''
     ∇
 
     ∇ ns←{ConxProps}ConnectionProperties url;p;defaultPort;ind;msg;protocol;secure;auth;host;port;path;urlparms
@@ -1288,6 +1353,18 @@
       :EndTrap
       Headers⌿⍨←Headers[;1](≢¨ci)eis name
       r←Headers
+    ∇
+
+    ∇ hdrs←environment hdrs
+    ⍝ substitute any header names or values that begin with '$env:' with the named environment variable
+      hdrs←(⍴hdrs)⍴'%[[:alpha:]].*?%'⎕R{GetEnv 1↓¯1↓⍵.Match}⊢,hdrs
+    ∇
+
+    ∇ hdrs←privatize hdrs
+    ⍝ suppress displaying Authorization header value if Private=1
+      :If Secret
+          hdrs[⍸hdrs[;1](∊ci)'Authorization' 'Proxy-Authorization';2]←⊂'>>> Secret setting is 1 <<<'
+      :EndIf
     ∇
 
     ∇ r←{a}eis w;f

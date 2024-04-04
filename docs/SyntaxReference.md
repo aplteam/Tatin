@@ -196,7 +196,7 @@ Creates a namespace with default parameters; it can be passed as (optional) left
 ### DeletePackages
 
 ```
-(statusCode errMsg)←DeletePackages (regID packageID)
+(statusCode errMsg)←DeletePackages (regID packageIDs)
 ```
 
 Deletes one or more packages, usually several versions of the same package.
@@ -216,7 +216,7 @@ In order to delete a package you must identify the package precisely:
 <group-name>-<package-name>-<precise_version_number>
 ```
 
-You may delete several packages in one go by specifying several complete package IDs. However, all packages will be deleted from the Registry identified by `regID`. `regID` can be a URL or a Registry alias or a Registry ID.
+You may delete several packages in one go by specifying several complete package IDs as a nested vector. However, all packages will be deleted from the same Registry identified by `regID`. `regID` can be a URL or a Registry alias or a Registry ID.
 
 The function returns an HTTP status code and a message, which will be empty in case of success.
 
@@ -909,6 +909,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

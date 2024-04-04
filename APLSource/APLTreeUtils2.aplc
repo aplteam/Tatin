@@ -17,10 +17,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'APLTreeUtils2' '1.3.0+62' '2023-11-05'
+      r←'APLTreeUtils2' '1.4.0+62' '2024-03-21'
     ∇
 
     ∇ History
+    ⍝ * 1.4.0 from 2024-04-21
+    ⍝   * Left argument of `GoToWebPage` can now be 0 rather than the path to a browser EXE.
+    ⍝ * 1.3.1 from 2023-12-01
+    ⍝   * `CreateUUID` required to set `⎕RL` due to the fact that the seed is the same in every new namespace.
     ⍝ * 1.3.0 from 2023-11-05
     ⍝   * `ToNum` now accepts a left argument which is returned in case the right argument is an empty vector.
     ⍝   * New methods: `BitsToInt` and `IntToBits`
@@ -204,15 +208,16 @@
       :EndIf
     ∇
 
-    ∇ {success}←{browser}GoToWebPage Url;wsh;url;html;title;EncodeBlanksForNix;⎕WX
+    ∇ {success}←{x}GoToWebPage Url;wsh;url;html;title;EncodeBlanksForNix;⎕WX;browser;rideFlag
       :Access Public Shared
     ⍝ Fires up the default browser and displays "Url". Exception is when the current
     ⍝ session is connected to Ride: then "Url" is displayed in the Ride browser.\\
     ⍝ Instead of using the default browser you can specify an EXE (Windows) or command
-    ⍝ as the left argument. That will then be used to show "Url". Note that the left
-    ⍝ argument is ignored in case the current session is connected to Ride.\\
-    ⍝ For displaying a local file rather then a url add "file:///".\\
-    ⍝ However, note that "file:///" does not work on some systems / with some browsers.\\
+    ⍝ as the left argument. That will then be used to show "Url". Instead the left argument
+    ⍝ can be a `0`: thi is useful to **not** use the Ride browser when connected to Ride.
+    ⍝ If not connected to Ride the left argument is ignored in case it is numeric.
+    ⍝ For displaying a local file rather then a url add "file://".\\
+    ⍝ However, note that "file://" does not work on some systems / with some browsers.\\
     ⍝ Returns 1 for success and 0 for failure. That can happen for example when the
     ⍝ Windows Scripting Host throws a DOMAIN ERROR.\\
     ⍝ Examples:
@@ -225,6 +230,14 @@
       ⎕WX←1
       success←1
       url←Lowercase Url
+      x←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'x'
+      :If ' '=1↑0⍴x
+          browser←{'"',(⍵~'"'),'" '}⍣(0<≢x)⊢x
+          rideFlag←1
+      :Else
+          rideFlag←⊃x
+          browser←''
+      :EndIf
       :If ∨/'file:'{⍺≡(≢⍺)↑⍵}url
           :If 'Win'≡GetOperatingSystem ⍬
               Url←'"',('"'~⍨'file://'{⍺,(≢⍺)↓⍵}Url),'"'
@@ -243,6 +256,7 @@
       (('\'=Url)/Url)←'/'
       Url←{l←3+1⍳⍨'://'⍷⍵ ⋄ (l↑⍵),{(~'//'⍷⍵)/⍵}l↓Url}Url
       :If 3501⌶⍬ ⍝ Connected to Ride?
+      :AndIf rideFlag
           :If 'file://'{⍺≡(≢⍺)↑⍵}Url
               ⍝Url←∊(⊂'\ ')@(⍸' '=Url)⊣Url
               Url←(≢'file://')↓Url
@@ -258,8 +272,6 @@
               success←0=Url(3500⌶)∊html
           :EndIf
       :Else
-          browser←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'browser'
-          browser←{'"',(⍵~'"'),'" '}⍣(0<≢browser)⊢browser
           :Select GetOperatingSystem ⍬
           :Case 'Win'
               'wsh'⎕WC'OLEClient' 'WScript.Shell'
@@ -314,12 +326,15 @@
     ∇ r←Create_UUID
     ⍝ Produces a UUID
       :Access Public Shared
+      ⎕RL[1]←⊂⍬
       r←'-'@(4+5×⍳4)⊢(⎕D,⎕C ⎕A)[4(9+|)@20⊢5@15?36⍴16]
     ∇
 
     ∇ r←{type}Base64 txt;charset
       :Access Public Shared
-    ⍝ Base64 encoding. `txt` must be a simple character vector.\\
+    ⍝ Base64 encoding and decoding. `txt` must be a simple character vector.
+    ⍝ The function works out what to do.\\
+    ⍝ Note that this function is **_not_** designed to convert large amounts of data.
     ⍝ `type` defaults to 1 which specifies the default alphabet: `[a-zA-z0-9+/=]`.\\
     ⍝ If you want a file and URL-save alphabet specify `type` as 2. Then `- is used instead of `+`, and `_` instead of `/`.\\
     ⍝ See [RFC 4648](http://www.rfc-editor.org/rfc/rfc4648.txt) for details.\\

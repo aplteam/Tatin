@@ -1,4 +1,4 @@
- r←Test_UC_002(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg;statusCode;errMsg
+ r←Test_UC_002(stopFlag batchFlag);⎕TRAP;rc;tempDir;packageFolder;zipfile;res;more;version;json;cfg;msg;statusCode;errMsg;ref
 ⍝ Exercise ]Tatin.PublishPackages with an already published package and different spelling (case)
 ⍝ We publish under group "SomeGroup" twice but with different spelling (case)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -26,7 +26,8 @@
  cfg.name←'os'
  json←TC.Reg.JSON cfg
  json TC.Reg.SaveJSON(tempDir,'/apl-package.json')1
- ⎕SE._Tatin.Client.CommTools.YesOrNo_Answers←1 2⍴'Test_UC_002 already published on' 'n'
+ ref←∆GetRefToTatin
+ ref.Client.CommTools.YesOrNo_Answers←1 2⍴'Test_UC_002 already published on' 'n'
  (rc msg res)←∆UCMD'PublishPackage "',tempDir,'" [localhost]'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
  →T.GoToTidyUp'Server: The package has already been published with a different spelling (case)'≢res
@@ -34,8 +35,8 @@
  r←T._OK
 
 ∆TidyUp:
- ⎕SE._Tatin.Client.CommTools.Cleanup
+ ref.Client.CommTools.Cleanup
  Assert 0=⊃F.RmDir tempDir
- (statusCode errMsg)←TC.DeletePackages'[localhost]SomeGroup-OS-1.0.0'
+ (statusCode errMsg)←TC.DeletePackages'[localhost]' 'SomeGroup-OS-1.0.0'
  Assert statusCode∧.=200
 ⍝Done

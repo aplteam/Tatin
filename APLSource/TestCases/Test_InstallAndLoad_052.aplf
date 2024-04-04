@@ -1,6 +1,6 @@
  r←Test_InstallAndLoad_052(stopFlag batchFlag);⎕TRAP;res;list;expected;ref;parms
  ;dir;src;dist;body;vars1;vars2;vars3;vars4;vars5;vars6;vars7;vars8;vars9;cfg;src2;zipfile
- ⍝ Save variables of all sortds and make sure they are installed as well.
+ ⍝ Save variables of all sorts and make sure they are installed as well.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -60,6 +60,7 @@
  Assert 0=⊃F.RmDir dir
  #.⎕EX TC.GetTatinRootSpace'#'
  :If 9=#.⎕NC'TEMP.Variables'
+ :AndIf 0<≢#.TEMP.Variables.TatinVars.HOME
      F.RmDir #.TEMP.Variables.TatinVars.HOME,'/..'
  :EndIf
 ⍝Done

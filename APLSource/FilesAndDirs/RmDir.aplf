@@ -26,8 +26,9 @@
  rc←0 ⋄ en←0 ⋄ more←''
  'Wildcard characters are not allowed'⎕SIGNAL 11/⍨∨/'*?'∊path
  :If 2=|≡path
-     (rc en more)←↓⍉↑mustBeEmpty RmDir¨path
+     (rc en more)←↓⍉↑mustBeEmpty RmDir¨,path
  :Else
+     '"path" must not be /..'⎕SIGNAL 11/⍨(⊂path)∊'\..' '/..'
      path←'expand'NormalizePath path
      :If ⎕NEXISTS path
          :If IsDir path

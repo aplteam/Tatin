@@ -1,4 +1,4 @@
- {ns}←{parms}Help recompileFlag;filename
+{ns}←{parms}Help recompileFlag;filename
 ⍝ Displays the file MarkAPL_CheatSheet.html with your default browser.\\
 ⍝ `recompileFlag`:
 ⍝ * 0 shows the file as it stands.
@@ -7,10 +7,14 @@
 ⍝ However, if the markdown file does not exist then `recompileFlag` has no effect (is always 0).
  :Access Public Shared
  parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHelpParms}'parms'
- :If ~⎕NEXISTS parms.homeFolder,'/Files/MarkAPL_CheatSheet.md'
+ :If 0=≢parms.homeFolder
+     filename←TatinVars.GetFullPath2AssetsFolder,'/MarkAPL_CheatSheet'
+ :Else
+     filename←parms.homeFolder,'/Files/MarkAPL_CheatSheet'
+ :EndIf
+ :If ~⎕NEXISTS filename,'.md'
      recompileFlag←0
  :EndIf
- filename←parms.homeFolder,'/Files/MarkAPL_CheatSheet'
  filename←recompileFlag AddAppropriateExtension filename
  ns←CompileHelp filename recompileFlag parms
  :If ¯1≠×recompileFlag  ⍝ This syntax is used only by `Make` and test cases, therefore it is not documented.

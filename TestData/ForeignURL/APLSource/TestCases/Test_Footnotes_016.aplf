@@ -1,0 +1,18 @@
+ R←Test_Footnotes_016(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff;expected
+⍝ A footnote with an ftp URL
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'# Loading Tatin  packages'
+ md,←⊂'## Level 2 [^footnote1]  packages'
+ md,←⊂'### Level 3'
+ md,←⊂''
+ md,←⊂'[^footnote1]:This is the FTP server:<br><ftp://ftp.MyDomain.com>'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<li id="fnref1"><p>This is the FTP server:<br><a href="ftp://ftp.MyDomain.com" class="external_link">ftp://ftp.MyDomain.com</a></p><a href="#fnref1" class="footnote_anchor"></a>'
+ →T.PassesIf∨/expected⍷∊ns.html
+
+ R←T._OK

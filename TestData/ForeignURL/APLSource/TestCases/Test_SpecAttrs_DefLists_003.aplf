@@ -1,0 +1,21 @@
+ R←Test_SpecAttrs_DefLists_003(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Definition list: several assignments.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Term 1'
+ md,←⊂': Explenation {.goo ##zoo style="color:pink;"}'
+ md,←⊂''
+ md,←⊂': Explenation2 {.roo #too style="color:green;"}'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<dd class="goo" id="#zoo" style="color:pink;"><p class="first_dd">Explenation</p></dd>'⍷∊ns.html
+ →T.PassesIf∨/'<dd class="roo" id="too" style="color:green;"><p>Explenation2</p></dd>'⍷∊ns.html
+
+ R←T._OK

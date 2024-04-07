@@ -1,0 +1,21 @@
+ R←Test_Lists_033(stopFlag batchFlag);⎕TRAP;md;ns;parms;expect
+⍝ Test changes of list markers (both bulleted). This must create a new list on the top level.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* List item a'
+ md,←⊂'  * List item a-1'
+ md,←⊂'  * List item a-2'
+ md,←⊂'  + List item a-3'
+ md,←⊂'  + List item b-2'
+ md,←⊂'* List item b'
+ md,←⊂'* List item b'
+ md,←⊂'* List item b'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 3=+/'<ul>'⍷∊ns.html
+
+ R←T._OK

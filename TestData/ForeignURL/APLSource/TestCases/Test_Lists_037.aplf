@@ -1,0 +1,26 @@
+ R←Test_Lists_037(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test list with an orphaned paragraph. Result is strange but that's what you get with rubbish input.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* List item 1'
+ md,←⊂'  * List item 1-a'
+ md,←⊂'  * List item 1-b with'
+ md,←⊂'    non-lazy continuation'
+ md,←⊂'    * list item 1-a-1'
+ md,←⊂'    * list item 1-a-2'
+ md,←⊂'  '
+ md,←⊂'   Para in nowhere land - the indentation does not fit any list item.'
+ md,←⊂'* List item 1-b with'
+ md,←⊂'* List item 2'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 3=+/'<ul>'⍷∊ns.html
+ →T.PassesIf 1=+/'<p>'⍷∊ns.html
+ →T.PassesIf 7=+/'</li>'⍷∊ns.html
+
+ R←T._OK

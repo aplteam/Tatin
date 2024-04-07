@@ -1,0 +1,27 @@
+ R←Test_HTML_011(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test nested tags, user-defined and HTML5 with a single HTML block.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+⍝ It's a single block, therefore **para** survises unchanged
+
+ md←''
+ md,←⊂'This is a para.'
+ md,←⊂''
+ md,←⊂'<my-special type="1">'
+ md,←⊂'    <span class="foo">'
+ md,←⊂'    Enclosed **para**'
+ md,←⊂'    </span>'
+ md,←⊂'</my-special>'
+ md,←⊂''
+ md,←⊂'This is a second para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<my-special type="1">'⍷∊ns.html
+ →T.PassesIf 1=+/'<span class="foo">'⍷∊ns.html
+ →T.PassesIf 1=+/'Enclosed **para**'⍷∊ns.html
+ →T.PassesIf 1=+/'</my-special>'⍷∊ns.html
+
+ R←T._OK

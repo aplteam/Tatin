@@ -1,0 +1,26 @@
+ R←Test_Lists_048(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;html
+⍝ Test a an bulleted list with the list items having a blank line between them.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Para.'
+ md,←⊂'*     This'
+ md,←⊂''
+ md,←⊂'*     That'
+ md,←⊂''
+ md,←⊂'*     More '
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'Para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+ →T.PassesIf 2=+/'<p>'⍷html
+ →T.PassesIf 1=+/'<ul>'⍷html
+ →T.PassesIf 1=+/'</ul>'⍷html
+ →T.PassesIf 3=+/'<li>'⍷html
+
+ R←T._OK

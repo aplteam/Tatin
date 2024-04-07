@@ -1,0 +1,17 @@
+ R←Test_Abbr_015(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Test an abbreviation that is part of a word. Was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'The word flex (also known as "flex") is well defined, but we have to be flexible here.'
+ md,←⊂''
+ md,←⊂'*[flex]: This and that'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+ →T.FailsIf 2≠+/'<abbr '⍷∊ns.html
+
+ R←T._OK

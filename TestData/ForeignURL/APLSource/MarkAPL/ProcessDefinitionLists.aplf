@@ -1,0 +1,58 @@
+ r←ProcessDefinitionLists ns;noOf;bool;bl;html;nop;not2;buff;bl2;total;el;not;sa;colons
+ r←0
+ :If 1<≢ns.markdown                                ⍝ A definitions has at least two lines
+ :AndIf 1≤ScanForPara ns                           ⍝ Exactly one line for a term but there might be no empty line after it.
+ :AndIf 0≠≢'^\s{0,3}:\s'⎕S 0⊣⊃(+/∧\1↓ns.emptyLines)↓1↓ns.markdown  ⍝ Is there ": " in the first non-empty line?
+     noOf←(≢ns.markdown)⌊(1 1⍷ns.emptyLines)⍳1     ⍝ Maximum number of lines until the last `:` of this definition list
+     colons←': '∘≡¨2↑¨noOf↑ns.leadingChars         ⍝ Where are any leading colons followed by a space?
+     total←0
+ :AndIf 0<+/colons                                 ⍝ Any at all? If not it's not a definition list!
+     bl←noOf↑ns.markdown                           ⍝ The whole lot
+     html←⊂'<dl>'
+     el←{0=≢¨⍵}bl~¨' '                           ⍝ Empty lines
+     :Repeat
+         :If 1<≢bl
+         :AndIf 0≠≢∊1↓bl
+         :AndIf 0≠≢'^\s{0,3}:\s'⎕S 0⊣{⍵⊃⍨1⍳⍨0<≢¨⍵}1↓bl
+             sa←GetSpecialAttributes⊃bl
+             (⊃bl)←sa DropSpecialAttributes⊃bl
+             buff←('dt',sa)∘Tag¨1⊃¨ns ProcessInlineMarkUp¨1↑bl
+             not←1++/∧\1↓el
+             (bl colons el)←not↓¨bl colons el
+         :AndIf 0∊el
+              ⍝ Now we pick up everything that fulfills one of the following conditions:
+              ⍝ * Starts with a ": "
+              ⍝ * Starts with two spaces (plus any leading spaces before the ":")
+              ⍝ * Is an empty line
+             nop←+/∧\el∨colons∨{⊃(' '=¯1↓⍵)∧' '≠¯1↑⍵}¨(3++/∧\' '=⊃bl)↑¨bl
+         :AndIf 0<≢bl2←nop↑bl
+             (bl colons el)←(≢bl2)↓¨bl colons el
+         :AndIf 0≠≢bl2←(0<≢¨bl2~¨' ')/bl2
+             bl2{v←⍺ ⋄ 0=≢⍵:v ⋄ ((¯1+⊃⍵)⊃v)←A.DMB((¯1+⊃⍵)⊃v),' ',(⊃⍵)⊃v ⋄ ((⊃⍵)⊃v)←'' ⋄ v ∇ 1↓⍵}←⌽⍸':'≠⊃¨A.DLB¨bl2
+             bl2←(0<≢¨bl2)/bl2
+             bl2←{⍵↓⍨1+⍵⍳':'}¨bl2
+             sa←GetSpecialAttributes¨bl2
+             bl2←sa DropSpecialAttributes¨bl2
+             bl2←⊃¨ns ProcessInlineMarkUp¨bl2
+             :If 1=not
+             :AndIf 1=≢bl2
+                 bl2←⊂('dd',⊃sa)Tag⊃bl2
+             :Else
+                 :If 1<≢bl2←((⊂'dd'),¨sa)Tag¨Tag¨bl2
+                     (1⊃bl2)←'<p>'⎕R'<p class="first_dd">'⊣1⊃bl2
+                 :EndIf
+             :EndIf
+             html,←buff,bl2
+             total+←not+nop
+         :Else
+             bl←''
+         :EndIf
+     :Until 0=≢bl
+     ns.noOf←total
+     html,←⊂'</dl>'
+     r←1
+     ns.html,←html
+     ns←Drop ns
+     ∆LastLineWasEmpty←1
+ :EndIf
+⍝Done

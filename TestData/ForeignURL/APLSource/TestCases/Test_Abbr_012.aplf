@@ -1,0 +1,33 @@
+ R←Test_Abbr_012(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test for an abbreviation that is also a header; was once bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# Abbreviations'
+ md,←⊂''
+ md,←⊂'Abbreviations can be useful & helpful!'
+ md,←⊂''
+ md,←⊂'*[Abbreviations]: Text is marked up with the <abbr> tag'
+ md,←⊂''
+ md,←⊂'Link to [Abbreviations](#).'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<div class="h_tag">'
+ expected,←⊂'<a href="#abbreviations" id="abbreviations" class="autoheader_anchor">'
+ expected,←⊂'<h1 data-id="Abbreviations">Abbreviations</h1>'
+ expected,←⊂'</a>'
+ expected,←⊂'</div>'
+ expected,←⊂'<p><abbr title="Text is marked up with the &lt;abbr&gt; tag">Abbreviations</abbr> can be useful &amp; helpful!</p>'
+ expected,←⊂'<p>Link to <a href="#abbreviations" class="bookmark_link">Abbreviations</a>.</p>'
+
+ →T.PassesIf expected≡ns.html
+ →T.PassesIf 0=≢ns.report
+
+ R←T._OK

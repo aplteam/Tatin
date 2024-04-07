@@ -1,0 +1,14 @@
+ R←Test_GetMaskForCode_004(stopFlag batchFlag);⎕TRAP;mask;expected
+⍝ Inline code that contains an "escaped bachtick": there is no such thing inside a code block.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ #.TEMP.m←'This `{\`⍵}` code'
+ mask←MarkAPL.Execute'GetMaskForCode #.TEMP.m'
+ expected←0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0
+ →T.PassesIf mask≡expected
+
+ R←T._OK

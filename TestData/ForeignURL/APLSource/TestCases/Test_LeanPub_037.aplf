@@ -1,0 +1,31 @@
+ R←Test_LeanPub_037(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test the leanpub extension "highlight lines of code": trailing blanks, CRs in the HTML and </span>
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂''
+ md,←⊂'~~~'
+ md,←⊂''
+ md,←⊂'leanpub-start-insert  '
+ md,←⊂'{(+⌿⍵)÷≢⍵}'
+ md,←⊂'</span>'
+ md,←⊂'leanpub-end-insert  '
+ md,←⊂'~~~'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+ parms.createFullHtmlPage←1
+ parms.screenCSS←'Dark_Screen.css'
+ parms.printCSS←'Dark_Print.css'
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A para</p>' '<pre tabindex="0"><code>' '<span class="leanpub_code">{(+⌿⍵)÷≢⍵}' '&lt;/span&gt;' '</span></code></pre>' '<p>Another para</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

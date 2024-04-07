@@ -1,0 +1,18 @@
+ R←Test_Links_015(stopFlag batchFlag);⎕TRAP;ns;html;md;expected;parms
+⍝ Test an attribute were the content contains a digit
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# This2That'
+ md,←⊂''
+ md,←⊂'Go to [This2That](#).'
+ parms←MarkAPL.CreateParms
+ parms.numberHeaders←1
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<a href="#this2that" class="bookmark_link">'
+ →T.PassesIf∨/expected⍷∊ns.html
+
+ R←T._OK

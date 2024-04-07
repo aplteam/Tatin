@@ -1,0 +1,28 @@
+ R←Test_Misc_023(stopFlag batchFlag);⎕TRAP;md;parms;html
+⍝ Test whether setting "width" to a non-default value has an effect on the CSS
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'# Test' '' '* This' '* That' '* More'
+ parms←MarkAPL.CreateParms
+ parms.width←234
+ parms.createFullHtmlPage←1
+
+ html←parms MarkAPL.Markdown2HTML md
+ →T.PassesIf 1=+/'max-width:234px;'⍷(∊html)~' '
+
+ parms←MarkAPL.CreateParms
+ parms.width←'234'
+ parms.createFullHtmlPage←1
+
+ html←parms MarkAPL.Markdown2HTML md
+ →T.PassesIf 1=+/'max-width:234px;'⍷(∊html)~' '
+
+ parms←MarkAPL.CreateParms
+ parms.width←'234em'
+ parms.createFullHtmlPage←1
+
+ html←parms MarkAPL.Markdown2HTML md
+ →T.PassesIf 1=+/'max-width:234em;'⍷(∊html)~' '
+
+ R←T._OK

@@ -1,0 +1,25 @@
+ R←Test_Lists_022(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Test indentation: what belonge to a list item and what doesn't.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂' 1) List I.'
+ md,←⊂' 1) List II.'
+ md,←⊂''
+ md,←⊂'    Another para'
+ md,←⊂''
+ md,←⊂'    `{+/⍵}`'
+ md,←⊂''
+ md,←⊂'    Even this belongs to "List II."'
+ md,←⊂' 1) List III.'
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<ol start="1">' '<li>' '<li>' '<p>' '<p>' '<p>' '<li>' '</ol>'
+ →T.PassesIf expected≡{⍵↑⍨⍵⍳'>'}¨ns.html
+
+ R←T._OK

@@ -1,0 +1,22 @@
+ R←Test_Header_027(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Check italic header with at least one space in it with header numbering on. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:numberHeaders = 6'
+ md,←⊂'# _Level one_'
+
+ ns←MarkAPL.Init ⍬ md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<div class="h_tag">'
+ expected,←⊂'<a href="#_level-one_" id="_level-one_" class="autoheader_anchor">'
+ expected,←⊂'<h1 data-id="_Level-one_">1. <em>Level one</em></h1>'
+ expected,←⊂'</a>'
+ expected,←⊂'</div>'
+
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

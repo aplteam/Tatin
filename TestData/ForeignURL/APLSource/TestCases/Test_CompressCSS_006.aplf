@@ -1,0 +1,16 @@
+ R←Test_CompressCSS_006(stopFlag batchFlag);⎕TRAP;css;css2;expected
+⍝ Try to compress CSS with a fint definition that has a space in it
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ css←''
+ css,←⊂'p {'
+ css,←⊂'  font-family:"APL385 Unicode";'
+ css,←⊂'}'
+
+ css2←MarkAPL.CompressCSS css
+
+ expected←'p{font-family:"APL385 Unicode";}'
+ →T.PassesIf css2≡expected
+
+ R←T._OK

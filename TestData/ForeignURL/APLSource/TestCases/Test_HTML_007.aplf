@@ -1,0 +1,49 @@
+ R←Test_HTML_007(stopFlag batchFlag);⎕TRAP;md;ns;l;this
+⍝ Test for user-defined tags.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+⍝ No HTML block: leading empty line is missing:
+ md←'This is a para.' '<MyTag>' 'That''s embraced by `<MyTag>`' '</MyTag>' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf(,⊂'<p>This is a para. <MyTag> That''s embraced by <code>&lt;MyTag&gt;</code> </MyTag></p>')∊ns.html
+
+ ⍝ No HTML block: trailing empty line is missing:
+ md←'This is a para.' '' '<MyTag>' 'That''s embraced by `<MyTag>`' '</MyTag>' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf∧/'<MyTag>' '<p>That''s embraced by <code>&lt;MyTag&gt;</code> </MyTag> Another para</p>'∊ns.html
+ →T.PassesIf(,⊂'<p>This is a para.</p>')∊ns.html
+
+ ⍝ No HTML block: no empty lines at all:
+ md←'This is a para.' '<MyTag>' 'That''s embraced by `<MyTag>`' '</MyTag>' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf∨/''⍷∊ns.html
+
+ md←'This is a para.' '' '<My-Tag>' 'That''s embraced by `<My-Tag>`' '</My-Tag>' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<My-Tag>'{⍺≡(⍴⍺)↑⍵}2⊃ns.html
+ →T.PassesIf'That''s embraced by `<My-Tag>`'{⍺≡(⍴⍺)↑⍵}3⊃ns.html
+ →T.PassesIf'</My-Tag>'≡4⊃ns.html
+ →T.PassesIf'<p>Another para</p>'{⍺≡(-⍴⍺)↑⍵}⊃¯1↑ns.html
+
+ md←'This is a para.' '' '<My-Tag>' '' 'That''s embraced by `<My-Tag>`' '' '</My-Tag>' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<My-Tag>'{⍺≡(⍴⍺)↑⍵}2⊃ns.html
+ →T.PassesIf'<p>That''s embraced by <code>&lt;My-Tag&gt;</code></p>'{⍺≡(⍴⍺)↑⍵}3⊃ns.html~⊂''
+ →T.PassesIf'</My-Tag>'≡4⊃ns.html~⊂''
+ →T.PassesIf'<p>Another para</p>'{⍺≡(-⍴⍺)↑⍵}⊃¯1↑ns.html
+
+ md←'<My-Tag>' '' 'That''s embraced by `<My-Tag>`' '' '</My-Tag>' '' 'A para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<My-Tag>'∘{⍺≡(⍴⍺)↑⍵}¨ns.html
+ →T.PassesIf 1=+/'<p>That''s embraced by <code>&lt;My-Tag&gt;</code></p>'∘{⍺≡(⍴⍺)↑⍵}¨ns.html
+ →T.PassesIf 1=+/'</My-Tag>'∘≡¨ns.html
+ →T.PassesIf 1=+/'<p>A para</p>'∘{⍺≡(-⍴⍺)↑⍵}¨ns.html
+
+ R←T._OK

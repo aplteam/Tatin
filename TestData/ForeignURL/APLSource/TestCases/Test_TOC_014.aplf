@@ -1,0 +1,20 @@
+ R←Test_TOC_014(stopFlag batchFlag);⎕TRAP;md;ns;parms;html
+⍝ Header with multiple spaces caused once havoc (bug #30)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:toc            = 1'
+ md,←⊂'[parm]:numberHeaders  = 1'
+ md,←⊂'# Change History  `({+/⍳⍵})`'
+ md,←⊂''
+ md,←⊂'Some paragraph'
+ parms←MarkAPL.CreateParms
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(⍴,ns.headerLineNos)=≢ns.headers
+ →T.PassesIf 1=+/'<h1 data-id="Change-History">1. Change History  <code>({+/⍳⍵})</code></h1>'⍷∊ns.html
+
+ R←T._OK

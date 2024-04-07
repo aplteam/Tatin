@@ -1,0 +1,15 @@
+ R←Test_InLine_025(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Paragraphs with multiple but odd number of asterisks: ignore last one.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'*A* *Paragraph.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←,⊂'<p><em>A</em> *Paragraph.</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

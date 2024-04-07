@@ -1,0 +1,23 @@
+ R←Test_Table_008(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Test table with just column headers. This was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'para 1'
+ mat,←⊂'|col 1|col 2|col 3|'
+ mat,←⊂'|-|-|-|'
+ mat,←⊂'para 2'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf'<p>para 1</p>'≡1⊃ns.html
+ →T.PassesIf(⊂'<th style="text-align: left;">col 1</th>')∊ns.html
+ →T.PassesIf(⊂'<th style="text-align: left;">col 2</th>')∊ns.html
+ →T.PassesIf(⊂'<th style="text-align: left;">col 3</th>')∊ns.html
+ →T.PassesIf 1=+/('<tbody>',(⎕UCS 13),'</tbody>')⍷html
+ →T.PassesIf'<p>para 2</p>'≡⊃¯1↑ns.html
+
+ R←T._OK

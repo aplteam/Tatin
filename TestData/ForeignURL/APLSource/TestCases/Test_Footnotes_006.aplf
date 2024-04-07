@@ -1,0 +1,27 @@
+ R←Test_Footnotes_006(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test whether an invalid foot note ref is reported correctly.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This: [^doesnotex] is the first ref to a footnote.'
+ md,←⊂''
+ md,←⊂'This: [^alsoFailure] is the second ref to a footnote.'
+ md,←⊂''
+ md,←⊂'This: `[^code1]` is code and therefore okay.'
+ md,←⊂''
+ md,←⊂'~~~'
+ md,←⊂'This: [^code2] is also code.'
+ md,←⊂'~~~'
+ md,←⊂''
+ md,←⊂'[^doesnotexist]: The APL wiki...'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 3=⍴ns.report
+ →T.PassesIf 3=+/∨/¨'doesnotex' 'footnote' 'doesnotexist'⍷¨⊂∊ns.report
+
+ R←T._OK

@@ -1,0 +1,14 @@
+ R←Test_Links_028(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Markdown with a link to a relative file as in `./thisfile.html`. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A link: [](./thisfile.html) this is.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<a href="./thisfile.html"'⍷∊ns.html
+
+ R←T._OK

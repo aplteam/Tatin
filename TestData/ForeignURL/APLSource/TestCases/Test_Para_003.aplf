@@ -1,0 +1,22 @@
+ R←Test_Para_003(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test paragraph with special attribute
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This is a paragraph. {.class1 .class2}'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<p class="class1 class2">This is a paragraph.</p>'≡↑,/ns.html
+
+ md←''
+ md,←'This is a paragraph that' 'stretches over 2 lines.{.class1 .class2}'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<p class="class1 class2">This is a paragraph that stretches over 2 lines.</p>'≡↑,/ns.html
+
+ R←T._OK

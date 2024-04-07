@@ -1,0 +1,22 @@
+ R←Test_Misc_061(stopFlag batchFlag);⎕TRAP;parms;tempFilename
+⍝ Specify a variable "HOME" in ##.## and check whether MarkAPL finds its assets.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'HOME'
+ #.MarkAPL.⎕SHADOW'HOME'
+ #.HOME←'./'
+
+ parms←MarkAPL.CreateHelpParms
+ parms.viewInBrowser←0
+ parms.verbose←0
+ tempFilename←FilesAndDirs.GetTempPath,'\MarkAPL_Tests\',(⊃⎕SI),'\MarkAPL.html'
+ parms.outputFilename←tempFilename
+ 'Create!'FilesAndDirs.CheckPath⊃⎕NPARTS parms.outputFilename
+
+ parms MarkAPL.Help 1
+
+ R←T._OK
+
+∆TidyUp:
+ FilesAndDirs.RmDir⊃⎕NPARTS tempFilename

@@ -1,0 +1,18 @@
+ path←GetTempPath;∆GetTempPath
+⍝ Returns the path to the temp directory on the current system.
+ :Select APLTreeUtils2.GetOperatingSystem ⍬
+ :Case 'Win'
+     '∆GetTempPath'⎕NA'I4 KERNEL32.C32|GetTempPath* I4 >T[]'
+     path←⊃↑/∆GetTempPath 1024 1024
+     :If 0=≢path
+         11 ⎕SIGNAL⍨'Problem getting Windows temp path!; rc=',⍕GetLastError
+     :Else
+         path←NormalizePath path
+     :EndIf
+ :Case 'Lin'
+     path←'/tmp/'
+ :Case 'Mac'
+     path←'/private/tmp/'
+ :Else
+     .⍝ Huuh?!
+ :EndSelect

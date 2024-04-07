@@ -1,0 +1,21 @@
+ R←Test_Abbr_010(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Test correct typography within an abbreviation.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'We talk a lot about HTML these days.'
+ md,←⊂''
+ md,←⊂'We really do talk a lot about HTML these days.'
+ md,←⊂''
+ md,←⊂'*[HTML]: HTML --- "Hyper Text Markup Language"'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>We talk a lot about <abbr title="HTML — “Hyper Text Markup Language”">HTML</abbr> these days.</p>'
+ →T.PassesIf expected≡1⊃ns.html
+ expected←'<p>We really do talk a lot about <abbr title="HTML — “Hyper Text Markup Language”">HTML</abbr> these days.</p>'
+ →T.PassesIf expected≡2⊃ns.html
+
+ R←T._OK

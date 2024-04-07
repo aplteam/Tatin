@@ -1,0 +1,16 @@
+ RunTests;htmlFilename;verbose;option
+⍝ 1. Prepares the test framework
+⍝ 2. Runs all test cases
+⍝ 3. Processes the code coverage data (if collected)
+⍝ 4. Asks the user whether the code coverage report should be put on view
+ Prepare
+ T.Run 1
+ :If 0<≢T.codeCoverage
+     {}CodeCoverage.ProcessData T.codeCoverage.filename
+     option←'Type of code coverage report' 0 1 CommTools.Select'Overview' 'Verbose' 'None'
+     :If 3>option
+         verbose←2=option
+         htmlFilename←verbose CodeCoverage.CreateReport T.codeCoverage.filename
+         ⎕←']Open file://',htmlFilename
+     :EndIf
+ :EndIf

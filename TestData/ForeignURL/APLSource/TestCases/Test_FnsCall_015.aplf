@@ -1,0 +1,18 @@
+ R←Test_FnsCall_015(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test function call that is actually not correct (three rather than two "⍎")
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{''}
+
+ md←''
+ md,←⊂'⍎⍎⍎#.TEMP.MyFns⍎⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<p>⍎⍎⍎#.TEMP.MyFns⍎⍎⍎</p>'≡∊ns.html
+
+ R←T._OK

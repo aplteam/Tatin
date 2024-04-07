@@ -1,0 +1,14 @@
+ R←Test_SpecAttrs_Header_001(stopFlag batchFlag);⎕TRAP;ns;md;fn
+⍝ Header: escaping { and } with \; shall not be considered a special attribute then.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'## Header level 2 \{author\}'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/' {author}'⍷∊ns.html
+
+ R←T._OK

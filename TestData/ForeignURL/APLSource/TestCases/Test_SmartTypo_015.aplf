@@ -1,0 +1,15 @@
+ R←Test_SmartTypo_015(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Two paths in a paragraph both enclosed by double quotes, one with trailing `\` and one without.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'"C:\Temp\" --- "D:\Temp"'
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←,⊂'<p>“C:\Temp\” — “D:\Temp”</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

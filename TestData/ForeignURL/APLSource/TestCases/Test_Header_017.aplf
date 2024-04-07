@@ -1,0 +1,28 @@
+ R←Test_Header_017(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test headers with bookmark anchors switched off.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# Level 1 A'
+ md,←⊂'## Level 2 A'
+ md,←⊂'### Level 2-1'
+ md,←⊂'### Level 2-2'
+ md,←⊂'### Level 2-1'
+ md,←⊂'## Level 2 B'
+ md,←⊂'# Level 1 B'
+ md,←⊂''
+
+ parms←MarkAPL.CreateParms
+ parms.bookmarkLink←0
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 21=⍴ns.html
+ →T.PassesIf 2=+/'<h1>'⍷∊ns.html
+ →T.PassesIf 2=+/'<h2>'⍷∊ns.html
+ →T.PassesIf 3=+/'<h3>'⍷∊ns.html
+
+ R←T._OK

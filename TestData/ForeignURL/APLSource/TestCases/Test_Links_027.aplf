@@ -1,0 +1,16 @@
+ R←Test_Links_027(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Markdown with "strong" and code in the link plus special attributes belonging to the link.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[This **is** code: `{{2=+⌿0=⍵∘.|⍵}⍳⍵}`](aplwiki.com/foo.html{style="font-size:400%;"}), rest assured'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p><a href="http://aplwiki.com/foo.html" class="external_link" style="font-size:400%;">'
+ expected,←'This <strong>is</strong> code: <code>{{2=+⌿0=⍵∘.|⍵}⍳⍵}</code></a>, rest assured</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ R←T._OK

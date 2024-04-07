@@ -1,0 +1,17 @@
+ R←Test_Images_12(stopFlag batchFlag);⎕TRAP;ns;md;fn;expected
+⍝ Test image filename with " around it. This is invalid and becomes rightly "title" and "alt" while "src" will be empty.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ fn←FilesAndDirs.EnforceSlash'"',FilesAndDirs.PWD,'\Images\Kai Jaeger Head Very Small 2014.jpg"'
+
+ md←''
+ md,←⊂'This is a para with an embedded ![](',fn,') in it.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a para with an embedded <img src="" alt=',fn,' title=',fn,'> in it.</p>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

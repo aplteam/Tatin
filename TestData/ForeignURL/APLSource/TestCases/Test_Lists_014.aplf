@@ -1,0 +1,19 @@
+ R←Test_Lists_014(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;html;expected
+⍝ Test a list that starts in column 4
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'   1. Running number, starting from 1.'
+ md,←⊂'   1. Bookmark name'
+ md,←⊂'   1. Caption'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ol start="1">' '<li>Running number, starting from 1.</li>' '<li>Bookmark name</li>'
+ expected,←'<li>Caption</li>' '</ol>'
+
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

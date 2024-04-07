@@ -1,0 +1,12 @@
+ R←Test_Mat2Markdown_008(stopFlag batchFlag);⎕TRAP;m;md;b;ns
+⍝ Test with a matrix with a single column and no column header
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ m←⍪'Kai' 'Thomas' 'Max'
+
+ md←MarkAPL.Matrix2MarkdownTable m
+ →T.PassesIf 4=⍴md
+ →T.PassesIf'|'∧.=⊃¨md
+
+ R←T._OK

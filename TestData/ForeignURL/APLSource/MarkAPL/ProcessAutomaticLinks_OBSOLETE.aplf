@@ -1,0 +1,25 @@
+ ProcessAutomaticLinks_OBSOLETE←{
+      ⍝ This must be done early because later any "<" and ">" will be replaced by there HTML entities.
+      ⍝ (It was a very bad idea to use this syntax! [](url} is so obvious!)
+      ⍝ Therefore we replace "<" and ">" by made-up HTML entities which we replace later by "<" & ">".
+      ⍝ Note that this function escapes any of `_`, `__`, `*`, `**`, `~~`.
+     txt←⍵
+     mask←~GetMaskForCode txt
+     0=≢i1←¯1+⍸'<'=mask\mask/txt:txt
+     txt←i1[1]⌽txt
+     (≢txt)<l←txt⍳'>':(-i1[1])⌽txt
+     link←¯1↓1↓l↑txt
+     sa←GetSpecialAttributes{'{'∊⍵:{⍵↑⍨⍵⍳'}'}{⍵↓⍨¯1+⍵⍳'{'}⍵ ⋄ ⍵}link
+     link←A.DTB{⍵/⍨~Between ⍵∊'{}'}link
+     ∨/link∊AllWhiteSpaceChars:⍵                       ⍝ The link text must not contain any white space
+     0={(∨/'://'⍷⍵)∨'@'∊⍵}link:⍵                       ⍝ We need to catch URLs and email addresses
+     link,⍨←(0={(∨/'://'⍷⍵)∨'@'∊⍵}link)/'http://'
+     link←'\_' '\*' '\~\~'⎕R'\\_' '\\*' '\\~\\~'⍠('Greedy' 0)⊣link
+     link,⍨←(('@'∊link)∧'mailto:'{⍺≢⎕C(≢⍺)↑⍵}link)/'mailto:'
+     class←' class="',((1+'mailto'{⍺≡(≢⍺)↑⍵}link)⊃'external_link' 'mailto_link'),'"'
+     linkText←sa DropSpecialAttributes'mailto:'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}1↓¯1↓l↑txt
+     linkText←'\_' '\*' '\~\~'⎕R'\\_' '\\*' '\\~\\~'⍠('Greedy' 0)⊣linkText
+     txt←('<a href="',link,'"',class,sa,'>',linkText,'</a>'),l↓txt
+     txt←(-i1[1])⌽txt
+     ∇ txt
+ }

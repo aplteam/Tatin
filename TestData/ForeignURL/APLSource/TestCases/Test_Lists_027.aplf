@@ -1,0 +1,16 @@
+ R←Test_Lists_027(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;html
+⍝ Test a list that starts in column 5 - this is not a list then.
+⍝ 3 blanks are the maximum number of leading blanks.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'    1. Running number, starting from 1.'
+ md,←⊂'    1. Bookmark name'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=+/'<ol'⍷∊ns.html
+
+ R←T._OK

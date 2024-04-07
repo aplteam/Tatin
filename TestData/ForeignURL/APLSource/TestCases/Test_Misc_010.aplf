@@ -1,0 +1,21 @@
+ R←Test_Misc_010(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test injecting line breaks with `<br>`.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This is a para.<br>New line'
+ md,←⊂''
+ md,←⊂'Col 1| Col2 '
+ md,←⊂'--|--'
+ md,←⊂'Call 1/A| Call 1 B '
+ md,←⊂'Call 2/A<br>new line| Call 2 B '
+ md,←⊂'Call 3/A| Call 3 B<br>new line '
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<table>'⍷∊ns.html
+ →T.PassesIf 3=+/'<br>'⍷∊ns.html
+
+ R←T._OK

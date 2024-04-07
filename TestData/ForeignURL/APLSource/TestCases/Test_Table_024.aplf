@@ -1,0 +1,23 @@
+ R←Test_Table_024(stopFlag batchFlag);⎕TRAP;ns;mat;expected
+⍝ Test table with an ill-defined table definition; was a bug once.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|This  | | | |'
+ mat,←⊂'|Card reader |   1 | 62.00|  62.00|'
+ mat,←⊂'|'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ expected←'<table>' '<tbody>'
+ expected,←⊂'<tr>'
+ expected,←'<td>This</td>' '<td style="text-align: right;"></td>' '<td style="text-align: right;"></td>' '<td style="text-align: right;"></td>'
+ expected,←⊂'</tr>'
+ expected,←⊂'<tr>'
+ expected,←'<td>Card reader</td>' '<td style="text-align: right;">1</td>' '<td style="text-align: right;">62.00</td>' '<td style="text-align: right;">62.00</td>'
+ expected,←⊂'</tr>'
+ expected,←'</tbody>' '</table>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

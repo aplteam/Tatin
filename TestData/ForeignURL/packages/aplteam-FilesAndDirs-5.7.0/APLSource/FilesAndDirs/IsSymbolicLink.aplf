@@ -1,0 +1,14 @@
+ r←IsSymbolicLink y
+⍝ Returns a 1 if `y` is a symbolic link and a 0 otherwise, even if `y` does exist as a file or directory.\\
+⍝ `y` must be a text vector.
+ :If 2=≡y
+     r←IsSymbolicLink¨y
+ :Else
+     'Invalid right argument'⎕SIGNAL 11/⍨' '≠1↑0⍴y
+     y←NormalizePath y
+     :Trap 19 22
+         r←4=1 ⎕NINFO⍠('Follow' 0)⊣y
+     :Else
+         r←0
+     :EndTrap
+ :EndIf

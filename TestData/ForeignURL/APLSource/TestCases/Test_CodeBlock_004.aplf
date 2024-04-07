@@ -1,0 +1,46 @@
+ R←Test_CodeBlock_004(stopFlag batchFlag);⎕TRAP;m;ns
+⍝ Test code blocks with <pre>
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ m←'<pre>' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</pre>'⍝ Three lines
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>')≢ns.html
+
+ m←'<pre><code>' '      {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</code></pre>'⍝ Three lines
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre><code>      {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>')≢ns.html
+
+ m←'<pre>' '      {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</pre>'                   ⍝ Three lines (not recommended due to missing <code></code>)
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre><code>      {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>')≢ns.html
+
+ m←'<pre id="foo" class="my"><code>' '      {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</code></pre>' ⍝ Five lines
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre id="foo" class="my"><code>      {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>')≢ns.html
+
+ m←'<pre>' '  ' '</pre>'                                           ⍝ Three lines, no real content (not recommended due to missing <code></code>)
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre><code></code></pre>')≢ns.html
+
+ m←⊂'<pre><code>  {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'                ⍝ Single line, two leading blanks
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre><code>  {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>')≢ns.html
+
+ m←⊂'<pre id="foo"><code>  {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'       ⍝ Single line, two leading blanks
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre id="foo"><code>  {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>')≢ns.html
+
+ m←⊂'<pre>  </pre>'                                                 ⍝ Single line, no content (not recommended due to missing <code></code>)
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf(,⊂'<pre><code>  </code></pre>')≢ns.html
+
+ R←T._OK

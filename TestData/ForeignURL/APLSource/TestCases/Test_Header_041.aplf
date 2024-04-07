@@ -1,0 +1,16 @@
+ R←Test_Header_041(stopFlag batchFlag);⎕TRAP;m;ns;expected;parms;buff
+⍝ Test headers with a trailing number of hashes that does not fit the opening number of hashes.
+⍝ This should result in the closing hashes taken to be literally.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←##.MarkAPL.CreateParms
+ parms.lowercaseID←0
+ m←,⊂'### Should be # rather than ##'
+ ns←MarkAPL.Init parms m
+ ns←MarkAPL.Process ns
+
+ expected←'<h3 data-id="Should-be--rather-than">Should be # rather than ##</h3>                     '
+ →T.FailsIf(⊂expected)∊ns.html
+
+ R←T._OK

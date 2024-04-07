@@ -1,0 +1,26 @@
+ R←Test_FnsCall_022(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test function call that takes the name of another function as argument which returns a <pre></pre> block
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.⎕FX'r←fnsname MyFns ns' 'r←⍎fnsname'
+ #.TEMP.⎕FX'r←CalledFns' 'r←''<pre><code>{(+/⍵)÷⍴,⍵}'' ''</code></pre>'''
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns #.TEMP.CalledFns⍎⍎'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<pre><code>{(+/⍵)÷⍴,⍵}' '</code></pre>'≡ns.html
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.⎕FX'r←fnsname MyFns ns' 'r←⍎⍎fnsname'
+ #.TEMP.⎕FX'r←CalledFns' 'r←''<pre><code>{(+/⍵)÷⍴,⍵}'' ''</code></pre>'''
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns ''#.TEMP.CalledFns''⍎⍎'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<pre><code>{(+/⍵)÷⍴,⍵}' '</code></pre>'≡ns.html
+
+ R←T._OK

@@ -1,0 +1,33 @@
+ md←Process_PRE md;first;last
+ md←,md
+ :If 1=≢md
+     :If 0=≢'<code\b[^>]*>'⎕S 0⊣⊃md   ⍝ <code> missing?!
+         (⊃md)←'(<pre\b[^>]*>)'⎕R'\1<code>'⊣⊃md
+     :EndIf
+     :If 0=≢'</code>'⎕S 0⊣⊃md   ⍝ </code> missing?!
+         ((≢md)⊃md)←'(</pre>)'⎕R'</code>\1'⊣(≢md)⊃md
+     :EndIf
+ :Else
+     (first last)←md[1,≢md]
+     :If 0=≢'<code\b[^>]*>'⎕S 0⊣first
+     :AndIf 0=≢'<code\b[^>]*>'⎕S 0⊣⊃1↓md
+         first,←'<code>'
+     :EndIf
+     :If 0=+/'</code'⍷last
+     :AndIf '</code'{⍺≢(≢⍺)↑⍵}⊃¯2↑md
+         :If 0=≢{⍵↓⍨⍵⍳'>'}last
+             last,⍨←'</code>'
+         :Else
+             last←'</code>',last
+         :EndIf
+     :EndIf
+     md[1]←⊂first
+     md[≢md]←⊂last
+     :If 0=≢'<code>'{⍵↓⍨(¯1+≢⍺)+1⍳⍨⍺⍷⍵}1⊃md        ⍝ Do <pre> and <code> stand on their own?
+         md←(,/2↑md),2↓md                          ⍝ Then connect the HTML with the first line of code
+     :EndIf
+     :If ≢'^</code></pre>$'⎕S 0⊣{⍵↓⍨-+/∧\' '=⌽⍵}{⍵/⍨~∨\⍵='⍝'}(≢md)⊃md  ⍝ Do </pre> and </code> stand on their own? (Comments are ignored)
+         md←(¯2↓md),,/¯2↑md                        ⍝ Then connect the HTML with the last line of code
+     :EndIf
+ :EndIf
+ md←'</pre>'DropTailAfterClosingTag md

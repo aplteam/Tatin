@@ -1,0 +1,40 @@
+ R←Test_TOC_011(stopFlag batchFlag);⎕TRAP;md;ns;parms;tags;expected
+⍝ Test line number of header in case LeanPub extensions are involved. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Pargraph'
+ md,←⊂''
+ md,←⊂'A> # Aside'
+ md,←⊂'A>'
+ md,←⊂'A> Pargraph 1.'
+ md,←⊂'A>'
+ md,←⊂'A> Pargraph 2.'
+ md,←⊂''
+ md,←⊂'# Ia'
+ md,←⊂'## Ib'
+ md,←⊂'### Ic'
+ md,←⊂''
+ md,←⊂'W> Warning'
+ md,←⊂''
+ md,←⊂'IIa'
+ md,←⊂'==='
+ md,←⊂'IIb'
+ md,←⊂'---'
+ md,←⊂'### IIc'
+
+
+ parms←MarkAPL.CreateParms
+ parms.toc←⍳6
+ parms.verbose←0
+ parms.leanpubExtensions←1
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'# Ia' '## Ib' '### Ic' 'IIa' 'IIb' '### IIc'
+ →T.PassesIf expected≡md[ns.headerLineNos]
+
+ R←T._OK
+⍝Done

@@ -1,0 +1,20 @@
+ R←Test_Misc_046(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test whether `lineNumberOffset` is honoured
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Paragraph "1.'
+ md,←⊂''
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ parms.lineNumberOffset←40
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=⍴ns.report
+ →T.PassesIf 41='^Warning: single double quotes found in paragraph \(line' '\).*$'∆GetLineNumber⊃ns.report
+
+ R←T._OK

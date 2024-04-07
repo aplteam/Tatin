@@ -1,0 +1,54 @@
+ R←Test_Header_010(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test numbering of headers but start numbering not with first level.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Main'
+ md,←⊂'===='
+ md,←⊂'Level I.'
+ md,←⊂'--------'
+ md,←⊂'### Level 3 A'
+ md,←⊂'#### Level 4 AA'
+ md,←⊂'##### Level 5 AAA'
+ md,←⊂'##### Level 5 AAB'
+ md,←⊂'#### Level 4 AB'
+ md,←⊂'#### Level 4 AC'
+ md,←⊂'### Level 3 B'
+ md,←⊂'### Level 3 C'
+ md,←⊂'#### Level 4 AD'
+ md,←⊂'##### Level 5 ABA'
+ md,←⊂'##### Level 5 ABB'
+ md,←⊂'### Level 3 D'
+ md,←⊂'### Level 3 E'
+ md,←⊂'### Level 3 B'
+ md,←⊂'### Level 3 C'
+ md,←⊂'Level II.'
+ md,←⊂'--------'
+
+ parms←MarkAPL.CreateParms
+ parms.numberHeaders←2 3 4                ⍝ Number all headers from 2 to 4
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf''≡1⊃ns.headers[;4]
+ →T.PassesIf'1.'≡2⊃ns.headers[;4]
+ →T.PassesIf'1.1.'≡3⊃ns.headers[;4]
+ →T.PassesIf'1.1.1.'≡4⊃ns.headers[;4]
+ →T.PassesIf''≡5⊃ns.headers[;4]
+ →T.PassesIf''≡6⊃ns.headers[;4]
+ →T.PassesIf'1.1.2.'≡7⊃ns.headers[;4]
+ →T.PassesIf'1.1.3.'≡8⊃ns.headers[;4]
+ →T.PassesIf'1.2.'≡9⊃ns.headers[;4]
+ →T.PassesIf'1.3.'≡10⊃ns.headers[;4]
+ →T.PassesIf'1.3.1.'≡11⊃ns.headers[;4]
+ →T.PassesIf''≡12⊃ns.headers[;4]
+ →T.PassesIf''≡13⊃ns.headers[;4]
+ →T.PassesIf'1.4.'≡14⊃ns.headers[;4]
+ →T.PassesIf'1.5.'≡15⊃ns.headers[;4]
+ →T.PassesIf'1.6.'≡16⊃ns.headers[;4]
+ →T.PassesIf'1.7.'≡17⊃ns.headers[;4]
+ →T.PassesIf'2.'≡18⊃ns.headers[;4]
+
+ R←T._OK

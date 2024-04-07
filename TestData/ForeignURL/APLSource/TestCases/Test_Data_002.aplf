@@ -1,0 +1,22 @@
+ R←Test_Data_002(stopFlag batchFlag);⎕TRAP;ns;md;data
+⍝ Test multiple [data]: definitions.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[data]:author=''Kai Jaeger'''
+ md,←⊂'[daTa]:Date=''2016-02-19'''
+ md,←⊂'[DATA]:Copies=112'
+ md,←⊂'[DAta]:sequence=1 2 3'
+ md,←⊂''
+ md,←⊂'This is a para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf 4≠↑⍴ns.data
+ data←↑ns.data
+ →T.FailsIf('author' 'Date' 'Copies' 'sequence')≢data[;1]
+ →T.FailsIf('Kai Jaeger' '2016-02-19' 112(1 2 3))≢data[;2]
+
+ R←T._OK

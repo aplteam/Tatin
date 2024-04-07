@@ -1,0 +1,18 @@
+ R←Test_Header_028(stopFlag batchFlag);⎕TRAP;md;ns;expected;parms
+⍝ Check on closing a header tag with `#` ghlyps between; was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'### Should be ## rather than ### ###'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'>Should be ## rather than ###</h3>'
+
+ →T.PassesIf 1=+/∨/¨expected∘⍷¨ns.html
+
+ R←T._OK

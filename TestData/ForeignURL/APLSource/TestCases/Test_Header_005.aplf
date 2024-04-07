@@ -1,0 +1,13 @@
+ R←Test_Header_005(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test automated bookmarks (from headers).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'H. level 1' '==' 'H. A level 2' '--' 'H. B level 2' '--'
+ md,←'### A' '### B' '### C'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf∧/∨/¨' id="'∘⍷¨{⍵/⍨'<a '∘≡¨3↑¨⍵}ns.html
+
+ R←T._OK

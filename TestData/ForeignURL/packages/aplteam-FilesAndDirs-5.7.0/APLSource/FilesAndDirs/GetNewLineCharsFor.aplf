@@ -1,0 +1,8 @@
+ newline←GetNewLineCharsFor os
+⍝ Returns the proper `newline` character(s) for `os` or, if `os` is empty, for the current OS.
+ :If 0=≢os
+     os←APLTreeUtils2.GetOperatingSystem ⍬
+ :EndIf
+ '⍵ is not a supported Operating System'⎕SIGNAL 11/⍨~(⊂os)∊'Win' 'Lin' 'Mac'
+ newline←('Win' 'Lin' 'Mac'⍳⊂os)⊃(⎕UCS 13 10)(⎕UCS 10)(⎕UCS 10)
+⍝Done

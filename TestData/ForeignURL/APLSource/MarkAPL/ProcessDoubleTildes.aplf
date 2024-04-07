@@ -1,0 +1,23 @@
+ txt←ProcessDoubleTildes txt_;noOf;bool;ind;start;end;mask;bool1;bool2
+⍝ Takes a string and marks up everything between ~~ and ~~ as <del>
+⍝ except when it occurs within a word or within APL code.
+⍝ "~~" might also appear as "~~~", and it might be escaped.
+ txt←'  ',txt_,'  '
+ :If 0<+/bool←'~~'⍷txt
+     ind←⍸bool
+ :AndIf 0<+/bool1←bool∧bool\~txt[¯1+ind]∊'\~'
+ :AndIf 0<+/bool2←bool∧bool\~txt[ind+≢'~~']∊'~\'
+ :AndIf 0<+/bool←bool1∧bool2
+     mask←GetMaskForCode txt
+     bool∧←~mask
+ :AndIf 0≠≢ind←⍸bool
+ :AndIf 0≠≢ind←((txt 2∘NotWithinWord¨ind))/ind
+     start←((≢ind)⍴1 0)/ind
+     end←((≢ind)⍴0 1)/ind
+     txt[start]←⊂'<del>'
+     txt[end]←⊂'</del>'
+     txt[1+start,end]←⊂''
+     txt←⊃,/txt
+ :EndIf
+ txt←2↓¯2↓txt
+⍝Done

@@ -1,0 +1,15 @@
+ R←Test_SmartTypo_013(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ `\"` should not be treated as escaping a " when preceeded by an opening unescaped ".
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'"C:\Temp\" --- "D:\Temp"'
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←,⊂'<p>“C:\Temp\” — “D:\Temp”</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

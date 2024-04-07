@@ -1,0 +1,20 @@
+ R←Test_TOC_006(stopFlag batchFlag);⎕TRAP;md;ns;parms;tags
+⍝ Test TOC generation with a header that carries *italic*; was once a bug (para!)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# All *R* topics'
+ md,←⊂''
+ md,←⊂'Ordinary paragraph'
+
+ parms←MarkAPL.CreateParms
+ parms.toc←1+⍳6
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<h1 data-id="All-R-topics">All <em>R</em> topics</h1>'⍷∊ns.html
+ →T.PassesIf 1=+/'<p>Ordinary paragraph</p>'⍷∊ns.html
+ R←T._OK

@@ -1,0 +1,21 @@
+ R←Test_CodeBlock_019(stopFlag batchFlag);⎕TRAP;ns;parms;md;expected
+⍝ Test having a leading lamp symbol (`⍝`) inside a code block. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'~~~'
+ md,←⊂':Namespace MyApp'
+ md,←⊂'⍝ First comment'
+ md,←⊂'A para'
+ md,←⊂'⍝ Second comment'
+ md,←⊂':EndNamespace'
+ md,←⊂'~~~'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<pre tabindex="0"><code>:Namespace MyApp' '⍝ First comment' 'A para' '⍝ Second comment' ':EndNamespace</code></pre>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

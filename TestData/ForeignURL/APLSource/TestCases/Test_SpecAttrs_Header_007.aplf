@@ -1,0 +1,25 @@
+ R←Test_SpecAttrs_Header_007(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Header: ID should go in the bookmark anchor while the rest goes to the <h{n} tag.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Header level 1 (SeText){.header1 ##foo1 style="color:red;"}'
+ md,←⊂'==============================='
+ md,←⊂''
+ md,←⊂'## Header level 2 (ATX){.header2 ##foo2 style="color:red;"}'
+ md,←⊂''
+
+ parms←MarkAPL.CreateParms
+ parms.numberHeaders←6                  ⍝ Number ALL headers
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(⊂'<a href="##foo1" id="#foo1" class="autoheader_anchor">')∊ns.html
+ →T.PassesIf(⊂'<h1 data-id="#foo1" class="header1" style="color:red;">1. Header level 1 (SeText)</h1>')∊ns.html
+ →T.PassesIf(⊂'<a href="##foo2" id="#foo2" class="autoheader_anchor">')∊ns.html
+ →T.PassesIf(⊂'<h2 data-id="#foo2" class="header2" style="color:red;">1.1. Header level 2 (ATX)</h2>')∊ns.html
+
+ R←T._OK

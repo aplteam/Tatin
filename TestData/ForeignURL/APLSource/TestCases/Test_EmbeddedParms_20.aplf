@@ -1,0 +1,23 @@
+ R←Test_EmbeddedParms_20(stopFlag batchFlag);⎕TRAP;md;b;ns;html;hits;filenames;path;parms
+⍝ Check that a parameter definition ends after two consecutive lines
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:cssURL      = ''Firlefanz'''
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'[parm]:linkToCSS   = 1'
+ md,←⊂'A paragraph'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=⍴ns.report
+ →T.PassesIf ns.parms.cssURL≡'Firlefanz'
+ →T.PassesIf ns.parms.linkToCSS=0
+ →T.PassesIf 0<+/'<p>[parm]:linkToCSS = 1 A paragraph</p>'⍷∊ns.html
+
+ R←T._OK

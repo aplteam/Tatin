@@ -1,0 +1,17 @@
+ R←Test_Links_007(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Test  a reference link without a link text in the reference call.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Link to [][aplwiki].'
+ md,←⊂''
+ md,←⊂'[aplwiki]: http://aplwiki.com "Link to the APL wiki"'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>Link to <a href="http://aplwiki.com" class="external_link" title="Link to the APL wiki">Link to the APL wiki</a>.</p>'
+ →T.PassesIf expected≡1⊃ns.html
+
+ R←T._OK

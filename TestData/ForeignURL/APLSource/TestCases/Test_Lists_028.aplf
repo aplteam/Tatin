@@ -1,0 +1,34 @@
+ R←Test_Lists_028(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test a lazy list with sub paragraphs
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* This paragraph stretches'
+ md,←⊂'over several'
+ md,←⊂'lines indeed,'
+ md,←⊂'4 in total!'
+ md,←⊂''
+ md,←⊂'  Para that belongs to the first list item.'
+ md,←⊂'Continues the para!'
+ md,←⊂''
+ md,←⊂'  Para that belongs to the first list item because of indentation'
+ md,←⊂'* This'
+ md,←⊂'is'
+ md,←⊂'the'
+ md,←⊂'second'
+ md,←⊂'one'
+ md,←⊂''
+ md,←⊂'An ordinary paragraph'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 2=+/'<li>'⍷∊ns.html
+ →T.PassesIf 3=+/'<p>'⍷∊ns.html
+ →T.PassesIf 1=+/'<ul>'⍷∊ns.html
+ →T.PassesIf 2=+/'</li>'⍷∊ns.html
+ →T.PassesIf(⊂'<p>Para that belongs to the first list item. Continues the para!</p>')∊ns.html
+
+ R←T._OK

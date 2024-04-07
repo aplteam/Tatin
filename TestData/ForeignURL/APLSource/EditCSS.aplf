@@ -1,0 +1,42 @@
+ EditCSS;folder;source;parms;ns
+⍝ This takes the following actions:
+⍝ 1. Create a temp folder
+⍝ 2. Open a Windows Explorer looking into that folder
+⍝ 3. Copy the cheat sheet to that folder
+⍝ 4. Copy the two CSS files to that folder
+⍝ 5. Create an HTML file within that folder with...
+⍝    * `linkCSS` being set to 1
+⍝    * `cssUrl` pointing to the temp folder
+⍝
+⍝ That allows you to change the CSS files and watch the result of
+⍝ the changes straight away. It also allows you to make temporary
+⍝ changes to the cheat sheet in case it does not contain what you
+⍝ want to change.
+⍝
+⍝ In case you made improving changes to the CSS files don't forget
+⍝ to bring them back to MarkAPL's project folder, otherwise you
+⍝ will loose your changes. Same hold true in case you've improved
+⍝ the cheat sheet.
+⍝
+⍝ Kai Jaeger ⋄ 2017-05-20
+
+ folder←¯4↓FilesAndDirs.GetTempFilename''
+ ⎕←'create!'FilesAndDirs.CheckPath folder
+ {}StartExplorer folder
+ 'MarkAPL_CheatSheet.md'FilesAndDirs.CopyTo folder,'/'
+ 'MarkAPL_screen.css'FilesAndDirs.CopyTo folder,'/'
+ 'MarkAPL_print.css'FilesAndDirs.CopyTo folder,'/'
+ parms←MarkAPL.CreateParms
+ parms.homeFolder←folder
+ parms.cssURL←'file://',folder
+ parms.cssURL←folder
+ parms.linkToCSS←1
+ parms.inputFilename←folder,'/MarkAPL_CheatSheet.md'
+ parms.outputFilename←folder,'/MarkAPL_CheatSheet.html'
+ parms.verbose←0
+
+∆Go:
+ ns←1↓parms MarkAPL.Markdown2HTML''
+ APLTreeUtils2.GoToWebPage'file://',folder,'/MarkAPL_CheatSheet.html'
+ .   ⍝ You might restart with →∆Go
+⍝Done

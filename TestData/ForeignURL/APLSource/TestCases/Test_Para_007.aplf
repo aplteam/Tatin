@@ -1,0 +1,14 @@
+ R←Test_Para_007(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test a paragraph with a line starting with ** (was a bug once).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←'This' 'is' 'a' '**paragraph**,' 'really'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<p>This is a <strong>paragraph</strong>, really</p>'≡∊ns.html
+
+ R←T._OK

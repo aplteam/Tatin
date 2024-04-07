@@ -1,0 +1,34 @@
+ R←Test_Blockquote_005(stopFlag batchFlag);⎕TRAP;md;ns;parms;html
+⍝ Test a blockquote that has a para spanning more than one line, all of wich start with '< '
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'> > Mad start!'
+ md,←⊂'> This is a para.'
+ md,←⊂'> Still the same blockquote.'
+ md,←⊂'> Keeps going.'
+ md,←⊂'>'
+ md,←⊂'> > Nested!'
+ md,←⊂'> and going.'
+ md,←⊂'> >'
+ md,←⊂'> > **Nested** blockquote'
+ md,←⊂'> |Col 1 | Col2 |'
+ md,←⊂'> |:-|:-:|-:|'
+ md,←⊂'> |Karsten Freitag| Mobil | 1.00|'
+ md,←⊂'> |Wolfgang Horst| This and that | 1,300.02'
+ md,←⊂''
+ md,←⊂'> > |Col 1 | Col2 |'
+ md,←⊂'> > |:-|:-:|-:|'
+ md,←⊂'> > |Karsten Freitag| Mobil | 1.00|'
+ md,←⊂'> > |Wolfgang Horst| This and that | 1,300.02'
+ md,←⊂''
+ md,←⊂'New --- non-blockquote -- para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←1↓⊃,/(⎕UCS 13),¨ns.html
+ →T.PassesIf 5=+/'<blockquote>'⍷html
+
+ R←T._OK

@@ -1,0 +1,57 @@
+ R←Test_Misc_007(stopFlag batchFlag);⎕TRAP;ns;m
+⍝ Test horizontal rulers
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←1                                                  ⍝ Not OK
+
+ m←'Para' '' '---'                                    ⍝ Simple syntax 1
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '***'                                    ⍝ Simple syntax 2
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '___'                                    ⍝ Simple syntax 3
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '- - -'                                  ⍝ Simple syntax 1
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '* * *'                                  ⍝ Simple syntax 2
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '_ _ _'                                  ⍝ Simple syntax 3
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '   ---'                                 ⍝ three leading white-space chars
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '    ---'                                ⍝ four leading white-space chars (no!)
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 0=+/'<hr>'⍷∊ns.html
+
+ m←'Para' '' '    --- *'                              ⍝ four leading white-space chars (no!)
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 0=+/'<hr>'⍷∊ns.html
+
+ m←'- This' '- That' '' '---'                         ⍝ A list with "-" as list marker followed by a blank line an a ruler
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf 1=+/'<hr>'⍷∊ns.html
+ →T.PassesIf 2=+/'<li>'⍷∊ns.html
+
+ R←0                                                  ⍝ OK

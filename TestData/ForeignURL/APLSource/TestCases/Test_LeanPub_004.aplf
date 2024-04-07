@@ -1,0 +1,17 @@
+ R←Test_LeanPub_004(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Test whether the leanpub extension are processed in case the `leanpubExtensions` are embedded into the document
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:leanpubExtensions=1'
+ md,←⊂''
+ md,←⊂'A> # An aside'
+
+ ns←MarkAPL.Init ⍬ md
+ ns←MarkAPL.Process ns
+
+ expected←'<div class="leanpub_A">' '<h3>An aside</h3>' '</div>'
+ →T.PassesIf≡/∊¨expected(ns.html~⊂'')
+
+ R←T._OK

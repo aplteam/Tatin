@@ -1,0 +1,21 @@
+ R←Test_SmartTypo_020(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff;expected
+⍝ Test smart typography: <==> becomes a left-and-right arrow
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md←⊂'First para<==>really! (as in `<==>`) <==>, really (`<==>`)'
+ md,←⊂''
+ md,←⊂'~~~'
+ md,←⊂' `<==>` are converted automatically into <==>'
+ md,←⊂'~~~'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>First para&lt;==&gt;really! (as in <code>&lt;==&gt;</code>) ↔, really (<code>&lt;==&gt;</code>)</p>'
+ →T.PassesIf expected≡1⊃ns.html
+ expected←'<pre tabindex="0"><code> `&lt;==&gt;` are converted automatically into &lt;==&gt;</code></pre>'
+ →T.PassesIf expected≡2⊃ns.html
+
+ R←T._OK

@@ -1,0 +1,18 @@
+ R←Test_SpecAttrs_List_004(stopFlag batchFlag);⎕TRAP;ns;md;fn
+⍝ List item spread over several lines with the special attributes defined on the first line
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* list item{#myid style="color:red; background-color:silver; font-family:''APL385 Unicode''" .class1 .class2}'
+ md,←⊂''
+ md,←⊂'  More'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'class="class1 class2"'⍷∊ns.html
+ →T.PassesIf∨/'id="myid"'⍷∊ns.html
+ →T.PassesIf∨/'style="color:red; background-color:silver; font-family:''APL385 Unicode''"'⍷∊ns.html
+
+ R←T._OK

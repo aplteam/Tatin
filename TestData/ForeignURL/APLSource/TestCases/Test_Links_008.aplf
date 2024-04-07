@@ -1,0 +1,17 @@
+ R←Test_Links_008(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Test auto-linking with the link text marked with ` (code, verbatim).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Link to function: [`FunctionName`](#)'
+ md,←⊂''
+ md,←⊂'# Link to a header `em`'
+ md,←⊂'# FunctionName'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(⊂'<p>Link to function: <a href="#functionname" class="bookmark_link"><code>FunctionName</code></a></p>')∊ns.html
+
+ R←T._OK

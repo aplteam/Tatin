@@ -1,0 +1,25 @@
+ R←Test_Para_020(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Check boxes, ticked and unticked.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Some programming languages (functional  ones are ticked):'
+ md,←⊂''
+ md,←⊂'[x] APL'
+ md,←⊂'[ ] Cobol'
+ md,←⊂'[ ] Fortran'
+ md,←⊂'[X] F#'
+ md,←⊂'[ ] Go'
+ md,←⊂'[X] Smalltalk'
+ md,←⊂''
+ md,←⊂'A paragraph.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>Some programming languages (functional ones are ticked):</p>' '<ul class="checkboxes">' '<li class="checked">APL</li>'
+ expected,←'<li>Cobol</li>' '<li>Fortran</li>' '<li class="checked">F#</li>' '<li>Go</li>' '<li class="checked">Smalltalk</li>' '</ul>' '<p>A paragraph.</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

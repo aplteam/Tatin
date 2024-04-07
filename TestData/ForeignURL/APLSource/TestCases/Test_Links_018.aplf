@@ -1,0 +1,22 @@
+ R←Test_Links_018(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Test  a reference link with code that carries "[]".
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Link to [aplwiki](# "Link to the `[aplwiki]`").'
+ md,←⊂''
+ md,←⊂'# aplwiki'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←⊂'<p>Link to <a href="#aplwiki" class="bookmark_link">Link to the <code>[aplwiki]</code></a>.</p>'
+ expected,←⊂'<div class="h_tag">'
+ expected,←⊂'<a href="#aplwiki" id="aplwiki" class="autoheader_anchor">'
+ expected,←⊂'<h1 data-id="aplwiki">aplwiki</h1>'
+ expected,←⊂'</a>'
+ expected,←⊂'</div>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

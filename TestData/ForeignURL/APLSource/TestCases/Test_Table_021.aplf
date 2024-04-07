@@ -1,0 +1,20 @@
+ R←Test_Table_021(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Test table with footer
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|Product name|Price| Units|  Total|'
+ mat,←⊂'|------------|-----|------|-------|'
+ mat,←⊂'|Speaker     |   2 | 56.00| 112.00|'
+ mat,←⊂'|Card reader |   1 | 62.00|  62.00|'
+ mat,←⊂'|Mouse       |   5 |  9.50|  47.50|'
+ mat,←⊂'|============|=====|======|=======|'
+ mat,←⊂'|Grand total |     |      | 221.50|'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.FailsIf 0=+/'<tfoot>'⍷html
+
+ R←T._OK

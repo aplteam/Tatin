@@ -1,0 +1,13 @@
+ LookForEmbeddedParm←{
+     markdown←⍵
+     valueName←⍺
+     searchFor←'[parm]:'
+     0=+/bool←searchFor∘≡¨(≢searchFor)↑¨markdown:''
+     buff←(≢searchFor)↓¨bool/markdown
+     0=+/bool←valueName∘≡¨(≢valueName)↑¨buff:''
+     buff←(≢searchFor)↓(bool⍳1)⊃markdown
+     valueName≢(≢valueName)↑buff:''
+     value←(1+≢valueName)↓buff
+     ''''=1⍴value:1↓¯1↓value
+     ⊃(//)⎕VFI value
+ }

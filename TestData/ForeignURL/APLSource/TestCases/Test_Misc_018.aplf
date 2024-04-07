@@ -1,0 +1,21 @@
+ R←Test_Misc_018(stopFlag batchFlag);⎕TRAP;path;filename;md;report
+⍝ Exercise `ConvertMarkdownFile` with just a filename.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ path←FilesAndDirs.GetTempPath,'\MarkAPL_Tests\',⊃⎕SI
+ :If FilesAndDirs.IsDir path
+     FilesAndDirs.RmDir path
+ :EndIf
+ FilesAndDirs.MkDir path
+ filename←path,'\Test_Misc_018.md'
+ md←'# Test' '' '* This' '* That' '* More'
+ (⊂md)⎕NPUT filename 1
+
+ report←MarkAPL.ConvertMarkdownFile filename
+ →T.GoToTidyUp~0∊⍴report
+
+ R←T._OK
+
+∆TidyUp:
+ FilesAndDirs.RmDir path

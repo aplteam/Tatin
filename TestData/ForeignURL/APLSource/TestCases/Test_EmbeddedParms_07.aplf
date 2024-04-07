@@ -1,0 +1,17 @@
+ R←Test_EmbeddedParms_07(stopFlag batchFlag);⎕TRAP;md;b;ns;html;hits;filenames;path;parms
+⍝ Check invalid embedded parms: no "="
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:cssURL      = '''''
+ md,←⊂'[parm]:linkToCSS    1'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf 2≠'^Data definition on line ' 'is invalid.*$'∘∆GetLineNumber¨ns.report
+
+ R←T._OK

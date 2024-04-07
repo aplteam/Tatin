@@ -1,0 +1,46 @@
+ R←Test_FnsCall_009(stopFlag batchFlag);⎕TRAP;md;ns;html;expected
+⍝ Test function call that returns an HTML block (Markdown should NOT be processed).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{'' '<p>**bold** --- </p>' ''}
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf 2=+/'**'⍷html
+ →T.PassesIf 1=+/'---'⍷html
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{'' '<pre><code>1' '20' '300' '4000' '</code><pre>' ''}
+ md←''
+ md,←⊂''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+ md,←⊂''
+ md,←⊂'** Bold **'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'' '<pre><code>1' '20' '300' '4000' '</code><pre>' '' '<p>** Bold **</p>'
+ →T.FailsIf expected≢ns.html
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{'' '<p>**bold** --- </p>' ''}
+ md←''
+ md,←⊂'This is the result: ⍎⍎#.TEMP.MyFns⍎⍎'
+ ns←MarkAPL.Init''md
+ :Trap 0
+     ns←MarkAPL.Process ns
+     →T.FailsIf 1
+ :Else
+     →T.FailsIf'Called function returned an HTML block but does not stand on its own'≢1⊃⎕DM
+ :EndTrap
+
+ R←T._OK

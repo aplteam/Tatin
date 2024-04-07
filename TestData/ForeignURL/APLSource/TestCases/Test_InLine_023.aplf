@@ -1,0 +1,17 @@
+ R←Test_InLine_023(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Paragraphs with single * whould not have any effect.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'*A Paragraph.'
+ md,←⊂''
+ md,←⊂'Another Paragraph.*'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>*A Paragraph.</p>' '<p>Another Paragraph.*</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

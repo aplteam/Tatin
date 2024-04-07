@@ -1,0 +1,19 @@
+ R←Test_Misc_029(stopFlag batchFlag);⎕TRAP;md;parms;ns;html;b
+⍝ Set `reportLinks` to 1 but we don't have any external links
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.toc←1+⍳6
+ parms.numberHeaders←1
+ parms.createFullHtmlPage←1
+ parms.reportLinks←1
+
+ md←'# External links' '' 'We don''t have external links in this one!'
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+ html←parms MarkAPL.MakeHTML_Doc ns.html  ⍝ Should not crash
+
+ R←T._OK
+⍝Done

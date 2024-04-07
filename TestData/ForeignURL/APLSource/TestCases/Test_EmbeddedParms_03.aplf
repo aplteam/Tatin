@@ -1,0 +1,14 @@
+ R←Test_EmbeddedParms_03(stopFlag batchFlag);⎕TRAP;md;parms;b;ns;html
+⍝ Check embedded parms: unknown parameters should be reported.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+
+ md←'[parm]:titel=''Foo''' '[parm]:subTocs=0'      ⍝ Deliberate typo: titel
+ md,←'# External links' '' '<http://aplwiki.com>'
+
+ ns←MarkAPL.Init parms md
+ →T.PassesIf'Invalid embbed parameter: "titel"'≡1⊃ns.report
+
+ R←T._OK

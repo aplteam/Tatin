@@ -1,0 +1,16 @@
+ R←Test_Para_008(stopFlag batchFlag);⎕TRAP;md;ns;parms;expect
+⍝ Test whether a line comprising just a <TAB> is considered "empty" (was a bug once).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Para 1'
+ md,←⊂⎕UCS 9
+ md,←⊂'Para2'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<p>Para 1</p>' '<p>Para2</p>'≡ns.html
+
+ R←T._OK

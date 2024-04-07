@@ -1,0 +1,40 @@
+ r←ns CheckOddNumberOfDoubleQuotes(txt type);mask;ind;escape;openFlag;i;msg
+⍝ Check "txt". That can be anything: paragraph, cell, list item, header, blockquote ...
+⍝ * If it contains no " or an even number nothing changes.
+⍝ * A single one is escaped.
+⍝ * When an odd number is found the last one is escaped and a warning is issued, because
+⍝   that might well not be what the user intended to do.
+ r←' ',txt
+ msg←''
+ mask←~GetMaskForCode r
+ :If 0=≢ind←⍸mask\'"'=mask/r                      ⍝ No double quotes at all? Done!
+     r←txt
+ :ElseIf 1=≢ind                                        ⍝ Just one double quote? Done!
+     r←'`(.*?)`' '"'⎕R'&' '\\"'⊣txt                    ⍝ Escapes the " but ignores `code`
+     msg←'Warning: single double quote found in ',type
+     ns.report,←⊂msg,' (line ',(⍕ns.parms.lineNumberOffset+⊃ns.lineNumbers),')'
+ :Else
+     :If '\'∧.≠r[ind-1]                                ⍝ Nothing escaped?
+         :If 0=2|≢ind                                  ⍝ Even number of "?
+             r←txt
+         :Else                                         ⍝ No, number is odd
+             (txt[¯1+¯1↑ind])←⊂'\"'                    ⍝ Escape the last one.
+             r←⊃,/txt
+             msg←'Warning: odd number of double quotes found in ',type
+             ns.report,←⊂msg,' (line ',(⍕¯1+ns.parms.lineNumberOffset+⊃ns.lineNumbers),')'
+         :EndIf
+     :Else                                             ⍝ We have some `\"` so we need a loop
+         openFlag←1
+         txt←' ',txt
+         :For i :In ind
+             :If '\"'≢txt[i-1 0]
+                 :If openFlag
+                     openFlag←0
+                 :Else
+                     openFlag←1
+                 :EndIf
+             :EndIf
+         :EndFor
+         r←1↓⊃,/txt
+     :EndIf
+ :EndIf

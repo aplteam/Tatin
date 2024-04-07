@@ -1,0 +1,26 @@
+ R←Test_SpecAttrs_Header_002(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Headers: several assignments with `bookmarkLink` switched off.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Title {#foo1}'
+ md,←⊂'======'
+ md,←⊂''
+ md,←⊂'Sub-Title {.foo2}'
+ md,←⊂'--------'
+ md,←⊂'### Chapter 1 {attr=123 #goo}'
+
+ parms←MarkAPL.CreateParms
+ parms.bookmarkLink←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf(⊂'<a id="foo1" class="autoheaderlink">')∊ns.html
+ →T.PassesIf(⊂'<h1 id="foo1">Title</h1>')∊ns.html
+ →T.FailsIf(⊂'<a id="sub-title" class="autoheaderlink">')∊ns.html
+ →T.PassesIf(⊂'<h2 class="foo2">Sub-Title</h2>')∊ns.html
+ →T.FailsIf(⊂'<a id="chapter-1" class="autoheaderlink">')∊ns.html
+ →T.PassesIf(⊂'<h3 id="goo" attr="123">Chapter 1</h3>')∊ns.html
+
+ R←T._OK

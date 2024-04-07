@@ -1,0 +1,28 @@
+ R←Test_Misc_050(stopFlag batchFlag);⎕TRAP;parms;tempFilename;tempFolder
+⍝ Exercise the `Reference` method. Uses the project, not the package!
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     →0,R←T._NoBatchTest
+ :ElseIf ~1 CommTools.YesOrNo'   This test will open an HTML document in your default browser; continue?'
+     →0,R←T._Inactive
+ :EndIf
+
+ parms←##.MarkAPL.CreateHelpParms
+ parms.verbose←0
+ tempFolder←FilesAndDirs.GetTempPath,'\MarkAPL_Tests\',(⊃⎕SI)
+ tempFilename←tempFolder,'/MarkAPL.html'
+ parms.outputFilename←tempFilename
+ 'Create!'FilesAndDirs.CheckPath⊃⎕NPARTS parms.outputFilename
+ tempFilename ⎕NCOPY'./Files/MarkAPL.html'
+ parms.inputFilename←tempFilename,'/MarkAPL.html'
+ parms ##.MarkAPL.Reference 1
+
+ →T.GoToTidyUp 0=1 CommTools.YesOrNo'   Did "MarkAPL Reference" appear in your default browser?'
+
+ R←T._OK
+
+∆TidyUp:
+ FilesAndDirs.RmDir⊃⎕NPARTS tempFilename
+⍝Done

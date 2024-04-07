@@ -1,0 +1,51 @@
+ R←Test_BR_017(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Test replacing a "\" character at the end of list items or paras by a <br/> tag.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'+ First\'
+ md,←⊂'ordered list item'
+ md,←⊂''
+ md,←⊂'  Second para'
+ md,←⊂'of first item\'
+ md,←⊂'with a `<br/>`'
+ md,←⊂'+ Second list item'
+ md,←⊂''
+ md,←⊂'+ Third one'
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'+ Forth one but new list'
+ md,←⊂''
+ md,←⊂'  First para in second list\'
+ md,←⊂'with a line break in between'
+ md,←⊂''
+ md,←⊂'* Any list item\'
+ md,←⊂'with a `<br/>` tag in it'
+ md,←⊂'* Another one'
+ md,←⊂''
+ md,←⊂'1. First\'
+ md,←⊂'ordered list item'
+ md,←⊂''
+ md,←⊂'   Second para'
+ md,←⊂'of first item\'
+ md,←⊂'with a `<br/>`'
+ md,←⊂'1. Second list item'
+ md,←⊂''
+ md,←⊂'+ This'
+ md,←⊂'+ That'
+ md,←⊂'+ More'
+ md,←⊂''
+ md,←⊂'Col 1 | Col 2'
+ md,←⊂'-|-'
+ md,←⊂'First Cell | Second cell'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 4=+/'<ul>'⍷∊ns.html
+ →T.PassesIf 1=+/'<ol'⍷∊ns.html
+ →T.PassesIf 6=+/'<br>'⍷∊ns.html
+ →T.PassesIf 11=+/'<li>'⍷∊ns.html
+
+ R←T._OK

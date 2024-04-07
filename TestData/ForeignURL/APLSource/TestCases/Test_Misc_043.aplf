@@ -1,0 +1,56 @@
+ R←Test_Misc_043(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Test `markdownStrict` (lists, ...).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This is a paragraphs.'
+ md,←⊂'* Starts a list'
+ md,←⊂'* One more list item'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a paragraphs.</p>' '<ul>' '<li>Starts a list</li>' '<li>One more list item</li>' '</ul>'
+
+ →T.PassesIf expected≡ns.html
+
+ parms←MarkAPL.CreateParms
+ parms.markdownStrict←1
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a paragraphs.</p>' '<p>* Starts a list</p>' '<p>* One more list item</p>'
+ →T.PassesIf expected≡ns.html
+
+ md←''
+ md,←⊂'|Col 1|Col 2|'
+ md,←⊂'|-----|-----|'
+ md,←⊂'| ABC |   10|'
+ md,←⊂'|=====|=====|'
+ md,←⊂'|Total|   10|'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←⊂'<table>'
+ expected,←'<thead>' '<tr>' '<th style="text-align: left;">Col 1</th>' '<th style="text-align: right;">Col 2</th>' '</tr>' '</thead>'
+ expected,←'<tbody>' '<tr>' '<td>ABC</td>' '<td style="text-align: right;">10</td>' '</tr>' '</tbody>'
+ expected,←'<tfoot>' '<tr>' '<td>Total</td>' '<td style="text-align: right;">10</td>' '</tr>' '</tfoot>'
+ expected,←⊂'</table>'
+
+ →T.PassesIf expected≡ns.html
+
+ parms←MarkAPL.CreateParms
+ parms.markdownStrict←1
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←⊂'<table>'
+ expected,←'<thead>' '<tr>' '<th style="text-align: left;">Col 1</th>' '<th style="text-align: right;">Col 2</th>' '</tr>' '</thead>'
+ expected,←'<tbody>' '<tr>' '<td>ABC</td>' '<td style="text-align: right;">10</td>' '</tr>' '<tr>' '<td>=====</td>' '<td style="text-align: right;">=====</td>' '</tr>' '<tr>' '<td>Total</td>' '<td style="text-align: right;">10</td>' '</tr>' '</tbody>'
+ expected,←⊂'</table>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

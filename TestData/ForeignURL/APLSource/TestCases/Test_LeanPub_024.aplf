@@ -1,0 +1,22 @@
+ R←Test_LeanPub_024(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test whether the leanpub extension "Exercise" (`X> `) works fine. It shouldn't: empty lines are missing!
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂'X> # An Exercise!'
+ md,←⊂'X>'
+ md,←⊂'X> This is an exercise.'
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A para X&gt; # An Exercise! X&gt; X&gt; This is an exercise. Another para</p>'
+ →T.PassesIf≡/∊¨expected ns.html
+
+ R←T._OK

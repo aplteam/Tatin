@@ -1,0 +1,26 @@
+ ProcessImages←{
+     txt←⍵
+     mask←~GetMaskForCode txt
+     0=≢i1←¯1+⍸mask∧'!['⍷txt:txt
+     i1←⊃i1
+     '![CDATA['{⍺≡(≢⍺)↑⍵}i1↓txt:txt        ⍝ Invalid <![CDATA[ section (probably missing empty lines)
+     txt←i1⌽txt
+     alt←2↓¯1↓{⍵↑⍨⍵⍳']'}txt
+     txt←{⍵↓⍨⍵⍳']'}txt
+     buff←1↓¯1↓txt↑⍨0⍳⍨(+\'('=txt)>+\')'=txt
+     specialAttributes←GetSpecialAttributes'.*\(' '\).*'⎕R'' ''⍠('Greedy' 0)⊣buff
+     buff2←specialAttributes DropSpecialImageAttributes buff
+     title←{A.DLB ¯1↓A.DTB{⍵↑⍨⍵⍳'"'}⍵↓⍨⍵⍳'"'}buff2
+     url←{A.DLB A.DTB ⍵↑⍨¯1+⌊/⍵⍳'"{'}buff2
+     ((url='\')/url)←'/'
+     url←url ProcessImageUrl ns.parms.imageURL
+     insert←'<img src="',url,'"'
+     insert,←specialAttributes
+     (('"'=alt)/alt)←''''
+     (title alt)←title{0=≢⍺:⊂⍵ ⋄ 0=≢⍵:⊂⍺ ⋄ ⍺ ⍵}alt
+     insert,←' alt="',alt,'"'
+     insert,←(0≠≢title)/' title="',title,'"'
+     insert,←'>'
+     txt←(-i1)⌽insert,(2+≢buff)↓txt
+     ∇ txt
+ }

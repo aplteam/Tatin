@@ -1,0 +1,20 @@
+ R←Test_LeanPub_011(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test whether the leanpub extension "Warning" (`W> `) works with a single line. It shouldn't: empty lines are missing.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂'<span>This W> # A warning!</span> `<>&` < <'
+ md,←⊂'More text'
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A para <span>This W&gt; # A warning!</span> <code>&lt;&gt;&amp;</code> &lt; &lt; More text</p>'
+ →T.PassesIf≡/∊¨expected ns.html
+
+ R←T._OK

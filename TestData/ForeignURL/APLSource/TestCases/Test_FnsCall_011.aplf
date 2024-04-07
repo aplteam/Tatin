@@ -1,0 +1,20 @@
+ R←Test_FnsCall_011(stopFlag batchFlag);⎕TRAP;md;ns;html
+⍝ Test function call that returns several lines of Markdown (should be processed).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{'This is a Markdown **paragraph**.' 'And so is this --- really!'}
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf 1=+/'—'⍷html
+ →T.PassesIf 1=+/'<strong>'⍷html
+
+ R←T._OK

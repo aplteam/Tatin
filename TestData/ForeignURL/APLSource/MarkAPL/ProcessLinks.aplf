@@ -1,0 +1,35 @@
+ ProcessLinks←{
+     ⍺←1
+     bookmarkMayStartWithDigit←⍺
+     txt←⍵
+     mask←~GetMaskForCode txt
+     ⍬≡on←mask IsolateLink txt:txt
+     txt←on⌽txt
+     mask←on⌽mask
+     closeBracket←(']('⍷(mask\mask/txt))⍳1
+     mask←(closeBracket⍴1),{(+\⍵='(')-+\⍵=')'}closeBracket↓txt  ⍝ Careful: a caption might contain ")" when just ⍳')' would not suffice
+     off←1++/∧\1=(∧\0=mask)∨mask>0
+     linkDef←off↑txt
+     linkDef←A.DMB ReplaceQTC_byBlank linkDef
+     mask←~GetMaskForCode linkDef
+     linkDef←ReplaceDoubleSmartQuotes linkDef mask
+     sa←GetSpecialAttributes⌽{'{'∊⍵:{⍵↑⍨⍵⍳'{'}{⍵↓⍨¯1+⍵⍳'}'}⍵ ⋄ ''}⌽mask/linkDef   ⍝ Because special attributes for a link follow straight after the link
+     txt←off↓txt
+     mask←⌽~GetMaskForCode linkDef
+     linkDef←⌽mask{'{'∊⍺/⍵:')',(⍵↓⍨(⍺\⍺/⍵)⍳'{') ⋄ ⍵}⌽linkDef                ⍝ Drop the special attribute but leave any code alone
+     (url title)←GetUrlAndTitleFromLink linkDef
+     poundFlag←⊃'#'=1⍴url
+     mask←~GetMaskForCode linkDef
+     linkText←1↓A.DTB mask{⍵↑⍨¯1+1⍳⍨⍺\']('⍷⍺/⍵}linkDef
+     url←linkText(bookmarkMayStartWithDigit∘CompileBookMarkName{(1<≢⍵)∧'#'=1↑⍵:'#',⍺⍺ ⍵'' ⋄ (,'#')≡,⍵:'#',⍺⍺ ⍺'' ⋄ ⍵})url
+     linkText{0=≢⍵:⍺ ⋄ ⍵}←(1+poundFlag)⊃linkText title
+     linkText←ProcessInlineMarkupInLinkText linkText
+     linkText{0=≢⍺~' ':⍵ ⋄ ⍺}←poundFlag↓url
+     tag←'a href="',({'#'=1⍴⍵:LowercaseID ⍵ ⋄ ⍵}url),'"'  ⍝ Make internal (bookmark) links lowercase unless supressed
+     tag,←(~poundFlag)/' class="',((1+'mailto'{⍺≡(≢⍺)↑⍵}url)⊃'external_link' 'mailto_link'),'"'
+     tag,←AddBookmarkClassName⍣poundFlag⊣sa
+     tag,←((~poundFlag)∧0≠≢title)/' title="',title,'"'
+     insert←tag Tag linkText
+     txt←(-on)⌽insert,txt
+     ∇ txt
+ }

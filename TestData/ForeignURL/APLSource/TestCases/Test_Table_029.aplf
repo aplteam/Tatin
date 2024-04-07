@@ -1,0 +1,47 @@
+ R←Test_Table_029(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test table: column alignment with and without assigning the class `.center` to the table.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'|Language|Comment|Misc|'
+ md,←⊂'|:-|-:|:-:|'
+ md,←⊂'|APL|`Powerful|Foo|'
+ md,←⊂'|COBOL|Outdated|Goo|'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=+/'<table class="center">'⍷∊ns.html
+ →T.PassesIf 1=+/'<th style="text-align: left;"'⍷∊ns.html
+ →T.PassesIf 3=+/'text-align: right;"'⍷∊ns.html
+ →T.PassesIf 2=+/'text-align: center;"'⍷∊ns.html
+
+ md←''
+ md,←⊂'|Language|Comment|Misc|{.center}'
+ md,←⊂'|:-|-:|:-:|'
+ md,←⊂'|APL|`Powerful|Foo|'
+ md,←⊂'|COBOL|Outdated|Goo|'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<table class="center">'⍷∊ns.html
+ →T.PassesIf 1=+/'text-align: left;"'⍷∊ns.html
+ →T.PassesIf 3=+/'text-align: right;"'⍷∊ns.html
+ →T.PassesIf 2=+/'text-align: center;"'⍷∊ns.html
+
+
+ md←''
+ md,←⊂'|APL|`Powerful|Foo|'
+ md,←⊂'|COBOL|Outdated|Goo|'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=+/'<table class="center">'⍷∊ns.html
+ →T.PassesIf 0=+/'text-align: left;"'⍷∊ns.html
+ →T.PassesIf 0=+/'text-align: right;"'⍷∊ns.html
+ →T.PassesIf 0=+/'text-align: center;"'⍷∊ns.html
+
+ R←T._OK

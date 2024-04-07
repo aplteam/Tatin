@@ -1,0 +1,13 @@
+ R←Test_HTML_030(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test <style>  tags.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'This is a para.' '' '<style>' 'p {font-size: xx-large; color:red;}' '</style>' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<style>' 'p {font-size: xx-large; color:red;}' '</style>'
+ →T.PassesIf∧/expected∊ns.html
+
+ R←T._OK

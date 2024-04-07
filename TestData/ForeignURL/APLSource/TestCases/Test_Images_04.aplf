@@ -1,0 +1,17 @@
+ R←Test_Images_04(stopFlag batchFlag);⎕TRAP;ns;md;fn;expected
+⍝ Test image with Title and Alt text
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ fn←FilesAndDirs.EnforceSlash'file://',FilesAndDirs.PWD,'\images\KaiJaegerHeadVerySmall.png'
+
+ md←''
+ md,←⊂'This is a para with an embedded ![Alt Text](',fn,'"This is a Title") in it.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a para with an embedded <img src="',fn,'" alt="Alt Text" title="This is a Title"> in it.</p>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

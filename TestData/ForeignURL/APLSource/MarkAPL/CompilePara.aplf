@@ -1,0 +1,8 @@
+ CompilePara←{
+     para←⍵
+     para←('⍝'≠⊃¨para)/para  ⍝ Get rid of lines that start with a lamp symbol.
+     para←{'\'≠¯1↑⍵:⍵ ⋄ (¯1↓⍵),⎕UCS 13}¨para
+     para←(1↓⊃,/' ',¨para)
+     mask←GetMaskForCode para
+     {⍵/⍨(GetMaskForCode ⍵)∨~(∧\' '=⍵)∨('  '⍷⍵)∨⌽∧\' '=⌽⍵}para
+ }

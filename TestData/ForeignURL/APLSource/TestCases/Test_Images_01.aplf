@@ -1,0 +1,17 @@
+ R←Test_Images_01(stopFlag batchFlag);⎕TRAP;ns;md;fn;expected
+⍝ Test simplest possible image
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ fn←FilesAndDirs.EnforceSlash'file://',FilesAndDirs.PWD,'\images\KaiJaegerHeadVerySmall.png'
+
+ md←''
+ md,←⊂'This is a para with an embedded ![](',fn,') in it.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a para with an embedded <img src="',fn,'" alt=""> in it.</p>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

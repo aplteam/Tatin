@@ -1,0 +1,25 @@
+ R←Test_List2Markdown_002(stopFlag batchFlag);⎕TRAP;ns;md;m;expected
+⍝ Test the conversion of an APL list to markdown. Numeric list should have non-1 start.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ m←''
+ m,←⊂0 1 'Level 1 a bull'
+ m,←⊂3 2 'Level 2 a num'
+ m,←⊂3 2 'Level 2 a num'
+ m,←⊂3 2 'Level 2 a num'
+ m,←⊂3 2 'Level 2 a num'
+ m,←⊂0 1 'Level 1 b bull'
+ m,←⊂0 1 'Level 1 c bull'
+
+
+ md←MarkAPL.Matrix2MarkdownList↑m
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>Level 1 a bull' '<ol start="3">' '<li>Level 2 a num</li>'
+ expected,←'<li>Level 2 a num</li>' '<li>Level 2 a num</li>' '<li>Level 2 a num</li>'
+ expected,←'</ol></li>' '<li>Level 1 b bull</li>' '<li>Level 1 c bull</li>' '</ul>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

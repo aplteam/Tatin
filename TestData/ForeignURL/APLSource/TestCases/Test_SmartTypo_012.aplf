@@ -1,0 +1,12 @@
+ R←Test_SmartTypo_012(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test typographical double quotes with another (single) double quote that is escaped.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'Pairs of double-quotes (\") are exchanged against their typographically correct aquivalents "like here".'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(,⊂'<p>Pairs of double-quotes (") are exchanged against their typographically correct aquivalents “like here”.</p>')≡ns.html
+
+ R←T._OK

@@ -1,0 +1,22 @@
+ R←Test_CodeBlock_012(stopFlag batchFlag);⎕TRAP;ns;parms;md;expected
+⍝ Test code block with more than 3 leading spaces but because the code block belongs to a (nested) list item.
+⍝ That is okay as long as the number of spaces is in line with the nesting, plus possibly up to three more spaces.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* Level 1'
+ md,←⊂'  * Level 2'
+ md,←⊂'    * Level 3'
+ md,←⊂'      * Level 4'
+ md,←⊂''
+ md,←⊂'        ~~~'
+ md,←⊂'          {+/⍵}'
+ md,←⊂'        ~~~'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<pre tabindex="0"><code>  {+/⍵}</code></pre></li>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

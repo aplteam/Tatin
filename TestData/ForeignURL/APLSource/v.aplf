@@ -1,0 +1,13 @@
+ {parms}v html;html2;filename;parms
+ :If ∨/'<html'⍷∊html
+     html2←html
+ :Else
+     :If 0=⎕NC'parms'
+         parms←MarkAPL.CreateParms
+     :EndIf
+     html2←parms MarkAPL.MakeHTML_Doc html
+ :EndIf
+ filename←(¯4↓MarkAPL.FilesAndDirs.GetTempFilename''),'.html'
+ (⊂html2)⎕NPUT filename 1
+ MarkAPL.APLTreeUtils2.GoToWebPage filename
+⍝Done

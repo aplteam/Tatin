@@ -1,0 +1,18 @@
+ R←Test_Title_008(stopFlag batchFlag);⎕TRAP;md;ns;html;title;parms
+⍝ Check whether `title` is taken from `parms` with method `MakeHTML_Doc` when just standard parms are provided.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A paragraph'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ parms←MarkAPL.CreateParms
+ parms.title←'Foo goo'
+ html←parms MarkAPL.MakeHTML_Doc ns.html
+
+ title←{⍵↑⍨¯1+⍵⍳'<'}(≢'<title>')↓{⍵{⍵[2]↑⍵[1]↓⍺}⊃'<title>.*</title>'⎕S 0 1⍠('Mode' 'D')⊣⍵}⊃,/(⎕UCS 10),¨html
+ →T.PassesIf title≡'Foo goo'
+
+ R←T._OK

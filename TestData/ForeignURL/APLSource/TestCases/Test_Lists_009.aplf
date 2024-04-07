@@ -1,0 +1,26 @@
+ R←Test_Lists_009(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;expected;html
+⍝ Test deeply nested lists that ends early.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First level'
+ md,←⊂' * Second level'
+ md,←⊂'  * Third level'
+ md,←⊂'      * Fourth level'
+ md,←⊂'        * Fifth level'
+ md,←⊂'           * Sixth level'
+ md,←⊂'        * Fifth level -2-'
+ md,←⊂'        * Sixth level -2-'
+ md,←⊂'           2) Seventh level a'
+ md,←⊂'           6) Seventh level b'
+ md,←⊂'      * Fourth level -2-'
+ md,←⊂'        * Fith level -3-'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '</ul>' '<li>' '<li>' '<ol start="2">' '<li>' '<li>' '</ol>' '</ul>' '<li>' '<ul>' '<li>' '</ul>' '</ul>' '</ul>' '</ul>' '</ul>'
+ →T.FailsIf expected≢{⍵↑⍨⍵⍳'>'}¨ns.html
+
+ R←T._OK

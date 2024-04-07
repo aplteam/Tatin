@@ -1,0 +1,16 @@
+ R←Test_InLine_017(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Escaping with \ should be smart: when to the right there is just an ANSI character then the `\` should survive.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'\_ \* \| \< \~ \{ \} \( \\ \'
+ md,←⊂'\T\h\i\s \i\s a path: C:\Temp\MyFoo.txt C:\\Temp\\My.txt'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>_ * | &lt; ~ { } ( \ <br/>\T\h\i\s \i\s a path: C:\Temp\MyFoo.txt. _  C:\Temp\My.txt</p>'
+ →T.PassesIf≡expected∊ns.html
+
+ R←T._OK

@@ -1,0 +1,26 @@
+ R←Test_HTML_015(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test a <div> HTML block that has itself <div>s.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂''
+ md,←⊂'<div>'
+ md,←⊂'<p>HTML block</p>'
+ md,←⊂'<div>'
+ md,←⊂'<div>'
+ md,←⊂'<p>A **paragraph**</p>'
+ md,←⊂'</div>'
+ md,←⊂'</div>'
+ md,←⊂'</div>'
+ md,←⊂''
+ md,←⊂'This is **another** para.'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<div>' '<p>HTML block</p>' '<div>' '<div>' '<p>A **paragraph**</p>' '</div>' '</div>' '</div>' '<p>This is <strong>another</strong> para.</p>'
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

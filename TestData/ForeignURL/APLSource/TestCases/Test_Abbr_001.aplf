@@ -1,0 +1,19 @@
+ R←Test_Abbr_001(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Test two simple abbreviations mentioned three times.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'We keep talking about HTML and CSS and HTML and ...'
+ md,←⊂''
+ md,←⊂'*[HTML]:Hyper Text Markup Language'
+ md,←⊂'*[CSS]: Cascading style sheets'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+ →T.FailsIf 3≠+/'<abbr'⍷html
+ →T.FailsIf 3≠+/'<abbr title="'⍷html
+
+ R←T._OK

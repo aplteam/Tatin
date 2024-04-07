@@ -1,0 +1,10 @@
+ GetLinkRef←{
+     html←⍺
+     (start length row)←⍵
+     row+←⎕IO
+     buff←row⊃html
+     match←(⊂start+⍳length)⌷buff
+     '[]['≡3↑match:''(¯1↓3↓match)match
+     (linkText id)←{⎕ML←3 ⋄ 0 2↓¨(1++\']['⍷⍵)⊂⍵}¯1↓1↓match
+     linkText id match
+ }

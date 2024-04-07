@@ -1,0 +1,14 @@
+ R←Test_Mat2Markdown_007(stopFlag batchFlag);⎕TRAP;m;md;b
+⍝ Test with a matrix with 10,000 rows and 10 columns. Performance should be acceptable.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ m←?10000 10⍴10000
+ b←1 0⍴⍨2⊃⍴m
+ (b/m)←⍕¨b/m            ⍝ Make half of it char
+
+ md←MarkAPL.Matrix2MarkdownTable m
+
+ →T.PassesIf 10001=⍴md
+
+ R←T._OK

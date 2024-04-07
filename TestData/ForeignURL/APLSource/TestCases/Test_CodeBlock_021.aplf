@@ -1,0 +1,43 @@
+ R←Test_CodeBlock_021(stopFlag batchFlag);⎕TRAP;ns;parms;md;expected
+⍝ Test that `|||` is not treated as fencing; this was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'~~~'
+ md,←⊂'a←1'
+ md,←⊂'~~~'
+ md,←⊂''
+ md,←⊂'```'
+ md,←⊂'b←1'
+ md,←⊂''
+ md,←⊂'```'
+ md,←⊂'|||'
+ md,←⊂'|a|bc|def|'
+ md,←⊂'|||'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<pre tabindex="0"><code>a←1</code></pre>'
+ expected,←⊂'<pre tabindex="0"><code>b←1'
+ expected,←⊂'</code></pre>'
+ expected,←⊂'<table>'
+ expected,←⊂'<tbody>'
+ expected,←⊂'<tr>'
+ expected,←⊂'<td>a</td>'
+ expected,←⊂'<td>bc</td>'
+ expected,←⊂'<td>def</td>'
+ expected,←⊂'</tr>'
+ expected,←⊂'<tr>'
+ expected,←⊂'<td></td>'
+ expected,←⊂'<td></td>'
+ expected,←⊂'<td> </td>'
+ expected,←⊂'</tr>'
+ expected,←⊂'</tbody>'
+ expected,←⊂'</table>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

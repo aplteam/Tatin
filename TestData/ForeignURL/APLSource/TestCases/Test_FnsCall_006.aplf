@@ -1,0 +1,19 @@
+ R←Test_FnsCall_006(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test function call with an invalid function name; should be reported.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Col 1 |⍎⍎UnknownFns⍎⍎'
+ md,←⊂'-|-'
+ md,←⊂' 1/a|1/B'
+ md,←⊂' 2/a|2/B'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+
+ ns←MarkAPL.Process ns
+ →T.PassesIf'Unknown external function: <UnknownFns>'≡1⊃ns.report
+
+ R←T._OK

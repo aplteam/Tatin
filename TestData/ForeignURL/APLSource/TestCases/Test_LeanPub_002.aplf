@@ -1,0 +1,23 @@
+ R←Test_LeanPub_002(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test whether the leanpub extension "Aside" (`A> `) works with a single line that is a header
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂''
+ md,←⊂'A> # An aside'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+ parms.div_h_tag←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A para</p>' '<div class="leanpub_A">' '<h3>An aside</h3>' '</div>' '<p>Another para</p>'
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

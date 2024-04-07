@@ -1,0 +1,21 @@
+ R←Test_Lists_011(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;html;expected
+⍝ Test two lists separated by two blank lines.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First'
+ md,←⊂'* Second'
+ md,←⊂'* Third'
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'* Alpha'
+ md,←⊂'* Beta'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>First</li>' '<li>Second</li>' '<li>Third</li>' '</ul>' '<ul>' '<li>Alpha</li>' '<li>Beta</li>' '</ul>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

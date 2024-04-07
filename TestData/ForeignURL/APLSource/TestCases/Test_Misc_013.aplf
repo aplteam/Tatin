@@ -1,0 +1,49 @@
+ R←Test_Misc_013(stopFlag batchFlag);⎕TRAP;md;ns;html;parms
+⍝ Test `syntaxSugar` (syntactical sugar).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This --- really! --- is a change'
+ md,←⊂''
+ md,←⊂'The game ended 2--0 for Leicester.'
+ md,←⊂''
+ md,←⊂'We leave that to you...'
+ md,←⊂''
+ md,←⊂'(c) APL Team Ltd'
+ md,←⊂''
+ md,←⊂'Microsoft Word is a (tm) of Microsoft.'
+ md,←⊂''
+ md,←⊂'He said: "rubbish!".'
+ md,←⊂''
+ md,←⊂'He said: <<rubbish!>>.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←1↓⊃,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf 2=+/'—'⍷html
+ →T.PassesIf 1=+/'–'⍷html
+ →T.PassesIf 1=+/'…'⍷html
+ →T.PassesIf 1=+/'©'=html
+ →T.PassesIf 1=+/'™'=html
+ →T.PassesIf 1=+/'“rubbish!”'⍷html
+ →T.PassesIf 1=+/'«rubbish!»'⍷html
+
+ parms←MarkAPL.CreateParms
+ parms.syntaxSugar←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ html←1↓⊃,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf 0=+/'—'⍷html
+ →T.PassesIf 0=+/'–'⍷html
+ →T.PassesIf 0=+/'…'⍷html
+ →T.PassesIf 0=+/'©'=html
+ →T.PassesIf 0=+/'™'=html
+ →T.PassesIf 1=+/'"rubbish!"'⍷html
+ →T.PassesIf 1=+/'&lt;&lt;rubbish!&gt;&gt;'⍷html
+
+ R←T._OK

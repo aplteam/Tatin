@@ -1,0 +1,24 @@
+ R←Test_Lists_018(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test invalid list: a list should be surrounded by empty lines.
+⍝ However, we allow this kind of laziness.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+⍝ There is no closing empty line after List II.
+ md←''
+ md,←⊂'* List I.'
+ md,←⊂(2⍴' '),'* List I-A'
+ md,←⊂''
+ md,←⊂(2⍴' '),'* List I-B'
+ md,←⊂''
+ md,←⊂(4⍴' '),'* List I-B-1'
+ md,←⊂'* List II.'
+ md,←⊂'Para'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 3=+/'<ul>'⍷∊ns.html
+
+ R←T._OK

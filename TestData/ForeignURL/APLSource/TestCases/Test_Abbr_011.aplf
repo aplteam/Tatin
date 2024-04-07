@@ -1,0 +1,18 @@
+ R←Test_Abbr_011(stopFlag batchFlag);⎕TRAP;ns;md;parms
+⍝ Test for an invalid abbreviation being reported
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'*[_∇∆_∇∆]: Invalid'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0∊⍴ns.html
+ →T.PassesIf∨/'Invalid abbreviation in line 1'⍷∊ns.report
+
+ R←T._OK

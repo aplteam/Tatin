@@ -1,0 +1,18 @@
+ R←Test_Footnotes_014(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ A footnote must carry a link somewhere, otherwise it's invalid
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'# Loading Tatin  packages'
+ md,←⊂'## Level 2 [^Tatin]  packages'
+ md,←⊂'### Level 3'
+ md,←⊂''
+ md,←⊂'[^tatin]:bla'
+
+ ns←MarkAPL.Init''md
+ ns.parms.verbose←0
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'Invalid footnote definition'⍷∊ns.report
+
+ R←T._OK

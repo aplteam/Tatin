@@ -1,0 +1,14 @@
+ R←Test_GetMaskForCode_010(stopFlag batchFlag);⎕TRAP;mask;expected
+⍝ Inline code that opens (and closes) with two rather than one backtick
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ #.TEMP.m←'This is ``{+/`⍳≢⍵}`` APL code'
+ mask←MarkAPL.Execute'GetMaskForCode #.TEMP.m'
+ expected←0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0
+ →T.PassesIf mask≡expected
+
+ R←T._OK

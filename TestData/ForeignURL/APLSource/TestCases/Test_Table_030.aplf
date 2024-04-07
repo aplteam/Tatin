@@ -1,0 +1,18 @@
+ R←Test_Table_030(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Check default alignment for numeric column without a header. See also Test_12.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|APL  |Brilliant|   800|'
+ mat,←⊂'|Cobol|Old      | 14000|'
+ mat,←⊂'|F#   |New      |  3400|'
+ mat,←⊂'|=====|=========|======|'
+ mat,←⊂'|     |         | 18200|'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf 4=+/'style="text-align: right;"'⍷html
+
+ R←T._OK

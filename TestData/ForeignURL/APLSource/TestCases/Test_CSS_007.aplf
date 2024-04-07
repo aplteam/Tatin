@@ -1,0 +1,41 @@
+ R←Test_CSS_007(stopFlag batchFlag);⎕TRAP;md;parms;b;ns;html;expected;start;length;buff
+⍝ Assign TWO CSS filenames to both `screenCSS` and `printCSS` with linked CSS files.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.linkToCSS←1
+ parms.cssURL←'file://C:/Temp'
+ parms.screenCSS←'MyScreen.CSS,YourScreen.css'
+ parms.printCSS←'MyPrint.CSS,YourPrint.css'
+
+ md←,⊂'A paragraph.'
+
+ ns←MarkAPL.Init parms md
+ →T.PassesIf 0∊≢ns.report
+ ns←MarkAPL.Process ns
+ ns.html←parms MarkAPL.MakeHTML_Doc ns.html
+
+ (start length)←↓⍉↑'<link href="[^"]*".*media="screen"'⎕S 0 1⍠('Greedy' 0)('Mode' 'M')('DotAll' 1)⊣ns.html
+ html←↑,/ns.html,¨⊂⎕UCS 10 13
+
+ buff←(⍴'<link ')↓length[1]↑start[1]↓html
+ expected←'href="file://C:/Temp/MyScreen.CSS"'
+ →T.PassesIf∨/expected⍷buff
+
+ buff←(⍴'<link ')↓length[2]↑start[2]↓html
+ expected←'href="file://C:/Temp/YourScreen.css"'
+ →T.PassesIf∨/expected⍷buff
+
+ (start length)←↓⍉↑'<link href="[^"]*".*media="print"'⎕S 0 1⍠('Greedy' 0)('Mode' 'M')('DotAll' 1)⊣ns.html
+ html←↑,/ns.html,¨⊂⎕UCS 10 13
+
+ buff←(⍴'<link ')↓length[1]↑start[1]↓html
+ expected←'href="file://C:/Temp/MyPrint.CSS"'
+ →T.PassesIf∨/expected⍷buff
+
+ buff←(⍴'<link ')↓length[2]↑start[2]↓html
+ expected←'href="file://C:/Temp/YourPrint.css"'
+ →T.PassesIf∨/expected⍷buff
+
+ R←T._OK

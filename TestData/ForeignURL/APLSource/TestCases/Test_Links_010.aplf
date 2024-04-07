@@ -1,0 +1,16 @@
+ R←Test_Links_010(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Test an explicit bookmark link with "()" INSIDE the bookmark definition.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# The “=” and “-” syntax (SeText))'                  ⍝ "()" within ()!!
+ md,←⊂''
+ md,←⊂'See [SeText header](#The “=” and “-” syntax (SeText)) for (important) details.'  ⍝ More ()!
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<a href="#the--and---syntax" class="bookmark_link">SeText header</a>'⍷∊ns.html
+
+ R←T._OK

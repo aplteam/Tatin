@@ -1,0 +1,24 @@
+ R←Test_Header_026(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Check whether external and internal links are both handled correctly
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# Level one header <https://aplwiki.com>'
+ md,←⊂''
+ md,←⊂'## Page <https://britishaplassociation.org/about-british-apl-association>'
+ md,←⊂''
+
+ ns←MarkAPL.Init ⍬ md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<a href="#level-one-header" id="level-one-header" class="autoheader_anchor">'
+ expected,←⊂'<h1 data-id="Level-one-header">Level one header <a href="https://aplwiki.com" class="external_link">https://aplwiki.com</a></h1>'
+ expected,←⊂'<div class="h_tag">'
+ expected,←⊂'<a href="#page" id="page" class="autoheader_anchor">'
+ expected,←⊂'<h2 data-id="Page">Page <a href="https://britishaplassociation.org/about-british-apl-association" class="external_link">https://britishaplassociation.org/about-british-apl-association</a></h2>'
+
+ →T.PassesIf∧/expected∊ns.html
+
+ R←T._OK

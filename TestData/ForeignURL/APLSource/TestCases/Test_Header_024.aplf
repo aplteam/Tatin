@@ -1,0 +1,24 @@
+ R←Test_Header_024(stopFlag batchFlag);⎕TRAP;md;ns;expected;parms
+⍝ Test header without a caption. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂''
+ md,←⊂'==================='
+ md,←⊂'A para.'
+ md,←⊂''
+ md,←⊂'## '
+ md,←⊂''
+ md,←⊂'Another para.'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>===================</p>' '<p>A para.</p>' '<p>##</p>' '<p>Another para.</p>'
+ →T.PassesIf expected≡ns.html
+ →T.PassesIf 0 0≡≢¨ns.(toc headerLineNos)
+
+ R←T._OK

@@ -1,0 +1,18 @@
+ R←Test_HTML_031(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test <span> as part of the markdown (intruduced in 12.0)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This is **foo** and this <span id="special">_goo_</span>'
+ md,←⊂''
+ md,←⊂'Another paragraph.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←⊂'<p>This is <strong>foo</strong> and this <span id="special"><em>goo</em></span></p>'
+ expected,←⊂'<p>Another paragraph.</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

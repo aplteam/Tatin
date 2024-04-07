@@ -1,0 +1,15 @@
+ R←Test_SmartTypo_017(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Have an escaped `\"` one between two " with code in front of them.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'`"This: \" is an escaped double quote"` will result in "This: \" is an escaped double quote".'
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←,⊂'<p><code>"This: \" is an escaped double quote"</code> will result in “This: \” is an escaped double quote".</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

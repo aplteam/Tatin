@@ -1,0 +1,73 @@
+ r←{printAsScreen}CreateDoc y;M;parms;ns;opCode;css;documents;EndIf
+⍝ Creates any of the documents MarkAPL comes with, defined by the "opCode"
+⍝ Useful for working on the CSS because the CSS files are linked, so changes are reflected straight away.
+⍝ Uses either the "Dark" theme (css=1) or "MarkAPL" (css=2) or "BlackAndWhite" (css=3).
+⍝ "printAsScreen" defaults to 0, meaning that the "screen" CSS file is used for display and "print" for print.
+⍝ Both default to 1 if not specified.
+⍝ In case "printAsScreen" is 1 the print CSS file is used for both, display and print.
+⍝ * If ⍵ is one of "?" or "-help" or "/help" help is provided.
+⍝ * If ⍵ is empty the user is interrogated.
+⍝ Otherwise y must be a two-element vector picking the document and the theme.
+ :If (,'?')≡,y
+ :OrIf '-help'≡⎕C y
+ :OrIf '/help'≡⎕C y
+     r←''
+     r,←⊂'1 = Full reference'
+     r,←⊂'2 = Cheat sheet'
+     r,←⊂'3 = LeanPub extensions'
+     r,←⊂'4 = MarkAPL for programmers'
+     r,←⊂'5 = Quick intro'
+     r,←⊂'6 = Styles'
+     r←⍪r
+     :Return
+ :EndIf
+ M←MarkAPL
+ parms←M.CreateParms
+ parms.ignoreEmbeddedParms←1
+ parms.cssURL←CiderConfig.HOME,'/Files'
+ parms.toc←2 3 4 5 6
+ parms.numberHeaders←2 3 4 5 6
+ parms.bookmarkLink←6
+ parms.width←1000
+ parms.reportLinks←1
+ parms.saveHTML←1
+ parms.linkToCSS←1
+ parms.leanpubExtensions←1
+ r←0 0⍴''
+ documents←'MarkAPL.md' 'MarkAPL_CheatSheet.md' 'LeanPubExtensions.md' 'MarkAPL_for_Programmers.md' 'QuickIntro.md' 'Styles.md'
+ :If 0=≢y
+     opCode←'Select document'TestCases.CommTools.Select'Full Ref' 'Cheat sheet' 'LeanPub Extension' 'MarkAPL for programmers' 'Quick Intro' 'Styles'
+     →(0=≢opCode)/0
+     printAsScreen←0 TestCases.CommTools.YesOrNo'Would you like to take "Print" the role of "Screen"?'
+     css←'Select theme'TestCases.CommTools.Select'Dark' 'MarkAPL' 'BlackOnWhite'
+     →(0=≢css)/0
+ :Else
+     (opCode css)←2↑y,1 1
+     printAsScreen←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'printAsScreen'
+     '"opCode" must be one of ⍳6'⎕SIGNAL 11/⍨~opCode∊⍳6
+     '"css" must be one if ⍳3'⎕SIGNAL 11/⍨~css∊⍳3
+ :EndIf
+ parms.inputFilename←CiderConfig.HOME,'/Files/',opCode⊃documents
+ :If (,1)≡,css
+     parms.screenCSS←'Dark_screen.css'
+     parms.printCSS←'Dark_print.css'
+     :If printAsScreen
+         parms.screenCSS←'Dark_print.css'
+     :EndIf
+ :ElseIf (,2)≡,css
+     parms.screenCSS←'MarkAPL_screen.css'
+     parms.printCSS←'MarkAPL_print.css'
+     :If printAsScreen
+         parms.screenCSS←'BlackOnWhite_print.css'
+     :EndIf
+ :ElseIf (,3)≡,css
+     parms.screenCSS←'BlackOnWhite_screen.css'
+     parms.printCSS←'BlackOnWhite_print.css'
+     :If printAsScreen
+         parms.screenCSS←'BlackOnWhite_print.css'
+     :EndIf
+ :EndIf
+ ns←M.Init parms''
+ ns←M.Process ns
+ parms v ns.html
+⍝Done

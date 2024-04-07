@@ -1,0 +1,21 @@
+ R←Test_SpecialAttrs_008(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Horizontal rulers: assign ID.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Title'
+ md,←⊂'======'
+ md,←⊂'* * * {#foo1}'
+ md,←⊂'This is a para. This is a para. This is a para. This is a para. This is a para. This is a para. '
+ md,←⊂'This is a para. This is a para. This is a para. This is a para. This is a para. This is a para. '
+ md,←⊂'   * * * {#Foo2}'
+ md,←⊂'This is a para. This is a para. This is a para. This is a para. This is a para. This is a para. '
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(⊂'<hr id="foo1">')∊ns.html
+ →T.PassesIf(⊂'<hr id="foo2">')∊ns.html
+
+ R←T._OK

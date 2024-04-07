@@ -1,0 +1,16 @@
+ R←Test_Links_043(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Test "[`]ADOC`](https://aplwiki.com)" syntax. Was once a bug.
+⍝ Square brackets with the APL code must be ignored
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'See [`]ADOC MyClass`](https://aplwiki.com "Link to the APL wiki" {style="color:red;"}) for details.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>See <a href="https://aplwiki.com" class="external_link" style="color:red;" title="Link to the APL wiki"><code>]ADOC MyClass</code></a> for details.</p>'
+ →T.PassesIf 1=+/expected⍷∊ns.html
+
+ R←T._OK

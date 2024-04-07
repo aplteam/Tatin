@@ -1,0 +1,32 @@
+ R←Test_SpecAttrs_Link_001(stopFlag batchFlag);⎕TRAP;ns;md;fn
+⍝ Link: assign an ID.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+
+ md←,⊂'Link [to the APL wiki](http://aplwiki.com{id="foo"}).'               ⍝ No blank
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<a href="http://aplwiki.com" class="external_link" id="foo">'⍷∊ns.html
+
+
+
+ md←,⊂'Link [to the APL wiki](http://aplwiki.com {id="foo"}).'              ⍝ 1 blank
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<a href="http://aplwiki.com" class="external_link" id="foo">'⍷∊ns.html
+
+
+
+ md←,⊂'Link [to the APL wiki](http://aplwiki.com  {id="foo"}).'             ⍝ Several blanks
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<a href="http://aplwiki.com" class="external_link" id="foo">'⍷∊ns.html
+
+ R←T._OK

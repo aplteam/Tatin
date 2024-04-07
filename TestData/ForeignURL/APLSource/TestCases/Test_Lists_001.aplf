@@ -1,0 +1,21 @@
+ R←Test_Lists_001(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Test nested lists
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* List I.'
+ md,←⊂(1⍴' '),'* List A'
+ md,←⊂(1⍴' '),'* List B'
+ md,←⊂(3⍴' '),'* List 1'
+ md,←⊂(3⍴' '),'* List 2'
+ md,←⊂'* List II.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>List I.' '<ul>' '<li>List A</li>' '<li>List B' '<ul>' '<li>List 1</li>' '<li>List 2</li>' '</ul></li>' '</ul></li>'
+ expected,←'<li>List II.</li>' '</ul>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

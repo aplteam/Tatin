@@ -1,0 +1,21 @@
+ R←Test_Header_013(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test numbering of headers that do not exist (although there are headers). Crashed once.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Level 1 Header'
+ md,←⊂'==============='
+ md,←⊂''
+ md,←⊂'Para'
+ md,←⊂''
+ md,←⊂'* This'
+ md,←⊂'* That'
+
+ parms←MarkAPL.CreateParms
+ parms.numberHeaders←2 3 4   ⍝ There are no such headers!
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ R←T._OK

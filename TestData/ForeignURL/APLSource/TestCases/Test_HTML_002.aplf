@@ -1,0 +1,60 @@
+ R←Test_HTML_002(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test <!-- tags in all flavours.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+⍝ Not an HTML block (leading empty line missing)
+ md←'This is a para.' '<!--comment-->' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf(⊂'<p>This is a para. <!--comment--></p>')∊ns.html
+
+⍝ Not an HTML block (both empty lines are missing)
+ md←'This is a para.' '<!--comment-->' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf(,⊂'<p>This is a para. <!--comment--> Another para</p>')≡ns.html
+
+⍝ From here we have real HTML blocks
+ md←'This is a para.' '' '<!--comment-->' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<p>This is a para.</p>' '<!--comment-->' '<p>Another para</p>'≡ns.html
+
+ md←'This is a para.' '' '<!--comment-->' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<!--'{⍺≡(⍴⍺)↑⍵}2⊃ns.html
+ →T.PassesIf∨/'-->'⍷2⊃ns.html
+ →T.PassesIf'<p>Another para</p>'{⍺≡(-⍴⍺)↑⍵}⊃¯1↑ns.html
+
+ md←'This is a para.' '' '<!--comment-->' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<!--'{⍺≡(⍴⍺)↑⍵}2⊃ns.html
+ →T.PassesIf∨/'-->'⍷2⊃ns.html
+ →T.PassesIf'<p>Another para</p>'{⍺≡(-⍴⍺)↑⍵}⊃¯1↑ns.html
+
+ md←'This is a para.' '' '<!--' 'comment 1' 'comment 2' '-->' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<!--'≡2⊃ns.html
+ →T.PassesIf'-->'≡5⊃ns.html
+ →T.PassesIf'<p>Another para</p>'≡⊃¯1↑ns.html
+
+ md←'This is a para.' '' '<!--' 'comment 1' '' 'comment 2' '--> This will be ignored' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<!--'≡2⊃ns.html
+ →T.PassesIf'-->'≡6⊃ns.html
+ →T.PassesIf'<p>Another para</p>'≡⊃¯1↑ns.html
+ →T.PassesIf~∨/'This will be ignored'⍷∊ns.html
+
+ md←'This is a para.' '' '<!--' 'comment 1' 'comment 2' 'Third and final comment -->' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<!--'≡2⊃ns.html
+ →T.PassesIf'Third and final comment -->'≡5⊃ns.html
+ →T.PassesIf'<p>Another para</p>'≡⊃¯1↑ns.html
+
+ R←T._OK

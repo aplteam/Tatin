@@ -1,0 +1,27 @@
+ ns←Init(parms markdown);buffer
+⍝ Creates a namespace "ns" that contains important stuff needed to process `markdown`.
+⍝ See "MarkAPL.html" for details.
+ :Access Public Shared
+ parms←CompileParms parms
+ markdown←GetMarkdown markdown
+ ns←Create_NS ⍬
+ ns.markdown←A.DTB(,⊆markdown),⊂''
+ ns.lineNumbers←⍳≢ns.markdown                ⍝ Useful for reporting problems
+ ns.parms←parms
+ ns←parms.ignoreEmbeddedParms ProcessEmbeddedParms ns
+ ns←RemoveAllComments ns
+ ns←parms ProcessLeanPubExtensions ns
+ :If IsLeanPubEncodingLine⊃ns.markdown
+     ns.markdown[1]←⊂''
+ :EndIf
+ ns.markdownLC←⎕C ns.markdown                ⍝ We need this often, so we do this ONCE
+ buffer←A.DLB ns.markdown
+ ns.emptyLines←GetEmptyLines buffer
+ ns.leadingChars←(16⌊≢¨ns.markdown)↑¨buffer
+ ns.withoutBlanks←ns.markdown~¨' '
+ :If (,0)≢,ns.parms.toc
+     ns.parms.bookmarkLink⌈←⌈/ns.parms.toc
+ :EndIf
+ ns.parms.head←,⊆ns.parms.head
+ LowercaseID←(1≡parms.lowercaseID)∘{(⎕C⍣⍺)⍵} ⍝ Lowercase ⍵ in case parms.lowercaseID is 1
+⍝Done

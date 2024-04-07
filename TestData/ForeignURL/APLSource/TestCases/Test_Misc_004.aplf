@@ -1,0 +1,18 @@
+ R←Test_Misc_004(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test that U+0000 is replaced by U+FFFD (security issue)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'H. level 1' '==' 'H. A level 2' '--' 'H. B level 2' '--'
+ md,←('### A',⎕UCS 0)'### B' '### C'
+
+ parms←MarkAPL.CreateParms
+ parms.toc←6
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf(⎕UCS 0)∊∊ns.html
+ →T.FailsIf~(⎕UCS 65533)∊∊ns.html ⍝ Because of the replacement
+
+ R←T._OK

@@ -1,0 +1,25 @@
+ R←Test_Lists_030(stopFlag batchFlag);⎕TRAP;md;ns;parms;expect
+⍝ Test a list where a para (rather then a list item) falls back in indentation to a previous level
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* List item a'
+ md,←⊂'  * List item a-1'
+ md,←⊂'    * List item a-1-1'
+ md,←⊂'      * List item a-1-1-1'
+ md,←⊂'        * List item a-1-1-1-1'
+ md,←⊂'      * List item a-1-1-2'
+ md,←⊂''
+ md,←⊂'    This is a real para, and it belonge to "List item a-1"!'
+ md,←⊂'  * List item b-2'
+ md,←⊂'* List item b'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+⍝          a            a-1         a-1-1         a-1-1-1      a-1-1-1-1      a-1-1-1-1      a-1-1-1  a-1-1                 a-1            a
+ expect←'<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '</ul>' '<li>' '</ul>' '</ul>' '<p>' '<li>' '</ul>' '<li>' '</ul>'
+ →T.PassesIf expect≡{⍵↑⍨⍵⍳'>'}¨ns.html
+
+ R←T._OK

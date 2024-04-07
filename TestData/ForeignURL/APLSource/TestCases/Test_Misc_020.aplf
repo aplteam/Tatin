@@ -1,0 +1,25 @@
+ R←Test_Misc_020(stopFlag batchFlag);⎕TRAP;path;filename;md;parms;report;html
+⍝ Exercise `ConvertMarkdownFile` with a non-default `outputFilename`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ path←FilesAndDirs.GetTempPath,'\MarkAPL_Tests\',⊃⎕SI
+ :If FilesAndDirs.IsDir path
+     FilesAndDirs.RmDir path
+ :EndIf
+ FilesAndDirs.MkDir path
+ filename←path,'\Test_Misc_018.md'
+ md←'# Test' '' '* This' '* That' '* More'
+ (⊂md)⎕NPUT filename 1
+ parms←MarkAPL.CreateParms
+ parms.outputFilename←path,'\MyOutput.htm'
+
+ report←parms MarkAPL.ConvertMarkdownFile filename
+ →T.GoToTidyUp~0∊⍴report
+ →T.GoToTidyUp~FilesAndDirs.IsFile parms.outputFilename
+ html←⊃⎕NGET parms.outputFilename 1
+ →T.GoToTidyUp 0=∨/'<html'⍷∊html
+ R←T._OK
+
+∆TidyUp:
+ FilesAndDirs.RmDir path

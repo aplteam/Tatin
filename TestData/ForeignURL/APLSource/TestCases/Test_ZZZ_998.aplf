@@ -1,0 +1,12 @@
+ R←Test_ZZZ_998(stopFlag batchFlag);⎕IO;⎕ML;⎕TRAP;ns;version1;version2
+⍝ Checks whether the function `Version` (must be assigned in this function) and the file apl-package.json are in line
+ ⎕IO←1 ⋄ ⎕ML←1
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._OK
+ version1←{⍵/⍨3>+\⍵∊'.+'}2⊃MarkAPL.Version
+ ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃⎕NGET'apl-package.json'
+ version2←{⍵/⍨3>+\⍵∊'.+'}ns.version
+ →T.PassesIf≡/version1 version2
+
+ R←T._OK
+⍝Done

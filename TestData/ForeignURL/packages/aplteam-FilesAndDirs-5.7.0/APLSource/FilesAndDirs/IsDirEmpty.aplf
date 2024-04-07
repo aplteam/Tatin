@@ -1,0 +1,9 @@
+  bool←IsDirEmpty dir;PathIsDirectoryEmptyW;res
+ ('Right argument is not a directory')⎕SIGNAL 6/⍨~IsDir dir
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     {}⎕NA'I2 Shlwapi.dll|PathIsDirectoryEmptyW <0T'
+     bool←PathIsDirectoryEmptyW⊂dir
+ :Else
+     res←⎕SH'[ "$(ls -A ',dir,')" ] && echo "Not Empty" || echo ""'
+     bool←'Not Empty'≢⊃res
+ :EndIf

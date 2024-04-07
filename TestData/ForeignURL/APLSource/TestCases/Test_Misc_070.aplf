@@ -1,0 +1,15 @@
+ R←Test_Misc_070(stopFlag batchFlag);⎕TRAP;tempFilename;md;ns
+⍝ Check whether any JavaScript is included when there is no need to
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'A simple paragraph'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ ⍝ Because it has no TOC, no collapsible and no code block it should not inject any JavaScript:
+ →T.PassesIf~∨/'<script'⍷∊ns.html
+
+ R←T._OK
+⍝Done

@@ -1,0 +1,45 @@
+ R←Test_Header_006(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test auto-headers (bookmarks)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Main'
+ md,←⊂'===='
+ md,←⊂''
+ md,←⊂'Level 2 (A) <http://aplwiki.com>'
+ md,←⊂'-------'
+ md,←⊂''
+ md,←⊂'### **A-Level** 3 -1- [^1]'
+ md,←⊂'### A-Level 3 [2]'
+ md,←⊂''
+ md,←⊂'Level _2_ (B)'
+ md,←⊂'-------------'
+ md,←⊂''
+ md,←⊂'### B-Level 3 -1-'
+ md,←⊂'#### B-Level 4 1.'
+ md,←⊂'#### B-Level    4 2.'
+ md,←⊂'### B-Level 3 -2-'           ⍝ First
+ md,←⊂'### B-Level 3 -2-'           ⍝ Double
+ md,←⊂'### B-Level 3 -2-'           ⍝ Double
+ md,←⊂'### B-Level 3 -2-'           ⍝ Double
+ md,←⊂'### Another /\ Level 3'      ⍝ First
+ md,←⊂'### .Another [Vector](vector.co.uk "The respected APL journal") Level 3' ⍝ Double
+ md,←⊂'### 1 Another Level 3'
+ md,←⊂'### 1111'
+ md,←⊂'### 2222'
+ md,←⊂'### 3333'
+ md,←''
+ md,←⊂'[^1]: My footnote'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 18=≢ns.headers
+ →T.PassesIf{(≢∪⍵)=⍴⍵}ns.headers[;2]
+ →T.PassesIf 0=≢{⍵/⍨~∨/¨'Warning'∘⍷¨⍵}ns.report
+ →T.PassesIf 17 18 19 21≡∆GetLineNumber¨ns.report
+
+ R←T._OK

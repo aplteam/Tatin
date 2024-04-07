@@ -1,0 +1,15 @@
+ R←Test_CodeBlock_014(stopFlag batchFlag);⎕TRAP;ns;parms;md
+⍝ Test having ` inside a code block. Was once a bug.
+⍝ That is okay as long as the number of spaces is in line with the nesting, plus possibly up to three more spaces.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'~~~'
+ md,←⊂'`{+/⍳⍴,w}'
+ md,←⊂'~~~'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf(,⊂'<pre tabindex="0"><code>`{+/⍳⍴,w}</code></pre>')≡ns.html
+
+ R←T._OK

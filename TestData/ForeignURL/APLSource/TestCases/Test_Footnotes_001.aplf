@@ -1,0 +1,43 @@
+ R←Test_Footnotes_001(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Test footnote data structure and resulting HTML.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂' See [^1] for details [^2], [^3].'
+ md,←'' 'Another para `[^1]` (This ref is marked as code!)'
+ md,←'' 'The APL wiki [^APLwiki] is ...'
+ md,←⊂''
+ md,←'' '[^1]: pandoc.org'
+ md,←'' '[^2]: Second one;'
+ md,←'' '[^3]: Third one'
+ md,←'' 'One more para '
+ md,←'' '[^APLwiki]: The APL wiki...'
+ md,←⊂'is great'
+ md,←'  The ' ' wiki ' ' contains...'
+ md,←⊂'  '
+ md,←⊂'  plenty...'
+ md,←⊂'  of good stuff'
+ md,←⊂'  '
+ md,←⊂'  Still footnote def!'
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'  Indentent but after two empty lines - no footnote def any more!'
+ md,←⊂''
+ md,←⊂'Last para ([^1],[^3]).'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 4 2≡⍴ns.footnoteDefs
+ →T.PassesIf'pandoc.org'≡⊃⊃ns.footnoteDefs[1;2]
+ →T.PassesIf'Second one;'≡⊃⊃ns.footnoteDefs[2;2]
+ →T.PassesIf'Third one'≡⊃⊃ns.footnoteDefs[3;2]
+ buff←⊃ns.footnoteDefs[4;2]
+ →T.PassesIf 3=≢buff
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf 2=+/'<a href="#fnref1" class="footnote_link"'⍷html
+ →T.PassesIf 1=+/'<a href="#fnref2" class="footnote_link"'⍷html
+ →T.PassesIf 2=+/'<a href="#fnref3" class="footnote_link"'⍷html
+ →T.PassesIf 1=+/'<a href="#fnref4" class="footnote_link"'⍷html  ⍝ Because we support only one ref to a pacticular footnote in a single para.
+
+ R←T._OK

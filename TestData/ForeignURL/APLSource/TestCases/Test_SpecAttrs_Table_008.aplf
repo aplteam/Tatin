@@ -1,0 +1,20 @@
+ R←Test_SpecAttrs_Table_008(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Table without header: assigning ID, class, attributes
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'|-----------|-----------|---:| { #foo .class2 foo=123}'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|1   |'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|2   |'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|300 |'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<table class="class2" id="foo" foo="123">'
+ →T.PassesIf expected≡⊃ns.html
+ →T.PassesIf~∨/'<td>———–</td>'⍷∊ns.html
+ →T.PassesIf∨/'<td style="text-align: right;">300</td>'⍷∊ns.html
+
+ R←T._OK

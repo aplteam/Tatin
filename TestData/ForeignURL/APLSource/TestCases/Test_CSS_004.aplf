@@ -1,0 +1,20 @@
+ R←Test_CSS_004(stopFlag batchFlag);⎕TRAP;md;parms;b;ns;html;expected
+⍝ Assign a non-local URL to `cssURL` that does not have a trailing `/` - was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.linkToCSS←1
+ parms.cssURL←'ftp://ftp.aplwiki.com/APLTeam'
+
+ md←,⊂'> > This is a recursive blockquote.'
+
+ ns←MarkAPL.Init parms md
+ →T.PassesIf 0∊≢ns.report
+ ns←MarkAPL.Process ns
+ ns.html←parms MarkAPL.MakeHTML_Doc ns.html
+
+ expected←'<link href="ftp://ftp.aplwiki.com/APLTeam/Dark_screen.css" rel="stylesheet" media="screen">'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

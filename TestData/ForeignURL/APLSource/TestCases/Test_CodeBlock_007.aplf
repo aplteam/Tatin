@@ -1,0 +1,16 @@
+ R←Test_CodeBlock_007(stopFlag batchFlag);⎕TRAP;ns;parms;md
+⍝ Test empty code block
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'First para.'
+ md,←⊂'~~~'
+ md,←⊂'~~~'
+ md,←⊂'Second and last para.'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<p>First para.</p>' '<p>Second and last para.</p>'≡ns.html
+
+ R←T._OK

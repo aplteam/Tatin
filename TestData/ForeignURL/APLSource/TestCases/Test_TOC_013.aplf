@@ -1,0 +1,22 @@
+ R←Test_TOC_013(stopFlag batchFlag);⎕TRAP;md;ns;parms;html
+⍝ Test parameters that to not fit (yet) to the headers in the document. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:toc            = 3'
+ md,←⊂'[parm]:numberHeaders  = 2 3 4'
+ md,←⊂''
+ md,←⊂'# ChangeHistory ⍺⌈⌊'
+ md,←⊂''
+ md,←⊂'...'
+
+ parms←MarkAPL.CreateParms
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(≢ns.headerLineNos)=≢ns.headers
+ html←parms MarkAPL.MakeHTML_Doc ns.html
+
+ R←T._OK

@@ -1,0 +1,32 @@
+ R←Test_Table_001(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Test table with column headers
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|Name|Remark|Count|'
+ mat,←⊂'|---|---|---|'
+ mat,←⊂'|APL|2 Brilliant|800|'
+ mat,←⊂'|COBOL & Pascal|1 Old|14000001|'
+ mat,←⊂'|F#|0 New|3400|'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.FailsIf 6≠+/'<td>'⍷html
+ →T.FailsIf 3≠+/'<td style'⍷html
+ →T.FailsIf 9≠+/'</td'⍷html
+ →T.FailsIf 3≠≢'<th[ >]'⎕S 0⊣html
+ →T.FailsIf 3≠+/'</th>'⍷html
+ →T.FailsIf 4≠+/'<tr>'⍷html
+ →T.FailsIf 4≠+/'</tr>'⍷html
+ →T.FailsIf 1≠+/'<thead>'⍷html
+ →T.FailsIf 1≠+/'</thead>'⍷html
+ →T.FailsIf 1≠+/'<tbody>'⍷html
+ →T.FailsIf 1≠+/'</tbody>'⍷html
+ →T.FailsIf 1≠+/'<table>'⍷html
+ →T.FailsIf 1≠+/'</table>'⍷html
+ →T.FailsIf 2≠+/'th style="text-align: left;"'⍷html
+ →T.FailsIf 1≠+/'th style="text-align: right;"'⍷html
+
+ R←T._OK

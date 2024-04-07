@@ -1,0 +1,32 @@
+ R←Test_Lists_010(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;expected;html
+⍝ Test deeply nested lists with paras in between.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First level'
+ md,←⊂' * Second level'
+ md,←⊂'  1. Third level'
+ md,←⊂'    '
+ md,←⊂'     Para on third level'
+ md,←⊂'      * Fourth level'
+ md,←⊂'        * Fifth level'
+ md,←⊂'           * Sixth level'
+ md,←⊂''
+ md,←⊂'             Para on sixth level'
+ md,←⊂'        * Fifth level -2-'
+ md,←⊂'        * Sixth level -2-'
+ md,←⊂'           * Seventh level a'
+ md,←⊂'           * Seventh level b'
+ md,←⊂''
+ md,←⊂'             Para on seventh level b'
+ md,←⊂'      * Fourth level -2-'
+ md,←⊂'        * Fith level -3-'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>' '<ul>' '<li>' '<ol start="1">' '<li>' '<p>' '<ul>' '<li>' '<ul>' '<li>' '<ul>' '<li>' '<p>' '</ul>' '<li>' '<li>' '<ul>' '<li>' '<li>' '<p>' '</ul>' '</ul>' '<li>' '<ul>' '<li>' '</ul>' '</ul>' '</ol>' '</ul>' '</ul>'
+ →T.FailsIf expected≢{⍵↑⍨⍵⍳'>'}¨ns.html
+
+ R←T._OK

@@ -1,0 +1,17 @@
+ R←Test_Data_001(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test a very simple [data]: definition.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[data]:  author=''Kai Jaeger'''
+ md,←⊂''
+ md,←⊂'This is a para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf 1≠⊃⍴ns.data
+ →T.FailsIf(,⊂'author' 'Kai Jaeger')≢ns.data
+
+ R←T._OK

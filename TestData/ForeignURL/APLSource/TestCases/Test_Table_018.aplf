@@ -1,0 +1,16 @@
+ R←Test_Table_018(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Single numeric column / single row without header - alignment?!
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|1000|'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf 1=+/'style="text-align: right;"'⍷html
+ →T.PassesIf 0=+/'style="text-align: center;"'⍷html
+ →T.PassesIf 0=+/'style="text-align: left;"'⍷html
+
+ R←T._OK

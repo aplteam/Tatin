@@ -1,0 +1,21 @@
+ R←Test_Lists_006(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;expected;html
+⍝ Test changing the bullet type stops a list
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* List 1'
+ md,←⊂'* List 2'
+ md,←⊂'+ List a'
+ md,←⊂'+ List b'
+ md,←⊂'* List I.'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>List 1</li>' '<li>List 2</li>' '</ul>' '<ul>' '<li>List a</li>' '<li>List b</li>'
+ expected,←'</ul>' '<ul>' '<li>List I.</li>' '</ul>'
+ →T.FailsIf expected≢ns.html
+
+ R←T._OK

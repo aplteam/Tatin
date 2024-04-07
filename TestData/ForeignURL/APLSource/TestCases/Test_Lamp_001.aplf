@@ -1,0 +1,21 @@
+ R←Test_Lamp_001(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Test a table with one row commented out
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'col 1|col2 |col 3'
+ mat,←⊂'-|-|-|'
+ mat,←⊂'APL|<Brilliant>|800'
+ mat,←⊂'⍝Foo|<What''s that?!>|0'
+ mat,←⊂'Cobol|<Oh dear>|100'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf 3=≢'<th[ >]'⎕S 0⊣html
+ →T.PassesIf 3=+/'<tr>'⍷html
+ →T.PassesIf 6=+/'<td'⍷html
+
+ R←T._OK

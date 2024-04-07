@@ -1,0 +1,25 @@
+ R←Test_Extensions_001(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test a very simple Collapsible (MarkAPL extension)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂''
+ md,←⊂'!> What is a Collapsible?'
+ md,←⊂'=> If supported by the Browser only the first line is shown initially, but the user may "open" it by clicking on the line'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ parms.linkToCSS←1
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ parms ##.v ns.html
+
+ expected←'<details>' '<summary>'
+ →T.PassesIf∧/∨/¨expected⍷¨⊂∊ns.html
+
+ R←T._OK

@@ -1,0 +1,18 @@
+ R←Test_Header_012(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test numbering of headers when there are no headers (crashed once).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Para'
+ md,←⊂''
+ md,←⊂'* This'
+ md,←⊂'* That'
+
+ parms←MarkAPL.CreateParms
+ parms.numberHeaders←6                  ⍝ Number ALL headers
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ R←T._OK

@@ -1,0 +1,19 @@
+ R←Test_Links_011(stopFlag batchFlag);⎕TRAP;ns;html;md;parms;expected
+⍝ Test for invalid internal bookmark links
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# The “=” and “-” syntax (SeText)'
+ md,←⊂''
+ md,←⊂'See [SeText header](#The “=” and “-” syntax SeText) for (important) details.'  ⍝ Missing () around "SeText" make the link invalid
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'Invalid internal link: [the--and---syntax-setext]'
+ →T.PassesIf 1=+/expected⍷∊ns.report
+
+ R←T._OK

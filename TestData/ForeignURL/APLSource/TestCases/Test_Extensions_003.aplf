@@ -1,0 +1,56 @@
+ R←Test_Extensions_003(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test a Collapsible (MarkAPL extension) with a complex body with lists, code blocks sub-header etc.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂''
+ md,←⊂'!> What can go into a Collapsible?'
+ md,←⊂'=> For a start, ordinary paragraphs like this one.'
+ md,←⊂'=> '
+ md,←⊂'=> #### Examples'
+ md,←⊂'=> But also:'
+ md,←⊂'=> '
+ md,←⊂'=> * Lists, ordered and un-ordered'
+ md,←⊂'=> * Code blocks'
+ md,←⊂'=> * Headers'
+ md,←⊂'=> * And of course inline-markdown'
+ md,←⊂'=> '
+ md,←⊂'=> This is code: `{+/⍳⍵}`'
+ md,←⊂'=> #### Other stuff'
+ md,←⊂'=> ```'
+ md,←⊂'=> ⍝ A code block: {+/⍳⍵}'
+ md,←⊂'=> ```'
+ md,←⊂'=> '
+ md,←⊂'=> 1. First'
+ md,←⊂'=> 1. Second'
+ md,←⊂'=> 1. This'
+ md,←⊂'=> '
+ md,←⊂'=> > Citations'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ parms←MarkAPL.CreateParms
+ parms.linkToCSS←1
+ parms.cssURL←'C:\T\Projects\APLTree\MarkAPL\Files'
+ parms.screenCSS←'BlackOnWhite_screen.css'
+ parms.printCSS←'BlackOnWhite_print.css'
+
+ parms.screenCSS←'MarkAPL_screen.css'
+ parms.printCSS←'MarkAPL_print.css'
+
+ parms.cssURL←'C:\T\Projects\APLTree\MarkAPL\Files\MoreCSS'
+ parms.screenCSS←'Dark_screen.css'
+ parms.printCSS←'Dark_print.css'
+
+ parms ##.v ns.html
+
+ expected←'<details>' '<summary>' '<div class="collapsible">'
+ →T.PassesIf∧/∨/¨expected⍷¨⊂∊ns.html
+ →T.PassesIf~∨/'<div class="accordion">'⍷∊ns.html
+
+ R←T._OK

@@ -1,0 +1,33 @@
+ R←Test_Lamp_002(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test whether a line that starts with a lamp symbol (`⍝`) does not make it to the output.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Para 1'
+ md,←⊂''
+ md,←⊂'⍝ Will be ignored'
+ md,←⊂'Para 2'
+ md,←⊂''
+ md,←⊂'`⍝` must not be ignored.'
+ md,←⊂''
+ md,←⊂'Para 3'
+ md,←⊂'⍝ This should be ignored, too'
+ md,←⊂'End of para 3'
+ md,←⊂''
+ md,←⊂'* This'
+ md,←⊂'* That\'
+ md,←⊂'⍝ Comment'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(⊂'<p>Para 1</p>')∊ns.html
+ →T.PassesIf(⊂'<p>Para 2</p>')∊ns.html
+ →T.PassesIf∨/'<p>Para 3'⍷∊ns.html
+ →T.PassesIf(⊂'<p><code>⍝</code> must not be ignored.</p>')∊ns.html
+ →T.FailsIf∨/'Will be ignored'⍷∊ns.html
+ →T.PassesIf 2=+/'<li>'⍷∊ns.html
+ →T.FailsIf∨/'Comment'⍷∊ns.html
+
+ R←T._OK

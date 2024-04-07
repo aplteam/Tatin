@@ -1,0 +1,17 @@
+ R←Test_BR_013(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Test that two spaces at the end of a para and a list item have no effect - we don't do stupid stuff!
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←'This is a para  ' 'withOUT a `<br>` tag within it. `More <br>`!'
+ md,←⊂'* A list item '
+ md,←'* Another list item withOUT  ' 'a `<br>` tag in it.'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=+/'<br>'⍷∊ns.html  ⍝ Two in the inline code, but with <>& converted, therefore 0
+
+ R←T._OK

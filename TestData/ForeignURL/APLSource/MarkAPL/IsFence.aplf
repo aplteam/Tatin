@@ -1,0 +1,10 @@
+ IsFence←{
+⍝ ⍺ must be either ~ or `
+⍝ Returns 1 in case ⍵ is a valid fence for a code block.
+     md←⍵
+     fence←⍺
+     pattern←'^ {0,3}',fence,'{3,}'
+     0=≢pattern ⎕S 0⍠('Greedy' 0)('Mode' 'L')⊣md:0
+     remains←pattern ⎕R''⍠('Greedy' 0)('Mode' 'L')⊣md
+     ~fence∊{⍵↓⍨+/∧\fence=⍵}remains
+ }

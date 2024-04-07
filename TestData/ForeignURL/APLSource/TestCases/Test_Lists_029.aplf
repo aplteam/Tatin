@@ -1,0 +1,21 @@
+ R←Test_Lists_029(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;html
+⍝ Test a "\" at the very end of a line that is an addition to the last list item.
+⍝ The addtions are indented but incorrectly but shall be appended to the list item anyway.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* Alpha'
+ md,←⊂'* Beta'
+ md,←⊂' Something.\'
+ md,←⊂'             More\'
+ md,←⊂'* First'
+ md,←⊂'* Second'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<ul>'⍷∊ns.html
+ →T.PassesIf 4=+/'<li>'⍷∊ns.html
+
+ R←T._OK

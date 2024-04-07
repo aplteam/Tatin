@@ -1,0 +1,27 @@
+ R←Test_Lists_050(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;html
+⍝ Test a bulleted list that starts with three spaces (that's allowed) but then switches to 0.
+⍝ Strictly speaking this is an invalid list definition but we must do something sensible with it anyway.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'   * First'
+ md,←⊂''
+ md,←⊂'      Para.'
+ md,←⊂''
+ md,←⊂'* Second'
+ md,←⊂'     * Second''s first'
+ md,←⊂'     * Second''s second'
+ md,←⊂'* Third'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf 1=+/'<p>'⍷html
+ →T.PassesIf 2=+/'<ul>'⍷html
+ →T.PassesIf 5=+/'<li>'⍷html
+ →T.PassesIf 5=+/'</li>'⍷html
+
+ R←T._OK

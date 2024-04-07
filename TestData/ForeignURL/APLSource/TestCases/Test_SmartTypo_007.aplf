@@ -1,0 +1,18 @@
+ R←Test_SmartTypo_007(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test conversion of `(c)` and `(tm)` into single symbols.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'IBM (tm) and this paper ((c) APL Team Ltd) both ...'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∧/'™' '©'∊∊ns.html
+
+ md←⊂'IBM (TM) and this paper ((C) APL Team Ltd) both ...'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∧/'™' '©'∊∊ns.html
+
+ R←T._OK

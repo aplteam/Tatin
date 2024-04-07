@@ -1,0 +1,35 @@
+ R←Test_DefinitionList_007(stopFlag batchFlag);⎕TRAP;ns;parms;md
+⍝ Test a complex definition list
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Term 1'
+ md,←⊂'Also Term 1'
+ md,←⊂''
+ md,←⊂': Definition of the term'
+ md,←⊂'    hsdaxsdbhjbshdc'
+ md,←⊂''
+ md,←⊂'Another term'
+ md,←⊂': Another definition'
+ md,←⊂''                            ⍝ Two consecutive blank lines break the definition list
+ md,←⊂''
+ md,←⊂'* This'
+ md,←⊂'* That'
+ md,←⊂''
+ md,←⊂'Another term'
+ md,←⊂': Another definition'
+ md,←⊂'Term 3'                      ⍝ Blank line is missing between the two definitions
+ md,←⊂': Definition of term 3'
+ md,←⊂''
+ md,←⊂'87 67 6876 876 876 87'       ⍝ Indentation is missing!
+ md,←⊂''
+ md,←⊂'No Term because...'
+ md,←⊂''
+ md,←⊂':Invalid'                    ⍝ Blank after the : is missing!
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf 0
+
+ R←T._OK

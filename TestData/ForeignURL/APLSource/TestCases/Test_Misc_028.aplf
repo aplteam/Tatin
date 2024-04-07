@@ -1,0 +1,21 @@
+ R←Test_Misc_028(stopFlag batchFlag);⎕TRAP;md;parms;ns;html
+⍝ Set the `enforceEdge` parameter
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.toc←1+⍳6
+ parms.numberHeaders←1
+ parms.createFullHtmlPage←1
+ parms.enforceEdge←0
+
+ md←'# Header' '' 'Any para'
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+ html←parms MarkAPL.MakeHTML_Doc ns.html
+
+ →T.PassesIf 0=+/∨/¨'Edge'∘⍷¨html
+
+ R←T._OK
+⍝Done

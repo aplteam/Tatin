@@ -1,0 +1,19 @@
+ R←Test_SpecAttrs_Table_003(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Table: empty special attributes
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'|Col A|Col B|  {}'
+ md,←⊂'|===|===|'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<table>'
+ →T.PassesIf expected≡⊃ns.html
+
+ R←T._OK

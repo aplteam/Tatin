@@ -1,0 +1,9 @@
+ MaskFunctionCall←{
+     txt←,⍵
+     b←(≢txt)⍴0
+     mask←~GetMaskForCodeTags txt
+     0=≢ind←'[^⍎]⍎⍎[^⍎]'⎕S 0⊣' ',(mask/txt),' ':b
+     ind←{↑,/{⍵[1]+⍳⍵[2]-⍵[1]}¨↓(((≢⍵)÷2),2)⍴⍵}ind
+     b[ind]←1
+     b
+ }

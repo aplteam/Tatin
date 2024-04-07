@@ -1,0 +1,17 @@
+ R←Test_Para_006(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test a paragraph that contains "_HTML" as part of a paragraph
+⍝ Should not trigger anything.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'The name of the variable is _HTML_, which is a reserved name.'
+ md,←⊂''
+ md,←⊂'The name of the variable is \_HTML\_, which is a reserved name.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<em>'⍷∊ns.html
+
+ R←T._OK

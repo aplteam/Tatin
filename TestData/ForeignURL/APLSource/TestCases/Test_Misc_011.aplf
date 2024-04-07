@@ -1,0 +1,37 @@
+ R←Test_Misc_011(stopFlag batchFlag);⎕TRAP;link;buff;expect
+⍝ Test internal function "GetUrlAndTitleFromLink" on external links.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ link←'[](http://aplwiki.com)'
+ buff←MarkAPL.Execute'GetUrlAndTitleFromLink ''',link,''''
+ expect←'http://aplwiki.com' ''
+ →T.PassesIf expect≡buff
+
+ link←'[](http://aplwiki.com  "The title")'
+ buff←MarkAPL.Execute'GetUrlAndTitleFromLink ''',link,''''
+ expect←'http://aplwiki.com' 'The title'
+ →T.PassesIf expect≡buff
+
+ link←'[](http://aplwiki.com  "The title") {target="_blank"}'
+ buff←MarkAPL.Execute'GetUrlAndTitleFromLink ''',link,''''
+ expect←'http://aplwiki.com' 'The title'
+ →T.PassesIf expect≡buff
+
+ link←'[Link text](http://aplwiki.com)'
+ buff←MarkAPL.Execute'GetUrlAndTitleFromLink ''',link,''''
+ expect←'http://aplwiki.com' ''
+ →T.PassesIf expect≡buff
+
+ link←'[Link (really!) text](http://aplwiki.com)'
+ buff←MarkAPL.Execute'GetUrlAndTitleFromLink ''',link,''''
+ expect←'http://aplwiki.com' ''
+ →T.PassesIf expect≡buff
+
+ link←'[Link "really" text](http://aplwiki.com)'
+ buff←MarkAPL.Execute'GetUrlAndTitleFromLink ''',link,''''
+ expect←'http://aplwiki.com' ''
+ →T.PassesIf expect≡buff
+
+
+ R←T._OK

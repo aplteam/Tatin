@@ -1,0 +1,33 @@
+ R←Test_Misc_044(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected;buff
+⍝ Test whether line number in ns.report are correct. HTML block and LeanPub extension make things interesting.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Paragraph 1"'
+ md,←⊂''
+ md,←⊂'I> # H1'
+ md,←⊂'I> '
+ md,←⊂'I> A simple "paragraph""'
+ md,←⊂''
+ md,←⊂'<pre><code>'
+ md,←⊂'{+⌿⍳⍴⍵}'
+ md,←⊂'</code></pre>'
+ md,←⊂''
+ md,←⊂'[This is a link](#to nowhere)'
+ md,←⊂''
+ md,←⊂'Para with odd number of "'
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←,¨'3-5' '1' '13' '[-]'
+ buff←{⍵~⎕A,' ().:',⎕C ⎕A}¨ns.report
+ →T.PassesIf↑=/⍴¨expected buff
+ →T.PassesIf∧/expected{(⍺∊⍵)∨(⍵∊⍺)}buff
+
+ R←T._OK

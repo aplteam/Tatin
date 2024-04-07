@@ -1,0 +1,15 @@
+ R←Test_SmartTypo_014(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ In case of an odd number of `"` the last one should be escaped.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'This "is" it."'
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←,⊂'<p>This “is” it."</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

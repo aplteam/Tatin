@@ -1,0 +1,53 @@
+ R←Test_Extensions_011(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test a simple accordion: two or more consecutive collapsibles (MarkAPL extension)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂''
+ md,←⊂'!> What can go into a Collapsible?'
+ md,←⊂'=> For a start, ordinary paragraphs like this one.'
+ md,←⊂'!> What else can go into a Collapsible?'
+ md,←⊂'=> Anything, really, except a collapsible, naturally.'
+ md,←⊂'!> What can go into a Collapsible?'
+ md,←⊂'=> For a start, ordinary paragraphs like this one.'
+ md,←⊂'=> '
+ md,←⊂'=> #### Examples'
+ md,←⊂'=> But also:'
+ md,←⊂'=> '
+ md,←⊂'=> * Lists, ordered and un-ordered'
+ md,←⊂'=> * Code blocks'
+ md,←⊂'=> * Headers'
+ md,←⊂'=> * And of course inline-markdown'
+ md,←⊂'=> '
+ md,←⊂'=> This is code: `{+/⍳⍵}`'
+ md,←⊂'=> #### Other stuff'
+ md,←⊂'=> ```'
+ md,←⊂'=> ⍝ A code block: {+/⍳⍵}'
+ md,←⊂'=> ```'
+ md,←⊂'=> '
+ md,←⊂'=> 1. First'
+ md,←⊂'=> 1. Second'
+ md,←⊂'=> 1. This'
+ md,←⊂'=> '
+ md,←⊂'=> > Citations'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ parms←MarkAPL.CreateParms
+ parms.linkToCSS←1
+ parms.cssURL←'C:\T\Projects\APLTree\MarkAPL\Files'
+ parms.screenCSS←'MarkAPL_screen.css'
+ parms.printCSS←'MarkAPL_print.css'
+
+ parms ##.v ns.html
+
+ expected←'<details>' '<summary>'
+ →T.PassesIf 6=+/+/¨expected⍷¨⊂∊ns.html
+ →T.PassesIf ∨/'<div class="accordion">'⍷∊ns.html
+
+ R←T._OK

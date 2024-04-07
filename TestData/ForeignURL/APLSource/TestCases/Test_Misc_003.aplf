@@ -1,0 +1,44 @@
+ R←Test_Misc_003(stopFlag batchFlag);⎕TRAP;ns;md;expect;md2
+⍝ Test internal function "Process_PRE"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ #.TEMP.md←'<pre>' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</pre>'
+ md2←MarkAPL.Execute'Process_PRE #.TEMP.md'
+ expect←,⊂'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'
+ →T.PassesIf expect≡md2
+
+ #.TEMP.md←'<pre>' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</pre> ⍝ This will be ignored'
+ md2←MarkAPL.Execute'Process_PRE #.TEMP.md'
+ expect←,⊂'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'
+ →T.PassesIf expect≡md2
+
+ #.TEMP.md←'<pre><code>' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</code></pre> ⍝ This will be ignored'
+ md2←MarkAPL.Execute'Process_PRE #.TEMP.md'
+ expect←,⊂'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'
+ →T.PassesIf expect≡md2
+
+ #.TEMP.md←'<pre><code>' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</pre> ⍝ This will be ignored'
+ md2←MarkAPL.Execute'Process_PRE #.TEMP.md'
+ expect←,⊂'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'
+ →T.PassesIf expect≡md2
+
+ #.TEMP.md←'<pre>' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</code></pre> ⍝ This will be ignored'
+ md2←MarkAPL.Execute'Process_PRE #.TEMP.md'
+ expect←,⊂'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'
+ →T.PassesIf expect≡md2
+
+ #.TEMP.md←⊂'<pre>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</pre> ⍝ This will be ignored'
+ md2←MarkAPL.Execute'Process_PRE #.TEMP.md'
+ expect←,⊂'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></pre>'
+ →T.PassesIf expect≡md2
+
+ #.TEMP.md←'<pre>' '' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '' '</pre>'
+ md2←MarkAPL.Execute'Process_PRE #.TEMP.md'
+ expect←'<pre><code>' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '</code></pre>'
+ →T.PassesIf expect≡md2~⊂''
+
+ R←T._OK

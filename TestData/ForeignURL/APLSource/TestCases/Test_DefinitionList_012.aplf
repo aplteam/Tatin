@@ -1,0 +1,19 @@
+ R←Test_DefinitionList_012(stopFlag batchFlag);⎕TRAP;ns;parms;md;expected
+⍝ Definition with <abbr>: within definition lists the keywords should never become <abbr> tags. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'First'
+ md,←⊂''
+ md,←⊂': This is a Definition.'
+ md,←⊂''
+ md,←⊂'*[First]: This and that'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<dl>' '<dt>First</dt>' '<dd><p>This is a Definition.</p></dd>' '</dl>'
+ →T.PassesIf expected≡(⍴expected)↑ns.html
+
+ R←T._OK

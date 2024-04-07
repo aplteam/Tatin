@@ -1,0 +1,84 @@
+ R←Test_InLine_005(stopFlag batchFlag);⎕TRAP;ns;md;expected;res
+⍝ Test inline markup; here `` <==> inline code
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'This: `` ` `` is a back-tick'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>This: <code>`</code> is a back-tick</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'This is a paragraph with `{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}` APL code in it.'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>This is a paragraph with <code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code> APL code in it.</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Enclose inline code with two ``` `` ``` (back-tick) characters'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Enclose inline code with two <code>``</code> (back-tick) characters</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'This:`` `⍴⍴array` `` is code and so is `(+/)÷⍴,⍵`'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>This:<code>`⍴⍴array`</code> is code and so is <code>(+/)÷⍴,⍵</code></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'``⊃⍉↓``'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p><code>⊃⍉↓</code></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'`` ` ``'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p><code>`</code></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Some ``` text ``'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Some ``` text ``</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'```.'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>```.</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'This is a back-tick (\`) and this is code: `{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}`'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>This is a back-tick (`) and this is code: <code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'These are three back-ticks (\`\`\`) and this is code: `{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}` and one more:`'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>These are three back-ticks (```) and this is code: <code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}</code> and one more:`</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Some `\`. text'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Some <code>\</code>. text</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Some ``\\`` `\`.  ```\\\``` text'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Some <code>\\</code> <code>\</code>. <code>\\\</code> text</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'C:\Users\<⎕AN>\.cider\ results in:'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>C:\Users&lt;⎕AN&gt;\.cider\ results in:</p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ R←T._OK

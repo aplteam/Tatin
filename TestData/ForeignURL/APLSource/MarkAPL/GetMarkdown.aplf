@@ -1,0 +1,14 @@
+ markdown←GetMarkdown markdown;length
+ :If 0=≢markdown
+     'Neither "markdown" nor "inputFilename" are set?!'⎕SIGNAL 6/⍨0=≢parms.inputFilename
+     markdown←⊃⎕NGET parms.inputFilename 1
+ :EndIf
+ markdown←,,¨markdown
+ 'Invalid Markdown (depth)'⎕SIGNAL 11/⍨2≠|≡markdown
+ 'Invalid Markdown (depth)'⎕SIGNAL 11/⍨(,1)≢∪≡¨markdown
+ length←≢markdown
+ :If length>≢markdown←'\t'⎕R(4⍴' ')⍠('Mode' 'M')⊣markdown              ⍝ Replace all <TAB> chars by 4 spaces
+     markdown,←(length-≢markdown)⍴⊂''                                  ⍝ In order to overcome bug <01446>
+ :EndIf
+ markdown←{0=+/b←(⎕UCS 0)=⍵:⍵ ⋄ w←⍵ ⋄ (b/w)←⎕UCS 65533 ⋄ w}¨markdown   ⍝ Replace U+0000 by U+FFFD for secutity reasons
+⍝Done

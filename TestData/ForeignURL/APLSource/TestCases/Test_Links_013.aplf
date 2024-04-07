@@ -1,0 +1,18 @@
+ R←Test_Links_013(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Test an explicit bookmark link composed of special characters (∆ & _)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:verbose=0'
+ md,←⊂'[parm]:syntaxSugar=0'
+ md,←⊂'# This and that'
+ md,←⊂''
+ md,←⊂'See ["More"](#∆_123) for details.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<p>See <a href="#∆_123" class="bookmark_link">"More"</a> for details.</p>'⍷∊ns.html
+
+ R←T._OK

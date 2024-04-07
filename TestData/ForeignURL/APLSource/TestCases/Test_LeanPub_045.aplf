@@ -1,0 +1,31 @@
+ R←Test_LeanPub_045(stopFlag batchFlag);⎕TRAP;ns;md;parms
+⍝ Test whether all <h1> and <h2> headers in an Aside are converted to an <h3> tag.
+⍝ It is recommended by the W3C to not use h1 and h2 in special circumstances (like an Aside).
+⍝ This is because screen readers happen to read them out as part of the major navigation.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:leanpubExtensions=1'
+ md,←⊂''
+ md,←⊂'A para.'
+ md,←⊂''
+ md,←⊂'A> # H1'
+ md,←⊂'A> ## H1'
+ md,←⊂'A> ### H1'
+ md,←⊂'A> #### H1'
+ md,←⊂'A> ##### H1'
+ md,←⊂'A> ###### H1'
+ md,←⊂'A> Last line'
+ md,←⊂''
+ md,←⊂'Another para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 3=+/'<h3>'⍷∊ns.html
+ →T.PassesIf 1=+/'<h4>'⍷∊ns.html
+ →T.PassesIf 1=+/'<h5>'⍷∊ns.html
+ →T.PassesIf 1=+/'<h6>'⍷∊ns.html
+
+ R←T._OK

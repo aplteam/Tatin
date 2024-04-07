@@ -1,0 +1,30 @@
+ Prepare;testPath;testFilename;ask;answer;options;flag;ind
+⍝ Creates an instance of the class `Tester2` named `T` and configures it for
+⍝ Assumes that the project is handled by the project manager "Cider", and that there is
+⍝ a namespace ##.CiderConfig available with the Cider config parameters.
+⍝ As a side effect is creates a folder "TestResults" in the project's root folder if the
+⍝ user wants to do code coverage with the `CodeCoverage` class.
+ ⎕IO←1 ⋄ ⎕ML←1
+ T←⎕NEW Tester2 ⎕THIS
+ testPath←##.CiderConfig.HOME,'/TestResults'
+ testFilename←testPath,'/CodeCoverage'
+ flag←0
+ :If ⎕NEXISTS testPath
+     :If ⎕NEXISTS testFilename,'.profile'
+         ind←('Code Coverage' 0 1)CommTools.Select'Append' 'Replace' 'Neither'
+         →(3=ind)/0
+         flag←1
+         :If 2=ind
+             1 CodeCoverage.DeleteFiles testFilename
+         :EndIf
+     :Else
+         flag←0 CommTools.YesOrNo'Code coverage?'
+     :EndIf
+ :Else
+     flag←0 CommTools.YesOrNo'Code coverage?'
+ :EndIf
+ :If flag
+     3 ⎕MKDIR testPath  ⍝
+     T.codeCoverage←⎕NEW CodeCoverage(,⊂'#.',{⍵,'.',⍵}2↓⍕⎕THIS.##)
+     T.codeCoverage.filename←testFilename
+ :EndIf

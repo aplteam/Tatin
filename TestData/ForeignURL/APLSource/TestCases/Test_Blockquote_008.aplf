@@ -1,0 +1,22 @@
+ R←Test_Blockquote_008(stopFlag batchFlag);⎕TRAP;md;ns;parms;html
+⍝ Test a blockquote that contains <<SUBTOPIC {.red}>>.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# Header 1'
+ md,←⊂'## Header 2'
+ md,←⊂'> # Level 1'
+ md,←⊂'> ## Level 2'
+ md,←⊂'> <<SUBTOC {.red}>>'
+ md,←⊂'> ## Level 3'
+
+ parms←MarkAPL.CreateParms
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ html←1↓⊃,/(⎕UCS 13),¨ns.html
+ →T.PassesIf 0=+/'subtoc'⍷⎕C html
+
+ R←T._OK

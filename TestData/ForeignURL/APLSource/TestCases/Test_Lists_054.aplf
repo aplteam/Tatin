@@ -1,0 +1,37 @@
+ R←Test_Lists_054(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test a list item that contains two code blocks with a para in between
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* This'
+ md,←⊂'* That'
+ md,←⊂''
+ md,←⊂'  ~~~'
+ md,←⊂'  {+⌿⍺,⍵} ⍝ 1.'
+ md,←⊂'  ~~~'
+ md,←⊂''
+ md,←⊂'  Para 1'
+ md,←⊂''
+ md,←⊂'  ~~~'
+ md,←⊂'  {+⌿⍺,⍵} ⍝ 2.'
+ md,←⊂'  ~~~'
+ md,←⊂''
+ md,←⊂'  Para 2'
+ md,←⊂''
+ md,←⊂'  Para 3'
+ md,←⊂'* Foo'
+ md,←⊂''
+ md,←⊂'Independent para'
+
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>This</li>' '<li>That' '<pre tabindex="0"><code>{+⌿⍺,⍵} ⍝ 1.</code></pre>'
+ expected,←'<p>Para 1</p>' '<pre tabindex="0"><code>{+⌿⍺,⍵} ⍝ 2.</code></pre>'
+ expected,←'<p>Para 2</p>' '<p>Para 3</p></li>'
+ expected,←'<li>Foo</li>' '</ul>' '<p>Independent para</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

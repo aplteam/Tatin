@@ -1,0 +1,19 @@
+ Make flag;M;C;path;zipFilename;res;version;cfg;parms
+ :If flag
+     M←⎕SE.MakeHelpers
+     C←##.CiderConfig
+     path←C.HOME,'/',C.CIDER.distributionFolder
+     cfg←⎕JSON⍠('Dialect' 'JSON5')⊢⊃⎕NGET C.HOME,'/apl-package.json'
+     version←M.CompileVersionNumberPattern cfg
+     M.RecreateFolder path
+     M.##.MarkAPL←##.MarkAPL  ⍝ Make sure that the docs are created with the most recent version of MarkAPL!
+     (##.CiderConfig.HOME,'/Files/')M.ConvertMarkdownToHtml5 2⍴⊂##.CiderConfig.HOME,'/Files'
+     M.CreateAPI ##.MarkAPL ##.MarkAPL.Public cfg.api
+     parms←⎕SE.Tatin.CreateBuildParms C.HOME
+     parms.targetPath←path
+     parms.version←version
+     parms.tatinVars←##.MarkAPL.TatinVars
+     zipFilename←⎕SE.Tatin.BuildPackage parms
+     ⎕←'*** New version build successfully:',M.CR,'   ',zipFilename
+ :EndIf
+ ⍝Done

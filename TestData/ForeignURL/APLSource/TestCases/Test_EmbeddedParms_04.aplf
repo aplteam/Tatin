@@ -1,0 +1,15 @@
+ R←Test_EmbeddedParms_04(stopFlag batchFlag);⎕TRAP;md;b;ns;html
+⍝ Check invalid embedded parms: should show in the document.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parms]:subTocs=0'      ⍝ Deliberate typo: [parms] rather than [parm]
+ md,←⊂'An ordinary para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(,⊂'<p>[parms]:subTocs=0 An ordinary para.</p>')≡ns.html
+
+ R←T._OK

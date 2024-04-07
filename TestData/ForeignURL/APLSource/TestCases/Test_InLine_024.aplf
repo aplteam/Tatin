@@ -1,0 +1,15 @@
+ R←Test_InLine_024(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Paragraphs with multiple but odd number of underscores: ignore last one.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'_A_ _Paragraph.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←,⊂'<p><em>A</em> _Paragraph.</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

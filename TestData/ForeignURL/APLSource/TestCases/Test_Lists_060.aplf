@@ -1,0 +1,36 @@
+ R←Test_Lists_060(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;expected;html
+⍝ Test nested list with paras on all levels with level changed by both list items and paras.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First level A'
+ md,←⊂'* First level B'
+ md,←⊂''
+ md,←⊂'  Para 1 belonging to ''First level B'''
+ md,←⊂''
+ md,←⊂'  1. First'
+ md,←⊂'  1. Second'
+ md,←⊂''
+ md,←⊂'     Para belonging to ''Second'''
+ md,←⊂''
+ md,←⊂'     Another para belonging to ''Second'''
+ md,←⊂''
+ md,←⊂'  1. Third'
+ md,←⊂''
+ md,←⊂'     Para belonging to third'
+ md,←⊂''
+ md,←⊂'  Para 2 still belonging to ''First level B'''
+ md,←⊂'* First level C'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>First level A</li>' '<li>First level B' '<p>Para 1 belonging to ''First level B''</p>'
+ expected,←'<ol start="1">' '<li>First</li>'
+ expected,←'<li>Second' '<p>Para belonging to ''Second''</p>' '<p>Another para belonging to ''Second''</p></li>'
+ expected,←'<li>Third' '<p>Para belonging to third</p></li>' '</ol>'
+ expected,←'<p>Para 2 still belonging to ''First level B''</p></li>' '<li>First level C</li>' '</ul>'
+ →T.FailsIf expected≢ns.html
+
+ R←T._OK

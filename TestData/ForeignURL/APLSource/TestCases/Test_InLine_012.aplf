@@ -1,0 +1,20 @@
+ R←Test_InLine_012(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test escaping * and _
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'First: *\*hello\**'
+ md,←⊂''
+ md,←⊂'Second: \**hello**'
+ md,←⊂''
+ md,←⊂'Third: this: `_\_hello\__` leads to this: _\_hello\__'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf'<p>First: <em>*hello*</em></p>'≢1⊃ns.html
+ →T.FailsIf'<p>Second: *<em>hello</em>*</p>'≢2⊃ns.html
+ →T.FailsIf'<p>Third: this: <code>_\_hello\__</code> leads to this: <em>_hello_</em></p>'≢3⊃ns.html
+
+ R←T._OK

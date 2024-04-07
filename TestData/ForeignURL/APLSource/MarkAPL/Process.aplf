@@ -1,0 +1,29 @@
+ ns←Process ns
+⍝ Takes a namespace, typically created by calling `Init`, and then processes `ns.markdown`,
+⍝ creating ns.html along the way.
+⍝
+⍝ The result is all MarkDown converted to HTML but not a fully-fledged HTML document. In order to
+⍝ achieve that call `MakeHTML_Doc` in the next step.
+ :Access Public Shared
+ ns.noOf←1               ⍝ Minimum number of lines to be removed from ns.(markdown leadingChars emptyLines) per cycle.
+ ns←CheckForInvalidFootnotes1 ns
+ ns←ScanMarkdown ns
+ ns←NumberHeaders ns
+ ns.toc←CollectToc ns
+ ns←SetTitle ns
+ ns←InjectTOC ns
+ ns←InjectSubTOCs ns
+ ns←ReplaceLinkIDs ns
+ ns←ReportLinks ns
+ ns←InjectFootNotes ns
+ ns←HandleAbbreviations ns
+ ns←CheckInternalLinks ns
+ ns←CheckForInvalidFootnotes2 ns
+ ns←PolishWarnings ns
+ :If A.IsDevelopment
+ :AndIf ns.parms.verbose
+ :AndIf 0≠≢ns.report
+     ⎕←⍪ns.report
+ :EndIf
+ ns.html←{1=≡⍵:⍵ ⋄ ⊃,/⊃⍵}¨ns.html
+⍝Done

@@ -1,0 +1,25 @@
+ R←Test_HTML_016(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test two <div> blocks in sucession
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂''
+ md,←⊂'<div>'
+ md,←⊂'<p>A **paragraph**</p>'
+ md,←⊂'</div>'
+ md,←⊂''
+ md,←⊂'<div>'
+ md,←⊂'<p>This is **another** para.</p>'
+ md,←⊂'</div>'
+ md,←⊂''
+ md,←⊂'One **more**.'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<div>' '<p>A **paragraph**</p>' '</div>' '<div>' '<p>This is **another** para.</p>' '</div>' '<p>One <strong>more</strong>.</p>'
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

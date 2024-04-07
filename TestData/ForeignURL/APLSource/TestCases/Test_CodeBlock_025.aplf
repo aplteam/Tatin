@@ -1,0 +1,16 @@
+ R←Test_CodeBlock_025(stopFlag batchFlag);⎕TRAP;ns;parms;md;expected
+⍝ Test code block with more than just three fence characters in the opening block (not fine).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'~~~~'
+ md,←⊂'{+/⍵}'
+ md,←⊂'~~~'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<pre tabindex="0"><code>{+/⍵}' '~~~</code></pre>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

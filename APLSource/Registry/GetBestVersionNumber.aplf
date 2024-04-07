@@ -33,13 +33,13 @@
          :EndIf
          list2←path_ InjectPublishingDate list      ⍝ Add publishing date where required
          list←list[SortIndexForPackageIDs list2]
-     :EndIf
-     best←⊃¯1↑list
-     version←{1↓⍵/⍨2≤+\'-'=⍵}⊃,/best
-     :If IsValidPackageID_WithoutPatchNo version
-         version←({⍵/⍨2>+\'-'=⍵}path),'-',version
-     :Else
-         r←path_,({⍵/⍨2>+\'-'=⍵}best),'-',version
+         best←⊃¯1↑list
+         version←{1↓⍵/⍨2≤+\'-'=⍵}⊃,/best
+         :If IsValidPackageID_WithoutPatchNo version
+             version←({⍵/⍨2>+\'-'=⍵}path),'-',version
+         :Else
+             r←path_,({⍵/⍨2>+\'-'=⍵}best),'-',version
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

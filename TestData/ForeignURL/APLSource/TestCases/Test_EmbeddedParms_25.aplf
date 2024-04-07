@@ -1,0 +1,22 @@
+ R←Test_EmbeddedParms_25(stopFlag batchFlag);⎕TRAP;md;b;ns;html;hits;filenames;path;parms
+⍝ Partly invalid `[parm]:` definition - was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:cssURL      = ''ABC'''
+ md,←⊂'[parm]:lang        = ''de'''
+ md,←⊂'[parms]:invalid    = 1'
+ md,←⊂'[parm]:saveHTML    = 0'
+ md,←⊂''
+ md,←⊂'A paragraph'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 2=≢ns.embeddedParms
+ →T.PassesIf 1=+/'<p>[parm]:saveHTML = 0</p>'⍷∊ns.html
+
+ R←T._OK

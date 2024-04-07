@@ -1,0 +1,20 @@
+ R←Test_Table_019(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ More data than header columns
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|Col 1|Col 2'
+ mat,←⊂'|-|-'
+ mat,←⊂'|1000|abc|13'
+ mat,←⊂'|2000|xyz'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf 3=+/'style="text-align: right;"'⍷html
+ →T.PassesIf 0=+/'style="text-align: center;"'⍷html
+ →T.PassesIf 4=+/'<td>'⍷html
+ →T.PassesIf 3=≢'<th[ >]'⎕S 0⊣html
+
+ R←T._OK

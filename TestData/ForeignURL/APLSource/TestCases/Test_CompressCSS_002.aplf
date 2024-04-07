@@ -1,0 +1,20 @@
+ R←Test_CompressCSS_002(stopFlag batchFlag);⎕TRAP;css;css2;expected
+⍝ Compress CSS with a multi-line comment
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ css←''
+ css,←⊂'/*multi'
+ css,←⊂'line'
+ css,←⊂'comment */'
+ css,←⊂''
+ css,←⊂'p {'
+ css,←⊂'  font-size : 19pt;'
+ css,←⊂'}'
+
+ css2←MarkAPL.CompressCSS css
+
+ expected←'p{font-size:19pt;}'
+ →T.PassesIf expected≡css2
+
+ R←T._OK

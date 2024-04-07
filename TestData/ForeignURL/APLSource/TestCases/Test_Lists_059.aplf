@@ -1,0 +1,27 @@
+ R←Test_Lists_059(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Nested list with a para the follows a sub list but belongs to the owning list item
+⍝ Which will be removed and leave the code block empty anyway.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'  * This'
+ md,←⊂'  * That'
+ md,←⊂'    1. First'
+ md,←⊂'    1. Second'
+ md,←⊂''
+ md,←⊂'    Para that belongs to "that".'
+ md,←⊂'  * More'
+ md,←⊂'    10. Tenth'
+ md,←⊂'    10. Eleventh'
+
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>This</li>' '<li>That' '<ol start="1">' '<li>First</li>' '<li>Second</li>' '</ol>'
+ expected,←'<p>Para that belongs to “that”.</p></li>' '<li>More' '<ol start="10">'
+ expected,←'<li>Tenth</li>' '<li>Eleventh</li>' '</ol></li>' '</ul>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

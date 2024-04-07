@@ -1,0 +1,16 @@
+ R←Test_SpecialAttrs_013(stopFlag batchFlag);⎕TRAP;ns;md;fn
+⍝ Muli-line paragraph: assign ID.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Simple but very long'
+ md,←⊂'paragraph'
+ md,←⊂'{#author}'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<p id="author">Simple but very long paragraph</p>'⍷∊ns.html
+
+ R←T._OK

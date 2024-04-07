@@ -1,0 +1,21 @@
+ R←Test_EmbeddedParms_26(stopFlag batchFlag);⎕TRAP;md;b;ns;hits;filenames;path;parms;html;expected
+⍝ Define `[parm]:head=...` - was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:head      = ''<meta author="John Doe">'''
+ md,←⊂''
+ md,←⊂'A paragraph'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ parms.createFullHtmlPage←1
+ parms.noCSS←1
+
+ (html ns)←parms MarkAPL.Markdown2HTML md
+
+ expected←'<head>' '</head>'
+ →T.PassesIf∧/expected∊html
+
+ R←T._OK

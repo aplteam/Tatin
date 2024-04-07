@@ -1,0 +1,17 @@
+ R←Test_Links_034(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Markdown with a link that has a link text that carries `[` and `]`; was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# The [Config] section'
+ md,←⊂'See [The [Config] section](#) for details.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<div class="h_tag">' '<a href="#the--section" id="the--section" class="autoheader_anchor">' '<h1 data-id="The--section">The [Config] section</h1>' '</a>'
+ expected,←'</div>' '<p>See <a href="#the--section" class="bookmark_link">The [Config] section</a> for details.</p>'
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

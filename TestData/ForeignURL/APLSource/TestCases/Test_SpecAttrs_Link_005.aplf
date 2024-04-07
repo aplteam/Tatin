@@ -1,0 +1,20 @@
+ R←Test_SpecAttrs_Link_005(stopFlag batchFlag);⎕TRAP;ns;md;fn;expected
+⍝ Link reference: assign "color=red" to the reference.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'See the [APL wiki][apl].'
+ md,←⊂''
+ md,←⊂'See also [GitHub][git].'
+ md,←⊂''
+ md,←⊂'[apl]: https://aplwiki.com {style="color:red;"}'
+ md,←⊂'[git]: https://github.com "Linus'' brain child" {style="color:red;"}'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'style="color:red;"'
+ →T.PassesIf 2=+/expected⍷∊ns.html
+
+ R←T._OK

@@ -1,0 +1,34 @@
+ R←Test_Misc_032(stopFlag batchFlag);⎕TRAP;md;parms;ns;html;b;tempPath;msg;rc;file;more;files
+⍝ Set the `` property
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.toc←⍳6
+ parms.startHeaderNoWith←7
+
+ files←''
+ tempPath←FilesAndDirs.GetTempSubDir⊃⎕SI
+ md←'# First' '' 'A para'
+ (⊂md) ⎕NPUT(file←tempPath,'/First.md')1
+ files,←⊂file
+ md←'# Second' '' 'Another para'
+ (⊂md) ⎕NPUT(file←tempPath,'/Second.md')1
+ files,←⊂file
+
+ html←''
+ :For file :In files
+     parms.inputFilename←file
+     ns←MarkAPL.Init parms ''
+     ns←MarkAPL.Process ns
+     html,←ns.html
+ :EndFor
+
+ →T.GoToTidyUp~∧/∨/¨'>First<' '>Second<'⍷¨   '<h1 '∘{⍵/⍨⍺∘≡¨(≢⍺)↑¨⍵}html
+
+ R←T._OK
+
+∆TidyUp:
+ (rc msg more)←FilesAndDirs.RmDir tempPath
+ {⍵:.}rc≠0
+⍝Done

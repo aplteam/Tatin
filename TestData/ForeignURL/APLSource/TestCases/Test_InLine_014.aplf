@@ -1,0 +1,31 @@
+ R←Test_InLine_014(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test escaping `.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'In the first expression the \` is removed...'
+ md,←⊂''
+ md,←⊂'This `{⍺+⍵}` is APL, this \` is a backtick and this: `¯1⍉vars` is APL again'
+ md,←⊂''
+ md,←⊂'* In the second expression the \` are removed...'
+ md,←⊂'* This `{⍺+⍵}` is APL, this \` is a backtick and this: `¯1⍉vars` is APL again'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'the ` is removed'⍷1⊃ns.html
+ →T.PassesIf 0=+/'<code>'⍷1⊃ns.html
+
+ →T.PassesIf 1=+/'this ` is '⍷2⊃ns.html
+ →T.PassesIf 2=+/'<code>'⍷2⊃ns.html
+ →T.PassesIf 2=+/'</code>'⍷2⊃ns.html
+
+ →T.PassesIf 1=+/'the ` are removed'⍷4⊃ns.html
+ →T.PassesIf 0=+/'<code>'⍷4⊃ns.html
+
+ →T.PassesIf 1=+/'this ` is '⍷5⊃ns.html
+ →T.PassesIf 2=+/'<code>'⍷5⊃ns.html
+ →T.PassesIf 2=+/'</code>'⍷5⊃ns.html
+
+ R←T._OK

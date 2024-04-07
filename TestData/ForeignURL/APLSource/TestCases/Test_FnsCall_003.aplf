@@ -1,0 +1,24 @@
+ R←Test_FnsCall_003(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test function call with an argument in a paragraph
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{
+     ns←⍵
+     '--- ',⍺,' ---'
+ }
+
+ md←''
+ md,←⊂'This is a para. This is a para. This is a para.'
+ md,←⊂''
+ md,←⊂'This "⍎⍎#.TEMP.MyFns 123⍎⍎" is the result of the function --- really!'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This “— 123 —” is the result of the function — really!</p>'
+ →T.PassesIf expected≡2⊃ns.html
+
+ R←T._OK

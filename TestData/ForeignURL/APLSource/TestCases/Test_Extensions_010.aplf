@@ -1,0 +1,31 @@
+ R←Test_Extensions_010(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test a simple accordion: two or more consecutive collapsibles (MarkAPL extension)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂''
+ md,←⊂'!> What can go into a Collapsible?'
+ md,←⊂'=> For a start, ordinary paragraphs like this one.'
+ md,←⊂'!> What else can go into a Collapsible?'
+ md,←⊂'=> Pretty much everything: lists, citations, headers, code blocks...'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ parms←MarkAPL.CreateParms
+ parms.linkToCSS←1
+ parms.cssURL←'C:\T\Projects\APLTree\MarkAPL\Files'
+ parms.screenCSS←'MarkAPL_screen.css'
+ parms.printCSS←'MarkAPL_print.css'
+
+ parms ##.v ns.html
+
+ expected←'<details>' '<summary>'
+ →T.PassesIf 4=+/+/¨expected⍷¨⊂∊ns.html
+ →T.PassesIf∨/'<div class="accordion">'⍷∊ns.html
+
+ R←T._OK

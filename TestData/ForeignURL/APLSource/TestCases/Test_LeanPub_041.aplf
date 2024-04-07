@@ -1,0 +1,22 @@
+ R←Test_LeanPub_041(stopFlag batchFlag);⎕TRAP;ns;md;expected;parms
+⍝ Test whether the leanpub extension "Aside" (`A> `) is NOT processed because embedded parms are suppressed.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:leanpubExtensions=1'
+ md,←⊂''
+ md,←⊂'A> An aside'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ parms.ignoreEmbeddedParms←1
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A&gt; An aside</p>' '<p>Another para</p>'
+ →T.PassesIf≡/∊¨expected(ns.html~⊂'')
+
+ R←T._OK

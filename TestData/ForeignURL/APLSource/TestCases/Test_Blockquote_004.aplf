@@ -1,0 +1,19 @@
+ R←Test_Blockquote_004(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test a blockquote that has a para spanning more than one line, all of wich start with '< '
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'> This is a para.'
+ md,←⊂'> Still the same blockquote.'
+ md,←⊂'> Keeps going.'
+ md,←⊂''
+ md,←⊂'New --- non-blockquote -- para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<blockquote>'≡1⊃ns.html
+ →T.PassesIf'<p>This is a para. Still the same blockquote. Keeps going.</p>'≡2⊃ns.html
+
+ R←T._OK

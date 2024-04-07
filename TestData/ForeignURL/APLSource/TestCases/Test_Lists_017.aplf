@@ -1,0 +1,24 @@
+ R←Test_Lists_017(stopFlag batchFlag);⎕TRAP;md;ns;noOfListItems;html;parms
+⍝ Test that special attributes are processed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* item 1 {.increment}'
+ md,←⊂'* item 2 {#foo}'
+ md,←⊂'* item 3'
+ md,←⊂'* item 4 {color="red";}'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<ul class="increment">'≡1⊃ns.html
+ →T.PassesIf'<li>item 1</li>'≡2⊃ns.html
+ →T.PassesIf'<li>item 2 {#foo}</li>'≡3⊃ns.html
+ →T.PassesIf'<li>item 3</li>'≡4⊃ns.html
+ →T.PassesIf'<li>item 4 {color=“red”;}</li>'≡5⊃ns.html
+ →T.PassesIf 6=≢ns.html
+
+ R←T._OK

@@ -1,0 +1,21 @@
+ R←Test_Images_15(stopFlag batchFlag);⎕TRAP;ns;md;expected;parms
+⍝ Test image standing on its own followed by a paragraph. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+
+ md←''
+ md,←⊂'![This is the "Error" icon](error.png)'
+ md,←⊂'This is a para'
+ md,←⊂'This is a para'
+
+ parms←MarkAPL.CreateParms
+ parms.imageURL←'http://download.aplwiki.com/LeanPub/Images'
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p><img src="http://download.aplwiki.com/LeanPub/Images/error.png" alt="This is the ''Error'' icon" title="This is the ''Error'' icon"> This is a para This is a para</p>'
+ →T.PassesIf expected≡1⊃ns.html
+
+ R←T._OK

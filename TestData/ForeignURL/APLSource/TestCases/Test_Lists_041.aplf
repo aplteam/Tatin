@@ -1,0 +1,14 @@
+ R←Test_Lists_041(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;html
+⍝ Test that " 1. " somewhere in the content does not start a list.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This is not 1. a list.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=+/'<ol>'⍷∊ns.html
+
+ R←T._OK

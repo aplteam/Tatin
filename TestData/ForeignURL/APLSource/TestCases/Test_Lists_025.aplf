@@ -1,0 +1,27 @@
+ R←Test_Lists_025(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test a lazy list
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* This paragraph stretches'
+ md,←⊂'over several'
+ md,←⊂'lines indeed,'
+ md,←⊂'4 in total!'
+ md,←⊂'* This'
+ md,←⊂'is'
+ md,←⊂'the'
+ md,←⊂'second'
+ md,←⊂'one'
+ md,←⊂''
+ md,←⊂'An ordinary paragraph'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 2=+/'<li>'⍷∊ns.html
+ →T.PassesIf 1=+/'<p>'⍷∊ns.html
+ →T.PassesIf 1=+/'<ul>'⍷∊ns.html
+
+ R←T._OK

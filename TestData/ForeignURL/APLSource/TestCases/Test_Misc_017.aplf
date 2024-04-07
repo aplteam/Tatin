@@ -1,0 +1,20 @@
+ R←Test_Misc_017(stopFlag batchFlag);⎕TRAP;expected;html;doc;parms;html2
+⍝ Exercise `MakeHTML_Doc` with defaults
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ html←'<ul>' '<li>First</li>' '<li>Second</li>' '</ul>'
+ parms←MarkAPL.CreateParms
+ doc←parms MarkAPL.MakeHTML_Doc html
+ →T.PassesIf 40>⍴doc ⍝ That should be more than sufficient
+ html2←∊doc
+ →T.PassesIf 1=+/'<html'⍷html2
+ →T.PassesIf 1=+/'</html>'⍷html2
+ →T.PassesIf 1=+/'<head>'⍷html2
+ →T.PassesIf 1=+/'</head>'⍷html2
+ →T.PassesIf 1=+/'<body>'⍷html2
+ →T.PassesIf 1=+/'</body>'⍷html2
+ →T.PassesIf 1=+/'<ul>'⍷html2
+ →T.PassesIf 1=+/'</ul>'⍷html2
+
+ R←T._OK

@@ -1,0 +1,17 @@
+ R←Test_Header_030(stopFlag batchFlag);⎕TRAP;m;ns;expected;parms;buff
+⍝ Test headers with "=" and "-" syntax (ATX and SeText headers) with suppressed lowercasing
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←##.MarkAPL.CreateParms
+ parms.lowercaseID←0
+ m←,¨'Level 1' '=' 'Level 2' '-'
+ ns←MarkAPL.Init parms m
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∧/∨/¨'Level'∘⍷¨2⊃¨ns.toc
+ →T.PassesIf∧/∨/¨'Level'∘⍷¨ns.headers[;2]
+ buff←'href="(.*)"'⎕S{⊃'"[^"]*"'⎕S{1↓¯1↓⍵.Match}⊣⍵.Match}⍠('Greedy' 0)⊣ns.html
+ →T.PassesIf∧/∨/¨'Level'∘⍷¨buff
+
+ R←T._OK

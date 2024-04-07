@@ -1,0 +1,17 @@
+ R←Test_InLine_021(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Test escaped underscores mixed with non-escaped underscores.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Inside a \___Word\___.'
+ md,←⊂''
+ md,←⊂'Inside a \___Word__\_.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>Inside a _<strong>Word_</strong>.</p>' '<p>Inside a _<strong>Word</strong>_.</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

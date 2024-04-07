@@ -1,0 +1,23 @@
+ R←Test_Lists_058(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test code block where the fences are less indented then all of the code as such.
+⍝ Which will be removed and leave the code block empty anyway.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* This'
+ md,←⊂''
+ md,←⊂'  ~~~'
+ md,←⊂'       {(+/⍵)÷⍴⍵}100 200'
+ md,←⊂'    150'
+ md,←⊂'  ~~~'
+ md,←⊂''
+ md,←⊂'* That'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>This' '<pre tabindex="0"><code>     {(+/⍵)÷⍴⍵}100 200' '  150</code></pre></li>' '<li>That</li>' '</ul>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

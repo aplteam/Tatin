@@ -1,0 +1,61 @@
+ R←Test_HTML_006(stopFlag batchFlag);⎕TRAP;md;ns;this
+⍝ Test all tags there are in the HTML5 standard.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+⍝ Not an HTML block; trailing empty line is missing:
+ md←'This is a para.' '' '<div class="foo">' 'That''s embraced by a div' '</div>' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf∨/''⍷∊ns.html
+
+⍝ Not an HTML block; leading empty line is missing:
+ md←'This is a para.' '<div class="foo">' '' 'That''s embraced by a div' '' '</div>' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf∨/''⍷∊ns.html
+
+⍝ Not an HTML block; no empty lines at all:
+ md←'This is a para.' '<div class="foo">' '' 'That''s embraced by a div' '' '</div>' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf∨/''⍷∊ns.html
+
+⍝ From here we really have HTML blocks:
+ md←'This is a para.' '' '<div class="foo">' '' 'That''s embraced by a div' '' '</div>' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<p>This is a para.</p>' '<div class="foo">' '<p>That''s embraced by a div</p>' '</div>' '<p>Another para</p>'≡ns.html~⊂''
+
+ md←'That''s embraced by a div' '' '</div>' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<p>That''s embraced by a div</p>' '</div>' '<p>Another para</p>'≡ns.html~⊂''
+
+⍝ According to the CommonMarkspec this ↓↓↓ should work. MarkAPL does not support this however
+ :If 0
+     md←'This is a para.' '' '<div' '>' 'That''s embraced by a div' '' '</div>' '' 'Another para'
+     ns←MarkAPL.Init''md
+     ns←MarkAPL.Process ns
+     →T.PassesIf'<![CDATA['{⍺≡(⍴⍺)↑⍵}1⊃ns.html
+     →T.PassesIf∨/']]>'⍷1⊃ns.html
+     →T.PassesIf'<p>Another para</p>'{⍺≡(-⍴⍺)↑⍵}↑¯1↑ns.html
+ :EndIf
+
+ :For this :In MarkAPL.HtmlTags
+     md←''('<',this,'>')''
+     ns←MarkAPL.Init''md
+     ns←MarkAPL.Process ns
+     :If 'pre'≢this     ⍝ Because <pre> gets attached a <code> if missing
+         →T.PassesIf 1=≢ns.html~⊂''
+     :EndIf
+     →T.PassesIf('<',this,'>')≡{⍵↑⍨⍵⍳'>'}1⊃ns.html~⊂''
+
+     md←''('</',this,'>')''
+     ns←MarkAPL.Init''md
+     ns←MarkAPL.Process ns
+     →T.PassesIf 1=⍴ns.html~⊂''
+     →T.PassesIf(,⊂'</',this,'>')≡ns.html~⊂''
+ :EndFor
+
+ R←T._OK

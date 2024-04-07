@@ -1,0 +1,31 @@
+ r←Cd path;Lin;r;rc;∆GetCurrentDirectory;∆SetCurrentDirectory;∆chdir
+⍝ Reports and/or changes the current directory.
+⍝ The method changes the current directory to what is passed as the right argument.\\
+⍝ It returns the former current directory as a result.\\
+⍝ Because an empty right argument has no effect, `Cd ''` effectively reports the
+⍝ current directory. See also [`PWD`](#) (Print Work Directory).
+ path←NormalizePath path
+ :Select APLTreeUtils2.GetOperatingSystem ⍬
+ :Case 'Win'
+     '∆GetCurrentDirectory'⎕NA'I4 KERNEL32.C32|GetCurrentDirectory* I4 >T[]'
+     '∆SetCurrentDirectory'⎕NA'I4 KERNEL32.C32|SetCurrentDirectory* <0T'
+     :If 0=⊃rc←∆GetCurrentDirectory 260 260
+         r←GetLastError'GetCurrentDirectory error' ''
+     :Else
+         r←NormalizePath⊃↑/rc
+     :EndIf
+     :If 0≠≢path←path~'"'
+     :AndIf ' '=1↑0⍴path
+         path,←(CurrentSep≠¯1↑path)/CurrentSep
+         :If ~∆SetCurrentDirectory⊂path
+             11 ⎕SIGNAL⍨↑{⍵,'; rc=',⍕⍺}/GetLastError'SetCurrentDirectory error'
+         :EndIf
+     :EndIf
+ :CaseList 'Lin' 'Mac'
+     path←NormalizePath path
+     r←⊃⎕SH'pwd'
+     '∆chdir'⎕NA'I ',OS.GetSharedLib,'| chdir <0T1[]'
+     {}∆chdir⊂path
+ :Else
+     .  ⍝ Huuh?!
+ :EndSelect

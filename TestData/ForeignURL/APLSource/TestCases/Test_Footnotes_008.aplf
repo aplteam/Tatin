@@ -1,0 +1,19 @@
+ R←Test_Footnotes_008(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Test footnote with inline code and an ellipsis (was once a bug).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'Function `TxtToCsv` takes the filepath of a TXT and writes a sibling CSV [^csv] containing...'
+ md,←⊂''
+ md,←⊂'[^csv]: With version 16.0 Dyalog has introduced `{(+⌿⍵)÷⍴,⍵}`...'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1 2≡⍴ns.footnoteDefs
+ →T.PassesIf'csv'≡⊃ns.footnoteDefs
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf 1=+/'[<a href="#fnref1" class="footnote_link"><sup>1</sup></a>]'⍷html
+ →T.PassesIf 1=+/'<li id="fnref1"><p>With version 16.0 Dyalog has introduced <code>{(+⌿⍵)÷⍴,⍵}</code>…</p><a href="#fnref1" class="footnote_anchor"></a>'⍷html
+
+ R←T._OK

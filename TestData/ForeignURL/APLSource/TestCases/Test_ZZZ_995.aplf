@@ -1,0 +1,13 @@
+ R←Test_ZZZ_995(stopFlag batchFlag);⎕TRAP;buff;md
+⍝ Test whether date and version number in document "MarkAPL_for_Programmers.md" are correct
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊃⎕NGET'Files/MarkAPL_for_Programmers.md'
+ buff←'This document refers to version '
+ buff,←⊃{⍺,'.',⍵}/2↑'.'APLTreeUtils2.Split 2⊃MarkAPL.Version
+ buff,←' of `MarkAPL`.'
+ →T.PassesIf 1=+/buff⍷md
+
+ R←T._OK
+⍝Done

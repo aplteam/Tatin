@@ -1,0 +1,26 @@
+ R←Test_EmbeddedParms_05(stopFlag batchFlag);⎕TRAP;md;b;ns;html;hits;filenames
+⍝ Check embedded parms: CSS stuff
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:cssURL         = ''',FilesAndDirs.PWD,'/Files/'''
+ md,←⊂'[parm]:linkToCSS      = 1'
+ md,←⊂'[parm]:printCSS       = ''BlackOnWhite_print.css'''
+ md,←⊂'[parm]:screenCSS      = ''BlackOnWhite_print.css'''
+ md,←⊂''
+ md,←⊂'# Header level 1'
+ md,←⊂'An ordinary para.'
+ md,←⊂'~~~'
+ md,←⊂'{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}'
+ md,←⊂'~~~'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.FailsIf 0=≢html←ns.parms MarkAPL.MakeHTML_Doc ns.html
+ →T.FailsIf 0=≢hits←'<link href="[^"]*"'⎕S GetHit⊣html
+ →T.FailsIf 2≠⍴filenames←¯1↓¨(⍴'href="')↓¨'href="[^"]*"'⎕S GetHit⊣hits
+ filenames←'file://'⎕R''⊣filenames
+ →T.FailsIf 2≠+/FilesAndDirs.IsFile filenames
+
+ R←T._OK

@@ -1,0 +1,23 @@
+ R←Test_FnsCall_001(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test simple function call in a paragraph.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{
+     'This comes from an "APL" function call'
+ }
+
+ md←''
+ md,←⊂'This is a para. This is a para. This is a para.'
+ md,←⊂''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a para. This is a para. This is a para.</p>' '<p>This comes from an “APL” function call</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

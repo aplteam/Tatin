@@ -1,0 +1,36 @@
+ R←Test_Links_003(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Test ordinary links.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'Link to the [APL wiki](http://aplwiki.com)'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Link to the <a href="http://aplwiki.com" class="external_link">APL wiki</a></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Link to the [APL wiki](http://aplwiki.com "This and that")'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Link to the <a href="http://aplwiki.com" class="external_link" title="This and that">APL wiki</a></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Link to the [APL wiki](http://aplwiki.com "This and that"{target="_blank"})'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Link to the <a href="http://aplwiki.com" class="external_link" target="_blank" title="This and that">APL wiki</a></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Link to the [APL wiki](http://aplwiki.com  {target="_blank"})'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Link to the <a href="http://aplwiki.com" class="external_link" target="_blank">APL wiki</a></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ md←⊂'Send me an [email](kai@aplteam.com)'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>Send me an <a href="mailto:kai@aplteam.com" class="mailto_link">email</a></p>'
+ →T.PassesIf expected≡⊃ns.html
+
+ R←T._OK

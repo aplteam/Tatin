@@ -1,0 +1,17 @@
+ R←Test_CodeBlock_024(stopFlag batchFlag);⎕TRAP;ns;parms;md;expected
+⍝ Non-closed code block should swallow the rest of the document.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂'~~~'
+ md,←⊂'Another para'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A para</p>' '<pre tabindex="0"><code>Another para</code></pre>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

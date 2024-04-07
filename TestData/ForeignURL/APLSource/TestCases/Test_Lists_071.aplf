@@ -1,0 +1,42 @@
+ R←Test_Lists_071(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;expected;html
+⍝ List that contains an image
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First list item'
+ md,←⊂''
+ md,←⊂'  ![Dots](Files\Logo.png "This is a logo"{width="70" height="70"})'
+ md,←⊂''
+ md,←⊂'  Paragraph -a- after an image'
+ md,←⊂''
+ md,←⊂'* Second list item'
+ md,←⊂''
+ md,←⊂'  * Second list item'
+ md,←⊂''
+ md,←⊂'    ![Dots](Files\Logo.png "This is a logo"{width="70" height="70"})'
+ md,←⊂''
+ md,←⊂'    This: ![Dots](Files\Logo.png "This is a logo"{width="70" height="70"}) is a logo{style="color:red;"}'
+ md,←⊂''
+ md,←⊂'    Paragraph -b- after an image'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<ul>'
+ expected,←⊂'<li>First list item'
+ expected,←⊂'<p><img src="Files/Logo.png" width="70" height="70" alt="Dots" title="This is a logo"></p>'
+ expected,←⊂'<p>Paragraph -a- after an image</p></li>'
+ expected,←⊂'<li>Second list item'
+ expected,←⊂'<ul>'
+ expected,←⊂'<li>Second list item'
+ expected,←⊂'<p><img src="Files/Logo.png" width="70" height="70" alt="Dots" title="This is a logo"></p>'
+ expected,←⊂'<p style="color:red;">This: <img src="Files/Logo.png" width="70" height="70" alt="Dots" title="This is a logo"> is a logo</p>'
+ expected,←⊂'<p>Paragraph -b- after an image</p></li>'
+ expected,←⊂'</ul></li>'
+ expected,←⊂'</ul>'
+ →T.FailsIf expected≢ns.html
+
+ R←T._OK

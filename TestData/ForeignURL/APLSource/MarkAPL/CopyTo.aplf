@@ -1,0 +1,14 @@
+ to←from CopyTo to;id;value;flag
+⍝ ⍺ is typically something like embedded parms while ⍵ are THE parms
+ :For id :In ' '~¨⍨↓from.⎕NL 2
+     :If flag←0=to.⎕NC id
+         value←from.⍎id
+     :Else
+         :If flag←¯1≢value←to.⍎id
+             flag←~0=≢value
+         :EndIf
+     :EndIf
+     :If flag
+         id to.{⍎⍺,'←⍵'}value
+     :EndIf
+ :EndFor

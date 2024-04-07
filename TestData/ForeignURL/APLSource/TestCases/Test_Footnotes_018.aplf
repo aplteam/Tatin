@@ -1,0 +1,22 @@
+ R←Test_Footnotes_018(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff;expected
+⍝ A footnote with a mail address (mailto:)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'# Loading Tatin  packages'
+ md,←⊂'He will answer [^footnote1] emails.'
+ md,←⊂'He _might_ answer [^footnote2] emails.'
+ md,←⊂'### Level 3'
+ md,←⊂''
+ md,←⊂'[^footnote1]:John Doe''s email address:<br><mailto:john.doe@email.com>'
+ md,←⊂'[^footnote2]:Max Doe''s email address:<br><max.doe@email.com>'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<li id="fnref1"><p>John Doe''s email address:<br><a href="mailto:john.doe@email.com" class="mailto_link">john.doe@email.com</a></p><a href="#fnref1" class="footnote_anchor"></a>'
+ expected,←⊂'<li id="fnref2"><p>Max Doe''s email address:<br><a href="mailto:max.doe@email.com" class="mailto_link">max.doe@email.com</a></p><a href="#fnref2" class="footnote_anchor"></a>'
+ →T.PassesIf∨/expected∊ns.html[16 17]
+
+ R←T._OK

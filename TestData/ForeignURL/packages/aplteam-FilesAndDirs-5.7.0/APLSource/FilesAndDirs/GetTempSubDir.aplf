@@ -1,0 +1,25 @@
+ dirname←GetTempSubDir prefixString;path;no;flag;success;i
+⍝ Returns name of previously unused sub directory in the `TEMP` directory with a random name.\\
+⍝ The directory will be created.
+⍝ `prefixString`, when empty, defaults to `⎕AN`. The name of the directory will
+⍝ match `prefixString` followed by an `_` and a randomly generated number.\\
+ 'The right argument must not carry a * or a \'⎕SIGNAL 11/⍨∨/prefixString∊'\*'
+ :If 0=≢prefixString
+     prefixString←⎕AN
+ :EndIf
+ path←GetTempPath
+ no←⍎ProduceRandomName
+ i←0
+ success←flag←0
+ :Repeat
+     dirname←path,(({⍵↓⍨-(¯1↑⍵)∊'/\'}prefixString),'_',(⍕no),'_',(⍕i))
+     :Trap 22
+         2 ⎕MKDIR dirname~'"'
+         flag←success←1
+     :Else
+         ⎕DL 0.01+0.01×0=5|5
+     :EndTrap
+ :Until flag∨30<i←i+1
+ dirname←NormalizePath dirname
+ ('Unable to create "',dirname,'"')⎕SIGNAL 22/⍨~success
+⍝Done

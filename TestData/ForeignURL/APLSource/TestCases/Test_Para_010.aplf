@@ -1,0 +1,15 @@
+ R←Test_Para_010(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Test a paragraph code that contained _. (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'`+/vars_name` should be a paragraph'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p><code>+/vars_name</code> should be a paragraph</p>'
+ →T.PassesIf expected≡∊ns.html
+
+ R←T._OK

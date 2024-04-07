@@ -1,0 +1,17 @@
+ R←Test_Data_003(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test an ill-formed data definition: should still result in a key=value pair
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[data]:author=''Kai Jaeger''; Date=''2016-02-19'''
+ md,←⊂''
+ md,←⊂'This is a para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf 1≠≢ns.data
+ →T.FailsIf'author' 'Kai Jaeger''; Date=''2016-02-19'≢1⊃ns.data
+
+ R←T._OK

@@ -1,0 +1,10 @@
+ bool←Exists y
+⍝ Same as `⎕NEXISTS` but `y` is normalized.\\
+⍝ Note that if `y` is a symbolic link that exists then a 1 will be returned, no matter
+⍝ whether the target the link is pointing to actually does exist or not.
+ y←NormalizePath y
+ :If 1<|≡y
+     bool←⎕NEXISTS¨y
+ :Else
+     bool←⎕NEXISTS y
+ :EndIf

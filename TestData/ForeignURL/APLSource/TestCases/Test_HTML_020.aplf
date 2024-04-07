@@ -1,0 +1,13 @@
+ R←Test_HTML_020(stopFlag batchFlag);⎕TRAP;md;ns;l;this;expected
+⍝ Test an HTML block that is just an image.
+⍝ Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'This is a para.' '' '<img src="http://aplteam.com/wp-content/uploads/2015/02/KaiJaegerHeadMedium75perc.png" title="logo">' '' 'Another para'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←'<p>This is a para.</p>' '<img src="http://aplteam.com/wp-content/uploads/2015/02/KaiJaegerHeadMedium75perc.png" title="logo">' '<p>Another para</p>'
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

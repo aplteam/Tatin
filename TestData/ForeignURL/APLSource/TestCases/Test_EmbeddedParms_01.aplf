@@ -1,0 +1,24 @@
+ R←Test_EmbeddedParms_01(stopFlag batchFlag);⎕TRAP;md;parms;html;b
+⍝ Set the `ignoreEmbeddedParms` property.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.title←'Foo'
+ parms.createFullHtmlPage←1
+
+ md←'[parm]:title=''123''' '# External links' '' '<http://aplwiki.com>'
+
+ html←⊃parms MarkAPL.Markdown2HTML md
+
+ →T.PassesIf(⊂'<title>123</title>')∊html
+
+ parms←MarkAPL.CreateParms
+ parms.title←'Foo'
+ parms.createFullHtmlPage←1
+ parms.ignoreEmbeddedParms←1
+
+ html←⊃parms MarkAPL.Markdown2HTML md
+ →T.PassesIf(⊂'<title>Foo</title>')∊html
+
+ R←T._OK

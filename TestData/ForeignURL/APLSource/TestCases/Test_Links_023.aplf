@@ -1,0 +1,15 @@
+ R←Test_Links_023(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Test  a self-link that contains `_`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'<http://foo.com/_/test.html>'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p><a href="http://foo.com/_/test.html" class="external_link">http://foo.com/_/test.html</a></p>'
+ →T.PassesIf expected≡∊ns.html
+
+ R←T._OK

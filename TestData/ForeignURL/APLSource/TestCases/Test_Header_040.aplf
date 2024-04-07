@@ -1,0 +1,15 @@
+ R←Test_Header_040(stopFlag batchFlag);⎕TRAP;m;ns;parms;buff;expected
+⍝ Test headers with hashes betwene the opening and closing hashes.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←##.MarkAPL.CreateParms
+ parms.lowercaseID←0
+ m←,⊂'### Should be ## rather than ### ###'
+ ns←MarkAPL.Init parms m
+ ns←MarkAPL.Process ns
+
+ expected←'<h3 data-id="Should-be--rather-than">Should be ## rather than ###</h3>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

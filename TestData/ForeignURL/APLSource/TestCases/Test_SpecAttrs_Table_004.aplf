@@ -1,0 +1,17 @@
+ R←Test_SpecAttrs_Table_004(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Table: invalid special attributes (will be ignored).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'|Col A|Col B|  }'
+ md,←⊂'|===|===|'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|'
+ md,←⊂'|Row 1/Col A|Row 1/Col B|'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ →T.PassesIf'<table>'≡⊃ns.html
+
+ R←T._OK

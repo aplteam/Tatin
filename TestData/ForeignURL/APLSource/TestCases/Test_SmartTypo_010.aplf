@@ -1,0 +1,14 @@
+ R←Test_SmartTypo_010(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test typographical double quotes with `lang="de`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'APL is a "modern language".'
+ parms←MarkAPL.CreateParms
+ parms.lang←'de'
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(,⊂'<p>APL is a „modern language“.</p>')≡ns.html
+
+ R←T._OK

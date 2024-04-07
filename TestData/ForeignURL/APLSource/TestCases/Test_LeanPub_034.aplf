@@ -1,0 +1,24 @@
+ R←Test_LeanPub_034(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected;html
+⍝ Test the leanpub extension "highlight lines of code" is ignored outside of any code blocks.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂''
+ md,←⊂'leanpub-start-insert'
+ md,←⊂'{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}'
+ md,←⊂'leanpub-end-insert'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A para</p>' '<p>leanpub-start-insert {{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵} leanpub-end-insert</p>' '<p>Another para</p>'
+ →T.PassesIf∧/expected∊ns.html
+
+ R←T._OK

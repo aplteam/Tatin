@@ -1,0 +1,53 @@
+ R←Test_SmartTypo_001(stopFlag batchFlag);⎕TRAP;ns;html;md;two;parms
+⍝ Test how a single double quote is dealt with.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Header "one'
+ md,←⊂'===='
+ md,←⊂''
+ md,←⊂'## Header "two'
+ md,←⊂''
+ md,←⊂'1. First is odd"'
+ md,←⊂'1. Second'
+ md,←⊂''
+ md,←⊂'* This is "odd'
+ md,←⊂'* That'
+ md,←⊂''
+ md,←⊂'> This "is a blockquote'
+ md,←⊂''
+ md,←⊂'An ordinary para".'
+ md,←⊂''
+ md,←⊂'This para "stretches over two lines,'
+ md,←⊂'but in total the number of " is even, not odd!'
+ md,←⊂''
+ md,←⊂'|Col 1"|Col 2|'
+ md,←⊂'|-|-|'
+ md,←⊂'|"First|Second|'
+ md,←⊂''
+ md,←⊂'|"A1|B1|'
+ md,←⊂'|"A2|B2|'
+ md,←⊂''
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ html←1↓⊃,/(⎕UCS 13),¨ns.html
+ →T.PassesIf 1=+/'Header "one'⍷html
+ →T.PassesIf 1=+/'Header "two'⍷html
+ →T.PassesIf 1=+/'First is odd"'⍷html
+ →T.PassesIf 1=+/'This is "odd'⍷html
+ →T.PassesIf 1=+/'This "is a blockquote'⍷html
+ →T.PassesIf 1=+/'An ordinary para".'⍷html
+ →T.PassesIf 1=+/'“'⍷html
+ →T.PassesIf 1=+/'”'⍷html
+ →T.PassesIf 1=+/'Col 1"'⍷html
+ →T.PassesIf 1=+/'"First'⍷html
+ →T.PassesIf 1=+/'"A1'⍷html
+ →T.PassesIf 1=+/'"A2'⍷html
+ →T.PassesIf 10=⊃⍴ns.report
+
+ R←T._OK

@@ -1,0 +1,11 @@
+ IdentifyList__←{
+     (ns max type)←⍵
+     nl←0,¯1↓'\'=⊃¨¯1↑¨max↑ns.markdown                                 ⍝ nl flags all lines that...
+     nl∨←0,¯1↓(~max↑ns.emptyLines)∧'  '∘≡¨¯2↑¨max↑ns.markdown          ⍝ ... belong to the predecessor...
+     nl∨←0,¯1↓'<<br>>'{⍺∘≡¨(-≢⍺)↑¨⍵}max↑ns.markdown                    ⍝ ... due to line breaks.
+     markers←(1+'*'=type)⊃'0123456789 ' '+-* '                         ⍝ "markers" depends on list type.
+     max←+/∧\nl∨(⊃¨max↑ns.leadingChars)∊markers                        ⍝
+     '*'≡type:+/∧\{(' '=⍵)∨~⊃∘IsOrderedHtmlList¨⍵}⊃¨max↑ns.markdown    ⍝ No mistake: we check for the ...
+     '1'≡type:+/∧\{(' '=⍵)∨~⊃∘IsBulletedHtmlList¨⍵}⊃¨max↑ns.leadingChars  ⍝ OTHER list type here!
+     .                                                                 ⍝ Huuh?!
+ }

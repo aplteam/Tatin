@@ -1,0 +1,23 @@
+ R←Test_Footnotes_013(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff;expected
+⍝ Footnote that is not referenced should show but a warning should be generated (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'Let''s check whether it worked [^apl1] na d[^apl2]:'
+ md,←⊂''
+ md,←⊂'[^dotnetcore]: More information on .NET Core is available at <br>'
+ md,←⊂'<https://en.wikipedia.org/wiki/.NET_Core>'
+ md,←⊂''
+ md,←⊂'[^apl1]: APL is great!'
+ md,←⊂'[^apl2]: APL is really great!'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<li id="fnref1">' '<li id="fnref2">'
+ →T.PassesIf 2=+/⊃∨/expected⍷¨⊂∊ns.html
+ →T.PassesIf'Warning: footnote "dotnetcore" not referenced anywhere'≡∊ns.report
+
+ R←T._OK

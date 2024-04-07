@@ -1,0 +1,23 @@
+ R←Test_Footnotes_002(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Footnotes IDs must not have whitespace within the square brackets.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'A para'
+ md,←'' ''
+ md,←⊂'[ ^1 ]: The APL wiki...'
+ md,←⊂'is great'
+ md,←' ' '  The ' ' wiki ' ' contains...'
+ md,←⊂'  '
+ md,←⊂'  `(+/⍵)÷⍴,⍵`'
+ md,←⊂'  '
+ md,←⊂'  Still footnote def!'
+ md,←⊂''
+ md,←'' 'The last para'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0∊⍴ns.footnoteDefs
+
+ R←T._OK

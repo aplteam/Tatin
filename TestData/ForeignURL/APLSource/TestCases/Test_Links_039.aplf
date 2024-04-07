@@ -1,0 +1,14 @@
+ R←Test_Links_039(stopFlag batchFlag);⎕TRAP;ns;html;md;expecting
+⍝ Test a "mailto" link. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'Contact us via [email](mailto:kai@aplteam.com).'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expecting←,⊂'<p>Contact us via <a href="mailto:kai@aplteam.com" class="mailto_link">email</a>.</p>'
+ →T.PassesIf expecting≡ns.html
+
+ R←T._OK

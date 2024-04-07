@@ -1,0 +1,19 @@
+ R←Test_FnsCall_016(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test function call that returns some typographical sugar.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{'em-dash: ---' 'en-dash: --'}
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>em-dash: —</p>' '<p>en-dash: –</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

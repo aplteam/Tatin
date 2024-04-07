@@ -1,0 +1,29 @@
+ R←Test_GetMaskForCode_002(stopFlag batchFlag);⎕TRAP;mask;expected
+⍝ Simple standard cases with embedded inline code.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ #.TEMP.m←'This is `{+/⍳≢⍵}` APL code'
+ mask←MarkAPL.Execute'GetMaskForCode #.TEMP.m'
+ expected←0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0
+ →T.PassesIf mask≡expected
+
+ #.TEMP.m←'This is `{+/⍳≢⍵}` APL code `{⍵}`'
+ mask←MarkAPL.Execute'GetMaskForCode #.TEMP.m'
+ expected←0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1
+ →T.PassesIf mask≡expected
+
+ #.TEMP.m←'`{⍵}` This is `{+/⍳≢⍵}` APL code'
+ mask←MarkAPL.Execute'GetMaskForCode #.TEMP.m'
+ expected←1 1 1 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0
+ →T.PassesIf mask≡expected
+
+ #.TEMP.m←'`{⍵}` This is `{+/⍳≢⍵}` APL code `{⍵}`'
+ mask←MarkAPL.Execute'GetMaskForCode #.TEMP.m'
+ expected←1 1 1 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1
+ →T.PassesIf mask≡expected
+
+ R←T._OK

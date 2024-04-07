@@ -1,0 +1,23 @@
+ R←Test_Links_038(stopFlag batchFlag);⎕TRAP;ns;html;md;expecting
+⍝ Test a bookmark link with `[]` as part of the text in front of the text. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# Data'
+ md,←⊂''
+ md,←⊂'Defining data: any line that starts with [data]: defines a key-value pair of data. See [Data](#) for details.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expecting←''
+ expecting,←⊂'<div class="h_tag">'
+ expecting,←⊂'<a href="#data" id="data" class="autoheader_anchor">'
+ expecting,←⊂'<h1 data-id="Data">Data</h1>'
+ expecting,←⊂'</a>'
+ expecting,←⊂'</div>'
+ expecting,←⊂'<p>Defining data: any line that starts with [data]: defines a key-value pair of data. See <a href="#data" class="bookmark_link">Data</a> for details.</p>'
+ →T.PassesIf expecting≡ns.html
+
+ R←T._OK

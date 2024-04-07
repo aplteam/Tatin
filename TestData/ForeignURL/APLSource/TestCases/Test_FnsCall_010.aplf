@@ -1,0 +1,21 @@
+ R←Test_FnsCall_010(stopFlag batchFlag);⎕TRAP;md;ns;html
+⍝ Test function call that returns an HTML block with several lines
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{'' '<p>**bold** --- </p>' '<p>*italic* --- </p>' ''}
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf 2=+/'**'⍷html
+ →T.PassesIf 2=+/'---'⍷html
+ →T.PassesIf 1=+/'*italic*'⍷html
+
+ R←T._OK

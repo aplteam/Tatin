@@ -1,0 +1,24 @@
+ R←Test_FnsCall_005(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test function call with an argument in a cell header
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{
+     ns←⍵
+     'Col 2'
+ }
+
+ md←''
+ md,←⊂'Col 1 |⍎⍎#.TEMP.MyFns⍎⍎'
+ md,←⊂'-|-'
+ md,←⊂' 1/a|1/B'
+ md,←⊂' 2/a|2/B'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'>Col 2<'⍷∊ns.html
+
+ R←T._OK

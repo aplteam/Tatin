@@ -1,0 +1,32 @@
+ R←Test_Lists_052(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test a nested list. Last two but one must be bulleted (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First line'
+ md,←⊂'* Second line'
+ md,←⊂'  * Yellow'
+ md,←⊂'    This is **not** a paragraph.'
+ md,←⊂''
+ md,←⊂'    This **is** a paragraph.'
+ md,←⊂''
+ md,←⊂'    ~~~'
+ md,←⊂'      {+/⍳⍴⍵}'
+ md,←⊂'    ~~~'
+ md,←⊂''
+ md,←⊂'    This is a paragraph that belongs to the "Yellow line".'
+ md,←⊂''
+ md,←⊂'  * Brown '
+ md,←⊂'  * Magenta'
+ md,←⊂'* Third line '
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 6=+/'<li>'⍷∊ns.html
+ →T.PassesIf 6=+/'</li>'⍷∊ns.html
+ →T.PassesIf 2=+/'<ul>'⍷∊ns.html
+ →T.PassesIf 2=+/'</ul>'⍷∊ns.html
+
+ R←T._OK

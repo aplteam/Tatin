@@ -1,0 +1,19 @@
+ R←Test_Images_05(stopFlag batchFlag);⎕TRAP;ns;md;fn;expected
+⍝ Test two images in a single para.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ fn←FilesAndDirs.EnforceSlash'file://',FilesAndDirs.PWD,'\images\KaiJaegerHeadVerySmall.png'
+
+ md←''
+ md,←⊂'Para with a pictures ![picture3](',fn,' "Kai Jaeger") in it.'
+ md,←⊂'Second picture in same para: ![picture4](',fn,' "Another one") in it.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>Para with a pictures <img src="',fn,'" alt="picture3" title="Kai Jaeger"> in it.'
+ expected,←' Second picture in same para: <img src="',fn,'" alt="picture4" title="Another one"> in it.</p>'
+ →T.PassesIf expected≡∊ns.html
+
+ R←T._OK

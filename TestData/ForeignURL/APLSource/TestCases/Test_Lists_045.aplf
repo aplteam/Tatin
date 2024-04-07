@@ -1,0 +1,22 @@
+ R←Test_Lists_045(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;expected
+⍝ Test a list item that contains a code block with a special attribute
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This is a para.'
+ md,←⊂'* This'
+ md,←⊂'* That'
+ md,←⊂''
+ md,←⊂'  ~~~{#MyID}'
+ md,←⊂'  {+⌿⍺,⍵}'
+ md,←⊂'  ~~~'
+ md,←⊂'* More '
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a para.</p>' '<ul>' '<li>This</li>' '<li>That' '<pre tabindex="0"><code id="myid">{+⌿⍺,⍵}</code></pre></li>' '<li>More</li>' '</ul>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

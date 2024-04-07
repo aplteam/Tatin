@@ -1,0 +1,18 @@
+ R←Test_InLine_030(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Use double-backticks for marking up inline code in order to allow backticks within it.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'``There is a literal backtick (`) here`` and this carries just three spaces: ``   ``'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←,⊂'<p><code>There is a literal backtick (`) here</code> and this carries just three spaces: <code>   </code></p>'
+ →T.PassesIf expected≡ns.html
+
+ md←⊂'A single backtick : `` ` `` and a backtick-delimited string in a code span : `` `foo` ``'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←,⊂'<p>A single backtick : <code>`</code> and a backtick-delimited string in a code span : <code>`foo`</code></p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

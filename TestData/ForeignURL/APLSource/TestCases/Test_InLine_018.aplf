@@ -1,0 +1,16 @@
+ R←Test_InLine_018(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Is ".~~" correctly recognized? This was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'~~An ordinary para.~~'
+ md,←⊂'... (tm) (c) --- -- ""'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p><del>An ordinary para.</del> &hellip; ™ © &mdash; &ndash; &ldquo;&rdquo;</p>'
+ →T.PassesIf≡expected∊ns.html
+
+ R←T._OK

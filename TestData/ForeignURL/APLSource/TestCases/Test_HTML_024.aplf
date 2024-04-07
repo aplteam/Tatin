@@ -1,0 +1,17 @@
+ R←Test_HTML_024(stopFlag batchFlag);⎕TRAP;md;ns;l;this;expected
+⍝ Test an HTML block that is located at the bottom of the document.
+⍝ Was once a bug because two empty lines were ALWAYS requested.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←'A paragraph.' '' '<div id="foo">' 'Another paragraph.' '</div>'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ expected←⊂'<p>A paragraph.</p>'
+ expected,←'<div id="foo">' 'Another paragraph.' '</div>'
+
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

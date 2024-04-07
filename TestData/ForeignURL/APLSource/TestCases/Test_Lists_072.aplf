@@ -1,0 +1,48 @@
+ R←Test_Lists_072(stopFlag batchFlag);⎕TRAP;md;ns;parms;noOfListItems;expected;html
+⍝ List that contains a quote
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First list item'
+ md,←⊂''
+ md,←⊂'  > One-line quote'
+ md,←⊂''
+ md,←⊂'* Second list item'
+ md,←⊂''
+ md,←⊂'  > Multi...'
+ md,←⊂'  >'
+ md,←⊂'  > ...line...'
+ md,←⊂'  >'
+ md,←⊂'  > ...quote'
+ md,←⊂''
+ md,←⊂'* Third list item'
+ md,←⊂''
+ md,←⊂'  > Quote'
+ md,←⊂'  > that'
+ md,←⊂'  stretches over'
+ md,←⊂'  several lines in the code but results in a single line in the output.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<ul>'
+ expected,←⊂'<li>First list item'
+ expected,←⊂'<blockquote>'
+ expected,←⊂'<p>One-line quote</p>'
+ expected,←⊂'</blockquote></li>'
+ expected,←⊂'<li>Second list item'
+ expected,←⊂'<blockquote>'
+ expected,←⊂'<p>Multi…</p>'
+ expected,←⊂'<p>…line…</p>'
+ expected,←⊂'<p>…quote</p>'
+ expected,←⊂'</blockquote></li>'
+ expected,←⊂'<li>Third list item'
+ expected,←⊂'<blockquote>'
+ expected,←⊂'<p>Quote that stretches over several lines in the code but results in a single line in the output.</p>'
+ expected,←⊂'</blockquote></li>'
+ expected,←⊂'</ul>'
+ →T.FailsIf expected≢ns.html
+
+ R←T._OK

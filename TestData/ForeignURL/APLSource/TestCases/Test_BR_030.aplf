@@ -1,0 +1,15 @@
+ R←Test_BR_030(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff;expected
+⍝ Test <br> within inline code
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A `<br>` tag can be inserted into paragraphs, lists and table cells with `<br>`.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A <code>&lt;br&gt;</code> tag can be inserted into paragraphs, lists and table cells with <code>&lt;br&gt;</code>.</p>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

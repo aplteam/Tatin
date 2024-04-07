@@ -1,0 +1,31 @@
+ R←Test_Footnotes_004(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Test footnote data structure
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'[^1]: First footnote.' ''
+ md,←⊂'A lenghty para with all sorts of text which here [^aplwiki] refers to the first footnote'
+ md,←⊂'and here [^1] the second one'
+ md,←'' ''
+ md,←⊂'[^aplwiki]: The APL wiki...'
+ md,←⊂'is great'
+ md,←⊂' '
+ md,←⊂'  The '
+ md,←⊂'  wiki '
+ md,←⊂'  contains...'
+ md,←⊂'  '
+ md,←⊂'  Still footnote'
+ md,←⊂'  def'
+ md,←⊂''
+ md,←'' 'The last para'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 2 2≡⍴ns.footnoteDefs
+ →T.PassesIf'First footnote.'≡1⊃⊃ns.footnoteDefs[1;2]
+ buff←⊃ns.footnoteDefs[2;2]
+ →T.PassesIf'The APL wiki… is great'≡1⊃buff
+ →T.PassesIf'The wiki contains…'≡2⊃⊃ns.footnoteDefs[2;2]
+
+ R←T._OK

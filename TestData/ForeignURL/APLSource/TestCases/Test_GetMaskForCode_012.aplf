@@ -1,0 +1,14 @@
+ R←Test_GetMaskForCode_012(stopFlag batchFlag);⎕TRAP;mask;expected
+⍝ Group of three backticks followed by a group of two backticks: no code block at all.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+
+ #.TEMP.m←'Some ``` text ``'
+ mask←MarkAPL.Execute'GetMaskForCode #.TEMP.m'
+ expected←(≢#.TEMP.m)⍴0
+ →T.PassesIf mask≡expected
+
+ R←T._OK

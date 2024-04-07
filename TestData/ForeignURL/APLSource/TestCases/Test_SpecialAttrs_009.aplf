@@ -1,0 +1,24 @@
+ R←Test_SpecialAttrs_009(stopFlag batchFlag);⎕TRAP;m;ns;html
+⍝ Code block: several assignments.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ m←'~~~ {id="foo" class="myclass" style="color:red;"}' '<code>' '      {`{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵``}' '' '~~~'
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf∨/'<code id="foo" class="myclass" style="color:red;">'∊html
+ →T.PassesIf∨/'&lt;code&gt;'⍷html
+ →T.PassesIf∨/'{`{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵``}'⍷html
+
+ m←'```{id="foo" class="myclass" style="color:red;"}' '<code>' '      {`{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵``}' '' '```'
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf∨/'<code id="foo" class="myclass" style="color:red;">'∊html
+ →T.PassesIf∨/'&lt;code&gt;'⍷html
+ →T.PassesIf∨/'{`{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵``}'⍷html
+
+ R←T._OK

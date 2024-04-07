@@ -1,0 +1,21 @@
+ R←Test_FnsCall_021(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test function call to a public class method (was a bug before 5.2.1)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.⎕FIX':Class Foo' '∇r←MyFns ns' ':Access Public Shared' 'r←''This comes from an "APL" function call''' '∇' ':EndClass'
+
+ md←''
+ md,←⊂'This is a para. This is a para. This is a para.'
+ md,←⊂''
+ md,←⊂'⍎⍎#.TEMP.Foo.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a para. This is a para. This is a para.</p>' '<p>This comes from an “APL” function call</p>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

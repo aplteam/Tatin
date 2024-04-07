@@ -1,0 +1,27 @@
+ R←Test_Lists_002(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test nested lists with four blanks indentation for defining a sublist.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* List I.'
+ md,←⊂(4⍴' '),'* List A'
+ md,←⊂(4⍴' '),'* List B'
+ md,←⊂(8⍴' '),'* List B1'
+ md,←⊂(12⍴' '),'1) List B11'
+ md,←⊂(16⍴' '),'1) List B111'
+ md,←⊂(20⍴' '),'1) List B1111'
+ md,←⊂(24⍴' '),'1) List B11111'
+ md,←⊂'* List II.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>List I.' '<ul>' '<li>List A</li>' '<li>List B' '<ul>' '<li>List B1'
+ expected,←'<ol start="1">' '<li>List B11' '<ol start="1">' '<li>List B111'
+ expected,←'<ol start="1">' '<li>List B1111' '<ol start="1">' '<li>List B11111</li>'
+ expected,←'</ol></li>' '</ol></li>' '</ol></li>' '</ol></li>' '</ul></li>' '</ul></li>'
+ expected,←'<li>List II.</li>' '</ul>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

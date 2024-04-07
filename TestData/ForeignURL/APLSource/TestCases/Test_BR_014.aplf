@@ -1,0 +1,43 @@
+ R←Test_BR_014(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Test replacing a "\" characters at the end of list items and paras belonging to lists.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'+ First\'
+ md,←⊂'ordered list item'
+ md,←⊂''
+ md,←⊂'  para belonging to'
+ md,←⊂'first item\'
+ md,←⊂'with a `<br/>`'
+ md,←⊂'+ Second list item'
+ md,←⊂''
+ md,←⊂'+ Third one'
+ md,←⊂''
+ md,←⊂''                                ⍝ Two empty lines! That breaks the list
+ md,←⊂'+ Restart'
+ md,←⊂'; belongs to "Restart"\'
+ md,←⊂'with a line break in between'
+ md,←⊂''
+ md,←⊂'* Any list item\'                ⍝ Change of list marker - breaks the list
+ md,←⊂'with a `<br/>` tag in it'
+ md,←⊂'* Another one'
+ md,←⊂''
+ md,←⊂'1. First\'
+ md,←⊂'ordered list item\'
+ md,←⊂'and more'
+ md,←⊂''
+ md,←⊂'+ This'
+ md,←⊂'+ That'
+ md,←⊂'+ More'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 4=+/'<ul>'⍷∊ns.html
+ →T.PassesIf 1=+/'<ol'⍷∊ns.html
+ →T.PassesIf 6=+/'<br>'⍷∊ns.html
+ →T.PassesIf 10=+/'<li>'⍷∊ns.html
+
+ R←T._OK

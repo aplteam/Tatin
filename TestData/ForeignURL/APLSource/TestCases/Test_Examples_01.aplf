@@ -1,0 +1,14 @@
+ R←Test_Examples_01(stopFlag batchFlag);⎕TRAP;ns;md;html
+⍝ Test APL array as (Markdown) input and APL array as (HTML) output with a single function call.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'This is a paragraph that' 'stretches over 2 lines.' '' 'Single-line paragraph.'
+
+ (html ns)←MarkAPL.Markdown2HTML md
+
+ →T.FailsIf 2≠≢html
+ →T.FailsIf(1⊃html)≢'<p>',(1↓⊃,/' ',¨2↑md),'</p>'
+ →T.FailsIf(2⊃html)≢'<p>',(4⊃md),'</p>'
+
+ R←T._OK

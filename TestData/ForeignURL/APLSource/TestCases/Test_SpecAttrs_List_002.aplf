@@ -1,0 +1,34 @@
+ R←Test_SpecAttrs_List_002(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Lists (nested): assign several attributes
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'3. First {style="color:red;" #foo .goo}'
+ md,←⊂'1. Second'
+ md,←⊂'   * This {.goo}'
+ md,←⊂'   * That'
+ md,←⊂'   + More {.poo}'
+ md,←⊂'   + More 2'
+ md,←⊂'     1. One {#qwe}'
+ md,←⊂'     1. Two'
+ md,←⊂'1. Third'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'<ol start="3" class="goo" id="foo" style="color:red;">'≡1⊃ns.html
+ →T.PassesIf'<ul class="goo">'≡4⊃ns.html
+ →T.PassesIf'<ul class="poo">'≡8⊃ns.html
+ →T.PassesIf(⊂'<li>More 2')∊ns.html
+ →T.PassesIf(⊂'<li>One</li>')∊ns.html
+ →T.PassesIf(⊂'<li>Two</li>')∊ns.html
+ →T.PassesIf 9=+/'<li>'⍷∊ns.html
+ →T.PassesIf 9=+/'</li>'⍷∊ns.html
+ expected←'ol' 'li' '/li' 'li' 'ul' 'li' '/li' 'li' '/li' '/ul' 'ul' 'li' '/li' 'li' 'ol' 'li' '/li' 'li' '/li' '/ul' '/li' '/li' 'li' '/li' '/ol'
+ →T.PassesIf expected≢{⍵↑⍨⌊/⍵⍳' >'}¨1↓'<'APLTreeUtils2.Split∊ns.html
+
+ R←T._OK

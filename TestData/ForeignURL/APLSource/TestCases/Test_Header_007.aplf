@@ -1,0 +1,23 @@
+ R←Test_Header_007(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Test report of ambiguous automated links when used
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# Main'
+ md,←⊂''
+ md,←⊂'See [Overview](#) for details.'
+ md,←⊂''
+ md,←⊂'## Level 2A'
+ md,←⊂'### Overview'
+ md,←⊂'## Level 2B'
+ md,←⊂'### Overview'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'Warning: header'⍷∊ns.report
+
+ R←T._OK

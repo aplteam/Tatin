@@ -1,0 +1,21 @@
+ R←Test_Links_021(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Test  a reference link with `target="_blank"`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Link to the [APL wiki][aplwiki].'
+ md,←⊂''
+ md,←⊂'The APLTree project is [hosted on the APL wiki][aplwiki].'
+ md,←⊂''
+ md,←⊂'[aplwiki]:http://aplwiki.com "Link to the APL wiki"{target="_blank"}'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>Link to the <a href="http://aplwiki.com" class="external_link" title="Link to the APL wiki" target="_blank">APL wiki</a>.</p>'
+ →T.PassesIf expected≡1⊃ns.html
+ expected←'<p>The APLTree project is <a href="http://aplwiki.com" class="external_link" title="Link to the APL wiki" target="_blank">hosted on the APL wiki</a>.</p>'
+ →T.PassesIf expected≡2⊃ns.html
+
+ R←T._OK

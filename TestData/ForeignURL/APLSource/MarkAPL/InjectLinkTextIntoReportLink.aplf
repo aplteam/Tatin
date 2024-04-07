@@ -1,0 +1,13 @@
+ html←InjectLinkTextIntoReportLink(html linkTexts);i;pattern;replaceBy;b1;b2;b3
+ :For i :In ⍳≢linkTexts
+     pattern←'\{\{\{\{\{',(⍕i),'}}}}}'
+     replaceBy←i⊃linkTexts
+     b1←replaceBy='\'
+     b2←replaceBy='%'
+     b3←replaceBy='&'
+     (b1/replaceBy)←⊂'\\'
+     (b2/replaceBy)←⊂'\&'
+     (b3/replaceBy)←⊂'\&'
+     replaceBy←⊃,/replaceBy
+     html←pattern ⎕R replaceBy⍠('Greedy' 0)⊣html
+ :EndFor

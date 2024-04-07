@@ -1,0 +1,26 @@
+ R←Test_LeanPub_033(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test the leanpub extension "highlight lines of code" with an escape character in front of `leanpub-*-insert`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A para'
+ md,←⊂'~~~'
+ md,←⊂'(+⌿⍵)÷⍴,⍵'
+ md,←⊂'\leanpub-start-insert'
+ md,←⊂'{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}'
+ md,←⊂'\leanpub-end-insert'
+ md,←⊂'(+⌿⍵)÷⍴,⍵'
+ md,←⊂'~~~'
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>A para</p>' '<pre tabindex="0"><code>(+⌿⍵)÷⍴,⍵' 'leanpub-start-insert' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' 'leanpub-end-insert' '(+⌿⍵)÷⍴,⍵</code></pre>' '<p>Another para</p>'
+ →T.PassesIf∧/expected∊ns.html
+
+ R←T._OK

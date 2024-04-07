@@ -1,0 +1,16 @@
+ R←Test_DefinitionList_002(stopFlag batchFlag);⎕TRAP;ns;parms;md
+⍝ Test a definition list that is no definition list (missing blank after the ":")
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Term'
+ md,←⊂''
+ md,←⊂':Definition'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf'<p>Term</p>' '<p>:Definition</p>'≢ns.html
+
+ R←T._OK

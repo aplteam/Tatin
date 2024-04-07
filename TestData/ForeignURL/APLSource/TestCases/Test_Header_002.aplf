@@ -1,0 +1,23 @@
+ R←Test_Header_002(stopFlag batchFlag);⎕TRAP;m;ns;expected
+⍝ Test headers with "=" and "-" syntax (ATX and SeText headers)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ m←,¨'Level 1' '=' 'Level 2' '-'
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.FailsIf 2≠≢{⊃⊃(//)⎕VFI 1↑2↓⍵}¨ns.html∘{⊃⍵ ⎕S{⍵.Match}⊣⍺}¨'12'{'<h',⍺,'[^>]*>',⍵,'</h',⍺,'>'}¨m[1 3]
+
+ m←'em `<em>` <em>' '==' 'strong `<strong>` <strong>' '--' 'This is a para.' 'del `<del>` <del>' '--' 'Another para.'
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+ →T.PassesIf(⊂'<h1 data-id="em">em <code>&lt;em&gt;</code> <em></h1>')∊ns.html
+
+ m←,¨'Level 1' '=' 'Level 2' '-' 'Any paragraph.' '' 'Level 1' 'header that' 'spans several lines' '='
+ ns←MarkAPL.Init''m
+ ns←MarkAPL.Process ns
+
+ expected←'<h1 data-id="Level-1-header-that-spans-several-lines">Level 1 header that spans several lines</h1>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

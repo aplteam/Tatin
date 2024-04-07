@@ -1,0 +1,42 @@
+ R←Test_InLine_013(stopFlag batchFlag);⎕TRAP;ns;result;expected
+⍝ Test inline markup; here __ <==> <strong>
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.m←'This is a simple paragraph'
+ result←MarkAPL.Execute'ProcessDoubleUnderscores #.TEMP.m'
+ →T.FailsIf #.TEMP.m≢result
+
+ #.TEMP.m←'This is a simple __paragraph__!'
+ result←MarkAPL.Execute'ProcessDoubleUnderscores #.TEMP.m'
+ →T.FailsIf'This is a simple <strong>paragraph</strong>!'≢result
+
+ #.TEMP.m←'This is a simple __paragraph__.'
+ result←MarkAPL.Execute'ProcessDoubleUnderscores #.TEMP.m'
+ →T.FailsIf'This is a simple <strong>paragraph</strong>.'≢result
+
+ #.TEMP.m←'This is a simple paragraph that has APL in it: `(__a←2*5)÷0.5'
+ result←MarkAPL.Execute'ProcessDoubleUnderscores #.TEMP.m'
+ →T.FailsIf'This is a simple paragraph that has APL in it: `(__a←2*5)÷0.5'≢result
+
+ #.TEMP.m←'In__si__de'
+ result←MarkAPL.Execute'ProcessDoubleUnderscores #.TEMP.m'
+ →T.FailsIf'In__si__de'≢result
+
+ #.TEMP.m←'This is __ really __ a good example'
+ result←MarkAPL.Execute'ProcessDoubleUnderscores #.TEMP.m'
+ →T.FailsIf'This is __ really __ a good example'≢result
+
+ ns←MarkAPL.Init''(⊂'__\_Word\___')
+ ns←MarkAPL.Process ns
+ expected←'<p><strong>_Word_</strong></p>'
+ →T.PassesIf expected≡∊ns.html
+
+ ns←MarkAPL.Init''(⊂'`St__ro__ng` (St__ro__ng) and `St**ro**ng` (St**ro**ng).')
+ ns←MarkAPL.Process ns
+ expected←'<p><code>St__ro__ng</code> (St__ro__ng) and <code>St**ro**ng</code> (St<strong>ro</strong>ng).</p>'
+ →T.PassesIf expected≡∊ns.html
+
+ R←T._OK

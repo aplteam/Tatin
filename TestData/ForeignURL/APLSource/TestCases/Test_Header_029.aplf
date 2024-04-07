@@ -1,0 +1,15 @@
+ R←Test_Header_029(stopFlag batchFlag);⎕TRAP;m;ns;expected;buff;parms
+⍝ Test headers with "=" and "-" syntax (ATX and SeText headers) repeating the same headers
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ m←,¨'Level 1' '=' 'Level 2' '-' 'A paragrapha' 'Level 1' '=' 'Level 2' '-'
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms m
+ ns←MarkAPL.Process ns
+
+ buff←'href="(.*)"'⎕S{'"[^"]*"'⎕S{1↓¯1↓⍵.Match}⊣⍵.Match}⍠('Greedy' 0)⊣ns.html
+ →T.PassesIf(≢buff)=≢∪buff
+
+ R←T._OK

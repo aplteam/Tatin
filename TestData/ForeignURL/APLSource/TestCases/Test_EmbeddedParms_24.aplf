@@ -1,0 +1,19 @@
+ R←Test_EmbeddedParms_24(stopFlag batchFlag);⎕TRAP;md;b;ns;html;hits;filenames;path;parms
+⍝ When the same parameter is defined twice the second is supposed to win.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:cssURL      = ''ABC'''
+ md,←⊂'[parm]:cssURL      = ''XYZ'''
+ md,←⊂''
+ md,←⊂'A paragraph'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'XYZ'≡ns.parms.cssURL
+
+ R←T._OK

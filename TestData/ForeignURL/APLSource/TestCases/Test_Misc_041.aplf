@@ -1,0 +1,15 @@
+ R←Test_Misc_041(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Play with the & character
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This regards AT&T. Bonny & Clyde'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This regards AT&amp;T. Bonny &amp; Clyde</p>'
+ →T.PassesIf expected≡∊ns.html
+
+ R←T._OK

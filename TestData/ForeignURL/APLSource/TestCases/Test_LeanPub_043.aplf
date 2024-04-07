@@ -1,0 +1,25 @@
+ R←Test_LeanPub_043(stopFlag batchFlag);⎕TRAP;ns;md;expected;parms
+⍝ Test whether the leanpub extension "Info" (`I> `) following a definition list is processed okay. Was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:leanpubExtensions=1'
+ md,←⊂''
+ md,←⊂'Def'
+ md,←⊂': Line one'
+ md,←⊂''
+ md,←⊂': Line Two'
+ md,←⊂''
+ md,←⊂'A> An aside'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<dl>' '<dt>Def</dt>' '<dd><p class="first_dd">Line one</p></dd>' '<dd><p>Line Two</p></dd>' '</dl>' '<div class="leanpub_A">'
+ expected,←'<p>An aside</p>' '</div>' '' '<p>Another para</p>'
+ →T.PassesIf≡/expected ns.html
+
+ R←T._OK

@@ -1,0 +1,40 @@
+ r←GetMaskForCode txt;on;txt_;ind;in;i;noOf;k;bool
+⍝ Returns a mask (vector of Booleans with zeros for all APL code in ⍵.
+⍝ Does not fall over odd number of tick: the last one is then ignored.
+⍝ Honors escaped backticks when found outside a code block.
+⍝ This can only be solved in a loop because of, say, this:  `\\`
+⍝ This is a code block with two backslashes, not an opening backtick followed by an escaped one!
+ txt_←' ',txt,' '
+ on←0
+ :If 0=≢ind←⍸txt_='`'
+     r←(≢txt)⍴0
+ :Else
+     r←(≢txt)⍴0
+     r←(2+≢txt)⍴0
+     i←0
+     :Repeat
+         i+←1
+         in←ind[i]
+         :If 0=on                          ⍝ No code block is "open" right now?
+             :If '\'≠txt_[in-1]            ⍝ Then an escape char in front of the ` must be honoured.
+             :AndIf i<≢ind                 ⍝ At least one more char to come? (results in ignoring the last in case of an odd number of backticks.
+                 noOf←+/∧\'`'=(in-1)↓txt_  ⍝ How many consecutive backticks? The same number must be used to close it!
+                 i+←0⌈noOf-1
+                 :If 1=+/bool←'`'=(in+noOf)↓txt_      ⍝ Is there a corresponding ...      (single backtick)
+                 :OrIf noOf∊{+/¨∧\¨1↓¨⍵⊂⍨0 1⍷⍵}0,bool                ⍝ ... closing block of backticks?   (more than one backtick)
+                     r[in]←1
+                     on←1                  ⍝ Code block "opened".
+                 :Else
+                                                ⍝ There is no corresponding closing block of backticks, so they did not open a block: they survive!
+                 :EndIf
+             :EndIf
+         :Else
+             :If noOf=+/∧\'`'=(in-1)↓txt_  ⍝ Only the precise same number of backticks that opened a block can close it.
+                 r[in+noOf-1]←1
+                 i+←noOf-1
+                 on←0                      ⍝ Code block "closed".
+             :EndIf
+         :EndIf
+     :Until i≥≢ind
+     r←{⍵∨≠\⍵}¯1↓1↓r
+ :EndIf

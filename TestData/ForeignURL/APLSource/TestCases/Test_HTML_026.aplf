@@ -1,0 +1,18 @@
+ R←Test_HTML_026(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test a <pre> block whith <code> being on a separate line (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂''
+ md,←⊂'```{{⍵/⍨2=+⌿0=⍵∘.|⍵}}⍳⍵}'
+ md,←⊂'```'
+ md,←⊂''
+ md,←⊂'A paragraph.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ ⍝ The result is garbage in any case because it's ill-formed markdown, but it should not crash
+
+ R←T._OK

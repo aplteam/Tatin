@@ -1,0 +1,26 @@
+ R←Test_LeanPub_050(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Test whether an internal link in an I> block leads to a (wrong) warning. Was once a bug
+⍝ Fixed by replacing empty lines with " ".
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:leanpubExtensions = 1'
+ md,←⊂'# Foo'
+ md,←⊂''
+ md,←⊂'My paragraph'
+ md,←⊂''
+ md,←⊂'I> Se also "[Foo](#)".'
+ md,←⊂''
+ md,←⊂'Another paragraph'
+ md,←⊂'that spans over'
+ md,←⊂'mutliple lines'
+ md,←⊂''
+ md,←⊂'I> Se also "[Foo](#)".'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=≢ns.report
+
+ R←T._OK

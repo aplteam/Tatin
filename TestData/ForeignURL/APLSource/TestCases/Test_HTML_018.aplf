@@ -1,0 +1,23 @@
+ R←Test_HTML_018(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test a <pre> block that contains a line that start with a `⍝`; was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'<pre>'
+ md,←⊂'{{⍵/⍨2=+⌿0=⍵∘.|⍵}}⍳⍵}'
+ md,←⊂'⍝ Prime numbers'
+ md,←⊂'</pre>'
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'A paragraph.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<pre><code>{{⍵/⍨2=+⌿0=⍵∘.|⍵}}⍳⍵}' '⍝ Prime numbers</code></pre>' '<p>A paragraph.</p>'
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

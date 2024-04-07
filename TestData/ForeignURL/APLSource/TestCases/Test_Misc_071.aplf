@@ -1,0 +1,27 @@
+ R←Test_Misc_071(stopFlag batchFlag);⎕TRAP;tempFilename;md;ns;parms;html
+⍝ Check whether any JavaScript is included when the "javaScript" parameter is set to 0
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# A header'
+ md,←⊂''
+ md,←⊂'A simple paragraph'
+ md,←⊂''
+ md,←⊂'```'
+ md,←⊂'⍝ APL stuff'
+ md,←⊂'```'
+
+ parms←MarkAPL.CreateParms
+ parms.javaScript←0
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ html←∊ns.html
+ →T.PassesIf~∨/'<script'⍷html                                      ⍝ Of course there must be no JavaScript
+ →T.PassesIf~∨/'<button id="toc-toggle"'⍷html                      ⍝ No button for toggling TOC visibility
+ →T.PassesIf~∨/'"Copies the code block to the clipboard"'⍷html     ⍝ No button for copying code
+
+ R←T._OK
+⍝Done

@@ -1,0 +1,28 @@
+ R←Test_Links_020(stopFlag batchFlag);⎕TRAP;ns;html;md;expected
+⍝ Test a bookmark link that carries "<>" within code together with <<SubTOC>>; was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:createFullHtmlPage=1'
+ md,←⊂'[parm]:toc=1'
+ md,←⊂'[parm]:subTocs=1'
+ md,←⊂'[parm]:noCSS=1'
+ md,←⊂'[parm]:title=',⊃⌽'.'APLTreeUtils2.Split⊃⎕XSI
+ md,←⊂'# Main menu'
+ md,←⊂'<<subTOC>>'
+ md,←⊂'## Code: the `<pre>` tag'
+ md,←⊂'## Something else'
+ md,←⊂''
+ md,←⊂'We link to [Code: the `<pre>` tag](#).'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ html←ns.parms MarkAPL.MakeHTML_Doc ns.html
+
+ →T.PassesIf 0=+/'<<SubTOC>>'⍷∊html
+ →T.PassesIf 2=⍴'<nav.*>'⎕S 0⍠('Greedy' 0)⊣html   ⍝ Just the sub TOC but no main toc!
+ →T.PassesIf(⊂'<li><a href="#code-the--tag" class="bookmark_link">Code: the <code>&lt;pre&gt;</code> tag</a></li>')∊ns.html
+ →T.PassesIf 0=≢ns.report
+
+ R←T._OK

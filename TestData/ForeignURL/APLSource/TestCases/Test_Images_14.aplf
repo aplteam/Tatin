@@ -1,0 +1,18 @@
+ R←Test_Images_14(stopFlag batchFlag);⎕TRAP;ns;md;expected;parms
+⍝ Test image that lives on the Internet, with `imageURL` set.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This is a para with an embedded ![This is the "Error" icon](error.png) in it.'
+
+ parms←MarkAPL.CreateParms
+ parms.imageURL←'http://download.aplwiki.com/LeanPub/Images'
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>This is a para with an embedded <img src="http://download.aplwiki.com/LeanPub/Images/error.png" alt="This is the ''Error'' icon" title="This is the ''Error'' icon"> in it.</p>'
+ →T.PassesIf(⊂expected)∊ns.html
+
+ R←T._OK

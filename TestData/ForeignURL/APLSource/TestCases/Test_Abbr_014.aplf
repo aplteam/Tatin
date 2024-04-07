@@ -1,0 +1,20 @@
+ R←Test_Abbr_014(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Test an abbreviation that itself contains another abbreviation. This was once buggy.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'_Active possession_ on a rod ... is _reachable_ by ... is no longer _reachable_. _Active possession_ is ...'
+ md,←⊂''
+ md,←⊂'*[Active possession]: During active play, active possession begins when the ball is reachable and ends when...'
+ md,←⊂'*[reachable]: A ball is reachable from a rod if a figure on that rod can contact it without flexing the rod.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+ →T.FailsIf 4≠+/'<abbr'⍷html
+ →T.FailsIf 4≠+/'<abbr title="'⍷html
+ →T.FailsIf'<p><em></em> on a rod … is <em></em> by … is no longer <em></em>. <em></em> is …</p>'≢'<abbr .*>.*</abbr>'⎕R''⍠('Greedy' 0)⊣html
+
+ R←T._OK

@@ -1,0 +1,18 @@
+ R←Test_FnsCall_014(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test function call that returns an empty vector. (Crashed MarkAPL until 1.7.0)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{''}
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0∊⍴ns.html
+
+ R←T._OK

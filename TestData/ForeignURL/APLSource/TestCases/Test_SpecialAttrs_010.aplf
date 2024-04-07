@@ -1,0 +1,17 @@
+ R←Test_SpecialAttrs_010(stopFlag batchFlag);⎕TRAP;ns;md;fn
+⍝ Image: style it.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'An ordinary paragraph.'
+ fn←(FilesAndDirs.PWD,'\images\KaiJaegerHeadVerySmall.png')
+ md,←⊂'This: ![Kai Jaeger in 2014](',fn,' "Kai Jaeger in 2014"{style="margin-left:auto;margin-right:auto;"}) is me in 2014.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'style="margin-left:auto;margin-right:auto;"'⍷{⍵/⍨{⍵∨≠\⍵}⍵∊'<>'}∊ns.html
+ →T.PassesIf 0=+/'{style="margin-left:auto;margin-right:auto;"}'⍷∊ns.html
+
+ R←T._OK

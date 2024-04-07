@@ -1,0 +1,16 @@
+ R←Test_CompressCSS_005(stopFlag batchFlag);⎕TRAP;css;css2;expected
+⍝ Try to compress CSS with ';' within ""
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ css←''
+ css,←⊂'p::before {'
+ css,←⊂'  content : "That''s fine; always";'
+ css,←⊂'}'
+
+ css2←MarkAPL.CompressCSS css
+
+ expected←'p::before{content:"That''s fine; always";}'
+ →T.PassesIf css2≡expected
+
+ R←T._OK

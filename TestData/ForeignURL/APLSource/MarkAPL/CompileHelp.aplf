@@ -1,0 +1,36 @@
+ ns←CompileHelp(filename recompileFlag parms);ps;fn;b
+⍝ Called by `Help` and `Reference`.
+ ns←⍬
+ parms←EstablishDefaultHomeFolder parms
+ :If ⎕NULL≡parms.cssURL
+ :AndIf {0=≢⍵:0 ⋄ (~':'∊⍵)∧'/'≠1⍴⍵}parms.screenCSS
+ :AndIf {0=≢⍵:0 ⋄ (~':'∊⍵)∧'/'≠1⍴⍵}parms.printCSS
+     parms.cssURL←parms.homeFolder,'/Files'
+ :EndIf
+ :If (':'∊filename)∨'/'=1⍴filename
+     fn←CorrectSlash filename
+ :Else
+     fn←CorrectSlash F.PWD,'/',filename
+ :EndIf
+ parms.inputFilename←fn
+ :If 0=≢parms.inputFilename
+ :AndIf 0=F.IsFile parms.inputFilename←(⊃,/2↑⎕NPARTS fn),(1+recompileFlag)⊃'.html' '.md'
+     ('Could not find "',parms.inputFilename,'"')⎕SIGNAL 6
+ :EndIf
+ :If 0=≢parms.outputFilename
+     parms.outputFilename←(⊃,/2↑⎕NPARTS fn),'.html'
+ :EndIf
+ :If |recompileFlag
+     :If 0=F.Exists parms.inputFilename
+         6 ⎕SIGNAL⍨'File "',parms.inputFilename,'" not found; set "homeFolder"'
+     :EndIf
+     :If 0=≢parms.outputFilename
+         parms.outputFilename←fn
+     :Else
+         fn←parms.outputFilename
+     :EndIf
+     ns←2⊃parms Markdown2HTML''
+ :EndIf
+ :If 0=parms.⎕NC'viewInBrowser'
+     parms.viewInBrowser←1
+ :EndIf

@@ -1,0 +1,14 @@
+ R←Test_SpecAttrs_Link_003(stopFlag batchFlag);⎕TRAP;ns;md;fn
+⍝ Auto link: assign target=_blank.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'<http://aplwiki.com {target="_blank"}>'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'target="_blank">'⍷∊ns.html
+
+ R←T._OK

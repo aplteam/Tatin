@@ -1,0 +1,19 @@
+ R←Test_InLine_015(stopFlag batchFlag);⎕TRAP;ns;md
+⍝ Test names with "_": should NOT be marked up with <em>.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'A. Some text. This: foo1_foo2 is a name. More text'
+ md,←⊂''
+ md,←⊂'B. Some text. This: foo1__foo2 is a name. More text'
+ md,←⊂''
+ md,←⊂'C. Some text. This is okay: _italic_.'
+ md,←⊂''
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<em>'⍷∊ns.html
+
+ R←T._OK

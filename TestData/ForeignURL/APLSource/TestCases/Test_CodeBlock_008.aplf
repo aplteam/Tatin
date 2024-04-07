@@ -1,0 +1,15 @@
+ R←Test_CodeBlock_008(stopFlag batchFlag);⎕TRAP;ns;parms;md
+⍝ Test code block with more than just three fence characters in the closing block (fine).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'~~~~'
+ md,←⊂'{+/⍵}'
+ md,←⊂'~~~~~~~'
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf(,⊂'<pre tabindex="0"><code>{+/⍵}</code></pre>')≡ns.html
+
+ R←T._OK

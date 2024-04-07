@@ -1,0 +1,21 @@
+ R←Test_DefinitionList_010(stopFlag batchFlag);⎕TRAP;ns;parms;md
+⍝ Test a definition list with sub paragraphs due to indentation (was once a bug).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Term'
+ md,←⊂': Definition'
+ md,←⊂''
+ md,←⊂': More'
+ md,←⊂''
+ md,←⊂'Independent para'
+ md,←⊂''
+ md,←⊂''                                ⍝ A second empty line made it crash!
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf~(⊂'<p>Independent para</p>')∊ns.html
+
+ R←T._OK

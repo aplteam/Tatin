@@ -1,0 +1,21 @@
+ R←Test_Misc_042(stopFlag batchFlag);⎕TRAP;ns;parms;md;expected
+⍝ Test a markdown definition that caused once an endless loop.
+⍝ This was actually caused by lines what should have been empty but cosisted of nothing but space characters.
+⍝ This can easily happen when an vector of text vector is converted into a matrix and then back to a vtv.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'# Master title'
+ md,←⊂''
+ md,←⊂'Definitions'
+ md,←⊂''
+ md,←⊂': This way!'
+
+ ns←MarkAPL.Init''(↓↑md)
+ ns←MarkAPL.Process ns
+
+ expected←'<dl>' '<dt>Definitions</dt>' '<dd><p>This way!</p></dd>' '</dl>'
+ →T.PassesIf∧/expected∊ns.html
+
+ R←T._OK

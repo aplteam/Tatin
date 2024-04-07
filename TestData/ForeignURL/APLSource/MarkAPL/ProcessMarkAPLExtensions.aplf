@@ -1,0 +1,73 @@
+ r←ProcessMarkAPLExtensions ns;noOfLines;b;list;html;details;b1;b2;ind;list2;summary;header;noOfHashes
+⍝ Converts `!> ` and `=>` to <details> and <summary>
+ r←0
+ :If ~ns.parms.markdownStrict
+     noOfLines←+/∧\~ns.emptyLines
+     list←noOfLines↑ns.markdown
+     (b1 b2)←{b1←'!> '∘≡¨⍵ ⋄ b2←'=> '∘≡¨⍵ ⋄ b1 b2}3↑¨list
+ :AndIf 1≤+/b2
+     :If 1=+/b1
+         ⍝ It's a single collapsible
+         b←b1∨b2
+         list2←3↓¨b/list
+         html←⊂'<div class="collapsible">'
+         html,←⊂'<details>'
+         html,←⊂'<summary>'
+         summary←1⊃list2
+         list2←1↓list2
+         header←{⍵↓⍨3⌊+/∧\' '=⍵}summary         ⍝ Remove up to three spaces
+         :If 0<noOfHashes←+/∧\'#'=header        ⍝ Any leading "#" at all?
+         :AndIf 7>noOfHashes                    ⍝ But not more than 6
+         :AndIf ' '=1⍴noOfHashes↓header         ⍝ The first char after the last leading # must be a space
+         :AndIf 0<≢(noOfHashes+1)↓header        ⍝ There must be something left which is the text of the header
+             header←noOfHashes{h←⍕⍺ ⋄ '<h',h,'>',⍵,'</h',h,'>'}(1+noOfHashes)↓header
+             html,←1⍴ConvertH1AndH2HeadersToH3⊂header
+         :Else
+             html,←1⍴ConvertH1AndH2HeadersToH3⊂summary
+         :EndIf
+         html,←⊂'</summary>'
+         html,←⊂'<div class="collapsible-content">'
+         html,←⊂'<hr>'
+         html,←1⊃ConvertMarkdown2HTML list2
+         html,←⊂'</div>'
+         html,←⊂'</details>'
+         html,←⊂'</div>'
+         ns.html,←html
+     :Else
+         ⍝ It's multiple collapsibles and therefore an accordian
+         html←⊂'<div class="accordion">'
+         :For ind :In ⍸b1
+             b←1,∧\ind↓b2
+             list2←3↓¨b/(ind-1)↓list
+             html,←⊂'<div>'
+             html,←⊂'<details>'
+             html,←⊂'<summary>'
+             summary←1⊃list2
+             list2←1↓list2
+             header←{⍵↓⍨3⌊+/∧\' '=⍵}summary         ⍝ Remove up to three spaces
+             :If 0<noOfHashes←+/∧\'#'=header        ⍝ Any leading "#" at all?
+             :AndIf 7>noOfHashes                    ⍝ But not more than 6
+             :AndIf ' '=1⍴noOfHashes↓header         ⍝ The first char after the last leading # must be a space
+             :AndIf 0<≢(noOfHashes+1)↓header        ⍝ There must be something left which is the text of the header
+                 header←noOfHashes{h←⍕⍺ ⋄ '<h',h,'>',⍵,'</h',h,'>'}(1+noOfHashes)↓header
+                 html,←1⍴ConvertH1AndH2HeadersToH3⊂header
+             :Else
+                 html,←1⍴ConvertH1AndH2HeadersToH3⊂summary
+             :EndIf
+             html,←⊂'</summary>'
+             html,←⊂'<div class="accordion-content">'
+             html,←⊂'<hr>'
+             html,←1⊃ConvertMarkdown2HTML list2
+             html,←⊂'</div>'
+             html,←⊂'</details>'
+             html,←⊂'</div>'
+         :EndFor
+         html,←⊂'</div>'
+         ns.html,←html
+     :EndIf
+     ns.noOf←noOfLines
+     ns←Drop ns
+     ∆LastLineWasEmpty←1
+     r←1
+ :EndIf
+⍝Done

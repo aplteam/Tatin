@@ -1,0 +1,23 @@
+ R←Test_CompressCSS_001(stopFlag batchFlag);⎕TRAP;css;css2;expected
+⍝ Compress very simple CSS
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ css←''
+ css,←⊂'/* Single line comment */'
+ css,←⊂''
+ css,←⊂'p {'
+ css,←⊂'  font-size : 19pt;'
+ css,←⊂'  font-family : "Foo Goo";'
+ css,←⊂'}'
+ css,←⊂'img {'
+ css,←⊂'  border: 0;'
+ css,←⊂'  margin: 10px 20px 30px 0;'
+ css,←⊂'}'
+
+ css2←MarkAPL.CompressCSS css
+
+ expected←'p{font-size:19pt;font-family:"Foo Goo";}img{border:0;margin:10px 20px 30px 0;}'
+ →T.PassesIf expected≡css2
+
+ R←T._OK

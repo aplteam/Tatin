@@ -1,0 +1,25 @@
+ R←Test_CSS_008(stopFlag batchFlag);⎕TRAP;md;parms;b;ns;html;expected
+⍝ Assign folder name to `cssURL`.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.cssURL←FilesAndDirs.PWD
+ parms.screenCSS←'BlackOnWhite_screen.css'
+ parms.printCSS←'BlackOnWhite_print.css'
+ parms.linkToCSS←1
+
+ md←,⊂'This is a para.'
+
+ ns←MarkAPL.Init parms md
+ →T.PassesIf 0∊≢ns.report
+ ns←MarkAPL.Process ns
+ ns.html←parms MarkAPL.MakeHTML_Doc ns.html
+
+ expected←FilesAndDirs.EnforceSlash'expand'FilesAndDirs.NormalizePath parms.(cssURL,'/',screenCSS)
+ →T.PassesIf∨/expected⍷∊ns.html
+
+ expected←FilesAndDirs.EnforceSlash'expand'FilesAndDirs.NormalizePath parms.(cssURL,'/',printCSS)
+ →T.PassesIf∨/expected⍷∊ns.html
+
+ R←T._OK

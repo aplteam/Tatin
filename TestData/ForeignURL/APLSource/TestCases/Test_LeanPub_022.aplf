@@ -1,0 +1,25 @@
+ R←Test_LeanPub_022(stopFlag batchFlag);⎕TRAP;ns;md;parms;expected
+⍝ Test whether the leanpub extension "Aside" works when there is an empty line before and after it. (It should)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂''
+ md,←⊂'A> # A Discussion!'
+ md,←⊂'A> ...'
+ md,←⊂''
+
+ parms←MarkAPL.CreateParms
+ parms.leanpubExtensions←1
+
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←''
+ expected,←⊂'<div class="leanpub_A">'
+ expected,←⊂'<h3>A Discussion!</h3>'
+ expected,←⊂'<p>…</p>'
+ expected,←⊂'</div>'
+ →T.PassesIf expected≡ns.html~⊂''
+
+ R←T._OK

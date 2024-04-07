@@ -1,0 +1,22 @@
+ R←Test_Lists_023(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Test that two empty lines really do break a list definition
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂' 1) List I.'
+ md,←⊂' 1) List II.'
+ md,←⊂''
+ md,←⊂''
+ md,←⊂' 2) List III.'
+ md,←⊂''
+ md,←⊂'Another para'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<ol start="1">' '<li>' '<li>' '</ol>' '<ol start="2">' '<li>' '</ol>' '<p>'
+ →T.PassesIf expected≡{⍵↑⍨⍵⍳'>'}¨ns.html
+
+ R←T._OK

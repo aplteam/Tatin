@@ -1,0 +1,40 @@
+ r←{x}ListDirs path;buff;recursiveFlag;part1;part2;recursive;depth
+⍝ Lists all directories (but nothing else) in `path`.\\
+⍝ `path` must of course be a directory.\\
+⍝ Specify the string `recursive` (not case sensitive) as left argument to make the
+⍝ function work recursively.\\
+⍝ In addition to `recursive` you may also specify an integer defining the depth. For example,
+⍝ if you are interested just in the given directories and its sub-directory set this to 2.\\
+⍝ `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs` cannot deal with files
+⍝ that contain a `*` or a `?` as part of any name, be it directory or filename; under Linux and Mac OS
+⍝ these are legal characters for filenames and directory names.\\
+⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.
+ x←{0<⎕NC ⍵:⍎⍵ ⋄ ''⍬}'x'
+ x←⊂∘,⍣((⊃' '=1↑0⍴↑x)∧1=≡x)⊣x
+ (recursive depth)←2↑x,(≢x)↓0 ⍬
+ depth-←1
+ path←NormalizePath,path
+ (part1 part2)←APLTreeUtils2.SplitPath path
+ 'Wildcard characters are allowed only in the last part of a path'⎕SIGNAL 11/⍨∨/'?*'∊part1
+ path↓⍨←-CurrentSep=¯1↑path
+ recursiveFlag←{0=⎕NC ⍵:0 ⋄ w←⍎⍵ ⋄ 0=1↑0⍴w:w ⋄ 'recursive'≡⎕C w}'recursive'
+ :If recursiveFlag
+ :AndIf ∨/'*?'∊path
+     '"path" must not carry wildcard chars in case "Recursive" is specified'⎕SIGNAL 11
+ :EndIf
+ path,←(~∨/'?*'∊path)/CurrentSep
+ 'Right argument is not a directory'⎕SIGNAL 11/⍨0=IsDir{~∨/'*?'∊⍵:⍵ ⋄ 0⊃⎕NPARTS ⍵}path
+ :Trap 10 19 22
+     buff←(0 1)⎕NINFO⍠('Wildcard' 1)⊣path,'*'
+ :Else
+     r←''  ⍝ Apparently we do not have the rights to read the directory, therefore we ignore it
+     :Return
+ :EndTrap
+ r←(1=1⊃buff)/0⊃buff
+ :If 0≠≢r←NormalizePath r
+ :AndIf 1=recursiveFlag
+ :AndIf 0=+/'*?'∊path
+ :AndIf (0=≢depth)∨1↑0<depth
+ :AndIf 0≠≢buff←⊃,/(⊂recursiveFlag depth)ListDirs¨r,¨'/'
+     r,←buff
+ :EndIf

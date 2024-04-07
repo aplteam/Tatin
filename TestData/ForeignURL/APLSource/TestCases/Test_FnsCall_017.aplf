@@ -1,0 +1,19 @@
+ R←Test_FnsCall_017(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test function call that lives in a namespace with a `_` in the name (was once a bug).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP_'#.⎕NS''
+ #.TEMP_.MyFns←{'This' 'is a paragraph.'}
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP_.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←{'<p>',⍵,'</p>'}¨#.TEMP_.MyFns ⍬
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

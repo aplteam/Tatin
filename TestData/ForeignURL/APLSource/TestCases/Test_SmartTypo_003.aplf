@@ -1,0 +1,25 @@
+ R←Test_SmartTypo_003(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff;expected
+⍝ Test smart typography: -- => n-dash
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'First para -- really! -- with n-dashes --  (as in `--`) --, really (`--`)'
+ md,←⊂''
+ md,←⊂'Second para--really!'
+ md,←⊂''
+ md,←⊂'~~~'
+ md,←⊂' `--` are converted -- automatically! -- with a RegEx.'
+ md,←⊂'~~~'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>First para – really! – with n-dashes – (as in <code>--</code>) –, really (<code>--</code>)</p>'
+ →T.PassesIf expected≡1⊃ns.html
+ expected←'<p>Second para–really!</p>'
+ →T.PassesIf expected≡2⊃ns.html
+ expected←'<pre tabindex="0"><code> `--` are converted -- automatically! -- with a RegEx.</code></pre>'
+ →T.PassesIf expected≡3⊃ns.html
+
+ R←T._OK

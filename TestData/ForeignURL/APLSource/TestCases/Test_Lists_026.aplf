@@ -1,0 +1,37 @@
+ R←Test_Lists_026(stopFlag batchFlag);⎕TRAP;md;ns;parms;expected
+⍝ Test a lazy nested list
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First'
+ md,←⊂' * This list item stretches'
+ md,←⊂'over several'
+ md,←⊂'lines indeed,'
+ md,←⊂'4 in total!'
+ md,←⊂''
+ md,←⊂'   This forms an independent'
+ md,←⊂'paragraph that stretches in the Markdown'
+ md,←⊂'over three lines'
+ md,←⊂''
+ md,←⊂'   This forms another independent para.'
+ md,←⊂' * This'
+ md,←⊂'is'
+ md,←⊂'the'
+ md,←⊂'sub-second'
+ md,←⊂'one'
+ md,←⊂'* Second'
+ md,←⊂''
+ md,←⊂''
+ md,←⊂'An ordinary paragraph (two two empty lines above break the list)'
+
+ parms←MarkAPL.CreateParms
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>' '<ul>' '<li>' '<p>' '<p>' '<li>' '</ul>' '<li>' '</ul>' '<p>'
+ →T.PassesIf expected≡{⍵↑⍨⍵⍳'>'}¨ns.html
+ →T.PassesIf 4=+/'<li>'⍷∊ns.html
+ →T.PassesIf 3=+/'<p>'⍷∊ns.html
+
+ R←T._OK

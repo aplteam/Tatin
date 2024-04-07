@@ -1,0 +1,17 @@
+ R←Test_Links_033(stopFlag batchFlag);⎕TRAP;ns;html;md
+⍝ Markdown with a link that has no link text.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'[parm]:reportLinks     =  1'
+ md,←⊂'See [](http://download.aplteam.com/MarkAPL.html) for details.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf∨/'<a href="http://download.aplteam.com/MarkAPL.html" class="external_link">'⍷∊ns.html
+ →T.PassesIf 4=+/'http://download.aplteam.com/MarkAPL.html'⍷∊ns.html
+ →T.PassesIf 1=⍴'<li>.*http://download.aplteam.com/MarkAPL.html'⎕S 1⍠('Greedy' 0)⊣ns.html
+
+ R←T._OK

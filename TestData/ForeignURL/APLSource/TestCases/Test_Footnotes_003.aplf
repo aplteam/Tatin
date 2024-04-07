@@ -1,0 +1,30 @@
+ R←Test_Footnotes_003(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff
+⍝ Test footnote data structure
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←⊂'A para'
+ md,←'' ''
+ md,←⊂'[^1]: The APL wiki...'
+ md,←⊂'is great'
+ md,←⊂' '
+ md,←⊂'  The '
+ md,←⊂'  wiki '
+ md,←⊂'  contains...'
+ md,←⊂'  '
+ md,←⊂'  plenty of stuff.'
+ md,←⊂'  '
+ md,←⊂'  Still footnote'
+ md,←⊂'  def'
+ md,←⊂''
+ md,←'' 'The last para'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf'The APL wiki… is great'≡1⊃⊃ns.footnoteDefs[1;2]
+ →T.PassesIf'The wiki contains…'≡2⊃⊃ns.footnoteDefs[1;2]
+
+ R←T._OK

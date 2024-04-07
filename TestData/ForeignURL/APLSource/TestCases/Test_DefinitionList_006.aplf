@@ -1,0 +1,20 @@
+ R←Test_DefinitionList_006(stopFlag batchFlag);⎕TRAP;ns;parms;md;html
+⍝ Test two simple definitions that do not have a blank line between them (required in classic Markdown but why?!).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Term 1'
+ md,←⊂': Definition of term 1'
+ md,←⊂'Term 2'
+ md,←⊂': Definition of term 2'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ html←∊ns.html
+ →T.PassesIf 1=+/'<dl>'⍷html
+ →T.PassesIf 2=+/'<dt>'⍷html
+ →T.PassesIf 2=+/'<dd>'⍷html
+
+ R←T._OK

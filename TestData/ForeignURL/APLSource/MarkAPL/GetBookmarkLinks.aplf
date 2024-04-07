@@ -1,0 +1,10 @@
+ links←GetBookmarkLinks html;buff
+⍝ Those have the class "bookmark_link" or "footnote_link" assigned in case they are generated via Markdown.
+⍝ However, if they are part of an HTML block then they might or not have any class assigned to them.
+⍝ Therefore we need to take anything into account that carries an HREF attribute.
+ links←''
+ :If 0≠≢buff←'<'A.Split html
+ :AndIf 0≠≢links←(∨/¨' href="'∘⍷¨buff)/buff
+     links←{⍵{0=≢⍵:'' ⋄ {⍵↑⍨¯1+⍵⍳'"'}(+/⍵)↓⍺}⊃'href="'⎕S 0 1⊣⍵}¨links
+     links←1↓¨('#'=⊃¨links)/links
+ :EndIf

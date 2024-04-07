@@ -1,0 +1,22 @@
+ R←Test_Lists_007(stopFlag batchFlag);⎕TRAP;md;ns;noOfListItems;expected;html
+⍝ Test nested lists with 3-character indentation.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'* First line'
+ md,←⊂'* Second line'
+ md,←⊂'   * Yellow'
+ md,←⊂'     This is NOT a para.'
+ md,←⊂'   * Brown'
+ md,←⊂'   * Magenta'
+ md,←⊂'* Third line'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ul>' '<li>First line</li>' '<li>Second line' '<ul>' '<li>Yellow This is NOT a para.</li>' '<li>Brown</li>'
+ expected,←'<li>Magenta</li>' '</ul></li>' '<li>Third line</li>' '</ul>'
+ →T.FailsIf expected≢ns.html
+
+ R←T._OK

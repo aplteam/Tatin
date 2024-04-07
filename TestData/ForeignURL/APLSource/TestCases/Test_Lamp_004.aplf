@@ -1,0 +1,25 @@
+ R←Test_Lamp_004(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ A line with an odd number of `'` must be reported correctly. Comment line needs to be taken into account. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'col 1|col2 |col 3'
+ mat,←⊂'-|-|-|'
+ mat,←⊂'APL|<Brilliant>|800'
+ mat,←⊂'⍝Foo|<What''s that?!>|0'
+ mat,←⊂'Cobol|<Oh dear>|100'
+ mat,←⊂'Python|Not bad|700'
+ mat,←⊂''
+ mat,←⊂'"That is a problem.'   ⍝ Odd number of double-quotes!
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+
+ ns←MarkAPL.Init parms mat
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=⍴ns.report
+ →T.PassesIf(,8)≡,'^.*line ' '\).*$'∘∆GetLineNumber¨ns.report
+
+ R←T._OK

@@ -1,0 +1,19 @@
+ R←Test_FnsCall_019(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test function call that returns tags - those are converted (it's not an HTML block) while inline markup is done.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{' <p>This **is** a paragraph.</p>'} ⍝ The leading blank is intentional: without it it's an HTML block!!
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←' <p>This <strong>is</strong> a paragraph.</p>'
+ →T.PassesIf expected≡(∊ns.html)
+
+ R←T._OK

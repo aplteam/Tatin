@@ -1,0 +1,34 @@
+ R←Test_DefinitionList_008(stopFlag batchFlag);⎕TRAP;ns;parms;md
+⍝ Test a definition list with sub paragraphs.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Term 1'
+ md,←⊂''
+ md,←⊂': Definition of the term'
+ md,←⊂''
+ md,←⊂': Still definition of the term'
+ md,←⊂'  running over many'
+ md,←⊂'  lines!'
+ md,←⊂''
+ md,←⊂': And still definition of the term'
+ md,←⊂''
+ md,←⊂'Term 2'
+ md,←⊂''
+ md,←⊂': Def os term 2.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf'<dl>'≢1⊃ns.html
+ →T.FailsIf'<dt>Term 1</dt>'≢2⊃ns.html
+ →T.FailsIf'<dd><p class="first_dd">Definition of the term</p></dd>'≢3⊃ns.html
+ →T.FailsIf'<dd><p>Still definition of the term running over many lines!</p></dd>'≢4⊃ns.html
+ →T.FailsIf'<dd><p>And still definition of the term</p></dd>'≢5⊃ns.html
+ →T.FailsIf'<dt>Term 2</dt>'≢6⊃ns.html
+ →T.FailsIf'<dd><p>Def os term 2.</p></dd>'≢7⊃ns.html
+ →T.FailsIf'</dl>'≢8⊃ns.html
+ →T.FailsIf 9<⍴ns.html
+
+ R←T._OK

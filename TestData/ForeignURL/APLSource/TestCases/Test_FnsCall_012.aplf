@@ -1,0 +1,21 @@
+ R←Test_FnsCall_012(stopFlag batchFlag);⎕TRAP;md;ns;html
+⍝ Test function call at the beginning of a document (IS an HTML block).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns←{'<p>**bold** --- </p>' '<p>*italic* --- </p>'}
+
+ md←''
+ md,←⊂'⍎⍎#.TEMP.MyFns⍎⍎'
+ md,←⊂''
+ md,←⊂'A paragraph'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+ html←1↓↑,/(⎕UCS 13),¨ns.html
+
+ →T.PassesIf 1=+/'<p>**bold** --- </p>'⍷html
+
+ R←T._OK

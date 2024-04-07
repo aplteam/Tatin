@@ -1,0 +1,15 @@
+ R←Test_CodeBlock_006(stopFlag batchFlag);⎕TRAP;m;ns;parms
+⍝ Test two code blocks following each other straight away.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←MarkAPL.CreateParms
+ parms.fenceStyle←'Extra'
+ m←'~~~' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '~~~'                              ⍝ Three lines
+ m,←'' '~~~' '{{⍵/⍨2=+⌿0=⍵∘.|⍵}⍳⍵}' '~~~'                          ⍝ Three more lines with a blank line in between
+ ns←MarkAPL.Init parms m
+ ns←MarkAPL.Process ns
+
+ →T.FailsIf 2≠+/'<pre tabindex="0">'⍷∊ns.html
+
+ R←T._OK

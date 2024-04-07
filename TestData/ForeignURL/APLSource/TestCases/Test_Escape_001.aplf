@@ -1,0 +1,15 @@
+ R←Test_Escape_001(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Test a paragraph that carries paths within double quotes, one in the middle and one at the end.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'The first folder is "C:\Temp1\" and the second "C:\Temp1\"'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p>The first folder is “C:\Temp1\” and the second “C:\Temp1\”</p>'
+ →T.PassesIf expected≡∊ns.html
+
+ R←T._OK

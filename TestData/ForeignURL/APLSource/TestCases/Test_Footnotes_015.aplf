@@ -1,0 +1,19 @@
+ R←Test_Footnotes_015(stopFlag batchFlag);⎕TRAP;md;ns;parms;html;buff;expected
+⍝ A complex footnote with some text and code and inline markup
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'Para [^Tatin]  packages'
+ md,←⊂''
+ md,←⊂'Another para'
+ md,←⊂''
+ md,←⊂'[^Tatin]:This is `the link` to the **domain**:<br><https://aplwiki.com>'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<li id="fnref1"><p>This is <code>the link</code> to the <strong>domain</strong>:<br><a href="https://aplwiki.com" class="external_link">https://aplwiki.com</a></p><a href="#fnref1" class="footnote_anchor"></a>'
+ →T.PassesIf∨/expected⍷∊ns.html
+
+ R←T._OK

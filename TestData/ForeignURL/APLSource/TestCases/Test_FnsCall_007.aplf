@@ -1,0 +1,23 @@
+ R←Test_FnsCall_007(stopFlag batchFlag);⎕TRAP;md;ns;expected
+⍝ Test function call in a list item (ordered and bulleted
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyFns1←{'abc'}
+ #.TEMP.MyFns2←{'1 2 3'}
+
+ md←''
+ md,←⊂'1. First'
+ md,←⊂'2. ⍎⍎#.TEMP.MyFns1⍎⍎'
+ md,←⊂' * This'
+ md,←⊂' * ⍎⍎#.TEMP.MyFns2 123⍎⍎'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<ol start="1">' '<li>First</li>' '<li>abc' '<ul>' '<li>This</li>' '<li>1 2 3</li>' '</ul></li>' '</ol>'
+ →T.PassesIf expected≡ns.html
+
+ R←T._OK

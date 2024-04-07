@@ -1,0 +1,17 @@
+ R←Test_Table_015(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Header defines more columns then the data
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|:---|:---:|---|---|'
+ mat,←⊂'|APL|Brilliant|800|'
+ mat,←⊂'|Cobol|Old|14000|'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.PassesIf 2=+/'style="text-align: right;"'⍷html
+ →T.PassesIf 2=+/'style="text-align: center;"'⍷html
+
+ R←T._OK

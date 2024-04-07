@@ -1,0 +1,20 @@
+ R←Test_Footnotes_007(stopFlag batchFlag);⎕TRAP;md;ns;parms
+⍝ Set the `footnoteCaption` parameter.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'This: [^doesexist] is a ref to a footnote.'
+ md,←⊂''
+ md,←⊂'[^doesexist]: The APL wiki...'
+
+ parms←MarkAPL.CreateParms
+ parms.verbose←0
+ parms.footnotesCaption←'Fußnoten'
+ ns←MarkAPL.Init parms md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 0=⍴ns.report
+ →T.PassesIf 2=+/'<hr>' '<p><strong>Fußnoten</strong></p>'∊ns.html
+
+ R←T._OK

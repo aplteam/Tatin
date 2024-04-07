@@ -1,0 +1,16 @@
+ R←Test_InLine_019(stopFlag batchFlag);⎕TRAP;ns;md;expected
+⍝ Is "._" correctly recognized? This was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←''
+ md,←⊂'_An ordinary para._'
+ md,←⊂'... (tm) (c) --- -- ""'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ expected←'<p><i>An ordinary para.</i> &hellip; ™ © &mdash; &ndash; &ldquo;&rdquo;</p>'
+ →T.PassesIf≡expected∊ns.html
+
+ R←T._OK

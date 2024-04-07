@@ -1,0 +1,18 @@
+ R←Test_Examples_02(stopFlag batchFlag);⎕TRAP;parms;md;html;ns
+⍝ Test APL array as (Markdown) input and writing the HTML output. This creates a fully fledged HTML file.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ md←'This is a paragraph that' 'stretches over 2 lines.' '' 'Single-line paragraph.'
+
+ parms←MarkAPL.CreateParms
+ parms.outputFilename←∆GetTempHtmlFileName
+
+ (html ns)←parms MarkAPL.Markdown2HTML md
+ →T.GoToTidyUp~0∊⍴ns.report
+ →T.GoToTidyUp 1≠⎕NEXISTS parms.outputFilename
+
+ R←T._OK
+
+∆TidyUp:
+ ⎕NDELETE parms.outputFilename

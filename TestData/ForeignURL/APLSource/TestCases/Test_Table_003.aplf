@@ -1,0 +1,28 @@
+ R←Test_Table_003(stopFlag batchFlag);⎕TRAP;ns;parms;mat;html
+⍝ Test table with column headers and alignment directives.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ mat←''
+ mat,←⊂'|Name|Remark|Count|'
+ mat,←⊂'|:---| :-: |---:|'
+ mat,←⊂'|APL|Brilliant|800|'
+ mat,←⊂'|COBOL & Pascal|Old|14000001|'
+ mat,←⊂'|F#|New|3400|'
+
+ ns←MarkAPL.Init''mat
+ ns←MarkAPL.Process ns
+ html←1↓∊(⎕UCS 13),¨ns.html
+ →T.FailsIf 9≠≢'<td[ >]'⎕S 0⊣html
+ →T.FailsIf 9≠+/'</td>'⍷html
+ →T.FailsIf 3≠+/'</th>'⍷⊣html
+ →T.FailsIf 4≠+/'<tr>'⍷html
+ →T.FailsIf 4≠+/'</tr>'⍷html
+ →T.FailsIf 1≠+/'<thead>'⍷html
+ →T.FailsIf 1≠+/'</thead>'⍷html
+ →T.FailsIf 1≠+/'<tbody>'⍷html
+ →T.FailsIf 1≠+/'</tbody>'⍷html
+ →T.FailsIf 1≠+/'<table>'⍷html
+ →T.FailsIf 1≠+/'</table>'⍷html
+
+ R←T._OK

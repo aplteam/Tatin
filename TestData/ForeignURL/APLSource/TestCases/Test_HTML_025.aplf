@@ -1,0 +1,61 @@
+ R←Test_HTML_025(stopFlag batchFlag);⎕TRAP;md;ns
+⍝ Test nested tags in an HTML block including self-defined ones.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+⍝ One block contains it all
+ md←''
+ md,←⊂'This is a para.'
+ md,←⊂''
+ md,←⊂'<my-tag id="abc">'
+ md,←⊂'    <span class="special">'
+ md,←⊂'    Enclosed **para**'
+ md,←⊂'    </span>'
+ md,←⊂'    <div id="xy">'
+ md,←⊂'        <span class="special2">'
+ md,←⊂'        Another enclosed _para_'
+ md,←⊂'        </span>'
+ md,←⊂'    </div>'
+ md,←⊂'</my-tag>'
+ md,←⊂''
+ md,←⊂'This is a second para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<my-tag id="abc">'⍷∊ns.html
+ →T.PassesIf 1=+/'<div id="xy">'⍷∊ns.html
+ →T.PassesIf 1=+/'<span class="special">'⍷∊ns.html
+ →T.PassesIf 1=+/'<span class="special2">'⍷∊ns.html
+ →T.PassesIf 1=+/'</my-tag>'⍷∊ns.html
+
+⍝ Two independent blocks
+ md←''
+ md,←⊂'This is a para.'
+ md,←⊂''
+ md,←⊂'<my-tag id="abc">'
+ md,←⊂'    <span class="special">'
+ md,←⊂'    Enclosed **para**'
+ md,←⊂'    </span>'
+ md,←⊂''
+ md,←⊂'This is **strong** word in a para'  ⍝ Not part of the HTML blocks and must therefore be processed as markdown!
+ md,←⊂''
+ md,←⊂'<div id="xy">'
+ md,←⊂'        <span class="special2">'
+ md,←⊂'        Another enclosed _para_'
+ md,←⊂'        </span>'
+ md,←⊂'    </div>'
+ md,←⊂'</my-tag>'
+ md,←⊂''
+ md,←⊂'This is a second para.'
+
+ ns←MarkAPL.Init''md
+ ns←MarkAPL.Process ns
+
+ →T.PassesIf 1=+/'<my-tag id="abc">'⍷∊ns.html
+ →T.PassesIf 1=+/'<div id="xy">'⍷∊ns.html
+ →T.PassesIf 1=+/'<span class="special">'⍷∊ns.html
+ →T.PassesIf 1=+/'<span class="special2">'⍷∊ns.html
+ →T.PassesIf 1=+/'</my-tag>'⍷∊ns.html
+
+ R←T._OK

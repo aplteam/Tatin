@@ -11,7 +11,7 @@ Before you start reading this document you should have read the document [Introd
 
 I> Note that you should know what [Semantic Versioning](./SemanticVersioning.html) is all about.
 
-In this document additional information, that you might or might not be interested in at this stage, is presented in boxes. You might well skip over them till later.
+In this document, additional information, that you might or might not be interested in at this stage, is presented in boxes. You might well skip over them till later.
 
 ## Where we start from
 
@@ -328,7 +328,8 @@ We can use `MarkAPL` by referring to it as `#.Foo.MarkAPL` because Tatin has als
 
 But how does `MarkAPL` find its assets? Tatin injects a namespace `TatinVars` into `#._tatin.aplteam_MarkAPL_11_0_1`, and that namespace carries several variables, among them these:
 
-* `HOME` carries the path to the directory where the package was loaded from
+* `HOME` carries the path to the directory the package was installed into, even if the package has no assets. This is different from what happens when the package is brought into the workspace with `LoadPackages`, see there.
+
 * `ASSETS` holds the path to the assets relative to `HOME`.
 
   If there are not assets then `ASSETS` is an empty vector.
@@ -592,7 +593,7 @@ Is a character vector holding the path of a folder that hosts the package.
 
 There is an exception: when the package was brought into the workspace with `LoadPackages` rather than `LoadDependencies` that has no assets. This is because without assets `LoadPackages` loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.
 
-In this case `HOME` is set to `''`.
+In this case `HOME` returns an empty vector.
 
 
 ##### ID
@@ -612,6 +613,7 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 ##### URI
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
+
 
 
 

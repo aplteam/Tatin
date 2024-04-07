@@ -197,7 +197,7 @@ Similarly, if `PkgName` consists of the two namespaces `Boo` and `Goo`, and `Run
 
 If this is empty then the package has no assets. Instead it can point to a folder hosting assets. 
 
-The folder must be relative to the package since the folder is part of the package. For that reason, a folder may not contain a "`:`", and not start with "`/`". If one does anyway an error is thrown.
+The folder must be relative to the package since the folder is part of the package. For that reason, a folder may not contain a "`:`", and not start with "`/`". If it does anyway an error is thrown.
 
 There is one exception: when an absolute path is specified but it's partly identical to what will become `HOME` (the folder where the package lives) then Tatin removes that part silently, making it effectively relative. 
 
@@ -574,6 +574,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

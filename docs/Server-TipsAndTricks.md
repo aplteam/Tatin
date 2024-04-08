@@ -129,7 +129,7 @@ These will call the Tatin functions that perform the real actions.
 
 Keep in mind that error trapping is active, so when you change a function and inject a typo this will trigger error trapping  once your code gets executed.
 
-If there is any danger of you locking horns with error trapping consider putting this into `OnRequest`:
+If there is any danger of you locking horns with error trapping, consider putting this into `OnRequest`:
 
 `⎕TRAP←0 'S'  ⍝TODO⍝`   
 
@@ -140,7 +140,7 @@ Also, make `⎕TRAP` a local variable in `OnRequest`.
 
 ### Developing with two sessions, server and client
 
-When the test cases are executed the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.
+When the test cases are executed, the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.
 
 If the user answers this with a "yes" an instance of the server is started.
 
@@ -149,7 +149,7 @@ You must know exactly what you are doing, otherwise you might loose code.
 I> ### `Tatin.Registry`: Danger zone
 I> Since you will change functions in `#.Tatin.Client` only on the client side, and functions in `#.Tatin.Server` only on the server side you will be fine with those changes.
 I>
-I> Changing stuff in `#.Tatin.Registry` is dangerous however, because this namespace is shared between client and server, so you need to be very careful.
+I> Changing stuff in `#.Tatin.Registry` is dangerous however, because this namespace is shared between client and server, so you need to be very careful: if you change the same function in `Registry` on both the client and the server then the last change wins the day, while all other changes are going to be lost.
 
 ## Misc
 
@@ -197,5 +197,6 @@ The text shown on the web page is defined in the document "Licensing.html" in th
 #### A "LICENSE" file
 
 By convention a file named "LICENSE" when placed in the root of the project will be copied automatically to the root of a package when build by `BuildPackage`. This convention is independent from the INI file.
+
 
 

@@ -82,7 +82,7 @@
      msg,←⊂'   ',source
      msg,←⊂'anyway?'
      :If 0=TC.C.YesOrNo msg
-         ⎕←'Publishing cancelled'
+         r←'Publishing cancelled'
          :Return
      :EndIf
  :EndIf
@@ -90,7 +90,12 @@
 ∆Again:
  :Trap ErrNo
      :If 0<≢dependencies
-         (rc msg zipFilename)←dependencies TC.PublishPackage source url
+         :If CheckDependencyOrigins source dependencies
+             (rc msg zipFilename)←dependencies TC.PublishPackage source url
+         :Else
+             r←'Publishing cancelled'
+             :Return
+         :EndIf
      :Else
          (rc msg zipFilename)←TC.PublishPackage source url
      :EndIf
@@ -124,16 +129,16 @@
                          :If 200=rc
                              →∆Again
                          :Else
-                             ⎕←'Delete attempt failed with status ',(⍕rc),'; publishing therefore not possible'
+                             r←'Delete attempt failed with status ',(⍕rc),'; publishing therefore not possible'
                              :Return
                          :EndIf
                      :EndIf
                  :Else
-                     ⎕←'Deleting already published package failed with status ',(⍕rc),'; publishing therefore not possible'
+                     r←'Deleting already published package failed with status ',(⍕rc),'; publishing therefore not possible'
                      :Return
                  :EndIf
              :Else
-                 ⎕←'Server does not allow overwriting an already published package; publishing therefore not possible'
+                 r←'Server does not allow overwriting an already published package; publishing therefore not possible'
                  :Return
              :EndIf
          :EndIf

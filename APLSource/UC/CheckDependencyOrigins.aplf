@@ -1,0 +1,10 @@
+ r←CheckDependencyOrigins(source dependencies);deps;buff;q
+⍝ Checks where dependencies come from and warn the user in case of something suspicious
+ :If ⎕NEXISTS source,'/',dependencies,'/',TC.Reg.BuildListFilename
+     deps←JSON⊃⎕NGET source,'/',dependencies,'/',TC.Reg.BuildListFilename
+ :AndIf ∨/deps.url≢¨⊂'https://tatin.dev/'
+     buff←⍕⍉↑,deps.(packageID url)
+     q←'CheckPkgDeps@Check the package dependencies:',,CR,' ',buff
+     q,←CR,'Sure you want to publish <',(⊃,/1↓⎕NPARTS source),'> ?'
+     r←TC.CommTools.YesOrNo q
+ :EndIf

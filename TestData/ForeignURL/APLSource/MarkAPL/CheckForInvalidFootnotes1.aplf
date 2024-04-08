@@ -1,8 +1,0 @@
- ns←CheckForInvalidFootnotes1 ns;ind;ids;mask;html;ind2
-⍝ At this point if headers are converted to links automatically they must not carry a footnote ref (early)
- :If 0<ns.parms.bookmarkLink
- :AndIf 0<≢ind←⍸{≢'^#{1,6}'⎕S 2⍠('Greedy' 0)⊢⍵}¨ns.markdown
- :AndIf 0<≢ind2←2+'\[\^[a-zA-Z]+\]'⎕S 2⊣ns.markdown[ind]
- :AndIf 0<≢ind←ind[ind2]
-     ns.report,←⊂'Invalid footnote definition in auto-link headers: line(s) ',⊃{⍺,',',⍵}/⍕¨ind
- :EndIf

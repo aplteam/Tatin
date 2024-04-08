@@ -256,7 +256,11 @@ Notes:
 
   That is good enough a reason to use this with care. Only when messing around with packages on your local machine that are not designed to be published on a Tatin server may this be used.
 
-* Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.
+* Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used with care.
+
+* When a package is published to a Tatin Registry, any protocols (file:// or http:// or https://) are removed: the dependency is defined just be the package names. 
+
+  When such a package is installed or loaded, Tatin will interrogate all Registries in its search path, with the first hit winning the day.
 
 
 ### Final step
@@ -393,6 +397,8 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
+
 
 
 

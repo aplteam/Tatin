@@ -1,0 +1,11 @@
+ CheckExecuteTime y;⎕IO;start;end;⎕TRAP
+⍝ Executes ]latest in order to check whether the response time is okay.
+⍝ Can be useful to detect a performance problem while executing the test suite.
+ ⎕IO←1
+ start←3⊃⎕AI
+ {}⎕SE.Latest.Run'' 1 0 0 ¯1 0
+ end←3⊃⎕AI
+ :If 4<-/⌊end start÷1000 ⍝ Should certainly not last more than four seconds
+     ⎕TRAP←0 'S'
+     ∘∘∘
+ :EndIf

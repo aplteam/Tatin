@@ -35,7 +35,10 @@
          identifier←ReplaceRegistryAlias identifier_
          ('Unknown',(∧/'[]'∊identifier_)/' alias')Assert 0<≢identifier
          identifier←noBetas CheckVersion identifier
-         ('Not found (404): ',identifier)Assert 0<≢identifier
+         :If 0=≢identifier    ⍝ Not found?
+             1 PrintToSession'Not found: ',identifier_
+             :Continue
+         :EndIf
          :If isUCMD
              :If 0=≢{⍵↓⍨⍵⍳']'}targetFolder
                  :If IsHTTP identifier

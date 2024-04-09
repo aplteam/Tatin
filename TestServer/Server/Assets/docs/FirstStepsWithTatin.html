@@ -62,7 +62,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </div>
 </div>
 
-<p>In this document additional information, that you might or might not be interested in at this stage, is presented in boxes. You might well skip over them till later.</p>
+<p>In this document, additional information, that you might or might not be interested in at this stage, is presented in boxes. You might well skip over them till later.</p>
 <div class="h_tag">
 <a href="#where-we-start-from" id="where-we-start-from" class="autoheader_anchor">
 <h2 data-id="Where-we-start-from">1. Where we start from</h2>
@@ -345,7 +345,7 @@ Styles.html</code></pre>
 #._tatin.aplteam_MarkAPL_11_0_1.MarkAPL</code></pre>
 <p>But how does <code>MarkAPL</code> find its assets? Tatin injects a namespace <code>TatinVars</code> into <code>#._tatin.aplteam_MarkAPL_11_0_1</code>, and that namespace carries several variables, among them these:</p>
 <ul>
-<li><code>HOME</code> carries the path to the directory where the package was loaded from</li>
+<li><code>HOME</code> carries the path to the directory the package was installed into, even if the package has no assets. This is different from what happens when the package is brought into the workspace with <code>LoadPackages</code>, see there.</li>
 <li><code>ASSETS</code> holds the path to the assets relative to <code>HOME</code>.
 <p>If there are not assets then <code>ASSETS</code> is an empty vector.</p></li>
 </ul>
@@ -557,7 +557,7 @@ aplteam-Foo-1.1.1</code></pre>
 </div>
 <p>Is a character vector holding the path of a folder that hosts the package.</p>
 <p>There is an exception: when the package was brought into the workspace with <code>LoadPackages</code> rather than <code>LoadDependencies</code> that has no assets. This is because without assets <code>LoadPackages</code> loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.</p>
-<p>In this case <code>HOME</code> is set to <code>''</code>.</p>
+<p>In this case <code>HOME</code> returns an empty vector.</p>
 <div class="h_tag">
 <a href="#id" id="id" class="autoheader_anchor">
 <h5 data-id="ID">4.5.3.6. ID</h5>

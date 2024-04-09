@@ -308,7 +308,9 @@ group2,&lt;hash2,&lt;salt2&gt;
 <ul>
 <li>Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with “400 — bad request”.
 <p>That is good enough a reason to use this with care. Only when messing around with packages on your local machine that are not designed to be published on a Tatin server may this be used.</p></li>
-<li>Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used very carefully, if at all.</li>
+<li>Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used with care.</li>
+<li>When a package is published to a Tatin Registry, any protocols (file:// or http:// or https://) are removed: the dependency is defined just be the package names.
+<p>When such a package is installed or loaded, Tatin will interrogate all Registries in its search path, with the first hit winning the day.</p></li>
 </ul>
 <div class="h_tag">
 <a href="#final-step" id="final-step" class="autoheader_anchor">

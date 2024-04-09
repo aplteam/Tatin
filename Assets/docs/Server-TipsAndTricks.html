@@ -164,7 +164,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </a>
 </div>
 <p>Keep in mind that error trapping is active, so when you change a function and inject a typo this will trigger error trapping once your code gets executed.</p>
-<p>If there is any danger of you locking horns with error trapping consider putting this into <code>OnRequest</code>:</p>
+<p>If there is any danger of you locking horns with error trapping, consider putting this into <code>OnRequest</code>:</p>
 <p><code>⎕TRAP←0 'S'  ⍝TODO⍝</code></p>
 <p>Also, make <code>⎕TRAP</code> a local variable in <code>OnRequest</code>.</p>
 <p><code>⍝TODO⍝</code> is a reminder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.</p>
@@ -173,7 +173,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <h3 data-id="Developing-with-two-sessions-server-and-client">2.4. Developing with two sessions, server and client</h3>
 </a>
 </div>
-<p>When the test cases are executed the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.</p>
+<p>When the test cases are executed, the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.</p>
 <p>If the user answers this with a “yes” an instance of the server is started.</p>
 <p>You must know exactly what you are doing, otherwise you might loose code.</p>
 <div class="leanpub">
@@ -181,7 +181,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <div>
 <h3><code>Tatin.Registry</code>: Danger zone</h3>
 <p>Since you will change functions in <code>#.Tatin.Client</code> only on the client side, and functions in <code>#.Tatin.Server</code> only on the server side you will be fine with those changes.</p>
-<p>Changing stuff in <code>#.Tatin.Registry</code> is dangerous however, because this namespace is shared between client and server, so you need to be very careful.</p>
+<p>Changing stuff in <code>#.Tatin.Registry</code> is dangerous however, because this namespace is shared between client and server, so you need to be very careful: if you change the same function in <code>Registry</code> on both the client and the server then the last change wins the day, while all other changes are going to be lost.</p>
 </div>
 </div>
 

@@ -21,6 +21,10 @@ After downloading it from <https://github.com/aplteam/Tatin/releases> you need t
 
   For the time being neither the Pi nor Mac OS nor AIX are supported. These restrictions might be lifted at a later stage.
 
+* On Windows, Dyalog must use the .NET Framework rather than .NET. 
+
+  This restriction might be lifted at a later stage.
+
 ## Configuration: the INI File
 
 First, you need to amend the file `server.ini`.
@@ -316,6 +320,7 @@ What kind of actions need to be taken, if any, is revealed by the release notes.
 First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+
 
 
 

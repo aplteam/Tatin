@@ -1,11 +1,10 @@
- r←Test_UC_052(stopFlag batchFlag);⎕TRAP;res;msg;rc;path;stop;buff;tempDir
+ r←Test_UC_052(stopFlag batchFlag);⎕TRAP;res;msg;rc;path;stop;buff;more;en
 ⍝ Exercise ]Tatin.CheckForLaterVersion with the -major flag
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  path←'./TestData/Packages/Update-Check-Single'
- tempDir←∆GetTempDir'_install'
- buff←⎕SE.Tatin.InstallPackages'[tatin]aplteam-MarkAPL'tempDir
+ buff←⊃⌽,2↓3⊃∆UCMD'ListVersions [local]aplteam-MarkAPL'
 
  stop←0
  (rc msg res)←stop ∆UCMD'CheckForLaterVersion ',path,' -major'

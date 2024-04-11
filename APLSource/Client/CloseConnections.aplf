@@ -14,7 +14,12 @@
          :EndIf
          :If flag
              list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
-             {}{⍵ R.Close 0}¨list
+             :Trap 0  ⍝TODO⍝
+                 {}{⍵ R.Close 0}¨list
+             :Else
+                 ⎕TRAP←0 'S'
+                 ̉∘∘∘
+             :EndTrap
              ⎕EX'∆PermanentConnections'
          :EndIf
      :Else

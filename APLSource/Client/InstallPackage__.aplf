@@ -18,7 +18,9 @@
      :If '.zip'≡¯4↑url
          zipFilename←RemoveFileProtocol url
      :Else
-         zipFilename←RemoveFileProtocol url,'/',packageID,'.zip'
+         :If ~⎕NEXISTS zipFilename←RemoveFileProtocol(F.AddTrailingSep url),packageID,'/',packageID,'.zip'
+             zipFilename←RemoveFileProtocol(F.AddTrailingSep url),packageID,'.zip'
+         :EndIf
      :EndIf
      ('File <',zipFilename,'> does not exist')Assert F.IsFile zipFilename
  :EndIf

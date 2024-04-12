@@ -1,4 +1,4 @@
- r←Initial parms;clientCfg;dir;cfg;registry;rc;msg;res;P;f2;flag;flag2;json;ns;local
+ r←Initial parms;P;cfg;clientCfg;dir;f2;flag;flag2;json;local;msg;ns;rc;registry;res
  #.⎕EX'_tatin'
  r←1
 
@@ -44,7 +44,10 @@
          :Until flag2
      :EndIf
  :Else
-     ##.Client.CommTools.Pause'Please start the Tatin server'
+     msg←'Please start the Tatin server by loading the WS RunTatinServer in a freshly started instance of Dyalog:'
+     msg,←⎕UCS 13
+     msg,←')load ',∆TEMP_SERVER_FOLDER,'/RunTatinServer'
+     ##.Client.CommTools.Pause msg
  :EndIf
 
  ⍝ T.exec_after_each_test←(⍕⎕THIS),'.CheckTempFolder'

@@ -24,11 +24,13 @@
     ∇ r←Version
     ⍝ See also `History`
       :Access Public Shared
-      r←'APLProcess' '0.7.0' '2023-09-26'    ⍝ Without Ride all fine, with Ride the Mac is still posing problems
+      r←'APLProcess' '0.7.1-beta-1' '2024-04-11'    ⍝ Without Ride all fine, with Ride the Mac is still posing problems
     ∇
 
     ∇ r←History
       :Access Public Shared
+    ⍝ * 0.7.1 from 2024-04-11
+    ⍝   * Killed the process even with Wait←0, meaning that the process was not running independently.
     ⍝ * 0.7.0 from 2023-09-26
     ⍝   * Now APLProcess can use .NET or .NET Framework (former version only worked with .NET Framework)
     ⍝ * 0.6.0 from 2021-05-27
@@ -140,7 +142,14 @@
           parmSpace.CommandLineArgs←1↓⊃,/' ',¨buff
       :EndIf
       'Invalid window style'Assert(⊂parmSpace.WindowsStyle)∊'Hidden' 'Maximized' 'Minimized' 'Normal'
+      :If 0<≢parmSpace.Exe
+          ('The specified EXE cannot be found: ',parmSpace.Exe)Assert ⎕NEXISTS parmSpace.Exe
+      :EndIf
       (RidePort OUT_FILE WorkspaceName Args _Wait)←parmSpace.(RidePort OutputFilename WorkspaceName CommandLineArgs Wait)
+      WorkspaceName~←'"'
+      :If 0<≢WorkspaceName
+          ('The specified workspace cannot be found: ',WorkspaceName)Assert ⎕NEXISTS WorkspaceName
+      :EndIf
       PATH←SourcePath
       Start parmSpace
     ∇
@@ -184,6 +193,7 @@
           cmd←ps.Exe
      
           ⎕USING←UsingSystemDiagnostics
+          ⍝⎕USING←'System' 'System.IO' 'System.Diagnostics,System.Diagnostics.Process'
           psi←⎕NEW Diagnostics.ProcessStartInfo,⊂ps.Exe(({0=≢⍵:⍵ ⋄ '"',(⍵~'"'),'" '}ps.WorkspaceName),args)
           psi.WindowStyle←Diagnostics.ProcessWindowStyle.⍎ps.WindowsStyle
           Proc←Diagnostics.Process.Start psi
@@ -282,7 +292,9 @@
 
     ∇ Close_;count;limit
       :Implements Destructor
-      WaitForKill&(5×Wait)0.2 ⍝ Start a new thread to do the dirty work
+      :If Wait
+          WaitForKill&(5×Wait)0.2 ⍝ Start a new thread to do the dirty work
+      :EndIf
     ∇
 
     ∇ r←CreateParms

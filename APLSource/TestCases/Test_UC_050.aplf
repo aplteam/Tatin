@@ -6,11 +6,19 @@
  path←'./TestData/Packages/Update-Check-Multiple'
  stop←0
  res←TC.ListVersions'aplteam-Markapl'
- →T.PassesIf 0<+/'C:/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ :If 'Win'≡A.GetOperatingSystem''
+     →T.PassesIf 0<+/'C:/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ :Else
+     →T.PassesIf 0<+/'/tmp/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ :EndIf
  →T.PassesIf 0<+/'https://localhost/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
 
  res←TC.ListVersions'aplteam-EventCodes'
- →T.PassesIf 0<+/'C:/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ :If 'Win'≡A.GetOperatingSystem''
+     →T.PassesIf 0<+/'C:/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ :Else
+     →T.PassesIf 0<+/'/tmp/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
+ :EndIf
  →T.PassesIf 0<+/'https://localhost/'{⍺∘≡¨(≢⍺)↑¨⍵}res[;1]
 
  (rc msg res)←stop ∆UCMD'CheckForLaterVersion ',path,' -major'

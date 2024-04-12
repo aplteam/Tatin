@@ -2,10 +2,10 @@
 ⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the associated user commands will be found.
 ⍝ This is for version 19.0
 ⍝ The function is part of the Tatin project.
-⍝ Version 0.1.6 from 2024-03-26  ⋄  Kai Jaeger
+⍝ Version 0.1.7 from 2024-04-12  ⋄  Kai Jaeger
  path←⊃,/1 ⎕NPARTS∊path_,'/../../SessionExtensions/CiderTatin'
  :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃# ⎕WG'APLVersion'
- :AndIf 0=⎕SE.⎕NC'_Tatin'
+     ⎕SE.⎕EX'_Tatin'    ⍝ In case Tatin was saved as part of the session file
      :Trap 0
          '_Tatin'⎕SE.⎕CY path,'/Tatin/Client.dws'
      :Else
@@ -24,11 +24,11 @@
          :Trap 0
              res←⎕SE.Tatin.LoadDependencies(path,'/Cider')⎕SE
              :If ~∨/'_Cider_'⍷∊⍕res
-                 ⎕←'Attempt to load the "Cider" package failed' ⋄ →0
+                 ⎕←'Attempt to load the "Cider" package failed'
              :EndIf
          :Else
              qdmx←⎕DMX
-             ⎕←'Attempt to load the "Cider" package failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')' ⋄ →0
+             ⎕←'Attempt to load the "Cider" package failed (',qdmx.EM,', RC=',(⍕qdmx.EN),')'
          :EndTrap
      :EndIf
  :EndIf

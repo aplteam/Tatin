@@ -1,0 +1,10 @@
+ new←path CorrectPkgName old;list;list_lc;bool
+⍝ Translates package name to the correct spelling in terms of lowercase/uppercase
+ list←,Reg.GetAllPackages path
+ list_lc←⎕C list
+ bool←list_lc≡¨⊂⎕C old
+ :If 0=+/bool
+     new←''
+ :Else
+     new←(bool⍳1)⊃list
+ :EndIf

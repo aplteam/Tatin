@@ -1,11 +1,8 @@
  msg←DeletePackage packagePath;msg;rc;en
+⍝ Existence of the folder `packagePath` must be checked beforehand
  msg←''
- :If F.IsDir packagePath
-     (rc en msg)←F.RmDir packagePath
-     :If 0≠rc
-         msg,←'; RC=',⍕en
-     :EndIf
- :Else
-     msg←'Package does not exist'
+ (rc en msg)←F.RmDir packagePath
+ :If 0≠rc
+     msg,←'; RC=',⍕en
  :EndIf
 ⍝Done

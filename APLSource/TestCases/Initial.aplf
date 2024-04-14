@@ -5,11 +5,15 @@
  RI←##.Client.RegistryIndices
 ⍝ Managed Registry:
  ∆TEMP_SERVER_FOLDER←F.GetTempSubDir'Tatin-Test-Server'
+ ⎕←'Copying data for the test server...'
  (∆TEMP_SERVER_FOLDER,'/')⎕NCOPY⍠1⊣#.Tatin.CiderConfig.HOME,'/TestServer/*'
+ ⎕←' Done'
 
 ⍝ Local folder, not managed:
  ∆TEMP_REGISTRY_FOLDER←F.GetTempSubDir'Tatin-Test-Registry'
+ ⎕←'Copying data for the (unmanaged) test registry...'
  ∆TEMP_REGISTRY_FOLDER∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨F.ListDirs #.Tatin.CiderConfig.HOME,'/TestServer/Registry/*'
+ ⎕←' Done'
 
  json←⊃⎕NGET'./TestData/tatin-client.json'
  ns←⎕JSON⍠('Dialect' 'JSON5')⊣json

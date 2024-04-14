@@ -1,4 +1,4 @@
- response←DeletePackages request;deletePolicy;packageIDs;regPath;rc;msg;⎕TRAP;b;regPaths;packageID;statusCodes;msgs;noOfOkay;noOfFailures;okay
+ response←DeletePackages request;b;deletePolicy;msg;msgs;noOfFailures;noOfOkay;okay;packageID;packageIDs;rc;regPath;statusCodes;⎕TRAP;packageID_
 ⍝ Delete one or more packages.\\
 ⍝ Whether deleting a package is an option is determined by the INI setting [CONFIG]DeletePackages
 ⍝ which is returned by `GetDeletePolicy` as a text vector.
@@ -11,21 +11,26 @@
      response←request Respond 400
      response.Content←'Invalid package ID(s): ',⊃{⍺,', ',⍵}/(~b)/packageIDs
  :Else
-     regPaths←(Reg.AddSlash G.RegistryPath)∘,¨packageIDs
      statusCodes←msgs←''
-     :For packageID regPath :InEach packageIDs regPaths
-         :If 'JustBetas'≢deletePolicy
-         :OrIf Reg.IsBeta packageID
-             :If 0=≢msg←Reg.DeletePackage regPath
-                 statusCodes,←200
-                 msgs,←⊂''
-             :Else
-                 statusCodes,←400
-                 msgs,←⊂msg
-             :EndIf
+     regPath←Reg.AddSlash G.RegistryPath
+     :For packageID :In packageIDs
+         :If 0=≢packageID_←regPath CorrectPkgName packageID
+             statusCodes,←404
+             msgs,←⊂'Package not found: ',packageID
          :Else
-             statusCodes,←405
-             msgs,←⊂'Not a beta version but the server policies allows deletion of betas only'
+             :If 'JustBetas'≢deletePolicy
+             :OrIf Reg.IsBeta packageID_
+                 :If 0=≢msg←Reg.DeletePackage regPath,packageID_
+                     statusCodes,←200
+                     msgs,←⊂''
+                 :Else
+                     statusCodes,←400
+                     msgs,←⊂msg
+                 :EndIf
+             :Else
+                 statusCodes,←405
+                 msgs,←⊂'Not a beta version but the server policies allows deletion of betas only'
+             :EndIf
          :EndIf
      :EndFor
      okay←200=statusCodes
@@ -41,7 +46,7 @@
          response.Content←'Package',((1<≢msgs)/'s'),' deleted'
          ##.Registry.Index.Compile G.RegistryPath
      :Else
-         response←request Respond ⌈/statusCodes
+         response←request Respond⌈/statusCodes
          noOfOkay←statusCodes+.=200
          noOfFailures←statusCodes+.≠200
          msg←¯2↓⊃,/{(1⊃⍵),': ',(⍕2⊃⍵),' (',(3⊃⍵),'); '}¨↓⍉↑(~okay)∘/¨packageIDs statusCodes msgs

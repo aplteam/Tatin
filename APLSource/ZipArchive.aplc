@@ -26,11 +26,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'ZipArchive' '1.1.0+16' '2023-06-12'
+      r←'ZipArchive' '1.2.0+16' '2024-04-15'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.2.0 from 2024-04-15
+    ⍝   * With High Sierra Apple introduced a version of "unzip" that throws an error in case of any non-ANSI
+    ⍝     characters in an filename.
     ⍝ * 1.1.0 from 2023-06-12
     ⍝   * On Linux, the `Add` method keeps failing every now and then for no apparent reason. Retries now.
     ⍝   * Many errors signalled by the `Assert` function did not incorporate a message when they should and could
@@ -238,7 +241,7 @@
       :EndIf
     ∇
 
-    ∇ {r}←zipFilename UnzipTo targetFolder;F;msg;rc;qdmx
+    ∇ {r}←zipFilename UnzipTo targetFolder;F;msg;rc;qdmx;cmd
     ⍝ Unzip `⍵` into `⍺`.\\
     ⍝ `targetFolder` must not yet exist.
       :Access Public Shared
@@ -251,7 +254,13 @@
           ⍝ For unknown reasons the following statement tends to crash, yet the unzip utility unzips everything anyway,
           ⍝ therefore we trap the error and just compare the number of files in the archive with what we've got.
           :Trap 11
-              (rc msg)←Exec'unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'
+              :If IsMac
+              ⍝ (rc msg)←Exec'unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'  ⍝ Does not work with, say, Umlaute in filesnames since High Sierra!
+                  cmd←'ditto -V -x -k "',(zipFilename~'"'),'" ',(1+0<≢targetFolder)⊃'.'targetFolder
+              :Else
+                  cmd←'unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'
+              :EndIf
+              (rc msg)←Exec cmd
           :Else
               qdmx←⎕DMX
               qdmx.Message ⎕SIGNAL qdmx.EN
@@ -313,6 +322,11 @@
     ∇ r←IsWindows;A
       A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
       r←'Win'≡A.GetOperatingSystem''
+    ∇
+
+    ∇ r←IsMac;A
+      A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
+      r←'Mac'≡A.GetOperatingSystem''
     ∇
 
       AddExtension←{

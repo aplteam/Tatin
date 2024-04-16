@@ -1,0 +1,39 @@
+ InstallTatin;ind;installFolder;aplVersion;q
+⍝ Installs Tatin into the appropriate folder, depending on the current OS.
+⍝ The user will be asked whether to install into the version specific folder or agnostic folder
+ ind←'Into which folder?'#.Cider.Cider.CommTools.Select'Version specific' 'Version agnostic'
+ :If 0<≢ind
+     :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
+     :Case 'Win'
+         :If ind=1
+             installFolder←2⊃4070⌶0
+         :Else
+             installFolder←(1⊃⎕NPARTS 2⊃4070⌶0),'Dyalog APL Files'
+         :EndIf
+         installFolder,←'\SessionExtensions\CiderTatin\'
+     :Case 'Lin'
+         aplVersion←# ⎕WG'APLVersion'
+         :If ind=1
+             installFolder←'/home/',⎕AN,'/.dyalog/','dyalog.',('.'~⍨{⍵/⍨2>+\⍵='.'}2⊃aplVersion),'U',(¯2↑1⊃aplVersion),'.files'
+         :Else
+             installFolder←'/home/',⎕AN,'/.dyalog/dyalog.files'
+         :EndIf
+         installFolder,←'/SessionExtensions/CiderTatin/'
+     :Case 'Mac'
+         aplVersion←# ⎕WG'APLVersion'
+         :If ind=1
+             installFolder←'/Users/',⎕AN,'/.dyalog/','dyalog.',('.'~⍨{⍵/⍨2>+\⍵='.'}2⊃aplVersion),'U',(¯2↑1⊃aplVersion),'.files'
+         :Else
+             installFolder←'/Users/',⎕AN,'/.dyalog/dyalog.files'
+         :EndIf
+         installFolder,←'/SessionExtensions/CiderTatin/'
+     :Else
+         ∘∘∘ ⍝ Huh?!
+     :EndSelect
+     q←'Installing Tatin into:',(⎕UCS 13),'  ',installFolder,'/Tatin ?'
+     :If ##.CommTools.YesOrNo q
+         {}##.FilesAndDirs.RmDir installFolder,'Tatin'
+         installFolder ⎕NCOPY ##.CiderConfig.HOME,'/Dist/Client/Tatin'
+         ⎕←'*** Done!'
+     :EndIf
+ :EndIf

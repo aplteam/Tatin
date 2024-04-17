@@ -1,0 +1,13 @@
+ r←Test_Misc_110(stopFlag batchFlag);⎕TRAP;list;ind;folder
+⍝ Test function Registry.SortIndexForPackageIDs for producing the correct sort index
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ folder←∆GetServerRegistryFolder
+ list←##.FilesAndDirs.ListDirs folder,'aplteam-APLTreeUtils-*'
+
+ ind←##.Registry.SortIndexForPackageIDs list
+ →T.PassesIf 6 4 3 5 2 1≡ind
+
+ r←T._OK
+⍝Done

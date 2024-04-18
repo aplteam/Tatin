@@ -3,7 +3,7 @@
 ⍝ See also `TakeBestVersion1` which is considered wrong.
  mat←⍉↑ns.(principal packageID url)
  principal←(1=mat[;1])⌿mat                              ⍝ Separate principal packages from the rest
- mat←⊖mat[Reg.SortIndexForPackageIDs mat[;2];]          ⍝ Make sure latest ones are at the top
+ mat←mat[Reg.SortIndexForPackageIDs mat[;2];]           ⍝ Latest ones are at the top
  groupNameMajor←Reg.RemoveMinorAndPatch¨mat[;2]         ⍝ Majors are consiered separate packages
  b←(⍳≢mat)=groupNameMajor⍳groupNameMajor
  mat←b⌿mat

@@ -1,13 +1,14 @@
- r←Test_Misc_112(stopFlag batchFlag);⎕TRAP;list;ind;folder
+ r←Test_Misc_112(stopFlag batchFlag);⎕TRAP;list;ind;folder;data
 ⍝ Test function Registry.SortIndexForPackageIDs for producing the correct sort index
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  folder←∆GetServerRegistryFolder
  list←##.FilesAndDirs.ListDirs folder,'example-versions-*'
+ data←##.Registry.InjectPublishingDate list
 
- ind←##.Registry.SortIndexForPackageIDs list
- →T.PassesIf 8 6 7 4 5 2 3 1≡ind
+ ind←##.Registry.SortIndexForPackageIDs data
+ →T.PassesIf 9 7 8 6 4 5 2 3 1≡ind
 
  r←T._OK
 ⍝Done

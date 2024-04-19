@@ -3,6 +3,9 @@
 ⍝ The user will be asked whether to install into the version specific folder or agnostic folder
  ind←'Into which folder?'##.CommTools.Select'Version specific' 'Version agnostic'
  :If 0<≢ind
+     :If 0=##.FilesAndDirs.⎕NC'APLTreeUtils2'
+         Initialize_Client
+     :EndIf
      :Select ##.APLTreeUtils2.GetOperatingSystem ⍬
      :Case 'Win'
          :If ind=1

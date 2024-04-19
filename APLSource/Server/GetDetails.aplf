@@ -9,15 +9,15 @@
      version←'full'
  :ElseIf Reg.IsValidPackageID_WithMajorNo packageID
      filenames←⊃F.Dir G.RegistryPath,packageID,'*'
-     filename←({⍵⊃⍨¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     filename←({⍵⊃⍨⊃Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
      version←'major'
  :ElseIf Reg.IsValidPackageID_WithoutPatchNo packageID
      filenames←⊃F.Dir(G.RegistryPath,packageID,'*')
-     filename←({⍵⊃⍨¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     filename←({⍵⊃⍨⊃Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
      version←'major+minor'
  :ElseIf Reg.IsValidPackageID_WithoutVersionNo packageID
      filenames←⊃F.Dir G.RegistryPath,packageID,'-*'
-     filename←({⍵⊃⍨¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     filename←({⍵⊃⍨⊃Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
      version←'none'
  :Else
      response←request Respond 404 1

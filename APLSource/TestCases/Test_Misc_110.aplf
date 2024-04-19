@@ -1,4 +1,4 @@
- r←Test_Misc_110(stopFlag batchFlag);⎕TRAP;list;ind;folder
+ r←Test_Misc_110(stopFlag batchFlag);⎕TRAP;list;ind;folder;expected
 ⍝ Test function Registry.SortIndexForPackageIDs for producing the correct sort index
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -7,7 +7,9 @@
  list←##.FilesAndDirs.ListDirs folder,'aplteam-APLTreeUtils-*'
 
  ind←##.Registry.SortIndexForPackageIDs list
- →T.PassesIf 6 4 3 5 2 1≡ind
+ expected←'aplteam-APLTreeUtils-7.0.0' 'aplteam-APLTreeUtils-6.0.11' 'aplteam-APLTreeUtils-6.0.10'
+ expected,←'aplteam-APLTreeUtils-6.0.9' 'aplteam-APLTreeUtils-6.0.1' 'aplteam-APLTreeUtils-6.0.0'
+ →T.PassesIf expected≡(≢folder)↓¨list[ind]
 
  r←T._OK
 ⍝Done

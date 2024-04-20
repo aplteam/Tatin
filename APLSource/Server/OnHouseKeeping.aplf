@@ -43,13 +43,13 @@
          ExecuteMaintenanceCode G
      :EndIf
  :Else
+     qdmx←⎕DMX
      :Trap 0
-         qdmx←⎕DMX
          P.G.Server Log'Housekeeping error: ',qdmx.EM,'; RC=',⍕qdmx.EN
          P.G.Server Log'Tatin cannot continue'
-         ⎕SIGNAL 11  ⍝ Let Rumba's "ServerLoop" take over
      :Else
          ⎕OFF 125
      :EndTrap
+     ⎕SIGNAL 11  ⍝ Let Rumba's "ServerLoop" take over
  :EndTrap
 ⍝Done

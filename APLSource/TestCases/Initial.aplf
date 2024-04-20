@@ -33,6 +33,7 @@
  {}''∆GetTempDir ⍬
  ∆TEST←1 ⍝ Used to add an HTTP header to any request. Influences only logging on the server side but implicitly also usage data
 
+ flag2←0
  :If 'win'≡⎕C ##.APLTreeUtils2.GetOperatingSystem ⍬
      :If ~(⊂parms)∊''⍬
      :AndIf ~parms.batchFlag
@@ -47,7 +48,8 @@
              :EndIf
          :Until flag2
      :EndIf
- :Else
+ :EndIf
+ :If 0=flag2
      msg←'Please start the Tatin server by loading the WS RunTatinServer in a freshly started instance of Dyalog:'
      msg,←⎕UCS 13
      msg,←')load ',∆TEMP_SERVER_FOLDER,'/RunTatinServer'

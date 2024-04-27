@@ -1,4 +1,4 @@
-{r}←LinkDependencies refs;ref;deps;root;destinations;bool;depName;destination;cfgs;cfg;list;dep;aliasOrName
+ {r}←LinkDependencies refs;ref;deps;root;destinations;bool;depName;destination;cfgs;cfg;list;dep;aliasOrName
 ⍝ Takes a list of refs, typically returned by `LoadDependencies`, and establishes any required references
 ⍝ to dependencies within those refs.
 ⍝ `api` rules, but if it's empty then `name` is taken instead.
@@ -19,11 +19,12 @@
                  depName←{⍵↑⍨¯1+⍵⍳'-'}{⍵↓⍨⍵⍳'-'}GetPackageIDFrom dep
                  aliasOrName←depName{'@'∊⍵:⍵↑⍨¯1+⍵⍳'@' ⋄ ⍺}dep
                  :If 0=≢cfg.api
- ⍝TODO⍝                      :If 1≠≢list←(' '~¨⍨↓⍎destination,'.⎕NL 9')~⊂'TatinVars'
-                     aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination
- ⍝TODO⍝                      :Else
- ⍝TODO⍝                          aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination,'.',1⊃list
- ⍝TODO⍝                      :EndIf
+                     :If 1=≢list←(' '~¨⍨↓⍎destination,'.⎕NL 9')~⊂'TatinVars'
+                     :AndIf aliasOrName≡1⊃list
+                         aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination,'.',1⊃list
+                     :Else
+                         aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination
+                     :EndIf
                  :Else
                      aliasOrName ref.{⍎'⎕THIS.',⍺,'←',⍵}destination,'.',cfg.api
                  :EndIf

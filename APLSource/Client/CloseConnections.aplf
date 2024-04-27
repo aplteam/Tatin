@@ -1,4 +1,4 @@
- {r}←CloseConnections force;list;flag
+ {r}←CloseConnections force;list;flag;qdmx
 ⍝ Close all permanent connections defined within ∆PermanentConnections, and delete that namespace.
 ⍝ That can be prevented by injecting `keepOpen←1` into ∆PermanentConnections which in turn
 ⍝ can be overwritten with ⍵←1.
@@ -14,9 +14,12 @@
          :EndIf
          :If flag
              list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
-             :Trap 0  ⍝TODO⍝
+             :Trap 0  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝
                  {}{⍵ R.Close 0}¨list
              :Else
+                 ⍝ This happens, but very rarely.
+                 ⍝ We need to find out why
+                 qdmx←⎕DMX
                  ⎕TRAP←0 'S'
                  ̉∘∘∘
              :EndTrap

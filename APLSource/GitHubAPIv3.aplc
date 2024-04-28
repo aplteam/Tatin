@@ -1,6 +1,6 @@
 :Class GitHubAPIv3
 ⍝ This class offers methods that allows one to communicate with GitHub by using GitHub's REST API from Dyalog APL.
-⍝ Note that this is version 3 of the GitHub API; Later versions doe **not** use REST.\\
+⍝ Note that this is version 3 of the GitHub API; Later versions do **not** use REST.\\
 ⍝ Most methods of this class become available only by instantiating the class. `⎕NEW` requires an owner as argument.\\
 ⍝ However, there are also a few shared methods beyond `Version` and `History` available.\\
 ⍝ Kai Jaeger\\
@@ -10,31 +10,23 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHubAPIv3' '1.0.1' '2023-08-28'
+      r←'GitHubAPIv3' '1.2.0' '2024-04-28'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.2.0
+    ⍝   * Instances of GitHubAPIv3 now have a useful display format: for a user "foo" it shows GitHubAPIv3[foo]
+    ⍝   * The name of the function `GetPrinciple` was changed to `GetPrincipal`
+    ⍝   * When Assert signals an error not only the message but also the HTTP code is returned as in "Not found (404)"
+    ⍝   * Package dependencies updated
+    ⍝   * Bug fixes
+    ⍝     * The DF of an issue was wrong ("Issues" rather than "Issue"). While on it the issue number was added.
+    ⍝ * 1.1.0
+    ⍝   Dependencies updated: HttpCommand and APLTreeUtil2
     ⍝ * 1.0.1
     ⍝   * Domain of the function `CastTagname2Number` extended: Major and minor nmber might both carry 3 digits,
     ⍝     while a build number might carry up to 5 digits.
-    ⍝ * 1.0.0
-    ⍝   * This release comes with several breaking changes due to a re-design:
-    ⍝     1. It does not depend on .NET anymore, meaning is works on Linux and Mac-OS without .NET
-    ⍝        Instead it now depends on the `HttpCommand` package.
-    ⍝     2. The functions return neither an error code nor an error message anymore, just the result;
-    ⍝        errors are signalled now
-    ⍝     3. `GetAllReleases` now returns by default a vector of character vectors with the versions.
-    ⍝        The newly introduced optional left argument `verbose` can be used to get the full data instead.
-    ⍝     4. The `CheckForUpdate` now returns a character vector rather than a Boolean, see there
-    ⍝     5. `GetAllEndpoints` now requires a Boolean right argument. If this is a 0 a two-column matrix is
-    ⍝        returned, though by passing a 1 as ⍺ ("verbose") one can still get the JSON objects as namespaces.
-    ⍝     6. The `regEx` property was removed because it is not required anymore
-    ⍝     7. `PutTopics` removed
-    ⍝   * There is now a property "personal_access_token" which when not empty is used to authenticate requests.
-    ⍝   * This version works cross-platform **without** depending on .NET.
-    ⍝   * Bug fixes
-    ⍝     * Package config was faulty (source). Functionality was not affected by this bug.
     ⍝\\
     ⍝ For information regarding older versions see <https://github.com/aplteam/GitHubAPIv3/releases>
     ∇
@@ -65,6 +57,7 @@
       _regEx←'setup_<repoName>_<version>[.\]*.[0-9]{0,6}\.exe'  ⍝ After version there _might_ be a built number
       A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
       H←(⊃⊃⎕CLASS ⎕THIS).##.HttpCommand
+      ⎕DF'GitHubAPIv3[',owner,']'
     ∇
 
     ∇ ns←GetLatestReleaseInfo repoName;gitPath
@@ -143,17 +136,17 @@
     ∇ ns←{addPullRequests}GetAllIssues repoName;gitPath
       :Access Public Instance
     ⍝ Returns all issues for a given repository but no pull requests by default.\\
-    ⍝ In GitHub, every pull request is an issue, but now all issues are pull requests.
-    ⍝ This function does not show pull requests by default, by you can change this by passing a 1 as left argument.
+    ⍝ In GitHub, every pull request is an issue, but not all issues are pull requests.
+    ⍝ You can enforce the addition of Pull Requests by passing a 1 as left argument.
       addPullRequests←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'addPullRequests'
       gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues'
       ns←GetJson gitPath
       :If ~addPullRequests
           ns←(0=⊃¨ns.⎕NC⊂'pull_request')/ns
       :EndIf
-      ns.{⎕DF'[Issues of repo ',⍵,']'}⊂repoName
+      ns.⎕DF(repoName,' issue ')∘,¨(⍕¨ns.number)
       ns.⎕FX⊂⎕CR'∆List'
-      ns.⎕FX⊂'r←∆Details instance' 'r←∆List' ' :If 0<≢instance' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name''' ':EndIf'
+      ns.⎕FX⊂'r←∆Details instance' 'r←∆List' ' :If 0<≢instance' 'r(instance.GetPrincipal)←''assignees'' ''login''' 'r(instance.GetPrincipal)←''labels'' ''name''' ':EndIf'
       ns.⎕FX⊂'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
     ∇
 
@@ -168,7 +161,7 @@
       ns←GetJson gitPath
       ns.{⎕DF ⍵}'[Issue ',(⍕number),' of repo ',repoName,']'
       ns.⎕FX ⎕CR'∆List'
-      ns.⎕FX'r←∆Details instance' 'r←∆List' 'r(instance.GetPrinciple)←''assignees'' ''login''' 'r(instance.GetPrinciple)←''labels'' ''name'''
+      ns.⎕FX'r←∆Details instance' 'r←∆List' 'r(instance.GetPrincipal)←''assignees'' ''login''' 'r(instance.GetPrincipal)←''labels'' ''name'''
       ns.⎕FX'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
     ∇
 
@@ -325,7 +318,7 @@
       :EndIf
       h.URL←EncodeBlank gitURL
       r←h.Run
-      r.HttpMessage Assert r.HttpStatus=200
+      (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus=200
       data←⎕JSON r.Data
       noOfPages←GetNoOfPages r.Headers
       :If 0<noOfPages
@@ -334,7 +327,7 @@
           link←2⊃r.Headers[ind;]
           h.URL←{¯1↓1↓⍵↑⍨¯1+⍵⍳';'}link
           r2←h.Run
-          r.HttpMessage Assert r.HttpStatus≠200 Assert 200=r.HttpStatus
+          (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus=200
           data,←⎕JSON r2.Data
           :If 2<noOfPages
               ⍝ Fetch all remaining pages
@@ -342,24 +335,22 @@
               :For link :In links
                   h.URL←link
                   r2←h.Run
-                  r.HttpMessage Assert r.HttpStatus=200
+                  (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus=200
                   data,←⎕JSON r2.Data
               :EndFor
           :EndIf
       :EndIf
     ∇
 
-    ∇ data←data GetPrinciple(propName principleName);row;jsonObj;buff
-    ⍝ * `propName` is the name of a variable in a data space that is one or more JSON object(s)
-    ⍝ * `principleName` is the principle name of all the properties of that JSON object\\
+    ∇ data←data GetPrincipal(propName principalName);row;jsonObj;buff
+    ⍝ * `propName` is the name of a variable in `data` holding one or more JSON object(s).\\
+    ⍝ * `principalName` is the principal name of that JSON object or JSON objects.\\
     ⍝   Typical examples are "label" or "name"\\
-    ⍝ The generic names are then replaced but the "real" ones.
-    ⍝ Is concatenated with a comma and a blank, so ('bug' 'question') become:
-    ⍝ 'bug, question'
+    ⍝ The generic names are then replaced but the real data.
       :Access Public instance
       row←data[;1]⍳⊂propName
       :If 0≠≢jsonObj←2⊃data[row;]
-          buff←jsonObj⍎¨⊂principleName
+          buff←jsonObj⍎¨⊂principalName
           data[row;2]←{⍺,', ',⍵}/buff
       :EndIf
     ∇

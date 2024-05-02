@@ -61,11 +61,20 @@ Note that there is no need to save a workspace or anything: every function, oper
 
 ## Prepare either the Client or the Server
 
+### Introduction
+
+Note that for running the test suite you only need to prepare the client. However, because  you might want to run the test server independently from the test suite, the required preparations for the server is discussed here as well.
+
+
+### Preparing the client
+
 If you want to run any Tatin client code execute the function
 
 ```
 #.Tatin.Admin.Initialize_Client
 ```
+
+### Preparing the server
 
 If you want to run the Tatin Server execute the function
 
@@ -118,7 +127,7 @@ The variable `⎕SE._Tatin.DEVELOPMENT←1` tells that the user wants to work on
 Note that if there is a variable `⎕SE._Tatin.DEVELOPMENT←0` Cider won't ask the question, and code is executed in `⎕SE`, as it is if there is no variable `⎕SE._Tatin.DEVELOPMENT` at all.
 
 
-## Executing the test cases
+## Executing the test suite
 
 If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider how to do that:
 
@@ -127,9 +136,9 @@ If you just want to execute all test cases before pushing your changes to GitHub
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite
 ```
 
-Executing `RunTests` means that on Windows you will be asked whether a test server should be started. Usually, you will answer with a "Y", and that lets the test suite start another instance of Dyalog, and run a test server in that instance.
+Executing `RunTests` means that on Windows you will be asked whether a test server should be started. Usually, you will answer with a "Y", Meaning that the test suite will start another instance of Dyalog, and run a test server in that instance for you.
 
-On non-Windows platforms you will be be asked to start the server yourself and press `<enter>` once that has been done.
+On non-Windows platforms you will be be asked to start another instance of Dyalog, and you will be given a `)Load /path/2/test-server/RunTatinServer.dws` statement that you can copy over into that new instance and run it. This will load and run the server in a temporary directory.
 
 Developers might also run into one of two common scenarios: 
 
@@ -139,7 +148,7 @@ Developers might also run into one of two common scenarios:
 
    When a test fails then the test framework stops, and the developer can investigate on the spot.
 
-1. You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; more than 95% of the tests are batchable)
+1. You might want to execute the test suite automatically (batch mode), meaning that the tests should not attempt to interact with a user. (That means that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; more than 95% of the tests are batchable)
 
    This might be required by an automated build process.
 
@@ -172,11 +181,11 @@ Use `]Cider.OpenProject` to do this. Once the project has been opened, you can a
 
 Note that by default the test cases use port 5001 for communication between the client and the Test Server that is part of Tatin. Change the INI files for both server and client if that does not work for you.
 
-When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!". (Windows only, elsewhere you must start the server yourself)
+When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a "Yes!". (Windows only, elsewhere you must start the server yourself by starting a new instance of Dyalog and then copying over and executing the `)Load` statement that is provided as part of the client test suite. This means that at the moment you cannot run the test suite automatically --- batch mode --- on non-Windows platforms, a restriction that will soon be lifted.)
 
 A> ### Starting a Tatin test server "manually"
 A>
-A> There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux or Mac-OS when this is a requirement. For that execute the following steps:
+A> There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:
 A> 
 A> 1. Instantiate Dyalog Unicode 18.0 or later
 A> 
@@ -194,7 +203,7 @@ The `RunTests` function performs these tasks:
 * Change the current directory
 * Establish all required references
 * Instantiate the `Tester2` class as `T` 
-* Start a local Tatin test server if the user confirms this
+* Start a local Tatin test server if the user confirms (Windows) this or make the user start a test server (other platforms)
 * Call the `T.Run` function
 
   This will run all test cases, including those that communicate with a locally running Tatin test server and the principal Tatin server available at <https://tatin.dev>
@@ -430,6 +439,7 @@ There is a function that creates a single HTML file from all the Tatin markdown 
 ```
 
 Now open that file with the word processor of your choice and use its spell-checking capabilities.
+
 
 
 

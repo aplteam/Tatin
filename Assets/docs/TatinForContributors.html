@@ -28,11 +28,16 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <li class="toc-entry toc-h2"><a href="#requirements">2. Requirements</a></li>
 <li class="toc-entry toc-h2"><a href="#tatin-is-managed-by-cider">3. Tatin is managed by Cider</a></li>
 <li class="toc-entry toc-h2"><a href="#how-to-work-on-tatin">4. How to work on Tatin</a></li>
-<li class="toc-entry toc-h2"><a href="#prepare-either-the-client-or-the-server">5. Prepare either the Client or the Server</a></li>
+<li class="toc-entry toc-h2"><a href="#prepare-either-the-client-or-the-server">5. Prepare either the Client or the Server</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#introduction">5.1. Introduction</a></li>
+<li class="toc-entry toc-h3"><a href="#preparing-the-client">5.2. Preparing the client</a></li>
+<li class="toc-entry toc-h3"><a href="#preparing-the-server">5.3. Preparing the server</a></li>
+</ul></li>
 <li class="toc-entry toc-h2"><a href="#updating-tatin-packages-used-by-tatin">6. Updating Tatin packages used by Tatin</a></li>
 <li class="toc-entry toc-h2"><a href="#do-your-thing">7. Do your thing</a></li>
 <li class="toc-entry toc-h2"><a href="#special-case-working-on-user-commands">8. Special case: working on user commands</a></li>
-<li class="toc-entry toc-h2"><a href="#executing-the-test-cases">9. Executing the test cases</a>
+<li class="toc-entry toc-h2"><a href="#executing-the-test-suite">9. Executing the test suite</a>
 <ul>
 <li class="toc-entry toc-h3"><a href="#testing-while-developing">9.1. Testing while developing</a>
 <ul>
@@ -100,8 +105,24 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <h2 data-id="Prepare-either-the-Client-or-the-Server">5. Prepare either the Client or the Server</h2>
 </a>
 </div>
+<div class="h_tag">
+<a href="#introduction" id="introduction" class="autoheader_anchor">
+<h3 data-id="Introduction">5.1. Introduction</h3>
+</a>
+</div>
+<p>Note that for running the test suite you only need to prepare the client. However, because you might want to run the test server independently from the test suite, the required preparations for the server is discussed here as well.</p>
+<div class="h_tag">
+<a href="#preparing-the-client" id="preparing-the-client" class="autoheader_anchor">
+<h3 data-id="Preparing-the-client">5.2. Preparing the client</h3>
+</a>
+</div>
 <p>If you want to run any Tatin client code execute the function</p>
 <pre tabindex="0"><code>#.Tatin.Admin.Initialize_Client</code></pre>
+<div class="h_tag">
+<a href="#preparing-the-server" id="preparing-the-server" class="autoheader_anchor">
+<h3 data-id="Preparing-the-server">5.3. Preparing the server</h3>
+</a>
+</div>
 <p>If you want to run the Tatin Server execute the function</p>
 <pre tabindex="0"><code>#.Tatin.Admin.Initialize_Server</code></pre>
 <p>Note that you cannot run both the Client and the Server in the same workspace.</p>
@@ -140,21 +161,21 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>The variable <code>⎕SE._Tatin.DEVELOPMENT←1</code> tells that the user wants to work on Tatin while calling code in <code>⎕SE</code>, and therefore Tatin makes sure that the code in <code>#</code> is executed rather than <code>⎕SE</code>.</p>
 <p>Note that if there is a variable <code>⎕SE._Tatin.DEVELOPMENT←0</code> Cider won't ask the question, and code is executed in <code>⎕SE</code>, as it is if there is no variable <code>⎕SE._Tatin.DEVELOPMENT</code> at all.</p>
 <div class="h_tag">
-<a href="#executing-the-test-cases" id="executing-the-test-cases" class="autoheader_anchor">
-<h2 data-id="Executing-the-test-cases">9. Executing the test cases</h2>
+<a href="#executing-the-test-suite" id="executing-the-test-suite" class="autoheader_anchor">
+<h2 data-id="Executing-the-test-suite">9. Executing the test suite</h2>
 </a>
 </div>
 <p>If you just want to execute all test cases before pushing your changes to GitHub then you may ask Cider how to do that:</p>
 <pre tabindex="0"><code>      ]Cider.RunTests
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite</code></pre>
-<p>Executing <code>RunTests</code> means that on Windows you will be asked whether a test server should be started. Usually, you will answer with a “Y”, and that lets the test suite start another instance of Dyalog, and run a test server in that instance.</p>
-<p>On non-Windows platforms you will be be asked to start the server yourself and press <code>&lt;enter&gt;</code> once that has been done.</p>
+<p>Executing <code>RunTests</code> means that on Windows you will be asked whether a test server should be started. Usually, you will answer with a “Y”, Meaning that the test suite will start another instance of Dyalog, and run a test server in that instance for you.</p>
+<p>On non-Windows platforms you will be be asked to start another instance of Dyalog, and you will be given a <code>)Load /path/2/test-server/RunTatinServer.dws</code> statement that you can copy over into that new instance and run it. This will load and run the server in a temporary directory.</p>
 <p>Developers might also run into one of two common scenarios:</p>
 <ol start="1">
 <li>During development you might want to execute all tests or just a specific group (or groups) of tests.
 <p>You are sitting in front of the monitor, and therefore tests can ask you to perform certain tasks, like closing an edit window etc.</p>
 <p>When a test fails then the test framework stops, and the developer can investigate on the spot.</p></li>
-<li>You might want to execute the test suite automatically (batch mode), meaning that the tests would not attempt to interact with a user. (This implies that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; more than 95% of the tests are batchable)
+<li>You might want to execute the test suite automatically (batch mode), meaning that the tests should not attempt to interact with a user. (That means that test cases that depend on a user won't be executed. Tatin has only a few test cases that fall into this category; more than 95% of the tests are batchable)
 <p>This might be required by an automated build process.</p>
 <p>In this case, any errors are trapped, and you get just either a single line that reports success or failure in the session or <code>⎕OFF</code> is executed, either without a code (in case of success) or the return code 123, indicating failure to the calling environment.</p>
 <p>Note that a single failing test case is considered as “failure” of the whole test suite, though the test framework will continue to execute all remaining tests.</p></li>
@@ -182,10 +203,10 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <pre tabindex="0"><code>      ]Cider.RunTests
 #.Tatin.#.Tatin.TestCases.RunTests ⍝ Execute this for running the test suite</code></pre>
 <p>Note that by default the test cases use port 5001 for communication between the client and the Test Server that is part of Tatin. Change the INI files for both server and client if that does not work for you.</p>
-<p>When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a “Yes!”. (Windows only, elsewhere you must start the server yourself)</p>
+<p>When you run the test suite you will be asked whether you want to start a Tatin test server locally, and usually, you will answer with a “Yes!”. (Windows only, elsewhere you must start the server yourself by starting a new instance of Dyalog and then copying over and executing the <code>)Load</code> statement that is provided as part of the client test suite. This means that at the moment you cannot run the test suite automatically — batch mode — on non-Windows platforms, a restriction that will soon be lifted.)</p>
 <div class="leanpub_A">
 <h3>Starting a Tatin test server “manually”</h3>
-<p>There may be scenarios when you want to start a local Tatin test server yourself, or you develop under Linux or Mac-OS when this is a requirement. For that execute the following steps:</p>
+<p>There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:</p>
 <ol start="1">
 <li>Instantiate Dyalog Unicode 18.0 or later</li>
 <li>Execute the following two statements:
@@ -200,7 +221,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <li>Change the current directory</li>
 <li>Establish all required references</li>
 <li>Instantiate the <code>Tester2</code> class as <code>T</code></li>
-<li>Start a local Tatin test server if the user confirms this</li>
+<li>Start a local Tatin test server if the user confirms (Windows) this or make the user start a test server (other platforms)</li>
 <li>Call the <code>T.Run</code> function
 <p>This will run all test cases, including those that communicate with a locally running Tatin test server and the principal Tatin server available at <a href="https://tatin.dev" class="external_link">https://tatin.dev</a></p></li>
 </ul>

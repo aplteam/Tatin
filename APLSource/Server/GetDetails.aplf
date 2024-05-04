@@ -1,4 +1,4 @@
- response←request GetDetails packageID;data;html;filename;url;version;filenames
+  response←request GetDetails packageID;data;html;filename;url;version;filenames
 ⍝ Attempts to return the package config file.
 ⍝ * If no version is specified then the latest version is determined and its details are returned.
 ⍝ * If just a major number is provided the details of the best version of that major number are returned.
@@ -9,15 +9,15 @@
      version←'full'
  :ElseIf Reg.IsValidPackageID_WithMajorNo packageID
      filenames←⊃F.Dir G.RegistryPath,packageID,'*'
-     filename←({⍵⊃⍨⊃Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     filename←({⍵⊃⍨⊃¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
      version←'major'
  :ElseIf Reg.IsValidPackageID_WithoutPatchNo packageID
      filenames←⊃F.Dir(G.RegistryPath,packageID,'*')
-     filename←({⍵⊃⍨⊃Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     filename←({⍵⊃⍨⊃¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
      version←'major+minor'
  :ElseIf Reg.IsValidPackageID_WithoutVersionNo packageID
      filenames←⊃F.Dir G.RegistryPath,packageID,'-*'
-     filename←({⍵⊃⍨⊃Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
+     filename←({⍵⊃⍨⊃¯1↑Reg.SortIndexForPackageIDs ⍵}filenames),'/',Reg.CFG_Name
      version←'none'
  :Else
      response←request Respond 404 1

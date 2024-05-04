@@ -5,17 +5,19 @@
 ⍝   [;1] packageID (without any beta part) or version numbers
 ⍝   [;2] the publishing date as a real (YYYYMMDD.hhmmss)
 ⍝   [;3] the publishing date but for non-betas 99999999 - this col determins the sort sequence
-⍝ The newest (latest) goes to the top, the oldest to the bottom.\\
+⍝ The latest (best) goes to the bottom, the oldest to the top.\\
 ⍝ * For non-betas the version number rules
 ⍝ * For betas the publishing dates rule\\
 ⍝ Notes:
-⍝ * {group}-{name}-9.0.0 comes after {group}-{name}-10.0.0
-⍝ * {group}-{name}-9.0.0 20101213.010203 comes after {group}-{name}-9.0.0 20110114.010203
+⍝ * {group}-{name}-9.0.0 comes before {group}-{name}-10.0.0
+⍝ * {group}-{name}-9.9.0 comes before {group}-{name}-9.10.0
+⍝ * {group}-{name}-9.9.9 comes before {group}-{name}-9.9.10
+⍝ * {group}-{name}-9.0.0 20101213.010203 comes before {group}-{name}-9.0.0 20110114.010203
  ind←⍬
  :If 0<≢data
      Assert 0=∧/~'.'∊¨data
      :If 2=⍴⍴data
-         ind1←⍒data[;3]
+         ind1←⍋data[;3]
          data←data[ind1;]
          buff←{⊃,/1↓⎕NPARTS ⍵}¨data[;1]
          buff←RemoveBetaPart¨buff

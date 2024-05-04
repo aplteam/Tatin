@@ -11,6 +11,10 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.108.1 from 2024-05-04
+
+* No action required
+
 ## Version 0.108.0 from 2024-05-02
 
 * You must update your client to 0.108.0 for correct results --- prior versions are incompatible with 0.108.0!
@@ -200,6 +204,8 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

@@ -19,7 +19,7 @@
      client←R.NewClient 0
      (client.Host request.RequestTarget)←{l←+/1>+\'/'=⍵ ⋄ (l↑⍵)(l↓⍵)}redirect
      data←client R.SendAndReceive request
-     ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 200')Assert data.StatusCode≡200
+     ('Accessing ',request.RequestTarget,' failed!',CR,'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 200')Assert data.StatusCode≡200
  :Else
-     ('Accessing ',request.RequestTarget,' failed!',(⎕UCS 13),'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert data.StatusCode≡200
+     ('Accessing ',request.RequestTarget,' failed!',CR,'HTTP status code is ',(⍕data.StatusCode),' rather than the expected 302')Assert data.StatusCode≡200
  :EndIf

@@ -6,7 +6,7 @@
  list←,TC.ListVersions'[local]example-versions'
  expected←'example-versions-2.0.0'  'example-versions-1.0.12-That-fix'  'example-versions-1.0.12-zzz'  'example-versions-1.0.12-aaa'  'example-versions-1.0.1-That-fix'
  expected,←'example-versions-1.0.1-This-fix' 'example-versions-1.0.0'  'example-versions-1.0.0-beta-1'  'example-versions-0.1.0'
- →T.PassesIf list≡expected          ⍝ Note that the publishing date dictates this sort order
+ →T.PassesIf list≡⌽expected          ⍝ Note that the publishing date dictates this sort order
  noOf←≢{⍵↓⍨-1+≢'-'A.Last ⍵}¨F.ListDirs ∆GetServerRegistryFolder,'\example-versions-*'
  →T.PassesIf 0<noOf
  →T.PassesIf noOf≡≢list

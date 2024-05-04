@@ -1,6 +1,7 @@
  r←{dateFlag}ListVersions uri;registryPath;packageID;group;name;regEx;pattern;ind;list;list2;list_lc;buff;major;groups;bool;version;minor;versions;bool2
 ⍝ Takes a package ID without minor and patch number (but possibly with major) and returns all versions saved for that package ID (vector)
-⍝ If `dateFlag` is specified and 1 (default is 0) then a matrix is returned with the publishing date in [;2]
+⍝ If `dateFlag` is specified and 1 (default is 0) then a matrix is returned with the publishing date in [;2].
+⍝ The latest (best?!) version is at the bottom, the oldes ot the top.
  'Invalid package ID'Assert 0 1 2∊⍨('\/'A.Last uri)+.='-' ⍝ Must be either "name" or "group-name" or "group-name-major" or "name-major"
  dateFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dateFlag'
  (registryPath packageID)←SplitAtLast uri

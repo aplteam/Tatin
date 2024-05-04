@@ -14,7 +14,7 @@
  :Hold 'INDEX'
      :If 0<≢packageList←##.F.ListDirs path
          packageList←##.InjectPublishingDate packageList
-         packageList←packageList[⌽##.SortIndexForPackageIDs packageList;1]
+         packageList←packageList[##.SortIndexForPackageIDs packageList;1]
          index←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}¨packageList
          cfgFiles←packageList,¨⊂'/apl-package.json'
          cfgFiles←(##.F.IsFile cfgFiles)/cfgFiles                       ⍝ Should only happen in case one is tracing through test cases

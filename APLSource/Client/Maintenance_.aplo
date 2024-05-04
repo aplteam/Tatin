@@ -9,10 +9,10 @@
          json←Reg.JSON data2
          :If ≢/Reg.JSON¨data2 data
              :If dry
-                 r,←'Would be changed: ',filename,⎕UCS 13
+                 r,←'Would be changed: ',filename,CR
              :Else
                  (⊂json)F.NPUT filename 1
-                 r,←'Changed: ',filename,⎕UCS 13
+                 r,←'Changed: ',filename,CR
              :EndIf
          :EndIf
          pkgName←data2.(group,'-',name,'-',version)
@@ -25,11 +25,11 @@
                  zipData←Reg.JSON⊃F.NGET tempFolder,'/apl-package.json'
                  :If json≢Reg.JSON zipData
                      :If dry
-                         r,←'Would be changed: ',zipFilename,⎕UCS 13
+                         r,←'Would be changed: ',zipFilename,CR
                      :Else
                          zip.Delete'apl-package.json'
                          path zip.Add'apl-package.json'
-                         r,←'Changed: ',zipFilename,⎕UCS 13
+                         r,←'Changed: ',zipFilename,CR
                      :EndIf
                  :EndIf
                  {}F.RmDirByForce tempFolder

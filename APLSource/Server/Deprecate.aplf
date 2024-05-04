@@ -18,7 +18,7 @@
      response←request Respond 404 0
      response.Content←'Package not found'
  :Else
-     bestVersions←{⍵{⍺[(⍳≢⍵){∪⍺[⍵⍳⍵]}⍵]}⌽Reg.RemoveMinorAndPatch¨⍵}{⍵[Reg.SortIndexForPackageIDs G.RegistryPath∘,¨⍵]}savedVersions
+     bestVersions←{⍵{⍺[(⍳≢⍵){∪⍺[⍵⍳⍵]}⍵]}⌽Reg.RemoveMinorAndPatch¨⍵}{⌽⍵[Reg.SortIndexForPackageIDs G.RegistryPath∘,¨⍵]}savedVersions
      bestMajorVersions←Reg.RemoveMinorAndPatch¨bestVersions
      tempFolder←(F.GetTempSubDir'Tatin'),'/'
      :If multiples←(,'*')≡,versions

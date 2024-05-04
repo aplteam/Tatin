@@ -1,4 +1,4 @@
- filename←{filename}GetPackageViaHTTP URL;uri;res;packageID;msg;CR;alias;packageID2
+ filename←{filename}GetPackageViaHTTP URL;uri;res;packageID;msg;alias;packageID2
 ⍝ Requests a package via HTTP
  filename←{0=⎕NC ⍵:'zip'F.GetTempFilename2'' ⋄ ⍎⍵}'filename'
  (uri packageID)←Reg.SeparateUriAndPackageID URL
@@ -7,7 +7,6 @@
  :If 200≡res.StatusCode
      res.Content Reg.WriteNativeFile filename
  :ElseIf 404≡res.StatusCode
-     CR←⎕UCS 13
      msg←'Could not find package:',CR
      msg,←'  ',packageID2,CR
      msg,←'on ',uri

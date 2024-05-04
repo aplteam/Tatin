@@ -64,8 +64,8 @@
  :EndIf
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
- P_←⎕NEW P(,⊂parms)
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Client...'
+ P_←⎕NEW P(,⊂parms)
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  UpdateDocumentation ⍬
@@ -83,10 +83,11 @@
  :EndIf
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
- P_←⎕NEW P(,⊃parms)
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
+ P_←⎕NEW P(,⊃parms)
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
+ 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   The final steps, putting it all together...'
  HandleRunFunction ⍬
  UpdateTestServerAssets ⍬
  {}⎕SE.Link.Refresh'#.Tatin'

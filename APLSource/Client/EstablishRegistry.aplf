@@ -26,42 +26,46 @@
      registries←(0<registries.priority)/registries
      'No Registries defined in the Client config file that can be scanned'Assert 1≤≢registries
      registries←({(⍵⍳⍵)=⍳≢⍵}registries.uri)/registries  ⍝ Because we might find the same registry multiple times with different credentials
-     PrintToSession'Scanning ',(⍕≢registries),' registr',((1+1=≢registries)⊃'ies' 'y'),' for ',packageID,'...'
-     i←0
-     skipped←⍬
-     :Repeat
-         i+←1
-         (uri alias port)←i⊃registries.(uri alias port)
-         :If ~port∊0 80 443
-             uri←(¯1↓uri),':',(⍕port),'/'
-         :EndIf
-         :If Reg.IsHTTP uri
-             (opCode reg)←EstablishRegistry_ uri packageID askUserFlag
-             :If opCode≡'skip'
-                 skipped,←⊂uri
-                 :Continue
-             :EndIf
-         :ElseIf Reg.IsValidPackageID_Complete packageID
-             :If F.IsDir(RemoveFileProtocol uri),'/',packageID
-                 reg←uri
-             :EndIf
-         :ElseIf Reg.IsValidPackageName packageID
-             :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/*-',packageID,'*'
-                 list←∪Reg.GetGroupName¨list
-                 ('Package name found in ',(⍕≢list),' groups')Assert 1=≢list
-                 reg←uri
-             :EndIf
-         :Else
-             :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/',packageID,'*'
-                 reg←uri
-             :EndIf
-         :EndIf
-         {}{PrintToSession ⍵}⍣(0=≢reg)⊣'   not found in ',uri
-     :Until (i=≢registries)∨0<≢reg
-     :If 0=≢reg
-         1 PrintToSession'   >>> not found anywhere!'
+     :If 1=≢registries
+         reg←registries[1].uri
      :Else
-         PrintToSession'   found in ',uri
+         PrintToSession'Scanning ',(⍕≢registries),' registr',((1+1=≢registries)⊃'ies' 'y'),' for ',packageID,'...'
+         i←0
+         skipped←⍬
+         :Repeat
+             i+←1
+             (uri alias port)←i⊃registries.(uri alias port)
+             :If ~port∊0 80 443
+                 uri←(¯1↓uri),':',(⍕port),'/'
+             :EndIf
+             :If Reg.IsHTTP uri
+                 (opCode reg)←EstablishRegistry_ uri packageID askUserFlag
+                 :If opCode≡'skip'
+                     skipped,←⊂uri
+                     :Continue
+                 :EndIf
+             :ElseIf Reg.IsValidPackageID_Complete packageID
+                 :If F.IsDir(RemoveFileProtocol uri),'/',packageID
+                     reg←uri
+                 :EndIf
+             :ElseIf Reg.IsValidPackageName packageID
+                 :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/*-',packageID,'*'
+                     list←∪Reg.GetGroupName¨list
+                     ('Package name found in ',(⍕≢list),' groups')Assert 1=≢list
+                     reg←uri
+                 :EndIf
+             :Else
+                 :If 0<≢list←F.ListDirs(RemoveFileProtocol uri),'/',packageID,'*'
+                     reg←uri
+                 :EndIf
+             :EndIf
+             {}{PrintToSession ⍵}⍣(0=≢reg)⊣'   not found in ',uri
+         :Until (i=≢registries)∨0<≢reg
+         :If 0=≢reg
+             1 PrintToSession'   >>> not found anywhere!'
+         :Else
+             PrintToSession'   found in ',uri
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

@@ -1,0 +1,65 @@
+ using_paths←{opts} Using project_dir;deps;d;k;v;t;pkg_name;pkgrt;dll;pkgs;ns;jsname;tgts;z;dlls;children;p;folder;name;opts;opts_mat;all_pkgs;keys;vals;def_opts;includePrimary;includePkgs;excludePkgs
+   ⍝ Return list of DLL paths for ⎕USING based on a primary DLL and the direct dependencies for a dotnet project published via NuGet
+   ⍝ args is expected to have one of three forms:
+   ⍝ 1. a string signifying the project directory; or
+   ⍝ 2. a list with the project directory as first element and a key-value pairs as other elements; or
+   ⍝ 3. a list of key-value pairs
+   ⍝
+   ⍝ The key-value part of args is interpreted as a map from options to values. Currently the following options are supported:
+   ⍝ * project_dir is the project directory; it must be signified if args is a pure list of key-value pairs
+   ⍝ * include_primary is a boolean signifying whether (1) or not (0) the path to the primary DLL is included in the output.
+   ⍝   Its standard value is 1.
+   ⍝ * exclude_pkgs is a list of package names (without version number!) to be excluded in the output
+   ⍝   Its standard value is ⍬
+   ⍝ * include_pkgs is a list of package names (without version number!) to be included in the output
+   ⍝   Its standard value is ⍬
+   ⍝ The parameter exclude_pkgs takes precedence over include_pkgs and giving include_pkgs a value of ⍬ means to include all packages.
+
+ def_opts←⎕NS ''
+ def_opts.(includePrimary includePkgs excludePkgs)←1 ⍬ ⍬
+ :Select ⊃⎕NC 'opts'
+     :Case 0
+         opts←⎕NS ''
+     :Case 2
+         opts←⎕SE.Dyalog.Array.Deserialise opts
+ :EndSelect
+ 'def_opts' ⎕NS opts
+ (includePrimary includePkgs excludePkgs)←def_opts.(includePrimary includePkgs excludePkgs)
+
+ jsname←7162⌶ ⍝ JSON Translate Name
+
+ pkgs←(~excludePkgs∊⍥⎕C⍨1⊃¨all_pkgs)/all_pkgs←Packages project_dir
+ :If 0<≢includePkgs
+     pkgs←(includePkgs∊⍥⎕C⍨1⊃¨pkgs)/pkgs
+ :EndIf
+
+
+ :If 0≠≢deps←findfile project_dir,'/*.deps.json'
+ :OrIf 0≠≢deps←findfile project_dir,'/published/*.deps.json'
+
+     (d k v t)←↓⍉⎕JSON ⎕OPT'Format' 'M'⊃⎕NGET deps
+     ⍝ Depth, Key, Value, Type
+     {}2{p[⍵]←⍺[⍺⍸⍵]}⌿⊢∘⊂⌸d⊣p←⍳≢d   ⍝ Parent vector p
+     ⍝ Descendant of pkgs and key≡"runtime"
+     pkg_name←⎕C⊃¨'/'(≠⊆⊢)¨k   ⍝ e.g. Clock/1.0.3 → Clock
+     pkgrt←(k∊⊂'runtime')(∧⍤1){⍵∨⍵[p]}⍤1⍣≡pkg_name(∊⍤1 0)⊃¨⎕C pkgs
+     ⍝ Child of "runtime" key is path to .dll
+     ⍝    file name    key  parent is "runtime"
+              ⍝ dll←⊃∘⌽¨'/'(≠⊆⊢)¨k⌿⍤1⍨(⊂p)⌷⍤1⊢pkgrt
+     dll←∊¨1↓¨⎕NPARTS(∨⌿pkgrt[;p])/k
+     using_paths←(project_dir,'/published/')∘,¨dll
+
+     (folder name)←2↑⎕NPARTS ¯10↓deps
+
+     ⍝ Possibly include primary DLL
+     :If includePrimary
+     :AndIf ⎕NEXISTS dll←(∊folder name),'.dll'
+         using_paths,←⊂dll
+     :EndIf
+
+ :Else ⍝ No deps.json file
+     'NuGet support currently requires .NET 6.0 or later' ⎕SIGNAL (2=⊃2250⌶0)/11
+     'Unable to locate deps.json file' ⎕SIGNAL 11 ⍝ /// Different strategy required for Framework
+     using_paths←{(~(2⊃¨⎕NPARTS ⍵)∊⊂project_name)/⍵}(⊃⎕NINFO⍠1⊢project_dir,'/published/*.dll')
+ :EndIf
+ using_paths←',',¨using_paths

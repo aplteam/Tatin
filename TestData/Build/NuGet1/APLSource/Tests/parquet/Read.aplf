@@ -1,0 +1,24 @@
+ Read←{
+⍝ ⍵ ←→ path to .parquet file
+⍝ ← ←→ (data) (header)
+⍝      ⍵ :: simple char vec
+⍝   data :: inverted table of simple vectors or matrices
+⍝ header :: is a nested vector of character vectors
+
+⍝ === NOTE ===
+⍝  currently reads a single inverted table from a single row group
+⍝  parquet files may be more complex, design is required
+⍝  for now users can use the following code as a translation template for the low-level API provided
+⍝  https://github.com/aloneguid/parquet-dotnet
+
+     fs←File.OpenRead⊆⍵
+     ct←⎕NEW System.Threading.CancellationToken 0
+     pr←Parquet.ParquetReader.CreateAsync fs ⎕NULL 0 ct
+     reader←pr.Result
+     X←((~∊⍨)⊆⊢) ⋄ nl←⎕UCS 10 13
+     header←⊃¨' 'X¨nl X reader.Schema.ToString
+     rgr←reader.OpenRowGroupReader 0
+     data←rgr∘ReadColumns¨reader.Schema.GetDataFields
+
+     data header
+ }

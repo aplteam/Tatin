@@ -1,0 +1,14 @@
+ files←DropExcludedFiles(files cfg path);exclude;dirFlag
+⍝ `files` is a list with all source files to be added to the package ZIP file.
+⍝ `cfg` is the config parameter of the package
+⍝ This function honours the "exclude" parameter (if defined and not empty) by excluding all specified files from `files`.
+⍝ Because exclude may carry directories and the ususal /\ trouble it's a bit more complicated than one might think as first glance.
+ :If 2=cfg.⎕NC'exclude'
+ :AndIf 0<≢cfg.exclude
+     exclude←F.EnforceSlash¨(⊂F.AddTrailingSep cfg.source),¨⊆','(≠⊆⊢)cfg.exclude
+     dirFlag←F.IsDir(⊂F.AddTrailingSep path),¨exclude
+     :If ∨/dirFlag
+         exclude←((~dirFlag)/exclude),(≢F.AddTrailingSep path)↓¨⊃,/{'recursive'F.ListFiles ⍵}¨(⊂F.AddTrailingSep path),¨dirFlag/exclude
+     :EndIf
+     files←(~(F.EnforceSlash¨fileList)∊F.EnforceSlash¨exclude)/files
+ :EndIf

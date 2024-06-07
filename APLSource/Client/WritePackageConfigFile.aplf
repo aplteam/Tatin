@@ -1,4 +1,4 @@
-{cfg}←{check}WritePackageConfigFile(path cfg);qdmx;cfg_file;tmp
+ {cfg}←{check}WritePackageConfigFile(path cfg);qdmx;cfg_file;tmp
 ⍝ Write package config file to disk.\\
 ⍝ By default several properties are checked and an error is thrown in case something is not quite right.\\
 ⍝ This can be changed by passing a 0 as ⍺. In this case the checks are **not** performed.
@@ -22,6 +22,7 @@
          cfg.license←MyUserSettings.license
      :EndIf
      cfg←ValidateMaintainer cfg
+     {}path ValidateExclude cfg
      cfg←path ValidateFiles cfg
      ⍝ Note that we cannot validate the license, that's up to the server.
      'Invalid: "assets" - not a path'Assert~','∊cfg.assets

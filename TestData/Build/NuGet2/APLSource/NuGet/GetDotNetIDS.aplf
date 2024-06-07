@@ -1,0 +1,37 @@
+ (TFM RID)←GetDotNetIDS dummy;⎕USING;major;minor;fd;dnv;arch;os;ok;netstatus
+ ⍝ Return DotNet
+ ⍝ TFM: Target Framework Moniker (net4N for Framework, netcoreapp3.N, or netN.0 for 6-8) : https://learn.microsoft.com/en-us/dotnet/standard/frameworks
+ ⍝ RID: Runtime Identifier       (win|mac|linux-x64|x86|arm64)                           : https://learn.microsoft.com/en-us/dotnet/core/rid-catalog
+
+ :If ~ok←2⊃netstatus←2250⌶⍬
+    ('No .NET available. 2250⌶ returned ',⍕netstatus) ⎕SIGNAL ok↓11
+ :EndIf
+ ⎕USING←''
+
+ (major minor)←System.Environment.Version.(Major Minor)
+ dnv←(⍕major),'.',⍕minor
+ 'Minimum .NET version is 3.0'⎕SIGNAL(3>major)/11
+ :Select major
+ :Case 3 ⍝ "core"
+     TFM←'netcoreapp',dnv
+
+ :Case 4 ⍝ Framework: see if we can get more detailed information
+     :If 0≠≢fd←{0::⍵ ⋄ System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}''
+         arch←System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture
+         dnv←∊2↑'.'(≠⊆⊢)⊃⌽' '(≠⊆⊢)fd
+     :EndIf
+     TFM←'net',dnv∩⎕D
+ :Else ⍝ 5+
+     TFM←'net',dnv
+ :EndSelect
+
+ :If major≠4 ⍝ Framework has this in corelib
+     ⎕USING←',System.Runtime',(major<7)/'.InteropServices.RuntimeInformation'
+ :EndIf
+ arch←System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture
+
+ os←{(¯1+⍵⍳'-')↑⍵}⊃'.'⎕WG'APLVersion'
+ os←⊃('win' 'mac' 'linux' '')['Windows' 'Mac' 'Linux'⍳⊂os]
+ 'unidentified OS'⎕SIGNAL(0=≢os)/11
+
+ RID←⎕C os,'-',⍕arch

@@ -1,0 +1,13 @@
+test name;folder;NuGet
+:If 0=≢name
+    ⎕←'The current test functions exist:'
+    ⎕←{(1=+/¨'_'=⍵)/⍵}'t' ⎕NL -3
+    →0
+:EndIf
+
+'No such test' ⎕SIGNAL (3≠⎕NC 'test_',name)/6
+folder←'/tmp/nuget-test'
+NuGet←find_nuget_api
+3 ⎕NDELETE folder
+NuGet.Setup folder
+⍎'test_',name,' folder'

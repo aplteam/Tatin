@@ -1,0 +1,11 @@
+ ReadColumns←{
+⍝ ⍺ ←→ Parquet.NET RowGroupReader
+⍝ ⍵ ←→ Parquet.NET Data Field
+⍝ ← ←→ Simple array of data
+     ct←⎕NEW System.Threading.CancellationToken 0
+     cd←⍺.ReadColumnAsync ⍵ ct
+     d←cd.Result.Data
+     type←¯2↓⊃⌽'.'(≠⊆⊢)⍵.ToString
+     'DateTime'≡type:1 ⎕DT⊆d.(Year Month Day Hour Minute Second Millisecond)
+     ↑d
+ }

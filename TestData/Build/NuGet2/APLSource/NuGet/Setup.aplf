@@ -1,0 +1,28 @@
+ r←Setup project_dir;csproj;xml;project_name;TFM;RID;pkgs;z
+ :If 0=⎕NC'force' ⋄ force←0 ⋄ :EndIf
+ project_name←'_',{(1-⌊/(⌽⍵)⍳'\/')↑⍵}project_dir
+
+ (TFM RID)←GetDotNetIDS ⍬
+ :If 'net4'≡4↑TFM
+     ('dotnet ',TFM,' currently not supported')⎕SIGNAL 11
+ :EndIf
+ ⍝ Ask dotnet to create a .csproj file
+
+ :If ⎕NEXISTS csproj←project_dir,'/',project_name,'.csproj'
+     r←'Project file "',csproj,'" already exists '
+     :If 0=≢pkgs←Packages project_dir
+         r,←' (no packages)'
+     :Else
+         r,←'with package(s): ',(¯1↓2↓∊', '∘,¨⍕¨pkgs)
+     :EndIf
+     →0
+ :EndIf
+
+ z←↑⎕CMD CmdPaths'dotnet new classlib --target-framework-override ',TFM,' --output ',project_dir,' --name ',project_name
+ (xml csproj)←CSProjXML project_dir
+ :If ~(⊂'LangVersion')∊xml[;2] ⍝ Add latest LangVersion
+     xml⍪←2 'LangVersion' 'Latest'⍬ 5
+     (⊂⎕XML xml)⎕NPUT csproj 1
+ :EndIf
+
+ r←'Created project file "',csproj,'"'

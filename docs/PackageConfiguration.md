@@ -19,6 +19,7 @@ This is an example:
   assets: "",
   description: "Zipping and unzipping with.NET Core on all major platforms",
   documentation: "",
+  exclude: "",
   files: "",
   group: "aplteam",
   io: 1,
@@ -281,6 +282,32 @@ This can be one of:
 
 Content that does not qualify for one of these options will be rejected.
 
+#### exclude
+
+This may or may not exist. If it does exist it must be one of:
+
+* A single file- or directory name 
+* A comma-separated list of those
+
+All entries must be relative to `source`, and they must exist as a file or a directory, otherwise an error is thrown.
+
+!> What is "exclude" good for?
+=> 
+=> If you want a particular repository to not only be available as a Tatin package but also from GitHub, then there is the problem of how to specify `⎕IO` and `⎕ML`.
+=> 
+=> Tatin packages allow these values to be defined in the package config file, and that works just fine for packages.
+=> 
+=> If you want to bring in just the `APLSource/` folder, you have to take care of `⎕IO` and `⎕ML` yourself. The obvious choice is to define two files, `⎕IO.apla` and `⎕ML.apla`, which will be loaded by Link and used to set the two system variables.
+=> 
+=> But those two files are not required by the package - it would be nice to be able to exclude them from being added to the package when it is built. `exclude` would allow just that:
+=> 
+=> ```
+=> exclude : "⎕IO.apla, ⎕ML.apla",
+=> ```
+=> 
+=> Because these files have non-ANSI characters in their filenames, adding them to a ZIP file on one platform would currently cause problems when unzipping it on different platform, and this problem is unlikely to go away.
+=> 
+=> This is just one example when `exclude` can be put to good use.
 
 #### files
 
@@ -515,6 +542,10 @@ By default the package configuration file carries the values of the two Dyalog p
 
 Tatin uses these values for setting the system variables accordingly in any namespace that is created by either the `LoadPackages` or the `LoadDependencies` function _before_ any code is loaded into them. This is important because that makes any sub-namespace created later on inherit those values.
 
+If you are tempted to create files names `⎕IO.apla` and `⎕ML.apla` and leave it to Link to use them in order to set `⎕IO` and `⎕ML`. Although that would work, for packages your are strongly advised to not do this.
+
+See [exclude](# `exclude`) for details.
+
 
 #### Injected values
 
@@ -574,6 +605,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

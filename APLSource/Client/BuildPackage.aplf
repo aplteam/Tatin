@@ -64,6 +64,7 @@
  :EndIf
  zipObj←⎕NEW ZipArchive(,⊂zipFilename)
  fileList←parms.projectPath GetAllFiles cfg
+ fileList←DropExcludedFiles fileList cfg parms.projectPath
  :If 0=≢fileList
      ⎕←'No files found in ',parms.projectPath,cfg.source,'...'
  :Else

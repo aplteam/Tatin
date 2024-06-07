@@ -24,7 +24,7 @@ Tatin requires a Unicode version of Dyalog and at least version 18.0; the Classi
 
 ### 18.0 and 18.2
 
-The document [_Installing And Updating The Tatin Client_](https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html "Link to InstallingAndUpdatingTheTatinClient.html on the Tatin server") discusses how to install the Tatin client.
+The document [Installing And Updating The Tatin Client](https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html "Link to InstallingAndUpdatingTheTatinClient.html on the Tatin server") discusses how to install the Tatin client.
 
 ### 19.0
 
@@ -34,7 +34,7 @@ This version comes with Tatin. Because it is experimental, it needs to be activa
 ]activate tatin
 ```
 
-Or, if you want to use both, Tatin and the project manager [Cider](https://github.com/aplteam/Cider]:
+Or, if you want to use both, Tatin and the project manager [Cider](https://github.com/aplteam/Cider "Link to Cider on GitHub"):
 
 ```
 ]activate all
@@ -44,7 +44,7 @@ Or, if you want to use both, Tatin and the project manager [Cider](https://githu
 
 Once you've installed the Tatin client, you have access to <https://tatin.dev>, the principal Tatin server.
 
-The document [_First Steps With Tatin_](https://tatin.dev/Assets/docs/FirstStepsWithTatin.html "Link to FirstStepsWithTatin.html on the Tatin server") will get you started.
+The document [First Steps With Tatin](https://tatin.dev/Assets/docs/FirstStepsWithTatin.html "Link to FirstStepsWithTatin.html on the Tatin server") will get you started.
 
 ## Tatin Server 
 

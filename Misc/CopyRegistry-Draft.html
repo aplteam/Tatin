@@ -23,20 +23,19 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <h2 data-id="Why--what-for">Why / what for</h2>
 </a>
 </div>
-<p>There are at least two cases when a user command <code>]CopyRegistry</code> is needed:</p>
+<p>There are at least two scenarios when a user command <code>]CopyRegistry</code> is needed:</p>
 <ul>
-<li>In case access to <code>https://tatin.dev</code> is restricted in a company by firewall rules.</li>
-<li>One wants to have access to the data of the principal Tatin registry without Internet access.</li>
+<li>In case access to <code>https://tatin.dev</code> is restricted in a company by firewall rules</li>
+<li>One wants to have access to the data of the principal Tatin registry without Internet access In both cases, copying the data from https://tatin.dev to a local disk makes sense. It also makes perfect sense to synchronize occasionally. <code>CopyRegistry</code> requires a Tatin server to run on the “from” Registry but not on the “to” Registry. When a Tatin server manages the “to” Registry, you are advised to pause it during the execution of <code>CopyRegistry</code>. <code>CopyRegistry</code> copies just packages but no meta data.</li>
 </ul>
-<p>In both cases it makes sense to copy the data from https://tatin.dev to a local disk. It also makes perfect sense to syncronize every now and then.</p>
 <div class="h_tag">
 <a href="#syntax" id="syntax" class="autoheader_anchor">
 <h2 data-id="Syntax">Syntax</h2>
 </a>
 </div>
-<pre tabindex="0"><code>]CopyRegistry &lt;url&gt; &lt;path&gt; -full -sync -group=</code></pre>
-<p><code>url</code>: Must be the URL of the Registry data is going to be copied from. Might be an alias like <code>[tatin]</code>. The Registry must be managed by a Tatin Server.</p>
-<p><code>path</code>: Path to the folder that holds the data of a Tatin Registry. You are advised to stop the server before <code>]CopyRegistry</code> is executed, and restart it after.</p>
+<pre tabindex="0"><code>]CopyRegistry &lt;url&gt; &lt;path&gt; -full -sync -dry -group=</code></pre>
+<p><code>URL</code>: This must be the URL of the Registry from which the packages will be copied. It might be an alias like <code>[tatin]</code>. The Registry must be managed by a Tatin Server.</p>
+<p><code>path</code>: Path to the folder that holds the data of a Tatin Registry. You are advised to stop the server before <code>]CopyRegistry</code> is executed and restart it afterwards.</p>
 <div class="h_tag">
 <a href="#details" id="details" class="autoheader_anchor">
 <h2 data-id="Details">Details</h2>
@@ -52,8 +51,8 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <h4 data-id="The-default">The default</h4>
 </a>
 </div>
-<p>In order to copy everything from the principal Tatin registry:</p>
-<pre tabindex="0"><code>]CopyRegistry [tatin]</code></pre>
+<p>To copy everything from the principal Tatin registry:</p>
+<pre tabindex="0"><code>]CopyRegistry [tatin] /path/2/Registry/data</code></pre>
 <p>By default this will copy the best version of every major version of all packages except those that are deprecated.</p>
 <div class="h_tag">
 <a href="#the--full-flag" id="the--full-flag" class="autoheader_anchor">
@@ -66,7 +65,13 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <h4 data-id="The--sync-flag">The <code>-sync</code> flag</h4>
 </a>
 </div>
-<p>If you have once copied a Registry, and now just want to get all new packages and the latest versions of packages you already got, specify the <code>-sync</code> flag.</p>
+<p>If you have once copied a Registry and now just want to get all packages added since then and the latest versions of packages you already have, specify the <code>—sync</code> flag.</p>
+<div class="h_tag">
+<a href="#the--dry-flag" id="the--dry-flag" class="autoheader_anchor">
+<h3 data-id="The--dry-flag">The <code>-dry</code> flag</h3>
+</a>
+</div>
+<p>Use this flag for a report of what <code>CopyRegistry</code> would do without actually doing it.</p>
 <div class="h_tag">
 <a href="#the--group-option" id="the--group-option" class="autoheader_anchor">
 <h4 data-id="The--group-option">The <code>-group=</code> option</h4>

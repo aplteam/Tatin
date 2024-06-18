@@ -1,0 +1,9 @@
+ pkgs←Packages project_dir ;xml;filename;refs
+ ⍝ Retrieve Package References from the project folder
+ xml←⊃CSProjXML project_dir
+
+ :If 0=≢refs←xml[⍸xml[;2]∊⊂'PackageReference';4]
+     pkgs←⍬
+ :Else
+     pkgs←{0=≢⍵:'' '' ⋄ ⍵[⍵[;1]⍳'Include' 'Version';2]}¨refs
+ :EndIf

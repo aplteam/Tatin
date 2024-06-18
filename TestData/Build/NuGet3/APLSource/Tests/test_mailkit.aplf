@@ -1,0 +1,32 @@
+r←test_mailkit project_dir;server;user;pass;ct;client;starttls;i;n;msg
+server←'mail.dyalog.com'
+user←'qa-internal@dyalog.com'
+pass←2 ⎕NQ'.' 'GetEnvironment' 'POP3_QA_INTERNAL'
+
+NuGet.Add project_dir 'MimeKit/3.5.0' 'MailKit/3.5.0'
+⎕USING←'System.Threading' 'MailKit.Net.Pop3',NuGet.Using project_dir
+ct←⎕NULL ⍝ Alternatively (⎕NEW CancellationToken 0)
+
+client←⎕NEW Pop3Client
+starttls←MailKit.Security.SecureSocketOptions.StartTls
+client.Connect server 110 starttls ct
+
+:Trap 90
+    client.Authenticate user pass ct
+:Else
+    ⎕←'Unable to authenticate as ',user,' on server ',server
+    →0
+:EndTrap
+
+'You have ',(⍕n←client.Count),' message(s)'
+
+:For i :In ⍳n
+     msg←client.GetMessage (i-1) ⎕NULL ⎕NULL ⍝ null CancellationToken and ITransferProgress
+     '[',(⍕i),']'
+     'From ',msg.From
+     'To   ',msg.To
+     'Subject: ',msg.Subject
+     ⎕←' '
+     msg.TextBody
+     ⎕←' '
+:EndFor

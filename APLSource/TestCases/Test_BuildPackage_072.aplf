@@ -1,0 +1,29 @@
+ r←Test_BuildPackage_072(stopFlag batchFlag);⎕TRAP;path;cfg;zipFileName;msg;rc;parms;tempPath;list;buff
+⍝ Build package and use the `exclude` property with two files and one dir but "wrong" casing
+⍝ Under Windows that must not matter, which is why it's not executed elsewhere
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If 'Win'≢3↑⊃# ⎕WG'APLVersion'
+     r←T._WindowsOnly ⋄ →0
+ :EndIf
+
+ tempPath←∆GetTempDir''
+ path←∆GetProjectPath,'/TestData/Build/NuGet2/'
+ cfg←TC.ReadPackageConfigFile path,'apl-package.json'
+ parms←TC.CreateBuildParms path
+ parms.targetPath←tempPath
+ zipFileName←TC.BuildPackage parms
+ list←TC.ZipArchive.ListZipContents zipFileName
+ buff←⍕⍪list
+ →T.PassesIf 0=∨/∨/'⎕IO.apla'⍷buff
+ →T.PassesIf 0=∨/∨/'⎕ML.apla'⍷buff
+ →T.PassesIf 0=∨/∨/'/Tests/'⍷buff
+
+ r←T._OK
+
+∆TidyUp:
+ F.DeleteFile zipFileName
+ (rc msg)←F.RmDirByForce tempPath
+ msg Assert rc=0
+⍝Done

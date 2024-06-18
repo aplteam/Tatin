@@ -287,7 +287,7 @@ Content that does not qualify for one of these options will be rejected.
 This may or may not exist. If it does exist it must be one of:
 
 * A single file- or directory name 
-* A comma-separated list of those
+* A comma-separated list of files and/or directories
 
 All entries must be relative to `source`, and they must exist as a file or a directory, otherwise an error is thrown.
 
@@ -305,7 +305,7 @@ All entries must be relative to `source`, and they must exist as a file or a dir
 => exclude : "⎕IO.apla, ⎕ML.apla",
 => ```
 => 
-=> Because these files have non-ANSI characters in their filenames, adding them to a ZIP file on one platform would currently cause problems when unzipping it on different platform, and this problem is unlikely to go away.
+=> Because these files have non-ANSI characters in their filenames, adding them to a ZIP file on one platform would currently cause problems when unzipping it on different platform, and this problem is unlikely to go away, and there is nothing we can do about this: it's a ZIP problem.
 => 
 => This is just one example when `exclude` can be put to good use.
 
@@ -605,6 +605,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

@@ -1,6 +1,39 @@
- r←PackageDependencies Arg;path;newFlag;origData;success;newData;msg;temp;filename
+ r←PackageDependencies Arg;path;newFlag;origData;success;newData;msg;temp;filename;openCiderProjects;ind;cfg;sub1;sub2
  r←⍬
- path←Arg._1
+ :If 0=≢path←{0≡⍵:'' ⋄ ⍵}Arg._1
+     'No path specified'Assert 9=⎕SE.⎕NC'Cider'
+     'No path specified'Assert 0<≢list←⎕SE.Cider.ListOpenProjects 0
+     openCiderProjects←⎕SE.Cider.ListOpenProjects 0
+     :If 1<≢openCiderProjects
+         ind←'SelectCiderProject@Which Cider project would you like to act on?'TC.C.Select↓⎕FMT openCiderProjects
+         :If 0=≢ind
+             r←'Cancelled by user' ⋄ →0
+         :EndIf
+         path←2⊃openCiderProjects[ind;]
+     :ElseIf 1=≢openCiderProjects
+         path←2⊃openCiderProjects[1;]
+     :Else
+         'No path specified & no open Cider projects found'Assert 0
+     :EndIf
+     cfg←TC.Reg.GetJsonFromFile path,'/cider.config'
+     sub1←{⍵↑⍨¯1+⍵⍳'='}cfg.CIDER.dependencies.tatin
+     sub2←{⍵↑⍨¯1+⍵⍳'='}cfg.CIDER.dependencies_dev.tatin
+     :If 0<≢sub1
+     :AndIf 0<≢sub2
+         ind←('SelectPackageFolder@Which folder in ',path,':')TC.C.Select sub1 sub2,¨'/'
+         :If 0=≢ind
+             r←'Cancelled by user' ⋄ →0
+         :Else
+             path,←'/',ind⊃sub1 sub2
+         :EndIf
+     :ElseIf 0<≢sub1
+         path←path,'/',sub1
+     :ElseIf 0<≢sub2
+         path←path,'/',sub2
+     :Else
+         'No path specified'Assert 0
+     :EndIf
+ :EndIf
  filename←path,'/apl-dependencies.txt'
  :If Arg.delete
      'File not found'Assert TC.F.IsFile filename
@@ -25,6 +58,6 @@
          (⊂newData)TC.F.NPUT filename 1
      :EndIf
  :Else
-     'File not found'Assert TC.F.IsFile filename
+     ('File not found: ',filename)Assert TC.F.IsFile filename
      r←⊃TC.F.NGET filename
  :EndIf

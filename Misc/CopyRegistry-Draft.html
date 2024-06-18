@@ -26,16 +26,19 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <p>There are at least two scenarios when a user command <code>]CopyRegistry</code> is needed:</p>
 <ul>
 <li>In case access to <code>https://tatin.dev</code> is restricted in a company by firewall rules</li>
-<li>One wants to have access to the data of the principal Tatin registry without Internet access In both cases, copying the data from https://tatin.dev to a local disk makes sense. It also makes perfect sense to synchronize occasionally. <code>CopyRegistry</code> requires a Tatin server to run on the “from” Registry but not on the “to” Registry. When a Tatin server manages the “to” Registry, you are advised to pause it during the execution of <code>CopyRegistry</code>. <code>CopyRegistry</code> copies just packages but no meta data.</li>
+<li>One wants to have access to the data of the principal Tatin registry without Internet access.</li>
 </ul>
+<p>In both cases, copying the data from https://tatin.dev to a local disk makes sense. It also makes perfect sense to synchronize occasionally.</p>
+<p><code>CopyRegistry</code> requires a Tatin server to run on the “from” Registry but not on the “to” Registry. When a Tatin server manages the “to” Registry, you are advised to pause it during the execution of <code>CopyRegistry</code>. <code>CopyRegistry</code> copies just packages but no meta data.</p>
+<p>Note that dependencies are always copied as well in case the number of packages to be copied is reduced in any way.</p>
 <div class="h_tag">
 <a href="#syntax" id="syntax" class="autoheader_anchor">
 <h2 data-id="Syntax">Syntax</h2>
 </a>
 </div>
-<pre tabindex="0"><code>]CopyRegistry &lt;url&gt; &lt;path&gt; -full -sync -dry -group=</code></pre>
+<pre tabindex="0"><code>]CopyRegistry &lt;url&gt; &lt;path&gt; -full -sync -dry -group= -list=</code></pre>
 <p><code>URL</code>: This must be the URL of the Registry from which the packages will be copied. It might be an alias like <code>[tatin]</code>. The Registry must be managed by a Tatin Server.</p>
-<p><code>path</code>: Path to the folder that holds the data of a Tatin Registry. You are advised to stop the server before <code>]CopyRegistry</code> is executed and restart it afterwards.</p>
+<p><code>path</code>: Path to the folder that holds the data of a Tatin Registry. You are advised to stop the server before <code>]CopyRegistry</code> is executed, and restart it afterwards.</p>
 <div class="h_tag">
 <a href="#details" id="details" class="autoheader_anchor">
 <h2 data-id="Details">Details</h2>
@@ -79,6 +82,17 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 </div>
 <p>In case you want to copy only packages of a specific group, you may set this option, for example:</p>
 <pre tabindex="0"><code>]CopyRegistry [tatin] /path/2/Registry/data -sync -group=dyalog</code></pre>
+<p>Packages from other groups might still be copied in case they are required as dependencies.</p>
+<div class="h_tag">
+<a href="#the--list-option" id="the--list-option" class="autoheader_anchor">
+<h4 data-id="The--list-option">The <code>-list=</code> option</h4>
+</a>
+</div>
+<p>This can be one of:</p>
+<ul>
+<li>A comma-separated list of packages with at least the group name and the package name</li>
+<li>A path to a file that contains the list of packages to be copied; must start with <code>file://</code></li>
+</ul>
 
 <script>
 

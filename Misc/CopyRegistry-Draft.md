@@ -5,20 +5,24 @@
 There are at least two scenarios when a user command `]CopyRegistry` is needed:
 
 * In case access to `https://tatin.dev` is restricted in a company by firewall rules
-* One wants to have access to the data of the principal Tatin registry without Internet access
+* One wants to have access to the data of the principal Tatin registry without Internet access.
+
 In both cases, copying the data from https://tatin.dev to a local disk makes sense. It also makes perfect sense to synchronize occasionally.
+
 `CopyRegistry` requires a Tatin server to run on the "from" Registry but not on the "to" Registry. When a Tatin server manages the "to" Registry, you are advised to pause it during the execution of `CopyRegistry`.
 `CopyRegistry` copies just packages but no meta data.
+
+Note that dependencies are always copied as well in case the number of packages to be copied is reduced in any way.
 
 ## Syntax
 
 ```
-]CopyRegistry <url> <path> -full -sync -dry -group=
+]CopyRegistry <url> <path> -full -sync -dry -group= -list=
 ```
 
 `URL`: This must be the URL of the Registry from which the packages will be copied. It might be an alias like `[tatin]`. The Registry must be managed by a Tatin Server.
 
-`path`: Path to the folder that holds the data of a Tatin Registry. You are advised to stop the server before `]CopyRegistry` is executed and restart it afterwards.
+`path`: Path to the folder that holds the data of a Tatin Registry. You are advised to stop the server before `]CopyRegistry` is executed, and restart it afterwards.
 
 ## Details
 
@@ -52,3 +56,13 @@ In case you want to copy only packages of a specific group, you may set this opt
 ```
 ]CopyRegistry [tatin] /path/2/Registry/data -sync -group=dyalog
 ```
+
+Packages from other groups might still be copied in case they are required as dependencies.
+
+#### The `-list=` option
+
+This can be one of:
+
+* A comma-separated list of packages with at least the group name and the package name
+* A path to a file that contains the list of packages to be copied; must start with `file://`
+

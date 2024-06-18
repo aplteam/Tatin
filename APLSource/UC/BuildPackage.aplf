@@ -1,4 +1,4 @@
- zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms;ref2TatinVars
+ zipFilename←BuildPackage Arg;filename;sourcePath;targetPath;prompt;msg;dependencies;version;openCiderProjects;ind;cfg;parms;ref2TatinVars;bump
  :If 'Win'≡TC.##.APLTreeUtils2.GetOperatingSystem ⍬
      'On Windows, Tatin requires .NET Framework to be available for building packages'Assert 0=0 TC.##.APLTreeUtils2.ToNum 2 ⎕NQ #'GetEnvironment' 'DYALOG_NETCORE'
  :EndIf
@@ -34,7 +34,19 @@
  :EndIf
  dependencies←''Arg.Switch'dependencies'
  version←''Arg.Switch'version'
- :If '+'=1⍴version
+ bump←''Arg.Switch'bump'
+ '-bump= and -version= are mutually exclusive'Assert~∧/0≠≢¨bump version
+ :If 0<≢bump
+     :If 'patch'≡⎕C bump
+         version←'+0.0.1'
+     :ElseIf 'minor'≡⎕C bump
+         version←'+0.1.0'
+     :ElseIf 'major'≡⎕C bump
+         version←'+1.0.0'
+     :EndIf
+ :EndIf
+ :If 0<≢version
+ :AndIf '+'=1⍴version
      'A rule for "version" must have two dots and just 0 and 1'Assert 2='.'+.=1↓version
      'A rule for "version" must have two dots and just 0 and 1'Assert∧/('.'~⍨1↓version)∊'01'
  :EndIf

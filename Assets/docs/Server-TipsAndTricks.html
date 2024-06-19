@@ -56,8 +56,8 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <h3 data-id="Tags">1.1. Tags</h3>
 </a>
 </div>
-<p>The most important thing is to watch tags. Tags can be very useful to find a package, but the problem is that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name as a tag or adding “dyalog” etc.</p>
-<p>That means that for tags to work there has to be a gatekeeper who is responsible for correcting/removing tags.</p>
+<p>The most important thing is to watch tags. Tags can be very useful to find a package, but the problem is that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name or “dyalog” etc.</p>
+<p>That means that for tags to work there has to be a gatekeeper who is responsible for correcting/removing/adding tags.</p>
 <p>That gatekeeper needs to be able to execute code on the server, but only once. The idea is to correct problems in the package config files somehow.</p>
 <div class="leanpub_A">
 <h3>The package config file and the ZIP file</h3>
@@ -98,15 +98,14 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>Four ordinary namespaces contain all the Tatin code:</p>
 <dl>
 <dt><code>Admin</code></dt>
-<dd><p class="first_dd">Contains helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.</p></dd>
-<dd><p>This is all about development.</p></dd>
+<dd><p>Contains helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.</p></dd>
 </dl>
 <p><code>Client</code></p>
 <p>Contains the code executed on the Client side of Tatin.</p>
 <p><code>Server</code></p>
 <p>Contains the code to run a Tatin Server</p>
 <p><code>Registry</code></p>
-<p>Contains all code that is shared between a Tatin client and a Tatin server.</p>
+<p>Contains all code that is shared by a Tatin client and a Tatin server.</p>
 <div class="h_tag">
 <a href="#other-stuff" id="other-stuff" class="autoheader_anchor">
 <h4 data-id="Other-stuff">2.1.2. Other stuff</h4>
@@ -181,7 +180,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <div>
 <h3><code>Tatin.Registry</code>: Danger zone</h3>
 <p>Since you will change functions in <code>#.Tatin.Client</code> only on the client side, and functions in <code>#.Tatin.Server</code> only on the server side you will be fine with those changes.</p>
-<p>Changing stuff in <code>#.Tatin.Registry</code> is dangerous however, because this namespace is shared between client and server, so you need to be very careful: if you change the same function in <code>Registry</code> on both the client and the server then the last change wins the day, while all other changes are going to be lost.</p>
+<p>Changing stuff in <code>#.Tatin.Registry</code> is dangerous however, because this namespace is shared between client and server, so you need to be careful: if you change the same function in <code>Registry</code> on both the client and the server, then the last change wins the day, while all other changes are lost.</p>
 </div>
 </div>
 
@@ -200,31 +199,69 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <p>One of the commands will return an HTML page with all available commands. We use this as an example.</p>
 <p>In a Browser enter this URL:</p>
 <pre tabindex="0"><code>https://localhost:5001/v1/list-commands</code></pre>
-<p>Note that except <code>list-commands</code> these commands do not return HTML, they trigger actions.</p>
+<p>Note that with the exception <code>list-commands</code>, these commands do not return HTML, they rather trigger actions.</p>
 <div class="h_tag">
 <a href="#executing-the-tatin-test-suite" id="executing-the-tatin-test-suite" class="autoheader_anchor">
 <h3 data-id="Executing-the-Tatin-test-suite">3.2. Executing the Tatin test suite</h3>
 </a>
 </div>
-<div class="leanpub">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="20pt" height="20pt" viewBox="0 0 20 20" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,20) scale(0.1,-0.1)" fill="#000000" stroke="none"><path d="M90 185 c0 -8 5 -15 10 -15 6 0 10 7 10 15 0 8 -4 15 -10 15 -5 0 -10 -7 -10 -15z"/><path d="M30 161 c0 -5 7 -11 14 -14 10 -4 13 -1 9 9 -6 15 -23 19 -23 5z"/><path d="M147 156 c-4 -10 -1 -13 9 -9 7 3 14 9 14 14 0 14 -17 10 -23 -5z"/><path d="M70 125 c-26 -32 13 -81 48 -59 9 6 18 19 20 28 8 38 -43 61 -68 31z m46 -16 c10 -17 -13 -36 -27 -22 -12 12 -4 33 11 33 5 0 12 -5 16 -11z"/><path d="M0 100 c0 -5 7 -10 15 -10 8 0 15 5 15 10 0 6 -7 10 -15 10 -8 0 -15 -4 -15 -10z"/><path d="M170 100 c0 -5 7 -10 15 -10 8 0 15 5 15 10 0 6 -7 10 -15 10 -8 0 -15 -4 -15 -10z"/><path d="M43 53 c-15 -5 -17 -23 -4 -23 5 0 11 7 15 15 3 8 4 15 3 14 -1 0 -8 -3 -14 -6z"/><path d="M147 44 c3 -7 9 -14 14 -14 14 0 10 17 -5 23 -10 4 -13 1 -9 -9z"/><path d="M90 15 c0 -8 5 -15 10 -15 6 0 10 7 10 15 0 8 -4 15 -10 15 -5 0 -10 -7 -10 -15z"/></g></svg>
-<div>
-<h3>To be enhanced</h3>
+<p>The test framework used is very powerful, and offers lots of options. Naturally only the basics are covered here.</p>
+<p>For more information refer to <a href="https://github.com/aplteam/Tester2" class="external_link">https://github.com/aplteam/Tester2</a></p>
+<div class="h_tag">
+<a href="#execute-the-complete-test-suite" id="execute-the-complete-test-suite" class="autoheader_anchor">
+<h4 data-id="Execute-the-complete-test-suite">3.2.1. Execute the complete test suite</h4>
+</a>
 </div>
+<p>This can be achieved by executing:</p>
+<pre tabindex="0"><code>#.Tatin.TestCases.RunTests</code></pre>
+<p>This prepares the test framework and then executes all tests in debug mode, meaning that in case something goes wrong, the framework will stop and you can investigate right away,</p>
+<p>You will be asked whether you want to copy the test data to a temp folder in preperation, and also whether you want to start a test server. Usually you will answer both questions with “yes”.</p>
+<div class="h_tag">
+<a href="#execute-particular-tests-or-group-of-tests" id="execute-particular-tests-or-group-of-tests" class="autoheader_anchor">
+<h4 data-id="Execute-particular-tests-or-group-of-tests">3.2.2. Execute particular tests or group(s) of tests</h4>
+</a>
 </div>
-
+<p>Sometimes it makes sense to execute not all but a small subset of test cases. In this case you might not need test data, or a running test server, depending on that test cases you are about to execute.</p>
+<p>This can be achieved as well; first you need to excute:</p>
+<pre tabindex="0"><code>#.Tatin.TestCases.Prepare</code></pre>
+<p>This initializes Tatin as a client and prepares for creating a code-coverage report. It also creates a number of references needed by the tests.</p>
+<p>You only need to call <code>Prepare</code> once.</p>
+<p>In a second step you can excute one or more tests. A couple of examples:</p>
+<p>Execute one particular test of the <code>UC</code> group:</p>
+<pre tabindex="0"><code>#.Tatin.TestCases.T.RunThese 'UC' 600</code></pre>
+<p>Execute several tests of the <code>UC</code> group:</p>
+<pre tabindex="0"><code>#.Tatin.TestCases.T.RunThese 'UC' (600 601 602)
+</code></pre>
+<p>Execute all tests belonging to the <code>UC</code> group:</p>
+<pre tabindex="0"><code>#.Tatin.TestCases.T.RunThese 'UC'</code></pre>
+<div class="h_tag">
+<a href="#execute-just-batch-tests" id="execute-just-batch-tests" class="autoheader_anchor">
+<h4 data-id="Execute-just-batch-tests">3.2.3. Execute just batch tests</h4>
+</a>
+</div>
+<p>A small number of tests require a user that can be asked to perform actions, like closing an edit window.</p>
+<p>Sometimes you might want to execute only tests that do not require a human in front of the monitor. These are called batch tests.</p>
+<p>These tests can be executed by executing:</p>
+<pre tabindex="0"><code>#.Tatin.TestCases.RunBatchTests 1</code></pre>
+<p>The 1 required as right argument is just a safety net against accidental calls.</p>
+<p>By default error trapping is in place: in case a test case fails or crashes, this is covered, and the test framework carries on.</p>
+<p>If you want batch tests to stop in case of a problem, you must specify the optional <code>debug</code> flag as left argument:</p>
+<pre tabindex="0"><code>1 #.Tatin.TestCases.RunBatchTests 1</code></pre>
 <div class="h_tag">
 <a href="#creating-a-new-version" id="creating-a-new-version" class="autoheader_anchor">
 <h3 data-id="Creating-a-new-version">3.3. Creating a new version</h3>
 </a>
 </div>
-<div class="leanpub">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="20pt" height="20pt" viewBox="0 0 20 20" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,20) scale(0.1,-0.1)" fill="#000000" stroke="none"><path d="M90 185 c0 -8 5 -15 10 -15 6 0 10 7 10 15 0 8 -4 15 -10 15 -5 0 -10 -7 -10 -15z"/><path d="M30 161 c0 -5 7 -11 14 -14 10 -4 13 -1 9 9 -6 15 -23 19 -23 5z"/><path d="M147 156 c-4 -10 -1 -13 9 -9 7 3 14 9 14 14 0 14 -17 10 -23 -5z"/><path d="M70 125 c-26 -32 13 -81 48 -59 9 6 18 19 20 28 8 38 -43 61 -68 31z m46 -16 c10 -17 -13 -36 -27 -22 -12 12 -4 33 11 33 5 0 12 -5 16 -11z"/><path d="M0 100 c0 -5 7 -10 15 -10 8 0 15 5 15 10 0 6 -7 10 -15 10 -8 0 -15 -4 -15 -10z"/><path d="M170 100 c0 -5 7 -10 15 -10 8 0 15 5 15 10 0 6 -7 10 -15 10 -8 0 -15 -4 -15 -10z"/><path d="M43 53 c-15 -5 -17 -23 -4 -23 5 0 11 7 15 15 3 8 4 15 3 14 -1 0 -8 -3 -14 -6z"/><path d="M147 44 c3 -7 9 -14 14 -14 14 0 10 17 -5 23 -10 4 -13 1 -9 -9z"/><path d="M90 15 c0 -8 5 -15 10 -15 6 0 10 7 10 15 0 8 -4 15 -10 15 -5 0 -10 -7 -10 -15z"/></g></svg>
-<div>
-<h3>To be enhanced</h3>
-</div>
-</div>
-
+<ol start="1">
+<li>Check <code>#.Tatin.Registry.Version</code> for being correct</li>
+<li>Check <code>#.Tatin.Registry.History</code> for being correct</li>
+<li>Check the document <code>docs/ReleaseNotes.md</code> for being correct</li>
+<li>Ask Cider how to “Make” a new version with <code>]Cider.Make</code></li>
+</ol>
+<p>It will tell you to execute:</p>
+<pre tabindex="0"><code>#.Tatin.Admin.Make 0</code></pre>
+<p>The right argument is a batch flag: it tells the function whether a human is available (0) or not (1). If there is, progress is reported to <code>⎕SE</code>. Naturally the latter is used in order to automatically create a new version.</p>
+<p>Note that if the batch flag is 0, the function will print a statement to the session which, when executed, will install the new version.</p>
 <div class="h_tag">
 <a href="#licensing" id="licensing" class="autoheader_anchor">
 <h3 data-id="Licensing">3.4. Licensing</h3>

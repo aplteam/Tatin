@@ -211,6 +211,27 @@ This method will make sure that it removes not only the package in question, but
 
 Clearly, there is a danger that you remove too much when you attempt to do this manually.
 
+#### Implicit downgrading 
+
+There might be a situation when removing a principal package implies a downgrade.
+
+We start with these packages (indentation defines dependency):
+
+```
+group-foo-1.0.0
+  group-zoo-1.1.0
+group-boo-1.0.0
+  group-zoo-1.0.0
+```
+
+Due to MVS (minimal version selection) both `foo` and `boo` will use `zoo` version 1.1 when loaded. But what happens if you remove `boo`?!
+
+It can well be argued that `zoo` 1.1 should survive this, and still be used. But it can also be argued that a package that is not required anywhere shouldn't be used. 
+
+A full implementation of MVS requires the former strategy. For the time being, we took a more pragmatic approach and settled for the latter strategy.
+
+It's not really obvious what's the best solution here, so we might well change the strategy depending on feedback.
+
 ### Adding a package
 
 If you want to add a package that has no dependencies you might feel tempted to just add it to the file "apl-dependencies.txt" and copy the package over.
@@ -247,6 +268,7 @@ A> When you specify the `-major` flag of the `CheckForLaterVersion` user command
 ## Downgrading
 
 There may be situations when you need to downgrade, for example when you find a particular package to be buggy, but an older version is known to be okay. Tatin does not offer help here; you need to do this yourself.
+
 
 
 

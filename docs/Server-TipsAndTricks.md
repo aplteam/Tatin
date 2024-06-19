@@ -13,9 +13,9 @@ Once you've installed a server there are a couple of things that need to be take
 
 ### Tags
 
-The most important thing is to watch tags. Tags can be very useful to find a package, but the problem is that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name as a tag or adding "dyalog" etc.
+The most important thing is to watch tags. Tags can be very useful to find a package, but the problem is that package authors tend to use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, tags that make no sense like adding the group name or "dyalog" etc.
 
-That means that for tags to work there has to be a gatekeeper who is responsible for correcting/removing tags.
+That means that for tags to work there has to be a gatekeeper who is responsible for correcting/removing/adding tags.
 
 That gatekeeper needs to be able to execute code on the server, but only once. The idea is to correct problems in the package config files somehow.
 
@@ -55,8 +55,6 @@ Four ordinary namespaces contain all the Tatin code:
 
 : Contains helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.
 
-: This is all about development.
-
 `Client`
 
 Contains the code executed on the Client side of Tatin.
@@ -67,7 +65,7 @@ Contains the code to run a Tatin Server
  
 `Registry`
 
-Contains all code that is shared between a Tatin client and a Tatin server.
+Contains all code that is shared by a Tatin client and a Tatin server.
 
 #### Other stuff
 
@@ -149,7 +147,7 @@ You must know exactly what you are doing, otherwise you might loose code.
 I> ### `Tatin.Registry`: Danger zone
 I> Since you will change functions in `#.Tatin.Client` only on the client side, and functions in `#.Tatin.Server` only on the server side you will be fine with those changes.
 I>
-I> Changing stuff in `#.Tatin.Registry` is dangerous however, because this namespace is shared between client and server, so you need to be very careful: if you change the same function in `Registry` on both the client and the server then the last change wins the day, while all other changes are going to be lost.
+I> Changing stuff in `#.Tatin.Registry` is dangerous however, because this namespace is shared between client and server, so you need to be careful: if you change the same function in `Registry` on both the client and the server, then the last change wins the day, while all other changes are lost.
 
 ## Misc
 
@@ -167,18 +165,100 @@ In a Browser enter this URL:
 https://localhost:5001/v1/list-commands
 ```
 
-Note that except `list-commands` these commands do not return HTML, they trigger actions.
+Note that with the exception `list-commands`, these commands do not return HTML, they rather trigger actions.
 
 
 ### Executing the Tatin test suite
 
-T> ### To be enhanced
+The test framework used is very powerful, and offers lots of options. Naturally only the basics are covered here. 
+
+For more information refer to <https://github.com/aplteam/Tester2>
+
+#### Execute the complete test suite
+
+This can be achieved by executing:
+
+```
+#.Tatin.TestCases.RunTests
+```
+
+This prepares the test framework and then executes all tests in debug mode, meaning that in case something goes wrong, the framework will stop and you can investigate right away,
+
+You will be asked whether you want to copy the test data to a temp folder in preperation, and also whether you want to start a test server. Usually you will answer both questions with "yes".
+
+#### Execute particular tests or group(s) of tests
+
+Sometimes it makes sense to execute not all but a small subset of test cases. In this case you might not need test data, or a running test server, depending on that test cases you are about to execute.
+
+This can be achieved as well; first you need to excute:
+
+```
+#.Tatin.TestCases.Prepare
+```
+
+This initializes Tatin as a client and prepares for creating a code-coverage report. It also creates a number of references needed by the tests.
+
+You only need to call `Prepare` once.
+
+In a second step you can excute one or more tests. A couple of examples:
+
+Execute one particular test of the `UC` group:
+
+```
+#.Tatin.TestCases.T.RunThese 'UC' 600
+```
+
+Execute several tests of the `UC` group:
+
+```
+#.Tatin.TestCases.T.RunThese 'UC' (600 601 602)
+
+```
+
+Execute all tests belonging to the `UC` group:
+
+```
+#.Tatin.TestCases.T.RunThese 'UC'
+```
+
+#### Execute just batch tests
+
+A small number of tests require a user that can be asked to perform actions, like closing an edit window. 
+
+Sometimes you might want to execute only tests that do not require a human in front of the monitor. These are called batch tests.
+
+These tests can be executed by executing:
+
+```
+#.Tatin.TestCases.RunBatchTests 1
+```
+
+The 1 required as right argument is just a safety net against accidental calls.
+
+By default error trapping is in place: in case a test case fails or crashes, this is covered, and the test framework carries on. 
+
+If you want batch tests to stop in case of a problem, you must specify the optional `debug` flag as left argument:
+
+```
+1 #.Tatin.TestCases.RunBatchTests 1
+```
 
 ### Creating a new version
 
-T> ### To be enhanced
+1. Check `#.Tatin.Registry.Version` for being correct
+2. Check `#.Tatin.Registry.History` for being correct
+3. Check the document `docs/ReleaseNotes.md` for being correct
+4. Ask Cider how to "Make" a new version with `]Cider.Make`
 
+It will tell you to execute:
 
+```
+#.Tatin.Admin.Make 0
+```
+
+The right argument is a batch flag: it tells the function whether a human is available (0) or not (1). If there is, progress is reported to `⎕SE`. Naturally the latter is used in  order to automatically create a new version.
+
+Note that if the batch flag is 0, the function will print a statement to the session which, when executed, will install the new version.
 
 ### Licensing
 
@@ -197,6 +277,7 @@ The text shown on the web page is defined in the document "Licensing.html" in th
 #### A "LICENSE" file
 
 By convention a file named "LICENSE" when placed in the root of the project will be copied automatically to the root of a package when build by `BuildPackage`. This convention is independent from the INI file.
+
 
 
 

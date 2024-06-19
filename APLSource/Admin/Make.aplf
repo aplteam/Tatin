@@ -91,7 +91,10 @@
  HandleRunFunction ⍬
  UpdateTestServerAssets ⍬
  {}⎕SE.Link.Refresh'#.Tatin'
- 1 #.Tatin.Admin.InstallTatin 1
+ :If ~batchFlag
+     ⎕←'In order to install the frshly created new version, execute this:'
+     ⎕←'1 #.Tatin.Admin.InstallTatin 1'
+ :EndIf
  :If #.Tatin.Registry.Version≢⎕SE.Tatin.Version
      ⎕SE.⎕EX¨'Tatin' '_Tatin'
      ⎕←'*** New version ',({(2⊃⍵),' from ',(3⊃⍵)}##.Registry.Version),' created, but version in ⎕SE is not up-to-date anymore, please restart Dyalog'

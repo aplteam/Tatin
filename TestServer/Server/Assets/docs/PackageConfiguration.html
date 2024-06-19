@@ -338,7 +338,7 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>This may or may not exist. If it does exist it must be one of:</p>
 <ul>
 <li>A single file- or directory name</li>
-<li>A comma-separated list of those</li>
+<li>A comma-separated list of files and/or directories</li>
 </ul>
 <p>All entries must be relative to <code>source</code>, and they must exist as a file or a directory, otherwise an error is thrown.</p>
 <div class="collapsible">
@@ -353,7 +353,7 @@ What is "exclude" good for?
 <p>If you want to bring in just the <code>APLSource/</code> folder, you have to take care of <code>⎕IO</code> and <code>⎕ML</code> yourself. The obvious choice is to define two files, <code>⎕IO.apla</code> and <code>⎕ML.apla</code>, which will be loaded by Link and used to set the two system variables.</p>
 <p>But those two files are not required by the package - it would be nice to be able to exclude them from being added to the package when it is built. <code>exclude</code> would allow just that:</p>
 <pre tabindex="0"><code>exclude : "⎕IO.apla, ⎕ML.apla",</code></pre>
-<p>Because these files have non-ANSI characters in their filenames, adding them to a ZIP file on one platform would currently cause problems when unzipping it on different platform, and this problem is unlikely to go away.</p>
+<p>Because these files have non-ANSI characters in their filenames, adding them to a ZIP file on one platform would currently cause problems when unzipping it on different platform, and this problem is unlikely to go away, and there is nothing we can do about this: it's a ZIP problem.</p>
 <p>This is just one example when <code>exclude</code> can be put to good use.</p>
 </div>
 </details>

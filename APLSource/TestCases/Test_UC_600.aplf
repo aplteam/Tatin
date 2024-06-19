@@ -1,0 +1,13 @@
+ r←Test_UC_600(stopFlag batchFlag);⎕TRAP;rc;msg;res;filename;folder
+⍝ Exercise ]Tatin.PackageDependencies with defaults
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (rc msg res)←∆UCMD'PackageDependencies ',∆TEMP_REGISTRY_FOLDER,'/aplteam-FilesAndDirs-3.2.7'
+ →T.PassesIf(rc=0)∧0=≢msg
+ →T.PassesIf 0<≢res
+ res←(⎕UCS 10)(≠⊆⊢)res
+ →T.PassesIf∧/'aplteam-'∘{⍺≡(≢⍺)↑⍵}¨res
+
+ r←T._OK
+⍝Done

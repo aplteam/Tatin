@@ -1,0 +1,10 @@
+ r←GetLastError;∆GetLastError
+ :Select APLTreeUtils2.GetOperatingSystem ⍬
+ :Case 'Win'
+     '∆GetLastError'⎕NA'I4 kernel32.C32|GetLastError'
+     r←∆GetLastError
+ :CaseList 'Lin' 'Mac'
+     r←⊃⊃(//)⎕VFI⊃⎕SH'echo $?'
+ :Else
+     'This operating system is not supported'⎕SIGNAL 11
+ :EndSelect

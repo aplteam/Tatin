@@ -1,0 +1,26 @@
+ {success}←{new}CheckPath path;newFlag
+⍝ Returns a 1 if the `path` to be checked is fine, otherwise 0.\\
+⍝ If `path` is nested it will return a vector of the same length as `path`
+⍝ * If `path` exists but is not a directory a 0 is returned.\\
+⍝ * If `path` does not exist a 0 is returned.\\
+⍝ * If `path` does not exist but the left argument is "CREATE!" it will be created,
+⍝ including any sub directories.\\
+⍝ The left argument is case insensitive.
+ :If 2=|≡path
+     :If 0=⎕NC'new'
+         success←CheckPath¨path
+     :Else
+         success←new∘CheckPath¨path
+     :EndIf
+ :Else
+     path←NormalizePath path
+     :If 1=⎕NEXISTS path
+         success←IsDir path
+     :Else
+         success←0
+         newFlag←'CREATE!' 1∊⍨⊂{6::0 ⋄ {(0=1↑0⍴⍵):⍵ ⋄ 1 ⎕C ⍵}⍎⍵}'new'
+         :If newFlag
+             success←MkDir path
+         :EndIf
+     :EndIf
+ :EndIf

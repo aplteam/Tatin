@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior:smooth" >
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title>Tester2 Reference</title>
+<link href="file://C:/Users/kai/Documents/MyUCMDs/MakeHelpers/aplteam-MarkAPL-12.1.0/Files/Dark_screen.css" rel="stylesheet" media="screen">
+<link href="file://C:/Users/kai/Documents/MyUCMDs/MakeHelpers/aplteam-MarkAPL-12.1.0/Files/Dark_print.css" rel="stylesheet" media="print">
+
+</head>
+<body>
+<div class="h_tag">
+<a href="#tester2-user-manual" id="tester2-user-manual" class="autoheader_anchor">
+<h1 data-id="Tester2-User-Manual">Tester2 User Manual</h1>
+</a>
+</div>
+<nav id="main_nav" class="toc">
+<h2 id="toc-heading">Table of contents</h2>
+<button id="toc-toggle" aria-controls="toc-list" aria-expanded="false">Show</button>
+
+<div class="toc-container">
+<ul id="toc-list" class="hide print">
+<li class="toc-entry toc-h2"><a href="#overview">Overview</a></li>
+<li class="toc-entry toc-h2"><a href="#details">Details</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#terminology">Terminology</a></li>
+<li class="toc-entry toc-h3"><a href="#assumptions-and-preconditions">Assumptions and preconditions</a></li>
+<li class="toc-entry toc-h3"><a href="#executing-test-cases">Executing test cases</a></li>
+<li class="toc-entry toc-h3"><a href="#definitions">Definitions</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#error-trapping">Error trapping (<code>trapFlag</code>)</a></li>
+<li class="toc-entry toc-h4"><a href="#debugging">Debugging (<code>debugFlag</code>)</a></li>
+<li class="toc-entry toc-h4"><a href="#suspend-execution">Suspend execution (<code>stopFlag</code>)</a></li>
+<li class="toc-entry toc-h4"><a href="#batchable-tests">Batchable tests</a></li>
+</ul></li>
+<li class="toc-entry toc-h3"><a href="#the-syntax-of-test-functions">The syntax of test functions</a></li>
+<li class="toc-entry toc-h3"><a href="#groups">Groups</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#examples">Examples</a></li>
+</ul></li>
+<li class="toc-entry toc-h3"><a href="#custom-symbolic-names">Custom symbolic names</a></li>
+<li class="toc-entry toc-h3"><a href="#checks-before--after-a-test-case-is-run">Checks before &amp; after a test case is run</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#application">Application</a></li>
+<li class="toc-entry toc-h4"><a href="#overview-1">Overview</a></li>
+</ul></li>
+</ul></li>
+<li class="toc-entry toc-h2"><a href="#workflow">Workflow</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#create-an-instance">Create an instance</a></li>
+<li class="toc-entry toc-h3"><a href="#ini-files">INI files (optional)</a></li>
+<li class="toc-entry toc-h3"><a href="#initialisation">Initialisation</a></li>
+<li class="toc-entry toc-h3"><a href="#initialisation-for-groups">Initialisation for groups</a></li>
+<li class="toc-entry toc-h3"><a href="#finally-running-the-test-cases">Finally: running the test cases</a></li>
+<li class="toc-entry toc-h3"><a href="#cleaning-up">Cleaning up</a></li>
+<li class="toc-entry toc-h3"><a href="#cleaning-up-for-groups">Cleaning up for groups</a></li>
+<li class="toc-entry toc-h3"><a href="#ini-file-again">INI file again</a></li>
+<li class="toc-entry toc-h3"><a href="#premature-exit">Premature exit</a></li>
+<li class="toc-entry toc-h3"><a href="#make-the-test-framework-stop">Make the test framework stop</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#stopping-on-a-test-function">Stopping on a test function</a></li>
+<li class="toc-entry toc-h4"><a href="#stopping-on-initial-function">Stopping on <code>Initial</code> function(s)</a></li>
+<li class="toc-entry toc-h4"><a href="#stopping-on-cleanup-function">Stopping on <code>Cleanup</code> function(s)</a></li>
+<li class="toc-entry toc-h4"><a href="#mixing-stops">Mixing stops</a></li>
+<li class="toc-entry toc-h4"><a href="#stops-with-the-gui">Stops with the GUI</a></li>
+</ul></li>
+</ul></li>
+<li class="toc-entry toc-h2"><a href="#code-coverage">Code coverage</a></li>
+<li class="toc-entry toc-h2"><a href="#instance-stuff-offered-by-tester2">Instance stuff offered by <code>Tester2</code></a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#running-test-cases">Running test cases</a></li>
+<li class="toc-entry toc-h3"><a href="#flow-control">Flow control</a></li>
+<li class="toc-entry toc-h3"><a href="#test-function-template">Test function template</a></li>
+<li class="toc-entry toc-h3"><a href="#symbolic-names">Symbolic names</a></li>
+</ul></li>
+<li class="toc-entry toc-h2"><a href="#helpers">Helpers</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#examples-1">Examples</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#with-top-level-helpers">With top-level helpers</a>
+<ul>
+<li class="toc-entry toc-h5"><a href="#runtests">RunTests</a></li>
+<li class="toc-entry toc-h5"><a href="#runtestsinbatchmode">RunTestsInBatchMode</a></li>
+<li class="toc-entry toc-h5"><a href="#prepare">Prepare</a></li>
+</ul></li>
+<li class="toc-entry toc-h4"><a href="#with-second-level-helpers">With second-level helpers</a>
+<ul>
+<li class="toc-entry toc-h5"><a href="#run"><code>Run</code></a></li>
+<li class="toc-entry toc-h5"><a href="#rungui"><code>RunGUI</code></a></li>
+<li class="toc-entry toc-h5"><a href="#runthese"><code>RunThese</code></a></li>
+<li class="toc-entry toc-h5"><a href="#runbatchtests"><code>RunBatchTests</code></a></li>
+</ul></li>
+<li class="toc-entry toc-h4"><a href="#without-helpers">Without Helpers</a>
+<ul>
+<li class="toc-entry toc-h5"><a href="#run__"><code>Run__</code></a></li>
+</ul></li>
+</ul></li>
+<li class="toc-entry toc-h3"><a href="#managing-test-cases">Managing test cases</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#listing-groups">Listing groups</a></li>
+<li class="toc-entry toc-h4"><a href="#listing-symbolic-names">Listing symbolic names</a></li>
+<li class="toc-entry toc-h4"><a href="#listing-test-functions">Listing test functions</a></li>
+<li class="toc-entry toc-h4"><a href="#editing-test-cases">Editing test cases</a></li>
+<li class="toc-entry toc-h4"><a href="#rename-a-test-function">Rename a test function</a></li>
+</ul></li>
+</ul></li>
+<li class="toc-entry toc-h2"><a href="#best-practices">Best Practices</a>
+</ul>
+</div>
+</nav>
+<div class="h_tag">
+<a href="#overview" id="overview" class="autoheader_anchor">
+<h2 data-id="Overview">Overview</h2>
+</a>
+</div>
+<p>The framework comprises the class <code>Tester2</code> which comes with functions designed to manage and execute test cases.</p>
+<p><code>Tester2</code> cooperates with the class <code>CodeCoverage</code> which is designed to produce a code coverage report, which is recommended.</p>
+<p>Both <code>Tester2</code> and <code>CodeCoverage</code> can be loaded as Tatin packages.</p>
+<p><code>Tester2</code> was originally implemented as a framework for testing all the projects of the APLTree library, but became quickly a general solution.</p>
+<p>You are likely to find the framework flexible enough to suit your own needs when it comes to implementing tests.</p>
+<p>Depending on how the Test framework is used it might or might not present a GUI. Note that the GUI is a Windows-only feature although in all other respects, <code>Tester2</code> works on all platforms; if you decide to avoid the GUI, messages are printed to the Dyalog session window.</p>
+<p>The GUI was mainly introduced for <code>Tester2</code>'s own sake: <code>Tester2</code> is used to test itself, and the messages printed to the session can be very confusing then, while the GUI gives you proper feedback even in that scenario.</p>
+<p>Note that executing a large test suite with the GUI is significantly slower than doing the same without the GUI.</p>
+<p>If the GUI shows, then this is how it looks like:</p>
+<p><img src="gui_1.png" alt="The messages" title="The messages"></p>
+<p>The “Log” tab shows all the messages the <code>Tester2</code> class provides:</p>
+<ul>
+<li>Whether there were any INI files instantiated</li>
+<li>Whether a function  <code>Initial</code> was found and executed, and what it returned, if anything</li>
+<li>Which test cases got examined and possibly executed</li>
+<li>What the overall picture is:
+<ul>
+<li>Number of test cases executed</li>
+<li>Number of test cases that crashed</li>
+<li>Number of test cases that failed</li>
+<li>Number of inactive test cases</li>
+<li>Number of test cases that were not applicable</li>
+<li>Number of test cases designed to run on different platforms</li>
+</ul></li>
+<li>Whether a function  <code>Cleanup</code> was found and executed</li>
+</ul>
+<p>The “Details” tab shows a list of all test cases with…</p>
+<ol start="1">
+<li>the status in the first column</li>
+<li>the name of the test function (but without <code>Test_</code>) in the second column</li>
+<li>the first comment line of the test function in the third column</li>
+<li>the symbolic name of the return code, like <code>Failed</code>, <code>OK</code> or <code>WindowsOnly</code> etc., in the fourth column.</li>
+</ol>
+<p><img src="gui_2.png" alt="This list" title="The list"></p>
+<p>The status column shows:</p>
+<ul>
+<li><code>✓</code> okay</li>
+<li><code>*</code> failed</li>
+<li><code>#</code> broken</li>
+<li><code>⍝</code> inactive</li>
+</ul>
+<p>Different statuses show in different colours.</p>
+<p>After all test cases got processed, the user might interact with the GUI. These are the commands presented by the context menu:</p>
+<p><img src="gui_3.png" alt="Context menu" title="Context menu"></p>
+<p>Note that all <code>Run*</code> functions return a two-element vector:</p>
+<ol start="1">
+<li>[1] is a return code (<code>rc</code>) with 0 for “okay”.</li>
+<li>[2] is an empty vector in case <code>rc</code> is 0 and might contain additional information in case <code>rc</code> is not 0.</li>
+</ol>
+<p>A reference pointing to the GUI is assigned internally. That's why the GUI does not disappear straight away after all test cases have been executed. To get rid of it either click the “Close” box or call the <code>T.CloseGUI</code> method which does not require an argument.</p>
+<div class="h_tag">
+<a href="#details" id="details" class="autoheader_anchor">
+<h2 data-id="Details">Details</h2>
+</a>
+</div>
+<div class="h_tag">
+<a href="#terminology" id="terminology" class="autoheader_anchor">
+<h3 data-id="Terminology">Terminology</h3>
+</a>
+</div>
+<p>Note that test cases causing a crash are considered “broken”. Test cases that do not return the expected result are considered “failing”.</p>
+<div class="h_tag">
+<a href="#assumptions-and-preconditions" id="assumptions-and-preconditions" class="autoheader_anchor">
+<h3 data-id="Assumptions-and-preconditions">Assumptions and preconditions</h3>
+</a>
+</div>
+<ol start="1">
+<li>The <code>#.Tester2</code> class assumes that all your tests are hosted in a namespace. It may be an ordinary (recommended) or a scripted namespace, but it <strong><em>must not</em></strong> be an unnamed namespace.</li>
+<li>You must create an instance of the <code>Tester2</code> class to do anything useful.
+<p>The constructor demands a right argument: that must be a reference to the namespace that hosts all your test cases.</p>
+<p>Example: given that all your test cases live in <code>Foo</code>, then you could create an instance <code>T</code> with: <code>T←⎕NEW Tester2 Foo</code></p></li>
+<li>All test functions inside their namespace are expected to start their names with <code>Test_</code> followed either by some digits or a group name followed by an underscore followed by some digits, for example, <code>Test_Foo_003</code>.
+<p>It is recommended that in case you use groups you assign <em>all</em> your test cases to groups.</p></li>
+<li>The number of digits you use for numbering is not restricted: <code>Test_foo_1</code> is fine, and so is <code>Test_foo_0000001</code>. However, they should be consistent, at least within a group.</li>
+<li>In each test function, the first line after the header (which includes any lines that start with a <code>;</code>) must carry a comment telling what is tested.
+<p>Keep in mind that later this is the only way to tell one test case from the others without reading the code, so be as clear as you can be, but also be as brief as possible.</p>
+<p>You are restricted to a single line, and you should keep it short enough to be displayed with a reasonable setting of <code>⎕PW</code>.</p></li>
+<li>Each test function must accept two Booleans as right argument, <code>stopFlag</code> and <code>batchFlag</code></li>
+</ol>
+<div class="leanpub_A">
+<h3><code>stopFlag</code> and <code>batchFlag</code></h3>
+<dl>
+<dt><code>stopFlag</code></dt>
+<dd><p class="first_dd">A Boolean that tells a test function whether it should stop in case a test fails, or just carry on and report the test as a failure.</p></dd>
+<dd><p>The first option allows you to investigate a failing test on the spot.</p></dd>
+<dt><code>batchFlag</code></dt>
+<dd><p class="first_dd">A Boolean that indicates whether the tests are executed as a batch job, meaning that no human can be asked any question or make any decisions, and reporting makes no sense.</p></dd>
+<dd><p>A test function can use that to not execute its test in case it needs to interact with a human, or is called as part of a fully automated process.</p></dd>
+<dd><p>When this flag is true and a test fails, the line number of the test that failed is reported at the end of the message.</p></dd>
+</dl>
+</div>
+
+<div class="h_tag">
+<a href="#executing-test-cases" id="executing-test-cases" class="autoheader_anchor">
+<h3 data-id="Executing-test-cases">Executing test cases</h3>
+</a>
+</div>
+<p>There are some typical scenarios:</p>
+<ul>
+<li>Run <em>all</em> test cases, with or without error trapping and with or without stop flag: see the function <code>Run</code>.</li>
+<li>Run only a <em>subset</em> of all test cases,  with or without error trapping and with or without stop flag: see the function <code>RunThese</code>.</li>
+<li>Run <em>only “batchable”</em> test cases, with or without error trapping and with or without stop flag: see the function <code>RunBatchTests</code>.</li>
+<li>Run <em>all</em> test cases <em>with a GUI</em>, with or without error trapping and with or without stop flag: see the function <code>RunGUI</code>.</li>
+</ul>
+<p>All these functions call the function <code>Run__</code> under the hood, which means that this is a generalized all-singing all-dancing function. If none of the above functions fulfils your needs, consider calling <code>Run__</code> yourself.</p>
+<div class="h_tag">
+<a href="#definitions" id="definitions" class="autoheader_anchor">
+<h3 data-id="Definitions">Definitions</h3>
+</a>
+</div>
+<div class="h_tag">
+<a href="#error-trapping" id="error-trapping" class="autoheader_anchor">
+<h4 data-id="Error-trapping">Error trapping (<code>trapFlag</code>)</h4>
+</a>
+</div>
+<p>Traps all errors except that it does not influence the workings of the <code>debugFlag</code>.</p>
+<div class="h_tag">
+<a href="#debugging" id="debugging" class="autoheader_anchor">
+<h4 data-id="Debugging">Debugging (<code>debugFlag</code>)</h4>
+</a>
+</div>
+<p>If <code>debugFlag</code> flag is 0, any failing test within any test function just makes the test function quit, returning a return code that has the symbolic name <code>_Failure</code>. See <a href="#symbolic-names" class="bookmark_link">Symbolic names</a> for details.</p>
+<p>If <code>debugFlag</code> is 1 (= <code>_OK</code>), then any failing check crashes right on the spot. This allows one to investigate what went wrong, and why.</p>
+<div class="h_tag">
+<a href="#suspend-execution" id="suspend-execution" class="autoheader_anchor">
+<h4 data-id="Suspend-execution">Suspend execution (<code>stopFlag</code>)</h4>
+</a>
+</div>
+<p>This makes the test framework stop just before the next test function is about to be executed. This allows you to trace test cases from top to bottom.</p>
+<div class="h_tag">
+<a href="#batchable-tests" id="batchable-tests" class="autoheader_anchor">
+<h4 data-id="Batchable-tests">Batchable tests</h4>
+</a>
+</div>
+<p>These are tests that do not need a human in front of the monitor. Ideally, all tests should be “batchable” of course. However, in real life, this is not always possible for technical reasons, or the effort would be too high.</p>
+<p>Note that all test cases get the <code>batchFlag</code> provided as part of the right argument, so they know what's required, and can act accordingly.</p>
+<div class="h_tag">
+<a href="#the-syntax-of-test-functions" id="the-syntax-of-test-functions" class="autoheader_anchor">
+<h3 data-id="The-syntax-of-test-functions">The syntax of test functions</h3>
+</a>
+</div>
+<ol start="1">
+<li>Every test function must accept a right argument which is a two-item vector of Booleans:
+<ol start="1">
+<li><code>debugFlag</code>; 1 means that the test function runs in debug mode.
+<p>Assuming that all tests use the <a href="#flow-control" class="bookmark_link">flow control functions</a> provided by <code>Tester2</code>, the difference is that with <code>debugFlag</code> being 0 the test function would quit and return the symbolic name <code>Failure</code>, while with <code>debugFlag</code> being 1 the test function would crash on the spot, allowing the user to investigate.</p></li>
+<li><code>batchFlag</code>: 1 means that there is no user available in front of the monitor.
+<p>That allows a test function that requires a human for, say, some confirmation or some action to <em>not</em> carry out the test but return the symbolic name <code>_NoBatchTest</code>.</p></li>
+</ol></li>
+<li>Every test function must return a result. You are advised to assign one of the symbolic names defined as read-only fields every instance of <code>Tester2</code> comes with. This is much more readable than a simple integer, and it is easier to find as well. Also, you can add custom names. See <a href="#symbolic-names" class="bookmark_link">Symbolic names</a> for details.</li>
+</ol>
+<div class="h_tag">
+<a href="#groups" id="groups" class="autoheader_anchor">
+<h3 data-id="Groups">Groups</h3>
+</a>
+</div>
+<p>Note that you will find that test cases need to be kept simple, and should not depend on each other (see <a href="#best-practices" class="bookmark_link">Best Practices</a>). That leads easily to a significant number of test cases in case you throw complex scenarios at them, like, say, <a href="https://github.com/aplteam/MarkAPL" class="external_link">MarkAPL</a>.</p>
+<p>It is pretty easy to get lost in a large number of test cases, less so when writing the first set but more so when later you need to delete obsolete test cases, add new test cases for new features or fixed bugs, or make changes to test cases that need, well, changing.</p>
+<p>That's why groups are quite important: they allow you to order test cases in a meaningful way.</p>
+<p>It is also possible to execute all test cases belonging to a particular group (or some groups) with a single command.</p>
+<p>You may also specify more than one group by…</p>
+<ul>
+<li>providing a comma-separated list of them</li>
+<li>use <code>*</code> as a wildcard character for matching one or more groups
+<p>The wildcard character can only be used at the end of a name.</p></li>
+<li>Exclude tests or groups with the <code>~</code> character (“without”)</li>
+<li>Mix <code>,</code> , <code>~</code> and <code>*</code> (since version 3.7)</li>
+</ul>
+<p>Note that you can have group-specific <a href="#initialisation-for-groups" class="bookmark_link">initialisation</a> and <a href="#cleaning-up-for-groups" class="bookmark_link">cleaning up</a>.</p>
+<div class="h_tag">
+<a href="#examples" id="examples" class="autoheader_anchor">
+<h4 data-id="Examples">Examples</h4>
+</a>
+</div>
+<p>Group selection requires to call <a href="#runthese" class="bookmark_link"><code>RunThese</code></a>:</p>
+<pre tabindex="0"><code>RunThese 'Grp1_01'       ⍝ Specific test case
+RunThese 'Grp1'          ⍝ Specific group
+RunThese 'Grp*'          ⍝ All groups starting with "Grp"
+RunThese 'Grp1,Grp2'     ⍝ Two specific groups
+RunThese 'Grp*,Misc_1'   ⍝ All groups starting with "Grp" &amp; one specific test case
+RunThese 'G*,~GP'        ⍝ Everything that starts with "G" except "GP"</code></pre>
+<div class="h_tag">
+<a href="#custom-symbolic-names" id="custom-symbolic-names" class="autoheader_anchor">
+<h3 data-id="Custom-symbolic-names">Custom symbolic names</h3>
+</a>
+</div>
+<p>Although there are quite a number of symbolic names available to give feedback for many foreseeable problems (see <a href="#symbolic-names" class="bookmark_link">Symbolic names</a> for details), there will always be circumstances that cannot be foreseen. Therefore <code>Tester2</code> allows you to define up to 9 custom symbolic names.</p>
+<p>They are named from <code>custom_1</code> to <code>custom_9</code>. They are initialised with <code>''</code>. In order to use one you must assign a simple character vector. This character vector is shown in the “Result” column of the GUI etc.</p>
+<p>An example would be (assuming that <code>T</code> is an instance of the <code>Tester2</code> class):</p>
+<pre tabindex="0"><code>T.custom_1←'Invalid version of Dyalog APL'</code></pre>
+<div class="h_tag">
+<a href="#checks-before--after-a-test-case-is-run" id="checks-before--after-a-test-case-is-run" class="autoheader_anchor">
+<h3 data-id="Checks-before--after-a-test-case-is-run">Checks before &amp; after a test case is run</h3>
+</a>
+</div>
+<div class="h_tag">
+<a href="#application" id="application" class="autoheader_anchor">
+<h4 data-id="Application">Application</h4>
+</a>
+</div>
+<p>Imagine that a few of a large set of test cases leave behind files in the temp folder, and you have no idea which one it is. That is easy to find out when you check right after a test case was executed.</p>
+<p>That's why <code>exec_before_each_test</code> and <code>exec_after_each_test</code> were added as properties with version 1.1 to <code>Tester2</code>: they allow you to check whatever you want either just before or right after a test case was executed.</p>
+<p>Another application is when a test case causes a sys error (aplcore) but it is not that particular test case that is causing the real problem but an earlier one. In that case you can execute <code>2 ⎕NQ'.' 'wscheck'</code> after each test case, forcing the interpreter to perform a workspace integrity check; that will bring you much closer to the real culprit.</p>
+<p>I found many other applications for this over the years.</p>
+<div class="h_tag">
+<a href="#overview-1" id="overview-1" class="autoheader_anchor">
+<h4 data-id="overview-1">Overview</h4>
+</a>
+</div>
+<p>When specified they must be the fully qualified name of a monadic function that may or may not return a result.</p>
+<p>The right argument will be a two-element vector:</p>
+<ol start="1">
+<li>The name of the test function that is about to be executed (in case of <code>exec_before_each_test</code>) or was just executed (in case of <code>exec_after_each_test</code>).</li>
+<li>A namespace with all the parameters.</li>
+</ol>
+<p>Regarding the result there are two options:</p>
+<ul>
+<li>In case no result is returned you need to either print a message to the session or make sure the function stops in case you find something not to your liking; you might need to keep <code>⎕TRAP</code> local and set it accordingly in the function for this.</li>
+<li>In case the function returns a result it must be a text vector. If that text vector is empty then <code>Tester2</code> does not take any action. If it is a simple non-empty string this string will be printed to the session. Then <code>Tester2</code> carries on.</li>
+</ul>
+<div class="h_tag">
+<a href="#workflow" id="workflow" class="autoheader_anchor">
+<h2 data-id="Workflow">Workflow</h2>
+</a>
+</div>
+<p>No matter which of the <code>Run*</code> functions you are going to call, the workflow is always the same. (There is a minor difference when <code>Run__</code> is used; this will be discussed later)</p>
+<div class="h_tag">
+<a href="#create-an-instance" id="create-an-instance" class="autoheader_anchor">
+<h3 data-id="Create-an-instance">Create an instance</h3>
+</a>
+</div>
+<p>First you need an instance. Let's assume that you have a project in <code>#.Foo</code> and that the project's test cases are hosted by the namespace <code>#.Foo.TestCases</code>. You create an instance with:</p>
+<pre tabindex="0"><code>      T←⎕NEW #.Tester2 #.Foo.TestCases</code></pre>
+<p>From then on, all <code>Run*</code> functions, all symbolic names and all other helpers are available via the instance <code>T</code>. Some examples:</p>
+<pre tabindex="0"><code>      T.RunGUI ⍬
+      T._OK
+      T.PassesIf
+      T.⎕nl -3    ⍝ Produces a list of all public instance methods</code></pre>
+<p>No matter which of the <code>Run*</code> functions you will call, they all carry out the same steps:</p>
+<div class="h_tag">
+<a href="#ini-files" id="ini-files" class="autoheader_anchor">
+<h3 data-id="INI-files">INI files (optional)</h3>
+</a>
+</div>
+<p>Note that there is an instance property <code>IniFolder</code>. By default this points to <code>CiderConfig.HOME</code> if a namespace <code>CiderConfig</code> can be found in the namespace that hosts the test cases or its parent.</p>
+<p>If there is no such namespace the default falls back to the current directory.</p>
+<p>If your INI file(s) do not live in either place then you must set the <code>IniFolder</code> property in order to allow <code>Tester2</code> to find the INI file(s).</p>
+<p>First the <code>Run*</code> methods check whether there is a file <code>testcases.ini</code>. If this is the case the INI file is processed. Use this INI file to specify general stuff that does not depend on a certain computer/environment.</p>
+<p>Then the <code>Run*</code> methods checks for a file <code>testcases-{computername}.ini</code>. If this file exists it is processed. Use this to specify stuff that does depend on a certain computer or environment.</p>
+<p>Note that if one or both of the two INI files exist there will be a <em>flat</em> namespace <code>T.INI</code>, meaning that any sections defined in the INI file(s) will be ignored.</p>
+<p>An example: if your test functions are hosted by a namespace <code>Foo.TestCases</code> and your INI file specifies a variable <code>hello</code> as holding “world” and you have created an instance with the name <code>T</code> inside <code>#.Foo.TestCases</code> then:</p>
+<pre tabindex="0"><code>       'world'≡#.Foo.TestCases.T.INI.hello
+1</code></pre>
+<div class="h_tag">
+<a href="#initialisation" id="initialisation" class="autoheader_anchor">
+<h3 data-id="Initialisation">Initialisation</h3>
+</a>
+</div>
+<p>In the next step, the <code>Run*</code> method checks whether there is a function <code>Initial</code> in the hosting namespace. If that is the case, this function is executed.</p>
+<p>Note that the function must be either niladic or monadic, and it may return no result at all or a Boolean result or a text vector.</p>
+<ul>
+<li>Boolean result (success flag)
+<ul>
+<li>A 1 means that the function did what it is supposed to do (=same as no result)</li>
+<li>A 0 means it could not initialise</li>
+</ul></li>
+<li>Text result
+<ul>
+<li>An empty text vector means that the function did what it is supposed to do (=same as no result)</li>
+<li>A non-empty text vector means that the function could not initialise; the text vector is added to the log.</li>
+</ul></li>
+</ul>
+<p>Of course, you can simply execute <code>→</code> on a single line in your <code>Initial</code> function if any requirement is not met, but that would also mean that if you run your test cases as part of, say, an automated build process, then this would disrupt the workflow. (There are other reasons why this is not a great idea)</p>
+<p>In such cases <code>Initial</code> should return a 0 indicating failure. Also, part of the initialisation might have been carried out, and a function <code>Cleanup</code> (discussed in a second) might get rid of any leftovers.</p>
+<p>If the function is monadic, then a reference pointing to the parameter space is passed as the right argument. By checking this parameter space <code>Initial</code> can, for example, find out whether the <code>batchFlag</code> is set or not.</p>
+<p>You may also put a variable inside that namespace which can later be referenced by the <code>Cleanup</code> function. However, in order to avoid name clashes you are advised to start the names of such variables with a <code>⍙</code> or a <code>∆</code> character.</p>
+<p>Use <code>Initial</code> to create stuff that's needed by <strong>all</strong> test cases, or tell the user something important (only if the batch flag is false of course).</p>
+<p>Notes:</p>
+<ul>
+<li>You can have separate <a href="#initialisation-for-groups" class="bookmark_link"><code>Initial</code> functions for specific groups</a>. Use this to initialise stuff that is only needed for a certain group, like a database connection etc.</li>
+<li>After executing all test cases <code>Tester2</code> will look for a function <code>Cleanup</code> in the hosting namespace. If there is such a function it will be executed.
+<p>Of course you can also have <a href="#cleaning-up-for-groups" class="bookmark_link">group-specific <code>Cleanup</code> functions</a>.</p></li>
+</ul>
+<div class="h_tag">
+<a href="#initialisation-for-groups" id="initialisation-for-groups" class="autoheader_anchor">
+<h3 data-id="Initialisation-for-groups">Initialisation for groups</h3>
+</a>
+</div>
+<p>You can have initialisation functions for groups. It's recognized by naming convention: for a group <code>foo</code> the function's name must be <code>Initial_foo</code>.</p>
+<p>The rules are the same as for the <a href="#initialisation" class="bookmark_link">global <code>Initial</code> function</a>, although the consequences are different:</p>
+<p>When <code>Initial_foo</code> returns a Boolean and that is a zero, then no test function belonging to the group <code>foo</code> will be executed, but <code>Tester2</code> will carry on executing other test cases.</p>
+<p>Accordingly, when <code>Initial_foo</code> returns a non-empty text vector, then no test function belonging to the group <code>foo</code> will be executed, but <code>Tester2</code> will carry on executing other test cases. The result will be added to the log.</p>
+<p>A group-specific initialisation function is executed right before the first test case of that group is executed.</p>
+<div class="h_tag">
+<a href="#finally-running-the-test-cases" id="finally-running-the-test-cases" class="autoheader_anchor">
+<h3 data-id="Finally-running-the-test-cases">Finally: running the test cases</h3>
+</a>
+</div>
+<p>Now the test cases are executed one by one, or, if groups are defined, one group after the other.</p>
+<div class="h_tag">
+<a href="#cleaning-up" id="cleaning-up" class="autoheader_anchor">
+<h3 data-id="Cleaning-up">Cleaning up</h3>
+</a>
+</div>
+<p>After the last test case was executed, the <code>Run*</code> function checks whether there is a function <code>Cleanup</code> in the namespace hosting your test cases. If that's the case, then this function is executed.</p>
+<p>Any <code>Cleanup</code> function should either return a shy result (which will be ignored) or no result at all. It might accept a right argument, but this is optional: it might as well be niladic. If it <em>does</em> accept a right argument it will get the parameter namespace passed.</p>
+<p>Note that a function <code>Cleanup</code> would be executed no matter whether there was or was not a function <code>Initial</code>, and if there was, no matter whether it returned a 0 or a 1 or nothing at all.</p>
+<div class="h_tag">
+<a href="#cleaning-up-for-groups" id="cleaning-up-for-groups" class="autoheader_anchor">
+<h3 data-id="Cleaning-up-for-groups">Cleaning up for groups</h3>
+</a>
+</div>
+<p>You can have clean-up functions for groups. It's recognized by naming convention: for a group <code>foo</code> the function's name must be <code>Cleanup_foo</code>.</p>
+<p>The rules are the same as for the <a href="#initialisation" class="bookmark_link">global <code>Cleanup</code> function</a>.</p>
+<p>Naturally a group-specific <code>Cleanup</code> function is called after the last test function of that group got executed.</p>
+<div class="h_tag">
+<a href="#ini-file-again" id="ini-file-again" class="autoheader_anchor">
+<h3 data-id="INI-file-again">INI file again</h3>
+</a>
+</div>
+<p>Finally, the namespace <code>INI</code> holding variables populated from your INI file(s) is removed from the instance.</p>
+<div class="h_tag">
+<a href="#premature-exit" id="premature-exit" class="autoheader_anchor">
+<h3 data-id="Premature-exit">Premature exit</h3>
+</a>
+</div>
+<p>There might be situations when you've executed some but not all test cases, and now you want to exit the test framework, typically while you are in a test function. Now the obvious choice is <code>)Reset</code>, or execute just <code>→</code>.</p>
+<p>However, there are situations when you need things to be cleaned up, like closing files, deleting folder(s), shutting down a server, stuff like that.</p>
+<p>In such a case the framework should clean up (execute any <code>Cleanup</code> function) etc.</p>
+<p>This can be achieved by calling the instance method <code>QuitTests</code>. This function signals a <code>QuitEvent</code> which is trapped and processed in a specific way by the test framework.</p>
+<div class="h_tag">
+<a href="#make-the-test-framework-stop" id="make-the-test-framework-stop" class="autoheader_anchor">
+<h3 data-id="Make-the-test-framework-stop">Make the test framework stop</h3>
+</a>
+</div>
+<p><code>Tester2</code> allows you to stop at strategically important points in time.</p>
+<div class="h_tag">
+<a href="#stopping-on-a-test-function" id="stopping-on-a-test-function" class="autoheader_anchor">
+<h4 data-id="Stopping-on-a-test-function">Stopping on a test function</h4>
+</a>
+</div>
+<p>You might want to trace through a test function from top to bottom without tracing through the test framework. That can be achieved by passing a 1 as left argument to any of the <code>Run*</code> functions. The test framework will stop just before the test function(s) get executed.</p>
+<div class="h_tag">
+<a href="#stopping-on-initial-function" id="stopping-on-initial-function" class="autoheader_anchor">
+<h4 data-id="Stopping-on-Initial-function">Stopping on <code>Initial</code> function(s)</h4>
+</a>
+</div>
+<p>You can force <code>Tester2</code> to stop just before any <code>Initial</code> function gets executed. That can be achieved by passing a 2 as left argument to any of the <code>Run*</code> functions.</p>
+<div class="h_tag">
+<a href="#stopping-on-cleanup-function" id="stopping-on-cleanup-function" class="autoheader_anchor">
+<h4 data-id="Stopping-on-Cleanup-function">Stopping on <code>Cleanup</code> function(s)</h4>
+</a>
+</div>
+<p>You can force <code>Tester2</code> to stop just before any <code>Cleanup</code> function gets executed. That can be achieved by passing a 4 as left argument to any of the <code>Run*</code> functions.</p>
+<div class="h_tag">
+<a href="#mixing-stops" id="mixing-stops" class="autoheader_anchor">
+<h4 data-id="Mixing-stops">Mixing stops</h4>
+</a>
+</div>
+<p>You may mix things up. For example, to make <code>Tester2</code> stop on every <code>Initial</code>, every test and every <code>Cleanup</code> function just specify the total as left argument: <code>1+2+4 = 7</code></p>
+<p>Any other combination (3, 5, 6) is valid as well.</p>
+<div class="h_tag">
+<a href="#stops-with-the-gui" id="stops-with-the-gui" class="autoheader_anchor">
+<h4 data-id="Stops-with-the-GUI">Stops with the GUI</h4>
+</a>
+</div>
+<p>Note that the GUI provides a combo box with all possible values:</p>
+<p><img src="gui_4.png" alt="Stop options" title="Stop options"></p>
+<div class="h_tag">
+<a href="#code-coverage" id="code-coverage" class="autoheader_anchor">
+<h2 data-id="Code-coverage">Code coverage</h2>
+</a>
+</div>
+<p>Usually one would like to know how much of the code is covered by test cases. Ideally that should be 100%, but that is rarely achievable.</p>
+<p>However, in order to improve on this, one needs to know how much code is covered, and also which parts of the code are <em>not</em> covered.</p>
+<p>Since version 2.3 <code>Tester2</code> can cooperate with the class <a href="https://github.com/aplteam/CodeCoverage" class="external_link">CodeCoverage</a> which is capable of collecting the necessary data and compiling a report.</p>
+<p>If you want <code>Tester2</code> to cooperate with <code>CodeCoverage</code>, assign a reference pointing to an instance of <code>CodeCoverage</code> to the <code>Tester2</code> property <code>codeCoverage</code>.</p>
+<div class="h_tag">
+<a href="#instance-stuff-offered-by-tester2" id="instance-stuff-offered-by-tester2" class="autoheader_anchor">
+<h2 data-id="Instance-stuff-offered-by-Tester2">Instance stuff offered by <code>Tester2</code></h2>
+</a>
+</div>
+<p>The methods fall into four groups:</p>
+<div class="h_tag">
+<a href="#running-test-cases" id="running-test-cases" class="autoheader_anchor">
+<h3 data-id="Running-test-cases">Running test cases</h3>
+</a>
+</div>
+<p><code>Run</code>, <code>RunBatchTests</code>, <code>RunGUI</code>, <code>RunThese</code> and <code>Run__</code> are running all or selected test cases with or without error trapping.</p>
+<p>Note that there are helpers available for the most common cases, see the “Helpers” for details.</p>
+<div class="h_tag">
+<a href="#flow-control" id="flow-control" class="autoheader_anchor">
+<h3 data-id="Flow-control">Flow control</h3>
+</a>
+</div>
+<p><code>FailsIf</code>, <code>PassesIf</code> and <code>GoToTidyUp</code> control the program flow in test functions. The test template (see <a href="#test-function-template" class="bookmark_link"><code>GetTestTemplate</code></a> for details) contains examples of how to use these functions.</p>
+<p>These functions return a result (Boolean) in case <code>debugFlag</code> is a 0 but make the calling <code>Test_*</code> function crash otherwise, allowing you to investigate a failing test case right on the spot. Note that the setting of the <code>trapFlag</code> has no bearing on this.</p>
+<p>This is achieved by the functions <code>FailsIf</code>, <code>PassesIf</code> and <code>GoToTidyUp</code> signalling an error 999 that can be trapped with, say:</p>
+<pre tabindex="0"><code>      ⎕TRAP←(999 'C' '∘∘∘ ⍝ Deliberate error')(0 'N')</code></pre>
+<p>That's why the template for a test function carries such a statement <em>and</em> keeps <code>⎕TRAP</code> local.</p>
+<p>Note that <code>GoToTidyUp</code> allows you to jump to a label <code>∆TidyUp</code> with a statement like this:</p>
+<pre tabindex="0"><code> →GoToTidyUp ~expected≡result</code></pre>
+<p>This is useful in case a test case needs to do some cleaning up like deleting a temporary file created by the test case, so just jumping out is not an option. In case the right argument is 1 (rather than 0) it causes a crash in debug mode and carries out the jump otherwise.</p>
+<div class="h_tag">
+<a href="#test-function-template" id="test-function-template" class="autoheader_anchor">
+<h3 data-id="Test-function-template">Test function template</h3>
+</a>
+</div>
+<p>You can get a test function template by calling the instance method <code>GetTestTemplate</code>.</p>
+<p>You must provide a number as right argument. The test function will be named <code>Test_{yourNumber}</code>. The number must be between 1 and 999 and will be formatted to a three-character vector.</p>
+<p>You can also provide a group name via the optional left argument.</p>
+<p>Check the examples which assume that an instance of <code>Tester2</code> is available as <code>T</code>, and that you are inside the (ordinary, non-scripted) namespace that hosts the test cases:</p>
+<pre tabindex="0"><code>     ≢'T'⎕NL 3
+0
+      T.GetTestTemplate 3
+Test_003
+     ≢'T'⎕NL 3
+1
+      'Misc' T.GetTestTemplate 1
+Test_Misc_001
+     ≢'T'⎕NL 3
+2</code></pre>
+<p>Notes:</p>
+<ul>
+<li>In case such a test function already exists  it will be overwritten, but first you will be prompted for confirmation.</li>
+<li>For technical reasons such a template function cannot be established by <code>GetTestTemplate</code> when the namespace hosting the test cases is scripted. If that is the case you will be prompted for copying the code to the clipboard; it is then up to you to insert the code into the script.</li>
+</ul>
+<div class="h_tag">
+<a href="#symbolic-names" id="symbolic-names" class="autoheader_anchor">
+<h3 data-id="Symbolic-names">Symbolic names</h3>
+</a>
+</div>
+<p>These are the public read-only instance fields that act like constants:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name                  </th>
+<th style="text-align: left;">Meaning                                                               </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_OK</code></td>
+<td>Passed</td>
+</tr>
+<tr>
+<td><code>_Failed</code></td>
+<td>Unexpected result</td>
+</tr>
+<tr>
+<td><code>_NoBatchTest</code></td>
+<td>Not executed because <code>batchFlag</code> was 1.</td>
+</tr>
+<tr>
+<td><code>_NotApplicable</code></td>
+<td>This test is not applicable here and now</td>
+</tr>
+<tr>
+<td><code>_NotImplemented</code></td>
+<td>Attempts to test a feature that has yet not been implemented</td>
+</tr>
+<tr>
+<td><code>_InActive</code></td>
+<td>Not executed: the test case is inactive (not ready, buggy, …)</td>
+</tr>
+<tr>
+<td><code>_IncompatibleVersion</code></td>
+<td>Regarding the version of Dyalog currently running</td>
+</tr>
+<tr>
+<td><code>_LinuxOnly</code></td>
+<td>Not executed because runs under Linux only</td>
+</tr>
+<tr>
+<td><code>_LinuxOrMacOnly</code></td>
+<td>Not executed because runs under Linux/Mac OS only</td>
+</tr>
+<tr>
+<td><code>_LinuxOrWindowsOnly</code></td>
+<td>Not executed because runs under Linux/Windows only</td>
+</tr>
+<tr>
+<td><code>_MacOrWindowsOnly</code></td>
+<td>Not executed because runs under Mac OS/Windows only</td>
+</tr>
+<tr>
+<td><code>_MacOnly</code></td>
+<td>Not executed because runs under Mac OS only</td>
+</tr>
+<tr>
+<td><code>_NoAcreTests</code></td>
+<td>Not executed because it's acre-related but acre is not around</td>
+</tr>
+<tr>
+<td><code>_NoCiderTest</code></td>
+<td>Not executed because it's Cider-related but Cider is not around</td>
+</tr>
+<tr>
+<td><code>_SkippedByUser</code></td>
+<td>Returned in case the user refused to execute a test case</td>
+</tr>
+<tr>
+<td><code>_WindowsOnly</code></td>
+<td>Not executed because runs under Windows only</td>
+</tr>
+</tbody>
+</table>
+<p>Use one of these to assign an explicit result within any test function. The advantages of this approach:</p>
+<ol start="1">
+<li>Much more readable than an integer</li>
+<li>You can easily search for, say, <code>_InActive</code>, while searching for its number is pointless</li>
+</ol>
+<p>Notes:</p>
+<ul>
+<li>There is a method <code>ListSymbolicNames</code> available</li>
+<li>By putting a comment on the line where a constant is assigned you can make sure that this comment is, together with the name of the constant, put into the GUI's “Result” comment
+<p>For example, assuming that <code>Tester2</code> was instantiated with <code>T←⎕NEW Tester2</code>, then this:</p>
+<p><code>R←T._Inactive ⍝ Waiting for fix for bug 1291</code></p>
+<p>would pop up as “Inactive: Waiting for fix for bug 1291” in the “Result” column for the associated test function.</p></li>
+</ul>
+<div class="h_tag">
+<a href="#helpers" id="helpers" class="autoheader_anchor">
+<h2 data-id="Helpers">Helpers</h2>
+</a>
+</div>
+<p>These are functions that are not required in order to run test cases, but can make a programmer's life significantly easier.</p>
+<p>Two scenarios are very common:</p>
+<ul>
+<li>Run all test cases and create data on the fly that allow creating a code coverage report.
+<p>Such tests may well interact with the user.</p></li>
+<li>Run all tests that do not require a user (batch tests), typically as part of some automated process
+<p>Most importantly this returns a Boolean that either indicates 100% success with a 1, or that at least one test cases failed, indicated by a 0.</p></li>
+</ul>
+<p><code>Tester2</code> can establish helpers in the namespace that host your test cases covering these two scenarios.</p>
+<p>Assuming that you are currently in that namespace, and that it contains <code>Tester2</code> (and also <code>CodeCoverage</code> if you are after a code coverage report) then this is all that is required:</p>
+<pre tabindex="0"><code>      Tester2.EstablishHelpers ⎕THIS
+"Prepare", "RunTests" &amp; "RunBatchTests" successfully established in ...</code></pre>
+<p>Note that you should read and amend the helpers after having established them, in particular <code>Prepare</code>.</p>
+<div class="h_tag">
+<a href="#examples-1" id="examples-1" class="autoheader_anchor">
+<h3 data-id="examples-1">Examples</h3>
+</a>
+</div>
+<div class="h_tag">
+<a href="#with-top-level-helpers" id="with-top-level-helpers" class="autoheader_anchor">
+<h4 data-id="With-top-level-helpers">With top-level helpers</h4>
+</a>
+</div>
+<p>First make sure that the helpers are established in the namespace that hosts your tests. If you are inside that namespace and have instantiated <code>Tester2</code> as <code>T</code>:</p>
+<pre tabindex="0"><code>      T.EstablishHelpers ⎕THIS
+"Prepare", "RunTests" &amp; "RunBatchTests" successfully established in ...</code></pre>
+<div class="h_tag">
+<a href="#runtests" id="runtests" class="autoheader_anchor">
+<h5 data-id="RunTests">RunTests</h5>
+</a>
+</div>
+<p>A niladic function that does not return a result. It asks whether the user wants to get a code coverage report.</p>
+<p>If there is already such a report the user might want to append data, for example when you need to run your test suite under Windows, Linux and Mac-OS.</p>
+<p>Such tests might well rely on the user to answer questions. The debug flag is set, so when a test case has a problem, it stops on the spot and allows the user to investigate the problem.</p>
+<div class="h_tag">
+<a href="#runtestsinbatchmode" id="runtestsinbatchmode" class="autoheader_anchor">
+<h5 data-id="RunTestsInBatchMode">RunTestsInBatchMode</h5>
+</a>
+</div>
+<pre tabindex="0"><code>(success log)←RunTestsInBatchMode</code></pre>
+<p>This does not do code coverage. The debug flag is off, so in case a test case fails it does not stop.</p>
+<p>This is typically run as part of an automated process.</p>
+<p>It returns a two-item vector as result:</p>
+<ol start="1">
+<li>A Boolean indicating success with a 1 and failure with a 0. It's a failure when at least one test case failed.</li>
+<li>A vector of text vectors with a detailed report</li>
+</ol>
+<div class="h_tag">
+<a href="#prepare" id="prepare" class="autoheader_anchor">
+<h5 data-id="Prepare">Prepare</h5>
+</a>
+</div>
+<p><code>Prepare</code> is called by <code>RunTests</code>, but it can also be useful if you want to prepare for a run but have special needs that are not covered by <code>RunTests</code>, for example when you want to run only a specific group of test cases.</p>
+<div class="h_tag">
+<a href="#with-second-level-helpers" id="with-second-level-helpers" class="autoheader_anchor">
+<h4 data-id="With-second-level-helpers">With second-level helpers</h4>
+</a>
+</div>
+<p>You only need to read this if the top-level helpers do not cover your needs.</p>
+<p>This is about <code>Tester2</code>'s <code>Run*</code> functions. These should be flexible enough to cover even exotic needs.</p>
+<div class="h_tag">
+<a href="#run" id="run" class="autoheader_anchor">
+<h5 data-id="Run"><code>Run</code></h5>
+</a>
+</div>
+<pre tabindex="0"><code>{(rc log)}←{stopFlag} Run debugFlag</code></pre>
+<p><code>Run</code> requires a Boolean right argument. A 1 makes the test framework stop on a line that fails to return the expected result (<code>PassesIf</code>, <code>FailsIf</code>, <code>GotoTidyUp</code>) while a 0 does not.</p>
+<p>The optional left argument must also be Boolean and defines whether the test framework should stop right before any of the test cases is executed (1) or not (0, which is the default).</p>
+<div class="h_tag">
+<a href="#rungui" id="rungui" class="autoheader_anchor">
+<h5 data-id="RunGUI"><code>RunGUI</code></h5>
+</a>
+</div>
+<p>With <code>RunGUI</code> you can achieve the same as with <code>Run</code> but it is a Windows-only feature. It might be easier to start with <code>RunGUI</code> but you might switch to <code>Run</code> later, if only because it is significantly faster.</p>
+<p>However, there are situations when <code>RunGUI</code> is indispensable: <code>Tester2</code>'s own test cases are almost impossible to follow without it, for example. It's also useful to demonstrate the features of the <code>Tester2</code> class.</p>
+<p><code>RunGUI</code> requires only a right argument; if this is empty <em>all</em> test cases will be executed. You can specify numbers or a group name or mix a group name with one or more numbers. You can also precede a group name with a <code>~</code> (without) to execute all test cases but the members of that group.</p>
+<p>Notes:</p>
+<ul>
+<li>You can specify only <em>one</em> group name.</li>
+<li>The GUI can be closed programmatically by calling the niladic instance method <code>CloseGUI</code>.</li>
+<li>You can create a parameter space by calling <code>CreateParms</code>, make amendments and pass the parameter space as the optional left argument to <code>RunGUI</code>. However, since you can make those amendments in the GUI itself this is useful only to specify defaults for the GUI.</li>
+</ul>
+<div class="h_tag">
+<a href="#runthese" id="runthese" class="autoheader_anchor">
+<h5 data-id="RunThese"><code>RunThese</code></h5>
+</a>
+</div>
+<p>This method is particularly helpful while developing/enhancing stuff: the function allows you to run just selected test functions rather than a whole test suite.</p>
+<p>If you now think, well, why not just call any function <code>Test_001</code> myself then imagine a situation when all your test cases depend on an INI file or the execution of <code>Initial</code> or both. That is exactly the advantage of <code>RunThese</code>: it carries out all these steps for you, and also executes the <code>Cleanup</code> function in case there is one.</p>
+<p><code>RunThese</code> offers the following options:</p>
+<pre tabindex="0"><code>T.RunThese 1                 ⍝ Execute test cases 1 that do not belong to any group
+T.RunThese 'Group1'          ⍝ Execute all test cases belonging to Group1
+T.RunThese '~Group1'         ⍝ Execute all tests but those belonging to Group1 (without)
+T.RunThese 'Group1' (2 3)    ⍝ Execute test cases 2 &amp; 3 of Group1
+T.RunThese 'Group1' 2 3      ⍝ Same as before
+T.RunThese 'Group1,Group2'   ⍝ Execute two groups
+T.RunThese 'Misc'            ⍝ Execute all test cases of the group "Misc"
+T.RunThese 'L*'              ⍝ Execute all test cases of all groups starting with "L"
+T.RunThese 'Group1_001'      ⍝ Executes just this test case
+T.RunThese 'Test_Group1_001' ⍝ Same as before</code></pre>
+<p>Sometimes you want to trace through test cases. This can be achieved by specifying a 1 as the (optional) left argument. <code>RunThese</code> would then stop just before any test case is executed, after processing any INI file(s) and executing any <code>Initial</code> function.</p>
+<div class="h_tag">
+<a href="#runbatchtests" id="runbatchtests" class="autoheader_anchor">
+<h5 data-id="RunBatchTests"><code>RunBatchTests</code></h5>
+</a>
+</div>
+<pre tabindex="0"><code>{(rc log)}←{stopFlag} RunBatchTests debugFlag</code></pre>
+<p>This is the same as <code>Run</code> except that it passes a 1 as <code>batchFlag</code> to the test functions. This allows the test function itself to quit under some circumstances. This is usually because a test requires a human in front of the monitor, and if such a human is not available right now then there is no point running such tests.</p>
+<div class="h_tag">
+<a href="#without-helpers" id="without-helpers" class="autoheader_anchor">
+<h4 data-id="Without-Helpers">Without Helpers</h4>
+</a>
+</div>
+<div class="h_tag">
+<a href="#run__" id="run__" class="autoheader_anchor">
+<h5 data-id="Run__"><code>Run__</code></h5>
+</a>
+</div>
+<pre tabindex="0"><code>{(rc log)}←Run__ ps</code></pre>
+<p>This is a generalized function that is effectively called by all the other <code>Run*</code> functions. In case the other functions don't suit your needs, you can use it yourself, although this requires a little more effort:</p>
+<pre tabindex="0"><code>      ps←T.CreateParms ⍬
+      ps._∆List  ⍝ List the defaults
+ batchFlag    0
+ debugFlag    0
+ guiFlag      0
+ stopFlag     0
+ testCaseNos
+ trapFlag     1
+      ⍝ Make amendments:
+      ps.stopFlag←1
+      ps.testCaseNos←'Misc' (1 2 3)
+      ⍝ Call the Run__ function:
+      (rc log)←T.Run__ ps</code></pre>
+<div class="h_tag">
+<a href="#managing-test-cases" id="managing-test-cases" class="autoheader_anchor">
+<h3 data-id="Managing-test-cases">Managing test cases</h3>
+</a>
+</div>
+<p>There are a couple of methods available that assist you in managing test cases.</p>
+<p>The examples stem from the <code>Fire</code> project (<a href="https://github.com/aplteam/Fire" class="external_link">https://github.com/aplteam/Fire</a>).</p>
+<p>We assume that you have instantiated <code>Tester2</code> as <code>T</code>.</p>
+<div class="h_tag">
+<a href="#listing-groups" id="listing-groups" class="autoheader_anchor">
+<h4 data-id="Listing-groups">Listing groups</h4>
+</a>
+</div>
+<p><code>ListGroups</code> lists all groups:</p>
+<pre tabindex="0"><code>      T.ListGroups
+acre
+Cider
+InternalMethods
+List
+Misc
+Replace
+ReportGhosts
+Search</code></pre>
+<div class="h_tag">
+<a href="#listing-symbolic-names" id="listing-symbolic-names" class="autoheader_anchor">
+<h4 data-id="Listing-symbolic-names">Listing symbolic names</h4>
+</a>
+</div>
+<p><code>ListSymbolicNames</code> lists all symbolic names.</p>
+<div class="h_tag">
+<a href="#listing-test-functions" id="listing-test-functions" class="autoheader_anchor">
+<h4 data-id="Listing-test-functions">Listing test functions</h4>
+</a>
+</div>
+<p><code>ListTestFunctions</code> requires a right argument (empty or group name) and accepts an optional left argument (test case numbers). The group name might carry a trailing <code>*</code> character as a wildcard.</p>
+<pre tabindex="0"><code>      ≢T.ListTestFunctions'Foo'
+0
+      ≢T.ListTestFunctions'foo'
+3
+      T.ListTestFunctions'foo'
+ Test_foo_01  Pro-forma test used to test `RunThese 'foo' 1`
+ Test_foo_02  Pro-forma test used to test `RunThese` with `1 2` as right argument
+ Test_foo_03  This is used to check whether T._Inactive is processed as intended AND ...
+      ≢T.ListTestFunctions'Mi*'
+33
+    1 7 99 ListTestFunctions 'Mi*'
+Test_Misc_01  Pro-forma test used to test `RunThese` with a 1 as right argument
+Test_Misc_07  Exercise the `RunThese` method
+      ≢ T.ListTestFunctions''
+87</code></pre>
+<p>With a large number of test cases you might prefer to get them into an edit window rather than printing them to the session. This can be achieved by passing “view” as left argument:</p>
+<pre tabindex="0"><code>'view' T.ListTestFunctions ''</code></pre>
+<p>Notes:</p>
+<ul>
+<li>Group names must be specified fully or you must specify an asterisk at the end</li>
+<li>Test case numbers passed as left argument that do not exist are simply ignored</li>
+<li>The result is a matrix with two columns: names in the first column and the first line after the header in the second column
+<p>If the result is too wide to fit into <code>⎕PW</code> measures are taken</p></li>
+<li>The group names are case sensitive</li>
+</ul>
+<div class="h_tag">
+<a href="#editing-test-cases" id="editing-test-cases" class="autoheader_anchor">
+<h4 data-id="Editing-test-cases">Editing test cases</h4>
+</a>
+</div>
+<p>Occasionally you might want to edit some or even all test case functions. That can be easily achieved:</p>
+<pre tabindex="0"><code>    T.EditTestFunctions''                          ⍝ Edit all test cases
+    T.EditTestFunctions T.ListTestFunctions'ZZZ'   ⍝ Edit all of the group "ZZZ"
+</code></pre>
+<div class="h_tag">
+<a href="#rename-a-test-function" id="rename-a-test-function" class="autoheader_anchor">
+<h4 data-id="Rename-a-test-function">Rename a test function</h4>
+</a>
+</div>
+<p>Renaming a test function is harder (and more dangerous) than you might think at first glance, hence the method <code>RenameTestFnsTo</code> is available to assist you.</p>
+<p>The syntax:</p>
+<pre tabindex="0"><code>'oldname' T.RenameTestFnsTo 'newname'</code></pre>
+<p>Let's assume that at first you started numbering your test functions. Soon you come to realize that groups would be helpful. But it is awkward to have some test functions carrying just numbers and others group names <em>and</em> numbers. Therefore, it is a good idea to rename those with just a number into, say, <code>Test_Misc_</code> followed by the number.</p>
+<p>For example:</p>
+<pre tabindex="0"><code>'Test_001' T.RenameTestFnsTo 'Test_Misc_001'</code></pre>
+<p><code>RenameTestFnsTo</code> does a couple of things for you:</p>
+<ol start="1">
+<li>It copies <code>Test_001</code> to <code>Test_Misc_001</code></li>
+<li>It cooperates with code management systems
+<ul>
+<li>If <a href="https://github.com/the-carlisle-group/Acre-Desktop" class="external_link">acre</a> is around it tells acre about the introduction of <code>Test_Misc_001</code></li>
+<li>If Link version 3.0.0 or better is available it is told about the introduction of <code>Test_Misc_001</code></li>
+</ul></li>
+<li>It deletes the function <code>Test_001</code></li>
+<li>It tells acre (if it's around) and Link (if at least version 3.0.0 is available) about the deletion of <code>Test_001</code></li>
+</ol>
+<p>Note that <code>RenameTestFnsTo</code> can deal with groups as well. For example:</p>
+<pre tabindex="0"><code>'Foo' T.RenameTestFnsTo  'Misc'</code></pre>
+<p>Assuming that there is a group “Foo”, then all members of that group would be renamed so that they become members of the group “Misc”.</p>
+<p>If there is already a group “Misc” then numbering would start with the highest previous number plus 1.</p>
+<div class="h_tag">
+<a href="#best-practices" id="best-practices" class="autoheader_anchor">
+<h2 data-id="Best-Practices">Best Practices</h2>
+</a>
+</div>
+<ul>
+<li>When starting to implement test cases you are advised to leave gaps: <code>Test_001</code>, <code>Test_010</code> etc. The same holds for numbering within groups.</li>
+<li>Try to keep your test cases simple and test just one thing at a time, for example just one method.</li>
+<li>For more complex methods (for example when the method accepts different kinds of arguments) create a group with the method name as group name.</li>
+<li>Create everything you need on the fly and tidy up afterwards. Or more precisely, tidy up (leftovers!), prepare, test, tidy up again. In other words, make the test case “stand-alone”.
+<p>The exception from this rule is when <em>all</em> test cases require the same pre-condition like, say, a database connection. In that case establish what's needed in a function <a href="#initialisation" class="bookmark_link"><code>Initial</code></a> and use a function <a href="#cleaning-up" class="bookmark_link"><code>CleanUp</code></a> to get rid of it.</p>
+<p>If all test functions of a certain group share the same requirement use <a href="#initialisation-for-groups" class="bookmark_link">Initialisation for groups</a>.</p></li>
+<li>Avoid a test case relying on changes made by an earlier test case. This can be a tempting thing to do, but you are likely to regret it later.
+<p>Having said this, in rare cases it is required to build up on other test cases for technical reasons, or in order to avoid a significant performance penalty.</p></li>
+<li>Notice that the DRY principle (don't repeat yourself) can and should be ignored when it comes to test cases: any test case should read from top to bottom like an independent story that can be understood by itself.</li>
+<li>It might be a good idea for <em>all</em> test functions to tidy up first, just in case this test case has failed earlier and left some debris behind.</li>
+<li>It's common practice to implement a test case for every bug, for bugs tend to make comebacks; such tests prevent that from happening.</li>
+</ul>
+
+<script>
+
+// Adds a "Copy" button to every code block & established the event handler
+const copyButtonLabel = " Copy " ;
+
+let blocks = document.querySelectorAll("pre");
+
+blocks.forEach((block) => {
+  if (navigator.clipboard) {
+    let button = document.createElement("button");
+
+    button.innerText = copyButtonLabel;
+    button.title = "Copies the code block to the clipboard.";
+    block.appendChild(button);
+     
+    button.addEventListener("click", async () => {
+      await copyCode(block, button);
+    });
+  }  
+});  
+
+async function copyCode(block, button) {
+  let code = block.querySelector("code");
+  let text = code.innerText;
+
+  await navigator.clipboard.writeText(text);
+
+  button.innerText = " Copied ";
+
+  setTimeout(() => {
+    button.innerText = copyButtonLabel;
+  }, 700);
+}
+
+
+// Toggle the visibility of the TOC when the "Hide/Show" button is clicked
+const button = document.querySelector("#toc-toggle");
+const content = document.querySelector("#toc-list");
+button.addEventListener("click", toggleTableOfContents);
+function toggleTableOfContents() {
+  content.classList.toggle("hide");
+  if (button.innerText === "Hide") {
+    button.innerText = "Show";
+    button.setAttribute("aria-expanded", false);
+  } else {
+    button.innerText = "Hide";
+    button.setAttribute("aria-expanded", true);
+  }
+}
+
+</script>
+
+</body>
+</html>

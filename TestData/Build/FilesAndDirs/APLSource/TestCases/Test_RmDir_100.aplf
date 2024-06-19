@@ -1,0 +1,29 @@
+ R←Test_RmDir_100(stopFlag batchFlag);⎕TRAP;tempFolder;res
+⍝ Test the `RmDirByForce` method on a folder that carries read-only file
+⍝ This test requires APLGit2 in ⎕SE
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If APLGit2.IsGitInstalled
+     tempFolder←##.FilesAndDirs.GetTempSubDir'FilesAndDirs ',⊃⎕SI
+     (tempFolder,'/')⎕NCOPY ##.CiderConfig.HOME,'/APLSource'
+     {}1 APLGit2.Init tempFolder
+     res←APLGit2.Add tempFolder
+     Assert 0≡res
+     res←'Some message'APLGit2.Commit tempFolder
+     Assert 0<≢res
+     res←##.FilesAndDirs.RmDir tempFolder
+     :If 'win'≡⎕C APLTreeUtils2.GetOperatingSystem''
+         Assert 1 19≡2↑res  ⍝ Because now .git/ carries files with the read-only flag set (Windows-only)
+     :Else
+         Assert 0 0≡2↑res
+     :EndIf
+
+     res←##.FilesAndDirs.RmDirByForce tempFolder
+     Assert 0=1⊃res
+     →T.PassesIf~⎕NEXISTS tempFolder
+
+     R←T._OK
+ :Else
+     R←T._NotApplicable
+ :EndIf

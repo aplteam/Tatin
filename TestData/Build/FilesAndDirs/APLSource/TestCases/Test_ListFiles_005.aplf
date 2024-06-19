@@ -1,0 +1,13 @@
+ R←Test_ListFiles_005(stopFlag batchFlag);⎕TRAP;result;qdmx
+⍝ Test the `ListFiles` method with wildcards
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ result←##.FilesAndDirs.ListFiles ##.CiderConfig.HOME,'/Tests/Test Dir/*.txt'
+ 'Must not be empty'Assert 0<≢result
+ →T.PassesIf'shakespeare.txt'≡∊{⊃,/1↓⎕NPARTS ⍵}¨result
+
+ result←'recursive'##.FilesAndDirs.ListFiles ##.CiderConfig.HOME,'/Tests/Test Dir/*.txt'
+ →T.PassesIf 3=≢result
+
+ R←T._OK

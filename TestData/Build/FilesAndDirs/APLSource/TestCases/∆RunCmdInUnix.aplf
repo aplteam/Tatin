@@ -1,0 +1,13 @@
+ (rc more result)←∆RunCmdInUnix cmd;buff;d
+ result←more←''
+ :Trap 11
+     buff←⎕SH cmd,' 2>&1; echo "CMDEXIT=$?"; exit 0'
+     :If 0≠rc←⍎(⍴'CMDEXIT=')↓⊃¯1↑buff
+         more←1⊃buff
+     :Else
+         result←¯1↓buff
+     :EndIf
+ :Else
+     rc←1
+     more←⎕DMX.mMssage
+ :EndTrap

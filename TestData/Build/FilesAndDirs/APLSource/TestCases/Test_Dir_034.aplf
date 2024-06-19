@@ -1,0 +1,27 @@
+ R←Test_Dir_034(stopFlag batchFlag);⎕TRAP;list;path;path2;Old
+⍝ Test the `Dir` method with wildcards and extensions
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ path←##.FilesAndDirs.GetTempPath,'\',⊃⎕SI
+ 'Create!'##.FilesAndDirs.CheckPath path
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/(path,'\file1.md')('# File 1' '' 'A para')
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/(path,'\file2.md')('# File 2' '' 'A para')
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/(path,'\file3.csv')('APL,Good' 'Pascal,Old' 'Cobol,Horrible')
+ path2←path,'\SubFolder'
+ 'Create!'##.FilesAndDirs.CheckPath path2
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/(path2,'\file4.md')('# File 4' '' 'A para')
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/(path2,'\file5.md')('# File 5' '' 'A para')
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/(path2,'\file6.csv')('This,1' 'That,2' 'More,3')
+
+ list←⊃##.FilesAndDirs.Dir path,'\*.md'
+ →T.GoToTidyUp 2≠≢list
+ list←⊃('recursive' 1)##.FilesAndDirs.Dir path,'\*.md'
+ →T.GoToTidyUp 4≠+/##.FilesAndDirs.IsFile list
+ list←⊃('recursive' 1)##.FilesAndDirs.Dir path,'\*3.cs*'
+ →T.GoToTidyUp 1≠+/##.FilesAndDirs.IsFile list
+
+ R←T._OK
+
+∆TidyUp:
+ ##.FilesAndDirs.RmDir path

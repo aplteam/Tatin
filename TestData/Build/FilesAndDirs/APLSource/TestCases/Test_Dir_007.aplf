@@ -1,0 +1,13 @@
+ R←Test_Dir_007(stopFlag batchFlag);⎕TRAP;list
+⍝ Test the `Dir` method in the most simple way: just the current dir
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←##.FilesAndDirs.Dir'./'
+ →T.PassesIf 1=≢list
+ →T.PassesIf 1=≢list
+
+ list←('type'(2 3 4))##.FilesAndDirs.Dir './'
+ →T.PassesIf 3=≢list
+
+ R←T._OK

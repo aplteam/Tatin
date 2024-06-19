@@ -1,0 +1,10 @@
+ R←Test_Dir_041(stopFlag batchFlag);⎕TRAP;list
+⍝ Test the `Dir` method with wildcards matching directories
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←1⊃##.FilesAndDirs.Dir'Tests\Test Dir\o*'
+ →T.PassesIf 2=≢list
+ →T.PassesIf∧/##.FilesAndDirs.IsDir list
+
+ R←T._OK

@@ -1,0 +1,47 @@
+ (rc msg)←RmDirByForce path;r;buff;flag;i;os;max
+⍝ Removes files and directories by force no matter what, including files that have the read-only flag set.\\
+⍝ Notes:
+⍝ * If `path` does not exist `(0 'Directory does not exist')` is returned
+⍝ * If `path` exists but is not a directory `(1 'Not a directory')` is returned
+⍝ * In case of success `(0 '')` is returned
+⍝ * Wildcard characters (`*` and `?`) are not allowed as part of `path`
+⍝   If such characters are specified anyway then an error is signalled.\\
+⍝   This is true even on Linux and Mac OS despite the fact that these characters are legal in
+⍝   the names of any files and directories.
+⍝ * The function checks whether `path` was successfully removed indeed.
+ '"path" must not be /..'⎕SIGNAL 11/⍨(⊂path)∊'\..' '/..'
+ path←'expand'NormalizePath path
+ 'Wildcard characters are not allowed'⎕SIGNAL 11/⍨∨/'*?'∊path
+ rc←0 ⋄ msg←''
+ :If ~⎕NEXISTS path
+     msg←'Directory does not exist'
+ :ElseIf ~IsDir path
+     rc←1
+     msg←'Not a directory'
+ :Else
+     os←⎕C APLTreeUtils2.GetOperatingSystem ⍬
+     max←5+3×os≢'win'
+     flag←i←0
+     :Repeat
+         :Trap 11
+             :Select os
+             :Case 'win'
+                 buff←∊⎕SH'rmdir /s /q "',(path~'"'),'"'
+             :Else
+                 buff←∊⎕SH'rm -f -r "',(path~'"'),'"'
+             :EndSelect
+         :EndTrap
+         :If 0≠rc←⎕NEXISTS path
+             :If max=i←i+1
+                 :If 0=≢msg←buff
+                     msg←'Removing directory failed'
+                 :EndIf
+                 flag←1
+             :Else
+                 ⎕DL 0.2×i
+             :EndIf
+         :Else
+             flag←1
+         :EndIf
+     :Until flag
+ :EndIf

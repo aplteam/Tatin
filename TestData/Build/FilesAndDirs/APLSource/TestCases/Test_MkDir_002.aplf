@@ -1,0 +1,18 @@
+ R←Test_MkDir_002(stopFlag batchFlag);⎕TRAP;myTempPath;success
+⍝ Test the `MkDir` method on an already existent directory
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ myTempPath←##.FilesAndDirs.GetTempPath,⊃⎕SI
+ ##.FilesAndDirs.MkDir myTempPath
+
+ success←##.FilesAndDirs.MkDir myTempPath
+ →T.PassesIf 1=success
+ →T.PassesIf ##.FilesAndDirs.IsDir myTempPath
+
+ R←T._OK
+
+∆TidyUp:
+ :Trap 0
+     {}##.FilesAndDirs.RmDir myTempPath
+ :EndTrap

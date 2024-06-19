@@ -1,0 +1,11 @@
+ R←Test_Dir_015(stopFlag batchFlag);⎕TRAP;list;parms;buff
+⍝ Test the `Dir` method on exactly one file
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ buff←('type'(0 1 2 3 4 5 6 7))('recursive' 1)##.FilesAndDirs.Dir ∆Home,'\Second\file_3'
+ →T.PassesIf(⊃1⊃buff)≡##.FilesAndDirs.NormalizePath ∆Home,'\Second\file_3'
+ →T.PassesIf 1=≢buff
+ →T.PassesIf 8=≢¨buff
+
+ R←T._OK

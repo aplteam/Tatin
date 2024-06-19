@@ -1,0 +1,37 @@
+ R←Test_Misc_023(stopFlag batchFlag);⎕TRAP;appdata;buff;∆
+⍝ Test the `ExpandPath` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ ∆←{##.FilesAndDirs.PWD,##.FilesAndDirs.CurrentSep,⍵}
+ →T.PassesIf(∆'a')≡##.FilesAndDirs.ExpandPath'a'
+
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     →T.PassesIf 0=≢##.FilesAndDirs.ExpandPath''
+     →T.PassesIf 0=≢##.FilesAndDirs.ExpandPath''
+     →T.PassesIf(##.FilesAndDirs.(EnforceBackslash PWD),'\a')≡##.FilesAndDirs.ExpandPath'a'
+     →T.PassesIf((##.FilesAndDirs.(EnforceBackslash Cd'')),'\a')≡##.FilesAndDirs.ExpandPath'a'
+     →T.PassesIf(∆'abc')≡##.FilesAndDirs.ExpandPath'abc'
+     →T.PassesIf(∆'abc\123')≡##.FilesAndDirs.ExpandPath'abc/123'
+     →T.PassesIf(∆'abc\123')≡##.FilesAndDirs.ExpandPath'abc/123'
+     →T.PassesIf(∆'abc\123')≡##.FilesAndDirs.ExpandPath'abc////123'
+     →T.PassesIf(∆'abc\123')≡##.FilesAndDirs.ExpandPath'abc\\\///123'
+     →T.PassesIf'\\APLTeam2\abc\123'≡##.FilesAndDirs.ExpandPath'\\APLTeam2\abc\123'    ⍝ Because this is a UNC path!
+     appdata←⊃⎕CMD'echo %appdata%'
+     →T.PassesIf appdata≡##.FilesAndDirs.ExpandPath'%appdata%'                         ⍝ Env Vars are expanded since 1.5
+
+     ⍝ There is no need for the ¨ ↓ here but it should work anyway, and there was once a bug!
+     →T.PassesIf(3⍴⊂buff)≡##.FilesAndDirs.ExpandPath¨3⍴{'..\',⍵}¨¯1↑'\'APLTreeUtils2.Split buff←##.FilesAndDirs.PWD
+ :Else
+     →T.PassesIf 0=≢##.FilesAndDirs.ExpandPath''
+     →T.PassesIf 0=≢##.FilesAndDirs.ExpandPath''
+     →T.PassesIf(##.FilesAndDirs.PWD,'/a')≡##.FilesAndDirs.ExpandPath'a'
+     →T.PassesIf(∆'abc')≡##.FilesAndDirs.ExpandPath'abc'
+     →T.PassesIf(∆'abc/123')≡##.FilesAndDirs.ExpandPath'abc/123'
+     →T.PassesIf(∆'abc/123')≡##.FilesAndDirs.ExpandPath'abc/123'
+     →T.PassesIf(∆'abc/123')≡##.FilesAndDirs.ExpandPath'abc////123'
+     →T.PassesIf(∆'abc/123')≡##.FilesAndDirs.ExpandPath'abc\\\///123'
+     →T.PassesIf'\\APLTeam2/abc/123'≡##.FilesAndDirs.ExpandPath'//APLTeam2\abc\123'    ⍝ Not a UNC path but treated as such - what else would it be?!
+ :EndIf
+
+ R←T._OK

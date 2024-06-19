@@ -1,0 +1,33 @@
+ R←Test_Misc_021(stopFlag batchFlag);⎕TRAP;folder;path;tempSubDir;dmx
+⍝ Test the `GetTempSubFolder` method
+⍝ See also the test for the `GetTempFilename` method.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ tempSubDir←##.FilesAndDirs.GetTempSubDir''
+ (path folder)←2↑⎕NPARTS tempSubDir
+ →T.GoToTidyUp path≢##.FilesAndDirs.GetTempPath
+ →T.GoToTidyUp ⎕AN≢⊃'_'APLTreeUtils2.Split folder
+ →T.GoToTidyUp 1≠##.FilesAndDirs.IsDir tempSubDir
+ ##.FilesAndDirs.RmDir tempSubDir
+
+ tempSubDir←##.FilesAndDirs.GetTempSubDir'Foo/Goo/Zoo'
+ (path folder)←2↑⎕NPARTS tempSubDir
+ →T.GoToTidyUp≢/##.FilesAndDirs.NormalizePath¨path((##.FilesAndDirs.NormalizePath ##.FilesAndDirs.GetTempPath,'/Foo/Goo'),'/')
+ →T.GoToTidyUp'Zoo'≢⊃'_'APLTreeUtils2.Split folder
+ →T.GoToTidyUp 1≠##.FilesAndDirs.IsDir tempSubDir
+ ##.FilesAndDirs.RmDir tempSubDir
+
+ :Trap 11
+     tempSubDir←##.FilesAndDirs.GetTempSubDir'***'
+     →T.GoToTidyUp 1
+ :Else
+     dmx←⎕DMX
+     →T.GoToTidyUp'The right argument must not carry a * or a \'{⍺≢(≢⍺)↑⍵}dmx.EM
+ :EndTrap
+
+ R←T._OK
+
+∆TidyUp:
+ :Trap 0 ⋄ {}##.FilesAndDirs.RmDir tempSubDir ⋄ :EndTrap
+⍝Done

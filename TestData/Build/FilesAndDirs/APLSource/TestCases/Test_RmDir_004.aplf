@@ -1,0 +1,11 @@
+ R←Test_RmDir_004(stopFlag batchFlag);⎕TRAP;list;parms;rc;more;en
+⍝ Test the `RmDir` method on a non-empty directory with a left argument 1 ("must-be-empty").
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ (rc en more)←1 ##.FilesAndDirs.RmDir ∆Home,'/'
+ →T.PassesIf 1=rc
+ →T.PassesIf 19=en
+ →T.PassesIf 0≠≢more
+
+ R←T._OK

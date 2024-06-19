@@ -1,0 +1,10 @@
+ R←Test_Misc_040(stopFlag batchFlag);⎕TRAP;list1
+⍝ Check that the API is complete
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list1←' '~¨⍨↓##.FilesAndDirs.API.⎕NL⍳16
+ →T.PassesIf list1 ∆LazyMatch ##.FilesAndDirs.Public
+
+ R←T._OK
+⍝Done

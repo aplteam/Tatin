@@ -1,0 +1,10 @@
+ R←Test_Dir_006(stopFlag batchFlag);⎕TRAP;parms;list1;list2
+⍝ Test the `Dir` method on a symbolic link.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list1←↑##.FilesAndDirs.Dir ∆Home,'/Second/Sub_a/deep/Also_First/'
+ list2←↑##.FilesAndDirs.Dir ∆Home,'/First/'
+ →T.PassesIf(1↓¨⎕NPARTS¨list1)≡1↓¨⎕NPARTS¨list2
+
+ R←T._OK

@@ -1,0 +1,21 @@
+ r←Test_UC_144(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;packageFolder;zipfile;cfg
+⍝ Exercise ]Tatin.BuildPackage bumping the version number (major)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir''
+ tempDir ⎕NCOPY'TestData/Build/Special'
+ packageFolder←tempDir,'/Special'
+ (rc msg zipfile)←∆UCMD'BuildPackage "',packageFolder,'" "',tempDir,'" -bump=major'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ 'Load the package failed?!'Assert TC.LoadPackages zipfile'#.TEMP'
+ cfg←⎕JSON⍠('Dialect' 'JSON5')⊣#.TEMP.Seven7Zip.TatinVars.CONFIG
+ →T.GoToTidyUp'10.0.0'≢{⍵↑⍨¯1+⍵⍳'+'}cfg.version
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDirByForce tempDir
+⍝Done

@@ -1,0 +1,26 @@
+ R←Test_Misc_004(stopFlag batchFlag);⎕TRAP;tempDir;myTempFile;tno;myTempFile2
+⍝ Test the `IsFile` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ →T.PassesIf 0=##.FilesAndDirs.IsFile'**********'
+ tempDir←##.FilesAndDirs.GetTempPath
+ myTempFile←tempDir,(⍕OS.GetPID),'_',' '~⍨(⍕⎕TS),'_1'
+ myTempFile2←tempDir,(⍕OS.GetPID),'_',' '~⍨(⍕⎕TS),'_2'
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/myTempFile'Temp test file'
+ {(⊂⍵)##.FilesAndDirs.NPUT ⍺}/myTempFile2'Another temp test file'
+ →T.GoToTidyUp 0≠##.FilesAndDirs.IsDir myTempFile
+ →T.GoToTidyUp 1≠##.FilesAndDirs.IsFile myTempFile
+ →T.GoToTidyUp 1 1≢##.FilesAndDirs.IsFile myTempFile myTempFile2
+ tno←myTempFile ⎕NTIE 0
+ →T.GoToTidyUp 1≠##.FilesAndDirs.IsFile tno
+ ⎕NUNTIE tno
+ :Trap 18
+     {}##.FilesAndDirs.IsFile tno
+     →T.GoToTidyUp 1
+ :EndTrap
+
+ R←T._OK
+
+∆TidyUp:
+ ##.FilesAndDirs.DeleteFile myTempFile

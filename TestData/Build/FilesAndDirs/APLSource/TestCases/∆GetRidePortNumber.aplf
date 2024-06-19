@@ -1,0 +1,14 @@
+ r←∆GetRidePortNumber;answer;buff;flag
+ ⎕←(⎕PW-1)⍴'-'
+ flag←0
+ r←⍬
+ :Repeat
+     ⎕←'Please enter Ride port number (empty=use default port 4502; 0=no Ride at all)'
+     :If 0=≢answer←⍞
+         r←4502
+         flag←1
+     :ElseIf 1=⊃buff←⎕VFI answer
+         r←⊃(//)buff
+         flag←1
+     :EndIf
+ :Until flag

@@ -1,0 +1,14 @@
+ R←Test_Misc_050(stopFlag batchFlag);⎕TRAP
+⍝ Exercise the AddTrailingSep function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ →T.PassesIf''≡##.FilesAndDirs.AddTrailingSep''
+ →T.PassesIf('aaa',##.FilesAndDirs.CurrentSep)≡##.FilesAndDirs.AddTrailingSep'aaa'
+ →T.PassesIf'aaa/'≡##.FilesAndDirs.AddTrailingSep'aaa/'
+ →T.PassesIf'aaa\'≡##.FilesAndDirs.AddTrailingSep'aaa\'
+ →T.PassesIf'aaa/'≡'/'##.FilesAndDirs.AddTrailingSep'aaa'
+  →T.PassesIf'1/22/333/'≡'/'##.FilesAndDirs.AddTrailingSep'1/22/333'
+
+ R←T._OK
+⍝Done

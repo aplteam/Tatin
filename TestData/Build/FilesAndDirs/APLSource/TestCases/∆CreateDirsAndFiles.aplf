@@ -1,0 +1,33 @@
+ {r}←{noLinks}∆CreateDirsAndFiles parent;link;source;cmd
+ r←⍬
+ noLinks←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noLinks'
+ 'Create!'##.FilesAndDirs.CheckPath parent
+ ⎕MKDIR parent,'/First'
+ (⊂'first_test1' '')⎕NPUT parent,'/First/file_a'
+ (⊂'first_test2' '')⎕NPUT parent,'/First/file_b'
+ (⊂'first_test3' '')⎕NPUT parent,'/First/file_c'
+ ⎕MKDIR parent,'/Second'
+ (⊂'second_test1' '')⎕NPUT parent,'/Second/file_1'
+ (⊂'second_test2' '')⎕NPUT parent,'/Second/file_2'
+ (⊂'second_test3' '')⎕NPUT parent,'/Second/file_3'
+ ⎕MKDIR parent,'/Second/Sub_a'
+ (⊂'second_sub_a_test1' '')⎕NPUT parent,'/Second/Sub_a/file_first'
+ (⊂'second_sub_a_test2' '')⎕NPUT parent,'/Second/Sub_a/file_second'
+ (⊂'second_sub_a_test2' '')⎕NPUT parent,'/Second/Sub_a/file_third'
+ ⎕MKDIR parent,'/Second/Sub_b'
+ (⊂'second_sub_b_test1' '')⎕NPUT parent,'/Second/Sub_b/file_aa'
+ (⊂'second_sub_b_test2' '')⎕NPUT parent,'/Second/Sub_b/file_ab'
+ ⎕MKDIR parent,'/Second/Sub_a/deep'
+ (⊂'second_sub_a_deep_test1' '')⎕NPUT parent,'/Second/Sub_a/deep/file_deep1'
+ ⎕MKDIR parent,'/Second/Sub_a/deep/empty'
+ :If 0=noLinks
+⍝ Create a link to a file
+     link←##.FilesAndDirs.NormalizePath parent,'/Second/also_file_third'
+     source←##.FilesAndDirs.NormalizePath parent,'/Second/Sub_a/file_third'
+     source CreateLinkTo link               ⍝ Requires admin rights!
+⍝ Create a link to a directory
+     link←##.FilesAndDirs.NormalizePath parent,'/Second/Sub_a/deep/Also_First'
+     source←##.FilesAndDirs.NormalizePath parent,'/First'
+     source CreateLinkTo link               ⍝ Requires admin rights!
+ :EndIf
+⍝Done

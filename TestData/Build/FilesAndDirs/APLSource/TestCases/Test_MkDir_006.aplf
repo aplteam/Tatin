@@ -1,0 +1,20 @@
+ R←Test_MkDir_006(stopFlag batchFlag);⎕TRAP;target1;target2;temp;target
+⍝ Test the `MkDir` method with multiple foler names
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ temp←##.FilesAndDirs.GetTempPath
+ target←temp,'\FilesAndDirsTest'
+ target1←target,'-TestFolder1'
+ target2←target,'-TestFolder2'
+
+ Assert 0=##.FilesAndDirs.IsDir target1
+ Assert 0=##.FilesAndDirs.IsDir target2
+ →T.GoToTidyUp∨/1≠##.FilesAndDirs.MkDir target1 target2
+ →T.GoToTidyUp~##.FilesAndDirs.IsDir target1
+ →T.GoToTidyUp~##.FilesAndDirs.IsDir target2
+
+ R←T._OK
+
+∆TidyUp:
+ ##.FilesAndDirs.RmDir target1 target2

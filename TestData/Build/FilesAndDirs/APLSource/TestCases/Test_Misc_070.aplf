@@ -1,0 +1,31 @@
+ R←Test_Misc_070(stopFlag batchFlag);qdmx;tempDir;⎕TRAP
+⍝ Exercise ⍸sDirEmpty`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ tempDir←##.FilesAndDirs.GetTempSubDir⊃⎕SI
+
+ →T.GoToTidyUp~##.FilesAndDirs.IsDirEmpty tempDir
+ →T.GoToTidyUp~##.FilesAndDirs.IsDirEmpty tempDir,'/'
+ ''⎕NPUT tempDir,'/test.file'
+ →T.GoToTidyUp ##.FilesAndDirs.IsDirEmpty tempDir
+ ##.FilesAndDirs.MkDir tempDir,'/suDir-level-1'
+ ##.FilesAndDirs.MkDir tempDir,'/suDir-level-1/suDir-level-2'
+ →T.GoToTidyUp ##.FilesAndDirs.IsDirEmpty tempDir,'/suDir-level-1'
+ →T.GoToTidyUp~##.FilesAndDirs.IsDirEmpty tempDir,'/suDir-level-1/suDir-level-2'
+ ''⎕NPUT tempDir,'/suDir-level-1/suDir-level-2/.invisible'
+ →T.GoToTidyUp ##.FilesAndDirs.IsDirEmpty tempDir,'/suDir-level-1/suDir-level-2'
+
+ :Trap 6
+     {}##.FilesAndDirs.IsDirEmpty tempDir,'/does-not-exist'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Right argument is not a directory'≢qdmx.EM
+ :EndTrap
+
+ R←T._OK
+
+∆TidyUp:
+ ##.FilesAndDirs.RmDir tempDir
+⍝Done

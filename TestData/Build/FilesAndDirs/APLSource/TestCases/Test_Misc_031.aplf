@@ -1,0 +1,26 @@
+ R←Test_Misc_031(stopFlag batchFlag);⎕TRAP;tempDir;filename;tno;qdmx
+⍝ Test the `ExecNfunction` operator on ⎕NCOPY when the file to be copied is tied
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If 'win'≢⎕C APLTreeUtils2.GetOperatingSystem ⍬
+     R←T._WindowsOnly ⋄ →0
+ :EndIf
+
+ tempDir←##.FilesAndDirs.GetTempSubDir⊃⎕SI
+ tempDir(⎕NCOPY⍠('IfExists' 'Replace')##.FilesAndDirs.ExecNfunction)##.CiderConfig.HOME,'/Tests/FOO.txt'
+ filename←tempDir,'/FOO.txt'
+ tno←filename ⎕NTIE 0 16
+ :Trap 19
+     (tempDir,'/FOO2.txt')(⎕NMOVE⍠('IfExists' 'Error')##.FilesAndDirs.ExecNfunction)filename
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'FILE ACCESS ERROR'≢qdmx.EM
+ :EndTrap
+
+ R←T._OK
+
+∆TidyUp:
+ ⎕NUNTIE tno
+ Assert~⊃##.FilesAndDirs.RmDirByForce tempDir

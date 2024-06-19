@@ -1,0 +1,7 @@
+ ∆CutFilesFromDirCommand←{
+⍝ Input comes from `⎕CMD 'dir`.\\
+⍝ Removes all lines that do not carry filenames. This is achieved by looking for lines that start with a date: 2[0-1]YY-MM-DD.
+⍝ Must take into account that what `Dir` returns as a date depends on user preferences.
+     seperators←'-/.'
+     ((≢'YYYY-MM-DD'){⍺≡+/∧\⍵∊seperators,⎕D}¨⍵)/⍵
+ }

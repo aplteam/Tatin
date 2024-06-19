@@ -1,0 +1,38 @@
+ R←Test_Misc_022(stopFlag batchFlag);⎕TRAP;tempSubDir;buff;filename;qdmx;NEL
+⍝ Test the `NPUT` and `NGET` methods
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ tempSubDir←##.FilesAndDirs.GetTempSubDir 1⊃⎕SI
+ filename←tempSubDir,'\test1.txt'
+ ##.FilesAndDirs.DeleteFile filename
+
+ (⊂'Simple vector')##.FilesAndDirs.NPUT filename
+ →T.GoToTidyUp'Simple vector'≢⎕TC~⍨1⊃##.FilesAndDirs.NGET filename
+ buff←'First line' 'Second line' 'Third line'
+ :Trap 22
+     (⊂buff)##.FilesAndDirs.NPUT filename
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp 0=∨/'Unable to create file'⍷qdmx.Message
+ :EndTrap
+ (⊂buff)##.FilesAndDirs.NPUT filename 1
+ →T.GoToTidyUp buff≢1⊃##.FilesAndDirs.NGET filename 1
+ →T.GoToTidyUp(∊buff)≢⎕TC~⍨1⊃##.FilesAndDirs.NGET filename
+
+ (⊂'Nested' 'vector')##.FilesAndDirs.NPUT filename 1
+ →T.GoToTidyUp'Nested' 'vector'≢1⊃##.FilesAndDirs.NGET filename 1
+
+ (('Nested' 'vector')'UTF-16')##.FilesAndDirs.NPUT filename 1
+ →T.GoToTidyUp('Nested' 'vector')'UTF-16LE-BOM'≢2↑##.FilesAndDirs.NGET filename 1
+
+ NEL←,133
+ (('Nested' 'vector')'UTF-16'NEL)##.FilesAndDirs.NPUT filename 1
+ →T.GoToTidyUp('Nested' 'vector')'UTF-16LE-BOM'NEL≢##.FilesAndDirs.NGET filename 1
+
+ R←T._OK
+
+∆TidyUp:
+ {}##.FilesAndDirs.RmDir tempSubDir
+⍝Done

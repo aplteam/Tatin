@@ -1,0 +1,69 @@
+ {(successFlag more)}←{parms}∆StartDyalogInstance wsname;bool;cmd;options;parms2;successFlag;rc;result;qdmx
+⍝ This starts a second session of Dyalog.
+⍝ `wsname` must be the name of the ws to be loaded. Example is "Files/Test_Misc_012".
+⍝
+⍝ If any parameters and/or options are to be added then these must be specified as
+⍝ key/value pairs via the left argument. What is an argument and what is an option is decided
+⍝ by a leading "-". An option's value can only be either 0 or 1, otherwise an error is thrown.
+⍝ In case of a 0 the option is not passed on, in case of a 1 it is.
+⍝
+⍝ If `parms` is empty or undefined then it defaults to:
+⍝ ~~~
+⍝ ('session_file' 'DoesNotExist') ('maxws' '32MB')('-rt' 1)('-x' 0)('RIDE_INIT' '')
+⍝ ~~~
+⍝
+⍝ Examples:
+⍝ ~~~
+⍝ parms←''
+⍝ parms,←⊂'filename' 'foo.txt'
+⍝ parms,←⊂'session_file' 'DoesNotExist'
+⍝ parms,←⊂'RIDE_INIT' 'SERVE::9999'
+⍝ parms,←⊂'maxws' '128M'
+⍝ parms,←⊂'-kbd' 0
+⍝ parms,←⊂'-x' 1
+⍝ ~~~
+
+ parms←⊆{0<⎕NC ⍵:⍎⍵ ⋄ ''}'parms'
+ parms←(0<≢¨2⊃¨parms)/parms
+ parms,←('session_file' 'DoesNotExist')('maxws' '32MB')('-rt' 0)('-x' 0)
+ options←'-'=⊃∘⊃¨parms
+ ⎕SIGNAL/{0=≢⍵:''⍬ ⋄ ∧/(⊃¨1↓¨⍵)∊0 1:''⍬ ⋄ 'Invalid value for option' 11}options/parms
+ :Select APLTreeUtils2.GetOperatingSystem ⍬
+ :Case 'Win'
+     wsname←'expand'##.FilesAndDirs.NormalizePath wsname
+     cmd←⊂'"',(⊃2 ⎕NQ'#' 'GetCommandLineArgs'),'"'
+     cmd,←⊂' ',wsname
+     parms2←(~options)/parms
+     parms2←({(⍵⍳⍵)=⍳⍴⍵}⊃¨parms2)/parms2
+     cmd,←⊃¨{' ',⍺,'="',(⍵~'"'),'"'}/¨parms2     ⍝ The " will be removed by Windows but they are still essential
+     parms2←options/parms
+     parms2←({(⍵⍳⍵)=⍳≢⍵}⊃¨parms2)/parms2
+     cmd,←{' ',(2⊃⍵)/1⊃⍵}¨parms2
+     (successFlag more)←2↑OS.WinExecute∊cmd
+ :CaseList 'Lin' 'Mac'
+     wsname←⊃,/1 ⎕NPARTS wsname
+     wsname←' '⎕R'\\ '⊣wsname   ⍝ Encode blanks
+     wsname,←('.dws'≢APLTreeUtils2.Lowercase ¯4↑wsname)/'.dws'
+     cmd←2 ⎕NQ'.' 'GetEnvironment' 'DYALOG'
+     cmd,←'/dyalog ',wsname
+     parms2←options/parms
+     :If 0≠≢parms2←({(⍵⍳⍵)=⍳⍴⍵}⊃¨parms2)/parms2
+         cmd,←∊{' ',(2⊃⍵)/1⊃⍵}¨parms2
+     :EndIf
+     parms2←(~options)/parms
+     :If 0≠≢parms2←({(⍵⍳⍵)=⍳⍴⍵}⊃¨parms2)/parms2
+         cmd←(∊' ',⍨¨{(1⊃⍵),'="',('"'~⍨2⊃⍵),'"'}¨parms2),cmd
+     :EndIf
+     cmd,←' &'
+     :Trap 11
+         (rc more result)←OS.ShellExecute cmd
+         successFlag←1
+         more←''
+     :Else
+         qdmx←⎕DMX
+         successFlag←0
+         more←qdmx.EM,'; EN=',⍕⎕EN
+     :EndTrap
+ :Else
+     .⍝ Huuh?!
+ :EndSelect

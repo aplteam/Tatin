@@ -1,0 +1,29 @@
+ R←Test_Misc_007(stopFlag batchFlag);⎕TRAP;parms;tempFile;myTempDir
+⍝ Test the `CheckPath` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ myTempDir←##.FilesAndDirs.GetTempPath,(⍕OS.GetPID),'_',' '~⍨⍕⎕TS
+ :If ##.FilesAndDirs.IsDir myTempDir
+ :AndIf 1≠↑##.FilesAndDirs.RmDir myTempDir
+     .⍝ Something is wrong
+ :EndIf
+ →T.GoToTidyUp 0≠##.FilesAndDirs.CheckPath myTempDir
+ →T.GoToTidyUp 1≠'Create!'##.FilesAndDirs.CheckPath myTempDir
+ myTempDir,←'aaa/bb/c'
+ →T.GoToTidyUp 1≠'Create!'##.FilesAndDirs.CheckPath myTempDir
+ →T.GoToTidyUp~##.FilesAndDirs.IsDir myTempDir
+
+ →T.GoToTidyUp 1∨.≠'Create!'##.FilesAndDirs.CheckPath myTempDir∘,¨'/test1' '/test2'
+ →T.GoToTidyUp 1≠##.FilesAndDirs.IsDir myTempDir,'/test1'
+ →T.GoToTidyUp 1≠##.FilesAndDirs.IsDir myTempDir,'/test2'
+
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     ⍝ Use an invalid filename in order to provoke an error
+     →T.GoToTidyUp 0≠'Create!'##.FilesAndDirs.CheckPath myTempDir,'???'
+ :EndIf
+
+ R←T._OK
+
+∆TidyUp:
+ {}##.FilesAndDirs.RmDir myTempDir

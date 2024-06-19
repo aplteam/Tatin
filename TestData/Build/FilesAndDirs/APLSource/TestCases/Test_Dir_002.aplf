@@ -1,0 +1,14 @@
+ R←Test_Dir_002(stopFlag batchFlag);⎕TRAP;list
+⍝ Test the `Dir` method in the most simple way: just contents of a directory
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←##.FilesAndDirs.Dir ∆Home,'/'
+
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     →T.PassesIf(∆Home∘,¨'\First' '\Second')≡1⊃list
+ :Else
+     →T.PassesIf(∆Home∘,¨'/First' '/Second')≡1⊃list
+ :EndIf
+
+ R←T._OK

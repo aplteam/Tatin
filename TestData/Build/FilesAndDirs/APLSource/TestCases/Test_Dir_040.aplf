@@ -1,0 +1,10 @@
+ R←Test_Dir_040(stopFlag batchFlag);⎕TRAP
+⍝ Test the `Dir` method on `C:\`; was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     R←T._Failed
+     →T.PassesIf 2<≢⊃2↓¨↑##.FilesAndDirs.Dir'C:\'
+     R←T._OK
+ :Else
+     R←T._WindowsOnly
+ :EndIf

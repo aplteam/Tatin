@@ -1,0 +1,11 @@
+ R←Test_Misc_017(stopFlag batchFlag);⎕TRAP;path
+⍝ Test `EnforceBackslash`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ path←'C:\path1\path2/path3/file.txt'
+ →T.PassesIf({w←⍵ ⋄ (('/'=w)/w)←'\' ⋄ w}path)≡##.FilesAndDirs.EnforceBackslash path
+ path←'\\Server\path1\path2/path3/file.txt'
+ →T.PassesIf({w←⍵ ⋄ (('/'=w)/w)←'\' ⋄ '\\',2↓w}path)≡##.FilesAndDirs.EnforceBackslash path
+
+ R←T._OK

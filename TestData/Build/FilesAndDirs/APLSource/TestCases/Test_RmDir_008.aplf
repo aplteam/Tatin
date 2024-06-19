@@ -1,0 +1,20 @@
+ R←Test_RmDir_008(stopFlag batchFlag);⎕TRAP;list;parms;rc;more;en;target;temp;target1;target2
+⍝ Test the `RmDir` method on mutiple folders
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ temp←##.FilesAndDirs.GetTempPath
+ target←temp,'\FilesAndDirsTest'
+ target1←target,'-TestFolder1'
+ target2←target,'-TestFolder2'
+
+ →T.GoToTidyUp 1∨.≠'Create!'##.FilesAndDirs.CheckPath target1 target2
+ (rc en more)←##.FilesAndDirs.RmDir target1 target2
+ →T.GoToTidyUp 0∨.≠rc
+ →T.GoToTidyUp 0≠##.FilesAndDirs.IsDir target1
+ →T.GoToTidyUp 0≠##.FilesAndDirs.IsDir target2
+
+ R←T._OK
+
+∆TidyUp:
+ (rc en more)←##.FilesAndDirs.RmDir target1 target2

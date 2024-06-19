@@ -1,0 +1,11 @@
+ R←Test_Dir_014(stopFlag batchFlag);⎕TRAP;buff
+⍝ Test the `Dir` method on a directory without trailing slash and "type".
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ buff←('type'(0 1 2 3 4 5 6 7))##.FilesAndDirs.Dir ∆Home
+ →T.PassesIf ∆Home≡⊃1⊃buff
+ →T.PassesIf 1=≢buff
+ →T.PassesIf 8=≢1⊃buff
+
+ R←T._OK

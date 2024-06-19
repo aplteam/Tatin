@@ -1,0 +1,32 @@
+ R←Test_Misc_030(stopFlag batchFlag);⎕TRAP;tempDir
+⍝ Test the `ExecNfunction` operator on both ⎕NCOPY and ⎕NMOVE
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ tempDir←##.FilesAndDirs.GetTempSubDir⊃⎕SI
+
+ tempDir(⎕NCOPY⍠('IfExists' 'Replace')##.FilesAndDirs.ExecNfunction)##.CiderConfig.HOME,'/Tests/FOO.txt'
+ (tempDir,'/GOOGOO')(⎕NMOVE⍠('IfExists' 'Skip')##.FilesAndDirs.ExecNfunction)tempDir,'/FOO.txt'
+ (tempDir,'/foo.md')(⎕NMOVE⍠('IfExists' 'Skip')##.FilesAndDirs.ExecNfunction)tempDir,'/GOOGOO'
+ →T.GoToTidyUp 0=⎕NEXISTS tempDir,'/foo.md'
+ Assert~⊃##.FilesAndDirs.RmDirByForce tempDir
+ tempDir←##.FilesAndDirs.GetTempSubDir⊃⎕SI
+ tempDir(⎕NCOPY⍠('IfExists' 'Replace')('Wildcard' 1)##.FilesAndDirs.ExecNfunction)##.CiderConfig.HOME,'/Tests/FOO.*'
+ →T.GoToTidyUp 1≠≢⊃##.FilesAndDirs.Dir tempDir,'/*'
+ Assert~⊃##.FilesAndDirs.RmDirByForce tempDir
+ tempDir←##.FilesAndDirs.GetTempSubDir⊃⎕SI
+ tempDir(⎕NCOPY⍠('IfExists' 'Replace')##.FilesAndDirs.ExecNfunction)##.CiderConfig.HOME,'/Tests/Test Dir'
+ →T.GoToTidyUp 1≠≢⊃##.FilesAndDirs.Dir tempDir,'/*'
+ Assert~⊃##.FilesAndDirs.RmDirByForce tempDir
+ tempDir←##.FilesAndDirs.GetTempSubDir⊃⎕SI
+ tempDir(⎕NCOPY⍠('IfExists' 'Replace')('Wildcard' 1)##.FilesAndDirs.ExecNfunction)##.CiderConfig.HOME,'/Tests/Test*'
+ →T.GoToTidyUp 1≠≢⊃##.FilesAndDirs.Dir tempDir,'/*'
+ Assert~⊃##.FilesAndDirs.RmDirByForce tempDir
+ tempDir←##.FilesAndDirs.GetTempSubDir⊃⎕SI
+ tempDir(⎕NCOPY⍠('IfExists' 'Replace')('Wildcard' 1)##.FilesAndDirs.ExecNfunction)##.CiderConfig.HOME,'/Tests/Test?Dir'
+ →T.GoToTidyUp 1≠≢⊃##.FilesAndDirs.Dir tempDir,'/*'
+
+ R←T._OK
+
+∆TidyUp:
+ Assert~⊃##.FilesAndDirs.RmDirByForce tempDir

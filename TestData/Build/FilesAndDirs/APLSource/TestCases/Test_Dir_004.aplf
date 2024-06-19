@@ -1,0 +1,15 @@
+ R←Test_Dir_004(stopFlag batchFlag);⎕TRAP;list;parms
+⍝ Test the `Dir` method with invalid parameter space
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←⎕NS''
+ parms.recursive←1
+ parms.this←0
+ :Trap 0
+     list←parms ##.FilesAndDirs.Dir ∆Home
+ :Else
+     R←'Invalid parameter'≢⎕DMX.EM
+ :EndTrap
+
+⍝Done

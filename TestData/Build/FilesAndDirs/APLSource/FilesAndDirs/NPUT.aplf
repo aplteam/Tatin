@@ -1,0 +1,31 @@
+ {r}←data NPUT y;filename;flags;data;counter;success;qdmx
+⍝ The purpose of this function is to cover `⎕NPUT` and make sure that the filename is normalized.\\
+⍝ In addition the function tries to overcome FILE ACCESS ERRROs twice. They are pretty common these days with
+⍝ tools like DropBox etc.\\
+⍝ The left as well as the right argument must be the same as for a call to the native `⎕NPUT`.
+ :If (≡y)∊0 1
+     filename←NormalizePath y
+     flags←¯1
+ :Else
+     (filename flags)←y
+     filename←NormalizePath filename
+ :EndIf
+ success←counter←0
+ :Repeat
+     :Trap 19
+         :If flags≡¯1
+             r←data ⎕NPUT filename
+         :Else
+             r←data ⎕NPUT filename flags
+         :EndIf
+         success←1
+     :Else
+         :If 4>counter←counter+1
+             ⎕DL 0.1×counter
+         :Else
+             qdmx←⎕DMX
+             (1↓⊃,/(⎕UCS 13),¨qdmx.DM)⎕SIGNAL qdmx.EN
+         :EndIf
+     :EndTrap
+ :Until success
+⍝Done

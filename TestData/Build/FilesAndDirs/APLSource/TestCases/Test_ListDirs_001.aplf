@@ -1,0 +1,40 @@
+ R←Test_ListDirs_001(stopFlag batchFlag);⎕TRAP;list;qdmx
+⍝ Test the `ListDirs` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←##.FilesAndDirs.ListDirs ∆Home
+ →T.PassesIf 2=≢list
+ →T.PassesIf∧/##.FilesAndDirs.IsDir¨list
+
+ list←'recursive'##.FilesAndDirs.ListDirs ∆Home
+ →T.PassesIf 2<≢list
+ →T.PassesIf∧/##.FilesAndDirs.IsDir¨list
+
+ →T.PassesIf 2=≢##.FilesAndDirs.ListDirs ∆Home,'/Second/Sub*'
+
+ :Trap 11
+     {}'Recursive'##.FilesAndDirs.ListDirs ∆Home,'/Second/Sub*'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'"path" must not carry wildcard chars in case "Recursive" is specified'≡qdmx.EM
+ :EndTrap
+
+ :Trap 11
+     {}##.FilesAndDirs.ListDirs ∆Home,'/does-nox-exist/Sub*'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'Right argument is not a directory'≡qdmx.EM
+ :EndTrap
+
+ :Trap 11
+     {}##.FilesAndDirs.ListDirs ∆Home,'/Sec*/Sub'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'Wildcard characters are allowed only in the last part of a path'≡qdmx.EM
+ :EndTrap
+
+ R←T._OK

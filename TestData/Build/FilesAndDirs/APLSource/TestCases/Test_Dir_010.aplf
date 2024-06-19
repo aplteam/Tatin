@@ -1,0 +1,30 @@
+ R←Test_Dir_010(stopFlag batchFlag);⎕TRAP;list;parms;buff
+⍝ Test the `Dir` method with plenty of attributes in a non-standard sequence and follow←1.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ parms←⎕NS''
+ parms.type←3 4 5 1 0 2 6 7 8
+ parms.recursive←1
+ list←parms ##.FilesAndDirs.Dir ∆Home,'/'
+ buff←⍉↑list
+
+ →T.PassesIf 23=≢buff
+ →T.PassesIf 7=∪≢¨buff[;1]                    ⍝ Is 4 is size in bytes
+ :Select APLTreeUtils2.GetOperatingSystem ⍬
+ :Case 'Win'
+     →T.PassesIf∧/0<≢¨buff[;2]                ⍝ Is 5 is Windows SID
+ :CaseList 'Lin' 'Mac'
+     →T.PassesIf∧/{⊃⊃⎕VFI ⍵}¨buff[;2]
+ :Else
+     .                                        ⍝ Huuh>!
+ :EndSelect
+ →T.PassesIf(,⊂,' ')≡∪1↑¨0⍴¨buff[;3]          ⍝ Is 6 is owner's name
+ →T.PassesIf∧/buff[;4]∊¯1+⍳8                  ⍝ Is 2 is type: integer between 0 and 7 inclusive
+ →T.PassesIf 0=buff[;4]+.=4                   ⍝      We have one symbolic link but with follow←0 it won't show
+ →T.PassesIf(,⊂,' ')≡∪1↑¨0⍴¨buff[;5]          ⍝ Is 1 is the filename
+ →T.PassesIf 0∧.<(2=buff[;4])⌿buff[;6]        ⍝ Is 2 and 3 is "type" and size in bytes
+ →T.PassesIf 0∧.=buff[;7]                     ⍝ Is 7 is the "hidden" flag
+ →T.PassesIf 0=+/≢¨buff[;8]                   ⍝ Is 8 is target of symbolic link but we have follow←0 here
+
+ R←T._OK

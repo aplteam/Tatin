@@ -1,0 +1,16 @@
+ R←Test_RmDir_102(stopFlag batchFlag);⎕TRAP;tempFolder;res
+⍝ Test the `RmDirByForce` method on a file rather than a folder
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ tempFolder←##.FilesAndDirs.GetTempSubDir'FilesAndDirs-',⊃⎕SI
+ (⊂'Hello world')⎕NPUT tempFolder,'/foo'
+
+ res←##.FilesAndDirs.RmDirByForce tempFolder,'/foo'
+ →T.GoToTidyUp 1 'Not a directory'≢res
+
+ R←T._OK
+
+∆TidyUp:
+ res←##.FilesAndDirs.RmDirByForce tempFolder
+ Assert 0=1⊃res

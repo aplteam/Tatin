@@ -1,0 +1,16 @@
+ R←Test_Misc_005(stopFlag batchFlag);⎕TRAP
+⍝ Test the `IsSymbolicLink` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ →T.PassesIf 0=##.FilesAndDirs.IsFile ∆Home,'/Second/Sub_a/deep/Also_First'
+ →T.PassesIf 1=##.FilesAndDirs.IsSymbolicLink ∆Home,'/Second/Sub_a/deep/Also_First'
+ →T.PassesIf 1 1≡##.FilesAndDirs.IsSymbolicLink 2⍴⊂∆Home,'/Second/Sub_a/deep/Also_First'
+ →T.PassesIf 0=##.FilesAndDirs.IsSymbolicLink'*****'
+
+ :Trap 11
+     ##.FilesAndDirs.IsSymbolicLink 111
+     →T.FailsIf 1
+ :EndTrap
+
+ R←T._OK

@@ -1,0 +1,29 @@
+ R←Test_ListDirs_002(stopFlag batchFlag);⎕TRAP;list;path;list2
+⍝ Test the `ListDirs` method on a folder that has read restrictions somewhere down the line.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If 'Win'≢APLTreeUtils2.GetOperatingSystem ⍬
+     R←T._WindowsOnly
+ :Else
+     path←(WinSys.ExpandEnv'%SYSTEMROOT%'),'\system32\'
+     list←'recursive'##.FilesAndDirs.ListDirs path
+    ⍝ First big step: it must not crash!
+    ⍝ We should verify the result as well.
+    ⍝ However, ('Recurse' 2) is only available from 17.0 onwards!
+
+     :If 17.1≤+/1 0.1×2↑⊃(//)'.'⎕VFI 1⊃# ⎕WG'APLVersion'
+         list←APLTreeUtils2.Lowercase list
+         list←list[⍋list]
+
+         list2←(0 1)⎕NINFO⍠('Recurse' 2)('Wildcard' 1)⊣path,'*'
+         list2←(1=1⊃list2)/1⊃list2
+         list2←⎕C list2
+         list2←##.FilesAndDirs.NormalizePath list2
+         list2←list2[⍋list2]
+
+         →T.PassesIf list≡list2
+     :EndIf
+
+     R←T._OK
+ :EndIf

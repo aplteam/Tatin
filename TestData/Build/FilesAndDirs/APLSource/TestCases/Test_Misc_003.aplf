@@ -1,0 +1,22 @@
+ R←Test_Misc_003(stopFlag batchFlag);list;list2;parms;tempFile;⎕TRAP
+⍝ Test the `IsDir` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←##.FilesAndDirs.ListDirs'.\'
+ list←2↓¨('.'≠⊃¨2↓¨list)/list
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     list2←⎕CMD'dir /AD'
+     list2←2↓∆CutFilesFromDirCommand list2
+     list2←{⍵/⍨'.'≠⊃¨⍵}{↑¯1↑' '(≠⊆⊢)APLTreeUtils2.DMB ⍵}¨list2
+ :Else
+     list2←⎕SH'ls -l'
+     list2←('d'=⊃¨list2)/list2
+     list2←{⍵↑⍨-¯1+(⌽⍵)⍳' '}¨list2
+ :EndIf
+ →T.PassesIf≡/≢¨list list2
+
+ →T.PassesIf 0=##.FilesAndDirs.IsDir'/does/not/exist/for/sure'
+
+ R←T._OK
+⍝Done

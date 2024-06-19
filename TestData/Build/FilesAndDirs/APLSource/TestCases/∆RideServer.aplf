@@ -1,0 +1,14 @@
+ {r}←∆RideServer;portNumber;rc
+ r←⍬
+ :If 3501⌶⍬
+     ⎕←'Ride is already served. Switch off with 3502⌶0 first and then call again./'
+ :Else
+     :If 0≠portNumber←∆GetRidePortNumber
+         rc←(3502⌶)0
+         Assert 0=rc
+         rc←(3502⌶)'SERVE::',⍕portNumber
+         Assert 0=rc
+         rc←(3502⌶)1
+         Assert 0=rc
+     :EndIf
+ :EndIf

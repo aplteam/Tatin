@@ -1,0 +1,9 @@
+ R←Test_Dir_019(stopFlag batchFlag);⎕TRAP;list
+⍝ Test the `Dir` method with a pattern that also matches a link with `('follow' 1)` (the default).
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←##.FilesAndDirs.Dir ∆Home,'\Second\Sub_a\deep\*_*'
+ →T.PassesIf 2=≢⊃list
+
+ R←T._OK

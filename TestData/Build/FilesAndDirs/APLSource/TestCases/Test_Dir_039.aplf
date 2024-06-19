@@ -1,0 +1,21 @@
+ R←Test_Dir_039(stopFlag batchFlag);⎕TRAP;list;list2
+⍝ Test the `Dir` method recursively with depths←1. Should only return the given folder and its sub-folders and the content.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+⍝ Because .git is hidden we simply remove everything that starts with a "."
+ list←2↓¨⊃##.FilesAndDirs.Dir'./'
+ list←('.'≠⊃¨list)/list
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     list2←⎕CMD'dir'
+     list2←∆CutFilesFromDirCommand list2
+     list2←APLTreeUtils2.DLB APLTreeUtils2.DTB list2
+     list2←{⍵↑⍨-¯1+(⌽⍵)⍳' '}¨list2
+ :Else
+     list2←⎕SH'ls'
+ :EndIf
+ list2←('.'≠⊃¨list2)/list2
+
+ →T.PassesIf APLTreeUtils2.LazyMatch/APLTreeUtils2.Lowercase¨list list2   ⍝ Sort sequence depends on OS!
+
+ R←T._OK

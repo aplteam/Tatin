@@ -1,0 +1,14 @@
+ R←Test_Misc_053(stopFlag batchFlag);⎕TRAP;res
+⍝ Exercise the Version function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ res←##.FilesAndDirs.CurrentSep
+ :If 'win'≡⎕C APLTreeUtils2.GetOperatingSystem ''
+     →T.PassesIf'\'=res
+ :Else
+     →T.PassesIf'/'=res
+ :EndIf
+
+ R←T._OK
+⍝Done

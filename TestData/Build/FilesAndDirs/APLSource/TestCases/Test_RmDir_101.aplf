@@ -1,0 +1,13 @@
+ R←Test_RmDir_101(stopFlag batchFlag);⎕TRAP;tempFolder;res
+⍝ Test the `RmDirByForce` method on a folder that does not exist
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ tempFolder←##.FilesAndDirs.GetTempSubDir'FilesAndDirs-',⊃⎕SI
+ res←##.FilesAndDirs.RmDir tempFolder
+ Assert 0≡1⊃res
+
+ res←##.FilesAndDirs.RmDirByForce tempFolder    ⍝ Now it does not exist anymore
+ →T.PassesIf 0 'Directory does not exist'≡res
+
+ R←T._OK

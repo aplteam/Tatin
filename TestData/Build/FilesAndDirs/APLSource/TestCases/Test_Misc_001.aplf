@@ -1,0 +1,14 @@
+ R←Test_Misc_001(stopFlag batchFlag);⎕TRAP;parms;workDir
+⍝ Test the `PWD` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     workDir←##.FilesAndDirs.NormalizePath{⍵↓⍨1++/2>+\' '=⍵}APLTreeUtils2.DMB 4⊃⎕SH'Dir'
+ :Else
+     workDir←⊃⎕SH'pwd'
+ :EndIf
+
+ →T.PassesIf workDir≡##.FilesAndDirs.PWD
+
+ R←T._OK

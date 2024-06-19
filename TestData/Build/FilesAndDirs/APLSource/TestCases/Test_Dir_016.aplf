@@ -1,0 +1,13 @@
+ R←Test_Dir_016(stopFlag batchFlag);⎕TRAP;list;parms;buff
+⍝ Test the `Dir` method on a non-existent file
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :Trap 6
+     {}##.FilesAndDirs.Dir'This_should_not_exist_really'
+     :Return
+ :Else
+     →T.PassesIf∨/'does not exist'⍷⎕DMX.EM
+ :EndTrap
+
+ R←T._OK

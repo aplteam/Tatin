@@ -1,0 +1,29 @@
+ R←Test_Misc_019(stopFlag batchFlag);⎕TRAP;tempPath;rc;list;opened
+⍝ Test `NNAMES` and `NCREATE`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ tempPath←##.FilesAndDirs.GetTempPath,'\Test_NNAMES\'
+ :If ##.FilesAndDirs.Exists tempPath
+     rc←##.FilesAndDirs.RmDir tempPath
+     Assert 0=⊃rc
+ :EndIf
+
+ opened←⎕NNUMS
+ 'Create!'##.FilesAndDirs.CheckPath tempPath
+ {}(tempPath,'  leading spaces')##.FilesAndDirs.NCREATE 0  ⍝ !
+ {}(tempPath,'QWERTYUIOPLKJHGFDSAZXCVBB')##.FilesAndDirs.NCREATE 0  ⍝ !
+ {}(tempPath,'First Second')##.FilesAndDirs.NCREATE 0  ⍝ !
+ {}(tempPath,'Foo.txt')##.FilesAndDirs.NCREATE 0  ⍝ !
+
+ list←↑##.FilesAndDirs.Dir tempPath
+ →T.GoToTidyUp~list{(∧/⍵∊⍺)∧∧/⍺∊⍵}##.FilesAndDirs.NNAMES
+
+ R←T._OK
+
+∆TidyUp:
+ ⎕NUNTIE ⎕NNUMS~opened
+ :If ##.FilesAndDirs.Exists tempPath
+     rc←##.FilesAndDirs.RmDir tempPath
+     Assert 0=⊃rc
+ :EndIf

@@ -1,0 +1,24 @@
+ R←Test_ZZZ_998(stopFlag batchFlag);⎕IO;⎕ML;⎕TRAP;report;buff;rf
+⍝ Checks on two text vectors: "⍝TODO⍝" and "⍝CHECK⍝"; never fails, just reports.
+ ⎕IO←0 ⋄ ⎕ML←3
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._OK
+ report←''
+ rf←##.FilesAndDirs
+
+ buff←rf T.FindSpecialString'⍝CHECK⍝'
+ buff←(buff[;0]≢¨⎕XSI[0])⌿buff ⍝ remove caller
+ :If 0≠≢buff
+     report,←↓(⊂' ⍝CHECK⍝ found:'),(⊂'   '),¨buff
+ :EndIf
+ buff←rf T.FindSpecialString'⍝TODO⍝'
+ buff←(buff[;0]≢¨⎕XSI[0])⌿buff ⍝ remove caller
+ :If 0≠≢buff
+     report,←↓(⊂' ⍝TODO⍝ found:'),(⊂'   '),¨buff
+ :EndIf
+ :If 1=≢report
+     report,←⊂'    Nothing found!'
+ :Else
+     ⎕←'Checking for ⍝TODO⍝ and ⍝CHECK⍝ '{⍵↑,'--- ',⍺,' ',⍵⍴'-'}80⌊⎕PW-1
+     ⎕←⊃report
+ :EndIf

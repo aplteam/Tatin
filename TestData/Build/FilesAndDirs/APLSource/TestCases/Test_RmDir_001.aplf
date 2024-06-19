@@ -1,0 +1,14 @@
+ R←Test_RmDir_001(stopFlag batchFlag);⎕TRAP;list;parms;rc;more;en
+⍝ Test the `RmDir` method in the most simple way.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ (rc en more)←##.FilesAndDirs.RmDir ∆Home,'\Second\Sub_a\deep\empty'
+ →T.PassesIf 0=rc
+
+ (rc en more)←##.FilesAndDirs.RmDir ∆Home,'\Second\Sub_a\deep\empty'
+ →T.PassesIf 0=rc
+ →T.PassesIf 0=en
+ →T.PassesIf more≡'Directory does not exist'
+
+ R←T._OK

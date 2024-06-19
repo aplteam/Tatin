@@ -1,0 +1,11 @@
+ R←Test_Dir_021(stopFlag batchFlag);⎕TRAP;buff1;buff2
+⍝ Test the `Dir` method on a link with `follow=0` and `follow=1`
+⍝ The results must be different then.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ buff1←↑('follow' 1)('type'((⎕IO)+⍳8))##.FilesAndDirs.Dir ∆Home,'\Second\Sub_a\deep\Also_First'
+ buff2←↑('follow' 0)('type'((⎕IO)+⍳8))##.FilesAndDirs.Dir ∆Home,'\Second\Sub_a\deep\Also_First'
+ →T.PassesIf buff1≢buff2
+
+ R←T._OK

@@ -1,0 +1,29 @@
+ R←Test_ListFiles_001(stopFlag batchFlag);⎕TRAP;list
+⍝ Test the `ListFiles` method
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←##.FilesAndDirs.ListFiles ∆Home
+ →T.PassesIf 0=≢list
+
+ list←'recursive'##.FilesAndDirs.ListFiles ∆Home
+ →T.PassesIf 2<≢list
+ →T.PassesIf∧/##.FilesAndDirs.IsFile¨list
+
+ →T.PassesIf 1=≢##.FilesAndDirs.ListFiles ∆Home,'/Second/Sub_b/*_ab'
+
+ :Trap 11
+     {}##.FilesAndDirs.ListFiles ∆Home,'/Sec*/Sub'
+     →T.FailsIf 1
+ :Else
+     →T.PassesIf'Wildcard characters are allowed only in the last part of a path'≡⊃⎕DM
+ :EndTrap
+
+ :Trap 11
+     {}##.FilesAndDirs.ListFiles ∆Home,'/DoesNotExist/Sub'
+     →T.FailsIf 1
+ :Else
+     →T.PassesIf'Right argument is not a directory'≡⊃⎕DM
+ :EndTrap
+
+ R←T._OK

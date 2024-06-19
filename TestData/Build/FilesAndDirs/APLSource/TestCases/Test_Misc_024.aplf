@@ -1,0 +1,22 @@
+ R←Test_Misc_024(stopFlag batchFlag);⎕TRAP;appdata;buff;younger;older;sameAsOlder;tsYounger;tsOlder;tsSameAsOlder
+⍝ Test the `DateToReal` and `GetModifiedDate` methods
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ younger←'./Tests/YoungerThan/younger.txt'
+ older←'./Tests/YoungerThan/older.txt'
+ sameAsOlder←'./Tests/YoungerThan/same-as-older.txt'
+
+ {(1↑⎕NGET ⍵)⎕NPUT ⍵ 1}older
+ {(1↑⎕NGET ⍵)⎕NPUT ⍵ 1}sameAsOlder
+ ⎕DL 1.2
+ {(1↑⎕NGET ⍵)⎕NPUT ⍵ 1}younger
+
+ tsYounger←##.FilesAndDirs.DateToReal ##.FilesAndDirs.GetModifiedDate younger
+ tsOlder←##.FilesAndDirs.DateToReal ##.FilesAndDirs.GetModifiedDate older
+ tsSameAsOlder←##.FilesAndDirs.DateToReal ##.FilesAndDirs.GetModifiedDate sameAsOlder
+
+ →T.PassesIf tsYounger>tsOlder
+ →T.PassesIf tsSameAsOlder=tsOlder
+
+ R←T._OK

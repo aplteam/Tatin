@@ -1,0 +1,12 @@
+ R←Test_RmDir_007(stopFlag batchFlag);⎕TRAP;list;parms;rc;more;en;target
+⍝ Test the `RmDir` method on a directory that starts with a "-"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ target←'-TestFolder'
+ →T.PassesIf 1='Create!'##.FilesAndDirs.CheckPath target
+ (rc en more)←##.FilesAndDirs.RmDir target
+ →T.PassesIf 0=rc
+ →T.PassesIf 0=##.FilesAndDirs.IsDir target
+
+ R←T._OK

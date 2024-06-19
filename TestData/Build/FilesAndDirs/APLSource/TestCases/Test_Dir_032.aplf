@@ -1,0 +1,15 @@
+ R←Test_Dir_032(stopFlag batchFlag);⎕TRAP;list;noOf
+⍝ Test the `Dir` method recursively with a restrictive file pattern
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←1⊃('recursive' 1)('type'(0 1 2 3 4))##.FilesAndDirs.Dir ∆Home,'/file_*'
+
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+     noOf←≢⎕CMD'dir /S /B ',∆Home,'\file_*'
+ :Else
+     noOf←≢⎕SH'find -L ',∆Home,' -name "file_*"'
+ :EndIf
+ →T.PassesIf noOf=+/##.FilesAndDirs.IsFile list
+
+ R←T._OK

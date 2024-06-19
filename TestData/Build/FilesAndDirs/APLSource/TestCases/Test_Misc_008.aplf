@@ -1,0 +1,39 @@
+ R←Test_Misc_008(stopFlag batchFlag);buff;currentDir;myTempDir;tempFile;⎕TRAP
+⍝ Test the `Cd` method
+⍝ ATTENTION: this function changes the current dir, so make sure it runs through
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ currentDir←##.FilesAndDirs.PWD
+ :Select APLTreeUtils2.GetOperatingSystem ⍬
+ :Case 'Win'
+     buff←⊃⎕SH'cd'
+ :CaseList 'Lin' 'Mac'
+     buff←⊃⎕SH'pwd'
+ :Else
+     .⍝ Huuh?!
+ :EndSelect
+ →T.GoToTidyUp currentDir≢##.FilesAndDirs.NormalizePath buff
+ myTempDir←##.FilesAndDirs.GetTempPath,(⍕OS.GetPID),'_',(' '~⍨⍕⎕TS)
+ :If ##.FilesAndDirs.IsDir myTempDir,'/aaa/b b/c'
+ :AndIf 1≠↑##.FilesAndDirs.RmDir myTempDir
+     .⍝ Something is wrong
+ :EndIf
+ →T.GoToTidyUp ##.FilesAndDirs.PWD≢##.FilesAndDirs.Cd''
+ →T.GoToTidyUp 1≠'Create!'##.FilesAndDirs.CheckPath myTempDir,'/aaa/b b/c'
+ {}##.FilesAndDirs.Cd myTempDir,'/aaa'
+ →T.GoToTidyUp ##.FilesAndDirs.PWD≢myTempDir,##.FilesAndDirs.CurrentSep,'aaa'
+ {}##.FilesAndDirs.Cd'b b'
+ →T.GoToTidyUp ##.FilesAndDirs.PWD≢myTempDir,##.FilesAndDirs.NormalizePath'/aaa/b b'
+ {}##.FilesAndDirs.Cd'..'
+ →T.GoToTidyUp ##.FilesAndDirs.PWD≢myTempDir,##.FilesAndDirs.NormalizePath'/aaa'
+ {}##.FilesAndDirs.Cd'b b'
+ →T.GoToTidyUp ##.FilesAndDirs.PWD≢myTempDir,##.FilesAndDirs.NormalizePath'/aaa/b b'
+
+ R←T._OK
+
+∆TidyUp:
+ {}##.FilesAndDirs.Cd currentDir  ⍝ SWITCH BACK!
+ :Trap 0
+     {}##.FilesAndDirs.RmDir myTempDir
+ :EndTrap

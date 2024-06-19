@@ -1,0 +1,14 @@
+ R←Test_ListDirs_003(stopFlag batchFlag);⎕TRAP;list;list2
+⍝ Test the `ListDirs` method on a folder with "depth" specified.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←('recursive' 1)##.FilesAndDirs.ListDirs ∆Home,'/'
+
+ list2←⊃('recursive' 1)('depth' 2)##.FilesAndDirs.Dir ∆Home,'/'
+ list2←(##.FilesAndDirs.IsDir list2)/list2
+
+ →T.PassesIf(≢list)<≢list2                        ⍝ list2 must be smaller than list
+ →T.PassesIf 0 1≡∪{+/⍵∊'/\'}¨(1+≢∆Home)↓¨list2    ⍝ Either 0 or 1 seperators after removing path
+
+ R←T._OK

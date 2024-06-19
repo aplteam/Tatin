@@ -1,0 +1,36 @@
+ {success}←MkDir path;counter;flag
+⍝ Make directory. If the directory already exists no action is taken and a 1 returned.\\
+⍝ Any part of `path` which does not already exist will be created along the way.\\
+⍝ In comparison with `⎕MKDIR` there are some differences:
+⍝ * This method normalizes `path`.
+⍝ * Errors 19 & 22 are trapped. The function tries again 9 more times at most.
+⍝ * The function overcomes a strange problem: on some systems `⎕MKDIR` refuses to create
+⍝   the directory repeatedly unless the code is traced.\\
+⍝ In any other respect `MkDir` acts like `3 ⎕MKDIR`.\\
+⍝ `success` is 1 in case the directory was created successfully or already existed, otherwise 0.
+⍝ If `path` is nested then `success` will have the same length as `path`.
+ :If 2=|≡path
+     success←MkDir¨path
+ :Else
+     path←NormalizePath path
+     success←0
+     :If IsDir path
+         success←1
+     :Else
+         :Trap 19 22
+             counter←flag←0
+                  ⍝ This loop tries to overcome the problem that on some machines ⎕MKDIR does not work
+                  ⍝ as expected. This cannot (!) be solved by a simple delay.
+                  ⍝ However, tracing as well as the loop do work.
+             :Repeat
+                 :Trap 19 22
+                     success←3 ⎕MKDIR path
+                 :Else
+                     :Leave ⍝ Something went wrong, indicated by `success ←→ 0`
+                 :EndTrap
+                 flag←⎕NEXISTS path
+                 ⎕DL(~flag)×0.05×counter+1
+             :Until flag∨10<counter←counter+1
+         :EndTrap
+     :EndIf
+ :EndIf

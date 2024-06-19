@@ -1,0 +1,10 @@
+ R←Test_MkDir_004(stopFlag batchFlag);⎕TRAP;myTempPath
+⍝ Test the `MkDir` method on an invalid path
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ myTempPath←(1+'Win'≡APLTreeUtils2.GetOperatingSystem ⍬)⊃'\0Doesnotwork' '2:\Doesnotwork'
+
+ →T.PassesIf 0=##.FilesAndDirs.MkDir myTempPath
+
+ R←T._OK

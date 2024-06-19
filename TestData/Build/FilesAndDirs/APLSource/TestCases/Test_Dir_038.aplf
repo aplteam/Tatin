@@ -1,0 +1,16 @@
+ R←Test_Dir_038(stopFlag batchFlag);⎕TRAP;list;list2
+⍝ Test the `Dir` method recursively with depths←1. Should only return the given folder and its sub-folders and the content.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ list←⊃('recursive' 1)##.FilesAndDirs.Dir ∆Home,'/'
+
+ list2←⊃('recursive' 1)('depth' 2)##.FilesAndDirs.Dir ∆Home,'/'
+ →T.PassesIf(≢list2)<≢list
+ →T.PassesIf 0 1≡∪{+/⍵∊'/\'}¨(1+≢∆Home)↓¨list2
+
+ list2←⊃('recursive' 1)('depth' 3)##.FilesAndDirs.Dir ∆Home,'/'
+ →T.PassesIf(≢list2)<≢list
+ →T.PassesIf 0 1 2≡∪{+/⍵∊'/\'}¨(1+≢∆Home)↓¨list2
+
+ R←T._OK

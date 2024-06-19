@@ -1,0 +1,10 @@
+ flag←{noOfSeconds}CheckForExistence filename;flag;counter
+⍝ Checks `filname` for existence but of `noOfSeconds` (default is 1).
+⍝ Returns 1 (success) in case the file exists but 0 otherwise no matter why.
+ noOfSeconds←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'noOfSeconds'
+ flag←counter←0
+ :Repeat
+     ⎕DL 0.1×counter>0
+     flag←⎕NEXISTS filename
+ :Until flag∨(1+noOfSeconds×10)<counter←counter+1
+⍝Done

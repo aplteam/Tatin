@@ -1,0 +1,23 @@
+ R←Test_RmDir_103(stopFlag batchFlag);⎕TRAP;qdmx
+⍝ Test the `RmDirByForce` method on "\.." (not allowed)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :Trap 0
+     →T.GoToTidyUp 0≠##.FilesAndDirs.RmDirByForce'\..'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'"path" must not be /..'≡qdmx.EM
+ :EndTrap
+
+ :Trap 0
+     →T.GoToTidyUp 0≠##.FilesAndDirs.RmDirByForce'/..'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf'"path" must not be /..'≡qdmx.EM
+ :EndTrap
+
+ R←T._OK
+⍝Done

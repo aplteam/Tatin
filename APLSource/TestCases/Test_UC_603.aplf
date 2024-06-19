@@ -1,4 +1,4 @@
- r←Test_UC_602(stopFlag batchFlag);⎕TRAP;rc;msg;res;parms;ref
+ r←Test_UC_603(stopFlag batchFlag);⎕TRAP;rc;msg;res;parms;ref
 ⍝ Exercise ]Tatin.PackageDependencies acting on an open Cider project
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -18,10 +18,11 @@
 
  ref←⎕SE._Tatin.Tatin.GetRefToTatin ⍬
  ref.Client.C.Select_Choices←1 2⍴'SelectCiderProject@' '#.booproj'
- ref.Client.C.Select_Choices⍪←'SelectPackageFolder@' 'packages/'
+ ref.Client.C.Select_Choices⍪←'SelectPackageFolder@' 'packages_dev/'
  (rc msg res)←∆UCMD'PackageDependencies'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- →T.GoToTidyUp'dyalog-HttpCommand-4.0.24'≢⎕TC~⍨∊res
+ res←(⎕UCS 10)(≠⊆⊢)res
+ →T.GoToTidyUp~res ∆LazyMatch⊃⎕NGET'TestData/Boo-Project/packages_dev/apl-dependencies.txt' 1
 
  r←T._OK
 

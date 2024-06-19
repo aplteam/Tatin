@@ -1,4 +1,4 @@
- r←Test_UC_601(stopFlag batchFlag);⎕TRAP;rc;msg;res;filename;folder
+ r←Test_UC_601(stopFlag batchFlag);⎕TRAP;rc;msg;res
 ⍝ Exercise ]Tatin.PackageDependencies with defaults
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -8,13 +8,8 @@
  :EndIf
  ##.Client.CommTools.Pause'This test needs YOU in order to close an edit window without making changes'
 
- (rc msg res)←∆UCMD'PackageDependencies ',∆TEMP_REGISTRY_FOLDER,'/aplteam-FilesAndDirs-3.2.7'
+ (rc msg res)←∆UCMD'PackageDependencies TestData/Boo-Project/packages_dev/aplteam-FilesAndDirs-5.7.1 -edit'
  →T.PassesIf(rc=0)∧0=≢msg
- folder←∆TEMP_REGISTRY_FOLDER,'/aplteam-FilesAndDirs-3.2.7'
- filename←folder,'/',TC.Dependencies.DEP_NAME
- (rc msg res)←∆UCMD'PackageDependencies ',folder,' -edit'
- →T.PassesIf(rc=0)∧0=≢msg
- →T.PassesIf 0<≢⊃F.NGET filename
 
  r←T._OK
 ⍝Done

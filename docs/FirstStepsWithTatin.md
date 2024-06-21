@@ -370,6 +370,18 @@ Note that `InstallPackages` accepts several package IDs, separated by commas:
 
 This will load three packages and all their dependencies at once. You might find this significantly faster than installing them one-by-one.
 
+!> ### Using an alias for a package
+=> It is possible to use an alias for a package. Check this example:
+=> ```
+=> ]tatin.InstallPackages F@FilesAndDirs
+=> ```
+=> This creates a ref `F` for FilesAndDirs. However, the purpose of such aliases is not to allow you to create
+=> a kind of shortcut for the package in question, this allows you to load to different versions of a package,
+=> something that is sometimes required due to specific requirements. 
+=> 
+=> All you need to do is to assign different aliases to the different versions of the package.
+
+
 ### Checking out a package: `LoadPackages`
 
 Let's assume that before actually installing it, you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace. 
@@ -613,6 +625,7 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 ##### URI
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
+
 
 
 

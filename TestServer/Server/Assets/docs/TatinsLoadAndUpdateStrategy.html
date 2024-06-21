@@ -200,6 +200,21 @@ mygroup-Goo-2.1.0</code></pre>
 <p>This method will make sure that it removes not only the package in question, but also all packages that are dependencies of it, but <em>only</em> if those packages are neither principal packages nor requested by other packages.</p>
 <p>Clearly, there is a danger that you remove too much when you attempt to do this manually.</p>
 <div class="h_tag">
+<a href="#implicit-downgrading" id="implicit-downgrading" class="autoheader_anchor">
+<h4 data-id="Implicit-downgrading">5.1.1. Implicit downgrading</h4>
+</a>
+</div>
+<p>There might be a situation when removing a principal package implies a downgrade.</p>
+<p>We start with these packages (indentation defines dependency):</p>
+<pre tabindex="0"><code>group-foo-1.0.0
+  group-zoo-1.1.0
+group-boo-1.0.0
+  group-zoo-1.0.0</code></pre>
+<p>Due to MVS (minimal version selection) both <code>foo</code> and <code>boo</code> will use <code>zoo</code> version 1.1 when loaded. But what happens if you remove <code>boo</code>?!</p>
+<p>It can well be argued that <code>zoo</code> 1.1 should survive this, and still be used. But it can also be argued that a package that is not required anywhere shouldn't be used.</p>
+<p>A full implementation of MVS requires the former strategy. For the time being, we took a more pragmatic approach and settled for the latter strategy.</p>
+<p>It's not really obvious what's the best solution here, so we might well change the strategy depending on feedback.</p>
+<div class="h_tag">
 <a href="#adding-a-package" id="adding-a-package" class="autoheader_anchor">
 <h3 data-id="Adding-a-package">5.2. Adding a package</h3>
 </a>

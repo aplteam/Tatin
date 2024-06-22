@@ -31,28 +31,28 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 </div>
 <p>The user must specify:</p>
 <ul>
-<li>A contact name</li>
-<li>An email address</li>
-<li>A second optional email address</li>
-<li>An optional telephone number</li>
-<li>An optional company name</li>
-<li>The mandatorygroup name</li>
+<li>A group name (mandatory)</li>
+<li>A contact name (mandatory)</li>
+<li>An email address (mandatory)</li>
+<li>A second email address (optional)</li>
+<li>An telephone number (optional)</li>
+<li>An company name (optional)</li>
 </ul>
 <div class="h_tag">
 <a href="#api-key" id="api-key" class="autoheader_anchor">
 <h2 data-id="API-key">API key</h2>
 </a>
 </div>
-<p>We generate an API key as a password (together with a SALT) and publish it to the user but don't save the API key.</p>
+<p>An API key is generated as a password (together with a SALT) and published to the user. Just the SALT and the hash are saved.</p>
 <div class="h_tag">
 <a href="#captcha" id="captcha" class="autoheader_anchor">
 <h2 data-id="Captcha">Captcha</h2>
 </a>
 </div>
 <p>We have to keep the bad guys at bay, and for that we need a kind of captcha.</p>
-<p>I suggest to present 5 APL characters 4 of which represent functions and operator but one does not, and we required that one to be identified.</p>
+<p>I suggest to present 5 APL characters to the user. 4 of them represent functions and operators but one does not, and we require that one to be identified.</p>
 <p>For example:</p>
-<blockquote>
+<hr>
 <p>Which of the following glyphs represent in APL neither a function nor an operator?</p>
 <ul class="checkboxes">
 <li><code>↑</code></li>
@@ -61,6 +61,24 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <li class="checked"><code>#</code></li>
 <li><code>⊣</code></li>
 </ul>
-</blockquote>
+<hr>
+<dl>
+<dt>Functions:</dt>
+<dd><p><code>⌶%⊢⊣⌷¨⍨/⌿\⍀&lt;≤=≥&gt;≠∨∧-+÷×?∊⍴~↑↓⍳○*⌈⌊∘⊂⊃∩∪⊥⊤|,⍱⍲⍒⍋⍉⌽⊖⍟⌹!⍕⍎⍪≡≢∣⍷⍣</code></p></dd>
+</dl>
+<p>We don't include any of <code>@&amp;</code> in order to avoid confusion.</p>
+<dl>
+<dt>Non-functions:</dt>
+<dd><p><code>'⍺⍵_¯[∇(;⍫"#⋄←→⍝)]⎕⍞'</code></p></dd>
+</dl>
+<p>We don't include any of <code>{}</code> in order to avoid confusion.</p>
+<div class="h_tag">
+<a href="#deleting-a-registered-group" id="deleting-a-registered-group" class="autoheader_anchor">
+<h2 data-id="Deleting-a-registered-group">Deleting a registered group</h2>
+</a>
+</div>
+<p>We must be prepared that someone will manage to register a group who shouldn't, because the captcha won't give us perfect protection, though it does require a human to take action.</p>
+<p>Therefore, it must be possible to delete a registered group name together with it's “home page” automatically by a REST call with a particular API key.</p>
+<p>For that we need to introduce the concept of a super user. Only super users are allowed to delete groups and packages (even when a non-delete policy is operated on a server).</p>
 </body>
 </html>

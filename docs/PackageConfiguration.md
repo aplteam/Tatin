@@ -208,7 +208,7 @@ Notes:
 
   See also the [`GetFullPath2AssetsFolder`](#GetFullPath2AssetsFolder) function.
 
-* The `assets\` folder must be considered read-only. Never write to it from a package!
+* The `assets\` folder must be considered read-only. Do not write to it from a package!
 
 * Check the "[files](#)" property for files like "ReadMe.txt" and the like.
 
@@ -232,6 +232,10 @@ A>
 A>    ```
 A>    (⊃⊃⎕CLASS ⎕THIS).##.TatinVars.GetFullPath2AssetsFolder
 A>    ```
+
+A> ### Platform dependent assets
+A> 
+A> There is no general solution for the problem of platform-dependent assets. One way to solve this is to use [`lx`](#) for this, see there.
 
 #### deprecated
 
@@ -364,7 +368,7 @@ This is optional: it may or may not exist, and it might be empty if it does exis
 
 In case it is not empty it must be the name of a niladic or monadic function that resides in the top-level namespace of the package (_not_ in what might be defined as API!) or a shared method of a class.
 
-This function will be executed by either `LoadPackages` or `LoadDependencies` _after_ all dependencies have been loaded and all refs got established.
+This function will be executed by either `LoadPackages` or `LoadDependencies` _after_ all dependencies have been loaded and all refs got established (read: at a very late stage).
 
 If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by `LoadPackages` and has no assets then the right argument will be empty.
 
@@ -379,6 +383,13 @@ The `lx` function will be executed under error trapping, and any errors will be 
 Note that the existence of a variable `TatinVars.LX` indicates that there was an `lx` function executed successfully, even when `TatinVars.LX` is empty.
 
 If no variable `TatinVars.LX` exists then there was either no `lx` function defined in the package config file or the function did crash.
+
+##### Applications
+
+There are two obvious applications for this:
+
+* For initializing a package right after bringing it into the workspace
+* For dealing with platform-dependent assets
 
 #### maintainer
 
@@ -605,6 +616,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

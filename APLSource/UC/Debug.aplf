@@ -1,0 +1,11 @@
+ r←Debug arg;mode
+ :If 0=##.Client.⎕NC'DEBUG'
+     ##.Client.DEBUG←'off'
+ :EndIf
+ mode←{0≡⍵:'' ⋄ ⎕C ⍵}arg._1
+ r←((,¨'on' '1' 'off' '0')⍳⊂∊##.Client.DEBUG)⊃'on' 'on' 'off' 'off' '??'
+ :If 0<≢mode
+     'Invalid argument; must be one of "on", 1, "off", 0'Assert(⊂,mode)∊,¨'on' 'off' '1' '0'
+     ##.Client.DEBUG←((,¨'on' '1' 'off' '0')⍳⊂mode)⊃'on' 'on' 'off' 'off' '??'
+     r←'Was: ',r
+ :EndIf

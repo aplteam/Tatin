@@ -30,7 +30,7 @@
  :EndIf
  tempFolder←F.GetTempSubDir''
  identifiers←','(≠⊆⊢)identifiers
- :Trap Reg.ErrorNo
+ :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓Reg.ErrorNo
      targetSpace∘{CheckAlias ⍵ ⍺}¨identifiers
  :Else
      qdmx←⎕DMX
@@ -38,7 +38,7 @@
      F.RmDir tempFolder
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
- :Trap Reg.ErrorNo
+ :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓Reg.ErrorNo
      paths←noBetas InstallPackages(⊃{⍺,',',⍵}/identifiers)tempFolder
  :Else
      qdmx←⎕DMX
@@ -50,7 +50,7 @@
  :If 0=≢paths
      F.RmDir tempFolder                                             ⍝ Nothing was loaded, so we can get rid of it
  :Else
-     :Trap Reg.ErrorNo
+     :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓Reg.ErrorNo
          r←≢loaded←LoadDependencies tempFolder targetSpace
      :Else
          qdmx←⎕DMX

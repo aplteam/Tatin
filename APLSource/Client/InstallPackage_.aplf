@@ -28,7 +28,7 @@
              tempDir←GetPackageFromCache url packageID2 path2cache
              cacheFlag←0
          :Else
-             :Trap Reg.ErrorNo
+             :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓Reg.ErrorNo
                  (success tempDir cacheFlag)←InstallPackage__ packageID2 url
                  :If 0=success
                      :Return

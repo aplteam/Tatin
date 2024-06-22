@@ -13,6 +13,9 @@
      :Case ⎕C'CreatePackage'
          r,←⊂'Create a new Tatin package in a given folder'
          r,←'' '  ]Tatin.CreatePackage'
+     :Case ⎕C'Debug'
+         r,←⊂'Toggle the Tatin debug mode'
+         r,←'' '  ]Tatin.Debug <[on|1|off|0]>'
      :Case ⎕C'DeprecatePackage'
          r,←⊂'Declare packages as deprecated'
          r,←'' '  ]Tatin.DeprecatePackage <URL|[Alias><group><name>[<major-version>] <comment> -force'
@@ -142,6 +145,15 @@
          r,←⊂'which in turn is an equivalent of creating a package.'
          r,←⊂''
          r,←⊂'The mandatory parameter must be a path to a folder that is going to become a package.'
+     :Case ⎕C'Debug'
+         r,←⊂'Toggles the Tatin debug mode.'
+         r,←⊂''
+         r,←⊂'When an argument is provided then it must be one of "on", 1, "off" 0.'
+         r,←⊂'"On" and 1 turn the debug mode on, "off" and 0 turn the debug mode off.'
+         r,←⊂'In debug mode Tatin does not trap application errors, allowing the user to investigate.'
+         r,←⊂'Error guards in dfns, errors when communicating via TCP/IP and similar errors will still be trapped.'
+         r,←⊂''
+         r,←⊂'If no argument is provided then the current state is reported as "on" or "off".'
      :Case ⎕C'DeprecatePackage'
          r,←⊂'Declares a particular major version of a package or all major versions of a particular'
          r,←⊂'package as deprecated. Requires two arguments:'
@@ -608,6 +620,7 @@
      :EndIf
  :Case 2
      :Select ⎕C Cmd
+     :Case ⎕C'Debug'
      :Case ⎕C'LoadTatin'
      :Case ⎕C'ListRegistries'
      :Case ⎕C'ListPackages'

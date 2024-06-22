@@ -6,7 +6,7 @@
  success←1
  :If isHTTP←Reg.IsHTTP url
      PrintToSession'  Fetching <',packageID,'>from ',url,'...'
-     :Trap Reg.ErrorNo
+     :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓Reg.ErrorNo
          zipFilename←GetPackageViaHTTP url,packageID
      :Else
          1 PrintToSession'    ',url,' does not host package <',packageID,'>'

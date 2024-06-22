@@ -32,7 +32,7 @@
  :EndIf
  'Invalid package name'Assert 0=(⎕NS''){0=≢⍵:0 ⋄ ⍺.⎕NC ⍵}cfg.name
  tmp←cfg_file,'.tmp'
- :Trap 0
+ :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓0
      {}cfg.⎕EX'∆List'
      {}(Reg.JSON cfg)Reg.SaveJSON tmp 1
      :If ⎕NEXISTS cfg_file

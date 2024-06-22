@@ -28,7 +28,7 @@
  :If isUCMD∧1<≢identifiers
      'You must not specify a name after [MyUCMDs] when installing more than one package'Assert 0=≢(≢'[myucmds]')↓targetFolder
  :EndIf
- :Trap Reg.ErrorNo
+ :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓Reg.ErrorNo
      :For identifier_ :In identifiers
          (alias identifier_)←SplitAtAlias identifier_
          ('Invalid alias: ',identifier_)Assert(,'@')≢alias

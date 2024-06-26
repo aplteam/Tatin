@@ -1,0 +1,15 @@
+ R←Test_Misc_001(stopFlag batchFlag);⎕TRAP;was;res
+⍝ Exercises the "Use" function
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ was←##.CompareFiles.INI.Default
+ res←##.CompareFiles.Use'BeyondCompare'
+ →T.GoToTidyUp 0=⎕NEXISTS res
+ →T.GoToTidyUp'BeyondCompare'≢##.CompareFiles.INI.Default
+
+ R←T._OK
+
+∆TidyUp:
+ ##.CompareFiles.Use was
+⍝Done

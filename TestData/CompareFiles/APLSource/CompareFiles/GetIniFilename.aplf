@@ -1,0 +1,7 @@
+ iniFilename←GetIniFilename
+ iniFilename←'ini.json5'
+ :If 0=##.⎕NC'CiderConfig'  ⍝ Running as a User Command?
+     iniFilename←GetMyUCMDsPath,'/CompareFiles/',iniFilename
+ :Else  ⍝ Opened as a Cider Project
+     iniFilename←##.CiderConfig.HOME,'/',iniFilename
+ :EndIf

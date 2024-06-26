@@ -1,0 +1,27 @@
+ R←Test_API_011(stopFlag batchFlag);⎕TRAP;msg;r;tool;parms;rc;out;err
+⍝ Run "KDiff3" with just default parameters.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     →0,R←T._NoBatchTest
+ :EndIf
+ :If ~∆PYTHON_IS_AVAILABLE
+     →0,R←T._NotApplicable
+ :EndIf
+
+ msg←''
+ msg,←⊂'This test case needs you: it fires up KDiff3 without parameters.'
+ msg,←⊂'No file should be editable; please check.'
+ ∆Show msg
+
+ parms←⎕SE.CompareFiles.ComparisonTools.CreateParmsForKDiff3
+ parms.(use name)←⎕SE.CompareFiles.EstablishCompareEXE'KDiff3'
+ parms.file1←##.CiderConfig.HOME,'/TestData/file1 with blank.txt'
+ parms.file2←##.CiderConfig.HOME,'/TestData/file2 with blank.txt'
+ (rc out err)←⎕SE.CompareFiles.Compare parms
+ Assert 0=rc
+
+ :If 1 ∆YesOrNo'Was "KDiff3" started?'
+     R←T._OK
+ :EndIf

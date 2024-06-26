@@ -1,0 +1,12 @@
+ (rc out err)←Meld parms;cmd;result
+⍝ Function for the comparison utility Meld
+ cmd←'"',(parms.use~'"'),'" '
+ :If 0<≢parms.file1
+     cmd,←'"',(parms.file1~'"'),'"'
+ :EndIf
+ :If 0<≢parms.file2
+     cmd,←' "',(parms.file2~'"'),'"'
+ :EndIf
+ result←##.RunProcess cmd
+ (rc out err)←result.(ExitCode StdOut ExitCode)
+⍝Done

@@ -1,0 +1,23 @@
+ R←Test_KDiff3_001(stopFlag batchFlag);⎕TRAP;msg;r;tool;cmd
+⍝ Run "KDiff3" without any parameters.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     →0,R←T._NoBatchTest
+ :EndIf
+
+ msg←''
+ msg,←⊂'This test case needs you: it fires up KDiff3 without parameters.'
+ msg,←⊂'Neither file will be editable since KDiff3 does not offer an edit-mode.'
+ ∆Show msg
+
+ cmd←'CompareFiles'
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData/file1 with blank.txt'''
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData/file2 with blank.txt'''
+ cmd,←' -use=KDiff3'
+ r←⎕SE.UCMD cmd
+
+ :If 1 ∆YesOrNo'Was "KDiff3" started?'
+     R←T._OK
+ :EndIf

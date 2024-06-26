@@ -1,0 +1,34 @@
+ index←{caption}Select options;flag;answer;question;value;bool
+⍝ Presents `options` as a numbered list and allows the user to select exactly item.\\
+⍝ One is the default.\\
+⍝ `manyFlag` defaults to 0 (meaning just one item might be selected) but might be 1, in which case
+⍝ multiple items can be selected by the user.
+⍝ `options` must not have more than 999 items.
+⍝ If the user aborts `index` is `⍬`.
+ caption←{0<⎕NC ⍵:⍎⍵ ⋄ 'Please select one item:'}'caption'
+ 'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL 11/⍨2≠≡options
+ 'Right argument has more than 999 items'⎕SIGNAL 11/⍨999<≢options
+ flag←0
+ :Repeat
+     ⎕←(⎕PW-1)↑'--- ',caption
+     ⎕←⍪{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳⍴⍵),¨⍵}options
+     ⎕←''
+     :If 0<≢answer←⍞,0/⍞←question←'Select one item (q=quit) : '
+         answer←(⍴question)↓answer
+         :If 1=≢answer
+         :AndIf answer∊'Qq'
+             index←⍬
+             :Return
+         :Else
+             (bool value)←⎕VFI answer
+             :If 1=+/bool
+             :AndIf ∧/value∊⍳≢options
+                 index←value
+                 flag←1
+             :Else
+                 ⎕←'Invalid input, please try again'
+             :EndIf
+         :EndIf
+     :EndIf
+ :Until flag
+ index←{1<≢⍵:⍵ ⋄ ⊃⍵}index

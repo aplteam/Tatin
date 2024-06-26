@@ -1,0 +1,45 @@
+ (exe name)←{force}EstablishCompareEXE use;ind;exes;names;default;saveFlag
+⍝ Tries to establish which exe/name to use for the comparison.\\
+⍝  * If `use` is not empty it is used
+⍝  * Otherwise INI.Default is checked: if it is not empty it is used
+⍝  * If neither is set then a list with all available utilities is compiled.
+⍝    * If that list has just just one item it is used
+⍝    * Otherwise the user is interrogated, unless `force` is 1 (default is 0) when the first item is returned.
+⍝ Remembers the choice via INI.Default except when force←→1 and there is more than just one.
+ exe←name←''
+ force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
+ (exes names default)←INI.(EXEs Names Default)
+ 'No comparison utility available/defined'Assert 0<≢exes
+ (exes names)←DropUnknownUtilities exes names
+ 'No comparison utility found'Assert 0<≢exes
+ saveFlag←0
+ :If 0<≢use
+ :AndIf (,'?')≢,use
+     ('Comparison utility "',use,'" is not available')Assert(⊂⎕C use)∊⎕C names
+     ind←(⎕C names)⍳⊂⎕C use
+     (exe name)←ind∘⊃¨exes names
+     saveFlag←1
+ :ElseIf 0<≢default
+ :AndIf (,'?')≢,use
+     ind←(⎕C names)⍳⊂⎕C default
+     'Default definition in INI file is invalid'Assert ind≤≢exes
+     (exe name)←ind⊃¨exes names
+ :Else
+     :If 1=≢exes
+         (exe name)←⊃¨exes names            ⍝ There is just one, so that rules the day
+     :Else
+         :If force
+             (exe name)←1⊃¨exes names       ⍝ There is just one, so that rules the day, but it won't be remembered
+         :Else                              ⍝ We need to interrogate the user
+             ind←'Select your preferred comparison utility (will be remembered)'Select names
+             →(0=≢ind)/0                    ⍝ She changed her mind: nothing selected
+             (exe name)←ind⊃¨exes names
+             saveFlag←1
+         :EndIf
+     :EndIf
+ :EndIf
+ :If saveFlag
+     INI.Default←name
+     INI WriteJSON5 GetIniFilename
+ :EndIf
+⍝Done

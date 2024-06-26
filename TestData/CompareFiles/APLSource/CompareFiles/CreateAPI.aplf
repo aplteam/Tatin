@@ -1,0 +1,17 @@
+ {r}←{tellLink}CreateAPI flag;list1;list2
+⍝ Creates cover functions for all API functions in ##.API from ##.Public.\\
+⍝ If ⍺←1 then Link will be told.
+⍝ Without ⍺ the user will be asked whether Link should be told.
+ r←⍬
+ tellLink←{0<⎕NC ⍵:⍎⍵ ⋄ ¯1}'tellLink'
+ :If flag
+     :If 0<≢list1←↓##.API.⎕NL⍳16
+         ⎕SE.Link.Expunge¨(⊂(⍕⎕THIS),'.##.API.'),¨list1
+     :EndIf
+     list2←##.Public~'Methods' 'Public' 'GoToGitHub'
+     ##.API.{⍎⍵,'←{⍺←⊣ ⋄ ⍺ ##.',⍵,' ⍵}'}¨list2
+     :If (,1)≡,tellLink
+     :OrIf 1 ##.U.YesOrNo'Tell Link?'
+         r,←⎕SE.Link.Add¨##.API.((⊂(⍕⎕THIS),'.'),¨↓⎕NL 3)
+     :EndIf
+ :EndIf

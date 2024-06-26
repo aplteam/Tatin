@@ -1,0 +1,25 @@
+ R←Test_UltraCompare_002(stopFlag batchFlag);⎕TRAP;msg;r;tool;cmd
+⍝ Run "UltraCompare" and set captions
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     →0,R←T._NoBatchTest
+ :EndIf
+
+ msg←''
+ msg,←⊂'This test case needs you: it fires up UltraCompare with specific titles.'
+ msg,←⊂'Sets "First" and "with space" as pane titles.'
+ ∆Show msg
+
+ cmd←'CompareFiles'
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData/file1 with blank.txt'''
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData/file2 with blank.txt'''
+ cmd,←' -caption1=First'
+ cmd,←' -caption2="with space"'
+ cmd,←' -use=UltraCompare'
+ r←⎕SE.UCMD cmd
+
+ :If 1 ∆YesOrNo'Was "UltraCompare" started? with the correct titles?'
+     R←T._OK
+ :EndIf

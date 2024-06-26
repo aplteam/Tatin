@@ -1,20 +1,132 @@
- {r}←CreateAPIfromCFG cfg;api;ref;public
-⍝ Checks the package config file: if there is an API defined and it is an ordinary (non-scripted!)
-⍝ namespace then it is re-created from scratch. If there is a function "Public" available in the main ...
-⍝
-⍝ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-⍝ We need to establish a way that allows indentifying the namespace within a project that is going to be the package, if any!
-⍝ In my (Kai's) case it is by convention: A project Foo always has a namepsace Foo.Foo that is going to be the package.
-⍝ However, other people may have different ideas, including one where the project is actually identical with the package.
- ∘∘∘   ⍝TODO⍝
- r←⍬
- api←'##.',cfg.name,'.',cfg.api
- :If ~(⎕NC⊂api)∊9.4 9.5             ⍝ Not for classes and interfaces
-     ref←⍎'##.',cfg.name
-     :If 3=(⍎'##.',cfg.name).⎕NC'Public'
-         public←
-     :Else
-         public←
+ {noOf}←{names}CreateAPIfromCFG(refTosourceNS cfg);ref;public;api;targetNamespace;Tref;b;name;flag;type;backRef;at;header;fullName;res;Tref2;backRef2
+⍝ Deletes and then re-creates a namespace `cfg.api` within `refTosourceNS` and then establishes functions
+⍝ returning references to variables, namespaces, classes, interfaces, functions and operators in this namespace
+⍝ as the public interface.\\
+⍝ Note that the API namespace must be a child of `refTosourceNS`.\\
+⍝ `⍵` must be a vector of length 2:\\
+⍝ [1] `refTosourceNS` (mandatory)  = name of the source namespace\\
+⍝ [2] `names`         (mandatory)  = list of all public names, typically returned by a niladic tfn named `Public`\\
+⍝ By default ALL APL objects in `refTosourceNS` will become public except when...
+⍝ * there is a function `Public` returning the names of APL objects. These are then goin to become the API
+⍝ * a list of names is passed as left argument\\
+⍝ Returns the number of fns/opr established.\\
+⍝ Handles all kinds of objects: niladic, monadic, dyadic and ambivalent fns as well as
+⍝ monadic and dyadic operators, namespaces, classes, interfaces and variables.\\
+⍝ Supports one level of sub-namespaces.\\
+⍝ It also honors shy results.\\
+⍝ Uses Link.Fix for establishing the functions.\\
+ noOf←0
+ :If 0<≢cfg.api
+     '"api" must not be dotted'Assert 0='.'+.=cfg.api
+     'Source namespace (1⊃⍵) is not a reference'Assert 0 1≡{(≡⍵)(≢⍵)}refTosourceNS
+     'Source namespace (1⊃⍵) is not a namespace'Assert 0=+/'[]'∊refTosourceNS
+     'Source namespace (1⊃⍵) is not a namespace'Assert 9.1≡⎕NC⊂⍕refTosourceNS
+     :If 0=⎕NC'names'
+     :OrIf 0=≢names
+         :If 3=refTosourceNS.⎕NC'Public'
+             names←refTosourceNS.Public                     ⍝ The result of the function `Public` rules the day
+         :Else
+             names←(' '~⍨¨↓refTosourceNS.⎕NL⍳16)~⊂cfg.api   ⍝ By default, everything but the API namespace is public
+         :EndIf
      :EndIf
-     M.CreateAPI ##.Inno public cfg.api
+     b←~0 1∊⍨{'.'+.=⍵}¨names
+     ('Dotted syntax not supported for more than one level: ',{0=≢⍵:'' ⋄ ⊃{⍺,', ',⍵}/⍵}b/names)Assert 0∧.=b
+     'No API names specified?!'Assert 0<≢names
+     names←,⊆names
+     targetNamespace←(⍕refTosourceNS),'.',cfg.api
+     :If 9=⎕NC targetNamespace
+     :AndIf 0<≢(⍎targetNamespace).⎕NL⍳16
+         res←⎕SE.Link.Expunge targetNamespace
+         ⎕DL 0.05
+     :EndIf
+     Tref←⍎targetNamespace ⎕NS''
+     b←{1='.'+.=⍵}¨names
+     :If ∨/b    ⍝ Any sub namespaces?
+         Tref.{⍵ ⎕NS''}¨∪{⍵↑⍨¯1+⍵⍳'.'}¨b/names
+     :EndIf
+     :If ∨/b←0=refTosourceNS.⎕NC↑names
+         0 Assert'Not found in ',(⍕refTosourceNS),': ',⊃{⍺,', ',⍵}/b/names
+     :EndIf
+     :For name :In names
+         name~←' '
+         flag←1
+         type←refTosourceNS.⎕NC⊂name
+         backRef←'##.'
+         :If '.'∊name
+             Tref2←Tref{⍺⍎⍵↑⍨¯1+⍵⍳'.'}name
+             backRef2←backRef,backRef,({⍵↑⍨¯1+⍵⍳'.'}name),'.'
+         :EndIf
+         :If 3=⌊type        ⍝ Function?
+             noOf+←1
+             at←refTosourceNS.⎕AT name
+             header←1⊃refTosourceNS.⎕NR name
+             :If 0=1 2⊃at   ⍝ Niladic functions need special treatment
+                 header←{⍵↑⍨¯1+⌊/⍵⍳'⍝;'}header
+                 :If '←'∊header  ⍝ With result
+                     :If '.'∊name
+                         Assert' '=1↑0⍴Tref2.{⎕SE.Link.Fix ⍵}header({('{}'~⍨1⊃⍵),'←',backRef2,(2⊃⍵)}'←'A.Split{⍵↑⍨¯1+⍵⍳'⍝'}header)
+                     :Else
+                         Assert' '=1↑0⍴Tref.{⎕SE.Link.Fix ⍵}header({('{}'~⍨1⊃⍵),'←',backRef,(2⊃⍵)}'←'A.Split{⍵↑⍨¯1+⍵⍳'⍝'}header)
+                     :EndIf
+                 :Else           ⍝ Without result
+                     :If '.'∊name
+                         Assert' '=1↑0⍴Tref2.{⎕SE.Link.Fix ⍵}header({backRef2,⍵}{⍵↓⍨⍵⍳'.'}name)
+                     :Else
+                         Assert' '=1↑0⍴Tref.{⎕SE.Link.Fix ⍵}header({backRef,⍵}{⍵↑⍨¯1+⍵⍳'⍝'}header)
+                     :EndIf
+                 :EndIf
+             :Else
+                 :If 2=|1 2⊃at   ⍝ Dyadic or ambivalent functions
+                     :If (({'.'∊⍵:⍵↓⍨⍵⍳'.' ⋄ ⍵}name),'←{')≡A.DLB header   ⍝ dfn?
+                         :If '.'∊name
+                             Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ ',⍺,⍵,' ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                         :Else
+                             Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ ',⍺,⍵,' ⍵}'}name
+                         :EndIf
+                     :Else
+                         :If '.'∊name
+                             Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ ⍺ ',⍺,⍵,' ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                         :Else
+                             Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ ⍺ ',⍺,⍵,' ⍵}'}name
+                         :EndIf
+                     :EndIf
+                 :Else           ⍝ Monadic functions (must be a tfn)
+                     :If '.'∊name
+                         Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{',⍺,⍵,' ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                     :Else
+                         Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{',⍺,⍵,' ⍵}'}name
+                     :EndIf
+                 :EndIf
+             :EndIf
+         :ElseIf 4=⌊type     ⍝ Operator
+             :Select 1 3⊃refTosourceNS.⎕AT name  ⍝ Syntax
+             :Case 1 ⍝ monadic operator
+                 :If '.'∊name
+                     Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ (⍺⍺ ',⍺,⍵,') ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                 :Else
+                     Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ (⍺⍺ ',⍺,⍵,') ⍵}'}name
+                 :EndIf
+             :Case 2 ⍝ dyadic operator
+                 :If '.'∊name
+                     Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ (⍺⍺ ',⍺,⍵,' ⍵⍵) ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                 :Else
+                     Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ (⍺⍺ ',⍺,⍵,' ⍵⍵) ⍵}'}name
+                 :EndIf
+             :Else
+                 'An operator that is neither monadic nor dyadic?!'⎕SIGNAL 11
+             :EndSelect
+             noOf+←1
+         :ElseIf type∊2.1 9.1 9.4 9.5   ⍝ Variable, Namespace, Class or Interface?
+             :If '.'∊name
+                 Assert' '=1↑0⍴backRef2 Tref2.{⎕SE.Link.Fix('r←',⍵)('r←',⍺,⍵)}{⍵↓⍨⍵⍳'.'}name
+             :Else
+                 Assert' '=1↑0⍴backRef Tref.{⎕SE.Link.Fix('r←',⍵)('r←',⍺,⍵)}name
+             :EndIf
+             noOf+←1
+         :Else
+             ⎕←'*** Ignored: ',name,' (name class=',(⍕type),')'
+             flag←0
+         :EndIf
+     :EndFor
  :EndIf
+⍝Done

@@ -39,7 +39,7 @@ window.matchMedia("print").addEventListener("change", evt => {
 <body>
 <div class="h_tag">
 <a href="#tatins-package-configuration-file" id="tatins-package-configuration-file" class="autoheader_anchor">
-<h1 data-id="Tatins-package-Configuration-File">Tatin's package Configuration File</h1>
+<h1 data-id="Tatins-Package-Configuration-File">Tatin's Package Configuration File</h1>
 </a>
 </div>
 <nav id="main_nav" class="toc">
@@ -180,86 +180,9 @@ window.matchMedia("print").addEventListener("change", evt => {
 <h4 data-id="api">2.3.1. api</h4>
 </a>
 </div>
-<p>“api”, if not empty, must be a single namespace or a single class <em>but neither a function nor an operator</em>. It must be relative to <code>source</code>.</p>
-<p>It might use dottet syntax.</p>
-<p>There are several scenarios:</p>
-<ol start="1">
-<li>The package consists of a single class or a single namespace, be it scripted or not</li>
-<li>The package consists of a single function or operator</li>
-<li>The package consists of several objects: a mixture of functions, operators, classes and/or namespaces</li>
-</ol>
-<div class="leanpub_A">
-<h3>Single functions</h3>
-<p>You <em>must not</em> specify the name of a function (or an operator) as the API in any of these cases.</p>
-<p>This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent, and dyadic functions, this is not possible for neither operators nor niladic functions.</p>
-</div>
-
-<div class="h_tag">
-<a href="#a-single-namespace" id="a-single-namespace" class="autoheader_anchor">
-<h5 data-id="A-single-namespace">2.3.1.1. A single namespace</h5>
-</a>
-</div>
-<ul>
-<li>If you don't specify <code>api</code> then the name of the namespace is the API.
-<p>For example, if the package name is <code>pkgName</code> and the namespace's name is <code>foo</code> and it has a function <code>Hello</code>, then you call <code>Hello</code> with:</p>
-<p><code>pkgName.foo.Hello</code></p></li>
-<li>If you do specify <code>api</code> by assigning an APL name to it (=no extension), then it must be the name of the namespace. In that case, the <em>contents</em> of the namespace become the API.
-<p>For example, if the package name is <code>pkgName</code> and the namespace's name is <code>foo</code> and it has a function <code>Hello</code>, then you specify <code>api</code> as <code>foo</code> and call <code>Hello</code> with:</p>
-<p><code>pkgName.Hello</code></p></li>
-</ul>
-<div class="h_tag">
-<a href="#a-single-class" id="a-single-class" class="autoheader_anchor">
-<h5 data-id="A-single-class">2.3.1.2. A single class</h5>
-</a>
-</div>
-<ul>
-<li>If you don't specify <code>api</code> then the name of the class is the API.
-<p>For example, if the package name is <code>pkgName</code> and the class name is <code>foo</code> and it has a function <code>Hello</code>, then you call <code>Hello</code> with:</p>
-<p><code>pkgName.foo.Hello</code></p></li>
-<li>If you do specify <code>api</code> then it must be the name of the class. In that case, everything in the class with <code>:Access Public Shared</code> becomes the API.
-<p>For example, if the package name is <code>pkgName</code> and the class name is <code>foo</code> and it has a publicly shared function <code>Hello</code>, then you call <code>Hello</code> with:</p>
-<p><code>pkgName.Hello</code></p></li>
-</ul>
-<div class="h_tag">
-<a href="#a-single-function-or-operator" id="a-single-function-or-operator" class="autoheader_anchor">
-<h5 data-id="A-single-function-or-operator">2.3.1.3. A single function or operator</h5>
-</a>
-</div>
-<p>If the name of the package is <code>pkgName</code>, and the name of the function is <code>MyFns</code>, then it is called as <code>pkgName.MyFns</code>. The function may be niladic, monadic, ambivalent or dyadic.</p>
-<p>The same holds for an operator.</p>
-<p>In this particular case <code>api</code> <em>must not</em> be defined (remain empty).</p>
-<div class="h_tag">
-<a href="#a-mixture-of-several-apl-objects" id="a-mixture-of-several-apl-objects" class="autoheader_anchor">
-<h5 data-id="A-mixture-of-several-APL-objects">2.3.1.4. A mixture of several APL objects</h5>
-</a>
-</div>
-<ul>
-<li>If <code>api</code> is not set then all top-level objects of the package become the API: functions, operators, namespaces, classes, interfaces.</li>
-<li>If <code>api</code> is set then it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what <code>api</code> is pointing to become the API.</li>
-</ul>
-<div class="h_tag">
-<a href="#restricting-whats-public" id="restricting-whats-public" class="autoheader_anchor">
-<h5 data-id="Restricting-whats-public">2.3.1.5. Restricting what's “public”</h5>
-</a>
-</div>
-<p>The user might want to expose only a subset of functions/operators of a namespace (classes have such an interface anyway: <code>:Public Shared</code>), and in that case, the user must not only specify <code>api</code>, but also structure her code accordingly.</p>
-<p>If the name of the package is <code>pkgName</code>, and it is loaded into <code>#</code>, and you want to expose only the functions <code>Run</code> and <code>CreateParmSpace</code>, then the recommended way of doing this is to create a sub-namespace with the name (say) <code>MyAPI</code> and populate it with two functions:</p>
-<ul>
-<li><code>Run</code>:
-<pre tabindex="0"><code>Run←{⍺←⊢ ⋄ ⍺ ##.Run ⍵}</code></pre>
-<p>(Assumes that <code>Run</code> takes an optional left argument)</p></li>
-<li><code>CreateParmSpace</code>:
-<pre tabindex="0"><code>CreateParmSpace←{##.CreateParmSpace ⍵}</code></pre>
-<p>(Assumes that <code>CreateParmSpace</code> does not accept a left argument)</p></li>
-</ul>
-<p>Finally, you need to specify <code>api: "MyAPI"</code> in the package config file.</p>
-<p>Calling the function <code>Run</code> (after loading the package) would then require:</p>
-<pre tabindex="0"><code>      #.PkgName.Run</code></pre>
-<p>To the outside world, only two functions are visible:</p>
-<pre tabindex="0"><code>      #.PkgName.⎕nl ⍳16
-#.Foo.Run
-#.Foo.CreateParmSpace</code></pre>
-<p>Similarly, if <code>PkgName</code> consists of the two namespaces <code>Boo</code> and <code>Goo</code>, and <code>Run</code> and <code>CreateParmSpace</code> live in <code>Boo</code>, then you could also have a sub-namespace <code>Boo.API</code> that hosts <code>Run</code> and <code>CreateParmSpace</code>, and <code>api</code> would be <code>Boo.API</code>, while calls are still <code>PkgName.Run</code> and <code>PkgName.CreateParmSpace</code>.</p>
+<p>“api”, if not empty, must be the name of the namespace that will contains the public interface of what's in the package. “API” is a good name for this.</p>
+<p><code>api</code> is used by the Tatin API function <code>CreateAPIfromCFG</code>. This function would create functions in the <code>api</code> namespace that act as the public interface, returning references to functions, operators, interfaces, classes, namespaces and variables.</p>
+<p>See the “Syntax Reference” document for details.</p>
 <div class="h_tag">
 <a href="#assets" id="assets" class="autoheader_anchor">
 <h4 data-id="assets">2.3.2. assets</h4>
@@ -272,7 +195,7 @@ window.matchMedia("print").addEventListener("change", evt => {
 <ul>
 <li>When the package configuration file is written to disk, the existence of “assets” is checked. If it's not a folder an error is thrown.
 <p>See also the <a href="#getfullpath2assetsfolder" class="bookmark_link"><code>GetFullPath2AssetsFolder</code></a> function.</p></li>
-<li>The <code>assets\</code> folder must be considered read-only. Never write to it from a package!</li>
+<li>The <code>assets\</code> folder must be considered read-only. Do not write to it from a package!</li>
 <li>Check the “<a href="#files" class="bookmark_link">files</a>” property for files like “ReadMe.txt” and the like.</li>
 <li>A file named “LICENSE” in the root of a project will always be copied to the root of a package by convention when a package is build.</li>
 </ul>
@@ -287,6 +210,11 @@ r←##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 <p>Therefore the following expression returns the path to the assets:</p>
 <pre tabindex="0"><code>(⊃⊃⎕CLASS ⎕THIS).##.TatinVars.GetFullPath2AssetsFolder</code></pre></li>
 </ol>
+</div>
+
+<div class="leanpub_A">
+<h3>Platform dependent assets</h3>
+<p>There is no general solution for the problem of platform-dependent assets. One way to solve this is to use <a href="#lx" class="bookmark_link"><code>lx</code></a> for this, see there.</p>
 </div>
 
 <div class="h_tag">
@@ -407,7 +335,7 @@ What is "exclude" good for?
 </div>
 <p>This is optional: it may or may not exist, and it might be empty if it does exist.</p>
 <p>In case it is not empty it must be the name of a niladic or monadic function that resides in the top-level namespace of the package (<em>not</em> in what might be defined as API!) or a shared method of a class.</p>
-<p>This function will be executed by either <code>LoadPackages</code> or <code>LoadDependencies</code> <em>after</em> all dependencies have been loaded and all refs got established.</p>
+<p>This function will be executed by either <code>LoadPackages</code> or <code>LoadDependencies</code> <em>after</em> all dependencies have been loaded and all refs got established (read: at a very late stage).</p>
 <p>If the function is monadic it will be fed with the path where the package lives on disk. If the package was brought into the WS by <code>LoadPackages</code> and has no assets then the right argument will be empty.</p>
 <p>The function must return a result which is assigned to <code>TatinVars.LX</code> inside the package namespace. Without an <code>lx</code> function there won't be a variable <code>LX</code> in <code>TatinVars</code>.[<a href="#fnref3" class="footnote_link"><sup>3</sup></a>]</p>
 <p>The <code>lx</code> function will be executed under error trapping, and any errors will be silently ignored. If you do not want this then you have two options:</p>
@@ -417,6 +345,16 @@ What is "exclude" good for?
 </ul>
 <p>Note that the existence of a variable <code>TatinVars.LX</code> indicates that there was an <code>lx</code> function executed successfully, even when <code>TatinVars.LX</code> is empty.</p>
 <p>If no variable <code>TatinVars.LX</code> exists then there was either no <code>lx</code> function defined in the package config file or the function did crash.</p>
+<div class="h_tag">
+<a href="#applications" id="applications" class="autoheader_anchor">
+<h5 data-id="Applications">2.3.11.1. Applications</h5>
+</a>
+</div>
+<p>There are two obvious applications for this:</p>
+<ul>
+<li>For initializing a package right after bringing it into the workspace</li>
+<li>For dealing with platform-dependent assets</li>
+</ul>
 <div class="h_tag">
 <a href="#maintainer" id="maintainer" class="autoheader_anchor">
 <h4 data-id="maintainer">2.3.12. maintainer</h4>
@@ -483,9 +421,9 @@ your.name@your-domain.com</code></pre>
 <p>Must be either the name of a text file that contains code or a folder that contains a collection of code files. <code>source</code> <em>must not</em> be empty.</p>
 <p>If it's a single file it might be anything with the extension <code>.aplc</code> (a class script), <code>.apln</code> (a namespace script), <code>.aplf</code> (a function) or <code>.aplo</code> (an operator).</p>
 <p>The <code>.dyalog</code> extension is supported for limited backward compatibility — Tatin does not guarantee complete compatibility with SALT. The <code>.dyalog</code> extension is still used by the user command framework, therefore Tatin must support it: a user command might well be delivered as a Tatin package. Note that outside this context using this extension is not encouraged.</p>
-<p>If <code>source</code> is a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.</p>
+<p>If <code>source</code> is a folder, it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.</p>
 <p><code>source</code> must be relative to the root of the package.</p>
-<p>Not that you may specify a default source in your user settings. The default will be injected when a new package is created.</p>
+<p>Not that you may specify a default source in your Tatin user settings. The default will be injected when a new package is created.</p>
 <div class="h_tag">
 <a href="#cider-and-tatin" id="cider-and-tatin" class="autoheader_anchor">
 <h5 data-id="Cider-and-Tatin">2.3.20.1. Cider and Tatin</h5>

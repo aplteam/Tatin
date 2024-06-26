@@ -1,0 +1,26 @@
+ R←Test_CompareIt_002(stopFlag batchFlag);⎕TRAP;msg;r;tool;cmd
+⍝ Run "CompareIt" and allow both files to be edited
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     →0,R←T._NoBatchTest
+ :EndIf
+
+ msg←''
+ msg,←⊂'This test case needs you: it fires up CompareIt with parameters'
+ msg,←⊂'Both files should be editable; make sure you change both.'
+ ∆Show msg
+
+ cmd←'CompareFiles'
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData/file1 with blank.txt'''
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData/file2 with blank.txt'''
+ cmd,←' -edit1'
+ cmd,←' -edit2'
+ cmd,←' -use=CompareIt'
+ r←⎕SE.UCMD cmd
+
+ :If 1 ∆YesOrNo'Was "CompareIt" started with the expected titles, and both files got changed?'
+ :AndIf 2=+/r
+     R←T._OK
+ :EndIf

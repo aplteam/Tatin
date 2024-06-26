@@ -1,0 +1,27 @@
+ R←Test_CompareIt_001(stopFlag batchFlag);⎕TRAP;msg;r;tool;cmd
+⍝ Run "CompareIt" with defaults: no file can be edited.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     →0,R←T._NoBatchTest
+ :EndIf
+  :If 'Win'≢##.APLTreeUtils2.GetOperatingSystem ⍬
+     →0,R←T._WindowsOnly
+ :EndIf
+
+ msg←''
+ msg,←⊂'This test case needs you: it fires up CompareIt without parameters.'
+ msg,←⊂'Neither file should be editable.'
+ ∆Show msg
+
+ cmd←'CompareFiles'
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData/file1 with blank.txt'''
+ cmd,←' ''',##.CiderConfig.HOME,'/TestData\file2 with blank.txt'''
+ cmd,←' -use=CompareIt'
+ r←⎕SE.UCMD cmd
+
+ :If 1 ∆YesOrNo'Was "CompareIt" started and no file was editable?'
+ :AndIf 0=+/r
+     R←T._OK
+ :EndIf

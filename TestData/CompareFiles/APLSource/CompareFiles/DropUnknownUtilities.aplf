@@ -1,0 +1,20 @@
+ (exes_ names_)←DropUnknownUtilities(exes names);paths;exe;b
+⍝ If an EXE is neither a absolute path nor found on PATH it's dropped.
+ paths←';'(≠⊆⊢)2 ⎕NQ #'GetEnvironment' 'PATH'
+ paths/⍨←~':\WINDOWS'{b←':\WINDOWS'{⍺∘≡¨(≢⍺)↑¨1↓¨⍵}paths ⋄ b∧(⊃¨(1+≢⍺)↓¨⍵)∊¨⊂' \'}paths
+ exes_←names_←''
+ :For exe :In exes
+     :If ':'∊exe                            ⍝ Is it an ...
+     :OrIf '/'=1⍴exe                        ⍝ ... absolute path ...
+         :If F.IsFile exe                   ⍝ ... and does exist?
+             exes_,←⊂exe                    ⍝ Then it's fine
+             names_,←⊂(exes⍳⊂exe)⊃names
+         :EndIf
+     :Else
+         :If ∨/b←F.IsFile paths,¨⊂'/',exe   ⍝ To be found on PATH somewhere?
+             exes_,←⊂((b⍳1)⊃paths),'/',exe  ⍝ Then it's fine
+             names_,←⊂(exes⍳⊂exe)⊃names
+         :EndIf
+     :EndIf
+ :EndFor
+⍝Done

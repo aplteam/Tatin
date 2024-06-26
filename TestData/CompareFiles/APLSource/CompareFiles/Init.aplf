@@ -1,0 +1,20 @@
+ {r}←Init dummy;sourceFilename;iniFilename;flag;ind;uff;iniFilename2;buff2;buff1
+ r←⍬
+ A←APLTreeUtils2
+ F←FilesAndDirs
+ :If 0=⎕NC'INI'
+     iniFilename←GetIniFilename
+     :If ~F.IsFile iniFilename
+         (⊃1 ⎕NPARTS iniFilename)⎕NCOPY(##.code.TatinVars.HOME,'/ini.json5')
+     :EndIf
+     buff1←ReadJSON5 iniFilename
+     iniFilename2←(1⊃⎕NPARTS iniFilename),'user.json5'
+     :If ⎕NEXISTS iniFilename2
+         buff2←ReadJSON5 iniFilename2
+     :AndIf 0<≢buff2.EXEs
+         buff1.EXEs,←buff2.EXEs
+         buff1.Names,←buff2.Names
+     :EndIf
+     'INI'⎕NS buff1 ⍝ Overcome the fact that ⎕JSON always creates in #!
+ :EndIf
+⍝Done

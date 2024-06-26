@@ -1,0 +1,20 @@
+ R←Test_CreateAPI_014(stopFlag batchFlag);⎕TRAP;noOf;cfg
+⍝ Exercise CreateAPI on a namespace with one function and two operators, one monadic and one dyadic
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ Assert' '=1↑0⍴#.TEMP.⎕FX'r←Hello' 'r←''World'''
+ Assert' '=1↑0⍴#.TEMP.⎕FX'r←x (fns Opr1) y' 'r←x fns y'
+ Assert' '=1↑0⍴#.TEMP.⎕FX'r←x (fns1 Opr2 fns2) y' 'r←x.fns2 y'
+ Assert' '=1↑0⍴#.TEMP.⎕FX'r←Public' 'r←''Hello'' ''Opr1'' ''Opr2'''
+
+ cfg←##.Client.InitPackageConfig ⍬
+ cfg.api←'API'
+ noOf←##.Client.CreateAPIfromCFG #.TEMP cfg
+ →T.PassesIf noOf=≢#.TEMP.Public
+ →T.PassesIf #.TEMP.Public ∆LazyMatch(⊂'Public')~⍨' '~⍨¨↓#.TEMP.⎕NL 3 4
+
+ R←T._OK
+⍝Done

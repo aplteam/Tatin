@@ -1,0 +1,12 @@
+ {exe}←Use name;exes;names;default
+⍝ Defines the Comparison utility to be used.
+⍝ Must be either available on the PATH environment variable or the exe must be a fully qualified path,
+⍝ otherwise an error is thrown.
+ (exes names default)←INI.(EXEs Names Default)
+ 'No comparison utility available/defined'Assert 0<≢exes
+ (exe name)←EstablishCompareEXE name
+ :If 0<≢name
+     INI.Default←name
+     {}INI WriteJSON5 GetIniFilename
+ :EndIf
+⍝Done

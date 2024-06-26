@@ -23,11 +23,15 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '2.1.0+67' '2023-02-01'
+      r←'DotNetZip' '2.2.0+67' '2023-02-26'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 2.2.0 from 2024-06-26
+    ⍝   * On very fast machines this could run into 
+    ⍝     "The process cannot access the file ... because it is being used by another process"
+    ⍝     We now wait for a moment and then try again, up to 5 times
     ⍝ * 2.1.0 from 2023-02-01
     ⍝   * Constructor is now more resilient against a temporary "File is in use" problem.
     ⍝ * 2.0.2 from 2022-05-31
@@ -63,13 +67,24 @@
         ∇
     :EndProperty
 
-    ∇ make1(zipFilename);overwriteFlag
+    ∇ make1(zipFilename);overwriteFlag;counter;success
     ⍝ Constructor that takes just one argument: the name of the ZIP file.\\
     ⍝ If `zipFilename` already exists it is kind of opened.
       :Access Public Instance
       :Implements Constructor
       overwriteFlag←0
-      make zipFilename overwriteFlag
+      counter←success←0
+      :Repeat
+          :Trap 99      ⍝ This can happen on very fast machines
+              make zipFilename overwriteFlag
+              success←1
+          :Else
+              ⎕DL 0.1   ⍝ The solution is to wait some time and then try again
+          :EndTrap
+      :Until 5<counter←counter+1
+      :If 0=success
+          ⎕EXCEPTION.Message ⎕SIGNAL 99
+      :EndIf
     ⍝Done
     ∇
 

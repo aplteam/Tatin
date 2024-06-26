@@ -5,7 +5,7 @@
 [parm]:numberHeaders     = 2 3 4 5 6
 
 
-# Tatin's package Configuration File
+# Tatin's Package Configuration File
 
 ## Overview 
 
@@ -88,110 +88,11 @@ If you specify any variable with a name that Tatin does not know about and that 
 
 #### api
 
-"api", if not empty,  must be a single namespace or a single class _but neither a function nor an operator_. It must be relative to `source`.
+"api", if not empty,  must be the name of the namespace that will contains the public interface of what's in the package. "API" is a good name for this.
 
-It might use dottet syntax.
+`api` is used by the Tatin API function `CreateAPIfromCFG`. This function would create functions in the `api` namespace that act as the public interface, returning references to functions, operators, interfaces, classes, namespaces and variables.
 
-There are several scenarios:
-
-1. The package consists of a single class or a single namespace, be it scripted or not
-
-1. The package consists of a single function or operator
-
-1. The package consists of several objects: a mixture of functions, operators, classes and/or namespaces
-
-A> ### Single functions 
-A>
-A> You _must not_ specify the name of a function (or an operator) as the API in any of these cases.
-A> 
-A> This restriction helps to avoid confusion, but there is also a technical issue: Tatin needs to establish references to the API, and although in Dyalog one can establish references (kind of) to monadic, ambivalent, and dyadic functions, this is not possible for neither operators nor niladic functions.
-
-
-##### A single namespace
-
-* If you don't specify `api` then the name of the namespace is the API. 
-
-  For example, if the package name is `pkgName` and the namespace's name is `foo` and it has a function `Hello`, then you call `Hello` with:
-
-  `pkgName.foo.Hello`
-
-* If you do specify `api` by assigning an APL name to it (=no extension), then it must be the name of the namespace. In that case, the _contents_ of the namespace become the API.
-
-  For example, if the package name is `pkgName` and the namespace's name is `foo` and it has a function `Hello`, then you specify `api` as `foo` and call `Hello` with:
-
-  `pkgName.Hello`
-
-
-##### A single class
-
-* If you don't specify `api` then the name of the class is the API. 
-
-  For example, if the package name is `pkgName` and the class name is `foo` and it has a function `Hello`, then you call `Hello` with:
-
-  `pkgName.foo.Hello`
-
-* If you do specify `api` then it must be the name of the class. In that case, everything in the class with `:Access Public Shared` becomes the API.
-
-  For example, if the package name is `pkgName` and the class name is `foo` and it has a publicly shared function `Hello`, then you call `Hello` with:
-
-  `pkgName.Hello`
-
-
-##### A single function or operator
-
-If the name of the package is `pkgName`, and the name of the function is `MyFns`, then it is called as `pkgName.MyFns`. The function may be niladic, monadic, ambivalent or dyadic.
-
-The same holds for an operator.
-
-In this particular case `api` _must not_ be defined (remain empty).
-
-
-##### A mixture of several APL objects
-
-* If `api` is not set then all top-level objects of the package become the API: functions, operators, namespaces, classes, interfaces.
-
-* If `api` is set then it must point to one of the namespaces or classes, or a sub-namespace (using dotted syntax), or a class in a sub-namespace. Then just the objects in what `api` is pointing to become the API.
-
-
-##### Restricting what's "public"
-
-The user might want to expose only a subset of functions/operators of a namespace (classes have such an interface anyway: `:Public Shared`), and in that case, the user must not only specify `api`, but also structure her code accordingly.
-
-If the name of the package is `pkgName`, and it is loaded into `#`, and you want to expose only the functions `Run` and `CreateParmSpace`, then the recommended way of doing this is to create a sub-namespace with the name (say) `MyAPI` and populate it with two functions:
-
-* `Run`:
-
-  ```
-  Run←{⍺←⊢ ⋄ ⍺ ##.Run ⍵}
-  ```
-
-  (Assumes that `Run` takes an optional left argument)
-
-* `CreateParmSpace`:
-
-  ```
-  CreateParmSpace←{##.CreateParmSpace ⍵}
-  ```
-
-  (Assumes that `CreateParmSpace` does not accept a left argument)
-
-Finally, you need to specify `api: "MyAPI"` in the package config file.
-
-Calling the function `Run` (after loading the package) would then require:
-
-```
-      #.PkgName.Run
-```
-
-To the outside world, only two functions are visible:
-
-```
-      #.PkgName.⎕nl ⍳16
-#.Foo.Run
-#.Foo.CreateParmSpace
-```
-
-Similarly, if `PkgName` consists of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `PkgName.Run` and `PkgName.CreateParmSpace`.
+See the "Syntax Reference" document for details.
 
 
 #### assets
@@ -453,11 +354,11 @@ If it's a single file it might be anything with the extension `.aplc` (a class s
 
 The `.dyalog` extension is supported for limited backward compatibility --- Tatin does not guarantee complete compatibility with SALT. The `.dyalog` extension is still used by the user command framework, therefore Tatin must support it: a user command might well be delivered as a Tatin package. Note that outside this context using this extension is not encouraged.
 
-If `source` is a folder it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
+If `source` is a folder, it might contain any number and mixture of the aforementioned files. Any files with other extensions will be ignored.
 
 `source` must be relative to the root of the package.
 
-Not that you may specify a default source in your user settings.  The default will be injected when a new package is created.
+Not that you may specify a default source in your Tatin user settings.  The default will be injected when a new package is created.
 
 
 ##### Cider and Tatin
@@ -616,6 +517,11 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
+
+
+
+
 
 
 

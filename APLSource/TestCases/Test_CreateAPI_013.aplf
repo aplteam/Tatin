@@ -1,0 +1,23 @@
+ R←Test_CreateAPI_013(stopFlag batchFlag);⎕TRAP;noOf;folder;res;cfg;names
+⍝ Exercise CreateAPIfromCFG with a left argument (list of names)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ folder←##.CiderConfig.HOME,'/TestData/Myapp'
+ res←⎕SE.Link.Import'#.TEMP'folder
+ Assert∨/'Imported:'⍷res
+ Assert~∨/'Error:'⍷res
+
+ cfg←##.Registry.GetJsonFromFile folder,'/apl-package.json'
+ names←'HelloVars' 'fn1' 'ns2.PI'
+ noOf←names ##.Client.CreateAPIfromCFG #.TEMP cfg
+ →T.PassesIf noOf=≢names
+
+ →T.PassesIf'Universe'≡#.TEMP.My_API.HelloVars
+ →T.PassesIf'Niladic'≡#.TEMP.My_API.fn1
+ →T.PassesIf 3.14≡#.TEMP.ns2.PI
+
+ R←T._OK
+⍝Done

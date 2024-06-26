@@ -1,0 +1,27 @@
+ R←Test_API_013(stopFlag batchFlag);⎕TRAP;msg;r;tool;parms;rc;out;err
+⍝ Run "Meld" with just default parameters.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ :If batchFlag
+     →0,R←T._NoBatchTest
+ :EndIf
+ :If ~∆PYTHON_IS_AVAILABLE
+     →0,R←T._NotApplicable
+ :EndIf
+
+ msg←''
+ msg,←⊂'This test case needs you: it fires up Meld without parameters.'
+ msg,←⊂'Both files will be editable since Meld does not offer read-only.'
+ ∆Show msg
+
+ parms←⎕SE.CompareFiles.ComparisonTools.CreateParmsForMeld
+ parms.(use name)←⎕SE.CompareFiles.EstablishCompareEXE'Meld'
+ parms.file1←##.CiderConfig.HOME,'/TestData/file1 with blank.txt'
+ parms.file2←##.CiderConfig.HOME,'/TestData/file2 with blank.txt'
+ (rc out err)←⎕SE.CompareFiles.Compare parms
+ Assert 0=rc
+
+ :If 1 ∆YesOrNo'Was "Meld" started?'
+     R←T._OK
+ :EndIf

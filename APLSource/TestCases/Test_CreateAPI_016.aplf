@@ -1,0 +1,18 @@
+ R←Test_CreateAPI_016(stopFlag batchFlag);⎕TRAP;noOf;cfg
+⍝ Exercise CreateAPIfromCFG on a namespace with a niladic function that does not provide a result (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ Assert' '=1↑0⍴#.TEMP.⎕FX'Dispose' '⎕EX ''GlobalVars'''
+ cfg←##.Client.InitPackageConfig ⍬
+ cfg.api←'My_API'
+ noOf←##.Client.CreateAPIfromCFG #.TEMP cfg
+ Assert noOf=≢(' '~⍨¨↓#.TEMP.⎕nl ⍳16)~⊂cfg.api
+ #.TEMP.GlobalVars←42
+ #.TEMP.My_API.Dispose
+ →T.PassesIf 0=#.TEMP.⎕NC'GlobalVars'
+
+ R←T._OK
+⍝Done

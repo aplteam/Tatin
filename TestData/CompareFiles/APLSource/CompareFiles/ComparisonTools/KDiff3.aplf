@@ -1,0 +1,26 @@
+ (rc out err)←KDiff3 parms;cmd;result
+⍝ Function for the comparison utility KDiff3
+ cmd←'"',(parms.use~'"'),'" '
+ :If 0<≢parms.file1
+     cmd,←'"',(parms.file1~'"'),'"'
+ :EndIf
+ :If 0<≢parms.file2
+     cmd,←' "',(parms.file2~'"'),'"'
+ :EndIf
+ :If 0=≢parms.caption1
+     cmd,←' -L1 ',' '~⍨⊃,/1↓⎕NPARTS parms.file1
+ :Else
+     cmd,←' -L1 "',(parms.caption1~'"'),'"'
+ :EndIf
+ :If 0=≢parms.caption2
+     cmd,←' -L2 ',' '~⍨⊃,/1↓⎕NPARTS parms.file2
+ :Else
+     cmd,←' -L2 "',(parms.caption2~'"'),'"'
+ :EndIf
+ result←##.RunProcess cmd
+ (rc out err)←result.(ExitCode StdOut ExitCode)
+ :If rc∊0 1  ⍝ 0 = file was saved; 1 = file was NOT saved
+     rc←0
+     err←''
+ :EndIf
+⍝Done

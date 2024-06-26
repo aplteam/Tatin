@@ -275,7 +275,7 @@ The folder may or may not carry a trailing slash (`/`).
 
 This would attempt to publish the package found in `path2package/` to the principal Tatin Server.
 
-You can also build a new version by calling `]TATIN.BuildPackage` (or its API aquivalent `BuildPackage`) and specify the resulting ZIP file as an argument to `PublishPackage`:
+You can also build a new version by calling `]TATIN.BuildPackage` (or its aquivalent, the API-function `BuildPackage`) and specify the resulting ZIP file as an argument to `PublishPackage`:
 
 ```
 ]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]
@@ -397,6 +397,7 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
 
 
 

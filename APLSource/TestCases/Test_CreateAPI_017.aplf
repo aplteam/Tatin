@@ -1,0 +1,42 @@
+ R←Test_CreateAPI_017(stopFlag batchFlag);⎕TRAP;noOf;folder;res;cfg
+⍝ Exercise CreateAPIfromCFG on all types of objects with many of them in a sub namespace
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ folder←##.CiderConfig.HOME,'/TestData/Myapp2'
+ res←⎕SE.Link.Import'#.TEMP'folder
+ Assert∨/'Imported:'⍷res
+ Assert~∨/'Error:'⍷res
+
+ cfg←##.Client.InitPackageConfig ⍬
+ cfg.api←'My_API'
+ noOf←##.Client.CreateAPIfromCFG #.TEMP cfg
+ →T.PassesIf noOf=≢(' '~⍨¨↓#.TEMP.Sub.⎕NL⍳16),(' '~⍨¨↓#.TEMP.⎕NL⍳16)~cfg.api'Public' 'ns2' 'Sub'
+
+ →T.PassesIf'Universe'≡#.TEMP.My_API.Sub.HelloVars
+ →T.PassesIf'Galaxy'≡#.TEMP.My_API.Sub.class1.Hello2
+ →T.PassesIf'Niladic'≡#.TEMP.My_API.Sub.fn1
+ →T.PassesIf'Monadic'≡#.TEMP.My_API.Sub.fn2 ⍬
+ →T.PassesIf'Dyadic'≡⍬ #.TEMP.My_API.Sub.fn3 ⍬
+ →T.PassesIf'Ambivalent'≡#.TEMP.My_API.Sub.fn4 ⍬
+ →T.PassesIf'Ambivalent'≡⍬ #.TEMP.My_API.Sub.fn4 ⍬
+ :Trap 0
+     #.TEMP.My_API.Sub.fn5
+ :Else
+     →T.PassesIf 0
+ :EndTrap
+∆Go:
+ →T.PassesIf 0<#.TEMP.My_API.Sub.⎕NC'interface1'
+ →T.PassesIf'Galaxy'≡#.TEMP.My_API.Sub.ns1.Hello
+ →T.PassesIf 0∧.≠#.TEMP.My_API.Sub.⎕NC↑'HelloVars' 'Hello'
+ →T.PassesIf'World'≡#.TEMP.My_API.Sub.Hello
+ →T.PassesIf'op1'≡(+#.TEMP.My_API.Sub.op1)1
+ →T.PassesIf'op2'≡(+#.TEMP.My_API.Sub.op2=)1
+ →T.PassesIf'op3'≡2(+#.TEMP.My_API.Sub.op3=)1
+ →T.PassesIf'op4'≡(+#.TEMP.My_API.Sub.op4=)1
+ →T.PassesIf'op4'≡2(+#.TEMP.My_API.Sub.op4=)1
+
+ R←T._OK
+⍝Done

@@ -1,0 +1,36 @@
+ (rc out err)←BeyondCompare parms;cmd;result
+⍝ Function for the comparison utility BeyondCompare
+ cmd←'"',(parms.use~'"'),'" '
+ :If 0<≢parms.file1
+     cmd,←'"',(parms.file1~'"'),'"'
+ :EndIf
+ :If 0<≢parms.file2
+     cmd,←' "',(parms.file2~'"'),'"'
+ :EndIf
+
+ :If 0=≢parms.caption1
+     cmd,←' /title1=',' '~⍨⊃,/1↓⎕NPARTS parms.file1
+ :Else
+     cmd,←' /title1="',(parms.caption1~'"'),'"'
+ :EndIf
+ :If 0=≢parms.caption2
+     cmd,←' /title2=',' '~⍨⊃,/1↓⎕NPARTS parms.file2
+ :Else
+     cmd,←' /title2="',(parms.caption2~'"'),'"'
+ :EndIf
+ :If 0=+/parms.(edit1 edit2)
+     cmd,←' /ro1 /ro2'
+ :Else
+     :If 0=parms.edit1
+         cmd,←' /ro1'
+     :EndIf
+     :If 0=parms.edit2
+         cmd,←' /ro2'
+     :EndIf
+ :EndIf
+ result←##.RunProcess cmd
+ (rc out err)←result.(ExitCode StdOut ExitCode)
+ :If rc∊0 1 2 11 12 13 14 101
+     rc←0
+ :EndIf
+⍝Done

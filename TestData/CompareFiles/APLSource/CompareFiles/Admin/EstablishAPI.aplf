@@ -1,0 +1,27 @@
+ {r}←EstablishAPI flag;list1;list2;this;name
+⍝ Creates cover functions for all API functions in ##.API according to ##.Public.\\
+ r←⍬
+ :If flag
+     :If 0<##.⎕NC'API'
+         :If 0<≢list1←↓##.API.⎕NL⍳16
+             ⎕SE.Link.Expunge¨(⊂(⍕⎕THIS),'.##.API.'),¨list1
+             'API.ComparisonTools'##.⎕NS''
+         :EndIf
+     :Else
+         'API'##.⎕NS''
+         'API.ComparisonTools'##.⎕NS''
+     :EndIf
+     list2←##.Public~'' ''
+     :For this :In list2
+         :If 0=1 2⊃##.⎕AT this ⍝ Niladic?
+             :If '.'∊this
+                 name←{⍵↓⍨⍵⍳'.'}this
+                 ##.API.ComparisonTools.⎕FX('r←',name)('r←##.##.ComparisonTools.',name)
+             :Else
+                 ##.API.⎕FX('r←',this)('r←##.',this)
+             :EndIf
+         :Else
+             ##.API.{⍎⍵,'←{⍺←⊣ ⋄ ⍺ ##.',⍵,' ⍵}'}this
+         :EndIf
+     :EndFor
+ :EndIf

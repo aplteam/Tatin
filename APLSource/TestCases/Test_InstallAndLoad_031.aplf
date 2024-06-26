@@ -1,11 +1,12 @@
  r←Test_InstallAndLoad_031(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted;res
  ;dir;src;body;cfg;installFolder;src2;src3;reg
-⍝ A package that depend on another package that has several functions and therefore uses "api"
+⍝ A package that depend on another package that has several functions
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  #.⎕EX TC.GetTatinRootSpace'#'
- #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''        ⍝ Used to load stuff into
+ #.⎕SHADOW'TEMP2' ⋄ 'TEMP2'#.⎕NS''      ⍝ Used to create a package
  dir←∆GetTempDir ⍬
  (src reg)←(⊂dir,'/'),¨'src' 'reg'
  src2←src,'/Example-Constants-0.1.0/'
@@ -28,18 +29,19 @@
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- body←'r←x Times y' 'r←Constants.PI× x×y'
- (⊂body)F.NPUT src3,'/APLSource/Times.aplf'
- body←'r←Total x' 'r←+/x'
- (⊂body)F.NPUT src3,'/APLSource/Total.aplf'
- body←'r←x Power y' 'r←x*y'
- (⊂body)F.NPUT src3,'/APLSource/Power.aplf'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyMath' '0.2.0'
  cfg.source←'APLSource'
  cfg.os_win←1
  TC.WritePackageConfigFile src3 cfg
  src3 TC.Dependencies.Add'Example-Constants-0.1.0'
+ Assert' '=1↑0⍴#.TEMP2.⎕FX'r←x Times y' 'r←Constants.PI× x×y'
+ Assert' '=1↑0⍴#.TEMP2.⎕FX'r←Total x' 'r←+/x'
+ Assert' '=1↑0⍴#.TEMP2.⎕FX'r←x Power y' 'r←x*y'
+ Assert' '=1↑0⍴#.TEMP2.⎕FX'r←Public' 'r←''Total'' ''Power'''
+ res←⎕SE.Link.Create #.TEMP2(src3,cfg.source)
+ Assert∨/'Linked: #.TEMP2 ←→'⍷∊res
+
  (rc msg zipFilename)←TC.PublishPackage src3 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
@@ -59,6 +61,7 @@
  r←T._OK
 
 ∆TidyUp:
+ {}⎕SE.Link.Break'#.TEMP2'
  Assert 0=⊃F.RmDir dir
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
  F.DeleteFile toBeDeleted

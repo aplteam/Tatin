@@ -1,4 +1,4 @@
-r←GetPathToPackageCache;folder
+ r←GetPathToPackageCache;folder
 ⍝ The user settings rule:
 ⍝ 1. If MyUserSettings.path2cache is not empty then that path is returned, otherwise:
 ⍝ 2. The function returns the standard path for caching which depends on the operating system\\
@@ -9,7 +9,7 @@ r←GetPathToPackageCache;folder
      :Case 'win'
          r←(2 ⎕NQ #'GetEnvironment' 'AllUsersProfile'),'\Dyalog\',folder
      :Case 'lin'
-         r←'/home/',⎕AN,'/.dyalog/',folder
+         r←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/.dyalog/',folder
      :Case 'mac'
          r←'/Applications/Dyalog/',folder
      :EndSelect

@@ -1,4 +1,4 @@
- r←{OS}GetUserHomeFolder add;p;v;w;l;d;h;lad;as;u
+ r←{OS}GetUserHomeFolder add;p;v;w;l;d;h;lad;as
 ⍝ Returns standard path for any user-specific data.\\
 ⍝ Works on all platforms but returns different results.\\
 ⍝ `⍵`, if not empty, is added to the resulting path.\\
@@ -24,12 +24,11 @@
      :ElseIf 0≠≢h
          r←F.ExpandPath h,as,d,add          ⍝ mac
      :Else
-         u←⊃~∘∊⍨2 ⎕NQ'.' 'GetEnvironment'('LOGNAME' 'USER' 'LNAME' 'USERNAME')
          'No user found?!'Assert 0<≢u
          :If l
-             r←'/home/',u,d,add             ⍝ linux
+             r←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),d,add       ⍝ linux
          :Else
-             r←'/Users/',u,as,d,add         ⍝ mac
+             r←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),as,d,add    ⍝ mac
          :EndIf
      :EndIf
  :EndIf

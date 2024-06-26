@@ -35,7 +35,6 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'UtilFns' '0.2.0'
  cfg.source←'APLSource'
- cfg.api←'Times'
  cfg.os_win←1
  TC.WritePackageConfigFile src3 cfg
  (rc msg zipFilename)←TC.PublishPackage src3 reg
@@ -49,7 +48,6 @@
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'MyTests' '0.3.0'
  cfg.source←'APLSource'
- cfg.api←'MyTests'
  cfg.os_win←1
  TC.WritePackageConfigFile src4 cfg
  src4 TC.Dependencies.Add'Example-Constants-0.1.0'
@@ -66,7 +64,7 @@
  →T.GoToTidyUp 1≠≢TC.Dependencies.Get installFolder
  {}TC.LoadDependencies installFolder #.TEMP
 
- →T.GoToTidyUp(3.14×3)≢#.TEMP.MyTests.Test1 3
+ →T.GoToTidyUp(3.14×3)≢#.TEMP.MyTests.MyTests.Test1 3
 
  r←T._OK
 

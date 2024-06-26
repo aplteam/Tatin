@@ -1,4 +1,4 @@
- r←Test_Demo_043(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;toBeDeleted;qdmx
+ r←Test_Demo_043(stopFlag batchFlag);⎕TRAP;rc;msg;zipFilename;qdmx
  ;dir;src;body;cfg;reg;list;index;expected;zipped;src2;src3;refs
 ⍝ Publish a package with two functions but with an API picking one of them (invalid)
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
@@ -29,16 +29,12 @@
  cfg.os_win←1
  TC.WritePackageConfigFile src2 cfg
 
- (rc msg zipFilename)←TC.PublishPackage src2 reg
- toBeDeleted,←⊂zipFilename
- Assert 200=rc
-
- :Trap ##.Registry.ErrorNo
-     {}TC.LoadPackages(reg,'/Example-Arithmetic-1.0.0')#.TEMP
+ :Trap 0
+     (rc msg zipFilename)←TC.PublishPackage src2 reg
      →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.GoToTidyUp~∨/'Is neither class nor namespace:'⍷qdmx.EM
+     →T.GoToTidyUp~∨/'API is defined but neither a namespace nor a script'⍷qdmx.EM
  :EndTrap
 
  r←T._OK
@@ -47,6 +43,5 @@
  (rc msg)←F.RmDirByForce dir
  msg Assert rc=0
  Assert TC.MyUserSettings.RemoveRegistry'[local2]'
- F.DeleteFile toBeDeleted
  #.⎕EX TC.GetTatinRootSpace'#'
 ⍝Done

@@ -6,7 +6,7 @@
          type←(extensions⍳extension)⊃'Function' 'Operator' 'Class' 'Interface' 'Namespace' 'Array' 'Script'
          ('Source ',cfg.source,' (',type,') does not exist')Assert ⎕NEXISTS projectPath,cfg.source
      :Else
-         files←↑1↓¨⎕NPARTS¨{(1+≢⍵)↓¨⊃F.Dir ⍵,'/*'}projectPath,cfg.source
+         files←↑1↓¨⎕NPARTS¨{(≢⍵)↓¨⊃F.Dir ⍵,'/*'}projectPath,F.AddTrailingSep cfg.source
          'API does not exist'Assert(1↑'.'(≠⊆⊢)cfg.api)∊files[;1]
          ind←files[;1]⍳1↑'.'(≠⊆⊢)cfg.api
          'API is defined but neither a namespace nor a script'Assert files[ind;2]∊'' '.apln' '.aplc'

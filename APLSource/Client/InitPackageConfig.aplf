@@ -17,8 +17,8 @@
  cfg.documentation←''
  comments,←'documentation' 'A URL or a local path or a function providing documentation'
     ⍝cfg.date←''                ⍝ Injected by the server (publishing date)
- cfg.exclude←''
- comments,←'exclude' 'Optional. Name of one or more files/folders relative to "source" excluded from the package'
+ ⍝cfg.exclude←''                ⍝ Optional, therefore not included (for best compatability)  ⍝TODO⍝ Change before 1.0.0 is released
+ ⍝comments,←'exclude' 'Optional. Name of one or more files/folders relative to "source" excluded from the package'
  cfg.files←''
  comments,←'files' 'Optional. For files like "ReadMe.txt" to go to the root of the package'
  cfg.group←MyUserSettings.group
@@ -58,7 +58,7 @@
  cfg.lx←''
  comments,←'lx' 'Function to be called when the package is established in the WS'
  :If 0<≢y
-     varsList←(' '~¨⍨↓cfg.⎕NL 2),'deprecateComment' 'deprecated'
+     varsList←(' '~¨⍨↓cfg.⎕NL 2),'deprecateComment' 'deprecated' 'exclude' ⍝ Remove "exclude" when it becomes a permanent property (1.0.0)
      {}'cfg'⎕NS y
      {}cfg.⎕EX'wx'              ⍝ Not anymore (since 0.61.0)
      list←(' '~¨⍨↓cfg.⎕NL 2)~' '~¨⍨↓'_'cfg.⎕NL 2 ⍝ user properties start with "_" by convention

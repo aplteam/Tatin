@@ -10,6 +10,9 @@
      :Case ⎕C'BuildPackage'
          r,←⊂'Create a new version of a package (resulting in a ZIP) from the directory'
          r,←'' '  ]Tatin.BuildPackage [<package-folder>] [<target-folder>] -dependencies= -version= -tatinVars= -bump=[minor|major|path]'
+     :Case ⎕C'CopyRegistry'
+         r,←⊂'Copy all or selective parts of a Tatin Registry to a folder'
+         r,←'' '  ]Tatin.CopyRegistry'
      :Case ⎕C'CreatePackage'
          r,←⊂'Create a new Tatin package in a given folder'
          r,←'' '  ]Tatin.CreatePackage'
@@ -139,6 +142,13 @@
          r,←⊂'-dependencies=  Use this to specify a subfolder of the project holding package dependencies.'
          r,←⊂'                Usually there is no need to specify this, refer to the documentation for details:'
          r,←⊂'                the document "Publishing Packages".'
+     :Case ⎕C'CopyRegistry'
+         ∘∘∘
+         r,←⊂'Copy either all (but deprecated) or selective packages from a remote Tatin registry to a folder.'
+         r,←⊂']Tatin.CopyRegistry'
+         r,←⊂''
+         r,←⊂'...'
+         r,←⊂''
      :Case ⎕C'CreatePackage'
          r,←⊂'This user command is an alias for:'
          r,←⊂']Tatin.PackageConfig -edit'
@@ -620,6 +630,7 @@
      :EndIf
  :Case 2
      :Select ⎕C Cmd
+     :Case ⎕C'CopyRegistry'
      :Case ⎕C'Debug'
      :Case ⎕C'LoadTatin'
      :Case ⎕C'ListRegistries'

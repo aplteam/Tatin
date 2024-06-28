@@ -92,10 +92,8 @@
  UpdateTestServerAssets ⍬
  {}⎕SE.Link.Refresh'#.Tatin'
  :If ~batchFlag
-     ⎕←'******************************************************************'
-     ⎕←'In order to install the freshly created new version, execute this:'
-     ⎕←'1 #.Tatin.Admin.InstallTatin 1'
-     ⎕←'******************************************************************'
+ :AndIf 1 ##.Client.CommTools.YesOrNo'Would you like to install the freshly created new version?'
+     ⎕←1 #.Tatin.Admin.InstallTatin 1
  :EndIf
  :If #.Tatin.Registry.Version≢⎕SE.Tatin.Version
      ⎕SE.⎕EX¨'Tatin' '_Tatin'

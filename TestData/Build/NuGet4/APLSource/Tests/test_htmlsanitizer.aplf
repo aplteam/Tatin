@@ -1,0 +1,19 @@
+ test_htmlsanitizer project_dir;⎕USING;hs;html;sanitized;expected
+ NuGet.Add project_dir'HtmlSanitizer'
+ ⎕USING←NuGet.Using project_dir
+ hs←⎕NEW Ganss.Xss.HtmlSanitizer
+
+ html ←'<script>alert(''xss'')</script><div onload="alert(''xss'')" '
+ html,←'style="background-color: rgba(0, 0, 0, 1)">Test<img src="test.png" '
+ html,←'style="background-image: url(javascript:alert(''xss'')); margin: 10px"></div>'
+
+ sanitized ← hs.Sanitize html 'https://www.example.com' ⎕NULL
+
+ expected ← '<div style="background-color: rgba(0, 0, 0, 1)">'
+ expected,← 'Test<img src="https://www.example.com/test.png" style="margin: 10px"></div>'
+
+ :If expected ≡ sanitized
+   ⎕←'it works!'
+ :Else
+   ∘∘∘ ⍝ oops
+ :EndIf

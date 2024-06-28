@@ -1,0 +1,13 @@
+{r}←CopyNativeFiles project_dir;target;native;n
+
+:If ⎕NEXISTS native←NativeFolder project_dir
+    :If 0≠≢findfile (target←project_dir),'/*.deps.json'
+    :OrIf 0≠≢findfile (target←project_dir,'/published'),'/*.deps.json'
+       n←target ⎕NCOPY⍠('IfExists' 'Skip')('Wildcard' 1)⊢native,'/*'
+    :Else
+       'Unable to locate target directory' ⎕SIGNAL 11
+    :EndIf
+    r←(⍕n),' new native files copied from ',native
+:Else
+    r←'no native files to copy'
+:EndIf

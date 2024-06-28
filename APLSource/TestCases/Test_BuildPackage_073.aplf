@@ -1,0 +1,27 @@
+ r←Test_BuildPackage_073(stopFlag batchFlag);⎕TRAP;path;zipFileName;msg;rc;parms;tempPath;qdmx
+⍝ Build package and use the `exclude` property with two files that both do not exist (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempPath←∆GetTempDir''
+ path←∆GetProjectPath,'/TestData/Build/NuGet4/'
+ parms←TC.CreateBuildParms path
+ parms.targetPath←tempPath
+
+ :Trap 998
+     zipFileName←TC.BuildPackage parms
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp'Not a valid path for "exclude": DoesNotExist.txt'≢∊qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempPath
+ msg Assert rc=0
+ :If 0<⎕NC'zipFileName'
+     F.DeleteFile zipFileName
+ :EndIf
+⍝Done

@@ -1,11 +1,10 @@
- r←Test_BuildPackage_071(stopFlag batchFlag);⎕TRAP;path;cfg;zipFileName;msg;rc;parms;tempPath;list;buff
+ r←Test_BuildPackage_071(stopFlag batchFlag);⎕TRAP;path;zipFileName;msg;rc;parms;tempPath;list;buff
 ⍝ Build package and use the `exclude` property with two files and one dir
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  tempPath←∆GetTempDir''
  path←∆GetProjectPath,'/TestData/Build/NuGet2/'
- cfg←TC.ReadPackageConfigFile path,'apl-package.json'
  parms←TC.CreateBuildParms path
  parms.targetPath←tempPath
  zipFileName←TC.BuildPackage parms

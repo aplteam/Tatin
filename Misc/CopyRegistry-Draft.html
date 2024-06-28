@@ -19,11 +19,28 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 </a>
 </div>
 <div class="h_tag">
+<a href="#history" id="history" class="autoheader_anchor">
+<h2 data-id="History">History</h2>
+</a>
+</div>
+<ol start="1">
+<li>First draft created on 2024-06-17</li>
+<li>Two amendments on 2024-06-28
+<ul>
+<li>Definition of <code>-list</code> enhanced:
+<ul>
+<li>Might be a variable name as well</li>
+<li>Definition of what might be specified clarified</li>
+</ul></li>
+<li>Topic “Additional REST command ”SYNC" added</li>
+</ul></li>
+</ol>
+<div class="h_tag">
 <a href="#why--what-for" id="why--what-for" class="autoheader_anchor">
 <h2 data-id="Why--what-for">Why / what for</h2>
 </a>
 </div>
-<p>There are at least two scenarios when a user command <code>]CopyRegistry</code> is needed:</p>
+<p>There are at least two scenarios when a user command <code>]CopyRegistry</code> and its API equivalent are needed:</p>
 <ul>
 <li>In case access to <code>https://tatin.dev</code> is restricted in a company by firewall rules</li>
 <li>One wants to have access to the data of the principal Tatin registry without Internet access.</li>
@@ -92,7 +109,23 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <ul>
 <li>A comma-separated list of packages with at least the group name and the package name</li>
 <li>A path to a file that contains the list of packages to be copied; must start with <code>file://</code></li>
+<li>Point to a variable like <code>#.VarsName</code> or <code>⎕SE.VarsName</code>. Must then be either a  vector of text vectors or a simple text vector with comma-separated names</li>
 </ul>
+<p>One might specify a package by…</p>
+<ul>
+<li>group name and package name</li>
+<li>group name and package name and the major version number</li>
+</ul>
+<p>Nothing else is accepted.</p>
+<div class="h_tag">
+<a href="#additional-rest-command-sync" id="additional-rest-command-sync" class="autoheader_anchor">
+<h2 data-id="Additional-REST-command-SYNC">Additional REST command “SYNC”</h2>
+</a>
+</div>
+<p>In addition to the user command and its API eqivalent there should be a REST command “SYNC”.</p>
+<p>This command would require one parameter: the URL of the managed Tatin Registry to copy from.</p>
+<p>No other parameters are allowed/required then, and it always acts on all packages as if <code>-sync</code> was specified.</p>
+<p>This obviously requires authorization, and the introduction of the concept of one or more super users, because the currently implemented stuff authorizes a user to act on a certain group (or groups), not on the entire Registry.</p>
 
 <script>
 

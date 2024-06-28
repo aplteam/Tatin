@@ -1,8 +1,17 @@
 # Copy Registry
 
+## History
+
+1. First draft created on 2024-06-17
+2. Two amendments on 2024-06-28
+   * Definition of `-list` enhanced: 
+     * Might be a variable name as well
+     * Definition of what might be specified clarified
+   * Topic "Additional REST command "SYNC" added
+
 ## Why / what for
 
-There are at least two scenarios when a user command `]CopyRegistry` is needed:
+There are at least two scenarios when a user command `]CopyRegistry` and its API equivalent are needed:
 
 * In case access to `https://tatin.dev` is restricted in a company by firewall rules
 * One wants to have access to the data of the principal Tatin registry without Internet access.
@@ -65,4 +74,26 @@ This can be one of:
 
 * A comma-separated list of packages with at least the group name and the package name
 * A path to a file that contains the list of packages to be copied; must start with `file://`
+* Point to a variable like `#.VarsName` or `⎕SE.VarsName`. Must then be either a  vector of text vectors or a simple text vector with comma-separated names
+
+One might specify a package by...
+
+* group name and package name 
+* group name and package name and the major version number
+
+Nothing else is accepted.
+
+
+## Additional REST command "SYNC"
+
+In addition to the user command and its API eqivalent there should be a REST command "SYNC". 
+
+This command would require one parameter: the URL of the managed Tatin Registry to copy from.
+
+No other parameters are allowed/required then, and it always acts on all packages as if `-sync` was specified.
+
+This obviously requires authorization, and the introduction of the concept of one or more super users, because the currently implemented stuff authorizes a user to act on a certain group (or groups), not on the entire Registry.
+
+
+
 

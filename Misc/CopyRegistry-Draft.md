@@ -1,3 +1,8 @@
+[parm]:numberHeaders = 2 3 4 5 6
+[parm]:title         = 'CopyReg'
+[parm]:toc           = 2 3 4 5
+
+
 # Copy Registry
 
 ## History
@@ -8,6 +13,18 @@
      * Might be a variable name as well
      * Definition of what might be specified clarified
    * Topic "Additional REST command "SYNC" added
+3. A number of amendments on 2024-06-29
+   * One argument is enough: must be the target folder, `[tatin]` is assumes as source
+   * `-sync` is now the default, therefore there is no need for this option anymore
+     
+     Instead there is now an option `-force` that makes sure that even packages are copied that are already available in the target Registry.
+
+     This appears to be closer to what's needed in real life.
+   * The (new) option `-last` can be used to make sure that only the latest version of the hightest major version of each package is copied.
+   * The REST-command "SYNC" got parameters.
+
+4. Road Map added
+     
 
 ## Why / what for
 
@@ -26,7 +43,7 @@ Note that dependencies are always copied as well in case the number of packages 
 ## Syntax
 
 ```
-]CopyRegistry <url> <path> -full -sync -dry -group= -list=
+]CopyRegistry [<url>] <path> -full -force -last -group= -list= -dry 
 ```
 
 `URL`: This must be the URL of the Registry from which the packages will be copied. It might be an alias like `[tatin]`. The Registry must be managed by a Tatin Server.
@@ -37,27 +54,41 @@ Note that dependencies are always copied as well in case the number of packages 
 
 ### Copy data
 
+Note that deprecated packages are NEVER copied.
+
 #### The default
 
-To copy everything from the principal Tatin registry:
+Examples
 
-```
-]CopyRegistry [tatin] /path/2/Registry/data
-```
+1. Copy the latest version of every major version (if not already available in the target Registry) from the principal Tatin registry:
 
-By default this will copy the best version of every major version of all packages except those that are deprecated.
+   ```
+   ]CopyRegistry /path/2/Registry/data
+   ```
+
+2. Copy the highest major version of all packages from a company Registry, and re-install:
+
+   ```
+   ]CopyRegistry [my-company] /path/2/Registry/data -last
+   ```
 
 #### The `-full` flag
 
-If you want to copy all versions of all packages, specify the `-full` flag. However, note that deprecated packages are never copied over.
+If you want to copy all versions of all packages, specify the `-full` flag. 
 
-#### The `-sync` flag
+Note that `-last` and `-full` are mutually exclusive.
 
-If you have once copied a Registry and now just want to get all packages added since then and the latest versions of packages you already have, specify the `—sync` flag.
+#### The `-force` flag
 
-### The `-dry` flag
+By default packages that are already available in the target Registry are not copied. This can be changed with the `-force` flag.
 
-Use this flag for a report of what `CopyRegistry` would do without actually doing it.
+
+#### The `-last` option
+
+When this option is specified, then only the hightest major version number of a package is copied.
+
+Note that `-last` and `-full` are mutually exclusive.
+
 
 #### The `-group=` option
 In case you want to copy only packages of a specific group, you may set this option, for example:
@@ -67,6 +98,7 @@ In case you want to copy only packages of a specific group, you may set this opt
 ```
 
 Packages from other groups might still be copied in case they are required as dependencies.
+
 
 #### The `-list=` option
 
@@ -83,16 +115,42 @@ One might specify a package by...
 
 Nothing else is accepted.
 
+#### The `-dry` flag
+
+Use this flag for a report of what `CopyRegistry` would do without actually doing it.
+
 
 ## Additional REST command "SYNC"
 
 In addition to the user command and its API eqivalent there should be a REST command "SYNC". 
 
-This command would require one parameter: the URL of the managed Tatin Registry to copy from.
+This command would require one argument: the URL or alias of the managed Tatin Registry to copy from. 
 
-No other parameters are allowed/required then, and it always acts on all packages as if `-sync` was specified.
+It acts on the latest versions of all packages by default.
 
-This obviously requires authorization, and the introduction of the concept of one or more super users, because the currently implemented stuff authorizes a user to act on a certain group (or groups), not on the entire Registry.
+### Parameters
+
+The following parameters might be specifid: 
+
+|Name   |Default|
+|-------|-------|
+|`full` |      0|
+|`force`|      0|
+|`last` |      0|
+
+### Authorization
+
+The introduction of "SYNC" as a REST command obviously requires authorization, and the introduction of the concept of a superuser, because the currently implemented stuff authorizes a user to act on a certain group (or groups), not on the entire Registry.
+
+
+## Road Map
+
+1. In a first step the user command and the API function will be implemented.
+
+2. The REST command "SYNC" and its associated enhancement of the authorization concept is only going to be implemented when really needed, and after Dyalog gives the okay.
+
+   However, it should be noted that the concept of a superuser is sooner or later very likely to be needed for other purposes as well.
+
 
 
 

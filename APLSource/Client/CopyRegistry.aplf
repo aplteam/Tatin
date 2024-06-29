@@ -1,0 +1,51 @@
+ list←CopyRegistry p;buff;filename;print
+⍝ Copies from a Registry and saves data in a given path.\\
+⍝ `p` must be a namespace with the required parameters, possibly created by calling `CreateCopyRegistryParms`.\\
+⍝ Returns a list with the names of all packages that were copied.
+⍝ In case `p.verbose` is 1 a matrix is returned rather then a list, with messages in the second columnd.
+⍝ "Fetched" indicates success.
+ p←CreateCopyRegistryParms p
+ print←p.verbose∘{⍺≠2: ⋄ ⎕←⍪⊆⍵ ⋄ 1:shy←0}
+ :If '#.'≡2↑p.list
+ :OrIf '⎕se.'≡⎕C 4↑p.list
+     :If 0<≢buff←⍎p.list
+     :AndIf 1=≡buff
+         :If ','∊buff
+             p.list←','(≠⊆⊢)buff
+         :Else
+             p.list←,⊂buff
+         :EndIf
+     :EndIf
+ :EndIf
+ :If 'file://'{⍺≡(≢⍺)↑⍵}p.list
+     filename←'file://'{(≢⍺)↓⍵}p.list
+     ('File not found: ',filename)Assert F.IsFile filename
+     p.list←⊃⎕NGET filename 1
+ :EndIf
+ :If 0<≢p.list
+     :If Reg.IsValidPackageID_WithoutVersionNo 1⊃p.list
+         '"list" must specify just group and package name but no version number'Assert∧/Reg.IsValidPackageID_WithoutVersionNo¨p.list
+     :ElseIf Reg.IsValidPackageID_WithMajorNo 1⊃p.list
+         '"list" must specify just group and package name but no version number'Assert∧/Reg.IsValidPackageID_WithMajorNo¨p.list
+     :Else
+         '"list" is not consistanty/correctly defined'Assert 0
+     :EndIf
+ :EndIf
+ 'Missing: "url"'Assert 0<≢p.url
+ '"url" does not use the HTTP protocol'Assert IsHTTP p.url
+ 'Missing: "path"'Assert 0<≢p.path
+ EstablishEmptyPermanentConnections 1
+ {}Connect2Client p.url
+ print'Fetch list of packages...'
+ list←FetchPkgListForCopyRegistry p
+ list←(~('/'∊¨list))/list   ⍝ In case there are dependencies stemming from a different Registry we ignore them
+ :If 0<≢list
+ :AndIf ~p.dry
+     list←p(print FetchPackagesForCopyRegistry)list
+ :EndIf
+ CloseConnections 1
+ :If 0=p.verbose
+ :AndIf 2=⍴⍴list
+     list←(list[;2]≡¨⊂'Fetched')/list[;1]
+ :EndIf
+⍝Done

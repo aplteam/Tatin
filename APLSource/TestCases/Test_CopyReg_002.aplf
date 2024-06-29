@@ -1,0 +1,27 @@
+ r←Test_CopyReg_002(stopFlag batchFlag);⎕TRAP;parms;msg;rc;list1;list2;list3;list4;groups
+⍝ Exercise the option "group="
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←##.Client.CreateCopyRegistryParms ⍬
+ parms.path←(F.GetTempSubDir⊃⎕SI),'/'
+ parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
+ parms.noDeps←1
+ parms.dry←1
+ list1←##.Client.CopyRegistry parms
+ →T.PassesIf 0<≢list1
+ →T.PassesIf 1<≢∪Reg.GetGroupFromPackageID¨list1
+
+ parms.group←'example'
+ list2←##.Client.CopyRegistry parms
+ →T.PassesIf>/≢¨list1 list2
+ groups←Reg.GetGroupFromPackageID¨list2
+ →T.PassesIf 1<≢groups
+ →T.PassesIf'example'≡∊∪groups
+
+ parms.group←'DoesNotExist'
+ list3←##.Client.CopyRegistry parms
+ →T.PassesIf 0=≢list3
+
+ r←T._OK
+⍝Done

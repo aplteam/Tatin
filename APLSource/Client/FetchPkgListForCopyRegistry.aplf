@@ -1,0 +1,32 @@
+ r←FetchPkgListForCopyRegistry p;request;firstFlag;res
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/copy-registry/'
+ firstFlag←1
+ :If p.full
+     request.RequestTarget,←'?full'
+     firstFlag←0
+ :EndIf
+ :If p.last
+     request.RequestTarget,←((firstFlag+1)⊃'&?'),'last'
+     firstFlag←0
+ :EndIf
+ :If 0<≢p.group
+     request.RequestTarget,←((firstFlag+1)⊃'&?'),'group=',p.group
+     firstFlag←0
+ :EndIf
+ :If 0<≢p.list
+     request.RequestTarget,←((firstFlag+1)⊃'&?'),'list=',⊃{⍺,',',⍵}/p.list
+     firstFlag←0
+ :EndIf
+ :If p.noDeps
+     request.RequestTarget,←((firstFlag+1)⊃'&?'),'noDeps=1'
+     firstFlag←0
+ :EndIf
+ :If 0                                                                          ⍝TODO⍝ Only for development
+     request.RequestTarget,←((firstFlag+1)⊃'&?'),'stop'                         ⍝TODO⍝
+ :EndIf                                                                         ⍝TODO⍝
+ request.Headers,←⊂'Accept' 'application/json'
+ res←SendAndReceive p.url request
+ res.Content Assert 200=res.StatusCode
+ r←{(,0)≡⍴⍵:'' ⋄ ⎕JSON⍠('Dialect' 'JSON5')⊣⍵}⊣res.Content
+⍝Done

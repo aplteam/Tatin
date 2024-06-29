@@ -1,0 +1,30 @@
+ r←Test_CopyReg_004(stopFlag batchFlag);⎕TRAP;parms;qdmx
+⍝ Exercise the "list=" option wiath invalid options
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←##.Client.CreateCopyRegistryParms ⍬
+ parms.path←(F.GetTempSubDir⊃⎕SI),'/'
+ parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
+ parms.dry←1
+
+ parms.list←'aplteam'   ⍝ Invalid
+ :Trap 998
+     {}##.Client.CopyRegistry parms
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'"list" is not consistanty/correctly defined'⍷qdmx.EM
+ :EndTrap
+
+ parms.list←'aplteam-APLTreeUtils,aplteam-SevenZip-4'  ⍝ Inconsistent
+ :Trap 998
+     {}##.Client.CopyRegistry parms
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'"list" is not consistanty/correctly defined'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

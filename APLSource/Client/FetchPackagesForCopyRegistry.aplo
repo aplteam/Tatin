@@ -1,0 +1,52 @@
+ r←parms(fns FetchPackagesForCopyRegistry)pkgs;pkg;i;res;data;zipFilename;qdmx;path;path2;doesExist;msg;rc
+⍝ Takes a list of complete package IDs ("pkgs", typically created by calling `FetchPkgListForCopyRegistry`) and
+⍝ and a parameter space "parms" (typically created by calling `CreateCopyRegistryParms` and then amended)
+⍝ and uses this to fetch all the packages one by one from the source Registry
+ r←pkgs,[1.5]⊂''
+ :For i :In ⍳≢pkgs
+     pkg←i⊃pkgs
+     path←F.EnforceSlash(F.AddTrailingSep parms.path),pkg
+     :If 0=doesExist←F.IsDir path
+     :OrIf parms.force
+         fns'Fetching ',pkg,'...'
+         :If doesExist
+             (rc msg)←F.RmDirByForce path
+             :If 0≠rc
+                 r[i;2]←⊂'ERROR: could not delete already existing folder; RC=',⍕rc
+                 fns'  Fetching ',pkg,' failed due to an error:',(≢'ERROR: ')↓2⊃r[i;]
+                 :Continue
+             :EndIf
+         :EndIf
+         :Trap 0
+             zipFilename←F.EnforceSlash GetPackageViaHTTP parms.url,pkg
+             path2←path,'/data'
+             zipFilename ZipArchive.UnzipTo path2
+             path ⎕NMOVE path2,'/apl-package.json'
+             :If ⎕NEXISTS path2,'/apl-dependencies.txt'
+                 path ⎕NMOVE path2,'/apl-dependencies.txt'
+             :EndIf
+             (path,'/',pkg,'.zip')⎕NMOVE zipFilename
+             r[i;2]←⊂'Fetched'
+             fns'  Success!'
+         :Else
+             qdmx←⎕DMX
+             :If 90=qdmx.EN
+                 r[i;2]←⊂'ERROR: ',⎕EXCEPTION.Message,'; RC=',⍕qdmx.EN
+             :ElseIf ∨/'Internal Server Error (500)'⍷qdmx.EM
+                 r[i;2]←⊂'ERROR: Server returned 500 Internal Error'
+             :Else
+                 :If (⎕UCS 13)∊qdmx.EM
+                     r[i;2]←{⍺,' ',A.DLB ⍵}/(⎕UCS 13)(≠⊆⊢)qdmx.EM
+                 :Else
+                     r[i;2]←⊂'ERROR: ',qdmx.EM,'; RC=',⍕qdmx.EN
+                 :EndIf
+             :EndIf
+             r[i;2]←⊂'ERROR: Fetching ',pkg,' failed due to an error:',(≢'ERROR: ')↓2⊃r[i;]
+             fns'  Fetching ',pkg,' failed due to an error:',(≢'ERROR: ')↓2⊃r[i;]
+         :EndTrap
+     :Else
+         r[i;2]←⊂'Not fetching ',pkg,', already in Registry'
+         fns'Not fetching ',pkg,', already in Registry'
+     :EndIf
+ :EndFor
+⍝Done

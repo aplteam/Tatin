@@ -1,7 +1,31 @@
- response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqueIDs;list;descriptionAndProjecturl;list5
+ response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqueIDs;descriptionAndProjecturl;list5;pkgs;⎕TRAP;group;json;list
 ⍝ Return literally all packages. Parameters are ignored
+ ⎕TRAP←0 'S'
  :If IsJsonRequest request.Headers
-     response←request RespondWithHTML 406 ⍝ We don't support this via JSON request
+     pkgs←1 Reg.GetAllPackages G.RegistryPath
+     :If 0<≢group←request R.GetQueryParameter'group'
+         pkgs←(group∘≡¨Reg.GetGroupFromPackageID¨pkgs[;1])⌿pkgs
+     :EndIf
+     pkgs←G.RegistryPath Reg.RemoveDeprecatedPackages pkgs
+     pkgs←pkgs[;1]
+     :If (⊂'last')∊request.QueryParameters[;1]
+         ⍝ Only the latest version of each package, ignoring the major version number
+         pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveVersionNumber¨⍵}pkgs
+     :ElseIf ~(⊂'full')∊request.QueryParameters[;1]
+         ⍝ Only the latest version of each major version of each package
+         pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveMinorAndPatch¨⍵}pkgs
+     :EndIf
+     :If 0<≢list←request R.GetQueryParameter'list'
+         list←','(≠⊆⊢)list
+         pkgs←list ReducePkgsList pkgs
+     :EndIf
+     pkgs,[1.5]←⊂''
+     :If 0=1↑A.ToNum request R.GetQueryParameter'noDeps'
+         pkgs←AddDependencies pkgs
+     :EndIf
+     pkgs←pkgs[;1]
+     json←Reg.JSON pkgs
+     response←request ReturnJSON json
  :Else  ⍝ It's a request from a Browser
      list←1 Reg.GetAllPackages G.RegistryPath
      html←packageID PrepareHtmlPageForFullPackageList list

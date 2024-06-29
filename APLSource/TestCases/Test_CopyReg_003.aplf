@@ -1,0 +1,42 @@
+ r←Test_CopyReg_003(stopFlag batchFlag);⎕TRAP;parms;msg;rc;list;expected;tempDir;buff;filename;list2;list3
+⍝ Exercise the "list=" option with all valid flavours
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ 'TEMP'#.⎕NS''
+ #.TEMP.MyPkgs←'example-boo,example-versions'
+
+ parms←##.Client.CreateCopyRegistryParms ⍬
+ parms.path←(F.GetTempSubDir⊃⎕SI),'/'
+ parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
+ parms.list←'#.TEMP.MyPkgs'
+ parms.dry←1
+ parms.last←1
+ parms.noDeps←1
+ list←##.Client.CopyRegistry parms
+ expected←'example-Boo-1.0.0' 'example-versions-2.0.0'
+ →T.GoToTidyUp expected≢list
+
+ parms.last←0
+ #.TEMP.MyPkgs←'aplteam-sevenzip'
+ list2←##.Client.CopyRegistry parms
+ expected←'aplteam-SevenZip-3' 'aplteam-SevenZip-4'
+ →T.GoToTidyUp expected≢Reg.RemoveMinorAndPatch¨list2
+
+ tempDir←F.GetTempSubDir⊃⎕SI
+ buff←'aplteam-APLTreeUtils' 'example-versions'
+ filename←tempDir,'/pkg-list.txt'
+ (⊂buff)⎕NPUT filename 1
+ parms.list←'file://',filename
+ parms.last←1
+ list3←##.Client.CopyRegistry parms
+ →T.GoToTidyUp 2≠≢list3
+
+ r←T._OK
+
+∆TidyUp:
+ #.⎕EX'TEMP'
+ :If 0<⎕NC'tempDir'
+     {}F.RmDirByForce tempDir
+ :EndIf
+⍝Done

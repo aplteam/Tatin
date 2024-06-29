@@ -1,0 +1,13 @@
+ r←list ReducePkgsList pkgs;pkg;pkgsMajor;pkgs_
+ r←⍬
+ pkgs_←⎕C Reg.RemoveVersionNumber¨pkgs
+ pkgsMajor←⎕C Reg.RemoveMinorAndPatch¨pkgs
+ :For pkg :In list
+     :If Reg.IsValidPackageID_WithoutVersionNo pkg
+         r,←(pkgs_≡¨⊂⎕C pkg)/pkgs
+     :ElseIf Reg.IsValidPackageID_WithMajorNo pkg
+         r,←(pkgsMajor≡¨⊂⎕C pkg)/pkgs
+     :Else
+         ⍝ Ignored because invalid
+     :EndIf
+ :EndFor

@@ -1,0 +1,18 @@
+ r←Test_CopyReg_005(stopFlag batchFlag);⎕TRAP;parms;list;groups
+⍝ Check whether dependencies are added
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←##.Client.CreateCopyRegistryParms ⍬
+ parms.path←(F.GetTempSubDir⊃⎕SI),'/'
+ parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
+ parms.dry←1
+ parms.group←'example'
+ list←##.Client.CopyRegistry parms
+
+ →T.PassesIf 0<≢list
+ groups←∪Reg.GetGroupFromPackageID¨list
+ →T.PassesIf 1<≢groups  ⍝ Because some packages depend on stuff from the "aplteam" group
+
+ r←T._OK
+⍝Done

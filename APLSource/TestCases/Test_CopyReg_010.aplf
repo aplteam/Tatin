@@ -1,0 +1,40 @@
+ r←Test_CopyReg_010(stopFlag batchFlag);⎕TRAP;parms;msg;rc;list1;list2;list3;list1_a;parms2;list4;b
+⍝ Exercise the default as well as the flags "full" & "last"
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←##.Client.CreateCopyRegistryParms ⍬
+ parms.path←(F.GetTempSubDir⊃⎕SI),'/'
+ parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
+ parms.noDeps←1
+ parms.verbose←1
+ list1←##.Client.CopyRegistry parms
+ →T.GoToTidyUp~1<≢∪##.Registry.GetGroupName¨list1
+ parms2←##.Registry.CheckParmsForListPackages ⍬
+ parms2.aggregate←0
+ list1_a←,parms2 ##.Client.ListPackages parms.url
+ →T.GoToTidyUp~</≢¨list1 list1_a
+
+ parms.full←1
+ list2←##.Client.CopyRegistry parms
+ →T.GoToTidyUp~</≢¨list1 list2
+
+ parms.full←0
+ parms.last←1
+ list3←##.Client.CopyRegistry parms
+ →T.GoToTidyUp~>/≢¨list1 list3
+ →T.GoToTidyUp≠/{≢¨⍵(∪⍵)}##.Registry.RemoveVersionNumber¨##.Registry.RemoveMinorAndPatch¨list3[;1]
+
+ {}F.RmDirByForce parms.path,'aplteam-RideClient-0.7.1'
+
+ parms.full←1
+ list4←##.Client.CopyRegistry parms
+ →T.GoToTidyUp 1≠+/b←list4[;2]≡¨⊂'Fetched'
+ →T.GoToTidyUp'aplteam-RideClient-0.7.1'≢1⊃list4[⊃⍸b;]
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce parms.path
+ msg Assert 0=rc
+⍝Done

@@ -1,0 +1,52 @@
+ r←CopyRegistry arg;p;qdmx;b
+ p←⎕NS'' ⍝ For parameters
+⍝ --- Handle arguments
+ :If TC.IsHTTP arg._1
+ :OrIf ']['≡2↑¯1⌽arg._1
+     p.url←arg._1
+     'Not specified: path to target Registry'Assert 0≢arg._2
+     p.path←arg._2
+ :Else
+     p.url←'[tatin]' ⍝ The default
+     'Not specified: path to target Registry'Assert 0≢arg._1
+     p.path←arg._1
+ :EndIf
+ p.path←TC.F.AddTrailingSep p.path
+ ('Not a folder: ',1⊃⎕NPARTS ¯1↓p.path)Assert TC.F.IsDir 1⊃⎕NPARTS ¯1↓p.path
+ 3 ⎕MKDIR ¯1↓p.path ⍝ Make sure the target exists
+⍝ --- Handle flags
+ p.(dry force full last)←arg.(dry force full last)
+ 'Flags "full" and "last" are mutually exclusive'Assert~∧/p.(full last)
+⍝ --- Handle options
+ p.list←''arg.Switch'list'
+ :If 0<≢p.list
+     :If 'file://'{⍺≡(≢⍺)↑⍵}p.list
+         ('Not a file: ',(≢'file://')↓p.list)Assert TC.F.IsFile(≢'file://')↓p.list
+         p.list←⊃⎕NGET((≢'file://')↓p.list)1
+         p.list←(0<≢¨p.list)/p.list
+     :ElseIf '#.'≡2↑p.list
+     :OrIf '⎕se.'≡⎕C 4↑p.list
+         ⍝ Must point to a variable or a niladic function
+         ('Neither a variable nor a function:  ',p.list)Assert(⎕NC p.list)∊2 3
+         :If 3=⎕NC p.list
+             ('Is a function, but not niladic: ',p.list)Assert 0=1 2⊃⎕AT p.list
+             ('Is a niladic function, but does not return a result: ',p.list)Assert 1=|1 1⊃⎕AT p.list
+         :EndIf
+         :Trap 0
+             p.list←⍎p.list
+         :Else
+             qdmx←⎕DMX
+             0 Assert⍨'Evaluating "',p.list,'" caused a ',qdmx.EM
+         :EndTrap
+         :If 0<≢p.list
+             :If 1∊b←~(TC.Reg.IsValidPackageID_WithMajorNo¨p.list)∨TC.Reg.IsValidPackageID_WithoutVersionNo¨p.list
+                 0 Assert⍨'Invalid entries found on "list": ',⊃{⍺,', ',⍵}/b/p.list
+             :EndIf
+         :EndIf
+     :Else
+         ∘∘∘  ⍝TODO⍝
+     :EndIf
+ :EndIf
+ p.group←''arg.Switch'group'
+ r←TC.CopyRegistry p
+⍝Done

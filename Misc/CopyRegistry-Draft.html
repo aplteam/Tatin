@@ -38,6 +38,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <li class="toc-entry toc-h4"><a href="#the--group-option">4.1.5. The <code>-group=</code> option</a></li>
 <li class="toc-entry toc-h4"><a href="#the--list-option">4.1.6. The <code>-list=</code> option</a></li>
 <li class="toc-entry toc-h4"><a href="#the--dry-flag">4.1.7. The <code>-dry</code> flag</a></li>
+<li class="toc-entry toc-h4"><a href="#the--nodeps-flag">4.1.8. The <code>-noDeps</code> flag</a></li>
 </ul></li>
 </ul></li>
 <li class="toc-entry toc-h2"><a href="#additional-rest-command-sync">5. Additional REST command “SYNC”</a>
@@ -54,28 +55,12 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <h2 data-id="History">1. History</h2>
 </a>
 </div>
-<ol start="1">
-<li>First draft created on 2024-06-17</li>
-<li>Two amendments on 2024-06-28
-<ul>
-<li>Definition of <code>-list</code> enhanced:
-<ul>
-<li>Might be a variable name as well</li>
-<li>Definition of what might be specified clarified</li>
-</ul></li>
-<li>Topic “Additional REST command ”SYNC" added</li>
-</ul></li>
-<li>A number of amendments on 2024-06-29
-<ul>
-<li>One argument is enough: must be the target folder, <code>[tatin]</code> is assumes as source</li>
-<li><code>-sync</code> is now the default, therefore there is no need for this option anymore
-<p>Instead there is now an option <code>-force</code> that makes sure that even packages are copied that are already available in the target Registry.</p>
-<p>This appears to be closer to what's needed in real life.</p></li>
-<li>The (new) option <code>-last</code> can be used to make sure that only the latest version of the hightest major version of each package is copied.</li>
-<li>The REST-command “SYNC” got parameters.</li>
-</ul></li>
-<li>Road Map added</li>
-</ol>
+<p>2024-07-01</p>
+<p>:This is a re-write with significant changes after the implementation of a rough prototype.</p>
+<dl>
+<dt>2024-07-01</dt>
+<dd><p>Parameter <code>noDeps</code> added</p></dd>
+</dl>
 <div class="h_tag">
 <a href="#why--what-for" id="why--what-for" class="autoheader_anchor">
 <h2 data-id="Why--what-for">2. Why / what for</h2>
@@ -88,15 +73,21 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 </ul>
 <p>In both cases, copying the data from https://tatin.dev to a local disk makes sense. It also makes perfect sense to synchronize occasionally.</p>
 <p><code>CopyRegistry</code> requires a Tatin server to run on the “from” Registry but not on the “to” Registry. When a Tatin server manages the “to” Registry, you are advised to pause it during the execution of <code>CopyRegistry</code>. <code>CopyRegistry</code> copies just packages but no meta data.</p>
-<p>Note that dependencies are always copied as well in case the number of packages to be copied is reduced in any way.</p>
+<p>Note that dependencies are always copied as well in case the number of packages to be copied is reduced in any way excepts when <code>-noDeps</code> is specified.</p>
 <div class="h_tag">
 <a href="#syntax" id="syntax" class="autoheader_anchor">
 <h2 data-id="Syntax">3. Syntax</h2>
 </a>
 </div>
 <pre tabindex="0"><code>]CopyRegistry [&lt;url&gt;] &lt;path&gt; -full -force -last -group= -list= -dry</code></pre>
-<p><code>URL</code>: This must be the URL of the Registry from which the packages will be copied. It might be an alias like <code>[tatin]</code>. The Registry must be managed by a Tatin Server.</p>
-<p><code>path</code>: Path to the folder that holds the data of a Tatin Registry. You are advised to stop the server before <code>]CopyRegistry</code> is executed, and restart it afterwards.</p>
+<dl>
+<dt><code>URL</code></dt>
+<dd><p class="first_dd">This must be the URL of the Registry from which the packages will be copied. It might be an alias like <code>[tatin]</code>. The Registry must be managed by a Tatin Server.</p></dd>
+<dd><p>If this is omitted, then it defaults to <code>[tatin]</code>.</p></dd>
+<dt><code>path</code></dt>
+<dd><p class="first_dd">Path to the folder that holds the data of a Tatin Registry.</p></dd>
+<dd><p>In case the Registry is managed you are advised to stop the server before executing <code>]CopyRegistry</code> (or its API equivalent), and restart it afterwards.</p></dd>
+</dl>
 <div class="h_tag">
 <a href="#details" id="details" class="autoheader_anchor">
 <h2 data-id="Details">4. Details</h2>
@@ -113,19 +104,16 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <h4 data-id="The-default">4.1.1. The default</h4>
 </a>
 </div>
-<p>Examples</p>
-<ol start="1">
-<li>Copy the latest version of every major version (if not already available in the target Registry) from the principal Tatin registry:
-<pre tabindex="0"><code>]CopyRegistry /path/2/Registry/data</code></pre></li>
-<li>Copy the highest major version of all packages from a company Registry, and re-install:
-<pre tabindex="0"><code>]CopyRegistry [my-company] /path/2/Registry/data -last</code></pre></li>
-</ol>
+<p>Without specifying a Tatin server URL and any flags/options the command copies the latest version of every major version (if not already available in the target Registry) from the principal Tatin registry:</p>
+<pre tabindex="0"><code>]CopyRegistry /path/2/Registry/data</code></pre>
+<p>If instead you want to copy just the highest major version of all packages from a company Registry:</p>
+<pre tabindex="0"><code>]CopyRegistry [my-company] /path/2/Registry/data -last</code></pre>
 <div class="h_tag">
 <a href="#the--full-flag" id="the--full-flag" class="autoheader_anchor">
 <h4 data-id="The--full-flag">4.1.2. The <code>-full</code> flag</h4>
 </a>
 </div>
-<p>If you want to copy all versions of all packages, specify the <code>-full</code> flag.</p>
+<p>If you want to copy ALL versions of ALL packages, specify the <code>-full</code> flag.</p>
 <p>Note that <code>-last</code> and <code>-full</code> are mutually exclusive.</p>
 <div class="h_tag">
 <a href="#the--force-flag" id="the--force-flag" class="autoheader_anchor">
@@ -147,30 +135,46 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 </div>
 <p>In case you want to copy only packages of a specific group, you may set this option, for example:</p>
 <pre tabindex="0"><code>]CopyRegistry [tatin] /path/2/Registry/data -sync -group=dyalog</code></pre>
-<p>Packages from other groups might still be copied in case they are required as dependencies.</p>
+<p>However, packages from other groups might still be copied eventually in case they are required as dependencies.</p>
 <div class="h_tag">
 <a href="#the--list-option" id="the--list-option" class="autoheader_anchor">
 <h4 data-id="The--list-option">4.1.6. The <code>-list=</code> option</h4>
 </a>
 </div>
-<p>This can be one of:</p>
+<p>This can be used to specify a list of package IDs.</p>
+<p>Packages can be specified in three different ways:</p>
 <ul>
-<li>A comma-separated list of packages with at least the group name and the package name</li>
+<li>With their full name, including the full version number</li>
+<li>By group name, package name and major version number</li>
+<li>Just by group name and package name</li>
+</ul>
+<p>No matter which option you use, all packages in the list must be specified consistantly in the same way, otherwise an error is thrown.</p>
+<p>You may use <code>⎕SE.Tatin.ListPackages</code> to produce a list of packages.</p>
+<p><code>-list=</code> can be one of:</p>
+<ul>
+<li>A comma-separated list of packages</li>
 <li>A path to a file that contains the list of packages to be copied; must start with <code>file://</code></li>
-<li>Point to a variable like <code>#.VarsName</code> or <code>⎕SE.VarsName</code>. Must then be either a  vector of text vectors or a simple text vector with comma-separated names</li>
+<li>The fully qualified name of a variable like <code>#.VarsName</code> or <code>⎕SE.VarsName</code>. Must then be either a  vector of text vectors or a simple text vector with comma-separated package IDs.</li>
 </ul>
-<p>One might specify a package by…</p>
-<ul>
-<li>group name and package name</li>
-<li>group name and package name and the major version number</li>
-</ul>
-<p>Nothing else is accepted.</p>
 <div class="h_tag">
 <a href="#the--dry-flag" id="the--dry-flag" class="autoheader_anchor">
 <h4 data-id="The--dry-flag">4.1.7. The <code>-dry</code> flag</h4>
 </a>
 </div>
-<p>Use this flag for a report of what <code>CopyRegistry</code> would do without actually doing it.</p>
+<p>Use this flag to prevent the user command as well as its API equivalent to actually do something: the API function would return a list of package IDs that would actually be copied, including required dependencies. The user command would print the list to <code>⎕SE</code>.</p>
+<p>This is true even when <code>-list=</code> is specified. The resulting list might be different from what was specified on <code>-list=</code> for two reasons:</p>
+<ul>
+<li>Packages that are not available on the given Registry, or have been deprecated, are removed from the list</li>
+<li>Dependencies that are required by packages on the list but are not on the list themselves are added</li>
+</ul>
+<div class="h_tag">
+<a href="#the--nodeps-flag" id="the--nodeps-flag" class="autoheader_anchor">
+<h4 data-id="The--noDeps-flag">4.1.8. The <code>-noDeps</code> flag</h4>
+</a>
+</div>
+<p>If this is specified no dependencies are added.</p>
+<p>In real life it is hard to see an application for this, but it is useful for test cases.</p>
+<p>That's the reason why this flag is not documented in the user command help.</p>
 <div class="h_tag">
 <a href="#additional-rest-command-sync" id="additional-rest-command-sync" class="autoheader_anchor">
 <h2 data-id="Additional-REST-command-SYNC">5. Additional REST command “SYNC”</h2>
@@ -179,6 +183,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 <p>In addition to the user command and its API eqivalent there should be a REST command “SYNC”.</p>
 <p>This command would require one argument: the URL or alias of the managed Tatin Registry to copy from.</p>
 <p>It acts on the latest versions of all packages by default.</p>
+<p>This would not accept any requests while “SYNC” is carried out, and re-create all meta-data after the copy operation, and then start handling requests again.</p>
 <div class="h_tag">
 <a href="#parameters" id="parameters" class="autoheader_anchor">
 <h3 data-id="Parameters">5.1. Parameters</h3>
@@ -213,6 +218,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 </a>
 </div>
 <p>The introduction of “SYNC” as a REST command obviously requires authorization, and the introduction of the concept of a superuser, because the currently implemented stuff authorizes a user to act on a certain group (or groups), not on the entire Registry.</p>
+<p>However, it should be noted that the concept of a superuser is sooner or later very likely to be needed for other purposes anyway.</p>
 <div class="h_tag">
 <a href="#road-map" id="road-map" class="autoheader_anchor">
 <h2 data-id="Road-Map">6. Road Map</h2>
@@ -220,8 +226,7 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin
 </div>
 <ol start="1">
 <li>In a first step the user command and the API function will be implemented.</li>
-<li>The REST command “SYNC” and its associated enhancement of the authorization concept is only going to be implemented when really needed, and after Dyalog gives the okay.
-<p>However, it should be noted that the concept of a superuser is sooner or later very likely to be needed for other purposes as well.</p></li>
+<li>The REST command “SYNC” and its associated enhancement of the authorization concept is only going to be implemented when really needed, and after Dyalog gives the okay.</li>
 </ol>
 
 <script>

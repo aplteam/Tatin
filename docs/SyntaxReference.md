@@ -166,6 +166,25 @@ Clears the cache, which is the folder `GetPathToPackageCache` points to.
 * If `url` is empty all subdirectories but `temp\` are removed
 * If `url` is not empty then only the given domain is removed from the cache
 
+### CopyRegistry
+```
+list←CopyRegistry parms 
+```
+
+This command copies packages from a managed Tatin Registry (by default `[tatin]`) to a local folder.
+
+There might be a Tatin Server running on the local target folder, but this is not a requirement. In fact any running local server must be paused or stopped while `CopyRegistry` is running.
+
+By default the latest version of any major version of all packages that are not deprecated are copied, plus any dependencies.
+
+Packages that are already saved in the target folder are not requested again, but check the `-force` flag.
+
+`CopyRegistry` was introduced with version 0.110.0, therefore you cannot use it on Tatin servers that run earlier version than that.
+
+The function takes one mandatory argument: a parameter namespace typically created by calling [CreateCopyRegistryParms](#), and then amended.
+
+Note that you must set two of the parameters, `url` and `path`. The other parameters have default values.
+
 ### CreateAPIfromCFG
 
 ```
@@ -306,6 +325,41 @@ targetPath
 version
 tatinVars
 ```
+
+### CreateCopyRegistryParms
+```
+parms←CreateCopyRegistryParms y
+```
+
+Returns a namespace with parameters required by the [`CopyRegistry`](#) function.
+
+`y` can either be a namespace with some or all of the parameters that might be defined in a parameter namespace for CopyRegistry.
+
+
+Of the parameters two MUST be specified: 
+
+`path` 
+
+: Defined a local folder where the packages aregoing to be saved.
+
+`url`
+
+: The url of the Tatin Registry to be copied from.
+
+The folllowing parameters can be used to amend the behaviour of `CopyRegistry` according to your needs:
+
+* `full`
+* `force`
+* `last`
+* `group`
+* `list`
+* `dry`
+* `verbose`
+
+All these flags and options are documented as part of the `]CopyRegistry` user command, for details see there.
+
+There is one exception: by specifying `noDeps←1` one can prevent dependencies from being copied, and the documentation of the user command `]CopyRegistry` does not talk about this option. The sole reason for this is that this is only useful for test cases.
+
 
 ### CreateReInstallParms
 
@@ -619,7 +673,7 @@ r←{verbose} GetNoCachingFlag url
 mat←{parms} ListPackages uri
 ```
 
-Lists all packages of a given Registry except when the last package of a major version number is marked as deprecated --- see `ListDepreciated` for listing those.
+Lists all packages of a given Registry except when the last package of a major version number is marked as deprecated --- see `ListDeprecated` for listing those.
 
 `uri` must be one of:
 
@@ -629,18 +683,18 @@ Lists all packages of a given Registry except when the last package of a major v
 
 #### Right argument
 
-##### Install folder
+##### Folder
 
-In case an install folder was specified a two-column matrix is returned:
+In case a folder was specified a two-column matrix is returned:
 
 |[;1] |Carries the package ID
 |[;2] |Carries a star for principal packages
 
 ##### Registry
 
-In case a Registry was specified by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.
+In case a Registry was specified, by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.
 
-You may specify an incomplete package ID; then only matching packages are listed.
+You may specify a package ID without version number, or only part of the version number; then only matching packages are listed.
 
 You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.
 
@@ -1031,6 +1085,8 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
+
 
 
 

@@ -16,7 +16,13 @@
      client←∆PermanentConnections.⍎uri_
      msg←uri,' did not respond'
      {}client R.Send¨request      ⍝ Pipeline requests
-     r←client R.Receive¨request   ⍝ Wait for all
+     :Trap 347
+         r←client R.Receive¨request   ⍝ Wait for all
+     :Else
+         qdmx←⎕DMX
+         CloseConnections 1
+         qdmx.EM ⎕SIGNAL qdmx.EN
+     :EndTrap
  :Else
 
 ∆Go: ⍝ Also jumped to in case the server closed the connection.

@@ -15,7 +15,8 @@
  ('Not a folder: ',1⊃⎕NPARTS ¯1↓p.path)Assert TC.F.IsDir 1⊃⎕NPARTS ¯1↓p.path
  3 ⎕MKDIR ¯1↓p.path ⍝ Make sure the target exists
 ⍝ --- Handle flags
- p.(dry force full last)←arg.(dry force full last)
+ p.(dry force full last noDeps)←arg.(dry force full last noDeps)
+ p.verbose←TC.A.ToNum'0'arg.Switch'verbose'
  'Flags "full" and "last" are mutually exclusive'Assert~∧/p.(full last)
 ⍝ --- Handle options
  p.list←''arg.Switch'list'
@@ -48,5 +49,6 @@
      :EndIf
  :EndIf
  p.group←''arg.Switch'group'
+ p.url←TC.ReplaceRegistryAlias p.url
  r←TC.CopyRegistry p
 ⍝Done

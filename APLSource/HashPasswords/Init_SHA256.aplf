@@ -7,7 +7,11 @@
  :OrIf force
      OS←APLTreeUtils2.GetOperatingSystem ⍬
      :If 'Win'≡OS
-         ⎕USING←',System.Security.Cryptography.Algorithms',('W'=⊃⊃'.'⎕WG'APLVersion')/'.dll'
+         :If 1=1⊃2250⌶0     ⍝ .NET?!
+             ⎕USING←',System.Security.Cryptography.Algorithms'
+         :Else              ⍝ .NET Framework!
+             ⎕USING←',System.Security.Cryptography.Algorithms.dll'
+         :EndIf
          SHA256←⎕NEW System.Security.Cryptography.SHA256Managed
      :Else
          'SHA256'⎕NS''

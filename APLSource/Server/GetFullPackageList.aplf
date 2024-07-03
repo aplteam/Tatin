@@ -7,7 +7,7 @@
      :EndIf
      pkgs←G.RegistryPath Reg.RemoveDeprecatedPackages pkgs
      pkgs←pkgs[;1]
-     :If (⊂'last')∊request.QueryParameters[;1]
+     :If (⊂'latest')∊request.QueryParameters[;1]
          ⍝ Only the latest version of each package, ignoring the major version number
          pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveVersionNumber¨⍵}pkgs
      :ElseIf ~(⊂'full')∊request.QueryParameters[;1]

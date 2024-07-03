@@ -350,7 +350,7 @@ The folllowing parameters can be used to amend the behaviour of `CopyRegistry` a
 
 * `full`
 * `force`
-* `last`
+* `latest`
 * `group`
 * `list`
 * `dry`
@@ -1085,6 +1085,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

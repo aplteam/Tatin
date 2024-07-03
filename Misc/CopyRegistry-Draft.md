@@ -33,7 +33,7 @@ Note that dependencies are always copied as well in case the number of packages 
 ## Syntax
 
 ```
-]CopyRegistry [<url>] <path> -full -force -last -group= -list= -dry 
+]CopyRegistry [<url>] <path> -full -force -latest -group= -list= -dry 
 ```
 
 `URL`
@@ -66,25 +66,25 @@ Without specifying a Tatin server URL and any flags/options the command copies t
 If instead you want to copy just the highest major version of all packages from a company Registry:
 
    ```
-   ]CopyRegistry [my-company] /path/2/Registry/data -last
+   ]CopyRegistry [my-company] /path/2/Registry/data -latest
    ```
 
 #### The `-full` flag
 
 If you want to copy ALL versions of ALL packages, specify the `-full` flag. 
 
-Note that `-last` and `-full` are mutually exclusive.
+Note that `-latest` and `-full` are mutually exclusive.
 
 #### The `-force` flag
 
 By default packages that are already available in the target Registry are not copied. This can be changed with the `-force` flag.
 
 
-#### The `-last` option
+#### The `-latest` option
 
 When this option is specified, then only the hightest major version number of a package is copied.
 
-Note that `-last` and `-full` are mutually exclusive.
+Note that `-latest` and `-full` are mutually exclusive.
 
 
 #### The `-group=` option
@@ -151,11 +151,11 @@ This would not accept any requests while "SYNC" is carried out, and re-create al
 
 The following parameters might be specifid: 
 
-|Name   |Default|
-|-------|-------|
-|`full` |      0|
-|`force`|      0|
-|`last` |      0|
+|Name    |Default|
+|--------|-------|
+|`full`  |      0|
+|`force` |      0|
+|`latest`|      0|
 
 ### Authorization
 
@@ -168,5 +168,6 @@ However, it should be noted that the concept of a superuser is sooner or later v
 1. In a first step the user command and the API function will be implemented.
 
 2. The REST command "SYNC" and its associated enhancement of the authorization concept is only going to be implemented when really needed, and after Dyalog gives the okay.
+
 
 

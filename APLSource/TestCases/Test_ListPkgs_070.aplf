@@ -1,0 +1,17 @@
+ r←Test_ListPkgs_070(stopFlag batchFlag);⎕TRAP;mat;parms;buff
+⍝ List all packages with their dependencies
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.dependencies←1
+ parms.aggregate←1      ⍝ This will be ignored because "dependencies" takes preceence
+ mat←parms TC.ListPackages'[localhost]'
+
+ →T.PassesIf 1=2⊃⍴mat
+ buff←(↑mat[;1])[;1 2]     ⍝ Dependencies are indentet by two spaces
+ →T.PassesIf 1<+/buff∧.≠'  '
+ →T.PassesIf 1<+/buff∧.='  '
+
+ r←T._OK
+⍝Done

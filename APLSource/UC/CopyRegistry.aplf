@@ -15,9 +15,9 @@
  ('Not a folder: ',1⊃⎕NPARTS ¯1↓p.path)Assert TC.F.IsDir 1⊃⎕NPARTS ¯1↓p.path
  3 ⎕MKDIR ¯1↓p.path ⍝ Make sure the target exists
 ⍝ --- Handle flags
- p.(dry force full last noDeps)←arg.(dry force full last noDeps)
+ p.(dry force full latest noDeps)←arg.(dry force full latest noDeps)
  p.verbose←TC.A.ToNum'0'arg.Switch'verbose'
- 'Flags "full" and "last" are mutually exclusive'Assert~∧/p.(full last)
+ 'Flags "full" and "latest" are mutually exclusive'Assert~∧/p.(full latest)
 ⍝ --- Handle options
  p.list←''arg.Switch'list'
  :If 0<≢p.list

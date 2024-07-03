@@ -38,8 +38,11 @@
  :If 0=parms.⎕NC'os_lin'
      parms.os_lin←flag
  :EndIf
- list←'group' 'tags' 'aggregate' 'date' 'project_url' 'since' 'os_win' 'os_mac' 'os_lin' 'userCommand'
- msg←'Invalid left argument: only "group", "tags", "date", "project_url", "aggregate", "os_win", "os_mac" and "os_lin" are permitted'
+ :If 0=parms.⎕NC'dependencies'
+     parms.dependencies←0
+ :EndIf
+ list←'group' 'tags' 'aggregate' 'date' 'project_url' 'since' 'os_win' 'os_mac' 'os_lin' 'userCommand' 'dependencies'
+ msg←'Invalid left argument: only "group", "tags", "date", "project_url", "aggregate", "dependencies", "os_win", "os_mac" and "os_lin" are permitted'
  msg Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊list
  '"aggregate" must be a Boolean'Assert parms.aggregate∊0 1
  '"date" must be a Boolean'Assert parms.date∊0 1
@@ -47,6 +50,7 @@
  '"os_mac" must be a Boolean'Assert parms.os_mac∊0 1
  '"os_lin" must be a Boolean'Assert parms.os_lin∊0 1
  '"userCommand" must be a Boolean'Assert parms.userCommand∊0 1
+ '"dependencies" must be a Boolean'Assert parms.dependencies∊0 1
  parms.since←{0=1↑0⍴∊⍵:⍵ ⋄ (flag value)←⎕VFI ⍵ ⋄ flag:value ⋄ ⍵}parms.since
  :If ' '=1↑0⍴parms.since
      :Trap 0

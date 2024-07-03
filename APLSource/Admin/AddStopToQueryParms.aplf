@@ -1,0 +1,6 @@
+ request←AddStopToQueryParms request
+⍝ Use this to make the server stop while developing.
+⍝ On the server G.TestFlag must be set and 1 for this to work
+⍝ If that's the case the server will stop on OnRequest (read: very early!)
+ request.RequestTarget,←((1+'?'∊request.RequestTarget)⊃'?&'),'&stop=1'
+⍝Done

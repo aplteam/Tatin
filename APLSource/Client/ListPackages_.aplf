@@ -12,6 +12,7 @@
      parms.os_win←1
      parms.os_mac←1
      parms.os_lin←1
+     parms.dependencies←0
  :EndIf
  (host packageID)←Reg.SeparateUriAndPackageID uri_
  'Not a valid URI'Assert('/'+.=host)∊2 3
@@ -42,6 +43,9 @@
      request.RequestTarget,←'date=1&'
  :Else
      request.RequestTarget,←'aggregate=',(⍕parms.aggregate),'&'
+ :EndIf
+ :If parms.dependencies
+     request.RequestTarget,←'dependencies=1&'
  :EndIf
  :If parms.project_url
      request.RequestTarget,←'project_url=1&'

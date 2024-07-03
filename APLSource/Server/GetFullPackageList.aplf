@@ -1,6 +1,5 @@
- response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqueIDs;descriptionAndProjecturl;list5;pkgs;⎕TRAP;group;json;list
+ response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqueIDs;descriptionAndProjecturl;list5;pkgs;group;json;list
 ⍝ Return literally all packages. Parameters are ignored
- ⎕TRAP←0 'S'
  :If IsJsonRequest request.Headers
      pkgs←1 Reg.GetAllPackages G.RegistryPath
      :If 0<≢group←request R.GetQueryParameter'group'
@@ -21,7 +20,7 @@
      :EndIf
      pkgs,[1.5]←⊂''
      :If 0=1↑A.ToNum request R.GetQueryParameter'noDeps'
-         pkgs←AddDependencies pkgs
+         pkgs←G.RegistryPath Reg.AddDependencies pkgs
      :EndIf
      pkgs←pkgs[;1]
      json←Reg.JSON pkgs

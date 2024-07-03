@@ -36,6 +36,9 @@
      parms.os_win←(⊂'win')∊OSs
  :EndIf
  parms.project_url←Arg.project_url
+ :If parms.dependencies←Arg.Switch'dependencies'
+     parms.aggregate←0
+ :EndIf
  :Trap ErrNo
      r←⍪parms TC.ListPackages registry
  :Else
@@ -51,6 +54,9 @@
      :Else
          :If 0≡parms.date
              r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Project URL')
+             :If parms.dependencies
+                 r[1;1]←⊂(1⊃r[1;]),' with dependencies'
+             :EndIf
          :Else
              r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),'Group & Name' 'Published at' 'Project URL'
          :EndIf

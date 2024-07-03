@@ -1,8 +1,14 @@
- response←OnRequest request;logMsg
+ response←OnRequest request;logMsg;trapWas
 ⍝ Main handler for requests. Requests are first split by HTTP verb.
  :If '/ping'≡request.Path
      response←request R.Respond 200
  :Else
+     :If G.TestFlag∧(⊂'stop')∊request.QueryParameters[;1]    ⍝ For development only: allow a client to trigger a "stop vector"
+         ⎕SHADOW'⎕TRAP'
+         trapWas←⎕TRAP
+         ⎕TRAP←0 'S'
+         ∘∘∘  ⍝ The client want the server to stop
+     :EndIf
      :Hold 'App-Log'   ⍝ Used by `Logs.CheckLogFile` for blocking all requests when dealing with the APP log file (once a year)
          :If 0=G.INI.Get'Trap:Policy'
          :AndIf ~request.Connection.Server.Trap

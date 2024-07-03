@@ -95,11 +95,19 @@ Note that by design new versions always comprehend both the server and the clien
 
 You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the code is doing, and at the same time, any changes and additions would be added to the project by Link.
 
-Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed, Tatin would ask you whether you want to start the server automatically -- that is the server we are talking about, **not** https://test.tatin.dev
+Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed, Tatin would ask you whether you want to start the server automatically -- that is the server we are talking about, **not** https://test.tatin.dev.
 
-To achieve this execute the following steps:
+When the server is started as part of the tests it is NOT opened as a Cider project, and changes would not be tracked by Link. If you want that execute the following steps instead:
 
-1. Open the Tatin project with `]CiderProject`
+1. Open the Tatin project with `]Cider.OpenProject`
+
+1. Run the function `#.Tatin.TestCasesServer.RunTests`
+
+This will run the Tatin server required by the test cases but also track any changes.
+
+**This is dangerous!** --- see [Developing with two sessions, server and client](#) for details!
+
+`⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹`  
 
 2. Execute `#.Tatin.Admin.Initialize_Server`
 
@@ -122,6 +130,9 @@ The main handlers are:
   * `Handle_Delete`
 
 These will call the Tatin functions that perform the real actions.
+
+!> ### A word of warning
+=> Developing
 
 #### Error trapping
 
@@ -277,6 +288,7 @@ The text shown on the web page is defined in the document "Licensing.html" in th
 #### A "LICENSE" file
 
 By convention a file named "LICENSE" when placed in the root of the project will be copied automatically to the root of a package when build by `BuildPackage`. This convention is independent from the INI file.
+
 
 
 

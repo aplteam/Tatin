@@ -29,13 +29,14 @@
  parms←{0<⎕NC ⍵:⍎⍵ ⋄ ⎕NS''}'parms'
  parms←Reg.CheckParmsForListPackages parms
  :If '[*]'{⍺≡(≢⍺)↑⍵}uri
-     registries←∪{⍵[;1]}ListRegistries''
-     registries←(IsHTTP¨registries)/registries
+     registries←ListRegistries''
+     registries←({(⍵⍳⍵)=⍳≢⍵}registries[;2])⌿registries
+     registries←(IsHTTP¨registries[;2])⌿registries
      mat←(0,1++/parms.(date project_url aggregate))⍴''
-     :For registry :In registries
-         :If 0<≢buff←parms ListPackages registry,{⍵↓⍨⍵⍳']'}uri
-             mat⍪←(2⊃⍴mat)↑registry' ' ' '
-             mat⍪←(2⊃⍴mat)↑[2]' ',buff
+     :For registry :In registries[;1]
+         :If 0<≢buff←parms ListPackages'[',registry,']',{⍵↓⍨⍵⍳']'}uri
+             mat⍪←(2⊃⍴mat)↑('[',registry,']')' ' ' '
+             mat⍪←(2⊃⍴mat)↑[2]' ',¨buff
          :EndIf
      :EndFor
  :Else

@@ -1,0 +1,31 @@
+ r←Test_CopyReg_020(stopFlag batchFlag);⎕TRAP;parms;list1;list2;msg;rc
+⍝ Copy full Registry, then delete some stuff and sync
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←##.Client.CreateCopyRegistryParms ⍬
+ parms.path←(F.GetTempSubDir⊃⎕SI),'/'
+ parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
+ parms.verbose←1
+ list1←##.Client.CopyRegistry parms
+ →T.GoToTidyUp~1<≢∪##.Registry.GetGroupName¨list1
+
+ (rc msg)←↓⍉↑F.RmDirByForce¨parms.path∘,¨list1[3 6 7;1]
+ (1↓⊃,/';',¨msg)Assert rc∧.=0
+
+ F.DeleteFile¨F.ListFiles parms.path,(1⊃list1[12;]),'/'
+ (rc msg)←↓⍉↑F.RmDirByForce¨F.ListDirs parms.path,(1⊃list1[12;]),'/'
+ (1↓⊃,/';',¨msg)Assert rc∧.=0
+ Assert 0=≢⊃F.Dir parms.path,(1⊃list1[12;]),'/'
+
+ list2←##.Client.CopyRegistry parms
+ →T.GoToTidyUp 3≠+/list2[;2]≡¨⊂'Fetched'
+ →T.GoToTidyUp~∧/⎕NEXISTS¨parms.path∘,¨list1[3 6 7;1]
+ →T.GoToTidyUp 0≠≢⊃F.Dir parms.path,(1⊃list1[12;]),'/'  ⍝ That one remains unchanged because just the contents was deleted!
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce parms.path
+ msg Assert 0=rc
+⍝Done

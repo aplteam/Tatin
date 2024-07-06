@@ -1,0 +1,13 @@
+level ∆Help title;lc;res
+ '"level" (⍺) must be 1 or 2'##.Assert(⊂level)∊1 2
+ lc←⎕C title
+ :Select ⊃⍎'level_',(⍕level),'.⎕NC ''',lc,''''
+ :Case 2
+     11 ⎕SIGNAL⍨'"',lc,'" is already a variable in help.level_',⍕level
+ :Case ¯1
+     11 ⎕SIGNAL⍨'"',lc,'" is an invalid name'
+ :EndSelect
+ ⍎'level_',(⍕level),'.',lc,'←',(⍕level),' ##.Help ''',title,''''
+ res←⎕SE.Link.Add'level_',(⍕level),'.',lc
+ {⍵:.}~∨/'Added: '⍷res
+⍝Done

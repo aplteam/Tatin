@@ -24,6 +24,9 @@
      :EndIf
  :Else
      'You must specify a path'Assert 0≢path
+     :If ∨/'[myucmds]'⍷path
+         path←TC.GetMyUCMDsFolder'/',{⍵↓⍨⍵⍳']'}path
+     :EndIf
      ('Is not a folder: ',path)Assert TC.F.IsDir path
      :If 0=≢list←TC.F.ListFiles home,'Maintenance/*.aplf'
          r←'No maintenance files found in ',home

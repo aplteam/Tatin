@@ -1,0 +1,54 @@
+# Mainteance files for the Tatin client
+
+The folder Maintenance/ in the Tatin installation folder might or might not contain any 
+*.aplf files: functions.
+
+Note that this is for the Tatin client: Tatin Servers have their own mechanism for 
+modifying packages.
+
+## The idea
+
+When the user command:
+]Tatin.Maintenance /path/2/some-packages
+is invoked, then such functions are offered for being executed. 
+If you select one (or several or all), then these functions are executed.
+
+For that the user command searches recursively in what was specified as the argument for
+package config files. If it finds one, then it calls the maintenance functions one after
+the other, and feeds them with the package config data as right argument, expecting the 
+maintenance function to return this data, possibly modified.
+
+It then writes the data back, and also adds them to the ZIP file.
+
+Note that it does not keep track of whether a function was executed, and on which folders.
+That is left to you.
+
+## The name
+
+The name of a maintenance function always follow the same pattern:
+
+* First a date: when was the function introduced
+* Second a short description of what the function will do
+
+## Internal structure
+
+Internally any maintenance fuunction is supposed to explain in details what it will do, and 
+under which conditions.
+
+When the user command is invoked with the -show flag, then these comments are printed to ⎕SE.
+
+## Application
+
+This mechanism can be used to...
+
+* inject new properties into package config files
+* remove deprecated properties from package config files
+* rename properties in package config files
+
+There might be other applications for this, but this list certainly covers the vast majority 
+of cases.
+
+## When to use
+
+Release notes will tell you when a maintenance function is introduced, and when and why and
+what for to use it.

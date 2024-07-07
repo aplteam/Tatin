@@ -1,19 +1,24 @@
- r←Maintenance Arg;dry;path;home;⎕TRAP;show;filename;body;list;ind
- (dry show)←Arg.(dry show)
+ r←Maintenance Arg;dry;path;home;⎕TRAP;show;filename;body;list;ind;info
+ (dry show info)←Arg.(dry show info)
  path←Arg._1
  home←1⊃⎕NPARTS GetSourceFile
- :If show
+ :If info
+     r←''
+     'Could not find maintenece''s "README" file'Assert ⎕NEXISTS home,'Maintenance/README'
+     {{}(#.⎕NS'').(⎕ED⍠('ReadOnly' 1)&{'ed'}ed←⍵)}⊃⎕NGET(home,'Maintenance/README')1
+ :ElseIf show
      :If 0=≢list←TC.F.ListFiles home,'Maintenance/*.aplf'
          r←'There are no Tatin maintenance files'
      :Else
-         r←''
+         r←⊂(⎕PW-2)⍴'-'
+         r,←⊂'>>> Maintenance files in ',home
          :For filename :In list
              body←1↓⊃TC.F.NGET filename 1
-             r,←⊂'*** ',filename
+             r,←⊂(⎕PW-2)⍴'-'
+             r,←⊂'*** ',⊃,/1↓⎕NPARTS filename
              body←(';'≠⊃¨TC.A.DLB body)/body
              body←(+/∧\'⍝'=⊃¨body)↑body
              r,←2↓¨body
-             r,←⊂(⎕PW-2)⍴'-'
          :EndFor
          r←⍪r
      :EndIf

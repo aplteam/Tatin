@@ -15,7 +15,7 @@
                  r,←'Changed: ',filename,CR
              :EndIf
          :EndIf
-         pkgName←data2.(group,'-',name,'-',version)
+         pkgName←data2.(group,'-',name,'-',{⍵↑⍨¯1+⍵⍳'+'}version)
          zipFilename←path,'/',pkgName,'.zip'
          :If ⎕NEXISTS zipFilename
              zip←⎕NEW ##.ZipArchive(,⊂zipFilename)

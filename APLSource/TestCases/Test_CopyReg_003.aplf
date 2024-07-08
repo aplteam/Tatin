@@ -14,14 +14,14 @@
  parms.last←1
  parms.noDeps←1
  list←##.Client.CopyRegistry parms
- expected←'example-Boo-1.0.0' 'example-versions-2.0.0'
- →T.GoToTidyUp expected≢list
+ expected←'example-Boo-1.0.0' 'example-versions-0.1.0' 'example-versions-1.0.12-That-fix' 'example-versions-2.0.0'
+ →T.GoToTidyUp expected≢,list
 
  parms.last←0
  #.TEMP.MyPkgs←'aplteam-sevenzip'
  list2←##.Client.CopyRegistry parms
  expected←'aplteam-SevenZip-3' 'aplteam-SevenZip-4'
- →T.GoToTidyUp expected≢Reg.RemoveMinorAndPatch¨list2
+ →T.GoToTidyUp expected≢,Reg.RemoveMinorAndPatch¨list2
 
  tempDir←F.GetTempSubDir⊃⎕SI
  buff←'aplteam-APLTreeUtils' 'example-versions'
@@ -30,12 +30,14 @@
  parms.list←'file://',filename
  parms.last←1
  list3←##.Client.CopyRegistry parms
- →T.GoToTidyUp 2≠≢list3
+ →T.GoToTidyUp 5≠≢list3
 
  r←T._OK
 
 ∆TidyUp:
  #.⎕EX'TEMP'
+ (rc msg)←F.RmDirByForce parms.path
+ msg Assert rc=0
  :If 0<⎕NC'tempDir'
      {}F.RmDirByForce tempDir
  :EndIf

@@ -11,12 +11,11 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.110.0 from 2024-07-07
+## Version 0.110.0 from 2024-07-08
 
 * A maintenance file "2024-07-07-Inject-Exclude.aplf" was introduced. 
 
-It allows to add the new "exlude" property (introduced with version 0.109.0) to be introduced into all saved packages
-as an empty text vector.
+It allows to add the new "exclude" property (introduced with version 0.109.0) to be introduced into all saved packages as an empty text vector.
 
 You don't have to run this maintenance function on all your packages (Tatin deals with both a defined "exclude" as well
 as an absent "exclude") but it is better for future use when this is part of all packages.
@@ -218,6 +217,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

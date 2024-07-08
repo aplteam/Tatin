@@ -57,7 +57,6 @@ window.matchMedia("print").addEventListener("change", evt => {
 <li class="toc-entry toc-h3"><a href="#structure">2.1. Structure</a></li>
 <li class="toc-entry toc-h3"><a href="#version">2.2. Version</a></li>
 <li class="toc-entry toc-h3"><a href="#developing-with-a-running-server">2.3. Developing with a running server</a></li>
-<li class="toc-entry toc-h3"><a href="#developing-with-two-sessions-server-and-client">2.4. Developing with two sessions, server and client</a></li>
 </ul></li>
 <li class="toc-entry toc-h2"><a href="#misc">3. Misc</a>
 <ul>
@@ -156,25 +155,35 @@ window.matchMedia("print").addEventListener("change", evt => {
 <h3 data-id="Developing-with-a-running-server">2.3. Developing with a running server</h3>
 </a>
 </div>
-<p>You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the code is doing, and at the same time, any changes and additions would be added to the project by Link.</p>
+<p>You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the code is doing, and at the same time, any changes and additions would be tracked by Link.</p>
+<p>You might even want to run the server in one workspace as an opened Cider project and at the same time run the test cases in another workspace, also as an opened Cider project. Of course you need to be very careful because otherwise you might loose code.</p>
 <p>Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed, Tatin would ask you whether you want to start the server automatically – that is the server we are talking about, <strong>not</strong> https://test.tatin.dev.</p>
-<p>When the server is started as part of the tests it is NOT opened as a Cider project, and changes would not be tracked by Link. If you want that execute the following steps instead:</p>
+<p>However, when the server is started as part of the tests it is NOT opened as a Cider project, and changes would not be tracked by Link. If you want that then execute the following steps instead:</p>
 <ol start="1">
-<li>Open the Tatin project with <code>]Cider.OpenProject</code></li>
+<li>Open the Tatin project with <code>]Cider.OpenProject</code> with the <code>watch</code> parameter set to “both”.</li>
 <li>Run the function <code>#.Tatin.TestCasesServer.RunTests</code></li>
 </ol>
-<p>This will run the Tatin server required by the test cases but also track any changes.</p>
-<p><strong>This is dangerous!</strong> — see <a href="#developing-with-two-sessions-server-and-client" class="bookmark_link">Developing with two sessions, server and client</a> for details!</p>
-<p><code>⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹</code></p>
-<ol start="2">
-<li>Execute <code>#.Tatin.Admin.Initialize_Server</code></li>
-<li>Change the current directory with these statements:
-<ol start="1">
-<li><code>#.Tatin.CiderConfig.HOME,'/TestServer/Server'</code></li>
-<li>Execute <code>]cd</code> with the output of the first statement as input</li>
-</ol></li>
-<li>Execute <code>#.Tatin.Server.Run 1</code></li>
-</ol>
+<div class="collapsible">
+<details>
+<summary>
+<h3>A word of warning</h3>
+</summary>
+<div class="collapsible-content">
+<hr>
+<p>Opening Tatin as a project in two different workspaces, and then make changes to the code in both of them is of course dangerous!</p>
+<p>On Windows or when .NET is available you can limit the danger by doing this:</p>
+<ul>
+<li>Make sure that Link's <code>Notify</code> parameter is set to 1. That makes Link print to the session whenever it updates a file or the workspace, so you get some feedback on what is happening. Make sure you watch this!</li>
+<li>Make sure that you set Link's <code>watch</code> parameter to “both” in both workspaces.
+<p>That ensure that when you change an APL object in on workspace, it will not only be written do disk but Link will also bring that change into the other workspace.</p></li>
+</ul>
+<p>This is particularly important when you change code in the <code>Tatin.Registry</code> namespace, because that code is shared between the client and the server.</p>
+<p>Taking these measure is important because the mechanism used by Dyalog works most of the time but not always (it's a .NET-problem!), so it is important to watch out for such problems.</p>
+<p>On non-Windows platforms with no .NET available, <code>watch=both</code> is not an option at the time of writing (July 2024), so that is particularly dangerous.</p>
+</div>
+</details>
+</div>
+<p>If you just want to run the test server, close the project before executing <code>#.Tatin.TestCasesServer.RunTests</code>.</p>
 <p>The main handlers are:</p>
 <ul>
 <li><code>#.Tatin.Server.OnRequest</code></li>
@@ -187,17 +196,6 @@ window.matchMedia("print").addEventListener("change", evt => {
 <li><code>Handle_Delete</code></li>
 </ul>
 <p>These will call the Tatin functions that perform the real actions.</p>
-<div class="collapsible">
-<details>
-<summary>
-<h3>A word of warning</h3>
-</summary>
-<div class="collapsible-content">
-<hr>
-<p>Developing</p>
-</div>
-</details>
-</div>
 <div class="h_tag">
 <a href="#error-trapping" id="error-trapping" class="autoheader_anchor">
 <h4 data-id="Error-trapping">2.3.1. Error trapping</h4>
@@ -208,23 +206,6 @@ window.matchMedia("print").addEventListener("change", evt => {
 <p><code>⎕TRAP←0 'S'  ⍝TODO⍝</code></p>
 <p>Also, make <code>⎕TRAP</code> a local variable in <code>OnRequest</code>.</p>
 <p><code>⍝TODO⍝</code> is a reminder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.</p>
-<div class="h_tag">
-<a href="#developing-with-two-sessions-server-and-client" id="developing-with-two-sessions-server-and-client" class="autoheader_anchor">
-<h3 data-id="Developing-with-two-sessions-server-and-client">2.4. Developing with two sessions, server and client</h3>
-</a>
-</div>
-<p>When the test cases are executed, the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.</p>
-<p>If the user answers this with a “yes” an instance of the server is started.</p>
-<p>You must know exactly what you are doing, otherwise you might loose code.</p>
-<div class="leanpub">
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="[title]" width="20px" height="20px" viewBox="0 0 20 20" preserveAspectRatio="xMidYMid meet"><title>Information</title><g transform="translate(0,20) scale(0.1,-0.1)" fill="#000000" stroke="none"><path d="M0 100 l0 -100 105 0 105 0 0 100 0 100 -105 0 -105 0 0 -100z m190 0 l0 -80 -85 0 -85 0 0 80 0 80 85 0 85 0 0 -80z"/><path d="M90 140 c0 -5 7 -10 15 -10 8 0 15 5 15 10 0 6 -7 10 -15 10 -8 0 -15 -4 -15 -10z"/> <path d="M90 80 c0 -20 5 -30 15 -30 10 0 15 10 15 30 0 20 -5 30 -15 30 -10 0 -15 -10 -15 -30z"/></g></svg>
-<div>
-<h3><code>Tatin.Registry</code>: Danger zone</h3>
-<p>Since you will change functions in <code>#.Tatin.Client</code> only on the client side, and functions in <code>#.Tatin.Server</code> only on the server side you will be fine with those changes.</p>
-<p>Changing stuff in <code>#.Tatin.Registry</code> is dangerous however, because this namespace is shared between client and server, so you need to be careful: if you change the same function in <code>Registry</code> on both the client and the server, then the last change wins the day, while all other changes are lost.</p>
-</div>
-</div>
-
 <div class="h_tag">
 <a href="#misc" id="misc" class="autoheader_anchor">
 <h2 data-id="Misc">3. Misc</h2>
@@ -256,7 +237,8 @@ window.matchMedia("print").addEventListener("change", evt => {
 <p>This can be achieved by executing:</p>
 <pre tabindex="0"><code>#.Tatin.TestCases.RunTests</code></pre>
 <p>This prepares the test framework and then executes all tests in debug mode, meaning that in case something goes wrong, the framework will stop and you can investigate right away,</p>
-<p>You will be asked whether you want to copy the test data to a temp folder in preperation, and also whether you want to start a test server. Usually you will answer both questions with “yes”.</p>
+<p>You will be asked whether you want to copy the test data to a temp folder in preperation.</p>
+<p>On Windows you will also be asked whether you want to start a test server. Usually you will answer both questions with “yes”. On Non-Windows platforms you will be asked to start the server yourself before carrying on.</p>
 <div class="h_tag">
 <a href="#execute-particular-tests-or-group-of-tests" id="execute-particular-tests-or-group-of-tests" class="autoheader_anchor">
 <h4 data-id="Execute-particular-tests-or-group-of-tests">3.2.2. Execute particular tests or group(s) of tests</h4>

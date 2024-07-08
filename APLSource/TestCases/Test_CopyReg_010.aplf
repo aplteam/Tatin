@@ -8,22 +8,19 @@
  parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
  parms.noDeps←1
  parms.verbose←1
+ parms.full←1
  list1←##.Client.CopyRegistry parms
  →T.GoToTidyUp~1<≢∪##.Registry.GetGroupName¨list1
+
  parms2←##.Registry.CheckParmsForListPackages ⍬
  parms2.aggregate←0
- list1_a←,parms2 ##.Client.ListPackages parms.url
- →T.GoToTidyUp~</≢¨list1 list1_a
-
- parms.full←1
- list2←##.Client.CopyRegistry parms
- →T.GoToTidyUp~</≢¨list1 list2
-
  parms.full←0
+ list1_a←,parms2 ##.Client.ListPackages parms.url
+ →T.GoToTidyUp≠/≢¨list1 list1_a
+
  parms.last←1
  list3←##.Client.CopyRegistry parms
  →T.GoToTidyUp~>/≢¨list1 list3
- →T.GoToTidyUp≠/{≢¨⍵(∪⍵)}##.Registry.RemoveVersionNumber¨##.Registry.RemoveMinorAndPatch¨list3[;1]
 
  {}F.RmDirByForce parms.path,'aplteam-RideClient-0.7.1'
 

@@ -93,30 +93,36 @@ Note that by design new versions always comprehend both the server and the clien
 
 ### Developing with a running server
 
-You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the code is doing, and at the same time, any changes and additions would be added to the project by Link.
+You might want to run a server while Tatin is an open Cider project. The running server allows you to investigate what the code is doing, and at the same time, any changes and additions would be tracked by Link.
+
+You might even want to run the server in one workspace as an opened Cider project and at the same time run the test cases in another workspace, also as an opened Cider project. Of course you need to be very careful because otherwise you might loose code.
 
 Let's assume that you want to run the Tatin server that is part of the Tatin project. When the Tatin test cases are executed, Tatin would ask you whether you want to start the server automatically -- that is the server we are talking about, **not** https://test.tatin.dev.
 
-When the server is started as part of the tests it is NOT opened as a Cider project, and changes would not be tracked by Link. If you want that execute the following steps instead:
+However, when the server is started as part of the tests it is NOT opened as a Cider project, and changes would not be tracked by Link. If you want that then execute the following steps instead:
 
-1. Open the Tatin project with `]Cider.OpenProject`
+1. Open the Tatin project with `]Cider.OpenProject` with the `watch` parameter set to "both".
 
 1. Run the function `#.Tatin.TestCasesServer.RunTests`
 
-This will run the Tatin server required by the test cases but also track any changes.
+!> ### A word of warning
+=> Opening Tatin as a project in two different workspaces, and then make changes to the code in both of them is of course dangerous!
+=>
+=> On Windows or when .NET is available you can limit the danger by doing this:
+=> 
+=> * Make sure that Link's `Notify` parameter is set to 1. That makes Link print to the session whenever it updates a file or the workspace, so you get some feedback on what is happening. Make sure you watch this!
+=> 
+=> * Make sure that you set Link's `watch` parameter to "both" in both workspaces. 
+=>
+=>   That ensure that when you change an APL object in on workspace, it will not only be written do disk but Link will also bring that change into the other workspace.
+=> 
+=> This is particularly important when you change code in the `Tatin.Registry` namespace, because that code is shared between the client and the server.
+=> 
+=> Taking these measure is important because the mechanism used by Dyalog works most of the time but not always (it's a .NET-problem!), so it is important to watch out for such problems.
+=> 
+=> On non-Windows platforms with no .NET available, `watch=both` is not an option at the time of writing (July 2024), so that is particularly dangerous.
 
-**This is dangerous!** --- see [Developing with two sessions, server and client](#) for details!
-
-`⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹⌹`  
-
-2. Execute `#.Tatin.Admin.Initialize_Server`
-
-3. Change the current directory with these statements:
-
-   1. `#.Tatin.CiderConfig.HOME,'/TestServer/Server'`
-   2. Execute `]cd` with the output of the first statement as input
-
-4. Execute `#.Tatin.Server.Run 1`
+If you just want to run the test server, close the project before executing `#.Tatin.TestCasesServer.RunTests`.
 
 The main handlers are:
 
@@ -131,9 +137,6 @@ The main handlers are:
 
 These will call the Tatin functions that perform the real actions.
 
-!> ### A word of warning
-=> Developing
-
 #### Error trapping
 
 Keep in mind that error trapping is active, so when you change a function and inject a typo this will trigger error trapping  once your code gets executed.
@@ -146,19 +149,6 @@ Also, make `⎕TRAP` a local variable in `OnRequest`.
 
 `⍝TODO⍝` is a reminder that won't go unnoticed: there is a test case that will detect these markers and report them, so it's pretty hard to forget them.
 
-
-### Developing with two sessions, server and client
-
-When the test cases are executed, the user is asked whether she wants the Tatin server required by the Tatin test cases to be started automatically.
-
-If the user answers this with a "yes" an instance of the server is started.
-
-You must know exactly what you are doing, otherwise you might loose code. 
-
-I> ### `Tatin.Registry`: Danger zone
-I> Since you will change functions in `#.Tatin.Client` only on the client side, and functions in `#.Tatin.Server` only on the server side you will be fine with those changes.
-I>
-I> Changing stuff in `#.Tatin.Registry` is dangerous however, because this namespace is shared between client and server, so you need to be careful: if you change the same function in `Registry` on both the client and the server, then the last change wins the day, while all other changes are lost.
 
 ## Misc
 
@@ -195,7 +185,9 @@ This can be achieved by executing:
 
 This prepares the test framework and then executes all tests in debug mode, meaning that in case something goes wrong, the framework will stop and you can investigate right away,
 
-You will be asked whether you want to copy the test data to a temp folder in preperation, and also whether you want to start a test server. Usually you will answer both questions with "yes".
+You will be asked whether you want to copy the test data to a temp folder in preperation.
+
+On Windows you will also be asked whether you want to start a test server. Usually you will answer both questions with "yes". On Non-Windows platforms you will be asked to start the server yourself before carrying on.
 
 #### Execute particular tests or group(s) of tests
 
@@ -288,6 +280,7 @@ The text shown on the web page is defined in the document "Licensing.html" in th
 #### A "LICENSE" file
 
 By convention a file named "LICENSE" when placed in the root of the project will be copied automatically to the root of a package when build by `BuildPackage`. This convention is independent from the INI file.
+
 
 
 

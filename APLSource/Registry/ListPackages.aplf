@@ -1,6 +1,7 @@
  r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;noOfHyphens;noOfDots;uniqueIDs;list2;since;flag;bool;OSlist
 ⍝ Documentation see ##.Client.ListPackages
  'No registry specified'Assert 0<≢uri
+ parms←CheckParmsForListPackages parms
  r←(0,(1+parms.date))⍴⍬
  (registryPath packageID)←SeparateUriAndPackageID uri
  registryPath←F.ExpandPath registryPath
@@ -94,6 +95,6 @@
  :EndIf
  :If 0<≢r
  :AndIf parms.dependencies
-   r←registryPath AddDependencies r
+     r←registryPath AddDependencies r
  :EndIf
 ⍝Done

@@ -22,6 +22,7 @@
      ('File not found: ',filename)Assert F.IsFile filename
      p.list←⊃⎕NGET filename 1
  :EndIf
+ p.list←p.list~¨' '
  :If 0<≢p.list
      :If Reg.IsValidPackageID_WithoutVersionNo 1⊃p.list
          '"list" must specify just group and package name but no version number'Assert∧/Reg.IsValidPackageID_WithoutVersionNo¨p.list

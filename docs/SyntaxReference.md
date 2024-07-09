@@ -179,7 +179,7 @@ By default the latest version of any major version of all packages that are not 
 
 Packages that are already saved in the target folder are not requested again, but check the `-force` flag.
 
-`CopyRegistry` was introduced with version 0.110.0, therefore you cannot use it on Tatin servers that run earlier version than that.
+`CopyRegistry` was introduced with version 0.110.0, therefore you cannot use it on Tatin servers that run earlier versions than that.
 
 The function takes one mandatory argument: a parameter namespace typically created by calling [CreateCopyRegistryParms](#), and then amended.
 
@@ -1085,6 +1085,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

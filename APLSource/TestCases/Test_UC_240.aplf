@@ -1,0 +1,32 @@
+ r←Test_UC_240(stopFlag batchFlag);⎕TRAP;list1;list2;msg;rc;stop;tempDir
+⍝ Copy full Registry, then delete some stuff and sync
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir⊃⎕SI
+ stop←0
+ (rc msg list1)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1'
+ msg Assert 0=rc
+ →T.GoToTidyUp~1<≢∪##.Registry.GetGroupName¨list1[;1]
+
+ (rc msg)←↓⍉↑F.RmDirByForce¨(⊂tempDir,'/'),¨list1[3 6 7;1]
+ (1↓⊃,/';',¨msg)Assert rc∧.=0
+
+ F.DeleteFile¨F.ListFiles tempDir,'/',(1⊃list1[12;]),'/'
+ (rc msg)←↓⍉↑F.RmDirByForce¨F.ListDirs tempDir,'/',(1⊃list1[12;]),'/'
+ (1↓⊃,/';',¨msg)Assert rc∧.=0
+ Assert 0=≢⊃F.Dir tempDir,'/',(1⊃list1[12;]),'/'
+
+ (rc msg list2)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1'
+ msg Assert 0=rc
+
+ →T.GoToTidyUp 3≠+/list2[;2]≡¨⊂'Fetched'
+ →T.GoToTidyUp~∧/⎕NEXISTS¨(⊂tempDir,'/'),¨list1[3 6 7;1]
+ →T.GoToTidyUp 0≠≢⊃F.Dir tempDir,'/',(1⊃list1[12;]),'/'  ⍝ That one remains unchanged because just the contents was deleted!
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert 0=rc
+⍝Done

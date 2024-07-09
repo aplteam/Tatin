@@ -1,0 +1,23 @@
+ r←Test_UC_241(stopFlag batchFlag);⎕TRAP;list1;list2;msg;rc;stop;tempDir
+⍝ Copy a particular group from a Registry, first without dependencies, then with dependencies
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir⊃⎕SI
+ stop←0
+ (rc msg list1)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1 -group=example -dependencies=0'
+ msg Assert 0=rc
+ →T.GoToTidyUp 1≠≢∪##.Registry.GetGroupName¨list1[;1]
+
+ (rc msg list2)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1'
+ msg Assert 0=rc
+
+ →T.GoToTidyUp~</≢¨list1 list2
+ →T.GoToTidyUp~1<≢∪##.Registry.GetGroupName¨list2[;1]
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert 0=rc
+⍝Done

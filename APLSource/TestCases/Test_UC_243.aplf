@@ -1,0 +1,25 @@
+ r←Test_UC_243(stopFlag batchFlag);⎕TRAP;msg;rc;stop;tempDir;list1;list2
+⍝ Copy some specific packages defined via a variable
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir⊃⎕SI
+ #.⎕SHADOW'TEMP'
+ 'TEMP'#.⎕NS''
+ #.TEMP.ThesePkgs1←'aplteam-OS,aplteam-rideclient'
+ #.TEMP.ThesePkgs2←'aplteam-OS' 'aplteam-rideclient'
+ stop←0
+ (rc msg list1)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1 -list=#.TEMP.ThesePkgs1 -dependencies=0 -latest'
+ msg Assert 0=rc
+ →T.GoToTidyUp 2≠≢list1
+
+ (rc msg list2)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1 -list=#.TEMP.ThesePkgs2 -dependencies=0 -latest'
+ msg Assert 0=rc
+ →T.GoToTidyUp 2≠≢list2
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert 0=rc
+⍝Done

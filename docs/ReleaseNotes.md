@@ -11,7 +11,7 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.110.0 from 2024-07-08
+## Version 0.110.0 from 2024-07-09
 
 * A maintenance file "2024-07-07-Inject-Exclude.aplf" was introduced. 
 

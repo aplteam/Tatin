@@ -6,7 +6,7 @@
  parms←##.Client.CreateCopyRegistryParms ⍬
  parms.path←(F.GetTempSubDir⊃⎕SI),'/'
  parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
- parms.noDeps←1
+ parms.dependencies←0
  parms.dry←1
  list1←##.Client.CopyRegistry parms
  →T.PassesIf 0<≢list1
@@ -17,7 +17,7 @@
  →T.PassesIf>/≢¨list1 list2
  groups←Reg.GetGroupFromPackageID¨list2
  →T.PassesIf 1<≢groups
- →T.PassesIf'example'≡∊∪groups
+ →T.PassesIf'example'≡∊∪,groups
 
  parms.group←'DoesNotExist'
  list3←##.Client.CopyRegistry parms

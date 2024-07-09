@@ -1,0 +1,19 @@
+ r←Test_UC_244(stopFlag batchFlag);⎕TRAP;msg;rc;stop;tempDir;filename;list
+⍝ Copy some specific packages defined via a file
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir⊃⎕SI
+ filename←tempDir,'/These Pkgs.txt'
+ (⊂'aplteam-OS' 'aplteam-rideclient')⎕NPUT filename 1
+ stop←0
+ (rc msg list)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1 -list=file://"',filename,'" -dependencies=0 -latest'
+ msg Assert 0=rc
+ →T.GoToTidyUp 2≠≢list
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert 0=rc
+⍝Done

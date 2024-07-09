@@ -19,7 +19,8 @@
          pkgs←list ReducePkgsList pkgs
      :EndIf
      pkgs,[1.5]←⊂''
-     :If 0=1↑A.ToNum request R.GetQueryParameter'noDeps'
+     :If 0=≢request R.GetQueryParameter'dependencies'
+     :OrIf 1=1↑A.ToNum request R.GetQueryParameter'dependencies'
          pkgs←G.RegistryPath Reg.AddDependencies pkgs
      :EndIf
      pkgs←pkgs[;1]

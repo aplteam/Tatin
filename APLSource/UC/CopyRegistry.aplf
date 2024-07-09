@@ -4,19 +4,24 @@
  :If TC.IsHTTP arg._1
  :OrIf ']['≡2↑¯1⌽arg._1
      p.url←arg._1
-     'Not specified: path to target Registry'Assert 0≢arg._2
+     :If 0=arg.dry
+         'Not specified: path to target Registry'Assert 0≢arg._2
+     :EndIf
      p.path←arg._2
  :Else
      p.url←'[tatin]' ⍝ The default
      'Not specified: path to target Registry'Assert 0≢arg._1
      p.path←arg._1
  :EndIf
- p.path←TC.F.AddTrailingSep p.path
- ('Not a folder: ',1⊃⎕NPARTS ¯1↓p.path)Assert TC.F.IsDir 1⊃⎕NPARTS ¯1↓p.path
- 3 ⎕MKDIR ¯1↓p.path ⍝ Make sure the target exists
+ :If 0=arg.dry
+     p.path←TC.F.AddTrailingSep p.path
+     ('Not a folder: ',1⊃⎕NPARTS ¯1↓p.path)Assert TC.F.IsDir 1⊃⎕NPARTS ¯1↓p.path
+     3 ⎕MKDIR ¯1↓p.path ⍝ Make sure the target exists
+ :EndIf
 ⍝ --- Handle flags
- p.(dry force full latest noDeps)←arg.(dry force full latest noDeps)
+ p.(dry force full latest dependencies)←arg.(dry force full latest dependencies)
  p.verbose←TC.A.ToNum'0'arg.Switch'verbose'
+ p.dependencies←TC.A.ToNum'1'arg.Switch'dependencies'
  'Flags "full" and "latest" are mutually exclusive'Assert~∧/p.(full latest)
 ⍝ --- Handle options
  p.list←''arg.Switch'list'
@@ -40,6 +45,9 @@
              0 Assert⍨'Evaluating "',p.list,'" caused a ',qdmx.EM
          :EndTrap
          :If 0<≢p.list
+             :If 1=≡,p.list
+                 p.list←','(≠⊆⊢)p.list
+             :EndIf
              :If 1∊b←~(TC.Reg.IsValidPackageID_WithMajorNo¨p.list)∨TC.Reg.IsValidPackageID_WithoutVersionNo¨p.list
                  0 Assert⍨'Invalid entries found on "list": ',⊃{⍺,', ',⍵}/b/p.list
              :EndIf

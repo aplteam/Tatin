@@ -1,0 +1,12 @@
+ r←Test_UC_245(stopFlag batchFlag);⎕TRAP;msg;rc;stop;list
+⍝ Copy some specific packages defined via a file
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ stop←0
+ (rc msg list)←stop ∆UCMD'CopyRegistry [localhost] -verbose=1 -full -dry'
+ msg Assert 0=rc
+ →T.PassesIf 0<≢list
+
+ r←T._OK
+⍝Done

@@ -1,10 +1,16 @@
- response←request ReturnDependencyFiles packageIDs;json;data;html;qdmx;packageID;filename
+ response←request ReturnDependencyFiles packageIDs;json;data;html;qdmx;packageID;filename;b
 ⍝ Returns config files or ⍬ for every packageID
  :Trap Reg.ErrorNo
      :If IsJsonRequest request.Headers
-         json←ReturnDependencyFiles_ packageIDs
-         response←R.NewResponse request
-         response.Content←json
+         :If 0∊b←F.IsDir G.RegistryPath∘,¨⊆packageIDs
+             response←R.NewResponse request
+             response←request Respond 404 0
+             response.Content←'Not found: ',⊃{⍺,',',⍵}/(~b)/⊆packageIDs
+         :Else
+             json←ReturnDependencyFiles_ packageIDs
+             response←R.NewResponse request
+             response.Content←json
+         :EndIf
      :Else
          packageID←packageIDs               ⍝ For HTML it's a single one for sure
          filename←G.RegistryPath,packageID,'/',Reg.DependenciesFilename

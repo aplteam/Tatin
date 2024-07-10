@@ -1,16 +1,51 @@
- r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag;isUCMD;makeHomeRelative
- installFolder←Arg._1
+ r←LoadDependencies Arg;installFolder;f1;f2;targetSpace;saveIn;overwriteFlag;isUCMD;makeHomeRelative;projects;ind;projectName;projectFolder;projCfg;installFolders;buff
+ installFolder←{0≡⍵:'' ⋄ ⍵}Arg._1
+ targetSpace←{0≡⍵:'' ⋄ ⍵}Arg._2
  isUCMD←'[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
- :If 0≡Arg._2
-     :If isUCMD
-         targetSpace←'⎕SE'
+ :If 0=≢installFolder,targetSpace
+     'No folder specified, and Cider is not available'Assert 0<⎕SE.⎕NC'Cider'
+     projects←⎕SE.Cider.ListOpenProjects 0
+     'No folder specified, and there are not open Cider projects'Assert 0<≢projects
+     :If 1=≢projects
+         (projectName projectFolder)←projects[1;]
      :Else
-         targetSpace←CalledFrom ⎕NSI
+         ind←⊃'SelectProjectForLoadDependencies@Select project to load dependencies from:'##.CommTools.Select projects[;1]
+         :If 0=≢ind
+             r←'Cancelled by user' ⋄ →0
+         :EndIf
+         (projectName projectFolder)←projects[ind;]
+     :EndIf
+     projCfg←⎕SE.Cider.##.Get_JSON5 projectFolder,'/cider.config'
+     installFolders←''
+     :If 0<⎕NC'projCfg.CIDER.dependencies.tatin'
+         installFolders,←{0=≢⍵:⍵ ⋄ ⊂⍵}projCfg.CIDER.dependencies.tatin
+     :EndIf
+     :If 0<⎕NC'projCfg.CIDER.dependencies_dev.tatin'
+         installFolders,←{0=≢⍵:⍵ ⋄ ⊂⍵}projCfg.CIDER.dependencies_dev.tatin
+     :EndIf
+     ('<',projectName,'> does not have any packages installed')Assert 0<≢installFolders
+     :If 1=≢installFolders
+         projCfg.CIDER.(parent,'.',projectSpace),'.',
+     :Else
+         ind←⊃'SelectLoadFolderForLoadDependencies@Select folder to load dependencies from:'##.CommTools.Select(⊂projectFolder,'/'),¨({'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨installFolders),¨'/'
+         :If 0=≢ind
+             r←'Cancelled by user' ⋄ →0
+         :EndIf
+         buff←{'='∊⍵:'='(≠⊆⊢)⍵ ⋄ ⍵''}ind⊃installFolders
+         installFolder←projectFolder,'/',1⊃buff
+         targetSpace←projCfg.CIDER.(parent,'.',projectSpace),{0=≢⍵:⍵ ⋄ '.',⍵},2⊃buff
      :EndIf
  :Else
-     targetSpace←,Arg._2
-     :If ~(⊃targetSpace)∊'⎕#'
-         targetSpace←(CalledFrom ⎕NSI),'.',targetSpace
+     :If 0=≢targetSpace
+         :If isUCMD
+             targetSpace←'⎕SE'
+         :Else
+             targetSpace←CalledFrom ⎕NSI
+         :EndIf
+     :Else
+         :If ~(⊃targetSpace)∊'⎕#'
+             targetSpace←(CalledFrom ⎕NSI),'.',targetSpace
+         :EndIf
      :EndIf
  :EndIf
  :If isUCMD

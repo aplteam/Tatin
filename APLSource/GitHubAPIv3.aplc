@@ -1,5 +1,5 @@
 :Class GitHubAPIv3
-⍝ This class offers methods that allows one to communicate with GitHub by using GitHub's REST API from Dyalog APL.
+⍝ This class offers methods that allow one to communicate with GitHub by using the GitHub REST API from Dyalog APL.
 ⍝ Note that this is version 3 of the GitHub API; Later versions do **not** use REST.\\
 ⍝ Most methods of this class become available only by instantiating the class. `⎕NEW` requires an owner as argument.\\
 ⍝ However, there are also a few shared methods beyond `Version` and `History` available.\\
@@ -10,11 +10,14 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHubAPIv3' '1.2.0' '2024-04-28'
+      r←'GitHubAPIv3' '1.2.1' '2024-05-28'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.2.1
+    ⍝   * Bug fixed
+    ⍝     `GetAllIssues` crashed when there were no issues to report 
     ⍝ * 1.2.0
     ⍝   * Instances of GitHubAPIv3 now have a useful display format: for a user "foo" it shows GitHubAPIv3[foo]
     ⍝   * The name of the function `GetPrinciple` was changed to `GetPrincipal`
@@ -137,17 +140,20 @@
       :Access Public Instance
     ⍝ Returns all issues for a given repository but no pull requests by default.\\
     ⍝ In GitHub, every pull request is an issue, but not all issues are pull requests.
-    ⍝ You can enforce the addition of Pull Requests by passing a 1 as left argument.
+    ⍝ You can enforce the addition of Pull Requests by passing a 1 as left argument.\\
+    ⍝ In case there are no issues an empty vector is returned.
       addPullRequests←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'addPullRequests'
       gitPath←'https://api.github.com/repos/',(_owner),'/',repoName,'/issues'
       ns←GetJson gitPath
-      :If ~addPullRequests
-          ns←(0=⊃¨ns.⎕NC⊂'pull_request')/ns
+      :If 0<≢ns
+          :If ~addPullRequests
+              ns←(0=⊃¨ns.⎕NC⊂'pull_request')/ns
+          :EndIf
+          ns.⎕DF(repoName,' issue ')∘,¨(⍕¨ns.number)
+          ns.⎕FX⊂⎕CR'∆List'
+          ns.⎕FX⊂'r←∆Details instance' 'r←∆List' ' :If 0<≢instance' 'r(instance.GetPrincipal)←''assignees'' ''login''' 'r(instance.GetPrincipal)←''labels'' ''name''' ':EndIf'
+          ns.⎕FX⊂'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
       :EndIf
-      ns.⎕DF(repoName,' issue ')∘,¨(⍕¨ns.number)
-      ns.⎕FX⊂⎕CR'∆List'
-      ns.⎕FX⊂'r←∆Details instance' 'r←∆List' ' :If 0<≢instance' 'r(instance.GetPrincipal)←''assignees'' ''login''' 'r(instance.GetPrincipal)←''labels'' ''name''' ':EndIf'
-      ns.⎕FX⊂'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
     ∇
 
     ∇ ns←GetIssue(repoName number);gitPath

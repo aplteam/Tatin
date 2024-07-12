@@ -1,14 +1,15 @@
- response←EditGroupHomepage request;html;row;groupName;filename;folder;parms;data
- groupName←request R.GetQueryParameter'name'
- response←R.NewResponse request
- :If request.Path≡'/',GetVersion_REST'group-homepage-edit'
-     data←{⍵[;2]}Reg.GetGroupData G.RegistryPath groupName
+ response←EditGroupHomepage request;html;row;groupName;folder;parms;data
+ :If 0=≢groupName←request R.GetQueryParameter'name'
+     response←request RespondWithHTML 400 'Invalid Request: no group name specified'
  :Else
-     data←'' ''
+     response←R.NewResponse request
+     :If request.Path≡'/',GetVersion_REST'group-homepage-edit'
+     :AndIf 0=≢data←{⍵[;2]}Reg.GetGroupData G.RegistryPath groupName
+         data←'' ''
+     :EndIf
+     folder←G.HTDOCS,'../Groups/'
+     'Create!'F.CheckPath folder
+     html←data EditGroupHomepage_ groupName
+     response←request ReturnHTML html
  :EndIf
- folder←G.HTDOCS,'../Groups/'
- 'Create!'F.CheckPath folder
- filename←folder,groupName,'.dcf'
- html←data EditGroupHomepage_ groupName
- response←request ReturnHTML html
 ⍝Done

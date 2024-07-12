@@ -1,21 +1,25 @@
- filename←{filename}GetPackageViaHTTP URL;uri;res;packageID;msg;alias;packageID2
+ filename←{filename}GetPackageViaHTTP URL;uri;res;packageID;msg;alias;packageID2;flag
 ⍝ Requests a package via HTTP
+ flag←⊃0=⎕NC'filename'
  filename←{0=⎕NC ⍵:'zip'F.GetTempFilename2'' ⋄ ⍎⍵}'filename'
  (uri packageID)←Reg.SeparateUriAndPackageID URL
  (alias packageID2)←SplitAtAlias packageID
  res←uri GetPackageViaHTTP_ packageID2
  :If 200≡res.StatusCode
      res.Content Reg.WriteNativeFile filename
- :ElseIf 404≡res.StatusCode
-     msg←'Could not find package:',CR
-     msg,←'  ',packageID2,CR
-     msg,←'on ',uri
-     msg Assert 0
  :Else
-     :If 0=≢res.Content
-         ('Server error on ',URL,' RC=',⍕res.StatusCode)Assert 0
+     F.DeleteFile⍣flag⊢filename
+     :If 404≡res.StatusCode
+         msg←'Could not find package:',CR
+         msg,←'  ',packageID2,CR
+         msg,←'on ',uri
+         msg Assert 0
      :Else
-         res.Content Assert 0
+         :If 0=≢res.Content
+             ('Server error on ',URL,' RC=',⍕res.StatusCode)Assert 0
+         :Else
+             res.Content Assert 0
+         :EndIf
      :EndIf
  :EndIf
 ⍝Done

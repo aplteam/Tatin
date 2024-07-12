@@ -7,7 +7,7 @@
      R←T._NotApplicable ⋄ →0
  :EndIf
 
- tempDir←∆GetTempDir⊃⎕SI
+ tempDir←∆GetTempDir ⍬
  parms←⎕SE.Cider.CreateCreateProjectParms tempDir
 
  res←⎕SE.Cider.CreateProject parms
@@ -17,7 +17,7 @@
 
  parms2←⎕SE.Cider.CreateOpenParms ⍬
  parms2.folder←tempDir
- parms2.parent←#.TEMP
+ parms2.parent←'#.TEMP'
  parms2.projectSpace←'Foo'
  parms2.batch←1
  parms2.ignoreUserExec←1
@@ -26,6 +26,8 @@
 
  cfgFilename←parms2.folder,'/cider.config'
  cfg←⎕JSON⍠('Dialect' 'JSON5')⊢⊃⎕NGET cfgFilename
+ cfg.CIDER.parent←'#.TEMP'
+ cfg.CIDER.projectSpace←'Foo'
  cfg.CIDER.dependencies.tatin←'MyPackages'
  (⊂⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊢cfg)⎕NPUT cfgFilename 1
 
@@ -39,7 +41,7 @@
  (rc msg)←2↑stop ∆UCMD'LoadDependencies'
  →T.GoToTidyUp 0≠rc
  →T.GoToTidyUp 0<≢msg
-∘∘∘ ⍝ →T.PassesIf'/MyUCMDs/foo'{≡/⎕C ⍺((-≢⍺)↑⍵)}F.EnforceSlash msg
+ →T.GoToTidyUp'JustOneBeta'≢⊃#.TEMP.Foo.JustOneBeta.Version
 
  R←T._OK
 

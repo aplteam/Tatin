@@ -9,19 +9,23 @@
  parms.dependencies←0
  parms.dry←1
  list1←##.Client.CopyRegistry parms
- →T.PassesIf 0<≢list1
- →T.PassesIf 1<≢∪Reg.GetGroupFromPackageID¨list1
+ →T.GoToTidyUp~0<≢list1
+ →T.GoToTidyUp~1<≢∪Reg.GetGroupFromPackageID¨list1
 
  parms.group←'example'
  list2←##.Client.CopyRegistry parms
- →T.PassesIf>/≢¨list1 list2
+ →T.GoToTidyUp~>/≢¨list1 list2
  groups←Reg.GetGroupFromPackageID¨list2
- →T.PassesIf 1<≢groups
- →T.PassesIf'example'≡∊∪,groups
+ →T.GoToTidyUp~1<≢groups
+ →T.GoToTidyUp'example'≢∊∪,groups
 
  parms.group←'DoesNotExist'
  list3←##.Client.CopyRegistry parms
- →T.PassesIf 0=≢list3
+ →T.GoToTidyUp 0≠≢list3
 
  r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce parms.path
+ msg Assert rc=0
 ⍝Done

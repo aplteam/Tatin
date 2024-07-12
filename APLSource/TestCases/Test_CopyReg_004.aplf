@@ -1,4 +1,4 @@
- r←Test_CopyReg_004(stopFlag batchFlag);⎕TRAP;parms;qdmx
+ r←Test_CopyReg_004(stopFlag batchFlag);⎕TRAP;parms;qdmx;rc;msg
 ⍝ Exercise the "list=" option with invalid options
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -11,20 +11,24 @@
  parms.list←'aplteam'   ⍝ Invalid
  :Trap 998
      {}##.Client.CopyRegistry parms
-     →T.FailsIf 1
+     →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.PassesIf∨/'"list" is not consistanty/correctly defined'⍷qdmx.EM
+     →T.GoToTidyUp~∨/'"list" is not consistanty/correctly defined'⍷qdmx.EM
  :EndTrap
 
  parms.list←'aplteam-APLTreeUtils,aplteam-SevenZip-4'  ⍝ Inconsistent
  :Trap 998
      {}##.Client.CopyRegistry parms
-     →T.FailsIf 1
+     →T.GoToTidyUp 1
  :Else
      qdmx←⎕DMX
-     →T.PassesIf∨/'"list" is not consistanty/correctly defined'⍷qdmx.EM
+     →T.GoToTidyUp~∨/'"list" is not consistanty/correctly defined'⍷qdmx.EM
  :EndTrap
 
  r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce parms.path
+ msg Assert rc=0
 ⍝Done

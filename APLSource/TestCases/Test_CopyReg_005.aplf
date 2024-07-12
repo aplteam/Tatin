@@ -1,4 +1,4 @@
- r←Test_CopyReg_005(stopFlag batchFlag);⎕TRAP;parms;list;groups
+ r←Test_CopyReg_005(stopFlag batchFlag);⎕TRAP;parms;list;groups;rc;msg
 ⍝ Check whether dependencies are added
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -15,4 +15,8 @@
  →T.PassesIf 1<≢groups  ⍝ Some packages depend on stuff from the "aplteam" group, so there must be more than one
 
  r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce parms.path
+ msg Assert rc=0
 ⍝Done

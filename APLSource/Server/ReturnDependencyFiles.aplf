@@ -2,10 +2,10 @@
 ⍝ Returns config files or ⍬ for every packageID
  :Trap Reg.ErrorNo
      :If IsJsonRequest request.Headers
-         :If 0∊b←F.IsDir G.RegistryPath∘,¨⊆packageIDs
+         :If 0∊b←F.IsDir G.RegistryPath∘,¨{','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}packageIDs
              response←R.NewResponse request
              response←request Respond 404 0
-             response.Content←'Not found: ',⊃{⍺,',',⍵}/(~b)/⊆packageIDs
+             response.Content←'Not found: ',⊃{⍺,',',⍵}/(~b)/{','∊⍵:','(≠⊆⊢)⍵ ⋄ ⊆⍵}packageIDs
          :Else
              json←ReturnDependencyFiles_ packageIDs
              response←R.NewResponse request

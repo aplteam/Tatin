@@ -1,7 +1,8 @@
- Cleanup_Cache;list
+ Cleanup_Cache;list;rc;msg
  :If 0<≢list←F.ListDirs TC.GetPathToPackageCache,'/'
  :AndIf 0<≢list←{⍵/⍨(⊂'temp')≢¨⍨2⊃¨⎕NPARTS¨⍵}list
-     {}F.RmDirByForce¨{⍵/⍨(⊂'temp')≢¨⍨2⊃¨⎕NPARTS¨⍵}list
+     (rc msg)←F.RmDirByForce¨{⍵/⍨(⊂'temp')≢¨⍨2⊃¨⎕NPARTS¨⍵}list
+     msg Assert rc=0
  :EndIf
  {}∆InitUserSettings 0
 ⍝Done

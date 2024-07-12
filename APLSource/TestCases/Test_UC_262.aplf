@@ -1,4 +1,4 @@
- R←Test_UC_262(stopFlag batchFlag);⎕TRAP;stop;msg;rc;tempDir;parms;res;parms2;res2;cfg;cfgFilename
+ R←Test_UC_262(stopFlag batchFlag);⎕TRAP;stop;msg;rc;tempDir;parms;res;parms2;res2;cfg;cfgFilename;noOf
 ⍝ Exercise ]Tatin.LoadDependencies without an argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←T._Failed
@@ -21,6 +21,7 @@
  parms2.projectSpace←'Foo'
  parms2.batch←1
  parms2.ignoreUserExec←1
+ parms2.watch←'ns'
  res2←⎕SE.Cider.OpenProject parms2
  Assert∨/'Project successfully opened and established in "#.TEMP.Foo"'⍷∊res2
 
@@ -46,7 +47,8 @@
  R←T._OK
 
 ∆TidyUp:
- {}0 ⎕SE.Cider.CloseProject #.TEMP.Foo
+ noOf←0 ⎕SE.Cider.CloseProject #.TEMP.Foo
+ 'Unable to close #.TEMP.Foo?!'Assert 1=noOf
  (rc msg)←F.RmDirByForce tempDir
  msg Assert rc=0
 ⍝Done

@@ -175,7 +175,7 @@ This command copies packages from a managed Tatin Registry (by default `[tatin]`
 
 There might be a Tatin Server running on the local target folder, but this is not a requirement. In fact any running local server must be paused or stopped while `CopyRegistry` is running.
 
-By default the latest version of any major version of all packages that are not deprecated are copied, plus any dependencies.
+By default all packages are copied, even deprecated ones.
 
 Packages that are already saved in the target folder are not requested again, but check the `-force` flag.
 
@@ -333,14 +333,14 @@ parms←CreateCopyRegistryParms y
 
 Returns a namespace with parameters required by the [`CopyRegistry`](#) function.
 
-`y` can either be a namespace with some or all of the parameters that might be defined in a parameter namespace for CopyRegistry.
+`y` can either be a namespace with some or all of the parameters that might be defined in a parameter namespace for `CopyRegistry`.
 
 
 Of the parameters two MUST be specified: 
 
 `path` 
 
-: Defined a local folder where the packages aregoing to be saved.
+: Defines a local folder where the packages are going to be saved.
 
 `url`
 
@@ -348,17 +348,16 @@ Of the parameters two MUST be specified:
 
 The folllowing parameters can be used to amend the behaviour of `CopyRegistry` according to your needs:
 
-* `full`
 * `force`
 * `latest`
 * `group`
-* `list`
+* `list=`
 * `dry`
-* `verbose`
+* `verbose=`
 
 All these flags and options are documented as part of the `]CopyRegistry` user command, for details see there.
 
-There is one exception: by specifying `noDeps←1` one can prevent dependencies from being copied, and the documentation of the user command `]CopyRegistry` does not talk about this option. The sole reason for this is that this is only useful for test cases.
+There is one exception: by specifying `noDeps←1` one can prevent dependencies from being copied, and the documentation of the user command `]CopyRegistry` does not talk about this option. The reason is that this is only useful for test cases.
 
 
 ### CreateReInstallParms
@@ -1085,6 +1084,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

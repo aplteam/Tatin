@@ -290,7 +290,7 @@ version</code></pre>
 <pre tabindex="0"><code>list←CopyRegistry parms</code></pre>
 <p>This command copies packages from a managed Tatin Registry (by default <code>[tatin]</code>) to a local folder.</p>
 <p>There might be a Tatin Server running on the local target folder, but this is not a requirement. In fact any running local server must be paused or stopped while <code>CopyRegistry</code> is running.</p>
-<p>By default the latest version of any major version of all packages that are not deprecated are copied, plus any dependencies.</p>
+<p>By default all packages are copied, even deprecated ones.</p>
 <p>Packages that are already saved in the target folder are not requested again, but check the <code>-force</code> flag.</p>
 <p><code>CopyRegistry</code> was introduced with version 0.110.0, therefore you cannot use it on Tatin servers that run earlier versions than that.</p>
 <p>The function takes one mandatory argument: a parameter namespace typically created by calling <a href="#createcopyregistryparms" class="bookmark_link">CreateCopyRegistryParms</a>, and then amended.</p>
@@ -419,26 +419,25 @@ tatinVars</code></pre>
 </div>
 <pre tabindex="0"><code>parms←CreateCopyRegistryParms y</code></pre>
 <p>Returns a namespace with parameters required by the <a href="#copyregistry" class="bookmark_link"><code>CopyRegistry</code></a> function.</p>
-<p><code>y</code> can either be a namespace with some or all of the parameters that might be defined in a parameter namespace for CopyRegistry.</p>
+<p><code>y</code> can either be a namespace with some or all of the parameters that might be defined in a parameter namespace for <code>CopyRegistry</code>.</p>
 <p>Of the parameters two MUST be specified:</p>
 <dl>
 <dt><code>path</code></dt>
-<dd><p>Defined a local folder where the packages aregoing to be saved.</p></dd>
+<dd><p>Defines a local folder where the packages are going to be saved.</p></dd>
 <dt><code>url</code></dt>
 <dd><p>The url of the Tatin Registry to be copied from.</p></dd>
 </dl>
 <p>The folllowing parameters can be used to amend the behaviour of <code>CopyRegistry</code> according to your needs:</p>
 <ul>
-<li><code>full</code></li>
 <li><code>force</code></li>
 <li><code>latest</code></li>
 <li><code>group</code></li>
-<li><code>list</code></li>
+<li><code>list=</code></li>
 <li><code>dry</code></li>
-<li><code>verbose</code></li>
+<li><code>verbose=</code></li>
 </ul>
 <p>All these flags and options are documented as part of the <code>]CopyRegistry</code> user command, for details see there.</p>
-<p>There is one exception: by specifying <code>noDeps←1</code> one can prevent dependencies from being copied, and the documentation of the user command <code>]CopyRegistry</code> does not talk about this option. The sole reason for this is that this is only useful for test cases.</p>
+<p>There is one exception: by specifying <code>noDeps←1</code> one can prevent dependencies from being copied, and the documentation of the user command <code>]CopyRegistry</code> does not talk about this option. The reason is that this is only useful for test cases.</p>
 <div class="h_tag">
 <a href="#createreinstallparms" id="createreinstallparms" class="autoheader_anchor">
 <h3 data-id="CreateReInstallParms">2.8. CreateReInstallParms</h3>

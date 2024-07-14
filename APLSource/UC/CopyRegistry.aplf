@@ -1,17 +1,23 @@
  r←CopyRegistry arg;p;qdmx;b
  p←⎕NS'' ⍝ For parameters
 ⍝ --- Handle arguments
- :If TC.IsHTTP arg._1
- :OrIf ']['≡2↑¯1⌽arg._1
-     p.url←arg._1
-     :If 0=arg.dry
-         'Not specified: path to target Registry'Assert 0≢arg._2
-     :EndIf
-     p.path←arg._2
- :Else
+ :If 0≡arg._1
+     'No argument was specified but -dry is missing'Assert arg.dry
      p.url←'[tatin]' ⍝ The default
-     'Not specified: path to target Registry'Assert 0≢arg._1
-     p.path←arg._1
+     p.path←''
+ :Else
+     :If TC.IsHTTP arg._1
+     :OrIf ']['≡2↑¯1⌽arg._1
+         p.url←arg._1
+         :If 0=arg.dry
+             'Not specified: path to target Registry'Assert 0≢arg._2
+         :EndIf
+         p.path←arg._2
+     :Else
+         p.url←'[tatin]' ⍝ The default
+         'Not specified: path to target Registry'Assert 0≢arg._1
+         p.path←arg._1
+     :EndIf
  :EndIf
  :If 0=arg.dry
      p.path←TC.F.AddTrailingSep p.path
@@ -19,10 +25,9 @@
      3 ⎕MKDIR ¯1↓p.path ⍝ Make sure the target exists
  :EndIf
 ⍝ --- Handle flags
- p.(dry force full latest dependencies)←arg.(dry force full latest dependencies)
+ p.(dry force latest dependencies)←arg.(dry force latest dependencies)
  p.verbose←TC.A.ToNum'0'arg.Switch'verbose'
  p.dependencies←TC.A.ToNum'1'arg.Switch'dependencies'
- 'Flags "full" and "latest" are mutually exclusive'Assert~∧/p.(full latest)
 ⍝ --- Handle options
  p.list←''arg.Switch'list'
  :If 0<≢p.list

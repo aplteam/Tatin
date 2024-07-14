@@ -11,26 +11,26 @@
  parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
  parms.list←'#.TEMP.MyPkgs'
  parms.dry←1
- parms.last←1
+ parms.latest←1
  parms.dependencies←0
  list←##.Client.CopyRegistry parms
- expected←'example-Boo-1.0.0' 'example-versions-0.1.0' 'example-versions-1.0.12-That-fix' 'example-versions-2.0.0'
+ expected←'example-Boo-1.0.0' 'example-versions-2.0.0'
  →T.GoToTidyUp expected≢,list
 
- parms.last←0
+ parms.latest←0
  #.TEMP.MyPkgs←'aplteam-sevenzip'
  list2←##.Client.CopyRegistry parms
- expected←'aplteam-SevenZip-3' 'aplteam-SevenZip-4'
- →T.GoToTidyUp expected≢,Reg.RemoveMinorAndPatch¨list2
+ expected←'aplteam-SevenZip-3.0.0' 'aplteam-SevenZip-3.0.1' 'aplteam-SevenZip-4.0.4'
+ →T.GoToTidyUp expected≢,list2
 
  tempDir←F.GetTempSubDir⊃⎕SI
  buff←'aplteam-APLTreeUtils' 'example-versions'
  filename←tempDir,'/pkg-list.txt'
  (⊂buff)⎕NPUT filename 1
  parms.list←'file://',filename
- parms.last←1
+ parms.latest←1
  list3←##.Client.CopyRegistry parms
- →T.GoToTidyUp 5≠≢list3
+ →T.GoToTidyUp 2≠≢list3
 
  r←T._OK
 

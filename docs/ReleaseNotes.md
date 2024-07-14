@@ -11,6 +11,17 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.112.0 from 2024-07-14
+
+* The `]CopyRegistry` user command, introduced in 0.110.0, got a changed syntax:
+
+  * The `-full` flag was removed
+  * Default behaviour is now what was so far achievable with `-full` except that deprecated packages are now copied as well
+
+    This is a necessity for compatability, because some package might well depend on an earlier version of a now deprecated package.
+  * With `-dry` one might omit both arguments, meaning that the URL defaults to `[tatin]` while no path is required
+  * The list of copied packages is now returned as a matrix
+
 ## Version 0.111.0 from 2024-07-12
 
 * No action required
@@ -221,6 +232,8 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

@@ -5,14 +5,10 @@
      :If 0<≢group←request R.GetQueryParameter'group'
          pkgs←(group∘≡¨Reg.GetGroupFromPackageID¨pkgs[;1])⌿pkgs
      :EndIf
-     pkgs←G.RegistryPath Reg.RemoveDeprecatedPackages pkgs
      pkgs←pkgs[;1]
      :If (⊂'latest')∊request.QueryParameters[;1]
          ⍝ Only the latest version of each package, ignoring the major version number
          pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveVersionNumber¨⍵}pkgs
-     :ElseIf ~(⊂'full')∊request.QueryParameters[;1]
-         ⍝ Only the latest version of each major version of each package
-         pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveMinorAndPatch¨⍵}pkgs
      :EndIf
      :If 0<≢list←request R.GetQueryParameter'list'
          list←','(≠⊆⊢)list

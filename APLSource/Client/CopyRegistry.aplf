@@ -32,9 +32,11 @@
          '"list" is not consistanty/correctly defined'Assert 0
      :EndIf
  :EndIf
- 'Missing: "url"'Assert 0<≢p.url
- '"url" does not use the HTTP protocol'Assert IsHTTP p.url
- 'Missing: "path"'Assert 0<≢p.path
+ :If ~p.dry
+     'Missing: "url"'Assert 0<≢p.url
+     '"url" does not use the HTTP protocol'Assert IsHTTP p.url
+     'Missing: "path"'Assert 0<≢p.path
+ :EndIf
  EstablishEmptyPermanentConnections 1
  {}Connect2Client p.url
  print'Fetch list of packages...'
@@ -49,7 +51,5 @@
  :AndIf 2=⍴⍴list
      list←(list[;2]≡¨⊂'Fetched')/list[;1]
  :EndIf
- :If p.dry
-     list←⍪list
- :EndIf
+ list←⍪⍣(⊃2≠⍴⍴list)⊢list
 ⍝Done

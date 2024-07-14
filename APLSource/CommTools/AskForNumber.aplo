@@ -6,7 +6,13 @@
 ⍝ a check function pass `{1}` as left operand.\\
 ⍝ If the user refuses to enter a number an empty vector is returned.
 ⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning that
-⍝ the user must enter a number in order to continue.
+⍝ the user must enter a number in order to continue.\\
+⍝ In case `question` is a scalar question mark, `AskForNumber` returns the path to itself and
+⍝ the name of the global variable that can be used for automation, separated by a dot.
+ :If '?'≡question
+     value←(⍕⎕THIS),'.AskForNumber_Answers←0 2⍴'' '''
+     :Return
+ :EndIf
  enforce←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'enforce'
  value←⍬
  success←flag←0

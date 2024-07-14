@@ -5,11 +5,17 @@
 ⍝ with a 1 indicating that the input is okay and 0 that it is not. If you don't need/want
 ⍝ a check function pass `{1}` as left operand.\\
 ⍝ If the user refuses to enter anything an empty vector is returned.
-⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning that
-⍝ the user must enter something in order to continue.
+⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning
+⍝ that the user must enter something in order to continue.
 ⍝ You can also specify a default as `⍺` by passing a character vector instead of a Boolean.
-⍝ In case the user does not enter something that default is returned; that's why the Boolean would
-⍝ not make a difference anyway.
+⍝ In case the user does not enter something that default is returned; that's why the Boolean
+⍝ would not make a difference anyway.\\
+⍝ In case `question` is a scalar question mark, `AskForText` returns the path to itself and
+⍝ the name of the global variable that can be used for automation, separated by a dot.
+ :If '?'≡question
+     text←(⍕⎕THIS),'.AskForText_Answers←0 2⍴'' '''
+     :Return
+ :EndIf
  x←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'x'
  :If ' '=1↑0⍴x
      default←x

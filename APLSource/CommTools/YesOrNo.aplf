@@ -1,14 +1,21 @@
  yesOrNo←{default}YesOrNo question;isOkay;answer;add;dtb;answer2;bool;flag;buff;alias;firstPart;ind
- ⍝ Asks a simple question and allows just "Y" (or "y") or "N" (or "n") as answers.\\
- ⍝ The question may be a simple character vector, possibly with `⎕UCS 10` in between,
- ⍝ or a vector of simple character vectors.\\
- ⍝ You may specify a default via the optional left argument which when specified
- ⍝ rules what happens when the user just presses <enter>.
- ⍝ `default` must be either 1 (yes) or 0 (no).\\
- ⍝ By entering "`∘∘∘`" the user may interrupt `YesOrNo`: this activates a stop.\\
- ⍝ You can make `YesOrNo` answer the question automatically, refer to the documentation
- ⍝ with ]ADoc CommTools\\
- ⍝ Note that this function does **not** work as intended when traced!
+⍝ Asks a simple question and allows just "Y" (or "y") or "N" (or "n") as answers.\\
+⍝ The question may be a simple character vector, possibly with `⎕UCS 10` in between,
+⍝ or a vector of simple character vectors.\\
+⍝ You may specify a default via the optional left argument which when specified
+⍝ rules what happens when the user just presses <enter>.
+⍝ `default` must be either 1 (yes) or 0 (no).\\
+⍝ By entering "`∘∘∘`" the user may interrupt `YesOrNo`: this activates a stop.\\
+⍝ You can make `YesOrNo` answer the question automatically, refer to the documentation
+⍝ with ]ADoc CommTools\\
+⍝ Notes:
+⍝ * This function does **not** work as intended when traced!
+⍝ * In case `question` is a scalar question mark, `YesOrNo` returns the path to itself and
+⍝   the name of the global variable that can be used for automation, separated by a dot.
+ :If '?'≡question
+     yesOrNo←(⍕⎕THIS),'.YesOrNo_Answers←0 2⍴'' '''
+     :Return
+ :EndIf
  isOkay←0
  default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
  isOkay←0

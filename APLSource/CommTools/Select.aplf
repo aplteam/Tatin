@@ -3,14 +3,21 @@
 ⍝ Selecting just one is the default.\\
 ⍝ The optional left argument allows you to specify multiple (positional) choices:
 ⍝  * `caption` is shown above the choices; must be a simple character vector
-⍝  * `manyFlag` defaults to 0 (meaning just one item might be selected) or 1, in which case multiple items can be selected
-⍝  * `mustFlag` forces the user to select at least one option\\
+⍝  * `manyFlag` defaults to 0 (= just 1 item might be selected) or 1 (allow selecting multiple items)
+⍝  * `mustFlag` forces the user to select at least one option, disallowing to quit without making a decision\\
 ⍝ Notes:
 ⍝  * `choices` must not have more than 999 items\\
-⍝  * By entering "`∘∘∘`" the user may interrupt `Select` by running onto a stop vector, overcoming the bug that ⍞ cannot be interrupted
+⍝  * By entering "`∘∘∘`" the user may interrupt `Select` by running onto a stop vector, overcoming
+⍝    the Dyalog bug that ⍞ cannot be interrupted
+⍝  * You may use the wildcard character "*" either at the beginning or the end of a selection string assigned
+⍝    to the `Select_Choices` variable
 ⍝  * If the user aborts by entering "q" (for "quit") `⍬` will be returned
-⍝ You can make `Select` select none, one or several choices automatically, refer to the documentation
-⍝ with ]ADoc CommTools\\
+⍝  * In case `choices` is a scalar question mark, `Select` returns the path to itself and the name of
+⍝    the global variable that can be used for automation, separated by a dot.
+ :If '?'≡choices
+     index←(⍕⎕THIS),'.Select_Choices←0 2⍴'' '''
+     :Return
+ :EndIf
  x←{0<⎕NC ⍵:⊆⍎⍵ ⋄ ''}'x'
  (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
  '"caption" must be a simple character vector'Assert 1=≡caption←,caption
@@ -41,6 +48,9 @@
          :ElseIf ' '=1↑0⍴∊index ⍝ Text?!
              :If '*'=¯1↑index
                  index←((¯1+≢index)↑¨{⍵↓⍨+/∧\' '=⍵}¨choices)⍳⊂(¯1↓index)
+                 'Invalid selection'Assert index∊⍳≢choices
+             :ElseIf '*'=⊃index
+                 index←((-¯1+≢index)↑¨{⍵↓⍨-+/∧\' '=⌽⍵}¨choices)⍳⊂(1↓index)
                  'Invalid selection'Assert index∊⍳≢choices
              :ElseIf (,'a')≡,index
                  index←⍳≢choices

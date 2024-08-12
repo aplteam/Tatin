@@ -85,9 +85,19 @@
                          :EndIf
                      :Else
                          :If '.'∊name
-                             Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ ⍺ ',⍺,⍵,' ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                             :If '←'∊header
+                             :AndIf '{'=⊃A.DLB header
+                                 Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ ',⍺,⍵,' ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                             :Else
+                                 Assert({⍵↓⍨⍵⍳'.'}name)≡∊backRef2 Tref2.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ ⍺ ',⍺,⍵,' ⍵}'}{⍵↓⍨⍵⍳'.'}name
+                             :EndIf
                          :Else
-                             Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ ⍺ ',⍺,⍵,' ⍵}'}name
+                             :If '←'∊header
+                             :AndIf '{'=⊃A.DLB header
+                                 Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ 1:shy←⍺ ',⍺,⍵,' ⍵}'}name
+                             :Else
+                                 Assert name≡∊backRef Tref.{⎕SE.Link.Fix,⊂⍵,'←{⍺←⊢ ⋄ ⍺ ',⍺,⍵,' ⍵}'}name
+                             :EndIf
                          :EndIf
                      :EndIf
                  :Else           ⍝ Monadic functions (must be a tfn)

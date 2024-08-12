@@ -26,13 +26,7 @@
  deps_←RemoveAlias¨deps
  :If r←force
  :OrIf r←ts_deps>ts_build
-     :If F.IsFile filenameBuild
-         b←deps_∊RemoveAlias¨tree[;2]                       ⍝ Check consistency
-         :If ∨/~b
-             ('Invalid entry: ',(⊃{⍺,', ',⍵}/(~b)/deps_),'; re-install!')Assert 0
-         :EndIf
-     :EndIf
-     1 CompileBuildList folder deps
+     tree←1 CompileBuildList folder deps
  :EndIf
  :If ⍬≡tree ⍝ No build list
  :OrIf 0∊deps∊tree[;2]

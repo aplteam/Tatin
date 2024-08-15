@@ -1,9 +1,6 @@
  {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;q;folder2;GH;currentVersion;tag;msg
  r←''
  folder←1⊃⎕NPARTS GetSourceFile
- :If ~{{⍺≡(≢⍺)↑⍵}/'expand'∘TC.F.NormalizePath¨⍵}(1 TC.GetProgramFilesFolder'')folder
-     ('Cannot deal with ',folder)Assert{{⍺≡(≢⍺)↑⍵}/'expand'∘TC.F.NormalizePath¨⍵}(0 TC.GetProgramFilesFolder'')folder
- :EndIf
  GH←⎕NEW TC.##.GitHubAPIv3(,⊂'aplteam')
  filename←folder,'/../../GitHub-personal-token.txt'
  :If TC.F.IsFile filename
@@ -12,7 +9,7 @@
  currentVersion←({⍵↑⍨¯1+⌊/⍵⍳'+-'}2⊃TC.Version)
  tag←GH.CheckForUpdate'Tatin'currentVersion
  :If 0=≢tag
-     r←'There is no better version available than ',⊃{⍺,' from ',⍵}/1↓TC.Version
+     r←'There is no later version available than ',⊃{⍺,' from ',⍵}/1↓TC.Version
  :Else
      msg←'UpdateTatin@Your version of Tatin is ',{⍵↑⍨¯1+⍵⍳'+'}2⊃TC.Version
      msg,←CR,'Latest published version is ',1↓tag

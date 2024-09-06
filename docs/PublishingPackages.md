@@ -1,6 +1,5 @@
 [parm]:title             = 'Tatin: Publishing Pkgs'
 [parm]:leanpubExtensions = 1
-[parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3 4
 [parm]:numberHeaders     = 2 3 4 5 6
 

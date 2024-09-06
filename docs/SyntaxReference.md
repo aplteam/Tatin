@@ -1,6 +1,5 @@
 [parm]:title             = 'Tatin: Syntax Reference'
 [parm]:toc               = 2 3 
-[parm]:collapsibleTOC    = 1
 [parm]:leanpubExtensions = 1
 [parm]:numberHeaders     = 2 3 4 5 6
 

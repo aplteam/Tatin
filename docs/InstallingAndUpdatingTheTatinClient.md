@@ -1,6 +1,5 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'Tatin: Installing & Updating'
-[parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
 [parm]:numberHeaders     = 2 3 4 5 6
 
@@ -28,9 +27,9 @@ Note that when you call `]Tatin.Init`, Tatin will check whether those requiremen
 
 ### 19.0
 
-Strictly speaking it is not necessary to install Tatin for 19.0, because Tatin is part of a 19.0-installation. However, before it can be used it must be activated.
+Strictly speaking it is not necessary to install Tatin for 19.0, because Tatin is part of a 19.0-installation. However, before it can be used it must be activated. That's because in 19.0 it is still experimental.
 
-Note that activating is available in 19.0 only. It's not supported in 18.0 and 18.2.
+Note that activating is available in 19.0 only. Activating is not supported in 18.0 and 18.2.
 
 In order to activate Tatin, execute
 
@@ -53,7 +52,7 @@ and follow the instructions.
 => <HOME>\Documents\Dyalog APL-64 19.0 Unicode Files
 => 
 => ⍝ Others
-=> <HOME>/.dyalog/dyalog.190U64.files
+=> <HOME>/dyalog.190U64.files
 => 
 => ⍝⍝⍝ Version agnostic
 => 
@@ -61,7 +60,7 @@ and follow the instructions.
 => <HOME>\Documents\Dyalog APL Files
 => 
 => ⍝ Others
-=> <HOME>/.dyalog/dyalog.files
+=> <HOME>/dyalog.files
 => 
 => ```
 => #### Deactivating
@@ -96,10 +95,10 @@ Instructions:
 => C:\Users\<⎕AN>\Documents\Dyalog APL[-64] <version> Unicode Files\SessionExtensions\CiderTatin
 => 
 => ⍝ Linux
-=> /home/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> /home/<⎕AN>/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
 => 
 => ⍝ Mac OS
-=> /Users/<⎕AN>/.dyalog/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> /Users/<⎕AN>/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
 => ```
 => However, these folders are version specific. Instead you might consider installing them into a version
 => agnostic folder in order to make Tatin available to, say, 18.0 and 18.2 at the same time.
@@ -110,10 +109,10 @@ Instructions:
 => C:\Users\<⎕AN>\Documents\Dyalog APL Files\SessionExtensions\CiderTatin
 => 
 => ⍝ Linux
-=> /home/<⎕AN>/.dyalog/dyalog.files/SessionExtensions/CiderTatin
+=> /home/<⎕AN>/dyalog.files/SessionExtensions/CiderTatin
 => 
 => ⍝ Mac OS
-=> /Users/<⎕AN>/.dyalog/dyalog.files/SessionExtensions/CiderTatin
+=> /Users/<⎕AN>/dyalog.files/SessionExtensions/CiderTatin
 => ```
 
 As a result you should see something like this:
@@ -123,7 +122,7 @@ As a result you should see something like this:
 ...\Dyalog APL[-64] <version> Unicode Files\SessionExtensions\CiderTatin\Tatin
 
 ⍝ Linux & Mac OS
-.../.dyalog/dyalog.<version><bit>.files/SessionExtensions/CiderTatin/Tatin
+.../dyalog.<version><bit>.files/SessionExtensions/CiderTatin/Tatin
 
 ```
 
@@ -358,6 +357,9 @@ There is always the possibility that the update process is itself buggy. Calling
 => 1. Execute `]DeActivate tatin` --- that removes Tatin
 => 2. Execute `]Activate tatin` --- that brings back the version of Tatin that your installation originally came with
 => 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version
+
+
+
 
 
 

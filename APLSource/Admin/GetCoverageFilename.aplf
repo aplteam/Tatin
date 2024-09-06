@@ -1,8 +1,10 @@
- r←GetCoverageFilename
+ r←GetCoverageFilename;load
  :If 0<⎕NC'##.CiderConfig.HOME'
      r←##.CiderConfig.HOME,'/'
+ :ElseIf 0<≢load←2 ⎕NQ #'GetEnvironment' 'load'
+     r←⊃1 ⎕NPARTS(1⊃1 ⎕NPARTS load),'../../'
  :Else
-     r←⊃1 ⎕NPARTS(1⊃1 ⎕NPARTS 2 ⎕NQ #'GetEnvironment' 'load'),'../../'
+     r←##.FilesAndDirs.PWD,'/'
  :EndIf
  r,←'TestResults/TatinTestCoverage'
 ⍝Done

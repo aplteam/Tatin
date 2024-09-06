@@ -1,6 +1,5 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'Tatin: Load & Update'
-[parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3
 [parm]:numberHeaders     = 2 3 4 5 6
 

@@ -14,8 +14,10 @@
          :EndIf
          :If flag
              list←∆PermanentConnections.{⍎¨↓⎕NL 9}⍬
-             :Trap 0  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝
+             :Trap 0
                  {}{⍵ R.Close 0}¨list
+             :Case 1006
+                 'Conga DLL reports an error 1006 and won''t work anymore - restart APL'⎕SIGNAL 11
              :Else
                  ⍝ This happens, but very rarely.
                  ⍝ We need to find out why

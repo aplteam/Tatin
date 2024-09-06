@@ -30,7 +30,14 @@
      zipFolder←(TC.Reg.AddSlash folder),cfg.CIDER.distributionFolder
      source←TC.F.ListFiles zipFolder,'/*.zip'
      ('No ZIP file found in ',zipFolder)Assert 0<≢source
-     ('More than one ZIP file found in ',zipFolder)Assert 1=≢source
+     :If 1<≢source
+         ind←('SelectZipToPublish@Select ZIP file to publish (from ',zipFolder,'):')TC.CommTools.Select{⊃,/1↓⎕NPARTS ⍵}¨source
+         :If 0=≢ind
+             →0 ⋄ r←'Cancelled by user'
+         :Else
+             source←source[ind]
+         :EndIf
+     :EndIf
      source←⊃source
      askForConfirmation←1
  :EndIf

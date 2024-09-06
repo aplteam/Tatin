@@ -1,6 +1,5 @@
 [parm]:leanpubExtensions = 1
 [parm]:title             = 'Tatin for Contributors'
-[parm]:collapsibleTOC    = 1
 [parm]:toc               = 2 3 4
 [parm]:numberHeaders     = 2 3 4 5
 

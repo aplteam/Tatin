@@ -6,50 +6,52 @@
 ⍝ `flag` is insurance against accidental call.
 ⍝ `batch` defaults to 0. If it is 1 then no questions are asked.
  r←''
- batch←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'batch'
- aplVersion←# ⎕WG'APLVersion'
- selectFlag←0
- :Select os←##.APLTreeUtils2.GetOperatingSystem ⍬
- :Case 'Win'
-     :If ~⎕NEXISTS installFolder←if1←(2⊃4070⌶0),'\SessionExtensions\CiderTatin\Tatin'
-     :AndIf ~⎕NEXISTS installFolder←if2←(1⊃⎕NPARTS 2⊃4070⌶0),'Dyalog APL Files\SessionExtensions\CiderTatin\Tatin'
-         selectFlag←1
-     :EndIf
- :Case 'Lin'
-     :If ~⎕NEXISTS installFolder←if1←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/.dyalog/dyalog.files/SessionExtensions/CiderTatin/Tatin'
-     :AndIf ~⎕NEXISTS installFolder←if2←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/.dyalog/','dyalog.',('.'~⍨{⍵/⍨2>+\⍵='.'}2⊃aplVersion),'U',(¯2↑1⊃aplVersion),'.files/SessionExtensions/CiderTatin/Tatin'
-         selectFlag←1
-     :EndIf
- :Case 'Mac'
-     :If ~⎕NEXISTS installFolder←if1←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/.dyalog/dyalog.files/SessionExtensions/CiderTatin/Tatin'
-     :AndIf ~⎕NEXISTS installFolder←if2←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/.dyalog/','dyalog.',('.'~⍨{⍵/⍨2>+\⍵='.'}2⊃aplVersion),'U',(¯2↑1⊃aplVersion),'.files/SessionExtensions/CiderTatin/Tatin'
-         selectFlag←1
-     :EndIf
- :Else
-     0 Assert⍨'OS <',os,'> is not supported'
- :EndSelect
- installFolder←⊃1 ⎕NPARTS installFolder
- :If selectFlag
-     ind←'Into which folder?'##.CommTools.Select'Version specific' 'Version agnostic'
-     :If 0=≢ind
-         ⎕←'Cancelled by user' ⋄ →0
-     :ElseIf ind=1
-         installFolder←if1
-     :ElseIf ind=2
-         installFolder←if2
+ :If flag
+     batch←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'batch'
+     aplVersion←# ⎕WG'APLVersion'
+     selectFlag←0
+     :Select os←##.APLTreeUtils2.GetOperatingSystem ⍬
+     :Case 'Win'
+         :If ~⎕NEXISTS installFolder←if1←(2⊃4070⌶0),'\SessionExtensions\CiderTatin\Tatin'
+         :AndIf ~⎕NEXISTS installFolder←if2←(1⊃⎕NPARTS 2⊃4070⌶0),'Dyalog APL Files\SessionExtensions\CiderTatin\Tatin'
+             selectFlag←1
+         :EndIf
+     :Case 'Lin'
+         :If ~⎕NEXISTS installFolder←if1←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/dyalog.files/SessionExtensions/CiderTatin/Tatin'
+         :AndIf ~⎕NEXISTS installFolder←if2←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/','dyalog.',('.'~⍨{⍵/⍨2>+\⍵='.'}2⊃aplVersion),'U',(¯2↑1⊃aplVersion),'.files/SessionExtensions/CiderTatin/Tatin'
+             selectFlag←1
+         :EndIf
+     :Case 'Mac'
+         :If ~⎕NEXISTS installFolder←if1←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/dyalog.files/SessionExtensions/CiderTatin/Tatin'
+         :AndIf ~⎕NEXISTS installFolder←if2←(2 ⎕NQ'.' 'GetEnvironment' 'HOME'),'/','dyalog.',('.'~⍨{⍵/⍨2>+\⍵='.'}2⊃aplVersion),'U',(¯2↑1⊃aplVersion),'.files/SessionExtensions/CiderTatin/Tatin'
+             selectFlag←1
+         :EndIf
      :Else
-         ∘∘∘  ⍝ Huh?!
+         0 Assert⍨'OS <',os,'> is not supported'
+     :EndSelect
+     installFolder←⊃1 ⎕NPARTS installFolder
+     :If selectFlag
+         ind←'Into which folder?'##.CommTools.Select'Version specific' 'Version agnostic'
+         :If 0=≢ind
+             ⎕←'Cancelled by user' ⋄ →0
+         :ElseIf ind=1
+             installFolder←if1
+         :ElseIf ind=2
+             installFolder←if2
+         :Else
+             ∘∘∘  ⍝ Huh?!
+         :EndIf
      :EndIf
- :EndIf
- :If batch
-     q←'Sure you want to install Tatin into:',(⎕UCS 13),'  ',installFolder,'/Tatin ?'
- :OrIf ##.CommTools.YesOrNo q
-     :If 0=##.FilesAndDirs.⎕NC'APLTreeUtils2'
-         Initialize_Client
+     :If batch
+         q←'Sure you want to install Tatin into:',(⎕UCS 13),'  ',installFolder,'/Tatin ?'
+     :OrIf ##.CommTools.YesOrNo q
+         :If 0=##.FilesAndDirs.⎕NC'APLTreeUtils2'
+             Initialize_Client
+         :EndIf
+         {}##.FilesAndDirs.RmDir installFolder,'Tatin'
+         installFolder ⎕NCOPY ##.CiderConfig.HOME,'/Dist/Client/Tatin'
+         r←'*** Tatin installed in ',installFolder
+         ⎕DL 2
+         ⎕SE.SALTUtils.ResetUCMDcache ¯1
      :EndIf
-     {}##.FilesAndDirs.RmDir installFolder,'Tatin'
-     installFolder ⎕NCOPY ##.CiderConfig.HOME,'/Dist/Client/Tatin'
-     r←'*** Tatin installed in ',installFolder
-     ⎕DL 2
-     ⎕SE.SALTUtils.ResetUCMDcache ¯1
  :EndIf

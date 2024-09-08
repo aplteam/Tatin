@@ -1,4 +1,4 @@
- {r}←{noQLX}Make batchFlag;P;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q;msg;rc
+{r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
@@ -49,41 +49,44 @@
  list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
  list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
  F.DeleteFile list
- P←⎕NEW ##.APLProcess
- P.Exe←GetAPLVersion versionOfAPL
- P.Args,←'load="',F.PWD,'\APLSource\Admin\Make_.aplc" '
- P.Args,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
- P.Args,←' lx="1 #.Make_.Run 1"'
+ P←##.APLProcess
+ parms←P.CreateParms
+ parms.Exe←GetAPLVersion versionOfAPL
+ parms.CommandLineArgs,←'load="',F.PWD,'\APLSource\Admin\Make_.aplc" '
+ parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
+ parms.CommandLineArgs,←' lx="1 #.Make_.Run 1"'
  :If 0  ⍝ Only for analyzing problems:
-     P.Args,←' -exec_setup=0 '
-     P.Args,←' -stop_in_setup=1 '
+     parms.CommandLineArgs,←' -exec_setup=0 '
+     parms.CommandLineArgs,←' -stop_in_setup=1 '
  :EndIf
  :If noQLX
-     P.Args,←' -x'
+     parms.CommandLineArgs,←' -x'
  :EndIf
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Client...'
- (rc msg)←P.Run
- msg Assert rc=0
- {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P
- 'The process exited with an error code'Assert 0=P.Proc.ExitCode
+ P_←⎕NEW P(,⊂parms)
+ {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+ 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  UpdateDocumentation ⍬
- P.Args←''
- P.Args,←'load="APLSource/Admin/Make_.aplc" '
- P.Args,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
- P.Args,←' lx="0 #.Make_.Run 2"'
- P.Exe←GetAPLVersion versionOfAPL
+ parms←P.CreateParms
+ parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" '
+ parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
+ parms.CommandLineArgs,←' lx="0 #.Make_.Run 2"'
+ parms.Exe←GetAPLVersion versionOfAPL
  :If 0          ⍝ Only for analyzing problems:
-     P.Args,←' -exec_setup=0'
-     P.Args,←' -stop_in_setup=1 '
+     parms.CommandLineArgs,←' -exec_setup=0'
+     parms.CommandLineArgs,←' -stop_in_setup=1 '
  :EndIf
  :If noQLX      ⍝ Only for analyzing problems:
-     P.Args,←' -x'
+     parms.CommandLineArgs,←' -x'
  :EndIf
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
- (rc msg)←P.Run
- msg Assert rc=0
- {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P
- 'The process exited with an error code'Assert 0=P.Proc.ExitCode
+ P_←⎕NEW P(,⊃parms)
+ {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
+ 'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   The final steps, putting it all together...'
  HandleRunFunction ⍬
  UpdateTestServerAssets ⍬

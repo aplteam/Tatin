@@ -1,0 +1,36 @@
+ {r}←∆StartServerProcessForTests_new debugFlag;P;rc;msg
+⍝ This function starts a server that acts on ∆TEMP_SERVER_FOLDER
+ r←⎕NEW ##.APLProcess
+ r.Exe←##.Admin.GetAPLVersion ⍬
+ :If 0  ⍝ Because APLProcess does not process "load" and "lx" on Linux and Mac OS
+     :If 0<#.Tatin.⎕NC'CiderConfig'
+         r.Args,←' load="',#.Tatin.CiderConfig.HOME,'/APLSource/Admin/LoadTatinAndStartServer.aplf" '
+     :Else
+         r.Args,←' load="',F.PWD,'/APLSource/Admin/LoadTatinAndStartServer.aplf" '
+     :EndIf
+ :Else
+     r.Args←#.Tatin.CiderConfig.HOME,'/LoadTestServer.dws'
+     :If 0<#.Tatin.⎕NC'CiderConfig'
+         r.Args,←' tatinHome="',#.Tatin.CiderConfig.HOME,'" '
+     :Else
+         r.Args,←' tatinHome="',F.PWD,'" '
+     :EndIf
+ :EndIf
+ :If 0<⎕NC'∆TEMP_SERVER_FOLDER'
+     r.Args,←'serverPath="',∆TEMP_SERVER_FOLDER,'" '
+ :EndIf
+ :If 0 ⍝ Because APLProcess does not process "load" and "lx" on Linux and Mac OS
+     r.Args,←'lx="',(debugFlag/'1 '),'#.LoadTatinAndStartServer 1" '
+ :EndIf
+ :If 0  ⍝ Only for analyzing problems:
+     r.Args,←' -exec_setup=0 '
+     r.Args,←' -stop_in_setup=1 '
+ :EndIf
+ :If 0
+     r.Args,←' -x '
+ :Else
+     r.Args,←'OFF2=1 '   ⍝ OFF=1 would work as well, but too early: Plodder would ⎕OFF rather than Tatin (No CodeCoverage then, for example)
+ :EndIf
+ (rc msg)←r.Run
+ msg Assert rc=0
+⍝Done

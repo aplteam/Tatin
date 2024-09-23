@@ -1,7 +1,10 @@
- r←ListVersions Arg;qdmx;dateFlag;buff;caption;ind;arg
+ r←ListVersions Arg;qdmx;dateFlag;buff;caption;ind;arg;list;msg;name
  dateFlag←Arg.Switch'date'
- arg←Arg._1
  :Trap ErrNo
+     :If 0≡arg←Arg._1
+         (arg msg)←SelectProject 1
+         →(0=≢arg)/0
+     :EndIf
      :If '[?]'{⍺≡(≢⍺)↑⍵}arg
          'No package specified'Assert 0<≢{⍵↓⍨⌈/⍵⍳'?]'}arg
          buff←{⍵[;,2]}1 TC.ListRegistries 0
@@ -12,6 +15,11 @@
          :Else
              arg←(1⊃buff[ind;]),{⍵↓⍨⌈/⍵⍳'?]'}arg
          :EndIf
+     :EndIf
+     :If '[]'≡(1↑arg),¯1↑arg
+         (arg msg)←SelectProject 1
+         →(0=≢arg)/0
+         arg←Arg._1,arg
      :EndIf
      :If dateFlag
          r←dateFlag TC.ListVersions arg

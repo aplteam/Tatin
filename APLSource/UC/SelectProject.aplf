@@ -1,0 +1,22 @@
+ (name msg)←SelectProject check;ind;list
+⍝ If there is no Cider available or no Cier project open, `name` is empty.
+⍝ If there is just one Cider project open, the name of that project is returned.
+⍝ If there are multiple Cider projects open, the user is questioned.
+⍝ If `check` is 0 no check is performed.
+⍝ If `check` is 1 all Cider projects that do not have a file "apl-package.json" in their root are ignored
+ name←⍬
+ msg←'No packages specified?!'
+ :If 0<⎕SE.⎕NC'Cider'
+ :AndIf 0<≢list←⎕SE.Cider.ListOpenProjects 0
+ :AndIf 0<≢list←(check{⍺:{TC.F.IsFile ⍵,'/apl-package.json'}¨⍵ ⋄ 1}list[;2])⌿list
+     :If 1=≢list
+         name←⊃list[1;1]
+     :ElseIf 1<≢list
+         ind←'SelectProject@Select a project'TC.C.Select↓⍕list
+         →(0=≢ind)/0
+         name←⊃list[ind;]
+     :Else
+         :Return
+     :EndIf
+     name←⊃¯1↑'.'(≠⊆⊢)name
+ :EndIf

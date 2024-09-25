@@ -1,4 +1,4 @@
-{r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
@@ -26,7 +26,7 @@
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Compiling HTML from the markdown files (documentation)...'
  CompileDocumentation ⍬
 
- path←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL-64 19.0 Unicode Files\SessionExtensions\CiderTatin\Tatin'
+ path←(⊃⎕NPARTS 2⊃4070⌶0),'Dyalog APL-64 19.0 Unicode Files\SessionExtensions\CiderTatin\Tatin'
  :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in the version-agnostic folder?
  :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live there?
      file1←path,'/Tatin.dyalog'

@@ -1,25 +1,27 @@
- r←{versionAgnostic}GetProgramFilesFolder postFix;version;aplVersion;OS
-⍝ Returns the path to Dyalog's version-specific program files folder by default.\\
+ r←{current}GetProgramFilesFolder postFix;version;aplVersion;OS
+⍝ Returns path to Dyalog's program files folder.\\
+⍝ * By default it returns the version agnostic folder
+⍝ * If ⍺=1 then it returns the folder for the currently running APL
 ⍝ Works on all platforms but returns different results.\\
 ⍝ Under Windows typically:\\
-⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 19.0 Unicode Files' ←→ GetMyUCMDsFolder
-⍝ If ⍺←1, the version-agnostic folder is returned.
- versionAgnostic←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'versionAgnostic'
+⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL Files' ←→ GetProgramFilesFolder ''
+⍝ When a 1 is passed as ⍺ and it's running on 19.0-64 bit Unicode:
+⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 19.0 Unicode Files' ←→ 1 GetProgramFilesFolder ''
+ current←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'current'
  OS←3↑1⊃# ⎕WG'APLVersion'
  postFix←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}postFix
  aplVersion←# ⎕WG'APLVersion'
- :If versionAgnostic
+ :If current
      :If OS≡'Win'
-         r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL Files',postFix
-     :Else
-         r←(⊃⎕SH'echo $HOME'),'/dyalog.files',postFix
-     :EndIf
- :Else
-     :If OS≡'Win'
-         version←((∨/'-64'⍷1⊃aplVersion)/'-64'),' ',({⍵/⍨2>+\⍵='.'}2⊃aplVersion),' ',(80=⎕DR' ')/'Unicode'
-         r←(2 ⎕NQ #'GetEnvironment' 'USERPROFILE'),'\Documents\Dyalog APL',version,' Files',postFix
+         r←(2⊃4070⌶0),postFix
      :Else
          version←({'.'~⍨⍵/⍨2>+\⍵='.'}2⊃aplVersion),((80=⎕DR' ')/'U'),((1+∨/'-64'⍷1⊃aplVersion)⊃'32' '64')
          r←(⊃⎕SH'echo $HOME'),'/dyalog.',version,'.files',postFix
+     :EndIf
+ :Else
+     :If OS≡'Win'
+         r←(⊃⎕NPARTS 2⊃4070⌶0),'Dyalog APL Files',postFix
+     :Else
+         r←(⊃⎕SH'echo $HOME'),'/dyalog.files',postFix
      :EndIf
  :EndIf

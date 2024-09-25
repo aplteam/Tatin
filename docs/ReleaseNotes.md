@@ -11,6 +11,10 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.114.0 from 2024-09-23
+
+* No action required but be aware of changes made to `]ListVersions`: if no argument is pprovided it checks on open Cider projects
+
 ## Version 0.113.1 from 2024-09-08
 
 * No action required
@@ -244,6 +248,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

@@ -3,7 +3,7 @@
  html←HtmlHeader''
  html,←⊂'<h2>Group home page of "',groupName,'"</h2>'
  html,←⊆AddSpecialMessage''
- html,←⊂'<form id="create-group-homepage" action="',GetVersion_REST'group-homepage-save">'
+ html,←⊂'<form id="create-group-homepage" action="','group-homepage-save">'
 
  html,←⊂'content'H.Label'Content (<a href="https://download.aplteam.com/MarkAPL_CheatSheet.html" target="_blank" rel=noopener>Markdown</a>):'
  html,←⊂H.BR
@@ -20,12 +20,14 @@
  html,←⊂'required'H.Input parms
  html,←⊂H.BR
 
- html,←⊂'api-key'H.Label'API key:'
- html,←⊂H.BR
- parms←⎕NS''
- parms.(id name type placeholder)←'api-key' 'api-key' 'password' 'Password (API-key)'
- html,←⊂'required'H.Input parms
- html,←⊂H.BR
+ :If 0<≢G.Credentials
+     html,←⊂'api-key'H.Label'API key:'
+     html,←⊂H.BR
+     parms←⎕NS''
+     parms.(id name type placeholder)←'api-key' 'api-key' 'password' 'Password (API-key)'
+     html,←⊂'required'H.Input parms
+     html,←⊂H.BR
+ :EndIf
 
  parms←⎕NS''
  parms.(id name type value style readonly)←'group' 'group' 'text'groupName'display:none;' 'readonly'

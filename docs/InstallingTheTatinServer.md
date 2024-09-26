@@ -64,21 +64,11 @@ This is the path where the Registry lives that is managed by the Tatin Server.
 
 #### [CONFIG]Base
 
-Replace this with your domain name, or "localhost" in case you just want to run a Tatin Server on your local machine for your own purposes, for example for checking it out.
-
-Never add a port number to `Base`; see `[CONFIG]BaseTagPort` for this.
-
+From version 0.104.0 onwards this INI file entry is ignored.
 
 #### [CONFIG]BaseTagPort
 
-Leave this alone in case the Tatin Server listens to either port 80 (http://) or 443 (https://). 
-
-In case you run the Tatin Server on a non-standard port like, say, 9999, then you would set `BaseTagPort` to 9999. This makes Tatin inject that port number into the HTML "base" tag, so that for example links in the Tatin documentation would continue to work.
-
-However, when your Tatin Server runs behind, say, an Apache Server, then Tatin would listen to a non-standard port used for the sole purpose of communicating with the Apache Server. In this case, you would leave `BaseTagPort` alone, except when the Apache Server itself listens to a non-standard port: then `BaseTagPort` needs to be _that_ port.
-
-See also `[CONFIG]Base`.
-
+From version 0.104.0 onwards this INI file entry is ignored.
 
 #### [CONFIG]Title
 
@@ -315,6 +305,7 @@ What kind of actions need to be taken, if any, is revealed by the release notes.
 First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+
 
 
 

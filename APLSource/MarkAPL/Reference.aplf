@@ -8,10 +8,10 @@
  :Access Public Shared
  parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHelpParms}'parms'
  parms←EstablishDefaultHomeFolder parms
- :If ~⎕NEXISTS parms.homeFolder,'/Files/MarkAPL.md'
+ filename←parms.homeFolder{0=≢⍺:'.',⍵ ⋄ ⍺,⍵}'/Files/MarkAPL'
+ :If ~⎕NEXISTS(⊃,/2↑⎕NPARTS filename),'.md'
      recompileFlag←0
  :EndIf
- filename←parms.homeFolder,'/Files/MarkAPL'
  filename←recompileFlag AddAppropriateExtension filename
  ns←CompileHelp filename recompileFlag parms
  :If ¯1≠×recompileFlag  ⍝ This syntax is used only by the `Make` workspace and test cases, therefore it is not documented.

@@ -1,10 +1,9 @@
- html←HtmlHeader add;base;caption;title
+ html←HtmlHeader add;caption;title
 ⍝ Strictly speaking this does not only return a header: it also returns...
 ⍝ * the DOC type
 ⍝ * an opening html tag
 ⍝ * an opening body tag
 ⍝ * some more stuff shared by all Tatin HTML pages
- base←GetBaseForHTML
  html←''
  html,←⊂'<!DOCTYPE html>'
  html,←⊂'<html lang="en">'
@@ -12,18 +11,12 @@
  title←⊃G.INI.Get'Config:Title'
  html,←⊂'<title>',title,'</title>'
  html,←⊂'<meta charset="UTF-8">'
- :If 0<≢base
-     html,←⊂'<meta name="url" content="',base,Reg.VersionOf_REST,'">'
- :EndIf
  html,←⊂'<meta name="robots" content="noindex">'
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/screen.css" media="screen">'
 ⍝html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="screen">'   ⍝ Can be useful for debugging the "Print" CSS
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="print">'
  html,←⊂'<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.css">'
  html,←⊂'<script src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.js"></script>'
- :If 0<≢base
-     html,←⊂'<base href="',base,'" />'
- :EndIf
  html,←⊂'<link rel="icon" type="image/x-icon" href="/Assets/img/favicon.ico">'
  html,←FetchBackground G.INI
  html,←⍕¨⊆add
@@ -33,7 +26,7 @@
  html,←⊂'<body>'
  html,←⊂'<div id="my-logo">'
  caption←⊃G.INI.Get'Config:Caption'
- html,←⊂'<a href="/"><img id="logo" src="Assets/img/tatin.png" title="Link to ',title,' main page" alt="Link to ',title,' main page"></a>'
+ html,←⊂'<a href="/"><img id="logo" src="/Assets/img/tatin.png" title="Link to ',title,' main page" alt="Link to ',title,' main page"></a>'
  html,←⊂'<h1>',caption,'</h1>'
  html,←⊂'</div>'
  html←,¨html

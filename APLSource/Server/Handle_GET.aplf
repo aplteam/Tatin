@@ -4,7 +4,9 @@
      response←CreateHomePage request
  :Else
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
-     :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath                        ⍝ Static stuff
+     :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}(≢Reg.VersionOf_REST)↓fullPath  ⍝ Static stuff with REST version
+         response←request ReturnFiles G.HTDOCS,(≢Reg.VersionOf_REST)↓fullPath
+     :ElseIf 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath                    ⍝ Static stuff without REST version
          response←request ReturnFiles G.HTDOCS,fullPath
      :ElseIf 'usage-data/'≡{⍵↑⍨⌊/⍵⍳'/\'}fullPath
          response←request ReturnUsageDataFiles fullPath

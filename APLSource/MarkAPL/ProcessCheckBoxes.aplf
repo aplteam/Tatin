@@ -1,16 +1,16 @@
  r←ProcessCheckBoxes ns;noOfLines;list;b
-⍝ Replaces "[ ]" with "☐" and "[x]" or "[X]" with "☒"
+⍝ Replaces "- [ ]" with "☐" and "- [x]" or "- [X]" with "☒"
  r←0
  :If 0<≢list←(+/∧\~ns.emptyLines)↑ns.markdown
-     b←∧\{0<≢'^ {0,3}\[[ xX]] '⎕S 0⊣⍵}¨list
+     b←∧\{0<≢'^ {0,3}- \[[ xX]] '⎕S 0⊣⍵}¨list
  :AndIf ∨/b
      noOfLines←+/b
      list←b/list
      list←ns{⊃⍺ ProcessInlineMarkUp ⍵}¨list
      b←∨/¨'[ ]'∘⍷¨list
-     (b/list)←{'\[ \]'⎕R'☐'⊣⍵}¨b/list
+     (b/list)←{'- \[ \]'⎕R'☐'⊣⍵}¨b/list
      b←~b
-     (b/list)←{'\[[xX]\]'⎕R'☒'⊣⍵}¨b/list
+     (b/list)←{'- \[[xX]\]'⎕R'☒'⊣⍵}¨b/list
      ns.noOf←noOfLines
      r←1
      ns.html,←⊂'<ul class="checkboxes">'

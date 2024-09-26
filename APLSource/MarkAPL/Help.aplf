@@ -1,19 +1,27 @@
-{ns}←{parms}Help recompileFlag;filename
-⍝ Displays the file MarkAPL_CheatSheet.html with your default browser.\\
+ {ns}←{parms}Help recompileFlag;filename;path;filenames;ind
+⍝ Displays any of the MarkAPL help files with your default browser.\\
 ⍝ `recompileFlag`:
-⍝ * 0 shows the file as it stands.
+⍝ * 0 shows the HTML file as it stands.
 ⍝ * 1 lets MarkAPL recompile it from MarkAPL_CheatSheet.md first.
 ⍝ Returns either `⍬` or the `ns` namespace created by `Init` and modified by `Process`.
-⍝ However, if the markdown file does not exist then `recompileFlag` has no effect (is always 0).
+⍝ However, if the markdown file does not exist then `recompileFlag` has no effect (is always 0)
+⍝ because then there is nothing that could be recompiled.
  :Access Public Shared
  parms←{0<⎕NC ⍵:⍎⍵ ⋄ CreateHelpParms}'parms'
  :If 0=≢parms.homeFolder
-     filename←TatinVars.GetFullPath2AssetsFolder,'/MarkAPL_CheatSheet'
+     path←TatinVars.GetFullPath2AssetsFolder,'/'
  :Else
-     filename←parms.homeFolder,'/Files/MarkAPL_CheatSheet'
+     path←parms.homeFolder,'/Files/'
  :EndIf
- :If ~⎕NEXISTS filename,'.md'
+ filenames←FilesAndDirs.ListFiles path,'*.html'
+ ind←'Select a document you want to put on view:'CommTools.Select{2⊃⎕NPARTS ⍵}¨filenames
+ →(0=≢ind)/0
+ filename←ind⊃filenames
+ :If ~⎕NEXISTS(⊃,/2↑⎕NPARTS filename),'.md'
      recompileFlag←0
+ :EndIf
+ :If recompileFlag
+     filename←(⊃,/2↑⎕NPARTS filename),'.md'
  :EndIf
  filename←recompileFlag AddAppropriateExtension filename
  ns←CompileHelp filename recompileFlag parms

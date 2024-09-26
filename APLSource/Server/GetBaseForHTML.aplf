@@ -1,9 +1,12 @@
  r←GetBaseForHTML;port
- r←⊃G.INI.Get'Config:Base'
- ##.Registry.Assert 1=≢'http[s]?://'⎕S 0⊣r  ⍝ MUST define the protocol
- :If G.INI.Exist'Config:BaseTagPort'
-     port←⊃G.INI.Get'Config:BaseTagPort'
- :AndIf 0≠port
-     r,←':',⍕port
+ r←''
+ :If G.INI.Exist'Config:Base'
+ :AndIf 0<≢r←⊃G.INI.Get'Config:Base'
+     ##.Registry.Assert 1=≢'http[s]?://'⎕S 0⊣r  ⍝ MUST define the protocol
+     :If G.INI.Exist'Config:BaseTagPort'
+         port←⊃G.INI.Get'Config:BaseTagPort'
+     :AndIf 0≠port
+         r,←':',⍕port
+     :EndIf
  :EndIf
 ⍝Done

@@ -1,4 +1,4 @@
-html←HtmlHeader add;base;caption;title
+ html←HtmlHeader add;base;caption;title
 ⍝ Strictly speaking this does not only return a header: it also returns...
 ⍝ * the DOC type
 ⍝ * an opening html tag
@@ -12,14 +12,18 @@ html←HtmlHeader add;base;caption;title
  title←⊃G.INI.Get'Config:Title'
  html,←⊂'<title>',title,'</title>'
  html,←⊂'<meta charset="UTF-8">'
- html,←⊂'<meta name="url" content="',base,Reg.VersionOf_REST,'">'
+ :If 0<≢base
+     html,←⊂'<meta name="url" content="',base,Reg.VersionOf_REST,'">'
+ :EndIf
  html,←⊂'<meta name="robots" content="noindex">'
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/screen.css" media="screen">'
 ⍝html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="screen">'   ⍝ Can be useful for debugging the "Print" CSS
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="print">'
  html,←⊂'<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.css">'
  html,←⊂'<script src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.js"></script>'
- html,←⊂'<base href="',base,'">'
+ :If 0<≢base
+     html,←⊂'<base href="',base,'" />'
+ :EndIf
  html,←⊂'<link rel="icon" type="image/x-icon" href="/Assets/img/favicon.ico">'
  html,←FetchBackground G.INI
  html,←⍕¨⊆add

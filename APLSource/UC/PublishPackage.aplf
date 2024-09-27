@@ -65,7 +65,8 @@
  :If TC.F.IsDir source
      ('"',source,'" does not contain a Tatin package')Assert TC.F.IsFile source,'/',TC.CFG_Name
  :Else
-     ('"',source,'" is not a ZIP file')Assert'.zip'≡⎕C ¯4↑source
+     ('"',source,'" is neither a folder nor a ZIP file')Assert'.zip'≡⎕C ¯4↑source
+     ('File not found: "',source,'"')Assert ⎕NEXISTS source
  :EndIf
  firstFlag←1
  :Trap ErrNo

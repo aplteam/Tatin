@@ -7,9 +7,9 @@
  :If 0=⎕NC'OS'
      OS←##.APLTreeUtils2.GetOperatingSystem''
  :EndIf
- add←{(((~'/\'∊⍨⊃⍵)∧0≠≢⍵)/'/'),⍵}add
+ add←##.FilesAndDirs.AddTrailingSep add
  :If 'Win'≡OS
-     r←##.FilesAndDirs.ExpandPath(2⊃4070⌶0),'\..\MyUCMDs',add
+     r←##.FilesAndDirs.ExpandPath GetUserDocumentsFolder,'MyUCMDs',add
  :Else
      r←(2 ⎕NQ'.' 'GetEnvironment' 'Home'),'/MyUCMDs',add
  :EndIf

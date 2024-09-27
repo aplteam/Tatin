@@ -34,6 +34,11 @@ Explore Tatin's comprehensive documentation presented as a collection of HTML fi
 
   Comprehensive syntax guide for all API functions.
 
+* [Tatin and OneDrive](./TatinAndOneDrive.html "TatinAndOneDrive.html") (draft)
+
+  Relevant if you are on Windows and you use OneDrive for your personal folders, in particular `Documents/`.
+
+
 ### Client Side
 
 * [Installing and updating the Tatin Client](./InstallingAndUpdatingTheTatinClient.html "InstallingAndUpdatingTheTatinClient.html") (draft)
@@ -87,6 +92,7 @@ Explore Tatin's comprehensive documentation presented as a collection of HTML fi
 * [Run Dyalog behind Apache](./RunDyalogBehindApache.html "RunDyalogBehindApache.html") (draft)
 
   Instructions for integrating a Tatin server with an Apache server.
+
 
 
 

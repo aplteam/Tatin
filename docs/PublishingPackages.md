@@ -93,6 +93,8 @@ You must provide these pieces of information:
 * If it's connected to a company, the company's name
 * Email address (if different from the one you are using to send the email)
 
+!> ### First step after receiving an API key
+=> After having received an API key you must first create a home page for your group name on the server. Only then can you start publishing packages.
 
 #### Credentials for the Tatin Test Server
 
@@ -396,6 +398,7 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
 
 
 

@@ -11,9 +11,10 @@
  :EndIf
  :If G.Credentials AcceptCredential apiKey groupName
      :If 0=≢'email'Reg.GetGroupData G.RegistryPath groupName
+     :AndIf 'group-homepage-save'{⍺≢(-≢⍺)↑⍵}request.RequestTarget
      :AndIf 0 G.INI.Get'CONFIG:EnforceEmailAddress'
          response←request Respond 400
-         response.Content←'You cannot publish without defining an email address for your group.'
+         response.Content←'You cannot publish without defining an email address for your group. Create a home page for your group for that'
      :Else
          :If Reg.IsValidPackageID_Complete request.RequestTarget
              response←SavePackage request

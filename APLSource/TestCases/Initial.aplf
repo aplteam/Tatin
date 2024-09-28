@@ -11,13 +11,11 @@
      ⎕←'Copying data for the test server...'
      ∆CopyTestServerDataTo ∆TEMP_SERVER_FOLDER
      ⎕←' Done'
-
 ⍝ Local folder, not managed:
      ∆TEMP_REGISTRY_FOLDER←F.GetTempSubDir'Tatin-Test-Registry'
      ⎕←'Copying data for the (un-managed) test registry...'
      ∆TEMP_REGISTRY_FOLDER∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨F.ListDirs #.Tatin.CiderConfig.HOME,'/TestServer/Registry/*'
      ⎕←' Done'
-
      json←⊃⎕NGET'./TestData/tatin-client.json'
      ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
      local←1⊃ns.registries
@@ -26,10 +24,10 @@
      (1⊃ns.registries)←local
      json←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
      (⊂json)⎕NPUT'./TestData/tatin-client.json' 1
-
      (rc msg res)←∆UCMD'Init ./TestData'
      Assert 0=rc
-
+ :Else
+     ∆TEMP_SERVER_FOLDER←∆GetServerPath
  :EndIf
 
  ∆CACHE_PARMS←∆InitUserSettings 0

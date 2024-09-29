@@ -6,7 +6,7 @@
      'This function requires Admin rights'⎕SIGNAL 11/⍨~##.APLTreeUtils2.IsRunningAsAdmin
      sourceFolder←##.Client.GetUserDocumentsFolder,'Dyalog APL-64 18.2 Unicode Files\CiderTatin\Tatin'
      sourceForRun←##.CiderConfig.HOME,'/Run.aplf'
-     :If 'Win'≡3↑1⊃# ⎕WG'APLVersion'
+     :If ##.Registry.IsWindows
          targetFolder←4{⍵/⍨⍺>+\'\'=⍵}sourceFolder
          :If ⎕NEXISTS targetFolder,'/Dyalog APL-64 18.0 Unicode Files'
              3 ⎕MKDIR targetFolder,'/Dyalog APL-64 18.0 Unicode Files\CiderTatin'

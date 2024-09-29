@@ -1,58 +1,56 @@
- r←Initial parms;P;cfg;clientCfg;dir;f2;flag;flag2;json;local;msg;ns;rc;registry;res;copyFlag
+ r←Initial parms;isWindows;autoStart;ini;reg;json;ns;local;rc;msg;res;flag;isBatch
  #.⎕EX'_tatin'
  r←1
-
  RI←##.Client.RegistryIndices
  ##.Client.DEBUG←0
- copyFlag←1 ##.CommTools.YesOrNo'Copy data for a Tatin server to the Temp folder?'
- :If copyFlag
-⍝ Managed Registry:
+ isWindows←Reg.IsWindows
+ isBatch←{~(⊂⍵)∊''⍬:0 ⋄ ⍵.batchFlag}parms
+ :If isWindows
+ :AndIf autoStart←isBatch{⍺:1 ⋄ 1 ##.Client.YesOrNo ⍵}'Would you like to start the Tatin test server automatically?'
+     ⍝ For an auto-start we must copy the test data into a temp folder first
      ∆TEMP_SERVER_FOLDER←F.GetTempSubDir'Tatin-Test-Server'
      ⎕←'Copying data for the test server...'
      ∆CopyTestServerDataTo ∆TEMP_SERVER_FOLDER
-     ⎕←' Done'
-⍝ Local folder, not managed:
-     ∆TEMP_REGISTRY_FOLDER←F.GetTempSubDir'Tatin-Test-Registry'
-     ⎕←'Copying data for the (un-managed) test registry...'
-     ∆TEMP_REGISTRY_FOLDER∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨F.ListDirs #.Tatin.CiderConfig.HOME,'/TestServer/Registry/*'
-     ⎕←' Done'
-     json←⊃⎕NGET'./TestData/tatin-client.json'
-     ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
-     local←1⊃ns.registries
-     Assert'local'≡local.alias
-     local.uri←∆TEMP_REGISTRY_FOLDER
-     (1⊃ns.registries)←local
-     json←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
-     (⊂json)⎕NPUT'./TestData/tatin-client.json' 1
-     (rc msg res)←∆UCMD'Init ./TestData'
-     Assert 0=rc
+     ⎕←' Server data copied!'
  :Else
+     autoStart←0
+     ini←⎕NEW ##.IniFiles(,⊂##.CiderConfig.HOME,'/TestServer/Server/server.ini')
+     reg←⎕NEW ##.Client.DefineRegistry(,⊂'[localhost]https://localhost')
+     reg.port←⊃ini.Get'CONFIG:Port'
+     ##.Client.MyUserSettings.AddRegistry reg
      ∆TEMP_SERVER_FOLDER←∆GetServerPath
  :EndIf
-
+ ⍝ Local folder (not managed):
+ ∆TEMP_REGISTRY_FOLDER←F.GetTempSubDir'Tatin-Test-Registry'
+ ⎕←'Copying data for the (un-managed) test registry...'
+ ∆TEMP_REGISTRY_FOLDER∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨F.ListDirs #.Tatin.CiderConfig.HOME,'/TestServer/Registry/*'
+ ⎕←' Local test data copied!'
+ ⍝ --------- Now we need to copy the test data to a different (from the server) temp folder for pure local tests
+ json←⊃⎕NGET'./TestData/tatin-client.json'
+ ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
+ local←1⊃ns.registries
+ Assert'local'≡local.alias
+ local.uri←∆TEMP_REGISTRY_FOLDER
+ (1⊃ns.registries)←local
+ json←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
+ (⊂json)⎕NPUT'./TestData/tatin-client.json' 1
+ (rc msg res)←∆UCMD'Init ./TestData'
+ Assert 0=rc
+ ⍝ --------------------------------------------
  ∆CACHE_PARMS←∆InitUserSettings 0
  #.Tatin.Client.∆PrintToSession←0
  ⎕SE._Tatin.Client.∆PrintToSession←0
  {}''∆GetTempDir ⍬
  ∆TEST←1 ⍝ Used to add an HTTP header to any request. Influences only logging on the server side but implicitly also usage data
-
- flag2←0
- :If copyFlag
-     :If ~(⊂parms)∊''⍬
-     :AndIf ~parms.batchFlag
-         flag←1 ##.Client.YesOrNo'Would you like to start the Tatin test server?'
-     :Else
-         flag←1
-     :EndIf
-     :If flag
-         ∆P←∆StartServerProcessForTests 0
-         :Repeat
-             :If 0=flag2←1 TC.Ping'[localhost]'
-             :EndIf
-         :Until flag2
-     :EndIf
+ flag←0
+ :If autoStart
+     ∆P←∆StartServerProcessForTests 0
+     :Repeat
+         :If 0=flag←1 TC.Ping'[localhost]'
+         :EndIf
+     :Until flag
  :EndIf
-
+ T.exec_after_each_test←'#.Kai'
  ⍝ T.exec_after_each_test←(⍕⎕THIS),'.CheckTempFolder'
  ⍝ T.exec_after_each_test←'#.Tatin.Admin.CheckExecuteTime'
 ⍝Done

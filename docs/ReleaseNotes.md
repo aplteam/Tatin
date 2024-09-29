@@ -11,13 +11,13 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.114.0 from 2024-09-27
+## Version 0.114.0 from 2024-09-28
 
-If you are on Windows and you are using OneDrive then you might need to pay attention. 
+In case you are on Windows and you are using OneDrive then you might need to pay attention. 
 
-Older versions of Tatin did not always cooperate with OneDrive, which could potentially cause problems. A new document, "Tatin and OneDrive," discusses this. If you use OneDrive, read it!
+Older versions of Tatin did not cooperate with OneDrive; this can potentially cause problems. A new document, "Tatin and OneDrive," discusses this issue. If you use OneDrive, read it!
 
-Otherwise no action is required, but be aware of changes made to `]ListVersions`: if no argument is provided it checks on open Cider projects
+Otherwise no action is required, but be aware of changes made to `]ListVersions`: if no argument is provided it checks on open Cider projects now.
 
 ## Version 0.113.1 from 2024-09-08
 
@@ -252,6 +252,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

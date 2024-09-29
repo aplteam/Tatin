@@ -17,8 +17,8 @@
 
  cfg←Reg.GetJsonFromFile(⊃⊃F.Dir packageFolder,'/',TC.CFG_Name)0
  version←⊃{⍺,'-',⍵}/cfg.(group name version)
- F.RmDir ∆GetServerRegistryFolder,version
- #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
+ F.RmDir ∆TEMP_SERVER_FOLDER,version
+ #.Tatin.Registry.Index.Compile ∆TEMP_SERVER_FOLDER
 
  (rc msg res)←∆UCMD'PublishPackage "',zipfile,'" [local]'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
@@ -28,5 +28,5 @@
 ∆TidyUp:
  Assert 0=⊃F.RmDir tempDir
  #.⎕EX TC.GetTatinRootSpace'#'
- #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
+ #.Tatin.Registry.Index.Compile ∆TEMP_SERVER_FOLDER
 ⍝Done

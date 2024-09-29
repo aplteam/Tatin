@@ -1,5 +1,6 @@
  ∆GetBestVersionFor←{
-     list←F.ListDirs ∆TEMP_SERVER_FOLDER,⍵,'*'
+     path←F.AddTrailingSep ⍺  ⍝ Either ∆TEMP_REGISTRY_FOLDER or ∆TEMP_SERVER_FOLDER
+     list←F.ListDirs path,⍵,'*'
      data←Reg.InjectPublishingDate list
      2⊃A.SplitPath⊃¯1↑list[Reg.SortIndexForPackageIDs data]
  }

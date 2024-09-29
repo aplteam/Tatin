@@ -7,15 +7,15 @@
  (rc msg res)←stop ∆UCMD'DeprecatePackage [localhost]/example-versions "Reason for deprecation" -force'
  →T.GoToTidyUp 0≠rc
  ⍝ Has three major versions, and for those there now must be new minor versions available:
- →T.GoToTidyUp 1≠⎕NEXISTS ∆GetServerRegistryFolder,'example-versions-0.2.0'
- →T.GoToTidyUp 1≠⎕NEXISTS ∆GetServerRegistryFolder,'example-versions-1.1.0'
- →T.GoToTidyUp 1≠⎕NEXISTS ∆GetServerRegistryFolder,'example-versions-2.1.0'
+ →T.GoToTidyUp 1≠⎕NEXISTS ∆TEMP_SERVER_FOLDER,'/example-versions-0.2.0'
+ →T.GoToTidyUp 1≠⎕NEXISTS ∆TEMP_SERVER_FOLDER,'/example-versions-1.1.0'
+ →T.GoToTidyUp 1≠⎕NEXISTS ∆TEMP_SERVER_FOLDER,'/example-versions-2.1.0'
 
  r←T._OK
 
 ∆TidyUp:
- F.RmDir ∆GetServerRegistryFolder,'example-versions-0.2.0'
- F.RmDir ∆GetServerRegistryFolder,'example-versions-1.1.0'
- F.RmDir ∆GetServerRegistryFolder,'example-versions-2.1.0'
- #.Tatin.Registry.Index.Compile ∆GetServerRegistryFolder
+ F.RmDir ∆TEMP_SERVER_FOLDER,'/example-versions-0.2.0'
+ F.RmDir ∆TEMP_SERVER_FOLDER,'/example-versions-1.1.0'
+ F.RmDir ∆TEMP_SERVER_FOLDER,'/example-versions-2.1.0'
+ #.Tatin.Registry.Index.Compile ∆TEMP_SERVER_FOLDER
 ⍝Done

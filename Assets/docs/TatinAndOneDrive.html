@@ -26,7 +26,9 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 <ul id="toc-list" class="hide print">
 <li class="toc-entry toc-h1"><a href="#tatin-and-onedrive">Tatin and OneDrive</a>
 <ul>
-<li class="toc-entry toc-h2"><a href="#background">1. Background</a>
+<li class="toc-entry toc-h2"><a href="#background">1. Background</a></li>
+<li class="toc-entry toc-h2"><a href="#solution">2. Solution</a></li>
+<li class="toc-entry toc-h2"><a href="#problems-when-updating-an-older-version-of-tatin">3. Problems when updating an older version of Tatin</a>
 </li></ul></li>
 </ul>
 </div>
@@ -38,10 +40,46 @@ html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{font-s
 </div>
 <p>OneDrive is cloud storage offered by Microsoft for backing up some of your personal folders.</p>
 <p>In the context of Tatin, the folder <code>Documents\</code> is of particular interest.</p>
-<p>For decades, Dyalog has saved stuff in a version agnostic folder named “XXXXX” in this folder, and also version specific stuff. For example, for version 19.0 there is a folder “YYYYYY” created in <code>Documents/</code>.</p>
-<p>Until version 0.114.0 Tatin questioned the envornment <code>USERPROFILE</code> in order to find out where to copy Tatin to. For example, for a user JohnDoe that would usually result in</p>
+<p>For decades, Dyalog has saved (or potentially saved) stuff in a version agnostic folder named <code>Dyalog APL Files</code> in the <code>Documents\</code> folder, and also version specific stuff. For example, for version 19.0 there is a folder <code>Dyalog APL-64 19.0 Unicode Files</code> created in <code>Documents/</code>.</p>
+<p>Until version 0.114.0 Tatin questioned the environment variable <code>USERPROFILE</code> in order to find out where to copy Tatin to. For example, for a user JohnDoe that would usually result in</p>
 <pre tabindex="0"><code>C:\Users\JohnDoe\Documents\</code></pre>
 <p>This is true no matter whether OneDrive is used or not.</p>
+<p>This means that in case OneDrive <strong>is</strong> used and the Documents folder is managed by OneDrive (the user might use OneDrive and still decide against this!), then <code>USERPROFILE</code> is misleading.</p>
+<div class="h_tag">
+<a href="#solution" id="solution" class="autoheader_anchor">
+<h2 data-id="Solution">2. Solution</h2>
+</a>
+</div>
+<p>Tatin now uses the — at the time of writing — inofficial I-beam <code>4070⌶0</code> which in the second item of the result gives the location of the Dyalog files folder for the currently running version of Dyalog, for example for a user JohnDoe:</p>
+<pre tabindex="0"><code>      2⊃4070⌶0
+C:\Users\JohnDoe\OneDrive\Documents\Dyalog APL-64 19.0 Unicode Files</code></pre>
+<p>With version 0.114.0 Tatin has adopted this and can therefore deal with a <code>Documents/</code> folder that is saved in OneDrive.</p>
+<div class="h_tag">
+<a href="#problems-when-updating-an-older-version-of-tatin" id="problems-when-updating-an-older-version-of-tatin" class="autoheader_anchor">
+<h2 data-id="Problems-when-updating-an-older-version-of-Tatin">3. Problems when updating an older version of Tatin</h2>
+</a>
+</div>
+<p>Any attempt to update an older version than 0.114.0 will appear to be successful, but after a restart you will still use the old version.</p>
+<p>The reason for this is that older versions were installed into</p>
+<pre tabindex="0"><code>C:\Users\JohnDoe\Documents\Dyalog APL-64 19.0 Unicode Files</code></pre>
+<p>while the updated version is copied into</p>
+<pre tabindex="0"><code>C:\Users\JohnDoe\OneDrive\Documents\Dyalog APL-64 19.0 Unicode Files</code></pre>
+<p>when your are running version 19.0</p>
+<p>If this hits you your are advised to carry out these steps:</p>
+<ol start="1">
+<li>Add the path
+<pre tabindex="0"><code>C:/Users/&lt;⎕AN&gt;/OneDrive/Documents/Dyalog APL-64 19.0 Unicode Files/SessionExtensions/CiderTatin</code></pre>
+<p>to SALT's <code>cmddir</code> and remove the path</p>
+<pre tabindex="0"><code>C:/Users/&lt;⎕AN&gt;/Documents/Dyalog APL-64 19.0 Unicode Files/SessionExtensions/CiderTatin</code></pre>
+<p>from it.</p></li>
+<li>Remove the folder
+<pre tabindex="0"><code>C:/Users/JohnDoe/Documents/Dyalog APL-64 19.0 Unicode Files/SessionExtensions/CiderTatin</code></pre>
+<p>from your disk.</p></li>
+</ol>
+<p>This solves the problem permanently in the sense that future updates will work as expected.</p>
+<p>However, if you are going back to any ill-behaving version, for example by executing this command:</p>
+<pre tabindex="0"><code>      ]activate -reset</code></pre>
+<p>then you are back on a version that won't work when an update is issued, until Dyalog ships a new version, when this document will change as well.</p>
 
 <script>
 

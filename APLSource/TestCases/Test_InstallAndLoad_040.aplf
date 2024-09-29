@@ -1,5 +1,4 @@
- r←Test_InstallAndLoad_040(stopFlag batchFlag);⎕TRAP;dir;installFolder
- ;src4;list1;list2;refs
+ r←Test_InstallAndLoad_040(stopFlag batchFlag);⎕TRAP;dir;installFolder;src4;list1;list2;refs
 ⍝ Install and load both APL_process and CompareSimple: they have plenty of dependencies
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -9,9 +8,9 @@
  dir←∆GetTempDir''
  F.MkDir installFolder←dir,'/Tatin_AppPackages'
 
- list1←TC.InstallPackages(∆GetServerRegistryFolder,'aplteam-APLProcess')installFolder ⍝ No version number at all
+ list1←TC.InstallPackages(∆TEMP_REGISTRY_FOLDER,'/aplteam-APLProcess')installFolder ⍝ No version number at all
  →T.GoToTidyUp 0=≢list1
- list2←TC.InstallPackages(∆GetServerRegistryFolder,'aplteam-CompareSimple-3.0.2')installFolder
+ list2←TC.InstallPackages(∆TEMP_REGISTRY_FOLDER,'/aplteam-CompareSimple-3.0.2')installFolder
  →T.GoToTidyUp 0=≢list2
 
  refs←TC.LoadDependencies installFolder'#.TEMP'

@@ -4,12 +4,12 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- zipFilename←∆GetServerRegistryFolder,'example-UC-1.0.0/example-UC-1.0.0.zip'
+ zipFilename←∆TEMP_SERVER_FOLDER,'/example-UC-1.0.0/example-UC-1.0.0.zip'
  installFolder←TC.GetMyUCMDsFolder'UC'
  res←TC.InstallPackages zipFilename'[myucmdS]'
  Assert'example-UC-1.0.0'≡∊res
 
- res←TC.ReInstallDependencies'[myucmds]UC'∆GetServerRegistryFolder
+ res←TC.ReInstallDependencies'[myucmds]UC'(∆TEMP_SERVER_FOLDER,'/')
  →T.GoToTidyUp'example-UC-1.0.0'≢∊res
 
  r←T._OK

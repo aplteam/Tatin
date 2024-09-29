@@ -1,12 +1,12 @@
  {r}←∆RestoreMarkaplInTestServer flag;request;response;url;path;projects;projects_
 ⍝ The test cases in DeletePkg delete some example-MarkAPL packages.
-⍝ This function copies them back into the test server's Registry and then issues "recompile-index".
+⍝ This function copies them back into the test server's Registry and then issues a "recompile-index" command.
  r←0
  :If flag
-     path←∆TEMP_SERVER_FOLDER
-     projects←F.ListDirs path,'..\Data-Backup\'
+     path←∆TEMP_SERVER_FOLDER,'/..'
+     projects←F.ListDirs path,'\Data-Backup\'
      projects_←2⊃¨A.SplitPath¨projects
-     path ⎕NCOPY⍠('IfExists' 'Replace')⊢projects
+     ∆TEMP_SERVER_FOLDER ⎕NCOPY⍠('IfExists' 'Replace')⊢projects
      url←TC.ReplaceRegistryAlias'[localhost]'
      request←R.NewRequest 0
      request.RequestTarget←'/v1/recompile-index'

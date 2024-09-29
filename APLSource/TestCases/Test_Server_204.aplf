@@ -5,7 +5,7 @@
 
  (statusCode errMsg result)←TC.GetBestVersionNumber'aplteam-APLProcess-0.2' (TC.ReplaceRegistryAlias '[localhost]')
  →T.PassesIf statusCode=200
- best←∆GetBestVersionFor'aplteam-APLProcess-0.2*'
+ best←∆TEMP_SERVER_FOLDER ∆GetBestVersionFor'aplteam-APLProcess-0.2*'
  →T.PassesIf≡/{⍵↓⍨¨≢¨TC.RemovePackageID¨⍵}result best
 
  r←T._OK

@@ -4,7 +4,7 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- toPath←⊃,/1 ⎕NPARTS ∆GetServerRegistryFolder,'../Server/Maintenance/'
+ toPath←⊃,/1 ⎕NPARTS ∆TEMP_SERVER_FOLDER,'/../Server/Maintenance/'
  toPath ⎕NCOPY ##.CiderConfig.HOME,'/TestData/MaintenanceFiles/Modify_example_foo_1_0_0.aplf'
 
  counter←flag←0
@@ -15,7 +15,7 @@
  :Until flag∨max<counter←counter+1
  →T.GoToTidyUp max=counter
 
- path←∆GetServerRegistryFolder,'example-Foo-1.0.0/'
+ path←∆TEMP_SERVER_FOLDER,'/example-Foo-1.0.0/'
  json←⊃F.NGET path,'apl-package.json'
  data←∆JSON json
  →T.GoToTidyUp data.description≢'Modified by maintenance file'

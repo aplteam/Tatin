@@ -1,4 +1,4 @@
-{r}←∆StartServerProcessForTests debugFlag;P;rc;parms
+ {r}←∆StartServerProcessForTests debugFlag;P;rc;parms
 ⍝ This function starts a server that acts on ∆TEMP_SERVER_FOLDER
 ⍝ It's the first version which uses aplteamm-APLProcess which works fine on Windows but not at all elsewhere
  parms←##.APLProcess.CreateParms
@@ -18,7 +18,7 @@
      :EndIf
  :EndIf
  :If 0<⎕NC'∆TEMP_SERVER_FOLDER'
-     parms.CommandLineArgs,←'serverPath="',∆TEMP_SERVER_FOLDER,'" '
+     parms.CommandLineArgs,←'serverPath="',(F.ExpandPath ∆TEMP_SERVER_FOLDER,'..'),'" '
  :EndIf
  :If 0 ⍝ Because "load" and "lx" do not work on Linux and Mac OS
      parms.CommandLineArgs,←'lx="',(debugFlag/'1 '),'#.LoadTatinAndStartServer 1" '

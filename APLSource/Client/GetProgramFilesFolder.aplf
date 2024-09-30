@@ -1,27 +1,32 @@
- r←{current}GetProgramFilesFolder postFix;version;aplVersion;OS
+ r←{current}GetProgramFilesFolder subFolder;version;aplVersion;OS
 ⍝ Returns path to Dyalog's program files folder.\\
+⍝ Comes always with a trailing separator.\\
 ⍝ * By default it returns the version agnostic folder
 ⍝ * If ⍺=1 then it returns the folder for the currently running APL
 ⍝ Works on all platforms but returns different results.\\
 ⍝ Under Windows typically:\\
 ⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL Files' ←→ GetProgramFilesFolder ''
+⍝ without OneDrive or, with OneDrive:
+⍝ `C:\Users\<⎕AN>\OneDrive\Documents\Dyalog APL Files' ←→ GetProgramFilesFolder ''
 ⍝ When a 1 is passed as ⍺ and it's running on 19.0-64 bit Unicode:
-⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL[-64] 19.0 Unicode Files' ←→ 1 GetProgramFilesFolder ''
+⍝ `C:\Users\<⎕AN>\Documents\Dyalog APL-64 19.0 Unicode Files' ←→ 1 GetProgramFilesFolder ''
+⍝ or, with OneDrive:
+⍝ `C:\Users\<⎕AN>\OneDrive\Documents\Dyalog APL-64 19.0 Unicode Files' ←→ 1 GetProgramFilesFolder ''
  current←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'current'
  OS←3↑1⊃# ⎕WG'APLVersion'
- postFix←##.FilesAndDirs.AddTrailingSep postFix
+ subFolder,←{(~(¯1↑⍵)∊'/\')/'/'}subFolder
  aplVersion←# ⎕WG'APLVersion'
  :If current
      :If OS≡'Win'
-         r←GetCurrentAPLsFolderInDocuments,postFix
+         r←GetCurrentAPLsFolderInDocuments,{⍵↓⍨-(,'/')≡⍵}subFolder
      :Else
          version←({'.'~⍨⍵/⍨2>+\⍵='.'}2⊃aplVersion),((80=⎕DR' ')/'U'),((1+∨/'-64'⍷1⊃aplVersion)⊃'32' '64')
-         r←(⊃⎕SH'echo $HOME'),'/dyalog.',version,'.files',postFix
+         r←(⊃⎕SH'echo $HOME'),'/dyalog.',version,'.files',subFolder
      :EndIf
  :Else
      :If OS≡'Win'
-         r←GetUserDocumentsFolder,'Dyalog APL Files',postFix
+         r←GetUserDocumentsFolder,'Dyalog APL Files',{0<≢⍵~'/\':'/',⍵ ⋄ ⍵}subFolder
      :Else
-         r←(⊃⎕SH'echo $HOME'),'/dyalog.files',postFix
+         r←(⊃⎕SH'echo $HOME'),'/dyalog.files',subFolder
      :EndIf
  :EndIf

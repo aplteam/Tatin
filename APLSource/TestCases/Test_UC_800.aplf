@@ -8,6 +8,9 @@
  #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS'' ⍝ Used to load stuff into
  zipFilename←'file://',##.CiderConfig.HOME,'/TestData/ZIP-file/aplteam-APLGit-0.24.0.zip'
  aliasFilename←⎕SE.Cider.GetCiderAliasFilename
+ :If ~⎕NEXISTS aliasFilename
+     (⊂'')##.FilesAndDirs.NPUT aliasFilename
+ :EndIf
  aliase←⊃##.FilesAndDirs.NGET aliasFilename 1
  alias←(⊃⎕SI)~'_'
  targetDir←∆GetTempDir''

@@ -1,8 +1,9 @@
- RunTests;htmlFilename;log;rc
- Prepare
+ RunTests;htmlFilename;log;rc;codeCoverageFlag
+ codeCoverageFlag←Prepare
  (rc log)←T.Run 1
 
- :If 0 ##.Client.YesOrNo'View CodeCoverage report?'
+ :If codeCoverageFlag
+ :AndIf 0 ##.Client.YesOrNo'View CodeCoverage report?'
      htmlFilename←##.CodeCoverage.ProcessDataAndCreateReport T.codeCoverage.filename
      ##.APLTreeUtils2.GoToWebPage htmlFilename
  :EndIf

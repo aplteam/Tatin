@@ -1,10 +1,11 @@
- Prepare;testFilename;ask;answer;ignore
+ {codeCoverageFlag}←Prepare;testFilename;ask;answer;ignore
  'This WS appears to be prepared for running as a Tatin Server'⎕SIGNAL 11/⍨0<##.Client.⎕NC''
  'Not enough memory: should provide at least 128MB for the tests'Assert 100<⌊247813016÷1024×1024
  :If 0=##.Client.⎕NC'MyUserSettings'
      ##.Admin.Initialize_Client
  :EndIf
  T←⎕NEW ##.Tester2 ⎕THIS
+ codeCoverageFlag←0
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝ Might become usesul again one day ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ :If 0 ##.Client.YesOrNo'Check Temp\ folder for left-overs?'
@@ -26,23 +27,26 @@
 
  testFilename←##.Admin.GetCoverageFilename
  :If ⎕NEXISTS testFilename,'.profile'
-     ask←{⎕←⍵,'; 1=append, 2=replace' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2:∇ ⍵ ⋄ ⊃a}
+     ask←{⎕←⍵,'; 1=append, 2=replace, 3=no code coverage' ⋄ a←⎕ ⋄ ~(⊂a)∊1 2 3:∇ ⍵ ⋄ ⊃a}
      answer←⊃ask'Coverage file already exists'
      :If 2≡answer
          1 ⎕NDELETE testFilename,'.profile'
          1 ⎕NDELETE testFilename,'.cr'
      :EndIf
  :EndIf
- T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Client,#.Tatin.Registry,#.Tatin.Server')
- T.codeCoverage.filename←testFilename
- ignore←''
- ignore,←⊂'#.Tatin.Client.InitUserSettings'
- ignore,←⊂'#.Tatin.Registry.Create_UUID'
- ignore,←⊂'#.Tatin.Client.GetUserHomeFolder'
- ignore,←⊂'#.Tatin.Client.PublishPackageToRemoteRegistry_2'
- ignore,←⊂'#.Tatin.Client.CreateAllRefs_Client'
- ignore,←⊂'#.Tatin.Client.GetMyUCMDsFolder'
- T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
+ codeCoverageFlag←answer∊1 2
+ :If 3≠answer
+     T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Client,#.Tatin.Registry,#.Tatin.Server')
+     T.codeCoverage.filename←testFilename
+     ignore←''
+     ignore,←⊂'#.Tatin.Client.InitUserSettings'
+     ignore,←⊂'#.Tatin.Registry.Create_UUID'
+     ignore,←⊂'#.Tatin.Client.GetUserHomeFolder'
+     ignore,←⊂'#.Tatin.Client.PublishPackageToRemoteRegistry_2'
+     ignore,←⊂'#.Tatin.Client.CreateAllRefs_Client'
+     ignore,←⊂'#.Tatin.Client.GetMyUCMDsFolder'
+     T.codeCoverage.ignore←⊃{⍺,',',⍵}/ignore
+ :EndIf
 
  A←##.APLTreeUtils2
  F←##.FilesAndDirs

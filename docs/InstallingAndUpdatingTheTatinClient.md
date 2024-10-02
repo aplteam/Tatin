@@ -90,14 +90,19 @@ Instructions:
 
 !> ### What is the correct installation folder?
 => Tatin must be installed into one of these folders dependening on your OS:
+=> 
+=> Windows:
 => ```
-=> ⍝ Windows
 => C:\Users\<⎕AN>\Documents\Dyalog APL[-64] <version> Unicode Files\SessionExtensions\CiderTatin
+=> ```
 => 
-=> ⍝ Linux
+=> Linux:
+=> ```
 => /home/<⎕AN>/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
+=> ```
 => 
-=> ⍝ Mac OS
+=> Mac OS:
+=> ```
 => /Users/<⎕AN>/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
 => ```
 => However, these folders are version specific. Instead you might consider installing them into a version
@@ -357,6 +362,7 @@ There is always the possibility that the update process is itself buggy. Calling
 => 1. Execute `]DeActivate tatin` --- that removes Tatin
 => 2. Execute `]Activate tatin` --- that brings back the version of Tatin that your installation originally came with
 => 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version
+
 
 
 

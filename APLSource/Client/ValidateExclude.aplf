@@ -1,7 +1,7 @@
  ValidateExclude←{
      0=cfg.⎕NC'exclude':cfg
      0=≢cfg.exclude:cfg
-     exclude←∪','(≠⊆⊢)cfg.exclude
+     exclude←∪A.(DLB DTB)','(≠⊆⊢)cfg.exclude
      projectPath←⍺
      b←⎕NEXISTS(⊂(F.AddTrailingSep projectPath),F.AddTrailingSep cfg.source),¨exclude
      ('Not a valid path for "exclude": ',(~b){0=+/⍺:'' ⋄ ⊃{⍺,', ',⍵}/⍺/⍵}exclude)Assert∧/b:

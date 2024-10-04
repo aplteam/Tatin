@@ -5,7 +5,7 @@
 ⍝ Because exclude may carry directories and the ususal /\ trouble it's a bit more complicated than one might think as first glance.
  :If 2=cfg.⎕NC'exclude'
  :AndIf 0<≢cfg.exclude
-     exclude←F.EnforceSlash¨(⊂F.AddTrailingSep cfg.source),¨⊆','(≠⊆⊢)cfg.exclude
+     exclude←F.EnforceSlash¨(⊂F.AddTrailingSep cfg.source),¨⊆A.(DLB DTB)','(≠⊆⊢)cfg.exclude
      dirFlag←F.IsDir(⊂F.AddTrailingSep path),¨exclude
      :If ∨/dirFlag
          exclude←((~dirFlag)/exclude),(≢F.AddTrailingSep path)↓¨⊃,/{'recursive'F.ListFiles ⍵}¨(⊂F.AddTrailingSep path),¨dirFlag/exclude

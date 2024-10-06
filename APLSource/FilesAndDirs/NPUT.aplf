@@ -12,6 +12,10 @@
  :EndIf
  success←counter←0
  :Repeat
+     :If flags≡¯1
+     :AndIf ⎕NEXISTS filename
+         ⎕DL 0.1  ⍝ Yes, makes no sense, but we've seen this working fine in reality due to the delay!
+     :EndIf
      :Trap 19
          :If flags≡¯1
              r←data ⎕NPUT filename

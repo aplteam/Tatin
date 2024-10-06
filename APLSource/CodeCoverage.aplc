@@ -54,11 +54,17 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.10.5+52' '2024-01-12'
+      r←'CodeCoverage' '0.10.7+52' '2024-06-05'
     ∇
 
     ∇ History
-      :Access Public Shared   
+      :Access Public Shared
+    ⍝ * 0.10.7 from 2024-06-05 
+    ⍝   * Bug fixes
+    ⍝     * A comma-separated list as argument to ⎕NEW caused a LENGTH ERROR
+    ⍝     * CodeCoverage tests attempted to act on itself - that cannot work properly because the tests overwrite ⎕PROFILE
+    ⍝ * 0.10.6 from 2024-01-30
+    ⍝   * Neither `#` nor `⎕SE` were allowed
     ⍝ * 0.10.5 from 2024-01-12
     ⍝   * Link to `Tester2` in the documentation corrected
     ⍝ * 0.10.4 from 2024-01-12
@@ -139,8 +145,10 @@
           'Must be character vector'⎕SIGNAL 11/⍨' '≠1↑0⍴v
           ('Has invalid characters',b/v)⎕SIGNAL 11/⍨∨/b←~v∊APL_Chars,',⎕#.'
           v2←','(≠⊆⊢),v
-          :If ∨/~b←0<⎕NC↑v2
-              11 ⎕SIGNAL⍨'Unknown names: ',⊃{⍺,',',⍵}/(~b)/v2
+          :If ~∧/v2∊,¨'#' '⎕SE'
+              :If ∨/~b←0<⎕NC↑v2
+                  11 ⎕SIGNAL⍨'Unknown names: ',⊃{⍺,',',⍵}/(~b)/v2
+              :EndIf
           :EndIf
           _watch←v2
         ∇
@@ -415,7 +423,7 @@
     ⍝ again, for example.
       :Access Public Instance
       r←⍬
-      {Stop ⍵}⍣(~⊃∆STOPPED)⊣⍬
+      0 0⍴{Stop ⍵}⍣(~⊃∆STOPPED)⊣⍬
       _data←_data[;1]{(⊃⍺)(∪⊃,/⍵)}⌸_data[;2]
       names←CollectDataForCoverageReport _watch
       details←0 4⍴⍬
@@ -564,7 +572,7 @@
       :If ⎕NEXISTS cr.filename
           cr.tno←cr.filename ⎕FTIE 0
           cr.names←⎕FREAD cr.tno,1
-          ⎕←'tied ',cr.filename,' for listings'
+          ⎕←'Tied ',cr.filename,' for listings'
       :Else
           ⎕←'Did not find file "',cr.filename,'" with CRs collected by fn "Finalize" - will try to work without it'
           cr.tno←0

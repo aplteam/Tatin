@@ -14,19 +14,33 @@
 ⍝ `Tester2` requires the classes `APLTreeUtils2` and `CodeCoverage`, but the latter only in case you want code
 ⍝ coverage to be checked; for that you need to set the `codeCoverage` property.
 ⍝ ## Misc
-⍝ This class is part of the APLTree Open Source project.\\
 ⍝ Home page: <https://github.com/aplteam/Tester2>\\
-⍝ Kai Jaeger
+⍝ Author: Kai Jaeger
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public shared
-      r←'Tester2' '3.7.0+5' '2024-03-02'
+      r←'Tester2' '3.9.1' '2024-10-03'
     ∇
 
     ∇ r←History
       :Access Public shared
+      ⍝ * 3.9.1 ⋄ 2024-10-03
+      ⍝   * Comment added according to issue #25
+      ⍝   * Bug fix: the new '?'-syntax did not work when 3 (for "Cleanup") was selected
+      ⍝ * 3.9.0 ⋄ 2024-10-01
+      ⍝   * The term `stopFlag` was used in two different ways: on the level of the test framework and inside
+      ⍝     test functions. This required a change: inside test functions, what was initially called
+      ⍝     `stopFlag` is now called `debugFlag`.\\
+      ⍝     Note that the old name is still supported in order to support old test cases, so this is not a
+      ⍝     breaking change.
+      ⍝   * `stopFlag` is not necessarily a Boolean anymore, making the name a misnomer.
+      ⍝     Therefore, it was renamed to `stop`.
+      ⍝   * All `Run*`-functions that accept `stop` as a left argument now allow it to be "?".
+      ⍝     This led to a list with all options the user may select from.
+      ⍝ * 3.8.0 ⋄ 2024-08-03
+      ⍝   * `RunThese` accepts now a list of names identifying test functions (like `Foo_001` or `Test_Foo_001)
       ⍝ * 3.7.0 ⋄ 2024-03-02
       ⍝   * The restriction that "," and "*" cannot go together has been lifted.
       ⍝   * The restriction that `~` could only be used at the beginning has been lifted
@@ -277,24 +291,27 @@
     :EndProperty
 
 
-    ∇ {(rc log)}←{stopFlag}Run debugFlag
+    ∇ {(rc log)}←{stop}Run debugFlag
     ⍝ Runs _all_ test cases, by default with error trapping.\\
     ⍝ The Boolean right argument decides whether with (0) or without (1) error trapping.\\
     ⍝ In addition you may specify an optional left argument which will make `Run` stop in certain circumstances:
-    ⍝ * 1=stop just before any test case is about to be executed
-    ⍝ * 2=stop in all `Initial*` functions
-    ⍝ * 4=stop in all `Cleanup*` functions\\
+    ⍝ * 1 = stop just before any test case is about to be executed
+    ⍝ * 2 = stop in all `Initial*` functions
+    ⍝ * 4 = stop in all `Cleanup*` functions
+    ⍝ * ? = gives you a list to select from\\
     ⍝ You may also specify a sum of them, like 3, 5, 6 or 7
     ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
-      stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument 'Assert 1=≡,stopFlag
-      'Invalid left argument 'Assert 1=≢stopFlag
-      'Invalid left argument 'Assert 83=⎕DR stopFlag
+      stop←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stop'
+      →(⍬≡stop←ProcessStop stop)/0
+      'Invalid left argument 'Assert(⊂stop)∊0 1 2 4 3 5 6 7
+      'Invalid left argument 'Assert 1=≡,stop
+      'Invalid left argument 'Assert 1=≢stop
+      'Invalid left argument 'Assert 83=⎕DR stop
       'Invalid right argument 'Assert(⊂debugFlag)∊0 1
       _parms←CreateParms ⍬
       _parms.debugFlag←debugFlag
-      _parms.stopFlag←stopFlag
+      _parms.stop←stop
       _parms.trapFlag←~debugFlag
       (rc log)←Run__ _parms
      ⍝Done
@@ -320,56 +337,63 @@
       :EndIf
     ∇
 
-    ∇ {(rc log)}←{stopFlag}RunThese these;rc;ref2Gui
+    ∇ {(rc log)}←{stop}RunThese these;rc;ref2Gui
     ⍝ Run just the specified tests.
     ⍝ `these` can be one of:
     ⍝ * A scalar or vector of numbers identifying ungrouped test cases.
     ⍝ * A text string that uniquily identifies a group.
     ⍝ * A text string that ends with an asterisk (`*`) identifying one or more test groups.
+    ⍝ * A nested vector with names of test functions (like `Test_Foo_002` or just `Foo_002`).\\
+    ⍝   This is particularly useful if you want to execute, say, just the test cases that have recently been changed.
     ⍝ * A two-item vector with:
     ⍝   * A text string identifying one or more groups (with the wildcard syntax, **not** by specifying more than one).
     ⍝   * An integer vector identifying test cases within that group.\\
-    ⍝ In addition you may specify an optional left argument which will make `RunThese` stop in certain circumstances:
-    ⍝ * 1=stop just before any test case is about to be executed
-    ⍝ * 2=stop in all `Initial*` functions
-    ⍝ * 4=stop in all `Cleanup*` functions\\
+    ⍝ Note that you cannot mix different syntaxes.\\
+    ⍝ You may specify an optional left argument which will make `RunThese` stop in certain circumstances:
+    ⍝ * 1 = stop just before any test case is about to be executed
+    ⍝ * 2 = stop in all `Initial*` functions
+    ⍝ * 4 = stop in all `Cleanup*` functions
+    ⍝ * ? = gives you a list to select from\\
     ⍝ You may also specify a sum of them, like 3, 5, 6 or 7.\\
     ⍝ The result:
     ⍝ 1. A return code. 0 means all test cases passed successfully.
     ⍝ 2. A vector of text vectors with the log. The log contains detailed information about what was carried out.
     ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
-      stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument 'Assert(⊂stopFlag)∊0 1 2 4 3 5 6 7
+      stop←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stop'
+      →(⍬≡stop←ProcessStop stop)/0
+      'Invalid left argument 'Assert(⊂stop)∊0 1 2 4 3 5 6 7
       _parms←CreateParms ⍬
       _parms.testCaseNos←these
       _parms.debugFlag←1
       _parms.trapFlag←0
-      _parms.stopFlag←stopFlag
+      _parms.stop←stop
       (rc log)←Run__ _parms
     ∇
 
-    ∇ {(rc log)}←{stopFlag}RunBatchTests debugFlag
+    ∇ {(rc log)}←{stop}RunBatchTests debugFlag
     ⍝ Runs all test cases but tells the test functions that this is a batch run, meaning that test cases in need
     ⍝ for any human being for interaction should abort themselves and return `_NoBatchTest` instead.\\
     ⍝ By default any errors are trapped.
     ⍝ In addition you can specify an optional left argument which will make `RunBatchTests` stop in certain circumstances:
-    ⍝ * 1=stop just before any test case is about to be executed
-    ⍝ * 2=stop in all `Initial*` functions
-    ⍝ * 4=stop in all `Cleanup*` functions\\
+    ⍝ * 1 = stop just before any test case is about to be executed
+    ⍝ * 2 = stop in all `Initial*` functions
+    ⍝ * 4 = stop in all `Cleanup*` functions
+    ⍝ * ? = gives you a list to select from\\
     ⍝ You may also specify a sum of them, like 3, 5, 6 or 7.\\
     ⍝ This function does not trap errors in case `debugFlag` is 1.\\
     ⍝ Returns 0 for okay or a 1 as `rc` in case one or more test cases are broken or failed.\\
     ⍝ DO NOT localyze `_parms` in this function!
       :Access Public Instance
-      stopFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stopFlag'
-      'Invalid left argument 'Assert(⊂stopFlag)∊0 1 2 4 3 5 6 7
+      stop←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'stop'
+      →(⍬≡stop←ProcessStop stop)/0
+      'Invalid left argument 'Assert(⊂stop)∊0 1 2 4 3 5 6 7
       'Invalid right argument 'Assert(⊂debugFlag)∊0 1
       _parms←CreateParms ⍬
       _parms.debugFlag←debugFlag
-      _parms.stopFlag←stopFlag
+      _parms.stop←stop
       _parms.batchFlag←1
-      _parms.trapFlag←0=debugFlag
+      _parms.trapFlag←~debugFlag
       _parms.testCaseNos←⍬
       (rc log)←Run__ _parms
     ∇
@@ -391,7 +415,7 @@
    ⍝ 3. `batchFlag`: a 1 would mean that the test should quit itself if for example it
    ⍝     needs a human being in front of the monitor. Such test cases are supposed to
    ⍝     do nothing but return `_NoBatchTest` when this flag is on.
-   ⍝ 4. `stopFlag`: is treated as "stop just before the next test case is going to be executed" when 1.\\
+   ⍝ 4. `stop`: is treated as "stop just before the next test case is going to be executed" when 1.\\
    ⍝     Since version 2.4 this accepts also an integer that can be the sum of:
    ⍝     * 1=stop just before any test case is executed
    ⍝     * 2=stop in all `Initial*` functions
@@ -403,10 +427,27 @@
       r.trapFlag←1
       r.debugFlag←0
       r.batchFlag←0
-      r.stopFlag←0
+      r.stop←0
       r.guiFlag←0
       r.testCaseNos←⍬
       r.⎕FX'r←List' 'r←↑{⍵(⍎⍵)}¨'' ''~¨⍨↓⎕NL 2'
+    ∇
+
+    ∇ stop←ProcessStop stop;list;ind;vals
+      :If '?'≡stop
+          list←'Tests' 'Initial' 'Cleanup' 'Tests & Initial' 'Tests & Cleanup' 'Initial & Cleanup' 'Test, Initial & Cleanup' 'Nowhere' 'Cancel'
+          vals←1 2 4 3 5 6 7 8 9
+          ind←'WhereToStop@Stop just before...' 1 1 ##.CommTools.Select list
+          :If 0=≢ind
+              stop←0
+          :ElseIf ind≡9
+              stop←⍬
+          :ElseIf ind≡8
+              stop←0
+          :Else
+              stop←vals[ind]
+          :EndIf
+      :EndIf
     ∇
 
     ∇ {(rc log)}←Run__ ps;⎕TRAP;rc2;filename;tno;buff;res;initialFlag
@@ -419,7 +460,6 @@
         ⍝ 2. Nested vector with the log information
       :Access Public Instance
       ⎕TRAP←(QuitEvent'C' '→∆GetOutOfHere')(PassEvent'C'('⎕SIGNAL ',⍕PassEvent))((0 1000)'N')
-      _ref.Stop←ps.stopFlag    ⍝ "Stop" is honored by "FailsIf" & "PassesIf"
       _INI←⍬                   ⍝ Flatten any leftovers
       ps.(log errCounter failedCounter totalCounter)←'' 0 0 0
       ps.guiFlag∧←'Win'≡A.GetOperatingSystem ⍬  ⍝ Windows only, if at all
@@ -467,9 +507,11 @@
       ps.returnCodes←⍬
       ps.processedGroups←''
       ShowLog(,'--- Tests started at ',A.FormatDateTime ⎕TS),' on ',(⍕_ref),' ---'
-      buff←⌽(8⍴2)⊤ps.stopFlag
-      buff[1]∨←¯1∊×ps.testCaseNos
-      ps.stopFlag←2⊥⌽buff
+      buff←⌽(8⍴2)⊤ps.stop
+      :If 0<≢ps.testCaseNos
+          buff[1]∨←¯1∊×ps.testCaseNos
+      :EndIf
+      ps.stop←2⊥⌽buff
       ProcessTestCases _ref ps
      ∆GetOutOfHere:
       :If 0<⎕NC'∆TRAPS_IN_SESSION'
@@ -509,7 +551,7 @@
           :If ps.ref2Gui.∆n.∆Closed   ⍝ The user has clicked the "Close" box but the GUI is still around
               CloseGUI
           :Else
-              ps.ref2Gui.∆n.(TrapErrors Debug StopFlag StartBtn PauseBtn).Active←0
+              ps.ref2Gui.∆n.(TrapErrors Debug Stop StartBtn PauseBtn).Active←0
           :EndIf
       :EndIf
     ∇
@@ -584,17 +626,19 @@
       report←'Looking for a function "Initial": '
       initMsg←''
       :If 3=ref.⎕NC'Initial'
-          :If 2⊃⌽(8⍴2)⊤ps.stopFlag
-              (∪(⎕STOP 1⊃⎕SI),∆stop1,∆stop2,∆stop3,∆stop4)⎕STOP 1⊃⎕SI
+          :If 2⊃⌽(8⍴2)⊤ps.stop
+              (∪(⎕STOP 1⊃⎕SI),∆stop_before_initial_1,∆stop_before_initial_2,∆stop_before_initial_3,∆stop_before_initial_4)⎕STOP 1⊃⎕SI
           :Else
-              ((⎕STOP 1⊃⎕SI)~,∆stop1,∆stop2,∆stop3,∆stop4)⎕STOP 1⊃⎕SI
+              ((⎕STOP 1⊃⎕SI)~,∆stop_before_initial_1,∆stop_before_initial_2,∆stop_before_initial_3,∆stop_before_initial_4)⎕STOP 1⊃⎕SI
           :EndIf
           :Select ⊃(⎕IO+1)⊃1 ref.⎕AT'Initial'
           :Case 0
               :If 0=⊃⊃ref.⎕AT'Initial'
-     ∆stop1:      ref.Initial
+     ∆stop_before_initial_1:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  ref.Initial
               :Else
-     ∆stop2:      buff←ref.Initial
+     ∆stop_before_initial_2:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  buff←ref.Initial
                   :If ' '=1↑0⍴buff
                       success←0=≢buff
                       :If 0<≢buff
@@ -606,9 +650,11 @@
               :EndIf
           :Case 1
               :If 0=⊃⊃ref.⎕AT'Initial'
-     ∆stop3:      ref.Initial ps
+     ∆stop_before_initial_3:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  ref.Initial ps
               :Else
-     ∆stop4:      buff←ref.Initial ps
+     ∆stop_before_initial_4:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  buff←ref.Initial ps
                   :If ' '=1↑0⍴buff
                       success←0=≢buff
                       :If 0<≢buff
@@ -622,7 +668,7 @@
               11 ⎕SIGNAL⍨'The "Initial" function in ',(⍕ref),' has an invalid signature: it''s neither monadic nor niladic'
           :EndSelect
           :If success
-              report,←'found and successfully executed'
+              report,←'found and executed successfully'
           :Else
               report,←'found and executed but it signalled failure'
               :If 0<≢initMsg
@@ -643,10 +689,18 @@
                   ps.group←ps.testCaseNos
                   ps.testCaseNos←⍬
               :Else
-                  ps.group←1⊃ps.testCaseNos
-                  'Group definition must not carry "," or "~" in case test case number were specified'Assert~∨/',~'∊ps.group
-                  ps.testCaseNos←∊1↓ps.testCaseNos
-                  'Test case number(s) must be numeric'Assert~∨/~{⊃0=1↑0⍴⍵}¨ps.testCaseNos
+                  :If ∧/{' '=⊃1↑0⍴⍵}¨ps.testCaseNos
+                  :AndIf ∧/{(⊃1⊃⎕VFI ⍵↑⍨-¯1+'_'⍳⍨⌽⍵)∧0<+/'_'=⍵}¨ps.testCaseNos
+                      ps.list←ps.testCaseNos
+                      ps.testCaseNos←⍬
+                      ps.list←{'Test_'≡(≢'Test_')↑⍵:⍵ ⋄ 'Test_',⍵}¨ps.list
+                      :Return
+                  :Else
+                      ps.group←1⊃ps.testCaseNos
+                      'Group definition must not carry "," or "~" in case test case number were specified'Assert~∨/',~'∊ps.group
+                      ps.testCaseNos←∊1↓ps.testCaseNos
+                      'Test case number(s) must be numeric'Assert~∨/~{⊃0=1↑0⍴⍵}¨ps.testCaseNos
+                  :EndIf
               :EndIf
           :EndIf
           :If 0≠≢ps.group
@@ -740,7 +794,7 @@
           :EndIf
           ps.ref2Gui.∆n.Form.on9998←0
           ps.ref2Gui.∆n.StartBtn.Active←0
-          ps.stopFlag←⊃{⍵≡(≢⍵)↑1:0 ⋄ ⍵/0 1 2 4 3 5 7 6}ps.ref2Gui.∆n.StopFlag.SelItems
+          ps.stop←⊃{⍵≡(≢⍵)↑1:0 ⋄ ⍵/0 1 2 4 3 5 7 6}ps.ref2Gui.∆n.Stop.SelItems
           ps.trapFlag←ps.ref2Gui.∆n.TrapErrors.State
           {2 ⎕NQ ps.ref2Gui.∆n.Grid'SetColSize'⍵ ¯3}¨¯1↓3↓⍳2⊃⍴ps.ref2Gui.∆n.Grid.Values
       :EndIf
@@ -819,7 +873,7 @@
           {}⎕WA  ⍝ Enforce a memory compaction in order to get rid of any rubbish.
           :If ps.guiFlag
           :AndIf 0=ps.ref2Gui.∆n.∆Closed
-              ps.stopFlag←⊃{⍵≡(≢⍵)↑1:0 ⋄ ⍵/0 1 2 4 3 5 7 6}ps.ref2Gui.∆n.StopFlag.SelItems
+              ps.stop←⊃{⍵≡(≢⍵)↑1:0 ⋄ ⍵/0 1 2 4 3 5 7 6}ps.ref2Gui.∆n.Stop.SelItems
               ps.trapFlag←ps.ref2Gui.∆n.TrapErrors.State
               ProcessGuiEvents ps.ref2Gui.∆n
           :AndIf ps.ref2Gui.∆n.∆Closed
@@ -833,8 +887,8 @@
     ∇
 
     ∇ HandleStops(fns ps StopHere testNo fnsName)
-      :If 0<ps.stopFlag
-      :AndIf 1⊃⌽(8⍴2)⊤⊃ps.stopFlag
+      :If 0<ps.stop
+      :AndIf 1⊃⌽(8⍴2)⊤⊃ps.stop
           (∪(⎕STOP fns),StopHere)⎕STOP fns
           ⎕←'About to execute <',(⍕_ref),'.',fnsName,'> ...'
       :Else
@@ -871,17 +925,20 @@
       r←⍬
       report←'Looking for a function "Cleanup": '
       :If 3=ref.⎕NC'Cleanup'
-          :If 3⊃⌽(8⍴2)⊤ps.stopFlag
-              (∆stop1 ∆stop2)⎕STOP 1⊃⎕SI
+          :If 3⊃⌽(8⍴2)⊤ps.stop
+              (∆stop_before_cleanup_1 ∆stop_before_cleanup_2)⎕STOP 1⊃⎕SI
           :Else
-              ((⎕STOP 1⊃⎕SI)~∆stop1 ∆stop2)⎕STOP 1⊃⎕SI
+              ((⎕STOP 1⊃⎕SI)~∆stop_before_cleanup_1 ∆stop_before_cleanup_2)⎕STOP 1⊃⎕SI
           :EndIf
           :If 0=1 2⊃ref.⎕AT'Cleanup'
-     ∆stop1:  ref.Cleanup
+     ∆stop_before_cleanup_1:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+              ref.Cleanup
               report,←'found and executed'
           :Else
-     ∆stop2:  ref.Cleanup ps
+     ∆stop_before_cleanup_2:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+              ref.Cleanup ps
           :EndIf
+          report,←' found and executed successfully'
       :Else
           report,←'not found'
       :EndIf
@@ -896,7 +953,7 @@
       :If 0<≢_codeCoverage
           _codeCoverage.Start ⍬
       :EndIf
-      HandleStops(1⊃⎕SI)ps ∆StopHere testNo fnsName
+      HandleStops(1⊃⎕SI)ps ∆stop_before_test testNo fnsName
       :If ps.guiFlag
           ps.ref2Gui.∆n.Info.Text←'Executing ',(⍕ref),'.',fnsName,'...'
       :EndIf
@@ -909,7 +966,10 @@
               :EndIf
           :EndIf
       :EndIf
-     ∆StopHere:rc←ref.⍎fnsName,' ',(⍕ps.debugFlag),' ',(⍕ps.batchFlag)
+     
+     ∆stop_before_test:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+      rc←ref.⍎fnsName,' ',(⍕ps.debugFlag),' ',(⍕ps.batchFlag)
+     
       :If 0<≢_exec_after_each_test
           :If 0=1 1⊃⎕AT _exec_after_each_test
               ⍎_exec_after_each_test,' fnsName ps'
@@ -1055,21 +1115,21 @@
       items,¨←'' ' (1)' ' (2)' ' (4)' ' (3)' ' (5)' ' (7)' ' (6)'
       ∆,←⊂'Items'items
       bool←(≢items)⍴0
-      :If 0=+/(8⍴2)⊤ps.stopFlag
+      :If 0=+/(8⍴2)⊤ps.stop
           bool[1]←1
       :Else
-          bool[1+1 2 4 3 5 7 6⍳ps.stopFlag]←1
+          bool[1+1 2 4 3 5 7 6⍳ps.stop]←1
       :EndIf
       ∆,←⊂'SelItems'bool
       ∆,←⊂'Attach'(4⍴'Top' 'Left')
       ∆,←⊂'TipObj'n.MyTipObj
       ∆,←⊂'Tip'('Stop just before any test or any "Initial" or' 'any "Cleanup" functions gets executed.' 'Allows tracing those functions.')
-      n.StopFlag←n.Form.⎕NEW'Combo'∆
+      n.Stop←n.Form.⎕NEW'Combo'∆
      
       ∆←''
-      ∆,←⊂'Posn'((8+1⊃+⌿↑n.StopFlag.(Posn Size))0)
+      ∆,←⊂'Posn'((8+1⊃+⌿↑n.Stop.(Posn Size))0)
       ∆,←⊂'Attach'('Top' 'Left' 'Bottom' 'Right')
-      ∆,←⊂'Size'((n.Form.Size[1]-20+(1⊃n.StartBtn.Size)+(1⊃n.SB.Size)+1⊃+⌿↑n.StopFlag.(Posn Size))⍬)
+      ∆,←⊂'Size'((n.Form.Size[1]-20+(1⊃n.StartBtn.Size)+(1⊃n.SB.Size)+1⊃+⌿↑n.Stop.(Posn Size))⍬)
       ∆,←⊂'Event'('KeyPress' '##.OnKeyPress')
       n.TB←n.Form.⎕NEW'TabControl'∆
      
@@ -1204,43 +1264,57 @@
       :EndTrap
     ∇
 
-    ∇ r←FailsIf y
-    ⍝ Usage : `→FailsIf x`, whith `x` being a boolean scalar.
+    ∇ r←FailsIf flag;ref
+    ⍝ Usage : `→FailsIf x`, with `x` being a boolean scalar.
       :Access Public Instance
-      r←PassesIf~y                  ⍝ Just PassesIf on negation
+      ref←⊃⎕RSI                     ⍝ Called from...
+      r←ref PassesIf~flag           ⍝ Just PassesIf on negation
     ∇
 
-    ∇ r←PassesIf y
-    ⍝ Usage : `→PassesIf x`, whith `x` being a boolean scalar
+    ∇ r←{ref}PassesIf flag;flag2
+    ⍝ Usage : `→PassesIf x`, with `x` being a boolean scalar
       :Access Public Instance
       r←⍬
       ⎕EX'∆FAILING_LINE'
-      :If ~y                        ⍝ Passes test, so →PassesIf x just continues
-          :If 2=_ref.⎕NC'stopFlag'  ⍝ Stop not defined, continue with test suite
-          :AndIf ~_ref.stopFlag     ⍝ Do not stop, continue with test suite
+      :If ~flag                     ⍝ Passes test, so →PassesIf x just continues
+          :If 0=⎕NC'ref'
+              ref←⊃⎕RSI             ⍝ Called from...
+          :EndIf
+          :If 0<ref.⎕NC'stopFlag'
+          :AndIf 0=ref.⎕NC'debugFlag'
+              flag2←ref.stopFlag
+          :Else
+              flag2←ref.debugFlag
+          :EndIf
+          :If flag2
+              ⎕SIGNAL 999           ⍝ Cause a stop for investigation
+          :Else                     ⍝ Do not stop, continue with test suite
               r←0
-              :If _ref.batchFlag
+              :If ref.batchFlag
                   ∆FAILING_LINE←2⊃⎕LC
               :EndIf
-          :Else
-              ⎕SIGNAL 999           ⍝ Otherwise stop for investigation
           :EndIf
       :EndIf
     ∇
 
-    ∇ r←{label}GoToTidyUp flag
+    ∇ r←{label}GoToTidyUp flag;ref;flag2
 ⍝ Returns either an empty vector or `label, which defaults to `∆TidyUp`.\\
-⍝ Signals 999 when `flag` is 1 and `stopFlag` exists and is 1.
+⍝ Signals 999 when `flag` is 1 and `debugFlag` is 1.
       :Access Public Instance
       ⎕EX'∆FAILING_LINE'
-      :If 1=flag
-      :AndIf 0<_ref.⎕NC'stopFlag'
-      :AndIf _ref.stopFlag
+      ref←⊃⎕RSI
+      :If 0<ref.⎕NC'stopFlag'
+      :AndIf 0=ref.⎕NC'debugFlag'
+          flag2←ref.stopFlag
+      :Else
+          flag2←ref.debugFlag
+      :EndIf
+      :If flag∧flag2
           ⎕SIGNAL 999
       :EndIf
-      label←{(0<⎕NC ⍵):⍎⍵ ⋄ r←_ref.⍎'∆TidyUp'}'label'
+      label←{(0<⎕NC ⍵):⍎⍵ ⋄ r←ref.⍎'∆TidyUp'}'label'
       r←flag/label
-      :If _ref.batchFlag
+      :If ref.batchFlag
           ∆FAILING_LINE←2⊃⎕LC
       :EndIf
     ∇
@@ -1571,7 +1645,7 @@
       :EndIf
     ∇
 
-    ∇ R←Test_000(stopFlag batchFlag);⎕TRAP
+    ∇ R←Test_000(debugFlag batchFlag);⎕TRAP
 ⍝ Model for a test function.
 ⍝ *** Watch out: assumes that the instance of Tester2 is called "T".
       ⎕TRAP←(999 'C' '∘∘∘ ⍝ Deliberate error')(0 'N')
@@ -1593,7 +1667,7 @@
           ps←⍵
           ps.trapFlag←ps.ref2Gui.∆n.TrapErrors.State
           ps.debugFlag←ps.ref2Gui.∆n.Debug.State
-          ps.stopFlag←+/ps.ref2Gui.∆n.StopFlag.SelItems/0 1 2 4 3 5 7 6
+          ps.stop←+/ps.ref2Gui.∆n.Stop.SelItems/0 1 2 4 3 5 7 6
           ps
       }
 
@@ -1702,17 +1776,20 @@
           ps.processedGroups,←⊂currentGroup
           :If 3=ref.⎕NC'Initial_',currentGroup
               at←1⊃ref.⎕AT'Initial_',currentGroup
-              :If 2⊃⌽(8⍴2)⊤ps.stopFlag
-                  (∪(⎕STOP 1⊃⎕SI),∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
+              :If 2⊃⌽(8⍴2)⊤ps.stop
+                  (∪(⎕STOP 1⊃⎕SI),∆stop_before_initial_1,∆stop_before_initial_2,∆stop_before_initial_3)⎕STOP 1⊃⎕SI
               :Else
-                  ((⎕STOP 1⊃⎕SI)~,∆stop1,∆stop2,∆stop3)⎕STOP 1⊃⎕SI
+                  ((⎕STOP 1⊃⎕SI)~,∆stop_before_initial_1,∆stop_before_initial_2,∆stop_before_initial_3)⎕STOP 1⊃⎕SI
               :EndIf
               :If (2⊃at)∊1 ¯2           ⍝ Accepts a right argument (monadic=1, ambivalent=¯2)?
-     ∆stop1:      result←ps ref.{⍎⍵,' ⍺'}'Initial_',currentGroup
+     ∆stop_before_initial_1:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  result←ps ref.{⍎⍵,' ⍺'}'Initial_',currentGroup
               :ElseIf |1⊃at
-     ∆stop2:      result←ps ref.{⍎⍵}'Initial_',currentGroup
+     ∆stop_before_initial_2:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  result←ps ref.{⍎⍵}'Initial_',currentGroup
               :Else
-     ∆stop3:      ref⍎'Initial_',currentGroup
+     ∆stop_before_initial_3:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  ref⍎'Initial_',currentGroup
                   result←1
               :EndIf
               :If ~(⊂result)∊⍬ 1
@@ -1735,7 +1812,7 @@
               :Else
                   buff←¯1↑ps.log
                   ps.log←¯1↓ps.log
-                  ShowLog'Function "Initial_',currentGroup,'" found and successfully executed'
+                  ShowLog'Function "Initial_',currentGroup,'" found and executed successfully'
                   ps.log,←buff
               :EndIf
           :EndIf
@@ -1748,16 +1825,18 @@
       :If i=≢ps.list                                                            ⍝ Last one?
       :OrIf currentGroup{0=≢⍺:0 ⋄ ⍺≢Remove∆Test_ GetGroupName(i+1)⊃⍵}ps.list    ⍝ Group change?!
           :If 3=ref.⎕NC'Cleanup_',currentGroup
-              :If 3⊃⌽(8⍴2)⊤ps.stopFlag
-                  (∪(⎕STOP 1⊃⎕SI),∆stop10,∆stop11)⎕STOP 1⊃⎕SI
+              :If 3⊃⌽(8⍴2)⊤ps.stop
+                  (∪(⎕STOP 1⊃⎕SI),∆stop_before_cleanup_1,∆stop_before_cleanup_2)⎕STOP 1⊃⎕SI
               :Else
-                  ((⎕STOP 1⊃⎕SI)~,∆stop10,∆stop11)⎕STOP 1⊃⎕SI
+                  ((⎕STOP 1⊃⎕SI)~,∆stop_before_cleanup_1,∆stop_before_cleanup_2)⎕STOP 1⊃⎕SI
               :EndIf
               at←1⊃ref.⎕AT'Cleanup_',currentGroup
               :If (2⊃at)∊1 ¯2                                                   ⍝ Accepts a right argument (1=monadic, ¯2=ambivalent)?
-     ∆stop10:     ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Cleanup_',currentGroup
+     ∆stop_before_cleanup_1:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  ps ref.{6::1 ⋄ ⍎⍵,' ⍺'}'Cleanup_',currentGroup
               :Else
-     ∆stop11:     ref.⍎'Cleanup_',currentGroup
+     ∆stop_before_cleanup_2:  ⍝ To switch off the stopping mechanism permanently, enter:   ps.stop←0
+                  ref.⍎'Cleanup_',currentGroup
               :EndIf
           :EndIf
       :EndIf

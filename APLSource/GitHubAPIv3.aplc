@@ -10,14 +10,28 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHubAPIv3' '1.2.1' '2024-05-28'
+      r←'GitHubAPIv3' '1.4.0' '2024-09-24'
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 1.2.1
+    ⍝ * 1.4.0 from 2024-09-24
+    ⍝   * New instance method `GetMyRateLimits` added whbich complements the older shared method `GetRateLimits`
+    ⍝   * BREAKING CHANGE
+    ⍝     The instance property `pathToConngaDLLs` has been removed and replaced by an instance field with the same name.
+    ⍝     This syntax change was necessary because some shared methods (`GetAllEndPoints`, `GetRateLimits`) called `GetJson`
+    ⍝     which relies on `pathToCongaDLLs` being defined. It affects you only when you have set `pathToCongaDLLs` as a
+    ⍝     property of an instance, because that needs changing: assign it to the field of the class instead.
+    ⍝  * `GetAllTopics` called `GetJson` with a left argument
+    ⍝ * 1.3.0 from 2024-09-23
+    ⍝   * There was no way to specify a path for the Conga DLLs in GetJson: now there is a field `path2CongaDLLs`
+    ⍝   * Bug fixes
+    ⍝     * `GetRelease` did not process its (optional) left argument correctly, resulting in a crash.
+    ⍝     * Shared method `GetJson` relied on instance property `path2CongaDLLs`. Can now be specified as left argument
+    ⍝     * The function `GetJson` had an optional left argument `parms` that was never processed: removed.
+    ⍝ * 1.2.1 from 2024-07-25
     ⍝   * Bug fixed
-    ⍝     `GetAllIssues` crashed when there were no issues to report 
+    ⍝     `GetAllIssues` crashed when there were no issues to report
     ⍝ * 1.2.0
     ⍝   * Instances of GitHubAPIv3 now have a useful display format: for a user "foo" it shows GitHubAPIv3[foo]
     ⍝   * The name of the function `GetPrinciple` was changed to `GetPrincipal`
@@ -33,6 +47,8 @@
     ⍝\\
     ⍝ For information regarding older versions see <https://github.com/aplteam/GitHubAPIv3/releases>
     ∇
+
+    :Field Public Shared  path2CongaDLLs←''
 
     :Property owner
     :Access Public Instance
@@ -108,13 +124,23 @@
       :EndIf
     ∇
 
-    ∇ rateLimits←GetRateLimits;gitPath;parms
+    ∇ rateLimits←GetRateLimits;gitPath
       :Access Public Shared
-    ⍝ Returns information regarding rate limits without hitting the limits
+    ⍝ Returns information regarding the general rate limits (no authentication) without hitting the limits.
+    ⍝ This is about the general rate limits that apply in case the user is not authenticated which applies
+    ⍝ because this is a shared method, so no authentication is implied.\\
+    ⍝ See also the instance method `GetMyRateLimits`.
       gitPath←'https://api.github.com/rate_limit'
-      parms←CreateHttpParms
-      parms.Accepted←'application/vnd.github+json"'
-      rateLimits←parms GetJson gitPath
+      rateLimits←GetJson gitPath
+    ∇
+
+    ∇ rateLimits←GetMyRateLimits;gitPath
+      :Access Public Instance
+    ⍝ Returns information regarding rate limits without hitting the limits. This is an instance method,
+    ⍝ meaning that it returns the rate limits for the currently used authentication token.
+    ⍝ See also the shared method `GetRateLimits`.
+      gitPath←'https://api.github.com/rate_limit'
+      rateLimits←GetJson gitPath
     ∇
 
     ∇ topics←GetAllTopics repoName;gitPath;parms;ns;data
@@ -122,9 +148,7 @@
     ⍝ Returns all topics of a given repository.\\
     ⍝ You must use `https://` as protocol or not specify a protocol at all.
       gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/topics'
-      parms←CreateHttpParms
-      parms.Accepted←'application/vnd.github.mercy-preview+json'
-      data←parms GetJson gitPath
+      data←GetJson gitPath
       topics←data.names
     ∇
 
@@ -238,18 +262,16 @@
     ⍝ `type` may be one of: <EXE>, <ZIP>, <TAR>. `type` is not case sensitive.\\
     ⍝ The optional left argument `tag` can be used to request a particular version rather than the latest one.
     ⍝ `tag` can be something like `1.2.3` (or `1.2.3.4`) or `v1.2.3` (or `v1.2.3.4`).\\
-    ⍝ Returns the url or an empty vector in case of failure, for example when the given type cannot be detected.
+    ⍝ Returns the download url or an empty vector in case of failure, for example when the given type cannot be detected.
       :Access Public Instance
       gitPath←'https://api.github.com/repos/',_owner,'/',repoName,'/releases'
       ns←GetJson gitPath
       url←''
       type←1 ⎕C type
       'Invalid right argument ("type")'⎕SIGNAL 11/⍨~(⊂type)∊'EXE' 'ZIP' 'TAR'
+      info←GetLatestReleaseInfo repoName
       :If 0=⎕NC'tag'
-          info←GetLatestReleaseInfo repoName
           tag←((1⍴info.tag_name)∊'Vv')↓info.tag_name
-      :Else
-          info←GetReleaseInfoByTagName repoName tag
       :EndIf
       :If (⊂type)∊'ZIP' 'TAR'
           url←('ZIP' 'TAR'⍳⊂type)⊃info.(zipball_url tarball_url)
@@ -309,7 +331,7 @@
           ⊃⊃(//)⎕VFI buff
       }
 
-    ∇ data←{parms}GetJson gitURL;h;json;r;noOfPages;i;ind;link;r2;links;H_
+    ∇ data←GetJson gitURL;h;json;r;noOfPages;i;ind;link;r2;links;H_
     ⍝ Takes a URL and returns a namespace, possibly with sub namespaces.
     ⍝ In case the result is virtually paged by the server this function collects all data!
       :If 0=⎕NC'H'
@@ -323,6 +345,9 @@
           'Authorization'h.AddHeader('Bearer ',_personal_access_token)
       :EndIf
       h.URL←EncodeBlank gitURL
+      :If 0<≢path2CongaDLLs
+          h.CongaPath←path2CongaDLLs
+      :EndIf
       r←h.Run
       (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus=200
       data←⎕JSON r.Data

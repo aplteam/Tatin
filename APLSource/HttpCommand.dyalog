@@ -7,7 +7,7 @@
     ∇ r←Version
     ⍝ Return the current version
       :Access public shared
-      r←'HttpCommand' '5.6.0' '2024-03-17'
+      r←'HttpCommand' '5.8.0' '2024-07-17'
     ∇
 
 ⍝ Request-related fields
@@ -20,6 +20,9 @@
     :field public Auth←''                          ⍝ authentication string
     :field public AuthType←''                      ⍝ authentication type
     :field public BaseURL←''                       ⍝ base URL to use when making multiple requests to the same host
+    :field public ChunkSize←0                      ⍝ set to size of chunk if using chunked transfer encoding
+    :field public shared HeaderSubstitution←''     ⍝ delimiters to indicate environment/configuration settings be substituted in headers, set to '' to disable
+
 
 ⍝ Proxy-related fields - only used if connecting through a proxy server
     :field public ProxyURL←''                      ⍝ address of the proxy server
@@ -53,7 +56,6 @@
     :field public UseZip←0                         ⍝ zip request payload (0-no, 1-use gzip, 2-use deflate)
     :field public ZipLevel←1                       ⍝ default compression level (0-9)
     :field public shared Debug←0                   ⍝ set to 1 to disable trapping, 2 to stop just before creating client
-
     :field public readonly shared ValidFormUrlEncodedChars←'&=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~*+~%'
 
     :field Client←''                               ⍝ Conga client ID
@@ -469,6 +471,7 @@
           hdrs←'User-Agent'(hdrs addHeader)deb'Dyalog-',1↓∊'/',¨2↑Version
           hdrs←'Accept'(hdrs addHeader)'*/*'
           hdrs←'Accept-Encoding'(hdrs addHeader)'gzip, deflate'
+     
           :If ~0∊⍴Auth
               :If (1<|≡Auth)∨':'∊Auth ⍝ (userid password) or userid:password
               :AndIf ('basic'≡lc AuthType)∨0∊⍴AuthType
@@ -477,13 +480,20 @@
               :EndIf
               hdrs←'Authorization'(hdrs setHeader)deb AuthType,' ',⍕Auth
           :EndIf
+     
           :If '∘???∘'≡hdrs getHeader'cookie' ⍝ if the user has specified a cookie header, it takes precedence
           :AndIf ~0∊⍴cookies←r applyCookies Cookies
               hdrs←'Cookie'(hdrs addHeader)formatCookies cookies
           :EndIf
+     
           :If ~0∊⍴auth
               hdrs←'Authorization'(hdrs addHeader)auth
           :EndIf
+     
+          :If 0≠ChunkSize
+              hdrs←'Transfer-Encoding'(hdrs addHeader)'chunked'
+          :EndIf
+     
           :If proxied
               :If ~0∊⍴ProxyAuth
                   :If (1<|≡ProxyAuth)∨':'∊ProxyAuth ⍝ (userid password) or userid:password
@@ -580,12 +590,17 @@
               :EndSelect
      
               :If RequestOnly>SuppressHeaders ⍝ Conga supplies content-length, but for RequestOnly we need to insert it
+              :AndIf 0=ChunkSize
                   hdrs←'Content-Length'(hdrs addHeader)⍕⍴parms
               :EndIf
           :EndIf
       :EndIf
      
       hdrs⌿⍨←~0∊¨≢¨hdrs[;2] ⍝ remove any headers with empty values
+     
+      :If 0≠ChunkSize
+          parms←ChunkSize Chunk parms
+      :EndIf
      
       :If RequestOnly
           r←cmd,' ',(path,(0∊⍴urlparms)↓'?',urlparms),' HTTP/1.1',(∊{NL,⍺,': ',∊⍕⍵}/privatize environment hdrs),NL,NL,parms
@@ -925,6 +940,19 @@
      ∆EXIT:
     ∇
 
+    ∇ r←size Chunk payload;l;n;last;lens;hlens;mask
+      :Access public shared
+    ⍝ Split payload into chunks for chunked transfer-encoding
+      l←≢payload ⍝ payload length
+      n←⌊l÷size  ⍝ number of whole chunk
+      last←l-n×size ⍝ size of last chunk
+      lens←(n⍴size),last,(last≠0)/0 ⍝ chunk lengths + 0 for terminating chunk
+      hlens←d2h¨lens ⍝ hex lengths
+      mask←0 1 0(⊢⊢⍤/(⍴⊢)⍴⊣),(2+≢¨hlens),lens,[1.1]2 ⍝ expansion mask
+      r←mask\payload ⍝ expand payload
+      r[⍸~mask]←2⌽∊NL∘,¨hlens,¨⊂NL ⍝ insert chunk information
+    ∇
+
     ∇ rc←r CheckPayloadSize size
     ⍝ checks if payload exceeds MaxPayloadSize
       rc←0
@@ -1026,7 +1054,7 @@
     splitOnFirst←{(⍺↑⍨¯1+p)(⍺↓⍨p←⌊/⍺⍳⍵)} ⍝ split ⍺ on first occurrence of ⍵ (removing first ⍵)
     splitOn←≠⊆⊣ ⍝ split ⍺ on all ⍵ (removing ⍵)
     h2d←{⎕IO←0 ⋄ 16⊥'0123456789abcdef'⍳lc ⍵} ⍝ hex to decimal
-    d2h←{⎕IO←0 ⋄ '0123456789ABCDEF'[16(⊥⍣¯1)⍵]} ⍝ decimal to hex
+    d2h←{⎕IO←0 ⋄ '0123456789ABCDEF'[((1∘⌈≢)↑⊢)16(⊥⍣¯1)⍵]} ⍝ decimal to hex
     getchunklen←{¯1=len←¯1+⊃(NL⍷⍵)/⍳⍴⍵:¯1 ¯1 ⋄ chunklen←h2d len↑⍵ ⋄ (⍴⍵)<len+chunklen+4:¯1 ¯1 ⋄ len chunklen}
     toInt←{0∊⍴⍵:⍬ ⋄ ~3 5∊⍨10|⎕DR t←1⊃2⊃⎕VFI ⍕⍵:⍬ ⋄ t≠⌊t:⍬ ⋄ t} ⍝ simple char to int
     fmtHeaders←{0∊⍴⍵:'' ⋄ (firstCaps¨⍵[;1])(,∘⍕¨⍵[;2])} ⍝ formatted HTTP headers
@@ -1355,9 +1383,14 @@
       r←Headers
     ∇
 
-    ∇ hdrs←environment hdrs
+    ∇ hdrs←environment hdrs;beg;end;escape;hits;regex
     ⍝ substitute any header names or values that begin with '$env:' with the named environment variable
-      hdrs←(⍴hdrs)⍴'%[[:alpha:]].*?%'⎕R{GetEnv 1↓¯1↓⍵.Match}⊢,hdrs
+      :If ~0∊⍴HeaderSubstitution
+          (beg end)←2⍴HeaderSubstitution
+          escape←'.^$*+?()[]{\|-'∘{m←∊(1+⍺∊⍨t←⌽⍵)↑¨1 ⋄ t←m\t ⋄ t[⍸~m]←'\' ⋄ ⌽t} ⍝ chars that need escaping in regex
+          regex←(escape beg),'[[:alpha:]].*?',escape end
+          hdrs←(⍴hdrs)⍴regex ⎕R{0∊⍴e←GetEnv(≢beg)↓(-≢end)↓⍵.Match:⍵.Match ⋄ e}⊢,hdrs
+      :EndIf
     ∇
 
     ∇ hdrs←privatize hdrs

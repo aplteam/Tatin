@@ -18,6 +18,9 @@
  :EndIf
  :If flag
      list←registryPath RemoveDeprecatedPackages list
+     :If parms.latest
+         list←(⌽({⍵⍳⍵}⌽RemoveMinorAndPatch¨list[;1])=⍳≢list)⌿list
+     :EndIf
  :EndIf
  :If 0<≢parms.group
      list←((⎕C parms.group)∘≡¨GetGroupFromPackageID¨list[;1])⌿list

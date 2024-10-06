@@ -39,6 +39,10 @@
  :If parms.dependencies←Arg.Switch'dependencies'
      parms.aggregate←0
  :EndIf
+ :If parms.latest←Arg.latest
+     parms.dependencies←0
+     parms.aggregate←1
+ :EndIf
  :Trap ErrNo
      r←⍪parms TC.ListPackages registry
  :Else
@@ -53,7 +57,7 @@
          r(AddHeader)←'Package-ID' 'Principal'
      :Else
          :If 0≡parms.date
-             r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),(⊂'Group & Name'),((parms.aggregate)/⊂'# major versions'),(⊂'Project URL')
+             r(AddHeader)←(2⊃⍴r)↑(('[*]'{⍺≡(≢⍺)↑⍵}registry)/⊂'Registry'),('Group & Name' 'Package ID'[1+parms.latest]),((parms.aggregate)/⊂'# major versions'),(⊂'Project URL')
              :If parms.dependencies
                  r[1;1]←⊂(1⊃r[1;]),' with dependencies'
              :EndIf

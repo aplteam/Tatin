@@ -1,0 +1,26 @@
+ r←CheckPackages flag;pkgs;latest;data;header;parms;allOnTatin;bool
+⍝ Checks whether there is a better version of the packages available in the packages/ folder.
+⍝ When `tatinServerOnly` is 0, all Registries with a priority greater than 0 are questioned.
+⍝ When `tatinServerOnly` is 1 only the Tatin registry is questioned
+⍝ `flag` is an insurance against accidental calls.
+ r←⍬
+ :If flag
+     :If 0<≢pkgs←##.FilesAndDirs.ListDirs ##.CiderConfig.HOME,'/packages'
+         pkgs←{⊃,/1↓⎕NPARTS ⍵}¨pkgs
+         parms←⎕NS''
+         parms.latest←1
+         allOnTatin←,parms ⎕SE.Tatin.ListPackages'[tatin]'
+         bool←(##.Registry.RemoveMinorAndPatch¨allOnTatin)∊##.Registry.RemoveMinorAndPatch¨pkgs
+         allOnTatin←bool/allOnTatin
+         r←⍪(~allOnTatin∊pkgs)/allOnTatin
+         r,←(~pkgs∊allOnTatin)/pkgs
+         :If 0<≢r
+             header←'Current' 'Latest'
+             r←(header,[0.5]' ')⍪r
+             r[2;]←(⌈/⍉≢¨r[;1 2])⍴¨'='
+         :Else
+             r←'All up-to-date'
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

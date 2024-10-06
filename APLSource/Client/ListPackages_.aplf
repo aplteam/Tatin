@@ -7,12 +7,20 @@
      parms.(group tags)←⊂''
      parms.aggregate←1
      parms.date←0
+     parms.latest←0
      parms.project_url←0
      parms.since←0
      parms.os_win←1
      parms.os_mac←1
      parms.os_lin←1
      parms.dependencies←0
+ :EndIf
+ :If 0=parms.⎕NC'latest'
+     parms.latest←0
+ :EndIf
+ :If parms.latest
+     parms.dependencies←0
+     parms.aggregate←1
  :EndIf
  :If parms.dependencies
      parms.aggregate←0
@@ -37,6 +45,9 @@
  :EndIf
  :If parms.os_lin
      request.RequestTarget,←'os_lin=1&'
+ :EndIf
+ :If parms.latest
+     request.RequestTarget,←'latest=1&'
  :EndIf
  :If 0<parms.⎕NC'userCommand'
  :AndIf parms.userCommand

@@ -27,6 +27,9 @@
  :If 0=parms.⎕NC'userCommand'
      parms.userCommand←0
  :EndIf
+ :If 0=parms.⎕NC'latest'
+     parms.latest←0
+ :EndIf
 ⍝ If at least one is specified the others default to 0. If none is specified they all default to 1
  flag←0∧.=parms.⎕NC↑'os_win' 'os_mac' 'os_lin'
  :If 0=parms.⎕NC'os_win'
@@ -41,10 +44,11 @@
  :If 0=parms.⎕NC'dependencies'
      parms.dependencies←0
  :EndIf
- list←'group' 'tags' 'aggregate' 'date' 'project_url' 'since' 'os_win' 'os_mac' 'os_lin' 'userCommand' 'dependencies'
- msg←'Invalid left argument: only "group", "tags", "date", "project_url", "aggregate", "dependencies", "os_win", "os_mac" and "os_lin" are permitted'
+ list←'group' 'latest' 'tags' 'aggregate' 'date' 'project_url' 'since' 'os_win' 'os_mac' 'os_lin' 'userCommand' 'dependencies'
+ msg←'Invalid left argument: only "group", "latest", "tags", "date", "project_url", "aggregate", "dependencies", "os_win", "os_mac" and "os_lin" are permitted'
  msg Assert∧/(' '~¨⍨↓parms.⎕NL 2)∊list
  '"aggregate" must be a Boolean'Assert parms.aggregate∊0 1
+ '"latest" must be a Boolean'Assert parms.latest∊0 1
  '"date" must be a Boolean'Assert parms.date∊0 1
  '"os_win" must be a Boolean'Assert parms.os_win∊0 1
  '"os_mac" must be a Boolean'Assert parms.os_mac∊0 1

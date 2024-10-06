@@ -1,0 +1,18 @@
+ r←Test_ListPkgs_080(stopFlag batchFlag);⎕TRAP;mat;parms;buff;all
+⍝ List latest version of all packages
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←⎕NS''
+ parms.aggregate←0
+ all←parms TC.ListPackages'[localhost]'
+
+ parms←⎕NS''
+ parms.latest←1
+ mat←parms TC.ListPackages'[localhost]'
+
+ →T.PassesIf 1=2⊃⍴mat
+ →T.PassesIf mat≡{⍪⍵⌿⍨⌽{(⍵⍳⍵)=⍳≢⍵}#.Tatin.Registry.RemoveMinorAndPatch¨⌽⍵},all
+
+ r←T._OK
+⍝Done

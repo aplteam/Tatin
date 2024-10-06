@@ -22,13 +22,19 @@
  parms←⎕NS''
  parms.group←request R.GetQueryParameter'group'
  parms.tags←request R.GetQueryParameter'tags'
- :If 0<≢parms.date←request R.GetQueryParameter'date'
-     parms.date←{⊃(//)⎕VFI ⍵}parms.date
+ parms.latest←⊃A.ToNum request R.GetQueryParameter'latest'
+ :If parms.latest
      parms.aggregate←0
- :Else
      parms.date←0
-     :If 0<≢buff←request R.GetQueryParameter'aggregate'
-         parms.aggregate←⊃A.ToNum buff
+ :Else
+     :If 0<≢parms.date←request R.GetQueryParameter'date'
+         parms.date←⊃A.ToNum parms.date
+         parms.aggregate←0
+     :Else
+         parms.date←0
+         :If 0<≢buff←request R.GetQueryParameter'aggregate'
+             parms.aggregate←⊃A.ToNum buff
+         :EndIf
      :EndIf
  :EndIf
  parms.project_url←{(⊂∊⍵)∊,¨'01':⍵ ⋄ 0}request R.GetQueryParameter'project_url'

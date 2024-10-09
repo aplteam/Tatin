@@ -26,16 +26,21 @@
  ⎕←'Copying data for the (un-managed) test registry...'
  ∆TEMP_REGISTRY_FOLDER∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨F.ListDirs #.Tatin.CiderConfig.HOME,'/TestServer/Registry/*'
  ⎕←' Local test data copied!'
+ ⍝ --------- Copy the test data to a temp folder
+ ∆TEMP_TEST_DATA←F.GetTempSubDir'Tatin-Test-Data'
+ ⎕←'Copying other test data for...'
+ ∆TEMP_TEST_DATA∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨⊃F.Dir #.Tatin.CiderConfig.HOME,'/TestData/*'
+ ⎕←' Other test data copied!'
  ⍝ --------- Now we need to copy the test data to a different (from the server) temp folder for pure local tests
- json←⊃⎕NGET'./TestData/tatin-client.json'
+ json←⊃⎕NGET ∆TEMP_TEST_DATA,'/tatin-client.json'
  ns←⎕JSON⍠('Dialect' 'JSON5')⊣json
  local←1⊃ns.registries
  Assert'local'≡local.alias
  local.uri←∆TEMP_REGISTRY_FOLDER
  (1⊃ns.registries)←local
  json←⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊣ns
- (⊂json)⎕NPUT'./TestData/tatin-client.json' 1
- (rc msg res)←∆UCMD'Init ./TestData'
+ (⊂json)⎕NPUT(∆TEMP_TEST_DATA,'/tatin-client.json')1
+ (rc msg res)←∆UCMD'Init "',∆TEMP_TEST_DATA,'/"'
  Assert 0=rc
  ⍝ --------------------------------------------
  ∆CACHE_PARMS←∆InitUserSettings 0

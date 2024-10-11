@@ -8,10 +8,10 @@
 
  ⍝#.Foo.fn←stop∘⎕THIS.{⍺ ∆UCMD'LoadDependencies ',⍵}
  :With #.Foo
-     ∆res←⎕SE.UCMD'Tatin.LoadDependencies ',#.Tatin.CiderConfig.HOME,'/TestData/InstallFromList'
+     ∆res←⎕SE.UCMD'Tatin.LoadDependencies ',#.Tatin.TestCases.∆TEMP_TEST_DATA,'/InstallFromList'
  :EndWith
  →T.GoToTidyUp'Dependencies loaded into #.Foo:'{⍺≢(≢⍺)↑⍵}∊#.Foo.∆res
- buildList←∆JSON⊃⎕NGET #.Tatin.CiderConfig.HOME,'/TestData/InstallFromList/apl-buildlist.json'
+ buildList←∆JSON⊃⎕NGET ∆TEMP_TEST_DATA,'/InstallFromList/apl-buildlist.json'
  →T.GoToTidyUp 9∨.≠⊃¨#.Foo.⎕NC¨{1↓1⊃('-'=⍵)⊂⍵}¨buildList.(principal/packageID)
 
  R←T._OK

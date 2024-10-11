@@ -3,13 +3,13 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- path←∆GetProjectPath,'/TestData/ForeignURL'
+ path←∆TEMP_TEST_DATA,'/ForeignURL'
  ref←∆GetRefToTatin
  ref.Client.CommTools.YesOrNo_Answers←1 2⍴'CheckPkgDeps@' 'n'
  stop←0
  (rc msg res)←stop ∆UCMD'PublishPackage "',path,'" [localhost] -dependencies=packages'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
- →T.GoToTidyUp 'Publishing cancelled'≢res
+ →T.GoToTidyUp'Publishing cancelled'≢res
 
  r←T._OK
 

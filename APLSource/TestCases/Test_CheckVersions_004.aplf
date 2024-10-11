@@ -4,12 +4,12 @@
  r←T._Failed
 
  dir←∆GetTempDir''
- dir ⎕NCOPY⍠('Wildcard' 1)⊣'./TestData/Packages/Install-template/*'
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣∆TEMP_TEST_DATA,'/Packages/Install-template/*'
  tempDir←∆GetTempDir'_install'
 
  versions←1 TC.CheckForLaterVersion dir
  →T.PassesIf 1=≢versions
- buff←⎕se.Tatin.InstallPackages '[localhost]aplteam-MarkAPL' tempDir
+ buff←⎕SE.Tatin.InstallPackages'[localhost]aplteam-MarkAPL'tempDir
 
  →T.GoToTidyUp(⊃buff)≢TC.GetPackageIDFrom⊃1 2⌷versions
 

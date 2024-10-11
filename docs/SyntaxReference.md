@@ -190,9 +190,11 @@ Note that you must set two of the parameters, `url` and `path`. The other parame
 {noOf}←{names} CreateAPIfromCFG (refTosourceNS cfg)
 ```
 
-This function creates cover functions for everything that is supposed to become the public interface of a package. 
+This function creates cover functions in the API namespace for everything that is supposed to become the public interface of a package. 
 
-By default the contents of the package becomes the public interface: `⎕NL 2 3 4 9`. However, if there is a function `Public` available, then this is expected to return a list of simple text vectors defining the public interface. `CreateAPIfromCFG` will use the result of such a function if it finds one in the root of the given namespace.
+These cover functions are one-line dfns that call thhe function with the same name one level above. Because they are one-liners the Tracer will ignore them: it is not possible to trace into a one-line dfn. Most of the time this is a blessing, but sometimes it is a curse.
+
+By default the contents of the package becomes the public interface: `⎕NL 2 3 4 9`. However, if there is a function `Public` available, then this is expected to return a list of simple text vectors defining the public interface. `CreateAPIfromCFG` will use the result of `Public` if it finds one in the root of the given namespace.
 
 Alternatively, you can pass a list of names as left argument to `CreateAPIfromCFG` - that would take precedence.
 
@@ -201,12 +203,12 @@ It is possible to keep `names` very simple by specifying a single name, but it c
 !> ### Tips and hints
 => You may call `CreateAPIfromCFG` when initialising a package after loading it (from a function that is executed by the package's `lx` parameter, see "Tatin's Package Configuration File" for details).
 => 
-=> Alternatively, you may call it as part of the package creation process, making it permanent. 
+=> Alternatively, you may call it as part of the package creation process, making the API a permanent part of the package. 
 
 
 #### Typical scenarios
 
-1. The package consists of a single class or a single namespace, be it scripted or not
+1. The package consists of a single class or a single ordinary namespace
 
 1. The package consists of a single function or operator
 
@@ -232,6 +234,38 @@ A> This restriction helps to avoid confusion, but there is also a technical issu
   For example, if the package name is `pkgName` and the namespace's name is `foo` and it has a function `Hello`, then you specify `api` as `foo` and call `Hello` with:
 
   `pkgName.Hello`
+
+
+##### A single scripted namespace
+
+If a package consists of a single scripted namespace then you cannot use the services of Tatin's `CreateAPIfromCFG` function. The reason is that this function tries to establish a sub-namespace (with a name defined by the package config parameter `api`) inside the target, and that works only with ordinary namespaces, but not with scripted namespaces.
+
+You could still create an API yourself, however. For example, if a package `Foo` consists of a scripted namspace that carries (say) about 20 variables, functions and operators of which only two should be accessible by a user (say `Encode` and `Decode`), then you could create this namespaces structure:
+
+```
+#.Foo
+#.Foo.Core
+  ... ⍝ vars, fns and oprs
+#.Foo.API
+#.Foo.API.Encode
+#.Foo.API.Decode  
+```
+
+This is how `#.Foo.API.Decode` would look like:
+
+```
+Decode←{⍺ ##.JWTAPL.Decode ⍵}
+```
+
+And this is how `#.Foo.API.Encode` would look like:
+
+```
+Encode←{⍺ ##.JWTAPL.Encode ⍵}
+```
+
+You just need to establish these functions yourself.
+
+You don't need a function `Public` here because that function's only purpose is to be called by `CreateAPIfromCFG` in order to establish a list of public objects. Here the job is done by you, therefore there is no need for `Public`.
 
 
 ##### A single class
@@ -1083,6 +1117,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

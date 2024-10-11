@@ -4,11 +4,11 @@
 
  r←T._Failed
 
- list←##.Client.FindDependencies'davin-DateAndTime'(##.CiderConfig.HOME,'/TestData/') 1
+ list←##.Client.FindDependencies'davin-DateAndTime'(∆TEMP_TEST_DATA,'/')1
  →T.PassesIf 1=≢list
  →T.PassesIf 2=≡1 2⊃list
  →T.PassesIf F.IsDir 1 1⊃list
  →T.PassesIf 2∧.≤{'-'+.=⊃,/1↓⎕NPARTS ⍵}¨1 2⊃list  ⍝ Must be valid package names and therefor have AT LEAST two hyphens
- →T.PassesIf'davin-DateAndTime-1.0.0'≡⊃,/1↓⎕NPARTS ∊1 2⊃list
+ →T.PassesIf'davin-DateAndTime-1.0.0'≡⊃,/1↓⎕NPARTS∊1 2⊃list
 
  r←T._OK

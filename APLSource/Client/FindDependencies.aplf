@@ -44,7 +44,7 @@
          folder←F.AddTrailingSep target
          'The folder must be a simple char vector'Assert 80=⎕DR folder
          ('Not found: ',folder)Assert ⎕NEXISTS folder
-         pkgList←⎕C','(≠⊆⊢),pkgList
+         pkgList←⎕C','(≠⊆⊢)' '~⍨,pkgList
          'A package name must not contain more than a maximum of two hyphens'Assert{2≥'-'+.=⍵}¨pkgList
          pkgList←Reg.RemoveMinorAndPatch¨pkgList
          buff←depth Reg.FindDependenciesLocally folder folder pkgList level

@@ -301,8 +301,9 @@ version</code></pre>
 </a>
 </div>
 <pre tabindex="0"><code>{noOf}←{names} CreateAPIfromCFG (refTosourceNS cfg)</code></pre>
-<p>This function creates cover functions for everything that is supposed to become the public interface of a package.</p>
-<p>By default the contents of the package becomes the public interface: <code>⎕NL 2 3 4 9</code>. However, if there is a function <code>Public</code> available, then this is expected to return a list of simple text vectors defining the public interface. <code>CreateAPIfromCFG</code> will use the result of such a function if it finds one in the root of the given namespace.</p>
+<p>This function creates cover functions in the API namespace for everything that is supposed to become the public interface of a package.</p>
+<p>These cover functions are one-line dfns that call thhe function with the same name one level above. Because they are one-liners the Tracer will ignore them: it is not possible to trace into a one-line dfn. Most of the time this is a blessing, but sometimes it is a curse.</p>
+<p>By default the contents of the package becomes the public interface: <code>⎕NL 2 3 4 9</code>. However, if there is a function <code>Public</code> available, then this is expected to return a list of simple text vectors defining the public interface. <code>CreateAPIfromCFG</code> will use the result of <code>Public</code> if it finds one in the root of the given namespace.</p>
 <p>Alternatively, you can pass a list of names as left argument to <code>CreateAPIfromCFG</code> - that would take precedence.</p>
 <p>It is possible to keep <code>names</code> very simple by specifying a single name, but it can also be complex and comprehend the names of functions, operators, variables, interfaces, classes and namespace, simple and scripted. It can also use dotted syntax to define names within namespaces, though only one level deep.</p>
 <div class="collapsible">
@@ -313,7 +314,7 @@ version</code></pre>
 <div class="collapsible-content">
 <hr>
 <p>You may call <code>CreateAPIfromCFG</code> when initialising a package after loading it (from a function that is executed by the package's <code>lx</code> parameter, see “Tatin's Package Configuration File” for details).</p>
-<p>Alternatively, you may call it as part of the package creation process, making it permanent.</p>
+<p>Alternatively, you may call it as part of the package creation process, making the API a permanent part of the package.</p>
 </div>
 </details>
 </div>
@@ -323,7 +324,7 @@ version</code></pre>
 </a>
 </div>
 <ol start="1">
-<li>The package consists of a single class or a single namespace, be it scripted or not</li>
+<li>The package consists of a single class or a single ordinary namespace</li>
 <li>The package consists of a single function or operator</li>
 <li>The package consists of several objects: a mixture of functions, operators, classes and/or namespaces</li>
 </ol>
@@ -347,8 +348,27 @@ version</code></pre>
 <p><code>pkgName.Hello</code></p></li>
 </ul>
 <div class="h_tag">
+<a href="#a-single-scripted-namespace" id="a-single-scripted-namespace" class="autoheader_anchor">
+<h5 data-id="A-single-scripted-namespace">2.5.1.2. A single scripted namespace</h5>
+</a>
+</div>
+<p>If a package consists of a single scripted namespace then you cannot use the services of Tatin's <code>CreateAPIfromCFG</code> function. The reason is that this function tries to establish a sub-namespace (with a name defined by the package config parameter <code>api</code>) inside the target, and that works only with ordinary namespaces, but not with scripted namespaces.</p>
+<p>You could still create an API yourself, however. For example, if a package <code>Foo</code> consists of a scripted namspace that carries (say) about 20 variables, functions and operators of which only two should be accessible by a user (say <code>Encode</code> and <code>Decode</code>), then you could create this namespaces structure:</p>
+<pre tabindex="0"><code>#.Foo
+#.Foo.Core
+  ... ⍝ vars, fns and oprs
+#.Foo.API
+#.Foo.API.Encode
+#.Foo.API.Decode</code></pre>
+<p>This is how <code>#.Foo.API.Decode</code> would look like:</p>
+<pre tabindex="0"><code>Decode←{⍺ ##.JWTAPL.Decode ⍵}</code></pre>
+<p>And this is how <code>#.Foo.API.Encode</code> would look like:</p>
+<pre tabindex="0"><code>Encode←{⍺ ##.JWTAPL.Encode ⍵}</code></pre>
+<p>You just need to establish these functions yourself.</p>
+<p>You don't need a function <code>Public</code> here because that function's only purpose is to be called by <code>CreateAPIfromCFG</code> in order to establish a list of public objects. Here the job is done by you, therefore there is no need for <code>Public</code>.</p>
+<div class="h_tag">
 <a href="#a-single-class" id="a-single-class" class="autoheader_anchor">
-<h5 data-id="A-single-class">2.5.1.2. A single class</h5>
+<h5 data-id="A-single-class">2.5.1.3. A single class</h5>
 </a>
 </div>
 <ul>
@@ -361,7 +381,7 @@ version</code></pre>
 </ul>
 <div class="h_tag">
 <a href="#a-single-function-or-operator" id="a-single-function-or-operator" class="autoheader_anchor">
-<h5 data-id="A-single-function-or-operator">2.5.1.3. A single function or operator</h5>
+<h5 data-id="A-single-function-or-operator">2.5.1.4. A single function or operator</h5>
 </a>
 </div>
 <p>If the name of the package is <code>pkgName</code>, and the name of the function is <code>MyFns</code>, then it is called as <code>pkgName.MyFns</code>. The function may be niladic, monadic, ambivalent or dyadic.</p>
@@ -369,7 +389,7 @@ version</code></pre>
 <p>In this particular case <code>api</code> <em>must not</em> be defined (remain empty).</p>
 <div class="h_tag">
 <a href="#a-mixture-of-several-apl-objects" id="a-mixture-of-several-apl-objects" class="autoheader_anchor">
-<h5 data-id="A-mixture-of-several-APL-objects">2.5.1.4. A mixture of several APL objects</h5>
+<h5 data-id="A-mixture-of-several-APL-objects">2.5.1.5. A mixture of several APL objects</h5>
 </a>
 </div>
 <ul>
@@ -378,7 +398,7 @@ version</code></pre>
 </ul>
 <div class="h_tag">
 <a href="#restricting-whats-public" id="restricting-whats-public" class="autoheader_anchor">
-<h5 data-id="Restricting-whats-public">2.5.1.5. Restricting what's “public”</h5>
+<h5 data-id="Restricting-whats-public">2.5.1.6. Restricting what's “public”</h5>
 </a>
 </div>
 <p>The user might want to expose only a subset of functions/operators of a namespace (classes have such an interface anyway: <code>:Public Shared</code>), and in that case, the user must not only specify <code>api</code>, but also structure her code accordingly.</p>

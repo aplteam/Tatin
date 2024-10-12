@@ -10,10 +10,11 @@
 ⍝ In case `question` is a scalar question mark, `AskForNumber` returns the path to itself and
 ⍝ the name of the global variable that can be used for automation, separated by a dot.
  :If '?'≡question
-     value←(⍕⎕THIS),'.AskForNumber_Answers←0 2⍴'' '''
+     value←(⍕⎕THIS),'.AskForNumber_Answers←1 2⍴'' ''  '' '''
      :Return
  :EndIf
  enforce←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'enforce'
+ 'Left argument ("enforce numeric input")must be a Boolean'Assert enforce∊0 1
  value←⍬
  success←flag←0
  :If ~(≡question)∊0 1

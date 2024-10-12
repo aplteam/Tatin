@@ -15,7 +15,7 @@
 ⍝  * In case `choices` is a scalar question mark, `Select` returns the path to itself and the name of
 ⍝    the global variable that can be used for automation, separated by a dot.
  :If '?'≡choices
-     index←(⍕⎕THIS),'.Select_Choices←0 2⍴'' '''
+     index←(⍕⎕THIS),'.Select_Choices←1 2⍴'' ''  '' '''
      :Return
  :EndIf
  x←{0<⎕NC ⍵:⊆⍎⍵ ⋄ ''}'x'
@@ -47,11 +47,13 @@
              index←⍬
          :ElseIf ' '=1↑0⍴∊index ⍝ Text?!
              :If '*'=¯1↑index
-                 index←((¯1+≢index)↑¨{⍵↓⍨+/∧\' '=⍵}¨choices)⍳⊂(¯1↓index)
-                 'Invalid selection'Assert index∊⍳≢choices
+                 index←⍸((¯1+≢index)↑¨{⍵↓⍨+/∧\' '=⍵}¨choices)≡¨⊂¯1↓index
+                 index←{1=≢⍵:⊃⍵ ⋄ ⍵}index
+                 'Invalid selection'Assert(mustFlag{(0<≢⍵)≠⍺}index)∨∨/index∊⍳≢choices
              :ElseIf '*'=⊃index
-                 index←((-¯1+≢index)↑¨{⍵↓⍨-+/∧\' '=⌽⍵}¨choices)⍳⊂(1↓index)
-                 'Invalid selection'Assert index∊⍳≢choices
+                 index←⍸((-¯1+≢index)↑¨{⍵↓⍨-+/∧\' '=⌽⍵}¨choices)≡¨⊂1↓index
+                 index←{1=≢⍵:⊃⍵ ⋄ ⍵}index
+                 'Invalid selection'Assert(mustFlag{(0<≢⍵)≠⍺}index)∨∨/index∊⍳≢choices
              :ElseIf (,'a')≡,index
                  index←⍳≢choices
              :ElseIf (,'q')≡,index

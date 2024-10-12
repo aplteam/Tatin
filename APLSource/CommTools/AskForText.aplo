@@ -1,4 +1,4 @@
- text←{x}(CheckFn AskForText)question;flag;alias;bool;buff;success;firstPart;enforce;default
+ text←{x}(CheckFn AskForText)question;flag;alias;bool;buff;success;firstPart;enforce;default;firstFlag
 ⍝ Operator asking a question and allowing the user to enter text.\\
 ⍝ By entering "`∘∘∘`" the user may interrupt `AskForText`: this activates a stop.\\
 ⍝ `CheckFn` is supposed to be a function that gets the input as `⍵` and must return a Boolean
@@ -13,10 +13,11 @@
 ⍝ In case `question` is a scalar question mark, `AskForText` returns the path to itself and
 ⍝ the name of the global variable that can be used for automation, separated by a dot.
  :If '?'≡question
-     text←(⍕⎕THIS),'.AskForText_Answers←0 2⍴'' '''
+     text←(⍕⎕THIS),'.AskForText_Answers←1 2⍴'' ''  '' '''
      :Return
  :EndIf
  x←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'x'
+ firstFlag←0
  :If ' '=1↑0⍴x
      default←x
      enforce←0
@@ -53,7 +54,9 @@
          :EndIf
      :EndIf
      :If 0<≢default
+     :AndIf firstFlag
          question,←' [',default,']'
+         firstFlag←0
      :EndIf
      :If ~flag
          text←⍞,0/⍞←question,': '

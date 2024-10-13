@@ -131,12 +131,12 @@
       :Else
           toBeZipped←F.NormalizePath toBeZipped
           :If 0=⎕NC'parent'
-              (rc msg)←Exec'zip -r ',_filename,' ',∊'"',¨(⊆toBeZipped),¨⊂'" '
+              (rc msg)←Exec'zip -r "',_filename,'" ',∊'"',¨(⊆toBeZipped),¨⊂'" '
               msg Assert 0=rc
           :Else
               parent←'expand'F.NormalizePath parent
               toBeZipped←{⍵↓⍨'/'=1⍴⍵}¨⊆toBeZipped
-              cmd←'cd ',parent,' && zip -r "',('expand'F.NormalizePath _filename~'"'),'" ',∊' ',¨'"',¨(toBeZipped~¨'"'),¨'"'
+              cmd←'cd "',parent,'" && zip -r "',('expand'F.NormalizePath _filename~'"'),'" ',∊' ',¨'"',¨(toBeZipped~¨'"'),¨'"'
               success←counter←0
               max←5
               first←1
@@ -159,7 +159,7 @@
           r←_ZipArchive.List
           r←{'.//'≡3⍴⍵:'./',3↓⍵ ⋄ '.\\'≡3⍴⍵:'.\',3↓⍵ ⋄ ⍵}¨r
       :Else
-          (rc msg)←Exec'unzip -l ',_filename
+          (rc msg)←Exec'unzip -l "',_filename,'"'
           msg Assert 0=rc
           r←MassageZipConentList msg
       :EndIf
@@ -175,7 +175,7 @@
       :Else
           filenames←F.NormalizePath⊆filenames
           :If 0<≢filenames←(filenames∊List)/filenames
-              (rc msg)←Exec'zip -d ',_filename,∊' ',¨'"',¨filenames,¨'"'
+              (rc msg)←Exec'zip -d "',_filename,'"',∊' ',¨'"',¨filenames,¨'"'
               msg Assert 0=rc
           :EndIf
       :EndIf
@@ -205,7 +205,7 @@
                   msg←⊃{⍺,';',⍵}/{'The file ''',⍵,''' already exists.'}¨b/names
                   msg ⎕SIGNAL 11
               :EndIf
-              (rc msg)←Exec'cd ',targetFolder,' && unzip ',('expand'F.NormalizePath _filename),∊' "'∘,¨names,¨'"'
+              (rc msg)←Exec'cd "',targetFolder,'" && unzip "',('expand'F.NormalizePath _filename),'"',∊' "'∘,¨names,¨'"'
               msg Assert 0=rc
           :EndIf
       :EndIf
@@ -237,7 +237,7 @@
       :Else
           zipFilename←AddExtension zipFilename
           ('Is not a directory: ',sourceFolder)Assert(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs.IsDir sourceFolder
-          res←Exec'cd ',('expand'F.NormalizePath sourceFolder),' && zip -r ',zipFilename,' *'
+          res←Exec'cd "',('expand'F.NormalizePath sourceFolder),'" && zip -r "',zipFilename,'" *'
       :EndIf
     ∇
 

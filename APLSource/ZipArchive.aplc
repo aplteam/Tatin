@@ -83,9 +83,9 @@
           :EndIf
           :If ~F.IsFile _filename
               tempFilename←F.GetTempFilename2''
-              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -q'
+              (rc msg)←Exec'zip "',_filename,'" "',tempFilename,'" -q'
               msg Assert 0=rc
-              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -dq'
+              (rc msg)←Exec'zip "',_filename,'" "',tempFilename,'" -dq'
               msg Assert 0=rc
               {}Exec'rm ',tempFilename,' -f'
           :EndIf

@@ -26,11 +26,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'ZipArchive' '1.2.0+16' '2024-04-19'
+      r←'ZipArchive' '1.2.1+16' '2024-10-13'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.2.1 from 2024-10-13
+    ⍝   Spaces in filesnames made ZipArchive crash
     ⍝ * 1.2.0 from 2024-04-19
     ⍝   * With High Sierra Apple introduced a version of "unzip" that throws an error in case of any non-ANSI
     ⍝     characters in an filename.
@@ -83,9 +85,9 @@
           :EndIf
           :If ~F.IsFile _filename
               tempFilename←F.GetTempFilename2''
-              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -q'
+              (rc msg)←Exec'zip "',(_filename~'"'),'" "',(tempFilename~'"'),'" -q'
               msg Assert 0=rc
-              (rc msg)←Exec'zip ',_filename,' ',tempFilename,' -dq'
+              (rc msg)←Exec'zip "',(_filename~'"'),'" "',(tempFilename~'"'),'" -dq'
               msg Assert 0=rc
               {}Exec'rm ',tempFilename,' -f'
           :EndIf
@@ -131,12 +133,12 @@
       :Else
           toBeZipped←F.NormalizePath toBeZipped
           :If 0=⎕NC'parent'
-              (rc msg)←Exec'zip -r ',_filename,' ',∊'"',¨(⊆toBeZipped),¨⊂'" '
+              (rc msg)←Exec'zip -r "',(_filename~'"'),'" ',∊'"',¨('"'~⍨¨⊆toBeZipped),¨⊂'" '
               msg Assert 0=rc
           :Else
               parent←'expand'F.NormalizePath parent
               toBeZipped←{⍵↓⍨'/'=1⍴⍵}¨⊆toBeZipped
-              cmd←'cd ',parent,' && zip -r "',('expand'F.NormalizePath _filename~'"'),'" ',∊' ',¨'"',¨(toBeZipped~¨'"'),¨'"'
+              cmd←'cd "',(parent~'"'),'" && zip -r "',('expand'F.NormalizePath _filename~'"'),'" ',∊' ',¨'"',¨(toBeZipped~¨'"'),¨'"'
               success←counter←0
               max←5
               first←1
@@ -159,7 +161,7 @@
           r←_ZipArchive.List
           r←{'.//'≡3⍴⍵:'./',3↓⍵ ⋄ '.\\'≡3⍴⍵:'.\',3↓⍵ ⋄ ⍵}¨r
       :Else
-          (rc msg)←Exec'unzip -l ',_filename
+          (rc msg)←Exec'unzip -l "',(_filename~'"'),'"'
           msg Assert 0=rc
           r←MassageZipConentList msg
       :EndIf
@@ -175,7 +177,7 @@
       :Else
           filenames←F.NormalizePath⊆filenames
           :If 0<≢filenames←(filenames∊List)/filenames
-              (rc msg)←Exec'zip -d ',_filename,∊' ',¨'"',¨filenames,¨'"'
+              (rc msg)←Exec'zip -d "',(_filename~'"'),'"',∊' ',¨'"',¨(filenames~'"'),¨'"'
               msg Assert 0=rc
           :EndIf
       :EndIf
@@ -205,7 +207,7 @@
                   msg←⊃{⍺,';',⍵}/{'The file ''',⍵,''' already exists.'}¨b/names
                   msg ⎕SIGNAL 11
               :EndIf
-              (rc msg)←Exec'cd ',targetFolder,' && unzip ',('expand'F.NormalizePath _filename),∊' "'∘,¨names,¨'"'
+              (rc msg)←Exec'cd "',(targetFolder~'"'),'" && unzip "',('expand'F.NormalizePath _filename~'"'),'"',∊' "'∘,¨(names~¨'"'),¨'"'
               msg Assert 0=rc
           :EndIf
       :EndIf
@@ -237,7 +239,7 @@
       :Else
           zipFilename←AddExtension zipFilename
           ('Is not a directory: ',sourceFolder)Assert(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs.IsDir sourceFolder
-          res←Exec'cd ',('expand'F.NormalizePath sourceFolder),' && zip -r ',zipFilename,' *'
+          res←Exec'cd "',('expand'F.NormalizePath sourceFolder~'"'),'" && zip -r "',(zipFilename~'"'),'" *'
       :EndIf
     ∇
 
@@ -255,8 +257,7 @@
           ⍝ therefore we trap the error and just compare the number of files in the archive with what we've got.
           :Trap 11
               :If IsMac
-              ⍝ (rc msg)←Exec'unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'  ⍝ Does not work with, say, Umlaute in filesnames since High Sierra!
-                  cmd←'ditto -V -x -k "',(zipFilename~'"'),'" ',(1+0<≢targetFolder)⊃'.'targetFolder
+                  cmd←'ditto -V -x -k "',(zipFilename~'"'),'" "',(((1+0<≢targetFolder)⊃'.'targetFolder)~'"'),'"'
               :Else
                   cmd←'unzip -o -qq "',(zipFilename~'"'),'"',(0<≢targetFolder)/' -d "',(targetFolder~'"'),'"'
               :EndIf
@@ -272,8 +273,8 @@
               :EndIf
           :EndIf
           ⍝ On my Ubuntu VM under Hyper-V I get files and dirs with no priviliges, so defaults need to be established:
-          {}{Exec'chmod 666 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListFiles targetFolder,'/'
-          {}{Exec'chmod 777 "',⍵,'"'}EachIfNotEmpty'recursive'F.ListDirs targetFolder,'/'
+          {}{Exec'chmod 666 "',(⍵~'"'),'"'}EachIfNotEmpty'recursive'F.ListFiles targetFolder,'/'
+          {}{Exec'chmod 777 "',(⍵~'"'),'"'}EachIfNotEmpty'recursive'F.ListDirs targetFolder,'/'
       :EndIf
     ∇
 

@@ -10,11 +10,13 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHubAPIv3' '1.4.0' '2024-09-24'
+      r←'GitHubAPIv3' '1.5.0' '2024-10-16'
     ∇
 
     ∇ History
       :Access Public Shared
+    ⍝ * 1.5.0 from 2024-10-16
+    ⍝   * `CheckForUpdate` can now handle beta versions on the client side (on GitHub, betas are not supported)
     ⍝ * 1.4.0 from 2024-09-24
     ⍝   * New instance method `GetMyRateLimits` added whbich complements the older shared method `GetRateLimits`
     ⍝   * BREAKING CHANGE
@@ -284,25 +286,38 @@
     ∇
 
     ∇ tag←GetLatestTag repoName;MyGitAPI;ns;gitVersion;api
-    ⍝ This method returns the latest `tag` (version number) for `repoName`.\\
+    ⍝ This method returns the latest `tag` (version number) for `repoName` .\\
     ⍝ Note that drafted releases and pre-releases are both ignored.
       :Access Public Instance
       ns←GetLatestReleaseInfo repoName
       tag←ns.tag_name
     ∇
 
-    ∇ betterVersion←CheckForUpdate(repoName version);gitVersion;version_;gitVersion_
-    ⍝ Takes a version number like `1.2.3` or `1.2.3.4` (usually what is currently installed/used).\\
+    ∇ betterVersion←CheckForUpdate(repoName version);gitVersion;version_;gitVersion_;msg
+    ⍝ Takes a version number like `1.2.3` or `1.2.3.4-beta-1` (usually what is currently installed/used).\\
     ⍝ Returns one of:
     ⍝ * An empty vector in case no better version is available
-    ⍝ * The better version number
+    ⍝ * The better version number\\
+    ⍝ If the given version is a beta version (say 1.2.3-beta-1) and on GitHub it is 1.2.3 then the GitHub version
+    ⍝ is considered to be a later version. \\
+    ⍝ If the latest verson on GitHub is a beta an erroris thrown: this is not supported. 
       :Access Public Instance
       betterVersion←''
       gitVersion_←GetLatestTag repoName
       gitVersion←⌊CastTagname2Number gitVersion_
-      version_←CastTagname2Number version~'v'
-      :If version_<gitVersion
-          betterVersion←gitVersion_
+      msg←'Latest version on GitHub is a beta (',gitVersion_,') - not supported'
+      msg Assert 0=≢gitVersion_~⎕D,'.v'             ⍝ This can only ever be untrue for a beta version
+      version_←{⍵↑⍨¯1+⍵⍳'-'}version
+      version_←CastTagname2Number version_~'v'
+      :If 0<≢version~⎕D,'.'                         ⍝ This can only ever be true for a beta version
+          :If version_≤gitVersion
+              betterVersion←gitVersion_             ⍝ Because a beta is by definition worse than a no-beta
+          :EndIf
+      :Else
+          version_←CastTagname2Number version~'v'
+          :If version_<gitVersion
+              betterVersion←gitVersion_
+          :EndIf
       :EndIf
     ∇
 

@@ -6,7 +6,7 @@
  :If TC.F.IsFile filename
      GH.personal_access_token←∊⊃TC.F.NGET filename 1
  :EndIf
- currentVersion←({⍵↑⍨¯1+⌊/⍵⍳'+-'}2⊃TC.Version)
+ currentVersion←({⍵↑⍨¯1+⍵⍳'+'}2⊃TC.Version)
  tag←GH.CheckForUpdate'Tatin'currentVersion
  :If 0=≢tag
      r←'There is no later version available than ',⊃{⍺,' from ',⍵}/1↓TC.Version
@@ -17,7 +17,7 @@
      :If 1 TC.YesOrNo msg
          version←TC.UpdateClient tag folder
          :If 0<≢version
-             0 TC.A.GoToWebPage 'file://',folder,'/Assets/docs/ReleaseNotes.html'
+             0 TC.A.GoToWebPage'file://',folder,'/Assets/docs/ReleaseNotes.html'
          :EndIf
          ⍝ Finally we check whether there is a folder Tatin/ in MyUCMDs/
          folder2←TC.GetMyUCMDsFolder'Tatin'

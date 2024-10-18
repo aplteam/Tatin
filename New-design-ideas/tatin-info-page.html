@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Package Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS v5.x -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <style>
+        body {
+            padding-top: 56px;
+        }
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        footer {
+            background-color: #f8f9fa;
+        }
+        .tag-badge {
+            margin-right: 5px;
+        }
+        .package-header {
+            margin-bottom: 2rem;
+        }
+        .package-info {
+            margin-bottom: 2rem;
+        }
+        .readme-content {
+            margin-top: 2rem;
+        }
+        /* Copy command box */
+        .copy-command {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            padding: 0.75rem;
+            position: relative;
+            font-family: monospace;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #007bff;
+        }
+        /* Responsive styling for the package header */
+        @media (max-width: 767px) {
+            .package-header {
+                text-align: center;
+            }
+            .package-header h1 {
+                font-size: 1.5rem;
+            }
+            .copy-button {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white border-bottom shadow-sm">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="packages.html">
+          <img src="https://tatin.dev/Assets/img/tatin.png" alt="Tatin Logo">
+          <span class="fw-bold">Tatin Registry</span>
+        </a>
+        <!-- Navbar Toggler -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarMenu">
+          <ul class="navbar-nav ms-auto align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link" href="packages.html">Packages</a>
+            </li>
+            <!-- Add more menu items as needed -->
+            <!-- User Icon Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-user fa-lg"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="#">Login</a></li>
+                <li><a class="dropdown-item" href="#">Register</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><a class="dropdown-item" href="#">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="container my-5">
+        <!-- Package Header -->
+        <div class="package-header">
+            <h1 id="packageName" class="fw-bold">Package Name</h1>
+            <p id="packageDescription" class="lead">Package Description</p>
+            <div id="packageTags">
+                <!-- Tags will be added dynamically -->
+            </div>
+        </div>
+        <!-- Copy Command Box -->
+        <div class="mb-4">
+            <h5><i class="fa fa-copy me-2"></i>Install Package</h5>
+            <div class="copy-command">
+                <code id="installCommand">]Tatin.InstallPackages &lt;PackageIdentifier&gt;</code>
+                <button class="copy-button" onclick="copyToClipboard()" title="Copy to Clipboard">
+                    <i class="fa fa-copy"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Package Info -->
+        <div class="row package-info">
+            <div class="col-md-4">
+                <h5><i class="fa fa-code-branch me-2"></i>Version</h5>
+                <p id="version">0.0.0</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-calendar me-2"></i>Date</h5>
+                <p id="date">YYYYMMDD.HHMMSS</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-desktop me-2"></i>OS Compatibility</h5>
+                <p id="osCompatibility">OS Info</p>
+            </div>
+        </div>
+        <div class="row package-info">
+            <div class="col-md-4">
+                <h5><i class="fa fa-file-code me-2"></i>API</h5>
+                <p id="api">API Info</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-cubes me-2"></i>Assets</h5>
+                <p id="assets">Assets Info</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-file me-2"></i>Files</h5>
+                <p id="files">Files Info</p>
+            </div>
+        </div>
+        <div class="row package-info">
+            <div class="col-md-4">
+                <h5><i class="fa fa-users me-2"></i>Group</h5>
+                <p id="group">Group Info</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-balance-scale me-2"></i>License</h5>
+                <p id="license">License Info</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-code me-2"></i>Minimum APL Version</h5>
+                <p id="minimumAplVersion">APL Version Info</p>
+            </div>
+        </div>
+        <div class="row package-info">
+            <div class="col-md-4">
+                <h5><i class="fa fa-terminal me-2"></i>User Command Script</h5>
+                <p id="userCommandScript">Script Info</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-exchange-alt me-2"></i>I/O Requirement</h5>
+                <p id="ioRequirement">I/O Info</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fa fa-memory me-2"></i>Memory Limit</h5>
+                <p id="memoryLimit">Memory Limit Info</p>
+            </div>
+        </div>
+        <!-- Project URL -->
+        <div class="mb-4">
+            <h5><i class="fa fa-link me-2"></i>Project URL</h5>
+            <p><a href="#" id="projectUrl" target="_blank">Project Repository</a></p>
+        </div>
+        <!-- README Content -->
+        <div class="readme-content">
+            <h2 class="fw-bold">README</h2>
+            <div id="readme">
+                <!-- README content will be rendered here -->
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="text-center py-4">
+        <div class="container">
+            <p class="mb-0">Created by Tatin version 0.115.0-beta-6+1984 from 2024-10-06 under Linux-64 18.2.45645.0 S Runtime</p>
+            <p>Bugs, questions, problems: <a href="mailto:info@tatin.dev">info@tatin.dev</a></p>
+        </div>
+    </footer>
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <!-- Showdown Library for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+    <!-- Custom Script -->
+    <script>
+        // Function to render package info
+        function renderPackageInfo(pkg) {
+            // Package Name and Description
+            document.getElementById('packageName').textContent = pkg.name;
+            document.getElementById('packageDescription').textContent = pkg.description;
+
+            // Tags
+            const tagsDiv = document.getElementById('packageTags');
+            tagsDiv.innerHTML = '';
+            const tagsArray = pkg.tags.split(',').map(tag => tag.trim());
+            tagsArray.forEach(tag => {
+                const tagBadge = document.createElement('span');
+                tagBadge.className = 'badge bg-primary me-1';
+                tagBadge.textContent = tag;
+                tagsDiv.appendChild(tagBadge);
+            });
+
+            // Version
+            document.getElementById('version').textContent = pkg.version;
+
+            // Date
+            document.getElementById('date').textContent = pkg.date;
+
+            // OS Compatibility
+            const osList = [];
+            if (pkg.os_lin) osList.push('Linux');
+            if (pkg.os_mac) osList.push('Mac');
+            if (pkg.os_win) osList.push('Windows');
+            document.getElementById('osCompatibility').textContent = osList.join(', ');
+
+            // API
+            document.getElementById('api').textContent = pkg.api || 'N/A';
+
+            // Assets
+            document.getElementById('assets').textContent = pkg.assets || 'N/A';
+
+            // Files
+            document.getElementById('files').textContent = pkg.files || 'N/A';
+
+            // Group
+            document.getElementById('group').textContent = pkg.group || 'N/A';
+
+            // License
+            document.getElementById('license').textContent = pkg.license || 'N/A';
+
+            // Minimum APL Version
+            document.getElementById('minimumAplVersion').textContent = pkg.minimumAplVersion || 'N/A';
+
+            // User Command Script
+            document.getElementById('userCommandScript').textContent = pkg.userCommandScript || 'N/A';
+
+            // I/O Requirement
+            document.getElementById('ioRequirement').textContent = pkg.io ? 'Yes' : 'No';
+
+            // Memory Limit
+            document.getElementById('memoryLimit').textContent = pkg.ml ? 'Yes' : 'No';
+
+            // Project URL
+            const projectUrlLink = document.getElementById('projectUrl');
+            projectUrlLink.href = pkg.project_url;
+            projectUrlLink.textContent = pkg.project_url;
+
+            // Render README
+            const converter = new showdown.Converter();
+            converter.setOption('simpleLineBreaks', true);
+            const readmeHtml = converter.makeHtml(pkg.readme || 'No README available.');
+            document.getElementById('readme').innerHTML = readmeHtml;
+
+            // Update the Install Command
+            const installCommand = document.getElementById('installCommand');
+            const packageIdentifier = `${pkg.group}-${pkg.name}-${pkg.version}`;
+            installCommand.textContent = `]Tatin.InstallPackages ${packageIdentifier}`;
+        }
+
+        // Copy to Clipboard Function
+        function copyToClipboard() {
+            const installCommand = document.getElementById('installCommand').textContent;
+            navigator.clipboard.writeText(installCommand).then(() => {
+                alert('Command copied to clipboard!');
+            }, () => {
+                alert('Failed to copy command.');
+            });
+        }
+
+        // Get package name from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const packageName = urlParams.get('name');
+
+        // For demonstration purposes, we'll use a predefined package data object.
+        // In a real application, you would fetch this data from an API based on the package name.
+
+        // Sample package data
+        const packages = [
+            {
+                "api": "ADOC",
+                "assets": "Docs",
+                "date": "20241012.125958",
+                "description": "Automated generation of documentation",
+                "documentation": "",
+                "files": "",
+                "group": "aplteam",
+                "io": 1,
+                "license": "MIT",
+                "lx": "",
+                // "maintainer": "kai@aplteam.com", // Excluded for privacy
+                "minimumAplVersion": "18.0",
+                "ml": 1,
+                "name": "ADOC",
+                "os_lin": 1,
+                "os_mac": 1,
+                "os_win": 1,
+                "project_url": "https://github.com/aplteam/ADOC",
+                "source": "APLSource/ADOC",
+                "tags": "documentation",
+                "userCommandScript": "APLSource/ADOC_uc.dyalog",
+                "version": "7.1.2+134",
+                "readme": `# ADOC
+
+ADOC stands for Automated Documentation. It analyzes Dyalog APL Classes, Interfaces, and namespaces—scripted as well as non-scripted ones—and generates documentation from them. That documentation can be enriched by adding Markdown comments to the Class, Interface, or namespace script.
+
+## Requirements
+
+ADOC requires Dyalog APL 18.0 Unicode or better.
+
+## Samples
+
+\`\`\`
+]ADoc -?
+───────────────────────────────────────────────────────────────────────────────
+]TOOLS.ADoc
+Source: /path/to/ADOC_uc.dyalog
+Version: 2.391
+Syntax:
+Accepts modifiers -browser= -ref= -summary[=] -title= -toc= -filename= -version
+Modifier 'ref' accepts values consisting only of characters in the set "0 1"
+Modifier 'summary' accepts only values "full"
+Modifier 'toc' accepts values consisting only of characters in the set "0 1"
+
+Automated documentation generation
+
+]ADoc -?? ⍝ for syntax details
+]ADoc -??? ⍝ to view the complete ADoc documentation in a browser window
+
+]ADoc -??
+───────────────────────────────────────────────────────────────────────────────
+]TOOLS.ADoc
+Source: /path/to/ADOC_uc.dyalog
+Version: 2.391
+Syntax:
+Accepts modifiers -browser= -ref= -summary[=] -title= -toc= -filename= -version
+Modifier 'ref' accepts values consisting only of characters in the set "0 1"
+Modifier 'summary' accepts only values "full"
+Modifier 'toc' accepts values consisting only of characters in the set "0 1"
+Modifier Default is a temp filename but allows any filename
+
+Gathers information about one or more classes and/or namespaces.
+Either compiles an HTML page which is then displayed in a browser (default) or prints summarizing information to the session (-summary).
+-title={text} Add a custom title with the content {text}
+-browser={path} Use the non-default browser specified
+-summary[=full] Returns summarized information about the object members (optionally including full function headers)
+-version Returns the version number of ADOC used. If specified everything else is ignored
+
+When objects are not addressed with a full name (= start neither with \`#\` nor with \`⎕SE\`), then the user command will try to find the objects in the namespace the user command was called from. If they cannot be found there, it will assume they live in \`#\`.
+
+Examples:
+]ADoc MyClass ⍝ single class
+]ADoc MyClass FilesAndDirs ⍝ two classes
+]ADoc MyClass -title="My Doc" ⍝ custom title
+]ADoc MyClass -browser="c:\\opera.exe" ⍝ custom browser
+]ADoc MyClass -summary ⍝ basic info
+]ADoc MyClass -summary=full ⍝ more detailed info
+]ADoc -??? ⍝ to view the complete ADoc documentation in a browser window
+\`\`\`
+
+## ADOC as a User Command
+
+With version 16.0, \`]ADOC\` became an official Dyalog user command.
+`
+            },
+            // Add more package objects as needed
+        ];
+
+        // Find the package data based on the package name
+        //const packageData = packages.find(pkg => `${pkg.group}-${pkg.name}` === packageName);
+        const packageData = packages[0];
+
+        if (packageData) {
+            // Set the page title
+            document.title = `Package Info - ${packageData.name}`;
+            // Render the package info
+            renderPackageInfo(packageData);
+        } else {
+            // Handle package not found
+            document.querySelector('.container').innerHTML = `<div class="alert alert-danger" role="alert">
+                Package not found.
+            </div>`;
+        }
+    </script>
+</body>
+</html>

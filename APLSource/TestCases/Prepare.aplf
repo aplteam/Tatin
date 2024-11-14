@@ -33,9 +33,13 @@
          1 ⎕NDELETE testFilename,'.profile'
          1 ⎕NDELETE testFilename,'.cr'
      :EndIf
+     codeCoverageFlag←answer∊1 2
+ :Else
+     ask←{⍞←⍵,' (y/n) ' ⋄ a←¯1↑⍞ ⋄ ~a∊'YyNn':∇ ⍵ ⋄ a∊'Yy'}
+     codeCoverageFlag←answer←⊃ask'There is no code coverage file yet - would you like to create one?'
  :EndIf
- codeCoverageFlag←answer∊1 2
- :If 3≠answer
+
+ :If codeCoverageFlag
      T.codeCoverage←⎕NEW ##.CodeCoverage(,⊂'#.Tatin.Client,#.Tatin.Registry,#.Tatin.Server')
      T.codeCoverage.filename←testFilename
      ignore←''

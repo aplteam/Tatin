@@ -25,7 +25,8 @@
      :EndIf
      ('<',projectName,'> does not have any packages installed')Assert 0<≢installFolders
      :If 1=≢installFolders
-         projCfg.CIDER.(parent,'.',projectSpace),'.',
+         installFolder←projectFolder,'/',1⊃installFolders
+         targetSpace←projCfg.CIDER.(parent,'.',projectSpace),'.',⊃installFolders
      :Else
          ind←⊃'SelectLoadFolderForLoadDependencies@Select folder to load dependencies from:'##.CommTools.Select(⊂projectFolder,'/'),¨({'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨installFolders),¨'/'
          :If 0=≢ind

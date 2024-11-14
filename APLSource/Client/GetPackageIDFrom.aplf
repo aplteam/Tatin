@@ -17,9 +17,10 @@
      r←{⍵↑⍨-¯1+⌊/'/\'⍳⍨⌽⍵}buff
  :ElseIf IsHTTP packageID
      buff←'http[s]://'⎕R''⊢packageID
+     buff←(~'//'⍷buff)/buff
      r←{'-'@(⍸'/'=⍵)⊢⍵}{⍵↓⍨⍵⍳'/'}buff
  :ElseIf ∨/'/\]'∊packageID
-     r←{⍵↑⍨-¯1+⌊/'/\'⍳⍨⌽⍵}packageID
+     r←{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}packageID
  :Else
      r←packageID
  :EndIf

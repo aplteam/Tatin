@@ -49,7 +49,8 @@
                  {(⍎⍺).⎕EX ⍵}/¯1 0↓¨'.'A.SplitPath saveIn
              :EndIf
              EstablishSystemVars saveIn cfg
-             Reg.ImportWithQuadFIX(path,'/',cfg.source)(saveIn)
+             msg←⎕SE.Link.Import(saveIn)({⍵↓⍨-(¯1↑⍵)∊'/\'}path,'/',cfg.source)        ⍝ Reg.ImportWithQuadFIX(path,'/',cfg.source)(saveIn)  ⍝TODO⍝
+             Assert∨/'Imported: '⍷∊msg
              ref←⍎saveIn
          :Else
              ref←⍎saveIn

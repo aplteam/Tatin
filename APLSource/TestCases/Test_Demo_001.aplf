@@ -18,22 +18,22 @@
  body←''
  body,←'∇r←x Plus y' ':Access Public Shared' 'r←x+y' '∇'
  body,←'∇r←x Times y' ':Access Public Shared' 'r←x×y' '∇'
- body←(⊂':Class MyClass'),body,(⊂':EndClass')
+ body←(⊂':Class Arithmetic'),body,(⊂':EndClass')
  (⊂body)F.NPUT src2,'/Arithmetic.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Arithmetic' '1.0.0'
  cfg.source←'Arithmetic.apln'
  cfg.os_win←1
  cfg.tags←'foo,boo'
-⍝ cfg.api←'MyClass'
+ cfg.api←'Arithmetic'
  TC.WritePackageConfigFile src2 cfg
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
  refs←TC.LoadPackages(reg,'/Example-Arithmetic-1.0.0')#.TEMP
- →T.GoToTidyUp 7≠3 #.TEMP.Arithmetic.MyClass.Plus 4
- →T.GoToTidyUp 12≠3 #.TEMP.Arithmetic.MyClass.Times 4
+ →T.GoToTidyUp 7≠3 #.TEMP.Arithmetic.Plus 4
+ →T.GoToTidyUp 12≠3 #.TEMP.Arithmetic.Times 4
 
  r←T._OK
 

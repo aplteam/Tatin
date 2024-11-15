@@ -15,12 +15,14 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- body←'Times←{' '  Package_B.Times ⍵' '}'
+ body←,¨'Times←{' '  ##.Package_B.Times ⍵' '}'
+ body←(⊂':Namespace Package_A'),body,(⊂':EndNamespace')   ⍝TODO⍝
  (⊂body)F.NPUT src2,'/Package_A.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Package_A' '1.0.0'
  cfg.source←'Package_A.apln'
  cfg.os_win←1
+ cfg.api←'Package_A'
  TC.WritePackageConfigFile src2 cfg
  src2 TC.Dependencies.Add'Example-Package_B-1.0.0'
  (rc msg zipFilename)←TC.PublishPackage src2 reg

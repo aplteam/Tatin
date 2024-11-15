@@ -16,7 +16,7 @@
  body←''
  body,←'∇r←PI' ':Access Public Instance' 'home←(⊃⊃⎕CLASS ⎕THIS).##.TatinVars.HOME' 'filename←home,''/pi.txt''' 'r←⊃(//)⎕VFI(⊃⎕NGET filename)~⎕TC' '∇'
  body,←'∇r←AssetFolder' ':Access Public Shared' 'r←##.TatinVars.HOME' '∇'
- body←(⊂':Class MyClass'),body,(⊂':EndClass')
+ body←(⊂':Class AssetAccess'),body,(⊂':EndClass')
  (⊂body)F.NPUT src,'/AssetAccess.aplc'
  (⊂,⊂'3.14')F.NPUT src,'/pi.txt'
  cfg←TC.InitPackageConfig ⍬
@@ -30,9 +30,9 @@
  Assert 200=rc
 
  {}TC.LoadPackages(reg,'/Example-AssetAccess-1.0.0')#.TEMP
- instance←⎕NEW #.TEMP.AssetAccess.MyClass
+ instance←⎕NEW #.TEMP.AssetAccess.AssetAccess
  →T.GoToTidyUp 3.14≠instance.PI
- →T.GoToTidyUp'Example-AssetAccess-1.0.0'≢⊃,/1↓⎕NPARTS #.TEMP.AssetAccess.MyClass.AssetFolder
+ →T.GoToTidyUp'Example-AssetAccess-1.0.0'≢⊃,/1↓⎕NPARTS #.TEMP.AssetAccess.AssetAccess.AssetFolder
 
  r←T._OK
 

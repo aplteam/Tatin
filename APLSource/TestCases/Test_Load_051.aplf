@@ -15,23 +15,24 @@
  TC.Reg.CreateRegistry reg
  TC.MyUserSettings.AddRegistry'[local2]',reg
 
- body←':Namespace Functions' 'Times←{' '×/⍵' '}' ':EndNamespace'
+ body←':Namespace Package_A' 'Times←{' '×/⍵' '}' ':EndNamespace'
  (⊂body)F.NPUT src2,'/Package_A.apln'
  cfg←TC.InitPackageConfig ⍬
  cfg.(group name version)←'Example' 'Package_A' '1.0.0'
  cfg.source←'Package_A.apln'
- cfg.api←'Functions'
+ cfg.api←'Package_A'
  cfg.os_win←1
  TC.WritePackageConfigFile src2 cfg
  (rc msg zipFilename)←TC.PublishPackage src2 reg
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- F.MkDir src3←src,'/Times'
+ src3←src,'/Times'
+ F.MkDir src3
  body←'r←Times y' '  r←Package_A.Times y'
  (⊂body)F.NPUT src3,'/Times.aplf'
  cfg←TC.InitPackageConfig ⍬
- cfg.(group name version)←'Example' 'Times_' '1.0.0'
+ cfg.(group name version)←'Example' 'Times' '1.0.0'
  cfg.source←'Times.aplf'
  cfg.os_win←1
  TC.WritePackageConfigFile src3 cfg
@@ -40,8 +41,8 @@
  toBeDeleted,←⊂zipFilename
  Assert 200=rc
 
- refs←TC.LoadPackages(reg,'/Example-Times_-1.0.0')#.TEMP
- →T.GoToTidyUp 12≠#.TEMP.Times_.Times 3 4
+ refs←TC.LoadPackages(reg,'/Example-Times-1.0.0')#.TEMP
+ →T.GoToTidyUp 12≠#.TEMP.Times.Times 3 4
 
  r←T._OK
 

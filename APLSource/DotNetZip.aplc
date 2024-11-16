@@ -23,13 +23,19 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'DotNetZip' '2.2.0+67' '2023-02-26'
+      r←'DotNetZip' '2.3.1+67' '2024-11-15'
     ∇
 
     ∇ History
-      :Access Public Shared
+      :Access Public Shared  
+    ⍝ * 2.3.1 from 2024-11-15
+    ⍝   * Packages updated 
+    ⍝ * 2.3.0 from 2024-11-15
+    ⍝   * `make` could run into "File is in use by another process" which appears to be caused by
+    ⍝     `DotNetZip` itself, though only on very fast machines. 
+    ⍝     This version is more resilient towards this.      
     ⍝ * 2.2.0 from 2024-06-26
-    ⍝   * On very fast machines this could run into 
+    ⍝   * On very fast machines this could run into
     ⍝     "The process cannot access the file ... because it is being used by another process"
     ⍝     We now wait for a moment and then try again, up to 5 times
     ⍝ * 2.1.0 from 2023-02-01
@@ -101,7 +107,7 @@
     ⍝Done
     ∇
 
-    ∇ make(zipFilename overwriteFlag);stream;msg;flag;counter;doesExist
+    ∇ make(zipFilename overwriteFlag);msg;flag;counter;doesExist;stream
       CheckMinVersion ⍬
       Initialize ⍬
       zipFilename←AddExtension F.ExpandPath zipFilename
@@ -137,7 +143,17 @@
           _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Create)
           _zip.Dispose
           ⍝ `List` is not available in "Create" mode, so we re-open it
-          stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
+          :Trap 90
+              stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
+          :Else
+              :If ∨/'The process cannot access the file'⍷⍕⎕EXCEPTION
+                  ⎕DL 0.2  ⍝ A small delay and a second attempt appear to solve this ibn 99% of the cases
+                  stream←System.IO.File.Open(zipFilename System.IO.FileMode.Open)
+              :Else
+                  exception←⎕EXCEPTION
+                  ⎕DM ⎕SIGNAL 90
+              :EndIf
+          :EndTrap
           _zip←QuadNEW System.IO.Compression.ZipArchive(stream System.IO.Compression.ZipArchiveMode.Update)
       :EndIf
       _zip.⎕DF'[archive:',zipFilename,']'

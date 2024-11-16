@@ -29,7 +29,7 @@
  m←(⊃⊃(//)⎕VFI(⊃raw[≢raw])[6 7])                            ⍝ Month of last entry
  :If 1<m                                                    ⍝ If current one is January we have no data yet
      lms←GetLastMonthSaved folder                           ⍝ Last month saved
-     m_←({⊃⊃(//)⎕VFI ⍵}¨↓(↑raw)[;6 7])                      ⍝ All months in raw
+     m_←{⊃⊃(//)⎕VFI ⍵[6 7]}¨raw                             ⍝ All months in raw
  :AndIf ((≢m_)⊃m_)>lms+1                                    ⍝ New month?! (But never Jan until current month is at least Feb)
      b←m_<m                                                 ⍝ All before the current month
      data←b/raw                                             ⍝ We are interested in everything but the current month

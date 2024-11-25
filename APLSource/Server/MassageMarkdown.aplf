@@ -1,4 +1,8 @@
- r←MassageMarkdown md;CRLF;length;drop;b
+ r←MassageMarkdown md;CRLF;length;drop;b;pattern
+ pattern←''
+ pattern,←⊂'(<[http[s]://[^>]*>)'    ⍝ Fetches Markdown links: those should suurvive untouched
+ pattern,←⊂'<[^>]*>'                 ⍝ Fetched HTML blocks - not allowed!
+ md←pattern ⎕R'\1' ''⊢md
  CRLF←⎕UCS 13 10
  r←md
  b←CRLF⍷r

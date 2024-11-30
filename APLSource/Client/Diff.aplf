@@ -1,0 +1,25 @@
+ r←old Diff new;v1;v2;b1;b2;n1;n2;added;removed;names;b
+⍝ Takes two namespaces representing package config files and reports the names that have different values.
+⍝ Returns a three-element vector. Each item may be empty or contain:
+⍝ [1] A list with removed names
+⍝ [2] A list with added names
+⍝ [3] A list with names and the old values
+⍝ [4] A list with names and the new (changed) values
+ r←'' '' '' ''
+ n1←old.(' '~⍨¨↓⎕NL 2)
+ n2←new.(' '~⍨¨↓⎕NL 2)
+ b1←~n1∊n2
+ b2←~n2∊n1
+ removed←b1/n1
+ added←b2/n2
+ names←(∪n1,n2)~removed,added
+ v1←old.{⍎¨⍵}names
+ v2←new.{⍎¨⍵}names
+ b←~v2∊v1
+ r[1]←⊂removed
+ r[2]←⊂added
+ :If ∨/b
+     r[3]←⊂old.{{⍵,'←',⍕⍎⍵}¨⍵}b/names
+     r[4]←⊂new.{{⍵,'←',⍕⍎⍵}¨⍵}b/names
+ :EndIf
+ ⍝Done

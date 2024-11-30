@@ -1,4 +1,4 @@
- r←(fn Maintenance_)(path dry);folders;filename;data;json;data2;pkgName;zipFilename;zip;tempFolder;zipData
+ {r}←(fn Maintenance_)(path dry details confirmation);folders;filename;data;json;data2;pkgName;zipFilename;zip;tempFolder;zipData;carryOut;buff
  r←''
  :If '.git'≢2⊃⎕NPARTS path,'/'
      filename←path,'/apl-package.json'
@@ -9,10 +9,28 @@
          json←Reg.JSON data2
          :If ≢/Reg.JSON¨data2 data
              :If dry
-                 r,←'Would be changed: ',filename,CR
+                 ⎕←'Would be changed: ',filename,CR
+                 :If details
+                     buff←data Diff data2
+                     ⎕←CR ProcessDiff buff
+                 :EndIf
              :Else
-                 (⊂json)F.NPUT filename 1
-                 r,←'Changed: ',filename,CR
+                 :If confirmation
+                     :If details
+                         ⎕←'*** ',filename
+                         buff←data Diff data2
+                         ⎕←CR ProcessDiff buff
+                     :EndIf
+                     :If ~carryOut←1 CommTools.YesOrNo'MaintenenaceConfirmation@Perform change?'
+                         ⎕←'Skipped by user: ',filename
+                     :EndIf
+                 :Else
+                     carryOut←1
+                 :EndIf
+                 :If carryOut
+                     (⊂json)F.NPUT filename 1
+                     ⎕←'Changed: ',filename,CR
+                 :EndIf
              :EndIf
          :EndIf
          pkgName←data2.(group,'-',name,'-',{⍵↑⍨¯1+⍵⍳'+'}version)
@@ -25,11 +43,31 @@
                  zipData←Reg.JSON⊃F.NGET tempFolder,'/apl-package.json'
                  :If json≢Reg.JSON zipData
                      :If dry
-                         r,←'Would be changed: ',zipFilename,CR
+                         ⎕←'Would be changed: ',zipFilename,CR
+                         :If details
+                             data2←Reg.JSON json
+                             buff←zipData Diff data2
+                             ⎕←CR ProcessDiff buff
+                         :EndIf
                      :Else
-                         zip.Delete'apl-package.json'
-                         path zip.Add'apl-package.json'
-                         r,←'Changed: ',zipFilename,CR
+                         :If confirmation
+                             :If details
+                                 ⎕←'*** ',filename
+                                 data2←Reg.JSON json
+                                 buff←zipData Diff data2
+                                 ⎕←CR ProcessDiff buff
+                             :EndIf
+                             :If ~carryOut←1 CommTools.YesOrNo'MaintenenaceConfirmationZip@Perform change?'
+                                 ⎕←'Skipped by user: ',filename
+                             :EndIf
+                         :Else
+                             carryOut←1
+                         :EndIf
+                         :If carryOut
+                             zip.Delete'apl-package.json'
+                             path zip.Add'apl-package.json'
+                             ⎕←'Changed: ',zipFilename,CR
+                         :EndIf
                      :EndIf
                  :EndIf
                  {}F.RmDirByForce tempFolder
@@ -39,6 +77,6 @@
      :EndIf
  :EndIf
  :If 0<≢folders←(F.ListDirs path,'/')~⊂'.git'
-     r,←∊fn{(⍺⍺ Maintenance_)⍵}¨(⊂¨folders),¨dry
+     fn{(⍺⍺ Maintenance_)⍵}¨(⊂¨folders),¨dry,¨details,¨confirmation
  :EndIf
  ⍝Done

@@ -1,0 +1,8 @@
+ ProcessDiff←{
+     ⍺←''
+     b←0<≢¨⍵
+     captions←(b/'  '∘,¨{(⍵↑⍨¨1+⌈/≢¨⍵)}'Removed' 'Added' 'Changed' ''),¨b/': ' ': ' ': ' '  '
+     r←captions{0=≢⍵:'' ⋄ ⍺,⊃{⍺,', ',⍵}/⍵}¨b/⍵
+     ''≡⍺:r
+     1↓∊⍺,¨r
+ }

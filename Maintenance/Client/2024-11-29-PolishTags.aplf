@@ -1,0 +1,14 @@
+  {data}←PolishTags_∆2024_11_29 data;tags
+⍝ People repeat the same kind of mistakes over and over. 
+⍝ This function is an attempt to avoid some of them.
+
+ tags←{','@(⍸';'=⍵)⊢⍵}data.tags
+ tags←','(≠⊆⊢)tags
+ tags~←'apl' 'dyalog' 'dyalog-apl' 'dyalogapl'   ⍝ Tatin is a Dyalog APL package manager...
+ tags~←'windows' 'mac-os' 'macos' 'mac' 'linux'  ⍝ We have other means for that
+ tags~←⊂'apltree'			          			 ⍝ "apltree" does not offer much
+ tags~←⊂data.group          			 		 ⍝ The group name should never be a tag
+ tags~←⊂'simple'			          			 ⍝ Not a useful tag, and we have seen it
+ 
+ data.tags←{0=≢⍵:'' ⋄ ⊃{⍺,',',⍵}/⍵}tags
+⍝Done

@@ -1,12 +1,8 @@
- r←Maintenance Arg;dry;path;home;⎕TRAP;show;filename;body;list;ind;info
- (dry show info)←Arg.(dry show info)
+ r←Maintenance Arg;dry;path;home;⎕TRAP;show;filename;body;list;ind;details;confirmation
+ (dry show details confirmation)←Arg.(dry show details ask)
  path←Arg._1
  home←1⊃⎕NPARTS GetSourceFile
- :If info
-     r←''
-     'Could not find maintenece''s "README" file'Assert ⎕NEXISTS home,'Maintenance/README'
-     {{}(#.⎕NS'').(⎕ED⍠('ReadOnly' 1)&{'ed'}ed←⍵)}⊃⎕NGET(home,'Maintenance/README')1
- :ElseIf show
+ :If show
      :If 0=≢list←TC.F.ListFiles home,'Maintenance/*.aplf'
          r←'There are no Tatin maintenance files'
      :Else
@@ -34,7 +30,7 @@
          list←⌽list
          :If 0<≢ind←'Which maintenance functions would you like to execute?' 1 0 TC.CommTools.Select{2⊃⎕NPARTS ⍵}¨list
              list←list[ind]
-             :If 0=≢r←TC.Maintenance path dry list
+             :If 0=≢r←TC.Maintenance path dry details confirmation list
                  r←'No packages found to be changed'
              :EndIf
          :Else

@@ -34,7 +34,7 @@ Packages can easily be updated to a later (and therefore hopefully better) versi
 
 ## Requirements
 
-* Tatin requires Dyalog version 18.0 or later. It will come automatically with version 19.0 (although it must be activated with the `]activate` user command) but must be installed in earlier versions.
+* Tatin requires Dyalog version 18.2 or later. It will come automatically with version 19.0 (although it must be activated with the `]activate` user command) but must be installed in earlier versions.
 
 * It needs Unicode --- Classic is not supported.
 
@@ -96,6 +96,7 @@ Now is the time to read [First Steps with Tatin](./FirstStepsWithTatin.html "Fir
 A> ### Semantic versioning and Minimal Version Selection
 A>
 A> We suggest that you make yourself familiar with the concepts of [Semantic Versioning](https://semver.org/ "External link, opened in a new Tab" {target="_blank"}) and [Minimum Version Selection](https://research.swtch.com/vgo-mvs "External link, opened in a new Tab" {target="_blank"}), and how exactly these concepts are implemented in Tatin by reading the document [Tatin's load- and update strategy](./TatinsLoadAndUpdateStrategy.html "Opens the document TatinsLoadAndUpdateStrategy.html").
+
 
 
 

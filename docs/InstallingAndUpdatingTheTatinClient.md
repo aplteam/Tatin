@@ -10,13 +10,13 @@
 
 You don't need to worry about installing Tatin if you use version 19.0 of Dyalog: In 19.0 Tatin just needs to be activated with the `]activate` user command.
 
-In 18.0 and 18.2 you need to install Tatin yourself.
+In 18.2 you need to install Tatin yourself.
 
 ## Requirements
 
 * Tatin needs a Unicode version of Dyalog
 
-* Dyalog version 18.0 or better
+* Dyalog version 18.2 or better
 
 * Link version 3.0.8 or better
 
@@ -29,7 +29,7 @@ Note that when you call `]Tatin.Init`, Tatin will check whether those requiremen
 
 Strictly speaking it is not necessary to install Tatin for 19.0, because Tatin is part of a 19.0-installation. However, before it can be used it must be activated. That's because in 19.0 it is still experimental.
 
-Note that activating is available in 19.0 only. Activating is not supported in 18.0 and 18.2.
+Note that activating is available in 19.0 only. Activating is not supported in 18.2.
 
 In order to activate Tatin, execute
 
@@ -79,7 +79,7 @@ and follow the instructions.
 => This can be achieved with the user command `]UpdateTatin`.
 
 
-### 18.0 and 18.2
+### 18.2
 
 Instructions:
 
@@ -106,7 +106,7 @@ Instructions:
 => /Users/<⎕AN>/dyalog.<version>U<bit>.files/SessionExtensions/CiderTatin
 => ```
 => However, these folders are version specific. Instead you might consider installing them into a version
-=> agnostic folder in order to make Tatin available to, say, 18.0 and 18.2 at the same time.
+=> agnostic folder in order to make Tatin available to several versions of Dyalog at the same time.
 => 
 => For that install into one of these folders:
 => ```
@@ -134,29 +134,20 @@ As a result you should see something like this:
 
 #### Tell Dyalog where to look for user commands
 
-Though Tatin's user command script etc. is now in place, Dyalog does not know about it yet. To achieve that we have to add the folder to SALT's search path. This step needs to be carried out only once for any installed version 18.0 or 18.2
+Though Tatin's user command script etc. is now in place, Dyalog does not know about it yet. To achieve that we have to add the folder to SALT's search path. This step needs to be carried out only once for version 18.2
 
 Execute one of the following commands:
 
 !> ### Windows 
 => ```
-=>  ⍝ 18.0
-=> ]SALT.Settings cmddir ",C:\Users\<⎕AN>\Documents\Dyalog APL-64 18.0 Unicode Files\SessionExtensions\CiderTatin" -p
-=>  ⍝ 18.2
 => ]SALT.Settings cmddir ",C:\Users\<⎕AN>\Documents\Dyalog APL-64 18.2 Unicode Files\SessionExtensions\CiderTatin" -p
   
 !> ### Linux
 => ```
-=>  ⍝ 18.0
-=> ]SALT.Settings cmddir ",/home/<⎕AN>/dyalog.180U64.files/SessionExtensions/CiderTatin -p
-=>   ⍝ 18.2
 => ]SALT.Settings cmddir ",/home/<⎕AN>/dyalog.182U64.files/SessionExtensions/CiderTatin -p
 
 !> ###  Mac OS
 => ```
-=>   ⍝ 18.0
-=> ]SALT.Settings cmddir ",/Users/<⎕AN>/dyalog.180U64.files/SessionExtensions/CiderTatin" -p
-=>   ⍝ 18.2
 => ]SALT.Settings cmddir ",/Users/<⎕AN>/dyalog.182U64.files/SessionExtensions/CiderTatin" -p
 => ```
 
@@ -169,7 +160,7 @@ Notes:
 
 Any newly started instance of Dyalog now comes with the user command `]Tatin.*`.
 
-There is no point in having a function `Run.aplf` in place with 18.0 and 18.2: only in 19.0 did Dyalog add the feature that a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure; in earlier versions such a function is not executed.
+There is no point in having a function `Run.aplf` in place with 8.2: only in 19.0 did Dyalog add the feature that a function `Run.aplf` will be loaded and executed as part of Dyalog's bootstrapping procedure; in earlier versions such a function is not executed.
 
 As a side effect of executing any of the Tatin user commands the Tatin API will become available via `⎕SE.Tatin`.
 
@@ -186,12 +177,12 @@ Once installed, any suitable version of Dyalog will provide a list of the Tatin 
 
 The script `Tatin.dyalog` is the interface between the Dyalog user command framework and the Tatin API.
 
-When any of the Tatin user commands is executed, it will check whether the API is already loaded --- that will be the case in 19.0 once Tatin is activated. If it's not available yet (18.0, 18.2), it will be loaded.
+When any of the Tatin user commands is executed, it will check whether the API is already loaded --- that will be the case in 19.0 once Tatin is activated. If it's not available yet (18.2), it will be loaded.
 
 
-## On `setup.dyalog` (18.0 and 18.2)
+## On `setup.dyalog` (18.2)
 
-I> This is 18.0/18.2 only because in later versions of Dyalog, Tatin's API will be available in `⎕SE` right from the start anyway.
+I> This is 18.2 only because in later versions of Dyalog, Tatin's API will be available in `⎕SE` right from the start anyway.
 I> 
 I> You might want the Tatin API to be available right from the start in earlier versions of Dyalog as well, so that you can invoke any of the Tatin API functions without first executing a Tatin user command. 
 I> 
@@ -307,7 +298,7 @@ Also, call `{}⎕SE.SALTUtils.ResetUCMDcache -1` in case `AutoLoadTatin` returne
 
 ## Updating Tatin
 
-You've installed (18.0, 18.2) or activated (later than 18.2) Tatin before and want to update it to the latest version.
+You've installed (18.2) or activated (later than 18.2) Tatin before and want to update it to the latest version.
 
 In that case you might need to perform some action, depending on how old your version of Tatin is.
 
@@ -356,12 +347,13 @@ There is always the possibility that the update process is itself buggy. Calling
 
 
 
-!> 18.2 and 18.0
+!> 18.2 
 => The easiest way to recover it by uninstalling and then installing Tatin again.
 !> 19.0 and later
 => 1. Execute `]DeActivate tatin` --- that removes Tatin
 => 2. Execute `]Activate tatin` --- that brings back the version of Tatin that your installation originally came with
 => 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version
+
 
 
 

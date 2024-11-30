@@ -232,7 +232,7 @@ The file `apl-package.json` describes the `MarkAPL` package:
   project_url: "https://github.com/aplteam/MarkAPL",
   io: 1,
   maintainer: "kai@aplteam.com",
-  minimumAplVersion: "18.0",
+  minimumAplVersion: "18.2",
   lx: "",
   ml: 1,
   name: "MarkAPL",
@@ -624,6 +624,7 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 ##### URI
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
+
 
 
 

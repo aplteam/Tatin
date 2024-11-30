@@ -25,7 +25,7 @@ This is an example:
   license: "MIT",
   lx: "",
   maintainer: "kai@aplteam.com",
-  minimumAplVersion: "18.0",
+  minimumAplVersion: "18.2",
   ml: 1,
   name: "DotNetZip",
   os_lin: 1,
@@ -314,7 +314,7 @@ You can define a default for `maintainer` in the user settings file. The default
 
 #### minimumAplVersion
 
-A character vector that must contain something like "18.0". 18.0 is the minimum version for any Tatin package, for Tatin itself needs at least version 18.0.
+A character vector that must contain something like "18.2". 18.2 is the minimum version for any Tatin package, for Tatin itself needs at least version 18.2.
 
 #### ml
 
@@ -519,6 +519,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

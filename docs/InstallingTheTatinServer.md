@@ -15,7 +15,7 @@ After downloading it from <https://github.com/aplteam/Tatin/releases> you need t
 
 ## Requirements
 
-* Dyalog Unicode 18.0 or better
+* Dyalog Unicode 18.2 or better
 * Windows or Linux
 
   For the time being neither the Pi nor AIX are supported. The PI might be added at a later stage.

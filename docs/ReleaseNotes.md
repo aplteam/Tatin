@@ -11,6 +11,10 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.116.0 from 2024-11-30
+
+* Tatin now requires at least 18.2: 18.0 is not supported any longer.
+
 ## Version 0.115.3 from 2024-11-25
 
 * Fixes a gaping security hole (Server only, group home page)
@@ -268,6 +272,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

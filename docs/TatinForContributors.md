@@ -20,7 +20,7 @@ Note that this is not an introduction to how to contribute to a project that is 
 
 ## Requirements
 
-To work on Tatin you need at least Dyalog 18.0 Unicode (it will never run in Classic).
+To work on Tatin you need at least Dyalog 18.2 Unicode (it will never run in Classic).
 
 You need one of: 
 
@@ -186,7 +186,7 @@ A> ### Starting a Tatin test server "manually"
 A>
 A> There may be scenarios when you want to start a local Tatin test server yourself. For that execute the following steps:
 A> 
-A> 1. Instantiate Dyalog Unicode 18.0 or later
+A> 1. Instantiate Dyalog Unicode 18.2 or later
 A> 
 A> 2. Execute the following two statements:
 A> 
@@ -438,6 +438,7 @@ There is a function that creates a single HTML file from all the Tatin markdown 
 ```
 
 Now open that file with the word processor of your choice and use its spell-checking capabilities.
+
 
 
 

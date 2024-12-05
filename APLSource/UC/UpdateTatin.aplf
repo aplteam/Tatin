@@ -1,4 +1,4 @@
- {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;q;folder2;GH;currentVersion;tag;msg
+ {r}←UpdateTatin Arg;path;filename;folder;path2Config;version;q;folder2;GH;currentVersion;tag;msg;allVersions
  r←''
  folder←1⊃⎕NPARTS GetSourceFile
  GH←⎕NEW TC.##.GitHubAPIv3(,⊂'aplteam')
@@ -7,7 +7,13 @@
      GH.personal_access_token←∊⊃TC.F.NGET filename 1
  :EndIf
  currentVersion←({⍵↑⍨¯1+⍵⍳'+'}2⊃TC.Version)
- tag←GH.CheckForUpdate'Tatin'currentVersion
+ :If 0≢Arg._1
+     allVersions←GH.GetAllReleases'tatin'
+     ('Is not a valid Tatin version: ',Arg._1)Assert(⊂Arg._1)∊{⍵↓⍨'v'=⊃⍵}¨allVersions
+     tag←'v',Arg._1
+ :Else
+     tag←GH.CheckForUpdate'Tatin'currentVersion
+ :EndIf
  :If 0=≢tag
      r←'There is no later version available than ',⊃{⍺,' from ',⍵}/1↓TC.Version
  :Else

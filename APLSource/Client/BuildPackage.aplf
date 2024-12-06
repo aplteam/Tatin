@@ -1,4 +1,4 @@
- zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg;buff
+  zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg;buff
 ⍝ Build a new version of a Tatin package.\\
 ⍝ The right argument must be a namespace with the required parameters, typically created by calling  `CreateBuildParms`.
 ⍝ These are the parameters:\\
@@ -30,16 +30,17 @@
  :AndIf '/'≠1⍴parms.targetPath
      parms.targetPath←(Reg.AddSlash parms.projectPath),parms.targetPath
  :EndIf
- hasBuildNo←0
+ hasBuildNo←⊃'+'∊cfg.version
  :If 0<≢parms.version
      :If '+'=1↑parms.version
          cfg.version←parms.version AddToVersion cfg.version
+         hasBuildNo∨←⊃'+'∊1↓cfg.version
      :Else
-         hasBuildNo←'+'∊parms.version
+         hasBuildNo∨←⊃'+'∊parms.version
          cfg.version←parms.version{'+'∊⍺:⍺ ⋄ ⍺,{⍵↓⍨¯1+⍵⍳'+'}⍵}cfg.version ⍝ Assign `version` but preserves build number if not specified
      :EndIf
  :EndIf
- cfg.version←IncreaseBuildNumber⍣(⊃~hasBuildNo)⊣cfg.version
+ cfg.version←IncreaseBuildNumber⍣hasBuildNo⊣cfg.version
  :If 0<≢cfg.assets
      cfg.assets←{1=≢⍵:⊃⍵ ⋄ 1↓⊃,/',',¨⍵}ProcessAssetsProp parms.projectPath cfg.assets
  :EndIf

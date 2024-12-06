@@ -180,16 +180,28 @@ version</code></pre>
 <li><code>+0.1.0</code> bumps the minor number and resets the patch number</li>
 <li><code>+1.0.0</code> bumps the major number and resets both the patch number and the minor number</li>
 </ul>
+<p><strong>— Changed in 0.117.0 —</strong></p>
+<p>Such a rule has no impact on the build number:</p>
+<ul>
+<li>If the package config file has a build number as part of <code>version</code>, that build number is bumped</li>
+<li>If the package config file has no build number nothing happens (starting with version 0.117.0)
+<p>However, in such a case you might want to force a build number into the package config file. This can be achieved by adding a trailing <code>+</code>, for example <code>+1.0.0+</code>. (Of course, you can also edit the config file and add <code>+0</code> at the end of <code>version</code>)</p>
+<p>Either way you end up with a build number 1.</p></li>
+</ul>
+<p><strong>— End of change —</strong></p>
 <div class="h_tag">
 <a href="#version-does-not-start-with-a" id="version-does-not-start-with-a" class="autoheader_anchor">
 <h5 data-id="version-does-not-start-with-a">2.1.5.2. “version” does not start with a “+”</h5>
 </a>
 </div>
+<p><strong>— Changed in 0.117.0 —</strong></p>
 <ul>
-<li>If <code>version</code> is empty then just the build number is bumped</li>
-<li>If <code>version</code> is not empty but does not carry a build number then it replaces the version information but the build number, which is bumped</li>
-<li>If <code>version</code> is not empty and includes a build number then it replaces the version information including the build number, and that build number is <strong>not</strong> bumped</li>
+<li>If <code>version</code> is empty, then just the build number in the config file is bumped, if there is one.</li>
+<li>If <code>version</code> is not empty but does not carry a build number, then it replaces the version information.
+<p>If the config file carries a build number , it is bumped.</p></li>
+<li>If <code>version</code> is not empty and includes a build number, then it replaces the version information including the build number. That build number is then bumped.</li>
 </ul>
+<p><strong>— End of change —</strong></p>
 <div class="h_tag">
 <a href="#dependencies" id="dependencies" class="autoheader_anchor">
 <h4 data-id="Dependencies">2.1.6. Dependencies</h4>

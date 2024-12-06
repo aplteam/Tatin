@@ -37,7 +37,7 @@ The plus (`+`) is used to separate an (optional) build number from the other par
 
 After {major}-{minor}-{patch} you may add the optional build number. Build numbers _do not_ participate in establishing precedence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.
 
-I> That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build-numbers - they are the same as far as Tatin is concerned.
+I> That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build numbers - they are the same as far as Tatin is concerned.
 
 A build number, when specified, needs to be separated by a `+`. A build number may consist of digits only.
 
@@ -60,7 +60,7 @@ Given `1.2.3+4`:
 * `3` is the _patch number_ 
 * The (optional) `4` is the _build number_.
 
-### The Build number
+### The build number
 
 The build number is optional and is ignored by Tatin. However, if a package has a build-number, it is bumped whenever the package is built again, no matter what. It is never reset. 
 
@@ -124,5 +124,6 @@ However, things can get pretty complicated even with Semantic Versioning; see th
 Semantic versioning came into being via this website:
 
 [https://semver.org/](https://semver.org/ {target="_blank"})
+
 
 

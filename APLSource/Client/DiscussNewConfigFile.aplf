@@ -15,7 +15,7 @@
  :AndIf 0<≢projectPath
      ns.name←2⊃⎕NPARTS{⍵↓⍨-'/\'∊⍨¯1↑⍵}projectPath,'/'
  :EndIf
- ns.name←(Enforce ns.name)({1}C.AskForText)'pkg-name@Enter the package name (mandatory)'
+ ns.name←(Enforce ns.name{0=≢⍵:⍺ ⋄ ⊃¯1↑'\/'{(~⍵∊⍺)⊆⍵}⍵}projectPath)({1}C.AskForText)'pkg-name@Enter the package name (mandatory)'
  ns.description←(Enforce'')({1}C.AskForText)'pkg-description@Enter a description of what the package is doing (mandatory)'
  ns.maintainer←(Enforce ns.maintainer)({1}C.AskForText)'pkg-maintainer@Enter the email address of the maintainer'
  ns.tags←(Enforce ns.tags)({1}C.AskForText)'pkg-tags@Enter a comma-separated list of tags'
@@ -25,5 +25,6 @@
  :Else
      ns.project_url←({1}C.AskForText)'pkg-projectUrl@Enter the URL of the project'
  :EndIf
+ ns.version,←(1 C.YesOrNo'AddBuildNo@Add a build number to the version (for telling different builds with same version no. apart)')/'+0'
  ns.userCommandScript←NegotiateUserCommandScript ns
 ⍝Done

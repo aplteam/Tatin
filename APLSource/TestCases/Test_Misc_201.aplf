@@ -1,0 +1,34 @@
+ r←Test_Misc_201(stopFlag batchFlag);⎕TRAP;path;testDataPath;msg;rc;path2;parms;zipFilename;cfgOrig;cfg
+⍝ Test the processing of build numbers in all flavours that add a build number after creation
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←F.GetTempSubDir⊃⎕SI
+ 'Create!'F.CheckPath path
+ testDataPath←##.CiderConfig.HOME,'/TestData/APLGit2'
+ path ⎕NCOPY testDataPath
+ path2←path,'/APLGit2/'
+ parms←TC.CreateBuildParms path2
+ parms.targetPath←path2
+ cfgOrig←TC.ReadPackageConfigFile path2
+ Assert~'+'∊cfgOrig.version
+
+ parms.version←'+1.0.0+'        ⍝ Adds a build number
+ zipFilename←TC.BuildPackage parms
+ cfg←TC.ReadPackageConfigFile path2
+ →T.GoToTidyUp cfg.version≢'1.0.0+1'
+ F.DeleteFile zipFilename
+
+ path2 ⎕NCOPY⍠('IfExists' 'Replace')⊢testDataPath,'/apl-package.json'
+ parms.version←'2.3.4+12'
+ zipFilename←TC.BuildPackage parms
+ cfg←TC.ReadPackageConfigFile path2
+ →T.GoToTidyUp cfg.version≢'2.3.4+13'
+ F.DeleteFile zipFilename
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce path
+ msg Assert rc=0
+⍝Done

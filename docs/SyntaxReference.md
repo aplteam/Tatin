@@ -98,13 +98,30 @@ The rules:
 * `+0.1.0` bumps the minor number and resets the patch number
 * `+1.0.0` bumps the major number and resets both the patch number and the minor number
 
+**--- Changed in 0.117.0 ---**
+
+Such a rule has no impact on the build number: 
+
+* If the package config file has a build number as part of `version`, that build number is bumped
+* If the package config file has no build number nothing happens (starting with version 0.117.0)
+
+  However, in such a case you might want to force a build number into the package config file. This can be achieved by adding a trailing `+`, for example `+1.0.0+`. (Of course, you can also edit the config file and add `+0` at the end of `version`)
+
+  Either way you end up with a build number 1.
+
+**--- End of change ---**
 
 ##### "version" does not start with a "+"
 
-* If `version` is empty then just the build number is bumped
-* If `version` is not empty but does not carry a build number then it replaces the version information but the build number, which is bumped
-* If `version` is not empty and includes a build number then it replaces the version information including the build number, and that build number is **not** bumped
+**--- Changed in 0.117.0 ---**
 
+* If `version` is empty, then just the build number in the config file is bumped, if there is one.
+* If `version` is not empty but does not carry a build number, then it replaces the version information.
+
+  If the config file carries a build number , it is bumped.
+* If `version` is not empty and includes a build number, then it replaces the version information including the build number. That build number is then bumped.
+
+**--- End of change ---**
 
 #### Dependencies
 
@@ -1117,6 +1134,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

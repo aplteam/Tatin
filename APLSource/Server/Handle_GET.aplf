@@ -2,6 +2,8 @@
  :If (,'/')≡request.Path
  :OrIf '/index.html'≡request.Path
      response←CreateHomePage request
+ :ElseIf '/robot.txt'≡request.Path
+     response←CreateRobotTxt request
  :Else
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
      :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}(≢Reg.VersionOf_REST)↓fullPath  ⍝ Static stuff with REST version

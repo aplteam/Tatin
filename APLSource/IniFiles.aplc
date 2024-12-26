@@ -7,33 +7,28 @@
 ⍝ MyInstance2←⎕NEW IniFiles ('MyIniFile1.ini' 'MyIniFile2.ini')
 ⍝ AsNamespace←MyInstance2.Convert ⎕NS ''
 ⍝ ~~~
-⍝ Author: Kai Jaeger ⋄ APL Team Ltd ⋄ http://aplteam.com
+⍝ Author: Kai Jaeger
 ⍝
-⍝ Homepage: http://aplwiki.com/IniFiles
+⍝ Homepage: https://github.com/aplteam/IniFiles
 
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
       :Access Public Shared
-      r←'IniFiles' '5.0.3+22' '2022-04-13'
+      r←'IniFiles' '5.1.0+23' '2022-11-30'
     ∇
 
     ∇ History
       :Access Public Shared
-      ⍝ * 5.0.3
+      ⍝ * 5.1.0 ⋄ 2024-11-30
+      ⍝   * 819⌶ removed for ⎕C in order to make IniFiles 20.0-ready
+      ⍝   * Author information updated
+      ⍝   * `Make` updated
+      ⍝ * 5.0.3 ⋄ 2022-04-13
       ⍝   * `GetIniFiles` did not work under Linux/Mac-OS
       ⍝   * Now managed by Cider
-      ⍝ * 5.0.2
+      ⍝ * 5.0.2 2021-03-04 20:35:52 
       ⍝   * Package config file corrected
-      ⍝ * 5.0.1
-      ⍝   * Internal change: `Uppercase` and Lowercase` replaced by calles to `⎕C`.
-      ⍝ * 5.0.0
-      ⍝   * BREAKING CHANGES:
-      ⍝     * Does not now requires the class `APLTreeUtils2`
-      ⍝     * Requires at least Dyalog 18.0
-      ⍝   * `IniFiles` does not :Include APLTreeUtils anymore
-      ⍝   * Bug fix: in case a value was added with `Put` the `Changed` property was not set to 1.
-      ⍝   * Internally now `⎕ML←1` is used.
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/IniFiles/releases>
     ∇
@@ -492,7 +487,7 @@
           code,←⊂' :Else'
           code,←⊂'     ''Invalid right argument''⎕SIGNAL 11/⍨~(≡section)∊0 1'
           code,←⊂'     toc←⎕NL-9'
-          code,←⊂'     section_U←1(819⌶)section'
+          code,←⊂'     section_U←{2::1(819⌶) ⍵ ⋄ 1 ⎕C ⍵}section'
           code,←⊂'     :If (⊂section_U)∊toc'
           code,←⊂'         ind←toc⍳⊂section_U'
           code,←⊂'         r←{⍵.{{⎕IO←0 ⋄ ⎕ML←3 ⋄ ⍵,[0.5]⍎¨⍵}⎕NL-2}⍵}⍎ind⊃toc'
@@ -1189,7 +1184,7 @@
       }
 
     ∇ r←GetComputerName
-      :If Reg.IsWindows
+      :If 'Win'≡A.GetOperatingSystem ⍬
           r←2 ⎕NQ'#' 'GetEnvironment' 'Computername'
       :Else
           r←⊃⎕SH'uname -n'

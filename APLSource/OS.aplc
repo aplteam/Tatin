@@ -9,13 +9,26 @@
 
     ⎕IO←1 ⋄ ⎕ML←1
 
-    ∇ r←Version
+    ∇ r←Version;buff;history;date
       :Access Public shared
-      r←'OS' '3.1.1' '2021-05-08'
+    ⍝ Returns the version number from TatinVars
+    ⍝ See also `History`
+      :If 0<⎕NC'TatinVars.CONFIG'
+          buff←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
+      :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
+          buff←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :EndIf
+      history←History
+      date←{⍵↑⍨¯1+⍵⍳' '}'from'{⍵↓⍨(≢⍺)+1⍳⍨⍺⍷⍵}history[1;]
+      r←'OS'buff date
+    ⍝Done
     ∇
 
     ∇ r←History
-      :Access Public shared     
+      :Access Public shared
+      ⍝ * 3.2.0 from 2024-12-25
+      ⍝   * The `Version` functions reports now what's defined in the package config file
+      ⍝   * Packages updated
       ⍝ * 3.1.1 from 2023-05-08
       ⍝   * APLTreeUtils2 updated which was buggy (wrong version number)
       ⍝ * 3.1.0 from 2023-05-02
@@ -256,17 +269,18 @@
 
     ∇ (success rc result)←{adminFlag}WinExecBatch cmd;batFilename;tempFilename;en;more;parms;i;flag
     ⍝ This method executes a command and returns its standard output on `result`.\\
-    ⍝ ** Don't** use this for programs that interact with a user! For example, don't use
-    ⍝ this to fire up an APL session! This cannot work because standard output is redirected.\\
-    ⍝ Use `WinExecute` for this which cannot capture standard output itself.\\
+    ⍝ **Don't** use this for programs that interact with a user! For example, don't use this to
+    ⍝ fire up an interactive APL session; this cannot work because standard output is redirected.
+    ⍝ (Use `WinExecute` for this which cannot capture standard output itself)\\
     ⍝ Performes the following actions:
-    ⍝ * Puts `cmd` into a batch file which is a temp file.
-    ⍝ * Execute that batch file with `WinExecute`.
-    ⍝ * Circumvent the standard output of the batch file into another temp file.
-    ⍝ * Waits until the temp file makes an appearance.
+    ⍝ * Puts `cmd` into a batch file which is a temp file
+    ⍝ * Executes the batch file with `WinExecute`
+    ⍝ * Circumvent the standard output of the batch file into another temp file
+    ⍝ * Waits until the temp file makes an appearance
     ⍝ * Reads that temp file and returns the contents as `result`.\\
-    ⍝ * `success` is a Boolean with 1 indicating success.
-    ⍝ * `rc` is a return code. 42 stands for "okay".
+    ⍝
+    ⍝ * `success` is a Boolean with 1 indicating success
+    ⍝ * `rc` is a return code. 42 stands for "okay"
       :Access Public Shared
       'Runs under Windows only'Assert'Win'≡##.APLTreeUtils2.GetOperatingSystem ⍬
       tempFilename←GetTempFilename

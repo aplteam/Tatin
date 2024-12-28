@@ -1,4 +1,4 @@
-  zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg;buff
+ zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg;ref
 ⍝ Build a new version of a Tatin package.\\
 ⍝ The right argument must be a namespace with the required parameters, typically created by calling  `CreateBuildParms`.
 ⍝ These are the parameters:\\
@@ -16,6 +16,7 @@
 ⍝      If no build number is specified the original build number is taken and bumped.
 ⍝      Otherwise the given version and build number rule (the build number is not bumped).\\
 ⍝    The package config file as well as CONFIG in the package's `TatinVars` namespace are updated as a side effect.
+ 'The parameter space MUST NOT contain "tatinVars" - check documentation on parameter "projectSpace"'Assert 0=parms.⎕NC'tatinVars'
  parms.projectPath←RemoveFileProtocol parms.projectPath
  parms.projectPath←⊃1 ⎕NPARTS ##.FilesAndDirs.AddTrailingSep parms.projectPath
  cfg_←ReadPackageConfigFile parms.projectPath
@@ -46,13 +47,12 @@
  :EndIf
  :If ≢/{⎕JSON⍠('Dialect' 'JSON5')⊣⍵}¨cfg cfg_
      WritePackageConfigFile parms.projectPath cfg
-     :If ~(⊂parms.tatinVars)∊''⍬
-     :AndIf 0<parms.tatinVars.⎕NC'CONFIG'
-         buff←⊃⎕NGET parms.projectPath,CFG_Name
-         (('\'=buff)/buff)←'/'
-         'Odd number of " ?!'Assert 0=2|'"'+.=buff
-         ((buff=⎕UCS 10)/buff)←CR
-         parms.tatinVars.⎕FX'r←CONFIG'('r←''',buff,'''')
+     :If 0<parms.⎕NC'projectSpace'
+     :AndIf 0<≢parms.projectSpace
+         'Parameter "projectSpace" does not point to a namespace'Assert 9=⎕NC ⍕parms.projectSpace
+         :If ⎕NULL≢ref←FindTatinVars parms.projectSpace
+             ref.⎕FX'r←CONFIG'('r←''',(⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊢cfg),'''')  ⍝ Update CONFIG in TatnVars
+         :EndIf
      :EndIf
  :EndIf
  dependencies←parms.dependencyFolder EstablishPackageDependencies parms.projectPath

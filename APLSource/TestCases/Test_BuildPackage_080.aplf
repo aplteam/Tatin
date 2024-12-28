@@ -1,0 +1,53 @@
+ r←Test_BuildPackage_080(stopFlag batchFlag);⎕TRAP;body;src;dir;cfg;parms;zipfile;rc;msg;dist;cfg2;wsValue;cfg3
+⍝ Build a package and check whether the build number is updated in the package cfg file & the WS
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←∆GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir src dist
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ 'Source'#.TEMP.⎕NS''
+ #.TEMP.Source.⎕FX'r←Hello' 'r←''World'''
+ 'TatinVars'#.TEMP.⎕NS''
+ #.TEMP.TatinVars.⎕FX'r←CONFIG' 'r←(⎕ucs 13),¨''{'' ''version: "0.1.0+123",'' ''}'''
+
+ body←'∇r←Hello' 'r←''World' '∇'
+ ⎕MKDIR src,'/Source'
+ (⊂body)F.NPUT src,'/Source/Hello.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_B'
+ cfg.version←'0.1.0+123'
+ cfg.source←'Source'
+ cfg.os_win←1
+ TC.WritePackageConfigFile src cfg
+
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+
+ zipfile←TC.BuildPackage parms
+ →T.GoToTidyUp 0≥≢zipfile
+
+ cfg2←TC.ReadPackageConfigFile src
+ →T.GoToTidyUp 124≠1↑A.ToNum{⍵↓⍨⍵⍳'+'}cfg2.version  ⍝ 1 more because it was bumped
+ wsValue←1↑A.ToNum{⍵↓⍨⍵⍳'+'}(⎕JSON⍠('Dialect' 'JSON5')⊢1↓⊃,/(⎕UCS 13),¨#.TEMP.TatinVars.CONFIG).version
+ →T.GoToTidyUp 123≠wsValue  ⍝ Because BuildPackage cannot know where to look.
+
+ parms.projectSpace←#.TEMP ⍝ Now BuildPackage can work it out
+ zipfile←TC.BuildPackage parms
+ →T.GoToTidyUp 0≥≢zipfile
+ cfg3←TC.ReadPackageConfigFile src
+ →T.GoToTidyUp 125≠1↑A.ToNum{⍵↓⍨⍵⍳'+'}cfg3.version  ⍝ 2 more because it was bumped twice now
+ wsValue←1↑A.ToNum{⍵↓⍨⍵⍳'+'}(⎕JSON⍠('Dialect' 'JSON5')⊢#.TEMP.TatinVars.CONFIG).version
+ →T.GoToTidyUp 125≠wsValue  ⍝ Because BuildPackage has now updated the WS tx to setting parms.projectSpace
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

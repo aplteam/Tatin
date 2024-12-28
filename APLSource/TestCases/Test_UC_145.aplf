@@ -1,0 +1,36 @@
+ r←Test_UC_145(stopFlag batchFlag);⎕TRAP;rc;msg;tempDir;packageFolder;zipfile;cfg;parms;res;expected;cfg2;ns
+⍝ Exercise ]Tatin.BuildPackage with the projectSpace property set
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir''
+ tempDir ⎕NCOPY'TestData/Build/Special'
+ packageFolder←tempDir,'/Special'
+ {}F.RmDirByForce packageFolder,'/dependencies'
+ {}F.RmDirByForce packageFolder,'/packages'
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ parms←⎕SE.Cider.CreateOpenParms ⍬
+ parms.folder←packageFolder
+ parms.suppressInit←1
+ parms.parent←'#.TEMP'
+ parms.ignoreUserExec←1
+ parms.projectSpace←'Special'
+ res←⎕SE.Cider.OpenProject parms
+ expected←'Project successfully opened and established in "#.TEMP.Special"'
+ →T.GoToTidyUp~∨/expected⍷∊res
+ cfg←##.Registry.GetJsonFromFile packageFolder,'/apl-package.json'
+ Assert 721=1↑A.ToNum{⍵↓⍨⍵⍳'+'}cfg.version
+
+ (rc msg zipfile)←∆UCMD'BuildPackage "',packageFolder,'" "',tempDir,'" -projectSpace=#.TEMP.Special'
+ →T.GoToTidyUp~(rc=0)∧0=≢msg
+ cfg2←##.Registry.GetJsonFromFile packageFolder,'/apl-package.json'
+ Assert 722=1↑A.ToNum{⍵↓⍨⍵⍳'+'}cfg2.version
+ ns←⎕JSON⍠('Dialect' 'JSON5')⊢#.TEMP.Special.TatinVars.CONFIG
+ →T.GoToTidyUp 722≠1↑A.ToNum{⍵↓⍨⍵⍳'+'}ns.version
+
+ r←T._OK
+
+∆TidyUp:
+ {}⎕SE.Cider.CloseProject'#.TEMP.Special'
+ Assert 0=⊃F.RmDirByForce tempDir
+⍝Done

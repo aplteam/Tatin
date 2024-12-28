@@ -1,0 +1,16 @@
+ r←FindTatinVars ref;list;list2;this
+⍝ Finds `TatinVars` somwhere in the projectSpace `ref` is pointing to and returns a ref to it or ⎕NULL if no hit.
+ r←⎕NULL
+ ref←⍎⍣(80 82∊⍨⎕DR ref)⊢ref
+ :If 0<ref.⎕NC'TatinVars'
+     r←ref.TatinVars
+ :Else
+     :If 0<≢list←↓ref.⎕NL 9
+         list2←ref.⍎¨list
+         :For this :In list2
+             :If ⎕NULL≢r←FindTatinVars this
+                 :Return
+             :EndIf
+         :EndFor
+     :EndIf
+ :EndIf

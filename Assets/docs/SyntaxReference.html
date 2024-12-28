@@ -121,9 +121,9 @@ window.matchMedia("print").addEventListener("change", evt => {
 <pre tabindex="0"><code>   parms←⎕SE.Cider.CreateBuildParms '/path/2/project`
    parms.⎕nl 2
 dependencyFolder
+namespace
 projectPath
 targetPath
-tatinVars
 version</code></pre>
 <div class="h_tag">
 <a href="#dependencyfolder" id="dependencyfolder" class="autoheader_anchor">
@@ -132,24 +132,31 @@ version</code></pre>
 </div>
 <p>A folder with packages the project depends on. Might be empty, in case there are'nt any dependencies.</p>
 <div class="h_tag">
+<a href="#projectspace" id="projectspace" class="autoheader_anchor">
+<h4 data-id="projectspace">2.1.2. projectspace</h4>
+</a>
+</div>
+<p>This is optional. Set this to the namespace where the package project lives.</p>
+<p>Setting this makes sense under these conditions:</p>
+<ul>
+<li>The package project lives in the workspace</li>
+<li>You want the build number in <code>TatinVars.CONFIG</code> to be upated by <code>BuildPackage</code></li>
+</ul>
+<p><code>BuildPackage</code> bumps the build ID, but only on file. It cannot update it in the WS because it does not know where it lives, unless you tell it by setting <code>projectspace</code> accordingly.</p>
+<p>If you do set <code>projectspace</code>, then <code>BuildPackage</code> will scan that namespace recursively for <code>TatinVars</code> and update <code>TatinVars.CONFIG</code>.</p>
+<div class="h_tag">
 <a href="#projectpath" id="projectpath" class="autoheader_anchor">
-<h4 data-id="projectPath">2.1.2. projectPath</h4>
+<h4 data-id="projectPath">2.1.3. projectPath</h4>
 </a>
 </div>
 <p>The folder the package is going to be created from. To be specified as the right argument of <code>CreateBuildParms</code>.</p>
 <div class="h_tag">
 <a href="#targetpath" id="targetpath" class="autoheader_anchor">
-<h4 data-id="targetPath">2.1.3. targetPath</h4>
+<h4 data-id="targetPath">2.1.4. targetPath</h4>
 </a>
 </div>
 <p>The folder the ZIP file is created in.</p>
 <p>Defaults to <code>projectPath</code> in case <code>targetPath</code> is empty.</p>
-<div class="h_tag">
-<a href="#tatinvars" id="tatinvars" class="autoheader_anchor">
-<h4 data-id="tatinVars">2.1.4. <code>tatinVars</code></h4>
-</a>
-</div>
-<p>Reference pointing to the <code>TatinVars</code> namespace of the package. Required if <code>TatinVars.CONFIG</code> in the workspace should be updated (build number).</p>
 <div class="h_tag">
 <a href="#version-parms" id="version-parms" class="autoheader_anchor">
 <h4 data-id="version-parms">2.1.5. version</h4>
@@ -441,9 +448,9 @@ version</code></pre>
 <p>Contains these parameters:</p>
 <pre tabindex="0"><code>dependencyFolder
 projectPath          ⍝ Set to `path`
+projectspace
 targetPath
-version
-tatinVars</code></pre>
+version</code></pre>
 <div class="h_tag">
 <a href="#createcopyregistryparms" id="createcopyregistryparms" class="autoheader_anchor">
 <h3 data-id="CreateCopyRegistryParms">2.7. CreateCopyRegistryParms</h3>

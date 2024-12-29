@@ -11,7 +11,7 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.118.0 from 2024-12-25
+## Version 0.118.0 from 2024-12-29
 
 * The API function `BuildPackage` does not process a property `tatinVars` anymore; if it is fed one anyway, it will throw an error.
 * The function `CreateBuildParms` does not contains a variable `tatinVars` anymore but a variable `projectspace` which is optional. You may set it to the namespace where the package project lives. That enables `BuildPackage` to update `TatinVars.CONFIG` in that namespace, otherwise `BuildPackage` don't know where to look.
@@ -289,6 +289,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

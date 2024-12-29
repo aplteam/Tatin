@@ -19,19 +19,27 @@
 
     ⎕IO←1 ⋄ ⎕ML←1
 
-    ∇ r←Version;buff;history;date
-      :Access Public shared
-    ⍝ Returns the version number from the package config file
+    ∇ r←Version
+    ⍝ Returns the version number from TatinVars (if we can)
     ⍝ See also `History`
-      buff←(⎕JSON⍠('Dialect' 'JSON5')⊢((⊃⊃⎕CLASS ⎕THIS).##).TatinVars.CONFIG).version
-      history←History
-      date←{⍵↑⍨¯1+⍵⍳' '}'⋄'{⍵↓⍨(≢⍺)+1⍳⍨⍺⍷⍵}history[1;]
-      r←'Tester2'buff date
+      r←''
+      :If 0<⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
+      :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+    ⍝ When a script is not loaded with Tatin, there will be no namespace `TatinVars`
+    ⍝ In such cases we cannot provide a version number, so we return an empty char vector
+          r←'Tester2' '' ''
+      :EndIf
     ⍝Done
     ∇
 
     ∇ r←History
-      :Access Public shared
+      :Access Public shared  
+      ⍝ * 3.11.1 ⋄ 2024-12-29
+      ⍝   Bug fix in `Version`: if for some strange reason it cannot find `TatinVars` it 
+      ⍝   should return an empty vector rather than crashing. 
       ⍝ * 3.11.0 ⋄ 2024-12-25
       ⍝   * `ListTestFunctions` enhanced
       ⍝   * `Version` extracts the version number now from the package config file

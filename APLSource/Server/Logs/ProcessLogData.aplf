@@ -3,7 +3,7 @@
  r←0 4⍴⊂''
  :If 0<≢data←(∨/¨' GET 200 '∘⍷¨data)/data       ⍝ We are interested only in successful GET operations
      data←(1={⍵+.='/'}¨data)⌿data               ⍝ Only lines with a single "/" are of interest
-     data←((2=↑{19↓⍵}¨data)+.='-')/data         ⍝ A package ID carries precisely two hyphens
+     data←(2≤(↑{19↓⍵}¨data)+.='-')/data         ⍝ A package ID carries at least two hyphens (betas!)
      data←(~∨/¨'(test)'∘⍷¨data)/data            ⍝ Remove any requests initiated by test runs
  :AndIf 0<≢data←↑data
      date←10↑[2]data

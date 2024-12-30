@@ -11,11 +11,11 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
-## Version 0.118.0 from 2024-12-29
+## Version 0.118.0 from 2024-12-30
 
 * The API function `BuildPackage` does not process a property `tatinVars` anymore; if it is fed one anyway, it will throw an error.
-* The function `CreateBuildParms` does not contains a variable `tatinVars` anymore but a variable `projectspace` which is optional. You may set it to the namespace where the package project lives. That enables `BuildPackage` to update `TatinVars.CONFIG` in that namespace, otherwise `BuildPackage` don't know where to look.
-* Accordingly the option `-tatinVars=` was removed from the ]BuildPackage` user command but the option `-projectspace=` was introduced.
+* The function `CreateBuildParms` does not contain a variable `tatinVars` anymore but a variable `projectspace` which is optional. You may set it to the namespace where the package project lives. That enables `BuildPackage` to update `TatinVars.CONFIG` in that namespace, otherwise `BuildPackage` don't know where to look.
+* Accordingly the option `-tatinVars=` was removed from the `]BuildPackage` user command but the option `-projectspace=` was introduced.
 * The user command `]ReInstallDependencies` now accepts a flag `-recursive`.
 
   This can be put to use with a folder that contains multiple independent packages, for example the folder `[MyUCMDs]`: all installed packages in that folder can be re-installed and (in this instance) updated without user interaction with the following statement.
@@ -289,6 +289,7 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

@@ -1,4 +1,4 @@
- zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg;ref
+ zipFilename←BuildPackage parms;cfg;fileList;zipObj;tempFilename;deps;errMsg;cfg_;dependencies;hasBuildNo;ciderCfg;ref;res
 ⍝ Build a new version of a Tatin package.\\
 ⍝ The right argument must be a namespace with the required parameters, typically created by calling  `CreateBuildParms`.
 ⍝ These are the parameters:\\
@@ -49,9 +49,10 @@
      WritePackageConfigFile parms.projectPath cfg
      :If 0<parms.⎕NC'projectSpace'
      :AndIf 0<≢parms.projectSpace
-         'Parameter "projectSpace" does not point to a namespace'Assert 9=⎕NC ⍕parms.projectSpace
+         'Parameter "projectSpace" does not point to a namespace'Assert 9=⎕NC⍕parms.projectSpace
          :If ⎕NULL≢ref←FindTatinVars parms.projectSpace
-             ref.⎕FX'r←CONFIG'('r←''',(⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊢cfg),'''')  ⍝ Update CONFIG in TatnVars
+             res←ref.⎕FX'r←CONFIG'('r←''',(⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊢cfg),'''')  ⍝ Update CONFIG in TatinVars
+             ('Could not update TatinVars.CONFIG in ',parms.projectSpace)Assert' '=1↑0⍴res
          :EndIf
      :EndIf
  :EndIf

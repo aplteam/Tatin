@@ -56,9 +56,11 @@ The document [_Installing The Tatin Server_](https://tatin.dev/Assets/docs/Insta
 
 ## Contributing to the code 
 
-There is a document [_Tatin For Contributors_](https://tatin.dev/Assets/docs/TatinForContributors.html "Link toTatinForContributors.html on the Tatin server") available that discusses how one can contribute to the documentation or the code or both.
+Before going into details please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository")
+ first. The next step is to consult the document [_Tatin For Contributors_](https://tatin.dev/Assets/docs/TatinForContributors.html "Link to TatinForContributors.html on the Tatin server"); it discusses how one can contribute to the documentation or the code or both.
 
 -----
 
-Latest revision 2020-12-22
+Latest revision 2025-01-09
+
 

@@ -158,7 +158,7 @@ window.matchMedia("print").addEventListener("change", evt => {
 <li>1.2.3-beta-1+911</li>
 </ul>
 <p><del>Build numbers are mostly not shown by Tatin.</del></p>
-<p>Build numbers are ignored by Tatin. Their sole purpose is to tell two different build apart when the version number has not changed.</p>
+<p>Build numbers are ignored by Tatin. Their sole purpose is to tell two different builds apart when the version number has not changed.</p>
 <div class="h_tag">
 <a href="#precondition-api-key" id="precondition-api-key" class="autoheader_anchor">
 <h2 data-id="Precondition-API-key">3. Precondition: API key</h2>
@@ -345,7 +345,7 @@ group2,&lt;hash2,&lt;salt2&gt;
 <li>Specifying a dependency with the file:// protocol means that you won't be able to publish that package to a Tatin server because it would for obvious reasons be rejected with “400 — bad request”.
 <p>That is good enough a reason to use this with care. Only when messing around with packages on your local machine that are not designed to be published on a Tatin server may this be used.</p></li>
 <li>Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used with care.</li>
-<li>When a package is published to a Tatin Registry, any protocols (file:// or http:// or https://) are removed: the dependency is defined just be the package names.
+<li>When a package is published to a Tatin Registry, any protocols (file:// or http:// or https://) are removed: the dependency is defined just by the package name.
 <p>When such a package is installed or loaded, Tatin will interrogate all Registries in its search path, with the first hit winning the day.</p></li>
 </ul>
 <div class="h_tag">
@@ -356,7 +356,7 @@ group2,&lt;hash2,&lt;salt2&gt;
 <p>Once the preparation is done the final step is easy. Specify the folder hosting the package:</p>
 <pre tabindex="0"><code>]TATIN.PublishPackage /path2package [tatin]</code></pre>
 <p>The folder may or may not carry a trailing slash (<code>/</code>).</p>
-<p>This would attempt to publish the package found in <code>path2package/</code> to the principal Tatin Server.</p>
+<p>This would attempt to publish the package found in <code>path2package/</code> to the principal Tatin Server. (In fact, <code>[tatin]</code> is optional: without a second argument the principal Registry would be assumed anyway)</p>
 <p>You can also build a new version by calling <code>]TATIN.BuildPackage</code> (or its aquivalent, the API-function <code>BuildPackage</code>) and specify the resulting ZIP file as an argument to <code>PublishPackage</code>:</p>
 <pre tabindex="0"><code>]TATIN.PublishPackage /path2package/group-name-1.2.3.zip [tatin]</code></pre>
 <p>When a path to a package project is provided rather than a ZIP file then <code>]PublishProject</code> would create the ZIP file itself.</p>

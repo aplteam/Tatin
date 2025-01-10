@@ -1,7 +1,8 @@
- r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders;bool;aliasDefs;alias;info
+ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders;bool;aliasDefs;alias;info;subFolder;recursive;buff
  r←''
  'Mandatory argument (install directory or project) must not be empty'Assert 0<≢installFolder←Args._1
  :If '[]'≡¯2↑⌽¯1⌽installFolder
+ :AndIf '[myucmds]'≢⎕C installFolder
      'You''ve specified a Cider project alias but Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
      project←installFolder
      aliasDefs←⎕SE.Cider.GetCiderAliasFileContent ⍬
@@ -42,10 +43,12 @@
  parms.force←0 Args.Switch'force'
  parms.noBetas←0 Args.Switch'nobetas'
  parms.update←1 Args.Switch'update'
+ recursive←0 Args.Switch'recursive'
  installFolder←{0≡⍵:'' ⋄ ⍵}installFolder
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
      installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
  :ElseIf 0=≢installFolder
+     'When -recursive is specified, you MUST specify a folder'Assert recursive=0
      :If 9=⎕SE.⎕NC'Cider'
          openCiderProjects←⎕SE.Cider.ListOpenProjects 0
          :If 1<≢openCiderProjects
@@ -82,48 +85,18 @@
          :EndIf
      :EndIf
  :EndIf
- installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
- :If 0=≢installFolder←EstablishPackageFolder installFolder
-     r←'Nothing specified',(0<⎕SE.⎕NC'Cider')/' and nothing obvious found either' ⋄ →0
- :EndIf
- ('Is not a directory: ',installFolder)Assert TC.F.IsDir installFolder
- :If ~TC.F.IsFile installFolder,'/apl-dependencies.txt'
-     :If 9=⎕SE.⎕NC'Cider'
-     :AndIf TC.F.IsFile installFolder,'/cider.config'
-         cfg←⎕SE.Cider.ReadProjectConfigFile installFolder
-     :AndIf 0<≢∊cfg.CIDER.(dependencies dependencies_dev).tatin
-         subFolders←({⍵↑⍨¯1+⍵⍳'='}¨cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
-         :If 1=≢subFolders
-             installFolder,←⊃subFolders
-             :If 0=1 TC.C.YesOrNo'Sure you want to act on ',installFolder,' ?'
-                 r←'Cancelled by user' ⋄ →0
-             :EndIf
-         :Else
-             ind←'Which folder would you like to re-install into?'TC.C.Select installFolder∘,¨subFolders
-             :If 0=≢ind
-                 r←'Cancelled by user' ⋄ →0
-             :Else
-                 installFolder,←ind⊃subFolders
-             :EndIf
+ :If 0 Args.Switch'recursive'
+     subFolders←##.FilesAndDirs.ListDirs installFolder
+     :If 0=≢subFolders
+         r←'The specified path does not contain any sub-folders'
+     :EndIf
+     ⎕←'Re-installing into ',installFolder
+     :For subFolder :In subFolders
+         :If ##.FilesAndDirs.IsFile subFolder,'/apl-dependencies.txt'
+             buff←1 ReInstallDependencies_ subFolder parms registry
+             ⎕←' ',¨buff
          :EndIf
-     :Else
-         r←'Directory does not host a file apl-dependencies.txt, and no dependencies are defined' ⋄ →0
-     :EndIf
- :EndIf
- deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
- 'Dependency file is empty'Assert 0<≢deps
- :If parms.force
- :OrIf TC.C.YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
-     :Trap ErrNo
-         r←parms TC.ReInstallDependencies installFolder registry
-     :Else
-         qdmx←⎕DMX
-         ⎕SIGNAL/CheckForInvalidVersion qdmx
-     :EndTrap
-     :If parms.force
-         r←''
-     :Else
-         r←⍪(⊂'Re-installed:'),' ',¨r
-         ⎕←'Done'
-     :EndIf
+     :EndFor
+ :Else
+     ⎕←ReInstallDependencies_ installFolder parms registry
  :EndIf

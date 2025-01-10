@@ -18,11 +18,11 @@ Tatin consists of three modules:
 
 Tatin clients and servers may run under Windows, Linux and Mac-OS.
 
-Tatin requires a Unicode version of Dyalog and at least version 18.0; the Classic version is not supported.
+Tatin requires a Unicode version of Dyalog and at least version 18.2; the Classic version is not supported.
 
 ## Installing and updating the Tatin Client
 
-### 18.0 and 18.2
+### 18.2
 
 The document [Installing And Updating The Tatin Client](https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html "Link to InstallingAndUpdatingTheTatinClient.html on the Tatin server") discusses how to install the Tatin client.
 
@@ -56,8 +56,11 @@ The document [_Installing The Tatin Server_](https://tatin.dev/Assets/docs/Insta
 
 ## Contributing to the code 
 
-There is a document [_Tatin For Contributors_](https://tatin.dev/Assets/docs/TatinForContributors.html "Link toTatinForContributors.html on the Tatin server") available that discusses how one can contribute to the documentation or the code or both.
+Before going into details please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository")
+ first. The next step is to consult the document [_Tatin For Contributors_](https://tatin.dev/Assets/docs/TatinForContributors.html "Link to TatinForContributors.html on the Tatin server"); it discusses how one can contribute to the documentation or the code or both.
 
 -----
 
-Latest revision 2020-12-22
+Latest revision 2025-01-09
+
+

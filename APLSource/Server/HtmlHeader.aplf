@@ -1,9 +1,11 @@
- html←HtmlHeader add;caption;title
+ html←{noiIndex}HtmlHeader add;caption;title
 ⍝ Strictly speaking this does not only return a header: it also returns...
 ⍝ * the DOC type
 ⍝ * an opening html tag
 ⍝ * an opening body tag
 ⍝ * some more stuff shared by all Tatin HTML pages
+⍝ noiIndex defaults to 0. If a page should not be index by, say, Google, pass a 1 as ⍺.
+ noiIndex←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noiIndex'
  html←''
  html,←⊂'<!DOCTYPE html>'
  html,←⊂'<html lang="en">'
@@ -11,9 +13,10 @@
  title←⊃G.INI.Get'Config:Title'
  html,←⊂'<title>',title,'</title>'
  html,←⊂'<meta charset="UTF-8">'
- html,←⊂'<meta name="robots" content="noindex">'
+ :If noiIndex
+     html,←⊂'<meta name="robots" content="noindex">'
+ :EndIf
  html,←⊂GetGoogleVerification
- '<meta name="google-site-verification" content="hQnvuUP3Zv41CTiu1MJPmMy48AcWFu3sXc3ptsGhYlk" />'  ⍝ use for verification to Google's Search Console - don't delete unless you know what you are doing
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/screen.css" media="screen">'
 ⍝html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="screen">'   ⍝ Can be useful for debugging the "Print" CSS
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="print">'

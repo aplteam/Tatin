@@ -19,11 +19,15 @@
              :Case 1006
                  'Conga DLL reports an error 1006 and won''t work anymore - restart APL'⎕SIGNAL 11
              :Else
+                 qdmx←⎕DMX
+                 :If ∨/'DLL Error: 1006'⍷qdmx.EM   ⍝ This may come with ⎕EN=999
+                     'Conga DLL reports an error 1006 and won''t work anymore - restart APL'⎕SIGNAL 11
+                 :Else
                  ⍝ This happens, but very rarely.
                  ⍝ We need to find out why
-                 qdmx←⎕DMX
-                 ⎕TRAP←0 'S'
-                 ∘∘∘
+                     ⎕TRAP←0 'S'
+                     ∘∘∘
+                 :EndIf
              :EndTrap
              ⎕EX'∆PermanentConnections'
          :EndIf

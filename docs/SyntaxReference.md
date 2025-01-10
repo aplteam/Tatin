@@ -44,9 +44,9 @@ Requires a namespace with parameters as right argument, typically created by cal
    parms←⎕SE.Cider.CreateBuildParms '/path/2/project`
    parms.⎕nl 2
 dependencyFolder
+namespace
 projectPath     
 targetPath   
-tatinVars   
 version         
 ```
 
@@ -54,6 +54,18 @@ version
 
 A folder with packages the project depends on. Might be empty, in case there are'nt any dependencies.
 
+#### projectspace
+
+This is optional. Set this to the namespace where the package project lives.
+
+Setting this makes sense under these conditions:
+
+* The package project lives in the workspace
+* You want the build number in `TatinVars.CONFIG` to be upated by `BuildPackage`
+
+`BuildPackage` bumps the build ID, but only on file. It cannot update it in the WS because it does not know where it lives, unless you tell it by setting `projectspace` accordingly.
+
+If you do set `projectspace`, then `BuildPackage` will scan that namespace recursively for `TatinVars` and update `TatinVars.CONFIG`.
 
 #### projectPath
 
@@ -65,11 +77,6 @@ The folder the package is going to be created from. To be specified as the right
 The folder the ZIP file is created in.
 
 Defaults to `projectPath` in case `targetPath` is empty.
-
-
-#### `tatinVars`
-
-Reference pointing to the `TatinVars` namespace of the package. Required if `TatinVars.CONFIG` in the workspace should be updated (build number).
 
 
 #### version{#version-parms}
@@ -371,9 +378,9 @@ Contains these parameters:
 ```
 dependencyFolder
 projectPath          ⍝ Set to `path`
+projectspace
 targetPath
 version
-tatinVars
 ```
 
 ### CreateCopyRegistryParms
@@ -1134,6 +1141,8 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
+
 
 
 

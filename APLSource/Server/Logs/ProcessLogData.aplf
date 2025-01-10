@@ -2,14 +2,14 @@
 ⍝ Takes the data saved in the log file and reduces them to the essentials, aggregate just by day
  r←0 4⍴⊂''
  :If 0<≢data←(∨/¨' GET 200 '∘⍷¨data)/data       ⍝ We are interested only in successful GET operations
-     data←(1=(↑data)+.='/')⌿data                ⍝ Only lines with a single "/" are of interest
-     data←(2=(19↓[2]↑data)+.='-')/data          ⍝ A package ID carries precisely two hyphens
+     data←(1={⍵+.='/'}¨data)⌿data               ⍝ Only lines with a single "/" are of interest
+     data←(2≤(↑{19↓⍵}¨data)+.='-')/data         ⍝ A package ID carries at least two hyphens (betas!)
      data←(~∨/¨'(test)'∘⍷¨data)/data            ⍝ Remove any requests initiated by test runs
  :AndIf 0<≢data←↑data
      date←10↑[2]data
      date2←(⊃∘{⊃(//)⎕VFI ⍵}¨↓data[;⍳4]),(⊃∘{⊃(//)⎕VFI ⍵}¨↓data[;5+⍳2]),[1.5](⊃∘{⊃(//)⎕VFI ⍵}¨↓data[;8+⍳2])
      packageIDs←↓(≢'YYYY-MM-DD hh:mm:ss GET 200 /')↓[2]data
-     isPkgID←##.##.Registry.IsValidPackageID_Complete¨packageIDs~¨' '   ⍝ The bad boys might send crazy stuff, but it will hardly match a valid, complete package ID
+     isPkgID←##.##.Registry.IsValidPackageID_Complete¨packageIDs~¨' ' ⍝ The bad boys might send crazy stuff, but it will hardly match a valid, complete package ID
      packageIDs←↑{ind←⍸'-'=⍵ ⋄ ((ind[1]-1)↑⍵)((ind[2]-1+ind[1])↑ind[1]↓⍵)(ind[2]↓⍵)}¨packageIDs
      r←packageIDs,date2
      r←r[⍋r[;3];]
@@ -19,7 +19,7 @@
      r←r[⍋r[;5];]
      r←r[⍋r[;4];]
      r←isPkgID⌿r
-     r[;3]←r[;3]~¨' '       ⍝ Version number might well carry trailing blanks
-     r←{⍺,≢⍵}⌸r[;6~⍨⍳2⊃⍴r]  ⍝ Without the day
+     r[;3]←r[;3]~¨' '                           ⍝ Version number might well carry trailing blanks
+     r←{⍺,≢⍵}⌸r[;6~⍨⍳2⊃⍴r]                      ⍝ Without the day
  :EndIf
  ⍝Done

@@ -1,0 +1,47 @@
+ r←{recursive}ReInstallDependencies_(installFolder parms registry);cfg;subFolders;ind;deps;qdmx
+ r←''
+ recursive←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'recursive'
+ installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
+ :If 0=≢installFolder←EstablishPackageFolder installFolder
+     r←'Nothing specified',(0<⎕SE.⎕NC'Cider')/' and nothing obvious found either' ⋄ →0
+ :EndIf
+ ('Is not a directory: ',installFolder)Assert TC.F.IsDir installFolder
+ :If ~TC.F.IsFile installFolder,'/apl-dependencies.txt'
+     :If 9=⎕SE.⎕NC'Cider'
+     :AndIf TC.F.IsFile installFolder,'/cider.config'
+         cfg←⎕SE.Cider.ReadProjectConfigFile installFolder
+     :AndIf 0<≢∊cfg.CIDER.(dependencies dependencies_dev).tatin
+         subFolders←({⍵↑⍨¯1+⍵⍳'='}¨cfg.CIDER.(dependencies dependencies_dev).tatin)~⊂''
+         :If 1=≢subFolders
+             installFolder,←⊃subFolders
+             :If 0=1 TC.C.YesOrNo'Sure you want to act on ',installFolder,' ?'
+                 r←'Cancelled by user' ⋄ →0
+             :EndIf
+         :Else
+             ind←'Which folder would you like to re-install into?'TC.C.Select installFolder∘,¨subFolders
+             :If 0=≢ind
+                 r←'Cancelled by user' ⋄ →0
+             :Else
+                 installFolder,←ind⊃subFolders
+             :EndIf
+         :EndIf
+     :Else
+         r←'Directory does not host a file apl-dependencies.txt, and no dependencies are defined' ⋄ →0
+     :EndIf
+ :EndIf
+ deps←⊃TC.F.NGET(installFolder,'/apl-dependencies.txt')1
+ 'Dependency file is empty'Assert 0<≢deps
+ :If parms.force
+ :OrIf TC.C.YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
+     :Trap ErrNo
+         r←parms TC.ReInstallDependencies installFolder registry
+     :Else
+         qdmx←⎕DMX
+         ⎕SIGNAL/CheckForInvalidVersion qdmx
+     :EndTrap
+     :If recursive
+         r←⍪(⊂'Re-installed in ',(2⊃⎕NPARTS installFolder),':'),' ',¨r
+     :Else
+         r←⍪(⊂'Re-installed in ',installFolder,':'),' ',¨r
+     :EndIf
+ :EndIf

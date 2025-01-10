@@ -144,7 +144,7 @@ Execute one of the following commands:
   
 !> ### Linux
 => ```
-=> ]SALT.Settings cmddir ",/home/<⎕AN>/dyalog.182U64.files/SessionExtensions/CiderTatin -p
+=> ]SALT.Settings cmddir ",/home/<⎕AN>/dyalog.182U64.files/SessionExtensions/CiderTatin" -p
 
 !> ###  Mac OS
 => ```
@@ -353,6 +353,7 @@ There is always the possibility that the update process is itself buggy. Calling
 => 1. Execute `]DeActivate tatin` --- that removes Tatin
 => 2. Execute `]Activate tatin` --- that brings back the version of Tatin that your installation originally came with
 => 3. Execute `]Tatin.UpdateTatin` --- that will try to update to the latest version
+
 
 
 

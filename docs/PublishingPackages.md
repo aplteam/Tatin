@@ -69,7 +69,7 @@ There is one restriction: a `+` cannot be part of the name of a beta version. Th
 
 ~~Build numbers are mostly not shown by Tatin.~~
 
-Build numbers are ignored by Tatin. Their sole purpose is to tell two different build apart when the version number has not changed.
+Build numbers are ignored by Tatin. Their sole purpose is to tell two different builds apart when the version number has not changed.
 
 
 ## Precondition: API key
@@ -261,7 +261,7 @@ Notes:
 
 * Using the http[s]:// protocol defeats Tatin's scan strategy: normally when a dependency is required Tatin will scan all defined Registries by their priority, unless the http[s]:// protocol is used. Again this should be used with care.
 
-* When a package is published to a Tatin Registry, any protocols (file:// or http:// or https://) are removed: the dependency is defined just be the package names. 
+* When a package is published to a Tatin Registry, any protocols (file:// or http:// or https://) are removed: the dependency is defined just by the package name. 
 
   When such a package is installed or loaded, Tatin will interrogate all Registries in its search path, with the first hit winning the day.
 
@@ -276,7 +276,7 @@ Once the preparation is done the final step is easy. Specify the folder hosting 
 
 The folder may or may not carry a trailing slash (`/`).
 
-This would attempt to publish the package found in `path2package/` to the principal Tatin Server.
+This would attempt to publish the package found in `path2package/` to the principal Tatin Server. (In fact, `[tatin]` is optional: without a second argument the principal Registry would be assumed anyway)
 
 You can also build a new version by calling `]TATIN.BuildPackage` (or its aquivalent, the API-function `BuildPackage`) and specify the resulting ZIP file as an argument to `PublishPackage`:
 
@@ -400,6 +400,7 @@ You can now develop a package `Foo` and publish it on `[my]`, probably several t
 You would then publish it on `[my-team]`. At the same time, you would either delete the package from `[my]` or, if you want the Registry `[my]` to be ignored altogether, set its priority to zero.
 
 When all is good the beta is promoted to an official release and published to the Tatin company server. At the same time, the package will most likely be deleted from the Team server.
+
 
 
 

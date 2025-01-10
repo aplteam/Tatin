@@ -20,12 +20,31 @@
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
-      :Access Public shared
-      r←'Tester2' '3.9.1' '2024-10-03'
+    ⍝ Returns the version number from TatinVars (if we can)
+    ⍝ See also `History`
+      r←''
+      :If 0<⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
+      :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+    ⍝ When a script is not loaded with Tatin, there will be no namespace `TatinVars`
+    ⍝ In such cases we cannot provide a version number, so we return an empty char vector
+          r←'Tester2' '' ''
+      :EndIf
+    ⍝Done
     ∇
 
     ∇ r←History
-      :Access Public shared
+      :Access Public shared  
+      ⍝ * 3.11.1 ⋄ 2024-12-29
+      ⍝   Bug fix in `Version`: if for some strange reason it cannot find `TatinVars` it 
+      ⍝   should return an empty vector rather than crashing. 
+      ⍝ * 3.11.0 ⋄ 2024-12-25
+      ⍝   * `ListTestFunctions` enhanced
+      ⍝   * `Version` extracts the version number now from the package config file
+      ⍝ * 3.10.0 ⋄ 2024-11-30
+      ⍝   * Dependencies updated in order to make Tester2 ready for 20.0 (IniFiles)
       ⍝ * 3.9.1 ⋄ 2024-10-03
       ⍝   * Comment added according to issue #25
       ⍝   * Bug fix: the new '?'-syntax did not work when 3 (for "Cleanup") was selected
@@ -1351,11 +1370,13 @@
     ∇
 
     ∇ r←{x}ListTestFunctions groupName;r2;b;max;longestName;buff;numbers;view
-⍝ Returns a matrix with two columns with the names of all test cases in the first column and the
-⍝ first comment line in the second column.\\
-⍝ If `groupName` is not empty then it will return only the members of that group (case dependent) or,
+⍝ Returns a matrix with two columns:
+⍝ * `[;1]` Carries the names of all test cases
+⍝ * `[;2]` The first comment line\\
+⍝ If `groupName` is not empty, then it will return only the members of that group (case dependent) or,
 ⍝ if the expression carries a wildcard, all groups matching the given string.\\
 ⍝ `groupName` may or may not start with `Test_`.\\
+⍝ Since version 3.11.0 `groupName` can be a comma-separated list of group names.
 ⍝ If the optional left argument (`numbers`)" is defined only those numbers are returned.
       :Access Public Instance
       x←{(0<⎕NC ⍵):⍎⍵ ⋄ ⍬}'x'
@@ -1374,6 +1395,13 @@
       :EndIf
       r2←↓'Test_'{⍵⌿⍨((≢⍺)↑[2]⍵)∧.=⍺}'T'_ref.⎕NL 3
       :If 0≠≢groupName
+          :If ','∊groupName
+              groupName←','(≠⊆⊢)groupName
+              buff←x∘ListTestFunctions¨groupName
+              buff←(0<≢¨buff)/buff
+              r←⊃⍪/buff
+              :Return
+          :EndIf
           groupName←'Test_'{⍵↓⍨(≢⍺)×⍺≡(≢⍺)↑⍵}groupName
           groupName←'Test_'{((⍺≢(≢⍺)↑⍵)/⍺),⍵}groupName
           groupName,←('*'≠¯1↑groupName)/'_'

@@ -1,0 +1,9 @@
+ r←Test_GetBestVersion_004(stopFlag batchFlag);⎕TRAP;id
+⍝ Exercise GetBestVersion on <name>-<major>.<minor>
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ id←(≢∆TEMP_SERVER_FOLDER)↓##.Registry.GetBestVersionNumber ∆TEMP_SERVER_FOLDER,'versions-1.0'
+ →T.PassesIf id≡'example-versions-1.0.12-That-fix'
+
+⍝Done

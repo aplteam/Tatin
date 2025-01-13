@@ -5,6 +5,7 @@
 ⍝ Throws an error if no group was specified but more than one group has a fit for the package name
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ GetNoBetasDefault}'noBetas '
  r←''
+ path←F.NormalizePath path
  id←(≢RemovePackageID path)↓path
  path_←(-≢id)↓path
  :If IsValidPackageName id
@@ -16,15 +17,15 @@
      :EndIf
      buff2←∪{⍵↑⍨¯1+⍵⍳'-'}¨(≢path)↓¨buff
      ((⍕≢buff2),' groups have a package with the given name')Assert 1=≢buff2
-     id←({⍵↑⍨⍵⍳'-'}{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}buff),id
+     id←({⍵↑⍨⍵⍳'-'}{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\'}⊃buff),id
      path,←id
  :EndIf
  :If 0<≢list←,GetAllPackages path_
  :AndIf 0<≢list←('.zip'∘≢¨⎕C¨3⊃∘⎕NPARTS¨list)/list
      :If HasGroup id
-         list←((⎕C id){⍺∘≡¨⎕C(≢⍺)↑¨⍵}list)/list
+         list←((⎕C{⍵,(1≥'-'+.=⍵)/'-'}id){⍺∘≡¨⎕C(≢⍺)↑¨⍵}list)/list
      :Else
-         list←((⎕C id){⍺∘≡¨⎕C(≢⍺)↑¨⍵}{(⍵↓⍨+⍵⍳'-')}¨list)/list
+         list←((⎕C{⍵,(1≥'-'+.=⍵)/'-'}id){⍺∘≡¨⎕C(≢⍺)↑¨⍵}{(⍵↓⍨+⍵⍳'-')}¨list)/list
      :EndIf
  :AndIf 0<≢list
      :If noBetas

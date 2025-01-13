@@ -7,7 +7,7 @@
  :If 0<≢r←TC.FindDependencies(⊃{⍺,',',⍵}/pkgList)target verbose
      buff←{((⊂''),⍪2⊃⍵)}¨r
      r←{TC.F.EnforceSlash TC.F.AddTrailingSep⊃⍵}¨r
-     :If ∨/bool←{∨/'/\'∊↑⍵[;2]}¨buff ⍝ Only local data is a full path
+     :If ∨/bool←{{('/\'∊⍨⊃⍵)∨':'∊⍵}⊃⍵[;2]}¨buff  ⍝ Tell local from
          (bool/buff)←(bool/r){l←≢⍺ ⋄ l↓¨⍵}¨(bool/buff)
          (bool/buff)←{w←⍵ ⋄ w[;2]←TC.F.EnforceSlash¨⍵[;2] ⋄ w}¨bool/buff
      :EndIf

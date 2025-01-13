@@ -1,4 +1,4 @@
- {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q;buff
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q;buff;commitFlag
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
@@ -25,8 +25,14 @@
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
 
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Compiling HTML from the markdown files (documentation)...'
+ commitFlag←0
+ :If ~batchFlag
+ :AndIf (⊂'#.Tatin')∊{⍵[;1]}⎕SE.Cider.ListOpenProjects 0
+     'Status is dirty'Assert 0=≢1 ⎕SE.APLGit2.Status'#.Tatin'
+     ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
+     commitFlag←0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
+ :EndIf
  CompileDocumentation ⍬
-
  path←##.Client.GetUserDocumentsFolder,'Dyalog APL-64 19.0 Unicode Files\SessionExtensions\CiderTatin\Tatin'
  :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in the version-agnostic folder?
  :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live there?
@@ -103,10 +109,7 @@
      #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(CFG.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
      0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'*** Done'
  :EndIf
- :If ~batchFlag
- :AndIf (⊂'#.Tatin')∊{⍵[;1]}⎕SE.Cider.ListOpenProjects 0
-     ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
- :AndIf 0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
+ :If commitFlag
      q←1↓⊃,/(⎕UCS 13),¨↓↑⎕SE.APLGit2.Status'#.Tatin'
      :If 1 ##.Client.CommTools.YesOrNo q,(⎕UCS 13),'---> Commit as "Make"?'
          ⎕SE.APLGit2.Add'#.Tatin'

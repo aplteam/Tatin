@@ -28,7 +28,8 @@
  commitFlag←0
  :If ~batchFlag
  :AndIf (⊂'#.Tatin')∊{⍵[;1]}⎕SE.Cider.ListOpenProjects 0
-     'Status is dirty'Assert 0=≢1 ⎕SE.APLGit2.Status'#.Tatin'
+     buff←1 ⎕SE.APLGit2.Status'#.Tatin'
+     'Status is dirty'Assert 0=+/~({⊃,/1↓⎕nparts ⍵}¨buff[;2])∊'History.apla' 'Version.aplf'
      ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
      commitFlag←0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
  :EndIf

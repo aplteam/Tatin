@@ -21,18 +21,6 @@
  F←##.FilesAndDirs ⋄ C←##.Client ⋄ CFG←##.CiderConfig ⋄ F.APLTreeUtils2←##.APLTreeUtils2
  {}F.Cd CFG.HOME
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Current dir is now: ',CFG.HOME
- :If ~batchFlag
- :AndIf (⊂'#.Tatin')∊{⍵[;1]}⎕SE.Cider.ListOpenProjects 0
-     ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
- :AndIf 0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
-     q←1↓⊃,/(⎕UCS 13),¨↓↑⎕SE.APLGit2.Status'#.Tatin'
-     :If 1 ##.Client.CommTools.YesOrNo q,(⎕UCS 13),'---> Commit as "Make"?'
-         ⎕SE.APLGit2.Add'#.Tatin'
-         buff←'<Make>'⎕SE.APLGit2.Commit'#.Tatin'
-     :Else
-         ⎕←'Cancelled by user' ⋄ →0
-     :EndIf
- :EndIf
  'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
 
@@ -114,5 +102,17 @@
  :Else
      #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(CFG.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
      0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'*** Done'
+ :EndIf
+ :If ~batchFlag
+ :AndIf (⊂'#.Tatin')∊{⍵[;1]}⎕SE.Cider.ListOpenProjects 0
+     ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
+ :AndIf 0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
+     q←1↓⊃,/(⎕UCS 13),¨↓↑⎕SE.APLGit2.Status'#.Tatin'
+     :If 1 ##.Client.CommTools.YesOrNo q,(⎕UCS 13),'---> Commit as "Make"?'
+         ⎕SE.APLGit2.Add'#.Tatin'
+         buff←'<Make>'⎕SE.APLGit2.Commit'#.Tatin'
+     :Else
+         ⎕←'Cancelled by user' ⋄ →0
+     :EndIf
  :EndIf
 ⍝Done

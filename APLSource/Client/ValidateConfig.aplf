@@ -3,8 +3,7 @@
      req←'group' 'name' 'version'
      _←'Missing required fields'Assert∧/req∊cfg.⎕NL-2:
      _←'"source" must not be empty'Assert 0<≢cfg.source:
-     _←'group'ValidateName cfg.group
-     _←'name'ValidateName cfg.name
+     cfg←ValidateNames cfg
      _←ValidateVersion cfg.version
      _←ValidateLX cfg
      cfg←projectPath ValidateExclude cfg

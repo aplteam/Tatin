@@ -1,4 +1,4 @@
- {(statusCode errMsg zipFilename)}←{dependencies}PublishPackage(source registry);uri;cfgFilename;cfg;packageID
+ {(statusCode errMsg zipFilename)}←{dependencies}PublishPackage(source registry);uri;cfgFilename;cfg;packageID;name;group
 ⍝ Publishes a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
 ⍝ 2. Creates a dependency file for the package if required
@@ -19,6 +19,9 @@
  'No URI provided'Assert 0<≢uri
  'Not just a Registry'Assert uri≡RemovePackageID uri
  'Unknown Registry'Assert(⊂EnforceTrailingSlash uri)∊⊃¨{0≡⍵:⍺ ⋄ (¯1↓⍺),':',(⍕⍵),'/'}/¨MyUserSettings.registries.(uri port)
+ (name group)←'-'(≠⊆⊢)Reg.RemoveVersionNumber{2⊃⎕NPARTS ⍵↓⍨-'/\'∊⍨¯1↑⍵}source
+ 'Invalid package name: only ASCII characters and digits and _ are allowed'Assert PackageNameIsOkay name
+ 'Invalid group name: only ASCII characters and digits and _ are allowed'Assert PackageGroupNameIsOkay group
  source←RemoveFileProtocol source  ⍝ Precaution
  zipFilename←dependencies PackIfFolder source
  'Invalid URI specified: not a zip file'Assert'.zip'≡⎕C ¯4↑zipFilename

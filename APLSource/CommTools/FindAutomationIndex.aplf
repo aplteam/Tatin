@@ -1,0 +1,16 @@
+ ind←FindAutomationIndex(type id);bool
+⍝ Returns the line in ∆Automation (if that exists) when type and id match ∆Automation[;1 2]
+⍝ In case ∆Automation does not exist or no line fits `⍬` is returned.
+ ind←⍬
+ 'Invalid type'Assert(⊂type)∊'YesOrNo' 'AskForNumber' 'AskForText' 'Pause' 'Select'
+ :If 0<⎕NC'∆Automation'
+ :AndIf 0<≢∆Automation
+     :If '@'∊id
+         bool←(∆Automation[;1]≡¨⊂type)∧(({⍵↑⍨⍵⍳'@'}¨∆Automation[;2])≡¨⊂{⍵↑⍨⍵⍳'@'}id)
+     :Else
+         bool←(∆Automation[;1]≡¨⊂type)∧(∆Automation[;2]≡¨⊂id)
+     :EndIf
+     :If ⍬≢ind←⍸,bool
+         ind←⊃ind
+     :EndIf
+ :EndIf

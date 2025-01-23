@@ -1,0 +1,34 @@
+ {r}←{overwrite}AddAutomation(type id value);msg;ind
+⍝ Use this to add a line to `∆Automation` or, if it does not yet exist, create `∆Automation`.
+⍝ If `id` is already defined for `type`, the user is questioned whether she really wants to overwrite
+⍝ the already existing definition. If she answers "No" no action is taken.\\
+⍝ You can enforce an update by passing a 1 as ⍺ (overwrite).
+⍝ `type` must be one of `YesOrNo`, `Select`, `Pause`, AskForText` or `AskForNumber.
+⍝ If it's not, an error is thrown.\\
+⍝ Returns 0 for "no action", 1 for "updated" and 2 for "added".
+ overwrite←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'overwrite'
+ r←0
+ :If 0=⎕NC'∆Automation'
+     ∆Automation←0 4⍴'' '' '' 0
+ :EndIf
+ 'Optional left argument, when specified, must be a scalar Boolean'Assert(⊂overwrite)∊0 1
+ 'Invalid type'Assert(⊂type)∊'YesOrNo' 'Select' 'Pause' 'AskForText' 'AskForNumber'
+ 'ID must not be empty'Assert 0<≢id
+ :Select type
+ :Case 'AskForNumber'
+     'Return value: invalid data type'Assert(,0)≡1↑0⍴⊂value
+ :Case 'YesOrNo'
+     'Invald return value; must be one of: "YyNn"'Assert(0=≢value)∨(⊂value)∊'YyNn'
+ :EndSelect
+ :If ⍬≡ind←FindAutomationIndex type id
+     ∆Automation⍪←type id value 0
+     r←2
+ :Else
+     :If overwrite
+         msg←'@ <',id,'> is already defined for <',type,'>'
+     :OrIf msg Assert YesOrNo msg,' - overwrite? (will reset the counter) '
+         ∆Automation[ind;]←type id value 0
+         r←1
+     :EndIf
+ :EndIf
+⍝Done

@@ -1,8 +1,8 @@
- Run path_;res;qdmx;sep;paths;DLB;DTB;path
+ Run path_;res;qdmx;sep;paths;DLB;DTB;path;cacheFilename;tie;data
 ⍝ Brings Cider's and Tatin's APIs into ⎕SE and makes sure that the associated user commands will be found.
-⍝ This is for version 19.0
+⍝ This is for version 19.0 and later but not the new user command framework.
 ⍝ The function is part of the Tatin project.
-⍝ Version 0.1.7 from 2024-04-12  ⋄  Kai Jaeger
+⍝ Version 1.2.0 from 2025-01-21  ⋄  Kai Jaeger
  path←⊃,/1 ⎕NPARTS∊path_,'/../../SessionExtensions/CiderTatin'
  :If 19≤⊃(//)⎕VFI{⍵↑⍨¯1+⍵⍳'.'}2⊃# ⎕WG'APLVersion'
      ⎕SE.⎕EX'_Tatin'    ⍝ In case Tatin was saved as part of the session file
@@ -33,5 +33,12 @@
      :EndIf
  :EndIf
  ⎕SE.⎕EX'CiderTatin'
- ⍝⎕SE.SALTUtils.ResetUCMDcache ¯1
+ cacheFilename←⎕SE.SALTUtils.UCMDCACHEFILE,⍨⊃⎕NPARTS ¯1↓⎕SE.Dyalog.StartupSession.VerSpec
+ :If ~⎕NEXISTS cacheFilename			⍝ If there is no user command cache we must create one
+     tie←cacheFilename ⎕FSTIE 0
+     data←⎕FREAD tie 2
+     ⎕FUNTIE tie
+ :OrIf ~(⊂'tatin')∊data[;1]				⍝ There is a user command cache but it does not know about "tatin"
+     ⎕SE.SALTUtils.ResetUCMDcache ¯1
+ :EndIf
  ⍝Done

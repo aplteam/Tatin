@@ -10,12 +10,24 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'GitHubAPIv3' '1.5.0' '2024-10-16'
+    ⍝ Returns the version number from TatinVars
+    ⍝ See also `History`
+      r←'GitHubAPIv3' '' '2025-01-25'
+      :If 0<##.⎕NC'TatinVars.CONFIG'
+          (2⊃r)←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+          ⍝ When a script is not loaded with Tatin, there will be no namespace `TatinVars`.
+          ⍝ In such cases we cannot provide a version number, so we return an empty char vector
+     
+      :EndIf
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 1.5.0 from 2024-10-16
+    ⍝ * 1.6.0 from 2025-01-025
+    ⍝   * CommTools removed as a dependency - it was only required for tests
+    ⍝   * `Version` now returns the package config file setting
+    ⍝ * 1.5.0 from 2024-11-16
     ⍝   * `CheckForUpdate` can now handle beta versions on the client side (on GitHub, betas are not supported)
     ⍝ * 1.4.0 from 2024-09-24
     ⍝   * New instance method `GetMyRateLimits` added whbich complements the older shared method `GetRateLimits`
@@ -300,7 +312,7 @@
     ⍝ * The better version number\\
     ⍝ If the given version is a beta version (say 1.2.3-beta-1) and on GitHub it is 1.2.3 then the GitHub version
     ⍝ is considered to be a later version. \\
-    ⍝ If the latest verson on GitHub is a beta an erroris thrown: this is not supported. 
+    ⍝ If the latest verson on GitHub is a beta an erroris thrown: this is not supported.
       :Access Public Instance
       betterVersion←''
       gitVersion_←GetLatestTag repoName

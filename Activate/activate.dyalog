@@ -5,7 +5,7 @@
 ⍝ 2023-11-06 kai: One can now -reset or deactivate just one of Cider/Tatin
 ⍝ 2024-01-15 adam: [21074] always return result
 ⍝ 2024-06-05 AndyS: [21422] Gracefully and informatively fail if run on AIX or on Classic interpreters; remove reference to -update in Help
-⍝ 2025-02-09 kai: .dyalog/ fixed, -versionagnostic flag added, -update flag removed, ]deactivate polished, ]ListActivated added
+⍝ 2025-03-12 kai: .dyalog/ fixed, -versionagnostic flag added, -update flag removed, ]deactivate polished, ]ListActivated added
 
     ⎕IO←1 ⋄ ⎕ML←1   ⍝ Set those here to avoid inheriting them from outside
     AllCmds←'Activate' 'Deactivate' 'ListActivated'

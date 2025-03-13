@@ -1,4 +1,4 @@
- {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q;buff;commitFlag
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q;buff;commitFlag;activateFilename
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
@@ -29,7 +29,7 @@
  :If ~batchFlag
  :AndIf (⊂'#.Tatin')∊{⍵[;1]}⎕SE.Cider.ListOpenProjects 0
      buff←1 ⎕SE.APLGit2.Status'#.Tatin'
-     'Status is dirty'Assert 0=+/~({⊃,/1↓⎕nparts ⍵}¨buff[;2])∊'History.apla' 'Version.aplf'
+     'Status is dirty'Assert 0=+/~({⊃,/1↓⎕NPARTS ⍵}¨buff[;2])∊'History.apla' 'Version.aplf'
      ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
      commitFlag←0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
  :EndIf
@@ -96,12 +96,22 @@
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   The final steps, putting it all together...'
+ CopyActivateUserCommandIntoProject ⍬
  HandleRunFunction ⍬
+ HandleActivateUserCommand ⍬
  UpdateTestServerAssets ⍬
  {}⎕SE.Link.Refresh'#.Tatin'
  :If ~batchFlag
- :AndIf 1 ##.Client.CommTools.YesOrNo'Would you like to install the freshly created new version?'
-     ⎕←1 #.Tatin.Admin.InstallTatin 1
+     :If 1 ##.Client.CommTools.YesOrNo'Would you like to install the freshly created new version?'
+         ⎕←1 #.Tatin.Admin.InstallTatin 1
+     :EndIf
+     activateFilename←##.Client.GetMyUCMDsFolder'/activate.dyalog'
+     :If 0=⎕NEXISTS activateFilename
+     :OrIf './Dist/activate.dyalog'F.YoungerThan activateFilename
+         :If 1 ##.Client.CommTools.YesOrNo'Install the ]activate user command?'
+             activateFilename ⎕NCOPY⍠('IfExists' 'Replace')⊢'./Dist/activate.dyalog'
+         :EndIf
+     :EndIf
  :EndIf
  :If #.Tatin.Registry.Version≢⎕SE.Tatin.Version
      ⎕SE.⎕EX¨'Tatin' '_Tatin'

@@ -1,0 +1,11 @@
+ {r}←HandleActivateUserCommand dummy;myZip;zipFilename
+⍝ 1. Copies the "Activate/activate.dyalog" script to the Dist folder
+⍝ 2. Creates a ZIP file for it
+ r←0
+ './Dist/'⎕NCOPY⍠('IfExists' 'Replace')⊣'Activate/activate.dyalog'
+ zipFilename←'./Dist/Activate.zip'
+ F.DeleteFile zipFilename
+ myZip←⎕NEW ##.ZipArchive(,⊂zipFilename)
+ (F.PWD,'/Activate')myZip.Add 'activate.dyalog'
+ myZip.Dispose
+⍝Done

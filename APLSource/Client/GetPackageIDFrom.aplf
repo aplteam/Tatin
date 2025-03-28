@@ -6,6 +6,8 @@
  ⍝ characters that are not ASCII or are not allowed in an APL name are replaced by an underscore character.
  ⍝ Examples:
  ⍝ 'Example_Package_A-1.0.0'  ←   GetPackageIDFrom 'file://C:/Temp/Example-Package_A-1.0.0.zip'
+ ⍝ 'aplteam-MarkAPL'  ←   GetPackageIDFrom 'https://tatin.dev/aplteam/MarkAPL'
+ ⍝ 'MarkAPL'  ←   GetPackageIDFrom 'MarkAPL'
  ⍝ 'Example-Package_A_1_0_0'  ← 1 GetPackageIDFrom 'file://C:/Temp/Example-Package_A-1.0.0.zip'
  ⍝ 'aplteam-APLProcess-0.7.0' ← 1 GetPackageIDFrom 'https://tatin.dev/aplteam-APLProcess'
  convert←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'convert'
@@ -16,7 +18,7 @@
      buff←(≢'file://')↓packageID
      r←{⍵↑⍨-¯1+⌊/'/\'⍳⍨⌽⍵}buff
  :ElseIf IsHTTP packageID
-     buff←'http[s]://'⎕R''⊢packageID
+     buff←RemoveHttpProtocol packageID
      buff←(~'//'⍷buff)/buff
      r←{'-'@(⍸'/'=⍵)⊢⍵}{⍵↓⍨⍵⍳'/'}buff
  :ElseIf ∨/'/\]'∊packageID

@@ -5,7 +5,7 @@
  ⍝ If there is no such file yet it is created.\\
  ⍝ Note that although ⍵ might contain an alias (like `[tatin]`), this will be replaced by what the alias stands for.
  r←0
- deps←⊆deps
+ deps←,⊆deps
  :If ∨/b←'@'∊¨deps
      {'Invalid dependency'##.Assert 1='@'+.=⍵:}¨b/deps
  :EndIf
@@ -20,6 +20,7 @@
  b←##.Reg.IsValidPackageID_Complete¨{⍵↑⍨1+-⌊/(⌽⍵)⍳'/\]'}¨2⊃∘##.SplitAtAlias¨deps
  {}b{('Not valid package IDs: ',⊃,/{⍺,',',⍵}/(~⍺)/deps)##.Assert 0}⍣(0∊b)⊣0
  sofar←Get path
+ sofar~←##.Reg.RemoveVersionNumber¨deps    ⍝ Important in case an entry has no version number (potentially used to enforce installing the latest major version)
  tempFile←(⊃,/2↑⎕NPARTS filename),'.tmp'
  sofar←∪sofar
  sofar←(~(##.Reg.RemoveMinorAndPatch¨sofar)∊##.Reg.RemoveMinorAndPatch¨deps)/sofar

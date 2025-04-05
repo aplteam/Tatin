@@ -1,4 +1,4 @@
-  r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;ind;success
+ r←{flags}CheckForLaterVersion path;buildFilename;topLevel;buildList;dependencies;majorVersions;ind;success
 ⍝ `path` must point to a folder with installed packages, meaning that there
 ⍝ must be a file apl-buildlist.json available. This is mandatory.
 ⍝ The optional left argument can carry flags as a single integer:
@@ -21,7 +21,7 @@
  flags←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'flags'
  'Invalid left argument'Assert 83=⎕DR flags
  'Invalid right argument'Assert(' '=1↑0⍴⊂path)∧(1=≡path)
- (majorVersions dependencies)←2↑Reg.IntToBits ⊃flags
+ (majorVersions dependencies)←2↑Reg.IntToBits⊃flags
  path←Reg.AddSlash path
  'Folder does not exist'Assert F.IsDir path
  buildFilename←path,Reg.BuildListFilename
@@ -33,6 +33,7 @@
      r,←r[;3]
      r[;3]←(dependencies∨buildList.principal)⌿buildList.url
      r[;3 5]←{IsHTTP ⍵:⍵ ⋄ 0=≢⍵~' ':'' ⋄ 'expand'F.NormalizePath ⍵}¨r[;3 5]
+     r[;4]∨←≢/¨↓r[;3 5]              ⍝ Those where the latest version comes from a different registry are candidates as well
      :If 0<≢ind←⍸~r[;4]
          r[ind;5]←⊂''
      :EndIf

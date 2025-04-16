@@ -34,14 +34,14 @@
  :If parms.force
  :OrIf TC.C.YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
      :Trap ErrNo
-         r←parms TC.ReInstallDependencies installFolder registry
+         r←1↓⊃,/(⎕UCS 13),¨⍕¨,parms TC.ReInstallDependencies installFolder registry
      :Else
          qdmx←⎕DMX
          ⎕SIGNAL/CheckForInvalidVersion qdmx
      :EndTrap
      :If recursive
-         r←⍪(⊂'Re-installed in ',(2⊃⎕NPARTS installFolder),':'),' ',¨r
+         r{0=≢⍺:⍵ ⋄ 1<≡⍵:⍺,⊃,/(⎕UCS 13),¨⍵ ⋄ ⍺,(⎕UCS 13),⍵}←(⊂'Re-installed in ',(2⊃⎕NPARTS installFolder),':'),' ',¨⊆r
      :Else
-         r←⍪(⊂'Re-installed in ',installFolder,':'),' ',¨r
+         r{0=≢⍺:⍵ ⋄ 1<≡⍵:⍺,⊃,/(⎕UCS 13),¨⍵ ⋄ ⍺,(⎕UCS 13),⍵}←(⊂'Re-installed in ',installFolder,':'),' ',¨⊆r
      :EndIf
  :EndIf

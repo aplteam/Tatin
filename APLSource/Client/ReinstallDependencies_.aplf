@@ -1,4 +1,4 @@
-refs←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;quiet;tempDir;forceClose;p;i;pkg;msg;ref;qdmx;major
+r←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;quiet;tempDir;forceClose;p;i;pkg;msg;ref;qdmx;major
 ⍝ Re-installs all packages listed by `deps`, including any dependencies.\\
 ⍝ In case `dry` is 1 it reports to the session what it _would_ do.\\
 ⍝ All work is done in a temp folder. Without -dry that temp folder will eventually replace the install folder.
@@ -12,7 +12,7 @@ refs←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;
  dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
  'You must specify at least 5 parameters'Assert 5≤≢y
  (deps installFolder registry noBetas update quiet major)←y,(≢y)↓⍬ ⍬ ⍬ ⍬ ⍬ 0 0
- refs←⍬
+ r←⍬
  tempDir←F.GetTempSubDir''
  tempDir ⎕NCOPY installFolder,'/',Reg.DependenciesFilename                  ⍝ Copy the dependency file
  :If major
@@ -39,7 +39,7 @@ refs←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;
          ('Package ',pkg,' in ',registry,' caused a problem: ',qdmx.EM)Assert 1=≢'Package <[^>].*> not found in any of these Registries:'⎕S 0⊣qdmx.EM
      :EndTrap
      p(⊂'Installed',(dry/' (dry)'),': '),ref
-     refs,←⊆ref
+     r,←⊆ref
  :EndFor
  :If dry
      ⎕DL 0.01

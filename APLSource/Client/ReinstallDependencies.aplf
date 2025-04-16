@@ -1,4 +1,4 @@
- {refs}←{parms}ReInstallDependencies y;installFolder;registry;deps;refs;msg
+ {r}←{parms}ReInstallDependencies y;installFolder;registry;deps;msg
 ⍝ Re-installs all packages by honoring the file `apl-dependencies.txt`.
 ⍝ The right argument must be one of:
 ⍝ * A folder that hosts a file `apl-dependencies.txt` (install folder)
@@ -23,7 +23,7 @@
 ⍝ * `major`
 ⍝   Defaults to 0, meaning that packages with different major version numbers are considered different packages.
 ⍝   Therefore a package foo-goo-1.0.0 is not updated to foo-goo-2.0.0
-⍝   This can be changed by setting `major1`.\\
+⍝   This can be changed by setting `major←1`.\\
  :If 0=⎕NC'parms'
      parms←CreateReInstallParms
  :EndIf
@@ -31,5 +31,5 @@
  msg←'Re-installing packages in ',installFolder,((1+parms.noBetas)⊃' including' ' without'),' beta versions'
  (~parms.quiet)PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}msg
  1 EstablishRumbaClients ⍬
- refs←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.update parms.quiet parms.major
+ r←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.update parms.quiet parms.major
 ⍝Done

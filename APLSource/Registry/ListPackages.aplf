@@ -1,4 +1,4 @@
- r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;noOfHyphens;noOfDots;uniqueIDs;list2;since;flag;bool;OSlist
+ r←{list}ListPackages(uri parms);packageID;registryPath;fuzzy;tags;noOfHyphens;noOfDots;uniqueIDs;list2;since;flag;bool;OSlist;ind
 ⍝ Documentation see ##.Client.ListPackages
  'No registry specified'Assert 0<≢uri
  parms←CheckParmsForListPackages parms
@@ -90,8 +90,9 @@
                  :EndIf
              :EndIf
          :Else
-             :If (⊂⎕C packageID)∊⎕C,list               ⍝ verbatim
-                 r←1 2⍴packageID ⍬
+             ind←(⎕C,list)⍳⊂⎕C packageID               ⍝ verbatin
+             :If (≢list)≥ind
+                 r←1 2⍴(⊃list[ind;])⍬                  ⍝ This will correct a wrong casing
              :EndIf
          :EndSelect
      :EndSelect

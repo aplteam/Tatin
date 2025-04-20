@@ -1,4 +1,4 @@
- (opCode reg)←EstablishRegistry_(uri packageID askUserFlag);stopFlag;list;options;msg;qdmx
+ (opCode reg packageID)←EstablishRegistry_(uri packageID askUserFlag);stopFlag;list;options;msg;qdmx
 ⍝ Attempts to interrogate a Tatin Server. In case the server is down (or anything else goes awry)
 ⍝ then `askUserFlag` determines what to do:
 ⍝ * If it is 0 an error is thrown
@@ -16,6 +16,7 @@
              reg←uri
              stopFlag←1
              opCode←'process'
+             packageID←(Reg.RemoveVersionNumber⊃list[1;]),(≢Reg.RemoveVersionNumber packageID)↓packageID  ⍝ Get the casing right
          :EndIf
      :Else
          :If askUserFlag

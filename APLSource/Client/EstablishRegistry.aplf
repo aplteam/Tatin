@@ -1,4 +1,4 @@
- reg←{askUserFlag}EstablishRegistry packageID;registries;uri;alias;list;msg;i;options;stopFlag;skipped;opCode;port
+ (reg packageID)←{askUserFlag}EstablishRegistry packageID;registries;uri;alias;list;msg;i;options;stopFlag;skipped;opCode;port
 ⍝ The purpose of this function is to establish the registry a package can be found in.
 ⍝ Useful in case the user specified just a package ID but no Registry but also for
 ⍝ dependencies: ReInstallDependencies for example **always** scans all Registries for
@@ -39,7 +39,7 @@
                  uri←(¯1↓uri),':',(⍕port),'/'
              :EndIf
              :If Reg.IsHTTP uri
-                 (opCode reg)←EstablishRegistry_ uri packageID askUserFlag
+                 (opCode reg packageID)←EstablishRegistry_ uri packageID askUserFlag
                  :If opCode≡'skip'
                      skipped,←⊂uri
                      :Continue

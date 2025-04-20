@@ -1,4 +1,4 @@
- r←targetFolder InstallPackage_(alias packageID);buildList;principal;packageID2;installFolder;msg;path2cache;url;bool;tempDir;cacheFlag;success;qdmx;cfg
+ r←targetFolder InstallPackage_(alias packageID);buildList;principal;packageID2;installFolder;msg;path2cache;url;bool;tempDir;cacheFlag;success;qdmx;cfg;packageID3
 ⍝ Fetches a package and unzips it into a temp folder.
 ⍝ When caching is on, the temp folder is created within the top-level of the cache folder.
 ⍝ Otherwise a folder is created inside the temp directory of the given OS.
@@ -37,6 +37,11 @@
                  qdmx←⎕DMX
                  qdmx.EM Assert 0
              :EndTrap
+         :EndIf
+         packageID3←{⍵↑⍨¯1+⍵⍳'+'}{⍵.(group,'-',name,'-',version)}Reg.APLfromJSON⊃⎕NGET(tempDir,'/apl-package.json')
+         :If ~(⊂packageID3)∊buildList[;2]
+             buildList[(buildList[;2])⍳⊂packageID2;2]←⊂packageID3 ⍝ Corrects wrong casing according to the config file
+             packageID2←packageID3
          :EndIf
          :If IsHTTP url
          :AndIf cacheFlag

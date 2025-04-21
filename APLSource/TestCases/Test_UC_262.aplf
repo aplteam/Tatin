@@ -1,4 +1,4 @@
- R←Test_UC_262(stopFlag batchFlag);⎕TRAP;stop;msg;rc;tempDir;parms;res;parms2;res2;cfg;cfgFilename;noOf
+ R←Test_UC_262(stopFlag batchFlag);⎕TRAP;stop;msg;rc;tempDir;parms;res;parms2;res2;cfg;cfgFilename;noOf;C;ref
 ⍝ Exercise ]Tatin.LoadDependencies without an argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←T._Failed
@@ -36,8 +36,9 @@
  Assert'example-JustOneBeta-0.1.0-beta-1'≡∊res
 
  stop←0
- #.Tatin.CommTools.AddAutomation'Select' 'SelectLoadFolderForLoadDependencies@'(parms2.folder,'/','MyPackages')
- #.Tatin.CommTools.AddAutomation'Select' 'SelectProjectForLoadDependencies@' '#.TEMP.Foo'
+ ref←∆GetRefToTatin
+ ref.CommTools.AddAutomation'Select' 'SelectLoadFolderForLoadDependencies@'(parms2.folder,'/','MyPackages')
+ ref.CommTools.AddAutomation'Select' 'SelectProjectForLoadDependencies@' '#.TEMP.Foo'
  (rc msg)←2↑stop ∆UCMD'LoadDependencies'
  →T.GoToTidyUp 0≠rc
  →T.GoToTidyUp 0<≢msg
@@ -46,8 +47,10 @@
  R←T._OK
 
 ∆TidyUp:
+ ref.CommTools.Cleanup
  noOf←0 ⎕SE.Cider.CloseProject #.TEMP.Foo
  'Unable to close #.TEMP.Foo?!'Assert 1=noOf
+ #._tatin.(⎕EX ⎕NL⍳16)
  (rc msg)←F.RmDirByForce tempDir
  msg Assert rc=0
 ⍝Done

@@ -1,4 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);forceClose;isUCMD;identifier_;alias;identifier;targetFolder_;packageID;cfg;ucScriptName;qdmx
+r←{noBetas}InstallPackages(identifiers targetFolder);forceClose;isUCMD;identifier_;alias;identifier;targetFolder_;packageID;cfg;ucScriptName;qdmx
 ⍝ Install package(s) `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
 ⍝ Multiple packages must be separated by commas.
@@ -61,7 +61,8 @@
          :If ∧/~'\/'∊identifier
          :AndIf '.zip'≢⎕C ¯4↑identifier
              :If ~∨/'/\:'∊identifier
-                 identifier←(Reg.RemoveVersionNumber 2⊃EstablishRegistry packageID),(≢Reg.RemoveVersionNumber packageID)↓packageID
+                  ⍝TODO⍝  ⍝TODO⍝  ⍝TODO⍝ identifier←(Reg.RemoveVersionNumber 2⊃EstablishRegistry packageID),(≢Reg.RemoveVersionNumber packageID)↓packageID
+                 identifier←(Reg.RemoveVersionNumber{(1⊃⍵),⍺⍺ 2⊃⍵}EstablishRegistry packageID),(≢Reg.RemoveVersionNumber packageID)↓packageID
                  :If 0=≢(-≢packageID)↓identifier
                      :Continue
                  :EndIf

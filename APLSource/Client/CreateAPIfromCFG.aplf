@@ -36,8 +36,14 @@
      targetNamespace←(⍕refTosourceNS),'.',cfg.api
      :If 9=⎕NC targetNamespace
      :AndIf 0<≢(⍎targetNamespace).⎕NL⍳16
-         res←⎕SE.Link.Expunge targetNamespace
-         ⎕DL 1
+         :If 0
+         ⍝ Not always working properly. See <02139> among others:
+             res←⎕SE.Link.Expunge targetNamespace
+         :Else
+             res←{⎕SE.Link.Expunge ⍵}¨(⊂targetNamespace,'.'),¨↓(⍎targetNamespace).⎕NL 2 3 4
+             ⎕EX targetNamespace
+         :EndIf
+         ⎕DL 0.05
      :EndIf
      Tref←⍎targetNamespace ⎕NS''
      b←{1='.'+.=⍵}¨names

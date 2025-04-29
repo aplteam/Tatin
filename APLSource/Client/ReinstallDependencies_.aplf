@@ -1,4 +1,4 @@
-r←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;quiet;tempDir;forceClose;p;i;pkg;msg;ref;qdmx;major
+ r←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;quiet;tempDir;forceClose;p;i;pkg;msg;ref;qdmx;major
 ⍝ Re-installs all packages listed by `deps`, including any dependencies.\\
 ⍝ In case `dry` is 1 it reports to the session what it _would_ do.\\
 ⍝ All work is done in a temp folder. Without -dry that temp folder will eventually replace the install folder.
@@ -17,7 +17,7 @@ r←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;qui
  tempDir ⎕NCOPY installFolder,'/',Reg.DependenciesFilename                  ⍝ Copy the dependency file
  :If major
  :AndIf RemoveAllVersionNumbersIn tempDir,'/',Reg.DependenciesFilename
-     deps←⊃⎕NGET (tempDir,'/',Reg.DependenciesFilename) 1                   ⍝ Read again because we have change the file
+     deps←⊃⎕NGET(tempDir,'/',Reg.DependenciesFilename)1                   ⍝ Read again because we have change the file
  :EndIf
  tempDir{0=≢⍵:shy←⍬ ⋄ ⍺∘{⍺ ⎕NCOPY ⍵}¨⍵}F.ListFiles installFolder,'/*.zip'   ⍝ Copy any ZIP files (packages): they take precedence
  forceClose←1 EstablishRumbaClients ⍬
@@ -36,7 +36,7 @@ r←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;qui
      :Else
          qdmx←⎕DMX
          :Trap 0 ⋄ F.RmDir tempDir ⋄ :EndTrap
-         ('Package ',pkg,' in ',registry,' caused a problem: ',qdmx.EM)Assert 1=≢'Package <[^>].*> not found in any of these Registries:'⎕S 0⊣qdmx.EM
+         qdmx.EM Assert 0
      :EndTrap
      p(⊂'Installed',(dry/' (dry)'),': '),ref
      r,←⊆ref

@@ -1,4 +1,4 @@
- r←{recursive}ReInstallDependencies_(installFolder parms registry);cfg;subFolders;ind;deps;qdmx
+  r←{recursive}ReInstallDependencies_(installFolder parms registry);cfg;subFolders;ind;deps;qdmx
  r←''
  recursive←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'recursive'
  installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
@@ -39,9 +39,5 @@
          qdmx←⎕DMX
          ⎕SIGNAL/CheckForInvalidVersion qdmx
      :EndTrap
-     :If recursive
-         r{0=≢⍺:⍵ ⋄ 1<≡⍵:⍺,⊃,/(⎕UCS 13),¨⍵ ⋄ ⍺,(⎕UCS 13),⍵}←(⊂'Re-installed in ',(2⊃⎕NPARTS installFolder),':'),' ',¨⊆r
-     :Else
-         r{0=≢⍺:⍵ ⋄ 1<≡⍵:⍺,⊃,/(⎕UCS 13),¨⍵ ⋄ ⍺,(⎕UCS 13),⍵}←(⊂'Re-installed in ',installFolder,':'),' ',¨⊆r
-     :EndIf
+     r←('Re-installed in ',installFolder,':'){0=≢⍵:⍵ ⋄ ⍺,⊃,/(⎕UCS 13),⍵}r
  :EndIf

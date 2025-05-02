@@ -1,0 +1,22 @@
+ WriteToLogFile parms;fns;parent
+ :If 0≠≢parms.logFunction
+     :Trap (parms.trapInternalErrors)/0
+         :If '.'∊parms.logFunction
+             fns←⍎parms.logFunction
+         :Else
+             :If ⍬≢parms.logFunctionParent
+                 fns←parms.logFunctionParent⍎parms.logFunction
+             :Else
+                 'Cannot find the log function'⎕SIGNAL 6
+             :EndIf
+         :EndIf
+         fns'*** Error'
+         fns'Error number=',⍕parms.LastErrorNumber
+         fns parms.LastError
+         :If 0≠≢parms.addToMsg
+             fns parms.addToMsg
+         :EndIf
+     :Else
+          ⍝ Useful to realize in the tracer that something went wrong
+     :EndTrap
+ :EndIf

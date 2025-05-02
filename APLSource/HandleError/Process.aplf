@@ -1,0 +1,58 @@
+ {r}←{signal}Process parms;crash;TRAP;⎕IO;⎕ML;⎕TRAP;filename;qdmx
+⍝ `⎕OFF`s in runtime or if `enforceOff` is 1 but executes `→` otherwise.\\
+⍝ In case you need to save the name of the error WS you must specify a parameter space. `HandleError` will
+⍝ inject a variable `∆ERROR_WS` into the parameter space.\\
+⍝ All actions `Process` will execute are performed under error trapping, so it should never fail.\\
+⍝ `signal`: if specified this overwrites `parms.signal`; this is for test cases only.
+ r←⍬
+ :Hold 'HandleError.Process'
+     ⎕IO←1 ⋄ ⎕ML←1
+     qdmx←⎕DMX
+     TRAP←⎕TRAP                                    ⍝ Remember old setting (for reporting)
+     ⎕TRAP←(0 1000)'C' '→∆End'                     ⍝ Make sure that it does not crash itself
+     parms←⍎⍣((0≠≢parms)∧(⎕DR parms)∊320 160 80 82)⊣parms     ⍝ Convert name into reference
+     :If 9≠⎕NC'parms'
+     :OrIf 0=≢parms
+         parms←CreateParms
+     :EndIf
+     :If 0<⎕NC'signal'
+         parms.signal←signal
+     :EndIf
+     parms.(LastError LastErrorNumber)←qdmx.(DM EN)
+     parms.(EN ENX EM Message)←qdmx.(EN ENX EM Message)
+     CheckErrorFolder parms
+     crash←CreateCrashNamespace parms TRAP
+     filename←CreateFilename parms.errorFolder
+     parms.∆ERROR_WS←filename
+     parms.crashFilename←filename
+     {}{0 ⎕TKILL ⍵}⍣parms.killThreads⊣⎕TNUMS~⎕TID   ⍝ Try to kill all threads but itself and the main thread
+     :Trap 0
+         WriteHtmlFile parms crash filename
+     :EndTrap
+     :Trap 0
+         WriteToLogFile parms
+     :EndTrap
+     ⎕DL 0.2
+     :Trap 0
+         crash←SaveErrorWorkspace filename parms crash
+     :Else
+         crash←⎕NS''
+     :EndTrap
+     SaveCrash filename crash parms
+     WriteToWindowsEvents parms
+     ExecuteCustomFns parms
+     :If 0≠parms.signal
+         ⎕SIGNAL parms.signal
+     :ElseIf parms.off
+         :If APLTreeUtils2.IsDevelopment∧0=parms.enforceOff
+             PrintErrorToSession 1⊃parms.LastError
+         :Else
+             ⎕OFF parms.returnCode
+         :EndIf
+     :Else
+         :If APLTreeUtils2.IsDevelopment∧0=parms.enforceOff
+             PrintErrorToSession 1⊃parms.LastError
+         :EndIf
+     :EndIf
+∆End:⎕TRAP←TRAP
+ :EndHold

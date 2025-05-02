@@ -1,4 +1,4 @@
- r←{x}ListFiles path;buff;recursiveFlag;part1;part2;recursive;depth
+r←{x}ListFiles path;buff;recursiveFlag;part1;part2;recursive;depth
 ⍝ Lists all files (but nothing else) in `path`.\\
 ⍝ `path` must of course be a directory.
 ⍝ Pass "recursive" (not case sensitive) as ⍺ to make the function work recursively.\\
@@ -8,7 +8,8 @@
 ⍝ `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs` cannot deal with files
 ⍝ that contain a `*` or a `?` as part of any name, be it directory or filename; under Linux and Mac OS
 ⍝ these are legal characters for filenames and directory names.\\
-⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.
+⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.\\
+⍝ ATTENTION: this function is now deprecated,use ListFiles2 instead, but be aware of the differences!
  x←{0<⎕NC ⍵:⍎⍵ ⋄ ''⍬}'x'
  x←⊂∘,⍣((⊃' '=1↑0⍴↑x)∧1=≡x)⊣x
  (recursive depth)←2↑x,(≢x)↓0 ⍬

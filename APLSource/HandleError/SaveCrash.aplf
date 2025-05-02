@@ -1,0 +1,13 @@
+ {r}←SaveCrash(filename crash parms);tno;qdmx
+ :If parms.saveCrash
+     :Trap (parms.trapInternalErrors)/0
+         tno←filename ⎕FCREATE 0
+         crash ⎕FAPPEND tno  ⍝ Might fail with a WS FULL
+     :Else
+         :Trap 0
+             qdmx←⎕DMX
+             qdmx.DM ⎕FAPPEND tno
+         :EndTrap
+     :EndTrap
+     :Trap 0 ⋄ ⎕FUNTIE tno ⋄ :EndTrap
+ :EndIf

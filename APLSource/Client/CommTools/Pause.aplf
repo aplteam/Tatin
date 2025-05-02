@@ -1,26 +1,33 @@
- {flag}←{lineFlag}Pause msg;input;alias;ind
- ⍝ Prints `msg` to he session and tells the user that she must press <enter> if she wants to continue.
+ {flag}←{lineFlag}Pause msg;input;alias;ind;bool;NoPause
+ ⍝ Prints `msg` to the session and tells the user that she must press <enter> if she wants to continue.
  ⍝ By entering "`∘∘∘`" the user may interrupt `Pause`: this activates a stop.\\
  ⍝ The optional left argument `lineFlag` defaults to 0. If it's 1 then a line is printed. The length
  ⍝ is defined by `⎕PW-1`.\\
  ⍝ You can prevent `Pause` from displaying the message and requiring the user to press <enter>,
- ⍝ refer to the documentation with ]ADoc CommTools\\
- ⍝ The function will return 1 in case it did present the message and stopped, and 0 otherwise.
+ ⍝ refer to the documentation with ]ADoc CommTools, catchword "Automation"\\
+ ⍝ The function will return 1 in case it did present the message and stopped, and 0 otherwise (when
+ ⍝ automation prevented that).
  lineFlag←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'lineFlag'
  msg←⊃LF{⍺,⍺⍺,⍵}/⊆msg
  msg←ReplaceCRbyLF msg
  flag←1
- :If AliasChar∊msg
-     :If 0<⎕NC'NoPause'
-         (alias msg)←{l←⍵⍳AliasChar ⋄ (l↑⍵)(l↓⍵)}msg
-         flag←~∨/({⍵↑⍨⍵⍳AliasChar}¨⊆NoPause)≡¨⊂alias
-     :EndIf
- :Else
-     :If 0<⎕NC'NoPause'
-         :If NoPause≡1
-         :OrIf ∨/(⊆NoPause)∊⊆msg
-         :OrIf ∨/(NoPause/⍨~AliasChar∊¨NoPause){⍺≡¨(≢¨⍺)↑¨(≢⍺)⍴⊂⍵}{⍵↑⍨¯1+⍵⍳LF}msg
-             flag←0
+ :If 0<⎕NC'∆Automation'
+ :AndIf 0<≢∆Automation
+     NoPause←(∆Automation[;1]≡¨⊂'Pause')⌿∆Automation[;2 3]
+     :If (,'*')≡,NoPause[;1]
+         flag←0
+         'Pause'Log'*'
+     :Else
+         :If AliasChar∊msg
+             (alias msg)←{l←⍵⍳AliasChar ⋄ (l↑⍵)(l↓⍵)}msg
+             :If 0=flag←~∨/({⍵↑⍨⍵⍳'@'}¨NoPause[;1])≡¨⊂alias
+                 'Pause'Log alias
+             :EndIf
+         :Else
+             :If ∨/bool←NoPause[;1]≡¨⊂msg
+                 flag←0
+                 'Pause'Log msg
+             :EndIf
          :EndIf
      :EndIf
  :EndIf

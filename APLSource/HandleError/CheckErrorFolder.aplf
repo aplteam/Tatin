@@ -1,0 +1,27 @@
+ {r}←CheckErrorFolder parms;buff;wsid
+ r←⍬
+ :If 0=≢parms.errorFolder
+     :If 0=≢wsid←⎕WSID
+         ⎕WSID←'Error-WS'
+     :EndIf
+     :If 0=≢buff←2⊃⎕NPARTS wsid
+         buff←2⊃⎕NPARTS{'"'∊⍵:1↓⍵/⍨1=+\'"'=⍵ ⋄ ⍵↑⍨¯1+⍵⍳' '}2 ⎕NQ'#' 'GetCommandLine' ⍝ Probably a stand-alone EXE
+     :EndIf
+     :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+         parms.errorFolder←(⊃⎕CMD'ECHO %LOCALAPPDATA%'),'/',buff,'\Errors'
+     :Else
+         parms.errorFolder←FilesAndDirs.PWD,'/Errors'
+     :EndIf
+ :EndIf
+ parms.errorFolder←{(-(¯1↑⍵)∊'/\')↓⍵}FilesAndDirs.NormalizePath parms.errorFolder
+ :If 0=+/'/\'∊parms.errorFolder
+     parms.errorFolder←FilesAndDirs.NormalizePath FilesAndDirs.PWD,'/',parms.errorFolder
+ :EndIf
+ :If 0=⎕NEXISTS parms.errorFolder
+ :AndIf parms.checkErrorFolder
+     :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+         FilesAndDirs.MkDir parms.errorFolder
+     :Else
+         ⎕SH'mkdir -p "',parms.errorFolder,'"'
+     :EndIf
+ :EndIf

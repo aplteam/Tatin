@@ -1,0 +1,58 @@
+ r←{parms_}ListFiles2 path;buff;part1;part2;parms;options
+⍝ Lists all files (but nothing else) in `path`.\\
+⍝ `path` must of course be a directory.
+⍝ You can pass a namespace with parameters `recurse' (default: 0) and `depth (default: 0) set.
+⍝ See the `⎕NINFO` documentation for details on these parameters.\\
+⍝ Alternatively you can specify these as key-values pairs like this:
+⍝ ```
+⍝ ('recurse' 1) FilesAndDirs.ListFiles2 path
+⍝ ```\\
+⍝ `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs` cannot deal with files
+⍝ that contain a `*` or a `?` as part of any name, be it directory or filename; under Linux and Mac OS
+⍝ these are legal characters for filenames and directory names.\\
+⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.
+ 'parms'⎕NS''
+ parms.recurse←0
+ parms.depth←¯1
+ :If 0<⎕NC'parms_'
+     :If {(0=≡⍵)∧326=⎕DR ⍵}parms_
+         :If 0<≢parms_.⎕NL 2
+             'parms'⎕NS(⊂'parms_.'),¨↓parms_.⎕NL 2
+         :EndIf
+     :Else
+         :If {2::0 ⋄ 1⊣⍵.⎕NL 2}parms_
+             {}parms.{{⍎⍺,'←⍵'}/⍵}¨parms_.({⍵(⍎⍵)}¨↓⎕NL 2)
+             'Invalid parameter'⎕SIGNAL 11/⍨∨/~(' '~¨⍨↓parms.⎕NL 2)∊'recursive' 'depth'
+         :Else
+             parms_←,⊂∘,⍣(2=|≡parms_)⊣parms_
+             'Invalid parameter'⎕SIGNAL 11/⍨0∊(⊃¨parms_)∊' '~¨⍨↓parms.⎕NL 2
+             parms.{{⍎⍺,'←⍵'}/⍵}¨parms_
+         :EndIf
+     :EndIf
+ :EndIf
+ :If ∧/~'?*'∊1⊃⎕NPARTS path
+     path←AddTrailingSep path
+ :EndIf
+ path←NormalizePath path
+ (part1 part2)←APLTreeUtils2.SplitPath path
+ 'Wildcard characters are allowed only in the last part of a path'⎕SIGNAL 11/⍨∨/'?*'∊part1
+ 'Right argument is not a directory'⎕SIGNAL 11/⍨0=IsDir part1
+ path↓⍨←-CurrentSep=¯1↑path
+ :If ~∨/'?*'∊path
+     path,←CurrentSep,'*'
+ :EndIf
+ options←('Wildcard' 1)('Follow' 1)
+ :If 0≠parms.recurse
+     :If ¯1=parms.depth
+         options,←⊂'Recurse'parms.recurse
+     :Else
+         options,←⊂'Recurse'(parms.(recurse,depth))
+     :EndIf
+ :EndIf
+ buff←(0 1)⎕NINFO⍠options⊣path
+ :If 0=≢buff
+     r←''
+ :Else
+     r←(2=1⊃buff)/0⊃buff
+     r←NormalizePath r
+ :EndIf

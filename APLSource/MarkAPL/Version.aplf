@@ -1,3 +1,12 @@
- r←Version
+r←Version
+⍝ Returns the version number from `TatinVars` if possible.
 ⍝ See also `History`
- r←'MarkAPL' '13.1.0+327' '2024-09-26'
+ :If 0<⎕NC'TatinVars.CONFIG'
+     r←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
+ :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
+     r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+ :Else
+⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+⍝ In such cases we cannot provide a version number, so we return just ''.
+     r←''
+ :EndIf

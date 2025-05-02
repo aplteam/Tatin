@@ -1,6 +1,5 @@
- r←Test_Load_021(stopFlag batchFlag);⎕TRAP;res;noOfRefs;qdmx;pkgs;expected
-⍝ Exercise ⎕SE.Tatin.LoadPackages on three packages without a particular Registry with the third one non-existent
-⍝ Therefore only the first and the second one will get loaded.
+ r←Test_Load_021(stopFlag batchFlag);⎕TRAP;noOfRefs;qdmx;pkgs
+⍝ Exercise ⎕SE.Tatin.LoadPackages on three packages without a particular Registry with the third one non-existent; results in a crash
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -9,12 +8,13 @@
 
  pkgs←'aplteam-APLTreeUtils-6.0.10,aplteam-CompareSimple-3.0.2,does-notExist-1.2.1'
 
- res←1 TC.LoadPackages pkgs'#.TEMP'
-
- →T.PassesIf 2=res
- →T.PassesIf 2=≢#.TEMP.⎕NL⍳16
- expected←'#._tatin.aplteam_APLTreeUtils_6_0_10.APLTreeUtils' '#._tatin.aplteam_CompareSimple_3_0_2.CompareSimple'
- →T.PassesIf expected≡⍕¨#.TEMP.{⍎¨⎕NL ⍵}¯9
+ :Trap 998
+     {}1 TC.LoadPackages pkgs'#.TEMP'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     T.PassesIf∨/'>>> does-notExist-1.2.1 not found anywhere'⍷∊qdmx.EM
+ :EndTrap
 
  r←T._OK
 ⍝Done

@@ -1,0 +1,54 @@
+ html←AssembleHTML(parms crash)
+ html←'<!DOCTYPE html>',CR
+ html,←'<html lang="en">',CR
+ html,←'<head>',CR
+ html,←'  <meta charset="utf-8">',CR
+ html,←'  <title>',('/'APLTreeUtils2.Last filename),'</title>',CR
+ html,←'  <style media="screen" type="text/css">',CR
+ html,←'    pre {',CR
+ html,←'   font-family: "APL385 Unicode"; font-size: 14px;',CR
+ html,←'   }',CR
+ html,←'   h1 {',CR
+ html,←'   font-family: "Courier New";',CR
+ html,←'   }',CR
+ html,←'   table#apl {',CR
+ html,←'   font-family: "APL385 Unicode"; font-size: 14px;',CR
+ html,←'   }',CR
+ html,←'  </style>',CR
+ html,←'</head>',CR
+ html,←'<body>',CR
+ html,←'  <h1>',('/'APLTreeUtils2.Last filename),'</h1>',CR
+ html,←'  <table id="apl">'
+ html,←'  Version'MarkupAsTableRow⍕'#'⎕WG'APLVersion'
+ html,←'  ⎕WSID'MarkupAsTableRow⍕{'/'APLTreeUtils2.Last ⍵ ⋄ ⍵}⍣('/'∊crash.WSID)⊣1↓' ',crash.WSID  ⍝ Enforce ⎕DR 80/82 with 1↓' ',
+ html,←'  ⎕IO'MarkupAsTableRow⍕⎕IO
+ html,←'  ⎕ML'MarkupAsTableRow⍕⎕ML
+ html,←'  ⎕WA'MarkupAsTableRow⍕⎕WA
+ html,←'  ⎕TNUMS'MarkupAsTableRow{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⍕¨⍵}⎕TNUMS
+ html,←'  Category'MarkupAsTableRow crash.Category
+ html,←'  EM'MarkupAsTableRow crash.EM
+ html,←'  HelpURL'MarkupAsTableRow crash.HelpURL
+ html,←'  EN'MarkupAsTableRow⍕crash.EN
+ html,←'  ENX'MarkupAsTableRow⍕crash.ENX
+ html,←'  InternalLocation'MarkupAsTableRow⍕crash.InternalLocation
+ html,←'  OSError'MarkupAsTableRow⍕crash.OSError
+ html,←'  Current Dir'MarkupAsTableRow⍕crash.CurrentDir
+ html,←'  Command line'MarkupAsTableRow⍕crash.CommandLine
+ :If 0≠≢parms.addToMsg
+     html,←'  Added Msg'MarkupAsTableRow parms.addToMsg
+ :EndIf
+ html,←'  </table>'
+ html,←'<p><b>Stack:</b></p>',CR
+ :If 0≠≢crash.XSI
+     html,←'<pre>',(⊃,/CR,¨crash.XSI,¨{'[',(⍕⍵),']'}¨crash.LC),CR,'</pre>',CR
+ :EndIf
+ html,←'<p><b>Error Message:</b></p>',CR
+ :If 0≠≢crash.DM
+     html,←'<pre>',(ExchangeHtmlChars⊃,/CR,¨crash.DM),CR
+     :If 0<≢crash.Message
+         html,←crash.Message,CR
+     :EndIf
+     html,←'</pre>',CR
+ :EndIf
+ html,←'</body>',CR
+ html,←'</html>',CR

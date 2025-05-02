@@ -1,0 +1,95 @@
+ r←{parms_}Dir2 path;list;more;parms;rc;extension;filename;folder;subFolders;pattern;recurse;options;hasWildcard;qdmx
+⍝ By default this function returns a list with filenames and directory name.
+⍝ You may request further information by specifying `type`.\\
+⍝ Without a trailing slash and any wildcards, `path` is expected to be either a filename or the name of a directory.
+⍝ `Dir2` uses `⎕NINFO`'s `Recurse` option for much better performance but slightly different result.\\
+⍝ `path` might be empty; in this case it defaults to the current directory.\\
+⍝ `*` and `?` are treated as wildcard characters. That means that `Dir2` cannot deal with files
+⍝ that contain a `*` or a `?` as part of any name, be it directory or filename: under Linux and Mac OS
+⍝ these are legal characters for filenames and directory names.\\
+⍝ Note that a wildcard is evaluated on every step when traversing down a tree with recurse←1.
+⍝ That makes `Dir2` different from `Dir`.\\
+⍝ The result depends on whether a filename or directory name without a wildcard is specified as argument or not
+⍝ The result is a vector of the same length as `type`. `type` defaults to 0 which stands for filenames
+⍝ and directory names.\\
+⍝ You may specify parameters either as key/value pairs or via a namespace populated with variables.
+⍝ Examples:
+⍝ ~~~
+⍝ ('recurse' 2) FilesAndDirs.Dir2 ''      ⍝ returns list with dirs & files in the current dir.
+⍝ ('recurse' 2) FilesAndDirs.Dir2 '*.md'  ⍝ returns list with files with extension "md".
+⍝ ~~~
+⍝
+⍝ ~~~
+⍝ parms←⎕ns''
+⍝ parms.recurse←2
+⍝ parms.type←3 4 5 1 0
+⍝ parms FilesAndDirs.Dir2 ''
+⍝ ~~~
+⍝ Note that the names of parameters are case sensitive.\\
+⍝ |Parameter|Default|Meaning|
+⍝ |---------|-------|-------|
+⍝ | depth   | ¯1    | Ignored when `recurse` is 0.<<br>>Use this to restrict the number of times `Dir2` goes down the directory tree.<<br>>¯1 means search all levels of sub directories.<<br>>See `⎕NINFO`'s help on the second element of the `Recurse` options for details.|
+⍝ | follow  |  1    | 1=follow symbolic links, meaning that the properties shown are those of the file the link points to rather than the link. |
+⍝ | recurse |  0    | 1=scan `path` recursively; may crash with "ACCESS DENIED"; 2=like 1 but ignores directories/files that cause "ACCESS DENIED"|
+⍝ | type    |  0    | Use this to define the information to be returned by `Dir2`.<<br>>0 means "names" which is the defult. For more information see help on `⎕NINFO`. |
+ r←⍬
+ path←NormalizePath path
+ parms←⎕NS''
+ parms.follow←1
+ parms.recurse←0
+ parms.depth←¯1
+ parms.type←0
+ :If 0<⎕NC'parms_'
+     :If {(0=≡⍵)∧326=⎕DR ⍵}parms_
+         :If {2::0 ⋄ 1⊣⍵.⎕NL 2}parms_
+             {}parms.{{⍎⍺,'←⍵'}/⍵}¨parms_.({⍵(⍎⍵)}¨↓⎕NL 2)
+             'Invalid parameter'⎕SIGNAL 11/⍨∨/~(' '~¨⍨↓parms.⎕NL 2)∊'follow' 'recurse' 'type' 'depth'
+         :Else
+             parms_←,⊂∘,⍣(2=|≡parms_)⊣parms_
+             'Invalid parameter'⎕SIGNAL 11/⍨0∊(⊃¨parms_)∊(' '~¨⍨↓parms.⎕NL 2)
+             parms.{{⍎⍺,'←⍵'}/⍵}¨parms_
+         :EndIf
+     :Else
+         :If {2::0 ⋄ 1⊣⍵.⎕NL 2}parms_
+             {}parms.{{⍎⍺,'←⍵'}/⍵}¨parms_.({⍵(⍎⍵)}¨↓⎕NL 2)
+             'Invalid parameter'⎕SIGNAL 11/⍨∨/~(' '~¨⍨↓parms.⎕NL 2)∊'follow' 'recursive' 'type' 'recursiveCall' 'depth'
+         :Else
+             parms_←,⊂∘,⍣(2=|≡parms_)⊣parms_
+             'Invalid parameter'⎕SIGNAL 11/⍨0∊(⊃¨parms_)∊' '~¨⍨↓parms.⎕NL 2
+             parms.{{⍎⍺,'←⍵'}/⍵}¨parms_
+         :EndIf
+     :EndIf
+ :EndIf
+ :If 0=≢path ⋄ :OrIf (,'.')≡,path
+     path←PWD,CurrentSep
+ :EndIf
+ path,←(CurrentSep=¯1↑path)/'*'
+ recurse←0
+ :If hasWildcard←∨/'*?'∊path
+ :AndIf ∨/'\/'∊path
+     ('Wildcard characters are allowed only after the last "',CurrentSep,'"')⎕SIGNAL 11/⍨∨/'*?'∊{⍵↓⍨-≢CurrentSep APLTreeUtils2.Last ⍵}path
+ :EndIf
+ :If 0<parms.recurse
+     recurse←parms.recurse
+ :AndIf parms.depth≠¯1
+ :AndIf recurse≠0
+     recurse,←parms.depth
+ :EndIf
+ options←('Follow'parms.follow)('Wildcard'hasWildcard)('Recurse'recurse)
+ :Trap 19 22
+     r←(0 1,parms.type~0 1)⎕NINFO⍠options⊣path
+ :Case 19
+     qdmx←⎕DMX
+     qdmx.Message ⎕SIGNAL 19
+ :Case 22
+     qdmx←⎕DMX
+     qdmx.Message ⎕SIGNAL 6
+ :EndTrap
+ :If 0<≢r
+     (0⊃r)←NormalizePath 0⊃r
+ :EndIf
+ :If {(2=≡0⊃⍵)∧1<≢0⊃⍵}r
+     r←(⊂SORT_ALPH⍋↑0⊃r)∘⌷¨r
+ :EndIf
+ r←,r[,(0 1,parms.type~0 1)⍳parms.type]
+⍝Done

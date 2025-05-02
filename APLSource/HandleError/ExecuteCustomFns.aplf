@@ -1,0 +1,17 @@
+ ExecuteCustomFns parms;fns;parent
+ :If 0≠≢parms.customFns
+     :Trap (parms.trapInternalErrors)/0
+         :If '.'∊parms.customFns
+             fns←⍎parms.customFns
+         :Else
+             :If ⍬≢parms.customFnsParent
+                 fns←parms.customFnsParent⍎parms.customFns
+             :Else
+                 'Cannot find the custom function'⎕SIGNAL 6
+             :EndIf
+         :EndIf
+         fns parms
+     :Else
+        ⍝ Useful to realize in the tracer that something went wrong
+     :EndTrap
+ :EndIf

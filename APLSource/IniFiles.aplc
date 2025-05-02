@@ -15,11 +15,27 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'IniFiles' '5.1.0+23' '2022-11-30'
+    ⍝ Returns the version number from TatinVars.
+    ⍝ When a script is not loaded with Tatin, there will be no namespace `TatinVars`.
+    ⍝ In such cases we cannot provide a version number, so we return an empty char vector.
+      r←''
+      :If 0<⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
+      :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :EndIf
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 6.0.0 ⋄ 2025-04-03
+      ⍝   * Potentially breaking change: `Version` now returns a simple char vector with the valud coming from the package config file
+      ⍝   * Packages updated
+      ⍝   * `Make` improved
+      ⍝ * 5.2.0 ⋄ 2025-03-26
+      ⍝   * Package updated (APLTreeUtils2)
+      ⍝   * `Version` returns the version number from the package config file
+      ⍝   * Bug fix: version date corrected
       ⍝ * 5.1.0 ⋄ 2024-11-30
       ⍝   * 819⌶ removed for ⎕C in order to make IniFiles 20.0-ready
       ⍝   * Author information updated
@@ -27,7 +43,7 @@
       ⍝ * 5.0.3 ⋄ 2022-04-13
       ⍝   * `GetIniFiles` did not work under Linux/Mac-OS
       ⍝   * Now managed by Cider
-      ⍝ * 5.0.2 2021-03-04 20:35:52 
+      ⍝ * 5.0.2 2021-03-04 20:35:52
       ⍝   * Package config file corrected
       ⍝\\
       ⍝ For information regarding older versions see <https://github.com/aplteam/IniFiles/releases>

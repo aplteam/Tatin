@@ -22,13 +22,24 @@
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
+    ⍝ Returns the version number from `TatinVars` if possible.
     ⍝ See also `History`
       :Access Public Shared
-      r←'APLProcess' '0.7.0' '2023-09-26'    ⍝ Without Ride all fine, with Ride the Mac is still posing problems
+      :If 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+    ⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+    ⍝ In such cases we cannot provide a version number, so we return just ''.
+          r←''
+      :EndIf
     ∇
 
     ∇ r←History
       :Access Public Shared
+    ⍝ * 0.8.0 from 2024-04-22
+    ⍝   * Packages updated & test fixed (`Version`
+    ⍝ * 0.7.1 from 2024-04-28
+    ⍝   * Killed the process even with Wait←0, meaning that the process was not running independently.
     ⍝ * 0.7.0 from 2023-09-26
     ⍝   * Now APLProcess can use .NET or .NET Framework (former version only worked with .NET Framework)
     ⍝ * 0.6.0 from 2021-05-27
@@ -37,18 +48,6 @@
     ⍝   * A parameter space is now copied rather than modified
     ⍝   * Problems on Linux fixed
     ⍝   * Problems on Mac-OS fixed accept when you need a Ride
-    ⍝ * 0.5.1 from 2021-05-08
-    ⍝   * Bug fix: addressing APLTreeUtils2 did not always work
-    ⍝ * 0.5.0 from 2021-05-02
-    ⍝   * The method `Kill` has been renamed into `KillItself` and does not required a right argument anymore
-    ⍝   * `RideInit` removed as a parameter, `RidePort` introduced instead
-    ⍝   * `History` does return a result now
-    ⍝   * `APLProcess` depends on `OS` now
-    ⍝   * `KillAfter` removed - does not make much sense
-    ⍝ * 0.4.1 from 2021-01-29
-    ⍝   * Package config file corrected
-    ⍝ * 0.4.0 from 2021-01-29
-    ⍝   * Fully transformed into a Tatin package
       r←↑{⍵↓⍨+/∧\∧⌿(↑⍵)=' '}{⍵↓⍨⍵⍳'⍝'}¨{⍵/⍨'⍝'=⊃¨⍵}{⍵↓⍨+/∧\(↑⍵)=' '}¨1↓⎕NR⊃⎕SI Proc
     ∇
 
@@ -140,7 +139,14 @@
           parmSpace.CommandLineArgs←1↓⊃,/' ',¨buff
       :EndIf
       'Invalid window style'Assert(⊂parmSpace.WindowsStyle)∊'Hidden' 'Maximized' 'Minimized' 'Normal'
+      :If 0<≢parmSpace.Exe
+          ('The specified EXE cannot be found: ',parmSpace.Exe)Assert ⎕NEXISTS parmSpace.Exe
+      :EndIf
       (RidePort OUT_FILE WorkspaceName Args _Wait)←parmSpace.(RidePort OutputFilename WorkspaceName CommandLineArgs Wait)
+      WorkspaceName~←'"'
+      :If 0<≢WorkspaceName
+          ('The specified workspace cannot be found: ',WorkspaceName)Assert ⎕NEXISTS WorkspaceName
+      :EndIf
       PATH←SourcePath
       Start parmSpace
     ∇
@@ -184,6 +190,7 @@
           cmd←ps.Exe
      
           ⎕USING←UsingSystemDiagnostics
+          ⍝⎕USING←'System' 'System.IO' 'System.Diagnostics,System.Diagnostics.Process'
           psi←⎕NEW Diagnostics.ProcessStartInfo,⊂ps.Exe(({0=≢⍵:⍵ ⋄ '"',(⍵~'"'),'" '}ps.WorkspaceName),args)
           psi.WindowStyle←Diagnostics.ProcessWindowStyle.⍎ps.WindowsStyle
           Proc←Diagnostics.Process.Start psi

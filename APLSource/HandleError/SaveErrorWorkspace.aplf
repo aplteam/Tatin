@@ -1,0 +1,15 @@
+ {crash}←SaveErrorWorkspace(filename parms crash);wsid;lx
+ :If parms.saveErrorWS
+     wsid←⎕WSID
+     ⎕WSID←filename
+     lx←⎕LX
+     ⎕LX←'⎕TRAP←0 ''S'' ⍝',⎕LX
+     :Trap parms.trapSaveWSID/0
+         ⎕SAVE ⎕WSID
+     :Else
+         crash.SaveFailed←qdmx.Message
+     :EndTrap
+     ⎕WSID←wsid       ⍝ Potentially important (for example when running test cases)
+     ⎕LX←lx
+ :EndIf
+∆End:

@@ -1,0 +1,25 @@
+ r←{force}SetTrap parameterSpaceName;⎕TRAP;⎕ML;⎕IO;calledFrom
+⍝ Returns a vector useful to set `⎕TRAP`.
+⍝ It behaves differently depending on whether it's a development session or not.\\
+⍝ The right argument can be either an empty vector or the **name** of a parameter space - **not** a reference!\\
+⍝ The left argument defaults to 0. Setting this to 1 enforces error
+⍝ trapping even under a development exe. Useful for test cases.
+ ⎕TRAP←0⍴⎕TRAP
+ ⎕IO←1 ⋄ ⎕ML←0
+ force←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'force'
+ r←(0 1000)'S'
+ calledFrom←{⌽{⍵/⍨2≤+\'.'=⍵}⌽⍵}1⊃⎕XSI
+ :If 0≠≢parameterSpaceName
+     :If 1≠≡,parameterSpaceName
+     :OrIf ~(⎕DR parameterSpaceName)∊80 82 160
+         'Invalid right argument: must be a name'⎕SIGNAL 11
+     :EndIf
+ :EndIf
+ :If 0=≢parameterSpaceName  ⍝ At a very early stage error trapping does not make sense
+ :AndIf (0=APLTreeUtils2.IsDevelopment)∨force
+     r←⊂0 'E'(calledFrom,'HandleError.Process ⍬')
+ :Else
+     :If (0=APLTreeUtils2.IsDevelopment)∨force
+         r←⊂0 'E'(calledFrom,'HandleError.Process ''',parameterSpaceName,'''')
+     :EndIf
+ :EndIf

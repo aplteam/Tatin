@@ -22,18 +22,34 @@
     ∆INIT←0
 
     ∇ r←Version
+    ⍝ Returns the version number from `TatinVars` if possible.
+    ⍝ See also `History`
       :Access Public Shared
-      r←'DotNetZip' '2.3.1+67' '2024-11-15'
+      :If 0<⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
+      :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+    ⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+    ⍝ In such cases we cannot provide a version number, so we return just ''.
+          r←''
+      :EndIf
     ∇
 
     ∇ History
-      :Access Public Shared  
+      :Access Public Shared
+    ⍝ * 3.0.1 from 2025-04-04
+    ⍝   * Bug fix on non-Windows platforms: With the `Add` function, when a non-empty left argument
+    ⍝     and a right argument with a leading '/' was specified it did not work.
+    ⍝ * 3.0.0 from 2025-04-03
+    ⍝   * Potentially breaking change: version now return a char vector from the package config file
+    ⍝   * Packages updated
     ⍝ * 2.3.1 from 2024-11-15
-    ⍝   * Packages updated 
+    ⍝   * Packages updated
     ⍝ * 2.3.0 from 2024-11-15
     ⍝   * `make` could run into "File is in use by another process" which appears to be caused by
-    ⍝     `DotNetZip` itself, though only on very fast machines. 
-    ⍝     This version is more resilient towards this.      
+    ⍝     `DotNetZip` itself, though only on very fast machines.
+    ⍝     This version is more resilient towards this.
     ⍝ * 2.2.0 from 2024-06-26
     ⍝   * On very fast machines this could run into
     ⍝     "The process cannot access the file ... because it is being used by another process"
@@ -184,7 +200,7 @@
       parent←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'parent'
       parent←F.EnforceSlash{0=≢⍵:⍵ ⋄ ⍵,(~'/\'∊⍨¯1↑⍵)/F.CurrentSep}parent
       :If (≡toBeZipped)∊0 1
-          toBeZipped←{⍵↓⍨'/\'∊⍨1⍴⍵}toBeZipped
+          toBeZipped←{⍵↓⍨'/\'∊⍨1⍴⍵}⍣(⊃0<≢parent)⊢toBeZipped
           toBeZipped←F.EnforceSlash toBeZipped
           :If F.IsDir parent,toBeZipped
               :If 0<≢list←⊃('recursive' 1)F.Dir parent,toBeZipped,'/*'
@@ -197,7 +213,7 @@
               parent Add_ toBeZipped
           :EndIf
       :Else
-          toBeZipped←{⍵↓⍨'/\'∊⍨1⍴⍵}¨toBeZipped
+          toBeZipped←parent∘{0=≢⍺:⍵ ⋄ ⍵↓⍨'/\'∊⍨1⍴⍵}¨toBeZipped
           toBeZipped←F.EnforceSlash¨toBeZipped
           isDir←F.IsDir parent∘,¨toBeZipped
           :If ∨/~isDir
@@ -373,7 +389,6 @@
 
     ∇ {r}←Initialize dummy;notwindows;netcoreset
       r←⍬
-      CheckMinVersion ⍬
       :If 0=∆INIT
           F←(⊃⊃⎕CLASS ⎕THIS).##.FilesAndDirs
           notwindows←'Win'≢3↑⊃# ⎕WG'APLVersion'

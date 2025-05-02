@@ -19,27 +19,39 @@
 
     ⎕IO←1 ⋄ ⎕ML←1
 
-    ∇ r←Version
-    ⍝ Returns the version number from TatinVars (if we can)
+
+    ∇ r←Version;ref
+      :Access Public shared
+    ⍝ Returns the version number from `TatinVars` if possible.
     ⍝ See also `History`
-      r←''
       :If 0<⎕NC'TatinVars.CONFIG'
           r←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
       :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
           r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
       :Else
-    ⍝ When a script is not loaded with Tatin, there will be no namespace `TatinVars`
-    ⍝ In such cases we cannot provide a version number, so we return an empty char vector
-          r←'Tester2' '' ''
+    ⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+    ⍝ In such cases we cannot provide a version number, so we return just ''.
+          :If '#.Tester2.TestCases.'{⍺≡(≢⍺)↑⍵}⍕⎕THIS
+              ⍝ Runs in its own testcases, and therefore won't find the correct function without help
+              ref←⊃⊃⎕CLASS ⎕THIS
+              r←ref.Version
+          :Else
+              r←''
+          :EndIf
       :EndIf
-    ⍝Done
     ∇
 
     ∇ r←History
-      :Access Public shared  
-      ⍝ * 3.11.1 ⋄ 2024-12-29
-      ⍝   Bug fix in `Version`: if for some strange reason it cannot find `TatinVars` it 
-      ⍝   should return an empty vector rather than crashing. 
+      :Access Public shared
+      ⍝ * 4.0.0 ⋄ 2025-04-03
+      ⍝   * Potenially breaking change: `Version` now returns the package config version number as a char vector
+      ⍝   * Packages updated
+      ⍝   * `Make` improved
+      ⍝ * 3.11.1 ⋄ 2024-12-30
+      ⍝   Bug fixes
+      ⍝   * In `Version`: if for some reason it cannot find `TatinVars` it should return
+      ⍝     an empty vector for the version number rather than crashing.
+      ⍝   * Reports were intended to honour ⎕PW but got one char too long
       ⍝ * 3.11.0 ⋄ 2024-12-25
       ⍝   * `ListTestFunctions` enhanced
       ⍝   * `Version` extracts the version number now from the package config file
@@ -485,7 +497,7 @@
       :If ps.guiFlag
           _parms.ref2Gui←ps.ref2Gui←ps CreateGui ⍬
       :EndIf
-      ShowLog{'--- Test framework "Tester2" version ',(2⊃⍵),' from ',(3⊃⍵),' ----'}Version
+      ShowLog{'--- Test framework "Tester2" version ',⍵,' ----'}Version
       _ref←ProcessIniFiles _ref ps
       ps.returnCodes←⍬
       initialFlag←0 ⍝ Tells whether `Initial was executed or not
@@ -801,7 +813,7 @@
     ∇ ProcessTestCases(ref ps);cw;max;noOf;length2;length;i;testFns;currentGroup;testNo;continueFlag;rc;comment;desc;marker
       cw←≢max←⍕noOf←≢ps.list
       length←2+⌈/≢¨ps.list
-      length2←length+≢'(',max,'/',max,')  '
+      length2←¯1+length+≢'(',max,'/',max,')  '
       :If ps.guiFlag
           :If 0<≢ps.list
               ps.ref2Gui.∆n.Grid.Values←(noOf,1↓⍴ps.ref2Gui.∆n.Grid.Values)⍴ps.ref2Gui.∆n.Grid.Values
@@ -854,7 +866,8 @@
               :EndIf
               ps AddReturnCodeToGrid rc i
               comment←2↓ref GetFirstCommentLine testFns
-              desc←(⎕PW-length2){⍺<≢⍵:'...',⍨⍵↑⍨⍺-4 ⋄ ⍵}⍣(~ps.guiFlag)⊢comment
+               ⍝TODO⍝ desc←(⎕PW-length2){⍺<≢⍵:'...',⍨⍵↑⍨⍺-4 ⋄ ⍵}⍣(~ps.guiFlag)⊢comment
+              desc←⊢comment
               :If rc∊0 1
                   marker←('*✓'[1+rc=0])
               :Else
@@ -880,7 +893,8 @@
               ps.errCounter+←1
               ps.totalCounter+←1
               comment←2↓ref GetFirstCommentLine testFns
-              desc←(⎕PW-length2){⍺<≢⍵:'...',⍨⍵↑⍨⍺-4 ⋄ ⍵}⍣(~ps.guiFlag)⊢comment
+               ⍝TODO⍝ desc←(⎕PW-length2){⍺<≢⍵:'...',⍨⍵↑⍨⍺-4 ⋄ ⍵}⍣(~ps.guiFlag)⊢comment
+              desc←⊢comment
               marker←'#'
               ¯2 ShowLog marker' ',desc
               i AddToGui(length2↑(length↑marker,' ',testFns),' (',(cw 0⍕i),'/',max,')'),' ⍝ ',desc
@@ -1302,6 +1316,9 @@
           :If 0<ref.⎕NC'stopFlag'
           :AndIf 0=ref.⎕NC'debugFlag'
               flag2←ref.stopFlag
+          :ElseIf 0<ref.⎕NC'stop'
+          :AndIf 0=ref.⎕NC'debugFlag'
+              flag2←ref.stop
           :Else
               flag2←ref.debugFlag
           :EndIf
@@ -1325,6 +1342,9 @@
       :If 0<ref.⎕NC'stopFlag'
       :AndIf 0=ref.⎕NC'debugFlag'
           flag2←ref.stopFlag
+      :ElseIf 0<ref.⎕NC'stop'
+      :AndIf 0=ref.⎕NC'debugFlag'
+          flag2←ref.stop
       :Else
           flag2←ref.debugFlag
       :EndIf

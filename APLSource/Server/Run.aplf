@@ -7,6 +7,14 @@
      testFlag←¯1     ⍝ Will be defined by the INI file but you may overwrite with 0 or 1
      iniFile←{0<⎕NC ⍵:⍎⍵ ⋄ './server.ini'}'iniFile'
 
+⍝ ----- Special handling because HandleError cannot be loaded as a package  ---
+     ##.HandleError.APLTreeUtils2←##.APLTreeUtils2
+     ##.HandleError.FilesAndDirs←##.FilesAndDirs
+     :If 0<##.⎕NC'WindowsEventLog'
+         ##.HandleError.WindowsEventLog←##.WindowsEventLog
+     :EndIf
+⍝ -----------------------------------------------------------------------------
+
      r←iniFile(##.Server.TatinAmendments ##.Plodder.Run)testFlag trapFlag   ⍝ <== Workhorse
 
      ⍝ Plodder.Run executes ⎕OFF in runtime or when the INI file says so,

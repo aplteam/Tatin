@@ -1,0 +1,10 @@
+ r←Test_GetBestVersion_002(stopFlag batchFlag);⎕TRAP;id
+⍝ Exercise GetBestVersion on <name>-<major>.<minor>
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ id←(≢∆TEMP_SERVER_FOLDER)↓##.Registry.GetBestVersionNumber ∆TEMP_SERVER_FOLDER,'APLGit-0.24'
+ →T.PassesIf id≡'aplteam-APLGit-0.24.5'
+
+ r←T._OK
+⍝Done

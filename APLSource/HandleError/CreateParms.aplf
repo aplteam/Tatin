@@ -1,0 +1,53 @@
+ r←CreateParms;rk;buf;⎕IO;⎕ML
+⍝ Returns a namespace with default values for the `HandleError` method
+⍝ | Parameter    | Description|
+⍝ | - | - |
+⍝ | `checkErrorFolder` | Boolean that defaults to 1. If this is 1 and the folder `errorFolder` does **not** exist<<br>>it will be created. |
+⍝ | `createHTML` | Boolean that defaults to 1. A 0 means that no HTML file will be created.|
+⍝ | `customFns`  | Fully qualified name of a monadic function to be executed by `Process`. Useful to send an email, for example. See also `customFnsParent`.|
+⍝ | `customFnsParent` | No default. May be a reference pointing to the parent of the `customFns`. Needed only in case the parent is a class instance since `logFunction` may use dottet syntax.|
+⍝ | `enforceOff` | Boolean that defaults to 0. With a 1 you can force `HandleError` to `⎕OFF` no matter whether it's a runtime EXE or not. Overwrites `off`. Mainly for test cases.|
+⍝ | `errorFolder`| Folder that keeps the component file (`crash`), the HTML page and the error WS. See below for rules.|
+⍝ | `killThreads`| Boolean that defaults to 1, meaning that all threads that can be killed will be killed.|
+⍝ | `logFunction`| Name of the logging function to be used. See also `logFnsParent`.|
+⍝ | `logFnsParent` | No default. May be a reference pointing to the parent of `logFunction`. Needed only in case the parent is a class instance since `logFunction` may use dottet syntax.|
+⍝ | `off`        | Boolean that defaults to 1 which makes `HandleError` execute `⎕OFF` with `returnCode` only in Runtime. A 0 suppresses this, executing `→` instead. See also `enforceOff`|
+⍝ | `returnCode` | The return code passed on to `⎕OFF`.|
+⍝ | `saveCrash`  | Boolean that defaults to 1.<<br>>A 0 suppresses the creation of `crash` & a component file in which `crash` is saved.|
+⍝ | `saveErrorWS`| Boolean that defaults to 1.<<br>>A 0 suppresses the creation of a crash workspace. There is no point in attempting<<br>>to save a WS in a multi-threaded application for example.|
+⍝ | `saveVars`   | Boolean that defaults to 1.<<br>>Is ignored when `saveCrash` is 0. If 1 all visible variables are saved in a<<br>>sub namespace `Vars` within `crash`.|
+⍝ | `signal`     | When `off` is 0 and `signal` is not 0 then `signal` is `⎕SIGNAL`led by `Process`.<<br>>This can be used for a restart attempt.|
+⍝ | `trapInternalErrors` | By default all internal errors are trapped:<<br>>`Process` should never crash an application.|
+⍝ | `trapSaveWSID`       | Boolean that defaults to 1. Makes sure that the `⎕SAVE` statement is guarded.<<br>>Useful to trace through it without a problem in versions prior to 14.1.|
+⍝ | `windowsEventSource` | Name of the Windows Event Log to write to. Ignored when empty.|
+⍝ | `addToMsg`           | Will be added to the log file as well as the Windows Event Log messages.<<br>>Mainly for test cases.|\\
+⍝ Since version 2.2.0 `errorFolder` defaults to an empty vector. Assuming that the WS or the stand-alone EXE have the name "Foo" the following rules hold true:
+⍝ * If `errorFolder` is empty then it defaults to "%LOCALAPPDATA%/Foo/Errors" under Windows and "Errors/" in the current
+⍝   directory otherwise.
+⍝ * If `errorFolder` is "Errors/" then this folder will be expected in the current directory.
+⍝ * If `errorFolder` is an absolute path it is assumed that the last part is the folder that shall hold the crash files.\\
+⍝ In all three instances if the folder in question does not exist but `checkErrorFolder` is 1 the folder will be created.
+ :Access Public Shared
+ ⎕IO←0 ⋄ ⎕ML←3
+ r←⎕NS''
+ r.⎕FX'r←∆List;⎕IO' '⍝ List all variables and possible references in this namespace' '⎕IO←0' 'r←{⍵,[0.5]⍎¨⍵}'' ''~¨⍨↓⎕NL 2 9'
+ r.checkErrorFolder←1
+ r.createHTML←1
+ r.customFns←''
+ r.customFnsParent←⍬
+ r.enforceOff←0
+ r.errorFolder←''
+ r.killThreads←1
+ r.logFunction←''
+ r.logFunctionParent←⍬
+ r.off←1
+ r.returnCode←1
+ r.saveCrash←1
+ r.saveErrorWS←1
+ r.saveVars←1
+ r.signal←0
+ r.trapInternalErrors←1
+ r.trapSaveWSID←1
+ r.windowsEventSource←''
+ r.addToMsg←''
+⍝Done

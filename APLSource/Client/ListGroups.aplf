@@ -1,0 +1,24 @@
+ r←ListGroups uri;uri_;request;res
+⍝ `uri` must a path to a Registry.
+⍝ `r` is a (potentially empty) vector with the names of all groups defined on the given Registry.
+ uri_←ReplaceRegistryAlias uri
+ 'No (valid) Registry specified?!'Assert 0<≢uri_
+ '⍵ is not an HTTP request'Assert Reg.IsHTTP uri_
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/groups'
+ request.Headers,←⊂'Accept' 'application/json'
+ res←SendAndReceive uri request
+ :If 200≠res.StatusCode
+     :If 0<≢res.Content
+         ('Server: ',res.Content)Assert 0
+     :Else
+         ('Failed with status code ',⍕res.StatusCode)Assert 0
+     :EndIf
+ :Else
+     :Trap 11
+         r←Reg.APLfromJSON res.Content
+     :Else
+         'Server failed to return (valid) JSON5'Assert 0
+     :EndTrap
+ :EndIf
+⍝Done

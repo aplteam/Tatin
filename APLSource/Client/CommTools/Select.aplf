@@ -1,47 +1,52 @@
- index←{x}Select choices;flag;answer;question;value;bool;⎕ML;⎕IO;manyFlag;mustFlag;caption;buff;flag2;alias;blankFlag;firstPart
+ index←{x}Select choices;flag;answer;question;value;bool;⎕ML;⎕IO;manyFlag;mustFlag;caption;buff;flag2;alias;blankFlag;firstPart;Select_Choices
 ⍝ Presents `choices` as a numbered list and allows the user to select either exactly one or multiple ones.
 ⍝ Selecting just one is the default.\\
 ⍝ The optional left argument allows you to specify multiple (positional) choices:
 ⍝  * `caption` is shown above the choices; must be a simple character vector
-⍝  * `manyFlag` defaults to 0 (meaning just one item might be selected) or 1, in which case multiple items can be selected
-⍝  * `mustFlag` forces the user to select at least one option\\
+⍝  * `manyFlag` defaults to 0 (= just 1 item might be selected) or 1 (allow selecting multiple items)
+⍝  * `mustFlag` forces the user to select at least one option, disallowing to quit without making a decision\\
 ⍝ Notes:
 ⍝  * `choices` must not have more than 999 items\\
-⍝  * By entering "`∘∘∘`" the user may interrupt `Select` by running onto a stop vector, overcoming the bug that ⍞ cannot be interrupted
+⍝  * By entering "`∘∘∘`" the user may interrupt `Select` by running onto a stop vector, overcoming
+⍝    the Dyalog bug that ⍞ cannot be interrupted
+⍝  * You can automate `Select`, refer to the documentation with ]ADoc CommTools, catch "Automation"\\
 ⍝  * If the user aborts by entering "q" (for "quit") `⍬` will be returned
-⍝ You can make `Select` select none, one or several choices automatically, refer to the documentation
-⍝ with ]ADoc CommTools\\
  x←{0<⎕NC ⍵:⊆⍎⍵ ⋄ ''}'x'
  (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
  '"caption" must be a simple character vector'Assert 1=≡caption←,caption
  '"caption" must not contain line feeds (⎕UCS 10)'Assert~LF∊caption
- '"caption" must not contain carriage returns (⎕UCS 13)'Assert~CR∊caption
+ '"caption" must not contain carriage returns (⎕UCS 13)'Assert~(⎕UCS 13)∊caption
  ⎕IO←1 ⋄ ⎕ML←1
  'Invalid right argument; must be a vector of text vectors.'⎕SIGNAL ErrNo/⍨2≠|≡choices
  'Right argument has more than 999 items'⎕SIGNAL ErrNo/⍨999<≢choices
  flag←0
  firstPart←{⍵↑⍨⍵⍳LF}caption
- :If 0<⎕NC'Select_Choices'
-     Select_Choices←(0<≢¨Select_Choices[;1])⌿Select_Choices
+ :If 0<⎕NC'∆Automation'
+ :AndIf 0<≢∆Automation
+     Select_Choices←(∆Automation[;1]≡¨⊂'Select')⌿∆Automation[;2 3]
  :AndIf 0<≢Select_Choices
      :If AliasChar∊caption
          (alias caption)←{l←⍵⍳AliasChar ⋄ (l↑⍵)(l↓⍵)}caption
          flag←0<+/bool←({⍵↑⍨(,⍵)⍳AliasChar}¨Select_Choices[;1])≡¨⊂alias
      :Else
-         :If 0=+/bool←Select_Choices[;1]≡¨⊂caption
-             bool←caption∘{⍵≡⍺↑⍨≢⍵}¨Select_Choices[;1]
-         :EndIf
+         bool←caption∘≡¨Select_Choices[;1]
          flag←0<+/bool
      :EndIf
      :If flag
          'Multiple choices qualify?!'Assert 1=+/bool
          index←2⊃Select_Choices[bool⍳1;]
+         'Select'Log⊃Select_Choices[bool⍳1;]
          :If (⊂index)∊0 ⍬
              index←⍬
          :ElseIf ' '=1↑0⍴∊index ⍝ Text?!
              :If '*'=¯1↑index
-                 index←((¯1+≢index)↑¨{⍵↓⍨+/∧\' '=⍵}¨choices)⍳⊂(¯1↓index)
-                 'Invalid selection'Assert index∊⍳≢choices
+                 index←⍸((¯1+≢index)↑¨{⍵↓⍨+/∧\' '=⍵}¨choices)≡¨⊂¯1↓index
+                 index←{1=≢⍵:⊃⍵ ⋄ ⍵}index
+                 'Invalid selection'Assert(mustFlag{(0<≢⍵)≠⍺}index)∨∨/index∊⍳≢choices
+             :ElseIf '*'=⊃index
+                 index←⍸((-¯1+≢index)↑¨{⍵↓⍨-+/∧\' '=⌽⍵}¨choices)≡¨⊂1↓index
+                 index←{1=≢⍵:⊃⍵ ⋄ ⍵}index
+                 'Invalid selection'Assert(mustFlag{(0<≢⍵)≠⍺}index)∨∨/index∊⍳≢choices
              :ElseIf (,'a')≡,index
                  index←⍳≢choices
              :ElseIf (,'q')≡,index
@@ -75,7 +80,7 @@
          question←'Select one ',(manyFlag/'or more '),'item',((manyFlag)/'s'),' '
          question,←((manyFlag∨~mustFlag)/'('),((~mustFlag)/'q=quit'),((manyFlag∧~mustFlag)/', '),(manyFlag/'a=all'),((manyFlag∨~mustFlag)/')'),' :'
          :If 0<≢answer←⍞,0/⍞←question
-             answer←(⍴question)↓answer
+             answer←{⍵↑⍨-¯1+(⌽⍵)⍳':'}answer
              :If '∘∘∘'≡¯3↑answer
                  (1+⊃⎕LC)⎕STOP⊃⎕SI
                  ∘∘∘ ⍝ Deliberate stop caused by user input

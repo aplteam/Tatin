@@ -1,4 +1,4 @@
- r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders;bool;aliasDefs;alias;info;subFolder;recursive;buff
+ r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders;bool;aliasDefs;alias;info;subFolder;recursive
  r←''
  'Mandatory argument (install directory or project) must not be empty'Assert 0<≢installFolder←Args._1
  :If '[]'≡¯2↑⌽¯1⌽installFolder
@@ -42,7 +42,8 @@
  parms.dry←0 Args.Switch'dry'
  parms.force←0 Args.Switch'force'
  parms.noBetas←0 Args.Switch'nobetas'
- parms.update←1 Args.Switch'update'
+ parms.update←0 Args.Switch'update'
+ parms.major←0 Args.Switch'major'
  recursive←0 Args.Switch'recursive'
  installFolder←{0≡⍵:'' ⋄ ⍵}installFolder
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
@@ -88,15 +89,14 @@
  :If 0 Args.Switch'recursive'
      subFolders←##.FilesAndDirs.ListDirs installFolder
      :If 0=≢subFolders
-         r←'The specified path does not contain any sub-folders'
+         r{0=≢⍺:⍵ ⋄ ⍺,(⎕UCS 13),⍵}←'The specified path does not contain any sub-folders'
      :EndIf
-     ⎕←'Re-installing into ',installFolder
+     r{0=≢⍺:⍵ ⋄ ⍺,(⎕UCS 13),⍵}←'Re-installing into ',installFolder
      :For subFolder :In subFolders
          :If ##.FilesAndDirs.IsFile subFolder,'/apl-dependencies.txt'
-             buff←1 ReInstallDependencies_ subFolder parms registry
-             ⎕←' ',¨buff
+             r,←1 ReInstallDependencies_ subFolder parms registry
          :EndIf
      :EndFor
  :Else
-     ⎕←ReInstallDependencies_ installFolder parms registry
+     r←ReInstallDependencies_ installFolder parms registry
  :EndIf

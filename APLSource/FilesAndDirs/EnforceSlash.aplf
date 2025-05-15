@@ -1,4 +1,6 @@
- path←EnforceSlash path
+ EnforceSlash←{
 ⍝ Use this if you must make sure that `path` contains `/` rather than `\`.\\
-⍝ Preserves the first two characters if they are `\\`.
- ((path='\')/path)←'/'
+     ~'\'∊r←⍵:r
+     ((r='\')/r)←'/'
+     r
+ }

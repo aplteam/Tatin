@@ -18,7 +18,7 @@
      :If 1='-'+.=packageID
      :AndIf 1<≢versions
          :If force
-             msg←'These major versions were found for ',packageID,' on ',uri,':',CR
+             msg←'SureDeprecateAll@These major versions were found for ',packageID,' on ',uri,':',CR
              msg,←⊃,/(⊂'  '),¨versions,¨CR
              msg,←'Are you sure that you want to deprecate ALL these versions?'
          :OrIf TC.C.YesOrNo msg
@@ -34,7 +34,7 @@
          :EndIf
      :Else
          :If force
-         :OrIf TC.C.YesOrNo'Sure that you want to deprecate <',packageID,'> on ',uri,' ?'
+         :OrIf TC.C.YesOrNo'SureDeprecate@Sure that you want to deprecate <',packageID,'> on ',uri,' ?'
              (rc msg)←TC.DeprecatePackage uri comment packageID
              :If 0=rc
                  r←'Successfully deprecated: ',packageID,' on ',uri

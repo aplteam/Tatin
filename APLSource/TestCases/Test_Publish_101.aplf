@@ -1,0 +1,16 @@
+ r←Test_Publish_101(stopFlag batchFlag);⎕TRAP;path;statusCode;errMsg;qdmx
+⍝ Try to publish a package that has non-ASCII-chars in its name
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ path←∆TEMP_TEST_DATA,'/NonßAsciiChar/'
+ :Trap 998
+     (statusCode errMsg)←2↑TC.PublishPackage path'[local]'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf qdmx.EM≡'Invalid package name: only ASCII characters and digits and _ are allowed'
+ :EndTrap
+
+ r←T._OK
+⍝Don

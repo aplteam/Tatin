@@ -54,7 +54,7 @@ version
 
 A folder with packages the project depends on. Might be empty, in case there are'nt any dependencies.
 
-#### projectspace
+#### projectSpace
 
 This is optional. Set this to the namespace where the package project lives.
 
@@ -63,9 +63,9 @@ Setting this makes sense under these conditions:
 * The package project lives in the workspace
 * You want the build number in `TatinVars.CONFIG` to be upated by `BuildPackage`
 
-`BuildPackage` bumps the build ID, but only on file. It cannot update it in the WS because it does not know where it lives, unless you tell it by setting `projectspace` accordingly.
+`BuildPackage` bumps the build ID, but only on file. It cannot update it in the WS because it does not know where it lives, unless you tell it by setting `projectSpace` accordingly.
 
-If you do set `projectspace`, then `BuildPackage` will scan that namespace recursively for `TatinVars` and update `TatinVars.CONFIG`.
+If you do set `projectSpace`, then `BuildPackage` will scan that namespace recursively for `TatinVars` and update `TatinVars.CONFIG`.
 
 #### projectPath
 
@@ -378,7 +378,7 @@ Contains these parameters:
 ```
 dependencyFolder
 projectPath          ⍝ Set to `path`
-projectspace
+projectSpace
 targetPath
 version
 ```
@@ -1141,6 +1141,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

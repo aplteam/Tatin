@@ -9,35 +9,39 @@
 
     ⎕IO←1 ⋄ ⎕ML←1
 
-    ∇ r←Version;buff;history;date
-      :Access Public shared
-    ⍝ Returns the version number from TatinVars
+    ∇ r←Version
+      :Access Public Shared
+    ⍝ Returns the version number from `TatinVars` if possible.
     ⍝ See also `History`
       :If 0<⎕NC'TatinVars.CONFIG'
-          buff←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢TatinVars.CONFIG).version
       :ElseIf 0<##.⎕NC'TatinVars.CONFIG'
-          buff←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+    ⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+    ⍝ In such cases we cannot provide a version number, so we return just ''.
+          r←''
       :EndIf
-      history←History
-      date←{⍵↑⍨¯1+⍵⍳' '}'from'{⍵↓⍨(≢⍺)+1⍳⍨⍺⍷⍵}history[1;]
-      r←'OS'buff date
-    ⍝Done
     ∇
 
     ∇ r←History
       :Access Public shared
-      ⍝ * 3.2.0 from 2024-12-25
+      ⍝ * 4.0.0 ⋄ 2025-03-28
+      ⍝   * `Version` has changed its syntax: it returns just a simple string with the version number now 
+      ⍝     which comes from the package config file.
+      ⍝   * `Make` improved.
+      ⍝ * 3.2.0 ⋄ 2024-12-25
       ⍝   * The `Version` functions reports now what's defined in the package config file
       ⍝   * Packages updated
-      ⍝ * 3.1.1 from 2023-05-08
+      ⍝ * 3.1.1 ⋄ 2023-05-08
       ⍝   * APLTreeUtils2 updated which was buggy (wrong version number)
-      ⍝ * 3.1.0 from 2023-05-02
+      ⍝ * 3.1.0 ⋄ 2023-05-02
       ⍝   * New method `GetTaskList` added
       ⍝   * `History now returns a useful result
-      ⍝ * 3.0.1 from 2021-03-01
+      ⍝ * 3.0.1 ⋄ 2021-03-01
       ⍝   * Package config file corrected (new format)
       ⍝   * APLTreeUtils2.Uppercase replaced by a call to 1 ⎕C
-      ⍝ * 3.0.0 from 2020-09-07
+      ⍝ * 3.0.0 ⋄ 2020-09-07
       ⍝   * Does not :Include APLTreeUtils anymore (but requires the class APLTreeUtils2)
       ⍝   * Uses ⎕ML←1 and  ⎕IO←1 internally
       ⍝   * Needs at least Dyalog 18.0

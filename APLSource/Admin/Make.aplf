@@ -1,4 +1,4 @@
- {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q
+ {r}←{noQLX}Make batchFlag;P;parms;P_;list;F;C;CFG;path;file1;file2;ts1;ts2;versionOfAPL;q;buff;commitFlag;activateFilename
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which bumps the build number) and then,
 ⍝ in the second session, `MakeServer`, which does not bump the version number.
@@ -15,7 +15,7 @@
  'Currently we build on Windows only, sorry'Assert ##.Registry.IsWindows
  versionOfAPL←'18.2'
  :If ~batchFlag
- :AndIf 0=##.Client.CommTools.YesOrNo'Create Tatin with version ',versionOfAPL,' ?'
+ :AndIf 0=1 ##.Client.CommTools.YesOrNo'Create Tatin with version ',versionOfAPL,' ?'
      ⎕←'Cancelled by user' ⋄ →0
  :EndIf
  F←##.FilesAndDirs ⋄ C←##.Client ⋄ CFG←##.CiderConfig ⋄ F.APLTreeUtils2←##.APLTreeUtils2
@@ -25,8 +25,18 @@
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
 
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Compiling HTML from the markdown files (documentation)...'
+ commitFlag←0
+ :If ~batchFlag
+ :AndIf (⊂'#.Tatin')∊{⍵[;1]}⎕SE.Cider.ListOpenProjects 0
+     buff←1 ⎕SE.APLGit2.Status'#.Tatin'
+     :If 0<+/~({⊃,/1↓⎕NPARTS ⍵}¨buff[;2])∊,⊂'History.apla'
+     :AndIf 0=1 ##.Client.CommTools.YesOrNo'The working area is dirty - continue anyway?'
+         ⎕←'Cancelled by user' ⋄ →0
+     :EndIf
+     ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
+     commitFlag←0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
+ :EndIf
  CompileDocumentation ⍬
-
  path←##.Client.GetUserDocumentsFolder,'Dyalog APL-64 19.0 Unicode Files\SessionExtensions\CiderTatin\Tatin'
  :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in the version-agnostic folder?
  :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live there?
@@ -89,12 +99,22 @@
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   The final steps, putting it all together...'
+ CopyActivateUserCommandIntoProject ⍬
  HandleRunFunction ⍬
+ HandleActivateUserCommand ⍬
  UpdateTestServerAssets ⍬
  {}⎕SE.Link.Refresh'#.Tatin'
  :If ~batchFlag
- :AndIf 1 ##.Client.CommTools.YesOrNo'Would you like to install the freshly created new version?'
-     ⎕←1 #.Tatin.Admin.InstallTatin 1
+     :If 1 ##.Client.CommTools.YesOrNo'Would you like to install the freshly created new version?'
+         ⎕←1 #.Tatin.Admin.InstallTatin 1
+     :EndIf
+     activateFilename←##.Client.GetMyUCMDsFolder'/activate.dyalog'
+     :If 0=⎕NEXISTS activateFilename
+     :OrIf './Dist/activate.dyalog'F.YoungerThan activateFilename
+         :If 1 ##.Client.CommTools.YesOrNo'Install the ]activate user command?'
+             activateFilename ⎕NCOPY⍠('IfExists' 'Replace')⊢'./Dist/activate.dyalog'
+         :EndIf
+     :EndIf
  :EndIf
  :If #.Tatin.Registry.Version≢⎕SE.Tatin.Version
      ⎕SE.⎕EX¨'Tatin' '_Tatin'
@@ -102,5 +122,12 @@
  :Else
      #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(CFG.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
      0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'*** Done'
+ :EndIf
+ :If commitFlag
+     q←1↓⊃,/(⎕UCS 13),¨↓↑⎕SE.APLGit2.Status'#.Tatin'
+     :If 1 ##.Client.CommTools.YesOrNo q,(⎕UCS 13),'---> Commit as "Make"?'
+         ⎕SE.APLGit2.Add'#.Tatin'
+         buff←'<Make>'⎕SE.APLGit2.Commit'#.Tatin'
+     :EndIf
  :EndIf
 ⍝Done

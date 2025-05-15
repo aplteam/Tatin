@@ -1,0 +1,17 @@
+ crash←CreateCrashNamespace(parms Trap)
+ crash←⎕NS''
+ crash.(AN DM EN XSI LC WSID TID TNUMS)←⎕AN ⎕DM ⎕EN ⎕XSI ⎕LC ⎕WSID ⎕TID ⎕TNUMS
+ crash.WA←⎕WA
+ crash.Trap←Trap
+ crash.CurrentDir←FilesAndDirs.PWD
+ crash.CommandLine←2 ⎕NQ'#' 'GetCommandLine'
+ :Trap (parms.trapInternalErrors)/0
+     crash.(Category DM EM HelpURL EN ENX InternalLocation Message OSError)←qdmx.(Category DM EM HelpURL EN ENX InternalLocation Message OSError)
+     crash.(XSI LC)←1↓¨crash.(XSI LC)
+ :EndTrap
+ :If 0≠≢parms.addToMsg
+     crash.addedMsg←parms.addToMsg
+ :EndIf
+ :If parms.saveVars
+     crash←SaveVisibleVars crash
+ :EndIf

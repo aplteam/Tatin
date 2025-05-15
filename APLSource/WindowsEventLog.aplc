@@ -27,12 +27,26 @@
     ⎕io←1 ⋄ ⎕ml←1
 
     ∇ r←Version
+    ⍝ Returns the version number from `TatinVars` if possible.
+    ⍝ See also `History`
       :Access Public Shared
-      r←'WindowsEventLog' '3.0.1+13' '2021-03-02'
+      :If 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :ElseIf 0<##.##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.##.TatinVars.CONFIG).version
+      :Else
+    ⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+    ⍝ In such cases we cannot provide a version number, so we return just ''.
+          r←''
+      :EndIf
     ∇
 
     ∇ History
       :Access Public Shared
+      ⍝ * 4.0.0
+      ⍝   * Potentially breaking: `Version` returns now a char vector stemming from the package config file
+      ⍝   * Packages updated (development only)
+      ⍝   * "Make" improved
       ⍝ * 3.0.1
       ⍝   * Package config corrected
       ⍝ * 3.0.0

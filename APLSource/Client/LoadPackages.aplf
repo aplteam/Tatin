@@ -1,5 +1,5 @@
  r←{noBetas}LoadPackages(identifiers targetSpace);paths;tempFolder;loaded;qdmx;list
-⍝ Loads package `identifier` dynamically into the workspace,\\
+⍝ Load packages `identifiers` dynamically into the workspace,\\
 ⍝ `identifiers` must be a simple char vector identifying one or more packages.
 ⍝ Multiple packages (items) must be separated by commas.
 ⍝ Every item in `identifiers` must be one of:
@@ -20,7 +20,8 @@
 ⍝ b) a package (or one of its dependencies) relies on file assets in which case the temporary directory (which is
 ⍝ created in any case) will not be deleted.\\
 ⍝ By default beta versions are considered in case the package ID is incomplete; suppress them by passing 1 as ⍺.\\
-⍝ Returns the total number of packages loaded, including dependencies.
+⍝ Returns the total number of packages loaded, including dependencies.\\
+⍝ Note that if a pckage fails to load, an error is thrown and no packages are loaded.
  r←0
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  targetSpace←,⍕targetSpace

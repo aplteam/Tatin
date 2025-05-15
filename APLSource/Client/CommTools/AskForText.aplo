@@ -1,16 +1,17 @@
- text←{x}(CheckFn AskForText)question;flag;alias;bool;buff;success;firstPart;enforce;default
+ text←{x}(CheckFn AskForText)question;flag;alias;bool;buff;success;firstPart;enforce;default;firstFlag;AskForText_Answers
 ⍝ Operator asking a question and allowing the user to enter text.\\
 ⍝ By entering "`∘∘∘`" the user may interrupt `AskForText`: this activates a stop.\\
 ⍝ `CheckFn` is supposed to be a function that gets the input as `⍵` and must return a Boolean
 ⍝ with a 1 indicating that the input is okay and 0 that it is not. If you don't need/want
 ⍝ a check function pass `{1}` as left operand.\\
 ⍝ If the user refuses to enter anything an empty vector is returned.
-⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning that
-⍝ the user must enter something in order to continue.
+⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning
+⍝ that the user must enter something in order to continue.
 ⍝ You can also specify a default as `⍺` by passing a character vector instead of a Boolean.
-⍝ In case the user does not enter something that default is returned; that's why the Boolean would
-⍝ not make a difference anyway.
+⍝ In case the user does not enter something that default is returned; that's why the Boolean
+⍝ would not make a difference anyway.\\
  x←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'x'
+ firstFlag←1
  :If ' '=1↑0⍴x
      default←x
      enforce←0
@@ -26,16 +27,21 @@
  question←ReplaceCRbyLF question
  question←{⍵↓⍨+/∧\' '=⍵}question
  :Repeat
-     firstPart←{⍵↑⍨⍵⍳LF}question
-     :If 0<⎕NC'AskForText_Answers'
+     firstPart←{⍵↑⍨¯1+⌊/⍵⍳LF,' '}question
+     :If 0<⎕NC'∆Automation'
+         AskForText_Answers←(∆Automation[;1]≡¨⊂'AskForText')⌿∆Automation[;2 3]
          AskForText_Answers←(0<≢¨' '~⍨¨AskForText_Answers[;1])⌿AskForText_Answers
          AskForText_Answers[;1]←{⍵↓⍨+/∧\' '=⍵}¨AskForText_Answers[;1]
      :AndIf 0<≢AskForText_Answers
-         :If AliasChar∊question
+         :If AliasChar∊firstPart
              (alias question)←{l←⍵⍳AliasChar ⋄ (l↑⍵)(l↓⍵)}question
-             flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨AskForText_Answers[;1])≡¨⊂alias
-         :ElseIf ~flag←0<+/bool←AskForText_Answers[;1]≡¨⊂question
-             flag←0<+/bool←question∘{⍵≡(≢⍵)↑⍺}¨AskForText_Answers[;1]
+             :If flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨AskForText_Answers[;1])≡¨⊂alias
+                 'AskForText'Log alias
+             :EndIf
+         :Else
+             :If flag←0<+/bool←({⍵,(':'≠¯1↑⍵)/':'}¨AskForText_Answers[;1])≡¨⊂question,(':'≠¯1↑question)/':'
+                 'AskForText'Log question,(':'≠¯1↑question)/':'
+             :EndIf
          :EndIf
          :If flag
              'Multiple pre-prepared answers qualify?!'Assert 1=+/bool
@@ -47,15 +53,17 @@
          :EndIf
      :EndIf
      :If 0<≢default
+     :AndIf firstFlag
          question,←' [',default,']'
+         firstFlag←0
      :EndIf
      :If ~flag
-         text←⍞,0/⍞←question,': '
+         text←⍞,0/⍞←question,((':'≠¯1↑question)/':'),' '
+         text←{⍵↑⍨2+-(⌽⍵)⍳':'}text
          :If '∘∘∘'≡¯3↑text
              (1+⊃⎕LC)⎕STOP⊃⎕SI
              ∘∘∘ ⍝ Deliberate stop caused by user input
          :EndIf
-         text←(≢{⍵↑⍨-¯1+(⌽⍵)⍳LF}question,': ')↓text
          :If 0=≢text
          :AndIf 0<≢default
              text←default

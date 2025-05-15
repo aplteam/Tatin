@@ -1,0 +1,51 @@
+ r←Test_Misc_300(stopFlag batchFlag);⎕TRAP;qdmx;msg;rc;dir;src;dist;body;cfg
+⍝ Test
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←∆GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir src dist
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ 'Source'#.TEMP.⎕NS''
+ #.TEMP.Source.⎕FX'r←Hello' 'r←''World'''
+ 'TatinVars'#.TEMP.⎕NS''
+ #.TEMP.TatinVars.⎕FX'r←CONFIG' 'r←(⎕ucs 13),¨''{'' ''version: "0.1.0+123",'' ''}'''
+
+ body←'∇r←Hello' 'r←''World' '∇'
+ ⎕MKDIR src,'/Source'
+ (⊂body)F.NPUT src,'/Source/Hello.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_ß'
+ cfg.version←'0.1.0+123'
+ cfg.source←'Source'
+ cfg.os_win←1
+
+ :Trap 998
+     {}TC.WritePackageConfigFile src cfg
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp qdmx.EM≢'Only ASCII characters (A-Z, a-z) and, after the first char, digits (0-9) and underscores (_), are allowed'
+ :EndTrap
+
+ cfg.group←'ExampleÜ'
+ cfg.name←'Package_'
+ :Trap 998
+     {}TC.WritePackageConfigFile src cfg
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp qdmx.EM≢'Only ASCII characters (A-Z, a-z) and, after the first char, digits (0-9) and underscores (_), are allowed'
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

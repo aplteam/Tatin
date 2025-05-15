@@ -1,4 +1,4 @@
- r←{majorVersions}CheckForLaterVersion_ packageID;fullPath;url;fullPath2;packageID2;errMsg;statusCode;packageID_
+ r←{majorVersions}CheckForLaterVersion_ packageID;fullPath;url;fullPath2;packageID2;errMsg;statusCode;packageID_;buff
 ⍝ Takes a packageID and checks whether it finds a later version.
 ⍝ All Registries with a priority greater than 0 are scanned.\\
 ⍝ If `majorVersions` is 0 only minor and patch number are considered.\\
@@ -12,11 +12,8 @@
  'Invalid left argument'Assert 1=≢majorVersions
  'Invalid left argument'Assert majorVersions∊0 1
  packageID_←RemoveAlias packageID
- :If majorVersions
-     url←('⎕'=⊃⊃⎕XSI)EstablishRegistry Reg.RemoveVersionNumber packageID_
- :Else
-     url←('⎕'=⊃⊃⎕XSI)EstablishRegistry Reg.RemoveMinorAndPatch packageID_
- :EndIf
+ (url buff)←('⎕'=⊃⊃⎕XSI)EstablishRegistry Reg.RemoveVersionNumber packageID_
+ packageID_←buff,(≢Reg.RemoveVersionNumber packageID_)↓packageID_
  :If 0=≢url
      r←packageID_'<<< Not found anywhere >>>' '' 0
  :Else

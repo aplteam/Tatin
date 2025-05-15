@@ -1,5 +1,4 @@
- r←{noBetas}InstallPackages(identifiers targetFolder);identifier_;cfg;qdmx;targetFolder_;isUCMD;ucScriptName;forceClose
- ;buildList;level;requestedBy;packageID2;installFolder;tempDir;zipFilename;id;identifier;packageID;alias
+ r←{noBetas}InstallPackages(identifiers targetFolder);forceClose;isUCMD;identifier_;alias;identifier;targetFolder_;packageID;cfg;ucScriptName;qdmx;registry
 ⍝ Install package(s) `identifiers` in `targetFolder`.\\
 ⍝ `identifiers` must be a simple char vector holding the package IDs (possibly incomplete) for one or more packages.
 ⍝ Multiple packages must be separated by commas.
@@ -62,7 +61,9 @@
          :If ∧/~'\/'∊identifier
          :AndIf '.zip'≢⎕C ¯4↑identifier
              :If ~∨/'/\:'∊identifier
-                 identifier←(EstablishRegistry packageID),packageID
+                 (registry packageID)←EstablishRegistry packageID
+                 ('>>> ',packageID,' not found anywhere')Assert 0<≢registry
+                 identifier←registry{'/'=¯1↑⍺:⍺,⍵ ⋄ ⍺,'/',⍵},packageID
                  :If 0=≢(-≢packageID)↓identifier
                      :Continue
                  :EndIf
@@ -91,7 +92,6 @@
  :Else
      qdmx←⎕DMX
      CloseConnections forceClose
-     :Trap 0 ⋄ F.RmDir tempDir ⋄ :EndTrap
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
 ⍝Done

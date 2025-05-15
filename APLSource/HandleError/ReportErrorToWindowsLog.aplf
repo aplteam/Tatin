@@ -1,0 +1,11 @@
+ {r}←ReportErrorToWindowsLog(appName message);⎕USING
+⍝ Reports an error to the Windows Event Log, by default to source="APL".\\
+⍝ Note that the Dyalog bridge DLLs are required for this to work.
+ r←⍬
+ ⎕USING←'System,system.dll' 'System.Diagnostics,system.dll'
+ :If 0=≢appName
+     appName←'APL'
+ :EndIf
+ message←⊆message
+ WriteWindowsLog_ appName EventLogEntryType.Error message
+⍝Done

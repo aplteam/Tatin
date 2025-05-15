@@ -1,25 +1,33 @@
- refs←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;quiet;tempDir;forceClose;p;i;pkg;msg;ref;qdmx
+ r←{dry}ReInstallDependencies_ y;deps;installFolder;registry;noBetas;update;quiet;tempDir;forceClose;p;i;pkg;msg;ref;qdmx;major
 ⍝ Re-installs all packages listed by `deps`, including any dependencies.\\
 ⍝ In case `dry` is 1 it reports to the session what it _would_ do.\\
 ⍝ All work is done in a temp folder. Without -dry that temp folder will eventually replace the install folder.
 ⍝ With -dry the temp folder will be deleted.
-⍝ By default principal packages are not upgraded but re-installed in exactly the same way as before.
-⍝ You can change this by setting `upgrade←1`.
+⍝ By default packages are not updated but re-installed in exactly the same way as before.
+⍝ This can be changed by setting `update←1`.\\
 ⍝ Note that this has a side effect: the same principal packages but with different version numbers (not major)
-⍝ will all be replaced by the latest version except those that have an alias assigned.
+⍝ will all be replaced by the latest version except those that have an alias assigned.\\
+⍝ Even with `update←1`, by default a package is only updated to the latest version with the same major version
+⍝ number. This can be changed by setting `major←1`.\\
  dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
  'You must specify at least 5 parameters'Assert 5≤≢y
- (deps installFolder registry noBetas update quiet)←y,(≢y)↓⍬ ⍬ ⍬ ⍬ ⍬ 0  ⍝ Default for "quiet" is 0
- refs←⍬
+ (deps installFolder registry noBetas update quiet major)←y,(≢y)↓⍬ ⍬ ⍬ ⍬ ⍬ 0 0
+ r←⍬
  tempDir←F.GetTempSubDir''
  tempDir ⎕NCOPY installFolder,'/',Reg.DependenciesFilename                  ⍝ Copy the dependency file
- tempDir{0=≢⍵:shy←⍬ ⋄ ⍺∘{⍺ ⎕NCOPY ⍵}¨⍵}F.ListFiles installFolder,'/*.zip'   ⍝ Copy any ZIP files (packages)
+ :If major
+ :AndIf RemoveAllVersionNumbersIn tempDir,'/',Reg.DependenciesFilename
+     deps←⊃⎕NGET(tempDir,'/',Reg.DependenciesFilename)1                   ⍝ Read again because we have change the file
+ :EndIf
+ tempDir{0=≢⍵:shy←⍬ ⋄ ⍺∘{⍺ ⎕NCOPY ⍵}¨⍵}F.ListFiles installFolder,'/*.zip'   ⍝ Copy any ZIP files (packages): they take precedence
  forceClose←1 EstablishRumbaClients ⍬
  p←(~quiet)∘PrintToSession
  :For i :In ⍳≢deps
      pkg←i⊃deps
      :If update
-         pkg←Reg.RemoveMinorAndPatch pkg
+         :If ~major    ⍝ Otherwise it's already done by RemoveAllVersionNumbersIn
+             pkg←Reg.RemoveMinorAndPatch pkg
+         :EndIf
      :EndIf
      msg←'Fetching package ',(⍕i),' of ',(⍕≢deps),' (',pkg,')',((0<≢registry)/' from ',registry),' ',(dry/'(dry)'),'...'
      p msg
@@ -27,10 +35,11 @@
          ref←noBetas InstallPackages(registry,pkg)tempDir
      :Else
          qdmx←⎕DMX
-         ('Package ',pkg,' in ',registry,' caused a problem: ',qdmx.EM)Assert 1=≢'Package <[^>].*> not found in any of these Registries:'⎕S 0⊣qdmx.EM
+         :Trap 0 ⋄ F.RmDir tempDir ⋄ :EndTrap
+         qdmx.EM Assert 0
      :EndTrap
      p(⊂'Installed',(dry/' (dry)'),': '),ref
-     refs,←⊆ref
+     r,←⊆ref
  :EndFor
  :If dry
      ⎕DL 0.01

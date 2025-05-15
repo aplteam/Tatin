@@ -1,0 +1,31 @@
+ r←{rawFlag}ListAutomation type
+⍝ Returns the contents of ∆Automation with column titles by default but check `rawFlag`.
+⍝ If `type` is not empty it is interpreted as a list of types.
+⍝ Only data of the given types is then returned.\\
+⍝ If `∆Automation` does not exist or is empty or does not have data for the requested types,
+⍝ a message is returned.\\
+⍝ If the optional left argument is specified and is 1, a matrix with pure data (no column titles)
+⍝ is returned, possibly empty.
+ rawFlag←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'rawFlag'
+ 'Optional left argument must be a Boolean'Assert(⊂rawFlag)∊0 1
+ type←{0=≢⍵:⍵ ⋄ ,⊆⍵}type
+ 'Invalid type'Assert∧/type∊'YesOrNo' 'Select' 'Pause' 'AskForText' 'AskForNumber' ''
+ :If 0=⎕NC'∆Automation'
+     :If rawFlag
+         r←0 4⍴⊂''
+     :Else
+         r←'∆Automation does not exist'
+     :EndIf
+ :Else
+     r←∆Automation
+     :If 0<≢type
+         r←(∆Automation[;1]∊type)⌿∆Automation
+     :EndIf
+     :If ~rawFlag
+         :If 0=≢r
+             r←'No data ',(1+0<≢type)⊃'available'('found for ',⊃{⍺,', ',⍵}/type)
+         :Else
+             r←({(⍉⍪⍵)⍪((≢¨⍵)⍴¨'-')}'Type' 'ID' 'Returns' 'Counter')⍪r
+         :EndIf
+     :EndIf
+ :EndIf

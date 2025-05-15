@@ -1,0 +1,15 @@
+ {html}←WriteHtmlFile(parms crash filename);If
+ :If parms.createHTML
+     html←AssembleHTML parms crash
+     :Trap (parms.trapInternalErrors)/0
+         (⊂html)⎕NPUT(filename,'.html')1
+     :Else
+         :Trap parms.trapInternalErrors/0
+             :If APLTreeUtils2.IsDevelopment
+                 11 ⎕SIGNAL'Writing HTML file failed: ',1⊃parms.LastError
+             :EndIf
+         :EndTrap
+     :EndTrap
+ :Else
+     html←''
+ :EndIf

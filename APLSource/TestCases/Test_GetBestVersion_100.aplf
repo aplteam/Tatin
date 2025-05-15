@@ -1,0 +1,18 @@
+ r←Test_GetBestVersion_100(stopFlag batchFlag);⎕TRAP;qdmx
+⍝ Exercise GetBestVersion on <name> with two groups having such a package
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :Trap 998
+     {}(≢∆TEMP_SERVER_FOLDER)↓##.Registry.GetBestVersionNumber ∆TEMP_SERVER_FOLDER,'markapl'    ⍝ There is a package aplteam-MarkAPL and example-MarkAPL!
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf qdmx.EM≡'2 groups have a package with the given name'
+ :EndTrap
+
+ r←T._OK
+⍝Done
+
+ r←T._OK
+⍝Done

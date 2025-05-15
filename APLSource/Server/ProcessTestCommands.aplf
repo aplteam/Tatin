@@ -1,4 +1,4 @@
- response←request ProcessTestCommands path;version
+ response←request ProcessTestCommands path;version;⎕TRAP
 ⍝ This function must only be called when G.TestFlag is true
  :If G.INI.Exist'CONFIG:SpecialCommands'
  :AndIf G.INI.Get'CONFIG:SpecialCommands'
@@ -31,6 +31,8 @@
          :If A.IsDevelopment
              ∘∘∘                            ⍝ In runtime this would be ⎕OFF
          :Else
+             ⎕TRAP←0 'S'
+             ∘∘∘
              ⎕OFF
          :EndIf
      :Else

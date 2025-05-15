@@ -6,7 +6,7 @@
      level←⊃A.ToNum request R.GetQueryParameter'level'
      packages←','A.Split ⎕C request R.GetQueryParameter'packages'
      data←2 Reg.FindDependenciesLocally G.RegistryPath G.RegistryPath packages level
-     data←{⊃,/1↓⎕NPARTS ⍵}¨data
+     data←(≢G.RegistryPath)↓¨data
      response←request ReturnJSON Reg.JSON data
  :Else
      qdmx←⎕DMX

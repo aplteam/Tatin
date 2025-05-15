@@ -27,7 +27,7 @@
      :AndIf '.zip'≢⎕C ¯4↑identifier
          packageID←GetPackageIDFrom identifier
          :If ~∨/'/\:'∊identifier
-             identifier←(EstablishRegistry packageID),packageID
+             identifier←⊃,/EstablishRegistry packageID
              PrintToSession⊃{'Installing <',⍵,'> from Registry ',⍺,'...'}/{⍵{(⍵↓⍺)(⍵↑⍺)}1+-'/'⍳⍨⌽⍵}identifier
          :EndIf
      :EndIf

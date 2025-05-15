@@ -9,43 +9,35 @@
     ⎕IO←1 ⋄ ⎕ML←1
 
     ∇ r←Version
+    ⍝ Returns the version number from `TatinVars` if possible.
+    ⍝ See also `History`
       :Access Public Shared
-      r←'GitHubAPIv3' '1.5.0' '2024-10-16'
+      :If 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+      ⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+      ⍝ In such cases we cannot provide a version number, so we return just ''.
+          r←''
+      :EndIf
     ∇
 
     ∇ History
       :Access Public Shared
-    ⍝ * 1.5.0 from 2024-10-16
-    ⍝   * `CheckForUpdate` can now handle beta versions on the client side (on GitHub, betas are not supported)
-    ⍝ * 1.4.0 from 2024-09-24
-    ⍝   * New instance method `GetMyRateLimits` added whbich complements the older shared method `GetRateLimits`
-    ⍝   * BREAKING CHANGE
-    ⍝     The instance property `pathToConngaDLLs` has been removed and replaced by an instance field with the same name.
-    ⍝     This syntax change was necessary because some shared methods (`GetAllEndPoints`, `GetRateLimits`) called `GetJson`
-    ⍝     which relies on `pathToCongaDLLs` being defined. It affects you only when you have set `pathToCongaDLLs` as a
-    ⍝     property of an instance, because that needs changing: assign it to the field of the class instead.
-    ⍝  * `GetAllTopics` called `GetJson` with a left argument
-    ⍝ * 1.3.0 from 2024-09-23
-    ⍝   * There was no way to specify a path for the Conga DLLs in GetJson: now there is a field `path2CongaDLLs`
+    ⍝ * 2.1.0 from 2025-04-21
+    ⍝   * Function `GetIssues` added
+    ⍝   * Function `GetLabelStats` added
+    ⍝   * `∆QuickView` (injected into issues) does not require an argument anymore & returns the creation date now as well
+    ⍝   * `∆Details` (injected into issues) does not require an argument anymore
     ⍝   * Bug fixes
-    ⍝     * `GetRelease` did not process its (optional) left argument correctly, resulting in a crash.
-    ⍝     * Shared method `GetJson` relied on instance property `path2CongaDLLs`. Can now be specified as left argument
-    ⍝     * The function `GetJson` had an optional left argument `parms` that was never processed: removed.
-    ⍝ * 1.2.1 from 2024-07-25
-    ⍝   * Bug fixed
-    ⍝     `GetAllIssues` crashed when there were no issues to report
-    ⍝ * 1.2.0
-    ⍝   * Instances of GitHubAPIv3 now have a useful display format: for a user "foo" it shows GitHubAPIv3[foo]
-    ⍝   * The name of the function `GetPrinciple` was changed to `GetPrincipal`
-    ⍝   * When Assert signals an error not only the message but also the HTTP code is returned as in "Not found (404)"
-    ⍝   * Package dependencies updated
-    ⍝   * Bug fixes
-    ⍝     * The DF of an issue was wrong ("Issues" rather than "Issue"). While on it the issue number was added.
-    ⍝ * 1.1.0
-    ⍝   Dependencies updated: HttpCommand and APLTreeUtil2
-    ⍝ * 1.0.1
-    ⍝   * Domain of the function `CastTagname2Number` extended: Major and minor nmber might both carry 3 digits,
-    ⍝     while a build number might carry up to 5 digits.
+    ⍝     * Typo fixed in `Version`
+    ⍝     * Empty "owner" was accepted by `⎕NEW` - makes no sense
+    ⍝ * 2.0.0 from 2025-04-09
+    ⍝   * Potentially breaking: `Version` now returns a char vector stemming from the package config file
+    ⍝   * Packages updated
+    ⍝   * "Make" improved
+    ⍝ * 1.6.0 from 2025-01-025
+    ⍝   * CommTools removed as a dependency - it was only required for tests
+    ⍝   * `Version` now returns the package config file setting
     ⍝\\
     ⍝ For information regarding older versions see <https://github.com/aplteam/GitHubAPIv3/releases>
     ∇
@@ -73,7 +65,7 @@
     ∇ make1(owner)
       :Access Public Instance
       :Implements Constructor
-      _owner←owner
+      '"Owner" must not be empty'Assert 0<≢_owner←owner~' '
       _personal_access_token←''
       _regEx←'setup_<repoName>_<version>[.\]*.[0-9]{0,6}\.exe'  ⍝ After version there _might_ be a built number
       A←(⊃⊃⎕CLASS ⎕THIS).##.APLTreeUtils2
@@ -177,8 +169,39 @@
           :EndIf
           ns.⎕DF(repoName,' issue ')∘,¨(⍕¨ns.number)
           ns.⎕FX⊂⎕CR'∆List'
-          ns.⎕FX⊂'r←∆Details instance' 'r←∆List' ' :If 0<≢instance' 'r(instance.GetPrincipal)←''assignees'' ''login''' 'r(instance.GetPrincipal)←''labels'' ''name''' ':EndIf'
-          ns.⎕FX⊂'r←∆QuickView instance;keyWords' 'r←∆Details instance' 'keyWords←''title'' ''number'' ''state'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]'
+          ns.⎕FX⊂'r←∆Details;ind' '⍝ Like <List> but with greatly improved readability' 'r←∆List' 'r(⎕THIS.##.GetPrincipal)←''assignees'' ''login''' 'r(⎕THIS.##.GetPrincipal)←''labels'' ''name''' 'r[⍸r[;2]≡¨⊂⊂''null'';2]←⊂''''' ':If 0<≢ind←⍸r[;1]∊''created_at'' ''updated_at''' 'r[ind;2]←{r←⍵ ⋄ r[11]←'' '' ⋄ r}¨r[ind;2]' ':EndIf'
+          ns.⎕FX⊂'r←∆QuickView;keyWords;ind' '⍝ Provides the most common pieces of information' 'r←∆Details' 'keyWords←''title'' ''number'' ''state'' ''created_at'' ''updated_at'' ''labels'' ''assignees''' 'r←(r[;1]∊keyWords)⌿r' 'r←r[⍋keyWords⍳r[;1];]' ':If 0<≢ind←⍸r[;1]∊''created_at'' ''updated_at''' 'r[ind;2]←{r←⍵ ⋄ r[11]←'' '' ⋄ r}¨r[ind;2]' ':EndIf'
+      :EndIf
+    ∇
+
+    ∇ r←GetIssues repoName;issues;labels
+    ⍝ Get a matrix with all issues.\\
+    ⍝ [;1] Issue number\\
+    ⍝ [;2] Creation date
+    ⍝ [;3] Title
+    ⍝ [;4] Label(s) assigned
+      :Access Public Instance
+      :If 0=≢issues←GetAllIssues repoName
+          r←0 4⍴⊂''
+      :Else
+          labels←{2::'' ⋄ ⊃{⍺,',',⍵}/⍵.name}¨issues.labels
+          r←issues.number,↑issues.(created_at title)
+          r,←labels
+          r[;2]←{r←↑⍵ ⋄ r[;11]←' ' ⋄ ↓r}r[;2]
+      :EndIf
+    ∇
+
+    ∇ r←GetLabelStats repoName;issues;labels
+    ⍝ Get a matrix with all labels assigned to issues in [;1] and the count in [;2]
+      :Access Public Instance
+      :If 0=≢issues←GetAllIssues repoName
+          r←0 2⍴⊂''
+      :Else
+          labels←⊃,/{2::⊂'<no label>' ⋄ ⍵.name}¨issues.labels
+          labels←labels{(⍵↓⍺),(⍵↑⍺)}+/'<no label>'∘≡¨labels
+          r←{⍺(≢⍵)}⌸labels
+          r[;1]←⊃¨r[;1]
+          r←r[⍒r[;2];]
       :EndIf
     ∇
 
@@ -300,7 +323,7 @@
     ⍝ * The better version number\\
     ⍝ If the given version is a beta version (say 1.2.3-beta-1) and on GitHub it is 1.2.3 then the GitHub version
     ⍝ is considered to be a later version. \\
-    ⍝ If the latest verson on GitHub is a beta an erroris thrown: this is not supported. 
+    ⍝ If the latest verson on GitHub is a beta an erroris thrown: this is not supported.
       :Access Public Instance
       betterVersion←''
       gitVersion_←GetLatestTag repoName
@@ -326,10 +349,12 @@
     ⍝ Currently this is private. We might need to change this once we introduce methods
     ⍝ that actually write data, like, say, `CreateIssue`.
     ⍝ :Access Public Instance
+    ⍝CodeCoverage:ignore⍝
       r←⎕NS''
       r.Accepted←'Accept: application/vnd.github.v3+json'
       r.Method←'GET'
       r.Body←''
+    ⍝CodeCoverage:ignore⍝
     ∇
 
     ⍝ ------------------------------------------ Private stuff ----------------------------------
@@ -364,7 +389,7 @@
           h.CongaPath←path2CongaDLLs
       :EndIf
       r←h.Run
-      (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus=200
+      (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus≡200
       data←⎕JSON r.Data
       noOfPages←GetNoOfPages r.Headers
       :If 0<noOfPages
@@ -373,7 +398,7 @@
           link←2⊃r.Headers[ind;]
           h.URL←{¯1↓1↓⍵↑⍨¯1+⍵⍳';'}link
           r2←h.Run
-          (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus=200
+          (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus≡200
           data,←⎕JSON r2.Data
           :If 2<noOfPages
               ⍝ Fetch all remaining pages
@@ -381,7 +406,7 @@
               :For link :In links
                   h.URL←link
                   r2←h.Run
-                  (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus=200
+                  (r.HttpMessage,' (',(⍕r.HttpStatus),')')Assert r.HttpStatus≡200
                   data,←⎕JSON r2.Data
               :EndFor
           :EndIf

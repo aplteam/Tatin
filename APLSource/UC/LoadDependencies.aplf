@@ -9,7 +9,7 @@
      :If 1=≢projects
          (projectName projectFolder)←projects[1;]
      :Else
-         ind←⊃'SelectProjectForLoadDependencies@Select project to load dependencies from:'##.CommTools.Select projects[;1]
+         ind←⊃'SelectProjectForLoadDependencies@Select project to load dependencies from:'##.Client.CommTools.Select projects[;1]
          :If 0=≢ind
              r←'Cancelled by user' ⋄ →0
          :EndIf
@@ -28,7 +28,7 @@
          installFolder←projectFolder,'/',1⊃installFolders
          targetSpace←projCfg.CIDER.(parent,'.',projectSpace)
      :Else
-         ind←⊃'SelectLoadFolderForLoadDependencies@Select folder to load dependencies from:'##.CommTools.Select(⊂projectFolder,'/'),¨({'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨installFolders),¨'/'
+         ind←⊃'SelectLoadFolderForLoadDependencies@Select folder to load dependencies from:'##.Client.CommTools.Select(⊂projectFolder,'/'),¨({'='∊⍵:⍵↑⍨¯1+⍵⍳'=' ⋄ ⍵}¨installFolders),¨'/'
          :If 0=≢ind
              r←'Cancelled by user' ⋄ →0
          :EndIf
@@ -50,7 +50,7 @@
      :EndIf
  :EndIf
  :If isUCMD
-     '[MyUCMDs] must stand on its own'Assert 0<≢(≢'[myucmds]')↓installFolder
+     '[MyUCMDs] must not stand on its own'Assert 0<≢(≢'[myucmds]')↓installFolder
      installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
  :EndIf
  overwriteFlag←Arg.overwrite

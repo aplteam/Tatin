@@ -1,0 +1,64 @@
+ r←{parms_}ListDirs2 path;buff;part1;part2;parms;options;flag
+⍝ Lists all directories (but nothing else) in `path`.\\
+⍝ `path` must of course be a directory.\\
+⍝ You may specify parameters either as key/value pairs or via a namespace populated with variables.
+⍝ Examples:
+⍝ ~~~
+⍝ ('recurse' 2) FilesAndDirs.ListDirs2 ''      ⍝ returns list with dirs & files in the current dir.
+⍝ ('recurse' 2) FilesAndDirs.ListDirs2 '*.md'  ⍝ returns list with files with extension "md".
+⍝ ~~~
+⍝
+⍝ ~~~
+⍝ parms←⎕ns''
+⍝ parms.recurse←2
+⍝ parms.type←3 4 5 1 0
+⍝ parms FilesAndDirs.ListDirs2 ''
+⍝ ~~~
+⍝ Alternatively you can specify these as key-values pairs like this:
+⍝ ```
+⍝ ('recurse' 1) FilesAndDirs.ListDirs2 path
+⍝ ('depth' 1) FilesAndDirs.ListDirs2 path
+⍝ ```\\
+⍝ In addition to `recursive` you may also specify an integer defining the depth. For example,
+⍝ if you are interested just in the given directories and its sub-directory set this to 2.\\
+⍝ `*` and `?` are treated as wildcard characters. That means that `FilesAndDirs` cannot deal with files
+⍝ that contain a `*` or a `?` as part of any name, be it directory or filename; under Linux and Mac OS
+⍝ these are legal characters for filenames and directory names.\\
+⍝ Returns a vector of text vectors in case anything was found and `''` otherwise.
+ 'parms'⎕NS''
+ parms.recurse←0
+ parms.depth←¯1
+ :If flag←0<⎕NC'parms_'
+     :If {(0=≡⍵)∧326=⎕DR ⍵}parms_
+         :If 0<≢parms_.⎕NL 2
+             'parms'⎕NS(⊂'parms_.'),¨↓parms_.⎕NL 2
+         :EndIf
+     :Else
+         :If {2::0 ⋄ 1⊣⍵.⎕NL 2}parms_
+             {}parms.{{⍎⍺,'←⍵'}/⍵}¨parms_.({⍵(⍎⍵)}¨↓⎕NL 2)
+             'Invalid parameter'⎕SIGNAL 11/⍨∨/~(' '~¨⍨↓parms.⎕NL 2)∊'follow' 'recursive' 'type' 'depth'
+         :Else
+             parms_←,⊂∘,⍣(2=|≡parms_)⊣parms_
+             'Invalid parameter'⎕SIGNAL 11/⍨0∊(⊃¨parms_)∊' '~¨⍨↓parms.⎕NL 2
+             parms.{{⍎⍺,'←⍵'}/⍵}¨parms_
+         :EndIf
+     :EndIf
+ :EndIf
+ path←NormalizePath,path
+ (part1 part2)←APLTreeUtils2.SplitPath path
+ 'Wildcard characters are allowed only in the last part of a path'⎕SIGNAL 11/⍨∨/'?*'∊part1
+ path↓⍨←-CurrentSep=¯1↑path
+ path,←(~∨/'?*'∊path)/CurrentSep
+ 'Right argument is not a directory'⎕SIGNAL 11/⍨0=IsDir{~∨/'*?'∊⍵:⍵ ⋄ 0⊃⎕NPARTS ⍵}path
+ options←('recurse'parms.recurse)('type'(0 1))
+ :If flag
+ :AndIf parms.depth≠¯1
+     options,←⊂('depth'parms.depth)
+ :EndIf
+ buff←options Dir2 path
+ r←''
+ :If 0<≢buff
+ :AndIf 0<≢buff←(1=1⊃buff)/0⊃buff
+     r←NormalizePath buff
+ :EndIf
+⍝Done

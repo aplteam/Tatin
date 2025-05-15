@@ -1,14 +1,14 @@
- yesOrNo←{default}YesOrNo question;isOkay;answer;add;dtb;answer2;bool;flag;buff;alias;firstPart;ind
- ⍝ Asks a simple question and allows just "Y" (or "y") or "N" (or "n") as answers.\\
- ⍝ The question may be a simple character vector, possibly with `⎕UCS 10` in between,
- ⍝ or a vector of simple character vectors.\\
- ⍝ You may specify a default via the optional left argument which when specified
- ⍝ rules what happens when the user just presses <enter>.
- ⍝ `default` must be either 1 (yes) or 0 (no).\\
- ⍝ By entering "`∘∘∘`" the user may interrupt `YesOrNo`: this activates a stop.\\
- ⍝ You can make `YesOrNo` answer the question automatically, refer to the documentation
- ⍝ with ]ADoc CommTools\\
- ⍝ Note that this function does **not** work as intended when traced!
+ yesOrNo←{default}YesOrNo question;isOkay;answer;add;dtb;answer2;bool;flag;buff;alias;firstPart;ind;Answers
+⍝ Asks a simple question and allows just "Y" (or "y") or "N" (or "n") as answers.\\
+⍝ The question may be a simple character vector, possibly with `⎕UCS 10` in between,
+⍝ or a vector of simple character vectors.\\
+⍝ You may specify a default via the optional left argument which, when specified,
+⍝ rules what happens when the user just presses <enter> without entering anything.
+⍝ `default` must be either 1 (yes) or 0 (no).\\
+⍝ By entering "`∘∘∘`" the user may interrupt `YesOrNo`: this activates a stop.\\
+⍝ You can make `YesOrNo` answer the question automatically, refer to the documentation
+⍝ with ]ADoc CommTools, catch "Automation"\\
+⍝ Note that this function does **not** work as intended when traced!
  isOkay←0
  default←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'default'
  isOkay←0
@@ -17,6 +17,7 @@
  :EndIf
  question←ReplaceCRbyLF question
  question←{⍵↓⍨+/∧\' '=⍵}question
+ question,←(~'?'∊question)/'?'
  :If 0≠≢default
      'Left argument must be a scalar'⎕SIGNAL 11/⍨1≠≢default
  :AndIf ~default∊0 1
@@ -24,22 +25,21 @@
  :EndIf
  flag←1
  firstPart←{⍵↑⍨⍵⍳LF}question
- :If 0<⎕NC'YesOrNo_Answers'
-     YesOrNo_Answers←(0<≢¨' '~⍨¨YesOrNo_Answers[;1])⌿YesOrNo_Answers
- :AndIf 0<≢YesOrNo_Answers
+ :If 0<⎕NC'∆Automation'
+ :AndIf 0<≢Answers←(∆Automation[;1]≡¨⊂'YesOrNo')⌿∆Automation[;2 3]
      :If AliasChar∊firstPart
          ind←firstPart⍳AliasChar
          (alias question)←ind{(⍺↑⍵)(⍺↓⍵)}firstPart
-         flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨YesOrNo_Answers[;1])≡¨⊂alias
-     :ElseIf ~flag←0<+/bool←YesOrNo_Answers[;1]≡¨⊂question
-     :AndIf ~flag←0<+/bool←question∘{⍵≡(≢⍵)↑⍺}¨YesOrNo_Answers[;1]
+         flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨Answers[;1])≡¨⊂alias
+     :ElseIf ~flag←0<+/bool←({⍵,(~'?'∊⍵)/'?'}¨Answers[;1])≡¨⊂question
      :AndIf LF∊question
          buff←{⍵↓⍨+/∧\' '=⍵}⊃¯1↑LF(≠⊆⊢)question
-         flag←0<+/bool←YesOrNo_Answers[;1]≡¨⊂buff
+         flag←0<+/bool←Answers[;1]≡¨⊂buff
      :EndIf
      :If flag
          'Multiple pre-prepared answers qualify?!'Assert 1=+/bool
-         answer←2⊃YesOrNo_Answers[bool⍳1;]
+         answer←2⊃Answers[bool⍳1;]
+         'YesOrNo'Log⊃Answers[bool⍳1;1]
          :If 0=≢answer
              yesOrNo←default
          :Else
@@ -80,6 +80,7 @@
              answer2←dtb answer
          :OrIf answer2≡((-≢answer2)↑LF{~⍺∊⍵:⍵ ⋄ ' ',dtb ⍺{⌽⍵↑⍨1+⍵⍳⍺}⌽⍵}question)  ⍝ ... press ...
          :OrIf answer≡{1↓⊃¯1↑(⍵=LF)⊂⍵}LF,question                                 ⍝ ... <enter>?
+         :OrIf answer≡⎕PW↓question
              :If 0≠≢default
                  yesOrNo←default
                  isOkay←1

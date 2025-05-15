@@ -1,14 +1,15 @@
- {refs}←{parms}ReInstallDependencies y;installFolder;registry;deps;refs;msg
+ {r}←{parms}ReInstallDependencies y;installFolder;registry;deps;msg
 ⍝ Re-installs all packages by honoring the file `apl-dependencies.txt`.
 ⍝ The right argument must be one of:
 ⍝ * A folder that hosts a file `apl-dependencies.txt` (install folder)
-⍝ * Optionally a Registry, either as a URL or as an alias
+⍝ * Optionally a Registry, either as a path to a directory or as an alias
 ⍝ The file `apl-buildlist.json` as well as all directories in that folder will be deleted.
 ⍝ Then all packages listed in the file `apl-dependencies.txt` are re-installed from scratch.\\
-⍝ Note that packages with different major version numbers are considered to be different packages.\\
+⍝ Note that packages with different major version numbers are considered to be different packages
+⍝ but check the parameter `major`.\\
 ⍝ By default all known Registries with a priority greater than 0 are scanned (if no Registry was specified.\\
 ⍝ The left argument is optional and, if specified, typically created by calling `CreateReInstallParms`.\\
-⍝ It may carry three parameters:
+⍝ It may carry these parameters:
 ⍝ * `noBetas`\\
 ⍝   Defaults to 0, meaning that beta versions are considered. Set to 1 if you want betas to be ignored.
 ⍝ * `update`\\
@@ -16,7 +17,13 @@
 ⍝   Change to 1 to force an update.
 ⍝ * `dry`
 ⍝   Defaults to 0, meaning the function does business.\\
-⍝   Set this to 1 in order to get a report of what the function would do without actually doing it.\\
+⍝   Set this to 1 in order to get a report of what the function would do without actually doing it.
+⍝ * `quiet`
+⍝   Defaults to 0. If this is 1 then no actions are printed to the session.
+⍝ * `major`
+⍝   Defaults to 0, meaning that packages with different major version numbers are considered different packages.
+⍝   Therefore a package foo-goo-1.0.0 is not updated to foo-goo-2.0.0
+⍝   This can be changed by setting `major←1`.\\
  :If 0=⎕NC'parms'
      parms←CreateReInstallParms
  :EndIf
@@ -24,5 +31,5 @@
  msg←'Re-installing packages in ',installFolder,((1+parms.noBetas)⊃' including' ' without'),' beta versions'
  (~parms.quiet)PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}msg
  1 EstablishRumbaClients ⍬
- refs←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.update parms.quiet
+ r←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.update parms.quiet parms.major
 ⍝Done

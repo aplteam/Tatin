@@ -1,0 +1,37 @@
+ path←flags NormalizePath_ path;UNCflag;sep;isScalar;path_;hasTrailingSep;isWin;expandFlag
+ isScalar←⍬≡⍴path
+ :If 0≠≢path←,path
+     (expandFlag isWin)←flags
+     sep←isWin⌽'\/'
+     hasTrailingSep←(¯1↑path)∊sep
+     :If 1<≡path
+         path←(⊂expandFlag isWin)NormalizePath_¨path
+     :Else
+         :If isWin
+         :AndIf '%'=1↑path
+             path←(2 ⎕NQ #'GetEnvironment'(1↓{⍵/⍨2>+\⍵='%'}path)),{⍵↓⍨1++/1=+\⍵='%'}path
+         :ElseIf '$'=1↑path
+             path←(⊃⎕SH'echo ',{⍵↑⍨⍵⍳'/'}path),{⍵↓⍨⍵⍳'/'}path
+         :EndIf
+         UNCflag←(⊂2⍴path)∊'\\' '//'
+         :If expandFlag
+             path←⊃,/1 ⎕NPARTS path
+             :If ~isWin
+                 path_←(~path∊sep)⊆path
+                 path←(0⊃sep),(⊃,/((-2×+/∧\(⌽path_)≡¨⊂'..')↓path_),¨0⊃sep)
+                 :If ~hasTrailingSep
+                     path←¯1↓path
+                 :EndIf
+             :EndIf
+         :EndIf
+         ((path=0⊃sep)/path)←1⊃sep
+         path←(~(2⍴1⊃sep)⍷path)/path
+         :If UNCflag
+             path←'\\',1↓path
+         :EndIf
+         :If isScalar
+         :AndIf 1=≢path
+             path←⊃path
+         :EndIf
+     :EndIf
+ :EndIf

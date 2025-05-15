@@ -1,4 +1,4 @@
- r←{recursive}ReInstallDependencies_(installFolder parms registry);cfg;subFolders;ind;deps;qdmx
+  r←{recursive}ReInstallDependencies_(installFolder parms registry);cfg;subFolders;ind;deps;qdmx
  r←''
  recursive←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'recursive'
  installFolder←'apl-dependencies.txt'{⍵↓⍨(-≢⍺)×⍺≡⎕C(-≢⍺)↑⍵}installFolder
@@ -34,14 +34,10 @@
  :If parms.force
  :OrIf TC.C.YesOrNo'Re-install ',(⍕≢deps),' Tatin packages in ',installFolder,'?'
      :Trap ErrNo
-         r←parms TC.ReInstallDependencies installFolder registry
+         r←1↓⊃,/(⎕UCS 13),¨⍕¨,parms TC.ReInstallDependencies installFolder registry
      :Else
          qdmx←⎕DMX
          ⎕SIGNAL/CheckForInvalidVersion qdmx
      :EndTrap
-     :If recursive
-         r←⍪(⊂'Re-installed in ',(2⊃⎕NPARTS installFolder),':'),' ',¨r
-     :Else
-         r←⍪(⊂'Re-installed in ',installFolder,':'),' ',¨r
-     :EndIf
+     r←('Re-installed in ',installFolder,':'){0=≢⍵:⍵ ⋄ ⍺,⊃,/(⎕UCS 13),⍵}r
  :EndIf

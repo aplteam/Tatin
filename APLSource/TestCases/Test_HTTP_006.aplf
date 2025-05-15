@@ -1,15 +1,10 @@
- r←Test_HTTP_006(stopFlag batchFlag);⎕TRAP;res;qdmx
+ r←Test_HTTP_006(stopFlag batchFlag);⎕TRAP;res
 ⍝ Attempt to download a package by specifying an invalid package ID
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- :Trap ##.Registry.ErrorNo
-     res←TC.LoadPackages'https://tatin.dev/HandleError-4.0.0' '#.TEMP'
-     →T.FailsIf 1
- :Else
-     qdmx←⎕DMX
-     →T.PassesIf'Invalid package ID'≡qdmx.EM
- :EndTrap
+ res←TC.LoadPackages'https://tatin.dev/HandleError-4.0.0' '#.TEMP'
+ →T.PassesIf res=0
 
  r←T._OK
 ⍝Done

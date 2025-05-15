@@ -1,0 +1,13 @@
+ {r}←WriteToWindowsEvents parms;msg
+ r←⍬
+ :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
+ :AndIf 0≠≢parms.windowsEventSource
+     :Trap (parms.trapInternalErrors)/0
+         msg←⊂'Application has crashed, RC=',(⍕crash.EN),'; MSG=',crash.EM
+         msg,←(0<≢parms.errorFolder)/''('Details can be found in ',parms.errorFolder)
+         :If 0≠≢parms.addToMsg
+             msg,←{(≡⍵)∊0 1:,⊂,⍵ ⋄ ⍵}parms.addToMsg
+         :EndIf
+         ReportErrorToWindowsLog parms.windowsEventSource msg
+     :EndTrap
+ :EndIf

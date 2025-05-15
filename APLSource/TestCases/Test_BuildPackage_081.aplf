@@ -1,0 +1,45 @@
+ r←Test_BuildPackage_081(stopFlag batchFlag);⎕TRAP;dir;src;dist;body;cfg;parms;zipfile;qdmx;rc;msg
+⍝ Build a package with a name that uses non-ASCII chars - must be rejected
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←∆GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ F.MkDir src dist
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ 'Source'#.TEMP.⎕NS''
+ #.TEMP.Source.⎕FX'r←Hello' 'r←''World'''
+ 'TatinVars'#.TEMP.⎕NS''
+ #.TEMP.TatinVars.⎕FX'r←CONFIG' 'r←(⎕ucs 13),¨''{'' ''version: "0.1.0+123",'' ''}'''
+
+ body←'∇r←Hello' 'r←''World' '∇'
+ ⎕MKDIR src,'/Source'
+ (⊂body)F.NPUT src,'/Source/Hello.aplf'
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'Package_ß'
+ cfg.version←'0.1.0+123'
+ cfg.source←'Source'
+ cfg.os_win←1
+ 0 TC.WritePackageConfigFile src cfg
+
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+
+ :Trap 998
+     zipfile←TC.BuildPackage parms
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp qdmx.EM≢'Only ASCII characters (A-Z, a-z) and, after the first char, digits (0-9) and underscores (_), are allowed'
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

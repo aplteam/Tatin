@@ -1,18 +1,18 @@
  {noOf}←{names}CreateAPIfromCFG(refTosourceNS cfg);ref;public;api;targetNamespace;Tref;b;name;flag;type;backRef;at;header;fullName;res;Tref2;backRef2
-⍝ Deletes and then re-creates a namespace `cfg.api` within `refTosourceNS` and then establishes functions
+⍝ Deletes and then re-creates a namespace <`cfg.api`> within `refTosourceNS` and then establishes functions
 ⍝ returning references to variables, namespaces, classes, interfaces, functions and operators in this namespace
 ⍝ as the public interface.\\
 ⍝ Note that the API namespace must be a child of `refTosourceNS`.\\
-⍝ `⍵` must be a vector of length 2:\\
-⍝ [1] `refTosourceNS` (mandatory)  = name of the source namespace\\
-⍝ [2] `names`         (mandatory)  = list of all public names, typically returned by a niladic tfn named `Public`\\
+⍝ `refTosourceNS` (mandatory) : name of the source namespace\\
+⍝ `cfg`           (mandatory) : package configuration as a namespace
+⍝ `names`         (optional)  : list of all public names, typically returned by a niladic tfn named `Public`\\
 ⍝ By default ALL APL objects in `refTosourceNS` will become public except when...
-⍝ * there is a function `Public` returning the names of APL objects. These are then goin to become the API
-⍝ * a list of names is passed as left argument\\
-⍝ Returns the number of fns/opr established.\\
+⍝ * there is a function `Public` returning the names of APL objects. These are then going to become the API.
+⍝ * a list of names is passed as left argument defining the public names.\\
+⍝ Returns the number of fns/oprs established.\\
 ⍝ Handles all kinds of objects: niladic, monadic, dyadic and ambivalent fns as well as
 ⍝ monadic and dyadic operators, namespaces, classes, interfaces and variables.\\
-⍝ Supports one level of sub-namespaces.\\
+⍝ Supports only one level of sub-namespaces.\\
 ⍝ It also honors shy results.\\
 ⍝ Uses Link.Fix for establishing the functions.\\
  noOf←0
@@ -36,8 +36,14 @@
      targetNamespace←(⍕refTosourceNS),'.',cfg.api
      :If 9=⎕NC targetNamespace
      :AndIf 0<≢(⍎targetNamespace).⎕NL⍳16
-         res←⎕SE.Link.Expunge targetNamespace
-         ⎕DL 1
+         :If 0
+         ⍝ Not always working properly. See <02139> among others:
+             res←⎕SE.Link.Expunge targetNamespace
+         :Else
+             res←⎕SE.Link.Expunge¨(⊂targetNamespace,'.'),¨↓(⍎targetNamespace).⎕NL 2 3 4
+             ⎕DL 0.1
+             ⎕EX targetNamespace
+         :EndIf
      :EndIf
      Tref←⍎targetNamespace ⎕NS''
      b←{1='.'+.=⍵}¨names

@@ -1,0 +1,15 @@
+ r←ListGroups Arg;registry;buff;qdmx;⎕TRAP
+ r←''
+ registry←Arg._1
+ :If 0≡registry
+     registry←tatinURL
+ :ElseIf (,'?')≡,registry
+     →(⍬≡registry←SelectRegistry 0)/0
+ :EndIf
+ registry←EnforceSlash registry
+ :Trap ErrNo
+     r←TC.ListGroups registry
+ :Else
+     qdmx←⎕DMX
+     ⎕SIGNAL/CheckForInvalidVersion qdmx
+ :EndTrap

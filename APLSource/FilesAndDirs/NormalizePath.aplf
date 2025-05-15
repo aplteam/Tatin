@@ -1,4 +1,4 @@
- path←{expandFlag}NormalizePath path;UNCflag;sep;ExpandEnvironmentStrings;isScalar;path_;isWin;hasTrailingSep
+ path←{expandFlag}NormalizePath path;isScalar;isWin
 ⍝ `path` might be either a simple text vector or scalar representing a single filename or a
 ⍝ vector of text vectors with each item representing a single filename.
 ⍝ Enforces either `\` or `/` as separator in `path` depending on the current operating system.\\
@@ -14,37 +14,11 @@
 ⍝ * Environment variables are expanded.
  isScalar←⍬≡⍴path
  :If 0≠≢path←,path
-     :If '%'∊path
-     :AndIf 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
-         'ExpandEnvironmentStrings'⎕NA'I4 KERNEL32.C32|ExpandEnvironmentStrings* <0T >0T I4'
-         path←1⊃ExpandEnvironmentStrings path 2048 2048
-     :EndIf
      expandFlag←{0<⎕NC ⍵:{0=1↑0⍴⍵:⍵ ⋄ 'expand'≡⎕C ⍵}w←⍎⍵ ⋄ 0}'expandFlag'
      isWin←'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
-     sep←isWin⌽'\/'
-     hasTrailingSep←(¯1↑path)∊sep
-     :If 1<≡path
-         path←expandFlag NormalizePath¨path
-     :Else
-         UNCflag←(⊂2⍴path)∊'\\' '//'
-         :If expandFlag
-             path←⊃,/1 ⎕NPARTS path
-             :If ~isWin
-                 path_←(~path∊sep)⊆path
-                 path←(0⊃sep),(⊃,/((-2×+/∧\(⌽path_)≡¨⊂'..')↓path_),¨0⊃sep)
-                 :If ~hasTrailingSep
-                     path←¯1↓path
-                 :EndIf
-             :EndIf
-         :EndIf
-         ((path=0⊃sep)/path)←1⊃sep
-         path←(~(2⍴1⊃sep)⍷path)/path
-         :If UNCflag
-             path←'\\',1↓path
-         :EndIf
-         :If isScalar
-         :AndIf 1=≢path
-             path←⊃path
-         :EndIf
+     path←(expandFlag isWin)NormalizePath_ path
+     :If isScalar
+     :AndIf 1=≢path
+         path←⊃path
      :EndIf
  :EndIf

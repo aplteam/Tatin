@@ -1,0 +1,18 @@
+ r←HasGroup id;buff
+⍝ "id" can be something like
+⍝ * <pkg-name>
+⍝ * <pkg-name>-1
+⍝ * <pkg-name>-1.2
+⍝ * <pkg-name>-1.2.3
+⍝ * <group-name>-<pkg-name>
+⍝ * <group-name>-<pkg-name>-1
+⍝ * <group-name>-<pkg-name>-1.2
+⍝ * <group-name>-<pkg-name>-1.2.3
+⍝ The function returns 1 only if "id" has a group name
+ r←0
+ :If 2='-'+.=id
+     r←1
+ :Else
+     buff←'-'(≠⊆⊢)id
+     r←~⎕D∊⍨⊃2⊃buff  ⍝ If the first element of the last part is a digit, it must be a version number rather than a group name, so there cannot be a group name!
+ :EndIf

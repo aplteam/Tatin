@@ -1,4 +1,4 @@
- value←{enforce}(CheckFn AskForNumber)question;flag;input;valid;alias;bool;buff;success;firstPart;ind
+ value←{enforce}(CheckFn AskForNumber)question;flag;input;valid;alias;bool;buff;success;firstPart;ind;AskForNumber_Answers
 ⍝ Operator asking a question and allowing the user to enter a number.\\
 ⍝ By entering "`∘∘∘`" the user may interrupt `AskForNumber`: this activates a stop.\\
 ⍝ `CheckFn` is supposed to be a function that gets the input as `⍵` and must return a Boolean
@@ -6,8 +6,9 @@
 ⍝ a check function pass `{1}` as left operand.\\
 ⍝ If the user refuses to enter a number an empty vector is returned.
 ⍝ However, you might prevent this from happening by specifying a 1 as `⍺` (`enforce`), meaning that
-⍝ the user must enter a number in order to continue.
+⍝ the user must enter a number in order to continue.\\
  enforce←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'enforce'
+ 'Left argument ("enforce numeric input")must be a Boolean'Assert enforce∊0 1
  value←⍬
  success←flag←0
  :If ~(≡question)∊0 1
@@ -16,22 +17,24 @@
  question←ReplaceCRbyLF question
  question←{⍵↓⍨+/∧\' '=⍵}question
  :Repeat
-     firstPart←{⍵↑⍨⍵⍳LF}question
-     :If 0<⎕NC'AskForNumber_Answers'
+     firstPart←{⍵↑⍨¯1+⌊/⍵⍳LF,' '}question
+     :If 0<⎕NC'∆Automation'
+         AskForNumber_Answers←(∆Automation[;1]≡¨⊂'AskForNumber')⌿∆Automation[;2 3]
          AskForNumber_Answers←(0<≢¨' '~⍨¨AskForNumber_Answers[;1])⌿AskForNumber_Answers
          AskForNumber_Answers[;1]←{⍵↓⍨+/∧\' '=⍵}¨AskForNumber_Answers[;1]
      :AndIf 0<≢AskForNumber_Answers
          :If AliasChar∊firstPart
              ind←firstPart⍳AliasChar
          :AndIf ∧/~(LF,' ')∊ind↑question
-             (alias question)←ind{(⍺↑⍵)(⍺↓⍵)}firstPart
+             (alias question)←ind{(⍺↑⍵)(⍺↓⍵)}question
              flag←0<+/bool←({⍵↑⍨⍵⍳AliasChar}¨AskForNumber_Answers[;1])≡¨⊂alias
-         :ElseIf ~flag←0<+/bool←AskForNumber_Answers[;1]≡¨⊂firstPart
-             flag←0<+/bool←firstPart∘{⍵≡(≢⍵)↑⍺}¨AskForNumber_Answers[;1]
+         :Else
+             flag←0<+/bool←AskForNumber_Answers[;1]≡¨⊂question
          :EndIf
          :If flag
              'Multiple pre-prepared answers qualify?!'Assert 1=+/bool
              input←⍕2⊃AskForNumber_Answers[bool⍳1;]
+             'AskForNumber'Log⊃AskForNumber_Answers[bool⍳1;]
          :EndIf
      :Else
          :If (⌊/firstPart⍳' ',LF)>firstPart⍳AliasChar
@@ -39,7 +42,7 @@
          :EndIf
      :EndIf
      :If ~flag
-         input←⍞,0/⍞←question,': '
+         input←⍞,0/⍞←question,((':'≠¯1↑question)/':'),' '
          :If '∘∘∘'≡¯3↑input
              (1+⊃⎕LC)⎕STOP⊃⎕SI
              ∘∘∘ ⍝ Deliberate stop caused by user input

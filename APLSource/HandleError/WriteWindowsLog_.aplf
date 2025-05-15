@@ -1,0 +1,28 @@
+ {r}←WriteWindowsLog_(source type message);eventLog;sep;⎕USING;buffer;⎕ML
+⍝ This function writes to the Windows Event Log.
+⍝ "message" must either be a string or a vector of strings.
+⍝ "type"
+ ⎕ML←1
+ r←⍬
+ ⎕USING←'System,system.dll' 'System.Diagnostics,system.dll'
+    ⍝ Should check the source/log exist.
+ eventLog←⎕NEW EventLog
+ eventLog.Source←source
+ sep←⎕UCS 10
+ buffer←¯1↓⊃,/message,¨sep
+ eventLog.WriteEntry buffer type
+ ∇
+
+ ∇ html←ExchangeHtmlChars html;b
+ :If 0<+/b←html='&'
+     (b/html)←⊂'&amp;'
+     html←∊html
+ :EndIf
+ :If 0<+/b←html='<'
+     (b/html)←⊂'&lt;'
+     html←∊html
+ :EndIf
+ :If 0<+/b←html='>'
+     (b/html)←⊂'&gt;'
+     html←∊html
+ :EndIf

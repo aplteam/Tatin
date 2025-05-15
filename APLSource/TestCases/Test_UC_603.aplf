@@ -14,11 +14,11 @@
  parms.ignoreUserExec←1
  parms.verbose←0
  res←⎕SE.Cider.OpenProject parms
- Assert∨/'Project successfully opened and established in "#.booproj"'⍷∊res
+ Assert∨/'Project successfully opened and established in: #.booproj'⍷∊res
 
  ref←⎕SE._Tatin.Tatin.GetRefToTatin ⍬
- ref.Client.C.Select_Choices←1 2⍴'SelectCiderProject@' '#.booproj'
- ref.Client.C.Select_Choices⍪←'SelectPackageFolder@' 'packages_dev/'
+ ref.Client.C.AddAutomation'Select' 'SelectCiderProject@' '#.booproj'
+ ref.Client.C.AddAutomation'Select' 'SelectPackageFolder@' 'packages_dev/'
  (rc msg res)←∆UCMD'PackageDependencies'
  →T.GoToTidyUp~(rc=0)∧0=≢msg
  res←(⎕UCS 10)(≠⊆⊢)res

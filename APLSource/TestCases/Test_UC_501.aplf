@@ -1,13 +1,13 @@
  r←Test_UC_501(stopFlag batchFlag);⎕TRAP;rc;msg;result;stop
-⍝ Exercise ]Tatin.FindDependencies of two packages and the folder
+⍝ Exercise ]Tatin.FindDependencies on the test server with -verbose on a single package
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  stop←0
- (rc msg result)←stop ∆UCMD'FindDependencies APLTreeUtils2,Tester2 ',##.CiderConfig.HOME
+ (rc msg result)←stop ∆UCMD'FindDependencies markapl [localhost] -verbose'
  Assert 0=rc
- →T.PassesIf 0<≢result
- →T.PassesIf∧/∆CheckForHavingDependencyFile result
+ →T.PassesIf 2=⍴⍴result
+ →T.PassesIf'aplteam-Laguntza-6.0.0-beta-1\'{⍺≡(≢⍺)↑⍵}2⊃result[2;]
 
  r←T._OK
 ⍝Done

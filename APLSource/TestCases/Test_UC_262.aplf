@@ -1,4 +1,4 @@
- R←Test_UC_262(stopFlag batchFlag);⎕TRAP;stop;msg;rc;tempDir;parms;res;parms2;res2;cfg;cfgFilename;noOf
+ R←Test_UC_262(stopFlag batchFlag);⎕TRAP;stop;msg;rc;tempDir;parms;res;parms2;res2;cfg;cfgFilename;noOf;C;ref
 ⍝ Exercise ]Tatin.LoadDependencies without an argument
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  R←T._Failed
@@ -23,7 +23,7 @@
  parms2.ignoreUserExec←1
  parms2.watch←'ns'
  res2←⎕SE.Cider.OpenProject parms2
- Assert∨/'Project successfully opened and established in "#.TEMP.Foo"'⍷∊res2
+ Assert∨/'Project successfully opened and established in: #.TEMP.Foo'⍷∊res2
 
  cfgFilename←parms2.folder,'/cider.config'
  cfg←⎕JSON⍠('Dialect' 'JSON5')⊢⊃⎕NGET cfgFilename
@@ -36,9 +36,9 @@
  Assert'example-JustOneBeta-0.1.0-beta-1'≡∊res
 
  stop←0
- #.Tatin.CommTools.Select_Choices←0 2⍴⍬
- #.Tatin.CommTools.Select_Choices⍪←1 2⍴'SelectLoadFolderForLoadDependencies@'(parms2.folder,'/','MyPackages')
- #.Tatin.CommTools.Select_Choices⍪←1 2⍴'SelectProjectForLoadDependencies@' '#.TEMP.Foo'
+ ref←∆GetRefToTatin
+ ref.Client.CommTools.AddAutomation'Select' 'SelectLoadFolderForLoadDependencies@'(parms2.folder,'/','MyPackages')
+ ref.Client.CommTools.AddAutomation'Select' 'SelectProjectForLoadDependencies@' '#.TEMP.Foo'
  (rc msg)←2↑stop ∆UCMD'LoadDependencies'
  →T.GoToTidyUp 0≠rc
  →T.GoToTidyUp 0<≢msg
@@ -47,8 +47,10 @@
  R←T._OK
 
 ∆TidyUp:
+ ref.Client.CommTools.Cleanup
  noOf←0 ⎕SE.Cider.CloseProject #.TEMP.Foo
  'Unable to close #.TEMP.Foo?!'Assert 1=noOf
+ #._tatin.(⎕EX ⎕NL⍳16)
  (rc msg)←F.RmDirByForce tempDir
  msg Assert rc=0
 ⍝Done

@@ -80,7 +80,7 @@
      :EndIf
  :EndIf
  :If 0=≢newPrincipalPkgs
-     cfg←ReadPackageConfigFile folder,RemoveAlias packageID_2
+     cfg←GetPackageConfigFileAsNS folder,RemoveAlias packageID_2
      :If 0<cfg.⎕NC'userCommandScript'
      :AndIf 0<≢cfg.userCommandScript ⍝ Is it a user command?!
          F.DeleteFile folder,⊃,/1↓⎕NPARTS cfg.userCommandScript
@@ -98,7 +98,7 @@
              msg←'Package is not installed'
              →cleanup←0
          :EndIf
-         cfg←ReadPackageConfigFile folder,RemoveAlias packageID_2
+         cfg←GetPackageConfigFileAsNS folder,RemoveAlias packageID_2
          :If 0<cfg.⎕NC'userCommandScript'
          :AndIf 0<≢cfg.userCommandScript ⍝ Is it a user command?!
              F.DeleteFile folder,⊃,/1↓⎕NPARTS cfg.userCommandScript

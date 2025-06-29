@@ -1,0 +1,21 @@
+ cfg←GetPackageConfigFileAsNS path;cfg_file;cfg;json;Reg
+⍝ Takes a path to a package (local or URL) and returns the config file as a namespace with variables.\\
+⍝ If the config file can not be found an empty vector is returned.
+ Reg←##.Registry
+ path←ReplaceRegistryAlias path
+ :If Reg.IsHTTP path
+     json←ReadPackageConfigFile path
+     ((json=CR)/json)←LF
+ :Else
+     cfg_file←path,((⎕C CFG_Name≢⎕C(-≢CFG_Name)↑path))/'/',CFG_Name
+     ('Config file missing: ',cfg_file)Assert F.Exists cfg_file
+     json←⊃F.NGET cfg_file
+     (('\'=json)/json)←'/'
+     'Odd number of " ?!'Assert 0=2|'"'+.=json
+ :EndIf
+ :Trap 0
+     'cfg'⎕NS Reg.JSON json
+ :Else
+     0 Assert⍨'Attempt to convert to JSON5 failed: ',cfg_file
+ :EndTrap
+⍝Done

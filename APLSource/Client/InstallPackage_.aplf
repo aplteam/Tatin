@@ -54,7 +54,7 @@
              PrintToSession'    Add ',packageID2,' to dependency file...'
              targetFolder Dependencies.Add alias,packageID2
          :Else
-             cfg←Reg.ReadPackageConfigFile installFolder
+             cfg←Reg.GetPackageConfigFileAsNS installFolder
              :If 0<cfg.⎕NC'userCommandScript'
              :AndIf 0<≢cfg.userCommandScript
                  ⎕NDELETE installFolder,'/',⊃,/1↓⎕NPARTS cfg.userCommandScript  ⍝  ⍝TODO⍝ Remove once User Command Framework stops scanning cmddirs for more than 1 level

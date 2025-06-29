@@ -11,6 +11,10 @@ Tatin release notes contain information regarding actions that need to be execut
 
 This document does not come with a complete list of fixes, added features etc. Consult [Tatin on GitHub](https://github.com/aplteam/Tatin) for that.
 
+## Version 0.120.1 from 2025-06-30
+
+* No action required
+
 ## Version 0.120.0 from 2025-05-03
 
 * `LoadPackages` now throws an error when one of the packages specified cannot be found. No package is loaded.
@@ -306,6 +310,8 @@ No breaking changes, no user actions required.
 ## Version 0.96.0 from 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

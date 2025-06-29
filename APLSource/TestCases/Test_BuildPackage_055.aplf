@@ -7,7 +7,7 @@
  tempDir ⎕NCOPY ∆TEMP_TEST_DATA,'/Build/Special'
  path←tempDir,'/Special/'
 
- cfg←TC.ReadPackageConfigFile path,'apl-package.json'
+ cfg←TC.GetPackageConfigFileAsNS path,'apl-package.json'
  parms←TC.CreateBuildParms path
  parms.targetPath←path
  parms.version←'4.0.0-beta-2+99'
@@ -15,7 +15,7 @@
  zipFileName←TC.BuildPackage parms
  list←TC.ZipArchive.ListZipContents zipFileName
  →T.GoToTidyUp~(⊂F.EnforceSlash'apl-dependencies.txt')∊F.EnforceSlash¨list
- cfg2←TC.ReadPackageConfigFile path,'apl-package.json'
+ cfg2←TC.GetPackageConfigFileAsNS path,'apl-package.json'
  →T.GoToTidyUp cfg2.version≢'4.0.0-beta-2+100'
 
  r←T._OK

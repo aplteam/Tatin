@@ -36,7 +36,7 @@ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
  :EndIf
  :If TC.Reg.IsHTTP what
      :Trap ErrNo
-         r←TC.ReadPackageConfigFile_ what
+         r←TC.ReadPackageConfigFile what
      :Else
          qdmx←⎕DMX
          ⎕SIGNAL/CheckForInvalidVersion qdmx
@@ -62,7 +62,7 @@ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
              :EndIf
          :EndIf
          :If TC.F.IsFile filename
-             ns←TC.ReadPackageConfigFile path
+             ns←TC.GetPackageConfigFileAsNS path
              newFlag←0
          :Else
              :If ~Arg.quiet

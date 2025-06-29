@@ -10,19 +10,19 @@
  path2←path,'/APLGit2/'
  parms←TC.CreateBuildParms path2
  parms.targetPath←path2
- cfgOrig←TC.ReadPackageConfigFile path2
+ cfgOrig←TC.GetPackageConfigFileAsNS path2
  Assert~'+'∊cfgOrig.version
 
  parms.version←'+1.0.0+'        ⍝ Adds a build number
  zipFilename←TC.BuildPackage parms
- cfg←TC.ReadPackageConfigFile path2
+ cfg←TC.GetPackageConfigFileAsNS path2
  →T.GoToTidyUp cfg.version≢'1.0.0+1'
  F.DeleteFile zipFilename
 
  path2 ⎕NCOPY⍠('IfExists' 'Replace')⊢testDataPath,'/apl-package.json'
  parms.version←'2.3.4+12'
  zipFilename←TC.BuildPackage parms
- cfg←TC.ReadPackageConfigFile path2
+ cfg←TC.GetPackageConfigFileAsNS path2
  →T.GoToTidyUp cfg.version≢'2.3.4+13'
  F.DeleteFile zipFilename
 

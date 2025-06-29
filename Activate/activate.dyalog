@@ -1,4 +1,4 @@
-﻿:Namespace activate ⍝ v0.4.0
+﻿:Namespace activate ⍝ v0.4.1
 ⍝ Pre-packaged tool activation
 ⍝ 2023-09-25
 ⍝ 2023-11-02 kai: `Run` must go into StartupSession/ rather than SessionExtensions/
@@ -6,6 +6,7 @@
 ⍝ 2024-01-15 adam: [21074] always return result
 ⍝ 2024-06-05 AndyS: [21422] Gracefully and informatively fail if run on AIX or on Classic interpreters; remove reference to -update in Help
 ⍝ 2025-03-12 kai: .dyalog/ fixed, -versionagnostic flag added, -update flag removed, ]deactivate polished, ]ListActivated added
+⍝ 2025-05-21 kai: Even ]Activate tatin wrongly reported that Cider was activated
 
     ⎕IO←1 ⋄ ⎕ML←1   ⍝ Set those here to avoid inheriting them from outside
     AllCmds←'Activate' 'Deactivate' 'ListActivated'
@@ -166,7 +167,7 @@
       :EndIf
     ∇
 
-    ∇ r←Activate(tool agnostic target target2);source;folder;m;src;sep;cmddir;z;mat
+    ∇ r←Activate(tool agnostic target target2);source;folder;m;src;sep;cmddir;z;mat;report
       r←''
       :If 'all'≡tool
       :AndIf ⎕NEXISTS target
@@ -184,13 +185,15 @@
       :If 0<+/mat[1+~agnostic;]
           →0⊣r←'Already installed in version-',((1+agnostic)⊃'specific' 'agnostic'),' folder: ',⊃{⍺,',',⍵}/mat[1+~agnostic;]/'Tatin' 'Cider'
       :EndIf
-      source←''
+      source←report←''
       folder←DYALOG,'/Experimental/CiderTatin/'
       :If (⊂tool)∊'tatin' 'all'
           source,←⊂folder,'Tatin'
+          report,←⊂'Tatin'
       :EndIf
       :If (⊂tool)∊'cider' 'all'
           source,←⊂folder,'Cider'
+          report,←⊂'Cider'
       :EndIf
       :If tool≡'cider'
       :AndIf 0=+/⎕NEXISTS target target2,¨⊂'/Tatin'
@@ -203,12 +206,11 @@
       :EndIf
       3 ⎕MKDIR target
       target ⎕NCOPY source
+      r,←'Activated: ',(⊃{⍺,', ',⍵}/report),CR
       source←folder,'Run.aplf'
-      r,←tool,' activated...',CR
-      :If ~⎕NEXISTS target2
+      :If ~⎕NEXISTS target2,'/',⊃,/1↓⎕NPARTS source
           3 ⎕MKDIR target2
           target2 ⎕NCOPY source
-          r,←'Cider activated...',CR
       :EndIf
       sep←(1+'Win'≡3↑⊃APLV)⊃':;'
       cmddir←GetSaltsCmdDir sep

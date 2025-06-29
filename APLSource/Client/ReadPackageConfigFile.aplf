@@ -1,21 +1,18 @@
- cfg←ReadPackageConfigFile path;cfg_file;cfg;buff;Reg
-⍝ Takes path to a package and returns the config file for that package as a namespace populated with variables.\\
-⍝ `path` may or may not carry the filename.\\
-⍝ If the config file could not be found and empty vector is returned.
- Reg←##.Registry
- path←ReplaceRegistryAlias path
- :If Reg.IsHTTP path
-     cfg←ReadPackageConfigFile_ path
+ list←ReadPackageConfigFile uri;host;packageID;request;res
+⍝ Takes a package URL and returns a char vector representing the package's config file
+ (host packageID)←Reg.SeparateUriAndPackageID uri
+ packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/packages/details/',{⍵↓⍨'/'=1⍴⍵}packageID
+ request.Headers,←⊂'Accept' 'application/json'
+ res←SendAndReceive host request
+ :Select res.StatusCode
+ :Case 404
+     list←''
+ :Case 200
+     list←{(,0)≡⍴⍵:'' ⋄ ⎕JSON⍠('Dialect' 'JSON5')⊣⍵}⊣res.Content
+     list←1↓⊃,/CR,¨list
  :Else
-     cfg_file←path,((⎕C CFG_Name≢⎕C(-≢CFG_Name)↑path))/'/',CFG_Name
-     ('Config file missing: ',cfg_file)Assert F.Exists cfg_file
-     buff←⊃F.NGET cfg_file
-     (('\'=buff)/buff)←'/'
-     'Odd number of " ?!'Assert 0=2|'"'+.=buff
-     :Trap 0
-         'cfg'⎕NS Reg.JSON buff
-     :Else
-         0 Assert⍨'Attempt to convert to JSON5 failed: ',cfg_file
-     :EndTrap
- :EndIf
+     ('Failed with status code ',⍕res.StatusCode)Assert 0
+ :EndSelect
 ⍝Done

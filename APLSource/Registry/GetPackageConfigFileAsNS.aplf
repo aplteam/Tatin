@@ -1,0 +1,9 @@
+ cfg←GetPackageConfigFileAsNS path;json
+⍝ Takes path to a package config file and returns the contents as a namespace with variables
+ :If CFG_Name{⍺≢(-≢⍺)↑⍵}path
+     path←(##.FilesAndDirs.AddTrailingSep path),CFG_Name
+ :EndIf
+ json←⊃F.NGET path
+ (('\'=json)/json)←'/'
+ cfg←⎕JSON⍠('Dialect' 'JSON5')⊣json
+⍝Done

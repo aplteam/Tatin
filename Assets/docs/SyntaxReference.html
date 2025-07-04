@@ -769,6 +769,12 @@ version</code></pre>
 </a>
 </div>
 <pre tabindex="0"><code>mat←{parms} ListPackages uri</code></pre>
+<p>Lists all packages either for a given Registry or an install folder.</p>
+<div class="h_tag">
+<a href="#listpackages-on-a-registry" id="listpackages-on-a-registry" class="autoheader_anchor">
+<h4 data-id="ListPackages-on-a-Registry">2.23.1. ListPackages on a Registry</h4>
+</a>
+</div>
 <p>Lists all packages of a given Registry except when the last package of a major version number is marked as deprecated — see <code>ListDeprecated</code> for listing those.</p>
 <p><code>uri</code> must be one of:</p>
 <ul>
@@ -776,13 +782,20 @@ version</code></pre>
 <li>A path to a Registry and optionally a (possibly incomplete) package ID</li>
 </ul>
 <div class="h_tag">
+<a href="#listpackages-on-a-local-path" id="listpackages-on-a-local-path" class="autoheader_anchor">
+<h4 data-id="ListPackages-on-a-local-path">2.23.2. ListPackages on a local path (an install folder)</h4>
+</a>
+</div>
+<p>Such a folder must contain a file <code>apl-buildlist.json</code> - that makes a folder an install folder from Tatin's perspective.</p>
+<p>With such an argument the result is basically the contents of the build file plus an additional column with a Boolean that is 1 in case the package is actually installed and 0 otherwise.</p>
+<div class="h_tag">
 <a href="#right-argument" id="right-argument" class="autoheader_anchor">
-<h4 data-id="Right-argument">2.23.1. Right argument</h4>
+<h4 data-id="Right-argument">2.23.3. Right argument</h4>
 </a>
 </div>
 <div class="h_tag">
 <a href="#folder" id="folder" class="autoheader_anchor">
-<h5 data-id="Folder">2.23.1.1. Folder</h5>
+<h5 data-id="Folder">2.23.3.1. Folder</h5>
 </a>
 </div>
 <p>In case a folder was specified a two-column matrix is returned:</p>
@@ -800,7 +813,7 @@ version</code></pre>
 </table>
 <div class="h_tag">
 <a href="#registry" id="registry" class="autoheader_anchor">
-<h5 data-id="Registry">2.23.1.2. Registry</h5>
+<h5 data-id="Registry">2.23.3.2. Registry</h5>
 </a>
 </div>
 <p>In case a Registry was specified, by default all packages saved in that Registry are returned, aggregated by major versions, as a two-column matrix.</p>
@@ -808,7 +821,7 @@ version</code></pre>
 <p>You may even specify just a package name, without a group name. That would not make a difference in case the name is only used once, but if it is used in several groups then all of them will be listed.</p>
 <div class="h_tag">
 <a href="#left-argument" id="left-argument" class="autoheader_anchor">
-<h4 data-id="Left-argument">2.23.2. Left argument</h4>
+<h4 data-id="Left-argument">2.23.4. Left argument</h4>
 </a>
 </div>
 <p>Optionally <code>parms</code> can be specified. If specified this must be a namespace that must contain the variables <code>group</code>, <code>tags</code> and <code>aggregate</code>. It may contain <code>date</code>, <code>since</code>, <code>project_url</code> and/or <code>userCommand</code>.</p>
@@ -832,7 +845,7 @@ version</code></pre>
 </ul>
 <div class="h_tag">
 <a href="#packageid" id="packageid" class="autoheader_anchor">
-<h5 data-id="packageID">2.23.2.1. packageID</h5>
+<h5 data-id="packageID">2.23.4.1. packageID</h5>
 </a>
 </div>
 <ul>
@@ -854,7 +867,7 @@ version</code></pre>
 </ul>
 <div class="h_tag">
 <a href="#result" id="result" class="autoheader_anchor">
-<h4 data-id="Result">2.23.3. Result</h4>
+<h4 data-id="Result">2.23.5. Result</h4>
 </a>
 </div>
 <p>Returns a matrix with at least two and up to four columns. These columns are always returned:</p>
@@ -876,7 +889,7 @@ version</code></pre>
 </ul>
 <div class="h_tag">
 <a href="#deprecated-packages" id="deprecated-packages" class="autoheader_anchor">
-<h4 data-id="Deprecated-packages">2.23.4. Deprecated packages</h4>
+<h4 data-id="Deprecated-packages">2.23.6. Deprecated packages</h4>
 </a>
 </div>
 <p>In case the last published version of a package carries a flag <code>deprecated</code> in its config file and that is a 1, such a package and all its predecessors with the same major version number <em>are not listed</em>.</p>

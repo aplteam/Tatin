@@ -729,6 +729,10 @@ r←{verbose} GetNoCachingFlag url
 mat←{parms} ListPackages uri
 ```
 
+Lists all packages either for a given Registry or an install folder.
+
+#### ListPackages on a Registry
+
 Lists all packages of a given Registry except when the last package of a major version number is marked as deprecated --- see `ListDeprecated` for listing those.
 
 `uri` must be one of:
@@ -736,6 +740,11 @@ Lists all packages of a given Registry except when the last package of a major v
 * A path to an install folder, defined by the presence of a file `apl-buildlist.json`
 * A path to a Registry and optionally a (possibly incomplete) package ID
 
+#### ListPackages on a local path (an install folder)
+
+Such a folder must contain a file `apl-buildlist.json` - that makes a folder an install folder from Tatin's perspective.
+
+With such an argument the result is basically the contents of the build file plus an additional column with a Boolean that is 1 in case the package is actually installed and 0 otherwise.
 
 #### Right argument
 
@@ -1141,6 +1150,7 @@ r←Version
 ```
 
 Returns "name", "version" and "date".
+
 
 
 

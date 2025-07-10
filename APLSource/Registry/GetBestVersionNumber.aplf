@@ -1,4 +1,4 @@
- r←{noBetas}GetBestVersionNumber path;id;list;buff;list2;version;best;path_;buff2
+ r←{noBetas}GetBestVersionNumber path;best;buff;buff2;id;list;list2;listOfDirs;path_;version
 ⍝ Establishes the best version number for ⍵
 ⍝ See test group "GetBestVersion" for all possibilities.
 ⍝ Returns an empty vector in case nothing fits.
@@ -11,7 +11,11 @@
  :If IsValidPackageName id
      ⍝ We first need to establish the group:
      path←{⍵↓⍨-≢'/\'A.Last ⍵}path
-     buff←F.ListDirs path,'*-',id
+     listOfDirs←F.ListDirs path,'*'
+     :If 0=≢listOfDirs
+         :Return
+     :EndIf
+     buff←((⊂⎕C id)≡¨(≢id)↑¨⎕C{⍵↑⍨¯1+⍵⍳'-'}¨{⍵↓⍨⍵⍳'-'}¨(≢path)↓¨listOfDirs)/listOfDirs
      :If 0=≢buff
          :Return
      :EndIf
@@ -42,4 +46,3 @@
          r←path_,({⍵/⍨2>+\'-'=⍵}best),'-',version
      :EndIf
  :EndIf
-⍝Done

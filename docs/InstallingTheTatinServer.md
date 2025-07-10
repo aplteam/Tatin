@@ -17,7 +17,9 @@ After downloading it from <https://github.com/aplteam/Tatin/releases> you need t
 
 On Windows and Linux at least Dyalog Unicode 18.2 is required.
 
-For the time being neither the Pi nor Mac OS nor AIX are supported. The PI and Mac OS might be added at a later stage.
+For the time being neither the Pi nor AIX are supported. The PI might be added at a later stage.
+
+The Tatin server now runs on Mac OS with Dyalog version 19.0.50074 or better.
 
 ## Configuration: the INI File
 
@@ -304,6 +306,7 @@ What kind of actions need to be taken, if any, is revealed by the release notes.
 First of all, never replace the folder `maintenance/`: its content documents what changes have been carried out towards the packages in the past, and you don't want to lose this.
 
 If the new one is not empty then copy the content over. Maintenance files can be used to carry out changes on all or some of the packages managed by that server, like adding a new property to the package config files of all packages.
+
 
 
 

@@ -18,10 +18,7 @@
      #.ErrorParms.customFns←'SendCrashMail'
  :EndIf
  ExecuteMaintenanceCode G
- congaPath←2 ⎕NQ #'GetEnvironment' 'DYALOG'
- :If 'Win'≢3↑⎕C 1⊃'.'⎕WG'APLVersion'
-     congaPath,←'/lib'
- :EndIf
+ congaPath←(2 ⎕NQ #'GetEnvironment' 'DYALOG'),(~##.Registry.IsWindows)/'/lib'
  ##.Admin.InitConga congaPath
  success←1
 ⍝Done

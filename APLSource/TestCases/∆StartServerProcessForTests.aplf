@@ -1,6 +1,5 @@
- {r}←∆StartServerProcessForTests debugFlag;P;rc;parms
-⍝ This function starts a server that acts on ∆TEMP_SERVER_FOLDER
-⍝ It's the first version which uses aplteamm-APLProcess which works fine on Windows but not at all elsewhere
+ {r}←∆StartServerProcessForTests(debugFlag folder);P;rc;parms
+⍝ This function starts a server that acts on `folder` if not empty
  parms←##.APLProcess.CreateParms
  parms.Exe←##.Admin.GetAPLVersion ⍬
  :If 0  ⍝ Because "load" and "lx" do not work on Linux and Mac OS
@@ -17,8 +16,8 @@
          parms.CommandLineArgs,←' tatinHome="',F.PWD,'" '
      :EndIf
  :EndIf
- :If 0<⎕NC'∆TEMP_SERVER_FOLDER'
-     parms.CommandLineArgs,←'serverPath="',(F.ExpandPath ∆TEMP_SERVER_FOLDER,'..'),'" '
+ :If 0<≢folder
+     parms.CommandLineArgs,←'serverPath="',(F.ExpandPath folder,'..'),'" '
  :EndIf
  :If 0 ⍝ Because "load" and "lx" do not work on Linux and Mac OS
      parms.CommandLineArgs,←'lx="',(debugFlag/'1 '),'#.LoadTatinAndStartServer 1" '

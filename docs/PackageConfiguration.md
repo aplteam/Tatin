@@ -229,8 +229,6 @@ That can be achieved by adding them to the "files" property. `files` can be one 
 * A single file
 * A comma-separated list of files
 
-Note that if it specifies a sub-folder, `BuildPackage` will copy the folder from that project-specific sub-folder to the root of the package.
-
 See also "[assets](#)".
 
 I> Note that a file `LICENSE` in the root of a project is by convention copied to the root of a package when a package is build.
@@ -519,6 +517,7 @@ In case [`assets`](#assets) is not empty this function returns a simple char vec
 [^version]: A version is built from the major number, the minor number and the version number, optionally followed by a build number
 
 [^TatinVars]: The Tatin package variables are discussed in detail in the document `FirstStepsWithTatin.html`
+
 
 
 

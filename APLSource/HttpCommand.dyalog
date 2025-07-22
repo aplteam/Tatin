@@ -7,7 +7,7 @@
     ∇ r←Version
     ⍝ Return the current version
       :Access public shared
-      r←'HttpCommand' '5.9.1' '2025-03-08'
+      r←'HttpCommand' '5.9.2' '2025-06-21'
     ∇
 
 ⍝ Request-related fields
@@ -63,10 +63,15 @@
     :field ConxProps←''                            ⍝ when a client is made, its connection properties are saved so that if either changes, we close the previous client
     :field origCert←¯1                             ⍝ used to check if Cert changed between calls
 
-    ∇ UpdateCommandMethod arg
+    ∇ UpdateCommandMethod arg 
+    ⍝ keeps Command and its alias Method in sync
       :Implements Trigger Command,Method
       :If (Command Method)∨.≢⊂arg.NewValue
-          Command←Method←arg.NewValue
+          :If 'Command'≡arg.Name
+              Method←arg.NewValue
+          :Else
+              Command←arg.NewValue
+          :EndIf
       :EndIf
     ∇
 
@@ -182,9 +187,9 @@
       r←''
       :Trap Debug↓0
           :If 0∊⍴args
-              r←##.⎕NEW ⊃⎕CLASS ⎕THIS
+              r←##.⎕NEW⊃⊃⎕CLASS ⎕THIS
           :Else
-              r←##.⎕NEW (⊃⊃⎕CLASS ⎕THIS)(eis⍣(9.1≠nameClass⊃args)⊢args)
+              r←##.⎕NEW(⊃⊃⎕CLASS ⎕THIS)(eis⍣(9.1≠nameClass⊃args)⊢args)
           :EndIf
           r.RequestOnly←requestOnly
       :Else

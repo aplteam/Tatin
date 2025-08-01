@@ -1,11 +1,15 @@
  {r}←SaveGroupHompeage_(group markdown email);html;parms;folder;dcfFilename;htmlFilename;dcfTie;ns
- parms←##.MarkAPL.CreateParms
- parms.createFullHtmlPage←0
- parms.verbose←0
- parms.ignoreEmbeddedParms←1
- parms.bookmarkLink←0
- markdown←MassageMarkdown markdown
- (html ns)←parms ##.MarkAPL.Markdown2HTML markdown
+ :If 0<≢(⊃,/markdown)~' '
+     parms←##.MarkAPL.CreateParms
+     parms.createFullHtmlPage←0
+     parms.verbose←0
+     parms.ignoreEmbeddedParms←1
+     parms.bookmarkLink←0
+     markdown←MassageMarkdown markdown
+     (html ns)←parms ##.MarkAPL.Markdown2HTML markdown
+ :Else
+     html←⊃,/{(⊂' AT ')@(⍸'@'=⍵)⊢⍵}email  ⍝ As a workaround for lazy uses, just the email address
+ :EndIf
  folder←'expand'F.NormalizePath G.HTDOCS,'/../Groups/'
  'Create!'F.CheckPath folder
  dcfFilename←folder,group,'.dcf'

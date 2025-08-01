@@ -4,16 +4,46 @@
 ⍝ of APL will be started, be it development or runtime.\\
 ⍝ You can change that by first creating a parameter space by calling `CreateParms`, then making the necessary
 ⍝ adjustments, and finally passing that namespace as parameter to `APLProcess.New`.\\
+⍝ Notes
+⍝ * This class is designed for test cases that require one or more additional instances of APL for some reason.
+⍝ That's why it does not offer encryption for a RIDE.\\
+⍝ This restriction might be lifted at a later stage depending on demand.
+⍝ * The destructor of this class will attempt to kill the process that was started.
+⍝ * In case any version of .NET is available it is used. Otherwise a command string is compiled and executed via
+⍝ `⎕SH`. This comes with limitations, so .NET is recommended.
+⍝ * You must not use `⎕NEW` with `APLProcess`; use `APLProcess.New` instead. If you wonder why that is:
+⍝ Go to <https://toolofthought.com/donts> and then Ctrl+F to "Don't use a naked ⎕NEW".\\
+⍝ ## Command line parameters
+⍝ Command line parameters are something like `MAXWS=125MB`. They are defined differently depending on the OS
+⍝ you are running on. `APLProcess` gives you an additional layer that simplifies the definitions of such pairs,
+⍝ making it the same on all operating systems.
 ⍝ Example:\\
 ⍝ ```
-⍝ APLProcess.New parameterSpace
+⍝ parms←APLProcess.CreateParms
+⍝ parms.ConfigParms⍪←'MAXWS' '125MB'
 ⍝ ```
-⍝
+⍝ ## Options
+⍝ Options start either with a `+` or a `-`. Specify them as a vector of simple char vectors on `Options`
+⍝ Example:\\
+⍝ ```
+⍝ parms←APLProcess.CreateParms
+⍝ parms.Options,←⊂'-Dc'
+⍝ ```
 ⍝ Notes:
-⍝ * This class is designed for test cases that require one or more additional instances of APL for some reason.
-⍝   That's why it does not offer encryption for a RIDE.\\
-⍝   This restriction might be lifted at a later stage depending on demand.
-⍝ * The destructor of this class will attempt to kill the process that was started.\\
+⍝ * `+s` and `-s` are managed by `APLProcess`
+⍝ * `-q` is managed by `APLProcess`
+⍝ * `-x` is managed via the `LX` parameter, see there\\
+⍝ ## Simple application
+⍝ ```
+⍝ parms←APLProcess.CreateParms
+⍝ parms.Runtime←1
+⍝ parms.Wait←0
+⍝ (myProcess←APLProcess.New parms).HasExited
+⍝ 0
+⍝ ⎕DL 10
+⍝ myProcess.HasExited
+⍝ 1
+⍝ ```
 
     ⎕IO←1 ⋄ ⎕ML←1
 
@@ -32,36 +62,48 @@
 
     ∇ r←History
       :Access Public Shared
+    ⍝ * 0.10.0 from 2025-07-30
+    ⍝   * Configuration parameters (like MAXWS=128MB) must now be specified via the two-column matrix `ConfigParms`
+    ⍝   * Options (like -Dc) must now be specified via `Options` as a vector of simple vectors
+    ⍝   * If any version of .NET is available on any OS, it is used
+    ⍝   * `OUT_FILE` renamed to `OutputFilename`
+    ⍝   * If .NET is not used, an additional name "APLPROCESS_NAMES" is exported holding a simicolon-separated
+    ⍝     list with all (other) exported names defined by the user of `APLProcess`.
+    ⍝   * Parameter `LX` added that defaults to 1, meaning that "-x" is NOT added.
+    ⍝   * New parameter "DontUseDotNET" introduced
+    ⍝   * Bug fixes
+    ⍝     * -run removed as an option
+    ⍝     * Handling of -s / +s corrected
     ⍝ * 0.9.0 from 2025-07-21
     ⍝   * Potentially breaking changes since version 0.8.0
-    ⍝     * The option to pass a command line string to the constructor has been removed
-    ⍝     * `IsNetCore` was renamed to `UseDotNetCore`
-    ⍝     * Property `LogFilename` was removed
-    ⍝     * Method `GetLog` was removed
-    ⍝     * You must use `APLProcess.New` rather than `⎕NEW` for creating an instance
+    ⍝   * The option to pass a command line string to the constructor has been removed
+    ⍝   * `IsNetCore` was renamed to `UseDotNetCore`
+    ⍝   * Property `LogFilename` was removed
+    ⍝   * Method `GetLog` was removed
+    ⍝   * You must use `APLProcess.New` rather than `⎕NEW` for creating an instance
     ⍝   * Tests amended
     ⍝   * `Make` polished
     ⍝   * Packages updated (development only)
     ⍝   * Bug fixes
     ⍝     * `History` did not work when called
     ⍝     * Now works reliably on Mac OS except with the runtime (not an `APLProcess problem)
-    ⍝     * Now works reliably on Linux 
+    ⍝     * Now works reliably on Linux
     ⍝     * `ExitCode` fixed
       r←↑{⍵↓⍨+/∧\∧⌿(↑⍵)=' '}{⍵↓⍨⍵⍳'⍝'}¨{⍵/⍨'⍝'=⊃¨⍵}{⍵↓⍨+/∧\(↑⍵)=' '}¨1↓↓180⌶'History'
     ∇
 
-    :Field Public Instance Args←''              ⍝ Command line parameter (but not a session file!).
-    :Field Public Instance WorkspaceName←''     ⍝ Name of the workpsace to be loaded.
-    :Field Public Instance Exe←''               ⍝ The Dyalog EXE started by `APLProcess`.
-    :Field Public Instance Proc←⎕NS ''          ⍝ Instance of the .NET class `Diagnostics.Process`.
-    :Field Public Instance Runtime←0            ⍝ Boolean. Only set this if no EXE is specified.
-    :Field Private Shared _Wait←1               ⍝ The default.
-
-    :Field Public Shared WindowsStyleDefault←'Minimized'  ⍝ Only test cases should change this. As a consumer of this class use the Property `WindowsStyle`
+    :Field Public Instance Options←'' ⍝ For stuff like -Dc
+    :Field Public Instance ConfigParms←'' ⍝ Key-value parms (like `1 2⍴('MAXWS' '128MB')`)
+    :Field Public Instance WorkspaceName←'' ⍝ Name of the workpsace to be loaded.
+    :Field Public Instance Exe←'' ⍝ The Dyalog EXE started by `APLProcess`.
+    :Field Public Instance Proc←⎕NS '' ⍝ Instance of the .NET class `Diagnostics.Process`.
+    :Field Public Instance Runtime←0 ⍝ Boolean. Only set this if no EXE is specified.
+    :Field Private Shared _Wait←1 ⍝ The default.
+    :Field Public Shared WindowsStyleDefault←'Minimized' ⍝ Only test cases should change this. As a consumer of this class use the Property `WindowsStyle`
 
     :Property Wait
     :Access Public Instance
-    ⍝ Defines whether a process is started independently (`Wait←0`) or not (`Wait←1`)
+        ⍝ Defines whether a process is started independently (`Wait←0`) or not (`Wait←1`)
         ∇ r←get
           r←_Wait
         ∇
@@ -97,7 +139,7 @@
         ∇
     :EndProperty
 
-    ∇ make parmSpace
+    ∇ make parmSpace;b
       :Access Public Instance
       :Implements Constructor
       'Please use the method APLProcess.New rather than ⎕NEW'Assert'APLProcess.New'≡{⌽{⍵/⍨2>+\'.'=⍵}⌽⍵}{⍵↓⍨⍵⍳'.'}⊃1↓⎕XSI
@@ -110,16 +152,18 @@
       :If 0<≢parmSpace.Exe
           ('The specified EXE cannot be found: ',parmSpace.Exe)Assert ⎕NEXISTS parmSpace.Exe
       :EndIf
-      (RidePort OUT_FILE WorkspaceName Args _Wait)←parmSpace.(RidePort OutputFilename WorkspaceName CommandLineArgs Wait)
+      (RidePort OutputFilename WorkspaceName ConfigParms Options _Wait)←parmSpace.(RidePort OutputFilename WorkspaceName ConfigParms Options Wait)
       WorkspaceName~←'"'
       :If 0<≢WorkspaceName
           ('The specified workspace cannot be found: ',WorkspaceName)Assert ⎕NEXISTS WorkspaceName
       :EndIf
+      ('Invalid parameter: ',{0=≢⍵:⍵ ⋄ ⊃{⍺,', ',⍵}/⍵}(~b)/parmSpace.⎕NL-2)Assert∧/b←(parmSpace.⎕NL-2)∊{⍵.⎕NL-2}CreateParms
+      '"ConfigParms" must be empty or a two-column matrix'Assert(0=≢parmSpace.ConfigParms)∨2=⍴⍴parmSpace.ConfigParms
       Start parmSpace
     ∇
 
     ∇ r←New parmSpace;rt;cmd;ws;windowStyle;buff
-    ⍝ `parmSpace` is a parameter namespace, usually created by calling `CreateParms`; see there.
+      ⍝ `parmSpace` is a parameter namespace, usually created by calling `CreateParms`; see there.
       :Access Public Shared
       r←⎕NEW ⎕THIS(,⊂parmSpace)
     ∇
@@ -130,7 +174,7 @@
       OS←##.##.OS
     ∇
 
-    ∇ Start ps;Z;args;cmd;exe;host;keyfile;output;pid;port;psi;qdmx;ride;z
+    ∇ Start ps;Z;buff;cmd;configParms;exe;host;keyfile;names;options;output;pid;port;psi;qdmx;z;ride
       :If 0=≢ps.Exe
           ps.Exe←(GetRuntimeName⍣ps.Runtime)GetCurrentExecutable ⍝ else, deduce it
       :Else
@@ -141,60 +185,74 @@
           :EndIf
       :EndIf
       Exe←ps.Exe
-      ride←''
-      :If 0≠ps.RidePort
-          ride←'RIDE_INIT="SERVE:*:',(⍕ps.RidePort),'"; RIDE_SPAWNED=1; '
-      :Else
-          ride←'RIDE_INIT= '
+      configParms←ps.ConfigParms
+      options←ps.Options
+      :If 0<≢ps.OutputFilename
+          configParms⍪←'LOG_FILE'ps.OutputFilename
       :EndIf
-      args←ps.CommandLineArgs
-      args,←(0<≢ps.OutputFilename)/' LOG_FILE="',ps.OutputFilename,'" '
-      output←(1+×≢OUT_FILE)⊃'/dev/null'OUT_FILE
+      output←(1+×≢OutputFilename)⊃'/dev/null'OutputFilename
       Proc.LogFilename←(739⌶0),'/APLProcess-Logfile-',{⎕RL←+/⎕TS ⋄ ⍕?⍵}100000
-      :Select GetOperatingSystem
-      :Case 'Win'
+      :If 1∧.≤2↑2250⌶0 ⍝ When .NET is available, we use it; always true on Windows
+      :AndIf (~ps.DontUseDotNET)∨'Win'≡GetOperatingSystem
+          :If 0≠ps.RidePort
+              configParms⍪←'RIDE_INIT'('SERVE:*:',⍕ps.RidePort)
+              configParms⍪←'RIDE_SPAWNED' 1
+          :Else
+              configParms⍪←'RIDE_INIT' ''
+          :EndIf
           :If ~ps.Runtime
               :If (,0)≡,ps.SessionFile
-                  args,←' session_file="" '
+                  configParms⍪←'session_file' ''
               :ElseIf (,1)≡,ps.SessionFile
                   ps.SessionFile←GetDefaultDseFilename ps.Exe
-                  args,←' session_file="',ps.SessionFile,'" '
+                  configParms⍪←'session_file'ps.SessionFile
               :ElseIf ' '=1↑0⍴ps.SessionFile
-                  args,←' session_file="',ps.SessionFile,'" '
+                  configParms⍪←'session_file'ps.SessionFile
               :Else
                   'Invalid parameter: "SessionFile"'Assert 0
               :EndIf
           :EndIf
-          cmd←ps.Exe
+          :If ~ps.LX
+              options,←⊂'-x'
+          :EndIf
+          :If ps.DYALOG_NOPOPUPS
+              configParms⍪←'DYALOG_NOPOPUPS'ps.DYALOG_NOPOPUPS
+          :EndIf
+          names←1↓⊃,/';',¨configParms[;1]
           ⎕USING←UsingSystemDiagnostics
-          psi←⎕NEW Diagnostics.ProcessStartInfo,⊂ps.Exe(({0=≢⍵:⍵ ⋄ '"',(⍵~'"'),'" '}ps.WorkspaceName),args,' ',ride~';')
+          cmd←⊃,/' ',¨options
+          cmd,←MakeConfigParmsCmdReady configParms
+          psi←⎕NEW Diagnostics.ProcessStartInfo,⊂ps.Exe(({0=≢⍵:⍵ ⋄ '"',(⍵~'"'),'" '}ps.WorkspaceName),cmd)
           psi.WindowStyle←Diagnostics.ProcessWindowStyle.⍎ps.WindowsStyle
           Proc←Diagnostics.Process.Start psi
           :If ps.Wait
               Proc.WaitForExit ⍬
           :EndIf
-      :CaseList 'Lin' 'Mac'
+      :Else
+        ⍝ If we get here, it is always a non-Windows platform
+          names←''
+          :If 0=ps.RidePort
+              ride←'RIDE_INIT=""'
+          :Else
+              ride←'RIDE_INIT="SERVE:*:',(⍕ps.RidePort),'" RIDE_SPAWNED=1 '
+          :EndIf
+          cmd←({0=≢⍵:⍵ ⋄ ⍵,' '}ride),'"',ps.Exe,'"'
+          cmd,←{0=≢⍵:⍵ ⋄ ' "',⍵,'"'}ps.WorkspaceName
+          options←(options~'+s' '-s' '+q' '-q' '-x'),'+s' '-q',(~ps.LX)/⊂'-x'  ⍝ Populate session, don't quit on error, no ⍎⎕LX
+          cmd,←⊃,/' ',¨options
+          cmd,←MakeConfigParmsCmdReady configParms
+          names,←(0=≢names)↓⊃,/';',¨configParms[;1]
+          cmd←'APLPROCESS_NAMES="',names,'" ',cmd
+          :If ~ps.Wait
+              cmd,←' -c APLppid=',⍕GetCurrentProcessId
+          :EndIf
+          cmd,←' 0</dev/null'
+          cmd,←' 1>',output
+          cmd,←' 2>',Proc.LogFilename
           :If ps.Wait
-              cmd←ride,' '
-              cmd,←'"',ps.Exe,'" '
-              :If 0<≢ps.WorkspaceName~' '
-                  cmd,←' "',ps.WorkspaceName,'"'
-                  cmd,←' -run'
-              :Else
-                  cmd,←' +s'  ⍝ Clean start
-              :EndIf
-              :If ps.Runtime
-                  cmd,←' -q'  ⍝ Quiet mode
-              :EndIf
-              cmd,←{0=≢⍵:⍵ ⋄ ' ',⍵}args
-              :If ps.RidePort=0
-                  cmd,←' 0<&-'
-                  cmd,←' 1>',output
-                  cmd,←,' 2>',Proc.LogFilename
-              :EndIf
-              ⍝ On non-Windows platforms, passing an argument to ⎕OFF that is not 0 will cause ⎕SH to throw a DOMAIN ERROR
-              ⍝ The numeric code at the end of the error message might be what was passed to ⎕OFF, but when the command as
-              ⍝ such was rejected, the the shell might return something like 133, and you cannot establish the difference
+            ⍝ On non-Windows platforms, passing an argument to ⎕OFF that is not 0 will cause ⎕SH to throw a DOMAIN ERROR
+            ⍝ The numeric code at the end of the error message might be what was passed to ⎕OFF,but when the command as
+            ⍝ such was rejected,the shell might return something like 133,and you cannot establish the difference.
               :Trap 11
                   Z←⎕SH cmd
                   _ExitCode←0
@@ -205,23 +263,14 @@
               Proc.HasExited←1
               Proc.Id←0
           :Else
-              cmd←ride,' "',ps.Exe,'"',({0=≢⍵:⍵ ⋄ ' "',⍵,'"'}ps.WorkspaceName),' +q ',((0<≢ps.WorkspaceName~' ')/'-run '),'-s -b -c '
-              cmd,←args
-              cmd,←' APLPPID=$PPID'
-              :If ps.RidePort=0
-                  cmd,←' 0<&-'
-                  cmd,←' 1>',output
-                  cmd,←,' 2>',Proc.LogFilename
-              :Else
-                  'Riding into a runtime is not implemented yet'⎕SIGNAL 11/⍨ps.Runtime
-              :EndIf
               cmd,←' & echo $!'
               pid←⎕SH cmd
+              ⎕DL 0.2
               Proc.Id←⊃⊃(//)⎕VFI∊pid
               Proc.HasExited←0
           :EndIf
           Proc.StartTime←⎕TS
-      :EndSelect
+      :EndIf
     ∇
 
     ∇ Close;count;limit
@@ -237,20 +286,28 @@
     ∇ r←CreateParms
       :Access Public Shared
     ⍝ Creates a parameter namespace that will be accepted by the constructor.
-    ⍝ | Name             | Description |
+    ⍝ | Name | Description |
     ⍝ |------------------|-------------|
-    ⍝ | `CommandLineArg` | By default empty. Optional command line parameters passed to `Exe`. (Don't specify a session file here!)|
-    ⍝ | `Exe`            | Defaults to `''` which means that the same EXE is executed the instance was created from. Can also be a fully qualified name of the exe to be run.|
+    ⍝ | `ConfigParms` | Matrix with names in [;1] and values in [;2] like `1 2⍴'MAXWS' '125MB'|
+    ⍝ | `DontUseNDotNET` | Defaults to 0, ignored on Windows. Mainly for test cases.|
+    ⍝ | `DYALOG_NOPOPUPS`| Defaults to 1 only in Runtime. Ignored on non-Windows platforms.|
+    ⍝ | `Exe` | Defaults to `''` which means that the same EXE is executed the instance was created from. Can also be a fully qualified name of the exe to be run.|
+    ⍝ | `LX` | Defaults to 1, meaning that "-x" is NOT added to the command line
+    ⍝ | `Options` | Empty or a nested vector with options like `-Dc`; Note that -s/+s and -q are handled automatically. |
     ⍝ | `OutputFilename` | By default empty, meaning that any output is thrown away. If this is specified it is expected to be the name of a file.|
-    ⍝ | `RidePort`       | By default 0 (no effect). When a positive integer > 0 this is used as port number for `RIDE_INIT`.|
-    ⍝ | `Runtime`        | Boolean that defaults to 0. Is ignored in case `Exe` is not empty.|
-    ⍝ | `SessionFile`    | Windows only. Defaults to 0 which means no session file is loaded. A 1 will load the default DSE file. May also be the fully qualified path to a DSE file.|
-    ⍝ | `Wait`           | Boolean that defaults to 1, meaning that `APLProcess` waits for the process to quit; 0 means it runs independently.|
-    ⍝ | `WindowStyle`    | Windows only. Defaults to "Minimized". May be "Hidden" or "Maximized" or "Normal" instead. Is case sensitive!|
-    ⍝ | `WorkspaceName`  | By default empty; the fully qualified name of the workspace to be loaded.|
+    ⍝ | `RidePort` | By default 0 (no effect). When a positive integer > 0 this is used as port number for `RIDE_INIT`.|
+    ⍝ | `Runtime` | Boolean that defaults to 0. Is ignored in case `Exe` is not empty.|
+    ⍝ | `SessionFile` | Windows only. Defaults to 0 which means no session file is loaded. A 1 will load the default DSE file. May also be the fully qualified path to a DSE file.|
+    ⍝ | `Wait` | Boolean that defaults to 1, meaning that `APLProcess` waits for the process to quit; 0 means it runs independently.|
+    ⍝ | `WindowStyle` | Windows only. Defaults to "Minimized". May be "Hidden" or "Maximized" or "Normal" instead. Is case sensitive!|
+    ⍝ | `WorkspaceName` | By default empty; the fully qualified name of the workspace to be loaded.|
       r←⎕NS''
-      r.CommandLineArgs←''
+      r.ConfigParms←0 2⍴''
+      r.DontUseDotNET←0
+      r.DYALOG_NOPOPUPS←'Win'≡3↑GetOperatingSystem
       r.Exe←''
+      r.LX←1
+      r.Options←''
       r.OutputFilename←''
       r.RidePort←0
       r.Runtime←0
@@ -270,7 +327,7 @@
                   count←count+1
               :Until (~Proc.HasExited)∧count>limit
               :AndIf ~Proc.HasExited
-              ⍝ OK, force has to be used
+    ⍝ OK, force has to be used
               :Trap 11
                   {}##.##.OS.KillPID Proc.Id
               :EndTrap
@@ -291,7 +348,7 @@
           :EndIf
       :Else
           t←⊃1↓⎕SH'ps -o args -p $PPID'
-          :If '"'''∊⍨⊃t  ⍝ if command begins with ' or "
+          :If '"'''∊⍨⊃t ⍝ if command begins with ' or "
               r←{⍵/⍨{∧\⍵∨≠\⍵}⍵=⊃⍵}t
           :Else
               r←{⍵↑⍨¯1+1⍳⍨(¯1↓0,⍵='\')<⍵=' '}t ⍝ otherwise find first non-escaped space (this will fail on files that end with '\\')
@@ -300,9 +357,9 @@
     ∇
 
     ∇ r←GetRuntimeName exe
-      ⍝ Assumes that:
-      ⍝ Windows runtime ends in "rt.exe"
-      ⍝ *NIX runtime ends in ".rt"
+    ⍝ Assumes that:
+    ⍝ Windows runtime ends in "rt.exe"
+    ⍝ *NIX runtime ends in ".rt"
       r←exe
       :If 'Win'≡GetOperatingSystem
           :If 'rt.exe'≢¯6↑{('rt.ex',⍵)[⍵⍳⍨'RT.EX',⍵]}exe ⍝ deal with case insensitivity
@@ -313,24 +370,23 @@
       :EndIf
     ∇
 
-
     ∇ r←HasExited
       :Access Public Instance
-      ⍝ Boolean that is 1 if and only if the process started by `APLProcess` has stopped running.
-      ⍝ Under Windows .NET tells us. On non-Windows platforms we need to check.
+    ⍝ Boolean that is 1 if and only if the process started by `APLProcess` has stopped running.
+    ⍝ Under Windows .NET tells us. On non-Windows platforms we need to check.
       r←0=≢Proc.Id OS.GetTaskList 0 0 0
     ∇
 
     ∇ r←GetPID
       :Access Public Instance
-      ⍝ Get process ID of the current process
+    ⍝ Get process ID of the current process
       r←Proc.Id
     ∇
 
     ∇ {success}←KillItself;proc;qdmx;pid
       :Access Public Instance
-      ⍝ Attempts to stop the process.\\
-      ⍝ `success` is 1 in case the process could be stopped, otherwise 0.
+    ⍝ Attempts to stop the process.\\
+    ⍝ `success` is 1 in case the process could be stopped, otherwise 0.
       success←0
       pid←Proc.Id
       success←OS.KillPID pid
@@ -358,6 +414,29 @@
     ⍝ Returns one of: "Win", "Mac", "AIX", "Lin" etc.\\
     ⍝ Note that under Linux you might need more information.
       r←3↑⊃'.'⎕WG'APLVersion'
+    ∇
+
+    ∇ r←MakeConfigParmsCmdReady configParms
+      :If 0=≢configParms
+          r←''
+      :Else
+          r←{0=≢⍵:⍵ ⋄ ∧/⎕D∊⍨'''"'~⍨⍕2⊃⍵:(⍕¨⍵)~¨⊂'''"' ⋄ (1⊃⍵)('"',('"'''~⍨2⊃⍵),'"')}¨↓configParms
+          r←⊃¨{⍺,'=',⍵}/¨r
+          r←⊃,/' ',¨r
+      :EndIf
+    ∇
+
+    ∇ r←GetCurrentProcessId;t
+      :Access Public Shared
+      :If 'Win'≡GetOperatingSystem
+          r←⊃(//)⎕VFI't'⎕NA'U4 kernel32|GetCurrentProcessId'
+      :Else
+          :Trap 0
+              r←Proc.Pid
+          :Else
+              r←⊃(//)⎕VFI⊃⎕SH'echo $PPID'
+          :EndTrap
+      :EndIf
     ∇
 
 :EndClass

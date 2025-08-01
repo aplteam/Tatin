@@ -63,39 +63,35 @@
  P←##.APLProcess
  parms←P.CreateParms
  parms.Exe←GetAPLVersion versionOfAPL
- parms.CommandLineArgs,←'load="',F.PWD,'\APLSource\Admin\Make_.aplc" '
- parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
- parms.CommandLineArgs,←' lx="1 #.Make_.Run 1"'
+ parms.ConfigParms⍪←'load'(F.PWD,'\APLSource\Admin\Make_.aplc')
+ parms.ConfigParms⍪←'DYALOGSTARTUPSE'({0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE')
+ parms.ConfigParms⍪←'lx' '1 #.Make_.Run 1'
  :If 0  ⍝ Only for analyzing problems:
-     parms.CommandLineArgs,←' -exec_setup=0 '
-     parms.CommandLineArgs,←' -stop_in_setup=1 '
+     parms.ConfigParms⍪←'exec_setup' 0
+     parms.ConfigParms⍪←'stop_in_setup' 1
  :EndIf
- :If noQLX
-     parms.CommandLineArgs,←' -x'
- :EndIf
+ parms.LX←~noQLX
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Client...'
- P_←⎕NEW P(,⊂parms)
+ P_←P.New parms
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  UpdateDocumentation ⍬
  parms←P.CreateParms
- parms.CommandLineArgs←'load="APLSource/Admin/Make_.aplc" '
- parms.CommandLineArgs,←{0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE'
- parms.CommandLineArgs,←' lx="0 #.Make_.Run 2"'
+ parms.ConfigParms⍪←'load' 'APLSource/Admin/Make_.aplc'
+ parms.ConfigParms⍪←'DYALOGSTARTUPSE'({0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE')
+ parms.ConfigParms⍪←'lx' '0 #.Make_.Run 2'
  parms.Exe←GetAPLVersion versionOfAPL
  :If 0          ⍝ Only for analyzing problems:
-     parms.CommandLineArgs,←' -exec_setup=0'
-     parms.CommandLineArgs,←' -stop_in_setup=1 '
+     parms.ConfigParms⍪←'exec_setup' 0
+     parms.ConfigParms⍪←'stop_in_setup' 1
  :EndIf
- :If noQLX      ⍝ Only for analyzing problems:
-     parms.CommandLineArgs,←' -x'
- :EndIf
+ parms.LX←~noQLX
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
- P_←⎕NEW P(,⊃parms)
+ P_←P.New parms
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
  0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   The final steps, putting it all together...'

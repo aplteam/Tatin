@@ -1,5 +1,5 @@
  {r}←SaveGroupHompeage_(group markdown email);html;parms;folder;dcfFilename;htmlFilename;dcfTie;ns
- :If 0<≢(⊃,/markdown)~' '
+ :If 0<≢(⊃,/markdown)~' ',⎕TC
      parms←##.MarkAPL.CreateParms
      parms.createFullHtmlPage←0
      parms.verbose←0
@@ -8,7 +8,7 @@
      markdown←MassageMarkdown markdown
      (html ns)←parms ##.MarkAPL.Markdown2HTML markdown
  :Else
-     html←⊃,/{(⊂' AT ')@(⍸'@'=⍵)⊢⍵}email  ⍝ As a workaround for lazy uses, just the email address
+     html←''
  :EndIf
  folder←'expand'F.NormalizePath G.HTDOCS,'/../Groups/'
  'Create!'F.CheckPath folder

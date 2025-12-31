@@ -1,4 +1,4 @@
- {r}←LinkTargetToPackage(cfg source target alias);ref;name
+ {r}←LinkTargetToPackage(cfg source target alias);ref;name;nc
 ⍝ Establishes a reference in the target space pointing to the loaded package.\\
 ⍝ Returns the fully qualified names of what was established in the target space.
  r←⍬
@@ -11,6 +11,14 @@
  :If 0<≢cfg.api
      ('Not found in ',source,': ',cfg.api)Assert 0<⍎source,'.⎕NC ''',cfg.api,''''
      ('Is neither class nor namespace: ',cfg.api)Assert 9=⍎source,'.⎕NC ''',cfg.api,''''
+     nc←(⍎target).⎕NC name
+     :If 9=nc
+         ⍝ We allow overwriting a ref pointing to a package:
+         ('<',target,'.',name,'> is already defined but not a package')Assert∨/'._tatin.'⍷⍕⍎target,'.',name
+     :Else
+         ⍝ Otherwise the name must not be used:
+         ('<',target,'.',name,'> is already defined as an object with name class ',⍕nc)Assert 0=nc
+     :EndIf
      target⍎name,'←',source,'.',cfg.api
  :Else
      target⍎name,'←',source

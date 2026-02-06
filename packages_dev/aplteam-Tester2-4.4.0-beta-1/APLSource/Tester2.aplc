@@ -42,6 +42,10 @@
 
     ∇ r←History
       :Access Public shared
+      ⍝ * 4.4.0 ⋄ 2026-02-06
+      ⍝   * Packages updated (CommTools!)       
+      ⍝ * 4.3.0 ⋄ 2025-09-13
+      ⍝   * Packages updated
       ⍝ * 4.2.0 ⋄ 2025-06-05
       ⍝   * `Cleanup` (as well as group-specific `Cleanup` functions) may now return a (optional) boolean indicating success (1) or failure (0).\\
       ⍝      (Up to version 4.2 a result, if any, was ignored.
@@ -568,7 +572,7 @@
       :EndIf
       :If ps.guiFlag
       :AndIf {6::1 ⋄ 0⊣⍵.Type}ps.ref2Gui.∆n.Form
-          ⎕←'*** Tests cancelled'
+          ⍞←'*** Tests cancelled',⎕UCS 10
           log←ps.log
           →0
       :EndIf
@@ -587,7 +591,7 @@
       :EndIf
       :If 0<≢_codeCoverage
           :If 0=≢res←_codeCoverage.Finalise 1
-              ⎕←'Coverage report: nothing to report'
+              ⍞←'Coverage report: nothing to report',⎕UCS 10
           :Else
               ShowLog'Coverage report: ',res
           :EndIf
@@ -871,8 +875,8 @@
                   :If (⊂rc)∊ListCustomMessages[;2]                      ⍝ Is it a valid custom message?
                       rc←-⍎¯1↑ListSymbolicNames{⊃⍺[1⍳⍨⍺[;2]≡¨⊂⍵;]}rc    ⍝ Translate custom msg into return code
                   :Else
-                      ⎕←'Current test function (',testFns,')'
-                      ⎕←'returned an invalid result: neither a valid numeric code (symbolic name) nor a custom message'
+                      ⍞←'Current test function (',testFns,')',⎕UCS 10
+                      ⍞←'returned an invalid result: neither a valid numeric code (symbolic name) nor a custom message',⎕UCS 10
                       ∘∘∘
                   :EndIf
               :EndIf
@@ -938,7 +942,7 @@
       :If 0<ps.stop
       :AndIf 1⊃⌽(8⍴2)⊤⊃ps.stop
           (∪(⎕STOP fns),StopHere)⎕STOP fns
-          ⎕←'About to execute <',(⍕_ref),'.',fnsName,'> ...'
+          ⍞←'About to execute <',(⍕_ref),'.',fnsName,'> ...',⎕UCS 10
       :Else
           ((⎕STOP fns)~StopHere)⎕STOP fns
       :EndIf
@@ -1026,7 +1030,7 @@
               ⍎_exec_before_each_test,' fnsName ps'
           :Else
               :If 0<≢buff←⍎_exec_before_each_test,' fnsName ps'
-                  ⎕←buff
+                  ⍞←buff,⎕UCS 10
               :EndIf
           :EndIf
       :EndIf
@@ -1039,7 +1043,7 @@
               ⍎_exec_after_each_test,' fnsName ps'
           :Else
               :If 0<≢buff←⍎_exec_after_each_test,' fnsName ps'
-                  ⎕←buff
+                  ⍞←buff,⎕UCS 10
               :EndIf
           :EndIf
       :EndIf
@@ -1100,13 +1104,14 @@
               :EndIf
               :If ~ps.guiFlag
                   :If type=3
-                      ⎕←⊃¯1↑ps.log
+                      ⍞←⊃¯1↑ps.log
+                      ⍞←⎕UCS 10
                   :ElseIf ¯1≠×type
                       selog←{1=≡⍵:⍵ ⋄ (3≠≢⍵)∨'---'≡3↑⊃⍵:⍪⍵ ⋄ (1⊃⍵),' ',(2⊃⍵),' ',(3⊃⍵)}msg
                       :If type<0
                           ⍞←selog,(type=¯2)/CR
                       :Else
-                          ⎕←selog
+                          ⍞←selog,⎕UCS 10
                       :EndIf
                   :EndIf
               :EndIf
@@ -1694,14 +1699,14 @@
               cl.Text←2↓⊃,/(⊂CRLF),¨body
               :Return
           :Else
-              ⎕←'No action taken' ⋄ →0
+              ⍞←'No action taken',⎕UCS 10 ⋄ →0
           :EndIf
       :Else
           _ref.⎕FX body
       :EndIf
       :If ∨/IsLinked _ref
-          ⎕←'You might want to tell Link:'
-          ⎕←']Link.Add ',(⍕_ref),'.',newName
+          ⍞←'You might want to tell Link:',⎕UCS 10
+          ⍞←']Link.Add ',(⍕_ref),'.',newName,⎕UCS 10
       :EndIf
     ∇
 
@@ -1718,7 +1723,7 @@
       :EndIf
       'Cannot establish helpers in class instances/unnamed namespaces'Assert~'['∊⍕ref
       :If 3=+/ref.⎕NC↑'Prepare' 'RunTests' 'RunTestsInBatchMode'
-          ⎕←'Prepare, RunTests and RunTestsInBatchMode are all already established in ',⍕ref
+          ⍞←'Prepare, RunTests and RunTestsInBatchMode are all already established in ',(⍕ref),⎕UCS 10
       :Else
           :If force
           :OrIf YesOrNo'Helpers@Sure you wanna establish three helpers "Prepare", "RunTests" & "RunTestsInBatchMode" in ',(⍕ref),' ?'
@@ -1733,8 +1738,8 @@
               r,←CR,'⍝ ⎕SE.Link.Add ',⊃,/('''','.',⍨⍕ref)∘,¨'Prepare'' ' 'RunTests'' ' 'RunTestsInBatchMode'' '
           :EndIf
           :If IsLinked ref
-              ⎕←'You might want to tell Link:'
-              ⎕←']Link.Add ',⊃,/(⊂⍕ref),¨'.Prepare ' '.RunTests ' '.RunTestsInBatchMode'
+              ⍞←'You might want to tell Link:',⎕UCS 10
+              ⍞←']Link.Add ',(⊃,/(⊂⍕ref),¨'.Prepare ' '.RunTests ' '.RunTestsInBatchMode'),⎕UCS 10
           :EndIf
       :EndIf
     ∇
@@ -1857,7 +1862,7 @@
               :EndIf
           :EndIf
       :Else
-          ⎕←'Incompatible version of Link detected; we need 3.0.0 or better'
+          ⍞←'Incompatible version of Link detected; we need 3.0.0 or better',⎕UCS 10
       :EndIf
     ∇
 
@@ -2029,7 +2034,7 @@
           :If 3>option
               verbose←2=option
               htmlFilename←verbose CodeCoverage.CreateReport T.codeCoverage.filename
-              ⎕←']Open file://',htmlFilename
+              ⍞←']Open file://',htmlFilename,⎕UCS 10
           :EndIf
       :EndIf
     ∇

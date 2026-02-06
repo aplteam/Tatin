@@ -12,7 +12,7 @@
  packages←F.ListDirs path
  :For i :In ⍳≢packages
      package←i⊃packages
-     ⎕←(⍕i),'. of ',⍕≢packages
+     ⍞←(⍕i),'. of ',(⍕≢packages),⎕UCS 10
      filename←package,'/apl-package.json'
      :If ~⎕NEXISTS filename
          :Continue
@@ -27,7 +27,7 @@
          folder myZip.Add'/apl-package.json'
          myZip.Dispose
      :EndIf
-     ⎕←'Solved: ',⊃,/1↓⎕NPARTS filename
+     ⍞←'Solved: ',(⊃,/1↓⎕NPARTS filename),⎕UCS 10
  :EndFor
  :If recursive
      paths←F.ListDirs path,'/'

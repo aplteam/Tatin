@@ -9,7 +9,7 @@
  F.(APLTreeUtils2 OS)←##.(APLTreeUtils2 OS)
  bumpBuild←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'bumpBuild'
  :If ~batchFlag
-     ⎕←(⎕PW-1)⍴'-'
+     ⍞←((⎕PW-1)⍴'-'),⎕UCS 10
      msg←''
      msg,←⊂'This function will close all Cider projects, delete everything that is not needed in order to'
      msg,←⊂'use the Tatin client, re-arrange stuff and finally save the workspace together with'
@@ -22,8 +22,8 @@
      msg,←⊂''
      msg,←⊂'In the last step all that''s required is zipped into <Tatin-Client-{major}.{Minor}.{Patch}.zip'
      msg,←⊂'That file is created within the Dist/ folder which is not managed by Git.'
-     ⎕←⍪msg
-     ⎕←''
+     ⍞←⍪msg
+     ⍞←⎕UCS 10
  :EndIf
  :If batchFlag
  :OrIf 1 ##.Client.YesOrNo'Would you like to continue?'
@@ -94,6 +94,6 @@
      :If batchFlag
          ⎕OFF
      :Else
-         ⎕←'*** Done;  note that the Tatin project has been closed'
+         ⍞←'*** Done;  note that the Tatin project has been closed',⎕UCS 10
      :EndIf
  :EndIf

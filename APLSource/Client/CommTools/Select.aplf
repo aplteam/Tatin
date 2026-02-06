@@ -12,7 +12,7 @@
 ⍝  * You can automate `Select`, refer to the documentation with ]ADoc CommTools, catch "Automation"\\
 ⍝  * If the user aborts by entering "q" (for "quit") `⍬` will be returned
  x←{0<⎕NC ⍵:⊆⍎⍵ ⋄ ''}'x'
- (caption manyFlag mustFlag)←x,(⍴,x)↓'' 0 0
+ (caption manyFlag mustFlag)←x,(≢x)↓'' 0 0
  '"caption" must be a simple character vector'Assert 1=≡caption←,caption
  '"caption" must not contain line feeds (⎕UCS 10)'Assert~LF∊caption
  '"caption" must not contain carriage returns (⎕UCS 13)'Assert~(⎕UCS 13)∊caption
@@ -74,9 +74,9 @@
                  caption←{~AliasChar∊⍵:⍵ ⋄ ⍵↓⍨⍵⍳AliasChar}caption
              :EndIf
          :EndIf
-         ⎕←{⍵↑'---',(blankFlag/' '),caption,(blankFlag/' '),⍵⍴'-'}⎕PW-1
-         ⎕←⍪{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳≢⍵),¨⍵}choices
-         ⎕←''
+         ⍞←({⍵↑'---',(blankFlag/' '),caption,(blankFlag/' '),⍵⍴'-'}⎕PW-2),⎕UCS 10
+         ⍞←⍕↑{((⊂'. '),¨⍨(⊂3 0)⍕¨⍳≢⍵),¨⍵}choices
+         ⍞←2⍴⎕UCS 10
          question←'Select one ',(manyFlag/'or more '),'item',((manyFlag)/'s'),' '
          question,←((manyFlag∨~mustFlag)/'('),((~mustFlag)/'q=quit'),((manyFlag∧~mustFlag)/', '),(manyFlag/'a=all'),((manyFlag∨~mustFlag)/')'),' :'
          :If 0<≢answer←⍞,0/⍞←question

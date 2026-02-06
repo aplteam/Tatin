@@ -1,4 +1,4 @@
- r←Cache Arg;url;list;pathFlag;flag;report;rc
+ r←Cache Arg;url;list;pathFlag;flag;report;rc;buff
  r←''
  :If 0≡Arg._1
      url←''
@@ -13,26 +13,27 @@
  :EndIf
  :If 0<≢list←pathFlag TC.ListCache url
      :If Arg.clear
-         r←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
+         buff←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
      :Else
-         r←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
+         buff←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
      :EndIf
  :Else
-     r←'Nothing found in ',TC.GetPathToPackageCache
+     ⍞←'Nothing found in ',TC.GetPathToPackageCache,⎕UCS 10
  :EndIf
  :If 0<≢list
  :AndIf Arg.clear
      :If Arg.force
          flag←1
      :Else
-         ⎕←r
+         ⍞←buff
+         ⍞←⎕UCS 10
          flag←TC.C.YesOrNo'Sure that you want delete these from the Tatin package cache?'
      :EndIf
  :AndIf flag
      (rc report)←TC.ClearCache url
      :If 0=rc
-         r←'Cache successfully cleared'
+         ⍞←'Cache successfully cleared',⎕UCS 10
      :Else
-         r←'Attempt to delete these failed:',⊃,/CR¨,⊆report
+         ⍞←'Attempt to delete these failed:'(,⊃,/CR¨,⊆report),⎕UCS 10
      :EndIf
  :EndIf

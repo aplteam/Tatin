@@ -1,8 +1,8 @@
  {r}←{dry}CopyPackagesToAPLSource flag;sourcePath;targetPath;list;pkg;name;C;F;pkgCfg;R;code_1;code_2;filename;msg;rc;sourcePath2;targetPath2;list2
-⍝ Of course Tatin cannot use Tatin to load the packages it dependes on, therefore they need to be copied
+⍝ Of course Tatin cannot use Tatin to load the packages it depends on, therefore they need to be copied
 ⍝ to Tatin's APLSource/ folder:
 ⍝ * If a package is just a class, the class script is copied over
-⍝ * If a package is a namespace the contents of the packages APLSource/ folder is copied into a folder
+⍝ * If a package is a namespace, the contents of the packages APLSource/ folder is copied into a folder
 ⍝   that is named like the package, for example "FilesAndDirs"\\
 ⍝ A detailed report is printed to the session.\\
 ⍝ The optional left argument `dry` defaults to 0. When a 1 is passed as left argument, all actions are reported
@@ -23,11 +23,11 @@
  ('Source path is empty?! (',sourcePath,')')Assert 0<≢list
  :For pkg :In list
      name←2⊃'-'(≠⊆⊢)((≢'packages/')+1+≢C.HOME)↓pkg
-     ⎕←'Processing <',name,'> ...'
+     ⍞←'Processing <',name,'> ...',⎕UCS 10
      pkgCfg←R.GetJsonFromFile pkg,'/apl-package.json'
      sourcePath2←pkg,'/',pkgCfg.source
      :If (⊂3⊃⎕NPARTS sourcePath2)∊'.aplc' '.dyalog'
-         ⎕←'  Is a single script'
+         ⍞←'  Is a single script',⎕UCS 10
          code_1←⊃⎕NGET sourcePath2 1
          filename←targetPath,name,3⊃⎕NPARTS pkgCfg.source
          code_2←⊃⎕NGET filename 1
@@ -35,25 +35,25 @@
              :If ~dry
                  (⊂code_1)⎕NPUT filename 1
              :EndIf
-             ⎕←'  Updated!'
+             ⍞←'  Updated!',⎕UCS 10
          :Else
-             ⎕←'  Code has not changed, therefore no action is taken'
+             ⍞←'  Code has not changed, therefore no action is taken',⎕UCS 10
          :EndIf
      :Else
-         ⎕←'  Is a namespace'
+         ⍞←'  Is a namespace',⎕UCS 10
          targetPath2←targetPath,((⊂name)∊'CommTools' '--place-holder--')/'Client/'
          :If CompareFolders sourcePath2(targetPath2,name)
-             ⎕←'  Code has not changed, therefore no action is taken'
+             ⍞←'  Code has not changed, therefore no action is taken',⎕UCS 10
          :Else
              :If ~dry
                  targetPath2 ⎕NCOPY⍠('IfExists' 'Replace')⊢sourcePath2
              :EndIf
-             ⎕←'  Updated!'
+             ⍞←'  Updated!',⎕UCS 10
          :EndIf
      :EndIf
  :EndFor
  :If dry
-     ⎕←'No action was actually, taken (dry run)'
+     ⍞←'No action was actually, taken (dry run)',⎕UCS 10
  :Else
-     ⎕←'Done'
+     ⍞←'Done',⎕UCS 10
  :EndIf

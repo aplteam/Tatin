@@ -5,7 +5,7 @@
 ⍝ `flag` is an insurance against accidental calls.
 ⍝ `development` defaults to 0, meaning that the folder packages/ is investigated.
 ⍝ You can change that by passing a 1 as left argument; then packages_dev/ is investigated instead.
- r←⍬
+ r←''
  :If flag
      'Run #.Tatin.Admin.Initialize_Client before calling this function'Assert 9=##.FilesAndDirs.⎕NC'APLTreeUtils2'
      development←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'development'
@@ -28,12 +28,13 @@
              msg←'=> Use the function ReinstallAndUpdateTatinPackages if udating is required'
              report←((≢msg)⌈2⊃⍴report)↑[2]report
              report,[1]←msg
-             ⎕←report
+             ⍞←report
+             ⍞←⎕UCS 10
          :Else
-             report←'All up-to-date'
+             ⍞←'All up-to-date',⎕UCS 10
          :EndIf
      :Else
-         report←'The given folder does not contain any sub-folders'
+         ⍞←'The given folder does not contain any sub-folders',⎕UCS 10
      :EndIf
  :EndIf
 ⍝Done

@@ -57,7 +57,7 @@ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
              :OrIf TC.C.YesOrNo'The directory does not exist yet. Would you like to create it?'
                  'Could not create the directory'Assert TC.F.MkDir path
              :Else
-                 ⎕←'Cancelled'
+                 ⍞←'Cancelled',⎕UCS 10
                  :Return ⍝ Give up
              :EndIf
          :EndIf
@@ -67,7 +67,7 @@ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
          :Else
              :If ~Arg.quiet
              :AndIf 0=1 TC.C.YesOrNo'There is no file ',filename,' yet; would you like to create it?'
-                 ⎕←'Cancelled by user' ⋄ →0
+                 ⍞←'Cancelled by user',⎕UCS 10 ⋄ →0
              :EndIf
              :If project
                  ns←what TC.InitPackageConfig ⍬
@@ -89,7 +89,7 @@ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
              :Repeat
                  (success newData)←(CheckPackageConfigFile EditJson)'PackageConfigFile'data path
                  :If ¯1=success
-                     ⎕←'Cancelled by user' ⋄ →0
+                     ⍞←'Cancelled by user',⎕UCS 10 ⋄ →0
                  :EndIf
                  flag←1
                  :If success∨error
@@ -100,9 +100,9 @@ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
                              1 TC.WritePackageConfigFile path ns
                          :Else
                              qdmx←⎕DMX
-                             ⎕←qdmx.EM
+                             ⍞←qdmx.EM,⎕UCS 10
                              :If 0=1 TC.C.YesOrNo'Would you like to try to fix the problem in the editor? (n=abandon changes)'
-                                 ⎕←'Cancelled, no change'
+                                 ⍞←'Cancelled, no change',⎕UCS 10
                              :Else
                                  flag←0
                                  error←1
@@ -121,7 +121,7 @@ r←PackageConfig Arg;path;ns;newFlag;origData;success;newData;msg;qdmx;filename
                          :EndIf
                      :EndIf
                  :Else
-                     ⎕←'No change, therefore no action is taken'
+                     ⍞←'No change, therefore no action is taken',⎕UCS 10
                  :EndIf
              :Until flag
          :Else

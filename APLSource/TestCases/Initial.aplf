@@ -7,9 +7,9 @@
  :If autoStart←1 ⍝ isBatch{⍺:1 ⋄ 1 ##.Client.YesOrNo ⍵}'Would you like to start the Tatin test server automatically?'
      ⍝ For an auto-start we must copy the test data into a temp folder first
      ∆TEMP_SERVER_FOLDER←F.GetTempSubDir'Tatin-Test-Server'
-     ⎕←'Copying data for the test server...'
+     ⍞←'Copying data for the test server...',⎕UCS 10
      ∆CopyTestServerDataTo ∆TEMP_SERVER_FOLDER
-     ⎕←' Server data copied!'
+     ⍞←' Server data copied!',⎕UCS 10
      ∆TEMP_SERVER_FOLDER,←'/Registry/'
  :Else
      autoStart←0
@@ -21,14 +21,14 @@
  :EndIf
  ⍝ Local folder (not managed):
  ∆TEMP_REGISTRY_FOLDER←F.GetTempSubDir'Tatin-Test-Registry'
- ⎕←'Copying data for the (un-managed) test registry...'
+ ⍞←'Copying data for the (un-managed) test registry...',⎕UCS 10
  ∆TEMP_REGISTRY_FOLDER∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨F.ListDirs #.Tatin.CiderConfig.HOME,'/TestServer/Registry/*'
- ⎕←' Local test data copied!'
+ ⍞←' Local test data copied!',⎕UCS 10
  ⍝ --------- Copy the test data to a temp folder
  ∆TEMP_TEST_DATA←F.GetTempSubDir'Tatin-Test-Data'
- ⎕←'Copying other test data...'
+ ⍞←'Copying other test data...',⎕UCS 10
  ∆TEMP_TEST_DATA∘{(⍺,'/')⎕NCOPY⍠1⊣⍵}¨⊃F.Dir #.Tatin.CiderConfig.HOME,'/TestData/*'
- ⎕←' Other test data copied!'
+ ⍞←' Other test data copied!',⎕UCS 10
  ⍝ --------- Now we need to copy the test data to a different (from the server) temp folder for pure local tests
  json←⊃⎕NGET ∆TEMP_TEST_DATA,'/tatin-client.json'
  ns←⎕JSON⍠('Dialect' 'JSON5')⊣json

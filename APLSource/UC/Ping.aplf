@@ -6,7 +6,7 @@
      :If 0<≢registries←GetListOfRegistriesForSelection 0
      :AndIf 0<≢registries←(TC.Reg.IsHTTP¨registries[;2])⌿registries
      :AndIf 0<≢registries←registries[∪{⍵⍳⍵}registries[;2];] ⍝ Because the same URL might turn up multiple times with different credentials/alias
-         ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
+         ⍞←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...',⎕UCS 10
          r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries[;2]
      :EndIf
  :ElseIf (,'?')≡,registry
@@ -14,10 +14,10 @@
          :Return
      :EndIf
      :If 0≠≢registries
-         ⎕←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...'
+         ⍞←'Questioning ',(⍕≢registries),' Tatin Registr',((1+1=≢registries)⊃'ies' 'y'),'...',⎕UCS 10
          r←{⍵,[1.5]⎕TSYNC{TC.Ping ⍵}¨&⍵}registries
      :EndIf
  :Else
-     ⎕←'Questioning 1 Tatin Registry...'
+     ⍞←'Questioning 1 Tatin Registry...',⎕UCS 10
      r←⍉⍪TC.Ping registry
  :EndIf

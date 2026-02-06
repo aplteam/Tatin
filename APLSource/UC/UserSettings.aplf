@@ -9,14 +9,14 @@
  origData←1⊃⎕NGET filename
  :If Arg.edit
      :If 0=≢new←EditJSON origData
-         ⎕←'Cancelled without a change'
+         ⍞←'Cancelled without a change',⎕UCS 10
      :Else
          :If new≢origData
          :AndIf 1 TC.C.YesOrNo'Do you want to save your changes to disk?'
              (⊂new)⎕NPUT filename 1
          :AndIf 1 TC.C.YesOrNo'Saved! Would you like to refresh the user settings in ⎕SE?'
              TC.Init ⍬
-             ⎕←'User settings in ⎕SE updated'
+             ⍞←'User settings in ⎕SE updated',⎕UCS 10
          :EndIf
      :EndIf
  :ElseIf Arg.refresh

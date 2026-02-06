@@ -1,14 +1,18 @@
-﻿:Namespace Tatin
+:Namespace Tatin
 ⍝ This script directs calls to Tatin user command to Tatin itself.
 ⍝ It's just an interface that does not do anything by itself.
-⍝ Version 0.4.0 ⋄ 2024-03-18 ⋄ Kai Jaeger
+⍝ Version 1.0.0 ⋄ 2026-02-06 ⋄ Kai Jaeger
 
     ∇ PrintError dummy;msg
       msg←''
       :If 3=⎕NC'⎕SE._Tatin.Reg.Version'
           msg←' Tatin is not installed correctly. Please remove and install again.'
       :EndIf
-      ⎕←msg
+      :If 2=⍴⍴msg
+          ⍞←msg ⋄ ⍞←⎕UCS 10
+      :Else
+          ⍞←msg,⎕UCS 10
+      :EndIf
     ∇
 
     ∇ r←List;ref
@@ -33,7 +37,7 @@
               PrintError''
           :EndIf
       :Else
-          ⎕←'Tatin not found'
+          ⍞←'Tatin not found',⎕UCS 10
       :EndIf
     ∇
 
@@ -48,7 +52,7 @@
               PrintError''
           :EndIf
       :Else
-          ⎕←'Tatin not found'
+          ⍞←'Tatin not found',⎕UCS 10
       :EndIf
     ∇
 

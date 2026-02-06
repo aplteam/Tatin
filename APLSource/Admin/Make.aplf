@@ -17,11 +17,11 @@
  CT←##.Client.CommTools
  :If ~batchFlag
  :AndIf 0=1 CT.YesOrNo'Create Tatin with version ',versionOfAPL,' ?'
-     ⎕←'Cancelled by user' ⋄ →0
+     ⍞←'Cancelled by user',⎕UCS 10 ⋄ →0
  :EndIf
  F←##.FilesAndDirs ⋄ C←##.Client ⋄ CFG←##.CiderConfig ⋄ F.APLTreeUtils2←##.APLTreeUtils2
  {}F.Cd CFG.HOME
- 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Current dir is now: ',CFG.HOME
+ {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'   Current dir is now: ',CFG.HOME
  'Check current directory'Assert{'Tatin'≡⊃¯1↑(~⍵∊'/\')⊆⍵}1⊃1 ⎕NPARTS''
  noQLX←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noQLX'
  commitFlag←0
@@ -30,12 +30,12 @@
      buff←1 ⎕SE.APLGit2.Status'#.Tatin'
      :If 0<+/~({⊃,/1↓⎕NPARTS ⍵}¨buff[;2])∊,⊂'History.apla'
      :AndIf 0=1 CT.YesOrNo'The working area is dirty - continue anyway?'
-         ⎕←'Cancelled by user' ⋄ →0
+         ⍞←'Cancelled by user',⎕UCS 10 ⋄ →0
      :EndIf
      ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
      commitFlag←0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
  :EndIf
- 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Compiling HTML from the markdown files (documentation)...'
+ {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'   Compiling HTML from the markdown files (documentation)...'
  CompileDocumentation ⍬
  path←##.Client.GetUserDocumentsFolder,'Dyalog APL-64 19.0 Unicode Files\SessionExtensions\CiderTatin\Tatin'
  :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in the version-agnostic folder?
@@ -74,7 +74,7 @@
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
  parms.Wait←0
- 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Client...'
+ {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Client...'
  P_←P.New parms
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
@@ -92,11 +92,11 @@
  parms.Wait←0
  parms.SessionFile←1
  parms.WindowsStyle←'Normal'
- 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
+ {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'   Process started for "making" the Tatin Server...'
  P_←P.New parms
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
- 0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'   The final steps, putting it all together...'
+ {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'   The final steps, putting it all together...'
  CopyActivateUserCommandIntoProject ⍬
  HandleRunFunction ⍬
  HandleActivateUserCommand ⍬
@@ -104,7 +104,7 @@
  {}⎕SE.Link.Refresh'#.Tatin'
  :If ~batchFlag
      :If 1 CT.YesOrNo'Would you like to install the freshly created new version?'
-         ⎕←1 #.Tatin.Admin.InstallTatin 1
+         ⍞←(1 #.Tatin.Admin.InstallTatin 1),⎕UCS 10
      :EndIf
      activateFilename←##.Client.GetMyUCMDsFolder'/activate.dyalog'
      :If 0=⎕NEXISTS activateFilename
@@ -116,10 +116,10 @@
  :EndIf
  :If #.Tatin.Registry.Version≢⎕SE.Tatin.Version
      ⎕SE.⎕EX¨'Tatin' '_Tatin'
-     ⎕←'*** New version ',({(2⊃⍵),' from ',(3⊃⍵)}##.Registry.Version),' created, but version in ⎕SE is not up-to-date anymore, please restart Dyalog'
+     ⍞←'*** New version ',({(2⊃⍵),' from ',(3⊃⍵)}##.Registry.Version),' created, but version in ⎕SE is not up-to-date anymore, please restart Dyalog',⎕UCS 10
  :Else
      #.Tatin.Registry ⎕SE.Link.Fix⊃⎕NGET(CFG.HOME,'/APLSource/Registry/Version.aplf')1  ⍝ Because building the Client changes the build number
-     0 0⍴{⎕←⍵}⍣(~batchFlag)⊣'*** Done'
+     {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'*** Done'
  :EndIf
  :If commitFlag
      question←1↓⊃,/(⎕UCS 13),¨↓↑⎕SE.APLGit2.Status'#.Tatin'

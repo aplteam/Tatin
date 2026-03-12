@@ -1,0 +1,18 @@
+ r←Test_Load_202(stopFlag batchFlag);⎕TRAP;msg;rc;qdmx;buff
+⍝ Attempts to load the package "APLTreeUtils2" into #.Foo where the name is already defined as a variable
+⍝ Must throw an error because that's not a legal operation. Was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS''
+ #.Foo.APLTreeUtils2←42
+ :Trap 0
+     buff←⎕SE.Tatin.LoadPackages(##.CiderConfig.HOME,'/TestData\aplteam-APLTreeUtils2-1.4.1.zip')'#.Foo'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'is already defined as an object with name class 2'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

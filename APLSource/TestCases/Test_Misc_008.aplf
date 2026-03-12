@@ -6,8 +6,8 @@
  text←⊃TC.F.NGET(##.CiderConfig.HOME,'/docs/ReleaseNotes.md')1
  version←{⍵↑⍨¯1+⌊/⍵⍳'-+'}2⊃TC.Version
 
- bool←∨/¨version∘⍷¨text             ⍝ Error? The release notes ...
- Assert∨/bool                       ⍝ ... don't know about this version!
+ bool←∨/¨version∘⍷¨text
+ 'The release notes don''t know about this version'Assert∨/bool
  row←⌊/⍸bool
  →T.PassesIf 0<≢row
  date←5⊃' '(≠⊆⊢)row⊃text

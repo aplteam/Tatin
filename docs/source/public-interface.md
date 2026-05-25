@@ -90,7 +90,7 @@ Function [`CreateAPIfromCFG`](api.md#create-api-from-cfg) creates the API space 
 
     You can substitute for this list (or override it) with an optional left argument.
 
-It looks in the package for a constant `Public` that names the objects to expose.
+It looks in the package for a constant `Public` (a traditional niladic function returning a vector of text vectors or a variable defining the public names) that names the objects to expose.
 This list of strings can name functions, operators, variables, interfaces, classes and namespaces, both simple and scripted.
 The objects must all be children (or, with dot syntax, grandchildren) of a single source namespace.
 
@@ -184,3 +184,4 @@ To the outside world, only two functions are visible:
 Similarly, if `PkgName` consists of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `PkgName.Run` and `PkgName.CreateParmSpace`.
 
  -->
+

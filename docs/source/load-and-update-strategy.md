@@ -265,6 +265,12 @@ In our example the pruning eliminates `Zoo` 1.1.1:
 rather than loading `Zoo` twice, Tatin loads only the latest **installed** version.
 Both `Foo` and `Goo` will use `Zoo` version 1.2.0.
 
+## Enforce update when a package is available with a hight major version number.
+
+One way to update to a new major version is to delete all packages from an installation folder, update the dependency file to refer to the new major version number and then open the project with Cider. 
+
+Cider will detect the need for re-installing and act accordingly.
+
 
 ## :fontawesome-solid-trash-can: Remove a principal package
 
@@ -322,6 +328,7 @@ performs some health checks, and if all is well, recreates the build list.
 Sometimes you might need to downgrade, for example from a version you find buggy, to an older version known to be okay.
 
 Tatin does not offer help here; you need to do this yourself.
+
 
 
 

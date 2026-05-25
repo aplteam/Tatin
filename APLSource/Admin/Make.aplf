@@ -2,7 +2,6 @@
 ⍝ This function will start two APL sessions in succession in order to open the Tatin
 ⍝ project and then execute first `MakeClient` (which does bump the build number) and then,
 ⍝ in the second session, `MakeServer`, which does *not* bump the build number.
-⍝ It also re-compiles the documentation (=creates HTML files from Markdown)
 ⍝ It cannot be done in one go, and it cannot be done in batch mode from the current session.
 ⍝ The right argument is expected to be a Boolean that tells whether this functions runs in
 ⍝ batch mode or not. In batch mode no messages are printed, and no interaction with a user
@@ -35,8 +34,6 @@
      ##.Registry.⎕ED⍠('EditName' 'Allow')⊢'Version'
      commitFlag←0<≢1 ⎕SE.APLGit2.Status'#.Tatin'
  :EndIf
- {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'   Compiling HTML from the markdown files (documentation)...'
- CompileDocumentation ⍬
  path←##.Client.GetUserDocumentsFolder,'Dyalog APL-64 19.0 Unicode Files\SessionExtensions\CiderTatin\Tatin'
  :If F.IsDir path                                           ⍝ Does a folder Tatin/  live in the version-agnostic folder?
  :AndIf F.IsFile path,'/Tatin.dyalog'                       ⍝ Does the Tatin user command script live there?
@@ -58,7 +55,7 @@
  'Create!'F.CheckPath'./Dist'
  list←⊃F.Dir'./Dist/*.zip'
  list←('.zip'∘≡¨3⊃¨⎕NPARTS¨list)/list
- list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server' 'Tatin-Documentation'⍷¨⊂⍵}¨list)/list
+ list←(∨/¨{∨/¨'Tatin-Client' 'Tatin-Server'⍷¨⊂⍵}¨list)/list
  F.DeleteFile list
  P←##.APLProcess
  parms←P.CreateParms
@@ -78,7 +75,6 @@
  P_←P.New parms
  {⍵.HasExited:shy←0 ⋄ _←⎕DL 0.2 ⋄ ∇ ⍵}P_
  'The process exited with an error code'Assert 0=P_.Proc.ExitCode
- UpdateDocumentation ⍬
  parms←P.CreateParms
  parms.ConfigParms⍪←'load' 'APLSource/Admin/Make_.aplc'
  parms.ConfigParms⍪←'DYALOGSTARTUPSE'({0=≢v←2 ⎕NQ #'GetEnvironment'⍵:v ⋄ ⍵,'="',v,'"'}'DYALOGSTARTUPSE')

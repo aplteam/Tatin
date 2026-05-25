@@ -2,7 +2,7 @@
 
 Tatin is a community project. It is available as Open Source under the (pretty relaxed) MIT license.
 
-A Tarte Tatin is a nice way to package Apple's.
+A Tarte Tatin is a nice way to package Apples.
 
 ## Documentation
 

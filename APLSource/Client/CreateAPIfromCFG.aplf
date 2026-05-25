@@ -5,9 +5,9 @@
 ⍝ Note that the API namespace must be a child of `refTosourceNS`.\\
 ⍝ `refTosourceNS` (mandatory) : name of the source namespace\\
 ⍝ `cfg`           (mandatory) : package configuration as a namespace
-⍝ `names`         (optional)  : list of all public names, typically returned by a niladic tfn named `Public`\\
+⍝ `names`         (optional)  : list of all public names, typically returned by a niladic tfn or variable named `Public`\\
 ⍝ By default ALL APL objects in `refTosourceNS` will become public except when...
-⍝ * there is a function `Public` returning the names of APL objects. These are then going to become the API.
+⍝ * there is a function or variable `Public` returning the names of APL objects. These are then going to become the API.
 ⍝ * a list of names is passed as left argument defining the public names.\\
 ⍝ Returns the number of fns/oprs established.\\
 ⍝ Handles all kinds of objects: niladic, monadic, dyadic and ambivalent fns as well as
@@ -23,8 +23,10 @@
      'Source namespace (1⊃⍵) is not a namespace'Assert 9.1≡⎕NC⊂⍕refTosourceNS
      :If 0=⎕NC'names'
      :OrIf 0=≢names
-         :If 3=refTosourceNS.⎕NC'Public'
-             names←refTosourceNS.Public                     ⍝ The result of the function `Public` rules the day
+         :If 2 3∊⍨refTosourceNS.⎕NC'Public'
+             :If 2=⍴⍴names←refTosourceNS.Public                     ⍝ The result of the function `Public` rules the day
+                 names←' '~⍨¨↓names
+             :EndIf
          :Else
              names←(' '~⍨¨↓refTosourceNS.⎕NL⍳16)~⊂cfg.api   ⍝ By default, everything but the API namespace is public
          :EndIf

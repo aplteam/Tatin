@@ -7,20 +7,6 @@ keywords: apl,dyalog,tatin,ui
 
 !!! abstract "User commands put Tatin packages at your fingertips"
 
-[Cache](#cache)                   [LoadDependencies](#load-dependencies)
-[CheckForLaterVersion](#check-for-later-version)    [LoadPackages](#load-packages)
-[Documentation](#documentation)           [LoadTatin](#load-tatin)
-[FindDependencies](#find-dependencies)        [PackageConfig](#package-config)
-[Init](#init)                    [PackageDependencies](#package-dependencies)
-[InstallPackages](#install-packages)         [Ping](#ping)
-[ListDeprecated](#list-deprecated)          [ReInstallDependencies](#reinstall-dependencies)
-[ListLicenses](#list-licenses)            [UnInstallPackages](#uninstall-packages)
-[ListPackages](#list-packages)            [UpdateTatin](#update-tatin)
-[ListRegistries](#list-registries)          [UserSettings](#user-settings)
-[ListTags](#list-tags)                [Version](#version)
-[ListVersions](#list-versions)            
-{: .typewriter}
-
 There are more user commands for [publishing](user-commands-publish.md) and [hosting](user-commands-host.md).
 
 User commands and their options are case-insensitive.
@@ -33,12 +19,12 @@ They all have help built in, for example
 
 !!! warning "Square brackets in the command syntax"
 
-	Square brackets in the command syntaxes shown on this page indicate **optional command arguments**.
-	For example, the `BuildPackage` command has syntax
+    Square brackets in the command syntaxes shown on this page indicate **optional command arguments**.
+    For example, the `BuildPackage` command has syntax
 
-		]TATIN.BuildPackage [source] [target]
+        ]TATIN.BuildPackage [source] [target]
 
-	Above, both the `source` and the `target` arguments are optional.
+    Above, both the `source` and the `target` arguments are optional.
 
 
 ## Command options
@@ -48,7 +34,7 @@ Options are further optional arguments to the command.
 Specify all the command’s arguments _before_ any options.
 Prefix options with dashes, e.g.
 
-	]TATIN.BuildPackage path/to/package path/to/target -bump=minor
+    ]TATIN.BuildPackage path/to/package path/to/target -bump=minor
 
 Options affect only the current command.
 They override settings in the [user settings](user-settings.md) and leave them unchanged.
@@ -163,7 +149,9 @@ scan the source/s recursively for folders wih `apl-dependencies.txt` files and l
 --------|----------
 verbose | Report the actual package folder(s) rather than the hosting folder.
 
-<!-- FIXME All I see listed is full package IDs -->
+<!-- FIXME All I see listed is full package IDs (SJT)
+For me it works. Please open an issue with a recipe how to reproduce this (KJ)
+-->
 
 :fontawesome-solid-code: API:
 [`FindDependencies`](api.md#find-dependencies)
@@ -191,8 +179,7 @@ Where
 -   `pkgs` is a comma-separated list: each item identifies a package as one of
 
     -   a [search pattern](#search-patterns) (optionally including a package alias)
-    -   `file://{path/to/folder}` or `file://{path/to/ZIP}`
-<!--    -   URL  FIXME Really? Or is this a registry URL in a search pattern? -->
+    -   `file://{path/to/ZIP}`
 
 -   `target` (optional) is
 
@@ -209,16 +196,14 @@ registering any package aliases specified.
     Don't use this for other purposes.
 
 If `target` is `[MyUCMDs]` or `[MyUCMDs]name` install in `⎕SE`.
-If `name` is omitted, use the package name,
-but signal an error if more than one user-command package is specified after `[MyUCMDs]`.
-<!-- FIXME Clarify error condition -->
+If `name` is omitted, the package name is used. However, if more than one user-command package is specified after `[MyUCMDs]` an error will be thrown.
 
 If `target` is omitted, look for open Cider projects:
-if one is found, install in it; if multiple, ask me which.
+if just one is found, use it; if there are multiple, ask the user which one to use.
 
 When installing into a Cider project,
 if its `dependencies` and `dependencies_dev` properties identify one folder,
-install there; if multiple, ask me which.
+install there; if both aare defined, ask the user.
 
 If a search pattern does not specify a registry, scan known registries
 and use the first hit.
@@ -292,7 +277,7 @@ If `reg` omitted, use `[tatin]`.
 Where `source` is
 
 -   a registry URL or alias
--   `[*]` for known registries (or `?` – ask me which)
+-   `[*]` for known registries (or `?` – ask the user)
 -   path to a registry
 -   path to an install folder
 
@@ -348,7 +333,7 @@ See also [`]TATIN.UserSettings`](#user-settings).
 Where `source` (default `[tatin]`) is
 
 -   a registry alias or URL
--   `?` (ask me which)
+-   `?` (ask the user)
 
 list alphabetically all tags used in all packages there.
 
@@ -367,7 +352,7 @@ os=   | (comma-separated list: `lin`, `mac` and `win`) show only tags on package
 
 Where `pattern` is a [search pattern](#search-pattern), list all versions of the package.
 
-If the registry is specified as `?` or `[?]`, ask me to choose one.
+If the registry is specified as `?` or `[?]`, ask the user to choose one.
 
 If no registry is specified, show registry URLs.
 
@@ -476,7 +461,6 @@ Write a user config file my home folder if none there.
 
 ----------|--------------------------------
 force     | Overwrite existing installation.
-permanent | Make any changes permanent. <!-- FIXME Changes to what? -->
 
 !!! detail "Makes the Tatin API available."
 
@@ -492,11 +476,11 @@ Where `source` is
 
 If `source` is omitted,
 
-1.  look for open Cider projects: if one is found, use it; if multiple, ask me which.
-1.  look for a package config file in the current directory and confirm with me if found.
+1.  look for open Cider projects: if one is found, use it; if multiple, ask the user which.
+1.  look for a package config file in the current directory and confirm with the user if found.
 
 ---|---
-edit   | Let me edit the config (since version 0.104.0 Tatin updates the workspace with the new config).
+edit   | Let the user edit the config (since version 0.104.0 Tatin updates the workspace with the new config).
 delete | Delete the config.
 
 ??? example
@@ -515,7 +499,7 @@ delete | Delete the config.
       license: "MIT",
       lx: "",
       maintainer: "kai@aplteam.com",
-      minimumAplVersion: "18.0",
+      minimumAplVersion: "18.2",
       ml: 1,
       name: "MarkAPL",
       os_lin: 1,
@@ -540,12 +524,12 @@ display the content of its `apl-dependencies.txt` file,
 creating one if necessary.
 
 If `path` is omitted, look for open Cider projects:
-if one is open, use it; if multiple, ask me which.
+if one is open, use it; if multiple, ask the user which.
 
 -------|--------------------------------------------
-edit   | Let me edit the file.
+edit   | Let the user edit the file.
 delete | Delete the dependencies file.
-force  | Don’t ask me for confirmations (useful for test cases).
+force  | Don’t ask the user for confirmations (useful for test cases).
 
 
 ## :fontawesome-solid-terminal: Ping
@@ -554,7 +538,7 @@ force  | Don’t ask me for confirmations (useful for test cases).
 
 Where `source` is
 
--   a registry or registries, ping it/them and show me which respond;
+-   a registry or registries, ping it/them and show user which respond;
 -   a folder, show whether it exists.
 
 Specify a registry as a registry URL or alias, or `?`.
@@ -562,7 +546,7 @@ Specify a registry as a registry URL or alias, or `?`.
 If `source` is
 
 -   omitted, ping all known registries
--   `?` ask me to choose registries
+-   `?` ask the user to choose registries
 
 ```
       ]TATIN.Ping
@@ -601,11 +585,9 @@ compile a new build list, and use it to re/install the dependencies.
 
 !!! tip "ZIP files have priority and are not removed."
 
-If `folder` is a relative path,
-or unspecified, <!-- FIXME Confirm -->
-look for a subfolder of an open Cider project:
-if one Cider project is open, use it; if multiple, ask me which.
-Either way, ask me to confirm the folder.
+If `folder` is unspecified, look for a subfolder of an open Cider project:
+if one Cider project is open, use it; if multiple, ask the user which.
+Either way, ask the user to confirm the folder.
 
 If `reg` is not specified, scan known registries for the direct dependencies,
 but scan known registries anyway for further dependencies.
@@ -641,10 +623,10 @@ Where
 package | <ul markdown><li>fully qualified name of a package</li><li>alias and fully qualified name of a package</li><li markdown>just a package alias (postfix with a `@` to mark it as alias)</li><li>package ID as group and name</li></ul>
 folder | <ul markdown><li>path to a folder with installed packages</li><li markdown>`[MyUCMDs]` (case independent)</li><li>a Cider alias in square brackets</li></ul>
 
-uninstall, according to syntax,
+Uninstall, according to syntax,
 
 1.  `package` from `folder`
-2.  `package` from the currently open Cider project (if several open, ask me which)
+2.  `package` from the currently open Cider project (if several open, ask the user which)
 3.  from `folder` all superflous packages; i.e. neither top-level nor dependency; e.g. outdated versions
 4.  the top-level packages I select from your prompt, and any dependencies thus superfluous
 
@@ -657,7 +639,7 @@ quiet   | Don’t report progress.
 :fontawesome-solid-code: API:
 [`UninstallPackages`](api.md#uninstall-packages)
 
-
+!!! detail "If a package was installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well, is the package actually removed."
 
 ## :fontawesome-solid-terminal: Update Tatin
 
@@ -722,7 +704,7 @@ hiding the API key.
 !!! tip "To see current user settings rather than the file content, use the API.""
 
 --------|-------------------------------------------------------
-edit    | Let me edit the file then ask me whether to refresh current settings.
+edit    | Let the user edit the file then ask the user whether to refresh current settings.
 home    | Show path to the config file and do nothing else.
 refresh | Refresh the current user settings from the config file.
 
@@ -739,7 +721,7 @@ Show the client’s Tatin version.
 
     ]TATIN.Version reg
 
-Where `reg` is a registry URL or alias (if `?` ask me which) show the Tatin version installed there.
+Where `reg` is a registry URL or alias (if `?` ask the user which) show the Tatin version installed there.
 
     ]TATIN.Version -all
     ]TATIN.Version *
@@ -754,4 +736,5 @@ Show the installed and minimum required versions of the Principal Registry.
 
 :fontawesome-solid-code: API:
 [`Version`](api.md#version)
+
 

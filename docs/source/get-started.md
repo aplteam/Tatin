@@ -191,7 +191,10 @@ To remove Tatin and/or Cider from the installation folder:
 
 
 
-<!-- FIXME move elsewhere
+<!-- FIXME move elsewhere (SJT)
+Well, until then it stays here
+--> 
+
 ### Installing several packages at once
 
 Note that `InstallPackages` accepts several package IDs, separated by commas:
@@ -209,7 +212,7 @@ This will load three packages and all their dependencies at once. You might find
 => ```
 => This creates a ref `F` for FilesAndDirs. However, the purpose of such aliases is not to allow you to create
 => a kind of shortcut for the package in question, this allows you to load to different versions of a package,
-=> something that is sometimes required due to specific requirements.
+=> something that is sometimes necessary due to specific requirements.
 =>
 => All you need to do is to assign different aliases to the different versions of the package.
 
@@ -458,4 +461,3 @@ Note that `LX` does not exist in case no such function is defined, or the functi
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
 
- -->

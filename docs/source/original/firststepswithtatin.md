@@ -375,7 +375,7 @@ This will load three packages and all their dependencies at once. You might find
 => ```
 => This creates a ref `F` for FilesAndDirs. However, the purpose of such aliases is not to allow you to create
 => a kind of shortcut for the package in question, this allows you to load to different versions of a package,
-=> something that is sometimes required due to specific requirements. 
+=> something that is sometimes necessary due to specific requirements. 
 => 
 => All you need to do is to assign different aliases to the different versions of the package.
 

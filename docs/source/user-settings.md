@@ -28,11 +28,16 @@ The default user-settings file lists two registries:
      tatin       https://tatin.dev/      ...
      tatin-test  https://test.tatin.dev/ ...
 
-<!-- Implementation detail: not relevant
+<!-- Implementation detail: not relevant (SJT)
+
+Sorry, I strongly disagree. When the user wants to deal with their own settings they need to know.
+John Doe: iunlikely. Holden Hover: strong candidate! (KJ)
+
+-->
 
 ### What does Tatin do at start-up time?
 
-When Tatin is initialized[^init] it creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`. (Strictly speaking it lives actually in `⎕SE._Tatin`; in `⎕SE.Tatin` there is just a niladic function `MyUserSettings` that returns a reference to `⎕SE._Tatin.MyUserSettings`)
+When Tatin is initialized[^init] it creates an instance of the `UserSettings` class with the name `MyUserSettings` which lives in `⎕se.Tatin`. (Strictly speaking it lives in `⎕SE._Tatin.Client`; in `⎕SE.Tatin` there is just a niladic function `MyUserSettings` that returns a reference to `⎕SE._Tatin.Client.MyUserSettings`)
 
 If the constructor does not get a fully qualified name of the user settings file as an argument then it performs two steps:
 
@@ -47,7 +52,6 @@ If the constructor does not get a fully qualified name of the user settings file
    * If that file exists then Tatin will instantiate it
 
    * If the file does not exist then it will be created with default settings
- -->
 
 ## Edit your settings
 
@@ -242,34 +246,37 @@ A> In that case Tatin assigns new values to all Registries except those with a p
 A>
 A> The new priorities will not change the order of the priorities, and the lowest one will be 100 or greater.
 
-So far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the change permanent; other sessions won't be affected.
+So far we have changed the user settings in the workspace, _not_ on file. This allows you to experiment with certain settings without making the changes permanent; other sessions won't be affected.
 
 If you want to make your changes permanent you must call the `Save` method and provide a 1 as the right argument.
 
- -->
-
 `id`
-
 : A unique key that can be used to identify a Registry definition in the user settings file when neither the URL nor an alias can be used for this.
 
-However, because mot of the time URL or alias are sufficient for this, setting `id` is optional.
+However, because most of the time a URL or an alias are sufficient for this, setting `id` is optional.
 
 
-## The "id"
+## The `id`
 
-<!-- FIXME Clarify -->
-Because it must be possible to ==define more than one set for the same URL==
---- for different groups! --- in the user settings, the URL does not necessarily qualify as a unique key for a Registry. Neither does the alias, because it is optional, and you may reset it to "undefined".
+Most users never need to care about the `id` property.
 
-So we need a unique key for this (though admittedly not many will be in need for this). That's why you may set "id".
+However, a Registry definition still needs a unique identifier, because neither the URL nor the alias are guaranteed to be unique:
 
-<!-- If you use the `DefineRegistry` class then "id" will be a newly created UUID. If you prefer to add a new Registry to the user settings by editing the user settings file then you should add "id" yourself. -->
+* The same Registry URL might appear more than once in your settings, for example for different groups or credentials.
+* An alias is optional and can be changed or removed at any time.
 
-This has only an impact locally in a scenario mentioned above, and that's why this is optional.
+For that reason a Registry definition may contain an `id`.
 
+When you create a Registry definition with the `DefineRegistry` class, Tatin automatically generates a UUID and assigns it to `id`.
+
+If you edit the user-settings file manually, you may also specify an `id` yourself, although in most cases there is no need to do so.
+
+The `id` is used only locally by Tatin to distinguish Registry definitions reliably. It has no special meaning outside your user settings.
 
 
 [^init]: Tatin is initialized either explicitly or as a side effect when the first Tatin user command is issued. <!-- See ["Installing and updating the Tatin Client"](installingandupdatingthetatinclient.md) for details. -->
+
+
 
 
 

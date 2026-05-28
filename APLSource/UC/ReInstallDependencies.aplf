@@ -1,6 +1,6 @@
  r←ReInstallDependencies Args;installFolder;registry;refs;deps;msg;parms;qdmx;cfg;ind;subFolders;openCiderProjects;project;folders;bool;aliasDefs;alias;info;subFolder;recursive
  r←''
- 'Mandatory argument (install directory or project) must not be empty'Assert 0<≢installFolder←Args._1
+ installFolder←{0≡⍵:'' ⋄ ⍵}Args._1
  :If '[]'≡¯2↑⌽¯1⌽installFolder
  :AndIf '[myucmds]'≢⎕C installFolder
      'You''ve specified a Cider project alias but Cider is not available'Assert 9=⎕SE.⎕NC'Cider'
@@ -45,7 +45,6 @@
  parms.update←0 Args.Switch'update'
  parms.major←0 Args.Switch'major'
  recursive←0 Args.Switch'recursive'
- installFolder←{0≡⍵:'' ⋄ ⍵}installFolder
  :If '[myucmds]'{⍺≡⎕C(≢⍺)↑⍵}installFolder
      installFolder←TC.GetMyUCMDsFolder{⍵↓⍨⍵⍳']'}installFolder
  :ElseIf 0=≢installFolder

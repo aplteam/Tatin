@@ -10,32 +10,13 @@ keywords: api, apl, dyalog, source, tatin
 The API functions are similar to the [user-commands](user-commands.md), but not identical.
 Not all have equivalent user commands.
 
-[BuildPackage](#build-package)              [InitPackageConfig](#initpackage-config)
-[CheckForLaterVersion](#check-for-later-version)      [InstallPackages](#install-packages)
-[ClearCache](#clear-cache)                [ListDeprecated](#list-deprecated)
-[CopyRegistry](#copy-registry)              [ListCache](#list-cache)
-[CreateAPIfromCFG](#create-api-from-cfg)          [ListLicenses](#list-licenses)
-[CreateBuildParms](#create-build-parms)          [ListPackages](#list-packages)
-[CreateCopyRegistryParms](#create-copyregistry-parms)   [ListRegistries](#list-registries)
-[CreateReInstallParms](#create-reinstall-parms)      [ListTags](#list-tags)
-[DeletePackages](#delete-packages)            [ListVersions](#list-versions)
-[DeprecatePackage](#deprecate-package)          [LoadDependencies](#load-dependencies)
-[FindDependencies](#find-dependencies)          [LoadPackages](#load-packages)
-[GetDeletePolicy](#get-deletepolicy)           [Ping](#ping)
-[GetDependencyTree](#get-dependency-tree)         [PublishPackage](#publish-package)
-[GetNoCachingFlag](#get-nocaching-flag)          [ReInstallDependencies](#reinstall-dependencies)
-[GetPathToPackageCache](#get-path-to-package-cache)     [ReadPackageConfigFile](#read-package-config-file)
-[GetUserHomeFolder](#get-user-home-folder)         [UnInstallPackages](#uninstall-packages)
-[InitialisePackage](#initialise-package)         [Version](#version)
-{: .typewriter}
-
-
 Unlike user commands, API function names are case-sensitive.
 
-The Tatin API is in `⎕SE.Tatin`.
-Call an API function like this:
+The Tatin API is in `⎕SE.Tatin`. Call an API function like this:
 
+```
     ⎕SE.Tatin.BuildPackage parms
+```
 
 ??? warning "API code cache"
 
@@ -43,12 +24,14 @@ Call an API function like this:
 
     Do not call functions in `⎕SE._Tatin`.
 
----
+
+
 
 
 ## :fontawesome-solid-code: Build package
 
-    zipFilename←BuildPackage parms
+
+      zipFilename←BuildPackage parms
 
 
 Zips all files required for a package into a file at `parms.targetPath` and returns its name.
@@ -71,9 +54,7 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
 `projectspace`
 : Namespace that is to contain the package contents.
 
-    ??? warning "Until version 0.118.0 this was known as `tatinVars`"
-
-        Now, Tatin signals an error if it finds a `tatinVars` parameter.
+    ??? warning "Until version 0.118.0 this was known as `tatinVars`". Now, Tatin signals an error if it finds a `tatinVars` parameter.
 
 `targetPath`
 : Path to folder in which to write the ZIP file. Default is `''`: use `projectPath`.
@@ -94,7 +75,9 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
 
 ## :fontawesome-solid-code: Check for later version
 
-    r←{flags} CheckForLaterVersion path
+```
+r←{flags} CheckForLaterVersion path
+```
 
 Scans all known registries (with priority >0) for later versions of the principal packages installed in `path` and returns a matrix with columns:
 
@@ -113,9 +96,14 @@ Change this with optional left argument `flags`: the sum of the following. (Defa
 
 ## :fontawesome-solid-code: Clear cache
 
-    (rc report)←ClearCache url
+```
+(rc report)←ClearCache url
+```
 
-Clears the cache and returns ==FIXME==.
+Clears the cache and returns a two-element vector:
+
+1. Is either 0 (for success) or 1 (for failure)
+2. Is either an empty vector of a simple text vectors, possible with injected LFs (`⎕UCS 10`).
 
 If `url` is
 
@@ -127,7 +115,9 @@ The cache is the folder [`GetPathToPackageCache`](#get-path-to-package-cache) po
 
 ## :fontawesome-solid-code: Copy registry
 
-    list←CopyRegistry parms
+```
+list←CopyRegistry parms
+```
 
 Copies packages from a managed Tatin registry to a local folder and returns
 ==as a list of strings the packages copied==
@@ -177,7 +167,7 @@ Required parameters are marked; others are optional.
 : URL of the Tatin registry from which to copy. Required unless `dry` set.
 
 `verbose=`
-: By default, prints the names of all packages copied to `⎕SE`. <!-- FIXME Prints to `⎕SE` or copies to `⎕SE`? -->
+: By default, the names of all packages that got copied are printged to `⎕SE`.
 
     1 – print a detailed report for all packages (`Fetched` indicates success)
 
@@ -190,18 +180,23 @@ Required parameters are marked; others are optional.
 
 ## :fontawesome-solid-code: Create API from CFG
 
-    {noOf}←{names} CreateAPIfromCFG (source cfg)
-
-<!-- FIXME arguments and results -->
+```
+{noOf}←{names} CreateAPIfromCFG (source cfg)
+```
 
 Where
 
 -------|-------------|------------
 source | _reference_ | namespace containing the package objects
-cfg    | ==_What?_== | package configuration
+cfg    | _namespace_ | package configuration as variables in a namespace
 names  | _strings_   | (optional) names of objects in the namespace to be exposed in the API
 
 then Tatin creates an API space as a child of `source` (with cover functions for the package’s public interface) and returns as a shy result the number of objects exposed.
+
+Note that `cfg` can be...
+
+* a namespace brought into the WS by `GetPackageConfigFileAsNS` which needs to path to a package config file
+* the result of a call to 
 
 If `names` is absent, the function looks for a constant `source.Public`.
 
@@ -213,7 +208,9 @@ See [Public Interface](public-interface.md) for more.
 
 ## :fontawesome-solid-code: Create build parms
 
-    parms←CreateBuildParms projectPath
+```
+parms←CreateBuildParms projectPath
+```
 
 Creates a parameter space for [`BuildPackage`](#build-package) with parameters:
 
@@ -227,7 +224,9 @@ version
 
 ## :fontawesome-solid-code: Create CopyRegistry parms
 
-    parms←CreateCopyRegistryParms y
+```
+parms←CreateCopyRegistryParms y
+```
 
 Where `y` is either an empty vector or a parameter space,
 returns a parameter space for [`CopyRegistry`](#copy-registry).
@@ -235,14 +234,18 @@ returns a parameter space for [`CopyRegistry`](#copy-registry).
 
 ## :fontawesome-solid-code: Create ReInstall parms
 
-    parms←CreateReInstallParms
+```
+parms←CreateReInstallParms
+```
 
 Returns a parameter space with default parameters for the (optional) left argument of [`ReInstallDependencies`](#reinstall-dependencies), in particular, `noBetas`, `update` and `dry`.
 
 
 ## :fontawesome-solid-code: Delete packages
 
-    (statusCode errMsg)←DeletePackages (regID packageIDs)
+```
+(statusCode errMsg)←DeletePackages (regID packageIDs)
+```
 
 Deletes `packages` from Tatin registry `regID` and returns HTTP `statusCode` and `errMsg`, empty if successful.
 
@@ -275,7 +278,9 @@ The principal Tatin server operates a `None` policy, meaning that you cannot del
 
 ## :fontawesome-solid-code: Deprecate package
 
-    msg←DeprecatePackage (registry comment package)
+```
+msg←DeprecatePackage (registry comment package)
+```
 
 Where
 
@@ -292,7 +297,9 @@ As the registry is defined, no scanning is done.
 
 ## :fontawesome-solid-code: Find dependencies
 
-    r←{depth} FindDependencies (target pkgList [verbose])
+```
+r←{depth} FindDependencies (target pkgList [verbose])
+```
 
 Where
 
@@ -303,8 +310,7 @@ verbose | flag | optional: whether to include more detail in the result; default
 depth | integer | optional: limit on recursive search
 
 then Tatin recursively scans the registry for the packages in `pkgList` and returns
-a fully qualified list of all matches.
-<!-- FIXME as what? -->
+a fully qualified list of all matches as a vector of text strings.
 
 <!-- FIXME Get this to work, then include an example -->
 
@@ -328,7 +334,9 @@ You can use it similarly if you know exactly what is stored where.
 
 ## :fontawesome-solid-code: Get delete policy
 
-    r←GetDeletePolicy server
+```
+r←GetDeletePolicy server
+```
 
 Where `server` is the alias or URL of a Tatin server, returns its delete policy:
 
@@ -347,8 +355,11 @@ None
 
 ## :fontawesome-solid-code: Get dependency tree
 
-<!-- tree←{append} GetDependencyTree x -->
-    tree←GetDependencyTree pkg
+<!-- tree←{append} GetDependencyTree x Left argument is used internally when called recursively -->
+
+```
+tree←GetDependencyTree pkg
+```
 
 Where `pkg` is one of:
 
@@ -369,15 +380,14 @@ col | contains
 This function requires the version number to be fully specified.
 
 !!! danger "The function accepts an optional left argument for INTERNAL use only."
-<!--
-FIXME Why document if for internal use only?
-Note that the function accepts an optional left argument, but this should not be specified by a user: it is only used internally.
 
-#### Optional left argument `append`
+## :fontawesome-solid-code: Get package config file as namespace
 
-The optional left argument defaults to 0, meaning a saved dependency tree is replaced. By passing a 1 as the left argument one can add to the saved dependency tree.
- -->
+```
+ns←GetPackageConfigFileAsNS /path/to/pkg
+```
 
+<!-- FIXME add meat -->
 
 ## :fontawesome-solid-code: Get NoCaching flag
 
@@ -396,7 +406,9 @@ If found the value of the `noCaching` property is returned, otherwise 0.
 
 ## :fontawesome-solid-code: Get path to package cache
 
-    path←GetPathToPackageCache
+```
+path←GetPathToPackageCache
+```
 
 Returns `MyUserSettings.path2cache` if not empty, otherwise the standard path for caching, according to the operating system.
 
@@ -408,7 +420,9 @@ Returns `MyUserSettings.path2cache` if not empty, otherwise the standard path fo
 
 ## :fontawesome-solid-code: Get user home folder
 
-    path←{aplVersion} GetUserHomeFolder str
+```
+path←{aplVersion} GetUserHomeFolder str
+```
 
 Returns the standard path for user-specific data, with string `str` appended.
 
@@ -435,7 +449,9 @@ Optional string `aplVersion` is used by test cases to simulate different version
 
 ## :fontawesome-solid-code: Initialise package
 
-    config←{configParms} InitialisePackage folder
+```
+config←{configParms} InitialisePackage folder
+```
 
 Where `folder` is a path to a folder, and (optional) `configParms` is a parameter space, Tatin creates the folder if necessary and initializes it with a config file.
 
@@ -452,7 +468,9 @@ but can be made from scratch:
 
 ## :fontawesome-solid-code: InitPackage config
 
-    cfg←{sourcePath}  InitPackageConfig parms
+```
+cfg←{sourcePath}  InitPackageConfig parms
+```
 
 Where
 
@@ -482,7 +500,7 @@ io                : 0
 license           :
 lx                :
 maintainer        :
-minimumAplVersion : 18.0
+minimumAplVersion : 18.2
 ml                : 0
 name              :
 os_lin            : 1
@@ -498,7 +516,9 @@ version           : 0.1.0
 
 ## :fontawesome-solid-code: Install packages
 
-    r←{noBetas} InstallPackages (identifiers targetFolder)
+```
+r←{noBetas} InstallPackages (identifiers targetFolder)
+```
 
 Where
 
@@ -525,18 +545,17 @@ To install the latest version, omit minor+patch or even major+minor+patch.
 
 ## :fontawesome-solid-code: List cache
 
-    list←{fullpath} ListCache registry [principalFlag]
+```
+list←{fullpath} ListCache registry
+```
 
 Where
 
 ---|---|---
 fullpath      | flag   | optional: report full paths; default 0
-principalFlag | flag   | optional: default 0
 registry      | string | empty, or a registry domain name or alias
 
 returns the contents of the Tatin package cache as a nested list with an item for each domain represented in the cache.
-
-<!-- FIXME What does `principalFlag` do? -->
 
 Each result item is a pair:
 
@@ -546,12 +565,11 @@ Each result item is a pair:
 If the cache is empty the result is an empty list.
 
 
-<!-- Refers to the `MyUserSettings` instance of the class `UserSettings`. -->
-
-
 ## :fontawesome-solid-code: List deprecated
 
-    list←{all} ListDeprecated source
+```
+list←{all} ListDeprecated source
+```
 
 Where
 
@@ -576,7 +594,9 @@ Set the `all` flag to include all versions of any major version  marked as depre
 
 ## :fontawesome-solid-code: List licenses
 
-    licences←{verbose} ListLicences registry
+```
+licences←{verbose} ListLicences registry
+```
 
 Where `registry` is the URL or alias of a Tatin server and `verbose` is a flag (default 0), returns a list of licences.
 
@@ -594,7 +614,9 @@ The result is a list of strings – if `verbose` is set, a 2-column matrix of wh
 
 ## :fontawesome-solid-code: List packages
 
-    packages←{parms} ListPackages source
+```
+packages←{parms} ListPackages source
+```
 
 Where
 
@@ -663,7 +685,9 @@ package ID | aggregate | column 1 | column 2
 
 ## :fontawesome-solid-code: List registries
 
-    registries←ListRegistries type
+```
+registries←ListRegistries type
+```
 
 Where `type` is a flag or `⍬`, returns as a matrix all registries specified in your config file.
 
@@ -694,7 +718,9 @@ If the registry does not respond, Tatin signals an error.
 
 ## :fontawesome-solid-code: List tags
 
-    list←{parms} ListTags registry
+```
+list←{parms} ListTags registry
+```
 
 Where `registry` is the alias or URL of a registry, and `parms` is a parameter space, returns as a 2-column matrix all tags in use there:
 
@@ -716,7 +742,9 @@ If optional argument `parms` contains a list of tags (comma-separated string) as
 
 ## :fontawesome-solid-code: List versions
 
-    mat←{dateFlag} ListVersions pkg
+```
+mat←{dateFlag} ListVersions pkg
+```
 
 Where (optional) `dateFlag` is a flag and `pkg` identifies a package, returns a list of all versions of the package.
 
@@ -767,7 +795,9 @@ with beta versions) then the publishing date is taken into account.
 
 ## :fontawesome-solid-code: Load dependencies
 
-    {refs}←{options} LoadDependencies folder [target]
+```
+{refs}←{options} LoadDependencies folder [target]
+```
 
 Where
 
@@ -789,13 +819,13 @@ The  flags in `options`:
 
     Case-insensitive alias `'[MyUCMDs]'` denotes the special folder `MyUCMDs/`, whose location depends on the operating system.
 
-    So where a Tatin package has been installed as a user command (and perhaps bundled into the Dyalog runtime) you cannot use absolute paths for referring to assets.
+    So where a Tatin package has been installed as a user command you cannot use absolute paths for referring to assets.
 
     In that case the paths must be relative to `MyUCMDs/`.
     This is what the second `options` flag is for.
 
-    The flag affects the result of `HOME` and `GetFullPath2AssetsFolder`. <!-- FIXME wossit? -->
-    Rather than returning the full path, only the folder containing the packages, and its parent are returned, making it a relative path.
+    The flag affects the result of `HOME` and `GetFullPath2AssetsFolder`: `HOME` would be empty, and `GetFullPath2AssetsFolder` would return just 
+    the folder containing the packages rather than the full path, making it a relative path.
 
     Where no name is specified after `[MyUCMDs]` the subfolder is named after the package.
 
@@ -804,7 +834,9 @@ The  flags in `options`:
 
 ## :fontawesome-solid-code: Load packages
 
-    no←{noBetas} LoadPackages (identifiers targetSpace)
+```
+no←{noBetas} LoadPackages (identifiers targetSpace)
+```
 
 Where
 
@@ -838,7 +870,9 @@ If the target space already exists but is not an ordinary namespace, Tatin signa
 
 ## :fontawesome-solid-code: Ping
 
-    flag←Ping source
+```
+flag←Ping source
+```
 
 Where `source` is
 
@@ -858,14 +892,16 @@ Where `source` is
 
 ## :fontawesome-solid-code: Publish package
 
-    {fn}←{deps} PublishPackage (source registry)
+```
+{fn}←{deps} PublishPackage (source registry)
+```
 
 Where
 
----------|------------|-----------------------------------------
-deps     | parm space | optional: argument for `BuildPackage`
-source   | string     | folder from which to create the package
-registry | string     | registry to which to publish the package
+-----------------|------------|-----------------------------------------
+dependencyFolder | parm space | optional: argument for `PackIfFolder` 
+source           | string     | folder from which to create the package
+registry         | string     | registry to which to publish the package
 
 Tatin
 
@@ -892,7 +928,9 @@ zfn  | zip file name: empty if `source` is a ZIP file, otherwise name of the ZIP
 
 ## :fontawesome-solid-code: Reinstall dependencies
 
-    {refs}←{parms} ReInstallDependencies deps folder [reg]
+```
+{refs}←{parms} ReInstallDependencies deps folder [reg]
+```
 
 Where
 
@@ -920,9 +958,9 @@ Optional argument `parms` can specify three flags.
 All default to 0,
 
 --------|---------------------------------
-noBetas | Ignore beta versions
+noBetas| Ignore beta versions
 update  | Update to a later version if available
-dry     | Report what the function would do but don’t do it
+dry   | Report what the function would do but don’t do it
 
 ??? detail "Registry scans"
 
@@ -935,7 +973,9 @@ dry     | Report what the function would do but don’t do it
 
 ## :fontawesome-solid-code: Read package config file
 
-    cfg←ReadPackageConfigFile path
+```
+cfg←ReadPackageConfigFile path
+```
 
 Where `path` is a path to a package Tatin returns its config file as a parameter namespace.
 
@@ -956,7 +996,7 @@ io                : 1
 license           : MIT
 lx                :
 maintainer        : kai@aplteam.com
-minimumAplVersion : 18.0
+minimumAplVersion : 18.2
 ml                : 1
 name              : APLTreeUtils2
 os_lin            : 1
@@ -973,13 +1013,15 @@ version           : 1.4.0+78
 
 ## :fontawesome-solid-code: Uninstall packages
 
-    (list emsg)←UnInstallPackage (packageID folder)
+```
+(list emsg)←UnInstallPackage (packageID folder)
+```
 
 Where
 
 ---|---|---
 packageID | string | a [full package ID](glossary.md) or an alias
-folder    | string | <p>either</p><ul markdown><li>path to a package folder with a Tatin dependency file<br>`apl-dependencies.txt`</li><li markdown>`'[MyUCMDs]'` (case-insensitive)</li></ul>
+folder    | string | <p>either</p><ul markdown><li>path to a package folder with a Tatin dependency file<br>`apl-dependencies.txt`</li><li markdown>`[MyUCMDs]` (case-insensitive)</li></ul>
 
 Tatin attempts to un-install the package `packageID`
 and any of its dependencies
@@ -988,25 +1030,13 @@ and returns:
 
 -----|-----------------|--------------------------------
 list | strings | Fully qualified names of all removed packages. (Might include aliases.)
-emsg | string  | Error message, ideally empty.
-
-<!-- `[MyUCMDS]` would translate into `MyUCMDs/packages/`. -->
+msg  | string  | Error message, ideally empty.
 
 !!! detail "If the package was installed with an alias then `packageID` must be its alias."
 
-If `packageID` matches more than one package, Tatin signals an error
+If `packageID` matches more than one package, Tatin signals an error.
 
-If `packageID` is empty, Tatin attempts to clean up: remove any packages that are neither principal packages nor required by other packages
-
-<!--
-FIXME relates only to user command?
-`folder` may be a subfolder of an open Cider project. Tatin works out the correct one; if there are multiple Cider projects open the user is questioned.
- -->
-
-<!--
-FIXME Move to user-commands.md
-If a package was installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well is the package actually removed.
- -->
+If `packageID` is empty, Tatin attempts to clean up: remove any packages that are neither principal packages nor required by other packages.
 
 <!--
 FIXME If this relates only to package dependencies why confirm
@@ -1022,14 +1052,15 @@ To keep things simple Tatin performs the following steps:
 
 !!! danger "Deleting parent folders"
 
-    Removing the folders hosting the packages might fail for all sorts of reasons,
+    Removing the folders hosting the packages might fail for all sorts of reasons Tatin has no control over,
     even after successfully removing the package and any dependencies
     from both the dependency file and the build list.
-    <!-- FIXME Seems a bit vague. Must keep zombie folders indefinitely? -->
 
 ## :fontawesome-solid-code: Version
 
-    r←Version
+```
+r←Version
+```
 
 Returns as strings Tatin’s name, version and date.
 
@@ -1039,4 +1070,5 @@ Returns as strings Tatin’s name, version and date.
 │Tatin│0.112.1+1942│2024-08-16│
 └─────┴────────────┴──────────┘
 ```
+
 

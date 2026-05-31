@@ -67,7 +67,7 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
         -   `'+0.0.1'` bumps the patch number
         -   `'+0.1.0'` bumps the minor number and resets the patch number
         -   `'+1.0.0'` bumps the major number and resets both the patch number and the minor number
-    -   An empty character vector
+    -   An empty string
     -   A string that replaces `version` in the package config file
 
     See [Glossary](glossary.md) for details.
@@ -103,7 +103,7 @@ Change this with optional left argument `flags`: the sum of the following. (Defa
 Clears the cache and returns a two-element vector:
 
 1. Is either 0 (for success) or 1 (for failure)
-2. Is either an empty vector of a simple text vector, possible with injected LFs (`⎕UCS 10`).
+2. Is either an empty vector of a simple string, possible with injected LFs (`⎕UCS 10`).
 
 If `url` is
 
@@ -216,9 +216,7 @@ version
 parms←CreateCopyRegistryParms y
 ```
 
-Where `y` is either an empty vector or a parameter space.
-
-Returns a parameter space for [`CopyRegistry`](#copy-registry).
+Where `y` is either an empty vector or a parameter space, returns a parameter space for [`CopyRegistry`](#copy-registry).
 
 
 ## :fontawesome-solid-code: Create ReInstall parms
@@ -299,7 +297,7 @@ verbose | flag | optional: whether to include more detail in the result; default
 depth | integer | optional: limit on recursive search
 
 then Tatin recursively scans the registry for the packages in `pkgList` and returns
-a fully qualified list of all matches as a vector of text strings.
+a fully qualified list of all matches as a vector of strings.
 
 <!-- FIXME Get this to work, then include an example -->
 

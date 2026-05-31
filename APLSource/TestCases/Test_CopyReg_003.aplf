@@ -1,4 +1,4 @@
- r←Test_CopyReg_003(stopFlag batchFlag);⎕TRAP;parms;msg;rc;list;expected;tempDir;buff;filename;list2;list3
+ r←Test_CopyReg_003(stopFlag batchFlag);⎕TRAP;parms;msg;rc;list;expected;tempDir;buff;filename;list2;list3;list4
 ⍝ Exercise the "list=" option with all valid flavours
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -15,13 +15,13 @@
  parms.dependencies←0
  list←##.Client.CopyRegistry parms
  expected←'example-Boo-1.0.0' 'example-versions-2.0.0'
- →T.GoToTidyUp expected≢,list
+ →T.GoToTidyUp expected≢list[;1]
 
  parms.latest←0
  #.TEMP.MyPkgs←'aplteam-sevenzip'
  list2←##.Client.CopyRegistry parms
  expected←'aplteam-SevenZip-3.0.0' 'aplteam-SevenZip-3.0.1' 'aplteam-SevenZip-4.0.4'
- →T.GoToTidyUp expected≢,list2
+ →T.GoToTidyUp expected≢list2[;1]
 
  tempDir←F.GetTempSubDir⊃⎕SI
  buff←'aplteam-APLTreeUtils' 'example-versions'
@@ -31,6 +31,11 @@
  parms.latest←1
  list3←##.Client.CopyRegistry parms
  →T.GoToTidyUp 2≠≢list3
+
+ parms.list←'aplteam-MarkAPL-9'
+ parms.latest←0
+ list4←##.Client.CopyRegistry parms
+ →T.GoToTidyUp 0=≢list4
 
  r←T._OK
 

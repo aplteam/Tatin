@@ -110,7 +110,7 @@ Plodder
 
 registry alias
 : A short name you can use locally as an alternative to its URL.
-<!-- FIXME Can I also use as an alternative to a path? -->
+**_ FIXME Can I also use as an alternative to a path? _**
 
 : Tatin is installed with `tatin` and `tatin-test` as aliases for the Principal Registry and the Test Server.
 
@@ -141,4 +141,5 @@ version
     -   patch marks a change in implementation
 
     (See examples of **full package ID**.)
+
 

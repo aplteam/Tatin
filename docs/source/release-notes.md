@@ -20,9 +20,9 @@ For a complete list of fixes, added features, etc. see
 
 ---
 
-## Version 0.123.0 from 2026-05-24
+## Version 0.124.0 from 2026-06-01
 
-* No action required but notice that the help has been changed completely.
+* The result of the function `Client.CopyRegistry`: it's now always a two-column matrix.
 
 ## Version 0.123.0 from 2025-12-07
 
@@ -442,6 +442,7 @@ No breaking changes, no user actions required.
 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

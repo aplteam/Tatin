@@ -1,4 +1,4 @@
- r←parms(fns FetchPackagesForCopyRegistry)pkgs;pkg;i;res;data;zipFilename;qdmx;path;path2;doesExist;msg;rc
+ r←parms FetchPackagesForCopyRegistry pkgs;pkg;i;res;data;zipFilename;qdmx;path;path2;doesExist;msg;rc
 ⍝ Takes a list of complete package IDs ("pkgs", typically created by calling `FetchPkgListForCopyRegistry`) and
 ⍝ and a parameter space "parms" (typically created by calling `CreateCopyRegistryParms` and then amended)
 ⍝ and uses this to fetch all the packages one by one from the source Registry
@@ -8,27 +8,29 @@
      path←F.EnforceSlash(F.AddTrailingSep parms.path),pkg
      :If 0=doesExist←F.IsDir path
      :OrIf parms.force
-         fns'Fetching ',pkg,' (',((⍕i),' of ',⍕≢pkgs),')...'
          :If doesExist
+         :AndIf ~parms.dry
              (rc msg)←F.RmDirByForce path
              :If 0≠rc
                  r[i;2]←⊂'ERROR: could not delete already existing folder; RC=',⍕rc
-                 fns'  Fetching ',pkg,' failed due to an error:',(≢'ERROR: ')↓2⊃r[i;]
                  :Continue
              :EndIf
          :EndIf
          :Trap 0
-             zipFilename←F.EnforceSlash GetPackageViaHTTP parms.url,pkg
-             path2←path,'/data'
-             'Create!'F.CheckPath path
-             zipFilename ZipArchive.UnzipTo path2
-             path ⎕NMOVE path2,'/apl-package.json'
-             :If ⎕NEXISTS path2,'/apl-dependencies.txt'
-                 path ⎕NMOVE path2,'/apl-dependencies.txt'
+             :If parms.dry
+                 r[i;2]←⊂'Would fetch but dry'
+             :Else
+                 zipFilename←F.EnforceSlash GetPackageViaHTTP parms.url,pkg
+                 path2←path,'/data'
+                 'Create!'F.CheckPath path
+                 zipFilename ZipArchive.UnzipTo path2
+                 path ⎕NMOVE path2,'/apl-package.json'
+                 :If ⎕NEXISTS path2,'/apl-dependencies.txt'
+                     path ⎕NMOVE path2,'/apl-dependencies.txt'
+                 :EndIf
+                 (path,'/',pkg,'.zip')⎕NMOVE zipFilename
+                 r[i;2]←⊂'Fetched'
              :EndIf
-             (path,'/',pkg,'.zip')⎕NMOVE zipFilename
-             r[i;2]←⊂'Fetched'
-             fns'  Success!'
          :Else
              qdmx←⎕DMX
              :If 90=qdmx.EN
@@ -43,11 +45,9 @@
                  :EndIf
              :EndIf
              r[i;2]←⊂'ERROR: Fetching ',pkg,' failed due to an error:',(≢'ERROR: ')↓2⊃r[i;]
-             fns'  Fetching ',pkg,' failed due to an error:',(≢'ERROR: ')↓2⊃r[i;]
          :EndTrap
      :Else
-         r[i;2]←⊂'Not fetching ',pkg,', already in Registry'
-         fns'Not fetching ',pkg,', already in Registry'
+         r[i;2]←⊂'Not fetched, already in Registry'
      :EndIf
  :EndFor
 ⍝Done

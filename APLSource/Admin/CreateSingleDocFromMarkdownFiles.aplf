@@ -1,0 +1,42 @@
+ filename←{parms}CreateSingleDocFromMarkdownFiles path;F;A;p;list;parms2;filename_;md;html
+⍝ Collects all markdown files in path/ and compiles them into a single HTML document.
+⍝ This can be useful for proof-readinging.
+⍝ Note that sub folders in path\ are scanned as well.
+⍝ If no ⍺ is specified a temp filename is created.
+⍝ You may create a namespace and populate it with 0 to all of:
+⍝  * `recurse` (defaults to 1)
+⍝  * `filename (defaults to a temp filename)
+⍝  * `extension` (defaults to ".md")
+⍝ Returns either the name of the HTML file created of an empty vector in case no Markdown files were found
+ F←##.FilesAndDirs ⋄ A←##.APLTreeUtils2 ⋄ F.APLTreeUtils2←A
+ '⍵ must point to a directory'Assert F.IsDir path
+ parms←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'parms'
+ p←⎕NS parms
+ :If 0=p.⎕NC'filename'
+     filename←'html'F.GetTempFilename2''
+ :EndIf
+ :If 0=p.⎕NC'recurse'
+     p.recurse←1
+ :EndIf
+ :If 0=p.⎕NC'extension'
+     p.extension←'md'
+ :EndIf
+ parms2←⎕NS''
+ parms2.recurse←p.recurse
+ list←parms F.ListFiles2 path,'/*',p.extension
+ :If 0<≢list
+     html←'<!DOCTYPE html' '<html>' '<head>' '<style>'
+     html,←'@media print {' '@page {' 'size: A4;' 'margin: 2cm;' '}' 'h2 {' 'break-before: page;' '}' 'h2:first-of-type {' 'break-before: auto;' '}' '}'
+     html,←'</style>' '</head>' '<body>'('<h1>All markdown files in ',path,'</h1>')
+     :For filename_ :In list
+         html,←⊂'<h2>Filename: ',filename_,'</h2>'
+         :If 0<≢md←⊃⎕NGET filename_ 1
+             html,←(⊂'<pre><code>'),md,⊂'</code></pre>'
+         :EndIf
+     :EndFor
+     html,←'</body>' '</html>'
+     (⊂html)⎕NPUT filename 1
+ :Else
+     filename←''
+ :EndIf
+⍝Done⍝

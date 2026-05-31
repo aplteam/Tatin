@@ -36,13 +36,13 @@ The downloaded server includes some examples.
     1.  renames the file from `*.aplf` to `*.crashed` to stop it being run again
 
 If the server finds APLFs in the Maintenance Folder during housekeeping, it loads and executes them.
-<!-- FIXME Is this ‘batch’ arrangement replaced by the user command? -->
+**_ FIXME Is this ‘batch’ arrangement replaced by the user command? __*
 
 Once executed, a file is renamed by adding an extension `.executed`,
 so it is not run again.
 That also documents what jobs were executed, and when.
 
-For example, a file `RemoveDyalogFromTags.aplf` gets loaded into an unnamed namespace and called with a right argument `G` (for _globals_). <!-- FIXME not the config param space? -->
+For example, a file `RemoveDyalogFromTags.aplf` gets loaded into an unnamed namespace and called with a right argument `G` (for _globals_). **_ FIXME not the config param space? _**
 Once executed, the file is renamed to `RemoveDyalogFromTags.aplf.executed`.
 
 :fontawesome-solid-terminal:

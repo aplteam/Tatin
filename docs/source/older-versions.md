@@ -92,7 +92,7 @@ on other platforms, create it yourself.
 
 !!! detail "Setup scripts"
 
-    At launch, Dyalog looks <!-- FIXME where? --> for a monadic `Setup` function in a `setup.dyalog` script.
+    At launch, Dyalog looks **_ FIXME where? __** for a monadic `Setup` function in a `setup.dyalog` script.
 
     In version 19.0 the `Run.aplf` function offers a better way to achieve that: `setup.dyalog` superfluous.
 

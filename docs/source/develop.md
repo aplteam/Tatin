@@ -69,10 +69,9 @@ If the flag is not set Cider <!-- won’t ask the question, and  --> will execut
 
 If the flag is already set to zero, Cider will not ask if you want to change it.
 
-<!-- 
-FIXME
+**_ FIXME
 Can this be right? Cider will ask if you want the flag set, but only if the flag is already set?
- -->
+ _**
 
 
 ## :fontawesome-solid-server: Developing with a running server

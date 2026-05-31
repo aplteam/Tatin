@@ -103,26 +103,29 @@ Change this with optional left argument `flags`: the sum of the following. (Defa
 Clears the cache and returns a two-element vector:
 
 1. Is either 0 (for success) or 1 (for failure)
-2. Is either an empty vector of a simple text vectors, possible with injected LFs (`⎕UCS 10`).
+2. Is either an empty vector of a simple text vector, possible with injected LFs (`⎕UCS 10`).
 
 If `url` is
 
 -   empty all subdirectories but `temp\` are removed
 -   not empty, only the given domain is removed from the cache
 
-The cache is the folder [`GetPathToPackageCache`](#get-path-to-package-cache) points to.
+The cache is the folder where [`GetPathToPackageCache`](#get-path-to-package-cache) points to.
 
 
 ## :fontawesome-solid-code: Copy registry
 
 ```
-list←CopyRegistry parms
+mat←CopyRegistry parms
 ```
 
 Copies packages from a managed Tatin registry to a local folder and returns
-==as a list of strings the packages copied==
+a two-column matrix with package names in the first column and corresponding messages in the second column.
 
-!!! warning "Pause or stop any running local server while `CopyRegistry` is running."
+!!! warning "`CopyRegistry` was introduced with version 0.110.0"
+
+    Tatin registries running on earlier versions will not respond to it.
+
 
 Argument `parms` is typically created with [CreateCopyRegistryParms](#create-copyregistry-parms), and then amended.
 Required parameters are marked; others are optional.
@@ -130,7 +133,7 @@ Required parameters are marked; others are optional.
 `dry`
 : List all packages the user command would copy without actually doing it.
 
-    If set you may omit both URL (defaults to `[tatin]`) and `path`.
+    If set you may omit `path`.
 
 `force`
 : Copy already available packages again.
@@ -139,10 +142,10 @@ Required parameters are marked; others are optional.
 `group=`
 : Restrict the packages to be copied to a particular group.
 
-    Dependencies will be copied as well, no matter which group they belong to.
+    Dependencies will always be copied, no matter which group they belong to.
 
 `latest`
-: Copy only the latest version of each major version of each non-deprecated package.
+: Copy only the latest of each major version of each non-deprecated package.
 
     By default all packages are copied, even deprecated ones.
 
@@ -157,26 +160,14 @@ Required parameters are marked; others are optional.
 
     Specify packages consistently: either `<group>-<pkgName>` or `<group>-<pkgName>-<major>`
 
-`noDeps`
-: Flag. If set, ignore dependencies. (Useful only for test cases.)
+`dependencies`
+: Flag. Default is 1. If 0, ignore dependencies. (Useful only for test cases.)
 
 `path`
-: A local folder in which to write the packages. Required unless `dry` set.
+: A local folder in which to write the packages. Required unless `dry` is set.
 
 `url`
-: URL of the Tatin registry from which to copy. Required unless `dry` set.
-
-`verbose=`
-: By default, the names of all packages that got copied are printged to `⎕SE`.
-
-    1 – print a detailed report for all packages (`Fetched` indicates success)
-
-    2 – print a message for every package as the list is processed
-
-!!! warning "`CopyRegistry` was introduced with version 0.110.0"
-
-    Tatin registries running on earlier versions will not respond to it.
-
+: URL of the Tatin registry from which to copy. Required unless `dry` is set.
 
 ## :fontawesome-solid-code: Create API from CFG
 
@@ -193,10 +184,7 @@ names  | _strings_   | (optional) names of objects in the namespace to be expose
 
 then Tatin creates an API space as a child of `source` (with cover functions for the package’s public interface) and returns as a shy result the number of objects exposed.
 
-Note that `cfg` can be...
-
-* a namespace brought into the WS by `GetPackageConfigFileAsNS` which needs to path to a package config file
-* the result of a call to 
+Note that `cfg` must be a namespace with appropriate variables. Typically this established in the WS by `GetPackageConfigFileAsNS` which needs a path to a package config file.
 
 If `names` is absent, the function looks for a constant `source.Public`.
 
@@ -228,8 +216,9 @@ version
 parms←CreateCopyRegistryParms y
 ```
 
-Where `y` is either an empty vector or a parameter space,
-returns a parameter space for [`CopyRegistry`](#copy-registry).
+Where `y` is either an empty vector or a parameter space.
+
+Returns a parameter space for [`CopyRegistry`](#copy-registry).
 
 
 ## :fontawesome-solid-code: Create ReInstall parms
@@ -1070,5 +1059,6 @@ Returns as strings Tatin’s name, version and date.
 │Tatin│0.112.1+1942│2024-08-16│
 └─────┴────────────┴──────────┘
 ```
+
 
 

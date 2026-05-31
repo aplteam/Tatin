@@ -117,7 +117,7 @@ To publish on the Principal Registry at [tatin.dev](https://tatin.dev)
 first request an API key.
 
 When you receive it, create a home page for your group at the registry.
-<!-- FIXME How? -->
+**_ FIXME How? _**
 
 
 ### Tatin Test Server

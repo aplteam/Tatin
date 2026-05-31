@@ -98,13 +98,13 @@ APLF files for functions that modify Tatin packages.
 The command asks you to pick jobs to run from the Maintenance Folder,
 then searches recursively in the file path for package config files.
 When it finds one, it applies the maintenance functions sequentially,
-with the package config data as argument, <!-- FIXME Not 'G'? -->
+with the package config data as argument, **_ FIXME Not 'G'? _**
 receiving the same as result, possibly modified,
 which it writes back to the package, and also to the ZIP file.
 
 
 The name of a maintenance function follows a pattern:
-==the date it was introduced==, and <!-- FIXME No longer true? -->
+==the date it was introduced==, and **_ FIXME No longer true? _**
 a short description of what it does.
 Tatin records the run and prevents repetition,
 by appending the extension `.executed` to the APLF file’s name.

@@ -1,0 +1,19 @@
+ r←Test_CopyReg_006(stopFlag batchFlag);⎕TRAP;parms;rc;list
+⍝ Exercise the "list=" option with latest ←→ 1
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ →0 ⋄ r←T._Inactive  ⍝ See issue #271  ⍝TODO⍝
+
+ parms←##.Client.CreateCopyRegistryParms ⍬
+ parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
+ parms.dry←1
+ parms.list←'aplteam-MarkAPL-9'
+ parms.latest←1
+ list←##.Client.CopyRegistry parms
+ →T.PassesIf 1=≢≢list
+ →T.PassesIf'aplteam-MarkAPL-9.1.13'≡⊃list
+
+ r←T._OK
+
+⍝Done

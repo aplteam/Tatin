@@ -69,4 +69,4 @@ The ZIPs:
     Tatin-Client-{major}.{minor}.{patch}.zip
     Tatin-Server-{major}.{minor}.{patch}.zip
 
-<!-- FIXME What to do with the ZIPs? -->
+**_ FIXME What to do with the ZIPs? _**

@@ -1,11 +1,10 @@
- list←CopyRegistry p;buff;filename;print
+ mat←CopyRegistry p;buff;filename;list2
 ⍝ Copies from a Registry and saves data in a given path.\\
 ⍝ `p` must be a namespace with the required parameters, possibly created by calling `CreateCopyRegistryParms`.\\
-⍝ Returns a list with the names of all packages that were copied.
-⍝ In case `p.verbose` is 1 a matrix is returned rather then a list, with messages in the second columnd.
-⍝ "Fetched" indicates success.
+⍝ Returns a two-column matrix with...
+⍝  [;1] = the names of all copied
+⍝  [;2] = messages
  p←CreateCopyRegistryParms p
- print←p.verbose∘{⍺≠2: ⋄ ⍞←⍪⊆⍵ ⋄ ⍞←⎕UCS 10 ⋄ 1:shy←0}
  :If '#.'≡2↑p.list
  :OrIf '⎕se.'≡⎕C 4↑p.list
      :If 0<≢buff←⍎p.list
@@ -17,21 +16,28 @@
          :EndIf
      :EndIf
  :EndIf
+ :If 0=≢p.url
+     p.url←'[tatin]'
+ :EndIf
  :If 'file://'{⍺≡(≢⍺)↑⍵}p.list
      filename←'file://'{(≢⍺)↓⍵}p.list
      ('File not found: ',filename)Assert F.IsFile filename
      p.list←⊃⎕NGET filename 1
  :EndIf
- p.list←p.list~¨' '
  :If 0<≢p.list
-     :If Reg.IsValidPackageID_WithoutVersionNo 1⊃p.list
+     :If ','∊p.list
+         p.list←{⍵⊆⍨','≠⍵}p.list
+     :EndIf
+     p.list←(⊆p.list)~¨' '
+     :If Reg.IsValidPackageID_WithoutVersionNo⊃p.list
          '"list" must specify just group and package name but no version number'Assert∧/Reg.IsValidPackageID_WithoutVersionNo¨p.list
-     :ElseIf Reg.IsValidPackageID_WithMajorNo 1⊃p.list
+     :ElseIf Reg.IsValidPackageID_WithMajorNo⊃p.list
          '"list" must specify just group and package name but no version number'Assert∧/Reg.IsValidPackageID_WithMajorNo¨p.list
      :Else
          '"list" is not consistanty/correctly defined'Assert 0
      :EndIf
  :EndIf
+ p.url←ReplaceRegistryAlias p.url
  :If ~p.dry
      'Missing: "url"'Assert 0<≢p.url
      '"url" does not use the HTTP protocol'Assert IsHTTP p.url
@@ -39,17 +45,20 @@
  :EndIf
  EstablishEmptyPermanentConnections 1
  {}Connect2Client p.url
- print'Fetch list of packages...'
- list←FetchPkgListForCopyRegistry p
- list←(~('/'∊¨list))/list   ⍝ In case there are dependencies stemming from a different Registry we ignore them
- :If 0<≢list
- :AndIf ~p.dry
-     list←p(print FetchPackagesForCopyRegistry)list
+ list2←FetchPkgListForCopyRegistry p
+ list2←(~('/'∊¨list2))/list2   ⍝ In case there are dependencies stemming from a different Registry we ignore them
+ :If ~p.dependencies
+ :AndIf ~0=≢p.list
+     :If 0<≢{⍵↓⍨1++/2>+\⍵='-'}⊃p.list
+         list2/⍨←(⎕C Reg.RemoveMinorAndPatch¨list2)∊⎕C p.list
+     :Else
+         list2/⍨←(⎕C Reg.RemoveVersionNumber¨list2)∊⎕C p.list
+     :EndIf
+ :EndIf
+ :If 0<≢list2
+     mat←p FetchPackagesForCopyRegistry list2
+ :Else
+     mat←0 2⍴''
  :EndIf
  CloseConnections 1
- :If 0=p.verbose
- :AndIf 2=⍴⍴list
-     list←(list[;2]≡¨⊂'Fetched')/list[;1]
- :EndIf
- list←⍪⍣(⊃2≠⍴⍴list)⊢list
 ⍝Done

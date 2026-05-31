@@ -124,8 +124,7 @@ Semantic versioning came into being via this website:
 
 [https://semver.org/](https://semver.org/)
 
-<!-- 
-FIXME: incorporate
+**_ FIXME: incorporate
 
     ??? detail "Version number is saved in the package configuration"
 
@@ -168,4 +167,4 @@ Such a rule has no impact on the build number:
 
 **--- End of change ---**
 
- -->
+__*

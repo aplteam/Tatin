@@ -129,8 +129,7 @@ To run only the batch tests:
 
 <!-- FIXME What – what, no preparation? -->
 
-The 1 required as right argument is a protection against accidental calls.
-<!-- FIXME Eh? -->
+You must pass a 1 as right argument in order to run the function.
 
 
 ## :fontawesome-solid-eject: Abort a test run
@@ -240,9 +239,8 @@ To start and run a local Tatin test server yourself, in a new Dyalog instance
 
     ]CIDER.OpenProject /path/to/Tatin
     #.Tatin.TestCasesServer.RunTests
+    ]CIDER.CloseProject
 
-!!! danger "Any code changes you make will be written back to disk."
-<!-- FIXME Avoid danger with ]CIDER.CloseProject ? -->
 
 ### Stress testing
 

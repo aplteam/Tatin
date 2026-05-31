@@ -18,7 +18,7 @@ Tatin consists of three modules:
 
 Tatin clients and servers may run under Windows, Linux and Mac-OS.
 
-Tatin requires a Unicode version of Dyalog and at least version 18.2; the Classic version is not supported.
+Tatin requires a Unicode edition of Dyalog and at least version 18.2; the Classic version is not supported.
 
 ## Installing and updating the Tatin Client
 
@@ -26,9 +26,9 @@ Tatin requires a Unicode version of Dyalog and at least version 18.2; the Classi
 
 The document [Installing And Updating The Tatin Client](https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html "Link to InstallingAndUpdatingTheTatinClient.html on the Tatin server") discusses how to install the Tatin client.
 
-### 19.0
+### 19.0 & 20.0
 
-This version comes with Tatin. Because it is experimental, it needs to be activated:
+These version come with Tatin. Because it is experimental, it needs to be activated:
 
 ```
 ]activate tatin

@@ -689,7 +689,7 @@ Result `registries` has columns:
      7 – Proxy
     [8 – API key]
 
-If `type` is set the result has an eighth column containing the API key.
+If `type` is 1 the result has an eighth column containing the API key.
 
 ```apl
       ⎕SE.Tatin.ListRegistries ⍬
@@ -697,8 +697,6 @@ If `type` is set the result has an eighth column containing the API key.
  tatin-test  https://test.tatin.dev/  2a282315-bfd6-4b15-8fe7-8c ...
 ```
 
-
-!!! warning "The result of the API function and the user command differ."
 
 If the registry does not respond, Tatin signals an error.
 
@@ -786,7 +784,7 @@ with beta versions) then the publishing date is taken into account.
 {refs}←{options} LoadDependencies folder [target]
 ```
 
-Where
+The right argument must be a vector of length one to three where
 
 --------|-----------|-----------------------------
 options | 2 flags   | optional: default 0
@@ -811,13 +809,7 @@ The  flags in `options`:
     In that case the paths must be relative to `MyUCMDs/`.
     This is what the second `options` flag is for.
 
-    The flag affects the result of `HOME` and `GetFullPath2AssetsFolder`: `HOME` would be empty, and `GetFullPath2AssetsFolder` would return just 
-    the folder containing the packages rather than the full path, making it a relative path.
-
-    Where no name is specified after `[MyUCMDs]` the subfolder is named after the package.
-
-    To install multiple user-command packages, specify no name after `[MyUCMDs]` – otherwise Tatin signals an error.
-
+    The flag affects the result of `HOME` and `GetFullPath2AssetsFolder`: `HOME` would be empty, and `GetFullPath2AssetsFolder` would return the assets folder in the folder containing the given package rather than the full path, making it a relative path.
 
 ## :fontawesome-solid-code: Load packages
 

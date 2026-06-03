@@ -76,9 +76,8 @@ To modify the source code:
 
 1.  On GitHub, synch your fork with the source repo.
     On your local machine, pull the `main` branch from your GitHub fork; then merge `main` into `123-fix-foo-bar`. 
-    Confirm  your branch `123-fix-foo-bar` passes the Tatin tests.
 
-If your changes pass the tests, push `123-fix-foo-bar` to your fork, and submit a pull request.
+1. Push `123-fix-foo-bar` to your fork, and submit a pull request.
 
 
 ## :fontawesome-solid-book-open: Documentation
@@ -110,3 +109,4 @@ The output appears under `docs/site/` (gitignored). For live-reload while editin
 
 When you have improved the documentation, fixed a bug, or added a feature, create a pull request (PR).
 The project team will check your contribution.
+

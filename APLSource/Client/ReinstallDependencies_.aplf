@@ -11,13 +11,13 @@
 ⍝ number. This can be changed by setting `major←1`.\\
  dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
  'You must specify at least 5 parameters'Assert 5≤≢y
- (deps installFolder registry noBetas update quiet major)←y,(≢y)↓⍬ ⍬ ⍬ ⍬ ⍬ 0 0
+ (installFolder registry deps noBetas update quiet major)←y,(≢y)↓⍬ ⍬ ⍬ ⍬ ⍬ 0 0
  r←⍬
  tempDir←F.GetTempSubDir''
  tempDir ⎕NCOPY installFolder,'/',Reg.DependenciesFilename                  ⍝ Copy the dependency file
  :If major
  :AndIf RemoveAllVersionNumbersIn tempDir,'/',Reg.DependenciesFilename
-     deps←⊃⎕NGET(tempDir,'/',Reg.DependenciesFilename)1                   ⍝ Read again because we have change the file
+     deps←⊃⎕NGET(tempDir,'/',Reg.DependenciesFilename)1                   ⍝ Read again because we have changed the file
  :EndIf
  tempDir{0=≢⍵:shy←⍬ ⋄ ⍺∘{⍺ ⎕NCOPY ⍵}¨⍵}F.ListFiles installFolder,'/*.zip'   ⍝ Copy any ZIP files (packages): they take precedence
  forceClose←1 EstablishRumbaClients ⍬

@@ -475,6 +475,8 @@ The `source` parameter in the result is set by (in order of precedence)
 1.  `parms.source`
 1.  global default in `MyUserSettings`
 
+<!-- FIXME what is showParms? (is used several times) -->
+
 ```apl
       showParms ⎕SE.Tatin.InitPackageConfig ⍬
 api               :
@@ -676,7 +678,7 @@ package ID | aggregate | column 1 | column 2
 registries←ListRegistries type
 ```
 
-Where `type` is a flag or `⍬`, returns as a matrix all registries specified in your config file.
+Where `type` is a flag or `⍬`, returns all registries specified in your config file as a matrix.
 
 Result `registries` has columns:
 
@@ -689,7 +691,7 @@ Result `registries` has columns:
      7 – Proxy
     [8 – API key]
 
-If `type` is 1 the result has an eighth column containing the API key.
+Only if `type` is 1 has the result an eighth column containing the API key.
 
 ```apl
       ⎕SE.Tatin.ListRegistries ⍬
@@ -872,15 +874,23 @@ Where `source` is
 ## :fontawesome-solid-code: Publish package
 
 ```
-{fn}←{deps} PublishPackage (source registry)
+{fn}←{dependencyFolder} PublishPackage (source registry)
 ```
 
 Where
 
 -----------------|------------|-----------------------------------------
-dependencyFolder | parm space | optional: argument for `PackIfFolder` 
+dependencyFolder | parm space | optional: argument for `PackIfFolder` and eventually `BuildPackage`
 source           | string     | folder from which to create the package
 registry         | string     | registry to which to publish the package
+
+The registry can be specified as a URL starting with https:// or an `[alias]`. An alias might point to a Tatin Registry...
+
+* on the web (like https://tatin.dev) 
+* running locally (starting with something like https://localhost...)
+* that is a local folder (without a running Tatin server, meaning un-managed)
+
+  Note that you *cannot* pass a path as argument to `PublishPackage` directly.
 
 Tatin
 
@@ -889,14 +899,23 @@ Tatin
 1. Moves the ZIP into the registry
 1. If the registry is local, updates its index
 
-<!-- FIXME `deps` was described here as a left argument to `BuildPackage`; the function is monadic, so I have presumed it is the *right* argument. -->
-
 and returns
 
 -----|---------------------------------------------------------
 rc   | HTTP return code (whether the registry is remote or not)
-emsg | error message: empty if `rc` is 200
+msg  | error message: empty if `rc` is 200
 zfn  | zip file name: empty if `source` is a ZIP file, otherwise name of the ZIP file created
+
+??? detail "The left argument `dependencyFolder`"
+
+    If you use Tatin in connection with Cider, you might have trouble to understand why there is an optional left argument `dependencyFolder`. The reason is that Cider *knows* about the depedencies, so it can fill Tatin in on this.
+
+    If you don't use Cider, well, how should `PublishPackage` know what dependencies the package in question relies on?!
+
+    But even without Cider it might work, if only because there is a convention: when there is a sub-folder `packages` in the root of a folder that hosts a package then Tatin (and therefore `PublishPackages`) presumes that this sub-folder contains the dependency definition (a file `apl-dependencies.txt`).
+
+    Only if you do not use Cider and for some reason keep the dependencies in a folder with a different name is there a need to tell `PublishPackage` about this other folder, because there is no other way for it to know.
+
 
 !!! detail "Delete policy"
 
@@ -908,38 +927,36 @@ zfn  | zip file name: empty if `source` is a ZIP file, otherwise name of the ZIP
 ## :fontawesome-solid-code: Reinstall dependencies
 
 ```
-{refs}←{parms} ReInstallDependencies deps folder [reg]
+{refs}←{parms} ReInstallDependencies folder [reg]
 ```
 
 Where
 
--------|------------|--------------
-parms  | parm space | optional: typically created by calling [`CreateReInstallParms`](#CreateReInstallParms)
-deps   | ???        | ???
-folder | string     | target folder: contains `apl-dependencies.txt`
-reg    | string     | optional: registry alias or URL
+---------|------------|--------------
+parms    | parm space | optional: typically created by calling [`CreateReInstallParms`](#CreateReInstallParms)
+folder   | string     | folder that contains a file `apl-dependencies.txt`
+reg      | string     | optional: registry alias or URL
 
 Tatin, in the target folder,
 
 1.  deletes file `apl-buildlist.json` and all directories
 2.  re-installs all files listed in `apl-dependencies.txt` (ignoring lines that start with a lamp `⍝`)
 
-and returns
-a list of references to the principal packages installed.
-<!-- FIXME Confirm -->
+and returns a list of references to the principal packages installed.
 
 Packages originally installed from ZIP files are just re-installed from their ZIP files without further ado.
 
 If `reg` is omitted Tatin scans all known registries with a priority above `0`.
 (Packages with different major version numbers are considered as different packages.)
 
-Optional argument `parms` can specify three flags.
-All default to 0,
+Optional argument `parms` can specify three flags all of which default to 0.
 
---------|---------------------------------
-noBetas| Ignore beta versions
-update  | Update to a later version if available
-dry   | Report what the function would do but don’t do it
+|-------|-------------------------------------------------------------------|
+|noBetas|Ignore beta versions                                               |
+|update |Update to a later version if available                             |
+|dry    |Report what the function would do but don’t do it                  |
+|quiet  |Set this to 1 to suppress messages in the session                  |
+|major  |Packages with ≠ major version nos are considered different packages|
 
 ??? detail "Registry scans"
 
@@ -953,53 +970,59 @@ dry   | Report what the function would do but don’t do it
 ## :fontawesome-solid-code: Read package config file
 
 ```
-cfg←ReadPackageConfigFile path
+cfg←ReadPackageConfigFile <package-url>
 ```
 
-Where `path` is a path to a package Tatin returns its config file as a parameter namespace.
+Where
 
-The `path` argument may optionally include the config file name `apl-package.json`.
+|------------|--------|--------------|
+|package-url | string | `<remote-registry><package-ID>`|
+
+The function does not work on a path, the right argument must point to a managed Tatin registry, either with `https://` or with an `[alias]`. In that respect it differs from the user command `]PackageConfig`.
+
+`packageID` must come with a group and a package name and may come with a version number.
+
+  You may omit the patch number, or the patch and minor number, or the version number altogether, `ReadPackageConfigFile` will always return the best version for the given argument.
+
 
 ```apl
-      path←'path/to/packages/aplteam-APLTreeUtils2-1.4.0'
-      q←⎕SE.Tatin.ReadPackageConfigFile path
-      showParms q
-api               : APLTreeUtils2
-assets            :
-date              : 20240325.14
-description       : General utilities required by most members of the APLTree library
-documentation     :
-files             :
-group             : aplteam
-io                : 1
-license           : MIT
-lx                :
-maintainer        : kai@aplteam.com
-minimumAplVersion : 18.2
-ml                : 1
-name              : APLTreeUtils2
-os_lin            : 1
-os_mac            : 1
-os_win            : 1
-project_url       : https://github.com/aplteam/APLTreeUtils2
-source            : APLSource/APLTreeUtils2.aplc
-tags              : tools,utilities
-uri               : https://tatin.dev/
-userCommandScript :
-version           : 1.4.0+78
-
+      ReadPackageConfigFile'[tatin]\aplteam-WinRegSimple-3'
+{
+  api: "",
+  assets: "",
+  date: 20241201.063614,
+  description: "Limited set of tools for dealing with the Windows Registry",
+  documentation: "",
+  files: "",
+  group: "aplteam",
+  io: 1,
+  license: "MIT",
+  lx: "",
+  maintainer: "kai@aplteam.com",
+  minimumAplVersion: "18.0",
+  ml: 1,
+  name: "WinRegSimple",
+  os_lin: 1,
+  os_mac: 1,
+  os_win: 1,
+  project_url: "https://github.com/aplteam/WinRegSimple",
+  source: "APLSource/WinRegSimple",
+  tags: "windows-registry",
+  userCommandScript: "",
+  version: "3.1.0+21",
+}
 ```
 
 ## :fontawesome-solid-code: Uninstall packages
 
 ```
-(list emsg)←UnInstallPackage (packageID folder)
+(list msg)←UnInstallPackage (packageID folder)
 ```
 
 Where
 
 ---|---|---
-packageID | string | a [full package ID](glossary.md) or an alias
+packageID | string | a [full package ID](glossary.md) or a package alias
 folder    | string | <p>either</p><ul markdown><li>path to a package folder with a Tatin dependency file<br>`apl-dependencies.txt`</li><li markdown>`[MyUCMDs]` (case-insensitive)</li></ul>
 
 Tatin attempts to un-install the package `packageID`
@@ -1029,7 +1052,7 @@ To keep things simple Tatin performs the following steps:
 5. Removes all packages that are not mentioned in the build list anymore
  -->
 
-!!! danger "Deleting parent folders"
+!!! danger "Deleting package folders"
 
     Removing the folders hosting the packages might fail for all sorts of reasons Tatin has no control over,
     even after successfully removing the package and any dependencies
@@ -1049,6 +1072,7 @@ Returns as strings Tatin’s name, version and date.
 │Tatin│0.112.1+1942│2024-08-16│
 └─────┴────────────┴──────────┘
 ```
+
 
 
 

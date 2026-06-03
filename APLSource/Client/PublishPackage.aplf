@@ -1,4 +1,4 @@
- {(statusCode errMsg zipFilename)}←{dependencies}PublishPackage(source registry);uri;cfgFilename;cfg;packageID;name;group
+ {(statusCode errMsg zipFilename)}←{dependencyFolder}PublishPackage(source registry);uri;cfgFilename;cfg;packageID;name;group
 ⍝ Publishes a package.\\
 ⍝ 1. Checks for uniqueness of the given package/version combination.
 ⍝ 2. Creates a dependency file for the package if required
@@ -8,13 +8,13 @@
 ⍝ Note that if ⍵ points already to a ZIP file it is **moved** into the Registry.\\
 ⍝ `⍵` must be a two-item vector:
 ⍝ 1. `source` → folder to create package from
-⍝ 2. `registry` → registry to publish package to (alias or uri)
+⍝ 2. `registry` → registry to publish package to (alias or uri or a path to a local registry)
 ⍝ ## The explicit result
 ⍝ * `statusCode` is an HTTP no matter whether it is an HTTP call or not.
 ⍝ * `errMsg` is empty if `statusCode` is 200, otherwise it is additional informartion.
 ⍝ * `zipFilename` is empty in case `source` is a ZIP file, but the name of the ZIP file created along the way otherwise.
  statusCode←200 ⋄ errMsg←''
- dependencies←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'dependencies'
+ dependencyFolder←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'dependencyFolder'
  uri←F.EnforceSlash ReplaceRegistryAlias registry
  'No URI provided'Assert 0<≢uri
  'Not just a Registry'Assert uri≡RemovePackageID uri
@@ -23,7 +23,7 @@
  'Invalid package name: only ASCII characters and digits and _ are allowed'Assert PackageNameIsOkay name
  'Invalid group name: only ASCII characters and digits and _ are allowed'Assert PackageGroupNameIsOkay group
  source←RemoveFileProtocol source  ⍝ Precaution
- zipFilename←dependencies PackIfFolder source
+ zipFilename←dependencyFolder PackIfFolder source
  'Invalid URI specified: not a zip file'Assert'.zip'≡⎕C ¯4↑zipFilename
  :If Reg.IsHTTP uri
      PublishPackageToRemoteRegistry_ zipFilename registry

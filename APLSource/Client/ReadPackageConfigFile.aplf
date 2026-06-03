@@ -1,6 +1,10 @@
  list←ReadPackageConfigFile uri;host;packageID;request;res
 ⍝ Takes a package URL and returns a char vector representing the package's config file
+ uri←ReplaceRegistryAlias uri
  (host packageID)←Reg.SeparateUriAndPackageID uri
+ :If 0=≢host
+     host←ReplaceRegistryAlias'[tatin]'
+ :EndIf
  packageID←{0=≢⍵:'*' ⋄ ⍵}packageID
  request←R.NewRequest 0
  request.RequestTarget←Reg.VersionOf_REST,'/packages/details/',{⍵↓⍨'/'=1⍴⍵}packageID

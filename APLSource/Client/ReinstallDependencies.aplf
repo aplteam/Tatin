@@ -1,9 +1,9 @@
  {r}←{parms}ReInstallDependencies y;installFolder;registry;deps;msg
 ⍝ Re-installs all packages by honoring the file `apl-dependencies.txt`.
-⍝ The right argument must be one of:
+⍝ The right argument requires at least one and accepts up to two parameters:
 ⍝ * A folder that hosts a file `apl-dependencies.txt` (install folder)
-⍝ * Optionally a Registry, either as a path to a directory or as an alias
-⍝ The file `apl-buildlist.json` as well as all directories in that folder will be deleted.
+⍝ * A Registry, either as a path to a directory or as an alias (optional)
+⍝ The file `apl-buildlist.json` as well as all directories in the install folder will be deleted.
 ⍝ Then all packages listed in the file `apl-dependencies.txt` are re-installed from scratch.\\
 ⍝ Note that packages with different major version numbers are considered to be different packages
 ⍝ but check the parameter `major`.\\
@@ -27,9 +27,9 @@
  :If 0=⎕NC'parms'
      parms←CreateReInstallParms
  :EndIf
- (deps installFolder registry)←CheckReInstallDependencies y
+ (installFolder registry deps)←CheckReInstallDependencies y
  msg←'Re-installing packages in ',installFolder,((1+parms.noBetas)⊃' including' ' without'),' beta versions'
  (~parms.quiet)PrintToSession(⎕PW-1){⍺↑'--- ',⍵,' ',⍺⍴'-'}msg
  1 EstablishRumbaClients ⍬
- r←parms.dry ReInstallDependencies_ deps installFolder registry parms.noBetas parms.update parms.quiet parms.major
+ r←parms.dry ReInstallDependencies_ installFolder registry deps parms.noBetas parms.update parms.quiet parms.major
 ⍝Done

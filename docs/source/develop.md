@@ -8,19 +8,50 @@
 Four ordinary namespaces contain the Tatin code.
 
 -----------|---
-`Admin`    | Helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.
 `Client`   | The code executed on the Client side of Tatin.
-`Registry` | All code shared by a Tatin client and a Tatin server.
 `Server`   | The code to run a Tatin Server
+`Registry` | All code shared by a Tatin client and a Tatin server.
+`Admin`    | Helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.
 
 
-## :fontawesome-solid-sitemap: Dependencies
+## :fontawesome-solid-sitemap: Updating Tatin's packagee dependencies
+
+Tatin depends on a couple of Tatin packages, but it cannot be used to load them – the classic bootstrap problem.
+
+To update packages installed in `packages/` or `packages_dev/`, run:
+
+```
+]ReInstallDependencies /path/to/Tatin/packages -update
+```
+
+Notes: 
+
+* If you want to check what Tatin would do, specify the `-dry` flag: this causes the function to report what it would do without actually doing it.
+
+* To upgrade to a newer major version, use the `-major` flag.
+
+Re-installing into `packages/` is not sufficient on its own; the code (and any associated assets) must also be copied into the `APLSource/` folder. This is because Tatin cannot load packages with itself, naturally. That's why a helper is availbale for this: 
+
+```
+#.Tatin.Admin.CopyPackagesToAPLSource 1
+```
+
+The right argument must be a 1, otherwise the function will throw an error. The left argument is optional and must be a flag when specified. Default is 0 while a 1 forces a dry run, meaning that actions to be taken will be reported without actually carrying them out.
+
+
+
+## :fontawesome-solid-sitemap: Other Dependencies
 
 -----------|---
 [`Plodder`](https://github.com/aplteam/Plodder) | A fully-fledged HTTP server based on Rumba and Conga
 [`RumbaLean`](https://github.com/aplteam/RumbaLean) | An implementation of HTTP 1.1 in APL
 
-These two packages are used by, but do not form part of, the Tatin project.
+These two dependencies are external to Tatin. Therefore, any modifications or improvements must be made directly in their own source projects, not within Tatin.
+
+Additionally, Tatin relies on several internal packages. Due to circular dependency issues (the _chicken-and-egg_ problem), these cannot be loaded as standard Tatin packages; instead, they are treated as integral parts of the Tatin codebase. Consequently, any modifications or improvements must still be made directly in their respective source projects.
+
+Refer to the dependencies/ folder to identify which packages Tatin requires. Similarly, the packages_dev/ folder contains the packages necessary for development and testing.
+
 
 
 ## :fontawesome-solid-reply: Server handlers
@@ -63,15 +94,9 @@ Now, when Cider opens the Tatin project it asks:
     (Allows executing user command code in # rather than ⎕SE)
     (Y/n)
 
-Setting the flag tells Tatin to execute user commands and API calls using the code in `#`, where Link will save any changes you make.
+but only in case the variable `DEVELOPMENT` is not yet set (undefined). Setting `DEVELOPMENT` to 1 tells Tatin to execute user commands and API calls using the code in `#`, where Link will save any changes you make.
 
-If the flag is not set Cider <!-- won’t ask the question, and  --> will execute code in `⎕SE` as usual.
-
-If the flag is already set to zero, Cider will not ask if you want to change it.
-
-**_ FIXME
-Can this be right? Cider will ask if you want the flag set, but only if the flag is already set?
- _**
+If `DEVELOPMENT` is set to 0 Cider won’t ask the question, and will execute code in `⎕SE` as usual.
 
 
 ## :fontawesome-solid-server: Developing with a running server
@@ -96,7 +121,7 @@ To link the running server code to its source files:
 
 ## :fontawesome-solid-clone: Opening Tatin as a project in two workspaces
 
-In developing Tatin it is natural to have two Dyalog instances running: one each for the client and server code.
+In developing Tatin it is natural to have two Dyalog instances running: one for the client code and one for the server code.
 
 The test server must be run in its own instance: you cannot run both the client and the server in the same workspace.
 
@@ -118,7 +143,7 @@ This is particularly important when you change code in the `Tatin.Registry` name
 **Watching Link’s reports in the session**
 is important: the .NET mechanism used by Dyalog works _most of the time_ but not always, so it is important to watch for problems.
 
-If you just want to run the test server, close the project before executing
+If you just want to run the test server (without changing code), close the project before executing
 
     #.Tatin.TestCasesServer.RunTests
 
@@ -129,24 +154,13 @@ Error trapping is active, so if you change a function and inject a typo, it will
 
 !!! tip inline end "`⍝TODO⍝` reminders"
 
-    `⍝TODO⍝` is a reminder that won’t go unnoticed: a test case detects and reports these markers and reports them.
+    `⍝TODO⍝` is a reminder that won’t go unnoticed: a test case detects these markers and reports them.
 
 To avoid locking horns with error trapping, you could put into `OnRequest`
 
     ⎕TRAP←0 'S'  ⍝TODO⍝
 
 Also, make `⎕TRAP` a local variable in `OnRequest`.
-
-
-## :fontawesome-solid-chart-diagram: Updating Tatin’s own dependencies
-
-Tatin depends on a couple of Tatin packages, but it cannot be used to load them – the classic bootstrap problem.
-
-To update a package installed in the `packages/` folder, bring it into the `APLSource/` folder by other means:
-
--   A **single class or namespace script** can simply be copied over; for example, the `Tester2` class.
--   An **ordinary namespace** needs to be copied over as a folder; for example, `CommTools`.
-
 
 
 ## :fontawesome-solid-terminal: Special REST commands
@@ -159,5 +173,7 @@ They should never be supported on a production server.
 For example, one command returns an HTML page with all the available commands: navigate to `https://localhost:5001/v1/list-commands`.
 
 The other commands do not return HTML but trigger actions.
+
+
 
 

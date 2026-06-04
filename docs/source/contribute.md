@@ -85,7 +85,14 @@ To modify the source code:
 If you find parts of this guide confusing, outdated, unclear or missing bits and pieces, change it.
 That might well be your first valuable contribution.
 
-A minor edit to the documentation does not require its own issue and branch; it can be made in the `main` branch.
+A minor edit to the documentation usually does not require its own issue and branch; it can be made in the `main` branch. This table might be useful:
+
+|Change type                        |Issue?    |Branch?            |
+|-----------------------------------|----------|-------------------|
+|Typo, grammar, broken link         |No        |Often not necessary|
+|Small factual correction           |Usually no|Usually yes        |
+|New documentation section          |Often yes |Yes                |
+|Behavioural or design clarification|Yes       |Yes                |
 
 ### Build documentation
 

@@ -54,9 +54,8 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
 `projectspace`
 : Namespace that is to contain the package contents.
 
-    <!-- ??? warning "Until version 0.118.0 this was known as `tatinVars`". Now, Tatin signals an error if it finds a `tatinVars` parameter. -->
     ??? warning "Until version 0.118.0 this was known as `tatinVars`"
-        ~~Now, Tatin signals an error if it finds a `tatinVars` parameter.~~
+        Now, Tatin signals an error if it finds a `tatinVars` parameter.
 
 `targetPath`
 : Path to folder in which to write the ZIP file. Default is `''`: use `projectPath`.
@@ -105,8 +104,7 @@ Change this with optional left argument `flags`: the sum of the following. (Defa
 Clears the cache and returns a two-element vector:
 
 1. Is either 0 (for success) or 1 (for failure)
-<!-- 2. Is either an empty vector of a simple string, possible with injected LFs (`⎕UCS 10`). -->
-2. Is either an empty vector ~~or~~ a simple string, ~~possibly~~ with injected LFs (`⎕UCS 10`).
+2. Is either an empty vector or a simple string, possibly with injected LFs (`⎕UCS 10`).
 
 If `url` is
 
@@ -187,8 +185,7 @@ names  | _strings_   | (optional) names of objects in the namespace to be expose
 
 then Tatin creates an API space as a child of `source` (with cover functions for the package’s public interface) and returns as a shy result the number of objects exposed.
 
-<!-- Note that `cfg` must be a namespace with appropriate variables. Typically this established in the WS by `GetPackageConfigFileAsNS` which needs a path to a package config file. -->
-Note that `cfg` must be a namespace with appropriate variables. Typically this ~~is~~ established in the WS by `GetPackageConfigFileAsNS` which needs a path to a package config file.
+Note that `cfg` must be a namespace with appropriate variables. Typically this is established in the WS by `GetPackageConfigFileAsNS` which needs a path to a package config file.
 
 If `names` is absent, the function looks for a constant `source.Public`.
 
@@ -305,10 +302,9 @@ a fully qualified list of all matches as a vector of strings.
 
 <!-- FIXME Get this to work, then include an example -->
 
-By default only the folder containing a file `apl-dependencies.txt` with at least one of the defined packages is returned.
-<!-- FIXME This implies the behaviour can be changed. How? -->
+<!-- What exactly does not work, and why shall we add examples to the syntax ref? -->
 
-If `verbose` is set the actual package folders are returned instead of the hosting folder/s, revealing the precise version/s installed.
+By default only the folder containing a file `apl-dependencies.txt` with at least one of the defined packages is returned. This can be changed with `-verbose`: then the actual package folders are returned instead of the hosting folder/s, revealing the precise version/s installed.
 
 Specify packages in `pkgList` partially or in full. Name is required but group and version can be omitted. You can specify a major version number, but minor and patch numbers are ignored if specified.
 
@@ -375,10 +371,15 @@ This function requires the version number to be fully specified.
 ## :fontawesome-solid-code: Get package config file as namespace
 
 ```
-ns←GetPackageConfigFileAsNS /path/to/pkg
+ns←GetPackageConfigFileAsNS path
 ```
 
-<!-- FIXME add meat -->
+Where `path` is a local path to a package folder or a URL/alias with a package ID, Tatin reads the package config file (`apl-package.json`) and returns its fields as variables in a namespace.
+
+If `path` points to a folder, Tatin appends `apl-package.json` automatically.
+If the config file cannot be found, an empty vector is returned.
+
+The result namespace has the same fields as those shown under [`ReadPackageConfigFile`](#read-package-config-file).
 
 ## :fontawesome-solid-code: Get NoCaching flag
 
@@ -466,8 +467,7 @@ cfg←{sourcePath}  InitPackageConfig parms
 Where
 
 `parms`
-<!-- : is a an empty vector or a parameter space -->
-: is ~~an~~ empty vector or a parameter space
+: is an empty vector or a parameter space
 
 `sourcePath`
 : (optional) is a path to the package source folder
@@ -783,8 +783,7 @@ Result `mat` has a column with full package names.
 15 1
 ```
 If version precedence cannot be established from the version numbers alone (often a problem
-<!-- with beta versions) then the publishing date is taken into account. -->
-with beta versions)~~,~~ then the publishing date is taken into account.
+with beta versions, then the publishing date is taken into account.
 
 
 ## :fontawesome-solid-code: Load dependencies
@@ -813,8 +812,7 @@ The  flags in `options`:
 
     Case-insensitive alias `'[MyUCMDs]'` denotes the special folder `MyUCMDs/`, whose location depends on the operating system.
 
-    <!-- So where a Tatin package has been installed as a user command you cannot use absolute paths for referring to assets. -->
-    So where a Tatin package has been installed as a user command~~,~~ you cannot use absolute paths for referring to assets.
+    So where a Tatin package has been installed as a user command, you cannot use absolute paths for referring to assets.
 
     In that case the paths must be relative to `MyUCMDs/`.
     This is what the second `options` flag is for.
@@ -916,8 +914,7 @@ zfn  | zip file name: empty if `source` is a ZIP file, otherwise name of the ZIP
 
 ??? detail "The left argument `dependencyFolder`"
 
-    <!-- If you use Tatin in connection with Cider, you might have trouble to understand why there is an optional left argument `dependencyFolder`. The reason is that Cider *knows* about the depedencies, so it can fill Tatin in on this. -->
-    If you use Tatin in connection with Cider, you might have trouble to understand why there is an optional left argument `dependencyFolder`. The reason is that Cider *knows* about the ~~dependencies~~, so it can fill Tatin in on this.
+        If you use Tatin in connection with Cider, you might have trouble to understand why there is an optional left argument `dependencyFolder`. The reason is that Cider *knows* about the dependencies, so it can fill Tatin in on this.
 
     If you don't use Cider, well, how should `PublishPackage` know what dependencies the package in question relies on?!
 
@@ -991,8 +988,7 @@ The function does not work on a path, the right argument must point to a managed
 
 `packageID` must come with a group and a package name and may come with a version number.
 
-  <!-- You may omit the patch number, or the patch and minor number, or the version number altogether, `ReadPackageConfigFile` will always return the best version for the given argument. -->
-  You may omit the patch number, or the patch and minor number, or the version number altogether~~;~~ `ReadPackageConfigFile` will always return the best version for the given argument.
+  You may omit the patch number, or the patch and minor number, or the version number altogether; `ReadPackageConfigFile` will always return the best version for the given argument.
 
 
 ```apl

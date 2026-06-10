@@ -10,7 +10,7 @@ keywords: apl, dyalog, package
 ![Tatin overview](img/tatin-overview.png)
 
 The diagram illustrates an APL application defined in [Linked](https://dyalog.github.io/link/4.0/) text files, and held on a GitHub repository.
-It depends on APL libraries in the form of Tatin packages imported from a Tatin repository.
+It depends on APL libraries in the form of Tatin packages imported from a Tatin registry.
 
 In the example, the application does not just *consume* Tatin packages.
 Its working parts, excluding the tests but including the dependencies, 
@@ -25,7 +25,7 @@ You can also host a Tatin registry on your local machine or on a server.
 
 ## :dyalog-tatin-logo: Packages
 
-A package should serve a particular, limited task, for example converting Markdown files into HTML. 
+A package should serve a particular, limited task, for example, converting Markdown files into HTML. 
 
 It may be as simple as a single source file, or multiple folders and source files. 
 
@@ -58,7 +58,7 @@ Upgrading might require newer versions of packages on which it in turn depends.
 Tatin follows the [semantic versioning](glossary.md) conventions
 and silently [manages all this](load-and-update-strategy.md) for you.
 
-To support this work the Principal Registry never deletes a published package.
+To support this work, the Principal Registry never deletes a published package.
 You can *deprecate* a package or a version, but the registry retains it for anyone who relies on it.
 
 

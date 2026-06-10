@@ -36,7 +36,8 @@ Re-installing into `packages/` is not sufficient on its own; the code (and any a
 #.Tatin.Admin.CopyPackagesToAPLSource 1
 ```
 
-The right argument must be a 1, otherwise the function will throw an error. The left argument is optional and must be a flag. Default is 0 while a 1 forces a dry run, meaning that actions to be taken will be reported without actually carrying them out.
+The right argument must be a 1, otherwise the function will throw an error. <!-- The left argument is optional and must be a flag. Default is 0 while a 1 forces a dry run, meaning that actions to be taken will be reported without actually carrying them out. -->
+The left argument is optional and must be a flag. Default is 0, and a 1 forces a dry run, meaning that actions to be taken will be reported without actually carrying them out.
 
 !!! danger "Make sure you do not make changes to any of those packages."
 
@@ -97,9 +98,11 @@ Now, when Cider opens the Tatin project it asks:
     (Allows executing user command code in # rather than ⎕SE)
     (Y/n)
 
-but only in case the variable `DEVELOPMENT` is not yet set (is undefined). Setting `DEVELOPMENT` to 1 tells Tatin to execute user commands and API calls using the code in `#`, where Link will save any changes you make.
+<!-- but only in case the variable `DEVELOPMENT` is not yet set (is undefined). -->
+but only if the variable `DEVELOPMENT` is not yet set (is undefined). Setting `DEVELOPMENT` to 1 tells Tatin to execute user commands and API calls using the code in `#`, where Link will save any changes you make.
 
-If `DEVELOPMENT` is set to 0 Cider won’t ask the question, and will execute code in `⎕SE` as usual.
+<!-- If `DEVELOPMENT` is set to 0 Cider won’t ask the question -->
+If `DEVELOPMENT` is set to 0, Cider won’t ask the question, and will execute code in `⎕SE` as usual.
 
 
 ## :fontawesome-solid-server: Developing with a running server
@@ -124,13 +127,15 @@ To link the running server code to its source files:
 
 ## :fontawesome-solid-clone: Opening Tatin as a project in two workspaces
 
-In developing Tatin it is natural to have two Dyalog instances running: one for the client code and one for the server code.
+<!-- In developing Tatin it is natural to have two Dyalog instances running -->
+In developing Tatin, it is natural to have two Dyalog instances running: one for the client code and one for the server code.
 
 The test server must be run in its own instance: you cannot run both the client and the server in the same workspace.
 
 !!! danger "Opening Tatin as a project in two different workspaces, and changing code in both is dangerous!"
 
-With .NET you can limit the danger:
+<!-- With .NET you can limit the danger: -->
+With .NET, you can limit the danger:
 
 -   Set Link’s `Notify` parameter to 1. That makes Link print to the session whenever it updates a file or the workspace, so you get some feedback on what is happening. Ensure you watch this!
 -   Set Link’s `watch` parameter to `'both'` in both workspaces.

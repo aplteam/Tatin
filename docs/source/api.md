@@ -1037,7 +1037,7 @@ and any of its dependencies
 and returns:
 
 -----|-----------------|--------------------------------
-list | strings | Fully qualified names of all removed packages. (Might include aliases.)
+list | strings | Fully qualified names of all removed packages (including aliases, if any).
 msg  | string  | Error message, ideally empty.
 
 !!! detail "If the package was installed with an alias then `packageID` must be its alias."
@@ -1050,13 +1050,15 @@ If `packageID` is empty, Tatin attempts to clean up: remove any packages that ar
 FIXME If this relates only to package dependencies why confirm
       pkg is mentioned in the dependency file?
       How else would it have been identified?
+Kai: just a safety against tryijng to un-install something that is not installed
+-->      
 
 To keep things simple Tatin performs the following steps:
+
 1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown
-3. Removes `packagedID` from the dependency file
-4. Re-compile the build list based on the new dependency file
-5. Removes all packages that are not mentioned in the build list anymore
- -->
+1. Removes `packagedID` from the dependency file
+1. Re-compile the build list based on the new dependency file
+1. Removes all packages that are not mentioned in the build list anymore
 
 !!! danger "Deleting package folders"
 

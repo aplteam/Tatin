@@ -66,7 +66,7 @@ Known Registries
     in descending order of priority.
 
 Maintenance Library
-: A child folder `Maintenance/` of the the Tatin server installation folder, containing [maintenance scripts](user-commands-host.md#maintenance).
+: A child folder `Maintenance/` of the Tatin server installation folder, containing [maintenance scripts](user-commands-host.md#maintenance).
 
 package alias
 : A short name you can use locally as an alternative to a full package ID.
@@ -125,7 +125,7 @@ strings
 
 version
 : A version follows the conventions of
-    [Semantic Versioning](https://semver.org):
+    [Semantic Versioning](https://semver.org)
     and comprises major and minor versions (integers)
     and a patch, separated by periods,
     e.g. `1.0.3`

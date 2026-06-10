@@ -49,7 +49,8 @@ If you are new to Cider, spend some time playing with it before using it for ser
 
 ## :fontawesome-solid-circle-play: Get started
 
-1.  On GitHub make your own fork of [Tatin](https://github.com/aplteam/cider) and clone it to your local machine, say at `C:\Tatin`.
+<!-- 1.  On GitHub make your own fork of [Tatin](https://github.com/aplteam/cider) and clone it to your local machine, say at `C:\Tatin`. -->
+1.  On GitHub make your own fork of [Tatin](~~https://github.com/aplteam/Tatin~~) and clone it to your local machine, say at `C:\Tatin`.
 
 2.  Launch Dyalog and open the project
 
@@ -74,7 +75,8 @@ To modify the source code:
 
 1.  Before finishing, confirm your branch `123-fix-foo-bar` passes the Tatin tests.
 
-1.  On GitHub, synch your fork with the source repo.
+<!-- 1.  On GitHub, synch your fork with the source repo. -->
+1.  On GitHub, ~~sync~~ your fork with the source repo.
     On your local machine, pull the `main` branch from your GitHub fork; then merge `main` into `123-fix-foo-bar`. 
 
 1. Push `123-fix-foo-bar` to your fork, and submit a pull request.

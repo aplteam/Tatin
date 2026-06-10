@@ -9,14 +9,14 @@ Four ordinary namespaces contain the Tatin code.
 
 -----------|---
 `Client`   | The code executed on the Client side of Tatin.
-`Server`   | The code to run a Tatin Server
+`Server`   | The code to run a Tatin Server.
 `Registry` | All code shared by a Tatin client and a Tatin server.
 `Admin`    | Helpers useful to administrate Tatin, for example creating a new version, performing maintenance tasks etc.
 
 
-## :fontawesome-solid-sitemap: Updating Tatin's packagee dependencies
+## :fontawesome-solid-sitemap: Updating Tatin's package dependencies
 
-Tatin depends on a couple of Tatin packages, but it cannot be used to load them – the classic bootstrap problem.
+Tatin depends on a few Tatin packages, but they cannot be used to load them – the classic bootstrap problem.
 
 To update packages installed in `packages/` or `packages_dev/`, run:
 
@@ -30,28 +30,31 @@ Notes:
 
 * To upgrade to a newer major version, use the `-major` flag.
 
-Re-installing into `packages/` is not sufficient on its own; the code (and any associated assets) must also be copied into the `APLSource/` folder. This is because Tatin cannot load packages with itself, naturally. That's why a helper is availbale for this: 
+Re-installing into `packages/` is not sufficient on its own; the code (and any associated assets) must be copied from packages into the `APLSource/` folder. Only then can Tatin make use of these packages. There is a helper available for this:
 
 ```
 #.Tatin.Admin.CopyPackagesToAPLSource 1
 ```
 
-The right argument must be a 1, otherwise the function will throw an error. The left argument is optional and must be a flag when specified. Default is 0 while a 1 forces a dry run, meaning that actions to be taken will be reported without actually carrying them out.
+The right argument must be a 1, otherwise the function will throw an error. The left argument is optional and must be a flag. Default is 0 while a 1 forces a dry run, meaning that actions to be taken will be reported without actually carrying them out.
 
+!!! danger "Make sure you do not make changes to any of those packages."
 
+    That is a mistake that is easy to make, because it is not obvious what code is part of a package and what code isn't! That's why the packages are installed in the `packages/` folder: that documents not only the packages, it is a record of the code as well.
+
+    When code that came from a package is changed, Link will save it on disk, and that appears to be fine. Until a new version of the package comes along, you re-install all packages in the `packages/` folder and then call the `Admin.CopyPackagesToAPLSource` helper - and your change is gone!
+
+    If you need to change code that came from a package, you must change the package itself!
 
 ## :fontawesome-solid-sitemap: Other Dependencies
 
 -----------|---
 [`Plodder`](https://github.com/aplteam/Plodder) | A fully-fledged HTTP server based on Rumba and Conga
-[`RumbaLean`](https://github.com/aplteam/RumbaLean) | An implementation of HTTP 1.1 in APL
+[`RumbaLean`](https://github.com/aplteam/RumbaLean) | An implementation of HTTP/1.1 in APL
 
 These two dependencies are external to Tatin. Therefore, any modifications or improvements must be made directly in their own source projects, not within Tatin.
 
-Additionally, Tatin relies on several internal packages. Due to circular dependency issues (the _chicken-and-egg_ problem), these cannot be loaded as standard Tatin packages; instead, they are treated as integral parts of the Tatin codebase. Consequently, any modifications or improvements must still be made directly in their respective source projects.
-
-Refer to the dependencies/ folder to identify which packages Tatin requires. Similarly, the packages_dev/ folder contains the packages necessary for development and testing.
-
+These two dependencies must be copied into the folder `Tatin/Assets/Runtime/`.
 
 
 ## :fontawesome-solid-reply: Server handlers
@@ -94,7 +97,7 @@ Now, when Cider opens the Tatin project it asks:
     (Allows executing user command code in # rather than ⎕SE)
     (Y/n)
 
-but only in case the variable `DEVELOPMENT` is not yet set (undefined). Setting `DEVELOPMENT` to 1 tells Tatin to execute user commands and API calls using the code in `#`, where Link will save any changes you make.
+but only in case the variable `DEVELOPMENT` is not yet set (is undefined). Setting `DEVELOPMENT` to 1 tells Tatin to execute user commands and API calls using the code in `#`, where Link will save any changes you make.
 
 If `DEVELOPMENT` is set to 0 Cider won’t ask the question, and will execute code in `⎕SE` as usual.
 
@@ -110,9 +113,9 @@ You would need to be very careful lest you lose code. (See warning box below.)
 
 Suppose you want to run the Tatin server that is part of the Tatin project.
 When the Tatin test cases are executed, Tatin would ask you whether you want to start this server automatically.
-(Not `https://test.tatin.dev`.)
+(This is not about `https://test.tatin.dev`.)
 
-However, when the server is started as part of the tests it is NOT opened as a Cider project, and changes would not be tracked by Link.
+However, when the server is started as part of the tests, it is NOT opened as a Cider project, and changes would not be tracked by Link.
 To link the running server code to its source files:
 
 1. Open the Tatin project with `]CIDER.OpenProject` with the `watch` parameter set to `'both'`.
@@ -168,7 +171,7 @@ Also, make `⎕TRAP` a local variable in `OnRequest`.
 A Tatin server can support several special REST commands for developing and testing.
 
 These commands are enabled (or not) by the INI entry `[CONFIG]SpecialCommands`.
-They should never be supported on a production server.
+They should never be enabled on a production server.
 
 For example, one command returns an HTML page with all the available commands: navigate to `https://localhost:5001/v1/list-commands`.
 

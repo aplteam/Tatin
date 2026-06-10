@@ -98,7 +98,7 @@ Sure you want to create and install into
 /Foo/packages ? (Y/n) Y
  Installed into /Foo/packages:
   aplteam-MarkAPL-13.1.0
- In order to load all dependecies (including newly installed ones) into the WS execute:
+ In order to load all dependencies (including newly installed ones) into the WS execute:
        ]TATIN.LoadDependencies "/Foo/packages"
 ```
 `MarkAPL` specifies neither group nor version number.
@@ -219,7 +219,7 @@ This will load three packages and all their dependencies at once. You might find
 
 ### Checking out a package: `LoadPackages`
 
-Let's assume that before actually installing it, you first  want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace.
+Let's assume that before actually installing it, you first want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace.
 
 That can be achieved with the `LoadPackages` user command. It loads the package into the workspace.
 
@@ -253,7 +253,7 @@ I> ]tatin.LoadPackages [tatin]MarkAPL
 I> 4 packages (including dependencies) loaded
 I> ```
 
-Here we did not specify a target namespace, so the package was loaded into `#`. In case the target namespace is something like `#.MyTests` then it may or may not exist. If it does not, Tatin will create it.
+Here we did not specify a target namespace, so the package was loaded into `#`. If the target namespace is something like `#.MyTests`, it may or may not exist. If it does not, Tatin will create it.
 
 Tatin has created a reference named `MarkAPL` in the target namespace `#`:
 
@@ -294,7 +294,8 @@ FilesAndDirs
 MarkAPL
 ```
 
-`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. For these two packages references are injected. `FilesAndDirs` depends on `OS` but because that is not required by `MarkAPL`, no reference to `OS` is injected into `aplteam_MarkAPL_11_0_0.`, but you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1`.
+`MarkAPL` is the package we asked for. It depends on two packages, `APLTreeUtils2` and `FilesAndDirs`. 
+For these two packages, references are injected. `FilesAndDirs` depends on `OS`, but because that is not required by `MarkAPL`, no reference to `OS` is injected into `aplteam_MarkAPL_11_0_0.`, but you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1`.
 
 
 ### Misc
@@ -331,7 +332,8 @@ A> Note that Tatin does not only scan all known Registries with a priority great
 
 Every piece of software will become obsolete one day. Packages are no exception. If a package is not needed anymore, or is obsolete because there is a better one available, it's time to mark it as deprecated.
 
-This can be done with the user command `]TATIN.DeprecatePackage`. In short what the user command does is to publish the latest version available yet as a new version with an increased minor version number and an injected flag `deprecated←1`
+This can be done with the user command `]TATIN.DeprecatePackage`. 
+In short, what the user command does is to publish the latest version available yet as a new version with an increased minor version number and an injected flag `deprecated←1`
 
 A> ### Deleting versus deprecating packages
 A>
@@ -354,13 +356,15 @@ Executing:
 ]TATIN.DeprecatePackage https://your-Registry/aplteam-Foo-1
 ```
 
-will publish a new version `aplteam-Foo-1.2.0` which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `deprecate_comment` which carries the comment in case you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
+will publish a new version `aplteam-Foo-1.2.0` which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `deprecate_comment` 
+which carries the comment if you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
 
 From now on both the "Packages" web page and `]TATIN.ListPackages` won't list these four packages anymore.
 
 Note that `]TATIN.ListDeprecated` is designed to list just the deprecated packages. If you want the list to include also the earlier versions --- which are now sort of hidden by 1.2.0 --- then you need to specify the `-all` flag.
 
-With `-all` a matrix with two columns rather than one is returned, with the second column carrying an asterisk for those packages that actually  do carry `deprecated←1` in their config file. That would be at least the very last one.
+With `-all` a matrix with two columns rather than one is returned, 
+with the second column carrying an asterisk for those packages that actually do carry `deprecated←1` in their config file. That would be at least the very last one.
 
 ##### Side effects of deprecating a package
 
@@ -382,7 +386,7 @@ This statement:
 
 would yield the same result, but only because there is just one major version anyway.
 
-If you ask _explicitly_ for an _earlier_ version than the deprecated one,  then that version would be loaded (or installed) without further ado, because Tatin would just assume that you know what you are doing.
+If you ask _explicitly_ for an _earlier_ version than the deprecated one, then that version would be loaded (or installed) without further ado, because Tatin would just assume that you know what you are doing.
 
 Note that the API functions for loading / installing packages would not complain or warn you at all.
 
@@ -403,7 +407,7 @@ They are injected into a namespace `TatinVars` which in turn is injected into th
 
 W> Of course this means that theoretically there could be a name clash, but then the name `TatinVars` should certainly not be used by any package author.
 
-Strictly speaking `TatinVars` is a misnomer because the namespace carries just functions, and not a single variable, but all but one of those act as constants, and the exception `GetFullPath2-AssetsFolder` was introduced at a later stage, so it was decided to stick with the name `TatinVars` for compatability.
+Strictly speaking `TatinVars` is a misnomer because the namespace carries just functions, and not a single variable, but all but one of those act as constants, and the exception `GetFullPath2AssetsFolder` was introduced at a later stage, so it was decided to stick with the name `TatinVars` for compatibility.
 
 Note that we refer to, say, `HOME` as a character vector because the niladic function `HOME` returns a character vector.
 
@@ -429,9 +433,9 @@ A vector of character vectors with the package IDs of the packages the package i
 
 This is a function which returns the result of the expression `HOME,'/',ASSETS` if both `HOME` and `ASSETS` are not empty _and_ `HOME` exists on disk. If `HOME` is empty or does not exist on disk then just `ASSETS` is returned.
 
-When accessing assets you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even to a different machine. The expression `HOME,'/',ASSETS` would then fail.
+When accessing assets, you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even to a different machine. The expression `HOME,'/',ASSETS` would then fail.
 
-But the function `GetFullPath2AssetsFolder` would not find `HOME` and therefore return just `ASSETS`, and that allows you to still access the assets sucessfully, assuming that you changed the current directory to where the workspace was loaded from.
+But the function `GetFullPath2AssetsFolder` would not find `HOME` and therefore return just `ASSETS`, and that allows you to still access the assets successfully, assuming that you changed the current directory to where the workspace was loaded from.
 
 
 ##### HOME

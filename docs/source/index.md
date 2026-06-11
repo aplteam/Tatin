@@ -88,7 +88,7 @@ Packages hosted on the Principal Registry make the software available with minim
 
 You can contribute to the [Principal Registry](https://tatin.dev): report errors (open issues in the package repositories), or submit pull requests if you can see how to fix them.
 
-Please also consider [publishing](publish.md) your own work as Tatin packages.
+Please also consider [publishing](publish-packages.md) your own work as Tatin packages.
 
 Besides the Principal Registry, you can [host your own Tatin registry](host.md).
 

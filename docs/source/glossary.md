@@ -66,7 +66,7 @@ Known Registries
     in descending order of priority.
 
 Maintenance Library
-: A child folder `Maintenance/` of the Tatin server installation folder, containing [maintenance scripts](user-commands-host.md#maintenance).
+: Either a child folder `Maintenance/` of the Tatin *server* installation folder, containing [maintenance scripts](maintenance.md#maintenance), or a child folder `Maintenance/` of the Tatin *client* installation folder.
 
 package alias
 : A short name you can use locally as an alternative to a full package ID.

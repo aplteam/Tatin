@@ -80,7 +80,7 @@ An automated build process might need to expose the API
 without first executing a command.
 You can do this with a `setup.dyalog` script in your `MyUCMDs/` folder.
 
-Default locations for the  `MyUCMDs/` folder:
+Default locations for the `MyUCMDs/` folder:
 
     /home/{username}/               ⍝ Linux
     /Users/{username}/              ⍝ macOS
@@ -92,9 +92,9 @@ on other platforms, create it yourself.
 
 !!! detail "Setup scripts"
 
-    At launch, Dyalog looks **_ FIXME where? __** for a monadic `Setup` function in a `setup.dyalog` script.
+    At launch, Dyalog looks for a monadic `Setup` function in a `setup.dyalog` script in the `MyUCMDs/` folder.
 
-    In version 19.0 the `Run.aplf` function offers a better way to achieve that: `setup.dyalog` superfluous.
+    In version 19.0 the `Run.aplf` function offers a better way to achieve that, making `setup.dyalog` superfluous.
 
 :fontawesome-solid-download:
 [`setup.dyalog`](assets/setup.dyalog) model setup script
@@ -149,7 +149,7 @@ If you are using OneDrive and a version of Tatin older than 0.114.0:
 
         C:/Users/<⎕AN>/OneDrive/Documents/<tatin-home>
 
-1.  Remove from SALT’s `cmddir`  the path
+1.  Remove from SALT’s `cmddir` the path
 
         C:/Users/<⎕AN>/Documents/<tatin-home>
 

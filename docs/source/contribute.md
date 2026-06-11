@@ -31,14 +31,13 @@ Linux, macOS, or Windows.
 AIX is not supported. 
 The Raspberry Pi is not officially supported but might work anyway.
 
-You can _develop_ on any operating system, but _building a new version_ is currently supported only on Windows.
-<!-- This restriction is likely to be lifted in a later version. -->
+You can _develop_ on any operating system, but _building a new version_ is currently supported only on Windows. This restriction is likely to be lifted in a later version.
 
 
 ## :dyalog-cider-logo: Managed by Cider
 
 Tatin is managed by the [Cider project management tool](https://github.com/aplteam/cider).
-If you are new to Cider, spend some time playing with it before using it for serious work. (Thirty minutes should suffice.)
+If you are new to Cider, spend some time playing with it before using it for serious work. An hour or two should be enough.
 
 ??? tip "Working without Cider"
 
@@ -49,12 +48,11 @@ If you are new to Cider, spend some time playing with it before using it for ser
 
 ## :fontawesome-solid-circle-play: Get started
 
-<!-- 1.  On GitHub make your own fork of [Tatin](https://github.com/aplteam/cider) and clone it to your local machine, say at `C:\Tatin`. -->
-1.  On GitHub make your own fork of [Tatin](~~https://github.com/aplteam/Tatin~~) and clone it to your local machine, say at `C:\Tatin`.
+1.  On GitHub make your own fork of [Tatin](https://github.com/aplteam/Tatin) and clone it to your local machine, say at `/path/2/Tatin`.
 
 2.  Launch Dyalog and open the project
 
-        ]CIDER.OpenProject C:\Tatin
+        ]CIDER.OpenProject /path/2/Tatin
 
 Now you have a working version of Tatin on your machine and you can start contributing.
 
@@ -75,8 +73,7 @@ To modify the source code:
 
 1.  Before finishing, confirm your branch `123-fix-foo-bar` passes the Tatin tests.
 
-<!-- 1.  On GitHub, synch your fork with the source repo. -->
-1.  On GitHub, ~~sync~~ your fork with the source repo.
+1.  On GitHub, sync your fork with the source repo.
     On your local machine, pull the `main` branch from your GitHub fork; then merge `main` into `123-fix-foo-bar`. 
 
 1. Push `123-fix-foo-bar` to your fork, and submit a pull request.

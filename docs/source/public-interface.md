@@ -84,7 +84,7 @@ Suppose you have a third namespace: `More`.
 For many packages, Tatin can create the API space for you, at build or load time.
 Specify the API space in the `api` setting of the [package config](package-configuration.md#standard-settings) and list what is to be exposed in it.
 
-Function [`CreateAPIfromCFG`](api.md#create-api-from-cfg) creates the API space as a child of the source namespace and populates it with references to the exposed ojects.
+Function [`CreateAPIfromCFG`](api.md#create-api-from-cfg) creates the API space as a child of the source namespace and populates it with references to the exposed objects.
 
 !!! tip inline end ""
 
@@ -95,7 +95,7 @@ This list of strings can name functions, operators, variables, interfaces, class
 The objects must all be children (or, with dot syntax, grandchildren) of a single source namespace.
 
 
-You can create the API by calling `CreateAPIfrom CFG`
+You can create the API by calling `CreateAPIfromCFG`
 
 -   at **load time** from a function specified as the package’s [`lx` setting](package-configuration.md#standard-settings)
 -   at **build time**, incorporating the API into the built package

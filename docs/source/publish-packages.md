@@ -8,9 +8,7 @@ keywords: apl,delete,install,organise,package,publish,tatin,user command
 !!! abstract "Organise, configure, install dependencies, publish."
 
 
-## :fontawesome-solid-circle-play: Get started
-
-<!-- ## :fontawesome-solid-sitemap: Organise -->
+## :fontawesome-solid-circle-play: Publishing steps
 
 A Tatin package separates APL source files from files
 such as CSS, EXE, DLL and so on.
@@ -31,16 +29,12 @@ Tatin calls the APL files _source_ and the others _assets_.
             ├── mean.aplf
             └── valid8_.aplf
 
-    <!-- ## :fontawesome-solid-list: Configure -->
-
 1.  Create a default **configuration** for your package:
 
         ]TATIN.PackageConfig path/to/myproj -edit
 
     The command prompts you for the essential [configuration parameters](package-configuration.md) and writes `myproj/apl-package.json`.
 
-
-    <!-- ## :fontawesome-solid-truck-ramp-box: Install dependencies -->
 
 1.  If your project incorporates other Tatin packages, **install** them, e.g.
 
@@ -55,14 +49,18 @@ Tatin calls the APL files _source_ and the others _assets_.
     [^pkgs]: By default Tatin assumes a subfolder `packages/` to contain dependencies.
 
 
-    <!-- ## :fontawesome-solid-upload: Publish to [tatin-test] -->
-
 1.  Finally, **publish**.
 
         ]TATIN.PublishPackage /path/to/myproj [tatin-test]
 
     :fontawesome-solid-terminal:
     [`]PublishPackage`](user-commands.md#publish-package)
+
+    Tatin zips your package and uploads it to the registry. The registry unzips it, validates the configuration, and checks for a `LICENSE` file. If all is well, the package is stored permanently.
+
+    The most common error is a version conflict: a published version cannot be republished. This is by design — it guarantees that any build depending on that version can always be reproduced.
+
+    On success, Tatin reports `Package published on <URL>`.
 
 
 ## :fontawesome-solid-sitemap: Dependencies
@@ -88,20 +86,15 @@ Requiring dependencies to be already published would not work in that case.
 
 ### URL protocols
 
-Tatin allows you to identify a package with a URL protocol,
-either the `file://` protocol for a local resource
-or `http://` or `https://` for a remote one.
+URL protocols (`file://`, `http://`, `https://`) are not acceptable for specifying a dependency of a published package.
+If you publish a package `foo` with a dependency `goo` specified with a URL protocol, the registry will remove the protocol and retain only `goo`.
+When Tatin loads `foo` it will scan the registries in its search path and use the first `goo` it finds.
 
-Useful as these are for local development, neither is acceptable for specifying a dependency of a published package.
+Tatin does allow URL protocols for local development — use them with care.
 
 ??? detail "URL protocols override Tatin’s scan strategy"
 
     Normally when a dependency is required Tatin scans known registries in order of priority – unless a URL protocol is used.
-
-    Use URL protocols for local development only, and only with care.
-
-If you publish a package `foo` with a dependency `goo` specified with a URL protocol, the registry will remove the protocol and retain only `goo`.
-When Tatin loads `foo` it will scan the registries in its search path, and use the first `goo` it finds.
 
 
 
@@ -152,7 +145,7 @@ The installed package will then consist of:
 
 !!! tip "A package must contain code."
 
-    If you implement a user command as a single script file (quite possible for a simple command) that would not be true.
+    If you implement a user command as a single script file (quite possible for a simple command), that would not be true.
     So, separate the user-command script (with the required `Run`, `List` and `Help` functions) from the ‘real code’ that does the work.
 
     Keeping the real code in the package satisfies the requirement.

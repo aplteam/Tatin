@@ -1,64 +1,64 @@
-  {data}←pkgID MakePackageCompatibleWith_81_0 data;tags;groupName;pkgName
+  {cfg}←pkgID MakePackageCompatibleWith_81_0 (cfg regPath);tags;groupName;pkgName
 ⍝ 2022-12-07
  pkgName←{⍵↑⍨¯1+⍵⍳'-'}{⍵↓⍨⍵⍳'-'}pkgID
  groupName←{⍵↑⍨¯1+⍵⍳'-'}pkgID
 
- data.⎕EX'wx'       ⍝ Delete outdated stuff
+ cfg.⎕EX'wx'       ⍝ Delete outdated stuff
 
- :If 0<data.⎕NC'comment'
-     deprecate_comment←data.comment
-     data.⎕EX'comment '
+ :If 0<cfg.⎕NC'comment'
+     deprecate_comment←cfg.comment
+     cfg.⎕EX'comment '
  :EndIf
 
- :If 0=data.⎕NC'minimumAplVersion'
- :OrIf 0=≢data.minimumAplVersion
-     data.minimumAplVersion←'18.0'
+ :If 0=cfg.⎕NC'minimumAplVersion'
+ :OrIf 0=≢cfg.minimumAplVersion
+     cfg.minimumAplVersion←'18.2'
  :EndIf
 
- :If 0=data.⎕NC'tags'
-     data.tags←''
+ :If 0=cfg.⎕NC'tags'
+     cfg.tags←''
  :EndIf
- tags←{','@(⍸';'=⍵)⊢⍵}data.tags
+ tags←{','@(⍸';'=⍵)⊢⍵}cfg.tags
  tags←','(≠⊆⊢)tags
  tags~←'apl' 'dyalog' 'dyalog-apl' 'dyalogapl'   ⍝ Tatin is a Dyalog APL package manager...
- :If 0=data.⎕NC'os_win'
-     data.os_win←(⊂'windows')∊tags
-     data.os_mac←∨/'mac-os' 'mac' 'macos'∊tags
-     data.os_lin←(⊂'linux')∊tags
-     :If 0=+/data.(os_win os_mac os_lin)
+ :If 0=cfg.⎕NC'os_win'
+     cfg.os_win←(⊂'windows')∊tags
+     cfg.os_mac←∨/'mac-os' 'mac' 'macos'∊tags
+     cfg.os_lin←(⊂'linux')∊tags
+     :If 0=+/cfg.(os_win os_mac os_lin)
          :If (⊂pkgName)∊'Execute' 'Laguntza' 'WinReg'
-             data.os_win←1
+             cfg.os_win←1
          :ElseIf (⊂pkgName)∊'APLGit' 'GitHubAPIv3' 'SevenZip'
-             data.(os_win os_mac os_lin)←1
+             cfg.(os_win os_mac os_lin)←1
          :EndIf
      :EndIf
  :EndIf
 
  tags~←'windows' 'mac-os' 'macos' 'mac' 'linux'
  tags~←'apltree'groupName          ⍝ apltree does not offer much, and the group name should never be a tag
- data.tags←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⍵}tags
- :If 0=≢data.tags
-     data.tags←''
+ cfg.tags←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⍵}tags
+ :If 0=≢cfg.tags
+     cfg.tags←''
      :If 'APLTreeUtils2'≡pkgName
-         data.tags←'utilities'
+         cfg.tags←'utilities'
      :Else
          ⍝∘∘∘
      :EndIf
  :EndIf
 
- :If 0=data.⎕NC'maintainer'
- :OrIf 0=≢data.maintainer
+ :If 0=cfg.⎕NC'maintainer'
+ :OrIf 0=≢cfg.maintainer
      :Select {⍵↑⍨¯1+⍵⍳'-'}pkgID
      :Case 'aplteam'
-         data.maintainer←'kai@aplteam.com'
+         cfg.maintainer←'kai@aplteam.com'
      :Case 'davin'
-         data.maintainer←'davinchurch@gmail.com '
+         cfg.maintainer←'davinchurch@gmail.com '
      :Case 'dyalog'
-         data.maintainer←'support@dyalog.com'
+         cfg.maintainer←'support@dyalog.com'
      :EndSelect
  :EndIf
 
  :If 'dyalog-Jarvis'≡##.##.Registry.RemoveVersionNumber pkgID
-     data.info_url←'https://github.com/Dyalog/Jarvis'
+     cfg.info_url←'https://github.com/Dyalog/Jarvis'
  :EndIf
 ⍝Done

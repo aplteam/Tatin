@@ -14,9 +14,7 @@ keywords: apl,dyalog,host,publish,registry,tatin,ui
 {: .typewriter}
 
 :fontawesome-solid-terminal:
-[User commands](user-commands.md)<br>
-:fontawesome-solid-terminal:
-[User commands for hosting](user-commands-host.md)
+[User commands](user-commands.md)
 
 
 ---

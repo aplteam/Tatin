@@ -34,15 +34,14 @@ CSS files, BAT files, icons, images, config files, documentation, DLLs, etc.
 
 It may depend on other packages: Tatin manages the dependencies behind the scenes.
 
-**_
-FIXME Detail: move elsewhere
+<!-- FIXME Detail: move elsewhere
 ??? warning "A file for each object"
 
 	Tatin requires its source files to carry exactly one APL object each: a function, operator, array, class, interface, or a namespace.
 
 	Dyalog APL supports multiple APL objects in a single text file; Tatin does not.
 	Nor is it compatible with SALT, although the extension `.dyalog` is supported.
- _**
+ -->
 
 !!! detail "Tatin package licences impose few restrictions on your use of the software."
 

@@ -12,7 +12,7 @@
          :If ~⎕NEXISTS codeFile,'.executed' ⍝ In case a new version brings along a maintenance file that has already been executed
              ref←⎕NS''
              body←⊃F.NGET codeFile 1
-             Reg.Assert' '=1↑0⍴ref.⎕FX body
+             ('Could not fix maintenance function ',codeFile)Reg.Assert' '=1↑0⍴ref.⎕FX body
              function←ref.⍎⊃↓ref.⎕NL 3
              pkgFolderList←,Reg.GetAllPackages G.RegistryPath
              :Trap 0

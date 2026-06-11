@@ -17,9 +17,14 @@ or (better) use a [reverse proxy](#reverse-proxy) to shield your Tatin registry 
 
 The server requires and accepts API keys according to `Credentials.csv` in the server’s home folder.
 
-!!! tip "Create a UUID and use that as an API key."
+!!! detail "Create a UUID and use that as an API key"
 
-**_ FIXME How? -_**
+    ```
+          ]LoadPackages APLTreeUtils2
+    1 package loaded into #
+          APLTreeUtils2.Create_UUID
+    ...
+    ```      
 
 ### Add an API key
 
@@ -85,14 +90,6 @@ The rules are read in sequence and can mix different scenarios.
 To delete a rule for a group, edit the file `Credentials.csv`.
 
 
-<!-- If a new group needs to be added, or a new API key needs to be assigned to an existing group, you must create a file `Credentials.txt`, see above.
-
-##### Comments
-
-The files `Credentials.txt` as well as `Credentials.csv` both allow comment lines: any line that has a `;` as the very first character is regarded a comment.
- -->
-
-
 ## :fontawesome-solid-certificate: Security certificates
 
 Encrypting communications (HTTPS) requires security certificates.
@@ -105,7 +102,8 @@ GitHub blocks downloads of certificates.
 If the PEMs are missing, you should see eponymous files with a further extension `.RemoveMe`.
 
 Removing that extension should produce what you need.
-**_ FIXME How to enable HTTPS for Plodder? _**
+
+!!! detail "You can force Plodder to use port 443 instead of 80 by setting `[CONFIG]Secure` in Plodder's INI file to 1."
 
 !!! tip "Instead of enabling HTTPS, shield the server with a reverse proxy."
 
@@ -127,7 +125,7 @@ Add the following lines to the web server’s configuration file, typically `/et
     ProxyPass / http://localhost:8081/
     ProxyPassReverse / http://localhost:8081/
 
-In `/etc/apache2/sites-enabled` there should be just a link pointing to `/etc/apache2/sites-available`.
+In `/etc/apache2/sites-enabled`, there should be just a link pointing to `/etc/apache2/sites-available`.
 
 The `ProxyPass` directive forwards incoming requests to the Tatin server.
 

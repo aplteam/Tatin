@@ -524,48 +524,6 @@ force     | Overwrite existing installation.
 !!! detail "Makes the Tatin API available."
 
 
-## :fontawesome-solid-terminal: Maintenance
-
-    ]TATIN.Maintenance [path]
-
-Where `path` is a path to a folder containing one or more packages,
-ask me to select functions from the Maintenance Library,
-then apply them to the packages.
-
-Invoked with an option, the command displays information only
-and leaves the packages untouched.
-
------|--------------------------------------------------------
-dry  | Show what the command would do.
-info | Show more information about the command and its purpose.
-show | Show the leading comments of the selected functions.
-
-The `Maintenance/` folder in the Tatin installation folder holds maintenance jobs:
-APLF files for functions that modify Tatin packages.
-
-The command asks you to pick jobs to run from the Maintenance Folder,
-then searches recursively in the file path for package config files.
-When it finds one, it applies the maintenance functions sequentially,
-with the package config data as argument, **_ FIXME Not 'G'? _**
-receiving the same as result, possibly modified,
-which it writes back to the package, and also to the ZIP file.
-
-The name of a maintenance function follows a pattern:
-==the date it was introduced==, and **_ FIXME No longer true? _**
-a short description of what it does.
-Tatin records the run and prevents repetition,
-by appending the extension `.executed` to the APLF file's name.
-
-Some use cases:
-
--   inject new properties into package config files
--   remove deprecated properties from package config files
--   rename properties in package config files
-
-Release notes tell you when a maintenance function is introduced,
-and when, why, and for what to use it.
-
-
 ## :fontawesome-solid-terminal: Package config
 
     ]TATIN.PackageConfig [source]

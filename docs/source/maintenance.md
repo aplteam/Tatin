@@ -39,8 +39,6 @@ The purpose is to change packages managed by a Tatin server.
 
 If the server finds APLFs in the Maintenance Folder during housekeeping, it loads and executes them.
 
-!!! detail "Note that the user command `]Tatin.Maintenance` can be used in a similar fashion for *installed packages*."
-
 Once executed, a file is renamed by adding an extension `.executed`,
 so it is not run again.
 That also documents what jobs were executed, and when.

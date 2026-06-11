@@ -14,7 +14,7 @@ The most important maintenance job is to curate the tags.
 
 Tags can be very useful for finding a package, but package authors may use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, or tags that make no sense, such as the group name or `dyalog` etc.
 
-To be useful, tags needs curating.
+To be useful, tags need curating.
 
 A package’s tags are defined in its [configuration file](package-configuration).
 Merely changing the config file is enough: the server watches for such changes and adds the new config to the package ZIP, thus updating it.
@@ -27,6 +27,8 @@ Create and run maintenance jobs to correct problems in the package config files.
 The [Maintenance Folder](glossary.md) holds maintenance jobs in the form of APL function files (APLFs).
 The downloaded server includes some examples.
 
+The purpose is to change packages managed by a Tatin server.
+
 !!! detail inline end ""
 
     If a job crashes, the server
@@ -36,18 +38,23 @@ The downloaded server includes some examples.
     1.  renames the file from `*.aplf` to `*.crashed` to stop it being run again
 
 If the server finds APLFs in the Maintenance Folder during housekeeping, it loads and executes them.
-**_ FIXME Is this ‘batch’ arrangement replaced by the user command? __*
+
+!!! detail "Note that the user command `]Tatin.Maintenance` can be used in a similar fashion for *installed packages*."
 
 Once executed, a file is renamed by adding an extension `.executed`,
 so it is not run again.
 That also documents what jobs were executed, and when.
 
-For example, a file `RemoveDyalogFromTags.aplf` gets loaded into an unnamed namespace and called with a right argument `G` (for _globals_). **_ FIXME not the config param space? _**
+For example, a file `RemoveDyalogFromTags.aplf` gets loaded into an unnamed namespace and called with
+
+* the package ID as the left argument
+* a two-element vector as the right argument:
+  * The first element is the package configuration as a namespace
+  * The second argument is the path to the Registry
+
 Once executed, the file is renamed to `RemoveDyalogFromTags.aplf.executed`.
 
-:fontawesome-solid-terminal:
-User command:
-[`]Maintenance`](user-commands-host.md#maintenance)
+Note that the user command `]Maintenance` serves a very different purpose: It can be used to adapt *installed* packages!
 
 
 
@@ -98,7 +105,7 @@ Often the subfolder `docs/` is to be replaced. (Contains the documentation.)
     The folder `maintenance/` documents changes made to the packages:
     you don’t want to lose this.
 
-If the new folder is not empty, copy its content over.
+If the new folder is not empty, copy its contents over.
 Maintenance files can be used to carry out changes on all or some of the packages managed by the server, like adding a new property to the package config files of all packages.
 
 

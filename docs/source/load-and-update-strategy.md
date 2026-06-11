@@ -136,7 +136,7 @@ Imagine these packages all hosted by a Tatin server with alias `MyTatin`.
     mygroup-Goo-2.1.0 ---> Zoo-1.2.0
                            Zoo-1.3.0
 
-While `Foo` relies on `Zoo` 1.1.1, `Goo` needs `Zoo` 1.2.0.
+While `Foo` relies on `Zoo` 1.1.1, `Goo` needs `Zoo` 1.2.0. Version 1.3.0 of `Zoo` is also available.
 What does Tatin do about this?
 
 It depends on what you do.
@@ -154,8 +154,7 @@ Goo
 
 ### Getting the latest version
 
-<!-- FIXME What does Foo-1.3.0 depend on? -->
-Suppose version 1.3.0 of `Foo` is the latest available with major number&nbsp;1,
+Suppose version 1.0.0 of `Foo` is the latest available with major number 1,
 then this would have been sufficient:
 
     ]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1 #.MyPkgs
@@ -180,7 +179,7 @@ Looking under the covers:
 
           #._tatin.⎕NL 9
     mygroup_Foo_1_0_0
-    mygroup_Goo_2_1_3
+    mygroup_Goo_2_1_0
     mygroup_Zoo_1_1_1
     mygroup_Zoo_1_2_0
 

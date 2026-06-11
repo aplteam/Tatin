@@ -20,6 +20,7 @@ The server requires and accepts API keys according to `Credentials.csv` in the s
 !!! detail "Create a UUID and use that as an API key"
 
     ```
+          ⍝ One way to create a UUID:
           ]LoadPackages APLTreeUtils2
     1 package loaded into #
           APLTreeUtils2.Create_UUID
@@ -33,12 +34,12 @@ To add an API key to the stored credentials, put it in a file `Credentials.txt` 
     <group-name>,<api-key>
     *,<api-key>
 
-The server:
+At the next house-keeping event the server will detect the file and then:
 
--   deletes from `Credentials.csv` rules with matching group names
--   creates a Salt for each API key in `Credentials.txt`
--   converts each key and its Salt into a hash and records the rule in `Credentials.csv`
--   deletes file `Credentials.txt`
+-   delete from `Credentials.csv` rules with matching group names
+-   create a Salt for each API key in `Credentials.txt`
+-   convert each key and its Salt into a hash and record the rule in `Credentials.csv`
+-   delete file `Credentials.txt`
 
 
 ### Credential rules
@@ -99,11 +100,11 @@ The server download includes two:
     Assets/Runtime/Certificates/localhost-[cert|key].pem
 
 GitHub blocks downloads of certificates.
-If the PEMs are missing, you should see eponymous files with a further extension `.RemoveMe`.
+If the PEMs are missing, look for files with the same names but with a `.RemoveMe` extension appended.
 
 Removing that extension should produce what you need.
 
-!!! detail "You can force Plodder to use port 443 instead of 80 by setting `[CONFIG]Secure` in Plodder's INI file to 1."
+To activate HTTPS, set `[CONFIG]Secure` to `1` in Plodder's INI file; this switches Plodder from port 80 to port 443.
 
 !!! tip "Instead of enabling HTTPS, shield the server with a reverse proxy."
 

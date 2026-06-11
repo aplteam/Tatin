@@ -41,7 +41,7 @@ and would break on version 1.1.1, which doesn’t have them.
 Several strategies are possible:
 
 1.  Load both versions of `Zoo`: let `Foo` use 1.1.1 and `Goo` 1.2.0.
-1.  Load `Zoo` version 1.2.0 and let `Zoo` and `Goo` both use it.
+1.  Load `Zoo` version 1.2.0 and let `Foo` and `Goo` both use it.
 1.  Check the server, load the latest version available (1.3.0) and use that.
 
 Each of these options is used by different package managers in the wild.
@@ -90,7 +90,7 @@ In our example
 This means `Foo` will also use version 1.2.0 of `Zoo`.
 
 This strategy is called [Minimal Version Selection](https://research.swtch.com/vgo-mvs "Link to the paper defining it") (MVS).
-It guarantees that when you rebuild you get the same result, but it will grab the latest installed version.
+It guarantees that when you rebuild, you get the same result, but it will grab the latest installed version.
 
 
 
@@ -140,7 +140,7 @@ While `Foo` relies on `Zoo` 1.1.1, `Goo` needs `Zoo` 1.2.0.
 What does Tatin do about this?
 
 It depends on what you do.
-Let’s first load `Zoo` and `Goo` into the workspace, the usual way to inspect a package:
+Let’s first load `Foo` and `Goo` into the workspace, the usual way to inspect a package:
 
 ```apl
       ]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1.0.0 #.MyPkgs
@@ -265,7 +265,7 @@ In our example the pruning eliminates `Zoo` 1.1.1:
 rather than loading `Zoo` twice, Tatin loads only the latest **installed** version.
 Both `Foo` and `Goo` will use `Zoo` version 1.2.0.
 
-## Enforce update when a package is available with a hight major version number.
+## Enforce update when a package is available with a higher major version number.
 
 One way to update to a new major version is to delete all packages from an installation folder, update the dependency file to refer to the new major version number and then open the project with Cider. 
 

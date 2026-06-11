@@ -1,6 +1,6 @@
 ---
 title: 'Testing Tatin'
-description: 'How to execute the test suite, and how to build a new version.'
+description: 'How to execute the Tatin test suite.'
 keywords: 'apl, dyalog, github, tatin, test, testing'
 ---
 # Testing Tatin
@@ -30,17 +30,17 @@ Only the basics are covered here.
 
     It changes the current directory, establishes all required references and instantiates the `Tester2` class as `T`.
 
-    You need call `Prepare` only once.
+    You need to call `Prepare` only once.
 
 
-1.  **Run** the tests.
+1.  **Run** the tests — see [Run the full test suite](#run-the-full-test-suite) below.
 
 
 ## :fontawesome-solid-play: Run the full test suite
 
         #.Tatin.TestCases.RunTests
 
-This runs all the tests in Debug mode, so if something goes wrong the framework will stop and you can investigate right away,
+This runs all the tests in Debug mode, so if something goes wrong the framework will stop and you can investigate right away.
 
 You will be asked if you want to copy the test data to a temporary folder in preparation.
 The usual answer is Yes.
@@ -116,7 +116,7 @@ The first example below runs the `Test_UC_600` function, and so on.
         #.Tatin.TestCases.T.RunThese 'API,Misc'          ⍝ two groups
         #.Tatin.TestCases.T.RunThese '~UserCommand'      ⍝ all except..
 
-Depending on which test cases you select, you might not need test data, or even a running test server,
+Depending on which test cases you select, you might not need test data, or even a running test server.
 
 
 ## :fontawesome-solid-list-check: Run batch tests
@@ -126,8 +126,6 @@ Batch tests do not require user interaction.
 To run only the batch tests:
 
     #.Tatin.TestCases.RunBatchTests 1
-
-<!-- FIXME What – what, no preparation? -->
 
 You must pass a 1 as right argument in order to run the function.
 
@@ -156,23 +154,6 @@ When set to 1, tests are run in Debug mode.
     1 #.Tatin.TestCases.T.RunThese 'UC' (600 601 602)
     1 #.Tatin.TestCases.RunBatchTests 1
 
-<!-- Assume these are executed by #.Tatin.TestCases.RunTests and #.Tatin.TestCases.Prepare
-
-## Prepare for testing
-
-### Prepare client
-
-To run the test suite, prepare the client.
-
-    #.Tatin.Admin.Initialize_Client
-
-### Prepare server
-
-If you also want to run the test server, independently from the test suite, prepare the server – but in its own own workspace.
-
-    #.Tatin.Admin.Initialize_Server
- -->
-
 
 ## :fontawesome-solid-code-pull-request: A new version for testing
 
@@ -184,6 +165,8 @@ For example, suppose one group of tests executes user commands.
 If your code changes affect the commands, then you need the changed code in `⎕SE` for testing – but that requires that you first create a new version.
 
 For this reason, a test checks that the version number in the workspace and in `⎕SE` match.
+
+See [Create a new version](create-version.md) for how to do this.
 
 
 ## :fontawesome-solid-gears: Automated builds
@@ -209,16 +192,17 @@ not       | A message is printed to the session, indicating success or failure.
 
 !!! warning
 
-    `OFF=1` in the command line would also work, but would kill Plodder, the underlying HTTP server used by Tatin.
-    That might be too early: for example, you could not then get a code coverage report.
+    `OFF2` is a custom parameter checked by the test suite itself, giving it control over when `⎕OFF` is called — allowing cleanup such as code-coverage reporting to finish first.
+
+    `OFF=1` would also work, but Plodder (the underlying HTTP server) would call `⎕OFF` directly, before the test suite can clean up.
 
 
 ### Running tests from the command line
 
 The Tatin root directory contains shell scripts that run the batch tests.
 
-    RunTests.bat // Windows
-    RunTests.sh  // Linux, macOS
+    RunTests.bat  # Windows
+    RunTests.sh   # Linux, macOS
 
 
 These are templates: check their contents, you might need to make amendments.

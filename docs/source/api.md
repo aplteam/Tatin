@@ -667,7 +667,7 @@ package ID | aggregate | column 1 | column 2
 {group}-{name} | 0    | all versions of the package | # of major versions
 {group}-{name} | 1    | all major versions of that package | # of major versions
 {group}-{name}-{major} | – | all versions (minor and patch) | # of major versions
-{group}-{name}-{major}-{minor} | – | all patch versions of the package | ???
+{group}-{name}-{major}-{minor} | – | all patch versions of the package | (empty)
 
 ```apl
       ⍴r←⎕SE.Tatin.ListPackages '[tatin]'
@@ -783,7 +783,7 @@ Result `mat` has a column with full package names.
 15 1
 ```
 If version precedence cannot be established from the version numbers alone (often a problem
-with beta versions, then the publishing date is taken into account.
+with beta versions), then the publishing date is taken into account.
 
 
 ## :fontawesome-solid-code: Load dependencies
@@ -1050,13 +1050,13 @@ If `packageID` is empty, Tatin attempts to clean up: remove any packages that ar
 FIXME If this relates only to package dependencies why confirm
       pkg is mentioned in the dependency file?
       How else would it have been identified?
-Kai: just a safety against tryijng to un-install something that is not installed
+Kai: just a safety against trying to un-install something that is not installed
 -->      
 
 To keep things simple Tatin performs the following steps:
 
-1. Checks whether the package ID is mentioned in the dependency file. If not an error is thrown
-1. Removes `packagedID` from the dependency file
+1. Checks whether the packageID is mentioned in the dependency file. If not an error is thrown
+1. Removes `packageID` from the dependency file
 1. Re-compile the build list based on the new dependency file
 1. Removes all packages that are not mentioned in the build list anymore
 

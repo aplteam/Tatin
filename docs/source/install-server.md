@@ -1,5 +1,5 @@
 ---
-title: 'Tatin: Server Installtion'
+title: 'Tatin: Server Installation'
 description: 'How to install and update your own Tatin registry server'
 keywords: 'apl, dyalog, registry, server, tatin'
 ---
@@ -65,7 +65,7 @@ AppName | Name used by Tatin for logging into the Windows Event Log.<br><br>The 
 Base<br>BaseTagPort | (Ignored from version 0.104.0.)
 Caption | `H1` element for HTML pages.
 DeletePackages | Deleting packages is: 0 – not allowed; 1 – allowed; 2 – allowed only for [betas](glossary.md).<br><br>The [Principal Registry](https://tatin.dev) will not delete anything. A build can always be reproduced.
-Registry | Path to the the registry.
+Registry | Path to the registry.
 ReloadWS | Flag: whether Tatin frequently checks for and reloads new versions of workspace `Server.dws`, meaning it will (kind of) restart itself.<br><br>Not recommended in production, but can be helpful in development.
 Secure | Flag: whether certificates are used (HTTPS) or not (HTTP).
 Title | Browser window or tab title for HTML pages.
@@ -80,7 +80,7 @@ Your Tatin server can send alerts by email.
 Names of the licences (and URLs to their definitions) the server accepts.
 
 The INI section is optional.
-if absent, the website shows no _Licensing_ menu item, and the server accepts any license, including packages that lack a `license` property.
+If absent, the website shows no _Licensing_ menu item, and the server accepts any license, including packages that lack a `license` property.
 
 By convention, `BuildPackage` copies any file `LICENSE` in the root of the project to the root of a package.
 This convention is independent of the INI file.

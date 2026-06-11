@@ -1,6 +1,6 @@
 ---
 title: 'Tatin: Package Configuration'
-description: 'Your package’s configuration contains essential information about it.'
+description: "Your package’s configuration contains essential information about it."
 keywords: apl,configuration,package,tatin
 ---
 # Package configuration
@@ -279,7 +279,7 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
         ├── apl-package.json
         └── cider.config
         ```
-        In this case, the package `source` package could be `APLSource/Goo`, because`Admin` and `TestCases` do not go in the package.
+        In this case, the package `source` could be `APLSource/Goo`, because `Admin` and `TestCases` do not go in the package.
 
 
 `tags`
@@ -294,7 +294,7 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
         Admins of the Principal Registry might silently edit them to keep them consistent and meaningful.
 
 `userCommandScript`
-: _String._ Path, relative to the project root, of the user-command script. Identifies and required for [user-command packages](publish-packages.md#user-command-packages). (Introduced in Tatin version 0.86.0.)
+: _String._ Path, relative to the project root, of the user-command script. Identifies and is required for [user-command packages](publish-packages.md#user-command-packages). (Introduced in Tatin version 0.86.0.)
 
 
 `version`
@@ -324,7 +324,7 @@ They require special treatment, because
 -   a package’s definitions might depend on them
 -   any subnamespaces inherit the values
 
-Before any code is loaded into a namespace created by `LoadPackages` or `LoadDependencies` Tatin sets these values as
+Before any code is loaded into a namespace created by `LoadPackages` or `LoadDependencies`, Tatin sets these values as
 
 1.  the `io` and `ml` settings in the package configuration; else
 1.  the two Dyalog parameters (environment variables) `Default_IO` and `Default_ML`; else
@@ -442,7 +442,7 @@ So any package function can refer to its metadata
 : _Strings._ [Full package IDs](glossary.md) of this package’s dependencies.
 
 `GetFullPath2AssetsFolder`
-: _String._ Absolute path to the assets, relative to `HOME` – empty if there are none.
+: _String._ Returns path to the assets by putting together `TatinVars,HOME` and `TatinVars,ASSETS` – empty if there are no assets.
 
     If `HOME` is empty or does not exist on disk the result is `ASSETS`
 

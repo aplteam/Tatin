@@ -10,11 +10,13 @@ keywords: apl,dyalog,tatin,ui
 Commands for building, publishing, deprecating, and deleting packages are on a [separate page](user-commands-publish.md).
 
 User commands and their options are case-insensitive.
+
 They all have help built in, for example
+
 ```
 ]tatin -?
 ]tatin -??
-]TATIN.CopyRegistry -?
+]TATIN.LoadPackages -?
 ```
 
 !!! warning "Square brackets in the command syntax"

@@ -1,7 +1,7 @@
 ---
-title: 'Tatin: SemVers'
-description: ''
-keywords: 
+title: 'Tatin: Semantic Versioning'
+description: 'An introduction to Semantic Versioning and how Tatin applies it'
+keywords: apl,build-number,package,semver,semantic-versioning,tatin,version
 ---
 # Tatin and Semantic Versioning
 
@@ -36,7 +36,7 @@ The plus (`+`) is used to separate an (optional) build number from the other par
 
 After {major}-{minor}-{patch} you may add the optional build number. Build numbers _do not_ participate in establishing precedence and are therefore ignored by Tatin when compiling the name of a package and/or a package ZIP file.
 
-I> That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build numbers - they are the same as far as Tatin is concerned.
+!!! detail "That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch-no but have different build numbers - they are the same as far as Tatin is concerned."
 
 A build number, when specified, needs to be separated by a `+`. A build number may consist of digits only.
 
@@ -77,7 +77,7 @@ If chances are high that a consumer might rely on the bug then you should bump t
 
 The minor version number is bumped in case functionality was added to a package. 
 
-That means that compatibility should still be guaranteed: anything else works exactly as before. A consumer should be confident when updating the package that nothing will break. She just may take advantage of, say, a function added to the API.
+That means that compatibility should still be guaranteed: anything else works exactly as before. A consumer should be confident when updating the package that nothing will break, and may take advantage of, say, a function added to the API.
 
 A> ### Chances of breaking things
 A>

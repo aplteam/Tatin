@@ -56,7 +56,7 @@ List all the packages on the principal registry.
  aplteam-APLProcess                          1
  ...
 ```
-Each package is identifed by a name and group name.
+Each package is identified by a name and group name.
 The listing shows the number of major versions of the package.
 
 :fontawesome-solid-arrow-up-right-from-square: [Semantic versioning](https://semver.org)
@@ -128,9 +128,8 @@ MarkAPL is one (the only one) of the dependencies of Foo.
 #._tatin.aplteam_MarkAPL_11_0_1
 ```
 
-!!! tip "Tatin is taciturn"
+!!! tip "Tatin is quiet by default"
 
-    Tatin works quietly by default.
     Use the `-verbose` flag if you need to see more of what is going on when packages are loaded.
 
 
@@ -186,15 +185,6 @@ To remove Tatin and/or Cider from the installation folder:
 
     ]Deactivate [all|cider|tatin] [-versionagnostic]
 
-
-<!-- ## :dyalog-cider-logo: Cider -->
-
-
-
-<!-- FIXME move elsewhere (SJT)
-Well, until then it stays here
---> 
-
 ### Installing several packages at once
 
 Note that `InstallPackages` accepts several package IDs, separated by commas:
@@ -203,18 +193,19 @@ Note that `InstallPackages` accepts several package IDs, separated by commas:
       ]tatin.InstallPackages Tester2,MarkAPL,Laguntza /Foo/packages
 ```
 
-This will load three packages and all their dependencies at once. You might find this significantly faster than installing them one-by-one.
+This will install three packages and all their dependencies at once. You might find this significantly faster than installing them one-by-one.
 
-!> ### Using an alias for a package
-=> It is possible to use an alias for a package. Check this example:
-=> ```
-=> ]tatin.InstallPackages F@FilesAndDirs
-=> ```
-=> This creates a ref `F` for FilesAndDirs. However, the purpose of such aliases is not to allow you to create
-=> a kind of shortcut for the package in question, this allows you to load to different versions of a package,
-=> something that is sometimes necessary due to specific requirements.
-=>
-=> All you need to do is to assign different aliases to the different versions of the package.
+!!! details "Using an alias for a package"
+
+    It is possible to use an alias for a package. Check this example:
+    ```
+    ]tatin.InstallPackages F@FilesAndDirs
+    ```
+    This creates a ref `F` for `FilesAndDirs`. However, the purpose of such aliases is not to allow you to create
+    a kind of shortcut for the package in question, this allows you to load two different versions of a package,
+    something that is sometimes necessary due to specific requirements.
+    
+    All you need to do is to assign different aliases to the different versions of the package.
 
 
 ### Checking out a package: `LoadPackages`
@@ -230,7 +221,7 @@ Notes:
 
 * Loading a package might well be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case.
 
-  This is discussed in the paper `TatinsLoadAndUpdateStrategy.html`
+  This is discussed in [Load-and-update-strategy](load-and-update-strategy.md)
 
 
 Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and optionally a target namespace:
@@ -247,11 +238,13 @@ Let's load the `MarkAPL` package into the workspace; for that we need to specify
   ...
 ```
 
-I> Without `-verbose` the command is taciturn:
-I> ```
-I> ]tatin.LoadPackages [tatin]MarkAPL
-I> 4 packages (including dependencies) loaded
-I> ```
+!!! details "verbose versus quiet"
+
+    Without `-verbose` the command is quiet:
+    ```
+    ]tatin.LoadPackages [tatin]MarkAPL
+    4 packages (including dependencies) loaded
+    ```
 
 Here we did not specify a target namespace, so the package was loaded into `#`. If the target namespace is something like `#.MyTests`, it may or may not exist. If it does not, Tatin will create it.
 
@@ -265,7 +258,7 @@ _tatin
 
 That reference points to the namespace that holds the package as such, which is loaded into `_tatin`: this is the namespace Tatin uses to manage all packages.
 
-I> The name `_tatin` is hard-coded and _cannot_ be changed.
+!!! details "The name `_tatin` is hard-coded and _cannot_ be changed."
 
 The name of the namespace carries the version number:
 
@@ -283,7 +276,18 @@ aplteam_MarkAPL_10_0_0
 aplteam_OS_3_0_0
 ```
 
-No matter whether the APL code of a package is a single function (or operator) or a bunch of functions and operators or a single namespace (ordinary or scripted) or a bunch of namespaces or a single class or a bunch of classes or a mixture of all these APL objects, they are going to live in the top namespace of a package.
+No matter whether the APL code of a package is...
+
+* a single function 
+* a single operator
+* a bunch of functions and operators
+* a single namespace (ordinary or scripted)
+* a bunch of namespaces 
+* a single class 
+* a bunch of classes 
+* a mixture of all these APL objects,
+
+...they are going to live in the top namespace of a package.
 
 But Tatin will also inject references into that namespace pointing to the dependencies, therefore:
 
@@ -305,27 +309,27 @@ For these two packages, references are injected. `FilesAndDirs` depends on `OS`,
 The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages:
 you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first.
 
-That way Tatin would find the package on your local machine even when they are not loaded as principal packages but just as dependencies.
+That way Tatin would find packages on your local machine even when they are not loaded as principal packages but just as dependencies.
 
-Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and --- don't forget that step! --- delete it from your local Registry.
+Later, when the package is ready, you could publish it to, say, the principal Tatin server on `https://tatin.dev`, and — don't forget that step! — delete it from your local Registry.
 
 
-A> ### Having the same package in more than one Registry
-A>
-A> In case you juggle with the same package in several Registries you might well be interested in getting a full list.
-A> The `]ListPackages` user command has a syntax for this:
-A>
-A> ```
-A>       ]ListVersions [*]example-versions
-A> ```
-A>
-A> This would check all known Registries with a priority greater than 0 for `example-versions`, and list all hits.
+!!! details "Having the same package in more than one Registry"
+
+    In case you juggle with the same package in several Registries you might well be interested in getting a full list.
+    The `]ListPackages` user command has a syntax for this:
+
+    ```
+    ]ListVersions [*]example-versions
+    ```
+    
+    This would check all known Registries with a priority greater than 0 for `example-versions`, and list all hits.
 
 The fact that Registries with a priority of `0` are not scanned by Tatin allows you to include a Registry like `https://test.tatin.dev` in your user settings. You don't really want that Registry to participate in a scan, but that way you can still execute commands like `]tatin.ListPackages` etc. on it.
 
-A> ### Scanning for dependencies
-A>
-A> Note that Tatin does not only scan all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies as well.
+!!! details "Scanning for dependencies"
+
+    Note that Tatin does not only scan all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies as well.
 
 
 #### Deprecated packages
@@ -335,11 +339,11 @@ Every piece of software will become obsolete one day. Packages are no exception.
 This can be done with the user command `]TATIN.DeprecatePackage`. 
 In short, what the user command does is to publish the latest version available yet as a new version with an increased minor version number and an injected flag `deprecated←1`
 
-A> ### Deleting versus deprecating packages
-A>
-A> Depending on the delete policy operated on a server you might as well delete all obsolete packages, but we discourage you from doing so.
-A>
-A> The reason is that one of Tatin's design goals was to make a build 100% reproducible. This is only achievable if packages are not deleted from a server. That's the reason why the principal Tatin Registry operates a non-delete policy.
+!!! details "Deleting versus deprecating packages"
+
+    Depending on the delete policy operated on a server you might as well delete all obsolete packages, but we discourage you from doing so.
+
+    The reason is that one of Tatin's design goals was to make a build 100% reproducible. This is only achievable if packages are not deleted from a server. That's the reason why the principal Tatin Registry operates a non-delete policy.
 
 For example, let's assume these three packages are published:
 
@@ -390,13 +394,13 @@ If you ask _explicitly_ for an _earlier_ version than the deprecated one, then t
 
 Note that the API functions for loading / installing packages would not complain or warn you at all.
 
-A> ### Mistakenly deprecated a package?
-A>
-A> There is an easy escape route: just publish the package again with an increased minor version number but `deprecated` either set to 0 or removed from the config file, and the package is back on track.
-A>
-A> If `deprecate_comment` was not empty then that should be removed or emptied.
-A>
-A> Once you've done that the very latest published package would no longer carry a "deprecated" flag with the value 1, and therefore it would no longer fulfil the criteria of a deprecated package.
+!!! warning "Mistakenly deprecated a package?"
+
+    There is an easy escape route: just publish the package again with an increased minor version number but `deprecated` either set to 0 or removed from the config file, and the package is back on track.
+    
+    If `deprecate_comment` was not empty then that should be removed or emptied.
+    
+    Once you've done that the very latest published package would no longer carry a "deprecated" flag with the value 1, and therefore it would no longer fulfil the criteria of a deprecated package.
 
 
 #### Tatin Variables
@@ -405,7 +409,7 @@ For every package Tatin will establish a couple of constants. Because APL has no
 
 They are injected into a namespace `TatinVars` which in turn is injected into the top package namespace.
 
-W> Of course this means that theoretically there could be a name clash, but then the name `TatinVars` should certainly not be used by any package author.
+!!! details "Of course this means that theoretically there could be a name clash, but then the name `TatinVars` should certainly not be used by any package author."
 
 Strictly speaking `TatinVars` is a misnomer because the namespace carries just functions, and not a single variable, but all but one of those act as constants, and the exception `GetFullPath2AssetsFolder` was introduced at a later stage, so it was decided to stick with the name `TatinVars` for compatibility.
 
@@ -433,7 +437,7 @@ A vector of character vectors with the package IDs of the packages the package i
 
 This is a function which returns the result of the expression `HOME,'/',ASSETS` if both `HOME` and `ASSETS` are not empty _and_ `HOME` exists on disk. If `HOME` is empty or does not exist on disk then just `ASSETS` is returned.
 
-When accessing assets, you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might than move the WS with the assets folder elsewhere, even to a different machine. The expression `HOME,'/',ASSETS` would then fail.
+When accessing assets, you are advised to always use the `GetFullPath2AssetsFolder` function. Why? Imagine the following scenario as an example: you've loaded packages into a clear workspace, set `⎕WSID` and then saved that WS. Later you make sure that the assets folder of the package becomes a sibling of the workspace. You might then move the WS with the assets folder elsewhere, even to a different machine. The expression `HOME,'/',ASSETS` would then fail.
 
 But the function `GetFullPath2AssetsFolder` would not find `HOME` and therefore return just `ASSETS`, and that allows you to still access the assets successfully, assuming that you changed the current directory to where the workspace was loaded from.
 

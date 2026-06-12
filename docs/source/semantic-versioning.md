@@ -79,11 +79,11 @@ The minor version number is bumped in case functionality was added to a package.
 
 That means that compatibility should still be guaranteed: anything else works exactly as before. A consumer should be confident when updating the package that nothing will break, and may take advantage of, say, a function added to the API.
 
-A> ### Chances of breaking things
-A>
-A> Note that by definition it seems that a change of the minor number is indicating a very low risk: just adding functionality should never change anything that has worked before, while a change in the patch number might come from a bug fix your code relies on. 
-A>
-A> In reality however a version with a new (bumped) minor version number often comes with bug fixes as well.
+!!! details "Chances of breaking things"
+
+    Note that by definition it seems that a change of the minor number is indicating a very low risk: just adding functionality should never change anything that has worked before, while a change in the patch number might come from a bug fix your code relies on. 
+    
+    In reality however a version with a new (bumped) minor version number often comes with bug fixes as well.
 
 ### The Major number
 

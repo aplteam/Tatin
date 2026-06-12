@@ -7,16 +7,6 @@ keywords: apl,dyalog,host,publish,registry,tatin,ui
 
 !!! abstract "User commands for publishing Tatin packages"
 
-[BuildPackage](#build-package)       [DeprecatePackage](#deprecate-package)
-[CreatePackage](#create-package)      [GetDeletePolicy](#get-delete-policy)
-[Debug](#debug)              [PublishPackage](#publish-package)
-[DeletePackages](#delete-packages)     [UsageData](#usage-data)
-{: .typewriter}
-
-:fontawesome-solid-terminal:
-[User commands](user-commands.md)
-
-
 ---
 
 ## :fontawesome-solid-terminal: Build package
@@ -28,7 +18,7 @@ bumping the build number unless the `version` option sets it.
 
 Folder `source` must contain a file `apl-package.json` defining the package.
 
-You can omit `source` and/or `target` if the source is a Cider project.
+You can omit `source` and/or `target` if the source is an opened Cider project. If there is one it will be used; if there are multiple, ask the user.
 
 The command asks you to confirm any assumptions.
 
@@ -59,18 +49,6 @@ Where `target` is a path to a folder, create a new Tatin package in it.
 The command is a wrapper for [`]TATIN.PackageConfig -edit`](user-commands.md#package-config).
 
 
-## :fontawesome-solid-terminal: Debug
-
-    ]TATIN.Debug [toggle]
-
-Where `toggle` is 0, 1, `on` or `off`, set Debug Mode on or off.
-
-If `toggle` is omitted, report current state.
-
-With Debug Mode on, Tatin leaves application errors untrapped so you can investigate them.
-(Error guards in dfns, errors when communicating via TCP/IP and similar errors are still trapped.)
-
-
 ## :fontawesome-solid-terminal: Delete packages
 
     ]TATIN.DeletePackages pattern
@@ -86,12 +64,12 @@ If the pattern matches multiple packages, ask which to delete.
 
 Example arguments:
 
-    https:/tatin.dev/grp-foo-1.0.0         ⍝ registry URL, package ID
-    [test-tatin]grp-foo-1.0.0              ⍝ registry alias, package ID
-    [test-tatin]foo-1.0.0                  ⍝ no group name
-    [test-tatin]foo-1                      ⍝ versions of foo with major=1
-    [test-tatin]foo                        ⍝ versions of foo
-    file:///path/2/Registry/grp-foo-1.0.0  ⍝ local package
+    https://tatin.dev/grp-foo-1.0.0         ⍝ registry URL, package ID
+    [test-tatin]grp-foo-1.0.0               ⍝ registry alias, package ID
+    [test-tatin]foo-1.0.0                   ⍝ no group name
+    [test-tatin]foo-1                       ⍝ versions of foo with major=1
+    [test-tatin]foo                         ⍝ versions of foo
+    file:///path/2/Registry/grp-foo-1.0.0   ⍝ local package
 
 :fontawesome-solid-code: API:
 [`DeletePackages`](api.md#delete-packages)
@@ -107,9 +85,9 @@ Where
 
 -   `majorversion` (optional) is a major version number (omitted, defaults to all major versions)
 
--   `comment` is text explaining why the package is deprecated (remmeber to delimit with quotes)
+-   `comment` is text explaining why the package is deprecated (remember to delimit with quotes)
 
-asks to confirm the action, then create
+asks to confirm the action, then creates
 (for each major version targeted)
 a new minor version with the `deprecated` property set.
 
@@ -118,7 +96,7 @@ force | Don’t ask for confirmation. (Useful mainly for tests.)
 
 Example: Deprecate on `[tatin]` all major versions of `grp-foo`:
 ```
-]TATIN.DeprecatePackages [tatin]grp-foo "Use MarkAPL instead"
+]TATIN.DeprecatePackage [tatin]grp-foo "Use MarkAPL instead"
 ```
 
 :fontawesome-solid-code: API:
@@ -138,9 +116,6 @@ Where (optional) `reg` is
 or if omitted, `[tatin]`,
 report the delete policy (`None`, `Any`, or `JustBetas`) of the server/s concerned
 and cache the result.
-
-Query a registry for its delete policy just once
-and then cache the result.
 
 ------|----------------------------------------
 check | Ignore the cache: query the server and cache the response.
@@ -163,7 +138,7 @@ publish the package to the registry if specified, otherwise to `[tatin]`.
 If `source` is not specified, look for open Cider projects.
 If you find one, use it; if multiple, ask me which.
 
-If the registry’s delete policy is `none`, ask me to confirm publication.
+If the registry’s delete policy is `None`, ask me to confirm publication.
 
 The name of the resulting package is extracted from the ZIP file which therefore must conform
 to the Tatin rules.
@@ -191,6 +166,7 @@ download | Ask me which usage files to download to a subfolder of my temp folder
 folder=  | Download to this empty folder.
 unzip    | Unzip downloaded file/s and delete ZIPs.
 
+Note that `-all`, `-folder=` and `-unzip` only make sense when `-download` is specified.
 !!! detail inline end "Package downloads"
 
     A package request might be one person taking a quick look,
@@ -205,14 +181,14 @@ unzip    | Unzip downloaded file/s and delete ZIPs.
 Each month, Tatin saves its request log as a CSV file,
 compresses it, makes it available for download as `usage-data-<YYYY>-<MM>.csv`,
 and deletes the previous usage file.
-For example, in May 2022 it saved `usage-data-2022-04` and deleted `usage-data-2022-03.csv`.
+For example, in May 2022 it saved `usage-data-2022-04.csv` and deleted `usage-data-2022-03.csv`.
 
-So the filename `usage-data-2022-04` holds requests from 2022-01-01 to 2022-04-30 inclusive.
+So the filename `usage-data-2022-04.csv` holds requests from 2022-01-01 to 2022-04-30 inclusive.
 
 Each January, Tatin collects the data from last year and saves it in a file `usage-data-<YYYY>.csv`.
-It also deletes any files `usage-data-<YYYY>-<MM>`.
+It also deletes any files `usage-data-<YYYY>-<MM>.csv`.
 
-For example, in January 2023 it created a file `usage-data-2022`, and deleted all files `usage-data-2022-*`.
+For example, in January 2023 it created a file `usage-data-2022.csv`, and deleted all files `usage-data-2022-*.csv`.
 
 :fontawesome-solid-desktop:
 A Tatin server [offers a page](https://tatin.dev/v1/usage-data "Link to the principal Tatin server`s Usage Data page") dedicated to the usage data.

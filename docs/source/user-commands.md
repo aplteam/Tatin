@@ -177,6 +177,18 @@ To update to latest minor version use [`]TATIN.ReInstallDependencies`](#reinstal
 (New major versions need installing.)
 
 
+## :fontawesome-solid-terminal: Debug
+
+    ]TATIN.Debug [toggle]
+
+Where `toggle` is 0, 1, `on` or `off`, set Debug Mode on or off.
+
+If `toggle` is omitted, report current state.
+
+With Debug Mode on, Tatin leaves application errors untrapped so you can investigate them.
+(Error guards in dfns, errors when communicating via TCP/IP and similar errors are still trapped.)
+
+
 ## :fontawesome-solid-terminal: Documentation
 
     ]TATIN.Documentation

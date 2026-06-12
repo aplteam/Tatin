@@ -1,15 +1,22 @@
- r←Test_FindDeps_010(stopFlag batchFlag);⎕TRAP;list;buff
+ r←Test_FindDeps_010(stopFlag batchFlag);⎕TRAP;list;buff;pkgs;dir;res
 ⍝ Exercise FindDependencies with defaults on just a package name
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
 
  r←T._Failed
 
- list←##.Client.FindDependencies'filesanddirs,HandleError,doesnotexist'##.CiderConfig.HOME
- →T.PassesIf 1=≢list                                            ⍝ Just one URL
- →T.PassesIf 2=≢1⊃list                                          ⍝ Hosts the "URL" and the list of hits
- →T.PassesIf≡/F.NormalizePath¨##.CiderConfig.HOME(1 1⊃list)     ⍝ Must match the right argument provided to FindDependencies
- →T.PassesIf 0<≢1 2⊃list                                        ⍝ Must not be empty, of course
- buff←{⎕C⊃,/1↓⎕NPARTS ⍵}¨F.ListDirs 1 2 1⊃list                  ⍝ Get the package IDs from the paths
- →T.PassesIf 1 1 0≡∨/¨∨/¨¨(⊂¨'filesanddirs' 'handleerror' 'doesnotexist')⍷¨¨⊂buff  ⍝ They all must turn up except "doesnotexist"...
+ dir←∆GetTempDir ⍬
+ res←TC.InstallPackages'HandleError'dir
+ →T.GoToTidyUp'aplteam-HandleError-'{⍺≢(≢⍺)↑⍵}∊res
+
+ list←##.Client.FindDependencies'IniFiles,HandleError,doesnotexist'dir
+ →T.GoToTidyUp 1≠≢list                                          ⍝ Just one URL
+ T.GoToTidyUp 2≠≢1⊃list                                         ⍝ Hosts the "URL" and the list of hits
+ →T.GoToTidyUp≢/F.NormalizePath¨dir(1 1⊃list)                   ⍝ Must match the right argument provided to FindDependencies
+ →T.GoToTidyUp~0<≢1 2⊃list                                      ⍝ Must not be empty, of course
+ buff←{⎕C⊃,/1↓⎕NPARTS ⍵}¨F.ListDirs dir                         ⍝ Get the package IDs from the paths
+ →T.GoToTidyUp 1 1 0≢∨/¨∨/¨¨(⊂¨'inifiles' 'handleerror' 'doesnotexist')⍷¨¨⊂buff  ⍝ They all must turn up except "doesnotexist"...
 
  r←T._OK
+
+∆TidyUp:
+ {}F.RmDirByForce dir

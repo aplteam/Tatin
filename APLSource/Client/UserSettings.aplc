@@ -306,11 +306,16 @@
       flag←∨/EqualsAliasOrName uriOrAlias
     ∇
 
-    ∇ {r}←RemoveRegistry idOrUriOrAlias;bool
-    ⍝ Removes a Registry from the user settings.\\
+    ∇ {r}←{removeMultiple}RemoveRegistry idOrUriOrAlias;bool
+    ⍝ Removes a single (if any) Registry from the user settings.\\
+    ⍝ `removeMultiple` defaults to 0, meaning that when you specify a URL and that
+    ⍝ matches more than one Registry, an error is thrown. You can enforce the deletion
+    ⍝ of multiple Registries by passing a 1 as left argument, but you must not
+    ⍝ remove all Registries.
     ⍝ `⍵` can be either an id or a uri or an alias.\\
     ⍝ `←` is 1 in case something was removed and 0 otherwise.
       :Access Public Instance
+      removeMultiple←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'removeMultiple'
       :If 0=≢_registries
           r←0
       :Else
@@ -323,6 +328,8 @@
               :Else
                   bool←~EqualsAliasOrName idOrUriOrAlias
               :EndIf
+              'You must not remove more than one registry at a time'Assert removeMultiple∨1≥+/~bool
+              'You must not remove all registries'Assert~∧/~bool
               _registries←bool/_registries
               r←∨/~bool
           :EndIf
@@ -411,8 +418,8 @@
               uri←{⍵/⍨3>+\⍵='/'}uri
           :EndIf
           uri←AddSlash uri
-          :If ∧/({' '~⍨⍵↑⍨1+-':'⍳⍨⌽⍵}uri)∊⎕D
-              port←⊃(//)⎕VFI{⍵↑⍨1+-':'⍳⍨⌽⍵}uri
+          :If ∧/({' /'~⍨⍵↑⍨1+-':'⍳⍨⌽⍵}uri)∊⎕D
+              port←⊃(//)⎕VFI{'/'~⍨⍵↑⍨1+-':'⍳⍨⌽⍵}uri
           :Else
               port←0 80 443
           :EndIf

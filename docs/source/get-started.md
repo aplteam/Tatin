@@ -365,7 +365,7 @@ which carries the comment if you've specified one with `-comment=`; this should 
 
 From now on both the "Packages" web page and `]TATIN.ListPackages` won't list these four packages anymore.
 
-Note that `]TATIN.ListDeprecated` is designed to list just the deprecated packages. If you want the list to include also the earlier versions --- which are now sort of hidden by 1.2.0 --- then you need to specify the `-all` flag.
+Note that `]TATIN.ListDeprecated` is designed to list just the deprecated packages. If you want the list to include also the earlier versions — which are now sort of hidden by 1.2.0 — then you need to specify the `-all` flag.
 
 With `-all` a matrix with two columns rather than one is returned, 
 with the second column carrying an asterisk for those packages that actually do carry `deprecated←1` in their config file. That would be at least the very last one.

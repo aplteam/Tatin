@@ -1,7 +1,7 @@
 ---
-title: 'Secure your Tatin registry'
-description: 'How to authorise users and secure your Tatin server from attack'
-keywords: 'apl, certificate, credentials, dyalog, https, key, registry, reverse-proxy, security, server, tatin'
+title: "Secure your Tatin registry"
+description: "How to authorise users and secure your Tatin server from attack"
+keywords: "apl, certificate, credentials, dyalog, https, key, registry, reverse-proxy, security, server, tatin"
 ---
 # Secure your Tatin registry
 

@@ -1,7 +1,7 @@
 ---
-title: 'Create new Tatin version'
-description: 'This article is about what an administrator of the Tatin project on GitHub does after accepting a PR or finishing work on a branch.'
-keywords: 'apl, dyalog, github, proofread, tatin, version'
+title: "Create new Tatin version"
+description: "This article is about what an administrator of the Tatin project on GitHub does after accepting a PR or finishing work on a branch."
+keywords: "apl, dyalog, github, proofread, tatin, version"
 ---
 # Create a new version of Tatin
 

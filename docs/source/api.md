@@ -1,6 +1,6 @@
 ---
-title: 'Tatin API reference'
-description: 'Complete reference to the Tatin API, which lets you call the Dyalog APL package manager from your own code.'
+title: "Tatin API reference"
+description: "Complete reference to the Tatin API, which lets you call the Dyalog APL package manager from your own code."
 keywords: api, apl, dyalog, source, tatin
 ---
 # API functions

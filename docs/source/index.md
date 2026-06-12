@@ -1,6 +1,6 @@
 ---
-title: 'About Tatin'
-description: 'Tatin is the community cross-platform package manager and registry for Dyalog APL'
+title: "About Tatin"
+description: "Tatin is the community cross-platform package manager and registry for Dyalog APL"
 keywords: apl, dyalog, package
 ---
 # About Tatin

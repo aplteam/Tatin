@@ -1,6 +1,6 @@
 ---
-title: 'Tatin User Settings'
-description: 'Settings govern your use of Tatin'
+title: "Tatin User Settings"
+description: "Settings govern your use of Tatin"
 keywords: apl,settings,tatin
 ---
 # User settings

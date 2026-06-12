@@ -1,6 +1,6 @@
 ---
-title: 'Tatin glossary'
-description: 'An explanation of terms used in the Tatin documentation'
+title: "Tatin glossary"
+description: "An explanation of terms used in the Tatin documentation"
 keywords: apl, documentation, glossary, tatin
 ---
 # Glossary

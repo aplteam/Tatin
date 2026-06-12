@@ -1,7 +1,7 @@
 ---
 title: "Tatin: About hosting"
-description: 'Host a personal, team, corporate or public Tatin registry.'
-keywords: 'apl, dyalog, host, registry, server, tatin'
+description: "Host a personal, team, corporate or public Tatin registry."
+keywords: "apl, dyalog, host, registry, server, tatin"
 ---
 # Host a Tatin registry
 

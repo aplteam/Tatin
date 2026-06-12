@@ -1,6 +1,6 @@
 ---
-title: 'Tatin: Before You Publish'
-description: 'Package identity, licences, and API keys: what you need before publishing a Tatin package'
+title: "Tatin: Before You Publish"
+description: "Package identity, licences, and API keys: what you need before publishing a Tatin package"
 keywords: apl,api-key,licence,package,version,tatin
 ---
 # Before you publish

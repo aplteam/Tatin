@@ -1,5 +1,5 @@
 ---
-title: 'Tatin: Package Configuration'
+title: "Tatin: Package Configuration"
 description: "Your package’s configuration contains essential information about it."
 keywords: apl,configuration,package,tatin
 ---

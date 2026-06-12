@@ -1,6 +1,6 @@
 ---
-title: 'Tatin user commands for publishing'
-description: 'Further user commands for publishing Tatin packages'
+title: "Tatin user commands for publishing"
+description: "Further user commands for publishing Tatin packages"
 keywords: apl,dyalog,host,publish,registry,tatin,ui
 ---
 # User commands for publishing

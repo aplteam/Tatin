@@ -1,6 +1,6 @@
 ---
-title: 'Tatin: Semantic Versioning'
-description: 'An introduction to Semantic Versioning and how Tatin applies it'
+title: "Tatin: Semantic Versioning"
+description: "An introduction to Semantic Versioning and how Tatin applies it"
 keywords: apl,build-number,package,semver,semantic-versioning,tatin,version
 ---
 # Tatin and Semantic Versioning

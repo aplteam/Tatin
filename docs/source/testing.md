@@ -1,9 +1,9 @@
 ---
-title: "Testing Tatin"
+title: "Testing"
 description: "How to execute the Tatin test suite."
 keywords: "apl, dyalog, github, tatin, test, testing"
 ---
-# Testing Tatin
+# Testing
 
 
 !!! abstract "Before submitting a pull request for your changes, confirm they pass the tests."

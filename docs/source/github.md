@@ -1,9 +1,9 @@
 ---
-title: "Tatin & GitHub"
+title: "GitHub & Tatin"
 description: "Tips on using Tatin with GitHub"
 keywords: apl, dyalog, git, github, limit, tatin
 ---
-# Tatin & GitHub
+# GitHub & Tatin
 
 
 

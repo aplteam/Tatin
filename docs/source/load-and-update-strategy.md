@@ -52,9 +52,9 @@ Strategy (3) appeals to many programmers: you are always up-to-date, and you alw
 But on reflection it looks much less appealing:
 
 1. Build your application, including updated dependencies
-1. Run your test cases; they all pass 
+1. Run your test cases; they all pass
 1. Rebuild your application without changing _anything_
-1. Rerun your test cases; but this time they fail 
+1. Rerun your test cases; but this time they fail
 
 This situation arises if, between the first and second build, the author of a dependency releases a new version with bugs in it. The second build fetches it,
 producing a different outcome – _even though you haven’t made any changes._

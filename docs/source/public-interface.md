@@ -7,10 +7,8 @@ keywords: api, apl, dyalog, interface, package, tatin
 
 !!! abstract "How to control which objects of a Tatin package are exposed to its users"
 
-<!-- 
-FIXME What?
 These cover functions are one-line dfns that call the function with the same name one level above. Because they are one-liners the Tracer will ignore them: it is not possible to trace into a one-line dfn. Most of the time this is a blessing, but sometimes it is a curse.
- -->
+
 By default, the public interface of your package is all its _top-level objects_:
 
     ⎕NL 2 3 4 9
@@ -112,8 +110,8 @@ You don’t need a function `Public` here.
 Its only purpose is to be called by `CreateAPIfromCFG` and here the job is done instead by you.
  -->
 
-<!-- 
-FIXME Move down the page
+**FIXME Move down the page**
+
 !!! warning "A function or operator cannot be the API"
 
     If your package exposes just a single function or operator,
@@ -124,7 +122,8 @@ FIXME Move down the page
     Although in Dyalog APL one can (sort of) create references
     to monadic, ambivalent, and dyadic functions,
     it is not possible for operators or niladic functions.
- -->
+
+ ------------------
 
 ## Some scenarios
 
@@ -140,9 +139,11 @@ multiple namespaces           | `API` |
 [^access]: In a class, use `:Field` and `:Access` declarations to expose objects.
 
 
-<!-- 
-FIXME This seems like a terrible idea.
-Why install in the workspace root and then access through a namespace?
+
+**FIXME This seems like a terrible idea.**
+
+**Why install in the workspace root and then access through a namespace?**
+
 ##### Restricting what's "public"
 
 The user might want to expose only a subset of functions/operators of a namespace (classes have such an interface anyway: `:Public Shared`), and in that case, the user must not only specify `api`, but also structure her code accordingly.
@@ -182,6 +183,3 @@ To the outside world, only two functions are visible:
 ```
 
 Similarly, if `PkgName` consists of the two namespaces `Boo` and `Goo`, and `Run` and `CreateParmSpace` live in `Boo`, then you could also have a sub-namespace `Boo.API` that hosts `Run` and `CreateParmSpace`, and `api` would be `Boo.API`, while calls are still `PkgName.Run` and `PkgName.CreateParmSpace`.
-
- -->
-

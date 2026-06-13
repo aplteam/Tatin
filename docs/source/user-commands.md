@@ -22,11 +22,11 @@ They all have help built in, for example
 !!! warning "Square brackets in the command syntax"
 
     Square brackets in the command syntaxes shown on this page indicate **optional command arguments**.
-    For example, the `BuildPackage` command has syntax
+    For example, the `ListPackages` command has syntax
 
-        ]TATIN.BuildPackage [source] [target]
+        ]TATIN.ListPackages [source]
 
-    Above, both the `source` and the `target` arguments are optional.
+    Above, `source` is optional.
 
 
 ## Command options
@@ -88,7 +88,7 @@ path  | Return full package paths.
    ...
 ```
 
- API:
+API:
 [`ClearCache`](api.md#clear-cache),
 [`ListCache`](api.md#list-cache)
 
@@ -145,15 +145,15 @@ verbose= | <ol markdown><li>Print a detailed report for each package copied.</li
 
         ]CopyRegistry /path/2/Reg -list=file=/myPkgs.txt
 
- API:
-[`CopyRegistry`](api.md#copy-registry)
+
+You can also use the API function [`CopyRegistry`](api.md#copy-registry) for this.
 
 
 ## Check for later version
 
     ]TATIN.CheckForLaterVersion folder
 
-Where `folder` is the path to a package folder (contains a `apl-buildlist.json` file),
+Where `folder` is the path to a package folder (contains an `apl-buildlist.json` file),
 scan known registries
 and list later **minor** versions of principal packages.
 (List different major versions as different packages.)
@@ -206,7 +206,7 @@ Where
 -   `sources` is a registry URL or alias (`[*]` for all known), or a path to a folder;
     (optional: defaults to current folder)
 
-scan the source/s recursively for folders wih `apl-dependencies.txt` files and list results.
+scan the source/s recursively for folders with `apl-dependencies.txt` files and list results.
 
 ```
       ]TATIN.FindDependencies MarkAPL [*]
@@ -220,7 +220,7 @@ scan the source/s recursively for folders wih `apl-dependencies.txt` files and l
 --------|----------
 verbose | Report the actual package folder(s) rather than the hosting folder.
 
- API:
+API:
 [`FindDependencies`](api.md#find-dependencies)
 
 
@@ -270,7 +270,7 @@ if just one is found, use it; if there are multiple, ask the user which one to u
 
 When installing into a Cider project,
 if its `dependencies` and `dependencies_dev` properties identify one folder,
-install there; if both aare defined, ask the user.
+install there; if both are defined, ask the user.
 
 If a search pattern does not specify a registry, scan known registries
 and use the first hit.
@@ -299,7 +299,7 @@ nobetas | Ignore beta versions.
     foo [MyUCMDs]test                    ⍝ install user command foo into test/
     ```
 
- API:
+API:
 [`InstallPackages`](api.md#install-packages)
 
 
@@ -312,9 +312,9 @@ list major versions of all deprecated packages.
 If `reg` omitted, use `[tatin]`.
 
 ---|---
-all | List all versions of all deprecated versions.
+all | List all versions of all deprecated packages.
 
- API:
+API:
 [`ListDeprecated`](api.md#list-deprecated)
 
 
@@ -333,7 +333,7 @@ If `reg` omitted, use `[tatin]`.
  Unlicense  CC0  0BSD  EPL  MIT  BSL  ISC  Apache  BSD-2  BSD-3
 ```
 
- API:
+API:
 [`ListLicences`](api.md#list-licences)
 
 
@@ -366,9 +366,9 @@ date         | show publishing date and assume `-noaggr`
 project_url  | show the URL
 noaggr       | don’t aggregate
 
-!!! tip "Both / or \\ work as path separators and trailing separators are optional."
+!!! tip "Both / or \\ work as path separators, and trailing separators are optional."
 
- API:
+API:
 [`ListPackages`](api.md#list-packages)
 
 
@@ -380,7 +380,7 @@ noaggr       | don’t aggregate
 List alias, URL, ID, port, priority and no-caching flag of known registries
 in descending order of priority.
 
-If a registry does not respond, ask me: retry, skip, or cancel the command.
+If a registry does not respond, ask the user: retry, skip, or cancel the command.
 
 -----|------------------
 full | Show API keys too.
@@ -388,7 +388,7 @@ raw  | Show the raw data.
 
 See also [`]TATIN.UserSettings`](#user-settings).
 
- API:
+API:
 [`ListRegistries`](api.md#list-registries)
 
 
@@ -408,7 +408,7 @@ list alphabetically all tags used in all packages there.
 tags= | (comma-separated list) show only tags on packages that have all the listed tags
 os=   | (comma-separated list: `lin`, `mac` and `win`) show only tags on packages restricted to these operating systems
 
- API:
+API:
 [`ListTags`](api.md#list-tags)
 
 
@@ -417,7 +417,7 @@ os=   | (comma-separated list: `lin`, `mac` and `win`) show only tags on package
 
     ]TATIN.ListVersions pattern
 
-Where `pattern` is a [search pattern](#search-pattern), list all versions of the package.
+Where `pattern` is a [search pattern](#search-patterns), list all versions of the package.
 
 If the registry is specified as `?` or `[?]`, ask the user to choose one.
 
@@ -429,7 +429,7 @@ take publication dates into account.
 -----|-----------------------
 date | Show publication dates.
 
- API:
+API:
 [`ListVersions`](api.md#list-versions)
 
 
@@ -448,7 +448,7 @@ recursively search the source folder for packages listed in `apl-dependencies.tx
 and load them into the target namespace unless already there.
 
 If `ns` is omitted, the target namespace is the current namespace –
-unless `source` is `[MyUCMDs]`, when it is `⎕SE.`
+unless `source` is `[MyUCMDs]`, when it defaults to `⎕SE`.
 
 If no arguments are specified, look for open Cider projects.
 If one is open, use it; if multiple, ask which.
@@ -458,7 +458,7 @@ If the Cider project config defines multiple installation folders, ask which to 
 makeHomeRelative | Instead of absolute paths, make `TatinVars.GetFullPath2AssetsFolder` and `TatinVars.HOME` return only the package folder and its parent.
 overwrite        | Overwrite existing packages in the target namespace.
 
- API:
+API:
 [`LoadDependencies`](api.md#load-dependencies)
 
 
@@ -500,7 +500,7 @@ verbose | Report details.
     group-name-2.0.0                ⍝ just full package ID without Registry
     [tatin]group-name-1.0           ⍝ alias & package ID without patch no.
     [tatin]group-name-1             ⍝ without patch and minor no.
-    [tatin]group-name               ⍝ with any version information
+    [tatin]group-name               ⍝ without any version information
     [tatin]/group-name-1.0.0        ⍝ with "/"
     [tatin]group-name-1.0.0         ⍝ without "/"
     [tatin]name #                   ⍝ with target namespace
@@ -513,7 +513,7 @@ verbose | Report details.
     [company]foo,[personal]bar      ⍝ multiple packages from specific servers
     ```
 
- API:
+API:
 [`LoadPackages`](api.md#load-packages)
 
 
@@ -522,7 +522,7 @@ verbose | Report details.
     ]TATIN.LoadTatin
 
 Load the Tatin client into `⎕SE` (resulting in `⎕SE.Tatin`), and initialize it.
-Write a user config file my home folder if none there.
+Write a user config file in my home folder if there is none.
 
 !!! tip "You can use [`Init`](#init) to temporarily switch to a different config."
 
@@ -605,7 +605,7 @@ force  | Don’t ask the user for confirmations (useful for test cases).
 
 Where `source` is
 
--   a registry or registries, ping it/them and show user which respond;
+-   a registry or registries, ping it/them and report which respond;
 -   a folder, show whether it exists.
 
 Specify a registry as a registry URL or alias, or `?`.
@@ -633,7 +633,7 @@ Questioning 1 Tatin Registry...
         ]TATIN.Ping https://tatin.dev
         ]TATIN.Ping http://tatin.dev   ⍝ This won't work
 
- API:
+API:
 [`Ping`](api.md#ping)
 
 
@@ -673,7 +673,7 @@ in (say) your UCMDs folder without prompts:
 ]ReinstallDependencies [MyUCMDs] -recursive -update -force
 ```
 
- API:
+API:
 [`ReinstallDependencies`](api.md#reinstall-dependencies)
 
 
@@ -694,8 +694,8 @@ Uninstall, according to syntax,
 
 1.  `package` from `folder`
 2.  `package` from the currently open Cider project (if several open, ask the user which)
-3.  from `folder` all superflous packages; i.e. neither top-level nor dependency; e.g. outdated versions
-4.  the top-level packages I select from your prompt, and any dependencies thus superfluous
+3.  from `folder` all superfluous packages; i.e. neither top-level nor dependency; e.g. outdated versions
+4.  the top-level packages selected by the user, and any dependencies thus superfluous
 
 If `folder` is a relative path, it must be a subfolder of an open Cider project.
 
@@ -703,7 +703,7 @@ If `folder` is a relative path, it must be a subfolder of an open Cider project.
 cleanup | See syntax (3) above.
 quiet   | Don’t report progress.
 
- API:
+API:
 [`UninstallPackages`](api.md#uninstall-packages)
 
 !!! detail "If a package was installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well, is the package actually removed."
@@ -712,53 +712,29 @@ quiet   | Don’t report progress.
 
     ]TATIN.UpdateTatin
 
-If a later version of Tatin is available,
-download it from GitHub,
-install it into the folder it was started from,
-and display the release notes in a browser window.
+If a later version of Tatin is available, download it from GitHub, install it into the folder it was started from, and display the release notes in a browser window.
 
 !!! warning "Does not update the current workspace"
 
     To use the updated version, close the current session
     and start a new one.
 
-In Dyalog 19.0 and later
-the command replaces the version installed in your home folder,
-not the shipped version, which remains unchanged.
+In Dyalog 19.0 and later the command replaces the version installed in your home folder, not the shipped version, which remains unchanged.
 
 
-> Debugging is the process of removing bugs from code, while programming is how you introduce them in the first place.
+If the update fails, calling it again rarely helps.
 
 ??? tip "Troubleshooting"
-
-    If the update fails, calling it again rarely helps.
 
     === "Dyalog 19.0+"
 
         1. `]DeActivate tatin` to remove Tatin
-        2. `]Activate tatin` restores the version your installation was shipped with
+        2. `]Activate tatin` to restore the version your installation was shipped with
         3. `]TATIN.UpdateTatin` to update to the latest version
 
     === "Dyalog 18.2"
 
-        Uninstall Tatin then install it again.
-
-??? detail "Tatin versions before 0.105.0"
-
-    <!-- Can we drop this section yet? -->
-
-    Versions before 0.105.0 might have been installed into one of these folders:
-
-    ```
-    C:\Users\<user>\Documents\MyUCMDs\     ⍝ Windows
-    /users/<user>/MyUCMDs/                 ⍝ Mac-OS
-    /home/<user>/MyUCMDs/                  ⍝ Linux
-    ```
-
-    If so, remove the folder `Tatin` from the `MyUCMDs/` folder and install Tatin (and, if installed, Cider) from scratch rather than updating it.
-
-    If you loaded Tatin into `⎕SE` with a script `setup.dyalog` you might need to amend it.
-
+        Uninstall Tatin, then install it again.
 
 
 ## Usage data
@@ -802,9 +778,7 @@ For example, in January 2023 it created a file `usage-data-2022.csv`, and delete
 A Tatin server [offers a page](https://tatin.dev/v1/usage-data "Link to the principal Tatin server`s Usage Data page") dedicated to the usage data.
 The page shows some of the data and provides links for downloading.
 
-
 There are no API functions available for retrieving usage data.
-
 
 
 ## User settings
@@ -814,14 +788,14 @@ There are no API functions available for retrieving usage data.
 Print my user settings from the config file in JSON format,
 hiding the API key.
 
-!!! tip "To see current user settings rather than the file content, use the API.""
+!!! tip "To see current user settings rather than the file content, use the API."
 
 --------|-------------------------------------------------------
 edit    | Let the user edit the file, then ask the user whether to refresh current settings.
 home    | Show path to the config file and do nothing else.
 refresh | Refresh the current user settings from the config file.
 
- API: [`UserSettings`](api.md#user-settings)
+API: [`UserSettings`](api.md#user-settings)
 
 
 ## Version
@@ -845,7 +819,7 @@ Show the installed and minimum required versions of the Principal Registry.
 
 !!! warning "Setting the `check` flag overrides all other arguments."
 
- API:
+API:
 [`Version`](api.md#version)
 
 

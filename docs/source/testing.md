@@ -45,12 +45,12 @@ This runs all the tests in Debug mode, so if something goes wrong the framework 
 You will be asked if you want to copy the test data to a temporary folder in preparation.
 The usual answer is Yes.
 
-=== " Windows"
+=== "Windows"
 
     You will be asked if you want to start a test server.
     The usual answer is Yes.
 
-=== " Linux   macOS"
+=== "Linux/macOS"
 
     You will be asked to start the server yourself before carrying on.
     **With this procedure for starting a Test Server, testing cannot be automated.**

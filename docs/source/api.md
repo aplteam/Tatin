@@ -5,7 +5,7 @@ keywords: api, apl, dyalog, source, tatin
 ---
 # API functions
 
-!!! abstract "With the Tatin API you can write DevOps scripts in APL."
+!!! abstract "With the API you can execute Tatin functionality under program control."
 
 The API functions are similar to the [user-commands](user-commands.md), but not identical.
 Not all have equivalent user commands.
@@ -20,7 +20,7 @@ The Tatin API is in `⎕SE.Tatin`. Call an API function like this:
 
 ??? warning "API code cache"
 
-    The Tatin code package is loaded into `⎕SE._Tatin`, but the API is exposed via `⎕SE.Tatin`.
+    The Tatin code is loaded into `⎕SE._Tatin`, but the API is exposed via `⎕SE.Tatin`.
 
     Do not call functions in `⎕SE._Tatin`.
 
@@ -419,15 +419,15 @@ path←{aplVersion} GetUserHomeFolder str
 Returns the standard path for user-specific data, with string `str` appended.
 
 
-=== " Windows"
+=== "Windows"
 
         C:\Users\%USERPROFILE%\AppData\Roaming\Tatin
 
-=== " Linux"
+=== "Linux"
 
         /home/{⎕AN}/Tatin
 
-=== " macOS"
+=== "macOS"
 
         /Users/{⎕AN}/Tatin
 

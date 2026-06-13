@@ -8,7 +8,7 @@ keywords: apl,delete,install,organise,package,publish,tatin,user command
 !!! abstract "Organise, configure, install dependencies, publish."
 
 
-## :fontawesome-solid-circle-play: Publishing steps
+## Publishing steps
 
 A Tatin package separates APL source files from files
 such as CSS, EXE, DLL and so on.
@@ -63,7 +63,7 @@ Tatin calls the APL files _source_ and the others _assets_.
     On success, Tatin reports `Package published on <URL>`.
 
 
-## :fontawesome-solid-sitemap: Dependencies
+## Dependencies
 
 ### Location
 
@@ -98,7 +98,7 @@ Tatin does allow URL protocols for local development — use them with care.
 
 
 
-## :fontawesome-solid-terminal: User-command packages
+## User-command packages
 
 A user-command package has a script that makes it a user command.
 
@@ -151,7 +151,7 @@ The installed package will then consist of:
     Keeping the real code in the package satisfies the requirement.
 
 
-## :fontawesome-solid-trash-can: Deleting packages
+## Deleting packages
 
 A registry’s [delete policy](user-commands-publish.md#get-delete-policy) controls whether you can delete a package published there:
 

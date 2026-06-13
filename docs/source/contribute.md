@@ -12,7 +12,7 @@ keywords: "apl, contribute, dyalog, github, tatin"
 
 
 
-## :fontawesome-solid-list-check: Requirements
+## Requirements
 
 To work on Tatin you need
 
@@ -46,7 +46,7 @@ If you are new to Cider, spend some time playing with it before using it for ser
     That said, you are not required to build a new version before submitting a pull request, so you might get away without Cider, but using Cider is certainly recommended.
 
 
-## :fontawesome-solid-circle-play: Get started
+## Get started
 
 1.  On GitHub make your own fork of [Tatin](https://github.com/aplteam/Tatin) and clone it to your local machine, say at `/path/2/Tatin`.
 
@@ -61,7 +61,7 @@ Now you have a working version of Tatin on your machine and you can start contri
     Every function, operator, class, interface or namespace script changed in `#.Tatin` is automatically saved to disk by Link.
 
 
-## :fontawesome-solid-code: Code
+## Code
 
 To modify the source code:
 
@@ -79,7 +79,7 @@ To modify the source code:
 1. Push `123-fix-foo-bar` to your fork, and submit a pull request.
 
 
-## :fontawesome-solid-book-open: Documentation
+## Documentation
 
 If you find parts of this guide confusing, outdated, unclear or missing bits and pieces, change it.
 That might well be your first valuable contribution.
@@ -111,7 +111,7 @@ Build:
 The output appears under `docs/site/` (gitignored). For live-reload while editing, run `zensical serve` instead.
 
 
-## :fontawesome-solid-upload: Submit your changes
+## Submit your changes
 
 When you have improved the documentation, fixed a bug, or added a feature, create a pull request (PR).
 The project team will check your contribution.

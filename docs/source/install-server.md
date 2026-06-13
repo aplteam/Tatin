@@ -8,13 +8,13 @@ keywords: "apl, dyalog, registry, server, tatin"
 !!! abstract "How to install and update your own Tatin registry server"
 
 
-## :fontawesome-solid-download: Download
+## Download
 
 Download the Tatin Server ZIP from the [Releases](https://github.com/aplteam/Tatin/releases) page
 and unzip it into the installation folder.
 
 
-## :fontawesome-solid-sliders: Configure
+## Configure
 
 !!! detail inline end "Local variable"
 
@@ -113,7 +113,7 @@ Text | Unless empty, inject as `<div><p>{text}</p></div>`
 CSS  | Unless empty, inject into the Text `<div>` as `style="{css}"`
 
 
-## :fontawesome-solid-laptop: Start a local Tatin server
+## Start a local Tatin server
 
 Start an instance of Dyalog with ample memory, and load the workspace `Server.dws`.
 The Latent Expression starts the server.
@@ -137,7 +137,7 @@ To run the Tatin server as a Windows Service, use the workspace `InstallAsWindow
 which installs Tatin as a Windows service. (Requires admin rights.)
 
 
-## :fontawesome-brands-docker: Configure Docker
+## Configure Docker
 
 To run Tatin in a Docker container,
 first adjust the Docker configuration to your environment and needs.
@@ -178,7 +178,7 @@ The second port exposed in the script is for connecting to the interpreter with 
 if permitted by the INI file.
 
 
-## :fontawesome-brands-docker: Docker workflow
+## Docker workflow
 
 Call:
 
@@ -187,7 +187,7 @@ Call:
 1. `start-tatin.sh` to start the container; the script ensures the container is restarted after a crash or auto-started after a reboot
 
 
-## :fontawesome-solid-bomb: Testing and debugging
+## Testing and debugging
 
 For testing and debugging you might want to change in `server.ini`
 the settings in the `LOGFILE` section,

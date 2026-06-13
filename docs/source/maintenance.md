@@ -8,7 +8,7 @@ keywords: "apl, dyalog, maintenance, registry, server, tags, tatin"
 !!! abstract "Care and grooming of your Tatin server."
 
 
-## :fontawesome-solid-tag: Curate the tags
+## Curate the tags
 
 The most important maintenance job is to curate the tags.
 
@@ -22,7 +22,7 @@ Merely changing the config file is enough: the server watches for such changes a
 Create and run maintenance jobs to correct problems in the package config files.
 
 
-## :fontawesome-solid-folder: Maintenance jobs
+## Maintenance jobs
 
 The [Maintenance Folder](glossary.md) holds maintenance jobs in the form of APL function files (APLFs).
 The downloaded server includes some examples.
@@ -57,7 +57,7 @@ Note that the user command `]Maintenance` serves a very different purpose: It ca
 
 
 
-## :fontawesome-solid-calendar-plus: Update the server
+## Update the server
 
 Download the release ZIP from the [Releases](https://github.com/aplteam/Tatin/releases) page into a temporary folder and unzip it.
 

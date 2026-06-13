@@ -11,7 +11,7 @@ keywords: "apl, dyalog, host, registry, server, tatin"
 You can host a Tatin registry server on your local machine, an intranet, or on a public server.
 
 
-## :fontawesome-solid-list-check: Requirements
+## Requirements
 
 -   Dyalog Unicode 18.2 or better
 -   Linux or Windows
@@ -20,7 +20,7 @@ The server should run under macOS in a Docker container,
 but this has not been tested.
 
 
-## :fontawesome-solid-server: Plodder
+## Plodder
 
 Tatin uses [Plodder](https://github.com/aplteam/Plodder) as an HTTP/S server.
 Its INI file is a Plodder INI file with some extra settings.

@@ -15,7 +15,7 @@ You can [get started](get-started.md) without grasping these policies,
 but they have important consequences you will eventually need to understand.
 
 
-## :fontawesome-solid-sitemap: Minimum version selection
+## Minimum version selection
 
 Suppose you need packages, `Foo` and `Goo`.
 Both rely on package `Zoo`; but while `Foo` requests `Zoo` 1.1.1,
@@ -128,7 +128,7 @@ Packages, once published, cannot be altered.
 So if the patch contains a text description, Tatin uses [publication date](package-configuration.md#read-only-settings) to determine the correct order.
 
 
-## :fontawesome-solid-truck-ramp-box: Loading dependencies
+## Loading dependencies
 
 Imagine these packages all hosted by a Tatin server with alias `MyTatin`.
 
@@ -192,7 +192,7 @@ That’s because the two `Load` operations are independent, so minimal version s
 [`CheckForLaterVersion`](api.md#check-for-later-version)
 
 
-## :fontawesome-solid-truck-ramp-box: Installing packages
+## Installing packages
 
 To incorporate packages into an application, they must be installed.
 In the following example, we install two packages, `Foo` and `Goo`. Both require `Zoo`, so `Zoo` gets installed as a side effect.
@@ -235,7 +235,7 @@ Above, the first column flags the principal packages.
 -   The **build list** comprises not only the two principal packages but also the dependencies.
 
 
-## :fontawesome-solid-truck-ramp-box: Loading installed packages
+## Loading installed packages
 
 Loading packages puts them in your workspace;
 installing packages puts them in your file system.
@@ -271,7 +271,7 @@ One way to update to a new major version is to delete all packages from an insta
 Cider will detect the need for re-installing and act accordingly.
 
 
-## :fontawesome-solid-trash-can: Remove a principal package
+## Remove a principal package
 
 Suppose you no longer need `Goo`.
 
@@ -283,7 +283,7 @@ This will remove not only the principal package, but any of its dependencies tha
     Tatin manages these dependency relations; don’t interfere.
 
 
-## :fontawesome-solid-eraser: Implicit downgrading
+## Implicit downgrading
 
 Removing a principal package might imply a downgrade.
 
@@ -309,7 +309,7 @@ It is not obvious what is best here.
 Tatin’s strategy might change after feedback.
 
 
-## :fontawesome-solid-hands-holding-circle: Add a package manually
+## Add a package manually
 
 To add a package that has no dependencies you could
 just add it to the file `apl-dependencies.txt`
@@ -322,7 +322,7 @@ performs some health checks, and if all is well, recreates the build list.
 (This is insurance against people manually introducing errors into `apl-dependencies.txt`)
 
 
-## :fontawesome-solid-calendar-xmark: Downgrade
+## Downgrade
 
 Sometimes you might need to downgrade, for example from a version you find buggy, to an older version known to be okay.
 

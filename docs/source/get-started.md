@@ -179,13 +179,13 @@ Test an example from the documentation.
     -   Deactivate and remove it before Tatin
     -   Re/Install Tatin before Cider.
 
-## :fontawesome-solid-trash-can: Deactivate
+## Deactivate
 
 To remove Tatin and/or Cider from the installation folder:
 
     ]Deactivate [all|cider|tatin] [-versionagnostic]
 
-### Installing several packages at once
+## Installing several packages at once
 
 Note that `InstallPackages` accepts several package IDs, separated by commas:
 
@@ -208,7 +208,7 @@ This will install three packages and all their dependencies at once. You might f
     All you need to do is to assign different aliases to the different versions of the package.
 
 
-### Checking out a package: `LoadPackages`
+## Checking out a package: `LoadPackages`
 
 Let's assume that before actually installing it, you first want to check whether the package `MarkAPL` suits your needs. In this case you might not want to install it (yet) but just to load it into the workspace.
 
@@ -302,9 +302,9 @@ MarkAPL
 For these two packages, references are injected. `FilesAndDirs` depends on `OS`, but because that is not required by `MarkAPL`, no reference to `OS` is injected into `aplteam_MarkAPL_11_0_0.`, but you would find such a reference in `#._tatin.aplteam_FilesAndDirs_5_0_1`.
 
 
-### Misc
+## Misc
 
-#### Scanning Registries
+### Scanning Registries
 
 The fact that Tatin scans Registries in order to find a package can be put to good use when developing packages:
 you can run your own Tatin server on, say, your own machine, and give it the highest priority. You can then publish new versions of a package on that server first.
@@ -332,7 +332,7 @@ The fact that Registries with a priority of `0` are not scanned by Tatin allows 
     Note that Tatin does not only scan all known Registries with a priority greater than zero for principal packages, it also scans all those Registries for dependencies as well.
 
 
-#### Deprecated packages
+### Deprecated packages
 
 Every piece of software will become obsolete one day. Packages are no exception. If a package is not needed anymore, or is obsolete because there is a better one available, it's time to mark it as deprecated.
 
@@ -370,7 +370,7 @@ Note that `]TATIN.ListDeprecated` is designed to list just the deprecated packag
 With `-all` a matrix with two columns rather than one is returned, 
 with the second column carrying an asterisk for those packages that actually do carry `deprecated←1` in their config file. That would be at least the very last one.
 
-##### Side effects of deprecating a package
+#### Side effects of deprecating a package
 
 If you try to load or install a package that is marked as deprecated then you will be asked whether you really want that, but if you insist then you will get what you asked for.
 
@@ -403,7 +403,7 @@ Note that the API functions for loading / installing packages would not complain
     Once you've done that the very latest published package would no longer carry a "deprecated" flag with the value 1, and therefore it would no longer fulfil the criteria of a deprecated package.
 
 
-#### Tatin Variables
+### Tatin Variables
 
 For every package Tatin will establish a couple of constants. Because APL has no concept of constants, they are emulated via niladic functions.
 
@@ -416,24 +416,24 @@ Strictly speaking `TatinVars` is a misnomer because the namespace carries just f
 Note that we refer to, say, `HOME` as a character vector because the niladic function `HOME` returns a character vector.
 
 
-##### ASSETS
+#### ASSETS
 
 The path to the package's assets relative to `HOME`. Is empty in case there are no assets.
 
 See also the [GetFullPath2AssetsFolder](#GetFullPath2AssetsFolder) function.
 
 
-##### CONFIG
+#### CONFIG
 
 This is a simple character vector that stems from the file `apl-package.json` of the given package.
 
 
-##### DEPENDENCIES
+#### DEPENDENCIES
 
 A vector of character vectors with the package IDs of the packages the package in question depends on.
 
 
-##### GetFullPath2AssetsFolder
+#### GetFullPath2AssetsFolder
 
 This is a function which returns the result of the expression `HOME,'/',ASSETS` if both `HOME` and `ASSETS` are not empty _and_ `HOME` exists on disk. If `HOME` is empty or does not exist on disk then just `ASSETS` is returned.
 
@@ -442,7 +442,7 @@ When accessing assets, you are advised to always use the `GetFullPath2AssetsFold
 But the function `GetFullPath2AssetsFolder` would not find `HOME` and therefore return just `ASSETS`, and that allows you to still access the assets successfully, assuming that you changed the current directory to where the workspace was loaded from.
 
 
-##### HOME
+#### HOME
 
 Is a character vector holding the path of a folder that hosts the package.
 
@@ -451,12 +451,12 @@ There is an exception: when the package was brought into the workspace with `Loa
 In this case `HOME` returns an empty vector.
 
 
-##### ID
+#### ID
 
 The full package name. This will include a build ID if there is any, so it is not necessarily identical with the package ID.
 
 
-##### LX
+#### LX
 
 In a package config file a function can be defined on the `lx` parameter. Such a function would be executed after the package was loaded. The purpose of the function is to perform some sort of initialisation.
 
@@ -465,7 +465,7 @@ If such a function returns a result then it is assigned to `LX` in the `TatinVar
 Note that `LX` does not exist in case no such function is defined, or the function did not return a result.
 
 
-##### URI
+#### URI
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
 

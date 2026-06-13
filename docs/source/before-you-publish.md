@@ -8,7 +8,7 @@ keywords: apl,api-key,licence,package,version,tatin
 !!! abstract "Package identity, licences, and API keys explained"
 
 
-## :fontawesome-solid-address-card: Package identity
+## Package identity
 
 A full package ID uniquely identifies a package on a particular Tatin Registry.
 The version number follows [semantic versioning](glossary.md) conventions
@@ -73,7 +73,7 @@ Their only use is to distinguish builds when the version number does not change.
 In most contexts build numbers need not be specified and Tatin does not display them.
 
 
-## :fontawesome-solid-scale-balanced: Licences
+## Licences
 
 Tatin is a community resource and offers software with minimal licence restrictions.
 All licences on the Principal Registry give users great freedom.
@@ -92,7 +92,7 @@ you must give it a `license` property with an acceptable value.
 [`ListLicences`](api.md#list-licences)
 
 
-## :fontawesome-solid-key: API keys
+## API keys
 
 To publish a package (or delete or deprecate it)
 you need an API key[^apikey] for the registry.

@@ -68,7 +68,7 @@ patch | patch number
 
 ---
 
-## :fontawesome-solid-terminal: Cache
+## Cache
 
     ]TATIN.Cache [reg]
 
@@ -93,7 +93,7 @@ path  | Return full package paths.
 [`ListCache`](api.md#list-cache)
 
 
-## :fontawesome-solid-terminal: Copy registry
+## Copy registry
 
     ]TATIN.CopyRegistry [source] [target]
 
@@ -149,7 +149,7 @@ verbose= | <ol markdown><li>Print a detailed report for each package copied.</li
 [`CopyRegistry`](api.md#copy-registry)
 
 
-## :fontawesome-solid-terminal: Check for later version
+## Check for later version
 
     ]TATIN.CheckForLaterVersion folder
 
@@ -177,7 +177,7 @@ To update to latest minor version use [`]TATIN.ReInstallDependencies`](#reinstal
 (New major versions need installing.)
 
 
-## :fontawesome-solid-terminal: Debug
+## Debug
 
     ]TATIN.Debug [toggle]
 
@@ -189,14 +189,14 @@ With Debug Mode on, Tatin leaves application errors untrapped so you can investi
 (Error guards in dfns, errors when communicating via TCP/IP and similar errors are still trapped.)
 
 
-## :fontawesome-solid-terminal: Documentation
+## Documentation
 
     ]TATIN.Documentation
 
 Open Tatin documentation in a browser window.
 
 
-## :fontawesome-solid-terminal: Find dependencies
+## Find dependencies
 
     ]TATIN.FindDependencies pkgs [sources]
 
@@ -228,7 +228,7 @@ For me it works. Please open an issue with a recipe how to reproduce this (KJ)
 [`FindDependencies`](api.md#find-dependencies)
 
 
-## :fontawesome-solid-terminal: Init
+## Init
 
     ]TATIN.Init [config]
 
@@ -241,7 +241,7 @@ Useful to apply in the session user settings that have changed on file.
 
 
 
-## :fontawesome-solid-terminal: Install packages
+## Install packages
 
     ]TATIN.InstallPackages pkgs [target]
 
@@ -307,7 +307,7 @@ nobetas | Ignore beta versions.
 [`InstallPackages`](api.md#install-packages)
 
 
-## :fontawesome-solid-terminal: List deprecated
+## List deprecated
 
     ]TATIN.ListDeprecated [reg]
 
@@ -323,7 +323,7 @@ all | List all versions of all deprecated versions.
 
 
 
-## :fontawesome-solid-terminal: List licenses
+## List licenses
 
     ]TATIN.ListLicenses [reg]
 
@@ -341,7 +341,7 @@ If `reg` omitted, use `[tatin]`.
 [`ListLicences`](api.md#list-licences)
 
 
-## :fontawesome-solid-terminal: List packages
+## List packages
 
     ]TATIN.ListPackages [source]
 
@@ -377,7 +377,7 @@ noaggr       | don’t aggregate
 
 
 
-## :fontawesome-solid-terminal: List registries
+## List registries
 
     ]TATIN.ListRegistries
 
@@ -397,7 +397,7 @@ See also [`]TATIN.UserSettings`](#user-settings).
 
 
 
-## :fontawesome-solid-terminal: List tags
+## List tags
 
     ]TATIN.ListTags [source]
 
@@ -417,7 +417,7 @@ os=   | (comma-separated list: `lin`, `mac` and `win`) show only tags on package
 
 
 
-## :fontawesome-solid-terminal: List versions
+## List versions
 
     ]TATIN.ListVersions pattern
 
@@ -438,7 +438,7 @@ date | Show publication dates.
 
 
 
-## :fontawesome-solid-terminal: Load dependencies
+## Load dependencies
 
     ]TATIN.LoadDependencies [source] [ns]
 
@@ -467,7 +467,7 @@ overwrite        | Overwrite existing packages in the target namespace.
 
 
 
-## :fontawesome-solid-terminal: Load packages
+## Load packages
 
     ]TATIN.LoadPackages pkgs [ns]
 
@@ -521,7 +521,7 @@ verbose | Report details.
 [`LoadPackages`](api.md#load-packages)
 
 
-## :fontawesome-solid-terminal: Load Tatin
+## Load Tatin
 
     ]TATIN.LoadTatin
 
@@ -536,7 +536,7 @@ force     | Overwrite existing installation.
 !!! detail "Makes the Tatin API available."
 
 
-## :fontawesome-solid-terminal: Package config
+## Package config
 
     ]TATIN.PackageConfig [source]
 
@@ -586,7 +586,7 @@ delete | Delete the config.
 
 
 
-## :fontawesome-solid-terminal: Package dependencies
+## Package dependencies
 
     ]TATIN.PackageDependencies [path]
 
@@ -603,7 +603,7 @@ delete | Delete the dependencies file.
 force  | Don’t ask the user for confirmations (useful for test cases).
 
 
-## :fontawesome-solid-terminal: Ping
+## Ping
 
     ]TATIN.Ping [source]
 
@@ -642,7 +642,7 @@ Questioning 1 Tatin Registry...
 
 
 
-## :fontawesome-solid-terminal: Re-install dependencies
+## Re-install dependencies
 
     ]TATIN.ReInstallDependencies [folder] [reg]
 
@@ -681,7 +681,7 @@ in (say) your UCMDs folder without prompts:
 [`ReinstallDependencies`](api.md#reinstall-dependencies)
 
 
-## :fontawesome-solid-terminal: Uninstall packages
+## Uninstall packages
 
     1. ]TATIN.UnInstallPackages package folder
     2. ]TATIN.UnInstallPackages package
@@ -712,7 +712,7 @@ quiet   | Don’t report progress.
 
 !!! detail "If a package was installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well, is the package actually removed."
 
-## :fontawesome-solid-terminal: Update Tatin
+## Update Tatin
 
     ]TATIN.UpdateTatin
 
@@ -765,7 +765,7 @@ not the shipped version, which remains unchanged.
 
 
 
-## :fontawesome-solid-terminal: Usage data
+## Usage data
 
     ]TATIN.UsageData [reg] [ -download [-all] [-folder=] [-unzip] ]
 
@@ -812,7 +812,7 @@ There are no API functions available for retrieving usage data.
 
 
 
-## :fontawesome-solid-terminal: User settings
+## User settings
 
     ]TATIN.UserSettings
 
@@ -831,7 +831,7 @@ refresh | Refresh the current user settings from the config file.
 
 
 
-## :fontawesome-solid-terminal: Version
+## Version
 
     ]TATIN.Version
 

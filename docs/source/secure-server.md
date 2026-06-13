@@ -13,7 +13,7 @@ Encrypt internet communications by installing [security certificates](#security-
 or (better) use a [reverse proxy](#reverse-proxy) to shield your Tatin registry behind an industrial-strength webserver such as Apache or Nginx.
 
 
-## :fontawesome-solid-key: Credentials
+## Credentials
 
 The server requires and accepts API keys according to `Credentials.csv` in the server’s home folder.
 
@@ -91,7 +91,7 @@ The rules are read in sequence and can mix different scenarios.
 To delete a rule for a group, edit the file `Credentials.csv`.
 
 
-## :fontawesome-solid-certificate: Security certificates
+## Security certificates
 
 Encrypting communications (HTTPS) requires security certificates.
 The server download includes two:
@@ -109,7 +109,7 @@ To activate HTTPS, set `[CONFIG]Secure` to `1` in Plodder's INI file; this switc
 !!! tip "Instead of enabling HTTPS, shield the server with a reverse proxy."
 
 
-## :fontawesome-solid-arrow-right-arrow-left: Reverse proxy
+## Reverse proxy
 
 If your registry serves requests from the internet, shield it behind an industrial-strength web server like Apache or Nginx.
 

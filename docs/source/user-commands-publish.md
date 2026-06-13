@@ -9,7 +9,7 @@ keywords: apl,dyalog,host,publish,registry,tatin,ui
 
 ---
 
-## :fontawesome-solid-terminal: Build package
+## Build package
 
     ]TATIN.BuildPackage [source] [target]
 
@@ -40,7 +40,7 @@ Now the build number gets bumped in all cases.
 
 
 
-## :fontawesome-solid-terminal: Create package
+## Create package
 
     ]TATIN.CreatePackage target
 
@@ -49,7 +49,7 @@ Where `target` is a path to a folder, create a new Tatin package in it.
 The command is a wrapper for [`]TATIN.PackageConfig -edit`](user-commands.md#package-config).
 
 
-## :fontawesome-solid-terminal: Delete packages
+## Delete packages
 
     ]TATIN.DeletePackages pattern
 
@@ -75,7 +75,7 @@ Example arguments:
 [`DeletePackages`](api.md#delete-packages)
 
 
-## :fontawesome-solid-terminal: Deprecate package
+## Deprecate package
 
     ]TATIN.DeprecatePackage pattern[majorversion] comment
 
@@ -103,7 +103,7 @@ Example: Deprecate on `[tatin]` all major versions of `grp-foo`:
 [`DeprecatePackage`](api.md#deprecate-package)
 
 
-## :fontawesome-solid-terminal: Get delete policy
+## Get delete policy
 
     ]TATIN.GetDeletePolicy [reg]
 
@@ -124,7 +124,7 @@ check | Ignore the cache: query the server and cache the response.
 [`GetDeletePolicy`](api.md#get-delete-policy)
 
 
-## :fontawesome-solid-terminal: Publish package
+## Publish package
 
     ]TATIN.PublishPackage [source] [reg]
 

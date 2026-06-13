@@ -28,7 +28,7 @@ The Tatin API is in `⎕SE.Tatin`. Call an API function like this:
 
 
 
-## :fontawesome-solid-code: Build package
+## Build package
 
 
       zipFilename←BuildPackage parms
@@ -74,7 +74,7 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
     See [Glossary](glossary.md) for details.
 
 
-## :fontawesome-solid-code: Check for later version
+## Check for later version
 
 ```
 r←{flags} CheckForLaterVersion path
@@ -95,7 +95,7 @@ Change this with optional left argument `flags`: the sum of the following. (Defa
     2 - Check package dependencies as well
 
 
-## :fontawesome-solid-code: Clear cache
+## Clear cache
 
 ```
 (rc report)←ClearCache url
@@ -114,7 +114,7 @@ If `url` is
 The cache is the folder where [`GetPathToPackageCache`](#get-path-to-package-cache) points to.
 
 
-## :fontawesome-solid-code: Copy registry
+## Copy registry
 
 ```
 mat←CopyRegistry parms
@@ -170,7 +170,7 @@ Required parameters are marked; others are optional.
 `url`
 : URL of the Tatin registry from which to copy. Required unless `dry` is set.
 
-## :fontawesome-solid-code: Create API from CFG
+## Create API from CFG
 
 ```
 {noOf}←{names} CreateAPIfromCFG (source cfg)
@@ -195,7 +195,7 @@ See [Public Interface](public-interface.md) for more.
 
 
 
-## :fontawesome-solid-code: Create build parms
+## Create build parms
 
 ```
 parms←CreateBuildParms projectPath
@@ -211,7 +211,7 @@ targetPath
 version
 ```
 
-## :fontawesome-solid-code: Create CopyRegistry parms
+## Create CopyRegistry parms
 
 ```
 parms←CreateCopyRegistryParms y
@@ -220,7 +220,7 @@ parms←CreateCopyRegistryParms y
 Where `y` is either an empty vector or a parameter space, returns a parameter space for [`CopyRegistry`](#copy-registry).
 
 
-## :fontawesome-solid-code: Create ReInstall parms
+## Create ReInstall parms
 
 ```
 parms←CreateReInstallParms
@@ -229,7 +229,7 @@ parms←CreateReInstallParms
 Returns a parameter space with default parameters for the (optional) left argument of [`ReInstallDependencies`](#reinstall-dependencies), in particular, `noBetas`, `update` and `dry`.
 
 
-## :fontawesome-solid-code: Delete packages
+## Delete packages
 
 ```
 (statusCode errMsg)←DeletePackages (regID packageIDs)
@@ -264,7 +264,7 @@ The principal Tatin server operates a `None` policy, meaning that you cannot del
 
 
 
-## :fontawesome-solid-code: Deprecate package
+## Deprecate package
 
 ```
 msg←DeprecatePackage (registry comment package)
@@ -283,7 +283,7 @@ If no major version number is provided, then _all_ major versions of the package
 As the registry is defined, no scanning is done.
 
 
-## :fontawesome-solid-code: Find dependencies
+## Find dependencies
 
 ```
 r←{depth} FindDependencies (target pkgList [verbose])
@@ -319,7 +319,7 @@ A server sets this to 1 because it knows it only needs to search the child folde
 You can use it similarly if you know exactly what is stored where.
 
 
-## :fontawesome-solid-code: Get delete policy
+## Get delete policy
 
 ```
 r←GetDeletePolicy server
@@ -340,7 +340,7 @@ None
 ```
 
 
-## :fontawesome-solid-code: Get dependency tree
+## Get dependency tree
 
 <!-- tree←{append} GetDependencyTree x Left argument is used internally when called recursively -->
 
@@ -368,7 +368,7 @@ This function requires the version number to be fully specified.
 
 !!! danger "The function accepts an optional left argument for INTERNAL use only."
 
-## :fontawesome-solid-code: Get package config file as namespace
+## Get package config file as namespace
 
 ```
 ns←GetPackageConfigFileAsNS path
@@ -381,7 +381,7 @@ If the config file cannot be found, an empty vector is returned.
 
 The result namespace has the same fields as those shown under [`ReadPackageConfigFile`](#read-package-config-file).
 
-## :fontawesome-solid-code: Get NoCaching flag
+## Get NoCaching flag
 
     flag←GetNoCachingFlag registry
 
@@ -396,7 +396,7 @@ If found the value of the `noCaching` property is returned, otherwise 0.
 ```
 
 
-## :fontawesome-solid-code: Get path to package cache
+## Get path to package cache
 
 ```
 path←GetPathToPackageCache
@@ -410,7 +410,7 @@ Returns `MyUserSettings.path2cache` if not empty, otherwise the standard path fo
 ```
 
 
-## :fontawesome-solid-code: Get user home folder
+## Get user home folder
 
 ```
 path←{aplVersion} GetUserHomeFolder str
@@ -439,7 +439,7 @@ Returns the standard path for user-specific data, with string `str` appended.
 Optional string `aplVersion` is used by test cases to simulate different versions of APL.
 
 
-## :fontawesome-solid-code: Initialise package
+## Initialise package
 
 ```
 config←{configParms} InitialisePackage folder
@@ -458,7 +458,7 @@ but can be made from scratch:
 ```
 
 
-## :fontawesome-solid-code: InitPackage config
+## InitPackage config
 
 ```
 cfg←{sourcePath}  InitPackageConfig parms
@@ -508,7 +508,7 @@ version           : 0.1.0
 ```
 
 
-## :fontawesome-solid-code: Install packages
+## Install packages
 
 ```
 r←{noBetas} InstallPackages (identifiers targetFolder)
@@ -537,7 +537,7 @@ To install the latest version, omit minor+patch or even major+minor+patch.
 
 
 
-## :fontawesome-solid-code: List cache
+## List cache
 
 ```
 list←{fullpath} ListCache registry
@@ -559,7 +559,7 @@ Each result item is a pair:
 If the cache is empty the result is an empty list.
 
 
-## :fontawesome-solid-code: List deprecated
+## List deprecated
 
 ```
 list←{all} ListDeprecated source
@@ -586,7 +586,7 @@ Set the `all` flag to include all versions of any major version  marked as depre
 ```
 
 
-## :fontawesome-solid-code: List licenses
+## List licenses
 
 ```
 licences←{verbose} ListLicences registry
@@ -607,7 +607,7 @@ The result is a list of strings – if `verbose` is set, a 2-column matrix of wh
 ```
 
 
-## :fontawesome-solid-code: List packages
+## List packages
 
 ```
 packages←{parms} ListPackages source
@@ -678,7 +678,7 @@ package ID | aggregate | column 1 | column 2
  aplteam-APLGit2  1
 ```
 
-## :fontawesome-solid-code: List registries
+## List registries
 
 ```
 registries←ListRegistries type
@@ -709,7 +709,7 @@ Only if `type` is 1 has the result an eighth column containing the API key.
 If the registry does not respond, Tatin signals an error.
 
 
-## :fontawesome-solid-code: List tags
+## List tags
 
 ```
 list←{parms} ListTags registry
@@ -733,7 +733,7 @@ If optional argument `parms` contains a list of tags (comma-separated string) as
 ```
 
 
-## :fontawesome-solid-code: List versions
+## List versions
 
 ```
 mat←{dateFlag} ListVersions pkg
@@ -786,7 +786,7 @@ If version precedence cannot be established from the version numbers alone (ofte
 with beta versions), then the publishing date is taken into account.
 
 
-## :fontawesome-solid-code: Load dependencies
+## Load dependencies
 
 ```
 {refs}←{options} LoadDependencies folder [target]
@@ -819,7 +819,7 @@ The  flags in `options`:
 
     The flag affects the result of `HOME` and `GetFullPath2AssetsFolder`: `HOME` would be empty, and `GetFullPath2AssetsFolder` would return the assets folder in the folder containing the given package rather than the full path, making it a relative path.
 
-## :fontawesome-solid-code: Load packages
+## Load packages
 
 ```
 no←{noBetas} LoadPackages (identifiers targetSpace)
@@ -855,7 +855,7 @@ If the target space already exists but is not an ordinary namespace, Tatin signa
 
 
 
-## :fontawesome-solid-code: Ping
+## Ping
 
 ```
 flag←Ping source
@@ -877,7 +877,7 @@ Where `source` is
 ```
 
 
-## :fontawesome-solid-code: Publish package
+## Publish package
 
 ```
 {fn}←{dependencyFolder} PublishPackage (source registry)
@@ -912,9 +912,9 @@ rc   | HTTP return code (whether the registry is remote or not)
 msg  | error message: empty if `rc` is 200
 zfn  | zip file name: empty if `source` is a ZIP file, otherwise name of the ZIP file created
 
-??? detail "The left argument `dependencyFolder`"
+!!! details "The optional left argument `dependencyFolder`"
 
-        If you use Tatin in connection with Cider, you might have trouble to understand why there is an optional left argument `dependencyFolder`. The reason is that Cider *knows* about the dependencies, so it can fill Tatin in on this.
+    If you use Tatin in connection with Cider, you might have trouble to understand why there is an optional left argument `dependencyFolder`. The reason is that Cider *knows* about the dependencies, so it can fill Tatin in on this.
 
     If you don't use Cider, well, how should `PublishPackage` know what dependencies the package in question relies on?!
 
@@ -923,14 +923,14 @@ zfn  | zip file name: empty if `source` is a ZIP file, otherwise name of the ZIP
     Only if you do not use Cider and for some reason keep the dependencies in a folder with a different name is there a need to tell `PublishPackage` about this other folder, because there is no other way for it to know.
 
 
-!!! detail "Delete policy"
+!!! details "Delete policy"
 
     The package is published no matter what the server’s delete policy is.
 
     That differs from the [user command](user-commands.md#publish-package), which asks you to confirm publication of a package that cannot then be deleted.
 
 
-## :fontawesome-solid-code: Reinstall dependencies
+## Reinstall dependencies
 
 ```
 {refs}←{parms} ReInstallDependencies folder [reg]
@@ -973,7 +973,7 @@ Optional argument `parms` can specify three flags all of which default to 0.
     If you installed a package from a Tatin registry and later removed that registry from your user settings, or set its priority to 0, then `ReInstallDependencies` will **not** scan it, despite knowing perfectly well where the package came from.
 
 
-## :fontawesome-solid-code: Read package config file
+## Read package config file
 
 ```
 cfg←ReadPackageConfigFile <package-url>
@@ -1019,7 +1019,7 @@ The function does not work on a path, the right argument must point to a managed
 }
 ```
 
-## :fontawesome-solid-code: Uninstall packages
+## Uninstall packages
 
 ```
 (list msg)←UnInstallPackage (packageID folder)
@@ -1066,7 +1066,7 @@ To keep things simple Tatin performs the following steps:
     even after successfully removing the package and any dependencies
     from both the dependency file and the build list.
 
-## :fontawesome-solid-code: Version
+## Version
 
 ```
 r←Version

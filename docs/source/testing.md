@@ -36,7 +36,7 @@ Only the basics are covered here.
 1.  **Run** the tests — see [Run the full test suite](#run-the-full-test-suite) below.
 
 
-## :fontawesome-solid-play: Run the full test suite
+## Run the full test suite
 
         #.Tatin.TestCases.RunTests
 
@@ -71,7 +71,7 @@ The usual answer is Yes.
     -   Calls the `T.Run` function to run all the test cases, including those that communicate with a locally running Tatin test server and the principal Tatin server available at <https://tatin.dev>
 
 
-## :fontawesome-solid-circle-play: Run selected tests
+## Run selected tests
 
 Executing the full test suite takes considerable time.
 Also, caching is switched off (except when caching itself is tested).
@@ -119,7 +119,7 @@ The first example below runs the `Test_UC_600` function, and so on.
 Depending on which test cases you select, you might not need test data, or even a running test server.
 
 
-## :fontawesome-solid-list-check: Run batch tests
+## Run batch tests
 
 Batch tests do not require user interaction.
 
@@ -130,7 +130,7 @@ To run only the batch tests:
 You must pass a 1 as right argument in order to run the function.
 
 
-## :fontawesome-solid-eject: Abort a test run
+## Abort a test run
 
 You might need to abort the test suite, for example if a test reveals a severe bug that makes running the remaining tests pointless.
 
@@ -140,7 +140,7 @@ Resist the temptation to use `)reset`; instead make the test suite clean up afte
 
 
 
-## :fontawesome-solid-bug: Debug mode
+## Debug mode
 
 Errors are trapped by default: if a test case fails or crashes, the test framework carries on.
 
@@ -155,7 +155,7 @@ When set to 1, tests are run in Debug mode.
     1 #.Tatin.TestCases.RunBatchTests 1
 
 
-## :fontawesome-solid-code-pull-request: A new version for testing
+## A new version for testing
 
 In a normal workflow you create a new version of Tatin only _after_ passing all the tests.
 
@@ -169,7 +169,7 @@ For this reason, a test checks that the version number in the workspace and in `
 See [Create a new version](create-version.md) for how to do this.
 
 
-## :fontawesome-solid-gears: Automated builds
+## Automated builds
 
 You can run batch tests as part of an automated build process;
 start the test suite either from APL or from the command line.
@@ -207,7 +207,7 @@ The Tatin root directory contains shell scripts that run the batch tests.
 
 These are templates: check their contents, you might need to make amendments.
 
-## :fontawesome-solid-comments: Notes
+## Notes
 
 ### Port 5001
 

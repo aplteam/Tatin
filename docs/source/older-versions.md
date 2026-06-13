@@ -13,7 +13,7 @@ keywords: apl,dyalog,install,packages,onedrive,requirements,tatin,versions
 
 Tatin is included in Dyalog 19.0; in Dyalog 18.2 it has to be installed.
 
-### :fontawesome-solid-list-check: Requirements
+### Requirements
 
 * Dyalog 18.2 **Unicode**
 * [Link](https://dyalog.github.io/link/4.0/) version 3.0.8 or better
@@ -21,7 +21,7 @@ Tatin is included in Dyalog 19.0; in Dyalog 18.2 it has to be installed.
 `]TATIN.Init` checks the requirements are met.
 
 
-### :fontawesome-solid-download: Download
+### Download
 
 Download the latest release of the Tatin client.
 
@@ -31,7 +31,7 @@ Download the latest release of the Tatin client.
 Unzip the file and move folder `Tatin/` to the installation folder.
 
 
-### :fontawesome-solid-folder-open: Installation folder
+### Installation folder
 
 The installation folder is at `<path>/SessionExtensions/CiderTatin`
 where `path` is:
@@ -56,7 +56,7 @@ where `path` is:
     ```
 
 
-### :fontawesome-solid-plug: Connect user commands
+### Connect user commands
 
 Include the installation folder in SALT’s search path.
 
@@ -70,7 +70,7 @@ Test for inline help: in a new Dyalog session enter
     ]tatin -?
 
 
-### :fontawesome-solid-code: Expose the API
+### Expose the API
 
 Executing any Tatin command exposes the [API](api.md).
 
@@ -107,7 +107,7 @@ If you already have a setup script:
         {}⎕SE.SALTUtils.ResetUCMDcache -1
 
 
-## :fontawesome-solid-plus: Update an old version of Tatin
+## Update an old version of Tatin
 
 ### Versions before 0.105.0
 
@@ -119,7 +119,7 @@ To update an earlier version:
 2.  Download and install Tatin from scratch. (Also Cider, if you are using it.)
 3.  Review your `setup.dyalog` script if you are using one.
 
-### :fontawesome-brands-windows: OneDrive and versions before 0.114.0
+### OneDrive and versions before 0.114.0
 
 OneDrive is cloud storage provided by Microsoft for backing up your personal folders.
 A Windows user `JohnDoe` who enables OneDrive changes his Documents folder:

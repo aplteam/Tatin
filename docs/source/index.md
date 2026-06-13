@@ -46,7 +46,7 @@ It may depend on other packages: Tatin manages the dependencies behind the scene
 !!! detail "Tatin package licences impose few restrictions on your use of the software."
 
 
-## :fontawesome-solid-sitemap: Versions and dependencies
+## Versions and dependencies
 
 _All things must change._
 In general a package exists as a series of versions.
@@ -61,7 +61,7 @@ To support this work, the Principal Registry never deletes a published package.
 You can *deprecate* a package or a version, but the registry retains it for anyone who relies on it.
 
 
-## :fontawesome-solid-laptop-code: Usage
+## Usage
 
 There are two ways to use Tatin.
 
@@ -69,7 +69,7 @@ There are two ways to use Tatin.
 -   **API functions** such as `⎕SE.Tatin.ListRegistries` let you write DevOps scripts 
 
 
-## :fontawesome-solid-list-check: Requirements
+## Requirements
 
 * Dyalog Unicode Edition Version 18.2 or better. (Classic is not supported.)
 * [Link](https://dyalog.github.io/link/4.0/) Version 3.0.8 or better
@@ -77,14 +77,14 @@ There are two ways to use Tatin.
 * The Tatin registry runs on Windows (as a service or a Docker container) and on Linux (as a Docker container)[^macserve].
 
 
-## :fontawesome-solid-scale-balanced: Licences
+## Licences
 
 Tatin is a community project.
 Packages hosted on the Principal Registry make the software available with minimal restrictions.
 
 
 
-## :fontawesome-solid-users: Community
+## Community
 
 You can contribute to the [Principal Registry](https://tatin.dev): report errors (open issues in the package repositories), or submit pull requests if you can see how to fix them.
 

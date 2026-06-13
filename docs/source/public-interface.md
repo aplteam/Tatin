@@ -132,10 +132,10 @@ To expose from your package APkg (as e.g. `#.APkg.Hello`)
 
 object/s from                 | api   | CreateAPIfromConfig
 ------------------------------|-------|--------------------------
-a single namespace `Foo`      | `Foo` | :fontawesome-solid-check:
-a single scripted namespace   | `API` | :fontawesome-solid-xmark:
-a single class `Foo`[^access] | `Foo` | :fontawesome-solid-xmark:
-multiple namespaces           | `API` | :fontawesome-solid-xmark:
+a single namespace `Foo`      | `Foo` | 
+a single scripted namespace   | `API` | 
+a single class `Foo`[^access] | `Foo` | 
+multiple namespaces           | `API` | 
 
 [^access]: In a class, use `:Field` and `:Access` declarations to expose objects.
 

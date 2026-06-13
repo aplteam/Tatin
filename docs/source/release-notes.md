@@ -12,10 +12,10 @@ The notes contain
 -   important information
 
 For a complete list of fixes, added features, etc. see
-:fontawesome-brands-github:
+
 [Tatin on GitHub](https://github.com/aplteam/Tatin).
 
-:fontawesome-solid-arrow-up-right-from-square: 
+ 
 [Semantic versioning](https://semver.org)
 
 ---

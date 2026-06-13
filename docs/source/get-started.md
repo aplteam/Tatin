@@ -59,7 +59,7 @@ List all the packages on the principal registry.
 Each package is identified by a name and group name.
 The listing shows the number of major versions of the package.
 
-:fontawesome-solid-arrow-up-right-from-square: [Semantic versioning](https://semver.org)
+ [Semantic versioning](https://semver.org)
 
 You can restrict the listing to a single group.
 

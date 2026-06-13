@@ -25,7 +25,7 @@ Tatin is included in Dyalog 19.0; in Dyalog 18.2 it has to be installed.
 
 Download the latest release of the Tatin client.
 
-:fontawesome-brands-github:
+
 <https://github.com/aplteam/Tatin/releases>
 
 Unzip the file and move folder `Tatin/` to the installation folder.
@@ -96,7 +96,7 @@ on other platforms, create it yourself.
 
     In version 19.0 the `Run.aplf` function offers a better way to achieve that, making `setup.dyalog` superfluous.
 
-:fontawesome-solid-download:
+
 [`setup.dyalog`](assets/setup.dyalog) model setup script
 
 If you already have a setup script:

@@ -86,9 +86,9 @@ To publish a package on the Principal Registry at [tatin.dev](https://tatin.dev)
 or on the [test server](https://test.tatin.dev)
 you must give it a `license` property with an acceptable value.
 
-:fontawesome-solid-terminal:
+
 [`]ListLicences`](user-commands.md#list-licences)<br>
-:fontawesome-solid-code:
+
 [`ListLicences`](api.md#list-licences)
 
 
@@ -102,7 +102,7 @@ you need an API key[^apikey] for the registry.
 
 !!! detail inline end ""
 
-    :fontawesome-solid-envelope:
+    
     [Request an API key](mailto:info@tatin.dev?subject=Request%20for%20an%20API%20key&body=Group%20name:%20%0D%0AMy%20name:%20%0D%0ACompany%20name:%20(if%20relevant)%0D%0AMaintainer%20email%20address:%20%0D%0A)
 
     Include
@@ -136,7 +136,7 @@ and whatever you publish there will eventually disappear.
 Your API keys are saved in your [user settings](user-settings.md).
 The quickest and safest way to edit them is with the command.
 
-:fontawesome-solid-terminal:
+
 [`]TATIN.UserSettings -edit`](user-commands.md#user-settings)
 
 

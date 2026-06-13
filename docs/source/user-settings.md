@@ -106,7 +106,7 @@ The `noCaching` flags in `tatin-client.json` toggle caching for specific Registr
 Caching is most commonly disabled for local Registries hosting packages being developed.
 
 
-:fontawesome-solid-terminal:
+
 [`]TATIN.Cache`](user-commands.md#cache)
 
 

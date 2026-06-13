@@ -40,7 +40,7 @@ Tatin calls the APL files _source_ and the others _assets_.
 
         ]TATIN.InstallPackages aplteam-MarkAPL path/to/myproj
 
-    :fontawesome-solid-terminal:
+    
     [`]InstallPackages`](user-commands.md#install-packages)
 
     This will install the dependencies in `myproj/packages`
@@ -53,7 +53,7 @@ Tatin calls the APL files _source_ and the others _assets_.
 
         ]TATIN.PublishPackage /path/to/myproj [tatin-test]
 
-    :fontawesome-solid-terminal:
+    
     [`]PublishPackage`](user-commands.md#publish-package)
 
     Tatin zips your package and uploads it to the registry. The registry unzips it, validates the configuration, and checks for a `LICENSE` file. If all is well, the package is stored permanently.

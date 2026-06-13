@@ -52,9 +52,9 @@ Strategy (3) appeals to many programmers: you are always up-to-date, and you alw
 But on reflection it looks much less appealing:
 
 1. Build your application, including updated dependencies
-1. Run your test cases; they all pass :fontawesome-solid-check:
+1. Run your test cases; they all pass 
 1. Rebuild your application without changing _anything_
-1. Rerun your test cases; but this time they fail :fontawesome-solid-xmark:
+1. Rerun your test cases; but this time they fail 
 
 This situation arises if, between the first and second build, the author of a dependency releases a new version with bugs in it. The second build fetches it,
 producing a different outcome – _even though you haven’t made any changes._
@@ -74,11 +74,11 @@ So, when asked to load installed packages, Tatin will do exactly that:
     Tatin does not update dependencies for you,
     but helps you discover whether later packages are available.
 
-    :fontawesome-solid-terminal:
+    
     [`]CheckForLaterVersions`](user-commands.md#check-for-later-versions)<br>
-    :fontawesome-solid-terminal:
+    
     [`]ReInstallDependencies`](user-commands.md#reinstall-dependencies)<br>
-    :fontawesome-solid-code:
+    
     [`ReInstallDependencies`](api.md#reinstall-dependencies)
 
 In our example
@@ -186,9 +186,9 @@ Looking under the covers:
 Both versions of `Zoo` have been loaded.
 That’s because the two `Load` operations are independent, so minimal version selection cannot be applied.
 
-:fontawesome-solid-terminal:
+
 [`]CheckForLaterVersion`](user-commands.md#check-for-later-version)<br>
-:fontawesome-solid-code:
+
 [`CheckForLaterVersion`](api.md#check-for-later-version)
 
 

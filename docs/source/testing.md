@@ -12,7 +12,7 @@ keywords: "apl, dyalog, github, tatin, test, testing"
 The Tester2 framework used for testing Tatin is very powerful, and offers lots of options.
 Only the basics are covered here.
 
-:fontawesome-brands-github:
+
 [Tester2](https://github.com/aplteam/Tester2)<br>
 `]ADOC #.Tatin.Tester2` (reference)
 
@@ -45,12 +45,12 @@ This runs all the tests in Debug mode, so if something goes wrong the framework 
 You will be asked if you want to copy the test data to a temporary folder in preparation.
 The usual answer is Yes.
 
-=== ":fontawesome-brands-windows: Windows"
+=== " Windows"
 
     You will be asked if you want to start a test server.
     The usual answer is Yes.
 
-=== ":fontawesome-brands-linux: Linux  :fontawesome-brands-apple: macOS"
+=== " Linux   macOS"
 
     You will be asked to start the server yourself before carrying on.
     **With this procedure for starting a Test Server, testing cannot be automated.**

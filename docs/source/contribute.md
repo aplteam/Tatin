@@ -18,7 +18,7 @@ To work on Tatin you need
 
 !!! tip inline end ""
 
-    :fontawesome-brands-github:
+    
     [How to contribute to a GitHub project](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project)
 
 -   Git and a GitHub account

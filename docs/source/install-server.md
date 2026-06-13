@@ -35,7 +35,7 @@ The most important are
 
 When the Tatin Server loads the INI file, it replaces `<INIFILE>` with the fully qualified path of the INI file.
 
-See :fontawesome-brands-github: [aplteam/Plodder](https://github.com/aplteam/Plodder) for INI file settings.
+See  [aplteam/Plodder](https://github.com/aplteam/Plodder) for INI file settings.
 Here are those you are likely to change for your Tatin server.
 
 
@@ -124,7 +124,7 @@ and return a 500 (Internal Server Error) response
 but do not stop the server.
 However, errors such as an aplcore or a WS FULL could bring the server down.
 
-!!! tip inline end "On Windows :fontawesome-brands-windows:"
+!!! tip inline end "On Windows "
 
     Running the server as a Windows Service gives you the best performance, but running it in a Docker container is still surprisingly fast, given that it runs a (very basic) version of Linux in a virtual machine.
 
@@ -206,4 +206,4 @@ ReloadWS         | Reload the server workspace if you detect a new one.
 
 
 
-[^plodini]: See :fontawesome-brands-github: [aplteam/IniFiles](https://github.com/aplteam/IniFiles).
+[^plodini]: See  [aplteam/IniFiles](https://github.com/aplteam/IniFiles).

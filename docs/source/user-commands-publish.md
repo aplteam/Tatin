@@ -35,7 +35,7 @@ Until version 0.118.0 `projectspace` was `tatinVars`.
 Until version 0.117.0 you could set the build number by including it in the version.
 Now the build number gets bumped in all cases.
 
-:fontawesome-solid-code: API:
+ API:
 [`BuildPackage`](api.md#build-package)
 
 
@@ -71,7 +71,7 @@ Example arguments:
     [test-tatin]foo                         ⍝ versions of foo
     file:///path/2/Registry/grp-foo-1.0.0   ⍝ local package
 
-:fontawesome-solid-code: API:
+ API:
 [`DeletePackages`](api.md#delete-packages)
 
 
@@ -99,7 +99,7 @@ Example: Deprecate on `[tatin]` all major versions of `grp-foo`:
 ]TATIN.DeprecatePackage [tatin]grp-foo "Use MarkAPL instead"
 ```
 
-:fontawesome-solid-code: API:
+ API:
 [`DeprecatePackage`](api.md#deprecate-package)
 
 
@@ -120,7 +120,7 @@ and cache the result.
 ------|----------------------------------------
 check | Ignore the cache: query the server and cache the response.
 
-:fontawesome-solid-code: API:
+ API:
 [`GetDeletePolicy`](api.md#get-delete-policy)
 
 
@@ -146,7 +146,7 @@ to the Tatin rules.
 --------------|-----------------------------------------------------------------
 dependencies= | Find dependencies in this project subfolder. (Rarely need to specify: see [Publish Packages](publish-packages.md).)
 
-:fontawesome-solid-hand-point-right:
+
 [Publishing a user-command package](publish-packages.md#user-command-packages)<br>
-:fontawesome-solid-code: API:
+ API:
 [`PublishPackage`](api.md#publish-package)

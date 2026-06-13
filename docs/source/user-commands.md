@@ -55,7 +55,7 @@ Case-insensitive search patterns are used to find packages.
 
 ------|-----------------------------
 reg   | registry alias or URL
-alias | local alias for the package (use only for [installing packages](#install-packages) or [loading packages](#lioad-packages))
+alias | local alias for the package (use only for [installing packages](#install-packages) or [loading packages](#load-packages))
 name  | package name
 maj   | major version number
 min   | minor version number
@@ -88,7 +88,7 @@ path  | Return full package paths.
    ...
 ```
 
-:fontawesome-solid-code: API:
+ API:
 [`ClearCache`](api.md#clear-cache),
 [`ListCache`](api.md#list-cache)
 
@@ -145,7 +145,7 @@ verbose= | <ol markdown><li>Print a detailed report for each package copied.</li
 
         ]CopyRegistry /path/2/Reg -list=file=/myPkgs.txt
 
-:fontawesome-solid-code: API:
+ API:
 [`CopyRegistry`](api.md#copy-registry)
 
 
@@ -220,11 +220,7 @@ scan the source/s recursively for folders wih `apl-dependencies.txt` files and l
 --------|----------
 verbose | Report the actual package folder(s) rather than the hosting folder.
 
-<!-- FIXME All I see listed is full package IDs (SJT)
-For me it works. Please open an issue with a recipe how to reproduce this (KJ)
--->
-
-:fontawesome-solid-code: API:
+ API:
 [`FindDependencies`](api.md#find-dependencies)
 
 
@@ -303,7 +299,7 @@ nobetas | Ignore beta versions.
     foo [MyUCMDs]test                    ⍝ install user command foo into test/
     ```
 
-:fontawesome-solid-code: API:
+ API:
 [`InstallPackages`](api.md#install-packages)
 
 
@@ -318,7 +314,7 @@ If `reg` omitted, use `[tatin]`.
 ---|---
 all | List all versions of all deprecated versions.
 
-:fontawesome-solid-code: API:
+ API:
 [`ListDeprecated`](api.md#list-deprecated)
 
 
@@ -337,7 +333,7 @@ If `reg` omitted, use `[tatin]`.
  Unlicense  CC0  0BSD  EPL  MIT  BSL  ISC  Apache  BSD-2  BSD-3
 ```
 
-:fontawesome-solid-code: API:
+ API:
 [`ListLicences`](api.md#list-licences)
 
 
@@ -372,7 +368,7 @@ noaggr       | don’t aggregate
 
 !!! tip "Both / or \\ work as path separators and trailing separators are optional."
 
-:fontawesome-solid-code: API:
+ API:
 [`ListPackages`](api.md#list-packages)
 
 
@@ -392,7 +388,7 @@ raw  | Show the raw data.
 
 See also [`]TATIN.UserSettings`](#user-settings).
 
-:fontawesome-solid-code: API:
+ API:
 [`ListRegistries`](api.md#list-registries)
 
 
@@ -412,7 +408,7 @@ list alphabetically all tags used in all packages there.
 tags= | (comma-separated list) show only tags on packages that have all the listed tags
 os=   | (comma-separated list: `lin`, `mac` and `win`) show only tags on packages restricted to these operating systems
 
-:fontawesome-solid-code: API:
+ API:
 [`ListTags`](api.md#list-tags)
 
 
@@ -433,7 +429,7 @@ take publication dates into account.
 -----|-----------------------
 date | Show publication dates.
 
-:fontawesome-solid-code: API:
+ API:
 [`ListVersions`](api.md#list-versions)
 
 
@@ -462,7 +458,7 @@ If the Cider project config defines multiple installation folders, ask which to 
 makeHomeRelative | Instead of absolute paths, make `TatinVars.GetFullPath2AssetsFolder` and `TatinVars.HOME` return only the package folder and its parent.
 overwrite        | Overwrite existing packages in the target namespace.
 
-:fontawesome-solid-code: API:
+ API:
 [`LoadDependencies`](api.md#load-dependencies)
 
 
@@ -517,7 +513,7 @@ verbose | Report details.
     [company]foo,[personal]bar      ⍝ multiple packages from specific servers
     ```
 
-:fontawesome-solid-code: API:
+ API:
 [`LoadPackages`](api.md#load-packages)
 
 
@@ -637,7 +633,7 @@ Questioning 1 Tatin Registry...
         ]TATIN.Ping https://tatin.dev
         ]TATIN.Ping http://tatin.dev   ⍝ This won't work
 
-:fontawesome-solid-code: API:
+ API:
 [`Ping`](api.md#ping)
 
 
@@ -677,7 +673,7 @@ in (say) your UCMDs folder without prompts:
 ]ReinstallDependencies [MyUCMDs] -recursive -update -force
 ```
 
-:fontawesome-solid-code: API:
+ API:
 [`ReinstallDependencies`](api.md#reinstall-dependencies)
 
 
@@ -707,7 +703,7 @@ If `folder` is a relative path, it must be a subfolder of an open Cider project.
 cleanup | See syntax (3) above.
 quiet   | Don’t report progress.
 
-:fontawesome-solid-code: API:
+ API:
 [`UninstallPackages`](api.md#uninstall-packages)
 
 !!! detail "If a package was installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well, is the package actually removed."
@@ -803,11 +799,10 @@ It also deletes any files `usage-data-<YYYY>-<MM>.csv`.
 
 For example, in January 2023 it created a file `usage-data-2022.csv`, and deleted all files `usage-data-2022-*.csv`.
 
-:fontawesome-solid-desktop:
 A Tatin server [offers a page](https://tatin.dev/v1/usage-data "Link to the principal Tatin server`s Usage Data page") dedicated to the usage data.
 The page shows some of the data and provides links for downloading.
 
-:fontawesome-solid-code:
+
 There are no API functions available for retrieving usage data.
 
 
@@ -822,13 +817,11 @@ hiding the API key.
 !!! tip "To see current user settings rather than the file content, use the API.""
 
 --------|-------------------------------------------------------
-edit    | Let the user edit the file then ask the user whether to refresh current settings.
+edit    | Let the user edit the file, then ask the user whether to refresh current settings.
 home    | Show path to the config file and do nothing else.
 refresh | Refresh the current user settings from the config file.
 
-:fontawesome-solid-code: API:
-[`UserSettings`](api.md#user-settings)
-
+ API: [`UserSettings`](api.md#user-settings)
 
 
 ## Version
@@ -852,7 +845,7 @@ Show the installed and minimum required versions of the Principal Registry.
 
 !!! warning "Setting the `check` flag overrides all other arguments."
 
-:fontawesome-solid-code: API:
+ API:
 [`Version`](api.md#version)
 
 

@@ -419,15 +419,15 @@ path←{aplVersion} GetUserHomeFolder str
 Returns the standard path for user-specific data, with string `str` appended.
 
 
-=== ":fontawesome-brands-windows: Windows"
+=== " Windows"
 
         C:\Users\%USERPROFILE%\AppData\Roaming\Tatin
 
-=== ":fontawesome-brands-linux: Linux"
+=== " Linux"
 
         /home/{⎕AN}/Tatin
 
-=== ":fontawesome-brands-apple: macOS"
+=== " macOS"
 
         /Users/{⎕AN}/Tatin
 

@@ -42,15 +42,15 @@ Your package configuration is in file `apl-package.json` in the package root.
 
 !!! detail "Key `wx` was removed in Tatin version 0.61.0."
 
-:fontawesome-solid-terminal:
+
 [`]CreatePackage`](user-commands-publish.md#create-package)<br>
-:fontawesome-solid-terminal:
+
 [`]PackageConfig`](user-commands.md#package-config)<br>
-:fontawesome-solid-code:
+
 [`InitialisePackage`](api.md#initialise-package)<br>
-:fontawesome-solid-code:
+
 [`InitPackageConfig`](api.md#init-package-config)<br>
-:fontawesome-solid-code:
+
 [`ReadPackageConfigFile`](api.md#read-package-config-file)
 
 

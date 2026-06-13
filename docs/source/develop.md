@@ -24,13 +24,13 @@ To update packages installed in `packages/` or `packages_dev/`, run:
 ]ReInstallDependencies /path/to/Tatin/packages -update
 ```
 
-Notes: 
+Notes:
 
 * If you want to check what Tatin would do, specify the `-dry` flag: this causes the function to report what it would do without actually doing it.
 
 * To upgrade to a newer major version, use the `-major` flag.
 
-Re-installing into `packages/` is not sufficient on its own; the code (and any associated assets) must be copied from packages into the `APLSource/` folder. Only then can Tatin make use of these packages. There is a helper available for this:
+Re-installing into `packages/` is not sufficient on its own; the code (and any associated assets) must be copied from `packages/` into the `APLSource/` folder. Only then can Tatin make use of these packages. There is a helper available for this:
 
 ```
 #.Tatin.Admin.CopyPackagesToAPLSource 1
@@ -41,7 +41,7 @@ The left argument is optional and must be a flag. Default is 0, and a 1 forces a
 
 !!! danger "Make sure you do not make changes to any of those packages."
 
-    That is a mistake that is easy to make, because it is not obvious what code is part of a package and what code isn't! That's why the packages are installed in the `packages/` folder: that documents not only the packages, it is a record of the code as well.
+    That is a mistake that is easy to make, because it is not obvious what code is part of a package and what code isn't! That's why the packages are installed in the `packages/` folder: that folder documents what code came from a package
 
     When code that came from a package is changed, Link will save it on disk, and that appears to be fine. Until a new version of the package comes along, you re-install all packages in the `packages/` folder and then call the `Admin.CopyPackagesToAPLSource` helper - and your change is gone!
 
@@ -113,7 +113,7 @@ You might even want to run the server in one workspace as an opened Cider projec
 You would need to be very careful lest you lose code. (See warning box below.)
 
 Suppose you want to run the Tatin server that is part of the Tatin project.
-When the Tatin test cases are executed, Tatin would ask you whether you want to start this server automatically.
+When the Tatin test cases are executed, Tatin will ask you whether you want to start this server automatically.
 (This is not about `https://test.tatin.dev`.)
 
 However, when the server is started as part of the tests, it is NOT opened as a Cider project, and changes would not be tracked by Link.
@@ -138,7 +138,7 @@ With .NET, you can limit the danger:
 
 !!! warning inline end "Without .NET"
 
-    On non-Windows platforms with no .NET available, `watch=both` is not an option, so that is particularly dangerous.
+    Without .NET (a possibility on none-Windows platform), `watch=both` is not an option, so that is particularly dangerous.
 
 Then when you change an APL object in one workspace, it will not only be written to disk: Link will **also** bring that change into the other workspace.
 

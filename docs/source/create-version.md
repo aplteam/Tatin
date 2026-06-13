@@ -14,7 +14,7 @@ This article is about what an administrator of the Tatin project on GitHub does 
 
 ## Check version, history and documentation
 
-!!! info "A version comprehends both server and client, so the version number is always the same for both."
+!!! info "A version comprises both server and client, so the version number is always the same for both."
 
 1. Check `#.Tatin.Registry.Version` is correct
 1. Check `#.Tatin.Registry.History` is correct
@@ -25,25 +25,23 @@ A function creates a single HTML file from all the Markdown documentation, makin
 
           htmlFilename←#.Tatin.Admin.CreateProofReadDocument 1
 
-Open that file with the word processor of your choice and use its spell-checking capabilities.
+Open that file with a tool of your choice and use its spell-checking capabilities.
 
 
-## Run the `Make` function
+## Run Tatin's `Make` function
 
-    #.Tatin.Admin.Make 0
-
-
-!!! tip inline end "Ask Cider"
+!!! tip "Ask Cider"
 
     You can ask Cider how to create a new version of Tatin:
 
-        ]CIDER.Make
-
+              ]CIDER.HowToMakeNewVersion
+```
+    #.Tatin.Admin.Make 0
+```
 
 The `Make` function launches two instances of Dyalog, one for creating the client version, one for creating the server version:
 
 1.  runs `#.Tatin.Admin.MakeClient`
-1.  compiles the documentation from Markdown into HTML files and distributes them
 1.  runs `#.Tatin.Admin.MakeServer`
 
 !!! info "The build ID is always bumped when you create a new version."
@@ -54,7 +52,7 @@ The `Make` function launches two instances of Dyalog, one for creating the clien
 The arguments to `Make` are both flags:
 
 ------|---
-right | Suppress user prompts: 1 is suitable for, say, a batch script.<br><br>If 0, `Make` will ask whether you want to try updating the packages Tatin itself depends on, and whether to copy the new version of the Tatin Client to the `MyUCMDs/` folder.
+right | Suppress user prompts: 1 is suitable for, say, a batch script
 left  | (optional) Block the `load` and `lx` command-line options in instances of Dyalog started to create the Client and the Server, thus preventing the interpreter from immediately running the code, and allowing you to run the code in the Tracer. (Defaults to zero.)
 
 
@@ -69,4 +67,25 @@ The ZIPs:
     Tatin-Client-{major}.{minor}.{patch}.zip
     Tatin-Server-{major}.{minor}.{patch}.zip
 
-**_ FIXME What to do with the ZIPs? _**
+### The `Run` function
+
+This function is used to make Tatin and/or Cider available in `⎕se`. A new release of Tatin requires both `Run.aplf` and a zipped version of it: `Run.zip`. Note that the function is part of the Tatin project.
+
+### The `]Activate` user command
+
+This user command is a general one, but it was invented with Dyalog v18.2 particularly for Tatin: it can be used to make experimental software like Tatin & Cider available (`]Activate`) or remove it (`]Deactivate`). You can also call `]ListActivated` in order to check what got activated.
+
+For the time being the user command is part of the Tatin project. That implies that the script (`Activate.dyalog`) as well as a ZIP file that contains just that script (`Activate.zip`) must be part of a release until further notice.
+
+### Releasing
+
+Create a new release on GitHub:
+  
+1. On GitHub, go to the Tatin repository and select Releases → Draft a new release
+1. Create a new tag matching the version number, e.g. 0.112.0
+1. Set the release title to the same version number
+1. Attach files as release assets
+   * The two ZIPs from `Dist/`
+   * `Activate.dyalog` and `Activate.zip`
+   * `Run.aplf` and `Run.zip`
+1. Publish the release

@@ -1,20 +1,20 @@
 ---
-title: "GitHub & Tatin"
-description: "Tips on using Tatin with GitHub"
+title: "GitHub rate limits"
+description: "How GitHub API rate limits affect Tatin and how to work around them"
 keywords: apl, dyalog, git, github, limit, tatin
 ---
-# GitHub & Tatin
+# GitHub rate limits
 
 
 
-!!! abstract "Tatin is version-controlled by Git and hosted on GitHub."
+!!! abstract "GitHub API rate limits can affect Tatin; here's how to work around them."
 
 There is no limit for accessing [GitHub](https://github.com) with a browser, but there are limits for what you can do when accessing GitHub via its API.
 
 
 ## GitHub’s limit policy
 
-GitHub has a fairly complex limit policy, which means that above a certain threshold further requests will be rejected for a period of time, typically one hour.
+GitHub has a fairly complex limit policy, which means that above a certain threshold, further requests will be rejected for a period of time, typically one hour.
 
 It is very unlikely that an ordinary Tatin user could hit this limit, because with a Tatin client, the only command that accesses GitHub via the API is `UpdateTatin`. With a Tatin server, it does not matter at all.
 

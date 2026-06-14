@@ -8,7 +8,7 @@ keywords: apl,conflict,minimum version selection,tatin,requirements,strategy,ver
 !!! abstract "How Tatin deals with conflicting requirements for package versions"
 
 As you incorporate packages and their dependencies into your application,
-you see different packages sometimes specify as dependencies different versions of the same package.
+different packages sometimes specify different versions of the same package as dependencies.
 As a package manager, Tatin has policies for resolving these conflicts.
 
 You can [get started](get-started.md) without grasping these policies,
@@ -31,7 +31,7 @@ Both rely on package `Zoo`; but while `Foo` requests `Zoo` 1.1.1,
 The best available version 1 of `Zoo` is 1.3.0.
 There is also a later major version: 2.0.0.
 
-Version 2.0.0 is not an option, because it is considered a completely different package and so ignored.
+Version 2.0.0 is not an option, because it is considered a completely different package and is therefore ignored.
 
 From [semantic versioning](https://semver.org) we know `Goo` relies on features of `Zoo` new in version 1.2.0,
 and would break on version 1.1.1, which doesn’t have them.
@@ -90,7 +90,7 @@ In our example
 This means `Foo` will also use version 1.2.0 of `Zoo`.
 
 This strategy is called [Minimal Version Selection](https://research.swtch.com/vgo-mvs "Link to the paper defining it") (MVS).
-It guarantees that when you rebuild, you get the same result, but it will grab the latest installed version.
+It guarantees that when you rebuild, you get the same result, but it grabs the latest installed version.
 
 
 
@@ -107,7 +107,7 @@ _Voila!_ Thanks to MVS, everything works.
 
 ### Comparing versions
 
-As long as the patch is a digit, precedence is easy to determine.
+As long as the patch is a number, precedence is easy to determine.
 
 Precedence is obvious for
 
@@ -187,9 +187,7 @@ Both versions of `Zoo` have been loaded.
 That’s because the two `Load` operations are independent, so minimal version selection cannot be applied.
 
 
-[`]CheckForLaterVersion`](user-commands.md#check-for-later-version)<br>
-
-[`CheckForLaterVersion`](api.md#check-for-later-version)
+Check the user command [`]CheckForLaterVersion`](user-commands.md#check-for-later-version) or the API-equivalent [`CheckForLaterVersion`](api.md#check-for-later-version).
 
 
 ## Installing packages
@@ -248,9 +246,8 @@ Load installed packages with command [`]LoadDependencies`](user-commands.md#load
 Its argument is a folder with files `apl-dependencies.txt` and `apl-buildlist.json`,
 created when you installed your first package there.
 
-You can also specify a second argument: where to create the references pointing to the principal packages.[^defaultns]
-
-[^defaultns]: (Defaults to `#` if that is your current namespace. If you are, say, in `#.foo` then Tatin asks whether to install into `#` or `#.foo`.)
+You can also specify a second argument: where to create the references pointing to the principal packages.
+It defaults to `#` if that is your current namespace. If you are, say, in `#.foo` then Tatin asks whether to install into `#` or `#.foo`.
 
 ```
 ]TATIN.LoadDependencies /myPkgs/ #.Temp
@@ -264,7 +261,7 @@ In our example the pruning eliminates `Zoo` 1.1.1:
 rather than loading `Zoo` twice, Tatin loads only the latest **installed** version.
 Both `Foo` and `Goo` will use `Zoo` version 1.2.0.
 
-## Enforce update when a package is available with a higher major version number.
+## Enforce update when a package is available with a higher major version number
 
 One way to update to a new major version is to delete all packages from an installation folder, update the dependency file to refer to the new major version number and then open the project with Cider. 
 
@@ -294,7 +291,7 @@ Consider, say, these packages (dependencies indented):
     group-boo-1.0.0
       group-zoo-1.0.0
 
-Minimal version selection (MVS) means both `foo` and `boo` use `zoo` 1.1 when loaded.
+Minimal version selection (MVS) means both `foo` and `boo` use `zoo` 1.1.0 when loaded.
 What happens if you remove `boo`?
 
 Either could be argued:
@@ -327,11 +324,3 @@ performs some health checks, and if all is well, recreates the build list.
 Sometimes you might need to downgrade, for example from a version you find buggy, to an older version known to be okay.
 
 Tatin does not offer help here; you need to do this yourself.
-
-
-
-
-
-
-
-

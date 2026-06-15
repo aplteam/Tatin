@@ -14,7 +14,7 @@ keywords: apl, documentation, glossary, tatin
 !!! abstract "Some terms used in the Tatin documentation"
 
 beta
-: A package with a text description in its patch.
+: A package with a text description in its patch number. It's a pre-release of a package.
 
     (See **version** and examples of **full package ID**.)
 
@@ -32,7 +32,7 @@ constant
 : A niladic function or a variable. (Same syntax, but the former is immutable.)
 
 dependency
-: Contrary to normal usage, a dependency of a package `foo` is another package on which `foo` depends.
+: A dependency of a package `foo` is another package on which `foo` depends.
 
 
 flag
@@ -52,8 +52,8 @@ full package ID
 
         apltree-Foo-1.0.0
         apltree-Foo-1.0.1+123
-        apltree-Foo-1.0.1-alpha-1         ⍝ beta
-        apltree-Foo-1.0.2-alpha-1+127     ⍝ beta
+        apltree-Foo-1.0.1-beta-1         ⍝ beta
+        apltree-Foo-1.0.2-fix_708+127    ⍝ beta fixing issue 708
 
 
 fully qualified namespace
@@ -100,7 +100,7 @@ package space
     ```
 
 parameter space
-: A namespace of variables representing parameters
+: A namespace of variables representing parameters.
 
 Plodder
 : A generalized HTTP server, used by Tatin, based on [Rumba](https://github.com/aplteam/RumbaLean) and Conga.
@@ -109,8 +109,7 @@ Plodder
 
 
 registry alias
-: A short name you can use locally as an alternative to its URL.
-**_ FIXME Can I also use as an alternative to a path? _**
+: A short name you can use locally as an alternative to the registry's URL or path.
 
 : Tatin is installed with `tatin` and `tatin-test` as aliases for the Principal Registry and the Test Server.
 

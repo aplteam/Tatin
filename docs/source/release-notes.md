@@ -9,7 +9,7 @@ keywords: apl,dyalog,history,tatin,release,version
 The notes contain 
 
 -   actions to take before using a new version
--   important information regarding compatability
+-   important information regarding compatibility
 
 For a complete list of fixes, added features, etc. see [Tatin on GitHub](https://github.com/aplteam/Tatin).
 

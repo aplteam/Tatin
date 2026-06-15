@@ -9,15 +9,11 @@ keywords: apl,dyalog,history,tatin,release,version
 The notes contain 
 
 -   actions to take before using a new version
--   important information
+-   important information regarding compatability
 
-For a complete list of fixes, added features, etc. see
-
-[Tatin on GitHub](https://github.com/aplteam/Tatin).
+For a complete list of fixes, added features, etc. see [Tatin on GitHub](https://github.com/aplteam/Tatin).
 
  
-[Semantic versioning](https://semver.org)
-
 ---
 
 ## v0.124.0 ⋄ 2026-06-03

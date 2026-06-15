@@ -48,11 +48,11 @@ For example, a file `RemoveDyalogFromTags.aplf` gets loaded into an unnamed name
 * the package ID as the left argument
 * a two-element vector as the right argument:
   * The first element is the package configuration as a namespace
-  * The second argument is the path to the Registry
+  * The second element is the path to the Registry
 
 Once executed, the file is renamed to `RemoveDyalogFromTags.aplf.executed`.
 
-Note that the user command `]Maintenance` serves a very different purpose: It can be used to adapt *installed* packages!
+Note that the user command `]Maintenance` serves a different purpose: It can be used to adapt *installed* packages!
 
 
 

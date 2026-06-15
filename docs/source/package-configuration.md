@@ -7,7 +7,7 @@ keywords: apl,configuration,package,tatin
 
 !!! abstract "Your package’s configuration contains essential information about it."
 
-Your package configuration is in file `apl-package.json` in the package root.
+Your package configuration is in the file `apl-package.json` in the package root.
 
 !!! example
 
@@ -73,7 +73,7 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
 
         If
 
-        -   the path contains a `:` or begins with `/`, **unless** the path begins with absolute path to the package root, when Tatin silently converts it to a relative path
+        -   the path contains a `:` or begins with `/`, **unless** the path begins with the absolute path to the package root, when Tatin silently converts it to a relative path
         -   the path does not point to an existing folder
 
     See also `files` and [`GetFullPath2AssetsFolder`](#package-metadata).
@@ -119,7 +119,7 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
     -   pointer to a function or a variable in the package, beginning `⎕THIS.`, e.g. `⎕THIS.Admin.ShowHelp`
 
 `exclude`
-: _Comma-delimited string._ Paths from `source` to file/s or directories to exclude from the package.
+: _Comma-delimited string._ Paths from `source` to files or directories to exclude from the package.
 
 
     ??? tip "Use cases"
@@ -166,7 +166,7 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
     -   to deal with platform-dependent assets
 
     If the function is monadic its argument is the file path to the package.
-    (If the package is brought into the workspace by `LoadPackages` and has no assets,  the argument will be empty.)
+    (If the package is brought into the workspace by `LoadPackages` and has no assets, the argument will be empty.)
 
     The function must return a result, which is assigned to `TatinVars.LX` inside the [package space](glossary.md).
     (Without an `lx` object there will be no `TatinVars.LX`.)
@@ -442,9 +442,9 @@ So any package function can refer to its metadata
 : _Strings._ [Full package IDs](glossary.md) of this package’s dependencies.
 
 `GetFullPath2AssetsFolder`
-: _String._ Returns path to the assets by putting together `TatinVars,HOME` and `TatinVars,ASSETS` – empty if there are no assets.
+: _String._ Returns path to the assets by putting together `TatinVars.HOME` and `TatinVars.ASSETS` – empty if there are no assets.
 
-    If `HOME` is empty or does not exist on disk the result is `ASSETS`
+    If `HOME` is empty or does not exist on disk, the result is `ASSETS`.
 
     ```apl
           #.MarkAPL

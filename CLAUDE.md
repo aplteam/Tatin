@@ -119,6 +119,8 @@ cd docs && mkdocs serve   # local preview
 
 ### Editing documentation
 
+Do not use the Oxford comma in documentation.
+
 When reviewing `docs/source/*.md` files for typos and grammar:
 
 - Fix only clear errors (spelling, punctuation, grammar). Do not rephrase or restructure.

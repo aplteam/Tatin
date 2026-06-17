@@ -25,6 +25,15 @@ The Tatin [Principal Registry](https://tatin.dev) hosts packages with minimal li
 You can also host a Tatin registry on your local machine or on a server.
 
 
+## Where packages are installed
+
+Package managers generally follow one of two strategies: installing packages to the operating system so they are available machine-wide, or installing them per application so each project carries its own dependencies.
+
+System-wide installation means one copy of a package is shared by everything on the machine. This saves disk space but makes version conflicts much more likely, and potentially numerous: if project A needs version 1.2.0 of a library and project B needs version 1.5.0, one of them loses. It also makes projects less portable — a project that relies on system packages works correctly only on machines where those packages are already installed.
+
+Tatin follows the per-application strategy. When you install a package into a project, it is placed in the project's package installation folder and stays there. Projects are therefore self-contained: move a project to a different machine and its dependencies travel with it. The trade-off is some duplication if many projects share the same packages, but in practice this is rarely significant.
+
+
 ## :dyalog-tatin-logo: Packages
 
 A package should serve a particular, limited task, for example, converting Markdown files into HTML. 

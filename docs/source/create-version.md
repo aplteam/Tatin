@@ -1,7 +1,7 @@
 ---
 title: "Creating a new version"
 description: "What a Tatin project administrator does to create a new release on GitHub"
-<!-- keywords: "github, proofread, version" -->
+keywords: 
 ---
 # Creating a new version
 

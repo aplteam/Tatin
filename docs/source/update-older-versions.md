@@ -1,7 +1,7 @@
 ---
 title: "Update older versions"
 description: "How to update older versions of Tatin, including special steps for OneDrive users"
-<!-- keywords: onedrive,update,versions -->
+keywords: 
 ---
 # Update older versions
 

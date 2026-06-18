@@ -1,7 +1,7 @@
 ---
 title: "Secure your Tatin registry"
 description: "How to authorise users and secure your Tatin server from attack"
-<!-- keywords: "certificate, credentials, https, key, registry, reverse-proxy, security, server" -->
+keywords: 
 ---
 # Secure your Tatin registry
 

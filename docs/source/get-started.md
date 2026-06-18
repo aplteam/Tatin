@@ -1,7 +1,7 @@
 ---
 title: "Get started with Tatin"
 description: ""
-<!-- keywords: tutorial -->
+keywords: 
 ---
 # Get started with Tatin
 

@@ -1,7 +1,7 @@
 ---
 title: "Package Configuration"
 description: "The package configuration file and its settings"
-<!-- keywords: configuration,package -->
+keywords: 
 ---
 # Package configuration
 

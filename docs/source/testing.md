@@ -1,7 +1,7 @@
 ---
 title: "Testing"
 description: "How to execute the Tatin test suite"
-<!-- keywords: "github, test, testing" -->
+keywords: 
 ---
 # Testing
 

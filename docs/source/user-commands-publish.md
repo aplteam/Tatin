@@ -1,7 +1,7 @@
 ---
 title: "User commands for publishing"
 description: "Further user commands for publishing Tatin packages"
-<!-- keywords: publish,registry,user-commands -->
+keywords: 
 ---
 # User commands for publishing
 

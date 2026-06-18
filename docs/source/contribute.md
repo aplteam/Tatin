@@ -1,7 +1,7 @@
 ---
 title: "Contributors"
 description: "How to contribute to Tatin and what you need to set up first"
-<!-- keywords: "contribute, github" -->
+keywords: 
 ---
 # Contribute to Tatin
 

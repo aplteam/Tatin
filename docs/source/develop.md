@@ -1,7 +1,7 @@
 ---
 title: "Developing"
 description: "Tatin's internal architecture and practical guidance for developers working on the Tatin codebase itself"
-<!-- keywords: architecture,cider,client,dependencies,development,link,server -->
+keywords: 
 ---
 # Developing
 

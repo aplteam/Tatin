@@ -1,7 +1,7 @@
 ---
 title: "Development Workflow"
 description: "Suggested workflow for developing and publishing Tatin packages across local, team, and corporate registries"
-<!-- keywords: development,package,registry,workflow -->
+keywords: 
 ---
 # Development workflow
 

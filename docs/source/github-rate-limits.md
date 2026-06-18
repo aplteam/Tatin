@@ -1,7 +1,7 @@
 ---
 title: "GitHub rate limits"
 description: "How GitHub API rate limits affect Tatin and how to work around them"
-<!-- keywords: git, github, limit -->
+keywords: 
 ---
 # GitHub rate limits
 

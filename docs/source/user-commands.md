@@ -1,7 +1,7 @@
 ---
 title: "User commands"
 description: "Use Tatin through its user commands"
-<!-- keywords: user-commands -->
+keywords: 
 ---
 # User commands
 

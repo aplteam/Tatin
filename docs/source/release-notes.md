@@ -1,7 +1,7 @@
 ---
 title: "Release Notes"
 description: "Version release history"
-<!-- keywords: history,release,version -->
+keywords: 
 ---
 # Release notes
 

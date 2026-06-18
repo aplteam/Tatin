@@ -1,7 +1,7 @@
 ---
 title: "Public interfaces"
 description: "How to control which objects of a Tatin package are exposed as its public interface"
-<!-- keywords: api, interface, package -->
+keywords: 
 ---
 # Public interface to a package
 

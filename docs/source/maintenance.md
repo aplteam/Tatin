@@ -1,7 +1,7 @@
 ---
 title: "Server Maintenance"
 description: "Maintaining your Tatin server"
-<!-- keywords: "maintenance, registry, server, tags" -->
+keywords: 
 ---
 # Maintain your server
 

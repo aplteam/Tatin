@@ -1,7 +1,7 @@
 ---
 title: "Publish a package"
 description: "Publish your first package and understand where dependencies are installed"
-<!-- keywords: install,package,publish,user-command -->
+keywords: 
 ---
 # Publish a package
 

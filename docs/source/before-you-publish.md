@@ -1,7 +1,7 @@
 ---
 title: "Before You Publish"
 description: "Package identity, licences, and API keys: what you need before publishing a Tatin package"
-<!-- keywords: api-key,licence,package,version -->
+keywords: 
 ---
 # Before you publish
 

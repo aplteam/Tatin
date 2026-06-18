@@ -1,7 +1,7 @@
 ---
 title: "Install client"
 description: "How to install the Tatin client in Dyalog v18.2"
-<!-- keywords: install -->
+keywords: 
 ---
 # Install the Tatin client
 

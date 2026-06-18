@@ -1,7 +1,7 @@
 ---
 title: "Glossary"
 description: "Definitions of terms used in the Tatin documentation"
-<!-- keywords: documentation, glossary -->
+keywords: 
 ---
 # Glossary
 

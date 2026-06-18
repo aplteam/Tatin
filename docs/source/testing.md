@@ -1,7 +1,7 @@
 ---
 title: "Testing"
-description: "How to execute the Tatin test suite."
-keywords: "apl, dyalog, github, tatin, test, testing"
+description: "How to execute the Tatin test suite"
+<!-- keywords: "github, test, testing" -->
 ---
 # Testing
 

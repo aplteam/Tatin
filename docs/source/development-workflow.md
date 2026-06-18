@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Development Workflow"
+title: "Development Workflow"
 description: "Suggested workflow for developing and publishing Tatin packages across local, team, and corporate registries"
-keywords: apl,development,package,registry,tatin,workflow
+<!-- keywords: development,package,registry,workflow -->
 ---
 # Development workflow
 

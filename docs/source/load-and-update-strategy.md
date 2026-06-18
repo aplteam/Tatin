@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Load and Update"
+title: "Load and Update"
 description: "How Tatin deals with conflicting requirements for package versions"
-keywords: apl,conflict,minimum version selection,tatin,requirements,strategy,version
+<!-- keywords: conflict,minimum-version-selection,requirements,strategy,version -->
 ---
 # Tatin’s load and update strategy
 

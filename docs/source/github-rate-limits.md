@@ -1,7 +1,7 @@
 ---
 title: "GitHub rate limits"
 description: "How GitHub API rate limits affect Tatin and how to work around them"
-keywords: apl, dyalog, git, github, limit, tatin
+<!-- keywords: git, github, limit -->
 ---
 # GitHub rate limits
 

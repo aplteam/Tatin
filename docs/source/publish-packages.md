@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Publish a package"
-description: "Publish your first package; understand where dependencies are installed"
-keywords: apl,delete,install,organise,package,publish,tatin,user command
+title: "Publish a package"
+description: "Publish your first package and understand where dependencies are installed"
+<!-- keywords: install,package,publish,user-command -->
 ---
 # Publish a package
 

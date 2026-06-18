@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Server Installation"
+title: "Server Installation"
 description: "How to install and update your own Tatin registry server"
-keywords: "apl, dyalog, registry, server, tatin"
+<!-- keywords: "registry, server" -->
 ---
 # Install a registry server
 

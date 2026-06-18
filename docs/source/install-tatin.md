@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Install client"
-description: "How to install the Tatin client in Dyalog 18.2."
-keywords: apl,dyalog,install,tatin
+title: "Install client"
+description: "How to install the Tatin client in Dyalog v18.2"
+<!-- keywords: install -->
 ---
 # Install the Tatin client
 

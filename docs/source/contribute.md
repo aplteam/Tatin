@@ -1,7 +1,7 @@
 ---
-title: "Tatin for Contributors"
-description: "How to contribute to Tatin, and how to set up to do that."
-keywords: "apl, contribute, dyalog, github, tatin"
+title: "Contributors"
+description: "How to contribute to Tatin and what you need to set up first"
+<!-- keywords: "contribute, github" -->
 ---
 # Contribute to Tatin
 

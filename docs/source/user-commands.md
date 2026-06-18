@@ -1,7 +1,7 @@
 ---
-title: "Tatin user commands"
-description: "Use Tatin through its user commands."
-keywords: apl,dyalog,tatin,ui
+title: "User commands"
+description: "Use Tatin through its user commands"
+<!-- keywords: user-commands -->
 ---
 # User commands
 

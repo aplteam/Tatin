@@ -1,7 +1,7 @@
 ---
 title: "Release Notes"
 description: "Version release history"
-keywords: apl,dyalog,history,tatin,release,version
+<!-- keywords: history,release,version -->
 ---
 # Release notes
 

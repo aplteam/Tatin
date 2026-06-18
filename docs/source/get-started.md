@@ -1,7 +1,7 @@
 ---
 title: "Get started with Tatin"
 description: ""
-keywords: apl, tatin, tutorial
+<!-- keywords: tutorial -->
 ---
 # Get started with Tatin
 

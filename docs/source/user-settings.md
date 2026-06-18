@@ -1,7 +1,7 @@
 ---
-title: "Tatin User Settings"
-description: "Settings govern your use of Tatin"
-keywords: apl,settings,tatin
+title: "User Settings"
+description: "The Tatin user settings file and what each setting controls"
+<!-- keywords: settings -->
 ---
 # User settings
 

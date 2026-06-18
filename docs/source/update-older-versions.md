@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Update older versions"
-description: "How to update Tatin versions older than 0.105.0. How to update Tatin versions older than 0.114.0 with OneDrive in use."
-keywords: apl,dyalog,onedrive,tatin,update,versions
+title: "Update older versions"
+description: "How to update older versions of Tatin, including special steps for OneDrive users"
+<!-- keywords: onedrive,update,versions -->
 ---
 # Update older versions
 

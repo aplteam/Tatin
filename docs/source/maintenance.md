@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Server Maintenance"
-description: "Care and grooming of your Tatin server"
-keywords: "apl, dyalog, maintenance, registry, server, tags, tatin"
+title: "Server Maintenance"
+description: "Maintaining your Tatin server"
+<!-- keywords: "maintenance, registry, server, tags" -->
 ---
 # Maintain your server
 

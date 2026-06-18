@@ -1,7 +1,7 @@
 ---
-title: "Tatin: Package Configuration"
-description: "Your package’s configuration contains essential information about it."
-keywords: apl,configuration,package,tatin
+title: "Package Configuration"
+description: "The package configuration file and its settings"
+<!-- keywords: configuration,package -->
 ---
 # Package configuration
 

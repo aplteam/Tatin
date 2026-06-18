@@ -1,7 +1,7 @@
 ---
 title: "Creating a new version"
-description: "This article is about what an administrator of the Tatin project on GitHub does after accepting a PR or finishing work on a branch."
-keywords: "apl, dyalog, github, proofread, tatin, version"
+description: "What a Tatin project administrator does to create a new release on GitHub"
+<!-- keywords: "github, proofread, version" -->
 ---
 # Creating a new version
 

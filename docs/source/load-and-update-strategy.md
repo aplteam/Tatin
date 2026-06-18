@@ -21,12 +21,14 @@ Suppose you need packages, `Foo` and `Goo`.
 Both rely on package `Zoo`; but while `Foo` requests `Zoo` 1.1.1,
 `Goo` requires version 1.2.0.
 
-             Zoo-1.0.0
-             Zoo-1.1.0
-    Foo ---> Zoo-1.1.1
-    Goo ---> Zoo-1.2.0
-             Zoo-1.3.0
-             Zoo-2.0.0
+```
+         Zoo-1.0.0
+         Zoo-1.1.0
+Foo ---> Zoo-1.1.1
+Goo ---> Zoo-1.2.0
+         Zoo-1.3.0
+         Zoo-2.0.0
+```             
 
 The best available version 1 of `Zoo` is 1.3.0.
 There is also a later major version: 2.0.0.
@@ -90,19 +92,17 @@ In our example
 This means `Foo` will also use version 1.2.0 of `Zoo`.
 
 This strategy is called [Minimal Version Selection](https://research.swtch.com/vgo-mvs "Link to the paper defining it") (MVS).
-It guarantees that when you rebuild, you get the same result, but it grabs the latest installed version.
+It guarantees that when you rebuild, you get the same result, because it grabs the latest installed version.
 
 
 
 ### Forcing updates
 
-Suppose a package of yours depends on someone else’s package `Foo`, which in turn depends on `Goo` 1.1.0 – and while using `Foo` you discover `Goo` 1.1.0 has a bug.
+Suppose a package of yours depends on someone else’s package `Foo` 3.0.0, which in turn depends on `Goo` 1.1.0 – and while using `Foo` you discover `Goo` 1.1.0 has a bug.
 
-You write to the author of `Foo`, saying `Goo` 1.1.1 is available and fixes that very bug, but you get no reply, and you have only two weeks to your deadline.
+You check and find that the author of `Goo` has fixed the bug and released the fix as 1.1.1. So you write to the author of `Foo`, saying `Goo` 1.1.1 is available and that they should release `Foo` 3.0.1 with an updated dependency, but you get no reply, and you have little time left to your deadline.
 
-**Solution**
-Create a package `Dummy` that does nothing, but declares a dependency on `Goo` 1.1.1.
-_Voila!_ Thanks to MVS, everything works.
+**Solution**: Create a package `Dummy` that does nothing, but declares a dependency on `Goo` 1.1.1, and add `Dummy` as a dependency to your package. _Voilà!_ Thanks to MVS, everything works.
 
 
 ### Comparing versions
@@ -132,9 +132,11 @@ So if the patch contains a text description, Tatin uses [publication date](packa
 
 Imagine these packages all hosted by a Tatin server with alias `MyTatin`.
 
-    mygroup-Foo-1.0.0 ---> Zoo-1.1.1
-    mygroup-Goo-2.1.0 ---> Zoo-1.2.0
-                           Zoo-1.3.0
+```
+mygroup-Foo-1.0.0 ---> Zoo-1.1.1
+mygroup-Goo-2.1.0 ---> Zoo-1.2.0
+                       Zoo-1.3.0
+```                           
 
 While `Foo` relies on `Zoo` 1.1.1, `Goo` needs `Zoo` 1.2.0. Version 1.3.0 of `Zoo` is also available.
 What does Tatin do about this?
@@ -159,7 +161,7 @@ then this would have been sufficient:
 
     ]TATIN.LoadPackages [MyTatin]/mygroup-Foo-1 #.MyPkgs
 
-Note neither the minor nor the patch number has been specified.
+Note that neither the minor nor the patch number has been specified.
 
 Suppose version 2.1.0 of `Goo` is the very latest version available, and that’s the version you want to use,
 then this would have been sufficient:
@@ -177,17 +179,17 @@ But where are the dependencies?
 
 Looking under the covers:
 
-          #._tatin.⎕NL 9
-    mygroup_Foo_1_0_0
-    mygroup_Goo_2_1_0
-    mygroup_Zoo_1_1_1
-    mygroup_Zoo_1_2_0
+```
+      #._tatin.⎕NL 9
+mygroup_Foo_1_0_0
+mygroup_Goo_2_1_0
+mygroup_Zoo_1_1_1
+mygroup_Zoo_1_2_0
+```
 
-Both versions of `Zoo` have been loaded.
-That’s because the two `Load` operations are independent, so minimal version selection cannot be applied.
+Both versions of `Zoo` have been loaded. That’s because the two `Load` operations are independent, so minimal version selection cannot be applied.
 
-
-Check the user command [`]CheckForLaterVersion`](user-commands.md#check-for-later-version) or the API-equivalent [`CheckForLaterVersion`](api.md#check-for-later-version).
+!!! tip "Check the user command [`]CheckForLaterVersion`](user-commands.md#check-for-later-version) or the API-equivalent [`CheckForLaterVersion`](api.md#check-for-later-version)."
 
 
 ## Installing packages
@@ -247,7 +249,7 @@ Its argument is a folder with files `apl-dependencies.txt` and `apl-buildlist.js
 created when you installed your first package there.
 
 You can also specify a second argument: where to create the references pointing to the principal packages.
-It defaults to `#` if that is your current namespace. If you are, say, in `#.foo` then Tatin asks whether to install into `#` or `#.foo`.
+It defaults to `#` if that is your current namespace. If you are, say, in `#.foo`, then Tatin asks whether to load into `#` or `#.foo`.
 
 ```
 ]TATIN.LoadDependencies /myPkgs/ #.Temp
@@ -261,9 +263,9 @@ In our example the pruning eliminates `Zoo` 1.1.1:
 rather than loading `Zoo` twice, Tatin loads only the latest **installed** version.
 Both `Foo` and `Goo` will use `Zoo` version 1.2.0.
 
-## Enforce update when a package is available with a higher major version number
+## Upgrading to a new major version
 
-One way to update to a new major version is to delete all packages from an installation folder, update the dependency file to refer to the new major version number and then open the project with Cider. 
+One way to upgrade to a new major version is to delete all packages from an installation folder, change the dependency file to refer to the new major version number and then open the project with Cider.
 
 Cider will detect the need for re-installing and act accordingly.
 
@@ -286,17 +288,17 @@ Removing a principal package might imply a downgrade.
 
 Consider, say, these packages (dependencies indented):
 
-    group-foo-1.0.0
-      group-zoo-1.1.0
-    group-boo-1.0.0
-      group-zoo-1.0.0
+    group-Foo-1.0.0
+      group-Zoo-1.1.0
+    group-Boo-1.0.0
+      group-Zoo-1.0.0
 
-Minimal version selection (MVS) means both `foo` and `boo` use `zoo` 1.1.0 when loaded.
-What happens if you remove `boo`?
+Minimal version selection (MVS) means both `Foo` and `Boo` use `Zoo` 1.1.0 when loaded.
+What happens if you remove `Boo`?
 
-Either could be argued:
+One could argue either:
 
-1.  `zoo-1.1.0` should survive this and still be used
+1.  `Zoo-1.1.0` should survive this and still be used
 1.  a package not required anywhere shouldn’t be used
 
 A full implementation of MVS requires (1).
@@ -321,6 +323,6 @@ performs some health checks, and if all is well, recreates the build list.
 
 ## Downgrade
 
-Sometimes you might need to downgrade, for example from a version you find buggy, to an older version known to be okay.
+Sometimes you might need to downgrade, for example from a version you find buggy, to an older version known to work.
 
 Tatin does not offer help here; you need to do this yourself.

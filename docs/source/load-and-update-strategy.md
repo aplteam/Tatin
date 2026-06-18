@@ -1,9 +1,9 @@
 ---
-title: "Load and Update"
+title: "Load and update strategy"
 description: "How Tatin deals with conflicting requirements for package versions"
 keywords: 
 ---
-# Tatin’s load and update strategy
+# Load and update strategy
 
 !!! abstract "How Tatin deals with conflicting requirements for package versions"
 

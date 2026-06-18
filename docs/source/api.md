@@ -3,7 +3,7 @@ title: "API reference"
 description: "Complete reference to the Tatin API, which lets you call the Dyalog APL package manager from your own code"
 keywords: 
 ---
-# API functions
+# API reference
 
 !!! abstract "With the API you can execute Tatin functionality under program control."
 

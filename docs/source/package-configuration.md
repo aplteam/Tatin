@@ -1,5 +1,5 @@
 ---
-title: "Package Configuration"
+title: "Package configuration"
 description: "The package configuration file and its settings"
 keywords: 
 ---

@@ -1,9 +1,9 @@
 ---
-title: "Semantic Versioning"
+title: "Semantic versioning"
 description: "An introduction to Semantic Versioning and how Tatin applies it"
 keywords: 
 ---
-# Tatin and Semantic Versioning
+# Semantic versioning
 
 Tatin is based on the concept of Semantic Versioning (SemVer), so before we go into any details, we first need to understand SemVer.
 

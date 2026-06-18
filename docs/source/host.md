@@ -1,5 +1,5 @@
 ---
-title: "About hosting"
+title: "Host a Tatin registry"
 description: "Host a personal, team, corporate or public Tatin registry"
 keywords: 
 ---

@@ -1,5 +1,5 @@
 ---
-title: "Release Notes"
+title: "Release notes"
 description: "Version release history"
 keywords: 
 ---

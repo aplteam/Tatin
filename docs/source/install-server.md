@@ -1,5 +1,5 @@
 ---
-title: "Server Installation"
+title: "Install a registry server"
 description: "How to install and update your own Tatin registry server"
 keywords: 
 ---

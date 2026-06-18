@@ -1,5 +1,5 @@
 ---
-title: "Contributors"
+title: "Contribute to Tatin"
 description: "How to contribute to Tatin and what you need to set up first"
 keywords: 
 ---

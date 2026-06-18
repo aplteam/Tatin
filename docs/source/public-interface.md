@@ -1,5 +1,5 @@
 ---
-title: "Public interfaces"
+title: "Public interface to a package"
 description: "How to control which objects of a Tatin package are exposed as its public interface"
 keywords: 
 ---

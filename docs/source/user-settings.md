@@ -1,5 +1,5 @@
 ---
-title: "User Settings"
+title: "User settings"
 description: "The Tatin user settings file and what each setting controls"
 keywords: 
 ---

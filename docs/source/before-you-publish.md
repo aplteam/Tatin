@@ -70,7 +70,7 @@ An integer that gets bumped (incremented) with each build.
 Tatin bumps but otherwise largely ignores build numbers.
 Their only use is to distinguish builds when the version number does not change.
 
-In most contexts build numbers need not be specified and Tatin does not display them.
+In most contexts, build numbers need not be specified and Tatin does not display them.
 
 
 ## Licenses
@@ -86,10 +86,7 @@ To publish a package on the Principal Registry at [tatin.dev](https://tatin.dev)
 or on the [test server](https://test.tatin.dev)
 you must give it a `license` property with an acceptable value.
 
-
-[`]ListLicenses`](user-commands.md#list-licenses)<br>
-
-[`ListLicenses`](api.md#list-licenses)
+Check the user command [`]ListLicenses`](user-commands.md#list-licenses) or its API equivalent [`ListLicenses`](api.md#list-licenses).
 
 
 ## API keys

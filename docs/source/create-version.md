@@ -69,13 +69,13 @@ The ZIPs:
 
 ### The `Run` function
 
-This function is used to make Tatin and/or Cider available in `⎕se`. A new release of Tatin requires both `Run.aplf` and a zipped version of it: `Run.zip`. Note that the function is part of the Tatin project.
+This function is used to make Tatin and/or Cider available in `⎕SE`. A new release of Tatin requires both `Run.aplf` and a zipped version of it: `Run.zip`. Note that the function is part of the Tatin project.
 
 ### The `]Activate` user command
 
 This user command is a general one, but it was invented with Dyalog v18.2 particularly for Tatin: it can be used to make experimental software like Tatin & Cider available (`]Activate`) or remove it (`]Deactivate`). You can also call `]ListActivated` in order to check what got activated.
 
-For the time being the user command is part of the Tatin project. That implies that the script (`Activate.dyalog`) as well as a ZIP file that contains just that script (`Activate.zip`) must be part of a release until further notice.
+For the time being, the user command is part of the Tatin project. That implies that the script (`Activate.dyalog`) as well as a ZIP file that contains just that script (`Activate.zip`) must be part of a release until further notice.
 
 ### Releasing
 

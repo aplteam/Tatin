@@ -88,13 +88,13 @@ Requiring dependencies to be already published would not work in that case.
 
 URL protocols (`file://`, `http://`, `https://`) are not acceptable for specifying a dependency of a published package.
 If you publish a package `foo` with a dependency `goo` specified with a URL protocol, the registry will remove the protocol and retain only `goo`.
-When Tatin loads `foo` it will scan the registries in its search path and use the first `goo` it finds.
+When Tatin loads `foo`, it will scan the registries in its search path and use the first `goo` it finds.
 
 Tatin does allow URL protocols for local development — use them with care.
 
 ??? detail "URL protocols override Tatin’s scan strategy"
 
-    Normally when a dependency is required Tatin scans known registries in order of priority – unless a URL protocol is used.
+    Normally, when a dependency is required, Tatin scans known registries in order of priority – unless a URL protocol is used.
 
 
 

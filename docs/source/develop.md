@@ -5,7 +5,7 @@ keywords:
 ---
 # Developing
 
-!!! abstract "To make changes or add new features you need a good understanding of the basic design of Tatin."
+!!! abstract "To make changes or add new features, you need a good understanding of the basic design of Tatin."
 
 
 ## Tatin code
@@ -46,9 +46,9 @@ The left argument is optional and must be a flag. Default is 0, and a 1 forces a
 
 !!! danger "Make sure you do not make changes to any of those packages."
 
-    That is a mistake that is easy to make, because it is not obvious what code is part of a package and what code isn't! That's why the packages are installed in the `packages/` folder: that folder documents what code came from a package
+    That is a mistake that is easy to make, because it is not obvious what code is part of a package and what code isn't! That's why the packages are installed in the `packages/` folder: that folder documents what code came from a package.
 
-    When code that came from a package is changed, Link will save it on disk, and that appears to be fine. Until a new version of the package comes along, you re-install all packages in the `packages/` folder and then call the `Admin.CopyPackagesToAPLSource` helper - and your change is gone!
+    When code that came from a package is changed, Link will save it on disk, and that appears to be fine. Until a new version of the package comes along, you re-install all packages in the `packages/` folder and then call the `Admin.CopyPackagesToAPLSource` helper — and your change is gone!
 
     If you need to change code that came from a package, you must change the package itself!
 
@@ -83,7 +83,7 @@ These call the Tatin functions that perform the real actions.
 
 The Tatin server comes with test certificates.
 
-GitHub prohibits downloading certificates, so the certificate files have an additional extension `.RemoveMe` which needs, well… removing.
+GitHub prohibits downloading certificates, so the certificate files have an additional extension `.RemoveMe`, which needs, well… removing.
 
 Check the folder `TestServer/Server/Assets/Runtime/Certificates`.
 
@@ -97,7 +97,7 @@ By default, code for user commands and API calls is stored and executed in `⎕S
 
 This stumbling block was addressed in version 0.106.0
 with the `⎕SE._Tatin.DEVELOPMENT` variable.
-Now, when Cider opens the Tatin project it asks:
+Now, when Cider opens the Tatin project, it asks:
 
     Set DEVELOPMENT←1 in ⎕SE._Tatin?
     (Allows executing user command code in # rather than ⎕SE)
@@ -143,7 +143,7 @@ With .NET, you can limit the danger:
 
 !!! warning inline end "Without .NET"
 
-    Without .NET (a possibility on none-Windows platform), `watch=both` is not an option, so that is particularly dangerous.
+    Without .NET (a possibility on non-Windows platforms), `watch=both` is not an option, so that is particularly dangerous.
 
 Then when you change an APL object in one workspace, it will not only be written to disk: Link will **also** bring that change into the other workspace.
 

@@ -34,7 +34,7 @@ The plus (`+`) is used to separate an (optional) build number from the other par
 
 ### Build numbers
 
-After `{major}.{minor}.{patch}` you may add the optional build number. Build numbers _do not_ participate in establishing precedence and are therefore ignored by Tatin when constructing the name of a package and/or a package ZIP file.
+After `{major}.{minor}.{patch}`, you may add the optional build number. Build numbers _do not_ participate in establishing precedence and are therefore ignored by Tatin when constructing the name of a package and/or a package ZIP file.
 
 !!! note "That means that you cannot publish two packages that share the same group-name, package-name, major-no, minor-no and patch but have different build numbers — they are the same as far as Tatin is concerned."
 
@@ -46,7 +46,7 @@ A build number, when specified, needs to be separated by a `+`. A build number m
 1.2.3-beta-1+123  ⍝ becomes 1.2.3-beta-1 as a Tatin package
 ```
 
-Therefore the version number `1.2.3-beta-1+abc` is _invalid_.
+Therefore, the version number `1.2.3-beta-1+abc` is _invalid_.
 
 Note that if a package has a build number, it is bumped whenever the package is built again, no matter what. It is never reset.
 
@@ -54,7 +54,7 @@ Note that if a package has a build number, it is bumped whenever the package is 
 
 When Tatin needs to establish precedence, it first takes `{major}.{minor}.{patch}` into account. As long as `{patch}` is just a number, it is straightforward how this can be established.
 
-But when there is a package `1.2.3-fix-double-quotes` and a package `1.2.3-fix-domain-error`, it is not possible to establish precedence from `{major}.{minor}.{patch}`. The build number cannot be used for this because it is optional. In such a case the publishing date is used to tell packages apart.
+But when there is a package `1.2.3-fix-double-quotes` and a package `1.2.3-fix-domain-error`, it is not possible to establish precedence from `{major}.{minor}.{patch}`. The build number cannot be used for this because it is optional. In such a case, the publishing date is used to tell packages apart.
 
 
 ## Versioning rules
@@ -80,7 +80,7 @@ That means that compatibility should still be guaranteed: anything else works ex
 
     Note that by definition it seems that a change of the minor number is indicating a very low risk: just adding functionality should never change anything that has worked before, while a change in the patch number might come from a bug fix your code relies on.
 
-    In reality however, a version with a new minor version number often comes with bug fixes as well.
+    In reality, however, a version with a new minor version number often comes with bug fixes as well.
 
 
 ### The major number
@@ -94,7 +94,7 @@ aplteam-foo-1.0.0
 aplteam-GOO-1.0.0
 ```
 
-... are of course considered to be different packages, but according to the concept of SemVer these two packages:
+... are of course considered to be different packages, but according to the concept of SemVer, these two packages:
 
 ```
 aplteam-foo-1.0.0

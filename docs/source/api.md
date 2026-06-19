@@ -585,12 +585,12 @@ Set the `all` flag to include all versions of any major version marked as deprec
 ## List licenses
 
 ```
-licences←{verbose} ListLicenses registry
+licenses←{verbose} ListLicenses registry
 ```
 
-Where `registry` is the URL or alias of a Tatin server and `verbose` is a flag (default 0), returns a list of licences.
+Where `registry` is the URL or alias of a Tatin server and `verbose` is a flag (default 0), returns a list of licenses.
 
-Without left argument (or it being a 0), the result is a list of strings. If `verbose` is set, it is a 2-column matrix of which the first column is licence names and the second their URLs.
+Without left argument (or it being a 0), the result is a list of strings. If `verbose` is set, it is a 2-column matrix of which the first column is license names and the second their URLs.
 
 
 ```

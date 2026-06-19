@@ -25,7 +25,7 @@ Only the basics are covered here.
 
         #.Tatin.TestCases.Prepare
 
-    This initializes Tatin as a client and prepares for creating a code-coverage report.
+    This initialises Tatin as a client and prepares for creating a code-coverage report.
     It also creates a number of references needed by the tests.
 
     It changes the current directory, establishes all required references and instantiates the `Tester2` class as `T`.
@@ -40,7 +40,7 @@ Only the basics are covered here.
 
         #.Tatin.TestCases.RunTests
 
-This runs all the tests in Debug mode, so if something goes wrong the framework will stop and you can investigate right away.
+This runs all the tests in Debug mode, so if something goes wrong, the framework will stop and you can investigate right away.
 
 You will be asked if you want to copy the test data to a temporary folder in preparation.
 The usual answer is Yes.
@@ -134,7 +134,7 @@ You must pass a 1 as right argument in order to run the function.
 
 You might need to abort the test suite, for example if a test reveals a severe bug that makes running the remaining tests pointless.
 
-Resist the temptation to use `)reset`; instead make the test suite clean up after itself:
+Resist the temptation to use `)reset`; instead, make the test suite clean up after itself:
 
     #.Tatin.TestCases.T.QuitTests
 
@@ -181,7 +181,7 @@ start the test suite either from APL or from the command line.
 
 The test suite itself starts (and shuts down) a Tatin server; Debug mode is off.
 
-The function ignores the few test cases that require human interaction
+The function ignores the few test cases that require human interaction.
 
 `RunBatchTests` checks the command line that launched Dyalog to see if `OFF2=1` was specified
 then, after the last test case
@@ -205,7 +205,7 @@ The Tatin root directory contains shell scripts that run the batch tests.
     RunTests.sh   # Linux, macOS
 
 
-These are templates: check their contents, you might need to make amendments.
+These are templates: check their contents; you might need to make amendments.
 
 ## Notes
 
@@ -232,6 +232,6 @@ You might be tempted to run the client tests in multiple instances to put some p
 
 !!! warning "The client tests are not suitable for this."
 
-For example, the tests in the `Cache` group _must_ be executed in sequence, as they rely on each other. Generally in testing, this should be avoided but here, for technical reasons, it’s a must.
+For example, the tests in the `Cache` group _must_ be executed in sequence, as they rely on each other. Generally in testing, this should be avoided, but here, for technical reasons, it’s a must.
 Running this group in parallel breaches this, and is certain to fail.
 

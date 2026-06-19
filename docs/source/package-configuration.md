@@ -137,8 +137,6 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
         exclude: "⎕IO.apla, ⎕ML.apla",
         ```
 
-        <!-- For better compatability this property is not injected into new packages but accepted as an optional parameter. This might be changed with version 1.0.0 of Tatin. -->
-
 `files`
 : _Comma-delimited string._ Files and/or folders to be moved into the package root, e.g. `ReadMe.txt`. (See also [`assets`](#assets).)
 
@@ -152,7 +150,7 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
 : _Integer._ Value to be assigned to `⎕IO`.
 
 `license`
-: _String._ Each Tatin registry [publishes a list](user-commands.md#list-licences) of licences it accepts for packages it hosts.
+: _String._ Each Tatin registry [publishes a list](user-commands.md#list-licenses) of licenses it accepts for packages it hosts.
 
 
 `lx`
@@ -165,11 +163,11 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
     -   to initialise a package on bringing it into the workspace
     -   to deal with platform-dependent assets
 
-    If the function is monadic its argument is the file path to the package.
+    If the function is monadic, its argument is the file path to the package.
     (If the package is brought into the workspace by `LoadPackages` and has no assets, the argument will be empty.)
 
     The function must return a result, which is assigned to `TatinVars.LX` inside the [package space](glossary.md).
-    (Without an `lx` object there will be no `TatinVars.LX`.)
+    (Without an `lx` object, there will be no `TatinVars.LX`.)
 
     ??? tip "Trapping errors"
 
@@ -294,7 +292,7 @@ A configuration setting or parameter is ‘set’ when a file key or parameter v
         Admins of the Principal Registry might silently edit them to keep them consistent and meaningful.
 
 `userCommandScript`
-: _String._ Path, relative to the project root, of the user-command script. Identifies and is required for [user-command packages](publish-packages.md#user-command-packages). (Introduced in Tatin version 0.86.0.)
+: _String._ Path, relative to the project root, of the user-command script. Identifies a user command script. Is required for [user-command packages](publish-packages.md#user-command-packages). (Introduced in Tatin version 0.86.0.)
 
 
 `version`
@@ -461,7 +459,7 @@ So any package function can refer to its metadata
 `HOME`
 : _String._ Path to the directory the package was installed into, even if the package has no assets.
 
-    This differs when the package is imported with [`LoadPackages`](user-commands.md#load-packages).
+    This is different when the package is brought into the workspace with [`LoadPackages`](user-commands.md#load-packages) and has no assets.
 
 `ID`
 : _String._ Full package ID.

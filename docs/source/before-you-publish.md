@@ -1,11 +1,11 @@
 ---
 title: "Before you publish"
-description: "Package identity, licences, and API keys: what you need before publishing a Tatin package"
+description: "Package identity, licenses, and API keys: what you need before publishing a Tatin package"
 keywords: 
 ---
 # Before you publish
 
-!!! abstract "Package identity, licences, and API keys explained"
+!!! abstract "Package identity, licenses, and API keys explained"
 
 
 ## Package identity
@@ -73,23 +73,23 @@ Their only use is to distinguish builds when the version number does not change.
 In most contexts build numbers need not be specified and Tatin does not display them.
 
 
-## Licences
+## Licenses
 
-Tatin is a community resource and offers software with minimal licence restrictions.
-All licences on the Principal Registry give users great freedom.
+Tatin is a community resource and offers software with minimal license restrictions.
+All licenses on the Principal Registry give users great freedom.
 
 !!! info inline end ""
 
-    If you host a Tatin registry you can [set your own licence policy](install-server.md#license).
+    If you host a Tatin registry you can [set your own license policy](install-server.md#license).
 
 To publish a package on the Principal Registry at [tatin.dev](https://tatin.dev)
 or on the [test server](https://test.tatin.dev)
 you must give it a `license` property with an acceptable value.
 
 
-[`]ListLicences`](user-commands.md#list-licences)<br>
+[`]ListLicenses`](user-commands.md#list-licenses)<br>
 
-[`ListLicences`](api.md#list-licences)
+[`ListLicenses`](api.md#list-licenses)
 
 
 ## API keys

@@ -10,7 +10,7 @@ keywords:
 
 Issue and require [credentials](#credentials) for publishing packages on your server.
 Encrypt internet communications by installing [security certificates](#security-certificates);
-or (better) use a [reverse proxy](#reverse-proxy) to shield your Tatin registry behind an industrial-strength webserver such as Apache or Nginx.
+or (better) use a [reverse proxy](#reverse-proxy) to shield your Tatin registry behind an industrial-strength web server such as Apache or Nginx.
 
 
 ## Credentials
@@ -34,7 +34,7 @@ To add an API key to the stored credentials, put it in a file `Credentials.txt` 
     <group-name>,<api-key>
     *,<api-key>
 
-At the next house-keeping event the server will detect the file and then:
+At the next house-keeping event, the server will detect the file and then:
 
 -   delete from `Credentials.csv` rules with matching group names
 -   create a Salt for each API key in `Credentials.txt`
@@ -113,7 +113,7 @@ To activate HTTPS, set `[CONFIG]Secure` to `1` in Plodder's INI file; this switc
 
 If your registry serves requests from the internet, shield it behind an industrial-strength web server like Apache or Nginx.
 
-This improves security and defences against e.g. [DDoS attacks](https://en.wikipedia.org/wiki/Denial-of-service_attack).
+This improves security and defences against e.g., [DDoS attacks](https://en.wikipedia.org/wiki/Denial-of-service_attack).
 It also offers an easy way to implement load balancing.
 
 Apache can be used as a [reverse-proxy](https://en.wikipedia.org/wiki/Reverse_proxy) server, a.k.a. gateway server.

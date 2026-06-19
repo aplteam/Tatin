@@ -262,8 +262,8 @@ registering any package aliases specified.
 
     Don't use this for other purposes.
 
-If `target` is `[MyUCMDs]` or `[MyUCMDs]name` install in `⎕SE`.
-If `name` is omitted, the package name is used. However, if more than one user-command package is specified after `[MyUCMDs]` an error will be thrown.
+If `target` is `[MyUCMDs]` or `[MyUCMDs]name`, install in `⎕SE`.
+If `name` is omitted, the package name is used. However, if more than one user-command package is specified after `[MyUCMDs]`, an error will be thrown.
 
 If `target` is omitted, look for open Cider projects:
 if just one is found, use it; if there are multiple, ask the user which one to use.
@@ -309,7 +309,7 @@ API:
 
 Where `reg` is a registry alias or URL
 list major versions of all deprecated packages.
-If `reg` omitted, use `[tatin]`.
+If `reg` is omitted, use `[tatin]`.
 
 ---|---
 all | List all versions of all deprecated packages.
@@ -324,9 +324,9 @@ API:
     ]TATIN.ListLicenses [reg]
 
 Where `reg` is a registry alias or URL,
-list the licences it accepts.
+list the licenses it accepts.
 
-If `reg` omitted, use `[tatin]`.
+If `reg` is omitted, use `[tatin]`.
 
 ```
       ]TATIN.ListLicenses
@@ -334,7 +334,7 @@ If `reg` omitted, use `[tatin]`.
 ```
 
 API:
-[`ListLicences`](api.md#list-licences)
+[`ListLicenses`](api.md#list-licenses)
 
 
 ## List packages
@@ -521,7 +521,7 @@ API:
 
     ]TATIN.LoadTatin
 
-Load the Tatin client into `⎕SE` (resulting in `⎕SE.Tatin`), and initialize it.
+Load the Tatin client into `⎕SE` (resulting in `⎕SE.Tatin`), and initialise it.
 Write a user config file in my home folder if there is none.
 
 !!! tip "You can use [`Init`](#init) to temporarily switch to a different config."
@@ -694,7 +694,7 @@ Uninstall, according to syntax,
 
 1.  `package` from `folder`
 2.  `package` from the currently open Cider project (if several open, ask the user which)
-3.  from `folder` all superfluous packages; i.e. neither top-level nor dependency; e.g. outdated versions
+3.  from `folder` all superfluous packages; i.e., neither top-level nor dependency; e.g., outdated versions
 4.  the top-level packages selected by the user, and any dependencies thus superfluous
 
 If `folder` is a relative path, it must be a subfolder of an open Cider project.
@@ -706,7 +706,7 @@ quiet   | Don’t report progress.
 API:
 [`UninstallPackages`](api.md#uninstall-packages)
 
-!!! detail "If a package was installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package but removes just the reference to it. Only when the other one is uninstalled as well, is the package actually removed."
+!!! detail "If a package was installed twice, once with an alias and once without, running `]UnInstallPackage` on either of them does not uninstall the package, but removes just the reference to it. Only when the other one is uninstalled as well, is the package actually removed."
 
 ## Update Tatin
 
@@ -806,7 +806,7 @@ Show the client’s Tatin version.
 
     ]TATIN.Version reg
 
-Where `reg` is a registry URL or alias (if `?` ask the user which) show the Tatin version installed there.
+Where `reg` is a registry URL or alias (if `?`, ask the user which), show the Tatin version installed there.
 
     ]TATIN.Version -all
     ]TATIN.Version *

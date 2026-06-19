@@ -5,7 +5,7 @@ keywords:
 ---
 # Host a Tatin registry
 
-!!! abstract "Host a personal, team, corporate, or public Tatin registry."
+!!! abstract "Host a personal, team, corporate or public Tatin registry."
 
 
 You can host a Tatin registry server on your local machine, an intranet, or on a public server.

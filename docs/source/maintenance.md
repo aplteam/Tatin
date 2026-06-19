@@ -7,6 +7,10 @@ keywords:
 
 !!! abstract "Care and grooming of your Tatin server."
 
+As packages accumulate on a registry, their configuration files can drift: tags diverge, variant spellings creep in, and conventions change. Maintenance is the process of correcting or updating those files programmatically, without touching the package ZIPs manually. Common tasks include standardising tags, removing meaningless ones, and adding new properties to existing packages. 
+
+Tatin automates this through maintenance jobs — APL function files placed in the Maintenance folder that the server detects and runs automatically.
+
 
 ## Curate the tags
 
@@ -104,7 +108,7 @@ Often the subfolder `docs/` is to be replaced. (Contains the documentation.)
     you don’t want to lose this.
 
 If the new folder is not empty, copy its contents over.
-Maintenance files can be used to carry out changes on all or some of the packages managed by the server, like adding a new property to the package config files of all packages.
+Maintenance files can be used to carry out changes to all or some of the packages managed by the server, like adding a new property to the package config files of all packages.
 
 
 

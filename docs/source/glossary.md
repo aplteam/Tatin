@@ -65,7 +65,7 @@ Known Registries
     A registry scan searches known registries with a priority above zero,
     in descending order of priority.
 
-Maintenance Library
+Maintenance Folder
 : Either a child folder `Maintenance/` of the Tatin *server* installation folder, containing [maintenance scripts](maintenance.md#maintenance), or a child folder `Maintenance/` of the Tatin *client* installation folder.
 
 package alias

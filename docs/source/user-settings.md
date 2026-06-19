@@ -12,11 +12,14 @@ Your Tatin user settings specify your ‘known Registries’
 – the Tatin Registries you want to use –
 and some other settings you might use if you publish packages yourself.
 
-When you launch Dyalog[^init], it reads your Tatin user-settings file
+When you launch Dyalog, it reads your Tatin user-settings file
 
     tatin-client.json
 
 into `⎕SE.Tatin.MyUserSettings`, a class instance.
+
+!!! details "Tatin is initialised either explicitly or as a side effect when the first Tatin user command is issued. In Dyalog 19.0 and later, once Tatin has been `]activated`, it initialises automatically on launch. In 18.2, the user must take explicit action to achieve this."
+
 If you don’t have a Tatin user-settings file, Dyalog creates one
 in your [home folder](user-commands.md#user-settings).
 
@@ -31,7 +34,7 @@ The default user-settings file lists two registries:
 
 ## What does Tatin do at start-up time?
 
-When Tatin is initialized[^init], it creates an instance of the `UserSettings` class with the name `MyUserSettings`, which lives in `⎕SE.Tatin`. Strictly speaking, it lives in `⎕SE._Tatin.Client`; in `⎕SE.Tatin` there is just a niladic function `MyUserSettings` that returns a reference to `⎕SE._Tatin.Client.MyUserSettings`.
+When Tatin is initialised[^init], it creates an instance of the `UserSettings` class with the name `MyUserSettings`, which lives in `⎕SE.Tatin`. Strictly speaking, it lives in `⎕SE._Tatin.Client`; in `⎕SE.Tatin` there is just a niladic function `MyUserSettings` that returns a reference to `⎕SE._Tatin.Client.MyUserSettings`.
 
 If the constructor does not get a fully qualified name of the user settings file as an argument, then it performs two steps:
 
@@ -227,13 +230,13 @@ Now we would expect three Registries:
  tatin-test  https://test.tatin.dev/        0
 ```
 
-The priority is not `⎕NULL` anymore but 90: any `⎕NULL` is replaced by the lowest number yet minus 10.
+The priority is not `⎕NULL` anymore, but 90: any `⎕NULL` is replaced by the lowest number yet minus 10.
 
 !!! detail "Regarding priorities"
 
     What happens when you add a Registry with `priority` being `⎕NULL` and the lowest Registry so far is 1?
     
-    In that case Tatin assigns new values to all Registries except those with a priority of zero, which will remain untouched.
+    In that case, Tatin assigns new values to all Registries except those with a priority of zero, which will remain untouched.
 
     The new priorities will not change the order of the priorities, and the lowest one will be 100 or greater.
 
@@ -247,7 +250,7 @@ If you want to make your changes permanent, you must call the `Save` method and 
 
 You can remove one Registry at a time from the user settings by calling the instance method `RemoveRegistry` of the `UserSettings` class by providing an [alias], a URI or an ID as right argument.
 
-Note that specifying a URI might match more than one Registry. By default an error is thrown in such a case. If you are absolutely certain that you want to delete all Registries matching that URI you can specify a 1 as left argument, then the deletion of more than one Registry is performed.
+Note that specifying a URI might match more than one Registry. By default, an error is thrown in such a case. If you are absolutely certain that you want to delete all Registries matching that URI, you can specify a 1 as left argument, then the deletion of more than one Registry is performed.
 
 However, you are advised to use IDs for removing Registries.
 
@@ -267,6 +270,3 @@ When you create a Registry definition with the `DefineRegistry` class, Tatin aut
 If you edit the user-settings file manually, you may also specify an `id` yourself, although in most cases there is no need to do so.
 
 The `id` is used only locally by Tatin to distinguish Registry definitions reliably. It has no special meaning outside your user settings.
-
-
-[^init]: Tatin is initialized either explicitly or as a side effect when the first Tatin user command is issued. In Dyalog 19.0 and later, once Tatin has been `]activated`, it initializes automatically on launch. In 18.2, the user must take explicit action to achieve this.

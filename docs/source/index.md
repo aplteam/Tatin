@@ -21,7 +21,7 @@ are also published as a new Tatin package.
 As shown, one package may depend on another, and so on.
 Tatin manages these dependencies.
 
-The Tatin [Principal Registry](https://tatin.dev) hosts packages with minimal licence restrictions.
+The Tatin [Principal Registry](https://tatin.dev) hosts packages with minimal license restrictions.
 You can also host a Tatin registry on your local machine or on a server.
 
 
@@ -45,7 +45,7 @@ CSS files, BAT files, icons, images, config files, documentation, DLLs, etc.
 
 It may depend on other packages: Tatin manages the dependencies behind the scenes.
 
-!!! detail "Tatin package licences impose few restrictions on your use of the software."
+!!! detail "Tatin package licenses impose few restrictions on your use of the software."
 
 
 ## Versions and dependencies
@@ -94,7 +94,7 @@ There are two ways to use Tatin.
 
 ??? warning "A file for each object"
 
-    Tatin requires its source files to carry exactly one APL object each: a function, operator, array, class, interface, or a namespace.
+    Tatin requires its source files to carry exactly one APL object each: a function, operator, array, class, interface, or namespace.
 
     Dyalog APL supports multiple APL objects in a single text file; Tatin does not.
 
@@ -112,8 +112,8 @@ Tatin is itself a community project, hosted on GitHub. It is open source and com
 You are very welcome to [contribute](contribute.md) to it.
 
 
-## Licences
+## Licenses
 
 Tatin is a community project. It is published under the (pretty relaxed) [MIT license](https://en.wikipedia.org/wiki/MIT_License).
 
-Packages hosted on the Principal Registry make the software available with minimal restrictions. That's because you can publish to it only when you accept one of the license offered, all of which are relaxed.
+Packages hosted on the Principal Registry make the software available with minimal restrictions. That's because you can publish to it only when you accept one of the licenses offered, all of which are relaxed.

@@ -6,7 +6,7 @@ keywords:
 # Contribute to Tatin
 
 
-!!! abstract "Tatin is published under the MIT licence, and you are welcome to contribute to it."
+!!! abstract "Tatin is published under the MIT license, and you are welcome to contribute to it."
 
 [Tatin](https://github.com/aplteam/Tatin) is not owned by anybody; it is a community project.
 
@@ -48,7 +48,7 @@ If you are new to Cider, spend some time playing with it before using it for ser
 
 ## Get started
 
-1.  On GitHub make your own fork of [Tatin](https://github.com/aplteam/Tatin) and clone it to your local machine, say at `/path/2/Tatin`.
+1.  On GitHub, make your own fork of [Tatin](https://github.com/aplteam/Tatin) and clone it to your local machine, say at `/path/2/Tatin`.
 
 2.  Launch Dyalog and open the project
 
@@ -81,7 +81,7 @@ To modify the source code:
 
 ## Documentation
 
-If you find parts of this guide confusing, outdated, unclear or missing bits and pieces, change it.
+If you find parts of this guide confusing, outdated, unclear or incomplete, change it.
 That might well be your first valuable contribution.
 
 A minor edit to the documentation usually does not require its own issue and branch; it can be made in the `main` branch. This table might be useful:

@@ -58,9 +58,7 @@ List all the packages on the principal registry.
 ```
 Each package is identified by a name and group name.
 The listing shows the number of major versions of the package.
-
- [Semantic versioning](https://semver.org)
-
+ 
 You can restrict the listing to a single group.
 
     ]TATIN.ListPackages -group=davin
@@ -168,7 +166,7 @@ Test an example from the documentation.
       ns
 #._tatin.aplteam_MarkAPL_13_1_0.[Namespace]
 ```
-**Congratulations** You have installed a Tatin package in your project, loaded it into your active workspace, and confirmed you can use it.
+**Congratulations!** You have installed a Tatin package in your project, loaded it into your active workspace, and confirmed you can use it.
 
 
 
@@ -202,7 +200,7 @@ This will install three packages and all their dependencies at once. You might f
     ]tatin.InstallPackages F@FilesAndDirs
     ```
     This creates a ref `F` for `FilesAndDirs`. However, the purpose of such aliases is not to allow you to create
-    a kind of shortcut for the package in question, this allows you to load two different versions of a package,
+    a kind of shortcut for the package in question. This allows you to load two different versions of a package,
     something that is sometimes necessary due to specific requirements.
     
     All you need to do is to assign different aliases to the different versions of the package.
@@ -219,9 +217,9 @@ Notes:
 
 * Loading a package in this way has one major purpose: to investigate it.
 
-* Loading a package might well be different from installing a package: when loading a package the precise versions of dependency packages will be loaded, but when a package is installed that is not necessarily the case.
+* Loading a package might well be different from installing a package: when loading a package, the precise versions of dependency packages will be loaded, but when a package is installed, that is not necessarily the case.
 
-  This is discussed in [Load-and-update-strategy](load-and-update-strategy.md)
+  This is discussed in [Load-and-update-strategy](load-and-update-strategy.md).
 
 
 Let's load the `MarkAPL` package into the workspace; for that we need to specify a URL and optionally a target namespace:
@@ -337,7 +335,7 @@ The fact that Registries with a priority of `0` are not scanned by Tatin allows 
 Every piece of software will become obsolete one day. Packages are no exception. If a package is not needed anymore, or is obsolete because there is a better one available, it's time to mark it as deprecated.
 
 This can be done with the user command `]TATIN.DeprecatePackage`. 
-In short, what the user command does is to publish the latest version available yet as a new version with an increased minor version number and an injected flag `deprecated←1`
+In short, what the user command does is to publish the latest version available yet as a new version with an increased minor version number and an injected flag `deprecated←1`.
 
 !!! details "Deleting versus deprecating packages"
 
@@ -360,21 +358,21 @@ Executing:
 ]TATIN.DeprecatePackage https://your-Registry/aplteam-Foo-1
 ```
 
-will publish a new version `aplteam-Foo-1.2.0` which is almost identical with version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `deprecate_comment` 
+will publish a new version `aplteam-Foo-1.2.0`, which is almost identical to version 1.1.1 except that it has two additional properties in its config file: `deprecated` with the value 1 and `deprecate_comment`,
 which carries the comment if you've specified one with `-comment=`; this should be used to explain why a package got marked as deprecated, so it will be something along the lines of "See package Foo-Boo".
 
 From now on both the "Packages" web page and `]TATIN.ListPackages` won't list these four packages anymore.
 
 Note that `]TATIN.ListDeprecated` is designed to list just the deprecated packages. If you want the list to include also the earlier versions — which are now sort of hidden by 1.2.0 — then you need to specify the `-all` flag.
 
-With `-all` a matrix with two columns rather than one is returned, 
+With `-all`, a matrix with two columns rather than one is returned, 
 with the second column carrying an asterisk for those packages that actually do carry `deprecated←1` in their config file. That would be at least the very last one.
 
 #### Side effects of deprecating a package
 
-If you try to load or install a package that is marked as deprecated then you will be asked whether you really want that, but if you insist then you will get what you asked for.
+If you try to load or install a package that is marked as deprecated, then you will be asked whether you really want that, but if you insist, then you will get what you asked for.
 
-Note however that this is only true when you ask explicitly for the last package (the one with `deprecated←1`).
+Note however, that this is only true when you ask explicitly for the last package (the one with `deprecated←1`).
 
 In our example that would be:
 
@@ -411,14 +409,14 @@ They are injected into a namespace `TatinVars` which in turn is injected into th
 
 !!! details "Of course this means that theoretically there could be a name clash, but then the name `TatinVars` should certainly not be used by any package author."
 
-Strictly speaking `TatinVars` is a misnomer because the namespace carries just functions, and not a single variable, but all but one of those act as constants, and the exception `GetFullPath2AssetsFolder` was introduced at a later stage, so it was decided to stick with the name `TatinVars` for compatibility.
+Strictly speaking, `TatinVars` is a misnomer because the namespace carries just functions, and not a single variable, but all but one of those act as constants, and the exception `GetFullPath2AssetsFolder` was introduced at a later stage, so it was decided to stick with the name `TatinVars` for compatibility.
 
 Note that we refer to, say, `HOME` as a character vector because the niladic function `HOME` returns a character vector.
 
 
 #### ASSETS
 
-The path to the package's assets relative to `HOME`. Is empty in case there are no assets.
+The path to the package's assets relative to `HOME`. It is empty in case there are no assets.
 
 See also the [GetFullPath2AssetsFolder](#GetFullPath2AssetsFolder) function.
 
@@ -458,9 +456,9 @@ The full package name. This will include a build ID if there is any, so it is no
 
 #### LX
 
-In a package config file a function can be defined on the `lx` parameter. Such a function would be executed after the package was loaded. The purpose of the function is to perform some sort of initialisation.
+In a package config file, a function can be defined on the `lx` parameter. Such a function would be executed after the package was loaded. The purpose of the function is to perform some sort of initialisation.
 
-If such a function returns a result then it is assigned to `LX` in the `TatinVars` namespace.
+If such a function returns a result, then it is assigned to `LX` in the `TatinVars` namespace.
 
 Note that `LX` does not exist in case no such function is defined, or the function did not return a result.
 

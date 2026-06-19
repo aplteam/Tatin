@@ -18,7 +18,7 @@ bumping the build number unless the `version` option sets it.
 
 Folder `source` must contain a file `apl-package.json` defining the package.
 
-You can omit `source` and/or `target` if the source is an opened Cider project. If there is one it will be used; if there are multiple, ask the user.
+You can omit `source` and/or `target` if the source is an opened Cider project. If there is one, it will be used; if there are multiple, ask the user.
 
 The command asks you to confirm any assumptions.
 
@@ -30,9 +30,9 @@ version=      | Set the version number in both the package project and the packa
 
 Note that `bump=` and `version=` are mutually exclusive.
 
-Until version 0.118.0 `projectspace` was `tatinVars`.
+Until version 0.118.0, `projectspace` was `tatinVars`.
 
-Until version 0.117.0 you could set the build number by including it in the version.
+Until version 0.117.0, you could set the build number by including it in the version.
 Now the build number gets bumped in all cases.
 
 API:
@@ -140,7 +140,7 @@ If you find one, use it; if multiple, ask me which.
 
 If the registry’s delete policy is `None`, ask me to confirm publication.
 
-The name of the resulting package is extracted from the ZIP file which therefore must conform
+The name of the resulting package is extracted from the ZIP file, which therefore must conform
 to the Tatin rules.
 
 --------------|-----------------------------------------------------------------

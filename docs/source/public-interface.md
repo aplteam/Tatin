@@ -44,12 +44,12 @@ The default name for the API space is `API`, and there are few reasons to change
 
 Establishing an API (or populating an API space) is surprisingly complex. Whether the object you want to expose is a tfn or a dfn, a namespace, class, interface or script, niladic or not, all of this makes a difference: all these objects need to be treated differently.
 
-Luckily Tatin offers a function that will establish the API for you: [`CreateAPIfromCFG`](api.md#create-api-from-cfg).
+Luckily, Tatin offers a function that will establish the API for you: [`CreateAPIfromCFG`](api.md#create-api-from-cfg).
 
 
 `CreateAPIfromCFG` looks in the package for a constant `Public` (a niladic function or a variable) that lists the names to expose as a vector of strings. It creates the API space as a child of the source namespace with the name specified in the configuration (which defaults to `API`) and populates it with references to or dfns calling those objects, whatever is appropriate.
 
-Along the way it handles shy results, ambivalent and niladic functions accordingly.
+Along the way, it handles shy results, ambivalent and niladic functions accordingly.
 
 
 ## When to call `CreateAPIfromCFG`
@@ -60,7 +60,7 @@ Call it as part of your build process before you call `BuildPackage`.
 
 ### Scripted namespaces
 
-`CreateAPIfromCFG` cannot create a child namespace inside a scripted namespace. Therefore it cannot establish an API.
+`CreateAPIfromCFG` cannot create a child namespace inside a scripted namespace. Therefore, it cannot establish an API.
 
 ### A package that comprises just a single function (or operator)
 

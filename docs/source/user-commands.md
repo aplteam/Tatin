@@ -233,8 +233,7 @@ Where (optional) `config` is a path to a folder containing a `tatin-client.json`
 
 If `config` is omitted, use the default user-settings file.
 
-Useful to apply in the session user settings that have changed on file.
-
+Useful for refreshing the session with user settings that have changed on file.
 
 
 ## Install packages

@@ -71,8 +71,6 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
     -   An empty string
     -   A string that replaces `version` in the package config file
 
-    See [Glossary](glossary.md) for details.
-
 
 ## Check for later version
 

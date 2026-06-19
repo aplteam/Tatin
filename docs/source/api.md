@@ -71,6 +71,8 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
     -   An empty string
     -   A string that replaces `version` in the package config file
 
+Note that by convention, `BuildPackage` copies any file named `LICENSE` in the root of the project to the root of a package.
+
 
 ## Check for later version
 

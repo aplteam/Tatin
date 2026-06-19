@@ -79,11 +79,7 @@ Names of the licenses (and URLs to their definitions) the server accepts.
 
 The INI section is optional. If absent, the website shows no _Licensing_ menu item, and the server accepts any license, including packages that lack a `license` property.
 
-By convention, `BuildPackage` copies any file named `LICENSE` in the root of the project to the root of a package.
-This convention is independent of the INI file.
-
 The text on the server web page is defined in `Assets/snippets/Licensing.md`.
-
 
 
 ### `LOGGING`

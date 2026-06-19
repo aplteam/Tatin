@@ -1,36 +1,35 @@
  r←{noBetas}LoadPackages y;paths;tempFolder;loaded;qdmx;list;identifiers;targetSpace;rootPath
-⍝ Load packages `identifiers` dynamically into the workspace,\\
-⍝ `identifiers` must be a simple char vector identifying one or more packages.
-⍝ Multiple packages (items) must be separated by commas.
-⍝ Every item in `identifiers` must be one of:
+⍝ Load packages dynamically into the workspace,\\
+⍝ y must be atm least one item and may be up to three items:
+⍝ [1] A string with one or more package names, separated by commas without spaces (identifiers)
+⍝ [2] (optional) A string defining the target namespace stuff will be established in (targetSpace)
+⍝ [3] (optional) A string defining the parent of `_tatin`. Defaults to # or ⎕se, depending on context (rootPath)\\
+⍝ Note that every item in `identifiers` must be one of:
 ⍝ * An HTTP request for a package
 ⍝ * A ZIP file holding a package
 ⍝ * A folder holding a package (like file://C:/Temp/group-name-version)
 ⍝ * A path to a package in a registry (like [RegistryAlias]{packageID} or C:\MyReg\{packageID}')
-⍝ * A package ID; Tatin will then attempt to find that package in one of the Registries defined in the
-⍝   Client's config file.
-⍝   The first hit wins.\\
-⍝ Optionally you may specify a second parameter specifying the name of the package. Without it the reference
-⍝ pointing to the packages is created either in `#` or in `⎕SE`.
-⍝ Optionally you may specify a third parameter with a path to where _tatin lives/will be created (root path)\\
+⍝ * A package ID; Tatin will then attempt to find that package in one of the Registries defined
+⍝   in the Client's config file. The first hit wins.\\
 ⍝ Usually the root path is either `#` (the default for non-user commands) or `⎕SE`, but you
-⍝ may specify a path into, say, an application like `#.MyApp`. In such a case the dependencies
-⍝ are loaded into `#.MyApp._tatin` rather then `#._tatin`.\\
-⍝ `targetSpace` must be a reference or a fully qualified name of an ordinary namespace, meaning the name must
+⍝ may specify a path into, say, an application like `#.MyApp`. In such a case the packages
+⍝ are loaded into `#.MyApp._tatin` rather than `#._tatin`.\\
+⍝ `targetSpace` must be a fully qualified name of an ordinary namespace, meaning the name must
 ⍝ start with either `#.` or `⎕SE.`.\\
-⍝ `targetSpace` might already exist, but if it doesn't it will be created. If it exists but is not an ordinary
-⍝ namespace an error is thrown.\\
-⍝ Loads package(s) into `(#|⎕SE).{ROOT_PATH}_tatin.{packageName}` and establishes a reference pointing to it in `targetSpace`\\
-⍝ Loads all dependencies, if any, as well into (#|⎕SE).{ROOT_PATH}_tatin but _not_ into `targetSpace`.\\
+⍝ `targetSpace` might already exist, but if it doesn't, it will be created.
+⍝ If it exists but is not an ordinary namespace, an error is thrown.\\
+⍝ Loads package(s) into `(#|⎕SE).{ROOT_PATH}._tatin.{packageName}` and establishes a ref pointing to it in `targetSpace`\\
+⍝ Loads all dependencies, if any, as well into (#|⎕SE).{ROOT_PATH}._tatin but _not_ into `targetSpace`.\\
 ⍝ Leaves no trails in the file system unless a) caching is on (because then any package will be cached) or
 ⍝ b) a package (or one of its dependencies) relies on file assets in which case the temporary directory (which is
 ⍝ created in any case) will not be deleted.\\
 ⍝ By default beta versions are considered in case the package ID is incomplete; suppress them by passing 1 as ⍺.\\
 ⍝ Returns the total number of packages loaded, including dependencies.\\
-⍝ Note that if a pckage fails to load, an error is thrown and no packages are loaded.
+⍝ Note that if a package fails to load, an error is thrown, and no packages are loaded.
  r←0
  'Length error on right argument'Assert(≢⊆y)∊2 3
- (identifiers targetSpace rootPath)←3↑(⊆y),'' ''
+ y←⊆y
+ (identifiers targetSpace rootPath)←3↑y,'' ''
  noBetas←{0<⎕NC ⍵:⍎⍵ ⋄ Reg.GetNoBetasDefault}'noBetas'
  targetSpace←,⍕targetSpace
  'Target namespace must be fully qualified'Assert(⊂{1 ⎕C ⍵↑⍨¯1+⍵⍳'.'}targetSpace)∊,¨'#' '⎕SE'

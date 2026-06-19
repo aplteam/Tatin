@@ -71,7 +71,7 @@ Parameter space `parms` is typically created with [`CreateBuildParms`](#create-b
     -   An empty string
     -   A string that replaces `version` in the package config file
 
-Note that by convention, `BuildPackage` copies any file named `LICENSE` in the root of the project to the root of a package.
+Note that by convention, `BuildPackage` copies any file named `LICENSE` from the root of the project to the root of a package.
 
 
 ## Check for later version
@@ -138,7 +138,7 @@ Required parameters are marked; others are optional.
 
 `force`
 : Copy already available packages again.
-    By default packages already saved in the target folder are not requested again.
+    By default, packages already saved in the target folder are not requested again.
 
 `group=`
 : Restrict the packages to be copied to a particular group.
@@ -258,7 +258,7 @@ The principal Tatin server operates a `None` policy, meaning that you cannot del
 
     If deleting a package is allowed – even when it is a beta version – then this cannot be guaranteed.
 
-    If you happen to publish a package and realize seconds later that you made a formidable mistake?
+    If you happen to publish a package and realise seconds later that you made a formidable mistake,
     Increase the patch number, fix the problem and publish a new version: that’s the only way.
 
 
@@ -300,9 +300,9 @@ depth | integer | optional: limit on recursive search
 then Tatin recursively scans the registry for the packages in `pkgList` and returns
 a fully qualified list of all matches as a vector of strings.
 
-By default only the folder containing a file `apl-dependencies.txt` with at least one of the defined packages is returned. This can be changed with `-verbose`: then the actual package folders are returned instead of the hosting folder/s, revealing the precise version/s installed.
+By default, only the folder containing a file `apl-dependencies.txt` with at least one of the defined packages is returned. This can be changed with `-verbose`: then the actual package folders are returned instead of the hosting folder/s, revealing the precise version/s installed.
 
-Specify packages in `pkgList` partially or in full. Name is required but group and version can be omitted. You can specify a major version number, but minor and patch numbers are ignored if specified.
+Specify packages in `pkgList` partially or in full. Name is required, but group and version can be omitted. You can specify a major version number, but minor and patch numbers are ignored if specified.
 
 The function scans `folder` recursively for a file `apl-dependencies.txt`. Folders containing such a file are searched for the packages listed in `pkgList`.
 The search is not case-sensitive.
@@ -382,7 +382,7 @@ The result namespace has the same fields as those shown under [`ReadPackageConfi
     flag←GetNoCachingFlag registry
 
 Where `registry` is a URI or alias, Tatin searches `MyUserSettings` for it.
-If found the value of the `noCaching` property is returned, otherwise 0.
+If found, the value of the `noCaching` property is returned, otherwise 0.
 
 ```apl
       ⎕SE.Tatin.GetNoCachingFlag '[tatin]'  ⍝ actual
@@ -466,7 +466,7 @@ Where
 : is an empty vector or a parameter space
 
 `sourcePath`
-: (optional) is a path to the package source folder. When it's a parameter space it is merged with defaults for the missing parameters. If it's an empty vector, a parameter space with just defaults is returned.
+: (optional) is a path to the package source folder. When it's a parameter space, it is merged with defaults for the missing parameters. If it's an empty vector, a parameter space with just defaults is returned.
 
 Tatin returns a parameter space for [`InitialisePackage`](#initialise-package).
 
@@ -760,7 +760,7 @@ Examples:
     '[tatin-test]example-versions-1.0'
     '[tatin-test]example-versions-1.0.1' ⍝ same as previous
 
-In the first three cases known registries with a priority above zero are scanned.
+In the first three cases, known registries with a priority above zero are scanned.
 
 Result `mat` has a column with full package names.
 
@@ -785,26 +785,31 @@ with beta versions), then the publishing date is taken into account.
 ## Load dependencies
 
 ```
-{refs}←{options} LoadDependencies folder [target]
+{refs}←{options} LoadDependencies folder [target] [rootPath]
 ```
 
 The right argument must be a vector of length one to three where
 
---------|-----------|-----------------------------
-options | 2 flags   | optional: default 0
-folder  | string    | path to package source folder, or `'[MyUCMDs]'`
-target  | reference | optional: target namespace
+---------|-----------|-----------------------------
+options  | 2 flags   | optional: default 0
+folder   | string    | path to package source folder, or `'[MyUCMDs]'`
+target   | string    | optional: target namespace
+rootPath | string    | optional: parent namespace of `_tatin`
 
 Loads all packages into `target` according to a build list in `folder` and returns a list of references to the loaded packages. (Principal packages only, not dependencies.)
 
-If unspecified the `target` namespace defaults to `#`, unless `folder` is `'[MyUCMDs]'`, when it defaults to `⎕SE`.
+If unspecified, the `target` namespace defaults to `#`, unless `folder` is `'[MyUCMDs]'`, when it defaults to `⎕SE`.
+
+??? details "Force `_tatin` elsewhere"
+
+    Normally, Tatin loads either into `#._tatin` or `⎕SE._tatin`. Under rare circumstances you might need to force Tatin to put `_tatin` elsewhere. For example, if you want everything in an application of yours to sit in `#.MyApp`, including `_tatin`, then you can enforce that by specifying `#.MyApp` as `rootPath`.
 
 The flags in `options`:
 
 1.  Overwrite if the package is already loaded
 1.  Make home relative. See details below.
 
-!!! detail "User commands"
+??? detail "Accessing assets by packages that are user commands"
 
     Case-insensitive alias `'[MyUCMDs]'` denotes the special folder `MyUCMDs/`, whose location depends on the operating system.
 
@@ -826,15 +831,20 @@ Where
 ---|---|---
 noBetas     | flag   | optional: ignore beta versions; default 0
 identifiers | string | comma-separated list of packages
-targetSpace | ref    | fully-qualified namespace: target
+targetSpace | string | fully-qualified namespace: target
+rootPath    | string | parent namespace of `_tatin`
 
 Tatin loads packages dynamically into the target space and returns the number of principal packages loaded.
 
-??? detail
+??? details "Where are the packages created?"
 
     Tatin actually loads the package into `[#|⎕SE]._tatin.{packageName}` and puts a reference to it in `targetSpace`.
 
-    Also loads any dependencies into `[#|⎕SE]._tatin` but does _not_ create references for them in `targetSpace`.
+    Tatin also loads any dependencies into `[#|⎕SE]._tatin`, but does _not_ create references for them in `targetSpace`.
+
+??? details "Force `_tatin` elsewhere"
+
+    Normally, Tatin loads either into `#._tatin` or `⎕SE._tatin`. Under rare circumstances you might need to force Tatin to put `_tatin` elsewhere. For example, if you want everything in an application of yours to sit in `#.MyApp`, including `_tatin`, then you can enforce that by specifying `#.MyApp` as `rootPath`.    
 
 In `identifiers` specify a package as one of
 
@@ -914,7 +924,7 @@ zfn  | zip file name: empty if `source` is a ZIP file, otherwise name of the ZIP
 
     If you don't use Cider, well, how should `PublishPackage` know what dependencies the package in question relies on?!
 
-    But even without Cider it might work, if only because there is a convention: when there is a sub-folder `packages` in the root of a folder that hosts a package then Tatin (and therefore `PublishPackages`) presumes that this sub-folder contains the dependency definition (a file `apl-dependencies.txt`).
+    But even without Cider it might work, if only because there is a convention: when there is a sub-folder `packages` in the root of a folder that hosts a package, then Tatin (and therefore `PublishPackages`) presumes that this sub-folder contains the dependency definition (a file `apl-dependencies.txt`).
 
     Only if you do not use Cider and for some reason keep the dependencies in a folder with a different name is there a need to tell `PublishPackage` about this other folder, because there is no other way for it to know.
 
@@ -948,10 +958,10 @@ and returns a list of references to the principal packages installed.
 
 Packages originally installed from ZIP files are just re-installed from their ZIP files without further ado.
 
-If `reg` is omitted Tatin scans all known registries with a priority above `0`.
+If `reg` is omitted, Tatin scans all known registries with a priority above `0`.
 (Packages with different major version numbers are considered as different packages.)
 
-Optional argument `parms` can specify the following flags all of which default to 0.
+Optional argument `parms` can specify the following flags, all of which default to 0.
 
 |-------|-------------------------------------------------------------------|
 |noBetas|Ignore beta versions                                               |
@@ -1042,12 +1052,12 @@ If `packageID` matches more than one package, Tatin signals an error.
 
 If `packageID` is empty, Tatin attempts to clean up: remove any packages that are neither principal packages nor required by other packages.
 
-To keep things simple Tatin performs the following steps:
+To keep things simple, Tatin performs the following steps:
 
-1. Checks whether the packageID is mentioned in the dependency file. If not, an error is thrown
-1. Removes `packageID` from the dependency file
-1. Recompiles the build list based on the new dependency file
-1. Removes all packages that are not mentioned in the build list anymore
+1. Checks whether the packageID is mentioned in the dependency file. If not, an error is thrown.
+1. Removes `packageID` from the dependency file.
+1. Recompiles the build list based on the new dependency file.
+1. Removes all packages that are not mentioned in the build list anymore.
 
 !!! danger "Deleting package folders"
 

@@ -16,11 +16,11 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.124.0 ⋄ 2026-06-03
+## v0.124.0 ⋄ 2026-06-20
 
-* The result of the function `Client.CopyRegistry` has changed: it's now always a two-column matrix.
+* The result of the function `Client.CopyRegistry` has changed: it's now always a two-column matrix. Check the APL documentation for details.
 
-* `CopyRegistry` has changed, refer to the API documentation.
+* The documentation has moved to https://aplteam.github.io. Therefore, the `docs/` folder in the root of an installed Tatin server is not required anymore. In old installations it should be removed, avoiding potential confusion.
 
 ## v0.123.0 ⋄ 2025-12-07
 
@@ -340,5 +340,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 

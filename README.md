@@ -1,5 +1,7 @@
 # Tatin - a Package Manager for Dyalog APL
 
+Tatin is a package manager: it lets APL developers share reusable libraries and manage their dependencies.
+
 Tatin is a community project. It is available as Open Source under the (pretty relaxed) MIT license.
 
 A Tarte Tatin is a nice way to package Apples.
@@ -16,7 +18,7 @@ Tatin consists of three modules:
 * `Server` 
 * `Registry` - all code that is shared between client and server
 
-Tatin clients and servers may run under Windows, Linux and Mac-OS.
+Tatin clients and servers may run under Windows, Linux and macOS.
 
 Tatin requires a Unicode edition of Dyalog and at least version 18.2; the Classic version is not supported.
 
@@ -28,7 +30,7 @@ The document [Installing And Updating The Tatin Client](https://tatin.dev/Assets
 
 ### 19.0 & 20.0
 
-These version come with Tatin. Because it is experimental, it needs to be activated:
+These versions come with Tatin. Because it is experimental, it needs to be activated:
 
 ```
 ]activate tatin
@@ -56,11 +58,10 @@ The document [_Installing The Tatin Server_](https://tatin.dev/Assets/docs/Insta
 
 ## Contributing to the code 
 
-Before going into details please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository")
- first. The next step is to consult the document [_Tatin For Contributors_](https://tatin.dev/Assets/docs/TatinForContributors.html "Link to TatinForContributors.html on the Tatin server"); it discusses how one can contribute to the documentation or the code or both.
+Before going into details, please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository") first. The next step is to consult the document [_Tatin For Contributors_](https://tatin.dev/Assets/docs/TatinForContributors.html "Link to TatinForContributors.html on the Tatin server"); it discusses how one can contribute to the documentation or the code or both.
 
 -----
 
-Latest revision 2025-01-09
+Latest revision 2026-06-21
 
 

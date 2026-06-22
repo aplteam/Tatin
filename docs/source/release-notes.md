@@ -16,6 +16,10 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.124.1 ⋄ 2026-06-21
+
+* No action required
+
 ## v0.124.0 ⋄ 2026-06-20
 
 * The result of the function `Client.CopyRegistry` has changed: it's now always a two-column matrix. Check the APL documentation for details.
@@ -340,6 +344,8 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

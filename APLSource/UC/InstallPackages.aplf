@@ -1,4 +1,4 @@
- r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;msg;rc;installFolder_;isUserCommand;buff;confirmed
+ r←InstallPackages Arg;identifier;installFolder;qdmx;list;ind;openCiderProjects;project;cfg;folders;msg;rc;installFolder_;isUserCommand;buff;confirmed;isUCMDs
  r←''
  (identifier installFolder)←Arg.(_1 _2)
  :If 0≡installFolder
@@ -38,7 +38,7 @@
      :EndIf
  :EndIf
  'Install folder is invalid'Assert~(⊂,1 ⎕C installFolder)∊,¨'#' '⎕SE'
- :If '[myucmds]'{⍺≢(≢⍺)↑⍵}⎕C installFolder
+ :If isUCMDs←'[myucmds]'{⍺≢(≢⍺)↑⍵}⎕C installFolder
  :AndIf './'≢2⍴installFolder
  :AndIf '/'≠1⍴installFolder
  :AndIf ~':'∊installFolder
@@ -97,7 +97,12 @@
  :EndTrap
  :If 0<≢r
      r←⍪(⊂'Installed into ',installFolder,':'),' ',¨r
-     r⍪←⊂'In order to load all dependencies (including newly installed ones) into the WS execute:'
-     r⍪←⊂'      ]Tatin.LoadDependencies "',installFolder,'" -overwrite'
+     :If isUCMDs
+         r⍪←⊂'In order to make the user command available in the current session, execute:'
+         r⍪←⊂']UReset'
+     :Else
+         r⍪←⊂'In order to load all dependencies (including newly installed ones) into the WS execute:'
+         r⍪←⊂'      ]Tatin.LoadDependencies "',installFolder,'" -overwrite'
+     :EndIf
  :EndIf
 ⍝Done

@@ -50,7 +50,7 @@ The left argument is optional and must be a flag. Default is 0, and a 1 forces a
 
     When code that came from a package is changed, Link will save it on disk, and that appears to be fine. Until a new version of the package comes along, you re-install all packages in the `packages/` folder and then call the `Admin.CopyPackagesToAPLSource` helper — and your change is gone!
 
-    If you need to change code that came from a package, you must change the package itself!
+    If you need to change code that came from a package, you must change the package itself, or ask the owner of that package to make the change.
 
 ## Other Dependencies
 
@@ -182,6 +182,7 @@ They should never be enabled on a production server.
 For example, one command returns an HTML page with all the available commands: navigate to `https://localhost:5001/v1/list-commands`.
 
 The other commands do not return HTML but trigger actions.
+
 
 
 

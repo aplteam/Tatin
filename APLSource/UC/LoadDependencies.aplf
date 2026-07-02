@@ -36,6 +36,10 @@
          installFolder←projectFolder,'/',1⊃buff
          targetSpace←projCfg.CIDER.(parent,'.',projectSpace),{0=≢⍵:⍵ ⋄ '.',⍵},2⊃buff
      :EndIf
+     :If '='∊installFolder
+         targetSpace,←'.',{⍵↓⍨⍵⍳'='}installFolder
+         installFolder←{⍵↑⍨¯1+⍵⍳'='}installFolder
+     :EndIf
  :Else
      :If 0=≢targetSpace
          :If isUCMD

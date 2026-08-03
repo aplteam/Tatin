@@ -1,0 +1,48 @@
+ r←Test_Load_211(stopFlag batchFlag);⎕TRAP;msg;rc;qdmx;buff
+⍝ Attempts to load package "APLTreeUtils2" into #.Foo where APLTreeUtils2 is already defined
+⍝ Must throw an error because that's not a legal operation. Was once a bug.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS''
+ #.Foo.APLTreeUtils2←42
+ :Trap 0
+     buff←⎕SE.Tatin.LoadPackages(##.CiderConfig.HOME,'/TestData\aplteam-APLTreeUtils2-1.4.1.zip')'#.Foo'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'is already defined as an object with name class 2'⍷qdmx.EM
+ :EndTrap
+
+ #.Foo.⎕EX'APLTreeUtils2'
+ #.Foo.APLTreeUtils2←{3.14}
+ :Trap 0
+     buff←⎕SE.Tatin.LoadPackages(##.CiderConfig.HOME,'/TestData\aplteam-APLTreeUtils2-1.4.1.zip')'#.Foo'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'is already defined as an object with name class 3'⍷qdmx.EM
+ :EndTrap
+
+ #.Foo.⎕EX'APLTreeUtils2'
+ #.Foo.⎕FX↑'r←(f APLTreeUtils2) y' 'r←f y'
+ :Trap 0
+     buff←⎕SE.Tatin.LoadPackages(##.CiderConfig.HOME,'/TestData\aplteam-APLTreeUtils2-1.4.1.zip')'#.Foo'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'is already defined as an object with name class 4'⍷qdmx.EM
+ :EndTrap
+
+ #.Foo.⎕EX'APLTreeUtils2'
+ #.Foo.⎕FIX':Namespace APLTreeUtils2' ':EndNamespace'
+ :Trap 0
+     buff←⎕SE.Tatin.LoadPackages(##.CiderConfig.HOME,'/TestData\aplteam-APLTreeUtils2-1.4.1.zip')'#.Foo'
+     →T.FailsIf 1
+ :Else
+     qdmx←⎕DMX
+     →T.PassesIf∨/'Cannot load package into a script'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+⍝Done

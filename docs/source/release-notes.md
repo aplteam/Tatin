@@ -16,6 +16,11 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.124.3 ⋄ 2026-08-06
+
+* Note that recent versions did not allow anymore to load a package into an empty namespace. That was too restrictive, though loading into a scripted namespace is still not allowed.
+* This version comes with a new version of the `]Activate` user command: it now can handle Tatin or Cider being installed in both the version-specific location and the version-agnostic location with the `-reset` option.
+
 ## v0.124.2 ⋄ 2026-07-01
 
 * No action required
@@ -348,6 +353,8 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

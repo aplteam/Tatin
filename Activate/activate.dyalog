@@ -1,4 +1,4 @@
-﻿:Namespace activate ⍝ v0.4.1
+﻿:Namespace activate ⍝ v0.4.2
 ⍝ Pre-packaged tool activation
 ⍝ 2023-09-25
 ⍝ 2023-11-02 kai: `Run` must go into StartupSession/ rather than SessionExtensions/
@@ -7,6 +7,7 @@
 ⍝ 2024-06-05 AndyS: [21422] Gracefully and informatively fail if run on AIX or on Classic interpreters; remove reference to -update in Help
 ⍝ 2025-03-12 kai: .dyalog/ fixed, -versionagnostic flag added, -update flag removed, ]deactivate polished, ]ListActivated added
 ⍝ 2025-05-21 kai: Even ]Activate tatin wrongly reported that Cider was activated
+⍝ 2026-08-05 kai: ]Activate all -reset did not react well when Tatin∨Cider was installed in both the version specific & the version agnostic folder
 
     ⎕IO←1 ⋄ ⎕ML←1   ⍝ Set those here to avoid inheriting them from outside
     AllCmds←'Activate' 'Deactivate' 'ListActivated'
@@ -28,11 +29,12 @@
       :Select ⎕C Cmd
      
       :Case ⎕C'Activate'
-          r←,⊂'Activate an experimental tool shipped with Dyalog APL 19.0'
+          r←,⊂'Activate an experimental tool shipped with Dyalog APL'
           r,←⊂'    ]',Cmd,' cider|tatin|all -reset -versionagnostic'
           r,←⊂''
           r,←⊂'By default a tool is activated for the currently running version of Dyalog, but check -versionagnostic.'
           r,←⊂'If you want to get rid of a tool (or all tools), check the ]Deactivate command.'
+          r,←⊂'See also ]ListActivated'
           r,←⊂''
           r,←⊂' -versionagnostic   Installs into a version-agnostic folder of Dyalog.'
           r,←⊂'                    Use this if you want to use a tool from more than one version'
@@ -47,6 +49,8 @@
           r,←⊂'Removes from both the version-specific and the version-agnostic folder.'
           r,←⊂''
           r,←⊂'Note that you cannot Deactivate Tatin while Cider is still activated because Cider depends on Tatin.'
+          r,←⊂''
+          r,←⊂'See also ]Deactivate  and  ]ListActivated'
      
       :Case ⎕C'ListActivated'
           r←,⊂'List all tools ativated anywhere (version specific and version agnostic)'
@@ -54,6 +58,8 @@
           r,←⊂'With the -raw flag you get a boolean matrix rather than textual information:'
           r,←⊂'Row:  Tatin, Cider'
           r,←⊂'Cols: specific, agnostic (version)'
+          r,←⊂''
+          r,←⊂'See also ]Activate  and  ]Deactivate'
      
       :EndSelect
     ∇
@@ -88,7 +94,7 @@
               :If Args.reset
                   Reset tool target target2
               :EndIf
-              r←Activate(tool agnostic target target2)
+              r←'still'Activate(tool agnostic target target2)
           :Case 'Deactivate'
               r←Deactivate tool
           :Else
@@ -167,8 +173,9 @@
       :EndIf
     ∇
 
-    ∇ r←Activate(tool agnostic target target2);source;folder;m;src;sep;cmddir;z;mat;report
+    ∇ r←{caption}Activate(tool agnostic target target2);source;folder;m;src;sep;cmddir;z;mat;report;target_a;target_b
       r←''
+      caption←{0<⎕NC ⍵:⍎⍵ ⋄ 'already'}'caption'
       :If 'all'≡tool
       :AndIf ⎕NEXISTS target
           →0⊣r←'Folder "',target,'" exists, please specify -reset'
@@ -183,7 +190,20 @@
       :EndIf
       mat←ListActivated_ ⍬
       :If 0<+/mat[1+~agnostic;]
-          →0⊣r←'Already installed in version-',((1+agnostic)⊃'specific' 'agnostic'),' folder: ',⊃{⍺,',',⍵}/mat[1+~agnostic;]/'Tatin' 'Cider'
+          target_a←⊃GetFolders 0
+          target_b←⊃GetFolders 1
+          :Select ⎕C tool
+          :Case 'all'
+              r←'Tatin/Cider are ',caption,' installed in:'
+              r,←⊃{⍺,CR,⍵}/(∨⌿mat)/target_a target_b
+          :Case 'tatin'
+              r←'Tatin is ',caption,' installed in:',CR
+              r,←⊃{⍺,CR,⍵}/(mat[;1])/target_a target_b
+          :Case 'cider'
+              r←'Cider is ',caption,' installed in:',CR
+              r,←⊃{⍺,CR,⍵}/(mat[;2])/target_a target_b
+          :EndSelect
+          :Return
       :EndIf
       source←report←''
       folder←DYALOG,'/Experimental/CiderTatin/'
@@ -268,15 +288,26 @@
     ⍝ Deletes the given activated tools so that the activation will restore the version APL was shiped with
       r←0
       :Select tool
-      :Case 'cider'
-          3 ⎕NDELETE target,'/Cider'
       :Case 'tatin'
-          3 ⎕NDELETE target,'/Tatin'
-          3 ⎕NDELETE target2,'/Run.apl'
+          →(0<≢r←RemoveFolder target,'/Tatin')/0
+          →(0<≢r←RemoveFolder target2,'/Tatin')/0
+      :Case 'cider'
+          →(0<≢r←RemoveFolder target,'/Cider')/0
+          →(0<≢r←RemoveFolder target2,'/Cider')/0
       :Case 'all'
-          3 ⎕NDELETE target
-          3 ⎕NDELETE target2,'/Run.apl'
+          →(0<≢r←RemoveFolder target)/0
+          →(0<≢r←RemoveFolder target2)/0
       :EndSelect
+    ∇
+
+    ∇ msg←RemoveFolder path;rc
+      msg←''
+      :If ⎕NEXISTS path
+          rc←3 ⎕NDELETE path
+          :If 0≠rc
+              msg←'Could not remove folder ',path,' (RC=',(⍕rc),')'
+          :EndIf
+      :EndIf
     ∇
 
     ∇ home←GetHomeFolder agnostic;rid

@@ -1,0 +1,29 @@
+ r←Test_Load_210(stopFlag batchFlag);⎕TRAP;tempPath;parms;msg;rc;qdmx;buff
+⍝ Creates a Cider project "#.Foo.NotEmptyNS" and then tries to load the package "APLTreeUtils2" into #.Foo
+⍝ Must throw an error because that's not a legal operation. Was once a bug
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :If 9≠⎕SE.⎕NC'Cider'
+     r←T._NotApplicable ⋄ →0
+ :EndIf
+
+ tempPath←F.GetTempSubDir'APLTreeUtils2'
+ parms←⎕SE.Cider.CreateCreateProjectParms tempPath
+ #.⎕SHADOW'Foo' ⋄ 'Foo'#.⎕NS'' ⋄ 'APLTreeUtils2'#.Foo.⎕NS'' ⋄ #.Foo.APLTreeUtils2.a←1
+ parms.namespace←'#.Foo'
+ ⎕SE.Cider.CreateProject parms
+ :Trap 0
+     buff←⎕SE.Tatin.LoadPackages(##.CiderConfig.HOME,'/TestData\aplteam-APLTreeUtils2-1.4.1.zip')'#.Foo'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp 0=∨/'<#.Foo.APLTreeUtils2> exists but is neither a package nor empty'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempPath
+ msg Assert 0=rc
+⍝Done

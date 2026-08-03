@@ -11,11 +11,12 @@
  :If 0<≢cfg.api
      ('Not found in ',source,': ',cfg.api)Assert 0<⍎source,'.⎕NC ''',cfg.api,''''
      ('Is neither class nor namespace: ',cfg.api)Assert 9=⍎source,'.⎕NC ''',cfg.api,''''
-     nc←(⍎target).⎕NC name
-     :If 9=nc
+     nc←(⍎target).⎕NC⊂name
+     :If nc∊9.4 9.5 9.1
          ref2←⍎target,'.',name
-         :If ~∨/'._tatin.'⍷⍕ref2  ⍝ We allow overwriting a ref pointing to a package:
-             ('<',target,'.',name,'> is already defined but not a package & not empty')Assert 0=≢ref2.⎕nl⍳16
+         :If ~∨/'._tatin.'⍷⍕ref2  ⍝ We allow overwriting a ref pointing to a package
+             ('<',target,'.',name,'> exists but is neither a package nor empty')Assert 0=≢ref2.⎕NL⍳16
+             'Cannot load package into a script'Assert~##.APLTreeUtils2.IsScripted ref2
          :EndIf
      :Else
          ⍝ Otherwise the name must not be used:

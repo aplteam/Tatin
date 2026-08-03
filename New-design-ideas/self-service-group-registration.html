@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior:smooth" >
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Self-service group registration</title>
+<style media="screen">
+html{-webkit-text-size-adjust:100%;}body{margin:0;}main{display:block;}h1{margin:0.67em 0;}hr{box-sizing:content-box;height:0;overflow:visible;}pre{font-family:monospace, monospace;}a{background-color:transparent;}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted;}b,strong{font-weight:bolder;}code,kbd,samp{font-family:monospace, monospace;font-size:1em;}small{font-size:80%;}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline;}sub{bottom:-0.25em;}sup{top:-0.5em;}img{border-style:none;}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0;}button,input{overflow:visible;}button,select{text-transform:none;}button,[type="button"],[type="reset"],[type="submit"]{-webkit-appearance:button;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner{border-style:none;padding:0;}button:-moz-focusring,[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring{outline:1px dotted ButtonText;}fieldset{padding:0.35em 0.75em 0.625em;}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal;}progress{vertical-align:baseline;}textarea{overflow:auto;}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0;}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto;}[type="search"]{-webkit-appearance:textfield;outline-offset:-2px;}[type="search"]::-webkit-search-decoration{-webkit-appearance:none;}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit;}details{display:block;}summary{display:list-item;}template{display:none;}[hidden]{display:none;}body{margin:0;font-family:Verdana, Arial, "Liberation Sans", sans-serif;background-color:#323232;font-size:16px;max-width:none;padding:0.83em;color:#DDD;margin-left:auto;margin-right:auto;overflow-wrap:break-word;line-height:1.4;}h1,h2,h3,h4,h5,h6{color:hsl(39,97%,83%);padding-left:0;}h1,h2,h3,h4{margin-bottom:0.88em;}h1{font-size:1.5em;margin:0.27em 0 1.11em 0;}h1 > code,h2 > code,h3 > code,h4 > code,h5 > code,h6 > code{font-size:1em;background-color:inherit;}h2{font-size:1.35em;margin:0.55em 0 0.55em 0;padding-top:0.55em;border-bottom:1px solid Silver;}nav h2{font-size:1.20em;margin:0 0 0.75em 0;}h3{margin:0;margin-top:0.75em;font-size:1.25em;}h4{font-size:1.2em;margin:0;margin-top:0.75em;}h5{font-size:1.15em;margin:0;margin-top:0.60em;padding:0;}h6{font-size:1em;margin:0;margin-top:0.60em;padding:0;}hr{border:0;border-top:1px solid silver;}a{color:#A3A3FF;margin:0;padding:0;vertical-align:baseline;}a:visited{color:hsl(270,70%,85%);}a:visited code{color:hsl(270,70%,85%);}a.autoheader_anchor{text-decoration:none;}img{margin-top:0.55em;margin-bottom:0.27em;}ul{list-style-type:disc;}dd{padding-top:0.25em;}p.first_dd{padding-top:0.25em;}li > ul,li > ol{padding-bottom:0;}li{margin-left:1.38em;margin-bottom:0.5em;}ul > li{margin-left:1.5em;}ol > li{margin-left:2.5em;}li ul{margin-left:0.55em;}li ul{margin-left:0.27em;}li p{padding:1px 0 0 0;margin:0.55em 0 0.27em 0;}ul, ol{padding:0 0 0 1.5em;margin:0.5em -0.6em;}ul ul,ul ol,ol ol,ol ul{margin-top:0.5em;margin-left:-0.6em;}p{padding:0.6em 0 0 0;margin:0;}pre{position:relative;overflow:auto;padding:0.6em 0.5em;margin:0.55em 0 0.55em 0 !important;background-color:#1A1A1A;-moz-tab-size:4;tab-size:4;-o-tab-size:4;display:block;font-family:APLFont, monospace;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none;border:1px solid silver;line-height:1;border-radius:5px;}pre > code{line-height:1.2;border:0;padding:0;margin:0;background-color:inherit;font-weight:normal;white-space:pre-wrap;}th code ,td code{color:#FFC266;background-color:inherit;padding:0.02em 0.3em;border-radius:5px;border:1px solid #737373;}a code{padding:0;font-size:1em;background-color:inherit;color:inherit;}nav code{background-color:inherit;font-weight:400;}mark{background-color:#ffd24d;color:#1a1a1a;}code{font-family:APLFont, monospace;color:#FFC266;background-color:#1A1A1A;line-height:1.4;white-space:nowrap;margin:0 0.2em 0 0.2em;padding:0.02em 0.3em;border-radius:5px;}tbody tr:nth-child(even){background-color:#3a3a3a;}tbody tr:nth-child(odd){background-color:#323232;}th{background-color:#4c4c4c;color:#DDD;}th, td{padding:0.3em 0.8em;font-weight:normal;color:#DDD;border-bottom:1px solid #474747;}table td + td{border-left:1px solid #474747;}table th + th{border-left:1px solid #474747;}table{margin:0.75em 0;border-collapse:collapse;font-family:APLFont;font-size:1em;line-height:1.0;border:1px solid #5a5a5a;}table a{color:#A3A3FF;}table a:visited{color:hsl(270,70%,85%);}thead th{color:#DDD;background-color:#4c4c4c;}td{color:#DDD;}tfoot td{color:#DDD;background-color:#4c4c4c;}li > table{margin:0.55em 0 0.55em 0;}tr{margin:1.11em;}blockquote{border-left:0.27em solid silver;padding:0 0.25em;margin:0.5em 0.25em 0.80em 0.5em;}blockquote p:first-child{padding-top:0;}blockquote p:last-child{padding-bottom:0;}blockquote p{padding:0.25em;}blockquote ul li{margin-left:1.38em;}blockquote ol li{margin-left:1.38em;}li > blockquote{margin-left:0;}nav{background-color:#4C4C4C;border:1px solid Silver;padding:0.55em;margin:0.50em 0 1em 0;margin-right:0;overflow:hidden;font-size:1em;}nav#main_nav{width:auto;}nav ul{list-style-type:None;margin:0 1em 0.11em 0;padding:0;}nav ul,nav ul{margin-left:2em;}nav > ul ul{margin-left:2em;}nav a{color:#EDEDED;}nav a:visited{color:#B0B0B0;}nav ul li{margin:0 0 0.16em 0;}nav li p{margin:0;padding:0;line-height:1;margin:0;padding:0;}nav li{line-height:1.5;padding:0;margin-top:0;margin-bottom:0;margin-left:2em;}nav p{font-weight:bold;font-size:1em;padding-top:0;margin-bottom:0.5em;}dl{margin-top:0.1em;margin-bottom:0.1em;}dt{margin-top:0.75em;margin-bottom:0.1em;font-weight:bold;}.toc-container{height:auto;margin:0;padding:0.5em 0.5em 0 0;}nav h2{font-size:1.5em;margin:0.27em 1em 0.27em 1em;}div.toc-container ul{margin-left:0.5em;margin-right:1em;padding-left:1em;}[type="checkbox"]{position:absolute;left:-9999px;}label{display:block;width:100%;height:1.1em;cursor:pointer;top:0;padding-left:1em;}div#footnotes_div p{line-height:1.2;padding-bottom:0;padding-top:0;}div#footnotes_div ol{padding-top:0;}@font-face{font-family:"APLFont";src:local("APL385 Unicode"), url("https://misc.aplteam.com/apl385.ttf") format("truetype");}.hide{display:none;}.red{color:red;}.center{text-align:center;margin-left:auto;margin-right:auto;}.left{text-align:left;margin-right:0;}.right{text-align:right;margin-left:0;}.print_only{display:none;}div.leanpub{padding:0.83em 0.55em 1.11em 0;margin:0.55em 0 0 0.27em;overflow:auto;display:grid;grid-template-columns:auto 1fr;grid-gap:10px;align-items:center;}div.leanpub p:first-child,div.leanpub h1:first-child,div.leanpub h2:first-child,div.leanpub h3:first-child,div.leanpub ul:first-child,div.leanpub ol:first-child{padding-top:0;}div.leanpub_A{border:1px solid silver;background-color:#3c3c3c;padding:0.55em;margin:1.11em 0 0.83em 0;color:#DDD;}div.leanpub h3,div.leanpub_A h3{font-size:1.2em;padding:0;margin:0;}div.leanpub h4,div.leanpub_A h4{font-size:1.1em;padding:0.27em 0 0 0;margin:0;}div.leanpub h5,div.leanpub h5{font-size:1.0em;padding:0.27em 0 0 0;margin:0;}div.leanpub_A h5,div.leanpub_A h5{font-size:1.0em;padding:0.27em 0 0 0;margin:0;}div.leanpub_A > p:first-child{padding-top:0;margin-top:0;}div.leanpub img{float:left;padding:0.5em;margin:0.5em 1em 0 0;clear:both;background-color:#CCCCFF;}div.leanpub tbody *{background-color:transparent;}div.leanpub p{padding:0.17em 0 0 0;margin:0;}span.leanpub_code{font-family:APLFont, monospace;color:#FFC266;background-color:#1A1A1A;padding:0.02em 0.3em;border-radius:5px;white-space:nowrap;}div.leanpub p{display:block;padding:0.44em 0 0 0;}div.leanpub > div{margin-left:3em;}pre[class*="language-"]{position:relative;margin:5px 0;padding:1.75em 0 1.75em 1em;}details summary{cursor:pointer;}details summary > *{display:inline;}div.accordion{border:1px solid silver;padding:0;margin:0.5em 0;background-color:#3c3c3c;}div.accordion > div{border:1px solid silver;padding:0.5em;margin:0 0;}div.accordion > div p,div.accordion > div ul,div.accordion > div ol,div.accordion > div img,div.accordion > div table{margin-block-end:0.1em;}div.collapsible{border:1px solid silver;padding:0.5em;margin:0.5em 0;background-color:#3c3c3c;}div.collapsible p,div.collapsible ul,div.collapsible ol,div.collapsible img,div.collapsible table{margin-block-end:0.1em;}ul.checkboxes{list-style:none;margin-left:0;padding-left:0em;}li{text-indent:0;padding-left:0;line-height:1.4;margin-left:4em;}ul.checkboxes > li::before{content:"☐ ";}ul.checkboxes > li.checked::before{content:"☒ ";}pre > button{position:absolute;top:5px;right:5px;font-size:0.8em;padding:0.15em;color:#DDD;background-color:#1A1A1A;border:1.25px solid #1A1A1A;border-top-left-radius:6px;border-top-right-radius:6px;border-bottom-right-radius:6px;border-bottom-left-radius:6px;}pre button:hover{cursor:pointer;color:#FFFFFF;}pre > button svg{background-color:transparent;padding:0;}#main_nav{position:relative;overflow:visible;}#main_nav h2{font-size:1.2em;margin:0;padding:0.5em 0.5em 0em 0.5em;border-bottom:0px solid Silver;}#toc-toggle{position:absolute;top:1.1em;right:1em;border-top-left-radius:6px;border-top-right-radius:6px;border-bottom-right-radius:6px;border-bottom-left-radius:6px;}#toc-list{margin:1em 1em 0.25em 0;}#toc-list.floating{position:absolute;left:0;right:0;top:100%;z-index:100;max-height:80vh;overflow:auto;margin:0;padding:0.5em 1em;box-sizing:border-box;background-color:#4C4C4C;border:1px solid Silver;border-radius:6px;box-shadow:0 6px 16px rgba(0, 0, 0, 0.45);}sup, sub{text-decoration:none;}svg{padding:0.5em;background-color:#CCCCFF;}div.leanpub > svg{padding:0;background-color:transparent;}div.leanpub > svg g{fill:#DDD;}@media (max-width:600px){table{display:block;overflow-x:auto;max-width:100%;}pre{overflow-x:auto;}}
+</style>
+<style media="print">
+@page{margin:25mm 20mm 25mm 20mm;}body{font-family:Verdana, Arial, "Liberation Sans", sans-serif;font-size:10pt;line-height:1.2;}h1{font-size:150%;}h2{font-size:124%;}h3{font-size:124%;}h4{font-size:116%;}h5{font-size:108%;}h6{font-size:100%;}nav h2{font-size:1em;}h1{margin:0 0 20pt 0;}h2{margin:15pt 0 3pt 0;}h3{margin:10pt 0 0pt 0;}h4{margin:10pt 0 0pt 0;}h5{margin:9pt 0 0pt 0;}h6{margin:9pt 0 0pt 0;}h1,h2,h3,h4,h5,h6{color:black;font-family:"Arial", "Sans";page-break-after:avoid;}h1 > code,h2 > code,h3 > code,h4 > code,h5 > code,h6 > code{font-size:100%;}h2{border-bottom:1pt solid Silver;padding-bottom:2pt;}.h_tag{page-break-after:avoid;break-after:avoid;}abbr[title]{border-bottom:0;text-decoration:none;}a{color:black;margin:0;padding:0;vertical-align:baseline;text-decoration:none;font-style:italic;}a.autoheader_anchor{text-decoration:none;font-style:normal;page-break-after:avoid;break-after:avoid;}ul{list-style-type:square;}ul, ol{padding:0;margin:0;margin-top:10pt;}li > ul,li > ol{padding-bottom:0;padding-top:0;}li{line-height:1.3;margin:2pt 5pt 2pt 13pt;}ul > li, ol > li{margin:0 0 0 15pt;}li ul{margin-left:5pt;}li ul,li ol{margin:0 3pt 0 3pt;}li p{padding:0;margin:2pt 0;line-height:1.3;}p,ul,ol{line-height:1.2;padding:3pt 0 0 0;margin:0;color:black;}ul,ol{margin-top:0;}pre{padding:3pt 6pt;margin:5pt 0;white-space:pre-wrap;background-color:#FAFAFA;border:1pt Silver solid;display:block;font-family:APLFont, monospace;page-break-inside:avoid;overflow:hidden;line-height:1;}pre code{background-color:#FAFAFA;color:Black;padding:0;margin:0;border:0;white-space:pre-wrap;overflow:hidden;}mark{background-color:transparent;font-weight:bold;font-style:italic;}code{font-family:APLFont, monospace;line-height:1.2;font-size:1em;color:black;padding:0 2pt;border:1pt solid silver;white-space:nowrap;margin:0 0.2em 0 0.2em;border-radius:5px;}nav code{font-size:0.9em;}table td + td{border-left:1pt solid silver;}table th + th{border-left:1pt solid silver;}th, td{padding:1pt 5pt;border:1pt solid silver;vertical-align:top;}table code{font-style:normal;padding-left:0;padding-right:0;}table{margin:0.75em 0;font-family:APLFont;font-size:1em;padding:0;border:1pt solid silver;border-collapse:collapse;}li > table{margin:10pt 0 10pt 0;}tr{margin:20pt;}th{font-weight:bold;}tfoot td{font-weight:bold;}tbody tr:nth-child(even) td,thead tr th{border-bottom:1pt solid #949494;}blockquote{border-left:5pt solid silver;padding-left:5pt;margin:8pt 3pt 8pt 8pt;margin:0.5em 0.2em 0.5em 0.5em;}blockquote p{padding:0 0.25em;}nav{background-color:#f8f8f8;border:1pt solid Gray;width:auto;padding:5pt 5pt 5pt 0;margin:5pt 0;overflow:hidden;}nav ul{list-style-type:none;margin:6pt 0 3pt 0;padding:0;}nav ul li{margin-top:3pt;margin-bottom:3pt;}nav li p{margin:0;padding:0;line-height:1;margin:0;padding:0;}nav li{line-height:1;padding:0;margin-top:0;margin-bottom:0;margin-left:8pt;}dl{margin-top:0;margin-bottom:10pt;}dt{margin-top:10pt;margin-bottom:0;font-weight:800;page-break-inside:avoid;}dd{margin-top:2pt;}label#hide_toc_label{font-size:65%;}.toc-container{background-color:inherit;}.toc-container h3{margin:0 0 2pt 7pt;}[type="checkbox"]{display:none;}label{display:block;width:100%;height:1.1em;top:0;padding-left:10pt;}a.external_link::before{content:" 🔗\FE0E\0020";}a.bookmark_link::before{content:" ➯ ";}a.mailto_link::before{content:" ✉ "}nav a.bookmark_link{font-style:normal;}nav p{margin-left:10pt;font-weight:bold;font-size:0.85em;}nav a{font-style:normal;}nav a.bookmark_link::before{content:"";}div#footnotes_div a::before{content:"";}div#footnotes_div a{font-style:normal;}div#footnotes_div{page-break-inside:avoid;}@font-face{font-family:"APLFont";src:local("APL385 Unicode"), url("https://misc.aplteam.com/apl385.ttf") format("truetype");}.no_print{display:none;}.print{display:block;}.red{color:red;}.center{text-align:center;margin:0 auto;}.left{text-align:left;margin-right:0;}.right{text-align:right;margin-left:0;}.avoid_page_break{page-break-inside:avoid;}.page_break_before{page-break-before:always;}div.leanpub{margin:10pt 0 10pt 8pt;page-break-inside:avoid;display:grid;grid-template-columns:auto 1fr;grid-gap:10pt;align-items:center;}div.leanpub_A{border:1pt solid black;background-color:#f9f9f9;padding:5pt;margin:10pt 0 10pt 0;page-break-inside:avoid;}div.leanpub h3,div.leanpub_A h3{font-size:1.2em;padding:3pt 0 0 0;margin:0;}div.leanpub h4,div.leanpub_A h4{font-size:1.1em;padding:3pt 0 0 0;margin:0;}div.leanpub h5,div.leanpub h5{font-size:1.0em;padding:3pt 0 0 0;margin:0;}div.leanpub_A h5,div.leanpub_A h5{font-size:1.0em;padding:3pt 0 0 0;margin:0;}div.leanpub img{padding:0;margin:0 10pt 2pt 0;}div.leanpub_A > p:first-child{padding-top:0;margin-top:0;}div.leanpub > div > h1:first-child{padding-top:5pt;}div.leanpub img{float:left;padding:0;margin:5pt 10pt 0 0;clear:both;}span.leanpub_code{font-family:APLFont, monospace;font-weight:normal;color:black;padding:0 2pt;border:1pt solid silver;border-radius:5px;white-space:nowrap;}div.leanpub p{display:block;padding:3pt 0 0 0;margin:0;}div.leanpub p:first-child,div.leanpub h1:first-child,div.leanpub h2:first-child,div.leanpub h3:first-child,div.leanpub ul:first-child,div.leanpub ol:first-child{padding-top:0;}div.leanpub > div{margin-left:35pt;}sup{font-size:0.75em;line-height:0;position:relative;vertical-align:baseline;top:-0.4em;}pre[class*="language-"]{position:relative;margin:5pt 0;padding:1.75rem 0 1.75rem 1rem;}pre[class*="language-"] button{position:absolute;top:5pt;right:5pt;}div.accordion{padding:0;margin:0.5em 0;}div.accordion > div{border:1pt solid silver;padding:0.5em;margin:0 0;}div.accordion > div p,div.accordion > div ul,div.accordion > div ol,div.accordion > div img,div.accordion > div table{margin-block-end:0.1em;}summary{display:block;}summary::before{content:"\25BE ";}div.collapsible{border:1pt solid silver;padding:0.5em;margin:0.5em 0;}div.collapsible p,div.collapsible ul,div.collapsible ol,div.collapsible img,div.collapsible table{margin-block-end:0.1em;}ul.checkboxes{list-style:none;margin-left:-2rem;padding-left:1.5rem;}li{padding-left:0;text-indent:0;}ul.checkboxes > li::before{content:"☐ ";}ul.checkboxes > li.checked::before{content:"☒ ";}ul.checkboxes > li{margin-bottom:1pt;}pre > button{display:none;}#toc-toggle{display:none;}#toc-list{display:block !important;}#main_nav h2{margin:0;padding:0.5em 1em;border-bottom:1pt solid silver;}
+</style>
+<meta name="author" content="kai">
+</head>
+<body>
+<div class="h_tag">
+<a href="#self-service-group-registration" id="self-service-group-registration" class="autoheader_anchor">
+<h1 data-id="Self-service-group-registration">Self-service group registration</h1>
+</a>
+</div>
+<nav id="main_nav" class="toc">
+<h2 id="toc-heading">Table of contents</h2>
+<button id="toc-toggle" aria-controls="toc-list" aria-expanded="true">Hide</button>
+
+<div class="toc-container">
+<ul id="toc-list" class="print">
+<li class="toc-entry toc-h2"><a href="#the-problem">The problem</a></li>
+<li class="toc-entry toc-h2"><a href="#goals">Goals</a></li>
+<li class="toc-entry toc-h2"><a href="#non-goals">Non-goals</a></li>
+<li class="toc-entry toc-h2"><a href="#overview">Overview</a></li>
+<li class="toc-entry toc-h2"><a href="#registration">Registration</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#step-1-choose-a-group-name">Step 1: choose a group name</a></li>
+<li class="toc-entry toc-h3"><a href="#step-2-give-an-email-address">Step 2: give an email address</a></li>
+<li class="toc-entry toc-h3"><a href="#step-3-enter-the-code">Step 3: enter the code</a></li>
+<li class="toc-entry toc-h3"><a href="#step-4-describe-the-group-and-choose-a-password">Step 4: describe the group and choose a password</a></li>
+</ul></li>
+<li class="toc-entry toc-h2"><a href="#the-api-key">The API key</a></li>
+<li class="toc-entry toc-h2"><a href="#forgotten-password">Forgotten password</a></li>
+<li class="toc-entry toc-h2"><a href="#data-model">Data model</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#credentialscsv">Credentials.csv</a></li>
+<li class="toc-entry toc-h3"><a href="#the-group-record">The group record</a></li>
+<li class="toc-entry toc-h3"><a href="#pending-registrations">Pending registrations</a></li>
+</ul></li>
+<li class="toc-entry toc-h2"><a href="#security">Security</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#the-code-is-six-digits">The code is six digits</a></li>
+<li class="toc-entry toc-h3"><a href="#throttling-access">Throttling access</a></li>
+<li class="toc-entry toc-h3"><a href="#salting">Salting</a></li>
+<li class="toc-entry toc-h3"><a href="#rate-limits">Rate limits</a></li>
+<li class="toc-entry toc-h3"><a href="#the-verification-email">The verification email</a></li>
+<li class="toc-entry toc-h3"><a href="#transport">Transport</a></li>
+<li class="toc-entry toc-h3"><a href="#name-squatting">Name squatting</a></li>
+</ul></li>
+<li class="toc-entry toc-h2"><a href="#configuration">Configuration</a></li>
+<li class="toc-entry toc-h2"><a href="#what-this-touches">What this touches</a></li>
+<li class="toc-entry toc-h2"><a href="#questions-for-discussion">Questions for discussion</a>
+</ul>
+</div>
+</nav>
+<p>Status: <strong>draft for discussion</strong><br> Author: Kai Jaeger</p>
+<p>This document proposes replacing the manual process for creating a group on a Tatin registry with a fully automated one.</p>
+<p>Nothing has been implemented yet. The purpose of this document is to agree the design before code is written.</p>
+<div class="h_tag">
+<a href="#the-problem" id="the-problem" class="autoheader_anchor">
+<h2 data-id="The-problem">The problem</h2>
+</a>
+</div>
+<p>Today a new user must email me as the registry operator (referred to as “the operator” in the remaining document). The operator then:</p>
+<ol start="1">
+<li>Creates a group according to the user's wishes</li>
+<li>Invents an API key for that group</li>
+<li>Installs the key on the server by writing <code>Credentials.txt</code></li>
+<li>Emails the key back to the user</li>
+</ol>
+<p>Only then can the user visit the group home page, enter a description and an email address, and save both by supplying the API key.</p>
+<p>This is slow, it does not scale, it costs the operator time for every single user and the key travels by email in clear text.</p>
+<div class="h_tag">
+<a href="#goals" id="goals" class="autoheader_anchor">
+<h2 data-id="Goals">Goals</h2>
+</a>
+</div>
+<ul>
+<li>A user can register a group without any human intervention</li>
+<li>Introduce a password along with an API key
+<ul>
+<li>the password is used to manage the data on the Tatin server</li>
+<li>the API key is used to publish etc. packages</li>
+</ul></li>
+<li>Ownership of the group is tied to a verifird email address</li>
+<li>A user can replace her API key on her own, should it leak</li>
+<li>A user who has lost her password can recover access on her own</li>
+<li>Everything that works today keeps working, with no migration step on the server</li>
+</ul>
+<div class="h_tag">
+<a href="#non-goals" id="non-goals" class="autoheader_anchor">
+<h2 data-id="Non-goals">Non-goals</h2>
+</a>
+</div>
+<p>These are deliberately out of scope for this proposal. They are listed so that we can agree they are out of scope.</p>
+<ul>
+<li>Several API keys per group. Deferred deliberately for the sake of a simpler first version; <a href="#the-api-key" class="bookmark_link">The API key</a> explains what it would cost to add later</li>
+<li>Transferring ownership of a group from one person to another</li>
+<li>More than one owner per group</li>
+<li>Scoping an API key to particular packages</li>
+<li>Automatic expiry of API keys</li>
+<li>Single sign-on by way of GitHub or similar</li>
+</ul>
+<div class="h_tag">
+<a href="#overview" id="overview" class="autoheader_anchor">
+<h2 data-id="Overview">Overview</h2>
+</a>
+</div>
+<p>Two secrets, with different jobs:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"> Secret </th>
+<th style="text-align: left;"> Created by </th>
+<th style="text-align: left;"> Used for </th>
+<th style="text-align: left;"> Where it lives </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Password</td>
+<td>Chosen by the user</td>
+<td>Web pages only: edit the home page, manage keys, change email</td>
+<td>Hashed, in the group record on the server</td>
+</tr>
+<tr>
+<td>API key</td>
+<td>Generated by the server</td>
+<td>Publishing and deleting packages</td>
+<td>Hashed on the server; clear text in the user's Tatin client settings</td>
+</tr>
+</tbody>
+</table>
+<p>Keeping them apart matters. The API key is stored in clear text in the client's user settings (see <code>api_key</code> in the documentation on user settings), so it should be a value the server invented and nobody has to remember. The password is a value the user remembers, and it never leaves the browser.</p>
+<p>This also means the client side does not change at all. A user still puts a server-generated key into <code>api_key</code>, exactly as today.</p>
+<div class="h_tag">
+<a href="#registration" id="registration" class="autoheader_anchor">
+<h2 data-id="Registration">Registration</h2>
+</a>
+</div>
+<p>The user visits a <em>Register a group</em> page and works through four steps. The steps are separate HTTP requests. There is no session: each step carries a token in a hidden field that identifies the pending registration on the server.</p>
+<div class="h_tag">
+<a href="#step-1-choose-a-group-name" id="step-1-choose-a-group-name" class="autoheader_anchor">
+<h3 data-id="Step-1-choose-a-group-name">Step 1: choose a group name</h3>
+</a>
+</div>
+<p>The user enters a name. The server checks that it:</p>
+<ul>
+<li>Matches <code>^[A-Za-z]+[A-Za-z0-9_]*$</code>, the same rule that already governs the group part of a package ID</li>
+<li>Is not on a small list of reserved names</li>
+<li>Is not taken</li>
+</ul>
+<p>“Taken” is the union of four sources, compared case insensitively because package IDs are compared that way too:</p>
+<ul>
+<li>Groups that already own packages, from the registry index</li>
+<li>Groups that appear in <code>Credentials.csv</code></li>
+<li>Groups that own a home page, meaning there is a record for them</li>
+<li>Groups that are the subject of an unexpired pending registration</li>
+</ul>
+<div class="h_tag">
+<a href="#step-2-give-an-email-address" id="step-2-give-an-email-address" class="autoheader_anchor">
+<h3 data-id="Step-2-give-an-email-address">Step 2: give an email address</h3>
+</a>
+</div>
+<p>The server generates a code, stores the pending registration and emails the code to the address given. The reply asks for the code.</p>
+<div class="h_tag">
+<a href="#step-3-enter-the-code" id="step-3-enter-the-code" class="autoheader_anchor">
+<h3 data-id="Step-3-enter-the-code">Step 3: enter the code</h3>
+</a>
+</div>
+<p>The server checks the code against the pending registration. If it matches, and has not expired, and the attempt limit has not been reached, the registration is marked as verified.</p>
+<div class="h_tag">
+<a href="#step-4-describe-the-group-and-choose-a-password" id="step-4-describe-the-group-and-choose-a-password" class="autoheader_anchor">
+<h3 data-id="Step-4-describe-the-group-and-choose-a-password">Step 4: describe the group and choose a password</h3>
+</a>
+</div>
+<p>The user supplies the text for the group home page and a password of at least ten characters. The server then, in one go:</p>
+<ul>
+<li>Writes the group record with the home page text, the email address and the hash of the password</li>
+<li>Generates the API key and writes its rule to <code>Credentials.csv</code></li>
+<li>Displays the API key <strong>once</strong>, with an explanation that it cannot be shown again</li>
+</ul>
+<p>The pending registration is deleted.</p>
+<div class="h_tag">
+<a href="#the-api-key" id="the-api-key" class="autoheader_anchor">
+<h2 data-id="The-API-key">The API key</h2>
+</a>
+</div>
+<p>Each group owns exactly one API key. The group home page gains a <em>Manage access</em> button, leading to a page that asks for the password and then offers three things:</p>
+<ul>
+<li><strong>Regenerate the API key.</strong> The server invents a new key, replaces the stored hash and shows the clear text once. The old key stops working the moment the new one is written.</li>
+<li><strong>Change the email address.</strong> The new address has to pass the same code check as at registration before it takes effect.</li>
+<li><strong>Change the password.</strong></li>
+</ul>
+<p>The key is never shown again after it has been created. A user who mislays it regenerates it and updates her client settings.</p>
+<p>Should several keys per group be wanted later, the shape of the change is known and it is not large. <code>Credentials.csv</code> gains a fourth column for a key name and a group owns as many rows as it has keys; rows written before that point default their name to the group name, so nothing on disk needs converting.</p>
+<p>The one piece of code that has to change is <code>AcceptCredential</code>, which today finds a group's rule with <code>groupNames⍳⊂groupName</code>, finding only the first one.</p>
+<div class="h_tag">
+<a href="#forgotten-password" id="forgotten-password" class="autoheader_anchor">
+<h2 data-id="Forgotten-password">Forgotten password</h2>
+</a>
+</div>
+<p>The same code mechanism, keyed on the group name:</p>
+<ol start="1">
+<li>The user asks to reset the password for a named group</li>
+<li>The server sends a code to the email address on file for that group</li>
+<li>On success the user chooses a new password</li>
+</ol>
+<p>The email address is never displayed and never accepted as input here. A person who does not already control that mailbox learns nothing and gains nothing.</p>
+<p>Resetting the password does <strong>not</strong> invalidate the API keys. They are independent, and revoking an API key is a separate deliberate act.</p>
+<div class="h_tag">
+<a href="#data-model" id="data-model" class="autoheader_anchor">
+<h2 data-id="Data-model">Data model</h2>
+</a>
+</div>
+<p>Three pieces of state. Two of them already exist.</p>
+<div class="h_tag">
+<a href="#credentialscsv" id="credentialscsv" class="autoheader_anchor">
+<h3 data-id="Credentialscsv">Credentials.csv</h3>
+</a>
+</div>
+<p>Unchanged, one rule per group:</p>
+<pre tabindex="0"><code>group,hash,salt</code></pre>
+<p>The format stays as it is, no file on disk is touched and <code>AcceptCredential</code>, <code>ReadCredentialFile</code> and <code>ConvertCredentials</code> are all left alone. The <code>Credentials.txt</code> drop-in that the operator uses keeps working exactly as documented.</p>
+<p>One thing is new, though. Until now this file is only ever written when the operator drops a <code>Credentials.txt</code> beside it. Registration and key regeneration have to add or replace a single rule directly, so the server needs to write the file itself. That write has to be held against concurrent requests, and it interacts with housekeeping, which watches the file's timestamp and rereads the credentials whenever it changes. Rereading after our own write is harmless, and in fact convenient.</p>
+<div class="h_tag">
+<a href="#the-group-record" id="the-group-record" class="autoheader_anchor">
+<h3 data-id="The-group-record">The group record</h3>
+</a>
+</div>
+<p>The record that already holds the home page text and the email address gains two more fields, for the password hash and its salt. The component file that holds it was created with six spare components, so there is room without changing its shape.</p>
+<p>Groups that have no password yet are the normal case on the day this ships. They keep working: where a password is asked for, a valid API key is accepted instead, and the page invites the user to set a password. That is the migration path, and it needs no action from the operator.</p>
+<p>A group whose record has no email address cannot use the password reset. Those users still have to write to the operator, as they do today.</p>
+<div class="h_tag">
+<a href="#pending-registrations" id="pending-registrations" class="autoheader_anchor">
+<h3 data-id="Pending-registrations">Pending registrations</h3>
+</a>
+</div>
+<p>One small file per pending registration, in a <code>Pending</code> folder, named after its token:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"> Field </th>
+<th style="text-align: left;"> Meaning </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>group</code></td>
+<td>The name being registered</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td>Where the code was sent</td>
+</tr>
+<tr>
+<td><code>purpose</code></td>
+<td><code>register</code> or <code>reset</code></td>
+</tr>
+<tr>
+<td><code>codeHash</code>, <code>salt</code></td>
+<td>YYYY-MM-DD</td>
+</tr>
+<tr>
+<td><code>expiresAt</code></td>
+<td>Dyalog date number</td>
+</tr>
+<tr>
+<td><code>attempts</code></td>
+<td>Incremented on every wrong guess</td>
+</tr>
+<tr>
+<td><code>ip</code></td>
+<td>For rate limiting</td>
+</tr>
+</tbody>
+</table>
+<p>Housekeeping deletes expired files.</p>
+<div class="h_tag">
+<a href="#security" id="security" class="autoheader_anchor">
+<h2 data-id="Security">Security</h2>
+</a>
+</div>
+<div class="h_tag">
+<a href="#the-code-is-six-digits" id="the-code-is-six-digits" class="autoheader_anchor">
+<h3 data-id="The-code-is-six-digits">The code is six digits</h3>
+</a>
+</div>
+<p>A million possibilities, for a code that lives ten minutes. That is ample on its own.</p>
+<div class="h_tag">
+<a href="#throttling-access" id="throttling-access" class="autoheader_anchor">
+<h3 data-id="Throttling-access">Throttling access</h3>
+</a>
+</div>
+<p>The code carries most of the weight itself, but guesses are still capped: <strong>five wrong ones and the code is destroyed</strong>, and the user starts again. At six digits this is less about the odds of a lucky guess than about denying an attacker a cheap way to keep a pending registration alive and to generate load.</p>
+<p>Failed password attempts need throttling too, with a growing delay. Unlike a code, a password does not expire, so an attacker can take as long as he likes over it.</p>
+<div class="h_tag">
+<a href="#salting" id="salting" class="autoheader_anchor">
+<h3 data-id="Salting">Salting</h3>
+</a>
+</div>
+<p>A salt defeats precomputed tables and stops one cracked hash from revealing password reuse across groups. It does nothing against guessing one particular password.</p>
+<p>The current hash is a single unstretched SHA-256 pass, which is fast. A weak password falls quickly to an attacker who has the file.</p>
+<p>So the ten character minimum is worth having, and the things that actually protect the account are:</p>
+<ul>
+<li>Throttling failed attempts, both for passwords and for codes</li>
+<li>Transport encryption, so that neither the password nor the code can be read off the wire</li>
+</ul>
+<div class="h_tag">
+<a href="#rate-limits" id="rate-limits" class="autoheader_anchor">
+<h3 data-id="Rate-limits">Rate limits</h3>
+</a>
+</div>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"> What </th>
+<th style="text-align: left;"> Limit </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wrong codes per pending registration</td>
+<td>5, then the code dies</td>
+</tr>
+<tr>
+<td>Codes requested per email address</td>
+<td>3 per hour</td>
+</tr>
+<tr>
+<td>Codes requested per IP address</td>
+<td>10 per hour</td>
+</tr>
+<tr>
+<td>Failed password attempts per group</td>
+<td>Throttled, with a growing delay</td>
+</tr>
+</tbody>
+</table>
+<p>The per-email and per-IP limits exist because the registration form makes the server send mail to an address that an anonymous caller chose. Step 2 cannot be authenticated: proving that the caller controls the mailbox is the very thing the code is there to establish, so at the moment the mail goes out the server does not know who asked.</p>
+<p>Without limits, anyone can script the form and aim your server at a victim's inbox. Three things follow, in rising order of seriousness:</p>
+<ul>
+<li>The victim's mailbox fills with verification codes. Each one costs the attacker a single HTTP request</li>
+<li>The resulting bounces and spam complaints put the reputation of the sending account at risk. The likely damage is not that somebody sends spam through us, it is that <strong>we lose the ability to send mail at all</strong>, which would cost us crash reports and publish notifications along with the codes themselves</li>
+<li>Sending is a blocking call, so every request occupies a thread for the length of an SMTP conversation. With <code>MaxNoOfThreads</code> at 64 it does not take many concurrent requests to starve the server of threads for ordinary traffic.</li>
+</ul>
+<div class="h_tag">
+<a href="#the-verification-email" id="the-verification-email" class="autoheader_anchor">
+<h3 data-id="The-verification-email">The verification email</h3>
+</a>
+</div>
+<p>Two details of how that mail is composed matter.</p>
+<p><strong>The group name has to be validated before any mail is composed.</strong> It is attacker-controlled and it will appear in the subject or the body. To be checked against <code>^[A-Za-z]+[A-Za-z0-9_]*$</code>.</p>
+<p><strong>The email address has to be rejected if it contains a control character.</strong> A CR or LF smuggled into the recipient field is the classic way to inject a header of one's own, adding a <code>Bcc:</code> or replacing the body. This check belongs next to the address validation.</p>
+<div class="h_tag">
+<a href="#transport" id="transport" class="autoheader_anchor">
+<h3 data-id="Transport">Transport</h3>
+</a>
+</div>
+<p>Registration, password entry and code entry must not be available over plain HTTP. On a server that terminates TLS elsewhere, this means trusting the reverse proxy's forwarded protocol header. The endpoints should refuse to serve when the connection is not secure, with the check configurable for local development.</p>
+<div class="h_tag">
+<a href="#name-squatting" id="name-squatting" class="autoheader_anchor">
+<h3 data-id="Name-squatting">Name squatting</h3>
+</a>
+</div>
+<p>Automated registration invites somebody to register <code>dyalog</code>, <code>aplteam</code> and every other name worth having, using throwaway addresses. Email verification does not prevent this; it only makes it slightly tedious.</p>
+<p>Several options, none of which is obviously right:</p>
+<ul>
+<li>Do nothing and deal with it if it happens</li>
+<li>Reclaim a group that has published no package within some number of days</li>
+<li>Keep a reserved list of names that only the operator can hand out</li>
+<li>Require a first package within some period, else the registration lapses</li>
+</ul>
+<p>This wants a decision, and it is a policy decision rather than a technical one.</p>
+<div class="h_tag">
+<a href="#configuration" id="configuration" class="autoheader_anchor">
+<h2 data-id="Configuration">Configuration</h2>
+</a>
+</div>
+<p>A new section in the server's INI file. Self-service is <strong>off</strong> by default, so that existing servers behave exactly as they do now until the operator turns it on.</p>
+<pre tabindex="0"><code>[REGISTRATION]
+Active              = 0     ; 1 enables self-service registration
+CodeLength          = 6
+CodeLifetime        = 10    ; minutes
+MaxAttempts         = 5     ; per code, then it is destroyed
+MinPasswordLength   = 10
+MaxPerEmailPerHour  = 3
+MaxPerIpPerHour     = 10
+RequireSecure       = 1     ; refuse to serve these pages over plain HTTP</code></pre>
+<div class="h_tag">
+<a href="#what-this-touches" id="what-this-touches" class="autoheader_anchor">
+<h2 data-id="What-this-touches">What this touches</h2>
+</a>
+</div>
+<p>For an estimate of the blast radius:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"> Area </th>
+<th style="text-align: left;"> Change </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Credentials file</td>
+<td>Written directly by the server, not only through the operator's drop-in file</td>
+</tr>
+<tr>
+<td>Request routing</td>
+<td>New pages, some of which must bypass the credential check that currently guards every POST</td>
+</tr>
+<tr>
+<td>Form handling</td>
+<td>The current parser assumes one particular form. It needs generalising</td>
+</tr>
+<tr>
+<td>Group record</td>
+<td>Two more fields, for the password hash and its salt</td>
+</tr>
+<tr>
+<td>Housekeeping</td>
+<td>Sweep expired pending registrations</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>One new message, the verification code</td>
+</tr>
+<tr>
+<td>Group home page</td>
+<td>Password instead of API key, and a link to managing access</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>The page on securing a registry, plus a new page for users</td>
+</tr>
+<tr>
+<td>Test cases</td>
+<td>A new group of server tests</td>
+</tr>
+</tbody>
+</table>
+<p>Because a group still owns exactly one API key, none of the code that reads or checks credentials changes at all. That is the benefit of deferring multiple keys, and it is worth a good deal: <code>AcceptCredential</code> is the function that decides who may publish.</p>
+<div class="h_tag">
+<a href="#questions-for-discussion" id="questions-for-discussion" class="autoheader_anchor">
+<h2 data-id="Questions-for-discussion">Questions for discussion</h2>
+</a>
+</div>
+<ol start="1">
+<li>What should the policy on name squatting be?</li>
+<li>Should the operator retain a veto, for example a mode where registrations are queued for approval rather than taking effect immediately?</li>
+</ol>
+
+<script>
+
+// Adds a "Copy" button to every code block & established the event handler
+const copyButtonLabel = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true" style="vertical-align:text-bottom"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>` ;
+
+let blocks = document.querySelectorAll("pre");
+
+blocks.forEach((block) => {
+  if (navigator.clipboard) {
+    let button = document.createElement("button");
+
+    button.innerHTML = copyButtonLabel;
+    button.title = "Copies the code block to the clipboard.";
+    block.appendChild(button);
+     
+    button.addEventListener("click", async () => {
+      await copyCode(block, button);
+    });
+  }  
+});  
+
+async function copyCode(block, button) {
+  let code = block.querySelector("code");
+  let text = code.innerText;
+
+  await navigator.clipboard.writeText(text);
+
+  button.innerHTML = `✓`;
+
+  setTimeout(() => {
+    button.innerHTML = copyButtonLabel;
+  }, 700);
+}
+
+
+// Show/Hide the TOC. It starts in normal flow (open); once toggled it becomes
+// an out-of-flow overlay (`.floating`) so further toggles do not re-composite
+// the whole page (which made the mouse erratic on large documents). Driven by
+// an inline style, so it also works when the stylesheet did not load.
+(function () {
+  var button = document.querySelector("#toc-toggle");
+  var content = document.querySelector("#toc-list");
+  if (!button || !content) { return; }
+  var open = !content.classList.contains("hide");
+  content.classList.remove("hide");
+  function setLabel(state) {
+    button.innerText = state ? "Hide" : "Show";
+    button.setAttribute("aria-expanded", state);
+  }
+  function setOpen(state) {
+    content.classList.add("floating");   // out-of-flow overlay: cheap to toggle
+    content.style.display = state ? "block" : "none";
+    setLabel(state);
+  }
+  if (open) { setLabel(true); } else { setOpen(false); }   // leave it in flow on load
+  button.addEventListener("click", function () {
+    setOpen(content.style.display === "none");
+  });
+  content.addEventListener("click", function (evt) {
+    if (evt.target.closest("a")) { setOpen(false); }   // close after picking an entry
+  });
+})();
+
+</script>
+
+</body>
+</html>

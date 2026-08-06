@@ -1,4 +1,4 @@
- r←Test_CopyReg_003(stopFlag batchFlag);⎕TRAP;parms;msg;rc;list;expected;tempDir;buff;filename;list2;list3;list4
+ r←Test_CopyReg_003(stopFlag batchFlag);⎕TRAP;parms;msg;rc;list;expected;tempDir;buff;filename;list2;list3;list4;list5;list6
 ⍝ Exercise the "list=" option with all valid flavours
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
@@ -14,7 +14,7 @@
  parms.latest←1
  parms.dependencies←0
  list←##.Client.CopyRegistry parms
- expected←'example-Boo-1.0.0' 'example-versions-2.0.0'
+ expected←'example-Boo-1.0.0' 'example-versions-0.1.0' 'example-versions-1.0.12-That-fix' 'example-versions-2.0.0'
  →T.GoToTidyUp expected≢list[;1]
 
  parms.latest←0
@@ -30,12 +30,22 @@
  parms.list←'file://',filename
  parms.latest←1
  list3←##.Client.CopyRegistry parms
- →T.GoToTidyUp 2≠≢list3
+ →T.GoToTidyUp 5≠≢list3
 
- parms.list←'aplteam-MarkAPL-9'
+ parms.list←'aplteam-MarkAPL'
  parms.latest←0
  list4←##.Client.CopyRegistry parms
  →T.GoToTidyUp 0=≢list4
+
+ parms.list←'aplteam-MarkAPL-9'
+ parms.latest←1
+ list5←##.Client.CopyRegistry parms
+ →T.GoToTidyUp~</≢¨list5 list4
+
+ parms.list←'aplteam-MarkAPL'
+ parms.latest←1
+ list6←##.Client.CopyRegistry parms
+ →T.GoToTidyUp~</≢¨list6 list4
 
  r←T._OK
 

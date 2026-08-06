@@ -7,7 +7,7 @@
  stop←0
  (rc msg list1)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1 -list=aplteam-OS,aplteam-rideclient -dependencies=0 -latest'
  msg Assert 0=rc
- →T.GoToTidyUp 2≠≢list1
+ →T.GoToTidyUp~(⊂'aplteam-RideClient')∊##.Registry.RemoveVersionNumber¨list1[;1]
 
  (rc msg list2)←stop ∆UCMD'CopyRegistry [localhost] "',tempDir,'" -verbose=1 -list=aplteam-OS,aplteam-rideclient -latest'
  msg Assert 0=rc

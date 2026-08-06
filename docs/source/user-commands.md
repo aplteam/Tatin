@@ -147,6 +147,7 @@ verbose= | <ol markdown><li>Print a detailed report for each package copied.</li
 
 
 You can also use the API function [`CopyRegistry`](api.md#copy-registry) for this.
+Note that the API function offers a feature that is not available with the user command: copy the latest version of every major version number of every package.
 
 
 ## Check for later version
@@ -820,5 +821,6 @@ Show the installed and minimum required versions of the Principal Registry.
 
 API:
 [`Version`](api.md#version)
+
 
 

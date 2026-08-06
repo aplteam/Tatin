@@ -143,12 +143,16 @@ Required parameters are marked; others are optional.
 `group=`
 : Restrict the packages to be copied to a particular group.
 
-    Dependencies will always be copied, no matter which group they belong to.
+    Dependencies will always be copied bby default, no matter which group they belong to, but check `dependencies` further down.
 
 `latest`
 : Copy only the latest of each major version of each non-deprecated package.
 
-    By default all packages are copied, even deprecated ones.
+:    By default all packages are copied, even deprecated ones.
+
+:    When used together with `-list` you can ask for every latest version of every major version number.
+
+:   For this, specify `<group>-<pkg-name>-<major>`
 
 `list=`
 : Packages to copy, as one of
@@ -161,8 +165,10 @@ Required parameters are marked; others are optional.
 
     Specify packages consistently: either `<group>-<pkgName>` or `<group>-<pkgName>-<major>`
 
+See also `-latest`.
+
 `dependencies`
-: Flag. Default is 1. If 0, ignore dependencies. (Useful only for test cases.)
+: Flag. Default is 1. If 0, ignore dependencies.
 
 `path`
 : A local folder in which to write the packages. Required unless `dry` is set.
@@ -1079,6 +1085,7 @@ Returns as strings Tatin’s name, version and date.
 │Tatin│0.112.1+1942│2024-08-16│
 └─────┴────────────┴──────────┘
 ```
+
 
 
 

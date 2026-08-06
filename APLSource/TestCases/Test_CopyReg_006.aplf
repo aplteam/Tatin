@@ -3,17 +3,24 @@
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- →0 ⋄ r←T._Inactive  ⍝ See issue #271  ⍝TODO⍝
-
  parms←##.Client.CreateCopyRegistryParms ⍬
  parms.url←##.Client.ReplaceRegistryAlias'[localhost]'
  parms.dry←1
- parms.list←'aplteam-MarkAPL-9'
+ parms.list←'aplteam-aplprocess'
  parms.latest←1
+ parms.dependencies←0
  list←##.Client.CopyRegistry parms
- →T.PassesIf 1=≢≢list
- →T.PassesIf'aplteam-MarkAPL-9.1.13'≡⊃list
+ →T.PassesIf 0<≢list
+
+ parms.list←'aplteam-aplprocess-1'   ⍝ Should be the latest!
+ list←##.Client.CopyRegistry parms
+ →T.PassesIf 0<≢list
+ →T.PassesIf(⊂'aplteam-APLProcess-1.0.0')∊list
+
+ parms.list←'aplteam-aplprocess,aplteam-APLTreeUtils2'   ⍝ Asks for the latest of every major version no.
+ list←##.Client.CopyRegistry parms
+ →T.PassesIf 0<≢list
+ →T.PassesIf∧/('aplteam-APLProcess-1.0.0' 'aplteam-APLProcess-0.5.1')∊list
 
  r←T._OK
-
 ⍝Done

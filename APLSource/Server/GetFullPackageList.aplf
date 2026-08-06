@@ -1,4 +1,4 @@
- response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqueIDs;descriptionAndProjecturl;list5;pkgs;group;json;list
+response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqueIDs;descriptionAndProjecturl;list5;pkgs;group;json;list
 ⍝ Return literally all packages. Parameters are ignored
  :If IsJsonRequest request.Headers
      pkgs←1 Reg.GetAllPackages G.RegistryPath
@@ -6,12 +6,18 @@
          pkgs←(group∘≡¨Reg.GetGroupFromPackageID¨pkgs[;1])⌿pkgs
      :EndIf
      pkgs←pkgs[;1]
+     list←request R.GetQueryParameter'list'
+     list←','(≠⊆⊢)list
      :If (⊂'latest')∊request.QueryParameters[;1]
-         ⍝ Only the latest version of each package, ignoring the major version number
-         pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveVersionNumber¨⍵}pkgs
+         :If ∧/{2>⍵+.='-'}¨list
+             ⍝ The latest version of each package for each major version number
+             pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveMinorAndPatch¨⍵}pkgs
+         :Else
+             ⍝ Only the latest version of each package
+             pkgs←{⍵/⍨⌽{(⍵⍳⍵)=⍳≢⍵}⌽Reg.RemoveMinorAndPatch¨⍵}pkgs
+         :EndIf
      :EndIf
-     :If 0<≢list←request R.GetQueryParameter'list'
-         list←','(≠⊆⊢)list
+     :If 0<≢list
          pkgs←list ReducePkgsList pkgs
      :EndIf
      pkgs,[1.5]←⊂''

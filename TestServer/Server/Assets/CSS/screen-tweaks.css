@@ -25,6 +25,23 @@ table.dataTable tfoot th {
     font-weight: normal;
 }
 
+/* DataTables draws its sort arrows at opacity .125 idle and .6 active,
+   which all but disappears against our grey header */
+table.dataTable thead > tr > th.sorting::before,
+table.dataTable thead > tr > th.sorting::after,
+table.dataTable thead > tr > th.sorting_asc::before,
+table.dataTable thead > tr > th.sorting_asc::after,
+table.dataTable thead > tr > th.sorting_desc::before,
+table.dataTable thead > tr > th.sorting_desc::after {
+    opacity: 0.35;
+}
+
+/* The arrow showing the direction actually in force */
+table.dataTable thead > tr > th.sorting_asc::before,
+table.dataTable thead > tr > th.sorting_desc::after {
+    opacity: 0.9;
+}
+
 table code, table code a {
     background-color: transparent;
     padding: 0;

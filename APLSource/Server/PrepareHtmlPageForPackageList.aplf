@@ -2,12 +2,14 @@
  html←HtmlHeader GetDataTableStuff 1
  html,←⊂'<h2>List of packages</h2>'
  html,←AddSpecialMessage ⍬
- colTitles←'Package name' 'Description' '≢' 'Project URL' 'OS' 'UC' 'Tags'
+ colTitles←'Package name' 'Description' '#' 'Project URL' 'OS' 'UC' 'Tags'
  colDescription←'' '' 'Number of major versions' '' 'Supported Operating Systems' 'Is a User Command' ''
+⍝ Sorting Description, OS or Tags would not tell anybody anything
+ colNoSort←0 1 0 0 1 0 1
  html,←⊂H.OpenTable+/(≢¨colTitles[2,2~⍨⍳2⊃⍴mat])⌈(≢⍕⌈/mat[;2]),⌈⌿≢¨mat[;2~⍨⍳2⊃⍴mat]
  html,←⊂'<thead>'
  html,←⊂'<tr class="my-first-th">'
- html,←colDescription{'<th ',((0<≢⍺)/'title="',⍺,'" '),'style="text-align:start">',⍵,'</th>'}¨colTitles
+ html,←(↓⍉↑colDescription colNoSort){'<th ',((0<≢1⊃⍺)/'title="',(1⊃⍺),'" '),((2⊃⍺)/'class="no-sort" '),'style="text-align:start">',⍵,'</th>'}¨colTitles
  html,←⊂'</tr>'
  html,←⊂'</thead>'
  html,←⊂'<tbody>'

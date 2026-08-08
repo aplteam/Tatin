@@ -1,6 +1,8 @@
- r←GetDataTableStuff dummy
+ r←GetDataTableStuff withCount
 ⍝ Returns the JavaScript that initialises the DataTables extension.
 ⍝ The CSS and the JavaScript library itself are linked by `HtmlHeader`.
+⍝ Pass a 1 as `withCount` to have "(shown/total)" added to the H2, or a
+⍝ ⍬ to leave the H2 alone.
  r←''
  r,←⊂' <script>'
  r,←⊂'    $(document).ready(function () {'
@@ -38,6 +40,19 @@
  r,←⊂'                tools.prepend(box);'
  r,←⊂'            }'
  r,←⊂'        }'
+ :If 1∊withCount
+⍝ The count is of rows matching the filter rather than rows on display:
+⍝ the two are the same while paging is switched off, but only the former
+⍝ would still make sense in a caption if paging were ever switched on.
+     r,←⊂'        if (h2.length) {'
+     r,←⊂'            var count = $(''<span class="row-count"></span>'').appendTo(h2);'
+     r,←⊂'            var showCount = function () {'
+     r,←⊂'                count.text('' ('' + table.rows({search:"applied"}).count() + ''/'' + table.rows().count() + '')'');'
+     r,←⊂'            };'
+     r,←⊂'            table.on(''draw'', showCount);'
+     r,←⊂'            showCount();'
+     r,←⊂'        }'
+ :EndIf
  r,←⊂'        var focusOn = filter.find(''input'').first();'
  r,←⊂'        if (!focusOn.length) { focusOn = $("input:visible").first(); }'
  r,←⊂'        focusOn.focus();'

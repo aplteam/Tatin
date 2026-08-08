@@ -4,7 +4,7 @@
  r←''
  r,←⊂' <script>'
  r,←⊂'    $(document).ready(function () {'
- r,←⊂'        $(''table'').DataTable({'
+ r,←⊂'        var table = $(''table'').DataTable({'
  r,←⊂'            "dom":"ft",'
  r,←⊂'            "paging":false,'
  r,←⊂'            "ordering": false,'
@@ -13,8 +13,34 @@
  r,←⊂'                "searchPlaceholder": "Filter..."'
  r,←⊂'            }'
  r,←⊂'        });'
- r,←⊂'        $(''.dataTables_filter'').css("float","left");'
- r,←⊂'        $("input:visible").first().focus();'
+⍝ Every page carrying a table has exactly one H2, so the filter box can
+⍝ be lifted out of the wrapper DataTables built and put next to it.
+ r,←⊂'        var h2 = $(''h2'').first(), filter = $(''.dataTables_filter'');'
+ r,←⊂'        if (h2.length && filter.length === 1) {'
+ r,←⊂'            var tools = $(''<div class="head-tools"></div>'');'
+ r,←⊂'            h2.wrap(''<div class="head-row"></div>'').parent().append(tools);'
+ r,←⊂'            tools.append(filter);'
+⍝ Only the list of packages has a Tags column, so it is looked up by its
+⍝ caption. Tags start out excluded from the filter; the check box adds
+⍝ them back in. `bSearchable` is internal to DataTables, hence the test.
+ r,←⊂'            var tags = -1;'
+ r,←⊂'            $(''table thead th'').each(function (i) { if ($(this).text().trim() === ''Tags'') tags = i; });'
+ r,←⊂'            var cols = table.settings()[0].aoColumns;'
+ r,←⊂'            if (tags >= 0 && cols[tags] && typeof cols[tags].bSearchable === "boolean") {'
+ r,←⊂'                cols[tags].bSearchable = false;'
+ r,←⊂'                table.rows().invalidate().draw();'
+ r,←⊂'                var box = $(''<label class="include-tags"><input type="checkbox"> Include Tags</label>'');'
+ r,←⊂'                box.find(''input'').on(''change'', function () {'
+ r,←⊂'                    cols[tags].bSearchable = this.checked;'
+⍝ The per-row search text is cached, so it has to be rebuilt
+ r,←⊂'                    table.rows().invalidate().draw();'
+ r,←⊂'                });'
+ r,←⊂'                tools.prepend(box);'
+ r,←⊂'            }'
+ r,←⊂'        }'
+ r,←⊂'        var focusOn = filter.find(''input'').first();'
+ r,←⊂'        if (!focusOn.length) { focusOn = $("input:visible").first(); }'
+ r,←⊂'        focusOn.focus();'
  r,←⊂'    });'
  r,←⊂' </script>'
 ⍝Done

@@ -22,6 +22,7 @@
     --color-code:        #a30000;
     --color-border:      #c9cfd2;
     --color-border-soft: #dde1e3;
+    --color-column-rule: #e3e6e7;                  /* between table columns */
     --color-surface:     #ffffff;
     --color-panel:       #ffffff;                  /* tab content panel */
     --color-sunken:      #f2f2f2;
@@ -115,13 +116,13 @@ div#my-logo h1,
 div.h_tag h1 {
     margin: 0;
     padding: 0;
-    font-size: clamp(1.5rem, 1.1rem + 2vw, 2.125rem);
+    font-size: clamp(1.2rem, 0.88rem + 1.6vw, 1.7rem);
     overflow-wrap: anywhere;
 }
 
 #logo {
-    width: 64px;
-    height: 64px;
+    width: 52px;
+    height: 52px;
 }
 
 #my-footer > hr {
@@ -147,11 +148,11 @@ h1, h2, h3, h4, h5, h6 {
 
 h2 {
     clear: both;                 /* still needed: .install-info floats */
-    font-size: clamp(1.3rem, 1.1rem + 1vw, 1.6rem);
+    font-size: clamp(1.1rem, 0.88rem + 1vw, 1.4rem);
     margin: var(--space-5) 0 var(--space-3) 0;
 }
 
-h3 { font-size: 1.15rem }
+h3 { font-size: 1.05rem }
 h4, h5, h6 { font-size: 1rem }
 
 ul li, ol li {
@@ -210,14 +211,23 @@ table {
 }
 
 th, td {
-    padding: var(--space-2) var(--space-3);
+    padding: 5px;
     vertical-align: top;
+}
+
+/* Column separators. The adjacent-sibling selector puts a rule between
+   columns without drawing one down the outer edges of the table. */
+th + th,
+td + td {
+    border-left: 1px solid var(--color-column-rule);
 }
 
 th {
     text-align: left;
     background-color: var(--color-shade);
     color: var(--color-heading);
+    /* The shaded background is enough to set the header row apart */
+    font-weight: normal;
     white-space: nowrap;
 }
 
@@ -250,7 +260,6 @@ input[type="password"],
 textarea {
     width: 100%;
     max-width: 100%;
-    min-height: var(--tap);
     padding: var(--space-2);
     outline: none;
     border: 2px solid var(--color-border);
@@ -385,8 +394,8 @@ input[type="submit"]:hover {
     }
 
     #logo {
-        width: 48px;
-        height: 48px;
+        width: 38px;
+        height: 38px;
     }
 
     /* The note reads better as a full-width block above the content */
@@ -414,13 +423,18 @@ input[type="submit"]:hover {
         padding: var(--space-2) var(--space-3);
     }
 
+    /* Inputs only need to be thumb-sized where a thumb is used; on a
+       desktop the min-height made them look oddly tall */
+    input[type="text"],
+    input[type="email"],
+    input[type="search"],
+    input[type="password"] {
+        min-height: var(--tap);
+    }
+
     /* DataTables puts its filter box above the table */
     .dataTables_filter input {
         width: 100%;
-    }
-
-    th, td {
-        padding: var(--space-2);
     }
 }
 

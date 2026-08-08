@@ -9,8 +9,20 @@ table.dataTable {
     border-radius: 0;
 }
 
-table.dataTable tr td {
-    padding: 4px 6px;
+/* DataTables sets its own padding (10px) and bold on header cells, and
+   8px 10px on body cells */
+table.dataTable thead th,
+table.dataTable thead td,
+table.dataTable tbody th,
+table.dataTable tbody td,
+table.dataTable tfoot th,
+table.dataTable tfoot td {
+    padding: 5px;
+}
+
+table.dataTable thead th,
+table.dataTable tfoot th {
+    font-weight: normal;
 }
 
 table code, table code a {
@@ -18,21 +30,111 @@ table code, table code a {
     padding: 0;
 }
 
+/* The init script moves the filter box in here, alongside the H2 */
+.head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    margin: var(--space-5) 0 var(--space-3) 0;
+}
+
+.head-row h2 {
+    margin: 0;
+}
+
+/* Check box and filter box, kept together at the right-hand end */
+.head-tools {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.include-tags {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin: 0;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.include-tags input {
+    width: 1.05em;
+    height: 1.05em;
+    margin: 0;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+}
+
+/* The filter box sits on the right, above the table */
 .dataTables_filter {
+    float: right;
+    text-align: right;
     margin-bottom: 0.5rem;
+}
+
+/* Inside the head row the flex layout does the positioning */
+.head-row .dataTables_filter {
+    float: none;
+    margin-bottom: 0;
+}
+
+/* Flex, so the magnifier and the input can never end up on separate
+   lines when the floated box shrinks to fit */
+.dataTables_filter label {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* A magnifier to the left of the input. The label holds nothing but the
+   input (DataTables is told to use a blank search caption), so ::before
+   lands right in front of it. */
+.dataTables_filter label::before {
+    content: "";
+    flex: none;
+    width: 1.1em;
+    height: 1.1em;
+    margin-right: 0.35em;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c6469' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5 21 21'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 
 .dataTables_filter input {
     margin-left: 0 !important;
-    min-height: 2.75rem;
 }
 
 @media (max-width: 48em) {
+    /* The check box drops below the filter box rather than beside it */
+    .head-tools {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+        width: 100%;
+    }
+
+    .head-tools .dataTables_filter { order: 1 }
+    .head-tools .include-tags      { order: 2 }
+
     /* The filter label and its input stack, so the input can use the
        full width */
-    .dataTables_filter,
-    .dataTables_filter label {
+    .dataTables_filter {
         display: block;
+        float: none;
         width: 100%;
+        text-align: left;
+    }
+
+    /* Full width, so the input can take whatever the magnifier leaves */
+    .dataTables_filter label {
+        display: flex;
+        width: 100%;
+    }
+
+    /* Thumb-sized only where a thumb is used */
+    .dataTables_filter input {
+        flex: 1 1 auto;
+        width: auto;
+        min-height: var(--tap);
     }
 }

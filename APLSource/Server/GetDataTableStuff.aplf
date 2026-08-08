@@ -31,7 +31,16 @@
  r,←⊂'            if (tags >= 0 && cols[tags] && typeof cols[tags].bSearchable === "boolean") {'
  r,←⊂'                cols[tags].bSearchable = false;'
  r,←⊂'                table.rows().invalidate().draw();'
- r,←⊂'                var box = $(''<label class="include-tags"><input type="checkbox"> Include Tags</label>'');'
+⍝ The caption is one element: the label is a flex box, so a bare text
+⍝ node beside the <u> would be a second item with a gap in front of it.
+ r,←⊂'                var box = $(''<label class="include-tags" title="Alt+I"><input type="checkbox"><span><u>I</u>nclude Tags</span></label>'');'
+⍝ e.code rather than e.key: on some layouts Alt+I is a dead key that
+⍝ produces a diacritic instead of an "i".
+ r,←⊂'                $(document).on(''keydown'', function (e) {'
+ r,←⊂'                    if (!e.altKey || e.ctrlKey || e.metaKey || e.code !== "KeyI") { return; }'
+ r,←⊂'                    e.preventDefault();'
+ r,←⊂'                    box.find(''input'').prop("checked", function (i, v) { return !v; }).trigger(''change'');'
+ r,←⊂'                });'
  r,←⊂'                box.find(''input'').on(''change'', function () {'
  r,←⊂'                    cols[tags].bSearchable = this.checked;'
 ⍝ The per-row search text is cached, so it has to be rebuilt

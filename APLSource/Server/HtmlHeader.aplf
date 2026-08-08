@@ -1,11 +1,11 @@
- html←{noiIndex}HtmlHeader add;caption;title
+ html←{noIndexing}HtmlHeader add;caption;title
 ⍝ Strictly speaking this does not only return a header: it also returns...
 ⍝ * the DOC type
 ⍝ * an opening html tag
 ⍝ * an opening body tag
 ⍝ * some more stuff shared by all Tatin HTML pages
-⍝ noiIndex defaults to 0. If a page should not be index by, say, Google, pass a 1 as ⍺.
- noiIndex←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noiIndex'
+⍝ noIndexing defaults to 0. If a page should not be indexed by, say, Google, pass a 1 as ⍺.
+ noIndexing←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noIndexing'
  html←''
  html,←⊂'<!DOCTYPE html>'
  html,←⊂'<html lang="en">'
@@ -14,7 +14,7 @@
  html,←⊂'<title>',title,'</title>'
  html,←⊂'<meta charset="UTF-8">'
  html,←⊂'<meta name="viewport" content="width=device-width, initial-scale=1">'
- :If noiIndex
+ :If noIndexing
      html,←⊂'<meta name="robots" content="noindex">'
  :EndIf
  html,←⊂GetGoogleVerification

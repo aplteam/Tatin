@@ -40,6 +40,37 @@
  r,←⊂'                tools.prepend(box);'
  r,←⊂'            }'
  r,←⊂'        }'
+⍝ A clear button of our own: the one the browser puts into a search field
+⍝ is a few pixels across, and Firefox has none at all. Esc does the same,
+⍝ and a "/" from anywhere on the page jumps into the filter.
+ r,←⊂'        if (filter.length === 1) {'
+ r,←⊂'            var input = filter.find(''input'').first();'
+ r,←⊂'            var clear = $(''<button type="button" class="filter-clear" title="Clear the filter (Esc)" aria-label="Clear the filter"></button>'');'
+ r,←⊂'            var toggleClear = function () { clear.toggleClass(''on'', input.val().length > 0); };'
+ r,←⊂'            var resetFilter = function () {'
+ r,←⊂'                input.val('''');'
+ r,←⊂'                table.search('''').draw();'
+ r,←⊂'                toggleClear();'
+ r,←⊂'                input.focus();'
+ r,←⊂'            };'
+ r,←⊂'            input.after(clear);'
+ r,←⊂'            clear.on(''click'', resetFilter);'
+ r,←⊂'            input.on(''input search'', toggleClear);'
+ r,←⊂'            input.on(''keydown'', function (e) {'
+ r,←⊂'                if (e.key === "Escape") { e.preventDefault(); resetFilter(); }'
+ r,←⊂'            });'
+ r,←⊂'            $(document).on(''keydown'', function (e) {'
+ r,←⊂'                if (e.key !== "/" || e.ctrlKey || e.altKey || e.metaKey) { return; }'
+ r,←⊂'                var el = e.target, tag = (el.tagName || "").toLowerCase();'
+⍝ Only fields that take text can swallow the "/"; a check box cannot
+ r,←⊂'                var typing = tag === "textarea" || tag === "select" || el.isContentEditable ||'
+ r,←⊂'                    (tag === "input" && !/^(checkbox|radio|button|submit|reset|file|range|color)$/.test(el.type));'
+ r,←⊂'                if (typing) { return; }'
+ r,←⊂'                e.preventDefault();'
+ r,←⊂'                input.focus();'
+ r,←⊂'            });'
+ r,←⊂'            toggleClear();'
+ r,←⊂'        }'
  :If 1∊withCount
 ⍝ The count is of rows matching the filter rather than rows on display:
 ⍝ the two are the same while paging is switched off, but only the former

@@ -25,14 +25,24 @@ table.dataTable tfoot th {
     font-weight: normal;
 }
 
-/* DataTables draws its sort arrows at opacity .125 idle and .6 active,
-   which all but disappears against our grey header */
+/* DataTables reserves 26px at the right of every sortable heading for
+   its arrows, which is out of all proportion to 5px cells */
+table.dataTable thead > tr > th.sorting,
+table.dataTable thead > tr > th.sorting_asc,
+table.dataTable thead > tr > th.sorting_desc {
+    padding-right: 16px;
+}
+
+/* Smaller and closer in, to match. DataTables draws them at opacity .125
+   idle and .6 active, which all but disappears against our grey header */
 table.dataTable thead > tr > th.sorting::before,
 table.dataTable thead > tr > th.sorting::after,
 table.dataTable thead > tr > th.sorting_asc::before,
 table.dataTable thead > tr > th.sorting_asc::after,
 table.dataTable thead > tr > th.sorting_desc::before,
 table.dataTable thead > tr > th.sorting_desc::after {
+    right: 4px;
+    font-size: 0.75em;
     opacity: 0.35;
 }
 

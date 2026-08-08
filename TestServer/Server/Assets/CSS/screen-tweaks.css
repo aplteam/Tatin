@@ -1,11 +1,38 @@
+/* Tweaks for the DataTables extension. Loaded after screen.css and
+   after the DataTables stylesheet, so it wins over both. */
+
+/* DataTables measures and sets the table width itself, so these tables
+   keep display:table and scroll inside the wrapper it builds around
+   them instead of being their own scroll container. */
+table.dataTable {
+    display: table;
+    border-radius: 0;
+}
+
 table.dataTable tr td {
-    padding: 4px 6px ;
+    padding: 4px 6px;
 }
 
 table code, table code a {
     background-color: transparent;
+    padding: 0;
+}
+
+.dataTables_filter {
+    margin-bottom: 0.5rem;
 }
 
 .dataTables_filter input {
     margin-left: 0 !important;
+    min-height: 2.75rem;
+}
+
+@media (max-width: 48em) {
+    /* The filter label and its input stack, so the input can use the
+       full width */
+    .dataTables_filter,
+    .dataTables_filter label {
+        display: block;
+        width: 100%;
+    }
 }

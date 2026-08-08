@@ -1,219 +1,446 @@
-@media screen{
-body {
-/* ---------------------------------------
-Note that background-related pieces of
-information are defined in the INI file.
-This is because they are used to tell test
-servers from production servers
------------------------------------------- */
-    font-size: large;
-    font-family:  Verdana, Kalimati, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
-    margin: 1em;
-}
-th, td {
-    padding: 5px 10px;
-}
-th {
-    text-align: left;
-}
-div#my-logo a {
-    float: left;
-    margin-bottom: 20px;
-}
-div#my-logo h1 {
-    margin: 0em;
-    margin-top: 10px;
-    padding: 0 10px 0 0.5em;
-    float: left;
-    font-size: xx-large;
+/* ---------------------------------------------------------------
+   Tatin server - screen styles
+
+   This file is linked with media="screen", therefore it does not
+   need an @media screen wrapper of its own.
+
+   Note that background-related pieces of information are defined
+   in the INI file. This is because they are used to tell test
+   servers from production servers. The <style> block created from
+   the INI file is injected after this file, so it wins.
+   --------------------------------------------------------------- */
+
+:root {
+    color-scheme: light;
+
+    /* Colours */
+    --color-text:        #2f3336;
+    --color-text-muted:  #5c6469;
+    --color-heading:     #424242;
+    --color-link:        #0f6ab4;
+    --color-accent:      #00807f;                  /* teal */
+    --color-code:        #a30000;
+    --color-border:      #c9cfd2;
+    --color-border-soft: #dde1e3;
+    --color-surface:     #ffffff;
+    --color-panel:       #ffffff;                  /* tab content panel */
+    --color-sunken:      #f2f2f2;
+    --color-shade:       #e6e6e6;
+    --color-stripe-odd:  #fafafa;
+    --color-stripe-even: #f0f0f0;
+    --color-note:        #faebd7;
+
+    /* Spacing scale */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+
+    /* Shape */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+
+    /* Type */
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Verdana,
+               Kalimati, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva,
+               Arial, sans-serif;
+    --font-code: APLFont, monospace;
+
+    /* Smallest comfortable tap target */
+    --tap: 2.75rem;
 }
 
+@font-face {
+    font-family: "APLFont";
+    src:
+        local("APL385 Unicode"),
+        url("https://misc.aplteam.com/apl385.ttf") format("truetype");
+}
+
+/* --- Base ------------------------------------------------------ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: var(--space-4);
+    font-family: var(--font-ui);
+    font-size: clamp(1rem, 0.96rem + 0.25vw, 1.125rem);
+    line-height: 1.55;
+    color: var(--color-text);
+    -webkit-text-size-adjust: 100%;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+a {
+    color: var(--color-link);
+}
+
+a:hover,
+a:focus-visible {
+    text-decoration: none;
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+a.mailto_link::before { content: " ✉" }
+
+/* --- Header and footer ----------------------------------------- */
+
+div#my-logo {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+div#my-logo a {
+    display: inline-flex;
+    margin: 0;
+}
+
+div#my-logo h1,
 div.h_tag h1 {
-    margin: 0em;
-    margin-top: 10px;
-    padding: 0 10px 0 0;
-    float: none;
-    font-size: xx-large;
+    margin: 0;
+    padding: 0;
+    font-size: clamp(1.5rem, 1.1rem + 2vw, 2.125rem);
+    overflow-wrap: anywhere;
+}
+
+#logo {
+    width: 64px;
+    height: 64px;
+}
+
+#my-footer > hr {
+    margin: var(--space-6) 0 0 0;
+    border: 0;
+    border-top: 1px solid var(--color-border-soft);
+}
+
+#my-footer > p {
+    margin: var(--space-2) 0 0 0;
+    font-size: 0.8em;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+}
+
+/* --- Typography ------------------------------------------------ */
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-heading);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
 }
 
 h2 {
-   clear: both;
-   font-size: x-large;
-}
-h1, h2, h3, h4, h5, h6 {
-    color: #424242;
+    clear: both;                 /* still needed: .install-info floats */
+    font-size: clamp(1.3rem, 1.1rem + 1vw, 1.6rem);
+    margin: var(--space-5) 0 var(--space-3) 0;
 }
 
-h3 {
-    font-size: large;
-}
+h3 { font-size: 1.15rem }
+h4, h5, h6 { font-size: 1rem }
 
-h4, h5 {
-    font-size: medium;
-}
-#logo {
-    width: 64px;
-    height:     64px;
-}
-tbody tr:nth-child(even) {
-    background-color: #F0F0F0;
-}
-tbody tr:nth-child(odd) {
-    background-color: #FAFAFA;
-}
-th {
-    background-color: #E6E6E6;
-    color: #424242;
-}
-table {
-    border: silver 1px solid;
-}
-code , code a {
-    font-size: large;
-    font-family: APLFont, monospace;
-    background-color: #E6E6E6;
-    color: #A30000;
-}
-#my-footer > hr {
-    margin-top: 2em;
-    margin-bottom: 0;
-}
-#my-footer > p {
-    font-size: small;
-    margin-top: 0;
-    margin-left: 2px;
-}
-pre {
-    border: 1px silver dashed;
-    background-color: #F2F2F2;
-    font-size: large;
-    margin: 0.5em 2em 0.5em 0.2em;
-    padding: 0.5em;
-    font-family: APLFont, monospace;
-}
 ul li, ol li {
-    margin: 0.7em 0.2em;
-}
-.button {
-  border: none;
-  color: white;
-  padding: 0.5em 1em;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 1.1em;
-  margin: 0.1em 0em;
-  cursor: pointer;
-  background-color: #4CAF50;    /* Green */
-  border-radius: 12px;
+    margin: 0.6em 0;
 }
 
-form#create-group-homepage input{
-    margin-bottom: 1em;
+/* --- Code ------------------------------------------------------ */
+
+code, code a {
+    font-family: var(--font-code);
+    font-size: 0.95em;
+    background-color: var(--color-shade);
+    color: var(--color-code);
+    border-radius: var(--radius-sm);
+    padding: 0 0.2em;
+    overflow-wrap: anywhere;
 }
+
+pre {
+    margin: var(--space-4) 0;
+    padding: var(--space-3);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-sunken);
+    font-family: var(--font-code);
+    font-size: 0.95em;
+    /* Long JSON lines scroll inside the box rather than widening the page */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+}
+
+/* --- Tables ---------------------------------------------------- */
+
+/* Tables are turned into their own scroll container so that a wide
+   table never makes the page itself scroll sideways. The inline
+   max-width written by H.OpenTable still caps the width on large
+   screens. */
+table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    border-collapse: collapse;
+}
+
+.dataTables_wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+th, td {
+    padding: var(--space-2) var(--space-3);
+    vertical-align: top;
+}
+
+th {
+    text-align: left;
+    background-color: var(--color-shade);
+    color: var(--color-heading);
+    white-space: nowrap;
+}
+
+tbody tr:nth-child(odd)  { background-color: var(--color-stripe-odd) }
+tbody tr:nth-child(even) { background-color: var(--color-stripe-even) }
+
+#data-table {
+    font-family: var(--font-code);
+    font-weight: normal;
+}
+
+/* --- Forms and buttons ----------------------------------------- */
 
 input, select, textarea, button {
     font-size: inherit;
     font-family: inherit;
 }
 
-.tab {
-   overflow: hidden;
-   border: 1px solid #ccc;
-   background-color: #f1f1f1;
- }
-
- /* Style the buttons that are used to open the tab content */
-
- .tab button {
-   background-color: inherit;
-   float: left;
-   border: none;
-   outline: none;
-   cursor: pointer;
-   padding: 14px 16px;
-   transition: 0.3s;
-   font-size: 1em;
- }
-
-
-.button, input[type="submit"] {
-   font-size: 1.2em; padding: 3px 12px;
-   font-family: Roboto, sans-serif;
-   font-weight: 300;
-   color: teal;
-   border: 1px solid silver;
-   background-image: linear-gradient(to top, gainsboro 0%, white 90%);
-   border-radius: 10px;
-   padding-left: 3em;
-   padding-right: 3em;
+label {
+    display: inline-block;
+    margin-bottom: var(--space-1);
+    font-size: 0.85em !important;
+    color: var(--color-text-muted);
 }
-
-
- /* Change background color of buttons on hover */
- .tab button:hover {
-   background-color: #ddd;
- }
-
- .tab button.active {
-   background-color: #ccc;
- }
-
- /* Style the tab content */
- .tabcontent {
-   display: none;
-   padding: 6px 12px;
-   border: 1px solid #ccc;
-   border-top: none;
- }
- #data-table {
-  font-size: large;
-   font-weight: normal;
-   font-family: monospace;
- }
-
- label {
-     font-size: 0.75em !important;
- }
 
 input[type="text"],
 input[type="email"],
 input[type="search"],
 input[type="password"],
 textarea {
-  width: 100%; min-width: 100%;
-  box-sizing: border-box;
-  padding: 4px;
-  outline: none;
-  border-radius: 6px;
-  border: 2px solid silver;
+    width: 100%;
+    max-width: 100%;
+    min-height: var(--tap);
+    padding: var(--space-2);
+    outline: none;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="search"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    border-color: var(--color-accent);
+}
+
+form#create-group-homepage input {
+    margin-bottom: var(--space-4);
 }
 
 ::placeholder {
-    opacity:1;
+    opacity: 1;
     transition: opacity 1s;
 }
 
-:focus::placeholder { opacity:0  }
+:focus::placeholder { opacity: 0 }
 
-a.mailto_link::before {content:" ✉"}
-@font-face {
-        font-family: "APLFont";
-    src:
-        local("APL385 Unicode"),
-        url("https://misc.aplteam.com/apl385.ttf") format("truetype");
+.button,
+input[type="submit"] {
+    display: inline-block;
+    max-width: 100%;
+    min-height: var(--tap);
+    /* Generous on a desktop, but never wider than a phone screen */
+    padding: var(--space-2) clamp(1rem, 8vw, 3rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin: var(--space-1) 0;
+    background-image: linear-gradient(to top, gainsboro 0%, white 90%);
+    color: var(--color-accent);
+    font-family: var(--font-ui);
+    font-size: 1.05em;
+    font-weight: 400;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
 }
+
+.button:hover,
+input[type="submit"]:hover {
+    background-image: linear-gradient(to top, gainsboro 0%, whitesmoke 90%);
+}
+
+/* --- Tabs ------------------------------------------------------ */
+
+/* The tabs sit on the top edge of the content panel: separated from
+   each other and from the left edge, and the active one is taller and
+   merges with the panel below it. */
+.tab {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;              /* tabs of unequal height share a baseline */
+    gap: var(--space-2);
+    padding-left: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tab button {
+    flex: 0 1 auto;
+    min-height: var(--tap);
+    margin-bottom: -1px;                /* overlap the baseline */
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border-soft);
+    border-bottom-color: var(--color-border);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    /* padding-box keeps the baseline visible underneath an inactive tab */
+    background-color: var(--color-sunken);
+    background-clip: padding-box;
+    color: var(--color-text-muted);
+    font-size: 1em;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color 0.3s, min-height 0.15s;
+}
+
+.tab button:hover {
+    background-color: var(--color-shade);
+    color: var(--color-heading);
+}
+
+.tab button.active {
+    /* Slightly taller than its neighbours, and its bottom edge is
+       painted in the panel colour so the two become one shape */
+    min-height: calc(var(--tap) + 0.375rem);
+    border-color: var(--color-border);
+    border-bottom-color: var(--color-panel);
+    background-color: var(--color-panel);
+    color: var(--color-heading);
+    font-weight: 600;
+}
+
+.tabcontent {
+    display: none;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-top: none;
+    background-color: var(--color-panel);
+}
+
+/* --- Components ------------------------------------------------ */
 
 .install-info {
     position: relative;
+    float: right;
     max-width: 300px;
     height: auto;
+    margin: var(--space-3) 0 var(--space-4) var(--space-5);
+    padding: var(--space-3) var(--space-4);
     border: 2px solid gray;
-    background-color: #FAEBD7;
-    margin: 10px 20px;
-    padding: 10px 20px;
-    box-sizing: border-box;
-    float: right;
-    font-size: large;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-note);
+    box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;
+}
+
+/* --- Small screens --------------------------------------------- */
+
+@media (max-width: 48em) {
+    body {
+        padding: var(--space-3);
+    }
+
+    #logo {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* The note reads better as a full-width block above the content */
+    .install-info {
+        float: none;
+        max-width: none;
+        margin: var(--space-4) 0;
+    }
+
+    /* Full-width buttons are easier to hit with a thumb */
+    .button,
+    input[type="submit"] {
+        display: block;
+        width: 100%;
+    }
+
+    /* Keep the tabs side by side rather than stacking them, so they
+       still read as tabs; just tighten them up */
+    .tab {
+        padding-left: var(--space-3);
+        gap: var(--space-1);
+    }
+
+    .tab button {
+        padding: var(--space-2) var(--space-3);
+    }
+
+    /* DataTables puts its filter box above the table */
+    .dataTables_filter input {
+        width: 100%;
+    }
+
+    th, td {
+        padding: var(--space-2);
+    }
+}
+
+/* --- Very narrow screens (iPhone SE and similar) --------------- */
+
+@media (max-width: 22em) {
+    /* Just enough to keep the three tabs on one row */
+    .tab {
+        padding-left: var(--space-2);
+    }
+
+    .tab button {
+        padding: var(--space-2);
+        font-size: 0.95em;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
 }

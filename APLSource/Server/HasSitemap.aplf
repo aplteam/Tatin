@@ -1,0 +1,9 @@
+ yesNo←HasSitemap
+⍝ Returns 1 only if the INI file carries an entry "CONFIG:Sitemap" and that entry is 1.
+⍝ If the entry is missing or 0 then "/sitemap.xml" returns a 404, and "robots.txt" does
+⍝ not point to a sitemap either.
+ yesNo←0
+ :If G.INI.Exist'CONFIG:Sitemap'
+     yesNo←⊃G.INI.Get'CONFIG:Sitemap'
+ :EndIf
+⍝Done

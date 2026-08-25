@@ -66,6 +66,7 @@ DeletePackages | Deleting packages is: 0 – not allowed; 1 – allowed; 2 – a
 Registry | Path to the registry.
 ReloadWS | Flag: whether Tatin frequently checks for and reloads new versions of workspace `Server.dws`, meaning it will effectively restart itself.<br><br>Not recommended in production, but can be helpful in development.
 Secure | Flag: whether certificates are used (HTTPS) or not (HTTP).
+Sitemap | Flag: whether `/sitemap.xml` is served and `robots.txt` points at it.<br><br>If the entry is missing or 0 then a request for `/sitemap.xml` gets a 404.
 Title | Browser window or tab title for HTML pages.
 
 

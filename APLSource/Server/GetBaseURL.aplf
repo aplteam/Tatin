@@ -1,0 +1,13 @@
+ url←GetBaseURL request;host;scheme;secure
+⍝ Returns the absolute base URL the current request came in on, for example "https://tatin.dev".
+⍝ Returns an empty vector in case the request does not carry a "host" header.
+⍝ "x-forwarded-proto" is honoured so that the result is correct behind a reverse proxy as well.
+ url←''
+ :If 0<≢host←'host'GetFromHeaders request.Headers
+     :If 0=≢scheme←'x-forwarded-proto'GetFromHeaders request.Headers
+         secure←⊃0 G.INI.Get'CONFIG:Secure'
+         scheme←'http','s'/⍨1=secure
+     :EndIf
+     url←scheme,'://',host
+ :EndIf
+⍝Done

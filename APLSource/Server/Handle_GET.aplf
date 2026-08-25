@@ -4,6 +4,8 @@
      response←CreateHomePage request
  :ElseIf '/robots.txt'≡request.Path
      response←CreateRobotTxt request
+ :ElseIf '/sitemap.xml'≡request.Path
+     response←CreateSitemapXml request
  :Else
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
      :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}(≢Reg.VersionOf_REST)↓fullPath  ⍝ Static stuff with REST version

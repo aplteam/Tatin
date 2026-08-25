@@ -1,0 +1,15 @@
+ response←CreateSitemapXml request;xml;data;baseURL
+⍝ Creates the file "sitemap.xml", listing all pages that are supposed to be indexed by search engines.
+⍝ Which pages those are is decided by `CollectSitemapData`.
+ :If ~HasSitemap
+     response←request Respond 404
+     :Return
+ :EndIf
+ baseURL←GetBaseURL request
+ data←CollectSitemapData ⍬
+ xml←⊂'<?xml version="1.0" encoding="UTF-8"?>'
+ xml,←⊂'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+ xml,←⊃,/{('  <url>')('    <loc>',(EscapeSpecialChars baseURL,1⊃⍵),'</loc>')('    <lastmod>',(2⊃⍵),'</lastmod>')('  </url>')}¨↓data
+ xml,←⊂'</urlset>'
+ response←request ReturnXML MassageTXT xml
+⍝Done

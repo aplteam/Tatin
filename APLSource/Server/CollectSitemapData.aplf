@@ -1,0 +1,28 @@
+ r←CollectSitemapData dummy;list;majors;dates;uniqueMajors;latest;newest;releaseDate;pages;Newest
+⍝ Returns a two-column matrix with everything that belongs into the sitemap:
+⍝ [;1] the path, relative to the server's base URL
+⍝ [;2] the date of the last modification in the format YYYY-MM-DD
+⍝ "details" and "major_versions" pages are deliberately excluded: those are not meant to be indexed.
+⍝ So are all pages that "robots.txt" tells the crawlers to stay away from.
+ Newest←{⊃⌽⍵[⍋⍵]}                                       ⍝ Dates are strings here, so ⌈/ is not an option
+ releaseDate←3⊃Reg.Version
+ uniqueMajors←latest←⍬
+ newest←releaseDate
+ list←1 Reg.GetAllPackages G.RegistryPath               ⍝ [;1]=package ID, [;2]=publishing date
+ :If 0<≢list
+     majors←Reg.RemoveMinorAndPatch¨list[;1]
+     dates←10↑¨list[;2]                                 ⍝ We want YYYY-MM-DD, nothing else
+     uniqueMajors←∪majors
+     latest←{Newest dates/⍨majors≡¨⊂⍵}¨uniqueMajors     ⍝ Newest release of every major version line
+     newest←Newest dates                                ⍝ Newest release on this Registry
+ :EndIf
+ pages←⊂(1↑'/')releaseDate
+ pages,←⊂(Reg.VersionOf_REST,'/packages')newest
+ pages,←⊂(Reg.VersionOf_REST,'/deprecated-pkgs')newest
+ pages,←⊂(Reg.VersionOf_REST,'/groups')newest
+ :If G.INI.Exist'LICENSE:names'
+ :AndIf 0<≢⊃G.INI.Get'LICENSE:names'
+     pages,←⊂(Reg.VersionOf_REST,'/get-licenses')releaseDate
+ :EndIf
+ r←(↑pages)⍪((⊂Reg.VersionOf_REST,'/packages/versions/'),¨uniqueMajors),[1.5]latest
+⍝Done

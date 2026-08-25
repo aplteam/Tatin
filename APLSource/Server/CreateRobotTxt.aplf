@@ -1,4 +1,4 @@
- response←CreateRobotTxt request;txt
+ response←CreateRobotTxt request;txt;baseURL
 ⍝ Creates a file "robots.txt"
  txt←''
  txt,←⊂'User-agent: *'
@@ -7,5 +7,10 @@
  txt,←⊂'Disallow: /v1/credential-report/'
  txt,←⊂'Disallow: /v1/version-information/'
  txt,←⊂'Crawl-delay: 10'        ⍝ Ignored by Google but honoured by Bing & Yandex & Yahoo at the time of writing (2024-12)
+ :If HasSitemap
+ :AndIf 0<≢baseURL←GetBaseURL request
+     txt,←⊂''
+     txt,←⊂'Sitemap: ',baseURL,'/sitemap.xml'
+ :EndIf
  response←request ReturnTXT MassageTXT txt
 ⍝Done

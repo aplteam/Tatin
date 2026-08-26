@@ -146,14 +146,15 @@
       (rc msg)←Do'MAIL FROM: ',message.(normalizeAddr extractAddr From)
       →Err if 0≠rc
       :For rec :In message.(normalizeAddr∘extractAddr¨Recipients)
-          {}logIt Do'RCPT TO: ',rec
+          (rc msg)←logIt Do'RCPT TO: ',rec
+          →Err if 0≠rc
       :EndFor
       (rc msg)←Do'DATA'
       →Err if 0≠rc
       (rc msg)←Do text,CRLF,'.'
       →Exit if 0=rc
      Err:
-      logIt(rc msg)←Do'RSET'
+      {}logIt Do'RSET'
      Exit:
     ∇
 

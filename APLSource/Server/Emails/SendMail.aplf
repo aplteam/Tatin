@@ -1,0 +1,37 @@
+ (rc msg)←{attachments}SendMail(INI subject body cc);parms;myConnection;mailParms;log;S;convert;this
+⍝ Sends a single email via the SMTP server defined in the "EMAIL" section of `INI`.
+⍝ This is the common part of `SendMail_CrashReport`, `SendMail_DeletedPkg` and
+⍝ `SendMail_PublishedPkg`: those decide whether an email is sent at all and what it says.
+⍝ * `subject` is a simple character vector
+⍝ * `body` is a simple character vector or a vector of character vectors
+⍝ * `cc` may be empty, a character vector or a vector of character vectors. More than one
+⍝   address is fine: they are handed over comma-separated, and all of them get the email.
+⍝ `attachments`, if specified, must be a vector of (filename mimeType) pairs.
+⍝ The idea is to have a GMail address dedicated for http://[test].tatin.dev
+⍝ but we use this only to logon the Google's SMTP server: the address is not monitored.
+⍝ That way we don't have to be particularly concerned regarding the password.
+ attachments←{0<⎕NC ⍵:⍎⍵ ⋄ ⍬}'attachments'
+ S←##.##.SMTP
+ convert←{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⊆⍵}
+ parms←⎕NEW S.ConnectionParameters
+ parms.Server←⊃INI.Get'EMAIL:SMTP_Server'
+ parms.Port←⊃INI.Get'EMAIL:Port'
+ parms.Userid←⊃INI.Get'EMAIL:To'
+ parms.Password←⊃INI.Get'EMAIL:Password'
+ myConnection←⎕NEW S.Connection(,⊂parms)
+ mailParms←⎕NEW S.MailParameters
+ mailParms.From←'do-not-reply@tatin.dev'
+ mailParms.To←⊃INI.Get'EMAIL:To'
+ mailParms.CC←convert cc
+ mailParms.Subject←subject
+ mailParms.Body←body
+ :For this :In attachments
+     mailParms.AddAttachment this
+ :EndFor
+ (rc msg log)←myConnection.Send mailParms
+ :If 0=rc
+     msg←'Email was sent successfully'
+ :Else
+     msg←'Failed with rc=',(⍕rc),'; ',¯1↓(⊆msg),¨⎕UCS 13
+ :EndIf
+⍝Done

@@ -16,6 +16,10 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.125.0 ⋄ 2026-08-25
+
+* No action required
+
 ## v0.124.3 ⋄ 2026-08-06
 
 * Note that recent versions did not allow anymore to load a package into an empty namespace. That was too restrictive, though loading into a scripted namespace is still not allowed.
@@ -353,6 +357,8 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

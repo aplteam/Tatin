@@ -60,7 +60,8 @@
       text,←'Organization'addHeader Org
       text,←'X-Mailer'addHeader XMailer
       text,←'MIME-Version'addHeader'1.0'
-      text,←∊CRLF∘(,⍨)¨('B'≠⊃¨Recipients)/Recipients ⍝ no headers for BCC recipients
+      text,←CRLF,⍨'To:'CompileRecipients Recipients
+      text,←CRLF,⍨'CC:'CompileRecipients Recipients
       text,←'Subject'addHeader(⎕UCS'UTF-8'⎕UCS Subject)     ⍝ the message subject
      
       :If haveAtts←0≠≢Attachments ⍝ Any attachments?
@@ -72,7 +73,7 @@
       :EndIf
      
       :If 0≠≢Body
-          mime←(1+∨/'<html'⍷⎕C ⊃Body)⊃'plain' 'html'
+          mime←(1+∨/'<html'⍷⎕C⊃Body)⊃'plain' 'html'
           mime←'text/',mime,'; charset="UTF-8"'
           text,←'Content-Type'addHeader mime
           text,←CRLF
@@ -252,4 +253,20 @@
     ∇
 
     beginsWith←{⍵≡(≢⍵)↑⍺}
+
+    ∇ r←type CompileRecipients from
+    ⍝ type must be either "To:" "CC:"
+    ⍝ `from` is expected to be a vector of email addresses, for example:
+    ⍝ 'CC:info@tatin.dev,john-doe@myserver.com' ←→ 'C' CompileRecipients 'To: kai@aplteam.com' 'CC: info@tatin.dev' 'CC: john-doe@myserver.com'
+    ⍝ Splits at commas when the result exceeds (a multiple of) 78.
+      '⍺ is invalid: must be tither "To:" or "CC:"'⎕SIGNAL 11/⍨~(⊂type)∊'To:' 'CC:'
+      r←{1=≢⍵:⊂{⍵↓⍨⍵⍳' '}1⊃⍵ ⋄ {⍵↓⍨¨⍵⍳¨' '}⍵}{⍵/⍨(⊃type)=⊃¨⍵}from
+      ⍝ Max length is 78: +1 for the ",", +4 for type
+      r←type,1↓4{⍺←0
+          0=≢⍵:⍵
+          n←1⌈+/79>⍺++\1+≢¨⍵
+          (', ',⊃{⍺,',',⍵}/n↑⍵),∇ n↓⍵
+      }r
+    ∇
+
 :EndClass

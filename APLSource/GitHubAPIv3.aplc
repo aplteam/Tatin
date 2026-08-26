@@ -23,6 +23,9 @@
 
     ∇ History
       :Access Public Shared
+    ⍝ * 2.1.1 from 2026-06-22
+    ⍝   * Bug fix: `CheckForUpdate` wrongly removed additional info from the version info.
+    ⍝     As a result v1.2.3-beta-1 in the WS was not considered to be "worse" than v1.2.3 on GitHub
     ⍝ * 2.1.0 from 2025-04-21
     ⍝   * Function `GetIssues` added
     ⍝   * Function `GetLabelStats` added
@@ -239,7 +242,7 @@
     ⍝ In case that is impossible (because `text` does not fulfil the criteria) `⍬` is returned.\\
     ⍝ Assumptions:
     ⍝ * `text` may or may not start with a non-digit. All leading non-digit characters are ignored.\\
-    ⍝   Therefore both `1.2.3` and `v.1.2.3` are valid input.
+    ⍝   Therefore both `1.2.3` and `v1.2.3` are valid input.
     ⍝ * No part is allowed to start with a zero followed by a non-zero digit. Therefore 1.0.0 is valid input but
     ⍝   01.2.3, 1.02.3 and 1.2.03 are not.
     ⍝ * The remaining `text` must consist of nothing but digits and dots.
@@ -310,37 +313,32 @@
 
     ∇ tag←GetLatestTag repoName;MyGitAPI;ns;gitVersion;api
     ⍝ This method returns the latest `tag` (version number) for `repoName` .\\
-    ⍝ Note that drafted releases and pre-releases are both ignored.
+    ⍝ That implies that drafted releases and pre-releases are both ignored.
       :Access Public Instance
       ns←GetLatestReleaseInfo repoName
       tag←ns.tag_name
     ∇
 
-    ∇ betterVersion←CheckForUpdate(repoName version);gitVersion;version_;gitVersion_;msg
+    ∇ betterVersion←CheckForUpdate(repoName version);gitVersion;version_;gitVersion_;msg;isBeta
     ⍝ Takes a version number like `1.2.3` or `1.2.3.4-beta-1` (usually what is currently installed/used).\\
     ⍝ Returns one of:
     ⍝ * An empty vector in case no better version is available
     ⍝ * The better version number\\
-    ⍝ If the given version is a beta version (say 1.2.3-beta-1) and on GitHub it is 1.2.3 then the GitHub version
-    ⍝ is considered to be a later version. \\
-    ⍝ If the latest verson on GitHub is a beta an erroris thrown: this is not supported.
+    ⍝ If the given version is a beta version (say 1.2.3-beta-1) and on GitHub it is 1.2.3,
+    ⍝ then the GitHub version is considered to be a later version. \\
+    ⍝ If the latest verson on GitHub is a beta an error is thrown: this is not supported.
       :Access Public Instance
       betterVersion←''
       gitVersion_←GetLatestTag repoName
       gitVersion←⌊CastTagname2Number gitVersion_
       msg←'Latest version on GitHub is a beta (',gitVersion_,') - not supported'
-      msg Assert 0=≢gitVersion_~⎕D,'.v'             ⍝ This can only ever be untrue for a beta version
-      version_←{⍵↑⍨¯1+⍵⍳'-'}version
-      version_←CastTagname2Number version_~'v'
-      :If 0<≢version~⎕D,'.'                         ⍝ This can only ever be true for a beta version
-          :If version_≤gitVersion
-              betterVersion←gitVersion_             ⍝ Because a beta is by definition worse than a no-beta
-          :EndIf
-      :Else
-          version_←CastTagname2Number version~'v'
-          :If version_<gitVersion
-              betterVersion←gitVersion_
-          :EndIf
+      msg Assert 0=≢gitVersion_~⎕D,'.v'            ⍝ This can only ever be untrue for a beta version
+      version_←{⍵↑⍨¯1+⍵⍳'+'}version                ⍝ The build number plays no role here
+      isBeta←'-'∊version
+      version_←CastTagname2Number{⍵↑⍨¯1+⍵⍳'-'}version
+      :If isBeta∧version_=gitVersion               ⍝ A beta is by definition worse than a no-beta
+      :OrIf version_<gitVersion
+          betterVersion←gitVersion_
       :EndIf
     ∇
 

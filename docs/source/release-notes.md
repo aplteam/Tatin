@@ -16,7 +16,7 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.125.0 ⋄ 2026-08-25
+## v0.125.0 ⋄ 2026-09-01
 
 * No action required
 
@@ -357,6 +357,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

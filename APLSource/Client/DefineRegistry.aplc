@@ -36,7 +36,7 @@
           ns.uri←y
       :EndIf
       '"uri": invalid data type'Assert' '=1↑0⍴∊ns.uri
-      :If {1=≢'^http[s]?://'⎕S 0⊣⎕C ⍵}ns.uri
+      :If {1=≢'^https?://'⎕S 0⊣⎕C ⍵}ns.uri
       :AndIf 1<+/∊ns.uri=':'
           ns.(uri port)←{((1⊃⍵),':',(2⊃⍵))(3⊃⍵)}':'(≠⊆⊢)ns.uri
           ns.port←⊃⊃(//)⎕VFI ns.port

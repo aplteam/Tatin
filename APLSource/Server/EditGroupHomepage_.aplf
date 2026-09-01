@@ -1,14 +1,17 @@
- html←data EditGroupHomepage_ groupName;html;parms;markdown;email
- (markdown email)←data
+ html←data EditGroupHomepage_ groupName;html;parms;markdown;email;msg
+ (markdown email msg)←data
  html←HtmlHeader''
  html,←⊂'<h2>Group home page of "',groupName,'"</h2>'
  html,←⊆AddSpecialMessage''
+ :If 0<≢msg
+     html,←⊂'class="noprint" style="color:red;"'H.Para msg
+ :EndIf
  html,←⊂'<form id="create-group-homepage" action="','group-homepage-save">'
 
  html,←⊂'content'H.Label'Content (Use <a href="https://download.aplteam.com/MarkAPL_CheatSheet.html" caption="Link to the Markdown Cheat Sheet" title="Link to the Markdown Cheat Sheet" target="_blank" rel=noopener>Markdown</a> without HTML):'
  html,←⊂H.BR
  html,←⊂'<textarea name="content" id="content" rows="15" placeholder="your markdown" autofocus required spellcheck="true" lang="en">'
- html,←⊆markdown
+ html,←⊆EscapeSpecialChars markdown
  html,←⊂'</textarea>'
  html,←⊂H.BR
  html,←⊂H.BR

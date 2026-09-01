@@ -1,14 +1,9 @@
- r←MassageMarkdown md;length;drop;b;pattern
- pattern←''
- pattern,←⊂'(<[http[s]://[^>]*>)'    ⍝ Fetches Markdown links: those should suurvive untouched
- pattern,←⊂'<[^>]*>'                 ⍝ Fetched HTML blocks - not allowed!
- md←pattern ⎕R'\1' ''⊢md
- r←md
- b←CRLF⍷r
- r[⍸b]←⊂CRLF,CRLF
- r←∊r
+ r←MassageMarkdown md;drop
+⍝ Converts `md`, a character vector with CRLFs, into a vector of character vectors, one per
+⍝ line, with all empty lines at the end removed.
+⍝ Note that this function does not care about HTML tags: `RemoveHtmlTags` deals with those.
  r←{(CRLF⍷⍵)⊂⍵}CRLF,md
  r~¨←⊂CRLF
  drop←-+/∧\0=⌽≢¨r
  r←drop↓r
- ⍝Done
+⍝Done

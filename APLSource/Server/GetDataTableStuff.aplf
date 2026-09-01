@@ -1,13 +1,18 @@
- r←GetDataTableStuff withCount
+ r←{withFilter}GetDataTableStuff withCount
 ⍝ Returns the JavaScript that initialises the DataTables extension.
 ⍝ The CSS and the JavaScript library itself are linked by `HtmlHeader`.
 ⍝ Pass a 1 as `withCount` to have "(shown/total)" added to the H2, or a
 ⍝ ⍬ to leave the H2 alone.
+⍝ `withFilter` defaults to 1. Pass a 0 for a page where the table is not what
+⍝ the page is about: the filter box would then end up next to an H2 that has
+⍝ nothing to do with the table. Sorting is not affected by this.
+ withFilter←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'withFilter'
  r←''
  r,←⊂' <script>'
  r,←⊂'    $(document).ready(function () {'
  r,←⊂'        var table = $(''table'').DataTable({'
- r,←⊂'            "dom":"ft",'
+⍝ "f" is the filter box, "t" the table itself
+ r,←⊂'            "dom":"',(withFilter/'f'),'t",'
  r,←⊂'            "paging":false,'
 ⍝ Without this DataTables measures the content and writes a width onto
 ⍝ every column, stretching the table across the full width available.
@@ -23,71 +28,74 @@
  r,←⊂'                "searchPlaceholder": "Filter..."'
  r,←⊂'            }'
  r,←⊂'        });'
+ r,←⊂'        var h2 = $(''h2'').first();'
+ :If withFilter
 ⍝ Every page carrying a table has exactly one H2, so the filter box can
 ⍝ be lifted out of the wrapper DataTables built and put next to it.
- r,←⊂'        var h2 = $(''h2'').first(), filter = $(''.dataTables_filter'');'
- r,←⊂'        if (h2.length && filter.length === 1) {'
- r,←⊂'            var tools = $(''<div class="head-tools"></div>'');'
- r,←⊂'            h2.wrap(''<div class="head-row"></div>'').parent().append(tools);'
- r,←⊂'            tools.append(filter);'
+     r,←⊂'        var filter = $(''.dataTables_filter'');'
+     r,←⊂'        if (h2.length && filter.length === 1) {'
+     r,←⊂'            var tools = $(''<div class="head-tools"></div>'');'
+     r,←⊂'            h2.wrap(''<div class="head-row"></div>'').parent().append(tools);'
+     r,←⊂'            tools.append(filter);'
 ⍝ Only the list of packages has a Tags column, so it is looked up by its
 ⍝ caption. Tags start out excluded from the filter; the check box adds
 ⍝ them back in. `bSearchable` is internal to DataTables, hence the test.
- r,←⊂'            var tags = -1;'
- r,←⊂'            $(''table thead th'').each(function (i) { if ($(this).text().trim() === ''Tags'') tags = i; });'
- r,←⊂'            var cols = table.settings()[0].aoColumns;'
- r,←⊂'            if (tags >= 0 && cols[tags] && typeof cols[tags].bSearchable === "boolean") {'
- r,←⊂'                cols[tags].bSearchable = false;'
- r,←⊂'                table.rows().invalidate().draw();'
+     r,←⊂'            var tags = -1;'
+     r,←⊂'            $(''table thead th'').each(function (i) { if ($(this).text().trim() === ''Tags'') tags = i; });'
+     r,←⊂'            var cols = table.settings()[0].aoColumns;'
+     r,←⊂'            if (tags >= 0 && cols[tags] && typeof cols[tags].bSearchable === "boolean") {'
+     r,←⊂'                cols[tags].bSearchable = false;'
+     r,←⊂'                table.rows().invalidate().draw();'
 ⍝ The caption is one element: the label is a flex box, so a bare text
 ⍝ node beside the <u> would be a second item with a gap in front of it.
- r,←⊂'                var box = $(''<label class="include-tags" title="Alt+I"><input type="checkbox"><span><u>I</u>nclude Tags</span></label>'');'
+     r,←⊂'                var box = $(''<label class="include-tags" title="Alt+I"><input type="checkbox"><span><u>I</u>nclude Tags</span></label>'');'
 ⍝ e.code rather than e.key: on some layouts Alt+I is a dead key that
 ⍝ produces a diacritic instead of an "i".
- r,←⊂'                $(document).on(''keydown'', function (e) {'
- r,←⊂'                    if (!e.altKey || e.ctrlKey || e.metaKey || e.code !== "KeyI") { return; }'
- r,←⊂'                    e.preventDefault();'
- r,←⊂'                    box.find(''input'').prop("checked", function (i, v) { return !v; }).trigger(''change'');'
- r,←⊂'                });'
- r,←⊂'                box.find(''input'').on(''change'', function () {'
- r,←⊂'                    cols[tags].bSearchable = this.checked;'
+     r,←⊂'                $(document).on(''keydown'', function (e) {'
+     r,←⊂'                    if (!e.altKey || e.ctrlKey || e.metaKey || e.code !== "KeyI") { return; }'
+     r,←⊂'                    e.preventDefault();'
+     r,←⊂'                    box.find(''input'').prop("checked", function (i, v) { return !v; }).trigger(''change'');'
+     r,←⊂'                });'
+     r,←⊂'                box.find(''input'').on(''change'', function () {'
+     r,←⊂'                    cols[tags].bSearchable = this.checked;'
 ⍝ The per-row search text is cached, so it has to be rebuilt
- r,←⊂'                    table.rows().invalidate().draw();'
- r,←⊂'                });'
- r,←⊂'                tools.prepend(box);'
- r,←⊂'            }'
- r,←⊂'        }'
+     r,←⊂'                    table.rows().invalidate().draw();'
+     r,←⊂'                });'
+     r,←⊂'                tools.prepend(box);'
+     r,←⊂'            }'
+     r,←⊂'        }'
 ⍝ A clear button of our own: the one the browser puts into a search field
 ⍝ is a few pixels across, and Firefox has none at all. Esc does the same,
 ⍝ and a "/" from anywhere on the page jumps into the filter.
- r,←⊂'        if (filter.length === 1) {'
- r,←⊂'            var input = filter.find(''input'').first();'
- r,←⊂'            var clear = $(''<button type="button" class="filter-clear" title="Clear the filter (Esc)" aria-label="Clear the filter"></button>'');'
- r,←⊂'            var toggleClear = function () { clear.toggleClass(''on'', input.val().length > 0); };'
- r,←⊂'            var resetFilter = function () {'
- r,←⊂'                input.val('''');'
- r,←⊂'                table.search('''').draw();'
- r,←⊂'                toggleClear();'
- r,←⊂'                input.focus();'
- r,←⊂'            };'
- r,←⊂'            input.after(clear);'
- r,←⊂'            clear.on(''click'', resetFilter);'
- r,←⊂'            input.on(''input search'', toggleClear);'
- r,←⊂'            input.on(''keydown'', function (e) {'
- r,←⊂'                if (e.key === "Escape") { e.preventDefault(); resetFilter(); }'
- r,←⊂'            });'
- r,←⊂'            $(document).on(''keydown'', function (e) {'
- r,←⊂'                if (e.key !== "/" || e.ctrlKey || e.altKey || e.metaKey) { return; }'
- r,←⊂'                var el = e.target, tag = (el.tagName || "").toLowerCase();'
+     r,←⊂'        if (filter.length === 1) {'
+     r,←⊂'            var input = filter.find(''input'').first();'
+     r,←⊂'            var clear = $(''<button type="button" class="filter-clear" title="Clear the filter (Esc)" aria-label="Clear the filter"></button>'');'
+     r,←⊂'            var toggleClear = function () { clear.toggleClass(''on'', input.val().length > 0); };'
+     r,←⊂'            var resetFilter = function () {'
+     r,←⊂'                input.val('''');'
+     r,←⊂'                table.search('''').draw();'
+     r,←⊂'                toggleClear();'
+     r,←⊂'                input.focus();'
+     r,←⊂'            };'
+     r,←⊂'            input.after(clear);'
+     r,←⊂'            clear.on(''click'', resetFilter);'
+     r,←⊂'            input.on(''input search'', toggleClear);'
+     r,←⊂'            input.on(''keydown'', function (e) {'
+     r,←⊂'                if (e.key === "Escape") { e.preventDefault(); resetFilter(); }'
+     r,←⊂'            });'
+     r,←⊂'            $(document).on(''keydown'', function (e) {'
+     r,←⊂'                if (e.key !== "/" || e.ctrlKey || e.altKey || e.metaKey) { return; }'
+     r,←⊂'                var el = e.target, tag = (el.tagName || "").toLowerCase();'
 ⍝ Only fields that take text can swallow the "/"; a check box cannot
- r,←⊂'                var typing = tag === "textarea" || tag === "select" || el.isContentEditable ||'
- r,←⊂'                    (tag === "input" && !/^(checkbox|radio|button|submit|reset|file|range|color)$/.test(el.type));'
- r,←⊂'                if (typing) { return; }'
- r,←⊂'                e.preventDefault();'
- r,←⊂'                input.focus();'
- r,←⊂'            });'
- r,←⊂'            toggleClear();'
- r,←⊂'        }'
+     r,←⊂'                var typing = tag === "textarea" || tag === "select" || el.isContentEditable ||'
+     r,←⊂'                    (tag === "input" && !/^(checkbox|radio|button|submit|reset|file|range|color)$/.test(el.type));'
+     r,←⊂'                if (typing) { return; }'
+     r,←⊂'                e.preventDefault();'
+     r,←⊂'                input.focus();'
+     r,←⊂'            });'
+     r,←⊂'            toggleClear();'
+     r,←⊂'        }'
+ :EndIf
  :If 1∊withCount
 ⍝ The count is of rows matching the filter rather than rows on display:
 ⍝ the two are the same while paging is switched off, but only the former
@@ -101,9 +109,12 @@
      r,←⊂'            showCount();'
      r,←⊂'        }'
  :EndIf
- r,←⊂'        var focusOn = filter.find(''input'').first();'
- r,←⊂'        if (!focusOn.length) { focusOn = $("input:visible").first(); }'
- r,←⊂'        focusOn.focus();'
+ :If withFilter
+⍝ Without a filter box there is nothing on such a page that wants the focus.
+     r,←⊂'        var focusOn = filter.find(''input'').first();'
+     r,←⊂'        if (!focusOn.length) { focusOn = $("input:visible").first(); }'
+     r,←⊂'        focusOn.focus();'
+ :EndIf
  r,←⊂'    });'
  r,←⊂' </script>'
 ⍝Done

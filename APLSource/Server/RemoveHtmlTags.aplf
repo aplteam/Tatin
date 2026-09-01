@@ -1,0 +1,32 @@
+ (md removed)←RemoveHtmlTags markdown;pattern;lines;fenced;i;line;IsFence
+⍝ Removes all HTML tags from `markdown`: injecting HTML is not permitted on a home page.
+⍝ These are left alone:
+⍝ * Automatic links like <https://tatin.dev>, <mailto:kai@aplteam.com> and <kai@aplteam.com>
+⍝ * Everything between a pair of fences, no matter whether ``` or ~~~ is used
+⍝ * Everything MarkAPL considers to be inline code
+⍝ Code is left alone because MarkAPL escapes the pointy brackets in code anyway: what the
+⍝ reader gets to see is then the tag itself rather than its effect, so it can do no harm.
+⍝ `removed` is 1 if at least one HTML tag was removed, otherwise 0. That allows the caller
+⍝ to tell the user rather than changing her text behind her back.
+ pattern←''
+ pattern,←⊂'<(?:https?|ftp|file)://[^>]*>'          ⍝ Automatic links: those should survive untouched
+ pattern,←⊂'<mailto:[^>]*>'                         ⍝ ... "mailto:" has no "//"
+ pattern,←⊂'<[^<>[:space:]]+@[^<>[:space:]]+>'      ⍝ ... and a bare email address is a link, too
+ pattern,←⊂'<[^>]*>'                                ⍝ Fetches HTML tags - not allowed!
+⍝ This is how MarkAPL itself decides what opens and closes a code block; see `GetListBlock`
+ IsFence←{3>≢⍵~' ':0 ⋄ (⊂3↑⍵~' ')∊'```' '~~~'}
+⍝ Dropping exactly the two characters of the delimiter rather than removing all CRs and LFs
+⍝ keeps this reversible, so `removed` cannot be fooled by a lonely LF within a line.
+ lines←2↓¨{(CRLF⍷⍵)⊂⍵}CRLF,markdown
+ fenced←0
+ :For i :In ⍳≢lines
+     line←i⊃lines
+     :If IsFence line
+         fenced←~fenced
+     :ElseIf ~fenced
+         (i⊃lines)←pattern RemoveHtmlTags_ line
+     :EndIf
+ :EndFor
+ md←2↓∊(⊂CRLF),¨lines
+ removed←md≢markdown
+⍝Done

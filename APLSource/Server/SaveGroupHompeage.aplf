@@ -1,11 +1,18 @@
- response←SaveGroupHompeage request;content;email;apiKey;groupName;html
+ response←SaveGroupHompeage request;content;email;apiKey;groupName;html;clean;removed;msg
  :If ⊃G.INI.Get'Config:GroupHomePages'
      groupName←request R.GetQueryParameter'group'
      email←request R.GetQueryParameter'email'
      apiKey←request R.GetQueryParameter'apiKey'
      content←request.Content
-     SaveGroupHompeage_ groupName content email
-     response←ReturnGroupHomepage groupName request
+     (clean removed)←RemoveHtmlTags content
+     :If removed
+     ⍝ Rather than silently saving something the user did not write we hand it back for polishing.
+         msg←'HTML is not permitted here, but your text contains at least one HTML tag. Please remove it and save again.'
+         response←request ReturnHTML(content email msg)EditGroupHomepage_ groupName
+     :Else
+         SaveGroupHompeage_ groupName clean email
+         response←ReturnGroupHomepage groupName request
+     :EndIf
  :Else
      response←RespondWithHTML 401 'Not authorized'
  :EndIf

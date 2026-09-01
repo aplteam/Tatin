@@ -1,0 +1,59 @@
+ r←Test_Misc_024(stopFlag batchFlag);⎕TRAP;md;removed;txt;CRLF
+⍝ Exercise `RemoveHtmlTags`
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+ CRLF←##.Server.CRLF
+
+⍝ ------------- HTML tags are removed, and that is reported back
+ (md removed)←##.Server.RemoveHtmlTags'Hi <b>there</b>!'
+ →T.PassesIf'Hi there!'≡md
+ →T.PassesIf 1=removed
+
+ (md removed)←##.Server.RemoveHtmlTags'<img src="x" onerror="alert(1)">'
+ →T.PassesIf 0=≢md
+ →T.PassesIf 1=removed
+
+⍝ ------------- Automatic links are not HTML tags: they must survive untouched
+ txt←'See <https://tatin.dev>, <http://tatin.dev>, <ftp://foo.com> and <file://bar>'
+ (md removed)←##.Server.RemoveHtmlTags txt
+ →T.PassesIf txt≡md
+ →T.PassesIf 0=removed
+
+ txt←'Write to <mailto:kai@aplteam.com> or simply <kai@aplteam.com>'
+ (md removed)←##.Server.RemoveHtmlTags txt
+ →T.PassesIf txt≡md
+ →T.PassesIf 0=removed
+
+⍝ ------------- Neither is a tag in inline code: MarkAPL escapes those anyway
+ txt←'Use `<b>bold</b>` in order to get bold'
+ (md removed)←##.Server.RemoveHtmlTags txt
+ →T.PassesIf txt≡md
+ →T.PassesIf 0=removed
+
+ (md removed)←##.Server.RemoveHtmlTags'Use `<b>` but not <i>this</i>'
+ →T.PassesIf'Use `<b>` but not this'≡md
+ →T.PassesIf 1=removed
+
+⍝ ------------- ... nor a tag between a pair of fences
+ txt←'text',CRLF,'```',CRLF,'<div>raw</div>',CRLF,'```'
+ (md removed)←##.Server.RemoveHtmlTags txt
+ →T.PassesIf txt≡md
+ →T.PassesIf 0=removed
+
+ txt←'a',CRLF,'   ~~~ apl',CRLF,'<span>x</span>',CRLF,'~~~'
+ (md removed)←##.Server.RemoveHtmlTags txt
+ →T.PassesIf txt≡md
+ →T.PassesIf 0=removed
+
+⍝ ------------- ... but a tag after the closing fence is still a tag
+ txt←'```',CRLF,'<div>ok</div>',CRLF,'```',CRLF,'<em>no</em>'
+ (md removed)←##.Server.RemoveHtmlTags txt
+ →T.PassesIf 1=removed
+
+⍝ ------------- Nothing at all is fine as well
+ (md removed)←##.Server.RemoveHtmlTags''
+ →T.PassesIf 0=≢md
+ →T.PassesIf 0=removed
+
+ r←T._OK
+⍝Done

@@ -1,0 +1,13 @@
+ line←pattern RemoveHtmlTags_ line;mask;starts;segs;bool
+⍝ Removes all HTML tags from a single `line` but leaves inline code alone.
+⍝ What inline code actually is gets decided by MarkAPL itself: that way this agrees with
+⍝ whatever MarkAPL is going to make of the very same line later on.
+ :If 0<≢line
+     mask←##.MarkAPL.GetMaskForCode line            ⍝ 1 for every character that is code
+     starts←1,2≠/mask                               ⍝ A new piece starts whenever the mask changes
+     segs←starts⊂line
+     bool←0=starts/mask                             ⍝ Only what is not code is scanned for HTML tags
+     (bool/segs)←{pattern ⎕R'\0' '\0' '\0' ''⊣⍵}¨bool/segs
+     line←∊segs
+ :EndIf
+⍝Done

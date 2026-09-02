@@ -1,6 +1,7 @@
  r←{withFilter}GetDataTableStuff withCount
 ⍝ Returns the JavaScript that initialises the DataTables extension.
-⍝ The CSS and the JavaScript library itself are linked by `HtmlHeader`.
+⍝ The CSS and the JavaScript library itself are linked here rather than by
+⍝ `HtmlHeader`: only a page that carries a table needs them.
 ⍝ Pass a 1 as `withCount` to have "(shown/total)" added to the H2, or a
 ⍝ ⍬ to leave the H2 alone.
 ⍝ `withFilter` defaults to 1. Pass a 0 for a page where the table is not what
@@ -8,6 +9,8 @@
 ⍝ nothing to do with the table. Sorting is not affected by this.
  withFilter←{0<⎕NC ⍵:⍎⍵ ⋄ 1}'withFilter'
  r←''
+ r,←⊂'<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.css">'
+ r,←⊂'<script src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.js"></script>'
  r,←⊂' <script>'
  r,←⊂'    $(document).ready(function () {'
  r,←⊂'        var table = $(''table'').DataTable({'

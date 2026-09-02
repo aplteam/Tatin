@@ -16,6 +16,18 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.125.1 ⋄ 2026-09-02
+
+* No action is required except when you already took advantage of the new `CONFIG:Sitemap=1` feature from the preceding release 0.125.0 _and_ you run a Tatin server behind a proxy like an Apache.
+
+  When Tatin runs behind Apache and `CONFIG:Sitemap=1` then both the sitemap URL in robots.txt and all links in sitemap.xml use http:// as protocol, not https://.
+
+  Version 0.125.1 fixed this with the introduction of a new INI entry `CONFIG:BaseURL`: the URL used by the outside world to reach the server, something like `https://tatin.dev`. It can be left empty with no `CONFIG:Sitemap` or `CONFIG:Sitemap=0`; behind a proxy with `CONFIG:Sitemap=1` it needs to be set.
+
+  Instead of setting `CONFIG:BaseURL` you may make the proxy tell Tatin which protocol the outside world used. With Apache that means adding `RequestHeader set X-Forwarded-Proto expr=%{REQUEST_SCHEME}` to the virtual host; see [Reverse proxy](secure-server.md#reverse-proxy).
+
+  The client side of Tatin has not changed at all with 0.125.1.
+
 ## v0.125.0 ⋄ 2026-09-01
 
 * No action required
@@ -357,6 +369,8 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

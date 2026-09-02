@@ -4,8 +4,11 @@
 ⍝ * an opening html tag
 ⍝ * an opening body tag
 ⍝ * some more stuff shared by all Tatin HTML pages
-⍝ noIndexing defaults to 0. If a page should not be indexed by, say, Google, pass a 1 as ⍺.
- noIndexing←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'noIndexing'
+⍝ If a page should not be indexed by, say, Google, pass a 1 as ⍺.
+⍝ The INI entry "CONFIG:NoIndexing" does the same for every page of the server rather than
+⍝ just one, which is what a test or a staging Registry wants. ⍺ defaults to 0, so with no
+⍝ such entry and no ⍺ a page is indexable.
+ noIndexing←'CONFIG:NoIndexing'{0<⎕NC ⍵:⍎⍵ ⋄ 0 G.INI.Get ⍺}'noIndexing'
  html←''
  html,←⊂'<!DOCTYPE html>'
  html,←⊂'<html lang="en">'

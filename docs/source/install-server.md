@@ -61,8 +61,10 @@ A certificate is required to use HTTPS.
 
 ---|---
 AppName | Name used by Tatin for logging into the Windows Event Log.<br><br>The setting has no meaning on non-Windows platforms, and is ignored if `[LOGGING]WindowsEventLog` is 0.
+BaseURL | The URL the outside world uses to reach this Registry, for example `https://tatin.dev`.<br><br>Leave it empty to have Tatin work the URL out from the request. That is reliable only while Tatin faces the Web itself: behind a [reverse proxy](secure-server.md#reverse-proxy) either set this or make the proxy send an `X-Forwarded-Proto` header, because otherwise `robots.txt` and `sitemap.xml` name the wrong scheme.
 Caption | `H1` element for HTML pages.
 DeletePackages | Deleting packages is: 0 – not allowed; 1 – allowed; 2 – allowed only for [betas](glossary.md).<br><br>The [Principal Registry](https://tatin.dev) will not delete anything. A build can always be reproduced.
+NoIndexing | Flag: whether every page tells search engines not to index it.<br><br>Switch this on for a test or a staging Registry: it stops those pages competing with the real one in search results. Note that `robots.txt` alone cannot achieve this, because a page that is never crawled is never seen to say so.
 Registry | Path to the registry.
 ReloadWS | Flag: whether Tatin frequently checks for and reloads new versions of workspace `Server.dws`, meaning it will effectively restart itself.<br><br>Not recommended in production, but can be helpful in development.
 Secure | Flag: whether certificates are used (HTTPS) or not (HTTP).

@@ -1,13 +1,20 @@
  url←GetBaseURL request;host;scheme;secure
-⍝ Returns the absolute base URL the current request came in on, for example "https://tatin.dev".
+⍝ Returns the absolute base URL the outside world uses, for example "https://tatin.dev".
+⍝ If the INI file carries a non-empty "CONFIG:BaseURL" then that is returned, no questions
+⍝ asked: a server hiding behind a reverse proxy cannot work out on its own what the world
+⍝ sees, since the proxy typically talks plain HTTP to Tatin even when it serves HTTPS itself.
+⍝ Otherwise the URL is compiled from the request: "x-forwarded-proto" is honoured for the
+⍝ benefit of proxies that send it, and "CONFIG:Secure" decides when they don't.
 ⍝ Returns an empty vector in case the request does not carry a "host" header.
-⍝ "x-forwarded-proto" is honoured so that the result is correct behind a reverse proxy as well.
- url←''
- :If 0<≢host←'host'GetFromHeaders request.Headers
-     :If 0=≢scheme←'x-forwarded-proto'GetFromHeaders request.Headers
-         secure←⊃0 G.INI.Get'CONFIG:Secure'
-         scheme←'http','s'/⍨1=secure
+ url←⊃'' G.INI.Get'CONFIG:BaseURL'
+ url↓⍨←-'/'=¯1↑url                                      ⍝ A trailing slash would end up doubled
+ :If 0=≢url
+     :If 0<≢host←'host'GetFromHeaders request.Headers
+         :If 0=≢scheme←'x-forwarded-proto'GetFromHeaders request.Headers
+             secure←⊃0 G.INI.Get'CONFIG:Secure'
+             scheme←'http','s'/⍨1=secure
+         :EndIf
+         url←scheme,'://',host
      :EndIf
-     url←scheme,'://',host
  :EndIf
 ⍝Done

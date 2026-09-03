@@ -1,20 +1,36 @@
- html←{noIndexing}HtmlHeader add;caption;title
+ html←{parms}HtmlHeader add;caption;title;docTitle;noIndexing;pageTitle
 ⍝ Strictly speaking this does not only return a header: it also returns...
 ⍝ * the DOC type
 ⍝ * an opening html tag
 ⍝ * an opening body tag
 ⍝ * some more stuff shared by all Tatin HTML pages
-⍝ If a page should not be indexed by, say, Google, pass a 1 as ⍺.
+⍝ ⍺ is optional. When given it must carry exactly two items: (noIndexing pageTitle).
+⍝ Two rather than "up to two" on purpose: `1 'X'` is a simple vector while `1 'Foo'` is a
+⍝ nested one, so a length-tolerant ⍺ would have to tell those apart and would get a
+⍝ one-character page title wrong. Pass '' or ⍬ for an item you have nothing to say about.
+⍝ `noIndexing`: pass a 1 for a page that should not be indexed by, say, Google.
 ⍝ The INI entry "CONFIG:NoIndexing" does the same for every page of the server rather than
-⍝ just one, which is what a test or a staging Registry wants. ⍺ defaults to 0, so with no
-⍝ such entry and no ⍺ a page is indexable.
- noIndexing←'CONFIG:NoIndexing'{0<⎕NC ⍵:⍎⍵ ⋄ 0 G.INI.Get ⍺}'noIndexing'
+⍝ just one, which is what a test or a staging Registry wants. An empty vector means "not
+⍝ specified": the INI entry then decides, and with neither a page is indexable.
+⍝ `pageTitle`: what this particular page is about, typically the same as its H2, like the
+⍝ package ID. It goes in front of the server's own title in <title>, so that browser tabs
+⍝ and search results tell the pages apart. Pass '' to let the server's title stand on its
+⍝ own, which is what the home page wants.
+ (noIndexing pageTitle)←{0<⎕NC ⍵:⍎⍵ ⋄ ⍬ ''}'parms'
+ :If 0=≢noIndexing
+     noIndexing←0 G.INI.Get'CONFIG:NoIndexing'
+ :EndIf
  html←''
  html,←⊂'<!DOCTYPE html>'
  html,←⊂'<html lang="en">'
  html,←⊂'<head>'
  title←⊃G.INI.Get'Config:Title'
- html,←⊂'<title>',title,'</title>'
+⍝ `title` on its own remains the server's title: it is used for the logo further down.
+ docTitle←title
+ :If 0<≢pageTitle
+     docTitle←pageTitle,' - ',title
+ :EndIf
+ html,←⊂'<title>',(EscapeSpecialChars docTitle),'</title>'
  html,←⊂'<meta charset="UTF-8">'
  html,←⊂'<meta name="viewport" content="width=device-width, initial-scale=1">'
  :If noIndexing

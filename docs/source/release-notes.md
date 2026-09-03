@@ -16,6 +16,21 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.125.2 ⋄ 2026-09-??
+
+* This is a server-only release: the client side of Tatin has not changed at all.
+
+* Replace the `Assets/` folder in the root of your Tatin server with the one that comes with this version.
+
+  Until now jQuery and the DataTables extension were loaded from a CDN. They are now served from `Assets/` instead, so that a Registry without access to the internet gets working tables as well. Two new files are involved and they live in two different folders:
+
+  ```
+  Assets/CSS/datatables-1.12.1.min.css
+  Assets/JS/datatables-1.12.1.min.js
+  ```
+
+  Copying only one of them fails quietly: with the JavaScript in place but the CSS missing, tables still sort and the filter box still works, while the sort markers in the column captions have disappeared.
+
 ## v0.125.1 ⋄ 2026-09-02
 
 * No action is required except when you already took advantage of the new `CONFIG:Sitemap=1` feature from the preceding release 0.125.0 _and_ you run a Tatin server behind a proxy like an Apache.

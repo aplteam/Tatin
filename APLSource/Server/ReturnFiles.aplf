@@ -3,6 +3,10 @@
  :Select ⎕C 3⊃⎕NPARTS filename
  :Case '.css'
      response.ContentType←'text/css'
+ :Case '.js'
+     response.ContentType←'text/javascript'
+ :Case '.txt'
+     response.ContentType←'text/plain'
  :Case '.ico'
      response.ContentType←'image/x-icon'
  :Case '.png'
@@ -18,7 +22,14 @@
  :If F.IsFile response.FilePath
      response.StatusCode←200
      response.IsFile←1
-     response.Headers,←⊂'Cache-Control' 'public'   ⍝ Allow caching
+    ⍝ Minified third-party files carry their version in their name (see Assets/JS/_ReadMe.md),
+    ⍝ so a new version arrives under a new name and can never be served from a stale cache.
+    ⍝ Everything else may well be replaced without its name changing, so it must be revalidated.
+     :If ∨/'.min.'⍷⎕C filename
+         response.Headers,←⊂'Cache-Control' 'public, max-age=31536000, immutable'
+     :Else
+         response.Headers,←⊂'Cache-Control' 'public'   ⍝ Allow caching
+     :EndIf
  :Else
      response←request Respond 404
      response.Content←'File not found'

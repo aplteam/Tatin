@@ -1,6 +1,9 @@
  {r}←LogError msg
-⍝ Uses Plodder's `LogError` (and therefore ultimately Rumba's) `Log` function to log errors.
-⍝ Expects the Global `G` to be around which holds an instance of the Rumba Server as G.Server.
-⍝ If `G` is not avaiable (too early, for example) the server instance must be provided as ⍺.
- r←##.Plodder.LogError msg
+⍝ Uses Plodder's `AppLogError`, the official function for logging application errors: it
+⍝ enforces the format by putting "*** Error" in front of the message.
+⍝ Expects the Global `G` to be around which holds `AppLogTie`.
+⍝ There is no ⍺: unlike `Log` this one does not need a server instance. It needs no trap
+⍝ around it either - `AppLog` traps for itself, so that logging can never bring down
+⍝ whatever was trying to report a problem.
+ r←##.Plodder.AppLogError msg
 ⍝Done

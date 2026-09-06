@@ -1,0 +1,36 @@
+ StoreReadme(packagePath status sourceUrl markdown);mdFilename;cfgFilename;ns;old;attempts;firstAttempt
+⍝ Records the outcome of a README fetch for the package in `packagePath`. Fields written:
+⍝ * `status`      : 'ok', 'none' or 'error'
+⍝ * `sourceUrl`   : where the Markdown came from; '' unless the status is 'ok'
+⍝ * `attempts`    : how many times this package has been tried; `ReadmeIsDue` stops at three
+⍝ * `firstAttempt`: when the first attempt was made, as seconds (⎕DT code 20), because the
+⍝                   retries are counted in hours from it and `fetched` cannot be added to
+⍝ * `fetched`     : when this attempt was made, as yyyymmdd.hhmmss (⎕DT code 60), matching
+⍝                   the package config's own "date", for whoever reads the file
+⍝ Every outcome is recorded, failures included: an attempt that leaves no trace would be
+⍝ chosen again immediately by `FetchPendingReadme`, and one unreachable repository would
+⍝ then stop every package behind it from ever being looked at.
+⍝ With anything but 'ok' any Markdown left from an earlier attempt is removed: a package
+⍝ must never show a README that the current attempt did not confirm.
+ (mdFilename cfgFilename)←GetReadmeFilenames packagePath
+ :If 'ok'≡status
+     (markdown'UTF-8')⎕NPUT mdFilename 1
+ :ElseIf F.IsFile mdFilename
+     {}F.DeleteFile mdFilename
+ :EndIf
+ attempts←0
+ firstAttempt←⊃20 ⎕DT⊂⎕TS
+ :If ⍬≢old←GetReadmeRecord packagePath
+     attempts←{0=old.⎕NC ⍵:0 ⋄ old⍎⍵}'attempts'
+     :If 0≠⊃{0=old.⎕NC ⍵:0 ⋄ old⍎⍵}'firstAttempt'
+         firstAttempt←{0=old.⎕NC ⍵:0 ⋄ old⍎⍵}'firstAttempt'
+     :EndIf
+ :EndIf
+ ns←⎕NS''
+ ns.status←status
+ ns.sourceUrl←sourceUrl
+ ns.attempts←attempts+1
+ ns.firstAttempt←firstAttempt
+ ns.fetched←⊃60 ⎕DT⊂⎕TS
+ ((Reg.JSON ns)'UTF-8')⎕NPUT cfgFilename 1
+⍝Done

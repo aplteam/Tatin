@@ -1,0 +1,37 @@
+ r←ResolveReadmeLinks_ match;m;ind;v;scheme
+⍝ Replacement function for `ResolveReadmeLinks`; see there for what is decided and why.
+⍝ `group`, `repo` and `tag` are not arguments because ⎕R decides what a replacement function
+⍝ is given: they come from the caller, where they are locals.
+ m←match.Match
+ ind←m⍳'"'
+ v←¯1↓ind↓m
+ r←m
+ :If 0=≢v
+     :Return
+ :EndIf
+ :If '#'=⊃v                                         ⍝ Points within this page; already dealt with
+     :Return
+ :EndIf
+ :If 0<≢scheme←UrlScheme v
+     :If (⊂⎕C scheme)∊'javascript' 'data' 'vbscript'
+         r←(ind↑m),'#"'                             ⍝ The one thing a link must not be allowed to do
+     :EndIf
+     :Return                                        ⍝ Any other scheme: already absolute
+ :EndIf
+ :If '//'≡2↑v                                       ⍝ Protocol relative: absolute as well
+     :Return
+ :EndIf
+ :If 0=≢group                                       ⍝ Nothing to resolve against
+     :Return
+ :EndIf
+ :If './'≡2↑v
+     v←2↓v
+ :EndIf
+ :If '/'=⊃v                                         ⍝ Relative to the repository root either way
+     v←1↓v
+ :EndIf
+ :If 'src'≡⎕C(ind-2)↑m
+     r←(ind↑m),(GetRawGitHubUrl group repo tag v),'"'
+ :Else
+     r←(ind↑m),(GetBlobGitHubUrl group repo tag v),'"'
+ :EndIf

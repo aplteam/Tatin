@@ -1,0 +1,14 @@
+ r←PrefixReadmeIds_ match;m;ind;v
+⍝ Replacement function for `PrefixReadmeIds`; see there for what this is for.
+⍝ `prefix` is not an argument because ⎕R decides what a replacement function is given: it
+⍝ comes from the caller, where it is a local.
+ m←match.Match
+ ind←m⍳'"'
+ v←¯1↓ind↓m
+ r←m
+ :If 'id'≡⎕C(ind-2)↑m
+     r←(ind↑m),prefix,v,'"'
+ :ElseIf 0<≢v
+ :AndIf '#'=⊃v
+     r←(ind↑m),'#',prefix,(1↓v),'"'
+ :EndIf

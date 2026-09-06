@@ -1,0 +1,15 @@
+ r←UrlScheme url;ind;scheme
+⍝ Returns the scheme of `url` - 'https', 'mailto', 'javascript' and so on - or '' when there
+⍝ is none.
+⍝ A colon on its own does not make a scheme: in "docs/a:b" it belongs to the path, so a
+⍝ slash before the colon rules it out. Nor does anything but a letter, a digit and "+-.".
+ r←''
+ ind←url⍳':'
+ :If ind≤≢url
+ :AndIf ~∨/'/'=(ind-1)↑url
+     scheme←(ind-1)↑url
+     :If 0<≢scheme
+     :AndIf ∧/scheme∊⎕A,(⎕C ⎕A),⎕D,'+-.'
+         r←scheme
+     :EndIf
+ :EndIf

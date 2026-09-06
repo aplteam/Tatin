@@ -1,0 +1,19 @@
+ r←GetReadmeRecord packagePath;mdFilename;cfgFilename;qdmx
+⍝ Returns the namespace recorded about a package's README, or ⍬ when there is no record or
+⍝ it cannot be read. See `StoreReadme` for the fields.
+⍝ An unreadable record counts as no record at all, so that whatever went wrong is tried
+⍝ again rather than accepted as an answer nobody ever established. It is logged, though:
+⍝ a record that will not parse is not something to pass over in silence.
+⍝ Only 11 (the JSON will not parse), 19 and 22 (no access, no file) are trapped. Anything
+⍝ else - a VALUE ERROR from a typo, say - must reach the surface rather than be swallowed.
+ r←⍬
+ (mdFilename cfgFilename)←GetReadmeFilenames packagePath
+ :If F.IsFile cfgFilename
+     :Trap 11 19 22
+         r←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET cfgFilename
+     :Else
+         qdmx←⎕DMX
+         r←⍬
+         LogError'Unreadable README record "',cfgFilename,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+     :EndTrap
+ :EndIf

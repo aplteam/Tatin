@@ -1,0 +1,14 @@
+ html←DemoteHeadings html;pat;rep
+⍝ Shifts every heading in `html` down one level, H1 becoming H2 and so on, with H6 staying
+⍝ as it is because there is nowhere further to go.
+⍝ A README starts at H1, which on a package page would compete with the page's own H1. The
+⍝ page keeps one H1 of its own and the README sits below it, which is both what a reader
+⍝ expects and what a search engine wants to see.
+⍝ One ⎕R with a pattern per level rather than six passes: ⎕R does not rescan what it has
+⍝ replaced, so H1 cannot be shifted to H2 by the first pattern and then to H3 by the second.
+ pat←'<h1' '<h2' '<h3' '<h4' '<h5' '<h6'
+ pat,←'</h1' '</h2' '</h3' '</h4' '</h5' '</h6'
+ rep←'<h2' '<h3' '<h4' '<h5' '<h6' '<h6'
+ rep,←'</h2' '</h3' '</h4' '</h5' '</h6' '</h6'
+ html←pat ⎕R rep⍠('IC' 1)⊣html
+⍝Done

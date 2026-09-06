@@ -1,0 +1,31 @@
+ r←GetReadmeUrls(projectUrl version);ver;group;repo;path;tag
+⍝ Returns a two-column matrix with the URLs a package's README might be fetched from:
+⍝ [;1] the "raw.githubusercontent.com" URL to fetch it from
+⍝ [;2] the matching "github.com/.../blob/..." URL, recorded for attributing the source
+⍝ One row per tag spelling worth trying, the most likely one first: Tatin release tags read
+⍝ "v1.2.3", but tags older than that convention read "1.2.3".
+⍝ The result is empty when `projectUrl` does not point at a GitHub repository: nothing else
+⍝ is supported, and guessing would attach a stranger's README to a package.
+⍝ Note that the tag decides: fetching from the default branch is deliberately not offered,
+⍝ because that would document a release with instructions that may not work for it.
+ r←0 2⍴''
+ ver←version
+ ver←(¯1+ver⍳'+')↑ver                               ⍝ Build metadata is no part of a tag
+ path←projectUrl
+ :If 0=≢ver
+ :OrIf 0=≢path
+     :Return
+ :EndIf
+ :If '/'=¯1↑path                                    ⍝ A trailing slash is common and harmless
+     path←¯1↓path
+ :EndIf
+ :If '.git'≡⎕C ¯4↑path
+     path←¯4↓path
+ :EndIf
+ :If 0=≢path←GetGitHubPath path
+     :Return
+ :EndIf
+ (group repo)←path
+ :For tag :In ('v',ver)ver
+     r⍪←(GetRawGitHubUrl group repo tag'README.md')(GetBlobGitHubUrl group repo tag'README.md')
+ :EndFor

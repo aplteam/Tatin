@@ -198,3 +198,44 @@ Do not use "Request Indexing" for more than a couple of spot checks — it handl
 6. Sitemap (§9)
 
 Steps 1–4 deliver the entire user-facing benefit. Steps 5–6 are what make the search side work, and can follow later without rework.
+
+---
+
+## 11. Documentation still to write
+
+Nothing in `docs/` has been touched. Deliberately: the behaviour is still moving. Write it
+once the shape is settled, and before the release that ships it.
+
+**For whoever publishes a package** — `publish-packages.md`, possibly a line in
+`before-you-publish.md`:
+
+- The README shown on a package page is fetched from GitHub, from the tag of that very
+  release. It is not taken from the package, and nothing has to be added to
+  `apl-package.json`.
+- What it takes for that to work: `project_url` must name a GitHub repository, the release
+  must be tagged `v1.2.3` or `1.2.3`, and the file must be called `README.md` exactly —
+  `raw.githubusercontent.com` is case sensitive even though the GitHub website is not.
+- Fetching happens after publishing, not during it, so a publish never waits for GitHub and
+  never fails because of it.
+- It is tried three times: straight away, 24 hours later, and a week after the first
+  attempt. A tag pushed more than a week after the package was published will therefore be
+  missed, and needs the manual re-fetch of §8.
+- Only the newest release of each major version line is rendered.
+
+**For whoever runs a Registry** — `maintenance.md`, `install-server.md`:
+
+- Three new files appear, all written and owned by the server: `apl-readme.md` and
+  `apl-readme.json` inside each package folder, and `apl-readme-sweep.json` in the root of
+  the Registry. None of them is part of a package and none reaches a client.
+- `apl-package.json` is not touched.
+- Deleting a package's `apl-readme.json` makes the server look again — the documented way to
+  force a re-fetch.
+- After upgrading to the release that brings this, run `BackfillReadmes` once rather than
+  waiting for the daily walk to work through an established Registry.
+- The walk runs in a thread and is throttled to one request per second, so it is polite to
+  GitHub and invisible to visitors.
+
+**Release notes** for whichever version ships it: no action required beyond the optional
+backfill, and a note that package pages now carry documentation.
+
+**Not needed:** `api.md`. Nothing here is part of the public API - it is all server side.

@@ -1,0 +1,15 @@
+ r←GetGitHubPath url;parts;bool;searchString;url2
+⍝ Takes a project URL and returns a two-item vector (group repo), or an empty vector when
+⍝ `url` is not a GitHub repository URL.
+⍝ Only "<host>/<group>/<repo>" is accepted. Anything deeper is refused rather than trimmed:
+⍝ a URL pointing into a repository's subfolder is not evidence of where its README lives.
+ r←⍬
+ searchString←'github.com/'
+ :If ∨/bool←searchString ⍷⎕C url
+     url2←((≢searchString)+¯1+bool⍳1)↓url            ⍝ Keep the original case: paths are case sensitive
+     parts←{1↓¨(⍵='/')⊂⍵}'/',url2
+     :If 2=≢parts
+     :AndIf ∧/0<≢¨parts
+         r←parts
+     :EndIf
+ :EndIf

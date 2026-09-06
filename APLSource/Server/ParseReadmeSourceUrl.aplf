@@ -1,0 +1,15 @@
+ (group repo tag)←ParseReadmeSourceUrl sourceUrl;parts;bool;searchString;path
+⍝ Takes the URL a README was fetched from, as `GetReadmeUrls` composed it -
+⍝ https://github.com/<group>/<repo>/blob/<tag>/README.md - and takes it apart again.
+⍝ Returns three empty vectors when it is not of that shape, which is the caller's signal to
+⍝ leave relative links alone rather than to point them somewhere invented.
+ (group repo tag)←'' '' ''
+ searchString←'github.com/'
+ :If ∨/bool←searchString⍷⎕C sourceUrl
+     path←((≢searchString)+¯1+bool⍳1)↓sourceUrl     ⍝ Keep the original case: paths are case sensitive
+     parts←{1↓¨(⍵='/')⊂⍵}'/',path
+     :If 5=≢parts
+     :AndIf 'blob'≡⎕C 3⊃parts
+         (group repo tag)←parts[1 2 4]
+     :EndIf
+ :EndIf

@@ -1,0 +1,26 @@
+ r←ReadmeIsDue packagePath;ns;attempts;firstAttempt;schedule;wanted
+⍝ Tells whether the README of the package in `packagePath` should be fetched now.
+⍝ A README is tried up to three times: straight away, 24 hours later, and one week after the
+⍝ first try. More than one go is worth having because a first failure is often temporary -
+⍝ GitHub unreachable, or a release tag pushed some time after the package was published -
+⍝ while a third failure a week later is not going to be cured by a fourth.
+⍝ 'ok' is final at once: a README is tied to a tag, and tags do not move.
+ schedule←24 168                                    ⍝ Hours after the FIRST attempt, one per retry
+ r←1
+ :If ⍬≢ns←GetReadmeRecord packagePath
+     :If 'ok'≡{0=ns.⎕NC ⍵:'' ⋄ ns⍎⍵}'status'
+         r←0
+     :Else
+         attempts←{0=ns.⎕NC ⍵:0 ⋄ ns⍎⍵}'attempts'
+         firstAttempt←{0=ns.⎕NC ⍵:0 ⋄ ns⍎⍵}'firstAttempt'
+         ⍝ `attempts` counts the tries already made, so it indexes the wait before the next one.
+         ⍝ Out of range means there is no next one: either all three are done, or this record predates
+         ⍝ retries altogether, in which case its answer stands rather than being reopened.
+         :If (attempts<1)∨(attempts>≢schedule)∨0=firstAttempt
+             r←0
+         :Else
+             wanted←firstAttempt+3600×attempts⊃schedule
+             r←wanted≤⊃20 ⎕DT⊂⎕TS                   ⍝ Code 20 is seconds, so hours are addable
+         :EndIf
+     :EndIf
+ :EndIf

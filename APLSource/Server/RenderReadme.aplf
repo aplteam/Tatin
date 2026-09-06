@@ -1,0 +1,40 @@
+ html←RenderReadme(markdown sourceUrl prefix);parms;lines;removed;group;repo;tag;ns
+⍝ Turns a package's README into HTML fit to be dropped into a package page, as a vector of
+⍝ character vectors like everything else that builds a page here.
+⍝ ⍵ is the Markdown as stored, the URL it was fetched from, and a prefix that keeps its ids
+⍝ from colliding with the page's own.
+⍝ The order is the point of this function:
+⍝ 1. every HTML tag goes before MarkAPL ever sees the text. A README is somebody else's
+⍝    writing on somebody else's server, so it is treated as text and nothing else: <script>,
+⍝    <iframe>, "onclick=" and the rest never arise, because no HTML survives to carry them.
+⍝    `RemoveHtmlTags` is what group home pages already use for exactly this reason.
+⍝ 2. MarkAPL renders what is left, so every tag in the result is one we generated
+⍝ 3. only then are headings, ids and links adjusted, and by then it is our own HTML
+⍝ Returns '' when there is nothing worth showing, which the caller should take as "leave the
+⍝ section out altogether" rather than "print an empty heading".
+ html←''
+ :If 0=≢markdown
+     :Return
+ :EndIf
+⍝ Stored by ⎕NPUT and read back by ⎕NGET, so the line endings are LFs by now, while
+⍝ `RemoveHtmlTags` and `MassageMarkdown` both work in CRLFs.
+ markdown←(⎕UCS 10)⎕R CRLF⊣markdown~⎕UCS 13
+ (markdown removed)←RemoveHtmlTags markdown
+ :If 0=≢lines←MassageMarkdown markdown
+     :Return
+ :EndIf
+ parms←##.MarkAPL.CreateParms
+ parms.createFullHtmlPage←0                         ⍝ A fragment: the page brings its own <head>
+ parms.verbose←0
+ parms.ignoreEmbeddedParms←1                        ⍝ A README must not configure our renderer
+ parms.bookmarkLink←0                               ⍝ No paragraph markers on somebody else's headings
+ parms.javaScript←0                                 ⍝ The page has its own; none is wanted from here
+ parms.copy2ClipboardBtn←0
+ parms.checkLinks←0                                 ⍝ Broken links in a README are not our business
+ parms.toc←0
+ (html ns)←parms ##.MarkAPL.Markdown2HTML lines
+ html←DemoteHeadings html
+ html←prefix PrefixReadmeIds html
+ (group repo tag)←ParseReadmeSourceUrl sourceUrl
+ html←(group repo tag)ResolveReadmeLinks html
+⍝Done

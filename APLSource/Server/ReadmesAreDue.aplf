@@ -1,0 +1,27 @@
+ r←ReadmesAreDue registryPath;ns;filename;lastSweep;indexStamp;qdmx
+⍝ Tells whether it is worth walking the Registry looking for READMEs to fetch.
+⍝ Two things make it worth doing, and nothing else does:
+⍝ * something has been published since the last walk, so there is a new package to look at
+⍝ * 24 hours have passed, which is when `ReadmeIsDue` lets failed packages round again
+⍝ Anything else and this returns 0 having done a single stat, whatever the size of the
+⍝ Registry. The walk itself is expensive - a config and a record read per package - so it
+⍝ must not happen on every housekeeping call.
+⍝ The record holds `indexStamp` (the index file's timestamp as at the last completed walk)
+⍝ and `lastSweep` (when that walk finished), both in seconds. No record means never walked.
+ r←1
+ filename←GetReadmeSweepFilename registryPath
+ :If F.IsFile filename
+     :Trap 11 19 22
+         ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET filename
+         lastSweep←{0=ns.⎕NC ⍵:0 ⋄ ns⍎⍵}'lastSweep'
+         indexStamp←{0=ns.⎕NC ⍵:0 ⋄ ns⍎⍵}'indexStamp'
+     :Else
+         qdmx←⎕DMX
+         LogError'Unreadable README sweep record "',filename,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+         :Return                                    ⍝ Walk anyway; the record gets rewritten
+     :EndTrap
+     :If indexStamp=GetIndexStamp registryPath
+     :AndIf (⊃20 ⎕DT⊂⎕TS)<lastSweep+24×3600
+         r←0
+     :EndIf
+ :EndIf

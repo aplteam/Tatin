@@ -42,6 +42,22 @@
          :EndIf
          Logs.ProcessLogFile(∊P.LogFolder)(3↑⎕TS)
          ExecuteMaintenanceCode G
+        ⍝ READMEs are fetched in a thread of their own, so housekeeping does not wait for
+        ⍝ GitHub. Only one at a time: ⎕TNUMS is asked rather than a flag, because a flag left
+        ⍝ standing by a thread that died would block this for the life of the server.
+        ⍝ `ReadmesAreDue` is a single stat unless there is genuinely something to do.
+        ⍝ Publishing does not do any of this, on purpose.
+         :If 0=⎕NC'∆README_TID'
+             ∆README_TID←¯1
+         :EndIf
+         :Trap 0
+             :If ~∆README_TID∊⎕TNUMS
+             :AndIf ReadmesAreDue G.RegistryPath
+                 ∆README_TID←ProcessReadmes&G.RegistryPath
+             :EndIf
+         :Else
+             LogError'Could not start the README thread: ',⎕DMX.EM
+         :EndTrap
      :EndIf
  :Else
      qdmx←⎕DMX
@@ -53,4 +69,3 @@
      :EndTrap
      ⎕SIGNAL 11  ⍝ Let Rumba's "ServerLoop" take over
  :EndTrap
-⍝Done

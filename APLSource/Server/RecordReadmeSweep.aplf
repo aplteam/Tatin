@@ -1,0 +1,12 @@
+ RecordReadmeSweep(registryPath indexStamp);ns
+⍝ Notes that a walk over the Registry has just finished, so that `ReadmesAreDue` says no
+⍝ until something is published or 24 hours have gone by.
+⍝ `indexStamp` is what the index file's timestamp was when the walk *started*, not now: a
+⍝ package published while the walk was running would otherwise be recorded as already seen
+⍝ and wait a whole day for its README.
+ ns←⎕NS''
+ ns.indexStamp←indexStamp
+ ns.lastSweep←⊃20 ⎕DT⊂⎕TS
+ ns.swept←⊃60 ⎕DT⊂⎕TS                               ⍝ The same moment, for whoever reads the file
+ ((Reg.JSON ns)'UTF-8')⎕NPUT(GetReadmeSweepFilename registryPath)1
+⍝Done

@@ -1,0 +1,19 @@
+ r←GetIndexStamp registryPath;filename;ts;qdmx
+⍝ Returns when "tatin_index.txt" was last written, in seconds (⎕DT code 20), or 0 when there
+⍝ is no such file - an unmanaged Registry has none.
+⍝ `SavePackage` recompiles that index after every successful publish, so this one stat
+⍝ answers "has anything been published since I last looked?" without listing the Registry,
+⍝ let alone reading a config from every package in it. That matters: this is asked on every
+⍝ housekeeping call, and a Registry is expected to grow into the thousands of packages.
+ r←0
+ filename←registryPath,'/',Reg.Index.GetIndexFilename
+ :If F.IsFile filename
+     :Trap 19 22
+         ts←⊃⊃('type' 3)F.Dir filename
+         r←⊃20 ⎕DT⊂ts
+     :Else
+         qdmx←⎕DMX
+         r←0
+         LogError'Cannot read the timestamp of "',filename,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+     :EndTrap
+ :EndIf

@@ -1,0 +1,30 @@
+ r←{dry}BackfillReadmes registryPath;ids;id;path;status;pause;due
+⍝ Fetches READMEs for every major version line nobody has looked at yet, in one go.
+⍝ Housekeeping does the same thing one package at a time (see `FetchPendingReadme`); this is
+⍝ for an admin who would rather not wait for that, typically right after the feature arrives
+⍝ on a Registry that already holds hundreds of packages.
+⍝ A package that is not due is left alone, so this can be interrupted and started again
+⍝ without fetching anything twice. Due means: never tried, or tried and failed and the
+⍝ next of the three attempts has come round; see `ReadmeIsDue`. To force one regardless,
+⍝ delete its "apl-readme.json".
+⍝ Pass a 1 as ⍺ for a dry run: nothing is fetched and nothing is written.
+⍝ Returns a two-column matrix: [;1] package ID, [;2] one of 'ok', 'none', 'error', 'skipped'
+⍝ or 'would fetch'. Tally it with {≢⍵}⌸r[;2]. The 'none' rows are the ones worth reading:
+⍝ a cluster of them sharing a group usually means a tagging convention of its own.
+⍝ 'error' rows mean GitHub could not be reached; those come round again by themselves.
+ dry←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'dry'
+ pause←1                                            ⍝ Seconds between fetches: a courtesy, not a requirement
+ r←0 2⍴''
+ :For id :In ids←GetNewestPerMajor registryPath
+     path←registryPath,'/',id
+     due←ReadmeIsDue path
+     :If due∧dry
+         status←'would fetch'
+     :ElseIf due
+         status←FetchAndStoreReadme path
+         ⎕DL pause
+     :Else
+         status←'skipped'
+     :EndIf
+     r⍪←id status
+ :EndFor

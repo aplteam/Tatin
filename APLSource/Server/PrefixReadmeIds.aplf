@@ -1,0 +1,9 @@
+ html←prefix PrefixReadmeIds html
+⍝ Puts `prefix` in front of every id in `html` and in front of every link pointing at one,
+⍝ so that headings coming from somebody else's README cannot collide with the ids the page
+⍝ generates for itself. Two elements sharing an id make invalid HTML, and the browser then
+⍝ jumps to whichever came first - which would be ours, not theirs.
+⍝ Links anywhere else are left alone: only an href that is nothing but a fragment can be
+⍝ pointing at an id in this very page.
+ html←('id="[^"]*"' 'href="[^"]*"')⎕R PrefixReadmeIds_⍠('IC' 1)⊣html
+⍝Done

@@ -1,0 +1,10 @@
+ r←AddNofollow_ match;m
+⍝ Replacement function for `ResolveReadmeLinks`: puts rel="nofollow noopener" on a link that
+⍝ leads away from here, because we are not vouching for wherever a README sends the reader.
+⍝ A link that already carries a "rel" is left alone.
+ m←match.Match
+ r←m
+ :If ~∨/'rel='⍷⎕C m
+ :AndIf ∨/'href="http'⍷⎕C m
+     r←(¯1↓m),' rel="nofollow noopener">'
+ :EndIf

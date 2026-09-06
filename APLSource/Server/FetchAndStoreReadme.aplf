@@ -1,0 +1,25 @@
+ status←FetchAndStoreReadme packagePath;cfg;projectUrl;version;sourceUrl;markdown;qdmx
+⍝ Fetches the README for the package in `packagePath` and records the outcome; see
+⍝ `GetReadmeFilenames` for where it goes. Returns 'ok', 'none' or 'error'.
+⍝ A package without a "project_url" - the field arrived after packages had been published -
+⍝ yields 'none', which is the truth: there is nowhere to look.
+⍝ Every outcome is recorded, 'error' included, so that the attempt is counted and the same
+⍝ package is not picked again on the very next housekeeping run; `ReadmeIsDue` decides when
+⍝ it comes round again. Nothing is recorded only when the package config itself cannot be
+⍝ read, which says nothing about the README either way.
+ status←'error'
+⍝ Only the ways a config file can genuinely be unusable are trapped: 11 for JSON that will
+⍝ not parse, 19 and 22 for no access and no file, and Tatin's own error number. A typo in
+⍝ this code raises a VALUE ERROR, and that must reach the surface rather than vanish here.
+ :Trap 11 19 22 Reg.ErrorNo
+     cfg←Reg.GetPackageConfigFileAsNS packagePath
+ :Else
+     qdmx←⎕DMX
+     LogError'Cannot read the package config in "',packagePath,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+     :Return
+ :EndTrap
+ projectUrl←{0=cfg.⎕NC ⍵:'' ⋄ cfg⍎⍵}'project_url'
+ version←{0=cfg.⎕NC ⍵:'' ⋄ cfg⍎⍵}'version'
+ (status sourceUrl markdown)←FetchReadme projectUrl version
+ StoreReadme packagePath status sourceUrl markdown
+⍝Done

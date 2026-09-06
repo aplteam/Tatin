@@ -1,0 +1,39 @@
+ ProcessReadmes registryPath;ids;id;path;indexStamp;pause;qdmx
+⍝ Walks the Registry once and fetches every README that is due; see `ReadmeIsDue`.
+⍝ This is what `OnHouseKeeping` starts as a thread, so it may run for a long time without
+⍝ holding anything up: with a pause between fetches a Registry of a few thousand packages
+⍝ takes the best part of an hour, and nothing waits for it.
+⍝ The `:Trap 0` is deliberate and is the only one in this feature. Everything it calls traps
+⍝ narrowly - a missing file, a corrupt record, a connection that failed - and lets anything
+⍝ else through, so what arrives here is a fault in the code rather than a fact about the
+⍝ world. Two reasons it is caught all the same:
+⍝ * an untrapped error would suspend the thread rather than end it, and a suspended thread
+⍝   keeps its number in ⎕TNUMS for ever - which is what `OnHouseKeeping` reads to decide
+⍝   whether one of these is already running. The walk would never start again.
+⍝ * ∆README_TID has to be cleared whatever happens, for the same reason.
+⍝ It is logged with the package it died on, and nothing is swallowed: the walk stops there,
+⍝ so the same fault is met and logged again on the next run rather than being walked past.
+⍝ That is on purpose. A bug here should be a nuisance until it is fixed.
+ pause←1                                            ⍝ Seconds between fetches: a courtesy to GitHub
+ id←'(none yet)'
+ :Trap 0
+     indexStamp←GetIndexStamp registryPath          ⍝ Read before the walk, recorded after it
+     :For id :In ids←GetNewestPerMajor registryPath
+         :If ∆SHUTDOWN≠0                            ⍝ The server is going down; stop bothering GitHub
+             :Leave
+         :EndIf
+         path←registryPath,'/',id
+         :If ReadmeIsDue path
+             {}FetchAndStoreReadme path
+             ⎕DL pause
+         :EndIf
+     :EndFor
+     :If ∆SHUTDOWN=0
+         RecordReadmeSweep registryPath indexStamp  ⍝ Only a walk that ran to the end counts
+     :EndIf
+ :Else
+     qdmx←⎕DMX
+     LogError'Fetching READMEs stopped at "',id,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+ :EndTrap
+ ∆README_TID←¯1
+⍝Done

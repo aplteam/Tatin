@@ -1,0 +1,22 @@
+ html←parms ResolveReadmeLinks html;group;repo;tag
+⍝ Makes the links of a rendered README fit to appear on our pages.
+⍝ A README's relative links are relative to its repository, so left alone every image on a
+⍝ package page would 404. They are resolved against the very tag the README came from and
+⍝ not against the default branch, so a picture belongs to the release it illustrates rather
+⍝ than to whatever the repository looks like today:
+⍝ * an image (src) goes to raw.githubusercontent.com, which serves the file itself
+⍝ * a link (href) goes to github.com/.../blob/..., which shows it in its place
+⍝ Left as they are: anything carrying a scheme of its own, and anything that is nothing but
+⍝ a fragment - that points within this very page, and `PrefixReadmeIds` has seen to it.
+⍝ Replaced by "#": the "javascript:", "data:" and "vbscript:" schemes. Markdown expresses
+⍝ those in an ordinary link and needs no HTML tag to do it, so removing HTML does not remove
+⍝ them, and they are the one thing a link can do that a reader would not expect.
+⍝ With no `group` the relative links are left alone - pointing them somewhere invented would
+⍝ be worse than leaving them broken.
+⍝ ⍺ arrives as one name and is unpacked here: a tradfn header cannot take a parenthesised
+⍝ left argument - the parser reads that as an operator's operands, and ⎕FX accepts it, so
+⍝ the mistake shows up only as a VALUE ERROR when something tries to call it.
+ (group repo tag)←parms
+ html←('src="[^"]*"' 'href="[^"]*"')⎕R ResolveReadmeLinks_⍠('IC' 1)⊣html
+ html←'<a[[:space:]][^>]*>'⎕R AddNofollow_⍠('IC' 1)⊣html
+⍝Done

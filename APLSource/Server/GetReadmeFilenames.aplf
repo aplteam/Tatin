@@ -1,0 +1,17 @@
+ (mdFilename cfgFilename)←GetReadmeFilenames packagePath
+⍝ Returns the names of the two files a package's README is kept in, both siblings of the
+⍝ package's own config file inside the Registry:
+⍝ * `mdFilename` holds the Markdown, as a text file: it exists only when there is one.
+⍝   Being a text file rather than a byte-for-byte copy, CRLF arrives back as LF and there is
+⍝   a trailing newline. Both are what a Markdown renderer wants, so neither is worth undoing.
+⍝ * `cfgFilename` holds where it came from and whether it was found at all. It is written
+⍝   whatever the outcome, so that "we looked and there is none" can be told apart from
+⍝   "nobody has looked yet", which is what the backfill needs to know.
+⍝ These are deliberately not part of "apl-package.json": that file belongs to whoever
+⍝ published the package, is shown as-is on the "details" page and follows a schema.
+⍝ They are no part of the ZIP the client gets either, which is built when a package is
+⍝ published and never looks at its neighbours.
+ packagePath←F.AddTrailingSep packagePath
+ mdFilename←packagePath,'apl-readme.md'
+ cfgFilename←packagePath,'apl-readme.json'
+⍝Done

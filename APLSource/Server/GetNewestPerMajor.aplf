@@ -1,0 +1,14 @@
+ r←GetNewestPerMajor registryPath;list;majors;uniqueMajors;m;buff
+⍝ Returns the package IDs of the newest release in every major version line.
+⍝ That is exactly the set a README is ever wanted for: only the newest release of a line is
+⍝ rendered, so fetching anything else would be work nobody looks at.
+ r←⍬
+ :If 0=≢list←1 Reg.GetAllPackages registryPath      ⍝ [;1]=package ID, [;2]=publishing date
+     :Return
+ :EndIf
+ majors←Reg.RemoveMinorAndPatch¨list[;1]
+ uniqueMajors←∪majors
+ :For m :In uniqueMajors
+     buff←list[⍸majors≡¨⊂m;]
+     r,←⊂⊃buff[⊃⌽⍋buff[;2];1]                       ⍝ Dates are strings here, so ⍋ rather than ⌈/
+ :EndFor

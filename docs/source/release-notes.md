@@ -20,6 +20,10 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
 
 * This is a server-only release: the client side of Tatin has not changed at all.
 
+* The INI entry `CONFIG:MenuItemBefore` is gone. It used to put a prefix in front of some of the links on the home page; those links now live in a menu carried by every page, where a prefix repeated on each item would be noise.
+
+  Nothing needs doing. An entry left in the INI file is ignored, so it can be removed at leisure or left where it is.
+
 * Replace the `Assets/` folder in the root of your Tatin server with the one that comes with this version. Replace rather than copy over, and see [Assets](maintenance.md#assets) for how to go about it: files were added in this version, and a plain copy leaves whatever it does not overwrite behind.
 
   Until now jQuery and the DataTables extension were loaded from a CDN. They are now served from `Assets/` instead, so that a Registry without access to the internet gets working tables as well. Two new files are involved and they live in two different folders:

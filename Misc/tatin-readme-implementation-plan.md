@@ -228,8 +228,11 @@ once the shape is settled, and before the release that ships it.
   `apl-readme.json` inside each package folder, and `apl-readme-sweep.json` in the root of
   the Registry. None of them is part of a package and none reaches a client.
 - `apl-package.json` is not touched.
-- Deleting a package's `apl-readme.json` makes the server look again — the documented way to
-  force a re-fetch.
+- Deleting a package's `apl-readme.json` makes that package due again, but only for the
+  next walk over the Registry — and a walk starts only when something has been published
+  or a day has passed. Deleting records therefore starts nothing on its own. To force a
+  re-fetch now, run `BackfillReadmes`, or delete `apl-readme-sweep.json` as well so the
+  next housekeeping call walks.
 - After upgrading to the release that brings this, run `BackfillReadmes` once rather than
   waiting for the daily walk to work through an established Registry.
 - The walk runs in a thread and is throttled to one request per second, so it is polite to

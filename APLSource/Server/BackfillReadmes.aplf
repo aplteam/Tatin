@@ -6,7 +6,9 @@
 ⍝ A package that is not due is left alone, so this can be interrupted and started again
 ⍝ without fetching anything twice. Due means: never tried, or tried and failed and the
 ⍝ next of the three attempts has come round; see `ReadmeIsDue`. To force one regardless,
-⍝ delete its "apl-readme.json".
+⍝ delete its "apl-readme.json" and run this: deleting that record is enough *here*, because
+⍝ this function asks every package directly. It is not enough for the walk housekeeping
+⍝ does, which is gated by `ReadmesAreDue` and will not notice until it next walks anyway.
 ⍝ Pass a 1 as ⍺ for a dry run: nothing is fetched and nothing is written.
 ⍝ Returns a two-column matrix: [;1] package ID, [;2] one of 'ok', 'none', 'error', 'skipped'
 ⍝ or 'would fetch'. Tally it with {≢⍵}⌸r[;2]. The 'none' rows are the ones worth reading:

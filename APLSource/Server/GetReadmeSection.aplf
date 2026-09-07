@@ -1,0 +1,28 @@
+ r←GetReadmeSection packagePath;status;sourceUrl;markdown;body;minSize;prefix
+⍝ Returns the HTML for the README of the package in `packagePath`, as a vector of character
+⍝ vectors, or '' when there is nothing worth showing.
+⍝ '' means "leave the section out altogether": no heading, and no notice saying that there
+⍝ is no README. A package without one should look like a package that never needed one.
+⍝ Too short counts as nothing worth showing. `minSize` is measured against the Markdown
+⍝ rather than against the text it renders to, which is an approximation - the Markdown
+⍝ carries its own syntax - but a generous one: what it lets through is at worst a little
+⍝ shorter than it looks.
+ r←''
+ minSize←200
+ prefix←'readme-'                                   ⍝ Keeps the README's ids clear of the page's own
+ (status sourceUrl markdown)←ReadStoredReadme packagePath
+ :If 'ok'≢status
+     :Return
+ :EndIf
+ :If minSize>≢markdown
+     :Return
+ :EndIf
+ :If 0=≢body←RenderReadme markdown sourceUrl prefix
+     :Return
+ :EndIf
+ r←⊂'<section class="readme">'
+ r,←body
+⍝ Whoever wrote it gets the credit, and the URL carries the tag, so it also says which
+⍝ release this documentation belongs to.
+ r,←⊂'<p class="readme-source">README from <a href="',(EscapeAttributeValue sourceUrl),'" rel="nofollow noopener">',(EscapeSpecialChars sourceUrl),'</a></p>'
+ r,←⊂'</section>'

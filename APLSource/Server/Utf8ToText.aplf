@@ -1,0 +1,15 @@
+ r←Utf8ToText bytes;qdmx
+⍝ Turns the body of an HTTP response into text.
+⍝ Rumba hands a body over exactly as it arrived. Conga runs in "Text" mode, so every byte
+⍝ became a character in the range 0-255 and nothing was decoded: `UTF8Content` is only ever
+⍝ called when Rumba *sends* something, never when it receives. Storing that as it stands and
+⍝ writing it out as UTF-8 encodes it a second time, which is how "⎕NA" becomes "ÃÂ¢ÃÂÃÂ•NA".
+⍝ Returns '' when the bytes are not valid UTF-8; the caller should read that as "unusable".
+⍝ Only 11 is trapped, which is what ⎕UCS signals for bytes that are not valid UTF-8.
+ r←''
+ :Trap 11
+     r←'UTF-8'⎕UCS ⎕UCS bytes
+ :Else
+     qdmx←⎕DMX
+     LogError'A README is not valid UTF-8 and was ignored: ',qdmx.EM
+ :EndTrap

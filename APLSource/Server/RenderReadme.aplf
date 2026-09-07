@@ -18,7 +18,12 @@
  :EndIf
 ⍝ Stored by ⎕NPUT and read back by ⎕NGET, so the line endings are LFs by now, while
 ⍝ `RemoveHtmlTags` and `MassageMarkdown` both work in CRLFs.
- markdown←(⎕UCS 10)⎕R CRLF⊣markdown~⎕UCS 13
+⍝ Not with ⎕R: it treats a newline as the separator between records, so an LF in the
+⍝ pattern never matches anything and the replacement silently does nothing at all - which
+⍝ handed MarkAPL the whole README as a single line, making its first heading swallow the
+⍝ rest of the file. `A.Split` is used because it keeps empty segments, and an empty line is
+⍝ what separates one paragraph from the next in Markdown.
+ markdown←2↓∊(⊂CRLF),¨(⎕UCS 10)A.Split markdown~⎕UCS 13
  (markdown removed)←RemoveHtmlTags markdown
  :If 0=≢lines←MassageMarkdown markdown
      :Return
@@ -28,6 +33,7 @@
  parms.verbose←0
  parms.ignoreEmbeddedParms←1                        ⍝ A README must not configure our renderer
  parms.bookmarkLink←0                               ⍝ No paragraph markers on somebody else's headings
+ parms.div_h_tag←0                                  ⍝ Plain <h2>...<h6>, not each one wrapped in a <div>
  parms.javaScript←0                                 ⍝ The page has its own; none is wanted from here
  parms.copy2ClipboardBtn←0
  parms.checkLinks←0                                 ⍝ Broken links in a README are not our business

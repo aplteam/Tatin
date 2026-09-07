@@ -1,8 +1,15 @@
- html←PrepareHtmlPageForVersionList(packageID data);links;col1;col2;col3;col4;bool;colTitles
+ html←PrepareHtmlPageForVersionList(packageID data);links;col1;col2;col3;col4;bool;colTitles;newestPath
  data←⊖data
- html←(⍬ packageID)HtmlHeader ''
+⍝ The README and the description belong to the newest release of this major version line:
+⍝ that is the only one a README is ever fetched for. The newest is picked by date rather
+⍝ than by position, so it does not matter which way round `data` happens to be sorted.
+ newestPath←G.RegistryPath,'/',⊃data[(⊃⌽⍋data[;2]);1]
+ html←(⍬ packageID)HtmlHeader GetMetaDescription GetPackageDescription newestPath
  html,←⊂'<h2>All versions of "',packageID,'"</h2>'
  html,←AddSpecialMessage ⍬
+⍝ Before the table on purpose: the documentation is what this page is about, and what a
+⍝ search engine should find first. The table of releases stays underneath it.
+ html,←GetReadmeSection newestPath
  colTitles←'Package ID' 'Publishing date' 'Config' 'Dependencies'
  html,←⊂H.OpenTable colTitles CalcTableWidth data
  html,←⊂'<thead>'

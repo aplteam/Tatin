@@ -1,0 +1,9 @@
+ r←EscapeAttributeValue text
+⍝ Escapes `text` for use as the value of an HTML attribute written in double quotes.
+⍝ `EscapeSpecialChars` sees to &, < and > but not to the double quote, which would end the
+⍝ attribute early and turn whatever follows into markup of its own. That matters here
+⍝ because the text comes from a package config, so it is written by somebody else.
+⍝ The order is not arbitrary: & is escaped first, by `EscapeSpecialChars`, so the & of the
+⍝ "&quot;" put in afterwards is not escaped a second time.
+ r←'"'⎕R'\&quot;'⊣EscapeSpecialChars text            ⍝ \& because a bare & means the whole match
+⍝Done

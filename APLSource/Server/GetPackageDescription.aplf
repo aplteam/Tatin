@@ -1,0 +1,15 @@
+ r←GetPackageDescription packagePath;cfg;qdmx
+⍝ Returns the "description" of the package in `packagePath`, or '' when it has none.
+⍝ A package published before the field existed simply has nothing to say, and that is no
+⍝ reason to make a fuss: the page then carries no description either.
+ r←''
+ :Trap 11 19 22 Reg.ErrorNo
+     cfg←Reg.GetPackageConfigFileAsNS packagePath
+ :Else
+     qdmx←⎕DMX
+     LogError'Cannot read the package config in "',packagePath,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+     :Return
+ :EndTrap
+ :If 0<cfg.⎕NC'description'
+     r←cfg.description
+ :EndIf

@@ -1,0 +1,12 @@
+ r←GetMetaDescription description
+⍝ Returns the <meta name="description"> tag for a package page, ready to be passed to
+⍝ `HtmlHeader` as ⍵, or '' when there is nothing to say.
+⍝ It travels in ⍵ rather than in a new item of ⍺ because ⍵ is precisely what ⍵ is for:
+⍝ whatever else belongs in the head of this particular page.
+⍝ Search engines often write their own snippet rather than use this, but a description
+⍝ written by the package's author beats anything that could be invented here, and it is the
+⍝ text a reader sees under the link before deciding whether to follow it.
+ r←''
+ :If 0<≢description
+     r←⊂'<meta name="description" content="',(EscapeAttributeValue description),'">'
+ :EndIf

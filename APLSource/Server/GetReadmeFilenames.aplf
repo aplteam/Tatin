@@ -7,6 +7,10 @@
 ⍝ * `cfgFilename` holds where it came from and whether it was found at all. It is written
 ⍝   whatever the outcome, so that "we looked and there is none" can be told apart from
 ⍝   "nobody has looked yet", which is what the backfill needs to know.
+⍝ Deleting `cfgFilename` makes that package due again - but only for the next walk over the
+⍝ Registry, and `ReadmesAreDue` starts one only when something has been published or a day
+⍝ has gone by. It does not look at these files, so deleting them starts nothing by itself.
+⍝ To have a package fetched now, run `BackfillReadmes`, which asks each package directly.
 ⍝ These are deliberately not part of "apl-package.json": that file belongs to whoever
 ⍝ published the package, is shown as-is on the "details" page and follows a schema.
 ⍝ They are no part of the ZIP the client gets either, which is built when a package is

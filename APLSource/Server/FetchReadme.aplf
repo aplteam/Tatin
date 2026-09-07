@@ -1,4 +1,4 @@
- (status sourceUrl markdown)←FetchReadme(projectUrl version);urls;i;u;c;q;resp;answered;maxSize
+ (status sourceUrl markdown)←FetchReadme(projectUrl version);urls;i;u;c;q;resp;answered;maxSize;rawUrl;blobUrl;text
 ⍝ Fetches a package's README from GitHub, keyed on the release's own tag. Returns one of:
 ⍝ * ('ok' sourceUrl markdown) - found
 ⍝ * ('none' '' '')            - GitHub answered and there is no README to be had
@@ -7,14 +7,6 @@
 ⍝ 'none' is a fact about the repository and stands, while 'error' says only that this
 ⍝ attempt failed, and writing it down as 'none' would bake a network hiccup into the
 ⍝ Registry for good.
-⍝ Rumba is used rather than HttpCommand: HttpCommand belongs to the client, and although it
-⍝ currently finds its way into the server workspace as well, that is an accident and no
-⍝ foundation to build on. Rumba is already there on purpose - `CreateAllRefs` aliases it as
-⍝ `R` - and its client side speaks TLS, which is all this needs.
-⍝ Rumba reports a connection that failed by signalling 345 rather than by a return code, so
-⍝ "GitHub answered" simply means a response came back at all. 345 is the only number it
-⍝ uses for that - `CongaError` maps every Conga return code onto it - so that is all that is
-⍝ trapped here, and anything else is a fault in this code and had better be seen.
 ⍝ A failed connection is not logged: it is recorded against the package as 'error' instead,
 ⍝ where it belongs, and logging every timeout would bury the log during a GitHub outage.
  (status sourceUrl markdown)←'error' '' ''
@@ -25,10 +17,11 @@
      status←'none'                                  ⍝ Nowhere to look is not a network problem
      :Return
  :EndIf
- :For i :In ⍳≢urls
+ :For i :In ⍳≢urls                                  ⍝ Loop over different spelling: first v{n1}.{n2}.{n3} then {n1}.{n2}.{n3}
      :Trap 345                                      ⍝ Rumba turns every failed connection into 345
-         u←R.ParseURI i⊃urls[;1]
-         c←R.NewClient u
+         (rawUrl blobUrl)←urls[i;]
+         u←R.ParseURI rawUrl
+         c←R.NewClient rawUrl
          c.CongaTimeout←3000                        ⍝ Milliseconds; raw.githubusercontent is a CDN
          c.ClientTimeout←10                         ⍝ Seconds, for the exchange as a whole
          q←R.NewRequest u.Resource
@@ -40,7 +33,9 @@
      :If 200=resp.StatusCode
      :AndIf 0<≢resp.Content
      :AndIf maxSize≥≢resp.Content
-         (status sourceUrl markdown)←'ok'(i⊃urls[;2])resp.Content
+     ⍝ What arrives is bytes, not text; see `Utf8ToText` for why it has to be decoded here.
+     :AndIf 0<≢text←Utf8ToText resp.Content
+         (status sourceUrl markdown)←'ok'blobUrl text
          :Return
      :EndIf
  :EndFor

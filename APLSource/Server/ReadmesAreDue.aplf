@@ -6,6 +6,9 @@
 ⍝ Anything else and this returns 0 having done a single stat, whatever the size of the
 ⍝ Registry. The walk itself is expensive - a config and a record read per package - so it
 ⍝ must not happen on every housekeeping call.
+⍝ Note what this means for anybody clearing README records by hand: deleting them does not
+⍝ start a walk, because nothing here looks at them. Delete the sweep record as well, or run
+⍝ `BackfillReadmes`, which does not consult this function at all.
 ⍝ The record holds `indexStamp` (the index file's timestamp as at the last completed walk)
 ⍝ and `lastSweep` (when that walk finished), both in seconds. No record means never walked.
  r←1

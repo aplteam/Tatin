@@ -1,5 +1,6 @@
- html←PrepareHtmlPageForPackageDetails(ID json url version);ID_;major;majorMinor
- html←(⍬('Details of ',ID))HtmlHeader''
+ html←PrepareHtmlPageForPackageDetails(ID json url version canonical);ID_;major;majorMinor
+⍝ `canonical` points at the "versions" page for this major line; see `GetCanonicalLink`.
+ html←(⍬('Details of ',ID))HtmlHeader canonical
  :Select version
  :Case 'full'
      html,←⊂'<h2>Details of &lt;',ID,'&gt;</h2>'

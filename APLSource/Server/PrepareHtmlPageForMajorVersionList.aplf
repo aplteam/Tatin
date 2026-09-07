@@ -1,5 +1,8 @@
  html←PrepareHtmlPageForMajorVersionList(packageID data);colTitles
- html←(⍬ packageID)HtmlHeader ''
+⍝ Not indexed: this page is a list of links and has no content of its own, nor any prospect
+⍝ of any. A crawler is still welcome to follow the links out of it - "noindex" alone leaves
+⍝ "follow" at its default - and a visitor sees no difference.
+ html←(1 packageID)HtmlHeader ''
  html,←⊂'<h2>Major versions of "',packageID,'"</h2>'
  html,←AddSpecialMessage ⍬
  colTitles←'Package name' 'Major version' 'Number of<br>minor versions'

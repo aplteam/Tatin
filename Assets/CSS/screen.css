@@ -461,10 +461,24 @@ input[type="submit"]:hover {
 }
 
 /* Created by JavaScript, so it is only ever here when it can actually do something */
-/* Drawn, not a character, so only its position needs saying here */
+/* Drawn, not a character, so only its position needs saying here. The nudge lifts the
+   drawing off the descender line so that its foot sits on the underline of the link
+   rather than a pixel below it. */
 .jump-arrow {
+    position: relative;
+    bottom: 2px;
     margin-left: 0.15em;
     vertical-align: text-bottom;
+}
+
+/* Both icons run right up to the edge of their 16x16 viewBox, and an SVG viewport clips at
+   its boundary. Sitting inline after text, they land on fractional pixel positions, and the
+   antialiasing of the outermost edge is then cut off - which is why the right-hand side of
+   the copy icon came out a pixel thinner than the other three. Letting them paint outside
+   costs nothing: there is nothing else there. */
+.copy-btn svg,
+.jump-arrow {
+    overflow: visible;
 }
 
 .copy-btn {

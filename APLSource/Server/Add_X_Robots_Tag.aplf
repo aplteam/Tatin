@@ -1,0 +1,8 @@
+ r←Add_X_Robots_Tag INI;data
+⍝ Check whether the INI file carries a non-empty [CONFIG]X_Robots_Tag and returns it
+⍝ in a propert format so that it can be added to an HTTP header via Rumba.
+ r←''
+ data←''INI.Get'CONFIG:X_Robots_Tag'
+ :If 0<≢data
+     r←'X-Robots-Tag'(⊃data)
+ :EndIf

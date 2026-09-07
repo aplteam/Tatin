@@ -71,9 +71,16 @@ body {
     padding: var(--space-4);
     font-family: var(--font-ui);
     font-size: clamp(1rem, 0.96rem + 0.25vw, 1.125rem);
-    line-height: 1.55;
+    line-height: 1.44;
     color: var(--color-text);
     -webkit-text-size-adjust: 100%;
+}
+
+/* Nothing styled <p>, so paragraphs took the browser's 1em above and below, which is more
+   air than this site wants. Kept above the leading of 1.55 all the same, so that one
+   paragraph still reads as ending before the next begins. */
+p {
+    margin: var(--space-3) 0;
 }
 
 img {
@@ -154,6 +161,15 @@ h2 {
 
 h3 { font-size: 1.05rem }
 h4, h5, h6 { font-size: 1rem }
+
+/* The browser default is symmetrical - and em-based, which assumes each level is set in a
+   smaller font than the one above. Here H4 to H6 are all 1rem, so those defaults come out
+   as 1.33, 1.67 and 2.33rem: the deeper the heading, the more air around it, which is
+   backwards. One rule for all four instead, and the space below is halved so that a
+   heading sits closer to the text it owns than to whatever came before it. */
+h3, h4, h5, h6 {
+    margin: var(--space-4) 0 var(--space-2) 0;
+}
 
 ul li, ol li {
     margin: 0.6em 0;
@@ -422,14 +438,59 @@ input[type="submit"]:hover {
 .install-info {
     position: relative;
     float: right;
-    max-width: 300px;
+    /* A float shrinks to its content, so no width is set: the box comes out exactly as
+       wide as the install command needs. The cap stops a very long package ID from
+       taking the whole line. */
+    max-width: min(100%, 44em);
     height: auto;
     margin: var(--space-3) 0 var(--space-4) var(--space-5);
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-1) var(--space-4);
     border: 2px solid gray;
     border-radius: var(--radius-sm);
     background-color: var(--color-note);
     box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;
+}
+
+/* The command is there to be copied, so it must not be broken across lines */
+.install-info code {
+    white-space: nowrap;
+    /* Let the box's own colour through and drop the padding that goes with it, exactly as
+       `pre code` does - which also lines the command up with the paragraphs around it */
+    background: none;
+    padding: 0;
+}
+
+/* Created by JavaScript, so it is only ever here when it can actually do something */
+/* Drawn, not a character, so only its position needs saying here */
+.jump-arrow {
+    margin-left: 0.15em;
+    vertical-align: text-bottom;
+}
+
+.copy-btn {
+    margin-left: 1em;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    line-height: 1;
+    /* Line the top of the icon up with the top of the text rather than letting it sit on
+       the baseline, where a 16px square looks as though it has sunk. */
+    vertical-align: text-top;
+}
+
+/* Nothing styles <p>, so these would take the browser's 1em, which is far too airy for a
+   box of three short lines. The padding above and below is left to the box itself. */
+.install-info p {
+    margin: var(--space-1) 0;
+}
+
+.install-info p:first-child {
+    margin-top: 0;
+}
+
+.install-info p:last-child {
+    margin-bottom: 0;
 }
 
 /* --- Small screens --------------------------------------------- */

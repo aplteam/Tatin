@@ -1,0 +1,26 @@
+ r←GetInstallInfo(packageID noOfReleases);plural;major;jumpArrow
+⍝ Returns the little box that sits at the top right of a package page, as a vector of
+⍝ character vectors: how to install the package, and a link down to the list of releases.
+⍝ It exists because of what that list is actually wanted for. Almost everybody scrolling to
+⍝ it wants one of two things - the newest version, or the command to install it - and both
+⍝ are answered here, at the top. The list itself is then what it should be: the full history,
+⍝ reference material, and no reason to put it in front of the documentation.
+⍝ `packageID` names the major version line rather than a single release, which is what one
+⍝ wants to install: it always resolves to the newest release in that line.
+⍝ "[tatin]" is the alias of the Registry the package is to come from, and <target-folder>
+⍝ is what the user has to replace: the command is an example to copy, not one to run blind.
+⍝ The class "install-info" is already defined in "screen.css" - a floated note box - and was
+⍝ waiting for a user.
+ plural←(1≠noOfReleases)/'s'
+⍝ An arrow to a bar - go to the bottom, rather than merely down - drawn rather than taken
+⍝ from a font. No character was a good choice here: U+2193 is APL's `drop` and reads as a
+⍝ primitive on a site full of APL, while the ones that are not APL are not covered by every
+⍝ font either. Drawn in the style of the copy icon beside it, and it inherits the text
+⍝ colour through fill="currentColor".
+ jumpArrow←'<svg class="jump-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M13.03 8.28a.75.75 0 0 0-1.06-1.06L8.75 10.44V1.75a.75.75 0 0 0-1.5 0v8.69L4.03 7.22a.75.75 0 0 0-1.06 1.06l4.5 4.5a.75.75 0 0 0 1.06 0Z"></path><path d="M2.75 14.5h10.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5Z"></path></svg>'
+ major←⊃⌽'-'A.Split packageID                       ⍝ "aplteam-WinReg-6" -> "6"
+ r←⊂'<div class="install-info">'
+ r,←⊂'<p>Install with:</p>'
+ r,←⊂'<p><code id="install-cmd">]TATIN.InstallPackages [tatin]',(EscapeSpecialChars packageID),' &lt;target-folder&gt;</code></p>'
+ r,←⊂'<p><a href="#releases">',(⍕noOfReleases),' release',plural,' for major version ',major,' &mdash; Jump ',jumpArrow,'</a></p>'
+ r,←⊂'</div>'

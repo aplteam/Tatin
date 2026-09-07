@@ -39,7 +39,11 @@
  parms.checkLinks←0                                 ⍝ Broken links in a README are not our business
  parms.toc←0
  (html ns)←parms ##.MarkAPL.Markdown2HTML lines
- html←DemoteHeadings html
+⍝ Two levels, not one: the page already has an H1 of its own (the Registry's caption) and
+⍝ an H2 (what the page is about), so a README's headings belong at H3 and below. That also
+⍝ keeps them clear of "clear: both", which screen.css puts on every H2 and which would stop
+⍝ the text flowing beside the floating install box.
+ html←2 DemoteHeadings html
  html←prefix PrefixReadmeIds html
  (group repo tag)←ParseReadmeSourceUrl sourceUrl
  html←(group repo tag)ResolveReadmeLinks html

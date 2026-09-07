@@ -1,0 +1,37 @@
+ r←GetJavaScriptForCopyButton dummy;copyCaption;copiedCaption
+⍝ Returns the JavaScript that puts a "copy to clipboard" button next to the install command,
+⍝ ready to be handed to `HtmlHeader` as part of ⍵.
+⍝ The button is created here rather than in the HTML, which is what MarkAPL does for its code
+⍝ blocks (see `MarkAPL.GetCopyCodeJavaScript`) and for the same reason: where there is no
+⍝ clipboard to write to - a Registry served over plain http, an old browser - no button
+⍝ appears at all, rather than one that does nothing when pressed.
+⍝ The icon is the two-sheets SVG that MarkAPL uses for the same job, copied rather than
+⍝ taken from `MarkAPL.CreateParms`: the MarkAPL that ships inside Tatin is older and still
+⍝ defaults `copyCaption` to the word "Copy". Worth replacing that copy with a reference
+⍝ once Tatin's MarkAPL has caught up.
+⍝ It goes in as `innerHTML`, being markup rather than text, and so does the tick.
+⍝ MarkAPL's SVG carries style="vertical-align:text-bottom" inline; that is dropped here,
+⍝ because an inline style cannot be overridden from a stylesheet without !important, and
+⍝ where the icon sits is a question for "screen.css", not for this string.
+ copyCaption←'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>'
+ copiedCaption←⎕UCS 10003                           ⍝ A tick, shown briefly after copying
+ r←⊂'<script>'
+ r,←⊂'var copyLabel = `',copyCaption,'`;'
+ r,←⊂'document.addEventListener("DOMContentLoaded", function () {'
+ r,←⊂'    if (!navigator.clipboard) { return; }'
+ r,←⊂'    var code = document.getElementById("install-cmd");'
+ r,←⊂'    if (!code) { return; }'
+ r,←⊂'    var button = document.createElement("button");'
+ r,←⊂'    button.type = "button";'
+ r,←⊂'    button.className = "copy-btn";'
+ r,←⊂'    button.innerHTML = copyLabel;'
+ r,←⊂'    button.title = "Copy the command to the clipboard";'
+ r,←⊂'    code.insertAdjacentElement("afterend", button);'
+ r,←⊂'    button.addEventListener("click", function () {'
+ r,←⊂'        navigator.clipboard.writeText(code.innerText).then(function () {'
+ r,←⊂'            button.innerHTML = "',copiedCaption,'";'
+ r,←⊂'            setTimeout(function () { button.innerHTML = copyLabel; }, 700);'
+ r,←⊂'        });'
+ r,←⊂'    });'
+ r,←⊂'});'
+ r,←⊂'</script>'

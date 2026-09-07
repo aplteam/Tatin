@@ -1,0 +1,25 @@
+ r←GetMainMenu dummy;items
+⍝ Returns the main menu as a vector of character vectors.
+⍝ `HtmlHeader` puts it on every page, which is what allows the home page to be about the
+⍝ Registry rather than a list of links to the rest of it.
+⍝ The administrative pages - credential report, usage data, version information - are not
+⍝ here but in the footer: they are for whoever runs the server rather than whoever visits it,
+⍝ and "robots.txt" keeps crawlers away from them in any case.
+⍝ There is no marking of the page one is on. `HtmlHeader` does not know which page it is
+⍝ building, and telling it would mean another item in ⍺ and a change to every caller for
+⍝ something a menu of six barely needs.
+ items←''
+ items,←⊂'/packages' 'Packages'
+ items,←⊂'/deprecated-pkgs' 'Deprecated'
+ items,←⊂'/groups' 'Groups'
+ items,←⊂'/tags' 'Tags'
+ :If G.INI.Exist'LICENSE:names'
+ :AndIf 0<≢⊃G.INI.Get'LICENSE:names'
+     items,←⊂'/get-licenses' 'Licensing'
+ :EndIf
+ r←⊂'<nav id="main-menu">'
+ r,←⊂'<ul>'
+ r,←{'<li><a href="',Reg.VersionOf_REST,(1⊃⍵),'">',(2⊃⍵),'</a></li>'}¨items
+ r,←⊂'<li><a href="https://aplteam.github.io/Tatin/">Documentation</a></li>'
+ r,←⊂'</ul>'
+ r,←⊂'</nav>'

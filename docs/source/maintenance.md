@@ -16,7 +16,7 @@ Tatin automates this through maintenance jobs — APL function files placed in t
 
 The most important maintenance job is to curate the tags.
 
-Tags can be very useful for finding a package, but package authors may use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, or tags that make no sense, such as the group name or `dyalog` etc.
+Tags can be useful for finding a package, but package authors may use different tags for the same thing, use legal but different spelling (UK versus US) or invalid spelling, or tags that make no sense, such as the group name or `dyalog` etc.
 
 To be useful, tags need curating.
 
@@ -61,6 +61,45 @@ Note that the user command `]Maintenance` serves a different purpose: It can be 
 
 
 
+## READMEs
+
+Every package page shows the README of the newest release of that major version line. The server fetches those from GitHub itself; [Publish a package](publish-packages.md#the-readme-on-the-package-page) states what a package has to do to qualify.
+
+Three files hold the result, and all three belong to the server rather than to any package:
+
+| File | Where | What it holds |
+|---|---|---|
+| `apl-readme.md` | in a package folder | The Markdown, when there is any |
+| `apl-readme.json` | in a package folder | Where it came from, and whether it was found at all |
+| `apl-readme-sweep.json` | in the root of the registry | When the registry was last walked |
+
+`apl-package.json` is never touched, and none of these files is part of a package: the ZIP a client downloads is built when the package is published and takes no notice of its neighbours.
+
+The server looks for READMEs when something has been published, and once a day in any case. A package that could not be fetched is tried three times altogether: at once, 24 hours later and a week after the first attempt.
+
+### Fetching a README again
+
+Deleting a package's `apl-readme.json` marks that package as one to look at again.
+
+!!! danger "Deleting records does not start anything by itself"
+
+    Whether the registry is walked at all is decided by `apl-readme-sweep.json`, and that takes no notice of the per-package files. Deleting them and waiting achieves nothing until the next walk comes round anyway.
+
+    To have it happen now, run
+
+    ```apl
+    #.Tatin.Server.BackfillReadmes #.Tatin.Server.G.RegistryPath
+    ```
+
+    It asks every package directly and ignores the sweep record. Deleting `apl-readme-sweep.json` as well works too, and makes the next housekeeping call walk the registry.
+
+The same call is what to run on a registry that already holds hundreds of packages, rather than waiting for the daily walk to work through them. A `1` as left argument makes it a dry run, reporting what it would fetch and touching nothing:
+
+```apl
+1 #.Tatin.Server.BackfillReadmes #.Tatin.Server.G.RegistryPath
+```
+
+
 ## Update the server
 
 Download the release ZIP from the [Releases](https://github.com/aplteam/Tatin/releases) page into a temporary folder and unzip it.
@@ -78,7 +117,7 @@ This makes for an easy update if no other action is required.
 The automatic update can be switched off in the INI file with `[CONFIG]ReloadWS`.
 
 While reloading the workspace, the server returns error messages.
-Expect this to last 10 seconds or more, depending on the number of packages managed.
+Expect this to last 10-30 seconds, depending on the number of packages managed.
 
 
 ### The INI file
@@ -97,7 +136,8 @@ Again, the release note will tell.
 ### Assets
 
 The release note describes what action to take, if any.
-Often the subfolder `docs/` is to be replaced. (Contains the documentation.)
+
+Whether `Assets/` needs updating or just one (or some) of its sub folders, it's always best to upload them as, say, `Assets_`, then delete the original and finally rename `Assets_` to `Assets`. This is because otherwise stale files will survive and one day cause confusion or worse.
 
 
 ### Maintenance folder
@@ -109,6 +149,7 @@ Often the subfolder `docs/` is to be replaced. (Contains the documentation.)
 
 If the new folder is not empty, copy its contents over.
 Maintenance files can be used to carry out changes to all or some of the packages managed by the server, like adding a new property to the package config files of all packages.
+
 
 
 

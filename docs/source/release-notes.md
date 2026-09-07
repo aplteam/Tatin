@@ -20,7 +20,7 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
 
 * This is a server-only release: the client side of Tatin has not changed at all.
 
-* Replace the `Assets/` folder in the root of your Tatin server with the one that comes with this version.
+* Replace the `Assets/` folder in the root of your Tatin server with the one that comes with this version. Replace rather than copy over, and see [Assets](maintenance.md#assets) for how to go about it: files were added in this version, and a plain copy leaves whatever it does not overwrite behind.
 
   Until now jQuery and the DataTables extension were loaded from a CDN. They are now served from `Assets/` instead, so that a Registry without access to the internet gets working tables as well. Two new files are involved and they live in two different folders:
 
@@ -30,6 +30,18 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
   ```
 
   Copying only one of them fails quietly: with the JavaScript in place but the CSS missing, tables still sort and the filter box still works, while the sort markers in the column captions have disappeared.
+
+* Package pages now carry the README of the package, and a number of changes were made so that search engines can make sense of a Registry at all. What these are and what each of them is for is described in [Search engines](search-engines.md).
+
+  Two things are worth doing after the upgrade:
+
+    * Run `Server.BackfillReadmes` once. READMEs are otherwise fetched by housekeeping, which walks the Registry when something has been published or once a day, so an established Registry would take a while to fill up on its own.
+
+    * If your server sits behind a reverse proxy, make sure `CONFIG:BaseURL` is set. It was introduced in 0.125.1 for the sitemap, and the canonical links added with this version need it just as much: without it they would name the wrong protocol.
+
+  Note also that every page carries a title of its own now. Until this version all pages of a Registry shared one and the same title, which left anybody looking at a column of identical search results with no way of telling them apart.
+
+  Do not expect a quick effect. Re-indexing is measured in weeks rather than days, and the change to watch for in Google Search Console is counter-intuitive: "Crawled - currently not indexed" should fall, while "Alternate page with proper canonical tag" rises by about as much. That is the "details" pages moving from "we looked at this and decided not to keep it" to "we know what this is a copy of". It reads like losing pages. It is what is supposed to happen.
 
 ## v0.125.1 ⋄ 2026-09-02
 

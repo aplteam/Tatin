@@ -63,6 +63,29 @@ Tatin calls the APL files _source_ and the others _assets_.
     On success, Tatin reports `Package published on <URL>`.
 
 
+## The README on the package page
+
+The page for your package on a Tatin registry shows the README of your package, so that anybody finding it can see what the package does without leaving the registry. It is also what makes the page worth finding at all; see [Search engines](search-engines.md).
+
+Nothing needs to be added to `apl-package.json` for this. The registry fetches the README from GitHub by itself, and three conditions have to hold:
+
+*   `project_url` names a GitHub repository, `https://github.com/aplteam/HttpCommand` for example. Nothing else is supported, though that may change over time.
+
+*   The release is tagged. Both `v1.2.3` (the suggested format) and `1.2.3` are looked for, in that order.
+
+*   The file is called `README.md`, spelled exactly like that. The GitHub website treats `readme.md` and `README.md` as the same file, but the server that hands out the raw file does not.
+
+The README is taken from the tag of that very release rather than from the default branch, so what a visitor reads belongs to the release it describes.
+
+A package page covers one major version line, and shows the README of the newest release in that line. Publishing a new release therefore replaces what that page shows, while a line that a newer major version has succeeded keeps the documentation that was current while it was maintained.
+
+!!! detail "Tag before you publish"
+
+    Fetching happens after the package has been accepted and stored, so publishing never waits for GitHub and never fails because of it. The attempt is repeated twice if it does not succeed: 24 hours later, and a week after the first attempt.
+
+    A tag pushed within a week of publishing is therefore picked up on its own. A tag pushed later than that is not, and the registry's owner has to ask for the README to be fetched again.
+
+
 ## Dependencies
 
 ### Location
@@ -160,4 +183,5 @@ A registry’s [delete policy](user-commands-publish.md#get-delete-policy) contr
 -   `None` – you cannot delete any packages at all
 
 Each server-hosted registry publishes its delete policy on its [home page](https://tatin.dev).
+
 

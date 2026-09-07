@@ -131,6 +131,25 @@ Two things are worth knowing. It hides nothing: `details` pages stay reachable, 
 Note that this page is *not* disallowed in `robots.txt`, and that is deliberate: see the trap in [Crawling, indexing and ranking](#crawling-indexing-and-ranking).
 
 
+## Telling search engines at once: IndexNow
+
+Everything above is passive. A sitemap says "here are my pages, come when you like", and then you wait. Publish a package at noon and its page may not be looked at for days.
+
+IndexNow turns that round: the site announces a URL that has changed. Bing and Yandex run it, and Seznam, Naver and Yep take part. **Google does not**, so this makes discovery quicker on some search engines rather than on all of them. It is worth rather more than that sounds, because Bing's index is what DuckDuckGo and Ecosia serve from and what several AI assistants search.
+
+Two INI entries switch it on:
+
+`CONFIG:IndexNowKey`
+: Any hex string of 8 to 128 characters. Empty means off.
+
+`CONFIG:BaseURL`
+: Required as well. IndexNow wants absolute URLs, and the announcement is made in the background where there is no request to work the public host out from.
+
+Nothing else needs setting up. The protocol proves that whoever announces a URL controls the site by asking for a file named after the key, holding the key; Tatin serves that from the INI entry, so there is no file to create and the two can never disagree. With a key of `a1b2c3`, `https://your.registry/a1b2c3.txt` returns `a1b2c3`.
+
+What is announced, and when: after something has been published, the package page of every major version line published since the last announcement, plus the home page and the package list, which both show what is new. The first run after switching this on announces nothing - it notes the time and stops - so that turning it on does not fire off one URL per package in the Registry.
+
+
 ## Keeping a registry out
 
 A registry on the internet that is not meant to be found, a test or staging server or one serving a single company, should say so rather than trust that nobody links to it.
@@ -153,4 +172,5 @@ A server that should disappear entirely needs both. Neither prevents access: the
 | `CONFIG:BaseURL` | `''` | The URL the outside world uses. Needed for a correct sitemap behind a proxy |
 | `CONFIG:NoIndexing` | `0` | 1 puts `noindex` on every HTML page |
 | `CONFIG:X_Robots_Tag` | `''` | Set to `noindex` to keep non-HTML resources out as well |
+| `CONFIG:IndexNowKey` | `''` | A key switches IndexNow on; needs `CONFIG:BaseURL` as well |
 

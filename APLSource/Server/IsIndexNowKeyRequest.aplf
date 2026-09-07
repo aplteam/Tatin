@@ -1,0 +1,10 @@
+ r←IsIndexNowKeyRequest path;key
+⍝ Tells whether `path` is the request for the IndexNow key file.
+⍝ IndexNow proves that whoever announces a URL controls the site by asking for a file named
+⍝ after the key, holding the key. Serving it from the INI entry rather than from a file on
+⍝ disk means there is only one place to change the key, and the two can never disagree.
+ r←0
+ :If 0<≢key←GetIndexNowKey
+     r←path≡'/',key,'.txt'
+ :EndIf
+⍝Done

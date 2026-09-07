@@ -58,6 +58,18 @@
          :Else
              LogError'Could not start the README thread: ',⎕DMX.EM
          :EndTrap
+        ⍝ Announcing changed pages to IndexNow, in a thread of its own for the same reasons
+        ⍝ and with the same guard. It decides for itself whether there is anything to do.
+         :If 0=⎕NC'∆INDEXNOW_TID'
+             ∆INDEXNOW_TID←¯1
+         :EndIf
+         :Trap 0
+             :If ~∆INDEXNOW_TID∊⎕TNUMS
+                 ∆INDEXNOW_TID←PingIndexNow&G.RegistryPath
+             :EndIf
+         :Else
+             LogError'Could not start the IndexNow thread: ',⎕DMX.EM
+         :EndTrap
      :EndIf
  :Else
      qdmx←⎕DMX

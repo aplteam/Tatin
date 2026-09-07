@@ -1,0 +1,10 @@
+ RecordIndexNowPing(registryPath indexStamp noOfUrls);ns
+⍝ Notes what was last announced to IndexNow; see `PingIndexNow` for the fields.
+⍝ `indexStamp` is what the index file's timestamp was when the announcement was prepared, so
+⍝ that a package published while it was going out is announced next time rather than missed.
+ ns←⎕NS''
+ ns.indexStamp←indexStamp
+ ns.lastPing←Reg.FormatFloatDate⊃60 ⎕DT⊂⎕TS         ⍝ Same shape as a publishing date, so the two compare
+ ns.pinged←noOfUrls
+ ((Reg.JSON ns)'UTF-8')⎕NPUT(GetIndexNowFilename registryPath)1
+⍝Done

@@ -1,0 +1,24 @@
+ r←SubmitToIndexNow(url key);u;c;q;resp;endpoint
+⍝ Announces a single URL to IndexNow and returns the HTTP status, or 0 when nothing came
+⍝ back. Submitting to one participating search engine shares it with the others, so one
+⍝ request per URL is all that is wanted.
+⍝ 200 and 202 both mean accepted - 202 says the key is still being checked. Anything else is
+⍝ logged: a 403 means the key file cannot be read back, which is worth knowing about because
+⍝ nothing else would ever show it.
+ r←0
+ endpoint←'https://api.indexnow.org/indexnow?url=',(R.PercentEncode url),'&key=',key
+ :Trap 345                                          ⍝ Rumba turns every failed connection into 345
+     u←R.ParseURI endpoint
+     c←R.NewClient endpoint
+     c.CongaTimeout←3000
+     c.ClientTimeout←10
+     q←R.NewRequest u.Resource
+     resp←⊃c R.SendAndReceive q
+ :Else
+     :Return                                        ⍝ Unreachable; the next publish tries again
+ :EndTrap
+ r←resp.StatusCode
+ :If ~r∊200 202
+     LogError'IndexNow refused "',url,'" with status ',⍕r
+ :EndIf
+⍝Done

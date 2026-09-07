@@ -1,0 +1,70 @@
+ PingIndexNow registryPath;key;baseURL;stamp;ns;filename;lastPing;list;new;urls;url;maxUrls;qdmx
+⍝ Tells IndexNow about the pages that changed since the last time it was told.
+⍝ IndexNow is a protocol by which a site announces a changed URL instead of waiting to be
+⍝ crawled. Bing and Yandex run it, and Seznam, Naver and Yep take part; Google does not, so
+⍝ this speeds up discovery on some search engines rather than on all of them.
+⍝ `OnHouseKeeping` starts this as a thread, so nothing waits for it, and only one runs at a
+⍝ time. It traps everything for the same reason `ProcessReadmes` does: an untrapped error
+⍝ would suspend the thread, and a suspended thread keeps its number in ⎕TNUMS for ever.
+⍝ Two INI entries are needed. Without `CONFIG:IndexNowKey` the feature is off. Without
+⍝ `CONFIG:BaseURL` it cannot work either: IndexNow wants absolute URLs, and a thread has no
+⍝ request to work the public host out from.
+⍝ The record holds `indexStamp` (the index file's timestamp when last announced), `lastPing`
+⍝ (when that was) and `pinged` (how many URLs went out). No record means nothing has been
+⍝ announced yet, and the first run announces nothing: it notes the time and stops, so that
+⍝ switching the feature on does not fire off one URL per package in the Registry.
+ maxUrls←50                                         ⍝ A publish adds one page; more than this is a bulk import
+ :Trap 0
+     :If 0=≢key←GetIndexNowKey
+         :Return
+     :EndIf
+     :If 0=≢baseURL←⊃''G.INI.Get'CONFIG:BaseURL'
+         :Return
+     :EndIf
+     baseURL←(-'/'=¯1↑baseURL)↓baseURL
+     stamp←GetIndexStamp registryPath
+     filename←GetIndexNowFilename registryPath
+     ns←⍬
+     :If F.IsFile filename
+         :Trap 11 19 22
+             ns←⎕JSON⍠('Dialect' 'JSON5')⊣⊃F.NGET filename
+         :Else
+             qdmx←⎕DMX
+             LogError'Unreadable IndexNow record "',filename,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+         :EndTrap
+     :EndIf
+     :If ⍬≡ns                                       ⍝ Never announced anything: start the clock, say nothing
+         RecordIndexNowPing registryPath stamp 0
+         :Return
+     :EndIf
+     :If stamp=⊃{0=ns.⎕NC ⍵:0 ⋄ ns⍎⍵}'indexStamp'   ⍝ Nothing published since we last looked
+         :Return
+     :EndIf
+     lastPing←{0=ns.⎕NC ⍵:'' ⋄ ns⍎⍵}'lastPing'
+     :If 0=≢lastPing                                ⍝ A record without one: start the clock instead
+         RecordIndexNowPing registryPath stamp 0
+         :Return
+     :EndIf
+     list←1 Reg.GetAllPackages registryPath         ⍝ [;1]=package ID, [;2]=publishing date
+⍝ Both are "YYYY-MM-DD hh:mm:ss". They cannot be compared as they stand - characters have no
+⍝ order in APL, only = and ≠ - so the punctuation comes out and what is left is a number.
+     new←(({⍎⍵~'- :'}¨list[;2])>⍎lastPing~'- :')/list[;1]
+     :If 0=≢new
+         RecordIndexNowPing registryPath stamp 0
+         :Return
+     :EndIf
+⍝ The pages that changed: one per major version line, plus the two that list what is new.
+     urls←∪{baseURL,Reg.VersionOf_REST,'/packages/versions/',Reg.RemoveMinorAndPatch ⍵}¨new
+     urls←(maxUrls⌊≢urls)↑urls
+     urls,←baseURL,'/'
+     urls,←⊂baseURL,Reg.VersionOf_REST,'/packages'
+     :For url :In urls
+         {}SubmitToIndexNow url key
+     :EndFor
+     RecordIndexNowPing registryPath stamp(≢urls)
+ :Else
+     qdmx←⎕DMX
+     LogError'Announcing to IndexNow stopped: ',qdmx.EM,'; RC=',⍕qdmx.EN
+ :EndTrap
+ ∆INDEXNOW_TID←¯1
+⍝Done

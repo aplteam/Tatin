@@ -1,27 +1,39 @@
-  response←CreateHomePage request;html;policy;add;regInfo
+  response←CreateHomePage request;html;policy;add;list;noOfReleases;noOfPackages;noOfGroups;baseURL
 ⍝ Creates the index.html
- add←''
+⍝ The list of packages is fetched once and then used twice, for the figures and for the list
+⍝ of recent releases. Fetching it means reading the config of every package in the Registry,
+⍝ which is not something to do twice on one page.
+ add←GetJavaScriptForCopyButton ⍬
  html←HtmlHeader add
  html,←⊂'<h2>Main page</h2>'
  html,←AddSpecialMessage ⍬
  html,←⊂'<p>This is the Tatin Registry. It holds packages designed to be used under Dyalog APL.</p>'
- html,←⊂'<nav>'
- html,←⊂'<ol>'
- regInfo←GetRegistryInfo G.INI
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/packages">',regInfo,'Packages</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/deprecated-pkgs">',regInfo,'Deprecated packages</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/groups">',regInfo,'Groups</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/tags">',regInfo,'Tags</a></li>'
- html,←⊂'<li><a href="https://aplteam.github.io/Tatin/">Documentation</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/credential-report">',regInfo,'Credential report</a></li>'
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/usage-data">',regInfo,'Usage data</a></li>'
- :If G.INI.Exist'LICENSE:names'
- :AndIf 0<≢⊃G.INI.Get'LICENSE:names'
-     html,←⊂'<li><a href="',Reg.VersionOf_REST,'/get-licenses">Licensing</a></li>'
+ html,←⊂'<p>A package is APL code together with everything needed to load it: which versions of'
+ html,←⊂'Dyalog it runs under, what it depends on and under what licence it may be used. Tatin'
+ html,←⊂'installs one into a folder of your choosing and fetches whatever it depends on at the'
+ html,←⊂'same time, so that using somebody else''s code is a single command rather than an'
+ html,←⊂'afternoon.</p>'
+ list←1 Reg.GetAllPackages G.RegistryPath           ⍝ [;1]=package ID, [;2]=publishing date
+ noOfReleases←≢list
+ :If 0<noOfReleases
+     noOfPackages←≢∪Reg.RemoveVersionNumber¨list[;1]
+     noOfGroups←≢∪{⍵↑⍨¯1+⍵⍳'-'}¨list[;1]            ⍝ The group is what comes before the first hyphen
+     html,←⊂'<p class="figures">'
+     html,←⊂'<span class="figure"><b>',(⍕noOfPackages),'</b> packages</span>'
+     html,←⊂'<span class="figure"><b>',(⍕noOfReleases),'</b> releases</span>'
+     html,←⊂'<span class="figure"><b>',(⍕noOfGroups),'</b> groups</span>'
+     html,←⊂'</p>'
  :EndIf
- html,←⊂'<li><a href="',Reg.VersionOf_REST,'/version-information">',regInfo,'Version information</a></li>'
- html,←⊂'</ol>'
- html,←⊂'</nav>'
+ html,←list GetRecentReleases 10
+⍝ What somebody who has just found this Registry needs to know next. The alias cannot be
+⍝ named here: it is whatever the visitor called this Registry in her own user settings.
+ html,←⊂'<h3>Using this Registry</h3>'
+ :If 0<≢baseURL←GetBaseURL request
+     html,←⊂'<p>This Registry lives at <code id="install-cmd">',(EscapeSpecialChars baseURL),'</code>. Check with <code>]TATIN.ListRegistries</code> whether you have it already, and if not add it to your <a href="https://aplteam.github.io/Tatin/user-settings/">user settings</a>.</p>'
+ :EndIf
+ html,←⊂'<p>Packages are then installed with</p>'
+ html,←⊂'<pre><code>]TATIN.InstallPackages [alias]group-name-major &lt;target-folder&gt;</code></pre>'
+ html,←⊂'<p>where <i>alias</i> is the name this Registry goes by on your machine. Every package page carries that command ready to be copied.</p>'
  :Select GetDeletePolicy
  :Case 'Any'
      policy←'This server operates a "delete any" policy: you may delete <b>any</b> package with fitting credentials.'

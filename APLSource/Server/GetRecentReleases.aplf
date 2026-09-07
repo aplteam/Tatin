@@ -1,0 +1,35 @@
+ r←list GetRecentReleases noOf;ind;ids;dates;descriptions;data;colTitles;col1;col2;col3
+⍝ Returns the HTML for a table of the most recently published releases, newest first.
+⍝ ⍺ is what `Reg.GetAllPackages` returned with its publishing dates, ⍵ how many to show.
+⍝ The list is passed in rather than fetched here because the caller wants the same one for
+⍝ the figures it prints, and fetching it means reading the config of every package in the
+⍝ Registry - once is quite enough.
+⍝ The description costs one more config read per row, which is worth it: "what was published
+⍝ and what it does" tells a visitor something, a column of package IDs does not.
+⍝ Each row links to the package page of its major version line rather than to the release
+⍝ itself, that being the page with the documentation on it.
+ r←''
+ :If 0=≢list
+     :Return
+ :EndIf
+ ind←⌽⍋list[;2]                                     ⍝ Dates are strings here, so ⍋ rather than ⍒
+ ind←(noOf⌊≢ind)↑ind                                ⍝ ⌊ because ↑ would pad with zeros, and 0 is no index
+ ids←list[ind;1]
+ dates←10∘↑¨list[ind;2]                             ⍝ The day is enough; the time is noise here
+ descriptions←{GetPackageDescription G.RegistryPath,'/',⍵}¨ids
+ colTitles←'Package' 'Description' 'Published'
+ data←⍉↑ids descriptions dates
+ r,←⊂'<h3>Recently published</h3>'
+ r,←⊂H.OpenTable colTitles CalcTableWidth data
+ r,←⊂'<thead>'
+ r,←⊂'<tr class="my-first-th">'
+ r,←{'<th>',⍵,'</th>'}¨colTitles
+ r,←⊂'</tr>'
+ r,←⊂'</thead>'
+ r,←⊂'<tbody>'
+ col1←{'<td><a href="',Reg.VersionOf_REST,'/packages/versions/',(Reg.RemoveMinorAndPatch ⍵),'"><code>',⍵,'</code></a></td>'}¨ids
+ col2←{'<td>',(EscapeSpecialChars ⍵),'</td>'}¨descriptions
+ col3←{'<td class="nowrap">',⍵,'</td>'}¨dates
+ r,←{'<tr>',⍵,'</tr>'}¨col1,¨col2,¨col3
+ r,←⊂'</tbody>'
+ r,←⊂'</table>'

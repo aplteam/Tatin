@@ -1,0 +1,43 @@
+ r←Test_Server_015(stopFlag batchFlag);⎕TRAP;request;response;ind;key;uri
+⍝ Requests the IndexNow key file and checks that the key switches the feature on and off
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+ uri←TC.ReplaceRegistryAlias'[localhost]'
+
+ ⍝ Without a key the feature is off, so not even "/.txt" is served:
+ request←R.NewRequest 0
+ request.RequestTarget←'/.txt'
+ response←TC.SendAndReceive uri request
+ →T.PassesIf 404=response.StatusCode
+
+ ⍝ Switch it on; the server reports the key it now uses:
+ request←R.NewRequest 0
+ request.RequestTarget←'/v1/setindexnowkey'
+ response←TC.SendAndReceive uri request
+ →T.GoToTidyUp 200≠response.StatusCode
+ key←response.Content
+ →T.GoToTidyUp 0=≢key
+
+ ⍝ Now the key file is served, named after the key and holding just the key:
+ request←R.NewRequest 0
+ request.RequestTarget←'/',key,'.txt'
+ response←TC.SendAndReceive uri request
+ →T.GoToTidyUp 200≠response.StatusCode
+ →T.GoToTidyUp(≢response.Headers)<ind←(⊃¨response.Headers)⍳⊂'content-type'
+ →T.GoToTidyUp~∨/'text/plain'⍷ind 2⊃response.Headers
+ →T.GoToTidyUp key≢response.Content~⎕UCS 13 10
+
+ ⍝ ... but only under exactly that name:
+ request←R.NewRequest 0
+ request.RequestTarget←'/',key,'x.txt'
+ response←TC.SendAndReceive uri request
+ →T.GoToTidyUp 404≠response.StatusCode
+
+ r←T._OK
+
+∆TidyUp:
+ request←R.NewRequest 0
+ request.RequestTarget←'/v1/unsetindexnowkey'
+ response←TC.SendAndReceive uri request
+ 'Could not switch IndexNow off again'Assert 200=response.StatusCode
+⍝Done

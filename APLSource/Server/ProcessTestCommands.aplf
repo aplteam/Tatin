@@ -1,4 +1,4 @@
- response←request ProcessTestCommands path
+ response←request ProcessTestCommands path;key
 ⍝ This function must only be called when G.TestFlag is true
  :If G.INI.Exist'CONFIG:SpecialCommands'
  :AndIf G.INI.Get'CONFIG:SpecialCommands'
@@ -43,6 +43,15 @@
          0 G.INI.Put'CONFIG:MustHaveLicenseFile'
          response←request Respond 200
          response.Content←'MustHaveLicenseFile=0'
+     :Case GetVersion_REST'setindexnowkey'
+         key←'a1b2c3d4e5f60718293a4b5c6d7e8f90'   ⍝ Shaped like a real key: 32 hex digits
+         key G.INI.Put'CONFIG:IndexNowKey'
+         response←request Respond 200
+         response.Content←GetIndexNowKey            ⍝ The test needs to know the key
+     :Case GetVersion_REST'unsetindexnowkey'
+         '' G.INI.Put'CONFIG:IndexNowKey'
+         response←request Respond 200
+         response.Content←'IndexNowKey='
      :Else
          response←request RespondWithHTML 404 'Unknown REST command'
      :EndSelect

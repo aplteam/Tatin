@@ -1,11 +1,13 @@
  response←Handle_GET request;html;packageID;fullPath;path;versionNo
- :If (,'/')≡request.Path
+ :If (,'/')≡,request.Path
  :OrIf '/index.html'≡request.Path
      response←CreateHomePage request
  :ElseIf '/robots.txt'≡request.Path
      response←CreateRobotTxt request
  :ElseIf '/sitemap.xml'≡request.Path
      response←CreateSitemapXml request
+ :ElseIf '/favicon.ico'≡request.Path
+     response←request ReturnFiles G.HTDOCS,'Assets/img/favicon.ico'
  :ElseIf IsIndexNowKeyRequest request.Path
      response←CreateIndexNowKeyFile request
  :ElseIf ('/docs/'≡6↑request.Path)∨'/docs'≡request.Path

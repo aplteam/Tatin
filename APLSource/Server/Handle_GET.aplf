@@ -8,6 +8,8 @@
      response←CreateSitemapXml request
  :ElseIf IsIndexNowKeyRequest request.Path
      response←CreateIndexNowKeyFile request
+ :ElseIf ('/docs/'≡6↑request.Path)∨'/docs'≡request.Path
+     response←request RedirectToDocs request.Path
  :Else
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
      :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}(≢Reg.VersionOf_REST)↓fullPath  ⍝ Static stuff with REST version

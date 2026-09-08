@@ -1,0 +1,31 @@
+ r←GetDocsUrl path;name;base;old;new;ind
+⍝ Takes the path of a page from the documentation Tatin used to serve itself, such as
+⍝ "/docs/FirstStepsWithTatin.html", and returns the URL of whatever replaced it.
+⍝ Where nothing corresponds - a page that was dropped rather than rewritten - the index of
+⍝ the documentation is returned. A reader who lands there is one click from what they wanted;
+⍝ one who lands on a 404 is gone.
+⍝ The name is folded to lower case before it is looked up because these files were named in
+⍝ CamelCase for some years and in lower case afterwards, and links to both are still about.
+ base←'https://aplteam.github.io/Tatin/'
+ old←'firststepswithtatin' 'initializingtatin' 'introduction' 'caching'
+ new←'get-started' 'get-started' '' ''
+ old,←'installingandupdatingthetatinclient' 'installingthetatinserver' 'packageconfiguration'
+ new,←'install-tatin' 'install-server' 'package-configuration'
+ old,←'publishingpackages' 'rundyalogbehindapache' 'semanticversioning' 'syntaxreference'
+ new,←'publish-packages' 'secure-server' 'semantic-versioning' 'user-commands'
+ old,←'tatinforcontributors' 'fordevelopers' 'tatinusersettings' 'usersettings'
+ new,←'contribute' 'develop' 'user-settings' 'user-settings'
+ old,←'tatinsloadandupdatestrategy' 'tatinsupdatestrategy' 'servermaintenance' 'server-tipsandtricks'
+ new,←'load-and-update-strategy' 'load-and-update-strategy' 'maintenance' 'maintenance'
+ old,←'github' 'releasenotes' 'usagedata' 'tatinandonedrive'
+ new,←'github-rate-limits' 'release-notes' 'host' ''
+ old,←'managing_packages_with_tatin' 'tatin_spec' '_readme'
+ new,←'' '' ''
+ name←⊃⌽'/'A.Split path                             ⍝ The last segment, so any folder in between is ignored
+ name←⎕C{⍵↑⍨¯1+⍵⍳'.'}name                           ⍝ ... without its extension
+ r←base
+ :If (≢old)≥ind←old⍳⊂name
+ :AndIf 0<≢ind⊃new
+     r←base,(ind⊃new),'/'
+ :EndIf
+⍝Done

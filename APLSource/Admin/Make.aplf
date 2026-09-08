@@ -118,6 +118,7 @@
      {}{⍞←⍵ ⋄ ⍞←⎕UCS 10}⍣(~batchFlag)⊣'*** Done'
  :EndIf
  :If commitFlag
+ :AndIf {⍵≡{⍵↑⍨¯1+⍵⍳'-'}⍵}{⍵↑⍨¯1+⍵⍳'+'}2⊃#.Tatin.Registry.Version
      question←1↓⊃,/(⎕UCS 13),¨↓↑⎕SE.APLGit2.Status'#.Tatin'
      :If 1 CT.YesOrNo question,(⎕UCS 13),'---> Commit as "Make"?'
          '#.Tatin'⎕SE.APLGit2.Add'.'

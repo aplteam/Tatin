@@ -51,7 +51,10 @@
  html,←⊂'<div id="my-logo">'
  caption←⊃G.INI.Get'Config:Caption'
  html,←⊂'<a href="/"><img id="logo" src="/Assets/img/tatin.png" title="Link to ',title,' main page" alt="Link to ',title,' main page"></a>'
- html,←⊂'<h1>',caption,'</h1>'
+⍝ The caption goes home as well as the logo does: half the visitors aim at the words rather
+⍝ than at the picture, and finding nothing there sends them looking for a "Home" menu item
+⍝ that does not exist.
+ html,←⊂'<h1><a href="/">',caption,'</a></h1>'
  html,←⊂'</div>'
 ⍝ The menu goes on every page; see `GetMainMenu` for why.
  html,←GetMainMenu ⍬

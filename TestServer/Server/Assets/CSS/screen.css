@@ -145,6 +145,12 @@ div.h_tag h1 {
     overflow-wrap: anywhere;
 }
 
+/* The caption goes home like the logo, but should not look like a link in running text */
+div#my-logo h1 a {
+    color: inherit;
+    text-decoration: none;
+}
+
 /* --- Main menu -------------------------------------------------- */
 
 /* A wrapping flex row rather than a disclosure menu: six items do not justify the
@@ -152,15 +158,51 @@ div.h_tag h1 {
 #main-menu ul {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2) var(--space-4);
-    margin: 0 0 var(--space-4) 0;
-    padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--color-border);
+    gap: var(--space-1) var(--space-1);
+    margin: var(--space-2) 0 var(--space-5) 0;
+    padding: 0 0 var(--space-2) 0;
+    border-bottom: 2px solid var(--color-border-soft);
     list-style: none;
 }
 
 #main-menu li {
     margin: 0;
+}
+
+/* Links elsewhere on the site are underlined and lose it on hover. A row of underlined
+   items reads as clutter rather than as a menu, so these are plain until pointed at. */
+#main-menu a {
+    display: block;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--color-heading);
+    text-decoration: none;
+}
+
+#main-menu a:hover,
+#main-menu a:focus-visible {
+    background-color: var(--color-shade);
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+/* --- Home page --------------------------------------------------- */
+
+/* The figures read as one line of facts rather than as a sentence */
+.figures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+}
+
+.figures .figure b {
+    font-size: 1.3em;
+    color: var(--color-accent);
+}
+
+/* A date is never worth breaking across two lines */
+td.nowrap {
+    white-space: nowrap;
 }
 
 /* --- Server links in the footer --------------------------------- */

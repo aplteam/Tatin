@@ -140,7 +140,8 @@ IndexNow turns that round: the site announces a URL that has changed. Bing and Y
 Two INI entries switch it on:
 
 `CONFIG:IndexNowKey`
-: Any hex string of 8 to 128 characters. Empty means off.
+: Between 8 and 128 characters, made up of letters, digits and dashes. A UUID is a good
+  choice, with or without its dashes. Empty means off.
 
 `CONFIG:BaseURL`
 : Required as well. IndexNow wants absolute URLs, and the announcement is made in the background where there is no request to work the public host out from.

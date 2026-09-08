@@ -6,6 +6,8 @@
      response←CreateRobotTxt request
  :ElseIf '/sitemap.xml'≡request.Path
      response←CreateSitemapXml request
+ :ElseIf IsIndexNowKeyRequest request.Path
+     response←CreateIndexNowKeyFile request
  :Else
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path
      :If 'Assets/'≡{⍵↑⍨⌊/⍵⍳'/\'}(≢Reg.VersionOf_REST)↓fullPath  ⍝ Static stuff with REST version

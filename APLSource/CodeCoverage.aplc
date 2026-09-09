@@ -2,7 +2,7 @@
 ⍝ # The class `CodeCoverage`
 ⍝ This class provides methods to watch certain parts of the workspace being executed, presumably as part of running
 ⍝ a test framework such as [`Tester2`](https://github.com/aplteam/Tester2 "Link to Tester2 on GitHub"), although checking
-⍝ on code coverage by simply running an application can also be useful, especially for legacy code.\\
+⍝ code coverage by simply running an application can also be useful, especially for legacy code.\\
 ⍝ To do this, the following steps need to be performed:
 ⍝ ## Prepare
 ⍝ * Instantiate `CodeCoverage` and pass a comma-separated list of namespaces and/or classes to monitor as an argument
@@ -17,8 +17,8 @@
 ⍝     The collected data and the list of namespaces/classes to watch can be referenced as `data` and
 ⍝     `watch` but _not_ set: they are read-only instance properties.\\
 ⍝ ## Running the code
-⍝ You must call the `Start` method before executing any code that is to be be watched for coverage. Assuming that
-⍝ the instance has been assigned to `C` then call `C.Start ⍬`.\\
+⍝ You must call the `Start` method before executing any code that is to be watched for coverage. Assuming that
+⍝ the instance has been assigned to `C`, call `C.Start ⍬`.\\
 ⍝ Once all the code you are interested in has been executed call `C.Stop ⍬`.\\
 ⍝ When the test framework is finished, run `C.Finalise ⍬`.\\
 ⍝ **Notes:**
@@ -36,15 +36,15 @@
 ⍝ executed are reported together with the lines not executed and the total number of lines.\\
 ⍝ This is a good place to start. Usually this leads to extending the list of things to ignore, adding more
 ⍝ test cases, deleting blocks of code that have become obsolete etc.\\
-⍝ At one point, however, or may want the full details: to do this, add a 1 as the left argument when calling
-⍝ `CodeCoverage.ProcessDataAndCreateReport`. Now the canonical representations of all functions and operators that are
+⍝ At one point, however, one might want the full details: to do this, add a 1 as the left argument when calling
+⍝ `CodeCoverage.ProcessDataAndCreateReport`. The canonical representations of all functions and operators that are
 ⍝ only partially covered will become part of the report. The lines that weren't executed are highlighted (bold) and have
 ⍝ a right-pointing arrow on the left.\\
+⍝ You may also create just a summary report by calling `ProcessDataAndCreateSummary`.\\
 ⍝ ## Limitations and flaws
 ⍝ * Nested namespaces/classes are currently not processed. This restriction may be lifted in a future release.
 ⍝ * Named dfns kept local within a traditional function are not processed correctly. This is a consequence of a
-⍝   flaw of `⎕PROFILE`. This cannot be overcome without changing `⎕PROFILE`.\\
-⍝ This class is part of the APLTree Open Source project.\\
+⍝   flaw in `⎕PROFILE`. This cannot be overcome without changing `⎕PROFILE`.\\
 ⍝ Home page: <https://github.com/aplteam/CodeCoverage>\\
 ⍝ Kai Jaeger
 
@@ -54,12 +54,28 @@
 
     ∇ r←Version
       :Access Public Shared
-      r←'CodeCoverage' '0.10.7+52' '2024-06-05'
+    ⍝ Returns the version number from `TatinVars` if possible.
+    ⍝ See also `History`
+      :If 0<##.⎕NC'TatinVars.CONFIG'
+          r←(⎕JSON⍠('Dialect' 'JSON5')⊢##.TatinVars.CONFIG).version
+      :Else
+    ⍝ When a script was not loaded with Tatin, there will be no namespace `TatinVars`.
+    ⍝ In such cases we cannot provide a version number, so we return just ''.
+          r←''
+      :EndIf
     ∇
 
     ∇ History
-      :Access Public Shared
-    ⍝ * 0.10.7 from 2024-06-05 
+      :Access Public Shared   
+    ⍝ * 0.12.0 from 2025-09-12
+    ⍝   * LICENSE file updated
+    ⍝   * Packages updated
+    ⍝ * 0.11.1 from 2025-06-04
+    ⍝   * When a reference to a namespace or class was passed as argument to `⎕NEW`, `CoderCoverage` reported zero code coverage.
+    ⍝ * 0.11.0 from 2025-06-03
+    ⍝   * New method `ProcessDataAndCreateSummary` introduced
+    ⍝   * Several tests added
+    ⍝ * 0.10.7 from 2024-06-05
     ⍝   * Bug fixes
     ⍝     * A comma-separated list as argument to ⎕NEW caused a LENGTH ERROR
     ⍝     * CodeCoverage tests attempted to act on itself - that cannot work properly because the tests overwrite ⎕PROFILE
@@ -145,6 +161,7 @@
           'Must be character vector'⎕SIGNAL 11/⍨' '≠1↑0⍴v
           ('Has invalid characters',b/v)⎕SIGNAL 11/⍨∨/b←~v∊APL_Chars,',⎕#.'
           v2←','(≠⊆⊢),v
+          v2←{(,'#')≡,⍵:⍵ ⋄ '⎕SE'≡⍵:⍵ ⋄ ~9.1 9.2∊⍨⎕NC⊂⍵:⍵ ⋄ ⍵≡ref←⍎⍵:w ⋄ ⍕ref}¨v2 ⍝ Convert any refs to their targets
           :If ~∧/v2∊,¨'#' '⎕SE'
               :If ∨/~b←0<⎕NC↑v2
                   11 ⎕SIGNAL⍨'Unknown names: ',⊃{⍺,',',⍵}/(~b)/v2
@@ -193,6 +210,56 @@
       :AndIf IsFile filename,'.html'
           r+←⎕NDELETE filename,'.html'
       :EndIf
+    ∇
+
+    ∇ mdFilename←ProcessDataAndCreateSummary filename;dcfFilename
+    ⍝ Compiles a summary file that can be used as a job in a GitHub workflow
+      :Access Public Shared
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.profile'
+      'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
+      {}ProcessData dcfFilename
+      mdFilename←CreateSummary filename
+    ∇
+
+    ∇ filename←CreateSummary filename;dcfFilename;tno;watched;data;runs;md;tally;caption;table
+      ⍝ This function creates an md file containing a summary of the coverage report from the data collected during the execution of an application.\\
+      ⍝ You must call `ProcessData` first: this function relies on the data being aggregated.\\
+      :Access Public Shared
+      dcfFilename←(⊃,/2↑⎕NPARTS filename),'.profile'
+      'File not found'⎕SIGNAL 11/⍨0=⎕NEXISTS dcfFilename
+      tno←dcfFilename ⎕FSTIE 0
+      watched←⎕FREAD tno 2
+      data←⎕FREAD tno 10
+      runs←⎕FREAD tno 4
+      ⎕FUNTIE tno
+      md←⊂'# Coverage Summary'
+      md,←,⊂''
+      :If 0=≢data
+          md,←⊂'Nothing to report at all'
+      :Else
+          tally←≢data[;4]
+          caption←⊃,/{⍺,', ',⍵}/watched
+          md,←⊂'Watched: ',(⍕tally),' fns/opr within `',caption,'`'
+          md,←⊂''
+          :If 1=≢runs
+              md,←⊂'The test suite was executed once:'
+          :Else
+              md,←⊂'The test suite was executed ',(⍕≢runs),' times:'
+          :EndIf
+          md,←⊂''
+          table←('Executed at' 'APLVersion' 'Memory (MB)'),[0.5]⊂'---'
+          md,←{,/('|',¨⍵),'|'}table⍪runs
+          :If 0<≢∊data[;2 4]
+              md,←⊂''
+              md,←⊂'Overall ',(⍕⌊0.5+100×÷/+⌿≢¨data[;2 4]),'% of the testable code is covered.'
+              md,←⊂''
+              md,←⊂'(Comment lines, empty lines, all `:End`* lines etc. are ignored)'
+          :EndIf
+          md,←⊂''
+          md,←⊂(⍕data[;3]+.=100),' of the fns/opr are 100% covered.'
+      :EndIf
+      filename←(⊃,/2↑⎕NPARTS filename),'.md'
+      (⊂md)⎕NPUT filename 1
     ∇
 
     ∇ htmlFilename←{verbose}ProcessDataAndCreateReport filename;details;watch;dcfFilename
@@ -310,7 +377,7 @@
       :EndIf
       html,←⊂'<div id="footer">'
       html,←⊂'<hr>'
-      html,←⊂'<p>Created by "CodeCoverage" version ',(2⊃Version),' from ',(3⊃Version),'</p>'
+      html,←⊂'<p>Created by "CodeCoverage" version ',(Version),'</p>'
       html,←⊂'</div>'
       html,←⊂''
       html,←⊂'</body>'
@@ -412,7 +479,7 @@
       ⎕FUNTIE tno
     ∇
 
-    ∇ r←Finalise dummy;names;details;i;name;row;linesCovered;body;lines;bool;regExPattern;filename;tno;d;buff;crF;crX;crT;crN;fileM;bodyC;t∆
+    ∇ r←Finalise dummy;names;details;i;name;row;linesCovered;body;lines;bool;regExPattern;filename;tno;d;buff;crF;crX;crT;crN;fileM;bodyC;t∆;crN0;crNewScopes
     ⍝ Call this when all the code you want to check on has been executed`.\\
     ⍝ It examines all functions and operators that are only partially covered, and saves the lines that
     ⍝ were executed as well as the lines that could have been executed.\\
@@ -444,7 +511,9 @@
           crN←⍬
           ⍬ ⎕FAPPEND crT
       :EndIf
-     
+      crN0←crN                                                      ⍝ The names as captured by earlier runs
+      crNewScopes←(~{p←⍵,'.' ⋄ ∨/p∘{⍺≡(≢⍺)↑⍵}¨crN0}¨_watch)/_watch  ⍝ Watched namespaces this file knows nothing about yet
+
       :For i :In ⍳≢names
           name←i⊃names
           :If (≢_data)≥row←_data[;1]⍳⊂name
@@ -466,7 +535,11 @@
                           ⎕←'Current definition of function "',name,'" does not match the one captured earlier - do not trust the results' ⍝ ⎕SIGNAL?!
                       :EndIf
                   :Else
-                      ⎕←'Found new function "',name,'" that was not captured in previous runs - do not trust the results!'
+                      :If ~∨/crNewScopes{(⍺,'.')≡((≢⍺)+1)↑⍵}¨⊂name  ⍝ Silent when the whole namespace is new to this file
+                          ⎕←'Found new function "',name,'" that was not captured in previous runs - do not trust the results!'
+                      :EndIf
+                      crN,←⊂name                                    ⍝ Capture it now, so later runs won't report it again
+                      body ⎕FAPPEND crT
                   :EndIf
               :Else
                   crN,←⊂name
@@ -493,9 +566,7 @@
       :EndFor
      
       details←('.'≠⊃¨¯1↑¨details[;1])⌿details
-      :If ~crX
-          crN ⎕FREPLACE crT,1
-      :EndIf
+      crN ⎕FREPLACE crT,1
       ⎕FUNTIE crT
       :If ⎕NEXISTS filename
           tno←filename ⎕FSTIE 0
@@ -505,40 +576,48 @@
           details ⎕FAPPEND tno
           ⎕FUNTIE tno
       :Else
-          3 ⎕MKDIR 1⊃⎕NPARTS filename
-          tno←filename ⎕FCREATE 0
-          (1 3⍴0 ¯1 0)⎕FSTAC tno                                    ⍝ Everybody everything; important for non-Windows platforms
-          d←''
-          d,←⊂'Documentation regarding the contents of this file'
-          d,←⊂(⍴1⊃d)⍴'-'
-          d,←⊂'* The first component contains this documentation'
-          d,←⊂'* The second one contains what has been watched; this will eventually be used to'
-          d,←⊂'  compile the caption for the coverage report.'
-          d,←⊂'* The third component holds the names of functions and operators to be ignored.'
-          d,←⊂'* The fourth component holds a matrix with as many rows as test runs have been performed:'
-          d,←⊂'  [;1] Timestamp ("YYYY-MM-DD hh:mm:ss")'
-          d,←⊂'  [;2] The result of the "APLVersion" property + info about the edition'
-          d,←⊂'  [;3] ⎕WA in KB'
-          d,←⊂'* Components five to nine are reserved'
-          d,←⊂'* The tenth one is originally empty. when "ProcessData" or "ProcessDataAndCreateReport"'
-          d,←⊂'  is called the resulting data is written to this component.'
-          d,←⊂'After the tenth one all components carry a matrix with n rows and 4 columns. n is'
-          d,←⊂'determined by the number of fns/oprs involved. The columns:'
-          d,←⊂'[;1] The name of the function or operator'
-          d,←⊂'[;2] Either empty or a vector of line numbers there were *not* executed.'
-          d,←⊂'     Empty in case none or all lines were executed.'
-          d,←⊂'[;3] Coverage percentage.'
-          d,←⊂'[;4] Total number of lines that can be expected to be tested.'
-          d ⎕FAPPEND tno
-          watch ⎕FAPPEND tno
-          ignore ⎕FAPPEND tno
-          (CollectInformation ⍬)⎕FAPPEND tno
-          tno{⍵ ⎕FAPPEND ⍺}¨(9-¯1+2⊃⎕FSIZE tno)⍴⊂''                 ⍝ Fill up to the tenth component
-          details ⎕FAPPEND tno
-          ⎕FUNTIE tno
+          (watch ignore details)CreateFile filename
       :EndIf
       r←filename
       ⍝Done
+    ∇
+
+    ∇ {r}←{y}CreateFile filename;tno;d;watch;ignore;details
+      :Access public Shared
+      y←⊆{0<⎕NC ⍵:⍎⍵ ⋄ ''}'y'
+      (watch ignore details)←3↑y,(≢y)↓'' '' ''
+      r←0
+      3 ⎕MKDIR 1⊃⎕NPARTS filename
+      tno←filename ⎕FCREATE 0
+      (1 3⍴0 ¯1 0)⎕FSTAC tno                                    ⍝ Everybody everything; important for non-Windows platforms
+      d←''
+      d,←⊂'Documentation regarding the contents of this file'
+      d,←⊂(⍴1⊃d)⍴'-'
+      d,←⊂'* The first component contains this documentation'
+      d,←⊂'* The second one contains what has been watched; this will eventually be used to'
+      d,←⊂'  compile the caption for the coverage report.'
+      d,←⊂'* The third component holds the names of functions and operators to be ignored.'
+      d,←⊂'* The fourth component holds a matrix with as many rows as test runs have been performed:'
+      d,←⊂'  [;1] Timestamp ("YYYY-MM-DD hh:mm:ss")'
+      d,←⊂'  [;2] The result of the "APLVersion" property + info about the edition'
+      d,←⊂'  [;3] ⎕WA in KB'
+      d,←⊂'* Components five to nine are reserved'
+      d,←⊂'* The tenth one is originally empty. when "ProcessData" or "ProcessDataAndCreateReport"'
+      d,←⊂'  is called the resulting data is written to this component.'
+      d,←⊂'After the tenth one all components carry a matrix with n rows and 4 columns. n is'
+      d,←⊂'determined by the number of fns/oprs involved. The columns:'
+      d,←⊂'[;1] The name of the function or operator'
+      d,←⊂'[;2] Either empty or a vector of line numbers there were *not* executed.'
+      d,←⊂'     Empty in case none or all lines were executed.'
+      d,←⊂'[;3] Coverage percentage.'
+      d,←⊂'[;4] Total number of lines that can be expected to be tested.'
+      d ⎕FAPPEND tno
+      watch ⎕FAPPEND tno
+      ignore ⎕FAPPEND tno
+      (CollectInformation ⍬)⎕FAPPEND tno
+      tno{⍵ ⎕FAPPEND ⍺}¨(9-¯1+2⊃⎕FSIZE tno)⍴⊂''                 ⍝ Fill up to the tenth component
+      details ⎕FAPPEND tno
+      ⎕FUNTIE tno
     ∇
 
     ∇ {r}←Start dummy
@@ -574,7 +653,7 @@
           cr.names←⎕FREAD cr.tno,1
           ⎕←'Tied ',cr.filename,' for listings'
       :Else
-          ⎕←'Did not find file "',cr.filename,'" with CRs collected by fn "Finalize" - will try to work without it'
+          ⎕←'Did not find file "',cr.filename,'" with CRs collected by fn "Finalise" - will try to work without it'
           cr.tno←0
       :EndIf
       :For i :In ⍳≢partlyCovered

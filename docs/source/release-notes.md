@@ -16,7 +16,7 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.126.0 ⋄ 2026-09-08
+## v0.126.0 ⋄ 2026-09-09
 
 * This is a server-only release: the client side of Tatin has not changed at all.
 
@@ -44,6 +44,8 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
     * If your server sits behind a reverse proxy, make sure `CONFIG:BaseURL` is set. It was introduced in 0.125.1 for the sitemap, and the canonical links added with this version need it just as much: without it they would name the wrong protocol.
 
   Note also that every page carries a title of its own now. Until this version all pages of a Registry shared one and the same title, which left anybody looking at a column of identical search results with no way of telling them apart.
+
+* URLs pointing to a help page that does not exist anymore are now correctly answered by a 301 (Redirect),
 
 ## v0.125.1 ⋄ 2026-09-02
 
@@ -398,6 +400,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

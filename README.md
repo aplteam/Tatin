@@ -26,7 +26,7 @@ Tatin requires a Unicode edition of Dyalog and at least version 18.2; the Classi
 
 ### 18.2
 
-The document [Installing And Updating The Tatin Client](https://tatin.dev/Assets/docs/InstallingAndUpdatingTheTatinClient.html "Link to InstallingAndUpdatingTheTatinClient.html on the Tatin server") discusses how to install the Tatin client.
+The document [Installing And Updating The Tatin Client](https://aplteam.github.io/Tatin/install-tatin/ "Link to Installing And Updating The Tatin Client in the Tatin documentation") discusses how to install the Tatin client.
 
 ### 19.0 & 20.0
 
@@ -46,7 +46,7 @@ Or, if you want to use both, Tatin and the project manager [Cider](https://githu
 
 Once you've installed the Tatin client, you have access to <https://tatin.dev>, the principal Tatin server.
 
-The document [First Steps With Tatin](https://tatin.dev/Assets/docs/FirstStepsWithTatin.html "Link to FirstStepsWithTatin.html on the Tatin server") will get you started.
+The document [First Steps With Tatin](https://aplteam.github.io/Tatin/get-started/ "Link to First Steps With Tatin in the Tatin documentation") will get you started.
 
 ## Tatin Server 
 
@@ -54,11 +54,11 @@ You might find it useful to run your own Tatin server. For example, all packages
 
 You may also keep a local Registry on your own machine, for example for development work. From a consumer's perspective there is no difference between consuming a package that is coming from a Tatin Server or from a local Registry.
 
-The document [_Installing The Tatin Server_](https://tatin.dev/Assets/docs/InstallingTheTatinServer.html "Link to InstallingTheTatinServer.html on the Tatin server") discusses how to install the Tatin Server.
+The document [_Installing The Tatin Server_](https://aplteam.github.io/Tatin/install-server/ "Link to Installing The Tatin Server in the Tatin documentation") discusses how to install the Tatin Server.
 
 ## Contributing to the code 
 
-Before going into details, please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository") first. The next step is to consult the document [_Tatin For Contributors_](https://tatin.dev/Assets/docs/TatinForContributors.html "Link to TatinForContributors.html on the Tatin server"); it discusses how one can contribute to the documentation or the code or both.
+Before going into details, please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository") first. The next step is to consult the document [_Tatin For Contributors_](https://aplteam.github.io/Tatin/contribute/ "Link to Tatin For Contributors in the Tatin documentation"); it discusses how one can contribute to the documentation or the code or both.
 
 -----
 

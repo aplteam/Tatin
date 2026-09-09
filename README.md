@@ -8,7 +8,7 @@ A Tarte Tatin is a nice way to package Apples.
 
 ## Documentation
 
-The documentation is available on [Tatin's principal server](https://tatin.dev/v1/documentation "Link to https://tatin.dev/v1/documentation").
+The documentation is available on [GitHub Pages](https://aplteam.github.io/Tatin/ "Link to the Tatin documentation").
 
 ## Overview
 
@@ -54,14 +54,14 @@ You might find it useful to run your own Tatin server. For example, all packages
 
 You may also keep a local Registry on your own machine, for example for development work. From a consumer's perspective there is no difference between consuming a package that is coming from a Tatin Server or from a local Registry.
 
-The document [_Installing The Tatin Server_](https://aplteam.github.io/Tatin/install-server/ "Link to Installing The Tatin Server in the Tatin documentation") discusses how to install the Tatin Server.
+The document [Installing The Tatin Server](https://aplteam.github.io/Tatin/install-server/ "Link to Installing The Tatin Server in the Tatin documentation") discusses how to install the Tatin Server.
 
 ## Contributing to the code 
 
-Before going into details, please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository") first. The next step is to consult the document [_Tatin For Contributors_](https://aplteam.github.io/Tatin/contribute/ "Link to Tatin For Contributors in the Tatin documentation"); it discusses how one can contribute to the documentation or the code or both.
+Before going into details, please read [CONTRIBUTING](https://github.com/aplteam/tatin/blob/main/CONTRIBUTING.md "Link to the file CONTRIBUTING.md on GitHub in the root of the Tatin repository") first. The next step is to consult the document [Tatin For Contributors](https://aplteam.github.io/Tatin/contribute/ "Link to Tatin For Contributors in the Tatin documentation"); it discusses how one can contribute to the documentation or the code or both.
 
 -----
 
-Latest revision 2026-06-21
+Latest revision 2026-09-09
 
 

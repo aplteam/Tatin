@@ -1,9 +1,11 @@
  response←request RedirectToDocs path
 ⍝ Answers a request for a page of the documentation Tatin used to serve itself with a
 ⍝ permanent redirect to wherever that page lives now; see `GetDocsUrl`.
-⍝ Those pages were served from a "docs/" folder in the root of the server until the
-⍝ documentation moved to aplteam.github.io. The folder went, the links to it did not, and
-⍝ they have been answered with a 404 ever since.
+⍝ Those pages were served from "Assets/docs/", reachable both with and without the REST
+⍝ version prefix, until the documentation moved to aplteam.github.io. The folder went, the
+⍝ links to it did not, and they have been answered with a 404 ever since.
+⍝ Note that it is "Assets/docs/", not the "docs/" in the root of the repository: that one
+⍝ holds the MkDocs sources and was never served. See `IsOldDocsRequest`.
 ⍝ 301 rather than 302 on purpose: the move is permanent, so a search engine should pass
 ⍝ whatever standing the old URL had on to the new one instead of keeping both.
  response←request Respond 301

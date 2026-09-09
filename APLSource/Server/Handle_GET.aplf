@@ -10,7 +10,7 @@
      response←request ReturnFiles G.HTDOCS,'Assets/img/favicon.ico'
  :ElseIf IsIndexNowKeyRequest request.Path
      response←CreateIndexNowKeyFile request
- :ElseIf ('/docs/'≡6↑request.Path)∨'/docs'≡request.Path
+ :ElseIf IsOldDocsRequest request.Path
      response←request RedirectToDocs request.Path
  :Else
      fullPath←{⍵↓⍨'/'=⊃⍵}request.Path

@@ -1,14 +1,29 @@
- r←GetReadmeUrls(projectUrl version);ver;group;repo;path;tag
-⍝ Returns a two-column matrix with the URLs a package's README might be fetched from:
+ r←GetReadmeUrls(projectUrl version);ver;group;repo;path;tag;filename;filenames;branchRef
+⍝ Returns a three-column matrix with the URLs a package's README might be fetched from:
 ⍝ [;1] the "raw.githubusercontent.com" URL to fetch it from
 ⍝ [;2] the matching "github.com/.../blob/..." URL, recorded for attributing the source
-⍝ One row per tag spelling worth trying, the most likely one first: Tatin release tags read
-⍝ "v1.2.3", but tags older than that convention read "1.2.3".
+⍝ [;3] 'tag' or 'branch': which of the two the row is keyed on, carried through so that the
+⍝      package page can say where the text actually came from
+⍝ Rows come in the order they are worth trying, and every tag row comes before every branch
+⍝ row: a README fetched from the tag documents this very release, while one fetched from
+⍝ the default branch documents whatever the project looks like today. The branch rows are
+⍝ there for the repositories that carry no tag for the version - without them those
+⍝ packages could never show a README at all - and `GetReadmeSection` says which of the two
+⍝ a package ended up with, so nobody is told that today's text describes this release.
+⍝ Tatin release tags read "v1.2.3", but tags older than that convention read "1.2.3", and
+⍝ GitHub serves raw files case sensitively, so each ref is tried with every spelling of the
+⍝ filename that occurs in the wild. "README.md" is tried against both tags before any other
+⍝ spelling is tried at all: it is what almost every repository uses, and that keeps the
+⍝ first request unchanged for the packages this already works for.
+⍝ "HEAD" stands for the repository's default branch whatever it happens to be called, and
+⍝ raw.githubusercontent.com and github.com both accept it, so the name need not be looked
+⍝ up - which would take an API call, and the GitHub API allows only 60 an hour without a
+⍝ token.
 ⍝ The result is empty when `projectUrl` does not point at a GitHub repository: nothing else
 ⍝ is supported, and guessing would attach a stranger's README to a package.
-⍝ Note that the tag decides: fetching from the default branch is deliberately not offered,
-⍝ because that would document a release with instructions that may not work for it.
- r←0 2⍴''
+ r←0 3⍴''
+ filenames←'README.md' 'README.MD' 'ReadMe.md' 'readme.md'
+ branchRef←'HEAD'
  ver←version
  ver←(¯1+ver⍳'+')↑ver                               ⍝ Build metadata is no part of a tag
  path←projectUrl
@@ -26,6 +41,12 @@
      :Return
  :EndIf
  (group repo)←path
- :For tag :In ('v',ver)ver
-     r⍪←(GetRawGitHubUrl group repo tag'README.md')(GetBlobGitHubUrl group repo tag'README.md')
+ :For filename :In filenames
+     :For tag :In ('v',ver)ver
+         r⍪←(GetRawGitHubUrl group repo tag filename)(GetBlobGitHubUrl group repo tag filename)'tag'
+     :EndFor
  :EndFor
+ :For filename :In filenames
+     r⍪←(GetRawGitHubUrl group repo branchRef filename)(GetBlobGitHubUrl group repo branchRef filename)'branch'
+ :EndFor
+⍝Done

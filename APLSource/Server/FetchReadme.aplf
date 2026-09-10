@@ -1,15 +1,28 @@
- (status sourceUrl markdown)←FetchReadme(projectUrl version);urls;i;u;c;q;resp;answered;maxSize;rawUrl;blobUrl;text
-⍝ Fetches a package's README from GitHub, keyed on the release's own tag. Returns one of:
-⍝ * ('ok' sourceUrl markdown) - found
-⍝ * ('none' '' '')            - GitHub answered and there is no README to be had
-⍝ * ('error' '' '')           - GitHub could not be reached at all
+ (status sourceUrl refKind markdown)←FetchReadme(projectUrl version);urls;i;u;c;q;resp;answered;maxSize;rawUrl;blobUrl;text
+⍝ Fetches a package's README from GitHub. Returns one of:
+⍝ * ('ok' sourceUrl refKind markdown) - found; `refKind` is 'tag' or 'branch'
+⍝ * ('none' '' '' '')                 - GitHub answered and there is no README to be had
+⍝ * ('error' '' '' '')                - GitHub could not be reached at all
 ⍝ The last two matter because only a settled answer is recorded (see `FetchAndStoreReadme`):
 ⍝ 'none' is a fact about the repository and stands, while 'error' says only that this
 ⍝ attempt failed, and writing it down as 'none' would bake a network hiccup into the
 ⍝ Registry for good.
+⍝ The rows are walked in the order `GetReadmeUrls` returns them, so every spelling of the
+⍝ release's own tag is tried before the default branch is considered at all: a package
+⍝ whose repository carries the tag never ends up with the branch's README.
+⍝ A failed connection ends the walk then and there rather than moving on to the next
+⍝ spelling: what failed is the connection to GitHub, not that particular URL, so the rows
+⍝ left cannot fare any better, and trying them all would multiply one outage by the number
+⍝ of spellings - each one waiting for `ClientTimeout` before it gives up.
+⍝ It leaves as 'error' whatever earlier rows answered, which is why it returns rather than
+⍝ leaving the loop: the spellings not reached were not tried, so 'none' - "we looked and
+⍝ there is none" - would be a claim this attempt has not earned. The package comes round
+⍝ again instead; see `ReadmeIsDue`.
+⍝ A 404 is a different matter and does move on: that is GitHub answering, and the next
+⍝ spelling may well be the one that exists.
 ⍝ A failed connection is not logged: it is recorded against the package as 'error' instead,
 ⍝ where it belongs, and logging every timeout would bury the log during a GitHub outage.
- (status sourceUrl markdown)←'error' '' ''
+ (status sourceUrl refKind markdown)←'error' '' '' ''
  answered←0
  maxSize←262144                                     ⍝ 256 KB; anything larger is not a README
  urls←GetReadmeUrls projectUrl version
@@ -17,9 +30,9 @@
      status←'none'                                  ⍝ Nowhere to look is not a network problem
      :Return
  :EndIf
- :For i :In ⍳≢urls                                  ⍝ Loop over different spelling: first v{n1}.{n2}.{n3} then {n1}.{n2}.{n3}
+ :For i :In ⍳≢urls                                  ⍝ Loop over the spellings, most likely first
      :Trap 345                                      ⍝ Rumba turns every failed connection into 345
-         (rawUrl blobUrl)←urls[i;]
+         (rawUrl blobUrl)←urls[i;1 2]
          u←R.ParseURI rawUrl
          c←R.NewClient rawUrl
          c.CongaTimeout←3000                        ⍝ Milliseconds; raw.githubusercontent is a CDN
@@ -27,7 +40,7 @@
          q←R.NewRequest u.Resource
          resp←⊃c R.SendAndReceive q
      :Else
-         :Continue                                  ⍝ Signalled: timed out, closed, or no route
+         :Return                                    ⍝ Signalled: timed out, closed, or no route
      :EndTrap
      answered←1
      :If 200=resp.StatusCode
@@ -35,7 +48,7 @@
      :AndIf maxSize≥≢resp.Content
      ⍝ What arrives is bytes, not text; see `Utf8ToText` for why it has to be decoded here.
      :AndIf 0<≢text←Utf8ToText resp.Content
-         (status sourceUrl markdown)←'ok'blobUrl text
+         (status sourceUrl refKind markdown)←'ok'blobUrl(3⊃urls[i;])text
          :Return
      :EndIf
  :EndFor

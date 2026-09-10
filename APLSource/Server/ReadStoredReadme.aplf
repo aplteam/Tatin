@@ -1,20 +1,23 @@
- (status sourceUrl markdown)←ReadStoredReadme packagePath;ns;mdFilename;cfgFilename
+ (status sourceUrl ref markdown)←ReadStoredReadme packagePath;ns;mdFilename;cfgFilename
 ⍝ Returns what is on record about the README of the package in `packagePath`:
 ⍝ * `status`   : 'ok', 'none', 'error', or '' when nobody has looked yet
 ⍝ * `sourceUrl`: where it came from; '' unless the status is 'ok'
+⍝ * `ref`      : 'tag' or 'branch', saying what `sourceUrl` names; '' unless the status is
+⍝                'ok', and '' as well for records written before the fallback existed
 ⍝ * `markdown` : the Markdown as fetched; '' unless the status is 'ok'
 ⍝ Whether another attempt is owed is a different question; `ReadmeIsDue` answers that one.
- (status sourceUrl markdown)←'' '' ''
+ (status sourceUrl ref markdown)←'' '' '' ''
  (mdFilename cfgFilename)←GetReadmeFilenames packagePath
  :If ⍬≢ns←GetReadmeRecord packagePath
      status←{0=ns.⎕NC ⍵:'' ⋄ ns⍎⍵}'status'
      sourceUrl←{0=ns.⎕NC ⍵:'' ⋄ ns⍎⍵}'sourceUrl'
+     ref←{0=ns.⎕NC ⍵:'' ⋄ ns⍎⍵}'ref'
      :If 'ok'≡status
          :If F.IsFile mdFilename
              markdown←⊃F.NGET mdFilename
          :Else
 ⍝ The record claims a README but the file has gone; saying 'none' is the honest answer
-             (status sourceUrl)←'none' ''
+             (status sourceUrl ref)←'none' '' ''
          :EndIf
      :EndIf
  :EndIf

@@ -1,4 +1,4 @@
- r←GetReadmeSection packagePath;status;sourceUrl;markdown;body;minSize;prefix
+ r←GetReadmeSection packagePath;status;sourceUrl;ref;markdown;body;minSize;prefix
 ⍝ Returns the HTML for the README of the package in `packagePath`, as a vector of character
 ⍝ vectors, or '' when there is nothing worth showing.
 ⍝ '' means "leave the section out altogether": no heading, and no notice saying that there
@@ -10,7 +10,7 @@
  r←''
  minSize←200
  prefix←'readme-'                                   ⍝ Keeps the README's ids clear of the page's own
- (status sourceUrl markdown)←ReadStoredReadme packagePath
+ (status sourceUrl ref markdown)←ReadStoredReadme packagePath
  :If 'ok'≢status
      :Return
  :EndIf
@@ -22,7 +22,12 @@
  :EndIf
  r←⊂'<section class="readme">'
  r,←body
-⍝ Whoever wrote it gets the credit, and the URL carries the tag, so it also says which
-⍝ release this documentation belongs to.
- r,←⊂'<p class="readme-source">README from <a href="',(EscapeAttributeValue sourceUrl),'" rel="nofollow noopener">',(EscapeSpecialChars sourceUrl),'</a></p>'
+⍝ Whoever wrote it gets the credit. A URL carrying the tag says which release this
+⍝ documentation belongs to; one carrying the default branch does not, and says so, because
+⍝ the project may have moved on since this version was published.
+ :If 'branch'≡ref
+     r,←⊂'<p class="readme-source">README from the project''s default branch, not from this release: <a href="',(EscapeAttributeValue sourceUrl),'" rel="nofollow noopener">',(EscapeSpecialChars sourceUrl),'</a></p>'
+ :Else
+     r,←⊂'<p class="readme-source">README from <a href="',(EscapeAttributeValue sourceUrl),'" rel="nofollow noopener">',(EscapeSpecialChars sourceUrl),'</a></p>'
+ :EndIf
  r,←⊂'</section>'

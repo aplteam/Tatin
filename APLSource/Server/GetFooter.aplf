@@ -1,7 +1,17 @@
  html←GetFooter;footer;email;subject
  html←''
- html,←⊂'<div id="my-footer">'
- html,←⊂'<hr>'
+ html,←⊂'<footer id="my-footer">'
+ footer←'Created by Tatin version ',(⊃{⍺,' from ',⍵}/1↓Version),' under ',⍕'#'⎕WG'APLVersion'
+ subject←⊃G.INI.Get'CONFIG:Subject'
+ email←⊃G.INI.Get'CONFIG:EmailAddress'
+ :If 0<≢subject
+ :AndIf 0<≢email
+     footer,←' &#8212; Bugs, questions, problems: '
+     ((subject∊'''"')/subject)←'`'
+     subject←' '⎕R'\%20'⊣subject
+     footer,←'<a class="mailto_link" href="mailto:',email,'?subject=',(subject~'''`'),'">',email,'</a>'
+ :EndIf
+ html,←⊂'<p id="version-line">',footer,'</p>'
 ⍝ For whoever runs the server rather than whoever visits it, so down here rather than in
 ⍝ the main menu.
  html,←⊂'<p id="server-links">'
@@ -9,16 +19,5 @@
  html,←⊂'<a href="',Reg.VersionOf_REST,'/usage-data">Usage data</a>'
  html,←⊂'<a href="',Reg.VersionOf_REST,'/version-information">Version information</a>'
  html,←⊂'</p>'
- footer←'Created by Tatin version ',(⊃{⍺,' from ',⍵}/1↓Version),' under ',⍕'#'⎕WG'APLVersion'
- subject←⊃G.INI.Get'CONFIG:Subject'
- email←⊃G.INI.Get'CONFIG:EmailAddress'
- :If 0<≢subject
- :AndIf 0<≢email
-     footer,←'	&#8212; Bugs, questions, problems:'
-     ((subject∊'''"')/subject)←'`'
-     subject←' '⎕R'\%20'⊣subject
-     footer,←'<a class="mailto_link" href="mailto:',email,'?subject=',(subject~'''`'),'">',email,'</a>'
- :EndIf
- html,←⊂'<p>',footer,'</p>'
- html,←⊂'</div>'
+ html,←⊂'</footer>'
 ⍝Done

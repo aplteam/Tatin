@@ -1,0 +1,13 @@
+ r←GetTestServerStrip ini;text
+⍝ Returns the strip that tells a test server from a production server, or '' when the INI
+⍝ file does not ask for one. `HtmlHeader` puts it at the very top of every page.
+⍝ The text comes from the INI entry "HTMLBACKGROUND:watermark"; on https://test.tatin.dev it
+⍝ reads "Tatin Test Server" for example.
+⍝ "HTMLBACKGROUND:color" is ignored: the page background is part of the design. The entry is
+⍝ on the list of things to be removed (see `ToDo`).
+ r←''
+ :If ini.Exist'HTMLBACKGROUND:watermark'
+     text←⊃ini.Get'HTMLBACKGROUND:watermark'
+ :AndIf 0<≢text
+     r←⊂'<div id="test-server-strip">',(EscapeSpecialChars text),'</div>'
+ :EndIf

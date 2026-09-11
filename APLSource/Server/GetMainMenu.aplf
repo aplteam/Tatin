@@ -1,13 +1,15 @@
- r←GetMainMenu dummy;items
+ r←GetMainMenu menuItem;items;links
 ⍝ Returns the main menu as a vector of character vectors.
 ⍝ `HtmlHeader` puts it on every page, which is what allows the home page to be about the
 ⍝ Registry rather than a list of links to the rest of it.
 ⍝ The administrative pages - credential report, usage data, version information - are not
 ⍝ here but in the footer: they are for whoever runs the server rather than whoever visits it,
 ⍝ and "robots.txt" keeps crawlers away from them in any case.
-⍝ There is no marking of the page one is on. `HtmlHeader` does not know which page it is
-⍝ building, and telling it would mean another item in ⍺ and a change to every caller for
-⍝ something a menu of six barely needs.
+⍝ `menuItem` is the path of the item the page being built belongs to, like '/packages'; that
+⍝ item is marked as the current one. '' marks none.
+⍝ The links are written twice: as a plain row for wide screens and inside a <details> element
+⍝ for phones. That needs no JavaScript and cannot get stuck open; the stylesheet shows one or
+⍝ the other.
  items←''
  items,←⊂'/packages' 'Packages'
  items,←⊂'/deprecated-pkgs' 'Deprecated'
@@ -17,9 +19,21 @@
  :AndIf 0<≢⊃G.INI.Get'LICENSE:names'
      items,←⊂'/get-licenses' 'Licensing'
  :EndIf
- r←⊂'<nav id="main-menu">'
- r,←⊂'<ul>'
- r,←{'<li><a href="',Reg.VersionOf_REST,(1⊃⍵),'">',(2⊃⍵),'</a></li>'}¨items
- r,←⊂'<li><a href="https://aplteam.github.io/Tatin/">Documentation</a></li>'
+ links←{
+     (path caption)←⍵
+     current←path≡menuItem
+     '<li><a href="',Reg.VersionOf_REST,path,'"',(current/' aria-current="page"'),'>',caption,'</a></li>'
+ }¨items
+ links,←⊂'<li><a href="https://aplteam.github.io/Tatin/">Documentation</a></li>'
+ r←⊂'<nav id="main-menu" aria-label="Main menu">'
+ r,←⊂'<ul class="menu-wide">'
+ r,←links
  r,←⊂'</ul>'
+ r,←⊂'<details class="menu-narrow">'
+ r,←⊂'<summary>Menu</summary>'
+ r,←⊂'<ul>'
+ r,←links
+ r,←⊂'</ul>'
+ r,←⊂'</details>'
  r,←⊂'</nav>'
+⍝Done

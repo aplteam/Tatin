@@ -1,7 +1,13 @@
  AddSpecialMessage←{
-⍝ Useful for adding a general message to ALL HTML pages right after the <h1> in case the INI file says so.
+⍝ Returns the band carrying a general message for ALL HTML pages in case the INI file says so,
+⍝ otherwise ''. `HtmlHeader` puts it right below the site header.
+⍝ Every entry of "MSG:Text" becomes a paragraph of its own. "MSG:CSS", when given, is still
+⍝ written onto the band as an inline style.
      0=≢∊msg←⊆⊃G.INI.Get'MSG:Text':''
      css←⊃G.INI.Get'MSG:CSS'
-     style←{0=≢⍵:⍵ ⋄ 'style="',⍵,'"'}css
-     style∘{'<div class="noprint" ',⍺,'><p>',⍵,'</p></div>'}¨msg
+     style←{0=≢⍵:⍵ ⋄ ' style="',⍵,'"'}css
+     html←⊂'<div id="special-message" class="noprint"',style,'>'
+     html,←⊂'<p class="special-message-label">Notice</p>'
+     html,←{'<p>',⍵,'</p>'}¨msg
+     html,⊂'</div>'
  }

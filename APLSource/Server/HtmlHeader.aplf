@@ -1,11 +1,11 @@
- html←{parms}HtmlHeader add;caption;title;docTitle;noIndexing;pageTitle
+ html←{parms}HtmlHeader add;caption;title;docTitle;noIndexing;pageTitle;menuItem
 ⍝ Strictly speaking this does not only return a header: it also returns...
 ⍝ * the DOC type
 ⍝ * an opening html tag
 ⍝ * an opening body tag
-⍝ * some more stuff shared by all Tatin HTML pages
-⍝ ⍺ is optional. When given it must carry exactly two items: (noIndexing pageTitle).
-⍝ Two rather than "up to two" on purpose: `1 'X'` is a simple vector while `1 'Foo'` is a
+⍝ * the strip of a test server, the site header with the main menu and the special message
+⍝ ⍺ is optional. When given it must carry exactly three items: (noIndexing pageTitle menuItem).
+⍝ Three rather than "up to three" on purpose: `1 'X'` is a simple vector while `1 'Foo'` is a
 ⍝ nested one, so a length-tolerant ⍺ would have to tell those apart and would get a
 ⍝ one-character page title wrong. Pass '' or ⍬ for an item you have nothing to say about.
 ⍝ `noIndexing`: pass a 1 for a page that should not be indexed by, say, Google.
@@ -16,16 +16,19 @@
 ⍝ package ID. It goes in front of the server's own title in <title>, so that browser tabs
 ⍝ and search results tell the pages apart. Pass '' to let the server's title stand on its
 ⍝ own, which is what the home page wants.
- (noIndexing pageTitle)←{0<⎕NC ⍵:⍎⍵ ⋄ ⍬ ''}'parms'
+⍝ `menuItem`: the path of the main menu item this page belongs to, like '/packages' (see
+⍝ `GetMainMenu`); that item is marked as the current one. Pass '' for a page that belongs to
+⍝ none of them, like the home page or the pages linked from the footer.
+ (noIndexing pageTitle menuItem)←{0<⎕NC ⍵:⍎⍵ ⋄ ⍬ '' ''}'parms'
  :If 0=≢noIndexing
      noIndexing←0 G.INI.Get'CONFIG:NoIndexing'
  :EndIf
  html←''
+⍝ `OnRequest` recognises an HTML page by this exact string, so it must not change its spelling
  html,←⊂'<!DOCTYPE html>'
  html,←⊂'<html lang="en">'
  html,←⊂'<head>'
  title←⊃G.INI.Get'Config:Title'
-⍝ `title` on its own remains the server's title: it is used for the logo further down.
  docTitle←title
  :If 0<≢pageTitle
      docTitle←pageTitle,' - ',title
@@ -41,21 +44,21 @@
 ⍝html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="screen">'   ⍝ Can be useful for debugging the "Print" CSS
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print.css" media="print">'
  html,←⊂'<link rel="icon" type="image/x-icon" href="/Assets/img/favicon.ico">'
- html,←FetchBackground G.INI
  html,←⍕¨⊆add
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/screen-tweaks.css" media="screen">'
  html,←⊂'<link rel="stylesheet" type="text/css" href="/Assets/CSS/print-tweaks.css" media="print">'
  html,←⊂'</head>'
  html,←⊂'<body>'
- html,←⊂'<div id="my-logo">'
+ html,←GetTestServerStrip G.INI
  caption←⊃G.INI.Get'Config:Caption'
- html,←⊂'<a href="/"><img id="logo" src="/Assets/img/tatin.png" title="Link to ',title,' main page" alt="Link to ',title,' main page"></a>'
+ html,←⊂'<header id="my-header">'
 ⍝ The caption goes home as well as the logo does: half the visitors aim at the words rather
 ⍝ than at the picture, and finding nothing there sends them looking for a "Home" menu item
-⍝ that does not exist.
- html,←⊂'<h1><a href="/">',caption,'</a></h1>'
- html,←⊂'</div>'
+⍝ that does not exist. The caption is shown in one piece, whatever the INI file says.
+ html,←⊂'<h1 id="my-logo"><a href="/" title="Link to ',(EscapeSpecialChars title),' main page"><img id="logo" src="/Assets/img/tatin.png" alt=""><span>',(EscapeSpecialChars caption),'</span></a></h1>'
 ⍝ The menu goes on every page; see `GetMainMenu` for why.
- html,←GetMainMenu ⍬
+ html,←GetMainMenu menuItem
+ html,←⊂'</header>'
+ html,←AddSpecialMessage ⍬
  html←,¨html
 ⍝Done

@@ -5,9 +5,8 @@
 ⍝ than by position, so it does not matter which way round `data` happens to be sorted.
  newestPath←G.RegistryPath,'/',⊃data[(⊃⌽⍋data[;2]);1]
  description←GetPackageDescription newestPath     ⍝ Wanted twice: in the head and on the page
- html←(⍬ packageID)HtmlHeader(GetMetaDescription description),GetJavaScriptForCopyButton ⍬
+ html←(⍬ packageID '/packages')HtmlHeader(GetMetaDescription description),GetJavaScriptForCopyButton ⍬
  html,←⊂'<h2>All versions of "',packageID,'"</h2>'
- html,←AddSpecialMessage ⍬
 ⍝ The box floats, so it goes before the description it sits beside.
  html,←GetInstallInfo packageID(≢data)
  :If 0<≢description

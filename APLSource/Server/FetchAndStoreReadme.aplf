@@ -1,4 +1,4 @@
- status←FetchAndStoreReadme packagePath;cfg;projectUrl;version;sourceUrl;refKind;markdown;qdmx
+ status←FetchAndStoreReadme packagePath;cfg;projectUrl;version;packageName;sourceUrl;refKind;markdown;qdmx
 ⍝ Fetches the README for the package in `packagePath` and records the outcome; see
 ⍝ `GetReadmeFilenames` for where it goes. Returns 'ok', 'none' or 'error'.
 ⍝ A package without a "project_url" - the field arrived after packages had been published -
@@ -20,6 +20,7 @@
  :EndTrap
  projectUrl←{0=cfg.⎕NC ⍵:'' ⋄ cfg⍎⍵}'project_url'
  version←{0=cfg.⎕NC ⍵:'' ⋄ cfg⍎⍵}'version'
- (status sourceUrl refKind markdown)←FetchReadme projectUrl version
+ packageName←{0=cfg.⎕NC ⍵:'' ⋄ cfg⍎⍵}'name'
+ (status sourceUrl refKind markdown)←FetchReadme projectUrl version packageName
  StoreReadme packagePath status sourceUrl refKind markdown
 ⍝Done

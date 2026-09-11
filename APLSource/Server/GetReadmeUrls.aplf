@@ -1,4 +1,4 @@
- r←GetReadmeUrls(projectUrl version);ver;group;repo;path;tag;filename;filenames;branchRef
+ r←GetReadmeUrls(projectUrl version packageName);ver;group;repo;path;tag;filename;filenames;branchRef
 ⍝ Returns a three-column matrix with the URLs a package's README might be fetched from:
 ⍝ [;1] the "raw.githubusercontent.com" URL to fetch it from
 ⍝ [;2] the matching "github.com/.../blob/..." URL, recorded for attributing the source
@@ -19,6 +19,15 @@
 ⍝ raw.githubusercontent.com and github.com both accept it, so the name need not be looked
 ⍝ up - which would take an API call, and the GitHub API allows only 60 an hour without a
 ⍝ token.
+⍝ The branch rows are offered only when the repository is named after the package. A
+⍝ package whose "project_url" is simply wrong - pointing at a predecessor, say - has no tag
+⍝ to match either, so without that test the fallback would quietly fetch some other
+⍝ project's README and present it as this one's. The tag rows carry no such test: a tag
+⍝ naming this very version is evidence enough that the repository is the right one.
+⍝ It is a test on the name and nothing more, so it errs: a package that legitimately lives
+⍝ in a repository of a different name - one of several in a monorepo, or a project since
+⍝ renamed - loses the fallback and shows no README. That is the direction to err in. An
+⍝ absent package name is not held against anybody, because then there is nothing to compare.
 ⍝ The result is empty when `projectUrl` does not point at a GitHub repository: nothing else
 ⍝ is supported, and guessing would attach a stranger's README to a package.
  r←0 3⍴''
@@ -46,7 +55,9 @@
          r⍪←(GetRawGitHubUrl group repo tag filename)(GetBlobGitHubUrl group repo tag filename)'tag'
      :EndFor
  :EndFor
- :For filename :In filenames
-     r⍪←(GetRawGitHubUrl group repo branchRef filename)(GetBlobGitHubUrl group repo branchRef filename)'branch'
- :EndFor
+ :If (0=≢packageName)∨(⎕C packageName)≡⎕C repo
+     :For filename :In filenames
+         r⍪←(GetRawGitHubUrl group repo branchRef filename)(GetBlobGitHubUrl group repo branchRef filename)'branch'
+     :EndFor
+ :EndIf
 ⍝Done

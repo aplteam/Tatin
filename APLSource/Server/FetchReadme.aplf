@@ -1,4 +1,4 @@
- (status sourceUrl refKind markdown)←FetchReadme(projectUrl version);urls;i;u;c;q;resp;answered;maxSize;rawUrl;blobUrl;text
+ (status sourceUrl refKind markdown)←FetchReadme(projectUrl version packageName);urls;i;u;c;q;resp;answered;maxSize;rawUrl;blobUrl;text
 ⍝ Fetches a package's README from GitHub. Returns one of:
 ⍝ * ('ok' sourceUrl refKind markdown) - found; `refKind` is 'tag' or 'branch'
 ⍝ * ('none' '' '' '')                 - GitHub answered and there is no README to be had
@@ -9,7 +9,8 @@
 ⍝ Registry for good.
 ⍝ The rows are walked in the order `GetReadmeUrls` returns them, so every spelling of the
 ⍝ release's own tag is tried before the default branch is considered at all: a package
-⍝ whose repository carries the tag never ends up with the branch's README.
+⍝ whose repository carries the tag never ends up with the branch's README. `packageName` is
+⍝ passed on for the test that decides whether the branch is offered at all; see there.
 ⍝ A failed connection ends the walk then and there rather than moving on to the next
 ⍝ spelling: what failed is the connection to GitHub, not that particular URL, so the rows
 ⍝ left cannot fare any better, and trying them all would multiply one outage by the number
@@ -25,7 +26,7 @@
  (status sourceUrl refKind markdown)←'error' '' '' ''
  answered←0
  maxSize←262144                                     ⍝ 256 KB; anything larger is not a README
- urls←GetReadmeUrls projectUrl version
+ urls←GetReadmeUrls projectUrl version packageName
  :If 0=≢urls
      status←'none'                                  ⍝ Nowhere to look is not a network problem
      :Return

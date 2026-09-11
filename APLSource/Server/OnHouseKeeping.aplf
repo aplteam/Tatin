@@ -1,4 +1,4 @@
- {r}←OnHouseKeeping msg;savedAt;rideable;rideableOld;rideActive;qdmx
+ {r}←OnHouseKeeping msg;savedAt;rideable;rideableOld;rideActive;⎕TRAP;TRAP;qdmx
 ⍝ Used for these purposes:
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
@@ -6,78 +6,54 @@
 ⍝ * Check whether the file "year" in the log folder is identical to ⊃⎕TS; if it
 ⍝   is not then take action.
  r←0
- :Trap 0
-     ReportNumberOfThreads G.INI
-     :If 1=∆SHUTDOWN
-         ∆SHUTDOWN←¯1  ⍝ In case this function runs again before it comes to an end
-         {}⎕NQ'#'GetQuitDQEvent
-         P.WindowsEventLog'Shutting down'
-         P.G.Server Log'Tatin Server is shutting down'
-         #.Tatin.TestCasesServer.Cleanup
-         :If ~A.IsDevelopment
-             ⎕OFF
-         :EndIf
-     :ElseIf ¯1≠∆SHUTDOWN
-         :If 0<⎕NC'∆WS_HASH'
-             ReloadThisWorkspaceIfChanged G.INI
-         :EndIf
-         :If F.IsFile G.RegistryPath,'/Credentials.txt'
-         :OrIf G.CredentialsTimestamp≢Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.RegistryPath,'/Credentials.csv'
-             G←ProcessCredentials G         ⍝  Credentials have changed, so we read them again
-         :EndIf
-         savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
-         :If G.INI.EstablishedAt<savedAt
-             rideActive←0 G.INI.Get'RIDE:active'
-             P.G(P.ProcessIniFile)←G.INI.IniFilename  ⍝ ... we initialize from scratch
-             Log'INI file re-instantiated because it was changed on disk'
-             rideable←P.CheckForRide P.G.INI
-             :If rideActive≠rideable
-                 :If rideable
-                     msg←'Ride is now enabled'
-                 :Else
-                     msg←'Ride is now disabled'
-                 :EndIf
-             :EndIf
-             Log msg
-         :EndIf
-         Logs.ProcessLogFile(∊P.LogFolder)(3↑⎕TS)
-         ExecuteMaintenanceCode G
-        ⍝ READMEs are fetched in a thread of their own, so housekeeping does not wait for
-        ⍝ GitHub. Only one at a time: ⎕TNUMS is asked rather than a flag, because a flag left
-        ⍝ standing by a thread that died would block this for the life of the server.
-        ⍝ `ReadmesAreDue` is a single stat unless there is genuinely something to do.
-        ⍝ Publishing does not do any of this, on purpose.
-         :If 0=⎕NC'∆README_TID'
-             ∆README_TID←¯1
-         :EndIf
-         :Trap 0
-             :If ~∆README_TID∊⎕TNUMS
-             :AndIf ReadmesAreDue G.RegistryPath
-                 ∆README_TID←ProcessReadmes&G.RegistryPath
-             :EndIf
-         :Else
-             LogError'Could not start the README thread: ',⎕DMX.EM
-         :EndTrap
-        ⍝ Announcing changed pages to IndexNow, in a thread of its own for the same reasons
-        ⍝ and with the same guard. It decides for itself whether there is anything to do.
-         :If 0=⎕NC'∆INDEXNOW_TID'
-             ∆INDEXNOW_TID←¯1
-         :EndIf
-         :Trap 0
-             :If ~∆INDEXNOW_TID∊⎕TNUMS
-                 ∆INDEXNOW_TID←PingIndexNow&G.RegistryPath
-             :EndIf
-         :Else
-             LogError'Could not start the IndexNow thread: ',⎕DMX.EM
-         :EndTrap
+ TRAP←⎕TRAP
+ ⎕TRAP←(⊂#.ErrorParms.signal'C' '→∆CarryOn'),⎕TRAP  ⍝ HandleError signals this when it is done.
+ :If 1=∆SHUTDOWN
+     ∆SHUTDOWN←¯1  ⍝ In case this function runs again before it comes to an end
+     {}⎕NQ'#'GetQuitDQEvent
+     P.WindowsEventLog'Shutting down'
+     P.G.Server Log'Tatin Server is shutting down'
+     #.Tatin.TestCasesServer.Cleanup
+     :If ~A.IsDevelopment
+         ⎕OFF
      :EndIf
- :Else
-     qdmx←⎕DMX
-     :Trap 0
-         P.G.Server Log'Housekeeping error: ',qdmx.EM,'; RC=',⍕qdmx.EN
-         P.G.Server Log'Tatin cannot continue'
-     :Else
-         ⎕OFF 125
-     :EndTrap
-     ⎕SIGNAL 11  ⍝ Let Rumba's "ServerLoop" take over
- :EndTrap
+ :ElseIf ¯1≠∆SHUTDOWN
+     :If 0<⎕NC'∆WS_HASH'
+         ReloadThisWorkspaceIfChanged G.INI
+         :Return
+     :EndIf
+     :If F.IsFile G.RegistryPath,'/Credentials.txt'
+     :OrIf G.CredentialsTimestamp≢Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.RegistryPath,'/Credentials.csv'
+         G←ProcessCredentials G         ⍝  Credentials have changed, so we read them again
+     :EndIf
+     savedAt←Reg.Timestamp2Float⊃⊃('type' 3)F.Dir G.INI.IniFilename
+     :If G.INI.EstablishedAt<savedAt
+         rideActive←0 G.INI.Get'RIDE:active'
+         P.G(P.ProcessIniFile)←G.INI.IniFilename  ⍝ ... we initialize from scratch
+         Log'INI file re-instantiated because it was changed on disk'
+         rideable←P.CheckForRide P.G.INI
+         :If rideActive≠rideable
+             :If rideable
+                 msg←'Ride is now enabled'
+             :Else
+                 msg←'Ride is now disabled'
+             :EndIf
+         :EndIf
+         Log msg
+     :EndIf
+     Logs.ProcessLogFile(∊P.LogFolder)(3↑⎕TS)
+     ExecuteMaintenanceCode G
+     :If 0=⎕NC'∆README_TID'
+         ∆README_TID←¯1
+     :EndIf
+     :If ~∆README_TID∊⎕TNUMS
+     :AndIf ReadmesAreDue G.RegistryPath
+         ∆README_TID←ProcessReadmes&G.RegistryPath
+     :EndIf
+     :If 0=⎕NC'∆INDEXNOW_TID'
+         ∆INDEXNOW_TID←¯1
+     :EndIf
+     :If ~∆INDEXNOW_TID∊⎕TNUMS
+         ∆INDEXNOW_TID←PingIndexNow&G.RegistryPath  ⍝ Announcing changed pages to IndexNow in a thread of its own
+     :EndIf
+ :EndIf

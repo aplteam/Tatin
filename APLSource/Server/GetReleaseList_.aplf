@@ -1,0 +1,13 @@
+ r←GetReleaseList_ row;id;date;version
+⍝ Returns one release of the list of releases on a package page; see `GetReleaseList`.
+⍝ It links to the release's configuration and, when it has any, to its dependencies.
+ (id date)←row
+ version←id↓⍨2⊃⍸'-'=id                              ⍝ All after the name, the hyphen of a beta included
+ r←'<li><span><span class="release-version">',(EscapeSpecialChars version),'</span>'
+ r,←'<span class="release-date">',((≢'YYYY-MM-DD')↑date),'</span></span>'
+ r,←'<span class="release-links"><a href="',Reg.VersionOf_REST,'/packages/details/',id,'">config</a>'
+ :If PackageHasDependencies id
+     r,←'<a href="',Reg.VersionOf_REST,'/packages/dependencies/',id,'">dependencies</a>'
+ :EndIf
+ r,←'</span></li>'
+⍝Done

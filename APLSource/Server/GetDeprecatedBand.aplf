@@ -1,0 +1,13 @@
+ r←GetDeprecatedBand comment;text
+⍝ Returns the band that tells a visitor that a package is deprecated, as a vector of character
+⍝ vectors, together with the comment given when it was deprecated, if any.
+⍝ A URL in that comment becomes a link: it typically points to the successor. A full stop or a
+⍝ comma right after the URL is taken to end the sentence rather than to belong to the URL.
+ r←⊂'<div class="deprecated-band">'
+ r,←⊂'<p class="deprecated-label">Deprecated</p>'
+ :If 0<≢comment
+     text←'(https?://[^\s<>"]*[^\s<>".,;:)])'⎕R'<a href="\1">\1</a>'⊣EscapeSpecialChars comment
+     r,←⊂'<p>',text,'</p>'
+ :EndIf
+ r,←⊂'</div>'
+⍝Done

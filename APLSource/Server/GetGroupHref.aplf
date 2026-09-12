@@ -1,0 +1,9 @@
+ r←GetGroupHref group
+⍝ Returns where the name of a group leads to from a breadcrumb: to the group's home page when it
+⍝ has one, otherwise to the list of packages, showing just that group.
+ :If ⊃0 G.INI.Get'Config:GroupHomePages'
+ :AndIf HasGroupHomePage group
+     r←'/',(GetVersion_REST'group-homepage?name='),group
+ :Else
+     r←Reg.VersionOf_REST,'/packages?group=',group
+ :EndIf

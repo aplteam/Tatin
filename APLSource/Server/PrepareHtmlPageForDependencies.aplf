@@ -1,17 +1,41 @@
- html←PrepareHtmlPageForDependencies deps
- html←(⍬('Dependencies of ',packageID)'/packages')HtmlHeader GetDataTableStuff ⍬
- html,←⊂'<h2>Dependencies of "',packageID,'"</h2>'
- html,←⊂H.OpenTable 2+⌈/≢¨deps
- html,←⊂'<thead>'
- html,←⊂'<tr class="my-first-th">'
- html,←{'<th>',⍵,'</th>'}¨⊆'Dependencies'
- html,←⊂'</thead>'
- html,←⊂'</tr>'
- html,←⊂'<tbody>'
- deps←MakeLinkToPackage¨deps
- html,←{'<tr><td><code>',⍵,'</code></td></tr>'}¨deps
- html,←⊂'</tbody>'
- html,←⊂'</table>'
+ html←PrepareHtmlPageForDependencies(packageID deps);noOfDeps;majorLine;group;name;version
+⍝ The dependencies of a single release, as they were recorded when it was published.
+⍝ `deps` is the dependencies file as a vector of lines, one dependency per line; see
+⍝ `PrepareHtmlPageForDependencies_` for what a line may look like.
+ deps←' '~⍨¨deps
+ deps←(0<≢¨deps)/deps
+ noOfDeps←≢deps
+ majorLine←Reg.RemoveMinorAndPatch packageID
+ (group name)←2↑'-'(≠⊆⊢)packageID
+ version←packageID↓⍨2⊃⍸'-'=packageID
+ html←(⍬('Dependencies of ',packageID)'/packages')HtmlHeader''
+ html,←⊂'<div class="page-head">'
+ html,←⊂GetBreadcrumb('Packages'(Reg.VersionOf_REST,'/packages'))(group(GetGroupHref group))(name(Reg.VersionOf_REST,'/packages/versions/',majorLine))(version'')
+ html,←⊂'<p class="page-label">Dependencies</p>'
+ html,←⊂'<h2 class="page-id">',(EscapeSpecialChars packageID),'</h2>'
+ html,←⊂'</div>'
+ html,←⊂'<div class="side-by-side">'
+ html,←⊂'<div>'
+ :Select noOfDeps
+ :Case 0
+     html,←⊂'<p class="dep-intro">This release has no dependencies.</p>'
+ :Case 1
+     html,←⊂'<p class="dep-intro">This release depends on one package:</p>'
+ :Else
+     html,←⊂'<p class="dep-intro">This release depends on these ',(⍕noOfDeps),' packages:</p>'
+ :EndSelect
+ :If 0<noOfDeps
+     html,←⊂'<div class="dep-list">'
+     html,←PrepareHtmlPageForDependencies_¨deps
+     html,←⊂'</div>'
+ :EndIf
+ html,←⊂'</div>'
+ html,←⊂'<aside class="see-also">'
+ html,←⊂'<h3>See also</h3>'
+ html,←⊂'<a href="',Reg.VersionOf_REST,'/packages/details/',packageID,'">Configuration of <code>',version,'</code></a>'
+ html,←⊂'<a href="',Reg.VersionOf_REST,'/packages/versions/',majorLine,'">All releases of <code>',majorLine,'</code></a>'
+ html,←⊂'</aside>'
+ html,←⊂'</div>'
  html,←⊆GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

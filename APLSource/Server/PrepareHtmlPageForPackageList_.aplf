@@ -7,13 +7,13 @@
  (name majors description os uc tags latestMajor)←row[1 2 3 5 6 7 8]
  group←name↑⍨name⍳'-'                               ⍝ Including the hyphen
  tagList←','(≠⊆⊢)'\s*[,;]\s*'⎕R','⊣tags
- html←'<div class="pkg-row" data-name="',(EscapeAttribute name),'" data-desc="',(EscapeAttribute description)
- html,←'" data-tags="',(EscapeAttribute{0=≢⍵:'' ⋄ 1↓⊃,/' ',¨⍵}tagList),'" data-majors="',(⍕majors),'">'
+ html←'<div class="pkg-row" data-name="',(EscapeAttributeValue name),'" data-desc="',(EscapeAttributeValue description)
+ html,←'" data-tags="',(EscapeAttributeValue{0=≢⍵:'' ⋄ 1↓⊃,/' ',¨⍵}tagList),'" data-majors="',(⍕majors),'">'
  html,←'<a class="pkg-name" href="',Reg.VersionOf_REST,'/packages/versions/',latestMajor,'">'
  html,←'<span class="pkg-group-prefix">',(EscapeSpecialChars group),'</span>',(EscapeSpecialChars(≢group)↓name),'</a>'
  html,←'<div class="pkg-desc"><span>',(EscapeSpecialChars description),'</span>'
  :If 0<≢tagList
-     html,←'<span class="pkg-tags">',(⊃,/{'<a href="',Reg.VersionOf_REST,'/packages?tag=',(EscapeAttribute ⍵),'">#',(EscapeSpecialChars ⍵),'</a>'}¨tagList),'</span>'
+     html,←'<span class="pkg-tags">',(⊃,/{'<a href="',Reg.VersionOf_REST,'/packages?tag=',(EscapeAttributeValue ⍵),'">',(EscapeSpecialChars ⍵),'</a>'}¨tagList),'</span>'
  :EndIf
  html,←'</div>'
  html,←'<span class="pkg-os" title="Runs on">',(⊃,/{'<span',((⍵∊os)/' class="os-on"'),'>',⍵,'</span>'}¨'LMW'),'</span>'

@@ -93,7 +93,7 @@
         var showAll = document.createElement("button");
         note.className = "tag-filter";
         label.appendChild(document.createTextNode("Only packages tagged "));
-        name.textContent = "#" + tag;
+        name.textContent = tag;
         label.appendChild(name);
         showAll.type = "button";
         showAll.textContent = "Show all packages";

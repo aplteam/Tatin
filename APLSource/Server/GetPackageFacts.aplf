@@ -1,0 +1,35 @@
+ r←GetPackageFacts cfg;version;date;license;minAplVersion;osNames;flags;os;url
+⍝ Returns the key facts about a release for the top of its package page, as a vector of
+⍝ character vectors: its version, when it was published, its licence, the oldest version of
+⍝ Dyalog it runs under, the operating systems, whether it is a user command and where the
+⍝ project lives. `cfg` is the release's config as a namespace.
+⍝ A fact the config does not carry is left out rather than shown empty. "Runs on" and "User
+⍝ command" are the exceptions: every package has an answer to those.
+ r←⊂'<dl class="facts">'
+ :If 0<≢version←'' GetConfigValue cfg'version'
+     r,←⊂'<div><dt>Latest</dt><dd class="fact-code fact-latest">',(EscapeSpecialChars version),'</dd></div>'
+ :EndIf
+ :If 0<date←0 GetConfigValue cfg'date'
+     r,←⊂'<div><dt>Published</dt><dd class="fact-code">',((≢'YYYY-MM-DD')↑FormatFloatDate date),'</dd></div>'
+ :EndIf
+ :If 0<≢license←'' GetConfigValue cfg'license'
+     r,←⊂'<div><dt>Licence</dt><dd>',(EscapeSpecialChars license),'</dd></div>'
+ :EndIf
+ :If 0<≢minAplVersion←'' GetConfigValue cfg'minimumAplVersion'
+     r,←⊂'<div><dt>Dyalog</dt><dd>',(EscapeSpecialChars minAplVersion),' or later</dd></div>'
+ :EndIf
+⍝ A package that does not say which operating systems it runs on is taken to run on all of them
+ osNames←'Linux' 'macOS' 'Windows'
+ flags←1 GetConfigValue¨(⊂cfg),¨⊂¨'os_lin' 'os_mac' 'os_win'
+ os←⊃,/{'<span',((⍵⊃flags)/' class="os-on"'),' title="',(⍵⊃osNames),'">',(⍵⊃'LMW'),'</span>'}¨⍳≢osNames
+ r,←⊂'<div><dt>Runs on</dt><dd class="fact-os">',os,'</dd></div>'
+ :If 0<≢'' GetConfigValue cfg'userCommandScript'
+     r,←⊂'<div><dt>User command</dt><dd><span class="uc-flag uc-yes" aria-hidden="true"></span><span class="sr-only">Yes</span></dd></div>'
+ :Else
+     r,←⊂'<div><dt>User command</dt><dd class="fact-none"><span aria-hidden="true">—</span><span class="sr-only">No</span></dd></div>'
+ :EndIf
+ :If 0<≢url←'' GetConfigValue cfg'project_url'
+     r,←⊂'<div class="fact-project"><dt>Project</dt><dd><a href="',(EscapeAttributeValue url),'">',(EscapeSpecialChars('^https?://'⎕R'')url),'</a></dd></div>'
+ :EndIf
+ r,←⊂'</dl>'
+⍝Done

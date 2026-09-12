@@ -654,72 +654,6 @@ input[type="submit"]:hover {
     font-weight: 500;
 }
 
-/* --- Package page ------------------------------------------------ */
-
-.install-info {
-    margin: var(--space-5) 0;
-    padding: var(--space-3) var(--space-5);
-    background-color: var(--panel);
-}
-
-.install-info p {
-    margin: var(--space-1) 0;
-}
-
-/* The command is there to be copied, so it must not be broken across lines */
-.install-info code {
-    padding: 0;
-    background: none;
-    white-space: nowrap;
-}
-
-.pkg-description {
-    font-size: 19px;
-    color: var(--ink-soft);
-}
-
-.readme h2, .readme h3, .readme h4, .readme h5, .readme h6 {
-    clear: none;
-}
-
-.readme-source {
-    margin-top: var(--space-5);
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--rule);
-    font-size: 14px;
-    color: var(--faint);
-}
-
-/* Created by JavaScript, so it is only ever here when it can actually do something */
-.jump-arrow {
-    position: relative;
-    bottom: 2px;
-    margin-left: 0.15em;
-    vertical-align: text-bottom;
-    overflow: visible;
-}
-
-/* A round icon button, so that it looks like one */
-.copy-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    margin-left: var(--space-3);
-    padding: 0;
-    border: 1px solid var(--control-border);
-    border-radius: 999px;
-    background: var(--paper-raised);
-    color: var(--faint);
-    vertical-align: middle;
-    cursor: pointer;
-}
-
-.copy-btn svg {
-    overflow: visible;
-}
-
 /* --- Small screens --------------------------------------------- */
 
 @media (max-width: 48em) {
@@ -758,10 +692,6 @@ input[type="submit"]:hover {
 
     #special-message {
         padding: 12px 16px;
-    }
-
-    .install-info code {
-        white-space: normal;
     }
 
     .button,
@@ -1333,4 +1263,584 @@ input[type="submit"]:hover {
 
 .tag-filter button:hover {
     border-color: var(--ink);
+}
+
+/* --- Package pages ---------------------------------------------------- */
+
+/* The head of a page further down the site: breadcrumb, title and what the page is about */
+.page-head {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 32px 0 28px;
+}
+
+.page-head h2 {
+    margin: 0;
+    line-height: 1.1;
+}
+
+.page-sub {
+    color: var(--faint);
+    font-size: 20px;
+    letter-spacing: 0;
+}
+
+.page-head .lead {
+    max-width: 760px;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 22px;
+    line-height: 1.35;
+}
+
+.page-label {
+    margin: 0;
+    color: var(--faint);
+    font-size: 14px;
+}
+
+.page-label code {
+    padding: 0;
+    background: none;
+}
+
+/* A package ID as the title: the configuration and the dependencies of a release */
+.page-head .page-id {
+    font-family: var(--font-code);
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.page-head.is-deprecated h2,
+.page-head.is-deprecated .lead {
+    color: var(--muted);
+}
+
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 8px;
+    color: var(--faint);
+    font-size: 15px;
+}
+
+.deprecated-band {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 22px;
+    margin: 0 0 24px;
+    padding: 16px 24px;
+    border-top: 2px solid var(--warning);
+    background: var(--warning-panel);
+}
+
+.deprecated-band p {
+    margin: 0;
+    font-size: 18px;
+}
+
+.deprecated-band .deprecated-label {
+    color: var(--warning);
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Key facts from the config of the newest release */
+.facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 44px;
+    margin: 0;
+    padding: 16px 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+}
+
+.facts div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.facts dt {
+    color: var(--faint);
+    font-size: 14px;
+}
+
+.facts dd {
+    margin: 0;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+}
+
+.facts .fact-code {
+    font-family: var(--font-code);
+}
+
+.facts .fact-latest {
+    font-weight: 600;
+}
+
+.facts .fact-os {
+    display: flex;
+    gap: 6px;
+    font-family: var(--font-code);
+    font-size: 15px;
+}
+
+.facts .fact-os span {
+    color: #d6cab8;
+}
+
+.facts .fact-os .os-on {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.facts .fact-none {
+    color: var(--faint);
+}
+
+.install {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin: 28px 0 44px;
+    padding: 18px 24px;
+    background: var(--panel);
+}
+
+.install-label {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.install-cmd-box {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 0;
+    padding: 10px 14px;
+    border: 1px solid var(--rule);
+    background: var(--paper-raised);
+}
+
+/* The command breaks at its blanks only, unless a single word is wider than the box */
+.install-cmd-box code {
+    padding: 0;
+    background: none;
+    font-size: 16px;
+    overflow-wrap: break-word;
+}
+
+/* A round icon button, so that it looks like one. Created by JavaScript, so it is only ever
+   there when it can actually do something. */
+.copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    background: var(--paper-raised);
+    color: var(--faint);
+    cursor: pointer;
+}
+
+.copy-btn:hover {
+    border-color: var(--ink);
+}
+
+.copy-btn svg {
+    overflow: visible;
+}
+
+/* ReadMe on the left, releases and tags on the right */
+.pkg-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 72px;
+    align-items: start;
+    margin-top: 40px;
+}
+
+/* Without a ReadMe the releases take its place rather than leave a hole */
+.pkg-body.no-readme {
+    grid-template-columns: minmax(0, 720px);
+}
+
+.pkg-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    min-width: 0;
+}
+
+.readme {
+    max-width: 720px;
+    min-width: 0;
+}
+
+.readme h2, .readme h3, .readme h4, .readme h5, .readme h6 {
+    clear: none;
+}
+
+.readme h3 {
+    margin: 36px 0 12px;
+    font-size: 26px;
+}
+
+.readme h4 {
+    margin: 30px 0 8px;
+    font-size: 20px;
+}
+
+.readme > :first-child {
+    margin-top: 0;
+}
+
+.readme-source {
+    margin-top: var(--space-5);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--rule);
+    color: var(--faint);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.releases .section-head {
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ink);
+}
+
+.releases .section-head h3,
+.pkg-tag-list h3,
+.see-also h3 {
+    font-size: 26px;
+}
+
+.releases .section-head span {
+    color: var(--faint);
+    font-size: 14px;
+}
+
+.release-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.release-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.release-version {
+    display: block;
+    font-family: var(--font-code);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.release-date {
+    display: block;
+    color: var(--faint);
+    font-size: 13px;
+}
+
+.release-links {
+    display: flex;
+    gap: 14px;
+    font-size: 14px;
+}
+
+/* Round, so that it looks like a button */
+.show-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    margin-top: 12px;
+    padding: 0 18px;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.show-all:hover {
+    border-color: var(--ink);
+}
+
+.pkg-tag-list h3,
+.see-also h3 {
+    margin: 0 0 4px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ink);
+}
+
+.pkg-tag-list p {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 6px 0 0;
+    font-size: 15px;
+}
+
+.pkg-tag-list a {
+    color: var(--accent);
+}
+
+/* The configuration and the dependencies of a release, with "See also" beside them */
+.side-by-side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 64px;
+    align-items: start;
+}
+
+.see-also {
+    display: flex;
+    flex-direction: column;
+}
+
+.see-also a {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    font-size: 16px;
+}
+
+.see-also code {
+    padding: 0;
+    background: none;
+    font-size: 14px;
+}
+
+.config-json {
+    margin: 0;
+    padding: 22px 32px;
+    border: 1px solid var(--rule);
+    border-top: 2px solid var(--ink);
+    background: var(--paper-raised);
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.json-key {
+    color: var(--link);
+}
+
+.json-number {
+    color: var(--accent);
+}
+
+.dep-intro {
+    margin: 0 0 14px;
+    color: var(--ink-soft);
+}
+
+.dep-list {
+    border-top: 1px solid var(--ink);
+}
+
+.dep-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.dep-id {
+    font-family: var(--font-code);
+    font-size: 16px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+a.dep-id {
+    color: var(--ink);
+}
+
+.dep-note {
+    font-size: 15px;
+}
+
+span.dep-note {
+    color: var(--faint);
+}
+
+.major-list {
+    max-width: 760px;
+    border-top: 1px solid var(--ink);
+}
+
+.major-row {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 24px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.major-row a {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.major-row > span {
+    color: var(--faint);
+    font-size: 16px;
+}
+
+.major-row .latest {
+    color: var(--accent);
+}
+
+@media (max-width: 48em) {
+    .page-head {
+        gap: 6px;
+        padding: 12px 0 20px;
+    }
+
+    .page-sub {
+        display: block;
+        margin-top: 4px;
+        font-size: 16px;
+    }
+
+    .page-head .lead {
+        font-size: 18px;
+    }
+
+    .page-head .page-id {
+        font-size: 22px;
+    }
+
+    .breadcrumb a {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
+    }
+
+    .deprecated-band {
+        padding: 12px 16px;
+    }
+
+    .deprecated-band .deprecated-label {
+        font-size: 20px;
+    }
+
+    .deprecated-band p {
+        font-size: 16px;
+    }
+
+    .facts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px 16px;
+        padding: 14px 0;
+    }
+
+    .facts .fact-project {
+        grid-column: 1 / -1;
+    }
+
+    .install {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin: 20px 0 28px;
+        padding: 16px;
+    }
+
+    .install-label {
+        font-size: 22px;
+    }
+
+    .install-cmd-box code {
+        font-size: 14px;
+    }
+
+    .copy-btn {
+        width: var(--tap);
+        height: var(--tap);
+    }
+
+    .pkg-body,
+    .pkg-body.no-readme,
+    .side-by-side {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 32px;
+    }
+
+    .pkg-body {
+        margin-top: 28px;
+    }
+
+    .readme h3 {
+        font-size: 22px;
+    }
+
+    .readme h4 {
+        font-size: 18px;
+    }
+
+    .releases .section-head h3,
+    .pkg-tag-list h3,
+    .see-also h3 {
+        font-size: 22px;
+    }
+
+    .release-links a,
+    .pkg-tag-list a {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
+    }
+
+    .release-list li {
+        padding: 2px 0;
+    }
+
+    .show-all {
+        min-height: var(--tap);
+        padding: 0 20px;
+        font-size: 16px;
+    }
+
+    .config-json {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .dep-row,
+    .major-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2px;
+    }
 }

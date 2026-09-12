@@ -1,3 +1,11 @@
  response←request ReturnUsageDataFiles fullPath;filename
+⍝ Returns a usage data file from the log folder; `fullPath` starts with "usage-data/".
+⍝ Anything but a usage data file - the application log next to them, a path - gets the same 404
+⍝ as a file that does not exist; see `IsUsageDataFilename`.
  filename←{⍵↓⍨⌊/⍵⍳'/\'}fullPath
- response←request ReturnFiles(∊P.LogFolder),filename
+ :If IsUsageDataFilename filename
+     response←request ReturnFiles(∊P.LogFolder),filename
+ :Else
+     response←request Respond 404
+     response.Content←'File not found'
+ :EndIf

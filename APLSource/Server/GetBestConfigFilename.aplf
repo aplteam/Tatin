@@ -1,0 +1,11 @@
+ filename←GetBestConfigFilename pattern;folders;ids;order
+⍝ Returns the name of the config file of the best release among the package folders in the
+⍝ Registry that match `pattern`, or '' when no folder does.
+⍝ "Best" is Tatin's order: by version number and, where that cannot decide, as with betas, by
+⍝ publishing date.
+ filename←''
+ :If 0<≢folders←⊃F.Dir pattern
+     ids←{⊃,/1↓⎕NPARTS ⍵}¨folders
+     order←Reg.SortIndexForPackageIDs G.RegistryPath Reg.InjectPublishingDate ids
+     filename←G.RegistryPath,(⊃⌽ids[order]),'/',Reg.CFG_Name
+ :EndIf

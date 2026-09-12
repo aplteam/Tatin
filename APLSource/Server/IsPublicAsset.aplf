@@ -1,0 +1,12 @@
+ r←IsPublicAsset path;folder
+⍝ Returns 1 when `path` - what follows "Assets/" in a request - may be served, and 0 otherwise.
+⍝ "Assets/Runtime/" holds what the server itself runs on: Plodder, Rumba and the certificates
+⍝ together with their private keys. None of that is for anybody else, so it is never served.
+⍝ The folder name is compared regardless of case and of trailing dots and blanks: Windows
+⍝ opens "runtime." as readily as "Runtime".
+ r←0
+ :If IsSafeRelativePath path
+     folder←path↑⍨¯1+path⍳'/'
+     folder←(-+/∧\⌽folder∊'. ')↓folder
+     r←'runtime'≢⎕C folder
+ :EndIf

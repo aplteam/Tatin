@@ -1,0 +1,11 @@
+ response←request ReturnAsset path
+⍝ Returns a file from the "Assets/" folder. `path` is relative to `G.HTDOCS` and starts with
+⍝ "Assets/".
+⍝ What `IsPublicAsset` refuses gets the same 404 as a file that does not exist, so a request
+⍝ learns nothing about what is there.
+ :If IsPublicAsset(≢StaticFolder)↓path
+     response←request ReturnFiles G.HTDOCS,path
+ :Else
+     response←request Respond 404
+     response.Content←'File not found'
+ :EndIf

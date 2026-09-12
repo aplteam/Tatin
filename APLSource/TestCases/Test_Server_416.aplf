@@ -1,0 +1,39 @@
+ r←Test_Server_416(stopFlag batchFlag);⎕TRAP;uri;blocked;served;downloads;target;request;res;codes
+⍝ Ask for files the server must not hand out: whatever the server itself runs on
+⍝ ("Assets/Runtime/": Plodder, Rumba, certificates and their private keys), anything outside
+⍝ the served folders, reached with ".." or one of its Windows variants, and anything in the log
+⍝ folder that is not a usage data file, like the application log.
+⍝ Files that are meant to be served must still be.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ uri←TC.ReplaceRegistryAlias'[localhost]'
+ blocked←'/Assets/Runtime/Rumba/LICENSE' '/v1/Assets/Runtime/Rumba/LICENSE' '/Assets/runtime/Rumba/LICENSE' '/Assets/Runtime./Rumba/LICENSE'
+ blocked,←'/Assets/../server.ini' '/Assets/CSS/../../server.ini' '/v1/Assets/../server.ini' '/Assets/..\server.ini'
+ blocked,←'/usage-data/app-log.txt' '/usage-data/../Logs/app-log.txt'
+ served←'/Assets/img/tatin.png' '/v1/Assets/img/tatin.png'
+⍝ The JSON download of usage data files, which is what the client uses
+ downloads←'app-log.txt' '../Logs/app-log.txt'
+
+ codes←⍬
+ :For target :In blocked,served
+     request←R.NewRequest 0
+     request.RequestTarget←target
+     res←TC.SendAndReceive uri request
+     codes,←res.StatusCode
+ :EndFor
+ :For target :In downloads
+     request←R.NewRequest 0
+     request.RequestTarget←Reg.VersionOf_REST,'/usage-data?download=',target
+     request.Headers,←⊂'Accept' 'application/json'
+     res←TC.SendAndReceive uri request
+     codes,←res.StatusCode
+ :EndFor
+ →T.PassesIf∧/404=(≢blocked)↑codes
+ →T.PassesIf∧/200=(≢served)↑(≢blocked)↓codes
+ →T.PassesIf∧/404=(≢downloads)↑(≢blocked,served)↓codes
+
+ r←T._OK
+
+∆TidyUp:
+⍝Done

@@ -1,0 +1,10 @@
+ r←IsUsageDataFilename name
+⍝ Returns 1 when `name` is the name of a usage data file, like "usage-data-2024.zip" or
+⍝ "usage-data-2025-08.csv", and 0 otherwise.
+⍝ The log folder these files live in holds the application log as well, and nothing but the
+⍝ usage data files is for the outside world. Being that strict also rules out any path.
+⍝ A line break is refused on its own account: ⎕S would otherwise look at every line separately.
+ r←0
+ :If ~∨/name∊⎕UCS 10 13
+     r←1=≢'^usage-data-[0-9]{4}(-[0-9]{2})?\.(csv|zip)$'⎕S 0⊣name
+ :EndIf

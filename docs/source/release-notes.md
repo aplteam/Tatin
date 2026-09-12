@@ -16,6 +16,26 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.126.1 ⋄ 2026-09-12
+
+* This is a server-only release, and it fixes a serious security problem. Everybody who runs a Tatin server should update right away.
+
+  Until this version the server handed out files it must never serve:
+
+  * Everything in `Assets/Runtime/`. That is where [Secure server](secure-server.md) puts the certificate of a server together with its private key.
+  * Any file the server process was able to read. Such a file could be reached with `..` from `/Assets/` or from `/usage-data/` and through the download of usage data; among them are `server.ini` and the `Credentials.csv` file of the Registry.
+  * The application log, which lives in the same folder as the usage data files.
+
+  All of these now get a 404, just like a file that does not exist.
+
+  There is no telling whether anybody took advantage of this, so assume that everything the server process was able to read has been read:
+
+  * If the certificate and its private key live in `Assets/Runtime/Certificates/`, replace them.
+  * Change the password in the `[EMAIL]` section of `server.ini` and `[CONFIG]IndexNowKey`, if you use them.
+  * API keys are kept in `Credentials.csv` as salted hashes rather than in plain text, but consider issuing new ones.
+
+* Replace the `Assets/` folder with the one that comes with this version, as described in [Assets](maintenance.md#assets): it carries a new version of Plodder.
+
 ## v0.126.0 ⋄ 2026-09-09
 
 * This is a server-only release: the client side of Tatin has not changed at all.

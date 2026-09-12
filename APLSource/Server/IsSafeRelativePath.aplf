@@ -1,0 +1,15 @@
+ r←IsSafeRelativePath path;segments
+⍝ Returns 1 when `path`, a relative path taken from a request, cannot lead outside the folder
+⍝ it is appended to, and 0 otherwise.
+⍝ Strict on purpose, because whoever sends the request writes the path:
+⍝ * Only "/" separates folders. A backslash is refused because Windows takes it for a
+⍝   separator as well.
+⍝ * No segment may consist of nothing but dots and blanks. That covers "..", and ".. " and
+⍝   "..." too: Windows drops trailing dots and blanks from a name.
+⍝ * No colon and no control character: on Windows those lead to drives, alternate data
+⍝   streams and devices.
+ r←0
+ :If ~∨/path∊'\:',⎕UCS ¯1+⍳32
+     segments←'/'(≠⊆⊢)path
+     r←~∨/{∧/⍵∊'. '}¨segments
+ :EndIf

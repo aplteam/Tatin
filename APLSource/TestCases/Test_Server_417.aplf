@@ -1,0 +1,61 @@
+ r←Test_Server_417(stopFlag batchFlag);⎕TRAP;dir;src;serverPath;body;versions;version;cfg;rc;msg;zipFilename;zipFilenames;uri;request;res;packageID
+⍝ Ask for the details of a package with just a major number, and with a major and a minor number,
+⍝ when another major (minor) number starts with the same digits: 1 must not match 10, nor 1.1 match 1.10
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir ⍬
+ src←dir,'/src'
+ F.MkDir src
+ serverPath←∆TEMP_SERVER_FOLDER,'/'
+ body←':Namespace Test' 'foo←{' '⍵' '}' ':EndNamespace'
+ (⊂body)F.NPUT src,'/Test.apln'
+ versions←'1.1.0' '1.10.0' '10.0.0'
+ zipFilenames←''
+ :For version :In versions
+     cfg←TC.InitPackageConfig ⍬
+     cfg.group←'Example'
+     cfg.name←'Collide'
+     cfg.version←version
+     cfg.source←'Test.apln'
+     cfg.os_win←1
+     cfg.license←'MIT'
+     cfg.checkLICENSEfile←0
+     TC.WritePackageConfigFile src cfg
+     (rc msg zipFilename)←TC.PublishPackage src'[localhost]'
+     Assert 200=rc
+     zipFilenames,←⊂zipFilename
+ :EndFor
+
+ uri←TC.ReplaceRegistryAlias'[localhost]'
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/packages/details/Example-Collide-1'
+ request.Headers,←⊂'Accept' 'application/json'
+ res←TC.SendAndReceive uri request
+ →T.GoToTidyUp 200≢res.StatusCode
+ →T.GoToTidyUp~∨/'version: "1.10.0"'⍷res.Content
+
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/packages/details/Example-Collide-1.1'
+ request.Headers,←⊂'Accept' 'application/json'
+ res←TC.SendAndReceive uri request
+ →T.GoToTidyUp 200≢res.StatusCode
+ →T.GoToTidyUp~∨/'version: "1.1.0"'⍷res.Content
+
+⍝ A major version without any release is simply not there
+ request←R.NewRequest 0
+ request.RequestTarget←Reg.VersionOf_REST,'/packages/details/Example-Collide-2'
+ request.Headers,←⊂'Accept' 'application/json'
+ res←TC.SendAndReceive uri request
+ →T.GoToTidyUp 404≢res.StatusCode
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ :For packageID :In 'Example-Collide-'∘,¨versions
+     Assert 0=⊃F.RmDir serverPath,packageID
+ :EndFor
+ ∆RecompileIndexOnServer
+ F.DeleteFile¨zipFilenames
+⍝Done

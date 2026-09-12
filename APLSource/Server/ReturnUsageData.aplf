@@ -5,13 +5,15 @@
  :If IsJsonRequest request.Headers
      :If 'list'≢request.Query
          list←','(≠⊆⊢)2⊃request.QueryParameters[1;]
-         :If 0=≢list
-             response.StatusCode←404
-         :Else
-             filename←(∊P.LogFolder),⊃request.QueryParameters[1;2]
+         filename←⊃request.QueryParameters[1;2]
+⍝ Nothing but a usage data file, and certainly no path: see `IsUsageDataFilename`
+         :If 0<≢list
+         :AndIf IsUsageDataFilename filename
              response.IsFile←1
-             response.FilePath←filename
+             response.FilePath←(∊P.LogFolder),filename
              response.ContentType←'application/zip'
+         :Else
+             response.StatusCode←404
          :EndIf
      :Else                          ⍝ No, so we just return a list
          :If 0<≢list←⊃F.Dir(∊P.LogFolder),'*.zip'

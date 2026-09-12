@@ -1,5 +1,8 @@
- r←{packageID}GetPackageList_ parms;list;list2;list3;uniqueIDs;data
- r←0 4⍴''
+ r←{packageID}GetPackageList_ parms;list;list2;list3;uniqueIDs;data;majors;names
+⍝ Returns one row per package: [;1] name, [;2] number of major versions, [;3] description,
+⍝ [;4] project URL, [;5] operating systems, [;6] 'Yes' for a user command, [;7] tags and
+⍝ [;8] the latest major version, like 'aplteam-Cider-0'.
+ r←0 8⍴''
  packageID←{0<⎕NC ⍵:⍎⍵ ⋄ ''}'packageID'
  list←Reg.GetAllPackages G.RegistryPath
  list←G.RegistryPath Reg.RemoveDeprecatedPackages list
@@ -9,5 +12,9 @@
      data←↑Reg.FetchAdditionalDataForListPackages¨G.RegistryPath∘,¨uniqueIDs
      data[;4]←'[,;]'⎕R', '⊣data[;4]  ⍝ Replace "," & ";" by ", " in description
      r←list2,data
+⍝ The latest major version of every package, so that the name can lead to its package page.
+⍝ Like `uniqueIDs` this relies on the list being in version order, hence the ⌽ again.
+     majors←⌽Reg.RemoveMinorAndPatch¨,list
+     names←Reg.RemoveVersionNumber¨majors
+     r,←majors[names⍳r[;1]]
  :EndIf
-⍝Done

@@ -1,38 +1,44 @@
-  response←CreateHomePage request;html;policy;add;list;noOfReleases;noOfPackages;noOfGroups;baseURL
+  response←CreateHomePage request;html;policy;list;noOfReleases;noOfPackages;noOfGroups;baseURL
 ⍝ Creates the index.html
 ⍝ The list of packages is fetched once and then used twice, for the figures and for the list
 ⍝ of recent releases. Fetching it means reading the config of every package in the Registry,
 ⍝ which is not something to do twice on one page.
- add←GetJavaScriptForCopyButton ⍬
- html←HtmlHeader add
- html,←⊂'<h2>Main page</h2>'
- html,←⊂'<p>This is the Tatin Registry. It holds packages designed to be used under Dyalog APL.</p>'
- html,←⊂'<p>A package is APL code together with everything needed to load it: which versions of'
- html,←⊂'Dyalog it runs under, what it depends on and under what licence it may be used. Tatin'
- html,←⊂'installs one into a folder of your choosing and fetches whatever it depends on at the'
- html,←⊂'same time, so that using somebody else''s code is a single command rather than an'
- html,←⊂'afternoon.</p>'
+⍝ The figures count deprecated packages as well.
+ html←HtmlHeader''
+ html,←⊂'<section class="home-intro">'
+ html,←⊂'<div>'
+ html,←⊂'<h2>Somebody else''s code: a single command rather than a couple of days.</h2>'
+ html,←⊂'<p>The Tatin Registry holds packages for Dyalog APL: code together with everything needed to load it — which versions of Dyalog it runs under, what it depends on and under what licence it may be used.</p>'
+ html,←⊂'</div>'
  list←1 Reg.GetAllPackages G.RegistryPath           ⍝ [;1]=package ID, [;2]=publishing date
  noOfReleases←≢list
  :If 0<noOfReleases
      noOfPackages←≢∪Reg.RemoveVersionNumber¨list[;1]
      noOfGroups←≢∪{⍵↑⍨¯1+⍵⍳'-'}¨list[;1]            ⍝ The group is what comes before the first hyphen
-     html,←⊂'<p class="figures">'
-     html,←⊂'<span class="figure"><b>',(⍕noOfPackages),'</b> packages</span>'
-     html,←⊂'<span class="figure"><b>',(⍕noOfReleases),'</b> releases</span>'
-     html,←⊂'<span class="figure"><b>',(⍕noOfGroups),'</b> groups</span>'
-     html,←⊂'</p>'
+     html,←⊂'<div class="home-figures">'
+     html,←⊂'<p><b>',(⍕noOfPackages),'</b>packages</p>'
+     html,←⊂'<p><b>',(⍕noOfReleases),'</b>releases</p>'
+     html,←⊂'<p><b>',(⍕noOfGroups),'</b>groups</p>'
+     html,←⊂'</div>'
  :EndIf
+ html,←⊂'</section>'
+ html,←⊂'<div class="home-columns">'
  html,←list GetRecentReleases 10
 ⍝ What somebody who has just found this Registry needs to know next. The alias cannot be
 ⍝ named here: it is whatever the visitor called this Registry in her own user settings.
+ html,←⊂'<aside class="using">'
  html,←⊂'<h3>Using this Registry</h3>'
  :If 0<≢baseURL←GetBaseURL request
-     html,←⊂'<p>This Registry lives at <code id="install-cmd">',(EscapeSpecialChars baseURL),'</code>. Check with <code>]TATIN.ListRegistries</code> whether you have it already, and if not add it to your <a href="https://aplteam.github.io/Tatin/user-settings/">user settings</a>.</p>'
+     html,←⊂'<div class="step">'
+     html,←⊂'<div class="step-head"><span class="step-no">1</span><p>Check with <code>]TATIN.ListRegistries</code> whether you have this Registry already; if not add it to your <a href="https://aplteam.github.io/Tatin/user-settings/">user settings</a>:</p></div>'
+     html,←⊂'<pre><code>',(EscapeSpecialChars baseURL),'</code></pre>'
+     html,←⊂'</div>'
  :EndIf
- html,←⊂'<p>Packages are then installed with</p>'
- html,←⊂'<pre><code>]TATIN.InstallPackages [alias]group-name-major &lt;target-folder&gt;</code></pre>'
- html,←⊂'<p>where <i>alias</i> is the name this Registry goes by on your machine. Every package page carries that command ready to be copied.</p>'
+ html,←⊂'<div class="step">'
+ html,←⊂'<div class="step-head"><span class="step-no">',(⍕1+0<≢baseURL),'</span><p>Install packages with</p></div>'
+ html,←⊂'<pre><code>]TATIN.InstallPackages [alias]PkgName /path/</code></pre>'
+ html,←⊂'<p class="step-note">where <i>alias</i> is the name this Registry goes by on your machine. Every package page carries that command ready to be copied.</p>'
+ html,←⊂'</div>'
  :Select GetDeletePolicy
  :Case 'Any'
      policy←'This server operates a "delete any" policy: you may delete <b>any</b> package with fitting credentials.'
@@ -41,7 +47,9 @@
  :Case 'JustBetas'
      policy←'This server operates a "delete betas only" policy: you may delete <b>only</b> beta packages with fitting credentials.'
  :EndSelect
- html,←⊂'<p>',policy,'</p>'
+ html,←⊂'<p class="policy">',policy,'</p>'
+ html,←⊂'</aside>'
+ html,←⊂'</div>'
  html,←GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

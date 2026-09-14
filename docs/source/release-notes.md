@@ -22,7 +22,7 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
 
   Until this version the server handed out files it must never serve:
 
-  * Everything in `Assets/Runtime/`. That is where [Secure server](secure-server.md) puts the certificate of a server together with its private key.
+  * Everything in `Assets/Runtime/`, including the certificates that come with Tatin.
   * Any file the server process was able to read. Such a file could be reached with `..` from `/Assets/` or from `/usage-data/` and through the download of usage data; among them are `server.ini` and the `Credentials.csv` file of the Registry.
   * The application log, which lives in the same folder as the usage data files.
 
@@ -30,11 +30,19 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
 
   There is no telling whether anybody took advantage of this, so assume that everything the server process was able to read has been read:
 
-  * If the certificate and its private key live in `Assets/Runtime/Certificates/`, replace them.
   * Change the password in the `[EMAIL]` section of `server.ini` and `[CONFIG]IndexNowKey`, if you use them.
-  * API keys are kept in `Credentials.csv` as salted hashes rather than in plain text, but consider issuing new ones.
+  * API keys are kept in `Credentials.csv` as salted hashes rather than in plain text, but you might consider issuing new ones anyway.
 
-* Replace the `Assets/` folder with the one that comes with this version, as described in [Assets](maintenance.md#assets): it carries a new version of Plodder.
+* Replace the `Assets/` folder in the root of your Tatin server with the one that comes with this version, as described in [Assets](maintenance.md#assets).
+
+  This needs more care only if your server serves HTTPS itself (`[CONFIG]Secure=1`) _and_ `[CERTIFICATES]PublicCertFile` or `[CERTIFICATES]PrivateKeyFile` point anywhere into `Assets/`. That certificate was there for anybody to download, and replacing the folder would delete it anyway. In that case, before replacing `Assets/`:
+
+  1. Put a new certificate and its private key into the root of your Tatin server, where `server.ini` lives, but not anywhere in `Assets/`.
+  2. Point `[CERTIFICATES]PublicCertFile` and `[CERTIFICATES]PrivateKeyFile` to the new files.
+
+* Packages turned out to be far messier in real life than anticipated; this release brings in the required adjustments:
+  * When a project carries no tags at all, or none that fits the version, the README is now fetched from the project's default branch instead. The package page says so: such a README describes the project as it is today, not that particular release.
+  * The README is now looked for as "README.md", "README.MD", "ReadMe.md" and "readme.md": GitHub serves file names case sensitively, so the spelling matters.
 
 ## v0.126.0 ⋄ 2026-09-09
 
@@ -420,6 +428,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

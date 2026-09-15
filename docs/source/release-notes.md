@@ -16,6 +16,12 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.126.2 ⋄ 2026-09-15
+
+No breaking changes, no user actions required.
+
+This is a server-only release, the client has not changed.
+
 ## v0.126.1 ⋄ 2026-09-12
 
 * This is a server-only release, and it fixes a serious security problem. Everybody who runs a Tatin server should update right away.
@@ -428,6 +434,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

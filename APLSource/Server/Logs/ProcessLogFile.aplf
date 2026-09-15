@@ -23,12 +23,13 @@
      :EndIf
      SaveAsCSV(folder,'usage-data-',y2)data                 ⍝ Save
      CreateZipFile folder,'usage-data-',y2,'.csv'
+     DeleteMonthlyFiles folder y2                           ⍝ Superseded by the file for the whole year
      flag←1
  :EndWhile
  {}(⊂raw)⎕NPUT⍣flag⊢filename 1                              ⍝ Save back the raw data (from current year only)
  m←(⊃⊃(//)⎕VFI(⊃raw[≢raw])[6 7])                            ⍝ Month of last entry
  :If 1<m                                                    ⍝ If current one is January we have no data yet
-     lms←GetLastMonthSaved folder                           ⍝ Last month saved
+     lms←GetLastMonthSaved folder(4↑⊃raw[≢raw])             ⍝ Last month saved for the year of the last entry
      m_←{⊃⊃(//)⎕VFI ⍵[6 7]}¨raw                             ⍝ All months in raw
  :AndIf ((≢m_)⊃m_)>lms+1                                    ⍝ New month?! (But never Jan until current month is at least Feb)
      b←m_<m                                                 ⍝ All before the current month

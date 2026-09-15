@@ -1,0 +1,28 @@
+ r←Test_Log_102(stopFlag batchFlag);⎕TRAP;tempDir;msg;rc;L;filename;list;expected
+⍝ Once the data of a year is saved in "usage-data-YYYY.csv", the monthly files of that year are
+⍝ superseded and must be gone; otherwise they are offered as data of the current year.
+⍝ Uses data from mid 2022 until 2024-03 to simulate the turn of the year, like Test_Log_100.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir'-Log/'
+ rc←'Create!'F.CheckPath tempDir
+ Assert rc
+ tempDir ⎕NCOPY ∆TEMP_TEST_DATA,'/LogFile/app-log.txt'
+ :For filename :In 'usage-data-2023-11.csv' 'usage-data-2023-11.zip'
+     (⊂'Group,Name,Version,Year,Month,Downloads')F.NPUT(tempDir,filename)1
+ :EndFor
+ L←##.Server.Logs
+ L.ProcessLogFile tempDir(2024 3 4)
+
+ →T.GoToTidyUp 0<≢F.ListFiles tempDir,'usage-data-2023-*'
+ list←{⊃,/1↓⎕NPARTS ⍵}¨F.ListFiles tempDir,'usage-data-20*.csv'
+ expected←'usage-data-2022.csv' 'usage-data-2023.csv' 'usage-data-2024-02.csv'
+ →T.GoToTidyUp~list ∆LazyMatch expected
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+⍝Done

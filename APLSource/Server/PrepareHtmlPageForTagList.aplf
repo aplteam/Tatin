@@ -1,8 +1,8 @@
- html←PrepareHtmlPageForTagList data;noOfCols;colTitles
- html←(⍬ 'List of all tags')HtmlHeader GetDataTableStuff ⍬
+ html←PrepareHtmlPageForTagList data;colTitles
+ html←(⍬'List of all tags')HtmlHeader GetDataTableStuff ⍬
  html,←⊂'<h2>List of all tags</h2>'
  html,←AddSpecialMessage ⍬
- colTitles←'Tag' 'Occurances'
+ colTitles←'Tag' 'Occurrences'
  data[;2]←⍕¨data[;2]
  html,←⊂H.OpenTable colTitles CalcTableWidth data
  html,←⊂'<thead>'
@@ -11,10 +11,7 @@
  html,←⊂'</tr>'
  html,←⊂'</thead>'
  html,←⊂'<tbody>'
- :If 0<≢data
-     html,←AddJavaScript data
-     html,←⊃¨{'<tr><td>',⍺,'</td><td>',⍵,'</td></tr>'}/¨↓data
- :EndIf
+ html,←⊃¨{'<tr><td>',⍺,'</td><td>',⍵,'</td></tr>'}/¨↓data
  html,←⊂'</tbody>'
  html,←⊂'</table>'
  html,←⊆GetFooter

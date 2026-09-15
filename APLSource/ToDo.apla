@@ -1,3 +1,16 @@
 (
- ''
+ '* Rumba (inside Plodder): when a server shuts down, ServerWait can crash with the Conga return code 1010 (ERR_OBJECT_NOT_FOUND, "Object not found"). '
+ '  The Conga server object has already been closed while the wait loop is still running, so its next DRC.Wait finds nothing. '
+ '  ServerWait accepts only 0 and 100; it should treat 1010 as "the server is gone" and leave the loop. Seen once, at the end of a batch test run.'
+ '* Client.UserSettings.EqualsAliasOrName: an empty URI, or one with a colon but no port number after it (like "https://localhost:/"), makes the local '
+ '  "port" an empty vector, because ∧/''''∊⎕D is 1 and ⎕VFI'''' yields ⍬. The comparison with _registries.port then fails with a LENGTH ERROR instead of '
+ '   telling that the Registry is not defined. Seen when Test_Server_416 was called directly, without Initial, so [localhost] was unknown.'
+ '* RunTests.bat and Admin.LoadTatinAndRunTests: the plain Link import creates no #.Tatin.CiderConfig (only Cider does that), but the tests need '
+ '  CiderConfig.HOME, so the batch run stops with a VALUE ERROR in TestCases.∆CopyTestServerDataTo before the first test. Create CiderConfig with HOME '
+ '  set to the project folder after the import.'
+ '* Batch test runs: a runner that quits with 123×0≠rc, where (rc log)←T.Run__ ps, exited with 123 although the log said "0 test cases failed, 0 test '
+ '  cases broken". Find out what rc holds in that case before relying on the exit code of a batch run.'
+ '* Server.PrepareHtmlPageForTagList builds the page listing all tags (/v1/tags, main menu item "Tags"). It adds the <script> block '
+ '  from AddJavaScript right after <tbody>, before the first <tr>, which is not valid HTML: a <script> must not sit inside <tbody>. '
+ '  Also, its column title is spelled "Occurances" instead of "Occurrences".'
 )

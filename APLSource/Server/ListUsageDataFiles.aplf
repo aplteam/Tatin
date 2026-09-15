@@ -1,0 +1,17 @@
+ r←extension ListUsageDataFiles folder;names;wholeYear;years;months
+⍝ Returns the names of the usage data files with `extension` ('zip' or 'csv') in `folder`, without
+⍝ the folder, newest first: by year and then by month, the file of a whole year before any file
+⍝ of that year that ends with a month.
+⍝ Only what `IsUsageDataFilename` accepts is listed: the folder also holds the application log
+⍝ and its year-end backups, and none of that is for the outside world.
+⍝ The sorting cannot be left to the file system: on Linux the files come in directory order.
+ r←''
+ names←{⊃,/1↓⎕NPARTS ⍵}¨F.ListFiles folder,'usage-data-*.',extension
+ names←(IsUsageDataFilename¨names)/names
+ :If 0<≢names
+     wholeYear←1+≢Months                                    ⍝ Sorts above any month
+     years←{⊃⊃(//)⎕VFI 4↑⍵}¨(≢'usage-data-')↓¨names
+     months←wholeYear{'-'≠⊃⍵:⍺ ⋄ ⊃⊃(//)⎕VFI 2↑1↓⍵}¨(≢'usage-data-YYYY')↓¨names
+     r←names[⍒years,[1.5]months]
+ :EndIf
+⍝Done

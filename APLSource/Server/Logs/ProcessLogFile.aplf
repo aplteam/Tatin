@@ -23,7 +23,6 @@
      :EndIf
      SaveAsCSV(folder,'usage-data-',y2)data                 ⍝ Save
      CreateZipFile folder,'usage-data-',y2,'.csv'
-     DeleteMonthlyFiles folder y2                           ⍝ Superseded by the file for the whole year
      flag←1
  :EndWhile
  {}(⊂raw)⎕NPUT⍣flag⊢filename 1                              ⍝ Save back the raw data (from current year only)
@@ -42,4 +41,5 @@
      SaveAsCSV f data                                       ⍝ Save
      CreateZipFile f,'.csv'
  :EndIf
+ DeleteSupersededFiles folder                               ⍝ Monthly files a later file of the same year makes redundant
 ⍝Done

@@ -3,6 +3,11 @@
 ⍝ Months of the current year are accumulated until the current month-1 (TS[2])
 ⍝ * `folder` is where the log files live
 ⍝ * `TS` is todays timestamp: Y M D
+⍝ Returns 1 when the last entry in the log file is from the month of `TS`: whatever is due in that
+⍝ month has been done then, so there is no need to call this again before the month changes.
+⍝ Returns 0 otherwise, typically right after a month has begun, before anything was logged in it.
+⍝ Worth knowing because this reads and scans the whole log file, all of the current year.
+ r←0
  filename←folder,GetLogFilename
  raw←⊃⎕NGET filename 1
  →(0=≢raw)/0
@@ -42,4 +47,5 @@
      CreateZipFile f,'.csv'
  :EndIf
  DeleteSupersededFiles folder                               ⍝ Monthly files a later file of the same year makes redundant
+ r←TS[1 2]≡(⊃⊃(//)⎕VFI 4↑⊃raw[≢raw]),m                     ⍝ Is the last entry from the month of `TS`?
 ⍝Done

@@ -3,8 +3,7 @@
 ⍝ * Check ∆SHUTDOWN; if this is 1 shut the server down
 ⍝ * Check whether the WS has been updated since it was loaded. If so reload.
 ⍝ * Check the INI file; if it has been changed re-instantiate the INI file
-⍝ * Check whether the file "year" in the log folder is identical to ⊃⎕TS; if it
-⍝   is not then take action.
+⍝ * Turn the log file into usage data files, once a month; see `Logs.ProcessLogFile`
  r←0
  TRAP←⎕TRAP
  ⎕TRAP←(⊂#.ErrorParms.signal'C' '→∆CarryOn'),⎕TRAP  ⍝ HandleError signals this when it is done.
@@ -40,7 +39,15 @@
          :EndIf
          Log msg
      :EndIf
-     Logs.ProcessLogFile(∊P.LogFolder)(3↑⎕TS)
+⍝ Reading the whole log file takes time, and once the current month has been dealt with there is
+⍝ nothing to do until the next one begins; see `Logs.ProcessLogFile` for when that is the case.
+     :If 0=⎕NC'∆USAGE_DATA_MONTH'
+         ∆USAGE_DATA_MONTH←⍬
+     :EndIf
+     :If ∆USAGE_DATA_MONTH≢2↑⎕TS
+     :AndIf Logs.ProcessLogFile(∊P.LogFolder)(3↑⎕TS)
+         ∆USAGE_DATA_MONTH←2↑⎕TS
+     :EndIf
      ExecuteMaintenanceCode G
      :If 0=⎕NC'∆README_TID'
          ∆README_TID←¯1

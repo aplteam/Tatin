@@ -18,7 +18,16 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
 
 ## v0.126.2 ⋄ 2026-09-15
 
-No breaking changes, no user actions required.
+* Version 0.126.1 came with a bug that stopped housekeeping from doing its job, so every server running 0.126.1 should update. As long as 0.126.1 was running:
+
+  * READMEs of newly published packages were not fetched.
+  * IndexNow was not told about new or changed pages.
+  * Changes to `Credentials.csv` and `server.ini` were not picked up.
+  * Usage data was not processed.
+
+  READMEs and IndexNow catch up on their own once 0.126.2 is running. A change made to `Credentials.csv` or `server.ini` while 0.126.1 was running takes effect with the update to 0.126.2.
+
+No breaking changes, no user actions required. Usage data files that are not needed any more, like the monthly files of a year that has a file for the whole year, are deleted automatically by the first housekeeping run: there is no need to delete them by hand.
 
 This is a server-only release, the client has not changed.
 

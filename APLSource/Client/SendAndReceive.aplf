@@ -4,7 +4,7 @@
 ⍝   This can improve performance dramatically because the same connection can be used again.
 ⍝ * If ∆PermanentConnections does not exist, a new client is created & the connection is closed when done.
  'Invalid request parameter: RequestTarget'Assert(≡request.RequestTarget)∊0 1
- request.Headers,←⊂Reg.TatinVersionAsHttpHeader
+ {}(Reg.TatinVersionAsHttpHeader)∘SetHeader¨request
  request←AddTestFlag request
  msg←uri,' did not respond'
  ⎕TRAP←(345 'C'('''',uri,''' SignalNoConnection ''',msg,''''))(347 'N')(348 'C' '→∆Go,errorCounter←errorCounter+1')(0 'S')

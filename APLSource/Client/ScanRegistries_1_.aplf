@@ -1,11 +1,18 @@
- {r}←request ScanRegistries_1_(registry packageIDs);res;ns;data;buff;deps
+ {r}←request ScanRegistries_1_(registry packageIDs);res;ns;data;buff;deps;packageID
 ⍝ Part of creating a build list.
-⍝ `registry` is usuall an http[s]:// address but may also be a (local) file.
+⍝ `registry` is usuall an http[s]:// address but may also be a (local) file.\\
+⍝ A server before 0.127.0 answers with a 404 when it does not host all of the packages asked for, even
+⍝ if it hosts some of them. In that case the packages are requested again one by one.
  r←0
  :If Reg.IsHTTP registry
      request.RequestTarget←Reg.VersionOf_REST,'/packages/dependencies/',1↓∊',',¨packageIDs
      res←SendAndReceive registry request
-     :If 200=res.StatusCode
+     :If 404=res.StatusCode
+     :AndIf 1<≢packageIDs
+         :For packageID :In packageIDs
+             request ScanRegistries_1_ registry(,⊂packageID)
+         :EndFor
+     :ElseIf 200=res.StatusCode
          ns←Reg.JSON res.Content
          :If 0<≢ns.data
              ∆TREE.Data⍪←(0,[1.5]1⊃¨ns.data),⊂registry      ⍝ Those are hosted by "registry"

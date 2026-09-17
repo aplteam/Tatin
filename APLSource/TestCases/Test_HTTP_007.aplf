@@ -1,21 +1,21 @@
- r←Test_HTTP_007(stopFlag batchFlag);⎕TRAP;request;res;names
-⍝ Send the very same request twice: the headers `SendAndReceive` adds must not pile up.
-⍝ They used to be appended with every call, so a re-used request carried them again and again.
+ r←Test_HTTP_007(stopFlag batchFlag);⎕TRAP;request;res;headers
+⍝ Send the very same request twice: `SendAndReceive` must not change the caller's request.
+⍝ Tatin (x-tatin, test-request) as well as Rumba (connection) used to append headers to it with every call,
+⍝ so a re-used request carried them again and again.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  request←R.NewRequest 0
  request.Headers,←⊂'Accept' 'application/json'
  request.RequestTarget←'/v1/packages/exist/aplteam-APLProcess-0.2.0'
+ headers←request.Headers
 
  res←TC.SendAndReceive ∆LocalHostAndPort request
  →T.PassesIf 200=res.StatusCode
  res←TC.SendAndReceive ∆LocalHostAndPort request
  →T.PassesIf 200=res.StatusCode
 
- names←⎕C⊃¨request.Headers
- →T.PassesIf(⊂'x-tatin')∊names
- →T.PassesIf names≡∪names
+ →T.PassesIf headers≡request.Headers
 
  r←T._OK
 ⍝Done

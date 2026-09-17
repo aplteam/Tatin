@@ -1,0 +1,7 @@
+ {request}←header AddHeader request
+⍝ Adds `header`, a name-value pair, to `request.Headers` unless a header of that name is already there
+⍝ (names are not case sensitive): a header set by the caller wins.
+ :If ~(⊂⎕C⊃header)∊⎕C⊃¨request.Headers
+     request.Headers,←⊂header
+ :EndIf
+⍝Done

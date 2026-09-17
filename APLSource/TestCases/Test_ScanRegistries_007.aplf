@@ -1,0 +1,26 @@
+ r←Test_ScanRegistries_007(stopFlag batchFlag);⎕TRAP;qdmx;registry;ind
+⍝ Scan just the test server for a package it hosts and one that does not exist anywhere.
+⍝ The package hosted must end up in the tree with the test server as its URL, and the other one must be reported.
+⍝ Servers before 0.127.0 answer the combined request with a 404, and the client must then ask package by package.
+⍝ The test server returns just the package it hosts, so against it this test does not exercise that fallback.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ registry←∆LocalHostAndPort
+ TC.∆TREE←TC.CreateTree ⎕NS''
+ :Trap ##.Registry.ErrorNo
+     (,⊂registry)TC.ScanRegistries'aplteam-APLProcess-0.2.0' 'aplteam-DoesNotExist-1.0.0'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~∨/'aplteam-DoesNotExist-1.0.0'⍷qdmx.EM
+ :EndTrap
+ ind←TC.∆TREE.Data[;TC.∆TREE.∆packageID]⍳⊂'aplteam-APLProcess-0.2.0'
+ →T.GoToTidyUp ind>≢TC.∆TREE.Data
+ →T.GoToTidyUp registry≢TC.∆TREE.Data[ind;TC.∆TREE.∆url]
+
+ r←T._OK
+
+∆TidyUp:
+ TC.⎕EX'∆TREE'
+⍝Done

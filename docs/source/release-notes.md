@@ -16,6 +16,10 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.127.0 ⋄ 2026-09-19
+
+Minor change in behaviour in order to fix aa problem: When scanning registries, if a registry is unreachable and skipped, a dependency that lives only there now causes an error. Before, it produced an incomplete build list.
+
 ## v0.126.2 ⋄ 2026-09-15
 
 * Version 0.126.1 came with a bug that stopped housekeeping from doing its job, so every server running 0.126.1 should update. As long as 0.126.1 was running:
@@ -443,6 +447,8 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
+
 
 
 

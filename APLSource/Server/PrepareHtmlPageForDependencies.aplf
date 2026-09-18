@@ -1,5 +1,6 @@
- html←PrepareHtmlPageForDependencies deps
- html←(⍬('Dependencies of ',packageID))HtmlHeader GetDataTableStuff ⍬
+ html←PrepareHtmlPageForDependencies(deps canonical)
+⍝ `canonical` points at the "versions" page for this major line; see `GetCanonicalLink`.
+ html←(⍬('Dependencies of ',packageID))HtmlHeader((GetDataTableStuff ⍬),canonical)
  html,←⊂'<h2>Dependencies of "',packageID,'"</h2>'
  html,←AddSpecialMessage ⍬
  html,←⊂H.OpenTable 2+⌈/≢¨deps

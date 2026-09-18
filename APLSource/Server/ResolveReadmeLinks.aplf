@@ -6,6 +6,12 @@
 ⍝ than to whatever the repository looks like today:
 ⍝ * an image (src) goes to raw.githubusercontent.com, which serves the file itself
 ⍝ * a link (href) goes to github.com/.../blob/..., which shows it in its place
+⍝ * one that starts with a "/" is not relative to the repository at all: GitHub renders a
+⍝   README at github.com/..., so a browser resolves such a link against that origin, and
+⍝   "/aplteam/APLGit2" therefore means that repository rather than a file in this one. It
+⍝   goes to github.com with the path unchanged. Resolved the other way it used to be left
+⍝   pointing at us, where it was answered with a 404: that is how Google came to report
+⍝   "/aplteam/APLProcess" as a broken page of ours.
 ⍝ Left as they are: anything carrying a scheme of its own, and anything that is nothing but
 ⍝ a fragment - that points within this very page, and `PrefixReadmeIds` has seen to it.
 ⍝ Replaced by "#": the "javascript:", "data:" and "vbscript:" schemes. Markdown expresses

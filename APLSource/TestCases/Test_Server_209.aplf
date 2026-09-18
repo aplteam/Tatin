@@ -1,0 +1,17 @@
+ r←Test_Server_209(stopFlag batchFlag);⎕TRAP;html
+⍝ Every release of a major version line has a "details" and a "dependencies" page of its own,
+⍝ and to a search engine those look like near-duplicates of one another. Both must therefore
+⍝ name the "versions" page of that major line as the one to be indexed.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages/details/aplteam-APLProcess-0.2.0'
+ →T.PassesIf∨/'<link rel="canonical" href="'⍷html
+ →T.PassesIf∨/'/packages/versions/aplteam-APLProcess-0">'⍷html
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages/dependencies/aplteam-APLProcess-0.2.0'
+ →T.PassesIf∨/'<link rel="canonical" href="'⍷html
+ →T.PassesIf∨/'/packages/versions/aplteam-APLProcess-0">'⍷html
+
+ r←T._OK
+⍝Done

@@ -1,13 +1,13 @@
  r←request GetCanonicalLink packageID;baseURL;target
-⍝ Returns the <link rel="canonical"> tag for a "details" page, ready to be handed to
-⍝ `HtmlHeader` as ⍵, or '' when the base URL cannot be established.
-⍝ Every release of a major version line has a "details" page of its own, and to a search
-⍝ engine they look like near-duplicates of one another - which is why so many of them end up
-⍝ as "Crawled, currently not indexed". This says which page counts instead: the "versions"
-⍝ page for that major line, the one that carries the README.
-⍝ Nothing is hidden by it. The "details" pages stay reachable and stay linked; the tag only
+⍝ Returns the <link rel="canonical"> tag for a "details" or a "dependencies" page, ready to
+⍝ be handed to `HtmlHeader` as ⍵, or '' when the base URL cannot be established.
+⍝ Every release of a major version line has a "details" and a "dependencies" page of its own,
+⍝ and to a search engine they look like near-duplicates of one another - which is why so many
+⍝ of them end up as "Crawled, currently not indexed". This says which page counts instead:
+⍝ the "versions" page for that major line, the one that carries the README.
+⍝ Nothing is hidden by it. Both kinds of page stay reachable and stay linked; the tag only
 ⍝ says which of a set of near-identical pages should be the one that is indexed.
-⍝ `Reg.RemoveMinorAndPatch` copes with all the shapes a "details" page is asked for - a full
+⍝ `Reg.RemoveMinorAndPatch` copes with all the shapes such a page is asked for - a full
 ⍝ package ID, one with just a major number, one with major and minor - and yields the major
 ⍝ version line in every case.
  r←''

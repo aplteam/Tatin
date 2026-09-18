@@ -1,0 +1,42 @@
+ r←Test_CheckVersions_005(stopFlag batchFlag);⎕TRAP;old;new;qdmx;rc;msg
+⍝ `CheckForDowngrades` must refuse to replace an installed package by an earlier version of it.\\
+⍝ That is what an update does to a version that was withdrawn from the Registry it came from, or
+⍝ that was never published: `ReInstallDependencies_` widens the exact version to its major version
+⍝ line, and the best version of that line is then older than what is installed. Because the install
+⍝ folder is afterwards swapped for the temporary one, the only copy there is would be gone.\\
+⍝ Needs no Registry: the function compares two build lists and nothing else.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ old←∆GetTempDir'old'
+ new←∆GetTempDir'new'
+
+⍝ Installed a beta, Registry offers an earlier release: this must be refused
+ (⊂∆BuildList'aplteam-APLGit2-1.2.0-beta-2')⎕NPUT(old,'/',Reg.BuildListFilename)1
+ (⊂∆BuildList'aplteam-APLGit2-1.1.0')⎕NPUT(new,'/',Reg.BuildListFilename)1
+ :Trap ##.Registry.ErrorNo
+     old TC.CheckForDowngrades new
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~∨/'aplteam-APLGit2-1.1.0'⍷qdmx.EM
+ :EndTrap
+
+⍝ The other way round is an ordinary update and must be let through
+ (⊂∆BuildList'aplteam-APLGit2-1.1.0')⎕NPUT(old,'/',Reg.BuildListFilename)1
+ (⊂∆BuildList'aplteam-APLGit2-1.2.0-beta-2')⎕NPUT(new,'/',Reg.BuildListFilename)1
+ →T.GoToTidyUp 0≢old TC.CheckForDowngrades new
+
+⍝ A later major version replaces nothing: the old line has no counterpart in the new build list
+ (⊂∆BuildList'aplteam-APLGit2-1.2.0')⎕NPUT(old,'/',Reg.BuildListFilename)1
+ (⊂∆BuildList'aplteam-APLGit2-2.0.0')⎕NPUT(new,'/',Reg.BuildListFilename)1
+ →T.GoToTidyUp 0≢old TC.CheckForDowngrades new
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce old
+ msg Assert rc=0
+ (rc msg)←F.RmDirByForce new
+ msg Assert rc=0
+⍝Done

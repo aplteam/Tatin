@@ -7,7 +7,13 @@
 ⍝ 1. Original package ID
 ⍝ 2. Package ID of the latest version found  (or "<<< No response >>>" or "<<< Not found >>>")
 ⍝ 3. URL
-⍝ 4. Boolean that is 1 in case of success and 0 ("Not found" or "No response") otherwise
+⍝ 4. Boolean that is 1 when a later version was found and 0 otherwise\\
+⍝ Note that the Registry is asked for the best version of a major version line, which may well be
+⍝ *earlier* than the one installed: that is what happens when the installed version was withdrawn,
+⍝ or was never published at all. The versions are therefore compared rather than just checked for
+⍝ being different, and [;2] then repeats the installed version because nothing beats it.
+⍝ `EstablishRegistry` is asked for the package *name*, so the Registry that answers may not host
+⍝ the installed version at all; `MarkUnavailablePackages` is what notices that.
  majorVersions←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'majorVersions'
  'Invalid left argument'Assert 1=≢majorVersions
  'Invalid left argument'Assert majorVersions∊0 1
@@ -34,7 +40,13 @@
          errMsg Assert 200=statusCode
          :If 0<≢fullPath2
              packageID2←GetPackageIDFrom fullPath2
-             r←packageID_ packageID2 url(packageID_≢packageID2)
+             :If packageID2 Reg.IsLaterThan packageID_
+                 r←packageID_ packageID2 url 1
+             :Else
+                 r←packageID_ packageID_ url 0    ⍝ Nothing the Registry offers beats what is installed
+             :EndIf
+         :Else
+             r←packageID_'<<< Not found >>>'url 0
          :EndIf
      :EndIf
  :EndIf

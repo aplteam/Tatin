@@ -1,0 +1,28 @@
+ r←Test_CheckVersions_061(stopFlag batchFlag);⎕TRAP;dir;buff;rc;msg;filename;json
+⍝ Run CheckForLaterVersion on an installed version that is ahead of everything the Registry hosts.\\
+⍝ That is what a beta becomes once it has been published, installed, and then deleted again: the
+⍝ Registry still knows the package name, so it answers with the best version of the major version
+⍝ line - which is *older* than what is installed. Reporting that as an update, which comparing the
+⍝ two IDs for being different rather than for being later once did, offers a downgrade.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ dir←∆GetTempDir''
+ dir ⎕NCOPY⍠('Wildcard' 1)⊣∆TEMP_TEST_DATA,'/myproj/*'
+
+⍝ 1.99.0 is ahead of every 1.x the Registry has, and the Registry cannot be hosting it
+ filename←dir,'/packages/',Reg.BuildListFilename
+ json←⊃F.NGET filename
+ json←'aplteam-versions-1.0.0-beta-1'⎕R'aplteam-versions-1.99.0'⊢json
+ (⊂json)⎕NPUT filename 1
+
+ buff←⎕FMT TC.CheckForLaterVersion dir,'/packages'
+ →T.GoToTidyUp~∨/'<<< Not available any more >>>'⍷buff
+ →T.GoToTidyUp∨/'1.0.0'⍷buff            ⍝ the earlier version the Registry offers must not be shown
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce dir
+ msg Assert rc=0
+⍝Done

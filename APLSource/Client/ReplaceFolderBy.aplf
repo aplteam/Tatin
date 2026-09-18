@@ -14,7 +14,13 @@
          flag←1
      :Else
          qdmx←⎕DMX
-         :If ~YesOrNo'Attempt to replace ',old,' resulted in a ',qdmx.EM,' error; try again?'
+⍝ `Message` is what tells the cases apart, and without it this question cannot be answered sensibly:
+⍝ "Access is denied" is a permission problem and retrying is pointless, while "used by another
+⍝ process" means something holds a handle - and under Windows a single open file anywhere inside the
+⍝ folder is enough to stop the folder itself from being renamed.
+         msg←'Attempt to replace ',old,' resulted in a ',qdmx.EM,' error'
+         msg,←((0<≢qdmx.Message)/': ',qdmx.Message),'; try again?'
+         :If ~YesOrNo msg
              'Cancelled by user after error'⎕SIGNAL 98
          :EndIf
      :EndTrap

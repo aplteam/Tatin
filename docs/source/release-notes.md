@@ -16,7 +16,7 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.127.0 ⋄ 2026-09-19
+## v0.127.0 ⋄ 2026-09-20
 
 Minor change in behaviour in order to fix a problem: When scanning registries, if a registry is unreachable and skipped, a dependency that lives only there now causes an error. Before, it produced an incomplete build list.
 
@@ -27,7 +27,7 @@ Two more changes in behaviour, both of them about versions going backwards:
 
 * `]Tatin.CheckForLaterVersion` compares versions now instead of just checking whether they differ, so such a package is no longer reported as updatable to an earlier version. 
 
-   When the installed version is not hosted by any Registry any more it says "Not available any more", which means that install cannot be reproduced by anybody.
+   When the installed version is not hosted by any Registry it says "Not available any more", which means that install cannot be reproduced by anybody.
 
 ## Server 
 
@@ -462,6 +462,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

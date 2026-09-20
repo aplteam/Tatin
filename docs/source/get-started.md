@@ -444,7 +444,7 @@ But the function `GetFullPath2AssetsFolder` would not find `HOME` and therefore 
 
 Is a character vector holding the path of a folder that hosts the package.
 
-There is an exception: when the package was brought into the workspace with `LoadPackages` rather than `LoadDependencies` that has no assets. This is because without assets `LoadPackages` loads the package into a temp folder, brings the package into the WS and then deletes the temp folder, because without assets there is no need to leave a footprint behind.
+There is an exception: a package that was brought into the workspace with `LoadPackages` rather than `LoadDependencies` and that has neither assets nor files. `LoadPackages` loads such a package into a temp folder, brings the package into the WS and then deletes the temp folder, because nothing is left behind that the package could need.
 
 In this case `HOME` returns an empty vector.
 

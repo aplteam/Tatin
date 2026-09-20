@@ -1,4 +1,4 @@
- r←{noBetas}LoadPackages y;paths;tempFolder;loaded;qdmx;list;identifiers;targetSpace;rootPath
+ r←{noBetas}LoadPackages y;paths;tempFolder;loaded;qdmx;list;identifiers;targetSpace;rootPath;cfgs
 ⍝ Load packages dynamically into the workspace,\\
 ⍝ y must be atm least one item and may be up to three items:
 ⍝ [1] A string with one or more package names, separated by commas without spaces (identifiers)
@@ -56,7 +56,7 @@
      (⊃{0=≢⍺:⍵ ⋄ ⍺}/qdmx.(Message EM))⎕SIGNAL{⍺=0:⍵ ⋄ ⍺}/qdmx.(ENX EN)
  :EndTrap
  :If 0=≢paths
-     F.RmDir tempFolder                                             ⍝ Nothing was loaded, so we can get rid of it
+     F.RmDir tempFolder                                    ⍝ Nothing was loaded, so we can get rid of it
  :Else
      :Trap ((⊂,##.Client.DEBUG)∊,¨'on' 1)↓Reg.ErrorNo
          r←≢loaded←LoadDependencies tempFolder targetSpace rootPath
@@ -70,17 +70,15 @@
      ⎕DL 0.01
      list←F.ListDirs tempFolder
      list/⍨←'Licenses'∘≢¨2⊃¨⎕NPARTS¨list
-     :If 0=≢list                                                ⍝ Anything? At all?!
-         F.RmDir tempFolder                                     ⍝ No assets, so we can get rid of it
-     :Else
-         :If 0=+/≢¨{6::'' ⋄ (Reg.JSON⊃F.NGET ⍵,'/',CFG_Name).assets}¨list ⍝ If there are no assets...
-             F.RmDir tempFolder                                 ⍝ ... then we delete the temp folder...
-             :If 0<≢loaded
-                 loaded.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'          ⍝ ... and undefine "HOME".
-             :EndIf
-         :ElseIf 0=+/≢¨loaded.TatinVars.HOME
-             F.RmDir tempFolder                                 ⍝ No assets, so we can get rid of it
+     cfgs←{Reg.JSON⊃F.NGET ⍵,'/',CFG_Name}¨list
+     :If 0=+/≢¨'assets'∘{2≠⍵.⎕NC ⍺:'' ⋄ ⍵.⍎⍺}¨cfgs     ⍝ If there are no assets...
+     :AndIf 0=+/≢¨'files'∘{2≠⍵.⎕NC ⍺:'' ⋄ ⍵.⍎⍺}¨cfgs   ⍝ ... and no files ...
+         F.RmDir tempFolder                            ⍝ ... then we delete the temp folder...
+         :If 0<≢loaded
+             loaded.TatinVars.⎕FX¨⊂⊂'r←HOME' 'r←⍬'     ⍝ ... and undefine "HOME".
          :EndIf
+     :ElseIf 0=≢loaded                                 ⍝ Nothing was loaded, so nothing can need the folder
+         F.RmDir tempFolder
      :EndIf
  :EndIf
 ⍝Done

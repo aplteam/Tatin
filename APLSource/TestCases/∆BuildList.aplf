@@ -1,9 +1,11 @@
  ∆BuildList←{
 ⍝ Returns the contents of an "apl-buildlist.json" carrying ⍵, a package ID, as its only principal
-⍝ package. Used to set up a pair of folders for testing what a re-install would replace.
+⍝ package. The optional left argument is the Registry the package was installed from; it defaults
+⍝ to the Tatin Registry. Used to set up a pair of folders for testing what a re-install would replace.
+     ⍺←'https://tatin.dev/'
      ns←⎕NS''
      ns.packageID←,⊆⍵
      ns.principal←,1
-     ns.url←,⊂'https://tatin.dev/'
+     ns.url←,⊂⍺
      ⎕JSON⍠('Dialect' 'JSON5')('Compact' 0)⊢ns
  }

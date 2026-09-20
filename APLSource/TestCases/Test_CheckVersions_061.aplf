@@ -1,4 +1,4 @@
- r←Test_CheckVersions_061(stopFlag batchFlag);⎕TRAP;dir;buff;rc;msg;filename;json
+ r←Test_CheckVersions_061(stopFlag batchFlag);⎕TRAP;dir;rc;msg;url;data
 ⍝ Run CheckForLaterVersion on an installed version that is ahead of everything the Registry hosts.\\
 ⍝ That is what a beta becomes once it has been published, installed, and then deleted again: the
 ⍝ Registry still knows the package name, so it answers with the best version of the major version
@@ -10,15 +10,15 @@
  dir←∆GetTempDir''
  dir ⎕NCOPY⍠('Wildcard' 1)⊣∆TEMP_TEST_DATA,'/myproj/*'
 
-⍝ 1.99.0 is ahead of every 1.x the Registry has, and the Registry cannot be hosting it
- filename←dir,'/packages/',Reg.BuildListFilename
- json←⊃F.NGET filename
- json←'aplteam-versions-1.0.0-beta-1'⎕R'aplteam-versions-1.99.0'⊢json
- (⊂json)⎕NPUT filename 1
+⍝ The local Registry hosts "example-versions" from 0.1.0 to 2.0.0, so it knows the package name but
+⍝ not 1.99.0, and every 1.x it offers is earlier than that
+ url←Reg.AddSlash ∆TEMP_REGISTRY_FOLDER
+ (⊂url ∆BuildList'example-versions-1.99.0')⎕NPUT(dir,'/packages/',Reg.BuildListFilename)1
 
- buff←⎕FMT TC.CheckForLaterVersion dir,'/packages'
- →T.GoToTidyUp~∨/'<<< Not available any more >>>'⍷buff
- →T.GoToTidyUp∨/'1.0.0'⍷buff            ⍝ the earlier version the Registry offers must not be shown
+ data←TC.CheckForLaterVersion dir,'/packages'
+ →T.GoToTidyUp 1≠≢data
+ →T.GoToTidyUp'<<< Not available any more >>>'≢⊃data[1;2]   ⍝ nothing earlier may be offered here
+ →T.GoToTidyUp 1∊data[;4]               ⍝ nothing to check: the version is gone rather than outdated
 
  r←T._OK
 

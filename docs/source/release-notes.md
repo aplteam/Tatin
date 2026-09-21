@@ -16,6 +16,68 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.127.0 ⋄ 2026-09-20
+
+Minor change in behaviour in order to fix a problem: When scanning registries, if a registry is unreachable and skipped, a dependency that lives only there now causes an error. Before, it produced an incomplete build list.
+
+Two more changes in behaviour, both of them about versions going backwards:
+
+* `]Tatin.ReInstallDependencies -update` now refuses, and changes nothing, when it would replace an installed package by an earlier version of it. 
+  That used to happen silently to a package whose installed version had been withdrawn from the Registry it came from, or had never been published: the version was widened to its major version line, and whatever the Registry offered as the best version of that line was installed over it.
+
+* `]Tatin.CheckForLaterVersion` compares versions now instead of just checking whether they differ, so such a package is no longer reported as updatable to an earlier version. 
+
+   When the installed version is not hosted by any Registry it says "Not available any more", which means that install cannot be reproduced by anybody.
+
+## Server 
+
+This release fixes the server answering a request for several packages' dependencies with a 404 when it hosts only some of them, which cost clients the dependencies it *did* host. 
+
+Older clients benefit from that fix as well, so it is worth updating a Registry even if nobody using it has upgraded their client.
+
+## v0.126.2 ⋄ 2026-09-15
+
+* Version 0.126.1 came with a bug that stopped housekeeping from doing its job, so every server running 0.126.1 should update. As long as 0.126.1 was running:
+
+  * READMEs of newly published packages were not fetched.
+  * IndexNow was not told about new or changed pages.
+  * Changes to `Credentials.csv` and `server.ini` were not picked up.
+  * Usage data was not processed.
+
+  READMEs and IndexNow catch up on their own once 0.126.2 is running. A change made to `Credentials.csv` or `server.ini` while 0.126.1 was running takes effect with the update to 0.126.2.
+
+No breaking changes, no user actions required. Usage data files that are not needed any more, like the monthly files of a year that has a file for the whole year, are deleted automatically by the first housekeeping run: there is no need to delete them by hand.
+
+This is a server-only release, the client has not changed.
+
+## v0.126.1 ⋄ 2026-09-12
+
+* This is a server-only release, and it fixes a serious security problem. Everybody who runs a Tatin server should update right away.
+
+  Until this version the server handed out files it must never serve:
+
+  * Everything in `Assets/Runtime/`, including the certificates that come with Tatin.
+  * Any file the server process was able to read. Such a file could be reached with `..` from `/Assets/` or from `/usage-data/` and through the download of usage data; among them are `server.ini` and the `Credentials.csv` file of the Registry.
+  * The application log, which lives in the same folder as the usage data files.
+
+  All of these now get a 404, just like a file that does not exist.
+
+  There is no telling whether anybody took advantage of this, so assume that everything the server process was able to read has been read:
+
+  * Change the password in the `[EMAIL]` section of `server.ini` and `[CONFIG]IndexNowKey`, if you use them.
+  * API keys are kept in `Credentials.csv` as salted hashes rather than in plain text, but you might consider issuing new ones anyway.
+
+* Replace the `Assets/` folder in the root of your Tatin server with the one that comes with this version, as described in [Assets](maintenance.md#assets).
+
+  This needs more care only if your server serves HTTPS itself (`[CONFIG]Secure=1`) _and_ `[CERTIFICATES]PublicCertFile` or `[CERTIFICATES]PrivateKeyFile` point anywhere into `Assets/`. That certificate was there for anybody to download, and replacing the folder would delete it anyway. In that case, before replacing `Assets/`:
+
+  1. Put a new certificate and its private key into the root of your Tatin server, where `server.ini` lives, but not anywhere in `Assets/`.
+  2. Point `[CERTIFICATES]PublicCertFile` and `[CERTIFICATES]PrivateKeyFile` to the new files.
+
+* Packages turned out to be far messier in real life than anticipated; this release brings in the required adjustments:
+  * When a project carries no tags at all, or none that fits the version, the README is now fetched from the project's default branch instead. The package page says so: such a README describes the project as it is today, not that particular release.
+  * The README is now looked for as "README.md", "README.MD", "ReadMe.md" and "readme.md": GitHub serves file names case sensitively, so the spelling matters.
+
 ## v0.126.0 ⋄ 2026-09-09
 
 * This is a server-only release: the client side of Tatin has not changed at all.
@@ -400,6 +462,12 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
+
+
+
+
+
 
 
 

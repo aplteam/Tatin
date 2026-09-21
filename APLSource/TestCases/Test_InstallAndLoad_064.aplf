@@ -1,0 +1,50 @@
+ r←Test_InstallAndLoad_064(stopFlag batchFlag);⎕TRAP;dir;src;src2;dist;body;cfg;parms;zipfile;home
+⍝ Load a package that has no assets but does have "files".\
+⍝ Such a package has a footprint: `LoadPackages` unpacks it into a temp folder, and that is where
+⍝ the files are, so the folder must survive and `HOME` must point at it. Deciding this by "assets"
+⍝ alone once emptied `HOME`, and Cider, whose only footprint is "cider.config.template", could not
+⍝ find its own template any more.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←∆GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ src2←src,'/APLSource'
+ F.MkDir src2 dist
+
+ body←'r←Hello' 'r←''World'''
+ (⊂body)F.NPUT src2,'/Test.aplf'
+ (⊂'The package needs this at run time')F.NPUT src,'/sample.template'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'WithFiles'
+ cfg.version←'0.1.0'
+ cfg.source←'APLSource/'
+ cfg.files←'sample.template'
+ cfg.os_win←1
+ TC.WritePackageConfigFile src cfg
+
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
+ →T.GoToTidyUp 0≥≢zipfile
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ {}⎕SE.Tatin.LoadPackages zipfile'#.TEMP'
+ home←#.TEMP.WithFiles.TatinVars.HOME
+ →T.GoToTidyUp 0=≢home                  ⍝ Without a HOME the package cannot find its own files
+ →T.GoToTidyUp~F.IsFile home,'/sample.template'
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+ :If 9=#.⎕NC'TEMP.WithFiles'
+ :AndIf 0<≢#.TEMP.WithFiles.TatinVars.HOME
+     F.RmDir #.TEMP.WithFiles.TatinVars.HOME,'/..'
+ :EndIf
+⍝Done

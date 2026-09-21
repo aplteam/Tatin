@@ -1,0 +1,15 @@
+ r←new IsLaterThan old
+⍝ Returns a 1 when `new` is a later version than `old`, otherwise a 0.\\
+⍝ Both must be complete package IDs, and both are assumed to name the same package: this answers
+⍝ "is it later?" and not "is it the same package?".
+⍝ `SortIndexForPackageIDs` settles every case but one: it removes the beta part before it compares,
+⍝ so "group-name-1.2.0-beta-2" and "group-name-1.2.0" look identical to it. Semantic Versioning puts
+⍝ a beta *before* the release it leads up to, so that one is decided here.
+⍝ Note that "later" is not the same as "different": a Registry may well offer a version that is
+⍝ older than the one installed, for example when the installed one was withdrawn or never published.
+ :If (RemoveBetaPart new)≡RemoveBetaPart old
+     r←(HasBetaPart old)>HasBetaPart new
+ :Else
+     r←2=⊃⌽SortIndexForPackageIDs old new
+ :EndIf
+⍝Done

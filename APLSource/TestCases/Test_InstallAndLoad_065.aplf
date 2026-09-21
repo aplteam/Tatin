@@ -1,0 +1,41 @@
+ r←Test_InstallAndLoad_065(stopFlag batchFlag);⎕TRAP;dir;src;src2;dist;body;cfg;parms;zipfile
+⍝ Load a package that has neither assets nor files.\
+⍝ Such a package leaves nothing behind that anybody could need: `LoadPackages` deletes the temp
+⍝ folder it was unpacked into, and `HOME` is empty. That is the documented behaviour, and the
+⍝ counterpart of Test_InstallAndLoad_064.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ #.⎕EX TC.GetTatinRootSpace'#'
+ dir←∆GetTempDir ⍬
+ (src dist)←(⊂dir,'/'),¨'src' 'dist'
+ src,←'/v0.1.0'
+ src2←src,'/APLSource'
+ F.MkDir src2 dist
+
+ body←'r←Hello' 'r←''World'''
+ (⊂body)F.NPUT src2,'/Test.aplf'
+
+ cfg←TC.InitPackageConfig ⍬
+ cfg.group←'Example'
+ cfg.name←'NoFootprint'
+ cfg.version←'0.1.0'
+ cfg.source←'APLSource/'
+ cfg.os_win←1
+ TC.WritePackageConfigFile src cfg
+
+ parms←TC.CreateBuildParms src
+ parms.targetPath←dist
+ zipfile←TC.BuildPackage parms
+ →T.GoToTidyUp 0≥≢zipfile
+
+ #.⎕SHADOW'TEMP' ⋄ 'TEMP'#.⎕NS''
+ {}⎕SE.Tatin.LoadPackages zipfile'#.TEMP'
+ →T.GoToTidyUp 0≠≢#.TEMP.NoFootprint.TatinVars.HOME
+
+ r←T._OK
+
+∆TidyUp:
+ Assert 0=⊃F.RmDir dir
+ #.⎕EX TC.GetTatinRootSpace'#'
+⍝Done

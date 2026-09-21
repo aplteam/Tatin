@@ -1,0 +1,17 @@
+ {r}←DeleteSupersededFiles folder;stems;years;superseded
+⍝ Deletes the usage data files in `folder` that are not needed any more, the CSV and the ZIP alike.
+⍝ A file for a year up to a month, like "usage-data-2025-08", holds all data of that year so far,
+⍝ so it is superseded by any later file of the same year:
+⍝ * by a later one up to a month, like "usage-data-2025-10"
+⍝ * by the file for the whole year, "usage-data-2025"
+⍝ Files for whole years always stay, and so does anything else in the folder, like the log file
+⍝ and its backups.
+ r←⍬
+⍝ Newest first, the file for a whole year ahead of those up to a month: see `ListUsageDataFiles`
+ stems←∪{⍵↓⍨-≢'.csv'}¨'*'##.ListUsageDataFiles folder
+ years←{4↑⍵↓⍨≢'usage-data-'}¨stems
+ superseded←(⍳≢years)≠years⍳years                  ⍝ Anything but the newest file of its year
+ :If ∨/superseded
+     {}##.F.DeleteFile¨,(folder∘,¨superseded/stems)∘.,'.csv' '.zip'
+ :EndIf
+⍝Done

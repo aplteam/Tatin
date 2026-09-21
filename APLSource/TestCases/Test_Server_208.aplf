@@ -1,0 +1,22 @@
+ r←Test_Server_208(stopFlag batchFlag);⎕TRAP;request;res;ns
+⍝ Ask the server for the dependencies of several packages, not all of which are hosted.
+⍝ The server used to answer with a 404 as soon as a single one was not hosted; now it must return
+⍝ just the ones it hosts. Only when none of them is hosted a 404 is expected.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ request←R.NewRequest 0
+ request.Headers,←⊂'Accept' 'application/json'
+
+ request.RequestTarget←'/v1/packages/dependencies/aplteam-APLProcess-0.2.0,aplteam-DoesNotExist-1.0.0'
+ res←TC.SendAndReceive ∆LocalHostAndPort request
+ →T.PassesIf 200=res.StatusCode
+ ns←⎕JSON⍠('Dialect' 'JSON5')⊢res.Content
+ →T.PassesIf(,⊂'aplteam-APLProcess-0.2.0')≡1⊃¨ns.data
+
+ request.RequestTarget←'/v1/packages/dependencies/aplteam-DoesNotExist-1.0.0,aplteam-DoesNotExist-2.0.0'
+ res←TC.SendAndReceive ∆LocalHostAndPort request
+ →T.PassesIf 404=res.StatusCode
+
+ r←T._OK
+⍝Done

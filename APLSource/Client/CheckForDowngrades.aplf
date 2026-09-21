@@ -1,0 +1,35 @@
+ {r}←installFolder CheckForDowngrades tempDir;oldFilename;newFilename;oldIDs;newIDs;ind;i;offenders;msg
+⍝ Throws an error when replacing the packages in `installFolder` by the ones just installed into
+⍝ `tempDir` would bring in an *earlier* version of a package that is already installed.\\
+⍝ `ReInstallDependencies_` widens an exact version to its major version line when `update` is 1, so
+⍝ whatever a Registry offers as the best version of that line is what gets installed - even when
+⍝ that is older than what is there already. That is what happens to a version that was withdrawn
+⍝ from the Registry it came from, or that was never published in the first place. Because the
+⍝ install folder is then swapped for the temporary one, the only copy there is would be gone.\\
+⍝ Packages are matched by their major version line, so an update to a later major version is not a
+⍝ downgrade: the old line simply has no counterpart in the new build list.\\
+⍝ Without a build list on either side there is nothing to compare, and nothing is done.
+ r←0
+ oldFilename←(F.AddTrailingSep installFolder),Reg.BuildListFilename
+ newFilename←(F.AddTrailingSep tempDir),Reg.BuildListFilename
+ :If F.IsFile oldFilename
+ :AndIf F.IsFile newFilename
+     oldIDs←,⊆(Reg.JSON⊃F.NGET oldFilename).packageID
+     newIDs←,⊆(Reg.JSON⊃F.NGET newFilename).packageID
+     ind←(Reg.RemoveMinorAndPatch¨oldIDs)⍳Reg.RemoveMinorAndPatch¨newIDs
+     offenders←''
+     :For i :In ⍳≢newIDs
+         :If (i⊃ind)≤≢oldIDs
+         :AndIf ((i⊃ind)⊃oldIDs)Reg.IsLaterThan(i⊃newIDs)
+             offenders,←⊂((i⊃ind)⊃oldIDs)(i⊃newIDs)
+         :EndIf
+     :EndFor
+     :If 0<≢offenders
+         msg←'Refused: this would replace ',(⍕≢offenders),' installed package'
+         msg,←((1<≢offenders)/'s'),' by an earlier version:'
+         msg,←⊃,/{CR,'  ',(1⊃⍵),'  -->  ',2⊃⍵}¨offenders
+         msg,←CR,'Re-install without "update", or publish the installed version first.'
+         msg Assert 0
+     :EndIf
+ :EndIf
+⍝Done

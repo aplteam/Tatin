@@ -27,8 +27,9 @@
  :If './'≡2↑v
      v←2↓v
  :EndIf
- :If '/'=⊃v                                         ⍝ Relative to the repository root either way
-     v←1↓v
+ :If '/'=⊃v                                         ⍝ Site relative, so GitHub resolves it against github.com itself
+     r←(ind↑m),'https://github.com',v,'"'
+     :Return
  :EndIf
  :If 'src'≡⎕C(ind-2)↑m
      r←(ind↑m),(GetRawGitHubUrl group repo tag v),'"'

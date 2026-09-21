@@ -16,8 +16,8 @@
              response.StatusCode←404
          :EndIf
      :Else                          ⍝ No, so we just return a list
-         :If 0<≢list←⊃F.Dir(∊P.LogFolder),'*.zip'
-             response.Content←⊃{⍺,',',⍵}/(≢∊P.LogFolder)↓¨list
+         :If 0<≢list←'zip'ListUsageDataFiles∊P.LogFolder    ⍝ Newest first, and nothing but usage data files
+             response.Content←⊃{⍺,',',⍵}/list
          :EndIf
      :EndIf
  :Else

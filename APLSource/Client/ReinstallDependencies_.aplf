@@ -41,6 +41,16 @@
      p(⊂'Installed',(dry/' (dry)'),': '),ref
      r,←⊆ref
  :EndFor
+⍝ Checked before the folders are swapped, and with "dry" as well: a downgrade is refused either way,
+⍝ and with "dry" everything it would have installed has already been reported by then.
+ :Trap Reg.ErrorNo
+     installFolder CheckForDowngrades tempDir
+ :Else
+     qdmx←⎕DMX
+     :Trap 0 ⋄ ⎕DL 0.01 ⋄ F.RmDir tempDir ⋄ :EndTrap
+     CloseConnections forceClose
+     qdmx.EM Assert 0
+ :EndTrap
  :If dry
      ⎕DL 0.01
      F.RmDir tempDir

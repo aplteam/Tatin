@@ -1,7 +1,9 @@
- StoreReadme(packagePath status sourceUrl markdown);mdFilename;cfgFilename;ns;old;attempts;firstAttempt
+ StoreReadme(packagePath status sourceUrl refKind markdown);mdFilename;cfgFilename;ns;old;attempts;firstAttempt
 ⍝ Records the outcome of a README fetch for the package in `packagePath`. Fields written:
 ⍝ * `status`      : 'ok', 'none' or 'error'
 ⍝ * `sourceUrl`   : where the Markdown came from; '' unless the status is 'ok'
+⍝ * `ref`         : 'tag' or 'branch', saying whether that URL names the release itself or
+⍝                   the project's default branch; '' unless the status is 'ok'
 ⍝ * `attempts`    : how many times this package has been tried; `ReadmeIsDue` stops at three
 ⍝ * `firstAttempt`: when the first attempt was made, as seconds (⎕DT code 20), because the
 ⍝                   retries are counted in hours from it and `fetched` cannot be added to
@@ -29,6 +31,7 @@
  ns←⎕NS''
  ns.status←status
  ns.sourceUrl←sourceUrl
+ ns.ref←refKind
  ns.attempts←attempts+1
  ns.firstAttempt←firstAttempt
  ns.fetched←⊃60 ⎕DT⊂⎕TS

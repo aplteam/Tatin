@@ -1,0 +1,29 @@
+ r←Test_Misc_026(stopFlag batchFlag);⎕TRAP;a;b;c;beta1;beta2
+⍝ Exercise `Registry.IsLaterThan`, which decides whether a Registry offers something later than
+⍝ what is installed. Answering "different" instead of "later" once reported a downgrade as an update.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ (a b c)←'aplteam-Foo-1.1.0' 'aplteam-Foo-1.2.0' 'aplteam-Foo-2.0.0'
+ (beta1 beta2)←'aplteam-Foo-1.2.0-beta-1' 'aplteam-Foo-1.2.0-beta-2'
+
+⍝ Ordinary version numbers
+ →T.PassesIf 1=b Reg.IsLaterThan a
+ →T.PassesIf 0=a Reg.IsLaterThan b
+ →T.PassesIf 0=a Reg.IsLaterThan a
+ →T.PassesIf 1=c Reg.IsLaterThan b
+
+⍝ Double digits must not be compared as text
+ →T.PassesIf 1='aplteam-Foo-1.10.0'Reg.IsLaterThan'aplteam-Foo-1.9.0'
+
+⍝ A beta comes before the release it leads up to, and after the version before it
+ →T.PassesIf 1=b Reg.IsLaterThan beta2
+ →T.PassesIf 0=beta2 Reg.IsLaterThan b
+ →T.PassesIf 1=beta1 Reg.IsLaterThan a
+ →T.PassesIf 0=a Reg.IsLaterThan beta1
+
+⍝ This is what the bug was: what a Registry offers may be earlier than what is installed
+ →T.PassesIf 0='aplteam-APLGit2-1.1.0'Reg.IsLaterThan'aplteam-APLGit2-1.2.0-beta-2'
+
+ r←T._OK
+⍝Done

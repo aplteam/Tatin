@@ -1,8 +1,11 @@
- r←GetLastMonthSaved folder;list
- :If 0<≢list←##.F.ListFiles folder,'usage-data-????-*.csv'     ⍝ All monthly data saved
+ r←GetLastMonthSaved(folder year);list
+⍝ Returns the last month of `year` saved in a file "usage-data-YYYY-MM.csv" in `folder`, or 0
+⍝ when there is none. `year` is a character vector like '2026'.
+⍝ Only files of `year` count: the month of a file of an earlier year says nothing about what was
+⍝ saved for this one.
+ r←0
+ :If 0<≢list←##.F.ListFiles folder,'usage-data-',year,'-*.csv'
      list←{⊃,/1↓⎕NPARTS ⍵}¨list
-     r←##.A.ToNum(⊃list[≢list])[1 2+≢'usage-data-2024-']  ⍝ Last month saved
- :Else
-     r←0
+     r←⌈/{⊃##.A.ToNum ⍵[1 2+≢'usage-data-YYYY-']}¨list
  :EndIf
 ⍝Done

@@ -1,0 +1,44 @@
+ r←MarkUnavailablePackages r;bool;ids;found;RI;registries;request;res;ns;i;registry
+⍝ Takes the matrix `CheckForLaterVersion` has built and marks every row whose installed version is
+⍝ not hosted by any Registry with a priority greater than 0 any more, by saying so in [;2].\\
+⍝ Only rows that offer no later version are looked at: where there is one, the version ahead is what
+⍝ matters, not the one behind. Rows that already carry a "<<< ... >>>" marker are left alone.\\
+⍝ A package that is not hosted anywhere cannot be installed again by anybody, including its author,
+⍝ so the build list it sits in cannot be reproduced. Finding that out when the build list is checked
+⍝ is a great deal better than finding it out when somebody tries to install it.\\
+⍝ Must be called while the connections established by `CheckForLaterVersion` are still open.\\
+⍝ A Registry that fails to answer contributes nothing and is passed over in silence: this is an
+⍝ additional piece of information, and not being able to get it must not make the report fail.
+ bool←(0=r[;4])∧'<'≠⊃¨r[;2]
+ :If 0<+/bool
+     ids←bool/r[;1]
+     found←(≢ids)⍴0
+     RI←RegistryIndices
+     registries←1 ListRegistries''
+     :If 0<≢registries←(registries[;RI.priority]>0)⌿registries
+         request←R.NewRequest 0
+         request.Headers,←⊂'Accept' 'application/json'
+         :For i :In ⍳≢registries
+             :If ∧/found
+                 :Leave
+             :EndIf
+             registry←⊃registries[i;RI.url]
+             :If Reg.IsHTTP registry
+                 request.RequestTarget←Reg.VersionOf_REST,'/packages/exist/',1↓∊',',¨(~found)/ids
+                 :Trap 0
+                     res←SendAndReceive registry request
+                     :If 200=res.StatusCode
+                         ns←Reg.JSON res.Content
+                         found[⍸(~found)\ns.exist]←1
+                     :EndIf
+                 :EndTrap
+             :Else
+                 found[⍸(~found)\F.IsDir registry∘,¨(~found)/ids]←1
+             :EndIf
+         :EndFor
+         :If 0<+/~found
+             r[⍸bool\~found;2]←⊂'<<< Not available any more >>>'
+         :EndIf
+     :EndIf
+ :EndIf
+⍝Done

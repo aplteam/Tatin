@@ -3,8 +3,12 @@
 ⍝ The right argument requires at least one and accepts up to two parameters:
 ⍝ * A folder that hosts a file `apl-dependencies.txt` (install folder)
 ⍝ * A Registry, either as a path to a directory or as an alias (optional)
-⍝ The file `apl-buildlist.json` as well as all directories in the install folder will be deleted.
-⍝ Then all packages listed in the file `apl-dependencies.txt` are re-installed from scratch.\\
+⍝ All packages listed in the file `apl-dependencies.txt` are re-installed from scratch, so the file
+⍝ `apl-buildlist.json` as well as all directories in the install folder are eventually replaced.
+⍝ The work is done in a temporary folder which replaces the install folder only once everything has
+⍝ been fetched, so a failure half-way through leaves the install folder as it was.\\
+⍝ An error is thrown, and nothing is changed, when this would install a package that is *earlier*
+⍝ than the one installed already; see `CheckForDowngrades`.\\
 ⍝ Note that packages with different major version numbers are considered to be different packages
 ⍝ but check the parameter `major`.\\
 ⍝ By default all known Registries with a priority greater than 0 are scanned (if no Registry was specified.\\

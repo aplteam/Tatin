@@ -13,9 +13,12 @@
 ⍝ Registry then it was originally installed from.
 ⍝ Returns a matrix with these columns:
 ⍝ [;1] Original package ID
-⍝ [;2] "Latest" package ID
+⍝ [;2] "Latest" package ID; repeats [;1] when nothing later was found, and says
+⍝      "<<< Not available any more >>>" when the installed version is not hosted anywhere (which
+⍝      means this build list cannot be reproduced); see `MarkUnavailablePackages`
 ⍝ [;3] Original URL
-⍝ [;4] Flag; 1 means Server did respond
+⍝ [;4] Flag; 1 means there is something to check: a later version, or the same version offered by
+⍝      a different Registry. It is always 0 for a row marked with "<<< ... >>>" in [;2]
 ⍝ [;5] URL the latest version was found at but empty in case it's identical with [;3]
  r←0 5⍴⍬
  flags←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'flags'
@@ -33,7 +36,9 @@
      r,←r[;3]
      r[;3]←(dependencies∨buildList.principal)⌿buildList.url
      r[;3 5]←{IsHTTP ⍵:⍵ ⋄ 0=≢⍵~' ':'' ⋄ 'expand'F.NormalizePath ⍵}¨r[;3 5]
-     r[;4]∨←≢/¨↓r[;3 5]              ⍝ Those where the latest version comes from a different registry are candidates as well
+     r←MarkUnavailablePackages r     ⍝ While [;4] still says just "a later version was found"
+     r[;4]∨←('<'≠⊃¨r[;2])∧≢/¨↓r[;3 5] ⍝ Those where the latest version comes from a different registry are candidates as well
+⍝                                      A row carrying a "<<< ... >>>" marker offers no version to check, whatever [;5] holds
      :If 0<≢ind←⍸~r[;4]
          r[ind;5]←⊂''
      :EndIf

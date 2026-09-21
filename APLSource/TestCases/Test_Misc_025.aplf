@@ -1,0 +1,25 @@
+ r←Test_Misc_025(stopFlag batchFlag);⎕TRAP;parms;Resolve
+⍝ Checks how `ResolveReadmeLinks` resolves the links of a rendered README.
+⍝ In particular one that starts with a "/": GitHub renders a README at github.com, so a
+⍝ browser resolves such a link against that origin rather than against the repository.
+⍝ Resolved the other way it was left pointing at us and answered with a 404.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ parms←'aplteam' 'APLGit2' 'v1.2.0'
+ Resolve←##.Server.ResolveReadmeLinks
+
+⍝ Site relative: the path is kept as it is, and github.com is put in front of it
+ →T.PassesIf'href="https://github.com/aplteam/Tatin"'≡parms Resolve'href="/aplteam/Tatin"'
+ →T.PassesIf'src="https://github.com/aplteam/Tatin/raw/main/pic.png"'≡parms Resolve'src="/aplteam/Tatin/raw/main/pic.png"'
+
+⍝ Relative to the repository: resolved against the tag the README came from
+ →T.PassesIf'href="https://github.com/aplteam/APLGit2/blob/v1.2.0/docs/x.md"'≡parms Resolve'href="docs/x.md"'
+ →T.PassesIf'src="https://raw.githubusercontent.com/aplteam/APLGit2/v1.2.0/pic.png"'≡parms Resolve'src="./pic.png"'
+
+⍝ Left alone
+ →T.PassesIf'href="https://example.com/x"'≡parms Resolve'href="https://example.com/x"'
+ →T.PassesIf'href="#foo"'≡parms Resolve'href="#foo"'
+
+ r←T._OK
+⍝Done

@@ -4,7 +4,10 @@
 ⍝ first try. More than one go is worth having because a first failure is often temporary -
 ⍝ GitHub unreachable, or a release tag pushed some time after the package was published -
 ⍝ while a third failure a week later is not going to be cured by a fourth.
-⍝ 'ok' is final at once: a README is tied to a tag, and tags do not move.
+⍝ 'ok' is final at once: a README is tied to a tag, and tags do not move. That holds for
+⍝ one taken from the default branch too, though for the opposite reason - the branch does
+⍝ move, and fetching it again would only carry the text further away from the release it is
+⍝ shown against. What was fetched is a snapshot, and it stands.
  schedule←24 168                                    ⍝ Hours after the FIRST attempt, one per retry
  r←1
  :If ⍬≢ns←GetReadmeRecord packagePath

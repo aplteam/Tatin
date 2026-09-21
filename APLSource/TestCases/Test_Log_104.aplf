@@ -1,0 +1,31 @@
+ r←Test_Log_104(stopFlag batchFlag);⎕TRAP;tempDir;msg;rc;L;lines;filename;list;expected
+⍝ Usage data files that are not needed any more are deleted, CSV and ZIP alike: files up to a
+⍝ month of a year that has a file for the whole year, and files up to a month that a later one of
+⍝ the same year supersedes. Files for whole years and the backups of the log file stay.
+⍝ This is what production looked like: sporadic monthly files of years that are long finished.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir'-Log/'
+ rc←'Create!'F.CheckPath tempDir
+ Assert rc
+ L←##.Server.Logs
+ lines←⊃F.NGET(∆TEMP_TEST_DATA,'/LogFile/app-log.txt')1
+ lines←('2024-'∘≡¨5↑¨lines)/lines                   ⍝ Only the data of the current year: Jan to Mar 2024
+ (⊂lines)F.NPUT(tempDir,L.GetLogFilename)1
+ :For filename :In ,'usage-data-2023' 'usage-data-2023-05' 'usage-data-2023-11' 'usage-data-2024-01'∘.,'.csv' '.zip'
+     (⊂'Group,Name,Version,Year,Month,Downloads')F.NPUT(tempDir,filename)1
+ :EndFor
+ (⊂'Backup')F.NPUT(tempDir,'app-log-2023.bkp.zip')1
+ L.ProcessLogFile tempDir(2024 3 4)
+
+ list←{⊃,/1↓⎕NPARTS ⍵}¨F.ListFiles tempDir,'*'
+ expected←'app-log-2023.bkp.zip' 'app-log.txt' 'usage-data-2023.csv' 'usage-data-2023.zip' 'usage-data-2024-02.csv' 'usage-data-2024-02.zip'
+ →T.GoToTidyUp~list ∆LazyMatch expected
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+⍝Done

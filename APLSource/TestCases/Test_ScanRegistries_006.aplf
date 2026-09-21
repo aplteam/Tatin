@@ -1,0 +1,23 @@
+ r←Test_ScanRegistries_006(stopFlag batchFlag);⎕TRAP;qdmx;registries
+⍝ Scan for a package that exists and one that does not exist anywhere.
+⍝ The test server answers with a 404 because it does not host all of them, and `ScanRegistries` used to ignore that:
+⍝ the missing package silently went missing from the build list. It must throw, naming just the package not found.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ registries←∆LocalHostAndPort(F.AddTrailingSep ∆TEMP_REGISTRY_FOLDER)
+ TC.∆TREE←TC.CreateTree ⎕NS''
+ :Trap ##.Registry.ErrorNo
+     registries TC.ScanRegistries'aplteam-APLProcess-0.2.0' 'aplteam-DoesNotExist-1.0.0'
+     →T.GoToTidyUp 1
+ :Else
+     qdmx←⎕DMX
+     →T.GoToTidyUp~∨/'aplteam-DoesNotExist-1.0.0'⍷qdmx.EM
+     →T.GoToTidyUp∨/'aplteam-APLProcess-0.2.0'⍷qdmx.EM
+ :EndTrap
+
+ r←T._OK
+
+∆TidyUp:
+ TC.⎕EX'∆TREE'
+⍝Done

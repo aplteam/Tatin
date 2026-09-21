@@ -1,0 +1,23 @@
+ r←Test_Log_103(stopFlag batchFlag);⎕TRAP;tempDir;msg;rc;filename;list;expected
+⍝ The usage data files offered for download are listed newest first, whatever order the file
+⍝ system delivers them in, and nothing but usage data files is listed: neither the application
+⍝ log nor its year-end backups, nor usage data files of another type.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir'-Log/'
+ rc←'Create!'F.CheckPath tempDir
+ Assert rc
+ :For filename :In 'usage-data-2024.zip' 'usage-data-2026-08.zip' 'usage-data-2022.zip' 'usage-data-2025.zip' 'usage-data-2025-11.zip' 'usage-data-2026-08.csv' 'app-log-2025.bkp.zip' 'app-log.txt'
+     (⊂'Group,Name,Version,Year,Month,Downloads')F.NPUT(tempDir,filename)1
+ :EndFor
+ list←'zip'##.Server.ListUsageDataFiles tempDir
+ expected←'usage-data-2026-08.zip' 'usage-data-2025.zip' 'usage-data-2025-11.zip' 'usage-data-2024.zip' 'usage-data-2022.zip'
+ →T.GoToTidyUp expected≢list
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+⍝Done

@@ -1,0 +1,31 @@
+ html←GetStatisticsView(folder zipName);filename;data;names;keys;downloads;first;view
+⍝ Returns the "View" tab of the usage data page; see `GetStatistics`.
+⍝ It shows the downloads per package in the newest file, all versions and months added up, most
+⍝ downloaded first. The file has a row per package version and month, and the downloads are in
+⍝ the column "Downloads": counting rows would count versions and months rather than downloads.
+⍝ Package names are compared regardless of case, as Tatin does: a request may spell a name in
+⍝ any case, and the file keeps what it was given. A name is shown as it was spelled first.
+ filename←folder,(¯3↓zipName),'csv'
+ data←⊃⎕CSV filename''(1 1 1 2 2 2)1              ⍝ Numbers as numbers, without the header
+ html←⊂'<section class="tab-panel" id="view" role="tabpanel" aria-labelledby="tab-view">'
+ html,←⊂'<h3 class="tab-title">View</h3>'
+ html,←⊂'<p class="tab-intro">Downloads per package in ',(UsageDataPeriod zipName),', all versions and months added up.</p>'
+ :If 0=≢data
+     html,←⊂'<p class="no-match">Nothing was downloaded in that time.</p>'
+ :Else
+     names←data[;1 2]
+     keys←⎕C names
+     downloads←keys{+/⍵}⌸data[;6]
+     first←(↓keys)⍳∪↓keys
+     view←names[first;],downloads
+     view←view[⍋⎕C view[;2];]
+     view←view[⍒view[;3];]                         ⍝ Stable, so equal counts stay sorted by name
+     html,←⊂'<table class="usage-table">'
+     html,←⊂'<thead><tr><th>Group</th><th>Package</th><th class="num">Downloads</th></tr></thead>'
+     html,←⊂'<tbody>'
+     html,←{'<tr><td class="usage-group">',(EscapeSpecialChars⍕1⊃⍵),'</td><td class="usage-name">',(EscapeSpecialChars⍕2⊃⍵),'</td><td class="num">',(⍕3⊃⍵),'</td></tr>'}¨↓view
+     html,←⊂'</tbody>'
+     html,←⊂'</table>'
+ :EndIf
+ html,←⊂'</section>'
+⍝Done

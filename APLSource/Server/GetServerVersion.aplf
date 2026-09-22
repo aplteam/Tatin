@@ -1,10 +1,9 @@
  response←GetServerVersion request;data;html
-⍝ Respond to a request for some or all tags, HTML or JSON
+⍝ Respond to a request for the version of Tatin the server runs, HTML or JSON
  :If IsJsonRequest request.Headers
      data←Reg.Version
      response←request ReturnJSON Reg.JSON data
  :Else
-     data←⊂'<p>',(⊃{⍺,' from ',⍵}/1↓Reg.Version),'</p>'
-     html←PrepareHtmlPageForServerVersionNo data
+     html←PrepareHtmlPageForVersionInformation ⍬
      response←request ReturnHTML html
  :EndIf

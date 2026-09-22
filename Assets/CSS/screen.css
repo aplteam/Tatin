@@ -497,10 +497,6 @@ td.nowrap {
     overflow-wrap: break-word;
 }
 
-#data-table {
-    font-family: var(--font-code);
-}
-
 /* "Is a user command": a check mark, or nothing. The wording sits in a .sr-only span beside
    it, so screen readers announce it and a filter still matches on "Yes" and "No". */
 .uc-flag {
@@ -574,11 +570,6 @@ input:disabled {
     color: var(--muted);
 }
 
-form#create-group-homepage input,
-form#create-group-homepage textarea {
-    margin-bottom: var(--space-4);
-}
-
 /* Buttons are round, so that they look like buttons */
 .button,
 input[type="submit"],
@@ -606,14 +597,16 @@ input[type="submit"]:hover {
 
 /* --- Tabs (usage data) ------------------------------------------ */
 
-.tab {
+/* Without JavaScript every panel is shown with its heading, one below the other; tabs.js adds
+   "tabs-on" and shows the tab bar instead of the headings */
+.tab-bar {
     display: flex;
     flex-wrap: wrap;
     gap: 0 32px;
     border-bottom: 1px solid var(--rule);
 }
 
-.tab button {
+.tab-bar button {
     margin-bottom: -1px;
     padding: 10px 0;
     border: 0;
@@ -624,19 +617,22 @@ input[type="submit"]:hover {
     cursor: pointer;
 }
 
-.tab button:hover {
+.tab-bar button:hover {
     color: var(--ink);
 }
 
-.tab button.active {
+.tab-bar button[aria-selected="true"] {
     border-bottom-color: var(--accent);
     color: var(--ink);
     font-weight: 600;
 }
 
-.tabcontent {
+.tab-panel {
+    padding: 20px 0;
+}
+
+.tabs-on .tab-title {
     display: none;
-    padding: var(--space-4) 0;
 }
 
 /* --- Home page --------------------------------------------------- */
@@ -1843,4 +1839,518 @@ span.dep-note {
         grid-template-columns: minmax(0, 1fr);
         gap: 2px;
     }
+}
+
+/* --- Groups ----------------------------------------------------------- */
+
+/* What a page is about, below its title, when there is more to say than a lead */
+.page-head .intro {
+    max-width: 640px;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 18px;
+}
+
+.group-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 56px;
+    border-top: 1px solid var(--ink);
+}
+
+.group-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px 0 24px;
+    border-bottom: 1px solid var(--rule);
+}
+
+.group-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.group-card-head a {
+    color: var(--ink);
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.1;
+}
+
+.group-card-head span {
+    color: var(--faint);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.group-card-packages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    font-family: var(--font-code);
+    font-size: 13.5px;
+    line-height: 1.7;
+}
+
+@media (max-width: 64em) {
+    .group-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 40px;
+    }
+}
+
+@media (max-width: 48em) {
+    .page-head .intro {
+        font-size: 16px;
+    }
+
+    .group-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .group-card-packages a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2rem;
+    }
+}
+
+/* --- Tags ------------------------------------------------------------- */
+
+.page-head .list-tools {
+    margin: 6px 0 0;
+}
+
+/* In the column of a page head the basis of the filter would become its height */
+.page-head .filter {
+    flex: 0 0 auto;
+    max-width: 560px;
+}
+
+.tag-index {
+    columns: 4;
+    column-gap: 48px;
+    padding-top: 8px;
+    border-top: 1px solid var(--ink);
+}
+
+.tag-letter {
+    padding: 12px 0 10px;
+    break-inside: avoid;
+}
+
+.tag-letter h3 {
+    margin: 0 0 4px;
+    color: var(--accent);
+    font-size: 24px;
+}
+
+.tag-letter ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tag-letter li {
+    margin: 0;
+    padding: 2px 0;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.tag-letter a {
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.no-match {
+    color: var(--muted);
+    font-style: italic;
+}
+
+@media (max-width: 64em) {
+    .tag-index {
+        columns: 3;
+    }
+}
+
+@media (max-width: 48em) {
+    .tag-index {
+        columns: 2;
+        column-gap: 24px;
+    }
+
+    .tag-letter a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2rem;
+    }
+}
+
+/* --- Deprecated packages ------------------------------------------------ */
+
+.deprecated-list {
+    border-top: 1px solid var(--ink);
+}
+
+.deprecated-row {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr) 260px;
+    gap: 24px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.deprecated-major {
+    color: var(--ink);
+    font-family: var(--font-code);
+    font-size: 16px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.deprecated-comment {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+}
+
+.deprecated-comment.none,
+.deprecated-last {
+    color: var(--faint);
+}
+
+.deprecated-last {
+    font-size: 15px;
+}
+
+.deprecated-last code {
+    padding: 0;
+    background: none;
+    font-size: 14px;
+}
+
+@media (max-width: 48em) {
+    .deprecated-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+    }
+}
+
+/* --- Licenses ------------------------------------------------------------ */
+
+/* Running text that comes from a Markdown snippet */
+.prose {
+    max-width: 700px;
+    font-size: 18px;
+}
+
+.prose p {
+    margin: 0 0 10px;
+}
+
+.license-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0 32px;
+    margin: 32px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+    list-style: none;
+}
+
+.license-list li {
+    margin: 0;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.license-list a {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.list-note {
+    margin: 14px 0 0;
+    color: var(--faint);
+    font-size: 14px;
+}
+
+@media (max-width: 64em) {
+    .license-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 48em) {
+    .prose {
+        font-size: 16px;
+    }
+
+    .license-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 20px;
+    }
+}
+
+/* --- Usage data ---------------------------------------------------------- */
+
+.tab-intro {
+    max-width: 760px;
+    margin: 0 0 16px;
+    color: var(--ink-soft);
+    font-size: 16px;
+}
+
+.usage-table {
+    max-width: 760px;
+}
+
+.usage-table td {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.usage-table .usage-group {
+    color: var(--faint);
+    font-family: var(--font-code);
+    font-size: 14px;
+}
+
+.usage-table .usage-name {
+    font-family: var(--font-code);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.usage-table .num {
+    padding-right: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.usage-table td.usage-name {
+    width: 100%;
+}
+
+.download-list {
+    max-width: 760px;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+    list-style: none;
+}
+
+.download-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 24px;
+    margin: 0;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule-soft);
+}
+
+.download-list a {
+    font-size: 17px;
+}
+
+.download-list span {
+    color: var(--faint);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 48em) {
+    .tab-bar {
+        gap: 0 24px;
+    }
+
+    .tab-bar button {
+        min-height: var(--tap);
+    }
+}
+
+/* --- Credential report ------------------------------------------------------ */
+
+.report {
+    max-width: 760px;
+    padding: 6px 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+    font-size: 19px;
+}
+
+.report p {
+    margin: 12px 0;
+}
+
+.report ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.report li {
+    margin: 0;
+}
+
+.report code {
+    padding: 0;
+    background: none;
+    font-size: 16px;
+}
+
+@media (max-width: 48em) {
+    .report {
+        font-size: 17px;
+    }
+}
+
+/* --- Group home page -------------------------------------------------------- */
+
+/* A button that is not the main action of the page: outlined, but still round and filled */
+.button.button-outline,
+button.button.button-outline {
+    min-height: 0;
+    padding: 7px 18px;
+    border-color: var(--control-border);
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-size: 15px;
+}
+
+.button.button-outline:hover {
+    border-color: var(--ink);
+    background: var(--paper-raised);
+    color: var(--ink);
+}
+
+.group-home {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 72px;
+    align-items: start;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--rule);
+}
+
+.group-home .prose {
+    max-width: 680px;
+}
+
+.group-home-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.group-home-side form {
+    margin: 0;
+}
+
+.side-fact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 16px;
+}
+
+.side-fact span,
+.side-note {
+    color: var(--faint);
+    font-size: 14px;
+}
+
+.side-note {
+    margin: 0;
+}
+
+.group-packages-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding: 32px 0 10px;
+}
+
+.group-packages-head h3 {
+    margin: 0;
+}
+
+.group-packages-head .legend {
+    margin: 0;
+}
+
+/* The form for creating or editing a group's home page */
+.group-home-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: 860px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.field label {
+    margin: 0;
+}
+
+.field-hint {
+    color: var(--faint);
+    font-size: 14px;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+}
+
+.form-message {
+    max-width: 860px;
+    margin: 0 0 22px;
+    padding: 12px 18px;
+    border-top: 2px solid var(--warning);
+    background: var(--warning-panel);
+}
+
+@media (max-width: 48em) {
+    .group-home,
+    .field-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+    }
+
+    .button.button-outline,
+    button.button.button-outline {
+        min-height: var(--tap);
+    }
+}
+
+/* --- Error pages ------------------------------------------------------------ */
+
+.error-next {
+    margin-top: 24px;
 }

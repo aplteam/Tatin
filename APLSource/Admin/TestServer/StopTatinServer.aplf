@@ -1,0 +1,50 @@
+ {r}←StopTatinServer port;tatin;ind;process;folder;url;request;counter;maxTries
+⍝ Stops the server `StartTatinServer` started on `port` and deletes its temporary folder.
+⍝ With an empty `port` every server `StartTatinServer` started is stopped.
+⍝ The server is asked to shut down. One that has not ended within `maxTries` half seconds is left
+⍝ alone, session and folder, and so is its entry: call this again once that session is closed.
+⍝ Returns the port when the server was stopped, otherwise ⍬.
+ r←⍬
+ tatin←##.##
+ :If 0=⎕NC'∆SERVERS'
+     ⎕←'No server is running' ⋄ →0
+ :EndIf
+ :If 0=≢port
+     ind←'Select the server(s) to be stopped' 1 1 ##.##.Client.CommTools.Select↓⍕∆SERVERS
+     :If ¯1≡ind
+     :OrIf 0∊≢ind
+         :Return
+     :EndIf
+     StopTatinServer¨∆SERVERS[ind;1]
+     :Return
+ :Else
+     port←⊃port
+     ind←∆SERVERS[;1]⍳port
+ :EndIf
+ ('No server started by StartTatinServer runs on port ',⍕port)##.Assert ind≤≢∆SERVERS
+ (process folder)←∆SERVERS[ind;2 3]
+ url←'https://localhost:',(⍕port),'/'
+ request←tatin.Client.R.NewRequest 0
+ request.RequestTarget←'/v1/shutdown'
+ :Trap 0
+     {}tatin.Client.SendAndReceive url request
+ :Else
+     ⍝ Not answering any more is fine: we are about to make sure that it is gone
+ :EndTrap
+ maxTries←20
+ counter←0
+ :While ~process.HasExited
+ :AndIf maxTries>counter←counter+1
+     ⎕DL 0.5
+ :EndWhile
+ :If process.HasExited
+     {}tatin.FilesAndDirs.RmDirByForce folder
+     ∆SERVERS←((⍳≢∆SERVERS)≠ind)⌿∆SERVERS
+     r←port
+     ⎕←'Tatin server on port ',(⍕port),' stopped'
+ :Else
+⍝ Most likely it is suspended on an error: session and folder are what is needed to find out why
+     ⎕←'Tatin server on port ',(⍕port),' did not end; see its session window. Its folder: ',folder
+     ⎕←'Once you have closed that session, StopTatinServer ',(⍕port),' removes the folder'
+ :EndIf
+⍝Done

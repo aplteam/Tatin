@@ -1,0 +1,19 @@
+ RunTatinServer flag;args;bool;home
+⍝ Runs in the process `StartTatinServer` starts, which gets this file as "load=" and
+⍝ "#.RunTatinServer 1" as "lx=": imports Tatin from the project folder passed as "tatinHome=",
+⍝ runs a test server on the data in "serverPath=" until it is asked to shut down, and ends the
+⍝ process then.
+⍝ A plain import creates no `CiderConfig`, but the server code finds the project folder there.
+⍝ `flag` must be 1: it is insurance against an accidental call, which would end the session.
+ :If flag
+     args←2 ⎕NQ #'GetCommandLineArgs'
+     bool←{'TATINHOME='≡1 ⎕C(≢'TATINHOME=')↑⍵}¨args
+     home←(≢'TATINHOME=')↓⊃bool/args
+     {}({⍵.fastLoad←1 ⋄ ⍵}⎕NS'')⎕SE.Link.Import'#.Tatin'(home,'/APLSource')
+     {}'#.Tatin.CiderConfig'⎕NS''
+     #.Tatin.CiderConfig.HOME←home
+     #.Tatin.Admin.Initialize_Server
+     {}#.Tatin.Admin.RunTestServer 1
+     ⎕OFF
+ :EndIf
+⍝Done

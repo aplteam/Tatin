@@ -1,0 +1,67 @@
+ {url}←StartTatinServer port;tatin;home;folder;iniFile;lines;encoding;newline;ind;parms;process;counter;maxTries;ready
+⍝ Starts a Tatin test server on `port` in a process of its own and returns its URL once it answers.
+⍝ Meant for looking at the web pages in a browser, like when working on the layout.
+⍝ Stop it with `StopTatinServer`.
+⍝ The server works on a temporary copy of TestServer/ with the port and the temp folder (which
+⍝ holds the log) changed in its INI file, so neither the project's test data nor the port and the
+⍝ log of the test cases' server are touched, and several servers can run side by side on
+⍝ different ports. It runs the code in APLSource/ as it is on disk and serves the assets in
+⍝ TestServer/Server/Assets/.
+⍝ Unlike the server the test cases start, it collects no code coverage and writes no test log.
+⍝ When the server does not answer, its session and its folder are left for inspection.
+ tatin←##.##
+ 'Specify a port number, like 5099'##.Assert(1=≢port)∧(⊃port)∊⍳65535
+ port←⊃port
+ :If 0=⎕NC'∆SERVERS'
+     ∆SERVERS←0 3⍴⍬                                   ⍝ Port, process and folder of every server started
+ :EndIf
+ ('A server started earlier runs on port ',⍕port)##.Assert~port∊∆SERVERS[;1]
+ url←'https://localhost:',(⍕port),'/'
+ :If 0=tatin.Client.⎕NC'R'
+     tatin.Admin.Initialize_Client
+ :EndIf
+ ('Something answers on port ',(⍕port),' already')##.Assert~1 tatin.Client.Ping url
+ home←tatin.CiderConfig.HOME
+ folder←tatin.FilesAndDirs.GetTempSubDir'Tatin-Server-',⍕port
+ (folder,'/')⎕NCOPY⍠('Wildcard' 1)⊣home,'/TestServer/*'
+ iniFile←folder,'/Server/server.ini'
+ (lines encoding newline)←⎕NGET iniFile 1
+ ind←{'Port='≡(≢'Port=')↑⍵}¨lines                  ⍝ The first one is in [CONFIG]; [EMAIL] has one as well
+ ('No "Port=" in ',iniFile)##.Assert∨/ind
+ lines[ind⍳1]←⊂'Port=',⍕port
+⍝ "temp" holds the log folder, among other things; the INI file puts it into a fixed folder shared
+⍝ by all test servers, so it must point into this server's own folder
+ ind←{'temp='≡(≢'temp=')↑⍵}¨lines
+ ('No "temp=" in ',iniFile)##.Assert∨/ind
+ lines[ind⍳1]←⊂'temp=''',folder,'/Temp/'''
+ 3 ⎕MKDIR folder,'/Temp/Logs'
+ (lines encoding newline)⎕NPUT iniFile 1
+ parms←tatin.APLProcess.CreateParms
+ parms.Exe←##.GetAPLVersion''
+ parms.ConfigParms⍪←'load'(home,'/APLSource/Admin/TestServer/RunTatinServer.aplf')
+ parms.ConfigParms⍪←'lx' '#.RunTatinServer 1'
+ parms.ConfigParms⍪←'tatinHome'home
+ parms.ConfigParms⍪←'serverPath'folder
+ parms.SessionFile←1
+ parms.WindowsStyle←'Normal'
+ parms.Wait←0
+ process←tatin.APLProcess.New parms
+ maxTries←120                                         ⍝ Half a second each
+ counter←0
+ :Repeat
+     ⎕DL 0.5
+     counter+←1
+     ready←1 tatin.Client.Ping url
+ :Until ready∨process.HasExited∨maxTries<counter
+ :If ready
+     ∆SERVERS⍪←port process folder
+     ⎕←'Tatin server running at ',url
+ :Else
+⍝ Session and folder are left alone: they are what is needed to find out what went wrong.
+⍝ A session still running is registered, so that `StopTatinServer` can deal with it later.
+     :If ~process.HasExited
+         ∆SERVERS⍪←port process folder
+     :EndIf
+     ('The server on port ',(⍕port),' did not answer; see its session window for why. Its folder: ',folder)##.Assert 0
+ :EndIf
+⍝Done

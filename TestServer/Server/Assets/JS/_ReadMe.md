@@ -1,20 +1,12 @@
-This folder holds JavaScript libraries that are served to the browser from the Registry itself rather than from a CDN. That way a Registry without access to the internet still gets working tables.
+This folder holds the JavaScript of the Registry's web pages. It is all written for Tatin: no library is used, there is nothing to build, and the Registry serves the files itself, so a Registry without access to the internet works just as well.
 
-`datatables-1.12.1.min.js` and the matching `../CSS/datatables-1.12.1.min.css` are one combined download from <https://datatables.net/download>, holding jQuery 3.6.0, DataTables 1.12.1 and Responsive 2.3.0. The exact build can be recreated or updated from:
+Every page is complete without JavaScript. The scripts only add tools, and the markup a script needs is written with `hidden` set, so without JavaScript it simply does not show.
 
-```
-https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.js
-https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.12.1/r-2.3.0/datatables.min.css
-```
+| File | Page | What it adds |
+|------|------|--------------|
+| `package-list.js` | Packages (`/v1/packages`) | The filter, "Include tags in the filter", the sort switch and the note shown for a tag link like `?tag=files`; "/" jumps into the filter and Esc clears it |
+| `package-page.js` | A major version of a package | "Show all N releases"; the copy button of the install command is an inline script made by `GetJavaScriptForCopyButton` |
+| `tag-list.js` | Tags (`/v1/tags`) | The filter; "/" and Esc as on the package list |
+| `tabs.js` | Usage data (`/v1/usage-data`) | Turns the sections into tabs; the tab shown can be named after "#" in the address |
 
-Both carry the version number in their names: when they are replaced by a newer version the names change with them, so no browser can serve a stale copy from its cache. `GetDataTableStuff` links the two files, so that is where the names must be changed as well.
-
-All three libraries are published under the MIT license. The combined download itself carries no license files, so they were taken from the repositories of the projects, each at the very version that went into the bundle:
-
-| File | Taken from |
-|------|------------|
-| `LICENSE-jQuery` | <https://github.com/jquery/jquery> tag 3.6.0 |
-| `LICENSE-DataTables` | <https://github.com/DataTables/DataTablesSrc> tag 1.12.1 |
-| `LICENSE-Responsive` | <https://github.com/DataTables/Responsive> tag 2.3.0 |
-
-Do not strip the comments at the top of the JavaScript and the CSS file either: that is where the copyright notices live.
+Each file says at the top which markup it relies on. The functions that write that markup are named there as well, so a change on one side can be matched on the other.

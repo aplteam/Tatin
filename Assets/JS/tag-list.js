@@ -5,6 +5,8 @@
 //
 // Every word typed must occur in a tag for that tag to stay; a letter without any tag left is
 // hidden as well.
+//
+// The markup comes from PrepareHtmlPageForTagList.
 
 (function () {
     "use strict";

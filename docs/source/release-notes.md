@@ -16,6 +16,26 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.129.0 ⋄ 2026-10-01
+
+The web pages of a Tatin server were redesigned. This concerns whoever runs a server; for anybody using a Registry nothing changes but the looks of the pages.
+
+## Server
+
+Replace the `Assets/` folder as a whole, as usual. The new pages need the fonts and the scripts that come with it, and the files of jQuery and DataTables, which no page uses any more, go with the old folder.
+
+One warning from 0.126.1 still applies: if the keys `PublicCertFile` and `PrivateKeyFile` under `[CERTIFICATES]` in your `server.ini` point into `Assets/`, put your certificate into the root of the server folder first and point those keys there. Everybody else can simply replace the folder.
+
+Two INI entries behave differently:
+
+* `[HTMLBACKGROUND]color` is ignored now. The background of the pages is part of the design.
+* `[HTMLBACKGROUND]watermark` is shown in a strip at the top of every page rather than as a diagonal watermark behind the text. That is what marks a test server.
+
+Two more changes in behaviour:
+
+* The "View" tab of the usage data page shows the downloads of the newest usage data file. It used to count the rows of that file, one per version and month, so the figures were far too low. The files themselves were always right.
+* `/v1/copy-registry` and `/v1/all_packages` answer a browser with a 406 instead of a page listing every release. They serve the user command `]Tatin.CopyRegistry`, which is not affected.
+
 ## v0.127.0 ⋄ 2026-09-20
 
 Minor change in behaviour in order to fix a problem: When scanning registries, if a registry is unreachable and skipped, a dependency that lives only there now causes an error. Before, it produced an incomplete build list.

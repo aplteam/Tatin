@@ -6,8 +6,10 @@
 // sections are simply shown one below the other, headings and all, and the tab bar stays hidden.
 //
 // The tab shown first is the one the address names after "#", or else the one the container
-// names in data-first-tab, or else the first. Choosing a tab updates the address, so it can be
-// bookmarked and "Back" returns to the tab before. Arrow keys move between the tabs.
+// names in data-first-tab, or else the first. Choosing a tab updates the address, so that it can
+// be bookmarked; it does not add to the history. Arrow keys move between the tabs.
+//
+// Written for the usage data page, whose markup comes from GetStatistics.
 
 (function () {
     "use strict";

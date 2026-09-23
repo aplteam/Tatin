@@ -1,0 +1,15 @@
+ r←Test_Server_420(stopFlag batchFlag);⎕TRAP;html
+⍝ Ask for the usage data page; pretends to be a Browser.\\
+⍝ The view adds up the "Downloads" column of the newest usage data file; it used to count its
+⍝ rows instead, one per version and month. In the test data Laguntza has 11 downloads.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←∆GetHtmlFromServer'[localhost]/v1/usage-data'
+ →T.PassesIf∨/'<h2>Usage data</h2>'⍷html
+ →T.PassesIf∨/'role="tablist"'⍷html
+ →T.PassesIf∨/'<a href="/usage-data/usage-data-'⍷html
+ →T.PassesIf∨/'<td class="usage-name">Laguntza</td><td class="num">11</td>'⍷html
+
+ r←T._OK
+⍝Done

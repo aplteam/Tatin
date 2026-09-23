@@ -3,6 +3,8 @@
 //
 // Without JavaScript every release is simply listed. The copy button next to the install
 // command is not made here but by GetJavaScriptForCopyButton.
+//
+// The list of releases comes from GetReleaseList.
 
 (function () {
     "use strict";

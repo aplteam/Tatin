@@ -7,9 +7,11 @@
      :If 'group'≡propName
          groupName←'"'~⍨{⍵/⍨{⍵∨≠\⍵}⍵='"'}item
      :AndIf HasGroupHomePage groupName
-         a←'<a href="',(('/',GetVersion_REST'group-homepage?name='),groupName),'" title="Link the the group`s homepage">'
+         a←'<a href="',(('/',GetVersion_REST'group-homepage?name='),groupName),'" title="Link to the group`s homepage">'
          a,←groupName,'</a>'
-         (i⊃json)←((+/∧\' '=item)⍴' '),'group: "',a,'"'
+⍝ The item is one line of the JSON, so it carries the comma that separates it from the next
+⍝ one; without it what follows the group is no longer valid JSON to look at.
+         (i⊃json)←((+/∧\' '=item)⍴' '),'group: "',a,'"',(','∊¯2↑item)/','
          :Return
      :EndIf
  :EndFor

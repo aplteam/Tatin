@@ -16,6 +16,15 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.127.1 ⋄ 2026-09-23
+
+Nothing but fixes, all of them on the server side. A Registry is worth updating for two of them in particular:
+
+* The "View" tab of the usage data page counted the rows of the newest usage data file, one per version and month, and called the result "Downloads". The figures were therefore far too low, and a package whose name was requested in different spellings was counted twice. The data files themselves were always right.
+* Shutting down a server ran a clean-up belonging to the server test suite. On a production server that meant an error on every shutdown.
+
+The other fixes concern the web pages: the MIME types of the fonts, a missing `[MSG]` entry in the INI file breaking every page, the order of the major versions of a package, the links on the dependencies page, the comma lost on the configuration page and a few more.
+
 ## v0.127.0 ⋄ 2026-09-20
 
 Minor change in behaviour in order to fix a problem: When scanning registries, if a registry is unreachable and skipped, a dependency that lives only there now causes an error. Before, it produced an incomplete build list.

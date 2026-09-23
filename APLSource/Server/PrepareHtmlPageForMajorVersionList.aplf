@@ -1,7 +1,11 @@
- html←PrepareHtmlPageForMajorVersionList(packageID data);colTitles
+ html←PrepareHtmlPageForMajorVersionList(packageID data);colTitles;majors
 ⍝ Not indexed: this page is a list of links and has no content of its own, nor any prospect
 ⍝ of any. A crawler is still welcome to follow the links out of it - "noindex" alone leaves
 ⍝ "follow" at its default - and a visitor sees no difference.
+⍝ The newest major version comes first. They are sorted by number here because the folder
+⍝ names they come from sort as text, which would put 9 behind 15.
+ majors←{⊃2⊃⎕VFI ⍵}¨data[;2]
+ data←data[⍒majors;]
  html←(1 packageID)HtmlHeader ''
  html,←⊂'<h2>Major versions of "',packageID,'"</h2>'
  html,←AddSpecialMessage ⍬

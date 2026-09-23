@@ -1,4 +1,4 @@
-  html←GetStatistics dummy;folder;list;filename;title;i;data;thisYear;year
+  html←GetStatistics dummy;folder;list;filename;title;i;data;thisYear;year;names;keys;downloads;first
 ⍝ Returns a page with download links to statistical data
 ⍝ The files are offered newest first; see `ListUsageDataFiles`.
  folder←∊P.LogFolder
@@ -41,12 +41,20 @@
      html,←⊂'<div id="view" class="tabcontent">'
 ⍝ The newest file: the data of the current year so far, or, as long as there is none (in January), that of last year
      filename←folder,(¯3↓⊃list),'csv'
-     data←⎕CSV filename
-     data←{⍺,≢⍵}⌸data[;1 2]
-     data[1;3]←⊂'Downloads'
-     data[;3]←⍕¨data[;3]
-     html,←⊂H.Para'The table shows the data from the file "',((≢∊P.LogFolder)↓filename),'" but aggregated by month and version number.'
-     html,←⊂H.Para'Because of the aggregation, "Month" and "Year" are no longer meaningful, therefore these columns are not shown.'
+⍝ A row of a usage data file holds the downloads of one version in one month, so the downloads
+⍝ are the sum of the column "Downloads": counting the rows would count versions and months.
+⍝ Names are compared regardless of case, as Tatin does: a request may spell a name in any
+⍝ case, and the file keeps what it was given. A name is shown as it was spelled first.
+     data←⊃⎕CSV filename''(1 1 1 2 2 2)1
+     names←data[;1 2]
+     keys←⎕C names
+     downloads←keys{⍺,+/⍵}⌸data[;6]
+     first←(↓keys)⍳∪↓keys
+     data←names[first;],downloads[;3]
+     data←data[⍒data[;3];]
+     data←('Group' 'Name' 'Downloads')⍪(2↑[2]data),⍕¨data[;3]
+     html,←⊂H.Para'The table shows the data from the file "',((≢∊P.LogFolder)↓filename),'", with all versions and months of a package added up.'
+     html,←⊂H.Para'Because of that, "Version", "Month" and "Year" are no longer meaningful, therefore these columns are not shown.'
      html,←⊂'<table id="data-table">'
      html,←⊂'<thead>'
      html,←(⊂'<tr>'),((⎕UCS 10),¨{'<th>',⍵,'</th>'}¨data[1;]),(⊂'</tr>')
@@ -68,7 +76,7 @@
          :Else                                              ⍝ The data of a year up to a month
              title←'Data for ',((1+year≡thisYear)⊃year'this year'),' up to ',(⊃(//)⎕VFI 2↑(≢'usage-data-YYYY-')↓filename)⊃Months
          :EndIf
-         title,←' (zipped, ~',(⍕1⌈⌊0.5+(('type' 2)F.Dir(∊P.LogFolder),filename)÷1014),'KB)'
+         title,←' (zipped, ~',(⍕1⌈⌊0.5+(('type' 2)F.Dir(∊P.LogFolder),filename)÷1024),'KB)'
          html,←⊂H.LI('/usage-data/',filename)H.A title   ⍝ Absolute: relative to "/v1/usage-data" it would end up in the REST route
      :EndFor
      html,←⊂'</ol>'

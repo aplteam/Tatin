@@ -1,8 +1,19 @@
- r←MakeLinkToPackage packageID;filename
- filename←G.RegistryPath,'/',packageID,'/',Reg.DependenciesFilename
- :If F.IsFile filename
-     r←'<a href="',Reg.VersionOf_REST,'/packages/dependencies/',packageID,'" title="Link to dependencies">',packageID,'</a>'
+ r←MakeLinkToPackage dep;filename;id;registry
+⍝ Returns one dependency of a dependency list, as a link where there is anything to link to.
+⍝ A line of a dependencies file names a package ID, possibly preceded by the alias it is loaded
+⍝ under ("A@aplteam-APLTreeUtils2-1.1.1") or by the URL of the Registry it comes from. Neither
+⍝ belongs into a link, and a package from another Registry cannot be linked to here at all.
+ dep←'^[A-Za-z_][A-Za-z0-9_]*@'⎕R''⊣dep
+ :If '/'∊dep                                        ⍝ From another Registry
+     id←dep↑⍨-¯1+(⌽dep)⍳'/'
+     registry←dep↓⍨-≢id
+     r←'<span title="Lives in ',registry,'">',id,'</span>'
  :Else
-     r←'<span title="Has no dependencies">',packageID,'</span>'
+     filename←G.RegistryPath,'/',dep,'/',Reg.DependenciesFilename
+     :If F.IsFile filename
+         r←'<a href="',Reg.VersionOf_REST,'/packages/dependencies/',dep,'" title="Link to dependencies">',dep,'</a>'
+     :Else
+         r←'<span title="Has no dependencies">',dep,'</span>'
+     :EndIf
  :EndIf
 ⍝Done

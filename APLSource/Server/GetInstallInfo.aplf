@@ -18,9 +18,17 @@
 ⍝ font either. Drawn in the style of the copy icon beside it, and it inherits the text
 ⍝ colour through fill="currentColor".
  jumpArrow←'<svg class="jump-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M13.03 8.28a.75.75 0 0 0-1.06-1.06L8.75 10.44V1.75a.75.75 0 0 0-1.5 0v8.69L4.03 7.22a.75.75 0 0 0-1.06 1.06l4.5 4.5a.75.75 0 0 0 1.06 0Z"></path><path d="M2.75 14.5h10.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5Z"></path></svg>'
+⍝ A package ID without a version number, like "aplteam-APLTreeUtils", is a valid request as
+⍝ well; then there is no major version to name, and saying "major version APLTreeUtils"
+⍝ is what this used to do.
  major←⊃⌽'-'A.Split packageID                       ⍝ "aplteam-WinReg-6" -> "6"
+ :If (0<≢major)∧∧/major∊⎕D
+     major←' for major version ',major
+ :Else
+     major←''
+ :EndIf
  r←⊂'<div class="install-info">'
  r,←⊂'<p>Install with:</p>'
  r,←⊂'<p><code id="install-cmd">]TATIN.InstallPackages [tatin]',(EscapeSpecialChars packageID),' &lt;target-folder&gt;</code></p>'
- r,←⊂'<p><a href="#releases">',(⍕noOfReleases),' release',plural,' for major version ',major,' &mdash; Jump ',jumpArrow,'</a></p>'
+ r,←⊂'<p><a href="#releases">',(⍕noOfReleases),' release',plural,major,' &mdash; Jump ',jumpArrow,'</a></p>'
  r,←⊂'</div>'

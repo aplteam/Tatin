@@ -1,0 +1,21 @@
+ r←Test_Server_424(stopFlag batchFlag);⎕TRAP;html;id
+⍝ Ask for the list of packages with a version number in the package ID; pretends to be a Browser.
+⍝ The page lists packages rather than versions, so there is nothing it could show: 404. It used
+⍝ to answer with an INDEX ERROR, because the list it got held one release rather than one package
+⍝ per row.
+⍝ A package name and no package ID at all must still be listed.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ :For id :In 'example-Goo-2' 'example-Goo-2.1' 'example-Goo-2.1.0'
+     html←404 ∆GetHtmlFromServer'[localhost]/v1/packages/',id
+     →T.PassesIf∨/'carries a version number'⍷html
+ :EndFor
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages/example-Goo'
+ →T.PassesIf∨/'example-Goo'⍷html
+ html←∆GetHtmlFromServer'[localhost]/v1/packages'
+ →T.PassesIf∨/'example-Goo'⍷html
+
+ r←T._OK
+⍝Done

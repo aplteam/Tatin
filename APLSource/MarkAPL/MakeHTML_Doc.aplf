@@ -11,6 +11,8 @@
           ⍝ This MUST be the first <meta> tag!
  :EndIf
  r,←⊂'<meta charset="',parms.charset,'">'
+ r,←⊂'<meta name="viewport" content="width=device-width, initial-scale=1">'  ⍝ render at true size on mobile
+
  :If ⎕NULL≡parms.title
      :If 1=+/ind←∨/¨⊃∨/'<h1 ' '<h1>'{⍺∘⍷¨⍵}¨⊂html
          parms.title←{⍵↑⍨¯1+⍵⍳'<'}{⍵↓⍨⍵⍳'>'}{⍵↓⍨¯1+1⍳⍨'<h1'⍷⍵}(ind⍳1)⊃html

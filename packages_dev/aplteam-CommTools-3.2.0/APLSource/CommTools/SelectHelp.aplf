@@ -1,0 +1,25 @@
+ r←SelectHelp(mustFlag quitFlag allFlag maxSel)
+⍝ Returns the lines `Select` puts on display when the user enters a "?".\\
+⍝ Only what this particular call allows is mentioned, so the flags decide what the user gets to see.\\
+⍝ Note that "∘∘∘" is deliberately not mentioned: that's for programmers, see the documentation.
+ r←''
+ :If 1=maxSel
+     r,←⊂'Enter the number of the item you want to select'
+ :Else
+     r,←⊂'Enter the number of the item you want to select, or several of them, separated by spaces or commas'
+     r,←⊂'A range like "3-6" stands for the items 3, 4, 5 and 6'
+ :EndIf
+ :If allFlag
+     r,←⊂'Enter "a" for all items, or "a~3 5" for all items but 3 and 5'
+     :If 1<maxSel
+         r,←⊂'A range may follow "a~" as well: "a~3-5" selects all items but 3, 4 and 5'
+     :EndIf
+ :EndIf
+ :If quitFlag
+     r,←⊂'Enter "q" in order to quit without selecting anything'
+ :EndIf
+ :If ~mustFlag
+     r,←⊂'Press <enter> without entering anything in order to select nothing'
+ :EndIf
+ r←('  * '∘,)¨r
+⍝Done

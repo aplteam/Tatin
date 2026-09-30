@@ -1,15 +1,18 @@
  {r}←{force}Init_SHA256 dummy;extn;⎕USING;filename;path;OS
-⍝ Make the necessary preparations for hashing a password.\\
-⍝ Once initiallized, the function does not run its code again, except when a 1 is passed as `⍺`.
+⍝ Makes the necessary preparations for hashing a password.\\
+⍝ Once initialized, the function does not run its code again, except when a 1 is passed as `⍺`.\\
+⍝ The right argument is ignored; pass `⍬`.\\
+⍝ Returns a shy 1.
+ r←1
  force←{0<⎕NC ⍵:⍎⍵ ⋄ 0}'force'
  '⍺ must be a Boolean'Assert(⊂force)∊0 1
  :If 9≠⎕NC'SHA256'
  :OrIf force
      OS←APLTreeUtils2.GetOperatingSystem ⍬
      :If 'Win'≡OS
-         :If 1=1⊃2250⌶0     ⍝ .NET?!
+         :If 1=1⊃2250⌶0     ⍝ .NET rather than .NET Framework?
              ⎕USING←',System.Security.Cryptography.Algorithms'
-         :Else              ⍝ .NET Framework!
+         :Else              ⍝ .NET Framework
              ⎕USING←',System.Security.Cryptography.Algorithms.dll'
          :EndIf
          SHA256←⎕NEW System.Security.Cryptography.SHA256Managed

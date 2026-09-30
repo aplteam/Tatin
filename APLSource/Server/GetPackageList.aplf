@@ -54,6 +54,17 @@
          response←request ReturnJSON Reg.JSON data
      :EndIf
  :Else  ⍝ It's a request from a Browser
+     :If 1<'-'+.=packageID
+⍝ The page lists packages rather than versions, so a package ID with a version number
+⍝ asks for something this page cannot deliver.
+         msg←packageID,' carries a version number, and this page lists packages'
+         response←request RespondWithHTML 404 '' msg
+         :Return
+     :EndIf
+⍝ The page shows one row per package, so it needs the aggregated list. "aggregate",
+⍝ "latest", "date" and "since" are parameters of the API: what they ask for cannot be
+⍝ shown here, and without the aggregated list the page fails.
+     parms.(aggregate latest date since)←1 0 0 0
      parms.tags←1
      mat←packageID GetPackageList_ parms
      html←packageID PrepareHtmlPageForPackageList mat

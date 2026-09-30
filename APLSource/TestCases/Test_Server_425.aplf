@@ -1,0 +1,17 @@
+ r←Test_Server_425(stopFlag batchFlag);⎕TRAP;htmls;query
+⍝ Ask the list of packages for what only the API can deliver; pretends to be a Browser.
+⍝ "aggregate", "latest", "date" and "since" all end in a list of single releases rather than
+⍝ packages, which the page cannot show, so they are ignored: every answer is the ordinary list,
+⍝ with one row per package. Before, the page failed with an INDEX ERROR.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ htmls←''
+ :For query :In '?aggregate=0' '?latest=1' '?date=1' '?date=0' '?since=2020-01-01' '?group=example&aggregate=0'
+     htmls,←⊂∆GetHtmlFromServer'[localhost]/v1/packages',query
+ :EndFor
+ →T.PassesIf∧/∨/¨'example-Goo'∘⍷¨htmls
+ →T.PassesIf~∨/∨/¨'example-Goo-2.1.0'∘⍷¨htmls
+
+ r←T._OK
+⍝Done

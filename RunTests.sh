@@ -6,18 +6,17 @@
 # This can help to identify problems that occur only when run in batch mode.
 # Do not use the Dyalog Runtime since what is tested might well attempt to write to the session.
 # Note that a log is written in TatinBatchTests/log.txt which is created in your OS's temp folder.
-# Make sure you call the correct version of Dyalog APL.
+# Make sure you call the correct version of Dyalog APL. 18.2 is the oldest one Tatin runs on.
 
-IF [ $1 -eq "-debug" ]
+parm=""
+if [ "$1" = "-debug" ]; then
     parm="-debug"
-ELSE
-    parm=""
-FI    
+fi
 
-"/opt/mdyalog/18.0/64/unicode/mapl" maxws=200MB load="./APLSource/Admin/LoadTatinAndRunTests.aplf" lx="#.LoadTatinAndRunTests" OFF=1 $parm 
+"/opt/mdyalog/18.2/64/unicode/mapl" maxws=200MB load="./APLSource/Admin/LoadTatinAndRunTests.aplf" lx="#.LoadTatinAndRunTests" OFF=1 $parm
 
-IF [ $? -eq 0 ]
-    echo "Tatin test suite passed"   
-ELSE 
-echo "Tatin test suite failed"   
-FI
+if [ $? -eq 0 ]; then
+    echo "Tatin test suite passed"
+else
+    echo "Tatin test suite failed"
+fi

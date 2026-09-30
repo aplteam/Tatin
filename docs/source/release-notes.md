@@ -31,10 +31,19 @@ Two INI entries behave differently:
 * `[HTMLBACKGROUND]color` is ignored now. The background of the pages is part of the design.
 * `[HTMLBACKGROUND]watermark` is shown in a strip at the top of every page rather than as a diagonal watermark behind the text. That is what marks a test server.
 
-Two more changes in behaviour:
+One more change in behaviour:
 
-* The "View" tab of the usage data page shows the downloads of the newest usage data file. It used to count the rows of that file, one per version and month, so the figures were far too low. The files themselves were always right.
 * `/v1/copy-registry` and `/v1/all_packages` answer a browser with a 406 instead of a page listing every release. They serve the user command `]Tatin.CopyRegistry`, which is not affected.
+
+## v0.127.1 ⋄ 2026-09-30
+
+Nothing but fixes, all of them on the server side. A Registry is worth updating for three of them in particular:
+
+* The "View" tab of the usage data page counted the rows of the newest usage data file, one per version and month, and called the result "Downloads". The figures were therefore far too low, and a package whose name was requested in different spellings was counted twice. The data files themselves were always right.
+* Shutting down a server ran a clean-up belonging to the server test suite. On a production server that meant an error on every shutdown.
+* The list of packages crashed with an INDEX ERROR when the package ID in the URL carried a version number, as in `/v1/packages/aplteam-Tatin-1`, and also when the URL carried one of the API parameters `aggregate`, `latest`, `date` or `since`. Bots try such URLs, so it happened without anybody asking for it.
+
+The other fixes concern the web pages: the MIME types of the fonts, a missing `[MSG]` entry in the INI file breaking every page, the order of the major versions of a package, the links on the dependencies page, the comma lost on the configuration page and a few more.
 
 ## v0.127.0 ⋄ 2026-09-20
 
@@ -482,6 +491,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

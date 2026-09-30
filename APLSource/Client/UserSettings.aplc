@@ -418,9 +418,13 @@
               uri←{⍵/⍨3>+\⍵='/'}uri
           :EndIf
           uri←AddSlash uri
-          :If ∧/({' /'~⍨⍵↑⍨1+-':'⍳⍨⌽⍵}uri)∊⎕D
-              port←⊃(//)⎕VFI{'/'~⍨⍵↑⍨1+-':'⍳⍨⌽⍵}uri
+          port←{' /'~⍨⍵↑⍨1+-':'⍳⍨⌽⍵}uri
+          :If (0<≢port)∧∧/port∊⎕D
+              port←⊃(//)⎕VFI port
           :Else
+⍝ No port number in the URI, so any of the three defaults will do. Without the length check
+⍝ an URI like "https://localhost:/" would end up with an empty port, because ∧/''∊⎕D is 1
+⍝ and ⊃(//)⎕VFI'' is ⍬, and the comparison below would fail with a LENGTH ERROR.
               port←0 80 443
           :EndIf
           uri_←':[0-9]+\/'⎕R'/'⊣uri      ⍝ Remove potential port number

@@ -1,0 +1,24 @@
+ r←Test_ClientConfig_123(stopFlag batchFlag);⎕TRAP;settings;tempDir;rc;msg
+⍝ Ask "Exist" for an empty URI, and for one that carries a colon but no port number. Neither
+⍝ names a Registry, so the answer is 0. It used to be a LENGTH ERROR, because the port came out
+⍝ empty and was then compared with the ports of all defined Registries.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ tempDir←∆GetTempDir''
+ F.DeleteFile tempDir,'/',TC.UserSettings.cfg_name   ⍝ Precaution
+ settings←∆NewUserSettings(,⊂tempDir)                ⍝ Comes with two Registries defined
+ →T.GoToTidyUp 2>≢settings.registries                ⍝ One would not be enough for a LENGTH ERROR
+
+ →T.GoToTidyUp∨/settings.Exist¨'' 'https://localhost:/'
+
+⍝ What is defined must still be found, by URI as well as by alias
+ →T.GoToTidyUp~settings.Exist(⊃settings.registries).uri
+ →T.GoToTidyUp~settings.Exist'[tatin]'
+
+ r←T._OK
+
+∆TidyUp:
+ (rc msg)←F.RmDirByForce tempDir
+ msg Assert rc=0
+⍝Done

@@ -3,6 +3,14 @@
 ⍝ Honors -debug from the command line if specified.
  #.⎕EX'Tatin'
  {}({⍵.fastLoad←1 ⋄ ⍵}⎕NS'')⎕SE.Link.Import'#.Tatin' './APLSource'
+ :If 0=#.Tatin.⎕NC'CiderConfig'
+⍝ Only Cider creates `CiderConfig`, and a plain Link import does not, but the test suite needs
+⍝ `CiderConfig.HOME`: without it `TestCases.∆CopyTestServerDataTo` fails with a VALUE ERROR
+⍝ before the first test case. A batch run starts in the project folder, so that is HOME.
+     #.Tatin.CiderConfig←⎕NS''
+     #.Tatin.CiderConfig.HOME←¯1↓⊃1 ⎕NPARTS''
+     ⍞←'CiderConfig.HOME set to ',#.Tatin.CiderConfig.HOME,⎕UCS 10
+ :EndIf
  debugFlag←'-debug'≡'-debug '{0=+/b←⍺∘≡¨(≢⍺)↑¨' ',⍨¨⎕C¨⍵:'' ⋄ (b⍳1)⊃⍵}⊣2 ⎕NQ #'GetCommandLineArgs'
  debugFlag #.Tatin.TestCases.RunBatchTests 1
 ⍝Done

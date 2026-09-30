@@ -6,14 +6,14 @@ REM If a parameter is passed it must be "-debug" (case sensitive!) which is inte
 REM This can help to identify problems that occur only when run in batch mode.
 REM Do not use the Dyalog Runtime since what is tested might well attempt to write to the session.
 REM # Note that a log is written in TatinBatchTests/log.txt which is created in your OS's temp folder.
-REM Make sure you call the correct version of Dyalog APL.
+REM Make sure you call the correct version of Dyalog APL. 18.2 is the oldest one Tatin runs on.
 
 SET parm=""
 
 IF "%1" == "-debug" (
     SET parm="-debug" ) 
 
-"C:\Program Files\Dyalog\Dyalog APL-64 18.0 Unicode\Dyalog.exe" maxws=200MB load="APLSource/Admin/LoadTatinAndRunTests.aplf" lx="#.LoadTatinAndRunTests" %parm% OFF=1
+"C:\Program Files\Dyalog\Dyalog APL-64 18.2 Unicode\Dyalog.exe" maxws=200MB load="APLSource/Admin/LoadTatinAndRunTests.aplf" lx="#.LoadTatinAndRunTests" %parm% OFF=1
 
 @echo on
 IF %ERRORLEVEL% NEQ 0 ( 

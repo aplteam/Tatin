@@ -16,7 +16,7 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.127.1 ⋄ 2026-09-23
+## v0.127.1 ⋄ 2026-09-30
 
 Nothing but fixes, all of them on the server side. A Registry is worth updating for three of them in particular:
 
@@ -472,6 +472,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

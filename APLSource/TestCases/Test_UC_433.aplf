@@ -1,0 +1,12 @@
+ R←Test_UC_433(stopFlag batchFlag);⎕TRAP;rc;msg;res1;res3;res4;res5;res
+⍝ Exercise ]Tatin.ListVersions with a non-existing pkg name and date flag specified (was once a bug)
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ R←T._Failed
+
+ (rc msg res)←∆UCMD'ListVersions [local]DoesNot-Exit -date'
+ →T.PassesIf rc=0
+ →T.PassesIf 0=≢msg
+ →T.PassesIf∨/'Not found: [local]DoesNot-Exit'⍷res
+
+ R←T._OK
+⍝Done

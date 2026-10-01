@@ -24,6 +24,9 @@
      :EndIf
      :If dateFlag
          r←dateFlag TC.ListVersions arg
+         :If 0=≢r
+             r←'Not found: ',arg ⋄ :Return
+         :EndIf
          r[;2⊃⍴r]←TC.Reg.FormatFloatDate¨r[;2⊃⍴r]
          r←⊃,/CR,¨↓⍕r
          r←(1↓⊃,/CR,¨↓('All versions of <',arg,'> :'),[0.5]'-'),r
@@ -47,9 +50,5 @@
  :Else
      qdmx←⎕DMX
      ⎕SIGNAL/CheckForInvalidVersion qdmx
-     :If 0=≢qdmx.EM
-         ('Not found: ',arg)⎕SIGNAL ErrNo
-     :Else
-         qdmx.EM ⎕SIGNAL ErrNo
-     :EndIf
+     qdmx.EM ⎕SIGNAL ErrNo
  :EndTrap

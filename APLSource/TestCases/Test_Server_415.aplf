@@ -1,12 +1,11 @@
  r←Test_Server_415(stopFlag batchFlag);⎕TRAP;html
-⍝ Ask for a list of all packages; pretends to be a Browser
+⍝ Ask for what ]Tatin.CopyRegistry asks for; pretends to be a Browser, which gets told off with a 406
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
- html←∆GetHtmlFromServer'[localhost]/v1/all_packages'
- →T.PassesIf∨/'<h2>List of all packages</h2>'⍷html
+ html←406 ∆GetHtmlFromServer'[localhost]/v1/copy-registry'
+ →T.PassesIf∨/'<h2>Not Acceptable</h2>'⍷html
+ →T.PassesIf∨/']Tatin.CopyRegistry'⍷html
 
  r←T._OK
-
-∆TidyUp:
 ⍝Done

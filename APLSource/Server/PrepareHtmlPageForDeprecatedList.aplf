@@ -1,24 +1,20 @@
- html←PrepareHtmlPageForDeprecatedList list;colTitles;col1;col2;data;links
- html←(⍬ 'List of deprecated packages')HtmlHeader GetDataTableStuff 1
- html,←⊂'<h2>List of deprecated packages</h2>'
- html,←AddSpecialMessage ⍬
- data←((⍪list),⊂'Config')
- colTitles←'Package name' 'Config'
- html,←⊂H.OpenTable colTitles CalcTableWidth data
- html,←⊂'<thead>'
- html,←⊂'<tr class="my-first-th">'
- html,←{'<th>',⍵,'</th>'}¨colTitles
- html,←⊂'</thead>'
- html,←⊂'<tbody>'
- :If 0<≢list
-     col1←{'<td><code>',⍵,'</code></td>'}¨data[;1]
-     links←{'<a href="',Reg.VersionOf_REST,'/packages/details/',⍵,'" title="Link to the package configuration">Show</a>'}¨data[;1]
-     col2←{'<td>',⍵,'</td>'}¨links
-     html,←{'<tr>',⍵,'</tr>'}¨col1,¨col2
+ html←PrepareHtmlPageForDeprecatedList list;majors
+⍝ Returns the page listing the deprecated major versions, one row each.
+⍝ `list` holds package IDs. Only their major version lines matter here, so a request asking for
+⍝ "all" versions gets the same page; that makes a difference for JSON only.
+ majors←∪Reg.RemoveMinorAndPatch¨list
+ html←(⍬'Deprecated packages' '/deprecated-pkgs')HtmlHeader''
+ html,←⊂'<div class="page-head">'
+ html,←⊂'<h2>Deprecated packages <span class="page-sub">',(⍕≢majors),'</span></h2>'
+ html,←⊂'</div>'
+ :If 0=≢majors
+     html,←⊂'<p class="no-match">No package is deprecated.</p>'
+ :Else
+     html,←⊂'<div class="deprecated-list">'
+     html,←PrepareHtmlPageForDeprecatedList_¨majors
+     html,←⊂'</div>'
  :EndIf
- html,←⊂'</tbody>'
- html,←⊂'</table>'
  html,←⊆GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'
- ⍝Done
+⍝Done

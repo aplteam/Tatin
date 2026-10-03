@@ -1,0 +1,19 @@
+ html←GetStatisticsInfo dummy
+⍝ Returns the "Information" tab of the usage data page; see `GetStatistics`.
+ html←⊂'<section class="tab-panel" id="info" role="tabpanel" aria-labelledby="tab-info">'
+ html,←⊂'<h3 class="tab-title">Information</h3>'
+ html,←⊂'<div class="prose">'
+ html,←⊂'<p>This page offers usage data of the packages of this Registry: how often every version of a package was downloaded, per month.</p>'
+ html,←⊂'<ul>'
+ html,←⊂'<li>For every past year there is a file <code>usage-data-YYYY.zip</code>.</li>'
+ html,←⊂'<li>For the current year there is a file <code>usage-data-YYYY-MM.zip</code> with all data of this year up to and including the month MM.</li>'
+ html,←⊂'</ul>'
+ html,←⊂'<p>A Tatin server creates these files by itself:</p>'
+ html,←⊂'<ul>'
+ html,←⊂'<li>When a year begins, it saves all data of the year before in <code>usage-data-YYYY.csv</code> and zips that file.</li>'
+ html,←⊂'<li>When any other month begins, it saves all data of the current year so far in <code>usage-data-YYYY-MM.csv</code> and zips that file. It replaces the file of the month before.</li>'
+ html,←⊂'</ul>'
+ html,←⊂'<p>A file has one row per package version and month, with the columns Group, Name, Version, Year, Month and Downloads.</p>'
+ html,←⊂'</div>'
+ html,←⊂'</section>'
+⍝Done

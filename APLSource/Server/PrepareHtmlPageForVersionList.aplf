@@ -1,44 +1,71 @@
- html←PrepareHtmlPageForVersionList(packageID data);links;col1;col2;col3;col4;bool;colTitles;newestPath;description
+ html←PrepareHtmlPageForVersionList(packageID data);newestPath;cfg;description;deprecated;majorLine;parts;group;name;title;caption;head;menuItem;crumbs;readme;tags;tagList
+⍝ The package page: the releases of one major version of a package, or of all its major
+⍝ versions when the request named none.
+⍝ `data` holds one row per release: [;1] package ID, [;2] publishing date.
+⍝ Everything the page says about the package - description, key facts, ReadMe and tags - comes
+⍝ from the newest release: that is the only one a ReadMe is ever fetched for.
+⍝ "Newest" means what it means everywhere in Tatin: `Reg.ListVersions` sorts by version number
+⍝ and only where that cannot decide, as with betas, by publishing date. The best release comes
+⍝ last there, so after the ⊖ it is the first row.
+⍝ A deprecated package gets a band that says so, and no install command: nobody should be
+⍝ invited to install it. The menu then marks "Deprecated" rather than "Packages".
  data←⊖data
-⍝ The README and the description belong to the newest release of this major version line:
-⍝ that is the only one a README is ever fetched for. "Newest" is Tatin's order, in which
-⍝ `data` arrives and which `GetNewestPerMajor` uses as well: by version number and, where
-⍝ that cannot decide, as with betas, by publishing date. `data` was just reversed, so the
-⍝ newest release is the first row.
  newestPath←G.RegistryPath,'/',⊃data[1;1]
- description←GetPackageDescription newestPath     ⍝ Wanted twice: in the head and on the page
- html←(⍬ packageID)HtmlHeader(GetMetaDescription description),GetJavaScriptForCopyButton ⍬
- html,←⊂'<h2>All versions of "',packageID,'"</h2>'
- html,←AddSpecialMessage ⍬
-⍝ The box floats, so it goes before the description it sits beside.
- html,←GetInstallInfo packageID(≢data)
- :If 0<≢description
-     html,←⊂'<p class="pkg-description">',(EscapeSpecialChars description),'</p>'
+ cfg←ReadPackageConfig newestPath
+ description←'' GetConfigValue cfg'description'     ⍝ Wanted twice: in the head and on the page
+ deprecated←1≡0 GetConfigValue cfg'deprecated'
+ majorLine←Reg.RemoveMinorAndPatch packageID
+ parts←'-'(≠⊆⊢)majorLine
+ (group name)←2↑parts
+ :If 3=≢parts                                       ⍝ Group, name and major version
+     title←'major version ',3⊃parts
+     caption←'in major version ',3⊃parts
+ :Else
+     title←'all major versions'
+     caption←'in all major versions'
  :EndIf
-⍝ Before the table on purpose: the documentation is what this page is about, and what a
-⍝ search engine should find first. The table of releases stays underneath it.
- html,←GetReadmeSection newestPath
- colTitles←'Package ID' 'Publishing date' 'Config' 'Dependencies'
- html,←⊂'<section id="releases">'
- html,←⊂H.OpenTable colTitles CalcTableWidth data
- html,←⊂'<thead>'
- html,←⊂'<tr class="my-first-th">'
- html,←{'<th>',⍵,'</th>'}¨colTitles
- html,←⊂'</tr>'
- html,←⊂'</thead>'
- html,←⊂'<tbody>'
- col1←{'<td><code>',⍵,'</code></td>'}¨data[;1]         ⍝ The package ID
- col2←{'<td>',(⍕⍵),'</td>'}¨data[;2]                   ⍝ The publishing Date
- links←{'<a href="',Reg.VersionOf_REST,'/packages/details/',⍵,'" title="Link to the package configuration">Show</a>'}¨data[;1]
- col3←{'<td>',⍵,'</td>'}¨links
- bool←PackageHasDependencies¨data[;1]
- links←bool{⍺:'<a href="',Reg.VersionOf_REST,'/packages/dependencies/',⍵,'" title="Link to the dependency definition">Show</a>' ⋄ 'None'}¨data[;1]
- col4←{'<td>',⍵,'</td>'}¨links
- html,←{'<tr>',⍵,'</tr>'}¨col1,¨col2,¨col3,¨col4
- html,←⊂'</tr>'
- html,←⊂'</tbody>'
- html,←⊂'</table>'
- html,←⊂'</section>'
+ head←GetMetaDescription description
+ head,←⊂'<script src="/Assets/JS/package-page.js" defer></script>'
+ :If deprecated
+     menuItem←'/deprecated-pkgs'
+     crumbs←⊂'Deprecated'(Reg.VersionOf_REST,'/deprecated-pkgs')
+ :Else
+     menuItem←'/packages'
+     crumbs←⊂'Packages'(Reg.VersionOf_REST,'/packages')
+     head,←GetJavaScriptForCopyButton ⍬
+ :EndIf
+ crumbs,←(⊂group(GetGroupHref group)),⊂name''
+ html←(⍬ packageID menuItem)HtmlHeader head
+ html,←⊂'<div class="page-head',(deprecated/' is-deprecated'),'">'
+ html,←⊂GetBreadcrumb crumbs
+ html,←⊂'<h2>',(EscapeSpecialChars name),' <span class="page-sub">',title,'</span></h2>'
+ :If 0<≢description
+     html,←⊂'<p class="lead">',(EscapeSpecialChars description),'</p>'
+ :EndIf
+ html,←⊂'</div>'
+ :If deprecated
+     html,←GetDeprecatedBand('' GetConfigValue cfg'deprecateComment')
+ :EndIf
+ html,←GetPackageFacts cfg
+ :If ~deprecated
+     html,←GetInstallInfo majorLine
+ :EndIf
+⍝ Without a ReadMe the releases move over into its place rather than leave a hole there
+ readme←GetReadmeSection newestPath
+ html,←⊂'<div class="pkg-body',((0=≢readme)/' no-readme'),'">'
+ html,←readme
+ html,←⊂'<aside class="pkg-aside">'
+ html,←GetReleaseList data caption
+ tags←'' GetConfigValue cfg'tags'
+ tagList←','(≠⊆⊢)'\s*[,;]\s*'⎕R','⊣tags
+ :If 0<≢tagList
+     html,←⊂'<section class="pkg-tag-list">'
+     html,←⊂'<h3>Tags</h3>'
+     html,←⊂'<p>',(⊃,/{'<a href="',Reg.VersionOf_REST,'/packages?tag=',(EscapeAttributeValue ⍵),'">',(EscapeSpecialChars ⍵),'</a>'}¨tagList),'</p>'
+     html,←⊂'</section>'
+ :EndIf
+ html,←⊂'</aside>'
+ html,←⊂'</div>'
  html,←⊆GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

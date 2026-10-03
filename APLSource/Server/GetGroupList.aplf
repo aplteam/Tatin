@@ -1,15 +1,16 @@
- response←GetGroupList dummy;data;html;groups;path
+ response←GetGroupList dummy;data;html;groups;path;published;parms;mat
  path←'expand'F.NormalizePath G.RegistryPath
  :If IsJsonRequest request.Headers
      data←Reg.ListGroups path
      response←request ReturnJSON Reg.JSON data
  :Else
-     groups←GetGroupList_ path
-     groups←groups,[1.5]1
-     groups⍪←(G.Credentials[;1]~,⊂,'*'),[1.6]0
-     groups←{(1⊃⍺)((≢⍵)×2⊃⍺)}⌸groups
-     groups←groups[groups[;1]⍳∪groups[;1];]
-     html←PrepareHtmlPageForGroupList groups
+     published←∪GetGroupList_ path                  ⍝ Groups with anything published, deprecated or not
+     groups←∪published,G.Credentials[;1]~,⊂,'*'   ⍝ Plus those known from the credentials only
+     groups←groups[⍋⎕C groups]
+     parms←Reg.CheckParmsForListPackages ⍬
+     parms.date←0
+     mat←GetPackageList_ parms
+     html←PrepareHtmlPageForGroupList groups published mat
      response←request ReturnHTML html
  :EndIf
 ⍝Done

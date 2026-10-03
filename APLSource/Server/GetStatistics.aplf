@@ -1,85 +1,24 @@
-  html←GetStatistics dummy;folder;list;filename;title;i;data;thisYear;year;names;keys;downloads;first
-⍝ Returns a page with download links to statistical data
+ html←GetStatistics dummy;folder;list
+⍝ Returns the body of the usage data page: what the data is, a view of the newest data and the
+⍝ files to download, as three tabs.
 ⍝ The files are offered newest first; see `ListUsageDataFiles`.
+⍝ Every tab is a section with a heading of its own, so without JavaScript the page shows them one
+⍝ below the other; Assets/JS/tabs.js turns them into tabs, the view being the first one shown.
  folder←∊P.LogFolder
  list←'zip'ListUsageDataFiles folder
- thisYear←⍕⊃⎕TS
  html←''
  :If 0=≢list
-     html,←⊂'Sorry, but there is no usage data available yet.'
+     html,←⊂'<p class="no-match">There is no usage data available yet.</p>'
  :Else
-     html,←⊂'<!-- Tab links -->'
-     html,←⊂'<div class="tab">'
-     html,←⊂'  <button id="info-tab" class="tablinks" onclick="openTab(event, ''info'')">Information</button>'
-     html,←⊂'  <button id="view-tab" class="tablinks" onclick="openTab(event, ''view'')">View</button>'
-     html,←⊂'  <button id="download-tab" class="tablinks" onclick="openTab(event, ''download'')">Downloads</button>'
+     html,←⊂'<div class="tabs" data-first-tab="view">'
+     html,←⊂'<div class="tab-bar" role="tablist" aria-label="Usage data" hidden>'
+     html,←⊂'<button type="button" role="tab" id="tab-info" aria-controls="info">Information</button>'
+     html,←⊂'<button type="button" role="tab" id="tab-view" aria-controls="view">View</button>'
+     html,←⊂'<button type="button" role="tab" id="tab-download" aria-controls="download">Downloads</button>'
      html,←⊂'</div>'
-
-   ⍝ Content for the "Info" Tab
-     html,←⊂'<div id="info" class="tabcontent">'
-     html,←⊂H.Para'Via this page you can download usage data for packages.'
-     html,←⊂'<ul>'
-     html,←⊂H.LI'  For every year there is a file <code>usage-data-&lt;YYYY&gt;.zip</code> (if data is available)'
-     html,←⊂H.LI'  For the current year there is a file <code>usage-data-&lt;YYYY&gt;-&lt;MM&gt;.zip</code> which means you get all data from this year except the current month'
-     html,←⊂'</ul>'
-     html,←⊂H.Para'The following steps are carried out by any Tatin Server:'
-     html,←⊂'<ol>'
-     html,←⊂H.LI'On the first of January of any given year:'
-     html,←⊂'<ul>'
-     html,←⊂H.LI'All the data of the previous year is collected and saved in <code>usage-data-&lt;YYYY&gt;.csv</code>'
-     html,←⊂H.LI'A file <code>usage-data-&lt;YYYY&gt;.zip</code> is created from that CSV file'
-     html,←⊂'</ul>'
-     html,←⊂H.LI'On the first day of any given month (except the first of January):'
-     html,←⊂'<ul>'
-     html,←⊂H.LI'A file <code>usage-data-&lt;YYYY&gt;-&lt;MM&gt;.csv</code> is created that comprehends all the data of that year except the new month'
-     html,←⊂H.LI'A file <code>usage-data-&lt;YYYY&gt;-&lt;MM&gt;.zip</code> is created from that CSV file'
-     html,←⊂'</ul>'
-     html,←⊂'</ol>'
-     html,←⊂'</div>'
-
-    ⍝ Content for the "View" Tab
-     html,←⊂'<div id="view" class="tabcontent">'
-⍝ The newest file: the data of the current year so far, or, as long as there is none (in January), that of last year
-     filename←folder,(¯3↓⊃list),'csv'
-⍝ A row of a usage data file holds the downloads of one version in one month, so the downloads
-⍝ are the sum of the column "Downloads": counting the rows would count versions and months.
-⍝ Names are compared regardless of case, as Tatin does: a request may spell a name in any
-⍝ case, and the file keeps what it was given. A name is shown as it was spelled first.
-     data←⊃⎕CSV filename''(1 1 1 2 2 2)1
-     names←data[;1 2]
-     keys←⎕C names
-     downloads←keys{⍺,+/⍵}⌸data[;6]
-     first←(↓keys)⍳∪↓keys
-     data←names[first;],downloads[;3]
-     data←data[⍒data[;3];]
-     data←('Group' 'Name' 'Downloads')⍪(2↑[2]data),⍕¨data[;3]
-     html,←⊂H.Para'The table shows the data from the file "',((≢∊P.LogFolder)↓filename),'", with all versions and months of a package added up.'
-     html,←⊂H.Para'Because of that, "Version", "Month" and "Year" are no longer meaningful, therefore these columns are not shown.'
-     html,←⊂'<table id="data-table">'
-     html,←⊂'<thead>'
-     html,←(⊂'<tr>'),((⎕UCS 10),¨{'<th>',⍵,'</th>'}¨data[1;]),(⊂'</tr>')
-     html,←⊂'</thead>'
-     html,←⊂'<tbody>'
-     html,←⊃,/{(⊂'<tr>'),((⎕UCS 10),¨'' '' 'style="text-align:right;"'{({0=≢⍵:'<td>' ⋄ '<td ',⍵,'>'}⍺),⍵,'</td>'}¨⍵),(⊂'</tr>')}¨↓1↓data
-     html,←⊂'</tbody>'
-     html,←⊂'</table>'
-     html,←⊂'</div>'
-
-    ⍝ Content for the "Download" Tab
-     html,←⊂'<div id="download" class="tabcontent">'
-     html,←⊂'<ol>'
-     :For i :In ⍳≢list
-         filename←i⊃list
-         year←4↑(≢'usage-data-')↓filename
-         :If (≢'usage-data-YYYY.zip')=≢filename             ⍝ The data of a whole year
-             title←'Data for ',year
-         :Else                                              ⍝ The data of a year up to a month
-             title←'Data for ',((1+year≡thisYear)⊃year'this year'),' up to ',(⊃(//)⎕VFI 2↑(≢'usage-data-YYYY-')↓filename)⊃Months
-         :EndIf
-         title,←' (zipped, ~',(⍕1⌈⌊0.5+(('type' 2)F.Dir(∊P.LogFolder),filename)÷1024),'KB)'
-         html,←⊂H.LI('/usage-data/',filename)H.A title   ⍝ Absolute: relative to "/v1/usage-data" it would end up in the REST route
-     :EndFor
-     html,←⊂'</ol>'
+     html,←GetStatisticsInfo ⍬
+     html,←GetStatisticsView folder(⊃list)
+     html,←GetStatisticsDownloads folder list
      html,←⊂'</div>'
  :EndIf
 ⍝Done

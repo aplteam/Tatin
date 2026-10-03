@@ -1,20 +1,35 @@
- html←PrepareHtmlPageForTagList data;colTitles
- html←(⍬'List of all tags')HtmlHeader GetDataTableStuff ⍬
- html,←⊂'<h2>List of all tags</h2>'
- html,←AddSpecialMessage ⍬
- colTitles←'Tag' 'Occurrences'
- data[;2]←⍕¨data[;2]
- html,←⊂H.OpenTable colTitles CalcTableWidth data
- html,←⊂'<thead>'
- html,←⊂'<tr class="my-first-th">'
- html,←{'<th>',⍵,'</th>'}¨colTitles
- html,←⊂'</tr>'
- html,←⊂'</thead>'
- html,←⊂'<tbody>'
- html,←⊃¨{'<tr><td>',⍺,'</td><td>',⍵,'</td></tr>'}/¨↓data
- html,←⊂'</tbody>'
- html,←⊂'</table>'
+ html←PrepareHtmlPageForTagList data;tags;letters;letter;bool
+⍝ Returns the page listing all tags as an alphabetical index, with a filter.
+⍝ `data` comes from `Reg.ListTags`: per row a tag and the number of packages carrying it. The
+⍝ numbers are not shown: this page is for finding a tag, and a tag leads to the list of packages
+⍝ filtered by it, which says how many there are.
+⍝ Tags that do not start with a letter are listed under "#".
+⍝ The filter is done by the script Assets/JS/tag-list.js. Without JavaScript the index is still
+⍝ complete, only without the filter: it is written with `hidden` set, and the script shows it.
+ html←(⍬'Tags' '/tags')HtmlHeader⊂'<script src="/Assets/JS/tag-list.js" defer></script>'
+ html,←⊂'<div class="page-head">'
+ html,←⊂'<h2>Tags</h2>'
+ html,←⊂'<div class="list-tools" id="tag-tools" hidden>'
+ html,←⊂'<label class="filter" for="tag-filter"><span class="sr-only">Filter the tags</span><input type="search" id="tag-filter" placeholder="Filter tags…" autocomplete="off"><kbd title="Press / to jump into the filter">/</kbd></label>'
+ html,←⊂'</div>'
+ html,←⊂'</div>'
+ tags←∪⎕C A.DLB A.DTB data[;1]                    ⍝ Blanks around a tag are no part of it, nor is the case
+ tags←(0<≢¨tags)/tags
+ tags←tags[⍋tags]
+ letters←{(⊃⍵)∊⎕C ⎕A:1 ⎕C⊃⍵ ⋄ '#'}¨tags
+ html,←⊂'<div class="tag-index" id="tag-index">'
+ :For letter :In ∪letters
+     bool←letters=letter
+     html,←⊂'<section class="tag-letter">'
+     html,←⊂'<h3>',letter,'</h3>'
+     html,←⊂'<ul>'
+     html,←{'<li><a href="',Reg.VersionOf_REST,'/packages?tag=',(EscapeAttributeValue ⍵),'">',(EscapeSpecialChars ⍵),'</a></li>'}¨bool/tags
+     html,←⊂'</ul>'
+     html,←⊂'</section>'
+ :EndFor
+ html,←⊂'</div>'
+ html,←⊂'<p class="no-match" id="tag-none" hidden>No tag contains what you typed.</p>'
  html,←⊆GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'
- ⍝Done
+⍝Done

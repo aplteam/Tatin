@@ -1,0 +1,7 @@
+ r←isNewest PrepareHtmlPageForMajorVersionList_ row;id;major;noOfReleases
+⍝ Returns one row of the list of major versions; see `PrepareHtmlPageForMajorVersionList`.
+⍝ `isNewest` is 1 for the newest major version, which then says so.
+ (id major noOfReleases)←row
+ r←'<div class="major-row"><a href="',Reg.VersionOf_REST,'/packages/versions/',id,'-',major,'">Major version ',major,'</a>'
+ r,←'<span>',(⍕noOfReleases),' release',((1≠noOfReleases)/'s'),(isNewest/' · <span class="latest">latest</span>'),'</span></div>'
+⍝Done

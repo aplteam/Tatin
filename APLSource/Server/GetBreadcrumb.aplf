@@ -1,0 +1,12 @@
+ r←GetBreadcrumb crumbs;links;here
+⍝ Returns the breadcrumb above the title of a page further down the site, like
+⍝ "Packages / aplteam / Cider", as a single character vector.
+⍝ `crumbs` is a vector of (caption href) pairs, from the top down. The last one is the page
+⍝ itself: it is marked as the current page rather than linked, so its href is ignored.
+⍝ Captions are escaped here; hrefs must be ready for use.
+ links←{'<a href="',(EscapeAttributeValue 2⊃⍵),'">',(EscapeSpecialChars 1⊃⍵),'</a>'}¨¯1↓crumbs
+ here←'<span aria-current="page">',(EscapeSpecialChars 1⊃⊃⌽crumbs),'</span>'
+ r←'<nav class="breadcrumb" aria-label="Breadcrumb">'
+ r,←⊃{⍺,'<span aria-hidden="true">/</span>',⍵}/links,⊂here
+ r,←'</nav>'
+⍝Done

@@ -1,0 +1,11 @@
+ r←UsageDataPeriod filename;year;month
+⍝ Returns the period a usage data file covers, for a caption: "2025" for the file of a whole year,
+⍝ "2026 up to August" for one that ends with a month; see `IsUsageDataFilename`.
+ year←4↑(≢'usage-data-')↓filename
+ :If '-'=⊃(≢'usage-data-YYYY')↓filename
+     month←⊃⊃(//)⎕VFI 2↑(≢'usage-data-YYYY-')↓filename
+     r←year,' up to ',month⊃Months
+ :Else
+     r←year
+ :EndIf
+⍝Done

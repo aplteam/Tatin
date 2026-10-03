@@ -1,0 +1,21 @@
+ html←PrepareHtmlPageForDeprecatedList_ major;data;newest;date;version;comment;group
+⍝ Returns one row of the list of deprecated packages; see `PrepareHtmlPageForDeprecatedList`.
+⍝ `major` is a major version line like "aplteam-APLGit-0". The row leads to its page, says what
+⍝ the author said when deprecating it - typically where to go instead - and which release was
+⍝ the last one, with a link to its configuration.
+ data←1 Reg.ListVersions G.RegistryPath,major
+ (newest date)←data[≢data;]                         ⍝ In Tatin's order, so the newest release comes last
+ date←(≢'YYYY-MM-DD')↑FormatFloatDate date
+ version←newest↓⍨2⊃⍸'-'=newest                     ⍝ All after the name, the hyphen of a beta included
+ comment←''GetConfigValue(ReadPackageConfig G.RegistryPath,newest)'deprecateComment'
+ group←major↑⍨major⍳'-'                            ⍝ Including the hyphen
+ html←'<div class="deprecated-row">'
+ html,←'<a class="deprecated-major" href="',Reg.VersionOf_REST,'/packages/versions/',major,'"><span class="pkg-group-prefix">',(EscapeSpecialChars group),'</span>',(EscapeSpecialChars(≢group)↓major),'</a>'
+ :If 0<≢comment
+     html,←'<span class="deprecated-comment">',(LinkURLs EscapeSpecialChars comment),'</span>'
+ :Else
+     html,←'<span class="deprecated-comment none">No reason given</span>'
+ :EndIf
+ html,←'<span class="deprecated-last">last release <code>',(EscapeSpecialChars version),'</code>, ',date,' · <a href="',Reg.VersionOf_REST,'/packages/details/',newest,'">config</a></span>'
+ html,←'</div>'
+⍝Done

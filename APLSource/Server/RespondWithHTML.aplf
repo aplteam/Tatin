@@ -1,17 +1,24 @@
  response←request RespondWithHTML y;html;msg;statusCode;caption
 ⍝ Compiles an HTML response with "caption" becoming an <h2> tag and
 ⍝ the (optional) "msg" one to many <p> tags.
+⍝ Such a page is not to be indexed by a search engine.
  (statusCode caption msg)←3↑(⊆y),'' '' ''
  :If 0=≢caption
      caption←GetReasonPhraseFor statusCode
  :EndIf
  response←request Respond statusCode
- html←HtmlHeader''
- html,←⊂'<h2>',caption,' (',(⍕statusCode),')</h2>'
- html,←AddSpecialMessage ⍬
+ html←(1 caption '')HtmlHeader''
+ html,←⊂'<div class="page-head">'
+ html,←⊂'<p class="page-label">Error ',(⍕statusCode),'</p>'
+ html,←⊂'<h2>',caption,'</h2>'
+ html,←⊂'</div>'
  :If 0<≢msg
+     html,←⊂'<div class="prose">'
      html,←{'<p>',⍵,'</p>'}¨⊆msg
+     html,←⊂'</div>'
  :EndIf
+ html,←⊂'<p class="error-next"><a href="/">Go to the home page</a></p>'
+ html,←⊆GetFooter
  html,←'</body>' '</html>'
  response.Content←MassageHTML html
 ⍝Done

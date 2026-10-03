@@ -1,4 +1,4 @@
-response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqueIDs;descriptionAndProjecturl;list5;pkgs;group;json;list
+response←request GetFullPackageList packageID;data;noOfVersions;IDs;uniqueIDs;descriptionAndProjecturl;list5;pkgs;group;json;list
 ⍝ Return literally all packages. Parameters are ignored
  :If IsJsonRequest request.Headers
      pkgs←1 Reg.GetAllPackages G.RegistryPath
@@ -29,7 +29,6 @@ response←request GetFullPackageList packageID;data;html;noOfVersions;IDs;uniqu
      json←Reg.JSON pkgs
      response←request ReturnJSON json
  :Else  ⍝ It's a request from a Browser
-     list←1 Reg.GetAllPackages G.RegistryPath
-     html←packageID PrepareHtmlPageForFullPackageList list
-     response←request ReturnHTML html
+⍝ Only the user command ]Tatin.CopyRegistry asks for this, and it asks for JSON
+     response←request RespondWithHTML 406 'Not Acceptable' 'This address serves the user command <code>]Tatin.CopyRegistry</code> and has nothing to show in a browser.'
  :EndIf

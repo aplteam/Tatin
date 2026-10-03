@@ -1,50 +1,58 @@
  html←data EditGroupHomepage_ groupName;html;parms;markdown;email;msg
+⍝ Returns the form for creating or editing the home page of a group.
+⍝ `data` is (markdown email msg): what is there already, and a message to show, if any, like why
+⍝ the last attempt to save was refused.
+⍝ The names of the fields are what `SaveGroupHompeage` expects, so they must not change.
  (markdown email msg)←data
- html←HtmlHeader''
- html,←⊂'<h2>Group home page of "',groupName,'"</h2>'
- html,←⊆AddSpecialMessage''
+ html←(⍬('Group ',groupName)'/groups')HtmlHeader''
+ html,←⊂'<div class="page-head">'
+ html,←⊂GetBreadcrumb('Groups'(Reg.VersionOf_REST,'/groups'))(groupName('/',GetVersion_REST'group-homepage?name=',groupName))('Edit' '')
+ html,←⊂'<h2>',(EscapeSpecialChars groupName),' <span class="page-sub">editing the home page</span></h2>'
+ html,←⊂'</div>'
  :If 0<≢msg
-     html,←⊂'class="noprint" style="color:red;"'H.Para msg
+     html,←⊂'<p class="form-message noprint">',msg,'</p>'
  :EndIf
- html,←⊂'<form id="create-group-homepage" action="','group-homepage-save">'
+ html,←⊂'<form id="create-group-homepage" class="group-home-form" action="','group-homepage-save">'
 
- html,←⊂'content'H.Label'Content (Use <a href="https://download.aplteam.com/MarkAPL_CheatSheet.html" caption="Link to the Markdown Cheat Sheet" title="Link to the Markdown Cheat Sheet" target="_blank" rel=noopener>Markdown</a> without HTML):'
- html,←⊂H.BR
+ html,←⊂'<div class="field">'
+ html,←⊂'content'H.Label'Content'
+ html,←⊂'<span class="field-hint"><a href="https://download.aplteam.com/MarkAPL_CheatSheet.html" title="Link to the Markdown Cheat Sheet" target="_blank" rel="noopener">Markdown</a> without HTML</span>'
  html,←⊂'<textarea name="content" id="content" rows="15" placeholder="your markdown" autofocus required spellcheck="true" lang="en">'
  html,←⊆EscapeSpecialChars markdown
  html,←⊂'</textarea>'
- html,←⊂H.BR
- html,←⊂H.BR
+ html,←⊂'</div>'
 
- html,←⊂'email'H.Label'Email address:'
- html,←⊂H.BR
+ html,←⊂'<div class="field-row">'
+ html,←⊂'<div class="field">'
+ html,←⊂'email'H.Label'Email address'
  parms←⎕NS''
  parms.(id name type placeholder value)←'email' 'email' 'email' 'your.name@email.address'email
  html,←⊂'required'H.Input parms
- html,←⊂H.BR
-
+ html,←⊂'</div>'
  :If 0<≢G.Credentials
-     html,←⊂'api-key'H.Label'API key:'
-     html,←⊂H.BR
+     html,←⊂'<div class="field">'
+     html,←⊂'api-key'H.Label'API key'
      parms←⎕NS''
      parms.(id name type placeholder)←'api-key' 'api-key' 'password' 'Password (API-key)'
      html,←⊂'required'H.Input parms
-     html,←⊂H.BR
+     html,←⊂'</div>'
  :EndIf
+ html,←⊂'</div>'
 
  parms←⎕NS''
  parms.(id name type value style readonly)←'group' 'group' 'text'groupName'display:none;' 'readonly'
  html,←⊂H.Input parms
- html,←⊂H.BR
 
  ⍝ This is used to tell the server what this is all about. That allows the server to determine that
  ⍝ the content must be massaged in a specific way.
  parms←⎕NS''
  parms.(id name type value style readonly)←'sgh' 'sgh' 'text' 'save-group-homepage' 'display:none;' 'readonly'
  html,←⊂H.Input parms
- html,←⊂H.BR
 
+ html,←⊂'<div class="form-actions">'
  html,←⊂'<input id="submit-homepage" formmethod="post" class="button" value="Save" type="submit">'
+ html,←⊂'<a href="/',(GetVersion_REST'group-homepage?name='),(EscapeAttributeValue groupName),'">Back to the home page</a>'
+ html,←⊂'</div>'
 
  html,←⊂'</form>'
 

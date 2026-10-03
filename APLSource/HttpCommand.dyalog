@@ -7,7 +7,7 @@
     ∇ r←Version
     ⍝ Return the current version
       :Access public shared
-      r←'HttpCommand' '5.11.1' '2026-05-18'
+      r←'HttpCommand' '5.11.2' '2026-09-29'
     ∇
 
 ⍝ Request-related fields
@@ -1418,8 +1418,8 @@
                   :If ''≡cookie.Expires ⍝ if Expires was set already from MaxAge, MaxAge takes precedence
                       →∆NEXT⍴⍨0∊⍴cookie.Expires←parseHttpDate value ⍝ ignore cookies with invalid expires dates
                   :EndIf
-              :Case 'max-age' ⍝ specifies number of seconds after which cookie expires
-                  cookie.Expires←Now+seconds toInt value
+              :Case 'max-age' ⍝ specifies number of seconds after which cookie expires - takes priority over 
+                  cookie.Expires←Now+seconds{⍵=0:¯86400 ⋄ 0}toInt value ⍝ max-age=0 means delete cookie
               :Case 'domain' ⍝ RCF 6265 Sec. 5.2.3
                   →∆NEXT⍴⍨0∊⍴domain←lc value ⍝ cookies with empty domain values are ignored
                   :If domain≡host
@@ -1622,7 +1622,7 @@
       :Access Public Shared
       ⎕IO←0
       format←{
-          1=≡⍵:⍺(,⍕⍵)
+          1≥≡⍵:1 2⍴⍺(,⍕⍵)
           ↑⍺∘{⍺(,⍕⍵)}¨⍵
       }
       :If 0=⎕NC'name' ⋄ name←'' ⋄ :EndIf

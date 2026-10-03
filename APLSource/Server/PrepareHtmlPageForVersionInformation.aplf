@@ -1,0 +1,20 @@
+ html←PrepareHtmlPageForVersionInformation dummy;minimum
+⍝ Returns the page telling which version of Tatin the server runs and, when the INI file says
+⍝ so, which version a client needs at least. A browser gets it for "/v1/version" as well as for
+⍝ "/v1/version-information".
+ html←(⍬'Version information' '')HtmlHeader''
+ html,←⊂'<div class="page-head">'
+ html,←⊂'<h2>Version information</h2>'
+ html,←⊂'</div>'
+ html,←⊂'<dl class="facts">'
+ html,←⊂'<div><dt>Server runs Tatin</dt><dd class="fact-code fact-latest">',(EscapeSpecialChars 2⊃Reg.Version),'</dd></div>'
+ html,←⊂'<div><dt>Built</dt><dd class="fact-code">',(EscapeSpecialChars 3⊃Reg.Version),'</dd></div>'
+ :If G.INI.Exist'Config:MinimumTatinVersion'
+ :AndIf 0<≢minimum←⍕⊃G.INI.Get'Config:MinimumTatinVersion'
+     html,←⊂'<div><dt>Clients need at least</dt><dd class="fact-code fact-latest">',(EscapeSpecialChars minimum),'</dd></div>'
+ :EndIf
+ html,←⊂'</dl>'
+ html,←⊆GetFooter
+ html,←⊂'</body>'
+ html,←⊂'</html>'
+⍝Done

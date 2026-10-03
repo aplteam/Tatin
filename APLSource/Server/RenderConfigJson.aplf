@@ -1,0 +1,15 @@
+ r←RenderConfigJson json;patterns
+⍝ Returns the lines of a package config file ready to be shown on its "details" page: escaped,
+⍝ with keys, strings and numbers in spans that give them their colours, URLs as links and the
+⍝ group leading to its home page, if it has one.
+⍝ It works line by line and pattern by pattern rather than parsing the JSON, so the page shows
+⍝ the file exactly as it was published, order and spacing included.
+⍝ The order of the patterns matters twice over. ⎕R tries them in this order at every position,
+⍝ so a URL is recognised before it can pass for an ordinary string, and the digits inside a
+⍝ string are never taken for a number. And `RenderJsonToken` tells them apart by position.
+ patterns←⊂'^(\s*)([A-Za-z_]\w*)(\s*:)'             ⍝ 0: a key, with the blanks before it and its colon
+ patterns,←⊂'"https?://[^"]*"'                      ⍝ 1: a string that is a URL
+ patterns,←⊂'"[^"]*"'                               ⍝ 2: any other string
+ patterns,←⊂'-?\b\d+(?:\.\d+)?\b'                   ⍝ 3: a number
+ r←patterns ⎕R RenderJsonToken⊢EscapeSpecialChars json
+⍝Done

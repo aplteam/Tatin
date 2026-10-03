@@ -1,20 +1,15 @@
- response←GetVersionInformation request;data;html;minimum;minor;major;v
-⍝ Return HTML with version information
- data←'Server is running Tatin version ',⊃{⍺,' from ',⍵}/1↓Reg.Version
- :If G.INI.Exist'Config:MinimumTatinVersion'
-     minimum←⊃G.INI.Get'Config:MinimumTatinVersion'
-     data,←'; minimum version required on the client side is ',⍕minimum
- :EndIf
+ response←GetVersionInformation request;data;html;minimum
+⍝ Return version information: which version of Tatin the server runs and which version a client
+⍝ needs at least, if any
  :If IsJsonRequest request.Headers
+     data←'Server is running Tatin version ',⊃{⍺,' from ',⍵}/1↓Reg.Version
+     :If G.INI.Exist'Config:MinimumTatinVersion'
+         minimum←⊃G.INI.Get'Config:MinimumTatinVersion'
+         data,←'; minimum version required on the client side is ',⍕minimum
+     :EndIf
      response←request ReturnJSON Reg.JSON data
  :Else
-     html←HtmlHeader''
-     html,←⊂'<h2>Version information and requirements</h2>'
-     html,←AddSpecialMessage ⍬
-     html,←⊂'<p>',data,'</p>'
-     html,←⊆GetFooter
-     html,←⊂'</body>'
-     html,←⊂'</html>'
+     html←PrepareHtmlPageForVersionInformation ⍬
      response←request ReturnHTML html
  :EndIf
 ⍝Done

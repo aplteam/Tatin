@@ -1,0 +1,14 @@
+ r←GetReleaseList(data caption)
+⍝ Returns the list of releases for the side column of a package page, as a vector of character
+⍝ vectors.
+⍝ `data` holds one row per release, newest first: [;1] package ID, [;2] publishing date.
+⍝ `caption` says what the count refers to, like "in major version 0".
+⍝ Every release is in the HTML. "package-page.js" shows only the newest of them at first,
+⍝ together with a button that shows the rest; without JavaScript they are all simply there.
+ r←⊂'<section class="releases">'
+ r,←⊂'<div class="section-head"><h3>Releases</h3><span>',(⍕≢data),' ',caption,'</span></div>'
+ r,←⊂'<ol class="release-list" id="release-list">'
+ r,←GetReleaseList_¨↓data
+ r,←⊂'</ol>'
+ r,←⊂'</section>'
+⍝Done

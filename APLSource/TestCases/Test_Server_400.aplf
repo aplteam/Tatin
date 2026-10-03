@@ -1,12 +1,10 @@
- r←Test_Server_400(stopFlag batchFlag);⎕TRAP;html;oldLayoutFlag;newLayoutFlag
+ r←Test_Server_400(stopFlag batchFlag);⎕TRAP;html
 ⍝ Ask for the home page; pretends to be a Browser
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  html←∆GetHtmlFromServer'[tatin-test]'
- oldLayoutFlag←∨/'<h2>Main page</h2>'⍷html
- newLayoutFlag←∨/'<h1 id="my-logo"><a href="/" title="Link to Tatin-Test main page"><img id="logo" src="/Assets/img/tatin.png" alt=""><span>Tatin Test Registry</span></a></h1>'⍷html
- →T.PassesIf oldLayoutFlag⍲newLayoutFlag
+ →T.PassesIf∨/'<h2>Somebody else''s code: a single command rather than a couple of days.</h2>'⍷html
 
  r←T._OK
 ⍝Done

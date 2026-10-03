@@ -1,25 +1,29 @@
- html←PrepareHtmlPageForMajorVersionList(packageID data);colTitles;majors
+ html←PrepareHtmlPageForMajorVersionList(packageID data);majors;group;name;newestID;description;noOfMajors
 ⍝ Not indexed: this page is a list of links and has no content of its own, nor any prospect
 ⍝ of any. A crawler is still welcome to follow the links out of it - "noindex" alone leaves
 ⍝ "follow" at its default - and a visitor sees no difference.
+⍝ `data` comes from `ListMajorVersions`: [;1] group and name, [;2] major version number,
+⍝ [;3] number of releases.
 ⍝ The newest major version comes first. They are sorted by number here because the folder
 ⍝ names they come from sort as text, which would put 9 behind 15.
+⍝ The description is the one of the newest release of the newest major version.
  majors←{⊃2⊃⎕VFI ⍵}¨data[;2]
  data←data[⍒majors;]
- html←(1 packageID)HtmlHeader ''
- html,←⊂'<h2>Major versions of "',packageID,'"</h2>'
- html,←AddSpecialMessage ⍬
- colTitles←'Package name' 'Major version' 'Number of<br>minor versions'
- html,←⊂H.OpenTable colTitles CalcTableWidth data
- html,←⊂'<thead>'
- html,←⊂'<tr class="my-first-th">'
- html,←{'<th>',⍵,'</th>'}¨colTitles
- html,←⊂'</tr>'
- html,←⊂'</thead>'
- html,←⊂'<tbody>'
- html,←{'<tr><td><a href="',Reg.VersionOf_REST,'/packages/versions/',(1⊃⍵),'-',(2⊃⍵),'" title="List all versions"><code>',(1⊃⍵),'</code></a></td><td>',(2⊃⍵),'</td><td style="text-align:end">',(⍕3⊃⍵),'</td></tr>'}¨↓data
- html,←⊂'</tbody>'
- html,←⊂'</table>'
+ noOfMajors←≢data
+ (group name)←2↑'-'(≠⊆⊢)packageID
+ newestID←⊃⌽Reg.ListVersions G.RegistryPath,packageID,'-',⊃data[1;2]   ⍝ Tatin's order: the best comes last
+ description←GetPackageDescription G.RegistryPath,newestID
+ html←(1 packageID '/packages')HtmlHeader''
+ html,←⊂'<div class="page-head">'
+ html,←⊂GetBreadcrumb('Packages'(Reg.VersionOf_REST,'/packages'))(group(GetGroupHref group))(name'')
+ html,←⊂'<h2>',(EscapeSpecialChars name),' <span class="page-sub">',(⍕noOfMajors),' major version',((1≠noOfMajors)/'s'),'</span></h2>'
+ :If 0<≢description
+     html,←⊂'<p class="lead">',(EscapeSpecialChars description),'</p>'
+ :EndIf
+ html,←⊂'</div>'
+ html,←⊂'<div class="major-list">'
+ html,←(1=⍳noOfMajors)PrepareHtmlPageForMajorVersionList_¨↓data
+ html,←⊂'</div>'
  html,←⊆GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

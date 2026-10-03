@@ -1,0 +1,14 @@
+ {r}←(fn SetOnWait)dummy
+⍝ Establishes `fn` as the function that is called whenever a `CommTools` function is about to wait
+⍝ for input from the user, typically for notifying the user.\\
+⍝ `fn` must be a monadic or ambivalent function that returns a result, which is ignored. It is called
+⍝ monadically with a two-item vector: the type (`YesOrNo`, `Select`, `Pause`, `AskForText` or
+⍝ `AskForNumber`) and the question (the message for `Pause`, the caption for `Select`) without alias.\\
+⍝ It is called once per question, and only when the user is really asked, never when automation
+⍝ answers. The question is shown only after `fn` has returned, so `fn` should not wait for anything.\\
+⍝ The right argument is ignored; pass a 0.\\
+⍝ Returns a shy result: 1 if a function established earlier was replaced, and 0 otherwise.
+ 'The operand must be a function'Assert 3=⎕NC'fn'
+ r←3=⎕NC'∆OnWait'
+ ∆OnWait←fn
+⍝Done

@@ -16,9 +16,28 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.127.1 ⋄ 2026-10-01
+## v0.128.0 ⋄ 2026-10-03
 
-Nothing but fixes, all of them on the server side. A Registry is worth updating for three of them in particular:
+The web pages of a Tatin server were redesigned. This concerns whoever runs a server; for anybody using a Registry nothing changes but the looks of the pages.
+
+## Server
+
+Replace the `Assets/` folder as a whole, as usual. The new pages need the fonts and the scripts that come with it, and the files of jQuery and DataTables, which no page uses any more, go with the old folder.
+
+One warning from 0.126.1 still applies: if the keys `PublicCertFile` and `PrivateKeyFile` under `[CERTIFICATES]` in your `server.ini` point into `Assets/`, put your certificate into the root of the server folder first and point those keys there. Everybody else can simply replace the folder.
+
+Two INI entries behave differently:
+
+* `[HTMLBACKGROUND]color` is ignored now. The background of the pages is part of the design.
+* `[HTMLBACKGROUND]watermark` is shown in a strip at the top of every page rather than as a diagonal watermark behind the text. That is what marks a test server.
+
+One more change in behaviour:
+
+* `/v1/copy-registry` and `/v1/all_packages` answer a browser with a 406 instead of a page listing every release. They serve the user command `]Tatin.CopyRegistry`, which is not affected.
+
+## Fixes
+
+Three of them are worth an update on their own:
 
 * The "View" tab of the usage data page counted the rows of the newest usage data file, one per version and month, and called the result "Downloads". The figures were therefore far too low, and a package whose name was requested in different spellings was counted twice. The data files themselves were always right.
 * Shutting down a server ran a clean-up belonging to the server test suite. On a production server that meant an error on every shutdown.

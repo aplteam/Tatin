@@ -1,0 +1,41 @@
+ (valid numbers)←max ParseSelectNumbers text;⎕IO;⎕ML;tokens;token;bool;values;lo;hi
+⍝ Interprets `text` as the item numbers a user entered for `Select`: single numbers and ranges like
+⍝ `3-6` (for `3 4 5 6`), separated by spaces and/or commas, so `1 2,5 10-13` stands for
+⍝ `1 2 5 10 11 12 13`.\\
+⍝ A range must not contain spaces, both of its numbers must be integers of at least 1, and the second
+⍝ one must be greater than the first one: `3 - 6`, `3 -6`, `3- 6` and `5-5` are all invalid.\\
+⍝ `max` is the number of choices. A range is expanded no further than `max+1`: that is enough for the
+⍝ caller to recognize a range that reaches beyond the choices, and a huge range cannot exhaust the
+⍝ workspace.\\
+⍝ Returns a Boolean `valid` and, if that is 1, the `numbers` in the order they were entered, duplicates
+⍝ included. Whether they are in range is the caller's business, because the user and `a~` are not
+⍝ treated the same in that respect.
+ ⎕IO←1 ⋄ ⎕ML←1
+ valid←0
+ numbers←⍬
+ tokens←' '(≠⊆⊢)' '@(','∘=),text
+ :For token :In tokens
+     :If '-'∊token
+         :If 1≠+/'-'=token
+         :OrIf '-'∊(⊃token),⊃⌽token
+             numbers←⍬ ⋄ :Return
+         :EndIf
+         (bool values)←⎕VFI' '@('-'∘=)token
+         :If ~∧/bool
+         :OrIf ∨/values≠⌊values
+         :OrIf 1>⊃values
+         :OrIf ≥/values
+             numbers←⍬ ⋄ :Return
+         :EndIf
+         (lo hi)←values⌊1+max
+         numbers,←(lo-1)↓⍳hi
+     :Else
+         (bool values)←⎕VFI token
+         :If ~∧/bool
+             numbers←⍬ ⋄ :Return
+         :EndIf
+         numbers,←values
+     :EndIf
+ :EndFor
+ valid←1
+⍝Done

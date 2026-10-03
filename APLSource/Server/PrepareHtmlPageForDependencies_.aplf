@@ -1,0 +1,26 @@
+ r←PrepareHtmlPageForDependencies_ dep;id;registry
+⍝ Returns one row of the list of dependencies; see `PrepareHtmlPageForDependencies`.
+⍝ A line in a dependencies file names a package ID, possibly preceded by the alias it is loaded
+⍝ under ("A@aplteam-APLTreeUtils2-1.1.1") or by the URL of the Registry it comes from.
+⍝ * A dependency in this Registry leads to its configuration and says whether it has
+⍝   dependencies of its own.
+⍝ * One from another Registry is named together with that Registry.
+⍝ * One that ought to be in this Registry but is not is just named.
+ dep←'^[A-Za-z_][A-Za-z0-9_]*@'⎕R''⊣dep              ⍝ The alias, if any, is of no interest here
+ r←'<div class="dep-row">'
+ :If '/'∊dep
+     id←dep↑⍨-¯1+(⌽dep)⍳'/'
+     registry←dep↓⍨-≢id
+     r,←'<span class="dep-id">',(EscapeSpecialChars id),'</span><span class="dep-note">from ',(EscapeSpecialChars registry),'</span>'
+ :ElseIf F.IsDir G.RegistryPath,dep
+     r,←'<a class="dep-id" href="',Reg.VersionOf_REST,'/packages/details/',dep,'">',dep,'</a>'
+     :If PackageHasDependencies dep
+         r,←'<a class="dep-note" href="',Reg.VersionOf_REST,'/packages/dependencies/',dep,'">its dependencies</a>'
+     :Else
+         r,←'<span class="dep-note">no dependencies of its own</span>'
+     :EndIf
+ :Else
+     r,←'<span class="dep-id">',(EscapeSpecialChars dep),'</span><span class="dep-note">not in this Registry</span>'
+ :EndIf
+ r,←'</div>'
+⍝Done

@@ -1,0 +1,23 @@
+ r←RenderJsonToken match;parts;value
+⍝ Called by ⎕R in `RenderConfigJson` for everything one of its patterns matches, which
+⍝ `match.PatternNum` tells apart; see there for the patterns.
+⍝ `parts` holds the whole match followed by its groups.
+ parts←match.Lengths↑¨match.Offsets↓¨⊂match.Block
+ :Select match.PatternNum
+ :Case 0                                            ⍝ A key
+     r←(2⊃parts),'<span class="json-key">',(3⊃parts),'</span>',4⊃parts
+ :Case 1                                            ⍝ A URL
+     value←1↓¯1↓match.Match
+     r←'<span class="json-string">"<a href="',value,'" target="_blank" rel="noopener">',value,'</a>"</span>'
+ :Case 2                                            ⍝ Any other string
+     value←1↓¯1↓match.Match
+     :If 0<≢'^\s*group\s*:'⎕S 0⊣match.Block
+     :AndIf ⊃0 G.INI.Get'Config:GroupHomePages'
+     :AndIf HasGroupHomePage value
+         r←'<span class="json-string">"<a href="/',(GetVersion_REST'group-homepage?name='),value,'">',value,'</a>"</span>'
+     :Else
+         r←'<span class="json-string">',match.Match,'</span>'
+     :EndIf
+ :Case 3                                            ⍝ A number
+     r←'<span class="json-number">',match.Match,'</span>'
+ :EndSelect

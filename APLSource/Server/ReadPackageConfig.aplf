@@ -1,0 +1,13 @@
+ cfg←ReadPackageConfig packagePath;qdmx
+⍝ Returns the config of the package in `packagePath` as a namespace. `packagePath` may also be
+⍝ the name of the config file itself.
+⍝ When the config cannot be read the result is an empty namespace, so that every field simply
+⍝ reads as missing: a page can do without the config, and one that cannot be read is no reason
+⍝ to break the page. It is logged, though.
+ :Trap 11 19 22 Reg.ErrorNo
+     cfg←Reg.GetPackageConfigFileAsNS packagePath
+ :Else
+     qdmx←⎕DMX
+     cfg←⎕NS''
+     LogError'Cannot read the package config in "',packagePath,'": ',qdmx.EM,'; RC=',⍕qdmx.EN
+ :EndTrap

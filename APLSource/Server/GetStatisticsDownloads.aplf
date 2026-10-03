@@ -1,0 +1,13 @@
+ html←GetStatisticsDownloads(folder list);filename;size
+⍝ Returns the "Downloads" tab of the usage data page; see `GetStatistics`.
+⍝ The links are absolute: relative to "/v1/usage-data" they would end up in the REST route.
+ html←⊂'<section class="tab-panel" id="download" role="tabpanel" aria-labelledby="tab-download">'
+ html,←⊂'<h3 class="tab-title">Downloads</h3>'
+ html,←⊂'<ul class="download-list">'
+ :For filename :In list
+     size←1⌈⌊0.5+(2 ⎕NINFO folder,filename)÷1024       ⍝ ⎕NINFO property 2 is the size in bytes
+     html,←⊂'<li><a href="/usage-data/',filename,'">Data for ',(UsageDataPeriod filename),'</a><span>zip, about ',(⍕size),' KB</span></li>'
+ :EndFor
+ html,←⊂'</ul>'
+ html,←⊂'</section>'
+⍝Done

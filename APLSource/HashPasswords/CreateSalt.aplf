@@ -1,6 +1,5 @@
  salt←CreateSalt length;⎕RL;alp
-⍝ Creates (pseudo)-randomly a salt with `length` characters. Only ASCII chars and digits are used as input.
- ⎕DL 0.0001×?100
- ⎕RL←+/⎕TS
+⍝ Returns a random salt of `length` characters, drawn from the ASCII letters `a-z` and `A-Z` and the digits `0-9`.
+ ⎕RL←⍬ 2    ⍝ Use the operating system's random number generator: a seed derived from the time would make salts guessable
  alp←(⎕C ⎕A),⎕A,⎕D
  salt←alp[?length⍴≢alp]

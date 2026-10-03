@@ -1,30 +1,39 @@
- html←PrepareHtmlPageForPackageDetails(ID json url version canonical);ID_;major;majorMinor
+ html←PrepareHtmlPageForPackageDetails(ID resolvedID json cfg canonical);majorLine;group;name;version;url;host
+⍝ The configuration of a single release, as it was published.
+⍝ `ID` is what was asked for and `resolvedID` the release it led to. They differ when the
+⍝ request named no version or only part of one, and the page then says so.
+⍝ `json` is the config file as a vector of lines, `cfg` the same config as a namespace.
 ⍝ `canonical` points at the "versions" page for this major line; see `GetCanonicalLink`.
- html←(⍬('Details of ',ID))HtmlHeader canonical
- :Select version
- :Case 'full'
-     html,←⊂'<h2>Details of &lt;',ID,'&gt;</h2>'
- :Case 'major'
-     (ID_ major)←{⍵{(⍵↓⍺)((1+⍵)↑⍺)}-'-'⍳⍨⌽⍵}ID
-     html,←⊂'<h2>Details of latest package for &lt;',ID_,'&gt; of major version ',(,major),'</h2>'
- :Case 'major+minor'
-     (ID_ majorMinor)←{⍵{(⍵↓⍺)((1+⍵)↑⍺)}-'-'⍳⍨⌽⍵}ID
-     html,←⊂'<h2>Details of latest patch for &lt;',ID_,'&gt; for version ',(,majorMinor),'</h2>'
- :Case 'none'
-     html,←⊂'<h2>Details of latest package for &lt;',ID,'&gt;</h2>'
+ majorLine←Reg.RemoveMinorAndPatch resolvedID
+ (group name)←2↑'-'(≠⊆⊢)resolvedID
+ version←resolvedID↓⍨2⊃⍸'-'=resolvedID
+ html←(⍬('Configuration of ',resolvedID)'/packages')HtmlHeader canonical
+ html,←⊂'<div class="page-head">'
+ html,←⊂GetBreadcrumb('Packages'(Reg.VersionOf_REST,'/packages'))(group(GetGroupHref group))(name(Reg.VersionOf_REST,'/packages/versions/',majorLine))(version'')
+ :If (⎕C ID)≡⎕C resolvedID
+     html,←⊂'<p class="page-label">Package configuration</p>'
  :Else
-     ∘∘∘ ⍝ Paranioa: should not happen of course
- :EndSelect
- html,←AddSpecialMessage ⍬
- json←EscapeSpecialChars json
- html,←⊂'<pre><json>',1⊃json
- json←MakeURLsLinks json
- :If ⊃G.INI.Get'Config:GroupHomePages'
-     html,←MakeGroupHomepageLink json
- :Else
-     html,←1↓json
+     html,←⊂'<p class="page-label">Package configuration of the latest release of <code>',(EscapeSpecialChars ID),'</code></p>'
  :EndIf
- html,←⊂'</json></pre>'
+ html,←⊂'<h2 class="page-id">',(EscapeSpecialChars resolvedID),'</h2>'
+ html,←⊂'</div>'
+ html,←⊂'<div class="side-by-side">'
+ json←RenderConfigJson json
+ json[1]←⊂'<pre class="config-json">',1⊃json
+ json[≢json]←⊂(⊃⌽json),'</pre>'
+ html,←json
+ html,←⊂'<aside class="see-also">'
+ html,←⊂'<h3>See also</h3>'
+ html,←⊂'<a href="',Reg.VersionOf_REST,'/packages/versions/',majorLine,'">All releases of <code>',majorLine,'</code></a>'
+ :If PackageHasDependencies resolvedID
+     html,←⊂'<a href="',Reg.VersionOf_REST,'/packages/dependencies/',resolvedID,'">Dependencies of <code>',version,'</code></a>'
+ :EndIf
+ :If 0<≢url←'' GetConfigValue cfg'project_url'
+     host←'^https?://([^/]+).*$'⎕R'\1'⊣url
+     html,←⊂'<a href="',(EscapeAttributeValue url),'">Project on ',(EscapeSpecialChars host),'</a>'
+ :EndIf
+ html,←⊂'</aside>'
+ html,←⊂'</div>'
  html,←⊆GetFooter
  html,←⊂'</body>'
  html,←⊂'</html>'

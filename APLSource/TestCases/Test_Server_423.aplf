@@ -1,0 +1,11 @@
+ r←Test_Server_423(stopFlag batchFlag);⎕TRAP;html
+⍝ Ask for something that does not exist; pretends to be a Browser, which gets an error page not to be indexed
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←400 ∆GetHtmlFromServer'[localhost]/v1/no-such-thing'
+ →T.PassesIf∨/'<p class="page-label">Error 400</p>'⍷html
+ →T.PassesIf∨/'<meta name="robots" content="noindex">'⍷html
+
+ r←T._OK
+⍝Done

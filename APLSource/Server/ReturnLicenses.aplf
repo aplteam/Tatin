@@ -1,4 +1,4 @@
- response←ReturnLicenses request;data;response;html;path;txt;html2;ns;names;urls
+ response←ReturnLicenses request;data;response;html;path;txt;html2;ns;names;urls;bool
 ⍝ Returns information regarding the licenses tolerated by the server, if any.
  :If IsJsonRequest request.Headers
      :If G.INI.Exist'LICENSE'
@@ -13,23 +13,28 @@
          :EndIf
      :EndIf
  :Else
-     html←HtmlHeader''
+     html←(⍬'Licenses' '/get-licenses')HtmlHeader''
+     html,←⊂'<div class="page-head">'
      html,←⊂'<h2>Licenses</h2>'
-     html,←AddSpecialMessage ⍬
-     html,←⊂'<div style="max-width: 1000px;">'
+     html,←⊂'</div>'
+⍝ What the Registry demands is up to whoever runs it, hence a snippet rather than fixed text
      path←G.HTDOCS,'Assets/snippets/'
      txt←⊃F.NGET(path,'Licensing.md')1
      (html2 ns)←##.MarkAPL.Markdown2HTML txt
      'Converting License markdown failed'Reg.Assert ns.report
-     html,←html2
-     names←⊃G.INI.Get'LICENSE:names'
-     urls←⊃G.INI.Get'LICENSE:urls'
-     (html2 ns)←##.MarkAPL.Markdown2HTML urls{'* [',⍵,'](',⍺,')'}¨names
-     'Converting License markdown failed'Reg.Assert ns.report
-     html,←html2
+     html,←⊂'<div class="prose">'
+     html,←'</body'{⍵↑⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html2
      html,←⊂'</div>'
-     html←'</body'{⍵↑⍨¯1+((≢⍺)↑¨⍵)⍳⊂⍺}html
-     html,←GetFooter
+     names←⊆⊃G.INI.Get'LICENSE:names'
+     urls←⊆⊃G.INI.Get'LICENSE:urls'
+     bool←0<≢¨names                                  ⍝ The INI file starts both lists with an empty entry
+     :If ∨/bool
+         html,←⊂'<ul class="license-list">'
+         html,←(bool/urls){'<li><a href="',(EscapeAttributeValue ⍺),'">',(EscapeSpecialChars ⍵),'</a></li>'}¨bool/names
+         html,←⊂'</ul>'
+         html,←⊂'<p class="list-note">Each name leads to a description of that license.</p>'
+     :EndIf
+     html,←⊆GetFooter
      html,←⊂'</body>'
      html,←⊂'</html>'
      response←request ReturnHTML html

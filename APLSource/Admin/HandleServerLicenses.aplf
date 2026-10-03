@@ -1,7 +1,7 @@
  {r}←C HandleServerLicenses targetPath;ns;version;caption;NOTICE;report;from;to
 ⍝ Establishes the version numbers for Rumba and Plodder, adds them to NOTICE, then adds
-⍝ the licenses of the JavaScript libraries served from "Assets/" and finally the licenses
-⍝ for all packages the server depends on.
+⍝ the licenses of the fonts served from "Assets/" and finally the licenses for all packages
+⍝ the server depends on.
  r←0
  ns←⎕NS''
  '#.Plodder.Version'ns.⎕CY'Assets/Runtime/Plodder/Plodder.dws'
@@ -12,15 +12,12 @@
  version←{⍵↑⍨¯1+⍵⍳'+'}2⊃ns.Version
  caption←'## Rumba ',version
  NOTICE,←(caption'```'),(⊃⎕NGET'Assets/Runtime/Rumba/LICENSE' 1),'```' ''
-⍝ Unlike Plodder and Rumba these three have no version that could be interrogated: they are
-⍝ served as one combined download. When the bundle in "Assets/" is replaced by a newer one
-⍝ the version numbers must be updated here as well.
- caption←'## jQuery 3.6.0'
- NOTICE,←(caption'```'),(⊃⎕NGET'Assets/JS/LICENSE-jQuery' 1),'```' ''
- caption←'## DataTables 1.12.1'
- NOTICE,←(caption'```'),(⊃⎕NGET'Assets/JS/LICENSE-DataTables' 1),'```' ''
- caption←'## Responsive 2.3.0'
- NOTICE,←(caption'```'),(⊃⎕NGET'Assets/JS/LICENSE-Responsive' 1),'```' ''
+⍝ The fonts served from "Assets/Fonts/" come with the SIL Open Font License, which asks for the
+⍝ license to go with them
+ caption←'## Newsreader (font)'
+ NOTICE,←(caption'```'),(⊃⎕NGET'Assets/Fonts/OFL-Newsreader.txt' 1),'```' ''
+ caption←'## Source Sans 3 (font)'
+ NOTICE,←(caption'```'),(⊃⎕NGET'Assets/Fonts/OFL-SourceSans3.txt' 1),'```' ''
  from←C.HOME,'/packages'
  to←targetPath,'/Server/'
  report←NOTICE ##.Registry.CreateNoticeFile from to

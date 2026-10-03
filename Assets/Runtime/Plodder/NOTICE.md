@@ -1,6 +1,6 @@
 # Third-Party Licenses
 
-## Rumba 3.4.2-beta-1
+## Rumba 3.5.0
 
 ```
 MIT License

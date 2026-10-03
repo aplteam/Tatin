@@ -1,17 +1,23 @@
- crash←CreateCrashNamespace(parms Trap)
+ crash←CreateCrashNamespace(parms Trap qdmx);own;noOf;caller
  crash←⎕NS''
  crash.(AN DM EN XSI LC WSID TID TNUMS)←⎕AN ⎕DM ⎕EN ⎕XSI ⎕LC ⎕WSID ⎕TID ⎕TNUMS
  crash.WA←⎕WA
  crash.Trap←Trap
+ caller←Caller
+ crash.(IO ML)←caller.(⎕IO ⎕ML)
  crash.CurrentDir←FilesAndDirs.PWD
  crash.CommandLine←2 ⎕NQ'#' 'GetCommandLine'
  :Trap (parms.trapInternalErrors)/0
      crash.(Category DM EM HelpURL EN ENX InternalLocation Message OSError)←qdmx.(Category DM EM HelpURL EN ENX InternalLocation Message OSError)
-     crash.(XSI LC)←1↓¨crash.(XSI LC)
+     own←(⍕⎕THIS),'.'                           ⍝ Functions of HandleError and its API...
+     noOf←+/∧\(⊂own)≡¨(≢own)↑¨crash.XSI        ⍝ ...are on top of the stack...
+     crash.(XSI LC)←noOf↓¨crash.(XSI LC)        ⍝ ...but not part of the problem
  :EndTrap
  :If 0≠≢parms.addToMsg
      crash.addedMsg←parms.addToMsg
  :EndIf
  :If parms.saveVars
-     crash←SaveVisibleVars crash
+     :Trap (parms.trapInternalErrors)/0
+         crash←SaveVisibleVars crash
+     :EndTrap
  :EndIf

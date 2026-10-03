@@ -1,14 +1,16 @@
- {r}←CheckErrorFolder parms;buff;wsid
+ {r}←CheckErrorFolder parms;buff
  r←⍬
  :If 0=≢parms.errorFolder
-     :If 0=≢wsid←⎕WSID
-         ⎕WSID←'Error-WS'
+     :If 'CLEAR WS'≡⎕WSID
+         buff←''
+     :ElseIf 0=≢⎕WSID                           ⍝ Probably a stand-alone EXE
+         buff←2⊃⎕NPARTS{'"'∊⍵:1↓⍵/⍨1=+\'"'=⍵ ⋄ ⍵↑⍨¯1+⍵⍳' '}2 ⎕NQ'#' 'GetCommandLine'
+     :Else
+         buff←2⊃⎕NPARTS ⎕WSID
      :EndIf
-     :If 0=≢buff←2⊃⎕NPARTS wsid
-         buff←2⊃⎕NPARTS{'"'∊⍵:1↓⍵/⍨1=+\'"'=⍵ ⋄ ⍵↑⍨¯1+⍵⍳' '}2 ⎕NQ'#' 'GetCommandLine' ⍝ Probably a stand-alone EXE
-     :EndIf
+     buff←{0=≢⍵:'ERROR_WS' ⋄ ⍵}buff
      :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
-         parms.errorFolder←(⊃⎕CMD'ECHO %LOCALAPPDATA%'),'/',buff,'\Errors'
+         parms.errorFolder←(2 ⎕NQ'.' 'GetEnvironment' 'LOCALAPPDATA'),'/',buff,'\Errors'
      :Else
          parms.errorFolder←FilesAndDirs.PWD,'/Errors'
      :EndIf
@@ -19,9 +21,5 @@
  :EndIf
  :If 0=⎕NEXISTS parms.errorFolder
  :AndIf parms.checkErrorFolder
-     :If 'Win'≡APLTreeUtils2.GetOperatingSystem ⍬
-         FilesAndDirs.MkDir parms.errorFolder
-     :Else
-         ⎕SH'mkdir -p "',parms.errorFolder,'"'
-     :EndIf
+     3 ⎕MKDIR parms.errorFolder
  :EndIf

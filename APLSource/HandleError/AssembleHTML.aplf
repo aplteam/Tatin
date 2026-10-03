@@ -1,4 +1,4 @@
- html←AssembleHTML(parms crash)
+ html←AssembleHTML(parms crash filename)
  html←'<!DOCTYPE html>',CR
  html,←'<html lang="en">',CR
  html,←'<head>',CR
@@ -20,22 +20,22 @@
  html,←'  <h1>',('/'APLTreeUtils2.Last filename),'</h1>',CR
  html,←'  <table id="apl">'
  html,←'  Version'MarkupAsTableRow⍕'#'⎕WG'APLVersion'
- html,←'  ⎕WSID'MarkupAsTableRow⍕{'/'APLTreeUtils2.Last ⍵ ⋄ ⍵}⍣('/'∊crash.WSID)⊣1↓' ',crash.WSID  ⍝ Enforce ⎕DR 80/82 with 1↓' ',
- html,←'  ⎕IO'MarkupAsTableRow⍕⎕IO
- html,←'  ⎕ML'MarkupAsTableRow⍕⎕ML
- html,←'  ⎕WA'MarkupAsTableRow⍕⎕WA
- html,←'  ⎕TNUMS'MarkupAsTableRow{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⍕¨⍵}⎕TNUMS
+ html,←'  ⎕WSID'MarkupAsTableRow⍕{'/'APLTreeUtils2.Last ⍵}⍣('/'∊crash.WSID)⊣1↓' ',crash.WSID  ⍝ Enforce ⎕DR 80/82 with 1↓' ',
+ html,←'  ⎕IO'MarkupAsTableRow⍕crash.IO
+ html,←'  ⎕ML'MarkupAsTableRow⍕crash.ML
+ html,←'  ⎕WA'MarkupAsTableRow⍕crash.WA
+ html,←'  ⎕TNUMS'MarkupAsTableRow{0=≢⍵:⍵ ⋄ ⊃{⍺,',',⍵}/⍕¨⍵}crash.TNUMS
  html,←'  Category'MarkupAsTableRow crash.Category
- html,←'  EM'MarkupAsTableRow crash.EM
- html,←'  HelpURL'MarkupAsTableRow crash.HelpURL
+ html,←'  EM'MarkupAsTableRow ExchangeHtmlChars crash.EM
+ html,←'  HelpURL'MarkupAsTableRow ExchangeHtmlChars crash.HelpURL
  html,←'  EN'MarkupAsTableRow⍕crash.EN
  html,←'  ENX'MarkupAsTableRow⍕crash.ENX
  html,←'  InternalLocation'MarkupAsTableRow⍕crash.InternalLocation
- html,←'  OSError'MarkupAsTableRow⍕crash.OSError
- html,←'  Current Dir'MarkupAsTableRow⍕crash.CurrentDir
- html,←'  Command line'MarkupAsTableRow⍕crash.CommandLine
+ html,←'  OSError'MarkupAsTableRow ExchangeHtmlChars⍕crash.OSError
+ html,←'  Current Dir'MarkupAsTableRow ExchangeHtmlChars⍕crash.CurrentDir
+ html,←'  Command line'MarkupAsTableRow ExchangeHtmlChars⍕crash.CommandLine
  :If 0≠≢parms.addToMsg
-     html,←'  Added Msg'MarkupAsTableRow parms.addToMsg
+     html,←'  Added Msg'MarkupAsTableRow ExchangeHtmlChars parms.addToMsg
  :EndIf
  html,←'  </table>'
  html,←'<p><b>Stack:</b></p>',CR
@@ -46,7 +46,7 @@
  :If 0≠≢crash.DM
      html,←'<pre>',(ExchangeHtmlChars⊃,/CR,¨crash.DM),CR
      :If 0<≢crash.Message
-         html,←crash.Message,CR
+         html,←(ExchangeHtmlChars crash.Message),CR
      :EndIf
      html,←'</pre>',CR
  :EndIf

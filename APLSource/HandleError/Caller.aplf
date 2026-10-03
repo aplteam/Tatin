@@ -1,0 +1,7 @@
+ r←Caller
+⍝ Returns a reference to the namespace the failing function was running in.\\
+⍝ `⎕RSI` holds the namespaces the functions on the stack were called from: the first one that is
+⍝ neither HandleError nor its API is the one we are after. Falls back to `#`.\\
+⍝ Namespace-scoped system variables like `⎕IO` and `⎕ML` must be read through this reference: read
+⍝ directly inside HandleError they report HandleError's own values.
+ r←⊃(⎕RSI~⎕THIS ⎕THIS.API),#

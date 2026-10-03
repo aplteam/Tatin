@@ -1,35 +1,25 @@
- r←{force}SetTrap parameterSpaceName;⎕TRAP;⎕ML;⎕IO;calledFrom
+ r←{force}SetTrap parameterSpaceName;⎕ML;⎕IO;parent
 ⍝ Returns a vector useful to set `⎕TRAP`.
 ⍝ It behaves differently depending on whether it's a development session or not.\\
-⍝ The right argument can be either an empty vector or the name of a parameter space.\\
+⍝ The right argument can be either an empty vector or the name (but not a ref!) of a parameter space.\\
 ⍝ The left argument defaults to 0. Setting this to 1 enforces error
 ⍝ trapping even under a development exe. Useful for test cases.
- ⎕TRAP←0⍴⎕TRAP
  ⎕IO←1 ⋄ ⎕ML←0
  force←{0=⎕NC ⍵:0 ⋄ ⍎⍵}'force'
  r←(0 1000)'S'
- calledFrom←{⌽{⍵/⍨2≤+\'.'=⍵}⌽⍵}1⊃⎕XSI
+ parent←⍕⎕THIS
+ :If 9=⎕NC'parameterSpaceName'
+ :AndIf ⎕NULL≢parameterSpaceName
+     'Invalid right argument: must be the name of a namespace, not a reference'⎕SIGNAL 11
+ :EndIf
  :If ~(⊂parameterSpaceName)∊''⍬
+     parameterSpaceName←⍕parameterSpaceName
      'Invalid right argument - not a named namespace'⎕SIGNAL 11/⍨∧/'[]'∊⍕parameterSpaceName
      'Invalid right argument - not a named namespace'⎕SIGNAL 11/⍨~{11::0 ⋄ 9=⎕NC ⍵}parameterSpaceName
  :EndIf
- parameterSpaceName←⍕parameterSpaceName
- :If 0≠≢parameterSpaceName
-     :If 1≠≡,parameterSpaceName
-     :OrIf ~(⎕DR parameterSpaceName)∊80 82 160
-         'Invalid right argument: must be a name'⎕SIGNAL 11
-     :EndIf
- :EndIf
  :If 0=≢parameterSpaceName  ⍝ At a very early stage error trapping does not make sense
  :AndIf (0=APLTreeUtils2.IsDevelopment)∨force
-     r←⊂0 'E'(calledFrom,'HandleError.Process ⍬')
- :Else
-     :If (0=APLTreeUtils2.IsDevelopment)∨force
-         :If ∨/'._tatin.'⍷calledFrom
-             calledFrom←({⌽{⍵/⍨1≤+\'.'=⍵}⌽⍵}1⊃⎕XSI),'API.'
-             r←⊂0 'E'(calledFrom,'Process ''',parameterSpaceName,'''')
-         :Else
-             r←⊂0 'E'(calledFrom,'HandleError.Process ''',parameterSpaceName,'''')
-         :EndIf
-     :EndIf
+     r←⊂0 'E'(parent,'.Process ⍬')
+ :ElseIf force∨0=APLTreeUtils2.IsDevelopment
+     r←⊂0 'E'(parent,'.Process ''',parameterSpaceName,'''')
  :EndIf

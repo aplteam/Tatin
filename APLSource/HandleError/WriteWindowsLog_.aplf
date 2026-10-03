@@ -1,11 +1,11 @@
  {r}←WriteWindowsLog_(source type message);eventLog;sep;⎕USING;buffer;⎕ML
 ⍝ This function writes to the Windows Event Log.
-⍝ "message" must either be a string or a vector of strings.
-⍝ "type"
+⍝ * "message" must either be a string or a vector of strings.
+⍝ * "type" must be one of EventLogEntryType
  ⎕ML←1
  r←⍬
  ⎕USING←'System,system.dll' 'System.Diagnostics,system.dll'
-    ⍝ Should check the source/log exist.
+ ⍝ Should check the source/log exist.
  eventLog←⎕NEW EventLog
  eventLog.Source←source
  sep←⎕UCS 10

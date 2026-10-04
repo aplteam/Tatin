@@ -1,20 +1,16 @@
-[parm]:toc             = 2 3 4
-[parm]:title = 'Tatin & README'
-
-
-
 # Implementation plan: rendering package READMEs on tatin.dev
 
-Assumes familiarity with the Tatin server.
+Assumes familiarity with the Tatin server. No SEO knowledge required.
 
-Page model this plan assumes (Tatin treats each major version as a distinct package):
+**Page model this plan assumes** (Tatin treats each major version as a distinct package):
 
 | URL | Role | Change |
 |---|---|---|
-| `/v1/packages/details/<name>-<version>` | One release. Immutable snapshot. | `noindex` |
+| `/v1/packages/details/<name>-<version>` | One release. Immutable snapshot. | Canonical tag only |
 | `/v1/packages/versions/<name>-<major>` | **The package page.** Currently a bare link table. | Renders the README |
-| `/v1/packages/major_versions/<name>` | Disambiguation hub listing major lines. | `noindex`|
+| `/v1/packages/major_versions/<name>` | Disambiguation hub listing major lines. | `noindex` only |
 
+---
 
 ## 1. Storage
 
@@ -26,60 +22,66 @@ Add to the **version** record:
 | `readmeSourceUrl` | The `https://github.com/<group>/<repo>/blob/v{x}.{y}.{z}/README.md` URL, for attribution. |
 | `readmeStatus` | `ok` / `none` — so gaps are visible. |
 
-`readmeMarkdown` is capped at ~256 KB. Anything larger is almost certainly not a README; we record `none` and move on.
+Cap `readmeMarkdown` at ~256 KB. Anything larger is almost certainly not a README; record `none` and move on.
 
-Rendered HTML should be cached.
+Rendered HTML can be cached separately or generated on request — MarkAPL is fast and the input is bounded and immutable.
 
-Only the newest release in each major line is ever rendered (§5).
+Only the newest release in each major line is ever rendered (§5), but storing per version costs little and leaves the option open to render on Details pages later.
+
+---
 
 ## 2. Fetching
 
 Trigger: **on publish**, after the release is accepted and stored. Never before — a fetch failure must not affect the publish outcome.
 
-Tatin release tags follow `v{x}.{y}.{z}`, so the URL is derivable:
+Tatin release tags follow `v{x}.{y}.{z}`, so the URL is derivable rather than guessable:
 
-1. Strip build metadata: take the version string up to `+` (`1.3.0+1` ==> `1.3.0`)
-1. Fetch `https://raw.githubusercontent.com/<group>/<repo>/v{x}.{y}.{z}/README.md`
-1. On 404, retry once without the leading "v" in the version number (for old packages)
-1. On 404 again, record `readmeStatus` = `none` and give up.
+1. Strip build metadata: take the version string up to `+` (`1.3.0+1` → `1.3.0`).
+2. Fetch `https://raw.githubusercontent.com/<group>/<repo>/v{x}.{y}.{z}/README.md`
+3. On 404, retry once as `.../{x}.{y}.{z}/README.md` — older tags predate the `v` convention.
+4. On 404 again, record `readmeStatus` = `none` and stop.
 
 Derive `<group>` and `<repo>` from `project_url`, tolerating a trailing `/` and a trailing `.git`.
 
-* No HEAD fallback
+**No HEAD fallback.** A tag either exists or it does not. Falling back to the default branch would attach the current documentation to a release it does not describe — which on a dormant major line means publishing instructions that do not work. A clean absence is better than a confident error.
 
-  A tag either exists or it does not. Falling back to the default branch would attach the current documentation to a release it does not describe — which on a dormant major line means publishing instructions that potentially do not work. A clean absence is better than a confident error.
+Use `raw.githubusercontent.com`, not the GitHub API: the API imposes a 60 requests/hour unauthenticated limit, the raw host does not, and no token is required.
 
-  Use `raw.githubusercontent.com`, not the GitHub API: the API imposes a 60 requests/hour unauthenticated limit, the raw host does not, and no token is required.
+**Case sensitivity:** GitHub's web interface resolves `readme.md` and `README.md` interchangeably; `raw.githubusercontent.com` does not. `README.md` is the correct single candidate. If an unexplained 404 rate appears later, this is the first thing to check.
 
-* Case sensitivity
+**Timeouts and failure:** hard timeout of a few seconds per attempt. Any failure records `none`, logs, and continues. The publish succeeds regardless.
 
-  GitHub's web interface resolves `readme.md` and `README.md` interchangeably; `raw.githubusercontent.com` does not.
-
-  `README.md` is the correct single candidate. If an unexplained 404 rate appears later, this is the first thing to check.
-
-* Timeouts and failure
-
-  Hard timeout of a few seconds per attempt. Any failure records `none`, logs, and continues. (The package is already published by then anyway)
-
+---
 
 ## 3. Sanitising
 
-The markdown is third-party content being rendered into Tatin's pages. Before the MarkAPL conversion:
+The markdown is third-party content being rendered into your pages. Before or after MarkAPL conversion:
 
-* Strip all HTML tags from the markdown.
-* Demote headings by one level --- a README's `#` becomes `<h2>`, so it does not compete with the page's own `<h1>`.
+- **Strip** `<script>`, `<style>`, `<iframe>`, `<object>`, `<embed>`, `<form>` and their contents.
+- **Strip** all `on*` attributes (`onclick`, `onerror`, `onload`, …).
+- **Strip** `javascript:` and `data:` URI schemes from `href` and `src`.
+- **Demote headings by one level** — a README's `#` becomes `<h2>`, so it does not compete with the page's own `<h1>`. Cascade downward, clamping at `<h6>`.
+- **Namespace anchor IDs** — prefix heading IDs generated from the README (e.g. `readme-installation`) so they cannot collide with IDs your template already emits.
 - Add `rel="nofollow noopener"` to outbound links from README content.
 
+The simplest robust approach is an allow-list of permitted tags and attributes applied to MarkAPL's output, rather than blocklisting markdown constructs on the way in.
+
+---
 
 ## 4. Rewriting relative paths
 
 READMEs use paths relative to the repository. Left alone, every image 404s against tatin.dev.
 
-For any `src` or `href` that is not absolute and does not begin with `#`, resolve against the same tag the README came from --- not the default branch, so images stay consistent with the documentation:
+For any `src` or `href` that is not absolute and does not begin with `#`, resolve against **the same tag the README came from** — not the default branch, so images stay consistent with the documentation:
 
 - **Images** → `https://raw.githubusercontent.com/<group>/<repo>/v{x}.{y}.{z}/<path>`
 - **Links** → `https://github.com/<group>/<repo>/blob/v{x}.{y}.{z}/<path>`
 
+Leave in-page anchors (`#section`) alone — they resolve correctly once IDs are namespaced (§3).
+
+Badge images (shields.io and similar) are absolute URLs and need no handling.
+
+---
 
 ## 5. Page changes
 
@@ -90,14 +92,15 @@ This page currently has no content of its own. It gains the README of the **newe
 Suggested order — distinctive content before boilerplate:
 
 1. Package name and description
-1. **README section** (new, collapsible)
-1. Existing table of releases (as now)
+2. Install command
+3. **README section** (new)
+4. Existing table of releases (as now)
 
-Note that this needs no update logic. The newest release in a line changes only when something is published to that line, and that publish is what fetched the README. A deprecated line simply stops changing, and correctly retains the documentation that was current when it was maintained.
+Note that this needs no update logic. The newest release in a line changes only when something is published to that line, and that publish is what fetched the README. A line demoted by a new major version simply stops changing, and correctly retains the documentation that was current when it was maintained.
 
 ### 5b. Attribution line
 
-Adjacent to the rendered README we add:
+Adjacent to the rendered README:
 
 ```
 README from <readmeSourceUrl>
@@ -107,24 +110,25 @@ This credits the author and gives visitors a route to the source. Because the UR
 
 ### 5c. Fallback
 
-If `readmeStatus` is not `ok`, or the markdown renders to fewer than ~200 characters of text, we omit the section entirely. No empty heading, no "no README available" notice.
+If `readmeStatus` is not `ok`, or the markdown renders to fewer than ~200 characters of text, omit the section entirely. No empty heading, no "no README available" notice.
 
 ### 5d. Details pages
 
 Unchanged, apart from the canonical tag in §6. They remain configuration snapshots.
 
+---
 
 ## 6. Canonical tags
 
-On each Details page, we add to `<head>`:
+On each Details page, add to `<head>`:
 
 ```html
 <link rel="canonical" href="https://tatin.dev/v1/packages/versions/<name>-<major>">
 ```
 
-This tells Google the releases are variants and consolidates them onto the package page. 
+This tells Google the releases are variants of one package and consolidates them onto the package page. It hides nothing; Details pages remain fully accessible to visitors.
 
-On `major_versions/<name>` — a pure index with no content of its own and no prospect of any — we add:
+On `major_versions/<name>` — a pure index with no content of its own and no prospect of any — add:
 
 ```html
 <meta name="robots" content="noindex,follow">
@@ -132,61 +136,109 @@ On `major_versions/<name>` — a pure index with no content of its own and no pr
 
 Visitors still reach it; Google follows the links out of it and stops trying to index an index.
 
-`versions/<name>-<major>` should be left free of both. It is the page we want indexed.
+Leave `versions/<name>-<major>` free of both. It is the page you want indexed.
 
+---
 
-## 7. Retrofit
+## 7. Backfill
 
-Run this once:
+One-off script:
 
-1. Enumerate distinct `<name>-<major>` combinations
-1. For each, find the newest version record
-1. Run the §2 fetch for it
-1. Rate-limit to roughly one request per second as courtesy to raw.githubusercontent.com (not a hard requirement)
-1. Save `ok` or `none`
+1. Enumerate distinct `<name>-<major>` combinations.
+2. For each, find the newest version record.
+3. Run the §2 fetch for it.
+4. Rate-limit to roughly one request per second — a courtesy to raw.githubusercontent.com, not a hard requirement.
+5. Log the tally of `ok` / `none`.
 
-Because the fetch keys on the release's own tag, historical releases backfill just as accurately as new ones --- there is no need to distinguish current from dormant lines.
+Because the fetch keys on the release's own tag, historical releases backfill just as accurately as new ones — there is no need to distinguish current from dormant lines.
 
-Roughly two-thirds will succeed (81 of 121 packages in the survey). We should review the `none` entries once: most will be genuine absences, but a cluster sharing a group may indicate a tagging convention worth accommodating.
+Expect roughly two-thirds success (81 of 121 packages in the survey). Review the `none` entries once: most will be genuine absences, but a cluster sharing a group may indicate a tagging convention worth accommodating.
 
+Optionally backfill every version rather than only the newest per line. Nothing renders them today, but the data is correct and costs little.
+
+---
 
 ## 8. Refresh
 
-There is none, and none is needed.
+**There is none, and none is needed.**
 
-The one useful admin operation is a **manual re-fetch for a single version**, to fill a record whose tag was pushed after the Tatin publish. Even that will fix itself when the next version of the packafe is published.
+Every README is tied to a Git tag, and tags do not move. A release's README is correct the moment it is fetched and stays correct forever. New documentation reaches tatin.dev with the next release, which is also when the package page's newest-release lookup picks it up.
 
+The one useful admin operation is a **manual re-fetch for a single version**, to fill a record whose tag was pushed after the Tatin publish.
+
+---
 
 ## 9. Sitemap
 
-There are good reasons to have a sitemap that lists `versions/<name>-<major>` pages and omits Details pages. 
+If tatin.dev serves a sitemap, ensure it lists `versions/<name>-<major>` pages and **omits** Details pages. If it does not serve one, generating a simple sitemap of package pages is a small addition worth doing at the same time.
 
-This topic is discussed in its own document, see there.
-
+---
 
 ## 10. Verification
 
 After deployment:
 
 1. View a package page's HTML source; confirm the README is present, visible and sanitised.
-1. Check a package with two major lines. Confirm each page shows its own line's documentation, not the newer line's.
-1. Confirm the canonical tag on a Details page points at the right `versions/<name>-<major>` URL.
-1. In Search Console, run *URL Inspection ==> Test live URL ==> View tested page ==> HTML* on one package page. Confirm the README text is in what Google receives.
-1. Wait. Re-indexing is measured in weeks. 
-
-   Check the Pages report after a month: expect "Crawled – currently not indexed" to fall and "Alternate page with proper canonical tag" to rise correspondingly. That shift is the intended outcome.
+2. Check a package with two major lines. Confirm each page shows its own line's documentation, not the newer line's.
+3. Confirm the canonical tag on a Details page points at the right `versions/<name>-<major>` URL.
+4. In Search Console, run **URL Inspection → Test live URL → View tested page → HTML** on one package page. Confirm the README text is in what Google receives.
+5. Wait. Re-indexing is measured in weeks. Check the Pages report after a month: expect "Crawled – currently not indexed" to fall and "Alternate page with proper canonical tag" to rise correspondingly. That shift is the intended outcome, not a regression.
 
 Do not use "Request Indexing" for more than a couple of spot checks — it handles individual URLs, not site-wide changes.
 
+---
 
 ## Order of work
 
-1. Sitemap (§9)
 1. Storage field (§1)
-1. Fetch logic + backfill script (§2, §7) — run the backfill and inspect results before touching templates
-1. Sanitise + path rewriting (§3, §4)
-1. Package page rendering (§5)
-1. Canonical and `noindex` tags (§6)
+2. Fetch logic + backfill script (§2, §7) — run the backfill and inspect results before touching templates
+3. Sanitise + path rewriting (§3, §4)
+4. Package page rendering (§5)
+5. Canonical and `noindex` tags (§6)
+6. Sitemap (§9)
 
-Steps 2–5 deliver the entire user-facing benefit. Steps 6+7 are what make the search side work, and can follow later without rework.
+Steps 1–4 deliver the entire user-facing benefit. Steps 5–6 are what make the search side work, and can follow later without rework.
 
+---
+
+## 11. Documentation still to write
+
+Nothing in `docs/` has been touched. Deliberately: the behaviour is still moving. Write it
+once the shape is settled, and before the release that ships it.
+
+**For whoever publishes a package** — `publish-packages.md`, possibly a line in
+`before-you-publish.md`:
+
+- The README shown on a package page is fetched from GitHub, from the tag of that very
+  release. It is not taken from the package, and nothing has to be added to
+  `apl-package.json`.
+- What it takes for that to work: `project_url` must name a GitHub repository, the release
+  must be tagged `v1.2.3` or `1.2.3`, and the file must be called `README.md` exactly —
+  `raw.githubusercontent.com` is case sensitive even though the GitHub website is not.
+- Fetching happens after publishing, not during it, so a publish never waits for GitHub and
+  never fails because of it.
+- It is tried three times: straight away, 24 hours later, and a week after the first
+  attempt. A tag pushed more than a week after the package was published will therefore be
+  missed, and needs the manual re-fetch of §8.
+- Only the newest release of each major version line is rendered.
+
+**For whoever runs a Registry** — `maintenance.md`, `install-server.md`:
+
+- Three new files appear, all written and owned by the server: `apl-readme.md` and
+  `apl-readme.json` inside each package folder, and `apl-readme-sweep.json` in the root of
+  the Registry. None of them is part of a package and none reaches a client.
+- `apl-package.json` is not touched.
+- Deleting a package's `apl-readme.json` makes that package due again, but only for the
+  next walk over the Registry — and a walk starts only when something has been published
+  or a day has passed. Deleting records therefore starts nothing on its own. To force a
+  re-fetch now, run `BackfillReadmes`, or delete `apl-readme-sweep.json` as well so the
+  next housekeeping call walks.
+- After upgrading to the release that brings this, run `BackfillReadmes` once rather than
+  waiting for the daily walk to work through an established Registry.
+- The walk runs in a thread and is throttled to one request per second, so it is polite to
+  GitHub and invisible to visitors.
+
+**Release notes** for whichever version ships it: no action required beyond the optional
+backfill, and a note that package pages now carry documentation.
+
+**Not needed:** `api.md`. Nothing here is part of the public API - it is all server side.

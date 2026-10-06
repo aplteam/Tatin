@@ -18,22 +18,21 @@
          buff←⎕FMT⍪{⍪('--- Entries in cache for ',(1⊃⍵),':')(⍪2⊃⍵)}¨list
      :EndIf
  :Else
-     ⍞←'Nothing found in ',TC.GetPathToPackageCache,⎕UCS 10
+     ⍞←'Nothing found in ',TC.GetPathToPackageCache,⎕UCS 13
  :EndIf
  :If 0<≢list
  :AndIf Arg.clear
      :If Arg.force
          flag←1
      :Else
-         ⍞←buff
-         ⍞←⎕UCS 10
+         ⍞←buff,⎕UCS 13
          flag←TC.C.YesOrNo'Sure that you want delete these from the Tatin package cache?'
      :EndIf
  :AndIf flag
      (rc report)←TC.ClearCache url
      :If 0=rc
-         ⍞←'Cache successfully cleared',⎕UCS 10
+         ⍞←'Cache successfully cleared',⎕UCS 13
      :Else
-         ⍞←'Attempt to delete these failed:'(,⊃,/CR¨,⊆report),⎕UCS 10
+         ⍞←'Attempt to delete these failed:'(,⊃,/CR¨,⊆report),⎕UCS 13
      :EndIf
  :EndIf

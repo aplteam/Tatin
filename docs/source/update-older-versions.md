@@ -10,7 +10,7 @@ keywords:
 
 ## Versions before 0.105.0
 
-Tatin Version 0.105.0 introduced the [`]Tatin.Update` user command](user-commands.md#update).
+Tatin Version 0.105.0 introduced the [`]Tatin.UpdateTatin` user command](user-commands.md#update-tatin).
 
 To update an earlier version:
 
@@ -67,3 +67,4 @@ Updates will then work as expected.
         ]activate -reset
 
     you also recreate the problem.
+

@@ -365,9 +365,9 @@ These are refs to the package cache in `#._tatin`.
       #.Foo.MarkAPL           ⍝ ref to API of cached package
 #._tatin.aplteam_MarkAPL_13_1_0.API
       #._tatin.⎕NL 9          ⍝ content of package cache
-aplteam-APLTreeUtils2-1.4.0
-aplteam-CommTools-1.8.1
-aplteam-FilesAndDirs-5.8.0
+aplteam-APLTreeUtils2_1.4.0
+aplteam-CommTools_1.8.1
+aplteam-FilesAndDirs_5.8.0
 aplteam_MarkAPL_13_1_0
 my_Foo_1_0_0
 my_Goo_1_1_0
@@ -466,4 +466,5 @@ So any package function can refer to its metadata
 
 `URI`
 : _String._ Source from which the package was loaded: URL or file path.
+
 

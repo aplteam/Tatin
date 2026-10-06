@@ -458,12 +458,13 @@ The full package name. This will include a build ID if there is any, so it is no
 
 In a package config file, a function can be defined on the `lx` parameter. Such a function would be executed after the package was loaded. The purpose of the function is to perform some sort of initialisation.
 
-If such a function returns a result, then it is assigned to `LX` in the `TatinVars` namespace.
+Such a function must return a result, which will be assigned to `LX` in the `TatinVars` namespace.
 
-Note that `LX` does not exist in case no such function is defined, or the function did not return a result.
+Note that `LX` does not exist in case no such function is defined.
 
 
 #### URI
 
 Character vector that holds the address of a Tatin server the package was loaded from, or the full name of a ZIP file.
+
 

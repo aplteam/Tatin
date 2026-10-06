@@ -143,7 +143,7 @@ Required parameters are marked; others are optional.
 `group=`
 : Restrict the packages to be copied to a particular group.
 
-    Dependencies will always be copied bby default, no matter which group they belong to, but check `dependencies` further down.
+    Dependencies will always be copied by default, no matter which group they belong to, but check `dependencies` further down.
 
 `latest`
 : Copy only the latest of each major version of each non-deprecated package.
@@ -829,7 +829,7 @@ The flags in `options`:
 ## Load packages
 
 ```
-no←{noBetas} LoadPackages (identifiers targetSpace)
+no←{noBetas} LoadPackages (identifiers targetSpace [rootPath])
 ```
 
 Where
@@ -1085,6 +1085,8 @@ Returns as strings Tatin’s name, version and date.
 │Tatin│0.112.1+1942│2024-08-16│
 └─────┴────────────┴──────────┘
 ```
+
+
 
 
 

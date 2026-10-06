@@ -16,6 +16,19 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
+## v0.129.1 ⋄ 2026-10-06
+
+## Server
+
+If your server sits behind Apache, add `disablereuse=On` to the `ProxyPass` line of its virtual host:
+
+    ProxyPass / http://localhost:8081/ disablereuse=On retry=0
+
+Apache otherwise keeps a connection to Tatin for reuse while Tatin closes it once it has been idle for `[CONFIG]IdleConnectionTimeout` seconds, and a request that lands on such a connection is answered with a 502 instead of reaching Tatin at all.
+On tatin.dev that cost about one request in eighty, most of them from crawlers, and it is invisible in Tatin's own log because the request never arrives.
+This is not new in this version; the recommendation is.
+See [Reverse proxy](secure-server.md#reverse-proxy).
+
 ## v0.128.0 ⋄ 2026-10-03
 
 The web pages of a Tatin server were redesigned. This concerns whoever runs a server; for anybody using a Registry nothing changes but the looks of the pages.

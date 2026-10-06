@@ -415,9 +415,12 @@ API:
 
 ## List versions
 
-    ]TATIN.ListVersions pattern
+    ]TATIN.ListVersions [pattern]
 
 Where `pattern` is a [search pattern](#search-patterns), list all versions of the package.
+
+If the argument is omitted, `]ListVersions` looks for open Cider projects.
+If one is open, use it; if multiple, ask which.
 
 If the registry is specified as `?` or `[?]`, ask the user to choose one.
 
@@ -452,6 +455,7 @@ unless `source` is `[MyUCMDs]`, when it defaults to `⎕SE`.
 
 If no arguments are specified, look for open Cider projects.
 If one is open, use it; if multiple, ask which.
+
 If the Cider project config defines multiple installation folders, ask which to use.
 
 -----------------|----------------------------------------------------
@@ -821,6 +825,7 @@ Show the installed and minimum required versions of the Principal Registry.
 
 API:
 [`Version`](api.md#version)
+
 
 
 

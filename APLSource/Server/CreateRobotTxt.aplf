@@ -1,10 +1,11 @@
  response←CreateRobotTxt request;txt;baseURL
 ⍝ Creates a file "robots.txt"
+⍝ Nothing is disallowed, on purpose: a crawler must fetch a page in order to see a "noindex"
+⍝ tag, and a page it is forbidden to fetch can still be indexed by its URL alone. A page that
+⍝ should stay out of an index therefore carries "noindex" and stays fetchable; see
+⍝ `search-engines.md`.
  txt←''
  txt,←⊂'User-agent: *'
- txt,←⊂'Disallow: /v1/tags'
- txt,←⊂'Disallow: /v1/credential-report'
- txt,←⊂'Disallow: /v1/version-information'
  txt,←⊂'Crawl-delay: 10'        ⍝ Ignored by Google but honoured by Bing & Yandex & Yahoo at the time of writing (2024-12)
  :If HasSitemap
  :AndIf 0<≢baseURL←GetBaseURL request

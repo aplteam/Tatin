@@ -1,5 +1,7 @@
  r←Test_Server_014(stopFlag batchFlag);⎕TRAP;request;response;ind
-⍝ Requests "robots.txt" and checks that it points to the sitemap
+⍝ Requests "robots.txt" and checks that it points to the sitemap and disallows nothing.
+⍝ A disallowed page cannot be fetched, so its "noindex" is never seen and, when something
+⍝ links to it, it can be indexed by its URL alone. Hence no path may be disallowed here.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
@@ -12,6 +14,9 @@
  →T.PassesIf∨/'User-agent: *'⍷response.Content
  →T.PassesIf∨/'Sitemap: https://'⍷response.Content
  →T.PassesIf∨/'/sitemap.xml'⍷response.Content
+ →T.PassesIf~∨/'Disallow: /v1/tags'⍷response.Content
+ →T.PassesIf~∨/'Disallow: /v1/credential-report'⍷response.Content
+ →T.PassesIf~∨/'Disallow: /v1/version-information'⍷response.Content
 
  r←T._OK
 ⍝Done

@@ -16,18 +16,12 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.129.1 ⋄ 2026-10-06
+## v0.128.1 ⋄ 2026-10-07
 
-## Server
+* The configuration page and the dependencies page of a release are no longer indexed by search engines: they carry "noindex" rather than a canonical link naming the package page, which search engines ignored. Both pages stay reachable and linked.
+* The tags page, the credential report and the version information are no longer indexed either, and "robots.txt" does not disallow anything any more. The two go together: a crawler must fetch a page in order to see its "noindex", and a page it may not fetch can still be indexed by its URL alone, with no title and no description. All three are linked from the menu or the footer of every page, which is what made them candidates.
+* Every tag of every package on the package list links to that list filtered by the tag, and the filtering happens in the browser, so all those URLs return the same page. The page now carries a canonical link naming the URL without the tag, so that a search engine treats them as one page rather than crawling hundreds of them and indexing none.
 
-If your server sits behind Apache, add `disablereuse=On` to the `ProxyPass` line of its virtual host:
-
-    ProxyPass / http://localhost:8081/ disablereuse=On retry=0
-
-Apache otherwise keeps a connection to Tatin for reuse while Tatin closes it once it has been idle for `[CONFIG]IdleConnectionTimeout` seconds, and a request that lands on such a connection is answered with a 502 instead of reaching Tatin at all.
-On tatin.dev that cost about one request in eighty, most of them from crawlers, and it is invisible in Tatin's own log because the request never arrives.
-This is not new in this version; the recommendation is.
-See [Reverse proxy](secure-server.md#reverse-proxy).
 
 ## v0.128.0 ⋄ 2026-10-03
 
@@ -504,6 +498,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

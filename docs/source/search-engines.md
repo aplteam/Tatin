@@ -37,12 +37,13 @@ Hence the trap. If a page carries `<meta name="robots" content="noindex">` *and*
 
 ## The page model
 
-Tatin treats each major version as a distinct package, so one package name produces three kinds of page. They are treated quite differently:
+Tatin treats each major version as a distinct package, so one package name produces four kinds of page. They are treated quite differently:
 
 | URL | What it is | How it is treated |
 |---|---|---|
 | `/v1/packages/versions/<name>-<major>` | **The package page**: description, install command, README, list of releases | Listed in the sitemap. This is the page meant to be found |
-| `/v1/packages/details/<package-id>` | One release and its configuration | Carries a canonical link to the package page |
+| `/v1/packages/details/<package-id>` | One release and its configuration | `noindex` |
+| `/v1/packages/dependencies/<package-id>` | The dependencies of one release | `noindex` |
 | `/v1/packages/major_versions/<name>` | A list of the major version lines | `noindex` |
 
 The rest of this page explains how each of those is arranged.
@@ -50,15 +51,11 @@ The rest of this page explains how each of those is arranged.
 
 ## robots.txt
 
-`robots.txt` sits at the root of a site and tells crawlers which paths not to fetch. Tatin serves it automatically. It disallows three paths of no use to a searcher:
+`robots.txt` sits at the root of a site and tells crawlers which paths not to fetch. Tatin serves it automatically, and it disallows nothing at all.
 
-```
-Disallow: /v1/tags
-Disallow: /v1/credential-report
-Disallow: /v1/version-information
-```
+That is deliberate, and it is the trap of the previous section seen from the other side. Disallowing a page you do not want indexed is self-defeating, because the crawler then never fetches it and never reads its `noindex`. Worse, a disallowed page that something links to can be indexed by its URL alone: the address appears in the results with no title and no description, which Google Search Console reports as "Indexed, though blocked by robots.txt". Every page that should stay out of an index therefore carries `noindex` and stays fetchable.
 
-It also carries `Crawl-delay: 10`, a request to wait ten seconds between fetches. Google ignores it; Bing, Yandex and Yahoo honour it.
+It carries `Crawl-delay: 10`, a request to wait ten seconds between fetches. Google ignores it; Bing, Yandex and Yahoo honour it.
 
 With a sitemap switched on, `robots.txt` points at it.
 
@@ -69,7 +66,7 @@ A sitemap lists the pages you would like a crawler to know about, with the date 
 
 Set `CONFIG:Sitemap = 1` to serve one. Without it `/sitemap.xml` returns a 404.
 
-Tatin lists the home page, the package list, the deprecated list, the group list, the licences page when there is one and **one page per major version line**, which is to say the package pages. It leaves out the `details` and `major_versions` pages deliberately: there is no sense inviting a crawler to spend its time on pages you have just asked it not to index.
+Tatin lists the home page, the package list, the deprecated list, the group list, the licences page when there is one and **one page per major version line**, which is to say the package pages. It leaves out the `details`, `dependencies` and `major_versions` pages deliberately: there is no sense inviting a crawler to spend its time on pages you have just asked it not to index.
 
 !!! danger "Behind a reverse proxy, set `CONFIG:BaseURL`"
 
@@ -103,19 +100,34 @@ This is the substantial one. It carries the package's README, fetched from GitHu
 A package page covers one major version line, and shows the README of the newest release in that line. It is fetched from that release's own tag rather than from the default branch, so the documentation belongs to the release it describes. [Maintenance](maintenance.md) covers the files this creates and how to force a re-fetch.
 
 
-## Canonical links
+## noindex on the details and dependencies pages
 
-Every release has a `details` page of its own. A package with forty releases therefore has forty pages differing in a version number and a date, and a search engine reasonably treats them as copies of one another. Faced with copies it picks one to keep, or keeps none of them, which is what Google Search Console reports as "Crawled - currently not indexed".
+Every release has a `details` page and a `dependencies` page of its own. A package with forty releases therefore has eighty pages differing in a version number and a date, and a search engine reasonably treats each of those sets as copies of one another. Faced with copies it picks one to keep, or keeps none of them, which is what Google Search Console reports as "Crawled - currently not indexed".
 
-A canonical link is how a site says which page of such a set is the real one:
+Neither page is offered for indexing:
 
 ```html
-<link rel="canonical" href="https://tatin.dev/v1/packages/versions/aplteam-HttpCommand-5">
+<meta name="robots" content="noindex">
 ```
 
-Every `details` page carries one pointing at the package page for its major version line. The standing of forty near-identical pages is thereby consolidated onto the single page that has the README on it.
+A canonical link naming the package page looks like the natural answer and is not one. Such a link says which page of a set of duplicates is the one to keep, but the search engine decides for itself which pages make up that set. The `details` pages of one major version line are near-identical to each other, so they form a set; the package page carries the README and the list of releases, so it is not in that set and cannot be elected from inside it. The hint is discarded, the engine keeps one of the `details` pages instead, and an arbitrary release ends up representing the package.
 
-Two things are worth knowing. It hides nothing: `details` pages stay reachable, stay linked and are served exactly as before, to people and crawlers alike. And it is a hint rather than an instruction, so a search engine may decide otherwise, and occasionally does.
+`noindex` asks for no judgement about duplicates, so nothing in that mechanism can defeat it.
+
+It hides nothing. Both kinds of page stay reachable, stay linked and are served exactly as before, to people and crawlers alike. `noindex` on its own permits the links to be followed, `follow` being the default, so a crawler passes through them to whatever they reference.
+
+
+## The canonical link on the package list
+
+Every tag on every row of the package list links to `/v1/packages?tag=<tag>`, and the page filters itself by that tag in the browser: `tag` never reaches the server, which returns the same document whatever it says. A registry with a hundred tags therefore offers a crawler a hundred URLs holding one page. That is the case a canonical link is made for:
+
+```html
+<link rel="canonical" href="/v1/packages">
+```
+
+It is worth seeing why the same mechanism works here and fails on the `details` pages above. Those pages are near-duplicates of one another, and the page the link named was not one of them, so the set the search engine formed never held the candidate it was being asked to elect. These URLs are not near-duplicates but the identical document, and the URL the link names is one of them. The hint names a member of the set, which is all a canonical link can ever do.
+
+`group` stays in the link. `/v1/packages?group=aplteam` really does list that group's packages and nothing else, so that page names itself and is indexed in its own right. The other parameters this page honours, `userCommand` and the three operating-system filters, leave it without a canonical link altogether: nothing links such a URL, so there is nothing to consolidate, and naming `/v1/packages` there would claim two different pages are one.
 
 
 ## noindex on the major-versions pages
@@ -128,7 +140,7 @@ Two things are worth knowing. It hides nothing: `details` pages stay reachable, 
 
 `noindex` on its own still permits the links to be followed, `follow` being the default, so a crawler passes through it to the package pages and merely stops trying to index an index.
 
-Note that this page is *not* disallowed in `robots.txt`, and that is deliberate: see the trap in [Crawling, indexing and ranking](#crawling-indexing-and-ranking).
+The tags page, the credential report and the version information carry `noindex` for the same reason: a filter, a summary of which groups need an API key and a list of version numbers are of no use to a searcher. None of them is disallowed in `robots.txt`, which is what lets the tag be read in the first place.
 
 
 ## Telling search engines at once: IndexNow

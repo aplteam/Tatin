@@ -1,4 +1,4 @@
- response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;list5;mat;group;msg;buff
+ response←request GetPackageList packageID;data;html;noOfVersions;IDs;parms;list5;mat;group;msg;buff;canonical
 ⍝ Respond to a request for some or all packages, HTML or JSON
  :If Reg.IsValidPackageName packageID
      :If 0<≢group←EstablishGroup packageID
@@ -67,6 +67,21 @@
      parms.(aggregate latest date since)←1 0 0 0
      parms.tags←1
      mat←packageID GetPackageList_ parms
-     html←packageID PrepareHtmlPageForPackageList mat
+⍝ "tag" is no parameter of this page at all: Assets/JS/package-list.js reads it in the
+⍝ browser, so "/v1/packages?tag=files" is the very same document as "/v1/packages". Every
+⍝ tag of every package links to such a URL, so a search engine meets hundreds of them,
+⍝ crawls them all and indexes none of them. The canonical link names the URL without it.
+⍝ A parameter the server does honour stays in, and one that cannot be expressed there
+⍝ leaves the page without a canonical link rather than with an untrue one; see
+⍝ `search-engines.md`.
+     :If parms.userCommand∨parms.dependencies∨(0≢parms.project_url)∨(0∊parms.(os_lin os_mac os_win))
+         canonical←''
+     :Else
+         canonical←Reg.VersionOf_REST,'/packages',((0<≢packageID)/'/'),packageID
+         :If 0<≢parms.group
+             canonical,←'?group=',parms.group
+         :EndIf
+     :EndIf
+     html←canonical PrepareHtmlPageForPackageList mat
      response←request ReturnHTML html
  :EndIf

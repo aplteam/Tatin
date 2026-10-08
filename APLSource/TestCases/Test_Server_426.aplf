@@ -1,0 +1,30 @@
+ r←Test_Server_426(stopFlag batchFlag);⎕TRAP;html
+⍝ The list of packages carries a canonical link, and the "tag" parameter is not part of it:
+⍝ Assets/JS/package-list.js reads that one in the browser, so every "?tag=..." URL - and
+⍝ every package row links to one per tag of that package - returns the very same page.
+⍝ "group" is a different matter, because the server really does filter by it, so it stays.
+⍝ A parameter that cannot be expressed in the canonical link leaves the page without one
+⍝ rather than with an untrue one; "userCommand" stands in for those here.
+ ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
+ r←T._Failed
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages'
+ →T.PassesIf∨/'<link rel="canonical" href="/v1/packages">'⍷html
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages?tag=files'
+ →T.PassesIf∨/'<link rel="canonical" href="/v1/packages">'⍷html
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages?group=example'
+ →T.PassesIf∨/'<link rel="canonical" href="/v1/packages?group=example">'⍷html
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages?group=example&tag=files'
+ →T.PassesIf∨/'<link rel="canonical" href="/v1/packages?group=example">'⍷html
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages/example-Goo'
+ →T.PassesIf∨/'<link rel="canonical" href="/v1/packages/example-Goo">'⍷html
+
+ html←∆GetHtmlFromServer'[localhost]/v1/packages?userCommand=1'
+ →T.PassesIf~∨/'<link rel="canonical"'⍷html
+
+ r←T._OK
+⍝Done

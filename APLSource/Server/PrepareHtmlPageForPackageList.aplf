@@ -1,11 +1,17 @@
- html←packageIDs PrepareHtmlPageForPackageList mat;groups;group;bool;noOf
+ html←canonical PrepareHtmlPageForPackageList mat;groups;group;bool;noOf;head
 ⍝ Returns the page listing all packages, grouped by their group.
 ⍝ `mat` comes from `GetPackageList_`, one row per package; see there for the columns.
+⍝ `canonical` is the URL this page is to be indexed under, or '' for none; `GetPackageList`
+⍝ establishes it and says why.
 ⍝ The filter, the sort switch and "Include tags in the filter" are done by the script
 ⍝ Assets/JS/package-list.js. Every row carries what that script needs as data attributes.
 ⍝ Without JavaScript the page is still complete, only without those tools: they are written
 ⍝ with `hidden` set, and the script shows them.
- html←(⍬ 'Packages' '/packages')HtmlHeader⊂'<script src="/Assets/JS/package-list.js" defer></script>'
+ head←⊂'<script src="/Assets/JS/package-list.js" defer></script>'
+ :If 0<≢canonical
+     head,←⊂'<link rel="canonical" href="',(EscapeAttributeValue canonical),'">'
+ :EndIf
+ html←(⍬ 'Packages' '/packages')HtmlHeader head
  html,←⊂'<h2>Packages <span class="row-count" id="pkg-count">',(⍕≢mat),'</span></h2>'
  html,←⊂'<div class="list-tools" id="pkg-tools" hidden>'
  html,←⊂'<div class="filter-row">'

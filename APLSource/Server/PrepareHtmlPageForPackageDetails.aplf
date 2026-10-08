@@ -1,13 +1,15 @@
- html←PrepareHtmlPageForPackageDetails(ID resolvedID json cfg canonical);majorLine;group;name;version;url;host
+ html←PrepareHtmlPageForPackageDetails(ID resolvedID json cfg);majorLine;group;name;version;url;host
 ⍝ The configuration of a single release, as it was published.
+⍝ Not indexed: to a search engine this page is a near-duplicate of the configuration page of
+⍝ every other release in the same major version line, and a canonical link naming the package
+⍝ page cannot cure that; see `search-engines.md`.
 ⍝ `ID` is what was asked for and `resolvedID` the release it led to. They differ when the
 ⍝ request named no version or only part of one, and the page then says so.
 ⍝ `json` is the config file as a vector of lines, `cfg` the same config as a namespace.
-⍝ `canonical` points at the "versions" page for this major line; see `GetCanonicalLink`.
  majorLine←Reg.RemoveMinorAndPatch resolvedID
  (group name)←2↑'-'(≠⊆⊢)resolvedID
  version←resolvedID↓⍨2⊃⍸'-'=resolvedID
- html←(⍬('Configuration of ',resolvedID)'/packages')HtmlHeader canonical
+ html←(1('Configuration of ',resolvedID)'/packages')HtmlHeader''
  html,←⊂'<div class="page-head">'
  html,←⊂GetBreadcrumb('Packages'(Reg.VersionOf_REST,'/packages'))(group(GetGroupHref group))(name(Reg.VersionOf_REST,'/packages/versions/',majorLine))(version'')
  :If (⎕C ID)≡⎕C resolvedID

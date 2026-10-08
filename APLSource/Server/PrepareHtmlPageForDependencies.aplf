@@ -1,15 +1,17 @@
- html←PrepareHtmlPageForDependencies(packageID deps canonical);noOfDeps;majorLine;group;name;version
+ html←PrepareHtmlPageForDependencies(packageID deps);noOfDeps;majorLine;group;name;version
 ⍝ The dependencies of a single release, as they were recorded when it was published.
+⍝ Not indexed: to a search engine this page is a near-duplicate of the dependencies page of
+⍝ every other release in the same major version line, and a canonical link naming the package
+⍝ page cannot cure that; see `search-engines.md`.
 ⍝ `deps` is the dependencies file as a vector of lines, one dependency per line; see
 ⍝ `PrepareHtmlPageForDependencies_` for what a line may look like.
-⍝ `canonical` points at the "versions" page for this major line; see `GetCanonicalLink`.
  deps←' '~⍨¨deps
  deps←(0<≢¨deps)/deps
  noOfDeps←≢deps
  majorLine←Reg.RemoveMinorAndPatch packageID
  (group name)←2↑'-'(≠⊆⊢)packageID
  version←packageID↓⍨2⊃⍸'-'=packageID
- html←(⍬('Dependencies of ',packageID)'/packages')HtmlHeader canonical
+ html←(1('Dependencies of ',packageID)'/packages')HtmlHeader''
  html,←⊂'<div class="page-head">'
  html,←⊂GetBreadcrumb('Packages'(Reg.VersionOf_REST,'/packages'))(group(GetGroupHref group))(name(Reg.VersionOf_REST,'/packages/versions/',majorLine))(version'')
  html,←⊂'<p class="page-label">Dependencies</p>'

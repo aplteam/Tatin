@@ -1,17 +1,23 @@
  r←Test_Server_209(stopFlag batchFlag);⎕TRAP;html
 ⍝ Every release of a major version line has a "details" and a "dependencies" page of its own,
-⍝ and to a search engine those look like near-duplicates of one another. Both must therefore
-⍝ name the "versions" page of that major line as the one to be indexed.
+⍝ and to a search engine those look like near-duplicates of one another. Neither is therefore
+⍝ offered for indexing.
+⍝ What is checked here is the absence of a canonical link naming the "versions" page. That is
+⍝ how this was solved first, and it does not work: a search engine honours a canonical link
+⍝ only within a set of pages it considers duplicates of one another, and the "versions" page
+⍝ is not in that set. It must not come back.
+⍝ That the pages carry "noindex" cannot be checked here: the INI file of the test server sets
+⍝ CONFIG:NoIndexing, so every page it serves carries the tag whatever the code does.
  ⎕TRAP←(999 'C' '. ⍝ Deliberate error')(0 'N')
  r←T._Failed
 
  html←∆GetHtmlFromServer'[localhost]/v1/packages/details/aplteam-APLProcess-0.2.0'
- →T.PassesIf∨/'<link rel="canonical" href="'⍷html
- →T.PassesIf∨/'/packages/versions/aplteam-APLProcess-0">'⍷html
+ →T.PassesIf∨/'aplteam-APLProcess-0.2.0'⍷html
+ →T.PassesIf~∨/'<link rel="canonical"'⍷html
 
  html←∆GetHtmlFromServer'[localhost]/v1/packages/dependencies/aplteam-APLProcess-0.2.0'
- →T.PassesIf∨/'<link rel="canonical" href="'⍷html
- →T.PassesIf∨/'/packages/versions/aplteam-APLProcess-0">'⍷html
+ →T.PassesIf∨/'aplteam-APLProcess-0.2.0'⍷html
+ →T.PassesIf~∨/'<link rel="canonical"'⍷html
 
  r←T._OK
 ⍝Done

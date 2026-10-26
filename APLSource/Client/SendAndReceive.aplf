@@ -1,4 +1,4 @@
- r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg;errorCounter;qdmx
+ r←SendAndReceive(uri request);client;uri_;port;⎕TRAP;msg;errorCounter;qdmx;onClosedConnection
 ⍝ Whether there is a (semi-)global ∆PermanentConnections or not makes a difference here:
 ⍝ * If it exists it's supposed to hold clients for all HTTP registries with a priority>0.
 ⍝   This can improve performance dramatically because the same connection can be used again.
@@ -8,7 +8,18 @@
  {}(Reg.TatinVersionAsHttpHeader)∘AddHeader¨request
  request←AddTestFlag request
  msg←uri,' did not respond'
- ⎕TRAP←(345 'C'('''',uri,''' SignalNoConnection ''',msg,''''))(347 'N')(348 'C' '→∆Go,errorCounter←errorCounter+1')(0 'S')
+⍝ A connection that dies says nothing about whether the server acted on the request: it looks
+⍝ the same whether the request never arrived or whether its answer was lost on the way back.
+⍝ A request that changes something must therefore not be sent a second time. Tatin's PUT is
+⍝ the one that hurts: it creates a package and refuses to overwrite one, so a replay turns a
+⍝ lost answer into "The package has already been published".
+⍝ 348 means "worth trying again" (see `SignalNoConnection`), and for everything that only
+⍝ reads it still does. For the rest it becomes a 347, which is passed outward.
+ onClosedConnection←348 'C' '→∆Go,errorCounter←errorCounter+1'
+ :If ∨/(⊆request.Method)∊'PUT' 'POST' 'DELETE' 'PATCH'
+     onClosedConnection←348 'C' '(''Lost the connection to '',uri,''; whether the request was carried out is unknown'')⎕SIGNAL 347'
+ :EndIf
+ ⎕TRAP←(345 'C'('''',uri,''' SignalNoConnection ''',msg,''''))(347 'N')onClosedConnection(0 'S')
  errorCounter←0
  :If 9=⎕NC'∆PermanentConnections'
      uri_←1 CompileNameFromUrl uri

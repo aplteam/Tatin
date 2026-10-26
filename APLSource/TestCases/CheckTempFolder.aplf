@@ -1,4 +1,16 @@
  CheckTempFolder(name ps);⎕TRAP
+⍝ Called by Tester2 after every single test, but only when `T.exec_after_each_test` names
+⍝ this function; see `Initial`, where the assignment sits commented out.
+⍝ It suspends rather than reports, hence ⎕TRAP←0 'S': the test that caused the problem is
+⍝ then still on the stack, and `name` says which one it was.
+⍝ What's checked:
+⍝ A "SomeGroup" package in the Registry of the test server. Only `Test_UC_002` and
+⍝ `Test_UC_007` ever publish one, and both delete it again in their ∆TidyUp. One that
+⍝ survives a test means ∆TidyUp did not get that far, and whichever of the two runs next
+⍝ is then told that its first publish has already been published - which neither expects.
+⍝ `Test_UC_007` has no automated answer for the question that follows, so it waits for one.
  ⎕TRAP←0 'S'
- {⍵:.}0<≢⊃F.Dir(739⌶0),'/kai*'
+ :If 0<⎕NC'∆TEMP_SERVER_FOLDER'                    ⍝ Undefined until `Initial` has run
+     {⍵:.}0<≢⊃F.Dir ∆TEMP_SERVER_FOLDER,'SomeGroup-*'
+ :EndIf
 ⍝Done

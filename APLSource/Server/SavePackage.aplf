@@ -1,4 +1,4 @@
- response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;rc;list;list_lc;packageID2
+ response←SavePackage request;packageID;target;tempFolder;filename;msg;statusCode;qdmx;exc;list;list_lc;packageID2
 ⍝ `packageID` is a valid package ID
 ⍝ This function saves the data in the appropriate folder which of course must not exist.
  packageID←request.RequestTarget
@@ -43,11 +43,9 @@
  response.Content←msg
  :If response.StatusCode=200
      Reg.Index.Compile G.RegistryPath
-     ⎕DL 0.5
-     (rc msg)←Emails.SendMail_PublishedPkg G.INI packageID G.RegistryPath
-     :If rc≠0
-         P.AppLogError'Sending email to gatekeeper with notification of a published package failed: ',(⍕rc),'; ',⍕∊rc
-     :EndIf
+⍝ As a thread, so that the client gets its answer whatever the SMTP server is up to; see
+⍝ `NotifyGatekeeper`, which also reports a failure for itself.
+     NotifyGatekeeper&packageID
  :EndIf
  F.RmDir tempFolder
 ⍝Done

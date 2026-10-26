@@ -16,11 +16,13 @@ For a complete list of fixes, added features, etc. see [Tatin on GitHub](https:/
  
 ---
 
-## v0.128.1 ⋄ 2026-10-07
+## v0.128.1 ⋄ 2026-10-25
 
 * The configuration page and the dependencies page of a release are no longer indexed by search engines: they carry "noindex" rather than a canonical link naming the package page, which search engines ignored. Both pages stay reachable and linked.
 * The tags page, the credential report and the version information are no longer indexed either, and "robots.txt" does not disallow anything any more. The two go together: a crawler must fetch a page in order to see its "noindex", and a page it may not fetch can still be indexed by its URL alone, with no title and no description. All three are linked from the menu or the footer of every page, which is what made them candidates.
 * Every tag of every package on the package list links to that list filtered by the tag, and the filtering happens in the browser, so all those URLs return the same page. The page now carries a canonical link naming the URL without the tag, so that a search engine treats them as one page rather than crawling hundreds of them and indexing none.
+* A request that changes something on a Registry (publishing a package, deleting one, deprecating one) is no longer sent a second time when the connection dies. A dead connection looks the same whether the request never arrived or whether its answer was lost on the way back, so re-sending it may carry out the same change twice. Such a request now reports that the connection was lost and that whether it was carried out is unknown; requests that only read are still retried as before.
+* A server now tells the gatekeeper about a newly published package in a thread of its own rather than before it answers the client. An SMTP server that was slow or unreachable used to hold up the answer long enough for the connection to be closed as idle, whereupon the client sent the same request again and got "The package has already been published" for a package it had in fact just published.
 
 
 ## v0.128.0 ⋄ 2026-10-03
@@ -498,6 +500,7 @@ No breaking changes, no user actions required.
 ## v0.96.0 ⋄ 2023-05-18
 
 No breaking changes, no user actions required.
+
 
 
 

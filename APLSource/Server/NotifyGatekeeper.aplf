@@ -1,0 +1,21 @@
+ NotifyGatekeeper packageID;rc;msg;qdmx
+⍝ Tells the gatekeeper(s) that `packageID` has been published. Whether an email is sent at
+⍝ all is decided by `Emails.SendMail_PublishedPkg`.
+⍝ `SavePackage` runs this as a thread, and that is what the function is for: an SMTP server
+⍝ may take tens of seconds to answer, or never answer at all, and until it does the client
+⍝ has no response. Plodder closes the connection as idle long before that, the client cannot
+⍝ tell that from a request that never arrived and sends the same one again, and the server
+⍝ reports the package it has just written as already published.
+⍝ A thread has no caller for an error to travel to, so this one reports for itself. It traps
+⍝ whatever `SendMail` may throw as well: a suspended thread would sit in the server for the
+⍝ rest of its life, holding on to a Conga client.
+ :Trap 0
+     (rc msg)←Emails.SendMail_PublishedPkg G.INI packageID G.RegistryPath
+ :Else
+     qdmx←⎕DMX
+     (rc msg)←qdmx.EN qdmx.EM
+ :EndTrap
+ :If rc≠0
+     LogError'Sending email to gatekeeper with notification of a published package failed: ',(⍕rc),'; ',⍕∊msg
+ :EndIf
+⍝Done
